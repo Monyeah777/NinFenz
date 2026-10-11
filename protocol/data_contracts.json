@@ -156,6 +156,27 @@
      "freshness": "同上", "consumers": ["check28"]},
     {"id": "schema-asset", "artifact": "protocol/schema/asset.schema.json",
      "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "同上", "consumers": ["check28"]}
+     "freshness": "同上", "consumers": ["check28"]},
+     {"id": "error-codes", "artifact": "protocol/error_codes.json",
+     "quality_rule": "assertion:error-codes-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "injection-profiles", "artifact": "protocol/injection_profiles.json",
+     "quality_rule": "assertion:injection-profiles-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "boundaries", "artifact": "protocol/boundaries.json",
+     "quality_rule": "assertion:boundaries-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "path-moved", "artifact": "protocol/path_moved.json",
+     "quality_rule": "assertion:path-moved-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "declined", "artifact": "protocol/declined.json",
+     "quality_rule": "assertion:declined-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "schema-pins", "artifact": "protocol/schema_pins.json",
+     "quality_rule": "assertion:schema-pins-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
+     {"id": "requirements", "artifact": "protocol/requirements.json",
+     "quality_rule": "assertion:requirements-face", "owner": "机制维护（断言即 owner）", "status": "active",
+     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]}
   ]
 }

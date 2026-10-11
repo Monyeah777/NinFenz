@@ -1,0 +1,5 @@
+{
+  "schema": "nf-path-moved/1",
+  "note": "路径迁移映射 old→new（机制借鉴 eunomia-bpf docs/MOVED.md；消费方 core/path_moved.py）。library/llms.txt/site 等直链面改路径时必须登记，防外部引用断裂。",
+  "moves": {}
+}
