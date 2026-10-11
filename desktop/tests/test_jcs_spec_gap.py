@@ -45,5 +45,20 @@ class JcsSpecGapTest(unittest.TestCase):
         self.assertEqual('{"n":[1,1.5,1e+30],"s":"x\\ny"}', got)
 
 
+    def test_integer_valued_float_differs_from_spec(self):
+        """差异类 B（D-10 影响评估实测 7/79 文档命中）：Python 发 1.0，JCS 发 1。"""
+        repo = attest.canonical({"v": 1.0}).decode("utf-8")
+        self.assertEqual('{"v":1.0}', repo)
+        self.assertNotEqual('{"v":1}', repo,
+                            "仓库口径已与 JCS 数值形态一致——请更新计划 §23.31 与 D-10")
+
+    def test_exponent_leading_zero_differs_from_spec(self):
+        """差异类 B 之二：Python 1e-07，ES6/JCS 1e-7。"""
+        repo = attest.canonical({"v": 1e-07}).decode("utf-8")
+        self.assertEqual('{"v":1e-07}', repo)
+        self.assertNotEqual('{"v":1e-7}', repo,
+                            "指数形态已变——请更新计划 §23.31 与 D-10")
+
+
 if __name__ == "__main__":
     unittest.main()
