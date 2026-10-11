@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:e02c4d6c5f49b671afd3374cd5b7c542a04026958bb4b34e4052da8256762053
   - desktop/src/core/pack_combo.py:210dda5d7ac5ba32ae1d7087d098bfe95cfa182f722a96f4aef5ebab765c661b
-  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
+  - protocol/code_metrics_baseline.json:df6bae5949ef679de984b1a60f3d9958b29b5da13df5492680524381f3a27f4d
 ---
 
 > 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
