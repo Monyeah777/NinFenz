@@ -185,6 +185,84 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
             "fuel_total": total, "rounds": rounds}
 
 
+def _body_facts(body: List[Dict[str, Any]],
+                subst: Dict[str, Any]) -> Tuple[Tuple[str, Tuple[Any, ...]], ...]:
+    """把已绑定的规则体原子实例化成基事实（guard 不计），作为推导图的入边。"""
+    out = []
+    for b in body:
+        if "guard" in b:
+            continue
+        out.append((b["pred"], tuple(subst.get(a, a) if is_var(a) else a for a in b["args"])))
+    return tuple(out)
+
+
+def evaluate_dag(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+    """**第三后端**（gate-DAG 风格）：显式记录「谁推出谁」，再按依赖深度分层。
+
+    与朴素/半朴素后端的差别只在**是否物化推导图**：事实集三者必须逐条相同（差分自检）。
+    返回额外给出 graph 统计（节点/边/最大深度）——它是「规则 → 可调度 DAG」的桥。
+    """
+    issues = validate(doc)
+    if issues:
+        return {"status": "INVALID", "issues": issues, "facts": [],
+                "fuel_used": 0, "fuel_total": 0, "rounds": 0,
+                "graph": {"nodes": 0, "edges": 0, "depth": 0}}
+    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+    base: Set[Tuple[str, Tuple[Any, ...]]] = {
+        (f["pred"], tuple(f["args"])) for f in doc["facts"]}
+    facts = set(base)
+    edges: Dict[Tuple[str, Tuple[Any, ...]], Set[Any]] = {}
+    counter: List[Any] = [0, total, False]
+    rounds = 0
+    while True:
+        rounds += 1
+        by_pred = _index(facts)
+        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        for r in doc["rules"]:
+            head = r["head"]
+
+            def _on(subst: Dict[str, Any], head=head) -> None:
+                if counter[2]:
+                    return
+                counter[0] += 1
+                if counter[0] > counter[1]:
+                    counter[2] = True
+                    return
+                node = (head["pred"],
+                        tuple(subst.get(a, a) if is_var(a) else a for a in head["args"]))
+                new.add(node)
+                deps = edges.setdefault(node, set())
+                for bf in _body_facts(r["body"], subst):
+                    if bf != node:
+                        deps.add(bf)
+
+            _bind(r["body"], by_pred, {}, _on)
+            if counter[2]:
+                break
+        added = new - facts
+        facts |= added
+        if counter[2] or not added:
+            break
+    depth = 0
+    memo: Dict[Any, int] = {f: 0 for f in base}
+    for _ in range(len(facts) + 1):
+        changed = False
+        for node, deps in edges.items():
+            if node not in facts:
+                continue
+            d = 1 + max((memo.get(x, 0) for x in deps), default=0)
+            if d > memo.get(node, 0):
+                memo[node] = d
+                changed = True
+        if not changed:
+            break
+    depth = max(memo.values(), default=0)
+    derived_edges = sum(len([d for d in deps if d in facts]) for deps in edges.values())
+    return {"status": "FUEL_EXHAUSTED" if counter[2] else "OK", "facts": _fmt(facts),
+            "fuel_used": counter[0], "fuel_total": total, "rounds": rounds,
+            "graph": {"nodes": len(facts), "edges": derived_edges, "depth": depth}}
+
+
 def _fmt(facts: Set[Tuple[str, Tuple[Any, ...]]]) -> List[str]:
     return sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts)
 

@@ -20,10 +20,14 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="NFA-L/R 规则求值（只读）")
     ap.add_argument("--file", required=True)
     ap.add_argument("--fuel", type=int, default=0)
+    ap.add_argument("--backend", default="naive", choices=("naive", "seminaive", "dag"),
+                    help="求值后端（三者事实集必须相同；dag 额外给出推导图统计）")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     doc = json.loads(Path(args.file).read_text(encoding="utf-8"))
-    got = nr.evaluate(doc, fuel=args.fuel or None)
+    fn = {"naive": nr.evaluate, "seminaive": nr.evaluate_seminaive,
+          "dag": nr.evaluate_dag}[args.backend]
+    got = fn(doc, fuel=args.fuel or None)
     if args.json:
         print(json.dumps(got, ensure_ascii=False, indent=2, sort_keys=True))
     else:
