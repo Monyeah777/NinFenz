@@ -17,8 +17,22 @@ asset_line_baseline / machine_contract / conformance_report）。同一路径知
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
+#: 进程内记忆：根 → {品类: 件表}。为什么加（2026-10-11 剖析 §23.35）：locate/mine 等按品类逐个
+#: glob，且被**逐件**调用 ⇒ 单次 catalog 触发 37,684 次 glob / 65k 次 stat。记忆只在进程内有效；
+#: 本进程内改过文件面的调用方须显式 reset_files（同族先例：import_graph.reset_code_scope）。
+_FILES_MEMO: Dict[str, Dict[str, List[str]]] = {}
+
+
+def reset_files(root: Optional[str] = None) -> None:
+    """清品类件表记忆（改了文件面后调用）；root=None 清全部。"""
+    if root is None:
+        _FILES_MEMO.clear()
+        return
+    _FILES_MEMO.pop(os.path.normcase(os.path.abspath(str(root))), None)
 
 LAYERS_REL = "protocol/LAYERS.json"
 
@@ -106,13 +120,20 @@ def globs(root: str, cat_id: str) -> Tuple[str, ...]:
 
 
 def files(root: str, cat_id: str) -> List[str]:
-    """按品类枚举文件（仓库相对 posix 路径；逐 glob 各自排序，不跨 glob 去重）。"""
-    base = Path(root)
-    out: List[str] = []
-    for pat in globs(root, cat_id):
-        out.extend(sorted(p.relative_to(base).as_posix()
-                          for p in base.glob(pat) if p.is_file()))
-    return out
+    """按品类枚举文件（仓库相对 posix；逐 glob 各自排序，不跨 glob 去重）。**进程内记忆**。
+
+    返回**副本**：调用方就地排序/追加不会污染记忆（同输入同输出仍成立）。
+    """
+    key = os.path.normcase(os.path.abspath(str(root)))
+    bucket = _FILES_MEMO.setdefault(key, {})
+    if cat_id not in bucket:
+        base = Path(root)
+        out: List[str] = []
+        for pat in globs(root, cat_id):
+            out.extend(sorted(p.relative_to(base).as_posix()
+                              for p in base.glob(pat) if p.is_file()))
+        bucket[cat_id] = out
+    return list(bucket[cat_id])
 
 
 def locate(root: str, rel: str) -> List[str]:

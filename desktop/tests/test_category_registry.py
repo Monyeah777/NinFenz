@@ -140,5 +140,26 @@ class CoverageTest(unittest.TestCase):
         self.assertFalse(any("未归属" in w for w in warns), warns)
 
 
+class FilesMemoTest(unittest.TestCase):
+    """§23.35 进程内记忆：返回副本 / 陈旧是有意为之 / reset_files 后可见新增。"""
+
+    def test_copy_then_stale_then_reset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "03_管线库"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "P01.md").write_text("x", encoding="utf-8")
+            cr.reset_files(tmp)
+            first = cr.files(tmp, "core-pipelines")
+            self.assertEqual(["03_管线库/P01.md"], first)
+            first.append("bogus")                     # 就地改不得污染记忆
+            self.assertEqual(["03_管线库/P01.md"], cr.files(tmp, "core-pipelines"))
+            (d / "P02.md").write_text("x", encoding="utf-8")
+            self.assertEqual(["03_管线库/P01.md"], cr.files(tmp, "core-pipelines"),
+                             "记忆内看不到新增件（须显式 reset 才刷新）")
+            cr.reset_files(tmp)
+            self.assertEqual(["03_管线库/P01.md", "03_管线库/P02.md"],
+                             cr.files(tmp, "core-pipelines"))
+
+
 if __name__ == "__main__":
     unittest.main()
