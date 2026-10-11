@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """core.interop 回归：分派 / 通知不应答 / 错误码 / 批量 / stdio 坏帧不杀会话。"""
 import io
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -92,6 +93,56 @@ class StdioTest(unittest.TestCase):
         self.assertEqual(0, rc)
         self.assertEqual(ip.PARSE_ERROR, first["error"]["code"])
         self.assertEqual(2, second["result"], "坏帧后必须继续服务（旧坑：一帧坏就收摊）")
+
+
+class ThreeTransportsTest(unittest.TestCase):
+    """P-I1：**同一分派核心**挂三条传输，必须给出同一结果。"""
+
+    REQ = {"jsonrpc": "2.0", "id": 42, "method": "add", "params": {"a": 20, "b": 22}}
+
+    def _via_stdio(self):
+        buf = io.BytesIO()
+        framing.write_message(buf, self.REQ)
+        buf.seek(0)
+        out = io.BytesIO()
+        ip.serve_stdio(_d(), buf, out)
+        out.seek(0)
+        return framing.read_message(out)
+
+    def _via_lines(self):
+        buf = io.BytesIO((json.dumps(self.REQ) + "\n").encode("utf-8"))
+        out = io.BytesIO()
+        ip.serve_lines(_d(), buf, out)
+        return json.loads(out.getvalue().decode("utf-8").strip())
+
+    def _via_http(self):
+        import urllib.request
+        server, _thread = ip.serve_http(_d())
+        try:
+            port = server.server_address[1]
+            req = urllib.request.Request(
+                "http://127.0.0.1:%d/" % port, method="POST",
+                data=json.dumps(self.REQ).encode("utf-8"),
+                headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        finally:
+            server.shutdown()
+            server.server_close()
+
+    def test_same_result_across_transports(self):
+        got = {"stdio": self._via_stdio(), "lines": self._via_lines(), "http": self._via_http()}
+        self.assertEqual({"jsonrpc": "2.0", "id": 42, "result": 42}, got["stdio"])
+        self.assertEqual(got["stdio"], got["lines"], got)
+        self.assertEqual(got["stdio"], got["http"], got)
+
+    def test_lines_bad_line_continues(self):
+        buf = io.BytesIO(b"{not json}\n" + (json.dumps(self.REQ) + "\n").encode("utf-8"))
+        out = io.BytesIO()
+        self.assertEqual(0, ip.serve_lines(_d(), buf, out))
+        rows = [json.loads(x) for x in out.getvalue().decode("utf-8").strip().splitlines()]
+        self.assertEqual(ip.PARSE_ERROR, rows[0]["error"]["code"])
+        self.assertEqual(42, rows[1]["result"])
 
 
 if __name__ == "__main__":
