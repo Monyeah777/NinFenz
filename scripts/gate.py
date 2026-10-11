@@ -64,6 +64,21 @@ def _derive(as_json):
     return 0
 
 
+def _route(changed, as_json):
+    from core import gate_router as gr
+    experts = gf.load_manifest(ROOT)
+    issues, plan, stats = gr.route(ROOT, changed or [], experts=experts)
+    issues += gr.audit_route(ROOT, plan, experts)
+    lines = ["== 路由（策略 S）==", "  changed=%d dense=%d routed=%d dormant=%d"
+             % (stats["changed"], stats["dense"], stats["routed"], stats["dormant"])]
+    for r in plan["routed"]:
+        lines.append("  [跑] %s（%s）" % (r["id"], r["via"]))
+    for d in plan["dormant"]:
+        lines.append("  [眠] %s（%s）" % (d["id"], d["reason"]))
+    _emit("gate-route", {"issues": issues, "plan": plan, "stats": stats}, as_json, lines)
+    return 1 if issues else 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁读面台账（只读）")
     ap.add_argument("--json", action="store_true")
@@ -71,6 +86,8 @@ def main(argv=None) -> int:
     ap.add_argument("--static-faces", action="store_true")
     ap.add_argument("--manifest", action="store_true")
     ap.add_argument("--derive", action="store_true", help="声明级别 vs 源码推导")
+    ap.add_argument("--route", nargs="*", default=None, metavar="PATH",
+                    help="按变更路径求路由（策略 S）并自检")
     args = ap.parse_args(argv)
     if args.observed:
         return _observed(args.json)
@@ -80,6 +97,8 @@ def main(argv=None) -> int:
         return _manifest(args.json)
     if args.derive:
         return _derive(args.json)
+    if args.route is not None:
+        return _route(args.route, args.json)
     issues, stats = gf.audit(ROOT)
     if args.json:
         print(json.dumps({"kind": "gate-audit", "issues": issues, "stats": stats},
