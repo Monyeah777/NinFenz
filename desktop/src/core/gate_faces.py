@@ -110,6 +110,32 @@ def static_faces(root: str = ".") -> Dict[str, List[str]]:
     return out
 
 
+def compress_face(paths: Iterable[str]) -> List[str]:
+    """具体路径集 → 尽量少的 glob（按 前两段 + 扩展名 归并；宁可过覆盖，不可漏）。
+
+    M2 实测（§23.17）：静态声明面（手写路径）远小于真读面，会漏判；声明面**必须**由
+    观测面生成，本函数即那步的压缩器。
+    """
+    groups: Dict[Any, int] = {}
+    for p in paths:
+        parts = _posix(p).split("/")
+        ext = os.path.splitext(parts[-1])[1]
+        # len>=3 取前两段（如 desktop/src）；len==2 取首段（如 scripts）；根文件取自身
+        prefix = "/".join(parts[:2]) if len(parts) >= 3 else parts[0]
+        key = (prefix, ext)
+        groups[key] = groups.get(key, 0) + 1
+    out = []
+    for (prefix, ext), _n in sorted(groups.items()):
+        out.append("%s/**/*%s" % (prefix, ext) if ext else "%s/**/*" % prefix)
+    return sorted(out)
+
+
+def derive_reads(root: str, observed: Iterable[str]) -> List[str]:
+    """观测读面 → 声明 reads（仓库相对 glob）。"""
+    rels = [r for r in (_posix(x) for x in observed) if r and r != "."]
+    return compress_face(rels)
+
+
 def load_manifest_doc(root: str = ".") -> Dict[str, Any]:
     """读声明面原文；缺件/坏件返回空表（由 audit 如实报 warn，不裸崩）。"""
     p = Path(root) / MANIFEST_REL
@@ -190,15 +216,30 @@ def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
     return out
 
 
+def _glob_variants(g: str) -> List[str]:
+    """glob 变体：`**/` 允许**零层**目录（fnmatch 的 `*` 本就跨 `/`，故去掉即覆盖）。
+
+    修的是实测缺陷：`scripts/**/*.py` 曾匹配不到 `scripts/a.py`（`**/` 被当成必需一层），
+    方向一律**偏过覆盖**（宁可多跑，不可漏跑）。
+    """
+    out = [g]
+    if "**/" in g:
+        out.append(g.replace("**/", ""))
+        out.append(g.replace("**/", "*/"))
+    if "**" in g:
+        out.append(g.replace("**", "*"))
+    return out
+
+
 def covered(path: str, patterns: Iterable[str]) -> bool:
-    """path 是否被 patterns 覆盖：非 glob 按目录前缀；glob 按 fnmatch。"""
+    """path 是否被 patterns 覆盖：非 glob 按目录前缀；glob 按 fnmatch（含 globstar 变体）。"""
     p = _cmp(path)
     for pat in patterns:
         g = _cmp(pat)
         if not any(ch in g for ch in "*?["):
             if p == g or p.startswith(g.rstrip("/") + "/"):
                 return True
-        elif fnmatch.fnmatchcase(p, g):
+        elif any(fnmatch.fnmatchcase(p, v) for v in _glob_variants(g)):
             return True
     return False
 

@@ -143,5 +143,20 @@ class SkipSafetyTest(unittest.TestCase):
         self.assertTrue(why)
 
 
+class CompressFaceTest(unittest.TestCase):
+    """M2：声明面由观测面生成（压缩成 glob，宁可过覆盖不可漏）。"""
+
+    def test_compress_groups_by_prefix_and_ext(self):
+        got = gf.compress_face(["scripts/a.py", "scripts/b.py", "docs/x.md"])
+        self.assertIn("scripts/**/*.py", got)
+        self.assertIn("docs/**/*.md", got)
+
+    def test_derive_reads_covers_every_observed_path(self):
+        observed = ["scripts/a.py", "scripts/b.py", "protocol/x.json"]
+        reads = gf.derive_reads(".", observed)
+        for rel in observed:
+            self.assertTrue(gf.covered(rel, reads), (rel, reads))
+
+
 if __name__ == "__main__":
     unittest.main()
