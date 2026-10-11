@@ -17,21 +17,15 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
+from core import effect_rows as er
+
 MANIFEST_REL = "protocol/gate_experts.json"
 CODE_FACES = ("desktop/src/core", "scripts")
 #: 声明面口径（§4）：顶层 schema 名与 skip_safety 三档（§5）。
 MANIFEST_SCHEMA = "nf-gate-experts/1"
 SKIP_SAFETY = ("SAFE", "CONDITIONAL", "UNSAFE")
 
-#: 非确定/外部面标记（§5 与 §15.4）：命中即 UNSAFE，永不被路由裁剪。
-EFFECT_MARKERS = {
-    "net": ("socket", "urllib", "http.client", "requests", "httpx", "aiohttp"),
-    "proc": ("subprocess", "shutil.which", "os.system", "ctypes", "multiprocessing"),
-    "env": ("os.environ", "os.getenv", "getpass", "platform.system", "sys.platform"),
-    "time": ("time.time", "time.perf_counter", "time.monotonic", "datetime.now", "date.today"),
-}
-#: 文件系统探测标记：命中即 CONDITIONAL（条件可枚举，触达其条件时必须入列）。
-FS_PROBE = ("os.path.exists", "Path.exists", "is_file", "is_dir", "glob(", "iterdir", "walk(")
+# 效应标记表已迁到 core/effect_rows.py（P-A2：效应行成层，ast 可证 + 规则层同判定）。
 
 
 def _posix(p: str) -> str:
@@ -218,19 +212,13 @@ def validate_manifest(doc: Any) -> List[str]:
 
 
 def classify_source(text: str) -> Tuple[str, List[str]]:
-    """源码面 → (skip_safety, 依据)：命中 env/proc/time/net 即 UNSAFE；文件系统探测为 CONDITIONAL。
+    """源码面 → (skip_safety, 依据)。
 
-    这是 §15.4「效应行 → skip_safety」在 DSL 效应行落地**之前**的同判据近似：
-    NFA-L/R 效应行一落地，本函数的输入即由「源码文本」换成「效应行」，判定表不变。
+    P-A2 起：输入换成 **effect_rows 的效应行**（ast 可证，带行号），判定表不变；
+    需要规则层同判定时用 effect_rows.level_via_rules（差分自证见 test_effect_rows）。
     """
-    hits = [kind + ":" + m for kind, marks in sorted(EFFECT_MARKERS.items())
-            for m in marks if m in text]
-    if hits:
-        return "UNSAFE", hits
-    probes = [m for m in FS_PROBE if m in text]
-    if probes:
-        return "CONDITIONAL", probes
-    return "SAFE", []
+    rs = er.rows(text)
+    return er.level(rs), ["%s:%s(L%s)" % (r["kind"], r["evidence"], r["line"]) for r in rs]
 
 
 def derive_skip_safety(root: str, expert: Dict[str, Any]
