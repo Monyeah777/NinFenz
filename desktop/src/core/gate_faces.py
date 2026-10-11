@@ -18,6 +18,9 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 MANIFEST_REL = "protocol/gate_experts.json"
 CODE_FACES = ("desktop/src/core", "scripts")
+#: 声明面口径（§4）：顶层 schema 名与 skip_safety 三档（§5）。
+MANIFEST_SCHEMA = "nf-gate-experts/1"
+SKIP_SAFETY = ("SAFE", "CONDITIONAL", "UNSAFE")
 
 
 def _posix(p: str) -> str:
@@ -97,8 +100,8 @@ def static_faces(root: str = ".") -> Dict[str, List[str]]:
     return out
 
 
-def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
-    """读专家声明面；缺件/坏件返回空表（由 audit 如实报 warn，不裸崩）。"""
+def load_manifest_doc(root: str = ".") -> Dict[str, Any]:
+    """读声明面原文；缺件/坏件返回空表（由 audit 如实报 warn，不裸崩）。"""
     p = Path(root) / MANIFEST_REL
     if not p.is_file():
         return {}
@@ -106,7 +109,37 @@ def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
         doc = json.loads(p.read_text(encoding="utf-8"))
     except ValueError:
         return {}
-    out = {}
+    return doc if isinstance(doc, dict) else {}
+
+
+def validate_manifest(doc: Any) -> List[str]:
+    """声明面形状校验 → 违例清单（空=合规）。fail-closed：缺字段/未知级别即违例。"""
+    out: List[str] = []
+    if not isinstance(doc, dict) or not doc:
+        return ["声明面缺失或非对象"]
+    if doc.get("schema") != MANIFEST_SCHEMA:
+        out.append("schema 须为 %s，实为 %r" % (MANIFEST_SCHEMA, doc.get("schema")))
+    experts = doc.get("experts")
+    if not isinstance(experts, list):
+        return out + ["experts 须为数组"]
+    for i, e in enumerate(experts):
+        if not isinstance(e, dict):
+            out.append("experts[%d] 须为对象" % i)
+            continue
+        if not str(e.get("id") or "").strip():
+            out.append("experts[%d] 缺 id" % i)
+        if not isinstance(e.get("reads"), list):
+            out.append("experts[%d] reads 须为数组（读面声明）" % i)
+        if e.get("skip_safety") not in SKIP_SAFETY:
+            out.append("experts[%d] skip_safety 须在 %s，实为 %r"
+                       % (i, list(SKIP_SAFETY), e.get("skip_safety")))
+    return out
+
+
+def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
+    """声明面 → {id: 专家}（只用形状合法的条目；整体校验由 audit 报违例）。"""
+    doc = load_manifest_doc(root)
+    out: Dict[str, Dict[str, Any]] = {}
     for e in (doc.get("experts") or []):
         if isinstance(e, dict) and e.get("id"):
             out[str(e["id"])] = e
@@ -130,11 +163,14 @@ def audit(root: str = ".", observed: Optional[Dict[str, List[str]]] = None,
           static: Optional[Dict[str, List[str]]] = None
           ) -> Tuple[List[str], Dict[str, Any]]:
     """三源对账 → (issues, stats)。observed/static 可注入（测试与后续接线共用）。"""
+    doc = load_manifest_doc(root)
     declared = load_manifest(root)
     issues: List[str] = []
     stats: Dict[str, Any] = {"experts": len(declared), "facts": {}, "warns": []}
-    if not declared:
+    if not doc:
         stats["warns"].append("声明面缺件（%s 未落，见 W-03.3）：本次无专家可对账" % MANIFEST_REL)
+    else:
+        issues += validate_manifest(doc)
     for eid, e in sorted(declared.items()):
         reads = [str(x) for x in (e.get("reads") or [])]
         st = list((static or {}).get(eid) or [])
