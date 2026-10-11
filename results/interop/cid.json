@@ -87,9 +87,9 @@
       "sha256": "8225689a75dce1f3088fb1d49f0cc11a607afbc39c56732a3bcc32576fc01c10"
     },
     {
-      "cid": "bafyreicd4rkzqj6fa2hoshxbc3ik46gnkhbf6r5ne34nzbl3eq6vf5lzcu",
+      "cid": "bafyreihrx2qxxnxc6dilkatxkkog7ubcjxwshzz52zvw7zg5nzbdluypem",
       "path": "protocol/conformance_report.json",
-      "sha256": "43e4559827c5068ee91ee116d0ae78cd51c25f47ad26f8dc857b243d52f57915"
+      "sha256": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -132,9 +132,9 @@
       "sha256": "c2b024386b746578e571c91085af09b8767b85e09862b733bd1c3f572ec99e44"
     },
     {
-      "cid": "bafyreifegrerxcottaerzooburh5sl6praiaz354mfitkujyb3cdr4dzuu",
+      "cid": "bafyreigha24lhmjw7th4n5iosv6slsdte5qrkmw3m3ufewpnppvnjpxacy",
       "path": "protocol/assertions.json",
-      "sha256": "a434491b89d398091cb9c1a44fd92fcf88100cefbc61513551380ec438f079a5"
+      "sha256": "c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016"
     },
     {
       "cid": "bafyreifasdxekpzvmyqdxch4g74bi7errdheprsyex7vzjap7ktdvitdqa",
@@ -142,9 +142,9 @@
       "sha256": "a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380"
     },
     {
-      "cid": "bafyreibhha73zrcmn66k4oivnljnet3jv2o5sm5t5ovl77ae3gpiwf6ali",
+      "cid": "bafyreibrmam224zwrjbnbkutq6c6iabppcsriztg6sueogpycpklyioulq",
       "path": "protocol/locales.json",
-      "sha256": "27383fbcc44c6fbcae39156ad2d24f69ae9dd933b3ebaabffc04d99e8b17c05a"
+      "sha256": "316019ad73368a42d0aa938785e4002f78a5146666f4a84719f813d4bc21d45c"
     },
     {
       "cid": "bafyreia7f7b7fi6bzixcnkf32fob5wffrhrjovvcdgskspefprzs2flmmy",
@@ -162,9 +162,9 @@
       "sha256": "b041ba07b0d7a146add5d93fc65f868da8a5af7c8dd2a75d35ea482790e47b7c"
     },
     {
-      "cid": "bafyreibirdaoixikbjttapi3u2n7e4kqtv3jaz4vi2q3nfwofq3s6tje5m",
+      "cid": "bafyreiehai4bxycuzk4fr7vulenns4z7s6vtjccggb4t2zz33cjttvh7wm",
       "path": "protocol/data_contracts.json",
-      "sha256": "2888c0e45d0a0a67303d1ba69bf271509d7690679546a1b696ce2c372f4d24eb"
+      "sha256": "8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3"
     },
     {
       "cid": "bafyreihcxufd4dnh2q25vbmjstuhsbbvr7qcjmsgh4pkguxs4f4k2z67bi",

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-11",
   "approved_by": "Monyeah",
-  "note": "机械重批（同既有记录批准人）：§15 审计修复波后机械重绑 42 件审计被审对象 digest + 退役 golden master 机制，冻结链重算",
+  "note": "雷达对照吸收波W3c：重冻耦合 metrics 面 + 重算 verification_report（新增 11 模块）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "43e4559827c5068ee91ee116d0ae78cd51c25f47ad26f8dc857b243d52f57915"
+  "subject_digest": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
 }
