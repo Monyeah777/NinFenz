@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-11",
   "approved_by": "Monyeah",
-  "note": "机械重批：gate_experts.json 行尾改 LF 后冻结链重算",
+  "note": "机械重批：第 36 轮全链复核发现的派生面过期（耦合面重冻后未重签）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
