@@ -35,6 +35,25 @@ class ClosureTest(unittest.TestCase):
         self.assertEqual(set(), gg.changed_modules(["docs/x.md", "scripts/nf.py"]))
 
 
+class DepsMemoTest(unittest.TestCase):
+    """记忆必须**随源码变化失效**（旧坑：只按 (根, 模块) 记忆 → 第二版读成第一版）。"""
+
+    def test_memo_invalidates_when_module_changes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _mk_core(tmp, "a.py", "X = 1\n")
+            _mk_core(tmp, "b.py", "from core import a\n")
+            first = gg.module_deps(tmp)
+            self.assertEqual({"a"}, set(first["b"]))
+            _mk_core(tmp, "b.py", "Y = 2\n")          # 内容/大小变了
+            second = gg.module_deps(tmp)
+            self.assertEqual(set(), set(second["b"]), "目录指纹未失效：记忆陈旧")
+
+    def test_second_call_is_cheap_and_equal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _mk_core(tmp, "a.py", "X = 1\n")
+            self.assertEqual(gg.module_deps(tmp), gg.module_deps(tmp))
+
+
 class AffectedExpertsTest(unittest.TestCase):
     def _decl(self):
         return {"e_a": {"id": "e_a", "module": "desktop/src/core/a.py", "reads": []},
