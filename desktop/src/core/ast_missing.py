@@ -1,4 +1,4 @@
-"""AST 判据 + 缺失清单（机制借鉴 ha_agent tests/test_websocket_security_ast.py）。
+"""AST 判据 + 缺失清单（机制借鉴 ha_agent 的 websocket 安全 AST 判据）。
 
 R5/R6 是直接 import/sink 面；本模块补**语法级「必须成对」判据**：某类函数体里必须
 出现指定守卫调用，否则输出**一次列全的缺失清单**（而非逐条首错）。
