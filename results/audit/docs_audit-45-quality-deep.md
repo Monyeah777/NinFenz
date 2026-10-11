@@ -7,6 +7,8 @@ auditor: 天枢（基于项目现状取证）
 related: [desktop/src/core/quality_baseline.py, desktop/src/core/asset_density.py, desktop/src/core/doc_hygiene.py, desktop/src/core/assemble_plan.py, docs/完整版样本_西幻生存流P03.md]
 ---
 
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
+
 # M_AUDIT 45 质量纵深顶尖化（收口）
 
 > **审计问题**：按 STRATEGY 五维口径（静态/动态/纯度/资产/文档），四候选是否逐一落地、机器可核验、无「以绿代顶尖」误宣称。

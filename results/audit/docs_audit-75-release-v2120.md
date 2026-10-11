@@ -6,17 +6,20 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:f3b92a13385ceee45dd3202ab223ed7cfed971c0ca48c7ba87ee4d47b947861e
+  - CHANGELOG.md:9e2ee31ab08a9fef113d01c7f7e83d0a15d29ad4c24b38e31804f7285c78d28e
   - docs/meta/VERSION-MATRIX.md:abe7adfd40849a0191f738bb4d051ce487e811328d800c3049bbda7add455615
-  - README.md:e2c3aaba8f56e8a7ca3a436b8075542d3cad0358e65dc8c62615a671bbddc987
-  - desktop/src/core/changelog_gen.py:91f1c9eae7a48bbad209d041b48b2eb6d91dbe2eca36c08ee457ffdf21104e16
-  - desktop/tests/test_changelog_gen.py:3ddb12cc2247f8bf5649dc4e64d7521fc40795aba93c90f8dd34fc3df47377b8
-  - protocol/release_policy.json:0c8ecfad8f1f23101442dc8a1c301cecb0f0cb9e33d293dd0ceb4caadc94f96d
-  - docs/release.md:b4ddbad660793dba16a125e2f1b351ecb3dec462785642107297dc70ff40e1d1
-  - scripts/nf.py:fcf2531f7b3234afe1ef74f03a32eaa36142f2b85d6df02de72bde132f4ca86c
-  - scripts/release_freeze.sh:30d8ae65f958d71e98411793affdacba75efaa5f0934373dab991e065fe530a3
+  - README.md:02cb4dde570cd93e45d2ff96b91be36ed616357984752cb4c4ae3d08059f245f
+  - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
+  - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
+  - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
+  - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
+  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
+
+> 退役（2026-10-11）：原 subject「scripts/release_freeze.sh」随 golden master 机制退役一并删除，故从 subjects 移除；本件结论不依赖该脚本的行为，只依赖它当时**在场**这一事实。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物：`protocol/conformance_report.json` / `protocol/RECEIPTS.json` / `protocol/generated/*` / `results/interop/*` / `protocol/approvals/*` / `.release-frozen/*` 均为可复算投影或每次重签即变。

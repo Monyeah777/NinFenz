@@ -6,19 +6,19 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:06932ee691ac96922d199ed3662099dbf6094d62b16c7d3a263e4dfff64a6230
+  - verify.sh:a3010dd8b83a54d5fc460ed761b89989ab49b946a58290b281276c8177a38c31
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
-  - desktop/src/core/text_hygiene.py:63ceb140b09acf932f1eecd8b3a324889e61d18c8b4cda12d4130594d9eb94fd
-  - desktop/src/core/interop_export.py:520aaf0edb53d5ab679d3a1568c315f45ce8301ead3df90411e3e67572dc269a
-  - desktop/src/core/mcp_runtime.py:8ba6e7e2ad01182c0422529922b892f0b13d75612cea65add875262ad58693f7
-  - desktop/src/core/prose_lint.py:d3d6789bc60e9fe664fa4c7af24c10d380f9aced70f2a494e812246da74d1a69
+  - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
+  - desktop/src/core/interop_export.py:446c6e1213b1c2488b6f1c80b32b8cfb3292094dac550b5deac6a3c9d4bf10ac
+  - desktop/src/core/mcp_runtime.py:13ec1ab8a3f4c969020cc161bc95e056cb38517b660061fad357ab5a5cfde9f9
+  - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
-  - desktop/src/core/doc_hygiene.py:635926ce334273ceec59d8ec83d9234d5e14466d336d7c285efe0cf2f4e125ec
-  - desktop/src/core/endpoint.py:ddb7e4b0bbb2f60753f249a8b08fc0a1ba9629ff0f63ea24f91ca348204c373e
-  - desktop/src/core/purity_scan.py:dcb81f0bab7511d9861e44e0511fcb7b1ce18d26213415a5add4cd533f891c30
-  - scripts/nf.py:fcf2531f7b3234afe1ef74f03a32eaa36142f2b85d6df02de72bde132f4ca86c
-  - scripts/check_external_links.py:04cfe9fa4d7213021e60faac7ff88414db529090892ed38441ff61db8810861e
-  - scripts/check_interop_schemas.py:d7a783e8f8612135b8df3b7e03bf1f0e24377df6d4649fd9aa42dbe3e7dfcae3
+  - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
+  - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
+  - desktop/src/core/purity_scan.py:35197628957a142161190de8a61d9b460e475fd3a58c6aff87f6a58439172fac
+  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
+  - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
+  - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
   - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:60fa25a37167622423de2f8ecf49310ff6aa4774a04fedbc4ba486bda1836903
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects = 本波承重件十九件（门禁 / EOL 声明 / 编码卫生 / 互操作导出 / MCP 硬化与帧纪律 / 文档命令面 / 许可表达式门 / 文档分类表 / 端点幂等判据 / sink 登记自洽 / CLI 入口 / 外链巡检重试面 / **外部 schema 校验工具与其取证报告** / 四份对外文档 / 机器入口）；任一件再改，本件结论即失效须重审。

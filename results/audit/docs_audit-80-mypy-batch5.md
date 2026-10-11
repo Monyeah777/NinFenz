@@ -7,14 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/semantic_conflict.py:eb11b7e32ac07c52400c4c4a457ed877f434decc05a77fd69ef6d0bf2ddcf131
-  - desktop/src/core/storage.py:3811f57302bc44e726abf44d028b363067ca1230a73e333cefe4074561f229ce
-  - desktop/src/core/receipts.py:afc48b24b00775b04b67200055d954c5ad735eff980921da9571e87ee13f169f
+  - desktop/src/core/storage.py:a8d5110b3d2cda9b25ba144315229b52a1768548fe15ea226892137244d585be
+  - desktop/src/core/receipts.py:9763037aa9461d98be4172a8a7dd7ce8bfbf2c3c1f87b33dc79dcf31fa32d0a7
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
-  - desktop/src/core/world_slots.py:4d7dc220020f9b63b7aeef6f3cd74d1647fe575bbcd804778d61d9de5840aea4
-  - desktop/src/core/pipelinerun.py:551bfd5e16424e630cc132fc32926d00bf7031f7e87163ff01cacc30698053bb
-  - desktop/src/core/mcp_runtime.py:8ba6e7e2ad01182c0422529922b892f0b13d75612cea65add875262ad58693f7
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - desktop/src/core/world_slots.py:22e40164da15ebf92dc80ea1fa0562f2ac42e2c3c2a000894398b6a6e2fd92db
+  - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
+  - desktop/src/core/mcp_runtime.py:13ec1ab8a3f4c969020cc161bc95e056cb38517b660061fad357ab5a5cfde9f9
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 `intake`/`world_slots` 行数与最长函数增长按工具指引评审后重冻。

@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:783e4db328ee2405c211666a26a4c450915d6f898be11fe5909461aa533cd6fc
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - desktop/src/core/terminal.py:f4601d7a8fd0e22016b4ea36bf20e9ff8990ff88d98d5122fb6fd91f0456925c
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 terminal 模块行数增长按工具指引重冻（见「设计偏差」）。

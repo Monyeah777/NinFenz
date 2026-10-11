@@ -6,17 +6,17 @@ scope: 作者指令「将 NF 与 IDE、文档平台与 LLM 框架集成达到生
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/lsp.py:304e8edabe0c2878bc6fe997d957281cdc8b7cdfa7474b271bc25871690bc107
-  - desktop/src/core/nf_language.py:a59d48d441a2cf4a52500680bbe93d3912323671cbec48168ee72847b946d0d7
-  - desktop/tests/test_lsp.py:d07f7ed61fa65c2be085f562b07d79c7b76dcd82ef2493a5b13abac74e4494a7
-  - desktop/tests/test_nf_language.py:c3db5b402404a9054079dbdc4fbd5e9de9acb30f341df52ed3392dbf7c0ddd9c
-  - desktop/tests/test_doc_truth.py:384ce4b09c7a59149dd5f8d021bc094207b7f3a8d7a6d40eb3238da0a9ccfc3f
-  - desktop/tests/test_site_face.py:d8e538a3af62d37994667d141dc940334d0821701644ceb8e34fbaf2ca07eb31
-  - verify.sh:06932ee691ac96922d199ed3662099dbf6094d62b16c7d3a263e4dfff64a6230
-  - scripts/nf.py:fcf2531f7b3234afe1ef74f03a32eaa36142f2b85d6df02de72bde132f4ca86c
+  - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
+  - desktop/src/core/nf_language.py:ce28f875e4662957118c4abdb53d0f61c6ea857dc203d9ab75a55f88efed5de9
+  - desktop/tests/test_lsp.py:d6279d866b335ffd0ea454a2f25d25f12c428b2f2204d09bcd5d9da2b4e047df
+  - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
+  - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
+  - desktop/tests/test_site_face.py:21c3d2d3ec4aea0343ea0043ce1038062077ee08a49af596d56fa784259418d2
+  - verify.sh:a3010dd8b83a54d5fc460ed761b89989ab49b946a58290b281276c8177a38c31
+  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:24afe867db3ac4a7395591ba4938a87d771afbe6c1d631e0e639eb9adeea7716
-  - docs/decision-layer.md:50755549b0970dbd64d7d98b4757011d55c586cd14172df5957d998a23c431a2
+  - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
   - protocol/driver.json:66d6caf189756b8131eb5123673c90592dfa998b62f3de8192b997e983b5212c
   - integrations/site/integration.json:4a0b13e80d195f74e2c9965b899f87576e38d9c0b42190defb10bb13184e1374
   - integrations/site/strings.json:4d19bc7e32eb8bb9f7d368261c8bf464c02837ff828cbce364da4da229c4e59c
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects = 本波承重件十八件（编辑器实现与符号索引 / 四个新判据件 / 门禁接线 / CLI / 四份人读文档 /

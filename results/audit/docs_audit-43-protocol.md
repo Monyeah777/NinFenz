@@ -7,6 +7,8 @@ auditor: 天枢（基于项目现状取证）
 related: [protocol/README.md, ROADMAP §9 协议层顶尖行, docs/meta/VERSION-MATRIX.md]
 ---
 
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
+
 # M_AUDIT 协议设计审计（43 · 五维自评段随行）
 
 > **被审计对象（target）**：43「协议层顶尖化 A1-A5」全量收口。

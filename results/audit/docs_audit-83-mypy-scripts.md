@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - scripts/rebuild_selfcontained_sample.py:a03129592c21f6db459a6b69fcc9819e71aeb80418517fb9a43c2bbfc81c8e68
-  - scripts/fde_sample_run.py:a891a76e559c4d68260ecc8ea03b9d76109a793e859e53cb42a0bc5b0edf9560
-  - scripts/serve_decision_model.py:ca019d14dcab3fb82a76ba414a5fdcf2a1d281cc699c7f88d2108b05771aa27b
-  - scripts/interop_thirdparty_kit.py:9b5b7d592048d588279fb976add510bd677bd19c34acda7a5cb5a47d00173c5b
-  - scripts/build_verification_cards.py:08e105daceb38ca1b907193b408dfeaec8ea5cb8943b47902c5301d2107d0960
-  - scripts/geo_export.py:616992be1e6f5e8251b5a9aa98abc8d27dfee22ddb9152a335538f17e28ea06a
-  - scripts/nf.py:fcf2531f7b3234afe1ef74f03a32eaa36142f2b85d6df02de72bde132f4ca86c
-  - scripts/check_external_links.py:04cfe9fa4d7213021e60faac7ff88414db529090892ed38441ff61db8810861e
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - scripts/rebuild_selfcontained_sample.py:51732ee527c918a6ee2effe4236fb3702ceb474ebed4856ea6aa2ee0c059e5d2
+  - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
+  - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
+  - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
+  - scripts/build_verification_cards.py:14c51ad8b2ba87abcbe1f42ece6feb4cba2a3f77b65736959bea0d5b569b4488
+  - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
+  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
+  - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 4 个脚本行数或圈复杂度增长按工具指引重冻。

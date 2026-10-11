@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:d6abc68828224f261afc7423483bff67b44627a10765d7c4e0ee751693ef5f9b
+  - CONTRIBUTING.md:532a98774d5947bf31b15e95a8be5b4b0fc05c8a824bbbacf2dbaee7bf463074
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:2fcc4ca115a6f9e3d62ac4d4e91506c50459721bf8303c1f80225128c4488840
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 语义：本件是「外部输入筛选」结论，绑定的三条是**判定所依据的仓内证据件**（准入面 / 语言面 / 索引面）——它们一改，本件结论即须重审。

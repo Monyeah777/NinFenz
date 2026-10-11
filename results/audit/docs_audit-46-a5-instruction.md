@@ -7,6 +7,8 @@ auditor: 天枢（基于项目现状取证）
 related: [desktop/src/core/instruction_step_audit.py, docs/agent/agent_组装指令包_v0.2.md, docs/45_执行遥测规范.md, docs/45_M2_回合级drill.md, docs/45_M3_techdoc载荷提案.md, docs/44_M2_AI通道内容规范.md]
 ---
 
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
+
 # M_AUDIT 45 A5 · 指令档步进级审计
 
 ## 审计口径

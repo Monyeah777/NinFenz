@@ -7,6 +7,8 @@ auditor: 天枢（基于项目现状取证）
 related: [docs/mcp.md, docs/44_M2_AI通道内容规范.md, docs/agent/agent_组装指令包_v0.2.md, desktop/src/core/mcp_runtime.py, desktop/src/core/assemble_plan.py]
 ---
 
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
+
 # M_AUDIT AI 通道工程审计（44 · 收口）
 
 > **审计问题**：AI 通道是否从「框架」升到「有实质内容 + 需求可自组装」的内部顶尖线，且立项/质量论证只引用内部证据（STRATEGY §三），无「以绿代顶尖」误宣称。
