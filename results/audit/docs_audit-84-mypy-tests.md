@@ -24,7 +24,7 @@ subjects:
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
-  - desktop/tests/test_dead_code.py:fb68a3060e21dcb37ee938905fa947abd78971210de0e8f7d291311759b0fa03
+  - desktop/tests/test_dead_code.py:f4e95574a247a2445b48427c0a45fce3374ea1fe214e678240077910b27da4fe
   - desktop/tests/test_daemon_parity.py:50e84719761faee8726e25025fd52efc823dcdddb1c57f7efc4ae3488694c76b
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
