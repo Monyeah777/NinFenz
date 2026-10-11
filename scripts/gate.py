@@ -79,6 +79,24 @@ def _route(changed, as_json):
     return 1 if issues else 0
 
 
+def _route_datalog(changed, as_json):
+    """P-A5：规则层路由（Part 2 后端）× 门禁影响图（Part 1）的同语义路径。"""
+    from core import gate_datalog as gd
+    from core import gate_graph as gg
+    experts = gf.load_manifest(ROOT)
+    mods = sorted(gg.changed_modules(changed or []))
+    hits, got = gd.routed(ROOT, mods, experts=experts, backend="dag")
+    g = got.get("graph") or {}
+    lines = ["== 规则层路由（P-A5 · dag 后端）==",
+             "  changed_modules=%s" % mods, "  hits=%s" % hits,
+             "  gate 推导图：nodes=%d edges=%d depth=%d fuel=%d/%d"
+             % (g.get("nodes", 0), g.get("edges", 0), g.get("depth", 0),
+                got["fuel_used"], got["fuel_total"])]
+    _emit("gate-route-datalog", {"hits": hits, "graph": g, "status": got["status"],
+                                 "changed_modules": mods}, as_json, lines)
+    return 0 if got["status"] == "OK" else 1
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁读面台账（只读）")
     ap.add_argument("--json", action="store_true")
@@ -90,6 +108,8 @@ def main(argv=None) -> int:
     ap.add_argument("--derive", action="store_true", help="声明级别 vs 源码推导")
     ap.add_argument("--route", nargs="*", default=None, metavar="PATH",
                     help="按变更路径求路由（策略 S）并自检")
+    ap.add_argument("--route-datalog", nargs="*", default=None, metavar="PATH",
+                    help="按变更路径用**规则层（P-A5 dag 后端）**求路由并打印 gate 推导图统计")
     args = ap.parse_args(argv)
     if args.observed:
         return _observed(args.json, use_hook=getattr(args, "observed_hook", False))
@@ -101,6 +121,8 @@ def main(argv=None) -> int:
         return _derive(args.json)
     if args.route is not None:
         return _route(args.route, args.json)
+    if args.route_datalog is not None:
+        return _route_datalog(args.route_datalog, args.json)
     issues, stats = gf.audit(ROOT)
     if args.json:
         print(json.dumps({"kind": "gate-audit", "issues": issues, "stats": stats},
