@@ -31,11 +31,11 @@
       "translations": {
         "en": {
           "path": "docs/en/release.md",
-          "source_sha256": "b4ddbad660793dba16a125e2f1b351ecb3dec462785642107297dc70ff40e1d1"
+          "source_sha256": "7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379"
         },
         "ja": {
           "path": "docs/ja/release.md",
-          "source_sha256": "b4ddbad660793dba16a125e2f1b351ecb3dec462785642107297dc70ff40e1d1"
+          "source_sha256": "7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379"
         }
       }
     },

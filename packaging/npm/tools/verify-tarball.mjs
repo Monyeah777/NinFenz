@@ -74,7 +74,14 @@ if (idx >= 0 && args[idx + 1]) {
   }
 }
 
-const ex = spawnSync('tar', ['-xzf', tarball, '-C', tmp], { encoding: 'utf8' });
+// cwd = tarball 所在目录 + 只传 basename：GNU tar（Git-Bash/msys）会把带盘符的绝对路径
+// 当成「host:path」远程规格（实测报 "Cannot connect to C: resolve failed"），bsdtar 则接受。
+// 传相对名对两者都成立（-C 的目标目录是选项值，不参与 host:path 解析）。
+// ★ 两端都用**相对路径**：GNU tar（Git-Bash/msys）既会把带盘符的存档路径当 host:path，
+// 也会在 -C 上把 "C:\..." 解析歪（实测两种报错各一）。cwd = 暂存目录、-C "." 对
+// GNU tar 与 bsdtar 都成立，且不产生任何 Windows 路径解析。
+const ex = spawnSync('tar', ['-xzf', path.basename(tarball), '-C', '.'],
+                     { cwd: tmp, encoding: 'utf8' });
 if (ex.status !== 0) {
   console.error('\u2717 解包失败：' + (ex.stderr || ''));
   process.exit(2);
