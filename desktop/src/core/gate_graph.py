@@ -6,23 +6,39 @@
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
-from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set
+from typing import Any, Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
 
 from core import gate_faces as gf
 from core import import_graph as ig
 
+#: 进程内记忆：根 → (目录指纹, 图)。指纹即 listing 的 (mtime_ns, size) 全集——
+#: 一次 scandir 就能判陈旧（M2 实测：不记忆时每次 route 重建图要 ~1.2s）。
+_DEPS_MEMO: Dict[str, Tuple[Any, Dict[str, FrozenSet[str]]]] = {}
+
 
 def module_deps(root: str = ".") -> Dict[str, FrozenSet[str]]:
-    """core 模块导入图：{模块名: 依赖的 core 模块名集合}（解析不出者跳过）。"""
+    """core 模块导入图：{模块名: 依赖的 core 模块名集合}（解析不出者跳过）。
+
+    记忆键含**目录指纹**（每个文件的 mtime_ns+size）：进程活着时源码被改即重建，
+    不重演「只按 (根, 模块) 记忆导致第二版读成第一版」的旧坑。
+    """
+    listing = ig.listing(root)
+    key = os.path.normcase(os.path.abspath(str(root)))
+    stamp = tuple(sorted(listing.items()))
+    hit = _DEPS_MEMO.get(key)
+    if hit is not None and hit[0] == stamp:
+        return hit[1]
     out: Dict[str, FrozenSet[str]] = {}
-    for fname, stamp in sorted(ig.listing(root).items()):
+    for fname, fstamp in sorted(listing.items()):
         stem = fname[:-3]
-        got = ig.load_or_parse(root, stem, stamp)
+        got = ig.load_or_parse(root, stem, fstamp)
         if got is None:
             continue
         _rel, deps, _dyn = got
         out[stem] = frozenset(deps)
+    _DEPS_MEMO[key] = (stamp, out)
     return out
 
 
