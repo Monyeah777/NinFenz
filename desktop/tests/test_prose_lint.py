@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """正文级 lint 单测（AI 味机械特征；只报告不阻断）。"""
 import os
 import sys

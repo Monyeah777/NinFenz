@@ -203,6 +203,64 @@ pub fn sdp_violations(g: &Graph) -> Vec<(String, String)> {
     out
 }
 
+/// 真源 `metrics_face_issues`：基线的 metrics 面必须**被读到**（审计 §11v.4 F1）。
+/// 缺失/非数值/越界/自相矛盾 → issue；数值漂移只进 stats（代码演进不算债）。
+fn metrics_face(base: &Option<Json>, g: &Graph) -> (Vec<String>, i64, i64, i64) {
+    let mut issues: Vec<String> = Vec::new();
+    let pairs: Vec<(String, Json)> = match base.as_ref().and_then(|b| get(b, "metrics")) {
+        Some(Json::Object(p)) if !p.is_empty() => p.clone(),
+        _ => {
+            issues.push(
+                "耦合基线缺 metrics 面（修复指引：python scripts/coupling_metrics.py --write）"
+                    .to_string(),
+            );
+            return (issues, 0, 0, g.deps.len() as i64);
+        }
+    };
+    let mut drift = 0i64;
+    for (m, mv) in &pairs {
+        let int_of = |k: &str| match get(mv, k) {
+            Some(Json::Int(n)) => Some(*n),
+            _ => None,
+        };
+        let i_of = match get(mv, "i") {
+            Some(Json::Float(f)) => Some(*f),
+            Some(Json::Int(n)) => Some(*n as f64),
+            _ => None,
+        };
+        let (Some(ca), Some(ce), Some(i)) = (int_of("ca"), int_of("ce"), i_of) else {
+            issues.push(format!("基线 metrics[{}] 含非数值（ca/ce/i）", m));
+            continue;
+        };
+        if ca < 0 || ce < 0 || !(0.0..=1.0).contains(&i) {
+            issues.push(format!("基线 metrics[{}] 越界（ca={} ce={} i={}）", m, ca, ce, i));
+            continue;
+        }
+        let want = if ca + ce != 0 {
+            pyfloat::round_to(ce as f64 / (ca + ce) as f64, 4)
+        } else {
+            0.0
+        };
+        if (i - want).abs() > 1e-9 {
+            issues.push(format!(
+                "基线 metrics[{}] 自相矛盾：I={:.4} ≠ Ce/(Ca+Ce)={:.4}",
+                m, i, want
+            ));
+            continue;
+        }
+        match (g.ca.get(m), g.ce.get(m)) {
+            (Some(a), Some(e)) if (*a, *e) == (ca, ce) => {}
+            _ => drift += 1,
+        }
+    }
+    let missing = g
+        .deps
+        .keys()
+        .filter(|m| !pairs.iter().any(|(k, _)| k == *m))
+        .count() as i64;
+    (issues, pairs.len() as i64, drift, missing)
+}
+
 fn load_baseline(root: &Path) -> Option<Json> {
     if !root.join(BASELINE_REL).is_file() {
         return None;
@@ -291,6 +349,9 @@ pub fn scan(root: &Path) -> CouplingScan {
         ));
     }
 
+    let (mut face_issues, metrics_recorded, metrics_drift, metrics_missing) =
+        metrics_face(&base, &g);
+    issues.append(&mut face_issues);
     let stats = Json::Object(vec![
         ("modules".to_string(), Json::Int(g.deps.len() as i64)),
         ("cycles".to_string(), Json::Int(cyc.len() as i64)),
@@ -303,6 +364,12 @@ pub fn scan(root: &Path) -> CouplingScan {
             "registered_sdp".to_string(),
             Json::Int(known_sdp.len() as i64),
         ),
+        (
+            "metrics_recorded".to_string(),
+            Json::Int(metrics_recorded),
+        ),
+        ("metrics_drift".to_string(), Json::Int(metrics_drift)),
+        ("metrics_missing".to_string(), Json::Int(metrics_missing)),
     ]);
     let _ = py_str(None);
     CouplingScan { issues, warns, stats }
@@ -450,17 +517,19 @@ import json
     fn scan_reports_both_cycle_and_sdp_with_exact_wording() {
         let root = build_fixture();
         let got = scan(&root);
-        assert_eq!(got.issues.len(), 3, "1 个环 + 2 处 SDP：{:?}", got.issues);
+        assert_eq!(got.issues.len(), 4, "1 个环 + 2 处 SDP + 缺 metrics 面：{:?}", got.issues);
         assert!(got.issues[0].starts_with("新增模块级环：aa → bb → aa（"), "{:?}", got.issues[0]);
         assert!(got.issues[1].starts_with("新增 SDP 违例：bb(I=0.50) 依赖了更不稳的 aa(I=0.75)（"), "{:?}", got.issues[1]);
         assert!(got.issues[2].starts_with("新增 SDP 违例：dd(I=0.50) 依赖了更不稳的 ff(I=0.67)（"), "{:?}", got.issues[2]);
+        assert!(got.issues[3].starts_with("耦合基线缺 metrics 面（"), "{:?}", got.issues[3]);
         assert_eq!(got.warns.len(), 1);
         assert!(got.warns[0].starts_with("无耦合基线 protocol/coupling_baseline.json"), "{:?}", got.warns[0]);
         assert!(crate::jsonread::json_eq(
             &got.stats,
             &crate::jsonread::convert(&serde_json::json!({
                 "cycles": 1, "modules": 9, "registered_cycles": 0,
-                "registered_sdp": 0, "sdp": 2
+                "registered_sdp": 0, "sdp": 2, "metrics_recorded": 0,
+                "metrics_drift": 0, "metrics_missing": 9
             }))
             .unwrap()
         ));

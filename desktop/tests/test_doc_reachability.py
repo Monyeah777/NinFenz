@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """路径可达门禁：入口文档里的仓库相对路径与 `nf <子命令>` 必须真实可达。
 
 为什么：文档是 agent 的**唯一入口**——一个写错的路径（实测：README 曾写
@@ -10,9 +9,12 @@
 `yes/no`、`NF-XXXX` 这类都不算路径，不参与判定；真路径一旦写错即 FAIL。
 """
 import argparse
+import ast
 import importlib.util
+import io
 import re
 import sys
+import tokenize
 import unittest
 from pathlib import Path
 
@@ -25,7 +27,8 @@ from core import repo_face as _repo_face  # noqa: E402
 #: 入口文档面（agent 与人的第一跳）：新增入口文档须同步入表，否则本门禁漏检。
 ENTRY_DOCS = (
     "README.md", "README.en.md", "llms.txt", "docs/agent/ROUTES.md", "docs/agent/AGENT_START.md",
-    "docs/agent/AI_ROUTING.md", "docs/meta/DEEP_DIVE.md", "AGENTS.md", "CONTRIBUTING.md", "SECURITY.md",
+    "docs/agent/AI_ROUTING.md", "docs/meta/DEEP_DIVE.md", "AGENTS.md", "CONTRIBUTING.md", "SECURITY"
+        ".md",
     "docs/mcp.md", "docs/terminal.md", "docs/ai-menu.md", "docs/library.md",
     "docs/nfal.md", "docs/conformance.md",
 )
@@ -131,7 +134,8 @@ EXEMPT_DOCS = {
 #: 逐条写明理由；判定按**前缀边界**（`.rivet/scratchx` 不算命中 `.rivet/scratch`）。本表只许缩小。
 LIVING_PATH_EXEMPT = {
     ".rivet/scratch": "内部档案暂存区（gitignored）：手稿/记录按设计引用，非仓库件",
-    "engine/rust/target": "Rust 构建产物目录（gitignored）：README/手稿指其布局，fresh clone 不在场",
+    "engine/rust/target"
+        "": "Rust 构建产物目录（gitignored）：README/手稿指其布局，fresh clone 不在场",
     "packaging/npm/payload": "npm 一键包暂存产物（gitignored）：由 npm run stage 生成",
 }
 
@@ -279,6 +283,28 @@ class GuidanceFlagReachabilityTest(unittest.TestCase):
                     bad.append("nf %s%s %s" % (cmd, (" " + sub) if sub else "", fl))
         return bad
 
+    @staticmethod
+    def _py_values(text: str) -> list:
+        """`.py` 要扫**值面**（字符串常量 + 注释 token），而不是裸源码。
+
+        为什么（2026-10-11 W1 实测）：折行会把 `nf receipts --write` 拆成两段源码文本，
+        裸源码扫描看到的是半个旗标 `--wr` ⇒ 假红。判据应测「这句话说了什么」，不是「它排在哪一行」。
+        """
+        out = []
+        try:
+            for n in ast.walk(ast.parse(text)):
+                if isinstance(n, ast.Constant) and isinstance(n.value, str):
+                    out.append(n.value)
+        except SyntaxError:
+            pass
+        try:
+            for t in tokenize.generate_tokens(io.StringIO(text).readline):
+                if t.type == tokenize.COMMENT:
+                    out.append(t.string)
+        except (tokenize.TokenError, IndentationError):
+            pass
+        return out
+
     def test_flags_in_guidance_exist(self):
         missing = []
         for face in FLAG_FACES:
@@ -286,8 +312,10 @@ class GuidanceFlagReachabilityTest(unittest.TestCase):
                 if not p.is_file() or p.suffix not in (".md", ".py", ".txt"):
                     continue
                 text = p.read_text(encoding="utf-8", errors="replace")
-                for hit in self._unreachable(text, self.surface, self.commands):
-                    missing.append("%s <- %s" % (hit, p.relative_to(ROOT).as_posix()))
+                texts = self._py_values(text) if p.suffix == ".py" else [text]
+                for one in texts:
+                    for hit in self._unreachable(one, self.surface, self.commands):
+                        missing.append("%s <- %s" % (hit, p.relative_to(ROOT).as_posix()))
         self.assertEqual([], sorted(set(missing)),
                          "指引引用了不存在的旗标（修复指引：改写成真实旗标，或删掉该写法）")
 
@@ -336,8 +364,11 @@ class GuidanceCommandReachabilityTest(unittest.TestCase):
         for face in ("desktop/src/core", "scripts"):
             for p in sorted((ROOT / face).glob("*.py")):
                 text = p.read_text(encoding="utf-8", errors="replace")
-                for hit in self._bad(text):
-                    missing.append("%s <- %s" % (hit, p.relative_to(ROOT).as_posix()))
+                # 与旗标那条同一口径：扫**值面**（字符串常量 + 注释 token），不扫裸源码——
+                # 折行会把一段 `nf <子命令> --旗标` 的指引拆成两段源码文本，裸扫会读出伪命令。
+                for one in GuidanceFlagReachabilityTest._py_values(text):
+                    for hit in self._bad(one):
+                        missing.append("%s <- %s" % (hit, p.relative_to(ROOT).as_posix()))
         self.assertEqual([], sorted(set(missing)),
                          "代码内指引引用了不存在的 nf 子命令（修复指引：改成真实命令，"
                          "或在 GUIDANCE_EXEMPT 里写明「刻意为之」的理由）")
@@ -353,7 +384,8 @@ class GuidanceCommandReachabilityTest(unittest.TestCase):
 GUIDANCE_PATH_EXEMPT = {
     "docs/checks.md": "引的是**上游项目** ossf/scorecard 的仓内文件（非本仓路径）",
     "packaging/npm/payload/": "npm 一键包的暂存产物：由 npm run stage 生成，且被 "
-                              "packaging/npm/.gitignore 忽略——fresh clone 本就不在场（生成物非仓库件）",
+                              "packaging/npm/.gitignore 忽略——fresh clone 本就不在场（生成物非仓库"
+                                  "件）",
 }
 _CODE_FACE = ("desktop/src/core", "scripts")
 
@@ -460,10 +492,12 @@ class OrphanArtifactTest(unittest.TestCase):
 
 
 #: 有意「不链进任何入口」的**存档记录** → 一句理由。本表只许缩小：条目一旦被别处引用
-#: （或已不在场）就必须删掉，否则会变成掩盖新孤儿的黑洞（见 `test_archive_registry_has_no_stale_entries`）。
+# : （或已不在场）就必须删掉，否则会变成掩盖新孤儿的黑洞（见 `test_archive_registry_has_no_stale_ent
+# ries`）。
 ARCHIVE_DOCS = {
     "docs/41_波C_C1_C2_实测记录.md":
-        "41 波C C1/C2 一次性验收实测记录——结论已入 CHANGELOG 与 `nf sig`/`nf diff` 判据，本件供追溯",
+        "41 波C C1/C2 一次性验收实测记录——结论已入 CHANGELOG 与 `nf sig`/`nf diff` 判据，本件供追溯"
+            "",
     "docs/41_波C_W2_C3_C4_实测记录.md":
         "41 波C W2 C3/C4 一次性验收实测记录——同上，供追溯",
     "docs/41_波C_W3_实测记录.md":
@@ -471,7 +505,8 @@ ARCHIVE_DOCS = {
     "docs/41_波C_W5_实测记录.md":
         "41 波C W5 一次性实测记录（D3 ruff / D4 日志级别），供追溯",
     "docs/42_M1_P06_演练集.md":
-        "42 M1 P06 内部执行演练集（第 2 份）——载体 fixture 在 desktop/tests/fixtures/execution/，本件是演练记录",
+        "42 M1 P06 内部执行演练集（第 2 份）——载体 fixture 在 desktop/tests/fixtures/execution/，本"
+            "件是演练记录",
     "docs/42_M4_文档分类普查.md":
         "42 M4 文档分类普查一次性报告——机检已由 `core/doc_hygiene.py` 承担，本件是普查结论存档",
     "docs/42_M4_资产评估报告.md":

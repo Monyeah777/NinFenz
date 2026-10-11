@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`core/content_face.py`（叶子件）与 `conformance_scan` 的**口径逐位一致**回归。
 
 为什么单列：指纹拆到叶子件是为了断模块级环（`disk_cache` 不再反向依赖校验层），

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Agentic 检索单测（v1.3.0 retriever.search：四类对象统一检索入口）。
 
 运行：cd desktop && python -m unittest tests.test_retriever -v

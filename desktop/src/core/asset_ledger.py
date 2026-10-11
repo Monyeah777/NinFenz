@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NinFenz 资产供应链台账（40 总纲 v2.7 波 A S2：资产六环中的 入库/溯源/浏览/版本/淘汰）。
 
 设计定位：

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """响应缓存：**树代际 ⇒ 整条命令响应**（守护 `daemon.execute` 与长驻会话 `session_watch` 共用）。
 
 这两条路径做的是**同一件事**——「树没变 + 命令纯读 ⇒ 回放同一份字节」。判据与账本放一处，
@@ -155,3 +154,39 @@ def wrap_runner(base, decide, sync=None):
         return code
 
     return runner
+
+
+#: 响应缓存的**准入表**：仅纯读、且对同一棵树**逐字节可复现**的命令。
+#: 表项是 **argv 前缀**（不是顶层命令名）：`module` / `decisions` / `patterns` 这些顶层命令
+#: 里既有读子命令也有**写子命令**（`module deprecate`、`decisions reindex`、`patterns reindex`），
+#: 只按顶层名放行会把写形态一起放进来——所以写子命令一律不入表。
+#: 两条准入判据都在 test_watch 里真跑：（a）同树连跑两次，exit/stdout/stderr 逐字节相同；
+#: （b）逐条 `git status` 前后不变（验证过：12 条候选全部既纯净又可复现）。
+CACHEABLE_COMMANDS = (
+    ("--version",),
+    ("score",), ("conformance",), ("layers",), ("stats",), ("doctor",),
+    ("interop",), ("toolface",), ("assertions",), ("cognition",),
+    ("patterns", "ls"), ("patterns", "show"), ("patterns", "for"), ("patterns", "verify"),
+    ("module", "ls"), ("module", "status"), ("module", "verify"),
+    ("decisions", "verify"), ("decisions", "show"),
+)
+#: 写盘类开关：出现任一前缀即**不缓存**（哪怕命令在准入表里）。宁可不缓存，不可把旧输出当新输出。
+_WRITE_FLAG_PREFIXES = ("--write", "--out", "--dest", "--build", "--save", "--fix",
+                        "--apply", "--yes", "--baseline", "--freeze", "--record",
+                        "--sign", "--delete", "--rm", "--all")
+# : 为什么有 `--all`（2026-10-01 判据抓到的洞）：`interop --all` 是**写面**（落盘 results/interop/*
+# ），
+#: 而 `interop` 在 `CACHEABLE_COMMANDS` 里、`--all` 又不在上面的旗标前缀里 ⇒ 第二次调用会被
+#: **响应缓存回放**（命令根本没跑，调用方却拿到成功输出）。这正是本表存在的理由：「宁可不缓存，
+#: 不可把旧输出当新输出」。`interop --check --all` 因此也一并放弃缓存（保守方向，代价可忽略）。
+#: 对账判据：`test_daemon.ResponseCacheWriteSafetyTest`（闸门表 × 可缓存命令 × 本表三方对齐）。
+
+
+def cacheable(argv: Sequence[str]) -> bool:
+    """这条命令是否允许走响应缓存（**前缀命中准入表** + 无写盘开关）。"""
+    argv = [str(a) for a in argv]
+    if not argv:
+        return False
+    if not any(tuple(argv[:len(pre)]) == pre for pre in CACHEABLE_COMMANDS):
+        return False
+    return not any(a.startswith(_WRITE_FLAG_PREFIXES) for a in argv)

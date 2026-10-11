@@ -12,11 +12,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from core import official_core
+
 #: 官方核心 13 件（对齐 verify check14/check15 硬编码 + 01 §6 官方核心）
-OFFICIAL13: List[str] = [
-    "M00", "通用:M10", "M08", "M23", "M24", "M50", "M80",
-    "事件:M22", "M06", "M12", "M13", "M20", "M90",
-]
+OFFICIAL13: List[str] = list(official_core.CORE_MODULES)   # 单一实现（审计 Z1 F6）
 
 #: 质量分级（v2.4.0 A6：模块/包分级徽章——官方核心 / 社区 / 实验）
 GRADE_OFFICIAL = "official"

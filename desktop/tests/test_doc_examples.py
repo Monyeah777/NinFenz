@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """文档示例可执行性（「照着抄就能跑」）。
 
 动机（2026-09-30 文档示例真跑）：把活文档里出现的 `nf` 示例逐条真跑，抓到 `nf bench
@@ -106,11 +105,13 @@ class NonNfDocumentedCommandTest(unittest.TestCase):
         "README.md": "顶部 TUI 演示帧——是 `--demo` 的**输出**（逐字渲染结果），不是命令行；"
                      "它与渲染器的一致性由 `desktop/tests/test_nf_tui.py` 断言，无需真跑",
         "docs/text-hygiene.md": "跑：`cd desktop/src && python -m core.text_hygiene ../..`",
-        "docs/42_M5_Release-checklist.md": "带版本占位符（`vX.Y.Z`）的发布流程示例，非可直接照抄形态",
+        "docs/42_M5_Release-checklist.md": "带版本占位符（`vX.Y.Z`）的发布流程示例，非可直接照抄形"
+            "态",
         "docs/45_执行遥测规范.md": "JSON 遥测样例（数据，不是命令行）",
         "docs/lsp.md": "客户端配置（JSON / Lua 各一处），路径由编辑器填",
         "docs/mcp.md": "MCP 客户端配置（JSON 两处），路径由用户填",
-        "skills/ninfenz/references/quickstart.md": "首行是仓库外动作（`git clone`），其后的 nf 命令由 doc-examples 覆盖",
+        "skills/ninfenz/references/quickstart.md"
+            "": "首行是仓库外动作（`git clone`），其后的 nf 命令由 doc-examples 覆盖",
     }
     FENCE = re.compile(r"(?m)^```([a-zA-Z0-9_-]*)[ \t]*$")
     CMD_HEAD = re.compile(r"^(python\s+)?nf\b|^python scripts/nf")

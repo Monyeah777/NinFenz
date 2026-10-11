@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """抽象阶梯（protocol/LAYERS.json）单测 —— 语义判据 L1–L10 + 变异注入 + 生成投影。
 
 纪律：每条规则至少一个违规样本必须被捕（check 的 check）；真仓库必须零 issue；

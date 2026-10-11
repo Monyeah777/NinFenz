@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """42 M4 —— 文档可执行性卫生检查单测（标识/last-updated/过期告警 + 变异注入）。"""
 import os
 import sys

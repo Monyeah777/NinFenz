@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """演练保真度（`core/drill_fidelity.py`）回归测试 —— 动态可执行面。
 
 断言：量化口径（执行演练 + 回合回放 + 总口径）、不达标即 FAIL、**无载体即 FAIL**、

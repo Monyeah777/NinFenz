@@ -143,7 +143,13 @@ def _read_with_retry(path: str | os.PathLike, binary: bool, encoding: str):
 
 
 def read_text(path: str | os.PathLike, encoding: str = "utf-8") -> str:
-    """读文本（**带瞬时占用重试**）：与 `write_text` 对称——写侧原子、读侧不因并发而炸。"""
+    """读文本（**带瞬时占用重试**）：与 `write_text` 对称——写侧原子、读侧不因并发而炸。
+
+    **默认保持 `utf-8`**（2026-10-10 审计 N4 修正）：本函数是通用读口，调用方里有**摘要计算**
+    （如 `library_entries.entry_digest`）——若默认剥 BOM，会给带 BOM 的件算出不同的摘要/签名。
+    BOM 容错放在**解析入口**（`registry_loader` 读 JSON 前显式去 BOM；外部 trace 读取用
+    `utf-8-sig`），不在这里一刀切。
+    """
     return _read_with_retry(path, False, encoding)
 
 

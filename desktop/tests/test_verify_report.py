@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """门禁机器可读报告（`core/verify_report.py`）回归测试 —— 静态可核验面。
 
 覆盖：构建确定性 / 声明与实测并排 / 缺件与篡改可检出 / 坏判据记账为 error 而不崩 /

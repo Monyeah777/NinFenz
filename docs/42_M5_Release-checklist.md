@@ -9,16 +9,11 @@
 - [ ] **判级器词表核验**：06 §11 无新增未定义强度词（必须/禁止/应/可之外）。
 - [ ] **错误信息审计零缺失**：check27 R4 绿。
 - [ ] **文档卫生**：doc_hygiene 标识/last-updated 常驻绿（指令类 100% + 零过期）。
-- [ ] **golden master 冻结**：`bash scripts/release_freeze.sh vX.Y.Z` 产出产物快照 + nf-sig 指纹（见下）。
 - [ ] **双端同步**：README 版本块 ✅ 已发布 + ROADMAP 状态行归位。
 - [ ] **端壳线确认**：无端壳待办残留（L3 端壳线已永久退役，2026-09-09 作者裁决；见 docs/L3_FROZEN.md）。
 
-## Golden Master 冻结（M5.6 + 批 C #5）
+## Golden Master 冻结（M5.6 + 批 C #5）——**已退役**
 
-tag 点把关键产物做成可复现存档：
-
-```bash
-bash scripts/release_freeze.sh vX.Y.Z
-# 产物 = .release-frozen/<tag>/sha256.manifest（01/02/06/07 + desktop/src/core/*.py +
-# verify.sh + nf sig --verify 全量指纹），供日后回归对照（tag 点产物不漂移）。
-```
+原项（tag 点产物快照：协议件 + `verify.sh` + `desktop/src/core/*.py` 的 sha256 清单 + `nf sig --verify` 指纹）
+已于 2026-10-11 作者裁决退役：156 条清单 77 条失效、无门禁消费、曾泄漏进 npm 发布物。
+清单与生成脚本已从仓库和 payload 排除表删除；tag 点不再产出该项。

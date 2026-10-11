@@ -1,7 +1,9 @@
 {
   "declared": {
+    "coverage_note": "判据级抽查面 30 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
     "expected_checks": 40,
     "expected_pass": 72,
+    "report_items": 30,
     "verify_version": "v2.30"
   },
   "items": [
@@ -14,7 +16,7 @@
       "stats": {
         "docs": 4,
         "import_residue": [],
-        "imports": 13,
+        "imports": 10,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -23,7 +25,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 58,
+        "raises": 59,
         "sinks": 14
       },
       "status": "pass",
@@ -108,14 +110,33 @@
           "general": 2,
           "teen": 1
         },
+        "decided": 3,
         "entries": 3,
         "issues": 0,
+        "undecided_token": "unrated",
+        "unrated": 0,
         "vocabulary": [
           "general",
           "teen",
           "mature",
           "unrated"
         ]
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "rating_decided",
+      "issues": 0,
+      "name": "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）",
+      "sample": [],
+      "source": "rating_gate.decided",
+      "stats": {
+        "allow_unrated": false,
+        "decided": 3,
+        "entries": 3,
+        "undecided_token": "unrated",
+        "unrated": 0
       },
       "status": "pass",
       "warns": 0
@@ -273,26 +294,30 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "98ba443949b47d9d54428ad885fb6c24db34c5939ea1a13dc397319223cb99ab",
-        "verdict": "conformant"
+        "passed": 26,
+        "root": "47c383121d046231a6162b06548f6f5eec3db62674e920f91de13e87232d4d0b",
+        "verdict": "non-conformant"
       },
       "status": "pass",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 0,
+      "issues": 242,
       "name": "审计件被审对象 digest",
-      "sample": [],
+      "sample": [
+        "AUD-0002：被审对象已变，旧审计失效：scripts/ai_domain_closure.py（修复指引：重审并更新 digest）",
+        "AUD-0002：被审对象已变，旧审计失效：desktop/tests/test_ai_domain_closure.py（修复指引：重审并更新 digest）",
+        "AUD-0003：被审对象已变，旧审计失效：scripts/ai_domain_closure.py（修复指引：重审并更新 digest）"
+      ],
       "source": "audit.scan",
       "stats": {
         "audits": 56,
         "legacy": 11,
-        "subjects_ok": 363,
+        "subjects_ok": 121,
         "with_header": 45
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 1
     },
     {
@@ -344,11 +369,26 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 184,
-        "files": 196,
+        "baseline": 201,
+        "files": 201,
         "max_fn_cc": 114,
-        "max_fn_lines": 1073,
-        "max_lines": 7081
+        "max_fn_lines": 1218,
+        "max_lines": 7332
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "redos",
+      "issues": 0,
+      "name": "正则失控回溯（形态 + 增长律；Y3 接线）",
+      "sample": [],
+      "source": "redos_scan.scan",
+      "stats": {
+        "budget_ms": 1500.0,
+        "n": 65536,
+        "patterns": 174,
+        "probed": 174
       },
       "status": "pass",
       "warns": 0
@@ -390,10 +430,13 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "modules": 164,
+        "metrics_drift": 0,
+        "metrics_missing": 0,
+        "metrics_recorded": 168,
+        "modules": 168,
         "registered_cycles": 0,
-        "registered_sdp": 6,
-        "sdp": 6
+        "registered_sdp": 8,
+        "sdp": 8
       },
       "status": "pass",
       "warns": 0
@@ -435,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 59,
+        "consumed": 60,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 61
+        "scanners": 62
       },
       "status": "pass",
       "warns": 0
@@ -450,7 +493,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 31,
+        "pinned_uses": 46,
         "requirements_files": 4,
         "with_explicit_permissions": 15,
         "workflows": 15
@@ -475,12 +518,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "0a6492aa95fd5162015980cd05c08221c00cd098afbb8bf03bbe9a6386681019",
+  "root_digest": "79639497be2bd0bf18dc268593597762dd5eb2c2ec789ff0e10e4bacc224e08b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 26,
-    "warn": 2
+    "fail": 1,
+    "pass": 28,
+    "warn": 1
   }
 }

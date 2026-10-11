@@ -102,7 +102,8 @@ HARD_ALLOW = {
 SOFT_IMPORTS = {
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
     "PySide6": "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
-    "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
+    "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指"
+        "引",
 }
 #: R5 存量残留（**WARN 挂账**：确有理由保留的存量违规须带裁决/文档指针；不判死但不得隐身）。
 #: 本扫描按**文件系统**取件 ⇒ 未入库的本地副本同样会被扫到。2026-09-20：唯一一项残留经作者裁决
@@ -135,7 +136,8 @@ DANGEROUS_CALLS = {
 #: 落地依据（2026-09 实测）：本仓 core 里当时有 **6 处 `.unlink()`**，全部一路绿灯穿过 R6——
 #: 与 F-10「递归删除面此前不在类目内」是同一类缺口。
 METHOD_SINKS = {
-    "unlink": "CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左右）",
+    "unlink": "CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左"
+        "右）",
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
@@ -149,16 +151,19 @@ SINK_ALLOW = {
         "监听机制自检的临时目录清理：该目录由本模块 tempfile.mkdtemp 现建（路径不来自外部输入），"
         "且**非递归**——真出现意外子树时 rmdir 会拒绝，而不是把它一并抹掉",
     "disk_cache.py:unlink":
-        "缓存裁剪：落点在 <NF_HOME>/cache/<tag>/ 之下，文件名是本模块自己算的 sha256（非外部输入），"
+        "缓存裁剪：落点在 <NF_HOME>/cache/<tag>/ 之下，文件名是本模块自己算的 sha256（非外部输入）"
+            "，"
         "且只删超出保留份数的旧条目（按 mtime 排序）",
     "atomic_write.py:unlink":
         "原子写的**失败清理**：临时件由本模块 tempfile.mkstemp 现造（名与落点皆非外部输入），"
         "只删自己刚写的那一个 .tmp；`os.replace` 成功路径不删除任何东西",
     "domain_pack.py:unlink":
-        "域包工厂的陈旧件清理：只在目标包自己的 modules/ 与 pipelines/ 内、且文件名令牌匹配该包代码，"
+        "域包工厂的陈旧件清理：只在目标包自己的 modules/ 与 pipelines/ 内、且文件名令牌匹配该包代码"
+            "，"
         "删的是本轮未列入 planned 的旧产物（可复算，删旧即安全）",
     "pack_combo.py:unlink":
-        "组合包改号残留清理：只在目标包自己的 pipelines/ 内、且文件名形如 P\\d{2,3} 且不等于本轮管线号",
+        "组合包改号残留清理：只在目标包自己的 pipelines/ 内、且文件名形如 P\\d{2,3} 且不等于本轮管"
+            "线号",
     "storage.py:unlink":
         "Preset 删除（remove_preset）：路径由 Store._safe_name 拼装且限于 presets_root 之下",
     "watch.py:unlink":
@@ -357,12 +362,16 @@ def _file_findings(rel: str, text: str, env: str, root: str):
             target = delta["residue"] if residue else out
             if mod in SOFT_IMPORTS:
                 if lineno not in guarded:
-                    msg = ("%s:%d 第三方 %s 未软导入（须 try/except ImportError 守卫；登记理由：%s）"
+                    msg = ("%s:%d 第三方 %s 未软导入（须 try/except ImportError 守卫；登记理由：%s"
+                        "）"
                            % (rel, lineno, mod, SOFT_IMPORTS[mod]))
                     target.append("%s（%s）" % (msg, residue) if residue else msg)
                 continue
-            msg = ("%s:%d 第三方 import 未登记：%s（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS "
-                   "登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）" % (rel, lineno, mod))
+            msg = ("%s:%d 第三方 import 未登记：%s（修复指引：改为软导入并在 purity_scan.SOFT_IMPOR"
+                "TS "
+                   "登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）" % (rel,
+ lineno,
+ mod))
             target.append("%s（%s）" % (msg, residue) if residue else msg)
         for lineno, call, shell_true in sinks:
             flags = []

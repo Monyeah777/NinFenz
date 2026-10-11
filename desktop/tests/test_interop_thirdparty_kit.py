@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """他证通道（`scripts/interop_thirdparty_kit.py`）的输入形状与可达性判据。
 
 实测缺口（2026-10-01）：`--record <不存在的证据件>` 直接 **FileNotFoundError 裸 traceback**；

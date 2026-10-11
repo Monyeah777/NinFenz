@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """公开面泄漏门禁：仓库文本产物不得含**机器绝对路径**或**凭据形状**。
 
 依据（本轮取证）：金标注据 15 件、`protocol/instruction_evidence.json` 2 条输出摘要、

@@ -105,6 +105,21 @@ fn cached_regex(pat: &str) -> Option<regex::Regex> {
     })
 }
 
+/// 真源 `json_schema.json_equal`：JSON 值相等（**严格**，布尔与数字不互相冒充）。
+///
+/// 2026-10-10 全仓审计 Y4（P1）：enum/const 是**值相等**，而 Python 的 == 把 False == 0 /
+/// True == 1 当同一件。两侧校验器共用这一条相等口径；数字之间仍按数学相等（1 == 1.0）。
+pub fn json_equal(a: &Json, b: &Json) -> bool {
+    match (a, b) {
+        (Json::Bool(x), Json::Bool(y)) => x == y,
+        (Json::Bool(_), _) | (_, Json::Bool(_)) => false,
+        // 数字之间按**数学相等**（真源 Python 的 1 == 1.0 为真；Rust 派生 Eq 会把它判不等）
+        (Json::Int(x), Json::Float(y)) => (*x as f64) == *y,
+        (Json::Float(x), Json::Int(y)) => *x == (*y as f64),
+        _ => a == b,
+    }
+}
+
 /// 真源 `subset_validate`：JSON-schema 子集校验（空 = 通过）。
 pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
@@ -114,6 +129,18 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
     let Json::Object(_) = schema else {
         return vec![format!("{}: schema 段非对象", path)];
     };
+    // enum 是**类型无关**的约束：先判一次，后面各类型分支的 return 都会带上它
+    // （2026-10-10 审计 Y4：真源此前只在 string 分支里判 ⇒ boolean/number 的 enum 静默放行）。
+    if let Some(Json::Array(en)) = get(schema, "enum") {
+        if !en.iter().any(|e| json_equal(e, instance)) {
+            out.push(format!(
+                "{}: 值 {} 不在枚举 {}",
+                path,
+                py_repr(instance),
+                py_repr(&Json::Array(en.clone()))
+            ));
+        }
+    }
     let stype = get(schema, "type");
     match stype {
         None => return out,
@@ -208,16 +235,6 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
                     if len < n {
                         out.push(format!("{}: 字符串过短 {} < minLength {}", path, len, n));
                     }
-                }
-            }
-            if let Some(Json::Array(en)) = get(schema, "enum") {
-                if !en.iter().any(|e| e == instance) {
-                    out.push(format!(
-                        "{}: 值 {} 不在枚举 {}",
-                        path,
-                        py_repr(instance),
-                        py_repr(&Json::Array(en.clone()))
-                    ));
                 }
             }
             if let Some(Json::Str(pat)) = get(schema, "pattern") {
@@ -623,6 +640,24 @@ mod tests {
         assert_eq!(got.len(), 1);
         // Python: 值 'z' 不在枚举 ['a', 'b']
         assert!(got[0].contains("值 'z' 不在枚举 ['a', 'b']"), "{:?}", got);
+    }
+
+    #[test]
+    fn enum_is_type_independent_and_bool_is_not_number() {
+        // 2026-10-10 审计 Y4：enum 此前只在 string 分支里判 ⇒ boolean/number 静默放行。
+        let schema = j(serde_json::json!({"type": "boolean", "enum": [true]}));
+        let got = subset_validate(&j(serde_json::json!(false)), &schema, "p");
+        assert_eq!(got.len(), 1, "boolean enum 必须判违例：{:?}", got);
+        assert!(got[0].contains("不在枚举"), "{:?}", got);
+        // 严格相等：False 不能冒充 0 / True 不能冒充 1；数字之间 1 == 1.0
+        assert!(json_equal(&j(serde_json::json!(true)), &j(serde_json::json!(true))));
+        assert!(!json_equal(&j(serde_json::json!(true)), &j(serde_json::json!(1))));
+        assert!(!json_equal(&j(serde_json::json!(false)), &j(serde_json::json!(0))));
+        assert!(json_equal(&j(serde_json::json!(1)), &j(serde_json::json!(1.0))));
+        // 无 type 时 enum 违例不得被吞掉（真源这一支此前 return []）
+        let s2 = j(serde_json::json!({"enum": ["a"]}));
+        let g2 = subset_validate(&j(serde_json::json!("b")), &s2, "p");
+        assert_eq!(g2.len(), 1, "无 type 也要报 enum：{:?}", g2);
     }
 
     #[test]

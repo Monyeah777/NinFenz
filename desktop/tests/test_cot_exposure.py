@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """思维链/对话转写暴露门禁：仓库文本面不得残留**内部推理**或**对话稿**（作者指令「思维链暴露删掉」）。
 
 为什么：`AGENTS.md`「公开文案纪律」写明「不写决策过程」，多份产出纪律文档也要求交付是
@@ -33,15 +32,18 @@ EXTS = (".md", ".py", ".json", ".txt", ".yaml", ".yml", ".cs", ".csv", ".sh", ".
         # 完全符合本判据「按 agent 可能读到取」的口径，但历次扩面都漏了它（按扩展名取面的老毛病）。
         # 扩面前实测：面外 67 件（45 件 .rs + lock/gitignore/cff/vba 等）**零命中** ⇒ 扩展免费。
         ".rs",
-        # 2026-10-04 同批补 `.mjs` / `.js`：npm 一键包与 HF Space 打包的 **9 件 JS 源码**（同样带中文注释），
+        # 2026-10-04 同批补 `.mjs` / `.js`：npm 一键包与 HF Space 打包的 **9 件 JS 源码**（同样带中
+        # 文注释），
         # 扩面前实测零命中。
         ".mjs", ".js")
 #: **无扩展名的文本件**：按名字点名（都能被 agent 读到）。判据会断言它们真的在场，
 #: 免得改名后这条覆盖静默失效。
 EXTRA_TEXT_FILES = ("scripts/nf", "LICENSE", ".gitattributes", ".gitignore",
                     "packaging/hf-space/Dockerfile")
-#: **刻意留在面外**（逐条给理由，免得后人以为是漏了）：`Cargo.lock` 是生成物、`library/anchors/*.sig`
-#: 是签名（二进制语义）、`*.gitignore` 子目录副本与 `protocol/demo_signers/allowed_signers` 是纯模式配置、
+# : **刻意留在面外**（逐条给理由，免得后人以为是漏了）：`Cargo.lock` 是生成物、`library/anchors/*.si
+# g`
+# : 是签名（二进制语义）、`*.gitignore` 子目录副本与 `protocol/demo_signers/allowed_signers` 是纯模
+# 式配置、
 #: `CITATION.cff` 是登记元数据、`*.vba` 是资产契约的**夹具**（故意制造怪内容）。它们都不承载散文。
 #: 本判据自身的仓库相对路径（含负例样本 ⇒ 豁免，见 public_texts）
 SELF = "desktop/tests/test_cot_exposure.py"
@@ -100,9 +102,11 @@ class CotRuleTest(unittest.TestCase):
             self.assertTrue((ROOT / rel).is_file(), "点名的无扩展文本件不见了：%s" % rel)
         texts = public_texts()
         self.assertTrue(any(r.endswith(".mmd") for r in texts), "生成图（.mmd）不在扫描面内")
-        self.assertTrue(any(r.endswith(".graphml") for r in texts), "生成图（.graphml）不在扫描面内")
+        self.assertTrue(any(r.endswith(".graphml") for r in texts),
+ "生成图（.graphml）不在扫描面内")
         self.assertTrue(any(r.endswith(".ps1") for r in texts), "PowerShell 门禁脚本不在扫描面内")
-        self.assertIn("scripts/nf", texts, "启动器 scripts/nf 不在扫描面内（它是被 agent 读的文本件）")
+        self.assertIn("scripts/nf", texts, "启动器 scripts/nf 不在扫描面内（它是被 agent 读的文本件"
+            "）")
         # 2026-10-04：AOT 快线的 .rs 源（注释是中文散文）必须真在面内，且留塌缩下限。
         rust = [r for r in texts if r.endswith(".rs")]
         self.assertIn("engine/rust/src/main.rs", texts, "快线 main.rs 不在扫描面内")

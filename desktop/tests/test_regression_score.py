@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """基线相对回归评分单测（绝对门之上的 no-silent-worsening 面）。"""
 import builtins
 import collections

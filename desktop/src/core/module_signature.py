@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 
 SCHEMA = "nf-module-signatures/1"
 BASELINE_REL = "protocol/module_signatures.json"
@@ -52,7 +52,7 @@ def baseline(root: str = ".", rel: str = BASELINE_REL) -> Dict[str, Any]:
     p = Path(root) / rel
     if not p.is_file():
         return {}
-    return json.loads(p.read_text(encoding="utf-8"))
+    return json_doc.load(p, dict, what=rel)
 
 
 def write(root: str = ".", rel: str = BASELINE_REL) -> str:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`desktop/src/core/*.py` 的**导入图**（谁 import 了 core 里的谁）——**持久化**。
 
 依据（实测 2026-09-29）：一次冷进程 `evaluate` 里，16 个派生站点各自要解析导入闭包，而

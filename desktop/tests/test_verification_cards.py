@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """验证卡册一致性门禁（`docs/verification-cards.md` ↔ `verify.sh`）。
 
 动机（本轮取证）：卡册自称由 `build_verification_cards.ps1` 生成，**该脚本不在仓库**——
@@ -15,7 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-spec = importlib.util.spec_from_file_location("bvc", ROOT / "scripts" / "build_verification_cards.py")
+spec = importlib.util.spec_from_file_location("bvc", ROOT / "scripts" / "build_verification_cards.p"
+    "y")
 assert spec is not None and spec.loader is not None
 bvc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bvc)
@@ -29,7 +29,8 @@ class VerificationCardsTest(unittest.TestCase):
 
     def test_generated_region_matches_live_recompute(self):
         self.assertEqual(self.doc, bvc.render(),
-                         "卡册生成区与 verify.sh 不一致（跑 scripts/build_verification_cards.py --write）")
+                         "卡册生成区与 verify.sh 不一致（跑 scripts/build_verification_cards.py --w"
+                             "rite）")
 
     def test_every_check_has_a_card_and_index_row(self):
         cards = {int(m) for m in re.findall(r"^### V(\d+) ·", self.doc, re.M)}

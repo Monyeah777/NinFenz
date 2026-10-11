@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """语言面（core/locales.py）回归：文件即真源 + 逐面同事实 + 切换行 + 结构对齐 + 变异自证。"""
 import sys
 import tempfile
@@ -36,7 +35,8 @@ class MutationTest(unittest.TestCase):
             (r / "verify.sh").write_text("x\n", encoding="utf-8")
             (r / "README.md").write_text("# T\n\n<!-- nf:locales --> 语言 / Languages：**中文**\n",
                                          encoding="utf-8")
-            (r / "README.en.md").write_text("# T\n\n<!-- nf:locales --> 语言 / Languages：[中文](README.md) · **English**\n",
+            (r / "README.en.md").write_text("# T\n\n<!-- nf:locales --> 语言 / Languages：[中文](RE"
+                "ADME.md) · **English**\n",
                                             encoding="utf-8")
             issues, _ = lc.check(d)
             self.assertTrue(any("缺机读锚点" in i for i in issues), issues)
@@ -84,7 +84,9 @@ class RegistryTest(unittest.TestCase):
             self._mini(Path(d), {"schema": "nf-locales/1", "canonical": "zh", "guides": [],
                                  "locales": [{"id": "zh", "label": "中文", "entry": "README.md",
                                               "coverage": "entry"},
-                                             {"id": "en", "label": "English", "entry": "README.en.md",
+                                             {"id": "en",
+ "label": "English",
+ "entry": "README.en.md",
                                               "codeowner": "@x", "coverage": "entry"}]})
             issues, _ = lc.check(d)
             self.assertTrue(any("codeowner" in i for i in issues), issues)
@@ -94,7 +96,9 @@ class RegistryTest(unittest.TestCase):
             self._mini(Path(d), {"schema": "nf-locales/1", "canonical": "zh", "guides": [],
                                  "locales": [{"id": "zh", "label": "中文", "entry": "README.md",
                                               "codeowner": "@x", "coverage": "entry"},
-                                             {"id": "en", "label": "English", "entry": "README.en.md",
+                                             {"id": "en",
+ "label": "English",
+ "entry": "README.en.md",
                                               "codeowner": "@x", "coverage": "entry"}]})
             d2 = Path(d) / "docs" / "en"
             d2.mkdir(parents=True)
@@ -127,7 +131,8 @@ class DocTreeTest(unittest.TestCase):
                             {"id": "en", "label": "English", "entry": "README.en.md",
                              "codeowner": "@x", "coverage": "entry+guides"}],
                 "docs": [{"path": "docs/a.md",
-                          "translations": {"en": {"path": "docs/en/a.md", "source_sha256": digest}}}]}
+                          "translations": {"en": {"path": "docs/en/a.md",
+ "source_sha256": digest}}}]}
 
     def test_stale_translation_is_caught(self):
         with tempfile.TemporaryDirectory() as d:

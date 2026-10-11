@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """自述数字实算真源（`core/repo_stats.py`）单测。
 
 为什么要补这一件：`repo_stats.py` 由 5157419 引入（237 行），但仓内没有对应测试，
@@ -49,7 +48,8 @@ def _mkroot(root):
                           "globs": ["community/*/protocol.yaml"]}]}))
     _write(root, "library/NF-1.md", "# 条目\n")
     _write(root, "library/INDEX.md", "# 索引\n")
-    _write(root, "verify.sh", "#!/usr/bin/env bash\n# 版本 : v2.28\ncheck1(){\n  :\n}\ncheck2(){\n  :\n}\n")
+    _write(root, "verify.sh", "#!/usr/bin/env bash\n# 版本 : v2.28\ncheck1(){\n  :\n}\ncheck2(){\n "
+        " :\n}\n")
     for rel in rs.BLOCK_FILES:
         _write(root, rel, "# 头部\n\n%s\n\n%s\n\n# 尾部\n" % (rs.BEGIN, rs.END))
 
@@ -115,7 +115,9 @@ class ComputeTest(unittest.TestCase):
     def test_missing_coverage_keys_are_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             _mkroot(tmp)
-            _write(tmp, "protocol/standards_catalog.json", json.dumps({"coverage": {"standards": 1}}))
+            _write(tmp,
+ "protocol/standards_catalog.json",
+ json.dumps({"coverage": {"standards": 1}}))
             _, issues = rs.compute(tmp)
             self.assertTrue([i for i in issues if "coverage 缺" in i], issues)
 
@@ -188,7 +190,10 @@ class WriteCheckRoundTripTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             _mkroot(tmp)
             rs.write(tmp)
-            _write(tmp, rs.STATS_REL, json.dumps({"schema": "nf-repo-stats/1", "core_modules": 999}))
+            _write(tmp,
+ rs.STATS_REL,
+ json.dumps({"schema": "nf-repo-stats/1",
+ "core_modules": 999}))
             issues, _ = rs.check(tmp)
             self.assertTrue([i for i in issues if rs.STATS_REL in i], issues)
 

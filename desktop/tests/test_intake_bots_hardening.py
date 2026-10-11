@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """云端代收站（.github/scripts）加固回归测试 —— 2026-09-24 渗透发现的「check 的 check」。
 
 对应两项渗透确认缺陷：
@@ -43,10 +42,11 @@ def bot_module():
 MAX_EXEC_STRLEN = 131072
 
 
-def run_bot(tmp, body=None, number="991", body_file=None):
+def run_bot(tmp, body=None, number="991", body_file=None, title=None):
     """在临时副本里真跑一次 GitHub 前端入库（DRY_RUN，不提交/不调 API）。
 
     正文传输：小载荷走 `ISSUE_BODY`（历史通道）；大载荷走 `ISSUE_BODY_FILE`（见下）。
+    `title` 用于投稿标题面判据（审计 Y2：标题也是不可信输入）。
     """
     shutil.copytree(os.path.join(ROOT, "library"), os.path.join(tmp, "library"))
     shutil.copytree(os.path.join(ROOT, "desktop", "src"),
@@ -57,7 +57,7 @@ def run_bot(tmp, body=None, number="991", body_file=None):
     env.pop("ISSUE_BODY_FILE", None)
     env.update({"DRY_RUN": "1", "REPO": "Monyeah777/NinFenz",
                 "ISSUE_NUMBER": number, "ISSUE_AUTHOR": "monyeah777",
-                "ISSUE_TITLE": "【NF投稿】回归测试投稿"})
+                "ISSUE_TITLE": title or "【NF投稿】回归测试投稿"})
     if body_file is not None:
         env["ISSUE_BODY_FILE"] = str(body_file)
     else:
@@ -107,6 +107,48 @@ class GateScopeTest(unittest.TestCase):
         self.assertFalse(hits, "入库机器人自身触发门禁：%s" % hits)
 
 
+class FrontmatterInjectionTest(unittest.TestCase):
+    """Y2（P1，2026-10-10 全仓审计）：投稿值不得注入 frontmatter 结构。
+
+    投稿标题/元信息是**不可信输入**，而条目 frontmatter 是按行读的（`parse_frontmatter`）：
+    值里一个换行就能注入新键（改掉 status / 加 sources 项），方括号成对会被读成列表。
+    """
+
+    def test_helpers_flatten_and_reject_unsafe_shapes(self):
+        m = bot_module()
+        self.assertEqual("a b", m.flatten_fm_value("a\nb"))
+        self.assertEqual("a b", m.flatten_fm_value("a\r\nb"))
+        self.assertTrue(m.fm_scalar_ok("普通标题"))
+        self.assertFalse(m.fm_scalar_ok("[a, b]"), "方括号成对会被解析成列表")
+        self.assertFalse(m.fm_scalar_ok('x"'), "首尾引号会被解析器剥掉")
+        self.assertEqual("title", m.fm_fields_ok((("title", "[x]"), ("type", "ok"))))
+        self.assertEqual("", m.fm_fields_ok((("title", "ok"),)))
+
+    def test_newline_in_issue_title_cannot_inject_keys(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proc = run_bot(tmp, "一句话: 演示\n\n---\n\n# 正文\n\n普通投稿。\n",
+                           title="【NF投稿】正常标题\nstatus: retired")
+            self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
+            made = new_entries(tmp)
+            self.assertTrue(made, "机器人未产出新条目：%s" % proc.stdout)
+            with open(os.path.join(tmp, "library", made[0]), encoding="utf-8") as fh:
+                text = fh.read()
+            from core.library_entries import parse_frontmatter
+            fm, _body = parse_frontmatter(text)
+            self.assertEqual("active", fm.get("status"),
+                             "标题里的换行注入了 frontmatter 键（status 被改写）")
+            self.assertIn("status: retired", str(fm.get("title")),
+                          "换行应被压平成普通文本，而不是成为结构")
+
+    def test_unsafe_bracket_value_is_rejected_not_corrupted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proc = run_bot(tmp, "标题: [a, b]\n一句话: 演示\n\n---\n\n# 正文\n\n投稿。\n")
+            self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
+            self.assertFalse(new_entries(tmp),
+                             "方括号元信息会被读成列表——应拒收而不是静默改形状")
+            self.assertIn("形状不安全", proc.stdout)
+
+
 class IngestRatingTest(unittest.TestCase):
     """F-03：入库产物必须自带 frontmatter `rating`，否则自伤 check34。"""
 
@@ -115,7 +157,8 @@ class IngestRatingTest(unittest.TestCase):
 
     def test_entry_carries_rating_and_passes_gates(self):
         with tempfile.TemporaryDirectory() as tmp:
-            proc = self._run_bot(tmp, "标题: 回归测试条目\n一句话: 演示\n\n---\n\n# 正文\n\n普通投稿。\n")
+            proc = self._run_bot(tmp, "标题: 回归测试条目\n一句话: 演示\n\n---\n\n# 正文\n\n普通投"
+                "稿。\n")
             self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
 
             made = new_entries(tmp)
@@ -133,7 +176,8 @@ class IngestRatingTest(unittest.TestCase):
         """投稿显式声明词表内分级时，机器人须照写（而不是一律 unrated）。"""
         with tempfile.TemporaryDirectory() as tmp:
             proc = self._run_bot(
-                tmp, "标题: 声明分级条目\n分级: mature\n一句话: 演示\n\n---\n\n# 正文\n\n普通投稿。\n")
+                tmp,
+ "标题: 声明分级条目\n分级: mature\n一句话: 演示\n\n---\n\n# 正文\n\n普通投稿。\n")
             self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
             made = new_entries(tmp)
             with open(os.path.join(tmp, "library", made[0]), encoding="utf-8") as fh:
@@ -147,7 +191,8 @@ class IngestSecretRefusalTest(unittest.TestCase):
     def test_secret_shaped_submission_is_refused(self):
         fake = "ghp_" + "A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"
         with tempfile.TemporaryDirectory() as tmp:
-            proc = run_bot(tmp, "标题: 示例条目\n一句话: 演示\n\n---\n\n# 正文\n\n占位：" + fake + "\n")
+            proc = run_bot(tmp,
+ "标题: 示例条目\n一句话: 演示\n\n---\n\n# 正文\n\n占位：" + fake + "\n")
             self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
             self.assertEqual([], new_entries(tmp),
                              "含密钥形状的投稿不应入库（会二次公开分发密钥并把 CI 打红）")
@@ -248,7 +293,8 @@ class IngestSizeCapTest(unittest.TestCase):
 
     def test_normal_sized_submission_still_ingests(self):
         with tempfile.TemporaryDirectory() as tmp:
-            proc = run_bot(tmp, "标题: 常规条目\n一句话: 演示\n\n---\n\n# 正文\n\n" + ("正常内容。" * 500) + "\n")
+            proc = run_bot(tmp,
+ "标题: 常规条目\n一句话: 演示\n\n---\n\n# 正文\n\n" + ("正常内容。" * 500) + "\n")
             self.assertEqual(0, proc.returncode, proc.stdout + proc.stderr)
             self.assertEqual(1, len(new_entries(tmp)), proc.stdout)
 

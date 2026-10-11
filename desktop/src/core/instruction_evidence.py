@@ -23,6 +23,7 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 DECL_REL = "protocol/instruction_evidence.json"
 SCHEMA = "nf-instruction-evidence/1"
@@ -43,7 +44,7 @@ def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
         return {}, ["缺指令实测记录件 %s（修复指引：新建并声明入口指令，再跑 "
                     "python scripts/instruction_evidence.py --record）" % DECL_REL]
     try:
-        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc = json_doc.load(p, dict, what=DECL_REL)
     except ValueError as exc:
         return {}, ["%s 不是合法 JSON：%s（修复指引：修好 JSON 语法）" % (DECL_REL, exc)]
     issues: List[str] = []

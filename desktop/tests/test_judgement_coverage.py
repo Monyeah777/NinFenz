@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """判据接线覆盖（`core/judgement_coverage.py`）回归测试 —— 静态可核验 / 架构纯度面。
 
 关键断言：未接线且未登记判 FAIL（带修复指引）、例外登记放行、例外失效记 WARN、

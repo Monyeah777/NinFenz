@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NinFenz 全链管道 CLI（v2.1.0 B2：retrieve→compose→gate→export 单命令）。
 
 用法：
@@ -39,6 +38,7 @@ if hasattr(sys.stderr, "reconfigure"):
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
+from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
 interp_diet.restore()
 
 NF_CLI_VERSION = "1.0.1"
@@ -86,15 +86,20 @@ def _make_parser() -> argparse.ArgumentParser:
                    help="显示版本号后退出")
     sub = p.add_subparsers(dest="cmd", required=False)
 
-    st = sub.add_parser("stats", help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
-                        description="出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁止手改")
+    st = sub.add_parser("stats",
+ help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
+                        description="出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁"
+                            "止手改")
     st.add_argument("--write", action="store_true", help="重写生成区并落 protocol/repo_stats.json")
     st.add_argument("--check", action="store_true", help="只校验（生成区 == 实算）")
     st.add_argument("--json", action="store_true", help="打印机读结果")
 
-    run = sub.add_parser("run", help="跑全链管道：模块选择→装配→质检→导出", description="跑全链管道：模块选择→装配→质检→导出")
+    run = sub.add_parser("run",
+ help="跑全链管道：模块选择→装配→质检→导出",
+ description="跑全链管道：模块选择→装配→质检→导出")
     run.add_argument("--pipeline", required=True,
-                     help="管线 md 文件路径（如 community/校园西幻轻混组合包/pipelines/P04_轻混装配流管线.md）")
+                     help="管线 md 文件路径（如 community/校园西幻轻混组合包/pipelines/P04_轻混装配"
+                         "流管线.md）")
     run.add_argument("--modules", required=True,
                      help="参与装配的模块 full_id，逗号分隔（如 通用类:M00,轻混类:M91）")
     run.add_argument("--store", default=None,
@@ -106,19 +111,23 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="导出格式（exporter 注册表：ccv3/skill/agents/claude/mcp）")
     run.add_argument("--doc-semantics", default=None,
                      choices=["project_rules", "skill"],
-                     help="显式声明装配产物语义（v2.3.0 A3：project_rules → AGENTS/CLAUDE 出口；skill → SKILL）——不传则回退 classify 启发式")
+                     help="显式声明装配产物语义（v2.3.0 A3：project_rules → AGENTS/CLAUDE 出口；ski"
+                         "ll → SKILL）——不传则回退 classify 启发式")
     run.add_argument("--dest", default=None, help="导出目录（缺省=store 根）")
     run.add_argument("--variant-add", default="",
-                     help="变体增量模块 full_id（逗号分隔，v2.3.0 B2：经 apply_variant 并入 selected）")
+                     help="变体增量模块 full_id（逗号分隔，v2.3.0 B2：经 apply_variant 并入 selecte"
+                         "d）")
     run.add_argument("--variant-remove", default="",
-                     help="变体移除模块 full_id（逗号分隔，从 selected 剔除；与 --variant-add 同用时 remove 优先）")
+                     help="变体移除模块 full_id（逗号分隔，从 selected 剔除；与 --variant-add 同用"
+                         "时 remove 优先）")
     run.add_argument("--no-include-refs", action="store_true",
                      help="不并入 E3 references 跨包模块（默认并入）")
     run.add_argument("--force-export", action="store_true",
                      help="质量门 FAIL 也导出（诊断用；ok 仍 False）")
 
     reg = sub.add_parser("register",
-                         help="协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）", description="协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）")
+                         help="协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）",
+ description="协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）")
     reg.add_argument("pkg_dir", help="包目录（如 community/校园西幻轻混组合包）")
     reg.add_argument("--check", dest="mode", action="store_const", const="check",
                      help="只校验三要件 + 打印投影 diff（缺省，不写盘）")
@@ -129,7 +138,8 @@ def _make_parser() -> argparse.ArgumentParser:
     reg.set_defaults(mode="check")
 
     mkt = sub.add_parser("market",
-                         help="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）", description="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）")
+                         help="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）",
+ description="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）")
     mkt.add_argument("pkg_dir", nargs="?", default=None,
                      help="包目录（如 community/校园西幻轻混组合包）；缺省 + --list 列目录")
     mkt.add_argument("--list", action="store_true",
@@ -143,30 +153,36 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     spc = sub.add_parser("spec",
-                         help="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）", description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）")
+                         help="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）",
+ description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）")
     spc.add_argument("action", nargs="?", default="ls", choices=["ls"],
                      help="动作（ls 列 spec 版本清单）")
     spc.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     rnd = sub.add_parser("render",
-                         help="协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）", description="协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）")
+                         help="协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）",
+ description="协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）")
     rnd.add_argument("pkg_dir", help="包目录（如 community/技术文档域包）")
     rnd.add_argument("--fmt", default="agents", choices=["agents", "claude", "skill"],
                      help="目标格式（agents/claude/skill）")
     rnd.add_argument("--dest", default=None, help="输出目录（缺省=当前目录）")
 
     srv = sub.add_parser("serve",
-                         help="MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起）", description="MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起）")
+                         help="MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 M"
+                             "CP client 拉起）",
+ description="MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起）")
     srv.add_argument("snapshot", nargs="?", default=None,
                      help="mcp.json 快照路径（如 nf run --fmt mcp 产物）；"
                           "缺省 = 实时仓库面（无需先产快照，默认路径直起）")
 
     dsn = sub.add_parser("design",
-                         help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）", description="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）")
+                         help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
+ description="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）")
     dsub = dsn.add_subparsers(dest="design_cmd", required=True)
     stl = dsub.add_parser("steelman",
-                          help="钢人论证工作单：init/--check/ls（默认缺席，按需自检）", description="钢人论证工作单：init/--check/ls（默认缺席，按需自检）")
+                          help="钢人论证工作单：init/--check/ls（默认缺席，按需自检）",
+ description="钢人论证工作单：init/--check/ls（默认缺席，按需自检）")
     stl.add_argument("action", nargs="?", default="ls",
                      choices=["init", "ls"],
                      help="动作（init 生成工作单 / ls 列决策档案索引；缺省 ls）")
@@ -186,7 +202,8 @@ def _make_parser() -> argparse.ArgumentParser:
     # nf design audit（M_AUDIT，升格合并后 design 家族统一入口；steelman 语义
     # 由 audit steelman mode 承载，nf design steelman 保留为兼容别名）
     aud = dsub.add_parser("audit",
-                          help="协议设计审计（M_AUDIT：决策过程质量——钢人/blindspot/full）", description="协议设计审计（M_AUDIT：决策过程质量——钢人/blindspot/full）")
+                          help="协议设计审计（M_AUDIT：决策过程质量——钢人/blindspot/full）",
+ description="协议设计审计（M_AUDIT：决策过程质量——钢人/blindspot/full）")
     aud.add_argument("action", nargs="?", default="ls",
                      choices=["init", "ls"],
                      help="动作（init 生成 audit.md / ls 列审计索引；缺省 ls）")
@@ -207,21 +224,25 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="ls：扫描目录（缺省 = 当前目录）")
 
     whr = sub.add_parser("who-refers",
-                         help="引用反查（A2：谁引用了某模块，遍历 registry references）", description="引用反查（A2：谁引用了某模块，遍历 registry references）")
+                         help="引用反查（A2：谁引用了某模块，遍历 registry references）",
+ description="引用反查（A2：谁引用了某模块，遍历 registry references）")
     whr.add_argument("module_id", help="模块 id（如 M91 或 情感:M55）")
     whr.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     imp = sub.add_parser("impact",
-                         help="变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）", description="变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）")
-    imp.add_argument("target", help="目标（protocol id 如 校园情感领域包，或 module id 如 M55 / 情感:M55）")
+                         help="变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）",
+ description="变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）")
+    imp.add_argument("target",
+ help="目标（protocol id 如 校园情感领域包，或 module id 如 M55 / 情感:M55）")
     imp.add_argument("--check", dest="mode", action="store_const", const="check",
                      help="门禁模式：破坏性变更（有引用方/官方在册）exit 1，无破坏 exit 0")
     imp.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     ren = sub.add_parser("rename",
-                         help="模块改名引用重链（A5：references 中引用该模块的条目批量更新）", description="模块改名引用重链（A5：references 中引用该模块的条目批量更新）")
+                         help="模块改名引用重链（A5：references 中引用该模块的条目批量更新）",
+ description="模块改名引用重链（A5：references 中引用该模块的条目批量更新）")
     ren.add_argument("old_id", help="旧模块 id（如 M55 或 情感:M55）")
     ren.add_argument("new_id", help="新模块 id（如 M99 或 情感:M99）")
     ren.add_argument("--check", dest="mode", action="store_const", const="check",
@@ -232,7 +253,9 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     imp2 = sub.add_parser("import",
-                          help="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗留闭环）", description="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗留闭环）")
+                          help="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗"
+                              "留闭环）",
+ description="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗留闭环）")
     imp2.add_argument("file", help="外部产物文件（SKILL.md 或 chara.json）")
     imp2.add_argument("--register", action="store_true",
                       help="解析出的 IR 模块幂等装载进 Store 内容库（save_module 覆盖式幂等）")
@@ -241,11 +264,16 @@ def _make_parser() -> argparse.ArgumentParser:
 
     # nf asset：资产供应链台账（40 总纲 v2.7 波 A S2——add/verify/inventory/ls/rm/deprecate/restore）
     ast = sub.add_parser("asset",
-                         help="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏览 / rm 摘除 / deprecate·restore 流转）", description="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏览 / rm 摘除 / deprecate·restore 流转）")
+                         help="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏"
+                             "览 / rm 摘除 / deprecate·restore 流转）",
+ description="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏览 / rm 摘除 / dep"
+     "recate·restore 流转）")
     asub = ast.add_subparsers(dest="asset_cmd", required=True)
 
     a_add = asub.add_parser("add",
-                            help="入库资产：资产文件头写 nf-asset 头 + 台账 append（溯源键表自动生成）", description="入库资产：资产文件头写 nf-asset 头 + 台账 append（溯源键表自动生成）")
+                            help="入库资产：资产文件头写 nf-asset 头 + 台账 append（溯源键表自动生"
+                                "成）",
+ description="入库资产：资产文件头写 nf-asset 头 + 台账 append（溯源键表自动生成）")
     a_add.add_argument("file", help="资产文件路径（相对 --root，如 用户自定义/TECH_RULES.md）")
     a_add.add_argument("--key", required=True, help="溯源键（台账内唯一，键无孤儿前提）")
     a_add.add_argument("--source", required=True,
@@ -261,51 +289,66 @@ def _make_parser() -> argparse.ArgumentParser:
                        help="货架分级（首次建档落台账级；缺省 official）")
     a_add.add_argument("--package", default="", help="归属包名（台账级，如 官方核心资产集）")
 
-    a_vrf = asub.add_parser("verify", help="台账闭合校验（与 verify.sh check23 同语义）", description="台账闭合校验（与 verify.sh check23 同语义）")
+    a_vrf = asub.add_parser("verify",
+ help="台账闭合校验（与 verify.sh check23 同语义）",
+ description="台账闭合校验（与 verify.sh check23 同语义）")
     a_vrf.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
 
     a_bl = asub.add_parser("baseline",
                            help="社区资产行数基线（可重签工件；漂移即 FAIL 直到显式重签）",
-                           description="社区资产行数基线（机制对齐 module signature：外形冻结、内容演进须显式重签）")
+                           description="社区资产行数基线（机制对齐 module signature：外形冻结、内容"
+                               "演进须显式重签）")
     a_bl.add_argument("--write", action="store_true", help="重新冻结基线（评审后显式重签）")
     a_bl.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
 
-    a_inv = asub.add_parser("inventory", help="库存盘点（台账摘要 + 未托管/孤儿统计）", description="库存盘点（台账摘要 + 未托管/孤儿统计）")
+    a_inv = asub.add_parser("inventory",
+ help="库存盘点（台账摘要 + 未托管/孤儿统计）",
+ description="库存盘点（台账摘要 + 未托管/孤儿统计）")
     a_inv.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_inv.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（盘点行）")
 
-    a_ls = asub.add_parser("ls", help="货架浏览（--pkg / --tier / --status 过滤）", description="货架浏览（--pkg / --tier / --status 过滤）")
+    a_ls = asub.add_parser("ls",
+ help="货架浏览（--pkg / --tier / --status 过滤）",
+ description="货架浏览（--pkg / --tier / --status 过滤）")
     a_ls.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_ls.add_argument("--json", action="store_true",
                       help="输出结构化 JSON（货架条目）")
     a_dns = asub.add_parser("density",
-                            help="资产键语义密度体检（45：键数/字符/无键与空档统计）", description="资产键语义密度体检（45：键数/字符/无键与空档统计）")
+                            help="资产键语义密度体检（45：键数/字符/无键与空档统计）",
+ description="资产键语义密度体检（45：键数/字符/无键与空档统计）")
     a_dns.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_dns.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（密度统计）")
     a_use = asub.add_parser("usage",
-                            help="资产引用度体检（45：键在 04/community/docs 全语料引用次数/零引用清单）", description="资产引用度体检（45：键在 04/community/docs 全语料引用次数/零引用清单）")
+                            help="资产引用度体检（45：键在 04/community/docs 全语料引用次数/零引用"
+                                "清单）",
+ description="资产引用度体检（45：键在 04/community/docs 全语料引用次数/零引用清单）")
     a_use.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_use.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（引用度统计）")
     a_use.add_argument("--strict", action="store_true",
                        help="零引用键存在即 exit 1（键消费证明进门禁）")
     a_thk = asub.add_parser("thickness",
-                            help="资产语义厚度体检（45：字符/键/小节/表格 + 低信息档候选）", description="资产语义厚度体检（45：字符/键/小节/表格 + 低信息档候选）")
+                            help="资产语义厚度体检（45：字符/键/小节/表格 + 低信息档候选）",
+ description="资产语义厚度体检（45：字符/键/小节/表格 + 低信息档候选）")
     a_thk.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_thk.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（厚度统计）")
     a_led = asub.add_parser("ledger",
-                            help="资产键表机读投影（45：protocol/community_asset_ledger.json；--refresh 重生成）", description="资产键表机读投影（45：protocol/community_asset_ledger.json；--refresh 重生成）")
+                            help="资产键表机读投影（45：protocol/community_asset_ledger.json；--ref"
+                                "resh 重生成）",
+ description="资产键表机读投影（45：protocol/community_asset_ledger.json；--refresh 重生成）")
     a_led.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_led.add_argument("--refresh", action="store_true",
                        help="重生成 ledger 文件（随资产变更提交）")
     a_led.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（校验统计）")
     a_ctr = asub.add_parser("contract",
-                            help="数字资产契约三面校验（数据/代码/脚本：格式+字段完整性+防篡改+AST 规范+可证空指针+脚本 I/O 对齐）",
-                            description="数字资产契约三面校验（真源 protocol/asset_contracts.json；与 verify check40 同源）")
+                            help="数字资产契约三面校验（数据/代码/脚本：格式+字段完整性+防篡改+AST "
+                                "规范+可证空指针+脚本 I/O 对齐）",
+                            description="数字资产契约三面校验（真源 protocol/asset_contracts.json；"
+                                "与 verify check40 同源）")
     a_ctr.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     a_ctr.add_argument("--face", default="", choices=("", "data", "code", "script"),
                        help="只跑某面（缺省=三面全跑）")
@@ -330,12 +373,17 @@ def _make_parser() -> argparse.ArgumentParser:
         _sp.add_argument("--key", required=True, help="溯源键")
     # ---- v2.8.0 波B S4：管线脚手架 ----
     pln = sub.add_parser("pipeline",
-                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）", description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
+                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
+ description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
     psub = pln.add_subparsers(dest="pipeline_cmd", required=True)
-    p_new = psub.add_parser("new", help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）", description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
+    p_new = psub.add_parser("new",
+ help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
+ description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
     p_dry = psub.add_parser("dryrun",
-                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory 分列）",
-                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，答不了『跑得通吗』）")
+                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory "
+                                "分列）",
+                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，"
+                                "答不了『跑得通吗』）")
     p_dry.add_argument("--pipeline", default="", help="管线 md 路径（缺省 + --all 时全仓扫）")
     p_dry.add_argument("--all", action="store_true", help="全仓管线扫一遍并汇总")
     p_dry.add_argument("--json", action="store_true", help="输出执行图 JSON")
@@ -352,30 +400,44 @@ def _make_parser() -> argparse.ArgumentParser:
 
     # ---- v2.8.0 波B S5：模块生命周期 ----
     mds = sub.add_parser("module",
-                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）", description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
+                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 "
+                             "verify）",
+ description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
     msub = mds.add_subparsers(dest="module_cmd", required=True)
-    m_ls = msub.add_parser("ls", help="浏览模块状态（--status 过滤；缺省全量）", description="浏览模块状态（--status 过滤；缺省全量）")
+    m_ls = msub.add_parser("ls",
+ help="浏览模块状态（--status 过滤；缺省全量）",
+ description="浏览模块状态（--status 过滤；缺省全量）")
     m_ls.add_argument("--status", default="", choices=("active", "deprecated", "retired"))
     m_ls.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
     m_ls.add_argument("--json", action="store_true",
                       help="输出结构化 JSON（模块状态清单）")
-    m_st = msub.add_parser("status", help="查看单个模块文件状态位", description="查看单个模块文件状态位")
+    m_st = msub.add_parser("status",
+ help="查看单个模块文件状态位",
+ description="查看单个模块文件状态位")
     m_st.add_argument("file", help="模块 md 路径（如 community/<包>/modules/Mxx_….md）")
-    m_dp = msub.add_parser("deprecate", help="状态流转 → deprecated（写文件元信息行状态位）", description="状态流转 → deprecated（写文件元信息行状态位）")
+    m_dp = msub.add_parser("deprecate",
+ help="状态流转 → deprecated（写文件元信息行状态位）",
+ description="状态流转 → deprecated（写文件元信息行状态位）")
     m_dp.add_argument("file", help="模块 md 路径")
     m_dp.add_argument("--reason", default="", help="弃用原因（写入状态位）")
-    m_rs = msub.add_parser("restore", help="状态流转 → active（deprecated/retired 回退）", description="状态流转 → active（deprecated/retired 回退）")
+    m_rs = msub.add_parser("restore",
+ help="状态流转 → active（deprecated/retired 回退）",
+ description="状态流转 → active（deprecated/retired 回退）")
     m_rs.add_argument("file", help="模块 md 路径")
-    m_vf = msub.add_parser("verify", help="引用门禁扫描（与 verify.sh check24 同语义）", description="引用门禁扫描（与 verify.sh check24 同语义）")
+    m_vf = msub.add_parser("verify",
+ help="引用门禁扫描（与 verify.sh check24 同语义）",
+ description="引用门禁扫描（与 verify.sh check24 同语义）")
     m_sg = msub.add_parser("signature",
                            help="模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
-                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结、实现可替）")
+                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结"
+                               "、实现可替）")
     m_sg.add_argument("--write", action="store_true",
                       help="重新冻结边界基线（评审后显式重签）")
     m_sg.add_argument("--json", action="store_true", help="输出结构化 JSON")
     m_ty = msub.add_parser("types",
                            help="I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
-                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段级新增）")
+                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段"
+                               "级新增）")
     m_ty.add_argument("--write", action="store_true",
                       help="给全部有机读契约的模块补 io_types（确定性推导，未命中写 untyped）")
     m_ty.add_argument("--json", action="store_true", help="输出结构化 JSON")
@@ -385,27 +447,34 @@ def _make_parser() -> argparse.ArgumentParser:
                       help="生成/校验类型积压台账（不可推断的 untyped 显式化）")
     m_ct = msub.add_parser("contract",
                            help="L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
-                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契约的结构化投影）")
+                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契"
+                               "约的结构化投影）")
     m_ct.add_argument("--write", action="store_true", help="写入机读块（幂等；已有机读块则跳过）")
     m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
     m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
 
     # ---- v2.8.0 波B S7：一键演示世界 ----
     dm = sub.add_parser("demo",
-                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）", description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
+                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
+ description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
     dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
     # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
     sg = sub.add_parser("sig",
-                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）", description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
+                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹"
+                            "）",
+ description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
     sg.add_argument("target", nargs="*", default=None,
                     help="目标 md 或目录；缺省 = 全量 01-36 编号方案文档")
     sg.add_argument("--json", action="store_true", help="输出完整 canonical JSON 记录")
     sg.add_argument("--verify", action="store_true",
                     help="check25 同语义：两遍生成一致性校验（可复现门禁）")
     at = sub.add_parser("attest",
-                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂锚）",
-                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证的篡改证据）。"
-                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可复现构建惯例）"
+                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂"
+                            "锚）",
+                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证"
+                            "的篡改证据）。"
+                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可"
+                                        "复现构建惯例）"
                                     "钉成固定值——机器面据此逐字节可复现。")
     at.add_argument("target", nargs="?", default="",
                     help="目标 md（缺省 = 01/02/06/07 四件集合）")
@@ -418,7 +487,8 @@ def _make_parser() -> argparse.ArgumentParser:
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
     sc = sub.add_parser("score",
                         help="基线相对回归评分（Codecov 式：当前 vs 基线，no silent worsening）",
-                        description="基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归判据）")
+                        description="基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归"
+                            "判据）")
     sc.add_argument("--baseline", default="",
                     help="基线 JSON（缺省 = protocol/score_baseline.json）")
     sc.add_argument("--write-baseline", action="store_true",
@@ -429,8 +499,10 @@ def _make_parser() -> argparse.ArgumentParser:
                     help="审计例外 JSON（[{signal,reason}]，例外只标注理由不隐藏回归）")
     sc.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ln = sub.add_parser("lint",
-                        help="机械检查/修复（doc_hygiene 同源判据 + 可选正文 lint；--fix 只改机械面）",
-                        description="机械检查/修复（内部差距：既有扫描器只报告不修，仓库无 auto-fix）")
+                        help="机械检查/修复（doc_hygiene 同源判据 + 可选正文 lint；--fix 只改机械面"
+                            "）",
+                        description="机械检查/修复（内部差距：既有扫描器只报告不修，仓库无 auto-fix"
+                            "）")
     ln.add_argument("target", nargs="*", default=None,
                     help="目标 md/目录（缺省 = doc_hygiene 关键/指令档清单）")
     ln.add_argument("--fix", action="store_true",
@@ -448,7 +520,8 @@ def _make_parser() -> argparse.ArgumentParser:
     asrt.add_argument("--json", action="store_true", help="输出结构化 JSON")
     mdl = sub.add_parser("model",
                          help="内容建模三件（词表登记册 / 规范与说明件 / 数据契约登记）",
-                         description="内容建模三件（机制借鉴 SKOS 概念方案 / 规范-说明件二分 / 数据契约要素）")
+                         description="内容建模三件（机制借鉴 SKOS 概念方案 / 规范-说明件二分 / 数据"
+                             "契约要素）")
     mdl.add_argument("part", nargs="?", default="",
                      choices=["", "vocab", "normative", "contracts"],
                      help="只看一件（缺省 = 三件全跑）")
@@ -457,7 +530,9 @@ def _make_parser() -> argparse.ArgumentParser:
                          help="决策记录（ADR：一条一编号；采纳后不改不删，只可被取代）",
                          description="决策记录（机制借鉴 ADR：supersede-only + 不可改）")
     dsub = dec.add_subparsers(dest="decisions_cmd")
-    d_sh = dsub.add_parser("show", help="看单条决策（frontmatter + 正文）", description="看单条决策")
+    d_sh = dsub.add_parser("show",
+ help="看单条决策（frontmatter + 正文）",
+ description="看单条决策")
     d_sh.add_argument("id", help="编号（如 ADR-0001）")
     for _d in (dsub.add_parser("verify", help="机检决策记录", description="机检决策记录"),
                dsub.add_parser("reindex", help="重建 INDEX 投影", description="重建 INDEX 投影"),
@@ -496,13 +571,15 @@ def _make_parser() -> argparse.ArgumentParser:
     cog.add_argument("--json", action="store_true", help="输出结构化 JSON")
     stv = sub.add_parser("st-validate",
                          help="ST 制卡校验器原型（卡 / 世界书 / MVU 变量 → 报告；A-S3）",
-                         description="ST 制卡校验器原型 v0（任务书 A-S3：R1 结构 / R3 世界书 / R4 变量）")
+                         description="ST 制卡校验器原型 v0（任务书 A-S3：R1 结构 / R3 世界书 / R4 "
+                             "变量）")
     stv.add_argument("path", help="被校验对象（JSON；卡 / 世界书 / MVU 变量产物）")
     stv.add_argument("--out", default="", help="把 markdown 报告写入该路径")
     stv.add_argument("--json", action="store_true", help="输出结构化 JSON")
     sfp = sub.add_parser("state-front",
                          help="条件先行排布（状态块前置/后置/省略；T3 刺激件生成器）",
-                         description="条件先行排布（灵感来源 arXiv:2609.02702 的 condition-first；NF 只做排布纪律）")
+                         description="条件先行排布（灵感来源 arXiv:2609.02702 的 condition-first；N"
+                             "F 只做排布纪律）")
     sfp.add_argument("path", help="产物 md 路径（仓库相对或绝对）")
     sfp.add_argument("--mode", default="front", choices=["front", "back", "none"],
                      help="排布方式（缺省 front = 条件先行）")
@@ -514,33 +591,39 @@ def _make_parser() -> argparse.ArgumentParser:
     lp = sub.add_parser("lsp",
                         help="LSP 服务器（stdio：诊断/补全/悬停/跳定义/大纲/quickfix；不写盘）",
                         description="LSP 服务器（stdio Content-Length 分帧；诊断与 nf lint 同源，"
-                                    "领域符号表来自 core/nf_language；--print-config 出编辑器配置）")
+                                    "领域符号表来自 core/nf_language；--print-config 出编辑器配置）"
+                                        "")
     lp.add_argument("--root", default="", help="仓库根（缺省 = 本仓库）")
     from core.lsp_client import CLIENT_EDITORS as _lsp_editors   # 单一真相：lsp_client.render_client_config
     lp.add_argument("--print-config", default="", choices=["", *_lsp_editors],
                     help="只打印目标编辑器的现成配置（不启动服务）")
     lc = sub.add_parser("license",
                         help="图书馆许可证门（登记表「许可」列 + 条目内联声明双源校验）",
-                        description="图书馆许可证门（内部差距：登记表无许可列，入库产物不承载共享条款）")
+                        description="图书馆许可证门（内部差距：登记表无许可列，入库产物不承载共享条"
+                            "款）")
     lc.add_argument("--json", action="store_true", help="输出结构化 JSON")
     tl = sub.add_parser("telemetry",
                         help="遥测 semconv 映射（trace 记录 → OTel GenAI 属性 / OTLP 形状）",
-                        description="遥测 semconv 映射（内部差距：trace 为自定 JSON，对外界不可消费）")
+                        description="遥测 semconv 映射（内部差距：trace 为自定 JSON，对外界不可消费"
+                            "）")
     tl.add_argument("trace", help="trace JSON（单条记录或 {records:[...]}）")
     tl.add_argument("--otlp", action="store_true",
                     help="输出 OTLP 形状 JSON（resourceSpans → scopeSpans → spans）")
     conf = sub.add_parser("conformance",
                          help="一致性报告工件（全部契约 → Merkle 根 + verdict；可归档可比对）",
-                          description="一致性报告工件（机制借鉴 MCOP runConformanceSuite：make it checkable instead of trusted）")
+                          description="一致性报告工件（机制借鉴 MCOP runConformanceSuite：make it c"
+                              "heckable instead of trusted）")
     conf.add_argument("--write", action="store_true",
                       help="把当前报告写入 protocol/conformance_report.json")
     conf.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("events",
                         help="全仓事件背书核对（订阅必有发布方；跨包事件可见；外部通道须挂账）",
-                        description="全仓事件背书核对（补 check16/26 之外：社区域包订阅是否真有发布方）")
+                        description="全仓事件背书核对（补 check16/26 之外：社区域包订阅是否真有发布"
+                            "方）")
     ev.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rc2 = sub.add_parser("receipts",
-                         help="协议层回执单根（01–07/schema/baseline 等机读产物各带 inclusion proof）",
+                         help="协议层回执单根（01–07/schema/baseline 等机读产物各带 inclusion proof"
+                             "）",
                          description="协议层回执单根（把回执覆盖面从馆藏扩到协议层机读产物）")
     rc2.add_argument("--scope", default="protocol", choices=["protocol"],
                      help="回执范围（当前支持 protocol）")
@@ -559,7 +642,8 @@ def _make_parser() -> argparse.ArgumentParser:
     rfc.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ptn = sub.add_parser("patterns",
                          help="实践包：可发布/可消费/可移植的最佳实践（ls/show/for/verify/reindex）",
-                         description="实践包品类（机制借鉴 ACP patterns：与内容域包并列的实践规范包）")
+                         description="实践包品类（机制借鉴 ACP patterns：与内容域包并列的实践规范包"
+                             "）")
     p2 = ptn.add_subparsers(dest="patterns_cmd")
     pa_ls = p2.add_parser("ls", help="列出全部 pattern", description="列出全部 pattern")
     pa_sh = p2.add_parser("show", help="看单条 pattern（frontmatter + 正文）",
@@ -590,7 +674,9 @@ def _make_parser() -> argparse.ArgumentParser:
                            description="保存预设（同名已存在须加 --force 覆盖）")
     pr_sv.add_argument("name", help="预设名")
     pr_sv.add_argument("--pipeline", default="P01", help="管线 id（如 P04）")
-    pr_sv.add_argument("--modules", default="", help="模块 full_id，逗号分隔（如 通用类:M00,轻混类:M91）")
+    pr_sv.add_argument("--modules",
+ default="",
+ help="模块 full_id，逗号分隔（如 通用类:M00,轻混类:M91）")
     pr_sv.add_argument("--assets", default="", help="资产包名（如 校园情感领域包）")
     pr_sv.add_argument("--force", action="store_true", help="同名预设已存在时覆盖")
     pr_rm = pr2.add_parser("rm", help="删除本机预设", description="删除本机预设")
@@ -630,7 +716,8 @@ def _make_parser() -> argparse.ArgumentParser:
                         description="服务端点契约（机制借鉴 microsoft/ai-chat-protocol）")
     ep.add_argument("--json", action="store_true", help="输出结构化 JSON")
     iop = sub.add_parser("interop",
-                         help="互操作导出（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto Statement / SPDX SBOM——纯派生）",
+                         help="互操作导出（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto Statement / SPDX SB"
+                             "OM——纯派生）",
                          description="互操作导出面：把既有声明件实时派生为外部标准工具可读的文档"
                                      "（不新增真源；同一输入两次导出逐字节一致）")
     # 单一真相：CLI 可选值**派生自导出面声明**（KINDS）——此前手工维护的列表
@@ -664,7 +751,8 @@ def _make_parser() -> argparse.ArgumentParser:
                                     "（community/<包>/outputs/INDEX.json）、T0–T4 档位判定、"
                                     "T4 可复算面重算比对、机验率基线")
     # `required=True`（2026-10-01 无参普查）：此前漏了它 ⇒ `nf output` 无参进 handler 时
-    # `args.json` 还不存在，直接 AttributeError 冒到 CLI 兜底报「内部错误」（与 `combine` / `domain` 同族）。
+    # `args.json` 还不存在，直接 AttributeError 冒到 CLI 兜底报「内部错误」（与 `combine` / `domain`
+    # 同族）。
     ofsub = of.add_subparsers(dest="output_cmd", required=True)
     of_ls = ofsub.add_parser("list", help="列形态清单（可按状态/类别/档位过滤）",
                              description="列产出形态清单：每条给类别 / 档位 / 状态 / 规范入口，"
@@ -675,23 +763,27 @@ def _make_parser() -> argparse.ArgumentParser:
     of_ls.add_argument("--json", action="store_true", help="输出结构化 JSON")
     of_ck = ofsub.add_parser("check", help="判单件（多件）产出面的形态与档位并校验",
                              description="判件：按扩展名 + 内容嗅探判形态与上限档位，"
-                                         "跑该形态的校验器（JSON 重复键 / CSV 行长 / Vega-Lite 通道绑定 / "
+                                         "跑该形态的校验器（JSON 重复键 / CSV 行长 / Vega-Lite 通道"
+                                             "绑定 / "
                                          "GraphML 悬空边 / 口径注册表的 engine 真实性…）")
     of_ck.add_argument("paths", nargs="+", help="待判文件路径（仓库相对或绝对）")
     of_ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
     of_vf = ofsub.add_parser("verify", help="全量机检（与 verify check32 output_forms 同语义）",
-                             description="全量机检：形态清单自洽 + 包级产出面逐件校验（形态/档位/schema/"
+                             description="全量机检：形态清单自洽 + 包级产出面逐件校验（形态/档位/sc"
+                                 "hema/"
                                          "双源一致/T4 复算）+ 机验率基线不回落；退出码即门禁语义")
     of_vf.add_argument("--json", action="store_true", help="输出结构化 JSON")
     of_rn = ofsub.add_parser("render", help="按包清单渲染产出面（数据/图表/图结构）",
-                             description="渲染：按 community/<包>/outputs/INDEX.json 调生成器重算/重绘产出面；"
+                             description="渲染：按 community/<包>/outputs/INDEX.json 调生成器重算/"
+                                 "重绘产出面；"
                                          "缺省只报告差异，--write 才落盘（EOL 契约 = LF）")
     of_rn.add_argument("--package", default="", help="只渲染某包（缺省全部）")
     of_rn.add_argument("--write", action="store_true", help="落盘（缺省只报告差异，不写）")
     of_rn.add_argument("--json", action="store_true", help="输出结构化 JSON")
     of_mt = ofsub.add_parser("meter", help="机验率 / 功能面计量（--write 重签基线）",
                              description="计量：逐包算机验面 / 功能面（T4）/ 散文资产与机验率；"
-                                         "--write 重签 protocol/output_forms_baseline.json（回退即 FAIL）")
+                                         "--write 重签 protocol/output_forms_baseline.json（回退即 "
+                                             "FAIL）")
     of_mt.add_argument("--write", action="store_true",
                        help="重签 protocol/output_forms_baseline.json")
     of_mt.add_argument("--json", action="store_true", help="输出结构化 JSON")
@@ -712,7 +804,8 @@ def _make_parser() -> argparse.ArgumentParser:
     dm_b.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dm_v = dmsub.add_parser("verify", help="校验已生成域包与生成器逐字节一致 + 登记到位",
                             description="工厂自检：生成物 ≡ 计划（字节级）+ 02 §8 在册 + "
-                                        "verify.sh DOMAIN 在册 + registry protocols[] 在册 + R2 类别不冲突")
+                                        "verify.sh DOMAIN 在册 + registry protocols[] 在册 + R2 类"
+                                            "别不冲突")
     dm_v.add_argument("--spec", default="", help="只验某域码（缺省全部已建域包）")
     dm_v.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dm_l = dmsub.add_parser("specs", help="列出内部域规格与其状态",
@@ -720,20 +813,27 @@ def _make_parser() -> argparse.ArgumentParser:
     dm_l.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dm_s = dmsub.add_parser("shells", help="派生空壳台账（域口径表：可数 + 只减不增棘轮）",
                             description="清点社区域包 DOMAIN_SPEC 的框架占位条目：逐包空壳数 / "
-                                        "已填包数 / 双源（md↔json）一致性 / 与冻结基线比对（只减不增）")
+                                        "已填包数 / 双源（md↔json）一致性 / 与冻结基线比对（只减不"
+                                            "增）")
     dm_s.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cb = sub.add_parser("combine",
                         help="域包自由组合（任意 n 元 / 组件级；五不变量 + 可复算证书）",
-                        description="组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭包 / "
+                        description="组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭"
+                            "包 / "
                                     "事件闭包 / 资产借阅 / 合法性判定 → 可复算证书（T4）；"
-                                    "`breadth` 对全部两两 + 抽样三元/四元/五元/六元跑同一套不变量证明广度；"
-                                    "`materialize` 把组合落成可装载的组合包（派生协议/管线/借阅索引/机验产出面）。")
+                                    "`breadth` 对全部两两 + 抽样三元/四元/五元/六元跑同一套不变量证"
+                                        "明广度；"
+                                    "`materialize` 把组合落成可装载的组合包（派生协议/管线/借阅索引"
+                                        "/机验产出面）。")
     # `required=True`（2026-10-01 无参普查）：同上——`nf combine` 无参时 `args.packs` 不存在。
     cbsub = cb.add_subparsers(dest="combine_cmd", required=True)
     cb_p = cbsub.add_parser("plan", help="组合一个（打印/落证书）",
-                            description="组合：--packs 逗号分隔包名；--modules/--assets 组件级取用；"
+                            description="组合：--packs 逗号分隔包名；--modules/--assets 组件级取用"
+                                "；"
                                         "--certify 写进 protocol/combo_certificates.json")
-    cb_p.add_argument("--packs", default="", help="包名，逗号分隔（如 大语言模型域包,视觉模型域包）")
+    cb_p.add_argument("--packs",
+ default="",
+ help="包名，逗号分隔（如 大语言模型域包,视觉模型域包）")
     cb_p.add_argument("--modules", default="", help="组件级：模块 id，逗号分隔（可跨包）")
     cb_p.add_argument("--assets", default="", help="组件级：资产，`包名:资产键`，逗号分隔")
     cb_p.add_argument("--label", default="", help="证书标签")
@@ -741,7 +841,8 @@ def _make_parser() -> argparse.ArgumentParser:
     cb_p.add_argument("--certify", action="store_true", help="写入证书台账")
     cb_p.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cb_b = cbsub.add_parser("breadth", help="广度证明（全部两两 + 抽样三元/四元/五元/六元）",
-                            description="广度证明：对 C(N,2) 全部两两组合与定种子抽样的三元/四元组合"
+                            description="广度证明：对 C(N,2) 全部两两组合与定种子抽样的三元/四元组"
+                                "合"
                                         "跑同一套不变量（依赖闭合 / 事件闭合 / 层栈 / 资产可寻址）")
     cb_b.add_argument("--triples", type=int, default=400, help="三元抽样数（缺省 400）")
     cb_b.add_argument("--quads", type=int, default=200, help="四元抽样数（缺省 200）")
@@ -749,11 +850,13 @@ def _make_parser() -> argparse.ArgumentParser:
     cb_b.add_argument("--sexts", type=int, default=60, help="六元抽样数（缺省 60）")
     cb_b.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cb_v = cbsub.add_parser("verify", help="证书复算（T4：与在盘证书逐字段比对）",
-                            description="证书复算：读 protocol/combo_certificates.json 逐条重算并比对")
+                            description="证书复算：读 protocol/combo_certificates.json 逐条重算并比"
+                                "对")
     cb_v.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cb_m = cbsub.add_parser("materialize",
                             help="把组合落成可装载的组合包（派生协议/管线/借阅索引/机验产出面）",
-                            description="组合包产物化：0 自有模块 + references 只读借阅 + available 层栈 + "
+                            description="组合包产物化：0 自有模块 + references 只读借阅 + available"
+                                " 层栈 + "
                                         "派生 P00 管线 + 8 件机验产出面（含 T4 证书）；"
                                         "--write 落盘并按域包工厂同一套登记流程登记")
     cb_m.add_argument("--packs", required=True, help="包名，逗号分隔")
@@ -762,7 +865,8 @@ def _make_parser() -> argparse.ArgumentParser:
     cb_m.add_argument("--write", action="store_true", help="落盘并登记（缺省 dry-run）")
     cb_m.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dc = sub.add_parser("decide",
-                        help="决策层（typed-decision 三原语 choice/noul/score：候选集上报概率 + argmax）",
+                        help="决策层（typed-decision 三原语 choice/noul/score：候选集上报概率 + arg"
+                            "max）",
                         description="决策层端口：把选择写成类型化问题交给决策模型；"
                                     "模型在门禁之外，缺适配器/超时/输出不合 schema 一律 abstained")
     dc.add_argument("--state", default="", help="状态文本文件路径")
@@ -770,7 +874,9 @@ def _make_parser() -> argparse.ArgumentParser:
     dc.add_argument("--questions", required=True, help="问题 JSON 文件路径")
     dc.add_argument("--adapter", default="stub",
                     help="适配器 id（stub 离线确定性 / systemone-http 本地服务 / openai-json）")
-    dc.add_argument("--endpoint", default="", help="适配器端点（systemone-http / openai-json 必填）")
+    dc.add_argument("--endpoint",
+ default="",
+ help="适配器端点（systemone-http / openai-json 必填）")
     dc.add_argument("--model", default="", help="openai-json 适配器的模型名")
     dc.add_argument("--timeout", type=float, default=30.0, help="适配器超时秒（缺省 30）")
     dc.add_argument("--dry-run", action="store_true",
@@ -839,7 +945,8 @@ def _make_parser() -> argparse.ArgumentParser:
     t_prom.add_argument("--by", default="", help="复核人（必填）")
     t_prom.add_argument("--at", default="", help="复核时间 YYYY-MM-DD（缺省 = 今天）")
     t_prom.add_argument("--evidence", default="",
-                        help="证据档（逗号分隔，须齐 machine-checkable,reproducible,externally-attestable）")
+                        help="证据档（逗号分隔，须齐 machine-checkable,reproducible,externally-atte"
+                            "stable）")
     t_prom.add_argument("--json", action="store_true", help="输出结构化 JSON")
     k_freq = ksub.add_parser("frequency", help="从 trace 复算知识源使用频次（--write 落台账）",
                              description="从 trace 复算知识源使用频次（确定性；频次不可手写）")
@@ -865,7 +972,8 @@ def _make_parser() -> argparse.ArgumentParser:
     ap.add_argument("--json", action="store_true", help="输出结构化 JSON")
     lib = sub.add_parser("library",
                          help="云端图书馆机器面（frontmatter 真源 / INDEX·ALIAS 投影 / 检索）",
-                         description="云端图书馆机器面（内部差距：library 无 CLI 面、MCP 检索不覆盖馆藏、元数据非一等公民）")
+                         description="云端图书馆机器面（内部差距：library 无 CLI 面、MCP 检索不覆盖"
+                             "馆藏、元数据非一等公民）")
     lsub = lib.add_subparsers(dest="library_cmd")
     l_ls = lsub.add_parser("ls", help="列出馆藏条目（编号/状态/许可/标题）",
                            description="列出馆藏条目（编号/状态/许可/标题）")
@@ -897,32 +1005,38 @@ def _make_parser() -> argparse.ArgumentParser:
     l_sp.add_argument("entry", help="被取代的旧编号")
     l_sp.add_argument("by", help="取代它的新编号")
     l_at = lsub.add_parser("attest", help="给条目挂 attestation（复用 nf attest 信封摘要）",
-                           description="给条目挂 attestation（复用 nf attest 信封摘要，写入 frontmatter）")
+                           description="给条目挂 attestation（复用 nf attest 信封摘要，写入 frontma"
+                               "tter）")
     l_at.add_argument("entry", help="编号")
     l_at.add_argument("--key-file", default="",
                       help="HMAC 密钥文件 → 一并落签名锚（不给则 digest_only 级）")
     l_at.add_argument("--ssh-key", default="",
-                      help="SSH 私钥路径 → 落 ssh-sig 锚（真实非对称签名，读者用 ssh-keygen 即可验）")
+                      help="SSH 私钥路径 → 落 ssh-sig 锚（真实非对称签名，读者用 ssh-keygen 即可验"
+                          "）")
     l_at.add_argument("--ssh-identity", default="",
                       help="ssh-sig 的 principal（allowed_signers 里的身份）")
     l_rc = lsub.add_parser("receipts",
                            help="馆藏回执 + 单根（逐条 inclusion proof，读者可本地折叠验证）",
-                           description="馆藏回执 + 单根（机制借鉴 MCOP MMR：O(log n) 审计路径代替 O(n) 重放）")
+                           description="馆藏回执 + 单根（机制借鉴 MCOP MMR：O(log n) 审计路径代替 O"
+                               "(n) 重放）")
     l_rc.add_argument("--write", action="store_true", help="写入 library/RECEIPTS.json")
     l_rc.add_argument("--entry", default="",
                       help="只验一条：按编号取回执并本地折叠到根（读者侧验证入口）")
     for _p in (l_ls, l_sh, l_ri, l_vf, l_se, l_dp, l_rs, l_sp, l_at, l_rc):
         _p.add_argument("--json", action="store_true", help="输出结构化 JSON")
     df = sub.add_parser("diff",
-                        help="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）", description="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）")
+                        help="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）",
+ description="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）")
     df.add_argument("a", help="签名 A 的文档 md 路径")
     df.add_argument("b", help="签名 B 的文档 md 路径")
     df.add_argument("--json", action="store_true", help="输出结构化差异 JSON")
     ex = sub.add_parser("explain",
-                        help="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）", description="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）")
+                        help="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）",
+ description="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）")
     ex.add_argument("check", help="check 编号（如 25；all = 全量清单）")
     rel = sub.add_parser("related",
-                        help="See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）", description="See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）")
+                        help="See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）",
+ description="See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）")
     rel.add_argument("target",
                     help="目标 = 包 id（如 技术文档域包）或模块 id（如 M90 / 技术文档:M90）")
     rel.add_argument("--registry", default=None,
@@ -930,19 +1044,26 @@ def _make_parser() -> argparse.ArgumentParser:
     rel.add_argument("--json", action="store_true",
                      help="输出结构化 JSON（See-Also 关联结果）")
     hep = sub.add_parser("help",
-                         help="显示 nf 或指定子命令的帮助", description="显示 nf 或指定子命令的帮助")
+                         help="显示 nf 或指定子命令的帮助",
+ description="显示 nf 或指定子命令的帮助")
     hep.add_argument("command", nargs="?", metavar="COMMAND",
                      help="子命令名；缺省 = 显示 nf 总帮助")
     doc = sub.add_parser("doctor",
-                         help="环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify 慢跑）", description="环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify 慢跑）")
+                         help="环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify"
+                             " 慢跑）",
+ description="环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify 慢跑）")
     doc.add_argument("--json", action="store_true",
                      help="输出结构化 JSON 报告")
     cmp = sub.add_parser("completion",
-                         help="生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc）", description="生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc）")
+                         help="生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.b"
+                             "ashrc）",
+ description="生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc）")
     cmp.add_argument("shell", choices=("bash", "zsh", "fish"),
                      help="目标 shell")
     asm = sub.add_parser("assemble",
-                         help="需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收）", description="需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收）")
+                         help="需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收"
+                             "）",
+ description="需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收）")
     asm.add_argument("requirement",
                      help="用户需求一句话（如：帮我组装一个西幻生存世界的完整版）")
     asm.add_argument("--check", dest="check_md", metavar="OUT.md",
@@ -958,7 +1079,8 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="回合级 drill：对成品转录按回合断言（引用/推进/编造，45 A2）")
     asm.add_argument("--answer", action="append", default=None,
                      metavar="问答",
-                     help="澄清回填（可多次，如 --answer \"题材：西幻生存\" --answer \"主轴：生存\"）")
+                     help="澄清回填（可多次，如 --answer \"题材：西幻生存\" --answer \"主轴：生存"
+                         "\"）")
     asm.add_argument("--session", dest="session_path", metavar="SESSION.json",
                      help="会话存储：多次调用间保留已回填澄清（多轮记忆落盘）")
     asm.add_argument("--build", action="store_true",
@@ -969,10 +1091,14 @@ def _make_parser() -> argparse.ArgumentParser:
     asm.add_argument("--allow-protected-dest", dest="allow_protected_dest",
                      action="store_true",
                      help="显式允许把产物写进真源面目录（缺省 fail-closed："
-                          "拒写 protocol/ 03_管线库/ 04_模块库/ 05_资产库/ community/ library/ 等）")
+                          "拒写 protocol/ 03_管线库/ 04_模块库/ 05_资产库/ community/ library/ 等）"
+                              "")
     rel = sub.add_parser("release",
-                         help="发布前体检与编排（体检照旧；--plan 出有序发布计划；--freeze [--apply] 按序走冻结链）",
-                         description="发布前体检与编排：默认=体检（verify + 基线自描述 + e2e + 覆盖率 + 报告新鲜度）；--plan=发布计划（只读）；--freeze [--apply]=冻结链（conformance → approve → receipts）")
+                         help="发布前体检与编排（体检照旧；--plan 出有序发布计划；--freeze [--apply"
+                             "] 按序走冻结链）",
+                         description="发布前体检与编排：默认=体检（verify + 基线自描述 + e2e + 覆盖"
+                             "率 + 报告新鲜度）；--plan=发布计划（只读）；--freeze [--apply]=冻结链"
+                             "（conformance → approve → receipts）")
     rel.add_argument("--fast", action="store_true",
                      help="跳过 verify.sh 全量（快速自检：基线自描述 + doctor）")
     rel.add_argument("--plan", action="store_true",
@@ -980,17 +1106,22 @@ def _make_parser() -> argparse.ArgumentParser:
     rel.add_argument("--json", action="store_true",
                      help="机读输出（配合 --plan；或体检结论摘要）")
     rel.add_argument("--freeze", action="store_true",
-                     help="冻结链：conformance --write → approve → receipts（缺省只打印；--apply 才执行）")
+                     help="冻结链：conformance --write → approve → receipts（缺省只打印；--apply 才"
+                         "执行）")
     rel.add_argument("--apply", action="store_true",
-                     help="冻结链：真正执行（缺省 dry-run；首例发布取证 2026-10-05：此前只登记了 --freeze，--apply 被 argparse 拒收）")
+                     help="冻结链：真正执行（缺省 dry-run；首例发布取证 2026-10-05：此前只登记了 --"
+                         "freeze，--apply 被 argparse 拒收）")
     rel.add_argument("--by", metavar="NAME",
                      help="批准人（--freeze --apply 写进 protocol/approvals/*）")
     rel.add_argument("--note", metavar="TEXT",
                      help="批准说明（--freeze --apply；同批准人一并落档）")
     cl = sub.add_parser("changelog",
-                        help="变更日志生成（从变更条目 + 约定式提交生成版本节；默认预览，--write 落盘并归档条目）",
-                        description="变更日志生成：渲染确定（无墙钟，版本/日期由参数给）+ 逐条可溯源（只分组、不改写）；"
-                                    "--write 把版本节插入 CHANGELOG 顶部并把 changes/unreleased/* 归档到 changes/<version>/")
+                        help="变更日志生成（从变更条目 + 约定式提交生成版本节；默认预览，--write 落"
+                            "盘并归档条目）",
+                        description="变更日志生成：渲染确定（无墙钟，版本/日期由参数给）+ 逐条可溯"
+                            "源（只分组、不改写）；"
+                                    "--write 把版本节插入 CHANGELOG 顶部并把 changes/unreleased/* "
+                                        "归档到 changes/<version>/")
     cl.add_argument("--version", metavar="X.Y.Z",
                     help="版本号（缺省 = CHANGELOG 最新节）")
     cl.add_argument("--date", metavar="YYYY-MM-DD",
@@ -1002,16 +1133,20 @@ def _make_parser() -> argparse.ArgumentParser:
                     help="只用变更条目，不并入 git 提交主题")
     loc = sub.add_parser("locales",
                          help="语言面自检（--write 重签文档译件的源件摘要）",
-                         description="语言面：注册表 ⇄ 文件在场双向对账（入口锚点/切换行/结构；文档译件路径镜像 + source_sha256 防过期）")
+                         description="语言面：注册表 ⇄ 文件在场双向对账（入口锚点/切换行/结构；文档"
+                             "译件路径镜像 + source_sha256 防过期）")
     loc.add_argument("--json", action="store_true", help="机读输出（issues + stats）")
     loc.add_argument("--write", action="store_true",
                      help="重签文档译件的 source_sha256（写 protocol/locales.json）")
     tf = sub.add_parser("toolface",
-                        help="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁）", description="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁）")
+                        help="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不"
+                            "入门禁）",
+ description="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁）")
     tf.add_argument("--json", action="store_true",
                     help="输出结构化 JSON（工具面清单）")
     wm = sub.add_parser("worldmodel",
-                        help="world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）", description="world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）")
+                        help="world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）",
+ description="world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）")
     wm.add_argument("--json", action="store_true",
                     help="输出结构化 JSON（world_model 清单）")
     wm.add_argument("--walk", action="store_true",
@@ -1039,7 +1174,8 @@ def _make_parser() -> argparse.ArgumentParser:
     sh.add_argument("--file", dest="script_file", default="", metavar="SCRIPT",
                     help="脚本文件模式：逐行执行（`#` 注释与空行跳过，行内 `;` 再分隔）")
     sh.add_argument("--commands", nargs="?", const="", default=None, metavar="过滤词",
-                    help="列出全部可达命令（顶层 + 二级，可按子串过滤）后退出——「最全功能」的可检视面")
+                    help="列出全部可达命令（顶层 + 二级，可按子串过滤）后退出——「最全功能」的可检视"
+                        "面")
     sh.add_argument("--search", default="", metavar="词",
                     help="在命令面上检索（不进入终端）：命中打印命令与用途，未命中退出 2")
     sh.add_argument("--map", dest="family_map", nargs="?", const="", default=None,
@@ -1067,16 +1203,19 @@ def _make_parser() -> argparse.ArgumentParser:
                     help="会话状态文件（视图设置 + 上次分区；缺省不持久化）")
     sh.add_argument("--form", dest="form_id", nargs="?", const="", default=None,
                     metavar="表单id",
-                    help="写盘表单：不带值列全部；带 id 组装命令（配合 --answer k=v；加 --yes 才执行）")
+                    help="写盘表单：不带值列全部；带 id 组装命令（配合 --answer k=v；加 --yes 才执"
+                        "行）")
     sh.add_argument("--answer", action="append", default=None, metavar="k=v",
                     help="表单回答（可多次；非交互模式下与 --form 配合）")
     sh.add_argument("--pager", choices=("auto", "never"), default="never",
-                    help="分页（缺省 never：非交互面逐字节确定；auto 仅在真 TTY 且 less/more 在场时接管）")
+                    help="分页（缺省 never：非交互面逐字节确定；auto 仅在真 TTY 且 less/more 在场时"
+                        "接管）")
     sh.add_argument("--surface", action="store_true",
                     help="终端面投影（单真值源 → 多视图）：打印机器快照，配 --json 出 JSON")
     sh.add_argument("--surface-write", dest="surface_write", nargs="?", const="", default=None,
                     metavar="路径",
-                    help="把终端面投影写成生成件（缺省 tui/_surface.py；改真源后必跑，check39 逐字节对账）")
+                    help="把终端面投影写成生成件（缺省 tui/_surface.py；改真源后必跑，check39 逐字"
+                        "节对账）")
     ly = sub.add_parser(
         "layers",
         help="抽象阶梯（两轴 + 纵切）：四阶真源/接口面 + 资产五子级 + 入口面 + 验证纵切",
@@ -1100,12 +1239,14 @@ def _make_parser() -> argparse.ArgumentParser:
                     "长驻/自指命令在守护内拒跑，不走等价面）。")
     dsub = dnm.add_subparsers(dest="daemon_cmd", required=True)
     dst = dsub.add_parser("start", help="拉起守护（后台、脱离控制台）",
-                          description="拉起执行层常驻守护：后台子进程、只绑 127.0.0.1 + 一次性令牌，"
+                          description="拉起执行层常驻守护：后台子进程、只绑 127.0.0.1 + 一次性令牌"
+                              "，"
                                       "状态落在 <NF_HOME>/daemon.json。已在运行则幂等返回。")
     dst.add_argument("--idle", type=float, default=3600.0,
                      help="空闲多少秒后自动退出（0=不退出）")
     dst.add_argument("--watch", action="store_true",
-                     help="启用目录监听 + 只读命令响应缓存（树没变即整条复用；平台不支持时自动降级）")
+                     help="启用目录监听 + 只读命令响应缓存（树没变即整条复用；平台不支持时自动降级"
+                         "）")
     dsub.add_parser("stop", help="请守护自行退出（协议级 shutdown，不发信号）",
                     description="请守护自行退出：走协议级 shutdown 帧（不发信号、不删文件），"
                                 "并把状态文件标记为停用——之后启动器自动回到 python 直跑。")
@@ -1121,12 +1262,14 @@ def _make_parser() -> argparse.ArgumentParser:
     dex.add_argument("argv", nargs=argparse.REMAINDER,
                      help="要执行的 nf 命令（如：nf daemon exec stats --check）")
     dbn = dsub.add_parser("bench", help="测量：直跑（含解释器启动）vs 守护往返",
-                          description="复跑效率对照表：对同一批探测命令分别测「直跑（含解释器启动）」"
+                          description="复跑效率对照表：对同一批探测命令分别测「直跑（含解释器启动）"
+                              "」"
                                       "与「守护往返」，各取 --runs 次最小值（--json 给机器面）。")
     dbn.add_argument("--runs", type=int, default=3, help="每场景取样次数（取最小值）")
     dbn.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dsi = dsub.add_parser("shell-init", help="输出 shell 快路（零子进程客户端），供 eval 安装",
-                          description="输出 shell 快路脚本：在交互 shell 里定义 nf() 函数，用 bash 内建"
+                          description="输出 shell 快路脚本：在交互 shell 里定义 nf() 函数，用 bash "
+                              "内建"
                                       "（/dev/tcp + read -N）直连守护——零子进程，真毫秒级；用法 "
                                       "eval \"$(nf daemon shell-init bash)\"。")
     dsi.add_argument("shell", nargs="?", default="bash", choices=("bash",),
@@ -1137,8 +1280,10 @@ def _make_parser() -> argparse.ArgumentParser:
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
     # 命令面实现收在 core.nfal_cli（此处只做入口，避免与 nf 命令面重复定义旗标）。
     nfl = sub.add_parser("nfal",
-                         help="NFA-L 装配语言：guard 表达式 解析/检查/编译/求值（声明层借 YAML/IDL）",
-                         description="NFA-L：声明层借既有 YAML + JSON-Schema IDL，命令层是封闭 guard 表达式"
+                         help="NFA-L 装配语言：guard 表达式 解析/检查/编译/求值（声明层借 YAML/IDL"
+                             "）",
+                         description="NFA-L：声明层借既有 YAML + JSON-Schema IDL，命令层是封闭 guar"
+                             "d 表达式"
                                      "（无用户函数/循环/赋值/IO）；用法见 docs/nfal.md")
     nfl.add_argument("nfal_args", nargs=argparse.REMAINDER,
                      help="透传给 NFA-L 的参数；完整用法见 nf nfal help")
@@ -1189,7 +1334,7 @@ def _cmd_register(args) -> int:
 
     import json
     with open(reg_path, encoding="utf-8") as f:
-        reg = json.load(f)
+        reg = json_doc.loads(f.read(), dict, what=reg_path)
     cur = reg.get("protocols")
     if not isinstance(cur, list):
         print("✗ registry protocols[] 缺失或非列表", file=sys.stderr)
@@ -1228,7 +1373,7 @@ def _cmd_register(args) -> int:
     from core import atomic_write
     with atomic_write.lock_file(reg_path, what="registry.json（nf register --apply）"):
         with open(reg_path, encoding="utf-8") as f:
-            latest = json.load(f)
+            latest = json_doc.loads(f.read(), dict, what=reg_path)
         latest["protocols"] = merge_protocols(latest.get("protocols") or [], [entry])
         atomic_write.write_text(reg_path,
                                 json.dumps(latest, ensure_ascii=False, indent=2) + "\n")
@@ -1276,7 +1421,7 @@ def _cmd_market(args) -> int:
     pkg_id = os.path.basename(args.pkg_dir.rstrip("/\\"))
 
     with open(reg_path, encoding="utf-8") as f:
-        reg = json.load(f)
+        reg = json_doc.loads(f.read(), dict, what=reg_path)
     prots = {p["id"]: p for p in reg.get("protocols", [])}
     with open(doc_path, encoding="utf-8") as f:
         doc = f.read()
@@ -1299,12 +1444,17 @@ def _cmd_market(args) -> int:
 
     # 加载各包 protocol.yaml 内容（data 供 dependencies/conflicts 用）
     import glob
-    import yaml
+    from core import lazy_yaml as _ly
+    _yaml = _ly.module()
+    if _yaml is None:
+        # 审计 Y6（P1）：缺 PyYAML 不裸崩成「内部错误」，给可执行指引（降级靠 lazy_yaml 出声）。
+        return _machine_fail(args, "缺 PyYAML：无法读各包 protocol.yaml 的声明"
+                                   "（修复指引：pip install pyyaml）", 1)
     data = {}
     for pf in sorted(glob.glob(os.path.join(ROOT, "community", "*", "protocol.yaml"))):
         try:
             with open(pf, encoding="utf-8") as f:
-                raw = yaml.safe_load(f)
+                raw = _yaml.safe_load(f)
             data[raw["package"]["id"]] = raw
         except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
             continue
@@ -1391,7 +1541,8 @@ def _cmd_impact(args) -> int:
     print(f"== 删除影响面预检: {target} ==")
     if im.get("error"):
         print(f"  [拒绝] {im['error']}（修复指引：目标须是 registry 在册的 module / protocol id"
-              f"（如 M00 / 通用:M10 / 校园情感领域包）；`nf market --list` 与 `nf module ls` 可枚举）")
+              f"（如 M00 / 通用:M10 / 校园情感领域包）；`nf market --list` 与 `nf module ls` 可枚举"
+                  f"）")
         return 1
 
     if "module_id" in im:                     # module 级
@@ -1514,7 +1665,7 @@ def _cmd_import(args) -> int:
         print("  [注入面] 未命中疑似内嵌指令（内容按数据消费）")
     try:
         if is_ccv3:
-            res = parse_ccv3(json.loads(raw))
+            res = parse_ccv3(json_doc.loads(raw, dict, what="CCV3 卡"))
             kind = "CCV3 chara"
             bundled = []
         else:
@@ -1642,7 +1793,8 @@ def _cmd_serve(args) -> int:
         try:
             snapshot = load_snapshot(args.snapshot)
         except OSError as exc:
-            print("  ✗ 快照不可读：%s（修复指引：确认路径；或直接 `nf serve` 走实时仓库面，无需快照）"
+            print("  ✗ 快照不可读：%s（修复指引：确认路径；或直接 `nf serve` 走实时仓库面，无需快照"
+                "）"
                   % exc, file=sys.stderr)
             return 2
         except ValueError as exc:
@@ -1818,7 +1970,8 @@ def _cmd_asset(args) -> int:
             for i in issues:
                 print("  [FAIL] %s" % i)
             if issues:
-                print("  ✗ 供应链台账存在缺口——修复后重跑（verify.sh check23 同语义）", file=sys.stderr)
+                print("  ✗ 供应链台账存在缺口——修复后重跑（verify.sh check23 同语义）",
+ file=sys.stderr)
                 return 1
             print("  ✓ 台账闭合：每资产可溯源 / 可发现 / 键无孤儿")
             return 0
@@ -1940,7 +2093,8 @@ def _cmd_asset(args) -> int:
             removed = al.remove_entry(assets_root, args.key, ledger_path=ledger_path)
             print("== nf asset rm ==")
             print("  ✓ 已从台账摘除：%s（%s）" % (removed["key"], removed["file"]))
-            print("    资产文件保留；若残留文件头，verify check23 将报孤儿——确认不再使用后手动清理旧头")
+            print("    资产文件保留；若残留文件头，verify check23 将报孤儿——确认不再使用后手动清理"
+                "旧头")
             return 0
         status = "deprecated" if args.asset_cmd == "deprecate" else "active"
         updated = al.set_status(assets_root, args.key, status, ledger_path=ledger_path)
@@ -2501,45 +2655,90 @@ def _open_store(args, home: str = ""):
 
 
 CHECK_GUIDE = {
-    "1": "缺什么：官方核心目录结构件缺失（01/02/06/07/README/LICENSE + 官方管线 P00/P01/P90）。补什么：按 07 §7 项1 清单补齐根级文件与 03_管线库 官方管线。",
-    "2": "缺什么：重号 ID 未全限定（官方层裸号重复）。补什么：官方核心层模块引用一律全限定（通用:M10/事件:M22），07 §7 项5。",
+    "1": "缺什么：官方核心目录结构件缺失（01/02/06/07/README/LICENSE + 官方管线 P00/P01/P90）。补什"
+        "么：按 07 §7 项1 清单补齐根级文件与 03_管线库 官方管线。",
+    "2": "缺什么：重号 ID 未全限定（官方层裸号重复）。补什么：官方核心层模块引用一律全限定（通用:M1"
+        "0/事件:M22），07 §7 项5。",
     "3": "缺什么：五条不变式落点缺失或错位。补什么：核对 01 §5 ↔ 07 §7 项6 的逐条落点声明。",
-    "4": "缺什么：认知边界断链（06 §4 管线 ↔ M23 认知域不一致）。补什么：对齐执行协议与 M23 的裁剪/过滤口径。",
-    "5": "缺什么：质检门流水线违约（M80 gate_action ↔ 06 §5）。补什么：核对输出生成器的 gate_action 三态与执行协议一致。",
-    "6": "缺什么：入口导航断链（README → 07 → 协议链/官方目录）。补什么：按 07 §7 项6 修 README 路由。",
-    "7": "缺什么：社区两包结构完整度违约。补什么：校园/西幻包 modules/pipelines/protocol.yaml/README 与 02 §8 在册数一致。",
-    "8": "缺什么：社区资产外形与基线不一致（文件数 / 行数 / 逐文件摘要）。补什么：核对内容后显式重签 `nf asset baseline --write`（07 §7 项3）。",
-    "9": "缺什么：模块-资产引用不可寻址或社区 README 重号未限定。补什么：资产键真实可寻址 + 社区重号限定引用。",
+    "4": "缺什么：认知边界断链（06 §4 管线 ↔ M23 认知域不一致）。补什么：对齐执行协议与 M23 的裁剪/"
+        "过滤口径。",
+    "5": "缺什么：质检门流水线违约（M80 gate_action ↔ 06 §5）。补什么：核对输出生成器的 gate_action"
+        " 三态与执行协议一致。",
+    "6": "缺什么：入口导航断链（README → 07 → 协议链/官方目录）。补什么：按 07 §7 项6 修 README 路"
+        "由。",
+    "7": "缺什么：社区两包结构完整度违约。补什么：校园/西幻包 modules/pipelines/protocol.yaml/READM"
+        "E 与 02 §8 在册数一致。",
+    "8": "缺什么：社区资产外形与基线不一致（文件数 / 行数 / 逐文件摘要）。补什么：核对内容后显式重"
+        "签 `nf asset baseline --write`（07 §7 项3）。",
+    "9": "缺什么：模块-资产引用不可寻址或社区 README 重号未限定。补什么：资产键真实可寻址 + 社区重"
+        "号限定引用。",
     "10": "缺什么：EXT 闭合违约或社区红线未落地。补什么：EXT 实体闭合 + 红线条目对齐 07 §7 项2/8。",
-    "11": "缺什么：资产-模块三方对账不一致（02 §8.1 ↔ modules/ ↔ assets/README）。补什么：三方条目对齐（08 方案 T5 A5）。",
+    "11": "缺什么：资产-模块三方对账不一致（02 §8.1 ↔ modules/ ↔ assets/README）。补什么：三方条目"
+        "对齐（08 方案 T5 A5）。",
     "12": "缺什么：desktop/src 或 scripts 语法/单测失败。补什么：跑 python -m unittest discover -s desktop/tests 修到全绿；示例：新模块未补测试→先写测试再实现。",
-    "13": "缺什么：02 头部与 registry.json 协议版本不一致或迁移记录不全。补什么：版本改动需 02 §9.3 四步（快照/bump/迁移说明/回读）。",
-    "14": "缺什么：社区协议登记缺 protocol.yaml/Schema 12 字段/登记三要件。补什么：01 §6.1 + 02 §8.3 补齐并保持 registry protocols[] 一致。",
-    "15": "缺什么：组合引用 references 违约（不在册/闭包未闭合/层冲突/schema 不兼容/双源不一致）。补什么：按 02 §8.4 五断言核对。",
-    "16": "缺什么：machine_contract 机读结构或装配 publish⊆subscribe 违约。补什么：01 §1.1 契约字段 + 运行时寻址授权一致。",
+    "13": "缺什么：02 头部与 registry.json 协议版本不一致或迁移记录不全。补什么：版本改动需 02 §9.3"
+        " 四步（快照/bump/迁移说明/回读）。",
+    "14": "缺什么：社区协议登记缺 protocol.yaml/Schema 12 字段/登记三要件。补什么：01 §6.1 + 02 §8."
+        "3 补齐并保持 registry protocols[] 一致。",
+    "15": "缺什么：组合引用 references 违约（不在册/闭包未闭合/层冲突/schema 不兼容/双源不一致）。"
+        "补什么：按 02 §8.4 五断言核对。",
+    "16": "缺什么：machine_contract 机读结构或装配 publish⊆subscribe 违约。补什么：01 §1.1 契约字段"
+        " + 运行时寻址授权一致。",
     "17": "缺什么：质量门 unittest 失败。补什么：装配/锚点/资产悬空需过 quality_gate 语义。",
     "18": "缺什么：导出契约 unittest 失败。补什么：ccv3_adapter/exporter 映射层检查锚点与条目。",
     "19": "缺什么：导出产物 shape 与 schema 不符。补什么：对照 export_schema 5 格式自检。",
     "20": "缺什么：模块文档必填项缺失。补什么：按文档完整性清单补必填字段。",
     "21": "缺什么：registry 引用图悬空/裸号重复。补什么：清理 source_package/module_id 引用。",
-    "22": "缺什么：导出物规范体检失败（spec_version/name/description 超限）。补什么：按 export_schema 硬约束修正。",
-    "23": "缺什么：资产供应链台账违约（不可溯源/不可发现/键孤儿）。补什么：05_资产库/provenance.json + 文件头双源一致。",
-    "24": "缺什么：模块状态位异常或 deprecated/retired 被引用。补什么：module deprecate/restore 流转或移除引用方。",
-    "25": "缺什么：01-36 编号方案文档签名不可复现/结构缺标题。补什么：文档须 UTF-8 且含 # 标题，同一内容重复生成须逐字节一致；示例：nf sig --verify。",
-    "26": "缺什么：语义矛盾（techdoc 链订阅事件无发布方 / 挂载点或类别漂移）。补什么：全库补发布方或修正漂移；示例：nf related 反查 + semantic_conflict.scan。",
-    "27": "缺什么：架构纯度违约（端壳残留/私货可变物/重复标题/raise 消息缺修复指引/第三方 import 未登记）。补什么：purity_scan 五规则逐条修；示例：R1 端壳关键词残留清理、R5 第三方 import 改软导入并在 SOFT_IMPORTS 登记理由。",
-    "28": "缺什么：协议层 IDL 违约（schema 定义缺失或协议件字段漂移）。补什么：protocol/schema 五定义在场 + 在场 machine_contract/管线/协议包/台账过 schema；示例：nf doctor 看 schema 在场。",
-    "29": "缺什么：Conformance 虚标或声明缺失（声明级别 > 可证级别）。补什么：按 01 §1.2 与 conformance_scan 提示降级或补证据。",
-    "30": "缺什么：扩展判据缺失或版本字段 bump 无迁移记录。补什么：protocol/EXTENSION.md 判据 + bump 变更带 01 §7/02 §9.3 四步迁移记录。",
-    "31": "缺什么：生成物过期（protocol/generated 与当前 schema/协议件不一致）。补什么：重跑 protocol_golden.write_golden 并随变更一并提交。",
-    "32": "缺什么：质量纵深汇总违约（载荷注册表/资产 ledger/指令审计/资产密度·厚度·零引用/tool_face/world_model/world_slots 任一缺口）。补什么：跑 nf release 看细分失败项，修复后 verify 全绿；world_model 契约自查可用 nf worldmodel。",
-    "33": "缺什么：新面汇总任一子扫描红（MCP dual-era/stdio 帧纪律、attestation、基线回归评分、机械修复、正文 lint、编辑器面（能力/诊断定位/didClose/退出码/领域智能/配置生成）、许可证门、遥测 semconv、编码卫生、互操作导出与入仓面、文档命令面、决策层面、构建回路）。补什么：`nf doctor` 先定位，再按面跑 `nf interop --check` / `nf lint` / `nf score` / `nf telemetry` / `nf conformance`；编码卫生命中按 `docs/text-hygiene.md` 处置（隐形字符/行尾/重复键）。",
-    "34": "缺什么：云端图书馆面违约（frontmatter 真源缺字段、INDEX·ALIAS 投影漂移、生命周期状态越表、文档四型未覆盖、llms.txt 入口缺失、内容分级未声明）。补什么：`nf library verify` 看逐条失败；改条目 frontmatter 后 `nf library reindex` 重建投影（投影不是真源）。",
-    "35": "缺什么：深化面违约（管线抽象执行 GraphSpec、馆藏回执单根、模块边界冻结、内容绑定批准、一致性报告工件、无效语料）。补什么：按失败项分别跑 `nf pipeline dryrun --all` / `nf library receipts --write` / `nf module signature --write` / `nf approve --verify` / `nf conformance --write`。",
-    "36": "缺什么：治理面违约（一致性声明 CONFORMANCE、RFC 版本史、指令档机器面路由、实践包、跑分台、端点契约）。补什么：`nf conformance` 看契约面，并用 `nf rfc` / `nf driver` / `nf patterns verify` / `nf endpoint` 逐条对；改声明件后重跑。",
-    "37": "缺什么：双源知识层违约（权威分层、查询有序、时效、消化可追溯、认知裁剪越权）。补什么：`nf knowledge lint` 逐条看巡检结论（`nf knowledge order|visible` 可复核顺序与可见性；本子命令**没有** `--check`）；补 `protocol/knowledge_sources.json` 声明或消化记录后重跑（越权源不得进入任何 clearance 的查询顺序）。",
-    "38": "缺什么：出口自动化违约（自述数字与实算不一致、他证通道缺回填、GEO 出口过期、FDE 样例不过）。补什么：`nf stats --write` 重写生成区；`docs/standards/index.md` 与 `protocol/geo_export.json` 重渲染；FDE 样例跑 `python scripts/fde_sample_run.py` 看失败项。",
-    "39": "缺什么：端壳残留回潮 / 终端三件缺失 / 菜单指向死命令 / 命令面未策展 / 输出不确定。补什么：按 `docs/L3_FROZEN.md` 裁决删除残留件；`nf shell --verify` 看终端自检逐项失败；新增命令要登记进 `core/terminal.py` 的能力族。",
+    "22": "缺什么：导出物规范体检失败（spec_version/name/description 超限）。补什么：按 export_sche"
+        "ma 硬约束修正。",
+    "23": "缺什么：资产供应链台账违约（不可溯源/不可发现/键孤儿）。补什么：05_资产库/provenance.jso"
+        "n + 文件头双源一致。",
+    "24": "缺什么：模块状态位异常或 deprecated/retired 被引用。补什么：module deprecate/restore 流"
+        "转或移除引用方。",
+    "25": "缺什么：01-36 编号方案文档签名不可复现/结构缺标题。补什么：文档须 UTF-8 且含 # 标题，同"
+        "一内容重复生成须逐字节一致；示例：nf sig --verify。",
+    "26": "缺什么：语义矛盾（techdoc 链订阅事件无发布方 / 挂载点或类别漂移）。补什么：全库补发布方"
+        "或修正漂移；示例：nf related 反查 + semantic_conflict.scan。",
+    "27": "缺什么：架构纯度违约（端壳残留/私货可变物/重复标题/raise 消息缺修复指引/第三方 import 未"
+        "登记）。补什么：purity_scan 五规则逐条修；示例：R1 端壳关键词残留清理、R5 第三方 import 改"
+        "软导入并在 SOFT_IMPORTS 登记理由。",
+    "28": "缺什么：协议层 IDL 违约（schema 定义缺失或协议件字段漂移）。补什么：protocol/schema 五定"
+        "义在场 + 在场 machine_contract/管线/协议包/台账过 schema；示例：nf doctor 看 schema 在场。"
+        "",
+    "29": "缺什么：Conformance 虚标或声明缺失（声明级别 > 可证级别）。补什么：按 01 §1.2 与 conform"
+        "ance_scan 提示降级或补证据。",
+    "30": "缺什么：扩展判据缺失或版本字段 bump 无迁移记录。补什么：protocol/EXTENSION.md 判据 + bum"
+        "p 变更带 01 §7/02 §9.3 四步迁移记录。",
+    "31": "缺什么：生成物过期（protocol/generated 与当前 schema/协议件不一致）。补什么：重跑 protoc"
+        "ol_golden.write_golden 并随变更一并提交。",
+    "32": "缺什么：质量纵深汇总违约（载荷注册表/资产 ledger/指令审计/资产密度·厚度·零引用/tool_face"
+        "/world_model/world_slots 任一缺口）。补什么：跑 nf release 看细分失败项，修复后 verify 全"
+        "绿；world_model 契约自查可用 nf worldmodel。",
+    "33": "缺什么：新面汇总任一子扫描红（MCP dual-era/stdio 帧纪律、attestation、基线回归评分、机械"
+        "修复、正文 lint、编辑器面（能力/诊断定位/didClose/退出码/领域智能/配置生成）、许可证门、遥"
+        "测 semconv、编码卫生、互操作导出与入仓面、文档命令面、决策层面、构建回路）。补什么：`nf do"
+        "ctor` 先定位，再按面跑 `nf interop --check` / `nf lint` / `nf score` / `nf telemetry` / `n"
+        "f conformance`；编码卫生命中按 `docs/text-hygiene.md` 处置（隐形字符/行尾/重复键）。",
+    "34": "缺什么：云端图书馆面违约（frontmatter 真源缺字段、INDEX·ALIAS 投影漂移、生命周期状态越表"
+        "、文档四型未覆盖、llms.txt 入口缺失、内容分级未声明）。补什么：`nf library verify` 看逐条"
+        "失败；改条目 frontmatter 后 `nf library reindex` 重建投影（投影不是真源）。",
+    "35": "缺什么：深化面违约（管线抽象执行 GraphSpec、馆藏回执单根、模块边界冻结、内容绑定批准、一"
+        "致性报告工件、无效语料）。补什么：按失败项分别跑 `nf pipeline dryrun --all` / `nf library "
+        "receipts --write` / `nf module signature --write` / `nf approve --verify` / `nf conformanc"
+        "e --write`。",
+    "36": "缺什么：治理面违约（一致性声明 CONFORMANCE、RFC 版本史、指令档机器面路由、实践包、跑分台"
+        "、端点契约）。补什么：`nf conformance` 看契约面，并用 `nf rfc` / `nf driver` / `nf pattern"
+        "s verify` / `nf endpoint` 逐条对；改声明件后重跑。",
+    "37": "缺什么：双源知识层违约（权威分层、查询有序、时效、消化可追溯、认知裁剪越权）。补什么：`n"
+        "f knowledge lint` 逐条看巡检结论（`nf knowledge order|visible` 可复核顺序与可见性；本子命"
+        "令**没有** `--check`）；补 `protocol/knowledge_sources.json` 声明或消化记录后重跑（越权源"
+        "不得进入任何 clearance 的查询顺序）。",
+    "38": "缺什么：出口自动化违约（自述数字与实算不一致、他证通道缺回填、GEO 出口过期、FDE 样例不过"
+        "）。补什么：`nf stats --write` 重写生成区；`docs/standards/index.md` 与 `protocol/geo_expo"
+        "rt.json` 重渲染；FDE 样例跑 `python scripts/fde_sample_run.py` 看失败项。",
+    "39": "缺什么：端壳残留回潮 / 终端三件缺失 / 菜单指向死命令 / 命令面未策展 / 输出不确定。补什么"
+        "：按 `docs/L3_FROZEN.md` 裁决删除残留件；`nf shell --verify` 看终端自检逐项失败；新增命令"
+        "要登记进 `core/terminal.py` 的能力族。",
     "40": "缺什么：数字资产契约违约（数据格式/字段完整性/输入输出一致性/防篡改；代码 AST 规范、可证空指针、测试用例在场；脚本 nf-io 头与声明双源不一致、链上 A 输出不匹配 B 输入）。补什么：`nf asset contract` 逐条看；数据件改声明或补字段；脚本补 `# nf-io: inputs=… outputs=…` 头并与 protocol/asset_contracts.json 对齐；sha256 漂移确认后用 `nf asset contract --freeze` 重冻。",
 }
 
@@ -2702,7 +2901,8 @@ def _cmd_sig(args):
             return 1
         targets = list(args.target) if args.target else ks.discover_docs(ROOT)
         if not targets:
-            print("  ✗ 未找到签名目标（缺省 = 根目录 01-36 编号方案文档）", file=sys.stderr); return 1
+            print("  ✗ 未找到签名目标（缺省 = 根目录 01-36 编号方案文档）",
+ file=sys.stderr); return 1
         out = []
         for t in targets:
             # 形状闸门（2026-09-30）：`nf sig <目录>` 此前落到读盘抛
@@ -3628,7 +3828,8 @@ def _cmd_domain(args):
         print("== nf domain shells（派生空壳台账 · 域口径表）==")
         print("  域包 %d（已填 %d · 带空壳 %d）· 空壳条目 **%d** 处"
               % (s["packs_total"], s["packs_filled"], s["packs_with_shell"], s["hits"]))
-        print("  冻结基线：带空壳包 ≤ %d · 空壳 ≤ %d 处（**只减不增**，见 core/shell_ledger.BASELINE）"
+        print("  冻结基线：带空壳包 ≤ %d · 空壳 ≤ %d 处（**只减不增**，见 core/shell_ledger.BASELIN"
+            "E）"
               % (sl.BASELINE["packs_with_shell"], sl.BASELINE["hits"]))
         for pkg, n in sorted(s["per_package"].items())[:5]:
             print("   · %-28s %d 处" % (pkg, n))
@@ -4267,7 +4468,8 @@ def _cmd_model(args):
         for i in issues:
             print("  [FAIL] %s" % i, file=sys.stderr)
         if not issues:
-            print("  ✓ 词表与真源一致 · 规范件皆有主 · 说明件未被当规范 · 契约 quality_rule 全部解析")
+            print("  ✓ 词表与真源一致 · 规范件皆有主 · 说明件未被当规范 · 契约 quality_rule 全部解"
+                "析")
     return 1 if issues else 0
 
 
@@ -5339,6 +5541,17 @@ def _cmd_doctor(args):
     except Exception as exc:
         chk("world_model/world_slots", False, str(exc))
 
+    # 可选依赖降级面（2026-10-10 审计 Y7，P2）：缺 PyYAML 时上面几条扫描会**静默降级**
+    # （tool_face 1/1/1→0/0/0、world_model 计数塌成 0），而此前只有 stderr 一行 WARN ⇒
+    # 「计数塌成 0」照样显示 N/N 通过、--json 面无从判别 = 降级报绿。现在它是一条**会 FAIL 的
+    # 检查**（CI 装了 PyYAML，故 CI 不受影响），并在 --json 面加 degraded 标记（fail-closed）。
+    from core import lazy_yaml as _ly_doc
+    yaml_ok = _ly_doc.module() is not None
+    chk("可选依赖 PyYAML 在场（YAML 字段不降级）", yaml_ok,
+        "PyYAML" if yaml_ok else
+        "缺 PyYAML：YAML 面计数会塌成 0——本行即 FAIL（修复指引：pip install pyyaml；"
+        "若只想静默 stderr 告警可设 NF_QUIET_YAML=1）")
+
     n_pass = sum(1 for c in checks if c["ok"])
     if args.json:
         print(_json.dumps({
@@ -5347,6 +5560,7 @@ def _cmd_doctor(args):
             "ok": n_pass == len(checks),
             "passed": n_pass,
             "total": len(checks),
+            "degraded": not yaml_ok,
             "checks": checks,
         }, ensure_ascii=False, indent=2, sort_keys=True))
     else:
@@ -5552,11 +5766,13 @@ def _cmd_shell(args) -> int:
     if state_warn:
         print("  [WARN] %s" % state_warn, file=sys.stderr)
     if args.session_path and not os.path.isabs(args.session_path):
-        print("  ✗ --session 须给绝对路径（修复指引：用 <NF_HOME>/shell_session.json 之类的仓库外路径）",
+        print("  ✗ --session 须给绝对路径（修复指引：用 <NF_HOME>/shell_session.json 之类的仓库外路"
+            "径）",
               file=sys.stderr)
         return 2
     if args.session_path and os.path.abspath(args.session_path).startswith(os.path.abspath(ROOT)):
-        print("  ✗ --session 不得落在仓库内（修复指引：会话状态属本机用户态，请放到 NF_HOME 或临时目录——"
+        print("  ✗ --session 不得落在仓库内（修复指引：会话状态属本机用户态，请放到 NF_HOME 或临时"
+            "目录——"
               "仓库内留件会被 git add -A 吞掉，2026-09-26 实测过）", file=sys.stderr)
         return 2
     # 历史落点（交互态；`--exec`/`--file` 一律不写，保确定性）
@@ -5914,11 +6130,13 @@ def _cmd_completion(args):
                 lines.append(
                     "    %s) if [ \"$COMP_CWORD\" -eq 2 ]; then"
                     " eval nest=\"$_nf_nested_%s\";"
-                    " COMPREPLY=( $(compgen -W \"$nest\" -- \"$cur\") ); return; fi ;;" % (c, var(c)))
+                    " COMPREPLY=( $(compgen -W \"$nest\" -- \"$cur\") ); return; fi ;;" % (c,
+ var(c)))
         lines += [
             "  esac",
             "  eval fl=\"$_nf_flags_${cmd//-/_}\"; fl=\"${fl:-}\"",
-            "  if [[ \"$cur\" == -* ]]; then COMPREPLY=( $(compgen -W \"$fl\" -- \"$cur\") ); return; fi",
+            "  if [[ \"$cur\" == -* ]]; then COMPREPLY=( $(compgen -W \"$fl\" -- \"$cur\") ); retur"
+                "n; fi",
             "  COMPREPLY=( $(compgen -W \"$fl\" -- \"$cur\") $(compgen -f -- \"$cur\") )",
             "}",
             "complete -F _nf_completions nf",
@@ -5972,7 +6190,8 @@ def _cmd_completion(args):
             lines.append("complete -c nf -n '__fish_seen_subcommand_from %s' -a '%s'"
                          % (c, n2))
             for f in tree[c]["nested"][n2]:
-                cond = "__fish_seen_subcommand_from %s; and __fish_seen_subcommand_from %s" % (c, n2)
+                cond = "__fish_seen_subcommand_from %s; and __fish_seen_subcommand_from %s" % (c,
+ n2)
                 if f.startswith("--"):
                     lines.append("complete -c nf -n '%s' -l %s" % (cond, f[2:]))
                 elif f.startswith("-") and len(f) == 2:
@@ -6051,12 +6270,14 @@ def _cmd_assemble(args):
     if funnel["status"] == "clarify":
         if args.session_path:
             _session_write(args.session_path, args.requirement, answers)
-        if args.trace_path:
-            _write_trace_file(args.trace_path, {
+        # 审计 N2（P1）：写失败必须让 rc≠0——此前 _write_trace_file 的返回值在 4 个调用点全被丢弃，
+        # 于是「--trace 写不进去」照样返回 0（静默失败却报成功）。
+        if args.trace_path and not _write_trace_file(args.trace_path, {
                 "tool": "nf assemble", "phase": "clarify",
                 "requirement": args.requirement,
                 "questions": funnel.get("questions") or [],
-            })
+        }):
+            return 1
         print("== nf assemble（需求澄清）==")
         print("  你的需求信息还不够直接编排，先补三点（缺一不可）：")
         for q in funnel["questions"]:
@@ -6069,7 +6290,8 @@ def _cmd_assemble(args):
             return _machine_fail(
                 args, "未执行验收：需求无法解析 ⇒ 定不出「允许集」，本次只做了需求澄清、"
                       "没有核对 %s（修复指引：把需求写成可编排的一句话，如 "
-                      "`nf assemble \"西幻生存+生存+单世界\" --check <out.md>`）" % args.check_md, 2)
+                      "`nf assemble \"西幻生存+生存+单世界\" --check <out.md>`）" % args.check_md,
+ 2)
         return 0
     if getattr(args, "build", False):
         from core import assemble_build as ab
@@ -6102,12 +6324,12 @@ def _cmd_assemble(args):
             print("  [FAIL] %s" % issue, file=sys.stderr)
         if not issues:
             print("  ✓ 产物通过自组装机器验收（八段骨架 + 编号允许集 + 决策引用）")
-        if args.trace_path:
-            _write_trace_file(args.trace_path, {
+        if args.trace_path and not _write_trace_file(args.trace_path, {
                 "tool": "nf assemble", "phase": "build",
                 "requirement": args.requirement, "output": out_path,
                 "stats": bstats, "ok": not issues, "issues": issues,
-            })
+        }):                       # 审计 N2：写失败 ⇒ rc≠0
+            return 1
         return 1 if issues else 0
     if args.check_md:
         try:
@@ -6145,8 +6367,7 @@ def _cmd_assemble(args):
             print("  [FAIL] %s" % issue, file=sys.stderr)
         if not issues:
             print("  ✓ 成品通过自组装机器验收（八段骨架 + 编号允许集 + 决策引用）")
-        if args.trace_path:
-            _write_trace_file(args.trace_path, {
+        if args.trace_path and not _write_trace_file(args.trace_path, {
                 "tool": "nf assemble", "phase": "check",
                 "requirement": args.requirement,
                 "source": args.check_md,
@@ -6157,7 +6378,8 @@ def _cmd_assemble(args):
                 "rounds": rounds_scope,
                 "issues": issues,
                 "stats": stats,
-            })
+        }):                       # 审计 N2：写失败 ⇒ rc≠0
+            return 1
         return 1 if issues else 0
     print("== nf assemble（需求 → 装配计划）==")
     if plan_["matched"]:
@@ -6182,8 +6404,7 @@ def _cmd_assemble(args):
               % args.requirement)
     if args.session_path:
         _session_write(args.session_path, args.requirement, answers)
-    if args.trace_path:
-        _write_trace_file(args.trace_path, {
+    if args.trace_path and not _write_trace_file(args.trace_path, {
             "tool": "nf assemble", "phase": "plan",
             "requirement": args.requirement,
             "status": plan_.get("status"),
@@ -6191,7 +6412,8 @@ def _cmd_assemble(args):
             "package": plan_.get("package"),
             "pipeline": plan_.get("pipeline"),
             "allowed_modules": len(plan_.get("allowed_module_ids") or []),
-        })
+    }):                       # 审计 N2：写失败 ⇒ rc≠0
+        return 1
     return 0
 
 
@@ -6207,7 +6429,8 @@ def _release_freeze(args):
 
     by = (getattr(args, "by", None) or "").strip()
     note = (getattr(args, "note", None) or "").strip()
-    # 顺序真源 = 策略件 protocol/release_policy.json 的 freeze_chain（缺件退回 rg.DEFAULT_FREEZE_CHAIN）；
+    # 顺序真源 = 策略件 protocol/release_policy.json 的 freeze_chain（缺件退回 rg.DEFAULT_FREEZE_CHA
+    # IN）；
     # 首例发布取证（2026-10-05）：此前写的是不存在的 rg.FREEZE_CHAIN ⇒ 该命令必抛内部错误。
     pol, _ = rg.policy(ROOT)
     chain_specs = list((pol or {}).get("freeze_chain") or rg.DEFAULT_FREEZE_CHAIN)
@@ -6234,7 +6457,9 @@ def _release_freeze(args):
         print("== 冻结链 [%d/%d] %s ==" % (i, len(chains), " ".join(argv[2:])))
         rc = subprocess.run(argv, cwd=ROOT).returncode  # noqa: S603  # nosec B603/B607 —— argv 列表、绝对解释器（无 shell、无注入面）
         if rc != 0:
-            print("  ✗ 冻结链第 %d 步失败（rc=%d）——按序停，后继步骤不执行" % (i, rc), file=sys.stderr)
+            print("  ✗ 冻结链第 %d 步失败（rc=%d）——按序停，后继步骤不执行" % (i,
+ rc),
+ file=sys.stderr)
             return rc
     print("  ✓ 冻结链完成：conformance → approve → receipts（协议回执单根已按当前字节重签）")
     return 0
@@ -6383,13 +6608,17 @@ def _cmd_release(args):
             print("  ✓ 端到端冒烟通过（官方 13 件 + M91/M92 + P04 → 装配 → 生成 → 断言）")
         # 机器可读报告新鲜度（静态可核验面）：已提交的 protocol/verification_report.json
         # 必须等于实时重算——否则门禁的「机器面结论」是过期的。
-        vrpt = subprocess.run([sys.executable, os.path.join("scripts", "verify_report.py"), "--fresh"],
+        vrpt = subprocess.run([sys.executable,
+ os.path.join("scripts",
+ "verify_report.py"),
+ "--fresh"],
                               cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
                               errors="replace")
         if vrpt.returncode != 0:
             gate_fail = True
             tail = [l for l in ((vrpt.stderr or "") + (vrpt.stdout or "")).splitlines() if l.strip()][-2:]
-            print("  [FAIL] 门禁机器可读报告过期或判据未过（修复指引：python scripts/verify_report.py "
+            print("  [FAIL] 门禁机器可读报告过期或判据未过（修复指引：python scripts/verify_report."
+                "py "
                   "--write）%s" % ("；" + " / ".join(tail) if tail else ""), file=sys.stderr)
         else:
             print("  ✓ 门禁机器可读报告新鲜（protocol/verification_report.json == 实时重算）")
@@ -6618,7 +6847,8 @@ def _cmd_daemon(args) -> int:
             if st is None:
                 print("  响应缓存：无法查询（守护未响应 stats）")
             elif st["enabled"]:
-                print("  响应缓存：已启用 · 代际 %s · 条目 %d · 命中 %d / 未命中 %d（树一变即整批作废）"
+                print("  响应缓存：已启用 · 代际 %s · 条目 %d · 命中 %d / 未命中 %d（树一变即整批作"
+                    "废）"
                       % (st["generation"], st["entries"], st["hits"], st["misses"]))
             else:
                 print("  响应缓存：未启用（未开 --watch，或目录监听不可用——行为与常规守护一致）")
@@ -6732,7 +6962,9 @@ def _cmd_stats(args) -> int:
               % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],
                  stats["domain_packs"], stats["subdivisions_total"]))
         print("  标准目录：%d 条（可达 %d / 不可达 %d · 机构 %d · %d 边） · 绑定 %d 条"
-              % (stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
+              % (stats["standards_total"],
+ stats["standards_reachable"],
+ stats["standards_unreachable"],
                  stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]))
         print("  质量凭证：verify check1-%d 常驻（脚本 v%s） · 馆藏 %d 件"
               % (stats["verify_checks"], stats["verify_version"], stats["library_items"]))
@@ -7038,22 +7270,19 @@ def main(argv=None) -> int:
     return 0
 
 
-def cli(argv=None) -> int:
-    """CLI 运行时封装：SIGPIPE 语义 + 断管/中断兜底 + 退出码归一。
+def guarded_main(argv=None) -> int:
+    """`main()` 的异常兜底 —— **CLI 与常驻守护共用的同一条错误面**。
 
-    - POSIX：恢复 SIGPIPE 默认动作（`nf ... | head` 静默截断，无 traceback）；
-    - 断管兜底（Windows 无 SIGPIPE 场景）；
-    - Ctrl-C → 130；返回非 int（如 None）按 0 处理。
-    - 未预期异常：默认一句错误 + 提示（NF_DEBUG=1 时透出堆栈），不裸刷 traceback。
+    为什么单独抽出来（2026-10-10 全仓审计 X0，P0）：守护 `core.daemon.execute()` 此前直接调
+    `main()`、只兜 `SystemExit`，于是任何未捕获异常都穿透守护循环、**杀死常驻进程**——实测
+    `nf receipts` 在 `protocol/RECEIPTS.json` 被截断时必抛 `json.JSONDecodeError`，18/18
+    条 protocol JSON 都如此；客户端拿 rc=1 + 零输出。兜底是仓库既有的正确实现，只是**写在了
+    `cli()` 里而没有到守护那条路径上**。抽到这里 ⇒ 同一语义只有一份实现，两条执行路径
+    （终端直跑 / 守护内跑）的 (退出码, stderr 文本) 逐字一致。
+
+    纪律：只兜 `Exception`（`SystemExit` 照旧上抛，由调用方按 argparse 语义归一；`KeyboardInterrupt`
+    与 `BrokenPipeError` 各自归一为 130 / 0）；`NF_DEBUG` 在场时透出原始堆栈（排障用）。
     """
-    try:
-        import signal
-        # Windows 无 SIGPIPE：取不到即跳过（原写法在该平台靠 except 兜住，行为等价）。
-        _sigpipe = getattr(signal, "SIGPIPE", None)
-        if _sigpipe is not None:
-            signal.signal(_sigpipe, signal.SIG_DFL)
-    except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B110 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-        pass
     try:
         code = main(argv)
     except BrokenPipeError:
@@ -7072,6 +7301,28 @@ def cli(argv=None) -> int:
               file=sys.stderr)
         code = 1
     return code if isinstance(code, int) else 0
+
+
+def cli(argv=None) -> int:
+    """CLI 运行时封装：SIGPIPE 语义 + 断管/中断兜底 + 退出码归一。
+
+    - POSIX：恢复 SIGPIPE 默认动作（`nf ... | head` 静默截断，无 traceback）；
+    - 断管兜底（Windows 无 SIGPIPE 场景）；
+    - Ctrl-C → 130；返回非 int（如 None）按 0 处理。
+    - 未预期异常：默认一句错误 + 提示（NF_DEBUG=1 时透出堆栈），不裸刷 traceback。
+
+    兜底实现只在 `guarded_main()`（上）一处：本函数只做「进程级」准备（SIGPIPE 动作），
+    其余转交共用实现——**别在这里再写一份 try/except**（两处实现就会分叉，历史教训见审计 §0.3）。
+    """
+    try:
+        import signal
+        # Windows 无 SIGPIPE：取不到即跳过（原写法在该平台靠 except 兜住，行为等价）。
+        _sigpipe = getattr(signal, "SIGPIPE", None)
+        if _sigpipe is not None:
+            signal.signal(_sigpipe, signal.SIG_DFL)
+    except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B110 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
+        pass
+    return guarded_main(argv)
 
 
 if __name__ == "__main__":

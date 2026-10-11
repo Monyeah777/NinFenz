@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """SAST 基线闸门（安全/供应链面 · ISO 25010 安全性）：bandit + ruff-S 的**只增不减**计数棘轮。
 
 为什么这样设计：
@@ -25,6 +24,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "desktop" / "src"))
+from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
+
 BASELINE_REL = "protocol/sast_baseline.json"
 SCHEMA = "nf-sast/1"
 SCAN_TARGETS = ("desktop/src", "scripts", ".github/scripts")
@@ -70,7 +72,8 @@ def bandit_counts() -> tuple:
         why = err.strip().splitlines()[-1] if (code == 124 and err.strip()) else "bandit 不在"
         return {}, {"error": "%s（修复指引：pip install -r .github/requirements-sast.txt）" % why}
     try:
-        rows = json.loads(out[out.index("{"):]).get("results", []) if "{" in out else []
+        rows = (json_doc.loads(out[out.index("{"):], None, what="bandit 输出").get("results", [])
+                if "{" in out else [])
     except ValueError as exc:
         return {}, {"error": "bandit 输出不可解析：%s" % exc}
     return _counts(rows, "test_id"), {
@@ -86,7 +89,7 @@ def ruff_counts() -> tuple:
         why = err.strip().splitlines()[-1] if (code == 124 and err.strip()) else "ruff 不在"
         return {}, {"error": "%s（修复指引：pip install -r .github/requirements-lint.txt）" % why}
     try:
-        rows = json.loads(out) if out.strip().startswith("[") else []
+        rows = json_doc.loads(out, None, what="ruff 输出") if out.strip().startswith("[") else []
     except ValueError as exc:
         return {}, {"error": "ruff 输出不可解析：%s" % exc}
     return _counts(rows, "code"), {"total": len(rows)}
@@ -106,7 +109,7 @@ def load_baseline() -> dict:
     if not p.is_file():
         return {}
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
+        return json_doc.load(p, dict, what=BASELINE_REL)
     except ValueError:  # 基线缺失/坏件 ⇒ 空基线：全部命中按「新增」判（fail-closed，宁可全报）
         return {}
 
@@ -187,7 +190,7 @@ def write() -> tuple:
     # 原子写（2026-09-30 收口）：SAST 基线是**在仓产物**，而 verify 的 sast 段正好是并发读者
     # ——半截基线会被读成「基线文件损坏」而不是「正在写」。
     sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
-    from core import atomic_write    # noqa: PLC0415
+    from core import atomic_write  # noqa: PLC0415
     atomic_write.write_text(ROOT / BASELINE_REL,
                             json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     return [], section

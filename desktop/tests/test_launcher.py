@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`scripts/nf` 启动器的**回退路径**判据：没有守护时必须静默回退 python 直跑。
 
 依据（2026-09 实测缺陷，两处叠加）：① `daemon_try` 用 `return 127` 表示「快路不接手」，
@@ -162,7 +161,8 @@ class AutostartDefaultDocumentationTest(unittest.TestCase):
         bad = {k: sorted(v) for k, v in current.items() if len(v) > 1}
         self.assertEqual({}, bad, "同一启动器在一句话/一段里有多个「当前」时延数字：%s" % bad)
         self.assertGreaterEqual(len(current), 3,
-                                "没扫到三个启动器的当前时延数字（判据可能已失效）：%s" % sorted(current))
+                                "没扫到三个启动器的当前时延数字（判据可能已失效）：%s"
+                                    "" % sorted(current))
 
 
 @unittest.skipUnless(BASH, "启动器是 POSIX sh 脚本，需 bash 执行快路")
@@ -188,7 +188,9 @@ class LongRunningNeverTakesTheFastPathTest(unittest.TestCase):
                            capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=120, stdin=subprocess.DEVNULL)
         out = r.stdout or ""
-        self.assertEqual(0, r.returncode, "别名 `nf terminal` 应能真跑（stderr=%s）" % r.stderr[:200])
+        self.assertEqual(0,
+ r.returncode,
+ "别名 `nf terminal` 应能真跑（stderr=%s）" % r.stderr[:200])
         self.assertIn("终端", out,
                       "守护在跑时 `nf terminal` 没走直跑（旧缺陷：rc=0 且零输出）")
         self.assertTrue(dm.ping(timeout=5.0), "长驻命令不该把守护占死")
@@ -427,7 +429,8 @@ class InterpreterLaunchBudgetTest(unittest.TestCase):
                          % (first.stderr or first.stdout))
         self.assertIn("nf ", first.stdout)
         self.assertEqual(3, self._starts(log),
-                         "缓存冷的那一条＝确诊兼探针(1) + 节食探针(1) + 真跑(1)（设计如此，不是回归）")
+                         "缓存冷的那一条＝确诊兼探针(1) + 节食探针(1) + 真跑(1)（设计如此，不是回归"
+                             "）")
         second = self._run("--version", env=env)
         self.assertEqual(0, second.returncode, second.stderr or second.stdout)
         self.assertEqual(4, self._starts(log), "稳态增量必须恰好 1 次（第 2 条命令只许真跑一次）")

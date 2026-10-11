@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 包管理器面（只读）：定义库品类的枚举 / 取件 / 检索。
 
 底层 = core.category_registry（品类真源）+ core.package_index（取件面）。本脚本是它们的

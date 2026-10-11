@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CCV3 映射层单测（v2.0.0 T1：IR→chara_card_v3 + world entries）。
 
 运行：cd desktop && python -m unittest tests.test_ccv3_adapter -v

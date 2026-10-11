@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """v2.8.0 波C C3 —— 语义矛盾扫描单测（41 规划，techdoc 链 testcase 驱动）。"""
 import os
 import sys

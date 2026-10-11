@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MCP 上架面·**真进程**端到端（默认实时仓库面 `nf serve` ↔ 越权/注入拒出面）。
 
 为什么单列一件：`test_mcp_runtime` / `test_trust_boundary` 都在**进程内**驱动 `McpRuntime`，

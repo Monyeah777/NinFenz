@@ -7,9 +7,10 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 _ROOT = Path(__file__).resolve().parents[3]
 _NUMERIC = ("tick", "day", "minute", "count", "qty", "lv", "from_lv", "to_lv",
@@ -22,7 +23,8 @@ _LISTISH = ("sections", "changes", "participants", "damage_log", "targets",
 
 def propose(root: str = ".") -> Dict[str, Any]:
     r = Path(root)
-    data = json.loads((r / "protocol/event_registry.json").read_text(encoding="utf-8"))
+    data = json_doc.load(r / "protocol/event_registry.json", dict, what="protocol/event_registry.js"
+        "on")
     out: Dict[str, Any] = {"status": "proposal", "events": {}}
     for ev, spec in data["events"].items():
         fields = spec.get("fields") or {}

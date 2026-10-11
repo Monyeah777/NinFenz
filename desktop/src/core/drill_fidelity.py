@@ -21,6 +21,7 @@ import json
 from core import atomic_write
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 EXEC_GLOB = "desktop/tests/fixtures/execution/p*_drill_cases.json"
 ROUND_GLOB = "desktop/tests/fixtures/execution/rounds/*.json"
@@ -37,11 +38,12 @@ def _exec_sets(root: Path) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for f in sorted(root.glob(EXEC_GLOB)):
         try:
-            data = json.loads(f.read_text(encoding="utf-8"))
+            data = json_doc.load(f, dict, what=f.name)
         except ValueError as exc:
             out.append({"set": f.name, "cases": 0, "passed": 0, "error": "JSON 不可解析：%s" % exc})
             continue
-        real, sem, src = data.get("real_ids") or [], data.get("semantics") or {}, data.get("source_text", "")
+        real, sem, src = data.get("real_ids") or [], data.get("semantics") or {}, data.get("source_"
+            "text", "")
         other, keys = data.get("other_ids") or [], data.get("asset_keys") or []
         lexicon = data.get("lexicon") or {}
         n = ok = 0
@@ -61,7 +63,7 @@ def _round_samples(root: Path) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for f in sorted(root.glob(ROUND_GLOB)):
         try:
-            d = json.loads(f.read_text(encoding="utf-8"))
+            d = json_doc.load(f, dict, what=f.name)
         except ValueError as exc:
             out.append({"sample": f.name, "declared": "?", "live": "error", "matched": False,
                         "error": "JSON 不可解析：%s" % exc})
@@ -102,7 +104,8 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     if m["execution"]["cases"] == 0:
         issues.append("找不到执行演练用例（修复指引：%s 下须有 p*_drill_cases.json）" % EXEC_GLOB)
     if m["rounds"]["total"] == 0:
-        issues.append("找不到回合级回放样本（修复指引：%s 下须有样本，含 transcript/allowed/verdict）"
+        issues.append("找不到回合级回放样本（修复指引：%s 下须有样本，含 transcript/allowed/verdict"
+            "）"
                       % ROUND_GLOB)
     for s in m["execution"]["sets"]:
         if s.get("error"):

@@ -246,7 +246,16 @@ def load_registry(path: Optional[Union[str, Path]] = None) -> Registry:
     p = Path(path) if path is not None else Path(__file__).with_name("registry.json")
     # 读侧短重试（2026-09-30）：registry.json 会被 `nf register/rename --apply` 原子重写，
     # 并发下 Windows 读者会瞬时 PermissionError（WinError 5/32）——见 atomic_write 实测。
-    raw = json.loads(atomic_write.read_text(p))
+    # BOM 容错（2026-10-10 审计 N4）：只在本 JSON 解析入口显式去 BOM——不把通用读口改成
+    # utf-8-sig（那会改变带 BOM 件的摘要/签名口径）。Windows 记事本另存的 JSON 即带 BOM。
+    raw = json.loads(atomic_write.read_text(p).lstrip("\ufeff"))
+    # 审计 N6（P2）：顶层非对象时此前 raw.get 直接抛 AttributeError（'list' object has no
+    # attribute 'get'），零修复指引。这里先判形状，抛带指引的 ValueError。
+    if not isinstance(raw, dict):
+        raise ValueError(
+            "registry.json 顶层须为 JSON 对象，实为 %s：%s"
+            "（修复指引：给 registry.json 的对象；四类畸形 [1,2,3] / \"hello\" / 42 / null "
+            "都不接受）" % (type(raw).__name__, p))
     return Registry(
         registry_schema_version=raw.get("registry_schema_version", ""),
         schema_name=raw.get("schema_name", ""),

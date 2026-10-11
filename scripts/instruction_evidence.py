@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """规范入口指令的实测记录（CLI）：声明 → 真跑 → 落证据 → 判新鲜度。
 
 用法：
@@ -33,7 +32,8 @@ def _runner(cmd: str):
     if argv[0] in ("python", "python3"):
         argv[0] = sys.executable
     elif argv[0] in ("bash", "sh") and shutil.which(argv[0]) is None:
-        # POSIX shell 统一走 core.posix_shell（PATH → NF_BASH → Git for Windows 反推 → Unix 常规位）：
+        # POSIX shell 统一走 core.posix_shell（PATH → NF_BASH → Git for Windows 反推 → Unix 常规位）
+        # ：
         # 本机（Windows 原生）`bash` 不在 PATH，不解析就会把「本机环境差异」误记成
         # 「指令不可执行」——那是假证据。
         argv[0] = psh.posix_shell()

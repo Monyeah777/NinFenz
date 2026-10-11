@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """I/O 类型面（io_types）单测：推导规则、注入幂等、可证不匹配、覆盖统计。"""
 import sys
 import tempfile

@@ -17,10 +17,11 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 DECL_REL = "protocol/judgement_coverage.json"
 SCHEMA = "nf-judgement-coverage/1"
@@ -79,7 +80,7 @@ def declaration(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
         return {}, ["缺判据例外声明 %s（修复指引：新建并在 exceptions 写明未接线判据与理由）"
                     % DECL_REL]
     try:
-        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc = json_doc.load(p, dict, what=DECL_REL)
     except ValueError as exc:
         return {}, ["%s 不是合法 JSON：%s（修复指引：修好 JSON 语法）" % (DECL_REL, exc)]
     if doc.get("schema") != SCHEMA:
@@ -107,7 +108,8 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                               "或删除该死判据；确属设计用途须在 %s 的 exceptions 写明理由）"
                               % (name, DECL_REL))
         elif name in exc:
-            warns.append("例外已失效：core/%s.py 已被消费（%s）（修复指引：从 %s 的 exceptions 移除）"
+            warns.append("例外已失效：core/%s.py 已被消费（%s）（修复指引：从 %s 的 exceptions 移除"
+                "）"
                          % (name, who[0], DECL_REL))
     stats = {"scanners": len(cands), "consumed": len(cands) - len(orphans),
              "exceptions": len(exc), "orphans": len(orphans)}

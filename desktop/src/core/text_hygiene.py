@@ -12,12 +12,12 @@
 """
 from __future__ import annotations
 
-import json
 import os
 import re
 import unicodedata
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
 from core import repo_face as _repo_face
 
 #: 扫描面 = **仓库件**（`core.repo_face.walk_repo_paths` 单点定义：静态目录名 + `.gitignore`
@@ -125,8 +125,8 @@ def _dup_check(text: str, rel: str, issues: List[str]) -> Tuple[Any, bool]:
         return dict(pairs)
 
     try:
-        doc = json.loads(text, object_pairs_hook=hook)
-    except json.JSONDecodeError as exc:
+        doc = json_doc.loads(text, None, what=rel, pairs_hook=hook)
+    except ValueError as exc:
         issues.append("%s 不是合法 JSON：%s（修复指引：跑 python -m json.tool 定位）"
                       % (rel, exc))
         return {}, False
@@ -280,7 +280,8 @@ if __name__ == "__main__":  # pragma: no cover - 手动体检入口
     # UTF-8 stdio（2026-10-01 实测）：本模块是**文档里可照抄的入口**
     # （`docs/text-hygiene.md`：`cd desktop/src && python -m core.text_hygiene ../..`），而此前没钉
     # 输出编码 ⇒ Windows 控制台/管道下摘要以 **GBK 字节**吐出，按 UTF-8 读就是 `�ı� 3079 …`——
-    # 正是 `test_stdio_encoding` 记载的「写给管道消费者的是 GBK」那类缺陷。口径与 `scripts/nf.py` 同。
+    # 正是 `test_stdio_encoding` 记载的「写给管道消费者的是 GBK」那类缺陷。口径与 `scripts/nf.py` 同
+    # 。
     for _s in (sys.stdout, sys.stderr):
         if hasattr(_s, "reconfigure"):
             _s.reconfigure(encoding="utf-8")

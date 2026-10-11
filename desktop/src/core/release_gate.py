@@ -1,18 +1,22 @@
 """发布编排（release orchestration）：把「tag 前要做什么」做成**机读策略 + 可编译计划 + 可机检前置**。
 
 为什么需要（内部差距实证 2026-10-05）：发布动作此前散在四处——`nf release`（体检）、
-`scripts/release_freeze.sh`（golden master 快照）、`scripts/bump_verify.sh`（版本换标）、
+原 golden master 快照脚本（**2026-10-11 裁决退役并删除**）、`scripts/bump_verify.sh`（版本换标）、
 `docs/42_M5_Release-checklist.md`（人工清单），再加 `decisions/ADR-0005-新增NET引擎线.md`
 记载的**冻结链**（conformance --write → approve → receipts --write）——**顺序**与**前置**只在
-文档与人的记忆里。2026-10-05 第二轮补上同类顶尖项目的两项机制：**配置即契约**（策略落
+文档与人的记忆里。
+
+**退役记录（2026-10-11，作者裁决）**：`.release-frozen/<tag>/sha256.manifest` 的 156 条清单实测
+77 条已失效（协议件改了而清单从不重算）、无任何门禁消费、且曾泄漏进 npm 发布物。故连同生成脚本一并删除。日后若需要「tag 点可复现快照」，应由**带新鲜度门禁**的
+新机制替代，而不是恢复这份名存实亡的清单（这就是「标准不得无载体」的反面：有清单、无判据）。2026-10-05 第二轮补上同类顶尖项目的两项机制：**配置即契约**（策略落
 `protocol/release_policy.json` + `protocol/schema/release.schema.json`，参照 release-please 的
 `$schema` 模式）与**变更条目收集**（`changes/unreleased/*.md`，参照 changesets）。
 
 三件可证的事（纯标准库、只读、不执行）：
 
-1. `plan(root)` —— 确定性计划：前置 → 门禁 → 冻结链 → golden master → 版本面 → 变更归档 → 审计 → tag。
+1. `plan(root)` —— 确定性计划：前置 → 门禁 → 冻结链 → 版本面 → 变更归档 → 审计 → tag。
 2. `check(root)` —— 机检前置（check38 子扫描）：策略 JSON 过 schema、人读策略件锚点齐、必需产物在场、
-   冻结链按序、golden 快照结构完整、**版本面登记不悬空**、**变更条目可归档**。
+   冻结链按序、**版本面登记不悬空**、**变更条目可归档**。
 3. `manifest(root)` —— 确定性证据摘要（无墙钟）。
 
 纪律：纯标准库；只读；无网络；无墙钟；同输入同输出；缺件/空根一律如实报 issue 并给修复指引，不抛裸异常。
@@ -28,12 +32,10 @@ POLICY_DOC = "docs/release.md"
 #: 机读策略真源（配置即契约）。
 POLICY_JSON = "protocol/release_policy.json"
 POLICY_SCHEMA_ID = "nf:release-policy"
-#: golden master 冻结根（scripts/release_freeze.sh 的产出面）。
-GOLDEN_DIR = ".release-frozen"
 #: 策略件必须写明的锚点（缺一即 FAIL——写了却没人看与没写同等不可核）。
 POLICY_ANCHORS: Tuple[str, ...] = (
-    "## 冻结链", "## 版本面", "## Golden Master", "## 变更条目",
-    "bash verify.sh", "scripts/release_freeze.sh",
+    "## 冻结链", "## 版本面", "## 变更条目",
+    "bash verify.sh",
     "python scripts/nf.py conformance --write", "nf approve",
     "python scripts/nf.py receipts --scope protocol --write",
 )
@@ -43,12 +45,9 @@ DEFAULT_FREEZE_CHAIN: Tuple[str, ...] = (
     "python scripts/nf.py approve protocol/conformance_report.json",
     "python scripts/nf.py receipts --scope protocol --write",
 )
-DEFAULT_GOLDEN: Tuple[str, ...] = (
-    "01_核心协议.md", "02_联动注册表.md", "06_Agent执行协议.md",
-    "07_官方核心出厂与社区预设导航.md", "verify.sh",
-)
 #: 变更条目允许的类型词表（对齐提交信息纪律的 type 词表 + release）。
-CHANGE_TYPES: Tuple[str, ...] = ("feat", "fix", "docs", "refactor", "perf", "test", "chore", "release")
+CHANGE_TYPES: Tuple[str, ...] = ("feat", "fix", "docs", "refactor", "perf", "test", "chore", "relea"
+    "se")
 
 
 def policy(root: str = ".") -> Tuple[Optional[Dict[str, Any]], List[str]]:
@@ -124,7 +123,8 @@ def plan(root: str = ".") -> List[Dict[str, str]]:
          "cmd": "python scripts/nf.py release", "out": "体检报告",
          "judge": "退出码 0（含 e2e 冒烟 / 逐模块覆盖率 / 门禁报告新鲜度 / ruff）"},
         {"id": "changes-1", "title": "变更日志生成与归档",
-         "cmd": "python scripts/nf.py changelog --version %s --date <发布日期> --write" % (rel or "X.Y.Z"),
+         "cmd": "python scripts/nf.py changelog --version %s --date <发布日期> --write"
+             "" % (rel or "X.Y.Z"),
          "out": "CHANGELOG.md 版本节（+ changes/%s/）" % (rel or "X.Y.Z"),
          "judge": "渲染确定且逐条可溯源（只分组不改写）；归档后 changes/unreleased 为空"},
         {"id": "freeze-1", "title": "一致性报告重算",
@@ -136,10 +136,6 @@ def plan(root: str = ".") -> List[Dict[str, str]]:
         {"id": "freeze-3", "title": "协议层回执重签",
          "cmd": chain[2], "out": "protocol/RECEIPTS.json（+ receipt_chain / interop 派生面）",
          "judge": "每条折叠到根、根与实时重算一致"},
-        {"id": "golden-1", "title": "Golden Master 冻结",
-         "cmd": "bash scripts/release_freeze.sh %s" % tag,
-         "out": GOLDEN_DIR + "/" + tag + "/sha256.manifest",
-         "judge": "快照齐策略声明的 golden_required + desktop/src/core/*.py + nf sig --verify 指纹"},
         {"id": "ver-1", "title": "版本面同步",
          "cmd": "CHANGELOG 版本节 + VERSION-MATRIX 行 + README 版本块",
          "out": "三处同版", "judge": "登记不悬空（发布线可达 CHANGELOG ↔ VERSION-MATRIX）"},
@@ -161,30 +157,6 @@ def render_plan(root: str = ".") -> str:
         lines.append("      产出：%s" % s["out"])
         lines.append("      判据：%s" % s["judge"])
     return "\n".join(lines)
-
-
-def _golden_issues(r: Path, required: Tuple[str, ...]) -> Tuple[List[str], List[str]]:
-    """golden master 快照结构完整性（在场时）。"""
-    issues: List[str] = []
-    root = r / GOLDEN_DIR
-    names: List[str] = []
-    if not root.is_dir():
-        return issues, names
-    for d in sorted(p for p in root.iterdir() if p.is_dir()):
-        names.append(d.name)
-        man = d / "sha256.manifest"
-        if not man.is_file():
-            issues.append("%s/%s 缺 sha256.manifest（修复指引：重跑 bash scripts/release_freeze.sh %s）"
-                          % (GOLDEN_DIR, d.name, d.name))
-            continue
-        text = man.read_text(encoding="utf-8", errors="replace")
-        missing = [f for f in required if f not in text]
-        if missing:
-            issues.append("%s/%s 快照不完整，缺 %s（修复指引：重跑 bash scripts/release_freeze.sh %s）"
-                          % (GOLDEN_DIR, d.name, "、".join(missing), d.name))
-        if not re.search(r"(?m)^[0-9a-f]{64}\s", text):
-            issues.append("%s/%s 的 sha256.manifest 空或无摘要行" % (GOLDEN_DIR, d.name))
-    return issues, names
 
 
 def _changes_issues(r: Path, changes_dir: str) -> Tuple[List[str], List[str]]:
@@ -227,7 +199,7 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     # 2 人读策略件：三段锚点齐
     doc = r / POLICY_DOC
     if not doc.is_file():
-        issues.append("缺人读发布策略 %s（修复指引：写明冻结链/版本面/Golden Master/变更条目四段；"
+        issues.append("缺人读发布策略 %s（修复指引：写明冻结链/版本面/变更条目三段；"
                       "锚点见 core/release_gate.py::POLICY_ANCHORS）" % POLICY_DOC)
     else:
         ptxt = doc.read_text(encoding="utf-8")
@@ -252,15 +224,11 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     cmds = [s["cmd"] for s in steps]
     pos = [next((i for i, c in enumerate(cmds) if c.startswith(x)), -1) for x in chain]
     if any(p < 0 for p in pos) or pos != sorted(pos):
-        issues.append("冻结链未按序进计划（%s）（修复指引：conformance → approve → receipts 顺序不可颠倒）"
+        issues.append("冻结链未按序进计划（%s）（修复指引：conformance → approve → receipts 顺序不"
+            "可颠倒）"
                       % "、".join(str(p) for p in pos))
 
-    # 5 golden master 结构完整（在场时）
-    required = tuple(pol.get("golden_required") or DEFAULT_GOLDEN)
-    g_issues, g_names = _golden_issues(r, required)
-    issues += g_issues
-
-    # 6 变更条目可归档 + 变更日志生成可溯源（release-please 的最后一环）
+    # 5 变更条目可归档 + 变更日志生成可溯源（release-please 的最后一环）
     ch_dir = str(pol.get("changes_dir") or "changes/unreleased")
     ch_issues, ch_names = _changes_issues(r, ch_dir)
     issues += ch_issues
@@ -273,7 +241,7 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if not any("changelog --version" in s["cmd"] for s in steps):
         issues.append("发布计划缺变更日志生成步（修复指引：changes-1 步须调 nf changelog）")
 
-    # 7 版本面登记不悬空（发布线可达 CHANGELOG ↔ VERSION-MATRIX）
+    # 6 版本面登记不悬空（发布线可达 CHANGELOG ↔ VERSION-MATRIX）
     if not (r / "README.md").is_file():
         issues.append("缺版本面入口 README.md（修复指引：版本块须在场）")
     rel = release_line(root)
@@ -289,7 +257,7 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     stats.update({
         "policy": POLICY_JSON, "policy_doc": POLICY_DOC, "release_line": rel,
         "gate_version": ver, "checks": checks, "expected_pass": expected_pass,
-        "plan_steps": len(steps), "golden_snapshots": g_names,
+        "plan_steps": len(steps),
         "freeze_chain": chain, "changes": ch_names,
     })
     return issues, stats

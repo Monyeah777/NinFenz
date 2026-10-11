@@ -23,6 +23,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from core import json_doc
+
 REGISTRY_REL = "protocol/locales.json"
 CANONICAL = "README.md"
 SWITCH_MARK = "<!-- nf:locales -->"
@@ -31,7 +33,8 @@ COVERAGES = ("entry", "entry+guides")
 _LOCALE_RE = re.compile(r"^README\.([A-Za-z][A-Za-z0-9-]*)\.md$")
 _LANG_LABEL = {"zh": "中文", "en": "English", "ja": "日本語", "ko": "한국어", "fr": "Français"}
 _H2_RE = re.compile(r"(?m)^## ")
-_MD_REF_RE = re.compile(r"[A-Za-z0-9_\-\./]+\.md")
+#: 同 integrations._PATH_TOKEN：负向后顾把起点钉在 token 首字符，避免每个起点各回溯一遍（O(n²)）。
+_MD_REF_RE = re.compile(r"(?<![A-Za-z0-9_\-\./])[A-Za-z0-9_\-\./]+\.md")
 _DOCS_LANG_RE = re.compile(r"^[A-Za-z][A-Za-z0-9-]*$")
 
 
@@ -42,7 +45,7 @@ def registry(root: str = ".") -> Tuple[Optional[Dict[str, Any]], List[str]]:
         return None, ["缺语言面注册表 %s（修复指引：声明 locales / guides；"
                       "canonical = zh）" % REGISTRY_REL]
     try:
-        data = json.loads(p.read_text(encoding="utf-8"))
+        data = json_doc.load(p, dict, what=REGISTRY_REL)
     except (OSError, ValueError) as exc:
         return None, ["%s 不可解析：%s" % (REGISTRY_REL, exc)]
     issues: List[str] = []
@@ -134,7 +137,7 @@ def stamp(root: str = ".", write: bool = False) -> Dict[str, Any]:
     p = r / REGISTRY_REL
     if not p.is_file():
         return {"ok": False, "issues": ["缺 %s" % REGISTRY_REL]}
-    data = json.loads(p.read_text(encoding="utf-8"))
+    data = json_doc.load(p, dict, what=REGISTRY_REL)
     stamped: List[str] = []
     for g in _docs(data):
         src = str(g.get("path", ""))
@@ -201,7 +204,9 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         txt = p.read_text(encoding="utf-8")
         for a in want:
             if a not in txt:
-                issues.append("%s 缺机读锚点 %s（修复指引：与 %s 同步机读事实）" % (fn, a, CANONICAL))
+                issues.append("%s 缺机读锚点 %s（修复指引：与 %s 同步机读事实）" % (fn,
+ a,
+ CANONICAL))
         if not re.search(r"v\d+\.\d+", txt):
             issues.append("%s 缺版本号（vX.Y）" % fn)
         line = switcher(locs, lang)
@@ -215,7 +220,8 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             miss = [x for x in zh_refs if x not in txt]
             if miss:
                 issues.append("%s 缺 canonical 引用的件：%s" % (fn, "、".join(miss[:5])))
-    # 文档面：声明 ⇄ 在场，双向；路径须镜像（docs/<lang>/<rest> ← docs/<rest>）；源件摘要须与当前字节一致（防过期）
+    # 文档面：声明 ⇄ 在场，双向；路径须镜像（docs/<lang>/<rest> ← docs/<rest>）；源件摘要须与当前字
+    # 节一致（防过期）
     declared = _declared_translations(data)
     guides = _docs(data)
     for g in guides:
@@ -236,13 +242,17 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                 continue
             # 路径镜像：译件必须落 docs/<lang>/ 下，且剩余路径与源件一致
             if not src.startswith("docs/") or not tp.startswith("docs/" + str(lang) + "/"):
-                issues.append("译件路径未镜像：%s（%s 的译文应落 docs/%s/<原文相对路径>）" % (tp, src, lang))
+                issues.append("译件路径未镜像：%s（%s 的译文应落 docs/%s/<原文相对路径>）" % (tp,
+ src,
+ lang))
             elif tp[len("docs/" + str(lang) + "/"):] != src[len("docs/"):]:
                 issues.append("译件路径未镜像：%s ≠ docs/%s/%s" % (tp, lang, src[len("docs/"):]))
             if not tsha:
-                issues.append("译件未签源件摘要：%s（修复指引：跑 nf locales --write 重签 source_sha256）" % tp)
+                issues.append("译件未签源件摘要：%s（修复指引：跑 nf locales --write 重签 source_sh"
+                    "a256）" % tp)
             elif tsha != src_digest:
-                issues.append("译件过期：%s 的 source_sha256 与 %s 当前字节不一致（修复指引：更新译文后跑 nf locales --write 重签）"
+                issues.append("译件过期：%s 的 source_sha256 与 %s 当前字节不一致（修复指引：更新译"
+                    "文后跑 nf locales --write 重签）"
                               % (tp, src))
     for item in (data.get("locales") or []):
         if not isinstance(item, dict):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 W1 · 基线自描述一致性机检单测。"""
 import os
 import sys

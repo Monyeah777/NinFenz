@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MCP Server 运行时单测（v2.5.0 Wave5 C1：快照 → stdio JSON-RPC 服务）。
 
 运行：cd desktop && python -m unittest tests.test_mcp_runtime -v
@@ -841,7 +840,8 @@ class LiveResourceReachabilityTest(unittest.TestCase):
         rt = self._rt()
         listed, cursor = [], ""
         while True:
-            body = self._call(rt, "resources/list", {"cursor": cursor} if cursor else {}).get("result") or {}
+            body = self._call(rt, "resources/list", {"cursor": cursor} if cursor else {}).get("resu"
+                "lt") or {}
             listed += [r["uri"] for r in body.get("resources") or []]
             cursor = body.get("nextCursor") or ""
             if not cursor:

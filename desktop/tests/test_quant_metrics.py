@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """量化域功能面单测：口径公式（对可手算的向量）+ 确定性 + 报告与图表产物。
 
 口径判据来自 assets/QUANT_METRICS.md（不是外部项目定义）：

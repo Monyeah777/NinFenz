@@ -11,9 +11,9 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 SLOT_KINDS = {"string", "integer", "number", "boolean", "array", "object"}
 ITEM_KINDS = {"string", "integer", "number", "boolean"}
@@ -57,7 +57,7 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if not path.is_file():
         return ["protocol/world_slots.json 缺失"], {"slots": 0}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json_doc.load(path, dict, what="protocol/world_slots.json")
     except Exception as exc:
         return ["protocol/world_slots.json 解析失败：%s" % exc], {"slots": 0}
     issues = validate_registry(data)

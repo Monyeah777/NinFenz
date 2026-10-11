@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 · tool_face 扫描器单测。"""
 import os
 import sys

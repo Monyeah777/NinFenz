@@ -3,7 +3,7 @@
 > **第三方目录（awesome / Cline / mcp.so / Glama / PulseMCP / 魔搭 …）的渠道、材料与逐步流程见 [DIRECTORIES.md](DIRECTORIES.md)。**
 
 > 面向 agent 的正面战场：把只读 MCP 服务登记进各目录，让 agent 与 MCP 客户端能搜到、一键装载。
-> 真源：`protocol/mcp_package.json`（机读）· 人读投影：`docs/mcp.md` 的「上架材料」节 · 本目录 `server.json`（官方注册表格式，按 2025-09-29 schema 校验）
+> 真源：`protocol/mcp_package.json`（机读）· 人读投影：`docs/mcp.md` 的「上架材料」节 · 本目录 `server.json`（官方注册表格式，按 **2025-12-11** schema 校验——与 `server.json` 的 `$schema`、`DIRECTORIES.md` 同口径；2026-10-10 审计 B1 修正此前三处不一致）
 > 最后更新：2026-10-08
 
 ---
@@ -57,7 +57,7 @@ curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=ninfenz"
 ```
 
 > 命名空间规则：`io.github.<你的 GitHub 用户名>/<服务名>`。我们填的是 `io.github.monyeah777/ninfenz`，与仓库属主一致，登录授权即可通过归属校验。
-> package 归属：注册表还会核对 npm 包 `ninfenz` 确实存在且版本匹配（当前 1.0.0）。若将来发 1.0.1，`server.json` 的 `version` 与 `packages[0].version` 要同步改。
+> package 归属：注册表还会核对 npm 包 `ninfenz` 确实存在且版本匹配（当前 **1.0.1**）。发新版时必须**同步**改 `server.json` 的 `version`、`packages[0].version` 与 `package.json` 的 `version`（三处同源，2026-10-10 审计 B2 修正此前写死的 1.0.0）。
 
 ---
 
@@ -87,12 +87,15 @@ NinFenz Content Gate — 一个只读 MCP 服务器：把长内容的验收标�
 
 ```bash
 # 工具面与运行时逐名一致（多一个少一个即 FAIL）
-python scripts/nf.py mcp --json 2>/dev/null || python -m unittest tests.test_mcp_packaging
+python scripts/nf.py mcp --json 2>/dev/null || (cd desktop && python -m unittest tests.test_mcp_packaging)
 # 只读红线：不含任何写工具
-python -m unittest tests.test_mcp_runtime tests.test_mcp_trust_meta
+(cd desktop && python -m unittest tests.test_mcp_runtime tests.test_mcp_trust_meta)
 # 端到端真跑（协议级）
 python scripts/nf.py serve   # 手工：喂 initialize → tools/list → tools/call
 ```
+
+> 测试件都在 `desktop/tests/`（仓库根**没有** `tests/` 目录）；2026-10-10 审计 B3 修正此前两条
+> 会报「module not found」的路径写法。
 
 ---
 

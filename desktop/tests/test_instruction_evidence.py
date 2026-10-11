@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """规范入口指令实测记录（`core/instruction_evidence.py`）回归测试 —— 文档可执行性面 GAP-6。
 
 全部用**注入执行器** + 临时根，不依赖工作区状态（并发会话不会把测试搞红）。

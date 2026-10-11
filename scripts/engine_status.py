@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """引擎 provider 状态（只读）：有哪些引擎实现 / 语言与工具链 / 本机能否装载。
 
 用法：
@@ -19,7 +18,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="引擎 provider 状态（Registry Pattern）")
     ap.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ap.add_argument("--check", action="store_true", help="注册表完整性：未声明的引擎目录即 exit 1")
-    ap.add_argument("--abi", action="store_true", help="动态加载 ABI 探针：装载平台 C 运行库并调用一次")
+    ap.add_argument("--abi", action="store_true", help="动态加载 ABI 探针：装载平台 C 运行库并调用"
+        "一次")
     args = ap.parse_args(argv)
     from core import engine_registry as er
 

@@ -13,10 +13,11 @@ NF 此前只有 `nf conformance` 的**报告**（跑一遍契约），没有**�
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 DECL_REL = "protocol/CONFORMANCE.md"
 _ROW = re.compile(r"^\|\s*`?([^`|]+?)`?\s*\|\s*`?([^`|]+?)`?\s*\|\s*([^|]+?)\s*\|\s*$")
@@ -69,11 +70,12 @@ def live_versions(root: str = ".") -> Dict[str, str]:
     out: Dict[str, str] = {}
     reg = Path(root) / "desktop" / "src" / "core" / "registry.json"
     if reg.is_file():
-        data = json.loads(reg.read_text(encoding="utf-8"))
+        data = json_doc.loads(reg.read_text(encoding="utf-8"), dict, what="registry.json")
         out["registry schema"] = str(data.get("registry_schema_version") or "")
     contract = Path(root) / "protocol" / "schema" / "contract.schema.json"
     if contract.is_file():
-        data = json.loads(contract.read_text(encoding="utf-8"))
+        data = json_doc.loads(contract.read_text(encoding="utf-8"), dict,
+                             what="protocol/schema/contract.schema.json")
         enum = ((data.get("properties") or {}).get("schema") or {}).get("enum") or []
         out["machine_contract schema"] = ",".join(str(x) for x in enum)
     prot = sorted((Path(root) / "community").glob("*/protocol.yaml"))

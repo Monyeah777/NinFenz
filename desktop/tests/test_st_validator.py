@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ST 制卡校验器原型（A-S3）单测：**自造 fixture**（非真实卡，仅验证判据）。"""
 import json
 import sys

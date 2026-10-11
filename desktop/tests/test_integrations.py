@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """接入面（core/integrations.py）回归：描述件在场 + 词表封闭 + 投影逐字 + 变异自证。"""
 import json
 import sys

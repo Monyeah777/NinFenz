@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """缺口逐行审查（gap_review）单测：候选筛法可复现 + 确定性证据复核 + stub 双轨纪律。
 
 补齐既有覆盖缺口（逐模块覆盖率门禁实测 `gap_review.py` 0.0%——AUD-0015 落地时无随行单测；

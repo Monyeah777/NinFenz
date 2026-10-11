@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """变体/条件装配库单测（v2.3.0 B2：装配层变体模板选择 + 重叠仲裁）。
 
 运行：cd desktop && python -m unittest tests.test_variants -v

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """world_slots 注册表扫描器单测。"""
 import os
 import sys

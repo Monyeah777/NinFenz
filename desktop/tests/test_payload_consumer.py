@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 #5 · payload-consumer 雏形单测（确定性 + 消费映射）。"""
 import os
 import sys

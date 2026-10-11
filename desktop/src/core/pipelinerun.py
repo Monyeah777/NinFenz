@@ -19,6 +19,7 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 
 from core.models import fid_key
 from core.pipeline_loader import load_pipeline_file
@@ -71,7 +72,7 @@ def _core_ids(root: str = ".") -> List[str]:
     """官方核心基座 id（registry.json modules[]）。"""
     path = Path(root) / "desktop" / "src" / "core" / "registry.json"
     try:
-        reg = json.loads(path.read_text(encoding="utf-8"))
+        reg = json_doc.load(path, dict, what=str(path))
     except (OSError, ValueError):  # 扫描失败 ⇒ 空集（下游按「无核心件」处理）
         return []
     return [str(m.get("id")) for m in (reg.get("modules") or []) if m.get("id")]
@@ -294,7 +295,7 @@ def verify_advisory(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                       "（修复指引：nf pipeline dryrun --all --write-advisory）")
         return issues, {"total": live["total"]}
     try:
-        committed = json.loads(p.read_text(encoding="utf-8"))
+        committed = json_doc.load(p, dict, what=p.name)
         if committed.get("counts") != live["counts"]:
             issues.append("advisory 台账过期：记录 %s ≠ 实测 %s"
                           "（修复指引：重建台账）"

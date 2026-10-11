@@ -43,7 +43,7 @@
     {
       "id": "laya-typed-decisions",
       "source": "hf:convaiinnovations/laya-typed-decisions",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "encoder": "answerdotai/ModernBERT-large",
       "params": "421M",
       "context": 1024,
@@ -55,7 +55,7 @@
     {
       "id": "laya-multilingual",
       "source": "hf:convaiinnovations/laya-multilingual",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "encoder": "mmBERT-base",
       "params": "322M",
       "context": 1024,
@@ -80,7 +80,7 @@
     {
       "id": "open-jev-9b",
       "source": "hf:ZefanCai/Open-Jev-9B",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "base_model": "Qwen/Qwen3.5-9B",
       "base_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
       "kind": "LoRA adapter + scalar decision head",

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """43 A3 —— 扩展策略 + nf diff 影响度三档单测。"""
 import os
 import unittest

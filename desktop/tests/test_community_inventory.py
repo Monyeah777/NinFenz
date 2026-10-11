@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """community 仓库盘点单测（v2.0.x-E5：模块市场雏形深化——可发现 → 可装载）。
 
 运行：cd desktop && python -m unittest tests.test_community_inventory -v

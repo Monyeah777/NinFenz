@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """scripts/orchestrate.py（编排面 CLI 入口）回归：目录 / 计划编译 / 机检 / 退出码。
 
 为什么单列：core.orchestration 是**叶子**（工具面由调用方注入），命令行入口落在 core 之外，

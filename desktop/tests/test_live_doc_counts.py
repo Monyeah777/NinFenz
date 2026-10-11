@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """活文档不得钉运行时计数（check 数 / PASS 数）——「内外口径统一」的可核判据。
 
 为什么：仓库纪律写的是「活文档不钉运行时计数（钉死会漂）」，但此前只有人记着。本轮实测
@@ -42,8 +41,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/agent/AI_ROUTING.md",
-              "docs/meta/DEEP_DIVE.md", "docs/meta/ROADMAP.md", "SECURITY.md", "docs/agent/ROUTES.md", "llms.txt")
+ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
+    "ent/AI_ROUTING.md",
+              "docs/meta/DEEP_DIVE.md",
+ "docs/meta/ROADMAP.md",
+ "SECURITY.md",
+ "docs/agent/ROUTES.md",
+ "llms.txt")
 EXEMPT = {"CHANGELOG.md", "docs/meta/VERSION-MATRIX.md", "docs/verification-cards.md"}
 EXEMPT_PREFIX = ("docs/examples/", "docs/reference/", "community/", "results/", "library/")
 

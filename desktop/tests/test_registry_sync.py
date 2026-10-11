@@ -45,7 +45,8 @@ class CheckRegisterableTest(unittest.TestCase):
         fake = ROOT / ".rivet" / "scratch" / "nf_not_registered_pkg"
         fake.mkdir(parents=True, exist_ok=True)
         (fake / "protocol.yaml").write_text(
-            "protocol:\n  schema_version: \"2\"\npackage:\n  id: 未登记测试包\n  name: 未登记测试包\n",
+            "protocol:\n  schema_version: \"2\"\npackage:\n  id: 未登记测试包\n  name: 未登记测试包"
+                "\n",
             encoding="utf-8")
         try:
             issues = registry_sync.check_registerable(str(fake), _doc_text())

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """v2.8.0 波C D2 —— scripts/nf.py CLI 层自动化测试（41 规划 D 组收口杂务）。
 
 覆盖子命令参数面与装配链 smoke（替代手工冒烟；不依赖 GUI/端壳）。
@@ -554,6 +553,50 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertIn("内部错误", err.getvalue())
         self.assertNotIn("Traceback", err.getvalue())
 
+    def test_guarded_main_is_the_single_error_face(self):
+        """兜底必须存在于**守护实际调用的那个入口**（2026-10-10 审计 X0，P0）。
+
+        历史成因：兜底只写在 `cli()`，而 `core.daemon.execute()` 调的是 `main()` ⇒ 任何未捕获
+        异常穿出守护、杀死常驻进程。本判据钉住 `guarded_main()` 自身就兜得住——只测 `cli()`
+        会在「守护改用 guarded_main」这条路径上留下假绿。
+        """
+        orig = nf.main
+
+        def boom(argv=None):
+            raise ValueError("bad payload")
+
+        nf.main = boom
+        try:
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                code = nf.guarded_main(["receipts"])
+        finally:
+            nf.main = orig
+        self.assertEqual(code, 1)
+        self.assertIn("内部错误", err.getvalue())
+        self.assertIn("bad payload", err.getvalue())
+        self.assertNotIn("Traceback", err.getvalue())
+
+    def test_guarded_main_normalizes_control_exceptions(self):
+        """Ctrl-C → 130；非 int 返回 → 0（与 cli 同一口径，逐条钉住）。"""
+        orig = nf.main
+
+        def interrupt(argv=None):
+            raise KeyboardInterrupt
+
+        nf.main = interrupt
+        try:
+            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(130, nf.guarded_main([]))
+        finally:
+            nf.main = orig
+
+        nf.main = lambda argv=None: None
+        try:
+            self.assertEqual(0, nf.guarded_main([]))
+        finally:
+            nf.main = orig
+
     @staticmethod
     def _walk(parser, prefix=""):
         out = [(prefix or "<root>", parser)]
@@ -614,6 +657,27 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn('"ok": true', out)
         self.assertIn('"version"', out)
+
+    def test_doctor_reports_yaml_degradation(self):
+        """Y7（2026-10-10 全仓审计）：缺 PyYAML 时 doctor 必须 FAIL 且 --json 带 degraded。
+
+        修复前：计数静默塌成 0，而 doctor 照样报 N/N 通过（只有 stderr 一行 WARN）——降级报绿。
+        """
+        from core import lazy_yaml
+        orig = lazy_yaml.module
+        lazy_yaml.module = lambda: None
+        try:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = nf._cmd_doctor(argparse.Namespace(json=True))
+        finally:
+            lazy_yaml.module = orig
+        self.assertEqual(1, code, "缺 PyYAML 必须让 doctor 退出码非 0（降级不得报绿）")
+        doc = json.loads(out.getvalue())
+        self.assertTrue(doc["degraded"])
+        self.assertFalse(doc["ok"])
+        self.assertTrue(any("PyYAML" in c["name"] and not c["ok"] for c in doc["checks"]),
+                        "缺少「可选依赖在场」这条会 FAIL 的检查")
 
     def test_cli_version_flag(self):
         proc = subprocess.run(

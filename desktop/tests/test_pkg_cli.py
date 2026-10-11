@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """包管理器面 CLI（scripts/pkg.py）回归测试 —— 品类枚举 / 取件 / 检索（机器面）。"""
 import json
 import subprocess

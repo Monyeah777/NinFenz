@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """定义库品类注册表（core/category_registry.py）回归测试 —— 注册表模式 / 单一发现真源。
 
 关键断言：LAYERS 派生 + 本地登记合并、attributed 标志诚实、按品类枚举与反查、

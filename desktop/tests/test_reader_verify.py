@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """读者侧独立验证器（scripts/nf_verify.py）端到端测试。
 
 刻意**不 import NF 的任何模块**来跑被测脚本——它就是给"没有 NF 的读者"用的，
@@ -83,7 +82,8 @@ class TestReaderVerifier(unittest.TestCase):
                 if mod.split(".")[0] in ("core", "desktop"):
                     offenders.append(mod)
         self.assertEqual([], offenders,
-                         "读者侧验证器 import 了仓内模块（读者机器上没有 NF 也读不到）：%s" % offenders)
+                         "读者侧验证器 import 了仓内模块（读者机器上没有 NF 也读不到）：%s"
+                             "" % offenders)
         # 非空转：脚本必须真被解析到（否则路径写错也「通过」）
         self.assertTrue(VERIFIER.is_file() and any(isinstance(n, ast.Import)
                                                    for n in ast.walk(tree)),

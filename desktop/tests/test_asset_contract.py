@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """数字资产契约层（core/asset_contract）回归 —— 数据 / 代码 / 脚本三面。
 
 覆盖：严格 JSON、CSV 列数、Markdown 表格列数、输入输出一致性（link）、sha256 防篡改、
@@ -65,7 +64,8 @@ class DataFaceTest(unittest.TestCase):
             _make(r, "s.csv", "c\na\nb\n")
             _make(r, "rep.json", '{"sample": "s.csv", "rows": 9}')
             issues, _ = ac._check_data(str(r), {"id": "r", "path": "rep.json", "format": "json",
-                                                "link": {"path_field": "sample", "rows_field": "rows"}})
+                                                "link": {"path_field": "sample",
+ "rows_field": "rows"}})
             self.assertTrue(any("不一致" in i for i in issues), issues)
 
     def test_link_rows_match_is_clean(self):
@@ -74,7 +74,8 @@ class DataFaceTest(unittest.TestCase):
             _make(r, "s.csv", "c\na\nb\n")
             _make(r, "rep.json", '{"sample": "s.csv", "rows": 2}')
             issues, _ = ac._check_data(str(r), {"id": "r", "path": "rep.json", "format": "json",
-                                                "link": {"path_field": "sample", "rows_field": "rows"}})
+                                                "link": {"path_field": "sample",
+ "rows_field": "rows"}})
             self.assertEqual([], issues, issues)
 
     def test_sha256_tamper(self):
@@ -133,7 +134,8 @@ class CodeFaceTest(unittest.TestCase):
         self.assertTrue(any("可证为 None" in i for i in issues), issues)
 
     def test_guard_returns_no_false_positive(self):
-        issues, _ = self._code("def f(x=None):\n    if x is None:\n        return 0\n    return x.y\n")
+        issues, _ = self._code("def f(x=None):\n    if x is None:\n        return 0\n    return x.y"
+            "\n")
         self.assertEqual([], issues, issues)
 
     def test_branch_reassign_no_false_positive(self):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 📚 NF 云端代收站 · 入库机器人 V2（Y12′ · 2026-09-07 · 编号 v0.4 制式）
 由 .github/workflows/library-ingest.yml 调用（Issue 标题以【NF投稿】开头时触发）。
@@ -27,7 +26,10 @@ from glob import glob
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__)))), "desktop", "src"))
-from core import atomic_write  # noqa: E402  —— 入库件落盘走统一原子写（2026-10-01）
+from core import (
+    atomic_write,  # noqa: E402  —— 入库件落盘走统一原子写（2026-10-01）
+    json_doc,
+)
 
 REPO = os.environ.get('REPO', '')
 TOKEN = os.environ.get('GITHUB_TOKEN', '')
@@ -63,6 +65,44 @@ SEG_RE = re.compile(r'^[A-Za-z0-9]{1,%d}$' % MAX_SEG)
 MAX_EXEC_STRLEN = 131072
 
 
+#: frontmatter 标量里的控制字符（含 CR/LF）——**结构注入口**，见 flatten_fm_value。
+_FM_CTRL = re.compile(r"[\x00-\x1f\x7f]+")
+
+
+def flatten_fm_value(v):
+    """frontmatter 标量压平：控制字符（含 CR/LF）→ 空格，再 strip。**两个前端共用的唯一实现**。
+
+    为什么（2026-10-10 审计 Y2，P1）：投稿的 Issue 标题等外部字段是不可信输入，而条目
+    frontmatter 是**按行读**的（core.library_entries.parse_frontmatter）——值里一个换行就能
+    **注入新键**（示例：标题尾部放 \nstatus: retired ⇒ 条目生命周期被投稿人改写）。
+    换行是结构分隔，不是内容：一律压平，不让它进结构。
+    """
+    return _FM_CTRL.sub(" ", str(v or "")).strip()
+
+
+def fm_scalar_ok(v) -> bool:
+    """压平后的值能否被 parse_frontmatter **原样读回**（不能则该投稿拒收，失败关闭）。
+
+    该解析器对一行 key: value 只有三条分支：空 → 空表；方括号成对 → 列表；其余 → 剥首尾引号。
+    故「往返安全」= 非空 + 首尾无空白 + 不以方括号成对 + 首尾无引号。
+    **刻意不做转义**：那个极简解析器不认转义，硬塞 JSON 引号会把反斜杠留在字段里（改坏内容）。
+    """
+    v = str(v or "")
+    if not v or v != v.strip():
+        return False
+    if v[0] == "[" and v[-1] == "]":
+        return False
+    return v.strip("'\"") == v
+
+
+def fm_fields_ok(fields) -> str:
+    """→ 第一个不能安全写入 frontmatter 的字段名（全安全则空串）。调用方据此拒收并回评。"""
+    for key, val in fields:
+        if not fm_scalar_ok(flatten_fm_value(val)):
+            return key
+    return ""
+
+
 def load_gate(channel='github'):
     """读投稿闸门声明 → (mode, allowlist)。**fail-closed**：声明缺失 / 不可解析 / mode 非法，
     一律按 `paused` 处理（宁可暂停接收并让作者看到修复指引，也不静默放行）。
@@ -71,7 +111,7 @@ def load_gate(channel='github'):
     """
     try:
         with open(INTAKE_REL, encoding='utf-8') as f:
-            data = json.load(f)
+            data = json_doc.loads(f.read(), dict, what=INTAKE_REL)
         ch = (data.get('channels') or {}).get(channel) or {}
         mode = str(ch.get('mode') or '')
         allow = {str(x).strip().lower() for x in (ch.get('allowlist') or []) if str(x).strip()}
@@ -110,7 +150,7 @@ def load_rating_vocab():
     """
     try:
         with open(INTAKE_REL, encoding='utf-8') as f:
-            data = json.load(f)
+            data = json_doc.loads(f.read(), dict, what=INTAKE_REL)
         vocab = [str(v) for v in ((data.get('rating') or {}).get('vocabulary') or [])]
         if vocab:
             return vocab
@@ -183,7 +223,7 @@ def api(path, data=None, method=None):
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             raw = r.read()
-            return json.loads(raw) if raw else {}
+            return json_doc.loads(raw, dict, what='intake API 响应') if raw else {}
     except urllib.error.HTTPError as e:
         print(f'API HTTP {e.code}: {e.read().decode()[:300]}')
         sys.exit(1)
@@ -296,7 +336,7 @@ def main():
     # ---- 2. 解析元信息（--- 之前为元信息区，之后为产物全文）----
     def clean_val(v):
         """模板残留净化：说明文字/括号示例一律视为未填（投稿人 = 蠢用户，机器兜底）。"""
-        v = v.strip()
+        v = flatten_fm_value(v)          # 先压平（含 CR/LF）——frontmatter 行读，换行即注入
         if not v:
             return ''
         if v.startswith(('（', '(')):
@@ -328,13 +368,14 @@ def main():
     if ('从这里开始粘贴产物全文' in body_main
             or '把 AI 产物全文整篇粘贴到这条线下面' in body_main
             or '此占位行务必删掉' in body_main):
-        comment('⚠️ 正文里还留着模板的占位提示行「（从这里开始粘贴产物全文…）」——请删掉它，并把 AI 产出的完整内容整篇粘贴进来，重新开题提交。')
+        comment('⚠️ 正文里还留着模板的占位提示行「（从这里开始粘贴产物全文…）」——请删掉它，并把 AI '
+            '产出的完整内容整篇粘贴进来，重新开题提交。')
         close_issue()
         print('正文区空壳（残留模板占位行），已拒绝并关闭')
         sys.exit(0)
 
     raw_title = clean_val(meta.get('标题', ''))
-    title = raw_title or re.sub(r'^【NF投稿】\s*', '', TITLE).strip() or f'投稿 #{N}'
+    title = raw_title or flatten_fm_value(re.sub(r'^【NF投稿】\s*', '', TITLE)) or f'投稿 #{N}'
     topic = clean_val(meta.get('形态/领域自述') or meta.get('形态') or '') or '未标注'
     one_line = clean_val(meta.get('一句话') or '') or '（见文件）'
     seg1 = clean_val(meta.get('档位词', ''))
@@ -350,6 +391,19 @@ def main():
         rating_note = ('（投稿未填分级或越词表 → 以 `unrated` 入库；'
                        '补填 `分级` 后重新开题即可定级）')
         rating = 'unrated'
+
+    # ---- 2.4 frontmatter 形状闸门（审计 Y2，P1）----
+    # 值必须能被 parse_frontmatter 原样读回：首尾引号会被剥掉、方括号成对形状会被读成列表。
+    # 这类投稿**拒收**而不是硬塞（转义会改坏内容，见 fm_scalar_ok）；换行已在 clean_val 压平。
+    _bad_fm = fm_fields_ok((('title', title), ('type', topic), ('description', one_line),
+                            ('author', AUTHOR), ('license', lic), ('rating', rating)))
+    if _bad_fm:
+        comment(f'⚠️ 元信息「{_bad_fm}」的取值无法安全写入条目 frontmatter——'
+                '首尾引号会被条目解析器剥掉、方括号成对的形状会被读成列表（都会改变你的内容）。'
+                '请去掉首尾引号 / 方括号后重新开题。')
+        close_issue()
+        print(f'元信息 {_bad_fm} 形状不安全，已拒绝并关闭')
+        sys.exit(0)
 
     # ---- 2.5 密钥形状拒收（安全边界）----
     # 为什么必须在入库前拦：投稿正文会**原样发布**到公开仓库 = 把别人的真实密钥再分发一次；
@@ -381,13 +435,15 @@ def main():
 
     # ---- 3. 校验档位/自定义段 + 分配编号 ----
     if bool(seg1) != bool(seg2):
-        comment('⚠️ 档位词与自定义段必须**都填或都不填**（两者都填 = 完整形 `NF-档位词-自定义段-序号`；都不填 = 默认形 `NF-序号`）。请按模板规则重新开题。')
+        comment('⚠️ 档位词与自定义段必须**都填或都不填**（两者都填 = 完整形 `NF-档位词-自定义段-序'
+            '号`；都不填 = 默认形 `NF-序号`）。请按模板规则重新开题。')
         close_issue()
         print('段位不配对，已拒绝并关闭')
         sys.exit(0)
     if seg1:
         if not SEG_RE.match(seg1) or not SEG_RE.match(seg2):
-            comment('⚠️ 档位词/自定义段仅允许字母数字、各 ≤16 字符、不含连字符（连字符是段分隔符）。请修正后重新开题。')
+            comment('⚠️ 档位词/自定义段仅允许字母数字、各 ≤16 字符、不含连字符（连字符是段分隔符）'
+                '。请修正后重新开题。')
             close_issue()
             print('段位字符非法，已拒绝并关闭')
             sys.exit(0)
@@ -404,7 +460,8 @@ def main():
                 near.append(os.path.basename(f)[:-3])
         if near:
             hint = '、'.join(near[:3])
-            comment(f'⚠️ 档位段+自定义段与现有条目仅大小写不同（{hint}）——为保转译表无歧义，前缀小写键必须全馆唯一。请更换档位词/自定义段拼写后重新开题。')
+            comment(f'⚠️ 档位段+自定义段与现有条目仅大小写不同（{hint}）——为保转译表无歧义，前缀小写'
+                f'键必须全馆唯一。请更换档位词/自定义段拼写后重新开题。')
             close_issue()
             print('前缀小写键撞车，已拒绝并关闭')
             sys.exit(0)
@@ -449,7 +506,7 @@ def main():
 
     # ---- 5. 重生成 INDEX 生成区 + ALIAS（投影；真源 = 条目 frontmatter）----
     sys.path.insert(0, 'desktop/src')
-    from core import library as nflib                       # noqa: E402
+    from core import library as nflib  # noqa: E402
     out = nflib.write_projection('.')
     print(f'投影已重生成: {out["changed"] or "无变化"}')
 
@@ -468,7 +525,8 @@ def main():
         f'✅ **云端代收成功——已入库 {nfid}**《{title}》\n\n'
         f'随时可用链接召回运行（说「运行 {nfid}」即可）：\n'
         f'- GitHub：`https://raw.githubusercontent.com/{REPO}/main/library/{nfid}.md`\n'
-        f'- 国内镜像（Gitee · 无需梯子）：`https://gitee.com/{GITEE_OWNER}/{GITEE_REPO}/raw/main/library/{nfid}.md`\n\n'
+        f'- 国内镜像（Gitee · 无需梯子）：`https://gitee.com/{GITEE_OWNER}/{GITEE_REPO}/raw/main/lib'
+            f'rary/{nfid}.md`\n\n'
         f'> 💡 给任意 AI 的启动句：请读取上面的链接，按文档执行。\n'
         f'> 🔤 若 AI 报编号时大小写拿不准：让它读 `library/ALIAS.md` 转译（编号全小写化后匹配）。\n'
         f'> 📊 已按闸门声明登记：许可 `{lic}` · 分级 `{rating}`{rating_note}\n'

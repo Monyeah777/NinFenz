@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """在仓产物的写入口必须走 `atomic_write`（半截件不留）——**模块级机械普查**。
 
 为什么（2026-10-01 取证）：`atomic_write` 的模块 docstring 早写明「已发布产物的写入口仍是
@@ -24,9 +23,13 @@ SKIP_STEMS = {"atomic_write", "disk_cache"}
 #: 已复核：有写 sink 但**只写用户态/临时路径**，不算在仓产物
 REVIEWED_NO_ATOMIC = {
     "attest": "只写临时工作目录里的 ssh 签名载荷（非仓产物）",
-    "daemon": "只写 `<NF_HOME>/daemon.json`——它自己做了 tmp + `os.replace`（见 write_state）",
     "storage": "只写 NF_HOME 用户库（Store 自有语义；本波未纳入）",
     "watch": "只写 NF_HOME 监听状态",
+}
+#: 脚本面已复核例外（N9 取证）：写的是**用户态**非在仓产物，且该件按设计保持纯 stdlib 热路径——
+#: 为它 import core 会把 Windows 快路从 ≈50ms 拖回 ≈390ms（本文件 docstring 的立项依据）。
+REVIEWED_NO_ATOMIC_SCRIPTS = {
+    "scripts/nf_client.py": "只写 NF_FASTPATH_MARKER 指定的用户态标记（热路径刻意零 core 依赖）",
 }
 
 
@@ -90,10 +93,25 @@ class CoreAtomicWriteTest(unittest.TestCase):
             text = p.read_text(encoding="utf-8", errors="replace")
             bad = [i for i, ln in enumerate(text.splitlines(), 1)
                    if SINKS.search(ln) and "atomic_write" not in ln]
+            rel = p.relative_to(ROOT).as_posix()
+            if rel in REVIEWED_NO_ATOMIC_SCRIPTS:
+                # 已复核例外：仍须自证「例外仍必要」——该件若已无裸写 sink（或那行已走
+                # atomic_write），清单就该划掉，不许长霉。
+                self.assertTrue(bad,
+                                "%s 已无需例外（无裸写 sink），请从 REVIEWED_NO_ATOMIC_SCRIPTS 划掉"
+                                % rel)
+                continue
             if bad:
-                raw[p.relative_to(ROOT).as_posix()] = bad
+                raw[rel] = bad
         self.assertEqual({}, raw,
                          "脚本面有裸写 sink（在仓产物/交付件须走 atomic_write）：%s" % raw)
+
+    def test_script_allowlist_is_exact(self):
+        """脚本面例外清单**逐条在场**（防清单长霉：文件改名/删除/已原子化都要当场红）。"""
+        for rel, why in REVIEWED_NO_ATOMIC_SCRIPTS.items():
+            p = ROOT / rel
+            self.assertTrue(p.is_file(), "REVIEWED_NO_ATOMIC_SCRIPTS 列了不在场的文件：%s" % rel)
+            self.assertTrue(why, "%s 的例外理由不许留空" % rel)
 
 
 if __name__ == "__main__":

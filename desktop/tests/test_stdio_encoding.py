@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """入口 stdio 编码门禁（`scripts/*.py` 的可达性 ↔ Windows 默认控制台）。
 
 动机（2026-09-30 真跑取证）：仓库自带的修复指引一律写「python scripts/<件> --write」，
@@ -86,7 +85,8 @@ class StdioEncodingTest(unittest.TestCase):
             if unpinned_cjk(path.read_text(encoding="utf-8")):
                 bad.append(path.relative_to(ROOT).as_posix())
         self.assertEqual([], bad, "入口打印中文却没钉 UTF-8 stdio（修复指引：照 scripts/nf.py "
-                                  "的写法，把 reconfigure(encoding=\"utf-8\") 放进 __main__ 分支）：%s"
+                                  "的写法，把 reconfigure(encoding=\"utf-8\") 放进 __main__ 分支）"
+                                      "：%s"
                          % bad)
 
     def test_every_entry_printing_non_gbk_pins_stdio(self):

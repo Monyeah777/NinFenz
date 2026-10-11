@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """模块级耦合度量（`core/coupling_metrics.py`）回归测试 —— Martin 包度量 / SDP / 环。
 
 关键断言：新增环或新增 SDP 违例判 FAIL、登记债放行、债务消除记 WARN、
@@ -49,6 +48,43 @@ class GraphTest(unittest.TestCase):
             viol = cm.sdp_violations(deps, metrics)
         self.assertIn(("core_util", "sink"), viol, "低 I 依赖高 I = 违例")
         self.assertNotIn(("sink", "core_util"), viol, "反向不是违例")
+
+
+class MetricsFaceTest(unittest.TestCase):
+    """审计 §11v.4 F1：基线的 metrics 面写了却从不读 —— 这里把它钉成判据。"""
+
+    def test_inconsistent_recorded_i_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _mod(tmp, "leaf")
+            _mod(tmp, "sink", ["leaf"])
+            cm.write(tmp)
+            p = Path(tmp) / cm.BASELINE_REL
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["metrics"]["sink"]["i"] = 0.99        # 与 Ce/(Ca+Ce) 自相矛盾
+            p.write_text(json.dumps(doc), encoding="utf-8")
+            issues, _w, _s = cm.scan(tmp)
+        self.assertTrue(any("自相矛盾" in i for i in issues), issues)
+
+    def test_missing_metrics_face_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _mod(tmp, "leaf")
+            cm.write(tmp)
+            p = Path(tmp) / cm.BASELINE_REL
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc.pop("metrics")
+            p.write_text(json.dumps(doc), encoding="utf-8")
+            issues, _w, stats = cm.scan(tmp)
+        self.assertTrue(any("缺 metrics 面" in i for i in issues), issues)
+        self.assertEqual(0, stats["metrics_recorded"])
+
+    def test_repo_metrics_face_is_fresh(self):
+        _deps, metrics = cm.graph(str(ROOT))
+        issues, _w, stats = cm.scan(str(ROOT))
+        self.assertEqual([], [i for i in issues if "metrics" in i], issues)
+        self.assertEqual(len(metrics), stats["metrics_recorded"])
+        self.assertEqual(0, stats["metrics_drift"],
+                         "基线 metrics 面已漂移（修复指引：--write 重冻）")
+        self.assertEqual(0, stats["metrics_missing"])
 
 
 class RatchetTest(unittest.TestCase):

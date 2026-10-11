@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 #3 · trace→drill 自动比对器单测。"""
 import json
 import os

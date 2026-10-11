@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """本轮新增面的分支覆盖测试（registry_cross / payload_harvest / machine_contract /
 receipts 协议层 / pipelinerun advisory）——把覆盖率拉回门槛之上，并钉住关键分支。"""
 import json
@@ -92,7 +91,9 @@ class TestPayloadHarvestApply(unittest.TestCase):
             self.assertTrue(any("demo_event.b_count" in x for x in r["added"]))
             self.assertTrue(any("a_id" in x for x in r["narrowed"])
                             or r["narrowed"] == [], r)
-            reg = json.loads(Path(tmp, "protocol", "event_registry.json").read_text(encoding="utf-8"))
+            reg = json.loads(Path(tmp,
+ "protocol",
+ "event_registry.json").read_text(encoding="utf-8"))
             self.assertEqual(reg["events"]["demo_event"]["fields"]["b_count"]["type"], "integer")
 
     def test_backlog_and_verify(self):

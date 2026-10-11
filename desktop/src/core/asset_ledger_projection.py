@@ -12,6 +12,7 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 
 from core import atomic_write
 from core import conformance_scan as csc   # 共享语料：一次只读调用内同文只读一遍
@@ -90,7 +91,7 @@ def _verify_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     path = r / _LEDGER
     if not path.exists():
         return ["%s 缺失（refresh 生成）" % _LEDGER], {}
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json_doc.load(path, dict, what=_LEDGER)
     current = build(str(r))
     if data.get("entries") != current:
         issues.append("%s 过期：与资产扫描不一致（refresh）" % _LEDGER)

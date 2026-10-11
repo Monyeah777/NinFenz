@@ -33,6 +33,20 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 - **版本锚点**：发布即打 annotated tag（vX.Y.Z），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
 - 开工前工作树须干净（当前版本锚点 = 最新 annotated tag，见 §2）。
 
+### 2.1 编号体系映射表（四套口径 · 唯一真源）
+
+仓库同时存在四套编号，混用即口径崩塌（2026-10-10 审计 P1-6）。机检 = `desktop/tests/test_version_map.py`：
+下表每一行的「唯一真源」都逐项断言，漂移即红。
+
+| 体系 | 语义 | 唯一真源 | 升级规则 |
+|---|---|---|---|
+| 协议 / 内容 vX.Y.Z | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [X.Y.Z]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
+| 门禁 verify vA.B | verify.sh 的判据集版本 | protocol/repo_stats.json（verify_version / verify_checks / baseline_pass）= core.quality_baseline 期望值 = llms.txt 质量凭证串 | scripts/bump_verify.sh 换标；判据集变即升 A.B |
+| CLI / npm / MCP 1.0.x | 启动器与 npm 包版本 | scripts/nf.py 的 NF_CLI_VERSION = packaging/npm/package.json = packaging/mcp/server.json（version 与 packages[0].version） | 发 npm 版时三处同改（stage-payload / test_mcp_packaging / site sync-numbers 均判死） |
+
+站点面（site/**）的 npm 版本 / 件数 / 体积必须与第三行一致，由 site/tools/sync-numbers.mjs 判死；
+CITATION.cff 刻意不钉版本号（见其文件头），不在断言面内。
+
 ## 3. 验证门槛（提交前三步，全部通过）
 
 ```bash
@@ -117,4 +131,17 @@ python3 -m compileall -q desktop/src scripts
 - **workflow 最小权限**：顶层默认 `contents: read`；需要写 Release/推送的 job 单独声明 `contents: write`——新增 workflow 或步骤前对照现有 permissions 模式（ci-verify/e2e 只读、build job 单提权）。
 - **Release 校验和**：发布资产随行 `sha256sum` 校验和文件（用户下载后可验完整性）。
 - **secret 扫描**：提交前自查常见 token 前缀（`ghp_` / `gho_` / `sk-` 等）；完整自动扫描入 ci-verify 为波 A 项（40 总纲 S8 全量，v2.7）。
+
+## 7. 贡献授权（inbound = outbound · DCO）
+
+> 依据：2026-10-10 全仓审计 §11af（贡献者条款此前 DCO/CLA/inbound/outbound 全 0）。
+
+- **inbound = outbound**：你提交到本仓库的任何贡献（代码 / 文档 / 协议补丁 / 社区包）均按本仓库的
+  **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
+- **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
+  条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
+- **投稿（`library/` 与 `community/`）**：见 `library/intake.json` 的投稿须知——投稿即声明原创
+  或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
+- **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，
+  已按「排除发布面 + 换自写夹具」修复）。
 - **沙箱意识**：工具执行限项目目录内。路径逃逸的拦截由**宿主 harness 的工具层**负责——仓库不对该层作实现承诺（旧文案写「被 validatePath 拦截」，而仓库内并无该实现，属虚假保证；2026-09-24 起文档只写真实载体）。仓库内组件之间的包含性判据 = `desktop/src/core/paths.py::validate_path`（**资产台账**与**产出面清单**已收敛到它，有单测 `desktop/tests/test_paths.py` + `desktop/tests/test_output_path_escape.py`），不得绕过。

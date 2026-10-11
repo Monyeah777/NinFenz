@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """42 M2 —— 回合状态头 + 判级器 + 中断重入单测。"""
 import sys
 import unittest

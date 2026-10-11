@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """双向锚定对齐报告（只读）：标准目录利用率（反向）+ 词汇交叉候选（正向）。
 
 用法：
@@ -80,7 +79,11 @@ def main(argv=None) -> int:
         return 0
     st = aa.stats(ROOT)
     if args.json:
-        print(json.dumps({"kind": "anchor-align", **st}, ensure_ascii=False, indent=2, sort_keys=True))
+        print(json.dumps({"kind": "anchor-align",
+ **st},
+ ensure_ascii=False,
+ indent=2,
+ sort_keys=True))
     else:
         print(aa.report(ROOT))
     return 0

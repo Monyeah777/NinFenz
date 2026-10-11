@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """43 追加 · IDL 元工具对照（可选：jsonschema 标准实现交叉验证）。
 
 仓库校验器为自实现 JSON-schema 子集（零第三方红线）。本测试仅当环境装有
@@ -29,10 +28,12 @@ from core import schema_lint as sl  # noqa: E402
 @unittest.skipIf(jsonschema is None, "jsonschema 未安装（可选对照依赖）")
 class SchemaReferenceTest(unittest.TestCase):
     def test_schema_files_valid_draft2020(self):
-        for f in sorted(glob.glob(os.path.join(ROOT, "protocol", "schema", "*.json"))):
+        files = sorted(glob.glob(os.path.join(ROOT, "protocol", "schema", "*.json")))
+        self.assertGreaterEqual(len(files), 5, "schema 面件数异常：%s" % files)
+        for f in files:
             with open(f, encoding="utf-8") as fh:
                 data = json.load(fh)
-            Draft202012Validator.check_schema(data)
+            Draft202012Validator.check_schema(data)   # 不合规即抛（N12：有显式件数前提）
 
     def test_representative_instance_matches_reference(self):
         contract = sl.load_schema(ROOT, "contract.schema.json")

@@ -1,8 +1,11 @@
 // 发布前自检：把「顶尖 npm 包」的硬要求做成可失败项（prepack 会跑它）。
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
-import { verifyTree, treeSha256 } from '../lib/payload.mjs';
+
+const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
+import { verifyTree, treeSha256, listFiles } from '../lib/payload.mjs';
 
 const pkg = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 const issues = [];
@@ -38,6 +41,19 @@ if (!fs.existsSync(manifestPath)) {
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   need(manifest.package_version === pkg.version, 'payload.package_version 与 package.json 不一致');
   need(manifest.cli_version === pkg.version, 'payload.cli_version 与 CLI 版本不一致');
+  // A2（2026-10-10 审计 P1）：verify 不是新鲜度闸门——staged payload 落后 HEAD 10 个提交、
+  // 41 个 payload 面文件仍 0 issue 通过。这里把清单的 source_commit 与 HEAD 对上，并把
+  // 「脏工作树暂存」判死（那意味着内容不来自纯提交）。
+  const rHead = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
+  const head = rHead.status === 0 ? String(rHead.stdout).trim() : '';
+  if (head) {
+    need(manifest.source_commit === head,
+         'payload source_commit 与 HEAD 不一致：清单=' + String(manifest.source_commit).slice(0, 12)
+         + ' HEAD=' + head.slice(0, 12) + '（修复指引：npm run stage 重新暂存后提交）');
+  }
+  need(manifest.worktree_dirty !== true,
+       'payload 由脏工作树暂存（worktree_dirty=true）：内容不来自纯提交'
+       + '（修复指引：提交后重新暂存）');
   const bad = verifyTree(PAYLOAD_DIR, manifest);
   need(bad.length === 0, 'payload 逐文件校验不过：' + bad.slice(0, 3).join(', '));
   need(treeSha256(manifest) === manifest.tree_sha256, 'payload.tree_sha256 自洽性不过');
@@ -45,10 +61,20 @@ if (!fs.existsSync(manifestPath)) {
     need(manifest.files.some(function (e) { return e.path === must; }), 'payload 缺关键件 ' + must);
   }
   const paths = manifest.files.map(function (e) { return e.path; });
-  const dots = paths.filter(function (r) { return r.split('/').pop().startsWith('.'); });
-  need(dots.length === 0, 'payload 含点文件（npm 打包含剔除，会导致 tarball 与清单不一致）：' + dots.slice(0, 3).join(', '));
+  // 点判据按**路径段**（审计 P1-8）：只看 basename 会放过 `.internal/…/manifest` 这类件——
+  // 内部件正是这样漏进 1.0.1 的 tarball。两处（stage 的 keep 与本处）口径现在唯一。
+  const dots = paths.filter(function (r) {
+    return r.split('/').some(function (seg) { return seg.startsWith('.'); });
+  });
+  need(dots.length === 0, 'payload 含点文件/点目录（npm 打包含剔除，会导致 tarball 与清单不一致）：' + dots.slice(0, 3).join(', '));
   const pyc = paths.filter(function (r) { return r.indexOf('__pycache__') >= 0 || r.endsWith('.pyc'); });
   need(pyc.length === 0, 'payload 混入字节码缓存：' + pyc.slice(0, 3).join(', '));
+  // 目录实况 == 清单（审计 P1-9）：只查「清单里的」不查「多出来的」，等于给发布边界留后门。
+  const listed = new Set(paths);
+  const extras = listFiles(PAYLOAD_DIR).filter(function (r) {
+    return r !== 'payload-manifest.json' && !listed.has(r);
+  });
+  need(extras.length === 0, 'payload 目录有清单外文件（会随 tarball 发布但校验不到）：' + extras.slice(0, 3).join(', '));
   const budget = Number(pkg.config && pkg.config.payload_budget_mb || 14) * 1024 * 1024;
   need(manifest.total_bytes <= budget * 4, 'payload 解包体积超预算：' + (manifest.total_bytes / 1048576).toFixed(1) + ' MB');
   if (manifest.total_bytes > budget * 2) warns.push('payload 偏大（' + (manifest.total_bytes / 1048576).toFixed(1) + ' MB），建议只带运行时面');

@@ -1,6 +1,25 @@
 # Changelog
 
-## [未发布] - 2026-10-06 · 项目改名：NarrativeForge → NinFenz（宁封子）
+## [未发布] - 2026-10-10 · 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
+
+> 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+
+- **全仓审计 V3 修复波（2026-10-10，结果形态）**：按审计 §15 执行计划落地 P0/P1 与 P1 候选、部分 P2/P3——
+  ① 守护单条坏输入零隔离修复（CLI 与守护共用 guarded_main 错误面 + 请求/连接级隔离 + 结构化错误帧）；
+  ② npm payload 排除 desktop/tests 并换自写夹具，发布边界补「清单外文件」判据与点段判据；
+  ③ LSP 读取加 realpath 包含性、initialize.rootUri 钳制到启动根；
+  ④ 性能预算增 P95/标准差/真中位/预热，判据改 P95 ≤ 预算并重录证据；
+  ⑤ Rust 自证 233/233（receipts 常量 44、两个用例生成器幂等化后重跑夹具）；
+  ⑥ 投稿 frontmatter 结构注入闸门（两个前端共用压平与形状判据）；
+  ⑦ 7 处二次回溯正则收口 + core/redos_scan 独立判据（接进 verify_report）；
+  ⑧ schema_lint / json_schema 枚举严格相等（叶子件 json_equal，Rust 端口同步）；
+  ⑨ assemble 走 lazy_yaml、doctor 缺 PyYAML 判 FAIL 且 --json 带 degraded；
+  ⑩ N1–N10 运行时形状契约（原子写/退出码/顶层类型/BOM/监听件唯一写入口/启动器带外回退）；
+  ⑪ 发布 provenance A1/A2/A6（脏树 fail-closed、source_commit 对 HEAD、README 不再静默改写）；
+  ⑫ 治理与依赖入口：pyproject.toml、SBOM 版本与 purl、REUSE/CoC/MAINTAINERS/SUPPORT/DCO/出口声明；
+  ⑬ P3 卫生：冗余 coding 声明清 250 件、SPDX 大小写、行尾/末尾换行、风格棘轮（E,W,F,B,UP,I,C4,SIM,RET）独立成门。
+  口径：不追 verify.sh 全绿（作者裁决，审计 §14）；code_metrics 评审后重冻、receipts/interop/verification_report 重签刷新；
+  audit 摘要与 NF-1 attestation 留待作者重审/重签。
 
 - **三轴接入生产级适配第一波：编辑器面从布尔到协议行为 · 站点面进常驻判据 · 对外文档对账门**（2026-10-07 内部差距实证，三轴只读审计逐条带 file:line 证据面；AUD-0045）：
   ① **IDE**：新增叶子模块 `core/nf_language.py`（模块 id 取模块文件自身 `machine_contract.id/name`——域包 `大语言模型:M01` 落在 `A01a_*.md`，按文件名反解必漏；层位/订阅/事件/资产/管线全部单源派生；**歧义不猜**，`M10`/`P00` 同名候选列全、跳定义失败关闭）；`nf lsp` 由「full-sync 诊断 + quickfix」升级为完整编辑器面（utf-16 位码口径、didClose、rootUri 采纳、真实诊断定位、最小行级编辑且回放自校验、补全/悬停/跳定义/大纲/工作区符号、未 shutdown 的 exit 退出码 1），并新增 `nf lsp --print-config {neovim,emacs,helix}` 生成现成配置；check33 第 5 面由「codeActionProvider 为真」改为 `lsp.check` 真跑协议行为。

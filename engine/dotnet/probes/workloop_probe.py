@@ -64,7 +64,7 @@ DECISION_LAYER = {
          "note": "门禁用的离线确定性适配器（合成语料）"},
     ],
     "candidates": [
-        {"id": "合成候选", "source": "hf:合成/候选", "license": "apache-2.0", "evidence": "合成语料",
+        {"id": "合成候选", "source": "hf:合成/候选", "license": "Apache-2.0", "evidence": "合成语料",
          "pulled": True, "local": {"how": "h", "runtime": "r", "served_by": "s"}},
     ],
     "boundaries": ["不执行动作", "不生成正文", "不入门禁路径"],

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """敏感文件忽略面门禁：AGENTS.md「敏感文件禁止」硬性闸门的**机器判据**。
 
 为什么：该纪律此前只有正文（AGENTS.md 写「不 cat/read/commit .env、credentials.*、

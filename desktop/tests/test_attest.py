@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """内容外挂签名 / attestation 单测（三级信任 + fail-closed）。"""
 import shutil
 import sys

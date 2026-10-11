@@ -23,7 +23,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 
 DECL_REL = "protocol/knowledge_sources.json"
 LOG_REL = "protocol/transform_log.json"
@@ -48,7 +48,7 @@ VISIBILITY_RANK = {"public": 0, "internal": 1, "restricted": 2}
 
 
 def _read_json(path: Path) -> Dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    return json_doc.load(path, dict, what=path.name) if path.is_file() else {}
 
 
 def load_decl(root: str = ".") -> Dict[str, Any]:
@@ -289,23 +289,30 @@ def harvest_frequency(trace_path: str) -> Dict[str, int]:
     源标识取记录的 `knowledge_source` 或 `source_id` 字段（与遥测 semconv 对齐的字段名）。
     """
     p = Path(trace_path)
-    text = p.read_text(encoding="utf-8")
+    text = p.read_text(encoding="utf-8-sig")   # 容忍外来件 BOM（审计 N4）
     records: List[Any] = []
     parsed_any = False
+    shape_error = ""
     try:
-        data = json.loads(text)
+        # NaN/±Infinity 拒绝与资产契约同一实现（json_doc.strict_constants，审计 N11/Z1 收口）。
+        data = json_doc.loads(text, None, what=str(trace_path), strict_constants=True)
         parsed_any = True
         if isinstance(data, list):
             records = data
         elif isinstance(data, dict):
             rec = data.get("records")
             records = rec if isinstance(rec, list) else [data]
+        else:
+            # 审计 N5（P2）：顶层是字符串/数字时此前静默按「0 源」放行——形如 "hello" / 42
+            # 的件根本不是 trace，读者会把「件给错了」读成「这次没用到知识源」。
+            shape_error = "顶层不是对象/数组（实为 %s）" % type(data).__name__
     except ValueError:
         for line in text.splitlines():
             line = line.strip()
             if line:
                 try:
-                    records.append(json.loads(line))
+                    records.append(json_doc.loads(line, None, what="knowledge trace 行",
+                                                strict_constants=True))
                     parsed_any = True
                 except ValueError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
                     continue
@@ -314,12 +321,18 @@ def harvest_frequency(trace_path: str) -> Dict[str, int]:
     # 静默错答）。空件仍按 0 记录放行（空 = 合法）。
     if text.strip() and not parsed_any:
         raise ValueError(
-            "trace 不是合法 JSON/JSONL：%s（修复指引：收 `nf assemble --check <成品.md> "
-            "--trace <trace.json>` 落的件，或 `{\"records\": [...]}` / 逐行 JSON）" % p)
+            "trace 不是合法 JSON/JSONL：%s（修复指引：收 nf assemble --check <成品.md> "
+            "--trace <trace.json> 落的件，或 {\"records\": [...]} / 逐行 JSON）" % p)
+    if shape_error:
+        raise ValueError("trace %s：%s（修复指引：单条记录 {...}、{\"records\": [...]} "
+                         "或逐行 JSON 对象）" % (shape_error, p))
+    if records and not all(isinstance(r, dict) for r in records):
+        # 审计 N5：对象数组里混进标量（[1,2,3]）此前静默算成 0 源——同样是把「件坏了」
+        # 读成「没用到」的静默错答。
+        raise ValueError("trace 记录必须都是 JSON 对象：%s（修复指引：单条记录 {...} 或 "
+                         "{\"records\": [...]}；数组元素与逐行内容都须是对象）" % p)
     counts: Dict[str, int] = {}
     for r in records:
-        if not isinstance(r, dict):
-            continue
         sid = str(r.get("knowledge_source") or r.get("source_id") or "")
         if sid:
             counts[sid] = counts.get(sid, 0) + 1
@@ -420,7 +433,9 @@ def verify_reuse(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]
             issues.append("%s 缺 frontmatter id（复用面无法寻址）" % p.name)
             continue
         if eid in ids:
-            issues.append("条目 id 重复：%s（%s 与 %s）——同一编号两处真源" % (eid, ids[eid], p.name))
+            issues.append("条目 id 重复：%s（%s 与 %s）——同一编号两处真源" % (eid,
+ ids[eid],
+ p.name))
         ids[eid] = p.name
         if eid != p.stem:
             issues.append("%s 的 id 与文件名不一致：%s" % (p.name, eid))

@@ -10,10 +10,10 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 GLOSSARY_REL = "protocol/glossary.json"
 MODES_REL = "protocol/execution_modes.json"
@@ -24,7 +24,7 @@ _BLOCK = re.compile(r"^\s*(?:[-*]|\d+[.、]|#{2,4})\s*", re.M)
 
 def _load(root: str, rel: str) -> Dict[str, Any]:
     p = Path(root) / rel
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=rel) if p.is_file() else {}
 
 
 def _text(root: str, rel: str) -> str:

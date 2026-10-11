@@ -13,11 +13,12 @@ R4 semantic_misalignment 编号真实语义错位：提及模块但语句用词�
 """
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 from typing import Dict, List
+
+from core import json_doc
 
 _MODULE_TOKEN = re.compile(r"(?:[\u4e00-\u9fff]+:)?M\d{2,3}")
 #: 判定词表（缺省中文；用例可在 fixture 的 lexicon 里按语言覆盖——见 §多语协议执行）。
@@ -154,7 +155,7 @@ def run_case(case: Dict, real_ids: List[str],
 
 
 def run_file(path: str) -> Dict:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = json_doc.load(Path(path), dict, what=str(path))
     real_ids = list(data.get("real_ids") or [])
     semantics = data.get("semantics") or {}
     source_text = data.get("source_text", "")
@@ -181,7 +182,7 @@ def main(argv: List[str] | None = None) -> int:
     if not args:
         print("用法: python -m core.execution_drill <cases.json>", file=sys.stderr)
         return 2
-    data = json.loads(Path(args[0]).read_text(encoding="utf-8"))
+    data = json_doc.load(Path(args[0]), dict, what=str(args[0]))
     real_ids = data.get("real_ids") or []
     semantics = data.get("semantics") or {}
     source_text = data.get("source_text", "")
@@ -208,7 +209,8 @@ def main(argv: List[str] | None = None) -> int:
 
 if __name__ == "__main__":
     # UTF-8 stdio（2026-10-01 实测）：本模块是**文档里可照抄的入口**
-    # （`docs/42_M1_协议可执行性自测规范.md`：`PYTHONPATH=desktop/src python -m core.execution_drill …`），
+    # （`docs/42_M1_协议可执行性自测规范.md`：`PYTHONPATH=desktop/src python -m core.execution_drill
+    # …`），
     # 而此前没钉输出编码 ⇒ Windows 管道下逐例结果以 **GBK 字节**吐出（实测
     # `== execution_drill��… ==`、`����=[]`），按 UTF-8 读全是乱码——与 `core.text_hygiene`
     # 同一类缺陷（`test_stdio_encoding` 管的是 `scripts/` 面，模块入口此前无人扫）。

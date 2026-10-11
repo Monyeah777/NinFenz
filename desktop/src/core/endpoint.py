@@ -13,10 +13,10 @@ NF 不产服务（公开面 = 协议 + core + CLI），所以本模块**不实�
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 CONTRACT_REL = "protocol/endpoint_contract.json"
 STATUSES = ("proposed", "implemented")
@@ -29,7 +29,7 @@ _CLI = re.compile(r"^nf\s+([a-z-]+)")
 
 def load(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / CONTRACT_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=CONTRACT_REL) if p.is_file() else {}
 
 
 def _cli_commands(root: str = ".") -> set:

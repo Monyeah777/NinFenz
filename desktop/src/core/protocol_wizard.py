@@ -8,18 +8,17 @@
   编号清单。产出的 protocol.yaml 应能过 v1 协议登记门禁的粗校验。
 - 非目标：无 LLM 自然语言（表单驱动）；不改协议层；登记沿用 v1 三要件。
 
-官方核心配合集（DEFAULT_CORE_MODULES）：12 件（两真实实例 core_modules 同列）。
+官方核心配合集（DEFAULT_CORE_MODULES）：13 件（单一实现见 core/official_core.py）。
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
-# 官方核心配合 12 件（实例实证：通用核心基础包 + 校园包 core_modules 同列）
-DEFAULT_CORE_MODULES: List[str] = [
-    "M00", "通用:M10", "M08", "M23", "事件:M22", "M06",
-    "M12", "M13", "M20", "M24", "M50", "M80",
-]
+from core import official_core
+
+# 官方核心配合集 = 单一实现（审计 Z1 F6：此前写 12、缺 M90）。
+DEFAULT_CORE_MODULES: List[str] = list(official_core.CORE_MODULES)
 
 
 @dataclass
@@ -105,7 +104,8 @@ def self_check(yaml_text: str) -> List[str]:
     if proto.get("schema_version") not in ("2",):
         warns.append(f"schema_version 应为 '2'，实际 {proto.get('schema_version')}")
     if not pkg.get("module_id_range"):
-            warns.append("module_id_range 为空——需声明模块编号（M91-M99 机制段或 <独占类别>:Mxx 类内段，02 §8.3）")
+            warns.append("module_id_range 为空——需声明模块编号（M91-M99 机制段或 <独占类别>:Mxx 类"
+                "内段，02 §8.3）")
     mods = pkg.get("modules") or []
     for m in mods:
         if not m.get("desc"):

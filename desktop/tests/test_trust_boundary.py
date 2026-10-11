@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """信任边界守卫（`core/trust_boundary.py`）+ MCP 越权面的回归测试。
 
 两层判据：
@@ -82,9 +81,12 @@ class ArgumentAdmissionTest(unittest.TestCase):
     """参数准入是硬面：合规静默通过，违规一律抛 ValueError 且带修复指引。"""
 
     def test_valid_arguments_pass(self):
-        tb.check_arguments("registry_query", {"query": "M90"})
-        tb.check_arguments("asset_get", {"key": "TECH_RULES", "package": "技术文档域包"})
-        tb.check_arguments("pipeline_read", {"pipeline": "community/包/P04_轻混管线.md"})
+        # 显式断言返回值（N12，2026-10-10 审计：纯「不抛异常」不算判据——上面三条此前没有断言）。
+        self.assertIsNone(tb.check_arguments("registry_query", {"query": "M90"}))
+        self.assertIsNone(tb.check_arguments("asset_get", {"key": "TECH_RULES",
+                                                           "package": "技术文档域包"}))
+        self.assertIsNone(tb.check_arguments("pipeline_read",
+                                             {"pipeline": "community/包/P04_轻混管线.md"}))
 
     def test_traversal_and_absolute_are_rejected(self):
         for val in ("../../etc/passwd", "a/../../b.md", "..\\evil.md",
@@ -111,7 +113,7 @@ class ArgumentAdmissionTest(unittest.TestCase):
         """负例对照：限定式 id 与 `nf://` uri 含冒号，不许被新规则误伤。"""
         for val in ("技术文档类:M90", "nf://repo/module/M90", "nf://repo/asset/包/键",
                     "P06_技术文档题材装配流管线.md", "版本:1.0"):
-            tb.check_arguments("module_read", {"module_id": val})
+            self.assertIsNone(tb.check_arguments("module_read", {"module_id": val}), val)
 
     def test_control_chars_and_overlength_rejected(self):
         with self.assertRaises(ValueError):

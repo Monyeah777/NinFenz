@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """墓碑代码门禁：公开/私有顶层函数**不得零引用**（全仓文本面都没人提）。
 
 为什么：`ADR-0002 门禁不注水` 与「清理墓碑代码」都要求不留无主件，但仓库此前只有
@@ -467,7 +466,8 @@ class ConstantRuleTest(unittest.TestCase):
 
     def test_no_zero_ref_constants(self):
         dead = zero_ref_constants(tracked_pool())
-        self.assertEqual([], dead, "零引用模块级常量（修复指引：删掉，或接线到生产面/文档并补判据）："
+        self.assertEqual([], dead, "零引用模块级常量（修复指引：删掉，或接线到生产面/文档并补判据）"
+            "："
                                    "%s" % dead)
 
     def test_rule_catches_mutation_and_keeps_referenced(self):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 A5 · 指令档步进审计单测。"""
 import os
 import sys

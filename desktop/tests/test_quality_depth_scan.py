@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 check32 · 质量纵深汇总扫描单测。"""
 import builtins
 import collections
@@ -76,9 +75,11 @@ class CompositeFaceCoverageTest(unittest.TestCase):
 
 class QualityDepthScanTest(unittest.TestCase):
     def test_repo_clean(self):
-        # **按当前模块实例量，并先清缓存**（2026-09-29 实测）：本判据量的是「一次纵深扫描的读取形状」，
+        # **按当前模块实例量，并先清缓存**（2026-09-29 实测）：本判据量的是「一次纵深扫描的读取形状
+        # 」，
         # 而派生结果有内容键缓存 ⇒ 若前面某个用例/模块已经把这一状态算热，`scan` 直接命中缓存、
-        # **一件都不读**（实测：与 `test_conformance_scan` 同进程连跑时 `reads` 为空，`max()` 直接炸）。
+        # **一件都不读**（实测：与 `test_conformance_scan` 同进程连跑时 `reads` 为空，`max()` 直接炸
+        # ）。
         # 故先绑**当前**实例、清掉两层缓存再量，并把「必须真读到件」立成前提（判据自身要有效）。
         import importlib
         qds_now = importlib.import_module("core.quality_depth_scan")

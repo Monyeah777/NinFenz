@@ -17,10 +17,11 @@ NF 原有 drill 只判「本轮有没有失范」，**没有"同一任务在不�
 from __future__ import annotations
 
 import hashlib
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 SUITE_REL = "desktop/tests/fixtures/benchmark/suite"
 SCHEMA = "nf-bench-run/1"
@@ -42,7 +43,7 @@ def cases(root: str = ".") -> List[Path]:
 
 
 def load_case(path: Path) -> Dict[str, Any]:
-    doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    doc = json_doc.load(Path(path), dict, what=str(path))
     doc["_dir"] = str(Path(path).parent)
     return doc
 

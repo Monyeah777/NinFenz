@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """AI 系统域 · 概念前置闭包求值单测（域包战例回归 + 负例注入）。
 
 被测件：`scripts/ai_domain_closure.py`（只读求值器）+ 域包资产

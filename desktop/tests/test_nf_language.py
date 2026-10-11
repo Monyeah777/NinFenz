@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NF 语言面符号索引单测（编辑器智能的数据真源）。
 
 判据：符号必须**从既有真源派生**且**歧义不猜**——模块身份取模块文件自身
@@ -89,7 +88,8 @@ class TestStructuredReferences(unittest.TestCase):
         self.assertIn("发布方", whys)
         self.assertIn("订阅方", whys)
         for r in refs:
-            self.assertTrue((Path(ROOT) / r["path"]).is_file(), "引用位置必须真在盘上：%s" % r["path"])
+            self.assertTrue((Path(ROOT) / r["path"]).is_file(),
+ "引用位置必须真在盘上：%s" % r["path"])
             self.assertIn(r["kind"], nl.KINDS + ("package",))
 
     def test_module_and_layer_references_are_symmetric(self):

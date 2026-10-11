@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """宁封子桌面工具 · 核心逻辑层单元测试（unittest，无 GUI 依赖）。
 
 运行：cd /tmp/nf-desktop && python3 -m unittest discover -s tests -v

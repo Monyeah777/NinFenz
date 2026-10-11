@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """资产键命名规范机检（`core/key_naming.py`）回归测试 —— 资产密度面 GAP-5。
 
 关键断言：形态/词表双判据来自**声明件**（不写死）、未登记与形态错都判 FAIL 且带修复指引、

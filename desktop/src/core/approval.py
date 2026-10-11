@@ -18,7 +18,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 
 SCHEMA = "nf-approval/1"
 DIR_REL = "protocol/approvals"
@@ -44,6 +44,11 @@ def approve(root: str, subject: str, approved_by: str, note: str = "",
            "approved_at": today or date.today().isoformat(),  # noqa: DTZ011 - 本地日历日期是有意语义（UTC 会在跨零点给出错误「今天」）
            "note": note}
     safe = subject.replace("/", "__").replace("\\", "__")
+    # 双扩展名修复（2026-10-10 审计 W7）：主体本身以 .json 结尾时，此前拼成 xxx.json.json
+    # （在仓实例：protocol/approvals/protocol__conformance_report.json.json）。记录名只是**唯一键**
+    # （读取按 glob + 记录内 subject 字段），去掉重复后缀不改语义。
+    if safe.endswith(".json"):
+        safe = safe[:-5]
     dest = Path(root) / DIR_REL / ("%s.json" % safe)
     dest.parent.mkdir(parents=True, exist_ok=True)
     # 原子写（2026-09-30 收口）：批准记录是**在仓产物**（protocol/approvals/*.json），
@@ -60,7 +65,7 @@ def records(root: str = ".") -> List[Dict[str, Any]]:
     out = []
     for p in sorted(d.glob("*.json")):
         try:
-            out.append(json.loads(p.read_text(encoding="utf-8")))
+            out.append(json_doc.load(p, dict, what=p.name))
         except ValueError:
             out.append({"schema": "?", "subject": p.name, "broken": True})
     return out

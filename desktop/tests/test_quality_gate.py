@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """质量治理门单测（v1.4.0 quality_gate：三态质检门，2.0 E0-③）。
 
 运行：cd desktop && python -m unittest tests.test_quality_gate -v

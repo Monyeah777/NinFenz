@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 A2 · 回合级 drill 单测（引用/推进/编造/跳号）。"""
 import os
 import json

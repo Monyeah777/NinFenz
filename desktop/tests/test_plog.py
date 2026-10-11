@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 · plog 日志层单测（stderr 不污染 stdout 协议面）。"""
 import logging
 import sys

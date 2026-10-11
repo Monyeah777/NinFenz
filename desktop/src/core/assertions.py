@@ -15,6 +15,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 DECL_REL = "protocol/assertions.json"
 SCHEMA = "nf-assertions/1"
 SEVERITIES = ("fail", "warn")
@@ -23,7 +25,7 @@ REQUIRED = ("id", "severity", "kind", "params", "message", "fix")
 
 def load(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / DECL_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=DECL_REL) if p.is_file() else {}
 
 
 def _glob(root: str, pattern: str) -> List[str]:

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + golden 快照 + 变异自证。"""
+"""发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。"""
 import json
 import re
 import sys
@@ -13,14 +12,14 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import release_gate as rg  # noqa: E402
 
 GOLDEN = ROOT / "desktop" / "tests" / "fixtures" / "release" / "plan.golden.json"
-GOOD_POLICY = "\n".join(["## 冻结链", "## 版本面", "## Golden Master", "## 变更条目",
-                          "bash verify.sh", "scripts/release_freeze.sh",
+GOOD_POLICY = "\n".join(["## 冻结链", "## 版本面", "## 变更条目",
+                          "bash verify.sh",
                           "python scripts/nf.py conformance --write", "nf approve",
                           "python scripts/nf.py receipts --scope protocol --write"])
 GOOD_JSON = {
     "schema": "nf-release-policy/1", "policy_doc": "docs/release.md",
     "freeze_chain": list(rg.DEFAULT_FREEZE_CHAIN),
-    "required_artifacts": ["verify.sh"], "golden_required": ["verify.sh", "README.md", "CHANGELOG.md"],
+    "required_artifacts": ["verify.sh"],
     "version_faces": ["README.md", "CHANGELOG.md"], "changes_dir": "changes/unreleased",
 }
 
@@ -48,7 +47,8 @@ class PlanTest(unittest.TestCase):
     def test_plan_covers_freeze_chain_in_order(self):
         steps = rg.plan(str(ROOT))
         cmds = [s["cmd"] for s in steps]
-        pos = [next(i for i, c in enumerate(cmds) if c.startswith(x)) for x in rg.DEFAULT_FREEZE_CHAIN]
+        pos = [next(i for i,
+ c in enumerate(cmds) if c.startswith(x)) for x in rg.DEFAULT_FREEZE_CHAIN]
         self.assertEqual(sorted(pos), pos, "冻结链顺序不可颠倒：%s" % pos)
         self.assertGreaterEqual(len(steps), 10, "计划退化成空转")
 
@@ -96,15 +96,6 @@ class CheckTest(unittest.TestCase):
             (ch / "x.md").write_text("type: feat\n", encoding="utf-8")
             issues, _ = rg.check(d)
             self.assertTrue(any("note" in i for i in issues), issues)
-
-    def test_golden_snapshot_structure_caught(self):
-        with tempfile.TemporaryDirectory() as d:
-            _mini(Path(d), GOOD_POLICY, GOOD_JSON)
-            snap = Path(d) / rg.GOLDEN_DIR / "v9.9.0"
-            snap.mkdir(parents=True)
-            (snap / "sha256.manifest").write_text("deadbeef\n", encoding="utf-8")
-            issues, _ = rg.check(d)
-            self.assertTrue(any(rg.GOLDEN_DIR in i for i in issues), issues)
 
     def test_empty_root_reports_issue_not_crash(self):
         with tempfile.TemporaryDirectory() as d:

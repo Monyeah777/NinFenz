@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """导出层 exporter 单测（v2.0.0 T2：格式注册表 + CCV3 JSON/PNG 封装）。
 
 运行：cd desktop && QT_QPA_PLATFORM=offscreen python -m unittest tests.test_exporter -v

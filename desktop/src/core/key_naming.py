@@ -72,7 +72,9 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     doc, issues = declaration(root)
     warns: List[str] = []
     found = collect(root)
-    stats: Dict[str, Any] = {"keys_seen": len(found), "occurrences": sum(len(v) for v in found.values())}
+    stats: Dict[str,
+ Any] = {"keys_seen": len(found),
+ "occurrences": sum(len(v) for v in found.values())}
     if doc is None or issues:
         stats.update({"registered": 0, "max_key_len": 0})
         return issues, warns, stats

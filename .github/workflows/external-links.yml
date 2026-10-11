@@ -27,13 +27,21 @@ jobs:
       - name: Scan mode (offline, always green)
         run: python scripts/check_external_links.py
 
-      - name: Fetch mode (network; failures turn this job red)
-        run: python scripts/check_external_links.py --fetch --json --write results/external-links-report.json
+      - name: Fetch mode (network; failures turn this job red; 日志落盘)
+        run: |
+          set -o pipefail
+          mkdir -p .artifacts
+          python scripts/check_external_links.py --fetch --json \
+            --write results/external-links-report.json 2>&1 | tee .artifacts/external-links.log
+          cp results/external-links-report.json .artifacts/external-links-report.json
 
-      - name: Upload report
+      - name: Upload report（本 run 的新鲜副本；**不**上传受跟踪的 results/ 原件）
+        # N1 同类（审计 Z5）：受跟踪文件在失败时可能是**上一次提交的旧结论**。
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: external-links-report
-          path: results/external-links-report.json
+          path: |
+            .artifacts/external-links-report.json
+            .artifacts/external-links.log
           if-no-files-found: warn

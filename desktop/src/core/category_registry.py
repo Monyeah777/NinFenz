@@ -166,7 +166,8 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         by_globs.setdefault(tuple(c["globs"]), []).append(str(c["id"]))
     for gl, ids in sorted(by_globs.items()):
         if len(ids) > 1:
-            issues.append("品类 glob 集合重复（同一件事多个 id——请并入 LAYERS 真源或改名）：%s -> %s"
+            issues.append("品类 glob 集合重复（同一件事多个 id——请并入 LAYERS 真源或改名）：%s -> %"
+                "s"
                           % ("、".join(sorted(ids)), " , ".join(gl)))
     if empty:
         warns.append("以下品类 glob 未命中在場件（缺件或路径漂移）：%s" % "、".join(empty))

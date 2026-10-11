@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """43 A1 —— 协议层 IDL schema 校验器单测（自实现 JSON-schema 子集 + 全量件扫描）。"""
 import json
 import os
@@ -37,6 +36,42 @@ class SchemaSubsetValidatorTest(unittest.TestCase):
         self.assertIn("应为 string", joined)
         self.assertIn("未知字段 extra", joined)
 
+    def test_enum_is_checked_for_every_type(self):
+        """enum 是类型无关约束（2026-10-10 审计 Y4）：boolean/number 的 enum 此前静默放行。"""
+        self.assertTrue(sl.subset_validate(False, {"type": "boolean", "enum": [True]}),
+                        "boolean 的 enum 必须判违例")
+        self.assertTrue(sl.subset_validate(0, {"type": "integer", "enum": [1]}),
+                        "integer 的 enum 必须判违例")
+        self.assertEqual([], sl.subset_validate(True, {"type": "boolean", "enum": [True]}))
+        # 无 type 时 enum 违例不得被吞掉（该分支此前 return []）
+        self.assertTrue(sl.subset_validate("b", {"enum": ["a"]}))
+
+    def test_agrees_with_json_schema_on_type_and_enum(self):
+        """跨实现夹具（审计 Y4 + §0.3）：两套 schema 校验器在 type/enum 上必须同判。"""
+        from core import json_schema as js
+        cases = [
+            (False, {"type": "boolean", "enum": [True]}),
+            (True, {"type": "boolean", "enum": [True]}),
+            ("z", {"type": "string", "enum": ["a", "b"]}),
+            (0, {"type": "integer", "enum": [1]}),
+            (1, {"type": "number", "enum": [1]}),
+            ("b", {"enum": ["a"]}),
+            (1, {"type": "number"}),
+        ]
+        for inst, sch in cases:
+            mine = bool(sl.subset_validate(inst, sch))
+            theirs = bool(js.json_schema_check(inst, sch))
+            self.assertEqual(mine, theirs, "两套校验器在 %r / %r 上分叉" % (inst, sch))
+
+    def test_json_equal_is_strict_about_bools(self):
+        """枚举相等口径（审计 Y4 的根因）：False 不得冒充 0、True 不得冒充 1。"""
+        from core import json_schema as js
+        self.assertTrue(js.json_equal(True, True))
+        self.assertTrue(js.json_equal(1, 1.0), "数字之间按数学相等（JSON 语义）")
+        self.assertFalse(js.json_equal(True, 1))
+        self.assertFalse(js.json_equal(False, 0))
+        self.assertFalse(js.json_equal("1", 1))
+
     def test_real_contract_mutation_detected(self):
         """真实机读块逐字段变异 → 均被 schema 拦截（漂移即 FAIL 的实证）。"""
         m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据结构.md")
@@ -62,7 +97,8 @@ class SchemaSubsetValidatorTest(unittest.TestCase):
         events = dict(mc["events"])
         del events["subscribe"]
         mut = dict(mc, events=events)
-        self.assertTrue(any("未知字段" in m or "缺必填" in m for m in sl.subset_validate(mut, schema)))
+        self.assertTrue(any("未知字段" in m or "缺必填" in m for m in sl.subset_validate(mut,
+ schema)))
         # 事件对象内未知字段
         events = dict(mc["events"], extra_event="x")
         mut = dict(mc, events=events)
@@ -164,7 +200,8 @@ class DocLintCacheTest(unittest.TestCase):
         self.assertEqual(1, len(sl._DOC_LINT_CACHE), "同正文同 schema 必须命中（路径不同不是理由）")
         self.assertEqual([m.replace("甲/a.md machine_contract", "乙/b.md machine_contract")
                           for m in a], b, "前缀替换必须与参考实现逐条一致")
-        other = sl._lint_doc_cached(text + "# 尾巴\n", "machine_contract", schema, fp, "甲/a.md machine_contract")
+        other = sl._lint_doc_cached(text + "# 尾巴\n", "machine_contract", schema, fp, "甲/a.md mac"
+            "hine_contract")
         self.assertEqual(2, len(sl._DOC_LINT_CACHE), "正文一变必须换键（否则读到陈旧校验）")
         self.assertEqual(a, other, "只加注释不该改结论")
         self.assertIsNone(sl._lint_doc_cached("没有围栏\n", "machine_contract", schema, fp, "x"))
@@ -181,7 +218,10 @@ class DocLintCacheTest(unittest.TestCase):
         self.assertGreater(len(entries), 5, "registry 条目太少")
         for entry in entries:
             self.assertEqual(sl.subset_validate(entry, module_schema, "registry.modules"),
-                             sl._lint_obj_cached(entry, module_schema, module_fp, "registry.modules"))
+                             sl._lint_obj_cached(entry,
+ module_schema,
+ module_fp,
+ "registry.modules"))
 
         prov = json.loads((Path(ROOT) / "05_资产库" / "provenance.json")
                           .read_text(encoding="utf-8"))

@@ -37,7 +37,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 from core import receipts
 
 SCHEMA = "nf-conformance/1"
@@ -375,7 +375,7 @@ def verify_committed(root: str = ".", rel: str = REPORT_REL,
     if not p.is_file():
         return ["缺一致性报告 %s（修复指引：nf conformance --write）" % rel], {}
     try:
-        committed = json.loads(p.read_text(encoding="utf-8"))
+        committed = json_doc.load(p, dict, what="一致性报告 %s" % rel)
     except ValueError as exc:
         return ["报告 JSON 不可解析：%s" % exc], {}
     live = run(root) if live is None else live

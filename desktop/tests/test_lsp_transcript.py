@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """LSP 会话转写：端到端**帧级金标**（客户端帧序列 → 服务端应答）的常驻判据。
 
 内部差距实证（2026-10-08）：编辑器面的回归此前全是「直接调 handle()」的行为断言加传输层
@@ -82,7 +81,9 @@ class TestLspSessionTranscript(unittest.TestCase):
         前只有直接调 handle() 的断言；扩到帧级后，连「$/ 请求必须回错误」这条规范口径也在金标里。
         """
         by_id = {m["id"]: m for m in self.fixture["server_messages"] if "id" in m}
-        self.assertEqual(-32601, by_id[9]["error"]["code"], "未声明的 willSaveWaitUntil 应回 -32601")
+        self.assertEqual(-32601,
+ by_id[9]["error"]["code"],
+ "未声明的 willSaveWaitUntil 应回 -32601")
         self.assertIsNone(by_id[10]["result"], "无符号词悬停应为 null")
         self.assertEqual([], by_id[11]["result"], "工作区符号无命中应为空表")
         self.assertEqual(-32601, by_id[12]["error"]["code"], "未知方法应回 -32601")
@@ -97,7 +98,8 @@ class TestLspSessionTranscript(unittest.TestCase):
         self.assertGreaterEqual(len(folds), 1, "折叠面应给出至少一条区间")
         self.assertTrue(all(r["endLine"] > r["startLine"] for r in folds), "折叠不得出现空跨")
         ignored = [m for m in self.fixture["client_messages"]
-                   if m.get("method") in ("textDocument/willSave", "workspace/didChangeWatchedFiles",
+                   if m.get("method") in ("textDocument/willSave",
+ "workspace/didChangeWatchedFiles",
                                           "workspace/didChangeConfiguration", "$/setTrace",
                                           "$/cancelRequest", "textDocument/didSave")]
         self.assertGreaterEqual(len(ignored), 6, "静默面入站帧过少（判据可能空转）")

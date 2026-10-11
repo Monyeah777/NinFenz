@@ -21,10 +21,10 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 
 REGISTRY_REL = "desktop/src/core/registry.json"
 EVENT_REGISTRY_REL = "protocol/event_registry.json"
@@ -50,7 +50,7 @@ _BARE_NUM = re.compile(r"^([^:]+):(M\d{2,3})$")
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     """读 JSON；缺件/坏件返回 None（调用方如实少给符号，不裸崩、不臆造）。"""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json_doc.load(path, dict, what=str(path))
     except (OSError, ValueError):
         return None
 
@@ -255,7 +255,8 @@ def _events(reg: Dict[str, Any], root: Path, out: List[Dict[str, Any]]) -> None:
         s = subs.get(name) or {}
         note = str(s.get("note") or "")
         payload = extra.get(name) or {}
-        fields = ", ".join(sorted((payload.get("fields") or {}))) if isinstance(payload, dict) else ""
+        fields = ", ".join(sorted((payload.get("fields") or {}))) if isinstance(payload,
+ dict) else ""
         doc = "事件 %s · 发布方：%s · 订阅方：%s%s%s" % (
             name, s.get("publisher") or "未登记",
             ", ".join(str(x) for x in (s.get("subscribers") or [])) or "无",

@@ -43,18 +43,36 @@ jobs:
             sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           fi
           python -m pip install -r .github/requirements-ci.txt
-      - name: 全量门禁（三平台同口径：bash verify.sh）
+      - name: 全量门禁（三平台同口径：bash verify.sh；日志落盘供失败诊断）
         shell: bash
-        run: bash verify.sh
-      - name: 门禁机器可读报告（写 + 新鲜度校验）
+        env:
+          # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ check12 等明细日志可下载。
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          set -o pipefail
+          bash verify.sh 2>&1 | tee verify.log
+      - name: 上传门禁日志（三平台各留一份；失败时同样上传）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: verify-log-${{ matrix.os }}
+          path: |
+            verify.log
+            .nf-logs/
+          if-no-files-found: warn
+      - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
+        # N1（审计 P2）：同 ci-verify —— 失败时上传的必须是本 run 现算的结论。
+        if: always()
         shell: bash
         run: |
+          mkdir -p .artifacts
           python scripts/verify_report.py --write
+          python scripts/verify_report.py --json > .artifacts/verification-report.json || true
           python scripts/verify_report.py --check
-      - name: 上传门禁报告（三平台各留一份）
+      - name: 上传门禁报告（三平台各留一份·本 run 结论）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: verification-report-${{ matrix.os }}
-          path: protocol/verification_report.json
+          path: .artifacts/verification-report.json
           if-no-files-found: warn

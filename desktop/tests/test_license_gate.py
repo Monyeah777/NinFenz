@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """图书馆入库许可证门单测（登记行合表 + 内联声明双源）。"""
 import sys
 import tempfile

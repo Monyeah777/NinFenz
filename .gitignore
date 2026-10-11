@@ -32,6 +32,10 @@ id_ed25519*
 .rivet/
 .rivet.md
 
+# CI 失败诊断产物（Z5：verify.sh 的日志与实时报告；由 workflow 上传为 artifact，不入仓）
+.nf-logs/
+.artifacts/
+
 .coverage
 _cov_tmp.json
 

@@ -11,10 +11,11 @@
 
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+from core import json_doc
 
 _ROOT = Path(__file__).resolve().parents[3]
 
@@ -36,18 +37,36 @@ CUSTOM_CUES = [
 _SEG = re.compile(r"^##\s*([0-7])\s*\.", re.M)
 _MODULE = re.compile(r"(?:[\u4e00-\u9fff]+:)?M\d{2,3}")
 _DECISION = re.compile(r"(应|应该|必须|禁止|不得|下一步|输出|结论)")
+#: 引文形态（§N / 第N节 / LN / 前缀:MN / N行）。与 round_drill._CITE 同源，由
+#: desktop/tests/test_redos_patterns.py 的夹具判据钉住两者逐字相同（同一语义两处实现的老病）。
+#: 那条 [0-9A-Za-z_]+: 分支必须带 \b 前缀（2026-10-10 审计 Y3，P1）：长串字母数字无冒号时
+#: 引擎会对每个起点各回溯一遍 ⇒ O(n²)（实测 4k/16k/64k = 11/178/2832 ms）；\b 让起点只落在
+#: 词首 ⇒ 线性。
 _CITATION = re.compile(r"(§\s*\d+(?:[.-]\d+)*|第\s*\d+\s*(?:节|步|章)|L\d+|"
-                       r"[0-9A-Za-z_]+:[MTP]\d{2,3}|\b\d{1,3}\b\s*行)")
+                       r"\b[0-9A-Za-z_]+:[MTP]\d{2,3}|\b\d{1,3}\b\s*行)")
 
 
 def _official_core_ids() -> List[str]:
-    reg = json.loads((_ROOT / "desktop/src/core/registry.json").read_text(encoding="utf-8"))
+    reg = json_doc.load(_ROOT / "desktop/src/core/registry.json", dict, what="desktop/src/core/regi"
+        "stry.json")
     return [str(m["id"]) for m in reg.get("modules", [])]
 
 
-def _package_module_sets() -> Dict[str, List[str]]:
-    import yaml
+def _yaml_module():
+    """PyYAML 模块（**惰性**入口，见 core.lazy_yaml）；缺依赖 → None。
 
+    审计 Y6（P1）：本模块此前在函数里裸写 import yaml，缺 PyYAML 时直接抛 ModuleNotFoundError，
+    一路冒成「内部错误：[blocked] yaml」——绕过了仓库为这件事专门做的 lazy_yaml 降级约定
+    （出声一次 + 回退子集口径）。
+    """
+    from core import lazy_yaml
+    return lazy_yaml.module()
+
+
+def _package_module_sets() -> Dict[str, List[str]]:
+    yaml = _yaml_module()
+    if yaml is None:                     # 缺依赖：按降级约定返回空集（lazy_yaml 已出声并给指引）
+        return {}
     sets: Dict[str, List[str]] = {}
     for proto in sorted((_ROOT / "community").glob("*/protocol.yaml")):
         try:
@@ -103,7 +122,8 @@ def dossier(requirement: str, plan_: Dict[str, Any],
         "5. 验收标准（可测断言）：nf assemble \"%s\" --check <out.md> 期望 PASS"
         "（八段骨架 / 编号在装配允许集 / 决策句带引用）" % req,
         "6. 风险与未知：关键词识别有界（未命中 ≠ 不适配，需回填确认）；"
-        "用户自定义件须先落库登记（M91-M99 或 <独占类别>:Mxx 类内段 / 资产 900+ / 新 Pxx 避让层位 id）验收才认；"
+        "用户自定义件须先落库登记（M91-M99 或 <独占类别>:Mxx 类内段 / 资产 900+ / 新 Pxx 避让层位 i"
+            "d）验收才认；"
         "外部实证按 STRATEGY 封闭期冻结（NF-FIELD-001 素材缺位）",
         "7. 涉及协议 / 文件：docs/agent/agent_组装指令包_v0.2.md；%s 管线件；"
         "装配计划允许集 %d 模块；community/模板制作指令包.md（如需建自定义件）"
@@ -135,8 +155,8 @@ def plan(requirement: str) -> Dict[str, Any]:
         proto = _ROOT / "community" / pkg / "protocol.yaml"
         if proto.is_file():
             try:
-                import yaml
-                data = yaml.safe_load(proto.read_text(encoding="utf-8"))
+                _y = _yaml_module()
+                data = _y.safe_load(proto.read_text(encoding="utf-8")) if _y else {}
                 modules = [str(x) for x in (data.get("package") or {}).get("module_id_range") or []]
             except Exception:
                 modules = []

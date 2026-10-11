@@ -9,11 +9,11 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import conformance_scan as csc   # 共享语料：同一次只读调用内同文只读一遍
+from core import json_doc
 
 _ROOT = Path(__file__).resolve().parents[3]
 
@@ -31,8 +31,10 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if missing:
         return (["缺 %s（修复指引：在 NF 仓库根运行本扫描，或先补齐该协议件）"
                  % "、".join(missing)], {})
-    schema = json.loads(csc.read_text_cached(r / "protocol/event_payload.schema.json"))
-    registry = json.loads(csc.read_text_cached(r / "protocol/event_registry.json"))
+    schema = json_doc.loads(csc.read_text_cached(r / "protocol/event_payload.schema.json"), dict,
+                            what="protocol/event_payload.schema.json")
+    registry = json_doc.loads(csc.read_text_cached(r / "protocol/event_registry.json"), dict,
+                              what="protocol/event_registry.json")
     issues += sl.subset_validate(registry, schema, "event_registry")
 
     used: set = set()
@@ -43,7 +45,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         ev = (mc or {}).get("events") or {}
         used.update(ev.get("publish") or [])
         used.update(ev.get("subscribe") or [])
-    reg_json = json.loads(csc.read_text_cached(r / "desktop/src/core/registry.json"))
+    reg_json = json_doc.loads(csc.read_text_cached(r / "desktop/src/core/registry.json"), dict,
+                              what="desktop/src/core/registry.json")
     used.update((reg_json.get("subscriptions") or {}).keys())
     registered = registry.get("events", {})
     dead = sorted(set(registered) - used)

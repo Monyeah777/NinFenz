@@ -17,9 +17,7 @@
 """
 from __future__ import annotations
 
-import json
-
-from core import atomic_write
+from core import atomic_write, json_doc
 import os
 import re
 from pathlib import Path
@@ -128,7 +126,7 @@ def _provable_level(root: str, mid: str, package_dir: str) -> str:
     reg = Path(root) / "desktop" / "src" / "core" / "registry.json"
     registered = False
     try:
-        data = json.loads(reg.read_text(encoding="utf-8"))
+        data = json_doc.loads(reg.read_text(encoding="utf-8"), dict, what="registry.json")
         for p in data.get("protocols") or []:
             if mid in (p.get("module_ids") or []):
                 registered = True
@@ -252,7 +250,8 @@ def apply_outputs(root: str = ".", write: bool = False) -> List[Dict[str, Any]]:
     reg = Path(root) / "protocol" / "event_registry.json"
     if reg.is_file():
         try:
-            data = json.loads(reg.read_text(encoding="utf-8"))
+            data = json_doc.loads(reg.read_text(encoding="utf-8"), dict,
+                                    what="protocol/event_registry.json")
             for ev, body in (data.get("events") or {}).items():
                 ev_fields[ev] = {k: (v.get("type") if isinstance(v, dict) else "untyped")
                                  for k, v in (body.get("fields") or {}).items()}

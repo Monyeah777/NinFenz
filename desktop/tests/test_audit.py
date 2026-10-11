@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """审计/验收（audit）正式与否定用例。"""
 import hashlib
 import sys

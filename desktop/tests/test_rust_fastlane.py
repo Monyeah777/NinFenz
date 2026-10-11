@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Rust 只读快线（engine/rust · nf-rs）与 Python 真源的逐字节对账门禁。
 
 为什么（2026-10-03 取证）：crate 的 Cargo.toml 与 main.rs 都宣称「与 Python 真源逐字节对账」，
@@ -522,10 +521,38 @@ class RustFastLaneParityTest(unittest.TestCase):
         """
         from core import verify_report as vr  # noqa: PLC0415
 
-        native = {"schema", "doc_markers", "baseline", "self_stats", "payload", "assets_ledger", "instruction", "key_naming", "intake", "library", "library_projection", "rating", "audit", "workflow_policy", "judgement_coverage", "license", "coupling", "contract", "knowledge", "conformance", "receipts", "drill_fidelity", "purity", "conformance_report", "code_metrics", "asset_contract"}
-        # ⚠️ 这个集合**必须与快线的自算面同步**：`verify_report.call` 是 **native 优先**于 `--results`，
-        # 所以少列一条不会立刻变红——但只要该条的分派将来断掉，就会静默回落到喂入值、**门禁照样全绿**。
-        # 实测 2026-10-04：本集合停在 19 条（差 `conformance` / `receipts`），对账门里也是同一处陈旧。
+        native = {"schema",
+ "doc_markers",
+ "baseline",
+ "self_stats",
+ "payload",
+ "assets_ledger",
+ "instruction",
+ "key_naming",
+ "intake",
+ "library",
+ "library_projection",
+ "rating",
+ "audit",
+ "workflow_policy",
+ "judgement_coverage",
+ "license",
+ "coupling",
+ "contract",
+ "knowledge",
+ "conformance",
+ "receipts",
+ "drill_fidelity",
+ "purity",
+ "conformance_report",
+ "code_metrics",
+ "asset_contract"}
+        # ⚠️ 这个集合**必须与快线的自算面同步**：`verify_report.call` 是 **native 优先**于 `--result
+        # s`，
+        # 所以少列一条不会立刻变红——但只要该条的分派将来断掉，就会静默回落到喂入值、**门禁照样全绿**
+        # 。
+        # 实测 2026-10-04：本集合停在 19 条（差 `conformance` / `receipts`），对账门里也是同一处陈旧
+        # 。
         report = vr.build(str(ROOT))
         want = vr.render(report).encode("utf-8")
         # **只跑一遍真源**（早先 `_call` 一遍 + `build` 一遍 = 24 个扫描器跑两轮，判据从 5.6 s 涨到

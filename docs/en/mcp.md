@@ -157,7 +157,7 @@ the filter had taken effect) — all "looks normal" wrong answers.
 | One-liner | Give any AI agent a verifiable content specification and asset foundation — check the contract first, then write. |
 | Category | `content-creation` |
 | Transport | `stdio` (dual-era: modern `2026-07-28` + legacy `2025-11-25`) |
-| Entry | `python scripts/nf.py serve` (**default = live-repo surface, no snapshot needed**) | snapshot surface (optional): `python scripts/nf.py run --fmt mcp` → `python scripts/nf.py serve <快照 .json>` |
+| Entry | `python scripts/nf.py serve` (**default = live-repo surface, no snapshot needed**); snapshot surface (optional): `python scripts/nf.py run --fmt mcp` → `python scripts/nf.py serve <快照 .json>` |
 
 ### 2. Installation (three steps, copy-paste ready)
 

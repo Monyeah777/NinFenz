@@ -17,10 +17,11 @@ NF 原有 01–07 编号与 §7 迁移记录，但**协议件自身没有版本�
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 INDEX_REL = "protocol/rfc_index.json"
 CATEGORIES = ("Standards Track", "Informational", "Experimental", "Process")
@@ -33,7 +34,7 @@ _LAST_UPDATED = re.compile(r">\s*最后更新：\s*([\d-]+)")
 
 def index(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / INDEX_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=INDEX_REL) if p.is_file() else {}
 
 
 def parse_head(text: str) -> Dict[str, str]:
@@ -100,6 +101,7 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                 issues.append("supersede 链成环：%s → … → %s" % (rfc, rfc))
                 break
     stats = {"docs": len(seen), "chains": len(supby),
-             "statuses": sorted({parse_head((Path(root) / r).read_text(encoding="utf-8")).get("status", "")
+             "statuses": sorted({parse_head((Path(root) / r).read_text(encoding="utf-8")).get("stat"
+                 "us", "")
                                  for r in seen.values()})}
     return issues, warns, stats

@@ -1,10 +1,10 @@
 # Release orchestration (release)
 > ⛔ Operating instruction: this file is the **human-readable projection** of the release policy. The machine source is `protocol/release_policy.json` (validated against `protocol/schema/release.schema.json`); the machine-checked preflight is check38's `release_gate` sub-scan. Read it and run it.
-> 最后更新：2026-10-05 (last updated)
+> 最后更新：2026-10-11 (last updated)
 
 ## What this solves
 
-Release steps used to live in four places — `nf release` (preflight), `scripts/release_freeze.sh` (golden master snapshot), `scripts/bump_verify.sh` (version relabeling) and a manual checklist — while the **order** and the **preconditions** existed only in prose. Two mechanisms from top-tier peers were adopted: **config-as-contract** (policy in `protocol/release_policy.json` + its JSON Schema, like release-please's `$schema` pattern) and **change collection** (`changes/unreleased/*.md`, like changesets).
+Release steps used to live in four places — `nf release` (preflight), the former golden-master snapshot script (retired 2026-10-11), `scripts/bump_verify.sh` (version relabeling) and a manual checklist — while the **order** and the **preconditions** existed only in prose. Two mechanisms from top-tier peers were adopted: **config-as-contract** (policy in `protocol/release_policy.json` + its JSON Schema, like release-please's `$schema` pattern) and **change collection** (`changes/unreleased/*.md`, like changesets).
 
 ```bash
 python scripts/nf.py release --plan          # ordered plan (command / output / criterion)
@@ -37,13 +37,9 @@ Three registrations must not dangle (recompute rules live in `core/quality_basel
 
 `bash verify.sh` is the single gate entry; the expected `PASS` value is a declaration (`quality_baseline.EXPECTED_*`) and is not hand-written here.
 
-## Golden Master
+## Golden Master (retired)
 
-```bash
-bash scripts/release_freeze.sh vX.Y.Z
-```
-
-Output = `.release-frozen/<tag>/sha256.manifest` (`01_核心协议.md` / `02_联动注册表.md` / `06_Agent执行协议.md` / `07_官方核心出厂与社区预设导航.md` / `verify.sh` + `desktop/src/core/*.py`) plus `sig-fingerprint.txt` (`nf sig --verify` knowledge fingerprint). Snapshots are **historical facts** and are not refreshed; incomplete structure (missing file classes / empty digests) is judged red by the `release_gate` sub-scan.
+The former mechanism (tag-time snapshot `.release-frozen/<tag>/sha256.manifest`) was **retired by the author on 2026-10-11**: 77 of its 156 digest lines had gone stale (protocol files changed, the manifest was never recomputed), no gate consumed it, and it once leaked into the npm payload. Both the frozen directory and its generator script are removed from the repository and from the payload exclusion list (the path face no longer carries that directory name). If a reproducible tag-time snapshot is ever needed again, it must ship with a **freshness gate** (a manifest without a judge is exactly the anti-pattern this document warns about).
 
 ## Change entries
 

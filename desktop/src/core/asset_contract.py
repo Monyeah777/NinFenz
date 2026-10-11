@@ -38,7 +38,7 @@ import unittest
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 
 DECL_REL = "protocol/asset_contracts.json"
 SCHEMA = "nf-asset-contracts/1"
@@ -54,9 +54,7 @@ _MISSING = object()
 # ---------------------------------------------------------------- 基础
 def _strict_json(text: str) -> Any:
     """严格如 RFC 8259：NaN/Infinity 不是 JSON 常量，出现即报错（不静默收下）。"""
-    def _bad(token: str) -> Any:
-        raise ValueError("非 RFC 8259 常量 %s（修复指引：改用 null 或有限数字）" % token)
-    return json.loads(text, parse_constant=_bad)
+    return json_doc.loads(text, dict, what="资产契约文本", strict_constants=True)
 
 
 def digest_of(path: Path) -> str:
@@ -183,7 +181,8 @@ def _data_markdown(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str]
         body = [r for r in table[1:] if not all(set(c) <= set("-:") for c in r)]
         ragged = [r for r in body if len(r) != len(header)]
         if ragged:
-            issues.append("数据件 %s 有一张表列数不齐：表头 %d 列 vs 数据 %d 列（修复指引：对齐竖线）"
+            issues.append("数据件 %s 有一张表列数不齐：表头 %d 列 vs 数据 %d 列（修复指引：对齐竖线"
+                "）"
                           % (rel, len(header), len(ragged[0])))
         n += 1
     return issues, {"tables": n}
@@ -419,7 +418,9 @@ def _none_deref(tree: ast.AST, rel: str) -> List[str]:
             pos_defaults = list(fn.args.defaults)
             # 位置默认值对应**尾部**参数（python 语义）——首版错配到头部，把普通形参也当成
             # None 默认（实测 json_schema._check 假红 37 条）；kw_defaults 与 kwonlyargs 一一对应。
-            pairs: List[Tuple[ast.arg, Any]] = list(zip(pos[len(pos) - len(pos_defaults):], pos_defaults))
+            pairs: List[Tuple[ast.arg,
+ Any]] = list(zip(pos[len(pos) - len(pos_defaults):],
+ pos_defaults))
             pairs += list(zip(fn.args.kwonlyargs, fn.args.kw_defaults))
             for arg, default in pairs:
                 if _is_none(default):
@@ -453,7 +454,8 @@ def _denied_calls(tree: ast.AST, rel: str, deny: set) -> List[str]:
         if isinstance(n, ast.Call):
             name = _dotted(n.func)
             if name and name in deny:
-                out.append("代码件 %s 第 %d 行调用了禁用面 %s（修复指引：换用不执行任意代码的等价实现；"
+                out.append("代码件 %s 第 %d 行调用了禁用面 %s（修复指引：换用不执行任意代码的等价实"
+                    "现；"
                            "确需保留须改声明并写明理由）" % (rel, n.lineno, name))
     return out
 
@@ -468,7 +470,8 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
         trel = str(t).replace("\\", "/")
         p = Path(root) / trel
         if not p.is_file():
-            issues.append("代码件 %s 声明的测试件不在场：%s（修复指引：先写测试再登记）" % (rel, trel))
+            issues.append("代码件 %s 声明的测试件不在场：%s（修复指引：先写测试再登记）" % (rel,
+ trel))
             continue
         text = p.read_text(encoding="utf-8", errors="replace")
         try:
@@ -485,11 +488,13 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
 def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     rel = str(spec.get("path") or "")
     if str(spec.get("lang") or "python") != "python":
-        return (["代码契约 %s 的 lang=%s 不在支持面（仅 python 走 AST；Bash/VBA 走脚本面声明式契约）"
+        return (["代码契约 %s 的 lang=%s 不在支持面（仅 python 走 AST；Bash/VBA 走脚本面声明式契约"
+            "）"
                  % (spec.get("id"), spec.get("lang"))], {})
     rels = resolve(root, spec)
     if not rels:
-        return (["代码契约 %s 未命中任何文件（修复指引：修正 path/glob）" % spec.get("id")], {"files": 0})
+        return (["代码契约 %s 未命中任何文件（修复指引：修正 path/glob）" % spec.get("id")],
+ {"files": 0})
     issues: List[str] = []
     stats: Dict[str, Any] = {"files": len(rels)}
     deny = {str(x) for x in spec.get("deny_calls") or []}
@@ -588,7 +593,8 @@ def _check_script(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str,
     declared_all = set(spec.get("inputs") or []) | set(spec.get("outputs") or [])
     extra = sorted({x for x in observed_paths(text, lang) if x not in declared_all})
     if extra:
-        issues.append("脚本 %s 出现未声明的字面路径 %s（修复指引：补进 inputs/outputs 或去掉硬编码）"
+        issues.append("脚本 %s 出现未声明的字面路径 %s（修复指引：补进 inputs/outputs 或去掉硬编码"
+            "）"
                       % (rel, ",".join(extra[:3])))
     return issues, {"files": 1, "inputs": len(spec.get("inputs") or []),
                     "outputs": len(spec.get("outputs") or [])}
@@ -598,7 +604,9 @@ def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
                  ) -> Tuple[List[str], Dict[str, Any]]:
     a_id, b_id = str(chain.get("from") or ""), str(chain.get("to") or "")
     if a_id not in specs or b_id not in specs:
-        return (["链 %s→%s 的端点未在脚本面登记（修复指引：先登记两端脚本契约）" % (a_id, b_id)], {})
+        return (["链 %s→%s 的端点未在脚本面登记（修复指引：先登记两端脚本契约）" % (a_id,
+ b_id)],
+ {})
     a, b = specs[a_id], specs[b_id]
     ao = [str(x).replace("\\", "/") for x in a.get("outputs") or []]
     bi = [str(x).replace("\\", "/") for x in b.get("inputs") or []]
@@ -615,7 +623,8 @@ def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
                 issues.append("链 %s→%s：下游未声明该输入 %s（修复指引：补进下游 inputs）"
                               % (a_id, b_id, in_p))
             if out_p != in_p:
-                issues.append("链 %s→%s：产物路径不对齐（上游 %s vs 下游 %s）（修复指引：统一路径写法）"
+                issues.append("链 %s→%s：产物路径不对齐（上游 %s vs 下游 %s）（修复指引：统一路径写"
+                    "法）"
                               % (a_id, b_id, out_p, in_p))
     elif not set(ao) & set(bi):
         issues.append("链 %s→%s：上游产物与下游输入无交集（上游 %s / 下游 %s）（修复指引："
@@ -629,14 +638,16 @@ def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     """读契约声明件 → (doc, issues)。缺件/坏件如实报，不抛裸异常。"""
     p = Path(root) / DECL_REL
     if not p.is_file():
-        return {}, ["缺数字资产契约声明 %s（修复指引：新建并写入 schema=%s 与 data/code/script 三面）"
+        return {}, ["缺数字资产契约声明 %s（修复指引：新建并写入 schema=%s 与 data/code/script 三面"
+            "）"
                     % (DECL_REL, SCHEMA)]
     try:
         doc = _strict_json(p.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return {}, ["%s 不可读或不是合法 JSON：%s（修复指引：修好语法）" % (DECL_REL, exc)]
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
-        return {}, ["%s schema 不匹配（期望 %s）（修复指引：改为声明件当前形态）" % (DECL_REL, SCHEMA)]
+        return {}, ["%s schema 不匹配（期望 %s）（修复指引：改为声明件当前形态）" % (DECL_REL,
+ SCHEMA)]
     return doc, []
 
 
@@ -687,13 +698,17 @@ def freeze(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         rel = str(spec.get("path") or "")
         p = Path(root) / rel
         if not p.is_file():
-            issues.append("数据契约 %s 的 %s 不在场（修复指引：补件后再冻）" % (spec.get("id"), rel))
+            issues.append("数据契约 %s 的 %s 不在场（修复指引：补件后再冻）" % (spec.get("id"),
+ rel))
             continue
         spec["sha256"] = digest_of(p)
         n += 1
     if not issues:
         atomic_write.write_text(Path(root) / DECL_REL,
-                                json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+                                json.dumps(doc,
+ ensure_ascii=False,
+ indent=2,
+ sort_keys=True) + "\n")
     return issues, {"frozen": n}
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """协议定义向导单测（v2.0.x-E2：ProtocolForm → protocol.yaml v2 生成 + self_check）。
 
 运行：cd desktop && python -m unittest tests.test_protocol_wizard -v

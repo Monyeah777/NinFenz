@@ -34,6 +34,7 @@ import re
 import xml.etree.ElementTree as ET  # nosec B405 -- self-authored artifacts only
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from core import json_doc
 
 from core import atomic_write
 
@@ -101,10 +102,13 @@ INDEX_INPUTS = ("community/*/outputs/**/*",
                 "community/*/modules/*.md",
                 "04_模块库/*/*.md",
                 "desktop/src/core/registry.json",
-                # 2026-09-29 补齐（**陈旧洞**）：本模块真读这两件（形态清单 registry + 机验率基线），
+                # 2026-09-29 补齐（**陈旧洞**）：本模块真读这两件（形态清单 registry + 机验率基线）
+                # ，
                 # 原先一条都没申报 ⇒ 重签基线/改形态清单时 `output-forms-scan` 会**命中旧结果**。
-                # 抓它的是「**逻辑读**」审计（`read_text_cached` 级追踪）：只盯 `io.open` 的旧判据看不见
-                # 常驻层命中的读，这两条洞因此躲过了很久——见 `test_conformance_scan.LogicalReadFaceAuditTest`。
+                # 抓它的是「**逻辑读**」审计（`read_text_cached` 级追踪）：只盯 `io.open` 的旧判据看
+                # 不见
+                # 常驻层命中的读，这两条洞因此躲过了很久——见 `test_conformance_scan.LogicalReadFaceA
+                # uditTest`。
                 "protocol/output_forms.json",
                 "protocol/output_forms_baseline.json")
 #: 结果缓存（键 = 输入内容指纹；输入一变指纹就变，故不需要随请求清空）。
@@ -123,7 +127,7 @@ def _read_bytes_cached(path: Path) -> bytes:
 
 def _read_json(path: Path) -> Tuple[Any, str]:
     try:
-        return json.loads(_read_text_cached(path)), ""
+        return json_doc.loads(_read_text_cached(path), None, what=str(path)), ""
     except OSError as exc:
         return None, "不可读：%s" % exc
     except ValueError as exc:
@@ -254,7 +258,7 @@ def _check_json(root: str, rel: str) -> List[str]:
         return dict(pairs)
 
     try:
-        json.loads(raw, object_pairs_hook=hook)
+        json_doc.loads(raw, None, what="JSON 文本", pairs_hook=hook)
     except ValueError as exc:
         return ["JSON 不可解析：%s" % exc]
     return ["JSON 重复键：%s" % d for d in sorted(set(dups))]
@@ -266,7 +270,7 @@ def _check_jsonl(root: str, rel: str) -> List[str]:
         if not line.strip():
             continue
         try:
-            json.loads(line)
+            json_doc.loads(line, None, what=f"第 {i} 行")
         except ValueError as exc:
             issues.append("第 %d 行非 JSON：%s" % (i, exc))
     return issues
@@ -554,7 +558,8 @@ _PACK_FACE_SLICE = ("outputs/**/*", "assets/*", "protocol.yaml", "modules/*.md")
 #: 判据：`test_output_forms.PackKeyReadCoverageTest`。
 _PACK_FACE_SHARED = ("community/*/modules/*.md", "community/*/protocol.yaml",
                      "community/*/assets/provenance.json", REGISTRY_INPUT)
-#: 逐包键里「按**解析后**契约进键」的那条（`04_模块库`）：正文改动不换键、`machine_contract` 变才换。
+# : 逐包键里「按**解析后**契约进键」的那条（`04_模块库`）：正文改动不换键、`machine_contract` 变才换
+# 。
 _PACK_FACE_PARSED = ("04_模块库/*/*.md",)
 
 
@@ -1422,7 +1427,9 @@ def meter(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             "prose_assets": sum(p["prose_assets"] for p in pkgs.values()),
             "machine_verifiable_ratio": round(
                 sum(p["machine_verifiable"] for p in pkgs.values())
-                / max(1, sum(p["machine_verifiable"] + p["prose_assets"] for p in pkgs.values())), 4),
+                / max(1,
+ sum(p["machine_verifiable"] + p["prose_assets"] for p in pkgs.values())),
+ 4),
         }
     return [], stats
 
@@ -1433,7 +1440,8 @@ def baseline_verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     base, err = _read_json(_rel(root, BASELINE_REL))
     _, stats = meter(root)
     if err:
-        return ["%s 缺失或不可解析（%s；重签：nf output meter --write）" % (BASELINE_REL, err)], stats
+        return ["%s 缺失或不可解析（%s；重签：nf output meter --write）" % (BASELINE_REL,
+ err)], stats
     prev = (base.get("packages") or {})
     for pkg, cur in stats["packages"].items():
         old = prev.get(pkg)

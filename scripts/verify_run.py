@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """跑 verify.sh（自动解析 POSIX shell）——「一键复现」的跨平台入口。
 
 为什么需要：全量门禁本体是 POSIX shell 脚本，`bash verify.sh` 在 Windows 上只在 Git bash

@@ -15,6 +15,7 @@ from __future__ import annotations
 import hashlib
 import re
 from typing import Dict, List, Tuple
+from core import json_doc
 
 STATE_HEAD = "## 状态块（条件先行摘要）"
 _IDS = re.compile(r"\b(?:M\d{2,3}|P\d{2})\b")
@@ -30,7 +31,8 @@ def build_state_block(text: str, max_points: int = 8) -> str:
     sections = len(_SECTION.findall(text))
     bullets = [b.strip() for b in _BULLET.findall(text)]
     lines = [STATE_HEAD, "",
-             "> 本块由产物**确定性提取**（非模型生成）——它是该产物的「状态文本代理」，供重读时先对齐状态。",
+             "> 本块由产物**确定性提取**（非模型生成）——它是该产物的「状态文本代理」，供重读时先对"
+                 "齐状态。",
              "", "| 项 | 值 |", "|---|---|",
              "| 模块/挂载编号 | %s |" % ("、".join(ids) if ids else "（无）"),
              "| NF 编号 | %s |" % ("、".join(nfs) if nfs else "（无）"),
@@ -93,14 +95,13 @@ def ab_manifest(text: str) -> Dict[str, Dict[str, object]]:
 
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, object]]:
     """门禁：凡登记为 condition-first 的产物件，必须真的通过 `check_order`。"""
-    import json
     from pathlib import Path as _Path
 
     rel = "protocol/state_front.json"
     p = _Path(root) / rel
     if not p.is_file():
         return ["缺条件先行声明 %s" % rel], [], {}
-    doc = json.loads(p.read_text(encoding="utf-8"))
+    doc = json_doc.load(p, dict, what=rel)
     issues: List[str] = []
     warns: List[str] = []
     if str(doc.get("schema") or "") != "nf-state-front/1":

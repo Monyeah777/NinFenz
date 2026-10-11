@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """编排面命令行入口：能力目录 / 计划编译 / 机检（core.orchestration 的 agent 入口）。
 
 为什么单独成脚本（而不是 core 模块里的 __main__）：core.orchestration 是**叶子**——它不 import
@@ -22,8 +21,9 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
-from core import mcp_runtime as mrt      # noqa: E402
-from core import orchestration as orch   # noqa: E402
+from core import json_doc  # noqa: E402 - 承重件在 desktop/src
+from core import mcp_runtime as mrt  # noqa: E402
+from core import orchestration as orch  # noqa: E402
 
 
 def tool_face():
@@ -34,7 +34,7 @@ def tool_face():
 def read_plan(path):
     """读计划 JSON（只读；落点合法性由调用方决定，本入口不写盘）。"""
     with open(path, encoding="utf-8") as fh:
-        return json.loads(fh.read())
+        return json_doc.loads(fh.read(), dict, what=path)
 
 
 def main(argv):
@@ -70,7 +70,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    # stdio 钉 UTF-8（同 scripts/nf.py / scripts/verify_run.py 纪律）：中文结论行不该依赖宿主控制台编码。
+    # stdio 钉 UTF-8（同 scripts/nf.py / scripts/verify_run.py 纪律）：中文结论行不该依赖宿主控制台
+    # 编码。
     for _stream in (sys.stdout, sys.stderr):
         if hasattr(_stream, "reconfigure"):
             _stream.reconfigure(encoding="utf-8")

@@ -6,9 +6,10 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 DECL_REL = "protocol/mcp_package.json"
 SCHEMA = "nf-mcp-package/1"
@@ -17,7 +18,7 @@ CATEGORIES = ("content-creation", "developer-tools", "knowledge-management")
 
 def decl(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / DECL_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=DECL_REL) if p.is_file() else {}
 
 
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:

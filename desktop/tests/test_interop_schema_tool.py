@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """互操作**外部权威校验工具**单测（离线可跑：只测声明面与失败口径，不联网）。
 
 联网校验本身是非门禁任务（`scripts/check_interop_schemas.py --fetch`），

@@ -35,7 +35,7 @@
       "unrated"
     ],
     "required": true,
-    "note": "内容分级（挂账收口）：每条馆藏须在 frontmatter 声明 rating（真源 = 条目 frontmatter，投影 = INDEX 的「分级」列）。取值 = general / teen / mature / unrated；`unrated` 是**显式声明未分级**（不是缺省），缺字段即 FAIL——分级是消费方选择的前提，不许沉默。分级由投稿人自述 + 入库机器人闸门里的 rating_warn 提示，门禁只判「声明在场且合规」。"
+    "note": "内容分级（挂账收口）：每条馆藏须在 frontmatter 声明 rating（真源 = 条目 frontmatter，投影 = INDEX 的「分级」列）。取值 = general / teen / mature / unrated；`unrated` 是**显式声明未分级**（不是缺省），缺字段即 FAIL——分级是消费方选择的前提，不许沉默。**投稿者必须自行声明适龄分级**（未声明 = 不合规，不会默认成 unrated；要写 unrated 也得显式写出来）。分级由投稿人自述 + 入库机器人闸门里的 rating_warn 提示，门禁只判「声明在场且合规」——**不替投稿人做适龄判断**（那是内容责任，不是机器责任）。"
   },
   "standards": [
     "自包含可召回",
@@ -43,5 +43,5 @@
     "许可未声明则挂账（不阻断）",
     "内容分级须声明（取值为词表内，未定级写 unrated 而非留空）"
   ],
-  "updated": "2026-09-20"
+  "updated": "2026-10-11"
 }

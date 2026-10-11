@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MCP 默认路径（`nf serve` 无参 = 实时仓库面）回归测试。
 
 动机：MCP 面此前**必须先产快照**（`nf run --fmt mcp`）才能 `nf serve`——对 agent 密集

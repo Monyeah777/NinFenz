@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """**指认判据必须在场**：代码与文档里点名 `test_x.py` / `test_x.test_y` 时，被判据要真的存在。
 
 依据（2026-10-01）：`AGENTS.md` 记着一次「文档承诺由 `validatePath` 拦截、仓库里却根本没有该实现」
@@ -77,7 +76,9 @@ class JudgeReferenceTest(unittest.TestCase):
                 if issue:
                     bad.append("%s → %s（%s）" % (p.name, m.group(0), issue))
         self.assertGreaterEqual(checked, 3, "没扫到代码面的判据指认（判据可能已失效）")
-        self.assertEqual([], bad, "指认的判据不存在（修复指引：改指认，或把文件/成员补回来）：%s" % bad)
+        self.assertEqual([],
+ bad,
+ "指认的判据不存在（修复指引：改指认，或把文件/成员补回来）：%s" % bad)
 
     def test_doc_side_judge_references_resolve(self):
         texts = _test_texts()
@@ -87,7 +88,9 @@ class JudgeReferenceTest(unittest.TestCase):
                 checked += 1
                 issue = resolve(m.group(1), "", texts)
                 if issue:
-                    bad.append("%s → %s（%s）" % (p.relative_to(ROOT).as_posix(), m.group(0), issue))
+                    bad.append("%s → %s（%s）" % (p.relative_to(ROOT).as_posix(),
+ m.group(0),
+ issue))
         self.assertGreaterEqual(checked, 30, "没扫到文档面的判据指认（判据可能已失效）")
         self.assertEqual([], bad, "文档指认的判据不存在：%s" % bad)
 

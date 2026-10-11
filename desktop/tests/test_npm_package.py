@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """npm 一键包交付线的**常驻**门禁：把 `packaging/npm` 的**两条发布前自检**接进 unittest discover。
 
 为什么（2026-10-03 取证）：`test/smoke.test.mjs` 与 `tools/verify-package.mjs` 此前**只在发布工作流**
@@ -74,7 +73,8 @@ class NpmPackageGateTest(unittest.TestCase):
         out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
         self.assertEqual(0, proc.returncode, "npm 包冒烟测试未过：\n%s" % out[-1500:])
         passed = re.search(r"pass (\d+)", out)
-        self.assertIsNotNone(passed, "冒烟输出里读不到 pass 计数（判据可能已失效）：\n%s" % out[-800:])
+        self.assertIsNotNone(passed,
+ "冒烟输出里读不到 pass 计数（判据可能已失效）：\n%s" % out[-800:])
         self.assertGreaterEqual(int(passed.group(1)), MIN_CASES,
                                 "冒烟用例塌缩（只减不增的判据面不许缩）：\n%s" % out[-800:])
         self.assertIn("fail 0", out, "有失败用例：\n%s" % out[-800:])
@@ -82,10 +82,13 @@ class NpmPackageGateTest(unittest.TestCase):
     def test_package_has_no_network_or_telemetry_primitives(self):
         """包的公开承诺（README：「零网络请求、零遥测」）必须**可静态核验**，而不是口号。"""
         files = [p for p in list(PKG.rglob("*.mjs")) + list(PKG.rglob("*.js"))
-                 if not p.relative_to(PKG).as_posix().startswith(("payload/", "node_modules/", "test/"))]
+                 if not p.relative_to(PKG).as_posix().startswith(("payload/",
+ "node_modules/",
+ "test/"))]
         self.assertGreaterEqual(len(files), 4, "扫描面塌缩（判据可能已失效）：%s" % files)
         hits = net_hits()
-        self.assertEqual([], hits, "包内出现网络/埋点原语（与 README 的「零网络/零遥测」承诺冲突）：%s" % hits[:5])
+        self.assertEqual([], hits, "包内出现网络/埋点原语（与 README 的「零网络/零遥测」承诺冲突）"
+            "：%s" % hits[:5])
 
     def test_install_materializes_a_run_tree(self):
         """物化路径（README 第二种用法 `npx -y ninfenz install --dest <目录>`）：
@@ -97,7 +100,11 @@ class NpmPackageGateTest(unittest.TestCase):
         node = _node_or_skip(self)
         with tempfile.TemporaryDirectory(dir=str(ROOT / ".rivet")) as tmp:
             dest = Path(tmp) / "nf"
-            proc = subprocess.run([node, str(PKG / "bin" / "nf.mjs"), "install", "--dest", str(dest)],
+            proc = subprocess.run([node,
+ str(PKG / "bin" / "nf.mjs"),
+ "install",
+ "--dest",
+ str(dest)],
                                   cwd=tempfile.gettempdir(), capture_output=True, timeout=900)
             out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
             self.assertEqual(0, proc.returncode, "物化失败：\n%s" % out[-1200:])
@@ -108,16 +115,28 @@ class NpmPackageGateTest(unittest.TestCase):
             for bad in (".git", ".github", "results"):
                 self.assertFalse((dest / bad).exists(),
                                  "物化树混入 %s（README 承诺 payload 是运行时/协议树）" % bad)
-            self.assertGreaterEqual(len(list(dest.iterdir())), 5, "物化树件数过少（可能只落了一半）")
+            self.assertGreaterEqual(len(list(dest.iterdir())),
+ 5,
+ "物化树件数过少（可能只落了一半）")
             # 非空目录必须 **fail-closed**（rc≠0 + 修复指引），显式 --force 才覆盖
-            # 实测（2026-10-03）：非空 → rc=3「✗ 目标非空：…（修复指引：加 --force 覆盖，或换空目录）」
-            again = subprocess.run([node, str(PKG / "bin" / "nf.mjs"), "install", "--dest", str(dest)],
+            # 实测（2026-10-03）：非空 → rc=3「✗ 目标非空：…（修复指引：加 --force 覆盖，或换空目录
+            # ）」
+            again = subprocess.run([node,
+ str(PKG / "bin" / "nf.mjs"),
+ "install",
+ "--dest",
+ str(dest)],
                                    cwd=tempfile.gettempdir(), capture_output=True, timeout=900)
             out2 = (again.stdout + again.stderr).decode("utf-8", "replace")
             self.assertNotEqual(0, again.returncode, "非空目标竟被静默覆盖：%s" % out2[-400:])
             self.assertIn("目标非空", out2, out2[-400:])
             self.assertIn("--force", out2, "修复指引里应给出 --force：%s" % out2[-400:])
-            forced = subprocess.run([node, str(PKG / "bin" / "nf.mjs"), "install", "--dest", str(dest), "--force"],
+            forced = subprocess.run([node,
+ str(PKG / "bin" / "nf.mjs"),
+ "install",
+ "--dest",
+ str(dest),
+ "--force"],
                                     cwd=tempfile.gettempdir(), capture_output=True, timeout=900)
             self.assertEqual(0, forced.returncode, "显式 --force 仍失败：%s"
                              % (forced.stdout + forced.stderr).decode("utf-8", "replace")[-400:])
@@ -136,15 +155,23 @@ class NpmPackageGateTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=str(ROOT / ".rivet")) as cache:
             env = dict(os.environ, NINFENZ_CACHE=cache)
             proc = subprocess.run([node, str(PKG / "bin" / "nf.mjs"), "doctor"],
-                                  cwd=tempfile.gettempdir(), capture_output=True, env=env, timeout=900)
+                                  cwd=tempfile.gettempdir(),
+ capture_output=True,
+ env=env,
+ timeout=900)
             out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
             self.assertEqual(0, proc.returncode, "解包后从缓存跑 doctor 失败：\n%s" % out[-1200:])
             homes = [p for p in Path(cache).iterdir() if p.is_dir()]
-            self.assertTrue(homes, "缓存目录里没有解包家——核心机制没跑（判据可能已失效）：%s" % out[-400:])
+            self.assertTrue(homes,
+ "缓存目录里没有解包家——核心机制没跑（判据可能已失效）：%s" % out[-400:])
             home = homes[0]
             for rel in ("scripts/nf.py", "verify.sh"):
-                self.assertTrue((home / rel).exists(), "解包树缺关键件 %s：%s" % (rel, sorted(x.name for x in home.iterdir())[:8]))
-            self.assertGreaterEqual(len(list(home.iterdir())), 5, "解包树件数过少（可能只解了一半）")
+                self.assertTrue((home / rel).exists(),
+ "解包树缺关键件 %s：%s" % (rel,
+ sorted(x.name for x in home.iterdir())[:8]))
+            self.assertGreaterEqual(len(list(home.iterdir())),
+ 5,
+ "解包树件数过少（可能只解了一半）")
 
     def test_package_has_no_install_time_scripts(self):
         """README 承诺「**零安装脚本**」：package.json 不得声明 preinstall / install / postinstall。
@@ -157,7 +184,9 @@ class NpmPackageGateTest(unittest.TestCase):
         pkg = json.loads((PKG / "package.json").read_text(encoding="utf-8"))
         scripts = pkg.get("scripts") or {}
         bad = sorted(k for k in scripts if k in ("preinstall", "install", "postinstall"))
-        self.assertEqual([], bad, "包声明了安装期脚本（与 README 的「零安装脚本」承诺冲突）：%s" % bad)
+        self.assertEqual([],
+ bad,
+ "包声明了安装期脚本（与 README 的「零安装脚本」承诺冲突）：%s" % bad)
         self.assertIn("verify", scripts, "scripts.verify 不在（判据可能在读错的件）：%s" % scripts)
 
     def test_net_predicate_catches_the_mutation(self):
@@ -168,7 +197,8 @@ class NpmPackageGateTest(unittest.TestCase):
             d.mkdir(parents=True)
             (d / "a.mjs").write_text("const r = await fetch('x');\nimport https from 'https';\n",
                                      encoding="utf-8")
-            (d / "b.mjs").write_text("export function add(a, b) { return a + b; }\n", encoding="utf-8")
+            (d / "b.mjs").write_text("export function add(a, b) { return a + b; }\n",
+ encoding="utf-8")
             hits = net_hits(Path(tmp))
         self.assertGreaterEqual(len(hits), 2, "变异未被抓到：%s" % hits)
         self.assertTrue(all("a.mjs" in h for h in hits), "误伤：%s" % hits)
@@ -180,7 +210,57 @@ class NpmPackageGateTest(unittest.TestCase):
                               capture_output=True, timeout=900)
         out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
         self.assertEqual(0, proc.returncode, "npm 发布前自检未过：\n%s" % out[-1500:])
-        self.assertIn("0 issue", out, "自检输出里读不到 issue 计数（判据可能已失效）：\n%s" % out[-800:])
+        self.assertIn("0 issue",
+ out,
+ "自检输出里读不到 issue 计数（判据可能已失效）：\n%s" % out[-800:])
+
+
+class PublishingProvenanceGateTest(unittest.TestCase):
+    """A1/A2/A6（2026-10-10 全仓审计）：发布 provenance 与新鲜度是**结构**判据。
+
+    结构性断言（不需要干净树、也不需要真发版）：
+    - stage 默认对脏工作树 fail-closed，且不再**静默改写**受跟踪的 README；
+    - verify 把 source_commit 与 HEAD 对上，并把「脏树暂存」判死。
+    """
+
+    def test_stager_guards_dirty_tree_and_readme(self):
+        src = (PKG / "tools" / "stage-payload.mjs").read_text(encoding="utf-8")
+        self.assertIn("worktree_dirty", src, "stage 未记工作树脏标志（A1）")
+        self.assertIn("--allow-dirty", src, "stage 缺脏树显式放行开关（A1）")
+        self.assertIn("--sync-readme", src, "stage 缺 README 显式同步开关（A6）")
+        # A6 行为哨：改写只在显式分支里、且过期路径会置非零退出码（不再静默改写）。
+        self.assertIn("if (syncReadme) {", src, "README 改写不在显式分支里（A6）")
+        self.assertIn("process.exitCode = 1;", src, "README 过期未置非零退出码（A6）")
+        self.assertFalse(re.search(r"(?m)^    fs\.writeFileSync\(README_PATH",
+                                   src), "stage 又回到无条件静默改写受跟踪 README（A6）")
+
+    def test_verifier_checks_head_freshness(self):
+        src = (PKG / "tools" / "verify-package.mjs").read_text(encoding="utf-8")
+        self.assertIn("rev-parse", src, "verify 未取 HEAD（A2）")
+        self.assertIn("source_commit", src, "verify 未比对 source_commit（A2）")
+        self.assertIn("worktree_dirty", src, "verify 未判脏树暂存（A1/A2）")
+
+    def test_tarball_matches_payload_manifest(self):
+        """A3（2026-10-10 审计）：npm pack 真打出来的 tarball 必须与 payload 清单逐字节一致。
+
+        verify-package.mjs 只看 payload 目录；「清单 → 发布物」的最后一跳此前**无人判定**，
+        正是 staged payload 落后 HEAD 10 个提交仍 0 issue 通过的原因。
+        """
+        node = _node_or_skip(self)
+        src = (PKG / "tools" / "verify-tarball.mjs").read_text(encoding="utf-8")
+        for needle in ("MANIFEST_NAME", "sha256File", "清单外文件", "package_version"):
+            self.assertIn(needle, src, "verify-tarball 缺判据：%s" % needle)
+        self.assertIn('"verify-tarball"',
+                      (PKG / "package.json").read_text(encoding="utf-8"),
+                      "package.json 缺 verify-tarball 脚本（A3 只能在发布链上跑）")
+        proc = subprocess.run([node, "tools/verify-tarball.mjs"], cwd=str(PKG),
+                              capture_output=True, timeout=1800)
+        out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
+        if proc.returncode == 2 and "npm pack" in out:
+            self.skipTest("npm 不在场——tarball 核对前置缺失（非本仓缺陷）：%s"
+                          % out.strip()[-200:])
+        self.assertEqual(0, proc.returncode, "tarball 与 payload 清单不一致：\n%s" % out[-1500:])
+        self.assertIn("逐字节一致", out, "tarball 核对未给出通过证据：\n%s" % out[-600:])
 
 
 if __name__ == "__main__":

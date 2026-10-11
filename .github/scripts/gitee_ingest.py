@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """📚 NF 云端代收站 · Gitee 前端轮询入库（Y12′ 扩展 · 2026-09-07 · 零治理开放投稿）
 
 背景：投稿的「写入口」此前只在 GitHub Issues——国内用户进不去 GitHub 就无法投稿。
@@ -17,7 +16,6 @@
 
 本地调试：设 DRY_RUN=1 只改工作区不提交/不调 API/不推远端。
 """
-import json
 import os
 import re
 import subprocess
@@ -30,13 +28,15 @@ from glob import glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__)))), "desktop", "src"))
+from core import json_doc
 from core import atomic_write  # noqa: E402  —— 入库件落盘走统一原子写（2026-10-01）
 # 复用 GitHub 前端的纯函数（36进制 / 文件名解析 / 存量扫描）
 # （`rebuild_alias` 已于 2026-10-01 删除：ALIAS 改由 `core.library.write_projection`
 #   全量重生成——该函数是它的旧实现，定义后从未被调用，只有本文件的 import 在“装作”被用）
 from library_ingest import (to_b36, parse_nfname, scan_existing,
                             SEG_RE, load_gate, INTAKE_REL, load_rating_vocab,
-                            secret_shape_hit, injection_probe, MAX_BODY_CHARS)
+                            secret_shape_hit, injection_probe, MAX_BODY_CHARS,
+                            flatten_fm_value, fm_fields_ok)
 
 GITEE_OWNER = 'monyeah777'
 GITEE_REPO = 'ninfenz'
@@ -66,7 +66,7 @@ def fail(msg):
 
 def clean_val(v):
     """模板残留净化：说明文字/括号示例一律视为未填。"""
-    v = v.strip()
+    v = flatten_fm_value(v)              # 先压平（含 CR/LF）——frontmatter 行读，换行即注入
     if not v:
         return ''
     if v.startswith(('（', '(')):
@@ -91,7 +91,7 @@ def gitee_api(path, params=None, method='GET'):
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             raw = r.read()
-            return json.loads(raw) if raw else {}
+            return json_doc.loads(raw, dict, what='Gitee API 响应') if raw else {}
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:300]
         print(f'⚠ Gitee API HTTP {e.code}: {body}')
@@ -234,12 +234,15 @@ def process(issue):
     if ('从这里开始粘贴产物全文' in body_main
             or '把 AI 产物全文整篇粘贴到这条线下面' in body_main
             or '此占位行务必删掉' in body_main):
-        gitee_comment(number, '⚠️ 正文里还留着模板的占位提示行——请删掉它，并把 AI 产出的完整内容整篇粘贴进来，重新开题提交。')
+        gitee_comment(number, '⚠️ 正文里还留着模板的占位提示行——请删掉它，并把 AI 产出的完整内容整'
+            '篇粘贴进来，重新开题提交。')
         gitee_close(number)
         print('  ✋ 正文区空壳（残留模板占位行），已拒绝并关闭')
         return
 
-    title = clean_val_(meta.get('标题', '')) or re.sub(r'^【NF投稿】\s*', '', title_raw).strip() or f'投稿 #{number}'
+    title = (clean_val_(meta.get('标题', ''))
+             or flatten_fm_value(re.sub(r'^【NF投稿】\s*', '', title_raw))
+             or f'投稿 #{number}')
     topic = clean_val_(meta.get('形态/领域自述') or meta.get('形态') or '') or '未标注'
     one_line = clean_val_(meta.get('一句话') or '') or '（见文件）'
     seg1 = clean_val_(meta.get('档位词', ''))
@@ -254,6 +257,18 @@ def process(issue):
         rating_note = ('（投稿未填分级或越词表 → 以 `unrated` 入库；'
                        '补填 `分级` 后重新开题即可定级）')
         rating = 'unrated'
+
+    # frontmatter 形状闸门（审计 Y2，P1）：值必须能被 parse_frontmatter 原样读回——首尾引号
+    # 会被剥掉、方括号成对的形状会被读成列表；这类投稿拒收而不是硬塞（换行已在 clean_val 压平）。
+    _bad_fm = fm_fields_ok((('title', title), ('type', topic), ('description', one_line),
+                            ('author', author), ('license', lic), ('rating', rating)))
+    if _bad_fm:
+        gitee_comment(number, f'⚠️ 元信息「{_bad_fm}」的取值无法安全写入条目 frontmatter——'
+                              '首尾引号会被条目解析器剥掉、方括号成对的形状会被读成列表'
+                              '（都会改变你的内容）。请去掉首尾引号 / 方括号后重新开题。')
+        gitee_close(number)
+        print(f'  ✋ 元信息 {_bad_fm} 形状不安全，已拒绝并关闭')
+        return
 
     # 密钥形状拒收（安全边界，与 GitHub 前端同规）：投稿正文会原样发布到公开仓库，
     # 检出疑似明文密钥即拒收——既不把别人的密钥二次分发，也不让零门槛通道把 CI 打红
@@ -278,7 +293,8 @@ def process(issue):
         rules = '、'.join(sorted({h['rule'] for h in hits}))
         gitee_comment(number, f'ℹ️ 本次投稿正文里检出 **{len(hits)} 处疑似内嵌指令**（{rules}）。'
                              f'本馆一律把内容按**数据**消费——其中的「指令」不会被任何消费方执行，'
-                             f'仅作素材参考；已如实记档。若这是正当的「注入防御」题材讨论，可忽略本提示。')
+                             f'仅作素材参考；已如实记档。若这是正当的「注入防御」题材讨论，可忽略本'
+                                 f'提示。')
         print(f'  注入面：命中 {len(hits)} 处（{rules}）——已回评记档（内容照常入库）')
     else:
         print('  注入面：未命中')
@@ -290,7 +306,8 @@ def process(issue):
         print('  ✋ 段位不配对，已拒绝并关闭')
         return
     if seg1 and (not SEG_RE.match(seg1) or not SEG_RE.match(seg2)):
-        gitee_comment(number, '⚠️ 档位词/自定义段仅允许字母数字、各 ≤16 字符、不含连字符。请修正后重新开题。')
+        gitee_comment(number,
+ '⚠️ 档位词/自定义段仅允许字母数字、各 ≤16 字符、不含连字符。请修正后重新开题。')
         gitee_close(number)
         print('  ✋ 段位字符非法，已拒绝并关闭')
         return
@@ -307,7 +324,8 @@ def process(issue):
                 near.append(os.path.basename(f)[:-3])
         if near:
             hint = '、'.join(near[:3])
-            gitee_comment(number, f'⚠️ 档位段+自定义段与现有条目仅大小写不同（{hint}）——小写键全馆唯一，请更换拼写后重新开题。')
+            gitee_comment(number,
+ f'⚠️ 档位段+自定义段与现有条目仅大小写不同（{hint}）——小写键全馆唯一，请更换拼写后重新开题。')
             gitee_close(number)
             print('  ✋ 前缀小写键撞车，已拒绝并关闭')
             return
@@ -338,7 +356,8 @@ def process(issue):
         '---\n\n'
     )
     header = (
-        f'> 📚 **NF 云端图书馆条目 {nfid}** · 入库 {today} · 投稿人：{author} · 来源：Gitee Issue #{number}\n'
+        f'> 📚 **NF 云端图书馆条目 {nfid}** · 入库 {today} · 投稿人：{author} · 来源：Gitee Issue #'
+            f'{number}\n'
         f'> 形态/领域：{topic} · 一句话：{one_line}\n'
         f'> 许可：{lic}（许可证门判据同源；未声明记挂账，不阻断入库）\n'
         f'> 分级：{rating}（真源 = 文件头 frontmatter；INDEX 为投影）{rating_note}\n'
@@ -362,7 +381,9 @@ def process(issue):
     git('config', 'user.name', 'NF Library Bot')
     git('config', 'user.email', 'nf-bot@users.noreply.github.com')
     git('add', fname, 'library/INDEX.md', 'library/ALIAS.md')
-    git('commit', '-m', f'lib(Y12): Gitee 云端代收 {nfid} 自动入库（Gitee Issue #{number}，投稿人 {author}）')
+    git('commit',
+ '-m',
+ f'lib(Y12): Gitee 云端代收 {nfid} 自动入库（Gitee Issue #{number}，投稿人 {author}）')
     # Gitee push：子令牌**只作本次 push 的 URL 参数**——不写 .git/config（失败也不残留，
     # CWE-522），参数与 git 回显全程经 _redact 脱敏（CWE-532）。
     git('push', f'https://{GITEE_OWNER}:{TOKEN}@gitee.com/{GITEE_OWNER}/{GITEE_REPO}.git',
@@ -372,7 +393,8 @@ def process(issue):
     reply = (
         f'✅ **云端代收成功——已入库 {nfid}**《{title}》\n\n'
         f'随时可用链接召回运行（说「运行 {nfid}」即可）：\n'
-        f'- Gitee（国内直连）：`https://gitee.com/{GITEE_OWNER}/{GITEE_REPO}/raw/main/library/{nfid}.md`\n'
+        f'- Gitee（国内直连）：`https://gitee.com/{GITEE_OWNER}/{GITEE_REPO}/raw/main/library/{nfid}'
+            f'.md`\n'
         f'- GitHub：`https://raw.githubusercontent.com/{GH_REPO}/main/library/{nfid}.md`\n\n'
         f'> 💡 给任意 AI 的启动句：请读取上面的链接，按文档执行。\n'
         f'> 🔤 若 AI 报编号时大小写拿不准：让它读 `library/ALIAS.md` 转译（编号全小写化后匹配）。\n'

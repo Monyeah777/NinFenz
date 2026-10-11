@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """全链管道化单测（v2.1.0 B2：retrieve→compose→gate→export 单命令）。
 
 运行：cd desktop && python -m unittest tests.test_pipeline -v

@@ -98,6 +98,7 @@ AI assembly:
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
 - **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
+- **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
 
 ## Capabilities and assets
 

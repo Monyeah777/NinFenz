@@ -1,0 +1,43 @@
+# NF 的**根依赖入口**（2026-10-10 全仓审计 Z4 / OSPS-QA-02.01）。
+#
+# 此前根目录没有 pyproject.toml / requirements.txt / setup.py / pytest.ini —— 新人拿到的仓库
+# **不带环境定义**，CI 的依赖只散落在 .github/requirements-*.txt 里。
+#
+# 口径：
+# - NF 本体是 **stdlib-only + 软第三方导入**（见 purity_scan R5），故 [project].dependencies
+#   刻意留空；可选依赖按**用途**声明，版本与 .github/requirements-*.txt 逐字一致。
+# - 这份给人类与依赖扫描器一个单点入口；CI 仍按 job 用那份精简清单（不为此改 CI）。
+# - ASCII-only 纪律只约束 requirements-*.txt（pip 按 locale 读）；本文件是 UTF-8 TOML，
+#   注释可用中文。
+[project]
+name = "ninfenz"
+version = "1.0.1"
+description = "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. Offline, MIT, stdlib-only core."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Monyeah777" }]
+keywords = ["content-contract", "markdown", "verification", "merkle", "llm", "long-form"]
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+# 本体零硬依赖（软导入由 purity_scan R5 登记）。
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Monyeah777/NinFenz"
+Repository = "https://github.com/Monyeah777/NinFenz"
+Issues = "https://github.com/Monyeah777/NinFenz/issues"
+
+[project.optional-dependencies]
+# 版本真源 = .github/requirements-*.txt（改这里也要同步那边；dependabot 两处都覆盖）。
+ci = ["pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1"]
+lint = ["ruff==0.16.8"]
+audit = ["pip-audit==2.10.1"]
+sast = ["bandit==1.9.4"]
+dev = [
+  "pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1",
+  "ruff==0.16.8", "bandit==1.9.4", "pip-audit==2.10.1",
+]

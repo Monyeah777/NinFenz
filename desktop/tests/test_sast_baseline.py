@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """SAST 计数棘轮（`scripts/sast_check.py`）回归测试 —— 安全/供应链面。
 
 只测**纯函数比对**（`compare`）与声明件在场性：不依赖 bandit/ruff 是否安装，
@@ -105,7 +104,8 @@ class LiveSastRatchetTest(unittest.TestCase):
                           ".github/requirements-sast.txt -r .github/requirements-lint.txt）"
                           % "/".join(missing))
         base = m.platform_baseline(m.load_baseline())
-        self.assertTrue(base, "缺本平台 SAST 基线段（修复指引：python scripts/sast_check.py --write）")
+        self.assertTrue(base, "缺本平台 SAST 基线段（修复指引：python scripts/sast_check.py --write"
+            "）")
         issues, _warns, stats = m.compare(cur, base)
         self.assertEqual([], issues,
                          "SAST 计数相对基线上升/新增（逐条修或重冻）：%s；实测 bandit %d · ruff-S %d"
@@ -140,7 +140,8 @@ class RealRepoTest(unittest.TestCase):
         self.assertEqual({}, self.m.platform_baseline({}))
         other = "posix" if self.m.PLATFORM != "posix" else "nt"     # 不许依赖跑测平台
         self.assertEqual({}, self.m.platform_baseline({"platforms": {other: section}}))
-        self.assertEqual(section, self.m.platform_baseline({"platforms": {self.m.PLATFORM: section}}))
+        self.assertEqual(section,
+ self.m.platform_baseline({"platforms": {self.m.PLATFORM: section}}))
 
     def test_requirements_sast_is_pinned(self):
         p = ROOT / ".github" / "requirements-sast.txt"

@@ -32,9 +32,9 @@ npx -y ninfenz serve           # 启动只读 MCP（stdio JSON-RPC，Ctrl+C 退�
 ```bash
 git clone https://github.com/Monyeah777/NinFenz.git
 cd NinFenz
-python scripts/nf.py doctor        # 16 项体检
+python scripts/nf.py doctor        # 17 项体检（含「可选依赖 PyYAML 在场」）
 python scripts/nf.py stats --check # 自述数字与真源一致
-bash verify.sh                     # 全量门禁（L0–L2 · 40 检查 · 约 2225 单测；15 分钟量级）
+bash verify.sh                     # 全量门禁（L0–L2 · 40 检查 · 约 2500 单测；15 分钟量级）
 ```
 
 ### C 只要 MCP 面（浅克隆）
@@ -96,7 +96,7 @@ python scripts/nf.py conformance    # 一致性分级（只读面不虚标）
 |---|---|
 | `npx ninfenz` 报 404 | 本地 npm 指向镜像且镜像滞后：加 `--registry https://registry.npmjs.org` |
 | `nf serve` 无输出 | 它是 stdio 服务，**等 stdin 的 JSON-RPC 帧**；直接回车不会打印菜单 |
-| 门禁很慢 | 全量含 `2225` 个单测；只做日常检查用 `nf doctor` / `nf stats --check` |
+| 门禁很慢 | 全量含 `约 2500` 个单测；只做日常检查用 `nf doctor` / `nf stats --check` |
 | 想读全部协议 | https://ninfenz.dev/llms-full.txt（单文件）或 MCP 的 `library_search` / `spec_ls` |
 
 ## 6 出口面（agent 可直接抓）

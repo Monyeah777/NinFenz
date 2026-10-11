@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """量化金融域包（community 第 7 包 / 第 3 个非叙事域）单测 —— 包体一致性 + 概念图 + 负例。
 
 覆盖：协议声明 ↔ 模块 ↔ 资产 ↔ registry 投影 四面一致；README 双源（check14 ⑥ 口径）；
@@ -28,8 +27,10 @@ assert _spec is not None and _spec.loader is not None
 adc = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(adc)
 
-OFFICIAL13 = {"M00", "通用:M10", "M08", "M23", "事件:M22", "M06", "M12", "M13",
-              "M20", "M24", "M50", "M80", "M90"}
+#: 官方核心件取自**单一实现**（审计 Z1 F6：此前本测试又抄一份 13 件清单）。
+from core.official_core import CORE_MODULES as _CORE_MODULES  # noqa: E402
+
+OFFICIAL13 = set(_CORE_MODULES)
 
 
 def _mc(text: str) -> dict:

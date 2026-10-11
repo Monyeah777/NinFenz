@@ -17,7 +17,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import doc_family
+from core import doc_family, json_doc
 
 GLOB = "decisions/ADR-*.md"
 INDEX_REL = "decisions/INDEX.md"
@@ -44,8 +44,7 @@ def _receipt_ids(root: str) -> set:
     p = Path(root) / RECEIPTS_REL
     if not p.is_file():
         return set()
-    import json
-    doc = json.loads(p.read_text(encoding="utf-8"))
+    doc = json_doc.load(p, dict, what=RECEIPTS_REL)
     return {str(e.get("id")) for e in (doc.get("entries") or [])}
 
 
@@ -191,7 +190,8 @@ def render_index(root: str = ".") -> str:
         out.append("| %s | %s | %s | %s | %s |" % (
             fm.get("id", e["file"]), fm.get("title", ""), fm.get("status", ""),
             fm.get("date", ""), fm.get("superseded_by") or "—"))
-    out += ["", "> 真源 = `decisions/ADR-*.md` 的 frontmatter；本表为投影（`nf decisions reindex` 重建）。",
+    out += ["", "> 真源 = `decisions/ADR-*.md` 的 frontmatter；本表为投影（`nf decisions reindex` "
+        "重建）。",
             "", END]
     return "\n".join(out)
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NinFenz 终端 TUI（nf-tui）——端壳退役后的全屏人机入口。
 
 定位
@@ -511,7 +510,11 @@ class Result:
 class Runner:
     """把 argv 交给系统执行——**没有 shell 这一层**。"""
 
-    def __init__(self, root: Path, python: str | None, timeout: float = 120.0, max_lines: int = 400):
+    def __init__(self,
+ root: Path,
+ python: str | None,
+ timeout: float = 120.0,
+ max_lines: int = 400):
         self.root = root
         self.prefix = cli_prefix(root, python)
         self.timeout = timeout
@@ -1050,7 +1053,10 @@ def _pane_output(ui: Ui, lay: dict) -> list:
     if ui.follow:
         ui.otop = _max_otop(ui, lay)
     ui.otop = min(max(0, ui.otop), _max_otop(ui, lay))
-    span = "%d-%d/%d" % (ui.otop + 1, min(total, ui.otop + lay["output_items"]), total) if total else "空"
+    span = "%d-%d/%d" % (ui.otop + 1,
+ min(total,
+ ui.otop + lay["output_items"]),
+ total) if total else "空"
     mark = "已跟随" if ui.follow else "已暂停(End 回末尾)"
     title = _pane_title("输出 · %s · %s" % (span, mark), ui.focus == FOCUS_OUTPUT)
     body = [(line, "normal") for line in ui.out[ui.otop:ui.otop + lay["output_items"]]]
@@ -1090,7 +1096,8 @@ def _help_rows(_inner: int, body: int) -> list:
             break
         rows.append((" %-26s %s" % (key, desc), "normal"))
     rows.append(("", "normal"))
-    rows.append((" 安全底线：无 shell 执行 · 路径包含性判据 · 写盘需键入 yes · 密钥只读环境变量且遮蔽", "dim"))
+    rows.append((" 安全底线：无 shell 执行 · 路径包含性判据 · 写盘需键入 yes · 密钥只读环境变量且遮"
+        "蔽", "dim"))
     return rows + [("", "normal")] * (body - len(rows))
 
 
@@ -1109,7 +1116,11 @@ def render_lines(ui: Ui, width=100, height=30) -> list:
         left += " · 过滤「%s」" % scope
     right = "焦点 %s · %s" % (FOCUS_LABELS[ui.focus], ui.notice)
     gap = max(1, w - 2 - display_width(left) - display_width(right))
-    rows.append(("│%s%s%s│" % (left, " " * gap, clip(right, max(0, w - 2 - display_width(left) - 1))),
+    rows.append(("│%s%s%s│" % (left,
+ " " * gap,
+ clip(right,
+ max(0,
+ w - 2 - display_width(left) - 1))),
                  "title" if ui.notice_kind != "err" else "err"))
     rows.append(("├" + "─" * split + "┬" + "─" * (w - split - 3) + "┤", "frame"))
 
@@ -1527,7 +1538,8 @@ def selftest(root: Path | None = None, python: str | None = None) -> tuple:
         assert set(_surface.BLOCKED) <= set(LONG_RUNNING), "长驻集比真源窄（拒跑口径退化）"
         for verb in LONG_RUNNING:
             assert classify([verb]) == "long", "长驻面未拒跑：%s" % verb
-        return ("闸门三表 %d 旗标 / %d 动词 / %d 配对逐条成立；长驻 %d 条（真源 %d + 本视图收紧 %d）"
+        return ("闸门三表 %d 旗标 / %d 动词 / %d 配对逐条成立；长驻 %d 条（真源 %d + 本视图收紧 %d"
+            "）"
                 % (len(WRITE_FLAGS), len(WRITE_VERBS), len(WRITE_PAIRS), len(LONG_RUNNING),
                    len(_surface.BLOCKED), len(TUI_EXTRA_LONG_RUNNING)))
 

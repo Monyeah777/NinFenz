@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """门禁可见性回归测试 —— 「门禁本身有没有门禁」里**看得见**的那一半。
 
 背景（实证）：2026-09-26～27 云端 `ci-verify` 连红 21 次（#155–#175，此前最后一次成功 #154），
@@ -45,15 +44,22 @@ class GateVisibilityTest(unittest.TestCase):
         names = {wf for rel in ENTRIES for wf in _BADGE.findall(_read(ROOT / rel))}
         self.assertTrue(names, "两份入口都没有 CI 徽章")
         for wf in names:
-            self.assertRegex(_read(WORKFLOWS / wf), r"(?m)^\s*-?\s*run:\s*bash verify\.sh\s*$",
+            # Z5（2026-10-10）：全量调用可带 `2>&1 | tee <log>` 落盘（失败诊断物），
+            # 但**不得**传任何子集参数——子集 = 假绿。
+            self.assertRegex(_read(WORKFLOWS / wf),
+                             r"(?m)^\s*bash verify\.sh(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
                              "%s 不是跑全量 verify.sh 的那条 workflow" % wf)
 
     def test_gate_workflow_runs_full_verify_not_a_subset(self):
-        """唯一入口纪律：CI 里只许裸跑全量，传子集参数即等于假绿。"""
-        runs = [r.strip() for r in _RUN.findall(_read(WORKFLOWS / "ci-verify.yml"))]
-        verify_runs = [r for r in runs if "verify.sh" in r]
-        self.assertEqual(["bash verify.sh"], verify_runs,
-                         "CI 里的 verify.sh 调用必须恰好是 `bash verify.sh`")
+        """唯一入口纪律：CI 里只许裸跑全量（可加 tee 落盘），传子集参数即等于假绿。"""
+        text = _read(WORKFLOWS / "ci-verify.yml")
+        invocations = [ln.strip() for ln in text.splitlines()
+                       if re.match(r"^\s*bash verify\.sh\b", ln)]
+        self.assertEqual(1, len(invocations),
+                         "ci-verify 必须恰好调用一次 verify.sh：%s" % invocations)
+        line = invocations[0]
+        self.assertRegex(line, r"^bash verify\.sh(\s+2>&1\s*\|\s*tee\s+\S+)?$",
+                         "verify.sh 必须裸跑全量（可带 tee 落盘），不得传子集参数：%s" % line)
 
     def test_gate_workflow_triggers_on_push_to_main(self):
         """推 main 即跑：徽章盯的是推送后的真实结论，不是手动才跑的空壳。"""

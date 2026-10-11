@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """条件先行排布（state_front）单测：幂等 / 排布判据 / A-B 差异仅在位置。"""
 import sys
 import unittest

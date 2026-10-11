@@ -62,7 +62,8 @@ def load_graph(asset_path: str | Path = DEFAULT_ASSET) -> Dict[str, Any]:
     """读资产 → `concept_graph` 字典（缺件 / 缺块 / 解析失败一律抛 ClosureError）。"""
     path = Path(asset_path)
     if not path.is_file():
-        raise ClosureError("概念图资产不存在：%s（修复指引：给出域包内 assets/CONCEPT_GRAPH.md 路径）"
+        raise ClosureError("概念图资产不存在：%s（修复指引：给出域包内 assets/CONCEPT_GRAPH.md 路径"
+            "）"
                            % path)
     body = fenced_block(csc.read_text_cached(path))
     if not body:

@@ -19,6 +19,8 @@ import json
 import os
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 RECEIPTS_REL = "protocol/RECEIPTS.json"
 GENERATED_REL = "protocol/generated/receipt_chain.json"
 SCHEMA = "nf-transparency/1"
@@ -44,8 +46,7 @@ def build(root: str = ".") -> Dict[str, Any]:
     path = os.path.join(root, RECEIPTS_REL)
     rec: Dict[str, Any] = {}
     if os.path.isfile(path):
-        with open(path, encoding="utf-8") as fh:
-            rec = json.load(fh)
+        rec = json_doc.load(path, dict, what=RECEIPTS_REL)
     prev = "0" * 64
     links: List[Dict[str, Any]] = []
     for i, e in enumerate(rec.get("entries") or [], 1):
@@ -81,8 +82,7 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                 % RECEIPTS_REL], {}
     doc = build(root)
     rec: Dict[str, Any] = {}
-    with open(os.path.join(root, RECEIPTS_REL), encoding="utf-8") as fh:
-        rec = json.load(fh)
+    rec = json_doc.load(os.path.join(root, RECEIPTS_REL), dict, what=RECEIPTS_REL)
     entries = rec.get("entries") or []
     if doc["count"] != len(entries):
         issues.append("链节数 %d ≠ 回执条目数 %d（修复指引：链须逐条对应回执）"

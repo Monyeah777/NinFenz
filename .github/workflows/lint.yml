@@ -4,6 +4,8 @@ name: lint
 on:
   push:
     branches: [main]
+  # D2 同源（2026-10-10 审计）：风格门也要管未合并 PR。
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -23,3 +25,29 @@ jobs:
         run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82）
         run: ruff check desktop/src scripts
+
+  style-ratchet:
+    name: ruff-style-ratchet
+    runs-on: ubuntu-latest
+    timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - name: 安装 ruff
+        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+      - name: 风格棘轮（Z2：规则集 E,W,F,B,UP,I,C4,SIM,RET，只拦新增；存量按基线冻结）
+        run: python scripts/style_check.py
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: lint-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

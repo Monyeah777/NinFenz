@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """FDE 打样 · 可跑样例（check38 子扫描 4）。
 
 定位：证明「NF 是 FDE 的 AI infra 中游标准」不是宣言——样例把一次 FDE 交付跑成证据：
@@ -31,6 +30,9 @@ import sys
 from typing import Any, Dict, List, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
+
 PACK = "community/AI系统域包"
 EV = "docs/fde-sample/evidence"
 
@@ -42,7 +44,7 @@ def _sha(path: str) -> str:
 
 def _read_json(path: str) -> Any:
     with open(path, encoding="utf-8") as fh:
-        return json.load(fh)
+        return json_doc.loads(fh.read(), dict, what=path)
 
 
 def _gates(root: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
@@ -70,7 +72,9 @@ def _gates(root: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
                 unparsable.append("%s (%s)" % (e.get("path"), ex))
     g1 = not missing and not unparsable
     rows.append({"gate": "G1_outputs_declared", "verdict": "PASS" if g1 else "FAIL",
-                 "detail": "声明面 %d · 缺失 %d · 不可解析 %d" % (len(declared), len(missing), len(unparsable))})
+                 "detail": "声明面 %d · 缺失 %d · 不可解析 %d" % (len(declared),
+ len(missing),
+ len(unparsable))})
     if not g1:
         issues.append("G1：产出面缺失=%s 不可解析=%s" % (missing, unparsable))
     facts["declared_outputs"] = len(declared)
@@ -125,19 +129,23 @@ def _gates(root: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
         issues.append("G4：缺 %s" % lack)
 
     # G5 中游层成立（出口自动化就位）
-    from core import repo_stats as rs
     import importlib.util
 
+    from core import repo_stats as rs
+
     s_issues, s_stats = rs.check(root)
-    spec = importlib.util.spec_from_file_location("geo_export", os.path.join(root, "scripts/geo_export.py"))
+    spec = importlib.util.spec_from_file_location("geo_export", os.path.join(root, "scripts/geo_exp"
+        "ort.py"))
     if spec is None:
-        raise RuntimeError("无法构造 geo_export 加载规格（修复指引：确认 scripts/geo_export.py 在场）")
+        raise RuntimeError("无法构造 geo_export 加载规格（修复指引：确认 scripts/geo_export.py 在场"
+            "）")
     geo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(geo)  # type: ignore[union-attr]
     g_issues, g_stats = geo.check(root)
     g5 = not s_issues and not g_issues
     rows.append({"gate": "G5_midstream_exports", "verdict": "PASS" if g5 else "FAIL",
-                 "detail": "stats.check 问题 %d · geo.check 问题 %d" % (len(s_issues), len(g_issues))})
+                 "detail": "stats.check 问题 %d · geo.check 问题 %d" % (len(s_issues),
+ len(g_issues))})
     if not g5:
         issues.append("G5：%s %s" % (s_issues[:2], g_issues[:2]))
     facts["standards"] = g_stats.get("standards", 0)
@@ -154,7 +162,8 @@ def _deliverable(root: str, facts: Dict[str, Any]) -> str:
         "# FDE 交付样例 · AI 系统域包 → 技术文档交付物",
         "",
         "> 本文件由 `python scripts/fde_sample_run.py --run` 生成（生成物，禁止手改）。",
-        "> 交付形态：技术文档（techdoc）。中游位置：NF 契约层夹在「模型/传输协议」与「客户交付物」之间。",
+        "> 交付形态：技术文档（techdoc）。中游位置：NF 契约层夹在「模型/传输协议」与「客户交付物」"
+            "之间。",
         "",
         "## 1. 交付对象（系统卡摘要）",
         "",
@@ -169,7 +178,9 @@ def _deliverable(root: str, facts: Dict[str, Any]) -> str:
         "## 2. 概念闭包（装配前提）",
         "",
         "- 目标：`%s` · 闭包大小 %s · 装载序长度 %s"
-        % (closure.get("target"), len(closure.get("closure") or []), len(closure.get("load_order") or [])),
+        % (closure.get("target"),
+ len(closure.get("closure") or []),
+ len(closure.get("load_order") or [])),
         "- 概念节点 %s · 拓扑序 %s · 证据强度 `%s`"
         % (facts.get("concept_nodes"), facts.get("topo_len"), facts.get("provenance_strength")),
         "",
@@ -179,7 +190,10 @@ def _deliverable(root: str, facts: Dict[str, Any]) -> str:
         "|---|---|---|---|",
     ]
     for e in idx.get("outputs") or []:
-        lines.append("| `%s` | %s | %s | %s |" % (e.get("path"), e.get("form"), e.get("tier"), e.get("role")))
+        lines.append("| `%s` | %s | %s | %s |" % (e.get("path"),
+ e.get("form"),
+ e.get("tier"),
+ e.get("role")))
     lines += [
         "",
         "## 4. 装配步骤（FDE 侧照做）",
@@ -198,9 +212,11 @@ def _deliverable(root: str, facts: Dict[str, Any]) -> str:
         "| G2 | T2 schema ↔ T3 data 逐对合规 | `evidence/gates.txt` |",
         "| G3 | 概念图健康（无环/无悬空/别名唯一/分支完备） | `evidence/gates.txt` |",
         "| G4 | 装配链四件在场可指认 | `evidence/gates.txt` |",
-        "| G5 | 中游出口成立（`nf stats --check` + `geo_export --check`） | `evidence/result.jsonl` |",
+        "| G5 | 中游出口成立（`nf stats --check` + `geo_export --check`） | `evidence/result.jsonl`"
+            " |",
         "",
-        "> 复算：`python scripts/fde_sample_run.py --check`（逐字节比对本目录证据与当前仓库状态）。",
+        "> 复算：`python scripts/fde_sample_run.py --check`（逐字节比对本目录证据与当前仓库状态）。"
+            "",
         "",
     ]
     return "\n".join(lines)
@@ -215,17 +231,24 @@ def _build(root: str) -> Dict[str, str]:
         + ["  [%s] %s · %s" % (r["verdict"], r["gate"], r["detail"]) for r in rows]) + "\n"
     outs["%s/result.jsonl" % EV] = "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n"
     inputs = {}
-    for rel in [os.path.join(PACK, "outputs/INDEX.json"), os.path.join(PACK, "outputs/SYSTEM_CARD.json"),
+    for rel in [os.path.join(PACK,
+ "outputs/INDEX.json"),
+ os.path.join(PACK,
+ "outputs/SYSTEM_CARD.json"),
                 os.path.join(PACK, "outputs/CONCEPT_CLOSURE.json"),
                 os.path.join(PACK, "assets/CONCEPT_GRAPH.md"), os.path.join(PACK, "protocol.yaml")]:
-        # 键一律用 POSIX 分隔符：仓库文本卫生判据禁止标识面出现反斜杠（Windows 下 os.path.join 会引入）
+        # 键一律用 POSIX 分隔符：仓库文本卫生判据禁止标识面出现反斜杠（Windows 下 os.path.join 会引
+        # 入）
         inputs[rel.replace(os.sep, "/")] = _sha(os.path.join(root, rel))
     manifest = {"schema": "nf-fde-sample/1", "pack": PACK, "facts": facts,
                 "inputs": inputs, "issues": issues,
                 "artifacts": {k: hashlib.sha256(v.encode("utf-8")).hexdigest()
                               for k, v in outs.items() if not k.endswith("manifest.json")},
                 "generated_at": ""}
-    outs["%s/manifest.json" % EV] = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    outs["%s/manifest.json" % EV] = json.dumps(manifest,
+ ensure_ascii=False,
+ indent=2,
+ sort_keys=True) + "\n"
     return outs
 
 
@@ -234,14 +257,15 @@ def run(root: str = ROOT) -> Tuple[List[str], int]:
     outs = _build(root)
     stamp = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %z")
     outs["%s/manifest.json" % EV] = outs["%s/manifest.json" % EV].replace('"generated_at": ""',
-                                                                         '"generated_at": "%s"' % stamp)
+                                                                         '"generated_at": "%s"'
+                                                                             '' % stamp)
     for rel, text in outs.items():
         path = os.path.join(root, rel)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         sys.path.insert(0, os.path.join(root, "desktop", "src"))
-        from core import atomic_write          # 交付件：原子写（2026-10-01 普查补齐）
+        from core import atomic_write  # 交付件：原子写（2026-10-01 普查补齐）
         atomic_write.write_text(path, text)
-    doc = json.loads(outs["%s/manifest.json" % EV])
+    doc = json_doc.loads(outs["%s/manifest.json" % EV], dict, what="manifest.json")
     return doc.get("issues") or [], len(outs)
 
 
@@ -256,8 +280,8 @@ def check(root: str = ROOT) -> Tuple[List[str], Dict[str, Any]]:
         if rel.endswith("manifest.json"):
             try:
                 with open(path, encoding="utf-8") as fh:
-                    on_disk = json.loads(fh.read())
-                fresh = json.loads(text)
+                    on_disk = json_doc.loads(fh.read(), dict, what=path)
+                fresh = json_doc.loads(text, dict, what="fde manifest 文本")
                 on_disk.pop("generated_at", None)
                 fresh.pop("generated_at", None)
                 if on_disk != fresh:

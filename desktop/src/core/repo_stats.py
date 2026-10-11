@@ -31,7 +31,7 @@ import sys
 from typing import Any, Dict, List, Tuple
 
 from core import category_registry as cr
-from core import atomic_write
+from core import atomic_write, json_doc
 
 STATS_REL = "protocol/repo_stats.json"
 BEGIN = "<!-- nf:stats:begin -->"
@@ -41,8 +41,7 @@ BLOCK_FILES = ("README.md", "README.en.md", "README.ja.md", "llms.txt")
 
 def _read_json(path: str) -> Any:
     try:
-        with open(path, encoding="utf-8") as fh:
-            return json.load(fh)
+        return json_doc.load(path, None, what=path)
     except Exception:  # noqa: BLE001
         return None
 
@@ -62,7 +61,8 @@ def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     stats["core_pipelines"] = pipes
 
     if not cr.globs(root, "level:declaration"):
-        issues.append("品类注册表缺 level:declaration（修复指引：protocol/LAYERS.json 的 asset_levels "
+        issues.append("品类注册表缺 level:declaration（修复指引：protocol/LAYERS.json 的 asset_leve"
+            "ls "
                       "须含 declaration；否则包目录口径会静默归零）")
     pack_dirs = sorted(p.split("/")[1] for p in cr.files(root, "level:declaration"))
     stats["pack_dirs"] = len(pack_dirs)
@@ -121,7 +121,8 @@ def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
         stats["baseline_pass"] = 0
         issues.append("取不到 quality_baseline.EXPECTED_*：%s（基线句无法生成）" % exc)
     if stats["baseline_checks"] != stats["verify_checks"]:
-        issues.append("基线 check 数 %d ≠ verify.sh 实扫 %d（同步 quality_baseline.EXPECTED_CHECKS）"
+        issues.append("基线 check 数 %d ≠ verify.sh 实扫 %d（同步 quality_baseline.EXPECTED_CHECKS"
+            "）"
                       % (stats["baseline_checks"], stats["verify_checks"]))
 
     stats["schema"] = "nf-repo-stats/1"
@@ -136,17 +137,23 @@ def _zh(stats: Dict[str, Any]) -> str:
         BEGIN,
         "**官方核心**：%d 模块 · %d 管线（%s） · 核心协议件 01–07"
         % (stats["core_modules"], len(stats.get("core_pipelines") or []), pipes),
-        "**社区规模**：%d 登记包 · %d 资产档 · %d 概念图 · %d 域包/%d 细分 · 标准目录 %d 条（可达 %d / 不可达 %d · 机构 %d · %d 条依赖边） · 标准绑定 %d 条"
+        "**社区规模**：%d 登记包 · %d 资产档 · %d 概念图 · %d 域包/%d 细分 · 标准目录 %d 条（可达 %"
+            "d / 不可达 %d · 机构 %d · %d 条依赖边） · 标准绑定 %d 条"
         % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**质量凭证**：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`） · 馆藏 %d 件"
-        % (stats["verify_version"], stats["baseline_checks"], stats["baseline_pass"], stats["library_items"]),
+        "**质量凭证**：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望基线取自 `qua"
+            "lity_baseline.EXPECTED_*`） · 馆藏 %d 件"
+        % (stats["verify_version"],
+ stats["baseline_checks"],
+ stats["baseline_pass"],
+ stats["library_items"]),
         "",
         "分层：%s （按标准目录 layer）" % layer_txt,
         "",
-        "> 本区由 `python scripts/nf.py stats --write` 生成，禁止手改；口径与实算真源见 `protocol/repo_stats.json`。",
+        "> 本区由 `python scripts/nf.py stats --write` 生成，禁止手改；口径与实算真源见 `protocol/r"
+            "epo_stats.json`。",
         END,
     ])
 
@@ -157,15 +164,22 @@ def _en(stats: Dict[str, Any]) -> str:
         "**Official core**: %d modules · %d pipelines (%s) · protocol files 01-07"
         % (stats["core_modules"], len(stats.get("core_pipelines") or []),
            " / ".join(stats.get("core_pipelines") or []) or "—"),
-        "**Community scale**: %d registered packs · %d asset files · %d concept graphs · %d domain packs / %d subdivisions · standards catalog %d (reachable %d / unreachable %d · %d bodies · %d dependency edges) · standard bindings %d"
+        "**Community scale**: %d registered packs · %d asset files · %d concept graphs · %d domain "
+            "packs / %d subdivisions · standards catalog %d (reachable %d / unreachable %d · %d bod"
+            "ies · %d dependency edges) · standard bindings %d"
         % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**Quality evidence**: verify v%s · check1-%d · PASS=%d (`bash verify.sh`; expectations from `quality_baseline.EXPECTED_*`) · library %d items"
-        % (stats["verify_version"], stats["baseline_checks"], stats["baseline_pass"], stats["library_items"]),
+        "**Quality evidence**: verify v%s · check1-%d · PASS=%d (`bash verify.sh`; expectations fro"
+            "m `quality_baseline.EXPECTED_*`) · library %d items"
+        % (stats["verify_version"],
+ stats["baseline_checks"],
+ stats["baseline_pass"],
+ stats["library_items"]),
         "",
-        "> Generated by `python scripts/nf.py stats --write`. Do not edit by hand; sources in `protocol/repo_stats.json`.",
+        "> Generated by `python scripts/nf.py stats --write`. Do not edit by hand; sources in `prot"
+            "ocol/repo_stats.json`.",
         END,
     ])
 
@@ -178,17 +192,24 @@ def _ja(stats: Dict[str, Any]) -> str:
         BEGIN,
         "**公式コア**：%d モジュール · %d パイプライン（%s） · コアプロトコル 01–07"
         % (stats["core_modules"], len(stats.get("core_pipelines") or []), pipes),
-        "**コミュニティ規模**：%d 登録パッケージ · %d 資産ファイル · %d 概念グラフ · %d ドメインパック／%d 細分類 · 標準カタログ %d 件（到達可能 %d ／ 不可達 %d · 機関 %d · %d 依存辺） · 標準バインディング %d 件"
+        "**コミュニティ規模**：%d 登録パッケージ · %d 資産ファイル · %d 概念グラフ · %d ドメインパ"
+            "ック／%d 細分類 · 標準カタログ %d 件（到達可能 %d ／ 不可達 %d · 機関 %d · %d 依存辺）"
+            " · 標準バインディング %d 件"
         % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],
            stats["domain_packs"], stats["subdivisions_total"],
            stats["standards_total"], stats["standards_reachable"], stats["standards_unreachable"],
            stats["standards_bodies"], stats["standards_edges"], stats["standard_bindings"]),
-        "**品質証憑**：verify v%s · check1-%d · PASS=%d（bash verify.sh の単一入口。期待基準は quality_baseline.EXPECTED_*） · 所蔵 %d 件"
-        % (stats["verify_version"], stats["baseline_checks"], stats["baseline_pass"], stats["library_items"]),
+        "**品質証憑**：verify v%s · check1-%d · PASS=%d（bash verify.sh の単一入口。期待基準は qual"
+            "ity_baseline.EXPECTED_*） · 所蔵 %d 件"
+        % (stats["verify_version"],
+ stats["baseline_checks"],
+ stats["baseline_pass"],
+ stats["library_items"]),
         "",
         "分层：%s （標準カタログ layer 別）" % layer_txt,
         "",
-        "> 本区は python scripts/nf.py stats --write が生成します（手改禁止）。口径と実算真源は protocol/repo_stats.json。",
+        "> 本区は python scripts/nf.py stats --write が生成します（手改禁止）。口径と実算真源は pro"
+            "tocol/repo_stats.json。",
         END,
     ])
 
@@ -196,13 +217,16 @@ def _ja(stats: Dict[str, Any]) -> str:
 def _llms(stats: Dict[str, Any]) -> str:
     return "\n".join([
         BEGIN,
-        "- 质量凭证（可静态实算）：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`，本行由生成器写入）。"
+        "- 质量凭证（可静态实算）：verify v%s · check1-%d · PASS=%d（`bash verify.sh` 单入口；期望"
+            "基线取自 `quality_baseline.EXPECTED_*`，本行由生成器写入）。"
         % (stats["verify_version"], stats["baseline_checks"], stats["baseline_pass"]),
-        "- 规模（实算真源 `protocol/repo_stats.json`）：%d 登记包 · %d 资产档 · %d 概念图 · 标准目录 %d 条（可达 %d） · 标准绑定 %d 条 · 馆藏 %d 件。"
+        "- 规模（实算真源 `protocol/repo_stats.json`）：%d 登记包 · %d 资产档 · %d 概念图 · 标准目"
+            "录 %d 条（可达 %d） · 标准绑定 %d 条 · 馆藏 %d 件。"
         % (stats["registered_packs"], stats["pack_assets"], stats["concept_graphs"],
            stats["standards_total"], stats["standards_reachable"], stats["standard_bindings"],
            stats["library_items"]),
-        "- 标准目录 GEO 出口（可引用）：`docs/standards/index.md` · 机读 `protocol/geo_export.json`。",
+        "- 标准目录 GEO 出口（可引用）：`docs/standards/index.md` · 机读 `protocol/geo_export.json`"
+            "。",
         END,
     ])
 

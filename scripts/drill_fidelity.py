@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """演练保真度（CLI）：把两套 drill 的结果量化成数字并判达标。
 
 用法：

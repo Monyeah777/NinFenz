@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """产出形态面单测：形态清单自洽 / 判件 / JSON Schema 子集语义 / 双源 / T4 复算 / 基线回退。
 
 负例取自真实缺陷类（本波实际踩到的三类）：
@@ -106,8 +105,10 @@ class PackKeyReadCoverageTest(unittest.TestCase):
                 of._verify_pack(ROOT, pkg)
                 leak = sorted(r for r in reads
                               if r and not r.startswith("..")
-                              # 读**不存在**的件（探在不在）不算输入：失败读取不贡献结论，而「件后来出现」
-                              # 会让枚举面变 ⇒ 键自然跟着变（枚举在面里，见 `content_fingerprint`）。
+                              # 读**不存在**的件（探在不在）不算输入：失败读取不贡献结论，而「件后来
+                              # 出现」
+                              # 会让枚举面变 ⇒ 键自然跟着变（枚举在面里，见 `content_fingerprint`）
+                              # 。
                               and os.path.isfile(os.path.join(ROOT, *r.split("/")))
                               and r not in slice_files and r not in shared
                               and not r.startswith(self.CODE_PREFIX)

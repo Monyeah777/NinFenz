@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 #1 · 载荷类型收窄工具单测（证据型机械规则）。"""
 import os
 import sys

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CLI 错误框定判据：失败必须是**干净错误 + 修复指引**（错误即微型文档）。
 
 扫法（2026-09-30 全命令面系统扫，65 命令 × 2 种畸形输入）：把每条命令喂「多余位置参数 /
@@ -21,6 +20,16 @@ ROOT = Path(__file__).resolve().parents[2]
 NF = str(ROOT / "scripts" / "nf.py")
 
 GUIDE = re.compile(r"修复指引|示例|详见|参见|可枚举|看全量")
+
+#: CLI 兜底错误帧（nf.py 打印 "  ✗ 内部错误：…（重跑 NF_DEBUG=1 …）"）。
+#: **不能**用裸子串「内部错误」判险——变更日志/文档正文里就有「不再冒内部错误」这类句子，
+#: 会把良性输出误判成缺陷（审计 §11at N-07 已把这条记为假红）。
+INTERNAL_ERROR_FRAME = "✗ 内部错误"
+
+
+def has_internal_error(text: str) -> bool:
+    """是否出现**兜底错误帧**或 Python 栈（只认形态，不认词）。"""
+    return INTERNAL_ERROR_FRAME in text or "Traceback (most recent call last)" in text
 
 #: (标签, argv 尾巴)——都在仓库内稳定可跑、且不落盘
 CASES = (
@@ -803,12 +812,13 @@ class BareInvocationSweepTest(unittest.TestCase):
                 bad.append("%s：无参直跑超时（挂起？如属长任务请登记 LONG_BY_DESIGN）" % path)
                 continue
             blob = (r.stderr or "") + (r.stdout or "")
-            if "内部错误" in blob or "Traceback" in blob:
+            if has_internal_error(blob):
                 bad.append("%s：rc=%d %s" % (path, r.returncode,
                                              (r.stderr or "").strip().splitlines()[:1]))
         self.assertGreaterEqual(checked, 140, "扫到的命令路径不足（判据可能已失效）")
         self.assertEqual([], bad, "无参直跑冒内部错误/栈（修复指引：给该子命令组加 "
-                                 "`add_subparsers(required=True)`，或在 handler 里给用法指引）：%s" % bad)
+                                 "`add_subparsers(required=True)`，或在 handler 里给用法指引）：%s"
+                                     "" % bad)
 
     def test_bare_json_invocation_stays_machine_readable(self):
         """同一普查的**机器面**版本：声明了 `--json` 的面无参 + `--json` 直跑。
@@ -837,7 +847,7 @@ class BareInvocationSweepTest(unittest.TestCase):
                 bad.append("%s --json：超时" % path)
                 continue
             blob = (r.stderr or "") + (r.stdout or "")
-            if "内部错误" in blob or "Traceback" in blob:
+            if has_internal_error(blob):
                 bad.append("%s --json：rc=%d %s" % (path, r.returncode,
                                                     (r.stderr or "").strip().splitlines()[:1]))
                 continue
@@ -957,6 +967,21 @@ class NonUtf8InputTest(unittest.TestCase):
                                encoding="utf-8", errors="replace", timeout=300)
             self.assertEqual(0, r.returncode, (r.stderr or "")[:300])
             self.assertTrue(out.exists(), "二进制密钥应当照常可用（闸门只拦文本类输入）")
+
+
+class InternalErrorDetectorTest(unittest.TestCase):
+    """判据自检（审计 §11at N-07）：检测器认**帧**，不认散文里的词。"""
+
+    def test_prose_mentioning_the_phrase_is_not_a_defect(self):
+        self.assertFalse(has_internal_error("…（无守护时不再冒内部错误）\n"))
+        self.assertFalse(has_internal_error("见 CHANGELOG：修掉三处内部错误框架\n"))
+
+    def test_real_frame_is_caught(self):
+        self.assertTrue(has_internal_error("  ✗ 内部错误：'Namespace' object has no attribute 'x'\n"))
+
+    def test_python_traceback_is_caught_but_bare_word_is_not(self):
+        self.assertTrue(has_internal_error("Traceback (most recent call last):\n  File ..."))
+        self.assertFalse(has_internal_error("文档里出现 Traceback 一词\n"))
 
 
 if __name__ == "__main__":

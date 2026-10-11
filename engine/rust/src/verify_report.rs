@@ -36,13 +36,14 @@ impl Spec {
 }
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
-pub const SPECS: [Spec; 28] = [
+pub const SPECS: [Spec; 30] = [
     Spec { id: "purity", name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）", module: "purity_scan", entry: "scan" },
     Spec { id: "schema", name: "协议层 IDL schema 门禁", module: "schema_lint", entry: "scan" },
     Spec { id: "conformance", name: "社区领域包 conformance 分级", module: "conformance_scan", entry: "scan" },
     Spec { id: "contract", name: "机读契约面（官方核心 13 件 id/标题一致）", module: "machine_contract", entry: "scan" },
     Spec { id: "knowledge", name: "双源知识层（权威分层/顺序/时效/巡检）", module: "knowledge", entry: "scan" },
     Spec { id: "rating", name: "馆藏内容分级声明", module: "rating_gate", entry: "scan" },
+    Spec { id: "rating_decided", name: "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）", module: "rating_gate", entry: "decided" },
     Spec { id: "license", name: "许可证门", module: "license_gate", entry: "scan" },
     Spec { id: "intake", name: "投稿闸门三方一致", module: "intake", entry: "scan" },
     Spec { id: "payload", name: "事件载荷注册表", module: "payload_registry", entry: "scan" },
@@ -57,6 +58,7 @@ pub const SPECS: [Spec; 28] = [
     Spec { id: "audit", name: "审计件被审对象 digest", module: "audit", entry: "scan" },
     Spec { id: "self_stats", name: "自述数字 == 实算（README/llms 生成区）", module: "repo_stats", entry: "check_strict" },
     Spec { id: "code_metrics", name: "代码规模/复杂度上限（棘轮冻结）", module: "code_metrics", entry: "scan" },
+    Spec { id: "redos", name: "正则失控回溯（形态 + 增长律；Y3 接线）", module: "redos_scan", entry: "scan" },
     Spec { id: "key_naming", name: "资产键命名规范（形态 + 声明词表）", module: "key_naming", entry: "scan" },
     Spec { id: "instruction_evidence", name: "规范入口指令实测记录（新鲜 + 退出码 0）", module: "instruction_evidence", entry: "scan" },
     Spec { id: "coupling", name: "模块级耦合（Martin 包度量 / SDP / 环 · 只许收敛）", module: "coupling_metrics", entry: "scan" },
@@ -385,11 +387,16 @@ fn call(spec: &Spec, root: &Path, supplied: &HashMap<String, Supplied>) -> Calle
     }
 }
 
-/// 真源 `_declared`：声明面（真源 = `quality_baseline`）。
+/// 真源 `_declared` + `build` 对声明面的两口补充（判据条数 + 「判据级抽查面 ≠ check 全量」）。
 fn declared(root: &Path) -> Json {
     let (ec, ep) = baseline::constants(root);
     let (_, stats) = baseline::scan(root);
     let vv = stats.map(|s| s.verify_version);
+    let note = format!(
+        "判据级抽查面 {} 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 {}（两者不可互替）",
+        SPECS.len(),
+        ec.map(|n| n.to_string()).unwrap_or_else(|| "None".to_string())
+    );
     Json::Object(vec![
         (
             "expected_checks".to_string(),
@@ -403,6 +410,8 @@ fn declared(root: &Path) -> Json {
             "verify_version".to_string(),
             vv.map(Json::Str).unwrap_or(Json::Null),
         ),
+        ("report_items".to_string(), Json::Int(SPECS.len() as i64)),
+        ("coverage_note".to_string(), Json::Str(note)),
     ])
 }
 
@@ -510,7 +519,7 @@ pub fn summary_line(report: &Json) -> String {
         }
     };
     format!(
-        "判据 {} 条：PASS {} · FAIL {} · WARN {} · ERROR {}；声明 check1-{} / PASS={} · verify {}",
+        "判据 {} 条：PASS {} · FAIL {} · WARN {} · ERROR {}；声明 check1-{} / PASS={} · verify {}（判据级抽查面，非 check 全量）",
         crate::pyval::arr_items(get(report, "items")).len(),
         g(s, "pass"),
         g(s, "fail"),
@@ -528,10 +537,13 @@ mod tests {
 
     #[test]
     fn spec_table_matches_the_truth_source_shape() {
-        assert_eq!(SPECS.len(), 28);
+        assert_eq!(SPECS.len(), 30);
         assert_eq!(SPECS[0].id, "purity");
         assert_eq!(SPECS[1].source(), "schema_lint.scan");
-        assert_eq!(SPECS[27].id, "asset_contract");
+        assert_eq!(SPECS[5].id, "rating");
+        assert_eq!(SPECS[6].id, "rating_decided");
+        assert_eq!(SPECS[6].source(), "rating_gate.decided");
+        assert_eq!(SPECS[29].id, "asset_contract");
     }
 
     #[test]

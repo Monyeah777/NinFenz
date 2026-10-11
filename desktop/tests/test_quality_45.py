@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 遗留常驻化：载荷注册表 / 资产密度·引用度·厚度 / 基线自描述 全部机检常驻。"""
 import os
 import sys

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """决策记录（ADR）正式与否定用例。"""
 import json
 import sys

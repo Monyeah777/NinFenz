@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """43 A4 —— 生成物同仓 golden 单测（确定性 + 双源一致 + 过期可检出）。"""
 import json
 import os
