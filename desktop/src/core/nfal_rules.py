@@ -1,0 +1,172 @@
+# -*- coding: utf-8 -*-
+"""NFA-L/R 规则层（P-A1）：JSON 事实 + 规则 → 定点推导，带 fuel 计量。
+
+设计（沿用 NFA-L/1 的 JSON 风格，不发明新文本语法）：
+  - 事实：{"pred": "edge", "args": ["a", "b"]}（**基**原子）；
+  - 规则：{"head": {...}, "body": [{...}, {"guard": ["?X", "!=", "?Y"]}]}；
+  - 变量：以 ? 开头的字符串（显式，避免与字面量混淆）；
+  - fuel：**每完成一次规则实例化（body 全部匹配成功）记 1**；超限即停并如实报
+    FUEL_EXHAUSTED（fail-closed：保留已达部分并标状态，绝不静默截断）。
+
+纪律：同输入同输出（输出全排序）；纯标准库；只读。
+"""
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+SCHEMA = "nf-nfal-rules/1"
+GUARD_OPS = ("!=", "==", "<", "<=", ">", ">=")
+#: 算子表（避免六分支链把圈复杂度顶上去）。
+_OPS = {"!=": lambda a, b: a != b, "==": lambda a, b: a == b,
+        "<": lambda a, b: a < b, "<=": lambda a, b: a <= b,
+        ">": lambda a, b: a > b, ">=": lambda a, b: a >= b}
+DEFAULT_FUEL = 100000
+
+
+def is_var(x: Any) -> bool:
+    """变量约定：以 ? 开头的字符串。"""
+    return isinstance(x, str) and x.startswith("?")
+
+
+def _atom_ok(a: Any) -> bool:
+    return (isinstance(a, dict) and isinstance(a.get("pred"), str) and bool(a["pred"])
+            and isinstance(a.get("args"), list))
+
+
+def _validate_facts(doc: Dict[str, Any], out: List[str]) -> None:
+    for i, f in enumerate(doc.get("facts") or []):
+        if not _atom_ok(f):
+            out.append("facts[%d] 形状不合法（须含 pred 与 args）" % i)
+        elif any(is_var(x) for x in f["args"]):
+            out.append("facts[%d] 含变量：事实必须是基原子" % i)
+
+
+def _validate_rules(doc: Dict[str, Any], out: List[str]) -> None:
+    for i, r in enumerate(doc.get("rules") or []):
+        if not isinstance(r, dict) or not _atom_ok(r.get("head")):
+            out.append("rules[%d] 缺 head 或形状不合法" % i)
+            continue
+        body = r.get("body")
+        if not isinstance(body, list) or not body:
+            out.append("rules[%d] body 须为非空数组" % i)
+            continue
+        for j, b in enumerate(body):
+            if isinstance(b, dict) and "guard" in b:
+                g = b["guard"]
+                if not isinstance(g, list) or len(g) != 3 or g[1] not in GUARD_OPS:
+                    out.append("rules[%d].body[%d] guard 须为 [左, 算子, 右]，算子 ∈ %s"
+                               % (i, j, list(GUARD_OPS)))
+            elif not _atom_ok(b):
+                out.append("rules[%d].body[%d] 既非原子也非 guard" % (i, j))
+
+
+def validate(doc: Any) -> List[str]:
+    """形状校验 → 违例清单（空=合规）。fail-closed：缺字段/未知算子一律判违例。"""
+    out: List[str] = []
+    if not isinstance(doc, dict) or not doc:
+        return ["规则文档缺失或非对象"]
+    if doc.get("schema") != SCHEMA:
+        out.append("schema 须为 %s，实为 %r" % (SCHEMA, doc.get("schema")))
+    for key in ("facts", "rules"):
+        if not isinstance(doc.get(key), list):
+            out.append("%s 须为数组" % key)
+    _validate_facts(doc, out)
+    _validate_rules(doc, out)
+    fuel = doc.get("fuel")
+    if fuel is not None and (not isinstance(fuel, int) or fuel <= 0):
+        out.append("fuel 须为正整数，实为 %r" % (fuel,))
+    return out
+
+
+def _guard_ok(g: List[Any], subst: Dict[str, Any]) -> bool:
+    left, op, right = g
+    if is_var(left) and left not in subst:
+        return False
+    if is_var(right) and right not in subst:
+        return False
+    a = subst.get(left, left) if is_var(left) else left
+    b = subst.get(right, right) if is_var(right) else right
+    try:
+        return bool(_OPS[op](a, b))
+    except TypeError:          # 类型不可比 → 判不通过（而不是崩）
+        return False
+
+
+def _bind(body: List[Dict[str, Any]], by_pred: Dict[str, List[Tuple[Any, ...]]],
+          subst: Dict[str, Any], on_solution) -> None:
+    """回溯匹配规则体；每找到完整解回调 on_solution(解)。"""
+    if not body:
+        on_solution(subst)
+        return
+    first, rest = body[0], body[1:]
+    if "guard" in first:
+        if _guard_ok(first["guard"], subst):
+            _bind(rest, by_pred, subst, on_solution)
+        return
+    for fact in by_pred.get(first["pred"], ()):
+        s = dict(subst)
+        ok = True
+        for pat, val in zip(first["args"], fact):
+            if is_var(pat):
+                if pat in s and s[pat] != val:
+                    ok = False
+                    break
+                s[pat] = val
+            elif pat != val:
+                ok = False
+                break
+        if ok:
+            _bind(rest, by_pred, s, on_solution)
+
+
+def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+    """定点推导 → {status, facts, fuel_used, fuel_total, rounds}。
+
+    status ∈ OK（达定点）/ FUEL_EXHAUSTED（燃料耗尽：结果**部分**且如实标记）/ INVALID。
+    """
+    issues = validate(doc)
+    if issues:
+        return {"status": "INVALID", "issues": issues, "facts": [],
+                "fuel_used": 0, "fuel_total": 0, "rounds": 0}
+    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+    facts: Set[Tuple[str, Tuple[Any, ...]]] = set()
+    for f in doc["facts"]:
+        facts.add((f["pred"], tuple(f["args"])))
+    rules = doc["rules"]
+    used = 0
+    exhausted = False
+    rounds = 0
+    while not exhausted:
+        rounds += 1
+        by_pred: Dict[str, List[Tuple[Any, ...]]] = {}
+        for pred, args in sorted(facts):
+            by_pred.setdefault(pred, []).append(args)
+        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        for r in rules:
+            head = r["head"]
+
+            def _on_solution(subst: Dict[str, Any], head=head) -> None:
+                nonlocal used, exhausted
+                if exhausted:
+                    return
+                used += 1
+                if used > total:
+                    exhausted = True
+                    return
+                new.add((head["pred"],
+                         tuple(subst.get(a, a) if is_var(a) else a for a in head["args"])))
+
+            _bind(r["body"], by_pred, {}, _on_solution)
+            if exhausted:
+                break
+        added = new - facts
+        facts |= added
+        if exhausted:
+            return {"status": "FUEL_EXHAUSTED",
+                    "facts": sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts),
+                    "fuel_used": used, "fuel_total": total, "rounds": rounds}
+        if not added:
+            break
+    return {"status": "OK",
+            "facts": sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts),
+            "fuel_used": used, "fuel_total": total, "rounds": rounds}
