@@ -25,6 +25,6 @@ def accepted(entries: List[Dict[str, Any]], hit: str) -> List[Dict[str, Any]]:
         try:
             if re.search(str(e.get("pattern")), hit):
                 out.append(e)
-        except re.error:
+        except re.error:  # 坏模式按「非已知残余」处理：跳过该条，不连累其余登记
             continue
     return out
