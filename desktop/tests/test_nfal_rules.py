@@ -64,5 +64,55 @@ class EvalTest(unittest.TestCase):
         self.assertFalse(nr.is_var("X"))
 
 
+class BackendDifferentialTest(unittest.TestCase):
+    """P-A3：朴素与半朴素**两条后端必须同结果**（随机语料 + 紧燃料对照）。"""
+
+    def _random_doc(self, seed):
+        import random
+        rnd = random.Random(seed)
+        consts = ["c0", "c1", "c2"]
+        preds = ["p0", "p1"]
+        facts = [{"pred": rnd.choice(preds), "args": [rnd.choice(consts), rnd.choice(consts)]}
+                 for _ in range(rnd.randint(2, 6))]
+        rules = []
+        for _ in range(rnd.randint(1, 3)):
+            h = rnd.choice(preds)
+            b1 = {"pred": rnd.choice(preds), "args": ["?X", "?Y"]}
+            rules.append({"head": {"pred": h, "args": ["?X", "?Y"]}, "body": [b1]})
+        rules.append({"head": {"pred": "p0", "args": ["?X", "?Z"]},
+                      "body": [{"pred": "p0", "args": ["?X", "?Y"]},
+                               {"pred": "p0", "args": ["?Y", "?Z"]}]})
+        return {"schema": "nf-nfal-rules/1", "facts": facts, "rules": rules}
+
+    def test_backends_agree_on_random_corpus(self):
+        bad = []
+        nontrivial = 0
+        for seed in range(40):
+            doc = self._random_doc(seed)
+            a = nr.evaluate(doc)
+            b = nr.evaluate_seminaive(doc)
+            base = {"%s(%s)" % (f["pred"], ",".join(str(x) for x in f["args"]))
+                    for f in doc["facts"]}
+            if set(a["facts"]) - base:
+                nontrivial += 1
+            if a["status"] != b["status"] or a["facts"] != b["facts"]:
+                bad.append((seed, a["status"], b["status"],
+                            set(a["facts"]) ^ set(b["facts"])))
+        self.assertEqual([], bad, "两后端分歧：%s" % bad[:3])
+        self.assertGreater(nontrivial, 10, "语料太浅（几乎无新增事实）——差分判据近乎空转")
+
+    def test_backends_agree_on_cycles_and_guards(self):
+        doc = _doc(edges=(("a", "b"), ("b", "a")), guard=True)
+        a, b = nr.evaluate(doc), nr.evaluate_seminaive(doc)
+        self.assertEqual(a["facts"], b["facts"])
+        self.assertEqual("OK", b["status"])
+
+    def test_seminaive_uses_no_more_fuel(self):
+        doc = _doc()
+        a, b = nr.evaluate(doc), nr.evaluate_seminaive(doc)
+        self.assertLessEqual(b["fuel_used"], a["fuel_used"],
+                             "半朴素不该比朴素更费（它是优化，不是另一套语义）")
+
+
 if __name__ == "__main__":
     unittest.main()

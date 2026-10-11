@@ -92,18 +92,34 @@ def _guard_ok(g: List[Any], subst: Dict[str, Any]) -> bool:
         return False
 
 
+def _index(facts: Set[Tuple[str, Tuple[Any, ...]]]
+           ) -> Dict[str, List[Tuple[Any, ...]]]:
+    """事实集 → 按谓词分组（顺序稳定，供回溯匹配）。"""
+    by_pred: Dict[str, List[Tuple[Any, ...]]] = {}
+    for pred, args in sorted(facts):
+        by_pred.setdefault(pred, []).append(args)
+    return by_pred
+
+
 def _bind(body: List[Dict[str, Any]], by_pred: Dict[str, List[Tuple[Any, ...]]],
-          subst: Dict[str, Any], on_solution) -> None:
-    """回溯匹配规则体；每找到完整解回调 on_solution(解)。"""
+          subst: Dict[str, Any], on_solution, delta: Optional[Dict[int, Any]] = None,
+          idx: int = 0) -> None:
+    """回溯匹配规则体；每找到完整解回调 on_solution(解)。
+
+    delta 非空时，**指定体位置**只在 delta 事实里取值（半朴素后端的核心；None 即朴素）。
+    """
     if not body:
         on_solution(subst)
         return
     first, rest = body[0], body[1:]
     if "guard" in first:
         if _guard_ok(first["guard"], subst):
-            _bind(rest, by_pred, subst, on_solution)
+            _bind(rest, by_pred, subst, on_solution, delta, idx + 1)
         return
-    for fact in by_pred.get(first["pred"], ()):
+    facts = (delta or {}).get(idx)
+    if facts is None:
+        facts = by_pred.get(first["pred"], ())
+    for fact in facts:
         s = dict(subst)
         ok = True
         for pat, val in zip(first["args"], fact):
@@ -116,7 +132,7 @@ def _bind(body: List[Dict[str, Any]], by_pred: Dict[str, List[Tuple[Any, ...]]],
                 ok = False
                 break
         if ok:
-            _bind(rest, by_pred, s, on_solution)
+            _bind(rest, by_pred, s, on_solution, delta, idx + 1)
 
 
 def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
@@ -138,9 +154,7 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
     rounds = 0
     while not exhausted:
         rounds += 1
-        by_pred: Dict[str, List[Tuple[Any, ...]]] = {}
-        for pred, args in sorted(facts):
-            by_pred.setdefault(pred, []).append(args)
+        by_pred = _index(facts)
         new: Set[Tuple[str, Tuple[Any, ...]]] = set()
         for r in rules:
             head = r["head"]
@@ -167,6 +181,71 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
                     "fuel_used": used, "fuel_total": total, "rounds": rounds}
         if not added:
             break
-    return {"status": "OK",
-            "facts": sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts),
-            "fuel_used": used, "fuel_total": total, "rounds": rounds}
+    return {"status": "OK", "facts": _fmt(facts), "fuel_used": used,
+            "fuel_total": total, "rounds": rounds}
+
+
+def _fmt(facts: Set[Tuple[str, Tuple[Any, ...]]]) -> List[str]:
+    return sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts)
+
+
+def _mk(head: Dict[str, Any], new: Set[Tuple[str, Tuple[Any, ...]]],
+        counter: List[Any]):
+    """口径与朴素后端一致的「解 → 头部事实」回调（counter=[used, cap, exhausted]）。"""
+    def _on(subst: Dict[str, Any]) -> None:
+        counter[0] += 1
+        if counter[0] > counter[1]:
+            counter[2] = True
+            return
+        new.add((head["pred"],
+                 tuple(subst.get(a, a) if is_var(a) else a for a in head["args"])))
+    return _on
+
+
+def evaluate_seminaive(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+    """**第二后端**（半朴素 delta 迭代）：语义等价、实例化更省。
+
+    每轮只让「至少一个体原子」落在上一轮新增（delta）里，逐位置取并集。
+    fuel 口径同为「规则实例化次数」；半朴素天然更省 ⇒ 紧燃料下用量与朴素不同，
+    但**两者都达定点时事实集必须逐条相同**（差分自检见 tests.test_nfal_rules）。
+    """
+    issues = validate(doc)
+    if issues:
+        return {"status": "INVALID", "issues": issues, "facts": [],
+                "fuel_used": 0, "fuel_total": 0, "rounds": 0}
+    total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
+    facts: Set[Tuple[str, Tuple[Any, ...]]] = {
+        (f["pred"], tuple(f["args"])) for f in doc["facts"]}
+    rules = doc["rules"]
+    counter: List[Any] = [0, total, False]
+    rounds = 0
+    delta = set(facts)
+    guard_only_done = False
+    while True:
+        rounds += 1
+        by_pred = _index(facts)
+        delta_idx = _index(delta)
+        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        for r in rules:
+            head = r["head"]
+            positions = [i for i, b in enumerate(r["body"]) if "guard" not in b]
+            if not positions:                      # 只有 guard 的规则：首轮按全量跑一次
+                if not guard_only_done:
+                    _bind(r["body"], by_pred, {}, _mk(head, new, counter))
+                continue
+            for i in positions:
+                pat = r["body"][i]
+                _bind(r["body"], by_pred, {}, _mk(head, new, counter),
+                      delta={i: delta_idx.get(pat["pred"], [])})
+                if counter[2]:
+                    break
+            if counter[2]:
+                break
+        guard_only_done = True
+        added = new - facts
+        facts |= added
+        delta = added
+        if counter[2] or not added:
+            break
+    return {"status": "FUEL_EXHAUSTED" if counter[2] else "OK", "facts": _fmt(facts),
+            "fuel_used": counter[0], "fuel_total": total, "rounds": rounds}
