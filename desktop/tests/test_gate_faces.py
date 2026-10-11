@@ -54,7 +54,8 @@ class ReconcileTest(unittest.TestCase):
             man.mkdir(parents=True, exist_ok=True)
             (man / "gate_experts.json").write_text(
                 '{"schema": "nf-gate-experts/1", "experts": ['
-                '{"id": "e1", "reads": %s}]}' % declared_reads, encoding="utf-8")
+                '{"id": "e1", "reads": %s, "skip_safety": "SAFE"}]}'
+                % declared_reads, encoding="utf-8")
             return gf.audit(str(tmp), observed=observed, static=static)
 
     def test_clean(self):
@@ -80,6 +81,28 @@ class ReconcileTest(unittest.TestCase):
             issues, stats = gf.audit(tmp)
             self.assertEqual([], issues)
             self.assertTrue(stats["warns"], stats)
+
+
+class ManifestSchemaTest(unittest.TestCase):
+    """W-03.3 声明面契约：形状违例如实报，合规不误报（fail-closed）。"""
+
+    def test_valid(self):
+        doc = {"schema": "nf-gate-experts/1",
+               "experts": [{"id": "e1", "reads": ["docs"], "skip_safety": "UNSAFE"}]}
+        self.assertEqual([], gf.validate_manifest(doc))
+
+    def test_wrong_schema(self):
+        issues = gf.validate_manifest({"schema": "x", "experts": []})
+        self.assertTrue(any("schema" in i for i in issues), issues)
+
+    def test_missing_reads_and_bad_level(self):
+        issues = gf.validate_manifest(
+            {"schema": "nf-gate-experts/1", "experts": [{"id": "e1"}]})
+        self.assertTrue(any("reads" in i for i in issues), issues)
+        self.assertTrue(any("skip_safety" in i for i in issues), issues)
+
+    def test_empty_is_violation(self):
+        self.assertTrue(gf.validate_manifest({}))
 
 
 if __name__ == "__main__":
