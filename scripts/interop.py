@@ -5,6 +5,7 @@
 用法：echo '方法面' | python scripts/interop.py        # 从 stdin 读帧、向 stdout 写帧
 注册方法：nf/echo、nf/version。这是 interop 分派核心的最小消费者（真接入层自 P-I1 起）。
 """
+import importlib
 import os
 import sys
 
@@ -13,11 +14,29 @@ sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
 from core import interop as ip  # noqa: E402
 
+#: 可经守护**同进程**执行的专家（白名单：不接受任意模块名，避免任意代码面被远程触达）。
+SCANNERS = ("code_metrics", "coupling_metrics", "conformance_scan", "purity_scan",
+            "schema_lint", "text_hygiene", "judgement_coverage")
+
+
+def _scan(params):
+    """同进程跑一个已登记扫描器 → JSON 安全摘要（热路径：省去逐次解释器启动）。"""
+    name = str((params or {}).get("expert") or "")
+    if name not in SCANNERS:
+        raise ValueError("未登记的专家：%s（修复指引：见 SCANNERS 白名单）" % name)
+    mod = importlib.import_module("core.%s" % name)
+    got = mod.scan(ROOT)          # 形状不一：既有 (issues, stats)，也有 (issues, warns, stats)
+    issues = got[0] if isinstance(got, tuple) else []
+    stats = got[-1] if isinstance(got, tuple) and isinstance(got[-1], dict) else {}
+    return {"expert": name, "issues": len(issues),
+            "stats_keys": sorted(str(k) for k in stats)}
+
 
 def build() -> ip.Dispatcher:
     d = ip.Dispatcher()
     d.register("nf/echo", lambda params: params)
-    d.register("nf/version", lambda _params: {"interop": "P-I0", "jsonrpc": "2.0"})
+    d.register("nf/version", lambda _params: {"interop": "P-I2", "jsonrpc": "2.0"})
+    d.register("nf/scan", _scan)
     return d
 
 

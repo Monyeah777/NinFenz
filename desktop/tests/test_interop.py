@@ -57,6 +57,36 @@ class DispatchTest(unittest.TestCase):
         self.assertEqual(["add", "boom"], _d().methods())
 
 
+class WarmScanTest(unittest.TestCase):
+    """P-I2 热路径：同进程跑已登记专家（白名单），免逐次解释器启动。"""
+
+    def _build(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "interop_cli", str(ROOT / "scripts" / "interop.py"))
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules["interop_cli"] = mod
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_registered_scanner_runs_in_process(self):
+        cli = self._build()
+        out = cli.build().handle({"jsonrpc": "2.0", "id": 1, "method": "nf/scan",
+                                  "params": {"expert": "code_metrics"}})
+        self.assertEqual(1, len(out))
+        res = out[0]["result"]
+        self.assertEqual("code_metrics", res["expert"])
+        self.assertIsInstance(res["issues"], int)
+        self.assertTrue(res["stats_keys"], res)
+        json.dumps(res)                     # 必须 JSON 安全（守护要过线格式）
+
+    def test_unregistered_scanner_is_refused(self):
+        cli = self._build()
+        out = cli.build().handle({"jsonrpc": "2.0", "id": 2, "method": "nf/scan",
+                                  "params": {"expert": "os"}})
+        self.assertEqual(ip.INTERNAL_ERROR, out[0]["error"]["code"])
+
+
 class StdioTest(unittest.TestCase):
     def _serve(self, frames):
         buf = io.BytesIO()
