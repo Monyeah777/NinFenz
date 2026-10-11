@@ -504,8 +504,11 @@ class ZeroRefRuleTest(unittest.TestCase):
         self.assertNotIn("dispatched", [n for _f, n, _l in got])
 
 
-#: 已复核「不引用也不删」的 core 模块 → 理由（当前为空；有例外必须逐条写明）。
-REVIEWED_UNREFERENCED: dict = {}
+#: 已复核「不引用也不删」的 core 模块 → 理由（有例外必须逐条写明）。
+REVIEWED_UNREFERENCED: dict = {
+    "gate_faces": "W-03 读面台账（静态/动态/声明三源对账）：消费者在 W-04/W-05 落地前"
+                  "暂未接线；它是路由方案的前置，删掉会丢证据。",
+}
 
 #: core 模块被「引用」的写法（缺一种就会把活模块判成墓碑）：
 #: - `from .x import` / `from ..x import`：包内相对导入（**首版探针就漏在这个**：

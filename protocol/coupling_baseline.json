@@ -197,9 +197,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 35,
+      "ca": 36,
       "ce": 6,
-      "i": 0.1463
+      "i": 0.1429
     },
     "content_face": {
       "ca": 3,
@@ -369,6 +369,11 @@
     "gap_review": {
       "ca": 0,
       "ce": 5,
+      "i": 1.0
+    },
+    "gate_faces": {
+      "ca": 0,
+      "ce": 1,
       "i": 1.0
     },
     "generator": {
