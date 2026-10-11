@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF Interop Layer 演示服务（P-I0）：stdlib Content-Length 分帧上的 JSON-RPC 2.0 echo 方法面。
 
 用法：echo '方法面' | python scripts/interop.py        # 从 stdin 读帧、向 stdout 写帧
@@ -56,7 +55,7 @@ def main() -> int:
         try:
             while True:
                 time.sleep(3600)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt:          # Ctrl-C = 用户要求收摊：静默返回 0，服务由 finally 关闭
             return 0
         finally:
             server.shutdown()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NFA-L/R 规则层（P-A1）：JSON 事实 + 规则 → 定点推导，带 fuel 计量。
 
 设计（沿用 NFA-L/1 的 JSON 风格，不发明新文本语法）：
@@ -12,7 +11,7 @@
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Set
 
 SCHEMA = "nf-nfal-rules/1"
 GUARD_OPS = ("!=", "==", "<", "<=", ">", ">=")
@@ -33,7 +32,7 @@ def _atom_ok(a: Any) -> bool:
             and isinstance(a.get("args"), list))
 
 
-def _validate_facts(doc: Dict[str, Any], out: List[str]) -> None:
+def _validate_facts(doc: dict[str, Any], out: list[str]) -> None:
     for i, f in enumerate(doc.get("facts") or []):
         if not _atom_ok(f):
             out.append("facts[%d] 形状不合法（须含 pred 与 args）" % i)
@@ -41,7 +40,7 @@ def _validate_facts(doc: Dict[str, Any], out: List[str]) -> None:
             out.append("facts[%d] 含变量：事实必须是基原子" % i)
 
 
-def _validate_rules(doc: Dict[str, Any], out: List[str]) -> None:
+def _validate_rules(doc: dict[str, Any], out: list[str]) -> None:
     for i, r in enumerate(doc.get("rules") or []):
         if not isinstance(r, dict) or not _atom_ok(r.get("head")):
             out.append("rules[%d] 缺 head 或形状不合法" % i)
@@ -60,9 +59,9 @@ def _validate_rules(doc: Dict[str, Any], out: List[str]) -> None:
                 out.append("rules[%d].body[%d] 既非原子也非 guard" % (i, j))
 
 
-def validate(doc: Any) -> List[str]:
+def validate(doc: Any) -> list[str]:
     """形状校验 → 违例清单（空=合规）。fail-closed：缺字段/未知算子一律判违例。"""
-    out: List[str] = []
+    out: list[str] = []
     if not isinstance(doc, dict) or not doc:
         return ["规则文档缺失或非对象"]
     if doc.get("schema") != SCHEMA:
@@ -78,7 +77,7 @@ def validate(doc: Any) -> List[str]:
     return out
 
 
-def _guard_ok(g: List[Any], subst: Dict[str, Any]) -> bool:
+def _guard_ok(g: list[Any], subst: dict[str, Any]) -> bool:
     left, op, right = g
     if is_var(left) and left not in subst:
         return False
@@ -92,17 +91,17 @@ def _guard_ok(g: List[Any], subst: Dict[str, Any]) -> bool:
         return False
 
 
-def _index(facts: Set[Tuple[str, Tuple[Any, ...]]]
-           ) -> Dict[str, List[Tuple[Any, ...]]]:
+def _index(facts: Set[tuple[str, tuple[Any, ...]]]
+           ) -> dict[str, list[tuple[Any, ...]]]:
     """事实集 → 按谓词分组（顺序稳定，供回溯匹配）。"""
-    by_pred: Dict[str, List[Tuple[Any, ...]]] = {}
+    by_pred: dict[str, list[tuple[Any, ...]]] = {}
     for pred, args in sorted(facts):
         by_pred.setdefault(pred, []).append(args)
     return by_pred
 
 
-def _bind(body: List[Dict[str, Any]], by_pred: Dict[str, List[Tuple[Any, ...]]],
-          subst: Dict[str, Any], on_solution, delta: Optional[Dict[int, Any]] = None,
+def _bind(body: list[dict[str, Any]], by_pred: dict[str, list[tuple[Any, ...]]],
+          subst: dict[str, Any], on_solution, delta: dict[int, Any] | None = None,
           idx: int = 0) -> None:
     """回溯匹配规则体；每找到完整解回调 on_solution(解)。
 
@@ -135,7 +134,7 @@ def _bind(body: List[Dict[str, Any]], by_pred: Dict[str, List[Tuple[Any, ...]]],
             _bind(rest, by_pred, s, on_solution, delta, idx + 1)
 
 
-def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+def evaluate(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
     """定点推导 → {status, facts, fuel_used, fuel_total, rounds}。
 
     status ∈ OK（达定点）/ FUEL_EXHAUSTED（燃料耗尽：结果**部分**且如实标记）/ INVALID。
@@ -145,7 +144,7 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
         return {"status": "INVALID", "issues": issues, "facts": [],
                 "fuel_used": 0, "fuel_total": 0, "rounds": 0}
     total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
-    facts: Set[Tuple[str, Tuple[Any, ...]]] = set()
+    facts: Set[tuple[str, tuple[Any, ...]]] = set()
     for f in doc["facts"]:
         facts.add((f["pred"], tuple(f["args"])))
     rules = doc["rules"]
@@ -155,11 +154,11 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
     while not exhausted:
         rounds += 1
         by_pred = _index(facts)
-        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in rules:
             head = r["head"]
 
-            def _on_solution(subst: Dict[str, Any], head=head) -> None:
+            def _on_solution(subst: dict[str, Any], head=head) -> None:
                 nonlocal used, exhausted
                 if exhausted:
                     return
@@ -185,8 +184,8 @@ def evaluate(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
             "fuel_total": total, "rounds": rounds}
 
 
-def _body_facts(body: List[Dict[str, Any]],
-                subst: Dict[str, Any]) -> Tuple[Tuple[str, Tuple[Any, ...]], ...]:
+def _body_facts(body: list[dict[str, Any]],
+                subst: dict[str, Any]) -> tuple[tuple[str, tuple[Any, ...]], ...]:
     """把已绑定的规则体原子实例化成基事实（guard 不计），作为推导图的入边。"""
     out = []
     for b in body:
@@ -196,7 +195,7 @@ def _body_facts(body: List[Dict[str, Any]],
     return tuple(out)
 
 
-def evaluate_dag(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+def evaluate_dag(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
     """**第三后端**（gate-DAG 风格）：显式记录「谁推出谁」，再按依赖深度分层。
 
     与朴素/半朴素后端的差别只在**是否物化推导图**：事实集三者必须逐条相同（差分自检）。
@@ -208,20 +207,20 @@ def evaluate_dag(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, A
                 "fuel_used": 0, "fuel_total": 0, "rounds": 0,
                 "graph": {"nodes": 0, "edges": 0, "depth": 0}}
     total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
-    base: Set[Tuple[str, Tuple[Any, ...]]] = {
+    base: Set[tuple[str, tuple[Any, ...]]] = {
         (f["pred"], tuple(f["args"])) for f in doc["facts"]}
     facts = set(base)
-    edges: Dict[Tuple[str, Tuple[Any, ...]], Set[Any]] = {}
-    counter: List[Any] = [0, total, False]
+    edges: dict[tuple[str, tuple[Any, ...]], Set[Any]] = {}
+    counter: list[Any] = [0, total, False]
     rounds = 0
     while True:
         rounds += 1
         by_pred = _index(facts)
-        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in doc["rules"]:
             head = r["head"]
 
-            def _on(subst: Dict[str, Any], head=head) -> None:
+            def _on(subst: dict[str, Any], head=head) -> None:
                 if counter[2]:
                     return
                 counter[0] += 1
@@ -244,7 +243,7 @@ def evaluate_dag(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, A
         if counter[2] or not added:
             break
     depth = 0
-    memo: Dict[Any, int] = {f: 0 for f in base}
+    memo: dict[Any, int] = {f: 0 for f in base}
     for _ in range(len(facts) + 1):
         changed = False
         for node, deps in edges.items():
@@ -263,14 +262,14 @@ def evaluate_dag(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, A
             "graph": {"nodes": len(facts), "edges": derived_edges, "depth": depth}}
 
 
-def _fmt(facts: Set[Tuple[str, Tuple[Any, ...]]]) -> List[str]:
+def _fmt(facts: Set[tuple[str, tuple[Any, ...]]]) -> list[str]:
     return sorted("%s(%s)" % (p, ",".join(str(x) for x in a)) for p, a in facts)
 
 
-def _mk(head: Dict[str, Any], new: Set[Tuple[str, Tuple[Any, ...]]],
-        counter: List[Any]):
+def _mk(head: dict[str, Any], new: Set[tuple[str, tuple[Any, ...]]],
+        counter: list[Any]):
     """口径与朴素后端一致的「解 → 头部事实」回调（counter=[used, cap, exhausted]）。"""
-    def _on(subst: Dict[str, Any]) -> None:
+    def _on(subst: dict[str, Any]) -> None:
         counter[0] += 1
         if counter[0] > counter[1]:
             counter[2] = True
@@ -280,7 +279,7 @@ def _mk(head: Dict[str, Any], new: Set[Tuple[str, Tuple[Any, ...]]],
     return _on
 
 
-def evaluate_seminaive(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[str, Any]:
+def evaluate_seminaive(doc: dict[str, Any], fuel: int | None = None) -> dict[str, Any]:
     """**第二后端**（半朴素 delta 迭代）：语义等价、实例化更省。
 
     每轮只让「至少一个体原子」落在上一轮新增（delta）里，逐位置取并集。
@@ -292,10 +291,10 @@ def evaluate_seminaive(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[
         return {"status": "INVALID", "issues": issues, "facts": [],
                 "fuel_used": 0, "fuel_total": 0, "rounds": 0}
     total = int(fuel if fuel is not None else (doc.get("fuel") or DEFAULT_FUEL))
-    facts: Set[Tuple[str, Tuple[Any, ...]]] = {
+    facts: Set[tuple[str, tuple[Any, ...]]] = {
         (f["pred"], tuple(f["args"])) for f in doc["facts"]}
     rules = doc["rules"]
-    counter: List[Any] = [0, total, False]
+    counter: list[Any] = [0, total, False]
     rounds = 0
     delta = set(facts)
     guard_only_done = False
@@ -303,7 +302,7 @@ def evaluate_seminaive(doc: Dict[str, Any], fuel: Optional[int] = None) -> Dict[
         rounds += 1
         by_pred = _index(facts)
         delta_idx = _index(delta)
-        new: Set[Tuple[str, Tuple[Any, ...]]] = set()
+        new: Set[tuple[str, tuple[Any, ...]]] = set()
         for r in rules:
             head = r["head"]
             positions = [i for i, b in enumerate(r["body"]) if "guard" not in b]

@@ -19,15 +19,15 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 #: 进程内记忆：根 → {品类: 件表}。为什么加（2026-10-11 剖析 §23.35）：locate/mine 等按品类逐个
 #: glob，且被**逐件**调用 ⇒ 单次 catalog 触发 37,684 次 glob / 65k 次 stat。记忆只在进程内有效；
 #: 本进程内改过文件面的调用方须显式 reset_files（同族先例：import_graph.reset_code_scope）。
-_FILES_MEMO: Dict[str, Dict[str, List[str]]] = {}
+_FILES_MEMO: dict[str, dict[str, list[str]]] = {}
 
 
-def reset_files(root: Optional[str] = None) -> None:
+def reset_files(root: str | None = None) -> None:
     """清品类件表记忆（改了文件面后调用）；root=None 清全部。"""
     if root is None:
         _FILES_MEMO.clear()

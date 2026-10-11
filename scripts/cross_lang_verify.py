@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """跨语言契约对拍器（W-10 / P-C0 走通件）。
 
 读向量清单（nf-test-vectors/1），对每条向量跑各语言声明的命令，按 compare_rule 归一后
@@ -12,11 +11,13 @@ import argparse
 import json
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404 - 只跑清单里声明过的命令
 import sys
 from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+from core import json_doc  # noqa: E402 - 读 JSON 走仓库唯一读点
 PROBES = {"python": "python", "rust": "cargo", "csharp": "dotnet"}
 LANGS = tuple(PROBES)
 
@@ -36,7 +37,7 @@ def canonical(rule, data):
     if rule == "byte":
         return data.replace(b"\r\n", b"\n")
     if rule == "jcs":
-        obj = json.loads(data.decode("utf-8"))
+        obj = json_doc.loads(data.decode("utf-8"), None, what="待规范化 JSON")
         return (json.dumps(obj, ensure_ascii=False, sort_keys=True,
                            separators=(",", ":")) + "\n").encode("utf-8")
     raise ValueError("未知 compare_rule：%s" % rule)
@@ -45,7 +46,8 @@ def canonical(rule, data):
 def run_cmd(cmd, cwd, timeout=120):
     """跑一条命令 → (rc, stdout)。超时记 rc=-9（调用方标 FAIL 或按需记 UNKNOWN）。"""
     try:
-        proc = subprocess.run([str(x) for x in cmd], cwd=cwd, capture_output=True,
+        proc = subprocess.run([str(x) for x in cmd], cwd=cwd, capture_output=True,  # nosec B603  # noqa: S603 - 只跑清单声明过的命令
+
                               timeout=timeout)
         return proc.returncode, proc.stdout
     except FileNotFoundError:
@@ -153,24 +155,24 @@ def self_test():
                    "csharp": {"cmd": ["dotnet"]}}}]}
     # 1) 三语言一致 → PASS
     tools, runner = _fake({"python": b"ok\n", "rust": b"ok\n", "csharp": b"ok\n"})
-    assert verify(doc, runner=runner, tools=tools)["verdict"] == "PASS"
+    assert verify(doc, runner=runner, tools=tools)["verdict"] == "PASS"  # nosec B101  # noqa: S101 - 自证用例：断言即判据本身
     # 2) 一语言偏离 → FAIL
     tools, runner = _fake({"python": b"ok\n", "rust": b"bad\n", "csharp": b"ok\n"})
     rep = verify(doc, runner=runner, tools=tools)
-    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"
+    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"  # nosec B101  # noqa: S101 - 自证用例：断言即判据本身
     # 3) 工具链缺席且其余一致 → UNKNOWN（不下结论）
     tools, runner = _fake({"python": b"ok\n", "csharp": b"ok\n"}, missing=("rust",))
     rep = verify(doc, runner=runner, tools=tools)
-    assert rep["verdict"] == "UNKNOWN", rep
+    assert rep["verdict"] == "UNKNOWN", rep  # nosec B101  # noqa: S101 - 自证用例：断言即判据本身
     # 4) probe 只探在场：缺席即 UNKNOWN
     pdoc = {"schema": "nf-test-vectors/1", "vectors": [
         {"id": "p", "compare_rule": "byte", "expected": "",
          "langs": {"rust": {"cmd": ["cargo"], "probe": True}}}]}
-    assert verify(pdoc, runner=runner, tools=tools)["verdict"] == "UNKNOWN"
+    assert verify(pdoc, runner=runner, tools=tools)["verdict"] == "UNKNOWN"  # nosec B101  # noqa: S101 - 自证用例：断言即判据本身
     # 5) probe 在场但输出为空（有 exe 无 SDK）→ 仍 UNKNOWN
     all_tools = {lang: "/fake/" + lang for lang in LANGS}
     empty = lambda cmd, cwd, timeout=120: (0, b"")
-    assert verify(pdoc, runner=empty, tools=all_tools)["verdict"] == "UNKNOWN"
+    assert verify(pdoc, runner=empty, tools=all_tools)["verdict"] == "UNKNOWN"  # nosec B101  # noqa: S101 - 自证用例：断言即判据本身
     print("self-test OK（一致=PASS / 偏离=FAIL / 缺席=UNKNOWN / probe 三态 / 空 SDK=UNKNOWN）")
     return 0
 
@@ -186,7 +188,8 @@ def main(argv=None):
     if not args.manifest:
         print("  ✗ 缺 --manifest（修复指引：给向量清单路径）", file=sys.stderr)
         return 2
-    doc = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
+    doc = json_doc.loads(Path(args.manifest).read_text(encoding="utf-8"), dict,
+                         what="向量清单")
     rep = verify(doc, root=ROOT)
     if args.json:
         print(json.dumps(rep, ensure_ascii=False, indent=2, sort_keys=True))

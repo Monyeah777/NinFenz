@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NF Interop Layer（P-I0）：与传输无关的 JSON-RPC 2.0 分派核心。
 
 为什么需要（§17）：LSP / MCP / HTTP 三个面各自写分派与错误形状；要「一份协议、三种传输」，
@@ -12,7 +11,9 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable
+
+from core import json_doc
 
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600
@@ -23,12 +24,12 @@ INTERNAL_ERROR = -32603
 Handler = Callable[[Any], Any]
 
 
-def error(rid: Any, code: int, message: str) -> Dict[str, Any]:
+def error(rid: Any, code: int, message: str) -> dict[str, Any]:
     """JSON-RPC 2.0 错误应答（三处拒绝共用一处形状）。"""
     return {"jsonrpc": "2.0", "id": rid, "error": {"code": code, "message": message}}
 
 
-def result(rid: Any, value: Any) -> Dict[str, Any]:
+def result(rid: Any, value: Any) -> dict[str, Any]:
     return {"jsonrpc": "2.0", "id": rid, "result": value}
 
 
@@ -36,18 +37,18 @@ class Dispatcher:
     """方法表 + 分派。**无传输、无 IO**——同一实例可挂任意传输。"""
 
     def __init__(self) -> None:
-        self._methods: Dict[str, Handler] = {}
+        self._methods: dict[str, Handler] = {}
 
     def register(self, method: str, handler: Handler) -> None:
         self._methods[method] = handler
 
-    def methods(self) -> List[str]:
+    def methods(self) -> list[str]:
         return sorted(self._methods)
 
-    def handle(self, msg: Any) -> List[Dict[str, Any]]:
+    def handle(self, msg: Any) -> list[dict[str, Any]]:
         """单条入站消息 → 应答列表（通知返回空列表）。"""
         if isinstance(msg, list):                      # 批量：逐条处理
-            out: List[Dict[str, Any]] = []
+            out: list[dict[str, Any]] = []
             for item in msg:
                 out += self.handle(item)
             return out
@@ -75,7 +76,7 @@ class Dispatcher:
         return [result(msg.get("id"), value)]
 
 
-def _write_line(wfile: Any, msg: Dict[str, Any]) -> None:
+def _write_line(wfile: Any, msg: dict[str, Any]) -> None:
     """换行分隔 JSON 写出（MCP 风格面；与 Content-Length 帧互不混用）。"""
     text = json.dumps(msg, ensure_ascii=False) + "\n"
     target = getattr(wfile, "buffer", None) or wfile
@@ -100,7 +101,7 @@ def serve_lines(dispatcher: Dispatcher, rfile: Any, wfile: Any) -> int:
         if not raw:
             continue
         try:
-            msg = json.loads(raw)
+            msg = json_doc.loads(raw, (dict, list), what="JSON-RPC 消息")
         except ValueError:
             _write_line(wfile, error(None, PARSE_ERROR,
                                      "坏行（非法 UTF-8/JSON）；修复指引：一行一条 UTF-8 JSON"))
@@ -123,7 +124,7 @@ def make_http_handler(dispatcher: Dispatcher):
             length = int(self.headers.get("Content-Length") or 0)
             body = self.rfile.read(length) if length else b""
             try:
-                msg = json.loads(body.decode("utf-8"))
+                msg = json_doc.loads(body.decode("utf-8"), (dict, list), what="JSON-RPC 消息")
             except (ValueError, UnicodeDecodeError):
                 self._send(error(None, PARSE_ERROR, "坏正文：须为 UTF-8 JSON"))
                 return
@@ -133,7 +134,7 @@ def make_http_handler(dispatcher: Dispatcher):
         def do_GET(self) -> None:                       # noqa: N802 - 基类约定名
             self._send(result(None, {"methods": dispatcher.methods()}))
 
-        def _send(self, payload: Dict[str, Any]) -> None:
+        def _send(self, payload: dict[str, Any]) -> None:
             data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -145,7 +146,7 @@ def make_http_handler(dispatcher: Dispatcher):
 
 
 def serve_http(dispatcher: Dispatcher, host: str = "127.0.0.1", port: int = 0
-               ) -> Tuple[Any, Any]:
+               ) -> tuple[Any, Any]:
     """起 HTTP loopback 服务 → (server, thread)；port=0 取临时端口。调用方负责 shutdown。"""
     import threading
     from http.server import HTTPServer

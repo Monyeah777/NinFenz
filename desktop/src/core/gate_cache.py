@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """内容寻址缓存（W-08）：键即内容，命中前必须 verify，缺失即失效。
 
 纪律（§7.2 + Tup 正确性规则）：
@@ -10,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Iterable
 
 from core import disk_cache as dc
 
@@ -27,7 +26,7 @@ def file_digest(path: Any) -> str:
         return ""
 
 
-def face_digest(root: str, rels: Iterable[str]) -> Dict[str, str]:
+def face_digest(root: str, rels: Iterable[str]) -> dict[str, str]:
     """读面/代码面 → {相对路径: 内容哈希}。"""
     return {str(r): file_digest(Path(root) / str(r)) for r in rels}
 
@@ -47,9 +46,9 @@ def key_for(root: str, expert_id: str, reads: Iterable[str],
     return h.hexdigest()
 
 
-def verify(root: str, entry: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def verify(root: str, entry: dict[str, Any]) -> tuple[bool, list[str]]:
     """命中前校验 → (是否有效, 理由)。缺件与内容变更都必须判无效。"""
-    reasons: List[str] = []
+    reasons: list[str] = []
     for kind in ("reads", "code"):
         for rel, want in sorted((entry.get(kind) or {}).items()):
             got = file_digest(Path(root) / rel)
@@ -60,7 +59,7 @@ def verify(root: str, entry: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return (not reasons), reasons
 
 
-_MEMO: Dict[str, Tuple[Any, Dict[str, Any]]] = {}
+_MEMO: dict[str, tuple[Any, dict[str, Any]]] = {}
 
 
 def _shape(value: Any) -> bool:
@@ -75,7 +74,7 @@ def clear() -> None:
 
 def memo(tag: str, ckey: str, impl: Callable[[], Any], root: str = ".",
          reads: Iterable[str] = (), code_files: Iterable[str] = CODE_FILES
-         ) -> Tuple[Any, bool]:
+         ) -> tuple[Any, bool]:
     """命中即返回 (值, True)；未命中/失效则算并落盘 → (值, False)。"""
     entry = {"reads": face_digest(root, reads), "code": face_digest(root, code_files)}
     hit = _MEMO.get(ckey)
