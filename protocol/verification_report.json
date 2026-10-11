@@ -366,7 +366,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 201,
-        "files": 269,
+        "files": 270,
         "max_fn_cc": 114,
         "max_fn_lines": 1218,
         "max_lines": 7332
@@ -428,11 +428,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 230,
-        "modules": 230,
+        "metrics_recorded": 231,
+        "modules": 231,
         "registered_cycles": 0,
-        "registered_sdp": 8,
-        "sdp": 8
+        "registered_sdp": 9,
+        "sdp": 9
       },
       "status": "pass",
       "warns": 0
@@ -514,7 +514,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "474844f8bacd40fc3c66920fbdefde239886e25e9a9ea710fbefc81c3b7af62c",
+  "root_digest": "679270618610fb38e0d0268303262436b9d89848eee1a780c4b29052abf9bf4f",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
