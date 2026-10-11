@@ -1,0 +1,19 @@
+{
+  "schema": "nf-test-vectors/1",
+  "note": "P-C1 真契约向量：期望值由 RFC 8785 规则**人工推导**（键按 UTF-16 码元排序、无空格、最小转义）",
+  "vectors": [
+    {
+      "id": "jcs/basic-ascii",
+      "spec_clause": "RFC8785/3.2.3",
+      "level": "L2",
+      "compare_rule": "byte",
+      "expected": "{\"a\":[2,1.5,true,null],\"b\":1,\"c\":\"xy\"}",
+      "langs": {
+        "python": {"cmd": ["python", "scripts/jcs.py", "--file",
+                           "protocol/generated/test_vectors/jcs_input.json"]},
+        "rust": {"cmd": ["cargo", "--version"], "probe": true},
+        "csharp": {"cmd": ["dotnet", "--list-sdks"], "probe": true}
+      }
+    }
+  ]
+}
