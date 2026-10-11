@@ -52,7 +52,7 @@ def _package_dirs() -> List[Path]:
                   if d.is_dir() and not d.name.startswith("."))
 
 
-def _pkg_files(cat: str, pkg: str, sub: str, cache: Optional[dict] = None) -> List[Path]:
+def _pkg_files(cat: str, pkg: str, sub: str, cache: dict | None = None) -> list[Path]:
     """包内某子目录的件；cache 为**单次 catalog 调用内**复用表（§23.34：不加则 93k 次 glob）。"""
     key = (cat, pkg, sub)
     if cache is not None and key in cache:
@@ -77,7 +77,7 @@ def _pipeline_ids_in_cache(store: Store) -> set:
 
 
 def _module_file(pkg_dir: Path, module_ref: str,
-                 files: Optional[List[Path]] = None) -> Optional[Path]:
+                 files: list[Path] | None = None) -> Path | None:
     """在包 modules/ 目录定位 <id>_*.md（files：已列好的文件表，可省）。"""
     num = str(module_ref).split(":")[-1]
     for f in (files if files is not None
@@ -88,7 +88,7 @@ def _module_file(pkg_dir: Path, module_ref: str,
 
 
 def load_community_module(pkg: str, full_id: str,
-                          files: Optional[List[Path]] = None) -> Optional[Module]:
+                          files: list[Path] | None = None) -> Module | None:
     """只读加载 community/<pkg>/modules 模块正文（files：已列表，可省）。"""
     from .parser import parse_module
     root = _community_root()
@@ -105,7 +105,7 @@ def load_community_module(pkg: str, full_id: str,
 
 
 def load_community_pipeline(pkg: str, pid: str,
-                            files: Optional[List[Path]] = None) -> Optional[Pipeline]:
+                            files: list[Path] | None = None) -> Pipeline | None:
     """只读加载 community/<pkg>/pipelines 管线（files 同 load_community_module）。"""
     from .pipeline_loader import load_pipeline_file
     root = _community_root()

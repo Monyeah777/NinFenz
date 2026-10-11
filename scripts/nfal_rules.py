@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NFA-L/R 规则层 CLI：读 JSON 规则文档 → 定点推导（只读）。
 
 用法：
@@ -13,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
+from core import json_doc  # noqa: E402
 from core import nfal_rules as nr  # noqa: E402
 
 
@@ -24,7 +24,7 @@ def main(argv=None) -> int:
                     help="求值后端（三者事实集必须相同；dag 额外给出推导图统计）")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
-    doc = json.loads(Path(args.file).read_text(encoding="utf-8"))
+    doc = json_doc.loads(Path(args.file).read_text(encoding="utf-8"), dict, what="规则文档")
     fn = {"naive": nr.evaluate, "seminaive": nr.evaluate_seminaive,
           "dag": nr.evaluate_dag}[args.backend]
     got = fn(doc, fuel=args.fuel or None)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """门禁读面台账 CLI（W-03 的消费者面，只读）。
 
 用法：

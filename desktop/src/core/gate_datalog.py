@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """P-A5：把「门禁影响图」投影成 NFA-L/R 规则，并由 DAG 后端求值。
 
 规则面（与 gate_graph.closure 同语义的两条路径）：
@@ -13,7 +12,7 @@ tests/test_gate_datalog.py；DAG 后端还额外给出 gate 推导图统计（�
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from core import gate_faces as gf
 from core import gate_graph as gg
@@ -23,11 +22,11 @@ FUEL = 5000000
 
 
 def route_doc(root: str = ".", changed_modules: Sequence[str] = (),
-              experts: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+              experts: dict[str, Any] | None = None) -> dict[str, Any]:
     """门禁影响图 → nfal-rules 文档（事实：imports/expert/changed；规则：affects/hit）。"""
     dep_map = gg.module_deps(root)
     decl = experts if experts is not None else gf.load_manifest(root)
-    facts: List[Dict[str, Any]] = []
+    facts: list[dict[str, Any]] = []
     for mod, deps in sorted(dep_map.items()):
         for dep in sorted(deps):
             facts.append({"pred": "imports", "args": [mod, dep]})
@@ -55,8 +54,8 @@ def route_doc(root: str = ".", changed_modules: Sequence[str] = (),
 
 
 def routed(root: str = ".", changed_modules: Sequence[str] = (),
-           experts: Optional[Dict[str, Any]] = None,
-           backend: str = "dag") -> Tuple[List[str], Dict[str, Any]]:
+           experts: dict[str, Any] | None = None,
+           backend: str = "dag") -> tuple[list[str], dict[str, Any]]:
     """→ (命中的专家 id 排序表, 求值结果)。backend ∈ {dag, naive, seminaive}。"""
     doc = route_doc(root, changed_modules, experts=experts)
     fn = {"dag": nr.evaluate_dag, "naive": nr.evaluate,

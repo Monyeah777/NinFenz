@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """门禁读面台账（W-03）：静态面 / 动态面 / 声明面 与三源对账。
 
 为什么要它（§6 前置）：门禁失败的直接原因是它的读面变了，不是它 import 了谁。
@@ -11,13 +10,13 @@ from __future__ import annotations
 
 import ast
 import fnmatch
-import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable
 
 from core import effect_rows as er
+from core import json_doc
 
 MANIFEST_REL = "protocol/gate_experts.json"
 CODE_FACES = ("desktop/src/core", "scripts")
@@ -45,7 +44,7 @@ def norm_key(key: str) -> str:
     return os.path.abspath(s)
 
 
-def rel_face(root: str, keys: Iterable[str]) -> List[str]:
+def rel_face(root: str, keys: Iterable[str]) -> list[str]:
     """把 memo 键归一成仓库相对 posix（只保留落在 root 内的）。"""
     base = os.path.normcase(os.path.abspath(str(root)))
     out = []
@@ -58,7 +57,7 @@ def rel_face(root: str, keys: Iterable[str]) -> List[str]:
 
 
 #: audit hook 的活收集器（进程内只装一次 hook；每次调用注册/注销，防跨次泄漏）。
-_COLLECTORS: List[set] = []
+_COLLECTORS: list[set] = []
 
 
 def _ensure_hook() -> None:
@@ -71,7 +70,7 @@ def _ensure_hook() -> None:
             return
         try:
             p = args[0]
-        except (IndexError, TypeError):
+        except (IndexError, TypeError):   # audit 事件参数形状随版本而异：取不到即跳过该事件（不涉业务错误）
             return
         if isinstance(p, int):          # 文件描述符：无路径可记
             return
@@ -86,7 +85,7 @@ def _ensure_hook() -> None:
 
 
 def observed_face(runner: Callable[[], Any], root: str = ".",
-                  use_hook: bool = False) -> List[str]:
+                  use_hook: bool = False) -> list[str]:
     """跑一次 runner（该专家的只读入口）→ 真实读面（仓库相对 posix）。
 
     两条观测路径（M2 §23.17 实测二者不通用）：
@@ -115,7 +114,7 @@ def observed_face(runner: Callable[[], Any], root: str = ".",
     return rel_face(root, keys)
 
 
-def static_face(path: str) -> Dict[str, List[str]]:
+def static_face(path: str) -> dict[str, list[str]]:
     """单文件静态面：import 名 + 路径样字符串字面量（含 glob）。"""
     tree = ast.parse(Path(path).read_text(encoding="utf-8"))
     imports, paths = set(), set()
@@ -136,9 +135,9 @@ def static_face(path: str) -> Dict[str, List[str]]:
     return {"imports": sorted(imports), "paths": sorted(paths)}
 
 
-def static_faces(root: str = ".") -> Dict[str, List[str]]:
+def static_faces(root: str = ".") -> dict[str, list[str]]:
     """代码面（core + scripts）的静态读面：模块相对路径 → 路径样字面量表。"""
-    out: Dict[str, List[str]] = {}
+    out: dict[str, list[str]] = {}
     for face in CODE_FACES:
         for p in sorted((Path(root) / face).glob("*.py")):
             rel = _posix(p.relative_to(root))
@@ -149,13 +148,13 @@ def static_faces(root: str = ".") -> Dict[str, List[str]]:
     return out
 
 
-def compress_face(paths: Iterable[str]) -> List[str]:
+def compress_face(paths: Iterable[str]) -> list[str]:
     """具体路径集 → 尽量少的 glob（按 前两段 + 扩展名 归并；宁可过覆盖，不可漏）。
 
     M2 实测（§23.17）：静态声明面（手写路径）远小于真读面，会漏判；声明面**必须**由
     观测面生成，本函数即那步的压缩器。
     """
-    groups: Dict[Any, int] = {}
+    groups: dict[Any, int] = {}
     for p in paths:
         parts = _posix(p).split("/")
         ext = os.path.splitext(parts[-1])[1]
@@ -169,27 +168,27 @@ def compress_face(paths: Iterable[str]) -> List[str]:
     return sorted(out)
 
 
-def derive_reads(root: str, observed: Iterable[str]) -> List[str]:
+def derive_reads(root: str, observed: Iterable[str]) -> list[str]:
     """观测读面 → 声明 reads（仓库相对 glob）。"""
     rels = [r for r in (_posix(x) for x in observed) if r and r != "."]
     return compress_face(rels)
 
 
-def load_manifest_doc(root: str = ".") -> Dict[str, Any]:
+def load_manifest_doc(root: str = ".") -> dict[str, Any]:
     """读声明面原文；缺件/坏件返回空表（由 audit 如实报 warn，不裸崩）。"""
     p = Path(root) / MANIFEST_REL
     if not p.is_file():
         return {}
     try:
-        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc = json_doc.loads(p.read_text(encoding="utf-8"), dict, what="门禁专家声明面")
     except ValueError:
         return {}
     return doc if isinstance(doc, dict) else {}
 
 
-def validate_manifest(doc: Any) -> List[str]:
+def validate_manifest(doc: Any) -> list[str]:
     """声明面形状校验 → 违例清单（空=合规）。fail-closed：缺字段/未知级别即违例。"""
-    out: List[str] = []
+    out: list[str] = []
     if not isinstance(doc, dict) or not doc:
         return ["声明面缺失或非对象"]
     if doc.get("schema") != MANIFEST_SCHEMA:
@@ -211,7 +210,7 @@ def validate_manifest(doc: Any) -> List[str]:
     return out
 
 
-def classify_source(text: str) -> Tuple[str, List[str]]:
+def classify_source(text: str) -> tuple[str, list[str]]:
     """源码面 → (skip_safety, 依据)。
 
     P-A2 起：输入换成 **effect_rows 的效应行**（ast 可证，带行号），判定表不变；
@@ -221,8 +220,8 @@ def classify_source(text: str) -> Tuple[str, List[str]]:
     return er.level(rs), ["%s:%s(L%s)" % (r["kind"], r["evidence"], r["line"]) for r in rs]
 
 
-def derive_skip_safety(root: str, expert: Dict[str, Any]
-                       ) -> Tuple[Optional[str], List[str]]:
+def derive_skip_safety(root: str, expert: dict[str, Any]
+                       ) -> tuple[str | None, list[str]]:
     """从专家源码推导 skip_safety；找不到源码返回 (None, 理由)——**不猜级别**。"""
     mod = str(expert.get("module") or "").strip()
     cands = [Path(root) / mod] if mod else []
@@ -239,20 +238,20 @@ def derive_skip_safety(root: str, expert: Dict[str, Any]
     return None, ["无源码可推（按保守处置：不得据此下调级别）"]
 
 
-def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
+def load_manifest(root: str = ".") -> dict[str, dict[str, Any]]:
     """声明面 → {id: 专家}（只用形状合法的条目；整体校验由 audit 报违例）。"""
     doc = load_manifest_doc(root)
-    out: Dict[str, Dict[str, Any]] = {}
+    out: dict[str, dict[str, Any]] = {}
     for e in (doc.get("experts") or []):
         if isinstance(e, dict) and e.get("id"):
             out[str(e["id"])] = e
     return out
 
 
-def _glob_variants(g: str) -> List[str]:
+def _glob_variants(g: str) -> list[str]:
     """glob 变体：`**/` 允许**零层**目录（fnmatch 的 `*` 本就跨 `/`，故去掉即覆盖）。
 
-    修的是实测缺陷：`scripts/**/*.py` 曾匹配不到 `scripts/a.py`（`**/` 被当成必需一层），
+    修的是实测缺陷：`scripts/**/*.py` 曾匹配不到 scripts 下**单层**的 .py 件（`**/` 被当成必需一层），
     方向一律**偏过覆盖**（宁可多跑，不可漏跑）。
     """
     out = [g]
@@ -277,14 +276,14 @@ def covered(path: str, patterns: Iterable[str]) -> bool:
     return False
 
 
-def audit(root: str = ".", observed: Optional[Dict[str, List[str]]] = None,
-          static: Optional[Dict[str, List[str]]] = None
-          ) -> Tuple[List[str], Dict[str, Any]]:
+def audit(root: str = ".", observed: dict[str, list[str]] | None = None,
+          static: dict[str, list[str]] | None = None
+          ) -> tuple[list[str], dict[str, Any]]:
     """三源对账 → (issues, stats)。observed/static 可注入（测试与后续接线共用）。"""
     doc = load_manifest_doc(root)
     declared = load_manifest(root)
-    issues: List[str] = []
-    stats: Dict[str, Any] = {"experts": len(declared), "facts": {}, "warns": []}
+    issues: list[str] = []
+    stats: dict[str, Any] = {"experts": len(declared), "facts": {}, "warns": []}
     if not doc:
         stats["warns"].append("声明面缺件（%s 未落，见 W-03.3）：本次无专家可对账" % MANIFEST_REL)
     else:

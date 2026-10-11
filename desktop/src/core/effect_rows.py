@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """效应面（P-A2）：源码 → **效应行**（ast 可证），并给出规则层（P-A1）的同判定 구현。
 
 效应行 = {"kind": net|proc|env|time|fs_probe, "evidence": 点号名, "line": 行号}
@@ -8,7 +7,7 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Dict, List
+from typing import Any
 
 from core import nfal_rules as nr
 
@@ -42,7 +41,7 @@ _RANK_LEVEL = {2: "UNSAFE", 1: "CONDITIONAL", 0: "SAFE"}
 
 def _dotted(node: ast.AST) -> str:
     """属性节点 → 点号名（os.path.exists）。"""
-    parts: List[str] = []
+    parts: list[str] = []
     cur: Any = node
     while isinstance(cur, ast.Attribute):
         parts.append(cur.attr)
@@ -52,31 +51,33 @@ def _dotted(node: ast.AST) -> str:
     return ".".join(reversed(parts))
 
 
-def rows(source: str) -> List[Dict[str, Any]]:
+def rows(source: str) -> list[dict[str, Any]]:
     """源码 → 效应行（去重后按 kind/evidence/line 排序）。**解析不出 → 最严一行**（fail-closed）。"""
     try:
         tree = ast.parse(source)
     except SyntaxError:
         return [{"kind": "env", "evidence": "unparseable", "line": 0}]
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for node in ast.walk(tree):
         line = int(getattr(node, "lineno", 0) or 0)
         if isinstance(node, ast.Import):
             for a in node.names:
                 k = IMPORT_KINDS.get(a.name.split(".")[0])
                 if k:
-                    out.append({"kind": k, "evidence": "import " + a.name, "line": line})
+                    out.append({"kind": k, "evidence": "import " + a.name,
+                                "line": line})
         elif isinstance(node, ast.ImportFrom):
             if node.module:
                 k = IMPORT_KINDS.get(node.module.split(".")[0])
                 if k:
-                    out.append({"kind": k, "evidence": "from " + node.module, "line": line})
+                    out.append({"kind": k, "evidence": "from " + node.module,
+                                "line": line})
         elif isinstance(node, ast.Attribute):
             dotted = _dotted(node).lower()
             k = ATTR_KINDS.get(dotted) or METHOD_KINDS.get(dotted.rsplit(".", 1)[-1])
             if k:
                 out.append({"kind": k, "evidence": dotted, "line": line})
-    best: Dict[Any, Dict[str, Any]] = {}
+    best: dict[Any, dict[str, Any]] = {}
     for r in out:
         key = (r["kind"], r["evidence"])
         if key not in best or r["line"] < best[key]["line"]:
@@ -84,7 +85,7 @@ def rows(source: str) -> List[Dict[str, Any]]:
     return sorted(best.values(), key=lambda r: (r["kind"], r["evidence"], r["line"]))
 
 
-def level(rows_list: List[Dict[str, Any]]) -> str:
+def level(rows_list: list[dict[str, Any]]) -> str:
     """直算级别：取最严一行（未知类按最严处置）。"""
     top = 0
     for r in rows_list:
@@ -92,9 +93,9 @@ def level(rows_list: List[Dict[str, Any]]) -> str:
     return _RANK_LEVEL[top]
 
 
-def _rule_doc(rows_list: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _rule_doc(rows_list: list[dict[str, Any]]) -> dict[str, Any]:
     """把判定表写成规则：sev(类, 严度) ⇒ level_max(严度)；module 事实兜底 SAFE。"""
-    facts: List[Dict[str, Any]] = [{"pred": "module", "args": ["m"]}]
+    facts: list[dict[str, Any]] = [{"pred": "module", "args": ["m"]}]
     for r in rows_list:
         facts.append({"pred": "sev", "args": [r["kind"], _SEV.get(r["kind"], 2)]})
     rules = [{"head": {"pred": "level_max", "args": [0]},
@@ -110,11 +111,11 @@ def level_via_rules(source: str) -> str:
     got = nr.evaluate(_rule_doc(rows(source)))
     if got["status"] != "OK":
         return "UNSAFE"
-    ranks: List[int] = []
+    ranks: list[int] = []
     for f in got["facts"]:
         if f.startswith("level_max("):
-            try:
-                ranks.append(int(f[len("level_max("):-1]))
-            except ValueError:
-                pass
+            # DAG 后端只产出 level_max(<int>)；非数字即形状异常 → 跳过（末尾 fail-closed 取最严兜底）
+            tail = f[len("level_max("):-1]
+            if tail.isdigit():
+                ranks.append(int(tail))
     return _RANK_LEVEL[max(ranks)] if ranks else "UNSAFE"
