@@ -6,7 +6,7 @@ patterns 的 applies_to 与 LAYERS 的 judged_by 已存在，但无「改了就�
 from __future__ import annotations
 
 import fnmatch
-from typing import Any, Dict, Iterable, List
+from typing import Dict, Iterable, List
 
 
 def triggered(mapping: Dict[str, str], changed: Iterable[str]) -> Dict[str, List[str]]:

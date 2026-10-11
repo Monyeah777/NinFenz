@@ -41,5 +41,5 @@ def _days(a: str, b: str):
         ya, ma, da = (int(x) for x in a.split("-"))
         yb, mb, db = (int(x) for x in b.split("-"))
         return (date(yb, mb, db) - date(ya, ma, da)).days
-    except (ValueError, TypeError):
+    except (ValueError, TypeError):  # 日期非法按「不可算」处理：返回 None，缺省由调用方判
         return None

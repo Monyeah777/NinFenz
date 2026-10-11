@@ -25,4 +25,5 @@ def evaluate(entries: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
             warn.append({"id": eid, "state": "missing", "reason": "取不到内容；若可选则继续"})
         else:
             ok.append({"id": eid, "state": "ok"})
-    return {"blocking": blocking, "warn": warn, "ok": ok}
+    # BLOCKING 是唯一真源：阻断档只由它裁定（改档位即改此处，不再有第二处字面量）
+    return {"blocking": [x for x in blocking if x["state"] in BLOCKING], "warn": warn, "ok": ok}

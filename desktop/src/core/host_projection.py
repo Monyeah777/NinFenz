@@ -6,7 +6,7 @@ NF 的 agents-rules 出口与 check31 是**整体** golden；本模块补**逐�
 from __future__ import annotations
 
 import re
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List
 
 _PLACEHOLDER = re.compile(r"\{\{[^}]+\}\}|<TODO>|__PLACEHOLDER__")
 
