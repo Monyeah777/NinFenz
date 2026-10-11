@@ -105,5 +105,43 @@ class ManifestSchemaTest(unittest.TestCase):
         self.assertTrue(gf.validate_manifest({}))
 
 
+class SkipSafetyTest(unittest.TestCase):
+    """W-04：效应面 → skip_safety 推导（变异自证：四类非确定面各自判 UNSAFE）。"""
+
+    def test_unsafe_markers(self):
+        cases = [("import subprocess", "proc"), ("import socket", "net"),
+                 ("import os\nX = os.environ['A']", "env"),
+                 ("import time\ntime.time()", "time")]
+        for snippet, kind in cases:
+            level, why = gf.classify_source(snippet)
+            self.assertEqual("UNSAFE", level, (snippet, why))
+            self.assertTrue(any(w.startswith(kind + ":") for w in why), (snippet, why))
+
+    def test_conditional_on_fs_probe(self):
+        level, why = gf.classify_source("import os\nos.path.exists('x')")
+        self.assertEqual("CONDITIONAL", level, why)
+
+    def test_safe_plain(self):
+        level, why = gf.classify_source("X = 1\n")
+        self.assertEqual("SAFE", level, why)
+
+    def test_derive_and_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "protocol").mkdir(parents=True, exist_ok=True)
+            (Path(tmp) / "m.py").write_text("import socket\n", encoding="utf-8")
+            (Path(tmp) / "protocol" / "gate_experts.json").write_text(
+                '{"schema": "nf-gate-experts/1", "experts": ['
+                '{"id": "e1", "reads": [], "skip_safety": "SAFE", "module": "m.py"}]}',
+                encoding="utf-8")
+            issues, stats = gf.audit(tmp)
+            self.assertTrue(any("声明级别与推导不符" in i for i in issues), issues)
+            self.assertEqual("UNSAFE", stats["facts"]["e1"]["derived_skip_safety"])
+
+    def test_no_source_does_not_guess(self):
+        level, why = gf.derive_skip_safety(".", {"id": "no-such-module"})
+        self.assertIsNone(level)
+        self.assertTrue(why)
+
+
 if __name__ == "__main__":
     unittest.main()

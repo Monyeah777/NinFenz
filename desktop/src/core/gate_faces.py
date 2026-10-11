@@ -22,6 +22,16 @@ CODE_FACES = ("desktop/src/core", "scripts")
 MANIFEST_SCHEMA = "nf-gate-experts/1"
 SKIP_SAFETY = ("SAFE", "CONDITIONAL", "UNSAFE")
 
+#: 非确定/外部面标记（§5 与 §15.4）：命中即 UNSAFE，永不被路由裁剪。
+EFFECT_MARKERS = {
+    "net": ("socket", "urllib", "http.client", "requests", "httpx", "aiohttp"),
+    "proc": ("subprocess", "shutil.which", "os.system", "ctypes", "multiprocessing"),
+    "env": ("os.environ", "os.getenv", "getpass", "platform.system", "sys.platform"),
+    "time": ("time.time", "time.perf_counter", "time.monotonic", "datetime.now", "date.today"),
+}
+#: 文件系统探测标记：命中即 CONDITIONAL（条件可枚举，触达其条件时必须入列）。
+FS_PROBE = ("os.path.exists", "Path.exists", "is_file", "is_dir", "glob(", "iterdir", "walk(")
+
 
 def _posix(p: str) -> str:
     return str(p).replace("\\", "/")
@@ -136,6 +146,40 @@ def validate_manifest(doc: Any) -> List[str]:
     return out
 
 
+def classify_source(text: str) -> Tuple[str, List[str]]:
+    """源码面 → (skip_safety, 依据)：命中 env/proc/time/net 即 UNSAFE；文件系统探测为 CONDITIONAL。
+
+    这是 §15.4「效应行 → skip_safety」在 DSL 效应行落地**之前**的同判据近似：
+    NFA-L/R 效应行一落地，本函数的输入即由「源码文本」换成「效应行」，判定表不变。
+    """
+    hits = [kind + ":" + m for kind, marks in sorted(EFFECT_MARKERS.items())
+            for m in marks if m in text]
+    if hits:
+        return "UNSAFE", hits
+    probes = [m for m in FS_PROBE if m in text]
+    if probes:
+        return "CONDITIONAL", probes
+    return "SAFE", []
+
+
+def derive_skip_safety(root: str, expert: Dict[str, Any]
+                       ) -> Tuple[Optional[str], List[str]]:
+    """从专家源码推导 skip_safety；找不到源码返回 (None, 理由)——**不猜级别**。"""
+    mod = str(expert.get("module") or "").strip()
+    cands = [Path(root) / mod] if mod else []
+    if not cands:
+        eid = str(expert.get("id") or "")
+        cands = [Path(root) / "desktop" / "src" / "core" / (eid + ".py"),
+                 Path(root) / "scripts" / (eid + ".py")]
+    for p in cands:
+        if p.is_file():
+            try:
+                return classify_source(p.read_text(encoding="utf-8"))
+            except OSError:
+                break
+    return None, ["无源码可推（按保守处置：不得据此下调级别）"]
+
+
 def load_manifest(root: str = ".") -> Dict[str, Dict[str, Any]]:
     """声明面 → {id: 专家}（只用形状合法的条目；整体校验由 audit 报违例）。"""
     doc = load_manifest_doc(root)
@@ -180,6 +224,11 @@ def audit(root: str = ".", observed: Optional[Dict[str, List[str]]] = None,
         for p in st:
             if not covered(p, reads):
                 issues.append("静态面未声明：%s 的 %s（补 reads 或删该读取）" % (eid, p))
+        derived, why = derive_skip_safety(root, e)
+        stats["facts"][eid]["derived_skip_safety"] = derived
+        if derived and e.get("skip_safety") and e["skip_safety"] != derived:
+            issues.append("声明级别与推导不符：%s 声明 %s，推导 %s（%s）"
+                          % (eid, e["skip_safety"], derived, "; ".join(why[:3])))
         if ob is None:
             continue
         for p in ob:

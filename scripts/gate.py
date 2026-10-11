@@ -51,12 +51,26 @@ def _manifest(as_json):
     return 0
 
 
+def _derive(as_json):
+    doc = gf.load_manifest(ROOT)
+    rows = []
+    for eid, e in sorted(doc.items()):
+        level, why = gf.derive_skip_safety(ROOT, e)
+        rows.append({"id": eid, "declared": e.get("skip_safety"),
+                     "derived": level, "why": why[:3]})
+    _emit("gate-derive", {"rows": rows}, as_json,
+          ["== 级别推导 =="] + ["  %s 声明=%s 推导=%s" % (r["id"], r["declared"], r["derived"])
+                                for r in rows])
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁读面台账（只读）")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--observed", action="store_true", help="跑只读扫描器并打印观测读面")
     ap.add_argument("--static-faces", action="store_true")
     ap.add_argument("--manifest", action="store_true")
+    ap.add_argument("--derive", action="store_true", help="声明级别 vs 源码推导")
     args = ap.parse_args(argv)
     if args.observed:
         return _observed(args.json)
@@ -64,6 +78,8 @@ def main(argv=None) -> int:
         return _static_faces(args.json)
     if args.manifest:
         return _manifest(args.json)
+    if args.derive:
+        return _derive(args.json)
     issues, stats = gf.audit(ROOT)
     if args.json:
         print(json.dumps({"kind": "gate-audit", "issues": issues, "stats": stats},
