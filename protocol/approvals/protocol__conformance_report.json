@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-11",
   "approved_by": "Monyeah",
-  "note": "机械重批：真声明面扩到 8 个专家（schema_lint/purity_scan/repo_stats/assertions）后冻结链重算",
+  "note": "机械重批：修 6 处红 + 风格基线重冻（9337）后冻结链重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
