@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """LSP 服务器单测（分帧 / 能力 / 诊断定位 / 领域智能 / 编辑 / 退出语义 / 配置生成）。
 
 判据来源：LSP 3.17 规范（initialize 能力、positionEncoding、didClose、shutdown/exit 退出码、
@@ -9,7 +8,9 @@ import io
 import json
 import os
 import re
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -84,13 +85,65 @@ class TestCapabilities(unittest.TestCase):
         self.assertTrue(caps["completionProvider"]["triggerCharacters"])
         self.assertEqual(res["serverInfo"]["name"], "nf-lsp")
 
-    def test_root_uri_adopted_only_without_explicit_root(self):
+    def test_root_uri_adopted_only_within_launch_root(self):
+        """rootUri 采纳口径（2026-10-10 审计 X2，P1）：只采纳「在场目录 + 落在启动根内」的落点。
+
+        修复前：客户端报 `file:///C:/somewhere/else` 就照单全收——会话根一搬走，`_text_of`
+        的包含性边界随之失效，等于把「能读哪些文件」的裁决权交给客户端。
+        """
         srv, _res = self._init({"rootUri": "file:///C:/somewhere/else"})
-        self.assertTrue(srv.root.replace(BS, "/").endswith("somewhere/else"))
+        self.assertEqual(str(Path(ROOT).resolve()), srv.root,
+                         "不在场 / 越界的 rootUri 必须被拒绝（保留启动根）")
+        sub = Path(ROOT) / "docs"
+        srv2, _res2 = self._init({"rootUri": lsp.path_to_uri(str(sub))})
+        self.assertEqual(str(sub.resolve()), srv2.root, "启动根内的在场子目录应被采纳")
         explicit = lsp.LspServer(root=ROOT, explicit_root=True)
         explicit.handle({"jsonrpc": "2.0", "id": 1, "method": lsp.M_INITIALIZE,
                          "params": {"rootUri": "file:///C:/somewhere/else"}})
         self.assertEqual(explicit.root, str(Path(ROOT).resolve()))
+
+
+class TestReadContainment(unittest.TestCase):
+    """审计 X2（P1）：工作区外 uri 绝不返回文件内容（CWE-22 → CWE-200）。"""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="nf_lsp_ext_")
+        self.outside = Path(self.tmp) / "secret.md"
+        self.outside.write_text("# 根外机密\n不得外带\n", encoding="utf-8")
+        self.srv = lsp.LspServer(root=ROOT)
+        self.srv.handle({"jsonrpc": "2.0", "id": 1, "method": lsp.M_INITIALIZE, "params": {}})
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_outside_uri_returns_empty_from_every_face(self):
+        uri = lsp.path_to_uri(str(self.outside))
+        self.assertEqual("", self.srv._text_of(uri), "根外 uri 不得读出正文")
+        for method, extra in ((lsp.M_DOCUMENT_SYMBOL, {}),
+                              (lsp.M_FOLDING_RANGE, {}),
+                              (lsp.M_HOVER, {"position": {"line": 0, "character": 1}})):
+            params = {"textDocument": {"uri": uri}}
+            params.update(extra)
+            res = self.srv.handle({"jsonrpc": "2.0", "id": 9, "method": method,
+                                   "params": params})[0]["result"]
+            self.assertIn(res, ([], None), "根外 uri 在 %s 面外带了内容：%r" % (method, res))
+
+    def test_dotdot_escape_uri_is_rejected(self):
+        """词法 `..` 逃逸：url 里的 `..` 必须在 realpath 归一后被包含性拦下。"""
+        from urllib.parse import quote
+        sibling = Path(ROOT).parent / "nf_lsp_escape_probe.md"
+        sibling.write_text("# 兄弟目录\n", encoding="utf-8")
+        try:
+            raw = Path(ROOT).as_posix() + "/../" + sibling.name
+            uri = "file://" + quote(raw)
+            self.assertEqual("", self.srv._text_of(uri))
+        finally:
+            sibling.unlink()
+
+    def test_inside_uri_is_still_read(self):
+        inside = Path(ROOT) / "README.md"
+        self.assertEqual(inside.read_text(encoding="utf-8"),
+                         self.srv._text_of(lsp.path_to_uri(str(inside))))
 
 
 class TestDiagnostics(unittest.TestCase):
@@ -341,7 +394,8 @@ class TestTransport(unittest.TestCase):
         self.assertEqual(parse_frames(out.getvalue())[0]["id"], 1)
 
     def test_unknown_method_returns_error(self):
-        out = _ready(lsp.LspServer(root=ROOT)).handle({"jsonrpc": "2.0", "id": 9, "method": "no/such"})
+        out = _ready(lsp.LspServer(root=ROOT)).handle({"jsonrpc": "2.0", "id": 9, "method": "no/suc"
+            "h"})
         self.assertEqual(out[0]["error"]["code"], -32601)
 
 
@@ -555,7 +609,8 @@ class TestLifecycleStateMachine(unittest.TestCase):
 
     def test_notification_before_initialize_is_ignored_not_an_error(self):
         out = self.srv.handle({"jsonrpc": "2.0", "method": lsp.M_DID_OPEN,
-                               "params": {"textDocument": {"uri": "file:///x.md", "text": "# T\n"}}})
+                               "params": {"textDocument": {"uri": "file:///x.md",
+ "text": "# T\n"}}})
         self.assertEqual([], out, "通知没有应答位：静默忽略，不回错误")
 
     def test_second_initialize_is_invalid_request(self):
@@ -665,7 +720,8 @@ class TestGeneratedConfigIsUsable(unittest.TestCase):
             self.assertEqual("lsp", srv["args"][-1], root)
             self.assertTrue(srv["args"][0].endswith("scripts/nf.py"), root)
             self.assertNotIn(self.BS, srv["args"][0],
-                             "路径里的反斜杠必须先折成正斜杠（否则 TOML 基本字符串非法）：%s" % root)
+                             "路径里的反斜杠必须先折成正斜杠（否则 TOML 基本字符串非法）：%s"
+                                 "" % root)
 
     def test_lua_and_elisp_blocks_are_delimiter_balanced(self):
         for editor in ("neovim", "emacs"):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """决策层候选模型的**拉取与启动脚手架**（非门禁 · 默认只打印，不擅自下载）。
 
 为什么默认不下载：候选是 300M–9B 级权重（Open-Jev 还需 base 模型 + GPU），
@@ -18,7 +17,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shlex
 import shutil
@@ -26,6 +24,9 @@ import subprocess  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # 承重件在 desktop/src，脚本须能独立运行
 
 DECL_REL = "protocol/decision_layer.json"
 
@@ -66,7 +67,7 @@ def _decl(root: Path) -> Dict[str, Any]:
     p = root / DECL_REL
     if not p.is_file():
         return {}
-    return json.loads(p.read_text(encoding="utf-8"))
+    return json_doc.load(p, dict, what=str(p))
 
 
 def _candidate(decl: Dict[str, Any], cid: str) -> Dict[str, Any]:
@@ -112,7 +113,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     dest = args.dir or ("checkpoints/%s" % cid)
     plan = PLANS.get(cid, {})
     if not plan:
-        print("  ✗ 该候选尚无拉取计划（修复指引：在 scripts/pull_decision_model.py 的 PLANS 补命令）",
+        print("  ✗ 该候选尚无拉取计划（修复指引：在 scripts/pull_decision_model.py 的 PLANS 补命令"
+            "）",
               file=sys.stderr)
         return 2
     cmds = [[part.format(dir=dest) for part in argv] for argv in plan.get("pull", [])]

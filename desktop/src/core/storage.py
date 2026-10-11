@@ -18,7 +18,9 @@ import re
 import shutil
 import subprocess  # nosec B404 - 只问 `git check-ignore`（argv 列表、无 shell）
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
+
+from core import json_doc
 
 from .models import Module, AssetPack, Preset, now_str, fid_key
 from . import paths as nf_paths
@@ -57,8 +59,10 @@ class Store:
                              "请改名或移走后重试）" % self.home)
         # 仓内落点闸门（2026-10-01 探针）：`--store` 落在**仓库内**且**不在 .gitignore 覆盖面**时
         # 拒绝——本类会建 modules / assets / presets / cache 四个目录，未忽略的仓内落点直接变成
-        # `git status` 里的未跟踪垃圾（与 `trace.json` / `docs/meta/档案.md` 那类残留同一类），还可能被误提交。
-        # 仓库自己的约定是 `.rivet/scratch/…` 这类**已忽略**路径（既有用例正落在那儿），故只拦这一种。
+        # `git status` 里的未跟踪垃圾（与 `trace.json` / `docs/meta/档案.md` 那类残留同一类），还可
+        # 能被误提交。
+        # 仓库自己的约定是 `.rivet/scratch/…` 这类**已忽略**路径（既有用例正落在那儿），故只拦这一种
+        # 。
         _in_repo_issue = self._in_repo_unignored_issue(repo_root)
         if _in_repo_issue:
             raise ValueError(_in_repo_issue)
@@ -120,7 +124,7 @@ class Store:
     def load_config(self) -> dict:
         if self.config_path.exists():
             try:
-                return json.loads(self.config_path.read_text(encoding="utf-8"))
+                return json_doc.load(self.config_path, dict, what="config %s" % self.config_path)
             except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
                 pass
         return {"pipeline": "P01", "asset_pack": "", "recent": []}
@@ -155,7 +159,7 @@ class Store:
         for d in self.module_dirs():
             try:
                 m = Module.from_json(
-                    json.loads((d / "module.json").read_text(encoding="utf-8")))
+                    json_doc.load(d / "module.json", dict, what=str(d / "module.json")))
                 # source.md 缺失时回退到内嵌 source_md
                 src = d / "source.md"
                 if src.exists():
@@ -191,8 +195,8 @@ class Store:
             if old == d:
                 continue
             try:
-                om = Module.from_json(json.loads(
-                    (old / "module.json").read_text(encoding="utf-8")))
+                om = Module.from_json(json_doc.load(
+                    old / "module.json", dict, what=str(old / "module.json")))
             except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
                 continue
             if fid_key(om.full_id) == key:
@@ -211,8 +215,8 @@ class Store:
         removed = False
         for d in list(self.module_dirs()):
             try:
-                mm = Module.from_json(json.loads(
-                    (d / "module.json").read_text(encoding="utf-8")))
+                mm = Module.from_json(json_doc.load(
+                    d / "module.json", dict, what=str(d / "module.json")))
             except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
                 continue
             if fid_key(mm.full_id) == key:
@@ -238,7 +242,7 @@ class Store:
             if jf.exists():
                 try:
                     a = AssetPack.from_json(
-                        json.loads(jf.read_text(encoding="utf-8")))
+                        json_doc.load(jf, dict, what=str(jf)))
                     a.source_dir = str(d)
                     out.append(a)
                 except Exception:  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（见 AUD-0016）
@@ -277,7 +281,7 @@ class Store:
         for f in sorted(self.presets_root.glob("*.json")):
             try:
                 out.append(Preset.from_json(
-                    json.loads(f.read_text(encoding="utf-8"))))
+                    json_doc.load(f, dict, what=str(f))))
             except Exception:  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（见 AUD-0016）
                 continue
         return out
@@ -302,11 +306,13 @@ class Store:
         (self.cache_root / f"{key}.json").write_text(
             json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    def load_cache(self, key: str) -> Optional[dict]:
+    def load_cache(self, key: str) -> Optional[Any]:
         f = self.cache_root / f"{key}.json"
         if f.exists():
             try:
-                return json.loads(f.read_text(encoding="utf-8"))
+                # 缓存是**通用**读口：值可以是对象也可以是数组（如 pipelines 缓存就是列表），
+                # 故不限定顶层形状——这里只保证「合法 JSON 才回，坏件回 None」。
+                return json_doc.load(f, None, what=str(f))
             except Exception:  # 缓存坏件/缺件 ⇒ 无命中（等价于未缓存，重算即可）
                 return None
         return None

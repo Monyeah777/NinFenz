@@ -21,6 +21,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 REPORT_REL = "protocol/verification_report.json"
 SCHEMA = "nf-verify-report/1"
 
@@ -33,6 +35,8 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
     ("contract", "机读契约面（官方核心 13 件 id/标题一致）", "machine_contract", "scan", "scan"),
     ("knowledge", "双源知识层（权威分层/顺序/时效/巡检）", "knowledge", "scan", "scan"),
     ("rating", "馆藏内容分级声明", "rating_gate", "scan", "scan"),
+    ("rating_decided", "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）",
+     "rating_gate", "decided", "scan"),
     ("license", "许可证门", "license_gate", "scan", "scan"),
     ("intake", "投稿闸门三方一致", "intake", "scan", "scan"),
     ("payload", "事件载荷注册表", "payload_registry", "scan", "scan"),
@@ -48,6 +52,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
     ("audit", "审计件被审对象 digest", "audit", "scan", "scan"),
     ("self_stats", "自述数字 == 实算（README/llms 生成区）", "repo_stats", "check_strict", "scan"),
     ("code_metrics", "代码规模/复杂度上限（棘轮冻结）", "code_metrics", "scan", "scan"),
+    ("redos", "正则失控回溯（形态 + 增长律；Y3 接线）", "redos_scan", "scan", "scan"),
     ("key_naming", "资产键命名规范（形态 + 声明词表）", "key_naming", "scan", "scan"),
     ("instruction_evidence", "规范入口指令实测记录（新鲜 + 退出码 0）",
      "instruction_evidence", "scan", "scan"),
@@ -58,8 +63,10 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "drill_fidelity", "scan", "scan"),
     ("judgement_coverage", "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
      "judgement_coverage", "scan", "scan"),
-    ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflow_policy", "scan", "scan"),
-    ("asset_contract", "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
+    ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
+        "w_policy", "scan", "scan"),
+    ("asset_contract",
+ "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
      "asset_contract", "scan", "scan"),
 )
 
@@ -124,9 +131,18 @@ def build(root: str = ".") -> Dict[str, Any]:
         items.append({"id": sid, "name": name, "source": "%s.%s" % (mod, entry),
                       "status": status, "issues": len(issues), "warns": len(warns),
                       "stats": stats, "sample": [str(x)[:200] for x in issues[:3]]})
-    summary = {k: sum(1 for i in items if i["status"] == k) for k in ("pass", "fail", "warn", "error")}
-    body = {"schema": SCHEMA, "items": items, "summary": summary,
-            "declared": _declared(root)}
+    summary = {k: sum(1 for i in items if i["status"] == k) for k in ("pass",
+ "fail",
+ "warn",
+ "error")}
+    declared = _declared(root)
+    # Z3（审计 §11ag F-04）：本报告是**判据级抽查面**，条数不等于 verify 的 check 总数；
+    # 把「对外宣称 40 条」与「报告实际 N 条」的差写在声明面里，读者不能把两者当同一件事。
+    declared["report_items"] = len(items)
+    declared["coverage_note"] = ("判据级抽查面 %d 条，各对应 verify.sh 的一道或多道门禁；"
+                                 "≠ 声明 check 总数 %s（两者不可互替）"
+                                 % (len(items), declared.get("expected_checks")))
+    body = {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared}
     digest_src = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
     body["root_digest"] = hashlib.sha256(digest_src).hexdigest()
     return body
@@ -155,7 +171,7 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if not p.is_file():
         return (["缺 %s（修复指引：python scripts/verify_report.py --write）" % REPORT_REL], live)
     try:
-        recorded = json.loads(p.read_text(encoding="utf-8"))
+        recorded = json_doc.load(p, dict, what=REPORT_REL)
     except ValueError as exc:
         return (["%s 不是合法 JSON：%s（修复指引：重跑 --write）" % (REPORT_REL, exc)], live)
     issues: List[str] = []
@@ -174,7 +190,7 @@ def summary_line(report: Dict[str, Any]) -> str:
     s = report.get("summary") or {}
     d = report.get("declared") or {}
     return ("判据 %d 条：PASS %s · FAIL %s · WARN %s · ERROR %s；"
-            "声明 check1-%s / PASS=%s · verify %s"
+            "声明 check1-%s / PASS=%s · verify %s（判据级抽查面，非 check 全量）"
             % (len(report.get("items") or []), s.get("pass"), s.get("fail"),
                s.get("warn"), s.get("error"), d.get("expected_checks"),
                d.get("expected_pass"), d.get("verify_version")))

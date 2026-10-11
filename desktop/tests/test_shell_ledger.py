@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """派生空壳台账（`core/shell_ledger.py`）回归测试：可数 + 只减不增 + 有捕获力。"""
 import sys
 import tempfile
@@ -70,7 +69,8 @@ class TierDeclarationTest(unittest.TestCase):
                 (pkg / "assets").mkdir(parents=True)
                 (pkg / "assets" / "DOMAIN_SPEC.md").write_text(
                     "> **内容档位**：authored（逐条撰写）\n" if tier == "authored"
-                    else "> **内容档位（如实标注）**：本包为 **derived 档**——领域细则待作者逐条补全。\n",
+                    else "> **内容档位（如实标注）**：本包为 **derived 档**——领域细则待作者逐条补全"
+                        "。\n",
                     encoding="utf-8")
                 (pkg / "outputs").mkdir()
                 (pkg / "outputs" / "DOMAIN_SPEC.json").write_text(
@@ -80,8 +80,12 @@ class TierDeclarationTest(unittest.TestCase):
                     fh.write(body)
             stats = sl.survey(tmp)
             joined = " ".join(stats["tier_mismatches"])
-            self.assertIn("虚报", joined, "声称 authored 却带占位必须报：%s" % stats["tier_mismatches"])
-            self.assertIn("少报", joined, "真填了却仍标 derived 必须报：%s" % stats["tier_mismatches"])
+            self.assertIn("虚报",
+ joined,
+ "声称 authored 却带占位必须报：%s" % stats["tier_mismatches"])
+            self.assertIn("少报",
+ joined,
+ "真填了却仍标 derived 必须报：%s" % stats["tier_mismatches"])
 
     def test_tier_mismatch_feeds_the_ratchet(self):
         """接线：对账结果必须进 `ratchet` 的 issues（否则只是台账里的一行数据）。"""

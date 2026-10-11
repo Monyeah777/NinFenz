@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """AGENTS vs SKILL 语义裁决单测（v2.1.0 A1：两判据机制化）。
 
 运行：cd desktop && python -m unittest tests.test_semantics -v

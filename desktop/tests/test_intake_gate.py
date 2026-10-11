@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """投稿闸门声明的三方一致门禁测试（check34 子断言 `core.intake`）。
 
 覆盖：仓库真源零 issue（两通道）；负例九类——缺声明 / schema 错 / updated 非法 /
@@ -34,7 +33,10 @@ def _decl(**over) -> dict:
     return doc
 
 
-def _tree(tmp: str, doc: Optional[dict] = None, index_text: Optional[str] = None, bots: bool = True) -> str:
+def _tree(tmp: str,
+ doc: Optional[dict] = None,
+ index_text: Optional[str] = None,
+ bots: bool = True) -> str:
     root = Path(tmp)
     (root / "library").mkdir(parents=True, exist_ok=True)
     (root / "library" / "intake.json").write_text(

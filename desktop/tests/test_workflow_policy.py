@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """工作流供应链策略（`core/workflow_policy.py`）回归测试 —— 外部标准落地面。
 
 标准出处：`ossf/scorecard` `docs/checks.md` §Pinned-Dependencies（构建/发布依赖须钉具体哈希）

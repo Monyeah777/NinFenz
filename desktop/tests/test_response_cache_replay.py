@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """响应缓存适配器**不得吞掉被包装者的输出**（`response_cache.wrap_runner`）。
 
 动机（本轮终端面取证，真缺陷）：`wrap_runner` 为了存/回放而捕获 stdout/stderr，但回放写在

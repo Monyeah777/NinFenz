@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """透明日志（哈希链）单测：链自洽 + 改一处即断链 + 边界声明 + 生成物一致性。"""
 import json
 import os

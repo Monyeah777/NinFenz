@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """PyYAML 的**惰性**入口：`import yaml` ≈ 40 ms，而缓存命中的冷跑根本不解析 YAML。
 
 依据（实测 2026-09-29，`-X importtime`）：冷 `nf score` 的导入自时 184.6 ms 里 **yaml 子树 39.9 ms**

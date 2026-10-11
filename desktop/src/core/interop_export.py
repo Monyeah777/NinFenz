@@ -14,10 +14,54 @@ AsyncAPI 代码生成器、in-toto 校验器或 SPDX 扫描器对接。
 """
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
+
+
+#: 依赖名别名（纯度登记的 import 名 → PyPI 项目名）：SBOM 的 purl/versionInfo 要用后者。
+_DEP_ALIAS = {"yaml": "pyyaml"}
+
+
+def _pinned_versions(root: str) -> Dict[str, str]:
+    """钉版清单 → {PyPI 名(小写): 版本}：.github/requirements-*.txt 优先，pyproject 可选依赖补。
+
+    2026-10-10 审计 Z4 / §11k.6：此前 SBOM 的依赖包**没有 versionInfo**，依赖扫描器
+    （pip-audit / Grype / Dependabot）拿不到可比对的版本号，结论只能是「无版本 SBOM」。
+    版本必须来自**已钉**的清单（不猜、不取 latest）。
+    """
+    out: Dict[str, str] = {}
+    for p in sorted(glob.glob(os.path.join(root, ".github", "requirements-*.txt"))):
+        try:
+            with open(p, encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except OSError:
+            # 尽力而为：依赖清单不可读 ⇒ 跳过该面（缺口由 self_stats / 供应链判据另行报出）。
+            continue
+        for line in lines:
+            body = line.split("#", 1)[0].strip()
+            if "==" in body:
+                name, ver = body.split("==", 1)
+                out.setdefault(name.strip().lower(), ver.strip())
+    pp = os.path.join(root, "pyproject.toml")
+    if os.path.isfile(pp):
+        try:
+            import tomllib                      # 3.11+
+            with open(pp, "rb") as fh:
+                doc = tomllib.load(fh)
+            extras = (doc.get("project", {}) or {}).get("optional-dependencies") or {}
+            for specs in extras.values():
+                for spec in (specs if isinstance(specs, list) else []):
+                    if isinstance(spec, str) and "==" in spec:
+                        name, ver = spec.split("==", 1)
+                        out.setdefault(name.strip().lower(), ver.strip())
+        except (OSError, ValueError, TypeError):
+            pass
+    return out
 
 CONTRACT_REL = "protocol/endpoint_contract.json"
 EVENTS_REL = "protocol/event_registry.json"
@@ -58,8 +102,8 @@ def _read_json(root: str, rel: str) -> Dict[str, Any]:
         return {}
     with open(path, encoding="utf-8") as fh:
         try:
-            return json.load(fh)
-        except json.JSONDecodeError as exc:
+            return json_doc.loads(fh.read(), dict, what=rel)
+        except ValueError as exc:
             # **在场但坏** 不是「空面」：静默当空会让导出的标准文档**悄悄少一大段**
             # （而 check 判的是「在盘产物 == 实时派生」，两边一起空 ⇒ 永远绿）。fail-closed。
             raise ValueError("源件不可解析：%s（%s）（修复指引：修好该 JSON 后重跑 "
@@ -142,7 +186,8 @@ def openapi_doc(root: str = ".") -> Dict[str, Any]:
             }
         # 路径参数派生（2026-09-24 他证实证修复）：OpenAPI 3.1 要求路径模板变量必须在
         # operation 或 path item 上声明；此前只派生 operation 本体 → 官方校验器
-        # （openapi-spec-validator）对 `/library/{id}` 报 “Path parameter 'id' ... was not resolved”。
+        # （openapi-spec-validator）对 `/library/{id}` 报 “Path parameter 'id' ... was not resolved”
+        # 。
         # 口径：模板变量名 → path 参数（type=string），与 endpoint_contract 的 {name} 写法同源。
         tmpl_vars = re.findall(r"\{([^}]+)\}", path)
         if tmpl_vars:
@@ -286,18 +331,32 @@ def sbom_doc(root: str = ".") -> Dict[str, Any]:
         "licenseDeclared": LICENSE_NAME,
         "copyrightText": "NOASSERTION",
     }]
+    pinned = _pinned_versions(root)
+
+    def _dep_meta(name: str) -> Dict[str, Any]:
+        """依赖包的版本证据（审计 Z4）：钉版在场 → versionInfo + pip purl；不在场 → 留空。"""
+        proj = _DEP_ALIAS.get(name.lower(), name.lower())
+        ver = pinned.get(proj, "")
+        if not ver:
+            return {}
+        return {"versionInfo": ver,
+                "externalRefs": [{"referenceCategory": "PACKAGE-MANAGER",
+                                  "referenceType": "purl",
+                                  "referenceLocator": "pkg:pypi/%s@%s" % (proj, ver)}]}
+
     deps: List[Tuple[str, str]] = []
     for name, why in sorted(hard.items()):
         pkg = "SPDXRef-Dependency-%s" % name
         packages.append({"SPDXID": pkg, "name": name, "downloadLocation": "NOASSERTION",
                          "licenseConcluded": "NOASSERTION",
-                         "comment": "硬依赖（登记）：%s" % why})
+                         "comment": "硬依赖（登记）：%s" % why, **_dep_meta(name)})
         deps.append((pkg, "DEPENDENCY_OF"))
     for name, why in sorted(soft.items()):
         pkg = "SPDXRef-Optional-%s" % name
         packages.append({"SPDXID": pkg, "name": name, "downloadLocation": "NOASSERTION",
                          "licenseConcluded": "NOASSERTION",
-                         "comment": "软依赖（可选，须 try/except 守卫）：%s" % why})
+                         "comment": "软依赖（可选，须 try/except 守卫）：%s" % why,
+                         **_dep_meta(name)})
         deps.append((pkg, "OPTIONAL_DEPENDENCY_OF"))
     return {
         "spdxVersion": "SPDX-2.3",
@@ -384,7 +443,7 @@ def slsa_provenance(root: str = ".") -> Dict[str, Any]:
 def prov_document(root: str = ".") -> Dict[str, Any]:
     """PROV-O（W3C Provenance Ontology）派生面：资产 / 馆藏 / 回执 → 实体·活动·代理三元组。
 
-    真源：`05_资产库/provenance.json`（资产）+ `library/INDEX.md`（馆藏行）+ 
+    真源：`05_资产库/provenance.json`（资产）+ `library/INDEX.md`（馆藏行）+
     `protocol/transform_log.json`（消化活动）+ `protocol/RECEIPTS.json`（回执绑定）。
     诚实边界：只写仓内**已有**的事实（谁何时入库、资产属谁、改了什么），不推断来源；
     空面如实为空（transform_log 当前 0 条 → activities 里就没有消化活动）。
@@ -473,14 +532,23 @@ def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
     seed = hashlib.sha256((sbom.get("documentNamespace") or "").encode("utf-8")).hexdigest()
     serial = "urn:uuid:%s-%s-%s-%s-%s" % (seed[:8], seed[8:12], seed[12:16],
                                           seed[16:20], seed[20:32])
+    pinned = _pinned_versions(root)
+
+    def _purl(name: str) -> Dict[str, Any]:
+        proj = _DEP_ALIAS.get(name.lower(), name.lower())
+        ver = pinned.get(proj, "")
+        return ({"version": ver, "purl": "pkg:pypi/%s@%s" % (proj, ver)} if ver else {})
+
     components = []
     for name, why in sorted(hard.items()):
         components.append({"type": "library", "bom-ref": "dep:%s" % name, "name": name,
-                           "scope": "required", "description": "硬依赖（登记）：%s" % why})
+                           "scope": "required", "description": "硬依赖（登记）：%s" % why,
+                           **_purl(name)})
     for name, why in sorted(soft.items()):
         components.append({"type": "library", "bom-ref": "opt:%s" % name, "name": name,
                            "scope": "optional",
-                           "description": "软依赖（可选，须守卫）：%s" % why})
+                           "description": "软依赖（可选，须守卫）：%s" % why,
+                           **_purl(name)})
     return {
         "bomFormat": "CycloneDX",
         "specVersion": "1.5",
@@ -559,7 +627,8 @@ def c2pa_manifest(root: str = ".") -> Dict[str, Any]:
     assertions = [{"label": "c2pa.actions",
                    "data": {"actions": [{"action": "c2pa.created",
                                          "digitalSourceType": "http://cv.iptc.org/newscodes/"
-                                                              "digitalsourcetype/digitalCapture"}]}}]
+                                                              "digitalsourcetype/digitalCapture"
+                                                                  ""}]}}]
     if sample:
         assertions.append({"label": "c2pa.hash.data",
                            "data": {"alg": "sha256", "hash": str(sample.get("digest") or ""),
@@ -654,8 +723,10 @@ def decision_surface(root: str = ".") -> Dict[str, Any]:
         "boundaries": decl.get("boundaries") or [],
         "workloop": decl.get("workloop") or {},
         "publicDecisionIndex": audits,
-        "x-nf-internal": "逐次工单（挑活/风险/收口）留在内部档案 .rivet/private_archive/work_orders/，"
-                         "不随本面发布（STRATEGY §四 计划内部消化）；本面只投影**能力与公开裁决索引**。",
+        "x-nf-internal": "逐次工单（挑活/风险/收口）留在内部档案 .rivet/private_archive/work_orders"
+            "/，"
+                         "不随本面发布（STRATEGY §四 计划内部消化）；本面只投影**能力与公开裁决索引"
+                             "**。",
     }
 
 
@@ -913,7 +984,8 @@ def _check_vc(vc: dict, issues: List[str]) -> None:
     if "VerifiableCredential" not in (_arr(vc.get("type"))):
         issues.append("VC type 缺 VerifiableCredential")
     if not _vc_issuer_ok(vc):
-        issues.append("VC 缺 issuer 或 validFrom（修复指引：自 protocol/approvals/* 取批准人与批准日）")
+        issues.append("VC 缺 issuer 或 validFrom（修复指引：自 protocol/approvals/* 取批准人与批准"
+            "日）")
     subj = _obj(vc.get("credentialSubject"))
     if not re.fullmatch(r"[0-9a-f]{64}", str(subj.get("receiptRoot") or "")):
         issues.append("VC credentialSubject.receiptRoot 非 sha256：%r"

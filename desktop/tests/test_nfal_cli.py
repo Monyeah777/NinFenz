@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """nfal_cli 命令面单测（覆盖 release 的逐模块覆盖率门 min30）。
 
 判据：五条子命令（parse/check/build/eval/schema-check）+ help 的真跑退出码与 JSON 信封；

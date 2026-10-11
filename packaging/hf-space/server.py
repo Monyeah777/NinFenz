@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NinFenz Space（S1 在线 demo）—— 纯标准库 HTTP 服务，真跑 NF 门禁。
 
 为什么不引 gradio：NF 全仓零第三方硬依赖，Space 侧也保持同一纪律；一个 stdlib HTTP

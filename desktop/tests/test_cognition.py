@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """认知族（术语表 / 执行分档）正式与否定用例。"""
 import json
 import sys

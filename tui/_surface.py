@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NF 终端面投影（**生成件 · 请勿手改**）。
 
 真源：desktop/src/core/terminal.py 的策展表（ZONES / FAMILIES / FORMS / 写盘闸门三表 /

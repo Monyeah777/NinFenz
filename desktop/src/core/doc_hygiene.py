@@ -316,8 +316,10 @@ def text_sanity(root: str = ".", globs=None) -> list:
     files = sorted({p for g in (globs or TEXT_SANITY_GLOBS)
                     for p in glob.glob(os.path.join(root, g), recursive=True)})
     for path_ in files:
-        # 报告相对**调用方 root**；Windows 跨盘符（CI：D: 工作区 vs C: 临时树）relpath 会抛 ⇒ 退回原路径
-        rel = os.path.relpath(path_, root) if os.path.splitdrive(path_)[0] == os.path.splitdrive(root)[0] else path_
+        # 报告相对**调用方 root**；Windows 跨盘符（CI：D: 工作区 vs C: 临时树）relpath 会抛 ⇒ 退回原
+        # 路径
+        rel = os.path.relpath(path_,
+ root) if os.path.splitdrive(path_)[0] == os.path.splitdrive(root)[0] else path_
         try:
             text = csc.read_text_cached(path_)
         except (OSError, UnicodeDecodeError) as exc:

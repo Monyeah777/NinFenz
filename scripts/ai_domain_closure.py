@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """概念前置闭包求值（只读 · 确定性 · 零网络 · 不改仓库任何文件）。
 
 定位：把「概念前置依赖」从**内容**变成**可复算产物**——读**任一**域包资产的
@@ -297,7 +296,8 @@ def _loaded_arg(raw: str) -> List[str]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
-        description="概念前置闭包求值（只读；跨域通用——用 --asset 指定任一含 concept_graph 块的资产）")
+        description="概念前置闭包求值（只读；跨域通用——用 --asset 指定任一含 concept_graph 块的资产"
+            "）")
     ap.add_argument("--asset", default=str(_ROOT / DEFAULT_ASSET),
                     help="概念图资产路径（缺省仓库内 %s）" % DEFAULT_ASSET)
     ap.add_argument("--target", default="C22",

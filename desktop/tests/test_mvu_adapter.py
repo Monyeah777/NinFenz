@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MVU 变量模板导出适配器单测（fixture 自包含，不依赖仓库外部状态）。"""
 import json
 import sys

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MCP server 定义导出单测（v2.1.0 A2：techdoc IR → MCP 资源型 server 定义）。
 
 运行：cd desktop && python -m unittest tests.test_mcp_adapter -v

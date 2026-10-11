@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`core.paths.validate_path` 单测 —— 2026-09-24 渗透发现 F-09 的判据。
 
 背景：AGENTS.md / CONTRIBUTING.md 把「路径逃逸被 validatePath 拦截」写成事实，

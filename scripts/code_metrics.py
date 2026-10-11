@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """代码规模/复杂度上限（CLI）：棘轮式冻结 + 只增不减校验。
 
 用法：

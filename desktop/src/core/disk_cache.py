@@ -26,7 +26,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
+from core import json_doc
 
 ENV_OFF = "NF_NO_DISK_CACHE"
 KEEP = 16
@@ -38,7 +39,8 @@ PRUNE_EVERY_BIG = 128
 #: 11 次 `store` 花 33–42 ms，其中 **20–23 ms 是 11 次 `prune`**（每次 `glob("*.json")` + 逐件
 #: `stat`）。按批后调用降到 1/8；代价是每标签最多多留 `PRUNE_EVERY_SMALL` 份（仍有界，判据在册）。
 PRUNE_EVERY_SMALL = 8
-#: 参与「代码面」的路径（改了算法即换键；不含 tests）。**别写 `scripts/**/*`**（2026-09-29 实测坑）：它连
+# : 参与「代码面」的路径（改了算法即换键；不含 tests）。**别写 `scripts/**/*`**（2026-09-29 实测坑）
+# ：它连
 #: `scripts/__pycache__/*.pyc`（Python 自生成）一起收 ⇒ 一导入就改指纹 ⇒ 宽面派生缓存反复 miss。
 CODE_FACE = ("desktop/src/**/*.py", "scripts/**/*.py", "scripts/*.sh",
              "scripts/nf", "scripts/nf.cmd")
@@ -96,7 +98,8 @@ def canonical(value: Any) -> Any:
     在**带缓存的机器面**上此前是假真。规范化一次（小对象往返，微秒级）就把两条路径收成一条，
     且对**所有** `memo_pair` / `scan` 站点同时生效（不必逐个打印面排序）。
     """
-    return json.loads(json.dumps(value, ensure_ascii=False, sort_keys=True))
+    return json_doc.loads(json.dumps(value, ensure_ascii=False, sort_keys=True),
+                        None, what="cache 规范化")
 
 
 def root_dir() -> Path:
@@ -151,8 +154,10 @@ def reset_code_fingerprint(root: Optional[str] = None) -> None:
     _CODE_FP.pop(os.path.normcase(os.path.abspath(str(root))), None)
 
 
-#: 仓库内模块的**导入图**（懒建、按 (根, 模块) 记忆）：模块名 → (文件相对路径, 依赖, 是否含动态导入)。
-#: 只用来**划定代码面的范围**（谁真的依赖谁的代码），不参与任何判定；解析不出/含动态导入 → 退回整块。
+# : 仓库内模块的**导入图**（懒建、按 (根, 模块) 记忆）：模块名 → (文件相对路径, 依赖, 是否含动态导入
+# )。
+# : 只用来**划定代码面的范围**（谁真的依赖谁的代码），不参与任何判定；解析不出/含动态导入 → 退回整块
+# 。
 _CORE_DIR = ("desktop", "src", "core")
 
 
@@ -180,13 +185,25 @@ def _path(tag: str, ckey: str) -> Path:
     return dir_for(tag) / ("%s.json" % ckey)
 
 
+#: 写失败观测（2026-10-10 审计 N7，P2）：缓存写不进是**降级**（读者重算即可），不该静默到
+#: 无法判别。此前 store 用固定名 p.name+".tmp" 手工写（4 进程 × 200 同键写实测 800 次全返回、
+#: 读者 55.5% FileNotFoundError）且 except 全吞。现在原子写 + 计数 + 最近原因。
+STORE_FAILURES = 0
+LAST_STORE_ERROR = ""
+
+
+def store_failures() -> Dict[str, Any]:
+    """写失败观测面 → {failures, last_error}（供 daemon stats / doctor 报出）。"""
+    return {"failures": STORE_FAILURES, "last_error": LAST_STORE_ERROR}
+
+
 def load(tag: str, ckey: str,
          validate: Optional[Callable[[Any], bool]] = None) -> Any:
     """读回缓存值；**任何不可信**一律返回 None（宁可重算，不可错答）。"""
     if not enabled():
         return None
     try:
-        got = json.loads(_path(tag, ckey).read_text(encoding="utf-8"))
+        got = json_doc.load(_path(tag, ckey), None, what=ckey)
     except Exception:                                  # noqa: BLE001 - 缺件/半截/不可读
         return None
     if validate is not None:
@@ -205,6 +222,7 @@ def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> None:
     裁剪一律**按批**：大集合每 `PRUNE_EVERY_BIG` 次、小集合每 `PRUNE_EVERY_SMALL` 次写入裁一次
     （每次都裁的代价实测占 `store` 的一半，见 `PRUNE_EVERY_SMALL` 的说明）。
     """
+    global STORE_FAILURES, LAST_STORE_ERROR
     if not enabled():
         return
     if _DEFER is not None:                  # 延迟模式：只入队（守护回包之后再落盘，见 `defer_flush`）
@@ -214,10 +232,10 @@ def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> None:
         d = dir_for(tag)
         d.mkdir(parents=True, exist_ok=True)
         p = _path(tag, ckey)
-        tmp = p.with_name(p.name + ".tmp")
-        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(json.dumps(value, ensure_ascii=False, sort_keys=True))
-        os.replace(tmp, p)                             # 原子替换：读者看不到半截 JSON
+        # 并发安全（审计 N7）：固定名 `.tmp` 会被同键并发写互踩；统一走 atomic_write
+        # （mkstemp 唯一临时名 + fsync + os.replace + 瞬时错短重试），与全仓落盘面同一出处。
+        from core import atomic_write
+        atomic_write.write_text(p, json.dumps(value, ensure_ascii=False, sort_keys=True))
         limit = int(keep if keep is not None else _KEEP.get(tag, KEEP))
         n = _PRUNE_COUNT.get(tag, 0) + 1
         every = PRUNE_EVERY_BIG if limit > 64 else PRUNE_EVERY_SMALL
@@ -226,7 +244,9 @@ def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> None:
             prune(tag, limit)
         else:
             _PRUNE_COUNT[tag] = n
-    except Exception:                                  # noqa: BLE001 - 写不进就算了
+    except Exception as exc:                           # noqa: BLE001 - 写不进不该让命令失败，但**要可观测**
+        STORE_FAILURES += 1
+        LAST_STORE_ERROR = "%s: %s" % (tag, exc)
         return
 
 

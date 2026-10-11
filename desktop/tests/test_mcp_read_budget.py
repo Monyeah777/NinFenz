@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """MCP 工具面的**读取面预算**（稳态毫秒级的计数判据，不测墙钟）。
 
 口径同 `test_nf_cli.LightCommandReadBudgetTest`：**能数就别计时**——一旦有人把「全仓扫描」

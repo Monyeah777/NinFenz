@@ -12,9 +12,10 @@ techdoc 链；**没有任何一道门问过**：某个模块订阅的事件，�
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
+
+from core import json_doc
 
 ALLOWLIST_REL = "protocol/external_events.json"
 
@@ -36,7 +37,7 @@ def _allowlist(root: str = ".") -> Set[str]:
     if not p.is_file():
         return set()
     try:
-        data = json.loads(p.read_text(encoding="utf-8"))
+        data = json_doc.load(p, dict, what=ALLOWLIST_REL)
     except ValueError:
         return set()
     return {str(k) for k in (data.get("events") or {})}

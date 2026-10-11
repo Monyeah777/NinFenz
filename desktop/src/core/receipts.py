@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from core import atomic_write
+from core import atomic_write, json_doc
 
 SCHEMA = "nf-receipts/1"
 RECEIPTS_REL = "library/RECEIPTS.json"
@@ -162,7 +162,8 @@ def write(root: str = ".", rel: str = RECEIPTS_REL) -> str:
 
 
 def load(root: str = ".", rel: str = RECEIPTS_REL) -> Dict[str, Any]:
-    return json.loads((Path(root) / rel).read_text(encoding="utf-8"))
+    # N11：顶层形状校验（非对象 → 带指引的 ValueError，不再裸 AttributeError）。
+    return json_doc.load(Path(root) / rel, dict, what=rel)
 
 
 # ---------------------------------------------------------------- 协议层回执
@@ -239,7 +240,8 @@ def verify_scope(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[
         return ["协议回执 schema 不匹配"], {}
     live = build_scope(root, [e["id"] for e in doc.get("entries") or []])
     if doc.get("root") != live["root"]:
-        issues.append("协议回执根不一致：记录=%s 实测=%s（修复指引：nf receipts --scope protocol --write）"
+        issues.append("协议回执根不一致：记录=%s 实测=%s（修复指引：nf receipts --scope protocol --"
+            "write）"
                       % (str(doc.get("root"))[:16], str(live["root"])[:16]))
     live_by = {e["id"]: e["digest"] for e in live["entries"]}
     for e in doc.get("entries") or []:

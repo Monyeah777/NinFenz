@@ -25,6 +25,7 @@ from core import atomic_write
 from core import io_types as _iot
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 # 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 # ——故本模块**不再** import import_graph（残留的那行已于 2026-10-01 删除：定义后从未用到）
@@ -64,7 +65,7 @@ def load_spec(root: str, code: str) -> Dict[str, Any]:
     if not p.is_file():
         raise ValueError("域规格不存在：%s.json（修复指引：`nf domain specs` 列全量规格代码）"
                          % code)
-    spec = json.loads(csc.read_text_cached(p))
+    spec = json_doc.loads(csc.read_text_cached(p), dict, what=str(p))
     issues = spec_issues(spec)
     if issues:
         raise ValueError("域规格不合规：%s（修复指引：按 spec_issues 逐条补齐规格字段）"
@@ -257,7 +258,8 @@ def bind_standard(spec: Dict[str, Any], sub: Dict[str, Any],
                 fallback = (sid, why + "（本机实测不可达，如实记录）")
     for sid in _STD_BY_CODE.get(spec["code"], []):
         if sid in catalog:
-            pool = _reachable_first([x for x in _STD_BY_CODE[spec["code"]] if x in catalog], catalog)
+            pool = _reachable_first([x for x in _STD_BY_CODE[spec["code"]] if x in catalog],
+ catalog)
             return pool[index % len(pool)], "域码 %s 专属绑定（轮换 %d）" % (spec["code"],
                                                                        index % len(pool))
     sec = str(spec.get("section", "")).split(" · ")[0]
@@ -471,7 +473,7 @@ def _write_text_retry(path: Path, text: str, _tries: int = 5) -> None:
 def _read_json_raw(path: Path) -> Any:
     """读 JSON；缺件/坏件返回 None（工厂在局部树上也要能工作——由调用方决定语义）。"""
     try:
-        return json.loads(csc.read_text_cached(path))
+        return json_doc.loads(csc.read_text_cached(path), None, what=str(path))
     except (OSError, ValueError):  # 缺件/坏件 ⇒ None（调用方决定语义；工厂在局部树上也要能跑）
         return None
 
@@ -558,7 +560,9 @@ def dump_yaml(obj: Any, indent: int = 0) -> List[str]:
                 out.append("%s%s:" % (pad, k))
                 out += dump_yaml(v, indent + 2)
             else:
-                out.append("%s%s: %s" % (pad, k, "[]" if v == [] else "{}" if v == {} else _yaml_scalar(v)))
+                out.append("%s%s: %s" % (pad,
+ k,
+ "[]" if v == [] else "{}" if v == {} else _yaml_scalar(v)))
         return out
     if isinstance(obj, list):
         for item in obj:
@@ -599,7 +603,8 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         '<!-- nf-asset: key="CONCEPT_GRAPH" version="1.0" status="active" -->',
         "# 概念图 · %s（概念前置偏序）" % name,
         "",
-        "> 用途：本域包的**前置闭包求值输入面**——把「%s」这一域的 %d 个细分概念声明成一张偏序图（DAG），"
+        "> 用途：本域包的**前置闭包求值输入面**——把「%s」这一域的 %d 个细分概念声明成一张偏序图（DA"
+            "G），"
         "供域内口径模块（%s:M01）与收口模块（%s:M02）消费。" % (name, len(subs), spec["category"],
                                                           spec["category"]),
         "> 资产键：`CONCEPT_GRAPH`｜形态：人读表（§2）/ 别名表（§3）/ 机器可读块（§4）三形态同源——"
@@ -608,7 +613,8 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         "概念 → 辅锚、标准依赖边）+ 1 个包外前置族（%s-00 领域通用前置）；"
         "节点 %d · 边 %d · 密度 %.4f。" % (len(subs), len(std_ids), code,
                                        _ci["nodes"], _ci["edges"], _ci["density"]),
-        "> 来源：本件正文自撰；每条细分的权威锚见资产 `DOMAIN_SPEC` 与 `STANDARDS_ANCHORS`（逐条可达性实证）。",
+        "> 来源：本件正文自撰；每条细分的权威锚见资产 `DOMAIN_SPEC` 与 `STANDARDS_ANCHORS`（逐条可"
+            "达性实证）。",
         "",
         "## 1. 读法",
         "",
@@ -644,7 +650,13 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         std_entry = cat.get(sid) or {}
         ev = std_entry.get("evidence") or {}
         lines.append("| `STD-%s` | 标准 · %s（%s｜%s｜实测 %s） | P80 | %s | std-catalog |"
-                     % (sid, std_entry.get("title", sid), std_entry.get("body", ""), std_entry.get("layer", ""),
+                     % (sid,
+ std_entry.get("title",
+ sid),
+ std_entry.get("body",
+ ""),
+ std_entry.get("layer",
+ ""),
                         ("✓" if ev.get("reachable") else "✗"),
                         "、".join("`%s`" % x for x in prereq.get("STD-%s" % sid, [])) or "—"))
     for i, s in enumerate(subs):
@@ -733,7 +745,8 @@ def domain_spec_md(spec: Dict[str, Any], root: str = ".") -> str:
         "# 域口径表 · %s" % name,
         "",
         "> 用途：本域包的**内容资产与口径面**——把「%s」这一域的 %d 条细分写成"
-        "可判定的口径（定义 / 可机验判据 / 常见失效模式），并逐条挂权威锚。" % (name, len(spec["subdivisions"])),
+        "可判定的口径（定义 / 可机验判据 / 常见失效模式），并逐条挂权威锚。" % (name,
+ len(spec["subdivisions"])),
         "> 资产键：`DOMAIN_SPEC`｜机读同源面 = `outputs/DOMAIN_SPEC.json`（双源一致由 "
         "check32 output_forms 断言；**本表是唯一人读真相，JSON 是它的机读投影**）。",
         tier_note,
@@ -749,7 +762,8 @@ def domain_spec_md(spec: Dict[str, Any], root: str = ".") -> str:
         "",
         "## 2. 细分口径表（%d 条）" % len(spec["subdivisions"]),
         "",
-        "| 条目键 | 细分 | 定义口径 | 可机验判据 | 常见失效模式 | 主锚（域口径标准） | 辅锚（产出承载标准） |",
+        "| 条目键 | 细分 | 定义口径 | 可机验判据 | 常见失效模式 | 主锚（域口径标准） | 辅锚（产出承"
+            "载标准） |",
         "|---|---|---|---|---|---|---|",
     ]
     cat = standards_catalog(root)
@@ -771,8 +785,10 @@ def domain_spec_md(spec: Dict[str, Any], root: str = ".") -> str:
         "",
         "## 4. 与模块的关系",
         "",
-        "- `%s:M01`（P40）：读本表登记口径，校验判据齐备性，越界即发口径冲突事件。" % spec["category"],
-        "- `%s:M02`（P60）：收口度量报告与形态产出，保证「口径 → 数 → 图」三段同源。" % spec["category"],
+        "- `%s:M01`（P40）：读本表登记口径，校验判据齐备性，越界即发口径冲突事件。"
+            "" % spec["category"],
+        "- `%s:M02`（P60）：收口度量报告与形态产出，保证「口径 → 数 → 图」三段同源。"
+            "" % spec["category"],
     ]
     return "\n".join(lines) + "\n"
 
@@ -786,7 +802,8 @@ def standards_md(spec: Dict[str, Any], root: str = ".") -> str:
         "# 权威锚表 · %s" % name,
         "",
         "> 用途：本域 %d 条细分各自的**外部权威锚**（规范 / 论文 / 参考实现）与**可达性实证**。"
-        "外部锚只作口径与机制参照，**不作品质背书**（STRATEGY §3.2/§3.3）。" % len(spec["subdivisions"]),
+        "外部锚只作口径与机制参照，**不作品质背书**（STRATEGY §3.2/§3.3）。"
+            "" % len(spec["subdivisions"]),
         "> 资产键：`STANDARDS_ANCHORS`｜细分锚实测日期：2026-09-22（本机 GET，HTTP 状态见下表；"
         "不可达如实记 `✗`，不假装可达）｜标准锚实测日期见下表「标准锚」列（取自 "
         "`protocol/standards_catalog.json` 的本机探针记录）。",
@@ -860,7 +877,8 @@ def module_md(spec: Dict[str, Any], which: int, alloc: Dict[str, Any]) -> str:  
         sub_ev = _event_names(spec, 2)[:]      # [report_ready, report_conflict]
         assets = "CONCEPT_GRAPH, DOMAIN_SPEC, STANDARDS_ANCHORS"
     else:
-        duty = ("把口径面收口为**可复算产出**：由样例与度量族重算域报告（T4），并从概念图派生图形态；"
+        duty = ("把口径面收口为**可复算产出**：由样例与度量族重算域报告（T4），并从概念图派生图形态"
+            "；"
                 "报告与图与口径表三段同源，任一漂移即发布收口冲突事件")
         outs = ["domain_report", "closure_conflict_list"]
         pub = [ready_ev, conflict_ev]
@@ -927,7 +945,8 @@ def module_md(spec: Dict[str, Any], which: int, alloc: Dict[str, Any]) -> str:  
     ]
     if which == 1:
         logic = {
-            "读口径": "从 DOMAIN_SPEC 读 %d 条细分的定义 / 判据 / 失效模式" % len(spec["subdivisions"]),
+            "读口径": "从 DOMAIN_SPEC 读 %d 条细分的定义 / 判据 / 失效模式" % len(spec["subdivision"
+                "s"]),
             "登记": "逐条登记 Spec 条目（id ∈ 条目键表，判据非空，锚为绝对 URL）",
             "校验": "判据齐备且锚可达性已记档 → 通过；缺项 / 锚非 URL → spec_conflict",
             "落槽": "写 DomainSpecState{subdivisions, conflicts, tick}",
@@ -1021,12 +1040,18 @@ def pipeline_md(spec: Dict[str, Any], alloc: Dict[str, Any]) -> str:
     for i, lay in enumerate(order):
         nxt = order[i + 1] if i + 1 < len(order) else "P00"
         cond = ("",
-                "\n        condition: =data_bus.round.phase == \"roll\" && event.tick_day")[nxt == "P00"]
+                "\n        condition: =data_bus.round.phase == \"roll\" && event.tick_day"
+                    "")[nxt == "P00"]
         lines += ["      - from: %s" % lay, "        to: %s%s" % (nxt, cond)]
     layer_names = {"P00": "数据基座", "P10": "世界推进", "P20": "角色状态", "P30": "事件生产",
                    "P40": "行为决策", "P50": "交互执行", "P60": "长期演变", "P70": "叙事素材",
                    "P80": "输出呈现"}
-    core_allow = {"P00": ["M00"], "P10": ["通用:M10"], "P20": ["M23"], "P30": ["事件:M22", "M06", "M13"],
+    core_allow = {"P00": ["M00"],
+ "P10": ["通用:M10"],
+ "P20": ["M23"],
+ "P30": ["事件:M22",
+ "M06",
+ "M13"],
                   "P50": ["M12"], "P70": ["M20", "M24"], "P80": ["M80"]}
     lines.append("  layers:")
     for lay in order:
@@ -1086,20 +1111,24 @@ def readme_md(spec: Dict[str, Any], alloc: Dict[str, Any]) -> str:
         "| --- | --- |",
         "| 管线 | **%s** %s装配流（九层线性回卷，装配自 P00 通用骨架） |" % (pid, name),
         "| 自带模块（本包） | 2：%s:M01（P40 口径登记） / %s:M02（P60 收口与派生） |" % (cat, cat),
-        "| 资产 | **3 文件**：`CONCEPT_GRAPH.md`（%d 概念前置图）· `DOMAIN_SPEC.md`（%d 条细分口径）"
+        "| 资产 | **3 文件**：`CONCEPT_GRAPH.md`（%d 概念前置图）· `DOMAIN_SPEC.md`（%d 条细分口径"
+            "）"
         "· `STANDARDS_ANCHORS.md`（逐条权威锚 + 可达性实测）" % (len(spec["subdivisions"]),
                                                          len(spec["subdivisions"])),
-        "| 机验产出面 | **9 件**：schema 2 / 数据 2 / 可复算 1（T4）/ 图表 1 / 图结构 2 / 系统卡 1 |",
+        "| 机验产出面 | **9 件**：schema 2 / 数据 2 / 可复算 1（T4）/ 图表 1 / 图结构 2 / 系统卡 1 "
+            "|",
         "| 度量族 | `%s`（口径公式见 `docs/domain-packs.md`） |" % spec["metric_family"],
         "",
         "## 2. 复现命令",
         "",
         "| 产物 | 命令（仓库根目录） |",
         "| --- | --- |",
-        "| 前置闭包 / 装载序 | `python scripts/ai_domain_closure.py --asset community/%s/assets/CONCEPT_GRAPH.md --target %s-12` |"
+        "| 前置闭包 / 装载序 | `python scripts/ai_domain_closure.py --asset community/%s/assets/CON"
+            "CEPT_GRAPH.md --target %s-12` |"
         % (spec["pack_name"], code),
         "| 形态与档位机检 | `python scripts/nf.py output verify` |",
-        "| 重渲染产出面 | `python scripts/nf.py output render --write --package %s` |" % spec["pack_name"],
+        "| 重渲染产出面 | `python scripts/nf.py output render --write --package %s` |"
+            "" % spec["pack_name"],
         "| 重新生成整包 | `python scripts/nf.py domain build --spec %s --write` |" % code,
         "",
         "## 3. 边界与不宣称",
@@ -1114,7 +1143,9 @@ def protocol_yaml(spec: Dict[str, Any], alloc: Dict[str, Any]) -> str:
     cat, code = spec["category"], spec["code"]
     pid, ids = alloc["pipeline"], alloc["module_ids"]
     return "\n".join([
-        "# protocol.yaml — 第三方协议声明（%s，清单 %s · %s）" % (spec["pack_name"], code, spec["section"]),
+        "# protocol.yaml — 第三方协议声明（%s，清单 %s · %s）" % (spec["pack_name"],
+ code,
+ spec["section"]),
         "# 依据 01 §6.1 Schema 模板骨架 + 02 §8.3 第三方协议登记；机读真相 = 本文件，"
         "人读速览 = README.md（双源一致，check14 ⑥ 断言）",
         "protocol:",
@@ -1353,7 +1384,8 @@ SYSTEM_CARD_SCHEMA_JSON = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://ninfenz.local/schema/domain-system-card.schema.json",
     "title": "域包系统卡（模型无关的机验形态）",
-    "description": "机制借鉴 Model Cards / Datasheets / NIST AI RMF 的字段面（取机制，不引外部文本背书）："
+    "description": "机制借鉴 Model Cards / Datasheets / NIST AI RMF 的字段面（取机制，不引外部文本"
+        "背书）："
                    "把「这个域包是什么 / 能做什么 / 不能做什么 / 怎么验的」写成有 schema 的数据。",
     "type": "object",
     "additionalProperties": False,
@@ -1461,7 +1493,8 @@ def system_card(spec: Dict[str, Any], alloc: Dict[str, Any]) -> str:
                          "概念前置偏序与装载序", "样例集上的域度量复算（T4）"],
         },
         "limitations": [
-            "覆盖以本节声明的 %d 条细分为界：域内相邻主题未列入者不自动继承" % len(spec["subdivisions"]),
+            "覆盖以本节声明的 %d 条细分为界：域内相邻主题未列入者不自动继承"
+                "" % len(spec["subdivisions"]),
             "域报告是**样例集（合成夹具）上的口径值**，不代表真实模型/系统能力",
             "外部权威锚只作口径参照，未做逐条规范全文比对",
             "包外前置族（%s-00）不随包交付，装载方须自备领域基础" % code,
@@ -1573,7 +1606,8 @@ def output_index(spec: Dict[str, Any]) -> str:
         "schema": "nf-output-index/1",
         "package": spec["pack_name"],
         "note": "机验产出面清单（域包工厂生成；check14/check32 与 nf output 按此判定）。"
-                "role 语义：schema 契约 / data 数据 / chart 图表 / diagram 图示 / functional 可复算。",
+                "role 语义：schema 契约 / data 数据 / chart 图表 / diagram 图示 / functional 可复算"
+                    "。",
         "outputs": entries,
     }
     return json.dumps(doc, ensure_ascii=False, indent=2) + "\n"
@@ -1629,7 +1663,11 @@ def _append_section02(root: str, spec: Dict[str, Any], alloc: Dict[str, Any]) ->
         "口径可判定、判据可机检、锚可复核，并产出可复算域报告与机验形态面。"
         "独占类别：%s（R2，与既有 [情感]/[生存]/[世界]/[事件]/[轻混]/[通用]/[技术文档]/[AI系统]/"
         "[量化金融] 及各 AI 品类域包类别无交集）。"
-        % (spec["code"], spec["section"], spec["name"], len(spec["subdivisions"]), spec["category"]),
+        % (spec["code"],
+ spec["section"],
+ spec["name"],
+ len(spec["subdivisions"]),
+ spec["category"]),
         "- 管线：%s %s装配流（pipelines/%s_%s装配流管线.md；九层位 linear flow P00→P80→P00 回卷，"
         "P40/P60 两驻留层各挂 %s / %s，官方核心 M00·通用:M10·M50·M80 core 依赖引用不搬移）"
         % (alloc["pipeline"], spec["name"], alloc["pipeline"], spec["name"], ids[0], ids[1]),
@@ -1643,7 +1681,8 @@ def _append_section02(root: str, spec: Dict[str, Any], alloc: Dict[str, Any]) ->
         % (len(spec["subdivisions"]), len(spec["subdivisions"])),
         "- 产出面（9 机验件）：outputs/ 下 schema 3 / 数据 3 / 可复算 1（T4 域报告）/ 图表 1 / "
         "图结构 2；可机验占比 100%（≥95% 门槛），见 outputs/INDEX.json 与 docs/domain-packs.md",
-        "- 依赖（R1）：core_only true + core_modules 4 件官方核心配合（M00 / 通用:M10 / M50 / M80）；"
+        "- 依赖（R1）：core_only true + core_modules 4 件官方核心配合（M00 / 通用:M10 / M50 / M80）"
+            "；"
         "cross_package [] 恒空、references [] 零跨包引用",
         "- 挂载层：P40 default [%s]、P60 default [%s]——类内段编号唯一，与既有包同层 default 无交集"
         % (ids[0], ids[1]),
@@ -1800,7 +1839,7 @@ def verify(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
 
 def manifest_entry(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
     alloc = allocate(root, spec)
-    idx = json.loads(output_index(spec))
+    idx = json_doc.loads(output_index(spec), dict, what="output index")
     mv = [e for e in idx["outputs"] if e.get("tier") in ("T2", "T3", "T4")]
     t4 = [e for e in idx["outputs"] if e.get("tier") == "T4"]
     ratio = round(len(mv) / max(1, len(idx["outputs"])), 4)
@@ -1849,7 +1888,7 @@ def manifest_entry(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
 def update_manifest(root: str, spec: Dict[str, Any], write: bool = False) -> Dict[str, Any]:
     """维护 `protocol/domain_packs.json`（公开名录：域码 → 包/管线/模块/产出面/机验率）。"""
     path = Path(root) / MANIFEST_REL
-    doc: Dict[str, Any] = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {
+    doc: Dict[str, Any] = json_doc.load(path, dict, what=MANIFEST_REL) if path.is_file() else {
         "schema": "nf-domain-packs/1",
         "note": "AI 品类域包名录（公开结果面）。每包：域码 / 独占类别 / 管线 / 模块 / "
                 "资产数 / 产出面与机验率 / 规格摘要。机检：check32 domain_packs 子扫描"
@@ -1946,7 +1985,7 @@ def manifest_verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     path = Path(root) / MANIFEST_REL
     if not path.is_file():
         return [], {"packs": 0, "note": "无域包名录（域包工程未启用）"}
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc = json_doc.load(path, dict, what=MANIFEST_REL)
     thr = float(doc.get("machine_verifiable_threshold") or 0.95)
     cat = standards_catalog(root)
     dens_min = float(doc.get("concept_density_threshold") or 1.0)
@@ -1983,7 +2022,8 @@ def manifest_verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         idx_path = Path(root) / "community" / pkg / "outputs" / "INDEX.json"
         if not idx_path.is_file():
             issues.append("%s：缺 outputs/INDEX.json" % pkg); continue
-        faces = (json.loads(csc.read_text_cached(idx_path)).get("outputs") or [])
+        idx_doc = json_doc.loads(csc.read_text_cached(idx_path), dict, what=str(idx_path))
+        faces = (idx_doc.get("outputs") or [])
         ratio = round(sum(1 for e in faces if e.get("tier") in ("T2", "T3", "T4"))
                       / max(1, len(faces)), 4)
         if ratio < thr:
@@ -2044,7 +2084,8 @@ def manifest_verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
 #:
 #: **2026-09-29 实测教训**：这里原先写的是 `.rivet/**/*`（整棵私档）——于是「见证」要把
 #: **676 MB**（含一个 628 MB 的模型文件）读一遍算摘要，一次唯一新状态里光这一项就 ~1.0 s ✗，
-#: 而本扫描器其实只读那 100 份 specs（实测读盘面 = community 300 + specs 100 + protocol 3 + registry 1）。
+# : 而本扫描器其实只读那 100 份 specs（实测读盘面 = community 300 + specs 100 + protocol 3 + registr
+# y 1）。
 #: 收窄到 specs 之后，「读盘面 ⊆ 输入面」判据仍然绿。**输入面只该声明「真的读到的」**，
 #: 宽到把无关大件卷进来，等于是给每条请求加一笔纯亏的见证成本。
 SCAN_INPUTS = ("community/**/*", ".rivet/private_archive/ai_packs/specs/*.json",

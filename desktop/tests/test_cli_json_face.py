@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """机器面**面判别键**门禁：每个 `--json` 面成功时都必须是自带类型的对象。
 
 为什么（2026-10-01 取证）：本仓机器面有两种信封——新面（`market-list` / `asset-ls` /
@@ -252,7 +251,8 @@ SKIP = {
     # 写面与交互面不在「只读面真跑」这条判据里；各自的**功能覆盖**另有专件（逐条点名，
     # 免得「跳过」被读成「没人管」）。
     "library attest": "写盘面（改馆藏 frontmatter）——见 test_library.py",
-    "library deprecate": "写盘面（生命周期流转）——见 test_library.test_lifecycle_flow_deprecate_supersede_restore",
+    "library deprecate": "写盘面（生命周期流转）——见 test_library.test_lifecycle_flow_deprecate_sup"
+        "ersede_restore",
     "library restore": "写盘面（生命周期流转）——见 test_library.py",
     "library supersede": "写盘面（生命周期流转）——见 test_library.py",
     "preset export": "写盘面（导出到文件）——全链见 test_preset_cli.py",

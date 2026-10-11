@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """提交信息机检单测（CONTRIBUTING §1 判据化 · 含"不打断自动化"回归）。
 
 工具：`scripts/commit_msg_check.py`（commit-msg 钩子消费）。判据由**仓库提交史实证**校准：
@@ -36,7 +35,12 @@ class CommitMsgCheckTest(unittest.TestCase):
             self.assertEqual(cmc.check(msg), [], "应合规：%r" % msg)
 
     def test_bypass_forms_pass(self):
-        for msg in ("Merge branch 'main'", 'Revert "feat: x"', "fixup! feat: x", "squash! x", "", "\n\n"):
+        for msg in ("Merge branch 'main'",
+ 'Revert "feat: x"',
+ "fixup! feat: x",
+ "squash! x",
+ "",
+ "\n\n"):
             self.assertEqual(cmc.check(msg), [], "应放行：%r" % msg)
 
     def test_invalid_forms_caught(self):

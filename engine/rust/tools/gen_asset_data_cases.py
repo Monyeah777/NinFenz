@@ -11,6 +11,7 @@
 """
 import json
 import pathlib
+import re
 import shutil
 import sys
 
@@ -216,20 +217,27 @@ for p in sorted(FIX.rglob('*')):
     if p.is_file():
         FIXFILES[p.relative_to(FIX).as_posix()] = p.read_text(encoding='utf-8')
 fix_entries = "\n".join('        (%s, %s),' % (rr(k), rr(v)) for k, v in FIXFILES.items())
-helper = '''
-    /// 合成夹具的内容（与 `tools/gen_asset_data_cases.py` 里 Python 侧那份**逐字同源**）。
-    const AC_FIX_FILES: [(&str, &str); %d] = [
-%s
-    ];
+#: 助手块的**显式标记**（幂等关键）：旧版把助手无条件往 `use super::*;` 后粘一份——
+#: 第二次运行就是「`AC_FIX_FILES` defined multiple times」编译失败，夹具因此长期没人敢刷
+#: （2026-10-10 审计 Y1 的「重跑生成器刷新夹具」前提）。现在带标记、先删后插，跑 N 次同一结果。
+HB = '    // >>> GENERATED HELPER by tools/gen_asset_data_cases.py（勿手改；重跑生成器覆盖本段）\n'
+HE = '    // <<< GENERATED HELPER\n'
+helper = (HB
+          + '    /// 合成夹具的内容（与 `tools/gen_asset_data_cases.py` 里 Python 侧那份**逐字同源**）。\n'
+          + '    const AC_FIX_FILES: [(&str, &str); %d] = [\n%s    ];\n\n'
+          + '    fn write_asset_data_fixture(root: &std::path::Path) {\n'
+          + '        for (rel, body) in AC_FIX_FILES {\n'
+          + '            let p = root.join(rel);\n'
+          + '            std::fs::create_dir_all(p.parent().unwrap()).unwrap();\n'
+          + '            std::fs::write(p, body).unwrap();\n'
+          + '        }\n'
+          + '    }\n'
+          + HE) % (len(FIXFILES), fix_entries)
 
-    fn write_asset_data_fixture(root: &std::path::Path) {
-        for (rel, body) in AC_FIX_FILES {
-            let p = root.join(rel);
-            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
-            std::fs::write(p, body).unwrap();
-        }
-    }
-''' % (len(FIXFILES), fix_entries)
+#: 历史无标记助手块（本波之前生成/被多粘的形态）：删净后再插一份。
+LEGACY = re.compile(
+    r"\n    /// 合成夹具的内容（与 `tools/gen_asset_data_cases\.py` 里 Python 侧那份\*\*逐字同源\*\*）。"
+    r".*?\n    \}\n", re.S)
 
 path = ROOT / 'engine' / 'rust' / 'src' / 'asset_contract.rs'
 t = path.read_text(encoding='utf-8')
@@ -240,8 +248,14 @@ if BEGIN in t:
 else:
     t = t.rstrip() + '\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n}\n'
     t = t.rstrip()[:-1].rstrip() + '\n' + block + '}\n'
-# 助手放进 tests 模块内（紧跟 use super::*;）
-t = t.replace('#[cfg(test)]\nmod tests {\n    use super::*;\n',
-              '#[cfg(test)]\nmod tests {\n    use super::*;\n' + helper, 1)
+# 助手块幂等化：① 删带标记的；② 删历史无标记的（可能有 N 份）；③ 插一份。
+while HB in t:
+    a = t.index(HB)
+    b = t.index(HE, a) + len(HE)
+    t = t[:a] + t[b:]
+t = LEGACY.sub('', t)
+anchor = '#[cfg(test)]\nmod tests {\n    use super::*;\n'
+assert anchor in t, 'tests 模块锚点未命中'
+t = t.replace(anchor, anchor + helper, 1)
 path.write_text(t, encoding='utf-8', newline='')
 print('# 已写入 asset_contract 的数据面判据（真实 %d 条 / 合成 %d 条）' % (len(real), len(synth)))

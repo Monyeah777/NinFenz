@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """工作流供应链策略机检（CLI）：`python scripts/workflow_policy.py [--json]`。
 
 判据本体见 `core/workflow_policy.py`（外部标准：ossf/scorecard 的

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 馆藏**读者侧独立验证器**（纯标准库，不 import NF 的任何模块）。
 
 用途：读者只拿到「回执（RECEIPTS.json 里的一条）+ 条目内容」，就能自己判断
@@ -122,6 +121,11 @@ def main(argv=None) -> int:
     try:
         with open(args.receipts, encoding="utf-8") as fh:
             doc = json.load(fh)
+        # 独立验证器**零 NF 依赖**（本判据不改）：顶层形状在这一层就地校验，
+            # 与 core.json_doc 同一口径（对象才继续，否则给指引）。
+        if not isinstance(doc, dict):
+            raise ValueError("%s 顶层应为对象，实为 %s（修复指引：回执件不是数组/标量）"
+                             % (args.receipts, type(doc).__name__))
     except (OSError, ValueError) as exc:
         print("✗ 回执不可读：%s" % exc, file=sys.stderr)
         return 2

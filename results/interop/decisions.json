@@ -30,7 +30,7 @@
     {
       "evidence": "2026-09-21 取回模型卡与配置实测：accuracy 0.766 / Brier 0.062 / ECE 0.213 / score MAE 0.242；四种 workflow 专用（agent-trace / customer-service / invoice / security）；作者自述 specialist（勿作静默默认）、英文专用、选项数建议 <20",
       "id": "laya-typed-decisions",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "local": null,
       "pulled": false,
       "source": "hf:convaiinnovations/laya-typed-decisions"
@@ -38,7 +38,7 @@
     {
       "evidence": "2026-09-21 取回模型卡实测：与 base 同族的做多语面（NF 中文 state 应优先此变体，而非英文专用 checkpoint）",
       "id": "laya-multilingual",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "local": {
         "runtime": "laya 0.3.5 + torch 2.14.0 + transformers 5.17.0（CPU 可跑）",
         "servedBy": "scripts/serve_decision_model.py（NF 口径 shim：POST /v1/systemone）"
@@ -49,7 +49,7 @@
     {
       "evidence": "2026-09-21 取回模型卡与 adapter_config 实测：非自回归、只评调用方给的候选；三原语 choice/noul/score；需上游 base 精确 revision + Open-Jev loader + GPU；AutoPeftModel 直调不实现该接口",
       "id": "open-jev-9b",
-      "license": "apache-2.0",
+      "license": "Apache-2.0",
       "local": null,
       "pulled": false,
       "source": "hf:ZefanCai/Open-Jev-9B"

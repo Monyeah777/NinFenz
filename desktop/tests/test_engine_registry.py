@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """引擎 provider 注册表（core/engine_registry.py）回归测试 —— 注册表模式 / 装载解析面。"""
 import json
 import sys

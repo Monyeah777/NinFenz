@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """40 总纲 v2.8 波B S5 —— 模块生命周期单测（status 位 + deprecate/restore + 引用门禁）。"""
 import os
 import sys

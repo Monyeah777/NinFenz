@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from core import json_doc
 from core import nfal
 from core.schema_lint import subset_key_violations, subset_validate
 
@@ -20,7 +21,7 @@ def _print(obj: Any) -> None:
 
 
 def _load_state(path: str) -> Dict[str, Any]:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    return json_doc.load(Path(path), dict, what=path)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -29,7 +30,8 @@ def _parser() -> argparse.ArgumentParser:
     common.add_argument("--root", default=argparse.SUPPRESS,
                         help="NF 仓库根（真源：world_slots / event_registry / schema）")
     ap = argparse.ArgumentParser(prog="nf nfal",
-                                 description="NFA-L：NF 声明式(借 YAML/IDL) + 命令式(封闭 guard 表达式) 混合前端/后端")
+                                 description="NFA-L：NF 声明式(借 YAML/IDL) + 命令式(封闭 guard 表"
+                                     "达式) 混合前端/后端")
     ap.add_argument("--root", default=".", help="NF 仓库根")
     sub = ap.add_subparsers(dest="nfal_cmd", required=True)
 
@@ -42,7 +44,9 @@ def _parser() -> argparse.ArgumentParser:
 
     p_build = sub.add_parser("build", parents=[common], help="管线 → NFIR（前端主链）")
     p_build.add_argument("pipeline")
-    p_build.add_argument("--strict", action="store_true", help="散文 condition 记 fail（默认 advisory）")
+    p_build.add_argument("--strict",
+ action="store_true",
+ help="散文 condition 记 fail（默认 advisory）")
     p_build.add_argument("--no-tokens", action="store_true", help="跳过模块索引（token 面为空）")
 
     p_eval = sub.add_parser("eval", parents=[common], help="后端：对各 guard 三值求值")
@@ -50,7 +54,9 @@ def _parser() -> argparse.ArgumentParser:
     p_eval.add_argument("--state", required=True, help="抽象状态 JSON（按 world_slots 全名嵌套）")
     p_eval.add_argument("--no-tokens", action="store_true")
 
-    p_schema = sub.add_parser("schema-check", parents=[common], help="用仓库自实现 JSON-Schema 子集校验管线声明")
+    p_schema = sub.add_parser("schema-check",
+ parents=[common],
+ help="用仓库自实现 JSON-Schema 子集校验管线声明")
     p_schema.add_argument("pipeline")
     return ap
 
@@ -61,7 +67,10 @@ def _cmd_parse(args: argparse.Namespace) -> int:
         ast = parse(args.expr)
     except Exception as exc:  # noqa: BLE001 —— CLI 边界：任何解析失败都以诊断给出
         _print({"schema": nfal.SCHEMA, "kind": "nfal-parse", "verdict": "fail",
-                "diagnostics": [{"code": "E0201", "severity": "fail", "message": str(exc), "pos": 0}]})
+                "diagnostics": [{"code": "E0201",
+ "severity": "fail",
+ "message": str(exc),
+ "pos": 0}]})
         return 1
     _print({"schema": nfal.SCHEMA, "kind": "nfal-parse", "verdict": "pass", "ast": strip_pos(ast)})
     return 0
@@ -105,7 +114,8 @@ def _cmd_eval(args: argparse.Namespace) -> int:
 
 def _cmd_schema_check(args: argparse.Namespace) -> int:
     root = Path(args.root)
-    schema = json.loads((root / "protocol" / "schema" / "pipeline.schema.json").read_text(encoding="utf-8"))
+    schema = json_doc.load(root / "protocol" / "schema" / "pipeline.schema.json", dict,
+                          what="protocol/schema/pipeline.schema.json")
     decl = nfal.load_decl(args.root, args.pipeline)
     issues = subset_key_violations(schema) + subset_validate(decl, schema)
     _print({"schema": nfal.SCHEMA, "kind": "nfal-schema", "artifact": args.pipeline,

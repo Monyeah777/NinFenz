@@ -81,9 +81,12 @@ class ProjectionLayerTest(unittest.TestCase):
         for key in ("P20", "P40", "P50", "P60"):
             with self.subTest(layer=key):
                 self.assertIn(key, entry["mount_layers"])
-                self.assertEqual(entry["mount_layers"][key]["name"], reg["mount_layers"][key]["name"])
-                self.assertEqual(entry["mount_layers"][key]["default"], reg["mount_layers"][key]["default"])
-                self.assertEqual(entry["mount_layers"][key]["available"], reg["mount_layers"][key]["available"])
+                self.assertEqual(entry["mount_layers"][key]["name"],
+ reg["mount_layers"][key]["name"])
+                self.assertEqual(entry["mount_layers"][key]["default"],
+ reg["mount_layers"][key]["default"])
+                self.assertEqual(entry["mount_layers"][key]["available"],
+ reg["mount_layers"][key]["available"])
 
 
 class GateIsomorphismTest(unittest.TestCase):

@@ -21,11 +21,27 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
-      - name: 发布前体检（verify + 基线自描述一致）
-        run: python3 scripts/nf.py release
+      - name: 发布前体检（verify + 基线自描述一致；日志落盘供失败诊断）
+        env:
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          set -o pipefail
+          python3 scripts/nf.py release 2>&1 | tee release-gate.log
       - name: 端到端显式步（与 nf release 内嵌同源；失败即红，便于定位）
         run: python3 scripts/e2e_desktop_headless.py
       - name: 覆盖率门槛（core ≥80）
         run: |
           coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
           coverage report --fail-under=80 --include="desktop/src/core/*"
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-gate-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

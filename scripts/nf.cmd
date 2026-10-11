@@ -19,26 +19,34 @@ rem and "no daemon yet" both take the fallback.
 setlocal
 set "NF_ROOT=%~dp0"
 set "NF_PY=python"
+rem Out-of-band fallback marker (2026-10-10 audit N9): a command's own rc can be 111, so the
+rem wrapper must NOT treat rc==111 alone as "fast path could not serve". The client writes this
+rem file only when it declines; the wrapper falls back iff the file exists.
+set "NF_MARK=%TEMP%\nf_fp_%RANDOM%%RANDOM%.flag"
+set "NF_FASTPATH_MARKER=%NF_MARK%"
 rem Flow is goto-based on purpose: inside a "( ... )" block cmd expands %ERRORLEVEL% when the
 rem whole block is parsed, so the rc would be the pre-block value (classic cmd pitfall).
 rem No "where python" probe: measured 2026-10-01, that one subprocess costs ~98 ms here (cmd bare
 rem 15 ms, "+where" 113 ms) -- more than the entire fast path. Instead: just run, and switch to the
 rem "py" launcher only when cmd reports 9009 (program not found).
 if "%~1"=="" goto :nf_shell
+del "%NF_MARK%" >nul 2>&1
 "%NF_PY%" -S "%NF_ROOT%nf_client.py" %*
 set "NF_RC=%ERRORLEVEL%"
 if "%NF_RC%"=="9009" goto :nf_use_py
-if "%NF_RC%"=="111" goto :nf_direct
+if exist "%NF_MARK%" goto :nf_direct
 goto :nf_done
 :nf_use_py
 set "NF_PY=py"
+del "%NF_MARK%" >nul 2>&1
 "%NF_PY%" -S "%NF_ROOT%nf_client.py" %*
 set "NF_RC=%ERRORLEVEL%"
 if "%NF_RC%"=="9009" goto :nf_direct
-if "%NF_RC%"=="111" goto :nf_direct
+if exist "%NF_MARK%" goto :nf_direct
 goto :nf_done
 :nf_direct
 rem Fallback: fast path could not serve (no daemon / long-running command / frame mismatch).
+del "%NF_MARK%" >nul 2>&1
 "%NF_PY%" "%NF_ROOT%nf.py" %*
 set "NF_RC=%ERRORLEVEL%"
 goto :nf_done

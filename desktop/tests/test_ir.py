@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """IR 内容归一化层单测（v1.2.0 协议中转站 v2，2.0 E0-①）。
 
 运行：cd desktop && python -m unittest tests.test_ir -v

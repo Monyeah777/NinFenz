@@ -18,6 +18,11 @@
    需要扩展宿主，本仓无编辑器可装载验证，按诚实标注留给使用者，不假称已适配（见 docs/lsp.md）。
 
 纪律：只读分析 + 只在客户端**显式请求** codeAction 时给编辑；本模块不自行写盘。
+
+**包含性（2026-10-10 审计 X2，P1）**：客户端 uri 与 initialize.rootUri 都是不可信输入。
+磁盘读取一律先过 realpath 包含性（边界 = 会话根），根外一律返回空；rootUri 只有「在场目录
+且落在启动根内」才被采纳。同仓库 MCP 面早有这道纪律（mcp_runtime._tool_pipeline_read），
+LSP 面此前漏了——一个 uri 就能读出工作区外任意文件的**全文**（CWE-22 → CWE-200）。
 """
 from __future__ import annotations
 
@@ -78,6 +83,21 @@ _URI_SAFE = "/:@"
 # 注：SEVERITY_WARNING / SYMBOL_KIND / HEADING / WORD 随文档级能力迁到 core/lsp_doc.py——
 # 这里不再各留一份（死代码判据 2026-10-08 抓到四处零引用常量，正是「拆完没清场」的痕迹）。
 
+def _within_root(root: str, path: str) -> bool:
+    """`path` 是否落在 `root` 内（realpath 包含性；含 root 自身）。
+
+    先 realpath 再判：`../`、符号链接、Windows 大小写都必须在归一后比较——按字符串前缀判
+    会被 `root-evil/` 这类兄弟目录骗过（2026-10-10 审计 X2 的同一族教训）。
+    """
+    try:
+        r = Path(root).resolve()
+        p = Path(path).resolve()
+    except (OSError, ValueError):
+        # 归一失败（不存在/不可达/链接循环）⇒ 保守判「不在根内」（fail-closed，宁可拒答）。
+        return False
+    return p == r or r in p.parents
+
+
 def uri_to_path(uri: str) -> str:
     """file:// uri → 本地路径（Windows 盘符与 URL 编码均还原）。"""
     parsed = urlparse(uri)
@@ -110,6 +130,8 @@ class LspServer:
 
     def __init__(self, root: str = ".", today: str = "", explicit_root: bool = False):
         self.root = os.path.abspath(root or ".")
+        #: 启动根：initialize 采纳 rootUri 时的**上界**（客户端不得把会话根搬到它之外）。
+        self._launch_root = self.root
         self.today = today
         self.explicit_root = explicit_root
         self.docs: Dict[str, Dict[str, str]] = {}
@@ -142,11 +164,31 @@ class LspServer:
             self._index = nf_language.build(self.root, sig)   # 复用刚扫的签名，不再扫第二遍
         return self._index
 
+    def _resolve_within_root(self, path: str) -> str:
+        """客户端给的路径 → **根内**绝对路径；不在根内返回空串（拒绝）。
+
+        审计 X2（P1）的修法落点：此前 `_text_of` 对客户端 uri 裸 `open()`，工作区外任意
+        文件都能被读出并**整文件回给客户端**（CWE-22 → CWE-200）。边界 = 当前会话根，
+        realpath 归一是关键（`../`、符号链接、百分号编码都必须在归一后判）。
+        """
+        raw = str(path or "")
+        if not raw:
+            return ""
+        try:
+            root_real = Path(self.root).resolve()
+            p = Path(raw)
+            target = p.resolve() if p.is_absolute() else (root_real / p).resolve()
+        except (OSError, ValueError):
+            return ""
+        return str(target) if target == root_real or root_real in target.parents else ""
+
     def _text_of(self, uri: str) -> str:
         doc = self.docs.get(uri)
         if doc:
             return doc.get("text", "")
-        path = uri_to_path(uri)
+        path = self._resolve_within_root(uri_to_path(uri))
+        if not path:                       # 根外/不可解析：空正文（绝不把文件内容外带）
+            return ""
         try:
             with open(path, encoding="utf-8") as fh:
                 return fh.read()
@@ -187,7 +229,8 @@ class LspServer:
             items.append({"label": sym["name"], "kind": COMPLETION_KIND.get(sym["kind"], 1),
                           "detail": sym["detail"], "documentation": {"kind": "markdown",
                                                                      "value": sym["doc"]},
-                          "sortText": "%d_%s" % (nf_language.KINDS.index(sym["kind"]), sym["name"])})
+                          "sortText": "%d_%s" % (nf_language.KINDS.index(sym["kind"]),
+ sym["name"])})
         return {"isIncomplete": False, "items": items}
 
     def _hover(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -219,7 +262,10 @@ class LspServer:
         target = os.path.join(self.root, sym["path"])
         tl = int(sym.get("line", 0) or 0)
         return {"uri": path_to_uri(target),
-                "range": {"start": {"line": tl, "character": 0}, "end": {"line": tl, "character": 0}}}
+                "range": {"start": {"line": tl,
+ "character": 0},
+ "end": {"line": tl,
+ "character": 0}}}
 
     def _document_symbols(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         uri = (params.get("textDocument") or {}).get("uri", "")
@@ -398,9 +444,16 @@ class LspServer:
             root = (folders[0] or {}).get("uri") if folders else ""
         if not root:
             root = params.get("rootPath")
-        if root:
-            self.root = os.path.abspath(uri_to_path(str(root)) if str(root).startswith("file:")
-                                        else str(root))
+        if not root:
+            return
+        candidate = uri_to_path(str(root)) if str(root).startswith("file:") else str(root)
+        # **采纳是有条件的**（审计 X2，P1）：rootUri 决定此后 `_text_of` 的包含性边界，
+        # 无条件照单全收等于把「能读哪些文件」的裁决权交给客户端。两条判据：① 落点必须是
+        # **在场目录**；② 必须落在**启动根**内（`nf lsp` 的仓库根 / `--root`）。不满足一律
+        # 拒绝并保留启动根——fail-closed：宁可少服务一个 workspace，不可越界读根外文件。
+        if not os.path.isdir(candidate) or not _within_root(self._launch_root, candidate):
+            return
+        self.root = os.path.abspath(candidate)
 
     def capabilities(self) -> Dict[str, Any]:
         """服务端能力（`positionEncoding` 固定 utf-16——LSP 规范要求客户端必须支持）。"""
@@ -434,7 +487,8 @@ class LspServer:
                     "jsonrpc": "2.0", "id": None,
                     "error": {"code": -32700,
                               "message": "Parse error（非法 UTF-8 / 非法 JSON / 坏 Content-Length；"
-                                         "修复指引：Content-Length 以**字节**计，正文为 UTF-8 JSON）"}})
+                                         "修复指引：Content-Length 以**字节**计，正文为 UTF-8 JSON"
+                                             "）"}})
                 continue
             if not isinstance(msg, dict):
                 # JSON-RPC 2.0：消息须为对象（本实现不支持批量数组）→ -32600 后继续。
@@ -530,7 +584,8 @@ def _check_lifecycle(srv: "LspServer", probe: str, root_s: str) -> List[str]:
 def _references_issues(srv: "LspServer", probe: str) -> List[str]:
     """引用面体检：**登记关系**（事件 ↔ 发布/订阅模块）必须给出可解释的位置。"""
     srv.handle({"jsonrpc": "2.0", "method": M_DID_OPEN,
-                "params": {"textDocument": {"uri": probe, "text": "# 探针\n事件 narrative_event\n"}}})
+                "params": {"textDocument": {"uri": probe,
+ "text": "# 探针\n事件 narrative_event\n"}}})
     out = srv.handle({"jsonrpc": "2.0", "id": 70, "method": M_REFERENCES,
                       "params": {"textDocument": {"uri": probe},
                                  "position": {"line": 1, "character": 4}}})[0]
@@ -637,7 +692,10 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     srv = LspServer(root=str(r.resolve()), explicit_root=True)
     probe = path_to_uri(str(r / "editor_face_probe.md"))
     # 握手一次（真实客户端序列；后续请求面都依赖它——协议状态机要求先 initialize）
-    init = srv.handle({"jsonrpc": "2.0", "id": 1, "method": M_INITIALIZE, "params": {}})[0]["result"]
+    init = srv.handle({"jsonrpc": "2.0",
+ "id": 1,
+ "method": M_INITIALIZE,
+ "params": {}})[0]["result"]
     issues = _check_capabilities(srv, init)
     issues += _check_lifecycle(srv, probe, str(r.resolve()))
     issues += _check_intelligence(srv, probe, r)

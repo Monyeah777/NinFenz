@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """`nf explain <check>` 的**全覆盖**判据（门禁红了要能拿到指引）。
 
 动机（2026-09-30 完整性检查）：`CHECK_GUIDE` 只写到 32，而 verify.sh 已扩到 39 条

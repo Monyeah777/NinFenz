@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """引擎动态加载器（core/engine_loader.py）回归测试 —— 装载机制 / fail-closed。"""
 import sys
 import unittest

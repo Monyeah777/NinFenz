@@ -1,10 +1,10 @@
 # 发布编排（release）
 > ⛔ 操作指令：本文是发布策略的**声明件**——`core/release_gate.py` 逐锚点机检（`nf release --plan` / check38 子扫描）；读到即执行，勿当资料。
-> 最后更新：2026-10-05
+> 最后更新：2026-10-11
 
 ## 这份文件解决什么
 
-发布动作散在 `nf release`（体检）、`scripts/release_freeze.sh`（快照）、`scripts/bump_verify.sh`（换标）
+发布动作散在 `nf release`（体检）、golden master 快照（**2026-10-11 作者裁决退役**）、`scripts/bump_verify.sh`（换标）
 与人工清单里，**顺序**与**前置**此前只存在于记忆。本文件把顺序写成可机检的锚点面，把执行交给一条命令：
 
 ```bash
@@ -40,18 +40,13 @@ python scripts/nf.py release --freeze --apply --by <批准人> --note "<本波�
 `bash verify.sh` 是全量门禁的单入口；`PASS` 期望值是声明（`quality_baseline.EXPECTED_*`），
 不手写在本文里（手写必漂）。
 
-## Golden Master
+## Golden Master（已退役）
 
-tag 点把关键产物做成可复现存档：
-
-```bash
-bash scripts/release_freeze.sh vX.Y.Z
-```
-
-产出 = `.release-frozen/<tag>/sha256.manifest`（`01_核心协议.md` / `02_联动注册表.md` /
-`06_Agent执行协议.md` / `07_官方核心出厂与社区预设导航.md` / `verify.sh` + `desktop/src/core/*.py`）
-+ `sig-fingerprint.txt`（`nf sig --verify` 全量知识指纹）。快照是**历史时点事实**，不随现状更新；
-结构不完整（缺件类 / 空摘要）即由 check38 的 `release_gate` 子扫描判红。
+原机制（tag 点产物快照 `.release-frozen/<tag>/sha256.manifest`）**已于 2026-10-11 作者裁决退役**：
+156 条清单实测 77 条失效（协议件改了而清单从不重算）、无任何门禁消费、且曾泄漏进 npm 发布物。
+原冻结目录与生成脚本已从仓库与 payload 排除表移除（路径面不再保留该目录名）。
+日后若需要「tag 点可复现快照」，应建成**带新鲜度门禁**的新机制（有清单就必须有判据，
+这正是本文件开头那条纪律的反面教材）。
 
 > 语言面：本指南另有 `docs/en/release.md`（English）· `docs/ja/release.md`（日本語）两版；本地化规则与覆盖面声明见 `docs/locales.md`（译件 `docs/en/locales.md` · `docs/ja/locales.md`）。注册表 = `protocol/locales.json`，判据 = check34 的语言面扫描。
 

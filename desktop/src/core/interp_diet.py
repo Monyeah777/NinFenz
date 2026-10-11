@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """解释器「节食」自愈：用 `-S` 起解释器省掉 site 定制，同时把 site-packages 显式加回来。
 
 依据（2026-09-29 实测，min-of-N）：

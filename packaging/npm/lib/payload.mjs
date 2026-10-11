@@ -41,6 +41,26 @@ export function verifyTree(dir, manifest) {
   return bad;
 }
 
+//: 目录里的**实际文件集**（相对路径、正斜杠、已排序）。
+//:
+//: 为什么必须单独有这条判据（2026-10-10 审计 P1-9）：`verifyTree` 只遍历**清单**——它能答
+//: 「清单里的件都在场且字节一致」，答不了「目录里有没有清单外的件」。而发布边界失守的正是后者：
+//: 发布物曾收进测试夹具/内部快照，就是因为它被登记进了清单、而校验从不看目录实况。
+//: 口径：实况 == 清单（清单自身 `payload-manifest.json` 一个例外，由调用方剔除）。
+export function listFiles(dir) {
+  const out = [];
+  const walk = function (base, prefix) {
+    const entries = fs.readdirSync(base, { withFileTypes: true });
+    for (const ent of entries) {
+      const rel = prefix ? prefix + '/' + ent.name : ent.name;
+      if (ent.isDirectory()) walk(path.join(base, ent.name), rel);
+      else if (ent.isFile()) out.push(rel);
+    }
+  };
+  if (fs.existsSync(dir)) walk(dir, '');
+  return out.sort();
+}
+
 export function treeSha256(manifest) {
   const h = crypto.createHash('sha256');
   for (const e of entriesOf(manifest).slice().sort(byPath)) {

@@ -20,6 +20,7 @@ import json
 import math
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Sequence, Tuple
+from core import json_doc
 from core import conformance_scan as csc
 
 DIGITS = 6
@@ -154,8 +155,8 @@ def extraction(rows: Sequence[Dict[str, str]], **_kwargs) -> Dict[str, Any]:
     """抽取口径：整条精确匹配 + 字段级 P/R/F1（gold_fields / pred_fields = JSON 数组）。"""
     em, tp, fp, fn = 0, 0, 0, 0
     for r in rows:
-        g = set(json.loads(r["gold_fields"]))
-        p = set(json.loads(r["pred_fields"]))
+        g = set(json_doc.loads(r["gold_fields"], list, what="gold_fields"))
+        p = set(json_doc.loads(r["pred_fields"], list, what="pred_fields"))
         if g == p:
             em += 1
         tp += len(g & p)

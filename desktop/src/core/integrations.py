@@ -14,10 +14,10 @@ Agent Skill / AGENTS 规则出口 / CCV3 出口 / npm 启动器 / Rust 快线 / 
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 DIR = "integrations"
 INDEX_REL = "integrations/README.md"
@@ -31,7 +31,11 @@ REQUIRED = ("schema", "id", "title", "kind", "status", "version", "codeowner", "
 SCHEMA_ID = "nf:integration"
 STRINGS_SCHEMA_ID = "nf:integration-strings"
 STRINGS_NAME = "strings.json"
-_PATH_TOKEN = re.compile(r"[A-Za-z0-9_./\\-]+\\.(?:py|sh|ps1|cmd|mjs|js|json|md|csproj|toml)")
+#: 多字符类 + 必需字面量：**必须带「不在类内」的负向后顾**（2026-10-10 ReDoS 扫描扫出）——
+#: 否则在长 token 上每个起点各回溯一遍 ⇒ O(n²)（实测 64 KB 纯字母数字 3.2 s）。后顾只让
+#: 起点落在 token 首字符，匹配结果与「取最大 token」等价。
+_PATH_TOKEN = re.compile(
+    r"(?<![A-Za-z0-9_./\\-])[A-Za-z0-9_./\\-]+\\.(?:py|sh|ps1|cmd|mjs|js|json|md|csproj|toml)")
 #: entry.command 里的 `nf <子命令>`（`python scripts/nf.py <子>` 与裸 `nf <子>` 两种形态）
 _NF_SUBCMD = re.compile(r"(?:\bpython\s+scripts/nf\.py|\bnf)\s+([a-z][a-z0-9-]*)")
 
@@ -55,7 +59,7 @@ def entries(root: str = ".") -> List[Dict[str, Any]]:
             continue
         rec: Dict[str, Any] = {"rel": DIR + "/" + sub.name}
         try:
-            rec.update(json.loads(f.read_text(encoding="utf-8")))
+            rec.update(json_doc.load(f, dict, what=f.name))
         except (OSError, ValueError) as exc:
             rec["_bad"] = str(exc)
         out.append(rec)
@@ -88,7 +92,8 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
     recs = entries(root)
     if not recs:
-        issues.append("缺接入面目录 " + DIR + "/（修复指引：每个接入面一个子目录 + integration.json；"
+        issues.append("缺接入面目录 " + DIR + "/（修复指引：每个接入面一个子目录 + integration.json"
+            "；"
                       "字段见 core/integrations.py::REQUIRED）")
     seen: Dict[str, str] = {}
     kinds: List[str] = []
@@ -171,7 +176,8 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         from core import schema_lint as _sl3
         _str_schema = _sl3.load_schema(str(r), STRINGS_SCHEMA_ID)
         if _str_schema is None:
-            issues.append("缺接入面字符串 schema（%s；修复指引：protocol/schema/integration_strings.schema.json）"
+            issues.append("缺接入面字符串 schema（%s；修复指引：protocol/schema/integration_strings"
+                ".schema.json）"
                           % STRINGS_SCHEMA_ID)
     except Exception as exc:
         issues.append("接入面字符串 schema 校验不可用：%s" % exc)
@@ -185,12 +191,14 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                           + "（修复指引：逐语言 title/summary；语言集见 protocol/locales.json）")
             continue
         try:
-            sdata = json.loads(sf.read_text(encoding="utf-8"))
+            sdata = json_doc.load(sf, dict, what=sf.name)
         except (OSError, ValueError) as exc:
             issues.append(DIR + "/" + sid + " " + STRINGS_NAME + " 不可解析：" + str(exc))
             continue
         if _str_schema is not None:
-            for _v in _sl3.subset_validate(sdata, _str_schema, DIR + "/" + sid + "/" + STRINGS_NAME):
+            for _v in _sl3.subset_validate(sdata,
+ _str_schema,
+ DIR + "/" + sid + "/" + STRINGS_NAME):
                 issues.append(DIR + "/" + sid + " strings 越界：" + _v)
         got = {str(k).lower() for k in (sdata.get("locales") or {})}
         if _want and got != _want:
@@ -210,7 +218,8 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         if not m:
             issues.append(INDEX_REL + " 缺生成区标记（" + BEGIN + " / " + END + "）")
         elif m.group(1).strip() != render_index(root).strip():
-            issues.append(INDEX_REL + " 生成区与实时渲染不一致（修复指引：按 render_index 重出该区）")
+            issues.append(INDEX_REL + " 生成区与实时渲染不一致（修复指引：按 render_index 重出该区"
+                "）")
     return issues, {"count": len([x for x in recs if not x.get("_missing") and not x.get("_bad")]),
                     "ids": sorted(seen), "kinds": sorted(set(kinds))}
 
@@ -219,7 +228,7 @@ def localized(root: str = ".", integration_id: str = "", locale: str = "zh") -> 
     """取某接入面某语言的字符串（缺件缺语言返回空 dict——调用方自行兜底，不臆造）。"""
     p = Path(root) / DIR / integration_id / STRINGS_NAME
     try:
-        data = json.loads(p.read_text(encoding="utf-8"))
+        data = json_doc.load(p, dict, what=p.name)
     except (OSError, ValueError):
         return {}
     loc = (data.get("locales") or {}).get(locale) or {}

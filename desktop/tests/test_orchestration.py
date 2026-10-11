@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """智能体工具编排（`core/orchestration.py`）回归：目录派生 / 计划编译 / 确定性序 / fail-closed 派发。
 
 正例（真仓零问题、合法计划编译通过）+ 变异自证（编排错误九类必判红）+ 派发停点与证据。
@@ -17,7 +16,8 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 from core import mcp_runtime as mrt  # noqa: E402
 from core import orchestration as orch  # noqa: E402
 
-#: 运行时工具面（{name: tool_def}）——按 orchestration 的叶子纪律**由调用方注入**，模块自己不 import。
+# : 运行时工具面（{name: tool_def}）——按 orchestration 的叶子纪律**由调用方注入**，模块自己不 import
+# 。
 TOOLS = {t["name"]: t for t in mrt.TOOL_DEFS}
 
 

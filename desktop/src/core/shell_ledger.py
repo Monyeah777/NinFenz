@@ -14,9 +14,9 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 #: 占位短语（命中任一即计一条空壳）
 SHELL_PHRASES = ("领域细则待作者补全", "领域专属判据待补", "领域专属失效模式待补")
@@ -84,13 +84,13 @@ def tier_mismatches(base: Path, per_package: Dict[str, int]) -> List[str]:
         proj_tier = None
         if proj.is_file():
             try:
-                proj_tier = json.loads(proj.read_text(encoding="utf-8", errors="replace"))\
-                    .get("content_tier")
+                proj_tier = json_doc.load(proj, dict, what=str(proj)).get("content_tier")
             except ValueError:
                 out.append("%s：机读投影不可解析（修复指引：重渲染 outputs/DOMAIN_SPEC.json）" % pkg)
                 continue
         if says_derived != (hits > 0):
-            out.append("%s：人读档位声明与正文占位%s（占位 %d 处）（修复指引：补全正文后把档位行改成 "
+            out.append("%s：人读档位声明与正文占位%s（占位 %d 处）（修复指引：补全正文后把档位行改"
+                "成 "
                        "authored，或按 derived 如实标注）"
                        % (pkg, "矛盾——声明 derived 却无占位" if says_derived else
                           "矛盾——声明 authored 却仍有占位", hits))

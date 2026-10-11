@@ -100,7 +100,8 @@
 | M16 | 建筑据点 | 世界 | P60 | 西幻包 |
 | M20 | 世界知识库 | 事件 | P00/P70 | 核心 |
 | M80 | 输出生成器 | 通用 | P80 | 核心 |
-| M50 | 主循环 | 通用 | 全局 | 核心 |- **事件契约（发布侧 · 模块头声明；订阅侧以 02 §3 与模块 events 为准）**：
+| M50 | 主循环 | 通用 | 全局 | 核心 |
+- **事件契约（发布侧 · 模块头声明；订阅侧以 02 §3 与模块 events 为准）**：
 
 | 事件 | 发布模块 | 已知订阅（02 §3 / 模块头显式） |
 |---|---|---|
@@ -200,7 +201,8 @@
 | 09_经济贸易_ECONOMY.md | ECONOMY | 市场事件/投资-店铺/投资-商路/商店刷新联动 | M09 |
 | 10_死亡重生_DEATH.md | DEATH | 死亡结算/祝福池/动态祝福生成器/重生机制 | 生存:M10 |
 | 11_魔法系统_MAGIC.md | MAGIC | 五层理论/七大元素/词根库/咒语生成/22 条二元素组合 | M11 |
-| 12_NPC对话_NPC_DIALOGUE.md | NPC_DIALOGUE | 13 NPC 总览与五槽全表/触发规则 | M12 || 13_NPC交互_NPC_INTERACTION.md | NPC_INTERACTION | NPC 状态机/好感关系/记忆/日程/死亡继承 | M13 |
+| 12_NPC对话_NPC_DIALOGUE.md | NPC_DIALOGUE | 13 NPC 总览与五槽全表/触发规则 | M12 |
+| 13_NPC交互_NPC_INTERACTION.md | NPC_INTERACTION | NPC 状态机/好感关系/记忆/日程/死亡继承 | M13 |
 | 14_势力阵营_FACTIONS.md | FACTIONS | 势力总表/声望等级体系/阵营动态 | M14 |
 | 15_帮派势力_GANGS.md | GANGS | 13 帮派/内部结构/行动类型/帮派秘密 | M15 |
 | 16_建筑据点_SETTLEMENTS.md | SETTLEMENTS | 建筑模板/居民模板/城镇生成/7 事件与税收 | M16 |

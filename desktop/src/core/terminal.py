@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 终端（`nf shell`）——端壳退役后的人机交互入口（纯 stdlib · 确定性 · 可注入）。
 
 定位（对齐 `docs/L3_FROZEN.md`「能力入口一律落 CLI」）：
@@ -20,7 +19,6 @@
 """
 from __future__ import annotations
 
-import tempfile
 import hashlib
 import io
 import json
@@ -28,12 +26,15 @@ import os
 import pprint
 import shlex
 import sys
+import tempfile
 import time
 from collections import namedtuple
 from contextlib import redirect_stderr, redirect_stdout
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
+from core import attest, json_doc
 
 SHELL_VERSION = "1.0.0"
 
@@ -69,7 +70,8 @@ CONFIRM_FLAGS = ("--write", "--apply", "--register", "--force",
                  # 与其余写面同待遇（不额外设闸）。表单侧不建追问表，理由见 `FORM_EXEMPT`。
                  "--surface-write")
 #: 2026-10-01 清掉 5 个**死条目**（表里有、`nf` 的 argparse 面里没有）：`--tag` / `--push` /
-#: `--delete` / `--rm` / `--re-sign`——都是更早版本的残影（`nf release` 如今是 `--fast` / `--plan` / `--freeze [--apply]`；
+# : `--delete` / `--rm` / `--re-sign`——都是更早版本的残影（`nf release` 如今是 `--fast` / `--plan` /
+# `--freeze [--apply]`；
 #: `nf asset baseline` 的重签旗标是 **`--write`**，已被上面那条覆盖，行为面并没有因此漏拦）。
 #: 死条目的害处不是漏拦（它们匹配不到任何东西），而是**误导读者的口径**：文档写着「命中
 #: `--re-sign` 才需要确认」，读者照着敲只会拿到用法错误。判据见 `test_write_flag_gate`：闸门
@@ -211,7 +213,12 @@ ZONES: tuple[dict[str, Any], ...] = (
      "actions": (
          {"key": "market", "title": "市场货架", "argv": ("market", "--list"), "params": (),
           "note": ""},
-         {"key": "asset-ls", "title": "资产清单", "argv": ("asset", "ls"), "params": (), "note": ""},
+         {"key": "asset-ls",
+ "title": "资产清单",
+ "argv": ("asset",
+ "ls"),
+ "params": (),
+ "note": ""},
          {"key": "asset-density", "title": "资产密度", "argv": ("asset", "density"), "params": (),
           "note": ""},
          {"key": "library-search", "title": "馆藏检索", "argv": ("library", "search", "{query}"),
@@ -291,14 +298,16 @@ FAMILIES: tuple[dict[str, Any], ...] = (
      "summary": "第一次进 NF：体检、一键演示、自述数字、抽象阶梯",
      "commands": ("doctor", "demo", "stats", "layers")},
     {"id": "forge", "name": "装配与生产",
-     "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读写、入库登记",
+     "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"
+         "写、入库登记",
      "commands": ("assemble", "preset", "run", "render", "spec", "register", "import")},
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",
                   "output", "rename")},
     {"id": "verify", "name": "质检与验证",
-     "summary": "正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",
+     "summary": "正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变"
+         "更日志生成、许可证、遥测、装配语言 guard 检查/编译",
      "commands": ("lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
                   "nfal")},
@@ -307,12 +316,14 @@ FAMILIES: tuple[dict[str, Any], ...] = (
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",
                   "related", "who-refers", "impact")},
     {"id": "govern", "name": "治理与决策",
-     "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明日志、设计审计、语言面（本地化与责任方）",
+     "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明"
+         "日志、设计审计、语言面（本地化与责任方）",
      "commands": ("decisions", "audit", "attest", "receipts", "handover",
                   "postmortem", "decide", "model", "review", "workloop",
                   "approve", "transparency", "design", "locales")},
     {"id": "integrate", "name": "服务与集成",
-     "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置、世界模型、模块工具面",
+     "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置"
+         "、世界模型、模块工具面",
      "commands": ("serve", "lsp", "bench", "endpoint", "interop", "driver",
                   "events", "state-front", "worldmodel", "toolface")},
     {"id": "meta", "name": "命令面与终端",
@@ -583,13 +594,20 @@ FORMS: tuple[dict[str, Any], ...] = (
     # 依据：闸门表（CONFIRM_VERBS / CONFIRM_FLAGS / CONFIRM_FLAG_PAIRS）是写面的**穷举真源**，
     # 而表单此前只覆盖其中 8 张 ⇒ 其余写面在终端里只能手敲全参数。本批先补 agent 高频的四类，
     # 其余逐条登记在 `FORM_EXEMPT`（写明「为什么不为它建表」），由判据保证「写面必有去处」。
-    {"id": "preset-save", "title": "保存预设", "summary": "把一条装配清单存成本机预设（落在 NF_HOME，非仓库）",
+    {"id": "preset-save",
+ "title": "保存预设",
+ "summary": "把一条装配清单存成本机预设（落在 NF_HOME，非仓库）",
      "steps": ({"key": "name", "prompt": "预设名", "required": True, "hint": "如 西幻生存-最小"},
-               {"key": "pipeline", "prompt": "管线 id（可空）", "required": False, "hint": "如 P04"},
+               {"key": "pipeline",
+ "prompt": "管线 id（可空）",
+ "required": False,
+ "hint": "如 P04"},
                {"key": "modules", "prompt": "模块 full_id，逗号分隔（可空）", "required": False,
                 "hint": "如 通用类:M00,轻混类:M91"},
                {"key": "assets", "prompt": "资产包名（可空）", "required": False},
-               {"key": "force", "prompt": "要覆盖同名预设就填 --force，否则留空", "required": False}),
+               {"key": "force",
+ "prompt": "要覆盖同名预设就填 --force，否则留空",
+ "required": False}),
      "argv": ("preset", "save", "{name}", "--pipeline", "{pipeline}", "--modules", "{modules}",
               "--assets", "{assets}", "{force}")},
     {"id": "library-deprecate", "title": "馆藏条目弃用",
@@ -597,7 +615,11 @@ FORMS: tuple[dict[str, Any], ...] = (
      "steps": ({"key": "entry", "prompt": "馆藏编号", "required": True, "hint": "如 NF-1"},),
      "argv": ("library", "deprecate", "{entry}")},
     {"id": "library-restore", "title": "馆藏条目回退",
-     "summary": "生命周期回退 → active", "steps": ({"key": "entry", "prompt": "馆藏编号", "required": True},),
+     "summary": "生命周期回退 → active",
+ "steps": ({"key": "entry",
+ "prompt": "馆藏编号",
+ "required": True},
+),
      "argv": ("library", "restore", "{entry}")},
     {"id": "pipeline-new", "title": "派生新管线",
      "summary": "自 P00 骨架派生新管线（改 id/name/领域标签；登记 02 与填层名挂载按 README 三步）",
@@ -728,7 +750,8 @@ def render_forms(filt: str = "", width=None, color: bool = False) -> str:
             continue
         lines.append(_row("/form " + str(form["id"]),
                           "%s —— %s" % (form["title"], form["summary"]), w, color))
-    lines.append("  用法：/form <id> 开始追问；/cancel 中止；参数真源见 protocol/LAYERS.json 同级的 CLI 面")
+    lines.append("  用法：/form <id> 开始追问；/cancel 中止；参数真源见 protocol/LAYERS.json 同级的"
+        " CLI 面")
     return "\n".join(lines)
 
 
@@ -774,12 +797,12 @@ def load_session_state(path: str):
         return {}, ""
     try:
         with open(path, encoding="utf-8") as fh:
-            data = json.load(fh)
+            data = json_doc.loads(fh.read(), dict, what=path)
     except FileNotFoundError:
         return {}, ""
     except OSError as exc:
         return {}, "会话文件不可读（%s）：%s" % (path, exc)
-    except json.JSONDecodeError as exc:
+    except ValueError as exc:   # json_doc 抛 ValueError（含 JSONDecodeError/顶层形状）
         return {}, "会话文件不是合法 JSON（%s）：%s（修复指引：删除该文件或改成合法 JSON）" \
             % (path, exc)
     if str(data.get("schema")) != SESSION_SCHEMA:
@@ -1524,7 +1547,7 @@ SLASH_HELP = (
 def default_history_path() -> str:
     """历史文件默认落点：`<NF_HOME>/shell_history`（与 Store 同一 home 约定，不落仓库）。"""
     try:
-        from core import storage            # 单源：NF_HOME 约定只在 storage 里定义一次
+        from core import storage  # 单源：NF_HOME 约定只在 storage 里定义一次
         home = storage.default_home()
     except Exception:                       # 尽力而为：storage 不可用时退回同样口径的字面约定
         home = Path(os.environ.get("NARRATIVE_FORGE_HOME")
@@ -2316,13 +2339,12 @@ def surface_payload(commands=(), root_flags=()) -> dict:
 def surface_digest(payload) -> str:
     """投影内容摘要（除 `digest` 自身外全量；键序归一，故与构造顺序无关）。"""
     body = {k: v for k, v in (payload or {}).items() if k != "digest"}
-    text = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+    # 规范化字节编码收成单一实现（审计 Z1）：attest.canonical 与内联表达式同字节。
+    return "sha256:" + hashlib.sha256(attest.canonical(body)).hexdigest()
 
 
 #: 生成件抬头（人读纪律写在件内，免得后人把它当手写表改）
-SURFACE_MODULE_HEAD = '''# -*- coding: utf-8 -*-
-"""NF 终端面投影（**生成件 · 请勿手改**）。
+SURFACE_MODULE_HEAD = '''"""NF 终端面投影（**生成件 · 请勿手改**）。
 
 真源：desktop/src/core/terminal.py 的策展表（ZONES / FAMILIES / FORMS / 写盘闸门三表 /
       BLOCKED_IN_SHELL）+ scripts/nf.py 的 argparse 面（命令存在性）。

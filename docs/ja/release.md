@@ -1,10 +1,10 @@
 # リリース編成（release）
 > ⛔ 操作指示：本ファイルはリリース方針の**人読投影**です。機読真源は `protocol/release_policy.json`（`protocol/schema/release.schema.json` で検証）、機検前置は check38 の `release_gate` 子スキャンです。読んだら実行してください。
-> 最后更新：2026-10-05 (last updated)
+> 最后更新：2026-10-11 (last updated)
 
 ## これが解決するもの
 
-リリース作業は以前 4 か所に散っていました——`nf release`（事前健診）、`scripts/release_freeze.sh`（golden master スナップショット）、`scripts/bump_verify.sh`（版ラベル差替）、手作業チェックリスト。**順序**と**前置**は文章と記憶の中だけにありました。ここで同種の一流プロジェクトから二つの仕組みを取り込みました：**設定即契約**（方針を `protocol/release_policy.json` + JSON Schema に、release-please の `$schema` 方式に倣う）と**変更エントリ収集**（`changes/unreleased/*.md`、changesets に倣う）。
+リリース作業は以前 4 か所に散っていました——`nf release`（事前健診）、旧 golden master スナップショット・スクリプト（2026-10-11 退役）、`scripts/bump_verify.sh`（版ラベル差替）、手作業チェックリスト。**順序**と**前置**は文章と記憶の中だけにありました。ここで同種の一流プロジェクトから二つの仕組みを取り込みました：**設定即契約**（方針を `protocol/release_policy.json` + JSON Schema に、release-please の `$schema` 方式に倣う）と**変更エントリ収集**（`changes/unreleased/*.md`、changesets に倣う）。
 
 ```bash
 python scripts/nf.py release --plan          # 順序付き計画（コマンド / 産物 / 判定）
@@ -37,13 +37,9 @@ python scripts/nf.py release --freeze --apply --by <承認者> --note "<波の�
 
 `bash verify.sh` が全量ゲートの単一入口です。`PASS` の期待値は宣言（`quality_baseline.EXPECTED_*`）であり、本文には書きません。
 
-## Golden Master
+## Golden Master（退役済み）
 
-```bash
-bash scripts/release_freeze.sh vX.Y.Z
-```
-
-産物 = `.release-frozen/<tag>/sha256.manifest`（`01_核心协议.md` / `02_联动注册表.md` / `06_Agent执行协议.md` / `07_官方核心出厂与社区预设导航.md` / `verify.sh` + `desktop/src/core/*.py`）+ `sig-fingerprint.txt`（`nf sig --verify` 知識指紋）。スナップショットは**歴史的事実**で現状に追従しません。構造不完全（件類欠落 / 摘要が空）は `release_gate` 子スキャンが赤にします。
+旧機制（tag 時点の産物スナップショット `.release-frozen/<tag>/sha256.manifest`）は **2026-10-11 に作者裁定で退役**しました。156 条のうち 77 条が既に失効（協議件は変更されたが清単は再計算されない）、消費するゲートは無く、かつて npm 配布物へ漏洩しました。旧凍結ディレクトリと生成スクリプトはリポジトリと payload 除外表から削除済みです（パス面にそのディレクトリ名は残しません）。将来「tag 時点の再現可能スナップショット」が必要なら、**鮮度ゲート付き**の新機制として作るべきです（清単に判据が無いのは本文件が戒める反例そのものです）。
 
 ## 変更エントリ
 

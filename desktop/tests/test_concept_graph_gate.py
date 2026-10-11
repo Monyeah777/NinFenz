@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """概念图健康门禁测试（check32 子扫描 `core.concept_graph` + 求值器同源校验）。
 
 覆盖：

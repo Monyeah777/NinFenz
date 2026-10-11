@@ -28,12 +28,15 @@ QD_INPUTS = ("03_管线库/**/*", "04_模块库/**/*", "05_资产库/**/*", "com
              "06_Agent执行协议.md", "07_官方核心出厂与社区预设导航.md",
              "verify.sh", "README.md", "README.en.md", "docs/agent/ROUTES.md", "llms.txt",
              "STRATEGY.md", "AGENTS.md",
-             # 代码只收 `desktop/src`：旧口径收 129 件 desktop/tests，而规则不读测试 ⇒ 白读（2850→2721）。
+             # 代码只收 `desktop/src`：旧口径收 129 件 desktop/tests，而规则不读测试 ⇒ 白读（2850→27
+             # 21）。
              "desktop/src/**/*.py", "desktop/scripts/*.py", "scripts/**/*.py", "scripts/*.sh",
              "scripts/nf", "scripts/nf.cmd", ".github/scripts/*.py",
              # 2026-09-29 补齐（**陈旧洞**）：下面三条是子扫描器读的面，而并集里一条都没有
-             # ⇒ 改它们时聚合缓存会**命中旧值**（实测：`domain_pack` 面未覆盖 101 件；`instruction_step_audit`
-             # 读的 `docs/agent/agent_组装指令包_v0.2.md` 也漏在外面）。并集面是**保守面**——宁可多列，不许漏列；
+             # ⇒ 改它们时聚合缓存会**命中旧值**（实测：`domain_pack` 面未覆盖 101 件；`instruction_s
+             # tep_audit`
+             # 读的 `docs/agent/agent_组装指令包_v0.2.md` 也漏在外面）。并集面是**保守面**——宁可多列
+             # ，不许漏列；
              # 覆盖性由 `test_quality_depth_scan.CompositeFaceCoverageTest` 与
              # `test_conformance_scan.LogicalReadFaceAuditTest` 逐条守着。
              ".rivet/private_archive/ai_packs/specs/*.json",

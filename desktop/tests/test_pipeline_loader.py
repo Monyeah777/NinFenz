@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 · pipeline_loader 单测（官方管线装载 + 缺件拒绝）。"""
 import os
 import sys

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """双源知识层（knowledge）正式与否定用例：声明 / 顺序 / 溯源 / 巡检。"""
 import json
 import sys

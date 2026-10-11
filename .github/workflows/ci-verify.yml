@@ -10,6 +10,9 @@ name: ci-verify
 on:
   push:
     branches: [main]
+  # D2（2026-10-10 审计 P1）：主门禁此前只跑 push:main —— 未合并 PR 不过 verify.sh。
+  # 加 pull_request（默认 opened/synchronize/reopened）。
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,20 +38,42 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
-      - name: 分层门禁（verify.sh 全量，L0-L2 默认锁）
-        run: bash verify.sh
+      - name: 分层门禁（verify.sh 全量，L0-L2 默认锁；日志落盘供失败诊断）
+        env:
+          # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ 失败日志可下载。
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          # Z5（2026-10-10 审计）：失败时要留**可下载的诊断产物**，不能只靠滚动日志。
+          # `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。
+          set -o pipefail
+          bash verify.sh 2>&1 | tee verify.log
+      - name: 上传门禁日志（失败时同样上传）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: verify-log
+          # 控制台日志 + verify.sh 的各 check 明细日志（NF_VERIFY_TMP 保留目录）。
+          path: |
+            verify.log
+            .nf-logs/
+          if-no-files-found: warn
       - name: 站点数字与真源同步（site/tools/sync-numbers.mjs：站点发布旧数字即红）
         run: node site/tools/sync-numbers.mjs
       - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
         run: node site/tools/site-check.mjs --offline
-      - name: 门禁机器可读报告（静态可核验面：落盘 + 新鲜度校验 + 留工件）
+      - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
+        # N1（审计 P2 实锤）：此前 if: always() 上传的是 git 跟踪的 protocol/verification_report.json
+        # ——红跑也会产出一份写着 fail=0 的 artifact。现在改成**本 run 现算**的 .artifacts/ 副本。
+        if: always()
         run: |
+          mkdir -p .artifacts
           python scripts/verify_report.py --write
+          python scripts/verify_report.py --json > .artifacts/verification-report.json || true
           python scripts/verify_report.py --check
-      - name: 上传门禁报告工件（机器可读结论留档）
+      - name: 上传门禁报告工件（本 run 的机器可读结论）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: verification-report
-          path: protocol/verification_report.json
+          path: .artifacts/verification-report.json
           if-no-files-found: warn

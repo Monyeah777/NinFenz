@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import copy
+import hashlib
 import itertools
 import json
 import os
@@ -28,15 +28,14 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
+from core import atomic_write, json_doc, official_core
 from core import conformance_scan as csc
-from core import atomic_write
 
 # 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 from core import import_graph as _ig
 
 CERT_REL = "protocol/combo_certificates.json"
-CORE13 = ["M00", "通用:M10", "M08", "M23", "M24", "M50", "M80",
-          "事件:M22", "M06", "M12", "M13", "M20", "M90"]
+CORE13 = list(official_core.CORE_MODULES)   # 单一实现（审计 Z1 F6）
 
 #: 进程级画像缓存（root 绝对路径 → {"prof", "contracts", "by_id", "pub_index", "core_pub"}）。
 #: 必要性（实测 2026-09-23）：广度证明要跑 C(N,2)+抽样数千次组合，若每次重解析
@@ -84,8 +83,10 @@ MODULE_CONTRACT_PATTERNS = ("community/*/modules/*.md",)
 CORE_CONTRACT_PATTERNS = ("04_模块库/*/*.md",)
 #: 契约解析结果的**内容键缓存**（进程内）。
 #: 依据（2026-09-29 实测）：守护**逐请求清空按根缓存**，而这两个函数此前只有按根缓存 ⇒ 每次新内容
-#: 状态都要把 235 份社区模块 + 13 份核心模块的 `machine_contract` 围栏重新解析一遍（`_module_contracts`
-#: 实测 ~34 ms）。「解析结果只是**这几份正文**的纯函数」——改 `04_模块库` 之外的件时社区契约必然不变，
+# : 状态都要把 235 份社区模块 + 13 份核心模块的 `machine_contract` 围栏重新解析一遍（`_module_contra
+# cts`
+# : 实测 ~34 ms）。「解析结果只是**这几份正文**的纯函数」——改 `04_模块库` 之外的件时社区契约必然不变
+# ，
 #: 反之亦然；键即内容 ⇒ 无陈旧面。判据：`test_pack_combo.ContractCacheTest`。
 _CONTRACTS_CACHE: Dict[str, Any] = {}
 _CONTRACTS_CACHE_MAX = 64
@@ -106,7 +107,7 @@ def _inputs_fingerprint(root: str = ".") -> str:
 
 def _read_json(path: Path) -> Any:
     try:
-        return json.loads(csc.read_text_cached(path))
+        return json_doc.loads(csc.read_text_cached(path), None, what=str(path))
     except (OSError, ValueError):  # 件不可读/不可解析 ⇒ None（调用方按「无该面」处理）
         return None
 
@@ -877,7 +878,8 @@ def materialize(root: str = ".", packs: Sequence[str] = (), combo_id: str = "",
     proto += ["  modules: []", "  assets:",
               "    count: 0",
               "    readme: README.md",
-              "  mount_layers:          # 堆叠写入 available（default 留空，规避同层 default 冲突）"]
+              "  mount_layers:          # 堆叠写入 available（default 留空，规避同层 default 冲突）"
+                  ""]
     for lay, ms in sorted(layers.items()):
         proto.append("    %s: {default: [], available: [%s]}" % (lay, ", ".join(ms)))
     files["community/%s/protocol.yaml" % name] = "\n".join(proto) + "\n"
@@ -920,9 +922,11 @@ def combo_readme(name: str, packs: Sequence[str], cert: Dict[str, Any],
     lines = [
         "# %s（组合包 · 由组合引擎产物化）" % name,
         "> 定位：**自由组合包**——由 `nf combine materialize` 从 %d 个域包组合而成；" % len(packs),
-        "> 组合包**不新增内容资产**，全部模块经 `references` **只读借阅**（源包模块不改号、资产不复制）。",
+        "> 组合包**不新增内容资产**，全部模块经 `references` **只读借阅**（源包模块不改号、资产不复"
+            "制）。",
         "> 唯一机读真相 = `protocol.yaml`；本 README 为人读速览（双源一致由 check14 ⑥ 断言）。",
-        "> 管线：**%s** %s装配流（派生自 P00 九层骨架）｜借阅模块 **%d** 个｜产出面 8 件（含 T4 证书）"
+        "> 管线：**%s** %s装配流（派生自 P00 九层骨架）｜借阅模块 **%d** 个｜产出面 8 件（含 T4 证"
+            "书）"
         % (pid, name, cert["module_count"]),
         "",
         "## 1. 组合构成",
@@ -975,14 +979,20 @@ def combo_pipeline(name: str, pid: str, layers: Dict[str, List[str]],
     lname = {"P00": "数据基座", "P10": "世界推进", "P20": "角色状态", "P30": "事件生产",
              "P40": "行为决策", "P50": "交互执行", "P60": "长期演变", "P70": "叙事素材",
              "P80": "输出呈现"}
-    core_allow = {"P00": ["M00"], "P10": ["通用:M10"], "P20": ["M23"], "P30": ["事件:M22", "M06", "M13"],
+    core_allow = {"P00": ["M00"],
+ "P10": ["通用:M10"],
+ "P20": ["M23"],
+ "P30": ["事件:M22",
+ "M06",
+ "M13"],
                   "P50": ["M12"], "P70": ["M20", "M24"], "P80": ["M80"]}
     lines = [
         "# 管线 %s · %s装配流（组合包派生）" % (pid, name),
         "",
         "> 由组合引擎产物化：九层位名沿用 P00 骨架；`allowed_modules` = 官方核心承载件 ∪ "
         "本组合**借阅**模块（写在各层 `available`）；组合包不新增模块。",
-        "> 组合合法性、层栈与闭包结果见 `outputs/COMBO_CERT.json`（T4：由 `nf combine verify` 重算）。",
+        "> 组合合法性、层栈与闭包结果见 `outputs/COMBO_CERT.json`（T4：由 `nf combine verify` 重算"
+            "）。",
         "```yaml",
         "Pipeline:",
         "  id: %s" % pid,
@@ -1002,7 +1012,8 @@ def combo_pipeline(name: str, pid: str, layers: Dict[str, List[str]],
             "    - id: %s" % lay,
             "      name: %s" % lname[lay],
             "      description: %s" % (("借阅模块堆叠：" + "、".join(borrow)) if borrow
-                                      else "由官方核心承载（%s）" % "/".join(core_allow.get(lay, []))),
+                                      else "由官方核心承载（%s）" % "/".join(core_allow.get(lay,
+ []))),
             "      optional: false",
             "      default_modules: []",
             "      allowed_modules: [%s]" % ", ".join(allow),
@@ -1011,7 +1022,8 @@ def combo_pipeline(name: str, pid: str, layers: Dict[str, List[str]],
               "## 说明",
               "",
               "- 本管线是**组合实例**：层位 default 全空，借阅模块入 available（不改源包挂载）。",
-              "- 生成命令：`nf combine materialize --packs \"%s\" --write`。" % "、".join(cert["packs"])]
+              "- 生成命令：`nf combine materialize --packs \"%s\" --write`。"
+                  "" % "、".join(cert["packs"])]
     return "\n".join(lines) + "\n"
 
 
@@ -1097,13 +1109,15 @@ def combo_outputs(root: str, name: str, cert: Dict[str, Any],
                                   "result": "五不变量全成立"}],
                        "reproduce_command": "python scripts/nf.py combine verify",
                        "not_measured": ["组合内容质量", "高阶组合的全枚举"]},
-        "human_oversight": ["组合声明变更须重跑 materialize 与门禁", "借阅边界由 references 白名单控制"],
+        "human_oversight": ["组合声明变更须重跑 materialize 与门禁",
+ "借阅边界由 references 白名单控制"],
         "risk_management": {"framework": "NIST AI RMF 1.0",
                             "functions": {"GOVERN": ["借阅白名单可审计"],
                                           "MAP": ["组合构成表（源包 → 模块）"],
                                           "MEASURE": ["证书 T4 复算 + 广度证明"],
                                           "MANAGE": ["组合非法即拒（fail-closed）"]},
-                            "residual_risks": ["抽样广度非全枚举", "源包演进会使组合证书过期（须重签）"]},
+                            "residual_risks": ["抽样广度非全枚举",
+ "源包演进会使组合证书过期（须重签）"]},
         "out_of_scope": ["新增内容资产", "替代源包职责"],
         "not_claims": ["不宣称组合内容质量", "不宣称已穷举所有高阶组合",
                        "不宣称组合包等价于任何源包"],
@@ -1231,7 +1245,7 @@ def _certificate_lines(root: str, cert: Dict[str, Any], witness: str) -> List[st
     「**该证书正文** + 本轮契约面」的纯函数：改与组合无关的件（04 模块库正文、文档、协议件）时
     它们必然不变。键 = (证书正文 sha256, 本轮全局见证)；两者任一变即重算，无陈旧面。
     """
-    from core import json_schema as _js       # 只取叶子校验器：不再 import output_forms（断双向对）
+    from core import json_schema as _js  # 只取叶子校验器：不再 import output_forms（断双向对）
     key = (hashlib.sha256(_canon(cert)).hexdigest(), witness)
     hit = _CERT_CACHE.get(key)
     if hit is None:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 A1 · 载荷证据扫描器单测（确定性 + 保守候选）。"""
 import os
 import sys

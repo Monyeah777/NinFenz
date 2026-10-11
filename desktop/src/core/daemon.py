@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 执行层常驻守护 —— 把「每条命令一次解释器启动」换成「一次启动、长期热跑」。
 
 **为什么要它（本机实测，2026-09-28）**：裸解释器启动 **146 ms**、`nf --version` **401 ms**
@@ -36,9 +35,10 @@ import os
 import secrets
 import socket
 import sys
+import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 PROTO = 1
 #: 监听地址：**只允许回环**（与 scripts/serve_decision_model.py 同一条纪律；本模块不提供
@@ -70,7 +70,8 @@ def _check_argv_size(argv) -> None:
                          % MAX_ARGV_TOTAL)
 #: 守护内**拒跑**的命令：长驻（`serve` / `shell` / `terminal` / `lsp`）与自指（`daemon`）。
 #:
-#: 为什么是这五个（2026-10-01 修）：此前只有 `serve` / `shell` / `daemon`，于是**别名与常驻面漏网**——
+# : 为什么是这五个（2026-10-01 修）：此前只有 `serve` / `shell` / `daemon`，于是**别名与常驻面漏网**
+# ——
 #: `nf terminal`（`shell` 的 argparse 别名）与 `nf lsp`（常驻 stdio 服务）会进守护在进程内执行，
 #: 而守护把 stdin 设成空串 ⇒ `lsp` 立刻读到 EOF 后**以 0 退出且零输出**，调用方（编辑器 / agent）
 #: 把「静默无事发生」当成成功，直跑却会真的起服务：**同一条命令两条路径两种结果**。
@@ -85,57 +86,8 @@ STATE_NAME = "daemon.json"
 #: 关键点：**全部用 bash 内建**（/dev/tcp + printf + read -N），因此 `nf …` 是当前 shell 里的
 #: 一次函数调用 + 一次套接字往返——没有子进程、没有解释器启动，这才是真正的毫秒级客户端。
 #: 长驻/自指命令（见 `REFUSED_COMMANDS`）与「无参」一律直落 python 入口（与守护拒绝面一致）。
-SHELL_INIT_BASH = """# NF 执行层快路（生成自 `nf daemon shell-init bash`）
-# 用法：  eval "$(nf daemon shell-init bash)"        # 或写进 ~/.bashrc
-# 卸载：  unset -f nf
-# 注意（2026-09 实测缺陷）：解释器与脚本路径**必须加引号**——本机解释器路径是
-# `C:\\Program Files\\Python311\\python.exe`，不加引号时回退那行会被 bash 拆成命令 `C:\\Program`，
-# 于是守护不在（含默认 1 小时空闲自退之后）时 `nf <任何命令>` → **rc=127 + `C:Program: command not found`**。
-# 语法检查抓不到这种错（它语法合法），所以判据必须是**行为级**的（见 test_launcher/test_daemon）。
-nf() {
-  case "${1:-}" in
-    daemon|shell|terminal|serve|lsp|"") command "{py}" "{root}/scripts/nf.py" "$@"; return $? ;;
-  esac
-  # 明文框是**逐行** argv：参数里含换行会被拆开、**静默改变参数个数**（实测：`help` 收到
-  # `line1\\nline2` 时只看到 `line1`）——这类命令一律不接快路，交 python 直跑
-  # （JSON 框才支持任意字符；见 `_parse_request` 的说明）。
-  local _nf_a="" _nf_nl=""
-  for _nf_a in "$@"; do
-    case "$_nf_a" in *$'\\n'*) _nf_nl=1 ;; esac
-  done
-  if [ -n "$_nf_nl" ]; then command "{py}" "{root}/scripts/nf.py" "$@"; return $?; fi
-  local _state="${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/daemon.json"
-  local _s="" _rest="" _port="" _token=""
-  if [ -f "$_state" ]; then
-    IFS= read -r _s < "$_state" || _s=""
-    case "$_s" in *'"port": '* ) ;; *) _s="" ;; esac
-  fi
-  if [ -n "$_s" ]; then
-    _rest=${_s#*'"port": '}; _port=${_rest%%[!0-9]*}
-    _rest=${_s#*'"token": "'}; _token=${_rest%%\\"*}
-  fi
-  if [ -n "$_port" ] && [ -n "$_token" ] && { exec 9<>"/dev/tcp/127.0.0.1/$_port"; } 2>/dev/null; then
-    printf 'NFREQ 1 %s\\n%s\\n%s\\n' "$_token" "$PWD" "$#" >&9
-    local _a=""
-    for _a in "$@"; do printf '%s\\n' "$_a" >&9; done
-    local _code="" _olen="" _elen=""
-    if IFS= read -r _code <&9 && IFS= read -r _olen <&9 && IFS= read -r _elen <&9; then
-      case "$_code$_olen$_elen" in
-        *[!0-9]*) : ;;
-        *)
-          local _o="" _e=""
-          if [ "$_olen" -gt 0 ]; then LC_ALL=C IFS= read -r -d '' -n "$_olen" _o <&9 || true; printf '%s' "$_o"; fi
-          if [ "$_elen" -gt 0 ]; then LC_ALL=C IFS= read -r -d '' -n "$_elen" _e <&9 || true; printf '%s' "$_e" >&2; fi
-          exec 9<&- || true
-          return "$_code"
-          ;;
-      esac
-    fi
-    exec 9<&- 2>/dev/null || true
-  fi
-  command "{py}" "{root}/scripts/nf.py" "$@"
-}
-"""
+# 兼容转发面：CLI 与测试读 dm.SHELL_INIT_BASH（模板真源已迁 core.daemon_shell，见其 docstring）。
+from core.daemon_shell import SHELL_INIT_BASH  # noqa: E402,F401
 
 
 def state_path() -> Path:
@@ -164,14 +116,17 @@ def write_state(doc: Dict[str, Any]) -> None:
     （module docstring：回环不是信任边界）。POSIX 上把它收紧到 `0600`（只给属主读写）——
     否则在多用户主机上，同机另一个用户读到令牌即可连回环口、以属主身份执行命令。
     Windows 上 ACL 随用户目录继承（`chmod` 无对应语义），故只在 posix 分支收紧。
+
+    **并发安全**（2026-10-10 审计 N1，P1）：此前用**固定名** `daemon.json.tmp` 手工两段写，
+    无锁无重试——4 进程 × 300 次实测：成功 326/1200、PermissionError 868、读者 270/2088
+    （12.9%）解析失败（同载荷走 `atomic_write.write_text` 则 1200/1200、0 撕裂）。现统一走
+    `atomic_write.write_text`：`mkstemp` 唯一临时名 + fsync + `os.replace` + 瞬时错短重试，
+    与全仓其它落盘面**同一出处**。`mkstemp` 在 POSIX 上即 0600，replace 后保持不变；
+    下面再显式收紧一次兜底。
     """
     p = state_path()
-    p.parent.mkdir(parents=True, exist_ok=True)
-    tmp = p.with_suffix(".json.tmp")
-    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(json.dumps(doc, ensure_ascii=False, sort_keys=True) + "\n")
-    _harden_perms(tmp)
-    os.replace(tmp, p)          # 原子替换：读者永远看不到半截 JSON
+    from core import atomic_write
+    atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, sort_keys=True) + "\n")
     _harden_perms(p)
 
 
@@ -295,7 +250,8 @@ def _cli_module(root: Path):
     import importlib.util
     spec = importlib.util.spec_from_file_location("nfcli_daemon", Path(root) / "scripts" / "nf.py")
     if spec is None:
-        raise RuntimeError("scripts/nf.py 路径无法构造加载规格（修复指引：确认 --root 指向 NF 仓库根，且 scripts/nf.py 在场）")
+        raise RuntimeError("scripts/nf.py 路径无法构造加载规格（修复指引：确认 --root 指向 NF 仓库"
+            "根，且 scripts/nf.py 在场）")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)          # type: ignore[union-attr]
     return mod
@@ -313,43 +269,26 @@ from core import response_cache as _rc  # noqa: E402 - 与下面的常量一组�
 _CACHE_STATS = _rc.STATS
 #: 当前监听件（`serve_forever(watch=True)` 装；单测可注入假件）。
 _WATCHER: Optional[Any] = None
+#: `_WATCHER` 的**唯一写入口**（2026-10-10 审计 N8，P2）：此前 `session_watch._install` 直接写
+#: `daemon._WATCHER`——跨模块可变全局没有所有权，谁都能改、没人能断言。现在写只走 `set_watcher`
+#: （进程内 mutex 保证换手原子）；读仍无锁（CPython 引用读写原子，换手期间读到旧/新都是完整
+#: 对象，健康判据由 `_watch_generation` 的 `healthy` 兜住）。
+_WATCH_LOCK = threading.Lock()
+
+
+def set_watcher(watcher: Optional[Any]) -> None:
+    """登记/注销本进程的树代际来源（**唯一写入口**）。"""
+    global _WATCHER
+    with _WATCH_LOCK:
+        _WATCHER = watcher
 #: 关闭「常驻语料层」的开关（诊断/对照用）：设了就整批作废且不再收录，退回每次重读。
 RESIDENT_ENV_OFF = "NF_NO_RESIDENT"
 #: 观测计数由 `response_cache.STATS` 提供（上面 `_CACHE_STATS` 即同一个字典对象）。
 
-#: 响应缓存的**准入表**：仅纯读、且对同一棵树**逐字节可复现**的命令。
-#: 表项是 **argv 前缀**（不是顶层命令名）：`module` / `decisions` / `patterns` 这些顶层命令
-#: 里既有读子命令也有**写子命令**（`module deprecate`、`decisions reindex`、`patterns reindex`），
-#: 只按顶层名放行会把写形态一起放进来——所以写子命令一律不入表。
-#: 两条准入判据都在 test_watch 里真跑：（a）同树连跑两次，exit/stdout/stderr 逐字节相同；
-#: （b）逐条 `git status` 前后不变（验证过：12 条候选全部既纯净又可复现）。
-CACHEABLE_COMMANDS = (
-    ("--version",),
-    ("score",), ("conformance",), ("layers",), ("stats",), ("doctor",),
-    ("interop",), ("toolface",), ("assertions",), ("cognition",),
-    ("patterns", "ls"), ("patterns", "show"), ("patterns", "for"), ("patterns", "verify"),
-    ("module", "ls"), ("module", "status"), ("module", "verify"),
-    ("decisions", "verify"), ("decisions", "show"),
-)
-#: 写盘类开关：出现任一前缀即**不缓存**（哪怕命令在准入表里）。宁可不缓存，不可把旧输出当新输出。
-_WRITE_FLAG_PREFIXES = ("--write", "--out", "--dest", "--build", "--save", "--fix",
-                        "--apply", "--yes", "--baseline", "--freeze", "--record",
-                        "--sign", "--delete", "--rm", "--all")
-#: 为什么有 `--all`（2026-10-01 判据抓到的洞）：`interop --all` 是**写面**（落盘 results/interop/*），
-#: 而 `interop` 在 `CACHEABLE_COMMANDS` 里、`--all` 又不在上面的旗标前缀里 ⇒ 第二次调用会被
-#: **响应缓存回放**（命令根本没跑，调用方却拿到成功输出）。这正是本表存在的理由：「宁可不缓存，
-#: 不可把旧输出当新输出」。`interop --check --all` 因此也一并放弃缓存（保守方向，代价可忽略）。
-#: 对账判据：`test_daemon.ResponseCacheWriteSafetyTest`（闸门表 × 可缓存命令 × 本表三方对齐）。
-
-
-def cacheable(argv: Sequence[str]) -> bool:
-    """这条命令是否允许走响应缓存（**前缀命中准入表** + 无写盘开关）。"""
-    argv = [str(a) for a in argv]
-    if not argv:
-        return False
-    if not any(tuple(argv[:len(pre)]) == pre for pre in CACHEABLE_COMMANDS):
-        return False
-    return not any(a.startswith(_WRITE_FLAG_PREFIXES) for a in argv)
+# 兼容转发面：测试读 dm.CACHEABLE_COMMANDS / dm._WRITE_FLAG_PREFIXES；cacheable 本模块自用。
+# 真源已迁 core.response_cache（准入表 + 闸门旗标前缀），此处只做对外再导出。
+from core.response_cache import (CACHEABLE_COMMANDS, _WRITE_FLAG_PREFIXES,  # noqa: F401
+                                 cacheable)
 
 
 def _watch_generation() -> Optional[int]:
@@ -398,8 +337,11 @@ def cache_stats() -> Dict[str, Any]:
     """响应缓存观测面（供 `nf daemon status` 与单测）。"""
     gen = _watch_generation()
     from core import conformance_scan as _csc
+    from core import disk_cache as _dc
     return {"enabled": gen is not None, "generation": gen,
             "entries": _rc.entries(), **dict(_CACHE_STATS),
+            # 持久缓存的写失败观测（审计 N7）：缓存写不进是降级，须可判别而不是静默吞掉。
+            "disk_cache": _dc.store_failures(),
             # 常驻语料层的规模也一并报出来：它是「不重读」的账本，出问题时第一个要看的就是它。
             "resident": _csc.resident_stats()}
 
@@ -506,7 +448,12 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
         sys.stdin = io.StringIO("")       # 一次性命令不读交互输入（长驻命令已被拒）
         with contextlib.redirect_stdout(out_txt), contextlib.redirect_stderr(err_txt):
             try:
-                code = int(nf.main(list(argv)))
+                # **必须走 guarded_main**（2026-10-10 审计 X0，P0）：`main()` 的异常兜底只在
+                # `cli()` 里，守护直接调 `main()` 会让任何未捕获异常穿出去、**杀死常驻进程**。
+                # 实测触发门槛极低：`protocol/` 下任一 JSON 被截断（18/18）⇒ json.JSONDecodeError
+                # ⇒ 守护退出、客户端 rc=1 + 零输出。guarded_main 是 CLI 与本守护**共用的同一条
+                # 错误面**（scripts/nf.py 单一实现），故两条路径的错误帧逐字一致。
+                code = int(nf.guarded_main(list(argv)))
             except SystemExit as exc:                      # argparse --help 等
                 code = int(exc.code or 0)
     finally:
@@ -528,8 +475,28 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
     return code, out, err
 
 
+def _internal_error_frame(exc: BaseException) -> bytes:
+    """一条**请求级**内部异常 → 结构化错误帧载荷（退出码由调用方置 1）。
+
+    为什么留这一层（2026-10-10 审计 X0，P0）：CLI 面已有兜底（`nf.guarded_main`），但守护在
+    「进 CLI 之前 / 出 CLI 之后」还有一段自己的活（常驻语料层同步、响应缓存查找、源码重载、
+    结果落盘）。那段里的任何异常此前都会顺着 `_handle_conn` → `serve_forever` 冒出去，
+    **整条守护进程退出**——而客户端只会看到 rc=1 与零输出（与「命令本身失败」不可区分）。
+
+    口径与 `nf` 的内层错误面同源：一句「内部错误 + 修复指引」，不吐 traceback；`NF_DEBUG=1`
+    时调用方改为上抛（排障），本函数不自行决定是否吞掉。
+    """
+    return ("  ✗ 守护内部错误：%s（修复指引：重跑同一条命令；若仍复现，请带着这条消息提 issue"
+            "——该异常已被单条请求隔离，守护未退出）\n" % exc).encode("utf-8")
+
+
 def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
-    """处理一条连接 → 是否请求关闭守护。"""
+    """处理一条连接 → 是否请求关闭守护。
+
+    **单条请求的异常不得外溢**（2026-10-10 审计 X0，P0）：`execute()` 之外的常驻层/缓存/
+    重载异常在这里归一成结构化错误帧；连接仍在场时把帧发回去，让客户端拿到「这次失败了」
+    而不是「守护没了」。
+    """
     try:
         req = _parse_request(_LineReader(conn))
     except (ValueError, OSError, UnicodeDecodeError) as exc:
@@ -557,9 +524,12 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     _dc.defer_begin()                # 请求期间：派生结果的写盘只入队
     try:
         code, out, err = execute(argv, root, cwd=req.get("cwd"))
-    except BaseException:
+    except SystemExit as exc:        # 请求级：裸 SystemExit 也归一（不得因它杀死守护）
+        _dc.defer_drop()
+        code, out, err = int(exc.code or 0), b"", b""
+    except Exception as exc:         # noqa: BLE001 - 单条请求失败不得杀死守护（见 _internal_error_frame）
         _dc.defer_drop()             # 异常路径：丢队列（缓存不是事实，丢了只是下次重算）
-        raise
+        code, out, err = 1, b"", _internal_error_frame(exc)
     send_framed(conn, code, out, err)
     # **回包之后再落盘**：写盘是纯写、只供别的进程（冷进程 / 守护重启）用，不该占客户端关键路径
     # （实测：一次新内容状态的落盘在守护口径下值 20–80 ms）。落盘失败也只是丢缓存。
@@ -568,6 +538,26 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except Exception:                                    # noqa: BLE001 - 落盘尽力而为
         pass
     return False
+
+
+def _serve_conn(conn: socket.socket, token: str, root: Path) -> bool:
+    """处理一条连接并做**连接级隔离**（2026-10-10 审计 X0 同族）。
+
+    为何单独成函数：主循环的圈复杂度/长度有棘轮上限，而这段是纯错误面——客户端中途断开
+    （`send_framed` 抛 BrokenPipeError/ConnectionResetError）此前会让整个 `serve_forever` 退出，
+    一条被中断的请求就带走常驻进程。现在记一行、继续 accept。
+    """
+    conn.settimeout(SOCKET_TIMEOUT)
+    try:
+        return _handle_conn(conn, token, root)
+    except OSError as exc:
+        print("  [warn] 连接中断（守护继续）：%s" % exc, file=sys.stderr)
+        return False
+    except Exception as exc:                       # noqa: BLE001 - 最后一道隔离网
+        if os.environ.get("NF_DEBUG"):
+            raise                                  # 排障：显式要求时透出堆栈
+        print("  [warn] 单条连接失败（守护继续）：%s" % exc, file=sys.stderr)
+        return False
 
 
 def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = None,
@@ -590,9 +580,9 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
         from core import watch as _watch
         watcher = _watch.DirWatcher(root)
         if watcher.start():
-            _WATCHER = watcher
+            set_watcher(watcher)
         else:
-            _WATCHER = None
+            set_watcher(None)
             watcher = None
             print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
                   "行为与常规守护一致", file=sys.stderr)
@@ -620,8 +610,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
                 break
             last = time.time()
             with conn:
-                conn.settimeout(SOCKET_TIMEOUT)
-                shutdown = _handle_conn(conn, token, root)
+                shutdown = _serve_conn(conn, token, root)
             if shutdown:
                 break
     finally:
@@ -630,7 +619,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
         # 「守护未响应」而不是「没有守护」）。
         if watcher is not None:
             watcher.stop()
-        _WATCHER = None
+        set_watcher(None)
         from core import conformance_scan as _csc
         _csc.clear_resident()      # 常驻语料层随守护一起消失（进程内起服务的测试不留残影）
         reset_response_cache()

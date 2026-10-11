@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 终端（`nf shell`）回归测试——端壳退役后的人机入口。
 
 覆盖三层：
@@ -236,7 +235,8 @@ class FormCoverageTest(unittest.TestCase):
         declared = {int(m) for m in re.findall(r"当前 \*\*(\d+) 张表\*\*", doc)}
         self.assertTrue(declared, "文档里没找到「当前 **N 张表**」的声明（改了措辞请同步判据）")
         self.assertEqual({len(term.form_table())}, declared,
-                         "文档表数量与真源分叉：文档=%s / 真源=%d" % (declared, len(term.form_table())))
+                         "文档表数量与真源分叉：文档=%s / 真源=%d" % (declared,
+ len(term.form_table())))
 
 
 class GateDocSyncTest(unittest.TestCase):
@@ -584,7 +584,11 @@ class CommandFaceTest(unittest.TestCase):
         for fam in term.family_table():
             self.assertTrue(fam["name"] and fam["summary"] and fam["commands"], fam["id"])
             for cmd in fam["commands"]:
-                self.assertNotIn(cmd, seen, "%s 同时归入 %s 与 %s" % (cmd, seen.get(cmd), fam["id"]))
+                self.assertNotIn(cmd,
+ seen,
+ "%s 同时归入 %s 与 %s" % (cmd,
+ seen.get(cmd),
+ fam["id"]))
                 self.assertIn(cmd, cmds, "族 %s 含不存在的命令 %s" % (fam["id"], cmd))
                 seen[cmd] = fam["id"]
         self.assertEqual(sorted(cmds - set(seen)), [], "未被策展的命令")

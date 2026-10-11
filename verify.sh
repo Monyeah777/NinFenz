@@ -34,13 +34,21 @@ cd "$ROOT" || { echo '无法进入仓库根目录'; exit 2; }
 # 背景：本仓库常有并发 agent 会话同时跑门禁；固定 /tmp 路径会让 B 会话的失败日志
 #       覆盖 A 会话的诊断输出，导致「看到的失败不是自己的」。原生 Windows（无 Git Bash）下
 #       硬编码 /tmp 亦不成立。故改为每次运行 mktemp -d 并在退出时清理。
-NFL_TMP="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/nf_verify_$$")"
+# Z5（2026-10-10 审计 0.2）：CI 需要能**下载**失败日志。默认仍是每次运行独立目录；
+# 但设置了 NF_VERIFY_TMP 时用该固定目录且**退出不清理**——workflow 由此把日志收成 artifact。
+if [ -n "${NF_VERIFY_TMP:-}" ]; then
+  NFL_TMP="$NF_VERIFY_TMP"; mkdir -p "$NFL_TMP" 2>/dev/null || true
+else
+  NFL_TMP="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/nf_verify_$$")"
+fi
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
   NFL_TMP="${TMPDIR:-/tmp}/nf_verify_$$"; mkdir -p "$NFL_TMP" 2>/dev/null || true
 fi
 cleanup_nfl(){
   # 全绿才清理；有 FAIL 时保留目录——诊断日志是修复依据，删掉等于把修复线索一起删了。
-  if [ "${FAIL:-0}" -gt 0 ]; then
+  if [ -n "${NF_VERIFY_TMP:-}" ]; then
+    printf '  [i] 诊断日志保留在：%s（NF_VERIFY_TMP 指定，不清理）\n' "$NFL_TMP" >&2
+  elif [ "${FAIL:-0}" -gt 0 ]; then
     printf '  [i] 本次有 FAIL —— 诊断日志保留在：%s\n' "$NFL_TMP" >&2
   else
     [ -n "$NFL_TMP" ] && [ "$NFL_TMP" != "/" ] && rm -rf "$NFL_TMP" 2>/dev/null

@@ -22,7 +22,14 @@ _ROOT = Path(__file__).resolve().parents[3]
 def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     r = Path(root)
     issues: List[str] = []
-    trace = json.loads(Path(trace_path).read_text(encoding="utf-8"))
+    # utf-8-sig：容忍外来件开头 BOM（审计 N4）——否则带 BOM 的 trace 被误报成「不是 JSON」。
+    trace = json.loads(Path(trace_path).read_text(encoding="utf-8-sig"))
+    # 审计 N3（P2）：顶层非对象时此前会在 trace.get 抛 AttributeError，一路冒成「内部错误：
+    # 'list' object has no attribute 'get'」——设计好的诊断分支因此不可达。这里先判形状。
+    if not isinstance(trace, dict):
+        return (["trace 顶层不是 JSON 对象（实为 %s）"
+                 "（修复指引：喂 nf assemble --check --trace 落盘的 trace 件，"
+                 "形如 {tool, phase, source, requirement, ok}）" % type(trace).__name__], {})
     source = trace.get("source")
     requirement = trace.get("requirement") or ""
     if not source:

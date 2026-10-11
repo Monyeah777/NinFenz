@@ -124,7 +124,12 @@ HELPER = {
     'turnover_single': [_rr(qm.turnover(W1)), _rr(qm.turnover([])), _rr(qm.turnover([[1.0]]))],
     'turnover_double': [_rr(qm.turnover(W1, single_side=False))],
 }"""
-assert old in gt, 'HELPER 锚点未命中'
-gt = gt.replace(old, new, 1)
-g.write_text(gt, encoding='utf-8', newline='')
-print('③ 已把 HELPER 期望值过 _r()（与判据侧的 r6() 同口径）')
+# 幂等（2026-10-10 审计 Y1 同类）：本步是「补丁 gen_quant_metrics_cases.py」——跑过一次之后
+# 旧骨架就不在了，再跑会断言失败（可重复的刷新命令不能第二次就红）。已是新骨架即跳过。
+if new in gt:
+    print('③ 已过 _r()（幂等，无需再改）')
+else:
+    assert old in gt, 'HELPER 锚点未命中'
+    gt = gt.replace(old, new, 1)
+    g.write_text(gt, encoding='utf-8', newline='')
+    print('③ 已把 HELPER 期望值过 _r()（与判据侧的 r6() 同口径）')

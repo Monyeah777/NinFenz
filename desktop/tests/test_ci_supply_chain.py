@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """CI 供应链固定回归测试 —— 2026-09-24 渗透发现 F-05 的「check 的 check」。
 
 背景（渗透实证）：`verify.sh` 与 core/scripts 的任何 check **都不读 `.github/`**，

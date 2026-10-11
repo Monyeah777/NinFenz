@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 W3 · 资产键语义密度体检单测。"""
 import os
 import shutil

@@ -12,13 +12,6 @@
     "protocol/approvals",
     "results/audit"
   ],
-  "golden_required": [
-    "01_核心协议.md",
-    "02_联动注册表.md",
-    "06_Agent执行协议.md",
-    "07_官方核心出厂与社区预设导航.md",
-    "verify.sh"
-  ],
   "version_faces": [
     "CHANGELOG.md",
     "docs/meta/VERSION-MATRIX.md",

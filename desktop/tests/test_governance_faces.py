@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """治理面六件（声明 / RFC / driver / 实践包 / 跑分台 / 端点契约）的正式与否定用例。"""
 import json
 import shutil

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """极端渗透（八向）暴露问题的回归测试 —— 2026-09-28 波。
 
 覆盖：
@@ -45,7 +44,8 @@ class LibraryEncodingTest(unittest.TestCase):
             lib = Path(tmp) / "library"
             lib.mkdir()
             (lib / "NF-1.md").write_text(
-                "---\nid: NF-1\ntype: t\ntitle: t\nrating: general\n---\n\n正文\n", encoding="utf-8")
+                "---\nid: NF-1\ntype: t\ntitle: t\nrating: general\n---\n\n正文\n",
+ encoding="utf-8")
             (lib / "NF-BIN.md").write_bytes(b"\xff\xfe\x00binary\x80\n")
 
             rows = nflib.entries(tmp)                       # 不得抛 UnicodeDecodeError
@@ -225,7 +225,8 @@ class EmptyRootScannerTest(unittest.TestCase):
                          "在 NOT_A_ROOT_SCANNER 里写明理由）")
         self.assertEqual([], bad,
                          "扫描器在空根下抛裸异常（修复指引：缺根/缺件时**如实报 issue 列表**再 "
-                         "return，不得让 FileNotFoundError 冒到调用方——与 payload_registry 同口径）：%s"
+                         "return，不得让 FileNotFoundError 冒到调用方——与 payload_registry 同口径）"
+                             "：%s"
                          % bad)
 
     def test_predicate_has_catch_power(self):

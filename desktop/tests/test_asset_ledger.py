@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """40 总纲 v2.7 S2 —— nf asset 供应链台账单测（纯 unittest，L2 core 零依赖）。"""
 import os
 import shutil

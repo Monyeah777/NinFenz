@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 57,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "a21f47fb41fd3f0da9845d476957ffd6951a9472a84d96593290b7d3e0b906ef",
+    "root": "cd71744b5017b42b2109c42a17f78cf557248bc832dd583689bfbf1590f66ec7",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -35,7 +35,7 @@
     },
     {
       "digest": {
-        "sha256": "d3575309480b55ace9587cb3d7cd911b6003e716feb4d1d2527461d8d0a0cf45"
+        "sha256": "c35802055742bbdd778fa00fc003d04115be758dc4d6265f7566db83c7d5da72"
       },
       "name": "07_官方核心出厂与社区预设导航.md"
     },
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "76a75024634a61c67895194278937a1aa838e4a1a761c794fbb9b38ab1da081b"
+        "sha256": "bced54acc8bf3ecd89beedd0b9369bcf841c5262d13e4c126b1c31764ef7f2a9"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -185,7 +185,7 @@
     },
     {
       "digest": {
-        "sha256": "0c8ecfad8f1f23101442dc8a1c301cecb0f0cb9e33d293dd0ceb4caadc94f96d"
+        "sha256": "1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66"
       },
       "name": "protocol/release_policy.json"
     },
@@ -263,7 +263,7 @@
     },
     {
       "digest": {
-        "sha256": "8429b9ccd1a9ce690f581de96d924034453027eb6c752ac204a25829cdd5e88f"
+        "sha256": "9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06"
       },
       "name": "protocol/decision_layer.json"
     },
@@ -317,7 +317,7 @@
     },
     {
       "digest": {
-        "sha256": "6d1dafa8b5dabb207d50d83f6f3a55f4b9a7908508d691dca182173a30f05b83"
+        "sha256": "4a0826e339becae4a2f278f9ca781542874802caf6d239453aeed2aa367165e1"
       },
       "name": "protocol/schema/release.schema.json"
     },

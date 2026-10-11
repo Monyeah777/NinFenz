@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NFA-L guard 诊断接入编辑器面（nf lsp）单测。
 
 判据：管线声明的 condition（=nf-expr）未登记符号/非 bool 时，LSP 诊断必须落到真实行/列、

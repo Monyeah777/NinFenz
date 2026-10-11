@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 · 载荷注册表单测（自校验 + 防死注册）。"""
 import json
 import os

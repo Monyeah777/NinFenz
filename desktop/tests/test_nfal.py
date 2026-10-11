@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NFA-L（声明式 + 命令式混合）前端/后端单测。
 
 判据：guard 表达式从 Pipeline 声明的 condition 字段进入——词法/语法/类型检查/三值判决/
@@ -136,7 +135,9 @@ class TestEval(unittest.TestCase):
         self.assertEqual(nfal.eval_guard(parse('contains("abc", "b")'), {})["verdict"], "pass")
         self.assertEqual(nfal.eval_guard(parse('has({a: 1}, "a")'), {})["verdict"], "pass")
         self.assertEqual(nfal.eval_guard(parse('startsWith("abc", "ab")'), {})["verdict"], "pass")
-        self.assertEqual(nfal.eval_guard(parse('"snow" in ["snow", "rain"]'), {})["verdict"], "pass")
+        self.assertEqual(nfal.eval_guard(parse('"snow" in ["snow", "rain"]'),
+ {})["verdict"],
+ "pass")
 
     def test_state_value_drives_verdict(self):
         expr = parse('WorldState.time.day >= 30 && WorldState.time.season == "winter"')

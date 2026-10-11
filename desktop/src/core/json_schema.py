@@ -121,12 +121,25 @@ def _check_type(instance: Any, schema: dict, path: str, errors: List[str]) -> No
                       % (path, "/".join(map(str, cand)), type(instance).__name__))
 
 
+def json_equal(a: Any, b: Any) -> bool:
+    """JSON 值相等（**严格**）：布尔与数字不互相冒充。
+
+    为什么单独有它（2026-10-10 全仓审计 Y4，P1）：enum/const 的语义是值相等，而 Python 的
+    == 把 False == 0 / True == 1 当同一件，于是 {type:boolean, enum:[true]} 对 False 的判断
+    会取决于「用哪套实现」。本函数是**两侧校验器共用的唯一相等口径**：布尔只与布尔相等；
+    数字之间仍按数学相等（1 == 1.0，JSON 语义如此）。
+    """
+    if isinstance(a, bool) or isinstance(b, bool):
+        return isinstance(a, bool) and isinstance(b, bool) and a == b
+    return a == b
+
+
 def _check_const_enum(instance: Any, schema: dict, path: str,
                       errors: List[str]) -> None:
-    """const / enum 两关键字。"""
-    if "const" in schema and instance != schema["const"]:
+    """const / enum 两关键字（相等口径 = json_equal，类型严格）。"""
+    if "const" in schema and not json_equal(instance, schema["const"]):
         errors.append("%s: 应为常量 %r" % (path, schema["const"]))
-    if "enum" in schema and instance not in schema["enum"]:
+    if "enum" in schema and not any(json_equal(instance, v) for v in schema["enum"]):
         errors.append("%s: 取值 %r 不在枚举内" % (path, instance))
 
 

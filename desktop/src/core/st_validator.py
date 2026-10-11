@@ -62,7 +62,9 @@ def check_worldbook(doc: Dict[str, Any]) -> List[Dict[str, str]]:
     elif isinstance(raw, list):
         rows = [v for v in raw if isinstance(v, dict)]
     else:
-        return [_issue("W1", "M", "entries 缺失或不是 dict/list（ST convertCharacterBook 要求数组）")]
+        return [_issue("W1",
+ "M",
+ "entries 缺失或不是 dict/list（ST convertCharacterBook 要求数组）")]
     seen: Dict[str, int] = {}
     for i, e in enumerate(rows):
         keys = e.get("keys") if e.get("keys") is not None else e.get("key")
@@ -123,7 +125,8 @@ def validate(path: str) -> Dict[str, Any]:
     elif doc.get("spec") is not None or doc.get("name") is not None:
         kind, issues = "card", check_card(doc)
     else:
-        kind, issues = "unknown", [_issue("C1", "M", "无法识别资产类型（无 spec/name/entries/variables 特征）")]
+        kind, issues = "unknown", [_issue("C1", "M", "无法识别资产类型（无 spec/name/entries/variab"
+            "les 特征）")]
     return {"path": path, "kind": kind, "issues": issues,
             "counts": {s: sum(1 for i in issues if i["severity"] == s)
                        for s in ("fail", "warn", "info")}}
@@ -144,6 +147,7 @@ def report_markdown(rep: Dict[str, Any]) -> str:
                                                   i["detail"]))
         out.append("")
     out += ["> 本报告只覆盖**可自动化项**（R1 结构 / R3 世界书 / R4 变量）；",
-            "> R2 引用一致、R5 可复现、R6 长会话友好等仍需人工清单（见 `docs/st-quality-checklist.md`）。",
+            "> R2 引用一致、R5 可复现、R6 长会话友好等仍需人工清单（见 `docs/st-quality-checklist.m"
+                "d`）。",
             "> 校验器原型 v0 不解析 PNG 实卡；输入为已解出的 JSON。", ""]
     return "\n".join(out)

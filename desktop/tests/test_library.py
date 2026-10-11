@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """云端图书馆机器面单测（frontmatter 真源 / 投影一致 / 生命周期 / 检索）。"""
 import sys
 import tempfile

@@ -13,9 +13,10 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 DECL_REL = "protocol/st_quality.json"
 SCHEMA = "nf-st-quality/1"
@@ -24,7 +25,7 @@ ARTIFACT_REL = "docs/examples/mvu-output/mvu_variables.json"
 
 def decl(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / DECL_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=DECL_REL) if p.is_file() else {}
 
 
 def _check_v2(root: str) -> List[str]:
@@ -32,7 +33,7 @@ def _check_v2(root: str) -> List[str]:
     p = Path(root) / ARTIFACT_REL
     if not p.is_file():
         return []
-    doc = json.loads(p.read_text(encoding="utf-8"))
+    doc = json_doc.load(p, dict, what=DECL_REL)
     names = {str(v.get("name")) for v in (doc.get("variables") or [])}
     init = doc.get("initial") or {}
     extra = sorted(set(init) - names)
@@ -103,7 +104,8 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             issues += _check_v2(root)
     issues += _check_checklist(root, d)
     if (d.get("pending") or []):
-        warns.append("规范为草案：%d 项待补（%s）" % (len(d["pending"]), "；".join(d["pending"][:2])))
+        warns.append("规范为草案：%d 项待补（%s）" % (len(d["pending"]),
+ "；".join(d["pending"][:2])))
     stats = {"rules": len(seen), "by_level": by_level,
              "artifact_checked": sum(1 for r in arts)}
     return issues, warns, stats

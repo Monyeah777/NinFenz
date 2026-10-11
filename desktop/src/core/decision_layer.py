@@ -29,6 +29,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 DECL_REL = "protocol/decision_layer.json"
 SCHEMA = "nf-decision-layer/1"
 RESPONSE_SCHEMA = "nf-decision-response/1"
@@ -46,8 +48,7 @@ def load_decl(root: str = ".") -> Dict[str, Any]:
     p = os.path.join(root, DECL_REL)
     if not os.path.isfile(p):
         return {}
-    with open(p, encoding="utf-8") as fh:
-        return json.load(fh)
+    return json_doc.load(p, dict, what=p)
 
 
 def adapter_ids(root: str = ".") -> List[str]:
@@ -206,7 +207,7 @@ def _post_json(url: str, payload: Dict[str, Any], timeout: float) -> Dict[str, A
         raise ValueError("只允许 http/https 端点（修复指引：端点须显式给 scheme）："
                          + repr(url))
     with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310 —— 已在上方校验 scheme ∈ {http,https}；端点由调用方显式给出
-        return json.loads(resp.read().decode("utf-8"))
+        return json_doc.loads(resp.read().decode("utf-8"), dict, what="决策端点响应")
 
 
 def systemone_decide(req: Dict[str, Any], endpoint: str,
@@ -276,9 +277,9 @@ def openai_json_decide(req: Dict[str, Any], endpoint: str, model: str,
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     r = urllib.request.Request(endpoint, data=data, method="POST", headers=headers)
     with urllib.request.urlopen(r, timeout=timeout) as resp:  # nosec B310 —— 已在上方校验 scheme ∈ {http,https}；端点由调用方显式给出
-        body = json.loads(resp.read().decode("utf-8"))
+        body = json_doc.loads(resp.read().decode("utf-8"), dict, what="决策端点响应")
     text = body["choices"][0]["message"]["content"]
-    raw = json.loads(text)
+    raw = json_doc.loads(text, dict, what="决策模型 JSON 文本")
     answers: Dict[str, Any] = {}
     for name, q in (req.get("questions") or {}).items():
         probs = [float(p) for p in raw[name]["probs"]]
@@ -400,7 +401,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         cid = str(c.get("id") or "")
         for k in ("id", "source", "license", "evidence", "pulled"):
             if k not in c:
-                issues.append("候选 %s 缺字段 %s（来源/许可/实证/是否已拉取都要写）" % (cid or "?", k))
+                issues.append("候选 %s 缺字段 %s（来源/许可/实证/是否已拉取都要写）" % (cid or "?",
+ k))
         if not isinstance(c.get("pulled"), bool):
             issues.append("候选 %s 的 pulled 须为布尔（状态不许含糊）" % cid)
         elif c.get("pulled") is True:

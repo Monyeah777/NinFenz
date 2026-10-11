@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """性能预算（`core/perf_budget.py`）回归测试 —— ISO 25010 性能效率面。
 
 全部用注入计时器 + 临时根；不依赖真实耗时与工作区状态。
@@ -26,7 +25,8 @@ def _decl(tmp: str, entries, evidence=None) -> None:
                             ensure_ascii=False), encoding="utf-8")
 
 
-ONE = [{"id": "x", "cmd": "python -c pass", "budget_ms": 100, "runs": 3, "max_age_days": 7}]
+# 预算 120：注入了 [70,90,110] 的三连发 ⇒ P95=110 恰好进预算（判据是 P95，不是中位）。
+ONE = [{"id": "x", "cmd": "python -c pass", "budget_ms": 120, "runs": 3, "max_age_days": 7}]
 
 
 class LoadTest(unittest.TestCase):
@@ -76,6 +76,15 @@ class ScanTest(unittest.TestCase):
             issues, _w, _s = pb.scan(tmp)
         self.assertTrue(any("ghost" in i for i in issues), issues)
 
+    def test_p95_is_judged_when_present(self):
+        """判据取 P95（尾延迟），不是中位——中位漂亮但尾抖大同样要红（审计 X3/M2）。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            _decl(tmp, ONE, {"x": {"median_ms": 80, "p95_ms": 250, "stdev_ms": 90,
+                                   "measured_at": dt.date.today().isoformat()}})
+            issues, _w, stats = pb.scan(tmp)
+        self.assertTrue(any("P95" in i and "250" in i for i in issues), issues)
+        self.assertEqual(1, stats["over_budget"])
+
     def test_exit_code_is_not_judged(self):
         """性能面只看耗时与新鲜度；正确性归 verify_report——故 exit_code 非 0 不该 FAIL。"""
         with tempfile.TemporaryDirectory() as tmp:
@@ -92,11 +101,37 @@ class RecordTest(unittest.TestCase):
             bad, doc = pb.record(tmp, only="all", runner=lambda cmd, n: (0, [90, 110, 70]))
             rec = doc["evidence"]["x"]
             self.assertEqual(90, rec["median_ms"], "中位数须取排序后中位（70,90,110 → 90）")
+            self.assertEqual(110, rec["p95_ms"], "P95 须落进证据（3 样本最近秩即最大值）")
+            self.assertEqual(20.0, rec["stdev_ms"], "样本标准差须落证据（70,90,110 → 20）")
             self.assertEqual(70, rec["min_ms"])
             self.assertEqual(110, rec["max_ms"])
             self.assertEqual([], bad)
             issues, _w, _s = pb.scan(tmp)
         self.assertEqual([], issues)
+
+    def test_true_median_for_even_runs(self):
+        """偶数样本取真中位（审计 M1）：[10,20,30,70] → 25，不是上中位 30。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            _decl(tmp, [dict(ONE[0], runs=4, budget_ms=200)])
+            _bad, doc = pb.record(tmp, only="all", runner=lambda cmd, n: (0, [10, 20, 30, 70]))
+            rec = doc["evidence"]["x"]
+        self.assertEqual(25.0, rec["median_ms"])
+        self.assertEqual(70, rec["p95_ms"])
+
+    def test_warmup_is_not_measured(self):
+        """预热不计入证据（审计 F2）：第一次调用只热场，第二次才是 measured runs。"""
+        calls = []
+
+        def runner(cmd, n):
+            calls.append(n)
+            return 0, [10] * n
+
+        with tempfile.TemporaryDirectory() as tmp:
+            _decl(tmp, [dict(ONE[0], warmups=2, runs=3)])
+            _bad, doc = pb.record(tmp, only="all", runner=runner)
+        self.assertEqual([2, 3], calls, "先热 2 次（丢弃），再测 3 次")
+        self.assertEqual(3, doc["evidence"]["x"]["runs"])
+        self.assertEqual(2, doc["evidence"]["x"]["warmups"])
 
     def test_record_reports_over_budget(self):
         with tempfile.TemporaryDirectory() as tmp:

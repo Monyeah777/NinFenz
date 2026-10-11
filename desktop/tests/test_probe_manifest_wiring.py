@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`.NET` 加速线的 probe 清单接线判据：`probe_manifest.json` ⟷ `probes/*.py` 必须严格对齐。
 
 为什么（2026-10-04 实测）：该 manifest 自称**跑批口径的唯一出处**（`name/script/tier/args/note`），
@@ -51,9 +50,12 @@ class ProbeManifestWiringTest(unittest.TestCase):
         self.assertEqual([], got["missing"],
                          "登记了但盘上没有的 probe（跑批会直接失败）：%s" % got["missing"])
         self.assertEqual([], got["unregistered"],
-                         "未登记的 probe 文件 ⇒ 永远不会被跑批执行（修复指引：登记进 probe_manifest.json，"
+                         "未登记的 probe 文件 ⇒ 永远不会被跑批执行（修复指引：登记进 probe_manifest"
+                             ".json，"
                          "或加进 NON_PROBE_FILES 并写明理由）：%s" % got["unregistered"])
-        self.assertEqual([], got["duplicates"], "重复登记（同一 script 多次）：%s" % got["duplicates"])
+        self.assertEqual([],
+ got["duplicates"],
+ "重复登记（同一 script 多次）：%s" % got["duplicates"])
 
     def test_non_probe_allowlist_is_not_stale(self):
         """豁免清单只许收缩：列出的件必须真的还在（消失或已登记即失效）。"""
@@ -67,8 +69,18 @@ class ProbeManifestWiringTest(unittest.TestCase):
         ok = {"probes": [{"script": "a_probe.py"}, {"script": "b_probe.py"}]}
         self.assertEqual({"missing": [], "unregistered": [], "duplicates": [], "registered": 2},
                          wiring(ok, ["a_probe.py", "b_probe.py"]))
-        self.assertEqual(["c_probe.py"], wiring(ok, ["a_probe.py", "b_probe.py", "c_probe.py"])["unregistered"])
-        self.assertEqual([], wiring(ok, ["a_probe.py", "b_probe.py", "_paths.py"], ("_paths.py",))["unregistered"],
+        self.assertEqual(["c_probe.py"],
+ wiring(ok,
+ ["a_probe.py",
+ "b_probe.py",
+ "c_probe.py"])["unregistered"])
+        self.assertEqual([],
+ wiring(ok,
+ ["a_probe.py",
+ "b_probe.py",
+ "_paths.py"],
+ ("_paths.py",
+))["unregistered"],
                          "豁免件不得算作漏登记")
         ghost = {"probes": [{"script": "ghost_probe.py"}]}
         self.assertEqual(["ghost_probe.py"], wiring(ghost, ["a_probe.py"])["missing"])

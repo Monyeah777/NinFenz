@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import ast
 
-from core import atomic_write
+from core import atomic_write, json_doc
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
@@ -103,12 +103,49 @@ def sdp_violations(deps: Dict[str, Set[str]], metrics: Dict[str, Dict[str, Any]]
     return sorted(out)
 
 
+def metrics_face_issues(base: Dict[str, Any], live: Dict[str, Dict[str, Any]]
+                        ) -> Tuple[List[str], Dict[str, Any]]:
+    """校验基线的 **metrics 面**（审计 §11v.4 F1：写了却从不读——面会烂在里面）。
+
+    判 FAIL 的只有「自相矛盾/越界/非数值」——那是基线被手改坏或半截写；数值**漂移**（代码演进
+    导致 Ca/Ce 变化）只记进 stats（否则每次加一个 import 都要重冻）。
+    """
+    out: List[str] = []
+    rec = base.get("metrics")
+    if not isinstance(rec, dict) or not rec:
+        out.append("耦合基线缺 metrics 面（修复指引：python scripts/coupling_metrics.py --write）")
+        return out, {"metrics_recorded": 0, "metrics_drift": 0, "metrics_missing": len(live)}
+    drift = 0
+    for m, mv in rec.items():
+        if not isinstance(mv, dict):
+            out.append("基线 metrics[%s] 不是对象（基线被改坏）" % m)
+            continue
+        ca, ce, i = mv.get("ca"), mv.get("ce"), mv.get("i")
+        if not all(isinstance(x, (int, float)) and not isinstance(x, bool)
+                   for x in (ca, ce, i)):
+            out.append("基线 metrics[%s] 含非数值（ca/ce/i=%r/%r/%r）" % (m, ca, ce, i))
+            continue
+        if ca < 0 or ce < 0 or not (0.0 <= float(i) <= 1.0):
+            out.append("基线 metrics[%s] 越界（ca=%s ce=%s i=%s）" % (m, ca, ce, i))
+            continue
+        want = round(ce / (ca + ce), 4) if (ca + ce) else 0.0
+        if abs(float(i) - want) > 1e-9:
+            out.append("基线 metrics[%s] 自相矛盾：I=%.4f ≠ Ce/(Ca+Ce)=%.4f"
+                       % (m, float(i), want))
+            continue
+        if m not in live or (live[m]["ca"], live[m]["ce"]) != (int(ca), int(ce)):
+            drift += 1
+    missing = [m for m in live if m not in rec]
+    return out, {"metrics_recorded": len(rec), "metrics_drift": drift,
+                 "metrics_missing": len(missing)}
+
+
 def load_baseline(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / BASELINE_REL
     if not p.is_file():
         return {}
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
+        return json_doc.load(p, dict, what=BASELINE_REL)
     except ValueError:  # 基线缺失/坏件 ⇒ 空基线：全部环/违例按「新增」判（fail-closed，宁可全报）
         return {}
 
@@ -144,8 +181,11 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     for a, b in sorted(known_sdp - set(sdp)):
         warns.append("登记 SDP 违例已消除：%s → %s（修复指引：从 %s 的 sdp 移除）"
                      % (a, b, BASELINE_REL))
+    face_issues, face_stats = metrics_face_issues(base, metrics)
+    issues.extend(face_issues)
     stats = {"modules": len(deps), "cycles": len(cyc), "sdp": len(sdp),
              "registered_cycles": len(known_cyc), "registered_sdp": len(known_sdp)}
+    stats.update(face_stats)
     return issues, warns, stats
 
 

@@ -119,6 +119,58 @@ if (fs.existsSync(factsPath)) {
   }
 }
 
-if (!fail) { console.log('✓ 站点数字与真源一致（质量凭证 + 规模）'); process.exit(0); }
+// ---- 真源 3：npm 包（version + 件数/体积口径一处）----
+// B13/C1/C2（2026-10-10 审计 P1）：站点此前**同时**出现 ninfenz v1.0.0 与 v1.0.1，件数/体积
+// 还有 2947/21.2、2953/20.25、2973 三套。现把 npm 的**版本真源**钉在 packaging/npm/package.json，
+// 并要求站点所有 npm 声明行口径唯一（版本 + 件数 + 体积）——一处真源，站点不许再说另一组数。
+const npmPkgPath = path.join(ROOT, 'packaging', 'npm', 'package.json');
+let NPM_V = '';
+try {
+  NPM_V = String(JSON.parse(read(npmPkgPath)).version);
+} catch (e) {
+  console.error('✗ 读不到 packaging/npm/package.json 的 version：' + e.message);
+  fail = 1;
+}
+if (NPM_V) {
+  const NPM_FACES = ['index.html', 'en/index.html', 'llms.txt', 'llms-full.txt', 'facts.json',
+                     'agent.txt', 'README.md', 'use/index.html', 'en/use/index.html'];
+  const counts = new Set();
+  const sizes = new Set();
+  const VER_NEAR = new RegExp('ninfenz[\\s\\S]{0,40}?[@v](\\d+\\.\\d+\\.\\d+)', 'g');
+  const VER_JSONLD = new RegExp('"softwareVersion":\\s*"(\\d+\\.\\d+\\.\\d+)"', 'g');
+  for (const f of NPM_FACES) {
+    const p = path.join(SITE, f);
+    if (!fs.existsSync(p)) { continue; }
+    const t = read(p);
+    const vers = [...t.matchAll(VER_NEAR)].map((x) => x[1])
+      .concat([...t.matchAll(VER_JSONLD)].map((x) => x[1]));
+    const bad = [...new Set(vers.filter((v) => v !== NPM_V))];
+    if (bad.length) {
+      console.error('✗ site/' + f + ' npm 版本口径漂移：' + bad.map((v) => 'v' + v).join(' / ')
+                    + ' ≠ packaging/npm/package.json=' + NPM_V);
+      fail = 1;
+      if (write) {
+        fs.writeFileSync(p, t.replace(/ninfenz v\d+\.\d+\.\d+/g, 'ninfenz v' + NPM_V)
+          .replace(/ninfenz@\d+\.\d+\.\d+/g, 'ninfenz@' + NPM_V), 'utf8');
+        console.error('  └ 已改写为 v' + NPM_V + '（请复核后提交）');
+      }
+    }
+    for (const ln of t.split(/\r?\n/).filter((l) => /ninfenz/.test(l))) {
+      const c = ln.match(/(\d+)\s*(?:文件|files)/);
+      if (c) { counts.add(c[1]); }
+      const s = ln.match(/(\d+\.\d+)\s*MB/);
+      if (s) { sizes.add(s[1]); }
+    }
+  }
+  if (counts.size > 1) { console.error('✗ 站点 npm 件数口径不唯一：' + [...counts].join(' / ')); fail = 1; }
+  if (sizes.size > 1) { console.error('✗ 站点 npm 体积口径不唯一：' + [...sizes].join(' / ')); fail = 1; }
+  if (!counts.size && !sizes.size) { console.log('  站点未见 npm 件数/体积声明（跳过口径一致性）'); }
+  if (!fail) {
+    console.log('  npm: 版本 v' + NPM_V + ' · 件数 ' + ([...counts][0] || '—')
+                + ' · 体积 ' + ([...sizes][0] || '—') + ' MB（口径唯一）');
+  }
+}
+
+if (!fail) { console.log('✓ 站点数字与真源一致（质量凭证 + 规模 + npm 口径）'); process.exit(0); }
 console.error('✗ 站点数字未过：跑 node site/tools/sync-numbers.mjs --write 同步可自动改写的项，其余按上面指引手改');
 process.exit(1);

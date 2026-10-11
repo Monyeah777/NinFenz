@@ -25,6 +25,11 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from core import conformance_scan as _csc   # 统一 YAML 加载器 / 围栏解析缓存真源
+from core import json_doc
+# enum/const 的值相等口径复用叶子件 json_schema.json_equal（唯一实现）——2026-10-10 审计 Y4：
+# 此前 enum 只写在 string 分支里，{type: boolean, enum: [true]} 对 False 静默放行，而
+# json_schema 会拒；同一语义两套校验器宽窄分叉，且分叉点落在「放过去」的那一侧。
+from core import json_schema as _js  # noqa: E402 - 叶子件（不 import 任何 core 模块），无环
 
 # 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 
@@ -90,6 +95,13 @@ def subset_validate(
         return [f"{path}: schema 段非对象"]
     out: List[str] = []
 
+    # enum 是**类型无关**的约束：先判一次，后面各类型分支的 return 都会带上它。
+    # （2026-10-10 审计 Y4：此前它只在 string 分支里 ⇒ boolean/number 的 enum 被静默放行。）
+    if "enum" in schema:
+        _enum = schema["enum"] if isinstance(schema["enum"], list) else []
+        if not any(_js.json_equal(instance, v) for v in _enum):
+            out.append(f"{path}: 值 {instance!r} 不在枚举 {schema['enum']}")
+
     stype = schema.get("type")
     if stype == "object":
         if not isinstance(instance, dict):
@@ -133,8 +145,6 @@ def subset_validate(
             return [f"{path}: 应为 string，实为 {type(instance).__name__}"]
         if "minLength" in schema and len(instance) < schema["minLength"]:
             out.append(f"{path}: 字符串过短 {len(instance)} < minLength {schema['minLength']}")
-        if "enum" in schema and instance not in schema["enum"]:
-            out.append(f"{path}: 值 {instance!r} 不在枚举 {schema['enum']}")
         if "pattern" in schema:
             if not re.search(schema["pattern"], instance):
                 out.append(f"{path}: 值 {instance!r} 不匹配 pattern {schema['pattern']}")
@@ -160,7 +170,8 @@ def subset_validate(
         return out
 
     if stype is None:
-        return []
+        # 无 type 也**不许吞掉**已判出的 enum 违例（2026-10-10 审计 Y4）：out 里可能有它。
+        return out
     return [f"{path}: 校验器不支持的 type {stype!r}"]
 
 
@@ -248,7 +259,7 @@ def _fence_yaml(text: str, marker: str) -> Optional[Dict[str, Any]]:
 
 def _read_json(path: str) -> Tuple[Optional[Dict[str, Any]], str]:
     try:
-        return json.loads(_csc.read_text_cached(path)), ""
+        return json_doc.loads(_csc.read_text_cached(path), None, what=str(path)), ""
     except Exception as exc:
         return None, str(exc)
 

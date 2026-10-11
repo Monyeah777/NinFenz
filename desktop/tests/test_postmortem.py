@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """复盘（postmortem）正式与否定用例。"""
 import sys
 import tempfile
@@ -69,10 +68,12 @@ class TestNegatives(unittest.TestCase):
                             for i in self._check(GOOD.replace("门禁顺序未成文", "没注意"))))
 
     def test_action_without_judgement_is_fail(self):
-        self.assertTrue(any("缺判据" in i for i in self._check(GOOD.replace("；**判据** = check35 恒绿", ""))))
+        self.assertTrue(any("缺判据" in i for i in self._check(GOOD.replace("；**判据** = check35 "
+            "恒绿", ""))))
 
     def test_action_without_owner_is_fail(self):
-        self.assertTrue(any("缺负责人" in i for i in self._check(GOOD.replace("**负责人** = 机制；", ""))))
+        self.assertTrue(any("缺负责人" in i for i in self._check(GOOD.replace("**负责人** = 机制；",
+ ""))))
 
     def test_empty_actions_is_fail(self):
         self.assertTrue(any("行动项为空" in i

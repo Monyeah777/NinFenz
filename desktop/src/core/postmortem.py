@@ -12,11 +12,11 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import doc_family
+from core import json_doc
 from core.library import parse_frontmatter
 
 DECL_REL = "protocol/postmortem.json"
@@ -73,10 +73,11 @@ def check_doc(root: str, rel: str) -> Tuple[List[str], Dict[str, Any]]:
     issues += doc_family.refs_issues(root, fm.get("trigger"), checks, label="引用")
     issues += doc_family.refs_issues(root, fm.get("refs"), checks, label="引用")
     if str(fm.get("status")) == "closed" and (r / RECEIPTS_REL).is_file():
-        doc = json.loads((r / RECEIPTS_REL).read_text(encoding="utf-8"))
+        doc = json_doc.load(r / RECEIPTS_REL, dict, what=RECEIPTS_REL)
         ids = {e.get("id") for e in (doc.get("entries") or [])}
         if rel not in ids:
-            issues.append("status=closed 但未被协议回执锚定（防事后美化；修复指引：nf receipts --write）")
+            issues.append("status=closed 但未被协议回执锚定（防事后美化；修复指引：nf receipts --wr"
+                "ite）")
     stats = {"actions": len(acts), "sections": sum(1 for s in SECTIONS if s in body)}
     return issues, stats
 

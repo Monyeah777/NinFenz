@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """原子写（`core/atomic_write.py`）回归测试：读者不见半截、失败不留残、LF 落盘。
 
 动机（重复调用安全）：仓库把原子写惯用法写在 `disk_cache`/`daemon` 里，而**已发布产物**
@@ -99,7 +98,8 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             root = Path(tmp)
             (root / "decisions").mkdir()
             (root / "decisions" / "INDEX.md").write_text(
-                "# NF 决策记录索引（INDEX）\n\n<!-- nf:index:begin -->\n旧\n<!-- nf:index:end -->\n",
+                "# NF 决策记录索引（INDEX）\n\n<!-- nf:index:begin -->\n旧\n<!-- nf:index:end -->"
+                    "\n",
                 encoding="utf-8")
             before = (root / dc.INDEX_REL).read_text(encoding="utf-8")
             with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):

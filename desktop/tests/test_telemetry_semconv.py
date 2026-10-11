@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """遥测 semconv 映射单测（不改 trace 格式；只对齐属性命名与 OTLP 形状）。"""
 import json
 import sys

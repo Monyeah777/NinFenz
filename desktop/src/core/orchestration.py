@@ -30,10 +30,10 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
+from core import json_doc
 
 SCHEMA = "nf-orchestration/1"
 DRIVER_REL = "protocol/driver.json"
@@ -60,7 +60,7 @@ def workflow_tools(root: str = ".") -> Dict[str, List[str]]:
     if not p.is_file():
         return {}
     try:
-        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc = json_doc.load(p, dict, what=str(p))
     except ValueError:
         return {}          # 坏件由 driver.scan 报出；同一规则不在两处各判一遍
     return {str(k): [str(t) for t in (v.get("mcp_tools") or [])]
@@ -119,7 +119,8 @@ def _args_issues(sid: str, args: Dict[str, Any], spec: Dict[str, Any],
     issues: List[str] = []
     for key in (spec.get("required") or []):
         if key not in args:
-            issues.append("步 %s 缺必填参数 %s（修复指引：见该工具 inputSchema.required）" % (sid, key))
+            issues.append("步 %s 缺必填参数 %s（修复指引：见该工具 inputSchema.required）" % (sid,
+ key))
     props = spec.get("properties") or {}
     for key, val in args.items():
         if key not in props:

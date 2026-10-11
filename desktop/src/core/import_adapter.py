@@ -106,7 +106,8 @@ class Ccv3ParseResult:
 _RE_LAYER = re.compile(r"^## 层\s+([^\s·]+)\s*·\s*(.+)$")
 _RE_MODULE = re.compile(r"^###\s+([^\s·]+)\s*·\s*(.+)$")
 _RE_EXTRA = re.compile(r"^## 附加规则\s*$")
-# NF 导出 description 格式：f"{pipeline_name}（{pipeline_id}）生成：协议/文档操作规格，共 N 个规则块。"
+# NF 导出 description 格式：f"{pipeline_name}（{pipeline_id}）生成：协议/文档操作规格，共 N 个规则块
+# 。"
 _RE_DESC_NF = re.compile(
     r"^(.+?)[（(]([^（）()]+)[)）]生成[:：]协议/文档操作规格，共\s*(\d+)\s*个规则块。?$")
 _PLACEHOLDER_NO_BODY = "（无正文）"
@@ -283,7 +284,8 @@ def parse_skill(text: str, skill_dir: Optional[Path] = None) -> SkillParseResult
 _RE_COMMENT_LAYER = re.compile(r"^NF 层\s*([^\s·]+)\s*·\s*(.+)$")
 _COMMENT_EXTRA = "NF 层外模块"
 _COMMENT_ASSET = "NF 资产素材"
-# NF 导出 chara description：f"{pipeline_name}（{pipeline_id}）装配产物 · N 个规则模块 + M 项资产素材。由宁封子 2.0 导出层生成。"
+# NF 导出 chara description：f"{pipeline_name}（{pipeline_id}）装配产物 · N 个规则模块 + M 项资产素
+# 材。由宁封子 2.0 导出层生成。"
 _RE_DESC_CCV3 = re.compile(
     r"^(.+?)[（(]([^（）()]+)[)）]装配产物")
 

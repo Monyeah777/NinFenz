@@ -63,7 +63,8 @@ def _volume_supports_notifications(path) -> bool:
         get_type.restype = ctypes.c_uint
         get_type.argtypes = [ctypes.c_wchar_p]
         DRIVE_FIXED = 3
-        # 注意：GetDriveTypeW 要的是**卷根**（`C:\`）；给完整路径会返回 DRIVE_NO_ROOT_DIR（实测踩过）
+        # 注意：GetDriveTypeW 要的是**卷根**（`C:\`）；给完整路径会返回 DRIVE_NO_ROOT_DIR（实测踩过
+        # ）
         drive = os.path.splitdrive(str(Path(path).resolve()))[0] or str(path)
         root = drive + os.sep if drive and not drive.endswith(os.sep) else drive
         return get_type(root) == DRIVE_FIXED

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """组装式命令（`core/assemble_build.py`）回归测试。
 
 判据：产物必须是**八段骨架**的单文件完整版、经 `assemble_plan.check` 零 issue
@@ -14,6 +13,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core import assemble_build as ab  # noqa: E402
 from core import assemble_plan as ap  # noqa: E402
+
+
+class YamlOptionalDependencyTest(unittest.TestCase):
+    """Y6（2026-10-10 全仓审计）：缺 PyYAML 不得裸崩，走 lazy_yaml 降级约定。"""
+
+    def test_missing_yaml_degrades_instead_of_crashing(self):
+        from core import lazy_yaml
+        orig = lazy_yaml.module
+        lazy_yaml.module = lambda: None
+        try:
+            self.assertEqual({}, ap._package_module_sets(),
+                             "缺 PyYAML 时应按降级约定返回空集，不得抛 ModuleNotFoundError")
+            plan = ap.plan("帮我组装一个校园情感世界的完整版")
+            self.assertIsInstance(plan, dict)
+        finally:
+            lazy_yaml.module = orig
 
 
 class AssembleBuildTest(unittest.TestCase):

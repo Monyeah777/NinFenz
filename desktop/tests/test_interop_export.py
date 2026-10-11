@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 2.3 / CloudEvents）。
 
 两件事必须被钉住：① 派生面**覆盖完整**（声明件里有多少端点/事件/回执，导出面就有多少）；
@@ -284,7 +283,8 @@ class InteropExportTest(unittest.TestCase):
                      "maps_to": "nf doctor", "deprecated": True, "sunset": "2027-01-01",
                      "replacement": None}]}))
             doc = ie.openapi_doc(tmp)
-            self.assertIn("text/event-stream", doc["paths"]["/a"]["get"]["responses"]["200"]["content"])
+            self.assertIn("text/event-stream", doc["paths"]["/a"]["get"]["responses"]["200"]["conte"
+                "nt"])
             self.assertEqual(doc["paths"]["/b"]["get"]["x-nf-sunset"], "2027-01-01")
             self.assertTrue(doc["paths"]["/b"]["get"]["deprecated"])
             self.assertIsNone(doc["paths"]["/b"]["get"]["x-nf-replacement"])

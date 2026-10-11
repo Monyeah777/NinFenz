@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """包管理器核心解析面（core/package_index.py）回归测试 —— 按品类取件 / 解析 / 检索。"""
 import sys
 import tempfile

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """断言表（数据化断言）正式与否定用例。"""
 import json
 import sys

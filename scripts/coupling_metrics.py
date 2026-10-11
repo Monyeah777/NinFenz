@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """模块级耦合度量 + 存量债棘轮（Martin 包度量 / SDP）。
 
 用法：

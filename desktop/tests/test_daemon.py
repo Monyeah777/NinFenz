@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """执行层常驻守护（core/daemon.py）单测：协议 / 令牌 / 拒绝面 / 等价性 / 新鲜度 / 相对加速。
 
 纪律与全仓一致：每条性质都要有**能在本机跑红**的判据——
@@ -336,6 +335,76 @@ class DaemonInProcessServerTest(unittest.TestCase):
             self.assertTrue(err, "拒收要带原因：%s" % label)
         self.assertTrue(dm.ping(), "畸形请求之后服务仍须可用")
 
+    def test_request_level_exception_is_isolated(self):
+        """请求级异常 → 结构化错误帧 + 服务继续（2026-10-10 审计 X0，P0）。
+
+        直接注入「`execute` 抛异常」这一层：它模拟的正是审计实测的崩溃路径
+        （`_handle_conn` → `execute` → 未捕获异常 → `serve_forever` 退出）。判据取两条：
+        ① 客户端拿到 rc=1 + 带「内部错误」的 stderr（不是零输出）；② 下一跳仍可达。
+        """
+        orig = dm.execute
+
+        def boom(argv, root, cwd=None):
+            raise RuntimeError("injected payload failure")
+
+        dm.execute = boom
+        try:
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["stats"]}).encode() + b"\n"
+            code, out, err = self._raw(payload)
+        finally:
+            dm.execute = orig
+        self.assertEqual(1, code, "请求级异常须归一成 rc=1")
+        self.assertEqual(b"", out)
+        self.assertIn("守护内部错误", err.decode("utf-8", "replace"))
+        self.assertTrue(dm.ping(), "单条请求异常之后服务必须仍可用")
+
+    def test_connection_level_oserror_is_isolated(self):
+        """连接级 OSError（客户端中途断开触发 send 失败）不得杀死服务（X0 同族）。"""
+        orig = dm._handle_conn
+
+        def boom(conn, token, root):
+            raise ConnectionResetError("client went away")
+
+        dm._handle_conn = boom
+        try:
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["--version"]}).encode() + b"\n"
+            try:
+                self._raw(payload)      # 服务端未回帧、直接关连接
+            except OSError:
+                # Windows 上半关闭会以 RST 收尾（WinError 10053），客户端侧本就是异常；
+                # 本判据只关心**服务端存活**，故连接层异常在此不算失败。
+                pass
+        finally:
+            dm._handle_conn = orig
+        self.assertTrue(dm.ping(), "连接级失败之后服务必须仍可用")
+
+    def test_corrupt_protocol_json_is_isolated(self):
+        """**真命令 + 真坏输入**：截断 `protocol/RECEIPTS.json` → `nf receipts` 必抛解析错。
+
+        这是审计 X0 的原始触发路径（18/18 条 protocol JSON 都会如此）。修复前该异常穿透守护、
+        进程直接消失（客户端收 rc=1 + 零输出）；修复后走 `nf.guarded_main` 的共用错误面。
+        判据只依赖「文件名 + 一半字节」，夹具在 finally 里按原字节还原（不改仓库事实）。
+        """
+        target = ROOT / "protocol" / "RECEIPTS.json"
+        self.assertTrue(target.is_file(), "协议层回执件必须在场（审计对象锁前提）")
+        original = target.read_bytes()
+        try:
+            target.write_bytes(b'{"entries": [')          # 合法前缀、整体非法 JSON
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["receipts"]}).encode() + b"\n"
+            code, out, err = self._raw(payload)
+        finally:
+            target.write_bytes(original)
+        self.assertEqual(1, code)
+        self.assertEqual(b"", out, "坏输入不得产出正常 stdout")
+        self.assertIn("内部错误", err.decode("utf-8", "replace"))
+        self.assertTrue(dm.ping(), "坏输入之后守护必须仍在线")
+
     def test_shutdown_op_stops_the_loop(self):
         doc = dm.read_state()
         code, _out, _err = self._raw(
@@ -496,7 +565,8 @@ class DaemonShellInitTest(unittest.TestCase):
                     self.assertEqual((d.returncode, d.stdout), (r.returncode, r.stdout),
                                      "shell-init 客户端与直跑不一致：%s\n%s"
                                      % (argv, (r.stderr or "")[:200]))
-                    # 同一口径覆盖**启动器本体**（`scripts/nf`）：它是另一条被文档写成「快路」的入口，
+                    # 同一口径覆盖**启动器本体**（`scripts/nf`）：它是另一条被文档写成「快路」的入口
+                    # ，
                     # 有守护时同样必须与直跑逐字节一致。
                     lr = subprocess.run([bash, "scripts/nf"] + argv, cwd=str(ROOT),
                                         env=dict(os.environ), capture_output=True, text=True,
@@ -566,13 +636,81 @@ class DaemonStatePermsTest(unittest.TestCase):
                             "root": ".", "started": "now"})
             p = dm.state_path()
             self.assertEqual(0, p.stat().st_mode & 0o077,
-                             "含令牌的状态文件须仅属主可读写（实测 %o）" % (p.stat().st_mode & 0o777))
+                             "含令牌的状态文件须仅属主可读写（实测 %o）"
+                                 "" % (p.stat().st_mode & 0o777))
             self.assertIsNotNone(dm.read_state(), "权限收紧不得影响自读")
         finally:
             if old is None:
                 os.environ.pop("NARRATIVE_FORGE_HOME", None)
             else:
                 os.environ["NARRATIVE_FORGE_HOME"] = old
+
+
+class DaemonStateWriteRaceTest(unittest.TestCase):
+    """N1（2026-10-10 审计 P1）：并发写状态文件不得撕裂。
+
+    修复前用**固定名** `daemon.json.tmp` 手工两段写 ⇒ 4 进程 × 300 次实测成功 326/1200、
+    读者 12.9% 解析失败。现走 `atomic_write.write_text`（mkstemp 唯一临时名 + replace）。
+    """
+
+    def setUp(self):
+        self.home = tempfile.mkdtemp(prefix="nf_daemon_state_race_")
+        self._old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = self.home
+
+    def tearDown(self):
+        if self._old is None:
+            os.environ.pop("NARRATIVE_FORGE_HOME", None)
+        else:
+            os.environ["NARRATIVE_FORGE_HOME"] = self._old
+        shutil.rmtree(self.home, ignore_errors=True)
+
+    def test_concurrent_writes_never_tear(self):
+        import threading
+        stop = threading.Event()
+        tears, errors = [], []
+
+        def writer(i):
+            for n in range(150):
+                try:
+                    dm.write_state({"proto": dm.PROTO, "pid": i, "port": 2000 + i,
+                                    "token": "t" * 8, "root": ".", "started": n})
+                except Exception as exc:                     # noqa: BLE001
+                    errors.append(exc)
+
+        def reader():
+            while not stop.is_set():
+                try:
+                    raw = dm.state_path().read_text(encoding="utf-8")
+                except (FileNotFoundError, PermissionError):
+                    continue                                  # 瞬时占用/未落盘：不是撕裂
+                except OSError:
+                    continue
+                if not raw.strip():
+                    continue
+                try:
+                    json.loads(raw)
+                except ValueError as exc:
+                    tears.append(str(exc))
+
+        writers = [threading.Thread(target=writer, args=(i,), daemon=True) for i in range(4)]
+        readers = [threading.Thread(target=reader, daemon=True) for _ in range(3)]
+        for th in readers + writers:
+            th.start()
+        for th in writers:
+            th.join(timeout=60)
+        stop.set()
+        for th in readers:
+            th.join(timeout=30)
+        self.assertEqual([], errors, "并发写出现异常（固定临时名互踩的特征）：%s" % errors[:3])
+        self.assertEqual([],
+ tears,
+ "读者看到了半截 JSON（%d 次撕裂）：%s" % (len(tears),
+ tears[:3]))
+        leftovers = [p.name for p in dm.state_path().parent.iterdir() if p.name.endswith(".tmp")]
+        self.assertEqual([],
+ leftovers,
+ "遗留临时件（原子写用 mkstemp，写完即 replace）：%s" % leftovers)
 
 
 class ResponseCacheWriteSafetyTest(unittest.TestCase):
@@ -613,7 +751,8 @@ class ResponseCacheWriteSafetyTest(unittest.TestCase):
             if not any(tuple(toks[:len(pre)]) == pre for pre in dm.CACHEABLE_COMMANDS):
                 continue
             for flag in (row.get("flags") or []):
-                if flag in self.term.CONFIRM_FLAGS or flag in {f for _c, f in self.term.CONFIRM_FLAG_PAIRS}:
+                if flag in self.term.CONFIRM_FLAGS or flag in {f for _c,
+ f in self.term.CONFIRM_FLAG_PAIRS}:
                     if dm.cacheable(toks + [flag]):
                         bad.append("%s %s" % (row["path"], flag))
         for cmd, sub in self.term.CONFIRM_VERBS:
@@ -652,7 +791,8 @@ class ResponseCacheWriteSafetyTest(unittest.TestCase):
                     orphans.append("%s %s" % (row["path"], flag))
         self.assertGreater(checked, 0, "没扫到任何「可缓存命令 × 闸门旗标」组合（判据可能已失效）")
         self.assertEqual([], orphans,
-                         "可缓存命令上的闸门旗标没进 `_WRITE_FLAG_PREFIXES`（写会被缓存）：%s" % orphans)
+                         "可缓存命令上的闸门旗标没进 `_WRITE_FLAG_PREFIXES`（写会被缓存）：%s"
+                             "" % orphans)
 
 
 if __name__ == "__main__":

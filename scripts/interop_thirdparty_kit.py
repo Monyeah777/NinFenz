@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """互操作性「从他证」通道套件（check38 子扫描 2）。
 
 分层纪律（不混淆两种证据）：
@@ -18,7 +17,6 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
-import json
 import os
 import re
 import shutil
@@ -28,6 +26,7 @@ from typing import Any, Dict, List, Tuple
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))   # core.*（原子写单源；2026-10-01）
 from core import atomic_write  # noqa: E402
+from core import json_doc  # noqa: E402 - 必须在 sys.path 插入之后（本脚本也作为独立件被第三方复制运行）
 DOC_REL = "docs/interop-thirdparty.md"
 STATUS_REL = "results/interop-thirdparty-status.md"
 UNFILLED = "未回填（通道就绪）"
@@ -38,7 +37,8 @@ FACES: List[Dict[str, Any]] = [
         "id": "mcp", "title": "MCP 运行时（server/discover · tools/list）",
         "artifact": "", "kind": "peer-consumption",
         "peer": "任意 MCP 客户端（Claude Desktop / mcp-inspector 等）",
-        "install": "对端自选；服务端：`python scripts/nf.py run --fmt mcp --dest out` 产出 mcp.json 快照",
+        "install": "对端自选；服务端：`python scripts/nf.py run --fmt mcp --dest out` 产出 mcp.json"
+            " 快照",
         "command": "python scripts/nf.py serve out/mcp.json  然后由对端客户端调用 server/discover / tools/list / resources/list / prompts/list",
         "expect": "对端能完成初始化并取到 4 类列表；应答通过官方 MCP 2026-07-28 schema",
         "why": "", "probe": "core.mcp_runtime",
@@ -91,7 +91,8 @@ FACES: List[Dict[str, Any]] = [
         "install": "go install github.com/slsa-framework/slsa-verifier/v2/cli/slsa-verifier@latest",
         "command": "slsa-verifier version  # 并对照官方 CUE/Protobuf 定义核对形状",
         "expect": "工具可得；形状与官方定义一致（本面**只证形状，不证构建来源**）",
-        "why": "SLSA v1.0 官方以 CUE / Protobuf 定义机器可读协议，不发布 JSON Schema；NF 导出面是契约形状而非真实构建证明，故本面判据止于形状一致。",
+        "why": "SLSA v1.0 官方以 CUE / Protobuf 定义机器可读协议，不发布 JSON Schema；NF 导出面是契"
+            "约形状而非真实构建证明，故本面判据止于形状一致。",
         "probe": "slsa-verifier",
     },
     {
@@ -99,9 +100,11 @@ FACES: List[Dict[str, Any]] = [
         "artifact": "results/interop/intoto.json", "kind": "shape-only",
         "peer": "in-toto（官方实现）",
         "install": "pip install in-toto",
-        "command": "python -c \"import in_toto, json; s=json.load(open('results/interop/intoto.json',encoding='utf-8')); assert {'_type','subject','predicateType'} <= set(s)\"",
+        "command": "python -c \"import in_toto, json; s=json.load(open('results/interop/intoto.json"
+            "',encoding='utf-8')); assert {'_type','subject','predicateType'} <= set(s)\"",
         "expect": "断言通过（Statement 必备键在位）",
-        "why": "in-toto 官方以 Markdown 规范发布 Statement，不提供 JSON Schema 文件；本面判据为必备键形状 + 官方文本核对。",
+        "why": "in-toto 官方以 Markdown 规范发布 Statement，不提供 JSON Schema 文件；本面判据为必备"
+            "键形状 + 官方文本核对。",
         "probe": "in_toto",
     },
     {
@@ -109,9 +112,11 @@ FACES: List[Dict[str, Any]] = [
         "artifact": "results/interop/vc.json", "kind": "shape-only",
         "peer": "W3C VC 数据模型校验库 / JSON-LD 处理器",
         "install": "pip install pyld",
-        "command": "python -c \"import json; d=json.load(open('results/interop/vc.json',encoding='utf-8')); assert {'@context','type','credentialSubject'} <= set(d)\"",
+        "command": "python -c \"import json; d=json.load(open('results/interop/vc.json',encoding='u"
+            "tf-8')); assert {'@context','type','credentialSubject'} <= set(d)\"",
         "expect": "断言通过（凭证必备键在位）",
-        "why": "VC 2.0 以规范文本 + JSON-LD 上下文发布，无官方 JSON Schema；本面判据为必备键形状 + 上下文可取。",
+        "why": "VC 2.0 以规范文本 + JSON-LD 上下文发布，无官方 JSON Schema；本面判据为必备键形状 + "
+            "上下文可取。",
         "probe": "pyld",
     },
     {
@@ -119,9 +124,11 @@ FACES: List[Dict[str, Any]] = [
         "artifact": "results/interop/prov.json", "kind": "shape-only",
         "peer": "PROV 工具链 / JSON-LD 处理器",
         "install": "pip install pyld",
-        "command": "python -c \"import json; d=json.load(open('results/interop/prov.json',encoding='utf-8')); assert d\"",
+        "command": "python -c \"import json; d=json.load(open('results/interop/prov.json',encoding="
+            "'utf-8')); assert d\"",
         "expect": "断言通过；JSON-LD 上下文可解析",
-        "why": "PROV-O 以本体 + 规范文本发布（官方 prov.jsonld 本轮实测 300/不可取），本面判据为形状 + 上下文解析。",
+        "why": "PROV-O 以本体 + 规范文本发布（官方 prov.jsonld 本轮实测 300/不可取），本面判据为形"
+            "状 + 上下文解析。",
         "probe": "pyld",
     },
     {
@@ -131,7 +138,8 @@ FACES: List[Dict[str, Any]] = [
         "install": "对端自装",
         "command": "（本仓不提供 A2A 端点，无法对端消费）",
         "expect": "—",
-        "why": "本仓只导出 Agent Card 形状、不运行 A2A 端点，故无法做对端消费；改由官方 .proto/文本核对形状（不判本面通过）。",
+        "why": "本仓只导出 Agent Card 形状、不运行 A2A 端点，故无法做对端消费；改由官方 .proto/文本"
+            "核对形状（不判本面通过）。",
         "probe": "",
     },
     {
@@ -141,7 +149,8 @@ FACES: List[Dict[str, Any]] = [
         "install": "对端自装",
         "command": "（本仓不做 CBOR/JUMBF 容器封装）",
         "expect": "—",
-        "why": "C2PA 以容器封装为真值载体；本仓只做清单形状，不做容器，故他证不适用（保留为形状面）。",
+        "why": "C2PA 以容器封装为真值载体；本仓只做清单形状，不做容器，故他证不适用（保留为形状面）"
+            "。",
         "probe": "",
     },
     {
@@ -149,7 +158,8 @@ FACES: List[Dict[str, Any]] = [
         "artifact": "results/interop/cid.json", "kind": "official-cli",
         "peer": "multiformats 参照实现 / 已知向量复算",
         "install": "无需安装（sha256 + base32 复算）",
-        "command": "python scripts/interop_thirdparty_kit.py --dry-run   # 内含 CID 已知向量复算（sha256(\"\")）",
+        "command": "python scripts/interop_thirdparty_kit.py --dry-run   # 内含 CID 已知向量复算（s"
+            "ha256(\"\")）",
         "expect": "复算出的 CIDv1 与 results/interop/cid.json 记录一致",
         "why": "", "probe": "",
     },
@@ -160,7 +170,8 @@ FACES: List[Dict[str, Any]] = [
         "install": "—",
         "command": "—",
         "expect": "—",
-        "why": "决策面是 NF 自有形状，无外部对端与外部 schema；判据落在 check33（覆盖一致 / 内部边界声明 / 确定性），不属他证范围。",
+        "why": "决策面是 NF 自有形状，无外部对端与外部 schema；判据落在 check33（覆盖一致 / 内部边"
+            "界声明 / 确定性），不属他证范围。",
         "probe": "",
     },
 ]
@@ -181,12 +192,12 @@ def _kcid_recompute(base: str) -> Tuple[bool, str]:
     path = os.path.join(base, "results/interop/cid.json")
     try:
         with open(path, encoding="utf-8") as fh:
-            doc = json.load(fh)
+            doc = json_doc.loads(fh.read(), dict, what=path)
     except Exception as e:  # noqa: BLE001
         return False, "cid.json 不可读：%s" % e
     try:
         with open(os.path.join(base, "protocol/RECEIPTS.json"), encoding="utf-8") as fh:
-            rec = json.load(fh)
+            rec = json_doc.loads(fh.read(), dict, what="protocol/RECEIPTS.json")
     except Exception as e:  # noqa: BLE001
         return False, "protocol/RECEIPTS.json 不可读：%s（跑 `nf receipts --write` 重签）" % e
     digests = {str(e.get("path")): str(e.get("digest")) for e in (rec.get("entries") or [])}
@@ -231,7 +242,9 @@ def dry_run(base: str = "") -> Tuple[List[str], List[Dict[str, Any]]]:
                 issues.append("cid 已知向量复算不一致：%s" % detail)
             continue
         if not probe:
-            rows.append({"id": f["id"], "state": "需对端", "detail": "需第三方客户端/对端环境（本机不可自证）"})
+            rows.append({"id": f["id"],
+ "state": "需对端",
+ "detail": "需第三方客户端/对端环境（本机不可自证）"})
             continue
         if probe.startswith("core."):
             avail = importlib.util.find_spec("core") is not None and \
@@ -248,7 +261,7 @@ def dry_run(base: str = "") -> Tuple[List[str], List[Dict[str, Any]]]:
             else:
                 try:
                     with open(p, encoding="utf-8") as fh:
-                        json.load(fh)
+                        json_doc.loads(fh.read(), dict, what=p)
                 except Exception as e:  # noqa: BLE001
                     issues.append("%s 的产物不可解析：%s" % (f["id"], e))
     return issues, rows
@@ -265,7 +278,8 @@ def _card(f: Dict[str, Any]) -> str:
         lines.append("- 相关产物：`%s`" % f["artifact"])
     if f["why"]:
         lines.append("- 为何如此判定：%s" % f["why"])
-    lines.append("- 回填：请在 `%s` 对应行填入 tool_version / run_by / run_at / output_sha256 / verdict。" % STATUS_REL)
+    lines.append("- 回填：请在 `%s` 对应行填入 tool_version / run_by / run_at / output_sha256 / ver"
+        "dict。" % STATUS_REL)
     lines.append("")
     return "\n".join(lines)
 
@@ -282,11 +296,14 @@ def render_doc() -> str:
            "> 定位：这些卡片是给**第三方**跑的，不冒充「本仓已他证」。回填表：`%s`。" % STATUS_REL,
            "",
            "## 两种证据，别混（分层）", "",
-           "- **上游判据校验（已有）**：`scripts/check_interop_schemas.py --fetch` 用上游官方 meta-schema 校导出面 → `results/interop-schema-validation.md`。",
-           "- **他证（本页）**：对端消费或官方验证器由第三方在其环境跑，结果回填状态表。未回填 = 未他证。",
+           "- **上游判据校验（已有）**：`scripts/check_interop_schemas.py --fetch` 用上游官方 meta-"
+               "schema 校导出面 → `results/interop-schema-validation.md`。",
+           "- **他证（本页）**：对端消费或官方验证器由第三方在其环境跑，结果回填状态表。未回填 = 未"
+               "他证。",
            "",
            "## 回填纪律", "",
-           "1. 六字段齐备才算一条他证：`tool_version` · `run_by` · `run_at` · `output_sha256` · `verdict` · `note`。",
+           "1. 六字段齐备才算一条他证：`tool_version` · `run_by` · `run_at` · `output_sha256` · `ve"
+               "rdict` · `note`。",
            "2. `output_sha256` 必须是被跑对象或输出的 sha256（不可用「看起来通过」代替）。",
            "3. 标 `not-applicable` 的面**不计入他证通过数**，只说明为何不适用。",
            "",
@@ -302,10 +319,12 @@ def emit(base: str = "") -> List[str]:
         fh.write(render_doc())
 
     rows = ["# 互操作性 · 他证回填状态表", "",
-            "> 由 `python scripts/interop_thirdparty_kit.py --emit` 生成骨架；由第三方回填右侧字段。",
+            "> 由 `python scripts/interop_thirdparty_kit.py --emit` 生成骨架；由第三方回填右侧字段"
+                "。",
             "> 初始 `verdict` = `%s`（表示通道就绪、**未被任何第三方跑过**）。" % UNFILLED,
             "",
-            "| face | kind | 对端工具 | 安装 | 命令原文 | tool_version | run_by | run_at | output_sha256 | verdict | note |",
+            "| face | kind | 对端工具 | 安装 | 命令原文 | tool_version | run_by | run_at | output_s"
+                "ha256 | verdict | note |",
             "|---|---|---|---|---|---|---|---|---|---|---|"]
     for f in FACES:
         note = f["why"] if f["kind"] == "not-applicable" else ""
@@ -378,7 +397,7 @@ def record(base: str, evidence_path: str) -> Tuple[List[str], int]:
                 "note 选填）；先跑 `--dry-run` 看本机探测到的面）" % evidence_path], 0
     try:
         with open(evidence_path, encoding="utf-8") as fh:
-            rows = [json.loads(l) for l in fh if l.strip()]
+            rows = [json_doc.loads(l, dict, what="证据行") for l in fh if l.strip()]
     except ValueError as exc:
         return ["证据件不是合法 JSONL：%s（修复指引：每行一个 JSON 对象，见 `--dry-run` "
                 "输出的面 id）" % exc], 0

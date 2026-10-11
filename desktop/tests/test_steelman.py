@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """钢人论证模块单测（v2.6-A：nf design steelman——可选决策辅助）。
 
 运行：cd desktop && python -m unittest tests.test_steelman -v

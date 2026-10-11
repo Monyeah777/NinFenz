@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """组合运行时调度单测（v2.0.x-E3：resolve_combination references 运行时消费）。
 
 运行：cd desktop && python -m unittest tests.test_composer -v

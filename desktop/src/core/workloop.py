@@ -25,6 +25,7 @@ import json
 import os
 from typing import Any, Dict, List, Optional, Tuple
 
+from core import attest, json_doc
 from core import decision_layer as dl
 
 #: 待办真源（公开声明件 → 工作项）。顺序即稳定排序键（确定性优先于「看起来聪明」）
@@ -43,8 +44,7 @@ def _read(root: str, rel: str) -> Dict[str, Any]:
     p = os.path.join(root, rel)
     if not os.path.isfile(p):
         return {}
-    with open(p, encoding="utf-8") as fh:
-        return json.load(fh)
+    return json_doc.load(p, dict, what=rel)
 
 
 def state(root: str = ".") -> Dict[str, Any]:
@@ -174,7 +174,8 @@ def capability_gaps(root: str = ".") -> List[Dict[str, Any]]:
             "detail": "现状：decision_layer.json 与 workloop 工单都在仓内，互操作导出面"
                       "（%d 面）尚无「决策面」投影；外部工具链读不到「谁按什么概率决定了什么」"
                       % len(interop_decl),
-            "where_hint": "core/interop_export.py 新增 kind（纯派生自 decision_layer.json + 公开裁决索引）",
+            "where_hint": "core/interop_export.py 新增 kind（纯派生自 decision_layer.json + 公开裁"
+                "决索引）",
             "done_when": ["新导出面纯派生（不改真源）",
                           "外部 schema 校验口径成立或如实记 no-schema",
                           "check33 入仓面逐字节一致"],
@@ -206,8 +207,8 @@ def questions(root: str = ".", top: int = 5, source: str = "") -> Dict[str, Any]
 
 
 def _order_id(chosen: str, st: Dict[str, Any]) -> str:
-    payload = json.dumps({"chosen": chosen, "state": st}, ensure_ascii=False,
-                         sort_keys=True, separators=(",", ":")).encode("utf-8")
+    # 规范化字节编码收成单一实现（审计 Z1）：与 attest.canonical 同字节，不再各写一份。
+    payload = attest.canonical({"chosen": chosen, "state": st})
     return "WO-%s" % hashlib.sha256(payload).hexdigest()[:12]
 
 
@@ -270,7 +271,7 @@ def write_order(root: str, doc: Dict[str, Any]) -> str:
     rel = "%s/%s.json" % (ORDER_DIR, doc["order_id"])
     path = os.path.join(root, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    from core import atomic_write              # 内部档案件：原子写（worker 读到半截即误判，2026-10-01）
+    from core import atomic_write  # 内部档案件：原子写（worker 读到半截即误判，2026-10-01）
     atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, indent=2,
                                              sort_keys=True) + "\n")
     return rel
@@ -304,7 +305,7 @@ def close(root: str, order_id: str, outcome: str, gate: str, note: str = "") -> 
     rel = "%s/%s.close.json" % (ORDER_DIR, order_id)
     path = os.path.join(root, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    from core import atomic_write              # 内部档案件：原子写（2026-10-01）
+    from core import atomic_write  # 内部档案件：原子写（2026-10-01）
     atomic_write.write_text(path, json.dumps(rec, ensure_ascii=False, indent=2,
                                              sort_keys=True) + "\n")
     return rel

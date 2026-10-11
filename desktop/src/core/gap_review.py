@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import decision_layer as dl
+from core import json_doc
 
 #: 模型判定阈值（仅用于排序与提示；进修复清单必须另有确定性证据）
 MODEL_THRESHOLD = 0.5
@@ -108,8 +109,12 @@ def _quality_rule_candidates(root: str) -> List[Dict[str, Any]]:
         # 缺协议件的根上本类候选**无从判定**——返回空表，由 `review()` 把缺件当 issue 报出；
         # 不许抛裸 FileNotFoundError（与 `payload_registry.scan` 同一纪律，见 F-5）。
         return out
-    dc = json.loads(Path(root, "protocol/data_contracts.json").read_text(encoding="utf-8"))
-    norm = json.loads(Path(root, "protocol/normative.json").read_text(encoding="utf-8"))
+    dc = json_doc.load(Path(root, "protocol/data_contracts.json"), dict, what="protocol/data_contra"
+        "cts.json")
+    norm = json_doc.load(Path(root,
+ "protocol/normative.json"),
+ dict,
+ what="protocol/normative.json")
     registered = {c["artifact"] for c in dc.get("contracts") or []}
     for item in norm.get("normative") or []:
         path = str(item.get("path") or "")
@@ -166,7 +171,10 @@ def evidence(root: str, row: Dict[str, Any]) -> str:
     if cls == "missing-quality-rule":
         if not _quality_rule_inputs_present(root):
             return ""
-        dc = json.loads(Path(root, "protocol/data_contracts.json").read_text(encoding="utf-8"))
+        dc = json_doc.load(Path(root,
+ "protocol/data_contracts.json"),
+ dict,
+ what="protocol/data_contracts.json")
         if row["snippet"] not in {c["artifact"] for c in dc.get("contracts") or []}:
             return ("可证：该规范件在 normative 名单却不在数据契约登记表"
                     "（无 quality_rule/owner/freshness）")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """编码卫生门禁单测（check33 新面：RFC 3629 / RFC 8259 §4 / UAX #15 / UTS #39）。
 
 每条规定一条**正例**（合规树零 issue）与**变异负例**（注入违规必须被抓）——
@@ -182,7 +181,8 @@ class SourceEscapeHygieneTest(unittest.TestCase):
                 if "invalid escape sequence" in str(w.message):
                     bad.append("%s:%s %s" % (path.relative_to(ROOT).as_posix(),
                                              getattr(w, "lineno", "?"), w.message))
-        self.assertEqual([], bad[:10], "源文件含无效转义序列（修复指引：改 raw 字符串或去掉多余反斜杠）")
+        self.assertEqual([], bad[:10], "源文件含无效转义序列（修复指引：改 raw 字符串或去掉多余反斜"
+            "杠）")
 
     def test_check_catches_a_planted_violation(self):
         with tempfile.TemporaryDirectory() as tmp:

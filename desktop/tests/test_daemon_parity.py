@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """守护快路 ⇄ 直跑 的等价门禁（默认路径可证等价 + 拒跑面闭合）。
 
 背景（2026-10-01 取证）：`scripts/nf.py` 的 `daemon` 帮助面写着「热进程与新起进程结果一致
@@ -126,11 +125,19 @@ class RefusalSetClosureTest(unittest.TestCase):
                          "客户端长驻表与守护拒跑表分叉：%s" % (names,))
 
     def test_windows_launcher_wires_the_fast_path_with_fallback(self):
-        """`scripts/nf.cmd` 必须真的调客户端、并认 111 回退（结构性——Windows 壳在 bash 门禁里跑不到）。"""
+        """`scripts/nf.cmd` 必须真的调客户端、并按**带外标记**回退。
+
+        结构性判据（Windows 壳在 bash 门禁里跑不到）。2026-10-10 审计 N9：此前按退出码 111
+        回退——而 111 可以是任何命令的真实返回码，那条命令会被执行两次。现改为「客户端回退时
+        写标记文件，启动器见标记才回退」。
+        """
         cmd = (ROOT / "scripts" / "nf.cmd").read_text(encoding="utf-8")
         self.assertIn("nf_client.py", cmd, "Windows 启动器没接快路客户端")
         self.assertIn("-S", cmd, "快路客户端必须走解释器节食（-S）")
-        self.assertIn("111", cmd, "Windows 启动器没认回退退出码 111")
+        self.assertIn("NF_FASTPATH_MARKER", cmd, "启动器没接带外回退标记（N9）")
+        self.assertIn('if exist "%NF_MARK%"', cmd, "启动器没按标记回退")
+        self.assertNotIn('"%NF_RC%"=="111"', cmd,
+                         "启动器还在拿退出码 111 当哨兵（命令真实 rc=111 会被执行两次）")
         self.assertIn("nf.py", cmd, "Windows 启动器缺直跑回退")
         # 「探测式」启动在最前面会吃掉快路的全部收益：实测 `where python` 单次 ≈98 ms
         # （cmd 裸跑 15 ms / 带 where 113 ms），而整条快路才 ≈78 ms ⇒ 不许再放探测命令在前。
@@ -280,6 +287,28 @@ class ClientFastPathTest(_DaemonFixture):
             code, out, _err = self._client(argv)
             self.assertEqual(111, code, "%s 应回退直跑" % argv)
             self.assertEqual(b"", out, "%s 回退时不得先回吐半截输出" % argv)
+
+    def test_client_writes_out_of_band_marker_on_fallback(self):
+        """N9：回退必须写带外标记（退出码 111 本身不能当哨兵）。"""
+        home = tempfile.mkdtemp(prefix="nf_client_mark_")
+        self.addCleanup(shutil.rmtree, home, ignore_errors=True)
+        mark = os.path.join(home, "fp.flag")
+        env = dict(os.environ, NARRATIVE_FORGE_HOME=home, NF_AUTOSTART="0",
+                   NF_FASTPATH_MARKER=mark)
+        code, _out, _err = self._client(["--version"], env=env)
+        self.assertEqual(111, code)
+        self.assertTrue(os.path.exists(mark), "回退未写带外标记（N9）")
+
+    def test_successful_command_writes_no_marker(self):
+        """有守护、命令成功时不得写标记——否则启动器会误判成回退而执行两次。"""
+        d = tempfile.mkdtemp(prefix="nf_client_nomark_")
+        self.addCleanup(shutil.rmtree, d, ignore_errors=True)
+        mark = os.path.join(d, "fp.flag")
+        env = os.environ.copy()
+        env["NF_FASTPATH_MARKER"] = mark
+        code, _out, _err = self._client(["--version"], env=env)
+        self.assertEqual(0, code, "有守护时 --version 应成功")
+        self.assertFalse(os.path.exists(mark), "成功命令不得写回退标记")
 
     def test_client_falls_back_when_no_daemon_and_autostart_off(self):
         empty = tempfile.mkdtemp(prefix="nf_client_empty_")

@@ -242,9 +242,9 @@ mod tests {
 
     #[test]
     fn fixed_table_matches_python_source() {
-        assert_eq!(FIXED.len(), 42, "固定段条数必须与 receipts.py 同步");
+        assert_eq!(FIXED.len(), 44, "固定段条数必须与 receipts.py 同步");
         assert_eq!(FIXED[0], "STRATEGY.md");
-        assert_eq!(FIXED[41], "desktop/src/core/registry.json");
+        assert_eq!(FIXED[43], "desktop/src/core/registry.json");
     }
 
     #[test]

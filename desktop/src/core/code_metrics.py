@@ -137,6 +137,10 @@ def write(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     out = Path(root) / BASELINE_REL
     # 原子写（2026-09-30）：agent 密集/并发调用下，读者（`python scripts/code_metrics.py`、check12）
     # 绝不该看到半截 JSON——同 `repo_stats` 的理由，收敛到唯一出处 `core.atomic_write`。
-    atomic_write.write_text(out, json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+    atomic_write.write_text(out,
+ json.dumps(doc,
+ ensure_ascii=False,
+ indent=2,
+ sort_keys=True) + "\n")
     issues = [rel for rel, m in cur.items() if m.get("syntax_error")]
     return issues, doc

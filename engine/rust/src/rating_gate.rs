@@ -86,6 +86,17 @@ pub fn scan(root: &Path) -> RatingScan {
         issues.push(format!("缺 {}（修复指引：投稿闸门声明件须在场）", INTAKE_REL));
     }
 
+    // Z3：把「声明在场」与「真被定级」拆成两个数（真源 scan 的口径）。
+    // 未定级记号来自声明 rating.undecided，缺省 unrated。
+    let tok = crate::library::intake_doc(root)
+        .and_then(|d| {
+            get(&d, "rating")
+                .and_then(|r| get(r, "undecided"))
+                .map(plain_str)
+        })
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "unrated".to_string());
+    let n_unrated = *counts.get(&tok).unwrap_or(&0);
     let stats = Json::Object(vec![
         ("entries".to_string(), Json::Int(rows.len() as i64)),
         (
@@ -101,6 +112,12 @@ pub fn scan(root: &Path) -> RatingScan {
                     .collect(),
             ),
         ),
+        (
+            "decided".to_string(),
+            Json::Int(rows.len() as i64 - n_unrated),
+        ),
+        ("unrated".to_string(), Json::Int(n_unrated)),
+        ("undecided_token".to_string(), Json::Str(tok)),
         ("issues".to_string(), Json::Int(issues.len() as i64)),
     ]);
     RatingScan { issues, stats }
@@ -192,6 +209,13 @@ mod tests {
                             .map(|(k, v)| ((*k).to_string(), crate::pyjson::Json::Int(*v)))
                             .collect(),
                     ),
+                ),
+                // Z3 追加口径（真源 scan 的 stats 同形）：3 件里 0 件只声明 unrated ⇒ decided=3。
+                ("decided".to_string(), crate::pyjson::Json::Int(3)),
+                ("unrated".to_string(), crate::pyjson::Json::Int(0)),
+                (
+                    "undecided_token".to_string(),
+                    crate::pyjson::Json::Str("unrated".to_string()),
                 ),
                 (
                     "issues".to_string(),

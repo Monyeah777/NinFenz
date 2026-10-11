@@ -115,7 +115,8 @@ def render_index(root: str = ".") -> str:
             fm.get("id", e["dir"]), fm.get("name", ""),
             fm.get("status", ""), "、".join(_as_list(fm.get("scope"))[:2]),
             len(_as_list(fm.get("rules")))))
-    out += ["", "> 真源 = 各包 `PATTERN.md` 的 frontmatter；本表为投影（`nf patterns reindex` 重建）。",
+    out += ["", "> 真源 = 各包 `PATTERN.md` 的 frontmatter；本表为投影（`nf patterns reindex` 重建"
+        "）。",
             "", END]
     return "\n".join(out)
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """互操作导出面的**外部权威校验**（非门禁 · 可选联网 · 只读）。
 
 定位（与 `check_external_links.py` 同纪律）：NF 的门禁必须静态可复现，因此「派生面是否
@@ -29,7 +28,10 @@ from pathlib import Path
 from typing import Dict, Sequence, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))  # core.*（原子写单源）
-from core import atomic_write
+from core import (
+    atomic_write,
+    json_doc,  # 承重件在 desktop/src，脚本须能独立运行
+)
 
 #: 派生面 → (主 URL, GitHub 兜底 (owner/repo, path, ref))；raw 取不到时走 contents API
 SCHEMAS: Dict[str, tuple] = {
@@ -152,8 +154,8 @@ def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str,
         row["detail"] = "schema 取不到（网络/地址问题，非派生面问题）"
         return row
     try:
-        schema = json.loads(blob)
-    except json.JSONDecodeError:
+        schema = json_doc.loads(blob, dict, what="官方 schema")
+    except ValueError:
         row["status"] = "unavailable"
         row["detail"] = "schema 非 JSON（可能取到 HTML 页）"
         return row
@@ -222,7 +224,7 @@ def check_st_ccv3(root: str) -> Dict[str, object]:
         row.update({"status": "unavailable",
                     "detail": "源码里未找到 spec/spec_version 赋值（上游已改写法，须人工复核）"})
         return row
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc = json_doc.load(path, dict, what=str(path))
     problems = []
     if doc.get("spec") != want_spec.group(1):
         problems.append("spec %r ≠ 上游 %r" % (doc.get("spec"), want_spec.group(1)))
@@ -267,9 +269,9 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
                                else "官方 schema 取不到（网络/地址问题）")})
         return row
     try:
-        schema = json.loads(blob)
+        schema = json_doc.loads(blob, dict, what="官方 schema")
         defs = schema.get("$defs") or {}
-    except json.JSONDecodeError:
+    except ValueError:
         row.update({"status": "unavailable", "detail": "schema 非 JSON"})
         return row
     sys.path.insert(0, str(Path(root) / "desktop" / "src"))
@@ -340,10 +342,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             listing.setdefault(kind, (NOSCHEMA[kind], None))
         for kind, spec in listing.items():
             print("  %-9s ← %s" % (kind, spec[0]))
-        print("  加 --fetch 才联网校验；jsonschema 可用：%s" % ("是" if validator else "否（跳过校验）"))
+        print("  加 --fetch 才联网校验；jsonschema 可用：%s" % ("是" if validator else "否（跳过校"
+            "验）"))
         return 0
 
-    docs = {k: json.loads(ie.render(k, args.root)) for k in ie.KINDS}
+    docs = {k: json_doc.loads(ie.render(k, args.root), dict, what=k) for k in ie.KINDS}
     # 逐面校验：SCHEMAS 表 + 官方无 schema 的面（no-schema 也要出现在报告里）
     all_specs = dict(SCHEMAS)
     for kind in NOSCHEMA:
@@ -372,7 +375,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                          % (r["kind"], r["schema"], r.get("schema_http"), r["status"],
                             str(r["detail"]).replace("|", "/")))
         lines += ["", "> 口径：`unavailable` = schema 取不到（网络/地址问题，不判派生面不合格）；",
-                  "> `skipped` = 本机缺 validator；`fail` = 官方 schema 判定派生面不合规（须修派生面）。", ""]
+                  "> `skipped` = 本机缺 validator；`fail` = 官方 schema 判定派生面不合规（须修派生"
+                      "面）。",
+ ""]
         atomic_write.write_text(out, "\n".join(lines))
         print("  报告已写入：%s" % args.write)
     return 1 if failed else 0

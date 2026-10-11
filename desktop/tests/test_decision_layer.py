@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """决策层端口单测（typed-decision：三原语 / schema / 确定性 / fail-closed / 拉取脚手架）。"""
 import importlib.util
 import io
@@ -44,7 +43,7 @@ class DecisionLayerTest(unittest.TestCase):
         cands = dl.load_decl(str(ROOT))["candidates"]
         for c in cands:
             self.assertTrue(c["source"].startswith("hf:"), c)
-            self.assertEqual(c["license"], "apache-2.0", c)
+            self.assertEqual(c["license"], "Apache-2.0", c)
             self.assertTrue(len(c["evidence"]) > 40, "实证要点须具体")
             self.assertIsInstance(c["pulled"], bool, "pulled 状态不许含糊")
             if c["pulled"]:
@@ -156,7 +155,7 @@ class PullToolTest(unittest.TestCase):
         out = buf.getvalue()
         for cid in ("laya-typed-decisions", "laya-multilingual", "open-jev-9b"):
             self.assertIn(cid, out)
-        self.assertIn("apache-2.0", out)
+        self.assertIn("Apache-2.0", out)
 
     def test_dry_run_prints_commands_without_downloading(self):
         buf = io.StringIO()

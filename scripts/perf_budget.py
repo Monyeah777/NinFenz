@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """性能预算（CLI）：声明 → 实测 N 次 → 落证据 → 判新鲜度与预算。
 
 用法：
@@ -22,6 +21,34 @@ sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import perf_budget as pb  # noqa: E402
 
 
+def _rec_line(r) -> str:
+    """一条证据的展示口径（唯一处）：中位 / P95 / σ / min-max——方差字段缺失（旧记录）如实留空。"""
+    if not r:
+        return "（无实测记录）"
+    tail = ""
+    if r.get("p95_ms") is not None:
+        tail += " · P95 %6.0f" % float(r.get("p95_ms") or 0)
+    if r.get("stdev_ms") is not None:
+        tail += " · σ %5.1f" % float(r.get("stdev_ms") or 0)
+    return ("实测中位 %6.0f%s ms（%s · min %.0f / max %.0f）"
+            % (float(r.get("median_ms") or 0), tail, r.get("measured_at"),
+               float(r.get("min_ms") or 0), float(r.get("max_ms") or 0)))
+
+
+def _resolve_shell() -> str:
+    """POSIX shell 落点：复用 `core.posix_shell` 的解析顺序（**唯一真相**），但不代它退出。
+
+    修 2026-10-10 审计 P3 W6：此处此前写死 `C:/comfyui/Git/bin/bash.exe`——那是**某一台机器**
+    的安装位，换机即失效，且把作者机路径带进了仓库。解析不到返回空串（不 `sys.exit`：性能
+    记录应继续，缺 shell 的那条如实记 exit=1，而不是把整次 `--record` 打掉）。
+    """
+    from core import posix_shell as ps
+    try:
+        return ps.posix_shell()
+    except SystemExit:
+        return ""
+
+
 def _runner(cmd: str, runs: int):
     """真跑 N 次 → (last_exit_code, [ms,...])；argv 列表执行（无 shell）。"""
     argv = shlex.split(cmd)
@@ -29,12 +56,10 @@ def _runner(cmd: str, runs: int):
         return 1, []
     if argv[0] in ("python", "python3"):
         argv[0] = sys.executable
-    elif shutil.which(argv[0]) is None:
-        for cand in (os.environ.get("NF_BASH", ""), r"C:\comfyui\Git\bin\bash.exe",
-                     r"C:\Program Files\Git\bin\bash.exe"):
-            if cand and os.path.isfile(cand):
-                argv[0] = cand
-                break
+    elif argv[0] in ("bash", "sh"):
+        found = shutil.which(argv[0]) or _resolve_shell()
+        if found:
+            argv[0] = found
     times, code = [], 1
     for _ in range(max(1, runs)):
         t0 = time.perf_counter()
@@ -66,11 +91,8 @@ def main(argv=None) -> int:
                                                       doc.get("reference_host", "?")))
         for e in doc["entries"]:
             r = ev.get(e["id"]) or {}
-            print("  %-14s 预算 %6.0f ms · %s"
-                  % (e["id"], float(e.get("budget_ms") or 0),
-                     ("实测中位 %6.0f ms（%s · min %.0f / max %.0f）"
-                      % (r.get("median_ms", 0), r.get("measured_at"), r.get("min_ms", 0),
-                         r.get("max_ms", 0))) if r else "（无实测记录）"))
+            print("  %-16s 预算 %7.0f ms · %s"
+                  % (e["id"], float(e.get("budget_ms") or 0), _rec_line(r)))
         return 0 if not issues else 1
 
     if args.record:
@@ -78,8 +100,9 @@ def main(argv=None) -> int:
         print("== 性能预算实测（only=%s） ==" % args.only)
         for eid, r in sorted((doc.get("evidence") or {}).items()):
             flag = "✗ 超预算" if eid in bad else "✓"
-            print("  %s %-14s 中位 %7.0f ms · 预算 %7.0f ms · exit=%s"
-                  % (flag, eid, r.get("median_ms", 0), float(r.get("budget_ms") or 0),
+            print("  %s %-16s 中位 %7.0f · P95 %7.0f · σ %6.1f ms · 预算 %7.0f ms · exit=%s"
+                  % (flag, eid, float(r.get("median_ms") or 0), float(r.get("p95_ms") or 0),
+                     float(r.get("stdev_ms") or 0), float(r.get("budget_ms") or 0),
                      r.get("exit_code")))
         if bad:
             print("  ✗ 超预算：%s（修复指引：定位退化点或评审后调整预算）" % "、".join(bad),

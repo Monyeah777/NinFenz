@@ -344,7 +344,8 @@ def verify_digest_anchor(subject_digest: str, anchor: Dict[str, Any],
         return ok, issues, "ssh-sig"
     if scheme == SCHEME_SIGSTORE:
         return False, ["sigstore 锚需外部验证器，当前不可校验"
-                       "（修复指引：装 cosign 后重验，或改用 hmac / ssh-sig 锚）"], "sigstore-keyless"
+                       "（修复指引：装 cosign 后重验，或改用 hmac / ssh-sig 锚）"
+                           ""], "sigstore-keyless"
     return False, ["未知锚方案：%s（支持：%s / %s / %s）"
                    % (scheme, SCHEME_HMAC, SCHEME_SSH, SCHEME_SIGSTORE)], "unsupported"
 

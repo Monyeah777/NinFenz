@@ -25,6 +25,8 @@
         "scripts/perf_budget.py::B603": 1,
         "scripts/sast_check.py::B404": 1,
         "scripts/sast_check.py::B603": 1,
+        "scripts/style_check.py::B404": 1,
+        "scripts/style_check.py::B603": 1,
         "scripts/verify_run.py::B404": 1
       },
       "meta": {
@@ -32,17 +34,17 @@
           "severities": [
             [
               "LOW",
-              29
+              31
             ],
             [
               "MEDIUM",
               3
             ]
           ],
-          "total": 32
+          "total": 34
         },
         "ruff": {
-          "total": 74
+          "total": 75
         }
       },
       "ruff": {
@@ -84,6 +86,7 @@
         "scripts/perf_budget.py::S603": 1,
         "scripts/pull_decision_model.py::S603": 1,
         "scripts/sast_check.py::S603": 1,
+        "scripts/style_check.py::S603": 1,
         "scripts/verify_run.py::S603": 1
       }
     },
@@ -112,6 +115,8 @@
         "scripts/perf_budget.py::B603": 1,
         "scripts/sast_check.py::B404": 1,
         "scripts/sast_check.py::B603": 1,
+        "scripts/style_check.py::B404": 1,
+        "scripts/style_check.py::B603": 1,
         "scripts/verify_run.py::B404": 1
       },
       "meta": {
@@ -126,10 +131,10 @@
               3
             ]
           ],
-          "total": 33
+          "total": 35
         },
         "ruff": {
-          "total": 75
+          "total": 76
         }
       },
       "ruff": {
@@ -172,6 +177,7 @@
         "scripts/perf_budget.py::S603": 1,
         "scripts/pull_decision_model.py::S603": 1,
         "scripts/sast_check.py::S603": 1,
+        "scripts/style_check.py::S603": 1,
         "scripts/verify_run.py::S603": 1
       }
     }

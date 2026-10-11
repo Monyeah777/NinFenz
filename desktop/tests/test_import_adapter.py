@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """读入适配器单测（v2.3.0 34 方案：A4 双向读入——parse_skill / parse_ccv3）。
 
 对称面：export(ir, 'skill'|'ccv3')（exporter._REGISTRY，全 export-only）→
@@ -7,10 +6,12 @@ import_adapter 的 parse_skill / parse_ccv3 反向闭环。五组用例：
 1. NF 结构层 round-trip 逐字节：自举 SKILL.md（fixtures/external/技术文档装配战例
    /SKILL.md，428B）→ parse_skill(mode='nf') → export(ir, 'skill')
    → 输出 == 原文（逐字节，含 frontmatter/空行/末尾无换行）。
-2. 外部宽容层：anthropic-official 官方 docx / skill-creator 两份 SKILL.md
-   parse 不抛错、mode='external'、frontmatter name/description 正确提取
+2. 外部宽容层：external/anthropic-official 目录下两份 **NF 自写夹具**（形态对齐自由散文
+   式 SKILL.md）parse 不抛错、mode='external'、frontmatter name/description 正确提取
    （docx description 为双引号包裹单行，剥外层引号保留内部裸单引号与冒号）、
    docx license 扩展字段透传、body 原样保留（由消费方判定升 IR）。
+   注：夹具内容为 NF 自写（2026-10-10 审计 X1：原第三方件自述 Proprietary，已替换）；
+   目录名是协议证据指针（protocol/export_conformance.json）里的稳定路径，故未改名。
 3. 失败路径：空文本 / 无 frontmatter / frontmatter 未闭合 / 缺 name /
    缺 description / 空正文 → ValueError；parse_ccv3：chara 非 dict /
    spec 不符 / 缺 spec_version / world 非 dict → ValueError。
@@ -98,7 +99,7 @@ class TestParseSkillRoundTrip(unittest.TestCase):
 
 # ------------------------------------------------------ 外部宽容层（官方兼容）
 class TestParseSkillExternalTolerant(unittest.TestCase):
-    """anthropic-official 两份官方技能：不崩、不静默丢、引号/扩展字段正确。"""
+    """两份外部形态夹具（NF 自写）：不崩、不静默丢、引号/扩展字段正确。"""
 
     def setUp(self):
         self.dest = Path(tempfile.mkdtemp(prefix="nf_import_ext_"))
@@ -118,7 +119,8 @@ class TestParseSkillExternalTolerant(unittest.TestCase):
         self.assertFalse(desc.startswith('"'))
         # 扩展字段透传（license 紧随 description）
         self.assertEqual(res.frontmatter["license"],
-                         "Proprietary. LICENSE.txt has complete terms")
+                         "NF-Test-Fixture-1.0 (self-authored for parser tolerance tests;"
+                         " not third-party content)")
         # body 原样保留（含首行 # DOCX ...）
         self.assertIn("# DOCX creation, editing, and analysis", res.body)
         _, body0 = parse_frontmatter(text)

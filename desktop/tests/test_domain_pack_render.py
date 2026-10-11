@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """域包工厂**渲染面**在无内部档案时的回归（合成规格，不依赖 `.rivet` 私档）。
 
 为什么需要：规格真源在私档 `.rivet/private_archive/ai_packs/specs`（不入库），于是

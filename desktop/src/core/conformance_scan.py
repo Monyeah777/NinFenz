@@ -16,14 +16,13 @@ import copy
 import contextlib
 import functools
 import hashlib
-import json
 import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from core import lazy_yaml as _lyaml          # PyYAML **惰性**入口（`import yaml` ≈ 40 ms，见其 docstring）
-from core import atomic_write
+from core import atomic_write, json_doc
 
 # 导入闭包指纹：由调用方算（持久层不再反向依赖解析层，见 2026-09-29 拆环）
 from core import import_graph as _ig
@@ -38,7 +37,8 @@ def __getattr__(name):                        # PEP 562：旧名字照旧可用�
 FENCE = re.compile(r"(?ms)```yaml\s*(.*?)```")
 _T = chr(96) * 3
 #: 围栏 YAML 解析缓存：键 = (marker, **文本本身**)，值 = 解析结果或 None（见 `_fence_yaml`）。
-#: **负结果（勿重复尝试）**：与 `_BODY_CACHE` 一样**不落盘**——575 块「纯解析」139 ms vs 读回 108 ms。
+# : **负结果（勿重复尝试）**：与 `_BODY_CACHE` 一样**不落盘**——575 块「纯解析」139 ms vs 读回 108 ms
+# 。
 _FENCE_CACHE: Dict[Tuple[str, str], Any] = {}
 _FENCE_CACHE_MAX = 4096
 #: 围栏**正文**缓存（键 = 正文本身）：给「自己抽正文」的调用方用（与 `_fence_yaml` 互补）。
@@ -52,7 +52,8 @@ _READ_MEMO: Optional[Dict[str, Any]] = None
 _DIR_MEMO: Optional[Dict[Any, Any]] = None       # 键为 ("entries", path) 元组（与 _PAT_MEMO 串行会话隔离）
 #: 与读缓存同生命周期的**逐件内容摘要**缓存（键＝文件）：输入面高度重叠，一次调用里每件只算一次。
 _DIGEST_MEMO: Optional[Dict[str, bytes]] = None
-#: 同生命周期的「按模式枚举」缓存：一次调用内同一 (root, pattern) 只走一遍文件系统（实测 44% 白走）。
+# : 同生命周期的「按模式枚举」缓存：一次调用内同一 (root, pattern) 只走一遍文件系统（实测 44% 白走）
+# 。
 _PAT_MEMO: Optional[Dict[Tuple[str, str], Tuple[str, ...]]] = None
 #: 同生命周期的「子树文件清单」缓存：键即目录 ⇒ 目录没变清单就一样。
 _TREE_MEMO: Optional[Dict[str, Tuple[str, ...]]] = None
@@ -617,7 +618,14 @@ def _raw_bytes(path, key: str) -> bytes:
 
 
 def _decode_text(raw: bytes) -> str:
-    """原始字节 → 文本：与 `Path.read_text(encoding="utf-8")` 同语义（含**通用换行**翻译）。"""
+    """原始字节 → 文本：与 `Path.read_text(encoding="utf-8")` 同语义（含**通用换行**翻译）。
+
+    **这里刻意不用 `utf-8-sig`**（2026-10-10 审计 N4 修正）：本层文本会进**内容摘要**与常驻
+    原始层，剥 BOM 会改变带 BOM 件（如 `bom.md`）的摘要值——BOM 边界已由
+    `test_conformance_scan` 的 `DigestPayloadEquivalenceTest` / `ResidentRawEquivalenceTest`
+    钉住。BOM 容错属于**解析入口**（见 `trace_drill` / `knowledge` / `telemetry_semconv` /
+    `registry_loader` 的定向处理），不在这里一刀切。
+    """
     import io as _io
     with _io.TextIOWrapper(_io.BytesIO(raw), encoding="utf-8", newline=None) as wrapper:
         return wrapper.read()
@@ -761,7 +769,8 @@ def load_yaml_cached(body: str) -> Any:
 
 def _read_json(path: str) -> Tuple[Any, str]:
     try:
-        return json.loads(read_text_cached(path)), ""
+        # N11/Z1：收敛到单一实现（顶层形状由调用方声明；此处通用读口不限定形状）。
+        return json_doc.loads(read_text_cached(path), None, what=str(path)), ""
     except Exception as exc:
         return None, str(exc)
 
@@ -886,7 +895,11 @@ def _gate_calls(verify_txt: str) -> set:
     return set(re.findall(r"\bcheck(\d+)\b", run))
 
 
-def export_manifest_issues(root: str, verify_txt: str, manifest: Dict[str, Any]) -> Tuple[List[str], int]:
+def export_manifest_issues(root: str,
+ verify_txt: str,
+ manifest: Dict[str,
+ Any]) -> Tuple[List[str],
+ int]:
     """导出契约面 manifest 判据（check29 面）→ (issues, 项数)。
 
     门禁判据（2026-10-07 强化，原差距：只判 `gate in verify_txt`）：**名子串 ⇒ 真定义 +
@@ -941,7 +954,9 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
     if hit is None:
         from core import disk_cache
         dkey = disk_cache.key("scan", fp, root=root,
-                              code_scope=_ig.code_scope_fingerprint(root, ("core.conformance_scan",)))
+                              code_scope=_ig.code_scope_fingerprint(root,
+ ("core.conformance_scan",
+)))
         cached = disk_cache.load("scan", dkey, validate=result_pair_ok)
         if cached is None:
             got = _scan_impl(root)
@@ -1081,7 +1096,8 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
         provable = 2 if isinstance(pid, str) and pid in reg_ids else 1
         order = {"L1": 1, "L2": 2, "L3": 3}
         if order[declared] > provable:
-            issues.append(f"{rel}: conformance 虚标 {declared} > 可证 L{provable}（包不在 registry protocols[]）")
+            issues.append(f"{rel}: conformance 虚标 {declared} > 可证 L{provable}（包不在 registry p"
+                f"rotocols[]）")
 
     # 导出契约面 manifest（L3 = 导出契约门禁锁定面）
     manifest_path = os.path.join(root, "protocol", "export_conformance.json")

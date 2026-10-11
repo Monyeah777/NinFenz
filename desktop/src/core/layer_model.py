@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """抽象阶梯（protocol/LAYERS.json）—— 真源唯一 + 生成投影 + 语义判据。
 
 **这是什么**：NF 的分层此前只有四套互不相干的「层」词汇（L0-L3 依赖治理编号 / P00-P80
@@ -23,11 +22,11 @@ from __future__ import annotations
 
 import ast
 import hashlib
-import json
 import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 from core import conformance_scan as csc
 from core import face_key as _fk
 from core import atomic_write
@@ -118,8 +117,8 @@ def load(root: str = ".") -> Dict[str, Any]:
         raise ValueError("缺阶梯真源 %s（修复指引：先落该件再跑 nf layers --verify）"
                          % DECL_REL)
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
+        doc = json_doc.load(path, dict, what=DECL_REL)
+    except ValueError as exc:
         raise ValueError("阶梯真源 %s 不是合法 JSON：%s（修复指引：修 JSON 语法后重跑）"
                          % (DECL_REL, exc)) from exc
     if str(doc.get("schema") or "") != SCHEMA:
@@ -400,7 +399,9 @@ def _rule_l8(root: str, doc: Dict[str, Any], tiers: list, issues: List[str]) -> 
     assertion_ids = set()
     if a_path.is_file():
         assertion_ids = {str(a.get("id")) for a in
-                         _arr(json.loads(csc.read_text_cached(a_path)).get("assertions"))}
+                         _arr(json_doc.loads(csc.read_text_cached(a_path),
+ dict,
+ what=str(a_path)).get("assertions"))}
     for owner, raw in _collect_judged_refs(doc, tiers):
         ref = str(raw)
         m = _JUDGE_CHECK.match(ref)
@@ -420,7 +421,8 @@ def _rule_l8(root: str, doc: Dict[str, Any], tiers: list, issues: List[str]) -> 
 def _rule_l9(root: str, doc: Dict[str, Any], cache: dict, issues: List[str]) -> None:
     """L9 豁免诚实：derived 条目须命中文件。"""
     for pattern in _arr(doc.get("derived")):
-        # 走**快路径**（子树索引 + 正则）：等价性由 test_expand_fast_path_matches_reference 逐 pattern
+        # 走**快路径**（子树索引 + 正则）：等价性由 test_expand_fast_path_matches_reference 逐 patte
+        # rn
         # 守着；原先是逐 pattern 的 Path.glob（本仓 6 条 derived），与别处的展开两套口径（实测）。
         if not _expand_many(root, [pattern], cache):
             issues.append("L9 derived 条目命中零文件：%s（修复指引：删掉该豁免或修正 glob）"

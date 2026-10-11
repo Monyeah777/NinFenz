@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """仓库件判据（`core.paths.walk_repo_paths` / `ignored_paths`）单测。
 
 为什么（2026-10-03 实证）：npm 一键包把受跟踪文件暂存成 `packaging/npm/payload/`（已 gitignore），

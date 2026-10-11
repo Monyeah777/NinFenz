@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """双向锚定对齐面（core/anchor_align.py）回归测试 —— 反向利用率 / 正向词汇交叉。"""
 import sys
 import tempfile

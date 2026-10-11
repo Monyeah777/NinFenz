@@ -12,10 +12,11 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 _TITLE = re.compile(r"^#\s*模块\s*([^·\s]+)\s*·\s*(.+?)\s*$", re.M)
 _CATEGORY = re.compile(r"^>\s*类别：\s*([^｜|\n]+)", re.M)
@@ -248,7 +249,8 @@ def protected_prefixes(root: str | Path) -> List[str]:
     单一真源纪律：阶梯声明才是唯一出处；读不到时退回保守清单（宁可多拦，不可放过）。
     """
     try:
-        layers = json.loads((Path(root) / "protocol" / "LAYERS.json").read_text(encoding="utf-8"))
+        layers = json_doc.load(Path(root) / "protocol" / "LAYERS.json", dict, what="protocol/LAYERS"
+            ".json")
     except (OSError, ValueError):
         return list(_FALLBACK_PROTECTED)
     out = set()
@@ -298,7 +300,9 @@ def build(root: str | Path, requirement: str, plan: Dict[str, Any],
     """组装 → (完整版 md 文本, stats)。同输入同输出（`stamp` 为空即不含日期）。"""
     root = Path(root)
     try:
-        reg = json.loads((root / "desktop/src/core/registry.json").read_text(encoding="utf-8"))
+        reg = json_doc.load(root / "desktop/src/core/registry.json",
+ dict,
+ what="desktop/src/core/registry.json")
     except (OSError, ValueError):
         reg = {}
     reg_by_id: Dict[str, Dict[str, Any]] = {}

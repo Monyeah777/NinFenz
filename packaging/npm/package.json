@@ -58,6 +58,7 @@
   "scripts": {
     "stage": "node tools/stage-payload.mjs",
     "verify": "node tools/verify-package.mjs",
+    "verify-tarball": "node tools/verify-tarball.mjs",
     "prepack": "node tools/stage-payload.mjs && node tools/verify-package.mjs",
     "test": "node --test test/smoke.test.mjs",
     "smoke": "node tools/stage-payload.mjs && node bin/nf.mjs --version && node bin/nf.mjs doctor"

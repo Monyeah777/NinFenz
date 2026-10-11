@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """`nf preset` 面回归：退役端壳的预设语义接成 CLI 后，**真跑一遍全链**。
 
 依据（2026-10-01）：`core/preset_manager.py` 此前只有自己的单测引用（`test_dead_code` 的
@@ -60,7 +59,9 @@ class PresetCliTest(unittest.TestCase):
         self.assertEqual([], json.loads(self._run("preset", "ls", "--json"))["rows"])
         self._run("preset", "import", out_file)
         self.assertEqual(["迁移用"],
-                         [r["name"] for r in json.loads(self._run("preset", "ls", "--json"))["rows"]])
+                         [r["name"] for r in json.loads(self._run("preset",
+ "ls",
+ "--json"))["rows"]])
         self._run("preset", "import", out_file, "--name", "改名后的")
         names = {r["name"] for r in json.loads(self._run("preset", "ls", "--json"))["rows"]}
         self.assertEqual({"迁移用", "改名后的"}, names)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """AGENTS/CLAUDE 出口适配器单测（v2.1.0 A1：techdoc+project_rules → AGENTS.md）。
 
 运行：cd desktop && python -m unittest tests.test_agent_rules_adapter -v

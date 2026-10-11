@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 
 SCHEMA = "nf-score/1"
 
@@ -192,8 +193,7 @@ def compare(current: Dict[str, Any], baseline: Dict[str, Any],
 
 
 def load_baseline(path: str) -> Dict[str, Any]:
-    with open(path, encoding="utf-8") as fh:
-        return json.load(fh)
+    return json_doc.load(path, dict, what=path)
 
 
 def save_baseline(path: str, evaluation: Dict[str, Any],

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """NF 守护快路客户端（**纯 stdlib**，`python -S` 可跑）——Windows 默认路径的毫秒级入口。
 
 用法（`scripts/nf.cmd` 调用；POSIX 侧由 `scripts/nf` 的 bash 内建客户端负责，两者同语义）：
@@ -27,13 +26,31 @@ from __future__ import annotations
 
 #: 热路径只 import 这三个（`python -S` 下实测：裸解释器 23 ms，+os/socket ≈ 40 ms；
 #: 而 `json` 单独就要 +16 ms -> 状态文件与请求框都按**与 `scripts/nf` 同一套**读法处理：
-#: 明文 `NFREQ` 框 + 字符串定位，不用 JSON 编解码器。`subprocess`/`time` 只在自动拉起路径里懒加载。）
+# : 明文 `NFREQ` 框 + 字符串定位，不用 JSON 编解码器。`subprocess`/`time` 只在自动拉起路径里懒加载。
+# ）
 import os
 import socket
 import sys
 
-#: 「快路不接手」的退出码：调用方（`scripts/nf.cmd` / 测试）据此回退直跑。
+#: 「快路不接手」的退出码：调用方据此回退直跑。
 FALLBACK = 111
+#: 带外「快路不接手」标记（2026-10-10 审计 N9，P2）：退出码 111 可以是任何命令的**真实**返回码，
+#: 调用方不能只看它。客户端在回退时把标记文件写到本环境变量指定的路径；`scripts/nf.cmd` 据此
+#: 回退。未设该变量时退化为旧行为（只给码）——不改可用性，只是少了那层区分。
+MARKER_ENV = "NF_FASTPATH_MARKER"
+
+
+def _mark_fallback() -> None:
+    """写下带外回退标记（尽力而为：写不进也只是退化为「只看退出码」）。"""
+    path = os.environ.get(MARKER_ENV)
+    if not path:
+        return
+    try:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("1\n")
+    except OSError:
+        # 尽力而为：标记只是「快路可用」提示，写不进不该拖死命令（缺口由回退判据报出）。
+        pass
 #: 与 `core.daemon.PROTO` 同值（协议版本）。
 PROTO = 1
 #: 长驻/自指命令：本客户端一律不接（集合与 `core.daemon.REFUSED_COMMANDS` 逐项一致，判据钉住）。
@@ -78,7 +95,10 @@ def _serve(argv) -> int:
                              "（修复指引：本客户端会回退 python 直跑，命令本身无需改动）")
     with socket.create_connection(("127.0.0.1", port), timeout=30.0) as sock:
         sock.settimeout(30.0)
-        frame = ["NFREQ %d %s" % (PROTO, token), os.getcwd(), str(len(argv))] + [str(a) for a in argv]
+        frame = ["NFREQ %d %s" % (PROTO,
+ token),
+ os.getcwd(),
+ str(len(argv))] + [str(a) for a in argv]
         sock.sendall(("\n".join(frame) + "\n").encode("utf-8"))
         fh = sock.makefile("rb")
         head = []
@@ -154,12 +174,14 @@ def _maybe_autostart() -> bool:
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and str(argv[0]) in LONG_RUNNING:
-        return FALLBACK                   # 占住前台的命令：交调用方直跑（不进守护，也不拉起守护）
+        _mark_fallback()                  # 带外标记（审计 N9）：占住前台的命令交调用方直跑
+        return FALLBACK
     try:
         return _serve(argv)
     except Exception:                     # noqa: BLE001 - 回退是设计面：任何连接层问题都不改可用性
         if argv:
             _maybe_autostart()
+        _mark_fallback()                  # 带外标记（审计 N9）
         return FALLBACK
 
 

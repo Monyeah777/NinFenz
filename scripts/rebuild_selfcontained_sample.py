@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """自包含装配样本的重嵌工具（编码漂移修复 · 幂等 · 纯标准库）。
 
 **背景**：自包含装配样本（`library/NF-TECHDOC-*.md` 等）把源文件正文**逐字内嵌**在
@@ -67,7 +66,9 @@ def _blocks(lines: list, pipeline_src: str) -> list:
             while cl > op and not lines[cl].strip():
                 cl -= 1
         else:
-            trailer = next((i for i in range(op, len(lines)) if TRAILER_RE.match(lines[i])), len(lines))
+            trailer = next((i for i in range(op,
+ len(lines)) if TRAILER_RE.match(lines[i])),
+ len(lines))
             cl = max(i for i in range(op, trailer) if lines[i].strip() == FENCE)
         if lines[cl].strip() != FENCE:
             raise SystemExit("段 %d 的收尾围栏不在预期位置（L%d）：%r" % (k + 1, cl + 1, lines[cl]))
@@ -79,7 +80,9 @@ def _blocks(lines: list, pipeline_src: str) -> list:
             if lines[op].strip() != FENCE + "markdown":
                 continue
             # 收尾围栏 = 下一节脚手架标题（§3 注册表投影）之前的最后一个围栏
-            stop = next((j for j in range(op, len(lines)) if SCAFFOLD_3_RE.match(lines[j])), len(lines))
+            stop = next((j for j in range(op,
+ len(lines)) if SCAFFOLD_3_RE.match(lines[j])),
+ len(lines))
             close_idx = max((j for j in range(op, stop) if lines[j].strip() == FENCE), default=None)
             if close_idx is None:
                 raise SystemExit("管线段收尾围栏未找到（引 L%d）" % (i + 1))
@@ -113,7 +116,8 @@ def rebuild(text_lines: list, pipeline_src: str, root: str = ".") -> tuple:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="自包含装配样本重嵌（编码漂移修复）")
     ap.add_argument("paths", nargs="+", help="产物 md 路径")
-    ap.add_argument("--pipeline", default="community/技术文档域包/pipelines/P06_技术文档题材装配流管线.md",
+    ap.add_argument("--pipeline", default="community/技术文档域包/pipelines/P06_技术文档题材装配流"
+        "管线.md",
                     help="管线声明段的源文件路径")
     ap.add_argument("--root", default=".", help="源路径解析根（缺省 = 当前目录 = 仓库根）")
     g = ap.add_mutually_exclusive_group(required=True)

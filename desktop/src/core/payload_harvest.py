@@ -24,6 +24,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 EVENT_REGISTRY = "protocol/event_registry.json"
 _FENCE = re.compile(r"```(?:yaml|yml)\n(.*?)```", re.S)
 _TYPE_WORDS = {"bool": "boolean", "boolean": "boolean", "int": "integer",
@@ -61,7 +63,9 @@ def _split_top_level(body: str) -> List[str]:
 #: 字段名尾部的**括注**（`location(M07)` = 「该字段由 M07 提供」的跨模块引用说明）不是
 #: 名字的一部分——注册表的键必须是可消费的标识符，否则收割出来的键没人能对上。
 #: 实测全仓 payload 行只有 1 处这种写法（见本波 CHANGELOG）。
-_ANNOTATION = re.compile(r"\s*[（(][^()（）]*[)）]\s*$")
+#: 行首空白前缀已删（2026-10-10 ReDoS 扫描扫出）：调用方 sub(空串).strip() 本就会 strip，
+#: 而这个前导在「全是空格的行」上让每个起点各回溯一遍 ⇒ O(n²)（64 KB 21.6 s）。
+_ANNOTATION = re.compile(r"[（(][^()（）]*[)）]\s*$")
 
 
 def _field_type(token: str) -> Tuple[str, str]:
@@ -167,7 +171,7 @@ def harvest(root: str = ".") -> Dict[str, Dict[str, str]]:
 def apply(root: str = ".", write: bool = False) -> Dict[str, Any]:
     """把收割结果并入 `event_registry.json` → 变更/冲突报告。"""
     reg_path = Path(root) / EVENT_REGISTRY
-    data = json.loads(reg_path.read_text(encoding="utf-8"))
+    data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
     events = data.setdefault("events", {})
     merged = harvest(root)
     added, narrowed, conflicts = [], [], []
@@ -201,7 +205,7 @@ def stats(root: str = ".") -> Dict[str, Any]:
     reg_path = Path(root) / EVENT_REGISTRY
     if not reg_path.is_file():
         return {}
-    data = json.loads(reg_path.read_text(encoding="utf-8"))
+    data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
     counts: Dict[str, int] = {}
     for body in (data.get("events") or {}).values():
         for spec in (body.get("fields") or {}).values():
@@ -220,7 +224,7 @@ def backlog(root: str = ".", write: bool = False) -> Dict[str, Any]:
     纪律：每个 untyped 字段必须带 note（说明为何没有类型证据）——门禁据此判「无声增长」。
     """
     reg_path = Path(root) / EVENT_REGISTRY
-    data = json.loads(reg_path.read_text(encoding="utf-8"))
+    data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
     rows, missing_note = [], []
     for ev, body in sorted((data.get("events") or {}).items()):
         for f, spec in sorted((body.get("fields") or {}).items()):
@@ -255,7 +259,7 @@ def verify_backlog(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                       "（修复指引：nf module types --backlog --write）")
     else:
         try:
-            committed = json.loads(p.read_text(encoding="utf-8"))
+            committed = json_doc.load(p, dict, what=p.name)
             if committed.get("count") != live["count"]:
                 issues.append("台账过期：记录 %s ≠ 实测 %s（修复指引：重写台账）"
                               % (committed.get("count"), live["count"]))

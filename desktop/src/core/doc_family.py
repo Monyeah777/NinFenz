@@ -19,10 +19,10 @@ core.library_entries 取（core.library 是 I 更高的转发面，反向依赖�
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
+from core import json_doc
 
 from core import atomic_write
 from core.library_entries import parse_frontmatter
@@ -37,7 +37,7 @@ _CHECK_DEF = re.compile(r"^check(\d+)\(\)\{", re.M)
 def load_decl(root: str, rel: str) -> Dict[str, Any]:
     """读协议声明件（protocol/*.json）；缺件返回 {}（是否判死由调用方决定）。"""
     p = Path(root) / rel
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=rel) if p.is_file() else {}
 
 
 def entries(root: str, glob_pattern: str) -> List[Dict[str, Any]]:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-  # nf-io: inputs=protocol/standards_catalog.json,protocol/standards_binding.json outputs=docs/standards/index.md,docs/standards/answer-cards.md,protocol/geo_export.json,docs/standards/layer-data.md,docs/standards/layer-eng.md,docs/standards/layer-form.md,docs/standards/layer-gov.md,docs/standards/layer-iface.md
+# nf-io: inputs=protocol/standards_catalog.json,protocol/standards_binding.json outputs=docs/standards/index.md,docs/standards/answer-cards.md,protocol/geo_export.json,docs/standards/layer-data.md,docs/standards/layer-eng.md,docs/standards/layer-form.md,docs/standards/layer-gov.md,docs/standards/layer-iface.md
 """标准目录 · GEO 出口生成器（check38 子扫描 3）。
 
 定位：把 `protocol/standards_catalog.json`（370 条）+ `protocol/standards_binding.json`（1200 绑定）
@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Tuple
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))   # core.*（原子写单源；2026-10-01）
 from core import atomic_write  # noqa: E402
+from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
 CATALOG_REL = "protocol/standards_catalog.json"
 BINDING_REL = "protocol/standards_binding.json"
 INDEX_REL = "docs/standards/index.md"
@@ -36,10 +37,8 @@ HEAD = ("> 本页由 `python scripts/geo_export.py --write` 生成，禁止手�
 
 
 def _load(root: str) -> Tuple[List[Dict[str, Any]], Dict[str, Any], Dict[str, Dict[str, int]]]:
-    with open(os.path.join(root, CATALOG_REL), encoding="utf-8") as fh:
-        cat = json.load(fh)
-    with open(os.path.join(root, BINDING_REL), encoding="utf-8") as fh:
-        bind = json.load(fh)
+    cat = json_doc.load(os.path.join(root, CATALOG_REL), dict, what=CATALOG_REL)
+    bind = json_doc.load(os.path.join(root, BINDING_REL), dict, what=BINDING_REL)
     counts: Dict[str, Dict[str, int]] = {}
     for pack in bind.get("packs") or []:
         for b in pack.get("bindings") or []:
@@ -66,12 +65,15 @@ def _line(s: Dict[str, Any], counts: Dict[str, Dict[str, int]]) -> str:
 
 def _head(title: str, coverage: Dict[str, Any], extra: str = "") -> List[str]:
     lines = ["# %s" % title, "", HEAD, ""]
-    lines.append("- 覆盖：标准 **%d** 条 · 本机可达 **%d** · 不可达 **%d** · 机构 **%d** · 依赖边 **%d**"
+    lines.append("- 覆盖：标准 **%d** 条 · 本机可达 **%d** · 不可达 **%d** · 机构 **%d** · 依赖边 *"
+        "*%d**"
                  % (coverage.get("standards", 0), coverage.get("reachable", 0),
                     coverage.get("unreachable", 0), coverage.get("bodies", 0),
                     coverage.get("depends_edges", 0)))
     by_layer = coverage.get("by_layer") or {}
-    lines.append("- 分层：%s" % " · ".join("%s %s" % (k, by_layer.get(k, 0)) for k in sorted(by_layer)))
+    lines.append("- 分层：%s" % " · ".join("%s %s" % (k,
+ by_layer.get(k,
+ 0)) for k in sorted(by_layer)))
     lines.append("- 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。")
     if extra:
         lines.append("- %s" % extra)
@@ -101,9 +103,12 @@ def build(root: str) -> Dict[str, str]:
     # 可引用卡（按问题形态聚合）
     cards = _head("标准目录 · 可引用卡（按问题形态）", coverage,
                   "每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。")
-    top_ext = sorted(standards, key=lambda s: (-len(s.get("ext_points") or []), str(s.get("id"))))[:20]
+    top_ext = sorted(standards,
+ key=lambda s: (-len(s.get("ext_points") or []),
+ str(s.get("id"))))[:20]
     cards += ["## 卡 1 · 哪些标准提供扩展点？", "",
-              "全 **%d** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：" % len(standards), ""]
+              "全 **%d** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：" % len(standards),
+ ""]
     cards += ["- `%s` · %s · 扩展点 %d：%s"
               % (s["id"], s.get("title") or "—", len(s.get("ext_points") or []),
                  ", ".join(s.get("ext_points") or [])[:120]) for s in top_ext]
@@ -115,8 +120,12 @@ def build(root: str) -> Dict[str, str]:
     bound_src: List[Dict[str, Any]] = [{"id": k, **v} for k, v in counts.items()]
     bound_rows = sorted(bound_src, key=lambda r: (-(r["main"] + r["support"]), r["id"]))
     cards += ["", "## 卡 3 · 哪些标准被域包绑定、绑了多少次？", "",
-              "绑定总量 **1200**（%d 条不同标准被引用；主锚=口径锚，辅锚=产出承载锚）。绑定最多的 20 条：" % len(counts), ""]
-    cards += ["- `%s` · 主锚 %d / 辅锚 %d" % (r["id"], r["main"], r["support"]) for r in bound_rows[:20]]
+              "绑定总量 **1200**（%d 条不同标准被引用；主锚=口径锚，辅锚=产出承载锚）。绑定最多的 2"
+                  "0 条：" % len(counts),
+ ""]
+    cards += ["- `%s` · 主锚 %d / 辅锚 %d" % (r["id"],
+ r["main"],
+ r["support"]) for r in bound_rows[:20]]
     unreach = [s for s in standards if not (s.get("evidence") or {}).get("reachable")]
     cards += ["", "## 卡 4 · 哪些标准本机不可达？（诚实披露）", "",
               "共 **%d** 条本机探测未达（不假装可达），逐条如下：" % len(unreach), ""]
@@ -189,7 +198,8 @@ def scan(root: str = ROOT) -> Tuple[List[str], Dict[str, Any]]:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="geo_export", description="标准目录 GEO 出口（生成物，防手改）")
+    ap = argparse.ArgumentParser(prog="geo_export",
+ description="标准目录 GEO 出口（生成物，防手改）")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
@@ -201,7 +211,8 @@ def main(argv=None) -> int:
               % (n, INDEX_REL, MACHINE_REL))
     else:
         issues, stats = check(args.root)
-        print("== GEO 出口自检 ==  标准 %(standards)d 条 · 被绑定 %(bound_standards)d 条 · 生成物 %(files)d 件"
+        print("== GEO 出口自检 ==  标准 %(standards)d 条 · 被绑定 %(bound_standards)d 条 · 生成物 %"
+            "(files)d 件"
               % stats)
     for i in issues:
         print("  [FAIL] %s" % i, file=sys.stderr)

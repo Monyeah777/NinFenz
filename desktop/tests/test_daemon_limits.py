@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """守护协议体量上限（`daemon._parse_request` / `_check_argv_size`）回归测试。
 
 动机（本轮守护面模糊测试）：请求体虽限 1 MB，但**单条 argv 无上限**——实测一条 200 KB 的
@@ -58,8 +57,9 @@ class DaemonArgvLimitTest(unittest.TestCase):
 
     def test_non_list_argv_is_left_to_later_validation(self):
         """`op=stats` 这类无 argv 的请求不受本判据影响（类型校验另有其处）。"""
-        dm._check_argv_size(None)
-        dm._check_argv_size("not-a-list")
+        # 显式断言（N12）：纯「不抛异常」不算判据。
+        self.assertIsNone(dm._check_argv_size(None))
+        self.assertIsNone(dm._check_argv_size("not-a-list"))
 
 
 if __name__ == "__main__":

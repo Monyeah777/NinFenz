@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。
 
 分层：
@@ -63,7 +62,7 @@ class ResponseCacheTest(unittest.TestCase):
             dm._CACHE_STATS[k] = 0
 
     def tearDown(self):
-        dm._WATCHER = self._old
+        dm.set_watcher(self._old)
         dm.reset_response_cache()
 
     def test_cacheable_truth_table(self):
@@ -92,7 +91,7 @@ class ResponseCacheTest(unittest.TestCase):
             self.assertFalse(dm.cacheable(argv), argv)
 
     def test_unchanged_tree_hits_cache_and_generation_bump_invalidates(self):
-        dm._WATCHER = _FakeWatcher(generation=7)
+        dm.set_watcher(_FakeWatcher(generation=7))
         first = dm.execute(["--version"], Path(ROOT))
         second = dm.execute(["--version"], Path(ROOT))
         self.assertEqual(first, second)
@@ -104,7 +103,7 @@ class ResponseCacheTest(unittest.TestCase):
 
     def test_unhealthy_watcher_never_serves_cache(self):
         """监听不可信（未启动 / 失效）→ 缓存整体停用：不命中、也不留旧条目。"""
-        dm._WATCHER = _FakeWatcher(generation=3, healthy=False)
+        dm.set_watcher(_FakeWatcher(generation=3, healthy=False))
         dm.execute(["--version"], Path(ROOT))
         dm.execute(["--version"], Path(ROOT))
         st = dm.cache_stats()
@@ -113,7 +112,7 @@ class ResponseCacheTest(unittest.TestCase):
         self.assertEqual(0, st["entries"])
 
     def test_non_allowlisted_command_is_not_cached(self):
-        dm._WATCHER = _FakeWatcher(generation=1)
+        dm.set_watcher(_FakeWatcher(generation=1))
         dm.execute(["help"], Path(ROOT))
         dm.execute(["help"], Path(ROOT))
         st = dm.cache_stats()
@@ -128,7 +127,7 @@ class ResponseCacheTest(unittest.TestCase):
         判据是确定性的、不靠计时：把假监听件的代际**按住不动**（模拟"监听还没察觉"），
         中间跑一条**非准入**命令（= 可能写），再看先前那条缓存还能不能命中。
         """
-        dm._WATCHER = _FakeWatcher(generation=1)
+        dm.set_watcher(_FakeWatcher(generation=1))
         dm.execute(["--version"], Path(ROOT))          # 真算并落缓存
         dm.execute(["--version"], Path(ROOT))          # 命中
         self.assertEqual(1, dm.cache_stats()["hits"])
@@ -139,7 +138,7 @@ class ResponseCacheTest(unittest.TestCase):
 
     def test_colour_env_is_part_of_the_key(self):
         """配色环境会改变**输出文本**，故必须进键：否则无色环境会回放带 ANSI 的旧响应。"""
-        dm._WATCHER = _FakeWatcher(generation=1)
+        dm.set_watcher(_FakeWatcher(generation=1))
         old = {k: os.environ.get(k) for k in ("NO_COLOR", "CLICOLOR_FORCE")}
         try:
             os.environ.pop("NO_COLOR", None)
@@ -163,7 +162,7 @@ class ResponseCacheTest(unittest.TestCase):
         缓存把「旧输出」当「新输出」的前提，是这些命令对同一棵树是**纯函数**——一旦某条命令
         的输出里混进时间戳 / 耗时 / 随机序，本判据当场红，逼着把它从 `CACHEABLE_COMMANDS` 删掉。
         """
-        dm._WATCHER = None                            # 关缓存：这里测的是命令自身
+        dm.set_watcher(None)                            # 关缓存：这里测的是命令自身
         for argv in (["--version"], ["layers", "--json"], ["stats", "--json"],
                      ["doctor", "--json"], ["interop", "--check"], ["toolface", "--json"],
                      ["assertions"], ["cognition", "glossary"], ["patterns", "ls"],
@@ -432,7 +431,8 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         probe = subprocess.run([BASH, "-c", 'printf %s "$1"', "p", "line1\nline2"],
                                capture_output=True)
         if probe.stdout != b"line1\nline2":
-            self.skipTest("本机 exec 边界（Git Bash 的 Win32 命令行解析）在参数抵达 NF 之前就把它拆开了"
+            self.skipTest("本机 exec 边界（Git Bash 的 Win32 命令行解析）在参数抵达 NF 之前就把它拆"
+                "开了"
                           "——「客户端输出 == 直跑输出」这一半在本平台无从判；协议契约已由 ①② 判过")
 
         argv = ["help", "line1\nline2"]

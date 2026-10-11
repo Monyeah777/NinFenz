@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """无效/变异语料 + golden 修复对（机制借鉴 Pipelex `invalid_*` 语料与 `*.golden.mthds`）。
 
 两件事：

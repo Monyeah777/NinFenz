@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """`nf shell` 会话缓存的判据：**新鲜度**（改了必须看见）+ **不留残影**（收尾必须整批作废）。
 
 会话缓存＝监听（`core.watch`）+ 常驻语料层（`conformance_scan._RESIDENT`）：它只换「怎么读到

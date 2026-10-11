@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """自包含装配样本重嵌工具单测（编码漂移检测 + 重嵌幂等 + 源逐字相等）。
 
 工具：`scripts/rebuild_selfcontained_sample.py`。本测在**临时夹具**里造一份最小样本
@@ -60,7 +59,8 @@ class SelfContainedRebuildTest(unittest.TestCase):
                     "docs/examples/state-front/techdoc_front.md"):
             text = (ROOT / rel).read_text(encoding="utf-8")
             lines, _ = sc.rebuild(text.splitlines(),
-                                  str(ROOT / "community/技术文档域包/pipelines/P06_技术文档题材装配流管线.md"),
+                                  str(ROOT / "community/技术文档域包/pipelines/P06_技术文档题材装配"
+                                      "流管线.md"),
                                   str(ROOT))
             self.assertEqual(lines, text.splitlines(), "%s 应无编码漂移" % rel)
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """45 #2 · 资产键表机读投影单测。"""
 import os
 import sys

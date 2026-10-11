@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """提交信息机检（Conventional Commits · 纯标准库）。
 
 **内部差距**：`CONTRIBUTING §1` 有成文的提交信息格式，但此前**零判据**——
@@ -136,13 +135,15 @@ def main(argv=None) -> int:
     issues = check(text)
     if not issues:
         return 0
-    print("== 提交信息不合规（CONTRIBUTING §1 · 判据见 scripts/commit_msg_check.py）==", file=sys.stderr)
+    print("== 提交信息不合规（CONTRIBUTING §1 · 判据见 scripts/commit_msg_check.py）==",
+ file=sys.stderr)
     # 标记用 ASCII：Windows 的 git 会把控制台码页装不下的字形（如 ✗）转义成 \u2717，
     # 而中文能正常显示——故此处避开花哨字形，保证修复指引在 hook 路径上可读。
     for i in issues:
         print("  [x] %s" % i, file=sys.stderr)
     print("  修复指引：改成 `<type>(<scope>): <subject>`，type ∈ %s；"
-          "确实需要绕过用 `git commit --no-verify`（并说明原因）" % "/".join(TYPES), file=sys.stderr)
+          "确实需要绕过用 `git commit --no-verify`（并说明原因）" % "/".join(TYPES),
+ file=sys.stderr)
     return 1
 
 

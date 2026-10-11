@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """路径可达门禁：`desktop/scripts/seed_from_repo.py` 必须**自定位到本仓根**。
 
 依据（2026-10-01 取证）：该入口此前只试 `/tmp/NinFenz` 等三个**固定历史路径**，

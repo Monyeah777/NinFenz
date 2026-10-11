@@ -27,7 +27,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 #: 类型分组顺序（渲染顺序真源；与 CONTRIBUTING §1 的 type 词表同源 + release）。
-TYPE_ORDER: Tuple[str, ...] = ("feat", "fix", "perf", "refactor", "docs", "test", "chore", "release")
+TYPE_ORDER: Tuple[str,
+ ...] = ("feat",
+ "fix",
+ "perf",
+ "refactor",
+ "docs",
+ "test",
+ "chore",
+ "release")
 _TYPE_TITLE = {"feat": "Features", "fix": "Bug Fixes", "perf": "Performance",
                "refactor": "Refactors", "docs": "Documentation", "test": "Tests",
                "chore": "Chores", "release": "Releases", "other": "Other"}
@@ -105,7 +113,8 @@ def _bullets(root: str, changes_dir: str, use_commits: bool) -> Dict[str, List[s
             parsed = parse_commit(subject)
             if not parsed:
                 continue
-            line = parsed["text"] if not parsed["scope"] else "%s: %s" % (parsed["scope"], parsed["text"])
+            line = parsed["text"] if not parsed["scope"] else "%s: %s" % (parsed["scope"],
+ parsed["text"])
             if line in seen:
                 continue
             seen.add(line)
@@ -113,7 +122,8 @@ def _bullets(root: str, changes_dir: str, use_commits: bool) -> Dict[str, List[s
     return groups
 
 
-def render(root: str = ".", version: str = "", date: str = "", changes_dir: str = "changes/unreleased",
+def render(root: str = ".", version: str = "", date: str = "", changes_dir: str = "changes/unreleas"
+    "ed",
            use_commits: bool = True) -> str:
     """确定性版本节（无墙钟；类型序固定，组内保持来源序）。"""
     groups = _bullets(root, changes_dir, use_commits)
@@ -170,13 +180,20 @@ def insert_into_changelog(text: str, section: str, version: str) -> str:
     return head + sep + "\n" + section + "\n" + tail
 
 
-def write(root: str = ".", version: str = "", date: str = "", changes_dir: str = "changes/unreleased",
+def write(root: str = ".",
+ version: str = "",
+ date: str = "",
+ changes_dir: str = "changes/unreleased",
           use_commits: bool = True) -> Dict[str, Any]:
     """写面：插版本节 + 归档变更条目（changes/<version>/）；返回动作摘要。"""
     r = Path(root)
     if not version:
         return {"ok": False, "issues": ["--write 需要 --version（版本号是真源，不臆造）"]}
-    section = render(root, version=version, date=date, changes_dir=changes_dir, use_commits=use_commits)
+    section = render(root,
+ version=version,
+ date=date,
+ changes_dir=changes_dir,
+ use_commits=use_commits)
     cl = r / "CHANGELOG.md"
     txt = cl.read_text(encoding="utf-8") if cl.is_file() else (_HEADER + "\n")
     from core import atomic_write          # 活文档：原子写（半截文件会被门禁当漂移）
@@ -198,7 +215,10 @@ def write(root: str = ".", version: str = "", date: str = "", changes_dir: str =
             "archived": archived}
 
 
-def check(root: str = ".", changes_dir: str = "changes/unreleased") -> Tuple[List[str], Dict[str, Any]]:
+def check(root: str = ".",
+ changes_dir: str = "changes/unreleased") -> Tuple[List[str],
+ Dict[str,
+ Any]]:
     """可机检面：渲染确定 + 条目可溯源（每条都出现在渲染里）。"""
     r = Path(root)
     if not (r / "verify.sh").is_file():

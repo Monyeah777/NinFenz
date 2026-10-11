@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """决策层本地服务（把 Laya 系模型包成 NF 的 `systemone-http` 契约）。
 
 为什么需要这一层：模型侧的真实 API 是 Python（`laya.load(...).predict(state, questions)`），
@@ -27,10 +26,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, Optional, Sequence
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                "desktop", "src"))
+from core import json_doc  # 承重件在 desktop/src，脚本须能独立运行
 
 AGENT: Any = None     # 进程内单例（模型常驻，避免每请求重载）
 AGENT_LOCK = threading.Lock()
@@ -199,7 +203,7 @@ class Handler(BaseHTTPRequestHandler):
         if body is None:
             return
         try:
-            payload = json.loads(body.decode("utf-8"))
+            payload = json_doc.loads(body.decode("utf-8"), dict, what="决策请求体")
         except ValueError as exc:
             self._send(400, _bad_request("请求体不是合法 JSON：%s" % str(exc)[:120]))
             return

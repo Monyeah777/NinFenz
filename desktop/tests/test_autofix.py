@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """机械修复引擎单测（只改机械面；dry-run 不写盘；幂等）。"""
 import sys
 import tempfile

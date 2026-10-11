@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """SKILL 出口适配器单测（v2.0.x 插件：techdoc IR → SKILL.md，产物矩阵第二行）。
 
 运行：cd desktop && python -m unittest tests.test_skill_adapter -v

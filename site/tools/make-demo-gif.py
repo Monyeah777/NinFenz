@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """生成 README / 站点用的终端演示 GIF（可复现：帧内容直接来自 TUI 渲染器）。
 
 为什么要有这个脚本（而不是留一张手工 GIF 在仓库里）：

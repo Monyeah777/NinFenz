@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """registry 变更影响面检查单测（v2.2.0 A4：impact_check 引用图闭合）。
 
 运行：cd desktop && python -m unittest tests.test_impact_check -v

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """管线抽象执行（dry-run → GraphSpec）单测。"""
 import sys
 import unittest

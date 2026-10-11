@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """协议多出口 rules 渲染单测（v2.5.0 Wave4 A3：protocol.yaml → agents/claude/skill）。
 
 运行：cd desktop && python -m unittest tests.test_rules_render -v

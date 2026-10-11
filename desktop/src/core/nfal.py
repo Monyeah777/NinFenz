@@ -21,6 +21,7 @@ import json
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from core import json_doc
 
 from core.nf_expr import LexError, ParseError, parse, strip_pos
 
@@ -62,7 +63,7 @@ def diag(code: str, severity: str, message: str, pos: int = 0) -> Dict[str, Any]
 
 def _read_json(path: Path) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json_doc.load(path, None, what=str(path))
     except (OSError, ValueError):  # 读不到/坏件 ⇒ None（调用方如实少给符号，不臆造；失败语义同 docstring）
         return None
 
@@ -256,7 +257,10 @@ def _infer_cond(node: Dict[str, Any], sym: SymbolTable, diags: List[Dict[str, An
 def _infer_call(node: Dict[str, Any], sym: SymbolTable, diags: List[Dict[str, Any]]) -> str:
     spec = FUNCS.get(str(node.get("fn")))
     if spec is None:
-        diags.append(diag("E0304", "fail", "未登记函数 %s（函数集封闭）" % node.get("fn"), _pos_of(node)))
+        diags.append(diag("E0304",
+ "fail",
+ "未登记函数 %s（函数集封闭）" % node.get("fn"),
+ _pos_of(node)))
         for a in node.get("args") or []:
             _infer(a, sym, diags)
         return "unknown"
@@ -321,7 +325,8 @@ def check_condition(ast: Any, sym: SymbolTable) -> Tuple[str, List[Dict[str, Any
     t, diags = infer_type(ast, sym)
     if t == "untyped":
         diags.append(diag("E0310", "warn",
-                          "guard 类型未收窄（untyped）：执行后端按 fail-closed 记 abstain", _pos_of(ast)))
+                          "guard 类型未收窄（untyped）：执行后端按 fail-closed 记 abstain",
+ _pos_of(ast)))
     elif t not in ("bool", "unknown"):
         diags.append(diag("E0302", "fail", "guard 应为 bool，实为 %s" % t, _pos_of(ast)))
     return t, diags
@@ -340,7 +345,8 @@ def check_expression(expr: str, sym: SymbolTable) -> Dict[str, Any]:
         return {"schema": SCHEMA, "kind": "nfal-check", "expr": expr, "verdict": "fail",
                 "diagnostics": [_exc_diag(exc)], "ast": None}
     t, diags = check_condition(ast, sym)
-    verdict = "fail" if any(d["severity"] == "fail" for d in diags) else ("warn" if diags else "pass")
+    verdict = "fail" if any(d["severity"] == "fail" for d in diags) else ("warn" if diags else "pas"
+        "s")
     return {"schema": SCHEMA, "kind": "nfal-check", "expr": expr, "verdict": verdict,
             "guard_type": t, "diagnostics": diags, "ast": strip_pos(ast)}
 
@@ -380,7 +386,12 @@ def evaluate(node: Any, env: Dict[str, Any], diags: List[Dict[str, Any]]) -> Any
     if k == "list":
         return [evaluate(x, env, diags) for x in node.get("items") or []]
     if k == "map":
-        return {evaluate(a, env, diags): evaluate(b, env, diags) for a, b in node.get("entries") or []}
+        return {evaluate(a,
+ env,
+ diags): evaluate(b,
+ env,
+ diags) for a,
+ b in node.get("entries") or []}
     if k == "un":
         return _eval_un(node, env, diags)
     if k == "cond":
@@ -602,7 +613,8 @@ def _edge_row(fl: Dict[str, Any], sym: SymbolTable, diags: List[Dict[str, Any]],
         sev = "fail" if strict else "warn"
         code = "E0202" if strict else "A0201"
         diags.append(diag(code, sev,
-                          "condition 为散文（不可机验）；迁移为 '=<nf-expr>' 后即可静态检查+执行：%s"
+                          "condition 为散文（不可机验）；迁移为 '=<nf-expr>' 后即可静态检查+执行：%"
+                              "s"
                           % raw[:80], 0))
         edge["guard"] = {"source": "prose", "expr": raw, "ast": None}
         return edge

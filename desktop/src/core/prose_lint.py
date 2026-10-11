@@ -162,7 +162,9 @@ FACE_DOCS = ("README.md", "README.en.md", "docs/agent/ROUTES.md", "docs/agent/AG
 _CODE_SPAN = re.compile(r"`([^`\n]+)`")
 _FENCE_BLOCK = re.compile(r"```[a-zA-Z0-9]*\n(.*?)```", re.S)
 _NF_CALL = re.compile(r"\b(?:nf|nf\.py)\s+([a-z][a-z0-9-]*)")
-_MCP_TOOL_MENTION = re.compile(r"([a-z][a-z0-9_]{2,})（MCP 工具）")
+#: 词首边界让起点只落在词首（2026-10-10 ReDoS 扫描扫出）：否则长小写串上每个起点各回溯一遍
+#: ⇒ O(n²)（64 KB 15.5 s）。语义同时更准：不再匹配长标识符的后缀。
+_MCP_TOOL_MENTION = re.compile(r"\b([a-z][a-z0-9_]{2,})（MCP 工具）")
 
 
 def _command_snippets(text: str) -> List[str]:

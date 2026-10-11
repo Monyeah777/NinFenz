@@ -132,13 +132,35 @@ def to_export(records: List[Dict[str, Any]],
 
 
 def load_trace(path: str) -> List[Dict[str, Any]]:
-    """读 trace JSON：单条记录或记录数组均可（兼容 nf assemble --trace 产物）。"""
-    with open(path, encoding="utf-8") as fh:
-        data = json.load(fh)
-    if isinstance(data, dict):
-        if isinstance(data.get("records"), list):
-            return [r for r in data["records"] if isinstance(r, dict)]
-        return [data]
-    if isinstance(data, list):
-        return [r for r in data if isinstance(r, dict)]
-    return []
+    """读 trace JSON：单条记录或记录数组均可（兼容 nf assemble --trace 产物）。
+
+    形状纪律（2026-10-10 审计 N10，P2）：顶层非对象/数组、对象数组里混标量、**空对象记录**、
+    以及 NaN/Infinity 一律拒绝——此前 {} 会产出一条**伪造 span**、NaN 被当合法记录收下。
+    knowledge.harvest_frequency 对同一批形状已经拒了；两处口径由 test_trace_shapes 钉住一致
+    （刻意不在两模块间加边：telemetry_semconv 是叶子，加边会动耦合面）。
+    """
+    def _reject_constant(name: str):
+        raise ValueError("含非有限数 %s（JSON 无 NaN/Infinity）" % name)
+
+    with open(path, encoding="utf-8-sig") as fh:   # 容忍外来件 BOM（审计 N4）
+        text = fh.read()
+    try:
+        data = json.loads(text, parse_constant=_reject_constant)
+    except ValueError as exc:
+        raise ValueError("trace 不是合法 JSON：%s（修复指引：单条记录 {...} 或 "
+                         "{records:[...]}）" % exc)
+    if isinstance(data, dict) and isinstance(data.get("records"), list):
+        data = data["records"]
+    elif isinstance(data, dict):
+        data = [data]
+    if not isinstance(data, list):
+        raise ValueError("trace 顶层须为对象或数组，实为 %s（修复指引：单条记录 {...} 或 "
+                         "{records:[...]}）" % type(data).__name__)
+    bad = sorted({type(r).__name__ for r in data if not isinstance(r, dict)})
+    if bad:
+        raise ValueError("trace 记录必须都是 JSON 对象，实见 %s（修复指引：去掉标量元素）"
+                         % ", ".join(bad))
+    if data and any(not r for r in data):
+        raise ValueError("trace 含空对象记录 {}（没有任何可消费字段）"
+                         "（修复指引：给记录字段，或删掉该条）")
+    return list(data)

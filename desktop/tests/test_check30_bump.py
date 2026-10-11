@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """check30（版本字段 bump 迁移门禁）回归测试 —— 取 verify.sh 内嵌程序真件执行。
 
 为什么取真件：判据的唯一实现住在 `verify.sh` check30 的 heredoc 里；同构复刻只能证明

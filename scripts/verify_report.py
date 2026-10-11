@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """门禁机器可读报告（CLI）：`protocol/verification_report.json`。
 
 用法：

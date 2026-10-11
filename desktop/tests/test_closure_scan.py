@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """44 追加 · 契约事件闭包扫描单测（元工具只报告不设闸 + 确定性）。"""
 import os
 import sys

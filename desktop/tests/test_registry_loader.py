@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """联动注册表机读加载器（T1.2）单元测试。
 
 覆盖 registry_loader.py 四件套 API 与收敛点助手：

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """AOT 快线的**模块接线**判据：每个 .rs 都参与编译、每个模块都真的被用上。
 
 为什么单列这条（2026-10-04 取证）：
@@ -45,7 +44,8 @@ def wiring(files: dict) -> dict:
 
 
 def real_files() -> dict:
-    return {p.stem: p.read_text(encoding="utf-8", errors="replace") for p in sorted(SRC.glob("*.rs"))}
+    return {p.stem: p.read_text(encoding="utf-8",
+ errors="replace") for p in sorted(SRC.glob("*.rs"))}
 
 
 class RustModuleWiringTest(unittest.TestCase):

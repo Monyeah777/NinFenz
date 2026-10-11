@@ -14,8 +14,12 @@
 //! | 直接子元素 `node` / `edge` | `g.findall("{*}node")` |
 //! | 属性取值 | `n.get("id")` / `e.get("source")` |
 //!
-//! **不做**：实体展开、DTD（真源在 `_xml_guard` 里**先拒**）、CDATA 的语义、命名空间解析
+//! **不做**：DTD（真源在 `_xml_guard` 里**先拒**）、CDATA 的语义、命名空间解析
 //! （只取局部名，与 `{*}` 通配同效）。
+//!
+//! **做**：XML 预定义实体与数字字符引用的解码（2026-10-10 全仓审计 §11am.2 / Z1 补）——
+//! 此前不解码，而真源 `ElementTree` 会解：同一份 GraphML 里 `attr="a&amp;b"` 两边取到
+//! `a&b` 与 `a&amp;b` 两个值，是**跨语言静默分叉**。
 
 /// 一个元素节点。
 #[derive(Debug, Clone)]
@@ -242,6 +246,54 @@ pub fn parse(text: &str) -> Result<XNode, String> {
     root.ok_or_else(|| "空文档".to_string())
 }
 
+/// 真源 XML 的实体解码：五个预定义实体 + 数字字符引用（`&#NN;` / `&#xHH;`）。
+///
+/// 其余命名实体按真源语义**拒**（未定义实体 = ParseError）；字符串里没有 `&` 时零拷贝短路。
+fn decode_entities(s: &str) -> Result<String, String> {
+    if !s.contains('&') {
+        return Ok(s.to_string());
+    }
+    let chars: Vec<char> = s.chars().collect();
+    let mut out = String::new();
+    let mut i = 0usize;
+    while i < chars.len() {
+        if chars[i] != '&' {
+            out.push(chars[i]);
+            i += 1;
+            continue;
+        }
+        let j = match chars[i..].iter().position(|c| *c == ';') {
+            Some(k) => i + k,
+            None => return Err(format!("实体未闭合：{}", s)),
+        };
+        let body: String = chars[i + 1..j].iter().collect();
+        let decoded = match body.as_str() {
+            "amp" => '&',
+            "lt" => '<',
+            "gt" => '>',
+            "quot" => '"',
+            "apos" => '\'',
+            _ => {
+                let num = match body.strip_prefix('#') {
+                    Some(rest) => rest,
+                    None => return Err(format!("未定义实体 &{};", body)),
+                };
+                let hex = num.strip_prefix('x').or_else(|| num.strip_prefix('X'));
+                let code = match hex {
+                    Some(h) => u32::from_str_radix(h, 16),
+                    None => num.parse::<u32>(),
+                }
+                .map_err(|_| format!("非法字符引用 &{};", body))?;
+                char::from_u32(code).ok_or_else(|| format!("非法码位 &{};", body))?
+            }
+        };
+        out.push(decoded);
+        i = j + 1;
+    }
+    Ok(out)
+}
+
+
 fn parse_attrs(s: &str) -> Result<Vec<(String, String)>, String> {
     let chars: Vec<char> = s.chars().collect();
     let mut out: Vec<(String, String)> = Vec::new();
@@ -283,7 +335,9 @@ fn parse_attrs(s: &str) -> Result<Vec<(String, String)>, String> {
         if i >= chars.len() {
             return Err(format!("属性 {} 的值未闭合", name));
         }
-        let value: String = chars[vstart..i].iter().collect();
+        // 实体解码（审计 Z1）：与真源 ElementTree 同语义，不能再把 a&amp;b 原样当值。
+        let raw_value: String = chars[vstart..i].iter().collect();
+        let value = decode_entities(&raw_value)?;
         i += 1;
         if out.iter().any(|(n, _)| *n == name) {
             return Err(format!("属性重复：{}", name));
@@ -301,6 +355,21 @@ mod tests {
     ///
     /// 钉住 `xmlmini` 的**用到那一层**：根元素局部名 / 后代 `graph` 数 / `node` id 集 / `edge`
     /// 端点悬空数。**解析失败的文本不可比**（CPython 的 ParseError vs 本线），故只比"是否解析成功"。
+    #[test]
+    fn predefined_and_numeric_entities_decode_like_elementtree() {
+        // 审计 Z1 / §11am.2：真源 ElementTree 会解码这五个预定义实体与数字字符引用，
+        // 而 xmlmini 此前原样保留 —— 同一份 GraphML 两边取到不同的属性值（跨语言静默分叉）。
+        let x = r#"<g id="a&amp;b" t="&#65;&#x42;&lt;&gt;&quot;&apos;"/>"#;
+        let n = parse(x).unwrap();
+        assert_eq!(n.attr("id"), Some("a&b"), "预定义实体须解码");
+        assert_eq!(n.attr("t"), Some("AB<>\"'"), "数字引用与预定义实体混用须解码");
+        // 非预定义命名实体：真源 ElementTree 报未定义实体 ⇒ 本线也 fail-closed。
+        assert!(parse(r#"<g id="&foo;"/>"#).is_err(), "未定义实体须报错（与真源同）");
+        // 无 & 的常见值零拷贝短路，值不变。
+        let y = parse(r#"<g id="plain"/>"#).unwrap();
+        assert_eq!(y.attr("id"), Some("plain"));
+    }
+
     #[test]
     fn xmlmini_matches_elementtree_query_layer() {
         let root = crate::testutil::repo_root();

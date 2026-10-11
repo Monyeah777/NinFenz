@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """接力协议（SBAR）正式与否定用例。"""
 import sys
 import tempfile
@@ -61,7 +60,8 @@ class TestRealRepo(unittest.TestCase):
 class TestNegatives(unittest.TestCase):
     def test_empty_pending_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.split("## 未决项")[0] + "## 未决项\n")
-        self.assertTrue(any("未决项为空" in i for i in ho.check_doc(tmp, "handovers/HO-0001-x.md")[0]))
+        self.assertTrue(any("未决项为空" in i for i in ho.check_doc(tmp,
+ "handovers/HO-0001-x.md")[0]))
 
     def test_pending_without_judgement_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.replace("：判据 = Y", ""))
@@ -69,15 +69,18 @@ class TestNegatives(unittest.TestCase):
 
     def test_missing_section_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.replace("## 评估", "## 概况"))
-        self.assertTrue(any("正文缺段落" in i for i in ho.check_doc(tmp, "handovers/HO-0001-x.md")[0]))
+        self.assertTrue(any("正文缺段落" in i for i in ho.check_doc(tmp,
+ "handovers/HO-0001-x.md")[0]))
 
     def test_unresolvable_ref_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.replace("art.md", "nowhere.md"))
-        self.assertTrue(any("refs 无法解析" in i for i in ho.check_doc(tmp, "handovers/HO-0001-x.md")[0]))
+        self.assertTrue(any("refs 无法解析" in i for i in ho.check_doc(tmp,
+ "handovers/HO-0001-x.md")[0]))
 
     def test_bad_status_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.replace("status: open", "status: wip"))
-        self.assertTrue(any("status 越词表" in i for i in ho.check_doc(tmp, "handovers/HO-0001-x.md")[0]))
+        self.assertTrue(any("status 越词表" in i for i in ho.check_doc(tmp,
+ "handovers/HO-0001-x.md")[0]))
 
 
 if __name__ == "__main__":

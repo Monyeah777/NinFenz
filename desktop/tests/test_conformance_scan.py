@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """43 A2 —— Conformance 分级扫描单测（声明 ≤ 可证、防虚标）。"""
 import builtins
 import contextlib
@@ -1173,7 +1172,8 @@ class FaceHygieneTest(unittest.TestCase):
         「不含 tests——测试不影响结果」，这条判据把同一条原则钉到**所有**声明面上。
         """
         from core import disk_cache as dc
-        # 只盯**内容面**（要逐件读进来取摘要的那些）；`layer_model.patterns()` / `purity_scan.patterns()`
+        # 只盯**内容面**（要逐件读进来取摘要的那些）；`layer_model.patterns()` / `purity_scan.patter
+        # ns()`
         # 是**成员面**（只枚举路径、不读内容，见 `core.face_key`），里面出现 tests 无害。
         faces = {"disk_cache.CODE_FACE": dc.CODE_FACE,
                  "quality_depth_scan.QD_INPUTS": qd.QD_INPUTS,
@@ -1230,7 +1230,8 @@ class ReloadCoherenceTest(unittest.TestCase):
         bare, same = out.stdout.strip().split()
         self.assertNotEqual("True", same, "子进程里没逼出重载？判据自身要有效")
         self.assertGreaterEqual(int(bare), 4,
-                                "重载之后按当前实例量，『说不清 ⇒ 全算』必须仍成立（否则观测面串了）")
+                                "重载之后按当前实例量，『说不清 ⇒ 全算』必须仍成立（否则观测面串了"
+                                    "）")
 
 
 if __name__ == "__main__":

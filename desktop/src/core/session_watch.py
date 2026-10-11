@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """**长驻会话**（`nf shell`）的两层缓存：监听 + 常驻语料层 + **响应缓存**。
 
 依据（实测 2026-09-29）：会话里连跑重命令时每条都要重读整棵语料取指纹——`score` 实测
@@ -28,7 +27,7 @@ def _install(root, watcher) -> None:
     """
     from core import conformance_scan as _csc
     from core import daemon as _dm
-    _dm._WATCHER = watcher
+    _dm.set_watcher(watcher)      # 唯一写入口（审计 N8：不再跨模块直写可变全局）
     if watcher is None:
         _csc.clear_resident()
     else:

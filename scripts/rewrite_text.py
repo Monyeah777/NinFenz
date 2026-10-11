@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """机械文本改写（**默认干跑**）：先给「文件:行号 + 改前 → 改后」对照表，人核后再 --write。
 
 为什么需要（两次自伤换来的，2026-10-08）：
@@ -52,7 +51,13 @@ def iter_files(include: List[str]) -> List[str]:
     return sorted(out)
 
 
-def scan(files: List[str], find: str, repl: str) -> Tuple[List[Tuple[str, int, str, str]], List[str]]:
+def scan(files: List[str],
+ find: str,
+ repl: str) -> Tuple[List[Tuple[str,
+ int,
+ str,
+ str]],
+ List[str]]:
     """→ (命中 [(路径, 行号, 改前, 改后)], 跳过 [(路径, 原因)])；只处理能按 UTF-8 解开的文本件。"""
     hits: List[Tuple[str, int, str, str]] = []
     skipped: List[str] = []
@@ -75,7 +80,10 @@ def render(hits, skipped, find, repl) -> None:
         print("  +  %s" % after.strip()[:160])
     for rel, why in skipped:
         print("  跳过 %s（%s）" % (rel, why))
-    print("命中 %d 行 / %d 件（字面量 %r → %r）" % (len(hits), len({h[0] for h in hits}), find, repl))
+    print("命中 %d 行 / %d 件（字面量 %r → %r）" % (len(hits),
+ len({h[0] for h in hits}),
+ find,
+ repl))
 
 
 def main(argv=None) -> int:
@@ -115,7 +123,9 @@ def main(argv=None) -> int:
         touched[rel] = text.count(args.find)
         atomic_write.write_text(path, text.replace(args.find, args.replace))
     left, _ = scan(sorted(touched), args.find, args.replace)
-    print("已改写 %d 件、共 %d 处；复验残留 %d 处" % (len(touched), sum(touched.values()), len(left)))
+    print("已改写 %d 件、共 %d 处；复验残留 %d 处" % (len(touched),
+ sum(touched.values()),
+ len(left)))
     return 1 if left else 0
 
 

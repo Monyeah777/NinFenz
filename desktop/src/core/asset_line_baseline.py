@@ -24,6 +24,7 @@ import json
 import os
 from datetime import date
 from typing import Any, Dict, List, Tuple
+from core import json_doc
 
 SCHEMA = "nf-asset-line-baseline/1"
 BASELINE_REL = "protocol/asset_line_baseline.json"
@@ -68,8 +69,7 @@ def load(root: str = ".") -> Dict[str, Any]:
     if not os.path.isfile(p):
         return {}
     try:
-        with open(p, encoding="utf-8") as fh:
-            return json.load(fh)
+        return json_doc.load(p, dict, what=str(p))
     except ValueError:  # 基线缺失/坏件 ⇒ 空基线：调用方按「无基线」如实提示，不回填默认值
         return {}
 
@@ -91,7 +91,9 @@ def verify(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     for d, cur in sorted(live.items()):
         if d not in base:
             issues.append("社区包资产未登记基线：%s（%d 文件 / %d 行）——"
-                          "新增包须重签基线（nf asset baseline --write）" % (d, cur["files"], cur["lines"]))
+                          "新增包须重签基线（nf asset baseline --write）" % (d,
+ cur["files"],
+ cur["lines"]))
     for d, want in sorted(base.items()):
         cur = live.get(d)
         if cur is None:
@@ -100,7 +102,8 @@ def verify(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             continue
         for key, label in (("files", "文件数"), ("lines", "行数"), ("digest", "外形摘要")):
             if cur.get(key) != want.get(key):
-                issues.append("%s 资产%s与基线不一致：实时=%s 基线=%s（修复指引：核对内容后显式重签 "
+                issues.append("%s 资产%s与基线不一致：实时=%s 基线=%s（修复指引：核对内容后显式重签"
+                    " "
                               "nf asset baseline --write）"
                               % (want.get("package") or d, label, cur.get(key), want.get(key)))
     stats = {"packages": len(live), "baseline": len(base),
@@ -116,7 +119,8 @@ def build(root: str = ".", recorded_at: str = "") -> Dict[str, Any]:
         pkgs.append({k: e[k] for k in ("package", "dir", "files", "lines", "digest")})
     return {"schema": SCHEMA,
             "note": "社区资产外形基线（文件数 / 行数 / 逐文件行数映射摘要）。内容改动后须显式重签："
-                    "`nf asset baseline --write`——数字不写在 verify.sh 里，基线变更与内容变更同提交可见。",
+                    "`nf asset baseline --write`——数字不写在 verify.sh 里，基线变更与内容变更同提交"
+                        "可见。",
             "recorded_at": recorded_at or date.today().isoformat(),  # noqa: DTZ011 - 本地日历日期是有意语义（UTC 会在跨零点给出错误「今天」）
             "packages": pkgs}
 

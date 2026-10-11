@@ -14,9 +14,10 @@ NF 的指令档（组装指令包 / AI_ROUTING / ai-menu）此前只说"怎么�
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+from core import json_doc
 
 DRIVER_REL = "protocol/driver.json"
 OVERRIDE_MARK = "DRIVER OVERRIDE"
@@ -24,7 +25,7 @@ OVERRIDE_MARK = "DRIVER OVERRIDE"
 
 def load(root: str = ".") -> Dict[str, Any]:
     p = Path(root) / DRIVER_REL
-    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+    return json_doc.load(p, dict, what=DRIVER_REL) if p.is_file() else {}
 
 
 def resolve(root: str = ".", workflow: str = "") -> Dict[str, Any]:

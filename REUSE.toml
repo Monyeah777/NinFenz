@@ -1,0 +1,19 @@
+# REUSE 3.x 声明（2026-10-10 全仓审计 §11af：此前 REUSE 0/3490，无 LICENSES/）。
+# 口径：代码/文档/协议面 = 本仓 MIT；library/ 与 community/ 的第三方投稿 = 投稿人版权，
+# 按 LICENSES/LicenseRef-Community-Submission.txt 的投稿条款在本仓库原样再分发。
+version = 1
+SPDX-PackageName = "NinFenz"
+SPDX-PackageSupplier = "Monyeah777"
+SPDX-PackageDownloadLocation = "https://github.com/Monyeah777/NinFenz"
+
+[[annotations]]
+path = ["**/*"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["library/NF-*.md", "library/anchors/**", "community/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "投稿人（见文件头 author / sources）"
+SPDX-License-Identifier = "LicenseRef-Community-Submission"

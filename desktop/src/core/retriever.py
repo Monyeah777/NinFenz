@@ -177,7 +177,11 @@ def referenced_by(module_id: str, path=None) -> List[dict]:
     for p in (registry.protocols or []):
         for r in (p.get("references") or []):
             mid = str(r.get("module_id", ""))
-            m_cat, m_bare = (mid.split(":", 1)[0], mid.split(":", 1)[1]) if ":" in mid else ("", mid)
+            m_cat, m_bare = (mid.split(":",
+ 1)[0],
+ mid.split(":",
+ 1)[1]) if ":" in mid else ("",
+ mid)
             hit = False
             if mid and q:
                 if not q_cat:
