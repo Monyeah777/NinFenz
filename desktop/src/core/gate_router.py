@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from core import gate_cache as gc
 from core import gate_faces as gf
 from core import gate_graph as gg
 
@@ -37,7 +38,11 @@ def route(root: str, changed: Sequence[str], experts: Optional[Dict[str, Any]] =
     dense: List[str] = []
     routed: List[Dict[str, Any]] = []
     dormant: List[Dict[str, str]] = []
-    affected = gg.affected_experts(root, changed_n, experts=decl)
+    # W-08：受影响集走内容寻址缓存（键含根 + 变更 + 声明面 + 代码面；命中前 verify）
+    akey = gc.key_for(root, "affected:" + "|".join(changed_n), [gf.MANIFEST_REL])
+    affected, cached = gc.memo("gate-affected", akey,
+                               lambda: gg.affected_experts(root, changed_n, experts=decl),
+                               root=root, reads=[gf.MANIFEST_REL])
     for eid, e in sorted(decl.items()):
         level, _why = effective_level(root, e)
         if level == "UNSAFE":
@@ -50,7 +55,7 @@ def route(root: str, changed: Sequence[str], experts: Optional[Dict[str, Any]] =
     plan = {"mode": mode, "changed": changed_n, "dense": dense,
             "routed": routed, "dormant": dormant}
     stats = {"experts": len(decl), "changed": len(changed_n), "dense": len(dense),
-             "routed": len(routed), "dormant": len(dormant)}
+             "routed": len(routed), "dormant": len(dormant), "affected_cached": bool(cached)}
     return [], plan, stats
 
 
