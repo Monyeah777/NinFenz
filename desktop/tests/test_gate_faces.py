@@ -143,6 +143,32 @@ class SkipSafetyTest(unittest.TestCase):
         self.assertTrue(why)
 
 
+class HookObserverTest(unittest.TestCase):
+    """W-03.4：audit hook 观测与实现无关；且不得跨次泄漏。"""
+
+    def test_hook_captures_direct_reads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "a.txt"
+            p.write_text("x", encoding="utf-8")
+            got = gf.observed_face(lambda: p.read_text(encoding="utf-8"), tmp, use_hook=True)
+            self.assertIn("a.txt", got)
+
+    def test_hook_does_not_leak_between_calls(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "a.txt"
+            p.write_text("x", encoding="utf-8")
+            gf.observed_face(lambda: p.read_text(encoding="utf-8"), tmp, use_hook=True)
+            self.assertEqual([], gf.observed_face(lambda: None, tmp, use_hook=True),
+                             "hook 泄漏：上一轮的读被再次记入")
+
+    def test_default_path_is_memo_based(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "a.txt"
+            p.write_text("x", encoding="utf-8")
+            got = gf.observed_face(lambda: p.read_text(encoding="utf-8"), tmp)
+            self.assertEqual([], got, "默认路径不该凭空观测到直读（它只认 memo）")
+
+
 class CompressFaceTest(unittest.TestCase):
     """M2：声明面由观测面生成（压缩成 glob，宁可过覆盖不可漏）。"""
 

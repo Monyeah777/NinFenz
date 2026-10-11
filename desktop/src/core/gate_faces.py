@@ -13,6 +13,7 @@ import ast
 import fnmatch
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
@@ -62,12 +63,56 @@ def rel_face(root: str, keys: Iterable[str]) -> List[str]:
     return sorted(set(out))
 
 
-def observed_face(runner: Callable[[], Any], root: str = ".") -> List[str]:
-    """跑一次 runner（该专家的只读入口），返回真实读面（仓库相对 posix）。
+#: audit hook 的活收集器（进程内只装一次 hook；每次调用注册/注销，防跨次泄漏）。
+_COLLECTORS: List[set] = []
 
-    conformance_scan 只以模块级 _READ_MEMO 暴露只读记录，且作用域出口即清，
-    故必须在 with 内取键——这是当前唯一可得的事实面（§6 观测面）。
+
+def _ensure_hook() -> None:
+    """确保进程内已装 open 事件 hook（只装一次；hook 装了不可撤，故用注册表而非重装）。"""
+    if _COLLECTORS:
+        return
+
+    def _hook(event: str, args: Any) -> None:
+        if event != "open":
+            return
+        try:
+            p = args[0]
+        except (IndexError, TypeError):
+            return
+        if isinstance(p, int):          # 文件描述符：无路径可记
+            return
+        try:
+            path = os.fsdecode(p)
+        except (TypeError, ValueError):
+            return
+        for seen in list(_COLLECTORS):
+            seen.add(path)
+
+    sys.addaudithook(_hook)
+
+
+def observed_face(runner: Callable[[], Any], root: str = ".",
+                  use_hook: bool = False) -> List[str]:
+    """跑一次 runner（该专家的只读入口）→ 真实读面（仓库相对 posix）。
+
+    两条观测路径（M2 §23.17 实测二者不通用）：
+      - use_hook=False（默认）：借 conformance_scan._READ_MEMO——**只覆盖走它读助手的扫描器**，
+        作用域出口即清，故在 with 内取键；
+      - use_hook=True：audit hook(open)——与实现无关，谁读都记。hook 装了不可撤，故
+        进程内只装一次、按次注册收集器并在 finally 注销（防跨次泄漏）。
     """
+    if use_hook:
+        _ensure_hook()
+        seen: set = set()
+        _COLLECTORS.append(seen)
+        try:
+            runner()
+        finally:
+            for i, s in enumerate(_COLLECTORS):
+                if s is seen:
+                    del _COLLECTORS[i]
+                    break
+        return rel_face(root, seen)
     from core import conformance_scan as _cs
     with _cs.read_memo():
         runner()

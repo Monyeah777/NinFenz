@@ -28,9 +28,9 @@ def _emit(kind, payload, as_json, lines):
         print(ln)
 
 
-def _observed(as_json):
+def _observed(as_json, use_hook=False):
     from core import conformance_scan as cs
-    face = gf.observed_face(lambda: cs.scan(ROOT), ROOT)
+    face = gf.observed_face(lambda: cs.scan(ROOT), ROOT, use_hook=use_hook)
     _emit("gate-observed", {"observed": len(face), "sample": face[:10]}, as_json,
           ["== 观测读面 ==", "  %d 件（示例 %s）" % (len(face), face[:3])])
     return 0
@@ -83,6 +83,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁读面台账（只读）")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--observed", action="store_true", help="跑只读扫描器并打印观测读面")
+    ap.add_argument("--observed-hook", action="store_true",
+                    help="观测读面用 audit hook（与实现无关；默认走 memo）")
     ap.add_argument("--static-faces", action="store_true")
     ap.add_argument("--manifest", action="store_true")
     ap.add_argument("--derive", action="store_true", help="声明级别 vs 源码推导")
@@ -90,7 +92,7 @@ def main(argv=None) -> int:
                     help="按变更路径求路由（策略 S）并自检")
     args = ap.parse_args(argv)
     if args.observed:
-        return _observed(args.json)
+        return _observed(args.json, use_hook=getattr(args, "observed_hook", False))
     if args.static_faces:
         return _static_faces(args.json)
     if args.manifest:
