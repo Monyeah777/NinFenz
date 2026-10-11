@@ -52,12 +52,18 @@ def _package_dirs() -> List[Path]:
                   if d.is_dir() and not d.name.startswith("."))
 
 
-def _pkg_files(cat: str, pkg: str, sub: str) -> List[Path]:
-    """包内某子目录的件（枚举走包管理器面；缺根/缺件返回空表）。"""
+def _pkg_files(cat: str, pkg: str, sub: str, cache: Optional[dict] = None) -> List[Path]:
+    """包内某子目录的件；cache 为**单次 catalog 调用内**复用表（§23.34：不加则 93k 次 glob）。"""
+    key = (cat, pkg, sub)
+    if cache is not None and key in cache:
+        return cache[key]
     from .package_index import files_under
     root = _community_root()
-    return files_under(str(root.parent), cat,
-                       "community/%s/%s/" % (pkg, sub)) if root else []
+    out = files_under(str(root.parent), cat,
+                      "community/%s/%s/" % (pkg, sub)) if root else []
+    if cache is not None:
+        cache[key] = out
+    return out
 
 
 def _pipeline_ids_in_cache(store: Store) -> set:
@@ -70,23 +76,26 @@ def _pipeline_ids_in_cache(store: Store) -> set:
     return ids
 
 
-def _module_file(pkg_dir: Path, module_ref: str) -> Optional[Path]:
-    """在包 modules/ 目录定位 <id>_*.md（id 取 ref 末段，如 M55）；枚举走包管理器面。"""
+def _module_file(pkg_dir: Path, module_ref: str,
+                 files: Optional[List[Path]] = None) -> Optional[Path]:
+    """在包 modules/ 目录定位 <id>_*.md（files：已列好的文件表，可省）。"""
     num = str(module_ref).split(":")[-1]
-    for f in _pkg_files("community-modules", pkg_dir.name, "modules"):
+    for f in (files if files is not None
+              else _pkg_files("community-modules", pkg_dir.name, "modules")):
         if f.name.startswith(num + "_") or f.stem == num:
             return f
     return None
 
 
-def load_community_module(pkg: str, full_id: str) -> Optional[Module]:
-    """只读加载 community/<pkg>/modules 模块正文（parse，I5 不写源）。"""
+def load_community_module(pkg: str, full_id: str,
+                          files: Optional[List[Path]] = None) -> Optional[Module]:
+    """只读加载 community/<pkg>/modules 模块正文（files：已列表，可省）。"""
     from .parser import parse_module
     root = _community_root()
     if root is None:
         return None
     pkg_dir = root / pkg
-    f = _module_file(pkg_dir, full_id)
+    f = _module_file(pkg_dir, full_id, files=files)
     if f is None:
         return None
     try:
@@ -95,13 +104,15 @@ def load_community_module(pkg: str, full_id: str) -> Optional[Module]:
         return None
 
 
-def load_community_pipeline(pkg: str, pid: str) -> Optional[Pipeline]:
-    """只读加载 community/<pkg>/pipelines 管线。"""
+def load_community_pipeline(pkg: str, pid: str,
+                            files: Optional[List[Path]] = None) -> Optional[Pipeline]:
+    """只读加载 community/<pkg>/pipelines 管线（files 同 load_community_module）。"""
     from .pipeline_loader import load_pipeline_file
     root = _community_root()
     if root is None:
         return None
-    for f in _pkg_files("community-pipelines", pkg, "pipelines"):
+    for f in (files if files is not None
+              else _pkg_files("community-pipelines", pkg, "pipelines")):
         try:
             pl = load_pipeline_file(f)
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
@@ -124,12 +135,14 @@ def catalog(store: Store) -> List[CommunityItem]:
     items: List[CommunityItem] = []
     installed_pipes = _pipeline_ids_in_cache(store)
     installed_mods = {fid_key(m.full_id) for m in store.list_modules()}
+    files_cache: dict = {}          # 单次调用内复用（见 _pkg_files 说明）
     for pkg_dir in _package_dirs():
         pkg = pkg_dir.name
         if (pkg_dir / "modules").is_dir():
-            for f in _pkg_files("community-modules", pkg, "modules"):
+            mod_files = _pkg_files("community-modules", pkg, "modules", cache=files_cache)
+            for f in mod_files:
                 try:
-                    m = load_community_module(pkg, f.stem.split("_")[0])
+                    m = load_community_module(pkg, f.stem.split("_")[0], files=mod_files)
                 except Exception:
                     m = None
                 if m is None:
@@ -144,7 +157,7 @@ def catalog(store: Store) -> List[CommunityItem]:
                     kind="community_module", pkg=pkg, ref=m.full_id,
                     name=m.name, layer=m.layer, installed=installed))
         if (pkg_dir / "pipelines").is_dir():
-            for f in _pkg_files("community-pipelines", pkg, "pipelines"):
+            for f in _pkg_files("community-pipelines", pkg, "pipelines", cache=files_cache):
                 try:
                     from .pipeline_loader import load_pipeline_file
                     pl = load_pipeline_file(f)
