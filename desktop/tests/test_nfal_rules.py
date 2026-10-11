@@ -107,6 +107,20 @@ class BackendDifferentialTest(unittest.TestCase):
         self.assertEqual(a["facts"], b["facts"])
         self.assertEqual("OK", b["status"])
 
+    def test_dag_backend_agrees_and_reports_graph(self):
+        """P-A4：第三后端（显式推导图）与另两后端事实集必须逐条相同，并给出图统计。"""
+        for doc in (self._random_doc(7), _doc(), _doc(edges=(("a", "b"), ("b", "a"))),
+                    _doc(edges=(("a", "a"), ("a", "b")), guard=True)):
+            a, b, c = nr.evaluate(doc), nr.evaluate_seminaive(doc), nr.evaluate_dag(doc)
+            self.assertEqual(a["facts"], c["facts"], doc)
+            self.assertEqual(b["facts"], c["facts"], doc)
+            self.assertEqual("OK", c["status"], doc)
+            self.assertGreaterEqual(c["graph"]["depth"], 1)
+            self.assertGreaterEqual(c["graph"]["edges"], 1)
+
+    def test_dag_backend_is_deterministic(self):
+        self.assertEqual(nr.evaluate_dag(_doc()), nr.evaluate_dag(_doc()))
+
     def test_seminaive_uses_no_more_fuel(self):
         doc = _doc()
         a, b = nr.evaluate(doc), nr.evaluate_seminaive(doc)
