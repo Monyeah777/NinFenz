@@ -99,7 +99,38 @@ def verify(doc, root=ROOT, runner=run_cmd, tools=None):
     elif any(r["verdict"] == "UNKNOWN" for r in report["vectors"]):
         report["verdict"] = "UNKNOWN"
     report["toolchains"] = tools
+    report["arbitration"] = arbitrate(report["vectors"])
     return report
+
+
+def arbitrate(vectors):
+    """多实现仲裁（P-C2）：**规范是权威**，多数票只作定位线索。
+
+    可比值 = status ∈ {PASS, FAIL}（UNKNOWN 不参与投票）。
+      - 无偏离 ⇒ PASS；
+      - 单一偏离 ⇒ FAIL，该实现为首要嫌疑（规范为权威，不因多数而改判）；
+      - 多数偏离 ⇒ **SPEC-GAP**：先怀疑规范/判据本身，禁止用多数票裁定"实现对"。
+    """
+    available, deviants = [], []
+    for row in vectors:
+        for lang, st in sorted((row.get("langs") or {}).items()):
+            status = st.get("status")
+            if status == "PASS":
+                available.append("%s/%s" % (row.get("id"), lang))
+            elif status == "FAIL":
+                available.append("%s/%s" % (row.get("id"), lang))
+                deviants.append("%s/%s" % (row.get("id"), lang))
+    if not available:
+        return {"outcome": "UNKNOWN", "clue": "无可比实现（工具链缺席）——不下结论"}
+    if not deviants:
+        return {"outcome": "PASS", "comparable": len(available),
+                "clue": "所有可比实现与规范一致"}
+    if len(deviants) * 2 >= len(available):
+        return {"outcome": "SPEC-GAP", "suspects": deviants, "comparable": len(available),
+                "clue": "多数可比实现偏离规范 ⇒ 先怀疑规范/判据本身；"
+                        "多数票**不得**用作改判依据（INV-6：规范 > 实现）"}
+    return {"outcome": "FAIL", "suspects": deviants, "comparable": len(available),
+            "clue": "单一实现偏离规范 ⇒ 该实现为首要嫌疑；多数票仅作定位线索"}
 
 
 # ---------------------------------------------------------------- self-test
@@ -161,6 +192,10 @@ def main(argv=None):
         print(json.dumps(rep, ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print("== 跨语言对拍（%s）==" % rep["verdict"])
+        arb = rep.get("arbitration") or {}
+        print("  仲裁：%s（%s）" % (arb.get("outcome"), arb.get("clue")))
+        for s in arb.get("suspects") or []:
+            print("    嫌疑：%s" % s)
         for row in rep["vectors"]:
             print("  %s [%s]" % (row["id"], row["verdict"]))
             for lang, st in sorted(row["langs"].items()):
