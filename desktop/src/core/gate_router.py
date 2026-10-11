@@ -45,9 +45,10 @@ def route(root: str, changed: Sequence[str], experts: Optional[Dict[str, Any]] =
                                root=root, reads=[gf.MANIFEST_REL])
     for eid, e in sorted(decl.items()):
         level, _why = effective_level(root, e)
-        if level == "UNSAFE":
+        if level == "UNSAFE" or not e.get("face_verified", True):
             dense.append(eid)
-            routed.append({"id": eid, "level": level, "via": "dense(UNSAFE)"})
+            via = "dense(UNSAFE)" if level == "UNSAFE" else "dense(读面未验证)"
+            routed.append({"id": eid, "level": level, "via": via})
         elif eid in affected:
             routed.append({"id": eid, "level": level, "via": affected[eid]})
         else:
@@ -74,8 +75,11 @@ def audit_route(root: str, plan: Dict[str, Any],
         if eid not in routed_ids and eid not in dormant_ids:
             issues.append("专家既未路由也不休眠：%s（路由表不完整）" % eid)
         level, _why = effective_level(root, e)
-        if level == "UNSAFE" and eid not in dense_ids:
-            issues.append("UNSAFE 专家被裁：%s（INV-10：先证不丢）" % eid)
+        must_dense = (level == "UNSAFE") or (not e.get("face_verified", True))
+        if must_dense and eid not in dense_ids:
+            why = "UNSAFE 专家被裁（INV-10：先证不丢）" if level == "UNSAFE" \
+                else "读面未验证的专家被裁（M2：声明面须由观测面生成）"
+            issues.append("%s：%s" % (why, eid))
     return issues
 
 

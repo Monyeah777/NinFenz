@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
+from core import gate_faces as gf  # noqa: E402
 from core import gate_router as gr  # noqa: E402
 
 
@@ -53,6 +54,30 @@ class RouteTest(unittest.TestCase):
             issues, stats = gr.audit(tmp, ["docs/x.md"])
             self.assertEqual([], issues)
             self.assertEqual(3, stats["experts"])
+
+
+class UnverifiedFaceTest(unittest.TestCase):
+    """M2：读面未验证（face_verified=false）的专家不得被裁，须进 dense。"""
+
+    def test_unverified_is_dense(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _fixture(tmp)
+            doc = gf.load_manifest(tmp) if False else None  # noqa: F841
+            experts = {"e_a": {"id": "e_a", "reads": [], "skip_safety": "SAFE",
+                               "module": "safe.py", "face_verified": False}}
+            _i, plan, _s = gr.route(tmp, ["docs/x.md"], experts=experts)
+            self.assertIn("e_a", plan["dense"])
+            self.assertEqual("dense(读面未验证)", plan["routed"][0]["via"])
+
+    def test_audit_catches_culling_unverified(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            experts = {"e_a": {"id": "e_a", "reads": [], "skip_safety": "SAFE",
+                               "module": "safe.py", "face_verified": False}}
+            _i, plan, _s = gr.route(tmp, [], experts=experts)
+            plan["dense"] = []
+            plan["routed"] = []
+            issues = gr.audit_route(tmp, plan, experts)
+            self.assertTrue(any("读面未验证" in i for i in issues), issues)
 
 
 class MutationTest(unittest.TestCase):
