@@ -158,6 +158,84 @@
       "message": "阶梯件出现绝对路径（公开面泄漏本机路径）",
       "fix": "改成仓库相对路径或占位符",
       "evidence": "check27 R7 / conformance::public-surface"
+    },
+    {
+      "id": "no-credential-leak-in-public-faces",
+      "severity": "fail",
+      "kind": "regex_absent",
+      "params": {
+        "globs": [".github/workflows/*.yml", "docs/**/*.md", "protocol/*.json",
+                  "integrations/**/*.json", "results/interop/*.json", "library/*.md",
+                  "llms.txt", "README.md", "README.en.md", "README.ja.md",
+                  "desktop/src/core/*.py", "scripts/*.py", "tui/*.py"],
+        "pattern": "AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{36,}|xox[baprs]-[A-Za-z0-9-]{10,}|sk-[A-Za-z0-9]{32,}|(?i:(api[_-]?key|secret|password|passwd|access[_-]?token|client[_-]?secret)\\s*[:=]\\s*[\"'][A-Za-z0-9/+_.-]{16,}[\"'])"
+      },
+      "message": "公开面/源码面出现疑似凭据（密钥/令牌/口令）——本断言只报位置，不回显命中值",
+      "fix": "移除明文凭据：改从环境变量读取且在输出中遮蔽；确为示例则用占位符（如 <TOKEN>）替换",
+      "evidence": "check35 / conformance::assertions"
+    },
+    {
+      "id": "error-codes-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/error_codes.json", "key": "schema", "op": "equals", "value": "nf-error-codes/1"},
+      "message": "错误码登记册不在位或 schema 未自证",
+      "fix": "补 protocol/error_codes.json（schema=nf-error-codes/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:error-codes-face）"
+    },
+    {
+      "id": "injection-profiles-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/injection_profiles.json", "key": "schema", "op": "equals", "value": "nf-injection-profiles/1"},
+      "message": "注入预算档位册不在位或 schema 未自证",
+      "fix": "补 protocol/injection_profiles.json（schema=nf-injection-profiles/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:injection-profiles-face）"
+    },
+    {
+      "id": "boundaries-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/boundaries.json", "key": "schema", "op": "equals", "value": "nf-boundaries/1"},
+      "message": "边界登记册不在位或 schema 未自证",
+      "fix": "补 protocol/boundaries.json（schema=nf-boundaries/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:boundaries-face）"
+    },
+    {
+      "id": "path-moved-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/path_moved.json", "key": "schema", "op": "equals", "value": "nf-path-moved/1"},
+      "message": "路径迁移映射不在位或 schema 未自证",
+      "fix": "补 protocol/path_moved.json（schema=nf-path-moved/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:path-moved-face）"
+    },
+    {
+      "id": "declined-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/declined.json", "key": "schema", "op": "equals", "value": "nf-declined/1"},
+      "message": "被否决候选留档不在位或 schema 未自证",
+      "fix": "补 protocol/declined.json（schema=nf-declined/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:declined-face）"
+    },
+    {
+      "id": "schema-pins-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/schema_pins.json", "key": "schema", "op": "equals", "value": "nf-schema-pins/1"},
+      "message": "版本钉扎样本册不在位或 schema 未自证",
+      "fix": "补 protocol/schema_pins.json（schema=nf-schema-pins/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:schema-pins-face）"
+    },
+    {
+      "id": "requirements-face",
+      "severity": "fail",
+      "kind": "json_value",
+      "params": {"path": "protocol/requirements.json", "key": "schema", "op": "equals", "value": "nf-requirements/1"},
+      "message": "需求登记册不在位或 schema 未自证",
+      "fix": "补 protocol/requirements.json（schema=nf-requirements/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:requirements-face）"
     }
   ]
 }

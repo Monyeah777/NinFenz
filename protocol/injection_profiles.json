@@ -1,0 +1,5 @@
+{
+  "schema": "nf-injection-profiles/1",
+  "note": "注入预算档位（机制借鉴 MemVault agent_adapt.rs:21-58 + lorepack assemble.ts:28-45；消费方 core/injection_budget.py）。06 §8 的量化契约落点：条数/预算/优先级/排除类型，order in = order out。",
+  "profiles": []
+}

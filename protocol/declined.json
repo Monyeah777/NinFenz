@@ -1,0 +1,5 @@
+{
+  "schema": "nf-declined/1",
+  "note": "被否决候选留档（机制借鉴 awesome-jev rejected.jsonl；消费方 core/declined_ledger.py）。每条须有 candidate/reason/date——「看过但不吸收」也留档，防反复重审。",
+  "declined": []
+}
