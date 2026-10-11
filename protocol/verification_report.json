@@ -294,30 +294,26 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 26,
-        "root": "47c383121d046231a6162b06548f6f5eec3db62674e920f91de13e87232d4d0b",
-        "verdict": "non-conformant"
+        "passed": 27,
+        "root": "41f5ec78a877141b66246a70d3de0f8077faa44f0638d048b266e230ef3a9686",
+        "verdict": "conformant"
       },
       "status": "pass",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 242,
+      "issues": 0,
       "name": "审计件被审对象 digest",
-      "sample": [
-        "AUD-0002：被审对象已变，旧审计失效：scripts/ai_domain_closure.py（修复指引：重审并更新 digest）",
-        "AUD-0002：被审对象已变，旧审计失效：desktop/tests/test_ai_domain_closure.py（修复指引：重审并更新 digest）",
-        "AUD-0003：被审对象已变，旧审计失效：scripts/ai_domain_closure.py（修复指引：重审并更新 digest）"
-      ],
+      "sample": [],
       "source": "audit.scan",
       "stats": {
         "audits": 56,
         "legacy": 11,
-        "subjects_ok": 121,
+        "subjects_ok": 362,
         "with_header": 45
       },
-      "status": "fail",
+      "status": "warn",
       "warns": 1
     },
     {
@@ -518,12 +514,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "79639497be2bd0bf18dc268593597762dd5eb2c2ec789ff0e10e4bacc224e08b",
+  "root_digest": "f28db4bb6509e1afa52ca9c1382374380fd8c72aa2e0fb0404fd2cabf14c4f56",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
+    "fail": 0,
     "pass": 28,
-    "warn": 1
+    "warn": 2
   }
 }

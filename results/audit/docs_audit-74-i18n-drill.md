@@ -10,7 +10,7 @@ subjects:
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:c27f0e22f7bdcb6dd983ff1e88db87d06b1b76ef7fec3b92d5ec63fa02be0c2d
+  - docs/en/mcp.md:7a839ec9b64bbae0d886e647efd31c9edd01673b710c6c4664ed81db7732e136
   - docs/ja/mcp.md:477e3fddc1a8c67d1f24e8d6779fe6b5d93dae30a0221ff3f1fea93f99c7edf0
   - docs/en/terminal.md:19fd82dd77b72366c4fb0cde2ce62294f9d14b7eac10242d1bf2f08480fee862
   - docs/ja/terminal.md:673e4869c326ba148893df4ed4e42f35a929f245269ce05ad9f7315235345783
@@ -18,16 +18,18 @@ subjects:
   - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
   - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
-  - desktop/src/core/execution_drill.py:7f291a20d779213d3acedaaf042722d4ec7223ba3333ee2477be6b5285152dea
-  - desktop/src/core/drill_fidelity.py:42d1064477b9f14821e222c3abe89b27d5b624f011c19d166d7077b1aff7ee71
-  - desktop/tests/test_execution_drill.py:f5f880b8eae0b5b00c7c6a94376922e291d079a9fd1c2c50ae1d8adf7eaaa2b2
-  - desktop/tests/test_round_drill.py:67e963dace7dfdbf1a77385bc18dcc230ad102cf3934ea93209c49cb5cf3bab3
+  - desktop/src/core/execution_drill.py:18d5e5bc9a58cac3f14425e2a38331cc33f055f871934a9cec9030c3c9805090
+  - desktop/src/core/drill_fidelity.py:42549a0992e4931ee9de1a500a6b959b4e17a992a4d7025f737d0b7afe9bb0d0
+  - desktop/tests/test_execution_drill.py:36615ef843354315ddcbc6422c0417fb1c54e5200aef1d2488c7b6c9ff88c0b8
+  - desktop/tests/test_round_drill.py:0a0997e935ce8cd417a7400fbaf2c897853e82297867f25165c9889117667a1a
   - desktop/tests/fixtures/execution/p04_drill_cases.json:9237e2713bab59df20ed8cc4df18f8a4f9bd1fe0437a4acf642b03ccdd9c5d07
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物：`protocol/RECEIPTS.json`、`protocol/conformance_report.json`、`protocol/generated/*`、`results/interop/*`、`protocol/approvals/*` 均为可复算投影或每次重签即变；`protocol/drill_fidelity.json` 由 `scripts/drill_fidelity.py` 从样本重算，同样不入绑定。

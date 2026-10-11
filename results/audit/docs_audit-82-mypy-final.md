@@ -7,31 +7,33 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/silent_skip.py:7a9e953f959d31161f29dcb5de4ef755a63d31ff807bdf333403c4b048f07457
-  - desktop/src/core/round_drill.py:4ad4faa28a2251a51897b8d96a6f7cfcc5d48f2bfb5b5c83b3c7af5be40ce9fb
+  - desktop/src/core/round_drill.py:0407fc814cbb7ea5bc610036a4cf3e4675977eaaf5b7fa11fa142e32d6504c0b
   - desktop/src/core/quant_metrics.py:ae2bd5a5b71531ee4cf4abe920f75a939a30a5bea105efa7aed011cc92369ce3
   - desktop/src/core/module_lifecycle.py:7b84396342e77fea32e6b54cd78e296f1dddf925937b8331dbcdebeb4e9ad1d0
-  - desktop/src/core/market_analyzer.py:797870b6ac5d8f012e94b0ecbe4785b001b3df825bd90c1507e18aa8f71a5989
+  - desktop/src/core/market_analyzer.py:eb5edffc55470b5f4aa8e6151ab7bffded36a45ce3ecc69fcdc54de59071cbdf
   - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
   - desktop/src/core/knowledge_sig.py:2e1177ae8701b38cff3b26e92892b3cbef4a347a48b986dd8b1f95934f60323b
-  - desktop/src/core/output_forms.py:4981ef6aea157be3d26754b4eade7a40340fd235795c50ba50fe193642cd5ea8
+  - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/pipeline_loader.py:4c58b842a8b79abdce6917305f8f5c307e4334cfa377cb3dc1b9d6f226871588
   - desktop/src/core/community_inventory.py:a7ac59ffb4d76215f12d1bfa2f560f8185622a6fd5d1fcdc46200c9273ff8851
-  - desktop/src/core/retriever.py:1bab0db39be26c025e37cecab19e65d8fb439140f3bb224e869b771666c777fd
-  - desktop/src/core/lazy_yaml.py:19df29d70c5a694ae63527f46e4537b041cd2b889baca358e6262b4dad0e151b
-  - desktop/src/core/json_schema.py:6de58ac9c73b5165d2bcd924fe7f8210e1f5cd6907b26085f8b89e566497f9da
+  - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
+  - desktop/src/core/lazy_yaml.py:127a18733214df1a721ad9e2fad8c0bc8cc195a4ee2f7fc782a60f85eb24d641
+  - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/orchestration.py:a2c50663819521a2bb1b7064f14382e7254910a39eb6cf88785cb05efdfdf558
-  - desktop/src/core/machine_contract.py:68e83ea3e474a788acc8574969b35573d7522726be8d9b98f30c4b6733aff3af
-  - desktop/src/core/decisions.py:63ce73c77315eea97081b72b5f0f7ffb18a94ab33f79e4cc3774ed9ebda69748
-  - desktop/src/core/layer_model.py:4b09c50a53884d1e3a5ed5541e42cc4bf8499bc031d5e00eebf38bc66c9b40d1
-  - desktop/src/core/import_graph.py:929b6cdff4715dc4b007bbcd273cee5581fc6744ed5abcd90157c4cfef0a80b0
-  - desktop/src/core/bench.py:a66769543e0a4546ec52d869baa326916a996748f86a4798ca1dd0f238c70153
-  - desktop/src/core/import_adapter.py:d85c4bc3632106ad28d924ed0122834903eb6d7eddc614b661ab7fe3dfbef441
-  - desktop/src/core/daemon.py:bbc51933d74825f6b0b7f90b72e637cda8ce0c50eba56bd9053cba679e80d48f
-  - desktop/src/core/decision_layer.py:4105c5e1b61adcc5a0b8b49568ec38df05705c2a02f2cdbb4d3f3c109b94aa99
+  - desktop/src/core/orchestration.py:6c860bebc068000dbd8f7a68103b300ab662c0666c912159226f015cea43327c
+  - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
+  - desktop/src/core/decisions.py:f5f5f7d77cbe2bf3a91cc930f6658fba31fc05932ef299938897f50d16126ba1
+  - desktop/src/core/layer_model.py:18822a9c4a8b39dc8076cbf40695e40588cb6025a5e59efe8f93769ef9315357
+  - desktop/src/core/import_graph.py:b97893527ec592921f81b96d9d9bd945be938db31e5d8c39d71d5a1d96990d9b
+  - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
+  - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
+  - desktop/src/core/daemon.py:6091dc72140524c34ba23662d457977511f49fcbee6573bd8cb0a2c91d405e5d
+  - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 7 个模块行数/圈复杂度增长按工具指引重冻。

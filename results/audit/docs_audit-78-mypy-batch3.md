@@ -6,11 +6,13 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/mcp_package.py:bc7d0a06a139427ca1d1f4988fcaa2b413d851556e6652254cb09c051578c273
-  - desktop/src/core/conformance_scan.py:0020d25262b861fc089dd3b3c63fbf02429a1b00bd80803caf37f24bf82d7421
-  - desktop/src/core/pack_combo.py:29b1b4d401ffd6d70d81a31be60262d00c6a3e132f79779effe9ad75b0300bf9
-  - protocol/code_metrics_baseline.json:2c2a8b4aa398f2d37947cd6744e7570c4a09c506fee6e8b181292849a7e5fc37
+  - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
+  - desktop/src/core/conformance_scan.py:e02c4d6c5f49b671afd3374cd5b7c542a04026958bb4b34e4052da8256762053
+  - desktop/src/core/pack_combo.py:210dda5d7ac5ba32ae1d7087d098bfe95cfa182f722a96f4aef5ebab765c661b
+  - protocol/code_metrics_baseline.json:fe52dc4b05cfa9e620109ad892bf0ca029eeaaa0397e90ca931c3cb6997cab42
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因三模块各 +1 行按工具指引评审后重冻。

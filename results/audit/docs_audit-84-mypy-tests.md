@@ -6,34 +6,36 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/tests/test_write_flag_gate.py:1e2bc2f592b8a3eee57a7e43d5857a388eb74dfe2e60c4e89321963bbfdb1657
-  - desktop/tests/test_verification_cards.py:e5ebad23cd0e7465ef4bc5b2aaa21d2df5fbde9a9715bcd754805bfe1bd35d8a
-  - desktop/tests/test_serve_default.py:f7e74df3d53b22cad3d0daf0f81c39a3c4e2a19228d210c8f445a315f24b9da8
-  - desktop/tests/test_selfcontained_rebuild.py:b0b7d252053ed69a41665ca5c4da0c2f2c84b9a85e644ae42d896a4ce4f430a3
-  - desktop/tests/test_rust_fastlane.py:b50481a83b030f5037f14601ae2056bce0253a31c127074c73a5e9bdb2d47e56
-  - desktop/tests/test_quant_domain_package.py:d0ca63155f193536f7ef5509f4145b9375c04747f0b48438936ba611b1db2b51
-  - desktop/tests/test_mcp_write_freedom.py:905806f235c67577594d4673140aa8709297f3673027c6b50e941a1de525d1c1
-  - desktop/tests/test_mcp_runtime.py:0e55b8e9db3abbf84dd99132c9cd6196b760e710e740c6619e3afa8d2d25327a
-  - desktop/tests/test_live_doc_counts.py:3c8ba51aeb3ca4dcc0b3784114ca522424f833fcccb90199a37f67022d76b7bb
-  - desktop/tests/test_layer_model.py:b8f0d653573f088ae8c4b1a66a415697b82496fd3fd4443d2e6cb8f4983aa54e
-  - desktop/tests/test_knowledge_sig.py:49d296144924aef62ecf80447ab631f98712c9f1113f8e7ec1f90b4677c66df3
-  - desktop/tests/test_judgement_coverage.py:1ef21354be3d9046aa24f845f32a0f24a4e7cc84ef5061a0948779458d93b2b7
-  - desktop/tests/test_judge_references.py:b9dd886b02f45c3fbf3c2c73a28ebc33b6783afeb31f5df94b2986368e304453
-  - desktop/tests/test_intake_gate.py:cf8e3677e40981b5b70b88798318e252bacfbb9b1c72ecda9fe3191a1f01d3c8
-  - desktop/tests/test_import_injection.py:bb39860e1dfa3276a648d38a7be3ec015279866a1407372f8c57c0a81a9fabc0
-  - desktop/tests/test_gap_review.py:a66c19073a942e7e4d825ac759ffb9b2f8ecde7d981748f0290051cefb8a67fc
-  - desktop/tests/test_explain_coverage.py:a64bc7bf7dacb57296b94d1babf8f2daa3aa51556d61676a603546804e4e3084
-  - desktop/tests/test_doc_reachability.py:368fcfff79565ad334c9f74b2a381f6d1e8b9b8d6df3261cec87997a4a875ab2
-  - desktop/tests/test_dead_code.py:f6e0bc799efe991e04f18c2103e749634493848ef34373d539aa853af9facfb8
-  - desktop/tests/test_daemon_parity.py:10582b2d9f5d7f9f6b2cb2f7e6bccc43b8b0ba1226d5153627ad7ff13cf89acb
-  - desktop/tests/test_concept_graph_gate.py:446dbfd023c9d5171578ac4e7741c099fc40dce77e2f3bf1944f243f1f29a7e0
-  - desktop/tests/test_commit_msg.py:505be6ffbee18922dc31eee174baf8a962d35f5dca9c28ba29fba352b3262cf8
-  - desktop/tests/test_cli_json_face.py:eddd34e046a1ebdd3b6d797f05076785b3c2505ecfae27c4426b2dc0b48a3695
-  - desktop/tests/test_ccv3_adapter.py:38960758d0f9487b70e02963e3e79bfd0c1d30f1e6160944e3d5b65bdc584516
-  - desktop/tests/test_ai_domain_closure.py:dc6a45d68ae576ae90a87700191ef5688aeb7db194139eff92317ecbc1140204
-  - desktop/tests/test_terminal.py:4746211c2b01d9289a78198b5b8b5a4c5d5afd5303acc60f19ffbe63c9026ce7
-  - desktop/tests/test_nf_cli.py:3517ec3f2dfee09a020c72a833675c60c8b4695be3cc816b2dac7d909f3b36be
+  - desktop/tests/test_write_flag_gate.py:bc55da5403b7acdcd8552c1f28c44f553f4a4f191ff8b9a81c47bae42a035803
+  - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
+  - desktop/tests/test_serve_default.py:739e151eda38b317123e03c06892f0ef2ef095735cc5dbb761453111ac2522b4
+  - desktop/tests/test_selfcontained_rebuild.py:46223ce2f7d49240be09d27975c303fc6e12c9619b63c5e328ec4e7aedf35d6d
+  - desktop/tests/test_rust_fastlane.py:d81a50895980f0877f858b088f4ad430753d73807504e28b3d83058c0762ccba
+  - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
+  - desktop/tests/test_mcp_write_freedom.py:4d951c1d395bec365ecc9971d2ce6acdc0063439823d61e9c23b7fb77767c025
+  - desktop/tests/test_mcp_runtime.py:9d6d1b11e2c2ecd517a9ddbe8bae64a3578e5e9462c12032dc1411f66f8f61eb
+  - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
+  - desktop/tests/test_layer_model.py:74ef800a95d1caed9d88809f76708b6de4427c6be9412387e5531e807f8ebf42
+  - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
+  - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
+  - desktop/tests/test_judge_references.py:4166744627ab477eddfff9fe782eee5f6bb457d8f4c93beb23df584087c8bf53
+  - desktop/tests/test_intake_gate.py:7b0fd39f903557abed07f6e10a562904bb043204d4843ced89d47df064f83fb2
+  - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
+  - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
+  - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
+  - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
+  - desktop/tests/test_dead_code.py:fb68a3060e21dcb37ee938905fa947abd78971210de0e8f7d291311759b0fa03
+  - desktop/tests/test_daemon_parity.py:50e84719761faee8726e25025fd52efc823dcdddb1c57f7efc4ae3488694c76b
+  - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
+  - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
+  - desktop/tests/test_cli_json_face.py:62f027e71d69a09980774e99027675de7ed1cdc0442c194754c79b42b2c16690
+  - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
+  - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
+  - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
+  - desktop/tests/test_nf_cli.py:4ddd00ad386d0e35e3bc717db777fda922019e1fd1f38580ef8912bdac682220
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；测试文件不在 `code_metrics` 棘轮面，未触发重冻。

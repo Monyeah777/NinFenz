@@ -6,16 +6,18 @@ scope: ① 执行作者裁决队列六项（闭包跨域形态 / 证据强度入
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/concept_graph.py:0f4bbd6b92ab0cb3daf47956378f7afd0d20432ed23f59e5d669621da7d239be
-  - verify.sh:06932ee691ac96922d199ed3662099dbf6094d62b16c7d3a263e4dfff64a6230
-  - README.en.md:02fed00159ffdfd36a17e4549a61cde38bba51181be4d5cd2171aace1ec136ca
-  - scripts/check_external_links.py:04cfe9fa4d7213021e60faac7ff88414db529090892ed38441ff61db8810861e
+  - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
+  - verify.sh:a3010dd8b83a54d5fc460ed761b89989ab49b946a58290b281276c8177a38c31
+  - README.en.md:1cff4f59322428a9bbd92efe5ff5b7578ac78ad61a6161af3a5d304695dc06a5
+  - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
   - community/量化金融域包/assets/QUANT_GRAPH.md:331d63943effe51462440c41832202df3b8e6bb2553734472947ac77927e094c
-  - .github/workflows/external-links.yml:3aa09434f507dd88969994666f4c25d1bf70eb3dbc940fa132a24eae8565c2dc
+  - .github/workflows/external-links.yml:e95c4fa1535bbf8de01b2204a661f5d77fb0e023daa41076975a2b547ddfa519
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects = 本波承重件（判据实现 / 门禁 / 双语入口 / 巡检工具 / 三件资产）；任一件再改，本件结论即失效须重审。

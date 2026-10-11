@@ -6,12 +6,14 @@ scope: 作者指令「先搜集所有可扩展标准；把所有域包在概念�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/domain_pack.py:336cbd097598ec272f15bfb2a912da3289ad95b5b1172a8c49948683df546a6a
-  - desktop/src/core/asset_density.py:84511253fa41989674eed66142fd572e4da7af288b6859b8e111a24eac999050
+  - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
+  - desktop/src/core/asset_density.py:a1f8eb7199ea0ecf25634303f30b3d90d8fc0f4d0a33eca432195b65393f1b99
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - protocol/data_contracts.json:2888c0e45d0a0a67303d1ba69bf271509d7690679546a1b696ce2c372f4d24eb
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects = 4 件（工厂、资产密度度量、公开文档、数据契约登记）；**不含派生物**

@@ -10,10 +10,12 @@ subjects:
   - community/AI系统域包/assets/CONCEPT_GRAPH.md:bd666baaf1bc9eccc0fbd319c37e922f2dc5abba09020003e74a1ec41c321894
   - community/AI系统域包/modules/M25_前置闭包求值.md:407a0cd4758d8390d04cfb8a3fd3b1bc4153b4e414cf023dc52f028e18ec353f
   - community/AI系统域包/modules/M26_装载序就绪门.md:997415ffd94150b0a6599359eaf04252001cf1b834495f0dfcfb95f5c50bddc3
-  - scripts/ai_domain_closure.py:2d5a1ed9e59dda0e72c185aed189647520183c6e2d4e942a2548dadd654cec1e
-  - desktop/tests/test_ai_domain_closure.py:dc6a45d68ae576ae90a87700191ef5688aeb7db194139eff92317ecbc1140204
+  - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
+  - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
 
 ---
+
+> 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 
