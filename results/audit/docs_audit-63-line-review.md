@@ -8,8 +8,8 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:2888c0e45d0a0a67303d1ba69bf271509d7690679546a1b696ce2c372f4d24eb
-  - protocol/assertions.json:a434491b89d398091cb9c1a44fd92fcf88100cefbc61513551380ec438f079a5
+  - protocol/data_contracts.json:8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3
+  - protocol/assertions.json:c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016
   - desktop/src/core/interop_export.py:446c6e1213b1c2488b6f1c80b32b8cfb3292094dac550b5deac6a3c9d4bf10ac
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056

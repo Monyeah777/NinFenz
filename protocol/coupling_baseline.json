@@ -1,10 +1,20 @@
 {
   "cycles": [],
   "metrics": {
+    "absence_guard": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "agent_rules_adapter": {
       "ca": 1,
       "ce": 3,
       "i": 0.75
+    },
+    "allowlist_expiry": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "anchor_align": {
       "ca": 0,
@@ -15,6 +25,16 @@
       "ca": 0,
       "ce": 2,
       "i": 1.0
+    },
+    "artifact_manifest": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "as_of": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "assemble_build": {
       "ca": 0,
@@ -56,6 +76,11 @@
       "ce": 2,
       "i": 1.0
     },
+    "ast_missing": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "atomic_write": {
       "ca": 47,
       "ce": 0,
@@ -81,6 +106,21 @@
       "ce": 3,
       "i": 1.0
     },
+    "boundaries": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "calibration_state": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "case_schema": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "category_registry": {
       "ca": 2,
       "ce": 0,
@@ -96,6 +136,11 @@
       "ce": 1,
       "i": 0.5
     },
+    "claim_labels": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "closure_scan": {
       "ca": 1,
       "ce": 1,
@@ -110,6 +155,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "commit_title_guard": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "community_inventory": {
       "ca": 1,
@@ -136,6 +186,11 @@
       "ce": 29,
       "i": 1.0
     },
+    "conformance_run": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "conformance_scan": {
       "ca": 35,
       "ce": 6,
@@ -143,6 +198,11 @@
     },
     "content_face": {
       "ca": 3,
+      "ce": 0,
+      "i": 0.0
+    },
+    "contract_pin": {
+      "ca": 0,
       "ce": 0,
       "i": 0.0
     },
@@ -171,6 +231,26 @@
       "ce": 2,
       "i": 0.6667
     },
+    "declined_ledger": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "delete_evidence": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "dep_closure": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "dirty_tree": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "disk_cache": {
       "ca": 7,
       "ce": 5,
@@ -185,6 +265,11 @@
       "ca": 3,
       "ce": 1,
       "i": 0.25
+    },
+    "doc_routing": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "domain_metrics": {
       "ca": 2,
@@ -221,6 +306,21 @@
       "ce": 0,
       "i": 0.0
     },
+    "error_codes": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "eval_collapse": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "eval_harness": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "execution_drill": {
       "ca": 1,
       "ce": 1,
@@ -236,10 +336,30 @@
       "ce": 8,
       "i": 0.8889
     },
+    "face_coverage": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "face_key": {
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "feature_lifecycle": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "fence_health": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "fetch_guard": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "gap_review": {
       "ca": 0,
@@ -251,10 +371,30 @@
       "ce": 3,
       "i": 0.75
     },
+    "grain_units": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "graph_health": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "grounding": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "handover": {
       "ca": 1,
       "ce": 3,
       "i": 0.75
+    },
+    "host_projection": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "impact_check": {
       "ca": 0,
@@ -270,6 +410,16 @@
       "ca": 6,
       "ce": 2,
       "i": 0.25
+    },
+    "injection_budget": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "injection_ledger": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "instruction_evidence": {
       "ca": 0,
@@ -297,6 +447,11 @@
       "i": 0.75
     },
     "interp_diet": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "invariants": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
@@ -347,7 +502,7 @@
       "i": 0.8
     },
     "lazy_yaml": {
-      "ca": 3,
+      "ca": 4,
       "ce": 0,
       "i": 0.0
     },
@@ -363,6 +518,11 @@
     },
     "license_gate": {
       "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
+    "load_state": {
+      "ca": 0,
       "ce": 0,
       "i": 0.0
     },
@@ -426,6 +586,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "missing_sentinel": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "modeling": {
       "ca": 1,
       "ce": 0,
@@ -471,6 +636,11 @@
       "ce": 4,
       "i": 1.0
     },
+    "numeric_grounding": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "official_core": {
       "ca": 3,
       "ce": 0,
@@ -480,6 +650,16 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "orphan_scan": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "output_envelope": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "output_forms": {
       "ca": 1,
@@ -500,6 +680,16 @@
       "ca": 2,
       "ce": 1,
       "i": 0.3333
+    },
+    "path_moved": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "path_trigger": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "paths": {
       "ca": 4,
@@ -561,7 +751,17 @@
       "ce": 6,
       "i": 0.8571
     },
+    "plan_token": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "plog": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "policy_snapshot": {
       "ca": 0,
       "ce": 0,
       "i": 0.0
@@ -676,6 +876,21 @@
       "ce": 4,
       "i": 1.0
     },
+    "report_meta": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "requirement_coverage": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "residual_registry": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "response_cache": {
       "ca": 2,
       "ce": 0,
@@ -685,6 +900,11 @@
       "ca": 0,
       "ce": 3,
       "i": 1.0
+    },
+    "retry_semantics": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "rfc": {
       "ca": 1,
@@ -701,6 +921,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "rule_conflict": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "rules_render": {
       "ca": 0,
       "ce": 0,
@@ -710,6 +935,11 @@
       "ca": 6,
       "ce": 3,
       "i": 0.3333
+    },
+    "schema_pins": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "semantic_conflict": {
       "ca": 0,
@@ -736,10 +966,20 @@
       "ce": 0,
       "i": 0.0
     },
+    "since_tags": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "skill_adapter": {
       "ca": 1,
       "ce": 2,
       "i": 0.6667
+    },
+    "skill_contract": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "st_quality": {
       "ca": 1,
@@ -765,6 +1005,16 @@
       "ca": 8,
       "ce": 3,
       "i": 0.2727
+    },
+    "strict_schema": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "style_dna": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "telemetry_semconv": {
       "ca": 0,
@@ -801,15 +1051,30 @@
       "ce": 1,
       "i": 0.5
     },
+    "unknown_policy": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "validator": {
       "ca": 0,
       "ce": 2,
       "i": 1.0
     },
+    "value_replay": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "variants": {
       "ca": 0,
       "ce": 1,
       "i": 1.0
+    },
+    "verifier_props": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
     },
     "verify_report": {
       "ca": 0,
@@ -840,6 +1105,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "yaml_recheck": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
     }
   },
   "note": "存量耦合债登记（棘轮：只许减少；新增环/SDP 违例判 FAIL，除非评审后重登）",
