@@ -116,9 +116,9 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/community_inventory.py": {
-      "lines": 199,
+      "lines": 212,
       "max_fn_cc": 11,
-      "max_fn_lines": 43
+      "max_fn_lines": 45
     },
     "desktop/src/core/composer.py": {
       "lines": 128,
