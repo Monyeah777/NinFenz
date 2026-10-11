@@ -22,7 +22,28 @@ def build() -> ip.Dispatcher:
 
 
 def main() -> int:
-    return ip.serve_stdio(build(), sys.stdin, sys.stdout)
+    import argparse
+    import time
+    ap = argparse.ArgumentParser(description="NF Interop Layer 演示服务（P-I0/P-I1）")
+    ap.add_argument("--lines", action="store_true", help="换行分隔 JSON 传输（默认 Content-Length 帧）")
+    ap.add_argument("--http", type=int, default=0, metavar="PORT",
+                    help="起 HTTP loopback 服务（0=临时端口）")
+    args = ap.parse_args()
+    d = build()
+    if args.http:
+        server, _thread = ip.serve_http(d, port=args.http)
+        host, port = server.server_address[:2]
+        print("interop HTTP loopback: http://%s:%d/（POST JSON-RPC）" % (host, port), flush=True)
+        try:
+            while True:
+                time.sleep(3600)
+        except KeyboardInterrupt:
+            return 0
+        finally:
+            server.shutdown()
+    if args.lines:
+        return ip.serve_lines(d, sys.stdin, sys.stdout)
+    return ip.serve_stdio(d, sys.stdin, sys.stdout)
 
 
 if __name__ == "__main__":

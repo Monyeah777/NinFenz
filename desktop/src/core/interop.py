@@ -11,7 +11,8 @@
 """
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List
+import json
+from typing import Any, Callable, Dict, List, Tuple
 
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600
@@ -72,6 +73,86 @@ class Dispatcher:
         if "id" not in msg:                            # 通知：执行但不应答
             return []
         return [result(msg.get("id"), value)]
+
+
+def _write_line(wfile: Any, msg: Dict[str, Any]) -> None:
+    """换行分隔 JSON 写出（MCP 风格面；与 Content-Length 帧互不混用）。"""
+    text = json.dumps(msg, ensure_ascii=False) + "\n"
+    target = getattr(wfile, "buffer", None) or wfile
+    try:
+        target.write(text)
+    except TypeError:                      # 二进制流：编码后再写
+        target.write(text.encode("utf-8"))
+    flush = getattr(target, "flush", None)
+    if flush:
+        flush()
+
+
+def serve_lines(dispatcher: Dispatcher, rfile: Any, wfile: Any) -> int:
+    """换行分隔 JSON 传输（本地 IPC/socket 面）：坏行回 -32700 后**继续服务**，EOF 收摊。"""
+    while True:
+        raw = rfile.readline()
+        if not raw:
+            return 0
+        if isinstance(raw, bytes):
+            raw = raw.decode("utf-8", "replace")
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            msg = json.loads(raw)
+        except ValueError:
+            _write_line(wfile, error(None, PARSE_ERROR,
+                                     "坏行（非法 UTF-8/JSON）；修复指引：一行一条 UTF-8 JSON"))
+            continue
+        for out in dispatcher.handle(msg):
+            _write_line(wfile, out)
+
+
+def make_http_handler(dispatcher: Dispatcher):
+    """HTTP loopback 面的请求处理器（POST / 收 JSON-RPC，正文即消息）。"""
+    from http.server import BaseHTTPRequestHandler
+
+    class _Handler(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, *args: Any) -> None:      # 静默，避免测试噪音
+            return
+
+        def do_POST(self) -> None:                      # noqa: N802 - 基类约定名
+            length = int(self.headers.get("Content-Length") or 0)
+            body = self.rfile.read(length) if length else b""
+            try:
+                msg = json.loads(body.decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                self._send(error(None, PARSE_ERROR, "坏正文：须为 UTF-8 JSON"))
+                return
+            replies = dispatcher.handle(msg)
+            self._send(replies[0] if replies else result(None, None))
+
+        def do_GET(self) -> None:                       # noqa: N802 - 基类约定名
+            self._send(result(None, {"methods": dispatcher.methods()}))
+
+        def _send(self, payload: Dict[str, Any]) -> None:
+            data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+    return _Handler
+
+
+def serve_http(dispatcher: Dispatcher, host: str = "127.0.0.1", port: int = 0
+               ) -> Tuple[Any, Any]:
+    """起 HTTP loopback 服务 → (server, thread)；port=0 取临时端口。调用方负责 shutdown。"""
+    import threading
+    from http.server import HTTPServer
+    server = HTTPServer((host, port), make_http_handler(dispatcher))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return server, thread
 
 
 def serve_stdio(dispatcher: Dispatcher, rfile: Any, wfile: Any) -> int:
