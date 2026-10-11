@@ -13,6 +13,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from core import gate_faces as gf
+from core import gate_graph as gg
 
 #: 级别严宽序（数值越大越严）。
 _ORDER = {"SAFE": 0, "CONDITIONAL": 1, "UNSAFE": 2}
@@ -36,15 +37,14 @@ def route(root: str, changed: Sequence[str], experts: Optional[Dict[str, Any]] =
     dense: List[str] = []
     routed: List[Dict[str, Any]] = []
     dormant: List[Dict[str, str]] = []
+    affected = gg.affected_experts(root, changed_n, experts=decl)
     for eid, e in sorted(decl.items()):
         level, _why = effective_level(root, e)
-        reads = [str(x) for x in (e.get("reads") or [])]
-        hit = bool(changed_n) and any(gf.covered(c, reads) for c in changed_n)
         if level == "UNSAFE":
             dense.append(eid)
             routed.append({"id": eid, "level": level, "via": "dense(UNSAFE)"})
-        elif hit:
-            routed.append({"id": eid, "level": level, "via": "读面命中"})
+        elif eid in affected:
+            routed.append({"id": eid, "level": level, "via": affected[eid]})
         else:
             dormant.append({"id": eid, "reason": "读面与变更闭包不相交（level=%s）" % level})
     plan = {"mode": mode, "changed": changed_n, "dense": dense,
