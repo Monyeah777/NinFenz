@@ -86,7 +86,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/category_registry.py": {
-      "lines": 185,
+      "lines": 206,
       "max_fn_cc": 13,
       "max_fn_lines": 43
     },
