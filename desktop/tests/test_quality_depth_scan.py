@@ -24,6 +24,11 @@ def _count_opens(fn):
     orig = io.open
 
     def spy(file, *a, **k):
+        if isinstance(file, int):
+            # 文件描述符不是「一份件」：os.fdopen(fd) 也会走到这里（atomic_write 的分支），
+            # 若把它 str() 成 "3" 再 abspath，就会在仓库根下造出一个假路径并计满计数
+            # （实测把真实最大 3 次顶成 28 次 ⇒ 判据失真）。故非路径参数一律不计数。
+            return orig(file, *a, **k)
         try:
             path = os.path.abspath(str(file))
             if path.startswith(ROOT) and os.sep + ".git" + os.sep not in path \

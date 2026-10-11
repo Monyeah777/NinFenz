@@ -426,16 +426,16 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 3,
+        "metrics_drift": 0,
         "metrics_missing": 0,
         "metrics_recorded": 231,
         "modules": 231,
         "registered_cycles": 0,
-        "registered_sdp": 9,
+        "registered_sdp": 8,
         "sdp": 8
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "perf_budget",
@@ -514,12 +514,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "42a0381b1eafd20f206a2599efb9d76d87c44f5723f21db547537a788fbbcd32",
+  "root_digest": "7c27b3b1b787905663fa28e2e16c97e1c45bc5d847cc43a6de0ed2dea8790fed",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 27,
-    "warn": 3
+    "pass": 28,
+    "warn": 2
   }
 }
