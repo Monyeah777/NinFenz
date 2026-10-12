@@ -112,8 +112,15 @@ def cacheable(mod: str, rec: dict | None, tests_dir: Path | None = None) -> bool
 
 
 def lane_of(rec: dict | None) -> str:
-    """quick | slow：单模块实测秒数达到阈值即让位（数据驱动，不靠猜）。"""
-    return "slow" if ((rec or {}).get("seconds") or 0) >= SLOW_SECONDS else "quick"
+    """quick | slow：秒数达到阈值即让位；**成本说不清（观测非 ok）也一律让位**。
+
+    为什么非 ok 要让位：那类记录没有可信秒数（实测有 observe_error 记 0s、真跑 137s 的），
+    留在快车道会让「秒级」变成谎话。让位不等于跳过——名单照打，慢车道/--all 照跑。
+    """
+    rec = rec or {}
+    if rec.get("status") != "ok":
+        return "slow"
+    return "slow" if (rec.get("seconds") or 0) >= SLOW_SECONDS else "quick"
 
 
 def _covered(changed: list, reads: list) -> bool:

@@ -105,8 +105,17 @@ class SelectTest(unittest.TestCase):
                 self.assertFalse(gs.cacheable(mod, doc[mod], tdir), mod)
 
     def test_lane_threshold(self):
-        self.assertEqual(gs.lane_of({"seconds": gs.SLOW_SECONDS - 1}), "quick")
-        self.assertEqual(gs.lane_of({"seconds": gs.SLOW_SECONDS}), "slow")
+        """阈值只对「成本可信」（status ok）的记录生效；缺 status 一律保守让位。"""
+        self.assertEqual(gs.lane_of({"status": "ok", "seconds": gs.SLOW_SECONDS - 1}), "quick")
+        self.assertEqual(gs.lane_of({"status": "ok", "seconds": gs.SLOW_SECONDS}), "slow")
+        self.assertEqual(gs.lane_of({"seconds": 1}), "slow")
+
+    def test_unknown_cost_goes_to_slow_lane(self):
+        """成本说不清（观测非 ok）必须让位：实测有 observe_error 记 0s、真跑 137s 的模块。"""
+        self.assertEqual(gs.lane_of({"status": "observe_error", "seconds": 0}), "slow")
+        self.assertEqual(gs.lane_of({"status": "timeout", "seconds": 0}), "slow")
+        self.assertEqual(gs.lane_of({"status": "tests_failed", "seconds": 1}), "slow")
+        self.assertEqual(gs.lane_of({"status": "ok", "seconds": 1}), "quick")
 
 
 class FailClosedDataTest(unittest.TestCase):

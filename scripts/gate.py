@@ -139,6 +139,7 @@ def _check(changed, workers, as_json, include_slow, use_cache, plan_only):
     for mod in failed:
         lines.append(f"  [红] {mod}")
     _emit("gate-check", {"failed": failed, "wall": result["wall"],
+                         "fresh": result["fresh"],
                          "hits": [m for m, _v in cached],
                          "deferred": plan_doc["deferred"]}, as_json, lines)
     return 1 if failed else 0

@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-12",
   "approved_by": "Monyeah",
-  "note": "机械重批：落地 gate_check + 基线重冻后冻结链重算",
+  "note": "机械重批：观测超时与车道规则修复 + 耦合基线重冻后冻结链重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"

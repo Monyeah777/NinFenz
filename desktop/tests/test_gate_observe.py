@@ -39,6 +39,16 @@ class T(unittest.TestCase):
         self.assertTrue(False)
 """
 
+_SLEEP_PROBE = """
+import time
+import unittest
+
+
+class T(unittest.TestCase):
+    def test_slow(self):
+        time.sleep(6)
+"""
+
 
 def _make_pkg(tmp):
     root = Path(tmp)
@@ -50,6 +60,8 @@ def _make_pkg(tmp):
                                                               encoding="utf-8", newline="\n")
     (root / "desktop" / "tests" / "test_probe_child.py").write_text(_CHILD_PROBE,
                                                                     encoding="utf-8", newline="\n")
+    (root / "desktop" / "tests" / "test_probe_sleep.py").write_text(_SLEEP_PROBE,
+                                                                  encoding="utf-8", newline="\n")
     (root / "desktop" / "tests" / "test_probe_red.py").write_text(_RED_PROBE,
                                                                   encoding="utf-8", newline="\n")
     return root
@@ -78,6 +90,14 @@ class ObserveOneTest(unittest.TestCase):
             root = _make_pkg(tmp)
             rec = go.observe_one("test_probe_red", root=str(root), capture_children=False)
             self.assertEqual(rec["status"], "tests_failed", rec)
+
+    def test_timeout_is_enforced_and_says_so(self):
+        """超时必须在场上生效并如实记 timeout（此前 timeout 参数根本没传到子进程）。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _make_pkg(tmp)
+            rec = go.observe_one("test_probe_sleep", root=str(root), timeout=1,
+                                 capture_children=False)
+            self.assertEqual(rec["status"], "timeout", rec)
 
     def test_missing_module_is_marked(self):
         with tempfile.TemporaryDirectory() as tmp:
