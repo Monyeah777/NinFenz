@@ -1509,6 +1509,7 @@
     "scripts/fde_sample_run.py::UP006": 21,
     "scripts/fde_sample_run.py::UP031": 39,
     "scripts/fde_sample_run.py::UP035": 3,
+    "scripts/gate.py::RUF100": 1,
     "scripts/gate.py::UP031": 13,
     "scripts/geo_export.py::E501": 1,
     "scripts/geo_export.py::I001": 1,

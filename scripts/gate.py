@@ -10,16 +10,19 @@
   python scripts/gate.py --select docs/README.md   # 按改动选出该跑的测试模块（秒级 check 前半）
   python scripts/gate.py --observe --workers 5     # 观测测试模块读面（数据落缓存区，不入库）
   python scripts/gate.py --verdicts docs/README.md # 判定缓存 dry-run（只查不跑：谁会命中）
+  python scripts/gate.py --check docs/README.md    # 跑快车道 check（--plan-only 只看计划）
 """
 import argparse
 import json
 import os
+import subprocess  # nosec B404 - 只跑仓库内测试（argv 列表、无 shell、路径自仓库）
 import sys
 from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
+from core import gate_check as gcheck  # noqa: E402
 from core import gate_faces as gf  # noqa: E402
 from core import gate_observe as go  # noqa: E402
 from core import gate_select as gs  # noqa: E402
@@ -103,6 +106,44 @@ def _route_datalog(changed, as_json):
     return 0 if got["status"] == "OK" else 1
 
 
+def _invoke_module(mod, timeout=600):
+    """真跑一个测试模块 → (退出码, 秒数)。"""
+    import time
+    started = time.perf_counter()
+    proc = subprocess.run([sys.executable, "-m", "unittest", f"tests.{mod}", "-q"],  # noqa: S603
+                          cwd=os.path.join(ROOT, "desktop"), capture_output=True,
+                          timeout=timeout)  # nosec B603
+    return proc.returncode, round(time.perf_counter() - started, 2)
+
+
+def _check(changed, workers, as_json, include_slow, use_cache, plan_only):
+    """快车道 check：计划期定键 → 并行 → 按钉住的键落盘。"""
+    plan_doc = gcheck.plan(changed, root=ROOT, quick_only=not include_slow,
+                           use_cache=use_cache)
+    cached, to_run = plan_doc["cached"], plan_doc["to_run"]
+    if plan_only:
+        _emit("gate-check-plan", {"cached": [m for m, _v in cached],
+                                  "to_run": [m for m, _p in to_run],
+                                  "deferred": plan_doc["deferred"],
+                                  "uncacheable": plan_doc["uncacheable"]}, as_json,
+              [f"== check 计划 ==  命中 {len(cached)} · 真跑 {len(to_run)} · "
+               f"慢车道让位 {len(plan_doc['deferred'])} · 跳过 {len(plan_doc['skipped'])}"])
+        return 0
+    result = gcheck.execute(plan_doc, _invoke_module, workers=workers)
+    result["failed"] = gcheck.failed(result)
+    failed = result["failed"]
+    lines = [f"== 快车道 check ==  计划 {len(cached) + len(to_run)}"
+             f"（命中 {len(cached)} · 真跑 {len(to_run)}）",
+             f"  墙钟 {result['wall']}s · 红 {len(failed)} · 慢车道让位 {len(plan_doc['deferred'])}"
+             f" · 跳过 {len(plan_doc['skipped'])}"]
+    for mod in failed:
+        lines.append(f"  [红] {mod}")
+    _emit("gate-check", {"failed": failed, "wall": result["wall"],
+                         "hits": [m for m, _v in cached],
+                         "deferred": plan_doc["deferred"]}, as_json, lines)
+    return 1 if failed else 0
+
+
 def _verdicts(changed, as_json):
     """判定缓存 dry-run：只查不跑，报出「谁会命中 / 谁要真跑 / 谁不可缓存」。"""
     got = gs.select(changed, root=ROOT)
@@ -178,6 +219,11 @@ def main(argv=None) -> int:
     ap.add_argument("--observe", nargs="*", default=None, metavar="MOD",
                     help="观测测试模块读面（省略模块名即全量；可续跑）")
     ap.add_argument("--workers", type=int, default=5, help="观测/执行的并行度")
+    ap.add_argument("--check", nargs="*", default=None, metavar="PATH",
+                    help="按改动跑快车道 check（判定缓存 + 并行 + 慢车道让位）")
+    ap.add_argument("--all", action="store_true", help="check 时含慢车道（定时/发布用）")
+    ap.add_argument("--no-cache", action="store_true", help="check 时绕过判定缓存")
+    ap.add_argument("--plan-only", action="store_true", help="check 只出计划不执行")
     ap.add_argument("--verdicts", nargs="*", default=None, metavar="PATH",
                     help="判定缓存 dry-run：按改动报出命中/真跑/不可缓存")
     ap.add_argument("--select", nargs="*", default=None, metavar="PATH",
@@ -197,6 +243,9 @@ def main(argv=None) -> int:
         return _route_datalog(args.route_datalog, args.json)
     if args.observe is not None:
         return _observe_all(args.observe, args.workers, args.json)
+    if args.check is not None:
+        return _check(args.check, args.workers, args.json, args.all, not args.no_cache,
+                      args.plan_only)
     if args.verdicts is not None:
         return _verdicts(args.verdicts, args.json)
     if args.select is not None:
