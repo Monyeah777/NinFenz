@@ -19,6 +19,7 @@
 | rust-fastlane | Rust 只读快线（nf-rs） | cli | active | 1.0.0 | @Monyeah777 | cargo run --release --manifest-path engine/rust/Cargo.toml | engine/rust/README.md |
 | site | 文档站点（人 + 机器入口） | export | proposed | 1.1.0 | @Monyeah777 | site/index.html | site/README.md |
 | tui | 终端 TUI（tui/nf.py） | cli | active | 1.0.0 | @Monyeah777 | python tui/nf.py --selftest | tui/README.md |
+| wasm-plugin | 微内核 wasm 插件面（P5） | library | active | 0.1.0 | @Monyeah777 | python scripts/plugin_promote.py --json | engine/wasm/README.md |
 <!-- nf:integrations:end -->
 
 ## 字段口径

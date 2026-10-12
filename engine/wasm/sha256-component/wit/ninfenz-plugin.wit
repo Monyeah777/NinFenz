@@ -1,0 +1,26 @@
+// ninfenz-plugin.wit —— 微内核插件的**接口契约**（P5-03.1 IDL）
+//
+// 这份 WIT 是插件的规范面：装载期校验用它的导出函数名对照清单声明的 methods
+// （desktop/src/core/plugin_manifest.py::validated_against_wit），名字对不上即拒绝装载。
+//
+// 现状（诚实）：本仓库当前产出的是 **WASI preview 1 的 CLI 形态**插件，尚未产出
+// Component Model 的二进制组件（.wasm 组件）。两者的**接口语义**是同一份（下面的 world），
+// 差异只在编码：CLI 形态把 list<u8> 走 stdin/stdout 管道，组件形态走 Canonical ABI 的
+// (ptr,len) 对。装载期校验因此落在「方法名 + I/O 形状 + 能力声明 + 确定性声明」上，
+// 而不是落在二进制的类型段上——后者要等组件形态落地才能收紧（P5-03.2 的剩余项）。
+
+package ninfenz:plugin@0.1.0;
+
+/// 插件导出的方法面。每个方法都是**纯函数**：字节进、字节出，无副作用。
+interface methods {
+    /// SHA-256 摘要：输入任意字节，输出 32 字节摘要（CLI 形态下十六进制 + LF）。
+    /// 确定性等级：deterministic（同一输入必得同一输出，跨平台/跨次运行）。
+    sha256: func(data: list<u8>) -> result<list<u8>, string>;
+}
+
+world nf-plugin {
+    /// 刻意**不导入**任何宿主能力：无文件系统、无网络、无时钟、无随机。
+    /// 需要能力必须在清单里显式声明；装载期对 fs/net 的**任何非空请求一律拒绝**
+    /// （deny by default，见 core/plugin_manifest.py::validate）。
+    export methods;
+}

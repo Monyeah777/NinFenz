@@ -1,0 +1,24 @@
+{
+  "schema": "nf-cross-lang-ratchet/1",
+  "note": "各实现覆盖的 spec_clause 集合（只增不减，§16.3 覆盖棘轮）。由 .rivet/private_archive/gen_cross_lang_vectors.py 生成。",
+  "clauses": {
+    "csharp": [
+      "RFC8785/3.1",
+      "RFC8785/3.2.2.2",
+      "RFC8785/3.2.2.3",
+      "RFC8785/3.2.3"
+    ],
+    "python": [
+      "RFC8785/3.1",
+      "RFC8785/3.2.2.2",
+      "RFC8785/3.2.2.3",
+      "RFC8785/3.2.3"
+    ],
+    "rust": [
+      "RFC8785/3.1",
+      "RFC8785/3.2.2.2",
+      "RFC8785/3.2.2.3",
+      "RFC8785/3.2.3"
+    ]
+  }
+}

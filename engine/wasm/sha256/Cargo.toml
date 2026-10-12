@@ -1,0 +1,15 @@
+[package]
+name = "nf-plugin-sha256"
+version = "0.1.0"
+edition = "2021"
+description = "NF 微内核参考插件（WASI preview1 CLI；std-only，无外部 crate）"
+license = "MIT"
+
+# 刻意 std-only：插件跑在**默认无 fs / 无 net / 无 env**的沙箱里，且要求 fuel 可计量、
+# 结果确定性。任何外部 crate 都会把这三条承诺变成「取决于依赖树」，故一律不引。
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"

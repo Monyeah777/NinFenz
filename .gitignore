@@ -50,3 +50,6 @@ checkpoints/
 # 且 `obj/` 里的文件是 CRLF/BOM 的，会撞编码卫生判据（text_hygiene 只看文件系统、不看 .gitignore）。
 engine/dotnet/**/bin/
 engine/dotnet/**/obj/
+# NativeAOT / 裁剪发布产物（P5-08 取数用；体积 MB 级，绝不入仓）
+engine/dotnet/tools/nf-canonical/dist-aot/
+engine/dotnet/tools/nf-canonical/dist-trim/

@@ -1,0 +1,15 @@
+# 密封构建只吃源码与协议件：把构建产物与本地工作区挡在上下文之外。
+.git
+.rivet
+.nf-logs
+.artifacts
+**/target/
+**/bin/
+**/obj/
+**/dist/
+**/dist-aot/
+**/dist-trim/
+**/__pycache__/
+**/*.pyc
+packaging/npm/payload
+site
