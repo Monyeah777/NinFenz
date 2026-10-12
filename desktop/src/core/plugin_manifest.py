@@ -85,9 +85,7 @@ def validate(doc: Any) -> list[str]:
         seen.add(name)
         if m.get("determinism") not in DETERMINISM:
             issues.append(f"{name}.determinism 非法：{m.get('determinism')!r}")
-        io = m.get("io")
-        if not isinstance(io, dict) or not (io.get("stdin") or io.get("argv")):
-            issues.append(f"{name}.io 缺输入面（stdin 或 argv 至少其一）")
+        issues.extend(_io_issues(name, m, str(doc.get("abi") or "")))
         cost = m.get("cost")
         if not isinstance(cost, dict) or cost.get("kind") not in COST_KINDS or not cost.get("unit"):
             issues.append(f"{name}.cost 须为 {{kind: {'|'.join(COST_KINDS)}, unit: ...}}")
@@ -104,6 +102,24 @@ def validate(doc: Any) -> list[str]:
             except _paths.PathEscapeError as exc:
                 issues.append(f"artifact.path 逃逸仓库根：{exc}")
     return issues
+
+
+def _io_issues(name: str, method: dict[str, Any], abi: str) -> list[str]:
+    """输入面按 **ABI** 判，而不是「随便有个键就算」。
+
+    CLI 形态靠 stdin/argv 搬运；组件形态靠 Canonical ABI 的具名调用（io.invoke）。
+    两者都允许任意形状，等于没有校验——装载期必须能把「形态与 ABI 不匹配」判红。
+    """
+    io = method.get("io")
+    if not isinstance(io, dict):
+        return [f"{name}.io 缺失"]
+    if abi == "wasi-preview2-component":
+        if not str(io.get("invoke") or "").strip():
+            return [f"{name}.io.invoke 缺失（组件形态必须声明调用名，否则装载期无从调用）"]
+        return []
+    if not (io.get("stdin") or io.get("argv")):
+        return [f"{name}.io 缺输入面（stdin 或 argv 至少其一）"]
+    return []
 
 
 def _fuel_issues(name: str, method: dict[str, Any]) -> list[str]:
