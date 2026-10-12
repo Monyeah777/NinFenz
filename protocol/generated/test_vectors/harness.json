@@ -8,7 +8,15 @@
       "level": "L1",
       "compare_rule": "byte",
       "expected": "2\n",
-      "langs": {"python": {"cmd": ["python", "-c", "print(1+1)"]}}
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "-c",
+            "print(1+1)"
+          ]
+        }
+      }
     },
     {
       "id": "harness/toolchain-probe",
@@ -17,8 +25,20 @@
       "compare_rule": "byte",
       "expected": "",
       "langs": {
-        "rust": {"cmd": ["cargo", "--version"], "probe": true},
-        "csharp": {"cmd": ["dotnet", "--list-sdks"], "probe": true}
+        "rust": {
+          "cmd": [
+            "cargo",
+            "--version"
+          ],
+          "probe": true
+        },
+        "csharp": {
+          "cmd": [
+            "dotnet",
+            "--list-sdks"
+          ],
+          "probe": true
+        }
       }
     }
   ]

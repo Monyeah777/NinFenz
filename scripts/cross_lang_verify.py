@@ -187,6 +187,46 @@ def _run_declared(spec, key, lang, exe, runner, cache):
     return rc, out
 
 
+def _evaluate_lang(lang, spec, exe, runner, root, cache, rule, expect, expected):
+    """单个（语言 × 向量）→ (状态条目 或 None, kind)。kind ∈ {"ok","missing","mismatch"}。
+
+    拆出来是因为原先 verify 一个函数扛下了五种情形（probe / 缺席 / 构建失败 / 拒绝语义 /
+    归一失败），file 级圈复杂度 34 > 阈值 25。这里把「一个语言怎么判」独立成一段。
+    """
+    if spec.get("probe"):
+        if not exe:
+            return {"status": "UNKNOWN", "detail": f"工具链缺席：{PROBES.get(lang, lang)}"}, "missing"
+        rc, out = runner(_with_exe(spec.get("cmd") or [], exe), root, stdin=_stdin_bytes(spec, root))
+        ok = (rc == 0 and bool(out.strip()))
+        entry = {"status": "PASS" if ok else "UNKNOWN",
+                 "detail": (f"工具链探针（rc={rc}，输出 {len(out)} 字节"
+                            f"{'' if ok else '：在场但无可用 SDK'}）")}
+        return entry, "ok" if ok else "missing"
+    if not exe:
+        return {"status": "UNKNOWN", "detail": f"工具链缺席：{PROBES.get(lang, lang)}"}, "missing"
+    built = _run_declared(spec, "build", lang, exe, runner, cache)
+    if built is not None and built[0] != 0:
+        rc_b, _ = built
+        if rc_b == -2:
+            return {"status": "UNKNOWN", "detail": "构建步骤的可执行文件缺席"}, "missing"
+        return {"status": "FAIL", "rc": rc_b,
+                "detail": f"声明的实现建不起来（rc={rc_b}）"}, "mismatch"
+    rc, out = runner(_with_exe(spec.get("cmd") or [], exe), root, stdin=_stdin_bytes(spec, root))
+    if expect == "fail":
+        ok = (rc != 0 and not out.strip())
+        entry = {"status": "PASS" if ok else "FAIL", "rc": rc,
+                 "detail": f"拒绝语义（rc={rc}，stdout {len(out)} 字节）"}
+        return entry, "ok" if ok else "mismatch"
+    try:
+        got = canonical(rule, out)
+    except (ValueError, UnicodeDecodeError) as exc:
+        return {"status": "FAIL", "rc": rc,
+                "detail": f"输出无法按 {rule} 归一：{exc}"}, "mismatch"
+    ok = (rc == 0 and got == expected)
+    return ({"status": "PASS" if ok else "FAIL", "rc": rc,
+             "got": got.decode("utf-8", "replace")[:120]}, "ok" if ok else "mismatch")
+
+
 def verify(doc, root=ROOT, runner=run_cmd, tools=None, builds=None):
     """→ 报告：逐向量逐语言三态 + 整条/整体判决（PASS/FAIL/UNKNOWN）。
 
@@ -202,61 +242,13 @@ def verify(doc, root=ROOT, runner=run_cmd, tools=None, builds=None):
         row = {"id": str(v.get("id")), "rule": rule, "expect": expect, "langs": {}}
         missing, mismatch = [], []
         for lang, spec in sorted((v.get("langs") or {}).items()):
-            exe = tools.get(lang)
-            if spec.get("probe"):
-                if not exe:
-                    row["langs"][lang] = {"status": "UNKNOWN",
-                                          "detail": f"工具链缺席：{PROBES.get(lang, lang)}"}
-                    missing.append(lang)
-                    continue
-                rc, out = runner(_with_exe(spec.get("cmd") or [], exe), root,
-                                 stdin=_stdin_bytes(spec, root))
-                ok = (rc == 0 and bool(out.strip()))
-                row["langs"][lang] = {
-                    "status": "PASS" if ok else "UNKNOWN",
-                    "detail": (f"工具链探针（rc={rc}，输出 {len(out)} 字节"
-                               f"{'' if ok else '：在场但无可用 SDK'}）")}
-                if not ok:
-                    missing.append(lang)
-                continue
-            if not exe:
-                row["langs"][lang] = {"status": "UNKNOWN",
-                                      "detail": f"工具链缺席：{PROBES.get(lang, lang)}"}
+            entry, kind = _evaluate_lang(lang, spec, tools.get(lang), runner, root, cache,
+                                         rule, expect, expected)
+            if entry is not None:
+                row["langs"][lang] = entry
+            if kind == "missing":
                 missing.append(lang)
-                continue
-            built = _run_declared(spec, "build", lang, exe, runner, cache)
-            if built is not None and built[0] != 0:
-                rc_b, _ = built
-                if rc_b == -2:
-                    row["langs"][lang] = {"status": "UNKNOWN", "detail": "构建步骤的可执行文件缺席"}
-                    missing.append(lang)
-                else:
-                    row["langs"][lang] = {
-                        "status": "FAIL", "rc": rc_b,
-                        "detail": f"声明的实现建不起来（rc={rc_b}）"}
-                    mismatch.append(lang)
-                continue
-            rc, out = runner(_with_exe(spec.get("cmd") or [], exe), root,
-                             stdin=_stdin_bytes(spec, root))
-            if expect == "fail":
-                ok = (rc != 0 and not out.strip())
-                row["langs"][lang] = {
-                    "status": "PASS" if ok else "FAIL", "rc": rc,
-                    "detail": f"拒绝语义（rc={rc}，stdout {len(out)} 字节）"}
-                if not ok:
-                    mismatch.append(lang)
-                continue
-            try:
-                got = canonical(rule, out)
-            except (ValueError, UnicodeDecodeError) as exc:
-                row["langs"][lang] = {"status": "FAIL", "rc": rc,
-                                      "detail": f"输出无法按 {rule} 归一：{exc}"}
-                mismatch.append(lang)
-                continue
-            ok = (rc == 0 and got == expected)
-            row["langs"][lang] = {"status": "PASS" if ok else "FAIL", "rc": rc,
-                                  "got": got.decode("utf-8", "replace")[:120]}
-            if not ok:
+            elif kind == "mismatch":
                 mismatch.append(lang)
         row["verdict"] = "FAIL" if mismatch else ("UNKNOWN" if missing else "PASS")
         report["vectors"].append(row)

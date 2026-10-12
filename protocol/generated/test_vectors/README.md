@@ -12,6 +12,7 @@
 | jcs_basic.json | P-C1 单条真契约向量（jcs_conformance 的子集） | 三实现逐字节 |
 | jcs_conformance.json | 8 条 JCS 正例（键序 / ES 数字形态 / 最小转义 / 嵌套排序） | 三实现逐字节 |
 | jcs_reject.json | 6 条 L4 负例（重复键 / 尾随逗号 / 前导零 / 非有限数 / 孤立代理 / 尾随内容） | 三实现均须非零退出且无标准输出 |
+| jcs_bad_*.badjson | 负例夹具（**故意不是合法 JSON**） | — |
 | ratchet.json | 覆盖棘轮基线：各实现覆盖的 spec_clause 集合（只增不减，§16.3） | 常驻判据 |
 | jcs_input.json 等 | 输入夹具（生成器产出，勿手改） | — |
 
@@ -33,6 +34,21 @@
   "真跑一次探针"判可用）；
 - Rust / C# 侧需先构建：构建步骤由向量的 build 字段声明（失败 = FAIL，exe 缺席 = UNKNOWN）；
 - 常驻判据（desktop/tests/test_cross_lang_matrix.py）**不构建**：产物缺席即 skip（照 test_rust_fastlane 的既有纪律）。
+
+## 两条刻意的取舍（都是被门禁逼出来的，不是随手）
+
+**一、负例夹具用 .badjson 而不是 .json。** 仓库的编码卫生门（core/text_hygiene.py）要求
+**每个 .json 都是合法且标识面干净的 JSON 文档**。负例夹具按定义不是合法 JSON——它们是拒绝
+路径的输入。若叫 .json，要么得改卫生门（把「仓库里的 JSON 都能解析」这条真判据削弱），
+要么得假装它们是文档；两个都不该做。故用 .badjson：扩展名如实说明「这不是一份 JSON 文档」。
+
+**二、没有 astral 键的向量。** RFC 8785 的键序是 UTF-16 码元序，而「码元序 ≠ 码点序」只在
+增补平面键（如 U+1F600）与 U+E000..U+FFFF 键之间出现。但卫生门要求 JSON **键**只含
+ASCII + CJK 汉字，而所有「码元 > D840 且码点更小」的 BMP 码位恰好都是私用区或兼容汉字——
+正是同形高风险类，不该为一条向量去放宽它。故该分歧**不进仓内夹具**，改由三处实现级判据
+覆盖：engine/rust/canonical 的单测、engine/dotnet/tools/nf-canonical 的 --self-test、
+desktop/tests/test_jcs_spec_gap.py。矩阵这边用标识面合规的键集（数字/大写/下划线/小写/CJK）
+覆盖同一个 spec_clause。
 
 ## 与 D-10 的边界
 
