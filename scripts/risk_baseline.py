@@ -451,9 +451,10 @@ def _st_records() -> int:
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         rec = Path(tmp) / "rec.json"
-        rec.write_text(json.dumps({"schema": RECORDS_SCHEMA, "deployments": [
+        rec_doc = {"schema": RECORDS_SCHEMA, "deployments": [
             {"id": "a", "failed": False}, {"id": "b", "failed": True, "restored_s": 600},
-            {"id": "c", "failed": True, "restored_s": 1800}]}), encoding="utf-8")
+            {"id": "c", "failed": True, "restored_s": 1800}]}
+        atomic_write.write_text(rec, json.dumps(rec_doc))
         got = dora_metrics(ROOT, "", str(rec))["dora"]
         assert got["change_failure_rate"]["value"] == round(2 / 3, 4), got  # nosec B101  # noqa: S101
         assert got["time_to_restore"]["value"] == round(1200 / 60.0, 3), got  # nosec B101  # noqa: S101

@@ -527,9 +527,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 67,
+      "ca": 68,
       "ce": 1,
-      "i": 0.0147
+      "i": 0.0145
     },
     "json_schema": {
       "ca": 5,
@@ -833,7 +833,7 @@
     },
     "plugin_manifest": {
       "ca": 0,
-      "ce": 1,
+      "ce": 2,
       "i": 1.0
     },
     "policy_snapshot": {

@@ -1523,7 +1523,6 @@
     "scripts/interop_thirdparty_kit.py::UP006": 16,
     "scripts/interop_thirdparty_kit.py::UP031": 38,
     "scripts/interop_thirdparty_kit.py::UP035": 3,
-    "scripts/jcs.py::F401": 1,
     "scripts/nf.py::B007": 1,
     "scripts/nf.py::C416": 1,
     "scripts/nf.py::E501": 12,
