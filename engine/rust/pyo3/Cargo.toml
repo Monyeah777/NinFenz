@@ -1,0 +1,16 @@
+[package]
+name = "nf-pyengine"
+version = "0.1.0"
+edition = "2021"
+description = "NF Python 扩展（PyO3）：同进程绑定的第二形态（P5-07.1/07.2）"
+license = "MIT"
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"] }
+
+[lib]
+name = "nf_pyengine"
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 2

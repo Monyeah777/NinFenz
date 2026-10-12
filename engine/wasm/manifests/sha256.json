@@ -1,0 +1,34 @@
+{
+  "schema": "nf-plugin-manifest/1",
+  "id": "nf-plugin-sha256",
+  "version": "0.1.0",
+  "abi": "wasi-preview1-cli",
+  "summary": "SHA-256 摘要（独立 std-only 实现）",
+  "artifact": {
+    "path": "engine/wasm/sha256/target/wasm32-wasip1/release/nf-plugin-sha256.wasm",
+    "sha256": null
+  },
+  "methods": [
+    {
+      "name": "sha256",
+      "io": {
+        "argv": ["--method", "sha256"],
+        "stdin": "bytes",
+        "stdout": "hex-lowercase+LF",
+        "exit_ok": [0],
+        "exit_usage": 2
+      },
+      "determinism": "deterministic",
+      "cost": {"kind": "linear", "unit": "byte"},
+      "fuel": {"base": 2000000, "per_kib": 200000, "hard_cap": 400000000000},
+      "wall_timeout_ms": 30000,
+      "capabilities": {
+        "fs": [],
+        "net": [],
+        "env": [],
+        "clocks": "deny",
+        "random": "deny"
+      }
+    }
+  ]
+}
