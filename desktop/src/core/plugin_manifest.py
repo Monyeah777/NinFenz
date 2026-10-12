@@ -72,25 +72,9 @@ def validate(doc: Any) -> list[str]:
     if not isinstance(methods, list) or not methods:
         issues.append("methods 必须是非空列表")
         methods = []
-    seen = set()
+    seen: set = set()
     for i, m in enumerate(methods):
-        if not isinstance(m, dict):
-            issues.append(f"methods[{i}] 不是对象")
-            continue
-        name = str(m.get("name") or "")
-        if not re.match(r"^[a-z][a-z0-9-]*$", name):
-            issues.append(f"methods[{i}].name 形状非法：{name!r}")
-        elif name in seen:
-            issues.append(f"方法名重复：{name}")
-        seen.add(name)
-        if m.get("determinism") not in DETERMINISM:
-            issues.append(f"{name}.determinism 非法：{m.get('determinism')!r}")
-        issues.extend(_io_issues(name, m, str(doc.get("abi") or "")))
-        cost = m.get("cost")
-        if not isinstance(cost, dict) or cost.get("kind") not in COST_KINDS or not cost.get("unit"):
-            issues.append(f"{name}.cost 须为 {{kind: {'|'.join(COST_KINDS)}, unit: ...}}")
-        issues.extend(_fuel_issues(name, m))
-        issues.extend(_capability_issues(name, m, m.get("determinism")))
+        issues.extend(_method_issues(i, m, str(doc.get("abi") or ""), seen))
 
     art = doc.get("artifact")
     if art is not None:
@@ -102,6 +86,32 @@ def validate(doc: Any) -> list[str]:
             except _paths.PathEscapeError as exc:
                 issues.append(f"artifact.path 逃逸仓库根：{exc}")
     return issues
+
+
+def _method_issues(i: int, m: Any, abi: str, seen: set) -> list[str]:
+    """单条方法声明的全部判据：名字 / 确定性 / 成本 / I-O / 燃料 / 能力。
+
+    拆出来是因为原先 validate 一个函数扛下了所有分支（file 级圈复杂度 27 > 阈值 25）——
+    不是把阈值调高，而是把「一条方法怎么判」变成可单读的一段。
+    """
+    if not isinstance(m, dict):
+        return [f"methods[{i}] 不是对象"]
+    out: list[str] = []
+    name = str(m.get("name") or "")
+    if not re.match(r"^[a-z][a-z0-9-]*$", name):
+        out.append(f"methods[{i}].name 形状非法：{name!r}")
+    elif name in seen:
+        out.append(f"方法名重复：{name}")
+    seen.add(name)
+    if m.get("determinism") not in DETERMINISM:
+        out.append(f"{name}.determinism 非法：{m.get('determinism')!r}")
+    cost = m.get("cost")
+    if not isinstance(cost, dict) or cost.get("kind") not in COST_KINDS or not cost.get("unit"):
+        out.append(f"{name}.cost 须为 {{kind: {'|'.join(COST_KINDS)}, unit: ...}}")
+    out.extend(_io_issues(name, m, abi))
+    out.extend(_fuel_issues(name, m))
+    out.extend(_capability_issues(name, m, m.get("determinism")))
+    return out
 
 
 def _io_issues(name: str, method: dict[str, Any], abi: str) -> list[str]:
@@ -202,5 +212,7 @@ def artifact_path(doc: dict[str, Any], root: str = ".") -> Path | None:
     try:
         safe = _paths.validate_path(root, rel)
     except _paths.PathEscapeError:
+        # 逃逸即拒：返回 None 而不是抛——调用方按「未产出」处理（fail-closed 语义写在
+        # 本函数 docstring 里），但**不许**静默放行一个被改写的路径。
         return None
     return Path(root) / safe

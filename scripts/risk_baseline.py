@@ -238,6 +238,49 @@ def delivery_counts(root: Path = ROOT) -> dict[str, Any]:
             "authors": len(authors)}
 
 
+def _incident_from_records(records: list[dict]) -> tuple[dict, dict]:
+    """显式交付记录（--records）→ (变更失败率, 恢复时长)。"""
+    failed = [d for d in records if d.get("failed")]
+    cfr = {"value": round(len(failed) / len(records), 4), "unit": "比例",
+           "basis": f"{RECORDS_SCHEMA} 的 deployments[].failed", "why": ""}
+    restored = [int(d["restored_s"]) for d in failed
+                if str(d.get("restored_s") or "").isdigit()]
+    mttr = {"value": None if not restored else round(_median(restored) / 60.0, 3),
+            "unit": "分钟（中位）",
+            "basis": f"{RECORDS_SCHEMA} 的 deployments[].restored_s",
+            "why": "" if restored else "记录里没有恢复时长字段"}
+    return cfr, mttr
+
+
+def _incident_from_postmortems(root: Path, tags: list[tuple[str, int]]) -> tuple[dict, dict]:
+    """本仓**正式的事故登记面**（复盘件）→ (变更失败率, 恢复时长)；规则显式、可逐条复核。"""
+    missing = {"value": None, "unit": "", "basis": "",
+               "why": f"{POSTMORTEM_DIR}/ 无复盘件或 tag 不足 ⇒ 无事故记录可算"}
+    posts = postmortems(root)
+    if not (tags and posts):
+        return dict(missing), dict(missing)
+    mapping = _incidents_by_release(tags, posts)
+    hit = [name for name, ids in mapping.items() if ids]
+    cfr = {
+        "value": round(len(hit) / len(tags), 4), "unit": "比例",
+        "basis": (f"{POSTMORTEM_DIR}/ 复盘件按日期落入发布区间"
+                  f"（规则见 _incidents_by_release）：{len(hit)}/{len(tags)} 次发布有登记事故"),
+        "why": ""}
+    days = []
+    for pm in posts:
+        start, end = _date_to_epoch(pm.get("date")), _date_to_epoch(pm.get("restored"))
+        if start is not None and end is not None and end >= start:
+            days.append((end - start) / 86400.0)
+    mttr = {
+        "value": None if not days else round(_median([int(d * 86400) for d in days]) / 60.0, 3),
+        "unit": "分钟（中位）",
+        "basis": f"{POSTMORTEM_DIR}/ 复盘件的 date → restored 字段",
+        "why": "" if days else
+               "复盘件没有 restored（恢复时刻）字段 ⇒ 无法算恢复时长；补该字段即可算"
+               "（也支持 --records 走另一条路）"}
+    return cfr, mttr
+
+
 def dora_values(root: Path = ROOT, records_path: str = "") -> tuple[dict, dict, str]:
     """→ (DORA 四键, 派生口径明细, records 原因)。两键真取数，两键要事故记录。"""
     tags = _tags_with_time(root)
@@ -268,46 +311,11 @@ def dora_values(root: Path = ROOT, records_path: str = "") -> tuple[dict, dict, 
     }
     records, why = _read_records(records_path)
     if records:
-        failed = [d for d in records if d.get("failed")]
-        values["change_failure_rate"] = {
-            "value": round(len(failed) / len(records), 4), "unit": "比例",
-            "basis": f"{RECORDS_SCHEMA} 的 deployments[].failed", "why": ""}
-        restored = [int(d["restored_s"]) for d in failed
-                    if str(d.get("restored_s") or "").isdigit()]
-        values["time_to_restore"] = {
-            "value": None if not restored else round(_median(restored) / 60.0, 3),
-            "unit": "分钟（中位）",
-            "basis": f"{RECORDS_SCHEMA} 的 deployments[].restored_s",
-            "why": "" if restored else "记录里没有恢复时长字段"}
+        values["change_failure_rate"], values["time_to_restore"] = _incident_from_records(records)
         return values, derived, why
 
-    # 没有 --records 时，用本仓**正式的事故登记面**（复盘件）来算——规则显式、可逐条复核。
-    posts = postmortems(root)
-    if tags and posts:
-        mapping = _incidents_by_release(tags, posts)
-        hit = [name for name, ids in mapping.items() if ids]
-        values["change_failure_rate"] = {
-            "value": round(len(hit) / len(tags), 4), "unit": "比例",
-            "basis": (f"{POSTMORTEM_DIR}/ 复盘件按日期落入发布区间"
-                      f"（规则见 _incidents_by_release）：{len(hit)}/{len(tags)} 次发布有登记事故"),
-            "why": ""}
-        restored_days = []
-        for pm in posts:
-            start, end = _date_to_epoch(pm.get("date")), _date_to_epoch(pm.get("restored"))
-            if start is not None and end is not None and end >= start:
-                restored_days.append((end - start) / 86400.0)
-        values["time_to_restore"] = {
-            "value": None if not restored_days else round(_median(
-                [int(d * 86400) for d in restored_days]) / 60.0, 3),
-            "unit": "分钟（中位）",
-            "basis": f"{POSTMORTEM_DIR}/ 复盘件的 date → restored 字段",
-            "why": "" if restored_days else
-                   "复盘件没有 restored（恢复时刻）字段 ⇒ 无法算恢复时长；补该字段即可算"
-                   "（POSIX 也支持 --records 走另一条路）"}
-    else:
-        values["change_failure_rate"] = {
-            "value": None, "unit": "", "basis": "",
-            "why": f"{POSTMORTEM_DIR}/ 无复盘件或 tag 不足 ⇒ 无事故记录可算"}
+    values["change_failure_rate"], values["time_to_restore"] = _incident_from_postmortems(
+        root, tags)
     return values, derived, why
 
 
@@ -391,38 +399,44 @@ def evaluation_digest(root: Path = ROOT, timings_path: str = "",
             "ok": all(bool(rep.get("ok", True)) for rep in reports.values())}
 
 
-def _self_test() -> int:
-    checks = 0
+def _st_stride() -> int:
+    """P6-04：真仓全绿 + 抽掉判据件必须全红（缺一不可）。"""
     rep = stride_report(ROOT)
     assert rep["ok"], rep["issues"]
-    checks += 1
     bad = stride_report(ROOT, exists=lambda _rel: False)
     assert not bad["ok"] and len(bad["issues"]) == len(STRIDE_CLASSES), bad["issues"]
-    checks += 1
+    return 1
+
+
+def _st_digest() -> int:
+    """P6-11：摘要形状 + 同输入同输出。"""
     d = evaluation_digest(ROOT)
     assert d["digest"].startswith("sha256:") and len(d["parts"]) == 4, d
-    # 同输入同输出：连算两次必须一致（P6-11 的验收原文）
     assert evaluation_digest(ROOT)["digest"] == d["digest"], "同输入必须同输出"
-    checks += 1
+    return 1
+
+
+def _st_delivery() -> int:
+    """P6-06：计数为真 + 提速曲线带出处 + **每个数字都有 basis、每个空值都有 why**。"""
     m = dora_metrics(ROOT)
     assert m["counts"]["test_files"] > 0 and m["counts"]["verify_checks"] > 0, m["counts"]
-    # 缺省基线必须在场且每条带出处（否则提速曲线会静默退回 UNKNOWN）
     assert m["speedup_curve"] and len(m["speedup_curve"]) >= 2, m["speedup_curve_why"]
     assert all(s["source"] for s in m["speedup_curve"]), m["speedup_curve"]
-    # 不许造数：**每个非空值都必须带出处**，每个空值都必须写清缺什么。
     for key, val in m["dora"].items():
         if val["value"] is not None:
             assert str(val.get("basis") or "").strip(), f"{key} 有数字却没出处"
         else:
             assert str(val.get("why") or "").strip(), f"{key} 为空却没写原因"
     # 本仓有 25 个 tag + 1 件复盘 ⇒ 三键应真取到数；只有恢复时长因缺字段为空。
-    assert m["dora"]["deployment_frequency"]["value"] is not None, m["dora"]
-    assert m["dora"]["lead_time_for_changes"]["value"] is not None, m["dora"]
-    assert m["dora"]["change_failure_rate"]["value"] is not None, m["dora"]
+    for key in ("deployment_frequency", "lead_time_for_changes", "change_failure_rate"):
+        assert m["dora"][key]["value"] is not None, m["dora"]
     assert m["dora"]["time_to_restore"]["value"] is None, m["dora"]
     assert m["dora"]["change_failure_rate"]["value"] == round(1 / 25, 4), m["dora"]
-    checks += 1
-    # 提供记录后，另两键必须能算出来（否则「可算」只是说法）
+    return 1
+
+
+def _st_records() -> int:
+    """--records 面：给了记录，另两键必须真算得出来（否则「可算」只是说法）。"""
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         rec = Path(tmp) / "rec.json"
@@ -432,7 +446,11 @@ def _self_test() -> int:
         got = dora_metrics(ROOT, "", str(rec))["dora"]
         assert got["change_failure_rate"]["value"] == round(2 / 3, 4), got
         assert got["time_to_restore"]["value"] == round(1200 / 60.0, 3), got
-    checks += 1
+    return 1
+
+
+def _self_test() -> int:
+    checks = _st_stride() + _st_digest() + _st_delivery() + _st_records()
     print(f"self-test OK（{checks} 例）")
     return 0
 

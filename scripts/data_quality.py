@@ -82,68 +82,89 @@ def _load_jcs(root: Path):
     return mod
 
 
-def vector_quality(root: Path = ROOT) -> dict[str, Any]:
-    """→ 向量集的完整性 / 一致性 / 可复用 + FAIR 四字母。"""
-    vdir = root / VECTOR_DIR
-    issues: list[str] = []
+def _vector_issues(root: Path, name: str, v: dict) -> list[str]:
+    """单条向量的完整性：必填字段 + 输入夹具在场 + 正例的期望值。
+
+    全 probe 的向量只探工具链在场，本就没有可比期望值（与形状判据同口径）。
+    """
+    vid = str(v.get("id") or "")
+    out = [f"{name}/{vid or '(无 id)'} 缺字段 {f}"
+           for f in ("id", "spec_clause", "level", "compare_rule")
+           if not str(v.get(f) or "").strip()]
+    rel = str(v.get("input") or "")
+    if rel and not (root / rel).is_file():
+        out.append(f"{vid} 的输入夹具缺席：{rel}")
+    if str(v.get("expect") or "ok") != "fail":
+        real = [s for s in (v.get("langs") or {}).values() if not s.get("probe")]
+        if real and not str(v.get("expected") or ""):
+            out.append(f"{vid} 是正例却无期望值")
+    return out
+
+
+def _manifest_scan(root: Path, vdir: Path) -> tuple[list, list, dict, dict]:
+    """遍历全部清单 → (完整性, 跨清单 id 一致性, id→清单名, 计数)。"""
     completeness: list[str] = []
     consistency: list[str] = []
-    reusability: list[str] = []
     ids: dict[str, str] = {}
-    total = ok_vectors = fail_vectors = 0
+    counts = {"total": 0, "ok": 0, "fail": 0}
     for name in VECTOR_FILES:
         path = vdir / name
         if not path.is_file():
             completeness.append(f"清单缺席：{VECTOR_DIR}/{name}")
             continue
-        doc = json.loads(path.read_text(encoding="utf-8"))
-        for v in doc.get("vectors") or []:
-            total += 1
+        for v in json.loads(path.read_text(encoding="utf-8")).get("vectors") or []:
+            counts["total"] += 1
             vid = str(v.get("id") or "")
-            for field in ("id", "spec_clause", "level", "compare_rule"):
-                if not str(v.get(field) or "").strip():
-                    completeness.append(f"{name}/{vid or '(无 id)'} 缺字段 {field}")
-            rel = str(v.get("input") or "")
-            if rel and not (root / rel).is_file():
-                completeness.append(f"{vid} 的输入夹具缺席：{rel}")
-            expect = str(v.get("expect") or "ok")
-            if expect == "fail":
-                fail_vectors += 1
-            else:
-                ok_vectors += 1
-                # 全 probe 的向量只探工具链在场，本就没有可比期望值（与形状判据同口径）。
-                real = [s for s in (v.get("langs") or {}).values() if not s.get("probe")]
-                if real and not str(v.get("expected") or ""):
-                    completeness.append(f"{vid} 是正例却无期望值")
+            completeness.extend(_vector_issues(root, name, v))
+            counts["fail" if str(v.get("expect") or "ok") == "fail" else "ok"] += 1
             if vid and vid in ids and name not in SUBSET_FILES:
                 consistency.append(f"id 跨清单重复：{vid}（{ids[vid]} 与 {name}）")
             else:
                 ids.setdefault(vid, name)
-    # 一致性：期望值必须与规范实现逐字节一致（防止手改期望值而无人核）
+    return completeness, consistency, ids, counts
+
+
+def _expectation_issues(root: Path, vdir: Path) -> list[str]:
+    """一致性：期望值必须与规范实现逐字节一致（防止手改期望值而无人核）。"""
     conf = vdir / "jcs_conformance.json"
-    if conf.is_file():
-        jcs = _load_jcs(root)
-        for v in json.loads(conf.read_text(encoding="utf-8")).get("vectors") or []:
-            rel = str(v.get("input") or "")
-            if not rel or not (root / rel).is_file():
-                consistency.append(f"{v.get('id')} 无可读输入，期望值无法复核")
-                continue
-            try:
-                got = jcs.canonical_jcs(jcs.loads_strict((root / rel).read_text(encoding="utf-8")))
-            except ValueError as exc:
-                consistency.append(f"{v.get('id')} 输入不可解析：{exc}")
-                continue
-            if got.decode("utf-8") != str(v.get("expected")):
-                consistency.append(f"{v['id']} 的期望值与规范实现不符：{got.decode('utf-8')!r}")
-    # 可复用：来源说明 + 覆盖棘轮 + 人读 README
-    for rel in (f"{VECTOR_DIR}/README.md", f"{VECTOR_DIR}/ratchet.json"):
-        if not (root / rel).is_file():
-            reusability.append(f"缺可复用件：{rel}")
+    if not conf.is_file():
+        return []
+    jcs = _load_jcs(root)
+    out: list[str] = []
+    for v in json.loads(conf.read_text(encoding="utf-8")).get("vectors") or []:
+        rel = str(v.get("input") or "")
+        if not rel or not (root / rel).is_file():
+            out.append(f"{v.get('id')} 无可读输入，期望值无法复核")
+            continue
+        try:
+            got = jcs.canonical_jcs(jcs.loads_strict((root / rel).read_text(encoding="utf-8")))
+        except ValueError as exc:
+            out.append(f"{v.get('id')} 输入不可解析：{exc}")
+            continue
+        if got.decode("utf-8") != str(v.get("expected")):
+            out.append(f"{v['id']} 的期望值与规范实现不符：{got.decode('utf-8')!r}")
+    return out
+
+
+def _reuse_issues(root: Path, vdir: Path) -> tuple[list, list]:
+    """可复用面：来源说明 + 覆盖棘轮（返回 (issues, 棘轮覆盖的接口名)）。"""
+    out = [f"缺可复用件：{rel}"
+           for rel in (f"{VECTOR_DIR}/README.md", f"{VECTOR_DIR}/ratchet.json")
+           if not (root / rel).is_file()]
     ratchet = vdir / "ratchet.json"
-    if ratchet.is_file():
-        clauses = (json.loads(ratchet.read_text(encoding="utf-8")).get("clauses") or {})
-        if {"python", "rust", "csharp"} - set(clauses):
-            reusability.append("覆盖棘轮未覆盖三实现")
+    clauses = (json.loads(ratchet.read_text(encoding="utf-8")).get("clauses") or {}
+               if ratchet.is_file() else {})
+    if ratchet.is_file() and {"python", "rust", "csharp"} - set(clauses):
+        out.append("覆盖棘轮未覆盖三实现")
+    return out, sorted(clauses)
+
+
+def vector_quality(root: Path = ROOT) -> dict[str, Any]:
+    """→ 向量集的完整性 / 一致性 / 可复用 + FAIR 四字母。"""
+    vdir = root / VECTOR_DIR
+    completeness, consistency, ids, counts = _manifest_scan(root, vdir)
+    consistency += _expectation_issues(root, vdir)
+    reusability, faces = _reuse_issues(root, vdir)
     issues = completeness + consistency + reusability
     fair = {
         "findable": not completeness and bool(ids),
@@ -158,11 +179,9 @@ def vector_quality(root: Path = ROOT) -> dict[str, Any]:
         "iso8000": {"completeness": completeness, "consistency": consistency,
                     "reusability": reusability},
         "fair": fair,
-        "stats": {"manifests": len(VECTOR_FILES), "vectors": total,
-                  "ok_vectors": ok_vectors, "fail_vectors": fail_vectors,
-                  "unique_ids": len(ids), "ratchet_faces": sorted(
-                      (json.loads(ratchet.read_text(encoding="utf-8")).get("clauses") or {})
-                      if ratchet.is_file() else [])},
+        "stats": {"manifests": len(VECTOR_FILES), "vectors": counts["total"],
+                  "ok_vectors": counts["ok"], "fail_vectors": counts["fail"],
+                  "unique_ids": len(ids), "ratchet_faces": faces},
     }
 
 

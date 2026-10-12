@@ -134,6 +134,8 @@ def parse_wave_result(text: str) -> bytes | None:
     try:
         return bytes(int(x) for x in inner.split(","))
     except ValueError:
+        # 形态合法但元素不是整数 ⇒ 按「解析失败」处理（调用方转成 bad_wave_result 降级），
+        # 不抛异常也不谎报成功。
         return None
 
 

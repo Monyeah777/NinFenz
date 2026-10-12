@@ -127,9 +127,9 @@ class ManifestShapeTest(unittest.TestCase):
         # 覆盖棘轮的另一半：正例集合不许「改 id」式替换——实测的 id 集合冻结在测例里。
         conf = _load("jcs_conformance.json")
         self.assertEqual(
-            ["jcs/astral-key-order", "jcs/basic-ascii", "jcs/escape-minimal",
-             "jcs/escape-slash", "jcs/nested-sort", "jcs/number-fixed-vs-exp",
-             "jcs/number-forms", "jcs/unicode-escape-decoded"],
+            ["jcs/basic-ascii", "jcs/escape-minimal", "jcs/escape-slash", "jcs/nested-sort",
+             "jcs/number-fixed-vs-exp", "jcs/number-forms", "jcs/unicode-escape-decoded",
+             "jcs/utf16-key-order"],
             sorted(v["id"] for v in conf["vectors"]))
 
 
