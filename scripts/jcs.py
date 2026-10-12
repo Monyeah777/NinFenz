@@ -17,7 +17,6 @@
 否则对拍器无法用 rc 统一判「拒绝」）：0 成功；1 输入不是合法 JSON/UTF-8；2 用法或读不到文件。
 """
 import argparse
-import json
 import sys
 from pathlib import Path
 
