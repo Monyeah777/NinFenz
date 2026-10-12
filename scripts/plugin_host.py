@@ -172,7 +172,7 @@ def invoke(doc, artifact, method: str, data: bytes, *, wasmtime=_AUTO, root: Pat
     meta["abi"] = str(doc.get("abi") or "")
     started = time.perf_counter()
     try:
-        proc = subprocess.run(argv, cwd=str(root), input=stdin, capture_output=True,  # nosec B603
+        proc = subprocess.run(argv, cwd=str(root), input=stdin, capture_output=True,  # nosec B603  # noqa: S603
                               timeout=min(timeout_s, timeout_ms / 1000.0 + 5.0))
     except subprocess.TimeoutExpired:
         meta.update(reason="timeout", wall_ms=round((time.perf_counter() - started) * 1000, 3),
@@ -225,20 +225,20 @@ def invoke_with_fallback(doc, artifact, method: str, data: bytes, **kw):
 def _self_test() -> int:
     checks = 0
     doc, issues, artifact = load_declared()
-    assert issues == [], f"自带清单不该有问题：{issues}"
+    assert issues == [], f"自带清单不该有问题：{issues}"  # nosec B101  # noqa: S101
     checks += 1
     # 能力收窄：argv 里不许出现 --dir / inherit-network / inherit-env=y
     argv = isolation_argv("wasmtime", artifact or Path("x.wasm"), 1000, 1000)
     joined = " ".join(argv)
     for forbidden in ("--dir", "inherit-network", "inherit-env=y"):
-        assert forbidden not in joined, f"宿主 argv 出现越权开关：{forbidden}"
+        assert forbidden not in joined, f"宿主 argv 出现越权开关：{forbidden}"  # nosec B101  # noqa: S101
     for required in ("fuel=", "timeout=", "inherit-env=n", "epoch-interruption=y"):
-        assert required in joined, f"宿主 argv 缺 {required}"
+        assert required in joined, f"宿主 argv 缺 {required}"  # nosec B101  # noqa: S101
     checks += 1
     # 降级路径：宿主缺席必须回退且**标记** degraded
     got = invoke_with_fallback(doc, artifact, "sha256", b"abc", wasmtime=None)
-    assert got["ok"] and got["meta"]["degraded"] and got["meta"]["reason"] == "host_absent"
-    assert got["data"] == _ref.METHODS["sha256"](b"abc")
+    assert got["ok"] and got["meta"]["degraded"] and got["meta"]["reason"] == "host_absent"  # nosec B101  # noqa: S101
+    assert got["data"] == _ref.METHODS["sha256"](b"abc")  # nosec B101  # noqa: S101
     checks += 1
     print(f"self-test OK（{checks} 例）")
     return 0

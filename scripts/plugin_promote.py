@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import cross_lang_verify as clv  # noqa: E402
 import plugin_host as host  # noqa: E402
+from core import atomic_write  # noqa: E402
 from core import plugin_gate as pg  # noqa: E402
 
 REF_CMD = ["python", "scripts/plugin_reference.py", "--method", "sha256"]
@@ -47,7 +48,7 @@ def make_input(size: int, root: Path = ROOT) -> Path:
     body = (seed * (size // len(seed) + 1))[:size]
     p = cache_dir(root) / f"input-{size}.bin"
     if not p.is_file() or p.stat().st_size != size:
-        p.write_bytes(body)
+        atomic_write.write_bytes(p, body)
     return p
 
 
@@ -57,7 +58,7 @@ def _time(argv, data: bytes, repeat: int, root: Path):
     for _ in range(max(1, repeat)):
         started = time.perf_counter()
         try:
-            proc = subprocess.run([str(x) for x in argv], cwd=str(root), input=data,  # nosec B603
+            proc = subprocess.run([str(x) for x in argv], cwd=str(root), input=data,  # nosec B603  # noqa: S603
                                   capture_output=True, timeout=600)
         except (OSError, subprocess.TimeoutExpired):
             return None

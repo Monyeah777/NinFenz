@@ -145,7 +145,7 @@ def run_cmd(cmd, cwd, timeout=120, stdin=None):
     stdin：向量可声明 stdin 文件（微内核插件的标准输入面——WASI 默认无 fs，输入只能走管道）。
     """
     try:
-        proc = subprocess.run([str(x) for x in cmd], cwd=cwd, capture_output=True,  # nosec B603
+        proc = subprocess.run([str(x) for x in cmd], cwd=cwd, capture_output=True,  # nosec B603  # noqa: S603
                               input=stdin, timeout=timeout)
         return proc.returncode, proc.stdout
     except FileNotFoundError:
@@ -411,25 +411,25 @@ def self_test():
                    "csharp": {"cmd": ["dotnet"]}}}]}
     # 1) 三语言一致 → PASS
     tools, runner = _fake({"python": b"ok\n", "rust": b"ok\n", "csharp": b"ok\n"})
-    assert verify(doc, runner=runner, tools=tools)["verdict"] == "PASS"  # nosec B101
+    assert verify(doc, runner=runner, tools=tools)["verdict"] == "PASS"  # nosec B101  # noqa: S101
     # 2) 一语言偏离 → FAIL
     tools, runner = _fake({"python": b"ok\n", "rust": b"bad\n", "csharp": b"ok\n"})
     rep = verify(doc, runner=runner, tools=tools)
-    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"  # nosec B101
+    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"  # nosec B101  # noqa: S101
     # 3) 工具链缺席且其余一致 → UNKNOWN（不下结论）
     tools, runner = _fake({"python": b"ok\n", "csharp": b"ok\n"}, missing=("rust",))
     rep = verify(doc, runner=runner, tools=tools)
-    assert rep["verdict"] == "UNKNOWN", rep  # nosec B101
+    assert rep["verdict"] == "UNKNOWN", rep  # nosec B101  # noqa: S101
     # 4) probe 只探在场：缺席即 UNKNOWN
     pdoc = {"schema": "nf-test-vectors/1", "vectors": [
         {"id": "p", "compare_rule": "byte", "expected": "",
          "langs": {"rust": {"cmd": ["cargo"], "probe": True}}}]}
-    assert verify(pdoc, runner=runner, tools=tools)["verdict"] == "UNKNOWN"  # nosec B101
+    assert verify(pdoc, runner=runner, tools=tools)["verdict"] == "UNKNOWN"  # nosec B101  # noqa: S101
     # 5) probe 在场但输出为空（有 exe 无 SDK）→ 仍 UNKNOWN
     all_tools = {lang: "/fake/" + lang for lang in LANGS}
     def empty(cmd, cwd, timeout=120, stdin=None):
         return 0, b""
-    assert verify(pdoc, runner=empty, tools=all_tools)["verdict"] == "UNKNOWN"  # nosec B101
+    assert verify(pdoc, runner=empty, tools=all_tools)["verdict"] == "UNKNOWN"  # nosec B101  # noqa: S101
     # 6) 构建失败（非「exe 缺席」）→ FAIL，不被 UNKNOWN 吞
     bdoc = {"schema": "nf-test-vectors/1", "vectors": [
         {"id": "b", "compare_rule": "byte", "expected": "ok\n",
@@ -438,11 +438,11 @@ def self_test():
         return (1, b"") if str(cmd[1]) == "build" else (0, b"ok\n")
 
     rep = verify(bdoc, runner=broke, tools=all_tools)
-    assert rep["verdict"] == "FAIL", rep  # nosec B101
+    assert rep["verdict"] == "FAIL", rep  # nosec B101  # noqa: S101
     # 7) 构建步骤 exe 缺席 → UNKNOWN（环境事实）
     tools_gone = dict.fromkeys(LANGS)
     tools_gone["rust"] = "/fake/rust"
-    assert verify(bdoc, runner=lambda c, w, t=120, stdin=None: (-2, b""),
+    assert verify(bdoc, runner=lambda c, w, t=120, stdin=None: (-2, b""),  # nosec B101  # noqa: S101
                   tools=tools_gone)["verdict"] == "UNKNOWN"  # nosec B101
     # 8) expect=fail：非零退出 + 空 stdout 才算各实现都拒绝
     fdoc = {"schema": "nf-test-vectors/1", "vectors": [
@@ -451,34 +451,34 @@ def self_test():
     tools3, _ = _fake({})
     def okall(cmd, cwd, timeout=120, stdin=None):
         return 1, b""
-    assert verify(fdoc, runner=okall, tools=tools3)["verdict"] == "PASS"  # nosec B101
+    assert verify(fdoc, runner=okall, tools=tools3)["verdict"] == "PASS"  # nosec B101  # noqa: S101
     def bad(cmd, cwd, timeout=120, stdin=None):
         return (1, b"") if "python" in str(cmd[0]) else (0, b"{}")
 
     rep = verify(fdoc, runner=bad, tools=tools3)
-    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"  # nosec B101
+    assert rep["verdict"] == "FAIL" and rep["vectors"][0]["langs"]["rust"]["status"] == "FAIL"  # nosec B101  # noqa: S101
     # 9) jcs 规则走真 JCS 本体（不是 json.dumps 近似）：星平面键序
     astral = b'{"\\ud83d\\ude00":1,"\\ue000":2}'
     got = canonical("jcs", astral)
-    assert got == '{"\U0001F600":1,"\ue000":2}'.encode("utf-8"), got  # nosec B101
+    assert got == '{"\U0001F600":1,"\ue000":2}'.encode("utf-8"), got  # nosec B101  # noqa: S101
     # 12) digest 面：同清单同产物必得同摘要，且缺席产物不入表（不编路径）
     probe = {"schema": "nf-test-vectors/1", "vectors": [
         {"id": "d", "compare_rule": "byte", "expected": "ok",
          "langs": {"python": {"cmd": ["python", "scripts/jcs.py", "--file", "x"]}}}]}
     dig = collect_digests(probe, tools={})
-    assert dig["artifacts"].get("scripts/jcs.py", "").startswith("sha256:"), dig
-    assert "no/such/file.py" not in dig["artifacts"]
-    assert collect_digests(probe, tools={})["artifacts"] == dig["artifacts"], "摘要必须可复算"
+    assert dig["artifacts"].get("scripts/jcs.py", "").startswith("sha256:"), dig  # nosec B101  # noqa: S101
+    assert "no/such/file.py" not in dig["artifacts"]  # nosec B101  # noqa: S101
+    assert collect_digests(probe, tools={})["artifacts"] == dig["artifacts"], "摘要必须可复算"  # nosec B101  # noqa: S101
     # 10) 工具链解析：PATH 命中优先；找不到即 None（不自造）
-    assert resolve_exe("definitely-not-a-real-exe-xyz") is None  # nosec B101
+    assert resolve_exe("definitely-not-a-real-exe-xyz") is None  # nosec B101  # noqa: S101
     # 11) 两个可比实现里的单一偏离 → FAIL（不是 SPEC-GAP）：N=2 根本没有「多数」可言。
     #     实测由 512 MiB 插件对拍抓到：当时 wasm 一侧偏离，却被 N=2 的旧规则判成 SPEC-GAP。
     two = [{"id": "v", "langs": {"python": {"status": "PASS"}, "wasm": {"status": "FAIL"}}}]
     got2 = arbitrate(two)
-    assert got2["outcome"] == "FAIL" and got2["suspects"] == ["v/wasm"], got2  # nosec B101
+    assert got2["outcome"] == "FAIL" and got2["suspects"] == ["v/wasm"], got2  # nosec B101  # noqa: S101
     three = [{"id": "v", "langs": {"python": {"status": "FAIL"}, "rust": {"status": "FAIL"},
                                    "csharp": {"status": "PASS"}}}]
-    assert arbitrate(three)["outcome"] == "SPEC-GAP"  # nosec B101
+    assert arbitrate(three)["outcome"] == "SPEC-GAP"  # nosec B101  # noqa: S101
     print("self-test OK（一致=PASS / 偏离=FAIL / 缺席=UNKNOWN / probe 三态 / 空 SDK=UNKNOWN / "
           "构建失败=FAIL / 构建 exe 缺席=UNKNOWN / 拒绝语义 / jcs 真本体 / 解析兜底）")
     return 0

@@ -25,6 +25,10 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core import json_doc  # noqa: E402 - 读 JSON 走仓库唯一读点
+
 VECTOR_DIR = "protocol/generated/test_vectors"
 RECEIPTS_REL = "protocol/RECEIPTS.json"
 #: 回执的「活动」与「代理」（PROV 的后两元）。真源实现写在这里，便于与 receipts.py 对账。
@@ -43,7 +47,7 @@ def prov_graph(root: Path = ROOT) -> dict[str, Any]:
         return {"schema": "nf-prov/1", "ok": False,
                 "issues": [f"缺真源：{RECEIPTS_REL}"],
                 "entities": [], "activities": [], "agents": []}
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc = json_doc.load(path, dict, what=RECEIPTS_REL)
     entries = doc.get("entries") or []
     entities = [{"id": f"entity:{e.get('id')}", "label": str(e.get("path") or ""),
                  "digest": e.get("digest"), "leaf": e.get("leaf")} for e in entries]
@@ -112,7 +116,7 @@ def _manifest_scan(root: Path, vdir: Path) -> tuple[list, list, dict, dict]:
         if not path.is_file():
             completeness.append(f"清单缺席：{VECTOR_DIR}/{name}")
             continue
-        for v in json.loads(path.read_text(encoding="utf-8")).get("vectors") or []:
+        for v in (json_doc.load(path, dict, what=name).get("vectors") or []):
             counts["total"] += 1
             vid = str(v.get("id") or "")
             completeness.extend(_vector_issues(root, name, v))
@@ -131,7 +135,8 @@ def _expectation_issues(root: Path, vdir: Path) -> list[str]:
         return []
     jcs = _load_jcs(root)
     out: list[str] = []
-    for v in json.loads(conf.read_text(encoding="utf-8")).get("vectors") or []:
+    conf_doc = json_doc.load(conf, dict, what="jcs_conformance.json")
+    for v in conf_doc.get("vectors") or []:
         rel = str(v.get("input") or "")
         if not rel or not (root / rel).is_file():
             out.append(f"{v.get('id')} 无可读输入，期望值无法复核")
@@ -152,7 +157,7 @@ def _reuse_issues(root: Path, vdir: Path) -> tuple[list, list]:
            for rel in (f"{VECTOR_DIR}/README.md", f"{VECTOR_DIR}/ratchet.json")
            if not (root / rel).is_file()]
     ratchet = vdir / "ratchet.json"
-    clauses = (json.loads(ratchet.read_text(encoding="utf-8")).get("clauses") or {}
+    clauses = (json_doc.load(ratchet, dict, what="ratchet.json").get("clauses") or {}
                if ratchet.is_file() else {})
     if ratchet.is_file() and {"python", "rust", "csharp"} - set(clauses):
         out.append("覆盖棘轮未覆盖三实现")
@@ -197,15 +202,15 @@ def report(root: Path = ROOT) -> dict[str, Any]:
 def _self_test() -> int:
     checks = 0
     rep = report(ROOT)
-    assert rep["ok"], rep["issues"]
+    assert rep["ok"], rep["issues"]  # nosec B101  # noqa: S101
     checks += 1
     # 真源缺席 → 图必须判红（不许拿空图当通过）
     empty = prov_graph(ROOT / "no" / "such" / "root")
-    assert not empty["ok"] and empty["entities"] == []
+    assert not empty["ok"] and empty["entities"] == []  # nosec B101  # noqa: S101
     checks += 1
     # count 篡改 → 必须抓到「图与真源分叉」
     doc = json.loads((ROOT / RECEIPTS_REL).read_text(encoding="utf-8"))
-    assert isinstance(doc.get("count"), int) and doc["count"] > 0
+    assert isinstance(doc.get("count"), int) and doc["count"] > 0  # nosec B101  # noqa: S101
     checks += 1
     print(f"self-test OK（{checks} 例）")
     return 0
