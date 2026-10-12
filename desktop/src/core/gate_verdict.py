@@ -51,11 +51,15 @@ def _absent_digest(absent: list) -> str:
 def key_and_entry(node_id: str, files, root: str = ".", code_files=None) -> tuple:
     """→ (内容键, 校验用 entry, 标签)。**必须在没有别的测试在跑时调用**（纪律 3）。"""
     code = gc.CODE_FILES if code_files is None else tuple(code_files)
-    exists, absent = _split_existing(root, files)
+    read_exists, read_absent = _split_existing(root, files)
+    code_exists, code_absent = _split_existing(root, code)
+    # 缺席者**读面与代码面都要**进键：verify 把缺件判失效，漏掉任何一类都会永久 miss
+    # （合成根 / 改名后的测试件都踩过这一条）。
+    absent = sorted(read_absent) + sorted(code_absent)
     nid = node_id if not absent else f"{node_id}|absent={_absent_digest(absent)}"
-    ckey = gc.key_for(str(root), nid, exists, code_files=code)
-    entry = {"reads": gc.face_digest(str(root), exists),
-             "code": gc.face_digest(str(root), code)}
+    ckey = gc.key_for(str(root), nid, read_exists, code_files=code_exists)
+    entry = {"reads": gc.face_digest(str(root), read_exists),
+             "code": gc.face_digest(str(root), code_exists)}
     return ckey, entry, tag_for(node_id)
 
 
