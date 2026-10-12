@@ -9,11 +9,13 @@
   python scripts/gate.py --manifest      # 打印声明面（缺件即空表）
   python scripts/gate.py --select docs/README.md   # 按改动选出该跑的测试模块（秒级 check 前半）
   python scripts/gate.py --observe --workers 5     # 观测测试模块读面（数据落缓存区，不入库）
+  python scripts/gate.py --verdicts docs/README.md # 判定缓存 dry-run（只查不跑：谁会命中）
 """
 import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
@@ -21,6 +23,7 @@ sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import gate_faces as gf  # noqa: E402
 from core import gate_observe as go  # noqa: E402
 from core import gate_select as gs  # noqa: E402
+from core import gate_verdict as gv  # noqa: E402
 
 
 def _emit(kind, payload, as_json, lines):
@@ -100,6 +103,28 @@ def _route_datalog(changed, as_json):
     return 0 if got["status"] == "OK" else 1
 
 
+def _verdicts(changed, as_json):
+    """判定缓存 dry-run：只查不跑，报出「谁会命中 / 谁要真跑 / 谁不可缓存」。"""
+    got = gs.select(changed, root=ROOT)
+    faces = gs.load_faces(ROOT)
+    tdir = Path(ROOT) / "desktop" / "tests"
+    hits, misses, uncacheable = [], [], []
+    for mod, _why in got["quick"]:
+        rec = faces.get(mod, {})
+        reads = rec.get("reads") or []
+        if not reads or not gs.cacheable(mod, rec, tdir):
+            uncacheable.append(mod)
+            continue
+        (hit, _v), _k, _e, _t = gv.lookup(mod, reads, ROOT, [f"desktop/tests/{mod}.py"])
+        (hits if hit else misses).append(mod)
+    _emit("gate-verdicts", {"changed": list(changed), "hits": hits, "misses": misses,
+                            "uncacheable": uncacheable}, as_json,
+          [f"== 判定缓存 dry-run ==  快车道 {len(got['quick'])} 个",
+           f"  命中 {len(hits)} · 要真跑 {len(misses)} · 常跑不可缓存 {len(uncacheable)}",
+           f"  数据面 {'在场' if faces else '缺席（全部按常跑）'}"])
+    return 0
+
+
 def _observe_all(mods, workers, as_json):
     """观测测试模块读面（可续跑；数据落缓存区，不入库）。"""
 
@@ -153,6 +178,8 @@ def main(argv=None) -> int:
     ap.add_argument("--observe", nargs="*", default=None, metavar="MOD",
                     help="观测测试模块读面（省略模块名即全量；可续跑）")
     ap.add_argument("--workers", type=int, default=5, help="观测/执行的并行度")
+    ap.add_argument("--verdicts", nargs="*", default=None, metavar="PATH",
+                    help="判定缓存 dry-run：按改动报出命中/真跑/不可缓存")
     ap.add_argument("--select", nargs="*", default=None, metavar="PATH",
                     help="按改动路径选「该跑的测试模块」（读面数据在缓存区，缺席即全跑）")
     args = ap.parse_args(argv)
@@ -170,6 +197,8 @@ def main(argv=None) -> int:
         return _route_datalog(args.route_datalog, args.json)
     if args.observe is not None:
         return _observe_all(args.observe, args.workers, args.json)
+    if args.verdicts is not None:
+        return _verdicts(args.verdicts, args.json)
     if args.select is not None:
         return _select(args.select, args.json)
     issues, stats = gf.audit(ROOT)
