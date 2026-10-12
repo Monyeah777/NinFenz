@@ -7,6 +7,7 @@
   python scripts/gate.py --static-faces  # 代码面静态读面统计
   python scripts/gate.py --observed      # 跑一次只读扫描器并打印其观测读面
   python scripts/gate.py --manifest      # 打印声明面（缺件即空表）
+  python scripts/gate.py --select docs/README.md   # 按改动选出该跑的测试模块（秒级 check 前半）
 """
 import argparse
 import json
@@ -17,6 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
 from core import gate_faces as gf  # noqa: E402
+from core import gate_select as gs  # noqa: E402
 
 
 def _emit(kind, payload, as_json, lines):
@@ -96,6 +98,25 @@ def _route_datalog(changed, as_json):
     return 0 if got["status"] == "OK" else 1
 
 
+def _select(changed, as_json):
+    """按改动选「该跑的测试模块」——只打印计划，不执行（执行面见 tests 套件的 check 入口）。"""
+    got = gs.select(changed, root=ROOT)
+    run = [m for m, _w in got["run"]]
+    faces = gs.load_faces(ROOT)
+    note = "" if faces else "（读面数据缺席：按 fail-closed 全部常跑）"
+    payload = {"changed": list(changed), "run": run, "skip": got["skip"],
+               "quick": [m for m, _w in got["quick"]], "slow": [m for m, _w in got["slow"]],
+               "uncacheable": got["uncacheable"], "observed_modules": len(faces)}
+    lines = ["== 待跑集合（按改动选择）==",
+             f"  改动 {len(changed)} 件 · 跑 {len(run)} · 跳 {len(got['skip'])} · "
+             f"快车道 {len(got['quick'])} · 慢车道让位 {len(got['slow'])} · "
+             f"常跑不可缓存 {len(got['uncacheable'])} {note}"]
+    for mod, why in got["run"][:20]:
+        lines.append(f"  [跑] {mod:<38} {why}")
+    _emit("gate-select", payload, as_json, lines)
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁读面台账（只读）")
     ap.add_argument("--json", action="store_true")
@@ -109,6 +130,8 @@ def main(argv=None) -> int:
                     help="按变更路径求路由（策略 S）并自检")
     ap.add_argument("--route-datalog", nargs="*", default=None, metavar="PATH",
                     help="按变更路径用**规则层（P-A5 dag 后端）**求路由并打印 gate 推导图统计")
+    ap.add_argument("--select", nargs="*", default=None, metavar="PATH",
+                    help="按改动路径选「该跑的测试模块」（读面数据在缓存区，缺席即全跑）")
     args = ap.parse_args(argv)
     if args.observed:
         return _observed(args.json, use_hook=getattr(args, "observed_hook", False))
@@ -122,6 +145,8 @@ def main(argv=None) -> int:
         return _route(args.route, args.json)
     if args.route_datalog is not None:
         return _route_datalog(args.route_datalog, args.json)
+    if args.select is not None:
+        return _select(args.select, args.json)
     issues, stats = gf.audit(ROOT)
     if args.json:
         print(json.dumps({"kind": "gate-audit", "issues": issues, "stats": stats},
