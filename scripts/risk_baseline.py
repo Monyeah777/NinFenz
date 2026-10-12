@@ -27,6 +27,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import subprocess  # nosec B404 - 只读 git 取数
 import sys
 from collections import Counter
@@ -36,12 +37,19 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
+#: git 用**绝对路径**：bandit B607 / ruff S607 针对「部分路径起进程」，结构上消掉它，
+#: 而不是靠 noqa 免责（免责会让这条规则将来对别处失效）。
+GIT = shutil.which("git") or "git"
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import data_quality as dq  # noqa: E402
 import standards_map as sm  # noqa: E402
-from core import attest  # noqa: E402
+from core import (  # noqa: E402 - 必须先插入 desktop/src 才能 import core
+    atomic_write,
+    attest,
+    json_doc,
+)
 
 #: P6-04：STRIDE 六类。每类 = 威胁 + 缓解 + 判据件（件必须真实在场）。
 STRIDE = (
@@ -102,7 +110,10 @@ def stride_report(root: Path = ROOT, exists: Callable[[str], bool] | None = None
 def _git(root: Path, *args: str) -> str:
     """只读 git 取数；失败返回空串（环境事实，不裸崩）。"""
     try:
-        proc = subprocess.run(["git", *args], cwd=str(root), capture_output=True,  # nosec B603
+        # bandit 只看「调用起点」那一行，ruff 也按起点行认 noqa——故标记全放在这一行。
+        # git 用绝对路径（shutil.which）：B607/S607 由结构消掉，而不是靠 noqa 免责。
+        proc = subprocess.run([GIT, *args], cwd=str(root),  # nosec B603  # noqa: S603
+                              capture_output=True,
                               text=True, encoding="utf-8", errors="replace", timeout=120)
     except (OSError, subprocess.TimeoutExpired):
         return ""
@@ -204,7 +215,7 @@ def _read_records(records_path: str) -> tuple[list[dict], str]:
     if not path.is_file():
         return [], f"记录文件不在场：{records_path}"
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.load(path, dict, what=path.name)
     except (OSError, ValueError) as exc:
         return [], f"记录不可解析：{exc}"
     if doc.get("schema") != RECORDS_SCHEMA:
@@ -352,7 +363,7 @@ def dora_metrics(root: Path = ROOT, timings_path: str = "",
         if not path.is_file():
             curve_why = f"样本文件不在场：{timings_path}"
         else:
-            samples = json.loads(path.read_text(encoding="utf-8")).get("samples") or []
+            samples = json_doc.load(path, dict, what=path.name).get("samples") or []
             if samples and all(s.get("source") for s in samples):
                 curve = [{"face": s.get("face"), "before_s": s.get("before_s"),
                           "after_s": s.get("after_s"),
@@ -402,36 +413,36 @@ def evaluation_digest(root: Path = ROOT, timings_path: str = "",
 def _st_stride() -> int:
     """P6-04：真仓全绿 + 抽掉判据件必须全红（缺一不可）。"""
     rep = stride_report(ROOT)
-    assert rep["ok"], rep["issues"]
+    assert rep["ok"], rep["issues"]  # nosec B101  # noqa: S101
     bad = stride_report(ROOT, exists=lambda _rel: False)
-    assert not bad["ok"] and len(bad["issues"]) == len(STRIDE_CLASSES), bad["issues"]
+    assert not bad["ok"] and len(bad["issues"]) == len(STRIDE_CLASSES), bad["issues"]  # nosec B101  # noqa: S101
     return 1
 
 
 def _st_digest() -> int:
     """P6-11：摘要形状 + 同输入同输出。"""
     d = evaluation_digest(ROOT)
-    assert d["digest"].startswith("sha256:") and len(d["parts"]) == 4, d
-    assert evaluation_digest(ROOT)["digest"] == d["digest"], "同输入必须同输出"
+    assert d["digest"].startswith("sha256:") and len(d["parts"]) == 4, d  # nosec B101  # noqa: S101
+    assert evaluation_digest(ROOT)["digest"] == d["digest"], "同输入必须同输出"  # nosec B101  # noqa: S101
     return 1
 
 
 def _st_delivery() -> int:
     """P6-06：计数为真 + 提速曲线带出处 + **每个数字都有 basis、每个空值都有 why**。"""
     m = dora_metrics(ROOT)
-    assert m["counts"]["test_files"] > 0 and m["counts"]["verify_checks"] > 0, m["counts"]
-    assert m["speedup_curve"] and len(m["speedup_curve"]) >= 2, m["speedup_curve_why"]
-    assert all(s["source"] for s in m["speedup_curve"]), m["speedup_curve"]
+    assert m["counts"]["test_files"] > 0 and m["counts"]["verify_checks"] > 0, m["counts"]  # nosec B101  # noqa: S101
+    assert m["speedup_curve"] and len(m["speedup_curve"]) >= 2, m["speedup_curve_why"]  # nosec B101  # noqa: S101
+    assert all(s["source"] for s in m["speedup_curve"]), m["speedup_curve"]  # nosec B101  # noqa: S101
     for key, val in m["dora"].items():
         if val["value"] is not None:
-            assert str(val.get("basis") or "").strip(), f"{key} 有数字却没出处"
+            assert str(val.get("basis") or "").strip(), f"{key} 有数字却没出处"  # nosec B101  # noqa: S101
         else:
-            assert str(val.get("why") or "").strip(), f"{key} 为空却没写原因"
+            assert str(val.get("why") or "").strip(), f"{key} 为空却没写原因"  # nosec B101  # noqa: S101
     # 本仓有 25 个 tag + 1 件复盘 ⇒ 三键应真取到数；只有恢复时长因缺字段为空。
     for key in ("deployment_frequency", "lead_time_for_changes", "change_failure_rate"):
-        assert m["dora"][key]["value"] is not None, m["dora"]
-    assert m["dora"]["time_to_restore"]["value"] is None, m["dora"]
-    assert m["dora"]["change_failure_rate"]["value"] == round(1 / 25, 4), m["dora"]
+        assert m["dora"][key]["value"] is not None, m["dora"]  # nosec B101  # noqa: S101
+    assert m["dora"]["time_to_restore"]["value"] is None, m["dora"]  # nosec B101  # noqa: S101
+    assert m["dora"]["change_failure_rate"]["value"] == round(1 / 25, 4), m["dora"]  # nosec B101  # noqa: S101
     return 1
 
 
@@ -444,8 +455,8 @@ def _st_records() -> int:
             {"id": "a", "failed": False}, {"id": "b", "failed": True, "restored_s": 600},
             {"id": "c", "failed": True, "restored_s": 1800}]}), encoding="utf-8")
         got = dora_metrics(ROOT, "", str(rec))["dora"]
-        assert got["change_failure_rate"]["value"] == round(2 / 3, 4), got
-        assert got["time_to_restore"]["value"] == round(1200 / 60.0, 3), got
+        assert got["change_failure_rate"]["value"] == round(2 / 3, 4), got  # nosec B101  # noqa: S101
+        assert got["time_to_restore"]["value"] == round(1200 / 60.0, 3), got  # nosec B101  # noqa: S101
     return 1
 
 
@@ -475,11 +486,11 @@ def main(argv=None) -> int:
         cur = evaluation_digest(ROOT, args.timings, args.records)
         if args.write or not path.is_file():
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(json.dumps(cur, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-                            encoding="utf-8")
+            atomic_write.write_text(path, json.dumps(cur, ensure_ascii=False, indent=2,
+                                                     sort_keys=True) + "\n")
             print(f"快照已写：{path} · {cur['digest']}")
             return 0
-        old = json.loads(path.read_text(encoding="utf-8"))
+        old = json_doc.load(path, dict, what=path.name)
         drift = [f for f in cur["parts"] if old.get("parts", {}).get(f) != cur["parts"][f]]
         if drift or old.get("digest") != cur["digest"]:
             print(f"评估漂移（{drift or ['总摘要']}）（修复指引：复核后 --write 重签）",

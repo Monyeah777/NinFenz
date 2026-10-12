@@ -168,8 +168,13 @@ def _pairs_hook(pairs):
 
 
 def loads_strict(text):
-    """严格 JSON 读入（重复键 / NaN / Infinity 一律拒，不静默降级）。"""
-    return json.loads(text, object_pairs_hook=_pairs_hook, parse_constant=_reject_constant)
+    """严格 JSON 读入（重复键 / NaN / Infinity 一律拒，不静默降级）。
+
+    走仓库**唯一读点** core.json_doc（它已支持 strict_constants 与 pairs_hook）——
+    不另起一个 json.loads 站点，重复键与非法常量的判据也就只有一份实现。
+    """
+    return json_doc.loads(text, None, what="待规范化 JSON", strict_constants=True,
+                          pairs_hook=_pairs_hook)
 
 
 def main() -> int:

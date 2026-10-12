@@ -16,11 +16,11 @@
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any
 
+from core import json_doc
 from core import paths as _paths
 
 SCHEMA = "nf-plugin-manifest/1"
@@ -40,7 +40,7 @@ _WIT_EXPORT = re.compile(r"^\s*([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\s*:\s*func\s*\(",
 
 def load(path: str) -> dict[str, Any]:
     """读清单（坏件即抛，不静默降级）。"""
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    return json_doc.load(path, dict, what=str(path))
 
 
 def wit_exports(text: str) -> list[str]:

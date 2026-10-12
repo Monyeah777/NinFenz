@@ -151,21 +151,21 @@ def report(root: Path = ROOT, exists: Callable[[str], bool] | None = None) -> di
 def _self_test() -> int:
     checks = 0
     always = lambda _rel: True  # noqa: E731 - 自证用的桩：这里要的就是「一律在场」
-    assert report(ROOT, exists=always)["ok"], report(ROOT, exists=always)["issues"]
+    assert report(ROOT, exists=always)["ok"], report(ROOT, exists=always)["issues"]  # nosec B101  # noqa: S101
     checks += 1
     never = lambda _rel: False  # noqa: E731
     bad = report(ROOT, exists=never)
-    assert not bad["ok"] and len(bad["issues"]) >= len(ISO29119_LAYERS) + len(AI_RMF), bad["issues"]
+    assert not bad["ok"] and len(bad["issues"]) >= len(ISO29119_LAYERS) + len(AI_RMF), bad["issues"]  # nosec B101  # noqa: S101
     checks += 1
     # 变异自证：少一层 / 属性名不符 / ATAM 缺权衡点，都必须判红
     short = check_mapping(ISO29119_LAYERS[:3], "layer", ISO29119_REQUIRED, always, "P6-05")
-    assert short, short
+    assert short, short  # nosec B101  # noqa: S101
     tampered = tuple({**r, "layer": "extra"} if i == 0 else r
                      for i, r in enumerate(ISO29119_LAYERS))
-    assert check_mapping(tampered, "layer", ISO29119_REQUIRED, always, "P6-05")
+    assert check_mapping(tampered, "layer", ISO29119_REQUIRED, always, "P6-05")  # nosec B101  # noqa: S101
     no_tradeoff = tuple({**r, "tradeoff": ""} if i == 0 else r
                         for i, r in enumerate(ATAM_SCENARIOS))
-    assert atam_issues(no_tradeoff, always)
+    assert atam_issues(no_tradeoff, always)  # nosec B101  # noqa: S101
     checks += 1
     print(f"self-test OK（{checks} 例）")
     return 0

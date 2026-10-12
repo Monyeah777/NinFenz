@@ -33,6 +33,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
+from core import json_doc  # noqa: E402 - 读 JSON 走仓库唯一读点
+
 #: 剖析三件套：cProfile 是 stdlib（恒在），另两件是外部工具（可能缺席）。
 STDLIB_TOOL = "cProfile"
 EXTERNAL_TOOLS = ("py-spy", "hyperfine")
@@ -194,7 +196,7 @@ def hyperfine_report(doc: dict) -> dict[str, Any]:
 
 def _run(argv: list[str], timeout: int = 600) -> tuple[int, str, str]:
     try:
-        proc = subprocess.run([str(x) for x in argv], cwd=str(ROOT), capture_output=True,  # nosec B603
+        proc = subprocess.run([str(x) for x in argv], cwd=str(ROOT), capture_output=True,  # nosec B603  # noqa: S603
                               text=True, encoding="utf-8", errors="replace", timeout=timeout)
     except (OSError, subprocess.TimeoutExpired) as exc:
         return -1, "", str(exc)
@@ -219,7 +221,7 @@ def run_sample(target: str, args: tuple, seconds: int, out_dir: Path) -> dict[st
     if rc != 0 or not out.is_file():
         return {"schema": "nf-hotspot-samples/1", "ok": False,
                 "reason": f"py-spy 退出码 {rc}", "why": stderr.strip()[:200]}
-    rep = speedscope_report(json.loads(out.read_text(encoding="utf-8")))
+    rep = speedscope_report(json_doc.load(out, dict, what="speedscope.json"))
     rep.update({"ok": True, "target": target, "seconds": seconds, "file": out.as_posix()})
     return rep
 
@@ -241,7 +243,7 @@ def run_benchmark(commands: list[str], runs: int, out_dir: Path) -> dict[str, An
     if rc != 0 or not out.is_file():
         return {"schema": "nf-hotspot-bench/1", "ok": False,
                 "reason": f"hyperfine 退出码 {rc}", "why": stderr.strip()[:200]}
-    rep = hyperfine_report(json.loads(out.read_text(encoding="utf-8")))
+    rep = hyperfine_report(json_doc.load(out, dict, what="hyperfine.json"))
     rep.update({"ok": True, "runs": runs, "file": out.as_posix()})
     return rep
 
@@ -251,21 +253,21 @@ def _self_test() -> int:
     fake = [{"key": "b", "calls": 2, "tottime_s": 1.0, "cumtime_s": 1.0},
             {"key": "a", "calls": 1, "tottime_s": 9.0, "cumtime_s": 5.0},
             {"key": "c", "calls": 3, "tottime_s": 0.5, "cumtime_s": 5.0}]
-    assert [e["key"] for e in rank(fake, 2)] == ["a", "c"], rank(fake, 2)
-    assert rank(fake, 0) == []
-    assert [e["key"] for e in rank(fake, 99)] == ["a", "c", "b"], "并列按 key 升序"
+    assert [e["key"] for e in rank(fake, 2)] == ["a", "c"], rank(fake, 2)  # nosec B101  # noqa: S101
+    assert rank(fake, 0) == []  # nosec B101  # noqa: S101
+    assert [e["key"] for e in rank(fake, 99)] == ["a", "c", "b"], "并列按 key 升序"  # nosec B101  # noqa: S101
     checks += 1
     rep = summarize(fake, 3)
-    assert rep["entries"] == 3 and rep["total_cumtime_s"] == 11.0, rep
-    assert set(rep["tools"]) == {STDLIB_TOOL, *EXTERNAL_TOOLS}
+    assert rep["entries"] == 3 and rep["total_cumtime_s"] == 11.0, rep  # nosec B101  # noqa: S101
+    assert set(rep["tools"]) == {STDLIB_TOOL, *EXTERNAL_TOOLS}  # nosec B101  # noqa: S101
     checks += 1
     stats = profile_callable(resolve_target("json:dumps"), ({"a": 1},))
-    assert stats and all({"key", "calls", "cumtime_s"} <= set(s) for s in stats), stats[:1]
+    assert stats and all({"key", "calls", "cumtime_s"} <= set(s) for s in stats), stats[:1]  # nosec B101  # noqa: S101
     checks += 1
     for bad in ("", "nosuch:fn", "mod"):
         try:
             resolve_target(bad)
-        except (ValueError, ImportError, AttributeError):
+        except (ValueError, ImportError, AttributeError):  # 期望被拒：吞掉后由下方断言兜
             continue
         raise AssertionError(f"应被拒：{bad!r}"
                              "（修复指引：目标解析面过宽，收窄 resolve_target 的判据）")
@@ -274,9 +276,9 @@ def _self_test() -> int:
     frames = [{"name": "hot", "file": "a.py", "line": 1},
               {"name": "cold", "file": "b.py", "line": 2}]
     samples = [[0, 1], [0], [0], [1]]
-    assert [r["key"] for r in top_frames(frames, samples, 2)] == ["a.py:hot", "b.py:cold"]
-    assert top_frames(frames, [], 5) == []
-    assert speedscope_report({"shared": {"frames": frames}, "profiles": [{"samples": samples}]},
+    assert [r["key"] for r in top_frames(frames, samples, 2)] == ["a.py:hot", "b.py:cold"]  # nosec B101  # noqa: S101
+    assert top_frames(frames, [], 5) == []  # nosec B101  # noqa: S101
+    assert speedscope_report({"shared": {"frames": frames}, "profiles": [{"samples": samples}]},  # nosec B101  # noqa: S101
                              1)["samples"] == 4
     checks += 1
     # 2.x 形状（measurements[].time_wall_clock）
@@ -286,21 +288,21 @@ def _self_test() -> int:
         {"command": "B", "measurements": [{"time_wall_clock": {"value": 0.5, "unit": "second"}},
                                           {"time_wall_clock": {"value": 0.5, "unit": "second"}}]}]}
     bench = hyperfine_report(new_schema)
-    assert bench["speedup_first_over_second"] == 4.0, bench
-    assert bench["commands"][0]["runs"] == 2 and bench["commands"][0]["mean_s"] == 2.0, bench
+    assert bench["speedup_first_over_second"] == 4.0, bench  # nosec B101  # noqa: S101
+    assert bench["commands"][0]["runs"] == 2 and bench["commands"][0]["mean_s"] == 2.0, bench  # nosec B101  # noqa: S101
     # 1.x 形状兜底
     legacy = hyperfine_report({"results": [{"command": "A", "mean": 2.0, "stddev": 0.1,
                                             "min": 1.9, "times": [2, 2]},
                                            {"command": "B", "mean": 0.5, "stddev": 0.01,
                                             "min": 0.49, "times": [0.5, 0.5]}]})
-    assert legacy["speedup_first_over_second"] == 4.0, legacy
-    assert hyperfine_report({"results": []})["speedup_first_over_second"] is None
+    assert legacy["speedup_first_over_second"] == 4.0, legacy  # nosec B101  # noqa: S101
+    assert hyperfine_report({"results": []})["speedup_first_over_second"] is None  # nosec B101  # noqa: S101
     checks += 1
     # 缺席必须如实：把解析面指向一个不存在的目录，必须返回 None 而不是编一个路径
     saved = os.environ.get(ENV_DIRS)
     os.environ[ENV_DIRS] = str(Path("/nonexistent-dir-xyz"))
     try:
-        assert resolve_tool("definitely-not-a-tool-xyz") is None
+        assert resolve_tool("definitely-not-a-tool-xyz") is None  # nosec B101  # noqa: S101
     finally:
         if saved is None:
             os.environ.pop(ENV_DIRS, None)
