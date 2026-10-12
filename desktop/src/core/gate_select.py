@@ -45,7 +45,14 @@ def _posix(p: object) -> str:
 
 
 def _rel(root: str, p: object) -> str | None:
-    """绝对路径 → 仓库相对 posix；不在根内（临时目录等）→ None。"""
+    """路径 → 仓库相对 posix；不在根内（临时目录等）→ None。
+
+    两种口径都收：观测器落盘的是**仓库相对**；早期/私有数据是**绝对**路径。
+    相对路径**不能**拿 cwd 去 abspath——那会按调用者所在目录解析（曾因此把读面清空）。
+    """
+    raw = str(p)
+    if not os.path.isabs(raw):
+        return _posix(raw).lstrip("/")
     rp = os.path.normcase(os.path.abspath(str(root)))
     n = os.path.normcase(os.path.abspath(str(p)))
     if n == rp or n.startswith(rp + os.sep):

@@ -331,6 +331,7 @@
     "desktop/src/core/gate_faces.py::UP035": 1,
     "desktop/src/core/gate_graph.py::UP006": 10,
     "desktop/src/core/gate_graph.py::UP035": 3,
+    "desktop/src/core/gate_observe.py::RUF100": 1,
     "desktop/src/core/gate_router.py::UP031": 4,
     "desktop/src/core/gate_router.py::UP035": 1,
     "desktop/src/core/generator.py::I001": 1,

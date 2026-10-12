@@ -8,6 +8,7 @@
   python scripts/gate.py --observed      # 跑一次只读扫描器并打印其观测读面
   python scripts/gate.py --manifest      # 打印声明面（缺件即空表）
   python scripts/gate.py --select docs/README.md   # 按改动选出该跑的测试模块（秒级 check 前半）
+  python scripts/gate.py --observe --workers 5     # 观测测试模块读面（数据落缓存区，不入库）
 """
 import argparse
 import json
@@ -18,6 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
 from core import gate_faces as gf  # noqa: E402
+from core import gate_observe as go  # noqa: E402
 from core import gate_select as gs  # noqa: E402
 
 
@@ -98,6 +100,24 @@ def _route_datalog(changed, as_json):
     return 0 if got["status"] == "OK" else 1
 
 
+def _observe_all(mods, workers, as_json):
+    """观测测试模块读面（可续跑；数据落缓存区，不入库）。"""
+
+    def progress(done, total, mod, rec):
+        print(f"  [{done}/{total}] {mod:<34} {rec['status']:<12} reads={len(rec['reads'])}",
+              flush=True)
+
+    doc = go.run_all(ROOT, mods=list(mods) if mods else None, workers=workers,
+                     on_progress=progress)
+    modules = doc.get("modules") or {}
+    ok = sum(1 for v in modules.values() if v.get("status") == "ok")
+    _emit("gate-observe", {"observed": len(modules), "ok": ok,
+                           "path": str(go.faces_path())}, as_json,
+          [f"== 读面观测 ==  模块 {len(modules)} · ok {ok}",
+           f"  数据落点 {go.faces_path()}（缓存区，不入库）"])
+    return 0
+
+
 def _select(changed, as_json):
     """按改动选「该跑的测试模块」——只打印计划，不执行（执行面见 tests 套件的 check 入口）。"""
     got = gs.select(changed, root=ROOT)
@@ -130,6 +150,9 @@ def main(argv=None) -> int:
                     help="按变更路径求路由（策略 S）并自检")
     ap.add_argument("--route-datalog", nargs="*", default=None, metavar="PATH",
                     help="按变更路径用**规则层（P-A5 dag 后端）**求路由并打印 gate 推导图统计")
+    ap.add_argument("--observe", nargs="*", default=None, metavar="MOD",
+                    help="观测测试模块读面（省略模块名即全量；可续跑）")
+    ap.add_argument("--workers", type=int, default=5, help="观测/执行的并行度")
     ap.add_argument("--select", nargs="*", default=None, metavar="PATH",
                     help="按改动路径选「该跑的测试模块」（读面数据在缓存区，缺席即全跑）")
     args = ap.parse_args(argv)
@@ -145,6 +168,8 @@ def main(argv=None) -> int:
         return _route(args.route, args.json)
     if args.route_datalog is not None:
         return _route_datalog(args.route_datalog, args.json)
+    if args.observe is not None:
+        return _observe_all(args.observe, args.workers, args.json)
     if args.select is not None:
         return _select(args.select, args.json)
     issues, stats = gf.audit(ROOT)
