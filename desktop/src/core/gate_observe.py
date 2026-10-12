@@ -112,13 +112,13 @@ def normalize_reads(root: str, paths, workdir: str | None = None) -> list:
 
 
 def _run_child(mod: str, cwd: str, out_path: str, capture_children: bool,
-               site_dir: str | None) -> None:
+               site_dir: str | None, timeout: int = 600) -> None:
     env = dict(os.environ)
     if capture_children and site_dir:
         env["PYTHONPATH"] = site_dir + os.pathsep + env.get("PYTHONPATH", "")
         env["NF_FACE_LOG"] = out_path + ".child"
     subprocess.run([sys.executable, "-c", RUNNER, out_path, mod], cwd=cwd,  # noqa: S603
-                   env=env, capture_output=True, check=False)  # nosec B603
+                   env=env, capture_output=True, check=False, timeout=timeout)  # nosec B603
 
 
 def observe_one(mod: str, root: str, cwd: str | None = None, timeout: int = 600,
@@ -137,9 +137,11 @@ def observe_one(mod: str, root: str, cwd: str | None = None, timeout: int = 600,
                       encoding="utf-8", newline="\n") as fh:
                 fh.write(SITE)
         try:
-            _run_child(mod, workdir, out_path, capture_children, site_dir)
+            _run_child(mod, workdir, out_path, capture_children, site_dir, timeout)
+        except subprocess.TimeoutExpired:
+            status = "timeout"               # 超时也是「说不清」：常跑兜底，不当成功
         except OSError:
-            status = "import_error"          # 起不来进程：按「说不清」如实记，交给常跑兜底
+            status = "import_error"          # 起不来进程：同样如实记
         else:
             try:
                 got = json_doc.loads(Path(out_path).read_text(encoding="utf-8"), dict,
