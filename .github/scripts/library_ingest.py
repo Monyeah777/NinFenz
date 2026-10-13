@@ -12,7 +12,9 @@
   - 档位/自定义段各 ≤16 字符、仅 [A-Za-z0-9]、不含连字符；要填就都填，否则默认形
   - 前缀小写键全馆唯一（禁止仅大小写不同的前缀并存 → 转译无歧义）
   - 入馆唯一硬标准 = 自包含可召回（引用式不再收；机器不审内容，作者把关）
-流程：白名单校验 → 解析元信息 → 分配编号 → 写文件 → 更新 INDEX → 重建 ALIAS → git 提交推送 → Issue 回评双端链接 → 关闭 Issue。
+流程：闸门声明校验（library/intake.json：open / author_only / paused）→ 解析元信息 → 分配编号 →
+      写文件 → 投影重生成（INDEX + ALIAS，走 core.library.write_projection）→ git 提交推送 →
+      Issue 回评双端链接 → 关闭 Issue。
 本地调试：设 DRY_RUN=1 只改工作区不提交/不调 API。
 """
 import json

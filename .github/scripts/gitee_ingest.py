@@ -5,12 +5,13 @@
 本脚本把投稿入口搬到 Gitee Issues（国内可达），由 GitHub Actions 定时轮询拉取：
   投稿人（任何人，零治理）→ Gitee 开 Issue（标题【NF投稿】+ 粘贴全文）
   → 本脚本每 10 分钟醒来 → Gitee API 拉 open 投稿 → 同一入库核心（净化/空壳拒收/
-    36进制编号/小写键查重/ALIAS 重建）→ git 提交推双端（origin + gitee）
+    36进制编号/小写键查重/投影重生成 INDEX+ALIAS）→ git 提交推双端（origin + gitee）
   → Gitee Issue 回评双端链接 → 关闭 Issue（state=closed = 天然幂等，处理过的不再拉取）。
 
 与 GitHub 前端（library_ingest.py）的差异：
   - 数据源 = Gitee API v5（不是 GitHub 事件推送的 env）
-  - 零治理：不校验投稿人白名单（作者拍板「烂就烂，出事拉黑」）
+  - 零治理：默认不校验投稿人白名单（作者拍板「烂就烂，出事拉黑」）；闸门声明转
+    `author_only` 时同一分支即白名单校验（见 load_gate('gitee')）
   - 入库注记头标注「来源：Gitee Issue #N」（防重/可追溯）
   - 回评与关闭走 Gitee API；git push 双端（gitee 用 GITEE_TOKEN 子令牌）
 
