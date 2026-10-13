@@ -58,7 +58,7 @@ jobs:
             --json --digest > cross-lang-report.json || true
           python3 scripts/cross_lang_verify.py \
             --manifest protocol/generated/test_vectors/jcs_reject.json --json >> cross-lang-report.json || true
-      - uses: actions/upload-artifact@6f51ac03b9356d0a7e1b6d0fc5fe3b7cfc800e0b  # v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         if: failure()
         with:
           name: cross-lang-report
