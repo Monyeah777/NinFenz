@@ -16,6 +16,6 @@
 # Scope: this is the CI toolchain, not NF's own package metadata. NF itself stays
 # stdlib-only with soft third-party imports (see purity_scan R5).
 pyyaml==6.0.3
-PySide6==6.11.2
+PySide6==6.12.0
 jsonschema==4.26.0
-coverage==7.16.1
+coverage==7.16.2
