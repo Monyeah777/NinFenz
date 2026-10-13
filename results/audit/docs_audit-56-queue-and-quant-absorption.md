@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
-  - verify.sh:a3010dd8b83a54d5fc460ed761b89989ab49b946a58290b281276c8177a38c31
+  - verify.sh:05bd42faa57f04e609ca8faf4cf3e9c2bf9c069911f72c1b124c14b8f608bd7c
   - README.en.md:1cff4f59322428a9bbd92efe5ff5b7578ac78ad61a6161af3a5d304695dc06a5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:e95c4fa1535bbf8de01b2204a661f5d77fb0e023daa41076975a2b547ddfa519
 
 ---
+
+> 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
 > 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 
