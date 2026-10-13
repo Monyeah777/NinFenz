@@ -5,6 +5,10 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write          # provenance / trusted publishing 必需

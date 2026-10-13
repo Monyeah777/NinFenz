@@ -7,6 +7,10 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:
@@ -17,6 +21,8 @@ jobs:
     steps:
       # ubuntu-latest 镜像自带 .NET 8 SDK 与 pwsh ⇒ 不引 setup-dotnet（少一个需钉 SHA 的依赖）
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4（与仓库既有 workflow 同钉法）
+        with:
+          persist-credentials: false
       - name: 工具链就绪（.NET 8 / pwsh）
         run: |
           dotnet --list-sdks

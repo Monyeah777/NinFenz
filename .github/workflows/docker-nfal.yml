@@ -12,6 +12,10 @@ on:
       - 'desktop/src/core/nfal_cli.py'
       - '.github/workflows/docker-nfal.yml'
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:
@@ -21,6 +25,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
       - name: 构建镜像（上下文=仓库根）
         run: docker build -f packaging/nfal/Dockerfile -t nfal:ci .
       - name: 冒烟：容器内入口可跑（--help）
