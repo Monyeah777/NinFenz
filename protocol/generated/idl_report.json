@@ -1,5 +1,6 @@
 {
   "asset_keys": [
+    "STYLE_DNA",
     "TECH_RULES",
     "TECH_TEMPLATES"
   ],
@@ -190,7 +191,7 @@
       "conformance": "L2",
       "id": "M00",
       "layer": "P00",
-      "name": "数据结构",
+      "name": "数据槽总线",
       "source": "04_模块库/通用类/M00_数据结构.md"
     },
     {
@@ -225,7 +226,7 @@
       "conformance": "L2",
       "id": "M06",
       "layer": "P30",
-      "name": "任务剧情",
+      "name": "流程状态机",
       "source": "04_模块库/事件类/M06_任务剧情.md"
     },
     {
@@ -239,7 +240,7 @@
       "conformance": "L2",
       "id": "M08",
       "layer": "P10",
-      "name": "季节天气",
+      "name": "环境状态",
       "source": "04_模块库/世界类/M08_季节天气.md"
     },
     {
@@ -267,14 +268,14 @@
       "conformance": "L2",
       "id": "M12",
       "layer": "P50",
-      "name": "NPC 对话",
+      "name": "模板检索库",
       "source": "04_模块库/事件类/M12_NPC对话.md"
     },
     {
       "conformance": "L2",
       "id": "M13",
       "layer": "P30",
-      "name": "NPC 交互",
+      "name": "实体交互",
       "source": "04_模块库/事件类/M13_NPC交互.md"
     },
     {
@@ -323,7 +324,7 @@
       "conformance": "L2",
       "id": "M20",
       "layer": "P70",
-      "name": "世界知识库",
+      "name": "知识条目库",
       "source": "04_模块库/事件类/M20_世界知识库.md"
     },
     {
@@ -337,14 +338,14 @@
       "conformance": "L2",
       "id": "M23",
       "layer": "P20",
-      "name": "认知边界",
+      "name": "可见性边界",
       "source": "04_模块库/通用类/M23_认知边界.md"
     },
     {
       "conformance": "L2",
       "id": "M24",
       "layer": "P70",
-      "name": "组合规则",
+      "name": "规则组合",
       "source": "04_模块库/通用类/M24_组合规则.md"
     },
     {
@@ -372,7 +373,7 @@
       "conformance": "L2",
       "id": "M50",
       "layer": "调度器",
-      "name": "主循环",
+      "name": "调度器",
       "source": "04_模块库/通用类/M50_主循环.md"
     },
     {
@@ -414,14 +415,14 @@
       "conformance": "L2",
       "id": "M80",
       "layer": "P80",
-      "name": "输出生成器",
+      "name": "输出质检门",
       "source": "04_模块库/通用类/M80_输出生成器.md"
     },
     {
       "conformance": "L2",
       "id": "M90",
       "layer": "P90",
-      "name": "技术文档结构",
+      "name": "结构装配",
       "source": "04_模块库/技术文档类/M90_技术文档结构.md"
     },
     {
@@ -540,7 +541,7 @@
       "conformance": "L2",
       "id": "事件:M22",
       "layer": "P30",
-      "name": "事件叙事",
+      "name": "事件编排",
       "source": "04_模块库/事件类/M22_事件叙事.md"
     },
     {
@@ -1625,7 +1626,7 @@
       "conformance": "L2",
       "id": "通用:M10",
       "layer": "P10",
-      "name": "时间推进",
+      "name": "节拍推进",
       "source": "04_模块库/通用类/M10_时间推进.md"
     },
     {
@@ -1742,7 +1743,7 @@
     }
   ],
   "coverage": {
-    "asset_entries": 2,
+    "asset_entries": 3,
     "contract_covered": 248,
     "module_docs": 248,
     "pipelines": 114,

@@ -703,7 +703,7 @@
     "desktop/src/core/quality_baseline.py::UP035": 3,
     "desktop/src/core/quality_depth_scan.py::SIM102": 1,
     "desktop/src/core/quality_depth_scan.py::UP006": 11,
-    "desktop/src/core/quality_depth_scan.py::UP031": 5,
+    "desktop/src/core/quality_depth_scan.py::UP031": 1,
     "desktop/src/core/quality_depth_scan.py::UP035": 3,
     "desktop/src/core/quality_gate.py::E741": 1,
     "desktop/src/core/quality_gate.py::UP006": 8,

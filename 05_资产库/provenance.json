@@ -5,7 +5,7 @@
     {
       "file": "用户自定义/TECH_RULES.md",
       "key": "TECH_RULES",
-      "source": "05_资产库/用户自定义 §3 登记记录（asset_register 2026-09-03）；P90 技术文档域演示资产（官方作者侧首批供应链托管）",
+      "source": "05_资产库/用户自定义 §2 登记记录（asset_register 2026-09-03）；机制资产（M90 结构装配；官方作者侧供应链托管）",
       "version": "1.0",
       "status": "active",
       "module": "M90",
@@ -14,12 +14,21 @@
     {
       "file": "用户自定义/TECH_TEMPLATES.md",
       "key": "TECH_TEMPLATES",
-      "source": "05_资产库/用户自定义 §3 登记记录（asset_register 2026-09-03）；P90 技术文档域演示资产（官方作者侧首批供应链托管）",
+      "source": "05_资产库/用户自定义 §2 登记记录（asset_register 2026-09-03）；机制资产（M90 结构装配；官方作者侧供应链托管）",
       "version": "1.0",
       "status": "active",
       "module": "M90",
       "added": "2026-09-07"
+    },
+    {
+      "file": "用户自定义/STYLE_DNA.md",
+      "key": "STYLE_DNA",
+      "source": "05_资产库/用户自定义 §2 登记记录（M80 双门重构 2026-09-08）；M80 输出 profile 机制资产（官方作者侧供应链托管）",
+      "version": "1.0",
+      "status": "active",
+      "module": "M80",
+      "added": "2026-10-13"
     }
   ],
-  "package": "官方核心资产集"
+  "package": "官方核心机制资产集"
 }

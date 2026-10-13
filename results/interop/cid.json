@@ -7,24 +7,24 @@
       "sha256": "287a95e5c746aec574c70058e841f8a3555012bf22c9fecc38c0ce0dfd581e20"
     },
     {
-      "cid": "bafyreichvoa5w5okbgmondqy5tutjauq7bipl4bd263vqr4cwa5laprqeq",
+      "cid": "bafyreidt6viis3e7ummfxzzbhgw75ujhppyzhowxunr7vmqh266dzxyjne",
       "path": "01_核心协议.md",
-      "sha256": "47ab81db75ca0998e68e18ece9348290f850f5f023d7b7584782b03ab03e3024"
+      "sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
     },
     {
-      "cid": "bafyreick322g3xulginfrk5osbfdudsqslwmnqrgdyra5qbzadnjdj3cu4",
+      "cid": "bafyreidyq7wnymb6uelg76hnyahys3jmw4osyvrozfwvdgopuol23dtq3q",
       "path": "02_联动注册表.md",
-      "sha256": "4adeb46dde8b321a58abae904a3a0e5092ecc6c2261e220ec03900da91a762a7"
+      "sha256": "7887ecdc303ea1166ff8edc00f896d2cb71d2c562ec96d5199cfa397ad8e70dc"
     },
     {
-      "cid": "bafyreihf4j47vbu4hryr7oopjs6rsancpliljujvryji3wrw7hay3hv2gm",
+      "cid": "bafyreiafe5yjd7v645w3lkfxwyjsjethmn7l6zhm2kvjtfctkjvitq5som",
       "path": "06_Agent执行协议.md",
-      "sha256": "e5e279fa869c3c711fb9cf4cbd1901a27ad0b4d1358e128dda36f9c18d9eba33"
+      "sha256": "05277091febee76db5a8b7b613249267637ebf64ecd2aa999453526a89c3b273"
     },
     {
-      "cid": "bafyreigdlabakv2cxpoxpd5ab7aahucbcw7hldoe2ytf65lg3ob4pvo2oi",
+      "cid": "bafyreighyurp2tydobtuzqwbsgcvyl7bjbe7xicppjoywldiwq35rq2cgm",
       "path": "07_官方核心出厂与社区预设导航.md",
-      "sha256": "c35802055742bbdd778fa00fc003d04115be758dc4d6265f7566db83c7d5da72"
+      "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
     },
     {
       "cid": "bafyreida7is2g4lhmischxrpr3husmip62veo5faj7w3ys5eq262da3jam",
@@ -87,9 +87,9 @@
       "sha256": "8225689a75dce1f3088fb1d49f0cc11a607afbc39c56732a3bcc32576fc01c10"
     },
     {
-      "cid": "bafyreihrx2qxxnxc6dilkatxkkog7ubcjxwshzz52zvw7zg5nzbdluypem",
+      "cid": "bafyreibdos34ypmbvl5tgtbnfywpm5iamovcs5ncmbvsisyxj5x7citbby",
       "path": "protocol/conformance_report.json",
-      "sha256": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
+      "sha256": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -217,9 +217,9 @@
       "sha256": "9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06"
     },
     {
-      "cid": "bafyreibp6b4fujtjc555o7ktyx4mhhnhshfcnw2bhkvxffelyruoekrgsu",
+      "cid": "bafyreignzocsk6lylweborittabb4vkedzrvvbl6blgtkv5ptkdlamhhzi",
       "path": "desktop/src/core/registry.json",
-      "sha256": "2ff0785a2669177bd77d53c5f8c39da791ca26db413aab72948bc468e22a2695"
+      "sha256": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca"
     },
     {
       "cid": "bafyreib4svsfql3myvr5mriy7fb7lxxs6kunbhb6gsev3xlhffvj7qcqna",
