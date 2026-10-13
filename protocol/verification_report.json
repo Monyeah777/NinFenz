@@ -1,9 +1,9 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
+    "coverage_note": "判据级抽查面 30 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
     "expected_checks": 40,
     "expected_pass": 72,
-    "report_items": 31,
+    "report_items": 30,
     "verify_version": "v2.30"
   },
   "items": [
@@ -512,29 +512,14 @@
       },
       "status": "pass",
       "warns": 0
-    },
-    {
-      "id": "intake_surface",
-      "issues": 0,
-      "name": "投稿面一致性（模板/须知/声明/闸门落点）",
-      "sample": [],
-      "source": "intake_surface.scan",
-      "stats": {
-        "fields": 14,
-        "gates": 8,
-        "paths": 2,
-        "templates": 2
-      },
-      "status": "pass",
-      "warns": 0
     }
   ],
-  "root_digest": "8a3c2c00e804384ceb2d8805e9f21641b81c2111919aadf97456e1655c81379f",
+  "root_digest": "cf12ad49162ebd6de938d873ef365becc16d66977bb91761fbb088007a904e10",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 29,
+    "pass": 28,
     "warn": 2
   }
 }
