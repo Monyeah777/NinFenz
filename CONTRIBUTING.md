@@ -140,7 +140,7 @@ python3 -m compileall -q desktop/src scripts
   **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
 - **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
   条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
-- **投稿（`library/` 与 `community/`）**：见 `library/intake.json` 的投稿须知——投稿即声明原创
+- **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
   或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
 - **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，
   已按「排除发布面 + 换自写夹具」修复）。
