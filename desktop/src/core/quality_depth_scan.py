@@ -82,6 +82,7 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     from core import concept_graph as cg
     from core import domain_pack as dpk
     from core import instruction_step_audit as isa
+    from core import intake_surface as isf
     from core import output_forms as of
     from core import pack_combo as pcb
     from core import payload_consumer as pc
@@ -101,7 +102,8 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                      ("combos", pcb.scan),
                      ("asset_density", ad.scan),
                      ("asset_thickness", ad.thickness_scan),
-                     ("asset_usage_strict", lambda r: ad.usage_scan(r))):
+                     ("asset_usage_strict", lambda r: ad.usage_scan(r)),
+                     ("intake_surface", isf.scan)):
         sub_issues, sub_stats = fn(root)
         if name == "asset_usage_strict":
             if sub_stats.get("zero_usage", 0) > 0:
