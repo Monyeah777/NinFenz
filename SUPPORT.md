@@ -10,7 +10,7 @@
 
 - **缺陷 / 功能请求**：开 Issue（附最小复现：命令 + 期望 + 实得 + 环境）。
 - **安全漏洞 / 行为准则举报**：**不要**开公开 Issue，走 [SECURITY.md](SECURITY.md) 的私密通道。
-- **投稿**：见 [CONTRIBUTING.md](CONTRIBUTING.md) 与投稿模板。
+- **投稿**：见 [CONTRIBUTING.md](CONTRIBUTING.md) 与投稿模板（GitHub 侧 `.github/ISSUE_TEMPLATE/library_submission.md`；Gitee 侧 `.github/ISSUE_TEMPLATE/NF投稿.md`）。
 
 ## 举报与申诉（治理通道 · Z6）
 

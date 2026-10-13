@@ -28,7 +28,7 @@
 
 > **实测备注（2026-09-07）**：raw 形态双镜像全 200（AI 通道可靠）；Gitee 网页形态（blob/tree/issues 页）对程序化访问返回 405/401（反爬/登录策略）——**网页形态仅供人用浏览器打开，程序/AI 一律走 raw**。
 
-> GitHub 投稿开题可带模板直达：`https://github.com/Monyeah777/NinFenz/issues/new?template=library_submission.md`（仅 GitHub 支持该参数；Gitee 不支持，开题后选模板即可）。
+> GitHub 投稿开题可带模板直达：`https://github.com/Monyeah777/NinFenz/issues/new?template=library_submission.md`。Gitee 侧**无模板选择器**（`.gitee/ISSUE_TEMPLATE/` 刻意空置，见 `library/intake.json` 的 `submission.gitee_surface`）：开题后按仓库内模板件 `.github/ISSUE_TEMPLATE/NF投稿.md` 的内容粘贴（口径见 `library/INDEX.md` 投稿须知）。
 
 ## 三、接待菜单（用户贴地址后，开场回复的结构）
 

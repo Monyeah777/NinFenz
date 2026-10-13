@@ -28,11 +28,13 @@
 2. **入库唯一硬标准 = 自包含可召回**：文件自带「是什么 + 怎么用」，AI 单文件即正确使用；引用式（运行需仓库配套的公开件）不再收（历史样本除外）。
 3. **编号**：投稿可选填档位词 + 自定义段（要填就都填，否则默认形）；序号由机器人按同前缀 36 进制自动分配（= 文件名 = 链接一部分，同前缀各自从 1 起）。
 4. **署名**：INDEX 每件标注投稿人；投稿人自创版权保留署名。
-5. **投稿通道（公开开放 · 零门槛）**：任何人可直接投稿。自动通道**主入口 = Gitee Issues（国内直连，面向所有人开放）**：`https://gitee.com/monyeah777/ninfenz/issues/new` 开题，标题 `【NF投稿】作品名`，正文按模板粘贴全文 → 机器人约 10 分钟内自动编号入库、回评双端链接并关题（全文 ≤ 约 6 万字符，超长走人工通道 = 交给作者身边助手 Operit）。**模板说明可以全不删**——机器人自动忽略括号说明；只要标题带 `【NF投稿】` + 正文粘了全文就能入库（零治理：作者不审核，违规内容作者见后下架）。GitHub 仓库 Issues 仅作者本人自投通道（外部投稿请走 Gitee）。
+5. **投稿通道（公开开放 · 零门槛）**：任何人可直接投稿。自动通道**主入口 = Gitee Issues（国内直连，面向所有人开放）**：`https://gitee.com/monyeah777/ninfenz/issues/new` 开题，标题 `【NF投稿】作品名`，正文按模板粘贴全文 → 机器人约 10 分钟内自动编号入库、回评双端链接并关题（正文约 6 万字符内为宜；机器人硬上限 = **256 KiB 字符**，超长即拒收，超长内容走人工通道 = 交给作者身边助手 Operit）。**分隔线以上的括号说明可留**（机器人按前缀净化忽略），但**分隔线以下的占位行必须被正文替换**——原样残留会被判「正文空壳」并关题；只要标题带 `【NF投稿】` + 正文粘了全文就能入库（零治理：作者不审核，违规内容作者见后下架）。GitHub 仓库 Issues 仅作者本人自投通道（外部投稿请走 Gitee）。
 
 6. **许可**：登记表带「许可」列——投稿请在正文写一行 `许可：<SPDX 标识>`（如 MIT / CC-BY-4.0）；未写即记「未声明」并由许可证门挂账提示（不阻断入库）。
 
-7. **单一真相源**：条目文件头的 YAML frontmatter 是**唯一真源**（`id/type/title/description/license/sources/generated/verified/status/stale_after/attestation`）；下方登记表与 `ALIAS.md` 均由脚本重生成（`python scripts/nf.py library reindex`），**不要手改生成区**。
+7. **分级（必填）**：投稿须在正文写一行 `分级：<general / teen / mature / unrated>`（词表真源 = `library/intake.json` 的 `rating.vocabulary`）；**未定级也必须显式写 `unrated`**——缺字段会被分级门判 FAIL，入库机器人只能兜底记 `unrated` 并回评提示补齐。分级由投稿人自述，门禁只判「声明在场且合规」，不替投稿人做适龄判断。
+
+8. **单一真相源**：条目文件头的 YAML frontmatter 是**唯一真源**（`id/type/title/description/license/sources/generated/verified/status/stale_after/attestation`）；下方登记表与 `ALIAS.md` 均由脚本重生成（`python scripts/nf.py library reindex`），**不要手改生成区**。
 
 > **闸门声明（机读真相）= `library/intake.json`**：上条两通道的接收模式（`open` / `author_only` / `paused`）以该件为准，两个入库机器人运行时读它（作者可一键关闸为 `paused`）；本条通道措辞须与声明逐字一致，三方不一致即 `verify check34` FAIL。
 
