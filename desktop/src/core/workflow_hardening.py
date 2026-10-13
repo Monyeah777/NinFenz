@@ -1,6 +1,6 @@
 """工作流工业级加固判据（Python-only 面 · 2026-10-13 补）。
 
-**为什么单独成件**：`core/workflow_policy.py` 是 `nf verify-report` 的 **native 面**
+**为什么单独成件**：`core/workflow_policy.py` 是 `python scripts/verify_report.py` 的 **native 面**
 （Rust 引擎 `engine/rust/src/workflow_policy.rs` 与其逐字节对账）；改它的问题/统计面就必须
 同步移植到 Rust，否则跨语言对账当场红。本件守的是 **CI 运行面**（并发 / 凭据 / 缓存 / 评审路由 /
 生态覆盖），不属于跨语言契约面——按仓库既有先例，新子判据挂到**喂入面**

@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-12",
-  "approved_by": "Monyeah",
-  "note": "机械重批：观测超时与车道规则修复 + 耦合基线重冻后冻结链重算",
+  "approved_at": "2026-10-13",
+  "approved_by": "本轮执行者",
+  "note": "机械重批：核心语义通用化波次后冻结链重生成（conformance → approve → receipts）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
+  "subject_digest": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
 }

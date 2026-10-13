@@ -32,6 +32,10 @@
       "note": "策略规格：策略模板与合规边界（量化金融域包）",
       "scope": "domain_pack"
     },
+    "STYLE_DNA": {
+      "note": "输出 profile 配置（M80 质量门前置 · 用户自定义资产）",
+      "scope": "user_asset"
+    },
     "TECH_RULES": {
       "note": "技术文档规则（技术文档域包 · 用户自定义资产）",
       "scope": "user_asset"
@@ -41,5 +45,5 @@
       "scope": "user_asset"
     }
   },
-  "updated": "2026-09-29"
+  "updated": "2026-10-13"
 }

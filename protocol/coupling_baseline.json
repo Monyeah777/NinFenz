@@ -893,7 +893,7 @@
     },
     "quality_depth_scan": {
       "ca": 0,
-      "ce": 14,
+      "ce": 15,
       "i": 1.0
     },
     "quality_gate": {
@@ -1163,6 +1163,11 @@
     },
     "watch": {
       "ca": 2,
+      "ce": 0,
+      "i": 0.0
+    },
+    "workflow_hardening": {
+      "ca": 1,
       "ce": 0,
       "i": 0.0
     },

@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 57,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "78f93e1ee21a2b40cbf7e1fd7453729eedc938a5d40875ac6574b3f13b02505e",
+    "root": "b06f2d8a4a4a6c57cb97859c09db7c82b958181b8b403a8681740c72d9c9cd7d",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -17,25 +17,25 @@
     },
     {
       "digest": {
-        "sha256": "47ab81db75ca0998e68e18ece9348290f850f5f023d7b7584782b03ab03e3024"
+        "sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
       },
       "name": "01_核心协议.md"
     },
     {
       "digest": {
-        "sha256": "4adeb46dde8b321a58abae904a3a0e5092ecc6c2261e220ec03900da91a762a7"
+        "sha256": "7887ecdc303ea1166ff8edc00f896d2cb71d2c562ec96d5199cfa397ad8e70dc"
       },
       "name": "02_联动注册表.md"
     },
     {
       "digest": {
-        "sha256": "e5e279fa869c3c711fb9cf4cbd1901a27ad0b4d1358e128dda36f9c18d9eba33"
+        "sha256": "05277091febee76db5a8b7b613249267637ebf64ecd2aa999453526a89c3b273"
       },
       "name": "06_Agent执行协议.md"
     },
     {
       "digest": {
-        "sha256": "c35802055742bbdd778fa00fc003d04115be758dc4d6265f7566db83c7d5da72"
+        "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
       },
       "name": "07_官方核心出厂与社区预设导航.md"
     },
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "f1bea17bb6e2f0d0b50277529c6fd0224ded23e73dd66b6fe4dd6e4235d30f23"
+        "sha256": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -269,7 +269,7 @@
     },
     {
       "digest": {
-        "sha256": "2ff0785a2669177bd77d53c5f8c39da791ca26db413aab72948bc468e22a2695"
+        "sha256": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca"
       },
       "name": "desktop/src/core/registry.json"
     },

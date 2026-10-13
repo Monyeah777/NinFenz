@@ -663,7 +663,7 @@
             "detail": "官方核心 · P00(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M00 · 数据结构 · 归属：官方核心 · 挂载：P00(active)"
+              "value": "模块 M00 · 数据槽总线 · 归属：官方核心 · 挂载：P00(active)"
             },
             "sortText": "0_M00"
           },
@@ -713,7 +713,7 @@
             "detail": "官方核心 · P30(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M06 · 任务剧情 · 归属：官方核心 · 挂载：P30(active)"
+              "value": "模块 M06 · 流程状态机 · 归属：官方核心 · 挂载：P30(active)"
             },
             "sortText": "0_M06"
           },
@@ -733,7 +733,7 @@
             "detail": "官方核心 · P10(available)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M08 · 季节天气 · 归属：官方核心 · 挂载：P10(available)"
+              "value": "模块 M08 · 环境状态 · 归属：官方核心 · 挂载：P10(available)"
             },
             "sortText": "0_M08"
           },
@@ -763,7 +763,7 @@
             "detail": "官方核心 · P50(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M12 · NPC 对话 · 归属：官方核心 · 挂载：P50(active)"
+              "value": "模块 M12 · 模板检索库 · 归属：官方核心 · 挂载：P50(active)"
             },
             "sortText": "0_M12"
           },
@@ -773,7 +773,7 @@
             "detail": "官方核心 · P30(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M13 · NPC 交互 · 归属：官方核心 · 挂载：P30(active)"
+              "value": "模块 M13 · 实体交互 · 归属：官方核心 · 挂载：P30(active)"
             },
             "sortText": "0_M13"
           },
@@ -843,7 +843,7 @@
             "detail": "官方核心 · P70(active), P00(available)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M20 · 世界知识库 · 归属：官方核心 · 挂载：P70(active), P00(available)"
+              "value": "模块 M20 · 知识条目库 · 归属：官方核心 · 挂载：P70(active), P00(available)"
             },
             "sortText": "0_M20"
           },
@@ -853,7 +853,7 @@
             "detail": "官方核心 · P20(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M23 · 认知边界 · 归属：官方核心 · 挂载：P20(active)"
+              "value": "模块 M23 · 可见性边界 · 归属：官方核心 · 挂载：P20(active)"
             },
             "sortText": "0_M23"
           },
@@ -863,7 +863,7 @@
             "detail": "官方核心 · P70(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M24 · 组合规则 · 归属：官方核心 · 挂载：P70(active)"
+              "value": "模块 M24 · 规则组合 · 归属：官方核心 · 挂载：P70(active)"
             },
             "sortText": "0_M24"
           },
@@ -903,7 +903,7 @@
             "detail": "官方核心 · 未登记",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M50 · 主循环 · 归属：官方核心 · 挂载：未登记"
+              "value": "模块 M50 · 调度器 · 归属：官方核心 · 挂载：未登记"
             },
             "sortText": "0_M50"
           },
@@ -963,7 +963,7 @@
             "detail": "官方核心 · P80(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M80 · 输出生成器 · 归属：官方核心 · 挂载：P80(active)"
+              "value": "模块 M80 · 输出质检门 · 归属：官方核心 · 挂载：P80(active)"
             },
             "sortText": "0_M80"
           },
@@ -973,7 +973,7 @@
             "detail": "官方核心 · P90(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 M90 · 技术文档结构 · 归属：官方核心 · 挂载：P90(active)"
+              "value": "模块 M90 · 结构装配 · 归属：官方核心 · 挂载：P90(active)"
             },
             "sortText": "0_M90"
           },
@@ -1143,7 +1143,7 @@
             "detail": "官方核心 · P30(active)",
             "documentation": {
               "kind": "markdown",
-              "value": "模块 事件:M22 · 事件叙事 · 归属：官方核心 · 挂载：P30(active)"
+              "value": "模块 事件:M22 · 事件编排 · 归属：官方核心 · 挂载：P30(active)"
             },
             "sortText": "0_事件:M22"
           },
@@ -2406,7 +2406,7 @@
       "result": {
         "contents": {
           "kind": "markdown",
-          "value": "**M00**（module）\n\n模块 M00 · 数据结构 · 归属：官方核心 · 挂载：P00(active)\n\n定义：`04_模块库/通用类/M00_数据结构.md`"
+          "value": "**M00**（module）\n\n模块 M00 · 数据槽总线 · 归属：官方核心 · 挂载：P00(active)\n\n定义：`04_模块库/通用类/M00_数据结构.md`"
         },
         "range": {
           "start": {
@@ -2662,5 +2662,5 @@
     }
   ],
   "exit_code": 0,
-  "digest": "abf5d51fb6dad6cf73c3d8c8e026e42b2218d601d167a69471874a44ed0972fc"
+  "digest": "9c604f5c349a9ad3b3f633bcbb18ebe30f7af21b19a78b38455afa177bdf81b0"
 }

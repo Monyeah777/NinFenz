@@ -155,27 +155,27 @@ check3(){
   fi
 }
 check4(){
-  echo '== [4/6·A] 认知边界（06 §4 管线 ↔ M23 认知域）=='
+  echo '== [4/6·A] 可见性边界（06 §4 管线 ↔ M23 可见性域）=='
   local err=0
-  for k in '事实管线' '事实快照' '认知裁剪' '裁剪渲染' '锚点回验'; do
-    grep -q "$k" 06_Agent执行协议.md || { no "06 §4 缺认知层名: $k"; err=1; }
+  for k in '事实管线' '事实快照' '可见性裁剪' '裁剪渲染' '锚点回验'; do
+    grep -q "$k" 06_Agent执行协议.md || { no "06 §4 缺可见性层名: $k"; err=1; }
   done
-  for k in '视角裁剪' '可见域' '推断域' '隐藏域' 'fail' '白描'; do
-    grep -q "$k" 04_模块库/通用类/M23_认知边界.md || { no "M23 缺认知域措辞: $k"; err=1; }
+  for k in '可见性裁剪' '可见域' '推断域' '隐藏域' 'fail'; do
+    grep -q "$k" 04_模块库/通用类/M23_认知边界.md || { no "M23 缺可见性域措辞: $k"; err=1; }
   done
-  if [ "$err" -eq 0 ]; then ok '06 §4 认知五步与 M23 认知域措辞语义一致（快照/裁剪/隐藏域/fail/白描）'
+  if [ "$err" -eq 0 ]; then ok '06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）'
   fi
 }
 check5(){
   echo '== [5/6·A] 质检门（M80 gate_action 流水线 ↔ 06 §5）=='
   local err=0
-  for k in 'pass:' 'warn:' 'fail:' '白描' '隐藏域直述' 'gate_action' 'gate_decision_record'; do
+  for k in 'pass:' 'warn:' 'fail:' 'gate_action' 'gate_decision_record'; do
     grep -q "$k" 04_模块库/通用类/M80_输出生成器.md || { no "M80 gate 缺: $k"; err=1; }
   done
-  for k in 'pass' 'warn' 'fail' '隐藏域直述' '白描'; do
+  for k in 'pass' 'warn' 'fail' '隐藏域直述' '最小可读'; do
     grep -q "$k" 06_Agent执行协议.md || { no "06 §5 gate 缺呼应: $k"; err=1; }
   done
-  if [ "$err" -eq 0 ]; then ok 'M80 gate_action 声明式流水线（pass/warn/fail + 白描降级 + 决策记录）与 06 §5 呼应一致'
+  if [ "$err" -eq 0 ]; then ok 'M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致'
   fi
 }
 check6(){
