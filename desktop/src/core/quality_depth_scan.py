@@ -26,7 +26,7 @@ QD_INPUTS = ("03_管线库/**/*", "04_模块库/**/*", "05_资产库/**/*", "com
              "library/**/*", "patterns/**/*", "decisions/**/*",
              "protocol/**/*", "docs/**/*", "01_核心协议.md", "02_联动注册表.md",
              "06_Agent执行协议.md", "07_官方核心出厂与社区预设导航.md",
-             ".github/ISSUE_TEMPLATE/**/*",  # 投稿面判据（intake_surface）读模板件
+             ".github/**/*",  # 投稿面 + CI 面判据（intake_surface / workflow_hardening）
              "verify.sh", "README.md", "README.en.md", "docs/agent/ROUTES.md", "llms.txt",
              "STRATEGY.md", "AGENTS.md",
              # 代码只收 `desktop/src`：旧口径收 129 件 desktop/tests，而规则不读测试 ⇒ 白读（2850→27
@@ -89,6 +89,7 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     from core import payload_consumer as pc
     from core import payload_registry as pr
     from core import tool_face as tf
+    from core import workflow_hardening as wh
     from core import world_model as wm
     from core import world_slots as ws
 
@@ -104,26 +105,27 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                      ("asset_density", ad.scan),
                      ("asset_thickness", ad.thickness_scan),
                      ("asset_usage_strict", lambda r: ad.usage_scan(r)),
-                     ("intake_surface", isf.scan)):
+                     ("intake_surface", isf.scan),
+                     ("workflow_hardening", wh.scan)):
         sub_issues, sub_stats = fn(root)
         if name == "asset_usage_strict":
             if sub_stats.get("zero_usage", 0) > 0:
                 sub_issues = ["资产零引用键 %d 个（键消费证明未闭合）"
                               % sub_stats["zero_usage"]]
         for i in sub_issues:
-            issues.append("%s: %s" % (name, i))
+            issues.append(f"{name}: {i}")
         stats[name] = sub_stats
     tf_issues, tf_stats = tf.scan(root)
     for i in tf_issues:
-        issues.append("tool_face: %s" % i)
+        issues.append(f"tool_face: {i}")
     stats["tool_face"] = tf_stats
     wm_issues, wm_stats = wm.scan(root)
     for i in wm_issues:
-        issues.append("world_model: %s" % i)
+        issues.append(f"world_model: {i}")
     stats["world_model"] = wm_stats
     ws_issues, ws_stats = ws.scan(root)
     for i in ws_issues:
-        issues.append("world_slots: %s" % i)
+        issues.append(f"world_slots: {i}")
     stats["world_slots"] = ws_stats
     _, consumer_stats = pc.scan(root)
     stats["payload_consumer"] = consumer_stats

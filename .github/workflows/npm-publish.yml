@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
       - name: tag 与包版本一致性（D3：v* tag 与 npm 版本不同源 ⇒ 不许静默空转）
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -90,6 +92,8 @@ jobs:
       packages: write          # 发布包到 GitHub Packages 必需
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
       - name: payload 暂存 + 发布前自检（先按 npmjs 口径自证，再改名）
         working-directory: packaging/npm
         run: |
