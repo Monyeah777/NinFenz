@@ -1969,7 +1969,7 @@ PYEOF
 }
 
 check34(){
-  echo '== [34/段C] 云端图书馆面门禁（frontmatter 真源 / INDEX·ALIAS 投影一致 / 生命周期 / 四型覆盖 / llms.txt 入口 / 内容分级声明）=='
+  echo '== [34/段C] 云端图书馆面门禁（frontmatter 真源 / INDEX·ALIAS 投影一致 / 生命周期 / 四型覆盖 / llms.txt 入口 / 内容分级声明 / 投稿面一致）=='
   local err=0
   if [ -n "$PY3" ]; then
     if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check34.log 2>&1
@@ -2026,6 +2026,9 @@ try:
     from core import intake as ik
     for i in ik.scan('.')[0]:
         problems.append('投稿闸门：%s' % i)
+    from core import intake_surface as isf
+    for i in isf.scan('.')[0]:
+        problems.append('投稿面：%s' % i)
 except Exception as exc:
     problems.append('投稿闸门声明确认不可用：%s' % exc)
 
