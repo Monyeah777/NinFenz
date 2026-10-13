@@ -4,6 +4,7 @@
 # 由本文件负责把固定值**自动跟进**——固定不等于冻结。
 version: 2
 updates:
+  # ① CI 里的 action 固定值跟进（固定到 SHA 后更必须有自动跟进，否则等于冻结上游安全修复）。
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -13,8 +14,15 @@ updates:
       prefix: "ci"
     labels:
       - dependencies
-  # CI 工具链版本固定（requirements-ci.txt / requirements-lint.txt）同样要能跟进，
-  # 否则固定会退化成冻结上游安全修复。
+    groups:
+      # 次要/补丁批量成一个 PR——降噪，同时保证安全修复仍能单独进来（major 不分组）。
+      actions-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+  # ② CI 工具链版本固定（requirements-*.txt）同样要能跟进，
+  #    否则固定会退化成冻结上游安全修复。
   - package-ecosystem: pip
     directory: /.github
     schedule:
@@ -24,3 +32,26 @@ updates:
       prefix: "ci"
     labels:
       - dependencies
+    groups:
+      pip-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+  # ③ 已发布 npm 包的依赖面（packaging/npm/package.json）——此前**无覆盖**：
+  #    仓库对外发布 ninfenz 包，其 devDependencies 却从不被跟进（工业级供应链要求全覆盖）。
+  - package-ecosystem: npm
+    directory: /packaging/npm
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+    groups:
+      npm-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
