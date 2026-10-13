@@ -4,7 +4,7 @@
     ".github/scripts/gitee_ingest.py::I001": 2,
     ".github/scripts/gitee_ingest.py::RUF100": 2,
     ".github/scripts/gitee_ingest.py::UP031": 1,
-    ".github/scripts/library_ingest.py::E501": 2,
+    ".github/scripts/library_ingest.py::E501": 1,
     ".github/scripts/library_ingest.py::RUF100": 4,
     ".github/scripts/library_ingest.py::SIM102": 1,
     ".github/scripts/library_ingest.py::UP031": 2,
