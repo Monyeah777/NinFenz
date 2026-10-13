@@ -75,9 +75,17 @@ class CiRequirementsPinTest(unittest.TestCase):
         """pip 按**locale** 编码解析 requirements（不认 coding cookie）。
 
         非 UTF-8 locale（如 Windows/GBK）下，非 ASCII 注释会让 `pip install -r` 直接抛
-        UnicodeDecodeError —— 本波实测踩到过。故这两个文件必须保持 ASCII。
+        UnicodeDecodeError —— 本波实测踩到过。故 **全部** `requirements-*.txt` 必须保持 ASCII：
+        2026-10-13 实测发现 `.github/requirements-sast.txt` 的中文注释逃逸（本判据当时只覆盖
+        ci/lint 两件），故改为按目录通配全量覆盖。
         """
-        for path in (self.CI_REQ, self.LINT_REQ):
+        paths = sorted(self.CI_REQ.parent.glob("requirements-*.txt"))
+        self.assertEqual({"requirements-audit.txt", "requirements-ci.txt",
+                          "requirements-lint.txt", "requirements-sast.txt"},
+                         {p.name for p in paths},
+                         "requirements 清单集合变化——本判据须覆盖全部清单："
+                         f"{sorted(p.name for p in paths)}")
+        for path in paths:
             with open(path, "rb") as fh:
                 raw = fh.read()
             bad = [b for b in raw if b > 127]
