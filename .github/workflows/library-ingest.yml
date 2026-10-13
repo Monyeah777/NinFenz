@@ -8,6 +8,10 @@ name: library-ingest
 on:
   issues:
     types: [opened]
+concurrency:
+  group: library-write
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: write

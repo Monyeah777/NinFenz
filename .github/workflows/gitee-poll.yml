@@ -11,6 +11,10 @@ on:
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
+concurrency:
+  group: library-write
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
