@@ -26,6 +26,7 @@ QD_INPUTS = ("03_管线库/**/*", "04_模块库/**/*", "05_资产库/**/*", "com
              "library/**/*", "patterns/**/*", "decisions/**/*",
              "protocol/**/*", "docs/**/*", "01_核心协议.md", "02_联动注册表.md",
              "06_Agent执行协议.md", "07_官方核心出厂与社区预设导航.md",
+             ".github/ISSUE_TEMPLATE/**/*",  # 投稿面判据（intake_surface）读模板件
              "verify.sh", "README.md", "README.en.md", "docs/agent/ROUTES.md", "llms.txt",
              "STRATEGY.md", "AGENTS.md",
              # 代码只收 `desktop/src`：旧口径收 129 件 desktop/tests，而规则不读测试 ⇒ 白读（2850→27
