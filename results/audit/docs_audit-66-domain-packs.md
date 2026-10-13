@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/domain_metrics.py:ac9a77beba7ac4641be155ea0aba29253cd5f98eb0921d28635062c308f421d5
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
-  - desktop/src/core/quality_depth_scan.py:79e250ea272c839c7ac0e4ca4c5d2203ffab7088d7b6f32ca1e9410a2046a14f
+  - desktop/src/core/quality_depth_scan.py:685d9f5c1f6e745726753790ef0e9ddd713f6ef391989fd53b18600a5e9862c8
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
@@ -18,6 +18,8 @@ subjects:
   - verify.sh:05bd42faa57f04e609ca8faf4cf3e9c2bf9c069911f72c1b124c14b8f608bd7c
 
 ---
+
+> 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
