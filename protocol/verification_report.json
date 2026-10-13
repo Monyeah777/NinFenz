@@ -1,9 +1,9 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 30 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
     "expected_checks": 40,
     "expected_pass": 72,
-    "report_items": 30,
+    "report_items": 31,
     "verify_version": "v2.30"
   },
   "items": [
@@ -365,8 +365,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 201,
-        "files": 283,
+        "baseline": 284,
+        "files": 284,
         "max_fn_cc": 114,
         "max_fn_lines": 1218,
         "max_lines": 7332
@@ -383,8 +383,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 187,
-        "probed": 187
+        "patterns": 189,
+        "probed": 189
       },
       "status": "pass",
       "warns": 0
@@ -428,8 +428,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 237,
-        "modules": 237,
+        "metrics_recorded": 238,
+        "modules": 238,
         "registered_cycles": 0,
         "registered_sdp": 8,
         "sdp": 8
@@ -474,10 +474,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 60,
+        "consumed": 61,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 62
+        "scanners": 63
       },
       "status": "pass",
       "warns": 0
@@ -512,14 +512,29 @@
       },
       "status": "pass",
       "warns": 0
+    },
+    {
+      "id": "intake_surface",
+      "issues": 0,
+      "name": "投稿面一致性（模板/须知/声明/闸门落点）",
+      "sample": [],
+      "source": "intake_surface.scan",
+      "stats": {
+        "fields": 14,
+        "gates": 8,
+        "paths": 2,
+        "templates": 2
+      },
+      "status": "pass",
+      "warns": 0
     }
   ],
-  "root_digest": "99943c3fe82cc6a6b35f2bdf56fcdd8bd931de9ee72fbbb7eb1321cd551a9336",
+  "root_digest": "8a3c2c00e804384ceb2d8805e9f21641b81c2111919aadf97456e1655c81379f",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 28,
+    "pass": 29,
     "warn": 2
   }
 }
