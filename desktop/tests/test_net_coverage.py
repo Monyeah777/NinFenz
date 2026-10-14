@@ -32,13 +32,12 @@ def coverage_issues(text: str, expected: int):
     out = []
     for key in ("覆盖", "不适用", "范围外"):
         if key not in buckets:
-            out.append("覆盖率行缺桶：%s" % key)
+            out.append(f"覆盖率行缺桶：{key}")
     if not any(t in row for t in TRUTH):
-        out.append("覆盖率行未指向真源（%s）" % " / ".join(TRUTH))
+        out.append("覆盖率行未指向真源（{}）".format(" / ".join(TRUTH)))
     if not out and sum(buckets.values()) != expected:
-        out.append("覆盖率分母与真源不一致：行内合计 %d != EXPECTED_CHECKS %d"
-                   "（修复指引：逐条裁定新 check 后同步本行）"
-                   % (sum(buckets.values()), expected))
+        out.append(f"覆盖率分母与真源不一致：行内合计 {sum(buckets.values())}"
+                   f" != EXPECTED_CHECKS {expected}（修复指引：逐条裁定新 check 后同步本行）")
     return out
 
 
@@ -48,7 +47,8 @@ class NetCoverageAdjudicationTest(unittest.TestCase):
         self.assertEqual([], coverage_issues(text, qb.EXPECTED_CHECKS))
 
     def test_stale_denominator_is_fail(self):
-        text = "| verify.sh 覆盖率 | 39 道：**覆盖 32 / 不适用 6 / 范围外 1**；真源见 EXPECTED_CHECKS |"
+        text = ("| verify.sh 覆盖率 | 39 道：**覆盖 32 / 不适用 6 / 范围外 1**；"
+                "真源见 EXPECTED_CHECKS |")
         self.assertTrue(any("不一致" in i for i in coverage_issues(text, 40)))
 
     def test_missing_truth_pointer_is_fail(self):

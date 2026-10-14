@@ -7,9 +7,9 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:c4aaec48dd63dd719b83a7f330bb543b76f09655c3601f2df4aadfd22c887c76
+  - desktop/src/core/purity_scan.py:9daeeedc9e7708c920512c895c02ed4a91eeaf2d7c99696cb5c0ff6902dab686
   - desktop/src/core/asset_contract.py:36b9103533b4163e986bc68670b51966718cefb10b757dfee70428057b22609d
-  - protocol/code_metrics_baseline.json:4bbde7fbd0bca6be4bc57bde06d46508a911889c14f3e7395e3123a1e775517b
+  - protocol/code_metrics_baseline.json:0ca139b5253821b5d4792901efe3133e7b3d52ef15a5c7272bcdc23515b369a2
 ---
 
 > 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。

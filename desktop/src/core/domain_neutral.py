@@ -1,7 +1,8 @@
 """核心文面去叙述（域中立）判据——R8 的独立实现件。
 
-为什么独立成件：`core/purity_scan.py` 有冻结的规模/复杂度上限（protocol/code_metrics_baseline.json），
-把词表与逐行扫描塞进去会顶破上限。按仓库既有先例（判据独立成件、由父判据调用），本件承载词表与扫描，
+为什么独立成件：`core/purity_scan.py` 有冻结的规模/复杂度上限
+（protocol/code_metrics_baseline.json）——把词表与逐行扫描塞进去会顶破上限。
+按仓库既有先例（判据独立成件、由父判据调用），本件承载词表与扫描，
 `purity_scan` 只保留一段调用，归入 check27 的同一个门（**不新增 check 序号**）。
 
 判据：`03_管线库/**/*.md` 与 `04_模块库/**/*.md` 正文不得出现叙述/题材专属词。
@@ -31,7 +32,7 @@ _DOMAIN_PAT = re.compile("|".join(DOMAIN_TERMS))
 
 def scan(root: str = ".") -> tuple:
     """扫核心文面，返回 (issues, stats)。逐行判定，命中即给修复指引。"""
-    from core import conformance_scan as csc          # 共享语料读（同一次只读调用内同件只读一遍）
+    from core import conformance_scan as csc  # 共享语料读（同一次只读调用内同件只读一遍）
     issues = []
     files = 0
     for rel_pat in FACE:
@@ -49,7 +50,8 @@ def scan(root: str = ".") -> tuple:
                         continue
                     if (rel, term) in DOMAIN_ALLOW:
                         continue
-                    issues.append("%s:%d 核心文面含叙述/题材词「%s」：%s（修复指引：改域中立表述；"
-                                  "确属必要改在 core/domain_neutral.DOMAIN_ALLOW 登记理由）"
-                                  % (rel, i, term, line.strip()[:80]))
+                    msg = ("{}:{} 核心文面含叙述/题材词「{}」：{}"
+                           "（修复指引：改域中立表述；确属必要改在 "
+                           "core/domain_neutral.DOMAIN_ALLOW 登记理由）")
+                    issues.append(msg.format(rel, i, term, line.strip()[:80]))
     return issues, {"files": files, "hits": len(issues)}
