@@ -35,6 +35,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import atomic_write
+from core import json_doc
 from core import repo_face
 
 DECL_REL = "protocol/LAYERS.json"
@@ -60,9 +61,8 @@ _VERB = (
 
 def load(root: str = ".") -> Dict[str, Any]:
     """读 `protocol/LAYERS.json` 的 `roles` 段。"""
-    p = Path(root) / DECL_REL
     try:
-        doc = json.loads(p.read_text(encoding="utf-8"))
+        doc = json_doc.load(Path(root) / DECL_REL, dict, what=DECL_REL)
     except (OSError, ValueError):
         return {}
     roles = doc.get("roles")
@@ -157,7 +157,7 @@ def self_line(root: str, rel: str) -> str:
         return ""
     if rel.endswith(".json"):
         try:
-            doc = json.loads(text)
+            doc = json_doc.loads(text, what=rel)
         except ValueError:
             return ""
         if isinstance(doc, dict):
@@ -245,7 +245,7 @@ def _projection_drift(root: str) -> List[str]:
     if not p.is_file():
         return ["② 缺职能坐标投影 %s（修复指引：nf layers --write）" % PROJECTION_REL]
     try:
-        rec = json.loads(p.read_text(encoding="utf-8"))
+        rec = json_doc.load(p, dict, what=PROJECTION_REL)
     except (OSError, ValueError) as exc:
         return ["② %s 不可读：%s（修复指引：nf layers --write）" % (PROJECTION_REL, exc)]
     if rec.get("root_digest") != live.get("root_digest"):
@@ -272,7 +272,7 @@ def _write_channel_issues(root: str, writers: List[str], exc: Dict[str, Any]) ->
     p = Path(root) / "protocol/data_contracts.json"
     if p.is_file():
         try:
-            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc = json_doc.load(p, dict, what="protocol/data_contracts.json")
             for c in doc.get("contracts") or []:
                 if isinstance(c, dict):
                     reg[str(c.get("artifact"))] = str(c.get("owner") or "")

@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "数字资产契约 D3 写通道契约化 + E2 第二实现线结构契约 + D4 回执锚定面扩到 67 件",
+  "note": "D3/E2/D4 续批收口：JSON 读点统一走 core.json_doc（未校验站点棘轮归位）+ 审计机械重绑",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "045c289989edd341227d3c009dea7ac9107ee3509adf8d9ab93e503b4ad9ffbb"
