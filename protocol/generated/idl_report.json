@@ -2832,6 +2832,7 @@
     "asset.schema.json",
     "contract.schema.json",
     "module.schema.json",
+    "nf:asset-contracts",
     "nf:integration",
     "nf:integration-strings",
     "nf:release-policy",

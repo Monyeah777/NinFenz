@@ -6,12 +6,13 @@
 ## 覆盖
 | schema | 模块文档 | 机读契约 | 管线 | 协议包 | 台账条目 |
 | - | - | - | - | - | - |
-| 8 | 248 | 248 | 114 | 111 | 3 |
+| 9 | 248 | 248 | 114 | 111 | 3 |
 
 ## schema 定义
 - asset.schema.json
 - contract.schema.json
 - module.schema.json
+- nf:asset-contracts
 - nf:integration
 - nf:integration-strings
 - nf:release-policy
