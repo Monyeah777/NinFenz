@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "数字资产契约 S 档收口：可移植 schema 并入规范面与 IDL 声明",
+  "note": "S 档收口：CHANGELOG 条目导致 AUD-0027 重绑",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"

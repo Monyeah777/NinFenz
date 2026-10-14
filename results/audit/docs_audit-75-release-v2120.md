@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:c5026907f1ca1c88cb641b58a924fa5ad3205702bb67859b94a930a288949630
+  - CHANGELOG.md:a5e3f5b0bdfdf2a0c3e2165f3757c9f31dbb9e559926c5a83cd5a6bfc22e679b
   - docs/meta/VERSION-MATRIX.md:abe7adfd40849a0191f738bb4d051ce487e811328d800c3049bbda7add455615
   - README.md:02cb4dde570cd93e45d2ff96b91be36ed616357984752cb4c4ae3d08059f245f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:7ade1df2b4f7e7488c43f855f6e6a1808d900d3e08ca9c7b5bdca5f9083fb5d9
 
 ---
+> 重审（2026-10-14 · CHANGELOG 记 S 档条目）：被审对象随本波改动（CHANGELOG 增加数字资产契约 S 档条目），digest 依「重审并更新 digest」机械重绑；既有结论不变。
+
 > 重审（2026-10-14 · 数字资产契约 S 档：包自述对账 / Frictionless 导出 / 可移植 schema）：被审对象随本波改动（组合包 INDEX 补登 SYSTEM_CARD 契约 / receipts 锚定面续扩 / CHANGELOG 条目），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 
 > 重审（2026-10-14 · 数字资产契约续批 D3/E2/D4 + CHANGELOG 补记）：被审对象随本波改动（receipts 锚定面 58→67 / data_contracts 45→52 / LAYERS roles.write_exceptions 结构化 / CHANGELOG 条目），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
