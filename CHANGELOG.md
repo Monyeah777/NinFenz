@@ -3,6 +3,13 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **数字资产契约续批（D3 写通道契约化 / E2 第二实现线结构契约 / D4 回执锚定面 58→67 件）**（**作者指令**：「继续」）：
+  ① **D3 写通道契约化**：`roles.write_exceptions` 的值从自由文本升级为 `{why, artifact}`；新增判据「写入口必须声明落点件，且该件已在 `data_contracts` 登记、`owner` **按文件名点名**该模块」——首跑即抓到一条存量「谁都不是 owner」（`asset_line_baseline.json` 原 owner 写的是『机制维护（check 即 owner）』）。同轮补 7 条基线/记录件登记（`code_metrics_baseline` / `coupling_baseline` / `drill_fidelity` / `instruction_evidence` / `perf_budget` / `repo_stats`（check38）/ `sast_baseline`），登记册 45→**52** 条。
+  ② **E2 第二实现线结构契约**：代码面新增**结构模式**（`forbid_regex` + `regex_limits` 计数棘轮，**不做 AST、也不假装 AST**）——Rust 禁 `unsafe`（实测 0 处）、`extern "C"` 上限 1（实测 1，只减不增）；C# 禁 `unsafe` / `DllImport` / `extern`（实测各 0）。受约件 956→**1168**。
+  ③ **D4 回执锚定面扩展**：`receipts.py` 的固定锚定清单补入资产册、职能投影与 7 份基线/记录件——回执 **58 → 67 件**，新真源与基线从「本地声明」升级为「可证明某时点已在册」。
+  ④ **验收**：`nf asset contract` 0 issue（**1168 件** · 数据 10 · 代码 6 · 脚本 4 · 链 1）；`nf receipts` 67 件单根；`nf conformance` 27/27；`verify_report` 31 条 PASS 29；`role / modeling / code_metrics / text_hygiene / audit drift` 全 0；测试 `test_role_model` + `test_asset_contract` 全绿（新增写通道 4 例、结构契约 3 例）。
+  ⑤ **仍留**：S1 包自带 `outputs/contracts.json` 骨架、S3 导出 Frictionless/ODCS、S2 可移植 `*.contract.json` 规范（S2 依赖 S3 定型）。
+
 
 - **数字资产契约深化（D2/D1/E1/E3）：把「手挑 11 件样本」升成「按约定自动发现 + 两册合一登记」**（**作者指令**：「按照最优决策，全做」）：
   ① **D2 包产物自动发现**：新增 `schema_siblings`（`schemas/{stem}.schema.json`、`schemas/DOMAIN_REPORT.schema.json` 候选）与 `required_any_columns`（表头**族**各不相同——实测 CASES.csv 有 11 种表头，故只判「至少含族内一个 id 列」）两个声明原语；受约件从 **11 → 956**（216 对同名 schema 校验全绿；无 schema 的 206 件计入 `no_schema` 可减缺口，不判死）。
