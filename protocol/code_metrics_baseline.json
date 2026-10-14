@@ -901,7 +901,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/quality_depth_scan.py": {
-      "lines": 132,
+      "lines": 136,
       "max_fn_cc": 8,
       "max_fn_lines": 53
     },

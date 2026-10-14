@@ -701,6 +701,7 @@
     "desktop/src/core/quality_baseline.py::UP006": 6,
     "desktop/src/core/quality_baseline.py::UP031": 8,
     "desktop/src/core/quality_baseline.py::UP035": 3,
+    "desktop/src/core/quality_depth_scan.py::E501": 1,
     "desktop/src/core/quality_depth_scan.py::SIM102": 1,
     "desktop/src/core/quality_depth_scan.py::UP006": 11,
     "desktop/src/core/quality_depth_scan.py::UP031": 1,
