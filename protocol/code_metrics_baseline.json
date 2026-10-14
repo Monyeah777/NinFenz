@@ -576,7 +576,7 @@
       "max_fn_lines": 45
     },
     "desktop/src/core/layer_model.py": {
-      "lines": 632,
+      "lines": 639,
       "max_fn_cc": 22,
       "max_fn_lines": 47
     },

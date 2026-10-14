@@ -7409,7 +7409,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "思维链/对话转写暴露门禁：仓库文本面不得残留**内部推理**或**对话稿**（作者指令「思维链暴露删掉」）。",
+      "function": "思维链/对话转写暴露门禁：仓库文本面不得残留**过程性叙述**或**对话稿**（作者指令「思维链暴露删掉」）。",
       "path": "desktop/tests/test_cot_exposure.py",
       "role": "verify",
       "rule": "R-verify"
@@ -11754,7 +11754,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "55a15ee523c66a305e9cf50e3c2ace5cdbf272b9fbc0768274f50804fe79cba5",
+  "root_digest": "cdaababf2a3206e116b84bcc1d2e626ad6e6666050cf683ba6f2647afe116929",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 74,
