@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:6091dc72140524c34ba23662d457977511f49fcbee6573bd8cb0a2c91d405e5d
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:4a9af8389f2066f67270917ad925a1fd05d974046927575e10f17377cf506c1d
+  - protocol/code_metrics_baseline.json:3159079db803137440b6837c6213199cadf7c063552d320386519c3c3bbf250c
 ---
 > 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 

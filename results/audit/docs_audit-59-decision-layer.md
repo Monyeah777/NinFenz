@@ -9,9 +9,9 @@ subjects:
   - verify.sh:5567d1139ec88b355884403a70ba8d4b73b584c78bd3245ad4a14c18e8e29b95
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:b041ba07b0d7a146add5d93fc65f868da8a5af7c8dd2a75d35ea482790e47b7c
-  - protocol/data_contracts.json:226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4
+  - protocol/data_contracts.json:f59b63ed8e4af7c6c6aa5169d1834f0b9db33afb913100abd3dac2eeb671a76e
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
-  - desktop/src/core/receipts.py:9763037aa9461d98be4172a8a7dd7ce8bfbf2c3c1f87b33dc79dcf31fa32d0a7
+  - desktop/src/core/receipts.py:064b5d6d9c564c35a932d487bc77efba3c5b620cedda0e503457199022247491
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
   - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5

@@ -133,10 +133,8 @@ class KernelConsistencyTest(unittest.TestCase):
 
     def test_registered_writer_is_clean(self):
         with tempfile.TemporaryDirectory() as d:
-            roles = _roles(write_exceptions={"desktop/src/core/w.py": "测试：冻结基线"})
-            _scene(d, files={"desktop/src/core/w.py": WRITER}, roles=roles)
-            issues, _ = rm.scan(d)
-            self.assertEqual([], [i for i in issues if "写" in i], issues)
+            issues, _ = _chan(d, "core/w.py（测试：冻结基线）")
+            self.assertEqual([], [i for i in issues if "写入口" in i], issues)
 
     def test_stale_write_exception_is_fail(self):
         with tempfile.TemporaryDirectory() as d:
@@ -157,6 +155,48 @@ class OverrideTest(unittest.TestCase):
                                roles["overrides"])
             self.assertEqual("prod", co["role"])
             self.assertEqual("override", co["rule"])
+
+
+
+def _chan(tmp, owner, exc=None, mk_artifact=True):
+    """写通道场景：roles.write_exceptions + 写入口模块 + 落点件 + data_contracts 登记。"""
+    roles = _roles(write_exceptions=exc or {
+        "desktop/src/core/w.py": {"why": "测试：冻结基线", "artifact": "protocol/x.json"}})
+    _mk(tmp, "protocol/LAYERS.json",
+        json.dumps({"schema": "nf-layers/1", "roles": roles}, ensure_ascii=False))
+    _mk(tmp, "docs/layers.md", "# layers")
+    _mk(tmp, "desktop/src/core/w.py", WRITER)
+    if mk_artifact:
+        _mk(tmp, "protocol/x.json", "{}")
+    _mk(tmp, "protocol/data_contracts.json",
+        json.dumps({"contracts": ([{"artifact": "protocol/x.json", "owner": owner}]
+                                    if owner else [])}, ensure_ascii=False))
+    rm.write(tmp)
+    return rm.scan(tmp)
+
+
+class WriteChannelTest(unittest.TestCase):
+    """D3：写通道必须声明落点件，且该件已在 data_contracts 登记、owner 点名模块。"""
+
+    def test_channel_without_artifact_is_fail(self):
+        with tempfile.TemporaryDirectory() as d:
+            issues, _ = _chan(d, "core/w.py", exc={"desktop/src/core/w.py": {"why": "只写了理由"}})
+            self.assertTrue(any("未声明落点件" in i for i in issues), issues)
+
+    def test_channel_without_registration_is_fail(self):
+        with tempfile.TemporaryDirectory() as d:
+            issues, _ = _chan(d, "")
+            self.assertTrue(any("未在 protocol/data_contracts.json 登记" in i for i in issues), issues)
+
+    def test_channel_owner_must_name_module(self):
+        with tempfile.TemporaryDirectory() as d:
+            issues, _ = _chan(d, "机制维护（check 即 owner）")
+            self.assertTrue(any("owner 未点名" in i for i in issues), issues)
+
+    def test_channel_missing_artifact_file_is_fail(self):
+        with tempfile.TemporaryDirectory() as d:
+            issues, _ = _chan(d, "core/w.py", mk_artifact=False)
+            self.assertTrue(any("落点件不在场" in i for i in issues), issues)
 
 
 if __name__ == "__main__":

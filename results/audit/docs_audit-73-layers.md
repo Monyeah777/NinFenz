@@ -6,7 +6,7 @@ scope: 作者指令「对标顶尖架构设计再改一版」。把 NF 的分层
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/LAYERS.json:a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f
+  - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:fa3735754774971ab33904df59bfd42df13d49df986402cd31b287f94b48d6f2
   - desktop/tests/test_layer_model.py:74ef800a95d1caed9d88809f76708b6de4427c6be9412387e5531e807f8ebf42
   - desktop/src/core/purity_scan.py:9daeeedc9e7708c920512c895c02ed4a91eeaf2d7c99696cb5c0ff6902dab686
@@ -16,10 +16,10 @@ subjects:
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016
-  - protocol/data_contracts.json:226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4
+  - protocol/data_contracts.json:f59b63ed8e4af7c6c6aa5169d1834f0b9db33afb913100abd3dac2eeb671a76e
   - protocol/normative.json:b041ba07b0d7a146add5d93fc65f868da8a5af7c8dd2a75d35ea482790e47b7c
   - protocol/glossary.json:4561ddb5a221f8fc5beca4cfcca07580b3ea4dd403eb23434549a8eaa8409a60
-  - desktop/src/core/receipts.py:9763037aa9461d98be4172a8a7dd7ce8bfbf2c3c1f87b33dc79dcf31fa32d0a7
+  - desktop/src/core/receipts.py:064b5d6d9c564c35a932d487bc77efba3c5b620cedda0e503457199022247491
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 

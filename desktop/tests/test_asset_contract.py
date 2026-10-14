@@ -491,5 +491,39 @@ class PowerShellFaceTest(unittest.TestCase):
             self.assertEqual([], issues, issues)
 
 
+
+class StructuralCodeTest(unittest.TestCase):
+    """E2：第二实现线的结构契约（禁用式 + 计数棘轮），不做 AST。"""
+
+    def test_forbid_regex_hits(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.rs", "fn f() { unsafe { g() } }\n")
+            issues, stats = ac._check_code(str(r), {
+                "id": "e", "glob": "*.rs", "lang": "rust",
+                "forbid_regex": [{"name": "unsafe", "pattern": "\\bunsafe\\b"}]})
+            self.assertTrue(any("unsafe" in i for i in issues), issues)
+            self.assertEqual(1, stats["forbid:unsafe"])
+
+    def test_regex_limit_ratchet(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.rs", 'extern "C" { fn a(); }\nextern "C" { fn b(); }\n')
+            spec = {"id": "e", "glob": "*.rs", "lang": "rust",
+                    "regex_limits": [{"name": "extern-c", "pattern": 'extern\\s+"C"', "max": 1}]}
+            issues, stats = ac._check_code(str(r), spec)
+            self.assertTrue(any("> 上限" in i for i in issues), issues)
+            self.assertEqual(2, stats["limit:extern-c"])
+            _make(r, "a.rs", 'extern "C" { fn a(); }\n')
+            issues2, _ = ac._check_code(str(r), spec)
+            self.assertEqual([], issues2, issues2)
+
+    def test_structural_miss_is_issue(self):
+        with tempfile.TemporaryDirectory() as d:
+            issues, _ = ac._check_code(d, {"id": "e", "glob": "*.rs",
+                                          "forbid_regex": [{"name": "x", "pattern": "x"}]})
+            self.assertTrue(any("未命中任何文件" in i for i in issues), issues)
+
+
 if __name__ == "__main__":
     unittest.main()

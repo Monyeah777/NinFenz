@@ -646,7 +646,48 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
     return issues
 
 
+def _code_structural(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """第二实现线的**结构契约**（E2）：不做完整 AST，只判可证的正则面（禁用式 / 计数上限）。
+
+    为什么：`engine/**` 在职能坐标里是 verify（只读判据的第二实现），而代码面此前只有 Python AST。
+    完整 Rust/C# 语法树不在本层能力内（ADR-0005 的范围划分），故只声明**范围**与**只减不增**的计数——
+    这比「装作 AST 判过」诚实，也比不判多一层门。
+    """
+    sid = str(spec.get("id") or "?")
+    rels = resolve(root, spec)
+    if not rels:
+        return ["代码契约 %s 未命中任何文件（修复指引：修正 path/glob）" % sid], {"files": 0}
+    texts = []
+    for rel in rels:
+        text, err = _read(root, rel)
+        if err:
+            return [err], {"files": len(rels)}
+        texts.append((rel, text))
+    issues: List[str] = []
+    stats: Dict[str, Any] = {"files": len(rels)}
+    for rule in spec.get("forbid_regex") or []:
+        rx = re.compile(str(rule.get("pattern") or ""))
+        hits = ["%s:%d" % (rel, text.count(chr(10), 0, m.start()) + 1)
+                for rel, text in texts for m in rx.finditer(text)]
+        stats["forbid:%s" % rule.get("name")] = len(hits)
+        if hits:
+            issues.append("代码契约 %s 命中禁用式 %s（%d 处，例 %s）（修复指引：%s）"
+                          % (sid, rule.get("name"), len(hits), "、".join(hits[:3]),
+                             rule.get("why") or "换成不越界的等价实现"))
+    for rule in spec.get("regex_limits") or []:
+        rx = re.compile(str(rule.get("pattern") or ""))
+        n = sum(len(rx.findall(text)) for _rel, text in texts)
+        cap = int(rule.get("max") or 0)
+        stats["limit:%s" % rule.get("name")] = n
+        if n > cap:
+            issues.append("代码契约 %s 的 %s 计数 %d > 上限 %d（棘轮只减不增）（修复指引：先降后改声明）"
+                          % (sid, rule.get("name"), n, cap))
+    return issues, stats
+
+
 def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    if spec.get("forbid_regex") or spec.get("regex_limits"):
+        return _code_structural(root, spec)
     rel = str(spec.get("path") or "")
     if str(spec.get("lang") or "python") != "python":
         return (["代码契约 %s 的 lang=%s 不在支持面（仅 python 走 AST；Bash/VBA 走脚本面声明式契约"
