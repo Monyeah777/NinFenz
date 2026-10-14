@@ -262,6 +262,43 @@ def write(root: str = ".") -> str:
     return PROJECTION_REL
 
 
+def _write_channel_issues(root: str, writers: List[str], exc: Dict[str, Any]) -> List[str]:
+    """③b 写通道契约化（D3）：写入口必须声明落点件，且该件已在 data_contracts 登记（owner 点名模块）。
+
+    「自带写入口」一直是本仓的**成本中心**（实测 10 个）。只登记「有例外」不够——例外要能回答
+    「写到哪个件、谁判它、坏了怎么重建」；答不出来就是没人管的写通道。
+    """
+    reg: Dict[str, str] = {}
+    p = Path(root) / "protocol/data_contracts.json"
+    if p.is_file():
+        try:
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            for c in doc.get("contracts") or []:
+                if isinstance(c, dict):
+                    reg[str(c.get("artifact"))] = str(c.get("owner") or "")
+        except (OSError, ValueError):
+            reg = {}
+    issues: List[str] = []
+    for rel in writers:
+        entry = exc.get(rel)
+        artifact = str(entry.get("artifact") or "") if isinstance(entry, dict) else ""
+        if not artifact:
+            issues.append("③ 写入口 %s 未声明落点件（修复指引：roles.write_exceptions 的值写成 "
+                          "{why, artifact}——写通道必须有契约）" % rel)
+            continue
+        if not (Path(root) / artifact).is_file():
+            issues.append("③ 写入口 %s 的落点件不在场：%s（修复指引：改名/补件）" % (rel, artifact))
+            continue
+        owner = reg.get(artifact)
+        if owner is None:
+            issues.append("③ 写入口 %s 的落点件 %s 未在 protocol/data_contracts.json 登记"
+                          "（修复指引：补一条契约，owner 点名该模块）" % (rel, artifact))
+        elif Path(rel).name not in owner:
+            issues.append("③ 写入口 %s 的落点件 %s 已登记，但 owner 未点名该模块（实为 %r）"
+                          "（修复指引：owner 写清维护模块）" % (rel, artifact, owner[:40]))
+    return issues
+
+
 def _vocab_issues(roles: Dict[str, Any]) -> List[str]:
     """roles.vocabulary 与实现封闭集一致（声明与实现不许两套词表）。"""
     vocab = [str(v) for v in roles.get("vocabulary") or []]
@@ -341,9 +378,10 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if empty:
         issues.append("② 规则空转：%s（修复指引：删规则或改 glob——空规则是腐烂）" % "、".join(empty))
     issues += _projection_drift(root)
-    exc = {str(k): str(v) for k, v in (roles.get("write_exceptions") or {}).items()}
+    exc = dict(roles.get("write_exceptions") or {})
     kernel_issues, writers = _kernel_issues(root, kernel, rules, overrides, exc)
     issues += kernel_issues
+    issues += _write_channel_issues(root, writers, exc)
     stats = {"files": len(files), "kernel": len(kernel), "rules": len(rules),
              "uncovered": sum(1 for c in coords.values() if not c["role"]),
              "kernel_no_self": sum(1 for r in kernel if not coords[r]["function"]),

@@ -594,16 +594,46 @@
     ],
     "overrides": {},
     "write_exceptions": {
-      "desktop/src/core/asset_contract.py": "nf asset contract --freeze：重冻声明件 sha256（防篡改棘轮，显式评审动作）",
-      "desktop/src/core/asset_line_baseline.py": "社区资产行数基线重签（--write；外形冻结的显式动作）",
-      "desktop/src/core/code_metrics.py": "代码度量基线重冻（--write；棘轮只增不减的显式评审动作）",
-      "desktop/src/core/coupling_metrics.py": "耦合基线重冻（--write；同类棘轮）",
-      "desktop/src/core/drill_fidelity.py": "演练保真基线重签（--write）",
-      "desktop/src/core/instruction_evidence.py": "指令实测证据落盘（--record；判据读它，写它的是记录动作）",
-      "desktop/src/core/perf_budget.py": "性能预算记录重签（--write）",
-      "desktop/src/core/repo_stats.py": "README/llms 自述数字生成区（--write；派生面投影）",
-      "desktop/src/core/role_model.py": "职能坐标投影落盘（nf layers --write；派生面）",
-      "scripts/sast_check.py": "SAST 计数基线冻结（--write；棘轮显式动作）"
+      "desktop/src/core/asset_contract.py": {
+        "why": "nf asset contract --freeze：重冻声明件 sha256（防篡改棘轮，显式评审动作）",
+        "artifact": "protocol/asset_contracts.json"
+      },
+      "desktop/src/core/asset_line_baseline.py": {
+        "why": "社区资产行数基线重签（--write；外形冻结的显式动作）",
+        "artifact": "protocol/asset_line_baseline.json"
+      },
+      "desktop/src/core/code_metrics.py": {
+        "why": "代码度量基线重冻（--write；棘轮只增不减的显式评审动作）",
+        "artifact": "protocol/code_metrics_baseline.json"
+      },
+      "desktop/src/core/coupling_metrics.py": {
+        "why": "耦合基线重冻（--write；同类棘轮）",
+        "artifact": "protocol/coupling_baseline.json"
+      },
+      "desktop/src/core/drill_fidelity.py": {
+        "why": "演练保真基线重签（--write）",
+        "artifact": "protocol/drill_fidelity.json"
+      },
+      "desktop/src/core/instruction_evidence.py": {
+        "why": "指令实测证据落盘（--record；判据读它，写它的是记录动作）",
+        "artifact": "protocol/instruction_evidence.json"
+      },
+      "desktop/src/core/perf_budget.py": {
+        "why": "性能预算记录重签（--write）",
+        "artifact": "protocol/perf_budget.json"
+      },
+      "desktop/src/core/repo_stats.py": {
+        "why": "README/llms 自述数字生成区（--write；派生面投影）",
+        "artifact": "protocol/repo_stats.json"
+      },
+      "desktop/src/core/role_model.py": {
+        "why": "职能坐标投影落盘（nf layers --write；派生面）",
+        "artifact": "protocol/role_coordinates.json"
+      },
+      "scripts/sast_check.py": {
+        "why": "SAST 计数基线冻结（--write；棘轮显式动作）",
+        "artifact": "protocol/sast_baseline.json"
+      }
     }
   }
 }

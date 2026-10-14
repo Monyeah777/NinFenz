@@ -386,7 +386,7 @@
       "id": "asset-line-baseline",
       "artifact": "protocol/asset_line_baseline.json",
       "quality_rule": "check23",
-      "owner": "机制维护（check 即 owner）",
+      "owner": "core/asset_line_baseline.py（社区资产行数基线·外形冻结）+ verify check8 行数溯源",
       "status": "active",
       "freshness": "可重签工件：nf asset baseline --write（内容/外形改动后显式重签）",
       "consumers": [
@@ -558,6 +558,90 @@
         "nf layers --verify",
         "verify_report role_coordinates",
         "ADR-0006"
+      ]
+    },
+    {
+      "id": "code-metrics",
+      "artifact": "protocol/code_metrics_baseline.json",
+      "quality_rule": "check12",
+      "owner": "core/code_metrics.py（冻结基线 + 单测）",
+      "status": "active",
+      "freshness": "重冻：python scripts/code_metrics.py --write（评审后显式动作）",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_code_metrics.py"
+      ]
+    },
+    {
+      "id": "coupling-baseline",
+      "artifact": "protocol/coupling_baseline.json",
+      "quality_rule": "check12",
+      "owner": "core/coupling_metrics.py（只许收敛的耦合基线）",
+      "status": "active",
+      "freshness": "重冻：python scripts/coupling_metrics.py --write",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_coupling_baseline.py"
+      ]
+    },
+    {
+      "id": "drill-fidelity",
+      "artifact": "protocol/drill_fidelity.json",
+      "quality_rule": "check12",
+      "owner": "core/drill_fidelity.py（演练保真基线）",
+      "status": "active",
+      "freshness": "重签：python scripts/drill_fidelity.py --write",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_drill_fidelity.py"
+      ]
+    },
+    {
+      "id": "instruction-evidence",
+      "artifact": "protocol/instruction_evidence.json",
+      "quality_rule": "check12",
+      "owner": "core/instruction_evidence.py（规范入口指令实测记录）",
+      "status": "active",
+      "freshness": "记录：python scripts/instruction_evidence.py --record",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_instruction_evidence.py"
+      ]
+    },
+    {
+      "id": "perf-budget",
+      "artifact": "protocol/perf_budget.json",
+      "quality_rule": "check12",
+      "owner": "core/perf_budget.py（性能预算记录）",
+      "status": "active",
+      "freshness": "重签：python scripts/perf_budget.py --write",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_perf_budget.py"
+      ]
+    },
+    {
+      "id": "repo-stats",
+      "artifact": "protocol/repo_stats.json",
+      "quality_rule": "check38",
+      "owner": "core/repo_stats.py（自述数字实算真源）+ check38 repo_stats 子扫描",
+      "status": "active",
+      "freshness": "重生成：python scripts/nf.py stats --write",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_repo_stats.py"
+      ]
+    },
+    {
+      "id": "sast-baseline",
+      "artifact": "protocol/sast_baseline.json",
+      "quality_rule": "check12",
+      "owner": "scripts/sast_check.py（bandit + ruff-S 计数棘轮）",
+      "status": "active",
+      "freshness": "重冻：python scripts/sast_check.py --write（分平台段）",
+      "consumers": [
+        "verify_report",
+        "desktop/tests/test_sast_baseline.py"
       ]
     }
   ]

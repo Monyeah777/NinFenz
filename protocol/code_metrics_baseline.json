@@ -56,7 +56,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 951,
+      "lines": 992,
       "max_fn_cc": 28,
       "max_fn_lines": 59
     },
@@ -926,9 +926,9 @@
       "max_fn_lines": 34
     },
     "desktop/src/core/receipts.py": {
-      "lines": 262,
+      "lines": 271,
       "max_fn_cc": 13,
-      "max_fn_lines": 35
+      "max_fn_lines": 44
     },
     "desktop/src/core/redos_scan.py": {
       "lines": 137,
@@ -1006,9 +1006,9 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 351,
+      "lines": 389,
       "max_fn_cc": 19,
-      "max_fn_lines": 34
+      "max_fn_lines": 35
     },
     "desktop/src/core/round_drill.py": {
       "lines": 54,

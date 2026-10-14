@@ -71,6 +71,33 @@
           "uri": "nf://repo/protocol/asset_line_baseline.json"
         },
         {
+          "uri": "nf://repo/protocol/asset_contracts.json"
+        },
+        {
+          "uri": "nf://repo/protocol/role_coordinates.json"
+        },
+        {
+          "uri": "nf://repo/protocol/code_metrics_baseline.json"
+        },
+        {
+          "uri": "nf://repo/protocol/coupling_baseline.json"
+        },
+        {
+          "uri": "nf://repo/protocol/drill_fidelity.json"
+        },
+        {
+          "uri": "nf://repo/protocol/instruction_evidence.json"
+        },
+        {
+          "uri": "nf://repo/protocol/perf_budget.json"
+        },
+        {
+          "uri": "nf://repo/protocol/repo_stats.json"
+        },
+        {
+          "uri": "nf://repo/protocol/sast_baseline.json"
+        },
+        {
           "uri": "nf://repo/protocol/CONFORMANCE.md"
         },
         {
@@ -194,7 +221,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "c84431cfb555039f",
+        "invocationId": "228da9a87b5b69be",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -305,7 +332,7 @@
     },
     {
       "digest": {
-        "sha256": "e99053de9315576188ae88c0b942e07508a06d4235d70be72a4bec17341f20f3"
+        "sha256": "045c289989edd341227d3c009dea7ac9107ee3509adf8d9ab93e503b4ad9ffbb"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -314,6 +341,60 @@
         "sha256": "15e29d124e0ab6bcf09f00b709ceae7153bfafba19777c5fbc6dfe52b48242e7"
       },
       "name": "protocol/asset_line_baseline.json"
+    },
+    {
+      "digest": {
+        "sha256": "fadfee9ea3be579674639e45630f84cb4e4a1b681289d1683d7dcbf33dc04498"
+      },
+      "name": "protocol/asset_contracts.json"
+    },
+    {
+      "digest": {
+        "sha256": "49e9fc4c8faea743cc3d5b41412ab2c85c03d66569fe475f8a1cee5ab70c3776"
+      },
+      "name": "protocol/role_coordinates.json"
+    },
+    {
+      "digest": {
+        "sha256": "3159079db803137440b6837c6213199cadf7c063552d320386519c3c3bbf250c"
+      },
+      "name": "protocol/code_metrics_baseline.json"
+    },
+    {
+      "digest": {
+        "sha256": "5d2c7c1999095699326fe47c2f157c854109a0e5d7d5af896e8ab5edd698291d"
+      },
+      "name": "protocol/coupling_baseline.json"
+    },
+    {
+      "digest": {
+        "sha256": "235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91"
+      },
+      "name": "protocol/drill_fidelity.json"
+    },
+    {
+      "digest": {
+        "sha256": "371816902cef76681e90399d065413386bc229db1286ec1b96fab8b8c634a608"
+      },
+      "name": "protocol/instruction_evidence.json"
+    },
+    {
+      "digest": {
+        "sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
+      },
+      "name": "protocol/perf_budget.json"
+    },
+    {
+      "digest": {
+        "sha256": "fae339b22dc2307b51288449f16c6aea01a684415861e7fb3e99715fd80764be"
+      },
+      "name": "protocol/repo_stats.json"
+    },
+    {
+      "digest": {
+        "sha256": "3d775e9622a1ec585e52371c58c874c23443575a8db8fab6d7d612c424920a3e"
+      },
+      "name": "protocol/sast_baseline.json"
     },
     {
       "digest": {
@@ -365,7 +446,7 @@
     },
     {
       "digest": {
-        "sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
+        "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"
       },
       "name": "protocol/LAYERS.json"
     },
@@ -395,7 +476,7 @@
     },
     {
       "digest": {
-        "sha256": "226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4"
+        "sha256": "f59b63ed8e4af7c6c6aa5169d1834f0b9db33afb913100abd3dac2eeb671a76e"
       },
       "name": "protocol/data_contracts.json"
     },

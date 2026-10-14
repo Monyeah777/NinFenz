@@ -57,12 +57,6 @@
       ]
     },
     {
-      "id": "role-model",
-      "path": "desktop/src/core/role_model.py",
-      "lang": "python",
-      "tests": [
-        "desktop/tests/test_role_model.py"
-      ],
       "deny_calls": [
         "eval",
         "exec",
@@ -70,105 +64,155 @@
         "os.system",
         "pickle.loads",
         "marshal.loads"
+      ],
+      "id": "role-model",
+      "lang": "python",
+      "path": "desktop/src/core/role_model.py",
+      "tests": [
+        "desktop/tests/test_role_model.py"
       ]
+    },
+    {
+      "forbid_regex": [
+        {
+          "name": "unsafe",
+          "pattern": "\\bunsafe\\b",
+          "why": "第二实现线是**只读判据**；unsafe 会把它变成可写面"
+        }
+      ],
+      "glob": "engine/rust/src/**/*.rs",
+      "id": "engine-rust-structural",
+      "lang": "rust",
+      "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）",
+      "regex_limits": [
+        {
+          "max": 1,
+          "name": "extern-c",
+          "pattern": "extern\\s+\"C\"",
+          "why": "FFI 面只许只减不增（实测 1 处）"
+        }
+      ]
+    },
+    {
+      "forbid_regex": [
+        {
+          "name": "unsafe",
+          "pattern": "\\bunsafe\\b",
+          "why": "第二实现线是只读判据"
+        },
+        {
+          "name": "DllImport",
+          "pattern": "\\bDllImport\\b",
+          "why": "P/Invoke 面须走显式声明与评审"
+        },
+        {
+          "name": "extern",
+          "pattern": "\\bextern\\b",
+          "why": "外部符号直接绑定会绕过只读边界"
+        }
+      ],
+      "glob": "engine/dotnet/**/*.cs",
+      "id": "engine-dotnet-structural",
+      "lang": "cs",
+      "note": "同上（实测三类各 0 处，故按零容忍声明）"
     }
   ],
   "data": [
     {
-      "id": "pack-outputs-vs-schemas",
-      "glob": "community/*/outputs/*.json",
       "format": "json",
+      "glob": "community/*/outputs/*.json",
+      "id": "pack-outputs-vs-schemas",
+      "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死",
       "schema_siblings": [
         "schemas/{stem}.schema.json"
-      ],
-      "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死"
+      ]
     },
     {
-      "id": "pack-reports-io",
-      "glob": "community/*/outputs/REPORT.json",
       "format": "json",
-      "schema_siblings": [
-        "schemas/{stem}.schema.json",
-        "schemas/DOMAIN_REPORT.schema.json"
-      ],
+      "glob": "community/*/outputs/REPORT.json",
+      "id": "pack-reports-io",
       "link": {
         "path_field": "sample",
         "rows_field": "sample_rows"
       },
-      "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）"
+      "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）",
+      "schema_siblings": [
+        "schemas/{stem}.schema.json",
+        "schemas/DOMAIN_REPORT.schema.json"
+      ]
     },
     {
-      "id": "pack-cases-csv",
-      "glob": "community/*/outputs/samples/CASES.csv",
       "format": "csv",
+      "glob": "community/*/outputs/samples/CASES.csv",
+      "id": "pack-cases-csv",
+      "min_rows": 1,
+      "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」",
       "required_any_columns": [
         "case_id",
         "task_id",
         "query_id",
         "bucket"
-      ],
-      "min_rows": 1,
-      "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」"
+      ]
     },
     {
+      "format": "markdown",
       "id": "library-index",
-      "path": "library/INDEX.md",
-      "format": "markdown"
+      "path": "library/INDEX.md"
     },
     {
+      "format": "json",
       "id": "ladder-truth",
       "path": "protocol/LAYERS.json",
-      "format": "json",
       "required_fields": [
         "schema",
         "rules",
         "tiers"
       ],
-      "sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
+      "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"
     },
     {
-      "id": "pack-protocol-yaml",
-      "glob": "community/*/protocol.yaml",
       "format": "yaml",
-      "schema": "protocol/schema/protocol.schema.json",
-      "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）"
+      "glob": "community/*/protocol.yaml",
+      "id": "pack-protocol-yaml",
+      "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）",
+      "schema": "protocol/schema/protocol.schema.json"
     },
     {
-      "id": "pack-charts-mermaid",
-      "glob": "community/*/outputs/charts/*.mmd",
       "format": "mmd",
+      "glob": "community/*/outputs/charts/*.mmd",
+      "id": "pack-charts-mermaid",
       "note": "图表资产：只判「首关键词是合法 Mermaid 图型」，不解析图内容"
     },
     {
-      "id": "pack-charts-graphml",
-      "glob": "community/*/outputs/**/*.graphml",
       "format": "graphml",
+      "glob": "community/*/outputs/**/*.graphml",
+      "id": "pack-charts-graphml",
       "min_nodes": 1,
       "note": "图结构资产：XML 良构 + 节点/边计数"
     },
     {
-      "id": "asset-contracts-self",
-      "path": "protocol/asset_contracts.json",
       "format": "json",
+      "id": "asset-contracts-self",
+      "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据",
+      "path": "protocol/asset_contracts.json",
       "required_fields": [
         "schema",
         "data",
         "code",
         "script"
-      ],
-      "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据"
+      ]
     },
     {
-      "id": "role-coordinates",
-      "path": "protocol/role_coordinates.json",
       "format": "json",
+      "id": "role-coordinates",
+      "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判",
+      "path": "protocol/role_coordinates.json",
       "required_fields": [
         "schema",
         "counts",
         "kernel",
         "root_digest"
-      ],
-      "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判"
+      ]
     }
   ],
   "note": "数字资产契约声明面（三面：data / code / script）。data 面判格式 + 字段完整性 + 防篡改 + 输入输出一致性；code 面判 AST 规范 + 可证空指针 + 测试用例在场（安全漏洞面由 scripts/sast_check.py 的 bandit/ruff-S 计数棘轮与 purity_scan R6 守着，本面不重造第二套口径）；script 面判脚本自带 nf-io 头与声明的双源一致 + 链上 A 输出 ⊆ B 输入。真源单点：改本件即改契约，verify check40 与 nf asset contract 同源消费。",
