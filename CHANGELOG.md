@@ -3,6 +3,14 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **`nf audit rebind`：重审重绑口径机器化（结束手搓脚本）**（**作者指令**：「做」）：
+  ① **命令**：`nf audit rebind --note "…"`——逐行替换审计件 `subjects` 的 sha256（**不重排 frontmatter**，只动 digest 行），并把重审理由落成正文首行；支持 `--dry-run` / `--json`。
+  ② **三条纪律**：**理由必填**（空 note 拒绝——无理由的重绑就是洗数据）、**幂等**（同一理由不重复追加：此前实测一份审计里叠了 6 条同一说明）、**legacy 不重绑**（无审计头的存量件只挂账）。
+  ③ **顺序坑写进命令描述**：改代码 → `code_metrics --write` → `audit rebind` → `receipts`（先重绑会被基线重冻打回——本波实测：重绑 17 件后 `code_metrics --write` 又让 2 件失效，只好按正确顺序重跑）。
+  ④ **实测**：本波用新命令重绑 **31 件 / 32 条摘要**；`nf audit verify` 57 件一致（11 件 legacy 挂账）。
+  ⑤ **新面被本仓自己的判据接住两处**（都是纪律在起作用，非缺陷）：`test_cli_json_face` 要求每个 `--json` 面进 CANON 或 SKIP（已按只读 `--dry-run` 入 CANON）、`test_cli_error_framing` 认为 `--face` 的 help 里出现「脚本」即自称文本类 → 已并入 `_UTF8_TEXT_DESTS`。
+  ⑥ **验收**：`rebind` 6 例单测（漂移重绑 / 幂等 / 空理由拒绝 / dry-run 不写 / legacy 跳过）；`conformance` 27/27；`verify_report` 31 条 PASS 29；`hygiene / role / asset / modeling / audit drift` 全 0。
+
 -
  
 *
