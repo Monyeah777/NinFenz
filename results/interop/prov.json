@@ -181,12 +181,12 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
+      "nf:sha256": "e99053de9315576188ae88c0b942e07508a06d4235d70be72a4bec17341f20f3"
     },
     {
       "@id": "nf:file/protocol/data_contracts.json",
       "@type": "prov:Entity",
-      "nf:sha256": "8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3"
+      "nf:sha256": "226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4"
     },
     {
       "@id": "nf:file/protocol/decision_layer.json",

@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "0e3edc94fc7604d3cffeeb319f997caa39dc08c3f2e1733468d95e07ad535ff6",
+        "root": "cf5194172054b7ae32692b4aa3ade11f76da02d49d31b5e63c91b013e98fe470",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -430,7 +430,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 3,
+        "metrics_drift": 5,
         "metrics_missing": 1,
         "metrics_recorded": 241,
         "modules": 242,
@@ -509,9 +509,10 @@
       "source": "asset_contract.scan",
       "stats": {
         "chains": 1,
-        "code": 3,
-        "data": 4,
-        "files": 11,
+        "code": 4,
+        "data": 10,
+        "files": 956,
+        "no_schema": 206,
         "script": 4
       },
       "status": "pass",
@@ -536,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "4d97968bdc5d9fb4adb24c85018d327969ef4bb6668828136c8d09e4c0c66a12",
+  "root_digest": "a37e86fbf11df38235234879a26b18e81d8b77fe485af14a5558484d09b015ae",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

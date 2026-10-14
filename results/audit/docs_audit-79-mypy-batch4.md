@@ -8,8 +8,8 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:9daeeedc9e7708c920512c895c02ed4a91eeaf2d7c99696cb5c0ff6902dab686
-  - desktop/src/core/asset_contract.py:36b9103533b4163e986bc68670b51966718cefb10b757dfee70428057b22609d
-  - protocol/code_metrics_baseline.json:d41261e1f6a3de30120cf123a0ff5d13dd971071a62de18994d1c284b9d67463
+  - desktop/src/core/asset_contract.py:9f4c3dcd2f3ee3ae561034b71726082402b011a1a3eee9a8a205bd19c0700cc4
+  - protocol/code_metrics_baseline.json:4a9af8389f2066f67270917ad925a1fd05d974046927575e10f17377cf506c1d
 ---
 > 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 

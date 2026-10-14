@@ -43,8 +43,9 @@ from core import atomic_write, json_doc
 DECL_REL = "protocol/asset_contracts.json"
 SCHEMA = "nf-asset-contracts/1"
 FACES = ("data", "code", "script")
-LANGS = ("python", "bash", "vba")
-FORMATS = ("json", "csv", "markdown", "text")
+LANGS = ("python", "bash", "vba", "powershell")
+FORMATS = ("json", "csv", "markdown", "text", "yaml", "toml", "jsonl",
+           "graphml", "mmd")
 #: 脚本自带 I/O 契约头：Python/Bash 用 #，VBA 用单引号——同一条 nf-io: 声明格式；
 #: 不锚行首：允许挂在既有注释行尾（不新增行 ⇒ 不触发 code_metrics 行数棘轮）。
 _IO_RE = re.compile(r"(?:#|')[ \t]*nf-io:[ \t]*(.+?)[ \t]*$", re.M)
@@ -102,11 +103,20 @@ def _dig(obj: Any, path: str) -> Any:
 def _data_json(root: str, rel: str, text: str, spec: Dict[str, Any]
                ) -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
+    stats: Dict[str, Any] = {}
     try:
         obj = _strict_json(text)
     except ValueError as exc:
         return ["数据件 %s 不是合法 JSON：%s（修复指引：修好语法或换 format）" % (rel, exc)], {}
     sch_rel = str(spec.get("schema") or "")
+    if not sch_rel:
+        # schema 兄弟候选（D2）：按 {stem} 约定在同目录找，先命中先用；全不命中则记 no_schema
+        # 并**只**跳过 schema 面（必填字段仍判）——不许把「没 schema」当成「没问题」。
+        for tmpl in spec.get("schema_siblings") or []:
+            cand = (Path(rel).parent / str(tmpl).replace("{stem}", Path(rel).stem)).as_posix()
+            if (Path(root) / cand).is_file():
+                sch_rel = cand
+                break
     if sch_rel:
         sch_text, err = _read(root, sch_rel)
         if err:
@@ -122,7 +132,10 @@ def _data_json(root: str, rel: str, text: str, spec: Dict[str, Any]
         if _dig(obj, field) is _MISSING:
             issues.append("数据件 %s 缺必填字段 %s（修复指引：补字段或从声明里删掉——声明即契约）"
                           % (rel, field))
-    return issues, {"fields": len(spec.get("required_fields") or [])}
+    if spec.get("schema_siblings") and not sch_rel:
+        stats["no_schema"] = 1          # 可见缺口：有 schema 兄弟约定但该件没有 schema
+    stats["fields"] = len(spec.get("required_fields") or [])
+    return issues, stats
 
 
 def _csv_rows(text: str) -> List[List[str]]:
@@ -146,6 +159,11 @@ def _data_csv(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dic
     missing = [c for c in spec.get("required_columns") or [] if c not in header]
     if missing:
         issues.append("数据件 %s 缺必需列 %s（修复指引：加列或改声明）" % (rel, ",".join(missing)))
+    any_cols = [str(c) for c in spec.get("required_any_columns") or []]
+    if any_cols and not any(c in header for c in any_cols):
+        # 表头**族**各不相同（实测 CASES.csv 有 11 种表头），故只判「至少含一个」而非全等。
+        issues.append("数据件 %s 表头不含任一必需列 %s（实为 %s）（修复指引：改用族内表头或改声明）"
+                      % (rel, "|".join(any_cols), ",".join(header[:6])))
     low = int(spec.get("min_rows") or 0)
     if len(data) < low:
         issues.append("数据件 %s 数据行 %d < min_rows %d（修复指引：补样例或下调声明）"
@@ -216,6 +234,135 @@ def _data_link(root: str, rel: str, spec: Dict[str, Any], obj: Any) -> List[str]
     return issues
 
 
+#: Mermaid 图的首关键词（结构判据：只认「这是一张什么图」，不解析图内容）
+_MMD_KINDS = ("graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram",
+              "erDiagram", "gantt", "pie", "mindmap", "timeline", "journey", "gitGraph",
+              "quadrantChart", "xychart-beta", "requirementDiagram", "C4Context", "block-beta")
+
+
+def _schema_of(root: str, rel: str, spec: Dict[str, Any]) -> str:
+    """声明的 schema 路径：显式 `schema` 优先，其次 `schema_siblings` 里第一个在场的兄弟候选。"""
+    sch = str(spec.get("schema") or "")
+    if sch:
+        return sch
+    for tmpl in spec.get("schema_siblings") or []:
+        cand = (Path(rel).parent / str(tmpl).replace("{stem}", Path(rel).stem)).as_posix()
+        if (Path(root) / cand).is_file():
+            return cand
+    return ""
+
+
+def _schema_issues(root: str, rel: str, obj: Any, sch_rel: str) -> List[str]:
+    """按 schema 校验已解析对象（四格式共用：YAML/TOML 解析后与 JSON 同一数据模型）。"""
+    from core import json_schema as js
+    sch_text, err = _read(root, sch_rel)
+    if err:
+        return ["数据件 %s 的 schema 读不到：%s" % (rel, err)]
+    try:
+        errs = js.json_schema_check(obj, _strict_json(sch_text))
+    except ValueError as exc:
+        errs = ["schema 本身不是合法 JSON：%s" % exc]
+    return ["数据件 %s 不符 schema %s：%s" % (rel, sch_rel, e) for e in errs[:5]]
+
+
+def _fields_issues(rel: str, obj: Any, spec: Dict[str, Any]) -> List[str]:
+    return ["数据件 %s 缺必填字段 %s（修复指引：补字段或从声明里删掉——声明即契约）" % (rel, f)
+            for f in spec.get("required_fields") or [] if _dig(obj, f) is _MISSING]
+
+
+def _data_yaml(root: str, rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """YAML 数据件：解析复用仓库既有懒加载 YAML（软依赖），解析后与 JSON 走同一套 schema/字段判据。"""
+    from core import lazy_yaml
+    ymod = lazy_yaml.module()                # 惰性入口：缺 PyYAML 时返回 None（不是即报）
+    if ymod is None:
+        # 契约判据**不许**在缺依赖时静默放行（那等于假绿）：报缺口并给安装指引。
+        return ["数据件 %s 未判：PyYAML 不在场（修复指引：pip install pyyaml，或把该件改成 format=text）"
+                % rel], {"yaml_unavailable": 1}
+    try:
+        loader = lazy_yaml.safe_loader()
+        obj = ymod.load(text, Loader=loader) if loader is not None else ymod.safe_load(text)
+    except Exception as exc:                                  # noqa: BLE001 —— 解析器异常按坏件报
+        return ["数据件 %s 不是合法 YAML：%s（修复指引：修好缩进/语法或换 format）" % (rel, exc)], {}
+    issues: List[str] = []
+    sch = _schema_of(root, rel, spec)
+    if sch:
+        issues += _schema_issues(root, rel, obj, sch)
+    issues += _fields_issues(rel, obj, spec)
+    return issues, {"fields": len(spec.get("required_fields") or [])}
+
+
+def _data_toml(root: str, rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """TOML 数据件：stdlib `tomllib`（3.11+）；解析后同 JSON 判据。"""
+    import tomllib
+    try:
+        obj = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        return ["数据件 %s 不是合法 TOML：%s（修复指引：修好语法或换 format）" % (rel, exc)], {}
+    issues: List[str] = []
+    sch = _schema_of(root, rel, spec)
+    if sch:
+        issues += _schema_issues(root, rel, obj, sch)
+    issues += _fields_issues(rel, obj, spec)
+    return issues, {"fields": len(spec.get("required_fields") or [])}
+
+
+def _data_jsonl(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """JSONL：**逐行**严格 JSON（空行跳过）；必填字段对每一行判。"""
+    issues: List[str] = []
+    rows = 0
+    for i, line in enumerate(text.splitlines(), 1):
+        if not line.strip():
+            continue
+        rows += 1
+        try:
+            obj = _strict_json(line)
+        except ValueError as exc:
+            issues.append("数据件 %s 第 %d 行不是合法 JSON：%s（修复指引：一行一条 JSON）" % (rel, i, exc))
+            continue
+        for f in spec.get("required_fields") or []:
+            if _dig(obj, f) is _MISSING:
+                issues.append("数据件 %s 第 %d 行缺必填字段 %s（修复指引：补字段或改声明）" % (rel, i, f))
+    if spec.get("min_rows") and rows < int(spec["min_rows"]):
+        issues.append("数据件 %s 行数 %d < min_rows %s（修复指引：补样例或下调声明）"
+                      % (rel, rows, spec["min_rows"]))
+    return issues, {"rows": rows}
+
+
+def _data_graphml(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """GraphML：XML 良构 + 节点/边计数（图结构资产的可证那部分）。"""
+    import xml.etree.ElementTree as ET
+    try:
+        root_el = ET.fromstring(text)
+    except ET.ParseError as exc:
+        return ["数据件 %s 不是良构 XML：%s（修复指引：修好 XML）" % (rel, exc)], {}
+    ns = {"g": "http://graphml.graphdrawing.org/xmlns"}
+    nodes = len(root_el.findall(".//g:node", ns)) or len(root_el.findall(".//node"))
+    edges = len(root_el.findall(".//g:edge", ns)) or len(root_el.findall(".//edge"))
+    issues: List[str] = []
+    if spec.get("min_nodes") and nodes < int(spec["min_nodes"]):
+        issues.append("数据件 %s 节点数 %d < min_nodes %s（修复指引：补结构或下调声明）"
+                      % (rel, nodes, spec["min_nodes"]))
+    return issues, {"nodes": nodes, "edges": edges}
+
+
+def _data_mmd(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """Mermaid：首关键词须是合法图型（结构判据，不解析图内容）。"""
+    first = ""
+    for line in text.splitlines():
+        s = line.strip()
+        if s and not s.startswith("%%"):
+            first = s.split()[0] if s.split() else ""
+            break
+    if not first:
+        return ["数据件 %s 是空 Mermaid 图（修复指引：补图声明）" % rel], {}
+    base = first.split("-")[0] if first.startswith(("xychart", "block")) else first
+    if first not in _MMD_KINDS and base not in _MMD_KINDS:
+        return ["数据件 %s 首关键词 %r 不是合法 Mermaid 图型（修复指引：用 graph/flowchart/sequenceDiagram 等）"
+                % (rel, first)], {}
+    return [], {"kind": first}
+
+
+
 def _check_data(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     sid = str(spec.get("id") or spec.get("path") or spec.get("glob") or "?")
     rels = resolve(root, spec)
@@ -248,9 +395,23 @@ def _check_data(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, A
             sub, s = _data_csv(rel, text, spec)
         elif fmt == "markdown":
             sub, s = _data_markdown(rel, text, spec)
+        elif fmt == "yaml":
+            sub, s = _data_yaml(root, rel, text, spec)
+        elif fmt == "toml":
+            sub, s = _data_toml(root, rel, text, spec)
+        elif fmt == "jsonl":
+            sub, s = _data_jsonl(rel, text, spec)
+        elif fmt == "graphml":
+            sub, s = _data_graphml(rel, text, spec)
+        elif fmt == "mmd":
+            sub, s = _data_mmd(rel, text, spec)
         else:
             sub, s = [], {"lines": len(text.splitlines())}
         issues += sub
+        for _k in ("no_schema", "yaml_unavailable"):
+            if s.get(_k):
+                stats[_k] = int(stats.get(_k) or 0) + 1
+                s = {k: v for k, v in s.items() if k != _k}
         stats.update(s)
         if spec.get("sha256"):
             got = digest_of(Path(root) / rel)
@@ -558,6 +719,11 @@ def observed_paths(text: str, lang: str) -> List[str]:
     elif lang == "bash":
         for m in re.finditer(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)", text):
             out.append(m.group(1) or m.group(2) or "")
+    elif lang == "powershell":
+        # `#` 注释与 bash 同形（parse_io_header 已覆盖）；路径取字面量的重定向/读写 cmdlet。
+        for m in re.finditer(r"(?:>>?|Out-File|Set-Content|Add-Content|Get-Content|Import-Csv)"
+                             r"[ \t]+([^\s;|&()\[\]$]+)", text):
+            out.append(m.group(1))
     elif lang == "vba":
         for m in re.finditer(r'(?i)\bOpen\s+"([^"]+)"', text):
             out.append(m.group(1))
@@ -634,6 +800,34 @@ def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
 
 
 # ---------------------------------------------------------------- 聚合 / 入口
+def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
+    """D1 两册合一：本册声明为数据的 `protocol/` 件必须已在 `protocol/data_contracts.json` 登记。
+
+    为什么：仓库里已有「数据契约登记册」（ODCS 式：谁判 / 谁管 / 坏了怎么重建）。资产册再造一份
+    「谁管」就是第二套词表——同型病。判据只问一句：**同一 artifact 不许只在资产册出现**。
+    """
+    targets = [rel for spec in doc.get("data") or [] for rel in resolve(root, spec)
+               if rel.startswith("protocol/") and rel.endswith(".json")]
+    if not targets:
+        return []                      # 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）
+    p = Path(root) / "protocol/data_contracts.json"
+    if not p.is_file():
+        return ["缺 protocol/data_contracts.json（修复指引：补登记册——本册有 protocol 真源件须登记）"]
+    try:
+        reg = _strict_json(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return ["protocol/data_contracts.json 不可读：%s（修复指引：修好 JSON）" % exc]
+    arts = {str(c.get("artifact")) for c in (reg.get("contracts") or []) if isinstance(c, dict)}
+    issues: List[str] = []
+    for spec in doc.get("data") or []:
+        for rel in resolve(root, spec):
+            if rel.startswith("protocol/") and rel.endswith(".json") and rel not in arts:
+                issues.append("资产 %s 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——"
+                              "同一 artifact 不许只在资产册出现）" % rel)
+                break
+    return issues
+
+
 def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     """读契约声明件 → (doc, issues)。缺件/坏件如实报，不抛裸异常。"""
     p = Path(root) / DECL_REL
@@ -660,6 +854,7 @@ def scan(root: str = ".", faces: Iterable[str] = ()
     stats.update({"files": 0, "chains": 0})
     if issues:
         return issues, warns, stats
+    issues += _registry_issues(root, doc)
     want = {str(x) for x in faces} or set(FACES)
     for face in FACES:
         if face not in want:
@@ -677,6 +872,7 @@ def scan(root: str = ".", faces: Iterable[str] = ()
             issues += sub
             stats[face] += 1
             stats["files"] += s.get("files", 0)
+            stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get("no_schema") or 0)
     specs = {str(s.get("id")): s for s in doc.get("script") or [] if isinstance(s, dict)}
     if "script" in want:
         for chain in doc.get("chains") or []:

@@ -10,12 +10,14 @@ subjects:
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5
-  - protocol/data_contracts.json:8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3
+  - protocol/data_contracts.json:226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
+
 
 > 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 

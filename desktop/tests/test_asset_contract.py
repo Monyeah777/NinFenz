@@ -368,5 +368,128 @@ class LiveRepoTest(unittest.TestCase):
             self.assertTrue(doc.get(face), face)
 
 
+class FormatFaceTest(unittest.TestCase):
+    """E1：数据面新增格式（yaml / toml / jsonl / graphml / mmd）与 schema 兄弟约定。"""
+
+    def _one(self, rel, text, spec, root=None):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d) if root is None else Path(root)
+            _make(r, rel, text)
+            return ac._check_data(str(r), dict({"id": "x", "path": rel}, **spec))
+
+    def test_yaml_with_schema(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.yaml", "name: n\nversion: 1\n")
+            _make(r, "s.json", '{"type":"object","required":["name","version"]}')
+            issues, _ = ac._check_data(str(r), {"id": "y", "path": "a.yaml", "format": "yaml",
+                                                  "schema": "s.json"})
+            self.assertEqual([], issues, issues)
+
+    def test_yaml_schema_violation_and_bad_yaml(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.yaml", "name: n\n")
+            _make(r, "s.json", '{"type":"object","required":["name","version"]}')
+            issues, _ = ac._check_data(str(r), {"id": "y", "path": "a.yaml", "format": "yaml",
+                                                  "schema": "s.json"})
+            self.assertTrue(any("schema" in i for i in issues), issues)
+            _make(r, "bad.yaml", "a: [1, 2\n")
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "bad.yaml", "format": "yaml"})
+            self.assertTrue(any("不是合法 YAML" in i for i in bad), bad)
+
+    def test_toml(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.toml", "name = \"n\"\n")
+            issues, _ = ac._check_data(str(r), {"id": "t", "path": "a.toml", "format": "toml",
+                                                 "required_fields": ["name"]})
+            self.assertEqual([], issues, issues)
+            _make(r, "bad.toml", "name = \n")
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "bad.toml", "format": "toml"})
+            self.assertTrue(any("不是合法 TOML" in i for i in bad), bad)
+
+    def test_jsonl_per_line(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.jsonl", '{"k": 1}\n\n{"k": 2}\n')
+            issues, stats = ac._check_data(str(r), {"id": "j", "path": "a.jsonl",
+                                                     "format": "jsonl", "required_fields": ["k"]})
+            self.assertEqual([], issues, issues)
+            self.assertEqual(2, stats["rows"])
+            _make(r, "b.jsonl", '{"k": 1}\n{oops}\n')
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "b.jsonl", "format": "jsonl"})
+            self.assertTrue(any("第 2 行" in i for i in bad), bad)
+
+    def test_mmd_kind(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.mmd", "graph TD\n  A --> B\n")
+            issues, stats = ac._check_data(str(r), {"id": "m", "path": "a.mmd", "format": "mmd"})
+            self.assertEqual([], issues, issues)
+            self.assertEqual("graph", stats["kind"])
+            _make(r, "b.mmd", "不是图\n")
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "b.mmd", "format": "mmd"})
+            self.assertTrue(any("Mermaid 图型" in i for i in bad), bad)
+
+    def test_graphml_nodes(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.graphml", '<graphml><graph><node id="n1"/><edge source="n1" target="n1"/>'
+                                    "</graph></graphml>")
+            issues, stats = ac._check_data(str(r), {"id": "g", "path": "a.graphml",
+                                                     "format": "graphml", "min_nodes": 1})
+            self.assertEqual([], issues, issues)
+            self.assertEqual(1, stats["nodes"])
+            _make(r, "b.graphml", "<graphml><graph>")
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "b.graphml", "format": "graphml"})
+            self.assertTrue(any("良构 XML" in i for i in bad), bad)
+
+    def test_csv_required_any_columns(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.csv", "case_id,x\n1,2\n")
+            ok, _ = ac._check_data(str(r), {"id": "c", "path": "a.csv", "format": "csv",
+                                            "required_any_columns": ["case_id", "task_id"]})
+            self.assertEqual([], ok, ok)
+            _make(r, "b.csv", "foo,bar\n1,2\n")
+            bad, _ = ac._check_data(str(r), {"id": "b", "path": "b.csv", "format": "csv",
+                                             "required_any_columns": ["case_id", "task_id"]})
+            self.assertTrue(any("不含任一必需列" in i for i in bad), bad)
+
+    def test_schema_sibling_hit_and_miss(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "schemas/A.schema.json", '{"type":"object","required":["k"]}')
+            _make(r, "A.json", '{"k": 1}')
+            spec = {"id": "s", "glob": "*.json", "format": "json",
+                    "schema_siblings": ["schemas/{stem}.schema.json"]}
+            issues, stats = ac._check_data(str(r), spec)
+            self.assertEqual([], issues, issues)
+            self.assertNotIn("no_schema", stats)
+            _make(r, "B.json", '{"k": 1}')
+            issues2, stats2 = ac._check_data(str(r), spec)
+            self.assertEqual([], issues2, issues2)
+            self.assertEqual(1, stats2.get("no_schema"))
+
+
+class PowerShellFaceTest(unittest.TestCase):
+    def test_powershell_header_and_observed_paths(self):
+        text = "# nf-io: inputs=in.json outputs=out.json\nGet-Content in.json > out.json\n"
+        self.assertEqual({"inputs": ["in.json"], "outputs": ["out.json"]},
+                         ac.parse_io_header(text))
+        self.assertIn("in.json", ac.observed_paths(text, "powershell"))
+        self.assertIn("out.json", ac.observed_paths(text, "powershell"))
+
+    def test_powershell_script_contract(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = Path(d)
+            _make(r, "a.ps1", "# nf-io: inputs=in.json outputs=-\nGet-Content in.json\n")
+            issues, _ = ac._check_script(str(r), {"id": "p", "lang": "powershell",
+                                                   "path": "a.ps1", "inputs": ["in.json"],
+                                                   "outputs": []})
+            self.assertEqual([], issues, issues)
+
+
 if __name__ == "__main__":
     unittest.main()

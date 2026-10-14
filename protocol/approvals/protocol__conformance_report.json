@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "ADR-0006 职能坐标：投影改对象列表（JSON 键不放路径）+ 审计重绑落 LF",
+  "note": "数字资产契约深化（D1/D2/E1/E3）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
+  "subject_digest": "e99053de9315576188ae88c0b942e07508a06d4235d70be72a4bec17341f20f3"
 }

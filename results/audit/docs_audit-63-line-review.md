@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
-  - protocol/data_contracts.json:8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3
+  - protocol/data_contracts.json:226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4
   - protocol/assertions.json:c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
@@ -16,6 +16,8 @@ subjects:
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5
 ---
+> 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
+
 
 > 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 

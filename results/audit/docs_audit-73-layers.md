@@ -16,7 +16,7 @@ subjects:
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016
-  - protocol/data_contracts.json:8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3
+  - protocol/data_contracts.json:226c51b90b3a1f844ded3e84a00ed27b52745a9bab8ca53982cd5aa93c8a01f4
   - protocol/normative.json:b041ba07b0d7a146add5d93fc65f868da8a5af7c8dd2a75d35ea482790e47b7c
   - protocol/glossary.json:4561ddb5a221f8fc5beca4cfcca07580b3ea4dd403eb23434549a8eaa8409a60
   - desktop/src/core/receipts.py:9763037aa9461d98be4172a8a7dd7ce8bfbf2c3c1f87b33dc79dcf31fa32d0a7
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
+
 > 重审（2026-10-14 · ADR-0006 L11 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / desktop/src/core/layer_model.py 接 L11 / docs/layers.md 生成区刷新 / protocol/code_metrics_baseline.json 按工具指引重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 
 

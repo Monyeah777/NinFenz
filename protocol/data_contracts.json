@@ -1,8 +1,15 @@
 {
   "schema": "nf-data-contracts/1",
   "note": "数据契约登记（机制借鉴 ODCS / Data Contract Specification：契约 = 生产方与消费方的约定，须写明结构、质量、支持渠道）。NF 的机读件此前只有『有 schema 』这一层，没有『谁管、按什么规则判、坏了怎么重建』。本册给每个机读件补三样：quality_rule（谁来判）、owner（维护机制）、freshness（重建动作）——**指不出 quality_rule 的契约不许登记**。",
-  "status_vocabulary": ["active", "proposed", "deprecated"],
-  "rule_prefixes": ["check", "assertion:"],
+  "status_vocabulary": [
+    "active",
+    "proposed",
+    "deprecated"
+  ],
+  "rule_prefixes": [
+    "check",
+    "assertion:"
+  ],
   "contracts": [
     {
       "id": "combo-certificates",
@@ -11,7 +18,11 @@
       "owner": "组合引擎（core/pack_combo.py）+ check32 combos 子扫描",
       "status": "active",
       "freshness": "重签：nf combine plan --certify（每条证书按 packs+extra_modules 复算）",
-      "consumers": ["check32 combos", "nf combine verify", "docs/combos.md"]
+      "consumers": [
+        "check32 combos",
+        "nf combine verify",
+        "docs/combos.md"
+      ]
     },
     {
       "id": "standards-catalog",
@@ -20,7 +31,11 @@
       "owner": "域包工厂（core/domain_pack.py）+ check32 domain_packs 子扫描",
       "status": "active",
       "freshness": "重建：python .rivet/scratch/ai_packs/build_standards_catalog.py（外部可达性为时间快照）",
-      "consumers": ["nf domain build", "check32 domain_packs", "protocol/standards_binding.json"]
+      "consumers": [
+        "nf domain build",
+        "check32 domain_packs",
+        "protocol/standards_binding.json"
+      ]
     },
     {
       "id": "standards-binding",
@@ -29,154 +44,521 @@
       "owner": "域包工厂（core/domain_pack.py）",
       "status": "active",
       "freshness": "重建：随 nf domain build --write 自动刷新（每包 12 条绑定）",
-      "consumers": ["check32 domain_packs", "docs/domain-packs.md"]
+      "consumers": [
+        "check32 domain_packs",
+        "docs/domain-packs.md"
+      ]
     },
-    {"id": "registry", "artifact": "desktop/src/core/registry.json",
-     "quality_rule": "check21", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重扫描：nf spec / nf market --tier community", "consumers": ["nf market", "nf related", "nf who-refers"]},
-    {"id": "conformance-report", "artifact": "protocol/conformance_report.json",
-     "quality_rule": "check35", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重生成：nf conformance --write（随后 nf receipts --write）",
-     "consumers": ["verify check35", "nf conformance"]},
-    {"id": "protocol-receipts", "artifact": "protocol/RECEIPTS.json",
-     "quality_rule": "check35", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重冻结：nf receipts --write（内容改动后必须最后跑）",
-     "consumers": ["verify check35", "scripts/nf_verify.py"]},
-    {"id": "release-policy", "artifact": "protocol/release_policy.json",
-     "quality_rule": "check38", "owner": "发布编排（core/release_gate.py）+ check38 release_gate 子扫描",
-     "status": "active", "freshness": "改策略后跑 nf release --json 自检（过 nf:release-policy schema）",
-     "consumers": ["nf release --plan/--freeze", "check38 release_gate", "docs/release.md"]},
-    {"id": "locales", "artifact": "protocol/locales.json",
-     "quality_rule": "check34", "owner": "语言面（core/locales.py）+ check34 语言面扫描",
-     "status": "active", "freshness": "加语言/加指南译件时同步注册表（coverage 与译件双向对账）",
-     "consumers": ["check34", "core/locales.py", "README.md 语言切换行"]},
-    {"id": "changelog-gen", "artifact": "changes/README.md",
-     "quality_rule": "check38", "owner": "变更日志生成（core/changelog_gen.py）+ check38 release_gate 子扫描",
-     "status": "active",
-     "freshness": "条目随改动落盘；发布时 nf changelog --write 归档到 changes/<version>/ 并生成 CHANGELOG 版本节",
-     "consumers": ["nf changelog", "check38 release_gate", "CHANGELOG.md"]},
-    {"id": "release-schema", "artifact": "protocol/schema/release.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "改 nf:release-policy 契约时同步（check28 过 dialect 与子集边界）",
-     "consumers": ["core/release_gate.py::policy", "check28", "protocol/release_policy.json"]},
-    {"id": "integration-strings-schema", "artifact": "protocol/schema/integration_strings.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "改 nf:integration-strings 契约时同步（check28 过 dialect 与子集边界）",
-     "consumers": ["core/integrations.py", "check38 integrations 子扫描", "integrations/*/strings.json"]},
-    {"id": "integration-schema", "artifact": "protocol/schema/integration.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "改 nf:integration 契约时同步（check28 过 dialect 与子集边界）",
-     "consumers": ["core/integrations.py", "check28", "integrations/*/integration.json"]},
-    {"id": "knowledge-sources", "artifact": "protocol/knowledge_sources.json",
-     "quality_rule": "check37", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工声明；改后跑 nf knowledge lint", "consumers": ["nf knowledge", "MCP knowledge_order"]},
-    {"id": "assertions", "artifact": "protocol/assertions.json",
-     "quality_rule": "assertion:public-surface-no-abs-path",
-     "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "新增断言 = 加一行数据；跑 nf assertions",
-     "consumers": ["nf assertions", "conformance::assertions"]},
-    {"id": "layers", "artifact": "protocol/LAYERS.json",
-     "quality_rule": "check27", "owner": "机制维护（core/layer_model.py + check27 R7）",
-     "status": "active",
-     "freshness": "改真源后跑 nf layers --write 刷新 docs/layers.md 生成区（check27 L10 断言一致）",
-     "consumers": ["nf layers", "check27 R7", "docs/layers.md"]},
-    {"id": "event-registry", "artifact": "protocol/event_registry.json",
-     "quality_rule": "check32", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重收割：nf module types --harvest", "consumers": ["nf events", "check26"]},
-    {"id": "type-backlog", "artifact": "protocol/type_backlog.json",
-     "quality_rule": "check32", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重生成：nf module types --backlog --write", "consumers": ["check32", "nf module types"]},
-    {"id": "module-signatures", "artifact": "protocol/module_signatures.json",
-     "quality_rule": "check35", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重签：nf module signature --write（显式评审后）",
-     "consumers": ["check35", "nf module signature"]},
-    {"id": "pipeline-advisory", "artifact": "protocol/pipeline_advisory.json",
-     "quality_rule": "check35", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "重生成：nf pipeline dryrun --all --write-advisory",
-     "consumers": ["check35", "nf pipeline dryrun"]},
-    {"id": "library-receipts", "artifact": "library/RECEIPTS.json",
-     "quality_rule": "check35", "owner": "机制维护（check 即 owner）", "status": "active",
+    {
+      "id": "registry",
+      "artifact": "desktop/src/core/registry.json",
+      "quality_rule": "check21",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重扫描：nf spec / nf market --tier community",
+      "consumers": [
+        "nf market",
+        "nf related",
+        "nf who-refers"
+      ]
+    },
+    {
+      "id": "conformance-report",
+      "artifact": "protocol/conformance_report.json",
+      "quality_rule": "check35",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重生成：nf conformance --write（随后 nf receipts --write）",
+      "consumers": [
+        "verify check35",
+        "nf conformance"
+      ]
+    },
+    {
+      "id": "protocol-receipts",
+      "artifact": "protocol/RECEIPTS.json",
+      "quality_rule": "check35",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重冻结：nf receipts --write（内容改动后必须最后跑）",
+      "consumers": [
+        "verify check35",
+        "scripts/nf_verify.py"
+      ]
+    },
+    {
+      "id": "release-policy",
+      "artifact": "protocol/release_policy.json",
+      "quality_rule": "check38",
+      "owner": "发布编排（core/release_gate.py）+ check38 release_gate 子扫描",
+      "status": "active",
+      "freshness": "改策略后跑 nf release --json 自检（过 nf:release-policy schema）",
+      "consumers": [
+        "nf release --plan/--freeze",
+        "check38 release_gate",
+        "docs/release.md"
+      ]
+    },
+    {
+      "id": "locales",
+      "artifact": "protocol/locales.json",
+      "quality_rule": "check34",
+      "owner": "语言面（core/locales.py）+ check34 语言面扫描",
+      "status": "active",
+      "freshness": "加语言/加指南译件时同步注册表（coverage 与译件双向对账）",
+      "consumers": [
+        "check34",
+        "core/locales.py",
+        "README.md 语言切换行"
+      ]
+    },
+    {
+      "id": "changelog-gen",
+      "artifact": "changes/README.md",
+      "quality_rule": "check38",
+      "owner": "变更日志生成（core/changelog_gen.py）+ check38 release_gate 子扫描",
+      "status": "active",
+      "freshness": "条目随改动落盘；发布时 nf changelog --write 归档到 changes/<version>/ 并生成 CHANGELOG 版本节",
+      "consumers": [
+        "nf changelog",
+        "check38 release_gate",
+        "CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "release-schema",
+      "artifact": "protocol/schema/release.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "改 nf:release-policy 契约时同步（check28 过 dialect 与子集边界）",
+      "consumers": [
+        "core/release_gate.py::policy",
+        "check28",
+        "protocol/release_policy.json"
+      ]
+    },
+    {
+      "id": "integration-strings-schema",
+      "artifact": "protocol/schema/integration_strings.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "改 nf:integration-strings 契约时同步（check28 过 dialect 与子集边界）",
+      "consumers": [
+        "core/integrations.py",
+        "check38 integrations 子扫描",
+        "integrations/*/strings.json"
+      ]
+    },
+    {
+      "id": "integration-schema",
+      "artifact": "protocol/schema/integration.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "改 nf:integration 契约时同步（check28 过 dialect 与子集边界）",
+      "consumers": [
+        "core/integrations.py",
+        "check28",
+        "integrations/*/integration.json"
+      ]
+    },
+    {
+      "id": "knowledge-sources",
+      "artifact": "protocol/knowledge_sources.json",
+      "quality_rule": "check37",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf knowledge lint",
+      "consumers": [
+        "nf knowledge",
+        "MCP knowledge_order"
+      ]
+    },
+    {
+      "id": "assertions",
+      "artifact": "protocol/assertions.json",
+      "quality_rule": "assertion:public-surface-no-abs-path",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "新增断言 = 加一行数据；跑 nf assertions",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "layers",
+      "artifact": "protocol/LAYERS.json",
+      "quality_rule": "check27",
+      "owner": "机制维护（core/layer_model.py + check27 R7）",
+      "status": "active",
+      "freshness": "改真源后跑 nf layers --write 刷新 docs/layers.md 生成区（check27 L10 断言一致）",
+      "consumers": [
+        "nf layers",
+        "check27 R7",
+        "docs/layers.md"
+      ]
+    },
+    {
+      "id": "event-registry",
+      "artifact": "protocol/event_registry.json",
+      "quality_rule": "check32",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重收割：nf module types --harvest",
+      "consumers": [
+        "nf events",
+        "check26"
+      ]
+    },
+    {
+      "id": "type-backlog",
+      "artifact": "protocol/type_backlog.json",
+      "quality_rule": "check32",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重生成：nf module types --backlog --write",
+      "consumers": [
+        "check32",
+        "nf module types"
+      ]
+    },
+    {
+      "id": "module-signatures",
+      "artifact": "protocol/module_signatures.json",
+      "quality_rule": "check35",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重签：nf module signature --write（显式评审后）",
+      "consumers": [
+        "check35",
+        "nf module signature"
+      ]
+    },
+    {
+      "id": "pipeline-advisory",
+      "artifact": "protocol/pipeline_advisory.json",
+      "quality_rule": "check35",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "重生成：nf pipeline dryrun --all --write-advisory",
+      "consumers": [
+        "check35",
+        "nf pipeline dryrun"
+      ]
+    },
+    {
+      "id": "library-receipts",
+      "artifact": "library/RECEIPTS.json",
+      "quality_rule": "check35",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
       "freshness": "重冻结：nf library receipts --write（馆藏改动后）",
-      "consumers": ["check35", "图书馆读者侧自验"]},
-    {"id": "decision-layer", "artifact": "protocol/decision_layer.json",
-     "quality_rule": "check33", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工声明；候选拉取状态改后跑 nf receipts --write（回执覆盖面含本件）",
-     "consumers": ["nf decide", "scripts/pull_decision_model.py", "verify check33"]},
-    {"id": "driver", "artifact": "protocol/driver.json", "quality_rule": "check36",
-     "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工声明；改后跑 nf driver 自检", "consumers": ["nf driver", "check36"]},
-    {"id": "endpoint-contract", "artifact": "protocol/endpoint_contract.json",
-     "quality_rule": "check36", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工声明；改后跑 nf endpoint + nf interop --all",
-     "consumers": ["nf endpoint", "nf interop（openapi/a2a 派生）"]},
-    {"id": "rfc-index", "artifact": "protocol/rfc_index.json", "quality_rule": "check36",
-     "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工声明；改协议件头部后跑 nf rfc",
-     "consumers": ["nf rfc", "check36"]},
-    {"id": "transform-log", "artifact": "protocol/transform_log.json",
-     "quality_rule": "check37", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "随消化转正追加（digest 绑定）；改后跑 nf knowledge lint",
-     "consumers": ["nf knowledge", "check37"]},
-    {"id": "knowledge-usage", "artifact": "protocol/knowledge_usage.json",
-     "quality_rule": "check37", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "由 trace 复算：nf knowledge frequency --trace <f> --write",
-     "consumers": ["nf knowledge", "check37"]},
-    {"id": "vocabularies", "artifact": "protocol/vocabularies.json",
-     "quality_rule": "assertion:vocabularies-face", "owner": "机制维护",
-     "status": "active", "freshness": "人工声明；改后跑 nf model vocab",
-     "consumers": ["nf model", "conformance::modeling"]},
-    {"id": "normative-list", "artifact": "protocol/normative.json",
-     "quality_rule": "assertion:normative-face", "owner": "机制维护",
-     "status": "active", "freshness": "人工声明；改后跑 nf model normative",
-     "consumers": ["nf model", "conformance::modeling"]},
-    {"id": "data-contracts-table", "artifact": "protocol/data_contracts.json",
-     "quality_rule": "assertion:data-contracts-face", "owner": "机制维护",
-     "status": "active", "freshness": "人工声明；改后跑 nf model contracts",
-     "consumers": ["nf model", "conformance::modeling"]},
-    {"id": "external-events", "artifact": "protocol/external_events.json",
-     "quality_rule": "check16", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工登记外部通道事件；改后跑 nf events",
-     "consumers": ["nf events", "check16"]},
-    {"id": "asset-line-baseline", "artifact": "protocol/asset_line_baseline.json",
-     "quality_rule": "check23", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "可重签工件：nf asset baseline --write（内容/外形改动后显式重签）",
-     "consumers": ["verify check23", "nf asset verify"]},
-    {"id": "schema-contract", "artifact": "protocol/schema/contract.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "人工改 schema；改后跑 nf model contracts + verify check28",
-     "consumers": ["check28", "nf model"]},
-    {"id": "schema-module", "artifact": "protocol/schema/module.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "同上", "consumers": ["check28"]},
-    {"id": "schema-pipeline", "artifact": "protocol/schema/pipeline.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "同上", "consumers": ["check28"]},
-    {"id": "schema-protocol", "artifact": "protocol/schema/protocol.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "同上", "consumers": ["check28"]},
-    {"id": "schema-asset", "artifact": "protocol/schema/asset.schema.json",
-     "quality_rule": "check28", "owner": "机制维护（check 即 owner）", "status": "active",
-     "freshness": "同上", "consumers": ["check28"]},
-     {"id": "error-codes", "artifact": "protocol/error_codes.json",
-     "quality_rule": "assertion:error-codes-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "injection-profiles", "artifact": "protocol/injection_profiles.json",
-     "quality_rule": "assertion:injection-profiles-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "boundaries", "artifact": "protocol/boundaries.json",
-     "quality_rule": "assertion:boundaries-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "path-moved", "artifact": "protocol/path_moved.json",
-     "quality_rule": "assertion:path-moved-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "declined", "artifact": "protocol/declined.json",
-     "quality_rule": "assertion:declined-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "schema-pins", "artifact": "protocol/schema_pins.json",
-     "quality_rule": "assertion:schema-pins-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]},
-     {"id": "requirements", "artifact": "protocol/requirements.json",
-     "quality_rule": "assertion:requirements-face", "owner": "机制维护（断言即 owner）", "status": "active",
-     "freshness": "登记方维护；改后跑 nf assertions + 冻结链", "consumers": ["nf assertions", "conformance::assertions"]}
+      "consumers": [
+        "check35",
+        "图书馆读者侧自验"
+      ]
+    },
+    {
+      "id": "decision-layer",
+      "artifact": "protocol/decision_layer.json",
+      "quality_rule": "check33",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工声明；候选拉取状态改后跑 nf receipts --write（回执覆盖面含本件）",
+      "consumers": [
+        "nf decide",
+        "scripts/pull_decision_model.py",
+        "verify check33"
+      ]
+    },
+    {
+      "id": "driver",
+      "artifact": "protocol/driver.json",
+      "quality_rule": "check36",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf driver 自检",
+      "consumers": [
+        "nf driver",
+        "check36"
+      ]
+    },
+    {
+      "id": "endpoint-contract",
+      "artifact": "protocol/endpoint_contract.json",
+      "quality_rule": "check36",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf endpoint + nf interop --all",
+      "consumers": [
+        "nf endpoint",
+        "nf interop（openapi/a2a 派生）"
+      ]
+    },
+    {
+      "id": "rfc-index",
+      "artifact": "protocol/rfc_index.json",
+      "quality_rule": "check36",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工声明；改协议件头部后跑 nf rfc",
+      "consumers": [
+        "nf rfc",
+        "check36"
+      ]
+    },
+    {
+      "id": "transform-log",
+      "artifact": "protocol/transform_log.json",
+      "quality_rule": "check37",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "随消化转正追加（digest 绑定）；改后跑 nf knowledge lint",
+      "consumers": [
+        "nf knowledge",
+        "check37"
+      ]
+    },
+    {
+      "id": "knowledge-usage",
+      "artifact": "protocol/knowledge_usage.json",
+      "quality_rule": "check37",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "由 trace 复算：nf knowledge frequency --trace <f> --write",
+      "consumers": [
+        "nf knowledge",
+        "check37"
+      ]
+    },
+    {
+      "id": "vocabularies",
+      "artifact": "protocol/vocabularies.json",
+      "quality_rule": "assertion:vocabularies-face",
+      "owner": "机制维护",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf model vocab",
+      "consumers": [
+        "nf model",
+        "conformance::modeling"
+      ]
+    },
+    {
+      "id": "normative-list",
+      "artifact": "protocol/normative.json",
+      "quality_rule": "assertion:normative-face",
+      "owner": "机制维护",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf model normative",
+      "consumers": [
+        "nf model",
+        "conformance::modeling"
+      ]
+    },
+    {
+      "id": "data-contracts-table",
+      "artifact": "protocol/data_contracts.json",
+      "quality_rule": "assertion:data-contracts-face",
+      "owner": "机制维护",
+      "status": "active",
+      "freshness": "人工声明；改后跑 nf model contracts",
+      "consumers": [
+        "nf model",
+        "conformance::modeling"
+      ]
+    },
+    {
+      "id": "external-events",
+      "artifact": "protocol/external_events.json",
+      "quality_rule": "check16",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工登记外部通道事件；改后跑 nf events",
+      "consumers": [
+        "nf events",
+        "check16"
+      ]
+    },
+    {
+      "id": "asset-line-baseline",
+      "artifact": "protocol/asset_line_baseline.json",
+      "quality_rule": "check23",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "可重签工件：nf asset baseline --write（内容/外形改动后显式重签）",
+      "consumers": [
+        "verify check23",
+        "nf asset verify"
+      ]
+    },
+    {
+      "id": "schema-contract",
+      "artifact": "protocol/schema/contract.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "人工改 schema；改后跑 nf model contracts + verify check28",
+      "consumers": [
+        "check28",
+        "nf model"
+      ]
+    },
+    {
+      "id": "schema-module",
+      "artifact": "protocol/schema/module.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "同上",
+      "consumers": [
+        "check28"
+      ]
+    },
+    {
+      "id": "schema-pipeline",
+      "artifact": "protocol/schema/pipeline.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "同上",
+      "consumers": [
+        "check28"
+      ]
+    },
+    {
+      "id": "schema-protocol",
+      "artifact": "protocol/schema/protocol.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "同上",
+      "consumers": [
+        "check28"
+      ]
+    },
+    {
+      "id": "schema-asset",
+      "artifact": "protocol/schema/asset.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check 即 owner）",
+      "status": "active",
+      "freshness": "同上",
+      "consumers": [
+        "check28"
+      ]
+    },
+    {
+      "id": "error-codes",
+      "artifact": "protocol/error_codes.json",
+      "quality_rule": "assertion:error-codes-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "injection-profiles",
+      "artifact": "protocol/injection_profiles.json",
+      "quality_rule": "assertion:injection-profiles-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "boundaries",
+      "artifact": "protocol/boundaries.json",
+      "quality_rule": "assertion:boundaries-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "path-moved",
+      "artifact": "protocol/path_moved.json",
+      "quality_rule": "assertion:path-moved-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "declined",
+      "artifact": "protocol/declined.json",
+      "quality_rule": "assertion:declined-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "schema-pins",
+      "artifact": "protocol/schema_pins.json",
+      "quality_rule": "assertion:schema-pins-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "requirements",
+      "artifact": "protocol/requirements.json",
+      "quality_rule": "assertion:requirements-face",
+      "owner": "机制维护（断言即 owner）",
+      "status": "active",
+      "freshness": "登记方维护；改后跑 nf assertions + 冻结链",
+      "consumers": [
+        "nf assertions",
+        "conformance::assertions"
+      ]
+    },
+    {
+      "id": "asset-contracts",
+      "artifact": "protocol/asset_contracts.json",
+      "quality_rule": "check40",
+      "owner": "数字资产契约（core/asset_contract.py）+ verify check40",
+      "status": "active",
+      "freshness": "改声明后跑 nf asset contract（sha256 钉用 --freeze 重冻）；数据面按 schema_siblings 自动发现包产物",
+      "consumers": [
+        "verify check40",
+        "nf asset contract",
+        "protocol/data_contracts.json"
+      ]
+    },
+    {
+      "id": "role-coordinates",
+      "artifact": "protocol/role_coordinates.json",
+      "quality_rule": "check40",
+      "owner": "职能坐标（core/role_model.py，经 core/layer_model.py 的 nf layers --write 落盘）",
+      "status": "active",
+      "freshness": "重生成：nf layers --write（与 docs/layers.md 同命令）",
+      "consumers": [
+        "nf layers --verify",
+        "verify_report role_coordinates",
+        "ADR-0006"
+      ]
+    }
   ]
 }
