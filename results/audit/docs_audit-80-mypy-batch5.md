@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:22e40164da15ebf92dc80ea1fa0562f2ac42e2c3c2a000894398b6a6e2fd92db
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:13ec1ab8a3f4c969020cc161bc95e056cb38517b660061fad357ab5a5cfde9f9
-  - protocol/code_metrics_baseline.json:d79747f4bcc83535036c10b88f1ddc7d1aa924e3f9f43131319211ef3750a163
+  - protocol/code_metrics_baseline.json:27bb2b6e6080f9d9d6da9f3b955588713ed8abafebf964e17b2c2e744b8bc337
 ---
+
+> 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

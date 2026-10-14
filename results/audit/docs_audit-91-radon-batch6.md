@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:18822a9c4a8b39dc8076cbf40695e40588cb6025a5e59efe8f93769ef9315357
-  - protocol/code_metrics_baseline.json:d79747f4bcc83535036c10b88f1ddc7d1aa924e3f9f43131319211ef3750a163
+  - protocol/code_metrics_baseline.json:27bb2b6e6080f9d9d6da9f3b955588713ed8abafebf964e17b2c2e744b8bc337
 ---
+
+> 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 
