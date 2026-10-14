@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:717d4b178af56537f006f920afbbc89d3ad6830a824fa5232c015827dc02ce14
+  - CHANGELOG.md:c5026907f1ca1c88cb641b58a924fa5ad3205702bb67859b94a930a288949630
   - docs/meta/VERSION-MATRIX.md:abe7adfd40849a0191f738bb4d051ce487e811328d800c3049bbda7add455615
   - README.md:02cb4dde570cd93e45d2ff96b91be36ed616357984752cb4c4ae3d08059f245f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5
 
 ---
+> 重审（2026-10-14 · 数字资产契约续批 D3/E2/D4 + CHANGELOG 补记）：被审对象随本波改动（receipts 锚定面 58→67 / data_contracts 45→52 / LAYERS roles.write_exceptions 结构化 / CHANGELOG 条目），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
+
 > 重审（2026-10-14 · ADR-0006 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / core/layer_model.py 由 nf layers --write 联动刷新职能投影 / code_metrics 基线重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 
 
