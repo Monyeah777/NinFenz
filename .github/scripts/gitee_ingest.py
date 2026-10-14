@@ -19,7 +19,6 @@
 """
 import os
 import re
-import subprocess
 import sys
 import urllib.parse
 import urllib.request
@@ -29,15 +28,39 @@ from glob import glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__)))), "desktop", "src"))
-from core import json_doc
-from core import atomic_write  # noqa: E402  —— 入库件落盘走统一原子写（2026-10-01）
+from core import (
+    atomic_write,  # noqa: E402  —— 入库件落盘走统一原子写（2026-10-01）
+    json_doc,
+)
+
 # 复用 GitHub 前端的纯函数（36进制 / 文件名解析 / 存量扫描）
 # （`rebuild_alias` 已于 2026-10-01 删除：ALIAS 改由 `core.library.write_projection`
 #   全量重生成——该函数是它的旧实现，定义后从未被调用，只有本文件的 import 在“装作”被用）
-from library_ingest import (to_b36, parse_nfname, scan_existing,
-                            SEG_RE, load_gate, INTAKE_REL, load_rating_vocab,
-                            secret_shape_hit, injection_probe, MAX_BODY_CHARS,
-                            flatten_fm_value, fm_fields_ok)
+from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026-10-14 core 抽取）
+    MAX_BODY_CHARS,
+    SEG_RE,
+    clean_val,
+    fail,
+    flatten_fm_value,
+    fm_fields_ok,
+    injection_probe,
+    load_gate,
+    load_rating_vocab,
+    parse_nfname,
+    redact,
+    run_git,
+    scan_existing,
+    secret_shape_hit,
+    to_b36,
+)
+
+
+def _redact(text):
+    return redact(text, TOKEN)
+
+
+def git(*args):
+    return run_git(args, secret=TOKEN, dry=DRY)
 
 GITEE_OWNER = 'monyeah777'
 GITEE_REPO = 'ninfenz'
@@ -46,36 +69,12 @@ TOKEN = os.environ.get('GITEE_TOKEN', '')
 DRY = os.environ.get('DRY_RUN', '') == '1'
 MAX_SEG = 16
 
-def _redact(text):
-    """令牌脱敏：任何要进日志 / 异常 / 回评的字符串都先过这里（CWE-532）。"""
-    out = str(text)
-    if TOKEN:
-        out = out.replace(TOKEN, '***')
-    return out
 
 
-# 模板残留说明短语（与 GitHub 前端同一套——投稿人 = 蠢用户，机器兜底）
-FILLER_PATS = ('如 校园情感世界', '作品名，同时', '可选，一句话', '可选，编号',
-               '编号规则', '从这里开始粘贴', '两者都填', '填了就必须',
-               '把 AI 产物全文整篇粘贴到这条线下面', '此占位行务必删掉')
 
 
-def fail(msg):
-    print('❌ ' + msg)
-    sys.exit(1)
 
 
-def clean_val(v):
-    """模板残留净化：说明文字/括号示例一律视为未填。"""
-    v = flatten_fm_value(v)              # 先压平（含 CR/LF）——frontmatter 行读，换行即注入
-    if not v:
-        return ''
-    if v.startswith(('（', '(')):
-        return ''
-    for pat in FILLER_PATS:
-        if v.startswith(pat):
-            return ''
-    return v
 
 
 def gitee_api(path, params=None, method='GET'):
@@ -155,23 +154,6 @@ def already_processed(number):
     return False
 
 
-def git(*args):
-    """git 调用统一出口：日志与异常一律脱敏（令牌绝不进 CI 日志——CWE-532）。
-
-    输出改由本函数捕获后经 `_redact` 回吐：git 自身在鉴权/网络失败时会把**含凭证的 URL**
-    打进 stderr，直接继承 stdout/stderr 等于把令牌写进 Actions 日志。
-    """
-    print('$ git', *(_redact(a) for a in args))
-    if DRY:
-        return
-    proc = subprocess.run(['git', *args], capture_output=True, text=True,
-                          encoding='utf-8', errors='replace')
-    for stream in (proc.stdout, proc.stderr):
-        if stream:
-            print(_redact(stream), end='')
-    if proc.returncode != 0:
-        raise RuntimeError('git 退出码 %d：%s（修复指引：检查远端可达性与令牌权限）'
-                           % (proc.returncode, _redact(' '.join(args))))
 
 
 def process(issue):
@@ -371,7 +353,7 @@ def process(issue):
 
     # 重生成 INDEX 生成区 + ALIAS（投影；真源 = 条目 frontmatter）
     sys.path.insert(0, 'desktop/src')
-    from core import library as nflib                       # noqa: E402
+    from core import library as nflib  # noqa: E402
     out = nflib.write_projection('.')
     print(f'  投影已重生成: {out["changed"] or "无变化"}')
 

@@ -21,6 +21,7 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from core import ingest_common as ic  # noqa: E402
 from core import purity_scan as ps  # noqa: E402
 
 ROOT = str(Path(__file__).resolve().parents[2])
@@ -115,7 +116,8 @@ class FrontmatterInjectionTest(unittest.TestCase):
     """
 
     def test_helpers_flatten_and_reject_unsafe_shapes(self):
-        m = bot_module()
+        # 共用件已抽到 core（2026-10-14 core 抽取）——两前端共用一份实现，故真源在此
+        m = ic
         self.assertEqual("a b", m.flatten_fm_value("a\nb"))
         self.assertEqual("a b", m.flatten_fm_value("a\r\nb"))
         self.assertTrue(m.fm_scalar_ok("普通标题"))
