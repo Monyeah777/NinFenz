@@ -4,16 +4,13 @@
     "nt": {
       "bandit": {
         ".github/scripts/gitee_ingest.py::B310": 1,
-        ".github/scripts/gitee_ingest.py::B404": 1,
-        ".github/scripts/gitee_ingest.py::B603": 1,
-        ".github/scripts/gitee_ingest.py::B607": 1,
         ".github/scripts/library_ingest.py::B310": 1,
-        ".github/scripts/library_ingest.py::B404": 1,
-        ".github/scripts/library_ingest.py::B603": 1,
-        ".github/scripts/library_ingest.py::B607": 1,
         "desktop/src/core/daemon.py::B110": 7,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
+        "desktop/src/core/ingest_common.py::B404": 1,
+        "desktop/src/core/ingest_common.py::B603": 1,
+        "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
         "desktop/src/core/watch.py::B110": 1,
         "scripts/check_external_links.py::B104": 1,
@@ -34,26 +31,22 @@
           "severities": [
             [
               "LOW",
-              31
+              28
             ],
             [
               "MEDIUM",
               3
             ]
           ],
-          "total": 34
+          "total": 31
         },
         "ruff": {
-          "total": 75
+          "total": 73
         }
       },
       "ruff": {
         ".github/scripts/gitee_ingest.py::S310": 2,
-        ".github/scripts/gitee_ingest.py::S603": 1,
-        ".github/scripts/gitee_ingest.py::S607": 1,
         ".github/scripts/library_ingest.py::S310": 1,
-        ".github/scripts/library_ingest.py::S603": 1,
-        ".github/scripts/library_ingest.py::S607": 1,
         "desktop/src/core/assemble_plan.py::S112": 1,
         "desktop/src/core/attest.py::S603": 4,
         "desktop/src/core/closure_scan.py::S112": 1,
@@ -62,6 +55,8 @@
         "desktop/src/core/composer.py::S112": 1,
         "desktop/src/core/daemon.py::S110": 7,
         "desktop/src/core/decision_layer.py::S310": 4,
+        "desktop/src/core/ingest_common.py::S603": 1,
+        "desktop/src/core/ingest_common.py::S607": 1,
         "desktop/src/core/interop_export.py::S110": 1,
         "desktop/src/core/library.py::S110": 1,
         "desktop/src/core/mcp_runtime.py::S110": 3,

@@ -199,7 +199,7 @@ def clean_val(v):
     return v
 
 
-def redact(text, secret=''):
+def redact(text, secret=None):
     """令牌脱敏：任何要进日志 / 异常 / 回评的字符串都先过这里（CWE-532）。"""
     out = str(text)
     if secret:
@@ -207,7 +207,7 @@ def redact(text, secret=''):
     return out
 
 
-def run_git(args, secret='', dry=False):
+def run_git(args, secret=None, dry=False):
     """git 调用统一出口：日志与异常一律脱敏（令牌绝不进 CI 日志——CWE-532）。
 
     输出由本函数捕获后经 redact 回吐：git 在鉴权/网络失败时会把**含凭证的 URL**

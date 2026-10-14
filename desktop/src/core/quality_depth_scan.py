@@ -26,7 +26,11 @@ QD_INPUTS = ("03_管线库/**/*", "04_模块库/**/*", "05_资产库/**/*", "com
              "library/**/*", "patterns/**/*", "decisions/**/*",
              "protocol/**/*", "docs/**/*", "01_核心协议.md", "02_联动注册表.md",
              "06_Agent执行协议.md", "07_官方核心出厂与社区预设导航.md",
-             ".github/**/*",  # 投稿面 + CI 面判据（intake_surface / workflow_hardening）
+             # 声明面精确到判据真读的件：通配到 .github/**/* 会把 .github/scripts/__pycache__
+             # 的 .pyc 也收进来（判据键随导入漂移、缓存整体失效——FaceHygieneTest 实测拦下）
+             ".github/ISSUE_TEMPLATE/**/*",  # 投稿面判据（intake_surface）
+             ".github/workflows/**/*",       # 供应链 + 加固判据（workflow_policy / workflow_hardening）
+             ".github/CODEOWNERS", ".github/dependabot.yml",
              "verify.sh", "README.md", "README.en.md", "docs/agent/ROUTES.md", "llms.txt",
              "STRATEGY.md", "AGENTS.md",
              # 代码只收 `desktop/src`：旧口径收 129 件 desktop/tests，而规则不读测试 ⇒ 白读（2850→27
