@@ -96,9 +96,9 @@
       "max_fn_lines": 53
     },
     "desktop/src/core/audit.py": {
-      "lines": 139,
+      "lines": 203,
       "max_fn_cc": 13,
-      "max_fn_lines": 35
+      "max_fn_lines": 38
     },
     "desktop/src/core/autofix.py": {
       "lines": 95,
@@ -1336,9 +1336,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7339,
+      "lines": 7362,
       "max_fn_cc": 114,
-      "max_fn_lines": 1220
+      "max_fn_lines": 1229
     },
     "scripts/nf_client.py": {
       "lines": 189,

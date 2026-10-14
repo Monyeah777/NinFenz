@@ -7,14 +7,18 @@
 - 带审计头的报告：必填齐；verdict 在词表；date 为 YYYY-MM-DD；
   **`subjects` 每条 `路径:sha256` 必须与当前文件一致**——对象一改，旧审计即失效；
   `accepted_by` 出现则必须有 `accepted_at`（验收签收双要素）；
-- 无审计头的存量件：按 **WARN** 挂账（legacy），不判死。
+- 无审计头的存量件：按 **WARN** 挂账（legacy），不判死；
+- `rebind()`：对象改动后**机械重绑** subjects 的 digest（`nf audit rebind --note`）——
+  只逐行替换 digest（不重排 frontmatter），并把重审理由落成正文首行（同一理由不重复追加）。
 """
 from __future__ import annotations
 
 import re
+from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from core import atomic_write
 from core import doc_family
 from core.library import parse_frontmatter
 
@@ -137,3 +141,63 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         warns.append("暂无审计件（%s）" % GLOB)
     return issues, warns, {"audits": len(rows), "with_header": len(rows) - len(legacy),
                            "legacy": len(legacy), "subjects_ok": subs}
+
+
+# ---------------------------------------------------------------- 重审重绑
+_SUBJECT_LINE = re.compile(r"^(\s+- )(.+):([0-9a-f]{64})\s*$", re.M)
+
+
+def _rebind_subjects(root: str, fm: str) -> Tuple[str, List[str]]:
+    """frontmatter 文本里逐行替换 `路径:sha256` → (新文本, 被重绑的路径)。"""
+    changed: List[str] = []
+    out = fm
+    for m in list(_SUBJECT_LINE.finditer(fm)):
+        rel = m.group(2)
+        sp = Path(root) / rel.replace(chr(92), "/")
+        if not sp.is_file():
+            continue
+        now = _sha(sp)
+        if now != m.group(3):
+            out = out.replace("%s:%s" % (rel, m.group(3)), "%s:%s" % (rel, now))
+            changed.append(rel)
+    return out, changed
+
+
+def rebind(root: str = ".", note: str = "", dry_run: bool = False,
+           ) -> Tuple[List[str], Dict[str, Any]]:
+    """重审并更新 digest → (issues, stats)。
+
+    纪律：**理由必填**（空 → 拒绝）——无理由的重绑就是洗数据；只重绑**已漂移**的条目；
+    理由落成正文首行，同一理由不重复追加（此前实测一份审计里叠了 6 条同一说明：重绑必须幂等）。
+    """
+    issues: List[str] = []
+    if not str(note).strip():
+        return (["重绑理由为空（修复指引：--note 写明重审理由——无理由的重绑就是洗数据）"],
+                {"changed": 0})
+    line = "> 重审（%s）：%s" % (date.today().isoformat(), str(note).strip())
+    stats: Dict[str, Any] = {"records": 0, "rechained": 0, "subjects": 0, "skipped": 0,
+                             "note": line}
+    for ent in entries(root):
+        rel = str(ent["path"])
+        path = Path(root) / rel
+        try:
+            text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+        except OSError as exc:
+            issues.append("%s 不可读：%s（修复指引：修好编码/权限）" % (rel, exc))
+            continue
+        stats["records"] += 1
+        parts = text.split("---")
+        if len(parts) < 3 or parts[0].strip():
+            stats["skipped"] += 1              # legacy：无审计头，不重绑（只挂账）
+            continue
+        new_fm, changed = _rebind_subjects(root, parts[1])
+        if not changed:
+            continue
+        body = "---".join(parts[2:])
+        if line not in body:
+            body = chr(10) + line + chr(10) + body
+        stats["rechained"] += 1
+        stats["subjects"] += len(changed)
+        if not dry_run:
+            atomic_write.write_text(path, "---" + new_fm + "---" + body)
+    return issues, stats
