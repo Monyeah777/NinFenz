@@ -545,8 +545,7 @@ class RustFastLaneParityTest(unittest.TestCase):
  "drill_fidelity",
  "purity",
  "conformance_report",
- "code_metrics",
- "asset_contract"}
+ "code_metrics"}   # 2026-10-14 裁定：asset_contract 退出原生面（见 verify_report.rs 注释）
         # ⚠️ 这个集合**必须与快线的自算面同步**：`verify_report.call` 是 **native 优先**于 `--result
         # s`，
         # 所以少列一条不会立刻变红——但只要该条的分派将来断掉，就会静默回落到喂入值、**门禁照样全绿**

@@ -10,7 +10,7 @@ subjects:
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:739e151eda38b317123e03c06892f0ef2ef095735cc5dbb761453111ac2522b4
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
-  - desktop/tests/test_rust_fastlane.py:d81a50895980f0877f858b088f4ad430753d73807504e28b3d83058c0762ccba
+  - desktop/tests/test_rust_fastlane.py:ad0bab51b9c29d816845b3632f1d5a3011b3dcdfcb777188e84afcce1933b1c6
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:4d951c1d395bec365ecc9971d2ce6acdc0063439823d61e9c23b7fb77767c025
   - desktop/tests/test_mcp_runtime.py:9d6d1b11e2c2ecd517a9ddbe8bae64a3578e5e9462c12032dc1411f66f8f61eb
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - desktop/tests/test_nf_cli.py:4ddd00ad386d0e35e3bc717db777fda922019e1fd1f38580ef8912bdac682220
 ---
+> 重审（2026-10-14）：Rust 快线同步：receipts 固定段 44→54 + verify_report SPECS 30→31（role_coordinates）+ asset_contract 裁定退出原生面
+
 > 重审（2026-10-14）：引入 nf audit rebind 命令（core/audit.py + CLI + 顺序纪律 + 两处面收敛）
 
 

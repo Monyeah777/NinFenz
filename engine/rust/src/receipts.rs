@@ -15,7 +15,7 @@ pub const ALGORITHM: &str = "RFC6962-style sha256 domain-separated";
 
 /// 真源 `protocol_subjects()` 的固定段——**顺序敏感**，真源按此序取件、不排序。
 /// 改动本表即改变根：任何增删都必须同步 `desktop/src/core/receipts.py`。
-const FIXED: [&str; 44] = [
+const FIXED: [&str; 54] = [
     "STRATEGY.md",
     "01_核心协议.md",
     "02_联动注册表.md",
@@ -35,6 +35,16 @@ const FIXED: [&str; 44] = [
     "protocol/module_signatures.json",
     "protocol/conformance_report.json",
     "protocol/asset_line_baseline.json",
+    "protocol/asset_contracts.json",
+    "protocol/schema/asset_contracts.schema.json",
+    "protocol/role_coordinates.json",
+    "protocol/code_metrics_baseline.json",
+    "protocol/coupling_baseline.json",
+    "protocol/drill_fidelity.json",
+    "protocol/instruction_evidence.json",
+    "protocol/perf_budget.json",
+    "protocol/repo_stats.json",
+    "protocol/sast_baseline.json",
     "protocol/CONFORMANCE.md",
     "protocol/driver.json",
     "protocol/rfc_index.json",
@@ -242,9 +252,9 @@ mod tests {
 
     #[test]
     fn fixed_table_matches_python_source() {
-        assert_eq!(FIXED.len(), 44, "固定段条数必须与 receipts.py 同步");
+        assert_eq!(FIXED.len(), 54, "固定段条数必须与 receipts.py 同步");
         assert_eq!(FIXED[0], "STRATEGY.md");
-        assert_eq!(FIXED[43], "desktop/src/core/registry.json");
+        assert_eq!(FIXED[53], "desktop/src/core/registry.json");
     }
 
     #[test]

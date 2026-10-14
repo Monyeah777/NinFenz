@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "风格棘轮收口：E501 修掉 + I001 修掉 + UP006/UP031 按模块既有idiom 评审重冻",
+  "note": "快线同步与范围裁定（asset_contract 走出原生面，由真源喂入）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"
