@@ -1165,11 +1165,8 @@ BASELINE_DEEP_MAX_MS = 6000
 
 
 def baseline_tmp_dir() -> str:
-    """基线探针目录：`<系统临时目录>/nf_baseline`（固定名；**仓库之外**）。
-
-    不用 `mkdtemp`：本环境删目录受限，固定名 + 覆盖写既干净又确定性，不给工作区留件。
-    """
-    path = os.path.join(tempfile.gettempdir(), "nf_baseline")
+    """基线探针目录：`<系统临时目录>/nf_baseline_<pid>`（按进程唯一；仓库之外）。"""
+    path = os.path.join(tempfile.gettempdir(), "nf_baseline_%d" % os.getpid())
     os.makedirs(path, exist_ok=True)
     return path
 
@@ -1202,12 +1199,9 @@ TERMINAL_BASELINE: tuple[dict[str, Any], ...] = (
      "expect": "另开", "expect_exit": 2},
     {"id": "complete", "name": "补全（命令 / 子命令 / 旗标）",
      "argv": ("shell", "--complete", "nf lay", "--no-banner"), "expect": "nf layers"},
-    {"id": "limit-hint", "name": "限长提示（长列表不静默截断）",
+    {"id": "limit-hint-and-no-ansi", "name": "限长提示 + 非 TTY 无色（一行双断言）",
      "argv": ("shell", "--commands", "asset", "--limit", "3", "--no-banner"),
-     "expect": "还有"},
-    {"id": "no-ansi-by-default", "name": "非 TTY 无色（逐字节确定）",
-     "argv": ("shell", "--commands", "asset", "--limit", "3", "--no-banner"),
-     "forbid": "\x1b"},
+     "expect": ("还有",), "forbid": "\x1b"},
     {"id": "script-face", "name": "脚本面（--exec 逐条执行）",
      "argv": ("shell", "--exec", "/zone 0", "--no-banner"), "expect": "环境自检"},
     {"id": "history-replay", "name": "历史重放（!! / !n / !前缀）",
@@ -1248,15 +1242,21 @@ def baseline_table() -> tuple:
 
 
 def baseline_argv_issues() -> list:
-    """基线自身的自洽判据：id 唯一、只走 shell、且证据行只读。"""
+    """自洽判据：id 唯一、**argv 唯一**、只走 shell、且证据行只读；只报 issue、不删行。
+    2026-10-14：同一 argv 跑两遍纯属冗余（差异只可能在断言里 → 合并为一行双断言）。"""
     issues = []
     seen = set()
+    seen_argv: dict = {}
     for row in TERMINAL_BASELINE:
         rid = str(row.get("id"))
         if not rid or rid in seen:
             issues.append("基线行 id 缺失或重复：%s" % rid)
         seen.add(rid)
         argv = [str(a) for a in row.get("argv") or []]
+        key = tuple(argv)
+        if key in seen_argv:
+            issues.append("基线行 %s 与 %s 的 argv 相同——合并断言，勿重复执行" % (rid, key))
+        seen_argv[key] = rid
         if not argv or argv[0] != "shell":
             issues.append("基线行 %s 的入口不是 shell：%s" % (rid, argv[:1]))
         if not row.get("expect") and not row.get("forbid"):

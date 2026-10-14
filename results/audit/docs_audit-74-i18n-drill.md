@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:316019ad73368a42d0aa938785e4002f78a5146666f4a84719f813d4bc21d45c
+  - protocol/locales.json:83ea0b4fadc2adb06fd64a6cb36659d6dd12c614cae5408c8b2d257f745cda8e
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
   - docs/en/mcp.md:7a839ec9b64bbae0d886e647efd31c9edd01673b710c6c4664ed81db7732e136
   - docs/ja/mcp.md:477e3fddc1a8c67d1f24e8d6779fe6b5d93dae30a0221ff3f1fea93f99c7edf0
-  - docs/en/terminal.md:19fd82dd77b72366c4fb0cde2ce62294f9d14b7eac10242d1bf2f08480fee862
-  - docs/ja/terminal.md:673e4869c326ba148893df4ed4e42f35a929f245269ce05ad9f7315235345783
+  - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
+  - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
   - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
@@ -46,7 +46,10 @@ subjects:
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物：`protocol/RECEIPTS.json`、`protocol/conformance_report.json`、`protocol/generated/*`、`results/interop/*`、`protocol/approvals/*` 均为可复算投影或每次重签即变；`protocol/drill_fidelity.json` 由 `scripts/drill_fidelity.py` 从样本重算，同样不入绑定。
 
-## 一、内部差距（开工依据）
+## 一、内部差距
+
+> 重审（2026-10-14 · 终端基线并发与 argv 唯一性）：被审对象随本轮改动（`baseline_tmp_dir()` 改为按进程唯一；`baseline_argv_issues()` 补 argv 唯一性；基线表 20→19 行）而变，subjects 依「重审并更新 digest」处置——**机械重绑**，既有结论不变。
+（开工依据）
 
 1. **文档面 i18n 只覆盖 2 份指南**（`docs/locales.md` 自述「发布」与「本地化」），而对接方第一跳 `docs/mcp.md`、agent 人机入口 `docs/terminal.md`、架构面 `docs/layers.md` 仍单语——注册机制（文件即真源 + 声明式增长）已立，缺的是译件本身。
 2. **执行失范类型只有 4 类**（句子级 fabricated_id / browse_repeat / no_citation / semantic_misalignment），62 计划点名的「跨管线串号」「资产键编造」无判据——编号真实但属其它管线、资产键编造会**静默通过**。
