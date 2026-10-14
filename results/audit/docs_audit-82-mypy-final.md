@@ -22,16 +22,20 @@ subjects:
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/orchestration.py:6c860bebc068000dbd8f7a68103b300ab662c0666c912159226f015cea43327c
   - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
-  - desktop/src/core/decisions.py:f5f5f7d77cbe2bf3a91cc930f6658fba31fc05932ef299938897f50d16126ba1
-  - desktop/src/core/layer_model.py:18822a9c4a8b39dc8076cbf40695e40588cb6025a5e59efe8f93769ef9315357
+  - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
+  - desktop/src/core/layer_model.py:fa3735754774971ab33904df59bfd42df13d49df986402cd31b287f94b48d6f2
   - desktop/src/core/import_graph.py:b97893527ec592921f81b96d9d9bd945be938db31e5d8c39d71d5a1d96990d9b
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
   - desktop/src/core/daemon.py:6091dc72140524c34ba23662d457977511f49fcbee6573bd8cb0a2c91d405e5d
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:0ca139b5253821b5d4792901efe3133e7b3d52ef15a5c7272bcdc23515b369a2
+  - protocol/code_metrics_baseline.json:5f10f51ab13ceef1d0051e908872ea8ceaa76970f9decdd5d87c3a0f98e47d3c
 ---
+> 重审（2026-10-14 · ADR-0006 L11 职能坐标）：被审对象随本波改动（protocol/LAYERS.json 增 roles 段 / desktop/src/core/layer_model.py 接 L11 / docs/layers.md 生成区刷新 / protocol/code_metrics_baseline.json 按工具指引重冻），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
+
+
+> 重审（2026-10-14 · ADR-0006）：`decisions.py` 的模块自述按「取代链互指由测层常驻判」更正（**行数不变**，仅同一行换文案），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 
 > 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 

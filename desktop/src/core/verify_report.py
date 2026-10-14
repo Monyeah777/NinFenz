@@ -68,6 +68,8 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
     ("asset_contract",
  "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
      "asset_contract", "scan", "scan"),
+    ("role_coordinates", "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
+     "role_model", "scan", "scan"),
 )
 
 

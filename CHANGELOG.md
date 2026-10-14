@@ -1,8 +1,15 @@
 # Changelog
 
-## [未发布] - 2026-10-10 · 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
+## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+
+- **职能坐标落地（ADR-0006 取代 ADR-0004 的「不逐件贴标签」条款）：与抽象阶梯轴**正交**的第二轴——核内逐件、核外按规则**（**作者指令**：「取代，坐标可推导对核要求逐件」）：
+  ① **新增 L11 职能坐标**：`protocol/LAYERS.json` 加 `roles` 段（七职能封闭集 + 9 条规则 + 写例外表）；新增 `desktop/src/core/role_model.py` 实现三条可判定性——**①全覆盖**（仓库件面 `repo_face.walk_repo_paths` 每件至少一个坐标；核内件不许落兜底；核内实现面 `.py` 必须有自述）、**②规则不漂**（规则空转即红；冻结投影 `protocol/role_coordinates.json` 与实时重算一致）、**③核内一致**（`verify` 是只读判据，自带写盘入口须在 `roles.write_exceptions` 逐条登记，例外表只许缩小）。
+  ② **首跑实测**：3763 件全入库（核内 **1955** 件逐件登进投影）；`uncovered 0`；`verify_writers 10`（`asset_contract` / `code_metrics` / `coupling_metrics` / `repo_stats` / `sast_check` …——「投影成本中心」的实测清单）；`kernel_no_self 310`（测试件与第二实现线无可推职能句的可减缺口，不计 FAIL）。
+  ③ **接线纪律**：职能判据**不折进 `layer_model` 的 issues**——该面是跨语言对照面（`engine/rust/src/layers.rs` 同步实现 L1-L10），折进去会让第二实现线当场不同步；改走 `verify_report` 判据表（同 `redos` 先例）。投影由 `nf layers --write` 与阶梯投影同命令刷新。
+  ④ **取代链「互指」判据补齐**：此前只在模块自述里、代码不判（变异实证：单向 `supersedes` 通过、`chains: 0`）——判据落测层（同 ERRATA 先例），core 自述与判据对齐（同行替换，不涨行）。
+  ⑤ **验收**：`nf decisions verify` 6 条 · accepted 5 全一致；`nf conformance` **27/27 conformant**；`nf receipts --scope protocol` 58 件单根一致；`verify_report` 31 条 PASS 29 / FAIL 0；`code_metrics` 0；测试切片 65 OK（含 `test_role_model` 13 例，三条判据各有变异自证）。**审计机械重绑 17 条记录**——一次改 `LAYERS.json`/基线扇出 17 份审计，是本波测得的**扇出成本**。
 
 - **全仓审计 V3 修复波（2026-10-10，结果形态）**：按审计 §15 执行计划落地 P0/P1 与 P1 候选、部分 P2/P3——
   ① 守护单条坏输入零隔离修复（CLI 与守护共用 guarded_main 错误面 + 请求/连接级隔离 + 结构化错误帧）；

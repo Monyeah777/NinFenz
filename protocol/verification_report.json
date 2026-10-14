@@ -1,9 +1,9 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 30 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
     "expected_checks": 40,
     "expected_pass": 72,
-    "report_items": 30,
+    "report_items": 31,
     "verify_version": "v2.30"
   },
   "items": [
@@ -24,7 +24,7 @@
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
-          "derived": 6,
+          "derived": 7,
           "rules": 10,
           "surfaces": 4,
           "tiers": 4
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "6b0d5f554cc2801d0b0c63bd323b26bbbd8aa593540464b3bf9e9f672d5f233f",
+        "root": "0e3edc94fc7604d3cffeeb319f997caa39dc08c3f2e1733468d95e07ad535ff6",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 288,
-        "files": 288,
+        "baseline": 289,
+        "files": 289,
         "max_fn_cc": 114,
         "max_fn_lines": 1218,
         "max_lines": 7332
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 191,
-        "probed": 191
+        "patterns": 198,
+        "probed": 198
       },
       "status": "pass",
       "warns": 0
@@ -430,10 +430,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 3,
+        "metrics_missing": 1,
         "metrics_recorded": 241,
-        "modules": 241,
+        "modules": 242,
         "registered_cycles": 0,
         "registered_sdp": 8,
         "sdp": 8
@@ -478,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 63,
+        "consumed": 64,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 65
+        "scanners": 66
       },
       "status": "pass",
       "warns": 0
@@ -516,14 +516,32 @@
       },
       "status": "pass",
       "warns": 0
+    },
+    {
+      "id": "role_coordinates",
+      "issues": 0,
+      "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
+      "sample": [],
+      "source": "role_model.scan",
+      "stats": {
+        "files": 3763,
+        "kernel": 1955,
+        "kernel_no_self": 310,
+        "rules": 9,
+        "uncovered": 0,
+        "verify_writers": 10,
+        "write_exceptions": 10
+      },
+      "status": "pass",
+      "warns": 0
     }
   ],
-  "root_digest": "b9f59e5261fa13782eae850ddaee56da9594e19c02878ab68d537e73308c4e88",
+  "root_digest": "4d97968bdc5d9fb4adb24c85018d327969ef4bb6668828136c8d09e4c0c66a12",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 28,
+    "pass": 29,
     "warn": 2
   }
 }

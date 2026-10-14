@@ -6,7 +6,7 @@
 - 编号：`id` 必须等于文件名前缀 `ADR-\\d{4}`；全库唯一；
 - 状态：`status ∈ {proposed, accepted, superseded, deprecated}`；`date` 为 YYYY-MM-DD；
 - 三段齐：正文必须含 `## 背景` / `## 决策` / `## 后果`；
-- 取代链：`supersedes` 与 `superseded_by` 互指、编号在册、链可解析且不成环；
+- 取代链：编号在册、链可解析且不成环（`superseded` 须给 `superseded_by`）；**互指**由 test_decisions.py 常驻判（同 ERRATA 落测层先例）；
 - 证据可解析：`evidence` 每条须解析到仓库真实件、`checkN`（verify.sh 在册）或 `ADR-N`；
 - **不可改**：`status: accepted` 的 ADR 必须已被协议回执锚定（`protocol/RECEIPTS.json`）——
   正文一改回执即失效，于是"改了"必然被 check35 抓住，决策只能靠新增 + 互指 supersede 演进。

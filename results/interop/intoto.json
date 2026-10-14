@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 57,
+    "count": 58,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "ccb8eebcf97112704166504722c833e0479724d61a202e0ca3fa78228a0de23e",
+    "root": "be37ac7baed5d2ce5e56991e90e81c181aafb7c14556cdb5db247db523d0f91a",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
+        "sha256": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -173,7 +173,7 @@
     },
     {
       "digest": {
-        "sha256": "a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380"
+        "sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
       },
       "name": "protocol/LAYERS.json"
     },
@@ -209,7 +209,7 @@
     },
     {
       "digest": {
-        "sha256": "e2bd0a3e0da7d435da858994e87904358fe024b2463f1ea352f2e178ad67df0a"
+        "sha256": "4eb7e47cabae9d472c6475edeb70fb4959b5b762727bf33fb64ca97e24a93109"
       },
       "name": "decisions/INDEX.md"
     },
@@ -341,7 +341,7 @@
     },
     {
       "digest": {
-        "sha256": "9881ef04d900dd8d9f44748d7e4477ca32c8914abc717fbccb7b7072c6167674"
+        "sha256": "3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196"
       },
       "name": "decisions/ADR-0004-抽象阶梯两轴与纵切.md"
     },
@@ -350,6 +350,12 @@
         "sha256": "e9c7a1627e7e07b80b3523ae4d5c90e4834d8be761ef3e47029787e9398fb762"
       },
       "name": "decisions/ADR-0005-新增NET引擎线.md"
+    },
+    {
+      "digest": {
+        "sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
+      },
+      "name": "decisions/ADR-0006-职能坐标与核内逐件定位.md"
     }
   ]
 }

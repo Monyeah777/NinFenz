@@ -98,6 +98,60 @@ class TestNegatives(unittest.TestCase):
         _mk(tmp, dc.INDEX_REL, "# hand written\n")
         self.assertTrue(dc.check_projection(tmp))
 
+    def test_one_way_supersede_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        b = (GOOD.replace("id: ADR-0001", "id: ADR-0002")
+                 .replace("supersedes: —", "supersedes: ADR-0001"))
+        _scene(tmp, text=GOOD, name="ADR-0001-t.md",
+               extra={"decisions/ADR-0002-t.md": b})
+        dc.write_projection(tmp)
+        self.assertTrue(any("未互指" in i for i in mutual_issues(tmp)))
+
+    def test_mutual_supersede_is_clean(self):
+        tmp = tempfile.mkdtemp()
+        a = GOOD.replace("superseded_by: —", "superseded_by: ADR-0002")
+        b = (GOOD.replace("id: ADR-0001", "id: ADR-0002")
+                 .replace("supersedes: —", "supersedes: ADR-0001"))
+        _scene(tmp, text=a, name="ADR-0001-t.md",
+               extra={"decisions/ADR-0002-t.md": b})
+        dc.write_projection(tmp)
+        self.assertEqual([], mutual_issues(tmp))
+
+
+def mutual_issues(root: str):
+    """取代链**互指**判据：A.supersedes = B  ⟺  B.superseded_by = A。
+
+    为什么在测试层（2026-10-14）：本判据的天然落点是 `core/decisions.py::scan`，而该件在
+    棘轮冻结面上（重冻 = 给中间态盖章）；测层随 check12 常驻生效，且不动冻结面——与
+    `errata_issues` 同一先例。
+    """
+    rows = dc.entries(root)
+    ids, sup_by, sup_es = set(), {}, {}
+    for e in rows:
+        fm = e["fm"]
+        did = str(fm.get("id") or "")
+        if not did:
+            continue
+        ids.add(did)
+        sb = str(fm.get("superseded_by") or "").strip()
+        sp = str(fm.get("supersedes") or "").strip()
+        if sb not in ("—", "-", ""):
+            sup_by[did] = sb
+        if sp not in ("—", "-", ""):
+            sup_es[did] = sp
+    out = []
+    for did, target in sup_es.items():
+        if target in ids and sup_by.get(target) != did:
+            out.append("%s 的 supersedes=%s 未互指（%s 的 superseded_by=%s）"
+                       "（修复指引：被取代方标 superseded_by=%s 并重签回执）"
+                       % (did, target, target, sup_by.get(target) or "—", did))
+    for did, target in sup_by.items():
+        if target in ids and sup_es.get(target) != did:
+            out.append("%s 的 superseded_by=%s 未互指（%s 的 supersedes=%s）"
+                       "（修复指引：取代方标 supersedes=%s）"
+                       % (did, target, target, sup_es.get(target) or "—", did))
+    return out
+
 
 ERRATA_REL = "decisions/ERRATA.json"
 ERRATA_SCHEMA = "nf-decisions-errata/1"
