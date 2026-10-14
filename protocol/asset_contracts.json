@@ -55,55 +55,120 @@
       "tests": [
         "desktop/tests/test_content_face.py"
       ]
+    },
+    {
+      "id": "role-model",
+      "path": "desktop/src/core/role_model.py",
+      "lang": "python",
+      "tests": [
+        "desktop/tests/test_role_model.py"
+      ],
+      "deny_calls": [
+        "eval",
+        "exec",
+        "__import__",
+        "os.system",
+        "pickle.loads",
+        "marshal.loads"
+      ]
     }
   ],
   "data": [
     {
+      "id": "pack-outputs-vs-schemas",
+      "glob": "community/*/outputs/*.json",
       "format": "json",
-      "id": "pack-report-d05",
+      "schema_siblings": [
+        "schemas/{stem}.schema.json"
+      ],
+      "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死"
+    },
+    {
+      "id": "pack-reports-io",
+      "glob": "community/*/outputs/REPORT.json",
+      "format": "json",
+      "schema_siblings": [
+        "schemas/{stem}.schema.json",
+        "schemas/DOMAIN_REPORT.schema.json"
+      ],
       "link": {
-        "base": "community/AI保险域包",
         "path_field": "sample",
         "rows_field": "sample_rows"
       },
-      "path": "community/AI保险域包/outputs/REPORT.json",
-      "required_fields": [
-        "kind",
-        "code",
-        "domain",
-        "family",
-        "sample",
-        "sample_rows",
-        "metrics"
-      ],
-      "schema": "community/AI保险域包/outputs/schemas/DOMAIN_REPORT.schema.json"
+      "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）"
     },
     {
+      "id": "pack-cases-csv",
+      "glob": "community/*/outputs/samples/CASES.csv",
       "format": "csv",
-      "id": "pack-cases-d05",
-      "min_rows": 1,
-      "path": "community/AI保险域包/outputs/samples/CASES.csv",
-      "required_columns": [
+      "required_any_columns": [
         "case_id",
-        "gold_fields",
-        "pred_fields"
-      ]
+        "task_id",
+        "query_id",
+        "bucket"
+      ],
+      "min_rows": 1,
+      "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」"
     },
     {
-      "format": "markdown",
       "id": "library-index",
-      "path": "library/INDEX.md"
+      "path": "library/INDEX.md",
+      "format": "markdown"
     },
     {
-      "format": "json",
       "id": "ladder-truth",
       "path": "protocol/LAYERS.json",
+      "format": "json",
       "required_fields": [
         "schema",
         "rules",
         "tiers"
       ],
       "sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
+    },
+    {
+      "id": "pack-protocol-yaml",
+      "glob": "community/*/protocol.yaml",
+      "format": "yaml",
+      "schema": "protocol/schema/protocol.schema.json",
+      "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）"
+    },
+    {
+      "id": "pack-charts-mermaid",
+      "glob": "community/*/outputs/charts/*.mmd",
+      "format": "mmd",
+      "note": "图表资产：只判「首关键词是合法 Mermaid 图型」，不解析图内容"
+    },
+    {
+      "id": "pack-charts-graphml",
+      "glob": "community/*/outputs/**/*.graphml",
+      "format": "graphml",
+      "min_nodes": 1,
+      "note": "图结构资产：XML 良构 + 节点/边计数"
+    },
+    {
+      "id": "asset-contracts-self",
+      "path": "protocol/asset_contracts.json",
+      "format": "json",
+      "required_fields": [
+        "schema",
+        "data",
+        "code",
+        "script"
+      ],
+      "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据"
+    },
+    {
+      "id": "role-coordinates",
+      "path": "protocol/role_coordinates.json",
+      "format": "json",
+      "required_fields": [
+        "schema",
+        "counts",
+        "kernel",
+        "root_digest"
+      ],
+      "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判"
     }
   ],
   "note": "数字资产契约声明面（三面：data / code / script）。data 面判格式 + 字段完整性 + 防篡改 + 输入输出一致性；code 面判 AST 规范 + 可证空指针 + 测试用例在场（安全漏洞面由 scripts/sast_check.py 的 bandit/ruff-S 计数棘轮与 purity_scan R6 守着，本面不重造第二套口径）；script 面判脚本自带 nf-io 头与声明的双源一致 + 链上 A 输出 ⊆ B 输入。真源单点：改本件即改契约，verify check40 与 nf asset contract 同源消费。",

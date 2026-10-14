@@ -4,6 +4,14 @@
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
 
+- **数字资产契约深化（D2/D1/E1/E3）：把「手挑 11 件样本」升成「按约定自动发现 + 两册合一登记」**（**作者指令**：「按照最优决策，全做」）：
+  ① **D2 包产物自动发现**：新增 `schema_siblings`（`schemas/{stem}.schema.json`、`schemas/DOMAIN_REPORT.schema.json` 候选）与 `required_any_columns`（表头**族**各不相同——实测 CASES.csv 有 11 种表头，故只判「至少含族内一个 id 列」）两个声明原语；受约件从 **11 → 956**（216 对同名 schema 校验全绿；无 schema 的 206 件计入 `no_schema` 可减缺口，不判死）。
+  ② **D1 两册合一**：仓库已有 ODCS 式登记册 `protocol/data_contracts.json`，资产册再造一份「谁管」就是第二套词表——新增判据「**资产册声明的 `protocol/*.json` 必须在登记册里**」，并把 `protocol/asset_contracts.json`（自指自检）与 `protocol/role_coordinates.json` 补登记（`quality_rule: check40`，`modeling.verify_contracts` 0 issue）。
+  ③ **E1 数据面五格式**：`yaml`（复用惰性 PyYAML；**缺依赖报缺口不放行**）/ `toml`（stdlib）/ `jsonl`（逐行）/ `graphml`（XML 良构 + 节点边计数）/ `mmd`（首关键词须是合法 Mermaid 图型）；并实证包 `protocol.yaml` 过 `protocol/schema/protocol.schema.json`。
+  ④ **E3 脚本面**：语言词表加 `powershell`（`#` 头同形 + 重定向/读写 cmdlet 的字面路径）；仓库无自带 `nf-io` 的 `.ps1`，能力由测层夹具覆盖，**不假装有**。
+  ⑤ **验收**：`nf asset contract` 0 issue（**956 件** · 数据契约 8→10 · 代码 4 · 脚本 4 · 链 1）；`nf conformance` 27/27；`nf receipts` 58 件；`verify_report` 31 条 PASS 29；`text_hygiene / role / code_metrics / audit drift` 全 0；测试切片 78 OK（`test_asset_contract` 49 例，五格式与 PowerShell 各有正反例）。
+  ⑥ **未做（已排期，附第一片设计）**：D3 写通道契约化（须先为 4 个只有 verify_report 判据的基线件补 `assertion:` 条目）、E2 第二实现线结构闸门（先按 ADR-0005 声明范围）、D4 资产摘要折进 receipts 锚定面、S1 包自带 `outputs/contracts.json` 骨架、S3 导出 Frictionless/ODCS、S2 可移植 `*.contract.json` 规范。
+
 - **职能坐标落地（ADR-0006 取代 ADR-0004 的「不逐件贴标签」条款）：与抽象阶梯轴**正交**的第二轴——核内逐件、核外按规则**（**作者指令**：「取代，坐标可推导对核要求逐件」）：
   ① **新增 L11 职能坐标**：`protocol/LAYERS.json` 加 `roles` 段（七职能封闭集 + 9 条规则 + 写例外表）；新增 `desktop/src/core/role_model.py` 实现三条可判定性——**①全覆盖**（仓库件面 `repo_face.walk_repo_paths` 每件至少一个坐标；核内件不许落兜底；核内实现面 `.py` 必须有自述）、**②规则不漂**（规则空转即红；冻结投影 `protocol/role_coordinates.json` 与实时重算一致）、**③核内一致**（`verify` 是只读判据，自带写盘入口须在 `roles.write_exceptions` 逐条登记，例外表只许缩小）。
   ② **首跑实测**：3763 件全入库（核内 **1955** 件逐件登进投影）；`uncovered 0`；`verify_writers 10`（`asset_contract` / `code_metrics` / `coupling_metrics` / `repo_stats` / `sast_check` …——「投影成本中心」的实测清单）；`kernel_no_self 310`（测试件与第二实现线无可推职能句的可减缺口，不计 FAIL）。
