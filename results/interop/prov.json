@@ -111,7 +111,7 @@
     {
       "@id": "nf:file/decisions/ADR-0004-抽象阶梯两轴与纵切.md",
       "@type": "prov:Entity",
-      "nf:sha256": "9881ef04d900dd8d9f44748d7e4477ca32c8914abc717fbccb7b7072c6167674"
+      "nf:sha256": "3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196"
     },
     {
       "@id": "nf:file/decisions/ADR-0005-新增NET引擎线.md",
@@ -119,9 +119,14 @@
       "nf:sha256": "e9c7a1627e7e07b80b3523ae4d5c90e4834d8be761ef3e47029787e9398fb762"
     },
     {
+      "@id": "nf:file/decisions/ADR-0006-职能坐标与核内逐件定位.md",
+      "@type": "prov:Entity",
+      "nf:sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
+    },
+    {
       "@id": "nf:file/decisions/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "e2bd0a3e0da7d435da858994e87904358fe024b2463f1ea352f2e178ad67df0a"
+      "nf:sha256": "4eb7e47cabae9d472c6475edeb70fb4959b5b762727bf33fb64ca97e24a93109"
     },
     {
       "@id": "nf:file/desktop/src/core/registry.json",
@@ -151,7 +156,7 @@
     {
       "@id": "nf:file/protocol/LAYERS.json",
       "@type": "prov:Entity",
-      "nf:sha256": "a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380"
+      "nf:sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
     },
     {
       "@id": "nf:file/protocol/assertions.json",
@@ -176,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
+      "nf:sha256": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
     },
     {
       "@id": "nf:file/protocol/data_contracts.json",
@@ -377,6 +382,6 @@
   "x-nf-counts": {
     "activities": 3,
     "agents": 3,
-    "entities": 63
+    "entities": 64
   }
 }

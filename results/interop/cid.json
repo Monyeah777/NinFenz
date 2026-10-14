@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreibdos34ypmbvl5tgtbnfywpm5iamovcs5ncmbvsisyxj5x7citbby",
+      "cid": "bafyreiddlfj3b6s2oz7xvdsbxlrodppkerf7rqc332su3rp4jg54enbc6u",
       "path": "protocol/conformance_report.json",
-      "sha256": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
+      "sha256": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -137,9 +137,9 @@
       "sha256": "c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016"
     },
     {
-      "cid": "bafyreifasdxekpzvmyqdxch4g74bi7errdheprsyex7vzjap7ktdvitdqa",
+      "cid": "bafyreifbm7toavzg3rxcej7bbed2qjxx5bfw3kmobenreykfznkonwiif4",
       "path": "protocol/LAYERS.json",
-      "sha256": "a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380"
+      "sha256": "a167e6e05726dc6e2227e10907a826f7e84b6da98e091b126145cb54e6d9082f"
     },
     {
       "cid": "bafyreied5ifu7locvwyg7vsknszwmwow3ujmmfgk4vaizcznev7xixg2ry",
@@ -167,9 +167,9 @@
       "sha256": "8702381be054cab858feb4591ad9733f97ab34884630793d673bd89339d4ffb3"
     },
     {
-      "cid": "bafyreihcxufd4dnh2q25vbmjstuhsbbvr7qcjmsgh4pkguxs4f4k2z67bi",
+      "cid": "bafyreicow7shzk5otvdsyzdv5xvxb62jlg23oytsppzt7nsmvf7cjkjrbe",
       "path": "decisions/INDEX.md",
-      "sha256": "e2bd0a3e0da7d435da858994e87904358fe024b2463f1ea352f2e178ad67df0a"
+      "sha256": "4eb7e47cabae9d472c6475edeb70fb4959b5b762727bf33fb64ca97e24a93109"
     },
     {
       "cid": "bafyreidpsmrdixkrxrpflye44bb6qa7kvmqt5ujdytxf2xiseog54oelg4",
@@ -277,14 +277,19 @@
       "sha256": "43ff7428a28389ce1cca04e98bf2aba3109da23ec7511ce49a937e36399f9f4f"
     },
     {
-      "cid": "bafyreieyqhxqjwia3wgz6rdurv7ei56kglejcsv4of73zs33obzmmftwoq",
+      "cid": "bafyreib3nq7ednt3hn3iiesrmdum3ulk3bfrugai6lxvqqsgv4qhludbsy",
       "path": "decisions/ADR-0004-抽象阶梯两轴与纵切.md",
-      "sha256": "9881ef04d900dd8d9f44748d7e4477ca32c8914abc717fbccb7b7072c6167674"
+      "sha256": "3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196"
     },
     {
       "cid": "bafyreihjy6qwe7t6a64awnjdvzgvzeheqngyxz3b547eoauxq7uttd5xmi",
       "path": "decisions/ADR-0005-新增NET引擎线.md",
       "sha256": "e9c7a1627e7e07b80b3523ae4d5c90e4834d8be761ef3e47029787e9398fb762"
+    },
+    {
+      "cid": "bafyreignlbgztaesqjxvx5mbjc2hqvffn4bj6uldfqyhllierxaxr5roqu",
+      "path": "decisions/ADR-0006-职能坐标与核内逐件定位.md",
+      "sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
     }
   ],
   "multibase": "base32 (lowercase, no padding, prefix 'b')",

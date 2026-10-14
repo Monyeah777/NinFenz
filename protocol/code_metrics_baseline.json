@@ -576,7 +576,7 @@
       "max_fn_lines": 45
     },
     "desktop/src/core/layer_model.py": {
-      "lines": 627,
+      "lines": 632,
       "max_fn_cc": 22,
       "max_fn_lines": 47
     },
@@ -1005,6 +1005,11 @@
       "max_fn_cc": 26,
       "max_fn_lines": 56
     },
+    "desktop/src/core/role_model.py": {
+      "lines": 346,
+      "max_fn_cc": 19,
+      "max_fn_lines": 34
+    },
     "desktop/src/core/round_drill.py": {
       "lines": 54,
       "max_fn_cc": 13,
@@ -1171,7 +1176,7 @@
       "max_fn_lines": 9
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 196,
+      "lines": 198,
       "max_fn_cc": 10,
       "max_fn_lines": 24
     },

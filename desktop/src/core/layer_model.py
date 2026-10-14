@@ -27,6 +27,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from core import json_doc
+from core import role_model as _roles
 from core import conformance_scan as csc
 from core import face_key as _fk
 from core import atomic_write
@@ -547,6 +548,10 @@ def write_region(root: str = ".") -> str:
     # 原子写（2026-09-30 收口）：`docs/layers.md` 是**活文档**，且 `layer_model` 自己会把
     # 它当常驻语料读（L8/L10）——裸 `open(w)` 下并发读者可能读到半截正文。
     atomic_write.write_text(path, new)
+    # 第二轴（职能坐标，ADR-0006）的冻结投影同命令刷新：`nf layers --write` = 两轴投影一起重生成。
+    # 注意：**不**把职能判据折进本模块 issues——本面是跨语言对照面（engine/rust 的 layers.rs 同步实现
+    # L1-L10），折进来会让第二实现线当场不同步；职能判据走 verify_report 判据表（同 redos 先例）。
+    _roles.write(root)
     return DOC_REL
 
 

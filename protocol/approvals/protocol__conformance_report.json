@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-13",
-  "approved_by": "本轮执行者",
-  "note": "机械重批：核心语义通用化波次后冻结链重生成（conformance → approve → receipts）",
+  "approved_at": "2026-10-14",
+  "approved_by": "Monyeah777",
+  "note": "ADR-0006 职能坐标（L11 走判据表，不折进跨语言对照面）：roles 段 + role_model + 冻结投影 + 审计重绑 + 基线重冻",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "2374b7cc3d81aafb334c2d2e2cf6750063aa2975a2606b244b174f6ff122610e"
+  "subject_digest": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
 }
