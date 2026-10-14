@@ -214,6 +214,8 @@ def _canon_argv(name: str) -> list:
 CANON = {
     "approve": ["approve", "--verify"],
     "audit check": ["audit", "check", "results/audit/docs_audit-73-layers.md"],
+    # --dry-run 是只读面（实测跑完 git status 无新件）；重绑的真写面另有 test_audit_rebind 覆盖。
+    "audit rebind": ["audit", "rebind", "--note", "canon 只读面", "--dry-run"],
     "bench compare": ["bench", "compare", "@runs_glob"],
     "bench report": ["bench", "report", "@runs_glob"],
     "bench run": ["bench", "run", "--case",

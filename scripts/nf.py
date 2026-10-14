@@ -4567,7 +4567,7 @@ def _path_writing_issue(args) -> str:
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
-                    "check_md", "entry", "exceptions", "file", "history", "key", "ledger",
+                    "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
                     "questions", "registry", "root", "runs", "script_file", "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
