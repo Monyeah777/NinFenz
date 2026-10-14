@@ -58,10 +58,10 @@ public static class AnchorChecks
         var err = false;
         void No(string message) { fail++; log.Add("  [FAIL] " + message); err = true; }
 
-        if (!File.Exists(Path.Combine(root, "04_模块库", "通用类", "M10_时间推进.md")))
-            No("缺 通用类/M10_时间推进.md");
-        if (!File.Exists(Path.Combine(root, "04_模块库", "事件类", "M22_事件叙事.md")))
-            No("缺 事件类/M22_事件叙事.md");
+        if (!File.Exists(Path.Combine(root, "04_模块库", "通用类", "M10_节拍推进.md")))
+            No("缺 通用类/M10_节拍推进.md");
+        if (!File.Exists(Path.Combine(root, "04_模块库", "事件类", "M22_事件编排.md")))
+            No("缺 事件类/M22_事件编排.md");
         var n10 = CountNamed(Path.Combine(root, "04_模块库"), "M10_*.md");
         var n22 = CountNamed(Path.Combine(root, "04_模块库"), "M22_*.md");
         if (n10 != 1) No($"04 内 M10 文件应 1 件（仅通用:M10），实为 {n10}");
@@ -121,7 +121,7 @@ public static class AnchorChecks
         }
         foreach (var word in new[] { "视角裁剪", "可见域", "推断域", "隐藏域", "fail", "白描" })
         {
-            if (!Has(root, "04_模块库/通用类/M23_认知边界.md", word)) No($"M23 缺认知域措辞: {word}");
+            if (!Has(root, "04_模块库/通用类/M23_可见性边界.md", word)) No($"M23 缺认知域措辞: {word}");
         }
         if (!err)
         {
@@ -142,7 +142,7 @@ public static class AnchorChecks
                      "pass:", "warn:", "fail:", "白描", "隐藏域直述", "gate_action", "gate_decision_record",
                  })
         {
-            if (!Has(root, "04_模块库/通用类/M80_输出生成器.md", word)) No($"M80 gate 缺: {word}");
+            if (!Has(root, "04_模块库/通用类/M80_输出质检门.md", word)) No($"M80 gate 缺: {word}");
         }
         foreach (var word in new[] { "pass", "warn", "fail", "隐藏域直述", "白描" })
         {

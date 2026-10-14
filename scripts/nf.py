@@ -2410,7 +2410,7 @@ def _cmd_module(args) -> int:
         if isinstance(exc, FileNotFoundError):
             print("  ✗ 模块文件不存在：%s" % fpath, file=sys.stderr)
             print("  修复指引：file 须是**在场**模块 md 路径（如 "
-                  "04_模块库/通用类/M00_数据结构.md，或 community/<包>/modules/<文件>.md）；"
+                  "04_模块库/通用类/M00_数据槽总线.md，或 community/<包>/modules/<文件>.md）；"
                   "`python scripts/nf.py module ls` 可枚举现有模块", file=sys.stderr)
         else:
             return _machine_fail(

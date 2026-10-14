@@ -74,7 +74,7 @@ class SchemaSubsetValidatorTest(unittest.TestCase):
 
     def test_real_contract_mutation_detected(self):
         """真实机读块逐字段变异 → 均被 schema 拦截（漂移即 FAIL 的实证）。"""
-        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据结构.md")
+        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据槽总线.md")
         with open(m00, encoding="utf-8") as fh:
             text = fh.read()
         parsed = sl._fence_yaml(text, "machine_contract")
@@ -105,7 +105,7 @@ class SchemaSubsetValidatorTest(unittest.TestCase):
         self.assertTrue(any("未知字段 extra_event" in m for m in sl.subset_validate(mut, schema)))
 
     def _m00_contract(self):
-        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据结构.md")
+        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据槽总线.md")
         with open(m00, encoding="utf-8") as fh:
             parsed = sl._fence_yaml(fh.read(), "machine_contract")
         self.assertIsNotNone(parsed)

@@ -201,7 +201,7 @@ class FaceReuseBudgetTest(unittest.TestCase):
 
     KNOWN_CASES = (("改文档", ("docs/44_m2_ai通用数据规范.md",), 1),
                    ("改包产物件", ("community/ai能力资源域包/outputs/index.json",), 2),
-                   ("改 04_模块库", ("04_模块库/通用类/m00_数据结构.md",), 4))
+                   ("改 04_模块库", ("04_模块库/通用类/m00_数据槽总线.md",), 4))
     UNKNOWN_FULL_COUNT = 6
 
     def test_fingerprint_recompute_budget(self):
@@ -342,8 +342,8 @@ class FaceFingerprintTest(unittest.TestCase):
             self.assertEqual(base + 2, cs._FACE_FP_STATS["recomputes"])
         inc = cs._FACE_FP_STATS["incremental"]
         with mock.patch.object(cs, "changed_paths",
-                               lambda: (True, {"04_模块库/通用类/m00_数据结构.md"})):
-            # 确知沾到、但**盘上还在**（监听给的是小写，真名是 `M00_数据结构.md`）⇒ 成员集合没变，
+                               lambda: (True, {"04_模块库/通用类/m00_数据槽总线.md"})):
+            # 确知沾到、但**盘上还在**（监听给的是小写，真名是 `M00_数据槽总线.md`）⇒ 成员集合没变，
             # 走**增量**：不整面重建（`recomputes` 不动），只更新那一件的摘要再重哈希。
             # 这条过去断言「必算」，是因为比对按大小写逐字做 ⇒ 每次都误判成新增件（安全但白算）。
             cs.face_fingerprint(ROOT, pats)

@@ -258,12 +258,12 @@ mod tests {
     fn keys_come_from_four_sources_including_hyphenated() {
         // 正文键：反引号 / JSON 键 / 标题 —— 三路都要；**裸词不入册**（真源只认这三路）
         let text = "`C01-01` 与 \"A08-07\": 1\n## B12-3 标题\nBARE_WORD\n";
-        let got = keys_of("M08_季节天气", text);
+        let got = keys_of("M08_环境状态", text);
         assert!(got.contains(&"C01-01".to_string()), "反引号键：{:?}", got);
         assert!(got.contains(&"A08-07".to_string()), "JSON 键：{:?}", got);
         assert!(got.contains(&"B12-3".to_string()), "标题键：{:?}", got);
         assert!(!got.contains(&"BARE_WORD".to_string()), "裸词不得入册：{:?}", got);
-        // 文件名令牌：`[A-Z][A-Z0-9_]*` 在 "M08_季节天气" 上只吃到 "M08_"（CJK 停住）
+        // 文件名令牌：`[A-Z][A-Z0-9_]*` 在 "M08_环境状态" 上只吃到 "M08_"（CJK 停住）
         assert!(got.contains(&"M08_".to_string()), "文件名令牌：{:?}", got);
     }
 

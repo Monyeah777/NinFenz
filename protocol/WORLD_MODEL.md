@@ -63,7 +63,7 @@ world_model:
 `desktop/src/core/world_model.py` 在 check32 质量纵深汇总中常驻，硬门只验可无歧义项：
 
 - `abstract_state.variables` 非空、变量名唯一、`kind/source` 合法；
-- 可选 `slot` 非空且全契约唯一，并须在 `protocol/world_slots.json` 注册；注册后校验 `kind/item_kind/owner` 与变量声明一致；`world_slots` 自身每个路径段还须在 `M00_数据结构.md` 锚定；
+- 可选 `slot` 非空且全契约唯一，并须在 `protocol/world_slots.json` 注册；注册后校验 `kind/item_kind/owner` 与变量声明一致；`world_slots` 自身每个路径段还须在 `M00_数据槽总线.md` 锚定；
 - `initial` 与变量集合**双射**：既不多未知变量，也不缺已声明变量；
 - 初值按 `kind`（含 `array.item_kind`）逐项匹配；
 - `transition.phases` 非空、相位名唯一、`guard/writes` 齐全；
@@ -90,7 +90,7 @@ CLI 入口：`nf worldmodel --run`；JSON 遥测出口：`nf worldmodel --run --
 
 ## 5. 首战实例
 
-`04_模块库/通用类/M50_主循环.md` 已落地首个 `world_model`：
+`04_模块库/通用类/M50_调度器.md` 已落地首个 `world_model`：
 
 - 抽象变量：`pipeline`、`tick`、`phase`、`phase_trace`，均绑定 `slot`；
 - 相位环：`begin → run → end → archive → roll → begin`；

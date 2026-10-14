@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:54fb9760bd7e2fa83b110b4b1c29e54f821434ca5a19b7d63ff0e1d4195e9e20
   - protocol/drill_fidelity.json:235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:7d9f6167b39a2879c29d406e1cb8e35985637ea82bb74f5173b29c7972d599d4
+  - protocol/code_metrics_baseline.json:4bbde7fbd0bca6be4bc57bde06d46508a911889c14f3e7395e3123a1e775517b
 ---
+
+> 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

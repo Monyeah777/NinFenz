@@ -428,11 +428,12 @@ def patterns(root: str = ".") -> tuple:
 OWN_PATTERNS = ("01_核心协议.md", "02_联动注册表.md", "06_Agent执行协议.md",
                 "07_官方核心出厂与社区预设导航.md", "protocol/*.json", "verify.sh",
                 "desktop/src/**/*.py", "scripts/**/*.py", "scripts/*.sh",
-                "scripts/nf", "scripts/nf.cmd", ".github/scripts/*.py")
+                "scripts/nf", "scripts/nf.cmd", ".github/scripts/*.py",
+                "03_管线库/**/*.md", "04_模块库/**/*.md")
 
 
 def scan(root: str = ".") -> tuple:
-    """纯度体检（R1–R7）。派生结果按**输入内容指纹**缓存（输入面见 `patterns()`，很宽）。
+    """纯度体检（R1–R8）。派生结果按**输入内容指纹**缓存（输入面见 `patterns()`，很宽）。
 
     **冷进程也走这层缓存**（2026-09-29 实测：宽面指纹在同一只读作用域内近乎白拿，而重算这条派生账
     贵得多；见 `quality_depth_scan.scan` 的实测数字）。
@@ -538,4 +539,13 @@ def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
     except Exception as _exc:
         issues.append("R7 阶梯体检不可用：%s（修复指引：核对 protocol/LAYERS.json 与 "
                       "desktop/src/core/layer_model.py 后可读性）" % _exc)
+    # R8：核心文面去叙述（域中立）——实现独立成件（core/domain_neutral.py），守住本件规模上限；
+    # 判定归入 check27 同一个门，不新增 check 序号。
+    try:
+        from core import domain_neutral as _dn
+        _dn_issues, _dn_stats = _dn.scan(root)
+        issues += _dn_issues
+        stats["domain_neutral"] = _dn_stats
+    except Exception as _dexc:
+        issues.append("R8 去叙述体检不可用：%s（修复指引：核对 desktop/src/core/domain_neutral.py 可读性）" % _dexc)
     return issues, stats

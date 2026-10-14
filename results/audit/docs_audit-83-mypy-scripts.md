@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:14c51ad8b2ba87abcbe1f42ece6feb4cba2a3f77b65736959bea0d5b569b4488
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
+  - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:7d9f6167b39a2879c29d406e1cb8e35985637ea82bb74f5173b29c7972d599d4
+  - protocol/code_metrics_baseline.json:4bbde7fbd0bca6be4bc57bde06d46508a911889c14f3e7395e3123a1e775517b
 ---
+
+> 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

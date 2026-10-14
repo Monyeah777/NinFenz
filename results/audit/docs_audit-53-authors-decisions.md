@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:a887cd12a5e6caf6f938d7b9e9912813180f48baa9f32029f6c246f48263b2ec
+  - verify.sh:5567d1139ec88b355884403a70ba8d4b73b584c78bd3245ad4a14c18e8e29b95
 
 ---
+
+> 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

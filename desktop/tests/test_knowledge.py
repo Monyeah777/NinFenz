@@ -33,7 +33,7 @@ def _tree(tmp):
             p.write_text("x", encoding="utf-8")
         else:
             p.mkdir(parents=True, exist_ok=True)
-    _mk(tmp, "04_模块库/通用类/M23_认知边界.md",
+    _mk(tmp, "04_模块库/通用类/M23_可见性边界.md",
         "# 模块 M23\n\n```yaml\nmachine_contract:\n  id: M23\n```\n")
     _mk(tmp, "library/NF-1.md", "---\nid: NF-1\nstale_after: 2027-03-14\n---\n\n# NF-1\n")
     _mk(tmp, "library/INDEX.md", "| NF-1 | 世界 |\n")

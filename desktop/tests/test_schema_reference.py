@@ -37,7 +37,7 @@ class SchemaReferenceTest(unittest.TestCase):
 
     def test_representative_instance_matches_reference(self):
         contract = sl.load_schema(ROOT, "contract.schema.json")
-        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据结构.md")
+        m00 = os.path.join(ROOT, "04_模块库", "通用类", "M00_数据槽总线.md")
         with open(m00, encoding="utf-8") as fh:
             parsed = sl._fence_yaml(fh.read(), "machine_contract")
         self.assertIsNotNone(parsed)

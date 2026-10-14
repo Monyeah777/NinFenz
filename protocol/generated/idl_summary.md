@@ -50,40 +50,40 @@
 | AI金融投研与风控:M02 | L2 | P60 | community/AI金融投研与风控域包/modules/D04b_AI金融投研与风控收口与形态派生.md |
 | AI食品与餐饮:M01 | L2 | P40 | community/AI食品与餐饮域包/modules/D16a_AI食品与餐饮口径登记.md |
 | AI食品与餐饮:M02 | L2 | P60 | community/AI食品与餐饮域包/modules/D16b_AI食品与餐饮收口与形态派生.md |
-| M00 | L2 | P00 | 04_模块库/通用类/M00_数据结构.md |
+| M00 | L2 | P00 | 04_模块库/通用类/M00_数据槽总线.md |
 | M01 | L2 | P20 | community/西幻生存领域包/modules/M01_职业成长.md |
 | M02 | L2 | P20 | community/西幻生存领域包/modules/M02_种族天赋.md |
 | M03 | L2 | P40 | community/西幻生存领域包/modules/M03_技能融合.md |
 | M04 | L2 | P50 | community/西幻生存领域包/modules/M04_战斗系统.md |
-| M06 | L2 | P30 | 04_模块库/事件类/M06_任务剧情.md |
+| M06 | L2 | P30 | 04_模块库/事件类/M06_流程状态机.md |
 | M07 | L2 | P60 | community/西幻生存领域包/modules/M07_地图区域.md |
-| M08 | L2 | P10 | 04_模块库/世界类/M08_季节天气.md |
+| M08 | L2 | P10 | 04_模块库/世界类/M08_环境状态.md |
 | M09 | L2 | P60 | community/西幻生存领域包/modules/M09_经济贸易.md |
 | M10 | L1 | P40 | community/西幻生存领域包/modules/M10_死亡重生.md |
 | M11 | L2 | P50 | community/西幻生存领域包/modules/M11_文字魔法.md |
-| M12 | L2 | P50 | 04_模块库/事件类/M12_NPC对话.md |
-| M13 | L2 | P30 | 04_模块库/事件类/M13_NPC交互.md |
+| M12 | L2 | P50 | 04_模块库/事件类/M12_模板检索库.md |
+| M13 | L2 | P30 | 04_模块库/事件类/M13_实体交互.md |
 | M14 | L2 | P60 | community/西幻生存领域包/modules/M14_阵营声望.md |
 | M15 | L2 | P60 | community/西幻生存领域包/modules/M15_帮派势力.md |
 | M16 | L2 | P60 | community/西幻生存领域包/modules/M16_建筑据点.md |
 | M17 | L2 | P50 | community/西幻生存领域包/modules/M17_生产制造.md |
 | M18 | L2 | P30 | community/西幻生存领域包/modules/M18_混沌事件.md |
 | M19 | L2 | P20 | community/西幻生存领域包/modules/M19_遗传后代.md |
-| M20 | L2 | P70 | 04_模块库/事件类/M20_世界知识库.md |
+| M20 | L2 | P70 | 04_模块库/事件类/M20_知识条目库.md |
 | M22 | L1 | P40 | community/校园情感领域包/modules/M22_三冲动驱动.md |
-| M23 | L2 | P20 | 04_模块库/通用类/M23_认知边界.md |
-| M24 | L2 | P70 | 04_模块库/通用类/M24_组合规则.md |
+| M23 | L2 | P20 | 04_模块库/通用类/M23_可见性边界.md |
+| M24 | L2 | P70 | 04_模块库/通用类/M24_规则组合.md |
 | M40 | L2 | P40 | community/校园情感领域包/modules/M40_关系深度.md |
 | M41 | L2 | P40 | community/校园情感领域包/modules/M41_恋爱进阶.md |
 | M43 | L2 | P40 | community/校园情感领域包/modules/M43_情敌系统.md |
-| M50 | L2 | 调度器 | 04_模块库/通用类/M50_主循环.md |
+| M50 | L2 | 调度器 | 04_模块库/通用类/M50_调度器.md |
 | M55 | L2 | P40 | community/校园情感领域包/modules/M55_匿名情书.md |
 | M57 | L2 | P50 | community/校园情感领域包/modules/M57_朋友圈动态.md |
 | M58 | L2 | P50 | community/校园情感领域包/modules/M58_电话通讯.md |
 | M59 | L2 | P50 | community/校园情感领域包/modules/M59_群聊系统.md |
 | M65 | L2 | P60 | community/校园情感领域包/modules/M65_幽灵遗憾.md |
-| M80 | L2 | P80 | 04_模块库/通用类/M80_输出生成器.md |
-| M90 | L2 | P90 | 04_模块库/技术文档类/M90_技术文档结构.md |
+| M80 | L2 | P80 | 04_模块库/通用类/M80_输出质检门.md |
+| M90 | L2 | P90 | 04_模块库/技术文档类/M90_结构装配.md |
 | M91 | L2 | P40 | community/校园西幻轻混组合包/modules/M91_异界身份桥.md |
 | M92 | L2 | P50 | community/校园西幻轻混组合包/modules/M92_轻混装配执行.md |
 | M93 | L2 | P00 | community/通用核心基础包/modules/M93_通用状态快照.md |
@@ -100,7 +100,7 @@
 | 世界书与设定库:M02 | L2 | P60 | community/世界书与设定库域包/modules/E03b_世界书与设定库收口与形态派生.md |
 | 个人助理与日常生活:M01 | L2 | P40 | community/个人助理与日常生活域包/modules/E16a_个人助理与日常生活口径登记.md |
 | 个人助理与日常生活:M02 | L2 | P60 | community/个人助理与日常生活域包/modules/E16b_个人助理与日常生活收口与形态派生.md |
-| 事件:M22 | L2 | P30 | 04_模块库/事件类/M22_事件叙事.md |
+| 事件:M22 | L2 | P30 | 04_模块库/事件类/M22_事件编排.md |
 | 交通与出行:M01 | L2 | P40 | community/交通与出行域包/modules/D13a_交通与出行口径登记.md |
 | 交通与出行:M02 | L2 | P60 | community/交通与出行域包/modules/D13b_交通与出行收口与形态派生.md |
 | 产业与商业落地:M01 | L2 | P40 | community/产业与商业落地域包/modules/F10a_产业与商业落地口径登记.md |
@@ -255,7 +255,7 @@
 | 语音识别与合成:M02 | L2 | P60 | community/语音识别与合成域包/modules/A04b_语音面收口与形态派生.md |
 | 语音转写与会议记录:M01 | L2 | P40 | community/语音转写与会议记录域包/modules/B13a_语音转写与会议记录口径登记.md |
 | 语音转写与会议记录:M02 | L2 | P60 | community/语音转写与会议记录域包/modules/B13b_语音转写与会议记录收口与形态派生.md |
-| 通用:M10 | L2 | P10 | 04_模块库/通用类/M10_时间推进.md |
+| 通用:M10 | L2 | P10 | 04_模块库/通用类/M10_节拍推进.md |
 | 量化金融:M31 | L2 | P40 | community/量化金融域包/modules/M31_因子与信号口径.md |
 | 量化金融:M32 | L2 | P60 | community/量化金融域包/modules/M32_回测与绩效口径.md |
 | 长文本与小说创作:M01 | L2 | P40 | community/长文本与小说创作域包/modules/E04a_长文本与小说创作口径登记.md |
@@ -274,7 +274,7 @@
 | 预训练与继续预训练:M02 | L2 | P60 | community/预训练与继续预训练域包/modules/C04b_预训练与继续预训练收口与形态派生.md |
 
 ## 管线
-- P00_通用文档生成管线.md, P01_标准管线.md, P02_校园情感流管线.md, P03_西幻生存流管线.md, P04_轻混装配流管线.md, P05_核心基础流管线.md, P06_技术文档题材装配流管线.md, P07_AI系统域装配流管线.md, P08_量化金融域装配流管线.md, P09_大语言模型装配流管线.md, P100_版权与知识产权装配流管线.md, P101_评测与基准装配流管线.md, P102_可解释性与审计装配流管线.md, P103_模型运营与成本装配流管线.md, P104_平台与基础设施装配流管线.md, P105_开源与开发者生态装配流管线.md, P106_产业与商业落地装配流管线.md, P107_监督微调装配流管线.md, P108_组合包-数据管线装配流管线.md, P109_组合包-检索栈装配流管线.md, P110_组合包-受监管行业装配流管线.md, P111_组合包-轻混与保险装配流管线.md, P112_游戏与互动娱乐装配流管线.md, P113_角色扮演与角色卡装配流管线.md, P114_知识管理与检索增强装配流管线.md, P115_企业培训与组织学习装配流管线.md, P116_对话与客服装配流管线.md, P117_零售与电商装配流管线.md, P118_推荐、排序与广告装配流管线.md, P119_预测、异常与风险装配流管线.md, P11_多模态大模型装配流管线.md, P120_评测、基准与排行榜装配流管线.md, P121_红队、越狱与安全测试装配流管线.md, P122_可观测性、成本与可靠性装配流管线.md, P123_AI+医疗健康装配流管线.md, P124_AI+制药与生物装配流管线.md, P125_AI+法律与合规装配流管线.md, P126_AI+金融投研与风控装配流管线.md, P127_AI+保险装配流管线.md, P128_AI+教育装配流管线.md, P129_AI+政务与公共事务装配流管线.md, P12_视觉模型装配流管线.md, P130_AI+制造业装配流管线.md, P131_AI+能源与电力装配流管线.md, P132_AI+农业装配流管线.md, P133_AI+人力资源与招聘装配流管线.md, P13_语音识别与合成装配流管线.md, P14_音频与音乐生成装配流管线.md, P15_视频生成与理解装配流管线.md, P16_图像生成与编辑装配流管线.md, P17_文本生成与创作装配流管线.md, P18_摘要与信息压缩装配流管线.md, P19_机器翻译与本地化装配流管线.md, P21_分类与情感分析装配流管线.md, P22_代码大模型装配流管线.md, P23_嵌入与检索表示装配流管线.md, P24_具身智能与机器人装配流管线.md, P25_三维与世界模型装配流管线.md, P26_数学与形式化推理装配流管线.md, P27_强化学习与决策装配流管线.md, P28_端侧与边缘小模型装配流管线.md, P29_信息抽取与结构化装配流管线.md, P31_知识问答与检索增强装配流管线.md, P32_多轮对话与角色扮演装配流管线.md, P33_代码生成与补全装配流管线.md, P34_代码审查与缺陷检测装配流管线.md, P35_测试与用例生成装配流管线.md, P36_数据分析与表格理解装配流管线.md, P37_文档解析与版面理解装配流管线.md, P38_语音转写与会议记录装配流管线.md, P39_语音合成与配音装配流管线.md, P41_图像生成与视觉设计装配流管线.md, P42_视频生成与自动剪辑装配流管线.md, P43_AI+食品与餐饮装配流管线.md, P45_数据采集与清洗装配流管线.md, P46_数据标注与标注质量装配流管线.md, P47_合成数据生成装配流管线.md, P48_预训练与继续预训练装配流管线.md, P49_参数高效微调装配流管线.md, P51_对齐与偏好优化装配流管线.md, P53_推理优化与加速装配流管线.md, P54_推理服务与部署装配流管线.md, P55_上下文工程与长上下文装配流管线.md, P56_提示工程与提示模板装配流管线.md, P57_记忆体与个性化装配流管线.md, P58_向量库与检索管线装配流管线.md, P59_智能体框架与工具调用装配流管线.md, P61_多智能体协同装配流管线.md, P71_物流与供应链装配流管线.md, P72_交通与出行装配流管线.md, P74_建筑与房地产装配流管线.md, P76_传媒与新闻装配流管线.md, P77_文旅与酒店装配流管线.md, P78_科研与实验装配流管线.md, P79_提示工程与指令设计装配流管线.md, P81_世界书与设定库装配流管线.md, P82_长文本与小说创作装配流管线.md, P83_内容改写与风格迁移装配流管线.md, P84_多语翻译与本地化装配流管线.md, P85_图像生成与视觉创作装配流管线.md, P86_视频生成与剪辑装配流管线.md, P87_音频音乐与语音装配流管线.md, P88_编辑校对与出版装配流管线.md, P89_智能体与工作流编排装配流管线.md, P90_技术文档生成管线.md, P91_代码与软件工程装配流管线.md, P92_数据分析与决策支持装配流管线.md, P93_个人助理与日常生活装配流管线.md, P94_搜索与信息聚合装配流管线.md, P95_内容分发与社区运营装配流管线.md, P96_数字人与虚拟形象装配流管线.md, P97_安全与对齐装配流管线.md, P98_合规与监管装配流管线.md, P99_隐私与数据治理装配流管线.md
+- P00_通用文档生成管线.md, P01_标准管线.md, P02_校园情感流管线.md, P03_西幻生存流管线.md, P04_轻混装配流管线.md, P05_核心基础流管线.md, P06_技术文档题材装配流管线.md, P07_AI系统域装配流管线.md, P08_量化金融域装配流管线.md, P09_大语言模型装配流管线.md, P100_版权与知识产权装配流管线.md, P101_评测与基准装配流管线.md, P102_可解释性与审计装配流管线.md, P103_模型运营与成本装配流管线.md, P104_平台与基础设施装配流管线.md, P105_开源与开发者生态装配流管线.md, P106_产业与商业落地装配流管线.md, P107_监督微调装配流管线.md, P108_组合包-数据管线装配流管线.md, P109_组合包-检索栈装配流管线.md, P110_组合包-受监管行业装配流管线.md, P111_组合包-轻混与保险装配流管线.md, P112_游戏与互动娱乐装配流管线.md, P113_角色扮演与角色卡装配流管线.md, P114_知识管理与检索增强装配流管线.md, P115_企业培训与组织学习装配流管线.md, P116_对话与客服装配流管线.md, P117_零售与电商装配流管线.md, P118_推荐、排序与广告装配流管线.md, P119_预测、异常与风险装配流管线.md, P11_多模态大模型装配流管线.md, P120_评测、基准与排行榜装配流管线.md, P121_红队、越狱与安全测试装配流管线.md, P122_可观测性、成本与可靠性装配流管线.md, P123_AI+医疗健康装配流管线.md, P124_AI+制药与生物装配流管线.md, P125_AI+法律与合规装配流管线.md, P126_AI+金融投研与风控装配流管线.md, P127_AI+保险装配流管线.md, P128_AI+教育装配流管线.md, P129_AI+政务与公共事务装配流管线.md, P12_视觉模型装配流管线.md, P130_AI+制造业装配流管线.md, P131_AI+能源与电力装配流管线.md, P132_AI+农业装配流管线.md, P133_AI+人力资源与招聘装配流管线.md, P13_语音识别与合成装配流管线.md, P14_音频与音乐生成装配流管线.md, P15_视频生成与理解装配流管线.md, P16_图像生成与编辑装配流管线.md, P17_文本生成与创作装配流管线.md, P18_摘要与信息压缩装配流管线.md, P19_机器翻译与本地化装配流管线.md, P21_分类与情感分析装配流管线.md, P22_代码大模型装配流管线.md, P23_嵌入与检索表示装配流管线.md, P24_具身智能与机器人装配流管线.md, P25_三维与世界模型装配流管线.md, P26_数学与形式化推理装配流管线.md, P27_强化学习与决策装配流管线.md, P28_端侧与边缘小模型装配流管线.md, P29_信息抽取与结构化装配流管线.md, P31_知识问答与检索增强装配流管线.md, P32_多轮对话与角色扮演装配流管线.md, P33_代码生成与补全装配流管线.md, P34_代码审查与缺陷检测装配流管线.md, P35_测试与用例生成装配流管线.md, P36_数据分析与表格理解装配流管线.md, P37_文档解析与版面理解装配流管线.md, P38_语音转写与会议记录装配流管线.md, P39_语音合成与配音装配流管线.md, P41_图像生成与视觉设计装配流管线.md, P42_视频生成与自动剪辑装配流管线.md, P43_AI+食品与餐饮装配流管线.md, P45_数据采集与清洗装配流管线.md, P46_数据标注与标注质量装配流管线.md, P47_合成数据生成装配流管线.md, P48_预训练与继续预训练装配流管线.md, P49_参数高效微调装配流管线.md, P51_对齐与偏好优化装配流管线.md, P53_推理优化与加速装配流管线.md, P54_推理服务与部署装配流管线.md, P55_上下文工程与长上下文装配流管线.md, P56_提示工程与提示模板装配流管线.md, P57_记忆体与个性化装配流管线.md, P58_向量库与检索管线装配流管线.md, P59_智能体框架与工具调用装配流管线.md, P61_多智能体协同装配流管线.md, P71_物流与供应链装配流管线.md, P72_交通与出行装配流管线.md, P74_建筑与房地产装配流管线.md, P76_传媒与新闻装配流管线.md, P77_文旅与酒店装配流管线.md, P78_科研与实验装配流管线.md, P79_提示工程与指令设计装配流管线.md, P81_世界书与设定库装配流管线.md, P82_长文本与小说创作装配流管线.md, P83_内容改写与风格迁移装配流管线.md, P84_多语翻译与本地化装配流管线.md, P85_图像生成与视觉创作装配流管线.md, P86_视频生成与剪辑装配流管线.md, P87_音频音乐与语音装配流管线.md, P88_编辑校对与出版装配流管线.md, P89_智能体与工作流编排装配流管线.md, P90_结构装配管线.md, P91_代码与软件工程装配流管线.md, P92_数据分析与决策支持装配流管线.md, P93_个人助理与日常生活装配流管线.md, P94_搜索与信息聚合装配流管线.md, P95_内容分发与社区运营装配流管线.md, P96_数字人与虚拟形象装配流管线.md, P97_安全与对齐装配流管线.md, P98_合规与监管装配流管线.md, P99_隐私与数据治理装配流管线.md
 
 ## 协议包
 - community/AI人力资源与招聘域包/protocol.yaml, community/AI保险域包/protocol.yaml, community/AI农业域包/protocol.yaml, community/AI制药与生物域包/protocol.yaml, community/AI制造业域包/protocol.yaml, community/AI医疗健康域包/protocol.yaml, community/AI政务与公共事务域包/protocol.yaml, community/AI教育域包/protocol.yaml, community/AI法律与合规域包/protocol.yaml, community/AI系统域包/protocol.yaml, community/AI能源与电力域包/protocol.yaml, community/AI金融投研与风控域包/protocol.yaml, community/AI食品与餐饮域包/protocol.yaml, community/三维与世界模型域包/protocol.yaml, community/上下文工程与长上下文域包/protocol.yaml, community/世界书与设定库域包/protocol.yaml, community/个人助理与日常生活域包/protocol.yaml, community/交通与出行域包/protocol.yaml, community/产业与商业落地域包/protocol.yaml, community/代码与软件工程域包/protocol.yaml, community/代码大模型域包/protocol.yaml, community/代码审查与缺陷检测域包/protocol.yaml, community/代码生成与补全域包/protocol.yaml, community/企业培训与组织学习域包/protocol.yaml, community/传媒与新闻域包/protocol.yaml, community/信息抽取与结构化域包/protocol.yaml, community/具身智能与机器人域包/protocol.yaml, community/内容分发与社区运营域包/protocol.yaml, community/内容改写与风格迁移域包/protocol.yaml, community/分类与情感分析域包/protocol.yaml, community/参数高效微调域包/protocol.yaml, community/可观测性成本与可靠性域包/protocol.yaml, community/可解释性与审计域包/protocol.yaml, community/合成数据生成域包/protocol.yaml, community/合规与监管域包/protocol.yaml, community/向量库与检索管线域包/protocol.yaml, community/图像生成与编辑域包/protocol.yaml, community/图像生成与视觉创作域包/protocol.yaml, community/图像生成与视觉设计域包/protocol.yaml, community/多智能体协同域包/protocol.yaml, community/多模态大模型域包/protocol.yaml, community/多语翻译与本地化域包/protocol.yaml, community/多轮对话与角色扮演域包/protocol.yaml, community/大语言模型域包/protocol.yaml, community/安全与对齐域包/protocol.yaml, community/对话与客服域包/protocol.yaml, community/对齐与偏好优化域包/protocol.yaml, community/嵌入与检索表示域包/protocol.yaml, community/平台与基础设施域包/protocol.yaml, community/建筑与房地产域包/protocol.yaml, community/开源与开发者生态域包/protocol.yaml, community/强化学习与决策域包/protocol.yaml, community/技术文档域包/protocol.yaml, community/推理优化与加速域包/protocol.yaml, community/推理服务与部署域包/protocol.yaml, community/推荐排序与广告域包/protocol.yaml, community/提示工程与指令设计域包/protocol.yaml, community/提示工程与提示模板域包/protocol.yaml, community/搜索与信息聚合域包/protocol.yaml, community/摘要与信息压缩域包/protocol.yaml, community/数字人与虚拟形象域包/protocol.yaml, community/数学与形式化推理域包/protocol.yaml, community/数据分析与决策支持域包/protocol.yaml, community/数据分析与表格理解域包/protocol.yaml, community/数据标注与标注质量域包/protocol.yaml, community/数据采集与清洗域包/protocol.yaml, community/文旅与酒店域包/protocol.yaml, community/文本生成与创作域包/protocol.yaml, community/文档解析与版面理解域包/protocol.yaml, community/智能体与工作流编排域包/protocol.yaml, community/智能体框架与工具调用域包/protocol.yaml, community/机器翻译与本地化域包/protocol.yaml, community/校园情感领域包/protocol.yaml, community/校园西幻轻混组合包/protocol.yaml, community/模型运营与成本域包/protocol.yaml, community/测试与用例生成域包/protocol.yaml, community/游戏与互动娱乐域包/protocol.yaml, community/版权与知识产权域包/protocol.yaml, community/物流与供应链域包/protocol.yaml, community/监督微调域包/protocol.yaml, community/知识管理与检索增强域包/protocol.yaml, community/知识问答与检索增强域包/protocol.yaml, community/科研与实验域包/protocol.yaml, community/端侧与边缘小模型域包/protocol.yaml, community/红队越狱与安全测试域包/protocol.yaml, community/组合包-受监管行业/protocol.yaml, community/组合包-数据管线/protocol.yaml, community/组合包-检索栈/protocol.yaml, community/组合包-轻混与保险/protocol.yaml, community/编辑校对与出版域包/protocol.yaml, community/西幻生存领域包/protocol.yaml, community/视觉模型域包/protocol.yaml, community/视频生成与剪辑域包/protocol.yaml, community/视频生成与理解域包/protocol.yaml, community/视频生成与自动剪辑域包/protocol.yaml, community/角色扮演与角色卡域包/protocol.yaml, community/记忆体与个性化域包/protocol.yaml, community/评测与基准域包/protocol.yaml, community/评测基准与排行榜域包/protocol.yaml, community/语音合成与配音域包/protocol.yaml, community/语音识别与合成域包/protocol.yaml, community/语音转写与会议记录域包/protocol.yaml, community/通用核心基础包/protocol.yaml, community/量化金融域包/protocol.yaml, community/长文本与小说创作域包/protocol.yaml, community/隐私与数据治理域包/protocol.yaml, community/零售与电商域包/protocol.yaml, community/音频与音乐生成域包/protocol.yaml, community/音频音乐与语音域包/protocol.yaml, community/预测异常与风险域包/protocol.yaml, community/预训练与继续预训练域包/protocol.yaml

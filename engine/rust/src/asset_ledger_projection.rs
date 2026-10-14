@@ -162,7 +162,7 @@ mod tests {
     #[test]
     fn file_keys_uses_this_modules_character_set() {
         // 本件字符集 **不含连字符**（与 asset_density 的 `C01-01` 口径不同）
-        let got = file_keys("M08_季节天气", "`C01-01` `AAA` \"BBB\": 1\n## CCC\n");
+        let got = file_keys("M08_环境状态", "`C01-01` `AAA` \"BBB\": 1\n## CCC\n");
         assert!(got.contains(&"AAA".to_string()), "{:?}", got);
         assert!(got.contains(&"BBB".to_string()), "{:?}", got);
         assert!(got.contains(&"CCC".to_string()), "{:?}", got);

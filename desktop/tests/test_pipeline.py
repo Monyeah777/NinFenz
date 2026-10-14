@@ -133,7 +133,7 @@ class TestDocSemanticsPassthrough(unittest.TestCase):
                 store.save_module(m)
             except Exception:
                 continue
-        p90 = load_pipeline_file(ROOT / "03_管线库" / "P90_技术文档生成管线.md")
+        p90 = load_pipeline_file(ROOT / "03_管线库" / "P90_结构装配管线.md")
         selected = ["通用类:M00", "技术文档类:M90", "通用类:M80"]
         return store, p90, selected
 

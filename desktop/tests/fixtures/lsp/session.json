@@ -2406,7 +2406,7 @@
       "result": {
         "contents": {
           "kind": "markdown",
-          "value": "**M00**（module）\n\n模块 M00 · 数据槽总线 · 归属：官方核心 · 挂载：P00(active)\n\n定义：`04_模块库/通用类/M00_数据结构.md`"
+          "value": "**M00**（module）\n\n模块 M00 · 数据槽总线 · 归属：官方核心 · 挂载：P00(active)\n\n定义：`04_模块库/通用类/M00_数据槽总线.md`"
         },
         "range": {
           "start": {
@@ -2424,7 +2424,7 @@
       "jsonrpc": "2.0",
       "id": 4,
       "result": {
-        "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M00_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.md",
+        "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M00_%E6%95%B0%E6%8D%AE%E6%A7%BD%E6%80%BB%E7%BA%BF.md",
         "range": {
           "start": {
             "line": 0,
@@ -2477,7 +2477,7 @@
           "kind": 9,
           "containerName": "module",
           "location": {
-            "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M00_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.md",
+            "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M00_%E6%95%B0%E6%8D%AE%E6%A7%BD%E6%80%BB%E7%BA%BF.md",
             "range": {
               "start": {
                 "line": 0,
@@ -2569,7 +2569,7 @@
       "id": 16,
       "result": [
         {
-          "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E4%BA%8B%E4%BB%B6%E7%B1%BB/M22_%E4%BA%8B%E4%BB%B6%E5%8F%99%E4%BA%8B.md",
+          "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E4%BA%8B%E4%BB%B6%E7%B1%BB/M22_%E4%BA%8B%E4%BB%B6%E7%BC%96%E6%8E%92.md",
           "range": {
             "start": {
               "line": 0,
@@ -2582,7 +2582,7 @@
           }
         },
         {
-          "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M80_%E8%BE%93%E5%87%BA%E7%94%9F%E6%88%90%E5%99%A8.md",
+          "uri": "file:///nf-repo-root/04_%E6%A8%A1%E5%9D%97%E5%BA%93/%E9%80%9A%E7%94%A8%E7%B1%BB/M80_%E8%BE%93%E5%87%BA%E8%B4%A8%E6%A3%80%E9%97%A8.md",
           "range": {
             "start": {
               "line": 0,
@@ -2662,5 +2662,5 @@
     }
   ],
   "exit_code": 0,
-  "digest": "9c604f5c349a9ad3b3f633bcbb18ebe30f7af21b19a78b38455afa177bdf81b0"
+  "digest": "1ee875df942efbf2888bdd4aa6b8cfeb47a9d5cb1e0be32a38a72ef88314b7a4"
 }

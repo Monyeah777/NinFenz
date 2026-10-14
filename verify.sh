@@ -105,23 +105,23 @@ check1(){
     [ -f "$f" ] || { no "根级缺失: $f"; err=1; }
   done
   # 03 管线库：官方 P00 骨架 + P01 标准 + P90 技术文档（P02/P03 已随社区包分发至 community/*/pipelines/）
-  for p in P00_通用文档生成管线.md P01_标准管线.md P90_技术文档生成管线.md; do
+  for p in P00_通用文档生成管线.md P01_标准管线.md P90_结构装配管线.md; do
     [ -f "03_管线库/$p" ] || { no "03 缺官方管线文件: $p"; err=1; }
   done
   # 04 模块库：官方核心 13 件逐文件存在（通用 6 / 事件 5 / 世界 1 / 技术 1，清单见 07 §1）
-  local core13='04_模块库/世界类/M08_季节天气.md
-04_模块库/事件类/M06_任务剧情.md
-04_模块库/事件类/M12_NPC对话.md
-04_模块库/事件类/M13_NPC交互.md
-04_模块库/事件类/M20_世界知识库.md
-04_模块库/事件类/M22_事件叙事.md
-04_模块库/技术文档类/M90_技术文档结构.md
-04_模块库/通用类/M00_数据结构.md
-04_模块库/通用类/M10_时间推进.md
-04_模块库/通用类/M23_认知边界.md
-04_模块库/通用类/M24_组合规则.md
-04_模块库/通用类/M50_主循环.md
-04_模块库/通用类/M80_输出生成器.md'
+  local core13='04_模块库/世界类/M08_环境状态.md
+04_模块库/事件类/M06_流程状态机.md
+04_模块库/事件类/M12_模板检索库.md
+04_模块库/事件类/M13_实体交互.md
+04_模块库/事件类/M20_知识条目库.md
+04_模块库/事件类/M22_事件编排.md
+04_模块库/技术文档类/M90_结构装配.md
+04_模块库/通用类/M00_数据槽总线.md
+04_模块库/通用类/M10_节拍推进.md
+04_模块库/通用类/M23_可见性边界.md
+04_模块库/通用类/M24_规则组合.md
+04_模块库/通用类/M50_调度器.md
+04_模块库/通用类/M80_输出质检门.md'
   while IFS= read -r f; do
     [ -f "$f" ] || { no "04 缺核心模块: $f"; err=1; }
   done <<< "$core13"
@@ -136,8 +136,8 @@ check2(){
   echo '== [2/6·A] 重号 ID 全限定·官方层（07 §7 项5）=='
   local err=0
   # 04 层：核心两重号文件须存在；04 内 M10/M22 各仅 1 件（生存:M10/情感:M22 属社区包）
-  [ -f 04_模块库/通用类/M10_时间推进.md ] || { no '缺 通用类/M10_时间推进.md'; err=1; }
-  [ -f 04_模块库/事件类/M22_事件叙事.md ] || { no '缺 事件类/M22_事件叙事.md'; err=1; }
+  [ -f 04_模块库/通用类/M10_节拍推进.md ] || { no '缺 通用类/M10_节拍推进.md'; err=1; }
+  [ -f 04_模块库/事件类/M22_事件编排.md ] || { no '缺 事件类/M22_事件编排.md'; err=1; }
   local n10=$(find 04_模块库 -name 'M10_*.md' | wc -l); local n22=$(find 04_模块库 -name 'M22_*.md' | wc -l)
   [ "$n10" -eq 1 ] || { no "04 内 M10 文件应 1 件（仅通用:M10），实为 $n10"; err=1; }
   [ "$n22" -eq 1 ] || { no "04 内 M22 文件应 1 件（仅事件:M22），实为 $n22"; err=1; }
@@ -178,7 +178,7 @@ check4(){
     grep -q "$k" 06_Agent执行协议.md || { no "06 §4 缺可见性层名: $k"; err=1; }
   done
   for k in '可见性裁剪' '可见域' '推断域' '隐藏域' 'fail'; do
-    grep -q "$k" 04_模块库/通用类/M23_认知边界.md || { no "M23 缺可见性域措辞: $k"; err=1; }
+    grep -q "$k" 04_模块库/通用类/M23_可见性边界.md || { no "M23 缺可见性域措辞: $k"; err=1; }
   done
   if [ "$err" -eq 0 ]; then ok '06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）'
   fi
@@ -187,7 +187,7 @@ check5(){
   echo '== [5/6·A] 质检门（M80 gate_action 流水线 ↔ 06 §5）=='
   local err=0
   for k in 'pass:' 'warn:' 'fail:' 'gate_action' 'gate_decision_record'; do
-    grep -q "$k" 04_模块库/通用类/M80_输出生成器.md || { no "M80 gate 缺: $k"; err=1; }
+    grep -q "$k" 04_模块库/通用类/M80_输出质检门.md || { no "M80 gate 缺: $k"; err=1; }
   done
   for k in 'pass' 'warn' 'fail' '隐藏域直述' '最小可读'; do
     grep -q "$k" 06_Agent执行协议.md || { no "06 §5 gate 缺呼应: $k"; err=1; }
@@ -929,13 +929,13 @@ check16(){
 import json, sys, os, glob
 import yaml
 CORE13 = [
- '04_模块库/通用类/M00_数据结构.md','04_模块库/通用类/M10_时间推进.md',
- '04_模块库/通用类/M23_认知边界.md','04_模块库/通用类/M24_组合规则.md',
- '04_模块库/通用类/M50_主循环.md','04_模块库/通用类/M80_输出生成器.md',
- '04_模块库/事件类/M06_任务剧情.md','04_模块库/事件类/M12_NPC对话.md',
- '04_模块库/事件类/M13_NPC交互.md','04_模块库/事件类/M20_世界知识库.md',
- '04_模块库/事件类/M22_事件叙事.md','04_模块库/世界类/M08_季节天气.md',
- '04_模块库/技术文档类/M90_技术文档结构.md']
+ '04_模块库/通用类/M00_数据槽总线.md','04_模块库/通用类/M10_节拍推进.md',
+ '04_模块库/通用类/M23_可见性边界.md','04_模块库/通用类/M24_规则组合.md',
+ '04_模块库/通用类/M50_调度器.md','04_模块库/通用类/M80_输出质检门.md',
+ '04_模块库/事件类/M06_流程状态机.md','04_模块库/事件类/M12_模板检索库.md',
+ '04_模块库/事件类/M13_实体交互.md','04_模块库/事件类/M20_知识条目库.md',
+ '04_模块库/事件类/M22_事件编排.md','04_模块库/世界类/M08_环境状态.md',
+ '04_模块库/技术文档类/M90_结构装配.md']
 def extract_mc(path):
     txt = open(path, encoding='utf-8').read()
     for part in txt.split('```'):
@@ -1109,7 +1109,7 @@ PYEOF
     fi
   else
     local f miss4=0
-    for f in 04_模块库/通用类/M00_数据结构.md 04_模块库/通用类/M10_时间推进.md 04_模块库/通用类/M23_认知边界.md 04_模块库/通用类/M24_组合规则.md 04_模块库/通用类/M50_主循环.md 04_模块库/通用类/M80_输出生成器.md 04_模块库/事件类/M06_任务剧情.md 04_模块库/事件类/M12_NPC对话.md 04_模块库/事件类/M13_NPC交互.md 04_模块库/事件类/M20_世界知识库.md 04_模块库/事件类/M22_事件叙事.md 04_模块库/世界类/M08_季节天气.md 04_模块库/技术文档类/M90_技术文档结构.md; do
+    for f in 04_模块库/通用类/M00_数据槽总线.md 04_模块库/通用类/M10_节拍推进.md 04_模块库/通用类/M23_可见性边界.md 04_模块库/通用类/M24_规则组合.md 04_模块库/通用类/M50_调度器.md 04_模块库/通用类/M80_输出质检门.md 04_模块库/事件类/M06_流程状态机.md 04_模块库/事件类/M12_模板检索库.md 04_模块库/事件类/M13_实体交互.md 04_模块库/事件类/M20_知识条目库.md 04_模块库/事件类/M22_事件编排.md 04_模块库/世界类/M08_环境状态.md 04_模块库/技术文档类/M90_结构装配.md; do
       grep -q 'machine_contract:' "$f" || { no "check16-A 降级 $f 缺 machine_contract: 键（01 §1.1 机读块必含）"; miss4=1; }
     done
     [ "$miss4" -eq 0 ] || errA=1
@@ -1446,7 +1446,7 @@ PYEOF
   fi
 }
 check27(){
-  echo '== [27/段C] 架构纯度体检门禁（42 M3：端壳残留/私货可变物/重复标题 grep 断言族 + core raise 消息修复指引审计 + 抽象阶梯归属与越界 R7）=='
+  echo '== [27/段C] 架构纯度体检门禁（42 M3：端壳残留/私货可变物/重复标题 grep 断言族 + core raise 消息修复指引审计 + 抽象阶梯归属与越界 R7 + 核心文面去叙述 R8）=='
   local err=0
   if [ -n "$PY3" ]; then
     if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check27.log 2>&1
@@ -1463,9 +1463,10 @@ for i in issues:
 for w in stats.get('import_residue') or []:
     print('WARN: %s' % w)
 _ly = stats.get('layers') or {}
-print('纯度体检统计：文档 %d / raise 审计 %d / 第三方 import %d / import 残留 %d / 阶梯阶 %d'
+_dn = stats.get('domain_neutral') or {}
+print('纯度体检统计：文档 %d / raise 审计 %d / 第三方 import %d / import 残留 %d / 阶梯阶 %d / 域中立件 %d'
       % (stats['docs'], stats['raises'], stats.get('imports', 0),
-         len(stats.get('import_residue') or []), _ly.get('tiers', 0)))
+         len(stats.get('import_residue') or []), _ly.get('tiers', 0), _dn.get('files', 0)))
 sys.exit(1 if issues else 0)
 PYEOF
     then
@@ -1473,7 +1474,7 @@ PYEOF
       while IFS= read -r _purline; do
         case "$_purline" in WARN:*) wn "${_purline#WARN: }" ;; esac
       done < "$NFL_TMP"/nf_check27.log
-      ok '架构纯度体检通过（M3：协议层无端壳残留/私货/重复标题 + 阶梯归属互斥/接口子集/依赖向下 + raise 消息修复指引零缺失）'
+      ok '架构纯度体检通过（M3：协议层无端壳残留/私货/重复标题 + 阶梯归属互斥/接口子集/依赖向下 + raise 消息修复指引零缺失 + 03/04 核心文面去叙述零命中 R8）'
     else
       while IFS= read -r _purline; do
         case "$_purline" in WARN:*) wn "${_purline#WARN: }" ;; esac
@@ -1483,7 +1484,7 @@ PYEOF
   else
     wn 'python3 不在 PATH（跳过 check27）'
   fi
-  if [ "$err" -eq 0 ]; then ok '架构纯度体检门禁全绿（check27：42 M3——纯度体检制度化，PASS 39→41）'
+  if [ "$err" -eq 0 ]; then ok '架构纯度体检门禁全绿（check27：42 M3 + R8 去叙述——纯度体检制度化，PASS 39→41）'
   fi
 }
 check28(){

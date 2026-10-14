@@ -277,7 +277,7 @@ pub fn world_slots_scan(root: &Path) -> (Vec<String>, Json) {
         }
     };
     let mut issues = validate_registry(&data, "world_slots");
-    let m00 = "04_模块库/通用类/M00_数据结构.md";
+    let m00 = "04_模块库/通用类/M00_数据槽总线.md";
     if root.join(m00).is_file() {
         let m00_text = read(root, m00);
         if let Some(Json::Object(slots)) = obj_get(&data, "slots") {
@@ -294,7 +294,7 @@ pub fn world_slots_scan(root: &Path) -> (Vec<String>, Json) {
             }
         }
     } else {
-        issues.push("04_模块库/通用类/M00_数据结构.md 缺失".to_string());
+        issues.push("04_模块库/通用类/M00_数据槽总线.md 缺失".to_string());
     }
     let (n, arrays) = match obj_get(&data, "slots") {
         Some(Json::Object(o)) => (
@@ -332,7 +332,7 @@ mod tests {
         (
             r#"tool_face_scan"#,
             &[],
-            r#"{"candidates": 1, "entries": 1, "faces": [{"entries": 1, "module": "通用:M10", "source": "04_模块库/通用类/M10_时间推进.md"}], "modules": 1}"#
+            r#"{"candidates": 1, "entries": 1, "faces": [{"entries": 1, "module": "通用:M10", "source": "04_模块库/通用类/M10_节拍推进.md"}], "modules": 1}"#
         ),
         (
             r#"world_slots_scan"#,

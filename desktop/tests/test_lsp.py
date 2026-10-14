@@ -224,7 +224,7 @@ class TestDomainIntelligence(unittest.TestCase):
                                           "position": {"line": line, "character": ch}}})
         value = out[0]["result"]["contents"]["value"]
         self.assertIn("模块 M00", value)
-        self.assertIn("04_模块库/通用类/M00_数据结构.md", value)
+        self.assertIn("04_模块库/通用类/M00_数据槽总线.md", value)
 
     def test_hover_reports_ambiguous_candidates(self):
         open_doc(self.srv, self.uri, self._text())

@@ -31,7 +31,7 @@ class SelfContainedRebuildTest(unittest.TestCase):
         art.write_text(
             "---\nid: X\n---\n\n管线声明原文（内嵌）：\n\n```markdown\n# 绠＄嚎 P06\n```\n```\n\n"
             "## 3. 注册表投影\n\n表\n\n"
-            "**4.1 M00_数据结构** · 归属：官方核心 · 溯源：src/M00.md\n\n"
+            "**4.1 M00_数据槽总线** · 归属：官方核心 · 溯源：src/M00.md\n\n"
             "```markdown\n# 妯″潡 M00 路 鏁版嵁缁撴瀯\n\n> 绫诲埆\n```\n\n"
             "## 5. 资产（0 文件）\n\n零资产\n",
             encoding="utf-8")
@@ -46,7 +46,7 @@ class SelfContainedRebuildTest(unittest.TestCase):
             self.assertNotEqual(lines, before.splitlines(), "漂移样本应被判为有漂移")
             # 重嵌后：内嵌正文 == 源文件逐字
             src = (root / "src" / "M00.md").read_text(encoding="utf-8").splitlines()
-            idx = lines.index("**4.1 M00_数据结构** · 归属：官方核心 · 溯源：src/M00.md")
+            idx = lines.index("**4.1 M00_数据槽总线** · 归属：官方核心 · 溯源：src/M00.md")
             # 标记行 → 空行 → ```markdown 包裹 → 正文
             self.assertEqual(lines[idx + 3:idx + 3 + len(src)], src)
             # 幂等

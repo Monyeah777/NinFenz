@@ -9,10 +9,10 @@ subjects:
   - protocol/LAYERS.json:a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380
   - desktop/src/core/layer_model.py:18822a9c4a8b39dc8076cbf40695e40588cb6025a5e59efe8f93769ef9315357
   - desktop/tests/test_layer_model.py:74ef800a95d1caed9d88809f76708b6de4427c6be9412387e5531e807f8ebf42
-  - desktop/src/core/purity_scan.py:35197628957a142161190de8a61d9b460e475fd3a58c6aff87f6a58439172fac
+  - desktop/src/core/purity_scan.py:c4aaec48dd63dd719b83a7f330bb543b76f09655c3601f2df4aadfd22c887c76
   - desktop/tests/test_purity_scan.py:27512feb0957c73f6e464c2fd595b1176ad70f597cbc0300cd9329644ad0bc6b
-  - scripts/nf.py:b6d5421ced1e004c5f1797781aecb2aca2fb6fc304642da128851285877db9f7
-  - verify.sh:a887cd12a5e6caf6f938d7b9e9912813180f48baa9f32029f6c246f48263b2ec
+  - scripts/nf.py:d52f2acf8d1bf65bd064b6424f2552502d6a61b4438186d4b058e2507bcd9ed5
+  - verify.sh:5567d1139ec88b355884403a70ba8d4b73b584c78bd3245ad4a14c18e8e29b95
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:c706b8b3b136fccfc6f50e957d25c87327611532db66e85259ed7bead4bee016
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:9881ef04d900dd8d9f44748d7e4477ca32c8914abc717fbccb7b7072c6167674
 
 ---
+
+> 重审（2026-10-14 · 核心文档改名/路径迁移）：被审对象随本波改名或引用替换而变，subjects 依「重审并更新 digest」机械重绑；本轮不主张新的语义审计。
 
 > 重审（2026-10-13 · 核心语义通用化）：被审对象 verify.sh 随本波改动（check4/check5 判据键集由「认知/白描」泛化为「可见性/profile」），subjects 依「重审并更新 digest」处置；本轮为**机械重绑**，不主张新的语义审计，既有结论不变。
 
