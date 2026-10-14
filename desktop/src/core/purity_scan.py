@@ -547,5 +547,8 @@ def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
         issues += _dn_issues
         stats["domain_neutral"] = _dn_stats
     except Exception as _dexc:
-        issues.append("R8 去叙述体检不可用：%s（修复指引：核对 desktop/src/core/domain_neutral.py 可读性）" % _dexc)
+        issues.append(
+            f"R8 去叙述体检不可用：{_dexc}"
+            "（修复指引：核对 desktop/src/core/domain_neutral.py 可读性）"
+        )
     return issues, stats

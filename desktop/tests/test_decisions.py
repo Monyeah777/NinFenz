@@ -117,24 +117,24 @@ def errata_issues(root: str):
     doc = json.loads(p.read_text(encoding="utf-8"))
     out = []
     if doc.get("schema") != ERRATA_SCHEMA:
-        out.append("%s 的 schema 不匹配：%s" % (ERRATA_REL, doc.get("schema")))
+        out.append("{} 的 schema 不匹配：{}".format(ERRATA_REL, doc.get("schema")))
     live = {str(e["fm"].get("id")): e["fm"] for e in dc.entries(root)}
     checks = doc_family.check_numbers(root)
     vocab = doc.get("fields_vocabulary") or []
     for ent in doc.get("entries") or []:
         adr = str(ent.get("adr") or "")
         if adr not in live:
-            out.append("勘误指向不在册 ADR：%s" % adr)
+            out.append(f"勘误指向不在册 ADR：{adr}")
             continue
         field = str(ent.get("field") or "")
         if field not in vocab:
-            out.append("%s 的勘误字段越词表：%s" % (adr, field))
+            out.append(f"{adr} 的勘误字段越词表：{field}")
             continue
         vals = [str(v) for v in (live[adr].get(field) or [])]
         if str(ent.get("was")) not in vals:
-            out.append("%s 的勘误已过期：正文该字段里已无 %s（修复指引：重审或撤销该条）"
-                       % (adr, ent.get("was")))
-        out += ["%s 的勘误 now 无法解析：%s（%s）" % (adr, ent.get("now"), i)
+            out.append(f"{adr} 的勘误已过期：正文该字段里已无 {ent.get('was')}"
+                       "（修复指引：重审或撤销该条）")
+        out += ["{} 的勘误 now 无法解析：{}（{}）".format(adr, ent.get("now"), i)
                 for i in doc_family.refs_issues(root, [str(ent.get("now"))], checks,
                                                 label="勘误 now", allow_adr=True)]
     return out

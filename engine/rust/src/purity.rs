@@ -28,6 +28,16 @@ pub const PROTO_DOCS: [&str; 4] = [
 pub const IMPORT_SCAN: [&str; 3] =
     ["desktop/src/core/*.py", "scripts/*.py", ".github/scripts/*.py"];
 
+/// 真源 `core/domain_neutral.FACE`（R8 的被扫面）。
+pub const DOMAIN_FACE: [&str; 2] = ["03_管线库/**/*.md", "04_模块库/**/*.md"];
+
+/// 真源 `core/domain_neutral.DOMAIN_TERMS`（顺序即判定序：最左优先、同位置按表序取首个）。
+const DOMAIN_TERMS: [&str; 28] = [
+    "叙事", "叙述", "故事", "剧情", "主角", "玩家", "NPC", "台词", "情感", "情绪", "好感", "冲动",
+    "遗憾", "幽灵", "战斗", "魔法", "校园", "西幻", "文风", "白描", "恋爱", "悬疑", "恐怖", "情书",
+    "情敌", "角色卡", "人物卡", "三冲动",
+];
+
 /// 真源 `HARD_ALLOW`：登记的第三方硬依赖（允许直接 import）。
 const HARD_ALLOW: [&str; 1] = ["yaml"];
 
@@ -405,6 +415,49 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         )])
     };
 
+    // R8：核心文面去叙述（域中立）——真源 `core/domain_neutral.py`，判定序 = 最左优先、同位置按表序取首个。
+    let mut dn_files = 0i64;
+    let mut dn_hits = 0i64;
+    for pat in DOMAIN_FACE {
+        for rel in crate::glob::expand(root, pat) {
+            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+                continue;
+            };
+            dn_files += 1;
+            for (i, line) in text.lines().enumerate() {
+                let chars: Vec<char> = line.chars().collect();
+                let mut pos = 0usize;
+                while pos < chars.len() {
+                    let mut hit: Option<&str> = None;
+                    for term in DOMAIN_TERMS {
+                        let t: Vec<char> = term.chars().collect();
+                        if pos + t.len() <= chars.len() && chars[pos..pos + t.len()] == t[..] {
+                            hit = Some(term);
+                            break;
+                        }
+                    }
+                    let Some(term) = hit else {
+                        pos += 1;
+                        continue;
+                    };
+                    let exempt = pos > 0 && matches!(chars[pos - 1], '非' | '跨' | '反' | '去');
+                    if !exempt {
+                        dn_hits += 1;
+                        let head: String = line.trim().chars().take(80).collect();
+                        issues.push(format!(
+                            "{}:{} 核心文面含叙述/题材词「{}」：{}（修复指引：改域中立表述；确属必要改在 core/domain_neutral.DOMAIN_ALLOW 登记理由）",
+                            rel,
+                            i + 1,
+                            term,
+                            head
+                        ));
+                    }
+                    pos += term.chars().count();
+                }
+            }
+        }
+    }
+
     let stats = Json::Object(vec![
         ("docs".to_string(), Json::Int(docs)),
         ("raises".to_string(), Json::Int(raises)),
@@ -412,6 +465,13 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         ("import_residue".to_string(), Json::Array(residue)),
         ("sinks".to_string(), Json::Int(sinks.unwrap_or(0))),
         ("layers".to_string(), layers),
+        (
+            "domain_neutral".to_string(),
+            Json::Object(vec![
+                ("files".to_string(), Json::Int(dn_files)),
+                ("hits".to_string(), Json::Int(dn_hits)),
+            ]),
+        ),
     ]);
     (issues, stats)
 }
@@ -508,7 +568,7 @@ def clean(p):
         let (issues, stats) = scan(&root);
         assert_eq!(issues, &[r#"01_核心协议.md:2 端壳/APK 残留：本节提到 android 端的旧方案（应为端壳残留）。"#, r#"01_核心协议.md:3 私货/可变物：路径 D:\private\x 与 /home/someone/y 属私货；TODO 也该清。"#, r#"01_核心协议.md 重复标题「同名小节」：行 4,6"#, r#"02_联动注册表.md 重复标题「也重复」：行 2,4"#, r#"zz_fixture.py:8 raise 消息缺修复指引：坏了"#, r#"scripts/zz_fixture.py:3 第三方 jsonschema 未软导入（须 try/except ImportError 守卫；登记理由：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面））"#, r#"scripts/zz_fixture.py:8 第三方 import 未登记：requests（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#, r#"scripts/zz_fixture.py:9 第三方 import 未登记：nosuchlocal（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#, r#"scripts/zz_fixture.py:15 危险 sink os.system（CWE-78 shell 命令（改用 subprocess 列表参数））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:16 危险 sink unlink（CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左右））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:17 危险 sink subprocess(shell=True)（shell=True 命令注入面）——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:18 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#] as &[&str], "issues 须逐字且同序");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"docs": 3, "import_residue": [], "imports": 5, "layers": {"skipped": "缺 protocol/LAYERS.json（另由断言表与规范性名单判）"}, "raises": 3, "sinks": 5}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"docs": 3, "import_residue": [], "imports": 5, "layers": {"skipped": "缺 protocol/LAYERS.json（另由断言表与规范性名单判）"}, "raises": 3, "sinks": 5, "domain_neutral": {"files": 0, "hits": 0}}"#).unwrap(),
         )
         .unwrap();
         assert!(

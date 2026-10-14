@@ -197,9 +197,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 36,
+      "ca": 37,
       "ce": 6,
-      "i": 0.1429
+      "i": 0.1395
     },
     "content_face": {
       "ca": 3,
@@ -279,6 +279,11 @@
     "domain_metrics": {
       "ca": 2,
       "ce": 2,
+      "i": 0.5
+    },
+    "domain_neutral": {
+      "ca": 1,
+      "ce": 1,
       "i": 0.5
     },
     "domain_pack": {
@@ -888,8 +893,8 @@
     },
     "purity_scan": {
       "ca": 2,
-      "ce": 4,
-      "i": 0.6667
+      "ce": 5,
+      "i": 0.7143
     },
     "quality_baseline": {
       "ca": 6,
