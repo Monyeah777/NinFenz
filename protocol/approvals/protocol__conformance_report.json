@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "ADR-0006 职能坐标（L11 走判据表，不折进跨语言对照面）：roles 段 + role_model + 冻结投影 + 审计重绑 + 基线重冻",
+  "note": "ADR-0006 职能坐标：投影改对象列表（JSON 键不放路径）+ 审计重绑落 LF",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "635953b0fa5a767f7a8e41bae2e1bdea244bf8c05bdea54dc5fc49bbc23422f5"
