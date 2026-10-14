@@ -430,7 +430,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 2,
+        "metrics_drift": 0,
         "metrics_missing": 0,
         "metrics_recorded": 242,
         "modules": 242,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "d77158a9d5d5146359e7016287e70ad4e7164818fad4d9eb12cb1a4d1347528a",
+  "root_digest": "ea113eaca05f3f75703315e6324648dca8830f858c826855671e8950c03f8062",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
