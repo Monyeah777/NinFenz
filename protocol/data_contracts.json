@@ -643,6 +643,30 @@
         "verify_report",
         "desktop/tests/test_sast_baseline.py"
       ]
+    },
+    {
+      "id": "asset-contract-export",
+      "artifact": "protocol/generated/asset_contract.frictionless.json",
+      "quality_rule": "check40",
+      "owner": "数字资产契约导出（core/asset_contract.py::write_export）+ verify check40",
+      "status": "active",
+      "freshness": "重导出：nf asset contract --export（漂移由 check40 ④ 判）",
+      "consumers": [
+        "nf asset contract",
+        "Frictionless 生态"
+      ]
+    },
+    {
+      "id": "asset-contract-schema",
+      "artifact": "protocol/schema/asset_contracts.schema.json",
+      "quality_rule": "check28",
+      "owner": "机制维护（check28 过 dialect 与子集边界）",
+      "status": "active",
+      "freshness": "改可移植格式时同步（声明不符即由 check40 ⑤ 判红）",
+      "consumers": [
+        "nf asset contract ⑤",
+        "docs/asset_contract.md"
+      ]
     }
   ]
 }

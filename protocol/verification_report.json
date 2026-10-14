@@ -47,7 +47,7 @@
         "module_docs": 248,
         "pipelines": 114,
         "protocols": 111,
-        "schema_files": 8
+        "schema_files": 9
       },
       "status": "pass",
       "warns": 0
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "8d0caf736c80e6e43a75ba3c559d835e2f7416a582473667afbe204da77c0515",
+        "root": "09ce11bd2bbee5375caf279a98538004c5b383077329e5058dc567ef735fb707",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -372,8 +372,8 @@
         "baseline": 289,
         "files": 289,
         "max_fn_cc": 114,
-        "max_fn_lines": 1218,
-        "max_lines": 7332
+        "max_fn_lines": 1220,
+        "max_lines": 7339
       },
       "status": "pass",
       "warns": 0
@@ -511,7 +511,8 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1168,
+        "files": 1274,
+        "index": 1,
         "no_schema": 206,
         "script": 4
       },
@@ -525,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3763,
-        "kernel": 1955,
+        "files": 3766,
+        "kernel": 1956,
         "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9047cacbd827deab5a2fd358fb3af98c235cf3a18e1e2d87d1661119ee064454",
+  "root_digest": "d77158a9d5d5146359e7016287e70ad4e7164818fad4d9eb12cb1a4d1347528a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

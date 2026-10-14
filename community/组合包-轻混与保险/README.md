@@ -24,7 +24,7 @@
 ## 3. 复现与验收
 
 ```
-python scripts/nf.py combine plan --packs "校园西幻轻混组合包,AI保险域包"
+python scripts/nf.py combine plan --packs "AI保险域包,校园西幻轻混组合包"
 python scripts/nf.py combine verify
 python scripts/nf.py output verify
 ```

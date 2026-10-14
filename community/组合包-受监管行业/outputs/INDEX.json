@@ -90,6 +90,13 @@
       "note": "模块依赖图（GraphML；端点引用完整性由形态校验器判定）"
     },
     {
+      "path": "outputs/schemas/SYSTEM_CARD.schema.json",
+      "form": "json-schema",
+      "tier": "T2",
+      "role": "schema",
+      "note": "系统卡契约（与常规域包同形）"
+    },
+    {
       "path": "outputs/SYSTEM_CARD.json",
       "form": "system-card",
       "tier": "T3",

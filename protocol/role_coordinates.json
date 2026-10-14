@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1446,
+    "app": 1447,
     "entry": 24,
     "floor": 5,
     "prod": 1034,
-    "projection": 128,
+    "projection": 129,
     "support": 209,
-    "verify": 916
+    "verify": 917
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11567,6 +11567,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF 数字资产契约声明（asset contracts）",
+      "path": "protocol/schema/asset_contracts.schema.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "模块头 machine_contract 机读契约块（01 §1.1 九键 + conformance + 已登记扩展键）",
       "path": "protocol/schema/contract.schema.json",
       "role": "verify",
@@ -11742,16 +11748,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "047addd24b77cfb2e20dbae174888b4466c41ab9bfcc3c39deedfb46294c9f90",
+  "root_digest": "4ce1463d22bc55a932145847db26d6674cc1268b80e76a5672e3c20df30a2ac8",
   "rule_counts": {
-    "R-app": 1446,
+    "R-app": 1447,
     "R-catch": 74,
     "R-entry": 24,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 113,
+    "R-projection": 114,
     "R-support": 111,
-    "R-verify": 805,
+    "R-verify": 806,
     "auto:R-core": 240
   },
   "schema": "nf-role-coordinates/1"

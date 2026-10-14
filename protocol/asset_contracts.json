@@ -8,7 +8,8 @@
         }
       ],
       "from": "cards",
-      "to": "external-links"
+      "to": "external-links",
+      "id": "cards-to-external-links"
     }
   ],
   "code": [
@@ -272,6 +273,13 @@
       "lang": "bash",
       "outputs": [],
       "path": "scripts/quality_all.sh"
+    }
+  ],
+  "index": [
+    {
+      "id": "pack-index-selfcontract",
+      "glob": "community/*/outputs/INDEX.json",
+      "note": "包自述契约（nf-output-index/1）与磁盘实况双向对账：声明件/schema/inputs 必须在场，outputs/ 下的实况必须都被声明（samples/ 夹具除外）"
     }
   ]
 }

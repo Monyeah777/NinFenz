@@ -22,7 +22,7 @@
 ## 3. 复现与验收
 
 ```
-python scripts/nf.py combine plan --packs "大语言模型域包,嵌入与检索表示域包,向量库与检索管线域包"
+python scripts/nf.py combine plan --packs "向量库与检索管线域包,大语言模型域包,嵌入与检索表示域包"
 python scripts/nf.py combine verify
 python scripts/nf.py output verify
 ```

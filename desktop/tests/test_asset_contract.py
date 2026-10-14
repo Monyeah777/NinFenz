@@ -25,7 +25,16 @@ def _make(root: Path, rel, text) -> Path:
 
 
 def _decl(root: Path, doc) -> None:
+    """写声明：缺的面补空数组（真声明的三面键总在场；临时场景不必逐条写全）。"""
+    for key in ("data", "code", "script"):
+        doc.setdefault(key, [])
     _make(root, ac.DECL_REL, json.dumps(doc, ensure_ascii=False))
+
+
+def _selfcontained(root: Path) -> None:
+    """给临时场景补「声明面自带件」：可移植 schema + 导出件（全量扫描的 ④/⑤ 要求在场）。"""
+    _make(root, ac.SCHEMA_REL, (ROOT / ac.SCHEMA_REL).read_text(encoding="utf-8"))
+    ac.write_export(str(root))
 
 
 class DataFaceTest(unittest.TestCase):
@@ -280,6 +289,7 @@ class DeclarationTest(unittest.TestCase):
             self.assertEqual(1, stats["frozen"])
             doc = json.loads((r / ac.DECL_REL).read_text(encoding="utf-8"))
             self.assertEqual(ac.digest_of(r / "f.json"), doc["data"][0]["sha256"])
+            _selfcontained(r)
             again, _warns, _s = ac.scan(str(r))
             self.assertEqual([], again, again)
 
@@ -523,6 +533,57 @@ class StructuralCodeTest(unittest.TestCase):
             issues, _ = ac._check_code(d, {"id": "e", "glob": "*.rs",
                                           "forbid_regex": [{"name": "x", "pattern": "x"}]})
             self.assertTrue(any("未命中任何文件" in i for i in issues), issues)
+
+
+class S1S2S3Test(unittest.TestCase):
+    """S1 包自述对账 / S3 导出漂移 / S2 声明过可移植 schema。"""
+
+    def _pkg(self, root, name="p1"):
+        _make(root, f"community/{name}/outputs/INDEX.json",
+              json.dumps({"schema": "nf-output-index/1", "package": name,
+                          "outputs": [
+                              {"path": "outputs/schemas/A.schema.json", "form": "json-schema",
+                               "tier": "T2", "role": "schema"},
+                              {"path": "outputs/A.json", "form": "json", "tier": "T3",
+                               "role": "data", "schema": "outputs/schemas/A.schema.json"}]}))
+        _make(root, f"community/{name}/outputs/A.json", "{}")
+        _make(root, f"community/{name}/outputs/schemas/A.schema.json", "{}")
+
+    def test_index_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._pkg(Path(d))
+            issues, stats = ac._check_index(str(Path(d)), {"id": "idx", "glob": "community/*/outputs/INDEX.json"})
+            self.assertEqual([], issues, issues)
+            self.assertEqual(2, stats["declared"])
+
+    def test_index_missing_declared_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._pkg(Path(d))
+            (Path(d) / "community/p1/outputs/A.json").unlink()
+            issues, _ = ac._check_index(str(Path(d)), {"id": "idx", "glob": "community/*/outputs/INDEX.json"})
+            self.assertTrue(any("不在场" in i for i in issues), issues)
+
+    def test_index_undeclared_on_disk(self):
+        with tempfile.TemporaryDirectory() as d:
+            self._pkg(Path(d))
+            _make(Path(d), "community/p1/outputs/EXTRA.json", "{}")
+            issues, _ = ac._check_index(str(Path(d)), {"id": "idx", "glob": "community/*/outputs/INDEX.json"})
+            self.assertTrue(any("未声明" in i for i in issues), issues)
+
+    def test_export_missing_is_issue(self):
+        with tempfile.TemporaryDirectory() as d:
+            _make(Path(d), "protocol/asset_contracts.json",
+                  json.dumps({"schema": "nf-asset-contracts/1", "data": [], "code": [], "script": []}))
+            issues = ac._export_drift(str(Path(d)))
+            self.assertTrue(any("缺契约导出" in i for i in issues), issues)
+
+    def test_schema_self_check_catches_bad_declaration(self):
+        with tempfile.TemporaryDirectory() as d:
+            sch = (ROOT / ac.SCHEMA_REL).read_text(encoding="utf-8")
+            _make(Path(d), ac.SCHEMA_REL, sch)
+            _make(Path(d), ac.DECL_REL, json.dumps({"schema": "nf-asset-contracts/1", "data": []}))
+            issues = ac._schema_self_check(str(Path(d)))
+            self.assertTrue(any("不符可移植 schema" in i for i in issues), issues)
 
 
 if __name__ == "__main__":
