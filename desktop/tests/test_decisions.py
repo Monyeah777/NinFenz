@@ -99,5 +99,75 @@ class TestNegatives(unittest.TestCase):
         self.assertTrue(dc.check_projection(tmp))
 
 
+ERRATA_REL = "decisions/ERRATA.json"
+ERRATA_SCHEMA = "nf-decisions-errata/1"
+
+
+def errata_issues(root: str):
+    """勘误登记的两条确定性判据（**不腐** / **不作假**）→ issue 列表。
+
+    为什么在测试层（2026-10-14）：本判据的天然落点是 `core/decisions.py::scan`，但该件在棘轮
+    冻结面上，给它加行须重冻基线；而当时工作区有另一个会话的整波改名在飞（100 项未提交），
+    重冻 = 给中间态盖章（本仓明令禁止）。测试层同样随 check12 常驻生效，且**不动冻结面**。
+    """
+    from core import doc_family
+    p = Path(root, ERRATA_REL)
+    if not p.is_file():
+        return [ERRATA_REL + " 缺失（修复指引：补声明件，或在 README 里撤掉镜像表）"]
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    out = []
+    if doc.get("schema") != ERRATA_SCHEMA:
+        out.append("%s 的 schema 不匹配：%s" % (ERRATA_REL, doc.get("schema")))
+    live = {str(e["fm"].get("id")): e["fm"] for e in dc.entries(root)}
+    checks = doc_family.check_numbers(root)
+    vocab = doc.get("fields_vocabulary") or []
+    for ent in doc.get("entries") or []:
+        adr = str(ent.get("adr") or "")
+        if adr not in live:
+            out.append("勘误指向不在册 ADR：%s" % adr)
+            continue
+        field = str(ent.get("field") or "")
+        if field not in vocab:
+            out.append("%s 的勘误字段越词表：%s" % (adr, field))
+            continue
+        vals = [str(v) for v in (live[adr].get(field) or [])]
+        if str(ent.get("was")) not in vals:
+            out.append("%s 的勘误已过期：正文该字段里已无 %s（修复指引：重审或撤销该条）"
+                       % (adr, ent.get("was")))
+        out += ["%s 的勘误 now 无法解析：%s（%s）" % (adr, ent.get("now"), i)
+                for i in doc_family.refs_issues(root, [str(ent.get("now"))], checks,
+                                                label="勘误 now", allow_adr=True)]
+    return out
+
+
+class ErrataTest(unittest.TestCase):
+    def test_real_repo_errata_is_clean(self):
+        self.assertEqual([], errata_issues(str(ROOT)))
+
+    def test_stale_erratum_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp())
+        _mk(tmp, ERRATA_REL, json.dumps({"schema": ERRATA_SCHEMA,
+            "fields_vocabulary": ["evidence"],
+            "entries": [{"adr": "ADR-0001", "field": "evidence",
+                         "was": "check99", "now": "art.md"}]}))
+        self.assertTrue(any("已过期" in i for i in errata_issues(tmp)))
+
+    def test_unresolvable_now_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp())
+        _mk(tmp, ERRATA_REL, json.dumps({"schema": ERRATA_SCHEMA,
+            "fields_vocabulary": ["evidence"],
+            "entries": [{"adr": "ADR-0001", "field": "evidence",
+                         "was": "art.md", "now": "nowhere.md"}]}))
+        self.assertTrue(any("无法解析" in i for i in errata_issues(tmp)))
+
+    def test_unknown_adr_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp())
+        _mk(tmp, ERRATA_REL, json.dumps({"schema": ERRATA_SCHEMA,
+            "fields_vocabulary": ["evidence"],
+            "entries": [{"adr": "ADR-9999", "field": "evidence",
+                         "was": "art.md", "now": "art.md"}]}))
+        self.assertTrue(any("不在册 ADR" in i for i in errata_issues(tmp)))
+
+
 if __name__ == "__main__":
     unittest.main()
