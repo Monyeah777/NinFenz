@@ -56,9 +56,9 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 1150,
+      "lines": 1173,
       "max_fn_cc": 28,
-      "max_fn_lines": 59
+      "max_fn_lines": 61
     },
     "desktop/src/core/asset_density.py": {
       "lines": 367,
@@ -1006,7 +1006,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 389,
+      "lines": 394,
       "max_fn_cc": 19,
       "max_fn_lines": 35
     },

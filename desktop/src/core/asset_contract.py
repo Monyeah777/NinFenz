@@ -272,19 +272,22 @@ def _fields_issues(rel: str, obj: Any, spec: Dict[str, Any]) -> List[str]:
             for f in spec.get("required_fields") or [] if _dig(obj, f) is _MISSING]
 
 
-def _data_yaml(root: str, rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    """YAML 数据件：解析复用仓库既有懒加载 YAML（软依赖），解析后与 JSON 走同一套 schema/字段判据。"""
+def _data_yaml(root: str, rel: str, text: str,
+               spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """YAML 数据件：复用仓库既有懒加载 YAML（软依赖），解析后与 JSON 同判据。"""
     from core import lazy_yaml
     ymod = lazy_yaml.module()                # 惰性入口：缺 PyYAML 时返回 None（不是即报）
     if ymod is None:
         # 契约判据**不许**在缺依赖时静默放行（那等于假绿）：报缺口并给安装指引。
-        return ["数据件 %s 未判：PyYAML 不在场（修复指引：pip install pyyaml，或把该件改成 format=text）"
+        return ["数据件 %s 未判：PyYAML 不在场"
+                "（修复指引：pip install pyyaml，或改成 format=text）"
                 % rel], {"yaml_unavailable": 1}
     try:
         loader = lazy_yaml.safe_loader()
         obj = ymod.load(text, Loader=loader) if loader is not None else ymod.safe_load(text)
     except Exception as exc:                                  # noqa: BLE001 —— 解析器异常按坏件报
-        return ["数据件 %s 不是合法 YAML：%s（修复指引：修好缩进/语法或换 format）" % (rel, exc)], {}
+        return ["数据件 %s 不是合法 YAML：%s（修复指引：修好缩进/语法）"
+                % (rel, exc)], {}
     issues: List[str] = []
     sch = _schema_of(root, rel, spec)
     if sch:
@@ -293,7 +296,8 @@ def _data_yaml(root: str, rel: str, text: str, spec: Dict[str, Any]) -> Tuple[Li
     return issues, {"fields": len(spec.get("required_fields") or [])}
 
 
-def _data_toml(root: str, rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+def _data_toml(root: str, rel: str, text: str,
+               spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     """TOML 数据件：stdlib `tomllib`（3.11+）；解析后同 JSON 判据。"""
     import tomllib
     try:
@@ -319,11 +323,13 @@ def _data_jsonl(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], D
         try:
             obj = _strict_json(line)
         except ValueError as exc:
-            issues.append("数据件 %s 第 %d 行不是合法 JSON：%s（修复指引：一行一条 JSON）" % (rel, i, exc))
+            issues.append("数据件 %s 第 %d 行不是合法 JSON：%s（修复指引：一行一条）"
+                          % (rel, i, exc))
             continue
         for f in spec.get("required_fields") or []:
             if _dig(obj, f) is _MISSING:
-                issues.append("数据件 %s 第 %d 行缺必填字段 %s（修复指引：补字段或改声明）" % (rel, i, f))
+                issues.append("数据件 %s 第 %d 行缺必填字段 %s（修复指引：补字段）"
+                              % (rel, i, f))
     if spec.get("min_rows") and rows < int(spec["min_rows"]):
         issues.append("数据件 %s 行数 %d < min_rows %s（修复指引：补样例或下调声明）"
                       % (rel, rows, spec["min_rows"]))
@@ -331,10 +337,18 @@ def _data_jsonl(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], D
 
 
 def _data_graphml(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    """GraphML：XML 良构 + 节点/边计数（图结构资产的可证那部分）。"""
-    import xml.etree.ElementTree as ET
+    """GraphML：XML 良构 + 节点/边计数（图结构资产的可证那部分）。
+
+    解析前的**拒收门槛**：含 DTD / 实体声明的图件直接拒——Billion-Laughs / XXE 的载体都在那两处，
+    而本层处理的是仓内资产（非不可信输入），故 `# nosec` 的例外只需覆盖「标准库 XML 解析」本身，
+    不覆盖实体展开（那条已在入口拒掉）。
+    """
+    if re.search(r"<!DOCTYPE|<!ENTITY", text):
+        return ["数据件 %s 含 DTD/实体声明，拒绝解析（修复指引：去掉 DOCTYPE/ENTITY——导出工具重跑）"
+                % rel], {}
+    import xml.etree.ElementTree as ET  # nosec B405 —— 见函数自述：入口已拒 DTD/ENTITY
     try:
-        root_el = ET.fromstring(text)
+        root_el = ET.fromstring(text)        # nosec B314  # noqa: S314
     except ET.ParseError as exc:
         return ["数据件 %s 不是良构 XML：%s（修复指引：修好 XML）" % (rel, exc)], {}
     ns = {"g": "http://graphml.graphdrawing.org/xmlns"}
@@ -359,7 +373,8 @@ def _data_mmd(rel: str, text: str, spec: Dict[str, Any]) -> Tuple[List[str], Dic
         return ["数据件 %s 是空 Mermaid 图（修复指引：补图声明）" % rel], {}
     base = first.split("-")[0] if first.startswith(("xychart", "block")) else first
     if first not in _MMD_KINDS and base not in _MMD_KINDS:
-        return ["数据件 %s 首关键词 %r 不是合法 Mermaid 图型（修复指引：用 graph/flowchart/sequenceDiagram 等）"
+        return ["数据件 %s 首关键词 %r 不是合法 Mermaid 图型"
+                "（修复指引：用 graph/flowchart/sequenceDiagram 等）"
                 % (rel, first)], {}
     return [], {"kind": first}
 
@@ -682,7 +697,8 @@ def _code_structural(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[s
         cap = int(rule.get("max") or 0)
         stats["limit:%s" % rule.get("name")] = n
         if n > cap:
-            issues.append("代码契约 %s 的 %s 计数 %d > 上限 %d（棘轮只减不增）（修复指引：先降后改声明）"
+            issues.append("代码契约 %s 的 %s 计数 %d > 上限 %d（棘轮只减不增）"
+                          "（修复指引：先降后改声明）"
                           % (sid, rule.get("name"), n, cap))
     return issues, stats
 
@@ -830,7 +846,8 @@ def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, 
         try:
             doc = _strict_json(text)
         except ValueError as exc:
-            issues.append("包清单 %s 不是合法 JSON：%s（修复指引：重跑 nf domain build）" % (rel, exc))
+            issues.append("包清单 %s 不是合法 JSON：%s（修复指引：重跑 nf domain build）"
+                          % (rel, exc))
             continue
         base = Path(rel).parent.parent          # <包>/outputs/INDEX.json → <包>
         outs = doc.get("outputs")
@@ -848,21 +865,25 @@ def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, 
             declared.add(pth)
             declared_total += 1
             if not (Path(root) / base / pth).is_file():
-                issues.append("包清单 %s 声明的 %s 不在场（修复指引：补件或重跑 nf domain build）" % (rel, pth))
+                issues.append("包清单 %s 声明的 %s 不在场"
+                              "（修复指引：补件或重跑 nf domain build）" % (rel, pth))
             sch = str(item.get("schema") or "")
             if sch and not (Path(root) / base / sch).is_file():
                 issues.append("包清单 %s 声明的 schema %s 不在场（修复指引：补件）" % (rel, sch))
             ins = item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])
             for inp in ins:
                 if not (Path(root) / base / str(inp)).is_file():
-                    issues.append("包清单 %s 声明的输入 %s 不在场（修复指引：补件或改声明）" % (rel, inp))
+                    issues.append("包清单 %s 声明的输入 %s 不在场"
+                                  "（修复指引：补件或改声明）" % (rel, inp))
         on_disk = {q.relative_to(Path(root) / base).as_posix()
                    for q in sorted((Path(root) / base / "outputs").rglob("*")) if q.is_file()}
         self_rel = Path(rel).relative_to(base).as_posix()   # 清单自身不是产出面（它是清单）
         missing = sorted(x for x in on_disk
-                         if x not in declared and x != self_rel and not x.startswith("outputs/samples/"))
+                         if x not in declared and x != self_rel
+                         and not x.startswith("outputs/samples/"))
         if missing:
-            issues.append("包清单 %s 未声明 %d 件实况（例 %s）（修复指引：重跑 nf domain build 让清单与实况同步）"
+            issues.append("包清单 %s 未声明 %d 件实况（例 %s）"
+                          "（修复指引：重跑 nf domain build 让清单与实况同步）"
                           % (rel, len(missing), "、".join(missing[:3])))
     return issues, {"files": len(rels), "declared": declared_total}
 
@@ -913,7 +934,8 @@ def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
         return []                      # 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）
     p = Path(root) / "protocol/data_contracts.json"
     if not p.is_file():
-        return ["缺 protocol/data_contracts.json（修复指引：补登记册——本册有 protocol 真源件须登记）"]
+        return ["缺 protocol/data_contracts.json"
+                "（修复指引：补登记册——本册有 protocol 真源件须登记）"]
     try:
         reg = _strict_json(p.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -923,7 +945,8 @@ def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
     for spec in doc.get("data") or []:
         for rel in resolve(root, spec):
             if rel.startswith("protocol/") and rel.endswith(".json") and rel not in arts:
-                issues.append("资产 %s 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——"
+                issues.append("资产 %s 未在 protocol/data_contracts.json 登记"
+                              "（修复指引：补一条契约——"
                               "同一 artifact 不许只在资产册出现）" % rel)
                 break
     return issues
@@ -946,7 +969,7 @@ def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     return doc, []
 
 
-_JS_TO_FRICTIONLESS = {"string": "string", "integer": "integer", "number": "number",
+_FRIENDLY = {"string": "string", "integer": "integer", "number": "number",
                       "boolean": "boolean", "array": "array", "object": "object",
                       "null": "any"}
 
@@ -984,7 +1007,7 @@ def frictionless_export(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
                     if sch:
                         item["x-nf-json-schema"] = {k: sch[k] for k in keep if k in sch}
                         item["x-nf-schema-source"] = sch_rel
-                    fields = [{"name": k, "type": _JS_TO_FRICTIONLESS.get(str(v.get("type") or ""), "any")}
+                    fields = [{"name": k, "type": _FRIENDLY.get(str(v.get("type") or ""), "any")}
                               for k, v in sorted((sch.get("properties") or {}).items())
                               if isinstance(v, dict)]
                     if fields:
@@ -1041,7 +1064,7 @@ def _export_drift(root: str) -> List[str]:
 
 def scan(root: str = ".", faces: Iterable[str] = ()
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；唯一门禁入口（check40 同源）。"""
+    """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；门禁入口（check40 同源）。"""
     doc, issues = load(root)
     warns: List[str] = []
     stats: Dict[str, Any] = {f: 0 for f in FACES}

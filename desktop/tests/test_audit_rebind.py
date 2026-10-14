@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """`nf audit rebind` 单测：机械重绑 + 理由落档 + 幂等 + 拒空理由（check 的 check）。"""
-import json
 import sys
 import tempfile
 import unittest

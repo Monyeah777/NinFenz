@@ -6,7 +6,7 @@ scope: 作者指令「拉取 ≥10 项代码审查工具；用工具 + 决策模
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/audit.py:18c16d36127ebef3f7bad5174a18f55441360f956f1061d519a46569ffcc65af
+  - desktop/src/core/audit.py:973b14991337d73ebe3508e4a4be0b9b5b632fa5477a40a82b1d0f5e4c69add2
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/storage.py:a8d5110b3d2cda9b25ba144315229b52a1768548fe15ea226892137244d585be
@@ -17,6 +17,8 @@ subjects:
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
 
 ---
+> 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
+
 > 重审（2026-10-14）：引入 nf audit rebind 命令（core/audit.py + CLI + 顺序纪律 + 两处面收敛）
 
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化

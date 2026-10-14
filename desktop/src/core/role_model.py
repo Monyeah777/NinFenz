@@ -64,6 +64,8 @@ def load(root: str = ".") -> Dict[str, Any]:
     try:
         doc = json_doc.load(Path(root) / DECL_REL, dict, what=DECL_REL)
     except (OSError, ValueError):
+        # 可吞：读不出即「无 roles 段」——调用方（scan/coordinate）按缺段如实报缺口，
+        # 不是静默放行；此处返回空只表示本件不可用。
         return {}
     roles = doc.get("roles")
     return roles if isinstance(roles, dict) else {}
@@ -121,6 +123,8 @@ def writes_disk(text: str) -> bool:
     try:
         tree = ast.parse(text)
     except SyntaxError:
+        # 可吞：解析不了 = 没有可证的写盘入口（本判据只认 AST 能证的部分），
+        # 语法坏件另有 check12 全量 py_compile 兜着，不在此重复报。
         return False
     for node in tree.body:
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -350,6 +354,7 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
         try:
             text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
         except OSError:
+            # 可吞：该件读不到 → 本判据跳过；「件不在场」另有 ① 覆盖判据兜着，不重复报。
             continue
         if writes_disk(text):
             writers.append(rel)
