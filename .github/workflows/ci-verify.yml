@@ -57,7 +57,7 @@ jobs:
           bash verify.sh 2>&1 | tee verify.log
       - name: 上传门禁日志（失败时同样上传）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: verify-log
           # 控制台日志 + verify.sh 的各 check 明细日志（NF_VERIFY_TMP 保留目录）。
@@ -80,7 +80,7 @@ jobs:
           python scripts/verify_report.py --check
       - name: 上传门禁报告工件（本 run 的机器可读结论）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: verification-report
           path: .artifacts/verification-report.json
