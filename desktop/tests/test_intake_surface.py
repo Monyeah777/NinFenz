@@ -48,7 +48,8 @@ def _fixture(tmp: str) -> None:
         dst = root / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / rel, dst)
-    for p in sorted((ROOT / ".github" / "ISSUE_TEMPLATE").glob("*.md")):
+    tpl_dir = ROOT / ".github" / "ISSUE_TEMPLATE"
+    for p in sorted([*tpl_dir.glob("*.md"), *tpl_dir.glob("*.yml")]):
         dst = root / ".github" / "ISSUE_TEMPLATE" / p.name
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(p, dst)
@@ -105,7 +106,7 @@ class TestIntakeSurface(unittest.TestCase):
     def test_anchor_line_drift_detected(self):
         with tempfile.TemporaryDirectory() as tmp:
             _fixture(tmp)
-            p = Path(tmp) / ".github" / "ISSUE_TEMPLATE" / "bug_report.md"
+            p = Path(tmp) / ".github" / "ISSUE_TEMPLATE" / "bug_report.yml"
             _mutate(p, "community 包", "community包")
             issues, _ = isf.scan(tmp)
             self.assertTrue(any("锚点行" in i for i in issues), issues)

@@ -121,8 +121,8 @@ python3 -m compileall -q desktop/src scripts
 **推荐段（可选，非门禁——v2.6-A 钢人论证 / M_AUDIT 协议设计审计）**：重大方向性决策（域包立项 / 协议设计前置 / 线体取舍 / 发布节奏）可选用协议设计审计工作单理清支持/反对/盲区——`nf design audit init "<问题>" --target T --mode {steelman,blindspot,full}` 生成，`--check` 结构自检（verdict 三态/论据与清单边界/meta 在场），`ls` 列审计索引。full 模式含盲区双问（Q1 低置信度 / Q2 遗漏）——反幻觉与反思维惯性；`nf design steelman` 为其钢人子集兼容入口。**措辞为推荐非必做**：默认缺席、按需装载，不强制任何决策走审计（「也许有人需要而有人不需要」）；审计产物（audit.md）是过程档案，与方案文档（产物）互补，可回溯决策依据。
 
 ## 5. Issue / PR 规范
-- **缺陷上报**：使用 .github/ISSUE_TEMPLATE/bug_report.md（环境信息按模板填写）。
-- **功能请求**：使用 .github/ISSUE_TEMPLATE/feature_request.md。
+- **缺陷上报**：使用 .github/ISSUE_TEMPLATE/bug_report.yml（结构化表单；环境信息按字段填写）。
+- **功能请求**：使用 .github/ISSUE_TEMPLATE/feature_request.yml（结构化表单）。
 - **PR**：使用 .github/PULL_REQUEST_TEMPLATE.md，勾选改动域（协议层 / 代码层 / 社区包）+ 门禁自检清单（verify.sh 全绿 / unittest 用例 / py_compile 通过）。
 
 ## 6. 安全章程（40 总纲 S8，2026-09-06）

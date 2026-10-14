@@ -64,15 +64,15 @@
       "license_warn": "code:desktop/src/core/license_gate.py",
       "rating_warn": "code:desktop/src/core/rating_gate.py"
     },
-    "path_surface": [".github/ISSUE_TEMPLATE/bug_report.md", ".github/ISSUE_TEMPLATE/feature_request.md", ".github/ISSUE_TEMPLATE/library_submission.md", ".github/ISSUE_TEMPLATE/NF投稿.md"],
+    "path_surface": [".github/ISSUE_TEMPLATE/bug_report.yml", ".github/ISSUE_TEMPLATE/feature_request.yml", ".github/ISSUE_TEMPLATE/library_submission.md", ".github/ISSUE_TEMPLATE/NF投稿.md"],
     "gate_ref_surface": ["library/intake.json", "library/INDEX.md"],
     "path_allow": ["NF-序号", "NF-档位词-自定义段-序号"],
     "code_surfaces": ["scripts/", "desktop/", "tui/", "engine/", "integrations/", "site/"],
-    "code_surface_template": ".github/ISSUE_TEMPLATE/feature_request.md",
-    "code_surface_prefix": "- [ ] 代码层",
+    "code_surface_template": ".github/ISSUE_TEMPLATE/feature_request.yml",
+    "code_surface_prefix": "代码层",
     "anchor_lines": [
       {
-        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "file": ".github/ISSUE_TEMPLATE/bug_report.yml",
         "text": "- 形态：CLI（scripts/nf.py）｜协议内容（模块/管线/资产/community 包）｜文档/质量门禁（verify.sh）｜其他（桌面 GUI 端壳已于 2026-09-09 退役移出）",
         "check_paths": ["scripts/nf.py", "verify.sh"]
       }
