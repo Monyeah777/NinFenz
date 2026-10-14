@@ -14,6 +14,7 @@
 <!-- nf:stats:end -->
 - 语言面与本地化：[docs/locales.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/locales.md)（规则与覆盖面；译件 `docs/en/locales.md` · `docs/ja/locales.md`；`nf locales [--write]`）
 - 发布与语言面：[docs/release.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/release.md)（发布编排：机读策略 `protocol/release_policy.json` + `nf release --plan/--freeze`）· 译件 `docs/en/release.md` · `docs/ja/release.md` · 语言面注册表 `protocol/locales.json`
+- [docs/asset_contract.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/asset_contract.md)：数字资产契约四面（数据/代码/脚本/包清单）+ 便携 schema + Frictionless 导出
 - 接入面目录（integrations）：`integrations/README.md`（MCP / LSP / CLI / TUI / 图书馆 raw / Agent Skill / AGENTS 规则 / CCV3 / npm / Rust 快线 / .NET 引擎 / A2A 卡片；机检 check38 `integrations` 子扫描）
 - 语言面（locales）：`README.md`（canonical 中文）· `README.en.md`（English）· `README.ja.md`（日本語）——机检 check34（`desktop/src/core/locales.py`：逐面机读事实锚点 + 语言切换行 + 结构对齐）
 - 英文入口（English entry）：`README.en.md`（覆盖同一组机读事实：协议件 / 装载路径 / 质量凭证；由 check34 断言与 `README.md` 一致）。

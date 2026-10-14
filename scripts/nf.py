@@ -345,13 +345,15 @@ def _make_parser() -> argparse.ArgumentParser:
     a_led.add_argument("--json", action="store_true",
                        help="输出结构化 JSON（校验统计）")
     a_ctr = asub.add_parser("contract",
-                            help="数字资产契约三面校验（数据/代码/脚本：格式+字段完整性+防篡改+AST "
-                                "规范+可证空指针+脚本 I/O 对齐）",
-                            description="数字资产契约三面校验（真源 protocol/asset_contracts.json；"
+                            help="数字资产契约四面校验（数据/代码/脚本/包清单：格式+字段完整性+"
+                                "防篡改+AST 规范+可证空指针+脚本 I/O 对齐+包自述对账）",
+                            description="数字资产契约四面校验（真源 protocol/asset_contracts.json；"
                                 "与 verify check40 同源）")
     a_ctr.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
-    a_ctr.add_argument("--face", default="", choices=("", "data", "code", "script"),
-                       help="只跑某面（缺省=三面全跑）")
+    a_ctr.add_argument("--face", default="", choices=("", "data", "code", "script", "index"),
+                       help="只跑某面（缺省=四面全跑：数据/代码/脚本/包清单）")
+    a_ctr.add_argument("--export", action="store_true",
+                       help="导出 Frictionless Data Package（protocol/generated/asset_contract.frictionless.json）")
     a_ctr.add_argument("--freeze", action="store_true",
                        help="按当前内容重冻声明的 sha256（显式棘轮，不由扫描器偷偷写）")
     a_ctr.add_argument("--run-tests", action="store_true",
@@ -2114,6 +2116,11 @@ def _asset_contract(args) -> int:
     """
     import json as _json
     from core import asset_contract as ac
+    if args.export:
+        n = ac.write_export(args.root)
+        print("== nf asset contract --export ==")
+        print("  已写出 %s（资源 %d 条）" % (ac.EXPORT_REL, n))
+        return 0
     if args.freeze:
         issues, stats = ac.freeze(args.root)
     elif args.run_tests:
@@ -2131,10 +2138,10 @@ def _asset_contract(args) -> int:
         print("== nf asset contract --run-tests ==")
         print("  测试件 %d · 用例 %d" % (stats.get("files", 0), stats.get("tests", 0)))
     else:
-        print("== nf asset contract（数字资产契约三面：数据/代码/脚本）==")
-        print("  面：data %d · code %d · script %d · 链 %d · 件 %d"
+        print("== nf asset contract（数字资产契约四面：数据/代码/脚本/包清单）==")
+        print("  面：data %d · code %d · script %d · index %d · 链 %d · 件 %d"
               % (stats.get("data", 0), stats.get("code", 0), stats.get("script", 0),
-                 stats.get("chains", 0), stats.get("files", 0)))
+                 stats.get("index", 0), stats.get("chains", 0), stats.get("files", 0)))
     for i in issues:
         print("  [FAIL] %s" % i, file=sys.stderr)
     if not issues and not args.json:

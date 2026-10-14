@@ -38,7 +38,8 @@
     {"path": "protocol/schema/asset.schema.json"},
     {"path": "protocol/schema/release.schema.json"},
     {"path": "protocol/schema/integration.schema.json"},
-    {"path": "protocol/schema/integration_strings.schema.json"}
+    {"path": "protocol/schema/integration_strings.schema.json"},
+    {"path": "protocol/schema/asset_contracts.schema.json"}
   ],
   "informative": [
     "README.md", "CONTRIBUTING.md", "docs/meta/ROADMAP.md", "docs/agent/ROUTES.md",

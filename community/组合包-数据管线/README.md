@@ -23,7 +23,7 @@
 ## 3. 复现与验收
 
 ```
-python scripts/nf.py combine plan --packs "数据采集与清洗域包,合成数据生成域包,预训练与继续预训练域包,评测基准与排行榜域包"
+python scripts/nf.py combine plan --packs "合成数据生成域包,数据采集与清洗域包,评测基准与排行榜域包,预训练与继续预训练域包"
 python scripts/nf.py combine verify
 python scripts/nf.py output verify
 ```

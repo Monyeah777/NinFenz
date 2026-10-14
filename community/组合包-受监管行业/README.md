@@ -23,7 +23,7 @@
 ## 3. 复现与验收
 
 ```
-python scripts/nf.py combine plan --packs "AI金融投研与风控域包,AI法律与合规域包,可解释性与审计域包,隐私与数据治理域包"
+python scripts/nf.py combine plan --packs "AI法律与合规域包,AI金融投研与风控域包,可解释性与审计域包,隐私与数据治理域包"
 python scripts/nf.py combine verify
 python scripts/nf.py output verify
 ```

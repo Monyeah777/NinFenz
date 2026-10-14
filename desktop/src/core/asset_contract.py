@@ -41,8 +41,10 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from core import atomic_write, json_doc
 
 DECL_REL = "protocol/asset_contracts.json"
+EXPORT_REL = "protocol/generated/asset_contract.frictionless.json"
+SCHEMA_REL = "protocol/schema/asset_contracts.schema.json"
 SCHEMA = "nf-asset-contracts/1"
-FACES = ("data", "code", "script")
+FACES = ("data", "code", "script", "index")
 LANGS = ("python", "bash", "vba", "powershell")
 FORMATS = ("json", "csv", "markdown", "text", "yaml", "toml", "jsonl",
            "graphml", "mmd")
@@ -807,6 +809,64 @@ def _check_script(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str,
                     "outputs": len(spec.get("outputs") or [])}
 
 
+def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """S1 包自述契约：读包自己的 `outputs/INDEX.json`，与**磁盘实况**双向对账。
+
+    为什么归到「资产契约」：包清单（`nf-output-index/1`）本就是**包自带**的产出面契约
+    （path / form / tier / role / schema / inputs）。NF 侧再拿 glob 猜一遍就是两套词表；本判据让
+    **声明**与**实况**互相对齐——声明的件必须在场，`outputs/` 下的实况必须都被声明。
+    """
+    sid = str(spec.get("id") or "?")
+    rels = resolve(root, spec)
+    if not rels:
+        return ["包清单契约 %s 未命中任何清单（修复指引：修正 glob）" % sid], {"files": 0}
+    issues: List[str] = []
+    declared_total = 0
+    for rel in rels:
+        text, err = _read(root, rel)
+        if err:
+            issues.append(err)
+            continue
+        try:
+            doc = _strict_json(text)
+        except ValueError as exc:
+            issues.append("包清单 %s 不是合法 JSON：%s（修复指引：重跑 nf domain build）" % (rel, exc))
+            continue
+        base = Path(rel).parent.parent          # <包>/outputs/INDEX.json → <包>
+        outs = doc.get("outputs")
+        if not isinstance(outs, list) or not outs:
+            issues.append("包清单 %s 的 outputs 为空（修复指引：重跑 nf domain build）" % rel)
+            continue
+        declared = set()
+        for item in outs:
+            if not isinstance(item, dict):
+                continue
+            pth = str(item.get("path") or "")
+            if not pth:
+                issues.append("包清单 %s 有一条无 path 的声明（修复指引：补 path）" % rel)
+                continue
+            declared.add(pth)
+            declared_total += 1
+            if not (Path(root) / base / pth).is_file():
+                issues.append("包清单 %s 声明的 %s 不在场（修复指引：补件或重跑 nf domain build）" % (rel, pth))
+            sch = str(item.get("schema") or "")
+            if sch and not (Path(root) / base / sch).is_file():
+                issues.append("包清单 %s 声明的 schema %s 不在场（修复指引：补件）" % (rel, sch))
+            ins = item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])
+            for inp in ins:
+                if not (Path(root) / base / str(inp)).is_file():
+                    issues.append("包清单 %s 声明的输入 %s 不在场（修复指引：补件或改声明）" % (rel, inp))
+        on_disk = {q.relative_to(Path(root) / base).as_posix()
+                   for q in sorted((Path(root) / base / "outputs").rglob("*")) if q.is_file()}
+        self_rel = Path(rel).relative_to(base).as_posix()   # 清单自身不是产出面（它是清单）
+        missing = sorted(x for x in on_disk
+                         if x not in declared and x != self_rel and not x.startswith("outputs/samples/"))
+        if missing:
+            issues.append("包清单 %s 未声明 %d 件实况（例 %s）（修复指引：重跑 nf domain build 让清单与实况同步）"
+                          % (rel, len(missing), "、".join(missing[:3])))
+    return issues, {"files": len(rels), "declared": declared_total}
+
+
 def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
                  ) -> Tuple[List[str], Dict[str, Any]]:
     a_id, b_id = str(chain.get("from") or ""), str(chain.get("to") or "")
@@ -886,9 +946,102 @@ def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     return doc, []
 
 
+_JS_TO_FRICTIONLESS = {"string": "string", "integer": "integer", "number": "number",
+                      "boolean": "boolean", "array": "array", "object": "object",
+                      "null": "any"}
+
+
+def frictionless_export(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
+    """S3 导出：把已声明的数据资产映射成 **Frictionless Data Package**（可被别的生态直接消费）。
+
+    诚实边界：`fields` 是 JSON Schema `properties` 的**尽力映射**（类型名对齐 Frictionless Table
+    Schema），原始 JSON Schema 仍在 `x-nf-json-schema` 里逐字段保留——映射丢信息就是装饰，故不丢。
+    只导出**资产面**（包产物/库索引），协议层真源不外发。
+    """
+    doc, issues = load(root)
+    if issues:
+        return {}, issues
+    res: List[Dict[str, Any]] = []
+    for spec in doc.get("data") or []:
+        if not isinstance(spec, dict):
+            continue
+        for rel in resolve(root, spec):
+            if rel.startswith("protocol/"):
+                continue
+            item: Dict[str, Any] = {"name": rel.replace("/", "--"), "path": rel}
+            fmt = str(spec.get("format") or "")
+            if fmt:
+                item["format"] = fmt
+            sch_rel = _schema_of(root, rel, spec)
+            if sch_rel:
+                stext, err = _read(root, sch_rel)
+                if not err:
+                    try:
+                        sch = _strict_json(stext)
+                    except ValueError:
+                        sch = {}
+                    keep = ("type", "required", "properties", "$schema", "title", "description")
+                    if sch:
+                        item["x-nf-json-schema"] = {k: sch[k] for k in keep if k in sch}
+                        item["x-nf-schema-source"] = sch_rel
+                    fields = [{"name": k, "type": _JS_TO_FRICTIONLESS.get(str(v.get("type") or ""), "any")}
+                              for k, v in sorted((sch.get("properties") or {}).items())
+                              if isinstance(v, dict)]
+                    if fields:
+                        item["schema"] = {"fields": fields}
+            res.append(item)
+    return {"profile": "data-package", "name": "ninfenz-asset-contracts",
+            "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+            "x-nf-generated-by": "nf asset contract --export",
+            "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射",
+            "resources": res}, []
+
+
+def write_export(root: str = ".") -> int:
+    """落盘导出件（原子写）；返回资源数。"""
+    pkg, issues = frictionless_export(root)
+    if issues:
+        return 0
+    atomic_write.write_text(Path(root) / EXPORT_REL,
+                            json.dumps(pkg, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+    return len(pkg.get("resources") or [])
+
+
+def _schema_self_check(root: str) -> List[str]:
+    """⑤ 声明必须过**可移植 schema**（S2）：规范要可执行，不做文档摆设。"""
+    sp = Path(root) / SCHEMA_REL
+    if not sp.is_file():
+        return ["⑤ 缺可移植 schema %s（修复指引：补该件——对外可移植契约靠它定型）" % SCHEMA_REL]
+    try:
+        doc = _strict_json((Path(root) / DECL_REL).read_text(encoding="utf-8"))
+        sch = _strict_json(sp.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return ["⑤ 声明或 schema 不可读：%s（修复指引：修好 JSON）" % exc]
+    from core import json_schema as js
+    return ["⑤ 声明不符可移植 schema %s：%s（修复指引：改声明或改 schema——两者只能有一个对）"
+            % (SCHEMA_REL, e) for e in js.json_schema_check(doc, sch)[:5]]
+
+
+def _export_drift(root: str) -> List[str]:
+    """④ 导出件 == 实时导出（缺件/漂移都 FAIL：导出面不许只在人手里新鲜）。"""
+    p = Path(root) / EXPORT_REL
+    live, errs = frictionless_export(root)
+    if errs:
+        return errs
+    if not p.is_file():
+        return ["④ 缺契约导出 %s（修复指引：nf asset contract --export）" % EXPORT_REL]
+    try:
+        disk = _strict_json(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return ["④ %s 不可读：%s（修复指引：nf asset contract --export）" % (EXPORT_REL, exc)]
+    if disk != live:
+        return ["④ %s 与实时导出不一致（修复指引：nf asset contract --export）" % EXPORT_REL]
+    return []
+
+
 def scan(root: str = ".", faces: Iterable[str] = ()
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """三面契约扫描 → (issues, warns, stats)；唯一门禁入口（verify check40 与机器报告同源）。"""
+    """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；唯一门禁入口（check40 同源）。"""
     doc, issues = load(root)
     warns: List[str] = []
     stats: Dict[str, Any] = {f: 0 for f in FACES}
@@ -896,6 +1049,9 @@ def scan(root: str = ".", faces: Iterable[str] = ()
     if issues:
         return issues, warns, stats
     issues += _registry_issues(root, doc)
+    if not faces:                      # ④/⑤ 是**声明面整体**判据；--face 是显式收窄，不判整体
+        issues += _export_drift(root)
+        issues += _schema_self_check(root)
     want = {str(x) for x in faces} or set(FACES)
     for face in FACES:
         if face not in want:
@@ -908,6 +1064,8 @@ def scan(root: str = ".", faces: Iterable[str] = ()
                 sub, s = _check_data(root, spec)
             elif face == "code":
                 sub, s = _check_code(root, spec)
+            elif face == "index":
+                sub, s = _check_index(root, spec)
             else:
                 sub, s = _check_script(root, spec)
             issues += sub

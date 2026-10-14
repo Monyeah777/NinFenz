@@ -56,7 +56,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 992,
+      "lines": 1150,
       "max_fn_cc": 28,
       "max_fn_lines": 59
     },
@@ -751,7 +751,7 @@
       "max_fn_lines": 71
     },
     "desktop/src/core/pack_combo.py": {
-      "lines": 1283,
+      "lines": 1285,
       "max_fn_cc": 63,
       "max_fn_lines": 145
     },
@@ -926,9 +926,9 @@
       "max_fn_lines": 34
     },
     "desktop/src/core/receipts.py": {
-      "lines": 271,
+      "lines": 272,
       "max_fn_cc": 13,
-      "max_fn_lines": 44
+      "max_fn_lines": 45
     },
     "desktop/src/core/redos_scan.py": {
       "lines": 137,
@@ -1336,9 +1336,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7332,
+      "lines": 7339,
       "max_fn_cc": 114,
-      "max_fn_lines": 1218
+      "max_fn_lines": 1220
     },
     "scripts/nf_client.py": {
       "lines": 189,

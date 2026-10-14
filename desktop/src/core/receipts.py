@@ -182,6 +182,7 @@ def protocol_subjects(root: str = ".") -> List[str]:
              "protocol/module_signatures.json", "protocol/conformance_report.json",
              "protocol/asset_line_baseline.json",
              "protocol/asset_contracts.json",
+"protocol/schema/asset_contracts.schema.json",
              "protocol/role_coordinates.json",
              "protocol/code_metrics_baseline.json",
              "protocol/coupling_baseline.json",
