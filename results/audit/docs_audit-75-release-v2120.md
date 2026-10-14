@@ -13,9 +13,13 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:7ade1df2b4f7e7488c43f855f6e6a1808d900d3e08ca9c7b5bdca5f9083fb5d9
+  - scripts/nf.py:535a849ade524f3e015fa2c12b5638900ac9fb748e0200635aefdbebfdbbc8dd
 
 ---
+> 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化
+
+> 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI）：重审并更新 digest 口径机器化，替换手搓脚本
+
 > 重审（2026-10-14 · CHANGELOG 记 S 档条目）：被审对象随本波改动（CHANGELOG 增加数字资产契约 S 档条目），digest 依「重审并更新 digest」机械重绑；既有结论不变。
 
 > 重审（2026-10-14 · 数字资产契约 S 档：包自述对账 / Frictionless 导出 / 可移植 schema）：被审对象随本波改动（组合包 INDEX 补登 SYSTEM_CARD 契约 / receipts 锚定面续扩 / CHANGELOG 条目），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。

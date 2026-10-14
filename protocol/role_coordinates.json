@@ -6,7 +6,7 @@
     "prod": 1034,
     "projection": 129,
     "support": 209,
-    "verify": 917
+    "verify": 918
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7199,6 +7199,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "`nf audit rebind` 单测：机械重绑 + 理由落档 + 幂等 + 拒空理由（check 的 check）。",
+      "path": "desktop/tests/test_audit_rebind.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "机械修复引擎单测（只改机械面；dry-run 不写盘；幂等）。",
       "path": "desktop/tests/test_autofix.py",
       "role": "verify",
@@ -11748,7 +11754,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4ce1463d22bc55a932145847db26d6674cc1268b80e76a5672e3c20df30a2ac8",
+  "root_digest": "55a15ee523c66a305e9cf50e3c2ace5cdbf272b9fbc0768274f50804fe79cba5",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 74,
@@ -11757,7 +11763,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 806,
+    "R-verify": 807,
     "auto:R-core": 240
   },
   "schema": "nf-role-coordinates/1"

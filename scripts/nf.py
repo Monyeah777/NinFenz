@@ -558,7 +558,7 @@ def _make_parser() -> argparse.ArgumentParser:
     for _p in (pmsub.add_parser("ls", help="列全部复盘", description="列全部复盘"), pm_ck,
                pmsub.add_parser("verify", help="机检声明 + 全部复盘件", description="机检")):
         _p.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    au = sub.add_parser("audit", help="审计/验收（结论绑定对象 digest + 签收双要素）",
+    au = sub.add_parser("audit", help="审计/验收（列表 / 单件机检 / 全量机检 / 重审重绑）",
                         description="审计/验收（机制借鉴 Audit Report + Acceptance/Sign-off）")
     ausub = au.add_subparsers(dest="audit_cmd")
     au_ck = ausub.add_parser("check", help="机检单件审计", description="机检单件审计")
@@ -566,6 +566,15 @@ def _make_parser() -> argparse.ArgumentParser:
     for _a in (ausub.add_parser("ls", help="列全部审计件", description="列全部审计件"), au_ck,
                ausub.add_parser("verify", help="机检声明 + 全部审计件", description="机检")):
         _a.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    au_rb = ausub.add_parser("rebind", help="重审并更新 digest（对象改动后机械重绑 + 落重审理由）",
+                             description="重审并更新 digest：只逐行替换 subjects 的 sha256（不重排"
+                                         "frontmatter），并把重审理由落成正文首行；同一理由不重复追加。"
+                                         "理由必填——无理由的重绑就是洗数据。顺序：改代码 → "
+                                         "code_metrics --write → audit rebind → receipts（先重绑会又被"
+                                         "基线重冻打回——实测踩过）。")
+    au_rb.add_argument("--note", required=True, help="重审理由（写进审计件的重审行）")
+    au_rb.add_argument("--dry-run", action="store_true", help="只列将重绑的条目，不写盘")
+    au_rb.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cog = sub.add_parser("cognition", help="认知族（行话术语表 + 执行分档 Runbook/Playbook）",
                          description="认知族（机制借鉴 Glossary + SOP/Runbook/Playbook 分档）")
     cog.add_argument("part", nargs="?", default="", choices=["", "glossary", "modes"],
@@ -4201,6 +4210,20 @@ def _cmd_audit(args):
     import json as _json
     sub = getattr(args, "audit_cmd", None) or "ls"
     want_json = bool(getattr(args, "json", False))
+    if sub == "rebind":
+        issues, st = au.rebind(ROOT, note=args.note, dry_run=bool(args.dry_run))
+        if want_json:
+            print(_json.dumps({"kind": "audit-rebind", "issues": issues, "stats": st},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf audit rebind%s ==" % ("（dry-run）" if args.dry_run else ""))
+            print("  %s" % st.get("note"))
+            print("  审计件 %d · 重绑 %d 件 / %d 条摘要 · 跳过（legacy）%d 件"
+                  % (st.get("records", 0), st.get("rechained", 0), st.get("subjects", 0),
+                     st.get("skipped", 0)))
+            for i in issues:
+                print("  [FAIL] %s" % i, file=sys.stderr)
+        return 1 if issues else 0
     if sub == "check":
         # 形状闸门（2026-10-01）：`nf audit check <目录>` 此前只吐一行「审计件不存在：docs」
         # 的 [FAIL]（**零指引**）——先判形状，给可执行口径（与 `nf postmortem check` 同规）。

@@ -6,17 +6,21 @@ scope: 作者指令「拉取 ≥10 项代码审查工具；用工具 + 决策模
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/audit.py:8433f38e55c1a66c72ed352e952310c4c43cd6616899c30c5c7526c705451e25
+  - desktop/src/core/audit.py:18c16d36127ebef3f7bad5174a18f55441360f956f1061d519a46569ffcc65af
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/storage.py:a8d5110b3d2cda9b25ba144315229b52a1768548fe15ea226892137244d585be
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:7ade1df2b4f7e7488c43f855f6e6a1808d900d3e08ca9c7b5bdca5f9083fb5d9
+  - scripts/nf.py:535a849ade524f3e015fa2c12b5638900ac9fb748e0200635aefdbebfdbbc8dd
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
 
 ---
+> 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化
+
+> 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI）：重审并更新 digest 口径机器化，替换手搓脚本
+
 > 重审（2026-10-14 · 数字资产契约 S 档：包自述对账 / Frictionless 导出 / 可移植 schema）：被审对象随本波改动（组合包 INDEX 补登 SYSTEM_CARD 契约 / receipts 锚定面续扩 / CHANGELOG 条目），subjects 依「重审并更新 digest」机械重绑；既有结论不变，不主张新的语义审计。
 
 
