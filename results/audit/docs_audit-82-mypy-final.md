@@ -23,15 +23,17 @@ subjects:
   - desktop/src/core/orchestration.py:6c860bebc068000dbd8f7a68103b300ab662c0666c912159226f015cea43327c
   - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
   - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
-  - desktop/src/core/layer_model.py:fa3735754774971ab33904df59bfd42df13d49df986402cd31b287f94b48d6f2
+  - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/src/core/import_graph.py:b97893527ec592921f81b96d9d9bd945be938db31e5d8c39d71d5a1d96990d9b
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
   - desktop/src/core/daemon.py:6091dc72140524c34ba23662d457977511f49fcbee6573bd8cb0a2c91d405e5d
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:267b25adfbb626685f11fad715837b9061464ae1cba45fafedc800f8c7e1320a
+  - protocol/code_metrics_baseline.json:d123ce69e7b5f4ce36b4de430a5636ee484fd1f44057b53177501d66e7c56e96
 ---
+> 重审（2026-10-14）：预推收口二：CoT 自述改口径 + 快路径末尾 ** 语义对齐 pathlib（实测 66217 vs 0）
+
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
 
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化

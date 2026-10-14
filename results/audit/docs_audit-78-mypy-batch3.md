@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:2faf253cf7ea3da33320e10f873d32962241e9856669f047854a27de602b819a
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - protocol/code_metrics_baseline.json:267b25adfbb626685f11fad715837b9061464ae1cba45fafedc800f8c7e1320a
+  - protocol/code_metrics_baseline.json:d123ce69e7b5f4ce36b4de430a5636ee484fd1f44057b53177501d66e7c56e96
 ---
+> 重审（2026-10-14）：预推收口二：CoT 自述改口径 + 快路径末尾 ** 语义对齐 pathlib（实测 66217 vs 0）
+
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
 
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化

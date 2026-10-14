@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:54fb9760bd7e2fa83b110b4b1c29e54f821434ca5a19b7d63ff0e1d4195e9e20
   - protocol/drill_fidelity.json:235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:267b25adfbb626685f11fad715837b9061464ae1cba45fafedc800f8c7e1320a
+  - protocol/code_metrics_baseline.json:d123ce69e7b5f4ce36b4de430a5636ee484fd1f44057b53177501d66e7c56e96
 ---
+> 重审（2026-10-14）：预推收口二：CoT 自述改口径 + 快路径末尾 ** 语义对齐 pathlib（实测 66217 vs 0）
+
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
 
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化

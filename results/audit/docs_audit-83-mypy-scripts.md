@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:97aadeb530bd78fd9cc206ed96d45eab75a61e7f3167fefcb0bc774536cb6257
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:267b25adfbb626685f11fad715837b9061464ae1cba45fafedc800f8c7e1320a
+  - protocol/code_metrics_baseline.json:d123ce69e7b5f4ce36b4de430a5636ee484fd1f44057b53177501d66e7c56e96
 ---
+> 重审（2026-10-14）：预推收口二：CoT 自述改口径 + 快路径末尾 ** 语义对齐 pathlib（实测 66217 vs 0）
+
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
 
 > 重审（2026-10-14）：引入 nf audit rebind 命令（core/audit.py + CLI + 顺序纪律 + 两处面收敛）

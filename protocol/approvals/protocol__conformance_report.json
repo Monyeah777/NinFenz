@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-14",
   "approved_by": "Monyeah777",
-  "note": "快线同步与范围裁定（asset_contract 走出原生面，由真源喂入）",
+  "note": "快路径 glob 语义修复 + CoT 口径改词",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"

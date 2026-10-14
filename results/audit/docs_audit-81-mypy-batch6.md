@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:267b25adfbb626685f11fad715837b9061464ae1cba45fafedc800f8c7e1320a
+  - protocol/code_metrics_baseline.json:d123ce69e7b5f4ce36b4de430a5636ee484fd1f44057b53177501d66e7c56e96
 ---
+> 重审（2026-10-14）：预推收口二：CoT 自述改口径 + 快路径末尾 ** 语义对齐 pathlib（实测 66217 vs 0）
+
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
 
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI + 顺序纪律）：重审并更新 digest 机器化

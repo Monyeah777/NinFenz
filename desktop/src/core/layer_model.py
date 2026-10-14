@@ -91,7 +91,14 @@ def _entry_imports(text: str) -> List[Tuple[int, str]]:
 
 
 def _pattern_to_regex(pattern: str):
-    """glob → **逐段**正则（`**` 跨目录、`*` 不跨、`?` 单字符）——只在本相对路径上匹配。"""
+    """glob → **逐段**正则（`**` 跨目录、`*` 不跨、`?` 单字符）——只在本相对路径上匹配。
+
+    末尾 `**` 的 pathlib 语义是「本级及其下全部**目录**」——本函数只取文件，故等价于**空集**。
+    此前漏了这条：`**` 被译成「任意串」⇒ 快路径把全仓文件都算进面，而参考实现（Path.glob +
+    is_file）给空集——实测 66217 vs 0。隐面大缓存树（如 .rivet/scratch）会把这条差异放大成红。
+    """
+    if pattern == "**" or pattern.endswith("/**"):
+        return re.compile(r"(?!)")            # 永不匹配文件（末尾 ** 只指目录）
     out, i = [], 0
     while i < len(pattern):
         ch = pattern[i]
