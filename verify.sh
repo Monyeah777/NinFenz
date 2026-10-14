@@ -41,6 +41,23 @@ if [ -n "${NF_VERIFY_TMP:-}" ]; then
 else
   NFL_TMP="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/nf_verify_$$")"
 fi
+# ---- 命令行参数：默认**无参数 = 全量**（向后兼容硬约束）----
+# `--fast` 是**开发快车道**（按改动跑增量 check，真源 scripts/verify_fast.py → core.gate_*）：
+# 它只把"该不该跑"收窄，**绝不改变任何一条 check 的判据**，也**不能替代全量结论**——故它跑在
+# 全部 check 之后、只做补充，并在红时把退出码拉成 1。
+# `--base` 指定增量档的比较基线（缺省 HEAD~1）。任何其它参数 = 用法错误（exit 2），
+# 以免"看上去像传了子集其实仍在全量"这类静默误读。
+NF_FAST=0; NF_BASE=''
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --fast) NF_FAST=1 ;;
+    --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
+    *)
+      echo "未知参数：$1（用法：bash verify.sh [--fast] [--base <ref>]）" >&2
+      exit 2 ;;
+  esac
+  shift
+done
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
   NFL_TMP="${TMPDIR:-/tmp}/nf_verify_$$"; mkdir -p "$NFL_TMP" 2>/dev/null || true
 fi
@@ -2619,6 +2636,21 @@ check39
 check40
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
+# ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
+if [ "$NF_FAST" -eq 1 ]; then
+  echo '—— 快车道（--fast：按改动跑增量 check；不是门禁结论）——'
+  _fast_args=()
+  [ -n "$NF_BASE" ] && _fast_args=(--base "$NF_BASE")
+  if [ -n "$PY3" ]; then
+    if "$PY3" scripts/verify_fast.py "${_fast_args[@]}"; then
+      echo '  [i] 快车道全绿：按改动选中的模块无红（让位项见上方名单）——仍不等于门禁结论'
+    else
+      no '快车道有红：见上方 [红] 明细（全量档 bash verify.sh 才是门禁结论）'
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 --fast 快车道）'
+  fi
+fi
 if [ "$FAIL" -gt 0 ]; then
   echo '>>> 存在 FAIL = 协议事故：请回滚本次修改，修正后重新运行验收 <<<'
   # 指引面接线（2026-09-30）：每条 check 都有「缺什么 / 补什么」条目（nf explain 1-39），

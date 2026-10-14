@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f4601d7a8fd0e22016b4ea36bf20e9ff8990ff88d98d5122fb6fd91f0456925c
+  - desktop/src/core/terminal.py:58713319d677b6450d5c6bf949c77d7c555b8fd9d62e7bfbed2f4f2505e4ea03
   - protocol/code_metrics_baseline.json:7d9f6167b39a2879c29d406e1cb8e35985637ea82bb74f5173b29c7972d599d4
 ---
 
@@ -27,7 +27,10 @@ subjects:
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 terminal 模块行数增长按工具指引重冻（见「设计偏差」）。
 
-## 一、内部差距（开工依据）
+## 一、内部差距
+
+> 重审（2026-10-14 · 终端基线并发与 argv 唯一性）：被审对象随本轮改动（`baseline_tmp_dir()` 改为按进程唯一；`baseline_argv_issues()` 补 argv 唯一性；基线表 20→19 行）而变，subjects 依「重审并更新 digest」处置——**机械重绑**，既有结论不变。
+（开工依据）
 
 - `Session.dispatch` 复杂度 **55（F）**：一个 18 分支的 if/elif 链（empty/quit/help/menu/zone/search/commands/map/complete/set/form/cancel/replay/replay-list/history/unknown/run），每加一个意图就要动控制流。
 

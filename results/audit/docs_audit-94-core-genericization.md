@@ -32,7 +32,7 @@ subjects:
   - 05_资产库/用户自定义/STYLE_DNA.md:0e6f4c5280a5b83054abc81a7333a91f81f457522a2cea75fa579cf8da8f9498
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
-  - verify.sh:056f3a69e53f44c73d36a795949bb2a05d86d67a9bf524f2007292a7814d0c0e
+  - verify.sh:a887cd12a5e6caf6f938d7b9e9912813180f48baa9f32029f6c246f48263b2ec
 
 ---
 

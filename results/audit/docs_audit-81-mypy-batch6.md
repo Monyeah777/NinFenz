@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f4601d7a8fd0e22016b4ea36bf20e9ff8990ff88d98d5122fb6fd91f0456925c
+  - desktop/src/core/terminal.py:58713319d677b6450d5c6bf949c77d7c555b8fd9d62e7bfbed2f4f2505e4ea03
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
@@ -30,7 +30,10 @@ subjects:
 > 签收位：本件**未填 `accepted_by`/`accepted_at`**——验收签收属作者动作，执行者不自签。
 > subjects 不含派生物；`protocol/code_metrics_baseline.json` 因 `assemble_plan`/`atomic_write`/`terminal` 行数增长按工具指引评审后重冻。
 
-## 一、内部差距（开工依据）
+## 一、内部差距
+
+> 重审（2026-10-14 · 终端基线并发与 argv 唯一性）：被审对象随本轮改动（`baseline_tmp_dir()` 改为按进程唯一；`baseline_argv_issues()` 补 argv 唯一性；基线表 20→19 行）而变，subjects 依「重审并更新 digest」处置——**机械重绑**，既有结论不变。
+（开工依据）
 
 - 承接 AUD-0032：`mypy desktop/src` 错误条数 68；本批取 `terminal`（25，最大块）+ `assemble_plan`/`asset_ledger`/`atomic_write`（各 3/3/6）。
 
