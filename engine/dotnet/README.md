@@ -12,7 +12,7 @@
 | 一致性契约 | **26 / 27** 已移植并逐契约对账；唯一未移植项 `purity-clean` 属源码 AST linter 面，已显式裁定范围外（不伪造） |
 | 命令行面 | **183 面逐字节全同 + 1 边界面**（组合证书 / 回执 / 透明链 / 馆藏 / 建模 / 知识签名 / 决策 / 断言 / 认知 / 指令档 / 装配 / 审查 / 评分 / 许可证 / 环境自检 / 注册表 …） |
 | 负例自检 | **227 例**（撞号 / 深链 / 未知包 / 悬空 / 未桥接 / 四类篡改 / 破坏输入 / 并行不变性 / 契约正反对照） |
-| `verify.sh` 覆盖率 | 39 道 check：**覆盖 32 / 不适用 6（有对应物）/ 范围外 1**；判据面无「部分」、无「未覆盖」 |
+| `verify.sh` 覆盖率 | **真源 = `desktop/src/core/quality_baseline.py` 的 `EXPECTED_CHECKS`**（现 40 道），逐条裁定：**覆盖 32 / 不适用 6（有对应物）/ 范围外 2** = 40。范围外 = `purity-clean`（源码 AST linter 面）+ `check40`（数字资产契约：本线零处引用 `asset_contract` / `protocol/asset_contracts.json`，全库 grep 实测无命中）。**分母与真源不一致即红**（判据 `desktop/tests/test_net_coverage.py`，随 check12 常驻）——防「真源加了 check、矩阵没跟」。历史快照：2026-09-28 冻结时 39 道为 32/6/1 |
 | 判据探针 | **45 条**（`probes/`，跑法见 `RUNBOOK.md` §0） |
 | 分发 | 引擎库包 `NinFenz.Engine`（**零 NuGet 依赖**）+ CLI 工具包 `NinFenz.Engine.Cli` + 自包含多文件产物（当片 **f112**：win/linux 各 189 文件 / 72.4 MB） |
 | 可复现构建 | 同 RID 异地重建 **189/189 文件逐字节全等**（`Directory.Build.props` 的 `PathMap` 归一） |
