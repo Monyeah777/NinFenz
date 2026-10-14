@@ -470,6 +470,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 29
     },
+    "desktop/src/core/ingest_common.py": {
+      "lines": 226,
+      "max_fn_cc": 8,
+      "max_fn_lines": 19
+    },
     "desktop/src/core/injection_budget.py": {
       "lines": 50,
       "max_fn_cc": 10,
@@ -511,7 +516,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/interop_export.py": {
-      "lines": 1100,
+      "lines": 1106,
       "max_fn_cc": 23,
       "max_fn_lines": 96
     },
