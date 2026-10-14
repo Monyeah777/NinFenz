@@ -18,8 +18,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write
-from core import doc_family
+from core import atomic_write, doc_family
 from core.library import parse_frontmatter
 
 DECL_REL = "protocol/audit.json"
@@ -48,8 +47,9 @@ def init_audit(question: str, context: str = "", decider: str = "",
 
 def check_audit(target) -> List[str]:
     """M_AUDIT check：委托 core.steelman.check_worksheet（同一套钢人节判据）。"""
-    from core import steelman
     from pathlib import Path as _Path
+
+    from core import steelman
     p = _Path(target)
     if not p.is_file():
         return ["审计件不存在：%s（修复指引：先 nf design audit init 生成工作单）" % p]

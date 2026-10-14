@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - protocol/audit.json:914c5dfe05763ecab52cea35cb72fd34026cd2522ca37fbebc0a86596a1d01eb
-  - desktop/src/core/audit.py:18c16d36127ebef3f7bad5174a18f55441360f956f1061d519a46569ffcc65af
+  - desktop/src/core/audit.py:973b14991337d73ebe3508e4a4be0b9b5b632fa5477a40a82b1d0f5e4c69add2
 accepted_by: 作者
 accepted_at: 2026-09-16
 ---
+> 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）
+
 > 重审（2026-10-14）：引入 nf audit rebind（core/audit.py + CLI）：重审并更新 digest 口径机器化，替换手搓脚本
 
 
