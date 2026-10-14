@@ -44,9 +44,15 @@ def _pinned_versions(root: str) -> Dict[str, str]:
             continue
         for line in lines:
             body = line.split("#", 1)[0].strip()
-            if "==" in body:
-                name, ver = body.split("==", 1)
-                out.setdefault(name.strip().lower(), ver.strip())
+            if not body or body.startswith("-") or "==" not in body:
+                continue          # 跳过 pip-compile 的 `--hash=` 续行与选项行
+            name, _, ver = body.partition("==")
+            name = name.strip().lower()
+            if "[" in name:
+                name = name.split("[", 1)[0].strip()   # `pkg[extra]==…` 取项目名
+            ver = ver.split(";", 1)[0].strip().rstrip("\\").strip()
+            if name and ver:
+                out.setdefault(name, ver)
     pp = os.path.join(root, "pyproject.toml")
     if os.path.isfile(pp):
         try:

@@ -56,11 +56,14 @@ class CiRequirementsPinTest(unittest.TestCase):
     CI_REQ = ROOT / ".github" / "requirements-ci.txt"
     LINT_REQ = ROOT / ".github" / "requirements-lint.txt"
     #: 允许的清单形态：`包名==版本`（允许 extras/连字符/下划线/点）
-    _PIN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9._,-]+\])?==[0-9][^#\s]*$")
+    #: 允许的清单形态：`包名==版本`（可带 extras；行尾可有 pip-compile 的续行反斜杠）
+    _PIN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9._,-]+\])?==[0-9][^#\s]*\s*\\?$")
 
     def _pins(self, path):
+        """钉版行（跳过注释与 pip-compile 的 `--hash=` 续行/选项行）。"""
         lines = [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines()]
-        return [ln for ln in lines if ln and not ln.startswith("#")]
+        return [ln for ln in lines
+                if ln and not ln.startswith("#") and not ln.startswith("-")]
 
     def test_requirements_files_exist_and_pin_exact_versions(self):
         for path in (self.CI_REQ, self.LINT_REQ):
