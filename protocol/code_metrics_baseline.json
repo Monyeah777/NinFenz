@@ -1006,7 +1006,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 346,
+      "lines": 351,
       "max_fn_cc": 19,
       "max_fn_lines": 34
     },

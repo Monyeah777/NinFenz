@@ -217,14 +217,19 @@ def projection(root: str = ".") -> Dict[str, Any]:
     files = [x for x in files_of(root) if x != PROJECTION_REL]
     rules = _rule_hits(roles, files)
     overrides = roles.get("overrides") or {}
-    entries, counts, rule_counts = {}, {}, {}
+    entries: List[Dict[str, Any]] = []
+    counts: Dict[str, int] = {}
+    rule_counts: Dict[str, int] = {}
     for rel in files:
         c = coordinate(root, rel, rules, overrides)
         key = c["role"] or "(未归类)"
         counts[key] = counts.get(key, 0) + 1
         rule_counts[c["rule"]] = rule_counts.get(c["rule"], 0) + 1
         if c["role"] in KERNEL_ROLES:
-            entries[rel] = {"role": c["role"], "function": c["function"], "rule": c["rule"]}
+            # 用**对象列表**而非「路径→值」字典：路径里含 `+` 等越界字符，而本仓 identity 卫生
+            # 判据对 JSON **键**有字符集约束（实测 34 条红）——键面不放路径。
+            entries.append({"path": rel, "role": c["role"],
+                            "function": c["function"], "rule": c["rule"]})
     body = {"schema": SCHEMA, "generated_by": "core.role_model.projection（nf layers --write）",
             "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
             "counts": counts, "rule_counts": rule_counts, "kernel": entries}
