@@ -146,8 +146,9 @@ class RealRepoTest(unittest.TestCase):
     def test_requirements_sast_is_pinned(self):
         p = ROOT / ".github" / "requirements-sast.txt"
         self.assertTrue(p.is_file())
+        #: 钉版行：`.strip()` 后跳过注释与 pip-compile 的 `--hash=`/`--via` 续行
         pins = [l.strip() for l in p.read_text(encoding="utf-8").splitlines()
-                if l.strip() and not l.startswith("#")]
+                if l.strip() and not l.strip().startswith(("#", "-"))]
         self.assertTrue(all("==" in l for l in pins), "SAST 工具须固定版本：%s" % pins)
 
 
