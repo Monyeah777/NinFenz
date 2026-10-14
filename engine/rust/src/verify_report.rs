@@ -1,6 +1,6 @@
 //! 门禁的**机器可读出口**（`verify_report`）—— 与真源 `desktop/src/core/verify_report.py` 对账。
 //!
-//! 真源把 **28 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
+//! 真源把 **31 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
 //! 逐条归一到 `(issues, warns, stats)` → 定 status → 汇总 counts + 声明面 → 主体规范化 sha256 作
 //! `root_digest`（报告被手改即对不上）→ 按 `indent=2, sort_keys=True` 渲染。
 //!
@@ -36,7 +36,7 @@ impl Spec {
 }
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
-pub const SPECS: [Spec; 30] = [
+pub const SPECS: [Spec; 31] = [
     Spec { id: "purity", name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）", module: "purity_scan", entry: "scan" },
     Spec { id: "schema", name: "协议层 IDL schema 门禁", module: "schema_lint", entry: "scan" },
     Spec { id: "conformance", name: "社区领域包 conformance 分级", module: "conformance_scan", entry: "scan" },
@@ -67,6 +67,7 @@ pub const SPECS: [Spec; 30] = [
     Spec { id: "judgement_coverage", name: "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）", module: "judgement_coverage", entry: "scan" },
     Spec { id: "workflow_policy", name: "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", module: "workflow_policy", entry: "scan" },
     Spec { id: "asset_contract", name: "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）", module: "asset_contract", entry: "scan" },
+    Spec { id: "role_coordinates", name: "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）", module: "role_model", entry: "scan" },
 ];
 
 /// 未移植判据的喂入结果（`--results` 的一条）。
@@ -145,15 +146,10 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
                 stats,
             })
         }
-        "asset_contract" => {
-            let (issues, warns, stats) = crate::asset_contract::scan(root);
-            Some(Called {
-                status: status_of(&issues, &warns),
-                issues,
-                warns,
-                stats,
-            })
-        }
+        // 裁定（2026-10-14）：`asset_contract` **退出本线原生面**——数字资产契约新增了
+        // YAML/TOML 解析、包自述双向对账、Frictionless 导出与可移植 schema 校验，Rust 侧无 YAML 解析
+        // 依赖且语义面已超出「只读快线」的移植收益；按增量法由真源 `--results` 喂入（同 check40 的
+        // 「范围外」先例）。见 docs/asset_contract.md。
         "code_metrics" => {
             let (issues, warns, stats) = crate::code_metrics::scan(root);
             Some(Called {
@@ -537,13 +533,15 @@ mod tests {
 
     #[test]
     fn spec_table_matches_the_truth_source_shape() {
-        assert_eq!(SPECS.len(), 30);
+        assert_eq!(SPECS.len(), 31);
         assert_eq!(SPECS[0].id, "purity");
         assert_eq!(SPECS[1].source(), "schema_lint.scan");
         assert_eq!(SPECS[5].id, "rating");
         assert_eq!(SPECS[6].id, "rating_decided");
         assert_eq!(SPECS[6].source(), "rating_gate.decided");
         assert_eq!(SPECS[29].id, "asset_contract");
+        assert_eq!(SPECS[30].id, "role_coordinates");
+        assert_eq!(SPECS[30].source(), "role_model.scan");
     }
 
     #[test]
