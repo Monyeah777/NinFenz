@@ -75,8 +75,8 @@ class TestIoTypes(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             # 提供方 M10：outputs [tick]（number）
             _tree(tmp, MOD.replace("id: M99", "id: M10").replace(
-                "inputs: [M00, M10]", "inputs: [M00]"), "M10_时间推进.md")
-            provider = Path(tmp, "04_模块库", "通用类", "M10_时间推进.md")
+                "inputs: [M00, M10]", "inputs: [M00]"), "M10_节拍推进.md")
+            provider = Path(tmp, "04_模块库", "通用类", "M10_节拍推进.md")
             provider.write_text(
                 iot.inject(provider.read_text(encoding="utf-8"),
                            {"outputs": {"tick": "number"}, "inputs": {"M00": "state"}}),

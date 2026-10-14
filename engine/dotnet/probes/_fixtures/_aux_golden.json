@@ -1395,7 +1395,7 @@
    }
   },
   "files": {
-   "04_模块库/通用类/M00_数据结构.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
+   "04_模块库/通用类/M00_数据槽总线.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
    "protocol/world_slots.json": "{\n  \"schema_version\": \"1\",\n  \"slots\": {\n    \"state.mood\": {\n      \"kind\": \"string\",\n      \"owner\": \"M00\"\n    },\n    \"state.items\": {\n      \"kind\": \"array\",\n      \"owner\": \"M00\",\n      \"item_kind\": \"number\"\n    }\n  }\n}\n"
   },
   "name": "world_slots/valid",
@@ -1413,7 +1413,7 @@
    }
   },
   "files": {
-   "04_模块库/通用类/M00_数据结构.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
+   "04_模块库/通用类/M00_数据槽总线.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
    "protocol/world_slots.json": "{\n  \"schema_version\": \"2\",\n  \"slots\": {}\n}\n"
   },
   "name": "world_slots/bad-head",
@@ -1433,7 +1433,7 @@
    }
   },
   "files": {
-   "04_模块库/通用类/M00_数据结构.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
+   "04_模块库/通用类/M00_数据槽总线.md": "# M00 数据结构\n\n槽位：state.mood / state.items / state.count 与 owner 说明。\n",
    "protocol/world_slots.json": "{\n  \"schema_version\": \"1\",\n  \"slots\": {\n    \"state.mood\": {\n      \"kind\": \"wat\",\n      \"owner\": \"\"\n    },\n    \"state.count\": {\n      \"kind\": \"string\",\n      \"owner\": \"M00\",\n      \"item_kind\": \"string\"\n    },\n    \"state.ghost\": {\n      \"kind\": \"number\",\n      \"owner\": \"M00\"\n    }\n  }\n}\n"
   },
   "name": "world_slots/bad-slots",
@@ -1442,7 +1442,7 @@
  {
   "expected": {
    "issues": [
-    "04_模块库/通用类/M00_数据结构.md 缺失"
+    "04_模块库/通用类/M00_数据槽总线.md 缺失"
    ],
    "stats": {
     "arrays": 0,

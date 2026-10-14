@@ -12,14 +12,14 @@
       "sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
     },
     {
-      "cid": "bafyreidyq7wnymb6uelg76hnyahys3jmw4osyvrozfwvdgopuol23dtq3q",
+      "cid": "bafyreidin2i6ro5wavpx37xkrtm35lqgjxeudv5tcjrzbhgblhsyir7dxi",
       "path": "02_联动注册表.md",
-      "sha256": "7887ecdc303ea1166ff8edc00f896d2cb71d2c562ec96d5199cfa397ad8e70dc"
+      "sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
     },
     {
-      "cid": "bafyreiafe5yjd7v645w3lkfxwyjsjethmn7l6zhm2kvjtfctkjvitq5som",
+      "cid": "bafyreieesub677mu6hl5uhk2vmwj3qv4mej3wpvi3zhw7imeizuvxkh5ki",
       "path": "06_Agent执行协议.md",
-      "sha256": "05277091febee76db5a8b7b613249267637ebf64ecd2aa999453526a89c3b273"
+      "sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
     },
     {
       "cid": "bafyreighyurp2tydobtuzqwbsgcvyl7bjbe7xicppjoywldiwq35rq2cgm",
@@ -42,9 +42,9 @@
       "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
     },
     {
-      "cid": "bafyreid7teg763zvrraaukmrb7g5asb7bb46h44vp5sahesxedz5i3d5zy",
+      "cid": "bafyreibqlthxbcjto5mi363mysnxlngpn75nptoa7donzg7bvv53s5zebe",
       "path": "protocol/event_registry.json",
-      "sha256": "7f990dff6f358c400a29910fcdd0483f0879e3f3957f6403925720f3d46c7dce"
+      "sha256": "305ccf70893377588dfb6cc49b75b4cf6ffad7cdc0f8dcdc9be1ad7bb9772409"
     },
     {
       "cid": "bafyreicowvcvkxgkfxzrrq5lfqic5k36keknbf2y4zw6dui4jb7shv4z6e",
@@ -82,9 +82,9 @@
       "sha256": "00dbe82ff51bbfed817398ddecb5e256a76463dc512978b8f2f050abfe41d3b9"
     },
     {
-      "cid": "bafyreiecevuju5o44hzqrd5r2spqzqi2mb5pxq44kzzsuo6mgjlw7qa4ca",
+      "cid": "bafyreibrhikdz7pflj552w5zn7uxfjksydeglvly6zq5jjw3u2xwjttqnu",
       "path": "protocol/module_signatures.json",
-      "sha256": "8225689a75dce1f3088fb1d49f0cc11a607afbc39c56732a3bcc32576fc01c10"
+      "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
       "cid": "bafyreibdos34ypmbvl5tgtbnfywpm5iamovcs5ncmbvsisyxj5x7citbby",
@@ -262,9 +262,9 @@
       "sha256": "4a0826e339becae4a2f278f9ca781542874802caf6d239453aeed2aa367165e1"
     },
     {
-      "cid": "bafyreif5lca62dbwlegeqwiauadr4xaxyfqvzkdwzybrog4h637frqsgty",
+      "cid": "bafyreickctyndpf3sdyy3fdsmq6n3yt33m6kfbvib66dhknz6e6tfcxrfm",
       "path": "decisions/ADR-0001-双源知识层落位.md",
-      "sha256": "bd5881ed0c36590c485900a0071e5c17c1615ca876ce03171b87f6fe58c2469e"
+      "sha256": "4a14f0d1bcbb90f18d9472643cdde27bdb3ca286a80fbc33a9b9f13d328af12b"
     },
     {
       "cid": "bafyreiei65rhiimxb62vzo4duk5ddx7sznwq47wsie4wg6lwey2coeam7y",

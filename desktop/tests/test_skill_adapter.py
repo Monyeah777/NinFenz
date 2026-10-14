@@ -90,10 +90,10 @@ class TestRealTechdocIR(unittest.TestCase):
         from core.parser import parse_module
         from core.pipeline_loader import load_pipeline_file
         repo = Path(__file__).resolve().parents[2]   # 仓库根
-        p90 = load_pipeline_file(repo / "03_管线库" / "P90_技术文档生成管线.md")
+        p90 = load_pipeline_file(repo / "03_管线库" / "P90_结构装配管线.md")
         self.assertIsNotNone(p90)
         m90 = parse_module((repo / "04_模块库" / "技术文档类"
-                            / "M90_技术文档结构.md").read_text(encoding="utf-8"))
+                            / "M90_结构装配.md").read_text(encoding="utf-8"))
         from core.generator import render_ir
         ir = render_ir(p90, [m90], title="技术文档结构规范")
         self.assertEqual(ir.type, "techdoc")     # P90 structure=techdoc → techdoc IR

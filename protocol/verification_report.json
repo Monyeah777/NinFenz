@@ -15,6 +15,10 @@
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
+        "domain_neutral": {
+          "files": 16,
+          "hits": 0
+        },
         "import_residue": [],
         "imports": 10,
         "layers": {
@@ -281,7 +285,7 @@
       "source": "receipts.verify_wrapped",
       "stats": {
         "entries": 3,
-        "root": "c76ecf47031c3b041f254c58deda46474ae487df05a4d2ac180dd416fada21c3"
+        "root": "42e1522438c6a5e485c7f188c7d22435c69f8b8a15a95b2ccf80700c7622caa1"
       },
       "status": "pass",
       "warns": 0
@@ -365,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 286,
-        "files": 287,
+        "baseline": 288,
+        "files": 288,
         "max_fn_cc": 114,
         "max_fn_lines": 1218,
         "max_lines": 7332
@@ -426,10 +430,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 2,
+        "metrics_missing": 1,
         "metrics_recorded": 240,
-        "modules": 240,
+        "modules": 241,
         "registered_cycles": 0,
         "registered_sdp": 8,
         "sdp": 8
@@ -474,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 62,
+        "consumed": 63,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 64
+        "scanners": 65
       },
       "status": "pass",
       "warns": 0
@@ -514,7 +518,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "a5c2c10584cc8d09d77b01d7fe86ed3aee43e7d3204f8294104420ef680179a3",
+  "root_digest": "de3e5cc83eb5d48e93c9a6dcdec7a5970109d189ce79cfe42a44f54884ae9f3b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

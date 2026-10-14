@@ -8243,7 +8243,7 @@
           "type": "untyped"
         }
       },
-      "note": "正文证据：04_模块库/世界类/M08_季节天气.md（payload 含嵌套 modifiers{combat,travel,market}）",
+      "note": "正文证据：04_模块库/世界类/M08_环境状态.md（payload 含嵌套 modifiers{combat,travel,market}）",
       "payload_status": "declared"
     }
   },

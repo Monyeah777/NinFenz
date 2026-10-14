@@ -687,7 +687,7 @@ mod tests {
         let (issues, stats) = scan(&root);
         assert_eq!(issues, &[] as &[&str], "真语料 issues 须逐字且同序");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"checks": 3, "invariants": 5, "models": [{"checks": 3, "initial_phase": "begin", "invariants": 5, "module": "M50", "phases": 5, "slots": 4, "source": "04_模块库/通用类/M50_主循环.md"}], "modules": 1, "phases": 5, "slot_registry": 10, "slots": 4, "variables": 4}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"checks": 3, "invariants": 5, "models": [{"checks": 3, "initial_phase": "begin", "invariants": 5, "module": "M50", "phases": 5, "slots": 4, "source": "04_模块库/通用类/M50_调度器.md"}], "modules": 1, "phases": 5, "slot_registry": 10, "slots": 4, "variables": 4}"#).unwrap(),
         )
         .unwrap();
         assert!(crate::jsonread::json_eq(&stats, &want),

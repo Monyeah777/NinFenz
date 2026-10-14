@@ -61,7 +61,7 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     except Exception as exc:
         return ["protocol/world_slots.json 解析失败：%s" % exc], {"slots": 0}
     issues = validate_registry(data)
-    m00_path = r / "04_模块库" / "通用类" / "M00_数据结构.md"
+    m00_path = r / "04_模块库" / "通用类" / "M00_数据槽总线.md"
     if m00_path.is_file():
         m00_text = m00_path.read_text(encoding="utf-8")
         slots_raw = data.get("slots") if isinstance(data, dict) else {}
@@ -74,7 +74,7 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                         % (part, slot)
                     )
     else:
-        issues.append("04_模块库/通用类/M00_数据结构.md 缺失")
+        issues.append("04_模块库/通用类/M00_数据槽总线.md 缺失")
     slots_raw = data.get("slots") if isinstance(data, dict) else {}
     slots = slots_raw if isinstance(slots_raw, dict) else {}
     arrays = sum(1 for v in slots.values()

@@ -430,7 +430,7 @@ fn unquote(t: &str) -> Result<String, String> {
 /// 裸标量 → 按 YAML 1.1 解析（与 PyYAML `SafeLoader` 对齐）。
 ///
 /// **为什么必须解析类型而不是一律当字符串**（实测教训 2026-10-03）：一开始本模块对
-/// 「看着像非字符串」的裸标量 fail-closed，结果 `M50_主循环.md` 里一个 `tick: 0`
+/// 「看着像非字符串」的裸标量 fail-closed，结果 `M50_调度器.md` 里一个 `tick: 0`
 /// 就让**整个模块**解析失败被丢弃，它发布的 `minute_tick` 随之变成"无发布方"，
 /// `event-backing` 凭空报出缺口。**fail-closed 必须精确到标量，不能连坐整件。**
 ///
@@ -617,7 +617,7 @@ mod tests {
 
     #[test]
     fn block_list_items_may_be_mappings() {
-        // 真源 `tool_face:` 的真形态（M10_时间推进.md）——曾因「列表项是映射」被我 fail-closed，
+        // 真源 `tool_face:` 的真形态（M10_节拍推进.md）——曾因「列表项是映射」被我 fail-closed，
         // 导致整个 M10 被丢弃、它发布的 minute_tick 变成"无发布方"。
         let body = "machine_contract:\n  id: 通用:M10\n  tool_face:\n    - purpose: 三轨换算\n      candidates:\n        - repo: https://github.com/arrow-py/arrow\n          ref: 1.3.0\n  events:\n    publish: [minute_tick]\n";
         let v = parse(body).expect("列表项是映射时必须可解析");

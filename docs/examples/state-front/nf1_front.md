@@ -135,7 +135,7 @@ anchor_fingerprint: SHA256:RytmBjDCNbJ7He6VN9UHzVO/QtTc8HG3h5vP9ZIFrwg
 - **M08 季节天气**（世界/P10）：天气/季节事件（WEATHER_SEASON/WEATHER_MOOD）；订阅 `tick_day`。
 - **M23 认知边界**（通用/P20）：视角裁剪四层管线（M00→M40 事实→快照→M23 裁剪→渲染→锚点回验，v0.7.13）；认知负荷分级（COGNITIVE_LOAD）。
 - **事件:M22 事件叙事**（事件/P30）：日常事件流与叙事窗口管理（含遗憾显形窗口判定）；订阅 `ghost_event`、`relationship_change`；发布 `narrative_event`。
-- **M06 任务剧情**（事件/P30）：任务生成/状态机/链式梯度；发布 `quest_state`（全文样例见 `04_模块库/事件类/M06_任务剧情.md`）。
+- **M06 任务剧情**（事件/P30）：任务生成/状态机/链式梯度；发布 `quest_state`（全文样例见 `04_模块库/事件类/M06_流程状态机.md`）。
 - **M13 NPC 交互**（事件/P30/P50）：NPC 行为执行与 `interaction_update` 结算；订阅 `quest_state`。
 - **M12 NPC 对话**（事件/P50）：对话执行（文本措辞，台词由 M80 质检门后输出）。
 - **M20 世界知识库**（事件/P70）：校园常识/设定素材库，经查询接口供给。

@@ -22,7 +22,7 @@ class PipelineLoaderTest(unittest.TestCase):
         self.assertIsNone(pl.load_pipeline_file(str(ROOT / "no_such.md")))
 
     def test_load_official_p90_and_community_p03(self):
-        for rel, pid in (("03_管线库/P90_技术文档生成管线.md", "P90"),
+        for rel, pid in (("03_管线库/P90_结构装配管线.md", "P90"),
                          ("community/西幻生存领域包/pipelines/P03_西幻生存流管线.md", "P03")):
             pipe = pl.load_pipeline_file(str(ROOT / rel))
             self.assertIsNotNone(pipe, rel)

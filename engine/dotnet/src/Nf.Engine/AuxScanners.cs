@@ -82,7 +82,7 @@ public static class AuxScanners
                 new Dictionary<string, object?>(StringComparer.Ordinal) { ["slots"] = 0L });
         }
         var issues = ValidateRegistry(data);
-        var m00 = Path.Combine(root, "04_模块库", "通用类", "M00_数据结构.md");
+        var m00 = Path.Combine(root, "04_模块库", "通用类", "M00_数据槽总线.md");
         var slots = (data as Dictionary<string, object?>)?.GetValueOrDefault("slots") as Dictionary<string, object?>
                     ?? new Dictionary<string, object?>(StringComparer.Ordinal);
         if (File.Exists(m00))
@@ -95,7 +95,7 @@ public static class AuxScanners
         }
         else
         {
-            issues.Add("04_模块库/通用类/M00_数据结构.md 缺失");
+            issues.Add("04_模块库/通用类/M00_数据槽总线.md 缺失");
         }
         var arrays = slots.Values.OfType<Dictionary<string, object?>>()
             .Count(v => PyStr(v.GetValueOrDefault("kind")) == "array");

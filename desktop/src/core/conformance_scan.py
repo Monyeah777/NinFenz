@@ -184,7 +184,7 @@ def face_digests(root: str, patterns):
             if not relevant:
                 return ent["fp"], ent["digests"]          # ① 确知没变：连哈希都不算
             # ② 只改内容 ⇒ 增量（成员集合不变）。比对必须**大小写不敏感**：监听的相对路径是小写，
-            # `iter_files` 是真实大小写（`M00_数据结构.md`）⇒ 否则一律误判成新增件、增量形同虚设。
+            # `iter_files` 是真实大小写（`M00_数据槽总线.md`）⇒ 否则一律误判成新增件、增量形同虚设。
             members = [ent["index"].get(str(c).lower()) for c in relevant]
             if all(rel and os.path.isfile(os.path.join(str(root), *rel.split("/")))
                    for rel in members):

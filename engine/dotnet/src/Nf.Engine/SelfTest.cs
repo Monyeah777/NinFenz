@@ -1186,7 +1186,7 @@ public static class SelfTest
         var root = Path.Combine(work, "knowledge");
         WriteFile(root, "library/RECEIPTS.json", "{}\n");
         // 认知裁剪模块必须在册（knowledge 的 _module_ids 正则扫模块文档找 id）
-        WriteFile(root, "04_模块库/通用类/M23_认知边界.md", IoDoc("M23", "[]", "[]",
+        WriteFile(root, "04_模块库/通用类/M23_可见性边界.md", IoDoc("M23", "[]", "[]",
             "    outputs: {}\n    inputs: {}"));
         WriteFile(root, "protocol/transform_log.json", "{\"schema\": \"nf-transform-log/1\", \"entries\": []}\n");
         WriteFile(root, "protocol/knowledge_usage.json",

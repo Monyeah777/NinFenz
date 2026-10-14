@@ -191,7 +191,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "0232966db940d9bf",
+        "invocationId": "ccb8eebcf9711270",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -212,13 +212,13 @@
     },
     {
       "digest": {
-        "sha256": "7887ecdc303ea1166ff8edc00f896d2cb71d2c562ec96d5199cfa397ad8e70dc"
+        "sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
       },
       "name": "02_联动注册表.md"
     },
     {
       "digest": {
-        "sha256": "05277091febee76db5a8b7b613249267637ebf64ecd2aa999453526a89c3b273"
+        "sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
       },
       "name": "06_Agent执行协议.md"
     },
@@ -248,7 +248,7 @@
     },
     {
       "digest": {
-        "sha256": "7f990dff6f358c400a29910fcdd0483f0879e3f3957f6403925720f3d46c7dce"
+        "sha256": "305ccf70893377588dfb6cc49b75b4cf6ffad7cdc0f8dcdc9be1ad7bb9772409"
       },
       "name": "protocol/event_registry.json"
     },
@@ -296,7 +296,7 @@
     },
     {
       "digest": {
-        "sha256": "8225689a75dce1f3088fb1d49f0cc11a607afbc39c56732a3bcc32576fc01c10"
+        "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
       },
       "name": "protocol/module_signatures.json"
     },
@@ -512,7 +512,7 @@
     },
     {
       "digest": {
-        "sha256": "bd5881ed0c36590c485900a0071e5c17c1615ca876ce03171b87f6fe58c2469e"
+        "sha256": "4a14f0d1bcbb90f18d9472643cdde27bdb3ca286a80fbc33a9b9f13d328af12b"
       },
       "name": "decisions/ADR-0001-双源知识层落位.md"
     },

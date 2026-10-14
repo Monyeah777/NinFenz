@@ -112,13 +112,13 @@ mod tests {
     #[test]
     fn id_comes_from_the_title_when_present() {
         let text = "# 模块 M10 · 时间推进\n\n> 类别：通用类\n";
-        assert_eq!(header_id(text, "04_模块库/通用类/M10_时间推进.md"), "M10");
+        assert_eq!(header_id(text, "04_模块库/通用类/M10_节拍推进.md"), "M10");
     }
 
     #[test]
     fn id_falls_back_to_the_file_name_prefix() {
         let text = "# 别的标题\n";
-        assert_eq!(header_id(text, "04_模块库/通用类/M10_时间推进.md"), "M10");
+        assert_eq!(header_id(text, "04_模块库/通用类/M10_节拍推进.md"), "M10");
     }
 
     #[test]

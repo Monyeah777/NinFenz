@@ -194,7 +194,7 @@ FACES = [
     ("module-ls", ["module", "ls"]),
     ("module-ls-json", ["module", "ls", "--json"]),
     ("module-ls-deprecated", ["module", "ls", "--status", "deprecated"]),
-    ("module-status", ["module", "status", "04_模块库/事件类/M22_事件叙事.md"]),
+    ("module-status", ["module", "status", "04_模块库/事件类/M22_事件编排.md"]),
     # 概念前置闭包求值器（第七十一片）——**真源是 scripts/ 下的独立脚本，不是 nf 子命令**：
     # 第三条 = Python 侧入口脚本；第四条 = 引擎参数要在 Python 参数前**去掉几个词**（这里是子命令名 1 个）。
     ("closure-default", ["domain-closure", "--target", "C22"], "scripts/ai_domain_closure.py", 1),

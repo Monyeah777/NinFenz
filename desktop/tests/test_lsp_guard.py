@@ -38,7 +38,7 @@ class TestLspGuardDiagnostics(unittest.TestCase):
 
     def test_non_pipeline_doc_produces_no_guard_diag(self):
         text = "condition: =NoSuch.slot == 1\n"
-        diags = _guard(lsp_doc.diagnose("04_模块库/通用类/M00_数据结构.md", text, str(ROOT)))
+        diags = _guard(lsp_doc.diagnose("04_模块库/通用类/M00_数据槽总线.md", text, str(ROOT)))
         self.assertEqual([], diags)
 
     def test_prose_condition_is_not_an_error(self):

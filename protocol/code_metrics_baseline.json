@@ -285,6 +285,11 @@
       "max_fn_cc": 52,
       "max_fn_lines": 78
     },
+    "desktop/src/core/domain_neutral.py": {
+      "lines": 55,
+      "max_fn_cc": 8,
+      "max_fn_lines": 24
+    },
     "desktop/src/core/domain_pack.py": {
       "lines": 2108,
       "max_fn_cc": 63,
@@ -891,9 +896,9 @@
       "max_fn_lines": 48
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 541,
+      "lines": 551,
       "max_fn_cc": 24,
-      "max_fn_lines": 84
+      "max_fn_lines": 93
     },
     "desktop/src/core/quality_baseline.py": {
       "lines": 61,
@@ -1414,6 +1419,11 @@
       "lines": 180,
       "max_fn_cc": 19,
       "max_fn_lines": 36
+    },
+    "scripts/verify_fast.py": {
+      "lines": 288,
+      "max_fn_cc": 17,
+      "max_fn_lines": 78
     },
     "scripts/verify_report.py": {
       "lines": 81,

@@ -57,8 +57,8 @@ class SemanticConflictTest(unittest.TestCase):
 
     def test_dangling_subscribe_is_issue(self):
         with tempfile.TemporaryDirectory() as tmp:
-            self._write(tmp, "04_模块库/通用类/M50_主循环.md", M50)
-            self._write(tmp, "04_模块库/技术文档类/M90_技术文档结构.md", M90)
+            self._write(tmp, "04_模块库/通用类/M50_调度器.md", M50)
+            self._write(tmp, "04_模块库/技术文档类/M90_结构装配.md", M90)
             issues, stats = sc.scan(tmp)
             self.assertTrue(any("intent_received" in i for i in issues), issues)
             self.assertEqual(stats["techdoc_chain"], 1)
@@ -66,16 +66,16 @@ class SemanticConflictTest(unittest.TestCase):
     def test_publisher_resolves_issue(self):
         with tempfile.TemporaryDirectory() as tmp:
             m50 = M50.replace("publish: []", "publish: [intent_received]")
-            self._write(tmp, "04_模块库/通用类/M50_主循环.md", m50)
-            self._write(tmp, "04_模块库/技术文档类/M90_技术文档结构.md", M90)
+            self._write(tmp, "04_模块库/通用类/M50_调度器.md", m50)
+            self._write(tmp, "04_模块库/技术文档类/M90_结构装配.md", M90)
             issues, _ = sc.scan(tmp)
             self.assertEqual(issues, [])
 
     def test_mount_and_category_drift_detected(self):
         text = M90.replace("挂载点：P90（active）", "挂载点：P60（active）")
         with tempfile.TemporaryDirectory() as tmp:
-            self._write(tmp, "04_模块库/通用类/M50_主循环.md", M50)
-            self._write(tmp, "04_模块库/技术文档类/M90_技术文档结构.md", text)
+            self._write(tmp, "04_模块库/通用类/M50_调度器.md", M50)
+            self._write(tmp, "04_模块库/技术文档类/M90_结构装配.md", text)
             issues, _ = sc.scan(tmp)
             self.assertTrue(any("挂载点漂移" in i for i in issues), issues)
 
