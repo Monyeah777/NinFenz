@@ -1722,7 +1722,21 @@ PYEOF
     then
       ok '质量纵深汇总扫描通过（载荷/ledger/指令/概念图/资产/world_model/world_slots 零缺口）'
     else
-      no "质量纵深汇总异常——$(tail -2 "$NFL_TMP"/nf_check32.log | tr '\n' ' ')"; err=1
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check32.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check32.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "质量纵深汇总异常——$(tail -2 "$NFL_TMP"/nf_check32.log | tr '\n' ' ')"
+      else
+        no "质量纵深汇总异常（check32 汇总）——以上 $_emitted 条子面失败，明细见 nf_check32.log"
+      fi
+      err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check32）'
@@ -2018,7 +2032,21 @@ PYEOF
       fi
       ok '新面扫描通过（MCP dual-era / stdio 帧纪律 / attestation / 评分 / 机械修复 / 正文 lint / 编辑器面（能力·定位·生命周期·领域智能·配置）/ 许可证 / 遥测 / 编码卫生 / 互操作导出与入仓面一致 / 文档命令面 / 决策层面 / 构建回路）'
     else
-      no "新面扫描异常——$(tail -3 "$NFL_TMP"/nf_check33.log | tr '\n' ' ')"; err=1
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check33.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check33.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "新面扫描异常——$(tail -3 "$NFL_TMP"/nf_check33.log | tr '\n' ' ')"
+      else
+        no "新面扫描异常（check33 汇总）——以上 $_emitted 条子面失败，明细见 nf_check33.log"
+      fi
+      err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check33）'
@@ -2198,7 +2226,21 @@ PYEOF
     then
       ok '深化面扫描通过（dry-run / 回执单根 / 边界冻结 / 批准记录 / 一致性报告 / 语料）'
     else
-      no "深化面扫描异常——$(tail -3 "$NFL_TMP"/nf_check35.log | tr '\n' ' ')"; err=1
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check35.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check35.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "深化面扫描异常——$(tail -3 "$NFL_TMP"/nf_check35.log | tr '\n' ' ')"
+      else
+        no "深化面扫描异常（check35 汇总）——以上 $_emitted 条子面失败，明细见 nf_check35.log"
+      fi
+      err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check35）'
@@ -2270,7 +2312,21 @@ PYEOF
     then
       ok '治理面扫描通过（声明 / RFC / driver / 实践包 / 跑分 / 端点）'
     else
-      no "治理面扫描异常——$(tail -3 "$NFL_TMP"/nf_check36.log | tr '\n' ' ')"; err=1
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check36.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check36.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "治理面扫描异常——$(tail -3 "$NFL_TMP"/nf_check36.log | tr '\n' ' ')"
+      else
+        no "治理面扫描异常（check36 汇总）——以上 $_emitted 条子面失败，明细见 nf_check36.log"
+      fi
+      err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check36）'
