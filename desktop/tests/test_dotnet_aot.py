@@ -33,6 +33,35 @@ def _minimal_env():
     return {"SYSTEMROOT": os.environ.get("SYSTEMROOT", "C:\\Windows")}
 
 
+def _dotnet_runtime_usable():
+    """→ (是否可用, 理由, 可执行件路径)。
+
+    为什么要探测而不是直接 `subprocess.run(["dotnet", …])`（2026-10-16 实测）：
+    某些机器上 PATH 里那个 `dotnet` 是**残缺安装**——命令在、但一跑就回
+    「The command could not be loaded」，于是 `--file` 那条 JIT 腿直接
+    `FileNotFoundError: [WinError 2]`，把**环境缺口**报成**判据失败**。
+    故这里先探一次 `--list-runtimes`：不可用就如实 skip（缺什么写清楚），
+    可用就用**解析出的绝对路径**，免得 PATH 抖动又变成间歇红。
+    """
+    import shutil
+    exe = shutil.which("dotnet")
+    if not exe:
+        return False, "dotnet 不在 PATH（修复指引：装 .NET 运行时或把 dotnet 加入 PATH）", "dotnet"
+    try:
+        proc = subprocess.run([exe, "--list-runtimes"], capture_output=True,  # nosec B603
+                              timeout=60)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return False, "dotnet 不可用：{}（修复指引：本机 dotnet 可能是残缺安装）".format(exc), exe
+    if proc.returncode != 0:
+        return False, ("dotnet 自检失败（rc={}）：{}".format(proc.returncode,
+                          proc.stderr.decode("utf-8", "replace").strip()[:120])), exe
+    return True, "", exe
+
+
+#: 在模块级**算一次**（decorator 里不重复探测；同一次进程内结论稳定）。
+_DOTNET_OK, _DOTNET_WHY, _DOTNET_EXE = _dotnet_runtime_usable()
+
+
 class ArtifactShapeTest(unittest.TestCase):
     def test_gitignore_keeps_publish_output_out_of_the_repo(self):
         text = (ROOT / ".gitignore").read_text(encoding="utf-8")
@@ -66,13 +95,14 @@ class AotEquivalenceTest(unittest.TestCase):
         self.assertEqual(14, checked, "两条清单共 14 条向量")
 
     @unittest.skipUnless(JIT_DLL.is_file(), "JIT 产物缺席")
+    @unittest.skipUnless(_DOTNET_OK, _DOTNET_WHY or "dotnet 不可用")
     def test_aot_and_jit_are_byte_identical(self):
         self.assertEqual(AOT_EXE.read_bytes()[:2], b"MZ", "AOT 产物应是原生 PE")
         for v in _vectors("jcs_conformance.json")[:3]:
             inp = ROOT / v["input"]
             aot = subprocess.run([str(AOT_EXE), "--file", str(inp)], capture_output=True,  # nosec B603
                                  cwd=str(ROOT), env=_minimal_env())
-            jit = subprocess.run(["dotnet", str(JIT_DLL), "--file", str(inp)],  # nosec B603
+            jit = subprocess.run([_DOTNET_EXE, str(JIT_DLL), "--file", str(inp)],  # nosec B603
                                  capture_output=True, cwd=str(ROOT))
             self.assertEqual(jit.returncode, aot.returncode, v["id"])
             self.assertEqual(jit.stdout, aot.stdout, v["id"])

@@ -165,6 +165,7 @@ def wrap_runner(base, decide, sync=None):
 CACHEABLE_COMMANDS = (
     ("--version",),
     ("score",), ("conformance",), ("layers",), ("stats",), ("doctor",),
+    ("verify",),
     ("interop",), ("toolface",), ("assertions",), ("cognition",),
     ("patterns", "ls"), ("patterns", "show"), ("patterns", "for"), ("patterns", "verify"),
     ("module", "ls"), ("module", "status"), ("module", "verify"),

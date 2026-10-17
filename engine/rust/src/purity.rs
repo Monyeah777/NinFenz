@@ -77,7 +77,7 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 )];
 
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
-const SINK_ALLOW: [(&str, &str); 10] = [
+const SINK_ALLOW: [(&str, &str); 11] = [
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),
@@ -88,6 +88,11 @@ const SINK_ALLOW: [(&str, &str); 10] = [
     ("pack_combo.py:unlink", ""),
     ("storage.py:unlink", ""),
     ("watch.py:unlink", ""),
+    // 2026-10-15（门禁提速批）：`core/gate_inproc.py` 的进程内 heredoc 执行面——
+    // 源码字符串由该模块自己从本仓 `verify.sh` 机械切出，不来自任何外部输入；
+    // 理由是「省掉 heredoc 的解释器启动税」，等价性由 Python 侧
+    // `tests/test_gate_engine_parity.py` 逐 check 差分守住。与真源同步见 `purity_scan.SINK_ALLOW`。
+    ("gate_inproc.py:exec", ""),
 ];
 
 fn end_shell_re() -> &'static regex::Regex {

@@ -59,26 +59,39 @@ def rel_face(root: str, keys: Iterable[str]) -> list[str]:
 #: audit hook 的活收集器（进程内只装一次 hook；每次调用注册/注销，防跨次泄漏）。
 _COLLECTORS: list[set] = []
 
+#: **目录列举事件**的活收集器（2026-10-16 新增，给 `core/subcheck_cache` 用）。
+#: 为什么必须单列一格：判据里「目录里多出一个文件」会改变结果，但它**不产生 `open`
+#: 事件**（只有 `listdir`/`scandir`）——只快照文件内容会漏掉这类输入，是 glob 类判据的
+#: 假命中来源。表格是**追加**的，既有收集器语义不变。
+_DIR_COLLECTORS: list[set] = []
+
+#: 目录列举类 audit 事件名（跨版本取并集；取不到的事件自然不触发）。
+_DIR_EVENTS = frozenset(("os.listdir", "os.scandir"))
+
 
 def _ensure_hook() -> None:
-    """确保进程内已装 open 事件 hook（只装一次；hook 装了不可撤，故用注册表而非重装）。"""
-    if _COLLECTORS:
+    """确保进程内已装 open/listdir/scandir 事件 hook（只装一次；hook 装了不可撤）。"""
+    if _COLLECTORS or _DIR_COLLECTORS:
         return
 
     def _hook(event: str, args: Any) -> None:
-        if event != "open":
+        if event == "open":
+            regs, take = _COLLECTORS, True
+        elif event in _DIR_EVENTS:
+            regs, take = _DIR_COLLECTORS, False
+        else:
             return
         try:
             p = args[0]
         except (IndexError, TypeError):   # audit 事件参数形状随版本而异：取不到即跳过该事件（不涉业务错误）
             return
-        if isinstance(p, int):          # 文件描述符：无路径可记
+        if take and isinstance(p, int):   # 文件描述符：无路径可记
             return
         try:
             path = os.fsdecode(p)
         except (TypeError, ValueError):
             return
-        for seen in list(_COLLECTORS):
+        for seen in list(regs):
             seen.add(path)
 
     sys.addaudithook(_hook)

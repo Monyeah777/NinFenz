@@ -91,7 +91,16 @@ from core.daemon_shell import SHELL_INIT_BASH  # noqa: E402,F401
 
 
 def state_path() -> Path:
-    """守护状态文件落点：`<NF_HOME>/daemon.json`（NF_HOME 约定只在 storage 里定义一次）。"""
+    """守护状态文件落点：`<NF_HOME>/daemon.json`（NF_HOME 约定只在 storage 里定义一次）。
+
+    **不提供落点覆盖**（2026-10-17 实测结论）：曾尝试加 `NARRATIVE_FORGE_DAEMON_STATE`
+    让并行 worker 各自隔离守护单例，三种粒度（整个 NF_HOME / 只 cache 共享 / 只状态文件）
+    **全部与既有测试契约冲突**：
+    - 切整个 NF_HOME ⇒ 丢 cache 预热，`quality_depth` 扫描器调用 8→9（判据红）；
+    - 只切状态文件 ⇒ `test_daemon` / `test_launcher` / `test_daemon_parity` 里
+      **断言 `daemon.json` 位置**的用例直接红（它们自设 NF_HOME 并期望状态就落在里面）。
+    ⇒ 守护单例**不可隔离**，并行只能靠「把打守护的模块排到独占串行段」。
+    """
     from core import storage
     return Path(storage.default_home()) / STATE_NAME
 
@@ -574,6 +583,10 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
     if not force and ping(timeout=1.0):
         print("已有守护在运行（修复指引：先 `nf daemon stop`，或显式 force 另起）", file=sys.stderr)
         return 2
+    # 确定性输出（2026-10-15）：守护与直跑必须**逐字节**同输出（test_daemon_parity 守门）。
+    # 但有些命令的人读面默认带墙钟耗时，而两条路径的耗时必然不同 ⇒ 值必然分叉。
+    # 故守护侧统一声明「不要不确定性面」，各命令按此关闭耗时字段（当前是 nf verify）。
+    os.environ["NF_VERIFY_QUIET_TIME"] = "1"
     global _WATCHER
     watcher = None
     if watch:

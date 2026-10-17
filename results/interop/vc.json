@@ -7,15 +7,15 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "1e091cf459a96c2fc951dfc5568e9bb610c5b83e93d92337bdce304d0025008d",
+    "receiptRoot": "36ce8d9739e30e216a6e6bea5f45a371f70995a1e928ccd2d679c9698049dc1e",
     "verdict": "conformant"
   },
-  "issuer": "Monyeah777",
+  "issuer": "门禁提速批（并行隔离结案）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"
   ],
-  "validFrom": "2026-10-14",
+  "validFrom": "2026-10-17",
   "x-nf-note": "派生自 protocol/conformance_report.json + protocol/RECEIPTS.json + protocol/approvals/*（纯派生，不新增真源）",
   "x-nf-proof-status": "unsigned（本仓签名走 ssh 外挂锚 nf attest；未接 JWS/Data Integrity 签名套件——形状可读，不可验证，勿当凭证使用）"
 }

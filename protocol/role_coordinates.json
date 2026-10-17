@@ -3,10 +3,10 @@
     "app": 1447,
     "entry": 24,
     "floor": 5,
-    "prod": 1034,
+    "prod": 1037,
     "projection": 129,
-    "support": 209,
-    "verify": 918
+    "support": 210,
+    "verify": 924
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6089,6 +6089,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "门禁单进程引擎（骨架）——**只做编排，不改判据**。",
+      "path": "desktop/src/core/gate_engine.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "门禁读面台账（W-03）：静态面 / 动态面 / 声明面 与三源对账。",
       "path": "desktop/src/core/gate_faces.py",
       "role": "verify",
@@ -6098,6 +6104,18 @@
       "function": "影响图（W-06/W-07）：core 模块导入图 → 反向可达闭包 → 专家影响集。",
       "path": "desktop/src/core/gate_graph.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "把 verify.sh 里 checkN 的 `$PY3 - <<'PYEOF' … PYEOF` 段**在当前进程内**执行（L-A 的核心）。",
+      "path": "desktop/src/core/gate_inproc.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "门禁的**原生结构面** check（check1 / check3）——纯文件在场与文本落点判定。",
+      "path": "desktop/src/core/gate_native.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -6815,6 +6833,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "**子 check 缓存**：把「一条 check 的判定」按内容寻址缓存起来。",
+      "path": "desktop/src/core/subcheck_cache.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "遥测对齐 OTel GenAI 语义约定（内部差距实证：docs/45_执行遥测规范.md 定义的",
       "path": "desktop/src/core/telemetry_semconv.py",
       "role": "verify",
@@ -6871,6 +6895,12 @@
     {
       "function": "验证器三性质探针（机制借鉴 vivera lib/chunk-schema.mjs:28-49）。",
       "path": "desktop/src/core/verifier_props.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "**并行跑 `nf verify` 的各条 check**：把「整批」从串行 ≈19 s 压到并行 ≈6.5 s。",
+      "path": "desktop/src/core/verify_checks.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -7681,6 +7711,12 @@
     {
       "function": "P-A5 差分自证：规则层路由（DAG/朴素/半朴素三后端）必须与影响图闭包同结果。",
       "path": "desktop/tests/test_gate_datalog.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "门禁引擎 ↔ verify.sh 的**逐 check 判据等价性**差分测试。",
+      "path": "desktop/tests/test_gate_engine_parity.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8753,6 +8789,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "子 check 缓存（`core/subcheck_cache.py`）的判据：**命中即等价，且绝不假命中**。",
+      "path": "desktop/tests/test_subcheck_cache.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "测试套件**接线**门禁：不许有「写好了却没人跑」的套件。",
       "path": "desktop/tests/test_suite_wiring.py",
       "role": "verify",
@@ -8833,6 +8875,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_verifier_props.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "`nf verify --jobs` 的判据：**并行结果必须与串行逐字节一致**，且失败必须如实计入。",
+      "path": "desktop/tests/test_verify_parallel_checks.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11729,6 +11777,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "**并行跑测试套件**（L-D）：按模块切分、多进程执行、汇总成 unittest 同形结论。",
+      "path": "scripts/verify_parallel.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁机器可读报告（CLI）：`protocol/verification_report.json`。",
       "path": "scripts/verify_report.py",
       "role": "verify",
@@ -11754,7 +11808,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cdaababf2a3206e116b84bcc1d2e626ad6e6666050cf683ba6f2647afe116929",
+  "root_digest": "5ee737683085a3d04c2a669eb5720e3b38bda3b6d3f45b92f34b6ba8fc06eae9",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 74,
@@ -11763,8 +11817,8 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 807,
-    "auto:R-core": 240
+    "R-verify": 811,
+    "auto:R-core": 246
   },
   "schema": "nf-role-coordinates/1"
 }

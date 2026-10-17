@@ -23,11 +23,13 @@ import ast
 import json
 import os
 import re
-import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cli_harness  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NF = str(ROOT / "scripts" / "nf.py")
@@ -101,18 +103,16 @@ def _probe_faces():
     """
     if _CACHE:
         return _CACHE["rows"], _CACHE["runs"]
-    p = subprocess.run([sys.executable, NF, "shell", "--commands", "--json"],
-                       capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", cwd=str(ROOT), timeout=300)
+    p = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
+                                 cwd=str(ROOT))
     doc = json.loads(p.stdout)
     rows = [r for r in (doc.get("commands") or doc.get("rows") or [])
             if "--json" in (r.get("flags") or [])]
     runs, raw = {}, {}
     for r in rows:
         path = r["path"]
-        q = subprocess.run([sys.executable, NF] + path.split() + ["--json"],
-                           capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", cwd=str(ROOT), timeout=300)
+        q = cli_harness.run_cli_proc([sys.executable, NF] + path.split() + ["--json"],
+                                     cwd=str(ROOT))
         if q.returncode == 2:
             continue
         raw[path] = q.stdout or ""
@@ -157,10 +157,9 @@ def _preset_env() -> dict:
     if not _PRESET_STATE:
         home = tempfile.mkdtemp(prefix="nf_preset_gate_")
         env = dict(os.environ, NARRATIVE_FORGE_HOME=home)
-        subprocess.run([sys.executable, NF, "preset", "save", "门禁用例预设",
-                        "--pipeline", "P01", "--modules", "通用类:M00"],
-                       capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", cwd=str(ROOT), env=env, timeout=300)
+        cli_harness.run_cli_proc([sys.executable, NF, "preset", "save", "门禁用例预设",
+                                  "--pipeline", "P01", "--modules", "通用类:M00"],
+                                 cwd=str(ROOT), env=env)
         _PRESET_STATE["env"] = env
     return _PRESET_STATE["env"]
 
@@ -190,12 +189,11 @@ def _fixtures() -> dict:
     with open(sfile, "w", encoding="utf-8") as fh:
         fh.write("西幻生存题材，需要多语输出。\n")
     for i in (1, 2):                      # 两份 run 记录：bench compare 才有可比面
-        subprocess.run([sys.executable, NF, "bench", "run", "--case",
-                        "desktop/tests/fixtures/benchmark/suite/p03-western-cross",
-                        "--model", "gate-%d" % i,
-                        "--out", os.path.join(tmp, "run%d.json" % i)],
-                       capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", cwd=str(ROOT), env=env, timeout=300)
+        cli_harness.run_cli_proc([sys.executable, NF, "bench", "run", "--case",
+                                  "desktop/tests/fixtures/benchmark/suite/p03-western-cross",
+                                  "--model", "gate-%d" % i,
+                                  "--out", os.path.join(tmp, "run%d.json" % i)],
+                                 cwd=str(ROOT), env=env)
     _PRESET_STATE["fixtures"] = {"env": env, "trace": trace, "questions": qfile,
                                  "state": sfile, "runs_glob": os.path.join(tmp, "run*.json")}
     return _PRESET_STATE["fixtures"]
@@ -270,10 +268,8 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
     """需参面的**真跑**判据 + 覆盖点名（每张声明 `--json` 的面都要有去处）。"""
 
     def _run(self, argv):
-        return subprocess.run([sys.executable, NF] + list(argv) + ["--json"],
-                              capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", cwd=str(ROOT), env=_preset_env(),
-                              timeout=300)
+        return cli_harness.run_cli_proc([sys.executable, NF] + list(argv) + ["--json"],
+                                        cwd=str(ROOT), env=_preset_env())
 
     def test_canonical_faces_are_self_describing(self):
         bad = []
@@ -351,18 +347,14 @@ class JsonFaceNoMachinePathTest(unittest.TestCase):
         _probe_faces()
         texts = dict(_CACHE["raw"])                      # 无参可跑的面（同一批已跑过）
         for name, argv in CANON.items():
-            p = subprocess.run([sys.executable, NF] + _canon_argv(name) + ["--json"],
-                               capture_output=True, text=True, encoding="utf-8",
-                               errors="replace", cwd=str(ROOT), env=_preset_env(),
-                               timeout=300)
+            p = cli_harness.run_cli_proc([sys.executable, NF] + _canon_argv(name) + ["--json"],
+                                         cwd=str(ROOT), env=_preset_env())
             texts[name] = p.stdout or ""
         # 面表之外的**人读面**（不带 `--json`、需要子旗标才看得到的那几处），
         # 2026-10-01 取证：`nf shell --verify` 会把 `<NF_HOME>/shell_history` 绝对路径打出来。
         for argv in (["shell", "--verify"], ["shell", "--baseline"],
                      ["shell", "--commands", "--json"], ["daemon", "status", "--json"]):
-            p = subprocess.run([sys.executable, NF] + argv, capture_output=True,
-                               text=True, encoding="utf-8", errors="replace",
-                               cwd=str(ROOT), timeout=300)
+            p = cli_harness.run_cli_proc([sys.executable, NF] + argv, cwd=str(ROOT))
             texts[" ".join(argv)] = (p.stdout or "") + (p.stderr or "")
         pats = (MACHINE_PATH, re.compile(re.escape(os.path.expanduser("~")), re.I))
         bad = []
