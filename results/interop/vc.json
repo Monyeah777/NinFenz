@@ -7,10 +7,10 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "36ce8d9739e30e216a6e6bea5f45a371f70995a1e928ccd2d679c9698049dc1e",
+    "receiptRoot": "bb2c4ce32f5eaae6f05ddca390dafdf353d13d93e09de2f66cb0b0baf67ae1bb",
     "verdict": "conformant"
   },
-  "issuer": "门禁提速批（并行隔离结案）",
+  "issuer": "门禁能力化批（原子层显式化）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"

@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 69,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "36ce8d9739e30e216a6e6bea5f45a371f70995a1e928ccd2d679c9698049dc1e",
+    "root": "bb2c4ce32f5eaae6f05ddca390dafdf353d13d93e09de2f66cb0b0baf67ae1bb",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -137,7 +137,7 @@
     },
     {
       "digest": {
-        "sha256": "cd77f23d17669add654b5385994c91444d5476ea7ffc2dd89b8407b09eb16022"
+        "sha256": "741b8d38e528d235e790fa72669c5e5fa0cc496cb5668eaa042046fe3a86ae1e"
       },
       "name": "protocol/role_coordinates.json"
     },
@@ -179,7 +179,7 @@
     },
     {
       "digest": {
-        "sha256": "b281a30553112f1ce728eddb8ddf749da08995f164e6c62e91789e0aeb8f1754"
+        "sha256": "1e77038c45f531122c7e27fca0b60ef6f677e0aa481b6713b80e2798d67238c4"
       },
       "name": "protocol/sast_baseline.json"
     },

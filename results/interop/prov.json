@@ -321,12 +321,12 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "cd77f23d17669add654b5385994c91444d5476ea7ffc2dd89b8407b09eb16022"
+      "nf:sha256": "741b8d38e528d235e790fa72669c5e5fa0cc496cb5668eaa042046fe3a86ae1e"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "b281a30553112f1ce728eddb8ddf749da08995f164e6c62e91789e0aeb8f1754"
+      "nf:sha256": "1e77038c45f531122c7e27fca0b60ef6f677e0aa481b6713b80e2798d67238c4"
     },
     {
       "@id": "nf:file/protocol/schema/asset.schema.json",

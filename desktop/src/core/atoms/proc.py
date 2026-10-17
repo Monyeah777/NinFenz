@@ -1,0 +1,45 @@
+"""进程原子（**受控副作用**，本包唯一的非纯面）：跑一个参数列表命令并取回输出。
+
+纯度例外是显式登记的，不是含糊的「差不多」：
+
+- run_capture 会真起进程，因此结果**不是**输入的函数（环境变了输出就变）——它只负责
+  「跑一次、把 code/out/err 原样交回」，**不做任何判断**（不比较、不超时重试、不判红）；
+- run_twice 跑两遍同一 thunk 并**原样返回两份结果**，比较留给能力层（CAP_DETERMINISTIC
+  的口径在能力层，原子不知道「两遍相等」意味着什么）。
+
+安全面：只接受 argv 列表，**永不**用 shell=True（purity_scan R6）；启动失败 / 超时都折算成
+code=None + err 文本，不向调用方抛异常（少一种崩溃面）。
+"""
+from __future__ import annotations
+
+import subprocess  # nosec B404 - 只跑 argv 列表（无 shell、无动态拼接）
+from collections.abc import Callable, Sequence
+from typing import Any
+
+
+def run_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None = None,
+                timeout: float = 120.0) -> dict[str, Any]:
+    """→ {"code": int | None, "out": str, "err": str}；起不来 / 超时 → code=None。
+
+    timeout 是**执行边界**（防挂死），不是判据：超时与否由调用方按 code=None 自行处置。
+    """
+    command = [str(part) for part in argv]
+    try:
+        proc = subprocess.run(  # nosec B603
+            command,
+            cwd=None if cwd is None else str(cwd),
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"code": None, "out": "", "err": str(exc)}
+    return {"code": proc.returncode, "out": proc.stdout, "err": proc.stderr}
+
+
+def run_twice(thunk: Callable[[], Any]) -> tuple[Any, Any]:
+    """跑同一 thunk 两遍 → (第一次结果, 第二次结果)；**不比较**。"""
+    return thunk(), thunk()

@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1037,
     "projection": 129,
-    "support": 210,
-    "verify": 924
+    "support": 218,
+    "verify": 925
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7217,6 +7217,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子层单测（门禁能力化重构 · 步骤1）：每个原子至少一正一反两例 + 纯度断言。",
+      "path": "desktop/tests/test_atoms.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "内容外挂签名 / attestation 单测（三级信任 + fail-closed）。",
       "path": "desktop/tests/test_attest.py",
       "role": "verify",
@@ -11808,16 +11814,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5ee737683085a3d04c2a669eb5720e3b38bda3b6d3f45b92f34b6ba8fc06eae9",
+  "root_digest": "d6c7f89ec5729f9ab10183edf2f5288435072441301ca2e9a47e5b28f6a7c0cf",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 74,
+    "R-catch": 82,
     "R-entry": 24,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 811,
+    "R-verify": 812,
     "auto:R-core": 246
   },
   "schema": "nf-role-coordinates/1"

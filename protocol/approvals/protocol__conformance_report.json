@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-17",
-  "approved_by": "门禁提速批（并行隔离结案）",
-  "note": "撤回隔离，保留单点派生",
+  "approved_by": "门禁能力化批（原子层显式化）",
+  "note": "原子层落地：core/atoms/* + test_atoms",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"

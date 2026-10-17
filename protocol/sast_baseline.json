@@ -42,13 +42,14 @@
           "total": 33
         },
         "ruff": {
-          "total": 77
+          "total": 78
         }
       },
       "ruff": {
         ".github/scripts/gitee_ingest.py::S310": 2,
         ".github/scripts/library_ingest.py::S310": 1,
         "desktop/src/core/assemble_plan.py::S112": 1,
+        "desktop/src/core/atoms/proc.py::S603": 1,
         "desktop/src/core/attest.py::S603": 4,
         "desktop/src/core/closure_scan.py::S112": 1,
         "desktop/src/core/community_inventory.py::S112": 3,
