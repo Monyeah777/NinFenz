@@ -16,6 +16,24 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 
 from core import verify_report as vr  # noqa: E402
 
+#: 真仓报告**按根缓存**（本文件 7 条判据都要读同一棵真仓）。
+#:
+#: 为什么要缓存（2026-10-15 实测）：`vr.build(真仓)` 单次 **22–30 s**（内部 31 个子扫描、
+#: 37051 次 `read_text`），而本文件 7 条判据各建一次 ⇒ 单文件 **190–240 s**。真仓在单次
+#: 测试进程内**不变化**，故整份报告可安全复用。
+#:
+#: **不缓存到生产代码里**：实测给 `Path.read_text` 加 mtime 缓存对同一构建只快 1.15×，
+#: 且会**改变报告结果**（9657 字节差异）——那种「拿判据换性能」的做法不做。
+_REPORT_CACHE: dict = {}
+
+
+def repo_report(root=None):
+    """真仓报告（进程内缓存）；`root` 省略即本仓。"""
+    key = str(root or ROOT)
+    if key not in _REPORT_CACHE:
+        _REPORT_CACHE[key] = vr.build(key)
+    return _REPORT_CACHE[key]
+
 
 class BuildTest(unittest.TestCase):
     def test_build_is_deterministic(self):
@@ -24,7 +42,7 @@ class BuildTest(unittest.TestCase):
                          "同一棵树两次构建必须同根（否则报告不可核验）")
 
     def test_items_cover_declared_specs(self):
-        r = vr.build(str(ROOT))
+        r = repo_report()
         self.assertEqual(len(vr.SPECS), len(r["items"]))
         self.assertEqual({"pass", "fail", "warn", "error"},
                          set(r["summary"]))
@@ -32,7 +50,7 @@ class BuildTest(unittest.TestCase):
                          sum(r["summary"].values()), "汇总须等于逐条计数之和")
 
     def test_declared_side_is_present(self):
-        d = vr.build(str(ROOT))["declared"]
+        d = repo_report()["declared"]
         self.assertIsInstance(d.get("expected_checks"), int)
         self.assertGreater(d["expected_checks"], 0)
         self.assertTrue(str(d.get("verify_version") or ""), "声明面须含 verify 版本")
@@ -82,12 +100,12 @@ class CheckTest(unittest.TestCase):
 
 class RealRepoTest(unittest.TestCase):
     def test_real_repo_has_no_failing_judgement(self):
-        r = vr.build(str(ROOT))
+        r = repo_report()
         bad = [i["id"] for i in r["items"] if i["status"] in ("fail", "error")]
         self.assertEqual([], bad, "真仓门禁报告不得有 FAIL/ERROR：%s" % bad)
 
     def test_summary_line_mentions_declared_baseline(self):
-        line = vr.summary_line(vr.build(str(ROOT)))
+        line = vr.summary_line(repo_report())
         self.assertIn("声明 check1-", line)
         self.assertIn("PASS=", line)
 

@@ -221,9 +221,9 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 756,
+      "lines": 769,
       "max_fn_cc": 14,
-      "max_fn_lines": 66
+      "max_fn_lines": 70
     },
     "desktop/src/core/daemon_shell.py": {
       "lines": 58,
@@ -400,13 +400,33 @@
       "max_fn_cc": 8,
       "max_fn_lines": 30
     },
+    "desktop/src/core/gate_engine.py": {
+      "lines": 601,
+      "max_fn_cc": 18,
+      "max_fn_lines": 72
+    },
     "desktop/src/core/gate_faces.py": {
-      "lines": 313,
+      "lines": 326,
       "max_fn_cc": 19,
       "max_fn_lines": 35
     },
     "desktop/src/core/gate_graph.py": {
       "lines": 89,
+      "max_fn_cc": 10,
+      "max_fn_lines": 22
+    },
+    "desktop/src/core/gate_inproc.py": {
+      "lines": 267,
+      "max_fn_cc": 12,
+      "max_fn_lines": 77
+    },
+    "desktop/src/core/gate_labels.py": {
+      "lines": 250,
+      "max_fn_cc": 15,
+      "max_fn_lines": 35
+    },
+    "desktop/src/core/gate_native.py": {
+      "lines": 82,
       "max_fn_cc": 10,
       "max_fn_lines": 22
     },
@@ -896,7 +916,7 @@
       "max_fn_lines": 48
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 554,
+      "lines": 559,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -986,7 +1006,7 @@
       "max_fn_lines": 10
     },
     "desktop/src/core/response_cache.py": {
-      "lines": 192,
+      "lines": 193,
       "max_fn_cc": 7,
       "max_fn_lines": 46
     },
@@ -1051,9 +1071,9 @@
       "max_fn_lines": 25
     },
     "desktop/src/core/session_watch.py": {
-      "lines": 110,
+      "lines": 143,
       "max_fn_cc": 4,
-      "max_fn_lines": 15
+      "max_fn_lines": 26
     },
     "desktop/src/core/shell_ledger.py": {
       "lines": 120,
@@ -1101,7 +1121,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/storage.py": {
-      "lines": 326,
+      "lines": 335,
       "max_fn_cc": 10,
       "max_fn_lines": 31
     },
@@ -1114,6 +1134,11 @@
       "lines": 33,
       "max_fn_cc": 7,
       "max_fn_lines": 11
+    },
+    "desktop/src/core/subcheck_cache.py": {
+      "lines": 347,
+      "max_fn_cc": 15,
+      "max_fn_lines": 63
     },
     "desktop/src/core/telemetry_semconv.py": {
       "lines": 166,
@@ -1175,13 +1200,18 @@
       "max_fn_cc": 3,
       "max_fn_lines": 9
     },
+    "desktop/src/core/verify_checks.py": {
+      "lines": 105,
+      "max_fn_cc": 8,
+      "max_fn_lines": 43
+    },
     "desktop/src/core/verify_report.py": {
       "lines": 198,
       "max_fn_cc": 10,
       "max_fn_lines": 24
     },
     "desktop/src/core/watch.py": {
-      "lines": 336,
+      "lines": 348,
       "max_fn_cc": 13,
       "max_fn_lines": 51
     },
@@ -1336,9 +1366,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7362,
-      "max_fn_cc": 114,
-      "max_fn_lines": 1229
+      "lines": 7490,
+      "max_fn_cc": 115,
+      "max_fn_lines": 1251
     },
     "scripts/nf_client.py": {
       "lines": 189,
@@ -1401,7 +1431,7 @@
       "max_fn_lines": 41
     },
     "scripts/risk_baseline.py": {
-      "lines": 529,
+      "lines": 555,
       "max_fn_cc": 21,
       "max_fn_lines": 53
     },
@@ -1429,6 +1459,11 @@
       "lines": 288,
       "max_fn_cc": 17,
       "max_fn_lines": 78
+    },
+    "scripts/verify_parallel.py": {
+      "lines": 180,
+      "max_fn_cc": 13,
+      "max_fn_lines": 64
     },
     "scripts/verify_report.py": {
       "lines": 81,

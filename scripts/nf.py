@@ -1288,6 +1288,28 @@ def _make_parser() -> argparse.ArgumentParser:
     dsi.add_argument("--shell", dest="shell_opt", default=None, choices=("bash",),
                      help="目标 shell（目前只支持 bash：需要 /dev/tcp 内建）")
 
+    vfy = sub.add_parser(
+        "verify",
+        help="门禁单进程引擎（已迁入的 check 与 verify.sh 判据逐字等价）",
+        description="门禁单进程引擎：把 verify.sh 的 check 收进**一个进程**跑，省掉每条一次的解释器"
+                    "启动（实测全量门禁起 42 次 $PY3）。判据**一字不改**——已迁入的 check 与 "
+                    "verify.sh 的输出逐字一致（由 tests/test_gate_engine_parity.py 逐 check 差分"
+                    "常驻守着）。**注意**：全量门禁的权威入口仍是 `bash verify.sh`；本命令是引擎"
+                    "入口，未迁入的 check 会如实报「未迁入」，不假装绿。")
+    vfy.add_argument("--only", default="",
+                     help="只跑指定 check 号（逗号分隔，如 1,3,23）；缺省跑全部已迁入的")
+    vfy.add_argument("--json", action="store_true", help="输出结构化 JSON（机器面）")
+    vfy.add_argument("--memo", action="store_true",
+                     help="打开内容寻址 memo（重复跑时跳过未变读面；默认关，保证差分测的是真跑）")
+    vfy.add_argument("--cached", action="store_true",
+                     help="打开**跨进程子 check 缓存**：按上次观测到的真实读面复核，等价则"
+                          "不跑判据本体直接回上次的判定（fail-closed：读面为空/含仓外/"
+                          "输入变或缺 ⇒ 重跑）。默认关，保证差分测的是真跑")
+    vfy.add_argument("--jobs", type=int, default=0,
+                     help="并行跑各条 check 的进程数（0=串行，缺省）。每条 check 仍在"
+                          "**独立子进程**里跑 `nf verify --only N --json`，判据一字不改；"
+                          "合并按 check 号排序，输出与串行逐字节一致（实测 8 路 ≈3.2×）")
+
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
     # 命令面实现收在 core.nfal_cli（此处只做入口，避免与 nf 命令面重复定义旗标）。
     nfl = sub.add_parser("nfal",
@@ -6815,6 +6837,110 @@ def _cmd_worldmodel(args):
     return 1 if issues else 0
 
 
+def _cmd_verify(args) -> int:
+    """nf verify：门禁单进程引擎入口（已迁入的 check 与 verify.sh 判据逐字等价）。
+
+    **纪律**：本命令不重写任何判据——执行体是 `core.gate_engine`，它对已迁入的 check
+    要么委托既有 `core.*`，要么在进程内跑 verify.sh 的 heredoc 原文；未迁入的如实报
+    「未迁入」，**不假装绿**。全量门禁的权威入口仍是 `bash verify.sh`。
+    """
+    import json as _json
+    import os as _os
+
+    from core import gate_engine as ge
+
+    ge.build_registry()
+    only = [int(x) for x in str(args.only).split(",") if x.strip()] if args.only else None
+    if only:
+        unknown = sorted(set(only) - set(ge.REGISTRY))
+        if unknown:
+            return _machine_fail(
+                args,
+                "check %s 尚未迁入引擎（现已迁入：%s）——请用 `bash verify.sh` 跑全量"
+                % (",".join(str(u) for u in unknown),
+                   ",".join(str(n) for n in sorted(ge.REGISTRY))), 2)
+
+    # 确定性输出：耗时是**不确定性面**，默认不进输出。
+    # 实测教训（test_daemon_parity）：直跑与守护的耗时必然不同，带上它两边就不逐字节一致。
+    # 故本命令**自己**把开关置上（而不是依赖守护侧注入）——直跑与守护走同一条代码路径，
+    # 判据只有一个，避免「两条路径各自设一次」再漂移（实测踩过：只设守护侧 ⇒ 仍差 28 字节）。
+    _os.environ["NF_VERIFY_QUIET_TIME"] = "1"
+    memo = ge.Memo() if args.memo else None
+    _jobs = int(getattr(args, "jobs", 0) or 0)
+    if _jobs > 1 and not only:
+        # **并行**：每条 check 在独立子进程里跑 `nf verify --only N --json`（判据一字不改），
+        # 再按 check 号排序合并。逐字节一致的守门判据见 `test_verify_parallel_checks`。
+        from core import verify_checks as _vc
+        nums = sorted(ge.REGISTRY)
+        payloads, broken = _vc.run_checks_parallel(ge.ROOT, nums, jobs=_jobs)
+        if broken:
+            print("并行子 check 不可信：%s（修复指引：去掉 --jobs 用串行复现）"
+                  % ",".join(str(b) for b in broken), file=sys.stderr)
+            return 2
+        fails = sum(1 for c in payloads
+                    for s in (c.get("verdicts") or []) if s == "FAIL")
+        pending = sorted(ge.PENDING)
+        if args.json:
+            print(_json.dumps({
+                "kind": "nf-verify", "schema": "nf-verify/1",
+                "ok": fails == 0, "fails": fails, "checks": payloads,
+                "pending": [int(n) for n in pending],
+                "complete": not pending, "gate_of_record": "bash verify.sh",
+            }, ensure_ascii=False, indent=2, sort_keys=True))
+            return 1 if fails else 0
+        print("== nf verify（门禁单进程引擎 · 判据与 verify.sh 逐字等价）==")
+        for c in payloads:
+            for status, msg in zip(c.get("verdicts") or [], c.get("messages") or []):
+                print("  [%s] %s" % (status, msg))
+        print("  已迁入 %d 条 · FAIL %d" % (len(payloads), fails))
+        if pending:
+            print("  ⚠ 未迁入 %d 条（仍在 verify.sh 里，**未在本次结论内**）：%s"
+                  % (len(pending), " ".join(str(n) for n in pending)))
+            print("  ⚠ 本条结论**不等于全量门禁**——全量请跑：bash verify.sh")
+        return 1 if fails else 0
+    verdicts = ge.run_checks(ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)))
+
+    fails = sum(v.fails for v in verdicts)
+    pending = sorted(set(ge.PENDING) - (set(only) if only else set()))
+
+    # 退出码**只看 FAIL**，与门禁（`verify.sh` 只按 FAIL 判死）同口径。
+    # 「未迁入」是**覆盖面**问题，不是判据失败——把它算进退出码会有两个坏后果：
+    #   ① 语义错位：引擎会把「还有 19 条没搬进来」报成「门禁红」；
+    #   ② 实测连带故障：响应缓存只收退出码 0 的响应 ⇒ `nf verify` 永远不入缓存
+    #      （实测 5 miss / 0 hit，热跑仍是 72 s）。
+    # 故未迁入只在人读面**大声声明**（并在机器面给 pending 列表），不动退出码。
+
+    if args.json:
+        print(_json.dumps({
+            "kind": "nf-verify",
+            "schema": "nf-verify/1",
+            "ok": fails == 0,
+            "fails": fails,
+            "checks": [{"check": int(v.name.replace("check", "")), "status": v.status,
+                        "verdicts": [s for s, _ in v.verdicts],
+                        # `messages` 让机器面**自足**：并行子进程跑 `--only N --json` 之后，
+                        # 人读面能按同一批数据重放出**逐字相同**的文案（否则并行态只剩
+                        # PASS/FAIL，文案无处可取）。顺序与 `verdicts` 一一对应。
+                        "messages": [m for _, m in v.verdicts]}
+                       for v in verdicts],
+            "pending": [int(n) for n in pending],
+            "complete": not pending,
+            "gate_of_record": "bash verify.sh",
+        }, ensure_ascii=False, indent=2, sort_keys=True))
+        return 1 if fails else 0
+
+    print("== nf verify（门禁单进程引擎 · 判据与 verify.sh 逐字等价）==")
+    for v in verdicts:
+        for status, msg in v.verdicts:
+            print("  [%s] %s" % (status, msg))
+    print("  已迁入 %d 条 · FAIL %d" % (len(verdicts), fails))
+    if pending:
+        print("  ⚠ 未迁入 %d 条（仍在 verify.sh 里，**未在本次结论内**）：%s"
+              % (len(pending), " ".join(str(n) for n in pending)))
+        print("  ⚠ 本条结论**不等于全量门禁**——全量请跑：bash verify.sh")
+    return 1 if fails else 0
+
+
 def _cmd_daemon(args) -> int:
     """nf daemon：执行层常驻守护（毫秒级响应）。
 
@@ -7075,6 +7201,8 @@ def main(argv=None) -> int:
         return _cmd_shell(args)
     if args.cmd == "layers":
         return _cmd_layers(args)
+    if args.cmd == "verify":
+        return _cmd_verify(args)
     if args.cmd == "daemon":
         return _cmd_daemon(args)
     if args.cmd == "help":

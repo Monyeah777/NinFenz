@@ -104,7 +104,7 @@ def canonical(value: Any) -> Any:
 
 def root_dir() -> Path:
     from core import storage
-    return storage.default_home() / "cache"
+    return storage.cache_root()
 
 
 def dir_for(tag: str) -> Path:

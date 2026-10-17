@@ -132,15 +132,41 @@ def _tags_with_time(root: Path) -> list[tuple[str, int]]:
     return out
 
 
+def _commit_times(root: Path, revs: str = "--all") -> dict[str, int]:
+    """一次性取「提交 → committer 时间」全表（`git log --format=%H %ct`）。
+
+    为什么要批量（2026-10-15 实测）：门禁 check12 里 `test_p6_evaluations` 一个文件
+    实测 **1352 次 git 子进程**（本机每次约 52–143 ms）⇒ 112 s。根因是 `_lead_lags` 与
+    调用方**逐 revision** 起 git（N+1）。改成一次全表读入、之后在内存里查表，
+    把「每次调用 O(标签数) 个子进程」降为**1 个**。
+    """
+    out: dict[str, int] = {}
+    for line in _git(root, "log", revs, "--format=%H %ct").splitlines():
+        sha, _, ts = line.partition(" ")
+        if sha and ts.strip().isdigit():
+            out[sha.strip()] = int(ts)
+    return out
+
+
 def _lead_lags(root: Path, tags: list[tuple[str, int]]) -> list[int]:
-    """逐次发布的「变更进入 → 被部署」滞后秒数（DORA 前置时间的定义口径）。"""
+    """逐次发布的「变更进入 → 被部署」滞后秒数（DORA 前置时间的定义口径）。
+
+    口径**逐字未变**：对每对相邻 tag，取 `prev..cur` 区间里**最早**那个提交的 committer 时间，
+    与 `cur` 的创建时间相减。变的只是取数方式——原先每个 tag 对起 2 次 git
+    （`rev-list` 拿区间 + `log -1` 拿时间），现在区间仍用一次 `rev-list`，
+    但「提交→时间」改用一张**批量全表**在内存里查。
+    """
     lags: list[int] = []
+    times = _commit_times(root)
     for (prev, _), (cur, cur_ts) in zip(tags, tags[1:], strict=False):
         revs = _git(root, "rev-list", "--reverse", f"{prev}..{cur}").split()
         if not revs:
             continue
-        first = _git(root, "log", "-1", "--format=%ct", revs[0])
-        if first.isdigit():
+        first = times.get(revs[0])
+        if first is None:                      # 全表未覆盖（浅克隆等）→ 退回单查，不猜
+            raw = _git(root, "log", "-1", "--format=%ct", revs[0])
+            first = int(raw) if raw.isdigit() else None
+        if first is not None:
             lags.append(cur_ts - int(first))
     return lags
 

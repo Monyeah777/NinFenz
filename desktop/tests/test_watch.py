@@ -32,6 +32,7 @@ except Exception:                      # noqa: BLE001 - 解析不到按原口径
 from core import daemon as dm  # noqa: E402
 from core import conformance_scan as csc  # noqa: E402
 from core import watch  # noqa: E402
+from core import session_watch as sw  # noqa: E402
 
 
 def _wait_generation(w, before: int, timeout: float = 5.0) -> bool:
@@ -89,6 +90,65 @@ class ResponseCacheTest(unittest.TestCase):
             self.assertTrue(dm.cacheable(argv), argv)
         for argv in no:
             self.assertFalse(dm.cacheable(argv), argv)
+
+    def test_verify_is_allowlisted_and_second_run_hits_cache(self):
+        """`nf verify` 必须在准入表内**且同代际第二跑能命中**。
+
+        为什么单钉这一条（2026-10-16 实测）：`nf verify` 冷跑 ~18 s（门禁单进程引擎，22 条 check），
+        是用户会反复跑的命令；响应缓存是它唯一的毫秒级路径（树未变时实测 **~0.1 s**）。
+        这里同时守住：① 准入表内有 `verify`；② 同代际第二跑命中并逐字段等价；③ 代际一变必须重算。
+        """
+        self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
+        self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
+        dm.set_watcher(_FakeWatcher(generation=11))
+        first = dm.execute(["verify", "--json"], Path(ROOT))     # 首跑（可能触发嵌套会话）
+        dm.set_watcher(_FakeWatcher(generation=11))              # 会话收尾后重新挂上同代际
+        second = dm.execute(["verify", "--json"], Path(ROOT))
+        self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
+        self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
+        dm.set_watcher(_FakeWatcher(generation=12))              # 树变了
+        third = dm.execute(["verify", "--json"], Path(ROOT))
+        self.assertEqual(first, third)
+        self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
+
+    def test_nested_session_release_keeps_the_outer_watcher(self):
+        """**嵌套会话收尾不得拆掉外层（守护）的监听**。
+
+        2026-10-16 实测抓到的真 bug：守护自己装着监听件，而被执行的命令内部还会再开嵌套会话
+        ——`nf verify`（check39）就会跑 `nf shell --verify --deep`。旧实现的 `release()`
+        **无条件** `set_watcher(None)`，于是守护的监听被拆掉、`_watch_generation()` 此后恒为
+        `None` ⇒ 响应缓存被整批作废并**永久停用**（「守护毫秒级路径偶发不生效」的第二根因）。
+
+        修法是**所有权**：`attach` 记下自己装的那件，`release` 只在「当前挂着的就是它」时才真注销，
+        否则原样恢复外层那件。
+        """
+        dm.set_watcher(_FakeWatcher(generation=5))
+        outer = dm._WATCHER
+        try:
+            ok = sw.attach(ROOT)
+            if not ok:
+                self.skipTest("本机装不上监听（平台不支持）")
+            sw.release()
+            self.assertIs(dm._WATCHER, outer,
+                          "嵌套会话收尾必须恢复外层监听（不得拆掉守护的）")
+        finally:
+            while sw._STACK:
+                sw.release()
+            dm.set_watcher(None)
+
+    def test_release_without_attach_is_a_noop(self):
+        """本会话没装过监听时 `release()` 不许动别人的监听（所有权判据）。"""
+        dm.set_watcher(_FakeWatcher(generation=6))
+        outer = dm._WATCHER
+        try:
+            while sw._STACK:
+                sw.release()
+            sw.release()
+            self.assertIs(dm._WATCHER, outer, "没装过就不许拆（否则会误伤守护）")
+        finally:
+            while sw._STACK:
+                sw.release()
+            dm.set_watcher(None)
 
     def test_unchanged_tree_hits_cache_and_generation_bump_invalidates(self):
         dm.set_watcher(_FakeWatcher(generation=7))
@@ -601,6 +661,48 @@ class DirWatcherTest(unittest.TestCase):
                 self.assertTrue(_wait_generation(w, before), "子目录变更未被监听到")
             finally:
                 w.stop()
+
+    @unittest.skipUnless(watch.available(), "本平台没有目录监听实现（本波仅 Windows）")
+    def test_internal_archive_and_bytecode_churn_do_not_bump_the_generation(self):
+        """`.rivet/` 与 `__pycache__/` 下的变更**不得**推进代际。
+
+        为什么这两条要单独立判据（2026-10-16 实测）：
+
+        - `.rivet/` 是**本仓内部档案区**（`.gitignore:32` 已忽略），实测 **1.7 GB / 24403 件**
+          （`scratch` 1.6 GB + 各次会话的 `tmp*`），而 agent 会话与门禁探针**每次都在往里写**。
+          忽略前：在 `.rivet/scratch` 写一个文件 → 代际 **0 → 4**，整批响应缓存作废；
+          连跑两次 `scripts/nf verify --json` 代际每次 +5、耗时 76 s / 82 s，
+          **永远命中不了**；忽略后同一条命令稳定 **0.11 s**。
+        - `__pycache__/` 由解释器自动产生、**不参与任何判据**（判据读 `.py` 源码）；
+          改一个 `.py` 会同时改源码与字节码，**源码那条通知已足以转脏**，故忽略字节码不会漏判。
+
+        安全边界：只忽略「整批通知都落在忽略面内」的情形；混批一律照旧转脏（下同）。
+        """
+        for sub in (".rivet/scratch", "__pycache__"):
+            with tempfile.TemporaryDirectory() as tmp:
+                (Path(tmp) / sub).mkdir(parents=True)   # 先建好：目录创建本身也是一条通知
+                w = watch.DirWatcher(tmp)
+                self.assertTrue(w.start())
+                try:
+                    before = w.generation
+                    probe = Path(tmp) / sub / "churn.txt"
+                    probe.write_text("x", encoding="utf-8")
+                    deadline = time.time() + 5
+                    while time.time() < deadline and w.ignored_batches == 0:
+                        time.sleep(0.02)
+                    self.assertGreaterEqual(w.ignored_batches, 1,
+                                            "`%s` 变更未被识别为可忽略批次" % sub)
+                    self.assertEqual(before, w.generation,
+                                     "`%s`-only 变更不得推进代际" % sub)
+                    # 删除会额外触发「目录本身」的通知（Windows 实测），同样必须被忽略
+                    probe.unlink()
+                    deadline = time.time() + 5
+                    while time.time() < deadline and w.ignored_batches < 2:
+                        time.sleep(0.02)
+                    self.assertEqual(before, w.generation,
+                                     "`%s` 下增删（含目录自身通知）不得推进代际" % sub)
+                finally:
+                    w.stop()
 
     @unittest.skipUnless(watch.available(), "本平台没有目录监听实现（本波仅 Windows）")
     def test_git_only_change_does_not_bump_the_generation(self):

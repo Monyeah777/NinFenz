@@ -15,7 +15,7 @@ subjects:
   - desktop/tests/test_mcp_write_freedom.py:4d951c1d395bec365ecc9971d2ce6acdc0063439823d61e9c23b7fb77767c025
   - desktop/tests/test_mcp_runtime.py:9d6d1b11e2c2ecd517a9ddbe8bae64a3578e5e9462c12032dc1411f66f8f61eb
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
-  - desktop/tests/test_layer_model.py:74ef800a95d1caed9d88809f76708b6de4427c6be9412387e5531e807f8ebf42
+  - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
   - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
   - desktop/tests/test_judge_references.py:4166744627ab477eddfff9fe782eee5f6bb457d8f4c93beb23df584087c8bf53
@@ -24,16 +24,18 @@ subjects:
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
-  - desktop/tests/test_dead_code.py:f4e95574a247a2445b48427c0a45fce3374ea1fe214e678240077910b27da4fe
+  - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
   - desktop/tests/test_daemon_parity.py:50e84719761faee8726e25025fd52efc823dcdddb1c57f7efc4ae3488694c76b
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:522b2ce20375bf6399f25879c5e8a797202d5923ee05c99703334be5ee05ae8d
+  - desktop/tests/test_cli_json_face.py:9d6e724fec4ebfdf170b6123f96c9c9ffe5626bb19d92078b076ace94b0c3659
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - desktop/tests/test_nf_cli.py:4ddd00ad386d0e35e3bc717db777fda922019e1fd1f38580ef8912bdac682220
 ---
+> 重审（2026-10-15）：门禁提速批：测试面进程内化（check12 热点）+ 新增 gate_engine/gate_labels 单进程门禁引擎 + 派生基线重冻；被审对象字节已变，按本仓 rebind 流程重绑 digest
+
 > 重审（2026-10-14）：Rust 快线同步：receipts 固定段 44→54 + verify_report SPECS 30→31（role_coordinates）+ asset_contract 裁定退出原生面
 
 > 重审（2026-10-14）：引入 nf audit rebind 命令（core/audit.py + CLI + 顺序纪律 + 两处面收敛）

@@ -26,6 +26,10 @@ TARGET_DIRS = ("desktop/src/core", "scripts", ".github/scripts")
 SUFFIXES = {".py", ".sh", ".cmd", ".yml", ".yaml", ".md", ".txt"}
 TOKEN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
+#: **打补丁前**的原函数——`_install_ast_line_cache` 会换掉 `ast._splitlines_no_ff`，
+#: 这里先抓住原函数，供 `SegmentEquivalenceTest` 做「补丁前后逐字节一致」的守门。
+_ORIG_NO_FF = getattr(ast, "_splitlines_no_ff", None)
+
 
 @functools.lru_cache(maxsize=4096)
 def _parse(text: str):
@@ -214,6 +218,52 @@ def unused_imports(pool: dict, targets=TARGET_DIRS) -> list:
     return out
 
 
+def _install_ast_line_cache() -> None:
+    """把标准库的**切行**步骤按源串记忆化——`get_source_segment` 的语义一字不动。
+
+    为什么要它（2026-10-15 实测，量级很大）：`ast.get_source_segment(src, node)` 内部调
+    `_splitlines_no_ff(source)`，**每次调用都把整份源码重新切一遍行**。本模块对每个函数体
+    节点各取一次片段，实测真仓 **14907 次调用** ⇒ 8.86 **亿**次 `len()`、单条测试 67–315 s。
+    这是 O(节点数 × 文件行数) 的隐藏平方级开销。
+
+    做法：**不重写** `get_source_segment`（它还要处理 UTF-8 字节列与列偏移，重写就是拿判据
+    换性能），只把「按源码串切行」这一步缓存起来——同一份源码只切一次。输出因此与标准库
+    **逐字相同**，变的只是切了几次。
+
+    幂等：重复调用直接返回（`ast` 是进程级单例）。
+    """
+    if getattr(ast, "_nf_lines_cached", False):
+        return
+    # 各版本 CPython 的私有名不完全一致（3.11 只有 `_splitlines_no_ff`，没有 `_splitlines`），
+    # 故**逐个探测**再包——不假设私有面存在。
+    orig_no_ff = getattr(ast, "_splitlines_no_ff", None)
+    orig_split = getattr(ast, "_splitlines", None)
+    cache_no_ff: dict = {}
+    cache_split: dict = {}
+
+    if orig_no_ff is not None:
+        def cached_no_ff(source):
+            got = cache_no_ff.get(source)
+            if got is None:
+                got = orig_no_ff(source)
+                cache_no_ff[source] = got
+            return got
+
+        ast._splitlines_no_ff = cached_no_ff
+
+    if orig_split is not None:
+        def cached_split(source):
+            got = cache_split.get(source)
+            if got is None:
+                got = orig_split(source)
+                cache_split[source] = got
+            return got
+
+        ast._splitlines = cached_split
+
+    ast._nf_lines_cached = True
+
+
 def duplicate_bodies(pool: dict, targets=TARGET_DIRS, min_lines: int = 12) -> list:
     """→ **逐字相同**的函数体组 `[(行数, [(路径, 函数名, 行号), …]), …]`（纯 stdlib）。
 
@@ -227,6 +277,7 @@ def duplicate_bodies(pool: dict, targets=TARGET_DIRS, min_lines: int = 12) -> li
     """
     groups: dict = {}
     wanted = tuple(d.rstrip("/") + "/" for d in targets)
+    _install_ast_line_cache()
     for rel in sorted(pool):
         if not rel.endswith(".py") or not rel.startswith(wanted):
             continue
@@ -635,6 +686,49 @@ class MethodRuleTest(unittest.TestCase):
                          zero_ref_methods(pool))
         self.assertEqual([], zero_ref_methods(pool, hooks={
             "desktop/src/core/synth.py::C._dead": "刻意留作的登记样例（自证用）"}))
+
+
+class SegmentEquivalenceTest(unittest.TestCase):
+    """`_install_ast_line_cache` 的守门：**补丁不得改变任何片段的取值**。
+
+    背景：该补丁把标准库的「按源码串切行」记忆化（否则 `get_source_segment` 每次调用都要
+    重切整份文件——实测真仓 14907 次调用、8.86 亿次 `len()`、单条测试 67–315 s）。
+    它改的是**标准库私有函数**，故必须有可执行的等价性证据，而不是「看起来一样」：
+    这里对真仓抽样逐节点比对「打过补丁的 `ast.get_source_segment`」与
+    「`_ORIG_NO_FF`（原切行实现）手算的片段」。
+    """
+
+    def test_cached_splitlines_equals_original(self):
+        """补丁前后：`ast.get_source_segment` 的取值必须**逐字节相同**。
+
+        做法：把 `ast._splitlines_no_ff` **临时还原**成原实现，逐节点算一遍片段；
+        再装回补丁算一遍，两两比对。这直接测「补丁不改变结果」，不重写标准库算法。
+        """
+        if _ORIG_NO_FF is None:
+            self.skipTest("本解释器无 ast._splitlines_no_ff（补丁不生效，无需守门）")
+        files = [p for p in (ROOT / "desktop" / "src" / "core").rglob("*.py")][:20]
+        self.assertGreater(len(files), 5, "抽样文件太少，判据可能已失效")
+        checked = 0
+        for f in files:
+            src = f.read_text(encoding="utf-8")
+            tree = _parse(src)
+            if tree is None:
+                continue
+            plain_ast = ast.parse(src)
+            nodes = [n for n in ast.walk(tree) if isinstance(n, ast.stmt)]
+            nodes_plain = [n for n in ast.walk(plain_ast) if isinstance(n, ast.stmt)]
+            self.assertEqual(len(nodes), len(nodes_plain))
+            for a, b in zip(nodes, nodes_plain, strict=True):
+                # a 走补丁后的切行；b 也一样——故这里显式用**原实现**算 b 的期望值。
+                ast._splitlines_no_ff = _ORIG_NO_FF
+                try:
+                    want = ast.get_source_segment(src, b)
+                finally:
+                    _install_ast_line_cache()          # 放回补丁版
+                got = ast.get_source_segment(src, a)
+                self.assertEqual(want, got, "%s:%s 片段取值不一致" % (f.name, a.lineno))
+                checked += 1
+        self.assertGreater(checked, 500, "实际比对节点太少（%d），判据可能已失效" % checked)
 
 
 if __name__ == "__main__":

@@ -285,11 +285,24 @@ class PurityScanTest(unittest.TestCase):
         2026-09-30 再 +1（13 → **14**，二次收口）：`atomic_write` 新增**二进制入口**
         `write_bytes`（签名锚 `.sig` 需要「要么旧全量、要么新全量」），它是同一条受控
         `os.fdopen(..., "wb")` 落盘——与 `write_text` 那处同键、同理由，故只在计数上 +1。
+
+        2026-10-15 再 +1（14 → **15**）：门禁单进程引擎 `core/gate_inproc.py` 的
+        **进程内 heredoc 执行面**——源码字符串由 `extract_heredoc` 从本仓 `verify.sh`
+        机械切出（`<<'PYEOF'` 到顶格结束标记），**不来自任何外部输入**；目的是省掉
+        heredoc 的解释器启动税（实测全量门禁起 42 次 `$PY3`）。理由已登记进
+        `SINK_ALLOW["gate_inproc.py:exec"]`，等价性由
+        `tests/test_gate_engine_parity.py` 逐 check 差分常驻守住。
+
+        2026-10-15 再 +1（15 → **16**）：同一次提速工作里，`gate_engine.py` 为让
+        **新文件模块行数合规**（本仓 code_metrics 限值 800 行）而被拆出
+        `core/gate_labels.py`（文案例解析单独成层）。拆件把一条既有 sink 计数
+        **按文件重新计了一次**，故总数 +1；**没有新增任何 danger sink**，
+        `SINK_ALLOW` 与 `purity_scan` 的 issues 面均为空（上一条 assertEqual 已证）。
         """
         issues, stats = ps.scan(ROOT)
         self.assertEqual([i for i in issues if "危险 sink" in i], [],
                          "真仓库出现未登记 sink 即 FAIL")
-        self.assertLessEqual(stats.get("sinks", 0), 14)
+        self.assertLessEqual(stats.get("sinks", 0), 16)
 
 
 class SinkRegistryTest(unittest.TestCase):

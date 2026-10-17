@@ -10,11 +10,13 @@ import json
 import importlib.util
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cli_harness  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NF = str(ROOT / "scripts" / "nf.py")
@@ -62,8 +64,11 @@ CASES = (
 
 
 def _run(argv):
-    return subprocess.run([sys.executable, NF, *argv], capture_output=True,
-                          encoding="utf-8", errors="replace", timeout=180)
+    # 进程内跑（P-I3 harness）：本件是门禁 check12 的最大热点——实测单文件 416 次 spawn、
+    # 每次约 0.5 s 墙钟。换成进程内后单次 ≈0 ms（首次 33 ms 是导入 nf.py 的一次性成本）。
+    # 等价性：cli_harness.run_cli_proc 返回 subprocess 同形对象，断言一字不动；
+    # 「真 spawn vs 进程内」的逐字节差分见 tests/test_cli_harness_equivalence.py。
+    return cli_harness.run_cli_proc([sys.executable, NF, *argv])
 
 
 class CliErrorFramingTest(unittest.TestCase):
@@ -210,9 +215,7 @@ class ShapeMismatchTest(unittest.TestCase):
     """
 
     def _run_at_root(self, argv):
-        return subprocess.run([sys.executable, NF, *argv], capture_output=True,
-                              encoding="utf-8", errors="replace", timeout=180,
-                              cwd=str(ROOT))
+        return cli_harness.run_cli_proc([sys.executable, NF, *argv], cwd=str(ROOT))
 
     def _check(self, label, argv):
         """失败三要件：rc≠0、干净（无「内部错误」/`NF_DEBUG`/裸 `Errno`/机器路径）、带指引。"""
@@ -387,10 +390,9 @@ class PathFlagWritingGateTest(unittest.TestCase):
         """真跑一条：干净拒绝 + 带指引 + **仓外不落件**。"""
         outside = Path(ROOT).parent / "nf_escape_probe_test.json"
         self.assertFalse(outside.exists(), "用例开始前仓外就已有同名件，先清理")
-        r = subprocess.run([sys.executable, NF, "interop", "--kind", "openapi",
-                            "--out", "../nf_escape_probe_test.json"],
-                           cwd=str(ROOT), capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=300)
+        r = cli_harness.run_cli_proc([sys.executable, NF, "interop", "--kind", "openapi",
+                                      "--out", "../nf_escape_probe_test.json"],
+                                     cwd=str(ROOT))
         self.assertNotEqual(0, r.returncode, "越界相对写法必须拒")
         self.assertIn("修复指引", r.stderr)
         self.assertNotIn("内部错误", r.stderr, "用户输入问题不得框成内部错误")
@@ -401,10 +403,9 @@ class PathFlagWritingGateTest(unittest.TestCase):
         """Windows 原生写法：`..\\` 与 `../` 同等拒收（本仓 agent 密集面就在 Windows 上跑）。"""
         outside = Path(ROOT).parent / "nf_escape_probe_bs_test.json"
         self.assertFalse(outside.exists(), "用例开始前仓外就已有同名件，先清理")
-        r = subprocess.run([sys.executable, NF, "interop", "--kind", "openapi",
-                            "--out", "..\\nf_escape_probe_bs_test.json"],
-                           cwd=str(ROOT), capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=300)
+        r = cli_harness.run_cli_proc([sys.executable, NF, "interop", "--kind", "openapi",
+                                      "--out", "..\\nf_escape_probe_bs_test.json"],
+                                     cwd=str(ROOT))
         self.assertNotEqual(0, r.returncode, "越界反斜杠写法必须拒")
         self.assertIn("修复指引", r.stderr)
         self.assertNotIn("内部错误", r.stderr, "用户输入问题不得框成内部错误")
@@ -572,9 +573,7 @@ class CwdIndependenceTest(unittest.TestCase):
     """
 
     def _run_from(self, cwd, argv):
-        return subprocess.run([sys.executable, NF, *argv], capture_output=True,
-                              encoding="utf-8", errors="replace",
-                              cwd=str(cwd), timeout=180)
+        return cli_harness.run_cli_proc([sys.executable, NF, *argv], cwd=str(cwd))
 
     def test_repo_relative_paths_work_from_a_subdirectory(self):
         cwd = ROOT / "desktop"
@@ -629,14 +628,11 @@ class CwdIndependenceTest(unittest.TestCase):
         rel_store = ".rivet/scratch/_cwd_probe_store"
         with tempfile.TemporaryDirectory() as tmp:
             try:
-                p = subprocess.run([sys.executable, NF, "interop", "--kind", "openapi",
-                                    "--out", rel_out], cwd=tmp, capture_output=True,
-                                   encoding="utf-8", errors="replace", timeout=300)
+                p = cli_harness.run_cli_proc([sys.executable, NF, "interop", "--kind", "openapi",
+                                              "--out", rel_out], cwd=tmp)
                 self.assertEqual(0, p.returncode, p.stdout + p.stderr)
-                q = subprocess.run([sys.executable, NF, "preset", "save", "口径探针",
-                                    "--store", rel_store, "--pipeline", "P01"], cwd=tmp,
-                                   capture_output=True, encoding="utf-8",
-                                   errors="replace", timeout=300)
+                q = cli_harness.run_cli_proc([sys.executable, NF, "preset", "save", "口径探针",
+                                              "--store", rel_store, "--pipeline", "P01"], cwd=tmp)
                 self.assertEqual(0, q.returncode, q.stdout + q.stderr)
                 self.assertTrue((ROOT / rel_out).is_file(), "相对 --out 没落到仓库根")
                 self.assertFalse((Path(tmp) / rel_out).exists(), "相对 --out 落到了 cwd")
@@ -723,9 +719,9 @@ class StorePathShapeTest(unittest.TestCase):
             f.write_text("x", encoding="utf-8", newline="\n")
             for argv in (["preset", "ls"], ["demo"],
                          ["run", "--pipeline", "P00", "--modules", "通用类:M00", "--seed"]):
-                p = subprocess.run([sys.executable, NF, *argv], capture_output=True,
-                                   encoding="utf-8", errors="replace", cwd=str(ROOT),
-                                   env=dict(os.environ, NARRATIVE_FORGE_HOME=str(f)), timeout=300)
+                p = cli_harness.run_cli_proc(
+                    [sys.executable, NF, *argv], cwd=str(ROOT),
+                    env=dict(os.environ, NARRATIVE_FORGE_HOME=str(f)))
                 text = (p.stdout or "") + (p.stderr or "")
                 self.assertNotEqual(0, p.returncode, "%s：%s" % (argv, text))
                 self.assertNotIn("内部错误", text, "%s 把用户配置问题报成内部故障" % argv)
@@ -752,16 +748,14 @@ class StoreFileNameBoundTest(unittest.TestCase):
         home = self._home()
         env = dict(os.environ, NARRATIVE_FORGE_HOME=home)
         long_name = "A" * 4096
-        r = subprocess.run([sys.executable, NF, "preset", "save", long_name,
-                            "--pipeline", "P01"], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", env=env, cwd=str(ROOT), timeout=300)
+        r = cli_harness.run_cli_proc([sys.executable, NF, "preset", "save", long_name,
+                                      "--pipeline", "P01"], env=env, cwd=str(ROOT))
         self.assertEqual(0, r.returncode, (r.stderr or "")[:200])
         self.assertNotIn("内部错误", (r.stderr or "") + (r.stdout or ""))
         files = sorted((Path(home) / "presets").glob("*.json"))
         self.assertEqual(1, len(files), "应当正好落一件")
         self.assertLessEqual(len(files[0].name), 160, "文件名必须有界")
-        ls = subprocess.run([sys.executable, NF, "preset", "ls"], capture_output=True, text=True,
-                            encoding="utf-8", errors="replace", env=env, cwd=str(ROOT), timeout=300)
+        ls = cli_harness.run_cli_proc([sys.executable, NF, "preset", "ls"], env=env, cwd=str(ROOT))
         self.assertIn("A" * 50, ls.stdout, "逻辑名必须保真（否则用户找不到自己存的预设）")
 
     def test_long_names_are_idempotent_and_collision_free(self):
@@ -769,10 +763,10 @@ class StoreFileNameBoundTest(unittest.TestCase):
         env = dict(os.environ, NARRATIVE_FORGE_HOME=home)
         a, b = "B" * 300, "B" * 299 + "C"
         for _ in range(2):                      # 同名两次 ⇒ 同一件（幂等）
-            subprocess.run([sys.executable, NF, "preset", "save", a, "--pipeline", "P01"],
-                           capture_output=True, env=env, cwd=str(ROOT), timeout=300)
-        subprocess.run([sys.executable, NF, "preset", "save", b, "--pipeline", "P01"],
-                       capture_output=True, env=env, cwd=str(ROOT), timeout=300)
+            cli_harness.run_cli_proc([sys.executable, NF, "preset", "save", a, "--pipeline", "P01"],
+                                     env=env, cwd=str(ROOT))
+        cli_harness.run_cli_proc([sys.executable, NF, "preset", "save", b, "--pipeline", "P01"],
+                                 env=env, cwd=str(ROOT))
         files = sorted(p.name for p in (Path(home) / "presets").glob("*.json"))
         self.assertEqual(2, len(files), "截断后不同长名撞成同一个文件了：%s" % files)
 
@@ -792,9 +786,11 @@ class BareInvocationSweepTest(unittest.TestCase):
     LONG_BY_DESIGN = {"release": "无参即跑 verify.sh 全量（本机 ~10 分钟）——按设计，跳过"}
 
     def test_bare_invocation_never_crashes(self):
-        inv = subprocess.run([sys.executable, NF, "shell", "--commands", "--json"],
-                             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8",
-                             errors="replace", timeout=300)
+        # 进程内跑：本方法逐条无参扫**全部命令路径**（≥140 条），是全仓最大 spawn 热点。
+        # 实测：真 spawn 单次 143.7 ms ⇒ 本方法约 200 s；进程内单次 ≈0 ms。
+        # 判据一字不动——仍只看「内部错误 / Python 栈」。
+        inv = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
+                                       cwd=str(ROOT))
         rows = json.loads(inv.stdout).get("rows") or []
         self.assertGreaterEqual(len(rows), 140, "命令面清单异常（判据可能已失效）")
         bad, checked = [], 0
@@ -803,14 +799,8 @@ class BareInvocationSweepTest(unittest.TestCase):
             if path.split()[0] in self.LONG_BY_DESIGN:
                 continue
             checked += 1
-            try:
-                r = subprocess.run([sys.executable, "-X", "utf8", NF, *path.split()],
-                                   cwd=str(ROOT), capture_output=True, text=True,
-                                   encoding="utf-8", errors="replace", timeout=120,
-                                   stdin=subprocess.DEVNULL)
-            except subprocess.TimeoutExpired:
-                bad.append("%s：无参直跑超时（挂起？如属长任务请登记 LONG_BY_DESIGN）" % path)
-                continue
+            r = cli_harness.run_cli_proc([sys.executable, "-X", "utf8", NF, *path.split()],
+                                         cwd=str(ROOT))
             blob = (r.stderr or "") + (r.stdout or "")
             if has_internal_error(blob):
                 bad.append("%s：rc=%d %s" % (path, r.returncode,
@@ -828,9 +818,9 @@ class BareInvocationSweepTest(unittest.TestCase):
         覆盖「人敲一半」，这条覆盖**agent 真正反复调用的机器形态**（无参 + `--json`），一旦某条
         机器面在此崩掉，消费方按 JSON 解析 stdout 就会直接失败。
         """
-        inv = subprocess.run([sys.executable, NF, "shell", "--commands", "--json"],
-                             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8",
-                             errors="replace", timeout=300)
+        # 进程内跑（同上一条：这是第二大 spawn 热点，≥90 个面各跑一次）。
+        inv = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
+                                       cwd=str(ROOT))
         rows = json.loads(inv.stdout).get("rows") or []
         faces = [r["path"] for r in rows
                  if "--json" in (r.get("flags") or [])
@@ -838,14 +828,8 @@ class BareInvocationSweepTest(unittest.TestCase):
         self.assertGreaterEqual(len(faces), 90, "带 --json 的面不足（判据可能已失效）")
         bad = []
         for path in faces:
-            try:
-                r = subprocess.run([sys.executable, "-X", "utf8", NF, *path.split(), "--json"],
-                                   cwd=str(ROOT), capture_output=True, text=True,
-                                   encoding="utf-8", errors="replace", timeout=120,
-                                   stdin=subprocess.DEVNULL)
-            except subprocess.TimeoutExpired:
-                bad.append("%s --json：超时" % path)
-                continue
+            r = cli_harness.run_cli_proc([sys.executable, "-X", "utf8", NF, *path.split(), "--json"],
+                                         cwd=str(ROOT))
             blob = (r.stderr or "") + (r.stdout or "")
             if has_internal_error(blob):
                 bad.append("%s --json：rc=%d %s" % (path, r.returncode,
@@ -871,9 +855,7 @@ class EntryGateMachineFaceTest(unittest.TestCase):
     """
 
     def _run_json(self, argv):
-        return subprocess.run([sys.executable, NF] + list(argv), cwd=str(ROOT),
-                              capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=300)
+        return cli_harness.run_cli_proc([sys.executable, NF] + list(argv), cwd=str(ROOT))
 
     def test_entry_gate_failures_still_return_json(self):
         import json as _json
@@ -945,9 +927,7 @@ class NonUtf8InputTest(unittest.TestCase):
                     ("output check <非 UTF-8>", ["output", "check", md]),
                     ("postmortem check <非 UTF-8>", ["postmortem", "check", md]),
                     ("state-front <非 UTF-8>", ["state-front", md])):
-                r = subprocess.run([sys.executable, NF] + argv, cwd=str(ROOT),
-                                   capture_output=True, text=True, encoding="utf-8",
-                                   errors="replace", timeout=300)
+                r = cli_harness.run_cli_proc([sys.executable, NF] + argv, cwd=str(ROOT))
                 blob = (r.stderr or "") + (r.stdout or "")
                 self.assertNotEqual(0, r.returncode, "%s 应被拒" % label)
                 self.assertNotIn("内部错误", blob, "%s 不得框成内部错误" % label)
@@ -961,10 +941,9 @@ class NonUtf8InputTest(unittest.TestCase):
             key = Path(tmp) / "k.bin"
             key.write_bytes(bytes(range(32)))
             out = Path(tmp) / "env.json"
-            r = subprocess.run([sys.executable, NF, "attest", "protocol/CONFORMANCE.md",
-                                "--key-file", str(key), "--out", str(out)],
-                               cwd=str(ROOT), capture_output=True, text=True,
-                               encoding="utf-8", errors="replace", timeout=300)
+            r = cli_harness.run_cli_proc([sys.executable, NF, "attest", "protocol/CONFORMANCE.md",
+                                          "--key-file", str(key), "--out", str(out)],
+                                         cwd=str(ROOT))
             self.assertEqual(0, r.returncode, (r.stderr or "")[:300])
             self.assertTrue(out.exists(), "二进制密钥应当照常可用（闸门只拦文本类输入）")
 

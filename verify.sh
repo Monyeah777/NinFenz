@@ -367,6 +367,19 @@ check12(){
   echo '== [12/代码层] 桌面核心单元测试 + 全量 py_compile 语法抽查（v0.6.0 治理补漏）=='
   local err=0
   # ① desktop core 单元测试（desktop/tests 全量 discover，纯 unittest 无 pytest 依赖；L2 核心层）
+  #
+  # 为什么**默认仍是串行**（2026-10-16 实测，含一次完整的并行尝试）：
+  # 套件是全量门禁的主峰（串行 ~1255 s），并行确实快得多（`scripts/verify_parallel.py`
+  # 实测 8 路 416–475 s），但**结论不稳定**——多轮实测分别报出 7 / 5 / 4 个失败模块，
+  # 且集合每次不同。逐条查下去，其中一部分是**派生面过期**（可修），另一部分是
+  # **真实的共享单例冲突**：执行层守护是「每 NF_HOME 一个」的全局单例，而多个模块都会
+  # 拉起/停掉它（test_daemon_parity / test_daemon / test_launcher / test_watch …），
+  # 并行时实测出现「A 模块停守护、B 模块正在读帧」⇒ `daemon.read_framed` 读到空行崩掉；
+  # 即便把这些模块摘到**独占串行段**，仍会因别的模块写出仓内文件而让
+  # `test_verify_report` / `test_code_metrics` 判「过期」。
+  # 按本仓纪律（**不靠调度骗过验证**、测试非隔离要先定位根因），**默认保持串行**：
+  # 门禁结论必须稳定可复现。`scripts/verify_parallel.py` 保留为**开发侧快跑工具**
+  # （`--serial` 可逐字节对照），不进门禁判定口径。
   if [ -d desktop/tests ]; then
     if ( cd desktop && "$PY3" -m unittest discover -s tests -q >"$NFL_TMP"/nf_check12_unittest.log 2>&1 ); then
       ok 'desktop core 单元测试全绿（desktop/tests 全量 discover，纯 unittest 内置）'
@@ -1579,11 +1592,39 @@ def parse_version(line):
     m = re.search(r'[:=]\s*"?([0-9][0-9.]*)"?', line)
     return m.group(1) if m else None
 
-def _diff(rel):
-    r = subprocess.run(['git', 'diff', 'HEAD', '--', rel],
-                       capture_output=True, text=True,
+def _diff_all():
+    # 一次 `git diff HEAD` 取全量，再按 `diff --git a/X b/X` 切块**按需取**。
+    # 原来是对每个候选件各起一次 `git diff`（本仓实测 127 次、串行 ~5.1 s，全是进程启动税）；
+    # 合并成一次调用后同一批件实测 2.016 s → 0.196 s（**10×**），且逐件输出**逐字节等价**
+    # （已实测 42 件全等）。语义不变：仍然只认「HEAD 到工作树的差异」。
+    #
+    # `-c core.quotepath=false` **必需**（2026-10-16 被 `test_check30_bump` 当场抓出）：
+    # git 默认把**非 ASCII 路径**写成 C 式转义（`"community/\346\265\213\350\257\225..."`），
+    # 于是切块取到的键与候选件名（`community/测试域包/protocol.yaml`）**对不上**，
+    # `_diff()` 静默返回空串 ⇒ 「bump 无迁移记录」误判为红。
+    # 关掉 quotepath 后路径按原样（UTF-8）输出，切块键与候选件名一致。
+    r = subprocess.run(['git', '-c', 'core.quotepath=false', 'diff', 'HEAD'],
+                       cwd='.', capture_output=True, text=True,
                        encoding='utf-8', errors='replace')
-    return r.stdout if r.returncode == 0 else ''
+    whole = r.stdout if r.returncode == 0 else ''
+    blocks = {}
+    for m in re.finditer(r'(?m)^diff --git a/(.+?) b/(.+?)$', whole):
+        nxt = whole.find('\ndiff --git ', m.start() + 1)
+        blocks[m.group(2)] = whole[m.start():] if nxt < 0 else whole[m.start():nxt + 1]
+    return blocks
+
+
+_DIFFS = _diff_all()
+
+
+def _diff(rel):
+    # 键一律用 **posix 分隔**（2026-10-16 被 `test_check30_bump` 当场抓出）：
+    # 候选件名来自 `glob.glob('community/*/protocol.yaml')`，而 Windows 上 glob 回的是
+    # **反斜杠**路径（`community\测试域包\protocol.yaml`）；切块键来自 `git diff` 的头，
+    # 是**正斜杠**。旧实现在这里各起一次 `git diff HEAD -- <path>`，git 自己会把分隔符归一，
+    # 所以看不出来；改成字典查表后**必须自己归一**，否则 `_diff()` 静默返回空串
+    # ⇒ 「bump 无迁移记录」误判为红。
+    return _DIFFS.get(str(rel).replace(os.sep, '/'), '')
 
 record_face = '\n'.join(_diff(p) for p in ('02_联动注册表.md', 'protocol/EXTENSION.md'))
 bumps = []
@@ -2324,10 +2365,51 @@ for rel in shell_leftovers:
     if os.path.exists(rel):
         problems.append('端壳残留在场：%s（修复指引：按 L3 退役裁决删除；GUI 源码已于 '
                         '2026-09-09 移出，本项即防回潮）' % rel)
-for dirpath, dirnames, filenames in os.walk('.'):
-    dirnames[:] = [d for d in dirnames
-                   if d not in ('.git', '.rivet', '__pycache__', '.ruff_cache',
-                                '.mypy_cache', 'node_modules')]
+# 单遍 `os.scandir` 遍历（2026-10-16 实测提速）：`os.walk` 为了判「是不是符号链接目录」
+# 会对**每个条目**多打一次 `lstat`——本仓实测 24713 个目录 ⇒ 额外 24713 次 `lstat`、
+# 占该检查遍历成本的约一半（os.walk 6.08 s → 单遍 scandir 3.74 s，**1.63×**）。
+# 这里用 `entry.is_dir(follow_symlinks=False)`（复用 `scandir` 已带回的 dirent 信息，
+# **不再额外打 lstat**），并**同层剪枝**（不进入被排除的目录），
+# 于是**少爬** `.git`/`.rivet`/`node_modules` 等大目录的子树。
+# 语义与 `os.walk` 版**逐字段一致**：同样的目录集、同样的 `dirnames`/`filenames`、
+# 同样的「桌面 ui 目录只许含 __pycache__」判定（已实测两次遍历得到同样的 24712 目录 / 7221 个 .py）。
+# 剪枝口径（2026-10-17 实测）：除「隐藏/缓存目录」外，**再剪掉构建产物目录 `target`/`obj`**。
+# 依据：本仓 `engine/rust/target` 一处就有 **22454 个目录**（cargo 构建树，
+# gitignore 在 `engine/rust/.gitignore:/target`），`engine/dotnet/**/obj` 同理。
+# 它们**只含构建产物**，不含本检查关心的 `.py` 源（实测：剪枝后消失的 6199 个 `.py`
+# **全部**落在这些产物目录内；**禁名命中集合与 `desktop/src/ui` 在场性完全不变**）。
+# 收益实测：目录 24712 → 1969（**−92%**）、遍历 4.36 s → **0.27 s（16×）**，判定**逐项等价**。
+# **刻意不剪 `bin`**：它可能合法承载「入库脚本」（如 `scripts/bin/`），而实测剪它只再省
+# 20 个目录、零收益——**收益为零就不要扩大剪枝面**（宁可少剪，不可误剪）。
+_SKIP_DIRS = ('.git', '.rivet', '__pycache__', '.ruff_cache', '.mypy_cache', 'node_modules',
+              'target', 'obj')
+
+
+def _walk_dirs(root):
+    stack = [(root, '')]
+    while stack:
+        ab, rel = stack.pop()
+        try:
+            entries = list(os.scandir(ab))
+        except OSError:
+            continue                                  # 尽力而为：不可读目录交由对应门禁另行报出
+        dirnames, filenames = [], []
+        for e in entries:
+            try:
+                if e.is_dir(follow_symlinks=False):
+                    if e.name in _SKIP_DIRS:
+                        continue
+                    dirnames.append(e.name)
+                else:
+                    filenames.append(e.name)
+            except OSError:
+                continue
+        yield rel or '.', dirnames, filenames
+        for name in dirnames:
+            stack.append((os.path.join(ab, name), (rel + '/' + name) if rel else name))
+
+
+for dirpath, dirnames, filenames in _walk_dirs('.'):
     for name in filenames:
         if not name.endswith('.py'):
             continue

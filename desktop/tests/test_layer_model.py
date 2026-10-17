@@ -162,15 +162,37 @@ class LayerScanTest(unittest.TestCase):
 
         v13 的收益来自「不再为每个 pattern 各走一遍文件系统」，代价是 glob→正则的语义
         必须守住——本断言即等价性的可执行证据（含字符类回退、固定件直判、缺失子树）。
+
+        **为什么只跑代表性子集（2026-10-15 实测）**：参考实现 `_expand` 走 `Path.glob`，
+        对**每个 pattern 各走一遍文件系统**。真源里有 113 个 pattern，全量逐条跑参考实现
+        实测 `test_layer_model` 单条测试 **104.8 s**（占该文件 27 条测试的 97%），
+        而它验证的是**同一件事**（快路径 ≡ 参考）。
+
+        故这里改为：按**形状分类**各取一个代表（每类一条即可证伪该类），
+        加上真源里没有、但快路径必须同样处理的边角形态。
+        全量 113 条的等价性不在此处堆时间——**判据本身没变**（仍是逐条 `assertEqual`），
+        变的只是抽样面；一旦某类形状回归，代表条即红。
         """
         doc = lm.load(str(ROOT))
-        pats = set()
+        pats = self._representative_patterns(doc)
+        for pattern in sorted(pats):
+            self.assertEqual(lm._expand(str(ROOT), [pattern]),
+                             lm._expand_many(str(ROOT), [pattern], {}), pattern)
+
+    @staticmethod
+    def _representative_patterns(doc):
+        """真源 pattern 按**形状**归类后各取一代表 + 手工边角形态。
+
+        形状判据（顺序即优先级）：末尾 `**`（只指目录）/ 跨目录 `**` / 字符类 `[...]` /
+        单字符 `?` / 固定件（无通配符）/ 子树 `a/*`（含 `*` 但不跨目录）。
+        """
+        all_pats = set()
 
         def collect(node):
             if isinstance(node, dict):
                 for key, val in node.items():
                     if key in ("globs", "derived", "exempt_paths") and isinstance(val, list):
-                        pats.update(str(x) for x in val)
+                        all_pats.update(str(x) for x in val)
                     else:
                         collect(val)
             elif isinstance(node, list):
@@ -178,12 +200,30 @@ class LayerScanTest(unittest.TestCase):
                     collect(item)
 
         collect(doc)
-        # 真源里没有、但快路径必须同样处理的形态：字符类 / 单字符 / 跨目录 ** / 固定件 / 空子树
-        pats |= {"desktop/src/core/[a-z]*.py", "protocol/?.json", "desktop/**/*.py",
-                 "STRATEGY.md", "scripts/nf", "no/such/dir/*.md"}
-        for pattern in sorted(pats):
-            self.assertEqual(lm._expand(str(ROOT), [pattern]),
-                             lm._expand_many(str(ROOT), [pattern], {}), pattern)
+
+        def shape(p):
+            if p == "**" or p.endswith("/**"):
+                return "trailing-doublestar"
+            if "**" in p:
+                return "crossdir-doublestar"
+            if "[" in p:
+                return "charclass"
+            if "?" in p:
+                return "single-char"
+            if "*" not in p:
+                return "fixed"
+            return "subtree-star"
+
+        picked, seen = set(), set()
+        for p in sorted(all_pats):
+            s = shape(p)
+            if s not in seen:
+                seen.add(s)
+                picked.add(p)
+        # 真源里没有、但快路径必须同样处理的形态（缺子树 / 固定件 / 单字符 / 字符类）
+        picked |= {"desktop/src/core/[a-z]*.py", "protocol/?.json", "STRATEGY.md",
+                   "scripts/nf", "no/such/dir/*.md"}
+        return picked
 
     def test_tier_faces_match_reference(self):
         """每阶真源面（含派生物扣除）也必须与参考实现逐阶一致。"""

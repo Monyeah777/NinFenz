@@ -150,6 +150,11 @@ SINK_ALLOW = {
     "watch.py:os.rmdir":
         "监听机制自检的临时目录清理：该目录由本模块 tempfile.mkdtemp 现建（路径不来自外部输入），"
         "且**非递归**——真出现意外子树时 rmdir 会拒绝，而不是把它一并抹掉",
+    "gate_inproc.py:exec":
+        "门禁引擎的**进程内 heredoc 执行面**：源码字符串由 gate_inproc.extract_heredoc 从"
+        "本仓 verify.sh 里机械切出（`<<'PYEOF'` 到顶格结束标记），**不来自任何外部输入**；"
+        "目的是省掉 heredoc 的解释器启动税（实测全量门禁 42 次 $PY3 启动）。"
+        "等价性由 tests/test_gate_engine_parity.py 逐 check 差分守住（verdict 行逐字一致）",
     "disk_cache.py:unlink":
         "缓存裁剪：落点在 <NF_HOME>/cache/<tag>/ 之下，文件名是本模块自己算的 sha256（非外部输入）"
             "，"

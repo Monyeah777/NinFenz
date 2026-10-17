@@ -38,6 +38,15 @@ def default_home() -> Path:
     return Path.home() / ".NinFenz"
 
 
+def cache_root() -> Path:
+    """cache 根（**单点派生**）：`<NF_HOME>/cache`。
+
+    2026-10-17 从两处重复表达式（`storage.Store.cache_root` 与 `disk_cache.root_dir`）
+    收敛到这里——两处各写一遍时，「换落点」只需要改一处就会静默漂移。
+    """
+    return default_home() / "cache"
+
+
 class Store:
     """对 NF_HOME 下所有本地数据的管理器。"""
 
@@ -70,7 +79,7 @@ class Store:
         self.modules_root = self.home / "modules"
         self.assets_root = self.home / "assets"
         self.presets_root = self.home / "presets"
-        self.cache_root = self.home / "cache"
+        self.cache_root = cache_root()
         self._ensure_dirs()
 
     def _in_repo_unignored_issue(self, repo_root: str) -> str:

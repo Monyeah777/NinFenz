@@ -15,6 +15,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import Any, Optional
 
+#: 历史字段（本模块不再维护它；树代际的真源是 `daemon._WATCHER`，见 `_install`）。
 _WATCHER: Optional[Any] = None
 
 
@@ -34,9 +35,19 @@ def _install(root, watcher) -> None:
         _dm._sync_resident(root)
 
 
+#: 当前生效的监听件（本模块的**镜像**，装/卸时同步；树代际的真源仍是 `daemon._WATCHER`）。
+_WATCHER: Optional[Any] = None
+#: 本模块装过的监听件**栈**（所有权凭据，支持嵌套会话）。
+#: 为什么用栈而不是一个字段（2026-10-16 实测踩过）：`nf verify` 内部会跑
+#: `nf shell --verify --deep`，于是同一个进程里出现**嵌套会话**；单字段记「外层是谁」
+#: 在多层嵌套下会被覆盖，`release()` 就把守护的监听拆掉了。
+_STACK: list = []
+
+
 def attach(root) -> bool:
     """装监听 + 常驻层（本进程内）。返回是否装上；任何一步不成 ⇒ False（不抛、不降级语义）。"""
     global _WATCHER
+    from core import daemon as _dm
     from core import watch as _watch
     try:
         if not _watch.available():
@@ -46,6 +57,9 @@ def attach(root) -> bool:
             return False
     except Exception:                                    # noqa: BLE001 - 装不上就照旧跑
         return False
+    # **装载前外层那件一起入栈**：`_install` 会把 `daemon._WATCHER` 覆盖成新的，
+    # 所以「外层是谁」必须在覆盖**之前**记下来，否则收尾时无从恢复（实测踩过）。
+    _STACK.append((watcher, _dm._WATCHER))
     _WATCHER = watcher
     _install(root, watcher)
     return True
@@ -59,11 +73,30 @@ def sync(root) -> None:
 
 
 def release() -> None:
-    """会话收尾：注销监听 + 整批作废常驻层与响应缓存（正常与异常路径都要调）。"""
+    """会话收尾：**只拆本会话装的那件**，并把外层（守护）那件**装回去**。
+
+    真 bug（2026-10-16 实测抓出）：守护自己装着监听件（`serve_forever(watch=True)`），
+    而被执行的命令内部还会再开嵌套会话——`nf verify`（check39）就会跑
+    `nf shell --verify --deep`。旧实现的 `release()` **无条件** `set_watcher(None)`，
+    于是守护的监听被拆掉、`_watch_generation()` 此后恒为 `None`
+    ⇒ 响应缓存被整批作废并**永久停用**（实测 `nf verify --json` 连跑两次 entries 1→0、
+    永不命中）。这是「守护毫秒级路径」除 `.rivet` churn 之外的第二根因。
+
+    修法 = **所有权栈**：`attach` 把「(自己装的, 装载前外层)」一起压栈；
+    `release` 弹栈后把**装载前那件装回去**，且**不动外层的响应缓存**；
+    只有栈空（= 本模块最外层会话结束）时才真正注销监听并清缓存。
+    """
     global _WATCHER
     from core import response_cache as _rc
-    _WATCHER = None
+    if not _STACK:
+        return                                   # 本会话没装过 → 什么都不该拆
+    _mine, outer = _STACK.pop()
+    if outer is not None:
+        _install(None, outer)                    # 恢复外层（守护）那件，不碰它的缓存
+        _WATCHER = outer
+        return
     _install(None, None)
+    _WATCHER = None
     _rc.clear()
 
 
