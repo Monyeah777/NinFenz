@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-17",
-  "approved_by": "门禁能力化批（步骤5 合并同类项）",
-  "note": "在场/关键词组收敛到参数化引擎，其余四组按等价性不过回滚",
+  "approved_by": "门禁能力化批（步骤5 结案）",
+  "note": "可证等价组已合并，其余四组按 §5.1 回滚并登记证据",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"

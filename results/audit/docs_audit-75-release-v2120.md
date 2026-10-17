@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:71bbaee62a42becdb682e64dc04e5ca2abeff13be53dd0a4380cab3e79d9974b
+  - CHANGELOG.md:95faf1200b3ae7994d4423117388815b69bc95bd7933435d15062c72a14c344e
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
   - README.md:8eeb1a274ab1200f409a7754518c1f73c31246396f0fa56c73951f3fa45e7699
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
 
 ---
+> 重审（2026-10-17）：步骤5 结案：四组回滚证据登记（逐组取证）
+
 > 重审（2026-10-17）：步骤5：在场/关键词组收敛到 _decl_check（等价性 15 例逐字节一致）
 
 > 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步

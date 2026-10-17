@@ -13,9 +13,13 @@
   `_decl_check` 引擎（声明清单 × 文件系统 → 逐条 verdict，**文案仍由各 check 给**，逐字不变）；
   ② **等价性证明**：新增 `desktop/tests/test_check_merge_equivalence.py`——独立参照实现 + 10 个变异夹具（删件/抽词）逐条比对；
   另用 HEAD 版旧 check 与新版逐字节差分 15 例（5 check × 干净树 + 2 变异）全等；
-  ③ **不合并的四组（附证据，不注水）**：7/8/11/23 是**四种提取器**、9/15/21/24 是**四种判定**（可寻址/五断言/图遍历/生命周期门禁）、
-  25/31 是 **knowledge_sig 与 protocol_golden 两套重算**、check10 是 EXT 溯源+版本锚点、check20 是模块文档必填项——
-  并进参数化引擎等于重写这些判据（复杂度上升、诊断粒度下降），按 §5.1「等价性不过即回滚该组」处置；
+  ③ **不合并的四组（逐组取证，按 §5.1「等价性不过即回滚该组」处置）**：
+  · `ref_closure`（9/15/21/24）：资产键可寻址 / 五条独立断言（check15 的 heredoc 187 行）/ registry 引用图遍历 / 生命周期引用门禁——四种判定，无共用子谓词；
+  · `set_reconcile`（7/8/11/23）：目录×在册数 / 行数溯源 / 三方对账 / 台账×文件头——**四种提取器**；
+  · `deterministic`（25/31）：`knowledge_sig` 与 `protocol_golden` 两套重算口径；
+  · 残余候选（10/20）：check10 是 EXT 溯源 + 版本锚点 + 三落点一致，check20 是模块文档必填项（含 WARN 分层）——都不是关键词对齐 / 在场。
+  合并这四组需重写 15 段判据（或搬进 >800 行模块，撞 `code_metrics` 上限），会降低诊断粒度 ⇒ 按 `ADR-0002 门禁不注水` 逐组回滚；
+  **能力视图不受影响**：42/42 check 的能力覆盖仍由 `capability_index` 提供，合并不是能力可达性的前提；
   ④ **验收**：`bash verify.sh` **check1-42 · PASS=76 · WARN=1 · FAIL=0**；`test_check_merge_equivalence` 3 例全绿；`test_gate_engine_parity` 全绿。
 - **`nf audit rebind`：重审重绑口径机器化（结束手搓脚本）**（**作者指令**：「做」）：
   ① **命令**：`nf audit rebind --note "…"`——逐行替换审计件 `subjects` 的 sha256（**不重排 frontmatter**，只动 digest 行），并把重审理由落成正文首行；支持 `--dry-run` / `--json`。
