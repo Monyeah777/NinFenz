@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:01e31d6c4164db4d12961436d977a3dd2da89470f5204044ce5a1a50b9706ec5
+  - protocol/code_metrics_baseline.json:727d991b74783c1201db8c1ef2bebe6aef526f285e04aff69d698d83f022bb65
 ---
+> 重审（2026-10-17）：步骤4：卡册扩段D（check41/42）+ 生成器识别段名直写
+
+> 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块
+
 > 重审（2026-10-17）：能力面挂账（回退一致性面 detail，保留能力校验）
 
 > 重审（2026-10-17）：能力面挂账：assertions.json 增 capability_vocabulary/index + 每条断言 capability

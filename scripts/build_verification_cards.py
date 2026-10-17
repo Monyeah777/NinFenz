@@ -26,9 +26,12 @@ VERIFY = ROOT / "verify.sh"
 
 _CHECK = re.compile(r"^check(\d+)\(\)\{", re.M)
 _FIRST_ECHO = re.compile(r"echo '([^']*)'")
-_TITLE = re.compile(r"\[(\d+)/(\d+)·([ABC])\]")
+#: 段位标记两式并存：旧式 `[12/3·B]`（数字段 + 字母）与新式 `[41/段D]`（段名直写）。
+#: 2026-10-17 扩段D 时补第二式——只认旧式会让新段的卡片全被算进"段C"（静默错标）。
+_TITLE = re.compile(r"\[(\d+)/(?:(\d+)·([ABCD])|(段[ABCD]))\]")
 
-SEGMENT = {"A": "段A", "B": "段B", "C": "段C"}
+SEGMENT = {"A": "段A", "B": "段B", "C": "段C", "D": "段D"}
+SEGMENTS = ("段A", "段B", "段C", "段D")
 
 
 def _checks() -> list:
@@ -42,9 +45,12 @@ def _checks() -> list:
         head = _FIRST_ECHO.search(body)
         title = head.group(1) if head else "（缺 echo 标题）"
         seg = _TITLE.search(title)
+        letter = ""
+        if seg:
+            letter = seg.group(3) or (seg.group(4) or "")[-1:]
         kind = "真实单测（unittest）" if "unittest" in body else "结构断言"
         out.append({"n": int(m.group(1)), "title": title,
-                    "segment": SEGMENT.get(seg.group(3), "段C") if seg else "段C",
+                    "segment": SEGMENT.get(letter, "段C"),
                     "kind": kind})
     return out
 
@@ -65,7 +71,7 @@ def render() -> str:
     rows = _checks()
     n_checks, n_pass = _baseline()
     n_lines = len(VERIFY.read_text(encoding="utf-8").splitlines())
-    seg_count = {k: sum(1 for r in rows if r["segment"] == k) for k in ("段A", "段B", "段C")}
+    seg_count = {k: sum(1 for r in rows if r["segment"] == k) for k in SEGMENTS}
     n_unit = sum(1 for r in rows if r["kind"].startswith("真实单测"))
     overview = [
         "| 项 | 值 |",
@@ -74,8 +80,8 @@ def render() -> str:
         "| 门禁脚本 | %d 行（verify.sh 实测） |" % n_lines,
         "| 声明基线 | check1-%d · PASS=%d（源自 quality_baseline.EXPECTED_*） |"
         % (n_checks, n_pass),
-        "| 段位分布 | 段A 官方核心 %d · 段B 社区包 %d · 段C 代码层 %d |"
-        % (seg_count["段A"], seg_count["段B"], seg_count["段C"]),
+        "| 段位分布 | 段A 官方核心 %d · 段B 社区包 %d · 段C 代码层 %d · 段D 供应链 %d |"
+        % (seg_count["段A"], seg_count["段B"], seg_count["段C"], seg_count["段D"]),
         "| 断言种类 | 真实单测 %d 条 · 结构断言 %d 条 |" % (n_unit, len(rows) - n_unit),
         "| 复跑入口 | `bash verify.sh`（全量）；单条见各卡片的「复跑命令」 |",
     ]

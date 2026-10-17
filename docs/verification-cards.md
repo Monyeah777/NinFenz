@@ -22,11 +22,11 @@ NF 的门禁是一份 bash 脚本、40 条 check，当前基线声明为 `check1
 
 | 项 | 值 |
 |---|---|
-| 卡片总数 | 40（= verify.sh 的 check 函数数，实测） |
-| 门禁脚本 | 2802 行（verify.sh 实测） |
-| 声明基线 | check1-40 · PASS=72（源自 quality_baseline.EXPECTED_*） |
-| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 |
-| 断言种类 | 真实单测 6 条 · 结构断言 34 条 |
+| 卡片总数 | 42（= verify.sh 的 check 函数数，实测） |
+| 门禁脚本 | 2907 行（verify.sh 实测） |
+| 声明基线 | check1-42 · PASS=76（源自 quality_baseline.EXPECTED_*） |
+| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 2 |
+| 断言种类 | 真实单测 6 条 · 结构断言 36 条 |
 | 复跑入口 | `bash verify.sh`（全量）；单条见各卡片的「复跑命令」 |
 ## 卡片索引
 
@@ -72,6 +72,8 @@ NF 的门禁是一份 bash 脚本、40 条 check，当前基线声明为 `check1
 | 38 | 段C | == [38/段C] 出口自动化门禁（自述数字 / 他证通道 / GEO 出口 / FDE 样例 / 发布编排 / 接入面）== | 结构断言 |
 | 39 | 段C | == [39/段C] 终端与端壳残留门禁（端壳退役已成事实 + 终端入口在场 + 命令面全策展可达 + 顶尖 CLI 基线逐条可核）== | 结构断言 |
 | 40 | 段C | == [40/段C] 数字资产契约门禁（数据/代码/脚本三面：格式 + 字段完整性 + 防篡改 + AST 规范 + 可证空指针 + 脚本 I/O 对齐）== | 结构断言 |
+| 41 | 段D | == [41/段D] 构建隔离门禁（SLSA L3 Build isolation：构建入口不联网 + 基座按 digest 钉 + 工具链定版）== | 结构断言 |
+| 42 | 段D | == [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）== | 结构断言 |
 ---
 
 ## 逐条卡片
@@ -476,6 +478,26 @@ NF 的门禁是一份 bash 脚本、40 条 check，当前基线声明为 `check1
 | 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
 | 记录 | 运行日志 nf_check40.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
 
+### V41 · [41/段D] 构建隔离门禁（SLSA L3 Build isolation：构建入口不联网 + 基座按 digest 钉 + 工具链定版）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [41/段D] 构建隔离门禁（构建期读面不被宿主污染） |
+| 判据 | 结构断言（core 模块：build_isolation；构建入口取网/取包命令 = 0 · `Dockerfile*` 基座按 `@sha256` 钉且无 `:latest` · 工具链定版：`engines.node` + `engine/rust/Cargo.lock` + CI 的 setup-python/setup-node 版本号） |
+| 复跑命令 | `python -c "import sys;sys.path.insert(0,'desktop/src');from core import build_isolation;print(build_isolation.scan('.'))"` |
+| 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check41.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
+### V42 · [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [42/段D] 不可伪造 provenance 门禁（验签方 ≠ 签名方） |
+| 判据 | 语义校验（core 模块：provenance_external；`protocol/RECEIPTS.json` 形状 + hmac 级 attestation 交**独立子进程**验签 + 主体摘要改一位后必须判否；外锚 cosign 缺位时如实 WARN） |
+| 复跑命令 | `python -c "import sys;sys.path.insert(0,'desktop/src');from core import provenance_external;print(provenance_external.scan('.'))"` |
+| 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check42.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
 ---
 
 > 本册可重建：仓库根执行 `python scripts/build_verification_cards.py --write`（生成器**随仓库分发**，真源 = `verify.sh`），产物逐字节一致；`--check` 为只读校验（生成区 ≠ 实时重算即 exit 1）。
@@ -483,3 +505,4 @@ NF 的门禁是一份 bash 脚本、40 条 check，当前基线声明为 `check1
 > 2026-09-25：check38/39 卡片按同一模板补齐，基线行同步为 check1-39 · PASS=68；下次跑生成器即回归逐字节重建。
 > 2026-10-03：check40（数字资产契约三面）按同一模板补齐，基线行同步为 check1-40 · PASS=70。
 > 2026-10-05：语言面注册（check34：硬编码双语对 → 注册面）· 发布编排（check38 release_gate）· 接入面目录（check38 integrations）三项**并入既有 check**（序号不变），基线行同步为 check1-40 · **PASS=72**。
+> 2026-10-17：check41（构建隔离）/ check42（不可伪造 provenance）按同一模板补齐，**新增段D（供应链面）**；基线行同步为 check1-42 · **PASS=76**。

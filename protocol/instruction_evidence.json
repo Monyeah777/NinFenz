@@ -3,14 +3,14 @@
     "code_metrics": {
       "cmd": "python scripts/code_metrics.py",
       "exit_code": 0,
-      "output_sha256": "6e1eb0d0d1d6f3a759554d72ffa41ac48fb69e5750e8c71474ca7f4aa698e16a",
-      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 296（基线 296）· 最大行数 7497 · 最长函数 1251 行 · 最大圈复杂度 115",
+      "output_sha256": "15467379abc25a117f7a2bbe37259bc8501c7f1e2ada24d754f8ae823091e94a",
+      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 298（基线 298）· 最大行数 7504 · 最长函数 1251 行 · 最大圈复杂度 115",
       "ran_at": "2026-10-17"
     },
     "conformance": {
       "cmd": "python scripts/nf.py conformance",
       "exit_code": 0,
-      "output_sha256": "00db6e95efcda92ba29e04b621f68fe601b877c86aad357e86c60b17b29bb361",
+      "output_sha256": "f98fe958fd8dd2f5a4c5070b42d07038c77d7c7f712f4ce0e5d10e5db95e3920",
       "output_tail": "  ✓ mcp-package                    工具 10 · 提示 1 · 类目 content-creation · 目标平台 4\n  ✓ state-front                    单件 0 · 族规则 1 · 族成员 3\n  ✓ public-surface                 公开导出面零泄漏",
       "ran_at": "2026-10-17"
     },
@@ -30,16 +30,16 @@
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
-      "exit_code": 1,
-      "output_sha256": "e1d7a50a70a01078ca5e73bebdc370ef357d503568301cfd56bcd949e5f0b338",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-40 / PASS=72 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=151ed830faf2 实测=4fac56c90b9d）（修复指引：重跑 python scripts/verify_report.py --write）",
+      "exit_code": 0,
+      "output_sha256": "9d31434a7ca350fcac5889237c95c5f2923fcf4e8ef414e0530af88a1327af26",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
       "ran_at": "2026-10-17"
     },
     "stats_check": {
       "cmd": "python scripts/nf.py stats --check",
       "exit_code": 0,
-      "output_sha256": "968fd313cf0a7995175374dd74b360f6854772fefe0c51fa46ad87e87731bed3",
-      "output_tail": "  标准目录：370 条（可达 332 / 不可达 38 · 机构 194 · 206 边） · 绑定 1200 条\n  质量凭证：verify check1-40 常驻（脚本 v2.30） · 馆藏 3 件\n  模式：check（只校验）",
+      "output_sha256": "0d1bbdd93a7df3355a49469b68242dca40decc2bc3b010234aebd15f47374f3b",
+      "output_tail": "  标准目录：370 条（可达 332 / 不可达 38 · 机构 194 · 206 边） · 绑定 1200 条\n  质量凭证：verify check1-42 常驻（脚本 v2.30） · 馆藏 3 件\n  模式：check（只校验）",
       "ran_at": "2026-10-17"
     },
     "verify": {

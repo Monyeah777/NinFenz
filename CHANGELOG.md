@@ -3,6 +3,11 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **门禁扩到 check1-42：新增构建隔离（check41）与不可伪造 provenance（check42）**（门禁能力化重构 · 步骤4）：
+  ① **check41 构建隔离**（SLSA L3 Build isolation）：构建入口不得出现取网/取包命令、容器基座按 `@sha256` 钉、工具链定版（node `engines` / `Cargo.lock` / CI 版本号）；
+  ② **check42 不可伪造 provenance**（SLSA L3 Non-falsifiable）：**独立子进程**验 hmac 级 attestation，且把主体摘要改一位后必须判否——证明「验签方 ≠ 签名方」；本仓外锚（cosign）缺位时如实 WARN，不假装已不可伪造；
+  ③ **基线联动**：`quality_baseline.EXPECTED_*` 40/72 → 42/76；README / protocol/CONFORMANCE / VERSION-MATRIX 基线句同步；`nf explain 41/42` 补齐修复指引；`capability_index` 补 41/42（能力覆盖仍 42/42）；
+  ④ **验收**：verify v2.30 **check1-42 · PASS=76**；新增 11 条变异夹具（两条新判据都能被置红）。
 - **`nf audit rebind`：重审重绑口径机器化（结束手搓脚本）**（**作者指令**：「做」）：
   ① **命令**：`nf audit rebind --note "…"`——逐行替换审计件 `subjects` 的 sha256（**不重排 frontmatter**，只动 digest 行），并把重审理由落成正文首行；支持 `--dry-run` / `--json`。
   ② **三条纪律**：**理由必填**（空 note 拒绝——无理由的重绑就是洗数据）、**幂等**（同一理由不重复追加：此前实测一份审计里叠了 6 条同一说明）、**legacy 不重绑**（无审计头的存量件只挂账）。

@@ -2778,6 +2778,13 @@ CHECK_GUIDE = {
         "：按 `docs/L3_FROZEN.md` 裁决删除残留件；`nf shell --verify` 看终端自检逐项失败；新增命令"
         "要登记进 `core/terminal.py` 的能力族。",
     "40": "缺什么：数字资产契约违约（数据格式/字段完整性/输入输出一致性/防篡改；代码 AST 规范、可证空指针、测试用例在场；脚本 nf-io 头与声明双源不一致、链上 A 输出不匹配 B 输入）。补什么：`nf asset contract` 逐条看；数据件改声明或补字段；脚本补 `# nf-io: inputs=… outputs=…` 头并与 protocol/asset_contracts.json 对齐；sha256 漂移确认后用 `nf asset contract --freeze` 重冻。",
+    "41": "缺什么：构建隔离违约（构建入口出现取网/取包命令；Dockerfile 基座未按 @sha256 钉或写了"
+          " :latest；engines.node / engine/rust/Cargo.lock 缺位；CI 的 setup-python / setup-node 未给"
+          "具体版本号）。补什么：先跑 core.build_isolation.scan 看逐条；构建入口改读仓内既有件、基座"
+          "换成 name:tag@sha256:*、工具链把版本写死（不浮动 major）。",
+    "42": "缺什么：provenance 校验不过（回执单根形状坏 / 独立子进程验签失败 / 篡改未被检出）。补什么"
+          "：nf receipts --scope protocol --write 重建单根；确认 nf attest --key-file 与"
+          " core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
 }
 
 def _cmd_preset(args):

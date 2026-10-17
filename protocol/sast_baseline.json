@@ -13,6 +13,7 @@
         "desktop/src/core/ingest_common.py::B603": 1,
         "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
+        "desktop/src/core/provenance_external.py::B404": 1,
         "desktop/src/core/watch.py::B110": 1,
         "scripts/check_external_links.py::B104": 1,
         "scripts/instruction_evidence.py::B404": 1,
@@ -32,17 +33,17 @@
           "severities": [
             [
               "LOW",
-              28
+              29
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 33
+          "total": 34
         },
         "ruff": {
-          "total": 78
+          "total": 79
         }
       },
       "ruff": {
@@ -68,6 +69,7 @@
         "desktop/src/core/pack_combo.py::S311": 1,
         "desktop/src/core/pipeline_loader.py::S112": 1,
         "desktop/src/core/protocol_golden.py::S112": 1,
+        "desktop/src/core/provenance_external.py::S603": 1,
         "desktop/src/core/retriever.py::S110": 2,
         "desktop/src/core/storage.py::S110": 1,
         "desktop/src/core/storage.py::S112": 5,

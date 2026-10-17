@@ -115,6 +115,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 12
     },
+    "desktop/src/core/build_isolation.py": {
+      "lines": 152,
+      "max_fn_cc": 14,
+      "max_fn_lines": 32
+    },
     "desktop/src/core/calibration_state.py": {
       "lines": 23,
       "max_fn_cc": 3,
@@ -915,6 +920,11 @@
       "max_fn_cc": 20,
       "max_fn_lines": 48
     },
+    "desktop/src/core/provenance_external.py": {
+      "lines": 123,
+      "max_fn_cc": 13,
+      "max_fn_lines": 29
+    },
     "desktop/src/core/purity_scan.py": {
       "lines": 559,
       "max_fn_cc": 24,
@@ -1261,8 +1271,8 @@
       "max_fn_lines": 39
     },
     "scripts/build_verification_cards.py": {
-      "lines": 128,
-      "max_fn_cc": 6,
+      "lines": 134,
+      "max_fn_cc": 8,
       "max_fn_lines": 26
     },
     "scripts/capabilities.py": {
@@ -1366,7 +1376,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7497,
+      "lines": 7504,
       "max_fn_cc": 115,
       "max_fn_lines": 1251
     },

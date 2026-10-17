@@ -1,8 +1,8 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 40（两者不可互替）",
-    "expected_checks": 40,
-    "expected_pass": 72,
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
+    "expected_checks": 42,
+    "expected_pass": 76,
     "report_items": 31,
     "verify_version": "v2.30"
   },
@@ -240,7 +240,7 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 40,
+        "checks": 42,
         "verify_version": "v2.30"
       },
       "status": "pass",
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "09ce11bd2bbee5375caf279a98538004c5b383077329e5058dc567ef735fb707",
+        "root": "4340ee1b3521778f8b323bb971748013d9ab6378c2a80bdee15263f70f3f61d7",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -327,8 +327,8 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 40,
-        "baseline_pass": 72,
+        "baseline_checks": 42,
+        "baseline_pass": 76,
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -356,7 +356,7 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 40,
+        "verify_checks": 42,
         "verify_version": "2.30"
       },
       "status": "pass",
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 296,
-        "files": 296,
+        "baseline": 298,
+        "files": 298,
         "max_fn_cc": 115,
         "max_fn_lines": 1251,
-        "max_lines": 7497
+        "max_lines": 7504
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 209,
-        "probed": 209
+        "patterns": 211,
+        "probed": 211
       },
       "status": "pass",
       "warns": 0
@@ -432,8 +432,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 248,
-        "modules": 248,
+        "metrics_recorded": 250,
+        "modules": 250,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -478,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 64,
+        "consumed": 66,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 66
+        "scanners": 68
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3786,
-        "kernel": 1967,
+        "files": 3789,
+        "kernel": 1970,
         "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "4fac56c90b9d40d5e24ddcd04db7d3a6a7143df30f7a8c46fbdf8031cbbd83c4",
+  "root_digest": "5ae7f3a1959f4d8057671d6b3405d5f5f0d76b212d57bd2cd0dde23b1c52c90c",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

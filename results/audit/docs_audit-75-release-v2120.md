@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:219f0e592c69e83626e73641dd83a0fa796f6c925eb299e0ae3af4d342e9abc3
-  - docs/meta/VERSION-MATRIX.md:abe7adfd40849a0191f738bb4d051ce487e811328d800c3049bbda7add455615
-  - README.md:02cb4dde570cd93e45d2ff96b91be36ed616357984752cb4c4ae3d08059f245f
+  - CHANGELOG.md:9354cad034a88255607915a4cfa403b061ba15b584f3f68aace1546ce66c05ee
+  - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
+  - README.md:8eeb1a274ab1200f409a7754518c1f73c31246396f0fa56c73951f3fa45e7699
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:99a48050f53268b4d02c85fcb00dc5b5bc81be742d4607aaaf33150d6f6ef6b3
+  - scripts/nf.py:b01388e804ceb9648d4f1947031f6455a96ca8bb0cb35269f847993143d34c2a
 
 ---
+> 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块
+
 > 重审（2026-10-17）：能力面挂账：assertions.json 增 capability_vocabulary/index + 每条断言 capability
 
 > 重审（2026-10-17）：整批毫秒路径深入：nf verify 增 --jobs（每 check 独立子进程跑 --only N --json，按 check 号排序合并）；机器面增 messages 使并行结果可重放文案；实测 18.6s→6.4s（2.9x）且人读面/机器面与串行逐字节一致；新增 test_verify_parallel_checks 4 条判据（等价+排序+fail-closed）

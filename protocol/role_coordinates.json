@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 218,
-    "verify": 925
+    "verify": 928
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5789,6 +5789,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "构建隔离体检（SLSA L3 —— Build isolation）：构建入口不联网 / 基座按 digest 钉 / 工具链定版。",
+      "path": "desktop/src/core/build_isolation.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "标定态：样本不足只报 CALIBRATION 不判红（机制借鉴 stashbase evals/README.md:67-74）。",
       "path": "desktop/src/core/calibration_state.py",
       "role": "verify",
@@ -6614,6 +6620,12 @@
       "function": "协议定义向导（v2.0.x-E2：ProtocolForm → protocol.yaml v2 生成 + self_check）。",
       "path": "desktop/src/core/protocol_wizard.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "外部验签的 provenance 检查（SLSA L3 —— Non-falsifiable provenance）。",
+      "path": "desktop/src/core/provenance_external.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -7699,6 +7711,12 @@
     {
       "function": "缺口逐行审查（gap_review）单测：候选筛法可复现 + 确定性证据复核 + stub 双轨纪律。",
       "path": "desktop/tests/test_gap_review.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "check41 / check42 的判据单测（含**变异夹具**：每条判据都必须能红）。",
+      "path": "desktop/tests/test_gate_41_42.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11814,7 +11832,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d6c7f89ec5729f9ab10183edf2f5288435072441301ca2e9a47e5b28f6a7c0cf",
+  "root_digest": "52e69921d5a67b68489f2fddf8fcbcf18ca9c05e79fd560897eacd55584874e0",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 82,
@@ -11823,8 +11841,8 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 812,
-    "auto:R-core": 246
+    "R-verify": 813,
+    "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"
 }

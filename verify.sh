@@ -2729,6 +2729,108 @@ PYEOF
   fi
 }
 
+check41(){
+  echo '== [41/段D] 构建隔离门禁（SLSA L3 Build isolation：构建入口不联网 + 基座按 digest 钉 + 工具链定版）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check41.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+try:
+    from core import build_isolation as biso
+except Exception as exc:
+    print('import 失败：%s' % exc)
+    sys.exit(1)
+issues, stats = biso.scan('.')
+for i in issues:
+    print('[FAIL] %s' % i)
+print('构建隔离统计：入口 %(entry_files)d 件 · 基座 %(base_images)d 处 · 取网命中 %(network_hits)d'
+      % stats)
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      ok '构建隔离通过（构建入口零取网、容器基座按 digest 钉、工具链定版）'
+    else
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check41.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check41.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "构建隔离异常——$(tail -2 "$NFL_TMP"/nf_check41.log | tr '\n' ' ')"
+      else
+        no "构建隔离异常（check41 汇总）——以上 $_emitted 条子面失败，明细见 nf_check41.log"
+      fi
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check41 构建隔离门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok '构建隔离门禁全绿（check41：SLSA L3 Build isolation——构建期读面不被宿主污染）'
+  fi
+}
+
+check42(){
+  echo '== [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_check42.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+try:
+    from core import provenance_external as pex
+except Exception as exc:
+    print('import 失败：%s' % exc)
+    sys.exit(1)
+issues, stats = pex.scan('.')
+for i in issues:
+    print('[FAIL] %s' % i)
+if stats.get('verified') and not stats.get('external_anchor'):
+    print('[WARN] 仓库自身 provenance 缺签名外锚（cosign 不在场）：本检查只证明外部验签'
+          '机制可用且对篡改敏感，不等于本仓 provenance 已不可伪造')
+print('provenance 统计：独立验签=%(verified)s · 篡改检出=%(tamper_detected)s · '
+      '外锚=%(external_anchor)s' % stats)
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check42.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[WARN]"*) wn "${_line#"[WARN] "}" ;;
+          esac
+        done < "$NFL_TMP"/nf_check42.log
+      fi
+      ok '不可伪造 provenance 检查通过（独立进程验签 + 篡改必红）'
+    else
+      local _emitted=0 _line=""
+      if [ -f "$NFL_TMP"/nf_check42.log ]; then
+        while IFS= read -r _line || [ -n "$_line" ]; do
+          _line="${_line%$'\r'}"
+          case "$_line" in
+            "[FAIL]"*) no "${_line#"[FAIL] "}"; _emitted=$((_emitted + 1)) ;;
+          esac
+        done < "$NFL_TMP"/nf_check42.log
+      fi
+      if [ "$_emitted" -eq 0 ]; then
+        no "provenance 校验异常——$(tail -2 "$NFL_TMP"/nf_check42.log | tr '\n' ' ')"
+      else
+        no "provenance 校验异常（check42 汇总）——以上 $_emitted 条子面失败，明细见 nf_check42.log"
+      fi
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check42 provenance 门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then ok '不可伪造 provenance 门禁全绿（check42：SLSA L3 Non-falsifiable——验签方 ≠ 签名方）'
+  fi
+}
+
 # ================= 主执行体（三段式） =================
 echo '=================================================='
 echo ' NinFenz 三段式验收门禁  v2.30（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
@@ -2773,6 +2875,9 @@ check37
 check38
 check39
 check40
+echo '—— 段 D：供应链面（check41-42 无条件执行：构建隔离 + 不可伪造 provenance）——'
+check41
+check42
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
@@ -2794,7 +2899,7 @@ if [ "$FAIL" -gt 0 ]; then
   echo '>>> 存在 FAIL = 协议事故：请回滚本次修改，修正后重新运行验收 <<<'
   # 指引面接线（2026-09-30）：每条 check 都有「缺什么 / 补什么」条目（nf explain 1-39），
   # 但此前从不把用户指过去——红的时候只有「请回滚」，没有下一步。这里补一句可执行的指引。
-  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-40））"
+  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42））"
   exit 1
 else
   echo '>>> 全部通过（WARN 仅提示非致命），变更可提交 <<<'

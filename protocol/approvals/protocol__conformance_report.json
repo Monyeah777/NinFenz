@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-17",
-  "approved_by": "门禁能力化批（能力面挂账）",
-  "note": "能力元数据落地：capability_vocabulary/index + 断言 capability",
+  "approved_by": "门禁能力化批（步骤4 check41/42）",
+  "note": "构建隔离 + 不可伪造 provenance 两条 P0 判据上线",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"
+  "subject_digest": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"
 }
