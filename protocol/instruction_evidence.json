@@ -10,7 +10,7 @@
     "conformance": {
       "cmd": "python scripts/nf.py conformance",
       "exit_code": 0,
-      "output_sha256": "2ae228a7ef6e9828fdbc495a82c73268f1c05060a27224d343ebf2dd5b4cf712",
+      "output_sha256": "00db6e95efcda92ba29e04b621f68fe601b877c86aad357e86c60b17b29bb361",
       "output_tail": "  ✓ mcp-package                    工具 10 · 提示 1 · 类目 content-creation · 目标平台 4\n  ✓ state-front                    单件 0 · 族规则 1 · 族成员 3\n  ✓ public-surface                 公开导出面零泄漏",
       "ran_at": "2026-10-17"
     },
@@ -31,8 +31,8 @@
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
       "exit_code": 1,
-      "output_sha256": "0c93056d9429f4e4e05b22573bbb8aab21e70f058810ccdf09ea5904ce7be93e",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-40 / PASS=72 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=17c0356a3487 实测=151ed830faf2）（修复指引：重跑 python scripts/verify_report.py --write）",
+      "output_sha256": "e1d7a50a70a01078ca5e73bebdc370ef357d503568301cfd56bcd949e5f0b338",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-40 / PASS=72 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=151ed830faf2 实测=4fac56c90b9d）（修复指引：重跑 python scripts/verify_report.py --write）",
       "ran_at": "2026-10-17"
     },
     "stats_check": {

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:655da170e30e6fbd2ad7583d916bb4511db74681fc8ca69a88580e6ce5528053
+  - protocol/code_metrics_baseline.json:01e31d6c4164db4d12961436d977a3dd2da89470f5204044ce5a1a50b9706ec5
 ---
+> 重审（2026-10-17）：能力面挂账（回退一致性面 detail，保留能力校验）
+
 > 重审（2026-10-17）：能力面挂账：assertions.json 增 capability_vocabulary/index + 每条断言 capability
 
 > 重审（2026-10-17）：并行的守护隔离：三种粒度（整个 NF_HOME / 只 cache 共享 / 只状态文件）实测全部与既有测试契约冲突，已全部撤回；保留 storage.cache_root() 单点派生（行为等价）与 daemon.state_path 的「为何不加覆盖」结论注释

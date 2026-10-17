@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:655da170e30e6fbd2ad7583d916bb4511db74681fc8ca69a88580e6ce5528053
+  - protocol/code_metrics_baseline.json:01e31d6c4164db4d12961436d977a3dd2da89470f5204044ce5a1a50b9706ec5
 ---
+> 重审（2026-10-17）：能力面挂账（回退一致性面 detail，保留能力校验）
+
 > 重审（2026-10-17）：能力面挂账：assertions.json 增 capability_vocabulary/index + 每条断言 capability
 
 > 重审（2026-10-17）：并行的守护隔离：三种粒度（整个 NF_HOME / 只 cache 共享 / 只状态文件）实测全部与既有测试契约冲突，已全部撤回；保留 storage.cache_root() 单点派生（行为等价）与 daemon.state_path 的「为何不加覆盖」结论注释

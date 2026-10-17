@@ -165,7 +165,7 @@
     "desktop/src/core/conformance_report.py::E501": 1,
     "desktop/src/core/conformance_report.py::I001": 1,
     "desktop/src/core/conformance_report.py::UP006": 39,
-    "desktop/src/core/conformance_report.py::UP031": 29,
+    "desktop/src/core/conformance_report.py::UP031": 28,
     "desktop/src/core/conformance_report.py::UP035": 4,
     "desktop/src/core/conformance_report.py::UP045": 2,
     "desktop/src/core/conformance_run.py::UP006": 4,

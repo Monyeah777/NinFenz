@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "dcd273e59c22ba4d5494729154b1505e0f5ddfad0f6da86942b359561266587f",
+        "root": "09ce11bd2bbee5375caf279a98538004c5b383077329e5058dc567ef735fb707",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "151ed830faf2ee31b61a64298c829f8173309d98953866fdf94c7c94acfa2167",
+  "root_digest": "4fac56c90b9d40d5e24ddcd04db7d3a6a7143df30f7a8c46fbdf8031cbbd83c4",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

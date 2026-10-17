@@ -191,7 +191,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/conformance_report.py": {
-      "lines": 395,
+      "lines": 391,
       "max_fn_cc": 8,
       "max_fn_lines": 26
     },

@@ -4,5 +4,5 @@
   "note": "能力元数据落地：capability_vocabulary/index + 断言 capability",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "21828c5325137cc635cb45d51208efd5622526c5222d40f52b3cafd6c2002235"
+  "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"
 }
