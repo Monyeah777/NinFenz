@@ -8,6 +8,15 @@
   ② **check42 不可伪造 provenance**（SLSA L3 Non-falsifiable）：**独立子进程**验 hmac 级 attestation，且把主体摘要改一位后必须判否——证明「验签方 ≠ 签名方」；本仓外锚（cosign）缺位时如实 WARN，不假装已不可伪造；
   ③ **基线联动**：`quality_baseline.EXPECTED_*` 40/72 → 42/76；README / protocol/CONFORMANCE / VERSION-MATRIX 基线句同步；`nf explain 41/42` 补齐修复指引；`capability_index` 补 41/42（能力覆盖仍 42/42）；
   ④ **验收**：verify v2.30 **check1-42 · PASS=76**；新增 11 条变异夹具（两条新判据都能被置红）。
+- **门禁能力化 · 步骤5：合并同类项（只合并可无损等价的一组）**：
+  ① **实测结论**：五组「同类」里只有 check1/3/4/5/6 的判定形状真正同构（在场 / 关键词在场），已收敛到 `verify.sh` 的
+  `_decl_check` 引擎（声明清单 × 文件系统 → 逐条 verdict，**文案仍由各 check 给**，逐字不变）；
+  ② **等价性证明**：新增 `desktop/tests/test_check_merge_equivalence.py`——独立参照实现 + 10 个变异夹具（删件/抽词）逐条比对；
+  另用 HEAD 版旧 check 与新版逐字节差分 15 例（5 check × 干净树 + 2 变异）全等；
+  ③ **不合并的四组（附证据，不注水）**：7/8/11/23 是**四种提取器**、9/15/21/24 是**四种判定**（可寻址/五断言/图遍历/生命周期门禁）、
+  25/31 是 **knowledge_sig 与 protocol_golden 两套重算**、check10 是 EXT 溯源+版本锚点、check20 是模块文档必填项——
+  并进参数化引擎等于重写这些判据（复杂度上升、诊断粒度下降），按 §5.1「等价性不过即回滚该组」处置；
+  ④ **验收**：`bash verify.sh` **check1-42 · PASS=76 · WARN=1 · FAIL=0**；`test_check_merge_equivalence` 3 例全绿；`test_gate_engine_parity` 全绿。
 - **`nf audit rebind`：重审重绑口径机器化（结束手搓脚本）**（**作者指令**：「做」）：
   ① **命令**：`nf audit rebind --note "…"`——逐行替换审计件 `subjects` 的 sha256（**不重排 frontmatter**，只动 digest 行），并把重审理由落成正文首行；支持 `--dry-run` / `--json`。
   ② **三条纪律**：**理由必填**（空 note 拒绝——无理由的重绑就是洗数据）、**幂等**（同一理由不重复追加：此前实测一份审计里叠了 6 条同一说明）、**legacy 不重绑**（无审计头的存量件只挂账）。

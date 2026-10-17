@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-17",
-  "approved_by": "门禁能力化批（步骤4 check41/42）",
-  "note": "构建隔离 + 不可伪造 provenance 两条 P0 判据上线",
+  "approved_by": "门禁能力化批（步骤5 合并同类项）",
+  "note": "在场/关键词组收敛到参数化引擎，其余四组按等价性不过回滚",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"

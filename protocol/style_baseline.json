@@ -1015,6 +1015,8 @@
     "desktop/tests/test_ccv3_adapter.py::RUF100": 2,
     "desktop/tests/test_ccv3_adapter.py::UP031": 5,
     "desktop/tests/test_check30_bump.py::UP031": 3,
+    "desktop/tests/test_check_merge_equivalence.py::E501": 3,
+    "desktop/tests/test_check_merge_equivalence.py::UP031": 7,
     "desktop/tests/test_ci_diagnostics.py::E501": 1,
     "desktop/tests/test_ci_diagnostics.py::UP031": 4,
     "desktop/tests/test_ci_supply_chain.py::UP031": 8,

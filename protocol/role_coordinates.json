@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 218,
-    "verify": 928
+    "verify": 929
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7325,6 +7325,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "步骤5「合并同类项」等价性证明：参数化引擎 vs 旧判据（独立参照实现 + 变异夹具）。",
+      "path": "desktop/tests/test_check_merge_equivalence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CI 失败诊断物（审计 Z5 / §11j N8 + N1 实锤）。",
       "path": "desktop/tests/test_ci_diagnostics.py",
       "role": "verify",
@@ -11832,7 +11838,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "52e69921d5a67b68489f2fddf8fcbcf18ca9c05e79fd560897eacd55584874e0",
+  "root_digest": "5ae330ab5727fb4573b05c11e58903f809256f146df4a96c494e245712d86169",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 82,
@@ -11841,7 +11847,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 813,
+    "R-verify": 814,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"

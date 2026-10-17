@@ -7,10 +7,10 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "7c97c9fe90f5bf9fedcf4fa31504282aea8d4feed1c6e2d4e160f5f5a52c8d3a",
+    "receiptRoot": "fad337945ed46a1c7958a3a20fc185d3cd92788c5914dc93f3dafe31ecbe1809",
     "verdict": "conformant"
   },
-  "issuer": "门禁能力化批（步骤4 check41/42）",
+  "issuer": "门禁能力化批（步骤5 合并同类项）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"

@@ -97,37 +97,74 @@ ok(){ PASS=$((PASS+1)); printf '  [PASS] %s\n' "$1"; }
 _gha_note(){ [ "${GITHUB_ACTIONS:-}" = "true" ] || return 0
   printf '::%s title=verify.sh::%s\n' "$1" "${2//$'\n'/%0A}"; }
 no(){ FAIL=$((FAIL+1)); printf '  [FAIL] %s\n' "$1"; _gha_note error "$1"; }
+# ---- 参数化在场/关键词判据（步骤5「合并同类项」：check1/3/4/5/6 共用**一份**判定）----
+# 输入（stdin，制表符分隔）：kind<TAB>path<TAB>token<TAB>message
+#   file  → 文件在场        dir   → 目录在场
+#   token → 正文含该词      all   → token 以 | 分隔，全部命中才算过（任一缺只报一条）
+# 输出：逐条 no "<message>"（顺序 = 声明顺序）；返回 0=全过 / 1=有缺。
+# 边界（ADR-0002）：引擎**不编写文案**——每条 message 由调用方给（文案真源仍在各 check 内），
+# 引擎只负责「声明清单 × 文件系统」这一层判定；因此合并后失败文案逐字不变。
+# 为什么只有这五条：它们的判定形状**确实同构**（在场 / 关键词在场）。其余「同类」候选
+# （7/8/11/23 的四种提取器、9/15/21/24 的可寻址/五断言/图遍历/生命周期、25/31 的两套重算、
+# 10 的 EXT 溯源、20 的文档必填项）判定核心互不相同——并进来是重写判据，不是去重。
+_decl_check(){
+  local kind path token msg missing hit _rest _t
+  missing=0
+  while IFS=$'\t' read -r kind path token msg; do
+    [ -n "$kind" ] || continue
+    [ "$token" = "-" ] && token=""
+    case "$kind" in
+      file) [ -f "$path" ] || { no "$msg"; missing=1; } ;;
+      dir) [ -d "$path" ] || { no "$msg"; missing=1; } ;;
+      token)
+        if [ ! -f "$path" ]; then no "$msg"; missing=1; continue; fi
+        grep -q -- "$token" "$path" || { no "$msg"; missing=1; } ;;
+      all)
+        hit=1; _rest="$token"
+        while [ -n "$_rest" ]; do
+          _t="${_rest%%|*}"
+          if [ "$_t" = "$_rest" ]; then _rest=''; else _rest="${_rest#*|}"; fi
+          if [ ! -f "$path" ] || ! grep -q -- "$_t" "$path"; then hit=0; break; fi
+        done
+        [ "$hit" -eq 1 ] || { no "$msg"; missing=1; } ;;
+      *) no "未知声明类型：$kind（修复指引：只支持 file/dir/token/all）"; missing=1 ;;
+    esac
+  done
+  return "$missing"
+}
 wn(){ WARN=$((WARN+1)); printf '  [WARN] %s\n' "$1"; _gha_note warning "$1"; }
 check1(){
   echo '== [1/6·A] 官方核心目录结构（07 §7 项1）=='
   local err=0
-  for f in 01_核心协议.md 02_联动注册表.md 06_Agent执行协议.md 07_官方核心出厂与社区预设导航.md README.md LICENSE; do
-    [ -f "$f" ] || { no "根级缺失: $f"; err=1; }
-  done
-  # 03 管线库：官方 P00 骨架 + P01 标准 + P90 技术文档（P02/P03 已随社区包分发至 community/*/pipelines/）
-  for p in P00_通用文档生成管线.md P01_标准管线.md P90_结构装配管线.md; do
-    [ -f "03_管线库/$p" ] || { no "03 缺官方管线文件: $p"; err=1; }
-  done
-  # 04 模块库：官方核心 13 件逐文件存在（通用 6 / 事件 5 / 世界 1 / 技术 1，清单见 07 §1）
-  local core13='04_模块库/世界类/M08_环境状态.md
-04_模块库/事件类/M06_流程状态机.md
-04_模块库/事件类/M12_模板检索库.md
-04_模块库/事件类/M13_实体交互.md
-04_模块库/事件类/M20_知识条目库.md
-04_模块库/事件类/M22_事件编排.md
-04_模块库/技术文档类/M90_结构装配.md
-04_模块库/通用类/M00_数据槽总线.md
-04_模块库/通用类/M10_节拍推进.md
-04_模块库/通用类/M23_可见性边界.md
-04_模块库/通用类/M24_规则组合.md
-04_模块库/通用类/M50_调度器.md
-04_模块库/通用类/M80_输出质检门.md'
-  while IFS= read -r f; do
-    [ -f "$f" ] || { no "04 缺核心模块: $f"; err=1; }
-  done <<< "$core13"
-  # 05 资产库：仅总 README + 用户自定义扩增槽（题材领域资产已整体迁出至 community）
-  [ -f 05_资产库/README.md ] || { no '05_资产库缺总 README'; err=1; }
-  [ -d 05_资产库/用户自定义 ] || { no '05 缺 用户自定义 扩增槽目录'; err=1; }
+  if ! _decl_check <<'DECLS'
+file	01_核心协议.md	-	根级缺失: 01_核心协议.md
+file	02_联动注册表.md	-	根级缺失: 02_联动注册表.md
+file	06_Agent执行协议.md	-	根级缺失: 06_Agent执行协议.md
+file	07_官方核心出厂与社区预设导航.md	-	根级缺失: 07_官方核心出厂与社区预设导航.md
+file	README.md	-	根级缺失: README.md
+file	LICENSE	-	根级缺失: LICENSE
+file	03_管线库/P00_通用文档生成管线.md	-	03 缺官方管线文件: P00_通用文档生成管线.md
+file	03_管线库/P01_标准管线.md	-	03 缺官方管线文件: P01_标准管线.md
+file	03_管线库/P90_结构装配管线.md	-	03 缺官方管线文件: P90_结构装配管线.md
+file	04_模块库/世界类/M08_环境状态.md	-	04 缺核心模块: 04_模块库/世界类/M08_环境状态.md
+file	04_模块库/事件类/M06_流程状态机.md	-	04 缺核心模块: 04_模块库/事件类/M06_流程状态机.md
+file	04_模块库/事件类/M12_模板检索库.md	-	04 缺核心模块: 04_模块库/事件类/M12_模板检索库.md
+file	04_模块库/事件类/M13_实体交互.md	-	04 缺核心模块: 04_模块库/事件类/M13_实体交互.md
+file	04_模块库/事件类/M20_知识条目库.md	-	04 缺核心模块: 04_模块库/事件类/M20_知识条目库.md
+file	04_模块库/事件类/M22_事件编排.md	-	04 缺核心模块: 04_模块库/事件类/M22_事件编排.md
+file	04_模块库/技术文档类/M90_结构装配.md	-	04 缺核心模块: 04_模块库/技术文档类/M90_结构装配.md
+file	04_模块库/通用类/M00_数据槽总线.md	-	04 缺核心模块: 04_模块库/通用类/M00_数据槽总线.md
+file	04_模块库/通用类/M10_节拍推进.md	-	04 缺核心模块: 04_模块库/通用类/M10_节拍推进.md
+file	04_模块库/通用类/M23_可见性边界.md	-	04 缺核心模块: 04_模块库/通用类/M23_可见性边界.md
+file	04_模块库/通用类/M24_规则组合.md	-	04 缺核心模块: 04_模块库/通用类/M24_规则组合.md
+file	04_模块库/通用类/M50_调度器.md	-	04 缺核心模块: 04_模块库/通用类/M50_调度器.md
+file	04_模块库/通用类/M80_输出质检门.md	-	04 缺核心模块: 04_模块库/通用类/M80_输出质检门.md
+file	05_资产库/README.md	-	05_资产库缺总 README
+dir	05_资产库/用户自定义	-	05 缺 用户自定义 扩增槽目录
+DECLS
+  then
+    err=1
+  fi
   if [ "$err" -eq 0 ]; then
     ok '根级 6 件；03 官方三管线（P00/P01/P90）；04 核心 13 件逐件在场；05=README+用户自定义'
   fi
@@ -161,52 +198,93 @@ check2(){
 check3(){
   echo '== [3/6·A] 五条不变式落点（01 §5 ↔ 07 §7 项6）=='
   local err=0
-  for s in '三正交分离' '核心固定' '通信契约' '数据隔离' '真相唯一'; do
-    grep -q "$s" 01_核心协议.md || { no "01 §5 缺不变式: $s"; err=1; }
-  done
-  for q in 'asset_get' 'asset_query' 'asset_match' 'asset_roll' 'asset_register'; do
-    grep -q "$q" 01_核心协议.md || { no "I4 五接口缺: $q"; err=1; }
-  done
-  grep -q 'M50' 01_核心协议.md && grep -q 'M80' 01_核心协议.md || { no 'I2 核心固定缺 M50/M80 字样'; err=1; }
-  if [ "$err" -eq 0 ]; then ok 'I1-I5 五条不变式 + I4 五接口 + I2 核心锚点全部落于 01 §5'
+  if ! _decl_check <<'DECLS'
+token	01_核心协议.md	三正交分离	01 §5 缺不变式: 三正交分离
+token	01_核心协议.md	核心固定	01 §5 缺不变式: 核心固定
+token	01_核心协议.md	通信契约	01 §5 缺不变式: 通信契约
+token	01_核心协议.md	数据隔离	01 §5 缺不变式: 数据隔离
+token	01_核心协议.md	真相唯一	01 §5 缺不变式: 真相唯一
+token	01_核心协议.md	asset_get	I4 五接口缺: asset_get
+token	01_核心协议.md	asset_query	I4 五接口缺: asset_query
+token	01_核心协议.md	asset_match	I4 五接口缺: asset_match
+token	01_核心协议.md	asset_roll	I4 五接口缺: asset_roll
+token	01_核心协议.md	asset_register	I4 五接口缺: asset_register
+all	01_核心协议.md	M50|M80	I2 核心固定缺 M50/M80 字样
+DECLS
+  then
+    err=1
+  fi
+  if [ "$err" -eq 0 ]; then
+    ok 'I1-I5 五条不变式 + I4 五接口 + I2 核心锚点全部落于 01 §5'
   fi
 }
 check4(){
   echo '== [4/6·A] 可见性边界（06 §4 管线 ↔ M23 可见性域）=='
   local err=0
-  for k in '事实管线' '事实快照' '可见性裁剪' '裁剪渲染' '锚点回验'; do
-    grep -q "$k" 06_Agent执行协议.md || { no "06 §4 缺可见性层名: $k"; err=1; }
-  done
-  for k in '可见性裁剪' '可见域' '推断域' '隐藏域' 'fail'; do
-    grep -q "$k" 04_模块库/通用类/M23_可见性边界.md || { no "M23 缺可见性域措辞: $k"; err=1; }
-  done
-  if [ "$err" -eq 0 ]; then ok '06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）'
+  if ! _decl_check <<'DECLS'
+token	06_Agent执行协议.md	事实管线	06 §4 缺可见性层名: 事实管线
+token	06_Agent执行协议.md	事实快照	06 §4 缺可见性层名: 事实快照
+token	06_Agent执行协议.md	可见性裁剪	06 §4 缺可见性层名: 可见性裁剪
+token	06_Agent执行协议.md	裁剪渲染	06 §4 缺可见性层名: 裁剪渲染
+token	06_Agent执行协议.md	锚点回验	06 §4 缺可见性层名: 锚点回验
+token	04_模块库/通用类/M23_可见性边界.md	可见性裁剪	M23 缺可见性域措辞: 可见性裁剪
+token	04_模块库/通用类/M23_可见性边界.md	可见域	M23 缺可见性域措辞: 可见域
+token	04_模块库/通用类/M23_可见性边界.md	推断域	M23 缺可见性域措辞: 推断域
+token	04_模块库/通用类/M23_可见性边界.md	隐藏域	M23 缺可见性域措辞: 隐藏域
+token	04_模块库/通用类/M23_可见性边界.md	fail	M23 缺可见性域措辞: fail
+DECLS
+  then
+    err=1
+  fi
+  if [ "$err" -eq 0 ]; then
+    ok '06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）'
   fi
 }
 check5(){
   echo '== [5/6·A] 质检门（M80 gate_action 流水线 ↔ 06 §5）=='
   local err=0
-  for k in 'pass:' 'warn:' 'fail:' 'gate_action' 'gate_decision_record'; do
-    grep -q "$k" 04_模块库/通用类/M80_输出质检门.md || { no "M80 gate 缺: $k"; err=1; }
-  done
-  for k in 'pass' 'warn' 'fail' '隐藏域直述' '最小可读'; do
-    grep -q "$k" 06_Agent执行协议.md || { no "06 §5 gate 缺呼应: $k"; err=1; }
-  done
-  if [ "$err" -eq 0 ]; then ok 'M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致'
+  if ! _decl_check <<'DECLS'
+token	04_模块库/通用类/M80_输出质检门.md	pass:	M80 gate 缺: pass:
+token	04_模块库/通用类/M80_输出质检门.md	warn:	M80 gate 缺: warn:
+token	04_模块库/通用类/M80_输出质检门.md	fail:	M80 gate 缺: fail:
+token	04_模块库/通用类/M80_输出质检门.md	gate_action	M80 gate 缺: gate_action
+token	04_模块库/通用类/M80_输出质检门.md	gate_decision_record	M80 gate 缺: gate_decision_record
+token	06_Agent执行协议.md	pass	06 §5 gate 缺呼应: pass
+token	06_Agent执行协议.md	warn	06 §5 gate 缺呼应: warn
+token	06_Agent执行协议.md	fail	06 §5 gate 缺呼应: fail
+token	06_Agent执行协议.md	隐藏域直述	06 §5 gate 缺呼应: 隐藏域直述
+token	06_Agent执行协议.md	最小可读	06 §5 gate 缺呼应: 最小可读
+DECLS
+  then
+    err=1
+  fi
+  if [ "$err" -eq 0 ]; then
+    ok 'M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致'
   fi
 }
 check6(){
   echo '== [6/6·A] 入口导航（README → 07 → 协议链/官方目录）=='
   local err=0
-  grep -q '07_官方核心出厂与社区预设导航' README.md || { no 'README 缺指向 07_官方核心出厂与社区预设导航'; err=1; }
-  for k in '01_核心协议' '02_联动注册表' '03_管线库' '05_资产库' '06_Agent执行协议' 'community'; do
-    grep -q "$k" 07_官方核心出厂与社区预设导航.md || { no "07 缺引用: $k"; err=1; }
-  done
-  for f in 07_官方核心出厂与社区预设导航.md 01_核心协议.md 02_联动注册表.md 06_Agent执行协议.md 05_资产库/README.md; do
-    [ -f "$f" ] || { no "导航目标缺失: $f"; err=1; }
-  done
-  [ -d 03_管线库 ] || { no '导航目标缺失: 03_管线库 目录'; err=1; }
-  if [ "$err" -eq 0 ]; then ok 'README→07→01/02/06/03/05 官方入口导航闭环可访问'
+  if ! _decl_check <<'DECLS'
+token	README.md	07_官方核心出厂与社区预设导航	README 缺指向 07_官方核心出厂与社区预设导航
+token	07_官方核心出厂与社区预设导航.md	01_核心协议	07 缺引用: 01_核心协议
+token	07_官方核心出厂与社区预设导航.md	02_联动注册表	07 缺引用: 02_联动注册表
+token	07_官方核心出厂与社区预设导航.md	03_管线库	07 缺引用: 03_管线库
+token	07_官方核心出厂与社区预设导航.md	05_资产库	07 缺引用: 05_资产库
+token	07_官方核心出厂与社区预设导航.md	06_Agent执行协议	07 缺引用: 06_Agent执行协议
+token	07_官方核心出厂与社区预设导航.md	community	07 缺引用: community
+file	07_官方核心出厂与社区预设导航.md	-	导航目标缺失: 07_官方核心出厂与社区预设导航.md
+file	01_核心协议.md	-	导航目标缺失: 01_核心协议.md
+file	02_联动注册表.md	-	导航目标缺失: 02_联动注册表.md
+file	06_Agent执行协议.md	-	导航目标缺失: 06_Agent执行协议.md
+file	05_资产库/README.md	-	导航目标缺失: 05_资产库/README.md
+dir	03_管线库	-	导航目标缺失: 03_管线库 目录
+DECLS
+  then
+    err=1
+  fi
+  if [ "$err" -eq 0 ]; then
+    ok 'README→07→01/02/06/03/05 官方入口导航闭环可访问'
   fi
 }
 check7(){
