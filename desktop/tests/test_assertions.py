@@ -118,5 +118,94 @@ class TestAssertionsNegatives(unittest.TestCase):
         self.assertTrue(any("未知 op" in i for i in A.run(tmp)[1]))
 
 
+class TestCapabilityFace(unittest.TestCase):
+    """能力面：挂账（断言 → 能力）+ 覆盖（能力 → check）+ **空洞检测能红**。"""
+
+    def test_real_repo_capabilities_cover_every_check(self):
+        issues, stats = A.capability_report(str(ROOT))
+        self.assertEqual(issues, [])
+        self.assertTrue(stats["declared"])
+        self.assertEqual(stats["covered"], stats["checks"])
+        self.assertGreaterEqual(stats["capabilities"], 15)
+        self.assertTrue(stats["aggregate_present"])
+        self.assertEqual(stats["mapped_assertions"], stats["assertions"])
+
+    def test_aggregate_only_checks_are_reported_not_hidden(self):
+        # 32/36 目前只被聚合器压着（拆聚合门之前，这是诚实状态而不是静默通过）
+        self.assertEqual(A.capability_report(str(ROOT))[1]["aggregate_only"], [32, 36])
+
+    def _write_decl(self, tmp, doc):
+        _mk(tmp, A.DECL_REL, json.dumps(doc, ensure_ascii=False))
+
+    def _stub(self, tmp, checks=("check1", "check2")):
+        _mk(tmp, "verify.sh", "".join("%s(){ :; }\n" % c for c in checks))
+
+    def test_table_without_capability_face_stays_backward_compatible(self):
+        tmp = tempfile.mkdtemp()
+        self._write_decl(tmp, _decl(assertions=[{
+            "id": "x", "severity": "fail", "kind": "regex_absent",
+            "params": {"globs": [], "pattern": "a"}, "message": "m", "fix": "f"}]))
+        self.assertEqual(A.scan(tmp)[0], [])
+
+    def test_uncovered_check_is_a_hole(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(
+            capability_vocabulary=[A.AGGREGATE_CAPABILITY, "CAP_X"],
+            capability_index={A.AGGREGATE_CAPABILITY: [1], "CAP_X": [1]}))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("能力空洞" in i and "2" in i for i in issues), issues)
+
+    def test_index_referencing_missing_check_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(
+            capability_vocabulary=[A.AGGREGATE_CAPABILITY, "CAP_X"],
+            capability_index={A.AGGREGATE_CAPABILITY: [1, 2], "CAP_X": [9]}))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("不存在的 check" in i and "9" in i for i in issues), issues)
+
+    def test_assertion_without_capability_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(
+            capability_vocabulary=[A.AGGREGATE_CAPABILITY, "CAP_X"],
+            capability_index={A.AGGREGATE_CAPABILITY: [2], "CAP_X": [1]},
+            assertions=[{"id": "bare", "severity": "fail", "kind": "regex_absent",
+                         "params": {"globs": [], "pattern": "a"},
+                         "message": "m", "fix": "f"}]))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("未挂能力" in i and "bare" in i for i in issues), issues)
+
+    def test_assertion_capability_outside_vocabulary_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(
+            capability_vocabulary=[A.AGGREGATE_CAPABILITY, "CAP_X"],
+            capability_index={A.AGGREGATE_CAPABILITY: [2], "CAP_X": [1]},
+            assertions=[{"id": "row", "severity": "fail", "kind": "regex_absent",
+                         "params": {"globs": [], "pattern": "a"}, "message": "m",
+                         "fix": "f", "capability": "CAP_NOPE"}]))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("越词表" in i and "CAP_NOPE" in i for i in issues), issues)
+
+    def test_missing_aggregate_capability_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(capability_vocabulary=["CAP_X"],
+                                    capability_index={"CAP_X": [1, 2]}))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("聚合器" in i for i in issues), issues)
+
+    def test_empty_capability_is_fail(self):
+        tmp = tempfile.mkdtemp()
+        self._stub(tmp)
+        self._write_decl(tmp, _decl(
+            capability_vocabulary=[A.AGGREGATE_CAPABILITY, "CAP_X"],
+            capability_index={A.AGGREGATE_CAPABILITY: [1, 2], "CAP_X": []}))
+        issues = A.scan(tmp)[0]
+        self.assertTrue(any("没有任何 check" in i for i in issues), issues)
+
+
 if __name__ == "__main__":
     unittest.main()

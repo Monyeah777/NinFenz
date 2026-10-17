@@ -3,10 +3,47 @@
   "note": "断言表（数据化断言，机制借鉴 Schematron 的 patterns→rules→assertions）：把「能确定性判定的形状类断言」从 check 代码里搬出来，新增规则 = 加一行数据。边界写死：kind 是**封闭集**（见 kind_vocabulary），只做搬运与去重，不做表达力扩张，不自造 DSL；业务语义断言仍留在 check 代码里。每条断言必须有 fix（修复指引）。",
   "severity_vocabulary": ["fail", "warn"],
   "kind_vocabulary": ["regex_absent", "regex_present", "count_at_least", "json_value"],
+  "capability_vocabulary": [
+    "CAP_TOPO_PRESENCE",
+    "CAP_REF_CLOSURE",
+    "CAP_IDENTITY_QUALIFIED",
+    "CAP_KEYWORD_ALIGN",
+    "CAP_CONTRACT_STRUCT",
+    "CAP_AUTH_COHERENT",
+    "CAP_SET_RECONCILE",
+    "CAP_PROVENANCE_TRACE",
+    "CAP_DETERMINISTIC",
+    "CAP_TAMPER_EVIDENT",
+    "CAP_LIFECYCLE_LEGAL",
+    "CAP_ASSERTION_PROVEN",
+    "CAP_PURITY_BOUNDARY",
+    "CAP_RUNTIME_EXECUTABLE",
+    "CAP_CORPUS_CONFORM",
+    "CAP_AGGREGATE_SUMMARY"
+  ],
+  "capability_index": {
+    "CAP_TOPO_PRESENCE": [1, 6, 7, 20, 34],
+    "CAP_REF_CLOSURE": [9, 15, 16, 21, 24],
+    "CAP_IDENTITY_QUALIFIED": [2, 9, 13, 30],
+    "CAP_KEYWORD_ALIGN": [3, 4, 5, 10, 26],
+    "CAP_CONTRACT_STRUCT": [14, 16, 18, 19, 22, 28],
+    "CAP_AUTH_COHERENT": [16],
+    "CAP_SET_RECONCILE": [7, 8, 11, 23],
+    "CAP_PROVENANCE_TRACE": [23, 38],
+    "CAP_DETERMINISTIC": [25, 31, 40],
+    "CAP_TAMPER_EVIDENT": [23, 25, 31, 40],
+    "CAP_LIFECYCLE_LEGAL": [17, 24, 29, 34],
+    "CAP_ASSERTION_PROVEN": [29, 35, 38],
+    "CAP_PURITY_BOUNDARY": [27, 39, 40],
+    "CAP_RUNTIME_EXECUTABLE": [12, 16, 33, 39],
+    "CAP_CORPUS_CONFORM": [20, 34, 37],
+    "CAP_AGGREGATE_SUMMARY": [32, 33, 35, 36]
+  },
   "assertions": [
     {
       "id": "public-surface-no-abs-path",
       "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
       "kind": "regex_absent",
       "params": {
         "globs": ["desktop/tests/fixtures/external/**/*", "docs/external-validation-assets/*"],
@@ -19,6 +56,7 @@
     {
       "id": "idl-schema-five-in-place",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "count_at_least",
       "params": {"glob": "protocol/schema/*.schema.json", "min": 5},
       "message": "IDL schema 定义少于 5 份（定义面残缺）",
@@ -28,6 +66,7 @@
     {
       "id": "llms-txt-machine-anchors",
       "severity": "fail",
+      "capability": "CAP_TOPO_PRESENCE",
       "kind": "regex_present",
       "params": {
         "path": "llms.txt",
@@ -41,6 +80,7 @@
     {
       "id": "contract-schema-declares-quality-keys",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {
         "path": "protocol/schema/contract.schema.json",
@@ -55,6 +95,7 @@
     {
       "id": "contract-schema-extension-face-closed",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {
         "path": "protocol/schema/contract.schema.json",
@@ -69,6 +110,7 @@
     {
       "id": "canonical-digest-declared",
       "severity": "fail",
+      "capability": "CAP_DETERMINISTIC",
       "kind": "regex_present",
       "params": {
         "path": "protocol/CONFORMANCE.md",
@@ -81,6 +123,7 @@
     {
       "id": "skill-face-frontmatter",
       "severity": "fail",
+      "capability": "CAP_CORPUS_CONFORM",
       "kind": "regex_present",
       "params": {
         "path": "skills/ninfenz/SKILL.md",
@@ -93,6 +136,7 @@
     {
       "id": "skill-face-references",
       "severity": "fail",
+      "capability": "CAP_TOPO_PRESENCE",
       "kind": "count_at_least",
       "params": {"glob": "skills/ninfenz/references/*.md", "min": 3},
       "message": "对外 skill 面参考件少于 3 件（SKILL.md 引用的 references 面残缺）",
@@ -102,6 +146,7 @@
     {
       "id": "vocabularies-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/vocabularies.json", "key": "schema",
                  "op": "equals", "value": "nf-vocabularies/1"},
@@ -112,6 +157,7 @@
     {
       "id": "normative-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/normative.json", "key": "schema",
                  "op": "equals", "value": "nf-normative/1"},
@@ -122,6 +168,7 @@
     {
       "id": "data-contracts-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/data_contracts.json", "key": "schema",
                  "op": "equals", "value": "nf-data-contracts/1"},
@@ -132,6 +179,7 @@
     {
       "id": "layers-declaration-in-place",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/LAYERS.json", "key": "schema",
                  "op": "equals", "value": "nf-layers/1"},
@@ -142,6 +190,7 @@
     {
       "id": "layers-generated-region",
       "severity": "fail",
+      "capability": "CAP_DETERMINISTIC",
       "kind": "regex_present",
       "params": {"path": "docs/layers.md",
                  "patterns": ["<!-- nf:layers:begin -->", "<!-- nf:layers:end -->"]},
@@ -152,6 +201,7 @@
     {
       "id": "layers-no-abs-path",
       "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
       "kind": "regex_absent",
       "params": {"globs": ["protocol/LAYERS.json", "docs/layers.md"],
                  "pattern": "(?<![A-Za-z0-9])[A-Za-z]:[\\\\/]|/Users/|/home/[a-z]"},
@@ -162,6 +212,7 @@
     {
       "id": "no-credential-leak-in-public-faces",
       "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
       "kind": "regex_absent",
       "params": {
         "globs": [".github/workflows/*.yml", "docs/**/*.md", "protocol/*.json",
@@ -177,6 +228,7 @@
     {
       "id": "error-codes-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/error_codes.json", "key": "schema", "op": "equals", "value": "nf-error-codes/1"},
       "message": "错误码登记册不在位或 schema 未自证",
@@ -186,6 +238,7 @@
     {
       "id": "injection-profiles-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/injection_profiles.json", "key": "schema", "op": "equals", "value": "nf-injection-profiles/1"},
       "message": "注入预算档位册不在位或 schema 未自证",
@@ -195,6 +248,7 @@
     {
       "id": "boundaries-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/boundaries.json", "key": "schema", "op": "equals", "value": "nf-boundaries/1"},
       "message": "边界登记册不在位或 schema 未自证",
@@ -204,6 +258,7 @@
     {
       "id": "path-moved-face",
       "severity": "fail",
+      "capability": "CAP_IDENTITY_QUALIFIED",
       "kind": "json_value",
       "params": {"path": "protocol/path_moved.json", "key": "schema", "op": "equals", "value": "nf-path-moved/1"},
       "message": "路径迁移映射不在位或 schema 未自证",
@@ -213,6 +268,7 @@
     {
       "id": "declined-face",
       "severity": "fail",
+      "capability": "CAP_LIFECYCLE_LEGAL",
       "kind": "json_value",
       "params": {"path": "protocol/declined.json", "key": "schema", "op": "equals", "value": "nf-declined/1"},
       "message": "被否决候选留档不在位或 schema 未自证",
@@ -222,6 +278,7 @@
     {
       "id": "schema-pins-face",
       "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
       "kind": "json_value",
       "params": {"path": "protocol/schema_pins.json", "key": "schema", "op": "equals", "value": "nf-schema-pins/1"},
       "message": "版本钉扎样本册不在位或 schema 未自证",
@@ -231,6 +288,7 @@
     {
       "id": "requirements-face",
       "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
       "kind": "json_value",
       "params": {"path": "protocol/requirements.json", "key": "schema", "op": "equals", "value": "nf-requirements/1"},
       "message": "需求登记册不在位或 schema 未自证",

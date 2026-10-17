@@ -51,9 +51,9 @@
       "max_fn_lines": 50
     },
     "desktop/src/core/assertions.py": {
-      "lines": 151,
-      "max_fn_cc": 21,
-      "max_fn_lines": 29
+      "lines": 247,
+      "max_fn_cc": 24,
+      "max_fn_lines": 73
     },
     "desktop/src/core/asset_contract.py": {
       "lines": 1173,
@@ -191,7 +191,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/conformance_report.py": {
-      "lines": 391,
+      "lines": 395,
       "max_fn_cc": 8,
       "max_fn_lines": 26
     },
@@ -1366,7 +1366,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7490,
+      "lines": 7497,
       "max_fn_cc": 115,
       "max_fn_lines": 1251
     },

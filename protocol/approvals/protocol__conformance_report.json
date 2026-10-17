@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-17",
-  "approved_by": "门禁能力化批（原子层显式化）",
-  "note": "原子层落地：core/atoms/* + test_atoms",
+  "approved_by": "门禁能力化批（能力面挂账）",
+  "note": "能力元数据落地：capability_vocabulary/index + 断言 capability",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "2c2e9f8b65bf1a369159515638708d2f10e24526702c42e1654dbf095d78da25"
+  "subject_digest": "21828c5325137cc635cb45d51208efd5622526c5222d40f52b3cafd6c2002235"
 }

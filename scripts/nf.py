@@ -4530,13 +4530,20 @@ def _cmd_assertions(args):
     from core import assertions as at
     import json as _json
     results, issues = at.run(ROOT)
+    cap_stats = at.capability_report(ROOT)[1]
     if args.json:
         print(_json.dumps({"kind": "assertions", "results": results,
-                           "issues": issues},
+                           "capabilities": cap_stats, "issues": issues},
                           ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print("== nf assertions（%d 条 · kind 封闭集 %s）=="
               % (len(results), "/".join(at.KINDS)))
+        if cap_stats.get("declared"):
+            print("  能力面：%d 个能力 · 覆盖 check %d/%d · 挂账断言 %d/%d%s"
+                  % (cap_stats["capabilities"], cap_stats["covered"], cap_stats["checks"],
+                     cap_stats["mapped_assertions"], cap_stats["assertions"],
+                     (" · 聚合独占：%s" % ",".join(str(n) for n in cap_stats["aggregate_only"]))
+                     if cap_stats.get("aggregate_only") else ""))
         for r in results:
             print("  [%s] %-38s %s" % ("PASS" if r["ok"] else "FAIL", r["id"], r["detail"]))
         for i in issues:

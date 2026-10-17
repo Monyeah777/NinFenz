@@ -3,14 +3,14 @@
     "code_metrics": {
       "cmd": "python scripts/code_metrics.py",
       "exit_code": 0,
-      "output_sha256": "87fe20925171819b0bfb1275be4f3f504f1fa5d35de5b9a9b5698c8dab451313",
-      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 296（基线 296）· 最大行数 7490 · 最长函数 1251 行 · 最大圈复杂度 115",
+      "output_sha256": "6e1eb0d0d1d6f3a759554d72ffa41ac48fb69e5750e8c71474ca7f4aa698e16a",
+      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 296（基线 296）· 最大行数 7497 · 最长函数 1251 行 · 最大圈复杂度 115",
       "ran_at": "2026-10-17"
     },
     "conformance": {
       "cmd": "python scripts/nf.py conformance",
       "exit_code": 0,
-      "output_sha256": "00db6e95efcda92ba29e04b621f68fe601b877c86aad357e86c60b17b29bb361",
+      "output_sha256": "2ae228a7ef6e9828fdbc495a82c73268f1c05060a27224d343ebf2dd5b4cf712",
       "output_tail": "  ✓ mcp-package                    工具 10 · 提示 1 · 类目 content-creation · 目标平台 4\n  ✓ state-front                    单件 0 · 族规则 1 · 族成员 3\n  ✓ public-surface                 公开导出面零泄漏",
       "ran_at": "2026-10-17"
     },
@@ -30,9 +30,9 @@
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
-      "exit_code": 0,
-      "output_sha256": "00d6e508b42173f07e7aa82e57c981c7a9a712989f889d8adb33e3f304ff198b",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-40 / PASS=72 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
+      "exit_code": 1,
+      "output_sha256": "0c93056d9429f4e4e05b22573bbb8aab21e70f058810ccdf09ea5904ce7be93e",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-40 / PASS=72 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=17c0356a3487 实测=151ed830faf2）（修复指引：重跑 python scripts/verify_report.py --write）",
       "ran_at": "2026-10-17"
     },
     "stats_check": {

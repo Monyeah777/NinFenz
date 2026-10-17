@@ -264,8 +264,12 @@ def _c_assertions(root: str) -> Tuple[bool, str]:
     from core import assertions as at
     results, issues = at.run(root)
     passed = sum(1 for r in results if r["ok"])
+    cap = at.capability_report(root)[1]
     detail = "断言 %d 条（通过 %d）· kind 封闭集 %d 种" % (
         len(results), passed, len(at.KINDS))
+    if cap.get("declared"):
+        detail += " · 能力 %d 个覆盖 check %d/%d" % (
+            cap["capabilities"], cap["covered"], cap["checks"])
     return (not issues, detail if not issues else "; ".join(issues[:2]))
 
 
