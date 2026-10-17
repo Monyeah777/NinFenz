@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:727d991b74783c1201db8c1ef2bebe6aef526f285e04aff69d698d83f022bb65
+  - protocol/code_metrics_baseline.json:419ac2e2b4d6904180337f89375c9dc52a92b476b9dbeefec999b32afbc6d41e
 ---
+> 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步
+
 > 重审（2026-10-17）：步骤4：卡册扩段D（check41/42）+ 生成器识别段名直写
 
 > 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块

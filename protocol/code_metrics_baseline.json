@@ -116,9 +116,9 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/build_isolation.py": {
-      "lines": 152,
+      "lines": 157,
       "max_fn_cc": 14,
-      "max_fn_lines": 32
+      "max_fn_lines": 34
     },
     "desktop/src/core/calibration_state.py": {
       "lines": 23,
@@ -1376,9 +1376,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7504,
+      "lines": 7523,
       "max_fn_cc": 115,
-      "max_fn_lines": 1251
+      "max_fn_lines": 1253
     },
     "scripts/nf_client.py": {
       "lines": 189,

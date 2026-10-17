@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:1c7cc5069aaa48b5804f0efd2f4bdd522166a3c070a549506789b6e292d499be
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
-  - scripts/nf.py:b01388e804ceb9648d4f1947031f6455a96ca8bb0cb35269f847993143d34c2a
+  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步
+
 > 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块
 
 > 重审（2026-10-17）：拆聚合门：check32/33/35/36 失败逐条透出（只动 bash 呈现层）

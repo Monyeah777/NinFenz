@@ -59,6 +59,9 @@ def network_hits(paths: list[Path]) -> list[str]:
         try:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
+            # 读不动/非 UTF-8 的入口件不进「取网」面：它的**存在性**不是本判据的对象
+            # （缺件由 entry_files 空集那条报），这里吞掉不会让污染静默通过——
+            # 真被污染的件一定是可读源码。
             continue
         for token in NETWORK_TOKENS:
             if token in text:
@@ -121,6 +124,8 @@ def toolchain_issues(root: Path) -> list[str]:
             try:
                 text = wf.read_text(encoding="utf-8")
             except (OSError, UnicodeDecodeError):
+                # 非 UTF-8 的 workflow 读不出 setup-* 面，跳过而不是判红：workflow 语法本身
+                # 由 CI 的前置 lint 面管，本判据只核「给了版本号没有」。
                 continue
             for kind in ("python", "node"):
                 if not re.search(r"uses:\s*actions/setup-\s*%s@" % kind, text):

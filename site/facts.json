@@ -56,8 +56,8 @@
   "facts": [
     {
       "id": "quality",
-      "claim_zh": "质量凭证：verify v2.30 · check1-40 · PASS=72",
-      "claim_en": "Quality evidence: verify v2.30 · check1-40 · PASS=72",
+      "claim_zh": "质量凭证：verify v2.30 · check1-42 · PASS=76",
+      "claim_en": "Quality evidence: verify v2.30 · check1-42 · PASS=76",
       "entry_point": "bash verify.sh",
       "anchor": "https://ninfenz.dev/#fact-quality",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
@@ -131,7 +131,7 @@
   "citation": {
     "plain": "NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz",
     "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-40 · PASS=72}}",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-42 · PASS=76}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {

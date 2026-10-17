@@ -486,6 +486,8 @@ def _make_parser() -> argparse.ArgumentParser:
                     help="HMAC 密钥文件 → 签发/校验 hmac-sha256 级 attestation")
     at.add_argument("--verify", default="",
                     help="校验既有 attestation JSON（缺省 = 生成模式）")
+    at.add_argument("--selfcheck", action="store_true",
+                    help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
     sc = sub.add_parser("score",
                         help="基线相对回归评分（Codecov 式：当前 vs 基线，no silent worsening）",
@@ -2978,6 +2980,23 @@ def _cmd_attest(args):
     """nf attest：内容 attestation 生成/校验（三级信任；缺锚一律拒绝）。"""
     from core import attest
     import json as _json
+    if getattr(args, "selfcheck", False):
+        # 机制体检（2026-10-17）：check42 是门禁侧入口，这一面是**用户侧**入口——
+        # 让「验签方 ≠ 签名方」这条结论随时可复跑，而不必等全量门禁。
+        from core import provenance_external as pex
+        issues, stats = pex.scan(ROOT)
+        if args.json:
+            print(_json.dumps({"kind": "attest-selfcheck", "ok": not issues,
+                               "issues": issues, "stats": stats},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf attest --selfcheck（外部验签机制体检）==")
+            for i in issues:
+                print("  [FAIL] %s" % i, file=sys.stderr)
+            if not issues:
+                print("  ✓ 独立子进程验签通过 · 篡改必红 · 外锚=%s"
+                      % ("在场" if stats.get("external_anchor") else "缺位（如实登记）"))
+        return 1 if issues else 0
     try:
         if args.verify:
             # 形状闸门（2026-09-30）：`--verify <目录>` 此前落到 open(dir) 抛

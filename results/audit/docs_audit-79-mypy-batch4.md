@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:727d991b74783c1201db8c1ef2bebe6aef526f285e04aff69d698d83f022bb65
+  - protocol/code_metrics_baseline.json:419ac2e2b4d6904180337f89375c9dc52a92b476b9dbeefec999b32afbc6d41e
 ---
+> 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步
+
 > 重审（2026-10-17）：步骤4：卡册扩段D（check41/42）+ 生成器识别段名直写
 
 > 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块

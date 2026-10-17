@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - scripts/nf.py:b01388e804ceb9648d4f1947031f6455a96ca8bb0cb35269f847993143d34c2a
+  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:d4b4423c3f28927bb23ea5354e7d656252dbd84c2341d94a11cd1b7165d83de5
 
 ---
+> 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步
+
 > 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块
 
 > 重审（2026-10-17）：拆聚合门：check32/33/35/36 失败逐条透出（只动 bash 呈现层）

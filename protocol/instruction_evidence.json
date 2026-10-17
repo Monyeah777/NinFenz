@@ -3,8 +3,8 @@
     "code_metrics": {
       "cmd": "python scripts/code_metrics.py",
       "exit_code": 0,
-      "output_sha256": "15467379abc25a117f7a2bbe37259bc8501c7f1e2ada24d754f8ae823091e94a",
-      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 298（基线 298）· 最大行数 7504 · 最长函数 1251 行 · 最大圈复杂度 115",
+      "output_sha256": "90307ce0b7738645f18c917d85751ced2b80f429b4f820fd58aef6b9bbaca3e0",
+      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 298（基线 298）· 最大行数 7523 · 最长函数 1253 行 · 最大圈复杂度 115",
       "ran_at": "2026-10-17"
     },
     "conformance": {
@@ -30,9 +30,9 @@
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
-      "exit_code": 0,
-      "output_sha256": "9d31434a7ca350fcac5889237c95c5f2923fcf4e8ef414e0530af88a1327af26",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
+      "exit_code": 1,
+      "output_sha256": "5215e8bd6d4058de6133930db6ae151f58b44eb7b02dbede3abbce96c1b03a4f",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=5ae7f3a1959f 实测=5c94bc54a339）（修复指引：重跑 python scripts/verify_report.py --write）",
       "ran_at": "2026-10-17"
     },
     "stats_check": {

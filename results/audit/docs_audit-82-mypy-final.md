@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:a35c6dda1796f9bdb1b94a35327f2b162c6a5534253480d3e0043729ccc35e27
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:727d991b74783c1201db8c1ef2bebe6aef526f285e04aff69d698d83f022bb65
+  - protocol/code_metrics_baseline.json:419ac2e2b4d6904180337f89375c9dc52a92b476b9dbeefec999b32afbc6d41e
 ---
+> 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步
+
 > 重审（2026-10-17）：步骤4：卡册扩段D（check41/42）+ 生成器识别段名直写
 
 > 重审（2026-10-17）：步骤4：新增 check41/42（构建隔离 + 不可伪造 provenance）与对应判据模块
