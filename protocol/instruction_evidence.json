@@ -30,9 +30,9 @@
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
-      "exit_code": 0,
-      "output_sha256": "9d31434a7ca350fcac5889237c95c5f2923fcf4e8ef414e0530af88a1327af26",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
+      "exit_code": 1,
+      "output_sha256": "00d388f2fe5e23c8843a9ce8b963116e18e449d542387a74eb41f9b8114d68dd",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 28 · FAIL 1 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✗ protocol/verification_report.json 与实时重算不一致（记录=39b97604731c 实测=e4ac19969a83）（修复指引：重跑 python scripts/verify_report.py --write）",
       "ran_at": "2026-10-17"
     },
     "stats_check": {

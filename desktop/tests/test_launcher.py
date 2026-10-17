@@ -181,6 +181,20 @@ class LongRunningNeverTakesTheFastPathTest(unittest.TestCase):
         home = tempfile.mkdtemp(prefix="nf_longrun_")
         self.addCleanup(shutil.rmtree, home, ignore_errors=True)
         env = dict(os.environ, NARRATIVE_FORGE_HOME=home)
+        # P1（2026-10-17 实测）：此前只把 home 放进**子进程** env，而 `dm.start` 在**本进程**里
+        # 读环境变量——于是守护起在环境默认 home，子进程却指向 temp home，两边不是同一个守护：
+        # 这条判据于是"看起来绿"但根本没验到「守护在跑时的快路」。必须同时改本进程环境。
+        old_home = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = home
+
+        def _restore_home():
+            if old_home is None:
+                os.environ.pop("NARRATIVE_FORGE_HOME", None)
+            else:
+                os.environ["NARRATIVE_FORGE_HOME"] = old_home
+
+        # 注册顺序很重要（cleanup 是 LIFO）：先注册还原，再注册停守护 ⇒ 停守护时 env 仍指向 temp home。
+        self.addCleanup(_restore_home)
         ok, msg = dm.start(Path(ROOT), idle_timeout=120.0)
         self.addCleanup(dm.stop)
         self.assertTrue(ok, "守护启动失败：%s" % msg)

@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 218,
-    "verify": 929
+    "verify": 930
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6953,7 +6953,7 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "",
+      "function": "tests 包：套件级隔离（P1：单模块跑与全量跑必须看到同一初始态）。",
       "path": "desktop/tests/__init__.py",
       "role": "verify",
       "rule": "R-verify"
@@ -8821,6 +8821,12 @@
     {
       "function": "子 check 缓存（`core/subcheck_cache.py`）的判据：**命中即等价，且绝不假命中**。",
       "path": "desktop/tests/test_subcheck_cache.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "套件级隔离的**契约测试**（P1）：单模块跑与全量跑必须看到同一初始态。",
+      "path": "desktop/tests/test_suite_isolation.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11838,7 +11844,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5ae330ab5727fb4573b05c11e58903f809256f146df4a96c494e245712d86169",
+  "root_digest": "f8e86e84d1076e687f74a3ae198aca4c5f7e8880280d792625610acaa04677c1",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 82,
@@ -11847,7 +11853,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 111,
-    "R-verify": 814,
+    "R-verify": 815,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"
