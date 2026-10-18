@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:a4ad9b0e0d2cbddf65fc75ba649130a88dba65623db1e9d376f486da8e9ac18c
-  - protocol/code_metrics_baseline.json:78cc3130bb99f45316479377bb9efa174601c95049fec65db2b0e61592338ffc
+  - protocol/code_metrics_baseline.json:344d1dcb8e10a0d33ba62b4a1854cdaf2923f5878b35d309e0a73d32f1d2b15b
 ---
+> 重审（2026-10-18）：队列改动后重冻度量
+
 > 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
 
 > 重审（2026-10-18）：mcp_runtime 增长后重冻度量上限（评审：+16 行，MCP 工具面扩充）

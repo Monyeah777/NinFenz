@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-18",
   "approved_by": "门禁提速批（B1）",
-  "note": "收口",
+  "note": "度量重冻",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "953a0b7db6e243bc7fafbefe9e16bea5b1d62f7ecd3af8dedf982026f4bdd81b"
