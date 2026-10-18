@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:6ab8113d79929e1904a5085c8349a7fae201007a35f5460d46938252c6013533
-  - protocol/code_metrics_baseline.json:ed09b0c2715953168b757aeb0689364b3910889d2ba4bfcf21ddc87bbc3608bb
+  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
+
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线
 
 > 重审（2026-10-18）：asset_read 第三轮：84→74 词，压缩替代方案括号

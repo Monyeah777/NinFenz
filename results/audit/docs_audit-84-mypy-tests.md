@@ -25,7 +25,7 @@ subjects:
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
-  - desktop/tests/test_daemon_parity.py:a315a960b69c23f19489e867118b2f781a5dd128c6a5e570785d1a0c28fa26fc
+  - desktop/tests/test_daemon_parity.py:545d1b87339bf83b570e40a16b20d87b3b999cfc6fa5491621aeb537d52a1bb5
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
   - desktop/tests/test_cli_json_face.py:9d6e724fec4ebfdf170b6123f96c9c9ffe5626bb19d92078b076ace94b0c3659
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - desktop/tests/test_nf_cli.py:4ddd00ad386d0e35e3bc717db777fda922019e1fd1f38580ef8912bdac682220
 ---
+> 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
+
 > 重审（2026-10-18）：Glama coherence：新增 pattern_ls/asset_ls；asset_read 兼容别名；同步 12 工具面
 
 > 重审（2026-10-18）：Glama coherence：asset_get→asset_read（旧名兼容别名）+ 协议边界描述；行尾规范为 LF

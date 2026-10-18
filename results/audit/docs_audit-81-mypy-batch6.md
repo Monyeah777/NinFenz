@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:ed09b0c2715953168b757aeb0689364b3910889d2ba4bfcf21ddc87bbc3608bb
+  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
+
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线
 
 > 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）

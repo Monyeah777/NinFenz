@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
+from core import json_doc  # noqa: E402
 from core import verify_report as vr  # noqa: E402
 
 #: 真仓报告**按根缓存**（本文件 7 条判据都要读同一棵真仓）。
@@ -37,14 +38,17 @@ def repo_report(root=None):
 
 class BuildTest(unittest.TestCase):
     def test_build_is_deterministic(self):
-        """两次**独立**构建必须同根。
+        """两次**独立**构建必须同根（判据不放松：仍是两份独立算出来的报告）。
 
-        P2（2026-10-17 实测）：一次 build 在真仓要 22–30 s，原先这里连建两次 = 55 s。
-        现改为「缓存的首跑 + 一次独立重算」——仍然是两次独立构建的比较（缓存的那次是
-        本进程内真跑出来的，不是落盘件），判据不放松，省掉一次 27 s。
+        P2（2026-10-17 → 10-18 实测）：一次 build 在真仓要 40 s 上下，连续两次 = 80 s。
+        现在第一份取**已提交的报告**——它是**另一个进程、另一个时刻**对该树算出来的
+        （更强意义上的独立构建），本进程只再算一份来比 root_digest。
+        「提交件是否新鲜」由 `RealRepoTest.test_committed_report_is_fresh` 单独判，
+        两者合起来仍然覆盖「同树同根 + 跨进程同根」。
         """
-        a, b = repo_report(), vr.build(str(ROOT))
-        self.assertEqual(a["root_digest"], b["root_digest"],
+        committed = json_doc.load(ROOT / vr.REPORT_REL, dict, what=vr.REPORT_REL)
+        live = vr.build(str(ROOT))
+        self.assertEqual(committed["root_digest"], live["root_digest"],
                          "同一棵树两次构建必须同根（否则报告不可核验）")
 
     def test_items_cover_declared_specs(self):

@@ -1080,7 +1080,6 @@
     "desktop/tests/test_daemon.py::UP031": 28,
     "desktop/tests/test_daemon_limits.py::RUF100": 2,
     "desktop/tests/test_daemon_limits.py::UP031": 2,
-    "desktop/tests/test_daemon_parity.py::E501": 1,
     "desktop/tests/test_daemon_parity.py::I001": 1,
     "desktop/tests/test_daemon_parity.py::UP017": 1,
     "desktop/tests/test_daemon_parity.py::UP031": 20,

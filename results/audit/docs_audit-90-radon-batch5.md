@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:ed09b0c2715953168b757aeb0689364b3910889d2ba4bfcf21ddc87bbc3608bb
+  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
+
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线
 
 > 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）

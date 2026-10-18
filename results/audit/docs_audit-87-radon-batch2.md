@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:ed09b0c2715953168b757aeb0689364b3910889d2ba4bfcf21ddc87bbc3608bb
+  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
+
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线
 
 > 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）

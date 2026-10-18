@@ -81,8 +81,12 @@ ALWAYS_MODULES = frozenset({
     "test_verify_report", "test_conformance_scan", "test_conformance_run",
     "test_style_ratchet", "test_purity_scan", "test_dead_code", "test_role_model",
     "test_doc_reachability", "test_live_doc_counts", "test_net_coverage",
-    "test_suite_isolation", "test_npm_package", "test_asset_ledger_projection",
+    "test_suite_isolation", "test_asset_ledger_projection",
 })
+
+#: 明确**不进**常驻集：`test_npm_package` 判的是 payload 清单与 HEAD 一致——那只在
+#: 发布/推送前才有意义（`--full` 与 `nf release` 都会跑它），把它塞进开发回路的常驻集
+#: 只会让每次提交后都"红到重暂存"为止（2026-10-18 实测：单次 28 s，且并发会话下必红）。
 
 _CORE_REF = (
     r"(?:from\s+core\s+import\s+([A-Za-z0-9_,\s]+)"
