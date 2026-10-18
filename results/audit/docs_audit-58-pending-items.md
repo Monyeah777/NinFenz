@@ -6,13 +6,13 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:3de864c14756215c8472013a548dcc20f4bf7f1e4eea2592dc7369a6d566efe7
+  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/mcp_runtime.py:327a7024a365af35af7f2b2761f56d6acaa8507a4cd6ee15f9f0fa76f79d80bb
+  - desktop/src/core/mcp_runtime.py:bfc862b42a6f99ae6cdd1a36f127d4e6b8881d6fc37ac1b3399adf6c37cc45bf
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
+
 > 重审（2026-10-18）：asset_read 第四轮：109 词 5 段 + 输出形状 + package 交互
 
 > 重审（2026-10-18）：asset_read：补 package 只缩文件集不改 key 匹配（参数交互）

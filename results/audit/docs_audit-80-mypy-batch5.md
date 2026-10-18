@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:327a7024a365af35af7f2b2761f56d6acaa8507a4cd6ee15f9f0fa76f79d80bb
+  - desktop/src/core/mcp_runtime.py:bfc862b42a6f99ae6cdd1a36f127d4e6b8881d6fc37ac1b3399adf6c37cc45bf
   - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
+
 > 重审（2026-10-18）：asset_read 第四轮：109 词 5 段 + 输出形状 + package 交互
 
 > 重审（2026-10-18）：asset_read：补 package 只缩文件集不改 key 匹配（参数交互）

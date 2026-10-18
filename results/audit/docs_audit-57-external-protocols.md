@@ -6,11 +6,11 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:3de864c14756215c8472013a548dcc20f4bf7f1e4eea2592dc7369a6d566efe7
+  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - desktop/src/core/mcp_runtime.py:327a7024a365af35af7f2b2761f56d6acaa8507a4cd6ee15f9f0fa76f79d80bb
+  - desktop/src/core/mcp_runtime.py:bfc862b42a6f99ae6cdd1a36f127d4e6b8881d6fc37ac1b3399adf6c37cc45bf
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
+
 > 重审（2026-10-18）：asset_read 第四轮：109 词 5 段 + 输出形状 + package 交互
 
 > 重审（2026-10-18）：asset_read：补 package 只缩文件集不改 key 匹配（参数交互）

@@ -383,10 +383,11 @@ Purpose/Usage/Behavior/Completeness 5，Params 4，CS 4）→ 74 词压缩版 **
 
 结论：这个工具的瓶颈不是字数，而是 **可读结构 + 输出形状**。压缩成括号/斜杠列表会掉分。
 
-第四轮（本版，109 词，目标 5）：
+第五轮（本版，100 词，标准合规版）：
 
-- 改成 **5 个短段落**：目的 → 使用/替代 → key/package 语义 → 匹配 → 默认/错误；
-- 补回输出形状：`returning package, file path, and text`（此前 74 词版删掉后 Behavior 掉到 4）；
+- 按 TDQS 风格指南的 **50–100 词**上限，从 109 压到 **100 词**；
+- 保留 **5 个短段落**：目的+返回 → 使用/替代 → key/package 语义 → 匹配/限制 → 默认/错误；
+- 补回输出形状：`returning package, path, and text`（此前 74 词版删掉后 Behavior 掉到 4）；
 - 补参数交互：`package` 只缩文件集、**never changes key matching**（此前 Params 4 的原因）；
 - 保留 no glob/regex/package/path/prose、exact directory、no fallback、扫描文件名或前 6000
   字符、多匹配、无匹配即错误；
@@ -395,6 +396,43 @@ Purpose/Usage/Behavior/Completeness 5，Params 4，CS 4）→ 74 词压缩版 **
 > Glama Directory API key（`glm_...`）只覆盖 `/v1/servers` 等只读查询；其 OpenAPI 没有
 > build/release 端点。Admin 的 Deploy / Make Release 必须用浏览器 OAuth 会话点，API key
 > 不能代替。该 key 只用于本地核对 `qualityScore=4.6`，用后已清空、未入库。
+
+## 15. 专业标准对比（2026-10-18）
+
+不是只看 Glama 的六维 rubric；把 MCP 规范、Anthropic 官方 tool design、TDQS 风格指南和两篇
+MCP 描述实证研究放在一起对照，结论更清楚。
+
+### 15.1 参考标准
+
+| 标准 | 核心要求 | 对本仓的含义 |
+|---|---|---|
+| [MCP Tools 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools) | `name` / `title` / `description` / `inputSchema` / `outputSchema` / annotations；错误语义；确定性顺序 | 我们已齐全；`structuredContent` + 文本 fallback |
+| [Anthropic Tool Design](https://github.com/anthropics/claude-plugins-official/blob/main/plugins/mcp-server-dev/skills/build-mcp-server/references/tool-design.md) | 描述是契约：做什么、返回什么、**不做什么**；兄弟工具互相指向；参数逐个说明；错误可恢复；1–15 工具最佳 | 本仓 12 工具；`asset_read` 明确不用来枚举/读模块/读管线 |
+| [TDQS rubric](https://github.com/glama-ai/tool-definition-quality-score) + [风格指南](https://github.com/logly/mureo/blob/main/docs/tdqs-style-guide.md) | 六维；模板“动词+资源 → 返回 → 副作用 → 默认值 → when/prefer”；典型 50–100 词，复杂工具最多约 150 | `asset_read` 从 109 压到 **100 词**，正好落在上限 |
+| [MCP Tool Descriptions Are Smelly! (2602.14878)](https://arxiv.org/abs/2602.14878) | 六个组件：Purpose / Guidelines / Limitations / Parameter Explanation / Length & Completeness / Examples；97.1% 描述至少一个 smell，56% 目的不清；全量增补提升成功率但增加 67% 步骤 | 我们覆盖前五项；Examples 由 schema 示例承担，避免为凑组件加长 |
+| [From Docs to Descriptions (2602.18914)](https://arxiv.org/abs/2602.18914) | 四维：accuracy / functionality / information completeness / conciseness，18 类 smell；10,831 服务器；标准合规描述在竞争场景 72% 选中 vs 20% 基线 | 本仓优先 accuracy/functionality；`asset_read` 的 accuracy（精确匹配/不回退）已写死 |
+
+### 15.2 4.6 这一版的对照结论
+
+4.6 的 74 词版本同时踩了两条：
+
+1. **Conciseness**：把替代工具压成 `(enumerate: asset_ls; other resources: …)` 的括号/斜杠列表，
+   违反 TDQS 风格指南的“句子可解析、不要压缩成单块”；
+2. **Contextual Completeness / Behavior**：为压字数删掉 `returning package, file path, and text`
+   与 `package only narrows files, never key matching`，而这两条正是六组件里的
+   Parameter Explanation / Limitations。
+
+所以它不是“内容不够”，而是**为了短而牺牲了标准要求的组件**。这版 100 词改成 5 个短段落：
+Purpose+Returns → Usage/Alternatives → Key/Package → Matching/Limitations → Default/Error，
+与 TDQS 模板和 Anthropic 的“what / returns / doesn't do”一致。
+
+### 15.3 决策
+
+- `asset_read` 不再继续压到 70 词以下：会丢 Limitations 或 Returns，按上述标准反而降分；
+- 100 词是“复杂只读工具”的合理上限；如果 Glama 仍给 4.8，属于评分器对 100% schema 覆盖工具
+  Parameters/CS 的软上限，接受并进入下一个工具；
+- 下一个 `module_read` 按同一模板改：Purpose+Returns → Usage/Alternatives → ID 语义 →
+  Limitations/Error → 默认；不再用括号压缩。
 
 ## 附录：官方参考
 

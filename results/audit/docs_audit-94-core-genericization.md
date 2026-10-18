@@ -32,9 +32,11 @@ subjects:
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
-  - verify.sh:3de864c14756215c8472013a548dcc20f4bf7f1e4eea2592dc7369a6d566efe7
+  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
 
 ---
+> 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
+
 > 重审（2026-10-18）：P2：分片数按核数自适应
 
 > 重审（2026-10-18）：P3：分层档位 + 判定缓存 + 受影响测试选择
