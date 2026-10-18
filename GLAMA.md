@@ -456,30 +456,37 @@ asset_read      -> Fetch asset content
 
 重跑 lint：12/12 `titleIsMeaningful=true`，仍 0 findings / 0 shadow。
 
-### 15.4 本地模型评分（DeepSeek Flash）
+### 15.4 本地模型评分（DeepSeek v4-pro）
 
-用用户提供的 OpenAI-compatible key 跑官方 `tdqs score`（模型 `deepseek-flash`）：
+用官方 `tdqs score` 连跑两次（模型 `deepseek-v4-pro`），结果稳定：
 
 ```text
-server: overall 4.6 A · descriptionQuality 4.6 · coherence 4.5
-asset_read: 4.8 A
-Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Conciseness 4
+server: overall 4.8 A · descriptionQuality 4.9 · coherence 4.5
+mean 4.9 · min 4.8
 ```
 
-最好的一次 `asset_read` 是 **4.9**（99 词、带 `found` 字段的版本）；当前 102 词版本
-4.8，差异主要是模型评分噪声，不是结构性退化。
+逐工具：`knowledge_order 5.0`、`module_read 5.0`、`library_search 5.0`（一次 4.9），
+其余 4.8–4.9；`asset_read 4.9`。仅剩 Conciseness / Parameters 的 4（100% schema 覆盖
+工具的软上限）。
 
-本轮还修了一个真实的一致性缺口：`asset_read` 的 outputSchema 原有 `found` 布尔，
-但无匹配时实际返回错误而不是 `found=false`。已从 outputSchema / 返回值中删除 `found`，
-只保留 `key` + `matches`；这让 “No match is an error” 与 schema 不再冲突。
+本轮按评分器 justification 补的真实信息：
+
+- `pipeline_ls`：只返回 metadata、按路径排序、query 不匹配正文；
+- `spec_ls`：缺/坏 registry 是错误，包按 registry 顺序；
+- `registry_query`：只读 registry.json，不扫描模块/管线文件，不匹配描述/路径/正文；
+- `library_search`：`limit` 是合并列表硬上限，catalog 命中在前，可能挤掉文档命中；
+- `library_read` / `pattern_read` / `pipeline_read` / `module_read`：full text / no truncation；
+- `knowledge_order`：clearance 是可见性上限（public ⊂ internal ⊂ restricted），本地无 auth/网络；
+- `asset_ls`：包内无匹配返回空列表，不是错误；keys 排序且无上限；
+- `asset_read`：删除 outputSchema 的 `found`，无匹配统一走错误，schema 与行为一致。
 
 ### 15.5 决策
 
-- `asset_read` 不再继续压到 70 词以下：会丢 Limitations 或 Returns，按上述标准反而降分；
-- 100 词是“复杂只读工具”的合理上限；如果 Glama 仍给 4.8，属于评分器对 100% schema 覆盖工具
-  Parameters/CS 的软上限，接受并进入下一个工具；
-- 下一个 `module_read` 按同一模板改：Purpose+Returns → Usage/Alternatives → ID 语义 →
-  Limitations/Error → 默认；不再用括号压缩。
+- 目标 **overall ≥ 4.8** 已达成；不再为 5.0 继续压缩，否则会丢 Returns/Limitations；
+- coherence 4.5 的缺口是结构性（没有 `spec_read`、没有全量 `library_list`），加工具会破坏
+  12 工具面，收益不抵成本；
+- 下一步：把 `0fe2e8bb` 之后的本轮改动推送，等 Glama 重新自省；若 Glama 仍显示旧分，
+  只需一次 Build/Release，不再逐词微调。
 
 ## 附录：官方参考
 

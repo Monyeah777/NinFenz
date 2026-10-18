@@ -345,13 +345,14 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "List NF pipelines as path/title metadata from 03_管线库 and "
-            "community/*/pipelines. Use it to discover a pipeline ID or relative path "
-            "before pipeline_read; do not use it to fetch pipeline text (use pipeline_read "
-            "instead), module metadata (registry_query), or protocol packages (spec_ls). The "
-            "optional query is a case-sensitive substring matched against the relative "
-            "path and H1 title; omit it to list every pipeline (examples: P04, 技术文档, "
-            "校园). No matches yields an empty list; each call rescans the local "
-            "repository."),
+            "community/*/pipelines. Use it to discover a pipeline ID before pipeline_read; "
+            "do not use it to fetch pipeline text (use pipeline_read instead), module "
+            "metadata (registry_query), or protocol packages (spec_ls). The optional query is a "
+            "case-sensitive substring of the repository-relative path or H1 title, not "
+            "file content; wildcard characters are literal. Omit it to list every pipeline "
+            "(examples: P04, 技术文档, 校园). Returns metadata only, never pipeline bodies, "
+            "sorted by repository path; no matches yields an empty list, and each call "
+            "rescans the repository."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -395,7 +396,8 @@ TOOL_DEFS = [
             "(registry_query) or pipelines (pipeline_ls), and do not treat protocol hits "
             "from registry_query as a substitute for this list. Takes no arguments; an "
             "empty list means the registry declares no protocols. Reads one local file "
-            "deterministically."),
+            "deterministically; a missing or malformed registry is an error. Packages "
+            "appear in registry order."),
         # 2026-10-08 删除已声明的 `tier`：registry 的 protocols 里**没有分级字段**，过滤从未实现
         # （实测：传任意 tier 返回完全相同的全量清单，结果里也没有 tier 字段）——「声明了不生效」
         # 是静默降级，比缺个参数更坏；宁可不声明。若将来 registry 补了分级数据，再连同实现一起加回。
@@ -443,10 +445,11 @@ TOOL_DEFS = [
             "Query the NF registry for modules whose id or name contains query. Use it to "
             "resolve a module ID before module_read; do not use it for the authoritative "
             "protocol package catalog (spec_ls) or free-text document search "
-            "(library_search). Matching is case-sensitive, query is required (examples: "
-            "M90, 技术文档域包), and an empty query matches every entry. Results are grouped "
-            "under modules and protocols; protocol hits are secondary lookup, and no "
-            "matches yields empty arrays."),
+            "(library_search). Matching is case-sensitive; query is required, and an empty "
+            "query matches every entry (examples: M90, 技术文档域包). Results are grouped "
+            "under modules and protocols, with protocol hits secondary. Reads registry.json "
+            "only and never scans module or pipeline files; it never matches descriptions, "
+            "paths, or file contents, and no matches yields empty arrays."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -504,9 +507,10 @@ TOOL_DEFS = [
             "for library_read or to locate a doc or package README; do not use it for "
             "exact module or protocol metadata (registry_query / spec_ls). Catalog matching "
             "is case-insensitive and relevance-ranked; document hits match the filename or "
-            "H1 title as a case-sensitive substring. The combined result is capped by "
-            "limit (default 10); an empty query returns the first page of document hits "
-            "only, and no matches yields an empty list (examples: 叙事, verify, 校园)."),
+            "H1 title as a case-sensitive substring.\n\n"
+            "The combined list is capped by limit (1–50, default 10). Catalog hits come "
+            "first, so a full catalog page can hide document hits; an empty query returns "
+            "the first page of document hits only, and no matches yields an empty list."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -576,12 +580,12 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read one library catalog entry by ID, returning its frontmatter record and "
-            "full Markdown text. Use it after library_search resolves the ID; do not use "
+            "body. Use it after library_search resolves the ID; do not use "
             "it to search (library_search) or to read modules, pipelines, or assets "
             "(module_read / pipeline_read / asset_read). The ID is the canonical stem "
             "without the .md suffix and matching is case-insensitive (for example NF-1); "
             "an unknown ID returns an error carrying the requested value and repair "
-            "guidance. Reads one local file."),
+            "guidance. Reads one local file and returns its full text without truncation."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -626,9 +630,9 @@ TOOL_DEFS = [
             "List engineering patterns as id/path/title/status metadata from "
             "patterns/*/PATTERN.md, sorted by ID. Use it to discover a pattern ID before "
             "pattern_read; do not use it to fetch pattern text (use pattern_read instead) "
-            "or to list modules/assets (module_read / asset_ls). No matches yields an "
-            "empty list; "
-            "each call rescans the local patterns directory."),
+            "or to list modules/assets (module_read / asset_ls). Returns metadata only, "
+            "never the PATTERN.md body; no matches yields an empty list, and each call "
+            "rescans the local patterns directory."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -670,8 +674,9 @@ TOOL_DEFS = [
             "including frontmatter, rules, and a counterexample. Use it for the practice "
             "behind an NF rule; do not use it to enumerate patterns (pattern_ls) or read "
             "domain modules (module_read). pattern_id is the exact, case-sensitive "
-            "directory name such as fail-closed-verification, not the document title; an "
-            "unknown ID returns an error. Reads one local file."),
+            "directory name such as fail-closed-verification, not the document title. A "
+            "missing pattern is an error, not an empty result; reads one local file and "
+            "returns its full text without truncation."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -710,9 +715,10 @@ TOOL_DEFS = [
             "with each source's authority, kind, locator, label requirement, and "
             "visibility. Use it before assembling or citing NF content; do not use it to "
             "search documents (use library_search instead) or read module/asset bodies "
-            "(module_read / asset_read). Optional clearance (public, internal, or restricted) hides "
-            "sources above that visibility; use public before republishing material, or "
-            "omit it to keep all. Reads one local declaration."),
+            "(module_read / asset_read). Optional clearance is a visibility ceiling: public "
+            "keeps public sources, internal keeps public and internal, restricted keeps all. "
+            "Use public before republishing material, or omit it to keep all. Reads only "
+            "the declaration, never source bodies; local-only, with no auth or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -775,8 +781,9 @@ TOOL_DEFS = [
             "pipelines or assets (pipeline_read / asset_read). The ID is the declared "
             "machine-contract or heading ID (M90), or a qualified ID (通用:M10, as returned "
             "by registry_query), not the filename; matching is case-sensitive. An unknown "
-            "ID returns an error with the requested value and repair guidance; reads one "
-            "local file."),
+            "ID returns an error with the requested value and repair guidance. Returns the "
+            "resolved ID, path, contract presence, bytes, and full text from one local "
+            "file; it does not evaluate the contract."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -822,7 +829,9 @@ TOOL_DEFS = [
             "asset_read). "
             "pipeline is either a Pxx stem (P01, matched against the filename prefix) or a "
             ".md path under 03_管线库/ or a community pipelines/ directory; paths outside "
-            "those roots and .. escapes are rejected. Reads one local file."),
+            "those roots and .. escapes are rejected. A missing pipeline is an error, not "
+            "an empty result; reads one local file and returns its full text without "
+            "truncation."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -861,7 +870,9 @@ TOOL_DEFS = [
             "asset_read; do not use it to fetch asset text (asset_read) or to list "
             "modules/patterns (module_read / pattern_ls). Optional package restricts the "
             "scan to community/<package>/assets (for example 校园情感领域包); README.md "
-            "files are skipped. Each call rescans the local asset files."),
+            "files are skipped. A package with no matching files returns an empty list, not "
+            "an error.\n\n"
+            "Keys are sorted and uncapped; each call rescans the local asset files."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
