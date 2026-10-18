@@ -338,7 +338,7 @@ class RealToolFaceDispatchTest(unittest.TestCase):
     """端到端：**真工具面**（`core.mcp_runtime.TOOL_DEFS` + `TOOL_HANDLERS`）→ 编译 → 派发 → 证据验收。
 
     为什么补这条：其余派发用例喂的都是合成 stub——那只能证明「编排代数对」，证明不了「接上真工具面
-    能跑」。这里用 `routing` 工作流（`spec_ls` → `registry_query`，两者皆只读）跑一遍**真调用**，
+    能跑」。这里用 `routing` 工作流（`spec_list` → `registry_search`，两者皆只读）跑一遍**真调用**，
     并另起一例证明「真工具成功但 `expects` 不满足」时同样即停。
     """
 
@@ -347,8 +347,8 @@ class RealToolFaceDispatchTest(unittest.TestCase):
         return mrt.TOOL_HANDLERS[name](args)
 
     def test_routing_plan_runs_against_real_tool_face(self):
-        plan = _plan([{"id": "specs", "tool": "spec_ls", "args": {}},
-                      {"id": "query", "tool": "registry_query", "args": {"query": "layers"},
+        plan = _plan([{"id": "specs", "tool": "spec_list", "args": {}},
+                      {"id": "query", "tool": "registry_search", "args": {"query": "layers"},
                        "needs": ["specs"], "expects": ["modules", "protocols"]}],
                      workflow="routing")
         compiled = orch.compile_plan(str(ROOT), plan, TOOLS)
@@ -357,7 +357,7 @@ class RealToolFaceDispatchTest(unittest.TestCase):
         self.assertIsNone(out["stopped_at"], out)
         self.assertEqual([], out["not_executed"])
         self.assertTrue(all(r["ok"] for r in out["results"]), out)
-        # 真产物（不是 stub）：registry_query 的对象里确有这两个字段
+        # 真产物（不是 stub）：registry_search 的对象里确有这两个字段
         detail = [r["detail"] for r in out["results"] if r["id"] == "query"][0]
         self.assertIn("modules", detail)
         self.assertIn("protocols", detail)

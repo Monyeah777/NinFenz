@@ -128,7 +128,7 @@
 | 项 | 期望 |
 |---|---|
 | Build 状态 | Success / 绿色 |
-| Tools | 12 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_ls` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_ls` `asset_read` |
+| Tools | 12 个：`pipeline_list` `spec_list` `registry_search` `library_search` `library_read` `pattern_list` `pattern_read` `knowledge_order_read` `module_read` `pipeline_read` `asset_list` `asset_read` |
 | Prompts | 1 个：`assemble_guide` |
 | Resources | `nf://repo/...`，首屏 20 条 + `nextCursor` |
 | Instructions | 只读内容服务的自述 |
@@ -278,17 +278,17 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 
 | 工具 | Purpose 25% | Usage 20% | Behavior 20% | Params 15% | Conciseness 10% | Completeness 10% | 估算 TDQS |
 |---|---|---|---|---|---|---|---|
-| pipeline_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| spec_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| registry_query | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| pipeline_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| spec_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| registry_search | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | library_search | 5 | 5 | 4 | 4 | 3 | 4 | 4.4 |
 | library_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| pattern_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| pattern_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | pattern_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| knowledge_order | 4 | 5 | 4 | 4 | 4 | 4 | 4.2 |
+| knowledge_order_read | 4 | 5 | 4 | 4 | 4 | 4 | 4.2 |
 | module_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | pipeline_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| asset_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| asset_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | asset_read | 5 | 5 | 5 | 4 | 3 | 4 | 4.6 |
 
 估算：descriptionQuality ≈ 4.4（A）；coherence ≈ 4.0–4.5（naming 是唯一弱项：
@@ -362,13 +362,13 @@ coherence 的反馈与处理如下：
 | 反馈 | 处理 |
 |---|---|
 | 多数工具针对明显不同的资源；描述交叉引用替代方案 | 保留；每个工具都写明“何时用 / 何时改用哪个工具” |
-| `spec_ls` 与 `registry_query` 的协议包元数据轻微重叠 | `spec_ls` 描述已明确为**权威协议包目录**；`registry_query` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
-| `pipeline_ls` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_ls` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
+| `spec_list` 与 `registry_search` 的协议包元数据轻微重叠 | `spec_list` 描述已明确为**权威协议包目录**；`registry_search` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
+| `pipeline_list` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_list` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
 | 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | **已改**：MCP 面统一为 `asset_read`（`asset_get` 保留为兼容别名，不进 `tools/list`）；核心协议的资产五接口仍叫 `asset_get`，描述里说明 `asset_read` 是它的 MCP 读面 |
-| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | **已补**：新增 `pattern_ls` / `asset_ls` 专用枚举工具，与 `pattern_read` / `asset_read` 成对；`resources/list` 仍保留为同源资源面 |
+| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | **已补**：新增 `pattern_list` / `asset_list` 专用枚举工具，与 `pattern_read` / `asset_read` 成对；`resources/list` 仍保留为同源资源面 |
 | 每个工具尾部重复“Read-only / no writes or network”，与 annotations 重复，压住 BT/CS 分 | **已删** 12 个工具的只读尾句；把空间改成显式“何时不要用 + 改用哪个工具”，只保留 annotations 无法表达的行为（未知 ID 报错、空结果、扫描/上限） |
 
-> 结论：overall 4.4 已经是 A；上述修改（`asset_read` 命名、`pattern_ls` / `asset_ls`、去重 +
+> 结论：overall 4.4 已经是 A；上述修改（`asset_read` 命名、`pattern_list` / `asset_list`、去重 +
 > 显式 when-not-use）会在 Glama 下次重建后重新评分，预期 disambiguation / naming /
 > completeness 都有提升，overall 从 4.4 向 4.6+ 走。核心协议的资产五接口仍叫 `asset_get`，
 > 这是协议层名字，不是 MCP 工具名。
@@ -416,7 +416,7 @@ MCP 描述实证研究放在一起对照，结论更清楚。
 
 4.6 的 74 词版本同时踩了两条：
 
-1. **Conciseness**：把替代工具压成 `(enumerate: asset_ls; other resources: …)` 的括号/斜杠列表，
+1. **Conciseness**：把替代工具压成 `(enumerate: asset_list; other resources: …)` 的括号/斜杠列表，
    违反 TDQS 风格指南的“句子可解析、不要压缩成单块”；
 2. **Contextual Completeness / Behavior**：为压字数删掉 `returning package, file path, and text`
    与 `package only narrows files, never key matching`，而这两条正是六组件里的
@@ -439,7 +439,7 @@ npx -y mcp-tdqs lint --command "python scripts/nf.py serve" \
 但 context signal 暴露了 4 个 **titleIsMeaningful=false**：
 
 ```text
-registry_query  -> Query registry      （title 只是 name 的复述）
+registry_search  -> Query registry      （title 只是 name 的复述）
 module_read     -> Read module
 pipeline_read   -> Read pipeline
 asset_read      -> Read asset
@@ -448,7 +448,7 @@ asset_read      -> Read asset
 已改为：
 
 ```text
-registry_query  -> Search module registry
+registry_search  -> Search module registry
 module_read     -> Fetch module document
 pipeline_read   -> Fetch pipeline document
 asset_read      -> Fetch asset content
@@ -462,34 +462,55 @@ asset_read      -> Fetch asset content
 `TDQS_API_KEY`），最终稳定在：
 
 ```text
-server: overall 4.8–4.9 A · descriptionQuality 4.9
-coherence 4.5–4.8 · mean 4.9 · min 4.8–4.9
+server: overall 4.9 A · descriptionQuality 4.9
+coherence 4.8–5.0 · mean 4.9 · min 4.8–4.9
 ```
 
-逐工具：`asset_read 5.0`、`asset_ls 5.0`、`knowledge_order 5.0`；多数 4.9；
-`registry_query` 4.8–5.0。没有工具低于 4.8。
+逐工具：`asset_read 5.0`、`asset_list 5.0`、`knowledge_order_read 5.0`；
+其余全部 4.9（其中 `module_read` 一次 4.8）。没有工具低于 4.8。
 
 本轮按评分器 justification 补的真实信息：
 
-- `pipeline_ls`：只返回 metadata、按路径排序、query 不匹配正文；
-- `spec_ls`：缺/坏 registry 是错误，包按 registry 顺序；
-- `registry_query`：只读 registry.json，不扫描模块/管线文件，不匹配描述/路径/正文；
+- `pipeline_list`：只返回 metadata、按路径排序、query 不匹配正文；
+- `spec_list`：缺/坏 registry 是错误，包按 registry 顺序；
+- `registry_search`：只读 registry.json，不扫描模块/管线文件，不匹配描述/路径/正文；
 - `library_search`：`limit` 是合并列表硬上限，catalog 命中在前，可能挤掉文档命中；
   **没有 offset / next-page**；
 - `library_read` / `pattern_read` / `pipeline_read` / `module_read`：full text / no truncation；
-- `pipeline_ls` / `library_read` / `module_read`：local-only，**no auth / network / rate limits**；
-- `pattern_ls`：metadata only、无分页；`asset_ls`：package 是 exact directory、
+- `pipeline_list` / `library_read` / `module_read`：local-only，**no auth / network / rate limits**；
+- `pattern_list`：metadata only、无分页；`asset_list`：package 是 exact directory、
   不是 glob/path/regex，包内无匹配返回空列表，keys 排序且无上限；
-- `knowledge_order`：clearance 是可见性上限（public ⊂ internal ⊂ restricted），本地无 auth/网络；
+- `knowledge_order_read`：clearance 是可见性上限（public ⊂ internal ⊂ restricted），本地无 auth/网络；
 - `asset_read`：删除 outputSchema 的 `found`，无匹配统一走错误，schema 与行为一致。
 
 ### 15.5 决策
 
-- 目标 **overall ≥ 4.8** 已达成；不再为 5.0 继续压缩，否则会丢 Returns/Limitations；
-- coherence 4.5 的缺口是结构性（没有 `spec_read`、没有全量 `library_list`），加工具会破坏
-  12 工具面，收益不抵成本；
-- 下一步：把 `0fe2e8bb` 之后的本轮改动推送，等 Glama 重新自省；若 Glama 仍显示旧分，
-  只需一次 Build/Release，不再逐词微调。
+- 目标 **overall ≥ 4.8** 已达成，并进一步稳定到 **4.9**；不再为 5.0 压缩描述，否则会丢
+  Returns/Limitations；
+- 4.9 的关键不是继续改描述，而是**命名归一**：`coherence/naming` 从 4 到 5 后，
+  coherence 稳定 4.8–5.0，overall 从 4.8 变成 4.9；
+- 下一步：等 Glama 重新自省；若仍显示旧分，只需一次 Build/Release，不再逐词微调。
+
+## 16. 工具命名归一（2026-10-18）
+
+为消除 `ls` / `query` / `order` 与 `read` / `search` 的动作词混用，12 工具面统一为
+`resource_operation`：
+
+| 旧名 | 新名 |
+|---|---|
+| `pipeline_ls` | `pipeline_list` |
+| `spec_ls` | `spec_list` |
+| `pattern_ls` | `pattern_list` |
+| `asset_ls` | `asset_list` |
+| `registry_query` | `registry_search` |
+| `knowledge_order` | `knowledge_order_read` |
+
+兼容策略：
+
+- `tools/list` 只发布新名；
+- 旧名继续通过 `TOOL_ALIASES` 可 `tools/call`，包括更早的 `asset_get` 与短暂的
+  `knowledge_order_get`；
+- 文档/引擎/打包面同步更新，协议工具数仍为 **12 + 1 prompt**。
 
 ## 附录：官方参考
 

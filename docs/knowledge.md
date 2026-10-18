@@ -26,7 +26,7 @@ python scripts/nf.py knowledge transform promote --from <源id> --to <产物> --
     --evidence machine-checkable,reproducible,externally-attestable                        # 转正
 ```
 
-MCP 侧：工具 `knowledge_order`（入参 `clearance` 可选）。
+MCP 侧：工具 `knowledge_order_read`（入参 `clearance` 可选）。
 
 ## 判据（可证）
 
@@ -39,7 +39,7 @@ MCP 侧：工具 `knowledge_order`（入参 `clearance` 可选）。
 | 消化可追溯 | 每条记录 `from` 须是已声明 reference 源、`to` 须是真实件且 `digest` 一致；标 `promoted: true` 者必须齐三档证据 + 复核人/复核时间非空 |
 | 认知裁剪 | `cognition.filter_module` 必须指向**在册模块**（当前 = M23 认知边界） |
 | 可见性 | `visibility ∈ {public, internal, restricted}` |
-| 裁剪执行 | `visible_ids(clearance)`：秩 `public ⊂ internal ⊂ restricted`，清除级达标才可见；`order --as` 与 MCP `knowledge_order` 都不返回越权源 |
+| 裁剪执行 | `visible_ids(clearance)`：秩 `public ⊂ internal ⊂ restricted`，清除级达标才可见；`order --as` 与 MCP `knowledge_order_read` 都不返回越权源 |
 | 频次可复算 | 台账 `protocol/knowledge_usage.json` 由 trace 复算（`--write` 是唯一写入口）；消化记录一旦声明 `reuse_count`，必须与台账一致——**手写频次即 FAIL** |
 | 复核工作流 | `transform add`（登记 + 双签，未转正）→ `transform promote`（齐三档证据才可转正）；两条路径都**先校验后写盘**，非法入参不落脏记录 |
 | 唯一来源复用 | `verify_reuse`：条目 `id` 唯一且等于文件名；`ALIAS.md` 小写键唯一且指向在册条目；**任意两件全文摘要不得相同**（同一内容两份 = 两个真源，禁止复制正文） |

@@ -212,7 +212,7 @@ class McpToolDefinitionQualityTest(unittest.TestCase):
         rt = mrt.McpRuntime({"mcp": {"name": "structured", "version": "0",
                                      "resources": []}})
         resp = rt.handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                          "params": {"name": "pipeline_ls", "arguments": {}}})
+                          "params": {"name": "pipeline_list", "arguments": {}}})
         result = resp["result"]
         self.assertIn("structuredContent", result)
         self.assertEqual(["items"], list(result["structuredContent"]))

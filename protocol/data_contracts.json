@@ -173,7 +173,7 @@
       "freshness": "人工声明；改后跑 nf knowledge lint",
       "consumers": [
         "nf knowledge",
-        "MCP knowledge_order"
+        "MCP knowledge_order_read"
       ]
     },
     {

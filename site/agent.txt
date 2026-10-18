@@ -63,8 +63,8 @@ python scripts/nf.py serve
     }
   }
 }
-连接后可用：检索类工具（library_search / registry_query / pipeline_ls / spec_ls）、
-枚举/内容工具（pattern_ls / pattern_read / asset_ls / asset_read / module_read / pipeline_read）、装载引导 prompt（assemble_guide）。
+连接后可用：检索类工具（library_search / registry_search / pipeline_list / spec_list）、
+枚举/内容工具（pattern_list / pattern_read / asset_list / asset_read / module_read / pipeline_read）、装载引导 prompt（assemble_guide）。
 双协议版本并存：modern 2026-07-28 + legacy 2025-11-25。
 
 ## 6 一键路径（可选，省去手抄）

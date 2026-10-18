@@ -315,11 +315,11 @@ class TestMcpRuntime(unittest.TestCase):
         tools = resp["result"]["tools"]
         names = {t["name"] for t in tools}
         self.assertEqual(names,
-                         {"library_search", "registry_query",
-                          "pipeline_ls", "spec_ls",
+                         {"library_search", "registry_search",
+                          "pipeline_list", "spec_list",
                           "module_read", "pipeline_read", "asset_read",
-                          "library_read", "pattern_ls", "pattern_read",
-                          "asset_ls", "knowledge_order"})
+                          "library_read", "pattern_list", "pattern_read",
+                          "asset_list", "knowledge_order_read"})
         for t in tools:
             self.assertIn("inputSchema", t)
 
@@ -367,9 +367,9 @@ class TestMcpRuntime(unittest.TestCase):
         resp = self.srv.handle(_req(21, "prompts/list"))
         self.assertEqual(resp["result"]["prompts"][0]["name"], "assemble_guide")
 
-    def test_tools_call_registry_query(self):
+    def test_tools_call_registry_search(self):
         resp = self.srv.handle(_req(22, "tools/call", {
-            "name": "registry_query", "arguments": {"query": "M90"}}))
+            "name": "registry_search", "arguments": {"query": "M90"}}))
         text = resp["result"]["content"][0]["text"]
         self.assertIn("M90", text)
 
@@ -889,10 +889,10 @@ class DeclaredSurfaceVsHandlersTest(unittest.TestCase):
     def test_every_declared_tool_is_reachable(self):
         """真派发一次：用声明里的必填参数名喂合法值，不得回 `-32601`（未知工具）。"""
         rt = mrt.McpRuntime({"name": "declared", "version": "0", "resources": []})
-        samples = {"pipeline_ls": {}, "spec_ls": {}, "registry_query": {"query": "M90"},
+        samples = {"pipeline_list": {}, "spec_list": {}, "registry_search": {"query": "M90"},
                    "library_search": {"query": "NF"}, "library_read": {"entry_id": "NF-1"},
-                   "pattern_ls": {}, "pattern_read": {"pattern_id": "fail-closed-verification"},
-                   "asset_ls": {}, "knowledge_order": {}, "module_read": {"module_id": "M90"},
+                   "pattern_list": {}, "pattern_read": {"pattern_id": "fail-closed-verification"},
+                   "asset_list": {}, "knowledge_order_read": {}, "module_read": {"module_id": "M90"},
                    "pipeline_read": {"pipeline": "P01"}, "asset_read": {"key": "TECH_RULES"}}
         for spec in mrt.TOOL_DEFS:
             name = spec["name"]
@@ -909,10 +909,10 @@ NOOP_ALLOWED: dict = {}
 
 #: 每个工具的最小合法参数（用于「声明属性是否有效果」的行为普查）
 VALID_ARGS = {
-    "pipeline_ls": {}, "spec_ls": {}, "registry_query": {"query": "M08"},
+    "pipeline_list": {}, "spec_list": {}, "registry_search": {"query": "M08"},
     "library_search": {"query": "叙事"}, "library_read": {"entry_id": "NF-1"},
-    "pattern_ls": {}, "pattern_read": {"pattern_id": "single-source-truth"},
-    "asset_ls": {}, "knowledge_order": {},
+    "pattern_list": {}, "pattern_read": {"pattern_id": "single-source-truth"},
+    "asset_list": {}, "knowledge_order_read": {},
     "module_read": {"module_id": "M08"}, "pipeline_read": {"pipeline": "P01"},
     "asset_read": {"key": "QUANT_METRICS", "package": "量化金融域包"},
 }
@@ -923,7 +923,7 @@ IMPOSSIBLE = "__nf_no_such_value__"
 class ToolSchemaEffectTest(unittest.TestCase):
     """声明即承诺：inputSchema 声明的每个属性都必须**真的有效果**。
 
-    内部差距实证（2026-10-08）：spec_ls 声明 tier「可选按分级过滤」，而 registry 的 protocols 里
+    内部差距实证（2026-10-08）：spec_list 声明 tier「可选按分级过滤」，而 registry 的 protocols 里
     根本没有分级字段——传任意 tier（含乱填）返回**完全相同**的全量清单，结果里也没有 tier 字段：
     客户端以为筛过了，实际拿到全部（静默降级，比缺参数更坏）。修法是删掉该声明；本件把这条钉住：
     声明了却在行为上无效果的属性必须进 NOOP_ALLOWED 并写明理由，否则红。
@@ -968,8 +968,8 @@ class ToolSchemaEffectTest(unittest.TestCase):
             return {"result": {"content": [{"type": "text",
                                             "text": json.dumps(args, sort_keys=True)}]}}
 
-        self.assertEqual(["query"], self._noop_properties("registry_query", ["query"], ignoring))
-        self.assertEqual([], self._noop_properties("registry_query", ["query"], honoring))
+        self.assertEqual(["query"], self._noop_properties("registry_search", ["query"], ignoring))
+        self.assertEqual([], self._noop_properties("registry_search", ["query"], honoring))
 
 
 if __name__ == "__main__":

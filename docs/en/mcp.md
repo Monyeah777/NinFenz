@@ -8,7 +8,7 @@
 NF provides an MCP (Model Context Protocol) stdio service, `nf serve`:
 
 - Burns an "MCP snapshot" (the `.json` exported by `nf run --fmt mcp`) into a JSON-RPC stdio session (newline-delimited UTF-8 messages);
-- **Read-only surface**: `resources/list` + `resources/read`; 41 Wave C C7 (2026-09-08 ruling) opened **read-only tools/prompts** — `tools/list`+`tools/call` (library_search / registry_query / pipeline_ls / spec_ls) and `prompts/list`+`prompts/get` (the assemble_guide loading guide); write-path tools are not implemented, and unknown tools/methods are refused;
+- **Read-only surface**: `resources/list` + `resources/read`; 41 Wave C C7 (2026-09-08 ruling) opened **read-only tools/prompts** — `tools/list`+`tools/call` (library_search / registry_search / pipeline_list / spec_list) and `prompts/list`+`prompts/get` (the assemble_guide loading guide); write-path tools are not implemented, and unknown tools/methods are refused;
 - **uri allowlist**: `resources/read` accepts only uris registered in the snapshot; an unknown uri returns `-32602 INVALID_PARAMS` (without leaking the directory structure);
 - **Protocol versions = dual-era**: modern `2026-07-28` (each request carries the version in `_meta`, no negotiation handshake) + legacy `2025-11-25` (`initialize` handshake) coexist; an unsupported version gets `-32022` plus the supported set. The key used to declare a version is the **canonical key** `_meta["io.modelcontextprotocol/protocolVersion"]`; any other key name (such as a bare `protocolVersion`) **is not a version declaration**, and the server treats it as legacy without returning `-32022` (measured 2026-10-01). For historical comparison see audit report 33 A5 (G1/G2/G4 already checked off); for modern-alignment empirical evidence see the specification's §Versioning / §Discovery.
 
@@ -77,7 +77,7 @@ In any client that supports MCP stdio, declare `nf.py serve` as a server (the ex
 (Snapshot surface: append `<快照 .json 绝对路径>` to the end of `args`.)
 
 After connecting, an agent can call: `resources/list` to enumerate resources → `resources/read` to fetch the body by uri — the live-repo surface serves `nf://repo/...` (module / asset / pipeline / library / pattern), while the snapshot surface serves the resources registered by that assembly. The concrete uri set is whatever the actual `resources/list` return value is.
-From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pipeline_ls` (pipeline list) / `spec_ls` (protocol-pack list) / `registry_query` (module + protocol query) / `library_search` (repository-side knowledge-base search), plus the loading-guide prompt `assemble_guide`. From 44 onward, **content-channel tools** are also open: `module_read` (module body) / `pipeline_read` (pipeline body) / `asset_read` (asset body) — an upgrade from "metadata retrieval" to "substantive content intake" (a mechanism borrowing empirically adapted from MCP's two-stage resource/content pattern; still entirely read-only). Data source = read-only repository scan (03/04/community/docs/registry.json); all read-only, no write surface.
+From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pipeline_list` (pipeline list) / `spec_list` (protocol-pack list) / `registry_search` (module + protocol query) / `library_search` (repository-side knowledge-base search), plus the loading-guide prompt `assemble_guide`. From 44 onward, **content-channel tools** are also open: `module_read` (module body) / `pipeline_read` (pipeline body) / `asset_read` (asset body) — an upgrade from "metadata retrieval" to "substantive content intake" (a mechanism borrowing empirically adapted from MCP's two-stage resource/content pattern; still entirely read-only). Data source = read-only repository scan (03/04/community/docs/registry.json); all read-only, no write surface.
 
 ## Capability table (one-to-one with the mcp_runtime implementation)
 
@@ -90,7 +90,7 @@ From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pip
 | `resources/list` | ✅ | pure metadata of snapshot-registered resources (no text field) |
 | `resources/templates/list` | ✅ | RFC 6570 level-1 subset resource templates (library / pattern / module / pipeline / asset); full coverage of real resource uris is asserted by check33 |
 | `resources/read` | ✅ | allowlisted uri → `contents[].text`; unknown uri → `-32602` |
-| `tools/list` / `tools/call` (read-only · retrieval surface) | ✅ | 41 Wave C C7: library_search / registry_query / pipeline_ls / spec_ls (inputSchema really exists; all read-only) |
+| `tools/list` / `tools/call` (read-only · retrieval surface) | ✅ | 41 Wave C C7: library_search / registry_search / pipeline_list / spec_list (inputSchema really exists; all read-only) |
 | `tools/list` / `tools/call` (read-only · content channel) | ✅ | 44: module_read / pipeline_read / asset_read — returns the substantive body of modules/pipelines/assets (not just metadata) |
 | Tool annotations on `tools/list` | ✅ | all 12 tools declare `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` (since 2026-10-18) — read-only is no longer prose only: an MCP client may **auto-approve** read-only calls instead of prompting for each one |
 | `prompts/list` / `prompts/get` | ✅ | 41 Wave C C7: assemble_guide loading-guide template (read-only) |
@@ -200,11 +200,11 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 4. Capability surface (read-only)
 
-- **tools (12)**: `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_ls` · `asset_read`
+- **tools (12)**: `pipeline_list` · `spec_list` · `registry_search` · `library_search` ·
+  `library_read` · `pattern_list` · `pattern_read` · `knowledge_order_read` · `module_read` ·
+  `pipeline_read` · `asset_list` · `asset_read`
 - **prompts (1)**: `assemble_guide`
-- **compatibility alias**: old clients may still `tools/call` the name `asset_get`; `tools/list` publishes only `asset_read`
+- **compatibility aliases**: old clients may still `tools/call` these legacy names: `asset_get`, `pipeline_ls`, `spec_ls`, `pattern_ls`, `asset_ls`, `registry_query`, `knowledge_order`; `tools/list` publishes only the new names
 - **resources**: snapshot-registered resources (`resources/list` → `resources/read`, uri allowlist) + live repository
   resources (`nf://repo/...`; all real uris are covered by the 5 templates; the count grows with the repository and is not hard-coded)
 

@@ -254,7 +254,7 @@ class NfCliSmokeTest(unittest.TestCase):
             code, out = self._run(argv)
             self.assertEqual(0, code, "%s 应当接受带空白的标识符：%s" % (argv, out[:120]))
 
-    def test_asset_ls_json(self):
+    def test_asset_list_json(self):
         code, out = self._run(["asset", "ls", "--json", "--root", str(ROOT)])
         self.assertEqual(code, 0)
         self.assertIn('"kind": "asset-ls"', out)

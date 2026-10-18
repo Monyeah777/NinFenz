@@ -219,8 +219,8 @@ class McpToolsDoNotTouchTheRepoTest(unittest.TestCase):
             cursor = (resp.get("result") or {}).get("nextCursor")
             if not cursor or not res:
                 break
-        args: dict = {"pipeline_ls": {}, "spec_ls": {}, "knowledge_order": {},
-                "registry_query": {"query": "M90"}, "library_search": {"query": "MCP"}}
+        args: dict = {"pipeline_list": {}, "spec_list": {}, "knowledge_order_read": {},
+                "registry_search": {"query": "M90"}, "library_search": {"query": "MCP"}}
         if isinstance(found.get("module"), str):
             args["module_read"] = {"module_id": found["module"]}
         if isinstance(found.get("pipeline"), str):

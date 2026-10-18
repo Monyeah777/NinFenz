@@ -329,8 +329,8 @@ class TestSiteMcpCapabilityNames(unittest.TestCase):
     """
 
     def test_extraction_logic(self):
-        text = "检索类工具（library_search / registry_query）、引导 prompt（assemble_guide）"
-        self.assertEqual(["library_search", "registry_query", "assemble_guide"],
+        text = "检索类工具（library_search / registry_search）、引导 prompt（assemble_guide）"
+        self.assertEqual(["library_search", "registry_search", "assemble_guide"],
                          mcp_capability_mentions(text))
         self.assertEqual([], mcp_capability_mentions("没有任何能力名"))
 

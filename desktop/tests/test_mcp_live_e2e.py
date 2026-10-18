@@ -26,8 +26,8 @@ INVALID_PARAMS = -32602
 
 #: 只读工具面（冻结）：与 `docs/mcp.md` 能力表、`mcp_runtime` 实现一一对应。
 READ_TOOLS = {
-    "pipeline_ls", "spec_ls", "registry_query", "library_search", "library_read",
-    "pattern_ls", "pattern_read", "asset_ls", "knowledge_order", "module_read",
+    "pipeline_list", "spec_list", "registry_search", "library_search", "library_read",
+    "pattern_list", "pattern_read", "asset_list", "knowledge_order_read", "module_read",
     "pipeline_read", "asset_read",
 }
 #: 写形/越权形工具名的形态（出现即说明只读白名单被破了口子）。
@@ -100,9 +100,9 @@ class McpLiveFaceTest(unittest.TestCase):
         """
         msgs, _, _ = _serve([
             _init(),
-            _req(2, "tools/call", {"name": "registry_query", "arguments": {"quer": "M90"}}),
-            _req(3, "tools/call", {"name": "registry_query", "arguments": {"query": 123}}),
-            _req(4, "tools/call", {"name": "registry_query", "arguments": {"query": "M90"}}),
+            _req(2, "tools/call", {"name": "registry_search", "arguments": {"quer": "M90"}}),
+            _req(3, "tools/call", {"name": "registry_search", "arguments": {"query": 123}}),
+            _req(4, "tools/call", {"name": "registry_search", "arguments": {"query": "M90"}}),
         ])
         got = _by_id(msgs)
         for mid in (2, 3):
@@ -119,10 +119,10 @@ class McpLiveFaceTest(unittest.TestCase):
         """
         msgs, _, _ = _serve([
             _init(),
-            _req(2, "tools/call", {"name": "spec_ls", "arguments": []}),
-            _req(3, "tools/call", {"name": "spec_ls", "arguments": 0}),
-            _req(4, "tools/call", {"name": "spec_ls", "arguments": "oops"}),
-            _req(5, "tools/call", {"name": "spec_ls", "arguments": {}}),
+            _req(2, "tools/call", {"name": "spec_list", "arguments": []}),
+            _req(3, "tools/call", {"name": "spec_list", "arguments": 0}),
+            _req(4, "tools/call", {"name": "spec_list", "arguments": "oops"}),
+            _req(5, "tools/call", {"name": "spec_list", "arguments": {}}),
         ])
         got = _by_id(msgs)
         for mid in (2, 3, 4):
@@ -134,7 +134,7 @@ class McpLiveFaceTest(unittest.TestCase):
         """① 续：白名单内的调用必须真读到仓库内容（拒出面之外还有正常面）。"""
         msgs, _, _ = _serve([
             _init(),
-            _req(2, "tools/call", {"name": "registry_query", "arguments": {"query": "M90"}}),
+            _req(2, "tools/call", {"name": "registry_search", "arguments": {"query": "M90"}}),
             _req(3, "resources/read", {"uri": "nf://repo/module/M90"}),
         ])
         got = _by_id(msgs)
@@ -149,16 +149,16 @@ class McpLiveFaceTest(unittest.TestCase):
             _req(2, "tools/call", {"name": "asset_read",
                                    "arguments": {"key": "../../../etc/passwd"}}),
             _req(3, "resources/read", {"uri": "nf://repo/../../../etc/passwd"}),
-            _req(4, "tools/call", {"name": "registry_query",
+            _req(4, "tools/call", {"name": "registry_search",
                                    "arguments": {"query": "x" * 10000}}),
-            _req(5, "tools/call", {"name": "registry_query",
+            _req(5, "tools/call", {"name": "registry_search",
                                    "arguments": {"query": "M90\x07"}}),
             _req(6, "tools/call", {"name": "write_file", "arguments": {"path": "x"}}),
             _req(7, "tools/call", {"name": "module_read",
                                    "arguments": {"module_id": "C:secrets.txt"}}),
             _req(8, "tools/call", {"name": "module_read",
                                    "arguments": {"module_id": "M90.md:hidden"}}),
-            _req(9, "tools/call", {"name": "registry_query", "arguments": {"query": "M90"}}),
+            _req(9, "tools/call", {"name": "registry_search", "arguments": {"query": "M90"}}),
         ])
         got = _by_id(msgs)
         for mid in (2, 3, 4, 5, 6, 7, 8):

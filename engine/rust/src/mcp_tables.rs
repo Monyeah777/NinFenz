@@ -13,18 +13,18 @@
 
 // >>> GENERATED TOOL_NAMES by tools/gen_mcp_tables.py（勿手改；重跑生成器覆盖本段）
 pub const TOOL_NAMES: [&str; 12] = [
-    "asset_ls",
+    "asset_list",
     "asset_read",
-    "knowledge_order",
+    "knowledge_order_read",
     "library_read",
     "library_search",
     "module_read",
-    "pattern_ls",
+    "pattern_list",
     "pattern_read",
-    "pipeline_ls",
+    "pipeline_list",
     "pipeline_read",
-    "registry_query",
-    "spec_ls",
+    "registry_search",
+    "spec_list",
 ];
 // <<< GENERATED TOOL_NAMES
 

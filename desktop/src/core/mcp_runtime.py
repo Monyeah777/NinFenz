@@ -16,7 +16,7 @@ C2 最小安全层（Wave5 随 C1）：
 
 C7 只读工具面（41_v2.8.0_波C质量编译深化规划，2026-09-08）：
 - tools（检索类结构化工具，inputSchema 真实存在）：library_search（仓库侧知识库检索）/
-  registry_query（registry 模块+协议查询）/ pipeline_ls（管线清单）/ spec_ls（协议包清单）。
+  registry_search（registry 模块+协议查询）/ pipeline_list（管线清单）/ spec_list（协议包清单）。
 - prompts：assemble_guide 装载引导模板（1 条）。
 - 数据源 = 本仓库只读扫描（03_管线库/04_模块库/community/*/docs/registry.json），
   不改 C2 只读安全层（全部只读，无 tools 写路径）。
@@ -338,7 +338,7 @@ def _md_title(text: str) -> str:
 
 TOOL_DEFS = [
     {
-        "name": "pipeline_ls",
+        "name": "pipeline_list",
         "title": "List pipelines",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -347,7 +347,7 @@ TOOL_DEFS = [
             "List NF pipelines as path/title metadata from 03_管线库 and "
             "community/*/pipelines. Use it to discover a pipeline ID before pipeline_read; "
             "do not use it to fetch pipeline text (use pipeline_read instead), module "
-            "metadata (registry_query), or protocol packages (spec_ls). The optional query is a "
+            "metadata (registry_search), or protocol packages (spec_list). The optional query is a "
             "case-sensitive substring of the repository-relative path or H1 title, not "
             "file content; wildcard characters are literal. Omit it to list every pipeline "
             "(examples: P04, 技术文档, 校园). Returns metadata only, never pipeline bodies, "
@@ -384,7 +384,7 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "spec_ls",
+        "name": "spec_list",
         "title": "List protocol packages",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -393,8 +393,8 @@ TOOL_DEFS = [
             "List protocol packages from desktop/src/core/registry.json with each "
             "package's id, version, module count, and categories. Use it for the "
             "authoritative protocol package catalog; do not use it to search modules "
-            "(registry_query) or pipelines (pipeline_ls), and do not treat protocol hits "
-            "from registry_query as a substitute for this list. Takes no arguments; an "
+            "(registry_search) or pipelines (pipeline_list), and do not treat protocol hits "
+            "from registry_search as a substitute for this list. Takes no arguments; an "
             "empty list means the registry declares no protocols. Reads one local file "
             "deterministically; a missing or malformed registry is an error. Packages "
             "appear in registry order."),
@@ -436,7 +436,7 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "registry_query",
+        "name": "registry_search",
         "title": "Search module registry",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -444,7 +444,7 @@ TOOL_DEFS = [
         "description": (
             "Query the NF registry for modules whose id or name contains query. Use it to "
             "resolve a module ID before module_read; do not use it for the authoritative "
-            "protocol package catalog (spec_ls) or free-text document search "
+            "protocol package catalog (spec_list) or free-text document search "
             "(library_search). Matching is case-sensitive; query is required, and an empty "
             "query matches every entry (examples: M90, 技术文档域包). Results are grouped "
             "under modules and protocols, with protocol hits secondary. Reads registry.json "
@@ -482,7 +482,7 @@ TOOL_DEFS = [
                         "type": "object",
                         "properties": {
                             "id": {"type": ["string", "null"],
-                                   "description": "Protocol package ID accepted by spec_ls."},
+                                   "description": "Protocol package ID accepted by spec_list."},
                             "version": {"type": ["string", "null"],
                                         "description": "Declared package version."},
                             "modules": {"type": "integer",
@@ -505,7 +505,7 @@ TOOL_DEFS = [
             "Search the library catalog and repository docs for query, returning ranked "
             "catalog entries plus matching document titles. Use it to find an entry ID "
             "for library_read or to locate a doc or package README; do not use it for "
-            "exact module or protocol metadata (registry_query / spec_ls). Catalog matching "
+            "exact module or protocol metadata (registry_search / spec_list). Catalog matching "
             "is case-insensitive and relevance-ranked; document hits match the filename or "
             "H1 title as a case-sensitive substring.\n\n"
             "The combined list is capped by limit (1–50, default 10), and there is no "
@@ -623,7 +623,7 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "pattern_ls",
+        "name": "pattern_list",
         "title": "List patterns",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -632,7 +632,7 @@ TOOL_DEFS = [
             "List engineering patterns as id/path/title/status metadata from "
             "patterns/*/PATTERN.md, sorted by ID. Use it to discover a pattern ID before "
             "pattern_read; do not use it to fetch pattern text (use pattern_read instead) "
-            "or to list modules/assets (module_read / asset_ls). Returns metadata only, "
+            "or to list modules/assets (module_read / asset_list). Returns metadata only, "
             "never the PATTERN.md body, with no pagination; no matches yields an empty "
             "list, and each call rescans the local patterns directory."),
         "inputSchema": {
@@ -674,11 +674,11 @@ TOOL_DEFS = [
         "description": (
             "Read one engineering pattern's full Markdown from patterns/<id>/PATTERN.md, "
             "including frontmatter, rules, and a counterexample. Use it for the practice "
-            "behind an NF rule; do not use it to enumerate patterns (pattern_ls) or read "
+            "behind an NF rule; do not use it to enumerate patterns (pattern_list) or read "
             "domain modules (module_read). pattern_id is the exact, case-sensitive "
             "directory name such as fail-closed-verification, not the document title. A "
             "missing pattern is an error, not an empty result; reads one local file and "
-            "returns its full text without truncation."),
+            "returns its full text without truncation. Local-only; no auth or rate limits."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -707,7 +707,7 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "knowledge_order",
+        "name": "knowledge_order_read",
         "title": "Resolve knowledge order",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -782,11 +782,11 @@ TOOL_DEFS = [
         "description": (
             "Read one NF module's full Markdown by ID, including its raw "
             "machine-contract block when present.\n\n"
-            "Use it after registry_query resolves a module, or enumerate IDs with "
-            "resources/list type=module; do not use it for pipelines or assets "
+            "Use it after registry_search resolves a module, or enumerate module IDs with "
+            "registry_search and an empty query; do not use it for pipelines or assets "
             "(pipeline_read / asset_read).\n\n"
             "The ID is the declared machine-contract or heading ID (M90), or a qualified "
-            "ID (通用:M10, as returned by registry_query), not the filename; matching is "
+            "ID (通用:M10, as returned by registry_search), not the filename; matching is "
             "case-sensitive. An unknown ID returns an error with the requested value and "
             "repair guidance. Returns the full file plus resolved metadata from one local "
             "file and does not evaluate the contract. Local-only; no auth, network, rate "
@@ -831,14 +831,14 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read one NF pipeline's full Markdown by P-number or repository-relative path. "
-            "Use it after pipeline_ls identifies a pipeline; do not use it to list "
-            "pipelines (use pipeline_ls instead) or read modules/assets (module_read / "
+            "Use it after pipeline_list identifies a pipeline; do not use it to list "
+            "pipelines (use pipeline_list instead) or read modules/assets (module_read / "
             "asset_read). "
             "pipeline is either a Pxx stem (P01, matched against the filename prefix) or a "
             ".md path under 03_管线库/ or a community pipelines/ directory; paths outside "
             "those roots and .. escapes are rejected. A missing pipeline is an error, not "
             "an empty result; reads one local file and returns its full text without "
-            "truncation."),
+            "truncation. Local-only; no auth or rate limits."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -866,7 +866,7 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "asset_ls",
+        "name": "asset_list",
         "title": "List asset keys",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
@@ -875,7 +875,7 @@ TOOL_DEFS = [
             "List asset files and the uppercase keys they declare, from "
             "community/*/assets and 05_资产库/用户自定义. Use it to discover a key before "
             "asset_read; do not use it to fetch asset text (asset_read) or to list "
-            "modules/patterns (module_read / pattern_ls). Optional package is an exact "
+            "modules/patterns (module_read / pattern_list). Optional package is an exact "
             "directory name, not a glob, path, or regex, and restricts the scan to "
             "community/<package>/assets (for example 校园情感领域包); README.md files are "
             "skipped. A package with no matching files returns an empty list, not an "
@@ -923,7 +923,7 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read asset files for a key, returning package, path, and text.\n\n"
-            "Use only a key from asset_ls; for enumeration use asset_ls, for other "
+            "Use only a key from asset_list; for enumeration use asset_list, for other "
             "resources module_read or pipeline_read.\n\n"
             "The key is exact uppercase, never glob, regex, package, path, or prose. The "
             "package is an exact directory; it narrows files but never key matching.\n\n"
@@ -982,7 +982,7 @@ PROMPT_DEFS = [
 ]
 
 
-def _tool_pipeline_ls(query: str = "") -> list:
+def _tool_pipeline_list(query: str = "") -> list:
     root = _repo_root()
     out = []
     for pat in ("03_管线库/*.md", "community/*/pipelines/*.md"):
@@ -996,7 +996,7 @@ def _tool_pipeline_ls(query: str = "") -> list:
     return out
 
 
-def _tool_spec_ls() -> list:
+def _tool_spec_list() -> list:
     reg = _read_json_rel("desktop/src/core/registry.json")
     return [{
         "id": p.get("id"), "version": p.get("version"),
@@ -1005,7 +1005,7 @@ def _tool_spec_ls() -> list:
     } for p in reg.get("protocols", [])]
 
 
-def _tool_registry_query(query: str) -> dict:
+def _tool_registry_search(query: str) -> dict:
     reg = _read_json_rel("desktop/src/core/registry.json")
     q = query.strip()
     modules = [m for m in reg.get("modules", [])
@@ -1076,7 +1076,7 @@ def _tool_library_read(entry_id: str) -> dict:
                      "（修复指引：用 nf library ls 列全量编号）" % entry_id)
 
 
-def _tool_pattern_ls() -> list:
+def _tool_pattern_list() -> list:
     """只读枚举：patterns/*/PATTERN.md 的 id/path/title/status。"""
     from core.library_entries import parse_frontmatter
 
@@ -1108,7 +1108,7 @@ def _tool_pattern_read(pattern_id: str) -> dict:
                      "fail-closed-verification）" % pattern_id)
 
 
-def _tool_knowledge_order(clearance: str = "") -> dict:
+def _tool_knowledge_order_read(clearance: str = "") -> dict:
     """按可见性裁剪解析知识源查询顺序（先合同级后参考级）。"""
     from core import knowledge as kn
     root = _repo_root()
@@ -1158,8 +1158,8 @@ def _resolve_module(index: list, module_id: str) -> dict:
     if len(suffix) > 1:
         raise ValueError(
             "module_id 存在多个同号限定（如 通用:M10 / 生存:M10）——请用限定 id"
-            "（修复指引：先 registry_query 查全限定 id 再重试）")
-    raise ValueError("模块未找到：%s（module ls / registry_query 可枚举）"
+            "（修复指引：先 registry_search 查全限定 id 再重试）")
+    raise ValueError("模块未找到：%s（module ls / registry_search 可枚举）"
                      "（修复指引：用仓库内真实模块 id，如 M90、M40 或 通用:M10）"
                      % module_id)
 
@@ -1213,7 +1213,7 @@ def _tool_pipeline_read(pipeline: str) -> dict:
             if stem == req:
                 hits.append(p)
     if not hits:
-        raise ValueError("管线未找到：%s（pipeline_ls 可枚举）"
+        raise ValueError("管线未找到：%s（pipeline_list 可枚举）"
                          "（修复指引：用 Pxx 编号或仓库内相对路径）" % pipeline)
     hit = hits[0]
     text = hit.read_text(encoding="utf-8")
@@ -1241,7 +1241,7 @@ def _asset_keys_of_file(path: Path) -> list:
     return sorted(keys)
 
 
-def _tool_asset_ls(package: str = "") -> list:
+def _tool_asset_list(package: str = "") -> list:
     """只读枚举：资产文件 → {package, file, keys}（跳过 README）。"""
     root = _repo_root()
     if package:
@@ -1295,24 +1295,33 @@ def _tool_asset_get(key: str, package: str = "") -> dict:
 
 
 TOOL_HANDLERS = {
-    "pipeline_ls": lambda a: _tool_pipeline_ls((a or {}).get("query", "")),
-    "spec_ls": lambda a: _tool_spec_ls(),
-    "registry_query": lambda a: _tool_registry_query((a or {}).get("query", "")),
+    "pipeline_list": lambda a: _tool_pipeline_list((a or {}).get("query", "")),
+    "spec_list": lambda a: _tool_spec_list(),
+    "registry_search": lambda a: _tool_registry_search((a or {}).get("query", "")),
     "library_search": lambda a: _tool_library_search((a or {}).get("query", ""),
                                                      (a or {}).get("limit", 10)),
     "library_read": lambda a: _tool_library_read((a or {}).get("entry_id", "")),
-    "pattern_ls": lambda a: _tool_pattern_ls(),
+    "pattern_list": lambda a: _tool_pattern_list(),
     "pattern_read": lambda a: _tool_pattern_read((a or {}).get("pattern_id", "")),
-    "knowledge_order": lambda a: _tool_knowledge_order((a or {}).get("clearance", "")),
+    "knowledge_order_read": lambda a: _tool_knowledge_order_read((a or {}).get("clearance", "")),
     "module_read": lambda a: _tool_module_read((a or {}).get("module_id", "")),
     "pipeline_read": lambda a: _tool_pipeline_read((a or {}).get("pipeline", "")),
-    "asset_ls": lambda a: _tool_asset_ls((a or {}).get("package", "")),
+    "asset_list": lambda a: _tool_asset_list((a or {}).get("package", "")),
     "asset_read": lambda a: _tool_asset_get((a or {}).get("key", ""),
                                             (a or {}).get("package", "")),
 }
 
-#: 兼容别名（不进 `tools/list`）：旧客户端仍可调 `asset_get`；新面只发布 `asset_read`。
-TOOL_ALIASES = {"asset_get": "asset_read"}
+#: 兼容别名（不进 `tools/list`）：旧客户端仍可调旧名；新面只发布 `_list/_search/_get`。
+TOOL_ALIASES = {
+    "asset_get": "asset_read",
+    "pipeline_ls": "pipeline_list",
+    "spec_ls": "spec_list",
+    "pattern_ls": "pattern_list",
+    "asset_ls": "asset_list",
+    "registry_query": "registry_search",
+    "knowledge_order": "knowledge_order_read",
+    "knowledge_order_get": "knowledge_order_read",
+}
 
 
 def _prompt_assemble_guide() -> str:
@@ -1682,7 +1691,7 @@ class McpRuntime:
         if not isinstance(params, dict) or not isinstance(params.get("name"), str):
             raise ValueError("tools/call 需 params{name, arguments}")
         name = params["name"]
-        # 旧名兼容：tools/list 只发布 asset_read，但旧客户端仍可 calls asset_get。
+        # 旧名兼容：tools/list 只发布新名，但旧客户端仍可 calls 旧名。
         canonical = TOOL_ALIASES.get(name, name)
         # arguments 是**声明为对象**的字段：显式 null 视为未传，其余非对象一律参数非法。
         # 修此处的理由（2026-10-08 实测）：旧写法把 []/""/0/False 这些**假值**静默当成「没传参数」

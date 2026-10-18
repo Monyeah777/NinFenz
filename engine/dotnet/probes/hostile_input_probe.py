@@ -238,7 +238,7 @@ def probe_mcp(cli: str, case: Path, timeout: int) -> tuple:
         '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}',
         '{这不是 JSON',                                                   # 解析失败
         '{"jsonrpc":"2.0","id":3,"method":"tools/list","params":{"x":%s}}' % deep,  # 超深 → 解析失败
-        '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"spec_ls","arguments":{}}}',  # 结构缺失 → 内部错误
+        '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"spec_list","arguments":{}}}',  # 结构缺失 → 内部错误
         '{"jsonrpc":"2.0","id":5,"method":"ping"}',                        # 存活探针
     ]
     proc = subprocess.Popen([cli, "--root", str(case), "serve"],

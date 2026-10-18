@@ -8,7 +8,7 @@
 NF 提供 MCP（Model Context Protocol）stdio 服务 `nf serve`：
 
 - 把「MCP 快照」（`nf run --fmt mcp` 导出的 `.json`）烧成 JSON-RPC stdio 会话（换行分隔 UTF-8 消息）；
-- **只读面**：`resources/list` + `resources/read`；41 波C C7（2026-09-08 裁决）开放**只读 tools/prompts**——`tools/list`+`tools/call`（library_search / registry_query / pipeline_ls / spec_ls）与 `prompts/list`+`prompts/get`（assemble_guide 装载引导）；写路径工具不实现，未知工具/方法拒出；
+- **只读面**：`resources/list` + `resources/read`；41 波C C7（2026-09-08 裁决）开放**只读 tools/prompts**——`tools/list`+`tools/call`（library_search / registry_search / pipeline_list / spec_list）与 `prompts/list`+`prompts/get`（assemble_guide 装载引导）；写路径工具不实现，未知工具/方法拒出；
 - **uri 白名单**：`resources/read` 只接受快照内已登记 uri，未知 uri 返回 `-32602 INVALID_PARAMS`（不泄露目录结构）；
 - **协议版本 = dual-era**：modern `2026-07-28`（每请求 `_meta` 携带版本，无协商握手）+ legacy `2025-11-25`（`initialize` 握手）并存；不支持版本回 `-32022` 并列出支持集。声明版本用的键是**规范键名** `_meta["io.modelcontextprotocol/protocolVersion"]`；用别的键名（如裸 `protocolVersion`）**不算版本声明**，服务端按 legacy 处理、不会回 `-32022`（实测 2026-10-01）。历史对照见 33 号 A5 核查报告（G1/G2/G4 已勾销），现代口径实证见规范 §Versioning / §Discovery。
 
@@ -77,7 +77,7 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 （快照面：`args` 末尾补 `<快照 .json 绝对路径>`。）
 
 连接后 agent 可调用：`resources/list` 枚举资源 → `resources/read` 按 uri 取正文——实时仓库面给的是 `nf://repo/...`（模块 / 资产 / 管线 / 馆藏 / 模式），快照面给的是该次装配登记的资源。具体 uri 集以实际 `resources/list` 返回为准。
-41 波C C7 起 agent 还可调用只读检索工具：`pipeline_ls`（管线清单）/ `spec_ls`（协议包清单）/ `registry_query`（模块+协议查询）/ `library_search`（仓库侧知识库检索），及装载引导 prompt `assemble_guide`。44 起再开放**内容通道工具**：`module_read`（模块正文）/ `pipeline_read`（管线正文）/ `asset_read`（资产正文）——从「元数据检索」升级为「实质内容取用」（机制借鉴 MCP resource/content 两段式实证适配，仍全只读）。数据源 = 仓库只读扫描（03/04/community/docs/registry.json），全部只读、无写面。
+41 波C C7 起 agent 还可调用只读检索工具：`pipeline_list`（管线清单）/ `spec_list`（协议包清单）/ `registry_search`（模块+协议查询）/ `library_search`（仓库侧知识库检索），及装载引导 prompt `assemble_guide`。44 起再开放**内容通道工具**：`module_read`（模块正文）/ `pipeline_read`（管线正文）/ `asset_read`（资产正文）——从「元数据检索」升级为「实质内容取用」（机制借鉴 MCP resource/content 两段式实证适配，仍全只读）。数据源 = 仓库只读扫描（03/04/community/docs/registry.json），全部只读、无写面。
 
 ## 能力表（与 mcp_runtime 实现一一对应）
 
@@ -90,7 +90,7 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 | `resources/list` | ✅ | 快照登记资源纯元数据（无 text 字段） |
 | `resources/templates/list` | ✅ | RFC 6570 一级子集资源模板（library / pattern / module / pipeline / asset 五条），真实资源 uri 全覆盖由 check33 断言 |
 | `resources/read` | ✅ | 白名单 uri → `contents[].text`；未知 uri → `-32602` |
-| `tools/list` / `tools/call`（只读 · 检索面） | ✅ | 41 波C C7：library_search / registry_query / pipeline_ls / spec_ls（inputSchema 真实存在，全只读） |
+| `tools/list` / `tools/call`（只读 · 检索面） | ✅ | 41 波C C7：library_search / registry_search / pipeline_list / spec_list（inputSchema 真实存在，全只读） |
 | `tools/list` / `tools/call`（只读 · 内容通道） | ✅ | 44：module_read / pipeline_read / asset_read——返回模块/管线/资产正文实质内容（不只元数据） |
 | `tools/list` 的工具注解 | ✅ | 12 个工具全部声明 `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false`（2026-10-18 起四项齐全）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
 | `tools/list` 的定义质量面 | ✅ | 每个工具都有 `title`、面向 agent 的 purpose/usage/behavior 描述、逐属性 `inputSchema` 说明、逐字段 `outputSchema`；`tools/call` 同时返回文本 `content` 与 `structuredContent` |
@@ -201,11 +201,11 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 四、能力面（只读）
 
-- **tools（12）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_ls` · `asset_read`
+- **tools（12）**：`pipeline_list` · `spec_list` · `registry_search` · `library_search` ·
+  `library_read` · `pattern_list` · `pattern_read` · `knowledge_order_read` · `module_read` ·
+  `pipeline_read` · `asset_list` · `asset_read`
 - **prompts（1）**：`assemble_guide`
-- **兼容别名**：旧客户端仍可 `tools/call` 名字 `asset_get`；`tools/list` 只发布 `asset_read`
+- **兼容别名**：旧客户端仍可 `tools/call` 这些旧名：`asset_get`、`pipeline_ls`、`spec_ls`、`pattern_ls`、`asset_ls`、`registry_query`、`knowledge_order`；`tools/list` 只发布新名
 - **resources**：快照登记资源（`resources/list` → `resources/read`，uri 白名单）+ 仓库实时
   资源（`nf://repo/...`，真实 uri 全被 5 条模板覆盖；条数随仓库增长，不写死）
 

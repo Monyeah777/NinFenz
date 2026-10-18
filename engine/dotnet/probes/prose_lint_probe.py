@@ -55,7 +55,7 @@ _README = """# 合成语料 · 入口文档
 
 用 `nf nope` 是不存在的子命令（应判出）。
 
-`registry_query（MCP 工具）` 在册；`not_a_tool（MCP 工具）` 不在册（应判出）。
+`registry_search（MCP 工具）` 在册；`not_a_tool（MCP 工具）` 不在册（应判出）。
 
 ```bash
 nf verify --all

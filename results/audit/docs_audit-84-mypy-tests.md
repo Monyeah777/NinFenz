@@ -8,12 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/tests/test_write_flag_gate.py:bc55da5403b7acdcd8552c1f28c44f553f4a4f191ff8b9a81c47bae42a035803
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
-  - desktop/tests/test_serve_default.py:739e151eda38b317123e03c06892f0ef2ef095735cc5dbb761453111ac2522b4
+  - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
   - desktop/tests/test_rust_fastlane.py:ad0bab51b9c29d816845b3632f1d5a3011b3dcdfcb777188e84afcce1933b1c6
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
-  - desktop/tests/test_mcp_write_freedom.py:b671c9d4599f43f9cd32b90644eb1d72689c32ee50474242355e9b3bbdd9a536
-  - desktop/tests/test_mcp_runtime.py:8ab4182fe0dce10c3c9d516ad312f22e45a40a6cf2fe0868c60d20bec3197429
+  - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
+  - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
@@ -32,8 +32,10 @@ subjects:
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
-  - desktop/tests/test_nf_cli.py:4ddd00ad386d0e35e3bc717db777fda922019e1fd1f38580ef8912bdac682220
+  - desktop/tests/test_nf_cli.py:55f3dbe5adc15441fbe6b6dae5f090ce3bd3f5909a790a10c525bc099e494ac0
 ---
+> 重审（2026-10-18）：工具名归一：6 个旧名 -> _list/_search/_read；旧名 alias；官方 tdqs 4.9 两次
+
 > 重审（2026-10-18）：asset_read：删除 outputSchema 的 found（无匹配为错误），2 参数 schema 一致；本地 TDQS 4.8/4.9
 
 > 重审（2026-10-18）：P2：两条全命令面扫描切片化

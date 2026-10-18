@@ -76,7 +76,7 @@ class TwoFacesJsonRpcParityTest(unittest.TestCase):
                                                   "position": {"line": 0, "character": 0}}})
         self.assertEqual([], lsp_out)
         mcp_out = _Faces.mcp().handle({"jsonrpc": "2.0", "method": "tools/call",
-                                       "params": {"name": "spec_ls", "arguments": {}}})
+                                       "params": {"name": "spec_list", "arguments": {}}})
         self.assertFalse(mcp_out, "MCP 面对「请求当通知发」回了应答")
 
     def test_bad_params_is_invalid_params_on_both_faces(self):
@@ -87,7 +87,7 @@ class TwoFacesJsonRpcParityTest(unittest.TestCase):
         self.assertEqual(INVALID_PARAMS, _code(lsp_reply), "LSP 面非法参数未回 -32602")
         mcp_reply = _Faces.mcp().handle(
             {"jsonrpc": "2.0", "id": 10, "method": "tools/call",
-             "params": {"name": "spec_ls", "arguments": []}})
+             "params": {"name": "spec_list", "arguments": []}})
         self.assertEqual(INVALID_PARAMS, _code(mcp_reply), "MCP 面非法参数未回 -32602")
 
     def test_ping_is_answered_by_mcp_and_unknown_to_lsp(self):

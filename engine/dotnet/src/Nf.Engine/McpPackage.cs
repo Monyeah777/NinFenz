@@ -22,9 +22,9 @@ public static class McpPackage
     /// <summary>镜像 <c>mcp_runtime.TOOL_DEFS</c> 的工具名（同一 HEAD 导出，顺序即运行时顺序）。</summary>
     public static readonly string[] RuntimeTools =
     {
-        "pipeline_ls", "spec_ls", "registry_query", "library_search", "library_read",
-        "pattern_ls", "pattern_read", "knowledge_order", "module_read", "pipeline_read",
-        "asset_ls", "asset_read",
+        "pipeline_list", "spec_list", "registry_search", "library_search", "library_read",
+        "pattern_list", "pattern_read", "knowledge_order_read", "module_read", "pipeline_read",
+        "asset_list", "asset_read",
     };
 
     /// <summary>镜像 <c>mcp_runtime.PROMPT_DEFS</c> 的提示名。</summary>

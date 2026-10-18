@@ -66,7 +66,7 @@ Claude Desktop / Cursor / Cline 通用配置（零安装，走 npm 包）：
 }
 ```
 
-**能力面（只读，无写路径）**：12 个工具 —— `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` · `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` · `pipeline_read` · `asset_ls` · `asset_read`；1 个 prompt —— `assemble_guide`。
+**能力面（只读，无写路径）**：12 个工具 —— `pipeline_list` · `spec_list` · `registry_search` · `library_search` · `library_read` · `pattern_list` · `pattern_read` · `knowledge_order_read` · `module_read` · `pipeline_read` · `asset_list` · `asset_read`；1 个 prompt —— `assemble_guide`。
 协议：modern `2026-07-28` 与 legacy `2025-11-25` 双版本并存；参数按 `inputSchema` 逐条校验（不合即 `-32602`）。
 
 ## 4 装完自检（agent 必做，全绿才算装好）
@@ -97,7 +97,7 @@ python scripts/nf.py conformance    # 一致性分级（只读面不虚标）
 | `npx ninfenz` 报 404 | 本地 npm 指向镜像且镜像滞后：加 `--registry https://registry.npmjs.org` |
 | `nf serve` 无输出 | 它是 stdio 服务，**等 stdin 的 JSON-RPC 帧**；直接回车不会打印菜单 |
 | 门禁很慢 | 全量含 `约 2500` 个单测；只做日常检查用 `nf doctor` / `nf stats --check` |
-| 想读全部协议 | https://ninfenz.dev/llms-full.txt（单文件）或 MCP 的 `library_search` / `spec_ls` |
+| 想读全部协议 | https://ninfenz.dev/llms-full.txt（单文件）或 MCP 的 `library_search` / `spec_list` |
 
 ## 6 出口面（agent 可直接抓）
 

@@ -8,7 +8,7 @@
 NF は MCP（Model Context Protocol）stdio サービス `nf serve` を提供します：
 
 - 「MCP スナップショット」（`nf run --fmt mcp` が出力する `.json`）を JSON-RPC stdio セッション（改行区切り UTF-8 メッセージ）へ焼き込みます；
-- **読み取り専用面**：`resources/list` + `resources/read`；41 波C C7（2026-09-08 裁決）で**読み取り専用 tools/prompts** を開放——`tools/list`+`tools/call`（library_search / registry_query / pipeline_ls / spec_ls）と `prompts/list`+`prompts/get`（assemble_guide ロードガイド）；書き込み経路のツールは実装せず、未知のツール/メソッドは拒否；
+- **読み取り専用面**：`resources/list` + `resources/read`；41 波C C7（2026-09-08 裁決）で**読み取り専用 tools/prompts** を開放——`tools/list`+`tools/call`（library_search / registry_search / pipeline_list / spec_list）と `prompts/list`+`prompts/get`（assemble_guide ロードガイド）；書き込み経路のツールは実装せず、未知のツール/メソッドは拒否；
 - **uri 許可リスト**：`resources/read` はスナップショットに登録済みの uri のみ受理し、未知の uri は `-32602 INVALID_PARAMS` を返します（ディレクトリ構造を漏らしません）；
 - **プロトコル版 = dual-era**：modern `2026-07-28`（各リクエストの `_meta` が版を運び、交渉ハンドシェイクなし）+ legacy `2025-11-25`（`initialize` ハンドシェイク）が併存；未対応の版には `-32022` を返し、対応集合を列挙。版宣言に使う鍵は**規範鍵名** `_meta["io.modelcontextprotocol/protocolVersion"]`；別の鍵名（素の `protocolVersion` など）は**版宣言と見なさず**、サーバは legacy として扱い `-32022` を返しません（実測 2026-10-01）。歴史的対照は 33 号 A5 核查報告（G1/G2/G4 は消し込み済み）、現代口径の実証は規範 §Versioning / §Discovery を参照。
 
@@ -77,7 +77,7 @@ MCP stdio をサポートする任意のクライアントで、`nf.py serve` �
 （スナップショット面：`args` の末尾に `<快照 .json 绝对路径>` を補います。）
 
 接続後、agent は次を呼べます：`resources/list` で資源を列挙 → `resources/read` で uri ごとに本文を取得——リアルタイムリポジトリ面は `nf://repo/...`（モジュール / 資産 / パイプライン / 館蔵 / パターン）を返し、スナップショット面はその回のアセンブリが登録した資源を返します。具体的な uri 集合は実際の `resources/list` の戻り値に従います。
-41 波C C7 以降、agent は読み取り専用の検索ツールも呼べます：`pipeline_ls`（パイプライン一覧）/ `spec_ls`（プロトコルパック一覧）/ `registry_query`（モジュール+プロトコル検索）/ `library_search`（リポジトリ側知識ベース検索）、およびロードガイド prompt `assemble_guide`。44 以降はさらに**コンテンツチャネルツール**を開放：`module_read`（モジュール本文）/ `pipeline_read`（パイプライン本文）/ `asset_read`（資産本文）——「メタデータ検索」から「実質コンテンツの取得」へ格上げ（MCP resource/content 二段式を機制借用として実証適配、依然すべて読み取り専用）。データ源 = リポジトリの読み取り専用スキャン（03/04/community/docs/registry.json）、すべて読み取り専用、書き込み面なし。
+41 波C C7 以降、agent は読み取り専用の検索ツールも呼べます：`pipeline_list`（パイプライン一覧）/ `spec_list`（プロトコルパック一覧）/ `registry_search`（モジュール+プロトコル検索）/ `library_search`（リポジトリ側知識ベース検索）、およびロードガイド prompt `assemble_guide`。44 以降はさらに**コンテンツチャネルツール**を開放：`module_read`（モジュール本文）/ `pipeline_read`（パイプライン本文）/ `asset_read`（資産本文）——「メタデータ検索」から「実質コンテンツの取得」へ格上げ（MCP resource/content 二段式を機制借用として実証適配、依然すべて読み取り専用）。データ源 = リポジトリの読み取り専用スキャン（03/04/community/docs/registry.json）、すべて読み取り専用、書き込み面なし。
 
 ## 能力表（mcp_runtime 実装と一対一対応）
 
@@ -90,7 +90,7 @@ MCP stdio をサポートする任意のクライアントで、`nf.py serve` �
 | `resources/list` | ✅ | スナップショット登録資源の純メタデータ（text フィールドなし） |
 | `resources/templates/list` | ✅ | RFC 6570 レベル1サブセットの資源テンプレート（library / pattern / module / pipeline / asset の5本）、実資源 uri の全被覆は check33 が断言 |
 | `resources/read` | ✅ | 許可リスト uri → `contents[].text`；未知 uri → `-32602` |
-| `tools/list` / `tools/call`（読み取り専用 · 検索面） | ✅ | 41 波C C7：library_search / registry_query / pipeline_ls / spec_ls（inputSchema は実在、すべて読み取り専用） |
+| `tools/list` / `tools/call`（読み取り専用 · 検索面） | ✅ | 41 波C C7：library_search / registry_search / pipeline_list / spec_list（inputSchema は実在、すべて読み取り専用） |
 | `tools/list` / `tools/call`（読み取り専用 · コンテンツチャネル） | ✅ | 44：module_read / pipeline_read / asset_read——モジュール/パイプライン/資産の本文実質内容を返す（メタデータだけではない） |
 | `tools/list` のツール注釈 | ✅ | 12 ツールすべてが `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` を宣言（2026-10-18 以降）——「読み取り専用」は散文だけでなく、MCP クライアントが読み取り専用呼び出しを**自動許可**できます |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide ロードガイドテンプレート（読み取り専用） |
@@ -200,11 +200,11 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 四、能力面（読み取り専用）
 
-- **tools（12）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_ls` · `asset_read`
+- **tools（12）**：`pipeline_list` · `spec_list` · `registry_search` · `library_search` ·
+  `library_read` · `pattern_list` · `pattern_read` · `knowledge_order_read` · `module_read` ·
+  `pipeline_read` · `asset_list` · `asset_read`
 - **prompts（1）**：`assemble_guide`
-- **互換別名**：旧クライアントは `tools/call` で `asset_get` を引き続き呼べる；`tools/list` が公開するのは `asset_read` のみ
+- **互換別名**：旧クライアントは `tools/call` で次の旧名を引き続き呼べる：`asset_get`、`pipeline_ls`、`spec_ls`、`pattern_ls`、`asset_ls`、`registry_query`、`knowledge_order`；`tools/list` が公開するのは新名のみ
 - **resources**：スナップショット登録資源（`resources/list` → `resources/read`、uri 許可リスト）+ リポジトリのリアルタイム
   資源（`nf://repo/...`、実 uri はすべて 5 テンプレートで覆われる；件数はリポジトリの成長に従い、ハードコードしない）
 

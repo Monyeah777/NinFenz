@@ -10,8 +10,8 @@ subjects:
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:7835fe2f53237b343858d0c915b39089aa1c83a3cde4f2948888d603284e9b3e
-  - docs/ja/mcp.md:6167688803f38c80db44fe43bab5bb41b3353d8cc393f2f27dd3f1e0360099ba
+  - docs/en/mcp.md:0653be472bb4888c814d3fc3696e7d882b35c6e49b965cf09b84d41d34c8d6f0
+  - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-18）：工具名归一：6 个旧名 -> _list/_search/_read；旧名 alias；官方 tdqs 4.9 两次
+
 > 重审（2026-10-18）：LSP 时间窗判据进串行段
 
 > 重审（2026-10-18）：串行段扩到内容快照族

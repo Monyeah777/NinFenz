@@ -6,9 +6,9 @@
 
 实测（2026-09-30，默认实时仓库面 · 每个工具一次 `tools/call`）：
 
-    轻面（1–4 次）：spec_ls 1 · registry_query 1 · pattern_read 1 · pipeline_read 1 ·
-                    knowledge_order 3 · library_read 4
-    扫树面（每次调用都枚举目录）：pipeline_ls 114 · library_search 179 ·
+    轻面（1–4 次）：spec_list 1 · registry_search 1 · pattern_read 1 · pipeline_read 1 ·
+                    knowledge_order_read 3 · library_read 4
+    扫树面（每次调用都枚举目录）：pipeline_list 114 · library_search 179 ·
                                 module_read 249 · asset_read 361
 
 扫树面是**已知代价**（按 id 解析要枚举 03_管线库 / community/*/modules / community/*/assets）；
@@ -28,14 +28,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from core import mcp_runtime as mrt  # noqa: E402
 
 #: 轻工具：只该碰几个文件（实测 1–4）
-LIGHT = {"spec_ls": {}, "registry_query": {"query": "M90"},
+LIGHT = {"spec_list": {}, "registry_search": {"query": "M90"},
          "pattern_read": {"pattern_id": "single-source-truth"},
          "pipeline_read": {"pipeline": "P01"},
-         "knowledge_order": {"clearance": "public"},
+         "knowledge_order_read": {"clearance": "public"},
          "library_read": {"entry_id": "NF-1"}}
 LIGHT_BUDGET = 30
 #: 扫树工具：按 id 解析要枚举目录树（实测 114–361），留两个数量级余量
-SCAN = {"pipeline_ls": {}, "library_search": {"query": "雨天"},
+SCAN = {"pipeline_list": {}, "library_search": {"query": "雨天"},
         "module_read": {"module_id": "M90"}, "asset_read": {"key": "STYLE_DNA"}}
 SCAN_BUDGET = 600
 
@@ -88,8 +88,8 @@ class McpReadBudgetTest(unittest.TestCase):
 
     def test_repeat_calls_do_not_amplify(self):
         """稳态：连续两次同一调用，第二次的开销不得**放大**（防「每次调用都加一层扫描」）。"""
-        first = _opens(self.srv, "registry_query", {"query": "M90"})
-        second = _opens(self.srv, "registry_query", {"query": "M90"})
+        first = _opens(self.srv, "registry_search", {"query": "M90"})
+        second = _opens(self.srv, "registry_search", {"query": "M90"})
         self.assertLessEqual(second, max(first, 1) * 2)
 
 

@@ -82,7 +82,7 @@ class ArgumentAdmissionTest(unittest.TestCase):
 
     def test_valid_arguments_pass(self):
         # 显式断言返回值（N12，2026-10-10 审计：纯「不抛异常」不算判据——上面三条此前没有断言）。
-        self.assertIsNone(tb.check_arguments("registry_query", {"query": "M90"}))
+        self.assertIsNone(tb.check_arguments("registry_search", {"query": "M90"}))
         self.assertIsNone(tb.check_arguments("asset_get", {"key": "TECH_RULES",
                                                            "package": "技术文档域包"}))
         self.assertIsNone(tb.check_arguments("pipeline_read",
@@ -117,18 +117,18 @@ class ArgumentAdmissionTest(unittest.TestCase):
 
     def test_control_chars_and_overlength_rejected(self):
         with self.assertRaises(ValueError):
-            tb.check_arguments("registry_query", {"query": "ok\x00bad"})
+            tb.check_arguments("registry_search", {"query": "ok\x00bad"})
         with self.assertRaises(ValueError):
-            tb.check_arguments("registry_query", {"query": "x" * (tb.MAX_ARG_CHARS + 1)})
+            tb.check_arguments("registry_search", {"query": "x" * (tb.MAX_ARG_CHARS + 1)})
 
     def test_shape_limits_rejected(self):
         with self.assertRaises(ValueError):
-            tb.check_arguments("registry_query", {"query": {"nested": 1}})
+            tb.check_arguments("registry_search", {"query": {"nested": 1}})
         with self.assertRaises(ValueError):
-            tb.check_arguments("registry_query",
+            tb.check_arguments("registry_search",
                                {("k%d" % i): "v" for i in range(tb.MAX_ARGS + 1)})
         with self.assertRaises(ValueError):
-            tb.check_arguments("registry_query", ["not", "a", "dict"])
+            tb.check_arguments("registry_search", ["not", "a", "dict"])
 
 
 class McpCallWiringTest(unittest.TestCase):
@@ -142,7 +142,7 @@ class McpCallWiringTest(unittest.TestCase):
                            "params": {"name": name, "arguments": args}})
 
     def test_valid_call_still_works(self):
-        resp = self._call("registry_query", {"query": "M90"})
+        resp = self._call("registry_search", {"query": "M90"})
         self.assertNotIn("error", resp, resp)
         self.assertIn("result", resp)
 
@@ -157,7 +157,7 @@ class McpCallWiringTest(unittest.TestCase):
         self.assertIn("修复指引", resp["error"]["message"])
 
     def test_control_char_argument_is_refused(self):
-        resp = self._call("registry_query", {"query": "M90\x07"})
+        resp = self._call("registry_search", {"query": "M90\x07"})
         self.assertEqual(mrt.INVALID_PARAMS, resp["error"]["code"], resp)
 
     def test_schema_declared_parameters_are_enforced(self):
@@ -168,17 +168,17 @@ class McpCallWiringTest(unittest.TestCase):
         最隐蔽的一类错答）。现按声明逐条校验（走本仓同一份 `json_schema` 子集校验器）。
         """
         for args in ({}, {"quer": "M90"}, {"query": 123}):
-            resp = self._call("registry_query", args)
+            resp = self._call("registry_search", args)
             self.assertEqual(mrt.INVALID_PARAMS, resp["error"]["code"], args)
             self.assertIn("inputSchema", resp["error"]["message"])
             self.assertIn("修复指引", resp["error"]["message"])
-        bad = self._call("knowledge_order", {"clearance": "secret"})   # 枚举越界
+        bad = self._call("knowledge_order_read", {"clearance": "secret"})   # 枚举越界
         self.assertEqual(mrt.INVALID_PARAMS, bad["error"]["code"], bad)
-        self.assertIn("result", self._call("registry_query", {"query": "M90"}))
+        self.assertIn("result", self._call("registry_search", {"query": "M90"}))
 
     def test_optional_arg_tools_still_accept_empty_arguments(self):
         """反向：声明 `required` 的那些才要求参数——可选面传 `{}` 仍须正常应答。"""
-        for name in ("pipeline_ls", "spec_ls", "knowledge_order"):
+        for name in ("pipeline_list", "spec_list", "knowledge_order_read"):
             resp = self._call(name, {})
             self.assertIn("result", resp, name)
 
@@ -199,12 +199,12 @@ class McpFuzzHardeningTest(unittest.TestCase):
             deep = {"n": deep}
         for bad in ({"query": {"a": 1}}, {"query": [1, 2]}, {"query": deep}):
             resp = self._call(srv, {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                                    "params": {"name": "registry_query", "arguments": bad}})
+                                    "params": {"name": "registry_search", "arguments": bad}})
             self.assertEqual(mrt.INVALID_PARAMS, resp["error"]["code"], bad)
 
     def test_oversized_argument_refused(self):
         resp = self._call(self._srv(), {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                                        "params": {"name": "registry_query",
+                                        "params": {"name": "registry_search",
                                                    "arguments": {"query": "x" * 10000}}})
         self.assertEqual(mrt.INVALID_PARAMS, resp["error"]["code"])
 
@@ -219,7 +219,7 @@ class McpFuzzHardeningTest(unittest.TestCase):
     def test_unicode_line_separators_keep_frame_discipline(self):
         """U+2028/U+2029 出现在参数或回包里时，应答仍必须是**单行**（stdio 帧纪律）。"""
         srv = self._srv()
-        resp = self._call(srv, {"jsonrpc": "2.0", "id": 1, "method": "registry_query",
+        resp = self._call(srv, {"jsonrpc": "2.0", "id": 1, "method": "registry_search",
                                 "params": {"query": "M90\u2028M10\u2029x"}})
         line = mrt.encode_message(resp)
         self.assertIsNotNone(line)
@@ -356,7 +356,7 @@ class ToolArgEscapeSweepTest(unittest.TestCase):
     def test_sweep_is_not_vacuous(self):
         """正例对照：合法参数仍能跑通（否则「全拒」也能假绿）。"""
         resp = self.rt.handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                               "params": {"name": "pipeline_ls", "arguments": {"query": "P"}}})
+                               "params": {"name": "pipeline_list", "arguments": {"query": "P"}}})
         self.assertNotIn("error", resp, "合法参数被误拒：%s" % resp)
 
 

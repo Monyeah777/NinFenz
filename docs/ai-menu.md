@@ -2,7 +2,7 @@
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令/步骤/判定，勿当资料阅读。
 > 最后更新：2026-09-08
 > **🔌 DRIVER OVERRIDE（先于本文件其余步骤执行）**：本文件对应工作流 `menu`（机读真源 `protocol/driver.json`）。
-> - 若该工作流已映射且 MCP 可用 → **改走 MCP**（提示 `assemble_guide`；工具 `library_search` / `library_read` / `registry_query`），本文件其余步骤**不再执行**。
+> - 若该工作流已映射且 MCP 可用 → **改走 MCP**（提示 `assemble_guide`；工具 `library_search` / `library_read` / `registry_search`），本文件其余步骤**不再执行**。
 > - 派发失败（工具报错 / 服务中途不可达）→ **如实报错并停止**，**不得回退**执行下面的文本步骤。
 > - 仅当**本工作流无映射**或**本会话未启用 MCP 面**时，才按本文件文本步骤执行（fallback）。
 

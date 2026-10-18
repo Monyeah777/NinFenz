@@ -43,7 +43,7 @@ class ServeDefaultPathTest(unittest.TestCase):
         self.assertEqual(0, code)
         msg = json.loads(out.strip().splitlines()[0])
         names = {t["name"] for t in msg["result"]["tools"]}
-        self.assertIn("registry_query", names)
+        self.assertIn("registry_search", names)
         self.assertEqual(sorted(names), sorted(t["name"] for t in mrt.TOOL_DEFS))
 
     def test_zero_arg_serve_lists_repo_resources(self):

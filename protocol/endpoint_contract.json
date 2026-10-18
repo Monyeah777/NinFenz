@@ -62,7 +62,7 @@
       "streaming": false,
       "request": {"query": "string|null"},
       "response": {"modules": "array", "protocols": "array"},
-      "maps_to": "registry_query（MCP 工具）"
+      "maps_to": "registry_search（MCP 工具）"
     },
     {
       "id": "pipeline.dryrun",

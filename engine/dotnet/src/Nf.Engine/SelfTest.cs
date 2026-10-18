@@ -582,7 +582,7 @@ public static class SelfTest
             {
                 "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{}}",
                 "{这不是 JSON",
-                "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"spec_ls\",\"arguments\":{}}}",
+                "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"spec_list\",\"arguments\":{}}}",
                 "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"ping\"}",
             }) + "\n");
             var output = new StringWriter();
@@ -785,7 +785,7 @@ public static class SelfTest
             "  \"package\": {",
             "    \"name_candidates\": [\"甲\"], \"one_liner_candidates\": [\"乙\"],",
             "    \"category\": \"content-creation\", \"targets\": [],",
-            "    \"tools\": [\"pipeline_ls\"], \"prompts\": [\"assemble_guide\"]",
+            "    \"tools\": [\"pipeline_list\"], \"prompts\": [\"assemble_guide\"]",
             "  }",
             "}",
         }) + "\n");

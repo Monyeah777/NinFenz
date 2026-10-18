@@ -53,17 +53,17 @@ public static class McpServer
         ("nf_interop", "互操作导出面：kind 缺省列 12 形状清单；给 kind 返回该形状派生文档；check=true 跑导出面门禁", ObjectSchema(("kind", "string", "导出形状（openapi/asyncapi/intoto/sbom/slsa/a2a/prov/cyclonedx/vc/c2pa/cid/decisions）"), ("check", "boolean", "true=跑门禁（覆盖完整 + 形状合法 + 确定性）"))),
         ("nf_st_validate", "ST 制卡校验器（卡 / 世界书 / MVU 变量 JSON → R1/R3/R4 可自动化项报告；只读，不落报告文件）", ObjectSchema(("path", "string", "被校验 JSON 的路径"))),
         // —— 以下三个与仓库侧 mcp_runtime 的**同名同形**：工具级逐字节对账已实测（见 README 第二十四片）
-        ("pipeline_ls", "列出 NF 管线清单（03_管线库 + community 包 pipelines）", ObjectSchema(("query", "string", "可选过滤串（匹配 id/标题）"))),
-        ("spec_ls", "列出 registry protocols 协议包清单（id/version/模块数/类别）", ObjectSchema()),
-        ("registry_query", "查询 registry 模块/协议（按 id/name 子串匹配，只读）", ObjectSchema(("query", "string", "检索串（如 M90 或 域包 id）"))),
+        ("pipeline_list", "列出 NF 管线清单（03_管线库 + community 包 pipelines）", ObjectSchema(("query", "string", "可选过滤串（匹配 id/标题）"))),
+        ("spec_list", "列出 registry protocols 协议包清单（id/version/模块数/类别）", ObjectSchema()),
+        ("registry_search", "查询 registry 模块/协议（按 id/name 子串匹配，只读）", ObjectSchema(("query", "string", "检索串（如 M90 或 域包 id）"))),
         ("library_read", "取云端图书馆馆藏条目正文（按 NF 编号，大小写不敏感；返回 frontmatter + 全文）", ObjectSchema(("entry_id", "string", "馆藏编号（如 NF-1）"))),
-        ("pattern_ls", "列出实践包清单（id / path / title / status；只读）", ObjectSchema()),
+        ("pattern_list", "列出实践包清单（id / path / title / status；只读）", ObjectSchema()),
         ("pattern_read", "取实践包（patterns/）正文：按 id 返回 frontmatter + 可执行规则 + 正反例（只读）", ObjectSchema(("pattern_id", "string", "pattern id（如 fail-closed-verification）"))),
         ("module_read", "取模块文档正文（04_模块库 与 community 包 modules；支持全限定 id 与裸号）", ObjectSchema(("module_id", "string", "模块 id（如 M90 / 通用:M10）"))),
         ("pipeline_read", "取管线正文（按 Pxx 编号或仓库内相对路径；只读 03_管线库 与 community/*/pipelines）", ObjectSchema(("pipeline", "string", "Pxx 或相对路径（如 03_管线库/P90….md）"))),
         ("library_search", "仓库侧知识库检索：馆藏条目（正文级）+ docs + community README + 编号方案文档", ObjectSchema(("query", "string", "检索串"))),
-        ("knowledge_order", "解析知识源查询顺序（先合同级后参考级；可按可见性 clearance 裁剪）", ObjectSchema(("clearance", "string", "可见性上限（public/internal/restricted）"))),
-        ("asset_ls", "列出资产文件与声明的键（可限定包；只读）", ObjectSchema(("package", "string", "包名（可选）"))),
+        ("knowledge_order_read", "解析知识源查询顺序（先合同级后参考级；可按可见性 clearance 裁剪）", ObjectSchema(("clearance", "string", "可见性上限（public/internal/restricted）"))),
+        ("asset_list", "列出资产文件与声明的键（可限定包；只读）", ObjectSchema(("package", "string", "包名（可选）"))),
         ("asset_read", "取资产正文（按资产键；可限定包）", ObjectSchema(("key", "string", "资产键"), ("package", "string", "包名（可选）"))),
     };
 
@@ -279,17 +279,17 @@ public static class McpServer
             "nf_stats" => RepoStatsPayload(root),
             "nf_interop" => InteropPayload(root, args),
             "nf_st_validate" => StValidate.Validate(ResolvePath(root, Str(args, "path"))),
-            "pipeline_ls" => PipelineList(root, Str(args, "query")),
-            "spec_ls" => SpecList(root),
-            "registry_query" => RegistryQuery(root, Str(args, "query")),
+            "pipeline_list" => PipelineList(root, Str(args, "query")),
+            "spec_list" => SpecList(root),
+            "registry_search" => RegistryQuery(root, Str(args, "query")),
             "library_read" => LibraryRead(root, Str(args, "entry_id")),
-            "pattern_ls" => PatternLs(root),
+            "pattern_list" => PatternLs(root),
             "pattern_read" => PatternRead(root, Str(args, "pattern_id")),
             "module_read" => ModuleRead(root, Str(args, "module_id")),
             "pipeline_read" => PipelineRead(root, Str(args, "pipeline")),
             "library_search" => LibrarySearch(root, Str(args, "query")),
-            "knowledge_order" => KnowledgeOrder(root, Str(args, "clearance")),
-            "asset_ls" => AssetLs(root, Str(args, "package")),
+            "knowledge_order_read" => KnowledgeOrder(root, Str(args, "clearance")),
+            "asset_list" => AssetLs(root, Str(args, "package")),
             "asset_read" => AssetGet(root, Str(args, "key"), Str(args, "package")),
             _ => null,
         };
@@ -863,9 +863,9 @@ public static class McpServer
         if (exact.Count > 0) hit = exact[0];
         else if (suffix.Count == 1) hit = suffix[0];
         else if (suffix.Count > 1)
-            throw new ArgumentException("module_id 存在多个同号限定（如 通用:M10 / 生存:M10）——请用限定 id（修复指引：先 registry_query 查全限定 id 再重试）");
+            throw new ArgumentException("module_id 存在多个同号限定（如 通用:M10 / 生存:M10）——请用限定 id（修复指引：先 registry_search 查全限定 id 再重试）");
         else
-            throw new ArgumentException($"模块未找到：{moduleId}（module ls / registry_query 可枚举）（修复指引：用仓库内真实模块 id，如 M90、M40 或 通用:M10）");
+            throw new ArgumentException($"模块未找到：{moduleId}（module ls / registry_search 可枚举）（修复指引：用仓库内真实模块 id，如 M90、M40 或 通用:M10）");
 
         var (text, bytes) = ReadRepoText(root, hit.Rel);
         return new Dictionary<string, object?>(StringComparer.Ordinal)
@@ -905,7 +905,7 @@ public static class McpServer
             }
         }
         if (hits.Count == 0)
-            throw new ArgumentException($"管线未找到：{pipeline}（pipeline_ls 可枚举）（修复指引：用 Pxx 编号或仓库内相对路径）");
+            throw new ArgumentException($"管线未找到：{pipeline}（pipeline_list 可枚举）（修复指引：用 Pxx 编号或仓库内相对路径）");
         var rel = Path.GetRelativePath(root, hits[0]).Replace('\\', '/');
         var (hitText, hitBytes) = ReadRepoText(root, rel);
         return new Dictionary<string, object?>(StringComparer.Ordinal)
