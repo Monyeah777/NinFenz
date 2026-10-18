@@ -102,7 +102,6 @@ AI 装配：
 **官方核心**：13 模块 · 3 管线（P00 / P01 / P90） · 核心协议件 01–07
 **社区规模**：111 登记包 · 363 资产档 · 101 概念图 · 100 域包/1200 细分 · 标准目录 370 条（可达 332 / 不可达 38 · 机构 194 · 206 条依赖边） · 标准绑定 1200 条
 **质量凭证**：verify v2.30 · check1-42 · PASS=76（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`） · 馆藏 3 件
-> 门禁两档：`bash verify.sh` = **quick**（42 条静态 check + 受影响测试，开发回路）；`bash verify.sh --full` = **全量测试**，发布/推送结论只看这一档（`nf release` 与 CI 已固定走 `--full --no-cache`）。输入未变时按内容摘要回放上次绿判定（秒级），`--no-cache` 可强制重算。
 
 分层：data 148 · eng 38 · form 29 · gov 71 · iface 84 （按标准目录 layer）
 

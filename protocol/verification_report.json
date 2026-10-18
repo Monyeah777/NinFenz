@@ -322,11 +322,9 @@
     },
     {
       "id": "self_stats",
-      "issues": 1,
+      "issues": 0,
       "name": "自述数字 == 实算（README/llms 生成区）",
-      "sample": [
-        "README.md 的生成区与实算不一致（跑 `nf stats --write` 重写）"
-      ],
+      "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
         "baseline_checks": 42,
@@ -361,7 +359,7 @@
         "verify_checks": 42,
         "verify_version": "2.30"
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -540,12 +538,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "a8884f7eff4d2bb4a6ba1fecea156c2b35491eba1f29342fdf2c257f1c9f7d07",
+  "root_digest": "9abdf4dd82bfd84427fe50cf09bf504d3708e4715e762545bb9a5b95f03ac0cc",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 28,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }
