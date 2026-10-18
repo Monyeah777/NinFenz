@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "scripts/verify_cache.py:142 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）; scripts/verify_cache.py:133 危险 sink unlink（CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左右））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）",
-      "digest": "4b570928fa2e92dfc3f6c3a08a31d4c0dea786cd645228a45ea4044116fc1c2b",
+      "detail": "纯度零违规",
+      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
       "id": "purity-clean",
-      "ok": false
+      "ok": true
     },
     {
       "description": "文档四型覆盖",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 26,
-  "root": "42aa0abf27ea001e37a503e54cdbe78923333075b0b851f1a2b6bf0e0fa28bd0",
+  "passed": 27,
+  "root": "4340ee1b3521778f8b323bb971748013d9ab6378c2a80bdee15263f70f3f61d7",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "non-conformant"
+  "verdict": "conformant"
 }
