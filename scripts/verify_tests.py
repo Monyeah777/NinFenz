@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -40,7 +41,7 @@ SHARD_TIMEOUT_S = 5400.0
 
 #: 落盘一律走 core.atomic_write（脚本面纪律：不得有裸写 sink）；权重是**仓内**协议件。
 sys.path.insert(0, str(DESKTOP / "src"))
-from core import atomic_write  # noqa: E402 - 先用后置（scripts 面统一写法）
+from core import atomic_write, json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
 
 
 def discover_ids() -> list:
@@ -72,10 +73,114 @@ def module_of(test_id: str) -> str:
     return parts[0] if parts else ""
 
 
-def load_weights() -> dict:
+#: 任何**非 core** 变更都要跑的模块：它们读全仓事实（文档/协议/产物/统计），
+#: 静态 import 看不到依赖面——宁可多跑，不可漏跑。
+ALWAYS_MODULES = frozenset({
+    "test_verify_report", "test_conformance_scan", "test_conformance_run",
+    "test_style_ratchet", "test_purity_scan", "test_dead_code", "test_role_model",
+    "test_doc_reachability", "test_live_doc_counts", "test_net_coverage",
+    "test_suite_isolation", "test_npm_package", "test_asset_ledger_projection",
+})
+
+_CORE_REF = (
+    r"(?:from\s+core\s+import\s+([A-Za-z0-9_,\s]+)"
+    r"|from\s+core\.([A-Za-z0-9_]+)"
+    r"|import\s+core\.([A-Za-z0-9_]+))"
+)
+
+
+def changed_paths() -> list:
+    """相对仓库根的变更面：tracked diff（HEAD）+ 未跟踪件。"""
+    out = []
     try:
-        doc = json.loads((ROOT / WEIGHTS_REL).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        p = subprocess.run(["git", "diff", "--name-only", "HEAD"], cwd=str(ROOT),
+                           capture_output=True, text=True, encoding="utf-8")
+        if p.returncode == 0:
+            out += [ln.strip() for ln in (p.stdout or "").splitlines() if ln.strip()]
+        q = subprocess.run(["git", "ls-files", "-o", "--exclude-standard"], cwd=str(ROOT),
+                           capture_output=True, text=True, encoding="utf-8")
+        if q.returncode == 0:
+            out += [ln.strip() for ln in (q.stdout or "").splitlines() if ln.strip()]
+    except (OSError, subprocess.SubprocessError):
+        # git 不在场/坏仓库 → 返回空 = 由调用方按"干净树"处理（只跑常驻集），不会静默全绿：
+        # 空集合只影响**选哪些测试**，判定本身仍由跑到的测试给出。
+        return []
+    return sorted(set(out))
+
+
+def _core_imports(text: str) -> set:
+    out = set()
+    for m in re.finditer(_CORE_REF, text):
+        if m.group(1):
+            out.update(x.strip() for x in m.group(1).split(",") if x.strip())
+        if m.group(2):
+            out.add(m.group(2))
+        if m.group(3):
+            out.add(m.group(3))
+    return out
+
+
+def _core_reverse_closure(start: set) -> set:
+    """变更的 core 模块 → 传递**反向依赖**闭包（谁 import 它）。"""
+    graph = {}
+    for py in (DESKTOP / "src" / "core").glob("*.py"):
+        try:
+            graph[py.stem] = _core_imports(py.read_text(encoding="utf-8", errors="replace"))
+        except OSError:
+            graph[py.stem] = set()
+    closure = set(start)
+    changed = True
+    while changed:
+        changed = False
+        for mod, imports in graph.items():
+            if mod not in closure and imports & closure:
+                closure.add(mod)
+                changed = True
+    return closure
+
+
+def _test_sources() -> dict:
+    out = {}
+    for py in TESTS.glob("test*.py"):
+        try:
+            out[py.stem] = py.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            out[py.stem] = ""
+    return out
+
+
+def affected_selection(ids: list) -> tuple:
+    """变更 → 受影响测试 id；非 core 变更**全量兜底**（宁慢勿漏）。"""
+    changed = changed_paths()
+    if not changed:
+        keep = [t for t in ids if module_of(t) in ALWAYS_MODULES]
+        return keep, "干净树（只跑常驻集 %d 个模块）" % len(keep and {module_of(t) for t in keep})
+    non_core = [p for p in changed if not p.startswith("desktop/src/core/")]
+    if non_core:
+        return list(ids), "非 core 变更 %d 个 → 全量兜底" % len(non_core)
+    changed_core = {Path(p).stem for p in changed if p.endswith(".py")}
+    closure = _core_reverse_closure(changed_core)
+    sources = _test_sources()
+    keep = []
+    for tid in ids:
+        mod = module_of(tid)
+        if mod in ALWAYS_MODULES or (_core_imports(sources.get(mod, "")) & closure):
+            keep.append(tid)
+    return keep, "core 变更 %d 个 → 反向依赖闭包 %d 个模块" % (len(changed_core), len(closure))
+
+
+def load_weights() -> dict:
+    """读权重基线（仓内 JSON 走 core.json_doc：形状校验 + 带指引报错）。
+
+    缺文件/坏件 → 空权重：只影响分片均衡，不影响判据（均匀兜底在 test_weights 里）。
+    """
+    path = ROOT / WEIGHTS_REL
+    if not path.is_file():
+        return {}
+    try:
+        doc = json_doc.load(path, dict, what=WEIGHTS_REL)
+    except ValueError:
+        # 权重是**纯加速参数**：坏件退回均匀权重即可，不必让门禁红（判据面不受影响）。
         return {}
     rows = doc.get("modules") if isinstance(doc, dict) else None
     return {str(k): float(v) for k, v in (rows or {}).items() if isinstance(v, (int, float))}
@@ -130,7 +235,7 @@ def run_shard_mode(spec_path: str) -> int:
     """子进程侧：按测试 id 清单跑。"""
     sys.path.insert(0, str(DESKTOP))
     sys.path.insert(0, str(TESTS))
-    tests = json.loads(Path(spec_path).read_text(encoding="utf-8"))["tests"]
+    tests = json_doc.load(Path(spec_path), dict, what="分片测试清单")["tests"]
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     for tid in tests:
@@ -161,6 +266,8 @@ def main(argv=None) -> int:
     ap.add_argument("--write-weights", action="store_true",
                     help="逐模块实测并写 protocol/check12_weights.json")
     ap.add_argument("--list", action="store_true", help="只打印发现的测试数")
+    ap.add_argument("--affected", action="store_true",
+                    help="只跑**受影响**测试（按变更面的 core 反向依赖闭包；非 core 变更全量兜底）")
     ap.add_argument("--run-shard", default="", help=argparse.SUPPRESS)
     ap.add_argument("--json", action="store_true", help="输出结构化摘要")
     args = ap.parse_args(argv)
@@ -180,6 +287,13 @@ def main(argv=None) -> int:
         print(json.dumps({"tests": len(ids), "modules": len({module_of(t) for t in ids})},
                          ensure_ascii=False))
         return 0
+
+    if args.affected and not args.write_weights:
+        ids, why = affected_selection(ids)
+        print("  受影响选择：%s → %d 条测试" % (why, len(ids)))
+        if not ids:
+            print("  受影响集为空（修复指引：用 --jobs 0 或 --full 档跑全量）", file=sys.stderr)
+            return 2
 
     if args.write_weights:
         t0 = time.perf_counter()

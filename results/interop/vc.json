@@ -7,10 +7,10 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "4830829802f66a11b709f806734f81f4e10447c0fb7b9b07259a853cd11dd5fb",
+    "receiptRoot": "68723558d429b6f5f9bedbf7c579dd72adbb5828759ae8277d2f678613dc82ad",
     "verdict": "conformant"
   },
-  "issuer": "门禁提速批（P2 分片）",
+  "issuer": "门禁提速批（P3）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"

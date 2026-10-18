@@ -26,26 +26,29 @@
         "scripts/sast_check.py::B603": 1,
         "scripts/style_check.py::B404": 1,
         "scripts/style_check.py::B603": 1,
+        "scripts/verify_cache.py::B404": 1,
+        "scripts/verify_cache.py::B603": 1,
         "scripts/verify_run.py::B404": 1,
         "scripts/verify_tests.py::B404": 1,
-        "scripts/verify_tests.py::B603": 1
+        "scripts/verify_tests.py::B603": 3,
+        "scripts/verify_tests.py::B607": 2
       },
       "meta": {
         "bandit": {
           "severities": [
             [
               "LOW",
-              31
+              37
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 36
+          "total": 42
         },
         "ruff": {
-          "total": 80
+          "total": 83
         }
       },
       "ruff": {
@@ -90,9 +93,11 @@
         "scripts/pull_decision_model.py::S603": 1,
         "scripts/sast_check.py::S603": 1,
         "scripts/style_check.py::S603": 1,
+        "scripts/verify_cache.py::S603": 1,
         "scripts/verify_parallel.py::S603": 1,
         "scripts/verify_run.py::S603": 1,
-        "scripts/verify_tests.py::S603": 1
+        "scripts/verify_tests.py::S603": 1,
+        "scripts/verify_tests.py::S607": 2
       }
     },
     "posix": {

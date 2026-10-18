@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 222,
-    "verify": 931
+    "verify": 932
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11807,6 +11807,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "门禁判定缓存：输入摘要 → 判定摘要（**只加速，不替代判定**）。",
+      "path": "scripts/verify_cache.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "**开发快车道**：按改动跑增量 check（薄适配层；判据真源在 core.gate_*）。",
       "path": "scripts/verify_fast.py",
       "role": "verify",
@@ -11850,7 +11856,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a79bbdce1ed6d0327ddca340577d7e948d41be9127dba5f36d34e4fd6fc7ef48",
+  "root_digest": "71c92b1dc51feac0901a679fe79bbaf707091d8c16a031c298aaf1a6262a9aca",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 85,
@@ -11859,7 +11865,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 112,
-    "R-verify": 816,
+    "R-verify": 817,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"

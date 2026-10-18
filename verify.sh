@@ -41,19 +41,26 @@ if [ -n "${NF_VERIFY_TMP:-}" ]; then
 else
   NFL_TMP="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/nf_verify_$$")"
 fi
-# ---- 命令行参数：默认**无参数 = 全量**（向后兼容硬约束）----
-# `--fast` 是**开发快车道**（按改动跑增量 check，真源 scripts/verify_fast.py → core.gate_*）：
-# 它只把"该不该跑"收窄，**绝不改变任何一条 check 的判据**，也**不能替代全量结论**——故它跑在
-# 全部 check 之后、只做补充，并在红时把退出码拉成 1。
-# `--base` 指定增量档的比较基线（缺省 HEAD~1）。任何其它参数 = 用法错误（exit 2），
-# 以免"看上去像传了子集其实仍在全量"这类静默误读。
-NF_FAST=0; NF_BASE=''
+# ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
+# 档位（2026-10-18 起）：
+#   bash verify.sh         quick 档 = 42 条静态 check + **受影响测试**（按变更面的 core 反向依赖
+#                          闭包；非 core 变更全量兜底）——给开发回路用的分钟级结论。
+#   bash verify.sh --full  full 档 = 42 条静态 check + **全量 3100+ 测试**（分片并行）；
+#                          **只有这一档能作为发布/推送结论**（nf release 走它）。
+#   bash verify.sh --fast  既有开发快车道（按改动选 check），跑在全部 check 之后、只作补充。
+# 缓存（P3b）：两档都按**输入内容寻址**缓存绿判定（HEAD + 工作树差异 + 未跟踪件 + 门禁代码 +
+#   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
+# 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
+NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast) NF_FAST=1 ;;
+    --full) NF_TIER='full' ;;
+    --quick) NF_TIER='quick' ;;
+    --no-cache) NF_CACHE=0 ;;
     --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
     *)
-      echo "未知参数：$1（用法：bash verify.sh [--fast] [--base <ref>]）" >&2
+      echo "未知参数：$1（用法：bash verify.sh [--full|--quick] [--fast] [--no-cache] [--base <ref>]）" >&2
       exit 2 ;;
   esac
   shift
@@ -458,7 +465,11 @@ check12(){
   # `NF_TEST_JOBS=1` 回到串行（排障用）；缺执行器时回退历史串行发现。
   if [ -d desktop/tests ]; then
     if [ -f scripts/verify_tests.py ]; then
-      _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "${NF_TEST_JOBS:-4}")
+      if [ "$NF_TIER" = "full" ]; then
+        _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "${NF_TEST_JOBS:-4}")
+      else
+        _ut_cmd=("$PY3" scripts/verify_tests.py --affected --jobs "${NF_TEST_JOBS:-4}")
+      fi
     else
       _ut_cmd=(bash -c 'cd desktop && exec "$0" -m unittest discover -s tests -q' "$PY3")
     fi
@@ -2912,10 +2923,27 @@ PYEOF
   fi
 }
 
+# ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
+# key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
+# 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
+_CACHE_KEY=''
+if [ "$NF_FAST" -eq 0 ] && [ "$NF_CACHE" -eq 1 ] && [ -n "$PY3" ] && [ -f scripts/verify_cache.py ]; then
+  _CACHE_KEY="$("$PY3" scripts/verify_cache.py --mode "$NF_TIER" --key 2>/dev/null || true)"
+  if [ -n "$_CACHE_KEY" ] && "$PY3" scripts/verify_cache.py --mode "$NF_TIER" --get --key "$_CACHE_KEY" 2>/dev/null; then
+    echo '>>> 全部通过（缓存判定：输入未变；--no-cache 可强制重算） <<<'
+    exit 0
+  fi
+fi
+
 # ================= 主执行体（三段式） =================
 echo '=================================================='
 echo ' NinFenz 三段式验收门禁  v2.30（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
 echo '=================================================='
+if [ "$NF_TIER" = "full" ]; then
+  echo ' 档位：full（42 条静态 check + 全量测试；发布/推送结论用这一档）'
+else
+  echo ' 档位：quick（42 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
+fi
 echo '—— 段 A：官方核心出厂（无 community 亦须通过）——'
 check1; check2; check3; check4; check5; check6
 echo '—— 段 B：社区领域包（两包在场执行，缺包 WARN 跳过）——'
@@ -2983,6 +3011,11 @@ if [ "$FAIL" -gt 0 ]; then
   echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42））"
   exit 1
 else
+  if [ "$NF_CACHE" -eq 1 ] && [ "$NF_FAST" -eq 0 ] && [ -n "$_CACHE_KEY" ] && [ -n "$PY3" ]; then
+    # 只缓存绿判定（红是瞬态）；失败不打扰退出码。
+    "$PY3" scripts/verify_cache.py --mode "$NF_TIER" --put --key "$_CACHE_KEY" \
+      --pass "$PASS" --warn "$WARN" >/dev/null 2>&1 || true
+  fi
   echo '>>> 全部通过（WARN 仅提示非致命），变更可提交 <<<'
   exit 0
 fi

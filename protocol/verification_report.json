@@ -30,7 +30,7 @@
           "tiers": 4
         },
         "raises": 61,
-        "sinks": 16
+        "sinks": 18
       },
       "status": "pass",
       "warns": 0
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 299,
-        "files": 299,
+        "baseline": 300,
+        "files": 300,
         "max_fn_cc": 115,
         "max_fn_lines": 1253,
         "max_lines": 7523
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3796,
-        "kernel": 1973,
+        "files": 3797,
+        "kernel": 1974,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "fddb1127664ca2626994c53882de06e7bc46de46b59047512c6dc77ec4ce5566",
+  "root_digest": "eb81a81ae1e1a775b4036e8702b7eb57455a3c8122265c7dc223d333d9ed33e1",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

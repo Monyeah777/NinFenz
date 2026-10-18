@@ -176,7 +176,11 @@ class DaemonFreshnessTest(DaemonHarness):
         orig = pack_combo.cache_clear
         pack_combo.cache_clear = lambda: (calls.append(1), orig())[1]
         try:
-            dm.execute(["--version"], ROOT)
+            # 用**独有 cwd** 强制走满整条执行路径：响应缓存按 (argv, gen, cwd) 命中，
+            # 若同一进程里别的用例刚跑过 --version，这里会**提前 return**、根本到不了
+            # 清缓存那一步（分片/乱序跑时实测必红；串行时只是碰巧没被预热）。
+            with tempfile.TemporaryDirectory() as tmp:
+                dm.execute(["--version"], ROOT, cwd=tmp)
         finally:
             pack_combo.cache_clear = orig
         self.assertGreaterEqual(len(calls), 1, "执行前后必须清空 pack_combo 进程缓存")

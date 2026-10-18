@@ -12,8 +12,14 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:54fb9760bd7e2fa83b110b4b1c29e54f821434ca5a19b7d63ff0e1d4195e9e20
   - protocol/drill_fidelity.json:235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:4f8fd31f8def501066c8cf2416bdba38a13c2fbe60b71e98fe60ea5007b8b2ca
+  - protocol/code_metrics_baseline.json:a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3
 ---
+> 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）
+
+> 重审（2026-10-18）：P3：判定缓存 + 分层档位（sink 登记）
+
+> 重审（2026-10-18）：P3：分层档位 + 判定缓存 + 受影响测试选择
+
 > 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
 
 > 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步

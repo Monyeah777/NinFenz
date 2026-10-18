@@ -926,7 +926,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 559,
+      "lines": 566,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1465,6 +1465,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },
+    "scripts/verify_cache.py": {
+      "lines": 177,
+      "max_fn_cc": 8,
+      "max_fn_lines": 26
+    },
     "scripts/verify_fast.py": {
       "lines": 288,
       "max_fn_cc": 17,
@@ -1486,9 +1491,9 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 246,
-      "max_fn_cc": 17,
-      "max_fn_lines": 83
+      "lines": 360,
+      "max_fn_cc": 20,
+      "max_fn_lines": 92
     },
     "scripts/workflow_policy.py": {
       "lines": 42,
