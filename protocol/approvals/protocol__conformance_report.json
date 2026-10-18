@@ -1,6 +1,6 @@
 {
   "approved_at": "2026-10-18",
-  "approved_by": "门禁提速批（卡册）",
+  "approved_by": "门禁提速批（重叠收窄）",
   "note": "收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",

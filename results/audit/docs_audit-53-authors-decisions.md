@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
+  - verify.sh:693bc0b5864859e99cf751c84d779c62be70b98117f57a2b5539467e32d02da6
 
 ---
+> 重审（2026-10-18）：重叠范围收窄到 quick
+
 > 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
 
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
