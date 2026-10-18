@@ -903,17 +903,18 @@ TOOL_DEFS = [
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
-            "Read every asset file that declares an asset key.\n\n"
-            "Use it only for a key from asset_ls. For enumeration use asset_ls. For "
-            "modules or pipelines use module_read or pipeline_read.\n\n"
-            "The key is an exact uppercase token, not a glob, regex, package name, path, "
-            "or prose. The package is an exact directory name; it only narrows the file "
-            "set and never changes key matching.\n\n"
-            "Matching uses tokens from each file's name or first 6000 characters; "
-            "lowercase or partial keys fail.\n\n"
-            "Without a package, all community assets and 05_资产库 are searched. With a "
-            "package, the scan is limited to that directory and does not fall back. "
-            "Multiple matches may be returned. No match is an error."),
+            "Read every asset file that declares an asset key, returning package, file "
+            "path, and text.\n\n"
+            "Use it only for a key from asset_ls. Use asset_ls for enumeration, "
+            "module_read or pipeline_read for other resources.\n\n"
+            "The key is an exact uppercase token, not a glob, regex, package, path, or "
+            "prose. The package is an exact directory name; it only narrows files and "
+            "never changes key matching.\n\n"
+            "Match tokens from each file's name or first 6000 characters; lowercase or "
+            "partial keys fail.\n\n"
+            "Without a package, all community assets and 05_资产库 are searched. A package "
+            "limits the scan to that directory with no fallback. Multiple matches may "
+            "return. No match is an error."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,

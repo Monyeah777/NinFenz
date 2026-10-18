@@ -375,30 +375,26 @@ coherence 的反馈与处理如下：
 
 ## 14. 逐工具精修记录
 
-### asset_read（旧名 asset_get 4.4 → 新工具页实评 **4.8**）
+### asset_read（旧名 asset_get 4.4 → 4.8 → 4.6 → 目标 5）
 
-Glama 已为改名后的 `asset_read` 建了新工具页，实评 **4.8/5.0**：
-Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Conciseness 4。
-旧 `asset_get` 的 4.4 是改名前的缓存页。
+Glama 工具页轨迹：旧 `asset_get` 4.4 → 改名后 `asset_read` 4.8（103 词单段，
+Purpose/Usage/Behavior/Completeness 5，Params 4，CS 4）→ 74 词压缩版 **4.6**
+（Behavior 4、CS 4、Params 4；反馈明确说“single long block, no visual structure”）。
 
-反馈：定义强、Behavior 已满；剩余缺口只有 **Parameters**（schema 已 100% 覆盖，需补更强的意图）
-和 **Conciseness**（密度略高）。
+结论：这个工具的瓶颈不是字数，而是 **可读结构 + 输出形状**。压缩成括号/斜杠列表会掉分。
 
-第一轮（已到 4.8）：删除 canonical/只读尾句，补 `asset_ls` / `module_read` / `pipeline_read`
-替代，补 `key` 的 uppercase、非包名/路径/散文语义。
+第四轮（本版，109 词，目标 5）：
 
-第二轮（84 词）仍 4.8：只有 **Conciseness** 还是 4，说明“密度略高”这一项要靠更短，而不是继续补语义。
+- 改成 **5 个短段落**：目的 → 使用/替代 → key/package 语义 → 匹配 → 默认/错误；
+- 补回输出形状：`returning package, file path, and text`（此前 74 词版删掉后 Behavior 掉到 4）；
+- 补参数交互：`package` 只缩文件集、**never changes key matching**（此前 Params 4 的原因）；
+- 保留 no glob/regex/package/path/prose、exact directory、no fallback、扫描文件名或前 6000
+  字符、多匹配、无匹配即错误；
+- 目标：Behavior / Parameters / Conciseness 三项同时 5。
 
-第三轮（74 词）**降到 4.6**：压缩成括号和斜杠列表后，被判 **Conciseness 3**——
-“single long block, no visual structure”。这说明这个工具的问题不是字数，而是**可读结构**。
-
-第四轮（本版，目标 5）：
-
-- 不再压缩成括号/斜杠列表；改成 **5 个短段落**：
-  目的 → 使用/替代 → key/package 语义 → 匹配 → 默认/错误；
-- 保留全部参数与行为信息（no glob/regex/package/path/prose、exact directory、
-  no fallback、扫描文件名或前 6000 字符、多匹配、无匹配即错误）；
-- 目标：用结构换 Conciseness 5，而不是继续减字。
+> Glama Directory API key（`glm_...`）只覆盖 `/v1/servers` 等只读查询；其 OpenAPI 没有
+> build/release 端点。Admin 的 Deploy / Make Release 必须用浏览器 OAuth 会话点，API key
+> 不能代替。该 key 只用于本地核对 `qualityScore=4.6`，用后已清空、未入库。
 
 ## 附录：官方参考
 
