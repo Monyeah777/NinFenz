@@ -38,6 +38,8 @@ DESKTOP = ROOT / "desktop"
 TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
 SHARD_TIMEOUT_S = 5400.0
+#: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
+SERIAL_MODULES = frozenset({"test_atomic_write", "test_daemon"})
 
 #: 落盘一律走 core.atomic_write（脚本面纪律：不得有裸写 sink）；权重是**仓内**协议件。
 sys.path.insert(0, str(DESKTOP / "src"))
@@ -373,21 +375,33 @@ def main(argv=None) -> int:
     jobs = max(1, min(jobs, len(ids)))
     weights_doc = load_weights()
     ws = test_weights(ids, weights_doc.get("modules", {}), weights_doc.get("tests", {}))
-    bins = assign(ids, ws, jobs)
-    flat = [t for b in bins for t in b]
-    if sorted(flat) != ids:
-        print("分片测试集与 discover 不一致（漏/重）：%d vs %d" % (len(flat), len(ids)),
-              file=sys.stderr)
-        return 1
+
+    # 负载敏感模块走**独占串行段**（2026-10-18 实测）：test_atomic_write / test_daemon 的
+    # 失败注入在 8 片并发下会偶发"补丁未生效"（隔离跑必绿、满负载下偶红）。这不是判据强弱问题，
+    # 而是**负载敏感**：它们自身要在进程内打桩/起守护，8 路并发把进程创建与文件系统延迟放大到
+    # 足以改变时序。
+    # 处置：这两族放到并行段之后**独占跑**（仍跑全部用例，一条不减），换确定性。
+    serial_ids = [t for t in ids if module_of(t) in SERIAL_MODULES]
+    parallel_ids = [t for t in ids if module_of(t) not in SERIAL_MODULES]
 
     t0 = time.perf_counter()
+    results = []
     if jobs == 1:
-        results = [run_shard(bins[0], 0)]
+        results = [run_shard(ids, 0)]
     else:
+        pjobs = max(1, min(jobs, max(1, len(parallel_ids))))
+        bins = assign(parallel_ids, ws, pjobs)
+        flat = [t for b in bins for t in b]
+        if sorted(flat) != sorted(parallel_ids):
+            print("分片测试集与 discover 不一致（漏/重）：%d vs %d"
+                  % (len(flat), len(parallel_ids)), file=sys.stderr)
+            return 1
         import concurrent.futures as cf
         with cf.ThreadPoolExecutor(max_workers=len(bins)) as ex:
             results = [f.result() for f in [ex.submit(run_shard, b, i)
                                             for i, b in enumerate(bins)]]
+        if serial_ids:
+            results.append(run_shard(serial_ids, len(bins)))
     wall = time.perf_counter() - t0
     failed = [r for r in results if r["rc"] != 0]
 
