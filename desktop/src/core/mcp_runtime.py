@@ -903,13 +903,12 @@ TOOL_DEFS = [
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
-            "Read every asset file that declares an asset key. Use it after asset_ls or a "
-            "package README names a key such as EMOTION_WHEEL; do not use it to enumerate "
-            "keys (use asset_ls instead), read modules (module_read), or read pipelines "
-            "(pipeline_read). key is the declared uppercase token—not a package name, "
-            "path, or prose phrase—and package is a bare package name, not a path. "
-            "Matching is exact and case-sensitive against tokens in each file's name or "
-            "first 6000 characters; lowercase or partial keys do not match. Optional "
+            "Read every asset file that declares an asset key. Use it for a key from "
+            "asset_ls or a package README; do not use it to enumerate keys (use asset_ls "
+            "instead), read modules (module_read), or read pipelines (pipeline_read). key "
+            "is an uppercase token—not a package name, path, or prose—and package is a "
+            "bare package name, not a path. Match exact, case-sensitive tokens from each "
+            "file's name or first 6000 chars; lowercase or partial keys fail. Optional "
             "package limits the scan to community/<package>/assets; otherwise all "
             "community assets and 05_资产库 are searched, and multiple matches are "
             "returned. No match is an error, not an empty result."),

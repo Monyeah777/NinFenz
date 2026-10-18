@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:e20ddecbbd72201b9e4a27f9278eb7aaf55253502de405efb3c7dc109cb01db7
+  - desktop/src/core/mcp_runtime.py:38a42a81c581967df7a42811a142b9e4a0a33bf554a531ed98076d6a2ee19400
   - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
 ---
+> 重审（2026-10-18）：asset_read 描述再压缩：去示例、缩短匹配句中句
+
 > 重审（2026-10-18）：Glama 逐工具精修：asset_read 明确 key/package 意图与 when-not-use，去重只读尾句
 
 > 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
