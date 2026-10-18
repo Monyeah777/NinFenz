@@ -12,7 +12,6 @@
 - 总预算：`total_s` ≤ BUDGET（防"慢慢变重还不自知"）；
 - 单个模块上限：任何模块 ≤ MODULE_CAP（防单模块重新长成 200 s 的怪）。
 """
-import json
 import sys
 import unittest
 from pathlib import Path
