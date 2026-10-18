@@ -10,7 +10,7 @@ subjects:
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - desktop/src/core/mcp_runtime.py:6ab8113d79929e1904a5085c8349a7fae201007a35f5460d46938252c6013533
+  - desktop/src/core/mcp_runtime.py:7176f54e7b10d6d56450e4caaa019faed8ec298b9215a40bbd9485d2bbec350c
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-18）：asset_read 第四轮：恢复段落结构（5 段），目标 Conciseness 5
+
 > 重审（2026-10-18）：asset_read 第三轮：84→74 词，压缩替代方案括号
 
 > 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）

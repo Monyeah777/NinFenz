@@ -389,14 +389,16 @@ Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Concisen
 
 第二轮（84 词）仍 4.8：只有 **Conciseness** 还是 4，说明“密度略高”这一项要靠更短，而不是继续补语义。
 
-第三轮（本版，目标 5）：
+第三轮（74 词）**降到 4.6**：压缩成括号和斜杠列表后，被判 **Conciseness 3**——
+“single long block, no visual structure”。这说明这个工具的问题不是字数，而是**可读结构**。
 
-- 从 84 词再压到 **74 词**；
-- 用括号压缩替代方案：`enumerate: asset_ls; other resources: module_read/pipeline_read`；
-- 保留 `key` 的 no glob/regex/package/path/prose、`package` 的 exact directory /
-  no fallback / omit default；
-- 保留精确/大小写匹配、扫描文件名或前 6000 字符、多匹配、无匹配即错误；
-- 目标：Conciseness 4→5，其余维持 5。
+第四轮（本版，目标 5）：
+
+- 不再压缩成括号/斜杠列表；改成 **5 个短段落**：
+  目的 → 使用/替代 → key/package 语义 → 匹配 → 默认/错误；
+- 保留全部参数与行为信息（no glob/regex/package/path/prose、exact directory、
+  no fallback、扫描文件名或前 6000 字符、多匹配、无匹配即错误）；
+- 目标：用结构换 Conciseness 5，而不是继续减字。
 
 ## 附录：官方参考
 
