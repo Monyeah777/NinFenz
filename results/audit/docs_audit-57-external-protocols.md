@@ -10,7 +10,7 @@ subjects:
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - desktop/src/core/mcp_runtime.py:38a42a81c581967df7a42811a142b9e4a0a33bf554a531ed98076d6a2ee19400
+  - desktop/src/core/mcp_runtime.py:07bcc1539d76df5c77da2725c734d908cbb341a270d4515a0c37c3898ec74cac
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-18）：asset_read 目标 5：再压到约 91 词，补 no glob/regex/fuzzy + package directory 语义
+
 > 重审（2026-10-18）：asset_read 描述再压缩：去示例、缩短匹配句中句
 
 > 重审（2026-10-18）：Glama 逐工具精修：asset_read 明确 key/package 意图与 when-not-use，去重只读尾句

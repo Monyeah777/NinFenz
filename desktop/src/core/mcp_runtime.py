@@ -898,20 +898,19 @@ TOOL_DEFS = [
     },
     {
         "name": "asset_read",
-        "title": "Get asset",
+        "title": "Read asset",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read every asset file that declares an asset key. Use it for a key from "
-            "asset_ls or a package README; do not use it to enumerate keys (use asset_ls "
-            "instead), read modules (module_read), or read pipelines (pipeline_read). key "
-            "is an uppercase token—not a package name, path, or prose—and package is a "
-            "bare package name, not a path. Match exact, case-sensitive tokens from each "
-            "file's name or first 6000 chars; lowercase or partial keys fail. Optional "
-            "package limits the scan to community/<package>/assets; otherwise all "
-            "community assets and 05_资产库 are searched, and multiple matches are "
-            "returned. No match is an error, not an empty result."),
+            "asset_ls; do not use it to enumerate keys (use asset_ls instead), read "
+            "modules (module_read), or read pipelines (pipeline_read). key is an exact "
+            "uppercase token—no glob, regex, fuzzy match, or prose; package is an exact "
+            "package directory name, not a path. Tokens come from each file's name or "
+            "first 6000 chars; lowercase or partial keys fail. package limits the scan to "
+            "community/<package>/assets; otherwise all community assets and 05_资产库 are "
+            "searched, and multiple matches are returned. No match is an error."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
