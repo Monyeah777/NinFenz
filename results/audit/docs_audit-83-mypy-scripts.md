@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
 
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线

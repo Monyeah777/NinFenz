@@ -51,20 +51,30 @@ fi
 # 缓存（P3b）：两档都按**输入内容寻址**缓存绿判定（HEAD + 工作树差异 + 未跟踪件 + 门禁代码 +
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
+# 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
+# `--checks-only` 只跑 42 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
+NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast) NF_FAST=1 ;;
     --full) NF_TIER='full' ;;
     --quick) NF_TIER='quick' ;;
     --no-cache) NF_CACHE=0 ;;
+    --checks-only) NF_CHECKS_ONLY=1 ;;
+    --tests-only) NF_TESTS_ONLY=1 ;;
+    --shard) shift; NF_SHARD="${1:-}"; [ -n "$NF_SHARD" ] || { echo '用法：--shard 需要形如 3/16 的取值' >&2; exit 2; } ;;
     --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
     *)
-      echo "未知参数：$1（用法：bash verify.sh [--full|--quick] [--fast] [--no-cache] [--base <ref>]）" >&2
+      echo "未知参数：$1（用法：bash verify.sh [--full|--quick] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
       exit 2 ;;
   esac
   shift
 done
+if [ "$NF_CHECKS_ONLY" = "1" ] && [ "$NF_TESTS_ONLY" = "1" ]; then
+  echo '--checks-only 与 --tests-only 不能同时给（二者互斥）' >&2; exit 2
+fi
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
   NFL_TMP="${TMPDIR:-/tmp}/nf_verify_$$"; mkdir -p "$NFL_TMP" 2>/dev/null || true
 fi
@@ -95,6 +105,25 @@ if command -v python3 >/dev/null 2>&1 && python3 -c 'import sys' >/dev/null 2>&1
   PY3='python3'
 elif command -v python >/dev/null 2>&1 && python -c 'import sys' >/dev/null 2>&1; then
   PY3='python'
+fi
+# ---- 矩阵模式（CI）：`--tests-only` 只跑测试并直接透传退出码（不产生 check 摘要、不写缓存）----
+# 为什么单独成路（2026-10-18）：CI 要"静态 1 台 + 测试 n 台并行"，测试那 n 台只该跑自己那一片；
+# 若仍走完整 verify.sh，每台都会重跑 42 条静态 check，n 倍浪费且摘要会被 n 份覆盖。
+if [ "$NF_TESTS_ONLY" = "1" ]; then
+  if [ -z "$PY3" ]; then echo '--tests-only 需要可用的 python' >&2; exit 2; fi
+  if [ ! -f scripts/verify_tests.py ]; then echo '--tests-only 需要 scripts/verify_tests.py' >&2; exit 2; fi
+  if [ -n "$NF_SHARD" ]; then
+    exec "$PY3" scripts/verify_tests.py --shard "$NF_SHARD"
+  fi
+  _UT_JOBS="${NF_TEST_JOBS:-}"
+  if [ -z "$_UT_JOBS" ]; then
+    _UT_JOBS="$("$PY3" -c 'import os; print(min(8, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+  fi
+  exec "$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS"
+fi
+if [ "$NF_CHECKS_ONLY" = "1" ]; then
+  # 只跑静态 check：结果**不进缓存**（半份门禁的"绿"不能当整份门禁用）。
+  NF_CACHE=0
 fi
 PASS=0; FAIL=0; WARN=0
 ok(){ PASS=$((PASS+1)); printf '  [PASS] %s\n' "$1"; }
@@ -463,7 +492,7 @@ check12(){
   # 执行器 `scripts/verify_tests.py` 的分片**由一次 discover 产出测试 id 后 LPT 分配**：
   # 分片并集必须逐项等于 discover 全集（不等即 exit 1），因此"并行"只改执行方式、不改判据面。
   # `NF_TEST_JOBS=1` 回到串行（排障用）；缺执行器时回退历史串行发现。
-  if [ -d desktop/tests ]; then
+  if [ "$NF_CHECKS_ONLY" != "1" ] && [ -d desktop/tests ]; then
     if [ -f scripts/verify_tests.py ]; then
       # 分片数：默认按**可用核数**自适应（min(8, max(2, cpu-1))）——CI 的 2 核机不该被 8 片拖死，
       # 20 核开发机也不该被 4 片浪费；显式 NF_TEST_JOBS 一律优先。

@@ -292,32 +292,39 @@
     },
     {
       "id": "conformance_report",
-      "issues": 0,
+      "issues": 2,
       "name": "一致性报告（已提交 == 实时重算）",
-      "sample": [],
+      "sample": [
+        "报告过期或被改：root 记录=3f7fc1d2008ec53e 实测=9bd61452b10a1078（修复指引：nf conformance --write）",
+        "verdict 不一致：记录=conformant 实测=non-conformant"
+      ],
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "3f7fc1d2008ec53eaadf6005ab1957cd7de9cb861499fda9003045f24cc1a8dc",
-        "verdict": "conformant"
+        "passed": 26,
+        "root": "9bd61452b10a107883989297e7ba817440add8b24f1fd597e7de68c80c81b3f7",
+        "verdict": "non-conformant"
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 0,
+      "issues": 3,
       "name": "审计件被审对象 digest",
-      "sample": [],
+      "sample": [
+        "AUD-0009：被审对象已变，旧审计失效：desktop/src/core/mcp_runtime.py（修复指引：重审并更新 digest）",
+        "AUD-0010：被审对象已变，旧审计失效：desktop/src/core/mcp_runtime.py（修复指引：重审并更新 digest）",
+        "AUD-0032：被审对象已变，旧审计失效：desktop/src/core/mcp_runtime.py（修复指引：重审并更新 digest）"
+      ],
       "source": "audit.scan",
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 386,
         "with_header": 46
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 1
     },
     {
@@ -493,7 +500,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 48,
+        "pinned_uses": 53,
         "requirements_files": 4,
         "with_explicit_permissions": 16,
         "workflows": 16
@@ -538,12 +545,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "86271ba56b25bbc203ff0cf68941833b131aa9527f9dd27e30472472f465fd68",
+  "root_digest": "86401fefb031c44e2bbe9bdcc1a35e8346fe4773125670d622c210dc83c28be4",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
-    "warn": 2
+    "fail": 2,
+    "pass": 28,
+    "warn": 1
   }
 }

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
 
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线

@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:54fb9760bd7e2fa83b110b4b1c29e54f821434ca5a19b7d63ff0e1d4195e9e20
   - protocol/drill_fidelity.json:235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
 
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线

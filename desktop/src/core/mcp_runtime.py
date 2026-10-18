@@ -903,17 +903,16 @@ TOOL_DEFS = [
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
-            "Read asset files for an asset key, returning package, path, and text.\n\n"
+            "Read asset files for a key, returning package, path, and text.\n\n"
             "Use only a key from asset_ls; for enumeration use asset_ls, for other "
             "resources module_read or pipeline_read.\n\n"
-            "The key is exact uppercase, never a glob, regex, package, path, or prose. "
-            "The package is an exact directory; it only narrows files and never key "
-            "matching.\n\n"
-            "Match tokens from each file's name or first 6000 characters; lowercase or "
-            "partial keys fail.\n\n"
-            "Without a package, all community assets and 05_资产库 are searched; a package "
-            "limits the scan to that directory with no fallback. Multiple matches may "
-            "return; no match is an error."),
+            "The key is exact uppercase, never glob, regex, package, path, or prose. The "
+            "package is an exact directory; it narrows files but never key matching.\n\n"
+            "Tokens come from each file's name or first 6000 characters; lowercase/partial "
+            "keys fail. Full text is returned; no truncation.\n\n"
+            "No package searches all community assets and 05_资产库; a package limits the "
+            "scan to one directory with no fallback. Multiple matches may return. No match "
+            "is an error."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,

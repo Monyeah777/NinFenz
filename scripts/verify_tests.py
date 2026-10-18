@@ -331,6 +331,10 @@ def main(argv=None) -> int:
     ap.add_argument("--list", action="store_true", help="只打印发现的测试数")
     ap.add_argument("--affected", action="store_true",
                     help="只跑**受影响**测试（按变更面的 core 反向依赖闭包；非 core 变更全量兜底）")
+    ap.add_argument("--shard", default="",
+                    help="矩阵模式：只跑第 i/n 片（如 3/16），供 CI 每台 runner 跑一份")
+    ap.add_argument("--plan", type=int, default=0,
+                    help="只打印 n 分片的分配计划并校验并集==全集（不跑测试）")
     ap.add_argument("--run-shard", default="", help=argparse.SUPPRESS)
     ap.add_argument("--json", action="store_true", help="输出结构化摘要")
     args = ap.parse_args(argv)
@@ -339,6 +343,46 @@ def main(argv=None) -> int:
         return run_shard_mode(args.run_shard)
 
     ids = discover_ids()
+    if args.plan or args.shard:
+        # 矩阵分片（CI）：**同一套权重、同一套 LPT**，因此 i=0..n-1 的并集必然等于 discover。
+        weights_doc = load_weights()
+        ws = test_weights(ids, weights_doc.get("modules", {}), weights_doc.get("tests", {}))
+        try:
+            if args.plan:
+                n = int(args.plan)
+                idx = None
+            else:
+                left, right = args.shard.split("/")
+                idx, n = int(left), int(right)
+        except (ValueError, TypeError):
+            print("--shard 需形如 3/16，--plan 需整数", file=sys.stderr)
+            return 2
+        if n < 1 or (idx is not None and not 0 <= idx < n):
+            print("分片下标/总数越界：%s/%s" % (idx, n), file=sys.stderr)
+            return 2
+        bins = assign(ids, ws, n)
+        flat = [t for b in bins for t in b]
+        if sorted(flat) != sorted(ids):
+            print("矩阵分片并集与 discover 不一致（漏/重）", file=sys.stderr)
+            return 1
+        if args.plan:
+            for i, b in enumerate(bins):
+                print("分片 %2d/%d：%4d 条 · 权重 %.1f s" % (i, n, len(b), sum(ws.get(t, 1.0) for t in b)))
+            print("并集校验：%d 条 == discover %d 条" % (len(flat), len(ids)))
+            return 0
+        ids = bins[idx]
+        jobs = 1
+        args.jobs = 1
+        res = run_shard(ids, idx)
+        if args.json:
+            print(json.dumps({"schema": "nf-verify-tests/1", "jobs": 1, "shard": args.shard,
+                              "wall_s": res["wall"], "tests": res["tests"],
+                              "rc": res["rc"]}, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("  分片 %s：测试 %d · %.1f s · rc=%d" % (args.shard, res["tests"],
+                                                        res["wall"], res["rc"]))
+        return 0 if res["rc"] == 0 else 1
+
     if args.mods:
         want = {m[len("tests."):] if m.startswith("tests.") else m for m in args.mods}
         ids = [t for t in ids if module_of(t) in want]

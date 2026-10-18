@@ -3,6 +3,7 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **门禁矩阵化（2026-10-18）**：CI 全量门禁拆成「静态 1 台 + 测试 **32 台并行**」——`verify.sh` 新增 `--checks-only` / `--tests-only --shard i/n`，`ci-verify.yml` 改为 `static-checks` + `unit-tests`（matrix 32 片）+ `gate`（needs 两者，任一片红即整条红）三个作业；32 片的分配与本地分片用**同一套权重/LPT**，`--plan 32` 可在本地校验「并集 == discover 全集」。动机：实测同机并行收益在 16 片后饱和（8 片 502 s / 16 片 396 s），跨机器没有争用才是"全量 1 分钟"的唯一实现路径。契约测试 `test_ci_visibility` 同步改为：CI 必须恰好一次 `--checks-only` + 一次 `--tests-only --shard ${{ matrix.shard }}/N`，且 N ≥ 16 且矩阵真的声明到 N-1。
 - **check12 门禁提速（P0–P3，2026-10-18）**：把 check12（3131 条测试、串行 ~1080 s）从"单进程全量"改成"分层 + 分片 + 内容寻址缓存"：
   ① **分层**：`bash verify.sh` 默认 **quick**（42 条静态 check + 受影响测试），`--full` 才跑全量；`nf release` 与 CI 固定 `--full --no-cache`，`test_ci_visibility` 的契约同步改为"CI 必须 full 档"（原"必须裸跑"在分层后反而是子集）；
   ② **分片**：`scripts/verify_tests.py` 一次 discover 产出测试 id → 逐测试权重（`protocol/check12_weights.json`，311 模块 / 3141 条实测）→ LPT 分配到 N 个进程（分片数按核数自适应）；分片并集必须逐项等于 discover 全集，不等即 exit 1；

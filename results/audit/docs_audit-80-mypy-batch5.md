@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:297b1942f3f12e186829add6d75be2fd6eeb7b5da4be589787f21b0fe5995791
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - desktop/src/core/mcp_runtime.py:61e59777cb7595c906f74efbafea8ec1ff1c98c7865e4aa0f83300216d86ca52
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：TDQS lint：修复 4 个 titleIsMeaningful=false；asset_read 100 词标准版
 
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制

@@ -44,12 +44,17 @@ class GateVisibilityTest(unittest.TestCase):
         names = {wf for rel in ENTRIES for wf in _BADGE.findall(_read(ROOT / rel))}
         self.assertTrue(names, "两份入口都没有 CI 徽章")
         for wf in names:
-            # Z5（2026-10-10）：全量调用可带 `2>&1 | tee <log>` 落盘（失败诊断物），
-            # 但**不得**传任何子集参数——子集 = 假绿。
-            self.assertRegex(_read(WORKFLOWS / wf),
-                             r"(?m)^\s*bash verify\.sh --full( --no-cache)?"
+            # P3+矩阵（2026-10-18）：全量门禁 = 静态作业 + 测试矩阵，两者缺一即不是全量。
+            text = _read(WORKFLOWS / wf)
+            self.assertRegex(text,
+                             r"(?m)^\s*bash verify\.sh --checks-only( --no-cache)?"
                              r"(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
-                             "%s 不是跑 **full 档** verify.sh 的那条 workflow" % wf)
+                             "%s 缺「静态 42 条 check」作业（--checks-only）" % wf)
+            self.assertRegex(text,
+                             r"(?m)^\s*bash verify\.sh --tests-only --shard [\"']?"
+                             r"\$\{\{ matrix\.shard \}\}/\d+[\"']?"
+                             r"(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
+                             "%s 缺「测试矩阵分片」作业（--tests-only --shard）" % wf)
 
     def test_gate_workflow_runs_full_verify_not_a_subset(self):
         """唯一入口纪律（P3 分层后）：CI 必须跑 **full 档**（quick 是开发档，不是发布结论）。
@@ -61,12 +66,30 @@ class GateVisibilityTest(unittest.TestCase):
         text = _read(WORKFLOWS / "ci-verify.yml")
         invocations = [ln.strip() for ln in text.splitlines()
                        if re.match(r"^\s*bash verify\.sh\b", ln)]
-        self.assertEqual(1, len(invocations),
-                         "ci-verify 必须恰好调用一次 verify.sh：%s" % invocations)
-        line = invocations[0]
-        self.assertRegex(line, r"^bash verify\.sh --full( --no-cache)?"
-                              r"(\s+2>&1\s*\|\s*tee\s+\S+)?$",
-                         "CI 必须跑 full 档（quick 不是发布结论）：%s" % line)
+        self.assertEqual(2, len(invocations),
+                         "ci-verify 必须恰好两次 verify.sh（静态 1 次 + 测试矩阵 1 次）：%s"
+                         % invocations)
+        checks = [ln for ln in invocations if "--checks-only" in ln]
+        tests = [ln for ln in invocations if "--tests-only" in ln]
+        self.assertEqual(1, len(checks), "静态作业必须只调一次：%s" % invocations)
+        self.assertEqual(1, len(tests), "测试矩阵必须只调一次：%s" % invocations)
+        self.assertRegex(checks[0], r"^bash verify\.sh --checks-only( --no-cache)?"
+                                    r"(\s+2>&1\s*\|\s*tee\s+\S+)?$",
+                         "静态作业必须只跑 check（不含测试）：%s" % checks[0])
+        self.assertRegex(tests[0],
+                         r"^bash verify\.sh --tests-only --shard [\"']?"
+                         r"\$\{\{ matrix\.shard \}\}/(\d+)[\"']?"
+                         r"(\s+2>&1\s*\|\s*tee\s+\S+)?$",
+                         "测试作业必须按矩阵分片跑：%s" % tests[0])
+        shards = int(re.search(r"--shard [\"']?\$\{\{ matrix\.shard \}\}/(\d+)",
+                               tests[0]).group(1))
+        self.assertGreaterEqual(shards, 16,
+                                "分片数 %d 太少——单机全量瓶颈会原样搬进 CI" % shards)
+        # 矩阵必须真的声明了对应数量的 shard（否则分片表达式取不到值，作业全跑 0/0）。
+        block = text.split("matrix:", 1)[1]
+        declared = [int(x) for x in re.findall(r"\b(\d{1,2})\b", block.split("steps:")[0])]
+        self.assertIn(shards - 1, declared,
+                      "workflow 的 matrix.shard 未声明到 %d" % (shards - 1))
 
     def test_gate_workflow_triggers_on_push_to_main(self):
         """推 main 即跑：徽章盯的是推送后的真实结论，不是手动才跑的空壳。"""

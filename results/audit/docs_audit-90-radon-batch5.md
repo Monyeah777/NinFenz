@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
 
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线

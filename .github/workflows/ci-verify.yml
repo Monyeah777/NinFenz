@@ -4,9 +4,14 @@ name: ci-verify
 # 绿 = FAIL=0 且 PASS 等于基线（`protocol/repo_stats.json` 是基线真源）；任一 FAIL → exit 1 → CI 红
 # （发布铁律 ROADMAP §8.4 门禁）。此处**不钉**具体计数与脚本版本——钉死就会随每次波次过期，
 # 而一份写着过期数字的 workflow 头，正是「本机绿、云端红」最难被发现的伪装。
-# G1 修复（38 方案，2026-09-06）：7 连红根因 = check12/check18 unittest 需
-# yaml + PySide6（本地有、CI 干净环境缺）——setup-python 后 pip 安装再跑 verify.sh；
-# verify.sh 失败分支已加 log 回显（诊断可溯）。
+#
+# P3+矩阵（2026-10-18）：全量门禁拆成 **静态 1 台 + 测试 32 台并行**。
+#   静态：`bash verify.sh --checks-only`（42 条 check，不含 unittest）
+#   测试：`bash verify.sh --tests-only --shard i/32`（每台只跑 1/32，权重由 check12_weights.json 定）
+#   汇总：`gate` 作业 needs 两者——**任一片红即整条红**，不因为"别的片绿"而变绿。
+#   为什么拆：单机全量约 600 s，且 16 片以上同机并行收益迅速饱和（实测 8 片 502 s / 16 片 396 s）；
+#   跨机器没有争用，32 片 × 约 60 s 的单片工作量才是"全量 1 分钟"的唯一实现路径。
+#   32 片的并集必须等于 discover 全集：`python scripts/verify_tests.py --plan 32` 可本地校验。
 on:
   push:
     branches: [main]
@@ -21,10 +26,10 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  verify:
-    name: verify-sh-l0-l2
+  static-checks:
+    name: static-checks-42
     runs-on: ubuntu-latest
-    timeout-minutes: 60          # 挂死上限（2026-10-01 统一：CI 不许把 runner 占满 6h 默认）
+    timeout-minutes: 30          # 挂死上限（2026-10-01 统一：CI 不许把 runner 占满 6h 默认）
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -46,38 +51,92 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
-      - name: 分层门禁（verify.sh 全量，L0-L2 默认锁；日志落盘供失败诊断）
+      - name: 静态 42 条 check（不含 unittest；测试交给矩阵）
         env:
           # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ 失败日志可下载。
           NF_VERIFY_TMP: .nf-logs
         run: |
-          # Z5（2026-10-10 审计）：失败时要留**可下载的诊断产物**，不能只靠滚动日志。
-          # P3（2026-10-18）：CI 是发布闸门 → 显式 --full（默认档是 quick：静态 + 受影响测试）；
-          # --no-cache 保证每次真跑、不复用本地判定缓存。
+          # P3（2026-10-18）：CI 是发布闸门 → 显式 --checks-only（默认档 quick 是开发回路）；
+          # --no-cache 保证每次真跑、不复用本地判定缓存（半份门禁的绿不进缓存）。
           # `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。
           set -o pipefail
-          bash verify.sh --full --no-cache 2>&1 | tee verify.log
+          bash verify.sh --checks-only --no-cache 2>&1 | tee verify-checks.log
+      - name: 站点数字与真源同步（site/tools/sync-numbers.mjs：站点发布旧数字即红）
+        run: node site/tools/sync-numbers.mjs
+      - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
+        run: node site/tools/site-check.mjs --offline
       - name: 上传门禁日志（失败时同样上传）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: verify-log
-          # 控制台日志 + verify.sh 的各 check 明细日志（NF_VERIFY_TMP 保留目录）。
           path: |
-            verify.log
+            verify-checks.log
             .nf-logs/
           if-no-files-found: warn
-      - name: 站点数字与真源同步（site/tools/sync-numbers.mjs：站点发布旧数字即红）
-        run: node site/tools/sync-numbers.mjs
-      - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
-        run: node site/tools/site-check.mjs --offline
+  unit-tests:
+    name: unit-tests-${{ matrix.shard }}-of-32
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false          # 单片红不影响其余片跑完——诊断信息越多越好；汇总由 gate 判
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装测试依赖（与静态作业同一份固定版本）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt
+      - name: 测试矩阵第 ${{ matrix.shard }}/32 片
+        env:
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          # 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。
+          set -o pipefail
+          bash verify.sh --tests-only --shard "${{ matrix.shard }}/32" 2>&1 | tee verify-tests.log
+      - name: 上传分片日志（失败时同样上传）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: unit-tests-log-${{ matrix.shard }}
+          path: |
+            verify-tests.log
+            .nf-logs/
+          if-no-files-found: warn
+  gate:
+    name: gate
+    needs: [static-checks, unit-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装测试依赖（报告重算需要 yaml/PySide6）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt
       - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
         # N1（审计 P2 实锤）：此前 if: always() 上传的是 git 跟踪的 protocol/verification_report.json
         # ——红跑也会产出一份写着 fail=0 的 artifact。现在改成**本 run 现算**的 .artifacts/ 副本。
-        if: always()
         run: |
           mkdir -p .artifacts
-          python scripts/verify_report.py --write
           python scripts/verify_report.py --json > .artifacts/verification-report.json || true
           python scripts/verify_report.py --check
       - name: 上传门禁报告工件（本 run 的机器可读结论）

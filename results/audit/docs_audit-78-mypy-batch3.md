@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:2faf253cf7ea3da33320e10f873d32962241e9856669f047854a27de602b819a
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
+  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：CI 门禁矩阵化（32 片）
+
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
 
 > 重审（2026-10-18）：P2：串行段落地后重冻度量基线
