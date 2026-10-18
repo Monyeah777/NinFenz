@@ -387,14 +387,16 @@ Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Concisen
 第一轮（已到 4.8）：删除 canonical/只读尾句，补 `asset_ls` / `module_read` / `pipeline_read`
 替代，补 `key` 的 uppercase、非包名/路径/散文语义。
 
-第二轮（本版，目标 5）：
+第二轮（84 词）仍 4.8：只有 **Conciseness** 还是 4，说明“密度略高”这一项要靠更短，而不是继续补语义。
 
-- 从 91 词再压到 **84 词**，拆开 run-on 句；
-- `key` 补 **no glob / regex / fuzzy / prose**；
-- `package` 补 **exact directory name，不是 path**，并补默认/交互：
-  **narrows the scan with no fallback；omit it to search all community assets and 05_资产库**；
+第三轮（本版，目标 5）：
+
+- 从 84 词再压到 **74 词**；
+- 用括号压缩替代方案：`enumerate: asset_ls; other resources: module_read/pipeline_read`；
+- 保留 `key` 的 no glob/regex/package/path/prose、`package` 的 exact directory /
+  no fallback / omit default；
 - 保留精确/大小写匹配、扫描文件名或前 6000 字符、多匹配、无匹配即错误；
-- 明确枚举走 `asset_ls`，其他资源走 `module_read` / `pipeline_read`。
+- 目标：Conciseness 4→5，其余维持 5。
 
 ## 附录：官方参考
 

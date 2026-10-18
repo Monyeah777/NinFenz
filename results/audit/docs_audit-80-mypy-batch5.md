@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:de890e16b61d9257c3ccf9708b755f632a0a31248e74573fe60396b3e65c28e7
+  - desktop/src/core/mcp_runtime.py:6ab8113d79929e1904a5085c8349a7fae201007a35f5460d46938252c6013533
   - protocol/code_metrics_baseline.json:d10bdb344b42a1d5b76512cd65ca0fcf6a17a6b273a69ebedf4ba59921bad8fc
 ---
+> 重审（2026-10-18）：asset_read 第三轮：84→74 词，压缩替代方案括号
+
 > 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）
 
 > 重审（2026-10-18）：asset_read 目标 5：再压到约 91 词，补 no glob/regex/fuzzy + package directory 语义
