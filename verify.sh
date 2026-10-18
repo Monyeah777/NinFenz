@@ -132,8 +132,11 @@ fi
 # 因此把测试放后台与静态 check 并行，墙钟从 "a+b" 变成 "max(a,b)"。
 # 判据不变：测试命令与判定逻辑一字未改，只是不在 check12 里"现场跑"，而是"先跑、到点收"。
 # --fast（补充快车道）/ --checks-only / --tests-only 不走重叠（语义不同）。
+# 只在 quick 档重叠（2026-10-18 实测）：full 档测试里有守护/启动器/编码这几族对并发敏感，
+# 与 42 条 check 同时跑会偶发红（chunk5 机器面即实例）；full 本来就要 9 分钟，省 55 s 不值这个风险。
 _NF_BG_TESTS_PID=''
-if [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "1" ] && [ "$NF_TESTS_ONLY" != "1" ] \
+if [ "$NF_TIER" = "quick" ] && [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "1" ] \
+   && [ "$NF_TESTS_ONLY" != "1" ] \
    && [ -n "$PY3" ] && [ -f scripts/verify_tests.py ] && [ -d desktop/tests ]; then
   _BG_JOBS="${NF_TEST_JOBS:-}"
   if [ -z "$_BG_JOBS" ]; then
