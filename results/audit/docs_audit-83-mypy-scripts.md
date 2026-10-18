@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a6ba8888df04945af1f438ee3cc427e0f012265a3333e51660f7d78c713ac1d0
+  - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-18）：LSP 时间窗判据进串行段
+
 > 重审（2026-10-18）：串行段扩到内容快照族
 
 > 重审（2026-10-18）：队列改动后重冻度量

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:a6ba8888df04945af1f438ee3cc427e0f012265a3333e51660f7d78c713ac1d0
+  - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-18）：LSP 时间窗判据进串行段
+
 > 重审（2026-10-18）：串行段扩到内容快照族
 
 > 重审（2026-10-18）：队列改动后重冻度量

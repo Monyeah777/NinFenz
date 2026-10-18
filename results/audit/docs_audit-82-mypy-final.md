@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:a35c6dda1796f9bdb1b94a35327f2b162c6a5534253480d3e0043729ccc35e27
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:a6ba8888df04945af1f438ee3cc427e0f012265a3333e51660f7d78c713ac1d0
+  - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-18）：LSP 时间窗判据进串行段
+
 > 重审（2026-10-18）：串行段扩到内容快照族
 
 > 重审（2026-10-18）：队列改动后重冻度量

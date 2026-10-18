@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:a6ba8888df04945af1f438ee3cc427e0f012265a3333e51660f7d78c713ac1d0
+  - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-18）：LSP 时间窗判据进串行段
+
 > 重审（2026-10-18）：串行段扩到内容快照族
 
 > 重审（2026-10-18）：队列改动后重冻度量

@@ -46,6 +46,9 @@ SERIAL_MODULES = frozenset({
     # 它们本身很便宜（合计 32 s），放到并发段后面独占跑，代价远小于偶发红。
     "test_schema_lint", "test_schema_reference", "test_quality_depth_scan",
     "test_instruction_step_audit", "test_pipeline_loader",
+    # test_lsp 的 warm 复用判据是**时间窗**口径（TTL 内只该扫一次签名）：16 路并发把单次
+    # 扫描拖长到窗外，就会"合法地"多扫一次而被判红——属负载敏感，进串行段。
+    "test_lsp",
 })
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
 # 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
