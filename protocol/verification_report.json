@@ -364,9 +364,12 @@
     },
     {
       "id": "code_metrics",
-      "issues": 0,
+      "issues": 2,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [],
+      "sample": [
+        "scripts/verify_tests.py 模块行数 549 > 冻结值 544（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "scripts/verify_tests.py 最长函数行数 191 > 冻结值 189（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+      ],
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 300,
@@ -375,7 +378,7 @@
         "max_fn_lines": 1253,
         "max_lines": 7526
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -538,12 +541,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "b4f704431818ac2d4d01e3218ca67080fe288b89da7f1dd0927649c29b315d4c",
+  "root_digest": "cdbe9488ae5c217cdd0722f9dbebe10ae43adc8de5cec6eefec8fc1fd4ac9117",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

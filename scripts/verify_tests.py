@@ -39,7 +39,10 @@ TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
 SHARD_TIMEOUT_S = 5400.0
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
-SERIAL_MODULES = frozenset({"test_atomic_write", "test_daemon"})
+SERIAL_MODULES = frozenset({"test_atomic_write", "test_daemon", "test_governance_faces"})
+# test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
+# 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
+# 判据不能与"会短暂写全仓"的判据同时跑。并发段跑完再独占跑它，判据不变、确定性恢复。
 
 #: 落盘一律走 core.atomic_write（脚本面纪律：不得有裸写 sink）；权重是**仓内**协议件。
 sys.path.insert(0, str(DESKTOP / "src"))
@@ -496,7 +499,9 @@ def main(argv=None) -> int:
                 try:
                     idx, c = q.get_nowait()
                 except _queue.Empty:
-                    return
+                    # 队列已空 = 所有片都被领走，worker 正常退出（不是吞错：没有错误发生，
+                    # 也没有任何失败信息被丢弃——失败只会来自 run_shard 的 rc）。
+                    break
                 try:
                     r = run_shard(c, idx)
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
