@@ -60,6 +60,36 @@ def _inventory() -> list:
     return _CACHE["rows"]
 
 
+def _machine_targets() -> list:
+    """机器面（带 --json、非拒跑、非写盘）→ [(path, argv)]；进程内缓存（4 个切片共用）。"""
+    if "machine_targets" not in _CACHE:
+        out = []
+        for row in _inventory():
+            if "--json" not in (row.get("flags") or []):
+                continue
+            path = row["path"]
+            if path.split()[0] in dm.REFUSED_COMMANDS:
+                continue
+            argv = path.split() + ["--json"]
+            if term.needs_confirm(argv):
+                continue                # 写盘面：会改仓库，另由各自的专件覆盖
+            out.append((path, argv))
+        assert len(out) > 30, ("机器面覆盖不足（%d）——判据形同虚设" % len(out))
+        _CACHE["machine_targets"] = out
+    return _CACHE["machine_targets"]
+
+
+def _check_expected(chunk: list, directs: dict) -> int:
+    """切片里**应该被比对**的条数（排除 rc=2 且零输出的"需参面"）。"""
+    n = 0
+    for _path, argv in chunk:
+        direct = directs[tuple(argv)]
+        if direct[0] == 2 and not direct[1].strip():
+            continue
+        n += 1
+    return n
+
+
 def _case_lists(text: str, must_contain: str = "daemon") -> list:
     """抓出 `case` 分支里「含 `must_contain` 的列举表」（`a|b|c)` 形态）→ 名字元组列表。"""
     out = []
@@ -228,28 +258,25 @@ class DaemonParityTest(_DaemonFixture):
         self.assertGreater(checked, 100, "命令面覆盖不足（%d）——判据形同虚设" % checked)
         self.assertEqual([], bad, "守护与直跑的 --help 面不一致：%s" % bad[:6])
 
-    def test_machine_faces_are_byte_identical_through_daemon(self):
-        bad, checked = [], 0
-        targets = []
-        for row in _inventory():
-            if "--json" not in (row.get("flags") or []):
-                continue
-            path = row["path"]
-            if path.split()[0] in dm.REFUSED_COMMANDS:
-                continue
-            argv = path.split() + ["--json"]
-            if term.needs_confirm(argv):
-                continue                    # 写盘面：会改仓库，另由各自的专件覆盖
-            targets.append((path, argv))
-        # P2（2026-10-17 实测）：本判据 142 s，其中 ~90% 是**直跑**那一路——每条都真起解释器
-        # 并做一次全仓扫描，而它们互相独立。这里把直跑并行化（默认 6 路），守护侧仍串行：
-        # 冷/热两跑必须依次落在同一个守护上，这一点不能并行。判据与比较顺序一字不动。
+    def _machine_chunk(self, index: int, total: int):
+        """跑第 index/total 片机器面（**切片只改执行粒度，不减少任何一条比较**）。
+
+        为什么要切（2026-10-18 实测）：本判据单条 142 s，是分片并行的**地板**——它落在哪个
+        分片，那个分片就要多跑 142 s。切成 4 片后地板降到 ~35 s，分片调度才有意义。
+        每片仍逐条走「直跑 + 守护冷跑 + 守护热跑」三路比对；覆盖率不靠"总数 > 30"这种
+        全局阈值兜，而是**每片必须逐条比完**（checked == 切片长度），只要有一条没比到就红。
+        """
+        targets = _machine_targets()
+        chunk = targets[index::total]
+        self.assertTrue(chunk, "机器面切片 %d/%d 为空（判据形同虚设）" % (index, total))
+        # 直跑并行（互相独立；守护侧仍串行——冷/热两跑必须依次落在同一个守护上）
         directs = {}
         with ThreadPoolExecutor(max_workers=6) as pool:
-            futures = {pool.submit(self._direct, argv): argv for _path, argv in targets}
+            futures = {pool.submit(self._direct, argv): argv for _path, argv in chunk}
             for fut in as_completed(futures):
                 directs[tuple(futures[fut])] = fut.result()
-        for path, argv in targets:
+        bad, checked = [], 0
+        for path, argv in chunk:
             direct = directs[tuple(argv)]
             if direct[0] == 2 and not direct[1].strip():
                 continue                    # 需参面：无参形态跑不到（rc=2 且零输出）
@@ -264,8 +291,21 @@ class DaemonParityTest(_DaemonFixture):
                            % (path, (direct[0], len(direct[1]), len(direct[2])),
                               (first[0], len(first[1]), len(first[2])),
                               (warm[0], len(warm[1]), len(warm[2]))))
-        self.assertGreater(checked, 30, "机器面覆盖不足（%d）——判据形同虚设" % checked)
         self.assertEqual([], bad, "守护与直跑的机器面不一致：%s" % bad[:6])
+        self.assertEqual(_check_expected(chunk, directs), checked,
+                         "有机器面没被比到（切片内覆盖不完整）")
+
+    def test_machine_faces_byte_identical_chunk0(self):
+        self._machine_chunk(0, 4)
+
+    def test_machine_faces_byte_identical_chunk1(self):
+        self._machine_chunk(1, 4)
+
+    def test_machine_faces_byte_identical_chunk2(self):
+        self._machine_chunk(2, 4)
+
+    def test_machine_faces_byte_identical_chunk3(self):
+        self._machine_chunk(3, 4)
 
 
 CLIENT = str(ROOT / "scripts" / "nf_client.py")

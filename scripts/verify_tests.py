@@ -182,12 +182,24 @@ def load_weights() -> dict:
     except ValueError:
         # 权重是**纯加速参数**：坏件退回均匀权重即可，不必让门禁红（判据面不受影响）。
         return {}
-    rows = doc.get("modules") if isinstance(doc, dict) else None
-    return {str(k): float(v) for k, v in (rows or {}).items() if isinstance(v, (int, float))}
+    if not isinstance(doc, dict):
+        return {}
+    out = {}
+    for key in ("modules", "tests"):
+        rows = doc.get(key)
+        if isinstance(rows, dict):
+            out[key] = {str(k): float(v) for k, v in rows.items()
+                        if isinstance(v, (int, float))}
+    return out
 
 
-def test_weights(ids: list, weights: dict) -> dict:
-    """每测试权重 = 所属模块实测耗时 / 该模块测试数（模块内均分；缺数据按 1.0）。"""
+def test_weights(ids: list, weights: dict, per_test: dict = None) -> dict:
+    """每测试权重：**有逐测试实测就用实测**，否则按所属模块耗时均分（缺数据按 1.0）。
+
+    为什么需要两档（2026-10-18 实测）：模块内耗时极不均匀——`test_daemon_parity` 里一条
+    142 s、其余各 <2 s；按模块均分会让 LPT 把那条重测试算成 6 s，分片严重失衡。
+    """
+    per_test = per_test or {}
     per_module = {}
     for tid in ids:
         per_module.setdefault(module_of(tid), []).append(tid)
@@ -195,7 +207,7 @@ def test_weights(ids: list, weights: dict) -> dict:
     for mod, group in per_module.items():
         share = weights.get(mod, float(len(group))) / max(1, len(group))
         for tid in group:
-            out[tid] = share
+            out[tid] = max(0.05, float(per_test.get(tid, share)))
     return out
 
 
@@ -210,12 +222,15 @@ def assign(ids: list, ws: dict, jobs: int) -> list:
     return bins
 
 
-def run_shard(ids: list, index: int) -> dict:
-    """跑一个分片：测试清单与 NF_HOME 都放在 TemporaryDirectory 里（自动清理，不写删文件 sink）。"""
+def run_shard(ids: list, index: int, dump: str = "") -> dict:
+    """跑一个分片（可选：把逐测试耗时写到 `dump` 路径，供权重实测用）。"""
     t0 = time.perf_counter()
     with tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index) as spec_dir:
         spec = Path(spec_dir) / "tests.json"
-        atomic_write.write_text(spec, json.dumps({"tests": ids}, ensure_ascii=False))
+        payload = {"tests": ids}
+        if dump:
+            payload["dump"] = dump
+        atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False))
         with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
@@ -231,31 +246,62 @@ def run_shard(ids: list, index: int) -> dict:
             "wall": round(time.perf_counter() - t0, 1), "tests": len(ids)}
 
 
+class _TimingResult(unittest.TextTestResult):
+    """记录逐测试墙钟（权重实测专用；不改变任何判定）。"""
+
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self.durations = {}
+
+    def startTest(self, test):
+        self._t0 = time.perf_counter()
+        super().startTest(test)
+
+    def stopTest(self, test):
+        self.durations[test.id()] = round(time.perf_counter() - self._t0, 2)
+        super().stopTest(test)
+
+
 def run_shard_mode(spec_path: str) -> int:
-    """子进程侧：按测试 id 清单跑。"""
+    """子进程侧：按测试 id 清单跑（可选把逐测试耗时写到 spec 指定的 dump 路径）。"""
     sys.path.insert(0, str(DESKTOP))
     sys.path.insert(0, str(TESTS))
-    tests = json_doc.load(Path(spec_path), dict, what="分片测试清单")["tests"]
+    spec = json_doc.load(Path(spec_path), dict, what="分片测试清单")
+    tests = spec["tests"]
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     for tid in tests:
         suite.addTests(loader.loadTestsFromNames([tid]))
-    result = unittest.TextTestRunner(verbosity=1).run(suite)
+    dump = str(spec.get("dump") or "")
+    if dump:
+        result = unittest.TextTestRunner(verbosity=1, resultclass=_TimingResult).run(suite)
+        atomic_write.write_text(Path(dump),
+                                json.dumps(result.durations, ensure_ascii=False, sort_keys=True))
+    else:
+        result = unittest.TextTestRunner(verbosity=1).run(suite)
     return 0 if result.wasSuccessful() else 1
 
 
-def measure_weights(ids: list) -> dict:
-    """逐模块实测（每模块一个子进程）→ {module: seconds}。"""
+def measure_weights(ids: list) -> tuple:
+    """逐模块实测（每模块一个子进程，带逐测试计时）→ ({module: s}, {test_id: s})。"""
     per_module = {}
     for tid in ids:
         per_module.setdefault(module_of(tid), []).append(tid)
-    out = {}
+    out, per_test = {}, {}
     mods = sorted(per_module)
-    for i, mod in enumerate(mods, 1):
-        res = run_shard(per_module[mod], i)
-        out[mod] = round(res["wall"], 2)
-        print("  [%3d/%3d] %7.1f s  %s" % (i, len(mods), res["wall"], mod), flush=True)
-    return out
+    with tempfile.TemporaryDirectory(prefix="nf_weights_") as dump_dir:
+        for i, mod in enumerate(mods, 1):
+            dump = str(Path(dump_dir) / ("%03d.json" % i))
+            res = run_shard(per_module[mod], i, dump=dump)
+            out[mod] = round(res["wall"], 2)
+            try:
+                per_test.update(json_doc.load(Path(dump), dict, what="逐测试耗时"))
+            except ValueError:
+                # 该模块的 dump 缺失（崩溃/超时）→ 只丢这批逐测试权重，模块权重仍有效；
+                # LPT 会退回"模块内均分"，只影响均衡、不影响判据。
+                pass
+            print("  [%3d/%3d] %7.1f s  %s" % (i, len(mods), res["wall"], mod), flush=True)
+    return out, per_test
 
 
 def main(argv=None) -> int:
@@ -297,23 +343,25 @@ def main(argv=None) -> int:
 
     if args.write_weights:
         t0 = time.perf_counter()
-        measured = measure_weights(ids)
+        measured, per_test = measure_weights(ids)
         doc = {"schema": "nf-check12-weights/1",
-               "note": "check12 逐模块墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
+               "note": "check12 墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
                "measured_at": time.strftime("%Y-%m-%d"),
                "total_s": round(sum(measured.values()), 1),
-               "modules": measured}
+               "modules": measured,
+               "tests": per_test}
         atomic_write.write_text(
             ROOT / WEIGHTS_REL,
             json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
-        print("  ✓ 权重已写入 %s：模块 %d · 合计 %.1f s（墙钟 %.1f s）"
-              % (WEIGHTS_REL, len(measured), doc["total_s"],
+        print("  ✓ 权重已写入 %s：模块 %d · 逐测试 %d · 合计 %.1f s（墙钟 %.1f s）"
+              % (WEIGHTS_REL, len(measured), len(per_test), doc["total_s"],
                  time.perf_counter() - t0))
         return 0
 
     jobs = args.jobs or int(os.environ.get("NF_TEST_JOBS") or 4)
     jobs = max(1, min(jobs, len(ids)))
-    ws = test_weights(ids, load_weights())
+    weights_doc = load_weights()
+    ws = test_weights(ids, weights_doc.get("modules", {}), weights_doc.get("tests", {}))
     bins = assign(ids, ws, jobs)
     flat = [t for b in bins for t in b]
     if sorted(flat) != ids:

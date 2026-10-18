@@ -52,9 +52,11 @@ jobs:
           NF_VERIFY_TMP: .nf-logs
         run: |
           # Z5（2026-10-10 审计）：失败时要留**可下载的诊断产物**，不能只靠滚动日志。
+          # P3（2026-10-18）：CI 是发布闸门 → 显式 --full（默认档是 quick：静态 + 受影响测试）；
+          # --no-cache 保证每次真跑、不复用本地判定缓存。
           # `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。
           set -o pipefail
-          bash verify.sh 2>&1 | tee verify.log
+          bash verify.sh --full --no-cache 2>&1 | tee verify.log
       - name: 上传门禁日志（失败时同样上传）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4

@@ -6640,7 +6640,10 @@ def _cmd_release(args):
     if args.fast:
         print("  --fast：跳过 verify.sh 全量（发布前请跑完整 nf release）")
         return 1 if issues else 0
-    rc = subprocess.run([psh.posix_shell(), "verify.sh"], cwd=ROOT).returncode  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+    # P3（2026-10-18）：发布前必须走 **full 档**（默认档是 quick：静态 + 受影响测试，
+    # 只给开发回路用）；--no-cache 保证发布体检是**真跑**而不是回放旧判定。
+    argv = [psh.posix_shell(), "verify.sh", "--full", "--no-cache"]  # nosec B404/B603/B607
+    rc = subprocess.run(argv, cwd=ROOT).returncode
     gate_fail = bool(issues) or rc != 0
     if not gate_fail:
         from core import asset_ledger_projection as alp
