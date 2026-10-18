@@ -319,7 +319,8 @@ class TestMcpRuntime(unittest.TestCase):
                          {"library_search", "registry_query",
                           "pipeline_ls", "spec_ls",
                           "module_read", "pipeline_read", "asset_read",
-                          "library_read", "pattern_read", "knowledge_order"})
+                          "library_read", "pattern_ls", "pattern_read",
+                          "asset_ls", "knowledge_order"})
         for t in tools:
             self.assertIn("inputSchema", t)
 
@@ -892,8 +893,8 @@ class DeclaredSurfaceVsHandlersTest(unittest.TestCase):
         rt = mrt.McpRuntime({"name": "declared", "version": "0", "resources": []})
         samples = {"pipeline_ls": {}, "spec_ls": {}, "registry_query": {"query": "M90"},
                    "library_search": {"query": "NF"}, "library_read": {"entry_id": "NF-1"},
-                   "pattern_read": {"pattern_id": "fail-closed-verification"},
-                   "knowledge_order": {}, "module_read": {"module_id": "M90"},
+                   "pattern_ls": {}, "pattern_read": {"pattern_id": "fail-closed-verification"},
+                   "asset_ls": {}, "knowledge_order": {}, "module_read": {"module_id": "M90"},
                    "pipeline_read": {"pipeline": "P01"}, "asset_read": {"key": "TECH_RULES"}}
         for spec in mrt.TOOL_DEFS:
             name = spec["name"]
@@ -912,7 +913,8 @@ NOOP_ALLOWED: dict = {}
 VALID_ARGS = {
     "pipeline_ls": {}, "spec_ls": {}, "registry_query": {"query": "M08"},
     "library_search": {"query": "叙事"}, "library_read": {"entry_id": "NF-1"},
-    "pattern_read": {"pattern_id": "single-source-truth"}, "knowledge_order": {},
+    "pattern_ls": {}, "pattern_read": {"pattern_id": "single-source-truth"},
+    "asset_ls": {}, "knowledge_order": {},
     "module_read": {"module_id": "M08"}, "pipeline_read": {"pipeline": "P01"},
     "asset_read": {"key": "QUANT_METRICS", "package": "量化金融域包"},
 }

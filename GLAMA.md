@@ -33,7 +33,7 @@
 2. **Dockerfile 页**：选仓库 Dockerfile；Build steps 留空；CMD 填 `["python","scripts/nf.py","serve"]`；
    env schema 填空对象；点 **Deploy**（有的页面叫 **Build**）。
 3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.1`，发布。
-4. 打开 Schema / Score 页验收：应有 10 个工具、1 个 prompt；Quality 开始评分。
+4. 打开 Schema / Score 页验收：应有 12 个工具、1 个 prompt；Quality 开始评分。
 
 如果你只想记一条：**先去 Repository 页点 Sync，再去 Dockerfile 页点 Deploy，成功后再点 Make Release。**
 
@@ -128,7 +128,7 @@
 | 项 | 期望 |
 |---|---|
 | Build 状态 | Success / 绿色 |
-| Tools | 10 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_read` |
+| Tools | 12 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_ls` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_ls` `asset_read` |
 | Prompts | 1 个：`assemble_guide` |
 | Resources | `nf://repo/...`，首屏 20 条 + `nextCursor` |
 | Instructions | 只读内容服务的自述 |
@@ -182,7 +182,7 @@
 
 期望从 “No tools” 变成：
 
-- Tools：10 个（名单见上表）；
+- Tools：12 个（名单见上表）；
 - Prompts：1 个；
 - Resources：`nf://repo/...`；
 - Instructions：有内容；
@@ -207,7 +207,7 @@ printf '%s\n' \
   | python scripts/nf.py serve
 ```
 
-期望：`serverInfo.name = nf-repo-live`；`tools` 10 个；`prompts` 1 个。
+期望：`serverInfo.name = nf-repo-live`；`tools` 12 个；`prompts` 1 个。
 
 ## 7. 33% 是什么，怎么提高
 
@@ -274,7 +274,7 @@ overall = 0.7 × descriptionQuality + 0.3 × coherence
 A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 ```
 
-本仓 10 个工具的人工预评估：
+本仓 12 个工具的人工预评估：
 
 | 工具 | Purpose 25% | Usage 20% | Behavior 20% | Params 15% | Conciseness 10% | Completeness 10% | 估算 TDQS |
 |---|---|---|---|---|---|---|---|
@@ -283,10 +283,12 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | registry_query | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | library_search | 5 | 5 | 4 | 4 | 3 | 4 | 4.4 |
 | library_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| pattern_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | pattern_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | knowledge_order | 4 | 5 | 4 | 4 | 4 | 4 | 4.2 |
 | module_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | pipeline_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
+| asset_ls | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | asset_read | 5 | 5 | 5 | 4 | 3 | 4 | 4.6 |
 
 估算：descriptionQuality ≈ 4.4（A）；coherence ≈ 4.0–4.5（naming 是唯一弱项：
@@ -321,7 +323,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | Name | NinFenz Content Gate |
 | One-liner (EN) | Read-only MCP server for a content contract layer: protocol, modules, pipelines, assets, library. |
 | One-liner (ZH) | 给任何 AI agent 一个可校验的内容规范与资产底座——先查契约，再落笔。 |
-| Description | 只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。10 个只读工具 + 1 个 prompt（assemble_guide）；支持 modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；无写路径。 |
+| Description | 只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。12 个只读工具 + 1 个 prompt（assemble_guide）；支持 modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；无写路径。 |
 | Repo | https://github.com/Monyeah777/NinFenz |
 | Site | https://ninfenz.dev/ |
 | Install | `npx -y ninfenz serve`（或容器：`docker build -t ninfenz-glama . && docker run --rm -i ninfenz-glama`） |
@@ -337,7 +339,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 - 根 `Dockerfile`：非 root、digest 钉版、stdio、零 pip；
 - `glama.json`：维护者 `Monyeah777`；
 - `GLAMA.md`：本教程；
-- `desktop/src/core/mcp_runtime.py`：10 工具 title / 四项 annotations / outputSchema /
+- `desktop/src/core/mcp_runtime.py`：12 工具 title / 四项 annotations / outputSchema /
   structuredContent / TDQS 描述；
 - `.dockerignore`、README 徽章、`docs/mcp.md` 容器节、英文/日文译件、conformance 报告。
 
@@ -363,7 +365,7 @@ coherence 的四条反馈与处理如下：
 | `spec_ls` 与 `registry_query` 的协议包元数据轻微重叠 | `spec_ls` 描述已明确为**权威协议包目录**；`registry_query` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
 | `pipeline_ls` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_ls` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
 | 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | **已改**：MCP 面统一为 `asset_read`（`asset_get` 保留为兼容别名，不进 `tools/list`）；核心协议的资产五接口仍叫 `asset_get`，描述里说明 `asset_read` 是它的 MCP 读面 |
-| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | 这是**有意的两段式**：`resources/list type=pattern|asset` 负责枚举，`pattern_read` / `asset_read` 负责取正文；描述已写明“canonical enumeration path”，避免 agent 找不到枚举路径 |
+| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | **已补**：新增 `pattern_ls` / `asset_ls` 专用枚举工具，与 `pattern_read` / `asset_read` 成对；`resources/list` 仍保留为同源资源面 |
 
 > 结论：overall 4.4 已经是 A；上述描述边界修改会在 Glama 下次重建后重新评分，
 > 主要提升 disambiguation / completeness，naming 仍可能停在 4。若一定要把 naming 推到 5，

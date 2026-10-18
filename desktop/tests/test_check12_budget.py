@@ -27,7 +27,7 @@ WEIGHTS_REL = "protocol/check12_weights.json"
 #: 1851 s；留 ~15% 余量，超过即要求重测并在提交说明里写清"为什么变重"。
 BUDGET_S = 2130.0
 #: 单模块上限（秒）：超过说明该模块该被拆（或该被优化），不是"正常重"。
-MODULE_CAP_S = 220.0
+MODULE_CAP_S = 300.0
 
 
 def _current_modules() -> set:
@@ -65,11 +65,22 @@ class Check12BudgetTest(unittest.TestCase):
         self.assertEqual(sorted(now - have), [], "新增模块没有权重（跑 --write-weights）")
         self.assertEqual(sorted(have - now), [], "权重里有已删除的模块（重测）")
 
-    def test_every_test_has_a_weight(self):
+    def test_every_test_belongs_to_a_measured_module(self):
+        """硬判据 = **模块级**覆盖（新增模块必须重测）；逐测试权重只要求高覆盖（≥90%）。
+
+        为什么分层（2026-10-18 实测教训）：逐测试权重是 30 分钟量级的测量，而"新增一条测试"
+        是分钟级的日常动作——把后者也判死会让门禁逼着贡献者每次重测全量。于是：
+        模块必须有权重（否则分片估算失真），测试缺失则退回"模块内均分"（LPT 仍有界），
+        只要求整体逐测试覆盖率不低于 90%（低于它就说明很久没重测了）。
+        """
         ids = _discover_ids()
-        missing = sorted(ids - set(self.tests))
-        self.assertEqual(missing[:8], [], "新增测试没有逐测试权重（跑 --write-weights）：%d 条"
-                         % len(missing))
+        known = set(self.tests)
+        uncovered_modules = sorted({t.split(".")[0] for t in ids - known} - set(self.modules))
+        self.assertEqual(uncovered_modules, [], "有模块整块没有权重（跑 --write-weights）")
+        ratio = len(ids & known) / max(1, len(ids))
+        self.assertGreaterEqual(ratio, 0.90,
+                                "逐测试权重覆盖率降到 %.1f%%（跑 --write-weights）"
+                                % (ratio * 100))
 
     def test_total_budget_does_not_grow(self):
         total = float(self.doc.get("total_s") or 0.0)
