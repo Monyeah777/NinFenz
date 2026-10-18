@@ -9,8 +9,8 @@ subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:6d4ad44167f44d75b493a271c6fe126a325647b9a4cfa7d1b59f37d66df94459
-  - desktop/tests/test_purity_scan.py:b1097e7181f260c6d863306e5b373278b36961be0e9feefa7eb7432bc6aadf55
+  - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
+  - desktop/tests/test_purity_scan.py:d00704eaab4784852c855455b4041134c639033aa46d9d08f470aa8ad8e784c0
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - verify.sh:3de864c14756215c8472013a548dcc20f4bf7f1e4eea2592dc7369a6d566efe7
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
+
 > 重审（2026-10-18）：P2：分片数按核数自适应
 
 > 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名

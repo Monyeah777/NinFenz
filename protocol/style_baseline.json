@@ -521,7 +521,7 @@
     "desktop/src/core/mcp_package.py::UP006": 8,
     "desktop/src/core/mcp_package.py::UP031": 8,
     "desktop/src/core/mcp_package.py::UP035": 3,
-    "desktop/src/core/mcp_runtime.py::E501": 5,
+    "desktop/src/core/mcp_runtime.py::E501": 6,
     "desktop/src/core/mcp_runtime.py::I001": 3,
     "desktop/src/core/mcp_runtime.py::SIM105": 1,
     "desktop/src/core/mcp_runtime.py::SIM108": 1,

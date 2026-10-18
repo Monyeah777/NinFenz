@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
+  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
 ---
+> 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
+
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
 
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
+  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
 ---
+> 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
+
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
 
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）

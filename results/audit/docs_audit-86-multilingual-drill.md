@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:54fb9760bd7e2fa83b110b4b1c29e54f821434ca5a19b7d63ff0e1d4195e9e20
   - protocol/drill_fidelity.json:235c028d1d817085a67c79303b7e1b4f8bb92b68885e43b49bfea209e51c6c91
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
+  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
 ---
+> 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
+
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
 
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）

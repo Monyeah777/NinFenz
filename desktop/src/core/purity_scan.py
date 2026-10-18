@@ -141,13 +141,6 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
-    # 门禁判定缓存（2026-10-18）：保留窗口裁剪与 --clear。
-    "verify_cache.py:unlink":
-        "缓存保留窗口裁剪；落点 = NF_HOME/verify_cache/<key 前两位>/<key>.json——key 由本模块"
-        " sha256 产出（非外部输入），文件名不受用户控制，且只在自建目录内删除",
-    "verify_cache.py:shutil.rmtree":
-        "对应 --clear（显式清空判定缓存）；落点由 _cache_root() 拼装并限定在 NF_HOME/verify_cache，"
-        "不接受路径参数，无法指向仓库根/主目录/盘根",
     "regression_score.py:__import__":
         "模块名取自内部常量表 SIGNAL_SPECS（非用户输入），用于按名调用既有扫描器",
     "e2e_desktop_headless.py:shutil.rmtree":

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
+  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
 ---
+> 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
+
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
 
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）

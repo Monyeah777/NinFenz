@@ -18,7 +18,9 @@ key 覆盖（逐项都有理由，缺一项都可能假绿）：
 纪律：
 - **只缓存 rc=0**：红是瞬态（环境未就绪、外部会话改了树），必须重跑；
 - 缓存文件带 `key` 与 `head/mode` 自证；读取时逐项核对，不符即未命中（不做"差不多就用"）；
-- 缓存放在 `NF_HOME`（用户态），不入仓、不进 payload；`--clear` 可随时清空。
+- 缓存放在 `NF_HOME`（用户态），不入仓、不进 payload；条目极小（每份几百字节），
+  需要清空时直接删目录即可（**本脚本刻意不含任何删除面**：删除 sink 会扩大 purity 面，
+  并与 Rust 快线的允许表产生口径分叉——2026-10-18 实测修复）。
 
 用法（verify.sh 调用）：
     python scripts/verify_cache.py --mode full --key                  # 打印 key
@@ -27,7 +29,6 @@ key 覆盖（逐项都有理由，缺一项都可能假绿）：
     python scripts/verify_cache.py --clear
 """
 import argparse
-import contextlib
 import hashlib
 import json
 import os
@@ -42,7 +43,6 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
 
 CACHE_VERSION = 1
-KEEP = 20
 
 
 def _run(argv: list) -> str:
@@ -124,23 +124,6 @@ def cmd_put(key: str, mode: str, n_pass: int, n_warn: int) -> int:
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(doc, ensure_ascii=False, sort_keys=True), encoding="utf-8")
     os.replace(tmp, path)
-    _prune()
-    return 0
-
-
-def _prune() -> None:
-    files = sorted(_cache_root().glob("*/*.json"), key=lambda p: p.stat().st_mtime)
-    for old in files[:-KEEP]:
-        # 老缓存删不掉（被占用/权限）不是判据问题：留下只是多占几 KB，
-        # 下次 prune 还会再试；绝不因为清理失败让门禁红。
-        with contextlib.suppress(OSError):
-            old.unlink()
-
-
-def cmd_clear() -> int:
-    import shutil
-    shutil.rmtree(_cache_root(), ignore_errors=True)
-    print("  ✓ 已清空门禁判定缓存")
     return 0
 
 
@@ -153,10 +136,7 @@ def main(argv=None) -> int:
     ap.add_argument("--put", action="store_true")
     ap.add_argument("--pass", dest="n_pass", type=int, default=0)
     ap.add_argument("--warn", dest="n_warn", type=int, default=0)
-    ap.add_argument("--clear", action="store_true")
     a = ap.parse_args(argv)
-    if a.clear:
-        return cmd_clear()
     key = a.key if a.key else compute_key(a.mode)
     if not key:
         return 2
