@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
+  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -16,9 +16,11 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/CONFORMANCE.md:d4b4423c3f28927bb23ea5354e7d656252dbd84c2341d94a11cd1b7165d83de5
+  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
+
 > 重审（2026-10-18）：P3：分层档位 + 判定缓存 + 受影响测试选择
 
 > 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）

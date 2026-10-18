@@ -11,7 +11,7 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:6d4ad44167f44d75b493a271c6fe126a325647b9a4cfa7d1b59f37d66df94459
   - desktop/tests/test_purity_scan.py:b1097e7181f260c6d863306e5b373278b36961be0e9feefa7eb7432bc6aadf55
-  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
+  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - verify.sh:b2b8edfc0c4ba8272cb47b109532cb1eb1262b46985fe34d33671f6af4b53966
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
+
 > 重审（2026-10-18）：P0/P3：权重基线入库 + sink 上限审阅（16→18）
 
 > 重审（2026-10-18）：P3：判定缓存 + 分层档位（sink 登记）

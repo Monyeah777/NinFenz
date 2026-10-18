@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:fbd60aaf7e13177c240075b1367b02a7015e3559987ffbd983126a660b3a26e7
+  - desktop/src/core/mcp_runtime.py:22891ab43f6340a997c611848a6a511bf59760ae89bbb887db0f9b5ae365809c
   - protocol/code_metrics_baseline.json:a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3
 ---
+> 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
+
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）
 
 > 重审（2026-10-18）：P3：判定缓存 + 分层档位（sink 登记）

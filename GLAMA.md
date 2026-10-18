@@ -352,6 +352,23 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 
 > 我没有你的 Glama OAuth 登录态，无法替你点这四个按钮；所有需要填的值都在上面。
 
+## 13. 对 Glama Coherence 4.3 的逐条答复
+
+Glama 当前实评（2026-10-18）：**descriptionQuality 4.5 · coherence 4.3 · overall 4.4 → A**。
+coherence 的四条反馈与处理如下：
+
+| 反馈 | 处理 |
+|---|---|
+| 多数工具针对明显不同的资源；描述交叉引用替代方案 | 保留；每个工具都写明“何时用 / 何时改用哪个工具” |
+| `spec_ls` 与 `registry_query` 的协议包元数据轻微重叠 | `spec_ls` 描述已明确为**权威协议包目录**；`registry_query` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
+| `pipeline_ls` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_ls` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
+| 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | `asset_get` 是核心协议**资产五接口**的规范名（`asset_get/query/match/roll/register`），MCP 工具直接沿用；`title` 写为 “Read asset”。改名会同时破坏 Python/Rust/.NET 三套实现和 189 处协议/内容引用，收益仅 naming 一档，故保留并在描述里说明 |
+| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | 这是**有意的两段式**：`resources/list type=pattern|asset` 负责枚举，`pattern_read` / `asset_get` 负责取正文；描述已写明“canonical enumeration path”，避免 agent 找不到枚举路径 |
+
+> 结论：overall 4.4 已经是 A；上述描述边界修改会在 Glama 下次重建后重新评分，
+> 主要提升 disambiguation / completeness，naming 仍可能停在 4。若一定要把 naming 推到 5，
+> 需要单独做一次跨语言 API 迁移（Python + Rust + .NET + 协议表 + 文档），不建议在 A 已达成时做。
+
 ## 附录：官方参考
 
 - Listing：<https://glama.ai/mcp/servers/Monyeah777/NinFenz>

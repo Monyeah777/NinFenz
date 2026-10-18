@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:95faf1200b3ae7994d4423117388815b69bc95bd7933435d15062c72a14c344e
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:0083b2f906e12965c99f38225e12202b1c23070098970473d1cecaf508c333f1
+  - README.md:e504a7c1ab2cb52cef2240eda75a06cc87dae5bb46e1692a4c4a690f53365c77
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
+  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
 
 ---
+> 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
+
 > 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
 
 > 重审（2026-10-17）：步骤5 结案：四组回滚证据登记（逐组取证）

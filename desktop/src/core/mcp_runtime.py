@@ -392,9 +392,11 @@ TOOL_DEFS = [
             "List protocol packages from desktop/src/core/registry.json, returning each "
             "package's id, version, module count, and categories. Use it when you need a "
             "protocol package ID or version; for module metadata use registry_query, and "
-            "for pipeline files use pipeline_ls. Takes no arguments and returns an empty "
-            "list only when the registry declares no protocols. Read-only and "
-            "deterministic: reads one local registry file, with no writes or network."),
+            "for pipeline files use pipeline_ls. This is the authoritative protocol "
+            "package catalog; registry_query returns protocol hits only as a secondary "
+            "lookup. Takes no arguments and returns an empty list only when the registry "
+            "declares no protocols. Read-only and deterministic: reads one local registry "
+            "file, with no writes or network."),
         # 2026-10-08 删除已声明的 `tier`：registry 的 protocols 里**没有分级字段**，过滤从未实现
         # （实测：传任意 tier 返回完全相同的全量清单，结果里也没有 tier 字段）——「声明了不生效」
         # 是静默降级，比缺个参数更坏；宁可不声明。若将来 registry 补了分级数据，再连同实现一起加回。
@@ -439,10 +441,11 @@ TOOL_DEFS = [
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
-            "Query the NF registry for modules and protocol packages whose id or name "
-            "contains query. Use it to resolve an exact module ID before module_read or "
-            "a protocol ID before spec_ls; for free-text document or catalog search use "
-            "library_search instead. Matching is case-sensitive, query is required "
+            "Query the NF registry for modules whose id or name contains query. Use it to "
+            "resolve an exact module ID before module_read; protocol packages are returned "
+            "only as a secondary lookup, so use spec_ls for the authoritative package "
+            "catalog. For free-text document or catalog search use library_search instead. "
+            "Matching is case-sensitive, query is required "
             "(examples: M90, 技术文档域包), and an empty query matches every entry; "
             "results are grouped under modules and protocols, and no matches yields empty "
             "arrays. Read-only: reads one local registry file, with no writes or network."),
@@ -625,9 +628,10 @@ TOOL_DEFS = [
         "description": (
             "Read one engineering pattern's full Markdown from patterns/<id>/PATTERN.md, "
             "including frontmatter, rules, and a counterexample. Use it when you need the "
-            "practice behind an NF rule; for domain modules use module_read, and enumerate "
-            "patterns with resources/list type=pattern. The "
-            "pattern_id is the exact, case-sensitive directory name such as "
+            "practice behind an NF rule; for domain modules use module_read. The canonical "
+            "enumeration path is resources/list type=pattern, and this tool fetches one "
+            "pattern ID from that list. The pattern_id is the exact, case-sensitive "
+            "directory name such as "
             "fail-closed-verification (not the document title); an unknown ID returns an "
             "error. Read-only: reads one local file, with no writes or network."),
         "inputSchema": {
@@ -815,10 +819,11 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read every asset file that declares a given asset key, returning each match's "
-            "package, file path, and full text. Use it when a package README or asset "
-            "listing names a key such as EMOTION_WHEEL, or enumerate keys with "
-            "resources/list type=asset; for modules use module_read. The "
-            "key match is exact and case-sensitive, using the uppercase tokens found in "
+            "package, file path, and full text. asset_get is the protocol's canonical "
+            "read-only asset interface; use resources/list type=asset to enumerate keys, "
+            "or read a key named in a package README such as EMOTION_WHEEL. For modules "
+            "use module_read. The key match is exact and case-sensitive, using the "
+            "uppercase tokens found in "
             "each asset file's name or first 6000 characters; optional package restricts "
             "the search to community/<package>/assets (for example 校园情感领域包), "
             "otherwise all community assets and 05_资产库 are searched, and multiple "

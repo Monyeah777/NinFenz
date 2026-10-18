@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:21c3d2d3ec4aea0343ea0043ce1038062077ee08a49af596d56fa784259418d2
   - verify.sh:b2b8edfc0c4ba8272cb47b109532cb1eb1262b46985fe34d33671f6af4b53966
-  - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
+  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:8a867b58c12ea4e6b2c6a37db4e34459ece9c37b60aa44095ba1e29dbb1bf3e4
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
+
 > 重审（2026-10-18）：P3：分层档位 + 判定缓存 + 受影响测试选择
 
 > 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
