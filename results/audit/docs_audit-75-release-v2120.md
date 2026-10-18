@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:95faf1200b3ae7994d4423117388815b69bc95bd7933435d15062c72a14c344e
+  - CHANGELOG.md:a654bbbd966a3db1a1bdb537d646884e1a9bffe099528d42e212c0dbebd205b2
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
   - README.md:0083b2f906e12965c99f38225e12202b1c23070098970473d1cecaf508c333f1
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
 
 ---
+> 重审（2026-10-18）：CHANGELOG 记入门禁提速
+
 > 重审（2026-10-18）：README 生成区重写（stats --write）
 
 > 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
