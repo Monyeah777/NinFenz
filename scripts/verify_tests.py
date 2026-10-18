@@ -357,6 +357,17 @@ def main(argv=None) -> int:
     if args.write_weights:
         t0 = time.perf_counter()
         measured, per_test = measure_weights(ids)
+        if args.mods:
+            # 增量重测（只重测指定模块）：与既有基线**合并**，而不是整份覆盖——
+            # 全量重测是 30 分钟量级，改一条测试就逼全量重测会让棘轮没人肯跟。
+            old_path = ROOT / WEIGHTS_REL
+            old = json_doc.load(old_path, dict, what=WEIGHTS_REL) if old_path.is_file() else {}
+            old_mod = dict(old.get("modules") or {})
+            old_tests = {k: v for k, v in (old.get("tests") or {}).items()
+                         if module_of(k) not in measured}
+            old_mod.update(measured)
+            old_tests.update(per_test)
+            measured, per_test = old_mod, old_tests
         doc = {"schema": "nf-check12-weights/1",
                "note": "check12 墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
                "measured_at": time.strftime("%Y-%m-%d"),

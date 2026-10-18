@@ -50,7 +50,7 @@ _CACHE: dict = {}
 
 
 def _inventory() -> list:
-    """命令面清单（与 `test_cli_json_face` 同一真源：`nf shell --commands --json`，由 argparse 派生）。"""
+    """命令面清单（真源同 test_cli_json_face：nf shell --commands --json，由 argparse 派生）。"""
     if "rows" not in _CACHE:
         p = subprocess.run([sys.executable, NF, "shell", "--commands", "--json"], cwd=str(ROOT),
                            capture_output=True, text=True, encoding="utf-8",
@@ -296,16 +296,28 @@ class DaemonParityTest(_DaemonFixture):
                          "有机器面没被比到（切片内覆盖不完整）")
 
     def test_machine_faces_byte_identical_chunk0(self):
-        self._machine_chunk(0, 4)
+        self._machine_chunk(0, 8)
 
     def test_machine_faces_byte_identical_chunk1(self):
-        self._machine_chunk(1, 4)
+        self._machine_chunk(1, 8)
 
     def test_machine_faces_byte_identical_chunk2(self):
-        self._machine_chunk(2, 4)
+        self._machine_chunk(2, 8)
 
     def test_machine_faces_byte_identical_chunk3(self):
-        self._machine_chunk(3, 4)
+        self._machine_chunk(3, 8)
+
+    def test_machine_faces_byte_identical_chunk4(self):
+        self._machine_chunk(4, 8)
+
+    def test_machine_faces_byte_identical_chunk5(self):
+        self._machine_chunk(5, 8)
+
+    def test_machine_faces_byte_identical_chunk6(self):
+        self._machine_chunk(6, 8)
+
+    def test_machine_faces_byte_identical_chunk7(self):
+        self._machine_chunk(7, 8)
 
 
 CLIENT = str(ROOT / "scripts" / "nf_client.py")
