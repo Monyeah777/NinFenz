@@ -1,5 +1,5 @@
 # NinFenz MCP 接続（`nf serve` · 40 総綱 v2.7 波A S1-E3 / X2）
-> 最后更新：2026-09-30 (last updated)
+> 最后更新：2026-10-18 (last updated)
 
 > **状態**：公開化文書は基礎層 v2.7 とともに着地済み。**E3 プロトコル級ロード実測は 2026-09-08 に通過**（stdio JSON-RPC フレーム列の直測で五方法すべて緑、文末の記録を参照。P06 パイプラインの缺口二つ——閉じ ``` の欠落 / techdoc 宣言の欠落——を修復）。41 波C C7（2026-09-08）で読み取り専用 tools/prompts を開放（本機 stdio スモーク通過、docs/41_波C_C7_实测记录.md を参照）。**宿主型クライアント（Claude Desktop などの GUI ロード）は依然ユーザ側での追記を推奨**——README の MCP 宣言は現状維持（S13 ゲートは docs_external-validation-v2.7.md の規則に従い開放）、追記後に「正式化」を補う。
 
@@ -230,3 +230,23 @@ python scripts/nf.py serve <输出目录>/mcp.json
 > （プロトコル / モジュール / パイプライン / 資産 / 館蔵）を agent が呼べる検索・取り出しのツール面に変えます。
 > 読み取り専用ツール 10 個 + ロードガイド prompt 1 個、modern `2026-07-28` と legacy `2025-11-25` の
 > 双プロトコル版をサポート、第三者依存ゼロ、書き込み経路なし。
+
+### 七、コンテナ / Glama（stdio イメージ）
+
+リポジトリルートの `Dockerfile` は Glama（およびビルド後に stdio で自省するディレクトリ）の
+入口です。イメージは読み取り専用面が実際に開くファイルだけをコピーし、非 root で実行し、
+`CMD` は `python scripts/nf.py serve`（リアルタイムリポジトリ面、スナップショット不要）です。
+
+```bash
+docker build -t ninfenz-glama .
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | docker run --rm -i ninfenz-glama
+```
+
+Glama Admin ページでは Build steps を空にし、CMD arguments を
+`["python","scripts/nf.py","serve"]`、環境変数 schema を空オブジェクトにします。
+詳細手順と評価基準はリポジトリルートの `GLAMA.md` にあります。イメージはポートを公開せず、
+外部ネットワークも使いません。動作はローカルの `nf serve` と同じ実装です。

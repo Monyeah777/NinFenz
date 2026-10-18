@@ -6,12 +6,12 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:83ea0b4fadc2adb06fd64a6cb36659d6dd12c614cae5408c8b2d257f745cda8e
+  - protocol/locales.json:5d283a9c9503e7103addd8c4a9463bb2ba8d5c0c4c29e9f78371c732d7a948b9
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:7a839ec9b64bbae0d886e647efd31c9edd01673b710c6c4664ed81db7732e136
-  - docs/ja/mcp.md:477e3fddc1a8c67d1f24e8d6779fe6b5d93dae30a0221ff3f1fea93f99c7edf0
+  - docs/en/mcp.md:06936b7fbe64ede65b6db1c4f1b62fd25a3844a1286ff8f84839ce09c8087ff2
+  - docs/ja/mcp.md:9cce8545a9694a26d460787f63eda12a38b2c0cd5bc6e865015160bb87402649
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:4f8fd31f8def501066c8cf2416bdba38a13c2fbe60b71e98fe60ea5007b8b2ca
 ---
+> 重审（2026-10-18）：Glama 上架：docs/mcp.md 增加容器/Glama 一节，英文/日文译件同步并重签 locales；根 Dockerfile 按 check41 钉基座 digest
+
 > 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
 
 > 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步

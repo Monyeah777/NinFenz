@@ -1,5 +1,5 @@
 # NinFenz MCP access (`nf serve` · plan 40 v2.7 Wave A S1-E3 / X2)
-> 最后更新：2026-09-30 (last updated)
+> 最后更新：2026-10-18 (last updated)
 
 > **Status**: the public documentation landed with base layer v2.7; **the E3 protocol-level load test passed on 2026-09-08** (a direct stdio JSON-RPC frame-sequence test of all five methods came back green — see the record at the end of this document; it fixed two P06 pipeline gaps — a missing closing ``` / a missing techdoc declaration). 41 Wave C C7 (2026-09-08) opened read-only tools/prompts (local stdio smoke test passed; see docs/41_波C_C7_实测记录.md). **Host-class clients (GUI loading such as Claude Desktop) still need user-side backfill** — the README's MCP claims stay as they are (the S13 gate opens per the docs_external-validation-v2.7.md rules), and "promotion" is filled in after the backfill.
 
@@ -230,3 +230,24 @@ python scripts/nf.py serve <输出目录>/mcp.json
 > (protocol / module / pipeline / asset / library) into a retrieval-and-pickup tool surface callable by agents.
 > 10 read-only tools + 1 loading-guide prompt, supporting modern `2026-07-28` and legacy `2025-11-25`
 > dual protocol versions, zero third-party dependencies, no write path.
+
+### 7. Container / Glama (stdio image)
+
+The root `Dockerfile` is the entry for Glama (and any registry that builds an image and then
+introspects over stdio): the image copies only the files the read-only surface actually opens,
+runs as a non-root user, and its `CMD` is `python scripts/nf.py serve` (live-repo surface, no
+snapshot needed).
+
+```bash
+docker build -t ninfenz-glama .
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | docker run --rm -i ninfenz-glama
+```
+
+On the Glama Admin page leave Build steps empty, set CMD arguments to
+`["python","scripts/nf.py","serve"]`, and use an empty environment-variable schema; the full
+steps and scoring rubric are in the repository-root `GLAMA.md`. The image exposes no port and
+makes no outbound network calls; its behavior is the same `nf serve` implementation as local.

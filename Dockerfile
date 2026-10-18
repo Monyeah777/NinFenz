@@ -5,7 +5,9 @@
 # Glama builds this file and starts the container with `CMD` below, then performs
 # `initialize` / `tools/list` / `resources/list` / `prompts/list` over stdio.
 # Keep stdout pure JSON-RPC (the startup banner in nf.py goes to stderr).
-FROM python:3.12-slim
+# Digest from Dockerfile.crosscheck's pinned PY_BASE (SLSA check41: base images
+# must be digest-pinned; a bare tag is rejected).
+FROM python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534c5767af9ea65f6ce
 
 LABEL org.opencontainers.image.title="NinFenz Content Gate" \
       org.opencontainers.image.description="Read-only MCP server for the NinFenz content contract layer" \
