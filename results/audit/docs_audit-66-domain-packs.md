@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:c563bf5145fdbc2f0e37f5ab12427934e196119281d549522c45ec9ea09e5141
+  - verify.sh:12dce8ea08dccab0bbfd5797948405f3184522e6f0723ee3b60662ff13cdcf0d
 
 ---
+> 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
+
 > 重审（2026-10-17）：步骤5：在场/关键词组收敛到 _decl_check（等价性 15 例逐字节一致）
 
 > 重审（2026-10-17）：步骤4 收口：attest --selfcheck 接线 + 站点/覆盖率分母同步

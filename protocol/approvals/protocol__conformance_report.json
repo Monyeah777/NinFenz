@@ -1,7 +1,7 @@
 {
-  "approved_at": "2026-10-17",
-  "approved_by": "门禁提速批（P1 套件隔离）",
-  "note": "测试套件级隔离落地",
+  "approved_at": "2026-10-18",
+  "approved_by": "门禁提速批（P2 分片）",
+  "note": "check12 分片并行落地",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"

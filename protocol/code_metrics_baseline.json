@@ -681,7 +681,7 @@
       "max_fn_lines": 49
     },
     "desktop/src/core/mcp_runtime.py": {
-      "lines": 1442,
+      "lines": 1864,
       "max_fn_cc": 30,
       "max_fn_lines": 69
     },
@@ -1216,9 +1216,9 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 198,
+      "lines": 204,
       "max_fn_cc": 10,
-      "max_fn_lines": 24
+      "max_fn_lines": 26
     },
     "desktop/src/core/watch.py": {
       "lines": 348,
@@ -1484,6 +1484,11 @@
       "lines": 32,
       "max_fn_cc": 1,
       "max_fn_lines": 4
+    },
+    "scripts/verify_tests.py": {
+      "lines": 246,
+      "max_fn_cc": 17,
+      "max_fn_lines": 83
     },
     "scripts/workflow_policy.py": {
       "lines": 42,

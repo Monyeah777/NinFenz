@@ -37,7 +37,13 @@ def repo_report(root=None):
 
 class BuildTest(unittest.TestCase):
     def test_build_is_deterministic(self):
-        a, b = vr.build(str(ROOT)), vr.build(str(ROOT))
+        """两次**独立**构建必须同根。
+
+        P2（2026-10-17 实测）：一次 build 在真仓要 22–30 s，原先这里连建两次 = 55 s。
+        现改为「缓存的首跑 + 一次独立重算」——仍然是两次独立构建的比较（缓存的那次是
+        本进程内真跑出来的，不是落盘件），判据不放松，省掉一次 27 s。
+        """
+        a, b = repo_report(), vr.build(str(ROOT))
         self.assertEqual(a["root_digest"], b["root_digest"],
                          "同一棵树两次构建必须同根（否则报告不可核验）")
 
@@ -118,7 +124,8 @@ class RealRepoTest(unittest.TestCase):
         `protocol/verification_report.json` 记录 `7ef20df0…` vs 实测 `1efe3d61…`（陈旧），
         而门禁全绿。`nf release --fresh` 会红，但那是可选入口。本件把它钉进常驻单测。
         """
-        issues, live = vr.check(str(ROOT))
+        # P2：把本进程已构建好的报告传进去（check 默认仍自己重算；判据不变，省一次 25 s 构建）
+        issues, live = vr.check(str(ROOT), live=repo_report())
         self.assertEqual([], issues,
                          "机器可读报告过期（修复指引：python scripts/verify_report.py --write）：%s"
                          % issues)

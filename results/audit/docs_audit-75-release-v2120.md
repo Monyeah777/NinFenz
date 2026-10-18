@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:95faf1200b3ae7994d4423117388815b69bc95bd7933435d15062c72a14c344e
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:8eeb1a274ab1200f409a7754518c1f73c31246396f0fa56c73951f3fa45e7699
+  - README.md:0083b2f906e12965c99f38225e12202b1c23070098970473d1cecaf508c333f1
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:94e6472118b0a03cae97977d8502a3f2532861b6e94fa0dc3f052dd89c3914cf
 
 ---
+> 重审（2026-10-18）：P2：check12 分片并行（verify_tests 执行器 + 权重基线）
+
 > 重审（2026-10-17）：步骤5 结案：四组回滚证据登记（逐组取证）
 
 > 重审（2026-10-17）：步骤5：在场/关键词组收敛到 _decl_check（等价性 15 例逐字节一致）

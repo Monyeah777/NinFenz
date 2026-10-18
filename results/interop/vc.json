@@ -7,15 +7,15 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "10bd9ec0b00be1958dade2e9ffc6258ab3733c41b8b331eb88a310e762285cdd",
+    "receiptRoot": "4830829802f66a11b709f806734f81f4e10447c0fb7b9b07259a853cd11dd5fb",
     "verdict": "conformant"
   },
-  "issuer": "门禁提速批（P1 套件隔离）",
+  "issuer": "门禁提速批（P2 分片）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"
   ],
-  "validFrom": "2026-10-17",
+  "validFrom": "2026-10-18",
   "x-nf-note": "派生自 protocol/conformance_report.json + protocol/RECEIPTS.json + protocol/approvals/*（纯派生，不新增真源）",
   "x-nf-proof-status": "unsigned（本仓签名走 ssh 外挂锚 nf attest；未接 JWS/Data Integrity 签名套件——形状可读，不可验证，勿当凭证使用）"
 }

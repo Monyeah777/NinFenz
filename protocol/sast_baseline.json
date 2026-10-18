@@ -26,24 +26,26 @@
         "scripts/sast_check.py::B603": 1,
         "scripts/style_check.py::B404": 1,
         "scripts/style_check.py::B603": 1,
-        "scripts/verify_run.py::B404": 1
+        "scripts/verify_run.py::B404": 1,
+        "scripts/verify_tests.py::B404": 1,
+        "scripts/verify_tests.py::B603": 1
       },
       "meta": {
         "bandit": {
           "severities": [
             [
               "LOW",
-              29
+              31
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 34
+          "total": 36
         },
         "ruff": {
-          "total": 79
+          "total": 80
         }
       },
       "ruff": {
@@ -89,7 +91,8 @@
         "scripts/sast_check.py::S603": 1,
         "scripts/style_check.py::S603": 1,
         "scripts/verify_parallel.py::S603": 1,
-        "scripts/verify_run.py::S603": 1
+        "scripts/verify_run.py::S603": 1,
+        "scripts/verify_tests.py::S603": 1
       }
     },
     "posix": {

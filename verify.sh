@@ -444,23 +444,26 @@ check11(){
 check12(){
   echo '== [12/代码层] 桌面核心单元测试 + 全量 py_compile 语法抽查（v0.6.0 治理补漏）=='
   local err=0
-  # ① desktop core 单元测试（desktop/tests 全量 discover，纯 unittest 无 pytest 依赖；L2 核心层）
+  # ① desktop core 单元测试（**分片并行**执行器；判据仍是「全量 discover 的测试全集」）
   #
-  # 为什么**默认仍是串行**（2026-10-16 实测，含一次完整的并行尝试）：
-  # 套件是全量门禁的主峰（串行 ~1255 s），并行确实快得多（`scripts/verify_parallel.py`
-  # 实测 8 路 416–475 s），但**结论不稳定**——多轮实测分别报出 7 / 5 / 4 个失败模块，
-  # 且集合每次不同。逐条查下去，其中一部分是**派生面过期**（可修），另一部分是
-  # **真实的共享单例冲突**：执行层守护是「每 NF_HOME 一个」的全局单例，而多个模块都会
-  # 拉起/停掉它（test_daemon_parity / test_daemon / test_launcher / test_watch …），
-  # 并行时实测出现「A 模块停守护、B 模块正在读帧」⇒ `daemon.read_framed` 读到空行崩掉；
-  # 即便把这些模块摘到**独占串行段**，仍会因别的模块写出仓内文件而让
-  # `test_verify_report` / `test_code_metrics` 判「过期」。
-  # 按本仓纪律（**不靠调度骗过验证**、测试非隔离要先定位根因），**默认保持串行**：
-  # 门禁结论必须稳定可复现。`scripts/verify_parallel.py` 保留为**开发侧快跑工具**
-  # （`--serial` 可逐字节对照），不进门禁判定口径。
+  # 演变（2026-10-16 → 2026-10-18）：此前**默认串行**，理由是并行时失败集合逐轮变化。
+  # 2026-10-17 逐条定位到两个根因并修掉：
+  #   ① **守护单例跨用例串场**：守护是「每 NF_HOME 一个」，而用例会拉起/停掉它；修法是
+  #      `desktop/tests/__init__.py` 把 NF_HOME 兜底到**套件私有临时目录**（并停掉其中守护），
+  #      于是每个进程（分片）各有一个隔离 home；守护端口本来由内核分配，不抢固定端口。
+  #   ② **用例环境与子进程不一致**：`test_launcher` 只把 home 放进子进程 env，没改进程 env，
+  #      导致「守护在跑」的判据其实没验到——已修（见该用例注释）。
+  # 执行器 `scripts/verify_tests.py` 的分片**由一次 discover 产出测试 id 后 LPT 分配**：
+  # 分片并集必须逐项等于 discover 全集（不等即 exit 1），因此"并行"只改执行方式、不改判据面。
+  # `NF_TEST_JOBS=1` 回到串行（排障用）；缺执行器时回退历史串行发现。
   if [ -d desktop/tests ]; then
-    if ( cd desktop && "$PY3" -m unittest discover -s tests -q >"$NFL_TMP"/nf_check12_unittest.log 2>&1 ); then
-      ok 'desktop core 单元测试全绿（desktop/tests 全量 discover，纯 unittest 内置）'
+    if [ -f scripts/verify_tests.py ]; then
+      _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "${NF_TEST_JOBS:-4}")
+    else
+      _ut_cmd=(bash -c 'cd desktop && exec "$0" -m unittest discover -s tests -q' "$PY3")
+    fi
+    if "${_ut_cmd[@]}" >"$NFL_TMP"/nf_check12_unittest.log 2>&1; then
+      ok 'desktop core 单元测试全绿（desktop/tests 全量 discover · 分片并行，判据面不变）'
     else
       no "desktop core 单元测试失败——见 $NFL_TMP/nf_check12_unittest.log"; err=1
       echo "  ── unittest log 尾部（诊断回显）──"

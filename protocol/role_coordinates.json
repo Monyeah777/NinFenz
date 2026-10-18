@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1037,
     "projection": 129,
-    "support": 218,
-    "verify": 930
+    "support": 222,
+    "verify": 931
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11831,6 +11831,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check12 的测试执行器：**按测试粒度分片并行**（只改执行方式，不改任何判据）。",
+      "path": "scripts/verify_tests.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "工作流供应链策略机检（CLI）：`python scripts/workflow_policy.py [--json]`。",
       "path": "scripts/workflow_policy.py",
       "role": "verify",
@@ -11844,16 +11850,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f8e86e84d1076e687f74a3ae198aca4c5f7e8880280d792625610acaa04677c1",
+  "root_digest": "a79bbdce1ed6d0327ddca340577d7e948d41be9127dba5f36d34e4fd6fc7ef48",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 82,
+    "R-catch": 85,
     "R-entry": 24,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
-    "R-support": 111,
-    "R-verify": 815,
+    "R-support": 112,
+    "R-verify": 816,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"

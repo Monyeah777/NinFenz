@@ -32,6 +32,7 @@ import sys
 import tempfile
 import time
 import unittest
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -229,6 +230,7 @@ class DaemonParityTest(_DaemonFixture):
 
     def test_machine_faces_are_byte_identical_through_daemon(self):
         bad, checked = [], 0
+        targets = []
         for row in _inventory():
             if "--json" not in (row.get("flags") or []):
                 continue
@@ -238,7 +240,17 @@ class DaemonParityTest(_DaemonFixture):
             argv = path.split() + ["--json"]
             if term.needs_confirm(argv):
                 continue                    # 写盘面：会改仓库，另由各自的专件覆盖
-            direct = self._direct(argv)
+            targets.append((path, argv))
+        # P2（2026-10-17 实测）：本判据 142 s，其中 ~90% 是**直跑**那一路——每条都真起解释器
+        # 并做一次全仓扫描，而它们互相独立。这里把直跑并行化（默认 6 路），守护侧仍串行：
+        # 冷/热两跑必须依次落在同一个守护上，这一点不能并行。判据与比较顺序一字不动。
+        directs = {}
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            futures = {pool.submit(self._direct, argv): argv for _path, argv in targets}
+            for fut in as_completed(futures):
+                directs[tuple(futures[fut])] = fut.result()
+        for path, argv in targets:
+            direct = directs[tuple(argv)]
             if direct[0] == 2 and not direct[1].strip():
                 continue                    # 需参面：无参形态跑不到（rc=2 且零输出）
             first = self._daemon(argv)

@@ -19,7 +19,7 @@ import hashlib
 import importlib
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from core import json_doc
 
@@ -166,9 +166,15 @@ def write(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     return issues, report
 
 
-def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """提交件 == 实时重算 → (issues, report)。"""
-    live = build(root)
+def check(root: str = ".", live: Optional[Dict[str, Any]] = None
+          ) -> Tuple[List[str], Dict[str, Any]]:
+    """提交件 == 实时重算 → (issues, report)。
+
+    `live` 允许调用方带上**同进程内已构建**的报告（默认 None = 自己重算）：判据本身不放松——
+    仍是"提交件 vs 实时"逐字段比，只是把重算成本留给调用方决定。唯一的用法约束写在测试里：
+    传入的 live 必须是同一棵树、同一进程内算出的（跨进程传旧报告即等于放松判据）。
+    """
+    live = build(root) if live is None else live
     p = Path(root) / REPORT_REL
     if not p.is_file():
         return (["缺 %s（修复指引：python scripts/verify_report.py --write）" % REPORT_REL], live)
