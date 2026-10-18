@@ -903,16 +903,16 @@ TOOL_DEFS = [
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
-            "Read every asset file that declares a given asset key, returning each match's "
-            "package, file path, and full text. asset_read is the MCP read surface for the "
-            "protocol's canonical asset_get interface. Use it for a key found via asset_ls "
-            "or a package README such as EMOTION_WHEEL; do not use it to enumerate keys "
-            "(asset_ls) or read modules (module_read). The match is exact and case-sensitive "
-            "against uppercase tokens in each file's name or first 6000 characters; "
-            "optional package restricts the search to community/<package>/assets (for "
-            "example 校园情感领域包), otherwise all community assets and 05_资产库 are "
-            "searched, and multiple matches are returned. No match is an error, not an "
-            "empty result."),
+            "Read every asset file that declares an asset key. Use it after asset_ls or a "
+            "package README names a key such as EMOTION_WHEEL; do not use it to enumerate "
+            "keys (use asset_ls instead), read modules (module_read), or read pipelines "
+            "(pipeline_read). key is the declared uppercase token—not a package name, "
+            "path, or prose phrase—and package is a bare package name, not a path. "
+            "Matching is exact and case-sensitive against tokens in each file's name or "
+            "first 6000 characters; lowercase or partial keys do not match. Optional "
+            "package limits the scan to community/<package>/assets; otherwise all "
+            "community assets and 05_资产库 are searched, and multiple matches are "
+            "returned. No match is an error, not an empty result."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,

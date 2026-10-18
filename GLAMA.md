@@ -373,6 +373,23 @@ coherence 的反馈与处理如下：
 > completeness 都有提升，overall 从 4.4 向 4.6+ 走。核心协议的资产五接口仍叫 `asset_get`，
 > 这是协议层名字，不是 MCP 工具名。
 
+## 14. 逐工具精修记录
+
+### asset_read（Glama 旧名 asset_get 实评 4.4）
+
+反馈：定义强、Behavior 已满；缺口是 **Usage 没有明确“何时不能用”**、**Parameter 仍在复述 schema**、
+以及 **尾部只读句与 annotations 重复**。
+
+本轮改动：
+
+- 删除“MCP read surface for the protocol's canonical asset_get interface”与尾部只读句；
+- 明确 `key` 是“声明的 uppercase token，不是包名/路径/散文短语”，`package` 是“裸包名，不是路径”
+  ——这是 schema 没写的参数意图；
+- 明确 `do not use it to enumerate keys (use asset_ls instead), read modules
+  (module_read), or read pipelines (pipeline_read)`；
+- 保留精确/大小写匹配、扫描字段、包作用域、多匹配、无匹配即错误；
+- 目标：Usage / Parameters / Conciseness 三项从 4 向 5 推，Behavior 维持 5。
+
 ## 附录：官方参考
 
 - Listing：<https://glama.ai/mcp/servers/Monyeah777/NinFenz>
