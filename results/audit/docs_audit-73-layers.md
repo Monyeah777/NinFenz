@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/purity_scan.py:6d4ad44167f44d75b493a271c6fe126a325647b9a4cfa7d1b59f37d66df94459
   - desktop/tests/test_purity_scan.py:b1097e7181f260c6d863306e5b373278b36961be0e9feefa7eb7432bc6aadf55
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
-  - verify.sh:b2b8edfc0c4ba8272cb47b109532cb1eb1262b46985fe34d33671f6af4b53966
+  - verify.sh:3de864c14756215c8472013a548dcc20f4bf7f1e4eea2592dc7369a6d566efe7
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-18）：P2：分片数按核数自适应
+
 > 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
 
 > 重审（2026-10-18）：P0/P3：权重基线入库 + sink 上限审阅（16→18）

@@ -465,10 +465,16 @@ check12(){
   # `NF_TEST_JOBS=1` 回到串行（排障用）；缺执行器时回退历史串行发现。
   if [ -d desktop/tests ]; then
     if [ -f scripts/verify_tests.py ]; then
+      # 分片数：默认按**可用核数**自适应（min(8, max(2, cpu-1))）——CI 的 2 核机不该被 8 片拖死，
+      # 20 核开发机也不该被 4 片浪费；显式 NF_TEST_JOBS 一律优先。
+      _UT_JOBS="${NF_TEST_JOBS:-}"
+      if [ -z "$_UT_JOBS" ]; then
+        _UT_JOBS="$("$PY3" -c 'import os; print(min(8, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+      fi
       if [ "$NF_TIER" = "full" ]; then
-        _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "${NF_TEST_JOBS:-4}")
+        _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS")
       else
-        _ut_cmd=("$PY3" scripts/verify_tests.py --affected --jobs "${NF_TEST_JOBS:-4}")
+        _ut_cmd=("$PY3" scripts/verify_tests.py --affected --jobs "$_UT_JOBS")
       fi
     else
       _ut_cmd=(bash -c 'cd desktop && exec "$0" -m unittest discover -s tests -q' "$PY3")
