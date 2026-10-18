@@ -1625,7 +1625,7 @@
     "scripts/verify_report.py::UP031": 7,
     "scripts/verify_run.py::UP031": 1,
     "scripts/verify_tests.py::SIM105": 1,
-    "scripts/verify_tests.py::UP031": 15,
+    "scripts/verify_tests.py::UP031": 16,
     "scripts/workflow_policy.py::E501": 1,
     "scripts/workflow_policy.py::UP031": 3,
     "tui/_surface.py::E501": 14,

@@ -40,7 +40,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
-from core import json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
+from core import atomic_write, json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
 
 CACHE_VERSION = 1
 
@@ -121,9 +121,8 @@ def cmd_put(key: str, mode: str, n_pass: int, n_warn: int) -> int:
            "head": _run(["git", "rev-parse", "HEAD"]),
            "at": time.strftime("%Y-%m-%d %H:%M:%S"),
            "pass": n_pass, "warn": n_warn}
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(doc, ensure_ascii=False, sort_keys=True), encoding="utf-8")
-    os.replace(tmp, path)
+    # 走 core.atomic_write（同目录临时件 + os.replace 的唯一出处）：脚本面不允许裸写。
+    atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, sort_keys=True))
     return 0
 
 
