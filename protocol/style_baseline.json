@@ -1016,7 +1016,6 @@
     "desktop/tests/test_ccv3_adapter.py::I001": 2,
     "desktop/tests/test_ccv3_adapter.py::RUF100": 2,
     "desktop/tests/test_ccv3_adapter.py::UP031": 5,
-    "desktop/tests/test_check12_budget.py::F401": 1,
     "desktop/tests/test_check12_budget.py::UP031": 2,
     "desktop/tests/test_check30_bump.py::UP031": 3,
     "desktop/tests/test_check_merge_equivalence.py::E501": 3,

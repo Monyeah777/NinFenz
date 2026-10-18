@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-18",
-  "approved_by": "门禁提速批（P3）",
-  "note": "缓存写入口原子化",
+  "approved_by": "门禁提速批（P2）",
+  "note": "串行段落地",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "953a0b7db6e243bc7fafbefe9e16bea5b1d62f7ecd3af8dedf982026f4bdd81b"
