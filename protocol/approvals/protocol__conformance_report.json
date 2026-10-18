@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-18",
-  "approved_by": "门禁提速批（P3）",
-  "note": "分层档位 + 判定缓存",
+  "approved_by": "门禁提速批（P0）",
+  "note": "权重基线 + sink 面审阅",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"

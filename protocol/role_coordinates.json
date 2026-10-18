@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 222,
-    "verify": 932
+    "verify": 933
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11417,6 +11417,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check12 逐模块墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
+      "path": "protocol/check12_weights.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "存量冻结的规模/复杂度上限（棘轮：只可下降；上调须评审后重冻）",
       "path": "protocol/code_metrics_baseline.json",
       "role": "verify",
@@ -11856,7 +11862,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "71c92b1dc51feac0901a679fe79bbaf707091d8c16a031c298aaf1a6262a9aca",
+  "root_digest": "ed8fc24eed77742d82e003e8aecf5d28ecd246aa0476a904fceef93d9e1fa10f",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 85,
@@ -11865,7 +11871,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 112,
-    "R-verify": 817,
+    "R-verify": 818,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"
