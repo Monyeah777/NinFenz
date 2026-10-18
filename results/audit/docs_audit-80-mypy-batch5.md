@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:5f2b396ea0297940787ae7a3ebc343a6fdfd6b67d1aa9dc4a85e0b7497a68c6d
+  - desktop/src/core/mcp_runtime.py:2e4cba5d3da9b553c4f89949e82e480bd725e96eb49712a52c2c0feb481dce23
   - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：knowledge_order：分段 + no auth/network/rate/writes；本地 v4-pro 4.8
+
 > 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
 
 > 重审（2026-10-18）：asset_read：删除 outputSchema 的 found（无匹配为错误），2 参数 schema 一致；本地 TDQS 4.8/4.9

@@ -713,12 +713,15 @@ TOOL_DEFS = [
         "description": (
             "Return the declared knowledge-source query order and a contract-first flag, "
             "with each source's authority, kind, locator, label requirement, and "
-            "visibility. Use it before assembling or citing NF content; do not use it to "
-            "search documents (use library_search instead) or read module/asset bodies "
-            "(module_read / asset_read). Optional clearance is a visibility ceiling: public "
-            "keeps public sources, internal keeps public and internal, restricted keeps all. "
-            "Use public before republishing material, or omit it to keep all. Reads only "
-            "the declaration, never source bodies; local-only, with no auth or network."),
+            "visibility.\n\n"
+            "Use it before assembling or citing NF content; do not use it to search "
+            "documents (use library_search instead) or read module/asset bodies "
+            "(module_read / asset_read).\n\n"
+            "Optional clearance is a visibility ceiling: public keeps public sources, "
+            "internal keeps public and internal, restricted keeps all. Use public before "
+            "republishing material, or omit it to keep all. Reads only the declaration, "
+            "never source bodies; local-only, with no auth, network, rate limits, or "
+            "writes."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
