@@ -1,75 +1,202 @@
-# Glama 上架详细教程（NinFenz Content Gate）
+# Glama 上架一步一步教程（NinFenz Content Gate）
 
-> 适用对象：仓库维护者。目标是把 GitHub 上的 MCP 服务变成 Glama 可构建、可自省、可评分的
-> Listing，并拿到 Quality A。
+> 更新时间：2026-10-18
+> 你现在的页面状态：**Discovery/Profile 33% · TDQS 未评分 · Repository Not Ready · No releases · No tools**
 >
-> 相关页面：
-> - Listing：<https://glama.ai/mcp/servers/Monyeah777/NinFenz>
-> - Score：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/score>
-> - Dockerfile 管理页：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin/dockerfile>
-> - Schema（自省结果）：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/schema>
+> 先用三句话看懂：
+>
+> 1. **33% 不是 MCP 质量分**，是“资料完整度 / 搜索曝光”分；不挡 A。
+> 2. **Quality 现在未评分**，因为 Glama 还没成功构建并启动过这个服务；构建入口是 Dockerfile 页。
+> 3. 仓库侧文件已经全部写好并推到 GitHub；剩下 **4 个需要登录 Glama 的按钮**只能由你点
+>    （我没有你的 Glama OAuth 会话，无法代点）。下面把每个按钮、每个字段写清楚。
 
-## 0. 先看清现状（2026-10-18）
+## 0. 你截图里的每一项是什么意思
 
-| 项 | 状态 | 说明 |
+| 页面文字 | 真实含义 | 现在要不要处理 |
 |---|---|---|
-| Claim | ✅ 已认领 | 页面显示 `author:claimed` / “claimed by its maintainer” |
-| License | ✅ **A** | 仓库根 `LICENSE` 是 MIT；Glama 自动识别 |
-| Quality | ⏳ **Not graded** | 还没有成功构建 + 自省，TDQS 没有输入 |
-| Maintenance | ⏳ **Not graded** | 还没有 Release |
-| Schema 页 | “No tools / 未自省” | 原因同上 |
+| `score 33%` / `TDQS` | 33% 是 **Discovery / Profile completion**；TDQS 是工具定义质量分，**未构建就没有分** | 先不用管 33%，先做构建 |
+| `GitHub Badge` | Glama 给的 README 徽章；本仓 README 已加 card + score 徽章 | 已完成 |
+| `Repository: Monyeah777/NinFenz` | 关联的 GitHub 仓库；创建后不能改 | 已完成 |
+| `Repository Not Ready` | Glama 还没有拿到这个仓库的 commit 数据 | **第 1 步要处理** |
+| `Auto-Release` | 每次 GitHub Release 自动构建/发布；没有 Release 时不会做事 | 首次发布后再考虑 |
+| `Releases: No releases yet` | 指 **Glama Release**，不是 GitHub Release | 第 4 步创建 |
+| `No Glama release` 说明 | Glama 给的官方操作顺序：Claim → Dockerfile 页 → Build → Make Release | 按本文做 |
+| `Discovery score 33%` | 资料完整度 + 曝光，不是 Quality | 构建完再做第 7 节 |
+| `No recent usage` | 最近 30 天没有工具调用统计 | 可选：用 Try in Browser 产生一次 |
+| `No related servers` | 没有填相关服务器 | 可选：第 8 节 |
 
-**根因不是 README，也不是描述文案，而是：Glama 只构建 GitHub 默认分支；默认分支上没有
-根 `Dockerfile`，它就无法启动服务、拿不到 `tools/list`，因此 Quality 无法评分。**
+## 1. 先做这 4 步（大约 5–10 分钟）
 
-本仓已补齐：
+> 顺序不能反：**Sync Repository → Dockerfile Build → Make Release → 验收**。
 
-| 文件 | 作用 |
+1. **Sync Repository**：Admin → Repository 页点 **Sync repository / Refresh**，等 commit 数据出现。
+2. **Dockerfile 页**：选仓库 Dockerfile；Build steps 留空；CMD 填 `["python","scripts/nf.py","serve"]`；
+   env schema 填空对象；点 **Deploy**（有的页面叫 **Build**）。
+3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.1`，发布。
+4. 打开 Schema / Score 页验收：应有 10 个工具、1 个 prompt；Quality 开始评分。
+
+如果你只想记一条：**先去 Repository 页点 Sync，再去 Dockerfile 页点 Deploy，成功后再点 Make Release。**
+
+## 2. 第 1 步：Repository Sync（解决 Repository Not Ready）
+
+页面提示原文：
+
+> The repository is linked but commit data is not yet available. This usually resolves
+> shortly after adding the server. Please sync the repository from the Repository page and refresh.
+
+操作：
+
+1. 打开 <https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin>。
+2. 找 **Repository** 标签（通常在 Admin 页顶部；地址一般是
+   <https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin/repository>）。
+3. 点 **Sync repository**；如果按钮叫 **Refresh** / **Sync**，点它。
+4. 等 1–2 分钟，刷新页面。
+5. 期望：`Repository Not Ready` 消失，能看到最新 commit（当前应为 `ebdb54e7` 或更新）。
+
+如果点了 Sync 仍然 Not Ready：
+
+- 等 10–30 分钟再刷新（Glama 的克隆/索引是异步的）；
+- 确认 GitHub 仓库是公开的、默认分支是 `main`；
+- 再不行就发邮件到 `support@glama.ai`，标题写
+  `Repository sync stuck for Monyeah777/NinFenz`，正文附 Listing URL 和当前 commit
+  `ebdb54e7e1090bcbe7f9d443460d0458eda1e0ef`。
+
+> 为什么必须先做这步：Glama 后续的 Build/Release 都基于它拿到的 commit 数据；
+> commit 数据没同步时，构建可能拿到旧树或直接失败。
+
+## 3. 第 2 步：Dockerfile Admin 页（最关键）
+
+打开：
+
+<https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin/dockerfile>
+
+### 3.1 选择 Dockerfile
+
+优先找 **Use repository Dockerfile** / **Use repo Dockerfile**，选中它。
+仓库根已经有最终版：[Dockerfile](Dockerfile)；原始文件：
+<https://raw.githubusercontent.com/Monyeah777/NinFenz/main/Dockerfile>。
+
+如果页面只给一个文本框让你粘贴 Dockerfile，就打开上面的 raw 链接，全选复制粘贴。
+
+### 3.2 各字段怎么填
+
+页面字段名可能随 Glama 版本略有差异，按语义对应：
+
+| 字段 | 填什么 | 说明 |
+|---|---|---|
+| Dockerfile | Use repository Dockerfile | 仓库根已有 |
+| Build steps | **留空** | 没有 `pip install`、没有编译；标准库直接跑 |
+| CMD arguments | `["python", "scripts/nf.py", "serve"]` | 如果页面是逐行表单，就填三行：`python` / `scripts/nf.py` / `serve` |
+| Environment variables schema | `{"type":"object","properties":{},"required":[]}` | 本服务不需要任何环境变量 |
+| Placeholder parameters | `{}` | 没有占位参数 |
+| Transport | `stdio` | 不是 HTTP / SSE |
+| Port | **不填** | 没有端口，没有 `EXPOSE` |
+| Auto-Release | 首次先关 | 等第一次 Release 成功后再开 |
+
+> 不要把 `pip install`、`uv`、`mcp-proxy` 写进 CMD。这个镜像就是 Python 标准库的
+> stdio 进程；多一层代理只会多一个故障点。
+
+### 3.3 为什么这个 Dockerfile 能过
+
+- 基座 `python:3.11-slim@sha256:e88e9763...`：满足 `requires-python >= 3.11`，且按 digest 钉版
+  （仓库 check41 要求）；
+- 非 root（UID 10001）；只读仓库文件；
+- 只 `COPY` 运行时真正会打开的文件：`scripts/`、`desktop/src/`、03/04/05、`community/`、
+  `library/`、`patterns/`、`protocol/`、`docs/`、根 md；
+- `PYTHONUTF8=1` / `LANG=C.UTF-8`：中文路径不乱码；
+- `CMD ["python", "scripts/nf.py", "serve"]`：exec 形式，stdout 只输出 JSON-RPC；
+- 无端口、无出站网络、无 `pip install`。
+
+## 4. 第 3 步：Deploy / Build（构建测试）
+
+填完字段后点页面底部的：
+
+- **Deploy**（Glama 官方博客用的词），或
+- **Build**（你的页面文案），或
+- **Build & Release**（如果它把两步合并；首次建议分开，先 Build 成功再 Release）。
+
+构建过程会发生什么：
+
+1. Glama 在 Firecracker microVM 里 `docker build`；
+2. 启动容器；
+3. 发 `initialize` → `tools/list` → `resources/list` → `prompts/list`；
+4. 记录工具 schema、annotations、instructions，并计算 TDQS；
+5. 结果出现在 Schema 页。
+
+期望结果：
+
+| 项 | 期望 |
 |---|---|
-| `Dockerfile` | Glama 的构建入口；stdio 启动、非 root、零 `pip install` |
-| `glama.json` | 主张维护者 `Monyeah777`；Claim 流程读取 |
-| `GLAMA.md` | 本教程 |
-| `desktop/src/core/mcp_runtime.py` | 10 个工具的 TDQS 定义面 |
-| `.dockerignore` | 缩小构建上下文；不破坏 `Dockerfile.crosscheck` |
-| `README.md` / `README.en.md` / `README.ja.md` | Glama card / score 徽章 |
-| `docs/mcp.md` | MCP 接入 + 容器一节 |
-| `protocol/mcp_package.json` | 只读面红线：10 工具 + 1 prompt，和运行时逐名一致 |
+| Build 状态 | Success / 绿色 |
+| Tools | 10 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_get` |
+| Prompts | 1 个：`assemble_guide` |
+| Resources | `nf://repo/...`，首屏 20 条 + `nextCursor` |
+| Instructions | 只读内容服务的自述 |
+| Capabilities | resources / tools / prompts |
 
-> 关键纪律：Glama 不读本地工作区。所有文件必须先在 GitHub 默认分支上。
+### Build 失败的常见原因
 
-## 1. 前置条件
+| 日志/现象 | 原因 | 处理 |
+|---|---|---|
+| 找不到 Dockerfile | Admin 没选 Use repository Dockerfile | 重新选；确认 GitHub 默认分支有 `Dockerfile` |
+| COPY 失败 | `.dockerignore` 排除了运行时要读的目录 | 检查 `.dockerignore`；本仓已保留 03/04/05/community/library/patterns/protocol/docs |
+| Build 成功但 No tools | CMD 起的是 CLI 而不是 `serve`；stdout 被日志污染 | CMD 必须是 `python scripts/nf.py serve`；启动横幅只允许走 stderr |
+| 启动即退出 | CMD 写成了 `nf.py` 的其他子命令 | 改回 `serve` |
+| 权限错误 | 非 root 读不到文件 | `COPY --chown=10001:10001` 已处理；确认没有额外挂载/权限覆盖 |
+| `useradd: not found` | 极简基座缺 `passwd` | 换数字 `USER 10001:10001`，或安装 `passwd` |
+| 自省超时 | 进程没进入 stdio 循环 | 本地用第 6 节四帧复现；stdout 只允许 JSON-RPC |
 
-1. 对 `github.com/Monyeah777/NinFenz` 有 write/admin 权限。
-2. 用该 GitHub 账号登录 Glama（OAuth）。
-3. 确认默认分支是 `main`（本仓是）。
-4. 本地可选：装 Docker，用于在推送前复现 Glama 的构建/启动；不装也能用
-   `python scripts/nf.py serve` 做协议级自检。
+## 5. 第 4 步：Make Release（创建 Glama Release）
 
-## 2. 本地先过一遍（推送前）
+构建测试成功后：
 
-### 2.1 仓库自检
+1. 在测试列表里点 **Make Release**；
+   如果进了测试详情页，点 **Create Release**。
+2. 版本填 **`1.0.1`**（与 `pyproject.toml` 一致）。
+3. Changelog 可填：
 
-```bash
-python scripts/nf.py doctor
-python scripts/nf.py stats --check
-```
+   ```text
+   Read-only MCP server for the NinFenz content contract layer: 10 read-only tools + 1 prompt,
+   dual protocol (modern 2026-07-28 + legacy 2025-11-25), stdlib-only, no write path.
+   ```
 
-MCP 相关单测（不需要 Docker）：
+4. 点 **Create & Publish Release**。
 
-```bash
-python -m pytest \
-  desktop/tests/test_mcp_runtime.py \
-  desktop/tests/test_mcp_packaging.py \
-  desktop/tests/test_mcp_live_e2e.py \
-  desktop/tests/test_serve_default.py \
-  desktop/tests/test_mcp_trust_meta.py \
-  desktop/tests/test_mcp_write_freedom.py \
-  -q
-```
+如果页面只有 **Build & Release**：
 
-### 2.2 协议级冒烟（最接近 Glama 的自省）
+- 点它，Glama 会构建并自动选版本发布；
+- 发布后在 Releases 里确认版本是 `1.0.1`，不是别的版本。
 
-不装 Docker 也能跑。直接向 stdin 喂四帧：
+发布后：
+
+- `Releases` 不再显示 “No releases yet”；
+- Quality / Maintenance 开始评分；
+- 用户可以部署这个服务；
+- Glama 会对镜像跑安全扫描。
+
+## 6. 验收：确认工具和评分
+
+### 6.1 Schema 页
+
+<https://glama.ai/mcp/servers/Monyeah777/NinFenz/schema>
+
+期望从 “No tools” 变成：
+
+- Tools：10 个（名单见上表）；
+- Prompts：1 个；
+- Resources：`nf://repo/...`；
+- Instructions：有内容；
+- Server Configuration：No arguments（本服务不需要 env）。
+
+### 6.2 Score 页
+
+<https://glama.ai/mcp/servers/Monyeah777/NinFenz/score>
+
+- Quality 从 `Not graded` 变成 A/B/C/D；
+- 点开每个工具可以看到六维分和 justification；
+- 本仓预评估 overall ≈ 4.3–4.4 → **A**。
+
+### 6.3 本地四帧复现（不依赖 Glama）
 
 ```bash
 printf '%s\n' \
@@ -80,145 +207,67 @@ printf '%s\n' \
   | python scripts/nf.py serve
 ```
 
-期望（stdout 只有 JSON-RPC，启动横幅在 stderr）：
+期望：`serverInfo.name = nf-repo-live`；`tools` 10 个；`prompts` 1 个。
 
-- 第 1 帧：`serverInfo.name = nf-repo-live`；`instructions` 有内容；
-- 第 2 帧：`tools` 10 个，每个都有 `title` / `annotations` / `inputSchema` / `outputSchema`；
-- 第 3 帧：`prompts` 1 个，`assemble_guide`。
+## 7. 33% 是什么，怎么提高
 
-### 2.3 Docker 冒烟（有 Docker 时）
+你看到的 **33%** 是 **Profile completion / Discovery score**，不是 TDQS 质量分。它影响搜索排名，
+不影响“能不能拿到 Quality A”。
 
-```bash
-docker build -t ninfenz-glama .
-printf '%s\n' \
-  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}' \
-  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-  '{"jsonrpc":"2.0","id":3,"method":"resources/list"}' \
-  | docker run --rm -i ninfenz-glama
+提高它，按优先级：
+
+1. **Sync Repository**（本教程第 1 步）——commit 数据没有时，资料分上不去。
+2. **Build + Release**（第 3–5 步）——没有 Glama Release，资料完整度天然缺一大块。
+3. **补全 Profile**：名称、描述、one-liner、分类、标签、License、图标、主页、仓库、
+   安装说明、README；本仓的提交文案见第 11 节。
+4. **Add related servers**：在 Admin/Related Servers 里加 2–3 个真实相关的服务
+   （例如 MCP 规范、内容/知识管理类），不要乱加。
+5. **Try in Browser**：在 Listing 页点一次，产生初始 usage；`No recent usage` 会消失。
+6. **保持活跃**：后续 commit / GitHub Release 会触发重扫；README 徽章已经加好。
+
+> 33% 不会挡 A；但把上面几项补齐，Discovery 分会明显上去。
+
+## 8. Auto-Release、GitHub Badge、Usage、Related Servers
+
+### Auto-Release
+
+- 含义：每次 GitHub Release 自动构建并发布一个新的 Glama Release。
+- 现在没 Release，所以它不会做事；**首次发布成功后再开**。
+- 开启后，每次 GitHub Release 记得版本号要递增。
+
+### GitHub Badge
+
+页面会给一段 Markdown；本仓 README 已经放了：
+
+```markdown
+[![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz)
+[![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 ```
 
-`docker build` 应很快完成：镜像没有 `pip install`、没有编译，只 `COPY` 只读面文件。
+### No recent usage
 
-## 3. Claim（认领）
+- 不是上架阻塞项；`Try in Browser` 或真实用户调用后会出现统计。
+- 不要为了数字刷调用；Glama 看的是实际使用。
 
-Listing 已经认领；本节用于新环境或重新主张时。
+### No related servers
 
-1. 用维护者 GitHub 账号登录 <https://glama.ai>。
-2. 打开 <https://glama.ai/mcp/servers?query=ninfenz>。
-3. 有条目就点 **Claim**；没有就提交仓库地址 `https://github.com/Monyeah777/NinFenz`。
-4. 仓库根必须有 `glama.json`：
+- 在 Admin → Related Servers（或 Listing 的 Related Servers 页）添加；
+- 只加真实相关的，别加不相关的凑数。
 
-   ```json
-   {
-     "$schema": "https://glama.ai/mcp/schemas/server.json",
-     "maintainers": ["Monyeah777"]
-   }
-   ```
+## 9. 评分标准与预评估
 
-5. 改了 `glama.json` 后要**重新走一次 Claim**，Glama 才会重新读取。
-6. 个人账号下的仓库通常可以直接用 GitHub OAuth 关联；组织仓库必须用 `glama.json`。
-
-## 4. Dockerfile 管理页（最关键的一步）
-
-打开 <https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin/dockerfile>。
-
-页面字段的名称可能随 Glama 版本变化，按语义对应即可：
-
-| 字段 | 填什么 |
-|---|---|
-| Dockerfile | 优先选 **Use repository Dockerfile**；仓库根已有 `Dockerfile` |
-| Build steps | **留空**。没有 `pip install` / 编译步骤；标准库即可运行 |
-| CMD arguments | `["python", "scripts/nf.py", "serve"]` |
-| Environment variables schema | `{"type":"object","properties":{},"required":[]}` |
-| Placeholder parameters | `{}` |
-| Transport | `stdio` |
-| Port | **不要填**；没有 HTTP 监听 / 没有 `EXPOSE` |
-
-若页面只让填“命令参数”的逐行表单，就填：
-
-```text
-python
-scripts/nf.py
-serve
-```
-
-**不要把 `mcp-proxy` / `uv` / `pip install` 写进 CMD。** 本服务就是 Python 标准库的 stdio
-进程；多一层代理只会多一个故障点。
-
-### Dockerfile 设计要点（为什么这样写）
-
-- `FROM python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534c5767af9ea65f6ce`：
-  满足 `requires-python >= 3.11`，镜像小；基座按 digest 钉（与 `Dockerfile.crosscheck` 同一
-  `PY_BASE`，check41 要求）。
-- 非 root（UID 10001）：服务只读仓库文件，不需要 root。
-- 显式 `COPY` 而不是 `COPY . .`：镜像只带 `scripts/`、`desktop/src/`、03/04/05、
-  `community/`、`library/`、`patterns/`、`protocol/`、`docs/`、根 md；
-  构建上下文小，运行时契约可审计。
-- `ENV PYTHONUTF8=1 / LANG=C.UTF-8`：仓库路径与标题含中文，固定 UTF-8。
-- `PYTHONDONTWRITEBYTECODE=1`：只读文件系统下不写 `__pycache__`。
-- `CMD ["python", "scripts/nf.py", "serve"]`：exec 形式，stdout 只输出 JSON-RPC；
-  `serve` 默认走**实时仓库面**，不需要先产快照。
-- 没有 `EXPOSE`、没有入口 HTTP 服务、没有出站网络。
-
-## 5. 触发构建与自省
-
-在 Admin 页保存 Dockerfile 配置后，Glama 会：
-
-1. 克隆默认分支；
-2. 在 Firecracker microVM 里 `docker build`；
-3. 启动容器，走 stdio；
-4. 依次发 `initialize`、`tools/list`、`resources/list`、`prompts/list`；
-5. 记录 schema、annotations、instructions，并计算 TDQS。
-
-构建成功后，Schema 页应从 “No tools” 变成：
-
-| 项 | 期望 |
-|---|---|
-| Tools | 10 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_get` |
-| Prompts | 1 个：`assemble_guide` |
-| Resources | `nf://repo/...` 实时资源，首屏 20 条 + `nextCursor` |
-| Instructions | 只读内容服务的自述（英文 + 中文） |
-| Capabilities | resources / tools / prompts |
-
-### 常见失败与定位
-
-| 现象 | 常见原因 | 处理 |
-|---|---|---|
-| Build 失败 | 根目录没有 `Dockerfile`；COPY 路径写错；基础镜像拉取失败 | 确认默认分支有 `Dockerfile`；逐个核对 `COPY` 源路径存在 |
-| Build 成功但 “No tools” | CMD 起的是 CLI 而不是 `serve`；stdout 被启动日志污染 | CMD 必须是 `python scripts/nf.py serve`；启动横幅只能走 stderr |
-| 自省超时 | 进程没进入 stdio 循环；等 stdin 时被别的输出阻塞 | 本地用 2.2 的四帧冒烟复现；stdout 只允许 JSON-RPC |
-| 工具数不对 | 改过 `TOOL_DEFS` 但没同步 `protocol/mcp_package.json` | 跑 `test_mcp_packaging` / `test_declared_tools_match_handlers` |
-| `module_read` 的 `has_machine_contract` 为 false | 镜像没装 PyYAML（本仓有意保持 stdlib-only） | 这是已知降级：正文仍完整返回；要该字段为 true 可在 Dockerfile 加 `pip install pyyaml==6.0.3`，代价是构建期网络依赖 |
-| 权限错误 | 容器以非 root 运行，但文件不可读 | `COPY --chown=10001:10001` 已处理；确认 `.dockerignore` 没排除运行时要读的目录 |
-| `useradd: not found` | 极简基础镜像缺 `passwd` | 改用数字 `USER 10001:10001`，或安装 `passwd` |
-
-## 6. Make Release
-
-构建测试通过后：
-
-1. 点 **Make Release**。
-2. 版本用当前包版本：`1.0.1`（见 `pyproject.toml`）。
-3. 发布说明写清楚：只读 MCP 服务、10 工具 + 1 prompt、modern/legacy 双协议、零依赖。
-4. 发布。
-
-**Release 之前 Quality / Maintenance 显示 Not graded 是正常的。** 发布后 Glama 才会把
-TDQS 结果和维保状态挂到 Listing 上。
-
-## 7. 评分标准与预评估
-
-Glama Listing 上有三个独立等级：
+Glama Listing 三个等级：
 
 | 等级 | 来源 | 本仓现状 |
 |---|---|---|
 | License | 仓库许可证 | A（MIT） |
-| Quality | TDQS 总体分 | 待构建后实评；预评估 A |
-| Maintenance | 仓库活跃度 / Release / 响应 | 待 Release 后实评 |
+| Quality | TDQS 总体分 | 构建后实评；预评估 A |
+| Maintenance | 活跃度 / Release / 响应 | Release 后实评 |
 
-Quality 的算法（公开 rubric）：
+Quality 算法（公开 rubric）：
 
 ```text
-每个工具：TDQS = 25%Purpose + 20%Usage + 20%Behavior + 15%Params + 10%Conciseness + 10%Completeness
+每个工具：25%Purpose + 20%Usage + 20%Behavior + 15%Params + 10%Conciseness + 10%Completeness
 descriptionQuality = 0.6 × mean(TDQS) + 0.4 × min(TDQS)
 coherence = (disambiguation + naming + toolCount + completeness) / 4
 overall = 0.7 × descriptionQuality + 0.3 × coherence
@@ -242,33 +291,30 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 
 估算：descriptionQuality ≈ 4.4（A）；coherence ≈ 4.0–4.5（naming 是唯一弱项：
 `*_ls` 与 `read/search/get` 混用）；**overall ≈ 4.3–4.4 → A**（保守下界 ≈ 4.0）。
-以上是人工按公开 rubric 的预评估，不是 Glama 官方分；实评以 Score 页面为准。
+以 Glama 实评为准。
 
-### 想从 A 再往上推，优先做什么
+### 分数偏低时优先改什么
 
-1. **Behavior Transparency**：描述里写 annotations 无法表达的行为（错误 vs 空结果、
-   是否缓存、扫描成本、上限），不要重复“只读/无网络”。
+1. **Behavior Transparency**：写 annotations 无法表达的行为（错误 vs 空结果、是否缓存、
+   扫描成本、返回上限），不要重复“只读/无网络”。
 2. **Parameter Semantics**：参数格式、大小写、默认值、上限、示例；schema 覆盖率已 100%，
-   描述要补的是“schema 没说的语义”。
-3. **Coherence 的 naming**：统一 `<resource>_<verb>` 的 verb（`ls` vs `read/search/get`）；
-   但改名会破坏兼容性，需单独评估。
-4. **Completeness**：当前通过 `resources/list type=module|asset|pattern` 提供枚举路径；
-   若愿意扩工具面，可评估 `module_ls` / `asset_ls`，但要同步 `protocol/mcp_package.json`
-   与“10 工具 + 1 prompt”红线。
+   描述补的是“schema 没说的语义”。
+3. **Coherence naming**：统一 `<resource>_<verb>`；但改名会破坏兼容性，需单独评估。
 
-## 8. 发布后的维护
+## 10. 排障：按你现在的页面文字查
 
-- 每次向默认分支 push 都会触发 Glama 重新构建/自省/评分；改工具描述就会改 TDQS。
-- 保持 `Dockerfile` 在默认分支、保持 `CMD` 可启动；删除/改名会被判为构建失败。
-- 版本发布后同步更新 `pyproject.toml` / `CHANGELOG.md`，再在 Glama 做新 Release。
-- README 的 Glama 徽章：
+| 页面文字 | 处理 |
+|---|---|
+| `Repository Not Ready` | 第 1 步 Admin → Repository → Sync；等 10–30 分钟；仍不行邮件 support |
+| `score 33%` | 第 7 节的资料完整度清单；不是质量分 |
+| `No releases yet` | 第 5 步 Make Release（必须先 Build 成功） |
+| `Auto-Release ... hasn't shipped a release` | 同上；首次发布后再开 Auto-Release |
+| `No tools` | Build 没跑、CMD 不是 `serve`、或 stdout 混入日志；看第 4 节 |
+| `No recent usage` | 可选：Try in Browser |
+| `No related servers` | 可选：第 8 节 |
+| `TDQS` 未评分 | 构建成功并 Release 后自动评分 |
 
-  ```markdown
-  [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz)
-  [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
-  ```
-
-## 9. 提交文案（可直接粘贴）
+## 11. 提交文案（可直接粘贴）
 
 | 字段 | 值 |
 |---|---|
@@ -284,39 +330,35 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | License | MIT |
 | Icon | `packaging/mcp/assets/icon-400.png`（400×400 PNG） |
 
-## 10. 排障速查（按症状）
+## 12. 我已经做完的 vs 你只需要点的
 
-1. **Listing 一直是 Not graded**：先看默认分支有没有 `Dockerfile`；再看 Admin 页有没有
-   触发 build；最后看 schema 页是否 “No tools”。
-2. **构建成功但 schema 为空**：本地用 2.2 的四帧复现；stdout 混入日志是最常见原因。
-3. **工具有缺**：`python -m pytest desktop/tests/test_mcp_packaging.py -q`；
-   工具面必须与 `protocol/mcp_package.json` 逐名一致。
-4. **分数比预评估低**：打开 Score 页看六维 justification；优先补 Behavior / Params
-   两个最容易掉分的维度，不要靠加长描述。
-5. **改了描述分数没变**：Glama 按 `inputHash` 增量评分；确认 push 到了默认分支，
-   并在 Admin 页重新 build/release。
+### 仓库侧（已完成并推到 GitHub `main`）
 
-## 附录 A：Glama 会用到的协议帧
+- 根 `Dockerfile`：非 root、digest 钉版、stdio、零 pip；
+- `glama.json`：维护者 `Monyeah777`；
+- `GLAMA.md`：本教程；
+- `desktop/src/core/mcp_runtime.py`：10 工具 title / 四项 annotations / outputSchema /
+  structuredContent / TDQS 描述；
+- `.dockerignore`、README 徽章、`docs/mcp.md` 容器节、英文/日文译件、conformance 报告。
 
-```text
-{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"glama","version":"1"}}}
-{"jsonrpc":"2.0","method":"notifications/initialized"}
-{"jsonrpc":"2.0","id":2,"method":"tools/list"}
-{"jsonrpc":"2.0","id":3,"method":"resources/list"}
-{"jsonrpc":"2.0","id":4,"method":"prompts/list"}
-```
+### Glama 侧（需要你登录后点）
 
-modern 路径（2026-07-28）也可以：
+| 操作 | 在哪 |
+|---|---|
+| Sync repository | Admin → Repository |
+| Build / Deploy | Admin → Dockerfile |
+| Make Release / Create Release | Build 成功后的测试列表 |
+| 补 Profile / Related Servers / Try in Browser | Admin / Listing 页 |
 
-```text
-{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{}}
-{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}
-```
+> 我没有你的 Glama OAuth 登录态，无法替你点这四个按钮；所有需要填的值都在上面。
 
-## 附录 B：官方参考
+## 附录：官方参考
 
+- Listing：<https://glama.ai/mcp/servers/Monyeah777/NinFenz>
+- Score：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/score>
+- Schema：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/schema>
+- Dockerfile 管理页：<https://glama.ai/mcp/servers/Monyeah777/NinFenz/admin/dockerfile>
+- Glama 发布教程：<https://glama.ai/blog/2026-03-15-how-to-make-a-release>
 - Glama 索引方法：<https://glama.ai/mcp/methodology>
-- TDQS 规范与 rubric：<https://github.com/glama-ai/tool-definition-quality-score>
-- TDQS 评分说明：<https://glama.ai/blog/2026-04-03-tool-definition-quality-score-tdqs>
+- TDQS 规范：<https://github.com/glama-ai/tool-definition-quality-score>
 - `glama.json` 说明：<https://glama.ai/blog/2025-07-08-what-is-glamajson>
-- Glama MCP 目录 API：<https://glama.ai/mcp/reference>
