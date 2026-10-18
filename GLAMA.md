@@ -458,16 +458,16 @@ asset_read      -> Fetch asset content
 
 ### 15.4 本地模型评分（DeepSeek v4-pro）
 
-用官方 `tdqs score` 连跑两次（模型 `deepseek-v4-pro`），结果稳定：
+用官方 `tdqs score` 连跑两次（模型 `deepseek-v4-pro`，key 从 `DEEPSEEK_API_KEY` 映射到
+`TDQS_API_KEY`），最终稳定在：
 
 ```text
-server: overall 4.8 A · descriptionQuality 4.9 · coherence 4.5
-mean 4.9 · min 4.8
+server: overall 4.8–4.9 A · descriptionQuality 4.9
+coherence 4.5–4.8 · mean 4.9 · min 4.8–4.9
 ```
 
-逐工具：`knowledge_order 5.0`、`module_read 5.0`、`library_search 5.0`（一次 4.9），
-其余 4.8–4.9；`asset_read 4.9`。仅剩 Conciseness / Parameters 的 4（100% schema 覆盖
-工具的软上限）。
+逐工具：`asset_read 5.0`、`asset_ls 5.0`、`knowledge_order 5.0`；多数 4.9；
+`registry_query` 4.8–5.0。没有工具低于 4.8。
 
 本轮按评分器 justification 补的真实信息：
 
@@ -475,9 +475,12 @@ mean 4.9 · min 4.8
 - `spec_ls`：缺/坏 registry 是错误，包按 registry 顺序；
 - `registry_query`：只读 registry.json，不扫描模块/管线文件，不匹配描述/路径/正文；
 - `library_search`：`limit` 是合并列表硬上限，catalog 命中在前，可能挤掉文档命中；
+  **没有 offset / next-page**；
 - `library_read` / `pattern_read` / `pipeline_read` / `module_read`：full text / no truncation；
+- `pipeline_ls` / `library_read` / `module_read`：local-only，**no auth / network / rate limits**；
+- `pattern_ls`：metadata only、无分页；`asset_ls`：package 是 exact directory、
+  不是 glob/path/regex，包内无匹配返回空列表，keys 排序且无上限；
 - `knowledge_order`：clearance 是可见性上限（public ⊂ internal ⊂ restricted），本地无 auth/网络；
-- `asset_ls`：包内无匹配返回空列表，不是错误；keys 排序且无上限；
 - `asset_read`：删除 outputSchema 的 `found`，无匹配统一走错误，schema 与行为一致。
 
 ### 15.5 决策

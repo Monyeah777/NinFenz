@@ -352,7 +352,7 @@ TOOL_DEFS = [
             "file content; wildcard characters are literal. Omit it to list every pipeline "
             "(examples: P04, 技术文档, 校园). Returns metadata only, never pipeline bodies, "
             "sorted by repository path; no matches yields an empty list, and each call "
-            "rescans the repository."),
+            "rescans the repository. Local-only; no auth or rate limits."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -508,9 +508,10 @@ TOOL_DEFS = [
             "exact module or protocol metadata (registry_query / spec_ls). Catalog matching "
             "is case-insensitive and relevance-ranked; document hits match the filename or "
             "H1 title as a case-sensitive substring.\n\n"
-            "The combined list is capped by limit (1–50, default 10). Catalog hits come "
-            "first, so a full catalog page can hide document hits; an empty query returns "
-            "the first page of document hits only, and no matches yields an empty list."),
+            "The combined list is capped by limit (1–50, default 10), and there is no "
+            "offset or next-page parameter. Catalog hits come first, so a full catalog page "
+            "can hide document hits; an empty query returns the first page of document hits "
+            "only, and no matches yields an empty list."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -585,7 +586,8 @@ TOOL_DEFS = [
             "(module_read / pipeline_read / asset_read). The ID is the canonical stem "
             "without the .md suffix and matching is case-insensitive (for example NF-1); "
             "an unknown ID returns an error carrying the requested value and repair "
-            "guidance. Reads one local file and returns its full text without truncation."),
+            "guidance. Reads one local file and returns its full text without truncation. "
+            "Local-only; no auth or rate limits."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -631,8 +633,8 @@ TOOL_DEFS = [
             "patterns/*/PATTERN.md, sorted by ID. Use it to discover a pattern ID before "
             "pattern_read; do not use it to fetch pattern text (use pattern_read instead) "
             "or to list modules/assets (module_read / asset_ls). Returns metadata only, "
-            "never the PATTERN.md body; no matches yields an empty list, and each call "
-            "rescans the local patterns directory."),
+            "never the PATTERN.md body, with no pagination; no matches yields an empty "
+            "list, and each call rescans the local patterns directory."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -779,14 +781,16 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read one NF module's full Markdown by ID, including its raw "
-            "machine-contract block when present. Use it after registry_query resolves a "
-            "module, or enumerate IDs with resources/list type=module; do not use it for "
-            "pipelines or assets (pipeline_read / asset_read). The ID is the declared "
-            "machine-contract or heading ID (M90), or a qualified ID (通用:M10, as returned "
-            "by registry_query), not the filename; matching is case-sensitive. An unknown "
-            "ID returns an error with the requested value and repair guidance. Returns the "
-            "resolved ID, path, contract presence, bytes, and full text from one local "
-            "file; it does not evaluate the contract."),
+            "machine-contract block when present.\n\n"
+            "Use it after registry_query resolves a module, or enumerate IDs with "
+            "resources/list type=module; do not use it for pipelines or assets "
+            "(pipeline_read / asset_read).\n\n"
+            "The ID is the declared machine-contract or heading ID (M90), or a qualified "
+            "ID (通用:M10, as returned by registry_query), not the filename; matching is "
+            "case-sensitive. An unknown ID returns an error with the requested value and "
+            "repair guidance. Returns the full file plus resolved metadata from one local "
+            "file and does not evaluate the contract. Local-only; no auth, network, rate "
+            "limits, or writes."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
@@ -871,10 +875,11 @@ TOOL_DEFS = [
             "List asset files and the uppercase keys they declare, from "
             "community/*/assets and 05_资产库/用户自定义. Use it to discover a key before "
             "asset_read; do not use it to fetch asset text (asset_read) or to list "
-            "modules/patterns (module_read / pattern_ls). Optional package restricts the "
-            "scan to community/<package>/assets (for example 校园情感领域包); README.md "
-            "files are skipped. A package with no matching files returns an empty list, not "
-            "an error.\n\n"
+            "modules/patterns (module_read / pattern_ls). Optional package is an exact "
+            "directory name, not a glob, path, or regex, and restricts the scan to "
+            "community/<package>/assets (for example 校园情感领域包); README.md files are "
+            "skipped. A package with no matching files returns an empty list, not an "
+            "error.\n\n"
             "Keys are sorted and uncapped; each call rescans the local asset files."),
         "inputSchema": {
             "type": "object",
