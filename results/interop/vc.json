@@ -10,7 +10,7 @@
     "receiptRoot": "22aef5b6e23baa214438bc64b4ec2cd222ed5ebe399f1afc5ac476f223efcad0",
     "verdict": "conformant"
   },
-  "issuer": "门禁提速批（重叠）",
+  "issuer": "门禁提速批（卡册）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"

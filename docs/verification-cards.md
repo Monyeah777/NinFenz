@@ -23,7 +23,7 @@ NF 的门禁是一份 bash 脚本、40 条 check，当前基线声明为 `check1
 | 项 | 值 |
 |---|---|
 | 卡片总数 | 42（= verify.sh 的 check 函数数，实测） |
-| 门禁脚本 | 3056 行（verify.sh 实测） |
+| 门禁脚本 | 3088 行（verify.sh 实测） |
 | 声明基线 | check1-42 · PASS=76（源自 quality_baseline.EXPECTED_*） |
 | 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 2 |
 | 断言种类 | 真实单测 6 条 · 结构断言 36 条 |
