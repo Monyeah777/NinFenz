@@ -930,8 +930,6 @@ TOOL_DEFS = [
             "type": "object",
             "description": "Every asset file that declares the requested key.",
             "properties": {
-                "found": {"type": "boolean",
-                          "description": "True when at least one asset file matched."},
                 "key": {"type": "string", "description": "Requested asset key."},
                 "matches": {
                     "type": "array",
@@ -951,7 +949,7 @@ TOOL_DEFS = [
                         "required": ["package", "file", "bytes", "text"],
                         "additionalProperties": False}},
             },
-            "required": ["found", "key", "matches"],
+            "required": ["key", "matches"],
             "additionalProperties": False,
         },
     },
@@ -1274,7 +1272,7 @@ def _tool_asset_get(key: str, package: str = "") -> dict:
         text = (root / h["file"]).read_text(encoding="utf-8")
         out.append({"package": h["package"], "file": h["file"],
                     "bytes": len(text.encode("utf-8")), "text": text})
-    return {"found": True, "key": req, "matches": out}
+    return {"key": req, "matches": out}
 
 
 TOOL_HANDLERS = {

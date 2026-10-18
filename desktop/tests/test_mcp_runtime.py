@@ -285,7 +285,6 @@ class TestMcpRuntime(unittest.TestCase):
             "name": "asset_read",
             "arguments": {"key": "EMOTION_WHEEL", "package": "校园情感领域包"}}))
         payload = json.loads(resp["result"]["content"][0]["text"])
-        self.assertTrue(payload["found"])
         self.assertGreater(len(payload["matches"][0]["text"]), 100)
 
     def test_read_resource_returns_text_g2(self):
@@ -355,7 +354,6 @@ class TestMcpRuntime(unittest.TestCase):
         resp = self.srv.handle(_req(27, "tools/call", {
             "name": "asset_read", "arguments": {"key": "TECH_RULES"}}))
         payload = json.loads(resp["result"]["content"][0]["text"])
-        self.assertTrue(payload["found"])
         self.assertEqual(payload["matches"][0]["package"], "官方")
         self.assertIn("text", payload["matches"][0])
 

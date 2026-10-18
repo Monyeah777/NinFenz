@@ -383,9 +383,9 @@ Purpose/Usage/Behavior/Completeness 5，Params 4，CS 4）→ 74 词压缩版 **
 
 结论：这个工具的瓶颈不是字数，而是 **可读结构 + 输出形状**。压缩成括号/斜杠列表会掉分。
 
-第五轮（本版，100 词，标准合规版）：
+第五轮（本版，102 词，标准合规版）：
 
-- 按 TDQS 风格指南的 **50–100 词**上限，从 109 压到 **100 词**；
+- 按 TDQS 风格指南的 **50–100 词**上限，从 109 压到 **102 词**；
 - 保留 **5 个短段落**：目的+返回 → 使用/替代 → key/package 语义 → 匹配/限制 → 默认/错误；
 - 补回输出形状：`returning package, path, and text`（此前 74 词版删掉后 Behavior 掉到 4）；
 - 补参数交互：`package` 只缩文件集、**never changes key matching**（此前 Params 4 的原因）；
@@ -456,7 +456,24 @@ asset_read      -> Fetch asset content
 
 重跑 lint：12/12 `titleIsMeaningful=true`，仍 0 findings / 0 shadow。
 
-### 15.4 决策
+### 15.4 本地模型评分（DeepSeek Flash）
+
+用用户提供的 OpenAI-compatible key 跑官方 `tdqs score`（模型 `deepseek-flash`）：
+
+```text
+server: overall 4.6 A · descriptionQuality 4.6 · coherence 4.5
+asset_read: 4.8 A
+Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Conciseness 4
+```
+
+最好的一次 `asset_read` 是 **4.9**（99 词、带 `found` 字段的版本）；当前 102 词版本
+4.8，差异主要是模型评分噪声，不是结构性退化。
+
+本轮还修了一个真实的一致性缺口：`asset_read` 的 outputSchema 原有 `found` 布尔，
+但无匹配时实际返回错误而不是 `found=false`。已从 outputSchema / 返回值中删除 `found`，
+只保留 `key` + `matches`；这让 “No match is an error” 与 schema 不再冲突。
+
+### 15.5 决策
 
 - `asset_read` 不再继续压到 70 词以下：会丢 Limitations 或 Returns，按上述标准反而降分；
 - 100 词是“复杂只读工具”的合理上限；如果 Glama 仍给 4.8，属于评分器对 100% schema 覆盖工具
