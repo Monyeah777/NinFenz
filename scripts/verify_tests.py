@@ -77,11 +77,14 @@ def module_of(test_id: str) -> str:
 
 #: 任何**非 core** 变更都要跑的模块：它们读全仓事实（文档/协议/产物/统计），
 #: 静态 import 看不到依赖面——宁可多跑，不可漏跑。
+#: 任何**非 core** 变更都要跑：只留"改代码就可能打红"的卫生判据（快、与内容无关）。
+#: 其余仓库内容扫描（verify_report / conformance_scan / doc_* / net_* / role_model / ledger）
+#: 只在 full 档与"文档/协议变更触发的全量兜底"里跑——2026-10-18 实测：把它们塞进常驻集
+#: 会让 quick 的测试侧白付 ~120 s（quick 墙钟 124 s 里它占了大头），而它们对"只改代码"
+#: 的回归几乎不敏感（内容扫描器判的是文件事实，不是逻辑）。
 ALWAYS_MODULES = frozenset({
-    "test_verify_report", "test_conformance_scan", "test_conformance_run",
-    "test_style_ratchet", "test_purity_scan", "test_dead_code", "test_role_model",
-    "test_doc_reachability", "test_live_doc_counts", "test_net_coverage",
-    "test_suite_isolation", "test_asset_ledger_projection",
+    "test_purity_scan", "test_style_ratchet", "test_dead_code",
+    "test_suite_isolation", "test_check12_budget",
 })
 
 #: 明确**不进**常驻集：`test_npm_package` 判的是 payload 清单与 HEAD 一致——那只在
@@ -214,6 +217,27 @@ def test_weights(ids: list, weights: dict, per_test: dict = None) -> dict:
         share = weights.get(mod, float(len(group))) / max(1, len(group))
         for tid in group:
             out[tid] = max(0.05, float(per_test.get(tid, share)))
+    return out
+
+
+def chunk_items(ids: list, ws: dict, jobs: int, factor: int = 4) -> list:
+    """按权重贪心切片（约 jobs×factor 片），供动态队列消费。
+
+    与 `assign`（静态分箱）并存：`--shard i/n`/CI 矩阵仍用静态分箱（可离线复现），
+    单机多进程用队列（能吃满核、摊平长尾）。
+    """
+    ordered = sorted(ids, key=lambda x: (-ws.get(x, 1.0), x))
+    total = sum(ws.get(t, 1.0) for t in ordered)
+    target = max(0.5, total / max(1, jobs * factor))
+    out, cur, acc = [], [], 0.0
+    for t in ordered:
+        cur.append(t)
+        acc += ws.get(t, 1.0)
+        if acc >= target:
+            out.append(cur)
+            cur, acc = [], 0.0
+    if cur:
+        out.append(cur)
     return out
 
 
@@ -449,18 +473,46 @@ def main(argv=None) -> int:
         results = [run_shard(ids, 0)]
     else:
         pjobs = max(1, min(jobs, max(1, len(parallel_ids))))
-        bins = assign(parallel_ids, ws, pjobs)
-        flat = [t for b in bins for t in b]
+        # **动态工作队列**（B1，2026-10-18）：静态 LPT 分箱在"负载不均"时会有长尾（实测 16 片：
+        # 均值 259 s / 最大 346 s）。这里把测试按权重切成约 4×jobs 个小片，由一个队列喂给
+        # jobs 个 worker——谁先跑完谁领下一片，尾巴被摊平。切片**只改调度**：并集仍逐项等于
+        # discover 全集（下面照旧校验），每片仍是独立进程 + 独立 NF_HOME。
+        chunks = chunk_items(parallel_ids, ws, pjobs, factor=4)
+        flat = [t for c in chunks for t in c]
         if sorted(flat) != sorted(parallel_ids):
-            print("分片测试集与 discover 不一致（漏/重）：%d vs %d"
+            print("工作队列切片与 discover 不一致（漏/重）：%d vs %d"
                   % (len(flat), len(parallel_ids)), file=sys.stderr)
             return 1
-        import concurrent.futures as cf
-        with cf.ThreadPoolExecutor(max_workers=len(bins)) as ex:
-            results = [f.result() for f in [ex.submit(run_shard, b, i)
-                                            for i, b in enumerate(bins)]]
+        import queue as _queue
+        import threading
+        q = _queue.Queue()
+        for i, c in enumerate(chunks):
+            q.put((i, c))
+        results_box = []
+        lock = threading.Lock()
+
+        def _worker():
+            while True:
+                try:
+                    idx, c = q.get_nowait()
+                except _queue.Empty:
+                    return
+                try:
+                    r = run_shard(c, idx)
+                except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
+                    r = {"index": idx, "rc": 1, "out": "worker 异常：%r" % (exc,),
+                         "wall": 0.0, "tests": len(c)}
+                with lock:
+                    results_box.append(r)
+
+        threads = [threading.Thread(target=_worker, daemon=True) for _ in range(pjobs)]
+        for th in threads:
+            th.start()
+        for th in threads:
+            th.join()
+        results = sorted(results_box, key=lambda r: r["index"])
         if serial_ids:
-            results.append(run_shard(serial_ids, len(bins)))
+            results.append(run_shard(serial_ids, len(chunks)))
     wall = time.perf_counter() - t0
     failed = [r for r in results if r["rc"] != 0]
 

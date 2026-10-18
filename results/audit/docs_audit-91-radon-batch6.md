@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:ccdcb198a2086fdffdad1c567b1e181241602d18572dd20f7eaa0fcd97fb85aa
+  - protocol/code_metrics_baseline.json:78cc3130bb99f45316479377bb9efa174601c95049fec65db2b0e61592338ffc
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：mcp_runtime 增长后重冻度量上限（评审：+16 行，MCP 工具面扩充）
 
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）

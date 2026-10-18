@@ -6,7 +6,7 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:693bc0b5864859e99cf751c84d779c62be70b98117f57a2b5539467e32d02da6
+  - verify.sh:7aa4b2c35cbce7e94ec35b2aa3155d3f8d236381457a0c1b6679cad86c220375
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：重叠范围收窄到 quick
 
 > 重审（2026-10-18）：TDQS 最终 4.8-4.9：补 local-only/no-auth、no offset、exact package、no pagination；12 工具均 >=4.8

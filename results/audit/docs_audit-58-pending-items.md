@@ -6,7 +6,7 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:693bc0b5864859e99cf751c84d779c62be70b98117f57a2b5539467e32d02da6
+  - verify.sh:7aa4b2c35cbce7e94ec35b2aa3155d3f8d236381457a0c1b6679cad86c220375
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：重叠范围收窄到 quick
 
 > 重审（2026-10-18）：TDQS 最终 4.8-4.9：补 local-only/no-auth、no offset、exact package、no pagination；12 工具均 >=4.8

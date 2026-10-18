@@ -32,9 +32,11 @@ subjects:
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
-  - verify.sh:693bc0b5864859e99cf751c84d779c62be70b98117f57a2b5539467e32d02da6
+  - verify.sh:7aa4b2c35cbce7e94ec35b2aa3155d3f8d236381457a0c1b6679cad86c220375
 
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：重叠范围收窄到 quick
 
 > 重审（2026-10-18）：quick 档测试与静态 check 重叠执行

@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:693bc0b5864859e99cf751c84d779c62be70b98117f57a2b5539467e32d02da6
+  - verify.sh:7aa4b2c35cbce7e94ec35b2aa3155d3f8d236381457a0c1b6679cad86c220375
 
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：重叠范围收窄到 quick
 
 > 重审（2026-10-18）：quick 档测试与静态 check 重叠执行

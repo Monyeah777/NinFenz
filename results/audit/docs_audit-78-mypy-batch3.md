@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:2faf253cf7ea3da33320e10f873d32962241e9856669f047854a27de602b819a
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - protocol/code_metrics_baseline.json:ccdcb198a2086fdffdad1c567b1e181241602d18572dd20f7eaa0fcd97fb85aa
+  - protocol/code_metrics_baseline.json:78cc3130bb99f45316479377bb9efa174601c95049fec65db2b0e61592338ffc
 ---
+> 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
+
 > 重审（2026-10-18）：mcp_runtime 增长后重冻度量上限（评审：+16 行，MCP 工具面扩充）
 
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）
