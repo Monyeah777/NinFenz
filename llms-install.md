@@ -88,7 +88,7 @@ python scripts/nf.py conformance    # 一致性分级（只读面不虚标）
 {"jsonrpc":"2.0","id":3,"method":"prompts/list"}
 ```
 
-期望：第 1 帧回 `serverInfo.name = nf-repo-live` 与协议版本；第 2 帧回 10 个工具（各带 `inputSchema`）。
+期望：第 1 帧回 `serverInfo.name = nf-repo-live` 与协议版本；第 2 帧回 12 个工具（各带 `inputSchema`）。
 
 ## 5 常见问题
 

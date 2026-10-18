@@ -92,7 +92,7 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 | `resources/read` | ✅ | 白名单 uri → `contents[].text`；未知 uri → `-32602` |
 | `tools/list` / `tools/call`（只读 · 检索面） | ✅ | 41 波C C7：library_search / registry_query / pipeline_ls / spec_ls（inputSchema 真实存在，全只读） |
 | `tools/list` / `tools/call`（只读 · 内容通道） | ✅ | 44：module_read / pipeline_read / asset_read——返回模块/管线/资产正文实质内容（不只元数据） |
-| `tools/list` 的工具注解 | ✅ | 10 个工具全部声明 `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false`（2026-10-18 起四项齐全）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
+| `tools/list` 的工具注解 | ✅ | 12 个工具全部声明 `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false`（2026-10-18 起四项齐全）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
 | `tools/list` 的定义质量面 | ✅ | 每个工具都有 `title`、面向 agent 的 purpose/usage/behavior 描述、逐属性 `inputSchema` 说明、逐字段 `outputSchema`；`tools/call` 同时返回文本 `content` 与 `structuredContent` |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide 装载引导模板（只读） |
 | 写路径工具（未实现） | ❌ | 未知工具 → `-32602`；未知方法 → `-32601`（只读安全层天然拒写） |
@@ -230,7 +230,7 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 > **NinFenz Content Gate** — 一个只读 MCP 服务器：把长内容的验收标准
 > （协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。
-> 10 个只读工具 + 1 个装载引导 prompt，支持 modern `2026-07-28` 与 legacy `2025-11-25`
+> 12 个只读工具 + 1 个装载引导 prompt，支持 modern `2026-07-28` 与 legacy `2025-11-25`
 > 双协议版本，零第三方依赖，无写路径。
 
 ### 七、容器 / Glama（stdio 镜像）

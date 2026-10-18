@@ -15,7 +15,7 @@ subjects:
   - verify.sh:b2b8edfc0c4ba8272cb47b109532cb1eb1262b46985fe34d33671f6af4b53966
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
-  - docs/mcp.md:b47b6ad30f151d6eb2aa22a6806c865b936694798fa0907c3fc6c5ac3957b976
+  - docs/mcp.md:6c5f9e17706e49bf702f282799cd431b0d5411630be619d727f764f9550b4816
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
   - protocol/driver.json:2486381f98d19448be414069b92d341fe78d6d146a47cacf055e96df59cea7f2
   - integrations/site/integration.json:4a0b13e80d195f74e2c9965b899f87576e38d9c0b42190defb10bb13184e1374
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-18）：Glama coherence：新增 pattern_ls/asset_ls；asset_read 兼容别名；同步 12 工具面
+
 > 重审（2026-10-18）：Glama coherence：asset_read 兼容别名说明（中/英/日）
 
 > 重审（2026-10-18）：Glama coherence：asset_get→asset_read（旧名兼容别名）+ 协议边界描述；行尾规范为 LF

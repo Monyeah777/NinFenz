@@ -170,8 +170,8 @@
     },
     {
       "description": "B 线包装声明（工具面与运行时一致）",
-      "detail": "工具 10 · 提示 1 · 类目 content-creation · 目标平台 4",
-      "digest": "678edb076fab30486de34ab4dfb137fc4f94722a7ffc474f5fd7466eb8c101d3",
+      "detail": "工具 12 · 提示 1 · 类目 content-creation · 目标平台 4",
+      "digest": "41f237792d749877c86f24d696eae022f2868bce484b88f0d709fa6b94bd1b95",
       "id": "mcp-package",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "4340ee1b3521778f8b323bb971748013d9ab6378c2a80bdee15263f70f3f61d7",
+  "root": "3f7fc1d2008ec53eaadf6005ab1957cd7de9cb861499fda9003045f24cc1a8dc",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

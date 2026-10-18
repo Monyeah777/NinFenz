@@ -50,5 +50,5 @@ License: MIT
 |---|---|
 | 传输 / transport | `stdio` |
 | 协议版本 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） |
-| 工具数 / prompts | 10 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |
+| 工具数 / prompts | 12 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |
 | 是否只读 | 是（无写路径） |

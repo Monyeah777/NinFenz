@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:a8f21f8ea2a5efdab03342ca0bbc6e69b626c950b18ba85f5ace5bc3aff4e778
+  - desktop/src/core/mcp_runtime.py:a3ba7f3bba4b73ee45002bbf954bfe3dcf6c699b275e62576bf4ec49e7435f2a
   - protocol/code_metrics_baseline.json:a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3
 ---
+> 重审（2026-10-18）：Glama coherence：新增 pattern_ls/asset_ls；asset_read 兼容别名；同步 12 工具面
+
 > 重审（2026-10-18）：Glama coherence：MCP 面 asset_get→asset_read（旧名保留兼容别名）；spec_ls/registry_query 描述边界
 
 > 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名

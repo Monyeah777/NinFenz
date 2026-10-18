@@ -1077,7 +1077,7 @@ def _tool_pattern_ls() -> list:
         out.append({
             "id": p.parent.name,
             "path": p.relative_to(root).as_posix(),
-            "title": str(fm.get("title") or _md_title(text)),
+            "title": str(fm.get("title") or fm.get("name") or p.parent.name),
             "status": str(fm.get("status") or "active"),
         })
     return out

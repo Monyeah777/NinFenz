@@ -12,12 +12,14 @@
 //! 本文件由 `tools/gen_mcp_tables.py` 生成，**勿手改**。
 
 // >>> GENERATED TOOL_NAMES by tools/gen_mcp_tables.py（勿手改；重跑生成器覆盖本段）
-pub const TOOL_NAMES: [&str; 10] = [
+pub const TOOL_NAMES: [&str; 12] = [
+    "asset_ls",
     "asset_read",
     "knowledge_order",
     "library_read",
     "library_search",
     "module_read",
+    "pattern_ls",
     "pattern_read",
     "pipeline_ls",
     "pipeline_read",

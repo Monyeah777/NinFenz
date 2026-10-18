@@ -77,7 +77,7 @@ curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=ninfenz"
 
 ```
 NinFenz Content Gate — 一个只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。
-10 个只读工具 + 1 个装载引导 prompt，支持 modern 2026-07-28 与 legacy 2025-11-25 双协议版本，零第三方依赖，无写路径。
+12 个只读工具 + 1 个装载引导 prompt，支持 modern 2026-07-28 与 legacy 2025-11-25 双协议版本，零第三方依赖，无写路径。
 安装：npx -y ninfenz serve     仓库：https://github.com/Monyeah777/NinFenz     站点：https://ninfenz.dev/
 ```
 

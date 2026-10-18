@@ -6,12 +6,12 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:55a593c35560d8ada71a3e342a714bb02f649e7eae324100eeff24fc26af3af4
+  - protocol/locales.json:36a9e209abd8d97432f0b959202141a0d83874cd31f878d571eb3fc0d9498509
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:d6063c53de16900167b685d0d6964688859bea1ea0dd9d18288da4a19fe3080c
-  - docs/ja/mcp.md:351936988eb7d0dc157135548b3640c2ee8dee535a44481cbdbcb30938490e80
+  - docs/en/mcp.md:7835fe2f53237b343858d0c915b39089aa1c83a3cde4f2948888d603284e9b3e
+  - docs/ja/mcp.md:6167688803f38c80db44fe43bab5bb41b3353d8cc393f2f27dd3f1e0360099ba
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3
 ---
+> 重审（2026-10-18）：Glama coherence：新增 pattern_ls/asset_ls；asset_read 兼容别名；同步 12 工具面
+
 > 重审（2026-10-18）：Glama coherence：asset_read 兼容别名说明（中/英/日）
 
 > 重审（2026-10-18）：Glama coherence：asset_get→asset_read（旧名兼容别名）+ 协议边界描述；行尾规范为 LF

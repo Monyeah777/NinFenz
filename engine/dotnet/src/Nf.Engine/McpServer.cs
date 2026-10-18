@@ -57,11 +57,13 @@ public static class McpServer
         ("spec_ls", "列出 registry protocols 协议包清单（id/version/模块数/类别）", ObjectSchema()),
         ("registry_query", "查询 registry 模块/协议（按 id/name 子串匹配，只读）", ObjectSchema(("query", "string", "检索串（如 M90 或 域包 id）"))),
         ("library_read", "取云端图书馆馆藏条目正文（按 NF 编号，大小写不敏感；返回 frontmatter + 全文）", ObjectSchema(("entry_id", "string", "馆藏编号（如 NF-1）"))),
+        ("pattern_ls", "列出实践包清单（id / path / title / status；只读）", ObjectSchema()),
         ("pattern_read", "取实践包（patterns/）正文：按 id 返回 frontmatter + 可执行规则 + 正反例（只读）", ObjectSchema(("pattern_id", "string", "pattern id（如 fail-closed-verification）"))),
         ("module_read", "取模块文档正文（04_模块库 与 community 包 modules；支持全限定 id 与裸号）", ObjectSchema(("module_id", "string", "模块 id（如 M90 / 通用:M10）"))),
         ("pipeline_read", "取管线正文（按 Pxx 编号或仓库内相对路径；只读 03_管线库 与 community/*/pipelines）", ObjectSchema(("pipeline", "string", "Pxx 或相对路径（如 03_管线库/P90….md）"))),
         ("library_search", "仓库侧知识库检索：馆藏条目（正文级）+ docs + community README + 编号方案文档", ObjectSchema(("query", "string", "检索串"))),
         ("knowledge_order", "解析知识源查询顺序（先合同级后参考级；可按可见性 clearance 裁剪）", ObjectSchema(("clearance", "string", "可见性上限（public/internal/restricted）"))),
+        ("asset_ls", "列出资产文件与声明的键（可限定包；只读）", ObjectSchema(("package", "string", "包名（可选）"))),
         ("asset_read", "取资产正文（按资产键；可限定包）", ObjectSchema(("key", "string", "资产键"), ("package", "string", "包名（可选）"))),
     };
 
@@ -84,7 +86,7 @@ public static class McpServer
     /// <summary>等价 Python <c>encode_message</c>：单行 JSON，U+2028/2029/0085 转义（帧边界陷阱）。</summary>
     /// <summary>
     /// 本引擎暴露的工具名。供自检做「真源 <c>core.mcp_runtime.TOOL_DEFS</c> ⊆ 引擎工具面」的**镜像交叉核验**：
-    /// <c>ProseLint.CommandFace</c> 用的是真源那 10 个基名（引擎自有 18 个 <c>nf_*</c> 不在其内），
+    /// <c>ProseLint.CommandFace</c> 用的是真源那 12 个基名（引擎自有 18 个 <c>nf_*</c> 不在其内），
     /// 若引擎的 MCP 面把基名工具删了，这条钉会红。
     /// </summary>
     public static IReadOnlyList<string> ToolNames => Tools.Select(t => t.Name).ToList();
@@ -281,11 +283,13 @@ public static class McpServer
             "spec_ls" => SpecList(root),
             "registry_query" => RegistryQuery(root, Str(args, "query")),
             "library_read" => LibraryRead(root, Str(args, "entry_id")),
+            "pattern_ls" => PatternLs(root),
             "pattern_read" => PatternRead(root, Str(args, "pattern_id")),
             "module_read" => ModuleRead(root, Str(args, "module_id")),
             "pipeline_read" => PipelineRead(root, Str(args, "pipeline")),
             "library_search" => LibrarySearch(root, Str(args, "query")),
             "knowledge_order" => KnowledgeOrder(root, Str(args, "clearance")),
+            "asset_ls" => AssetLs(root, Str(args, "package")),
             "asset_read" => AssetGet(root, Str(args, "key"), Str(args, "package")),
             _ => null,
         };
@@ -621,6 +625,31 @@ public static class McpServer
         return keys.OrderBy(x => x, StringComparer.Ordinal).ToList();
     }
 
+    private static List<Dictionary<string, object?>> AssetLs(string root, string package)
+    {
+        var patterns = package.Length > 0
+            ? new[] { $"community/{package}/assets/*.md" }
+            : new[] { "community/*/assets/*.md", "05_资产库/用户自定义/*.md" };
+        var rows = new List<Dictionary<string, object?>>();
+        foreach (var pattern in patterns)
+        {
+            foreach (var file in Assertions.Glob(root, pattern))
+            {
+                if (Path.GetFileName(file) == "README.md") continue;
+                var keys = AssetKeysOfFile(file);
+                if (keys.Count == 0) continue;
+                var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
+                rows.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+                {
+                    ["package"] = rel.StartsWith("community/", StringComparison.Ordinal) ? rel.Split('/')[1] : "官方",
+                    ["file"] = rel,
+                    ["keys"] = keys,
+                });
+            }
+        }
+        return rows;
+    }
+
     private static Dictionary<string, object?> AssetGet(string root, string key, string package)
     {
         var req = key.Trim();
@@ -747,6 +776,17 @@ public static class McpServer
         {
             ["id"] = k.Id,
             ["label"] = k.Label,
+        }).ToList();
+    }
+
+    private static List<Dictionary<string, object?>> PatternLs(string root)
+    {
+        return Patterns.Entries(root).Select(e => new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["id"] = e.Dir,
+            ["path"] = e.Path,
+            ["title"] = Str(e.Fm, "name") is { Length: > 0 } name ? name : e.Dir,
+            ["status"] = Str(e.Fm, "status"),
         }).ToList();
     }
 

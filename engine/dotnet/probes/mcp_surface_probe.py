@@ -25,11 +25,13 @@ ARGS = {
     "nf_st_validate": {"path": "docs/examples/st-validate/fixture_card_v2_clean.json"},
     "registry_query": {"query": "M08"},
     "library_read": {"entry_id": "NF-1"},
+    "pattern_ls": {},
     "pattern_read": {"pattern_id": "single-source-truth"},
     "module_read": {"module_id": "M08"},
     "pipeline_read": {"pipeline": "P01"},
     "library_search": {"query": "叙事"},
     "knowledge_order": {},
+    "asset_ls": {},
     "asset_read": {"key": "QUANT_METRICS"},
 }
 
