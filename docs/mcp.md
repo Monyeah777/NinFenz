@@ -201,9 +201,9 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 四、能力面（只读）
 
-- **tools（10）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_read`
+- **tools（12）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
+  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
+  `pipeline_read` · `asset_ls` · `asset_read`
 - **prompts（1）**：`assemble_guide`
 - **兼容别名**：旧客户端仍可 `tools/call` 名字 `asset_get`；`tools/list` 只发布 `asset_read`
 - **resources**：快照登记资源（`resources/list` → `resources/read`，uri 白名单）+ 仓库实时
@@ -211,7 +211,7 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 五、红线（提交前自查）
 
-1. **只读**：不新增任何写工具（当前 10 工具 + 1 prompt）。
+1. **只读**：不新增任何写工具（当前 12 工具 + 1 prompt）。
 2. **零新依赖**：仅标准库。
 3. **uri 白名单**：资源模板受白名单约束；未知 uri → `-32602`。
 4. **双协议版本**：modern `2026-07-28` + legacy `initialize` 并存。

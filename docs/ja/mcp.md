@@ -92,7 +92,7 @@ MCP stdio をサポートする任意のクライアントで、`nf.py serve` �
 | `resources/read` | ✅ | 許可リスト uri → `contents[].text`；未知 uri → `-32602` |
 | `tools/list` / `tools/call`（読み取り専用 · 検索面） | ✅ | 41 波C C7：library_search / registry_query / pipeline_ls / spec_ls（inputSchema は実在、すべて読み取り専用） |
 | `tools/list` / `tools/call`（読み取り専用 · コンテンツチャネル） | ✅ | 44：module_read / pipeline_read / asset_read——モジュール/パイプライン/資産の本文実質内容を返す（メタデータだけではない） |
-| `tools/list` のツール注釈 | ✅ | 10 ツールすべてが `annotations.readOnlyHint: true` を宣言（2026-10-08 以降）——「読み取り専用」は散文だけでなく、MCP クライアントが読み取り専用呼び出しを**自動許可**できます |
+| `tools/list` のツール注釈 | ✅ | 12 ツールすべてが `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` を宣言（2026-10-18 以降）——「読み取り専用」は散文だけでなく、MCP クライアントが読み取り専用呼び出しを**自動許可**できます |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide ロードガイドテンプレート（読み取り専用） |
 | 書き込み経路ツール（未実装） | ❌ | 未知ツール → `-32602`；未知メソッド → `-32601`（読み取り専用安全層が構造的に書き込みを拒否） |
 
@@ -200,9 +200,9 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 四、能力面（読み取り専用）
 
-- **tools（10）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_read`
+- **tools（12）**：`pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
+  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
+  `pipeline_read` · `asset_ls` · `asset_read`
 - **prompts（1）**：`assemble_guide`
 - **互換別名**：旧クライアントは `tools/call` で `asset_get` を引き続き呼べる；`tools/list` が公開するのは `asset_read` のみ
 - **resources**：スナップショット登録資源（`resources/list` → `resources/read`、uri 許可リスト）+ リポジトリのリアルタイム
@@ -210,7 +210,7 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 五、レッドライン（提出前の自己チェック）
 
-1. **読み取り専用**：書き込みツールを一切追加しない（現在 10 ツール + 1 prompt）。
+1. **読み取り専用**：書き込みツールを一切追加しない（現在 12 ツール + 1 prompt）。
 2. **新規依存ゼロ**：標準ライブラリのみ。
 3. **uri 許可リスト**：資源テンプレートは許可リストに束縛；未知 uri → `-32602`。
 4. **双プロトコル版**：modern `2026-07-28` + legacy `initialize` の併存。

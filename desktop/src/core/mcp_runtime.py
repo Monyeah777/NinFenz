@@ -620,6 +620,48 @@ TOOL_DEFS = [
         },
     },
     {
+        "name": "pattern_ls",
+        "title": "List patterns",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "List engineering patterns as id/path/title/status metadata from "
+            "patterns/*/PATTERN.md. Use it to discover a pattern ID before pattern_read; "
+            "for modules use module_read, and for assets use asset_ls. Results are sorted "
+            "by pattern id, and no matches yields an empty list. Read-only: rescans the "
+            "local patterns directory on each call, with no writes or network."),
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {},
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "Wrapper for the pattern list; the payload is in items.",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "Patterns sorted by ID.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string",
+                                   "description": "Pattern directory name accepted by pattern_read."},
+                            "path": {"type": "string",
+                                     "description": "Repository-relative PATTERN.md path."},
+                            "title": {"type": "string",
+                                      "description": "H1 title, or an empty string when absent."},
+                            "status": {"type": "string",
+                                       "description": "Pattern lifecycle status from frontmatter."}},
+                        "required": ["id", "path", "title", "status"],
+                        "additionalProperties": False}},
+            },
+            "required": ["items"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "pattern_read",
         "title": "Read engineering pattern",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
@@ -812,6 +854,53 @@ TOOL_DEFS = [
         },
     },
     {
+        "name": "asset_ls",
+        "title": "List asset keys",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "List asset files and the uppercase keys they declare, from "
+            "community/*/assets and 05_资产库/用户自定义. Use it to discover an asset key "
+            "before asset_read; for modules use module_read, and for patterns use "
+            "pattern_ls. Optional package restricts the scan to community/<package>/assets "
+            "(for example 校园情感领域包); README.md files are skipped. Read-only: rescans "
+            "the local asset files on each call, with no writes or network."),
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {"package": {
+                "type": "string",
+                "description": ("Optional community package name; omit to scan all "
+                                "community assets and 05_资产库.")}},
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "Wrapper for the asset key list; the payload is in items.",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "Asset files and their declared keys.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "package": {"type": "string",
+                                        "description": ("Community package name, or 官方 "
+                                                        "for user-defined assets.")},
+                            "file": {"type": "string",
+                                     "description": "Repository-relative Markdown path."},
+                            "keys": {"type": "array",
+                                     "items": {"type": "string"},
+                                     "description": ("Uppercase keys declared by the file; "
+                                                     "pass one to asset_read.")}},
+                        "required": ["package", "file", "keys"],
+                        "additionalProperties": False}},
+            },
+            "required": ["items"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "asset_read",
         "title": "Get asset",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
@@ -976,6 +1065,24 @@ def _tool_library_read(entry_id: str) -> dict:
                      "（修复指引：用 nf library ls 列全量编号）" % entry_id)
 
 
+def _tool_pattern_ls() -> list:
+    """只读枚举：patterns/*/PATTERN.md 的 id/path/title/status。"""
+    from core.library_entries import parse_frontmatter
+
+    root = _repo_root()
+    out = []
+    for p in sorted(root.glob("patterns/*/PATTERN.md")):
+        text = p.read_text(encoding="utf-8")
+        fm, _body = parse_frontmatter(text)
+        out.append({
+            "id": p.parent.name,
+            "path": p.relative_to(root).as_posix(),
+            "title": str(fm.get("title") or _md_title(text)),
+            "status": str(fm.get("status") or "active"),
+        })
+    return out
+
+
 def _tool_pattern_read(pattern_id: str) -> dict:
     """按 id 取实践包正文（patterns/<id>/PATTERN.md）。"""
     root = _repo_root()
@@ -1123,6 +1230,30 @@ def _asset_keys_of_file(path: Path) -> list:
     return sorted(keys)
 
 
+def _tool_asset_ls(package: str = "") -> list:
+    """只读枚举：资产文件 → {package, file, keys}（跳过 README）。"""
+    root = _repo_root()
+    if package:
+        patterns = ["community/%s/assets/*.md" % package]
+    else:
+        patterns = ["community/*/assets/*.md", "05_资产库/用户自定义/*.md"]
+    out = []
+    for pat in patterns:
+        for p in sorted(root.glob(pat)):
+            if p.name == "README.md":
+                continue
+            keys = _asset_keys_of_file(p)
+            if not keys:
+                continue
+            rel = p.relative_to(root).as_posix()
+            out.append({
+                "package": rel.split("/")[1] if rel.startswith("community") else "官方",
+                "file": rel,
+                "keys": keys,
+            })
+    return out
+
+
 def _tool_asset_get(key: str, package: str = "") -> dict:
     root = _repo_root()
     req = key.strip()
@@ -1159,10 +1290,12 @@ TOOL_HANDLERS = {
     "library_search": lambda a: _tool_library_search((a or {}).get("query", ""),
                                                      (a or {}).get("limit", 10)),
     "library_read": lambda a: _tool_library_read((a or {}).get("entry_id", "")),
+    "pattern_ls": lambda a: _tool_pattern_ls(),
     "pattern_read": lambda a: _tool_pattern_read((a or {}).get("pattern_id", "")),
     "knowledge_order": lambda a: _tool_knowledge_order((a or {}).get("clearance", "")),
     "module_read": lambda a: _tool_module_read((a or {}).get("module_id", "")),
     "pipeline_read": lambda a: _tool_pipeline_read((a or {}).get("pipeline", "")),
+    "asset_ls": lambda a: _tool_asset_ls((a or {}).get("package", "")),
     "asset_read": lambda a: _tool_asset_get((a or {}).get("key", ""),
                                             (a or {}).get("package", "")),
 }

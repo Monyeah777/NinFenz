@@ -92,7 +92,7 @@ From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pip
 | `resources/read` | ✅ | allowlisted uri → `contents[].text`; unknown uri → `-32602` |
 | `tools/list` / `tools/call` (read-only · retrieval surface) | ✅ | 41 Wave C C7: library_search / registry_query / pipeline_ls / spec_ls (inputSchema really exists; all read-only) |
 | `tools/list` / `tools/call` (read-only · content channel) | ✅ | 44: module_read / pipeline_read / asset_read — returns the substantive body of modules/pipelines/assets (not just metadata) |
-| Tool annotations on `tools/list` | ✅ | all 10 tools declare `annotations.readOnlyHint: true` (since 2026-10-08) — read-only is no longer prose only: an MCP client may **auto-approve** read-only calls instead of prompting for each one |
+| Tool annotations on `tools/list` | ✅ | all 12 tools declare `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false` (since 2026-10-18) — read-only is no longer prose only: an MCP client may **auto-approve** read-only calls instead of prompting for each one |
 | `prompts/list` / `prompts/get` | ✅ | 41 Wave C C7: assemble_guide loading-guide template (read-only) |
 | Write-path tools (not implemented) | ❌ | unknown tool → `-32602`; unknown method → `-32601` (the read-only security layer refuses writes by construction) |
 
@@ -200,9 +200,9 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 4. Capability surface (read-only)
 
-- **tools (10)**: `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
-  `library_read` · `pattern_read` · `knowledge_order` · `module_read` ·
-  `pipeline_read` · `asset_read`
+- **tools (12)**: `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` ·
+  `library_read` · `pattern_ls` · `pattern_read` · `knowledge_order` · `module_read` ·
+  `pipeline_read` · `asset_ls` · `asset_read`
 - **prompts (1)**: `assemble_guide`
 - **compatibility alias**: old clients may still `tools/call` the name `asset_get`; `tools/list` publishes only `asset_read`
 - **resources**: snapshot-registered resources (`resources/list` → `resources/read`, uri allowlist) + live repository
@@ -210,7 +210,7 @@ python scripts/nf.py serve <输出目录>/mcp.json
 
 ### 5. Red lines (self-check before submission)
 
-1. **Read-only**: add no write tools (currently 10 tools + 1 prompt).
+1. **Read-only**: add no write tools (currently 12 tools + 1 prompt).
 2. **Zero new dependencies**: standard library only.
 3. **uri allowlist**: resource templates are bound by the allowlist; unknown uri → `-32602`.
 4. **Dual protocol versions**: modern `2026-07-28` + legacy `initialize` coexist.
