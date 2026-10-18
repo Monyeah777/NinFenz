@@ -6,7 +6,7 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
@@ -15,6 +15,8 @@ subjects:
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
 
 > 重审（2026-10-18）：P2：分片数按核数自适应

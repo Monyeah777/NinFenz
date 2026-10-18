@@ -6,13 +6,13 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/mcp_runtime.py:ae02ae909c434c5c48b097914c6e970e3eb640796d079c7fa53214361c23574a
+  - desktop/src/core/mcp_runtime.py:5f2b396ea0297940787ae7a3ebc343a6fdfd6b67d1aa9dc4a85e0b7497a68c6d
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read：删除 outputSchema 的 found（无匹配为错误），2 参数 schema 一致；本地 TDQS 4.8/4.9
 
 > 重审（2026-10-18）：矩阵化落地后重绑一致性面

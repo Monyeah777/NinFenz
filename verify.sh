@@ -125,6 +125,29 @@ if [ "$NF_CHECKS_ONLY" = "1" ]; then
   # 只跑静态 check：结果**不进缓存**（半份门禁的"绿"不能当整份门禁用）。
   NF_CACHE=0
 fi
+
+# ---- 测试与静态 check 重叠加速（2026-10-18）----
+# quick 档 = 静态 42 条（约 55 s）+ 受影响测试（约 90 s），顺序跑是两者相加；
+# 它们**互不依赖**（测试在独立进程/独立 NF_HOME 里跑，不写仓内受跟踪文件），
+# 因此把测试放后台与静态 check 并行，墙钟从 "a+b" 变成 "max(a,b)"。
+# 判据不变：测试命令与判定逻辑一字未改，只是不在 check12 里"现场跑"，而是"先跑、到点收"。
+# --fast（补充快车道）/ --checks-only / --tests-only 不走重叠（语义不同）。
+_NF_BG_TESTS_PID=''
+if [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "1" ] && [ "$NF_TESTS_ONLY" != "1" ] \
+   && [ -n "$PY3" ] && [ -f scripts/verify_tests.py ] && [ -d desktop/tests ]; then
+  _BG_JOBS="${NF_TEST_JOBS:-}"
+  if [ -z "$_BG_JOBS" ]; then
+    _BG_JOBS="$("$PY3" -c 'import os; print(min(8, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+  fi
+  if [ "$NF_TIER" = "full" ]; then
+    "$PY3" scripts/verify_tests.py --jobs "$_BG_JOBS" \
+      >"$NFL_TMP"/nf_check12_unittest.log 2>&1 &
+  else
+    "$PY3" scripts/verify_tests.py --affected --jobs "$_BG_JOBS" \
+      >"$NFL_TMP"/nf_check12_unittest.log 2>&1 &
+  fi
+  _NF_BG_TESTS_PID=$!
+fi
 PASS=0; FAIL=0; WARN=0
 ok(){ PASS=$((PASS+1)); printf '  [PASS] %s\n' "$1"; }
 # 机制借鉴 reviewdog 的「发现 → 结构化注解」：在 GitHub Actions 里把 FAIL/WARN 同时打成
@@ -508,7 +531,16 @@ check12(){
     else
       _ut_cmd=(bash -c 'cd desktop && exec "$0" -m unittest discover -s tests -q' "$PY3")
     fi
-    if "${_ut_cmd[@]}" >"$NFL_TMP"/nf_check12_unittest.log 2>&1; then
+    # 重叠模式：测试已在后台跑到这里，只收结果（命令与判据同 --tests-only）。
+    if [ -n "$_NF_BG_TESTS_PID" ]; then
+      if wait "$_NF_BG_TESTS_PID"; then _ut_rc=0; else _ut_rc=$?; fi
+      _NF_BG_TESTS_PID=''
+    elif "${_ut_cmd[@]}" >"$NFL_TMP"/nf_check12_unittest.log 2>&1; then
+      _ut_rc=0
+    else
+      _ut_rc=$?
+    fi
+    if [ "$_ut_rc" -eq 0 ]; then
       ok 'desktop core 单元测试全绿（desktop/tests 全量 discover · 分片并行，判据面不变）'
     else
       no "desktop core 单元测试失败——见 $NFL_TMP/nf_check12_unittest.log"; err=1

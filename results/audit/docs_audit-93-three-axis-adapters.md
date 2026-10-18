@@ -12,7 +12,7 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:21c3d2d3ec4aea0343ea0043ce1038062077ee08a49af596d56fa784259418d2
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:6c5f9e17706e49bf702f282799cd431b0d5411630be619d727f764f9550b4816
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
 
 > 重审（2026-10-18）：P2：分片数按核数自适应

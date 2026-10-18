@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
   - README.en.md:8a24f5de86df0619909b931e112d6fbdd8584f34894d913f40031d616c0daef5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
 
 > 重审（2026-10-18）：P2：分片数按核数自适应

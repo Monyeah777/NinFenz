@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
 
 > 重审（2026-10-18）：P2：分片数按核数自适应

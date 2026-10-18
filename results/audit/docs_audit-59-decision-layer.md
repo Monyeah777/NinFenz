@@ -6,7 +6,7 @@ scope: 作者指令「拉取 jev 或 laya 这种模型作为决策层」——�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:8c8085bf7554128fa952792e666c7667eefb2e2919df09ff8ffb19449b07472b
+  - verify.sh:760648f400bedaa9252da35a22ac0efb31e993a13c8416c61ec41af9ea0d2d59
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/data_contracts.json:d6fbdd2e886a5295728dcbb5c48a14e543d1b5fc64eacd20b8a3af7120404990
@@ -19,6 +19,8 @@ subjects:
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-18）：quick 档测试与静态 check 重叠执行
+
 > 重审（2026-10-18）：asset_read 第五轮：按 TDQS 50-100 词上限压到 100，保留 5 段与输出/参数/限制
 
 > 重审（2026-10-18）：P2：分片数按核数自适应
