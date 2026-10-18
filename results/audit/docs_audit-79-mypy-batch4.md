@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
+  - protocol/code_metrics_baseline.json:ccdcb198a2086fdffdad1c567b1e181241602d18572dd20f7eaa0fcd97fb85aa
 ---
+> 重审（2026-10-18）：mcp_runtime 增长后重冻度量上限（评审：+16 行，MCP 工具面扩充）
+
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）
 
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload
