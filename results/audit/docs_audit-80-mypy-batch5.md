@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:7176f54e7b10d6d56450e4caaa019faed8ec298b9215a40bbd9485d2bbec350c
+  - desktop/src/core/mcp_runtime.py:20fd451782908a3f1888e0b91644d8f20a375297ef8bdecd1da84280b2ee0041
   - protocol/code_metrics_baseline.json:37024e90addbcc73ae046d97047d6f1ee18330ee06e0d793e1000d9920f1b25a
 ---
+> 重审（2026-10-18）：asset_read：补 package 只缩文件集不改 key 匹配（参数交互）
+
 > 重审（2026-10-18）：asset_read 第四轮：恢复段落结构（5 段），目标 Conciseness 5
 
 > 重审（2026-10-18）：P2：判定同根改跨进程比对 + 常驻集去掉 npm payload

@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/mcp_runtime.py:7176f54e7b10d6d56450e4caaa019faed8ec298b9215a40bbd9485d2bbec350c
+  - desktop/src/core/mcp_runtime.py:20fd451782908a3f1888e0b91644d8f20a375297ef8bdecd1da84280b2ee0041
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-18）：asset_read：补 package 只缩文件集不改 key 匹配（参数交互）
+
 > 重审（2026-10-18）：asset_read 第四轮：恢复段落结构（5 段），目标 Conciseness 5
 
 > 重审（2026-10-18）：asset_read 第三轮：84→74 词，压缩替代方案括号
