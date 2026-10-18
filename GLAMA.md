@@ -356,8 +356,8 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 
 ## 13. 对 Glama Coherence 4.3 的逐条答复
 
-Glama 当前实评（2026-10-18）：**descriptionQuality 4.5 · coherence 4.3 · overall 4.4 → A**。
-coherence 的四条反馈与处理如下：
+Glama 本次修改前的实评（2026-10-18）：**descriptionQuality 4.5 · coherence 4.3 · overall 4.4 → A**。
+coherence 的反馈与处理如下：
 
 | 反馈 | 处理 |
 |---|---|
@@ -366,10 +366,12 @@ coherence 的四条反馈与处理如下：
 | `pipeline_ls` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_ls` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
 | 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | **已改**：MCP 面统一为 `asset_read`（`asset_get` 保留为兼容别名，不进 `tools/list`）；核心协议的资产五接口仍叫 `asset_get`，描述里说明 `asset_read` 是它的 MCP 读面 |
 | 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | **已补**：新增 `pattern_ls` / `asset_ls` 专用枚举工具，与 `pattern_read` / `asset_read` 成对；`resources/list` 仍保留为同源资源面 |
+| 每个工具尾部重复“Read-only / no writes or network”，与 annotations 重复，压住 BT/CS 分 | **已删** 12 个工具的只读尾句；把空间改成显式“何时不要用 + 改用哪个工具”，只保留 annotations 无法表达的行为（未知 ID 报错、空结果、扫描/上限） |
 
-> 结论：overall 4.4 已经是 A；上述描述边界修改会在 Glama 下次重建后重新评分，
-> 主要提升 disambiguation / completeness，naming 仍可能停在 4。若一定要把 naming 推到 5，
-> 需要单独做一次跨语言 API 迁移（Python + Rust + .NET + 协议表 + 文档），不建议在 A 已达成时做。
+> 结论：overall 4.4 已经是 A；上述修改（`asset_read` 命名、`pattern_ls` / `asset_ls`、去重 +
+> 显式 when-not-use）会在 Glama 下次重建后重新评分，预期 disambiguation / naming /
+> completeness 都有提升，overall 从 4.4 向 4.6+ 走。核心协议的资产五接口仍叫 `asset_get`，
+> 这是协议层名字，不是 MCP 工具名。
 
 ## 附录：官方参考
 

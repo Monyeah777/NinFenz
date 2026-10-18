@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:a3ba7f3bba4b73ee45002bbf954bfe3dcf6c699b275e62576bf4ec49e7435f2a
+  - desktop/src/core/mcp_runtime.py:2141b9e2c2e388f67159dabaf4b5ed699d1ddab8b3ddfea8a4209940f25e89c2
   - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
 ---
+> 重审（2026-10-18）：Glama TDQS：删除 12 工具重复只读尾句，改显式 when-not-use；保留错误/空结果/扫描行为
+
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
 
 > 重审（2026-10-18）：Glama coherence：新增 pattern_ls/asset_ls；asset_read 兼容别名；同步 12 工具面
