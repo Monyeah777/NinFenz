@@ -242,6 +242,17 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
                 rc, out = proc.returncode, (proc.stdout or "") + (proc.stderr or "")
             except subprocess.TimeoutExpired:
                 rc, out = 124, "分片超时（%.0f s）" % SHARD_TIMEOUT_S
+    log_dir = os.environ.get("NF_SHARD_LOG_DIR")
+    if log_dir:
+        # 诊断用（默认关闭）：把每个分片的**完整**输出落盘——分片失败时只看末 40 行
+        # 往往抓不到"哪条测试红"，而这正是并行敏感问题的唯一线索。
+        try:
+            target = Path(log_dir) / ("shard%d.log" % index)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            atomic_write.write_text(target, out)
+        except OSError:
+            # 落盘失败只是少一份诊断，不影响判定（分片结果仍按 rc 汇总）。
+            pass
     return {"index": index, "rc": rc, "out": out,
             "wall": round(time.perf_counter() - t0, 1), "tests": len(ids)}
 
