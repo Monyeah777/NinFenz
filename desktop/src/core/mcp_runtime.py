@@ -910,9 +910,9 @@ TOOL_DEFS = [
             "package is an exact directory; it narrows files but never key matching.\n\n"
             "Tokens come from each file's name or first 6000 characters; lowercase/partial "
             "keys fail. Full text is returned; no truncation.\n\n"
-            "No package searches all community assets and 05_资产库; a package limits the "
-            "scan to one directory with no fallback. Multiple matches may return. No match "
-            "is an error."),
+            "Without a package, all community assets and 05_资产库 are searched. A package "
+            "limits the scan to one directory with no fallback. Multiple matches may be "
+            "returned. No match is an error."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,

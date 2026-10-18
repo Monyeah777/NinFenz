@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:61e59777cb7595c906f74efbafea8ec1ff1c98c7865e4aa0f83300216d86ca52
+  - desktop/src/core/mcp_runtime.py:50c4d8f33d6c8fb1a5e11723efefb33d940298757a8789f313fcfc779f0d3bb0
   - protocol/code_metrics_baseline.json:b0e2f368a92eb87434ca640d44e8aa4a21bf0429a70745e6e3103941c339f897
 ---
+> 重审（2026-10-18）：矩阵化落地后重绑一致性面
+
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）
 
 > 重审（2026-10-18）：TDQS lint：修复 4 个 titleIsMeaningful=false；asset_read 100 词标准版
