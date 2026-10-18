@@ -19,7 +19,7 @@
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
         "scripts/nf.py::B404": 1,
-        "scripts/nf.py::B603": 4,
+        "scripts/nf.py::B603": 5,
         "scripts/perf_budget.py::B404": 1,
         "scripts/perf_budget.py::B603": 1,
         "scripts/sast_check.py::B404": 1,
@@ -38,14 +38,14 @@
           "severities": [
             [
               "LOW",
-              37
+              38
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 42
+          "total": 43
         },
         "ruff": {
           "total": 83

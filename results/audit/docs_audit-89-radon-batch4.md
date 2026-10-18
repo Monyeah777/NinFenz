@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3
+  - protocol/code_metrics_baseline.json:b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894
 ---
+> 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
+
 > 重审（2026-10-18）：P3：缓存脚本收口（suppress 清理面）
 
 > 重审（2026-10-18）：P3：判定缓存 + 分层档位（sink 登记）

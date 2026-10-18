@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 222,
-    "verify": 933
+    "verify": 934
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7319,6 +7319,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "check12 规模棘轮（P0）：权重基线必须**覆盖全部模块与测试**，总预算不得回升。",
+      "path": "desktop/tests/test_check12_budget.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "check30（版本字段 bump 迁移门禁）回归测试 —— 取 verify.sh 内嵌程序真件执行。",
       "path": "desktop/tests/test_check30_bump.py",
       "role": "verify",
@@ -11417,7 +11423,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "check12 逐模块墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
+      "function": "check12 墙钟基线（--write-weights 实测；P0 棘轮与分片均衡共用）",
       "path": "protocol/check12_weights.json",
       "role": "verify",
       "rule": "R-verify"
@@ -11862,7 +11868,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ed8fc24eed77742d82e003e8aecf5d28ecd246aa0476a904fceef93d9e1fa10f",
+  "root_digest": "1f531f2d20d3124dce52380a1b7d608ec84183e549e694eea79781360f7ac00e",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 85,
@@ -11871,7 +11877,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 112,
-    "R-verify": 818,
+    "R-verify": 819,
     "auto:R-core": 248
   },
   "schema": "nf-role-coordinates/1"

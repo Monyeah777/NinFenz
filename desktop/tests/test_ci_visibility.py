@@ -47,19 +47,26 @@ class GateVisibilityTest(unittest.TestCase):
             # Z5（2026-10-10）：全量调用可带 `2>&1 | tee <log>` 落盘（失败诊断物），
             # 但**不得**传任何子集参数——子集 = 假绿。
             self.assertRegex(_read(WORKFLOWS / wf),
-                             r"(?m)^\s*bash verify\.sh(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
-                             "%s 不是跑全量 verify.sh 的那条 workflow" % wf)
+                             r"(?m)^\s*bash verify\.sh --full( --no-cache)?"
+                             r"(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
+                             "%s 不是跑 **full 档** verify.sh 的那条 workflow" % wf)
 
     def test_gate_workflow_runs_full_verify_not_a_subset(self):
-        """唯一入口纪律：CI 里只许裸跑全量（可加 tee 落盘），传子集参数即等于假绿。"""
+        """唯一入口纪律（P3 分层后）：CI 必须跑 **full 档**（quick 是开发档，不是发布结论）。
+
+        为什么改（2026-10-18）：verify.sh 默认档已改为 quick（静态 + 受影响测试），
+        "裸跑"不再等于全量——裸跑反而是子集。CI 因此必须显式 `--full`（`--no-cache` 可选，
+        用于强制真跑）；仍只允许一次调用（防"跑两遍拼出一个绿"）。
+        """
         text = _read(WORKFLOWS / "ci-verify.yml")
         invocations = [ln.strip() for ln in text.splitlines()
                        if re.match(r"^\s*bash verify\.sh\b", ln)]
         self.assertEqual(1, len(invocations),
                          "ci-verify 必须恰好调用一次 verify.sh：%s" % invocations)
         line = invocations[0]
-        self.assertRegex(line, r"^bash verify\.sh(\s+2>&1\s*\|\s*tee\s+\S+)?$",
-                         "verify.sh 必须裸跑全量（可带 tee 落盘），不得传子集参数：%s" % line)
+        self.assertRegex(line, r"^bash verify\.sh --full( --no-cache)?"
+                              r"(\s+2>&1\s*\|\s*tee\s+\S+)?$",
+                         "CI 必须跑 full 档（quick 不是发布结论）：%s" % line)
 
     def test_gate_workflow_triggers_on_push_to_main(self):
         """推 main 即跑：徽章盯的是推送后的真实结论，不是手动才跑的空壳。"""

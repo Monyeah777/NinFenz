@@ -681,7 +681,7 @@
       "max_fn_lines": 49
     },
     "desktop/src/core/mcp_runtime.py": {
-      "lines": 1864,
+      "lines": 2008,
       "max_fn_cc": 30,
       "max_fn_lines": 69
     },
@@ -1376,7 +1376,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7523,
+      "lines": 7526,
       "max_fn_cc": 115,
       "max_fn_lines": 1253
     },
@@ -1491,9 +1491,9 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 360,
+      "lines": 408,
       "max_fn_cc": 20,
-      "max_fn_lines": 92
+      "max_fn_lines": 94
     },
     "scripts/workflow_policy.py": {
       "lines": 42,

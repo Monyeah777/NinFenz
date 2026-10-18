@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "4340ee1b3521778f8b323bb971748013d9ab6378c2a80bdee15263f70f3f61d7",
+        "root": "3f7fc1d2008ec53eaadf6005ab1957cd7de9cb861499fda9003045f24cc1a8dc",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -322,9 +322,11 @@
     },
     {
       "id": "self_stats",
-      "issues": 0,
+      "issues": 1,
       "name": "自述数字 == 实算（README/llms 生成区）",
-      "sample": [],
+      "sample": [
+        "README.md 的生成区与实算不一致（跑 `nf stats --write` 重写）"
+      ],
       "source": "repo_stats.check_strict",
       "stats": {
         "baseline_checks": 42,
@@ -359,7 +361,7 @@
         "verify_checks": 42,
         "verify_version": "2.30"
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -373,7 +375,7 @@
         "files": 300,
         "max_fn_cc": 115,
         "max_fn_lines": 1253,
-        "max_lines": 7523
+        "max_lines": 7526
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +528,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3798,
-        "kernel": 1975,
+        "files": 3799,
+        "kernel": 1976,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,12 +540,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "dc4577549d6e879a9a25fc2185e53ab9dd362adcffd7be732f81b03c47247681",
+  "root_digest": "a8884f7eff4d2bb4a6ba1fecea156c2b35491eba1f29342fdf2c257f1c9f7d07",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

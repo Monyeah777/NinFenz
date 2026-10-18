@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreihx3usjblerku22h5j5e6xq7ri4p4uhm7ww5f4c5mvbi6xmnvxa7m",
+      "cid": "bafyreievhifx3nxcio6h7l5672pbnpvfwhlc67wnhl4n5x4yeatpjpoydm",
       "path": "protocol/conformance_report.json",
-      "sha256": "f7dd2490ac915535a3f53d27af0fc51c7f28767ed6e9782eb2a147aec6d6e0fb"
+      "sha256": "953a0b7db6e243bc7fafbefe9e16bea5b1d62f7ecd3af8dedf982026f4bdd81b"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,19 +107,19 @@
       "sha256": "13b711c64920942efc2bc0c61cc7ba6b57b9299945f95c37823f97b552b06325"
     },
     {
-      "cid": "bafyreiadjrp3zzpqwgkpgadceioqblq3wsfo4es3xypvpe4z2it4nvr73m",
+      "cid": "bafyreiax7iw4b6udzvau3jecd5id5edezectwmd2s6bdok6f37e3wotd7a",
       "path": "protocol/role_coordinates.json",
-      "sha256": "034c5fbce5f0b194f30062221d00ae1bb48aee125bbe1f579399d227c6d63fdb"
+      "sha256": "17fa2dc0fa83cd414da4821f503e9064c9053b307a9782372bc5dfc9bb3a63f8"
     },
     {
-      "cid": "bafyreifazcmse4wq4lxraiwxeadtzqrfkecxe3ss74frzfsh6szkcdsg4m",
+      "cid": "bafyreifsfcmqqjeqjmptrdqq7mz6nxcnstccpo3lgowk5uf6mshiewiisq",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "a0c8992272d0e2ef1022d720073cc2255105726e52ff0b1c9647f4b2a10e46e3"
+      "sha256": "b228990824904b1f388e10fb33e6dc4d94c427bb6b33acaed0be648e82590894"
     },
     {
-      "cid": "bafyreidketye2l7idmnrs2appaxou4ag6lobz53s52zjwwvlqzerr55erq",
+      "cid": "bafyreif2dprxd62wx3fj7ufb6dfgpclrxpb4qa5p24a2txexvhylxmpu4i",
       "path": "protocol/coupling_baseline.json",
-      "sha256": "6a24f04d2fe81b1b19680f782eea7006f2dc1cf772eeb29b5aab864918f7a48c"
+      "sha256": "ba1be371fb56beca9fd0a1f0ca678971bbc3c803afd701a9dc97a9f0bbb1f4e2"
     },
     {
       "cid": "bafyreibdlqbi2hmbocc2m7dzga5x4g2pro4sw2eilzb3jg76uie6khdmse",
@@ -142,19 +142,19 @@
       "sha256": "a21468bb3df2d1565b6fbbb36ad7093d7020dde37cfe5fe1de5218378119029e"
     },
     {
-      "cid": "bafyreiatvkasbt33r2ljxkojfajpg7fli625vbekqxvabvfq2ota43biki",
+      "cid": "bafyreieyjbmlvebj3ivly2y3prco4h4yus3pczxakiemuqpkrt7my3ytha",
       "path": "protocol/sast_baseline.json",
-      "sha256": "13aa8120cf7b8e969ba9c92812f37cab47b5da848a85ea00d4b0d3a60e6c2852"
+      "sha256": "984858ba9029da2abc6b1b7c44ee1f98a4b6f166e05208ca41ea8cfecc6f1338"
     },
     {
-      "cid": "bafyreiguwrbdypzisj53epvfgvhh2zlckln5qtbdihmuueondnywlwb54u",
+      "cid": "bafyreiaannlhjc3nvlzedg7ebjssi7mq57lcshuhztlbyzjh5uksnnvu4q",
       "path": "protocol/CONFORMANCE.md",
-      "sha256": "d4b4423c3f28927bb23ea5354e7d656252dbd84c2341d94a11cd1b7165d83de5"
+      "sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
     },
     {
-      "cid": "bafyreidg23fpdclvnoatd22renttzeczfx5jtc3c6ppidevzs7uyhnjbfq",
+      "cid": "bafyreibeqy4b7ggrsrel4qkang4s2na746gw2fdki7fm6bk6s3pvttvh6i",
       "path": "protocol/driver.json",
-      "sha256": "66d6caf189756b8131eb5123673c90592dfa998b62f3de8192b997e983b5212c"
+      "sha256": "2486381f98d19448be414069b92d341fe78d6d146a47cacf055e96df59cea7f2"
     },
     {
       "cid": "bafyreieh3z5mnd4yi2ztgmr673g3w5kvvxzeefnoqfc5k476rudirohinu",
@@ -192,9 +192,9 @@
       "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"
     },
     {
-      "cid": "bafyreic5fa5jzfid44idvxoyysuumo5sxkgvydcmfhu7pa3ry4znpkkixe",
+      "cid": "bafyreibwvhratk6y3f2df4fzleqccqna3a4hjtjr7b4nk4plh7anssmfbe",
       "path": "protocol/locales.json",
-      "sha256": "5d283a9c9503e7103addd8c4a9463bb2ba8d5c0c4c29e9f78371c732d7a948b9"
+      "sha256": "36a9e209abd8d97432f0b959202141a0d83874cd31f878d571eb3fc0d9498509"
     },
     {
       "cid": "bafyreia7f7b7fi6bzixcnkf32fob5wffrhrjovvcdgskspefprzs2flmmy",
@@ -252,9 +252,9 @@
       "sha256": "21c8589b07247607bfefc6916cff01d8589988fe7fd73914f687df262fa14e2d"
     },
     {
-      "cid": "bafyreifpn2xwhmrlrkazhzvhnoy3sceycbosuygsuwtb2lhj3fbwkpw2ci",
+      "cid": "bafyreifbihuoy7wuxdnevgoksd7tdy24j3v3oqzz2xdwhnb7wxi6jpmjxm",
       "path": "protocol/mcp_package.json",
-      "sha256": "af6eaf63b22b8a8193e6a76bb1b90898105d2a60d2a5a61d2ce9d943653eda12"
+      "sha256": "a141e8ec7ed4b8da4a99ca90ff31e35c4eebb74339d5c763b43fb5d1e4bd89bb"
     },
     {
       "cid": "bafyreia2kqszdtzyhavogma46wwgpsaknjgs7xh5prlpvmt6zs522dfhse",
