@@ -28,7 +28,7 @@ C7 只读工具面（41_v2.8.0_波C质量编译深化规划，2026-09-08）：
   （术语见规范 §Versioning：modern / legacy / dual-era）。
 - `server/discover`：现代服务器 MUST 实现——一次返回 supportedVersions /
   capabilities / serverInfo(_meta) 与可选 instructions / ttlMs / cacheScope。
-- initialize 响应：{protocolVersion, capabilities, serverInfo: Implementation}
+- initialize 响应：{protocolVersion, capabilities, serverInfo: Implementation, instructions}
 - notifications/initialized 是通知（无 id）→ 不应答；ping → EmptyResult（{}）
 - 标准错误码：PARSE_ERROR=-32700 / INVALID_REQUEST=-32600 / METHOD_NOT_FOUND=-32601 /
   INVALID_PARAMS=-32602 / INTERNAL_ERROR=-32603
@@ -233,7 +233,10 @@ def template_matches(template: str, uri: str) -> bool:
 
 def _discover_instructions() -> str:
     """server/discover 的 instructions 位（可选自然语言自述，非协议语义）。"""
-    return ("NinFenz 只读内容服务：可枚举并取回 NF 仓库的模块/管线/资产正文"
+    return ("NinFenz read-only content service: enumerate and fetch NF modules, "
+            "pipelines, assets, library entries, and patterns through resources and "
+            "read-only tools/prompts. No write path and no network. "
+            "NinFenz 只读内容服务：可枚举并取回 NF 仓库的模块/管线/资产正文"
             "（resources + 只读 tools/prompts）。无写路径。")
 
 
@@ -336,19 +339,62 @@ def _md_title(text: str) -> str:
 TOOL_DEFS = [
     {
         "name": "pipeline_ls",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "列出 NF 管线清单（03_管线库 + community 包 pipelines）。",
+        "title": "List pipelines",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "List NF pipelines as path/title metadata from 03_管线库 and "
+            "community/*/pipelines. Use it to discover a pipeline ID or relative path "
+            "before pipeline_read; for modules use registry_query, and for protocol "
+            "packages use spec_ls. The optional query is a case-sensitive substring "
+            "matched against the relative path and H1 title; omit it to list every "
+            "pipeline (examples: P04, 技术文档, 校园); no matches yields an empty list. "
+            "Read-only: rescans the local repository on each call and never writes or "
+            "uses the network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"query": {"type": "string",
- "description": "可选过滤串（匹配 id/标题）"}},
+            "properties": {"query": {
+                "type": "string",
+                "description": ("Case-sensitive substring matched against the relative "
+                                "path and H1 title; omit to list every pipeline.")}},
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "Wrapper for the pipeline list; the payload is in items.",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "Pipelines matching query, sorted by repository path.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string",
+                                     "description": "Repository-relative Markdown path."},
+                            "title": {"type": "string",
+                                      "description": ("H1 heading text, or an empty "
+                                                      "string when absent.")}},
+                        "required": ["path", "title"],
+                        "additionalProperties": False}},
+            },
+            "required": ["items"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "spec_ls",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "列出 registry protocols 协议包清单（id/version/模块数/类别）。",
+        "title": "List protocol packages",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "List protocol packages from desktop/src/core/registry.json, returning each "
+            "package's id, version, module count, and categories. Use it when you need a "
+            "protocol package ID or version; for module metadata use registry_query, and "
+            "for pipeline files use pipeline_ls. Takes no arguments and returns an empty "
+            "list only when the registry declares no protocols. Read-only and "
+            "deterministic: reads one local registry file, with no writes or network."),
         # 2026-10-08 删除已声明的 `tier`：registry 的 protocols 里**没有分级字段**，过滤从未实现
         # （实测：传任意 tier 返回完全相同的全量清单，结果里也没有 tier 字段）——「声明了不生效」
         # 是静默降级，比缺个参数更坏；宁可不声明。若将来 registry 补了分级数据，再连同实现一起加回。
@@ -357,110 +403,467 @@ TOOL_DEFS = [
             "additionalProperties": False,
             "properties": {},
         },
+        "outputSchema": {
+            "type": "object",
+            "description": ("Wrapper for the protocol package list; the payload is in "
+                            "items."),
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": "Registered protocol packages in registry order.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": ["string", "null"],
+                                   "description": "Protocol package ID."},
+                            "version": {"type": ["string", "null"],
+                                        "description": "Declared package version."},
+                            "modules": {"type": "integer",
+                                        "description": ("Number of module IDs bound to "
+                                                        "the package.")},
+                            "categories": {"type": "array",
+                                           "items": {"type": "string"},
+                                           "description": ("Package category labels; "
+                                                           "empty when undeclared.")}},
+                        "required": ["id", "version", "modules", "categories"],
+                        "additionalProperties": False}},
+            },
+            "required": ["items"],
+            "additionalProperties": False,
+        },
     },
     {
         "name": "registry_query",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "查询 registry 模块/协议（按 id/name/包 id 子串匹配，只读）。",
+        "title": "Query registry",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Query the NF registry for modules and protocol packages whose id or name "
+            "contains query. Use it to resolve an exact module ID before module_read or "
+            "a protocol ID before spec_ls; for free-text document or catalog search use "
+            "library_search instead. Matching is case-sensitive, query is required "
+            "(examples: M90, 技术文档域包), and an empty query matches every entry; "
+            "results are grouped under modules and protocols, and no matches yields empty "
+            "arrays. Read-only: reads one local registry file, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"query": {"type": "string",
- "description": "检索串（如 M90 或 域包 id）"}},
+            "properties": {"query": {
+                "type": "string",
+                "description": ("Case-sensitive substring matched against module and "
+                                "protocol ids and names.")}},
             "required": ["query"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "Modules and protocol packages matching query.",
+            "properties": {
+                "modules": {
+                    "type": "array",
+                    "description": "Matching modules in registry order.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": ["string", "null"],
+                                   "description": "Module ID accepted by module_read."},
+                            "name": {"type": ["string", "null"],
+                                     "description": "Human-readable module name."}},
+                        "required": ["id", "name"],
+                        "additionalProperties": False}},
+                "protocols": {
+                    "type": "array",
+                    "description": "Matching protocol packages in registry order.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": ["string", "null"],
+                                   "description": "Protocol package ID accepted by spec_ls."},
+                            "version": {"type": ["string", "null"],
+                                        "description": "Declared package version."},
+                            "modules": {"type": "integer",
+                                        "description": ("Number of module IDs bound to "
+                                                        "the package.")}},
+                        "required": ["id", "version", "modules"],
+                        "additionalProperties": False}},
+            },
+            "required": ["modules", "protocols"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "library_search",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": ("仓库侧知识库检索：**馆藏条目（正文级，含标题/描述/标签/正文）** "
-                        "+ docs + community README + 编号方案文档。"),
+        "title": "Search library and docs",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Search the library catalog and repository docs for query, returning ranked "
+            "catalog entries plus matching document titles. Use it to find an entry ID "
+            "for library_read or to locate a doc or package README; for structured module "
+            "or protocol lookup use registry_query. Catalog matching is case-insensitive "
+            "and relevance-ranked; document hits match the filename or H1 title as a "
+            "case-sensitive substring. The combined result is capped by limit (default "
+            "10); an empty query returns the first page of document hits only, and no "
+            "matches yields an empty list (examples: 叙事, verify, 校园). Read-only: "
+            "scans local files, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"query": {"type": "string", "description": "检索串"}},
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": ("Search text; catalog hits are relevance-ranked and "
+                                    "document hits match filename or H1 title.")},
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50,
+                    "description": ("Maximum combined hits to return (default 10); "
+                                    "catalog and document hits share the cap.")},
+            },
             "required": ["query"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": ("Wrapper for mixed catalog and document hits; the payload "
+                            "is in items."),
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "description": ("Ranked catalog entries followed by matching "
+                                    "documents, truncated to limit."),
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "kind": {
+                                "type": "string",
+                                "enum": ["library", "doc"],
+                                "description": ("Hit source: library catalog entry or "
+                                                "repository document.")},
+                            "id": {"type": "string",
+                                   "description": ("Catalog entry ID; present only for "
+                                                   "kind=library.")},
+                            "path": {"type": "string",
+                                     "description": ("Repository-relative path of the "
+                                                     "catalog file or document.")},
+                            "title": {"type": "string",
+                                      "description": "Entry or document title."},
+                            "score": {"type": "number",
+                                      "description": ("Relevance score for kind=library; "
+                                                      "absent for documents.")},
+                            "status": {"type": "string",
+                                       "description": ("Catalog lifecycle status; present "
+                                                       "only for kind=library.")},
+                            "type": {"type": "string",
+                                     "description": ("Catalog Diátaxis type; present only "
+                                                     "for kind=library.")},
+                            "uri": {"type": "string",
+                                    "description": ("nf://repo/library/<id> resource URI; "
+                                                    "present only for kind=library.")}},
+                        "required": ["kind", "path", "title"],
+                        "additionalProperties": False}},
+            },
+            "required": ["items"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "library_read",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "取云端图书馆馆藏条目正文（按 NF 编号，大小写不敏感；返回 frontmatter + 全文"
-            "）。",
+        "title": "Read library entry",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Read one library catalog entry by ID, returning its frontmatter record and "
+            "full Markdown text. Use it after library_search resolves the ID; for modules, "
+            "pipelines, or assets use module_read, pipeline_read, or asset_get instead. "
+            "The ID is the canonical stem without the .md suffix and matching is "
+            "case-insensitive (for example NF-1); an unknown ID returns an error carrying "
+            "the requested ID and repair guidance. Read-only: reads one local file, with "
+            "no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"entry_id": {"type": "string",
-                                        "description": "馆藏编号（如 NF-1 / nf-worldcampus-monyeah7"
-                                            "77-1）"}},
+            "properties": {"entry_id": {
+                "type": "string",
+                "description": ("Catalog ID, case-insensitive (for example NF-1 or "
+                                "nf-worldcampus-monyeah777-1).")}},
             "required": ["entry_id"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "A catalog entry with its metadata and full Markdown body.",
+            "properties": {
+                "found": {"type": "boolean",
+                          "description": "True when the entry was located."},
+                "id": {"type": "string", "description": "Canonical catalog ID."},
+                "path": {"type": "string",
+                         "description": "Repository-relative Markdown path."},
+                "status": {"type": "string",
+                           "description": "Catalog lifecycle status (for example active)."},
+                "frontmatter": {
+                    "type": "object",
+                    "description": ("Parsed YAML frontmatter as JSON; keys vary by "
+                                    "entry."),
+                    "additionalProperties": True},
+                "bytes": {"type": "integer",
+                          "description": "UTF-8 byte length of text."},
+                "text": {"type": "string",
+                         "description": "Full Markdown body as stored on disk."},
+            },
+            "required": ["found", "id", "path", "status", "frontmatter", "bytes", "text"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "pattern_read",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "取实践包（patterns/）正文：按 id 返回 frontmatter + 可执行规则 + 正反例（只"
-            "读）。",
+        "title": "Read engineering pattern",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Read one engineering pattern's full Markdown from patterns/<id>/PATTERN.md, "
+            "including frontmatter, rules, and a counterexample. Use it when you need the "
+            "practice behind an NF rule; for domain modules use module_read, and enumerate "
+            "patterns with resources/list type=pattern. The "
+            "pattern_id is the exact, case-sensitive directory name such as "
+            "fail-closed-verification (not the document title); an unknown ID returns an "
+            "error. Read-only: reads one local file, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
             "properties": {"pattern_id": {
                 "type": "string",
-                "description": "pattern id（如 fail-closed-verification / single-source-truth）"}},
+                "description": ("Exact pattern directory name (for example "
+                                "fail-closed-verification or single-source-truth).")}},
             "required": ["pattern_id"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "A pattern file with its metadata and full Markdown body.",
+            "properties": {
+                "found": {"type": "boolean",
+                          "description": "True when the pattern was located."},
+                "id": {"type": "string", "description": "Pattern directory name."},
+                "path": {"type": "string",
+                         "description": "Repository-relative Markdown path."},
+                "bytes": {"type": "integer",
+                          "description": "UTF-8 byte length of text."},
+                "text": {"type": "string",
+                         "description": "Full PATTERN.md body as stored on disk."},
+            },
+            "required": ["found", "id", "path", "bytes", "text"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "knowledge_order",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "解析知识源查询顺序（先合同级后参考级；可按可见性 clearance 裁剪）——双源知识"
-            "层的机器面。",
+        "title": "Resolve knowledge order",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Return the declared knowledge-source query order and a contract-first flag, "
+            "with each source's authority, kind, locator, label requirement, and "
+            "visibility. Use it before assembling or citing NF content to know which "
+            "source to consult first; it is not a document search, so use library_search "
+            "for content. Optional clearance (public, internal, or restricted) hides "
+            "sources above that visibility; use public before republishing material, or "
+            "omit it to keep all. Read-only: reads one local declaration, with no writes "
+            "or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
             "properties": {"clearance": {
                 "type": "string",
-                "description": "消费方清除级：public / internal / restricted（缺省 = 不裁剪）",
+                "description": ("Consumer clearance; hides sources above this visibility. "
+                                "Omit to keep every source."),
                 "enum": ["public", "internal", "restricted"]}},
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "The resolved consultation order and the applied clearance.",
+            "properties": {
+                "clearance": {"type": "string",
+                              "description": ("Applied clearance, or '不裁剪' when "
+                                              "omitted.")},
+                "contract_first": {"type": "boolean",
+                                   "description": ("True when the first source in the "
+                                                   "declared order is contract-level.")},
+                "count": {"type": "integer",
+                          "description": "Number of sources in query_order."},
+                "query_order": {
+                    "type": "array",
+                    "description": "Sources in required consultation order.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string", "description": "Stable source ID."},
+                            "authority": {"type": "string",
+                                          "description": "Source authority level."},
+                            "kind": {"type": "string", "description": "Source kind."},
+                            "locator": {"type": "string",
+                                        "description": ("Repository-relative source "
+                                                        "path.")},
+                            "requires_source_label": {
+                                "type": "string",
+                                "description": ("'true' when quotations must carry a "
+                                                "source label, 'false' otherwise.")},
+                            "visibility": {"type": "string",
+                                           "description": ("Visibility level used by "
+                                                           "clearance filtering.")}},
+                        "required": ["id", "authority", "kind", "locator",
+                                     "requires_source_label", "visibility"],
+                        "additionalProperties": False}},
+            },
+            "required": ["clearance", "contract_first", "count", "query_order"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "module_read",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description"
-            "": "取模块正文实质内容（04_模块库 + community modules，按 id 或限定 id 解析）。",
+        "title": "Read module",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Read one NF module's full Markdown by ID, including its raw "
+            "machine-contract block when present. Use it after registry_query resolves a "
+            "module, or enumerate module resources with resources/list type=module; for "
+            "pipelines or assets use pipeline_read or asset_get. Accepts an "
+            "exact machine-contract or heading ID (M90) or a qualified ID (通用:M10, as "
+            "returned by registry_query); matching is case-sensitive, and an unknown ID "
+            "returns an error with the requested value and repair guidance. Read-only: "
+            "reads one local file, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"module_id": {"type": "string", "description": "如 M90 或 通用:M10"}},
+            "properties": {"module_id": {
+                "type": "string",
+                "description": ("Exact ID (M90) or qualified ID (通用:M10); matching is "
+                                "case-sensitive.")}},
             "required": ["module_id"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "A module file with its metadata and full Markdown body.",
+            "properties": {
+                "found": {"type": "boolean",
+                          "description": "True when the module was located."},
+                "id": {"type": "string",
+                       "description": "Machine-contract or heading ID of the module."},
+                "path": {"type": "string",
+                         "description": "Repository-relative Markdown path."},
+                "has_machine_contract": {
+                    "type": "boolean",
+                    "description": ("True when a machine_contract block was parsed from "
+                                    "the file.")},
+                "bytes": {"type": "integer",
+                          "description": "UTF-8 byte length of text."},
+                "text": {"type": "string",
+                         "description": "Full module Markdown as stored on disk."},
+            },
+            "required": ["found", "id", "path", "has_machine_contract", "bytes", "text"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "pipeline_read",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "取管线正文实质内容（03_管线库 + community pipelines，按 id 或相对路径）。",
+        "title": "Read pipeline",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Read one NF pipeline's full Markdown by P-number or repository-relative path. "
+            "Use it after pipeline_ls identifies a pipeline; for modules or assets use "
+            "module_read or asset_get. pipeline is either a Pxx stem (P01, matched against "
+            "the filename prefix) or a .md path under 03_管线库/ or inside a community "
+            "pipelines/ directory; paths outside those roots and .. escapes are rejected. "
+            "Read-only: reads one local file, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "properties": {"pipeline": {"type": "string",
- "description": "如 P90 或 community/…/P04….md"}},
+            "properties": {"pipeline": {
+                "type": "string",
+                "description": ("Pxx stem (P01) or repository-relative .md path under "
+                                "03_管线库/ or community/*/pipelines/.")}},
             "required": ["pipeline"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "A pipeline file with its path and full Markdown body.",
+            "properties": {
+                "found": {"type": "boolean",
+                          "description": "True when the pipeline was located."},
+                "path": {"type": "string",
+                         "description": "Repository-relative Markdown path."},
+                "bytes": {"type": "integer",
+                          "description": "UTF-8 byte length of text."},
+                "text": {"type": "string",
+                         "description": "Full pipeline Markdown as stored on disk."},
+            },
+            "required": ["found", "path", "bytes", "text"],
+            "additionalProperties": False,
         },
     },
     {
         "name": "asset_get",
-        "annotations": {"readOnlyHint": True},   # 只读红线写成协议层可机读形式
-        "description": "取资产正文实质内容（community/*/assets + 05 用户自定义，按键/包定位）。",
+        "title": "Get asset",
+        # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
+        "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                        "idempotentHint": True, "openWorldHint": False},
+        "description": (
+            "Read every asset file that declares a given asset key, returning each match's "
+            "package, file path, and full text. Use it when a package README or asset "
+            "listing names a key such as EMOTION_WHEEL, or enumerate keys with "
+            "resources/list type=asset; for modules use module_read. The "
+            "key match is exact and case-sensitive, using the uppercase tokens found in "
+            "each asset file's name or first 6000 characters; optional package restricts "
+            "the search to community/<package>/assets (for example 校园情感领域包), "
+            "otherwise all community assets and 05_资产库 are searched, and multiple "
+            "matches are returned. A key with no match is an error, not an empty result. "
+            "Read-only, with no writes or network."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
             "properties": {
                 "key": {"type": "string",
- "description": "资产键（如 EMOTION_WHEEL / JOB / TECH_RULES）"},
-                "package": {"type": "string", "description": "可选包过滤（如 校园情感领域包）"},
+                        "description": ("Exact, case-sensitive asset key (for example "
+                                        "EMOTION_WHEEL, JOB, or TECH_RULES).")},
+                "package": {"type": "string",
+                            "description": ("Optional community package name; omit to "
+                                            "search all community assets and 05_资产库.")},
             },
             "required": ["key"],
+        },
+        "outputSchema": {
+            "type": "object",
+            "description": "Every asset file that declares the requested key.",
+            "properties": {
+                "found": {"type": "boolean",
+                          "description": "True when at least one asset file matched."},
+                "key": {"type": "string", "description": "Requested asset key."},
+                "matches": {
+                    "type": "array",
+                    "description": "Matching files, one entry per declaring asset.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "package": {"type": "string",
+                                        "description": ("Community package name, or 官方 "
+                                                        "for user-defined assets.")},
+                            "file": {"type": "string",
+                                     "description": "Repository-relative Markdown path."},
+                            "bytes": {"type": "integer",
+                                      "description": "UTF-8 byte length of text."},
+                            "text": {"type": "string",
+                                     "description": "Full asset Markdown as stored on disk."}},
+                        "required": ["package", "file", "bytes", "text"],
+                        "additionalProperties": False}},
+            },
+            "required": ["found", "key", "matches"],
+            "additionalProperties": False,
         },
     },
 ]
@@ -512,6 +915,11 @@ def _tool_registry_query(query: str) -> dict:
 
 def _tool_library_search(query: str, limit: int = 10) -> list:
     """只读检索：馆藏条目（frontmatter 真源，正文级）∪ 仓库文档标题/路径。"""
+    # `limit` 在 inputSchema 里声明为 1–50 的整数；未注入 schema_check 的调用方
+    # （单测 / 内嵌运行时）仍可能绕过声明面，故处理器自身再闸一次，避免 str 切片崩溃。
+    if not isinstance(limit, int) or isinstance(limit, bool):
+        raise ValueError("limit 须为 1–50 的整数（收到 %s）" % type(limit).__name__)
+    limit = max(1, min(50, limit))
     root = _repo_root()
     q = query.strip()
     hits = []
@@ -581,7 +989,10 @@ def _tool_knowledge_order(clearance: str = "") -> dict:
     from core import knowledge as kn
     root = _repo_root()
     rows = kn.resolve_order(root, clearance=(clearance or ""))
-    return {"clearance": clearance or "不裁剪", "contract_first": True,
+    # 此前硬编码 True；改为从声明顺序实算（首源 authority=contract ⇒ 合同级在先），
+    # 避免「声明改了、字段还说 true」的静默失真。
+    contract_first = bool(rows) and str(rows[0].get("authority") or "") == "contract"
+    return {"clearance": clearance or "不裁剪", "contract_first": contract_first,
             "count": len(rows), "query_order": rows}
 
 
@@ -739,7 +1150,8 @@ TOOL_HANDLERS = {
     "pipeline_ls": lambda a: _tool_pipeline_ls((a or {}).get("query", "")),
     "spec_ls": lambda a: _tool_spec_ls(),
     "registry_query": lambda a: _tool_registry_query((a or {}).get("query", "")),
-    "library_search": lambda a: _tool_library_search((a or {}).get("query", "")),
+    "library_search": lambda a: _tool_library_search((a or {}).get("query", ""),
+                                                     (a or {}).get("limit", 10)),
     "library_read": lambda a: _tool_library_read((a or {}).get("entry_id", "")),
     "pattern_read": lambda a: _tool_pattern_read((a or {}).get("pattern_id", "")),
     "knowledge_order": lambda a: _tool_knowledge_order((a or {}).get("clearance", "")),
@@ -1107,6 +1519,9 @@ class McpRuntime:
             "protocolVersion": version,
             "capabilities": self._capabilities(),
             "serverInfo": {"name": self.server_name, "version": self.server_version},
+            # MCP InitializeResult 的可选 instructions 位：目录站/客户端在读工具表
+            # 之前先看到「只读、无写路径、无网络」的定位，与 server/discover 同源。
+            "instructions": _discover_instructions(),
         }
 
     # ---- C7 只读 tools/prompts（41 波C；无写路径）----
@@ -1147,9 +1562,16 @@ class McpRuntime:
                     "传参——键名/类型/枚举须一致，勿夹带多余键）"
                     % (name, "；".join((errs + unsup)[:4])))
         result = handler(args)
-        payload: Dict[str, Any] = {"content": [{"type": "text",
-                               "text": json.dumps(result, ensure_ascii=False,
-                                                  indent=2, sort_keys=True)}]}
+        # MCP 2025-06-18+：声明了 outputSchema 的工具必须同时给 structuredContent。
+        # 列表型结果统一包成 {"items": [...]}（与 outputSchema 的根对象一致）；content
+        # 仍保留原来的 JSON 文本，老客户端按文本消费不受影响。
+        structured = result if isinstance(result, dict) else {"items": result}
+        payload: Dict[str, Any] = {
+            "content": [{"type": "text",
+                         "text": json.dumps(result, ensure_ascii=False,
+                                            indent=2, sort_keys=True)}],
+            "structuredContent": structured,
+        }
         # 信任边界（06 §12）：结果里只要掺了外来面（library/ / community/ / 外部材料），
         # 就带一条 `_meta` 标注——消费方据此按**数据**消费，标注不改正文一个字节。
         srcs: List[str] = []

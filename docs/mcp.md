@@ -1,5 +1,5 @@
 # NinFenz MCP 接入（`nf serve` · 40 总纲 v2.7 波A S1-E3 / X2）
-> 最后更新：2026-09-30
+> 最后更新：2026-10-18
 
 > **状态**：公开化文档已随基础层 v2.7 落地；**E3 协议级装载实测已于 2026-09-08 通过**（stdio JSON-RPC 帧序列直测五方法全绿，见文末记录；修复 P06 管线两缺口——缺闭合 ``` / 缺 techdoc 声明）。41 波C C7（2026-09-08）开放只读 tools/prompts（本机 stdio 冒烟通过，见 docs/41_波C_C7_实测记录.md）。**宿主类客户端（Claude Desktop 等 GUI 装载）仍建议用户侧补录**——README 对 MCP 的宣告维持现状（S13 门按 docs_external-validation-v2.7.md 规则开），回填后补「转正」。
 
@@ -92,7 +92,8 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 | `resources/read` | ✅ | 白名单 uri → `contents[].text`；未知 uri → `-32602` |
 | `tools/list` / `tools/call`（只读 · 检索面） | ✅ | 41 波C C7：library_search / registry_query / pipeline_ls / spec_ls（inputSchema 真实存在，全只读） |
 | `tools/list` / `tools/call`（只读 · 内容通道） | ✅ | 44：module_read / pipeline_read / asset_get——返回模块/管线/资产正文实质内容（不只元数据） |
-| `tools/list` 的工具注解 | ✅ | 10 个工具全部声明 `annotations.readOnlyHint: true`（2026-10-08 起）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
+| `tools/list` 的工具注解 | ✅ | 10 个工具全部声明 `readOnlyHint` / `destructiveHint: false` / `idempotentHint` / `openWorldHint: false`（2026-10-18 起四项齐全）——「只读」不止写在散文里，MCP 客户端据此可**自动放行**只读调用，不必逐个弹窗 |
+| `tools/list` 的定义质量面 | ✅ | 每个工具都有 `title`、面向 agent 的 purpose/usage/behavior 描述、逐属性 `inputSchema` 说明、逐字段 `outputSchema`；`tools/call` 同时返回文本 `content` 与 `structuredContent` |
 | `prompts/list` / `prompts/get` | ✅ | 41 波C C7：assemble_guide 装载引导模板（只读） |
 | 写路径工具（未实现） | ❌ | 未知工具 → `-32602`；未知方法 → `-32601`（只读安全层天然拒写） |
 
@@ -230,3 +231,22 @@ python scripts/nf.py serve <输出目录>/mcp.json
 > （协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。
 > 10 个只读工具 + 1 个装载引导 prompt，支持 modern `2026-07-28` 与 legacy `2025-11-25`
 > 双协议版本，零第三方依赖，无写路径。
+
+### 七、容器 / Glama（stdio 镜像）
+
+仓库根目录的 `Dockerfile` 是 Glama（以及任何「构建后用 stdio 自省」的目录站）入口：
+镜像只拷贝只读面真正会打开的文件，以非 root 用户运行，`CMD` 就是
+`python scripts/nf.py serve`（实时仓库面，无需快照）。
+
+```bash
+docker build -t ninfenz-glama .
+printf '%s\n' \
+  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"probe","version":"1"}}}' \
+  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+  | docker run --rm -i ninfenz-glama
+```
+
+Glama Admin 页的 Build steps 留空、CMD arguments 填 `["python","scripts/nf.py","serve"]`、
+环境变量 schema 为空对象；完整步骤与评分口径见根目录 `GLAMA.md`。镜像没有端口 /
+出站网络，行为和本地 `nf serve` 是同一套实现。

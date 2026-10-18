@@ -169,5 +169,55 @@ class McpToolAnnotationsTest(unittest.TestCase):
         self.assertEqual([], self._offenders(mrt.TOOL_DEFS))
 
 
+class McpToolDefinitionQualityTest(unittest.TestCase):
+    """工具定义质量面（2026-10-18，Glama TDQS 上架准备）。
+
+    目录站读的是 `tools/list`，不是 README：title / 四项 annotations / 逐属性
+    inputSchema 说明 / 逐字段 outputSchema 缺一项，分数就掉一档。本件把
+    「定义面不退化」钉住——改描述时别只改文档。
+    """
+
+    def test_every_tool_has_title_and_full_annotation_set(self):
+        for t in mrt.TOOL_DEFS:
+            ann = t.get("annotations") or {}
+            self.assertTrue(t.get("title"), "%s 缺 title" % t["name"])
+            self.assertNotEqual(t["title"], t["name"], "%s 的 title 只是复述 name" % t["name"])
+            self.assertIs(ann.get("readOnlyHint"), True, t["name"])
+            self.assertIs(ann.get("destructiveHint"), False, t["name"])
+            self.assertIs(ann.get("idempotentHint"), True, t["name"])
+            self.assertIs(ann.get("openWorldHint"), False, t["name"])
+
+    def test_every_tool_has_a_documented_output_schema(self):
+        for t in mrt.TOOL_DEFS:
+            out = t.get("outputSchema") or {}
+            self.assertEqual("object", out.get("type"), t["name"])
+            self.assertTrue(out.get("properties"), "%s 的 outputSchema 为空" % t["name"])
+            for name, prop in out["properties"].items():
+                self.assertTrue(prop.get("description"),
+                                "%s.outputSchema.%s 缺字段说明" % (t["name"], name))
+
+    def test_every_tool_description_carries_the_tdqs_signals(self):
+        for t in mrt.TOOL_DEFS:
+            desc = t.get("description") or ""
+            self.assertGreaterEqual(len(desc), 200, "%s 描述过短" % t["name"])
+            low = desc.lower()
+            self.assertIn("use ", low, "%s 缺 usage guidance" % t["name"])
+            self.assertTrue(("instead" in low) or ("for " in low),
+                            "%s 没有具名替代工具/边界" % t["name"])
+            for prop, spec in (t["inputSchema"].get("properties") or {}).items():
+                self.assertTrue(spec.get("description"),
+                                "%s.%s 缺参数说明" % (t["name"], prop))
+
+    def test_tool_call_publishes_structured_content(self):
+        rt = mrt.McpRuntime({"mcp": {"name": "structured", "version": "0",
+                                     "resources": []}})
+        resp = rt.handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                          "params": {"name": "pipeline_ls", "arguments": {}}})
+        result = resp["result"]
+        self.assertIn("structuredContent", result)
+        self.assertEqual(["items"], list(result["structuredContent"]))
+        self.assertIsInstance(result["structuredContent"]["items"], list)
+
+
 if __name__ == "__main__":
     unittest.main()

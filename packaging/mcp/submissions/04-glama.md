@@ -17,3 +17,14 @@
 **标签 / Tags**：mcp, content-contract, spec-driven, verification, knowledge-base, python, llm
 **许可 / License**：MIT
 **图标 / Icon**：packaging/mcp/assets/icon-400.png（400×400 PNG）
+
+## 仓库侧已备（2026-10-18）
+
+| 文件 | 作用 |
+|---|---|
+| `Dockerfile` | Glama 构建 + stdio 启动（非 root、无 pip install、`CMD` = `python scripts/nf.py serve`） |
+| `glama.json` | 主张维护者 `Monyeah777`（Claim 时读取） |
+| `GLAMA.md` | Admin 页 Build steps / CMD arguments / env schema 的逐步口径 |
+| `desktop/src/core/mcp_runtime.py` | 10 个工具的 TDQS 定义面：title + 四项 annotations + 逐字段 outputSchema |
+
+这些文件必须在 GitHub 默认分支上 Glama 才会构建；本地工作区不会被读取。

@@ -13,3 +13,22 @@
 **/*.pyc
 packaging/npm/payload
 site
+
+# --- 根 Dockerfile（Glama / stdio MCP 镜像）额外挡掉的非运行时输入 ---
+# 注意：`engine/` 不能整目录排除——Dockerfile.crosscheck 仍要 engine/rust 与
+# engine/dotnet 的源码；这里只排除本机生成的 wasm 产物。
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.wrangler/
+desktop/tests/
+engine/wasm/
+results/
+changes/
+decisions/
+handovers/
+postmortems/
+integrations/
+tui/
+packaging/
