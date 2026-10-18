@@ -904,13 +904,13 @@ TOOL_DEFS = [
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read every asset file that declares an asset key. Use it for a key from "
-            "asset_ls; do not use it to enumerate keys (use asset_ls instead), read "
-            "modules (module_read), or read pipelines (pipeline_read). key is an exact "
-            "uppercase token—no glob, regex, fuzzy match, or prose; package is an exact "
-            "package directory name, not a path. Tokens come from each file's name or "
-            "first 6000 chars; lowercase or partial keys fail. package limits the scan to "
-            "community/<package>/assets; otherwise all community assets and 05_资产库 are "
-            "searched, and multiple matches are returned. No match is an error."),
+            "asset_ls; enumerate with asset_ls, and use module_read/pipeline_read for other "
+            "resources. key is an exact uppercase token, not a glob/regex/package/path/"
+            "prose; package is an exact directory name, not a path. Tokens come from each "
+            "file's name or first 6000 chars; lowercase/partial keys fail. package narrows "
+            "the scan to community/<package>/assets with no fallback; omit it to search all "
+            "community assets and 05_资产库. Multiple matches may be returned; no match is "
+            "an error."),
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,

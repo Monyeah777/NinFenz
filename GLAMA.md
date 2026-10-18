@@ -384,15 +384,17 @@ Purpose 5 · Usage 5 · Behavior 5 · Completeness 5 · Parameters 4 · Concisen
 反馈：定义强、Behavior 已满；剩余缺口只有 **Parameters**（schema 已 100% 覆盖，需补更强的意图）
 和 **Conciseness**（密度略高）。
 
-本轮改动：
+第一轮（已到 4.8）：删除 canonical/只读尾句，补 `asset_ls` / `module_read` / `pipeline_read`
+替代，补 `key` 的 uppercase、非包名/路径/散文语义。
 
-- 删除“MCP read surface for the protocol's canonical asset_get interface”与尾部只读句；
-- 明确 `key` 是“exact uppercase token，无 glob / regex / fuzzy / prose”，`package` 是
-  “exact package directory name，不是 path”——这是 schema 没写的参数意图；
-- 明确 `do not use it to enumerate keys (use asset_ls instead), read modules
-  (module_read), or read pipelines (pipeline_read)`；
-- 保留精确/大小写匹配、扫描字段、包作用域、多匹配、无匹配即错误；
-- 从 103 词压到约 91 词，拆开 run-on 句，目标：Parameters / Conciseness 从 4 推到 5。
+第二轮（本版，目标 5）：
+
+- 从 91 词再压到 **84 词**，拆开 run-on 句；
+- `key` 补 **no glob / regex / fuzzy / prose**；
+- `package` 补 **exact directory name，不是 path**，并补默认/交互：
+  **narrows the scan with no fallback；omit it to search all community assets and 05_资产库**；
+- 保留精确/大小写匹配、扫描文件名或前 6000 字符、多匹配、无匹配即错误；
+- 明确枚举走 `asset_ls`，其他资源走 `module_read` / `pipeline_read`。
 
 ## 附录：官方参考
 

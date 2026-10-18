@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
+  - protocol/code_metrics_baseline.json:d10bdb344b42a1d5b76512cd65ca0fcf6a17a6b273a69ebedf4ba59921bad8fc
 ---
+> 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）
+
 > 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
 
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:35f47840d975f18045a578dc1ee16c692e965e696220c4fe205b4ee25be1b07b
+  - protocol/code_metrics_baseline.json:d10bdb344b42a1d5b76512cd65ca0fcf6a17a6b273a69ebedf4ba59921bad8fc
 ---
+> 重审（2026-10-18）：P3：缓存写走 atomic_write（脚本面纪律）
+
 > 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）
 
 > 重审（2026-10-18）：P2/P3 收口：CI 契约改 full 档 + 规模棘轮
