@@ -20,6 +20,8 @@ import cli_harness  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 NF = str(ROOT / "scripts" / "nf.py")
+#: 命令面清单缓存（同一进程里的 8 个切片共用一次枚举，避免各扫一遍 argparse）。
+_CACHE: dict = {}
 
 GUIDE = re.compile(r"修复指引|示例|详见|参见|可枚举|看全量")
 
@@ -785,64 +787,72 @@ class BareInvocationSweepTest(unittest.TestCase):
     #: 无参即跑**全量门禁**的命令 → 理由（按设计的长任务，不是挂起）
     LONG_BY_DESIGN = {"release": "无参即跑 verify.sh 全量（本机 ~10 分钟）——按设计，跳过"}
 
-    def test_bare_invocation_never_crashes(self):
-        # 进程内跑：本方法逐条无参扫**全部命令路径**（≥140 条），是全仓最大 spawn 热点。
-        # 实测：真 spawn 单次 143.7 ms ⇒ 本方法约 200 s；进程内单次 ≈0 ms。
-        # 判据一字不动——仍只看「内部错误 / Python 栈」。
-        inv = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
-                                       cwd=str(ROOT))
-        rows = json.loads(inv.stdout).get("rows") or []
-        self.assertGreaterEqual(len(rows), 140, "命令面清单异常（判据可能已失效）")
-        bad, checked = [], 0
-        for row in rows:
-            path = row["path"]
-            if path.split()[0] in self.LONG_BY_DESIGN:
-                continue
-            checked += 1
-            r = cli_harness.run_cli_proc([sys.executable, "-X", "utf8", NF, *path.split()],
-                                         cwd=str(ROOT))
-            blob = (r.stderr or "") + (r.stdout or "")
-            if has_internal_error(blob):
-                bad.append("%s：rc=%d %s" % (path, r.returncode,
-                                             (r.stderr or "").strip().splitlines()[:1]))
-        self.assertGreaterEqual(checked, 140, "扫到的命令路径不足（判据可能已失效）")
-        self.assertEqual([], bad, "无参直跑冒内部错误/栈（修复指引：给该子命令组加 "
-                                 "`add_subparsers(required=True)`，或在 handler 里给用法指引）：%s"
-                                     "" % bad)
+    def _rows(self):
+        if "rows" not in _CACHE:
+            inv = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
+                                           cwd=str(ROOT))
+            _CACHE["rows"] = json.loads(inv.stdout).get("rows") or []
+        return _CACHE["rows"]
 
-    def test_bare_json_invocation_stays_machine_readable(self):
-        """同一普查的**机器面**版本：声明了 `--json` 的面无参 + `--json` 直跑。
+    def _bare_sweep(self, index: int, total: int, json_mode: bool = False):
+        """无参直跑扫**第 index/total 片**（切片只改执行粒度，不减少任何一条检查）。
 
-        依据（2026-10-01 普查）：100 个声明 `--json` 的面各跑一次——**0 内部错误、0 非 JSON**
-        （65 条产出合法 JSON，其余是 argparse 用法错 rc=2，属正常）。这条与上一条互补：上一条
-        覆盖「人敲一半」，这条覆盖**agent 真正反复调用的机器形态**（无参 + `--json`），一旦某条
-        机器面在此崩掉，消费方按 JSON 解析 stdout 就会直接失败。
+        P2（2026-10-18 实测）：这两条是全仓最大/第二大的进程内扫描（≥140 / ≥90 条面），
+        单条墙钟 ~90 s，是分片的地板。切 4 片后每片 ~20 s，分片能真正并行它们；
+        每片仍逐条跑「无参（或 --json）」，判据与报错文案一字不动。
         """
-        # 进程内跑（同上一条：这是第二大 spawn 热点，≥90 个面各跑一次）。
-        inv = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
-                                       cwd=str(ROOT))
-        rows = json.loads(inv.stdout).get("rows") or []
+        rows = self._rows()
         faces = [r["path"] for r in rows
-                 if "--json" in (r.get("flags") or [])
-                 and r["path"].split()[0] not in self.LONG_BY_DESIGN]
-        self.assertGreaterEqual(len(faces), 90, "带 --json 的面不足（判据可能已失效）")
+                 if r["path"].split()[0] not in self.LONG_BY_DESIGN
+                 and (not json_mode or "--json" in (r.get("flags") or []))]
+        chunk = faces[index::total]
+        if total == 1:
+            self.assertGreaterEqual(len(faces), 140 if not json_mode else 90,
+                                    "命令面清单异常（判据可能已失效）")
+        self.assertTrue(chunk, "切片 %d/%d 为空（判据形同虚设）" % (index, total))
         bad = []
-        for path in faces:
-            r = cli_harness.run_cli_proc([sys.executable, "-X", "utf8", NF, *path.split(), "--json"],
-                                         cwd=str(ROOT))
+        for path in chunk:
+            argv = [sys.executable, "-X", "utf8", NF, *path.split()]
+            if json_mode:
+                argv.append("--json")
+            r = cli_harness.run_cli_proc(argv, cwd=str(ROOT))
             blob = (r.stderr or "") + (r.stdout or "")
             if has_internal_error(blob):
-                bad.append("%s --json：rc=%d %s" % (path, r.returncode,
-                                                    (r.stderr or "").strip().splitlines()[:1]))
+                bad.append("%s%s：rc=%d %s"
+                           % (path, " --json" if json_mode else "", r.returncode,
+                              (r.stderr or "").strip().splitlines()[:1]))
                 continue
-            if r.returncode == 2:
-                continue                      # argparse 用法错：正常
-            try:
-                json.loads((r.stdout or "").strip())
-            except ValueError:
-                bad.append("%s --json：rc=%d stdout 非 JSON（%s）"
-                           % (path, r.returncode, (r.stdout or "")[:40]))
-        self.assertEqual([], bad, "机器面无参直跑不合契约：%s" % bad)
+            if json_mode and r.returncode != 2:
+                try:
+                    json.loads((r.stdout or "").strip())
+                except ValueError:
+                    bad.append("%s --json：rc=%d stdout 非 JSON（%s）"
+                               % (path, r.returncode, (r.stdout or "")[:40]))
+        self.assertEqual([], bad, "无参直跑冒内部错误/栈或无参机器面不合契约：%s" % bad)
+
+    def test_bare_invocation_never_crashes_chunk0(self):
+        self._bare_sweep(0, 4)
+
+    def test_bare_invocation_never_crashes_chunk1(self):
+        self._bare_sweep(1, 4)
+
+    def test_bare_invocation_never_crashes_chunk2(self):
+        self._bare_sweep(2, 4)
+
+    def test_bare_invocation_never_crashes_chunk3(self):
+        self._bare_sweep(3, 4)
+
+    def test_bare_json_invocation_stays_machine_readable_chunk0(self):
+        self._bare_sweep(0, 4, json_mode=True)
+
+    def test_bare_json_invocation_stays_machine_readable_chunk1(self):
+        self._bare_sweep(1, 4, json_mode=True)
+
+    def test_bare_json_invocation_stays_machine_readable_chunk2(self):
+        self._bare_sweep(2, 4, json_mode=True)
+
+    def test_bare_json_invocation_stays_machine_readable_chunk3(self):
+        self._bare_sweep(3, 4, json_mode=True)
 
 
 class EntryGateMachineFaceTest(unittest.TestCase):

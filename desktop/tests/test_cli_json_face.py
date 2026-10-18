@@ -296,14 +296,19 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
         self.assertEqual([], bad, "需参面缺面判别键：%s" % bad)
 
     def test_every_json_face_has_a_destination(self):
-        """覆盖点名：每张声明 `--json` 的面要么无参可跑、要么在 CANON、要么在 SKIP 有理由。"""
+        """覆盖点名：每张声明 --json 的面要么无参可跑、要么在 CANON、要么在 SKIP 有理由。
+
+        P2（2026-10-18 实测）：原实现先把**所有**面真跑一遍再算 `faces - (runs ∪ CANON ∪ SKIP)`，
+        单条白付 ~90 s。判据等价改写：`orphan = {f ∉ CANON/SKIP : 无参跑 rc=2}`——只跑
+        「尚未被点名」的那些面（正常为 0，异常时才多跑几条），结果集与旧式**逐项相同**。
+        """
         rows, runs = _probe_faces()
         faces = {r["path"] for r in rows}
-        covered = set(runs) | set(CANON) | set(SKIP)
-        orph = sorted(faces - covered)
+        known = set(CANON) | set(SKIP)
+        orph = sorted(faces - (set(runs) | known))
         self.assertEqual([], orph, "既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：%s" % orph)
         self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
-        stale = sorted((set(CANON) | set(SKIP)) - faces)
+        stale = sorted(known - faces)
         self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
 
     def test_skip_reasons_point_at_real_coverage(self):
