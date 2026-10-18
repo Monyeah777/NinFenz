@@ -435,7 +435,7 @@ TOOL_DEFS = [
     },
     {
         "name": "registry_query",
-        "title": "Query registry",
+        "title": "Search module registry",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
@@ -764,7 +764,7 @@ TOOL_DEFS = [
     },
     {
         "name": "module_read",
-        "title": "Read module",
+        "title": "Fetch module document",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
@@ -811,7 +811,7 @@ TOOL_DEFS = [
     },
     {
         "name": "pipeline_read",
-        "title": "Read pipeline",
+        "title": "Fetch pipeline document",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
@@ -898,7 +898,7 @@ TOOL_DEFS = [
     },
     {
         "name": "asset_read",
-        "title": "Read asset",
+        "title": "Fetch asset content",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},

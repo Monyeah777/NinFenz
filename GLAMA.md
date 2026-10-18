@@ -426,7 +426,37 @@ MCP 描述实证研究放在一起对照，结论更清楚。
 Purpose+Returns → Usage/Alternatives → Key/Package → Matching/Limitations → Default/Error，
 与 TDQS 模板和 Anthropic 的“what / returns / doesn't do”一致。
 
-### 15.3 决策
+### 15.3 规范 lint 结果（确定性，无模型）
+
+用官方 `mcp-tdqs` 1.3 对实时 stdio 服务跑确定性阶段：
+
+```bash
+npx -y mcp-tdqs lint --command "python scripts/nf.py serve" \
+  --server-name "NinFenz Content Gate" --format json
+```
+
+结果：`findings 0` · `shadowCandidates 0` · `toolCount 12`。
+但 context signal 暴露了 4 个 **titleIsMeaningful=false**：
+
+```text
+registry_query  -> Query registry      （title 只是 name 的复述）
+module_read     -> Read module
+pipeline_read   -> Read pipeline
+asset_read      -> Read asset
+```
+
+已改为：
+
+```text
+registry_query  -> Search module registry
+module_read     -> Fetch module document
+pipeline_read   -> Fetch pipeline document
+asset_read      -> Fetch asset content
+```
+
+重跑 lint：12/12 `titleIsMeaningful=true`，仍 0 findings / 0 shadow。
+
+### 15.4 决策
 
 - `asset_read` 不再继续压到 70 词以下：会丢 Limitations 或 Returns，按上述标准反而降分；
 - 100 词是“复杂只读工具”的合理上限；如果 Glama 仍给 4.8，属于评分器对 100% schema 覆盖工具
