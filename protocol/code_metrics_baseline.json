@@ -1491,7 +1491,7 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 549,
+      "lines": 556,
       "max_fn_cc": 43,
       "max_fn_lines": 191
     },

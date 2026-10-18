@@ -39,7 +39,14 @@ TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
 SHARD_TIMEOUT_S = 5400.0
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
-SERIAL_MODULES = frozenset({"test_atomic_write", "test_daemon", "test_governance_faces"})
+SERIAL_MODULES = frozenset({
+    "test_atomic_write", "test_daemon", "test_governance_faces",
+    # 2026-10-18 实测（16 片 + 动态队列）：下面这几族是"读协议内容快照"的判据，与"会短暂改写
+    # protocol/ 的判据"（schema_lint 的变异用例等）同机并发时会互相扫到中间态 → 串行段跑。
+    # 它们本身很便宜（合计 32 s），放到并发段后面独占跑，代价远小于偶发红。
+    "test_schema_lint", "test_schema_reference", "test_quality_depth_scan",
+    "test_instruction_step_audit", "test_pipeline_loader",
+})
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
 # 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
 # 判据不能与"会短暂写全仓"的判据同时跑。并发段跑完再独占跑它，判据不变、确定性恢复。
