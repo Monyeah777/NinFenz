@@ -3,13 +3,13 @@
 > ⛔ 操作指令：阅读即执行（取货顺序 → 选件铁律 → 八段骨架 → 自检；勿当资料阅读）。
 > 最后更新：2026-09-09
 > **🔌 DRIVER OVERRIDE（先于本文件其余步骤执行）**：本文件对应工作流 `assemble`（机读真源 `protocol/driver.json`）。
-> - 若该工作流已映射且 MCP 可用（`nf serve`，见 `docs/mcp.md`）→ **改走 MCP**（提示 `assemble_guide`；工具 `module_read` / `pipeline_read` / `asset_get`），本文件其余步骤**不再执行**。
+> - 若该工作流已映射且 MCP 可用（`nf serve`，见 `docs/mcp.md`）→ **改走 MCP**（提示 `assemble_guide`；工具 `module_read` / `pipeline_read` / `asset_read`），本文件其余步骤**不再执行**。
 > - 派发失败（工具报错 / 服务中途不可达）→ **如实报错并停止**，**不得回退**执行下面的文本步骤。
 > - 仅当**本工作流无映射**或**本会话未启用 MCP 面**时，才按本文件文本步骤执行（fallback）。
 > 用途：让**任意聊天 AI / Agent**（豆包、DeepSeek、Kimi、文心一言、ChatGPT 免费版、Claude、本地模型等），**仅凭 NinFenz 仓库地址**，即可自助取货、按规范组装、直接产出「完整版」叙事世界文档——全程不需要桌面工具。
 > 配套：单件生产（做一个模块/管线/资产包）用 `community/模板制作指令包.md`；本包负责**整装**（把选中的件装配成一个可直接开跑的世界）。
 >
-> **v0.2 升级（内容通道取货协议）**：取货分两档——① 仓库只读（clone/raw 直链）按下方「第一步 · 取货」的文件顺序读；② 有 NF MCP 通道（`nf serve`，A 线/开发者环境）时改用**内容工具**取实质正文：`module_read <模块 id>` / `pipeline_read <Pxx 或路径>` / `asset_get <资产键>`（或标准资源面 `resources/read` `nf://repo/module/<id>`、`nf://repo/pipeline/<Pxx>`、`nf://repo/asset/<包>/<键>`）。**任一档都必须先读后写、禁止凭记忆**——装配记录里引用的每个模块/管线/资产都要真被读过或如实标注缺口。
+> **v0.2 升级（内容通道取货协议）**：取货分两档——① 仓库只读（clone/raw 直链）按下方「第一步 · 取货」的文件顺序读；② 有 NF MCP 通道（`nf serve`，A 线/开发者环境）时改用**内容工具**取实质正文：`module_read <模块 id>` / `pipeline_read <Pxx 或路径>` / `asset_read <资产键>`（或标准资源面 `resources/read` `nf://repo/module/<id>`、`nf://repo/pipeline/<Pxx>`、`nf://repo/asset/<包>/<键>`）。**任一档都必须先读后写、禁止凭记忆**——装配记录里引用的每个模块/管线/资产都要真被读过或如实标注缺口。
 > **v0.2 自检补一条（硬断言）**：在「##7 自检清单」之外，逐项核对“本完整版引用的所有模块编号/资产键，均来自我实际读到的源文件或已标注的缺口”——编号错位、编造键、凭印象写职责任一命中即回炉（对齐 execution_drill R1-R4 失范类）。
 
 ## 怎么用（三步）

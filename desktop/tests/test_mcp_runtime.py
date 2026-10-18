@@ -280,9 +280,9 @@ class TestMcpRuntime(unittest.TestCase):
             resp = self.srv.handle(_req(41, "resources/read", {"uri": u}))
             self.assertIn("text", resp["result"]["contents"][0])
             self.assertNotIn("error", resp)
-        # 资产：包内社区键也可经 asset_get 取正文
+        # 资产：包内社区键也可经 asset_read 取正文
         resp = self.srv.handle(_req(42, "tools/call", {
-            "name": "asset_get",
+            "name": "asset_read",
             "arguments": {"key": "EMOTION_WHEEL", "package": "校园情感领域包"}}))
         payload = json.loads(resp["result"]["content"][0]["text"])
         self.assertTrue(payload["found"])
@@ -318,7 +318,7 @@ class TestMcpRuntime(unittest.TestCase):
         self.assertEqual(names,
                          {"library_search", "registry_query",
                           "pipeline_ls", "spec_ls",
-                          "module_read", "pipeline_read", "asset_get",
+                          "module_read", "pipeline_read", "asset_read",
                           "library_read", "pattern_read", "knowledge_order"})
         for t in tools:
             self.assertIn("inputSchema", t)
@@ -349,10 +349,10 @@ class TestMcpRuntime(unittest.TestCase):
         self.assertTrue(payload["found"])
         self.assertIn("P90", payload["text"])
 
-    def test_tools_call_asset_get_content(self):
-        """44 内容通道：asset_get 返回资产正文（官方用户自定义 TECH_RULES）。"""
+    def test_tools_call_asset_read_content(self):
+        """44 内容通道：asset_read 返回资产正文（官方用户自定义 TECH_RULES）。"""
         resp = self.srv.handle(_req(27, "tools/call", {
-            "name": "asset_get", "arguments": {"key": "TECH_RULES"}}))
+            "name": "asset_read", "arguments": {"key": "TECH_RULES"}}))
         payload = json.loads(resp["result"]["content"][0]["text"])
         self.assertTrue(payload["found"])
         self.assertEqual(payload["matches"][0]["package"], "官方")
@@ -894,7 +894,7 @@ class DeclaredSurfaceVsHandlersTest(unittest.TestCase):
                    "library_search": {"query": "NF"}, "library_read": {"entry_id": "NF-1"},
                    "pattern_read": {"pattern_id": "fail-closed-verification"},
                    "knowledge_order": {}, "module_read": {"module_id": "M90"},
-                   "pipeline_read": {"pipeline": "P01"}, "asset_get": {"key": "TECH_RULES"}}
+                   "pipeline_read": {"pipeline": "P01"}, "asset_read": {"key": "TECH_RULES"}}
         for spec in mrt.TOOL_DEFS:
             name = spec["name"]
             self.assertIn(name, samples, "新工具 %s 没有抽样参数（判据需同步）" % name)
@@ -914,7 +914,7 @@ VALID_ARGS = {
     "library_search": {"query": "叙事"}, "library_read": {"entry_id": "NF-1"},
     "pattern_read": {"pattern_id": "single-source-truth"}, "knowledge_order": {},
     "module_read": {"module_id": "M08"}, "pipeline_read": {"pipeline": "P01"},
-    "asset_get": {"key": "QUANT_METRICS", "package": "量化金融域包"},
+    "asset_read": {"key": "QUANT_METRICS", "package": "量化金融域包"},
 }
 #: 「绝无此值」的探针串：任何正常输入都不该与它等价
 IMPOSSIBLE = "__nf_no_such_value__"

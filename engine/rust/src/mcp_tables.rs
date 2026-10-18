@@ -13,7 +13,7 @@
 
 // >>> GENERATED TOOL_NAMES by tools/gen_mcp_tables.py（勿手改；重跑生成器覆盖本段）
 pub const TOOL_NAMES: [&str; 10] = [
-    "asset_get",
+    "asset_read",
     "knowledge_order",
     "library_read",
     "library_search",

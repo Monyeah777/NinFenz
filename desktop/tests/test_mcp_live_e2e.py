@@ -27,10 +27,10 @@ INVALID_PARAMS = -32602
 #: 只读工具面（冻结）：与 `docs/mcp.md` 能力表、`mcp_runtime` 实现一一对应。
 READ_TOOLS = {
     "pipeline_ls", "spec_ls", "registry_query", "library_search", "library_read",
-    "pattern_read", "knowledge_order", "module_read", "pipeline_read", "asset_get",
+    "pattern_read", "knowledge_order", "module_read", "pipeline_read", "asset_read",
 }
 #: 写形/越权形工具名的形态（出现即说明只读白名单被破了口子）。
-#: 只挑**不会误伤**的词根——`set_` 会命中 `asset_get`、`run` 会命中 `runtime`，一律不收。
+#: 只挑**不会误伤**的词根——`set_` 会命中 `asset_read`、`run` 会命中 `runtime`，一律不收。
 WRITE_SHAPED = re.compile(r"write|delete|remove|exec|shell|upload|patch|create|mkdir", re.I)
 
 
@@ -145,7 +145,7 @@ class McpLiveFaceTest(unittest.TestCase):
         """③ 越权/注入硬面：六类试探 → 一律 -32602；不泄露；随后正常调用照样应答。"""
         msgs, out_raw, _ = _serve([
             _init(),
-            _req(2, "tools/call", {"name": "asset_get",
+            _req(2, "tools/call", {"name": "asset_read",
                                    "arguments": {"key": "../../../etc/passwd"}}),
             _req(3, "resources/read", {"uri": "nf://repo/../../../etc/passwd"}),
             _req(4, "tools/call", {"name": "registry_query",

@@ -230,7 +230,7 @@ class McpToolsDoNotTouchTheRepoTest(unittest.TestCase):
         if isinstance(found.get("pattern"), str):
             args["pattern_read"] = {"pattern_id": found["pattern"]}
         if isinstance(found.get("asset"), list):
-            args["asset_get"] = {"key": found["asset"][-1], "package": found["asset"][0]}
+            args["asset_read"] = {"key": found["asset"][-1], "package": found["asset"][0]}
         return args
 
     def test_tools_call_leaves_the_tree_untouched(self):

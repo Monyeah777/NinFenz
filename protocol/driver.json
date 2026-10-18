@@ -4,14 +4,14 @@
   "bindings": {
     "mcp.server": "python scripts/nf.py serve",
     "mcp.tools": ["pipeline_ls", "spec_ls", "registry_query", "library_search",
-                  "library_read", "module_read", "pipeline_read", "asset_get"],
+                  "library_read", "module_read", "pipeline_read", "asset_read"],
     "mcp.prompts": ["assemble_guide"],
     "setup": "nf serve（默认实时仓库面，无需快照；仅固化某次装配成果面时才 nf run --fmt mcp → nf serve <快照>，详见 docs/mcp.md）"
   },
   "workflows": {
     "assemble": {
       "mcp_prompt": "assemble_guide",
-      "mcp_tools": ["module_read", "pipeline_read", "asset_get"],
+      "mcp_tools": ["module_read", "pipeline_read", "asset_read"],
       "fallback": "docs/agent/agent_组装指令包_v0.2.md"
     },
     "routing": {

@@ -30,7 +30,7 @@ ARGS = {
     "pipeline_read": {"pipeline": "P01"},
     "library_search": {"query": "叙事"},
     "knowledge_order": {},
-    "asset_get": {"key": "QUANT_METRICS"},
+    "asset_read": {"key": "QUANT_METRICS"},
 }
 
 

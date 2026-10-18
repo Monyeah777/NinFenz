@@ -128,7 +128,7 @@
 | 项 | 期望 |
 |---|---|
 | Build 状态 | Success / 绿色 |
-| Tools | 10 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_get` |
+| Tools | 10 个：`pipeline_ls` `spec_ls` `registry_query` `library_search` `library_read` `pattern_read` `knowledge_order` `module_read` `pipeline_read` `asset_read` |
 | Prompts | 1 个：`assemble_guide` |
 | Resources | `nf://repo/...`，首屏 20 条 + `nextCursor` |
 | Instructions | 只读内容服务的自述 |
@@ -287,7 +287,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | knowledge_order | 4 | 5 | 4 | 4 | 4 | 4 | 4.2 |
 | module_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | pipeline_read | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
-| asset_get | 5 | 5 | 5 | 4 | 3 | 4 | 4.6 |
+| asset_read | 5 | 5 | 5 | 4 | 3 | 4 | 4.6 |
 
 估算：descriptionQuality ≈ 4.4（A）；coherence ≈ 4.0–4.5（naming 是唯一弱项：
 `*_ls` 与 `read/search/get` 混用）；**overall ≈ 4.3–4.4 → A**（保守下界 ≈ 4.0）。
@@ -362,8 +362,8 @@ coherence 的四条反馈与处理如下：
 | 多数工具针对明显不同的资源；描述交叉引用替代方案 | 保留；每个工具都写明“何时用 / 何时改用哪个工具” |
 | `spec_ls` 与 `registry_query` 的协议包元数据轻微重叠 | `spec_ls` 描述已明确为**权威协议包目录**；`registry_query` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
 | `pipeline_ls` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_ls` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
-| 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | `asset_get` 是核心协议**资产五接口**的规范名（`asset_get/query/match/roll/register`），MCP 工具直接沿用；`title` 写为 “Read asset”。改名会同时破坏 Python/Rust/.NET 三套实现和 189 处协议/内容引用，收益仅 naming 一档，故保留并在描述里说明 |
-| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | 这是**有意的两段式**：`resources/list type=pattern|asset` 负责枚举，`pattern_read` / `asset_get` 负责取正文；描述已写明“canonical enumeration path”，避免 agent 找不到枚举路径 |
+| 命名基本一致，但 `asset_get` 用 `_get`，其他读取用 `_read` | **已改**：MCP 面统一为 `asset_read`（`asset_get` 保留为兼容别名，不进 `tools/list`）；核心协议的资产五接口仍叫 `asset_get`，描述里说明 `asset_read` 是它的 MCP 读面 |
+| 模式/资产没有独立 list 工具，枚举依赖 `resources/list` | 这是**有意的两段式**：`resources/list type=pattern|asset` 负责枚举，`pattern_read` / `asset_read` 负责取正文；描述已写明“canonical enumeration path”，避免 agent 找不到枚举路径 |
 
 > 结论：overall 4.4 已经是 A；上述描述边界修改会在 Glama 下次重建后重新评分，
 > 主要提升 disambiguation / completeness，naming 仍可能停在 4。若一定要把 naming 推到 5，

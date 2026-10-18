@@ -26,7 +26,7 @@
     "targets": ["mcp.so", "Smithery", "魔搭（ModelScope）", "百度 MCP 表单"],
     "tools": ["pipeline_ls", "spec_ls", "registry_query", "library_search",
               "library_read", "pattern_read", "knowledge_order", "module_read",
-              "pipeline_read", "asset_get"],
+              "pipeline_read", "asset_read"],
     "prompts": ["assemble_guide"],
     "entry": "nf serve（缺省 = 实时仓库面，无需快照）｜快照面（可选）：nf run --fmt mcp → nf serve <mcp.json>",
     "default_surface": "live-repo（实时仓库面：缺省即用，agent 密集调用无需先产快照）",

@@ -22,7 +22,7 @@
 | 许可 | MIT |
 | 站点 | https://ninfenz.dev/ · 仓库 https://github.com/Monyeah777/NinFenz |
 
-能力面（只读）：10 tools（pipeline_ls · spec_ls · registry_query · library_search · library_read · pattern_read · knowledge_order · module_read · pipeline_read · asset_get）+ 1 prompt（assemble_guide）。**无写路径**。
+能力面（只读）：10 tools（pipeline_ls · spec_ls · registry_query · library_search · library_read · pattern_read · knowledge_order · module_read · pipeline_read · asset_read）+ 1 prompt（assemble_guide）。**无写路径**。
 
 ---
 

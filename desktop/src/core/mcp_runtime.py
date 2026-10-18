@@ -580,7 +580,7 @@ TOOL_DEFS = [
         "description": (
             "Read one library catalog entry by ID, returning its frontmatter record and "
             "full Markdown text. Use it after library_search resolves the ID; for modules, "
-            "pipelines, or assets use module_read, pipeline_read, or asset_get instead. "
+            "pipelines, or assets use module_read, pipeline_read, or asset_read instead. "
             "The ID is the canonical stem without the .md suffix and matching is "
             "case-insensitive (for example NF-1); an unknown ID returns an error carrying "
             "the requested ID and repair guidance. Read-only: reads one local file, with "
@@ -735,7 +735,7 @@ TOOL_DEFS = [
             "Read one NF module's full Markdown by ID, including its raw "
             "machine-contract block when present. Use it after registry_query resolves a "
             "module, or enumerate module resources with resources/list type=module; for "
-            "pipelines or assets use pipeline_read or asset_get. Accepts an "
+            "pipelines or assets use pipeline_read or asset_read. Accepts an "
             "exact machine-contract or heading ID (M90) or a qualified ID (通用:M10, as "
             "returned by registry_query); matching is case-sensitive, and an unknown ID "
             "returns an error with the requested value and repair guidance. Read-only: "
@@ -781,7 +781,7 @@ TOOL_DEFS = [
         "description": (
             "Read one NF pipeline's full Markdown by P-number or repository-relative path. "
             "Use it after pipeline_ls identifies a pipeline; for modules or assets use "
-            "module_read or asset_get. pipeline is either a Pxx stem (P01, matched against "
+            "module_read or asset_read. pipeline is either a Pxx stem (P01, matched against "
             "the filename prefix) or a .md path under 03_管线库/ or inside a community "
             "pipelines/ directory; paths outside those roots and .. escapes are rejected. "
             "Read-only: reads one local file, with no writes or network."),
@@ -812,15 +812,16 @@ TOOL_DEFS = [
         },
     },
     {
-        "name": "asset_get",
+        "name": "asset_read",
         "title": "Get asset",
         # 只读红线写成协议层可机读形式；四个 hint 全给，客户端才能自动放行只读调用。
         "annotations": {"readOnlyHint": True, "destructiveHint": False,
                         "idempotentHint": True, "openWorldHint": False},
         "description": (
             "Read every asset file that declares a given asset key, returning each match's "
-            "package, file path, and full text. asset_get is the protocol's canonical "
-            "read-only asset interface; use resources/list type=asset to enumerate keys, "
+            "package, file path, and full text. asset_read is the MCP read surface for "
+            "the protocol's canonical asset_get interface; use resources/list type=asset "
+            "to enumerate keys, "
             "or read a key named in a package README such as EMOTION_WHEEL. For modules "
             "use module_read. The key match is exact and case-sensitive, using the "
             "uppercase tokens found in "
@@ -1162,9 +1163,12 @@ TOOL_HANDLERS = {
     "knowledge_order": lambda a: _tool_knowledge_order((a or {}).get("clearance", "")),
     "module_read": lambda a: _tool_module_read((a or {}).get("module_id", "")),
     "pipeline_read": lambda a: _tool_pipeline_read((a or {}).get("pipeline", "")),
-    "asset_get": lambda a: _tool_asset_get((a or {}).get("key", ""),
-                                           (a or {}).get("package", "")),
+    "asset_read": lambda a: _tool_asset_get((a or {}).get("key", ""),
+                                            (a or {}).get("package", "")),
 }
+
+#: 兼容别名（不进 `tools/list`）：旧客户端仍可调 `asset_get`；新面只发布 `asset_read`。
+TOOL_ALIASES = {"asset_get": "asset_read"}
 
 
 def _prompt_assemble_guide() -> str:
@@ -1175,7 +1179,7 @@ def _prompt_assemble_guide() -> str:
         "docs/agent/agent_组装指令包_v0.2.md。输出完整版 md 自检过 "
         "「##7. 自检清单」；引用式档位须如实标注缺口，禁止编造未读内容。仓库验证：bash verify.sh。"
         "取实质内容用内容工具：module_read <模块 id>（模块正文）/ pipeline_read <Pxx 或路径>"
-        "（管线正文）/ asset_get <资产键>（资产正文）——禁止凭记忆写未读取的模块/资产内容。"
+        "（管线正文）/ asset_read <资产键>（资产正文）——禁止凭记忆写未读取的模块/资产内容。"
         "标准资源面亦可取正文：resources/read nf://repo/module/<id> / nf://repo/pipeline/<Pxx> "
         "/ nf://repo/asset/<包>/<键>。"
     )
@@ -1534,6 +1538,8 @@ class McpRuntime:
         if not isinstance(params, dict) or not isinstance(params.get("name"), str):
             raise ValueError("tools/call 需 params{name, arguments}")
         name = params["name"]
+        # 旧名兼容：tools/list 只发布 asset_read，但旧客户端仍可 calls asset_get。
+        canonical = TOOL_ALIASES.get(name, name)
         # arguments 是**声明为对象**的字段：显式 null 视为未传，其余非对象一律参数非法。
         # 修此处的理由（2026-10-08 实测）：旧写法把 []/""/0/False 这些**假值**静默当成「没传参数」
         # 并继续执行——客户端以为走了位置参数，服务端却按默认值跑完并给了结果（静默降级）；
@@ -1546,18 +1552,18 @@ class McpRuntime:
         else:
             raise ValueError("arguments 须为对象（收到 %s；修复指引：按 tools/list 的 inputSchema "
                              "用 {name: value} 形式，勿传数组/标量）" % type(raw_args).__name__)
-        handler = TOOL_HANDLERS.get(name)
+        handler = TOOL_HANDLERS.get(canonical)
         if handler is None:
             raise ValueError("未知工具：%s（只读工具面 = %s）"
                              % (name, "、".join(sorted(TOOL_HANDLERS))))
         # 越权/注入参数面（trust_boundary 硬面）：控制字符 / 超长载荷 / 路径穿越写法
         # 在进入处理器之前一律拒出（映射 -32602），fail-closed。
-        trust_boundary.check_arguments(name, args)
+        trust_boundary.check_arguments(canonical, args)
         # **声明面校验**（2026-09-30 补）：按 `tools/list` 里那份 inputSchema 逐条校验参数——
         # 类型不符、枚举越界、**多余/拼错的键**（additionalProperties=false）都在进处理器之前
         # 拒掉。此前未知键被静默忽略：客户端把 `query` 拼成 `quer` 会拿到**未过滤的**结果，
         # 却以为筛过了（只读面里最隐蔽的一类错答）。
-        schema = next((t.get("inputSchema") for t in TOOL_DEFS if t.get("name") == name), None)
+        schema = next((t.get("inputSchema") for t in TOOL_DEFS if t.get("name") == canonical), None)
         if isinstance(schema, dict) and self._schema_check is not None:
             unsup: List[str] = []
             errs = self._schema_check(args, schema, unsupported=unsup)

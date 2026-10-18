@@ -62,7 +62,7 @@ public static class McpServer
         ("pipeline_read", "取管线正文（按 Pxx 编号或仓库内相对路径；只读 03_管线库 与 community/*/pipelines）", ObjectSchema(("pipeline", "string", "Pxx 或相对路径（如 03_管线库/P90….md）"))),
         ("library_search", "仓库侧知识库检索：馆藏条目（正文级）+ docs + community README + 编号方案文档", ObjectSchema(("query", "string", "检索串"))),
         ("knowledge_order", "解析知识源查询顺序（先合同级后参考级；可按可见性 clearance 裁剪）", ObjectSchema(("clearance", "string", "可见性上限（public/internal/restricted）"))),
-        ("asset_get", "取资产正文（按资产键；可限定包）", ObjectSchema(("key", "string", "资产键"), ("package", "string", "包名（可选）"))),
+        ("asset_read", "取资产正文（按资产键；可限定包）", ObjectSchema(("key", "string", "资产键"), ("package", "string", "包名（可选）"))),
     };
 
     private static Dictionary<string, object?> ObjectSchema(params (string Name, string Type, string Description)[] properties)
@@ -286,7 +286,7 @@ public static class McpServer
             "pipeline_read" => PipelineRead(root, Str(args, "pipeline")),
             "library_search" => LibrarySearch(root, Str(args, "query")),
             "knowledge_order" => KnowledgeOrder(root, Str(args, "clearance")),
-            "asset_get" => AssetGet(root, Str(args, "key"), Str(args, "package")),
+            "asset_read" => AssetGet(root, Str(args, "key"), Str(args, "package")),
             _ => null,
         };
 

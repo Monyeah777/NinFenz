@@ -15,9 +15,9 @@ subjects:
   - verify.sh:b2b8edfc0c4ba8272cb47b109532cb1eb1262b46985fe34d33671f6af4b53966
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
-  - docs/mcp.md:8a867b58c12ea4e6b2c6a37db4e34459ece9c37b60aa44095ba1e29dbb1bf3e4
+  - docs/mcp.md:b47b6ad30f151d6eb2aa22a6806c865b936694798fa0907c3fc6c5ac3957b976
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
-  - protocol/driver.json:66d6caf189756b8131eb5123673c90592dfa998b62f3de8192b997e983b5212c
+  - protocol/driver.json:2486381f98d19448be414069b92d341fe78d6d146a47cacf055e96df59cea7f2
   - integrations/site/integration.json:4a0b13e80d195f74e2c9965b899f87576e38d9c0b42190defb10bb13184e1374
   - integrations/site/strings.json:4d19bc7e32eb8bb9f7d368261c8bf464c02837ff828cbce364da4da229c4e59c
   - integrations/lsp/integration.json:2a0a752a3138db7bfd0d7c1c912c375f98e1eaf3fe783744ecb61a4d28e2a41e
@@ -26,6 +26,12 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-18）：Glama coherence：asset_read 兼容别名说明（中/英/日）
+
+> 重审（2026-10-18）：Glama coherence：asset_get→asset_read（旧名兼容别名）+ 协议边界描述；行尾规范为 LF
+
+> 重审（2026-10-18）：Glama coherence：MCP 面 asset_get→asset_read（旧名保留兼容别名）；spec_ls/registry_query 描述边界
+
 > 重审（2026-10-18）：Glama coherence：收紧 spec_ls/registry_query 描述边界；asset_get 说明为协议资产五接口规范名
 
 > 重审（2026-10-18）：P3：分层档位 + 判定缓存 + 受影响测试选择

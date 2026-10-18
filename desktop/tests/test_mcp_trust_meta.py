@@ -46,7 +46,7 @@ class McpTrustMetaTest(unittest.TestCase):
         srv = _srv()
         for name, args, want in (
                 ("library_read", {"entry_id": "NF-1"}, "library/NF-1.md"),
-                ("asset_get", {"key": "EMOTION_WHEEL", "package": "校园情感领域包"},
+                ("asset_read", {"key": "EMOTION_WHEEL", "package": "校园情感领域包"},
                  "community/校园情感领域包/assets/EMOTION_WHEEL.md")):
             meta = _trust(_call(srv, name, args))
             self.assertIsNotNone(meta, name)

@@ -23,7 +23,7 @@ public static class McpPackage
     public static readonly string[] RuntimeTools =
     {
         "pipeline_ls", "spec_ls", "registry_query", "library_search", "library_read",
-        "pattern_read", "knowledge_order", "module_read", "pipeline_read", "asset_get",
+        "pattern_read", "knowledge_order", "module_read", "pipeline_read", "asset_read",
     };
 
     /// <summary>镜像 <c>mcp_runtime.PROMPT_DEFS</c> 的提示名。</summary>

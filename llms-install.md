@@ -66,7 +66,7 @@ Claude Desktop / Cursor / Cline 通用配置（零安装，走 npm 包）：
 }
 ```
 
-**能力面（只读，无写路径）**：10 个工具 —— `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` · `library_read` · `pattern_read` · `knowledge_order` · `module_read` · `pipeline_read` · `asset_get`；1 个 prompt —— `assemble_guide`。
+**能力面（只读，无写路径）**：10 个工具 —— `pipeline_ls` · `spec_ls` · `registry_query` · `library_search` · `library_read` · `pattern_read` · `knowledge_order` · `module_read` · `pipeline_read` · `asset_read`；1 个 prompt —— `assemble_guide`。
 协议：modern `2026-07-28` 与 legacy `2025-11-25` 双版本并存；参数按 `inputSchema` 逐条校验（不合即 `-32602`）。
 
 ## 4 装完自检（agent 必做，全绿才算装好）

@@ -9,7 +9,7 @@
     轻面（1–4 次）：spec_ls 1 · registry_query 1 · pattern_read 1 · pipeline_read 1 ·
                     knowledge_order 3 · library_read 4
     扫树面（每次调用都枚举目录）：pipeline_ls 114 · library_search 179 ·
-                                module_read 249 · asset_get 361
+                                module_read 249 · asset_read 361
 
 扫树面是**已知代价**（按 id 解析要枚举 03_管线库 / community/*/modules / community/*/assets）；
 本判据只钉「不许更宽」，不假装它免费——按仓库纪律（宁可重算，不可拿旧账当新账），
@@ -36,7 +36,7 @@ LIGHT = {"spec_ls": {}, "registry_query": {"query": "M90"},
 LIGHT_BUDGET = 30
 #: 扫树工具：按 id 解析要枚举目录树（实测 114–361），留两个数量级余量
 SCAN = {"pipeline_ls": {}, "library_search": {"query": "雨天"},
-        "module_read": {"module_id": "M90"}, "asset_get": {"key": "STYLE_DNA"}}
+        "module_read": {"module_id": "M90"}, "asset_read": {"key": "STYLE_DNA"}}
 SCAN_BUDGET = 600
 
 
