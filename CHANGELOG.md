@@ -3,6 +3,14 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **check12 门禁提速（P0–P3，2026-10-18）**：把 check12（3131 条测试、串行 ~1080 s）从"单进程全量"改成"分层 + 分片 + 内容寻址缓存"：
+  ① **分层**：`bash verify.sh` 默认 **quick**（42 条静态 check + 受影响测试），`--full` 才跑全量；`nf release` 与 CI 固定 `--full --no-cache`，`test_ci_visibility` 的契约同步改为"CI 必须 full 档"（原"必须裸跑"在分层后反而是子集）；
+  ② **分片**：`scripts/verify_tests.py` 一次 discover 产出测试 id → 逐测试权重（`protocol/check12_weights.json`，311 模块 / 3141 条实测）→ LPT 分配到 N 个进程（分片数按核数自适应）；分片并集必须逐项等于 discover 全集，不等即 exit 1；
+  ③ **负载敏感串行段**：`test_atomic_write` / `test_daemon` 的失败注入在 8 片并发下偶发"打桩未生效"（隔离必绿、满负载偶红），并行段之后独占跑这两族（51 条），用例一条不减；
+  ④ **判定缓存**：key = HEAD + `git stash create` 脏树提交 + 未跟踪件内容 + 门禁代码哈希 + 运行时 + 档位；只缓存绿判定；`--no-cache` / `NF_VERIFY_CACHE=0` 强制重算；
+  ⑤ **实测**：quick 冷跑 **148 s**、full 冷跑 **587 s**（原 1158 s）、两档命中缓存 **1.6 s**；均为 `PASS=76 WARN=1 FAIL=0`；
+  ⑥ **等价性取证**：两条全命令面普查切片化后做**逐面差分**（旧实现扫全量 vs 新实现 4 片并集，同输入同树）：156 张无参面、105 张 `--json` 面，**逐面 verdict 0 差异**；分片化本身以"并集 == discover 全集"断言兜底；重测试切片（机器面 8 片、CLI 普查 4 片）每片都断言"切片非空 + 片内逐条比完"；
+  ⑦ **两处根因被本波抓到并修掉**：Rust 快线二进制落后于源码会让 parity 假红（`cargo build --release` 重编即恢复，target/ 不入库）；判定缓存脚本若含删除面，会与 Rust 侧 purity 允许表口径分叉（已改为不含删除面）。
 - **门禁扩到 check1-42：新增构建隔离（check41）与不可伪造 provenance（check42）**（门禁能力化重构 · 步骤4）：
   ① **check41 构建隔离**（SLSA L3 Build isolation）：构建入口不得出现取网/取包命令、容器基座按 `@sha256` 钉、工具链定版（node `engines` / `Cargo.lock` / CI 版本号）；
   ② **check42 不可伪造 provenance**（SLSA L3 Non-falsifiable）：**独立子进程**验 hmac 级 attestation，且把主体摘要改一位后必须判否——证明「验签方 ≠ 签名方」；本仓外锚（cosign）缺位时如实 WARN，不假装已不可伪造；
