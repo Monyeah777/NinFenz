@@ -21,6 +21,10 @@ use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/asset_contracts.json";
 pub const SCHEMA: &str = "nf-asset-contracts/1";
+/// 真源 `SCHEMA_REL`：可移植 schema（⑤ 声明自检用）。
+pub const SCHEMA_REL: &str = "protocol/schema/asset_contracts.schema.json";
+/// 真源 `EXPORT_REL`：Frictionless Data Package 导出件（④ 漂移判据用）。
+pub const EXPORT_REL: &str = "protocol/generated/asset_contract.frictionless.json";
 pub const FACES: [&str; 4] = ["data", "code", "script", "index"];
 pub const LANGS: [&str; 3] = ["python", "bash", "vba"];
 /// 真源 `FORMATS`（D3 写通道契约化后扩到 9 个：yaml/toml/jsonl/graphml/mmd 逐条对应
@@ -1356,6 +1360,289 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     )
 }
 
+// ---------------------------------------------------------------- 登记册面（D1）
+
+/// 真源 `_registry_issues`：本册声明为数据的 `protocol/` 件必须已在
+/// `protocol/data_contracts.json` 登记。
+///
+/// 为什么：仓库里已有「数据契约登记册」（ODCS 式：谁判 / 谁管 / 坏了怎么重建）。资产册再造一份
+/// 「谁管」就是第二套词表——同型病。判据只问一句：**同一 artifact 不许只在资产册出现**。
+pub fn registry_issues(root: &Path, doc: &Json) -> Vec<String> {
+    // `targets` 为空 ⇒ 本册没有 protocol 真源件 ⇒ 登记册判据不适用（临时场景常见）。
+    if protocol_data_targets(root, doc).is_empty() {
+        return Vec::new();
+    }
+    let p = root.join("protocol/data_contracts.json");
+    if !p.is_file() {
+        return vec!["缺 protocol/data_contracts.json\
+                     （修复指引：补登记册——本册有 protocol 真源件须登记）"
+            .to_string()];
+    }
+    let reg = match std::fs::read_to_string(&p) {
+        Err(e) => {
+            return vec![format!(
+                "protocol/data_contracts.json 不可读：{}（修复指引：修好 JSON）",
+                e
+            )]
+        }
+        Ok(t) => match strict_json(&t) {
+            Err(e) => {
+                return vec![format!(
+                    "protocol/data_contracts.json 不可读：{}（修复指引：修好 JSON）",
+                    e
+                )]
+            }
+            Ok(v) => v,
+        },
+    };
+    let mut arts: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    if let Some(Json::Array(cs)) = obj_get(&reg, "contracts") {
+        for c in cs {
+            if matches!(c, Json::Object(_)) {
+                arts.insert(sg_str(c, "artifact"));
+            }
+        }
+    }
+    let mut issues: Vec<String> = Vec::new();
+    if let Some(Json::Array(specs)) = obj_get(doc, "data") {
+        for spec in specs {
+            for rel in resolve(root, spec) {
+                if rel.starts_with("protocol/") && rel.ends_with(".json") && !arts.contains(&rel) {
+                    issues.push(format!(
+                        "资产 {} 未在 protocol/data_contracts.json 登记\
+                         （修复指引：补一条契约——同一 artifact 不许只在资产册出现）",
+                        rel
+                    ));
+                    break;
+                }
+            }
+        }
+    }
+    issues
+}
+
+/// 真源 `_registry_issues` 里 `targets` 的那一步：本册数据面命中的 `protocol/**/*.json`。
+fn protocol_data_targets(root: &Path, doc: &Json) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    if let Some(Json::Array(specs)) = obj_get(doc, "data") {
+        for spec in specs {
+            for rel in resolve(root, spec) {
+                if rel.starts_with("protocol/") && rel.ends_with(".json") {
+                    out.push(rel);
+                }
+            }
+        }
+    }
+    out
+}
+
+// ---------------------------------------------------------------- 导出面（S3）
+
+/// 真源 `_FRIENDLY`：JSON Schema 类型名 → Frictionless Table Schema 类型名。
+fn friendly_type(t: &str) -> &'static str {
+    match t {
+        "string" => "string",
+        "integer" => "integer",
+        "number" => "number",
+        "boolean" => "boolean",
+        "array" => "array",
+        "object" => "object",
+        "null" => "any",
+        _ => "any",
+    }
+}
+
+/// 真源 `frictionless_export`：把已声明的数据资产映射成 **Frictionless Data Package**。
+///
+/// 诚实边界：`fields` 是 JSON Schema `properties` 的**尽力映射**（类型名对齐 Frictionless
+/// Table Schema），原始 JSON Schema 仍在 `x-nf-json-schema` 里逐字段保留——映射丢信息就是
+/// 装饰，故不丢。只导出**资产面**（包产物/库索引），协议层真源不外发。
+pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
+    let (doc, issues) = load(root);
+    if !issues.is_empty() {
+        return (Json::Object(vec![]), issues);
+    }
+    let mut res: Vec<Json> = Vec::new();
+    if let Some(Json::Array(specs)) = obj_get(&doc, "data") {
+        for spec in specs {
+            if !matches!(spec, Json::Object(_)) {
+                continue;
+            }
+            for rel in resolve(root, spec) {
+                if rel.starts_with("protocol/") {
+                    continue;
+                }
+                let mut item: Vec<(String, Json)> = vec![
+                    ("name".to_string(), Json::Str(rel.replace('/', "--"))),
+                    ("path".to_string(), Json::Str(rel.clone())),
+                ];
+                let fmt = sg_str(spec, "format");
+                if !fmt.is_empty() {
+                    item.push(("format".to_string(), Json::Str(fmt)));
+                }
+                let sch_rel = schema_of(root, &rel, spec);
+                if !sch_rel.is_empty() {
+                    let (stext, err) = sread(root, &sch_rel);
+                    if err.is_none() {
+                        let sch = strict_json(&stext.unwrap_or_default())
+                            .unwrap_or_else(|_| Json::Object(vec![]));
+                        let keep = ["type", "required", "properties", "$schema", "title", "description"];
+                        let mut sub: Vec<(String, Json)> = Vec::new();
+                        if let Json::Object(kv) = &sch {
+                            for k in keep.iter() {
+                                if let Some((kk, vv)) = kv.iter().find(|(kk, _)| kk == k) {
+                                    sub.push((kk.clone(), vv.clone()));
+                                }
+                            }
+                        }
+                        let sch_nonempty = matches!(&sch, Json::Object(kv) if !kv.is_empty());
+                        if sch_nonempty {
+                            item.push(("x-nf-json-schema".to_string(), Json::Object(sub)));
+                            item.push((
+                                "x-nf-schema-source".to_string(),
+                                Json::Str(sch_rel.clone()),
+                            ));
+                        }
+                        let mut props: Vec<(String, Json)> = match obj_get(&sch, "properties") {
+                            Some(Json::Object(o)) => o.clone(),
+                            _ => Vec::new(),
+                        };
+                        props.sort_by(|a, b| a.0.cmp(&b.0));
+                        let mut fields: Vec<Json> = Vec::new();
+                        for (k, v) in props {
+                            if !matches!(v, Json::Object(_)) {
+                                continue;
+                            }
+                            let t = sg_str(&v, "type");
+                            fields.push(Json::Object(vec![
+                                ("name".to_string(), Json::Str(k)),
+                                ("type".to_string(), Json::Str(friendly_type(&t).to_string())),
+                            ]));
+                        }
+                        if !fields.is_empty() {
+                            item.push((
+                                "schema".to_string(),
+                                Json::Object(vec![(
+                                    "fields".to_string(),
+                                    Json::Array(fields),
+                                )]),
+                            ));
+                        }
+                    }
+                }
+                res.push(Json::Object(item));
+            }
+        }
+    }
+    let pkg = Json::Object(vec![
+        ("profile".to_string(), Json::Str("data-package".to_string())),
+        ("name".to_string(), Json::Str("ninfenz-asset-contracts".to_string())),
+        (
+            "title".to_string(),
+            Json::Str("NinFenz 数字资产契约（Frictionless Data Package 导出）".to_string()),
+        ),
+        (
+            "x-nf-generated-by".to_string(),
+            Json::Str("nf asset contract --export".to_string()),
+        ),
+        (
+            "x-nf-note".to_string(),
+            Json::Str(
+                "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射".to_string(),
+            ),
+        ),
+        ("resources".to_string(), Json::Array(res)),
+    ]);
+    (pkg, Vec::new())
+}
+
+/// 真源 `_export_drift`（④）：导出件 == 实时导出（缺件/漂移都 FAIL：导出面不许只在人手里新鲜）。
+pub fn export_drift(root: &Path) -> Vec<String> {
+    let (live, errs) = frictionless_export(root);
+    if !errs.is_empty() {
+        return errs;
+    }
+    let p = root.join(EXPORT_REL);
+    if !p.is_file() {
+        return vec![format!(
+            "④ 缺契约导出 {}（修复指引：nf asset contract --export）",
+            EXPORT_REL
+        )];
+    }
+    let disk = match std::fs::read_to_string(&p) {
+        Err(e) => {
+            return vec![format!(
+                "④ {} 不可读：{}（修复指引：nf asset contract --export）",
+                EXPORT_REL, e
+            )]
+        }
+        Ok(t) => match strict_json(&t) {
+            Err(e) => {
+                return vec![format!(
+                    "④ {} 不可读：{}（修复指引：nf asset contract --export）",
+                    EXPORT_REL, e
+                )]
+            }
+            Ok(v) => v,
+        },
+    };
+    if crate::jsonread::json_eq(&disk, &live) {
+        Vec::new()
+    } else {
+        vec![format!(
+            "④ {} 与实时导出不一致（修复指引：nf asset contract --export）",
+            EXPORT_REL
+        )]
+    }
+}
+
+// ---------------------------------------------------------------- 声明自检面（S2）
+
+/// 真源 `_schema_self_check`（⑤）：声明必须过**可移植 schema**（规范要可执行，不做文档摆设）。
+pub fn schema_self_check(root: &Path) -> Vec<String> {
+    let sp = root.join(SCHEMA_REL);
+    if !sp.is_file() {
+        return vec![format!(
+            "⑤ 缺可移植 schema {}（修复指引：补该件——对外可移植契约靠它定型）",
+            SCHEMA_REL
+        )];
+    }
+    let read = |p: &Path| -> Result<Json, String> {
+        match std::fs::read_to_string(p) {
+            Err(e) => Err(e.to_string()),
+            Ok(t) => strict_json(&t),
+        }
+    };
+    let doc = match read(&root.join(DECL_REL)) {
+        Ok(v) => v,
+        Err(e) => {
+            return vec![format!(
+                "⑤ 声明或 schema 不可读：{}（修复指引：修好 JSON）",
+                e
+            )]
+        }
+    };
+    let sch = match read(&sp) {
+        Ok(v) => v,
+        Err(e) => {
+            return vec![format!(
+                "⑤ 声明或 schema 不可读：{}（修复指引：修好 JSON）",
+                e
+            )]
+        }
+    };
+    json_schema::json_schema_check(&doc, &sch)
+        .iter()
+        .take(5)
+        .map(|e| {
+            format!(
+                "⑤ 声明不符可移植 schema {}：{}（修复指引：改声明或改 schema——两者只能有一个对）",
+                SCHEMA_REL, e
+            )
+        })
+        .collect()
+}
+
 // ---------------------------------------------------------------- 聚合 / 入口
 
 /// 真源 `load`。
@@ -1416,6 +1703,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         kv.push(("chains".to_string(), Json::Int(0)));
         return (issues, warns, Json::Object(kv));
     }
+    // 真源同序：load → 登记册（D1，四面都判）→ 导出漂移（④）/ 声明自检（⑤，声明面整体判据）。
+    issues.extend(registry_issues(root, &doc));
+    issues.extend(export_drift(root));
+    issues.extend(schema_self_check(root));
     for face in FACES {
         let specs = match obj_get(&doc, face) {
             Some(Json::Array(a)) => a.clone(),
@@ -1961,6 +2252,251 @@ l2
         .unwrap();
         assert!(crate::jsonread::json_eq(&stats, &want),
                 "聚合 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+    }
+    // <<< GENERATED
+    // >>> GENERATED by tools/gen_asset_contract_faces.py（勿手改；重跑生成器覆盖本段）
+    /// ===== 三个「声明面整体判据」（D1 / ④ / ⑤）的对拍 + 变异自证 =====
+    ///
+    /// 真语料上三面都是空集，oracle 只能核到「都对」那一侧——判据有没有接线、文案有没有对齐，
+    /// 空集看不出来。故用**同一份夹具**逐面变异：clean（全绿）→ registration_missing /
+    /// export_drift / schema_missing（各红一条）→ restored（= clean，改回即回绿）。
+    ///
+    /// 期望值由 `tools/gen_asset_contract_faces.py` 跑**真源同名函数**现算；同一批文案同时写进
+    /// 本段与 `desktop/tests/test_asset_contract_faces.py` ⇒ 两侧断言同一批 issue。
+    struct AcFaceFixture {
+        name: &'static str,
+        files: &'static [(&'static str, &'static str)],
+        registry: &'static [&'static str],
+        export_drift: &'static [&'static str],
+        schema_self: &'static [&'static str],
+        scan_issues: &'static [&'static str],
+        scan_stats: &'static str,
+    }
+
+    const AC_FACE_CASES: &[AcFaceFixture] = &[
+        AcFaceFixture {
+            name: r#"clean"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
+"#),
+            ],
+            registry: &[],
+            export_drift: &[],
+            schema_self: &[],
+            scan_issues: &[],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+        AcFaceFixture {
+            name: r#"registration_missing"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
+"#),
+            ],
+            registry: &[r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#],
+            export_drift: &[],
+            schema_self: &[],
+            scan_issues: &[r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+        AcFaceFixture {
+            name: r#"export_drift"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts-drift",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
+"#),
+            ],
+            registry: &[],
+            export_drift: &[r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#],
+            schema_self: &[],
+            scan_issues: &[r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+        AcFaceFixture {
+            name: r#"schema_missing"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+            ],
+            registry: &[],
+            export_drift: &[],
+            schema_self: &[r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#],
+            scan_issues: &[r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+        AcFaceFixture {
+            name: r#"schema_violation"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"required": ["schema", "no_such_key"], "type": "object"}
+"#),
+            ],
+            registry: &[],
+            export_drift: &[],
+            schema_self: &[r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#],
+            scan_issues: &[r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+        AcFaceFixture {
+            name: r#"restored"#,
+            files: &[
+                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#),
+                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#),
+                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+  "name": "ninfenz-asset-contracts",
+  "profile": "data-package",
+  "resources": [],
+  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",
+  "x-nf-generated-by": "nf asset contract --export",
+  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
+}
+"#),
+                (r#"protocol/probe.json"#, r#"{"a": 1}
+"#),
+                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
+"#),
+            ],
+            registry: &[],
+            export_drift: &[],
+            schema_self: &[],
+            scan_issues: &[],
+            scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
+        },
+    ];
+
+    fn write_ac_face_fixture(root: &std::path::Path, files: &[(&str, &str)]) {
+        for (rel, body) in files {
+            let p = root.join(rel);
+            if let Some(parent) = p.parent() {
+                std::fs::create_dir_all(parent).expect("夹具父目录可建");
+            }
+            std::fs::write(&p, body).expect("夹具件可写");
+        }
+    }
+
+    /// 三个声明面（D1 / ④ / ⑤）的 issues —— 与真源 `scan` 里的调用序一致。
+    fn ac_face_issues(root: &std::path::Path) -> (Vec<String>, Vec<String>, Vec<String>) {
+        let (doc, _load_issues) = load(root);
+        (registry_issues(root, &doc), export_drift(root), schema_self_check(root))
+    }
+
+    #[test]
+    fn asset_contract_integral_faces_mutation_parity() {
+        for case in AC_FACE_CASES {
+            let root = crate::testutil::fixture(&format!("asset-contract-faces-{}", case.name));
+            write_ac_face_fixture(&root, case.files);
+            let (reg, exp, sch) = ac_face_issues(&root);
+            assert_eq!(reg, case.registry, "{} 的 D1 登记册 issues 不一致", case.name);
+            assert_eq!(exp, case.export_drift, "{} 的 ④ 导出漂移 issues 不一致", case.name);
+            assert_eq!(sch, case.schema_self, "{} 的 ⑤ 声明自检 issues 不一致", case.name);
+            let (issues, _warns, stats) = scan(&root);
+            assert_eq!(issues, case.scan_issues, "{} 的 scan issues 不一致", case.name);
+            let want: Json = crate::jsonread::convert(
+                &serde_json::from_str::<serde_json::Value>(case.scan_stats).unwrap(),
+            )
+            .unwrap();
+            assert!(
+                crate::jsonread::json_eq(&stats, &want),
+                "{} 的 scan stats 不一致\n  实得 {}\n  期望 {}",
+                case.name,
+                stats.dumps(),
+                want.dumps()
+            );
+        }
+    }
+
+    /// 真语料上三面必须**各自为空**（真源同语料实测见生成器输出）。
+    ///
+    /// 分开断言是为了**归因**：`asset_contract_scan_matches_truth_source` 只断言聚合 issues
+    /// 为空，某面静默不接线时也能绿（这正是本次补齐前的既有缺口）。
+    #[test]
+    fn asset_contract_integral_faces_clean_on_real_corpus() {
+        let root = ac_repo_root();
+        let (doc, load_issues) = load(&root);
+        assert!(load_issues.is_empty(), "真语料声明件须可读：{:?}", load_issues);
+        assert_eq!(
+            registry_issues(&root, &doc),
+            Vec::<String>::new(),
+            "真语料 D1 登记册面须空"
+        );
+        assert_eq!(export_drift(&root), Vec::<String>::new(), "真语料 ④ 导出漂移面须空");
+        assert_eq!(
+            schema_self_check(&root),
+            Vec::<String>::new(),
+            "真语料 ⑤ 声明自检面须空"
+        );
     }
     // <<< GENERATED
 }
