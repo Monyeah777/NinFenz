@@ -785,8 +785,8 @@ public static class McpServer
         {
             ["id"] = e.Dir,
             ["path"] = e.Path,
-            ["title"] = Str(e.Fm, "name") is { Length: > 0 } name ? name : e.Dir,
-            ["status"] = Str(e.Fm, "status"),
+            ["title"] = DictStr(e.Fm, "name") is { Length: > 0 } name ? name : e.Dir,
+            ["status"] = DictStr(e.Fm, "status"),
         }).ToList();
     }
 
