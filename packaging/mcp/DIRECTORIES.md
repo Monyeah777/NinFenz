@@ -89,7 +89,7 @@
 | 传输 | `stdio`（modern `2026-07-28` + legacy `2025-11-25` 双协议） |
 | 安装（零安装） | `npx -y ninfenz serve` |
 | 安装（检出） | `python scripts/nf.py serve` |
-| 工具面 | 10 只读工具 + 1 prompt（`assemble_guide`）；**无写路径** |
+| 工具面 | 12 只读工具 + 1 prompt（`assemble_guide`）；**无写路径** |
 | 许可 | MIT |
 | 仓库 | https://github.com/Monyeah777/NinFenz |
 | 站点 | https://ninfenz.dev/ |
@@ -108,7 +108,7 @@ NinFenz Content Gate —— 只读 MCP 服务器：把长内容的验收标准�
 
 ```text
 NinFenz Content Gate — a read-only MCP server that exposes a content contract layer to agents: protocol specs, modules, pipelines, assets and the knowledge library.
-10 read-only tools + 1 prompt (assemble_guide); dual protocol era (2026-07-28 modern / 2025-11-25 legacy); zero third-party deps (Python stdlib); no write paths.
+12 read-only tools + 1 prompt (assemble_guide); dual protocol era (2026-07-28 modern / 2025-11-25 legacy); zero third-party deps (Python stdlib); no write paths.
 Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    Site: https://ninfenz.dev/
 ```
 
