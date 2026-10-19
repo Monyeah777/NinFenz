@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:7aa4b2c35cbce7e94ec35b2aa3155d3f8d236381457a0c1b6679cad86c220375
+  - verify.sh:cea4f2afc74425fe683e07a4808fea56c96d8bc2f6485bb6ce2352885c373d87
 
 ---
+> 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
+
 > 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
 
 > 重审（2026-10-18）：重叠范围收窄到 quick

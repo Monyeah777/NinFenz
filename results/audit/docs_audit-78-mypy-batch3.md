@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:2faf253cf7ea3da33320e10f873d32962241e9856669f047854a27de602b819a
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - protocol/code_metrics_baseline.json:9672e6a227cd96d469f7fe69c01e325afbdae7e72a664b223d1441df49cc7e8c
+  - protocol/code_metrics_baseline.json:3fd3e593841c733243ba574aa4b1e28f767b3954980bf9a50931a075230faa31
 ---
+> 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
+
 > 重审（2026-10-19）：重测试再切分（机器面 16 片 / JSON 面 4 片）+ 内层线程 8/jobs
 
 > 重审（2026-10-18）：LSP 时间窗判据进串行段

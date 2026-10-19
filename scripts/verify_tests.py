@@ -282,7 +282,13 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             # 总并发上限按 8 路算：16 片时内层 = 1（一片同一时刻只 spawn 一个子进程）。
             # 2026-10-19 实测：16 片 × 2 线程仍把单条重测试拖到 352 s，降为 1 路才真正削峰。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
-            env["NF_INNER_THREADS"] = str(max(1, min(6, 8 // max(1, _jobs_hint))))
+            if _jobs_hint > 1:
+                _inner = max(1, min(6, 8 // max(1, _jobs_hint)))
+            else:
+                # 单分片（CI 矩阵的一台 runner / --shard 模式）：按核数的一半算——
+                # 2 核 runner ≈ 1 路，20 核机 ≈ 6 路；不再假设"单分片就是最强机器"。
+                _inner = max(1, min(6, (os.cpu_count() or 4) // 2))
+            env["NF_INNER_THREADS"] = str(_inner)
             try:
                 proc = subprocess.run(
                     [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],

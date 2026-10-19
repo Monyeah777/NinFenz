@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:9672e6a227cd96d469f7fe69c01e325afbdae7e72a664b223d1441df49cc7e8c
+  - protocol/code_metrics_baseline.json:3fd3e593841c733243ba574aa4b1e28f767b3954980bf9a50931a075230faa31
 ---
+> 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
+
 > 重审（2026-10-19）：重测试再切分（机器面 16 片 / JSON 面 4 片）+ 内层线程 8/jobs
 
 > 重审（2026-10-18）：LSP 时间窗判据进串行段

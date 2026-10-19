@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:9672e6a227cd96d469f7fe69c01e325afbdae7e72a664b223d1441df49cc7e8c
+  - protocol/code_metrics_baseline.json:3fd3e593841c733243ba574aa4b1e28f767b3954980bf9a50931a075230faa31
 ---
+> 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
+
 > 重审（2026-10-19）：重测试再切分（机器面 16 片 / JSON 面 4 片）+ 内层线程 8/jobs
 
 > 重审（2026-10-18）：LSP 时间窗判据进串行段

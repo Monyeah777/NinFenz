@@ -132,10 +132,11 @@ fi
 # 因此把测试放后台与静态 check 并行，墙钟从 "a+b" 变成 "max(a,b)"。
 # 判据不变：测试命令与判定逻辑一字未改，只是不在 check12 里"现场跑"，而是"先跑、到点收"。
 # --fast（补充快车道）/ --checks-only / --tests-only 不走重叠（语义不同）。
-# 只在 quick 档重叠（2026-10-18 实测）：full 档测试里有守护/启动器/编码这几族对并发敏感，
-# 与 42 条 check 同时跑会偶发红（chunk5 机器面即实例）；full 本来就要 9 分钟，省 55 s 不值这个风险。
+# 两档都重叠（2026-10-19 复测）：此前的偶发红来自"每片 6 路线程 × 16 片 = 96 并发进程"，
+# 内层线程已压到 1 路（NF_INNER_THREADS=8/jobs），并发峰与静态 check 共存不再放大；
+# 于是 full 也吃这 55 s 的重叠收益：墙钟 = max(静态, 测试) 而不是两者相加。
 _NF_BG_TESTS_PID=''
-if [ "$NF_TIER" = "quick" ] && [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "1" ] \
+if [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "1" ] \
    && [ "$NF_TESTS_ONLY" != "1" ] \
    && [ -n "$PY3" ] && [ -f scripts/verify_tests.py ] && [ -d desktop/tests ]; then
   _BG_JOBS="${NF_TEST_JOBS:-}"
