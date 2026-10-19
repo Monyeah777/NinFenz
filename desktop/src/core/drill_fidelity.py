@@ -136,6 +136,8 @@ def _real_corpus_block(root: Path) -> Tuple[str, Dict[str, Any], List[str]]:
         try:
             d = json_doc.load(f, dict, what=f.name)
         except ValueError:
+            # 为何可以吞：单个回合样本解析失败不该让整份保真度报告崩掉——该样本会在
+            # 上层按「缺件/不可解析」计数并以 issues 暴露，故此处只跳过本条、保住全量基线。
             continue
         block = d.get("real_corpus")
         if isinstance(block, dict):
