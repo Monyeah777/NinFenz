@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "L8 contract 的判据 check13 在 verify.sh 中不存在（修复指引：改指向真实 check）; L8 contract 的判据 check28 在 verify.sh 中不存在（修复指引：改指向真实 check）",
-      "digest": "abcefbb3c4475bbc06f6e86f544a8f1c98e61a4f7393134bf2a0a303c8a885d0",
+      "detail": "纯度零违规",
+      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
       "id": "purity-clean",
-      "ok": false
+      "ok": true
     },
     {
       "description": "文档四型覆盖",
@@ -79,10 +79,10 @@
     },
     {
       "description": "一致性声明",
-      "detail": "声明与真源不一致：基线 声明=v2.30 · check1-42 · PASS=76 真源=? · check1-42 · PASS=76（修复指引：改声明对齐真源）",
-      "digest": "5c4c6d74526c59292aa0c44cb7604bd50b091203f6a103d8378f34314e3bcce8",
+      "detail": "版本 5 · scope 19 · 排除 11",
+      "digest": "e7e76a4af8705ad67f06ece0cb0608ee71329bdf52e6872bae4fd514f271c16e",
       "id": "declaration",
-      "ok": false
+      "ok": true
     },
     {
       "description": "协议件版本史头",
@@ -121,31 +121,31 @@
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "规范件 protocol/EXTENSION.md 的 covered_by 指向不存在的 check：check30; 契约 combo-certificates 的 quality_rule 指向不存在的 check：check32",
-      "digest": "424325421fedce603523578da808f9c58f8457f1e5024565d150778e8b409cbb",
+      "detail": "词表 12 · 规范件 37 / 说明件 2393 · 数据契约 54",
+      "digest": "168e138acb9fbe4da71e7d5859a9a3de0c3af16fe665c0082285d4ba89f00da7",
       "id": "modeling",
-      "ok": false
+      "ok": true
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "ADR-0001 的 evidence 指向不存在的 check：check37; ADR-0002 的 evidence 指向不存在的 check：check30",
-      "digest": "4f894188a24f15b5c73d61114a3bf21bb67964046809c3bdfa9c821afee374b1",
+      "detail": "决策 6 条（accepted 5 · 取代链 1）",
+      "digest": "b343a22824f60e29ef4db69abae033e52f2ce7190fd242548d81d7266ee71063",
       "id": "decisions",
-      "ok": false
+      "ok": true
     },
     {
       "description": "接力协议（SBAR 五段 + 未决带判据）",
-      "detail": "HO-0002：refs 指向不存在的 check：check35; HO-0002：refs 指向不存在的 check：check36",
-      "digest": "9e4de4e6b4aa0a8ff9cf3cc3aa5377cc1cc75d4c2f7e0b8a5f2910635476a2e5",
+      "detail": "交接件 2 件 · 未决 12 条",
+      "digest": "c68f82f021754691fc89ebf6415602b427b8d13666604d9cd2eacd3787379405",
       "id": "handover",
-      "ok": false
+      "ok": true
     },
     {
       "description": "复盘（无指责 + 根因指向机制 + 行动项闭环）",
-      "detail": "PO-0001：引用 指向不存在的 check：check35",
-      "digest": "5c6781de0f584ddf9c850f542a9227559ebd6a104742a30506d6c0a46cb82cb0",
+      "detail": "复盘 1 件 · 行动项 2 条",
+      "digest": "6141ca85efef093f1e030b4f66bfbab6505a57cebd5c06db618ad0a31e466bca",
       "id": "postmortem",
-      "ok": false
+      "ok": true
     },
     {
       "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 21,
-  "root": "a86cd44c2d5c2be2889a8576f78716ced8dceadf8b39a3de74f41938bbf0d2dc",
+  "passed": 27,
+  "root": "3f7fc1d2008ec53eaadf6005ab1957cd7de9cb861499fda9003045f24cc1a8dc",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "non-conformant"
+  "verdict": "conformant"
 }

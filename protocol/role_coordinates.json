@@ -11861,14 +11861,14 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "!/usr/bin/env bash",
       "path": "verify.sh",
       "role": "verify",
       "rule": "R-verify"
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "cf4b9a7733a380db7fa0314d33d59dc3a19fa4298a174189f07138f338604108",
+  "root_digest": "1014152b6b90b0fa72865754735b613b64ad53074b181b743ab23f6a8ecc877d",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 96,

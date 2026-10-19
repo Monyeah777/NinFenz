@@ -4,18 +4,14 @@
     "expected_checks": 42,
     "expected_pass": 76,
     "report_items": 31,
-    "verify_version": ""
+    "verify_version": "v2.30"
   },
   "items": [
     {
       "id": "purity",
-      "issues": 46,
+      "issues": 0,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [
-        "L8 contract 的判据 check13 在 verify.sh 中不存在（修复指引：改指向真实 check）",
-        "L8 contract 的判据 check28 在 verify.sh 中不存在（修复指引：改指向真实 check）",
-        "L8 contract 的判据 check29 在 verify.sh 中不存在（修复指引：改指向真实 check）"
-      ],
+      "sample": [],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -36,7 +32,7 @@
         "raises": 61,
         "sinks": 16
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -58,20 +54,16 @@
     },
     {
       "id": "conformance",
-      "issues": 8,
+      "issues": 0,
       "name": "社区领域包 conformance 分级",
-      "sample": [
-        "导出面 ccv3: 证据门禁 check18 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
-        "导出面 ccv3: 证据门禁 check22 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
-        "导出面 skill: 证据门禁 check18 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）"
-      ],
+      "sample": [],
       "source": "conformance_scan.scan",
       "stats": {
         "export_items": 4,
         "modules_mc": 248,
         "packages": 111
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -243,18 +235,15 @@
     },
     {
       "id": "baseline",
-      "issues": 2,
+      "issues": 0,
       "name": "基线自描述一致（verify 版本 / check 数）",
-      "sample": [
-        "verify.sh 缺版本头（vX.Y）",
-        "verify.sh check 函数数/编号异常：[]"
-      ],
+      "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 0,
-        "verify_version": ""
+        "checks": 42,
+        "verify_version": "v2.30"
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -309,9 +298,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 21,
-        "root": "a86cd44c2d5c2be2889a8576f78716ced8dceadf8b39a3de74f41938bbf0d2dc",
-        "verdict": "non-conformant"
+        "passed": 27,
+        "root": "3f7fc1d2008ec53eaadf6005ab1957cd7de9cb861499fda9003045f24cc1a8dc",
+        "verdict": "conformant"
       },
       "status": "pass",
       "warns": 0
@@ -333,13 +322,9 @@
     },
     {
       "id": "self_stats",
-      "issues": 8,
+      "issues": 0,
       "name": "自述数字 == 实算（README/llms 生成区）",
-      "sample": [
-        "verify.sh 头部缺「# 版本 : vX」版本行",
-        "verify.sh 未扫到任何 checkN() 定义",
-        "基线 check 数 42 ≠ verify.sh 实扫 0（同步 quality_baseline.EXPECTED_CHECKS）"
-      ],
+      "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
         "baseline_checks": 42,
@@ -371,10 +356,10 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 0,
-        "verify_version": ""
+        "verify_checks": 42,
+        "verify_version": "2.30"
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -488,21 +473,17 @@
     },
     {
       "id": "judgement_coverage",
-      "issues": 3,
+      "issues": 0,
       "name": "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
-      "sample": [
-        "判据未接线：core/build_isolation.py 暴露 scan() 却没有任何消费者（修复指引：接进 verify.sh / nf.py / verify_report 判据表 / 其它 core 模块，或删除该死判据；确属设计用途须在 protocol/judgement_coverage.json 的 exceptions 写明理由）",
-        "判据未接线：core/semantic_conflict.py 暴露 scan() 却没有任何消费者（修复指引：接进 verify.sh / nf.py / verify_report 判据表 / 其它 core 模块，或删除该死判据；确属设计用途须在 protocol/judgement_coverage.json 的 exceptions 写明理由）",
-        "判据未接线：core/text_hygiene.py 暴露 scan() 却没有任何消费者（修复指引：接进 verify.sh / nf.py / verify_report 判据表 / 其它 core 模块，或删除该死判据；确属设计用途须在 protocol/judgement_coverage.json 的 exceptions 写明理由）"
-      ],
+      "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 63,
+        "consumed": 66,
         "exceptions": 2,
-        "orphans": 5,
+        "orphans": 2,
         "scanners": 68
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -547,7 +528,7 @@
       "stats": {
         "files": 3812,
         "kernel": 1976,
-        "kernel_no_self": 310,
+        "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -557,12 +538,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "122e33f2754b97e050fb347e208b162c00d202caca2095fdbeb465bcbf61a2c2",
+  "root_digest": "94b2cf93e32397c19705d6d49d44ba670691f642fc897552fff6320260c10a51",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 5,
-    "pass": 24,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }
