@@ -77,22 +77,26 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 )];
 
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
-const SINK_ALLOW: [(&str, &str); 11] = [
+/// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
+/// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
+const SINK_ALLOW: [(&str, &str); 13] = [
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),
     ("watch.py:os.rmdir", ""),
-    ("disk_cache.py:unlink", ""),
-    ("atomic_write.py:unlink", ""),
-    ("domain_pack.py:unlink", ""),
-    ("pack_combo.py:unlink", ""),
-    ("storage.py:unlink", ""),
-    ("watch.py:unlink", ""),
     // 2026-10-15（门禁提速批）：`core/gate_inproc.py` 的进程内 heredoc 执行面——
     // 源码字符串由该模块自己从本仓 `verify.sh` 机械切出，不来自任何外部输入；
     // 理由是「省掉 heredoc 的解释器启动税」，等价性由 Python 侧
     // `tests/test_gate_engine_parity.py` 逐 check 差分守住。与真源同步见 `purity_scan.SINK_ALLOW`。
     ("gate_inproc.py:exec", ""),
+    ("disk_cache.py:unlink", ""),
+    ("scratch.py:unlink", ""),
+    ("scratch.py:shutil.rmtree", ""),
+    ("atomic_write.py:unlink", ""),
+    ("domain_pack.py:unlink", ""),
+    ("pack_combo.py:unlink", ""),
+    ("storage.py:unlink", ""),
+    ("watch.py:unlink", ""),
 ];
 
 fn end_shell_re() -> &'static regex::Regex {
