@@ -39,7 +39,19 @@ cd "$ROOT" || { echo '无法进入仓库根目录'; exit 2; }
 if [ -n "${NF_VERIFY_TMP:-}" ]; then
   NFL_TMP="$NF_VERIFY_TMP"; mkdir -p "$NFL_TMP" 2>/dev/null || true
 else
-  NFL_TMP="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/nf_verify_$$")"
+  NFL_TMP="$(mktemp -d 2>/dev/null || true)"
+fi
+# 兜底（2026-10-19 实测）：有些 Windows 会话里 `/tmp` 不可写（mktemp 报 Permission denied），
+# 于是诊断目录建不出来、后面每条 check 的日志重定向全失败。这里按顺序试「TMPDIR → /tmp →
+# 仓库内 .rivet/tmp」，都不行就**显式报错退出**——不许带着一个不存在的日志目录继续跑。
+if [ -z "${NFL_TMP:-}" ] || [ ! -d "${NFL_TMP:-}" ]; then
+  for _cand in "${TMPDIR:-/tmp}" "$PWD/.rivet/tmp"; do
+    if mkdir -p "$_cand/nf_verify_$$" 2>/dev/null; then NFL_TMP="$_cand/nf_verify_$$"; break; fi
+  done
+fi
+if [ -z "${NFL_TMP:-}" ] || [ ! -d "${NFL_TMP:-}" ]; then
+  echo '无法创建诊断日志目录（TMPDIR / /tmp / .rivet/tmp 均不可写）——请设 NF_VERIFY_TMP 指向可写目录' >&2
+  exit 2
 fi
 # ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
 # 档位（2026-10-18 起）：
@@ -76,7 +88,12 @@ if [ "$NF_CHECKS_ONLY" = "1" ] && [ "$NF_TESTS_ONLY" = "1" ]; then
   echo '--checks-only 与 --tests-only 不能同时给（二者互斥）' >&2; exit 2
 fi
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
-  NFL_TMP="${TMPDIR:-/tmp}/nf_verify_$$"; mkdir -p "$NFL_TMP" 2>/dev/null || true
+  for _cand in "${TMPDIR:-/tmp}" "$PWD/.rivet/tmp"; do
+    if mkdir -p "$_cand/nf_verify_$$" 2>/dev/null; then NFL_TMP="$_cand/nf_verify_$$"; break; fi
+  done
+fi
+if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
+  echo '无法创建诊断日志目录——请设 NF_VERIFY_TMP 指向可写目录' >&2; exit 2
 fi
 cleanup_nfl(){
   # 全绿才清理；有 FAIL 时保留目录——诊断日志是修复依据，删掉等于把修复线索一起删了。
