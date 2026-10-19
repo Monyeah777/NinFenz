@@ -40,14 +40,13 @@ WEIGHTS_REL = "protocol/check12_weights.json"
 SHARD_TIMEOUT_S = 5400.0
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
 SERIAL_MODULES = frozenset({
-    "test_atomic_write", "test_daemon", "test_governance_faces",
-    # 2026-10-18 实测（16 片 + 动态队列）：下面这几族是"读协议内容快照"的判据，与"会短暂改写
-    # protocol/ 的判据"（schema_lint 的变异用例等）同机并发时会互相扫到中间态 → 串行段跑。
-    # 它们本身很便宜（合计 32 s），放到并发段后面独占跑，代价远小于偶发红。
-    "test_schema_lint", "test_schema_reference", "test_quality_depth_scan",
-    "test_instruction_step_audit", "test_pipeline_loader",
-    # test_lsp 的 warm 复用判据是**时间窗**口径（TTL 内只该扫一次签名）：16 路并发把单次
-    # 扫描拖长到窗外，就会"合法地"多扫一次而被判红——属负载敏感，进串行段。
+    "test_atomic_write", "test_daemon",
+    # 2026-10-19 复核：串行段一度扩到 9 个模块，结果串行段本身成了 367 s 的新瓶颈（j24 实测
+    # 最大片 = 367 s）。逐条回看取证后发现：schema_lint / governance / quality_depth 那一族的
+    # 红，全部发生在**工作树不干净**的跑次上（报告/回执/一致性面被判过期），不是读写竞争。
+    # 因此收回，只留**真正进程内打桩 + 时间窗**的两族。
+    # test_lsp 的 warm 复用判据是时间窗口径（TTL 内只该扫一次签名）：并发把单次扫描拖到窗外
+    # 就会"合法地"多扫一次而被判红——属负载敏感，保留串行。
     "test_lsp",
 })
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
@@ -277,6 +276,11 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
         with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
+            # 内层并发闸（2026-10-19 实测）：test_daemon_parity 的直跑面默认开 6 路线程，
+            # 16 片就是 96 个并发 python 进程——进程创建争用会把整片拖慢。
+            # 分片越多、每个分片的内层线程越少，总量固定在 ~16 路。
+            _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
+            env["NF_INNER_THREADS"] = str(max(1, min(6, 16 // max(1, _jobs_hint))))
             try:
                 proc = subprocess.run(
                     [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],

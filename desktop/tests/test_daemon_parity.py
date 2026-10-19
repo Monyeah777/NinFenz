@@ -271,7 +271,10 @@ class DaemonParityTest(_DaemonFixture):
         self.assertTrue(chunk, "机器面切片 %d/%d 为空（判据形同虚设）" % (index, total))
         # 直跑并行（互相独立；守护侧仍串行——冷/热两跑必须依次落在同一个守护上）
         directs = {}
-        with ThreadPoolExecutor(max_workers=6) as pool:
+        # 内层线程数可由分片器下调（NF_INNER_THREADS）：16 片 × 6 线程 = 96 个并发进程，
+        # 进程创建争用反而拖慢整体；分片越多、每片内层线程越少，总量维持 ~16 路。
+        _threads = max(1, min(6, int(os.environ.get("NF_INNER_THREADS") or 6)))
+        with ThreadPoolExecutor(max_workers=_threads) as pool:
             futures = {pool.submit(self._direct, argv): argv for _path, argv in chunk}
             for fut in as_completed(futures):
                 directs[tuple(futures[fut])] = fut.result()
