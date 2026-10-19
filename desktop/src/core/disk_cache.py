@@ -88,7 +88,7 @@ def count_files() -> int:
     return total
 
 
-def enforce_bounds(limit: Optional[int] = None) -> int:
+def enforce_bounds(limit: int | None = None) -> int:
     """把总量压到上限内（按 mtime 从旧到新删），返回删掉的份数。
 
     边界：任何异常都吞（缓存不是事实，删不动只是多占空间，不得影响命令结果）。

@@ -42,9 +42,9 @@ class WriteSemanticsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "a.json")
             aw.write_text(p, "old")
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
-                with self.assertRaises(PermissionError):
-                    aw.write_text(p, "new")
+            with (mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")),
+                  self.assertRaises(PermissionError)):
+                aw.write_text(p, "new")
             self.assertEqual(p.read_text(encoding="utf-8"), "old")
             self.assertEqual(sorted(x.name for x in Path(tmp).iterdir()), ["a.json"])
 

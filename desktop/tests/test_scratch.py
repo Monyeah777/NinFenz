@@ -60,9 +60,9 @@ class ResolveTest(_Base):
     def test_repo_inside_candidate_rejected_by_default(self):
         os.environ.pop(scratch.ENV_ALLOW_REPO, None)
         inside = scratch._repo_root() / ".rivet" / "tmp"
-        with mock.patch.object(scratch, "_candidates", return_value=[inside]):
-            with self.assertRaises(scratch.ScratchUnavailable) as ctx:
-                scratch.resolve()
+        with (mock.patch.object(scratch, "_candidates", return_value=[inside]),
+              self.assertRaises(scratch.ScratchUnavailable) as ctx):
+            scratch.resolve()
         self.assertIn(scratch.ENV_ALLOW_REPO, str(ctx.exception))
 
     def test_repo_inside_allowed_with_explicit_opt_in(self):
@@ -74,9 +74,9 @@ class ResolveTest(_Base):
     def test_all_candidates_unusable_fails_closed(self):
         bad = self._tmpdir() / "file"
         bad.write_text("x", encoding="utf-8")
-        with mock.patch.object(scratch, "_candidates", return_value=[bad]):
-            with self.assertRaises(scratch.ScratchUnavailable):
-                scratch.resolve()
+        with (mock.patch.object(scratch, "_candidates", return_value=[bad]),
+              self.assertRaises(scratch.ScratchUnavailable)):
+            scratch.resolve()
 
     def test_never_falls_back_to_cwd(self):
         bad = self._tmpdir() / "file"
@@ -85,9 +85,9 @@ class ResolveTest(_Base):
         work = self._tmpdir()
         os.chdir(work)
         try:
-            with mock.patch.object(scratch, "_candidates", return_value=[bad]):
-                with self.assertRaises(scratch.ScratchUnavailable):
-                    scratch.resolve()
+            with (mock.patch.object(scratch, "_candidates", return_value=[bad]),
+                  self.assertRaises(scratch.ScratchUnavailable)):
+                scratch.resolve()
         finally:
             os.chdir(old)
 
@@ -141,10 +141,10 @@ class ScratchDirTest(_Base):
 
     def test_scratch_dir_cleans_up_on_exception(self):
         holder = {}
-        with self.assertRaises(RuntimeError):
-            with scratch.scratch_dir("nfx") as d:
-                holder["d"] = d
-                raise RuntimeError("boom")
+        with (self.assertRaises(RuntimeError),
+              scratch.scratch_dir("nfx") as d):
+            holder["d"] = d
+            raise RuntimeError("boom")
         self.assertFalse(holder["d"].exists())
 
 

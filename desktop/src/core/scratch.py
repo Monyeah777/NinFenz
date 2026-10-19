@@ -31,9 +31,9 @@ import shutil
 import tempfile
 import time
 import uuid
-from contextlib import contextmanager
+from collections.abc import Iterator
+from contextlib import contextmanager, suppress
 from pathlib import Path
-from typing import Iterator, Optional
 
 ENV_ROOT = "NF_SCRATCH"
 ENV_ALLOW_REPO = "NF_ALLOW_REPO_SCRATCH"
@@ -88,10 +88,8 @@ def _candidates() -> list:
     home = os.environ.get("NARRATIVE_FORGE_HOME") or os.path.join(
         os.path.expanduser("~"), ".NinFenz")
     out.append(Path(home) / "scratch")
-    try:
+    with suppress(Exception):              # gettempdir 自身也可能炸
         out.append(Path(tempfile.gettempdir()) / "nf-scratch")
-    except Exception:                      # noqa: BLE001 - gettempdir 自身也可能炸
-        pass
     out.append(_repo_root() / ".rivet" / "tmp")
     return out
 
@@ -104,13 +102,13 @@ def resolve() -> Path:
     tried = []
     for cand in _candidates():
         if not cand.is_absolute():
-            tried.append("%s（非绝对路径，忽略）" % cand)
+            tried.append(f"{cand}（非绝对路径，忽略）")
             continue
         if in_repo(cand) and not allow_repo:
-            tried.append("%s（在仓库内，需 %s=1）" % (cand, ENV_ALLOW_REPO))
+            tried.append(f"{cand}（在仓库内，需 {ENV_ALLOW_REPO}=1）")
             continue
         if not _probe_writable(cand):
-            tried.append("%s（不可写）" % cand)
+            tried.append(f"{cand}（不可写）")
             continue
         _CACHE["root"] = cand
         return cand
@@ -125,7 +123,7 @@ def reset_cache() -> None:
     _CACHE.clear()
 
 
-def ensure_process_tempdir() -> Optional[Path]:
+def ensure_process_tempdir() -> Path | None:
     """把裁决结果写进 tempfile 与 TEMP/TMP/TMPDIR（幂等）。
 
     这是必要的全局副作用：tempfile.gettempdir() 在坏环境下返回 cwd，第三方库
@@ -165,7 +163,7 @@ def gc() -> int:
 def new_dir(prefix: str = "nf") -> Path:
     """在 scratch 根下新建唯一子目录（长期件用这个，不自动清理）。"""
     root = resolve()
-    d = root / ("%s-%s" % (prefix, uuid.uuid4().hex[:12]))
+    d = root / f"{prefix}-{uuid.uuid4().hex[:12]}"
     d.mkdir(parents=True, exist_ok=False)
     return d
 

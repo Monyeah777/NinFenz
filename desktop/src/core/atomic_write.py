@@ -73,8 +73,8 @@ def _ensure_target(path: str | os.PathLike) -> Path:
         raise ValueError("atomic_write: 路径不能为空（修复指引：传具体文件路径，"
                          "如 <root>/protocol/x.json；空串与纯空白一律拒绝）")
     if p.exists() and p.is_dir():
-        raise IsADirectoryError("atomic_write: 目标是目录，不是文件：%s"
-                                "（修复指引：改为该目录下的具体文件路径）" % p)
+        raise IsADirectoryError(f"atomic_write: 目标是目录，不是文件：{p}"
+                                "（修复指引：改为该目录下的具体文件路径）")
     return p
 
 
