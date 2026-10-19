@@ -6,7 +6,7 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:608d9d48bf5bdd94bc8f8cebbc61473dfd7f93a39391854d92b398686f3730d0
+  - verify.sh:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
@@ -20,6 +20,8 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-10-19）：verify.sh 补 _NF_BG_TESTS_PID 声明（set -u 下 pre-push 钩子炸点）
+
 > 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
 
 > 重审（2026-10-19）：EOL 归一 + 译件重签

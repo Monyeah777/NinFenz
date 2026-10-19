@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
   - desktop/tests/test_purity_scan.py:d00704eaab4784852c855455b4041134c639033aa46d9d08f470aa8ad8e784c0
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
-  - verify.sh:608d9d48bf5bdd94bc8f8cebbc61473dfd7f93a39391854d92b398686f3730d0
+  - verify.sh:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-19）：verify.sh 补 _NF_BG_TESTS_PID 声明（set -u 下 pre-push 钩子炸点）
+
 > 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
 
 > 重审（2026-10-19）：EOL 归一 + 译件重签

@@ -9,7 +9,7 @@
     ]
   },
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://ninfenz.dev/spdx/v2.30",
+  "documentNamespace": "https://ninfenz.dev/spdx/0.0.0",
   "name": "ninfenz-sbom",
   "packages": [
     {
@@ -19,7 +19,7 @@
       "licenseConcluded": "MIT",
       "licenseDeclared": "MIT",
       "name": "NinFenz",
-      "versionInfo": "v2.30"
+      "versionInfo": "0.0.0"
     },
     {
       "SPDXID": "SPDXRef-Dependency-yaml",
