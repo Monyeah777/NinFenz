@@ -6,14 +6,16 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/execution_drill.py:f52aa937f153e9e456eaa94c765ce82f900e336752e2725788724b498d41cdbb
-  - desktop/src/core/drill_fidelity.py:2664d0012fab7916f280d0d50ca7caf790c9ef3e0c99e154803c047ec67a1e4a
+  - desktop/src/core/execution_drill.py:32f84410800ddce3e70b4f9cfd5e77d4c5a37c11a221af394c592a5976ecb031
+  - desktop/src/core/drill_fidelity.py:d48a6a197a871cb41aa11584e96ca3e6cb105d6b5a0ca2d2d5c7a68ecff3b187
   - desktop/tests/fixtures/execution/p07_en_drill_cases.json:0fea6393ea0cbaf089e0499dd59364ca10f5f51c0ef9080cf34a747cafde9bb7
   - engine/rust/src/drill_fidelity.rs:081f7fa332d84446ae9a96927be79945780ae9c95ba4b42ed89dc8a7859e4be2
   - protocol/drill_fidelity.json:d1f96b08fd35473c471f63753ae87706655800647599414bd8668087d2dfa3ca
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
+  - protocol/code_metrics_baseline.json:8f0c9f269b4239bfa17637f1f9b95e66b2b69cc3b43d0a543b0a5d14d2bcb36d
 ---
+> 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算
+
 > 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
 
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算

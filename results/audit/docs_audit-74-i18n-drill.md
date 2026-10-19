@@ -18,16 +18,18 @@ subjects:
   - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
   - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
-  - desktop/src/core/execution_drill.py:f52aa937f153e9e456eaa94c765ce82f900e336752e2725788724b498d41cdbb
-  - desktop/src/core/drill_fidelity.py:2664d0012fab7916f280d0d50ca7caf790c9ef3e0c99e154803c047ec67a1e4a
-  - desktop/tests/test_execution_drill.py:7f965722cf0f262369172150eb1ec8aca316a1aa3de61e2debeedf88b7ac70cb
+  - desktop/src/core/execution_drill.py:32f84410800ddce3e70b4f9cfd5e77d4c5a37c11a221af394c592a5976ecb031
+  - desktop/src/core/drill_fidelity.py:d48a6a197a871cb41aa11584e96ca3e6cb105d6b5a0ca2d2d5c7a68ecff3b187
+  - desktop/tests/test_execution_drill.py:d193a6a7fb77e092b2b75f20e66429aed917c72cf4826b029a8a55446c5f6e2d
   - desktop/tests/test_round_drill.py:0a0997e935ce8cd417a7400fbaf2c897853e82297867f25165c9889117667a1a
   - desktop/tests/fixtures/execution/p04_drill_cases.json:9237e2713bab59df20ed8cc4df18f8a4f9bd1fe0437a4acf642b03ccdd9c5d07
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
+  - protocol/code_metrics_baseline.json:8f0c9f269b4239bfa17637f1f9b95e66b2b69cc3b43d0a543b0a5d14d2bcb36d
 ---
+> 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算
+
 > 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
 
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
