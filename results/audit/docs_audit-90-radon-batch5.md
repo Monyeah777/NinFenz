@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

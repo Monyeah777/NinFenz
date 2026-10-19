@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:6fae42fb839915e37d65e4d499486e2e98987de0f95bf2407e9c3ed45cd6cb6f
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:a35c6dda1796f9bdb1b94a35327f2b162c6a5534253480d3e0043729ccc35e27
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

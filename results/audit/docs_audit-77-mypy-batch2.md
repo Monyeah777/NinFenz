@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

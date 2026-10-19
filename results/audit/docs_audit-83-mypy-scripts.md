@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
 
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）

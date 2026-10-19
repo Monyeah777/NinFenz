@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

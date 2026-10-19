@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:0aba977ce21067d5ca9e60d64e48160c1d0cd0f237da7441384882598550abb8
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

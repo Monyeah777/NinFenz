@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:470318e84b91801e2262a68df193ebe46ca7b6988ad1148cf417b4cd849f7395
+  - protocol/code_metrics_baseline.json:5bbd0425dd8744e538060c5e04913d864f8ad941d053884a994363f0e774e168
 ---
+> 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）
+
 > 重审（2026-10-19）：EOL 归一 + 译件重签
 
 > 重审（2026-10-19）：度量重冻（conformance_scan +11 行：非仓库目录跳过）
