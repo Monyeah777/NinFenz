@@ -54,20 +54,55 @@ def _bigrams(text: str) -> set:
 
 
 def _mention_tokens(output: str) -> List[str]:
+    """**原始**模块号提及（含路径/文件名里的前缀）——只作「有没有编号提及」用。"""
     return _MODULE_TOKEN.findall(output)
+
+
+def _id_tokens(output: str) -> List[str]:
+    """**可作编号断言的**模块号 token：排除路径/文件名的前缀。
+
+    2026-10-20 真实语料实测：唯一真实战例 `docs/完整版样本_西幻生存流P03.md` 第 109 行
+    `- 出处：community/西幻生存领域包/modules/M10_死亡重生.md` —— `M10` 是**文件名**的一部分，
+    旧实现照抓并判 `fabricated_id`（"文件名被当裸编号"的误报）。
+    判据：紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）的匹配
+    不是裸编号断言；中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
+    """
+    out: List[str] = []
+    for m in _MODULE_TOKEN.finditer(output):
+        nxt = output[m.end():m.end() + 2]
+        if nxt[:1] and nxt[0].isascii() and (nxt[0].isalnum() or nxt[0] == "_"):
+            continue
+        if nxt[:1] == "." and len(nxt) > 1 and nxt[1].isascii() and nxt[1].isalnum():
+            continue
+        out.append(m.group(0))
+    return out
 
 
 def _clauses(output: str) -> List[str]:
     return [c.strip() for c in _SPLIT.split(output) if c.strip()]
 
 
+def _tail(tok: str) -> str:
+    """编号尾段：`通用:M10` → `M10`（无冒号即整串）。"""
+    return tok.split(":", 1)[-1]
+
+
 def _check_fabricated_id(output: str, real_ids: List[str], other_ids: List[str]) -> str:
-    """编号断言：本管线真实编号放行；**其它管线真实编号**判「跨管线串号」；其余判编造。"""
-    others = set(other_ids or [])
-    for tok in _mention_tokens(output):
-        if tok in real_ids:
+    """编号断言：本管线真实编号放行；**其它管线真实编号**判「跨管线串号」；其余判编造。
+
+    **后缀归一**（2026-10-20 修）：装配真实集里写 `通用:M10` / `生存:M10`（重号须类别前缀限定），
+    执行正文里常写裸 `M10`——旧实现拿整串精确比较 ⇒ 同一模块被判「编造」。
+    现与 `round_drill.scan`（R-R3）和 `assemble_plan`（决策句编号校验，`assemble_plan.py:219`）
+    **同口径**：冒号后的尾段命中即放行。
+    """
+    real_set = set(real_ids or [])
+    real_tails = {_tail(r) for r in real_set}
+    other_set = set(other_ids or [])
+    other_tails = {_tail(r) for r in other_set}
+    for tok in _id_tokens(output):
+        if tok in real_set or _tail(tok) in real_tails:
             continue
-        if tok in others:
+        if tok in other_set or _tail(tok) in other_tails:
             return "cross_pipeline_id"
         return "fabricated_id"
     return ""
