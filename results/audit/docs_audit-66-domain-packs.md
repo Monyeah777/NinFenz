@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:24853ba3c7deea26d21778745e2c58c6ef33698a4f8b7d77783b30b23312009f
+  - verify.sh:608d9d48bf5bdd94bc8f8cebbc61473dfd7f93a39391854d92b398686f3730d0
 
 ---
+> 重审（2026-10-19）：EOL 归一 + 译件重签
+
 > 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑
 
 > 重审（2026-10-19）：诊断目录兜底：TMPDIR/仓库内 .rivet/tmp
