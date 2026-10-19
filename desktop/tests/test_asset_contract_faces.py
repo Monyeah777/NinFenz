@@ -19,169 +19,287 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 
 from core import asset_contract as ac  # noqa: E402
 
-CASES = [{'export_drift': [],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
-             '"nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
+CASES = [
+    {
+        'export_drift': [],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                (
+                    '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
+                    '"nf-data-contracts/1"}\n'
+                ),
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts",\n  "profile": "data-package",\n  "reso'
+                    'urces": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出'
+                    '）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note": "由'
+                    '已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
             ('protocol/probe.json', '{"a": 1}\n'),
-            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n')],
-  'name': 'clean',
-  'registry': [],
-  'scan_issues': [],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': [],
-  'why': '三面全绿（D1 已登记 / ④ 导出件==实时导出 / ⑤ 过可移植 schema）'},
- {'export_drift': [],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [], "schema": "nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
+            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n'),
+        ],
+        'name': 'clean',
+        'registry': [],
+        'scan_issues': [],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [],
+        'why': '三面全绿（D1 已登记 / ④ 导出件==实时导出 / ⑤ 过可移植 schema）',
+    },
+    {
+        'export_drift': [],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                '{"contracts": [], "schema": "nf-data-contracts/1"}\n',
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts",\n  "profile": "data-package",\n  "reso'
+                    'urces": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出'
+                    '）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note": "由'
+                    '已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
             ('protocol/probe.json', '{"a": 1}\n'),
-            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n')],
-  'name': 'registration_missing',
-  'registry': ['资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact '
-               '不许只在资产册出现）'],
-  'scan_issues': ['资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 '
-                  'artifact 不许只在资产册出现）'],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': [],
-  'why': '变异：登记册少了 protocol/probe.json → D1 必须红'},
- {'export_drift': ['④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset '
-                   'contract --export）'],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
-             '"nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts-drift",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
+            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n'),
+        ],
+        'name': 'registration_missing',
+        'registry': [
+            (
+                '资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条'
+                '契约——同一 artifact 不许只在资产册出现）'
+            ),
+        ],
+        'scan_issues': [
+            (
+                '资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条'
+                '契约——同一 artifact 不许只在资产册出现）'
+            ),
+        ],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [],
+        'why': '变异：登记册少了 protocol/probe.json → D1 必须红',
+    },
+    {
+        'export_drift': [
+            (
+                '④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：'
+                'nf asset contract --export）'
+            ),
+        ],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                (
+                    '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
+                    '"nf-data-contracts/1"}\n'
+                ),
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts-drift",\n  "profile": "data-package",\n '
+                    ' "resources": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package'
+                    ' 导出）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note"'
+                    ': "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
             ('protocol/probe.json', '{"a": 1}\n'),
-            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n')],
-  'name': 'export_drift',
-  'registry': [],
-  'scan_issues': ['④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset '
-                  'contract --export）'],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': [],
-  'why': '变异：导出件与实时导出不一致 → ④ 必须红'},
- {'export_drift': [],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
-             '"nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
-            ('protocol/probe.json', '{"a": 1}\n')],
-  'name': 'schema_missing',
-  'registry': [],
-  'scan_issues': ['⑤ 缺可移植 schema '
-                  'protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）'],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': ['⑤ 缺可移植 schema '
-                  'protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）'],
-  'why': '变异：可移植 schema 缺件 → ⑤ 的**缺件分支**必须红'},
- {'export_drift': [],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
-             '"nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
+            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n'),
+        ],
+        'name': 'export_drift',
+        'registry': [],
+        'scan_issues': [
+            (
+                '④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：'
+                'nf asset contract --export）'
+            ),
+        ],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [],
+        'why': '变异：导出件与实时导出不一致 → ④ 必须红',
+    },
+    {
+        'export_drift': [],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                (
+                    '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
+                    '"nf-data-contracts/1"}\n'
+                ),
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts",\n  "profile": "data-package",\n  "reso'
+                    'urces": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出'
+                    '）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note": "由'
+                    '已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
             ('protocol/probe.json', '{"a": 1}\n'),
-            ('protocol/schema/asset_contracts.schema.json',
-             '{"required": ["schema", "no_such_key"], "type": "object"}\n')],
-  'name': 'schema_violation',
-  'registry': [],
-  'scan_issues': ['⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 '
-                  'no_such_key（修复指引：改声明或改 schema——两者只能有一个对）'],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': ['⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 '
-                  'no_such_key（修复指引：改声明或改 schema——两者只能有一个对）'],
-  'why': '变异：schema 在场但声明不符（缺必填 no_such_key）→ ⑤ 的**校验分支**必须红'},
- {'export_drift': [],
-  'files': [('protocol/asset_contracts.json',
-             '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
-             '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": '
-             '[]}\n'),
-            ('protocol/data_contracts.json',
-             '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
-             '"nf-data-contracts/1"}\n'),
-            ('protocol/generated/asset_contract.frictionless.json',
-             '{\n'
-             '  "name": "ninfenz-asset-contracts",\n'
-             '  "profile": "data-package",\n'
-             '  "resources": [],\n'
-             '  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出）",\n'
-             '  "x-nf-generated-by": "nf asset contract --export",\n'
-             '  "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n'
-             '}\n'),
+        ],
+        'name': 'schema_missing',
+        'registry': [],
+        'scan_issues': [
+            (
+                '⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——'
+                '对外可移植契约靠它定型）'
+            ),
+        ],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [
+            (
+                '⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——'
+                '对外可移植契约靠它定型）'
+            ),
+        ],
+        'why': '变异：可移植 schema 缺件 → ⑤ 的**缺件分支**必须红',
+    },
+    {
+        'export_drift': [],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                (
+                    '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
+                    '"nf-data-contracts/1"}\n'
+                ),
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts",\n  "profile": "data-package",\n  "reso'
+                    'urces": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出'
+                    '）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note": "由'
+                    '已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
             ('protocol/probe.json', '{"a": 1}\n'),
-            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n')],
-  'name': 'restored',
-  'registry': [],
-  'scan_issues': [],
-  'scan_stats': '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, '
-                '"script": 0}',
-  'schema_self': [],
-  'why': '恢复：改回与 clean 同一份 → 三面必须同时回绿'}]
+            (
+                'protocol/schema/asset_contracts.schema.json',
+                '{"required": ["schema", "no_such_key"], "type": "object"}\n',
+            ),
+        ],
+        'name': 'schema_violation',
+        'registry': [],
+        'scan_issues': [
+            (
+                '⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段'
+                ' no_such_key（修复指引：改声明或改 schema——两者只能有一个对）'
+            ),
+        ],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [
+            (
+                '⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段'
+                ' no_such_key（修复指引：改声明或改 schema——两者只能有一个对）'
+            ),
+        ],
+        'why': '变异：schema 在场但声明不符（缺必填 no_such_key）→ ⑤ 的**校验分支**必须红',
+    },
+    {
+        'export_drift': [],
+        'files': [
+            (
+                'protocol/asset_contracts.json',
+                (
+                    '{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": '
+                    '"protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "scrip'
+                    't": []}\n'
+                ),
+            ),
+            (
+                'protocol/data_contracts.json',
+                (
+                    '{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": '
+                    '"nf-data-contracts/1"}\n'
+                ),
+            ),
+            (
+                'protocol/generated/asset_contract.frictionless.json',
+                (
+                    '{\n  "name": "ninfenz-asset-contracts",\n  "profile": "data-package",\n  "reso'
+                    'urces": [],\n  "title": "NinFenz 数字资产契约（Frictionless Data Package 导出'
+                    '）",\n  "x-nf-generated-by": "nf asset contract --export",\n  "x-nf-note": "由'
+                    '已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"\n}\n'
+                ),
+            ),
+            ('protocol/probe.json', '{"a": 1}\n'),
+            ('protocol/schema/asset_contracts.schema.json', '{"type": "object"}\n'),
+        ],
+        'name': 'restored',
+        'registry': [],
+        'scan_issues': [],
+        'scan_stats': (
+            '{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": '
+            '0}'
+        ),
+        'schema_self': [],
+        'why': '恢复：改回与 clean 同一份 → 三面必须同时回绿',
+    },
+]
 
 
 class AssetContractIntegralFacesTest(unittest.TestCase):
@@ -195,22 +313,22 @@ class AssetContractIntegralFacesTest(unittest.TestCase):
 
     def test_faces_and_scan_match_generated_expectations(self):
         for case in CASES:
-            with self.subTest(case=case["name"]):
-                with tempfile.TemporaryDirectory() as tmp:
-                    self._build(tmp, case["files"])
-                    doc, load_issues = ac.load(tmp)
-                    self.assertEqual(load_issues, [], case["name"])
-                    self.assertEqual(ac._registry_issues(tmp, doc), case["registry"],
-                                     "%s 的 D1 登记册 issues 不一致" % case["name"])
-                    self.assertEqual(ac._export_drift(tmp), case["export_drift"],
-                                     "%s 的 ④ 导出漂移 issues 不一致" % case["name"])
-                    self.assertEqual(ac._schema_self_check(tmp), case["schema_self"],
-                                     "%s 的 ⑤ 声明自检 issues 不一致" % case["name"])
-                    issues, _warns, stats = ac.scan(tmp)
-                    self.assertEqual(issues, case["scan_issues"],
-                                     "%s 的 scan issues 不一致" % case["name"])
-                    self.assertEqual(json.dumps(stats, ensure_ascii=False, sort_keys=True),
-                                     case["scan_stats"], "%s 的 scan stats 不一致" % case["name"])
+            with self.subTest(case=case["name"]), tempfile.TemporaryDirectory() as tmp:
+                self._build(tmp, case["files"])
+                doc, load_issues = ac.load(tmp)
+                self.assertEqual(load_issues, [], case["name"])
+                self.assertEqual(ac._registry_issues(tmp, doc), case["registry"],
+                                 f"{case['name']} 的 D1 登记册 issues 不一致")
+                self.assertEqual(ac._export_drift(tmp), case["export_drift"],
+                                 f"{case['name']} 的 ④ 导出漂移 issues 不一致")
+                self.assertEqual(ac._schema_self_check(tmp), case["schema_self"],
+                                 f"{case['name']} 的 ⑤ 声明自检 issues 不一致")
+                issues, _warns, stats = ac.scan(tmp)
+                self.assertEqual(issues, case["scan_issues"],
+                                 f"{case['name']} 的 scan issues 不一致")
+                self.assertEqual(json.dumps(stats, ensure_ascii=False, sort_keys=True),
+                                 case["scan_stats"],
+                                 f"{case['name']} 的 scan stats 不一致")
 
 
 if __name__ == "__main__":
