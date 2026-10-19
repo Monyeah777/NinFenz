@@ -189,8 +189,8 @@ def _all_c0_and_quoting_case():
             src.append("\\" + short)
             want.append("\\" + short)
         else:
-            src.append("\\u%04x" % cp)
-            want.append("\\u%04x" % cp)
+            src.append(f"\\u{cp:04x}")
+            want.append(f"\\u{cp:04x}")
     src.extend(["\\\\", "\\/", '\\"', "\\u007f"])
     want.extend(["\\\\", "/", '\\"', chr(0x7F)])
     return '"' + "".join(src) + '"', '"' + "".join(want) + '"'
