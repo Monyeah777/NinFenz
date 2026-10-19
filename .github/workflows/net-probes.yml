@@ -1,0 +1,158 @@
+name: net-probes
+# .NET 判据探针跑批（45 条 = 39 core + 6 long）的 CI 接线。
+#
+# 为什么要有它（2026-10-19 只读侦查证实）：
+#   · `engine/dotnet/run-probes.ps1`（清单驱动的一键跑批，口径唯一出处 =
+#     probes/probe_manifest.json）**没有任何 workflow 引用**；CI 只在 `net-engine.yml` 里
+#     直跑了 3 条 probe（face-parity / no-regression / reproducible-build）——剩下 42 条
+#     "有实现、无 CI"。
+#   · 45 条里有 2 条（artifact-equivalence / nuget-package-consumer）的参数带 **`{win}` /
+#     `{linux}` 占位符**：它们要的是**两个 RID 的自包含交付形态目录**（dist/nf-dotnet-<rid>-fNN-*），
+#     不是 runner OS。故不是"windows 跑 win 子集、linux 跑 linux 子集"，而是**双平台都先产两个
+#     RID** 再跑同一套 core 档，平台差异只体现在「执行用哪个 RID 的 CLI」。
+#   · 探针的 `{snap}` 需要**金标语料快照**（引擎常数 `CorpusStamp.Baseline` 锚定 HEAD `aa259d7`
+#     的导出快照）。CI 不 checkout 兄弟目录 nf-snap-h16 ⇒ 用 `git archive aa259d7` 现场重建。
+#     **本地实测（2026-10-19）**：该导出指纹 = `fe8e8f3eb215a57d` == CorpusStamp.Baseline，
+#     即"重建快照 = 金标快照"，不是凑合用的活仓库。
+#
+# 铁律（RUNBOOK §4 的两条已证伪变体，别再走）：
+#   · **树外构建**：copy 到 $RUNNER_TEMP/nf-engine 再 build/publish（树内 bin/obj 会让
+#     text-hygiene 类判据假红）；
+#   · **门跑导出快照、不拿活仓库当金标**：{snap}=aa259d7 导出；{other}=本次检出（做漂移归因）。
+#
+# 为什么 long 档（6 条重型：双门同判 / 规模 / 模糊 / 敌意输入 / 可复现构建 / 规模对照）不进 CI：
+# 跑批超时预算与墙钟（探针单条 timeout 默认 3600 s）。要跑全量用 workflow_dispatch 输入 tier=all。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: '探针档位（core=39 条默认；all=45 条含重型）'
+        required: false
+        default: core
+        type: choice
+        options: [core, all]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probes:
+    name: net-probes-${{ matrix.os }}
+    strategy:
+      fail-fast: false          # 两平台各自出结论，不因一台红掩盖另一台
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    env:
+      # 与净引擎门同口径：Windows runner 默认 ANSI 码页，子进程 CJK 输出会 UnicodeEncodeError。
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+      # 跑批档位：push/PR 固定 core；手动触发可 all。
+      NF_PROBE_TIER: ${{ github.event.inputs.tier || 'core' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          # 金标快照要 `git archive aa259d7`：浅克隆（默认 depth=1）里没有这个祖先提交。
+          fetch-depth: 0
+      - name: 工具链就绪（python / .NET 8 / pwsh / bash）
+        shell: bash
+        run: |
+          (python3 --version || python --version)
+          dotnet --list-sdks
+          dotnet --list-sdks | grep -q '^8\.' || { echo "::error::缺 .NET 8 SDK"; exit 1; }
+          pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
+          bash --version | head -1
+      - name: 金标语料快照（git archive aa259d7 → nf-snap-h16；指纹须 == CorpusStamp.Baseline）
+        shell: pwsh
+        run: |
+          $snap = Join-Path $env:RUNNER_TEMP 'nf-snap-h16'
+          $tar = Join-Path $env:RUNNER_TEMP 'nf-snap.tar'
+          New-Item -ItemType Directory -Force -Path $snap | Out-Null
+          git archive --format=tar --output=$tar aa259d7
+          if ($LASTEXITCODE -ne 0) { throw 'git archive aa259d7 失败（快照提交不在历史里？）' }
+          # **不要用 tar.exe 解包**（RUNBOOK 已记）：Windows 自带 bsdtar 解 CJK 路径会报
+          # 「Invalid empty pathname」并丢文件 ⇒ 用 Python tarfile（两侧都通，CJK 名安全）。
+          $py = if ($env:RUNNER_OS -eq 'Windows') { 'python' } else { 'python3' }
+          & $py -c "import sys,tarfile; t=tarfile.open(sys.argv[1]); t.extractall(sys.argv[2], filter='data') if hasattr(tarfile,'data_filter') else t.extractall(sys.argv[2])" $tar $snap
+          if ($LASTEXITCODE -ne 0) { throw '解包快照失败（Python tarfile）' }
+          Remove-Item -Force $tar
+          Write-Host ("快照件数 = " + (Get-ChildItem -Recurse -File $snap).Count)
+      - name: 树外构建引擎 + 两个 CLI + 两 RID 交付形态（{cli}/{parity}/{win}/{linux} 的真身）
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $build = Join-Path $env:RUNNER_TEMP 'nf-engine'
+          Copy-Item -Recurse -Force engine/dotnet $build
+          dotnet build (Join-Path $build 'src/Nf.Engine/Nf.Engine.csproj') -c Release --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'Nf.Engine 构建失败' }
+          dotnet build (Join-Path $build 'tools/nf-dotnet/nf-dotnet.csproj') -c Release --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'nf-dotnet 构建失败' }
+          dotnet build (Join-Path $build 'tools/nfparity/nfparity.csproj') -c Release --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'nfparity 构建失败' }
+          foreach ($rid in @('win-x64', 'linux-x64')) {
+            $out = Join-Path $build "dist/nf-dotnet-$rid-f0-ci"
+            dotnet publish (Join-Path $build 'tools/nf-dotnet/nf-dotnet.csproj') `
+              -c Release -r $rid --self-contained true --nologo -o $out
+            if ($LASTEXITCODE -ne 0) { throw "publish $rid 失败" }
+            Write-Host ("{0}: {1} 件" -f $rid, (Get-ChildItem -File $out).Count)
+          }
+      - name: 判据跑批（run-probes.ps1 · core 档；占位符全部解析）
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $engine = Join-Path $env:RUNNER_TEMP 'nf-engine'
+          $snap = Join-Path $env:RUNNER_TEMP 'nf-snap-h16'
+          $isWin = $env:RUNNER_OS -eq 'Windows'
+          # 平台差异只在这里：Linux runner 上 nf-dotnet / nfparity 是原生 apphost（无 .exe）。
+          $cli = if ($isWin) {
+            Join-Path $engine 'dist/nf-dotnet-win-x64-f0-ci/nf-dotnet.exe'
+          } else {
+            Join-Path $engine 'dist/nf-dotnet-linux-x64-f0-ci/nf-dotnet'
+          }
+          $parity = Join-Path $engine ('tools/nfparity/bin/Release/net8.0/' + $(if ($isWin) { 'nfparity.exe' } else { 'nfparity' }))
+          $py = if ($isWin) { 'python' } else { 'python3' }
+          # -Bash 要**路径**（跑批器把它当 token 做 Test-Path 校验）：先 Get-Command 取 Source，
+          # 取不到再退回名字（Linux 镜像的 PATH 里 bash 恒在；Windows 镜像靠 Git for Windows）。
+          $bashExe = (Get-Command bash -ErrorAction SilentlyContinue).Source
+          if (-not $bashExe) { $bashExe = 'bash' }
+          $runArgs = @(
+            '-NoProfile', '-File', (Join-Path $engine 'run-probes.ps1'),
+            '-Engine', $engine,
+            '-Snap', $snap,
+            '-Other', $PWD.Path,
+            '-Cli', $cli,
+            '-Parity', $parity,
+            '-Python', $py,
+            '-DotNet', 'dotnet',
+            '-Bash', $bashExe,
+            '-Tier', $env:NF_PROBE_TIER
+          )
+          pwsh @runArgs
+          if ($LASTEXITCODE -ne 0) { throw "判据跑批 FAIL（exit $LASTEXITCODE）" }
+      - name: 失败证据（跑批机器面 + 各条输出尾部；均来自树外产物，不入库）
+        if: failure()
+        shell: pwsh
+        run: |
+          $art = Join-Path $PWD '.artifacts'
+          New-Item -ItemType Directory -Force -Path $art | Out-Null
+          $stout = Join-Path $env:RUNNER_TEMP 'nf-engine/probes/_stout'
+          Copy-Item (Join-Path $stout '_probe_run.json') $art -ErrorAction SilentlyContinue
+          Get-ChildItem $stout -Filter '*.txt' -ErrorAction SilentlyContinue |
+            Select-Object -First 200 | ForEach-Object {
+              $tail = Get-Content $_.FullName -Tail 40 -ErrorAction SilentlyContinue
+              ("### " + $_.Name) , ($tail -join "`n") | Out-File (Join-Path $art 'probe-tails.txt') -Encoding utf8 -Append
+            }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: failure()
+        with:
+          name: net-probes-diagnostics-${{ matrix.os }}
+          path: .artifacts/
+          if-no-files-found: warn
