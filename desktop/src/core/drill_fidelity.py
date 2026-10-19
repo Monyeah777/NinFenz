@@ -32,7 +32,7 @@ import re
 
 from core import atomic_write
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 from core import json_doc
 
 EXEC_GLOB = "desktop/tests/fixtures/execution/p*_drill_cases.json"
@@ -50,15 +50,16 @@ VERDICT_MAP = {"good": "conformant", "conformant": "conformant",
 PENDING = "pending"
 
 
-def _exec_sets(root: Path) -> List[Dict[str, Any]]:
+def _exec_sets(root: Path) -> list[dict[str, Any]]:
     from core import execution_drill as ed
 
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for f in sorted(root.glob(EXEC_GLOB)):
         try:
             data = json_doc.load(f, dict, what=f.name)
         except ValueError as exc:
-            out.append({"set": f.name, "cases": 0, "passed": 0, "error": "JSON 不可解析：%s" % exc})
+            out.append({"set": f.name, "cases": 0, "passed": 0,
+                        "error": f"JSON 不可解析：{exc}"})
             continue
         real, sem, src = data.get("real_ids") or [], data.get("semantics") or {}, data.get("source_"
             "text", "")
@@ -75,9 +76,9 @@ def _exec_sets(root: Path) -> List[Dict[str, Any]]:
     return out
 
 
-def _round_adjudications(doc: Dict[str, Any], hits: List[str]) -> List[Dict[str, Any]]:
+def _round_adjudications(doc: dict[str, Any], hits: list[str]) -> list[dict[str, Any]]:
     """待裁定样本的逐条裁定表（`adjudication`: hit / verdict=TP|FP / basis）——只留命中过的。"""
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for item in doc.get("adjudication") or []:
         if not isinstance(item, dict):
             continue
@@ -87,7 +88,7 @@ def _round_adjudications(doc: Dict[str, Any], hits: List[str]) -> List[Dict[str,
     return out
 
 
-def _round_sample(f: Path) -> Dict[str, Any]:
+def _round_sample(f: Path) -> dict[str, Any]:
     from core import round_drill as rd
 
     name = f.name
@@ -97,7 +98,7 @@ def _round_sample(f: Path) -> Dict[str, Any]:
         return {"sample": name, "declared": "?", "live": "error", "matched": False,
                 "label_status": "adjudicated", "pending": False, "turns": 0, "parse_ok": False,
                 "hits": [], "first_issue": "", "adjudication": [],
-                "error": "JSON 不可解析：%s" % exc}
+                "error": f"JSON 不可解析：{exc}"}
     transcript = str(d.get("transcript") or "")
     issues, stats = rd.scan(transcript, list(d.get("allowed") or []))
     live = "non-conformant" if issues else "conformant"
@@ -119,13 +120,13 @@ def _round_sample(f: Path) -> Dict[str, Any]:
             "adjudication": _round_adjudications(d, issues)}
 
 
-def _round_samples(root: Path) -> List[Dict[str, Any]]:
+def _round_samples(root: Path) -> list[dict[str, Any]]:
     return [_round_sample(f) for f in sorted(root.glob(ROUND_GLOB))]
 
 
-def _registry_ids(text: str) -> List[str]:
+def _registry_ids(text: str) -> list[str]:
     """从真实语料的注册表投影表行抽出模块号集（去重保序）。"""
-    out: List[str] = []
+    out: list[str] = []
     for line in text.splitlines():
         m = REGISTRY_ROW.match(line)
         if m and m.group(1) not in out:
@@ -133,7 +134,7 @@ def _registry_ids(text: str) -> List[str]:
     return out
 
 
-def _real_corpus_block(root: Path) -> Tuple[str, Dict[str, Any], List[str]]:
+def _real_corpus_block(root: Path) -> tuple[str, dict[str, Any], list[str]]:
     """找带 `real_corpus` 裁定的回合样本 → (样本名, 裁定块, 该样本 allowed)。"""
     for f in sorted(root.glob(ROUND_GLOB)):
         try:
@@ -148,59 +149,58 @@ def _real_corpus_block(root: Path) -> Tuple[str, Dict[str, Any], List[str]]:
     return "", {}, []
 
 
-def _corpus_meta_problems(block: Dict[str, Any], text: str, sha: str,
-                          nonblank: List[Tuple[int, str]],
-                          allowed: List[str]) -> Tuple[List[str], List[str]]:
+def _corpus_meta_problems(block: dict[str, Any], text: str, sha: str,
+                          nonblank: list[tuple[int, str]],
+                          allowed: list[str]) -> tuple[list[str], list[str]]:
     """裁定表元数据对账（防语料换了/允许集被裁剪后仍报旧数）→ (problems, real_ids)。"""
-    problems: List[str] = []
+    problems: list[str] = []
     if block.get("sha256") and block["sha256"] != sha:
-        problems.append("真实语料已变（sha256 不匹配）——逐条裁定表须重做：%s" % REAL_CORPUS_REL)
+        problems.append(f"真实语料已变（sha256 不匹配）"
+                        f"——逐条裁定表须重做：{REAL_CORPUS_REL}")
     if block.get("nonblank_lines") not in (None, len(nonblank)):
-        problems.append("真实语料非空行数变了（裁定表记 %r，实测 %d）——裁定表须重做"
-                        % (block.get("nonblank_lines"), len(nonblank)))
+        problems.append(f"真实语料非空行数变了（裁定表记 {block.get('nonblank_lines')!r}，"
+                        f"实测 {len(nonblank)}）——裁定表须重做")
     real_ids = [str(x) for x in (block.get("real_ids") or [])]
     if allowed and set(real_ids) != set(allowed):
         problems.append("裁定表 real_ids 与所属样本 allowed 不一致"
                         "（修复指引：两处须同为该管线在册集）")
     registry = _registry_ids(text)
     if registry and set(real_ids) != set(registry):
-        problems.append("裁定表 real_ids 与语料注册表投影不一致（防裁剪允许集）"
-                        "——投影 %d 件，裁定表 %d 件"
-                        % (len(registry), len(real_ids)))
+        problems.append(f"裁定表 real_ids 与语料注册表投影不一致（防裁剪允许集）"
+                        f"——投影 {len(registry)} 件，裁定表 {len(real_ids)} 件")
     return problems, real_ids
 
 
-def _corpus_live_hits(nonblank: List[Tuple[int, str]], real_ids: List[str]
-                      ) -> List[Tuple[int, str]]:
+def _corpus_live_hits(nonblank: list[tuple[int, str]], real_ids: list[str]
+                      ) -> list[tuple[int, str]]:
     """逐非空行回放 `execution_drill` → 现存命中 `[(行号, 规则名)]`。"""
     from core import execution_drill as ed
 
-    live: List[Tuple[int, str]] = []
+    live: list[tuple[int, str]] = []
     for line_no, line in nonblank:
         for rule in ed.run_case({"output": line}, real_ids, {}):
             live.append((line_no, rule))
     return live
 
 
-def _corpus_forward(live: List[Tuple[int, str]], keyed: Dict[Tuple[int, str], Dict[str, Any]]
-                    ) -> Tuple[int, int, List[Dict[str, Any]], List[str]]:
+def _corpus_forward(live: list[tuple[int, str]], keyed: dict[tuple[int, str], dict[str, Any]]
+                    ) -> tuple[int, int, list[dict[str, Any]], list[str]]:
     """正向：现存命中逐条裁定 → (tp, fp, detail, problems)。"""
-    problems: List[str] = []
+    problems: list[str] = []
     tp = fp = 0
-    detail: List[Dict[str, Any]] = []
+    detail: list[dict[str, Any]] = []
     for line_no, rule in live:
         entry = keyed.get((line_no, rule))
         if entry is None:
-            problems.append("真实语料命中未裁定：第 %d 行 %s（裁定表缺条目）" % (line_no, rule))
+            problems.append(f"真实语料命中未裁定：第 {line_no} 行 {rule}（裁定表缺条目）")
             continue
         verdict = str(entry.get("verdict") or "").upper()
         basis = str(entry.get("basis") or "").strip()
         if verdict not in ("TP", "FP"):
-            problems.append("裁定 verdict 必须 TP/FP：第 %d 行 %s 实为 %r"
-                            % (line_no, rule, verdict))
+            problems.append(f"裁定 verdict 必须 TP/FP：第 {line_no} 行 {rule} 实为 {verdict!r}")
             continue
         if not basis:
-            problems.append("裁定缺依据（basis）：第 %d 行 %s" % (line_no, rule))
+            problems.append(f"裁定缺依据（basis）：第 {line_no} 行 {rule}")
         if verdict == "TP":
             tp += 1
         else:
@@ -210,22 +210,22 @@ def _corpus_forward(live: List[Tuple[int, str]], keyed: Dict[Tuple[int, str], Di
     return tp, fp, detail, problems
 
 
-def _corpus_reverse(keyed: Dict[Tuple[int, str], Dict[str, Any]], live_keys: set
-                    ) -> Tuple[int, List[Dict[str, Any]], List[str]]:
+def _corpus_reverse(keyed: dict[tuple[int, str], dict[str, Any]], live_keys: set
+                    ) -> tuple[int, list[dict[str, Any]], list[str]]:
     """反向：裁定表里已不命中的条目必须改成 live=false（FP 记为已修，TP 记为漏报回归）。"""
-    problems: List[str] = []
+    problems: list[str] = []
     resolved = 0
-    detail: List[Dict[str, Any]] = []
+    detail: list[dict[str, Any]] = []
     for (line_no, rule), entry in sorted(keyed.items()):
         if (line_no, rule) in live_keys:
             continue
         verdict = str(entry.get("verdict") or "").upper()
         if entry.get("live") is True:
-            problems.append("裁定表声称仍命中但实测已消失：第 %d 行 %s（修复指引：若系修复所致，"
-                            "把该条 live 置 false）" % (line_no, rule))
+            problems.append(f"裁定表声称仍命中但实测已消失：第 {line_no} 行 {rule}"
+                            f"（修复指引：若系修复所致，把该条 live 置 false）")
         elif verdict == "TP":
-            problems.append("TP 命中消失（漏报回归）：第 %d 行 %s（修复指引：不得为了指标放宽/删除"
-                            "判据——TP 消失必须解释并改裁定）" % (line_no, rule))
+            problems.append(f"TP 命中消失（漏报回归）：第 {line_no} 行 {rule}"
+                            f"（修复指引：不得为了指标放宽/删除判据——TP 消失必须解释并改裁定）")
         else:
             resolved += 1
             detail.append({"line": line_no, "rule": rule, "verdict": verdict,
@@ -234,8 +234,8 @@ def _corpus_reverse(keyed: Dict[Tuple[int, str], Dict[str, Any]], live_keys: set
     return resolved, detail, problems
 
 
-def _corpus_adjudicate(live: List[Tuple[int, str]], keyed: Dict[Tuple[int, str], Dict[str, Any]]
-                       ) -> Tuple[int, int, int, List[Dict[str, Any]], List[str]]:
+def _corpus_adjudicate(live: list[tuple[int, str]], keyed: dict[tuple[int, str], dict[str, Any]]
+                       ) -> tuple[int, int, int, list[dict[str, Any]], list[str]]:
     """现存命中逐条裁定 + 裁定表反向核对 → (tp, fp, fp_resolved, detail, problems)。
 
     三条反向判据缺一不可，否则本判据会退化成「自报绿」：
@@ -246,7 +246,7 @@ def _corpus_adjudicate(live: List[Tuple[int, str]], keyed: Dict[Tuple[int, str],
     return tp, fp, resolved, detail + resolved_detail, problems + reverse_problems
 
 
-def real_corpus(root: str = ".") -> Dict[str, Any]:
+def real_corpus(root: str = ".") -> dict[str, Any]:
     """真实语料逐命中裁定（活判据）→ 度量块；找不到语料/裁定表时返回 `{}`。
 
     造这条判据的原因：74/74 drill 全是自造样本（0 份真实转录），保真度 100% 属自指绿。
@@ -273,7 +273,7 @@ def real_corpus(root: str = ".") -> Dict[str, Any]:
     tp, fp, resolved, detail, verdict_problems = _corpus_adjudicate(live, keyed)
     problems += verdict_problems
     raw_turns = int(rd.scan(text, [])[1].get("turns") or 0)
-    rules: Dict[str, int] = {}
+    rules: dict[str, int] = {}
     for _n, rule in live:
         rules[rule] = rules.get(rule, 0) + 1
     return {"source": REAL_CORPUS_REL,
@@ -293,7 +293,7 @@ def real_corpus(root: str = ".") -> Dict[str, Any]:
             "adjudications": detail}
 
 
-def measure(root: str = ".") -> Dict[str, Any]:
+def measure(root: str = ".") -> dict[str, Any]:
     """→ 保真度度量（执行演练 + 回合级回放 + 真实语料裁定 + 总口径）。"""
     r = Path(root)
     ex = _exec_sets(r)
@@ -337,67 +337,67 @@ def measure(root: str = ".") -> Dict[str, Any]:
                         "round_tp": round_tp, "round_fp": round_fp}}
 
 
-def _exec_issues(sets: List[Dict[str, Any]]) -> List[str]:
+def _exec_issues(sets: list[dict[str, Any]]) -> list[str]:
     """执行演练集的判据问题（坏 JSON / 保真度不足）。"""
-    issues: List[str] = []
+    issues: list[str] = []
     for s in sets:
         if s.get("error"):
-            issues.append("%s %s" % (s["set"], s["error"]))
+            issues.append("{} {}".format(s["set"], s["error"]))
         elif s["passed"] != s["cases"]:
-            issues.append("执行演练保真度不足：%s %d/%d（修复指引：先修样本集自身或捕获逻辑，"
-                          "演练集不达标不得入库）" % (s["set"], s["passed"], s["cases"]))
+            issues.append(f"执行演练保真度不足：{s['set']} {s['passed']}/{s['cases']}"
+                          f"（修复指引：先修样本集自身或捕获逻辑，演练集不达标不得入库）")
     return issues
 
 
-def _round_issues(samples: List[Dict[str, Any]]) -> List[str]:
+def _round_issues(samples: list[dict[str, Any]]) -> list[str]:
     """回合级样本的判据问题（声明未复现 / 待裁定样本 parse 或裁定缺位）。"""
-    issues: List[str] = []
+    issues: list[str] = []
     for s in samples:
         if s.get("error"):
-            issues.append("%s %s" % (s["sample"], s["error"]))
+            issues.append("{} {}".format(s["sample"], s["error"]))
             continue
         if not s.get("pending"):
             if not s.get("matched"):
-                issues.append("回合级回放未复现声明：%s 声明=%s 实测=%s（%s）（修复指引：修样本或"
+                issues.append("回合级回放未复现声明：{} 声明={} 实测={}（{}）（修复指引：修样本或"
                               "回合断言——回放须可复现声明结论）"
-                              % (s["sample"], s.get("declared"), s.get("live"),
-                                 str(s.get("first_issue"))[:60]))
+                              .format(s["sample"], s.get("declared"), s.get("live"),
+                                      str(s.get("first_issue"))[:60]))
             continue
         # 待裁定样本：parse 是裁定前提；命中必须逐条裁定，不许留「疑似」。
         if not s.get("parse_ok"):
-            issues.append("待裁定回合样本未解析出回合标记：%s（parse 失败 ⇒ 裁定前提不成立；"
-                          "修复指引：转录须含「回合 N：」/「第 N 回合」）" % s["sample"])
+            issues.append("待裁定回合样本未解析出回合标记：{}（parse 失败 ⇒ 裁定前提不成立；"
+                          "修复指引：转录须含「回合 N：」/「第 N 回合」）".format(s["sample"]))
         declared = {a["hit"]: a["verdict"] for a in s.get("adjudication") or []}
         for hit in s.get("hits") or []:
             if declared.get(hit) not in ("TP", "FP"):
-                issues.append("待裁定样本 %s 的规则命中未裁定：%s（修复指引：在样本 adjudication 里"
-                              "逐条给 TP/FP + 依据）" % (s["sample"], hit))
+                issues.append("待裁定样本 {} 的规则命中未裁定：{}（修复指引：在样本 adjudication 里"
+                              "逐条给 TP/FP + 依据）".format(s["sample"], hit))
     return issues
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+def scan(root: str = ".") -> tuple[list[str], list[str], dict[str, Any]]:
     """→ (issues, warns, stats)：任一例不达标 / 无载体 / 命中未裁定 = FAIL。"""
     m = measure(root)
-    warns: List[str] = []
-    issues: List[str] = []
+    warns: list[str] = []
+    issues: list[str] = []
     if m["execution"]["cases"] == 0:
-        issues.append("找不到执行演练用例（修复指引：%s 下须有 p*_drill_cases.json）" % EXEC_GLOB)
+        issues.append("找不到执行演练用例"
+                      f"（修复指引：{EXEC_GLOB} 下须有 p*_drill_cases.json）")
     if m["rounds"]["parse_total"] == 0:
-        issues.append("找不到回合级回放样本（修复指引：%s 下须有样本，含 transcript/allowed/verdict"
-            "）"
-                      % ROUND_GLOB)
+        issues.append("找不到回合级回放样本"
+                      f"（修复指引：{ROUND_GLOB} 下须有样本，含 transcript/allowed/verdict）")
     issues += _exec_issues(m["execution"]["sets"])
     issues += _round_issues(m["rounds"]["samples"])
     for p in m["real_corpus"].get("problems") or []:
-        issues.append("真实语料裁定：%s（修复指引：按变更重做 real_corpus.adjudications，"
-                      "不得放宽判据）" % p)
+        issues.append(f"真实语料裁定：{p}（修复指引：按变更重做 real_corpus.adjudications，"
+                      "不得放宽判据）")
     stats = m["overall"]
     stats.update({"exec_sets": len(m["execution"]["sets"]),
                   "round_samples": m["rounds"]["parse_total"]})
     return issues, warns, stats
 
 
-def write(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+def write(root: str = ".") -> tuple[list[str], dict[str, Any]]:
     """把度量结果落盘（供机器消费）→ (issues, doc)。"""
     m = measure(root)
     p = Path(root) / REPORT_REL

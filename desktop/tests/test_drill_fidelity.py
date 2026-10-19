@@ -206,7 +206,7 @@ class RealCorpusAdjudicationTest(unittest.TestCase):
 class RealRepoTest(unittest.TestCase):
     def test_real_repo_fidelity_is_full(self):
         issues, _w, stats = df.scan(str(ROOT))
-        self.assertEqual([], issues, "真仓演练保真度须为满分，实得问题：%s" % issues[:3])
+        self.assertEqual([], issues, f"真仓演练保真度须为满分，实得问题：{issues[:3]}")
         self.assertEqual(1.0, stats["fidelity"])
         self.assertGreaterEqual(stats["exec_sets"], 5)
         self.assertGreaterEqual(stats["round_samples"], 2)
@@ -232,7 +232,7 @@ class RealRepoTest(unittest.TestCase):
         live = {(a["line"], a["rule"]) for a in rc["adjudications"] if a["live"]}
         self.assertEqual(rc["hits"], len(live))
         for a in rc["adjudications"]:
-            self.assertTrue(a["basis"].strip(), "裁定缺依据：%s" % a)
+            self.assertTrue(a["basis"].strip(), f"裁定缺依据：{a}")
             self.assertIn(a["verdict"], ("TP", "FP"))
         # 已确证缺陷：P03:109 的 `M10_死亡重生.md` 文件名误报必须消失（且不是靠放宽判据）
         self.assertNotIn((109, "fabricated_id"), live,

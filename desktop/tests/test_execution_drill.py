@@ -44,8 +44,7 @@ class ExecutionDrillTest(unittest.TestCase):
                 continue
             hits = set(self._hits(data, case))
             self.assertTrue(expected <= hits,
-                            "%s/%s 期望捕获 %s 实得 %s" %
-                            (data["pipeline"], case["id"],
+                            "{}/{} 期望捕获 {} 实得 {}".format(data["pipeline"], case["id"],
                              sorted(expected), sorted(hits)))
 
     def test_guard_samples_no_false_positive(self):
@@ -55,8 +54,8 @@ class ExecutionDrillTest(unittest.TestCase):
                 continue
             hits = set(self._hits(data, case))
             self.assertEqual(hits, set(),
-                             "%s/%s 应无捕获，实得 %s" %
-                             (data["pipeline"], case["id"], sorted(hits)))
+                             "{}/{} 应无捕获，实得 {}".format(
+                                 data["pipeline"], case["id"], sorted(hits)))
 
     def test_capture_rate_at_least_two_thirds(self):
         """M1 验收：注入 ≥3 失范样本捕获率 ≥2/3（逐管线）。"""
@@ -75,7 +74,7 @@ class ExecutionDrillTest(unittest.TestCase):
         for rule, law_id in drill.RULE_LAW.items():
             law = rh.LAW_INDEX[law_id]
             self.assertIn(law["level"], ("必须", "禁止"),
-                          "%s 不得映射到软级/自由级" % rule)
+                          f"{rule} 不得映射到软级/自由级")
         self.assertEqual(len(drill.RULE_LAW), 6)
 
 
@@ -86,7 +85,7 @@ class RealCorpusRegressionTest(unittest.TestCase):
         """真实集写 `生存:M10`/`通用:M10`，正文写裸 `M10` ⇒ 同一模块，不得判编造。"""
         for ids in (["生存:M10"], ["通用:M10"], ["M00", "生存:M10"]):
             self.assertEqual([], drill.run_case({"output": "裸 M10 由本模块结算。"}, ids),
-                             "real_ids=%s 时裸 M10 被判编造（后缀归一缺失）" % ids)
+                             f"real_ids={ids} 时裸 M10 被判编造（后缀归一缺失）")
         self.assertEqual(["fabricated_id"],
                          drill.run_case({"output": "由 M99 完成本条推进。"}, ["M00", "生存:M10"]),
                          "真编造必须still捕获")
@@ -106,7 +105,7 @@ class RealCorpusRegressionTest(unittest.TestCase):
                     "见 modules/M99.md。",
                     "文件 M99_死亡重生.md 已归档。"):
             self.assertEqual([], drill.run_case({"output": out}, ["M00"]),
-                             "路径/文件名 token 被当裸编号：%r" % out)
+                             f"路径/文件名 token 被当裸编号：{out!r}")
         self.assertEqual(["fabricated_id"],
                          drill.run_case({"output": "由 M99 推进。"}, ["M00"]),
                          "裸编号断言不得因路径排除而漏报")

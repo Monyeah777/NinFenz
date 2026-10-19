@@ -16,7 +16,6 @@ from __future__ import annotations
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 from core import json_doc
 
@@ -31,7 +30,7 @@ _PROGRESS = ("回合推进", "进入回合", "已进入第", "时间推进", "�
 _SPLIT = re.compile(r"[。！？；\n]+")
 
 
-def _compile_citation(patterns) -> "re.Pattern[str]":
+def _compile_citation(patterns) -> re.Pattern[str]:
     """引用判据：缺省用内置单模式；用例声明列表时按 (?:p1|p2|…) 合成（多语各写各的模式）。"""
     if not patterns:
         return re.compile("(?:%s)" % _CITATION_SRC)
@@ -53,12 +52,12 @@ def _bigrams(text: str) -> set:
     return {flat[i:i + 2] for i in range(len(flat) - 1)} or {flat}
 
 
-def _mention_tokens(output: str) -> List[str]:
+def _mention_tokens(output: str) -> list[str]:
     """**原始**模块号提及（含路径/文件名里的前缀）——只作「有没有编号提及」用。"""
     return _MODULE_TOKEN.findall(output)
 
 
-def _id_tokens(output: str) -> List[str]:
+def _id_tokens(output: str) -> list[str]:
     """**可作编号断言的**模块号 token：排除路径/文件名的前缀。
 
     2026-10-20 真实语料实测：唯一真实战例 `docs/完整版样本_西幻生存流P03.md` 第 109 行
@@ -67,7 +66,7 @@ def _id_tokens(output: str) -> List[str]:
     判据：紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）的匹配
     不是裸编号断言；中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
     """
-    out: List[str] = []
+    out: list[str] = []
     for m in _MODULE_TOKEN.finditer(output):
         nxt = output[m.end():m.end() + 2]
         if nxt[:1] and nxt[0].isascii() and (nxt[0].isalnum() or nxt[0] == "_"):
@@ -78,7 +77,7 @@ def _id_tokens(output: str) -> List[str]:
     return out
 
 
-def _clauses(output: str) -> List[str]:
+def _clauses(output: str) -> list[str]:
     return [c.strip() for c in _SPLIT.split(output) if c.strip()]
 
 
@@ -87,7 +86,7 @@ def _tail(tok: str) -> str:
     return tok.split(":", 1)[-1]
 
 
-def _check_fabricated_id(output: str, real_ids: List[str], other_ids: List[str]) -> str:
+def _check_fabricated_id(output: str, real_ids: list[str], other_ids: list[str]) -> str:
     """编号断言：本管线真实编号放行；**其它管线真实编号**判「跨管线串号」；其余判编造。
 
     **后缀归一**（2026-10-20 修）：装配真实集里写 `通用:M10` / `生存:M10`（重号须类别前缀限定），
@@ -108,7 +107,7 @@ def _check_fabricated_id(output: str, real_ids: List[str], other_ids: List[str])
     return ""
 
 
-def _check_fabricated_asset_key(output: str, asset_keys: List[str]) -> str:
+def _check_fabricated_asset_key(output: str, asset_keys: list[str]) -> str:
     """资产键断言：只判「大写下划线键」且仅当调用方给了允许集（无允许集不判，防误报）。"""
     allowed = set(asset_keys or [])
     if not allowed:
@@ -137,7 +136,7 @@ def _check_no_citation(output: str, decision, citation) -> str:
     return ""
 
 
-def _check_semantic_misalignment(output: str, semantics: Dict[str, list]) -> str:
+def _check_semantic_misalignment(output: str, semantics: dict[str, list]) -> str:
     if not semantics:
         return ""
     for clause in _clauses(output):
@@ -153,11 +152,11 @@ def _check_semantic_misalignment(output: str, semantics: Dict[str, list]) -> str
     return ""
 
 
-def run_case(case: Dict, real_ids: List[str],
-                 semantics: Dict[str, list] | None = None,
-             source_text: str = "", other_ids: List[str] | None = None,
-             asset_keys: List[str] | None = None,
-             lexicon: Dict[str, list] | None = None) -> List[str]:
+def run_case(case: dict, real_ids: list[str],
+                 semantics: dict[str, list] | None = None,
+             source_text: str = "", other_ids: list[str] | None = None,
+             asset_keys: list[str] | None = None,
+             lexicon: dict[str, list] | None = None) -> list[str]:
     """对单样本输出跑全部硬断言 → 返回命中的失范规则名列表。
 
     other_ids = 其它管线真实编号集（判跨管线串号）；asset_keys = 本装配允许的资产键集
@@ -189,7 +188,7 @@ def run_case(case: Dict, real_ids: List[str],
     return hits
 
 
-def run_file(path: str) -> Dict:
+def run_file(path: str) -> dict:
     data = json_doc.load(Path(path), dict, what=str(path))
     real_ids = list(data.get("real_ids") or [])
     semantics = data.get("semantics") or {}
@@ -212,7 +211,7 @@ def run_file(path: str) -> Dict:
     return {"total": len(results), "results": results}
 
 
-def main(argv: List[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     args = list(argv) if argv is not None else sys.argv[1:]
     if not args:
         print("用法: python -m core.execution_drill <cases.json>", file=sys.stderr)
