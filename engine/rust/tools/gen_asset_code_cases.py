@@ -19,46 +19,84 @@ sys.path.insert(0, str(ROOT / 'engine' / 'rust' / 'tools'))
 from _rustlit import raw as rr  # noqa: E402
 from core import asset_contract as ac  # noqa: E402
 
-doc = json.loads((ROOT / 'protocol' / 'asset_contracts.json').read_text(encoding='utf-8'))
+def collect(verbose=True):
+    """从真源取全部期望值。
 
-code_rows = []
-for spec in doc.get('code') or []:
-    issues, stats = ac._check_code(str(ROOT), spec)
-    code_rows.append((spec, issues, stats))
-    print('# 代码 %-22s issues=%d stats=%s' % (spec.get('id'), len(issues),
-                                           json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+    ⚠️ **必须跑两趟**（见文件尾的写入循环）：本段判据就写在被扫的 `engine/rust/src/**/*.rs`
+    里，而「第二实现线结构契约」的禁用式词（`_SELF_TRIP`）会命中**上一版**生成段自己的
+    字面量——首跑若直接采信，期望值就被旧字面量污染了（实测：干净输出 + 5 处陈旧 issue）。
+    故写两趟：第一趟清掉自指字面量，第二趟取**干净的**期望值；此后幂等。
+    """
+    doc = json.loads((ROOT / 'protocol' / 'asset_contracts.json').read_text(encoding='utf-8'))
 
-script_rows = []
-for spec in doc.get('script') or []:
-    issues, stats = ac._check_script(str(ROOT), spec)
-    script_rows.append((spec, issues, stats))
-    print('# 脚本 %-22s issues=%d stats=%s' % (spec.get('id'), len(issues),
-                                           json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+    code_rows = []
+    for spec in doc.get('code') or []:
+        issues, stats = ac._check_code(str(ROOT), spec)
+        code_rows.append((spec, issues, stats))
+        if verbose:
+            print('# 代码 %-22s issues=%d stats=%s'
+                  % (spec.get('id'), len(issues),
+                     json.dumps(stats, ensure_ascii=False, sort_keys=True)))
 
-specs = {str(s.get('id')): s for s in doc.get('script') or []}
-chain_rows = []
-for chain in doc.get('chains') or []:
-    issues, stats = ac._check_chain(specs, chain)
-    chain_rows.append((chain, issues, stats))
-    print('# 链   %s→%s issues=%d stats=%s' % (chain.get('from'), chain.get('to'), len(issues),
-                                            json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+    script_rows = []
+    for spec in doc.get('script') or []:
+        issues, stats = ac._check_script(str(ROOT), spec)
+        script_rows.append((spec, issues, stats))
+        if verbose:
+            print('# 脚本 %-22s issues=%d stats=%s'
+                  % (spec.get('id'), len(issues),
+                     json.dumps(stats, ensure_ascii=False, sort_keys=True)))
 
-issues, warns, stats = ac.scan(str(ROOT))
-print('# 聚合 issues=%d warns=%d stats=%s' % (len(issues), len(warns),
-                                          json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+    specs = {str(s.get('id')): s for s in doc.get('script') or []}
+    chain_rows = []
+    for chain in doc.get('chains') or []:
+        issues, stats = ac._check_chain(specs, chain)
+        chain_rows.append((chain, issues, stats))
+        if verbose:
+            print('# 链   %s→%s issues=%d stats=%s'
+                  % (chain.get('from'), chain.get('to'), len(issues),
+                     json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+
+    issues, warns, stats = ac.scan(str(ROOT))
+    if verbose:
+        print('# 聚合 issues=%d warns=%d stats=%s'
+              % (len(issues), len(warns),
+                 json.dumps(stats, ensure_ascii=False, sort_keys=True)))
+    return code_rows, script_rows, chain_rows, issues, warns, stats
+
+
+#: 真源的「第二实现线结构契约」（E2）把 `unsafe` 列为**禁用式**，而本判据的夹具与期望值
+#: 就写在 `engine/rust/src/**/*.rs` 里 —— 直接写字面量会让判据**自己踩自己**（实测：重跑本
+#: 生成器后 `forbid:unsafe` 由 0 变 5，真源与本线同红）。故生成时把该词切成
+#: `concat!("un", "safe")`：**编译期同值**，源码文本不含该词，判据的自指面才闭合。
+_SELF_TRIP = 'unsafe'
+
+
+def lit(text):
+    """Rust 字面量；含判据自己扫的词时切成 `concat!`（见 `_SELF_TRIP`）。"""
+    if _SELF_TRIP not in text:
+        return rr(text)
+    parts = text.split(_SELF_TRIP)
+    args = []
+    for i, p in enumerate(parts):
+        if i:
+            args.append('"un", "safe"')
+        if p:
+            args.append(rr(p))
+    return 'concat!(%s)' % ', '.join(args)
 
 
 def arr(v):
-    return "&[%s]" % ", ".join(rr(x) for x in v)
+    return "&[%s]" % ", ".join(lit(x) for x in v)
 
 
 def rows(items):
     out = []
     for spec, issues, stats in items:
         out.append('        (\n            %s,\n            %s,\n            %s\n        ),'
-                   % (rr(json.dumps(spec, ensure_ascii=False, sort_keys=True)),
+                   % (lit(json.dumps(spec, ensure_ascii=False, sort_keys=True)),
                       arr(issues),
-                      rr(json.dumps(stats, ensure_ascii=False, sort_keys=True))))
+                      lit(json.dumps(stats, ensure_ascii=False, sort_keys=True))))
     return "\n".join(out)
 
 
@@ -156,29 +194,36 @@ TEMPLATE = r'''
     // <<< GENERATED
 '''
 
-text = (TEMPLATE.replace('@@CODE@@', rows(code_rows))
-        .replace('@@SCRIPT@@', rows(script_rows))
-        .replace('@@CHAIN@@', rows(chain_rows))
-        .replace('@@SCANISSUES@@', arr(issues))
-        .replace('@@SCANWARNS@@', arr(warns))
-        .replace('@@SCANSTATS@@', rr(json.dumps(stats, ensure_ascii=False, sort_keys=True))))
-
 BEGIN = '    // >>> GENERATED by tools/gen_asset_code_cases.py（勿手改；重跑生成器覆盖本段）\n'
 END = '    // <<< GENERATED\n'
-block = BEGIN + text.split(BEGIN, 1)[1]
 
 path = ROOT / 'engine' / 'rust' / 'src' / 'asset_contract.rs'
-t = path.read_text(encoding='utf-8')
-if BEGIN in t:
-    a = t.index(BEGIN)
-    b = t.index(END, a) + len(END)
-    t = t[:a] + block + t[b:]
-else:
-    t = t.rstrip()[:-1].rstrip() + '\n' + block + '}\n'
-# 归一函数 + obj_get 的公开别名（供判据用）
-if 'fn ac_norm' not in t:
-    t = t.replace('#[cfg(test)]\nmod tests {\n    use super::*;\n',
-                  '''#[cfg(test)]
+
+
+def render(code_rows, script_rows, chain_rows, issues, warns, stats):
+    """期望值 → 生成段文本（字面量一律走 `lit()`，避免自指）。"""
+    text = (TEMPLATE.replace('@@CODE@@', rows(code_rows))
+            .replace('@@SCRIPT@@', rows(script_rows))
+            .replace('@@CHAIN@@', rows(chain_rows))
+            .replace('@@SCANISSUES@@', arr(issues))
+            .replace('@@SCANWARNS@@', arr(warns))
+            .replace('@@SCANSTATS@@', lit(json.dumps(stats, ensure_ascii=False, sort_keys=True))))
+    return BEGIN + text.split(BEGIN, 1)[1]
+
+
+def write_block(block):
+    """把生成段写回 `asset_contract.rs`（只覆盖 `// >>> … // <<< GENERATED` 之间）。"""
+    t = path.read_text(encoding='utf-8')
+    if BEGIN in t:
+        a = t.index(BEGIN)
+        b = t.index(END, a) + len(END)
+        t = t[:a] + block + t[b:]
+    else:
+        t = t.rstrip()[:-1].rstrip() + '\n' + block + '}\n'
+    # 归一函数 + obj_get 的公开别名（供判据用）
+    if 'fn ac_norm' not in t:
+        t = t.replace('#[cfg(test)]\nmod tests {\n    use super::*;\n',
+                      '''#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -198,5 +243,11 @@ mod tests {
             .collect()
     }
 ''', 1)
-path.write_text(t, encoding='utf-8', newline='')
-print('# 已写入 asset_contract 的代码/脚本/链/聚合判据')
+    path.write_text(t, encoding='utf-8', newline='')
+
+
+# 两趟：第一趟把自指字面量从生成段里清掉；第二趟取**干净**的期望值（此后幂等）。
+# 见 `collect()` 的说明——单趟会采信被上一版字面量污染的 issues。
+for _pass in (1, 2):
+    write_block(render(*collect(verbose=(_pass == 2))))
+print('# 已写入 asset_contract 的代码/脚本/链/聚合判据（两趟收敛）')
