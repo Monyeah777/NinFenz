@@ -30,8 +30,11 @@ from __future__ import annotations
 
 import os
 import re
+import shlex
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -42,6 +45,13 @@ from core import gate_engine  # noqa: E402
 
 BANNER = re.compile(r"^== \[(\d+)/")
 VERDICT = re.compile(r"^\s*\[(PASS|FAIL|WARN)\] (.*)$")
+VERIFY_TEXT = (ROOT / "verify.sh").read_text(encoding="utf-8")
+BASH = shutil.which("bash")
+
+#: 聚合门：失败时必须「N 条子面明细 + 1 条汇总」的四条（工作包 C）。
+#: 三条执行体不同（check32 委托 / check33/36 进程内 / check35 仍在 PENDING），
+#: 但**失败分支的呈现口径**只由 verify.sh 定义——故本组直接跑 bash 原文取真值。
+AGGREGATE_GATES = (32, 33, 35, 36)
 
 #: 探针目录（内部档案：计划期产物不进公开仓库）。缺失即跳过，不假装通过。
 PROBE = ROOT / ".rivet" / "private_archive" / "2026-10-15_gate-speedup-probe"
@@ -180,6 +190,152 @@ class GateEngineParityTest(unittest.TestCase):
             if any(not s.strip() for s in labels.pass_lines):
                 bad.append("check%d 含空文案" % num)
         self.assertEqual([], bad, "\n".join(bad))
+
+
+#: verify.sh 里已升级为逐条透出的聚合门（41/42 是同一口径的先行面）。
+UPGRADED_GATES = (32, 33, 35, 36, 41, 42)
+
+#: 汇总句模板（`$_emitted` 是 bash 的计数变量）。测试侧从 verify.sh 现读，不硬编码。
+_AGG_SUMMARY_RE = re.compile(r'no\s+"([^"]*?以上\s+\$_emitted\s+条子面失败[^"]*)"')
+
+
+def _aggregate_summary(num: int) -> str:
+    """从 verify.sh 现读该 check 的汇总句模板（不在测试里硬编码——硬编码就是第二份文案）。"""
+    body = gate_engine.gate_labels.check_body(VERIFY_TEXT, num)
+    m = _AGG_SUMMARY_RE.search(body)
+    return m.group(1) if m else ""
+
+
+def _tail_census(text: str) -> tuple[list[int], list[int]]:
+    """扫 verify.sh → (贴整段日志尾部的 check, 把 verdict 压成一行的 check)。
+
+    - `| sed`：失败时把日志尾部贴出来，是**诊断上下文**，不是一行 verdict；
+    - `| tr` ：`no "前缀$(tail -N log | tr '\\n' ' ')"` —— 子面明细被压成一行 verdict。
+    """
+    dump, verdict = set(), set()
+    for line in text.splitlines():
+        if "tail -" not in line:
+            continue
+        m = re.search(r"nf_check(\d+)", line)
+        if not m:
+            continue
+        if "| sed" in line:
+            dump.add(int(m.group(1)))
+        elif "| tr" in line:
+            verdict.add(int(m.group(1)))
+    return sorted(dump), sorted(verdict)
+
+
+def _upgraded_gates(text: str) -> list[int]:
+    """→ bash 体里已有「遍历日志、逐条透出 [FAIL]」口径的 check（顺序按编号）。"""
+    return [n for n in range(1, 43)
+            if 'case "$_line" in' in gate_engine.gate_labels.check_body(text, n)]
+
+
+def _bash_path(p) -> str:
+    """Windows 盘符路径 → Git Bash 可执行的 `/c/...`；POSIX 平台原样返回。
+
+    为什么需要：bash 的 `"$PY3"` 要真的 exec 这个假解释器，`C:\\…` 在 Git Bash 里
+    不是可执行路径；而 python 的 `tempfile` 只会给 Windows 路径。
+    """
+    m = re.match(r"^([A-Za-z]):[\\/](.*)$", str(p))
+    if not m:
+        return str(p)
+    return "/" + m.group(1).lower() + "/" + m.group(2).replace("\\", "/")
+
+
+def _bash_aggregate_fails(num: int, problems: list[str]) -> list[str]:
+    """跑**真实 check 的 bash 失败分支**：PY3 换成「只写 N 条 [FAIL] 再退出 1」的假解释器。
+
+    为什么要这样构造：明细条数、`[FAIL] ` 前缀剥离、汇总里的计数都走 verify.sh 原文，
+    不是把打印逻辑复制一遍——复制出来的夹具只能证明夹具自洽。
+    """
+    if not BASH:
+        raise unittest.SkipTest("没有 bash：聚合门诊断口径无法验证")
+    tmp = Path(tempfile.mkdtemp(prefix="nf-agg-"))
+    try:
+        stub = tmp / "stub_py"
+        lines = ["#!/usr/bin/env bash", "cat >/dev/null 2>&1 || true"]
+        for p in problems:
+            lines.append("printf '%s\\n' " + shlex.quote("[FAIL] " + p))
+        lines += ["printf '统计行\\n'", "exit 1"]
+        stub.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+        stub.chmod(0o755)
+        script = (
+            "set -u\nPASS=0; FAIL=0; WARN=0\n"
+            "ok(){ PASS=$((PASS+1)); }\n"
+            "no(){ FAIL=$((FAIL+1)); printf '  [FAIL] %s\\n' \"$1\"; }\n"
+            "wn(){ WARN=$((WARN+1)); }\n"
+            "PY3=" + shlex.quote(_bash_path(stub)) + "\n"
+            "NFL_TMP=" + shlex.quote(_bash_path(tmp)) + "\n"
+            + gate_engine.gate_labels.check_body(VERIFY_TEXT, num) + "\n"
+            "check" + str(num) + "\n")
+        # 落盘再跑：check33 的整段体超过 Windows 命令行长度上限，`bash -c` 会被截断。
+        runner = tmp / "run_check.sh"
+        runner.write_text(script, encoding="utf-8", newline="\n")
+        proc = subprocess.run([BASH, str(runner)], cwd=str(ROOT),
+                              capture_output=True, text=True, encoding="utf-8")
+        return [ln[len("  [FAIL] "):] for ln in proc.stdout.splitlines()
+                if ln.startswith("  [FAIL] ")]
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+@unittest.skipUnless(BASH, "没有 bash：聚合门诊断口径无法验证")
+class AggregateFailDiagnosticsTest(unittest.TestCase):
+    """聚合门失败：N 条子面明细 + 1 条汇总，且汇总句逐字来自 verify.sh。"""
+
+    def test_bash_emits_n_details_plus_one_summary(self):
+        """构造 N 个子面失败 → bash 必须输出 N 条明细 + 1 条汇总（N=1/3 都验）。"""
+        for num in AGGREGATE_GATES:
+            body = gate_engine.gate_labels.check_body(VERIFY_TEXT, num)
+            self.assertIn('case "$_line" in', body,
+                          f"check{num} 的 bash 体没有逐条透出口径（只剩 tail 压缩？）")
+            tmpl = _aggregate_summary(num)
+            self.assertTrue(tmpl, f"check{num} 未从 verify.sh 抽到汇总句")
+            self.assertIn(tmpl, VERIFY_TEXT, f"check{num} 汇总句不是 verify.sh 的逐字原文")
+            for n in (1, 3):
+                problems = [f"子面失败{i}" for i in range(1, n + 1)]
+                with self.subTest(check=num, n=n):
+                    self.assertEqual(
+                        problems + [tmpl.replace("$_emitted", str(n))],
+                        _bash_aggregate_fails(num, problems))
+
+    def test_no_detail_falls_back_to_one_tail_line(self):
+        """日志里没有 [FAIL] 行时不得凭空造汇总：仍是**一条** tail 摘要。"""
+        for num in AGGREGATE_GATES:
+            with self.subTest(check=num):
+                got = _bash_aggregate_fails(num, [])
+                self.assertEqual(1, len(got), got)
+                self.assertNotIn("条子面失败", got[0])
+
+
+class AggregateGateCensusTest(unittest.TestCase):
+    """模式普查：verify.sh 里 tail 压缩的全量清单（防止“这是个案例”被误读）。"""
+
+    def test_tail_compression_sites(self):
+        """23 处 tail：20 处压 verdict（check23-42）+ 3 处贴日志尾部（check12×2/check18）。"""
+        total = sum(1 for line in VERIFY_TEXT.splitlines() if "tail -" in line)
+        dump, verdict = _tail_census(VERIFY_TEXT)
+        self.assertEqual(23, total)
+        self.assertEqual([12, 18], dump)
+        self.assertEqual(list(range(23, 43)), verdict)
+
+    def test_upgraded_gates_are_exactly_the_six(self):
+        """逐条透出口径当前覆盖 32/33/35/36/41/42；其余 14 处仍是模式存量。"""
+        self.assertEqual(list(UPGRADED_GATES), _upgraded_gates(VERIFY_TEXT))
+
+    def test_summary_has_single_source(self):
+        """汇总句只在 verify.sh 出现一次；生产模块不得内置任何一条具体文案。"""
+        for num in AGGREGATE_GATES:
+            tmpl = _aggregate_summary(num)
+            self.assertTrue(tmpl, f"check{num} 未从 verify.sh 抽到汇总句")
+            self.assertEqual(1, VERIFY_TEXT.count(tmpl),
+                             f"check{num} 汇总句在 verify.sh 里不是唯一一份")
+        for rel in ("desktop/src/core/gate_engine.py", "desktop/src/core/gate_labels.py"):
+            src = (ROOT / rel).read_text(encoding="utf-8")
+            for text in ("条子面失败", "nf_check32.log", "质量纵深汇总异常"):
+                self.assertNotIn(text, src, f"{rel} 内置了汇总句片段：{text}")
 
 
 if __name__ == "__main__":
