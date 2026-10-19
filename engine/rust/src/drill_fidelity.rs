@@ -641,7 +641,8 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         ("passed".to_string(), Json::Int(passed)),
         ("fidelity".to_string(), Json::Float(fidelity(passed, total))),
         ("exec_sets".to_string(), Json::Int(sets.len() as i64)),
-        ("round_samples".to_string(), Json::Int(rnd_total)),
+        // 真源 `stats["round_samples"]` = 样本文件总数（含待裁定样本）；`cases` 只计已裁定样本。
+        ("round_samples".to_string(), Json::Int(samples.len() as i64)),
     ]);
     (issues, Vec::new(), stats)
 }
