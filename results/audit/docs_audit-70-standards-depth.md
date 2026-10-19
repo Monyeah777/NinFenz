@@ -9,10 +9,12 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:cea4f2afc74425fe683e07a4808fea56c96d8bc2f6485bb6ce2352885c373d87
+  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
 
 ---
+> 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
+
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
 
 > 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16

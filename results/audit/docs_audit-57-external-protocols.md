@@ -6,7 +6,7 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:cea4f2afc74425fe683e07a4808fea56c96d8bc2f6485bb6ce2352885c373d87
+  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
+
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
 
 > 重审（2026-10-19）：knowledge_order_read 去 annotation 重叠，补 filtered-order/count；tdqs 两次 4.9、全部工具 >=4.9

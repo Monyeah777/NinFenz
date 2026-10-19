@@ -6,7 +6,7 @@ scope: 作者指令「遗留全部补上」——处置 AUD-0009 §五 列出的
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:cea4f2afc74425fe683e07a4808fea56c96d8bc2f6485bb6ce2352885c373d87
+  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
+
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
 
 > 重审（2026-10-19）：knowledge_order_read 去 annotation 重叠，补 filtered-order/count；tdqs 两次 4.9、全部工具 >=4.9

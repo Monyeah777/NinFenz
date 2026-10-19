@@ -6,7 +6,7 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:cea4f2afc74425fe683e07a4808fea56c96d8bc2f6485bb6ce2352885c373d87
+  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
@@ -15,6 +15,8 @@ subjects:
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
+
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数
 
 > 重审（2026-10-18）：动态队列 + 常驻集收敛 + 分片上限 16
