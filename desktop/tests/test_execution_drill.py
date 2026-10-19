@@ -196,5 +196,59 @@ class ContextBoundaryTest(unittest.TestCase):
                          "跨句豁免（否定词在上一句）")
 
 
+class PositiveControlTest(unittest.TestCase):
+    """**正例对照**：注入已知违规必须被捕获，原版 P03 必须仍 0 命中。
+
+    为什么需要（2026-10-20）：真实语料 hits 从 5 降到 0 有两种解释——(a) 语料确实干净（好）；
+    (b) 判据被改弱到什么都不报（坏）。本组用例用「注入→必红 / 原版→必绿」把二者区分开，
+    并自校验变体逐字节等于「语料+注入」（语料一改就红，须重生成夹具）。
+    """
+
+    ROOT = Path(__file__).resolve().parents[2]
+
+    def _controls(self):
+        from core import drill_fidelity as df  # 局部导入：避免测试模块级循环依赖
+
+        return df.positive_controls(str(self.ROOT))
+
+    def test_positive_controls_are_live_and_all_pass(self):
+        pc = self._controls()
+        self.assertTrue(pc, "正例对照夹具缺失")
+        self.assertEqual([], pc["problems"], pc["problems"])
+        self.assertEqual(3, pc["total"], f"注入清单必须恰好三组：{pc.get('injections')}")
+        self.assertEqual(pc["total"], pc["passed"], pc)
+        self.assertEqual([], pc["original_hits"], "原版 P03 必须 0 命中")
+        self.assertTrue(pc["original_passed"])
+
+    def test_each_injection_hits_expected_rule_on_injected_line(self):
+        pc = self._controls()
+        want = {"inject-fabricated-id": ["fabricated_id"],
+                "inject-no-citation": ["no_citation"],
+                "inject-decision-should": ["no_citation"]}
+        got = {c["id"]: c for c in pc["injections"]}
+        self.assertEqual(sorted(want), sorted(got), f"注入清单不符：{sorted(got)}")
+        for cid, rules in want.items():
+            self.assertEqual(rules, got[cid]["hits"], f"{cid} 命中规则不符")
+            self.assertEqual([], got[cid]["extra_hits"], f"{cid} 出现附带命中")
+            self.assertTrue(got[cid]["passed"])
+            self.assertEqual(pc["source_lines"] + 1, got[cid]["line"], "注入行号不符")
+
+    def test_original_corpus_stays_green(self):
+        """原版→必绿（与上组共用同一份语料/允许集，避免两边口径漂移）。"""
+        from core import drill_fidelity as df  # 局部导入：避免测试模块级循环依赖
+
+        pc = self._controls()
+        source_text = (self.ROOT / pc["source"]).read_text(encoding="utf-8")
+        hits = df._text_hits(source_text, self._ids())
+        self.assertEqual([], hits, f"原版 P03 必须 0 命中，实测 {hits}")
+
+    def _ids(self):
+        import json  # 局部导入：仅本用例读取对照清单
+
+        manifest = json.loads(
+            (FIX_DIR / "positive_controls" / "p03_injections.json").read_text(encoding="utf-8"))
+        return manifest["real_ids"]
+
+
 if __name__ == "__main__":
     unittest.main()

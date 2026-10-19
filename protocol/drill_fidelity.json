@@ -54,6 +54,8 @@
     "parse_ok": 6,
     "parse_rate": 1.0,
     "parse_total": 6,
+    "positive_controls_passed": 3,
+    "positive_controls_total": 3,
     "raw_parse_rate": 0.0,
     "round_fp": 0,
     "round_hits": 0,
@@ -64,6 +66,60 @@
     "cases": 74,
     "fidelity": 1.0,
     "passed": 74
+  },
+  "positive_controls": {
+    "injections": [
+      {
+        "expect": [
+          "fabricated_id"
+        ],
+        "extra_hits": [],
+        "hits": [
+          "fabricated_id"
+        ],
+        "id": "inject-fabricated-id",
+        "injection": "由 M97 结算本轮产物。",
+        "kind": "fabricated_id",
+        "line": 215,
+        "passed": true
+      },
+      {
+        "expect": [
+          "no_citation"
+        ],
+        "extra_hits": [],
+        "hits": [
+          "no_citation"
+        ],
+        "id": "inject-no-citation",
+        "injection": "下一步进入结算阶段。",
+        "kind": "no_citation",
+        "line": 215,
+        "passed": true
+      },
+      {
+        "expect": [
+          "no_citation"
+        ],
+        "extra_hits": [],
+        "hits": [
+          "no_citation"
+        ],
+        "id": "inject-decision-should",
+        "injection": "应当输出结算结果。",
+        "kind": "no_citation",
+        "line": 215,
+        "passed": true
+      }
+    ],
+    "original_hits": [],
+    "original_passed": true,
+    "passed": 3,
+    "problems": [],
+    "sha256": "ca3d75b86a84a500af1890aa6608659cef30eb300dc3ff8d8d74b1407a81b1a7",
+    "source": "docs/完整版样本_西幻生存流P03.md",
+    "source_lines": 214,
+    "total": 3
   },
   "real_corpus": {
     "adjudications": [

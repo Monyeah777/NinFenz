@@ -1,0 +1,64 @@
+{
+  "schema": "nf-execution-positive-controls/1",
+  "note": "正例对照：hits=0 有两种解释（语料真干净 / 判据被改弱到什么都不报）。本夹具对真实语料 P03 逐份注入**已知违规**生成变体，断言注入行必中、其它行零附带命中；同时要求原版 P03 仍 0 命中。变体必须逐字节等于「语料+注入」（测试自校验，防夹具漂移）。",
+  "source": "docs/完整版样本_西幻生存流P03.md",
+  "source_sha256": "ca3d75b86a84a500af1890aa6608659cef30eb300dc3ff8d8d74b1407a81b1a7",
+  "source_lines": 214,
+  "real_ids": [
+    "M00",
+    "通用:M10",
+    "M08",
+    "M01",
+    "M02",
+    "M19",
+    "M03",
+    "M23",
+    "M06",
+    "M18",
+    "事件:M22",
+    "M04",
+    "M11",
+    "M24",
+    "M12",
+    "M13",
+    "M17",
+    "生存:M10",
+    "M07",
+    "M09",
+    "M14",
+    "M15",
+    "M16",
+    "M20",
+    "M80",
+    "M50"
+  ],
+  "controls": [
+    {
+      "id": "inject-fabricated-id",
+      "kind": "fabricated_id",
+      "injection": "由 M97 结算本轮产物。",
+      "expect": [
+        "fabricated_id"
+      ],
+      "variant": "p03_inject_fabricated_id.md"
+    },
+    {
+      "id": "inject-no-citation",
+      "kind": "no_citation",
+      "injection": "下一步进入结算阶段。",
+      "expect": [
+        "no_citation"
+      ],
+      "variant": "p03_inject_no_citation.md"
+    },
+    {
+      "id": "inject-decision-should",
+      "kind": "no_citation",
+      "injection": "应当输出结算结果。",
+      "expect": [
+        "no_citation"
+      ],
+      "variant": "p03_inject_decision_should.md"
+    }
+  ]
+}

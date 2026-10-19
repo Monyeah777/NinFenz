@@ -20,6 +20,9 @@
 - **待裁定样本**（`verdict/label_status = pending`）：不参与「声明 vs 实测」分子分母
   （未裁定就无声明可复现），
   但**必须解析出回合标记**（parse 失败 ⇒ 裁定前提不成立，判 FAIL），其命中同样须逐条裁定。
+- **正例对照**（2026-10-20 加）：真实语料 hits 从 5 降到 0 有两种解释——语料干净（好）或
+  判据被改弱到什么都不报（坏）。对原版 P03 逐份注入**已知违规**生成变体，要求「注入行必中期望规则 +
+  其它行零附带命中」，同时「原版必须仍 0 命中」；变体须逐字节等于「语料+注入」（防夹具漂移）。
 - **判据**：任一例不达标 → FAIL（保真度必须 100%）；**找不到用例/样本 → FAIL**（标准不得无载体）。
 
 纪律：纯标准库；只读（唯 `write()` 落盘度量结果供机器消费）；错误消息带修复指引。
@@ -48,6 +51,8 @@ VERDICT_MAP = {"good": "conformant", "conformant": "conformant",
                "bad": "non-conformant", "non-conformant": "non-conformant"}
 #: 待裁定标记（2026-10-20）：`verdict` 或 `label_status` 为它 ⇒ 不参与声明复现，只过 parse/裁定门。
 PENDING = "pending"
+#: 正例对照夹具（2026-10-20）：真实语料的**注入变体**与期望命中（注入→必红 / 原版→必绿）。
+POSITIVE_CONTROLS_REL = "desktop/tests/fixtures/execution/positive_controls/p03_injections.json"
 
 
 def _exec_sets(root: Path) -> list[dict[str, Any]]:
@@ -183,6 +188,114 @@ def _corpus_live_hits(nonblank: list[tuple[int, str]], real_ids: list[str]
     return live
 
 
+def _text_hits(text: str, real_ids: list[str]) -> list[tuple[int, str]]:
+    """整段文本逐非空行回放 `execution_drill` → `[(行号, 规则名)]`（正例对照用）。"""
+    return _corpus_live_hits(
+        [(i + 1, line) for i, line in enumerate(text.splitlines()) if line.strip()], real_ids)
+
+
+def _pc_source(r: Path) -> dict[str, Any]:
+    """读取正例对照清单与源语料 → `{manifest, source_rel, source_text, real_ids, sha, problems}`。
+
+    清单/语料缺件时 `problems` 非空且 `manifest` 为 `None`（上层据此返回 `{}` 或带问题的块）。
+    """
+    manifest_p = r / POSITIVE_CONTROLS_REL
+    out: dict[str, Any] = {"manifest": None, "source_rel": REAL_CORPUS_REL, "source_text": "",
+                           "real_ids": [], "sha": "", "problems": []}
+    if not manifest_p.is_file():
+        return out
+    try:
+        manifest = json_doc.load(manifest_p, dict, what=POSITIVE_CONTROLS_REL)
+    except ValueError as exc:
+        out["problems"].append(f"{POSITIVE_CONTROLS_REL} {exc}")
+        return out
+    out["manifest"] = manifest
+    out["source_rel"] = str(manifest.get("source") or REAL_CORPUS_REL)
+    source_p = r / out["source_rel"]
+    if not source_p.is_file():
+        out["problems"].append(f"正例对照源语料缺件：{out['source_rel']}")
+        return out
+    out["source_text"] = source_p.read_text(encoding="utf-8")
+    out["sha"] = hashlib.sha256(source_p.read_bytes()).hexdigest()
+    out["real_ids"] = [str(x) for x in (manifest.get("real_ids") or [])]
+    if manifest.get("source_sha256") and manifest["source_sha256"] != out["sha"]:
+        out["problems"].append(f"正例对照源语料已变（sha256 不匹配）——须重生成变体："
+                               f"{out['source_rel']}")
+    return out
+
+
+def _pc_case(r: Path, folder: str, item: dict[str, Any], base: str, source_lines: int,
+             real_ids: list[str]) -> tuple[dict[str, Any], list[str]]:
+    """单个注入变体：校验「变体 == 语料+注入」并回放 → (控制项记录, problems)。"""
+    cid = str(item.get("id") or "?")
+    injection = str(item.get("injection") or "")
+    variant_rel = f"{folder}/{item.get('variant') or ''}"
+    expect = [str(x) for x in (item.get("expect") or [])]
+    variant_p = r / variant_rel
+    if not injection or not variant_p.is_file():
+        return {}, [f"正例对照 {cid} 缺注入文本或缺变体件：{variant_rel}"]
+    want_text = base + injection + "\n"
+    if variant_p.read_text(encoding="utf-8") != want_text:
+        return {}, [f"正例对照 {cid} 的变体不是「语料+注入」（须重生成夹具）"]
+    line_no = source_lines + 1
+    hits = _text_hits(want_text, real_ids)
+    got = sorted({rule for n, rule in hits if n == line_no})
+    extra = [(n, rule) for n, rule in hits if n != line_no]
+    problems: list[str] = []
+    if extra or not set(expect) <= set(got):
+        problems.append(f"正例对照 {cid} 未按预期命中：期望 {expect}，实得行 {line_no}={got}，"
+                        f"附带命中={extra}（修复指引：判据不得被改弱到什么都不报）")
+    entry = {"id": cid, "kind": str(item.get("kind") or ""), "injection": injection,
+             "expect": expect, "line": line_no, "hits": got, "extra_hits": extra,
+             "passed": not problems}
+    return entry, problems
+
+
+def positive_controls(root: str = ".") -> dict[str, Any]:
+    """正例对照（活判据）→ 度量块；找不到夹具时返回 `{}`。
+
+    动机见模块头「正例对照」：hits=0 既可能是语料干净，也可能是判据失效；这里用
+    「注入→必红 / 原版→必绿」区分。变体必须逐字节等于「语料+注入」，否则判夹具漂移。
+    """
+    r = Path(root)
+    src = _pc_source(r)
+    manifest = src["manifest"]
+    if manifest is None:
+        if not src["problems"]:
+            return {}
+        return {"source": "", "injections": [], "original_hits": [], "passed": 0, "total": 0,
+                "problems": src["problems"]}
+    source_text = src["source_text"]
+    problems = list(src["problems"])
+    base = source_text if source_text.endswith("\n") else source_text + "\n"
+    source_lines = len(source_text.splitlines())
+    real_ids = src["real_ids"]
+    if source_text:
+        original_hits = _text_hits(source_text, real_ids)
+        if original_hits:
+            problems.append(f"原版真实语料必须 0 命中，实测 {original_hits}")
+    else:
+        original_hits = []
+    folder = POSITIVE_CONTROLS_REL.rsplit("/", 1)[0]
+    controls: list[dict[str, Any]] = []
+    for item in manifest.get("controls") or []:
+        if not isinstance(item, dict):
+            continue
+        entry, case_problems = _pc_case(r, folder, item, base, source_lines, real_ids)
+        problems += case_problems
+        if entry:
+            controls.append(entry)
+    return {"source": src["source_rel"],
+            "sha256": src["sha"],
+            "source_lines": source_lines,
+            "injections": controls,
+            "original_hits": original_hits,
+            "original_passed": not original_hits,
+            "passed": sum(1 for c in controls if c["passed"]),
+            "total": len(controls),
+            "problems": problems}
+
+
 def _corpus_forward(live: list[tuple[int, str]], keyed: dict[tuple[int, str], dict[str, Any]]
                     ) -> tuple[int, int, list[dict[str, Any]], list[str]]:
     """正向：现存命中逐条裁定 → (tp, fp, detail, problems)。"""
@@ -305,6 +418,7 @@ def measure(root: str = ".") -> dict[str, Any]:
     rnd_pass = sum(1 for s in adjudicated if s.get("matched"))
     parsed = sum(1 for s in rnd if s.get("parse_ok"))
     corpus = real_corpus(str(r))
+    controls = positive_controls(str(r))
     #: 待裁定样本的规则命中（逐条裁定）——与真实语料命中分开计，口径不混。
     round_hits = [h for s in rnd if s.get("pending") for h in (s.get("hits") or [])]
     round_adj = {a["hit"]: a["verdict"] for s in rnd if s.get("pending")
@@ -323,6 +437,7 @@ def measure(root: str = ".") -> dict[str, Any]:
                        "hits": round_hits, "tp": round_tp, "fp": round_fp,
                        "fidelity": round(rnd_pass / rnd_total, 4) if rnd_total else 0.0},
             "real_corpus": corpus,
+            "positive_controls": controls,
             "overall": {"cases": total, "passed": passed,
                         "fidelity": round(passed / total, 4) if total else 0.0},
             "metrics": {"parse_rate": round(parsed / len(rnd), 4) if rnd else 0.0,
@@ -334,7 +449,9 @@ def measure(root: str = ".") -> dict[str, Any]:
                         "hits_before": corpus.get("hits_before", 0),
                         "fp_resolved": corpus.get("fp_resolved", 0),
                         "round_hits": len(round_hits),
-                        "round_tp": round_tp, "round_fp": round_fp}}
+                        "round_tp": round_tp, "round_fp": round_fp,
+                        "positive_controls_passed": controls.get("passed", 0),
+                        "positive_controls_total": controls.get("total", 0)}}
 
 
 def _exec_issues(sets: list[dict[str, Any]]) -> list[str]:
@@ -391,6 +508,14 @@ def scan(root: str = ".") -> tuple[list[str], list[str], dict[str, Any]]:
     for p in m["real_corpus"].get("problems") or []:
         issues.append(f"真实语料裁定：{p}（修复指引：按变更重做 real_corpus.adjudications，"
                       "不得放宽判据）")
+    controls = m.get("positive_controls") or {}
+    if controls:
+        for p in controls.get("problems") or []:
+            issues.append(f"正例对照失效：{p}（修复指引：注入必须被捕获——判据不得被改弱到"
+                          "什么都不报）")
+        if not controls.get("total"):
+            issues.append("正例对照无载体（修复指引：新增注入变体并重生成 "
+                          f"{POSITIVE_CONTROLS_REL}）")
     stats = m["overall"]
     stats.update({"exec_sets": len(m["execution"]["sets"]),
                   "round_samples": m["rounds"]["parse_total"]})

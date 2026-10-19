@@ -35,6 +35,10 @@
 //!    不是静默：真源 `scan` 的 issues 里会多出「真实语料裁定：…」条目。
 //! 6. **待裁定样本**（`verdict`/`label_status` = `pending`，2026-10-20 加）：两侧同口径——
 //!    不参与「声明 vs 实测」分子分母，但必须解析出回合标记（`turns > 0`），否则 FAIL。
+//! 7. **正例对照（2026-10-20 加，真源 `positive_controls`）**：真源对真实语料注入已知违规生成变体
+//!    （注入→必红 / 原版→必绿）并把结果记进 `protocol/drill_fidelity.json`；本线在测试侧**同夹具
+//!    同期望**复跑（`positive_controls_catch_injected_violations`），但不把它接进 `scan` issues
+//!    （同偏差 5：度量面不移植）。两侧都失败时真源 `scan` 多出「正例对照失效：…」条目——有意不对称。
 
 use crate::jsonread;
 use crate::pyjson::Json;
@@ -912,5 +916,86 @@ mod tests {
         // 语境窗不跨句
         assert_eq!(run("该模块未启用。由 M99 完成推进。"),
                    vec!["fabricated_id".to_string()], "跨句豁免（否定词在上一句）");
+    }
+
+    /// ===== 正例对照（2026-10-20，非生成段：与真源 `drill_fidelity.positive_controls` 同夹具）=====
+    ///
+    /// 动机：真实语料 hits 从 5 降到 0 有两种解释——(a) 语料确实干净；(b) 判据被改弱到
+    /// 什么都不报。用**注入已知违规**的 P03 变体区分：注入行必须命中期望规则、其它行零附带命中，
+    /// 且原版 P03 仍 0 命中；变体还必须逐字节等于「语料+注入」（语料一改就要重生成夹具）。
+    #[test]
+    fn positive_controls_catch_injected_violations() {
+        let root = crate::testutil::repo_root();
+        let rel = "desktop/tests/fixtures/execution/positive_controls/p03_injections.json";
+        let manifest = jsonread::read_file(&root, rel).expect("正例对照清单缺件");
+        let source_rel = plain_str_opt(get(&manifest, "source"));
+        let real_ids: Vec<String> = arr_items(get(&manifest, "real_ids"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
+        let source = std::fs::read_to_string(root.join(&source_rel)).expect("源语料不可读");
+        assert!(
+            probe_line_hits(&source, &real_ids).is_empty(),
+            "原版真实语料必须 0 命中：{:?}",
+            probe_line_hits(&source, &real_ids)
+        );
+        let base = if source.ends_with('\n') {
+            source.clone()
+        } else {
+            format!("{}\n", source)
+        };
+        let source_lines = source.lines().count();
+        let mut count = 0;
+        for item in arr_items(get(&manifest, "controls")) {
+            let id = plain_str_opt(get(item, "id"));
+            let injection = plain_str_opt(get(item, "injection"));
+            let variant = plain_str_opt(get(item, "variant"));
+            let expect: Vec<String> = arr_items(get(item, "expect"))
+                .iter()
+                .map(|v| py_str(Some(v)))
+                .collect();
+            let vpath = root
+                .join("desktop/tests/fixtures/execution/positive_controls")
+                .join(&variant);
+            let text = std::fs::read_to_string(&vpath).expect("变体件不可读");
+            assert_eq!(text, format!("{}{}\n", base, injection), "变体须等于「语料+注入」：{}", id);
+            let line_no = source_lines + 1;
+            let hits = probe_line_hits(&text, &real_ids);
+            let at_line: Vec<String> = hits
+                .iter()
+                .filter(|(n, _)| *n == line_no)
+                .map(|(_, r)| r.clone())
+                .collect();
+            let extra: Vec<(usize, String)> =
+                hits.into_iter().filter(|(n, _)| *n != line_no).collect();
+            assert!(extra.is_empty(), "{} 出现附带命中：{:?}", id, extra);
+            for rule in &expect {
+                assert!(
+                    at_line.iter().any(|r| r == rule),
+                    "{} 注入行未命中 {}（实得 {:?}）",
+                    id,
+                    rule,
+                    at_line
+                );
+            }
+            count += 1;
+        }
+        assert_eq!(count, 3, "注入清单必须恰好三组");
+    }
+
+    /// 逐非空行回放 `run_case` → `[(行号, 规则名)]`（正例对照用）。
+    fn probe_line_hits(text: &str, real_ids: &[String]) -> Vec<(usize, String)> {
+        let mut out: Vec<(usize, String)> = Vec::new();
+        for (i, line) in text.split('\n').enumerate() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let case: Json = crate::jsonread::convert(&serde_json::json!({"output": line}))
+                .expect("case 构造");
+            for rule in run_case(&case, real_ids, None, "", &[], &[], None) {
+                out.push((i + 1, rule));
+            }
+        }
+        out
     }
 }
