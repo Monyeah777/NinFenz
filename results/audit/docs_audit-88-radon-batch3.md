@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - protocol/code_metrics_baseline.json:a170296db1571fbb863f6344be6aebbabacd8dcfa6d1e9362cb4813284cefb65
+  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
 ---
+> 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
+
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
 
 > 重审（2026-10-19）：摘取 W5 三修复并重冻度量基线后，被审承重件 digest 校准（结论未变）

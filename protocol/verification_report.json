@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 213,
-        "probed": 213
+        "patterns": 214,
+        "probed": 214
       },
       "status": "pass",
       "warns": 0
@@ -466,7 +466,7 @@
         "exec_sets": 8,
         "fidelity": 1.0,
         "passed": 74,
-        "round_samples": 5
+        "round_samples": 6
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3820,
-        "kernel": 1980,
+        "files": 3823,
+        "kernel": 1983,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "824f66a6966f55baaeac076239473964da3456187ed3d06d4686fcf1bdd0378e",
+  "root_digest": "260f8febcc2788d155cd430731ee767784a6f0cf9891065341a49e1ffbd06343",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

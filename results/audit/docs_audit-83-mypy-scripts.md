@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a170296db1571fbb863f6344be6aebbabacd8dcfa6d1e9362cb4813284cefb65
+  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
 ---
+> 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
+
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
 
 > 重审（2026-10-19）：摘取 W5 三修复并重冻度量基线后，被审承重件 digest 校准（结论未变）

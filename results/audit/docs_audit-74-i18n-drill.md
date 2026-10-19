@@ -18,16 +18,18 @@ subjects:
   - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
   - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
-  - desktop/src/core/execution_drill.py:18d5e5bc9a58cac3f14425e2a38331cc33f055f871934a9cec9030c3c9805090
-  - desktop/src/core/drill_fidelity.py:42549a0992e4931ee9de1a500a6b959b4e17a992a4d7025f737d0b7afe9bb0d0
-  - desktop/tests/test_execution_drill.py:36615ef843354315ddcbc6422c0417fb1c54e5200aef1d2488c7b6c9ff88c0b8
+  - desktop/src/core/execution_drill.py:f52aa937f153e9e456eaa94c765ce82f900e336752e2725788724b498d41cdbb
+  - desktop/src/core/drill_fidelity.py:b6c9db0ae4f179f281264110c18aa983f9ac777ef8a52c51cba4b44dc4e50684
+  - desktop/tests/test_execution_drill.py:ea8c1814041a4b61935b682e8937e07aed56482a1e7d044e466414478ce06929
   - desktop/tests/test_round_drill.py:0a0997e935ce8cd417a7400fbaf2c897853e82297867f25165c9889117667a1a
   - desktop/tests/fixtures/execution/p04_drill_cases.json:9237e2713bab59df20ed8cc4df18f8a4f9bd1fe0437a4acf642b03ccdd9c5d07
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:a170296db1571fbb863f6344be6aebbabacd8dcfa6d1e9362cb4813284cefb65
+  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
 ---
+> 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
+
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
 
 > 重审（2026-10-19）：摘取 W5 三修复并重冻度量基线后，被审承重件 digest 校准（结论未变）
