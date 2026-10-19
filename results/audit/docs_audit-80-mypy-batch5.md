@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
-  - protocol/code_metrics_baseline.json:8f0c9f269b4239bfa17637f1f9b95e66b2b69cc3b43d0a543b0a5d14d2bcb36d
+  - protocol/code_metrics_baseline.json:537aa303463406aeafb556689987b94ed2f9892eaede9b76297c80297cedb885
 ---
+> 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算
+
 > 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算
 
 > 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算

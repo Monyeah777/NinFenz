@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:8f0c9f269b4239bfa17637f1f9b95e66b2b69cc3b43d0a543b0a5d14d2bcb36d
+  - protocol/code_metrics_baseline.json:537aa303463406aeafb556689987b94ed2f9892eaede9b76297c80297cedb885
 ---
+> 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算
+
 > 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算
 
 > 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - protocol/code_metrics_baseline.json:8f0c9f269b4239bfa17637f1f9b95e66b2b69cc3b43d0a543b0a5d14d2bcb36d
+  - protocol/code_metrics_baseline.json:537aa303463406aeafb556689987b94ed2f9892eaede9b76297c80297cedb885
 ---
+> 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算
+
 > 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算
 
 > 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
