@@ -1,0 +1,1 @@
+{"schema": "nf-data-contracts/1", "status_vocabulary": ["active"], "rule_prefixes": ["check", "assertion:"], "contracts": [{"id": "x", "artifact": "art.json", "quality_rule": "assertion:a1", "owner": "机制", "status": "active", "freshness": "f", "consumers": []}]}

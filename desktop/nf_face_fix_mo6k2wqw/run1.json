@@ -1,0 +1,25 @@
+{
+  "artifact": "docs/完整版样本_西幻生存流P03.md",
+  "artifact_digest": "ca3d75b86a84a500af1890aa6608659cef30eb300dc3ff8d8d74b1407a81b1a7",
+  "case": "p03-western-cross",
+  "detail": {
+    "issues": [],
+    "prose_findings": 0,
+    "segments": 8
+  },
+  "floor": 60.0,
+  "meets_min_segments": true,
+  "min_segments": 8,
+  "model": "gate-1",
+  "run_id": "ca3d75b86a84",
+  "schema": "nf-bench-run/1",
+  "scores": {
+    "closure": 0.6,
+    "prose": 1.0,
+    "selfcheck": 1.0,
+    "structure": 1.0,
+    "traceability": 1.0
+  },
+  "total": 92.0,
+  "verdict": "pass"
+}

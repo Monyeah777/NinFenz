@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
   - desktop/tests/test_purity_scan.py:d00704eaab4784852c855455b4041134c639033aa46d9d08f470aa8ad8e784c0
   - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
-  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
+  - verify.sh:24853ba3c7deea26d21778745e2c58c6ef33698a4f8b7d77783b30b23312009f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
@@ -24,6 +24,10 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑
+
+> 重审（2026-10-19）：诊断目录兜底：TMPDIR/仓库内 .rivet/tmp
+
 > 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
-  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
+  - verify.sh:24853ba3c7deea26d21778745e2c58c6ef33698a4f8b7d77783b30b23312009f
   - README.en.md:8a24f5de86df0619909b931e112d6fbdd8584f34894d913f40031d616c0daef5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,10 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑
+
+> 重审（2026-10-19）：诊断目录兜底：TMPDIR/仓库内 .rivet/tmp
+
 > 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

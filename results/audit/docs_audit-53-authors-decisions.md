@@ -11,9 +11,13 @@ subjects:
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
+  - verify.sh:24853ba3c7deea26d21778745e2c58c6ef33698a4f8b7d77783b30b23312009f
 
 ---
+> 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑
+
+> 重审（2026-10-19）：诊断目录兜底：TMPDIR/仓库内 .rivet/tmp
+
 > 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

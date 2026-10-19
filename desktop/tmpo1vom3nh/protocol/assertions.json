@@ -1,0 +1,1 @@
+{"schema": "nf-assertions/1", "severity_vocabulary": ["fail", "warn"], "kind_vocabulary": ["regex_absent"], "assertions": []}

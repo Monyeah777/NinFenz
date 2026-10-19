@@ -1,0 +1,19 @@
+{
+  "name": "校园试炼 · 世界书",
+  "entries": [
+    {
+      "name": "关系推进",
+      "keys": [
+        "情感类:M40",
+        "关系推进"
+      ],
+      "content": "好感度规则",
+      "enabled": true,
+      "insertion_order": 0,
+      "case_sensitive": false,
+      "priority": 10,
+      "id": 0,
+      "comment": "NF 层 P40 · 行为决策"
+    }
+  ]
+}

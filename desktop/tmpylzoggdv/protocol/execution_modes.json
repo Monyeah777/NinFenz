@@ -1,0 +1,1 @@
+{"schema": "nf-execution-modes/1", "modes": [{"id": "runbook", "required_blocks": ["步骤", "预期"], "instances": ["inst.md"]}]}

@@ -1,0 +1,1 @@
+{"schema": "nf-execution-modes/1", "modes": [{"id": "playbook", "required_blocks": ["角色", "决策"], "instances": ["inst.md"]}]}

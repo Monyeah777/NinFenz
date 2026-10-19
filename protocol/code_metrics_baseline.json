@@ -206,7 +206,7 @@
       "max_fn_lines": 11
     },
     "desktop/src/core/conformance_scan.py": {
-      "lines": 1122,
+      "lines": 1131,
       "max_fn_cc": 26,
       "max_fn_lines": 97
     },

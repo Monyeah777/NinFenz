@@ -1,0 +1,1 @@
+{"schema": "nf-decisions-errata/1", "fields_vocabulary": ["evidence"], "entries": [{"adr": "ADR-0001", "field": "evidence", "was": "art.md", "now": "nowhere.md"}]}

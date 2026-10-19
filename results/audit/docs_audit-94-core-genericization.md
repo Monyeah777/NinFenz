@@ -32,9 +32,13 @@ subjects:
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
-  - verify.sh:9b5723552e11630d125cb1df9d26d762d3189fd22d60e629a7d8b32da9f23983
+  - verify.sh:24853ba3c7deea26d21778745e2c58c6ef33698a4f8b7d77783b30b23312009f
 
 ---
+> 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑
+
+> 重审（2026-10-19）：诊断目录兜底：TMPDIR/仓库内 .rivet/tmp
+
 > 重审（2026-10-19）：full 重叠回退（实测更慢且内容面互扰）
 
 > 重审（2026-10-19）：full 档也重叠 + 单分片内层线程按核数

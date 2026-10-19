@@ -1,0 +1,1 @@
+{"schema": "nf-assertions/1", "severity_vocabulary": ["fail", "warn"], "kind_vocabulary": ["regex_absent", "regex_present", "count_at_least", "json_value"], "assertions": [{"id": "x", "severity": "fail", "kind": "regex_absent", "params": {"globs": [], "pattern": "a"}, "message": "m"}]}

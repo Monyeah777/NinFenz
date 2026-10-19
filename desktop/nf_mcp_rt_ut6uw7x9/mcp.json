@@ -1,0 +1,23 @@
+{
+  "mcp": {
+    "name": "P90-mcp",
+    "version": "0.1.0",
+    "capabilities": {
+      "resources": {}
+    },
+    "resources": [
+      {
+        "uri": "nf://P90/P10/协议骨架-M90",
+        "name": "技术文档类:M90 · 协议骨架",
+        "mimeType": "text/markdown",
+        "text": "协议必含：前置声明/字段表/示例三段。"
+      },
+      {
+        "uri": "nf://P90/P30/规则校验-M90",
+        "name": "技术文档类:M90 · 规则校验",
+        "mimeType": "text/markdown",
+        "text": "字段命名：snake_case；引用闭合。"
+      }
+    ]
+  }
+}
