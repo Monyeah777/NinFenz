@@ -96,11 +96,6 @@ def _id_token_spans(output: str) -> list[tuple[str, int, int]]:
     return spans
 
 
-def _id_tokens(output: str) -> list[str]:
-    """可作编号断言的 token 列表（位置信息见 `_id_token_spans`）。"""
-    return [tok for tok, _start, _end in _id_token_spans(output)]
-
-
 def _assertion_context(output: str, start: int, end: int) -> tuple[str, str]:
     """取编号前后**同句内**的语境窗（不跨 。！？；换行），供否定/历史谓词判定。"""
     before = output[max(0, start - _ASSERT_CTX_BEFORE):start]
