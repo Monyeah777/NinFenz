@@ -1,1 +1,0 @@
-{"schema": "nf-assertions/1", "severity_vocabulary": ["fail", "warn"], "kind_vocabulary": ["regex_absent", "regex_present", "count_at_least", "json_value"], "assertions": [{"id": "j", "severity": "fail", "kind": "json_value", "params": {"path": "d.json", "key": "properties", "op": "contains_keys", "value": ["zzz"]}, "message": "m", "fix": "f"}]}

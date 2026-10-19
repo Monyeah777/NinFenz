@@ -1,1 +1,0 @@
-{"schema": "nf-assertions/1", "severity_vocabulary": ["fail", "warn"], "kind_vocabulary": ["regex_absent", "regex_present", "count_at_least", "json_value"], "assertions": [{"id": "no-abs", "severity": "fail", "kind": "regex_absent", "params": {"globs": ["a.txt"], "pattern": "[A-Za-z]:"}, "message": "m", "fix": "去掉绝对路径"}]}

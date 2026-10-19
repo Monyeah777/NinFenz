@@ -1,1 +1,0 @@
-{"schema": "nf-assertions/1", "severity_vocabulary": ["fail", "warn"], "kind_vocabulary": ["regex_absent", "regex_present", "count_at_least", "json_value"], "assertions": [], "capability_vocabulary": ["CAP_AGGREGATE_SUMMARY", "CAP_X"], "capability_index": {"CAP_AGGREGATE_SUMMARY": [1, 2], "CAP_X": [9]}}
