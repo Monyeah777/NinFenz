@@ -146,7 +146,7 @@ def self_line(root: str, rel: str) -> str:
     p = Path(root) / rel
     try:
         text = p.read_text(encoding="utf-8", errors="replace")
-    except OSError:
+    except OSError:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
         return ""
     if rel.endswith(".py"):
         m = _DOC.search(text) or _DOC2.search(text)
@@ -162,7 +162,7 @@ def self_line(root: str, rel: str) -> str:
     if rel.endswith(".json"):
         try:
             doc = json_doc.loads(text, what=rel)
-        except ValueError:
+        except ValueError:  # 可吞：坏 JSON=无自述可推；坏件由 schema 面另报
             return ""
         if isinstance(doc, dict):
             for k in ("note", "title", "schema", "id"):
