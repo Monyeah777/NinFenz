@@ -21,9 +21,33 @@ use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/asset_contracts.json";
 pub const SCHEMA: &str = "nf-asset-contracts/1";
-pub const FACES: [&str; 3] = ["data", "code", "script"];
+pub const FACES: [&str; 4] = ["data", "code", "script", "index"];
 pub const LANGS: [&str; 3] = ["python", "bash", "vba"];
-pub const FORMATS: [&str; 4] = ["json", "csv", "markdown", "text"];
+/// 真源 `FORMATS`（D3 写通道契约化后扩到 9 个：yaml/toml/jsonl/graphml/mmd 逐条对应
+/// `asset_contracts.json` 里新增的数据件声明）。顺序须与真源元组**逐字同序**——
+/// 报错文案里 `"/".join(FORMATS)` 会进判据。
+pub const FORMATS: [&str; 9] =
+    ["json", "csv", "markdown", "text", "yaml", "toml", "jsonl", "graphml", "mmd"];
+/// 真源 `_MMD_KINDS`：Mermaid 首关键词词表（结构判据：只认「这是一张什么图」）。
+pub const MMD_KINDS: [&str; 17] = [
+    "graph",
+    "flowchart",
+    "sequenceDiagram",
+    "classDiagram",
+    "stateDiagram",
+    "erDiagram",
+    "gantt",
+    "pie",
+    "mindmap",
+    "timeline",
+    "journey",
+    "gitGraph",
+    "quadrantChart",
+    "xychart-beta",
+    "requirementDiagram",
+    "C4Context",
+    "block-beta",
+];
 
 // ---------------------------------------------------------------- 基础
 
@@ -174,9 +198,87 @@ pub fn csv_rows(text: &str) -> Vec<Vec<String>> {
 
 // ---------------------------------------------------------------- 数据面
 
-/// 真源 `_data_json`。
-fn data_json(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
+/// `Path(rel).stem`：末段去掉最后一个 `.` 之后的部分。
+fn path_stem(rel: &str) -> String {
+    let base = rel.rsplit('/').next().unwrap_or(rel);
+    match base.rsplit_once('.') {
+        Some((s, _)) => s.to_string(),
+        None => base.to_string(),
+    }
+}
+
+/// `Path(rel).parent`：去掉末段（`.` → 空串，与 `Path("x").parent == "."` 的拼接效果等价）。
+fn path_parent(rel: &str) -> String {
+    rel.rsplit_once('/').map(|(d, _)| d.to_string()).unwrap_or_default()
+}
+
+/// 真源 `_schema_of`：显式 `schema` 优先，其次 `schema_siblings` 里**第一个在场**的兄弟候选。
+fn schema_of(root: &Path, rel: &str, spec: &Json) -> String {
+    let sch = sg_str(spec, "schema");
+    if !sch.is_empty() {
+        return sch;
+    }
+    let stem = path_stem(rel);
+    let parent = path_parent(rel);
+    for tmpl in sg_strs(spec, "schema_siblings") {
+        let cand_raw = tmpl.replace("{stem}", &stem);
+        let cand = if parent.is_empty() {
+            cand_raw
+        } else {
+            format!("{}/{}", parent, cand_raw)
+        };
+        if root.join(&cand).is_file() {
+            return cand;
+        }
+    }
+    String::new()
+}
+
+/// 真源 `_schema_issues`：按 schema 校验已解析对象（JSON / YAML / TOML 解析后同一数据模型）。
+fn schema_issues(root: &Path, rel: &str, obj: &Json, sch_rel: &str) -> Vec<String> {
     let mut issues: Vec<String> = Vec::new();
+    let (sch_text, err) = sread(root, sch_rel);
+    match err {
+        Some(e) => issues.push(format!("数据件 {} 的 schema 读不到：{}", rel, e)),
+        None => {
+            let errs = match strict_json(&sch_text.unwrap_or_default()) {
+                Ok(s) => json_schema::json_schema_check(obj, &s),
+                Err(e) => vec![format!("schema 本身不是合法 JSON：{}", e)],
+            };
+            for e in errs.iter().take(5) {
+                issues.push(format!("数据件 {} 不符 schema {}：{}", rel, sch_rel, e));
+            }
+        }
+    }
+    issues
+}
+
+/// 真源 `_fields_issues`。
+fn fields_issues(rel: &str, obj: &Json, spec: &Json) -> Vec<String> {
+    let mut issues: Vec<String> = Vec::new();
+    if let Some(Json::Array(req)) = obj_get(spec, "required_fields") {
+        for field in req {
+            let f = pyval::plain_str(field);
+            if dig(obj, &f).is_none() {
+                issues.push(format!(
+                    "数据件 {} 缺必填字段 {}（修复指引：补字段或从声明里删掉——声明即契约）",
+                    rel, f
+                ));
+            }
+        }
+    }
+    issues
+}
+
+fn required_fields_len(spec: &Json) -> i64 {
+    match obj_get(spec, "required_fields") {
+        Some(Json::Array(a)) => a.len() as i64,
+        _ => 0,
+    }
+}
+
+/// 真源 `_data_json`（含 D2 的 `schema_siblings` 兄弟候选与 `no_schema` 缺口计数）。
+fn data_json(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
     let obj = match strict_json(text) {
         Ok(v) => v,
         Err(e) => {
@@ -186,38 +288,19 @@ fn data_json(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
             )
         }
     };
-    let sch_rel = sg_str(spec, "schema");
+    let sch_rel = schema_of(root, rel, spec);
+    let mut issues: Vec<String> = Vec::new();
     if !sch_rel.is_empty() {
-        let (sch_text, err) = sread(root, &sch_rel);
-        match err {
-            Some(e) => issues.push(format!("数据件 {} 的 schema 读不到：{}", rel, e)),
-            None => {
-                let errs = match strict_json(&sch_text.unwrap_or_default()) {
-                    Ok(s) => json_schema::json_schema_check(&obj, &s),
-                    Err(e) => vec![format!("schema 本身不是合法 JSON：{}", e)],
-                };
-                for e in errs.iter().take(5) {
-                    issues.push(format!("数据件 {} 不符 schema {}：{}", rel, sch_rel, e));
-                }
-            }
-        }
+        issues.extend(schema_issues(root, rel, &obj, &sch_rel));
     }
-    if let Some(Json::Array(req)) = obj_get(spec, "required_fields") {
-        for field in req {
-            let f = pyval::plain_str(field);
-            if dig(&obj, &f).is_none() {
-                issues.push(format!(
-                    "数据件 {} 缺必填字段 {}（修复指引：补字段或从声明里删掉——声明即契约）",
-                    rel, f
-                ));
-            }
-        }
+    issues.extend(fields_issues(rel, &obj, spec));
+    let mut stats: Vec<(String, Json)> = vec![];
+    if sg_strs(spec, "schema_siblings").len() > 0 && sch_rel.is_empty() {
+        // 可见缺口：有 schema 兄弟约定但该件没有 schema（**只**跳过 schema 面，必填字段仍判）
+        stats.push(("no_schema".to_string(), Json::Int(1)));
     }
-    let nf = match obj_get(spec, "required_fields") {
-        Some(Json::Array(a)) => a.len() as i64,
-        _ => 0,
-    };
-    (issues, Json::Object(vec![("fields".to_string(), Json::Int(nf))]))
+    stats.push(("fields".to_string(), Json::Int(required_fields_len(spec))));
+    (issues, Json::Object(stats))
 }
 
 /// 真源 `_data_csv`。
@@ -261,6 +344,17 @@ fn data_csv(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
             "数据件 {} 缺必需列 {}（修复指引：加列或改声明）",
             rel,
             missing.join(",")
+        ));
+    }
+    // 真源 `required_any_columns`：样例集表头**族**各不相同（实测 11 种），故只判「至少含一个」。
+    let any_cols: Vec<String> = sg_strs(spec, "required_any_columns");
+    if !any_cols.is_empty() && !any_cols.iter().any(|c| header.contains(c)) {
+        let shown: Vec<String> = header.iter().take(6).cloned().collect();
+        issues.push(format!(
+            "数据件 {} 表头不含任一必需列 {}（实为 {}）（修复指引：改用族内表头或改声明）",
+            rel,
+            any_cols.join("|"),
+            shown.join(",")
         ));
     }
     let low = pyval::py_int_or(obj_get(spec, "min_rows"), 0);
@@ -389,6 +483,186 @@ fn data_link(root: &Path, rel: &str, spec: &Json, obj: &Json) -> Vec<String> {
     issues
 }
 
+// ------------------------------------------------ 数据面（D3：yaml/toml/jsonl/graphml/mmd）
+
+/// 真源 `_data_yaml`：复用 `miniyaml`（真源走 `lazy_yaml`），解析后与 JSON 同判据。
+fn data_yaml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
+    let obj = match crate::miniyaml::parse(text) {
+        Ok(v) => v,
+        Err(e) => {
+            return (
+                vec![format!("数据件 {} 不是合法 YAML：{}（修复指引：修好缩进/语法）", rel, e)],
+                Json::Object(vec![]),
+            )
+        }
+    };
+    let mut issues: Vec<String> = Vec::new();
+    let sch = schema_of(root, rel, spec);
+    if !sch.is_empty() {
+        issues.extend(schema_issues(root, rel, &obj, &sch));
+    }
+    issues.extend(fields_issues(rel, &obj, spec));
+    (
+        issues,
+        Json::Object(vec![("fields".to_string(), Json::Int(required_fields_len(spec)))]),
+    )
+}
+
+/// 真源 `tomllib.loads` 的结果 → 本线 `Json`（TOML 的日期时间退化成字符串，足够判 schema/必填）。
+fn toml_to_json(v: &toml::Value) -> Json {
+    match v {
+        toml::Value::String(s) => Json::Str(s.clone()),
+        toml::Value::Integer(i) => Json::Int(*i),
+        toml::Value::Float(f) => Json::Float(*f),
+        toml::Value::Boolean(b) => Json::Bool(*b),
+        toml::Value::Datetime(d) => Json::Str(d.to_string()),
+        toml::Value::Array(a) => Json::Array(a.iter().map(toml_to_json).collect()),
+        toml::Value::Table(t) => Json::Object(
+            t.iter().map(|(k, v)| (k.clone(), toml_to_json(v))).collect(),
+        ),
+    }
+}
+
+/// 真源 `_data_toml`：stdlib `tomllib`（本线走 `toml` crate），解析后与 JSON 同判据。
+fn data_toml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
+    let obj = match text.parse::<toml::Value>() {
+        Ok(v) => toml_to_json(&v),
+        Err(e) => {
+            return (
+                vec![format!("数据件 {} 不是合法 TOML：{}（修复指引：修好语法或换 format）", rel, e)],
+                Json::Object(vec![]),
+            )
+        }
+    };
+    let mut issues: Vec<String> = Vec::new();
+    let sch = schema_of(root, rel, spec);
+    if !sch.is_empty() {
+        issues.extend(schema_issues(root, rel, &obj, &sch));
+    }
+    issues.extend(fields_issues(rel, &obj, spec));
+    (
+        issues,
+        Json::Object(vec![("fields".to_string(), Json::Int(required_fields_len(spec)))]),
+    )
+}
+
+/// 真源 `_data_jsonl`：**逐行**严格 JSON（空行跳过）；必填字段对每一行判。
+fn data_jsonl(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
+    let mut issues: Vec<String> = Vec::new();
+    let mut rows = 0i64;
+    for (i, line) in text.lines().enumerate() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        rows += 1;
+        let obj = match strict_json(line) {
+            Ok(v) => v,
+            Err(e) => {
+                issues.push(format!(
+                    "数据件 {} 第 {} 行不是合法 JSON：{}（修复指引：一行一条）",
+                    rel,
+                    i + 1,
+                    e
+                ));
+                continue;
+            }
+        };
+        for f in sg_strs(spec, "required_fields") {
+            if dig(&obj, &f).is_none() {
+                issues.push(format!(
+                    "数据件 {} 第 {} 行缺必填字段 {}（修复指引：补字段）",
+                    rel,
+                    i + 1,
+                    f
+                ));
+            }
+        }
+    }
+    let min_rows = pyval::py_int_or(obj_get(spec, "min_rows"), 0);
+    if min_rows > 0 && rows < min_rows {
+        issues.push(format!(
+            "数据件 {} 行数 {} < min_rows {}（修复指引：补样例或下调声明）",
+            rel, rows, min_rows
+        ));
+    }
+    (issues, Json::Object(vec![("rows".to_string(), Json::Int(rows))]))
+}
+
+/// 真源 `_data_graphml`：XML 良构 + 节点/边计数（入口先拒 DTD/实体声明）。
+fn data_graphml(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
+    if text.contains("<!DOCTYPE") || text.contains("<!ENTITY") {
+        return (
+            vec![format!(
+                "数据件 {} 含 DTD/实体声明，拒绝解析（修复指引：去掉 DOCTYPE/ENTITY——导出工具重跑）",
+                rel
+            )],
+            Json::Object(vec![]),
+        );
+    }
+    let root_el = match crate::xmlmini::parse(text) {
+        Ok(n) => n,
+        Err(e) => {
+            return (
+                vec![format!("数据件 {} 不是良构 XML：{}（修复指引：修好 XML）", rel, e)],
+                Json::Object(vec![]),
+            )
+        }
+    };
+    // 真源先试 graphml 命名空间版 `.//g:node`，再退 `.//node`；两者在真语料上同值
+    // （本线解析器只取局部名，与 `{*}` 通配同效）。
+    let nodes = root_el.descendants("node").len() as i64;
+    let edges = root_el.descendants("edge").len() as i64;
+    let mut issues: Vec<String> = Vec::new();
+    let min_nodes = pyval::py_int_or(obj_get(spec, "min_nodes"), 0);
+    if min_nodes > 0 && nodes < min_nodes {
+        issues.push(format!(
+            "数据件 {} 节点数 {} < min_nodes {}（修复指引：补结构或下调声明）",
+            rel, nodes, min_nodes
+        ));
+    }
+    (
+        issues,
+        Json::Object(vec![
+            ("nodes".to_string(), Json::Int(nodes)),
+            ("edges".to_string(), Json::Int(edges)),
+        ]),
+    )
+}
+
+/// 真源 `_data_mmd`：首关键词须是合法 Mermaid 图型（结构判据，不解析图内容）。
+fn data_mmd(rel: &str, text: &str) -> (Vec<String>, Json) {
+    let mut first = String::new();
+    for line in text.lines() {
+        let s = line.trim();
+        if !s.is_empty() && !s.starts_with("%%") {
+            first = s.split_whitespace().next().unwrap_or("").to_string();
+            break;
+        }
+    }
+    if first.is_empty() {
+        return (
+            vec![format!("数据件 {} 是空 Mermaid 图（修复指引：补图声明）", rel)],
+            Json::Object(vec![]),
+        );
+    }
+    let base: &str = if first.starts_with("xychart") || first.starts_with("block") {
+        first.split('-').next().unwrap_or("")
+    } else {
+        &first
+    };
+    if !MMD_KINDS.contains(&first.as_str()) && !MMD_KINDS.contains(&base) {
+        return (
+            vec![format!(
+                "数据件 {} 首关键词 {} 不是合法 Mermaid 图型（修复指引：用 graph/flowchart/sequenceDiagram 等）",
+                rel,
+                pyval::py_repr(&Json::Str(first))
+            )],
+            Json::Object(vec![]),
+        );
+    }
+    (Vec::new(), Json::Object(vec![("kind".to_string(), Json::Str(first))]))
+}
+
 /// 真源 `_check_data`。
 pub fn check_data(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     let sid = {
@@ -463,6 +737,11 @@ pub fn check_data(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             }
             "csv" => data_csv(rel, &text, spec),
             "markdown" => data_markdown(rel, &text, spec),
+            "yaml" => data_yaml(root, rel, &text, spec),
+            "toml" => data_toml(root, rel, &text, spec),
+            "jsonl" => data_jsonl(rel, &text, spec),
+            "graphml" => data_graphml(rel, &text, spec),
+            "mmd" => data_mmd(rel, &text),
             _ => (
                 Vec::new(),
                 Json::Object(vec![(
@@ -473,7 +752,19 @@ pub fn check_data(root: &Path, spec: &Json) -> (Vec<String>, Json) {
         };
         issues.extend(sub);
         if let Json::Object(kv) = s {
+            // 真源对 `no_schema` / `yaml_unavailable` 两个键**累加**到顶层，其余键 `update` 覆盖。
             for (k, v) in kv {
+                if k == "no_schema" || k == "yaml_unavailable" {
+                    let add = pyval::py_int_or(Some(&v), 0);
+                    match stats.iter_mut().find(|(kk, _)| *kk == k) {
+                        Some(e) => {
+                            let base = pyval::py_int_or(Some(&e.1), 0);
+                            e.1 = Json::Int(base + add);
+                        }
+                        None => stats.push((k, Json::Int(add))),
+                    }
+                    continue;
+                }
                 match stats.iter_mut().find(|(kk, _)| *kk == k) {
                     Some(e) => e.1 = v,
                     None => stats.push((k, v)),
@@ -554,8 +845,101 @@ fn check_tests(root: &Path, rel: &str, spec: &Json) -> Vec<String> {
     issues
 }
 
+/// spec 里某键的数组条目（非数组 → 空）。
+fn sg_array(spec: &Json, k: &str) -> Vec<Json> {
+    match obj_get(spec, k) {
+        Some(Json::Array(a)) => a.clone(),
+        _ => Vec::new(),
+    }
+}
+
+/// 真源 `_code_structural`（E2 第二实现线结构契约）：不做完整 AST，只判**可证的正则面**——
+/// 禁用式（必须 0 处）与计数上限（棘轮只减不增）。真源明说这是「范围与只减不增的计数」，
+/// 比「装作 AST 判过」诚实；本线用 `regex` crate 承担同一条语义（模式均来自真源声明）。
+fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
+    let sid = {
+        let s = sg_str(spec, "id");
+        if s.is_empty() {
+            "?".to_string()
+        } else {
+            s
+        }
+    };
+    let rels = resolve(root, spec);
+    if rels.is_empty() {
+        return (
+            vec![format!("代码契约 {} 未命中任何文件（修复指引：修正 path/glob）", sid)],
+            Json::Object(vec![("files".to_string(), Json::Int(0))]),
+        );
+    }
+    let mut texts: Vec<(String, String)> = Vec::new();
+    for rel in &rels {
+        let (text, err) = sread(root, rel);
+        if let Some(e) = err {
+            return (
+                vec![e],
+                Json::Object(vec![("files".to_string(), Json::Int(rels.len() as i64))]),
+            );
+        }
+        texts.push((rel.clone(), text.unwrap_or_default()));
+    }
+    let mut issues: Vec<String> = Vec::new();
+    let mut stats: Vec<(String, Json)> =
+        vec![("files".to_string(), Json::Int(rels.len() as i64))];
+    for rule in sg_array(spec, "forbid_regex") {
+        let name = sg_str(&rule, "name");
+        let pat = sg_str(&rule, "pattern");
+        let Ok(rx) = regex::Regex::new(&pat) else { continue };
+        let mut hits: Vec<String> = Vec::new();
+        for (rel, text) in &texts {
+            for m in rx.find_iter(text) {
+                let line = text[..m.start()].matches('\n').count() + 1;
+                hits.push(format!("{}:{}", rel, line));
+            }
+        }
+        stats.push((format!("forbid:{}", name), Json::Int(hits.len() as i64)));
+        if !hits.is_empty() {
+            let why = {
+                let w = sg_str(&rule, "why");
+                if w.is_empty() {
+                    "换成不越界的等价实现".to_string()
+                } else {
+                    w
+                }
+            };
+            let sample: Vec<String> = hits.iter().take(3).cloned().collect();
+            issues.push(format!(
+                "代码契约 {} 命中禁用式 {}（{} 处，例 {}）（修复指引：{}）",
+                sid,
+                name,
+                hits.len(),
+                sample.join("、"),
+                why
+            ));
+        }
+    }
+    for rule in sg_array(spec, "regex_limits") {
+        let name = sg_str(&rule, "name");
+        let pat = sg_str(&rule, "pattern");
+        let Ok(rx) = regex::Regex::new(&pat) else { continue };
+        let n: i64 = texts.iter().map(|(_, t)| rx.find_iter(t).count() as i64).sum();
+        let cap = pyval::py_int_or(obj_get(&rule, "max"), 0);
+        stats.push((format!("limit:{}", name), Json::Int(n)));
+        if n > cap {
+            issues.push(format!(
+                "代码契约 {} 的 {} 计数 {} > 上限 {}（棘轮只减不增）（修复指引：先降后改声明）",
+                sid, name, n, cap
+            ));
+        }
+    }
+    (issues, Json::Object(stats))
+}
+
 /// 真源 `_check_code`。
 pub fn check_code(root: &Path, spec: &Json) -> (Vec<String>, Json) {
+    if !sg_array(spec, "forbid_regex").is_empty() || !sg_array(spec, "regex_limits").is_empty() {
+        return check_code_structural(root, spec);
+    }
     let rel = sg_str(spec, "path");
     let lang = {
         let l = sg_str(spec, "lang");
@@ -830,6 +1214,148 @@ pub fn check_chain(specs: &[(String, Json)], chain: &Json) -> (Vec<String>, Json
     (issues, Json::Object(vec![("matched".to_string(), Json::Int(matched))]))
 }
 
+// ---------------------------------------------------------------- 包清单面（S1）
+
+/// 递归收集 `dir` 下的全部文件（相对 `base` 的 POSIX 路径）。真源 `rglob("*") if is_file()`。
+fn walk_files(dir: &Path, base: &Path, out: &mut Vec<String>) {
+    let Ok(rd) = std::fs::read_dir(dir) else { return };
+    let mut names: Vec<std::path::PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+    names.sort();
+    for p in names {
+        if p.is_dir() {
+            walk_files(&p, base, out);
+        } else if p.is_file() {
+            if let Ok(rel) = p.strip_prefix(base) {
+                out.push(rel.to_string_lossy().replace('\\', "/"));
+            }
+        }
+    }
+}
+
+/// 真源 `_check_index`：读包自己的 `outputs/INDEX.json`，与**磁盘实况**双向对账。
+///
+/// 为什么归到「资产契约」：包清单（`nf-output-index/1`）本就是**包自带**的产出面契约，
+/// NF 侧再拿 glob 猜一遍就是两套词表；本判据让**声明**与**实况**互相对齐。
+pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
+    let sid = {
+        let s = sg_str(spec, "id");
+        if s.is_empty() {
+            "?".to_string()
+        } else {
+            s
+        }
+    };
+    let rels = resolve(root, spec);
+    if rels.is_empty() {
+        return (
+            vec![format!("包清单契约 {} 未命中任何清单（修复指引：修正 glob）", sid)],
+            Json::Object(vec![("files".to_string(), Json::Int(0))]),
+        );
+    }
+    let mut issues: Vec<String> = Vec::new();
+    let mut declared_total = 0i64;
+    for rel in &rels {
+        let (text, err) = sread(root, rel);
+        if let Some(e) = err {
+            issues.push(e);
+            continue;
+        }
+        let doc = match strict_json(&text.unwrap_or_default()) {
+            Ok(v) => v,
+            Err(e) => {
+                issues.push(format!(
+                    "包清单 {} 不是合法 JSON：{}（修复指引：重跑 nf domain build）",
+                    rel, e
+                ));
+                continue;
+            }
+        };
+        let base = path_parent(&path_parent(rel)); // <包>/outputs/INDEX.json → <包>
+        let outs: Vec<Json> = match obj_get(&doc, "outputs") {
+            Some(Json::Array(a)) if !a.is_empty() => a.clone(),
+            _ => {
+                issues.push(format!(
+                    "包清单 {} 的 outputs 为空（修复指引：重跑 nf domain build）",
+                    rel
+                ));
+                continue;
+            }
+        };
+        let mut declared: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        for item in &outs {
+            if !matches!(item, Json::Object(_)) {
+                continue;
+            }
+            let pth = sg_str(item, "path");
+            if pth.is_empty() {
+                issues.push(format!("包清单 {} 有一条无 path 的声明（修复指引：补 path）", rel));
+                continue;
+            }
+            declared.insert(pth.clone());
+            declared_total += 1;
+            if !root.join(&base).join(&pth).is_file() {
+                issues.push(format!(
+                    "包清单 {} 声明的 {} 不在场（修复指引：补件或重跑 nf domain build）",
+                    rel, pth
+                ));
+            }
+            let sch = sg_str(item, "schema");
+            if !sch.is_empty() && !root.join(&base).join(&sch).is_file() {
+                issues.push(format!("包清单 {} 声明的 schema {} 不在场（修复指引：补件）", rel, sch));
+            }
+            // 真源 `item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])`
+            let mut ins: Vec<String> = sg_strs(item, "inputs");
+            if ins.is_empty() {
+                let rec = sg(item, "recompute");
+                if matches!(rec, Json::Object(_)) {
+                    ins = sg_strs(&rec, "inputs");
+                }
+            }
+            for inp in &ins {
+                if !root.join(&base).join(inp).is_file() {
+                    issues.push(format!(
+                        "包清单 {} 声明的输入 {} 不在场（修复指引：补件或改声明）",
+                        rel, inp
+                    ));
+                }
+            }
+        }
+        let mut on_disk: Vec<String> = Vec::new();
+        walk_files(&root.join(&base).join("outputs"), &root.join(&base), &mut on_disk);
+        // 真源 `self_rel = Path(rel).relative_to(base).as_posix()`：清单自身不是产出面（它是清单）。
+        let self_rel: String = if let Some(rest) = rel.strip_prefix(&base) {
+            rest.trim_start_matches('/').to_string()
+        } else {
+            rel.clone()
+        };
+        let mut missing: Vec<String> = on_disk
+            .into_iter()
+            .filter(|x| {
+                !declared.contains(x)
+                    && *x != self_rel
+                    && !x.starts_with("outputs/samples/")
+            })
+            .collect();
+        missing.sort();
+        if !missing.is_empty() {
+            let sample: Vec<String> = missing.iter().take(3).cloned().collect();
+            issues.push(format!(
+                "包清单 {} 未声明 {} 件实况（例 {}）（修复指引：重跑 nf domain build 让清单与实况同步）",
+                rel,
+                missing.len(),
+                sample.join("、")
+            ));
+        }
+    }
+    (
+        issues,
+        Json::Object(vec![
+            ("files".to_string(), Json::Int(rels.len() as i64)),
+            ("declared".to_string(), Json::Int(declared_total)),
+        ]),
+    )
+}
+
 // ---------------------------------------------------------------- 聚合 / 入口
 
 /// 真源 `load`。
@@ -882,6 +1408,7 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
     let mut files = 0i64;
     let mut chains = 0i64;
+    let mut no_schema = 0i64;
     if !issues.is_empty() {
         let mut kv: Vec<(String, Json)> =
             counts.iter().map(|(k, v)| (k.clone(), Json::Int(*v))).collect();
@@ -902,6 +1429,7 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             let (sub, s) = match face {
                 "data" => check_data(root, &spec),
                 "code" => check_code(root, &spec),
+                "index" => check_index(root, &spec),
                 _ => check_script(root, &spec),
             };
             issues.extend(sub);
@@ -909,6 +1437,8 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
                 e.1 += 1;
             }
             files += pyval::py_int_or(obj_get(&s, "files"), 0);
+            // 真源：`stats["no_schema"] = int(stats.get("no_schema") or 0) + int(s.get(...) or 0)`
+            no_schema += pyval::py_int_or(obj_get(&s, "no_schema"), 0);
         }
     }
     let specs: Vec<(String, Json)> = match obj_get(&doc, "script") {
@@ -931,6 +1461,7 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         counts.iter().map(|(k, v)| (k.clone(), Json::Int(*v))).collect();
     kv.push(("files".to_string(), Json::Int(files)));
     kv.push(("chains".to_string(), Json::Int(chains)));
+    kv.push(("no_schema".to_string(), Json::Int(no_schema)));
     (issues, warns, Json::Object(kv))
 }
 
@@ -1041,14 +1572,19 @@ l2
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
         (
-            r#"{"format": "json", "id": "pack-report-d05", "link": {"base": "community/AI保险域包", "path_field": "sample", "rows_field": "sample_rows"}, "path": "community/AI保险域包/outputs/REPORT.json", "required_fields": ["kind", "code", "domain", "family", "sample", "sample_rows", "metrics"], "schema": "community/AI保险域包/outputs/schemas/DOMAIN_REPORT.schema.json"}"#,
+            r#"{"format": "json", "glob": "community/*/outputs/*.json", "id": "pack-outputs-vs-schemas", "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死", "schema_siblings": ["schemas/{stem}.schema.json"]}"#,
             &[],
-            r#"{"fields": 7, "files": 1, "format": "json"}"#
+            r#"{"fields": 0, "files": 422, "format": "json", "no_schema": 206}"#
         ),
         (
-            r#"{"format": "csv", "id": "pack-cases-d05", "min_rows": 1, "path": "community/AI保险域包/outputs/samples/CASES.csv", "required_columns": ["case_id", "gold_fields", "pred_fields"]}"#,
+            r#"{"format": "json", "glob": "community/*/outputs/REPORT.json", "id": "pack-reports-io", "link": {"path_field": "sample", "rows_field": "sample_rows"}, "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）", "schema_siblings": ["schemas/{stem}.schema.json", "schemas/DOMAIN_REPORT.schema.json"]}"#,
             &[],
-            r#"{"columns": 3, "files": 1, "format": "csv", "rows": 12}"#
+            r#"{"fields": 0, "files": 100, "format": "json"}"#
+        ),
+        (
+            r#"{"format": "csv", "glob": "community/*/outputs/samples/CASES.csv", "id": "pack-cases-csv", "min_rows": 1, "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」", "required_any_columns": ["case_id", "task_id", "query_id", "bucket"]}"#,
+            &[],
+            r#"{"columns": 4, "files": 100, "format": "csv", "rows": 20}"#
         ),
         (
             r#"{"format": "markdown", "id": "library-index", "path": "library/INDEX.md"}"#,
@@ -1056,9 +1592,34 @@ l2
             r#"{"files": 1, "format": "markdown", "tables": 2}"#
         ),
         (
-            r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "a090ee453f3566203b88fc37f8147c9188ce47c65825ff5ca40ffaa63aa26380"}"#,
+            r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"}"#,
             &[],
             r#"{"fields": 3, "files": 1, "format": "json"}"#
+        ),
+        (
+            r#"{"format": "yaml", "glob": "community/*/protocol.yaml", "id": "pack-protocol-yaml", "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）", "schema": "protocol/schema/protocol.schema.json"}"#,
+            &[],
+            r#"{"fields": 0, "files": 111, "format": "yaml"}"#
+        ),
+        (
+            r#"{"format": "mmd", "glob": "community/*/outputs/charts/*.mmd", "id": "pack-charts-mermaid", "note": "图表资产：只判「首关键词是合法 Mermaid 图型」，不解析图内容"}"#,
+            &[],
+            r#"{"files": 106, "format": "mmd", "kind": "flowchart"}"#
+        ),
+        (
+            r#"{"format": "graphml", "glob": "community/*/outputs/**/*.graphml", "id": "pack-charts-graphml", "min_nodes": 1, "note": "图结构资产：XML 良构 + 节点/边计数"}"#,
+            &[],
+            r#"{"edges": 49, "files": 105, "format": "graphml", "nodes": 24}"#
+        ),
+        (
+            r#"{"format": "json", "id": "asset-contracts-self", "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据", "path": "protocol/asset_contracts.json", "required_fields": ["schema", "data", "code", "script"]}"#,
+            &[],
+            r#"{"fields": 4, "files": 1, "format": "json"}"#
+        ),
+        (
+            r#"{"format": "json", "id": "role-coordinates", "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判", "path": "protocol/role_coordinates.json", "required_fields": ["schema", "counts", "kernel", "root_digest"]}"#,
+            &[],
+            r#"{"fields": 4, "files": 1, "format": "json"}"#
         ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
@@ -1098,19 +1659,19 @@ l2
         (
             r#"non-rfc8259"#,
             r#"{"format": "json", "id": "s3", "path": "nonan.json"}"#,
-            &[r#"数据件 nonan.json 不是合法 JSON：非 RFC 8259 常量 NaN（修复指引：改用 null 或有限数字）（修复指引：修好语法或换 format）"#],
+            &[r#"数据件 nonan.json 不是合法 JSON：资产契约文本 不是合法 JSON：按 RFC 8259 不接受 NaN（修复指引：改用 null 或有限数字）（修复指引：核对该件是否被写坏 / 含注释 / 截断）（修复指引：修好语法或换 format）"#],
             r#"{"files": 1, "format": "json"}"#
         ),
         (
             r#"bad-schema-json"#,
             r#"{"format": "json", "id": "s4", "path": "ok.json", "schema": "badschema.json"}"#,
-            &[r#"数据件 ok.json 不符 schema badschema.json：schema 本身不是合法 JSON：Expecting value: line 1 column 10 (char 9)"#],
+            &[r#"数据件 ok.json 不符 schema badschema.json：schema 本身不是合法 JSON：资产契约文本 不是合法 JSON：Expecting value: line 1 column 10 (char 9)（修复指引：核对该件是否被写坏 / 含注释 / 截断）"#],
             r#"{"fields": 0, "files": 1, "format": "json"}"#
         ),
         (
             r#"schema-missing"#,
             r#"{"format": "json", "id": "s5", "path": "ok.json", "schema": "nope.json"}"#,
-            &[r#"数据件 ok.json 的 schema 读不到：读不到 nope.json：[Errno 2] No such file or directory: 'C:\\Users\\mon_7\\Downloads\\NarrativeForge-main\\engine\\rust\\target\\test-fixtures\\asset-data-cases\\nope.json'（修复指引：核对声明里的路径在场）"#],
+            &[r#"数据件 ok.json 的 schema 读不到：读不到 nope.json：[Errno 2] No such file or directory: 'C:\\Users\\mon_7\\Downloads\\nf-wt-rustrf\\engine\\rust\\target\\test-fixtures\\asset-data-cases\\nope.json'（修复指引：核对声明里的路径在场）"#],
             r#"{"fields": 0, "files": 1, "format": "json"}"#
         ),
         (
@@ -1122,7 +1683,7 @@ l2
         (
             r#"format-invalid"#,
             r#"{"format": "xml", "id": "s7", "path": "ok.json"}"#,
-            &[r#"数据契约 s7 的 format='xml' 不在词表 json/csv/markdown/text（修复指引：改用词表内格式）"#],
+            &[r#"数据契约 s7 的 format='xml' 不在词表 json/csv/markdown/text/yaml/toml/jsonl/graphml/mmd（修复指引：改用词表内格式）"#],
             r#"{"files": 1}"#
         ),
         (
@@ -1283,6 +1844,21 @@ l2
             &[],
             r#"{"files": 1}"#
         ),
+        (
+            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "role-model", "lang": "python", "path": "desktop/src/core/role_model.py", "tests": ["desktop/tests/test_role_model.py"]}"#,
+            &[],
+            r#"{"files": 1}"#
+        ),
+        (
+            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是**只读判据**；"#, "un", "safe", r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#),
+            &[],
+            concat!(r#"{"files": 84, "forbid:"#, "un", "safe", r#"": 0, "limit:extern-c": 1}"#)
+        ),
+        (
+            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#),
+            &[],
+            concat!(r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
+        ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -1353,7 +1929,7 @@ l2
         };
         let cases: &[(&str, &[&str], &str)] = &[
         (
-            r#"{"feeds": [{"input": "docs/verification-cards.md", "output": "docs/verification-cards.md"}], "from": "cards", "to": "external-links"}"#,
+            r#"{"feeds": [{"input": "docs/verification-cards.md", "output": "docs/verification-cards.md"}], "from": "cards", "id": "cards-to-external-links", "to": "external-links"}"#,
             &[],
             r#"{"matched": 1}"#
         ),
@@ -1380,7 +1956,7 @@ l2
         assert_eq!(ac_norm(&issues), &[] as &[&str], "聚合 issues 不一致");
         assert_eq!(warns, &[] as &[&str], "聚合 warns 不一致");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 3, "data": 4, "files": 11, "script": 4}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 6, "data": 10, "files": 1255, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
         )
         .unwrap();
         assert!(crate::jsonread::json_eq(&stats, &want),
