@@ -221,16 +221,22 @@ class RealRepoTest(unittest.TestCase):
         self.assertEqual(0.0, met["raw_parse_rate"], "原始 P03 不含「回合 N：」标记")
         self.assertEqual(1.0, met["parse_rate"], "回合样本应全部 parse 成功（含 pending 自测转录）")
         self.assertEqual(met["hits"], met["tp"] + met["fp"], "每条现存命中都必须有 TP/FP 裁定")
-        self.assertGreater(met["hits_before"], met["hits"], "修复后现存命中数应下降")
-        self.assertGreaterEqual(met["fp_resolved"], 1, "至少一条误报被修掉")
+        # 2026-10-20 修完 5 条误报 ⇒ 真实语料现存命中 0（此前 5）
+        self.assertEqual(5, met["hits_before"], "修复前命中数（裁定表条目）应仍为 5")
+        self.assertEqual(0, met["hits"], "5 条已裁定误报修完后现存命中应为 0")
+        self.assertEqual(0, met["tp"], "真实语料上从无真阳性")
+        self.assertEqual(0, met["fp"], "现存误报应为 0")
+        self.assertEqual(5, met["fp_resolved"], "5 条误报应全记入已修")
 
-    def test_real_repo_adjudications_are_all_live_or_resolved(self):
+    def test_real_repo_adjudications_are_all_resolved(self):
         """逐条裁定必须与现测命中一致，且每条都带依据（不许「疑似」）。"""
         rc = df.real_corpus(str(ROOT))
         self.assertTrue(rc, "真实语料裁定块缺失（rounds/selfrun-*.json 的 real_corpus）")
         self.assertEqual([], rc["problems"], rc["problems"])
         live = {(a["line"], a["rule"]) for a in rc["adjudications"] if a["live"]}
-        self.assertEqual(rc["hits"], len(live))
+        self.assertEqual(0, rc["hits"], f"真实语料现存命中应为 0：{sorted(live)}")
+        self.assertEqual(set(), live)
+        self.assertEqual(5, rc["fp_resolved"], "5 条误报应全部转为 live=false")
         for a in rc["adjudications"]:
             self.assertTrue(a["basis"].strip(), f"裁定缺依据：{a}")
             self.assertIn(a["verdict"], ("TP", "FP"))

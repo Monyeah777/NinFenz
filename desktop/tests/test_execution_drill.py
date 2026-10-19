@@ -119,27 +119,81 @@ class RealCorpusRegressionTest(unittest.TestCase):
 
 
 class ReverseCheckTest(unittest.TestCase):
-    """反向：真实语料上 `M10` 的文件名误报必须消失（用整个 P03 文档逐行回放）。"""
+    """反向：真实语料（唯一真实战例 P03）逐行回放必须**零误报**。"""
 
-    def test_p03_real_corpus_has_no_path_false_positive(self):
-        root = Path(__file__).resolve().parents[2]
-        doc = root / "docs" / "完整版样本_西幻生存流P03.md"
-        text = doc.read_text(encoding="utf-8")
+    def _real_ids(self, text):
         real_ids = []
         for line in text.splitlines():
             m = re.match(r"^\|\s*((?:[\u4e00-\u9fff]+:)?M\d{2,3})\s*\|", line)
             if m and m.group(1) not in real_ids:
                 real_ids.append(m.group(1))
         self.assertEqual(26, len(real_ids), "P03 注册表投影应 26 在册")
+        return real_ids
+
+    def test_p03_real_corpus_has_no_false_positive(self):
+        root = Path(__file__).resolve().parents[2]
+        text = (root / "docs" / "完整版样本_西幻生存流P03.md").read_text(encoding="utf-8")
+        real_ids = self._real_ids(text)
         reported = []
         for line_no, line in enumerate(text.splitlines(), 1):
             if not line.strip():
                 continue
             for rule in drill.run_case({"output": line}, real_ids):
                 reported.append((line_no, rule))
-        self.assertNotIn((109, "fabricated_id"), reported,
-                         "P03:109 的 `M10_死亡重生.md` 文件名误报仍在（路径 token 未排除）")
-        # 剩余命中已逐条人工裁定（工件 = rounds/selfrun-*.json 的 real_corpus.adjudications）
+        self.assertEqual([], reported, f"P03 真实语料仍有命中（应全为已裁定误报）：{reported}")
+
+    def test_p03_known_false_positive_lines_are_gone(self):
+        """上轮逐条裁定的 4 条误报（构词粘连 / 否定语境 / 历史语境）定点消失。"""
+        real_ids = ["M00", "M23", "M04", "M02", "通用:M10", "生存:M10", "M01", "M08"]
+        cases = (
+            ("元素反应", "- 核心逻辑：战斗结算——元素反应 → 士气体型修正。"),
+            ("对应件", "### 官方核心配合 11 件（契约摘要；全文路径 = 04_模块库对应件）"),
+            ("否定语境", "（步 5 M23、步 14 M65 幽灵沉淀不命中）"),
+            ("历史语境", "| 数据接口 | EXTERNAL | 源编号残留 M21，职能归 M00 |"),
+        )
+        for name, out in cases:
+            self.assertEqual([], drill.run_case({"output": out}, real_ids),
+                             f"{name} 误报仍在：{out!r}")
+
+
+class ContextBoundaryTest(unittest.TestCase):
+    """两条新判据的**边界守卫**：只收紧不放宽（真阳性必须仍捕获）。"""
+
+    IDS = ["M00"]
+
+    def _hits(self, out):
+        return drill.run_case({"output": out}, self.IDS)
+
+    def test_decision_word_glue_is_not_decision(self):
+        for out in ("技能应用说明。", "混沌事件响应链。", "种族适应与亚种。",
+                    "材料供应清单。", "地形效应修正。"):
+            self.assertEqual([], self._hits(out), f"构词粘连被当决策词：{out!r}")
+
+    def test_real_decision_words_still_caught(self):
+        for out in ("应当输出结算结果。", "必须先写回状态。", "下一步进入结算。",
+                    "结论：按此推进。", "禁止跳过质检门。"):
+            self.assertEqual(["no_citation"], self._hits(out), f"真决策句漏报：{out!r}")
+
+    def test_negation_context_only_for_explicit_predicates(self):
+        """否定**谓词**才豁免；句内光有「不」不算（否则真失范会被误豁免）。"""
+        for out in ("步 14 M65 幽灵沉淀不命中。", "M99 未使用。", "M99 不参与本回合。",
+                    "不得使用 M98 作为编号。"):
+            self.assertEqual([], self._hits(out), f"否定语境误报：{out!r}")
+        for out in ("M99 输出不完整。", "M99 未完待续。", "由 M99 完成本条推进。"):
+            self.assertEqual(["fabricated_id"], self._hits(out),
+                             f"否定语境豁免过宽，真失范漏报：{out!r}")
+
+    def test_history_context(self):
+        for out in ("源编号残留 M21，职能归 M00。", "旧版 M98 已下线。",
+                    "此前曾由 M97 承担。"):
+            self.assertEqual([], self._hits(out), f"历史语境误报：{out!r}")
+        self.assertEqual(["fabricated_id"], self._hits("由 M21 结算经济。"),
+                         "当前断言里的编造编号被历史语境规则吃掉")
+
+    def test_context_window_does_not_cross_clause(self):
+        """语境窗不跨句：前一句的否定不得豁免后一句的当前断言。"""
+        self.assertEqual(["fabricated_id"], self._hits("该模块未启用。由 M99 完成推进。"),
+                         "跨句豁免（否定词在上一句）")
 
 
 if __name__ == "__main__":

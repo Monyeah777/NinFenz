@@ -22,12 +22,31 @@ from core import json_doc
 _MODULE_TOKEN = re.compile(r"(?:[\u4e00-\u9fff]+:)?M\d{2,3}")
 #: 判定词表（缺省中文；用例可在 fixture 的 lexicon 里按语言覆盖——见 §多语协议执行）。
 _DECISION_WORDS = ("应", "应该", "必须", "禁止", "不得", "下一步", "输出", "结论")
+#: 单字判定词的**构词排除表**（2026-10-20 真实语料实测）。
+#: 键 = 单字判定词；值 = (不能紧邻其前的构词字, 不能紧邻其后的构词字)。
+#: 多字判定词（应该/必须/…）仍按子串匹配；这里只拦「不是独立判定用法」的粘连形态——
+#: 中文无空格，`元素反应`/`对应件`/`应用` 里的 `应` 不是「应当」义。
+_DECISION_GLUE: dict[str, tuple[str, str]] = {
+    "应": ("反对适响供效相顺答呼照策接报感",
+           "用急对变聘邀酬届试运付缴纳计答战征招"),
+}
 _CITATION_SRC = (r"§\s*\d+(?:[.-]\d+)*|第\s*\d+\s*(?:节|步|章)|L\d+|行号|"
                  r"[0-9A-Za-z_]+:[MTP]\d{2,3}|/\d+|\b\d{1,3}\b\s*行")
 #: 资产键形态：**大写下划线**标识（至少一个下划线）——模块号/管线号无下划线，天然不入面。
 _ASSET_TOKEN = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
 _PROGRESS = ("回合推进", "进入回合", "已进入第", "时间推进", "推进至", "进入下一回合")
 _SPLIT = re.compile(r"[。！？；\n]+")
+#: 编号断言的否定/历史语境谓词（2026-10-20 真实语料实测，见 `_is_contextual_mention`）。
+#: **只认显式谓词**：不做「句内有『不』就豁免」的粗口径，否则 `M99 输出不完整` 这类真失范
+#: 会被误豁免——判据只能收紧，不能放宽。
+_ASSERT_ABSENT_CUES = ("不命中", "未命中", "不适用", "不含", "不包含", "未包含", "不参与",
+                       "未参与", "不涉及", "未涉及", "未采用", "未使用", "不使用",
+                       "不得使用", "禁止使用", "不挂载", "未挂载", "不纳入", "未纳入",
+                       "跳过", "已移除", "未生效")
+_ASSERT_HISTORY_CUES = ("曾", "此前", "上一版", "旧版", "历史", "原编号", "旧编号",
+                        "残留", "遗留", "已废弃", "已下线", "已迁移", "旧名")
+_ASSERT_CTX_BEFORE = 10
+_ASSERT_CTX_AFTER = 14
 
 
 def _compile_citation(patterns) -> re.Pattern[str]:
@@ -57,8 +76,8 @@ def _mention_tokens(output: str) -> list[str]:
     return _MODULE_TOKEN.findall(output)
 
 
-def _id_tokens(output: str) -> list[str]:
-    """**可作编号断言的**模块号 token：排除路径/文件名的前缀。
+def _id_token_spans(output: str) -> list[tuple[str, int, int]]:
+    """**可作编号断言的**模块号 token 及其位置：排除路径/文件名的前缀。
 
     2026-10-20 真实语料实测：唯一真实战例 `docs/完整版样本_西幻生存流P03.md` 第 109 行
     `- 出处：community/西幻生存领域包/modules/M10_死亡重生.md` —— `M10` 是**文件名**的一部分，
@@ -66,15 +85,63 @@ def _id_tokens(output: str) -> list[str]:
     判据：紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）的匹配
     不是裸编号断言；中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
     """
-    out: list[str] = []
+    spans: list[tuple[str, int, int]] = []
     for m in _MODULE_TOKEN.finditer(output):
         nxt = output[m.end():m.end() + 2]
         if nxt[:1] and nxt[0].isascii() and (nxt[0].isalnum() or nxt[0] == "_"):
             continue
         if nxt[:1] == "." and len(nxt) > 1 and nxt[1].isascii() and nxt[1].isalnum():
             continue
-        out.append(m.group(0))
-    return out
+        spans.append((m.group(0), m.start(), m.end()))
+    return spans
+
+
+def _id_tokens(output: str) -> list[str]:
+    """可作编号断言的 token 列表（位置信息见 `_id_token_spans`）。"""
+    return [tok for tok, _start, _end in _id_token_spans(output)]
+
+
+def _assertion_context(output: str, start: int, end: int) -> tuple[str, str]:
+    """取编号前后**同句内**的语境窗（不跨 。！？；换行），供否定/历史谓词判定。"""
+    before = output[max(0, start - _ASSERT_CTX_BEFORE):start]
+    before = _SPLIT.split(before)[-1]
+    after = output[end:end + _ASSERT_CTX_AFTER]
+    after = _SPLIT.split(after)[0]
+    return before, after
+
+
+def _is_contextual_mention(before: str, after: str) -> bool:
+    """否定/历史语境里的编号提及**不是当前断言**（见 `_ASSERT_ABSENT_CUES` 注释）。
+
+    真实语料实测两类：
+    - 第 100 行 `步 14 M65 幽灵沉淀**不命中**` —— 否定谓词作用于该步，不是「由 M65 执行」；
+    - 第 188 行 `源编号**残留** M21` —— 回顾性叙述指向过去，不是当前装配声明。
+    """
+    cues = _ASSERT_ABSENT_CUES + _ASSERT_HISTORY_CUES
+    return any(c in before or c in after for c in cues)
+
+
+def _has_decision(output: str, decision) -> bool:
+    """判定词命中（**带边界**）：多字词按子串；单字词排除构词粘连（反应/对应/应用…）。"""
+    for word in decision:
+        if len(word) > 1:
+            if word in output:
+                return True
+            continue
+        glue = _DECISION_GLUE.get(word)
+        start = 0
+        while True:
+            i = output.find(word, start)
+            if i < 0:
+                break
+            prev = output[i - 1] if i > 0 else ""
+            nxt = output[i + 1] if i + 1 < len(output) else ""
+            glued = bool(glue) and ((bool(prev) and prev in glue[0])
+                                    or (bool(nxt) and nxt in glue[1]))
+            if not glued:
+                return True
+            start = i + 1
+    return False
 
 
 def _clauses(output: str) -> list[str]:
@@ -93,13 +160,20 @@ def _check_fabricated_id(output: str, real_ids: list[str], other_ids: list[str])
     执行正文里常写裸 `M10`——旧实现拿整串精确比较 ⇒ 同一模块被判「编造」。
     现与 `round_drill.scan`（R-R3）和 `assemble_plan`（决策句编号校验，`assemble_plan.py:219`）
     **同口径**：冒号后的尾段命中即放行。
+
+    **语境排除**（2026-10-20 修）：否定谓词（`不命中`/`未启用`/`不得使用`…）与历史谓词
+    （`曾`/`旧版`/`残留`…）作用于该提及时，它不是在断言「本回合由它执行」——详见
+    `_is_contextual_mention`；只认显式谓词，不按「句内有『不』」豁免。
     """
     real_set = set(real_ids or [])
     real_tails = {_tail(r) for r in real_set}
     other_set = set(other_ids or [])
     other_tails = {_tail(r) for r in other_set}
-    for tok in _id_tokens(output):
+    for tok, start, end in _id_token_spans(output):
         if tok in real_set or _tail(tok) in real_tails:
+            continue
+        before, after = _assertion_context(output, start, end)
+        if _is_contextual_mention(before, after):
             continue
         if tok in other_set or _tail(tok) in other_tails:
             return "cross_pipeline_id"
@@ -129,7 +203,7 @@ def _check_browse_repeat(output: str, source_text: str, progress) -> str:
 
 
 def _check_no_citation(output: str, decision, citation) -> str:
-    if any(w in output for w in decision) and not citation.search(output):
+    if _has_decision(output, decision) and not citation.search(output):
         # 仅当整句既无引用也无真实模块编号时判失范
         if not _mention_tokens(output):
             return "no_citation"

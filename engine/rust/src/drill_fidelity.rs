@@ -17,7 +17,9 @@
 //!
 //! 1. **坏 JSON 的异常文本**：真源 `except ValueError as exc` 把 CPython 的
 //!    `JSONDecodeError` 原文（如 `Expecting value: line 1 column 1 (char 0)`）拼进 issue；
-//!    本线措辞自拟。**两侧都判 FAIL**，只是文本不同。真语料上所有夹具件均可解析，故不触发。
+//!    本线措辞自拟（`…不是合法 JSON：（本线不复刻 CPython 解析器原文，见模块头）`）。
+//!    **两侧都判 FAIL**，只是文本不同。真语料上所有夹具件均可解析；分支夹具里的坏 JSON 因此
+//!    只断言 issue 前缀（`bad_json_*_needs_a_self_authored_prefix`），不伪造真源文本。
 //! 2. **JSON 合法但非对象**（如顶层是 `[]`）：真源 `data.get(...)` 抛 `AttributeError` ⇒ 整条判据
 //!    记 **ERROR**；本线把该件当作「无 cases / 无样本」继续 ⇒ 记 **FAIL**。两侧都是红的，
 //!    但状态不同。这与 `modeling` 的未登记 `python_attr` 是同一类偏差。
@@ -66,6 +68,31 @@ fn module_token_re() -> &'static regex::Regex {
 
 /// 真源 `execution_drill._DECISION_WORDS`（缺省中文；用例可在 fixture 的 lexicon 里覆盖）。
 const EXEC_DECISION: [&str; 8] = ["应", "应该", "必须", "禁止", "不得", "下一步", "输出", "结论"];
+
+/// 真源 `execution_drill._DECISION_GLUE`：单字判定词的构词排除表（(词, (前字集, 后字集))）。
+/// 真实语料实测：`元素反应`/`对应件`/`应用` 里的 `应` 不是「应当」义。
+const EXEC_DECISION_GLUE: [(&str, (&str, &str)); 1] = [(
+    "应",
+    ("反对适响供效相顺答呼照策接报感", "用急对变聘邀酬届试运付缴纳计答战征招"),
+)];
+
+/// 真源 `execution_drill._ASSERT_ABSENT_CUES`：编号断言的否定语境谓词。
+/// **只认显式谓词**（不做「句内有『不』就豁免」的粗口径，否则真失范会被误豁免）。
+const ASSERT_ABSENT_CUES: [&str; 22] = [
+    "不命中", "未命中", "不适用", "不含", "不包含", "未包含", "不参与", "未参与", "不涉及",
+    "未涉及", "未采用", "未使用", "不使用", "不得使用", "禁止使用", "不挂载", "未挂载",
+    "不纳入", "未纳入", "跳过", "已移除", "未生效",
+];
+
+/// 真源 `execution_drill._ASSERT_HISTORY_CUES`：编号断言的历史语境谓词。
+const ASSERT_HISTORY_CUES: [&str; 13] = [
+    "曾", "此前", "上一版", "旧版", "历史", "原编号", "旧编号", "残留", "遗留", "已废弃",
+    "已下线", "已迁移", "旧名",
+];
+
+/// 真源 `_ASSERT_CTX_BEFORE` / `_ASSERT_CTX_AFTER`（单位：**码点**，与 Python 切片一致）。
+const ASSERT_CTX_BEFORE: usize = 10;
+const ASSERT_CTX_AFTER: usize = 14;
 
 /// 真源 `execution_drill._CITATION`。
 fn citation_re() -> &'static regex::Regex {
@@ -138,8 +165,8 @@ fn mention_tokens(output: &str) -> Vec<String> {
 /// 旧线照抓并判 `fabricated_id`。Rust `regex` 无 lookaround，故按匹配尾后字符就地过滤：
 /// 紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）者不算裸编号断言；
 /// 中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
-fn exec_id_tokens(output: &str) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
+fn exec_id_token_spans(output: &str) -> Vec<(String, usize, usize)> {
+    let mut out: Vec<(String, usize, usize)> = Vec::new();
     for m in module_token_re().find_iter(output) {
         let mut it = output[m.end()..].chars();
         if let Some(c) = it.next() {
@@ -152,9 +179,80 @@ fn exec_id_tokens(output: &str) -> Vec<String> {
                 }
             }
         }
-        out.push(m.as_str().to_string());
+        out.push((m.as_str().to_string(), m.start(), m.end()));
     }
     out
+}
+
+/// 真源 `_assertion_context`：取编号前后**同句内**的语境窗（不跨 。！？；换行）。
+fn assertion_context(output: &str, start: usize, end: usize) -> (String, String) {
+    let before_raw = tail_chars(&output[..start], ASSERT_CTX_BEFORE);
+    let before = split_re().split(before_raw).last().unwrap_or("").to_string();
+    let after_raw = head_chars(&output[end..], ASSERT_CTX_AFTER);
+    let after = split_re().split(after_raw).next().unwrap_or("").to_string();
+    (before, after)
+}
+
+/// `s` 末尾 `n` 个码点（`n` 超长时取全串）。
+fn tail_chars(s: &str, n: usize) -> &str {
+    let mut count = 0usize;
+    for (i, _) in s.char_indices().rev() {
+        count += 1;
+        if count == n {
+            return &s[i..];
+        }
+    }
+    s
+}
+
+/// `s` 开头 `n` 个码点（`n` 超长时取全串）。
+fn head_chars(s: &str, n: usize) -> &str {
+    match s.char_indices().nth(n) {
+        Some((i, _)) => &s[..i],
+        None => s,
+    }
+}
+
+/// 真源 `_is_contextual_mention`：否定/历史语境里的编号提及**不是当前断言**。
+fn is_contextual_mention(before: &str, after: &str) -> bool {
+    ASSERT_ABSENT_CUES
+        .iter()
+        .chain(ASSERT_HISTORY_CUES.iter())
+        .any(|c| before.contains(c) || after.contains(c))
+}
+
+/// 真源 `_has_decision`：判定词命中（**带边界**）——多字词子串；单字词排除构词粘连。
+fn has_decision(output: &str, decision: &[String]) -> bool {
+    for word in decision {
+        if word.chars().count() > 1 {
+            if output.contains(word.as_str()) {
+                return true;
+            }
+            continue;
+        }
+        let Some(first) = word.chars().next() else {
+            continue;
+        };
+        let glue = EXEC_DECISION_GLUE.iter().find(|(w, _)| *w == word.as_str()).map(|(_, g)| *g);
+        for (i, ch) in output.char_indices() {
+            if ch != first {
+                continue;
+            }
+            let prev = output[..i].chars().next_back();
+            let next = output[i + ch.len_utf8()..].chars().next();
+            let glued = match glue {
+                Some((prev_set, next_set)) => {
+                    prev.map(|c| prev_set.contains(c)).unwrap_or(false)
+                        || next.map(|c| next_set.contains(c)).unwrap_or(false)
+                }
+                None => false,
+            };
+            if !glued {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 /// 真源「_ASSET_TOKEN」：大写下划线资产键（至少一个下划线）。
@@ -183,9 +281,13 @@ fn clauses(output: &str) -> Vec<String> {
 fn check_fabricated_id(output: &str, real_ids: &[String], other_ids: &[String]) -> &'static str {
     let real_tails: Vec<String> = real_ids.iter().map(|r| tail_after_colon(r)).collect();
     let other_tails: Vec<String> = other_ids.iter().map(|r| tail_after_colon(r)).collect();
-    for tok in exec_id_tokens(output) {
+    for (tok, start, end) in exec_id_token_spans(output) {
         let tail = tail_after_colon(&tok);
         if real_ids.iter().any(|r| *r == tok) || real_tails.iter().any(|t| *t == tail) {
+            continue;
+        }
+        let (before, after) = assertion_context(output, start, end);
+        if is_contextual_mention(&before, &after) {
             continue;
         }
         if other_ids.iter().any(|r| *r == tok) || other_tails.iter().any(|t| *t == tail) {
@@ -226,7 +328,7 @@ fn check_browse_repeat(output: &str, source_text: &str, progress: &[String]) -> 
 
 /// 真源 `_check_no_citation`。
 fn check_no_citation(output: &str, decision: &[String], citation: &regex::Regex) -> &'static str {
-    if decision.iter().any(|w| output.contains(w.as_str())) && !citation.is_match(output) {
+    if has_decision(output, decision) && !citation.is_match(output) {
         if mention_tokens(output).is_empty() {
             return "no_citation";
         }
@@ -452,6 +554,8 @@ struct RoundSample {
     pending: bool,
     /// 回合数（parse 成功 ⇔ `turns > 0`；待裁定样本的 parse 是裁定前提）。
     turns: i64,
+    /// 样本坏件（真源 `_round_sample` 的 `error` 键）：非空时 `scan` 直接报该条并跳过其余判定。
+    error: Option<String>,
 }
 
 /// 真源 `_exec_sets`。返回 `(集合, issues)`——坏 JSON 记 issue（措辞自拟，见模块头偏差 1/2）。
@@ -524,26 +628,33 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
         };
         let Some(d) = jsonread::read_file(root, &rel) else {
             out.push(RoundSample {
+                error: Some(format!(
+                    "JSON 不可解析：{} 不是合法 JSON：（本线不复刻 CPython 解析器原文，见模块头）",
+                    name
+                )),
                 sample: name,
                 declared: "?".to_string(),
                 live: "error".to_string(),
                 matched: false,
                 pending: false,
                 turns: 0,
-                // 真源这条**没有 `first_issue` 键** ⇒ `str(None)` = `"None"`（不是空串）
-                first_issue: "None".to_string(),
+                first_issue: String::new(),
             });
             continue;
         };
         if !matches!(d, Json::Object(_)) {
             out.push(RoundSample {
+                error: Some(format!(
+                    "JSON 不可解析：{} 顶层形状不对：（本线不复刻 CPython 解析器原文，见模块头）",
+                    name
+                )),
                 sample: name,
                 declared: "?".to_string(),
                 live: "error".to_string(),
                 matched: false,
                 pending: false,
                 turns: 0,
-                first_issue: "JSON 顶层非对象（真源在此记 ERROR，本线如实报出）".to_string(),
+                first_issue: String::new(),
             });
             continue;
         }
@@ -564,6 +675,7 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
             first_issue: issues.first().cloned().unwrap_or_default(),
             pending,
             turns,
+            error: None,
         });
     }
     out
@@ -617,6 +729,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         }
     }
     for s in &samples {
+        if let Some(err) = &s.error {
+            issues.push(format!("{} {}", s.sample, err));
+            continue;
+        }
         if s.pending {
             if s.turns == 0 {
                 issues.push(format!(
@@ -723,11 +839,15 @@ mod tests {
     }
 
     #[test]
-    fn bad_json_round_sample_matches_the_truth_source() {
-        // 坏 JSON 的回合样本：真源那条**没有 `first_issue` 键** ⇒ `str(None)` = `"None"`
+    fn bad_json_round_sample_needs_a_self_authored_prefix() {
+        // ⚠️ 已知偏差：真源 issue 尾部含 CPython `JSONDecodeError` 原文（如
+        // `Expecting value: line 1 column 13 (char 12)`），本线不复刻 ⇒ 只断言前缀，
+        // 与 `badexec_needs_a_self_authored_prefix` 同一口径。
         let root = build_df_fixture("badround", None, &[("bad.json", "{ \"broken\": ")]);
         let (issues, _w, stats) = scan(&root);
-        assert_eq!(issues, &["找不到执行演练用例（修复指引：desktop/tests/fixtures/execution/p*_drill_cases.json 下须有 p*_drill_cases.json）", "回合级回放未复现声明：bad.json 声明=? 实测=error（None）（修复指引：修样本或回合断言——回放须可复现声明结论）"] as &[&str], "坏 JSON 回合样本的 issue 逐字一致");
+        assert_eq!(issues.len(), 2, "{:?}", issues);
+        assert!(issues[0].starts_with("找不到执行演练用例"), "{}", issues[0]);
+        assert!(issues[1].starts_with("bad.json JSON 不可解析："), "{}", issues[1]);
         assert!(crate::jsonread::json_eq(
             &stats,
             &crate::jsonread::convert(&serde_json::json!({
@@ -753,4 +873,44 @@ mod tests {
         );
     }
     // <<< GENERATED
+
+    /// ===== 真实语料误报收口（2026-10-20，非生成段：与真源 `test_execution_drill` 同用例集）=====
+    ///
+    /// 判据只收紧不放宽：构词粘连（反应/对应/应用…）不算决策词；否定/历史**显式谓词**
+    /// 语境里的编号提及不算断言；而句内光有「不」、或跨句的谓词都不得豁免真失范。
+    #[test]
+    fn context_boundary_matches_the_truth_source() {
+        let ids = vec!["M00".to_string()];
+        let run = |out: &str| run_case(&crate::jsonread::convert(&serde_json::json!(
+            {"output": out})).unwrap(), &ids, None, "", &[], &[], None);
+        // 构词粘连：不算决策词 ⇒ 无失范
+        for out in ["技能应用说明。", "混沌事件响应链。", "种族适应与亚种。",
+                    "材料供应清单。", "地形效应修正。"] {
+            assert!(run(out).is_empty(), "构词粘连被当决策词：{}", out);
+        }
+        // 真决策句仍捕获
+        for out in ["应当输出结算结果。", "必须先写回状态。", "下一步进入结算。",
+                    "结论：按此推进。", "禁止跳过质检门。"] {
+            assert_eq!(run(out), vec!["no_citation".to_string()], "真决策句漏报：{}", out);
+        }
+        // 否定语境：只认显式谓词
+        for out in ["步 14 M65 幽灵沉淀不命中。", "M99 未使用。", "M99 不参与本回合。",
+                    "不得使用 M98 作为编号。"] {
+            assert!(run(out).is_empty(), "否定语境误报：{}", out);
+        }
+        for out in ["M99 输出不完整。", "M99 未完待续。", "由 M99 完成本条推进。"] {
+            assert_eq!(run(out), vec!["fabricated_id".to_string()],
+                       "否定语境豁免过宽，真失范漏报：{}", out);
+        }
+        // 历史语境 + 守卫
+        for out in ["源编号残留 M21，职能归 M00。", "旧版 M98 已下线。",
+                    "此前曾由 M97 承担。"] {
+            assert!(run(out).is_empty(), "历史语境误报：{}", out);
+        }
+        assert_eq!(run("由 M21 结算经济。"), vec!["fabricated_id".to_string()],
+                   "当前断言里的编造编号被历史语境规则吃掉");
+        // 语境窗不跨句
+        assert_eq!(run("该模块未启用。由 M99 完成推进。"),
+                   vec!["fabricated_id".to_string()], "跨句豁免（否定词在上一句）");
+    }
 }
