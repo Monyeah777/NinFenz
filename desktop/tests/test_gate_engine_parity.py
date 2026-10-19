@@ -92,7 +92,7 @@ def _truth_key() -> tuple[str, bool] | None:
     if rc != 0:
         return None
     verify_sha = hashlib.sha256(VERIFY_TEXT.encode("utf-8")).hexdigest()
-    return "%shead=%s verify=%s" % (CACHE_PREFIX, head, verify_sha), not status
+    return (f"{CACHE_PREFIX}head={head} verify={verify_sha}", not status)
 
 
 def _parse_verdicts(text: str) -> dict[int, list[str]]:
@@ -157,9 +157,9 @@ def _bash_verdicts() -> dict[int, list[str]]:
     missing = [n for n in TARGETS if n not in merged]
     if missing:
         raise RuntimeError(
-            "bash 定向真值缺 check%s——抽取器/环境坏了，残缺真值不能进缓存"
+            f"bash 定向真值缺 check{missing}——抽取器/环境坏了，残缺真值不能进缓存"
             "（修复指引：bash_targets.sh 是否把 check 体之外的 helper 定义一起抽到了？）"
-            % missing)
+        )
     return merged
 
 
@@ -270,10 +270,10 @@ class GateLabelsExtractionTest(unittest.TestCase):
         joined = "\n".join(labels.pass_lines)
         for anchor in CHECK39_ANCHORS:
             self.assertIn(anchor, VERIFY_TEXT,
-                          "verify.sh 里已没有锚点 %r——回归锚点须随真源同步" % anchor)
-            self.assertIn(anchor, joined, "check39 成功文案漏抽：%r" % anchor)
+                          f"verify.sh 里已没有锚点 {anchor!r}——回归锚点须随真源同步")
+            self.assertIn(anchor, joined, f"check39 成功文案漏抽：{anchor!r}")
         self.assertEqual(2, len(labels.pass_lines),
-                         "check39 成功路径文案条数异常：%s" % labels.pass_lines)
+                         f"check39 成功路径文案条数异常：{labels.pass_lines}")
 
     def test_pass_lines_are_verbatim_ok_literals(self) -> None:
         """抽到的成功文案必须逐字等于体里某条 `ok` 字面量（防截断 / 拼接 / 凭空生成）。"""
@@ -282,7 +282,7 @@ class GateLabelsExtractionTest(unittest.TestCase):
             labels = gate_engine.gate_labels.parse_labels(VERIFY_TEXT, num)
             for s in labels.pass_lines:
                 if s not in labels.ok:
-                    bad.append("check%d：抽取值不是体里的 ok 字面量：%r" % (num, s[:60]))
+                    bad.append(f"check{num}：抽取值不是体里的 ok 字面量：{s[:60]!r}")
         self.assertEqual([], bad, "\n".join(bad))
 
 
