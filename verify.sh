@@ -53,6 +53,10 @@ if [ -z "${NFL_TMP:-}" ] || [ ! -d "${NFL_TMP:-}" ]; then
   echo '无法创建诊断日志目录（TMPDIR / /tmp / .rivet/tmp 均不可写）——请设 NF_VERIFY_TMP 指向可写目录' >&2
   exit 2
 fi
+# **把可写临时目录传给所有子进程**（2026-10-19 实测的硬伤）：如果 TEMP/TMP 指向的目录不可写，
+# Python 的 tempfile 会退到 os.getcwd()——于是 atomic_write / disk_cache 把临时件建在**仓库根**，
+# 既污染仓库（repo_clean 判据红），又让全仓扫描越跑越慢。这里统一指到 NFL_TMP。
+export TMPDIR="$NFL_TMP" TEMP="$NFL_TMP" TMP="$NFL_TMP"
 # ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
 # 档位（2026-10-18 起）：
 #   bash verify.sh         quick 档 = 42 条静态 check + **受影响测试**（按变更面的 core 反向依赖
