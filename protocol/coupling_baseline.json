@@ -238,8 +238,8 @@
     },
     "decisions": {
       "ca": 1,
-      "ce": 2,
-      "i": 0.6667
+      "ce": 3,
+      "i": 0.75
     },
     "declined_ledger": {
       "ca": 1,
@@ -612,9 +612,9 @@
       "i": 0.4167
     },
     "library_entries": {
-      "ca": 5,
+      "ca": 6,
       "ce": 1,
-      "i": 0.1667
+      "i": 0.1429
     },
     "license_gate": {
       "ca": 1,
@@ -1063,6 +1063,11 @@
     },
     "schema_pins": {
       "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
+    "scratch": {
+      "ca": 0,
       "ce": 0,
       "i": 0.0
     },

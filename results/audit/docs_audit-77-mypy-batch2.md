@@ -8,8 +8,14 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:93994ae9206fcb60814a46faa5eabeec382b6be4f595b208b2cb8112364ba764
+  - protocol/code_metrics_baseline.json:1565443345fe155b6685592ca31a638ac46be8bc9738fa2e801d3cbfe9df3042
 ---
+> 重审（2026-10-19）：摘取 W5 三修复并重冻度量基线后，被审承重件 digest 校准（结论未变）
+
+> 重审（2026-10-19）：摘取 W1 纯度修复后重绑 atomic_write.py 被审对象 digest（结论未变）
+
+> 重审（2026-10-19）：CRLF 归一后派生面重算：被审承重件 digest 校准，审计结论未变
+
 > 重审（2026-10-19 · 逆向重构）：decisions.py 重写（值对象 + 规则表 + 结构化诊断，33 例）；行数重冻连带基线变更，subjects 按当前字节重绑
 
 > 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）

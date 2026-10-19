@@ -13,8 +13,14 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
-  - protocol/code_metrics_baseline.json:93994ae9206fcb60814a46faa5eabeec382b6be4f595b208b2cb8112364ba764
+  - protocol/code_metrics_baseline.json:1565443345fe155b6685592ca31a638ac46be8bc9738fa2e801d3cbfe9df3042
 ---
+> 重审（2026-10-19）：摘取 W5 三修复并重冻度量基线后，被审承重件 digest 校准（结论未变）
+
+> 重审（2026-10-19）：摘取 W1 纯度修复后重绑 atomic_write.py 被审对象 digest（结论未变）
+
+> 重审（2026-10-19）：CRLF 归一后派生面重算：被审承重件 digest 校准，审计结论未变
+
 > 重审（2026-10-19 · 逆向重构）：decisions.py 重写（值对象 + 规则表 + 结构化诊断，33 例）；行数重冻连带基线变更，subjects 按当前字节重绑
 
 > 重审（2026-10-19）：度量重冻（nf.py +6 行：会话落点例外）

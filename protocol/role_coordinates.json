@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 235,
-    "verify": 934
+    "verify": 938
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6791,6 +6791,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "临时/scratch 区的唯一裁决点：谁用临时目录、用哪个、能不能用，只在这里判。",
+      "path": "desktop/src/core/scratch.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "v2.8.0 波C C3：跨模块语义矛盾扫描（41 规划——编译期矛盾拦截）。",
       "path": "desktop/src/core/semantic_conflict.py",
       "role": "verify",
@@ -7229,6 +7235,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子写的防御性边界（TDD）：只测边界与失败语义，不改既有判据。",
+      "path": "desktop/tests/test_atomic_write_boundaries.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "原子层单测（门禁能力化重构 · 步骤1）：每个原子至少一正一反两例 + 纯度断言。",
       "path": "desktop/tests/test_atoms.py",
       "role": "verify",
@@ -7555,6 +7567,12 @@
     {
       "function": "内容寻址持久缓存（`core.disk_cache`）单测：键的构成 + 不可信即重算 + 有界 + 可关闭。",
       "path": "desktop/tests/test_disk_cache.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "disk_cache 的全局容量边界（TDD）：按标签有界之外，总量也必须可裁。",
+      "path": "desktop/tests/test_disk_cache_bounds.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8683,6 +8701,12 @@
     {
       "function": "43 追加 · IDL 元工具对照（可选：jsonschema 标准实现交叉验证）。",
       "path": "desktop/tests/test_schema_reference.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "scratch 裁决点的边界契约（TDD）：每条都对应一个真实事故或一条防御性边界。",
+      "path": "desktop/tests/test_scratch.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11868,7 +11892,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1014152b6b90b0fa72865754735b613b64ad53074b181b743ab23f6a8ecc877d",
+  "root_digest": "2462e89c8c177c4b8e8ff5b7d851510522fee5ff6a19d7476b8af85c262b3764",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 96,
@@ -11877,8 +11901,8 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 114,
-    "R-verify": 819,
-    "auto:R-core": 248
+    "R-verify": 822,
+    "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"
 }
