@@ -681,7 +681,7 @@
       "max_fn_lines": 49
     },
     "desktop/src/core/mcp_runtime.py": {
-      "lines": 2019,
+      "lines": 2027,
       "max_fn_cc": 30,
       "max_fn_lines": 69
     },
@@ -1491,7 +1491,7 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 559,
+      "lines": 565,
       "max_fn_cc": 43,
       "max_fn_lines": 191
     },

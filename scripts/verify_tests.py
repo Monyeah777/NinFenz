@@ -279,8 +279,10 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             # 内层并发闸（2026-10-19 实测）：test_daemon_parity 的直跑面默认开 6 路线程，
             # 16 片就是 96 个并发 python 进程——进程创建争用会把整片拖慢。
             # 分片越多、每个分片的内层线程越少，总量固定在 ~16 路。
+            # 总并发上限按 8 路算：16 片时内层 = 1（一片同一时刻只 spawn 一个子进程）。
+            # 2026-10-19 实测：16 片 × 2 线程仍把单条重测试拖到 352 s，降为 1 路才真正削峰。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
-            env["NF_INNER_THREADS"] = str(max(1, min(6, 16 // max(1, _jobs_hint))))
+            env["NF_INNER_THREADS"] = str(max(1, min(6, 8 // max(1, _jobs_hint))))
             try:
                 proc = subprocess.run(
                     [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],

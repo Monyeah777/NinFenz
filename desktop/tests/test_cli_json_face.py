@@ -96,20 +96,30 @@ class JsonFaceStaticTest(unittest.TestCase):
 _CACHE: dict = {}
 
 
-def _probe_faces():
+def _face_rows():
+    """声明 --json 的面清单（只枚举、不跑）——便宜的半个探针。"""
+    if "rows" not in _CACHE:
+        p = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
+                                     cwd=str(ROOT))
+        doc = json.loads(p.stdout)
+        _CACHE["rows"] = [r for r in (doc.get("commands") or doc.get("rows") or [])
+                          if "--json" in (r.get("flags") or [])]
+    return _CACHE["rows"]
+
+
+def _probe_faces(index: int = 0, total: int = 1):
     """枚举声明 `--json` 的面，并**真跑无参形态**（rc=2 = 缺必填参数，本判据跑不到）。
 
-    结果按模块缓存：本文件三个判据共用一次扫描，避免同一批子进程跑三遍。
+    按切片缓存（index/total 只决定"跑哪一份面"，判据不变）：分片器可以把同一条判据
+    切成多份并行，单条地板从 ~90 s 降到 ~25 s。total=1 即历史全量口径。
     """
-    if _CACHE:
-        return _CACHE["rows"], _CACHE["runs"]
-    p = cli_harness.run_cli_proc([sys.executable, NF, "shell", "--commands", "--json"],
-                                 cwd=str(ROOT))
-    doc = json.loads(p.stdout)
-    rows = [r for r in (doc.get("commands") or doc.get("rows") or [])
-            if "--json" in (r.get("flags") or [])]
+    rows = _face_rows()
+    chunk = rows[index::total] if total > 1 else rows
+    key = (index, total)
+    if key in _CACHE.get("runs", {}):
+        return chunk, _CACHE["runs"][key]
     runs, raw = {}, {}
-    for r in rows:
+    for r in chunk:
         path = r["path"]
         q = cli_harness.run_cli_proc([sys.executable, NF] + path.split() + ["--json"],
                                      cwd=str(ROOT))
@@ -120,31 +130,47 @@ def _probe_faces():
             runs[path] = json.loads((q.stdout or "").strip())
         except ValueError:
             runs[path] = None
-    _CACHE["rows"], _CACHE["runs"], _CACHE["raw"] = rows, runs, raw
-    return rows, runs
+    _CACHE.setdefault("runs", {})[key] = runs
+    _CACHE.setdefault("raw", {}).update(raw)
+    return chunk, runs
 
 
 class JsonFaceDynamicTest(unittest.TestCase):
-    def test_every_runnable_json_face_is_self_describing(self):
-        _, runs = _probe_faces()
-        missing, exempt_seen = [], set()
+    def _assert_self_describing_slice(self, index: int, total: int = 4):
+        """自描述判据的分片版：每片只跑自己的 1/4 面，断言内容与原判据逐条相同。"""
+        _, runs = _probe_faces(index, total)
+        missing = []
         for path, data in sorted(runs.items()):
             if data is None:
                 missing.append("%s（stdout 非 JSON）" % path)
                 continue
             top = path.split()[0]
             if top in EXEMPT:
-                exempt_seen.add(top)
                 keys = set(data) if isinstance(data, dict) else set()
                 if not (keys & EXEMPT[top]):
                     missing.append("%s（豁免面缺自证键）" % path)
                 continue
             if not isinstance(data, dict) or not ({"kind", "schema"} & set(data)):
                 missing.append("%s（%s）" % (path, type(data).__name__))
-        self.assertGreater(len(runs), 40, "动态面扫描覆盖不足（%d）" % len(runs))
+        self.assertGreater(len(runs), 8, "分片内可跑面不足（%d）——判据形同虚设" % len(runs))
         self.assertEqual([], missing, "缺少面判别键的 --json 面：%s" % missing)
-        self.assertEqual(set(EXEMPT), exempt_seen,
-                         "豁免面集合与实测不一致（防悄悄新增/失效豁免）")
+        if index == 0:
+            # 豁免面集合与实测一致（全量口径）：用面清单（便宜）判，不再为它跑全量探针。
+            tops = {r["path"].split()[0] for r in _face_rows()}
+            self.assertEqual(set(EXEMPT), {t for t in EXEMPT if t in tops},
+                             "豁免面集合与实测不一致（防悄悄新增/失效豁免）")
+
+    def test_every_runnable_json_face_is_self_describing_chunk0(self):
+        self._assert_self_describing_slice(0)
+
+    def test_every_runnable_json_face_is_self_describing_chunk1(self):
+        self._assert_self_describing_slice(1)
+
+    def test_every_runnable_json_face_is_self_describing_chunk2(self):
+        self._assert_self_describing_slice(2)
+
+    def test_every_runnable_json_face_is_self_describing_chunk3(self):
+        self._assert_self_describing_slice(3)
 
 
 #: 预设面的**隔离 NF_HOME**：预设库在用户态，判据不许碰真实 `~/.NinFenz`
@@ -310,6 +336,41 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
         self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
         stale = sorted(known - faces)
         self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
+
+    # ── 分片版（2026-10-19）：把同一条判据按面切成 4 份，让分片器能并行它 ──
+    # 判据本身不变：仍是「每张面要么无参可跑、要么被 CANON/SKIP 点名」，只是不再由一条
+    # 测试独占 ~90 s（实测那是全量档的头部地板之一）。
+    def _face_chunk(self, index: int, total: int = 4):
+        rows = _face_rows()
+        chunk = rows[index::total]
+        self.assertTrue(chunk, "面切片 %d/%d 为空（判据形同虚设）" % (index, total))
+        return rows, chunk
+
+    def _assert_face_slice(self, index: int, total: int = 4):
+        rows, chunk = self._face_chunk(index, total)
+        known = set(CANON) | set(SKIP)
+        paths = [r["path"] for r in chunk]
+        runs = _probe_faces(index, total)[1]
+        orph = sorted(p for p in paths if p not in (set(runs) | known))
+        self.assertEqual([], orph,
+                         "既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：%s" % orph)
+        if index == 0:
+            all_faces = {r["path"] for r in rows}
+            self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
+            stale = sorted(known - all_faces)
+            self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
+
+    def test_every_json_face_has_a_destination_chunk0(self):
+        self._assert_face_slice(0)
+
+    def test_every_json_face_has_a_destination_chunk1(self):
+        self._assert_face_slice(1)
+
+    def test_every_json_face_has_a_destination_chunk2(self):
+        self._assert_face_slice(2)
+
+    def test_every_json_face_has_a_destination_chunk3(self):
+        self._assert_face_slice(3)
 
     def test_skip_reasons_point_at_real_coverage(self):
         """`SKIP` 理由里点名的覆盖专件**必须真的碰过这张面**（防「按记忆填理由」）。

@@ -7,15 +7,15 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "65e81870c5729c26579195ac2588e0aaa29505ec5984e7366f763ecd987a4a17",
+    "receiptRoot": "ab40810fb12993aa35cec2d3c0f9fbaa9409b65b2b5c003416fea0d1ffae8245",
     "verdict": "conformant"
   },
-  "issuer": "门禁提速批（B1）",
+  "issuer": "门禁提速批（极致）",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"
   ],
-  "validFrom": "2026-10-18",
+  "validFrom": "2026-10-19",
   "x-nf-note": "派生自 protocol/conformance_report.json + protocol/RECEIPTS.json + protocol/approvals/*（纯派生，不新增真源）",
   "x-nf-proof-status": "unsigned（本仓签名走 ssh 外挂锚 nf attest；未接 JWS/Data Integrity 签名套件——形状可读，不可验证，勿当凭证使用）"
 }

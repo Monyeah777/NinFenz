@@ -509,7 +509,7 @@
             "description": "错误（RFC 9457 Problem Details 映射见 x-nf-error-mapping）"
           }
         },
-        "summary": "maps_to registry_query（MCP 工具）",
+        "summary": "maps_to registry_search（MCP 工具）",
         "x-nf-idempotency": "idempotent"
       }
     }

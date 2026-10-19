@@ -53,7 +53,7 @@
       ]
     },
     {
-      "description": "maps_to registry_query（MCP 工具）（GET /registry）",
+      "description": "maps_to registry_search（MCP 工具）（GET /registry）",
       "id": "registry.query",
       "name": "registry.query",
       "tags": [
