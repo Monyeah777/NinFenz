@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-19",
   "approved_by": "收口",
-  "note": "check39 挂载五分钟入口子判据后重写一致性报告（verify.sh 结构性变更 → audit 重绑 → conformance --write）",
+  "note": "最终派生面重冻：代码度量/审计/阶梯重算后一致性报告重签（27/27 conformant）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "ec72347fbb8888dcf87616560e34a9eb3c9813a57d457b3498a5047355a03e4c"
