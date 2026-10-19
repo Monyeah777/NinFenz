@@ -167,6 +167,30 @@ def code_scope_files(root: str, modules) -> Optional[Tuple[str, ...]]:
 
 
 _SCOPE_FP: Dict[Any, Optional[str]] = {}
+#: 逐件摘要的**跨模块集**记忆（2026-10-19 实测）：同一份代码件常被多个站点的闭包同时收录
+#: （纵深扫描里 7 个扫描器各算一次闭包 ⇒ 单件被读 9 次）。摘要只取内容与路径，与「按哪些模块
+#: 取闭包」无关；按 (根, 相对路径, mtime_ns, size) 记忆 ⇒ 字节一变（写盘即换 mtime）就自然失效，
+#: 不引入额外的 reset 协议。上限只防失控，不参与任何判定。
+_SCOPE_DIGEST: dict = {}
+_SCOPE_DIGEST_MAX = 4096
+
+
+def _scope_digest(root: str, rel: str, cf) -> bytes:
+    """单件摘要（跨模块集复用）：stat 键命中就不重开文件；stat 失败＝老实读一次。"""
+    path = os.path.join(root, *rel.split("/"))
+    try:
+        st = os.stat(path)
+        key = (os.path.normcase(os.path.abspath(root)), rel, st.st_mtime_ns, st.st_size)
+    except OSError:
+        return cf.payload_digest(root, rel)
+    got = _SCOPE_DIGEST.get(key)
+    if got is None:
+        got = cf.payload_digest(root, rel)
+        if len(_SCOPE_DIGEST) >= _SCOPE_DIGEST_MAX:
+            _SCOPE_DIGEST.clear()
+        _SCOPE_DIGEST[key] = got
+    return got
+
 
 def code_scope_fingerprint(root: str, modules) -> Optional[str]:
     """闭包的**内容指纹**（按 (根, 模块元组) 记忆）；闭包算不出 → None。
@@ -184,8 +208,11 @@ def code_scope_fingerprint(root: str, modules) -> Optional[str]:
     if files is not None:
         from core import content_face as _cf      # 同帧同口径（叶子件），缺件不计入
         have = _cf.list_core_files(str(root))
-        digests = {rel: _cf.payload_digest(str(root), rel) for rel in files
-                   if rel.rsplit("/", 1)[-1] in have}
+        digests = {}
+        for rel in files:
+            if rel.rsplit("/", 1)[-1] not in have:
+                continue
+            digests[rel] = _scope_digest(str(root), rel, _cf)
         out = _cf.hash_face(sorted(digests), digests)
     _SCOPE_FP[rkey] = out
     return out
@@ -194,8 +221,8 @@ def code_scope_fingerprint(root: str, modules) -> Optional[str]:
 
 
 def reset_code_scope(root: Optional[str] = None) -> None:
-    """清掉导入图与闭包指纹的记忆（守护判定代码已换版后调用）。"""
+    """清掉导入图 / 闭包指纹 / 逐件摘要的记忆（守护判定代码已换版后调用）。"""
     rkey = None if root is None else os.path.normcase(os.path.abspath(str(root)))
-    for memo in (_IMPORT_MEMO, _SCOPE_FP):
+    for memo in (_IMPORT_MEMO, _SCOPE_FP, _SCOPE_DIGEST):
         for k in [k for k in memo if rkey is None or k[0] == rkey]:
             memo.pop(k, None)

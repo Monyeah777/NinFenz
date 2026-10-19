@@ -86,7 +86,7 @@
       "max_fn_lines": 15
     },
     "desktop/src/core/atomic_write.py": {
-      "lines": 231,
+      "lines": 252,
       "max_fn_cc": 8,
       "max_fn_lines": 43
     },
@@ -243,7 +243,7 @@
     "desktop/src/core/decisions.py": {
       "lines": 523,
       "max_fn_cc": 8,
-      "max_fn_lines": 31
+      "max_fn_lines": 21
     },
     "desktop/src/core/declined_ledger.py": {
       "lines": 25,
@@ -266,9 +266,9 @@
       "max_fn_lines": 9
     },
     "desktop/src/core/disk_cache.py": {
-      "lines": 261,
-      "max_fn_cc": 7,
-      "max_fn_lines": 33
+      "lines": 328,
+      "max_fn_cc": 10,
+      "max_fn_lines": 37
     },
     "desktop/src/core/doc_family.py": {
       "lines": 135,
@@ -496,7 +496,7 @@
       "max_fn_lines": 73
     },
     "desktop/src/core/import_graph.py": {
-      "lines": 201,
+      "lines": 228,
       "max_fn_cc": 17,
       "max_fn_lines": 29
     },
@@ -926,7 +926,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 559,
+      "lines": 565,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1069,6 +1069,11 @@
       "lines": 36,
       "max_fn_cc": 10,
       "max_fn_lines": 13
+    },
+    "desktop/src/core/scratch.py": {
+      "lines": 178,
+      "max_fn_cc": 8,
+      "max_fn_lines": 22
     },
     "desktop/src/core/semantic_conflict.py": {
       "lines": 118,
