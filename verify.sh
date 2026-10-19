@@ -2858,6 +2858,46 @@ try:
 except Exception as exc:
     problems.append('终端 JSON 机器面不可解析：%s（修复指引：--json 须输出合法 JSON）' % exc)
 
+# ---- ⑤ 五分钟可复现入口（docs/quickstart.md ↔ scripts/quickstart_check.sh）----
+# 判据挂在既有 check39（不新增 check 序号）：一条命令跑最短路径 + 文档步数 == 脚本步数 +
+# 墙钟 ≤ 300 s。入口任一侧改坏（增删步 / 换步号 / 写错子命令 / 命令跑不通）本 check 立刻红。
+# 为什么用子进程整份执行：静态步数对齐挡不住「命令参数写错但步数没变」，真跑才挡得住。
+import subprocess as _sp
+
+try:
+    _qs = _sp.run(['bash', 'scripts/quickstart_check.sh'], capture_output=True,
+                  encoding='utf-8', errors='replace', timeout=330)
+except _sp.TimeoutExpired:
+    problems.append('五分钟入口超时：bash scripts/quickstart_check.sh 330 s 未结束'
+                    '（修复指引：单步命令卡死；判据上限见脚本 NF_QUICKSTART_MAX_SECONDS=300）')
+else:
+    _qout = _qs.stdout or ''
+    _qerr = _qs.stderr or ''
+    if _qs.returncode != 0:
+        _tail = ' / '.join(((_qout + _qerr).strip().splitlines())[-3:])
+        problems.append('五分钟入口红：bash scripts/quickstart_check.sh 退出码 %s'
+                        '（修复指引：按输出修入口；%s）' % (_qs.returncode, _tail))
+    else:
+        if 'NF_QUICKSTART_OK=1' not in _qout:
+            problems.append('五分钟入口未打印 NF_QUICKSTART_OK=1（修复指引：入口脚本须以该行'
+                            '给出机读通过标记）')
+        _qdoc = _qscript = None
+        _qelapsed = None
+        for _qline in _qout.splitlines():
+            if _qline.startswith('NF_QUICKSTART_DOC_STEPS='):
+                _qdoc = _qline.split('=', 1)[1].strip()
+            elif _qline.startswith('NF_QUICKSTART_SCRIPT_STEPS='):
+                _qscript = _qline.split('=', 1)[1].strip()
+            elif _qline.startswith('NF_QUICKSTART_ELAPSED_SECONDS='):
+                _qelapsed = _qline.split('=', 1)[1].strip()
+        if not _qdoc or _qdoc != _qscript:
+            problems.append('五分钟入口步数不对齐：文档 %r / 脚本 %r（修复指引：docs/quickstart.md'
+                            ' 与 scripts/quickstart_check.sh 的 nf-step 步标记逐项同步）'
+                            % (_qdoc, _qscript))
+        if _qelapsed is None or not _qelapsed.isdigit() or int(_qelapsed) > 300:
+            problems.append('五分钟入口墙钟越界：NF_QUICKSTART_ELAPSED_SECONDS=%r（上限 300 s）'
+                            % _qelapsed)
+
 for p in problems:
     print('[FAIL] %s' % p)
 print('端壳残留项：%d · 菜单区：%d · 菜单示例：%d · 菜单动作：%d（含表单投影）'
@@ -2873,14 +2913,14 @@ print('顶尖 CLI 基线：%d 行 · 通过 %d' % (_bstats['rows'], _bstats['pas
 sys.exit(1 if problems else 0)
 PYEOF
     then
-      ok '端壳残留零在场 + 终端入口在场 + 命令面全策展可达（check39 子扫描：源件/入口/打包线 + terminal.self_check 单源判据 + 检索/地图/自检/补全/限长/无色/写盘表单/活体档/纯 JSON + 单真值源投影对账（tui/_surface.py 逐字节 + 视图闸门不弱于真源）+ 顶尖 CLI 基线逐行，行数不写死）'
+      ok '端壳残留零在场 + 终端入口在场 + 命令面全策展可达 + 五分钟入口可跑（check39 子扫描：源件/入口/打包线 + terminal.self_check 单源判据 + 检索/地图/自检/补全/限长/无色/写盘表单/活体档/纯 JSON + 单真值源投影对账（tui/_surface.py 逐字节 + 视图闸门不弱于真源）+ 顶尖 CLI 基线逐行，行数不写死 + docs/quickstart.md ↔ scripts/quickstart_check.sh 步数/命令/墙钟）'
     else
       no "终端与端壳残留门禁异常——$(tail -3 "$NFL_TMP"/nf_check39.log 2>/dev/null | tr '\n' ' ')"; err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check39 终端与端壳残留门禁）'
   fi
-  if [ "$err" -eq 0 ]; then ok '终端与端壳残留门禁全绿（check39：端壳零回潮 + 终端三件在场 + 菜单无死命令 + 命令面全策展可达 + 单真值源投影同源 + 输出确定）'
+  if [ "$err" -eq 0 ]; then ok '终端与端壳残留门禁全绿（check39：端壳零回潮 + 终端三件在场 + 菜单无死命令 + 命令面全策展可达 + 单真值源投影同源 + 输出确定 + 五分钟入口文档步数==脚本步数）'
   fi
 }
 

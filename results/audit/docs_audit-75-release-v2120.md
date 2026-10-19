@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:1b0a76e810f1f79aa2329aabefef5087c509c4039ebae73d773c052ccd9683c1
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:0083b2f906e12965c99f38225e12202b1c23070098970473d1cecaf508c333f1
+  - README.md:7fc9a71ce7ef52a9f4d4bb8e5fce37c8c13874d3f3c0885fe75eef16f0bdfe08
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
 
 ---
+> 重审（2026-10-19）：check39 挂载五分钟入口判据（docs/quickstart.md ↔ scripts/quickstart_check.sh），verify.sh 结构性新增子判据
+
 > 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
 
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）

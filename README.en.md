@@ -72,6 +72,8 @@ Details: `tui/README.md`.
 
 ## Quick start
 
+First hop: follow the 6 copy-paste steps in [`docs/quickstart.md`](docs/quickstart.md); one-command self-check: `bash scripts/quickstart_check.sh` (exit 0 · wall clock ≤ 300 s · doc steps == script steps, enforced by check39).
+
 Human (author/developer, 5 minutes):
 
 1. `bash verify.sh`

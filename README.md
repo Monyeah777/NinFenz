@@ -68,7 +68,7 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 
 ## 快速开始
 
-作者/开发者，5 分钟：
+作者/开发者，5 分钟：第一跳照 [`docs/quickstart.md`](docs/quickstart.md) 的 6 步逐条复制粘贴；想一条命令自检用 `bash scripts/quickstart_check.sh`（判据：退出码 0 · 墙钟 ≤ 300 秒 · 文档步数 == 脚本步数）。
 
 1. `bash verify.sh`
 2. `python scripts/nf.py shell`（交互终端：端壳退役后的人机入口，见 `docs/terminal.md`）

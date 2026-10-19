@@ -29,6 +29,8 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 
 ## クイックスタート
 
+最初の一歩：[`docs/quickstart.md`](docs/quickstart.md) の 6 ステップを順にコピー＆ペースト。ワンコマンドで自己検査する場合は `bash scripts/quickstart_check.sh`（判定：終了コード 0 · 実時間 ≤ 300 秒 · 文書ステップ数 == スクリプトステップ数）。
+
 作者・開発者向け（5 分）：
 
 1. `bash verify.sh`
