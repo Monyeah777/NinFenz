@@ -25,6 +25,14 @@
 //!    本线按空集处理 ⇒ FAIL。
 //! 4. **Unicode 数字的回合号**：Python `int("٣")` 得 3；本线 `parse::<i64>()` 只吃 ASCII 数字，
 //!    解析失败按 0 计。真语料为 ASCII。
+//! 5. **真实语料命中裁定（2026-10-20 加，真源 `real_corpus`）**：真源把唯一真实战例
+//!    `docs/完整版样本_西幻生存流P03.md` 逐非空行回放 `execution_drill`，并要求逐条 TP/FP 裁定
+//!    （`real_corpus.adjudications`）；本线**只移植 `scan`**（写面/度量面不移植，见本模块头），
+//!    故 `real_corpus` 的命中裁定门与 `metrics` 只在真源侧执行。两侧在真语料上的 `scan`
+//!    （issues/stats）仍逐字一致；语料裁定漂移时只有真源报 FAIL——这是**有意的不对称**，
+//!    不是静默：真源 `scan` 的 issues 里会多出「真实语料裁定：…」条目。
+//! 6. **待裁定样本**（`verdict`/`label_status` = `pending`，2026-10-20 加）：两侧同口径——
+//!    不参与「声明 vs 实测」分子分母，但必须解析出回合标记（`turns > 0`），否则 FAIL。
 
 use crate::jsonread;
 use crate::pyjson::Json;
@@ -123,6 +131,32 @@ fn mention_tokens(output: &str) -> Vec<String> {
     module_token_re().find_iter(output).map(|m| m.as_str().to_string()).collect()
 }
 
+/// 真源 `execution_drill._id_tokens`：**可作编号断言的**模块号（排除路径/文件名前缀）。
+///
+/// 真实语料实测（2026-10-20）：唯一真实战例 P03 第 109 行
+/// `- 出处：community/西幻生存领域包/modules/M10_死亡重生.md` —— `M10` 是**文件名**的前缀，
+/// 旧线照抓并判 `fabricated_id`。Rust `regex` 无 lookaround，故按匹配尾后字符就地过滤：
+/// 紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）者不算裸编号断言；
+/// 中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
+fn exec_id_tokens(output: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for m in module_token_re().find_iter(output) {
+        let mut it = output[m.end()..].chars();
+        if let Some(c) = it.next() {
+            if c.is_ascii_alphanumeric() || c == '_' {
+                continue;
+            }
+            if c == '.' {
+                if matches!(it.next(), Some(d) if d.is_ascii_alphanumeric()) {
+                    continue;
+                }
+            }
+        }
+        out.push(m.as_str().to_string());
+    }
+    out
+}
+
 /// 真源「_ASSET_TOKEN」：大写下划线资产键（至少一个下划线）。
 fn asset_token_re() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
@@ -142,12 +176,19 @@ fn clauses(output: &str) -> Vec<String> {
 }
 
 /// 真源「_check_fabricated_id」：本管线真实编号放行；其它管线真实编号判跨管线串号；其余判编造。
+///
+/// **后缀归一**（2026-10-20 修）：装配真实集写 `通用:M10` / `生存:M10`（重号须类别前缀限定），
+/// 执行正文里常写裸 `M10`——旧实现拿整串精确比较 ⇒ 同一模块被判「编造」。
+/// 现与 `round_drill.scan`（R-R3）和 `assemble_plan`（决策句编号校验）**同口径**：尾段命中即放行。
 fn check_fabricated_id(output: &str, real_ids: &[String], other_ids: &[String]) -> &'static str {
-    for tok in mention_tokens(output) {
-        if real_ids.iter().any(|r| *r == tok) {
+    let real_tails: Vec<String> = real_ids.iter().map(|r| tail_after_colon(r)).collect();
+    let other_tails: Vec<String> = other_ids.iter().map(|r| tail_after_colon(r)).collect();
+    for tok in exec_id_tokens(output) {
+        let tail = tail_after_colon(&tok);
+        if real_ids.iter().any(|r| *r == tok) || real_tails.iter().any(|t| *t == tail) {
             continue;
         }
-        if other_ids.iter().any(|r| *r == tok) {
+        if other_ids.iter().any(|r| *r == tok) || other_tails.iter().any(|t| *t == tail) {
             return "cross_pipeline_id";
         }
         return "fabricated_id";
@@ -407,6 +448,10 @@ struct RoundSample {
     live: String,
     matched: bool,
     first_issue: String,
+    /// 真源 `label_status == "pending"` 或 `verdict == "pending"`：未裁定样本。
+    pending: bool,
+    /// 回合数（parse 成功 ⇔ `turns > 0`；待裁定样本的 parse 是裁定前提）。
+    turns: i64,
 }
 
 /// 真源 `_exec_sets`。返回 `(集合, issues)`——坏 JSON 记 issue（措辞自拟，见模块头偏差 1/2）。
@@ -483,6 +528,8 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
                 declared: "?".to_string(),
                 live: "error".to_string(),
                 matched: false,
+                pending: false,
+                turns: 0,
                 // 真源这条**没有 `first_issue` 键** ⇒ `str(None)` = `"None"`（不是空串）
                 first_issue: "None".to_string(),
             });
@@ -494,6 +541,8 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
                 declared: "?".to_string(),
                 live: "error".to_string(),
                 matched: false,
+                pending: false,
+                turns: 0,
                 first_issue: "JSON 顶层非对象（真源在此记 ERROR，本线如实报出）".to_string(),
             });
             continue;
@@ -501,15 +550,20 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
         let transcript = py_str(get(&d, "transcript"));
         let allowed: Vec<String> =
             arr_items(get(&d, "allowed")).iter().map(|v| py_str(Some(v))).collect();
-        let (issues, _turns, _gaps) = round_scan(&transcript, &allowed);
+        let (issues, turns, _gaps) = round_scan(&transcript, &allowed);
         let live = if issues.is_empty() { "conformant" } else { "non-conformant" };
         let declared = declared_of(&d);
+        // 真源：`label_status`/`verdict` 为 pending ⇒ 未裁定（不参与「声明 vs 实测」分子分母）。
+        let pending = py_str(get(&d, "label_status")).to_lowercase() == "pending"
+            || py_str(get(&d, "verdict")).to_lowercase() == "pending";
         out.push(RoundSample {
             sample: name,
-            matched: declared == live,
+            matched: !pending && declared == live,
             declared,
             live: live.to_string(),
             first_issue: issues.first().cloned().unwrap_or_default(),
+            pending,
+            turns,
         });
     }
     out
@@ -531,8 +585,11 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
 
     let ex_cases: i64 = sets.iter().map(|s| s.cases).sum();
     let ex_pass: i64 = sets.iter().map(|s| s.passed).sum();
-    let rnd_total = samples.len() as i64;
-    let rnd_pass = samples.iter().filter(|s| s.matched).count() as i64;
+    // 待裁定样本（pending）不参与「声明 vs 实测」分子分母（未裁定就无声明可复现），
+    // 但必须解析出回合标记——parse 是裁定前提。
+    let adjudicated: Vec<&RoundSample> = samples.iter().filter(|s| !s.pending).collect();
+    let rnd_total = adjudicated.len() as i64;
+    let rnd_pass = adjudicated.iter().filter(|s| s.matched).count() as i64;
     let total = ex_cases + rnd_total;
     let passed = ex_pass + rnd_pass;
 
@@ -560,6 +617,15 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         }
     }
     for s in &samples {
+        if s.pending {
+            if s.turns == 0 {
+                issues.push(format!(
+                    "待裁定回合样本未解析出回合标记：{}（parse 失败 ⇒ 裁定前提不成立；修复指引：转录须含「回合 N：」/「第 N 回合」）",
+                    s.sample
+                ));
+            }
+            continue;
+        }
         if !s.matched {
             let head: String = s.first_issue.chars().take(60).collect();
             issues.push(format!(

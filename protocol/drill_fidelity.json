@@ -46,57 +46,185 @@
       }
     ]
   },
+  "metrics": {
+    "fp": 4,
+    "fp_resolved": 1,
+    "hits": 4,
+    "hits_before": 5,
+    "parse_ok": 6,
+    "parse_rate": 1.0,
+    "parse_total": 6,
+    "raw_parse_rate": 0.0,
+    "round_fp": 0,
+    "round_hits": 0,
+    "round_tp": 0,
+    "tp": 0
+  },
   "overall": {
     "cases": 74,
     "fidelity": 1.0,
     "passed": 74
   },
+  "real_corpus": {
+    "adjudications": [
+      {
+        "basis": "该行枚举 06 §3 步次，原文写「步 14 M65 幽灵沉淀**不命中**」——否定式陈述，不是「本回合由 M65 执行」的执行断言；且 M65=情感:M65 幽灵遗憾是**真实模块**（02_联动注册表.md:159），不属「编造」。定点验证：传 other_ids=['情感:M65'] 时现返回 cross_pipeline_id（类别正确），说明此处 fabricated_id 系类别错标（FP·d）。",
+        "line": 100,
+        "live": true,
+        "live_before": true,
+        "rule": "fabricated_id",
+        "verdict": "FP"
+      },
+      {
+        "basis": "句中出现「元素**反应**」——判定词表 _DECISION_WORDS 的裸 `应` 按子串命中；该句是模块职责陈述（无「应/必须/结论」类决策语义），且含真实编号 M04。属判定词子串误中（FP·b，未在本包修：会动判定词表口径，须独立包评审）。",
+        "line": 113,
+        "live": true,
+        "live_before": true,
+        "rule": "no_citation",
+        "verdict": "FP"
+      },
+      {
+        "basis": "「04_模块库**对应件**」——同上，裸 `应` 子串误中；该行是标题，无决策性断言。（FP·b，未在本包修）",
+        "line": 145,
+        "live": true,
+        "live_before": true,
+        "rule": "no_citation",
+        "verdict": "FP"
+      },
+      {
+        "basis": "表格数据列「源编号残留 M21，职能归 M00 + 五接口」——文档**显式声明** M21 是历史残留编号、职能已归 M00/M24，并非在册模块，也非执行断言；编号在本文档自身表格内有明确来源，「编造」不成立（FP·c）。",
+        "line": 188,
+        "live": true,
+        "live_before": true,
+        "rule": "fabricated_id",
+        "verdict": "FP"
+      },
+      {
+        "basis": "「community/西幻生存领域包/modules/M10_死亡重生.md」是**文件路径**：M10 是文件名的前缀，不是裸编号断言；该文件即 生存:M10/通用:M10 的模块正文出处。旧实现把文件名当裸编号 ⇒ fabricated_id 误报（FP·a，已由「路径 token 排除 + 后缀归一」修掉）。",
+        "line": 109,
+        "live": false,
+        "live_before": true,
+        "rule": "fabricated_id",
+        "verdict": "FP"
+      }
+    ],
+    "fp": 4,
+    "fp_resolved": 1,
+    "hits": 4,
+    "hits_before": 5,
+    "nonblank_lines": 185,
+    "problems": [],
+    "raw_parse_rate": 0.0,
+    "raw_round_turns": 0,
+    "rules": {
+      "fabricated_id": 2,
+      "no_citation": 2
+    },
+    "sample": "selfrun-2026-10-20.json",
+    "sha256": "ca3d75b86a84a500af1890aa6608659cef30eb300dc3ff8d8d74b1407a81b1a7",
+    "sha256_matched": true,
+    "source": "docs/完整版样本_西幻生存流P03.md",
+    "tp": 0
+  },
   "rounds": {
     "fidelity": 1.0,
+    "fp": 0,
+    "hits": [],
     "matched": 5,
+    "parse_ok": 6,
+    "parse_rate": 1.0,
+    "parse_total": 6,
+    "pending": 1,
+    "pending_samples": 1,
     "samples": [
       {
+        "adjudication": [],
         "declared": "non-conformant",
         "first_issue": "第 1 回合缺引用（R-R1）",
+        "hits": [
+          "第 1 回合缺引用（R-R1）",
+          "第 2 回合出现允许集外编号 M99（R-R3）"
+        ],
+        "label_status": "adjudicated",
         "live": "non-conformant",
         "matched": true,
+        "parse_ok": true,
+        "pending": false,
         "sample": "bad.json",
         "turns": 2
       },
       {
+        "adjudication": [],
         "declared": "non-conformant",
         "first_issue": "第 1 回合无推进/状态留痕（R-R2）",
+        "hits": [
+          "第 1 回合无推进/状态留痕（R-R2）"
+        ],
+        "label_status": "adjudicated",
         "live": "non-conformant",
         "matched": true,
+        "parse_ok": true,
+        "pending": false,
         "sample": "bad_r2.json",
         "turns": 1
       },
       {
+        "adjudication": [],
         "declared": "non-conformant",
         "first_issue": "第 1 回合出现允许集外编号 M99（R-R3）",
+        "hits": [
+          "第 1 回合出现允许集外编号 M99（R-R3）"
+        ],
+        "label_status": "adjudicated",
         "live": "non-conformant",
         "matched": true,
+        "parse_ok": true,
+        "pending": false,
         "sample": "bad_r3.json",
         "turns": 1
       },
       {
+        "adjudication": [],
         "declared": "conformant",
         "first_issue": "",
+        "hits": [],
+        "label_status": "adjudicated",
         "live": "conformant",
         "matched": true,
+        "parse_ok": true,
+        "pending": false,
         "sample": "gap_ok.json",
         "turns": 2
       },
       {
+        "adjudication": [],
         "declared": "conformant",
         "first_issue": "",
+        "hits": [],
+        "label_status": "adjudicated",
         "live": "conformant",
         "matched": true,
+        "parse_ok": true,
+        "pending": false,
         "sample": "good.json",
         "turns": 2
+      },
+      {
+        "adjudication": [],
+        "declared": "pending",
+        "first_issue": "",
+        "hits": [],
+        "label_status": "pending",
+        "live": "conformant",
+        "matched": null,
+        "parse_ok": true,
+        "pending": true,
+        "sample": "selfrun-2026-10-20.json",
+        "turns": 3
       }
     ],
-    "total": 5
+    "total": 5,
+    "tp": 0
   },
   "schema": "nf-drill-fidelity/1"
 }
