@@ -15,6 +15,7 @@
 import importlib.util
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -173,6 +174,72 @@ class ExeSubstitutionTest(unittest.TestCase):
              "langs": {"python": {"cmd": ["python", "-c", "print('ok')"]}}}]}
         self.assertEqual("PASS", clv.verify(doc, runner=runner, tools=tools)["verdict"])
         self.assertEqual(["/resolved/python"], seen)
+
+
+def _all_c0_and_quoting_case():
+    """→ (输入 JSON 文本, 期望规范化文本)：全 C0 + 引号/反斜杠/斜杠 + DEL。
+
+    RFC 8785 §3.2.2.2 的最小转义只覆盖 `"`、`\\` 与 C0；`/` 与 DEL 必须原样保留。
+    短转义（\\b \\t \\n \\f \\r）优先于 \\u00XX 形态。
+    """
+    src, want = [], []
+    for cp in range(0x20):
+        short = {0x08: "b", 0x09: "t", 0x0A: "n", 0x0C: "f", 0x0D: "r"}.get(cp)
+        if short:
+            src.append("\\" + short)
+            want.append("\\" + short)
+        else:
+            src.append("\\u%04x" % cp)
+            want.append("\\u%04x" % cp)
+    src.extend(["\\\\", "\\/", '\\"', "\\u007f"])
+    want.extend(["\\\\", "/", '\\"', chr(0x7F)])
+    return '"' + "".join(src) + '"', '"' + "".join(want) + '"'
+
+
+def _edge_cases():
+    """→ [(id, 输入 JSON 文本, 期望规范化文本)]：矩阵清单受卫生门限制未收录的边界夹具。"""
+    c0_src, c0_want = _all_c0_and_quoting_case()
+    return (
+        ("numbers/ieee754-boundaries",
+         "[5e-324,1.7976931348623157e308,2.2250738585072014e-308,"
+         "9007199254740993,1e21,1e-7,-0,123456789012345678901234567890]",
+         "[5e-324,1.7976931348623157e+308,2.2250738585072014e-308,"
+         "9007199254740992,1e+21,1e-7,0,1.2345678901234568e+29]"),
+        ("strings/all-c0-and-quoting", c0_src, c0_want),
+        ("strings/surrogate-pair-nonascii",
+         '"\\ud83d\\ude00\\u4e2d\\u00e9\\u2028\\u007f"',
+         '"' + chr(0x1F600) + chr(0x4E2D) + chr(0xE9) + chr(0x2028) + chr(0x7F) + '"'),
+        ("keys/utf16-vs-byte-order",
+         '{"\\ue000":1,"\\ud83d\\ude00":2,"\\uffff":3,"a":4,"\\u00e9":5}',
+         '{"a":4,"' + chr(0xE9) + '":5,"' + chr(0x1F600) + '":2,"'
+         + chr(0xE000) + '":1,"' + chr(0xFFFF) + '":3}'),
+    )
+
+
+class EdgeFixtureParityTest(unittest.TestCase):
+    """边界夹具的三实现逐字节对拍（补齐矩阵清单因卫生门无法收录的类别）。
+
+    矩阵清单要求 JSON 键只含 ASCII+CJK，故星平面键、全 C0 控制字符只能放**内联夹具**；
+    期望值由 RFC 8785 规则导出并在此**写死**（不拿某一实现的输出当真源），再要求
+    Python 真源与在场 Rust / C# 产物逐字节相同。产物缺席时仍判 Python 侧（不假装跑过）。
+    键序用例同时区分 UTF-16 码元序、UTF-8 字节序与码点序（三者在本例各给一个不同结果）。
+    """
+
+    def test_edge_fixtures_are_byte_identical_across_implementations(self):
+        for cid, text, want in _edge_cases():
+            with tempfile.TemporaryDirectory() as td:
+                path = Path(td) / "input.json"
+                path.write_bytes(text.encode("utf-8"))
+                truth = clv._jcs.canonical_jcs(clv._jcs.loads_strict(text))
+                self.assertEqual(want.encode("utf-8"), truth, f"{cid}：Python 真源偏离规范期望")
+                if RUST_BIN is not None:
+                    rc, out = _run([RUST_BIN, "--file", str(path)])
+                    self.assertEqual(0, rc, f"{cid}：Rust 退出码非 0")
+                    self.assertEqual(truth, out, f"{cid}：Rust 字节与 Python 真源不符")
+                if CS_READY:
+                    rc, out = _run([DOTNET, str(CS_DLL), "--file", str(path)])
+                    self.assertEqual(0, rc, f"{cid}：C# 退出码非 0")
+                    self.assertEqual(truth, out, f"{cid}：C# 字节与 Python 真源不符")
 
 
 if __name__ == "__main__":
