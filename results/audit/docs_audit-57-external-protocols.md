@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:524d1814f3c94a61089cb2b1bb6f48d1a81ad80c6891830d18ab45aa23a25027
-  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
+  - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:3c48d926176ee6f9612ac9c9969cbfc170c4cf9cf75a934643effa21445d95b7
 
 ---
+> 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
+
 > 重审（2026-10-19）：EOL 归一 + 译件重签
 
 > 重审（2026-10-19）：verify.sh 诊断目录/临时变量修复后重绑

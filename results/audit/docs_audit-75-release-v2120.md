@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:c0dcf4d8c1021300dc58acbfc7ef694a729dea042065033acdced00454ed25a3
+  - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
 
 ---
+> 重审（2026-10-19）：nf.py 会话落点放行 .rivet（受限环境唯一可写临时区）
+
 > 重审（2026-10-18）：CI 门禁矩阵化（32 片）
 
 > 重审（2026-10-18）：CHANGELOG 记入门禁提速

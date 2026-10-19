@@ -5855,7 +5855,11 @@ def _cmd_shell(args) -> int:
             "径）",
               file=sys.stderr)
         return 2
-    if args.session_path and os.path.abspath(args.session_path).startswith(os.path.abspath(ROOT)):
+    _sess_abs = os.path.abspath(args.session_path) if args.session_path else ""
+    _scratch_prefix = os.path.abspath(os.path.join(ROOT, ".rivet")) + os.sep
+    _inside_repo = bool(_sess_abs) and _sess_abs.startswith(os.path.abspath(ROOT))
+    _in_scratch = bool(_sess_abs) and _sess_abs.startswith(_scratch_prefix)
+    if args.session_path and _inside_repo and not _in_scratch:
         print("  ✗ --session 不得落在仓库内（修复指引：会话状态属本机用户态，请放到 NF_HOME 或临时"
             "目录——"
               "仓库内留件会被 git add -A 吞掉，2026-09-26 实测过）", file=sys.stderr)
