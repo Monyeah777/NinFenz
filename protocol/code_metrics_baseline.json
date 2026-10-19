@@ -241,7 +241,7 @@
       "max_fn_lines": 86
     },
     "desktop/src/core/decisions.py": {
-      "lines": 209,
+      "lines": 523,
       "max_fn_cc": 8,
       "max_fn_lines": 31
     },

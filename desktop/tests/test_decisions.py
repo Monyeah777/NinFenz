@@ -1,4 +1,11 @@
-"""决策记录（ADR）正式与否定用例。"""
+"""决策记录（ADR）正式与否定用例。
+
+三组分工：
+1) 正式面：真仓必须全绿、accepted 必须被回执锚定、投影必须与实时重算一致；
+2) 规则面：每条判据都有反例（否定用例）；
+3) 边界面：畸形 / 恶意输入必须转成**结构化诊断**（fail-closed）——
+   不得 traceback，也不得静默放行（空 frontmatter、重复键、路径逃逸、类型混淆）。
+"""
 import json
 import sys
 import tempfile
@@ -10,23 +17,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core import decisions as dc  # noqa: E402
 
-GOOD = """---
-id: ADR-0001
-title: t
-status: proposed
-date: 2026-09-15
-supersedes: —
-superseded_by: —
-evidence: [art.md, check1]
----
 
-## 背景
-b
-## 决策
-d
-## 后果
-c
-"""
+def _adr(adr_id="ADR-0001", status="proposed", supersedes="—", superseded_by="—",
+         evidence="[art.md, check1]", title="t"):
+    return (
+        f"---\nid: {adr_id}\ntitle: {title}\nstatus: {status}\ndate: 2026-09-15\n"
+        f"supersedes: {supersedes}\nsuperseded_by: {superseded_by}\n"
+        f"evidence: {evidence}\n---\n\n"
+        "## 背景\nb\n## 决策\nd\n## 后果\nc\n"
+    )
+
+
+GOOD = _adr()
 
 
 def _mk(root, rel, text):
@@ -34,6 +36,17 @@ def _mk(root, rel, text):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text, encoding="utf-8")
     return p
+
+
+def _multi(tmp, adrs, receipts=None):
+    """多 ADR 场景：verify.sh / 证据文件 / 回执 / 投影 一次铺好。"""
+    _mk(tmp, "verify.sh", "check1(){ :; }\n")
+    _mk(tmp, "art.md", "x")
+    for rel, text in adrs.items():
+        _mk(tmp, rel, text)
+    _mk(tmp, dc.RECEIPTS_REL, json.dumps({"entries": receipts or []}, ensure_ascii=False))
+    dc.write_projection(tmp)
+    return tmp
 
 
 def _scene(tmp, text=GOOD, name="ADR-0001-t.md", receipts=None, extra=None):
@@ -55,12 +68,15 @@ class TestRealRepo(unittest.TestCase):
         self.assertGreaterEqual(stats["decisions"], 3)
 
     def test_accepted_are_receipt_anchored(self):
-        import json as _json
-        doc = _json.loads((ROOT / "protocol/RECEIPTS.json").read_text(encoding="utf-8"))
+        doc = json.loads((ROOT / "protocol/RECEIPTS.json").read_text(encoding="utf-8"))
         ids = {e["id"] for e in doc["entries"]}
         for e in dc.entries(str(ROOT)):
             if e["fm"].get("status") == "accepted":
                 self.assertIn(e["path"], ids, e["path"])
+
+    def test_analysis_is_deterministic(self):
+        codes = [i.code for i in dc.analyze(str(ROOT)).issues]
+        self.assertEqual(codes, [i.code for i in dc.analyze(str(ROOT)).issues])
 
 
 class TestNegatives(unittest.TestCase):
@@ -78,79 +94,164 @@ class TestNegatives(unittest.TestCase):
 
     def test_unanchored_accepted_is_fail(self):
         tmp = _scene(tempfile.mkdtemp(), text=GOOD.replace("status: proposed",
-                                                          "status: accepted"))
+                                                           "status: accepted"))
         self.assertTrue(any("未被协议回执锚定" in i for i in dc.scan(tmp)[0]))
         _scene(tmp, text=GOOD.replace("status: proposed", "status: accepted"),
                receipts=[{"id": "decisions/ADR-0001-t.md"}])
         self.assertEqual([i for i in dc.scan(tmp)[0] if "回执锚定" in i], [])
 
     def test_supersede_cycle_is_fail(self):
-        tmp = tempfile.mkdtemp()
-        a = GOOD.replace("superseded_by: —", "superseded_by: ADR-0002")
-        b = (GOOD.replace("id: ADR-0001", "id: ADR-0002")
-                 .replace("superseded_by: —", "superseded_by: ADR-0001"))
-        _scene(tmp, text=a, name="ADR-0001-t.md", extra={"decisions/ADR-0002-t.md": b})
-        dc.write_projection(tmp)
+        tmp = _multi(tempfile.mkdtemp(), {
+            "decisions/ADR-0001-t.md": _adr(superseded_by="ADR-0002"),
+            "decisions/ADR-0002-t.md": _adr("ADR-0002", supersedes="ADR-0001",
+                                            superseded_by="ADR-0001"),
+        })
         self.assertTrue(any("成环" in i for i in dc.scan(tmp)[0]))
+
+    def test_one_way_supersede_is_fail(self):
+        tmp = _multi(tempfile.mkdtemp(), {
+            "decisions/ADR-0001-t.md": _adr(),
+            "decisions/ADR-0002-t.md": _adr("ADR-0002", supersedes="ADR-0001"),
+        })
+        self.assertTrue(any("互指断裂" in i for i in dc.scan(tmp)[0]))
+
+    def test_mutual_supersede_is_clean(self):
+        tmp = _multi(tempfile.mkdtemp(), {
+            "decisions/ADR-0001-t.md": _adr(superseded_by="ADR-0002"),
+            "decisions/ADR-0002-t.md": _adr("ADR-0002", supersedes="ADR-0001"),
+        })
+        self.assertEqual([i for i in dc.scan(tmp)[0] if "互指" in i], [])
 
     def test_projection_drift_is_fail(self):
         tmp = _scene(tempfile.mkdtemp())
         _mk(tmp, dc.INDEX_REL, "# hand written\n")
         self.assertTrue(dc.check_projection(tmp))
 
-    def test_one_way_supersede_is_fail(self):
+
+class TestChainTopology(unittest.TestCase):
+    """取代链拓扑：环判定必须与图论事实一致（旧实现只报"回到起点"的环）。"""
+
+    def test_cycle_not_returning_to_origin_is_fail(self):
+        tmp = _multi(tempfile.mkdtemp(), {
+            "decisions/ADR-0001-t.md": _adr(superseded_by="ADR-0002"),
+            "decisions/ADR-0002-t.md": _adr("ADR-0002", superseded_by="ADR-0003"),
+            "decisions/ADR-0003-t.md": _adr("ADR-0003", superseded_by="ADR-0002"),
+        })
+        issues = dc.scan(tmp)[0]
+        self.assertTrue(any("成环" in i for i in issues), issues)
+        self.assertTrue(any("ADR-0002" in i and "ADR-0003" in i for i in issues), issues)
+
+    def test_self_supersede_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(supersedes="ADR-0001"))
+        self.assertTrue(any("指向自身" in i for i in dc.scan(tmp)[0]))
+
+    def test_chain_of_n_has_no_cycle_and_one_head(self):
+        for n in range(2, 8):
+            adrs = {}
+            for i in range(1, n + 1):
+                sb = f"ADR-{i + 1:04d}" if i < n else "—"
+                sp = f"ADR-{i - 1:04d}" if i > 1 else "—"
+                adrs[f"decisions/ADR-{i:04d}-t.md"] = _adr(
+                    f"ADR-{i:04d}", supersedes=sp, superseded_by=sb)
+            tmp = _multi(tempfile.mkdtemp(), adrs)
+            issues = dc.scan(tmp)[0]
+            self.assertEqual([x for x in issues if "成环" in x], [], f"n={n}")
+            self.assertEqual(1, dc.analyze(tmp).stats["chains"], f"n={n}")
+
+    def test_closing_the_chain_always_cycles(self):
+        for n in range(2, 8):
+            adrs = {}
+            for i in range(1, n + 1):
+                sb = f"ADR-{i + 1:04d}" if i < n else "ADR-0001"
+                sp = f"ADR-{i - 1:04d}" if i > 1 else f"ADR-{n:04d}"
+                adrs[f"decisions/ADR-{i:04d}-t.md"] = _adr(
+                    f"ADR-{i:04d}", supersedes=sp, superseded_by=sb)
+            tmp = _multi(tempfile.mkdtemp(), adrs)
+            self.assertTrue(any("成环" in x for x in dc.scan(tmp)[0]), f"n={n}")
+
+
+class TestEvidenceBoundaries(unittest.TestCase):
+    def test_unknown_adr_reference_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(evidence="[ADR-9999]"))
+        self.assertTrue(any("不在册 ADR" in i for i in dc.scan(tmp)[0]))
+
+    def test_traversal_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(evidence="[../outside.md, check1]"))
+        issues = dc.scan(tmp)[0]
+        self.assertTrue(any("无法解析" in i and ".." in i for i in issues), issues)
+
+    def test_absolute_path_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(evidence="[/etc/passwd, check1]"))
+        self.assertTrue(any("绝对路径" in i for i in dc.scan(tmp)[0]))
+
+    def test_directory_is_not_evidence(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(evidence="[decisions, check1]"))
+        self.assertTrue(any("不是文件" in i for i in dc.scan(tmp)[0]))
+
+    def test_scalar_evidence_is_one_item_not_chars(self):
+        tmp = _scene(tempfile.mkdtemp(), text=_adr(evidence="art.md"))
+        self.assertEqual([], dc.scan(tmp)[0])
+
+    def test_empty_item_is_fail(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr(evidence="[art.md, , check1]"))
+        self.assertTrue(any("有空项" in i for i in dc.scan(tmp)[0]))
+
+
+class TestMalformedInput(unittest.TestCase):
+    """畸形输入：一律结构化诊断，绝不 traceback。"""
+
+    def test_missing_frontmatter(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text="# 无 frontmatter\n\n## 背景\nb\n## 决策\nd\n## 后果\nc\n")
+        self.assertTrue(any("缺 frontmatter" in i for i in dc.scan(tmp)[0]))
+
+    def test_duplicate_frontmatter_key(self):
+        tmp = _scene(tempfile.mkdtemp(),
+                     text=_adr().replace("status: proposed",
+                                         "status: proposed\nstatus: accepted"))
+        self.assertTrue(any("重复键" in i for i in dc.scan(tmp)[0]))
+
+    def test_non_utf8(self):
+        tmp = _scene(tempfile.mkdtemp())
+        Path(tmp, "decisions/ADR-0002-t.md").write_bytes(
+            b"---\nid: ADR-0002\ntitle: \xff\xfe\n---\n")
+        self.assertTrue(any("非 UTF-8" in i for i in dc.scan(tmp)[0]))
+
+    def test_broken_receipts_declaration(self):
+        tmp = _scene(tempfile.mkdtemp())
+        _mk(tmp, dc.RECEIPTS_REL, "{not json")
+        issues = dc.scan(tmp)[0]
+        self.assertTrue(any("回执声明不可解析" in i for i in issues), issues)
+
+    def test_no_adr_at_all(self):
         tmp = tempfile.mkdtemp()
-        b = (GOOD.replace("id: ADR-0001", "id: ADR-0002")
-                 .replace("supersedes: —", "supersedes: ADR-0001"))
-        _scene(tmp, text=GOOD, name="ADR-0001-t.md",
-               extra={"decisions/ADR-0002-t.md": b})
-        dc.write_projection(tmp)
-        self.assertTrue(any("未互指" in i for i in mutual_issues(tmp)))
-
-    def test_mutual_supersede_is_clean(self):
-        tmp = tempfile.mkdtemp()
-        a = GOOD.replace("superseded_by: —", "superseded_by: ADR-0002")
-        b = (GOOD.replace("id: ADR-0001", "id: ADR-0002")
-                 .replace("supersedes: —", "supersedes: ADR-0001"))
-        _scene(tmp, text=a, name="ADR-0001-t.md",
-               extra={"decisions/ADR-0002-t.md": b})
-        dc.write_projection(tmp)
-        self.assertEqual([], mutual_issues(tmp))
+        _mk(tmp, "verify.sh", "check1(){ :; }\n")
+        self.assertTrue(any("未发现任何 ADR" in i for i in dc.scan(tmp)[0]))
 
 
-def mutual_issues(root: str):
-    """取代链**互指**判据：A.supersedes = B  ⟺  B.superseded_by = A。
+class TestProjectionEscaping(unittest.TestCase):
+    """投影注入：竖线 / 控制字符不得破坏表格，也不得静默改写。"""
 
-    为什么在测试层（2026-10-14）：本判据的天然落点是 `core/decisions.py::scan`，而该件在
-    棘轮冻结面上（重冻 = 给中间态盖章）；测层随 check12 常驻生效，且不动冻结面——与
-    `errata_issues` 同一先例。
-    """
-    rows = dc.entries(root)
-    ids, sup_by, sup_es = set(), {}, {}
-    for e in rows:
-        fm = e["fm"]
-        did = str(fm.get("id") or "")
-        if not did:
-            continue
-        ids.add(did)
-        sb = str(fm.get("superseded_by") or "").strip()
-        sp = str(fm.get("supersedes") or "").strip()
-        if sb not in ("—", "-", ""):
-            sup_by[did] = sb
-        if sp not in ("—", "-", ""):
-            sup_es[did] = sp
-    out = []
-    for did, target in sup_es.items():
-        if target in ids and sup_by.get(target) != did:
-            out.append("%s 的 supersedes=%s 未互指（%s 的 superseded_by=%s）"
-                       "（修复指引：被取代方标 superseded_by=%s 并重签回执）"
-                       % (did, target, target, sup_by.get(target) or "—", did))
-    for did, target in sup_by.items():
-        if target in ids and sup_es.get(target) != did:
-            out.append("%s 的 superseded_by=%s 未互指（%s 的 supersedes=%s）"
-                       "（修复指引：取代方标 supersedes=%s）"
-                       % (did, target, target, sup_es.get(target) or "—", did))
-    return out
+    def test_pipe_in_title_stays_one_row(self):
+        tmp = _scene(tempfile.mkdtemp(), text=_adr(title="A|B"))
+        text = dc.render_index(tmp)
+        rows = [ln for ln in text.splitlines() if ln.startswith("| ADR-0001")]
+        self.assertEqual(1, len(rows))
+        self.assertIn("A\\|B", rows[0])
+
+    def test_control_chars_are_stripped(self):
+        tmp = _scene(tempfile.mkdtemp(), text=_adr(title="a\x00b"))
+        self.assertNotIn("\x00", dc.render_index(tmp))
+
+    def test_projection_round_trips_with_escaping(self):
+        tmp = _scene(tempfile.mkdtemp(), text=_adr(title="A|B"))
+        self.assertEqual([], dc.check_projection(tmp))
 
 
 ERRATA_REL = "decisions/ERRATA.json"
@@ -158,12 +259,7 @@ ERRATA_SCHEMA = "nf-decisions-errata/1"
 
 
 def errata_issues(root: str):
-    """勘误登记的两条确定性判据（**不腐** / **不作假**）→ issue 列表。
-
-    为什么在测试层（2026-10-14）：本判据的天然落点是 `core/decisions.py::scan`，但该件在棘轮
-    冻结面上，给它加行须重冻基线；而当时工作区有另一个会话的整波改名在飞（100 项未提交），
-    重冻 = 给中间态盖章（本仓明令禁止）。测试层同样随 check12 常驻生效，且**不动冻结面**。
-    """
+    """勘误登记的两条确定性判据（不腐 / 不作假）→ issue 列表。"""
     from core import doc_family
     p = Path(root, ERRATA_REL)
     if not p.is_file():
