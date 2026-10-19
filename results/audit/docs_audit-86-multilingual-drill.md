@@ -6,14 +6,16 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/execution_drill.py:0146648637f046ad8a39131be3491db20452161db37709712252a460eae7d6d0
+  - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
   - desktop/src/core/drill_fidelity.py:d48a6a197a871cb41aa11584e96ca3e6cb105d6b5a0ca2d2d5c7a68ecff3b187
   - desktop/tests/fixtures/execution/p07_en_drill_cases.json:0fea6393ea0cbaf089e0499dd59364ca10f5f51c0ef9080cf34a747cafde9bb7
   - engine/rust/src/drill_fidelity.rs:7eee8e48991800b3c834b8143b2e3a2db600a1668aeadb627d406ef34ce06b9d
   - protocol/drill_fidelity.json:923e58bc07467cf41cd65eb11fe2142fb85e6896a8770593369fa4bf02bacfee
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:537aa303463406aeafb556689987b94ed2f9892eaede9b76297c80297cedb885
+  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
 ---
+> 重审（2026-10-20）：删除死代码后重算
+
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算
 
 > 重审（2026-10-20）：风格全量收口（E501/UP006/UP031/SIM117）+ 权重补齐后重算

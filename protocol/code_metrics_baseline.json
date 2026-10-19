@@ -346,7 +346,7 @@
       "max_fn_lines": 11
     },
     "desktop/src/core/execution_drill.py": {
-      "lines": 328,
+      "lines": 323,
       "max_fn_cc": 15,
       "max_fn_lines": 34
     },
