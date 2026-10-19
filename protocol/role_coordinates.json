@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 237,
-    "verify": 941
+    "verify": 945
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7049,6 +7049,30 @@
       "rule": "R-verify"
     },
     {
+      "function": "叙事世界完整版：西幻生存流（P03）",
+      "path": "desktop/tests/fixtures/execution/positive_controls/p03_inject_decision_should.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "叙事世界完整版：西幻生存流（P03）",
+      "path": "desktop/tests/fixtures/execution/positive_controls/p03_inject_fabricated_id.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "叙事世界完整版：西幻生存流（P03）",
+      "path": "desktop/tests/fixtures/execution/positive_controls/p03_inject_no_citation.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "正例对照：hits=0 有两种解释（语料真干净 / 判据被改弱到什么都不报）。本夹具对真实语料 P03 逐份注入**已知违规**生成变体，断言注入行必中、其它行零附带命中；同时要求原版 P03 仍 0 命中。变体必须逐字节等于「语料+注入」（测试自校验，防夹具漂移）。",
+      "path": "desktop/tests/fixtures/execution/positive_controls/p03_injections.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-round-transcript/1",
       "path": "desktop/tests/fixtures/execution/rounds/bad.json",
       "role": "verify",
@@ -11910,7 +11934,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "98f0fceff69a977a832fb3f2620db8cb9a0468ba4c4f0c4dd447a2eb5980c8de",
+  "root_digest": "c9273e93a987f55a4f001ff95c3adea396f7a967d618ec2616f00b27e43bc21b",
   "rule_counts": {
     "R-app": 1448,
     "R-catch": 96,
@@ -11919,7 +11943,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 116,
-    "R-verify": 825,
+    "R-verify": 829,
     "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"

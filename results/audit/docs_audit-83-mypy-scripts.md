@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算

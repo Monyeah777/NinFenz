@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算

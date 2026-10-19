@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算

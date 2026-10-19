@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算

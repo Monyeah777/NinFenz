@@ -7,13 +7,15 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
-  - desktop/src/core/drill_fidelity.py:d48a6a197a871cb41aa11584e96ca3e6cb105d6b5a0ca2d2d5c7a68ecff3b187
+  - desktop/src/core/drill_fidelity.py:a53d9366287ab64431787b2d5b389c3179f22b0cd6c0ca7a091cb86ac07ae190
   - desktop/tests/fixtures/execution/p07_en_drill_cases.json:0fea6393ea0cbaf089e0499dd59364ca10f5f51c0ef9080cf34a747cafde9bb7
-  - engine/rust/src/drill_fidelity.rs:7eee8e48991800b3c834b8143b2e3a2db600a1668aeadb627d406ef34ce06b9d
-  - protocol/drill_fidelity.json:923e58bc07467cf41cd65eb11fe2142fb85e6896a8770593369fa4bf02bacfee
+  - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
+  - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算

@@ -19,15 +19,17 @@ subjects:
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
   - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
-  - desktop/src/core/drill_fidelity.py:d48a6a197a871cb41aa11584e96ca3e6cb105d6b5a0ca2d2d5c7a68ecff3b187
-  - desktop/tests/test_execution_drill.py:d11866649e6f8cec888fd1137c07eb8d03048b9fb7b19e2c97a189eb763e20c4
+  - desktop/src/core/drill_fidelity.py:a53d9366287ab64431787b2d5b389c3179f22b0cd6c0ca7a091cb86ac07ae190
+  - desktop/tests/test_execution_drill.py:f9df38b1f586fd4a705e608bf849b510ed217c8b38fd1dd68ab78176b2dcb02d
   - desktop/tests/test_round_drill.py:0a0997e935ce8cd417a7400fbaf2c897853e82297867f25165c9889117667a1a
   - desktop/tests/fixtures/execution/p04_drill_cases.json:9237e2713bab59df20ed8cc4df18f8a4f9bd1fe0437a4acf642b03ccdd9c5d07
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:452dbe6e9f206779bb43ac6b6ee57c2a5155c4ebc40249e1a71b16a4ebe687d0
+  - protocol/code_metrics_baseline.json:4dc3e36d028e35ed96a82b2f9827e0ae0a780238fa781434967b7957f62336c6
 ---
+> 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算
+
 > 重审（2026-10-20）：删除死代码后重算
 
 > 重审（2026-10-20）：drill 误报清零（判定词边界+否定/历史语境）后重算
