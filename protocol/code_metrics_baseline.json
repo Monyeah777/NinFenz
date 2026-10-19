@@ -426,7 +426,7 @@
       "max_fn_lines": 77
     },
     "desktop/src/core/gate_labels.py": {
-      "lines": 250,
+      "lines": 257,
       "max_fn_cc": 15,
       "max_fn_lines": 35
     },

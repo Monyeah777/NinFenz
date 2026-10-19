@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 235,
-    "verify": 938
+    "verify": 939
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -10829,6 +10829,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "[cfg(test)]",
+      "path": "engine/rust/src/syswin.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "![cfg(test)]",
       "path": "engine/rust/src/testutil.rs",
       "role": "verify",
@@ -11892,7 +11898,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "453878fb06df4bd6e7dacb6a8d19061ec490468595e7edc2ef6959221a8e6056",
+  "root_digest": "59f3868f9440e8ef71b6496aa7155c5e6949f20580b61eae1a8aa5950f953b9f",
   "rule_counts": {
     "R-app": 1448,
     "R-catch": 96,
@@ -11901,7 +11907,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 114,
-    "R-verify": 822,
+    "R-verify": 823,
     "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"

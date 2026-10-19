@@ -7,10 +7,10 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "a0bec03cdcc99b7949f2ce3d178405c9324b985d68fe59c093fc596efcfe2a58",
+    "receiptRoot": "0a7d8917bef6f3ba2d859e10651fb71b6a7038debc754e1db06e048713c7099f",
     "verdict": "conformant"
   },
-  "issuer": "收口",
+  "issuer": "fixer",
   "type": [
     "VerifiableCredential",
     "NfConformanceCredential"
