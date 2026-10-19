@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:66804d4e95932a7e345c4bd09677f54fc861109acc1d8f9c581d14e051b2c2c6
+  - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
   - protocol/code_metrics_baseline.json:9a1704ed575f7e9a9e410157c0123165c7a18cb6a4492aa7c86718d523271822
 ---
+> 重审（2026-10-19）：knowledge_order_read 去 annotation 重叠，补 filtered-order/count；tdqs 两次 4.9、全部工具 >=4.9
+
 > 重审（2026-10-18）：工具名归一：6 个旧名 -> _list/_search/_read；旧名 alias；官方 tdqs 4.9 两次
 
 > 重审（2026-10-18）：LSP 时间窗判据进串行段

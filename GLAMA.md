@@ -467,7 +467,7 @@ coherence 4.8–5.0 · mean 4.9 · min 4.8–4.9
 ```
 
 逐工具：`asset_read 5.0`、`asset_list 5.0`、`knowledge_order_read 5.0`；
-其余全部 4.9（其中 `module_read` 一次 4.8）。没有工具低于 4.8。
+其余全部 4.9。连续两次没有工具低于 4.9。
 
 本轮按评分器 justification 补的真实信息：
 
