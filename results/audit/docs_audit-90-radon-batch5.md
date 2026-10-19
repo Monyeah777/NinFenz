@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
+  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
 ---
+> 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
+
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
 
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复

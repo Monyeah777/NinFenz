@@ -7,13 +7,15 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/execution_drill.py:f52aa937f153e9e456eaa94c765ce82f900e336752e2725788724b498d41cdbb
-  - desktop/src/core/drill_fidelity.py:b6c9db0ae4f179f281264110c18aa983f9ac777ef8a52c51cba4b44dc4e50684
+  - desktop/src/core/drill_fidelity.py:2664d0012fab7916f280d0d50ca7caf790c9ef3e0c99e154803c047ec67a1e4a
   - desktop/tests/fixtures/execution/p07_en_drill_cases.json:0fea6393ea0cbaf089e0499dd59364ca10f5f51c0ef9080cf34a747cafde9bb7
   - engine/rust/src/drill_fidelity.rs:081f7fa332d84446ae9a96927be79945780ae9c95ba4b42ed89dc8a7859e4be2
   - protocol/drill_fidelity.json:d1f96b08fd35473c471f63753ae87706655800647599414bd8668087d2dfa3ca
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
+  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
 ---
+> 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
+
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
 
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复

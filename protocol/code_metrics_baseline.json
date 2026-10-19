@@ -301,7 +301,7 @@
       "max_fn_lines": 152
     },
     "desktop/src/core/drill_fidelity.py": {
-      "lines": 396,
+      "lines": 406,
       "max_fn_cc": 13,
       "max_fn_lines": 45
     },

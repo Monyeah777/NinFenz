@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9234af2a096729f9853b1ff43d06c5d165f5c19a1becef5c4969e9ffd8485770
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
+  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
 ---
+> 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
+
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
 
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复

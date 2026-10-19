@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:28b890cf1ba5bc39ed735062f86d2e009504bf8ca0def4fcfe6aa5e97b67cc94
+  - protocol/code_metrics_baseline.json:1a37325c8ebaae9e14b93e8b6967fef5081138bc1b145436068cc653ed225622
 ---
+> 重审（2026-10-20）：风格棘轮收口（生成器级修复）+ 权重补齐后重算
+
 > 重审（2026-10-20）：drill 真实转录裁定 + Rust asset_contract 三面接线后重算
 
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
