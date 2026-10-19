@@ -112,7 +112,8 @@ class RealCorpusRegressionTest(unittest.TestCase):
                          "裸编号断言不得因路径排除而漏报")
 
     def test_path_token_keeps_no_citation_guard(self):
-        """路径排除只作用于编号断言：路径里的真实编号仍算「有编号提及」（避免新增 no_citation 误报）。"""
+        """路径排除只作用于编号断言：路径里的真实编号仍算「有编号提及」
+        （避免新增 no_citation 误报）。"""
         out = "应用与亚种。出处：modules/M02_种族天赋.md。"
         self.assertEqual([], drill.run_case({"output": out}, ["M00", "M02"]),
                          "路径 token 一并从「有编号提及」里排除 ⇒ 反而新增 no_citation 误报")

@@ -12,10 +12,13 @@
   是否复现样本声明（`good → conformant` / `bad → non-conformant`），保真度 = 复现数 / 样本数。
 - **真实语料命中裁定**（2026-10-20 加）：把唯一真实战例 `docs/完整版样本_西幻生存流P03.md`
   逐非空行回放 `execution_drill`，命中必须逐条给出 TP/FP 裁定与依据（裁定表写在待裁定回合样本的
-  `real_corpus.adjudications` 里）；**命中未裁定 / TP 命中消失 / 裁定声称现存而实测已消失** 都判 FAIL。
-  这条判据的动机：74/74 的 drill 全是自造样本（写样本的人与写实现的人互证），保真度 100% 是**自指绿**；
+  `real_corpus.adjudications` 里）；**命中未裁定 / TP 命中消失 /
+  裁定声称现存而实测已消失** 都判 FAIL。
+  这条判据的动机：74/74 的 drill 全是自造样本（写样本的人与写实现的人互证），
+  保真度 100% 是**自指绿**；
   真实语料上的命中精度必须单列成数（`metrics.hits / tp / fp`）。
-- **待裁定样本**（`verdict/label_status = pending`）：不参与「声明 vs 实测」分子分母（未裁定就无声明可复现），
+- **待裁定样本**（`verdict/label_status = pending`）：不参与「声明 vs 实测」分子分母
+  （未裁定就无声明可复现），
   但**必须解析出回合标记**（parse 失败 ⇒ 裁定前提不成立，判 FAIL），其命中同样须逐条裁定。
 - **判据**：任一例不达标 → FAIL（保真度必须 100%）；**找不到用例/样本 → FAIL**（标准不得无载体）。
 
@@ -146,7 +149,8 @@ def _real_corpus_block(root: Path) -> Tuple[str, Dict[str, Any], List[str]]:
 
 
 def _corpus_meta_problems(block: Dict[str, Any], text: str, sha: str,
-                          nonblank: List[Tuple[int, str]], allowed: List[str]) -> Tuple[List[str], List[str]]:
+                          nonblank: List[Tuple[int, str]],
+                          allowed: List[str]) -> Tuple[List[str], List[str]]:
     """裁定表元数据对账（防语料换了/允许集被裁剪后仍报旧数）→ (problems, real_ids)。"""
     problems: List[str] = []
     if block.get("sha256") and block["sha256"] != sha:
@@ -156,15 +160,18 @@ def _corpus_meta_problems(block: Dict[str, Any], text: str, sha: str,
                         % (block.get("nonblank_lines"), len(nonblank)))
     real_ids = [str(x) for x in (block.get("real_ids") or [])]
     if allowed and set(real_ids) != set(allowed):
-        problems.append("裁定表 real_ids 与所属样本 allowed 不一致（修复指引：两处须同为该管线在册集）")
+        problems.append("裁定表 real_ids 与所属样本 allowed 不一致"
+                        "（修复指引：两处须同为该管线在册集）")
     registry = _registry_ids(text)
     if registry and set(real_ids) != set(registry):
-        problems.append("裁定表 real_ids 与语料注册表投影不一致（防裁剪允许集）——投影 %d 件，裁定表 %d 件"
+        problems.append("裁定表 real_ids 与语料注册表投影不一致（防裁剪允许集）"
+                        "——投影 %d 件，裁定表 %d 件"
                         % (len(registry), len(real_ids)))
     return problems, real_ids
 
 
-def _corpus_live_hits(nonblank: List[Tuple[int, str]], real_ids: List[str]) -> List[Tuple[int, str]]:
+def _corpus_live_hits(nonblank: List[Tuple[int, str]], real_ids: List[str]
+                      ) -> List[Tuple[int, str]]:
     """逐非空行回放 `execution_drill` → 现存命中 `[(行号, 规则名)]`。"""
     from core import execution_drill as ed
 
@@ -189,7 +196,8 @@ def _corpus_forward(live: List[Tuple[int, str]], keyed: Dict[Tuple[int, str], Di
         verdict = str(entry.get("verdict") or "").upper()
         basis = str(entry.get("basis") or "").strip()
         if verdict not in ("TP", "FP"):
-            problems.append("裁定 verdict 必须 TP/FP：第 %d 行 %s 实为 %r" % (line_no, rule, verdict))
+            problems.append("裁定 verdict 必须 TP/FP：第 %d 行 %s 实为 %r"
+                            % (line_no, rule, verdict))
             continue
         if not basis:
             problems.append("裁定缺依据（basis）：第 %d 行 %s" % (line_no, rule))
