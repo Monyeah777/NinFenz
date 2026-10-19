@@ -6,9 +6,11 @@
 **全量** `verify.sh`」——`verify.sh` 与 core/scripts 的 check 都不读 `.github/`，该面此前只有
 `test_ci_supply_chain` 管了 action 固定。于是「本机绿、云端红」可以静默持续三周。
 
-本测试把两条钉住：
+本测试把三条钉住：
 ① 两份入口都带 ci-verify 徽章，且徽章指向的 workflow **真实在场**（改名即红，防徽章静默 404）；
-② ci-verify.yml 跑的是全量 `bash verify.sh` 且 push→main 即触发（不是某个 check 子集、不是只手动）。
+② ci-verify.yml 跑的是全量 `bash verify.sh` 且 push→main 即触发（不是某个 check 子集、不是只手动）；
+③ 任何 workflow 调 `verify.sh` 都必须**显式给档位**（`--full` 或 CI 矩阵拆档），
+   禁止裸跑默认 quick——否则「silent quick」会让三平台全绿变成假象（2026-10-19 实锤）。
 """
 import re
 import unittest
@@ -22,6 +24,13 @@ ENTRIES = ("README.md", "README.en.md")
 _BADGE = re.compile(
     r"https://github\.com/[^/\s)]+/[^/\s)]+/actions/workflows/([A-Za-z0-9_.\-]+\.ya?ml)/badge\.svg")
 _RUN = re.compile(r"(?m)^\s*-?\s*run:\s*(.+?)\s*$")
+
+#: verify.sh 的**显式档位**（P3 分层：默认档是 quick 开发档，--full 才是发布结论）。
+#: `--checks-only` + `--tests-only --shard i/n` 是 CI 矩阵拆档——两档合起来 = 一次完整全量。
+_TIER_FLAGS = ("--full", "--checks-only", "--tests-only", "--quick")
+#: 只匹配**调用行**：run 块里以 `bash verify.sh` 开头，或行内写法 `run: bash verify.sh`。
+#: step 的 `name:` 里出现同名字样不算调用（那是描述，不是执行面）。
+_INVOKE = re.compile(r"^\s*(?:run:\s*)?bash\s+verify\.sh(?:\s|$)")
 
 
 def _read(path):
@@ -97,4 +106,31 @@ class GateVisibilityTest(unittest.TestCase):
         self.assertRegex(text, r"(?m)^on:\s*$")
         self.assertRegex(text, r"(?m)^\s{2}push:\s*$")
         self.assertRegex(text, r"(?m)^\s{4}branches:\s*\[main\]\s*$")
+
+    def test_every_workflow_verify_invocation_declares_its_tier(self):
+        """任何 workflow 调 verify.sh 都必须**显式给档位**——禁止裸跑 quick 冒充全量。
+
+        为什么（2026-10-19 实锤）：verify.sh 自 P3 分层起**默认档已是 quick**（42 条静态
+        check + 受影响测试），裸跑不再等于全量；只有 `--full`（或 CI 矩阵合起来的
+        checks-only + tests-only）才是发布结论。`cross-platform.yml` 就因此裸跑：
+        三平台看起来全绿，全量 3100+ 测试其实一条没跑——「silent quick」比红更危险，
+        因为它长得像绿。本判据挂在既有 check12 上（不新增 check 序号），把
+        「workflow 调 verify.sh 必须显式档位」立成机检，防回潮。
+        """
+        offenders = []
+        invocations = 0
+        for wf in sorted(WORKFLOWS.glob("*.y*ml")):
+            for lineno, raw in enumerate(_read(wf).splitlines(), 1):
+                line = raw.split("#", 1)[0]      # 行尾注释里的档位不算数
+                if not _INVOKE.match(line):
+                    continue
+                invocations += 1
+                if not any(tok in _TIER_FLAGS for tok in line.split()):
+                    offenders.append(f"{wf.name}:{lineno} 裸跑 verify.sh（默认 quick）"
+                                     f"，未声明档位：{raw.strip()}")
+        self.assertGreater(invocations, 0,
+                           "没解析到任何 workflow 的 verify.sh 调用——判据可能已失效")
+        self.assertEqual([], offenders,
+                         "workflow 调 verify.sh 必须显式给档位（--full / --checks-only / "
+                         "--tests-only / --quick）：裸跑 = 默认 quick = silent quick")
 
