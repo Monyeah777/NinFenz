@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1275,
+        "files": 1274,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3819,
-        "kernel": 1981,
+        "files": 3818,
+        "kernel": 1980,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "255a6e0c2be76b688dbe82bb0012f476e5e8089bc6fb1bc02a4cb0e168b9fac8",
+  "root_digest": "1a58d40414e607b9b6c244ca5c6fcd2eb61d083fc08e0dbabe63c05071616480",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

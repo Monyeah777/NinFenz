@@ -10,7 +10,7 @@ subjects:
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
-  - desktop/tests/test_rust_fastlane.py:0d431643b45bb920c517543f905d773480f4654bad56042b07011932daaa62a6
+  - desktop/tests/test_rust_fastlane.py:ad0bab51b9c29d816845b3632f1d5a3011b3dcdfcb777188e84afcce1933b1c6
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
   - desktop/tests/test_nf_cli.py:55f3dbe5adc15441fbe6b6dae5f090ce3bd3f5909a790a10c525bc099e494ac0
 ---
+> 重审（2026-10-19）：干净树重冻；修正外部 WIP 污染（AUD-0036 subject 从 WIP 版 0d431643 回到干净版 ad0bab51）
+
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
 
 > 重审（2026-10-19）：重测试再切分（机器面 16 片 / JSON 面 4 片）+ 内层线程 8/jobs

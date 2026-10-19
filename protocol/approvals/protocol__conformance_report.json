@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-19",
   "approved_by": "fixer",
-  "note": "重冻",
+  "note": "干净树重冻（WIP 污染修正后）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "ec72347fbb8888dcf87616560e34a9eb3c9813a57d457b3498a5047355a03e4c"
