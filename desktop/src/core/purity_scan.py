@@ -159,6 +159,12 @@ SINK_ALLOW = {
         "缓存裁剪：落点在 <NF_HOME>/cache/<tag>/ 之下，文件名是本模块自己算的 sha256（非外部输入）"
             "，"
         "且只删超出保留份数的旧条目（按 mtime 排序）",
+    "scratch.py:unlink":
+        "临时区写权限探针的**自清**：探针名含 uuid，落点由 resolve() 裁决（scratch 根），"
+        "删的是本模块刚建的那一个文件；不接收外部路径参数",
+    "scratch.py:shutil.rmtree":
+        "scratch 上下文退出与 TTL GC 的**整目录回收**：落点同样由 resolve() 裁决，"
+        "且只删 nf* 前缀的子目录（gc 显式跳过非 nf*），无法指向仓库根/主目录/盘根",
     "atomic_write.py:unlink":
         "原子写的**失败清理**：临时件由本模块 tempfile.mkstemp 现造（名与落点皆非外部输入），"
         "只删自己刚写的那一个 .tmp；`os.replace` 成功路径不删除任何东西",

@@ -302,7 +302,8 @@ class PurityScanTest(unittest.TestCase):
         issues, stats = ps.scan(ROOT)
         self.assertEqual([i for i in issues if "危险 sink" in i], [],
                          "真仓库出现未登记 sink 即 FAIL")
-        self.assertLessEqual(stats.get("sinks", 0), 16)
+        # 2026-10-19：16 → 20（scratch：写权限探针自清 + 上下文清理 + TTL 回收，各站点已登记理由）
+        self.assertLessEqual(stats.get("sinks", 0), 20)
 
 
 class SinkRegistryTest(unittest.TestCase):

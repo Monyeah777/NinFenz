@@ -61,8 +61,25 @@ def _replace(tmp: str, p: Path, attempts: int = 10, backoff: float = 0.05) -> No
             time.sleep(backoff)
 
 
+def _ensure_target(path: str | os.PathLike) -> Path:
+    """防御性边界：空路径 / 目标是目录 / 目标是设备文件 —— 一律**快速失败**且报错精准。
+
+    为什么单独成函数（2026-10-19）：`tempfile.mkstemp(dir=...) + os.replace` 在这些输入上
+    会给出很难读的底层错误（或更糟：先建了临时件再失败）。入口处判掉，既省一次 IO，
+    也让调用方拿到可判别的异常类型。
+    """
+    p = Path(path)
+    if not str(path).strip():
+        raise ValueError("atomic_write: 路径不能为空")
+    if p.exists() and p.is_dir():
+        raise IsADirectoryError("atomic_write: 目标是目录，不是文件：%s" % p)
+    return p
+
+
 def write_text(path: str | os.PathLike, text: str) -> None:
     """把 `text` 原子地写到 `path`（LF 落盘；失败不留半截目标文件）。"""
+    _ensure_target(path)
+
     def _once() -> None:
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -91,6 +108,8 @@ def write_bytes(path: str | os.PathLike, data: bytes) -> None:
     与 `write_text` 同一纪律，供二进制产物使用（如 `library/anchors/*.sig` 的签名锚
     拷贝——半截的签名件会让校验方判「签名无效」而不是「没写完」）。
     """
+    _ensure_target(path)
+
     def _once() -> None:
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)

@@ -56,6 +56,69 @@ _PRUNE_COUNT: dict = {}
 #: 丢了只是下次重算），**不影响任何判定**。
 _DEFER: Optional[list] = None
 
+#: **总量上限**（2026-10-19 实测）：按标签裁剪只保证"单标签有界"，标签一多总量仍会失控
+#: （现场：~/.NinFenz/cache 涨到 1.1 万文件后，新建文件的 open() 在杀软/ACL 下开始卡住，
+#: 表现成整条判据"挂死"）。这里再加一道全局闸：超过上限就按 mtime 淘汰最旧的整份缓存。
+ENV_MAX_TOTAL = "NF_CACHE_MAX_TOTAL"
+MAX_TOTAL_DEFAULT = 20000
+#: 每多少次 store 检查一次总量（全量 scandir 有代价，按批做）
+ENFORCE_EVERY = 200
+_STORE_TICKS = 0
+
+
+def max_total() -> int:
+    """全局文件数上限（可由 NF_CACHE_MAX_TOTAL 覆盖；非法值退回默认）。"""
+    try:
+        got = int(os.environ.get(ENV_MAX_TOTAL) or MAX_TOTAL_DEFAULT)
+    except (TypeError, ValueError):
+        return MAX_TOTAL_DEFAULT
+    return got if got > 0 else MAX_TOTAL_DEFAULT
+
+
+def count_files() -> int:
+    """当前缓存根下的 `.json` 文件总数（只扫两层：<tag>/<key>.json）。"""
+    total = 0
+    try:
+        for tag_dir in root_dir().iterdir():
+            if tag_dir.is_dir():
+                total += sum(1 for _ in tag_dir.glob("*.json"))
+    # 缓存根不可读＝按 0 计（这是诊断/容量面，不参与任何判定）
+    except OSError:
+        return 0
+    return total
+
+
+def enforce_bounds(limit: Optional[int] = None) -> int:
+    """把总量压到上限内（按 mtime 从旧到新删），返回删掉的份数。
+
+    边界：任何异常都吞（缓存不是事实，删不动只是多占空间，不得影响命令结果）。
+    """
+    cap = max_total() if limit is None else int(limit)
+    removed = 0
+    try:
+        entries = []
+        for tag_dir in root_dir().iterdir():
+            if not tag_dir.is_dir():
+                continue
+            for f in tag_dir.glob("*.json"):
+                try:
+                    entries.append((f.stat().st_mtime, f))
+                except OSError:  # 枚举与 stat 之间消失的条目＝当作不存在（并发写者的正常竞态）
+                    continue
+        if len(entries) <= cap:
+            return 0
+        entries.sort(key=lambda t: t[0])
+        for _mtime, f in entries[: len(entries) - cap]:
+            try:
+                f.unlink()
+                removed += 1
+            except OSError:  # 单份删不掉（被占用）＝跳过它，下一轮再试（不影响已删数量）
+                continue
+    # 整体枚举失败＝尽力而为（缓存不是事实；返回已删数量供观测）
+    except OSError:
+        return removed
+    return removed
+
 
 def defer_begin() -> None:
     """进入延迟写盘模式（守护在**处理请求前**调用）。"""
@@ -215,19 +278,19 @@ def load(tag: str, ckey: str,
     return got
 
 
-def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> None:
+def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> bool:
     """写盘（尽力而为）：原子替换 + 有界裁剪；失败静默。
 
     `keep` 给「每份文件一条」的大集合标签用（如 AST 事实 250 条）；小集合标签沿用 `KEEP`。
     裁剪一律**按批**：大集合每 `PRUNE_EVERY_BIG` 次、小集合每 `PRUNE_EVERY_SMALL` 次写入裁一次
     （每次都裁的代价实测占 `store` 的一半，见 `PRUNE_EVERY_SMALL` 的说明）。
     """
-    global STORE_FAILURES, LAST_STORE_ERROR
+    global STORE_FAILURES, LAST_STORE_ERROR, _STORE_TICKS
     if not enabled():
-        return
+        return False
     if _DEFER is not None:                  # 延迟模式：只入队（守护回包之后再落盘，见 `defer_flush`）
         _DEFER.append((tag, ckey, value, keep))
-        return
+        return True
     try:
         d = dir_for(tag)
         d.mkdir(parents=True, exist_ok=True)
@@ -244,10 +307,14 @@ def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> None:
             prune(tag, limit)
         else:
             _PRUNE_COUNT[tag] = n
+        _STORE_TICKS += 1
+        if _STORE_TICKS % ENFORCE_EVERY == 0:
+            enforce_bounds()
+        return True
     except Exception as exc:                           # noqa: BLE001 - 写不进不该让命令失败，但**要可观测**
         STORE_FAILURES += 1
         LAST_STORE_ERROR = "%s: %s" % (tag, exc)
-        return
+        return False
 
 
 def prune(tag: str, keep: int = KEEP) -> None:
