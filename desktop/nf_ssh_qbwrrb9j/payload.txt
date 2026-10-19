@@ -1,2 +1,0 @@
-nf-attest-v1
-subject_sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb

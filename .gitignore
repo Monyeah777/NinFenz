@@ -57,3 +57,5 @@ engine/dotnet/tools/nf-canonical/dist-trim/
 # 测试/夹具在仓内落下的临时目录（tempfile 回退到 cwd 时出现；2026-10-19 实测）：
 desktop/nf_attest_*/
 desktop/nf-locks/
+# 测试/夹具在仓内落下的临时目录（tempfile 回退到 cwd 时出现；2026-10-19 实测）：
+desktop/nf_*/
