@@ -14,7 +14,9 @@
 3. `then ok '…'` 在按 `;` 切词时是**一个分段** ⇒ 不把 `then` 切成独立词就**永远看不到那条 ok**；
 4. 换行续行 `\\` + `\\"` 转义（check13）⇒ 不处理会把文案截在反斜杠上；
 5. 按行数而不是按词认 `if` ⇒ 单行 `if … fi` 把深度算负，**吞掉后面所有 ok**；
-6. heredoc 里嵌的 Python `if` 不是 shell 分支 ⇒ 必须先挖掉 heredoc 段再扫分支。
+6. heredoc 里嵌的 Python `if` 不是 shell 分支 ⇒ 必须挖掉 heredoc **正文**再扫分支；
+7. `if "$PY3" - <<'PYEOF'` 的 `if` 就在 heredoc **起始行**上 ⇒ 整行挖掉会让随后的
+   `then/else/fi` 挂到外层 `if`（潜伏错配；正文仍须挖掉，但起始行的 shell 词要留下）。
 
 纪律：本模块只**读**；不执行、不写盘；同输入同输出。
 """
@@ -125,11 +127,16 @@ def _reachable_oks(lines: list[str], spans: list[tuple[int, int]]) -> list[str]:
     踩坑史（都被差分测试抓过，故这里写得啰嗦但要写对）：
       - 按行数而不是按词认 `if` ⇒ 单行 `if … fi` 把深度算负，**吞掉后面所有 ok**；
       - 把 `; else` 当成行首 `else` ⇒ 跳不过 else 分支；
-      - heredoc 内的 Python `if` 被当 shell 分支 ⇒ 张冠李戴。
+      - heredoc 内的 Python `if` 被当 shell 分支 ⇒ 张冠李戴；
+      - heredoc **起始行整行挖掉** ⇒ `if "$PY3" - <<'PYEOF'` 的 `if` 丢失，随后的
+        `then/else/fi` 挂到外层 `if` 上（潜伏错配：当前形状下恰好不影响结果，
+        但一旦外层 `else` 里有 `ok` 就会把失败文案当成功文案）。
     """
     in_heredoc: set = set()
     for a, b in spans:
-        in_heredoc.update(range(a, b + 1))
+        # **起始行不能挖**：`if "$PY3" - <<'PYEOF' …` 的 `if` 就在那一行上；
+        # 只挖 heredoc 正文与终止标记行（正文里的 Python 分支不是 shell 分支）。
+        in_heredoc.update(range(a + 1, b + 1))
     tokens = _shell_tokens(lines, in_heredoc)
     return _oks_on_success_path(tokens)
 

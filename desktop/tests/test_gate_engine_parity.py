@@ -28,6 +28,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 import shlex
@@ -61,6 +62,37 @@ TARGETS = [1, 3, 8, 13, 14, 15, 16, 20, 23, 24, 25, 26, 27, 28, 29, 30,
 #: 形成自指噪声；放 /tmp 又在「每步独立 shell」的工作流里步间不留存）。
 PARITY_DIR = ROOT.parent / "_nf_parity"
 CACHE = PARITY_DIR / "bash_verdicts.txt"
+#: 缓存键前缀。键 = HEAD 提交 + verify.sh sha256：bash 真值既依赖 verify.sh，也依赖
+#: 工作树里的源码（如 check40 扫 asset_contract），只校验其中一项都会漏。
+CACHE_PREFIX = "# parity truth key "
+
+
+def _git(*args: str) -> tuple[int, str]:
+    """跑只读 git（`core.quotepath=false`：中文路径不转义，指纹才稳定）。"""
+    try:
+        p = subprocess.run(["git", "-c", "core.quotepath=false", *args],
+                           cwd=str(ROOT), capture_output=True, text=True,
+                           encoding="utf-8", timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return -1, ""
+    return p.returncode, p.stdout.strip()
+
+
+def _truth_key() -> tuple[str, bool] | None:
+    """→ (缓存键, 工作树是否干净)；git 不可用 → None（禁用缓存：宁可慢，不复用可疑真值）。
+
+    为什么键里要有 HEAD：真值不只由 verify.sh 决定，还读工作树源码；只看 verify.sh 会漏。
+    为什么脏树既不复用也不写缓存：脏树的真值只对那一刻有效（2026-10-19 实测：并发写者
+    改 engine/rust 期间生成过一版真值，若落缓存会被之后「看似干净」的树错误复用）。
+    """
+    rc, head = _git("rev-parse", "HEAD")
+    if rc != 0:
+        return None
+    rc, status = _git("status", "--porcelain")
+    if rc != 0:
+        return None
+    verify_sha = hashlib.sha256(VERIFY_TEXT.encode("utf-8")).hexdigest()
+    return "%shead=%s verify=%s" % (CACHE_PREFIX, head, verify_sha), not status
 
 
 def _parse_verdicts(text: str) -> dict[int, list[str]]:
@@ -88,6 +120,21 @@ def _parse_verdicts(text: str) -> dict[int, list[str]]:
     return out
 
 
+def _read_cache(key: str) -> dict[int, list[str]] | None:
+    """读缓存；**只有**键（HEAD + verify.sh 指纹）一致才复用，否则返回 None（→ 重跑真值）。
+
+    首行是键。为什么必须校验：真源/基线一变，旧真值仍然「格式合法」，静默复用要么把
+    正确抽取判成假红、要么把真漂移掩盖成假绿——两者都破坏等价性证明。
+    """
+    if not CACHE.is_file():
+        return None
+    text = CACHE.read_text(encoding="utf-8")
+    first, _, rest = text.partition("\n")
+    if first != key:
+        return None
+    return _parse_verdicts(rest)
+
+
 def _bash_verdicts() -> dict[int, list[str]]:
     """跑**定向** bash 真值（只抽取目标 check 的函数体，不碰 check12 的 3035 个单测）。
 
@@ -104,6 +151,15 @@ def _bash_verdicts() -> dict[int, list[str]]:
         f = PARITY_DIR / ("out_check%d.log" % n)
         if f.is_file():
             merged.update(_parse_verdicts(f.read_text(encoding="utf-8", errors="replace")))
+    # 残缺真值是「抽取器坏了」而不是「判据漂移」：不许进缓存、也不许拿去比对。
+    # 实测踩坑：check1/3/4/5/6 自 8789d46d 起调 `_decl_check`（定义在 check 体之外），
+    # 旧抽取器只抽 check 体 → `command not found` → 这些 check 的 verdict 整条消失。
+    missing = [n for n in TARGETS if n not in merged]
+    if missing:
+        raise RuntimeError(
+            "bash 定向真值缺 check%s——抽取器/环境坏了，残缺真值不能进缓存"
+            "（修复指引：bash_targets.sh 是否把 check 体之外的 helper 定义一起抽到了？）"
+            % missing)
     return merged
 
 
@@ -113,19 +169,24 @@ class GateEngineParityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         force = os.environ.get("NF_PARITY_FORCE")
-        if CACHE.is_file() and not force:
-            cls.bash = _parse_verdicts(CACHE.read_text(encoding="utf-8"))
-        else:
+        keyed = _truth_key()
+        clean = bool(keyed and keyed[1])
+        cls.bash = None
+        if keyed and clean and not force:
+            cls.bash = _read_cache(keyed[0])
+        if cls.bash is None:
             cls.bash = _bash_verdicts()
-            try:
-                CACHE.parent.mkdir(parents=True, exist_ok=True)
-                merged = []
-                for n in sorted(cls.bash):
-                    merged.append("== [%d/x] cached ==" % n)
-                    merged.extend(cls.bash[n])
-                CACHE.write_text("\n".join(merged), encoding="utf-8")
-            except OSError:
-                pass
+            # 只有干净树的真值才是可复用的：脏树的真值不落缓存。
+            if clean and keyed is not None:
+                try:
+                    CACHE.parent.mkdir(parents=True, exist_ok=True)
+                    merged = [keyed[0]]
+                    for n in sorted(cls.bash):
+                        merged.append("== [%d/x] cached ==" % n)
+                        merged.extend(cls.bash[n])
+                    CACHE.write_text("\n".join(merged), encoding="utf-8")
+                except OSError:
+                    pass
         gate_engine.build_registry()
         cls.engine = {}
         for v in gate_engine.run_checks(ROOT):
@@ -189,6 +250,39 @@ class GateEngineParityTest(unittest.TestCase):
                 bad.append("check%d 抽取不到成功文案" % num)
             if any(not s.strip() for s in labels.pass_lines):
                 bad.append("check%d 含空文案" % num)
+        self.assertEqual([], bad, "\n".join(bad))
+
+
+#: check39 成功文案的回归锚点（真源仍是 verify.sh 里的 `ok` 字面量；这里只判「抽到了没」）。
+CHECK39_ANCHORS = ("五分钟入口可跑", "输出确定")
+
+
+class GateLabelsExtractionTest(unittest.TestCase):
+    """抽取层自身的回归：成功文案必须**整条**抽到，不能被 then 空壳 / 引号 / 分支语义吞掉。"""
+
+    def test_check39_success_text_is_fully_extracted(self) -> None:
+        """check39 的两条成功文案必须完整抽到（含 quickstart 追加在尾部的判据）。
+
+        为什么单列一条：逐字 parity 依赖 bash 真值缓存，缓存过期时会把**正确的抽取**
+        判成假红（2026-10-19 实测）；这条不依赖任何缓存，是抽取层的独立回归锚。
+        """
+        labels = gate_engine.gate_labels.parse_labels(VERIFY_TEXT, 39)
+        joined = "\n".join(labels.pass_lines)
+        for anchor in CHECK39_ANCHORS:
+            self.assertIn(anchor, VERIFY_TEXT,
+                          "verify.sh 里已没有锚点 %r——回归锚点须随真源同步" % anchor)
+            self.assertIn(anchor, joined, "check39 成功文案漏抽：%r" % anchor)
+        self.assertEqual(2, len(labels.pass_lines),
+                         "check39 成功路径文案条数异常：%s" % labels.pass_lines)
+
+    def test_pass_lines_are_verbatim_ok_literals(self) -> None:
+        """抽到的成功文案必须逐字等于体里某条 `ok` 字面量（防截断 / 拼接 / 凭空生成）。"""
+        bad = []
+        for num in gate_engine.INPROC_CHECKS:
+            labels = gate_engine.gate_labels.parse_labels(VERIFY_TEXT, num)
+            for s in labels.pass_lines:
+                if s not in labels.ok:
+                    bad.append("check%d：抽取值不是体里的 ok 字面量：%r" % (num, s[:60]))
         self.assertEqual([], bad, "\n".join(bad))
 
 
