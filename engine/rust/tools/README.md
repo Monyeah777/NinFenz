@@ -48,6 +48,17 @@ cargo test --release --manifest-path engine/rust/Cargo.toml
 **纪律**：`gen_*` 写出的期望值**一律标"从真源生成，勿手改"**。真源改了措辞 → 判据红 →
 重跑生成器 → 期望值跟上。手改期望值等于把判据降级成"记录我上次写的字"。
 
+**夹具落点**（2026-10-20 收口）：生成器算期望值用的合成夹具写**临时目录**
+（`tempfile.mkdtemp`），不落 `engine/rust/target/`；判据侧需要夹具的，一律由判据
+**运行期自建**——`testutil::fixture`（带进程号 + 序号，天然并发隔离）建唯一目录 + 内联内容表，
+如 `quant_metrics` 的 `QUANT_FIX_FILES` / `quant_fixture_dir`。
+
+为什么：`target/` 是 **gitignore 的生成物**，干净检出与 CI 上都不存在。把判据的**输入**
+放在那里，等于让 `cargo test` 依赖「这台机器上有人跑过生成器」——实测干净 worktree 直接
+`cargo test --release` 会让 `quant_metrics` 两条判据红在「读不到 good.csv」，而
+`rust-parity.yml` 正是裸跑 `cargo test`（首跑即红）。运行期自建后，本机与 CI 行为一致，
+且不把生成物塞进仓库。
+
 ### 二、普查 / 审计脚本（`survey_*.py` / `audit_engine_reads.py`）
 
 | 脚本 | 作用 |
