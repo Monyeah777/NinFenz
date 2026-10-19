@@ -410,6 +410,14 @@ def _scandir_list(path: str):
     return entries
 
 
+#: 扫描**从不进入**的目录：工具/环境的临时产物，不是仓库内容。
+#: 2026-10-19 实测：`.rivet/`（本仓 agent 的 scratch，含 1.6 GB / 3 万文件）会让
+#: `**/*.py` 这类宽面枚举从 ~1 s 涨到 >25 s，进而把 conformance 的 purity 契约拖到挂死。
+#: 它们本来就被 .gitignore 排除、也不该参与判据——跳过后语义更准（只看仓库内容），也更快。
+NON_REPO_DIRS = frozenset({".git", ".rivet", ".venv", "node_modules", "__pycache__",
+                           ".mypy_cache", ".pytest_cache", ".ruff_cache"})
+
+
 def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
     """`os.scandir` **单遍**枚举（相对 root 的 posix 路径）。语义对齐 `Path.glob`：
 
@@ -431,7 +439,8 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
             match(dir_abs, rel, i + 1)                       # 零层：当前目录直接续匹配
             for entry in _scandir_list(dir_abs):
                 try:
-                    if entry.is_dir() and not entry.is_symlink():
+                    if entry.is_dir() and not entry.is_symlink() \
+                            and entry.name not in NON_REPO_DIRS:
                         match(entry.path, rel + entry.name + "/", i)
                 except OSError:
                     continue
