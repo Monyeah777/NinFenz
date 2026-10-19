@@ -71,7 +71,13 @@ def is_ignored(rel: str, ignored: Set[str]) -> bool:
 
 
 def walk_repo_paths(root: str) -> Iterator[Path]:
-    """遍历**仓库件**（跳过 `SKIP_DIR_NAMES` 与 `.gitignore` 覆盖面）→ 逐个产出 `Path`。"""
+    """遍历**仓库件**（跳过 `SKIP_DIR_NAMES` 与 `.gitignore` 覆盖面）→ 逐个产出 `Path`。
+
+    注意（2026-10-19 实测）：**链接工作树**（`git worktree add`）里的 `.git` 是**文件**不是目录，
+    `SKIP_DIR_NAMES` 只剪目录 ⇒ 它会被当成一件仓库件（实测 `role_model` 投影多记 1 件、
+    `root_digest` 漂移 ⇒ 工作树里 ② 判据假红）。故文件名侧同样点掉 `.git`：VCS 元数据
+    在任何检出形态下都不是仓库件。
+    """
     root_abs = os.path.abspath(str(root))
     ignored = ignored_paths(root_abs)
     for dirpath, dirnames, filenames in os.walk(root_abs):
@@ -87,6 +93,8 @@ def walk_repo_paths(root: str) -> Iterator[Path]:
             keep.append(name)
         dirnames[:] = keep
         for name in filenames:
+            if name == ".git":          # 链接工作树：`.git` 是指针文件（见 docstring）
+                continue
             rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
             if is_ignored(rel, ignored):
                 continue

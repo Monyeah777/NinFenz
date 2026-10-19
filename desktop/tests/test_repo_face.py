@@ -156,6 +156,19 @@ class WalkRepoPathsMutationTest(unittest.TestCase):
             self.assertIn("src/ok.md", rels, "未忽略件被误排除")
             self.assertNotIn("gen/leak.md", rels, "被忽略的子树没被剪掉（判据无判别力）")
 
+    def test_linked_worktree_git_pointer_file_is_pruned(self):
+        """链接工作树里 `.git` 是**文件**（`gitdir: …` 指针），不得当作仓库件。
+
+        依据（2026-10-19 实测）：`SKIP_DIR_NAMES` 只剪目录 ⇒ 工作树里 `.git` 进面，
+        `role_model` 的件数/`root_digest` 与普通检出不一致（工作树内 ② 判据假红）。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / ".git").write_text("gitdir: ../x/.git/worktrees/y\n", encoding="utf-8")
+            (Path(tmp) / "keep.md").write_text("y\n", encoding="utf-8")
+            rels = sorted(p.relative_to(tmp).as_posix() for p in paths.walk_repo_paths(tmp))
+            self.assertIn("keep.md", rels, "未忽略件被误排除")
+            self.assertNotIn(".git", rels, "链接工作树的 .git 指针文件进了仓库件面")
+
 
 if __name__ == "__main__":
     unittest.main()
