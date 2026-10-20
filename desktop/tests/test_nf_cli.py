@@ -3,16 +3,6 @@
 
 覆盖子命令参数面与装配链 smoke（替代手工冒烟；不依赖 GUI/端壳）。
 """
-def _cli_version() -> str:
-    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
-    import re as _re
-    from pathlib import Path as _Path
-    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
-    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
-    return m.group(1) if m else "?"
-
-
-CLI_VERSION = _cli_version()
 import argparse
 import ast
 import builtins
@@ -28,6 +18,17 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+def _cli_version() -> str:
+    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
+    import re as _re
+    from pathlib import Path as _Path
+    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
+    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
+    return m.group(1) if m else "?"
+
+
+CLI_VERSION = _cli_version()
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 spec = importlib.util.spec_from_file_location("nfcli", ROOT / "scripts" / "nf.py")

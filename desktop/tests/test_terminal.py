@@ -7,16 +7,6 @@
 3. **CLI 集成**：`nf shell --exec` 的确定性、退出码、JSON 机器面，以及
    「菜单示例必须指向真实子命令」（与 verify check39 同一判据，单测先兜一层）。
 """
-def _cli_version() -> str:
-    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
-    import re as _re
-    from pathlib import Path as _Path
-    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
-    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
-    return m.group(1) if m else "?"
-
-
-CLI_VERSION = _cli_version()
 import argparse
 import ast
 import contextlib
@@ -36,6 +26,18 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import terminal as term  # noqa: E402
+
+
+def _cli_version() -> str:
+    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
+    import re as _re
+    from pathlib import Path as _Path
+    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
+    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
+    return m.group(1) if m else "?"
+
+
+CLI_VERSION = _cli_version()
 
 _spec = importlib.util.spec_from_file_location("nfcli", ROOT / "scripts" / "nf.py")
 assert _spec is not None and _spec.loader is not None
