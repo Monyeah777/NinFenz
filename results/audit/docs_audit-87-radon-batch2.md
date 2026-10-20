@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:a841928a46875adf0d0eacd39f30f3d456e43d180620ee2ef70f915311f7849b
+  - protocol/code_metrics_baseline.json:cf90eb177c363d437ae9d56b46a446b6e390b8a5bfa95fb23cf3662bad6f882c
 ---
+> 重审（2026-10-20）：0.x renumber 1
+
 > 重审（2026-10-20）：readme/tag 治理 1
 
 > 重审（2026-10-20）：compliance 1

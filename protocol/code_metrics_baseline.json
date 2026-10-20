@@ -1445,6 +1445,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 39
     },
+    "scripts/renumber_versions_0x.py": {
+      "lines": 133,
+      "max_fn_cc": 4,
+      "max_fn_lines": 14
+    },
     "scripts/rewrite_text.py": {
       "lines": 136,
       "max_fn_cc": 9,
