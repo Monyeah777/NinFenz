@@ -17,6 +17,8 @@ evidence:
   - desktop/src/core/purity_scan.py
 ---
 
+# 报错必须带修复指引
+
 ## 为什么
 
 报错是**最后一次可执行的交互**。只说"失败了"会把定位成本全部推给读者；NF 的读者常常是 AI，

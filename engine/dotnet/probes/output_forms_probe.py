@@ -213,10 +213,10 @@ def main() -> int:
                expect_rc=1, must_contain="证书不合 schema")
 
         # ————— 两处已声明的不可比
-        # 真源对 ruff.toml（合法 TOML）判绿 exit 0；引擎**明确拒绝** exit 1——这正是声明边界的形状：
+        # 真源对 pyproject.toml（合法 TOML）判绿 exit 0；引擎**明确拒绝** exit 1——这正是声明边界的形状：
         # 两边退出码**本应不同**，且引擎理由可读（不静默放行）。
         declared(rep, "已声明①· toml 形态引擎明确拒绝（真源放行 / 引擎拒绝）", snap, cli,
-                 ["output", "check", "ruff.toml"], "未内建 TOML 解析器", py_rc=0)
+                 ["output", "check", "pyproject.toml"], "未内建 TOML 解析器", py_rc=0)
         declared(rep, "已声明②· 坏 JSON 文案随运行时（两边都判红）", snap, cli,
                  ["output", "check", bad_json], "JSON 不可解析", py_rc=1)
         declared(rep, "已声明②· JSONL 坏行文案随运行时（两边都判红）", snap, cli,

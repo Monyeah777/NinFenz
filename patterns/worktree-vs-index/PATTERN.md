@@ -21,6 +21,8 @@ evidence:
   - handovers/HO-0002-顶尖化两线与收口.md
 ---
 
+# 门禁看工作区、git 看索引——两处口径先对齐
+
 ## 为什么
 
 门禁与 git 看的**不是同一份字节**：门禁扫**工作区**，git 的 `text=auto eol=lf` 只在 `git add` 那一刻把

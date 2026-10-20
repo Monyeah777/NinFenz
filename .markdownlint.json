@@ -1,0 +1,14 @@
+{
+  "_comment": "NF markdown 结构规则（FX-14 / FX-15）。默认集不启用，逐条显式开关：",
+  "_why_default_false": "默认全开会让历史正文（含大量中文长段落与表格）一次性爆红；手册要求的是『结构规则被显式启用且真的在跑』，不是把历史文档全部重排。",
+  "default": false,
+  "MD001": true,
+  "MD009": true,
+  "MD025": { "level": 1, "front_matter_title": "" },
+  "MD041": true,
+  "MD047": true,
+  "MD013": false,
+  "_why_MD013_false": "行长度与 Prettier/中文排版换行冲突（手册 FX-15 点名）；本仓的换行分工：正文换行由作者与 Prettier 口径决定，markdownlint 不负责；本仓无 Prettier 配置，故也不存在 proseWrap 互相改格式。",
+  "MD012": false,
+  "MD024": false
+}

@@ -62,7 +62,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 
 - 清单 `payload/payload-manifest.json`：逐文件 sha256 + 聚合 `tree_sha256`
 
-当前体积：**2927 件 · 解包 22.85 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
+当前体积：**2929 件 · 解包 22.87 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
 
 ## 供应链纪律（为什么可以放心 npx）
 

@@ -41,3 +41,16 @@ dev = [
   "pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1",
   "ruff==0.16.8", "bandit==1.9.4", "pip-audit==2.10.1",
 ]
+
+# ── 工具配置真源（SP-02）：ruff 的唯一配置点 ──
+# 原根目录 ruff.toml 已并入本段并删除（规则集不变：E9/F63/F7/F82）。并入 pyproject 而不是
+# 搬进 .config/：ruff 只认 pyproject.toml / ruff.toml / .ruff.toml（或 --config），挪进 .config/
+# 后工具仍读旧位置，就是手册 SP-02 伪解②「目录只是摆设」。本配置项仓内声明命中数 = 1。
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".git", ".rivet", "docs", "community", "desktop/tests/fixtures"]
+
+[tool.ruff.lint]
+# 有意保守：只收语法级 + 未定义名（与 CI lint.yml、test_ruff_syntax.py 同源）。
+select = ["E9", "F63", "F7", "F82"]

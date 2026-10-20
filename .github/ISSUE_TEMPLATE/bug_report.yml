@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        > ⚠️ **安全问题（漏洞 / 越权 / 凭据泄露）不要开公开 Issue**：请走 [SECURITY.md](../../SECURITY.md) 的私密通道（仓库页 → Security → Report a vulnerability）。公开 Issue 会触发云端代收站自动入库。
+        > ⚠️ **安全问题（漏洞 / 越权 / 凭据泄露）不要开公开 Issue**：请走 [SECURITY.md](../SECURITY.md) 的私密通道（仓库页 → Security → Report a vulnerability）。公开 Issue 会触发云端代收站自动入库。
   - type: textarea
     id: what-happened
     attributes:

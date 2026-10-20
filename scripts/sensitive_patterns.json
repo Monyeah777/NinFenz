@@ -1,0 +1,60 @@
+{
+  "schema": "sensitive-patterns/1",
+  "note": "FG-03 检测规则。样例必须是明显假值：本文件本身会被提交，任何真密钥写进来就变成新的泄漏面。",
+  "rules": [
+    {
+      "id": "secret-github-token",
+      "category": "secret",
+      "regex": "gh[pousr]_[0-9A-Za-z]{20,}",
+      "why": "GitHub token 片段（假值样例：ghp_FAKE000000000000000000000000000000）"
+    },
+    {
+      "id": "secret-openai-key",
+      "category": "secret",
+      "regex": "sk-[0-9A-Za-z]{20,}",
+      "why": "OpenAI 风格密钥片段（假值样例：sk-FAKE000000000000000000000000）"
+    },
+    {
+      "id": "secret-aws-key",
+      "category": "secret",
+      "regex": "AKIA[0-9A-Z]{16}",
+      "why": "AWS access key 片段（假值样例：AKIAFAKEFAKEFAKEFAKE）"
+    },
+    {
+      "id": "secret-private-key-block",
+      "category": "secret",
+      "regex": "BEGIN (RSA |EC |OPENSSH |PGP )?PRIVATE KEY",
+      "why": "私钥块头（假值样例只写块头，不贴正文）"
+    },
+    {
+      "id": "secret-assignment",
+      "category": "secret",
+      "regex": "(?:password|passwd|secret|api[_-]?key|token)\\s*[:=]\\s*[^\\s'\"]{8,}",
+      "why": "赋值式凭据（假值样例：password=FAKE-not-real-123）"
+    },
+    {
+      "id": "internal-windows-user-path",
+      "category": "internal-path",
+      "regex": "[A-Za-z]:\\\\Users\\\\[^\\\\\\s]+",
+      "why": "本机 Windows 用户目录绝对路径（假值样例：C:\\\\Users\\\\FAKE\\\\）"
+    },
+    {
+      "id": "internal-posix-home-path",
+      "category": "internal-path",
+      "regex": "/(?:home|Users)/[A-Za-z0-9_.-]{3,}/",
+      "why": "本机用户目录绝对路径（假值样例：/home/FAKE/）"
+    },
+    {
+      "id": "internal-unc-share",
+      "category": "internal-path",
+      "regex": "\\\\\\\\(?:[A-Za-z0-9_-]+)\\\\(?:[A-Za-z0-9_.$-]+)",
+      "why": "UNC 内网共享路径（假值样例：\\\\\\\\FILESERVER\\\\share）"
+    },
+    {
+      "id": "vuln-cve-id",
+      "category": "vuln",
+      "regex": "CVE-\\d{4}-\\d{4,}",
+      "why": "漏洞编号线索——公开可查的编号本身不泄密，但常与自述利用细节同时出现，故命中后提示走私密通道"
+    }
+  ]
+}

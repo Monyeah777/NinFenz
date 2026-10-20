@@ -9,7 +9,7 @@
 ## Pattern 登记表（由各包 frontmatter 生成，勿手改）
 
 | id | 名称 | 状态 | 适用面 | 规则数 |
-| --- | --- | --- | --- | --- |
+|---|---|---|---|---|
 | dependency-direction | 依赖方向：需要低层能力时由调用方注入 | active | 代码层 | 3 |
 | error-message-guidance | 报错必须带修复指引 | active | 代码层、协议层 | 3 |
 | fail-closed-verification | 缺验证器即拒绝，不静默降级 | active | 代码层、协议层 | 3 |

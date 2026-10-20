@@ -41,11 +41,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ENTRY_DOCS = ("README.md", "README.en.md", "CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
+ENTRY_DOCS = ("README.md", "README.en.md", ".github/CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
     "ent/AI_ROUTING.md",
               "docs/meta/DEEP_DIVE.md",
  "docs/meta/ROADMAP.md",
- "SECURITY.md",
+ ".github/SECURITY.md",
  "docs/agent/ROUTES.md",
  "llms.txt")
 EXEMPT = {"CHANGELOG.md", "docs/meta/VERSION-MATRIX.md", "docs/verification-cards.md"}

@@ -1,10 +1,45 @@
 .DS_Store
 *.swp
 *.tmp
-build/
-dist/
+Thumbs.db
+desktop.ini
+.idea/
+
+# 编辑器面取舍（FX-05）：本仓没有需要共享的 .vscode 调试配置（历史零入库、CI 不读 .vscode、
+# 开发入口是 bash/python/node 命令行与 tui/），故选「整目录忽略」而非「白名单保留 settings.json」——
+# 后者会把每台机器的绝对解释器路径带进仓库。
+.vscode/
+
+# ── 依赖目录（FX-01：删掉可重建即不入库；env/ 与 .venv/ 是不同名字，不能只写一个）──
+node_modules/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── 构建产物（FX-02）──
+# 根级产物锚定到仓库根（前导 /）：不误伤同名源码目录（packaging/npm/bin/ 是启动器源码）。
+/build/
+/dist/
+/release/
+/bin/
+/obj/
 __pycache__/
 *.pyc
+*.o
+*.class
+
+# ── 运行时数据与日志（FX-03：历史零入库，这里防回潮）──
+*.log
+/logs/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.pid
+/tmp/
+*.cache
 
 # 敏感文件（AGENTS.md「敏感文件禁止」硬性闸门的**忽略侧**）：本地留用，一律不入仓。
 # 高信号形态才入本表（含 *.pem/*.key/*.p12 与 id_rsa*/id_ed25519*/credentials.*）——
@@ -12,6 +47,8 @@ __pycache__/
 # 内容侧由 CI 密钥扫描 + check12 的公开面泄漏判据守着。
 .env
 .env.*
+# 反忽略必须有实体：.env.example 是模板（占位符，复制可用），不能被 .env.* 吃掉。
+!.env.example
 credentials.json
 credentials.yaml
 credentials.yml
@@ -37,6 +74,7 @@ id_ed25519*
 .artifacts/
 
 .coverage
+htmlcov/
 _cov_tmp.json
 
 # 本地模型权重与运行环境（决策层候选；体积 GB 级，绝不入仓）

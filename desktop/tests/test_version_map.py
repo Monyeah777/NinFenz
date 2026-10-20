@@ -81,14 +81,14 @@ class MappingTableTest(unittest.TestCase):
     """映射表本身在册，且**在册的三套口径**都写到。"""
 
     def test_mapping_table_lists_the_living_families(self):
-        text = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "CONTRIBUTING.md").read_text(encoding="utf-8")
         for needle in ("编号体系映射表", "协议 / 内容", "门禁 verify", "CLI / npm / MCP",
                        "test_version_map.py"):
             self.assertIn(needle, text, "CONTRIBUTING 的编号映射表缺：%s" % needle)
 
     def test_retired_freeze_family_is_gone(self):
         """退役的第四套口径不得回流（2026-10-11 裁决）：映射表里再出现「冻结目录」即红。"""
-        text = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "CONTRIBUTING.md").read_text(encoding="utf-8")
         self.assertNotIn("冻结目录", text, "CONTRIBUTING 仍在列已退役的冻结目录口径")
 
 

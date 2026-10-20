@@ -37,7 +37,7 @@ class RuffSyntaxTest(unittest.TestCase):
 
     def test_config_keeps_the_syntax_rule_set(self):
         """配置不得被悄悄放宽（把 F82 去掉 = 本判据变空转）。"""
-        cfg = (ROOT / "ruff.toml").read_text(encoding="utf-8")
+        cfg = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
         self.assertIn("select", cfg)
         for rule in ("E9", "F63", "F7", "F82"):
             self.assertIn(rule, cfg, "ruff 规则集缺 %s" % rule)
@@ -52,7 +52,7 @@ class RuffSyntaxTest(unittest.TestCase):
             fh.write("def f():\n    return totally_undefined_name\n")
         try:
             p = subprocess.run([sys.executable, "-m", "ruff", "check",
-                                "--config", str(ROOT / "ruff.toml"), probe],
+                                "--config", str(ROOT / "pyproject.toml"), probe],
                                capture_output=True, text=True, encoding="utf-8",
                                errors="replace", cwd=str(ROOT), timeout=120)
             self.assertNotEqual(0, p.returncode,
