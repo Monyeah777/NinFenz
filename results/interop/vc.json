@@ -7,8 +7,8 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 70,
-    "receiptRoot": "dcf74de74b2839189ce5dc46bd9c732a5d21f09b45b142c28c55cf65e5e889de",
-    "verdict": "conformant"
+    "receiptRoot": "a2dae940e74b0b85186399015fa0ad910750b22be2e510a9fbd32dee19025320",
+    "verdict": "non-conformant"
   },
   "issuer": "lead",
   "type": [
