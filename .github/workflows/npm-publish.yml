@@ -15,6 +15,10 @@ permissions:
 jobs:
   publish:
     name: npm-publish-provenance
+    # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
+    # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref_name, 'v1.')
+
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # 作业级再声明一次：workflow 级 permissions 在部分 fork/复用场景会被覆盖，
@@ -98,6 +102,10 @@ jobs:
 
   publish-github-packages:
     name: npm-publish-github-packages
+    # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
+    # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref_name, 'v1.')
+
     # GitHub Packages 只接受 scoped 包（@owner/name），故两通道**包名不同**：
     #   npmjs.com        → ninfenz（unscoped，面向公众）
     #   GitHub Packages  → @monyeah777/ninfenz（同仓发布用 GITHUB_TOKEN，无需 PAT；scoped 名须全小写）

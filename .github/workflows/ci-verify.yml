@@ -97,6 +97,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt
+      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项分片必红）
+        shell: bash
+        run: |
+          # 与 cross-platform.yml 同一口径：这 4 项 gitignored / empty-by-design，
+          # 干净 clone 里不存在，但部分 check 会读它们（实测：Gitee 模板 → check32；
+          # dotnet dist/obj → asset_contract 计数；wasm 产物 → test_plugin_wasm_host；
+          # canonical/target → 并发测试报「工具越权写」）。
+          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+          echo "前置目录已建"
       - name: 测试矩阵第 ${{ matrix.shard }}/32 片
         env:
           NF_VERIFY_TMP: .nf-logs
