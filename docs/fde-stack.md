@@ -21,7 +21,7 @@
 **对下（基础设施侧）——NF 要求下层提供什么**
 
 | 契约 | 形态 | 载体 |
-|---|---|---|
+| --- | --- | --- |
 | 传输/工具面 | MCP（`server/discover` + 四类列表）、A2A Agent Card | `results/interop/mcp.json` / `a2a.json`；他证通道 `docs/interop-thirdparty.md` |
 | 内容与格式面 | OpenAPI / AsyncAPI / SBOM / CycloneDX / in-toto / SLSA / PROV / VC | `results/interop/*.json`（12 面）+ 上游判据校验 `results/interop-schema-validation.md` |
 | 标准锚面 | 370 条可扩展标准（含扩展点）与 1200 条绑定 | `protocol/standards_catalog.json` · `standards_binding.json` · GEO 出口 `docs/standards/index.md` |
@@ -29,7 +29,7 @@
 **对上（交付侧）——NF 向 FDE 承诺什么**
 
 | 契约 | 形态 | 复算 |
-|---|---|---|
+| --- | --- | --- |
 | 装载 | 三条装载路径（A 有 API / B1 能读文件 / B2 纯粘贴） | `docs/agent/AI_ROUTING.md`；机读入口 `llms.txt` |
 | 装配 | 模块 + 管线 + 资产的声明式装配（域包自带装配流） | `community/*/protocol.yaml` + `pipelines/*` |
 | 门禁 | 单入口验收：`bash verify.sh` | check 全量常驻（**数不写死**：当前值看 `nf stats --check` 生成区；期望基线在 `desktop/src/core/quality_baseline.py`） |

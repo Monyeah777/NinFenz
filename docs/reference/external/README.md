@@ -5,7 +5,7 @@
 > 落档日期：2026-09-17
 
 | 文件 | 材料 | 级别与来源 |
-|---|---|---|
+| --- | --- | --- |
 | `trace-as-state.md` | Trace as State：推理轨迹作条件状态 | **A 级 · 预印本** `arXiv:2609.02702`（2026-09-02，cs.CL v1） |
 | `laap-observation.md` | LAAP（Living Agent Application Protocol）生态观察 | **B 级 · 自述口径、非同行评审**（官网 laap.cn / CSDN / GitHub，2026-09-17 快照） |
 

@@ -4,7 +4,7 @@
 
 [![ゲート ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
-**サイト（公開）**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
+**サイト（公開）**: <https://ninfenz.dev> · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
 **NF ターミナル（TUI）** —— 全画面の人間向け入口（標準ライブラリのみ）。メニューと各アクションは `nf` CLI の実コマンドの制御された呼び出し元です。キー操作は一流ターミナルの慣例に従います（`Tab` でパネル切替、`↑↓` で移動、`/` で絞り込み、`?` でキー一覧）。詳細は [tui/README.md](tui/README.md) を参照。
 
@@ -74,7 +74,7 @@ AI による組立：
 ## プロトコルチェーンと文書ナビ
 
 | 層 | 入口 |
-|---|---|
+| --- | --- |
 | 方向 | `STRATEGY.md` |
 | プロトコル | `01_核心协议.md` · `02_联动注册表.md` · `06_Agent执行协议.md` · `07_官方核心出厂与社区预设导航.md` · `protocol/WORLD_MODEL.md` |
 | ライブラリ | `03_管线库/` · `04_模块库/` · `05_资产库/` |
@@ -87,7 +87,7 @@ AI による組立：
 ## バージョンブロック
 
 | バージョン | 状態 |
-|---|---|
+| --- | --- |
 | v2.11.0 | 現行（2026-09-10）· world_model 決定的抽象状態契約 + world_slots |
 | v2.10.0 | 公開済み 2026-09-09 · 45 品質縦深 + 基盤層 A 群の収口 |
 | v2.9.0 | 公開済み 2026-09-08 · STRATEGY + 43/44 随波 |

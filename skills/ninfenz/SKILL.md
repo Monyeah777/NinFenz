@@ -13,7 +13,7 @@ NinFenz（NF）是**内容契约层**：把长内容生产变成可装载、可�
 ## 快速选路
 
 | 用户想做什么 | 入口 |
-|---|---|
+| --- | --- |
 | 不安装任何东西，直接让 AI 组装内容 | `docs/agent/AGENT_START.md` → `docs/agent/agent_组装指令包_v0.2.md` |
 | 本地跑全部 CLI 功能 | 克隆仓库，`python scripts/nf.py --help` |
 | 看模块/管线/资产市场 | `python scripts/nf.py market --list` |

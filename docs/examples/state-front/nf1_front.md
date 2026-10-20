@@ -3,7 +3,7 @@
 > 本块由产物**确定性提取**（非模型生成）——它是该产物的「状态文本代理」，供重读时先对齐状态。
 
 | 项 | 值 |
-|---|---|
+| --- | --- |
 | 模块/挂载编号 | M00、M06、M08、M10、M12、M13、M20、M22、M23、M24、M40、M41、M43、M50、M55、M57、M58、M59、M65、M80、P00、P01、P02、P10、P20、P30、P40、P50、P60、P70、P80 |
 | NF 编号 | NF-1 |
 | 二级标题数 | 8 |
@@ -35,12 +35,13 @@ verified: 2026-09-14
 status: active
 stale_after: 2027-03-14
 sources:
-  - community/校园情感领域包
-  - 04_模块库
+
+- community/校园情感领域包
+- 04_模块库
 tags:
-  - 校园情感
-  - 装配样本
-  - 引用式
+- 校园情感
+- 装配样本
+- 引用式
 attestation: b90173a7148194031a2c63f75407ee14143667b61a4c4d22e12a93b27cab1cf9
 attested_at: 2026-09-14
 anchor_scheme: ssh-sig
@@ -48,13 +49,15 @@ anchor_ns: nf-attest
 anchor_identity: nf-demo@local
 anchor_sig_file: library/anchors/NF-1.sig
 anchor_fingerprint: SHA256:RytmBjDCNbJ7He6VN9UHzVO/QtTc8HG3h5vP9ZIFrwg
+
 ---
 
 # 叙事世界完整版：校园情感流（高二 · 毕业遗憾线）
+>
 > 📚 NF 云端图书馆条目 **NF-1** · 入库 2026-09-07 · 投稿人：NinFenz（NF）作者 · 类型：装配样本（历史引用式件——正文含引用与缺口声明；普通入馆件一律须自包含可召回）
 > 许可：MIT（登记表同列同值；许可证门校验双源一致）
 
-> 版本：1.0.0 · 装配师：Operit（扮演外部 Agent）· 日期：2026-09-06 · 规范源：https://github.com/Monyeah777/NinFenz
+> 版本：1.0.0 · 装配师：Operit（扮演外部 Agent）· 日期：2026-09-06 · 规范源：<https://github.com/Monyeah777/NinFenz>
 > 档位：**轻量引用式**（规格自包含、正文引用式）——题材模块含原文浓缩版与契约摘要，核心模块与资产全文以路径引用；离线自包含档需内嵌全文（见 ## 0 缺口声明）。
 
 ## 0. 装配记录
@@ -78,7 +81,7 @@ anchor_fingerprint: SHA256:RytmBjDCNbJ7He6VN9UHzVO/QtTc8HG3h5vP9ZIFrwg
 ## 2. 管线（P02 · 校园情感流 · linear 九层）
 
 | 层 | 层名 | 职责（数据怎么流） | default 模块 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | P00 | 数据基座 | 存档装载（relationships/active_quests/ghost_data） | M00 |
 | P10 | 世界推进 | 校园作息节拍 + 天气季节 | 通用:M10、M08 |
 | P20 | 角色状态 | 人格画像、认知边界裁剪 | M23、情感:M22 |
@@ -98,7 +101,7 @@ anchor_fingerprint: SHA256:RytmBjDCNbJ7He6VN9UHzVO/QtTc8HG3h5vP9ZIFrwg
 - **模块总表（21 = 官方核心 12 + 题材 9）**：
 
 | 模块ID | 名称 | 类别 | 挂载层 | 来源 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | M00 | 数据结构 | 通用 | P00 | 核心 |
 | 通用:M10 | 时间推进 | 通用 | P10 | 核心 |
 | M08 | 季节天气 | 世界 | P10 | 核心 |
@@ -146,39 +149,48 @@ anchor_fingerprint: SHA256:RytmBjDCNbJ7He6VN9UHzVO/QtTc8HG3h5vP9ZIFrwg
 ### 题材 9 件（3 件原文浓缩 · 6 件契约摘要）
 
 #### 情感:M22 · 三冲动驱动（原文浓缩）
+
 - 契约：情感/P40（基线挂 P20）；输入 M00、M40；输出 `npc_action`；依赖 M40 深度（v0.7.12 起冲动与社会关系隔离：冲动只产「接近信号」——挪座位/递水/偷看/回避脚步，**永不直接写告白/交往/约会/relationship_change**）；主角豁免（不进冲动计算）；NPC 冲动行为先过 M23 认知边界再交 M40 结算。
 - 核心逻辑：大五→三冲动（escape 神经质>50 / sexual 外向>50 / mischief 宜人<50 且开放>50；尽责>50 整体下调）→ 6 步扳机检测（恐惧词命中 + 认知负荷修正 + 情绪轮同向放大）→ 4 条决策（强度>60 权重 0.7 主导；双冲动差<5 僵住 ×0.5；恐惧+escape→回避）。
 - 资产挂接：ATTR_TEMPLATES / FEAR_LIBRARY / EMOTION_WHEEL。
 - 违例：冲动永不输出为内心独白，只表现为行为信号。
 
 #### M40 · 关系深度（原文浓缩）
+
 - 契约：情感/P40（兼 P60）；输入 M00、M13；输出 `relationship_change`；订阅 `tick_day`（微量衰减/回忆沉淀）、`npc_action`（冲动行为计入互动质量）、`interaction_update`。
 - 核心逻辑：INTERACTION_DEPTH 模型——深度轴 depth(0-100) + 认知轴 cognition(0-100)；频率效应提认知、质量效应抬深度下限线、破坏效应可击穿下限线触发负向 `relationship_change`；写回 NPCState.relation.depth/cognition/history（history 只增不改）；越档发布 `relationship_change` → M41/M43/M55/事件:M22。
 - 资产挂接：INTERACTION_DEPTH / PERSONALITY_LINK / BEHAVIOR_SIGNALS / BIG5_INFER。
 - 违例：关系数值唯一结算方；其他模块只读或请求变更。
 
 #### M65 · 幽灵遗憾（原文浓缩，毕业线的核心）
+
 - 契约：情感/P60；输入 M41、M40；输出 `ghost_event`；订阅 `romance_state_change`（M41→R2/R3 错过类）、`narrative_event`（事件:M22 窗口开启）、`death_trigger`/`chaos_event`（经事件桥，跨包 R6）。
 - 核心逻辑：REGRET_LIBRARY 6 条基线（R1 未寄出的信←M55 情书中断 / R2 迟到的回应←毕业/离开 / R3 没说出口的话←M41 窗口前退缩 / R4 误会的代价 / R5 被抢走的人←M43 / R6 永别的省略号）；生命周期：种子（事件未闭环）→ 沉淀（随 tick 沉底）→ 显形窗口（事件:M22 指定：雨天/毕业/旧物/祭日）→ 玩家回应则闭环消散（转关系深度/记忆），窗口关闭未回应则 weight+ 加深等待下窗或封存。
 - 资产挂接：REGRET_LIBRARY。
 - 违例：窗口内不替玩家做选择；幽灵不驱动 NPC 行为（那是情感:M22 的职责）；经 M00 只读 episodic/semantic，不直写他模块字段。
 
 #### M41 · 恋爱进阶（契约摘要）
+
 - 情感/P40；关系越档判定与阶段推进（依赖 M40 depth 档位阈值）；发布 `romance_state_change`。全文：`modules/M41_恋爱进阶.md`。
 
 #### M43 · 情敌系统（契约摘要）
+
 - 情感/P40；情敌竞争与抢先告白分支（R5 遗憾触发源之一）；资产挂接 RIVAL_INFO / GIFT_PREFS / ATTR_TEMPLATES。全文：`modules/M43_情敌系统.md`。
 
 #### M55 · 匿名情书（契约摘要）
+
 - 情感/P40；情书传递/冒名/中断（R1/R4 遗憾触发源）；资产挂接 LOCATIONS。全文：`modules/M55_匿名情书.md`。
 
 #### M57 · 朋友圈动态（契约摘要）
+
 - 情感/P50；社交流之一：动态发布/点赞/评论结算；资产挂接 FORUM_POSTS / SOCIAL_FEED / GOSSIP_TOPICS。全文：`modules/M57_朋友圈动态.md`。
 
 #### M58 · 电话通讯（契约摘要）
+
 - 情感/P50；社交流之一：电话事件（夜窗口主要通道）；资产挂接 PHONE_CALL。全文：`modules/M58_电话通讯.md`。
 
 #### M59 · 群聊系统（契约摘要）
+
 - 情感/P50；社交流之一：群聊消息流结算；资产挂接 GROUP_CHAT / GOSSIP_TOPICS。全文：`modules/M59_群聊系统.md`。
 
 ## 5. 资产（28 键 · 键表完整 · 正文以 assets/ 为准）

@@ -1,4 +1,5 @@
 # 域包自由组合（combos）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-24
 
@@ -19,7 +20,7 @@ python scripts/nf.py combine verify                              # 在盘证书�
 ## 五条不变量（任一不成立即非法，不许静默降级）
 
 | # | 不变量 | 判据 |
-|---|---|---|
+| --- | --- | --- |
 | 1 | 模块唯一可定位 | 选中模块 id 唯一，且能定位到机读契约（缺契约即报 `module_missing_contract`） |
 | 2 | 依赖闭合 | 模块 `inputs` ⊆ 组合内模块 ∪ 官方核心 13 件（否则 `dependency_closure.dangling`） |
 | 3 | 事件闭合 | 任一 `subscribe` 在组合内（含核心模块）有发布方（否则 `event_closure.unbridged`；无人发布者记 `events_unpublished`） |
@@ -35,7 +36,7 @@ python scripts/nf.py combine verify                              # 在盘证书�
 不变量，断言「任意组合合法」。实测（2026-09-23）：
 
 | 规模 | 数量 | 合法 |
-|---|---|---|
+| --- | --- | --- |
 | 两两（全集） | 6105 | **6105** |
 | 三元（抽样） | 400 | **400** |
 | 四元（抽样） | 200 | **200** |
@@ -53,7 +54,7 @@ python scripts/nf.py combine verify                              # 在盘证书�
 组合**落成一个真正的协议包**（dry-run 缺省，`--write` 才落盘 + 登记）。
 
 | 产物 | 说明 |
-|---|---|
+| --- | --- |
 | `protocol.yaml` | **0 自有模块**（`module_id_range: []`）+ `references` 逐条只读借阅（`asset_readonly: true`）+ `mount_layers` 写 `available`（`default` 留空，规避同层 default 冲突） |
 | `pipelines/Pxxx_*装配流管线.md` | 派生自 P00 骨架的九层装配流；`allowed_modules` = 官方核心 ∪ 借阅模块 |
 | `outputs/`（8 面） | 借阅索引 / 系统卡 / 层栈图（Vega-Lite）/ 装载序图（Mermaid）/ 依赖图（GraphML）/ 三件 schema / **T4 组合证书** `COMBO_CERT.json` |

@@ -32,7 +32,7 @@ License: MIT
 **字段式（表单把 command / args 拆开问时）**
 
 | 字段 | 值 |
-|---|---|
+| --- | --- |
 | 名称 / name | `ninfenz` |
 | command | `npx` |
 | args | `-y ninfenz serve`（或数组 `["-y","ninfenz","serve"]`） |
@@ -47,7 +47,7 @@ License: MIT
 **同页常问的其它字段**
 
 | 字段 | 值 |
-|---|---|
+| --- | --- |
 | 传输 / transport | `stdio` |
 | 协议版本 | modern `2026-07-28` + legacy `2025-11-25`（双版本并存） |
 | 工具数 / prompts | 12 个只读工具 + 1 个 prompt（`assemble_guide`）；`additionalProperties: false`，参数不合即 `-32602` |

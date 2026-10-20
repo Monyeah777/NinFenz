@@ -1,4 +1,5 @@
 # NinFenz MCP 接続（`nf serve` · 40 総綱 v2.7 波A S1-E3 / X2）
+>
 > 最后更新：2026-10-18 (last updated)
 
 > **状態**：公開化文書は基礎層 v2.7 とともに着地済み。**E3 プロトコル級ロード実測は 2026-09-08 に通過**（stdio JSON-RPC フレーム列の直測で五方法すべて緑、文末の記録を参照。P06 パイプラインの缺口二つ——閉じ ``` の欠落 / techdoc 宣言の欠落——を修復）。41 波C C7（2026-09-08）で読み取り専用 tools/prompts を開放（本機 stdio スモーク通過、docs/41_波C_C7_实测记录.md を参照）。**宿主型クライアント（Claude Desktop などの GUI ロード）は依然ユーザ側での追記を推奨**——README の MCP 宣言は現状維持（S13 ゲートは docs_external-validation-v2.7.md の規則に従い開放）、追記後に「正式化」を補う。
@@ -82,7 +83,7 @@ MCP stdio をサポートする任意のクライアントで、`nf.py serve` �
 ## 能力表（mcp_runtime 実装と一対一対応）
 
 | メソッド | 実装 | 説明 |
-|---|---|---|
+| --- | --- | --- |
 | `server/discover` | ✅ | modern 必須：`supportedVersions` / `capabilities` / `_meta.serverInfo` + `instructions`/`ttlMs` を一度に返す |
 | `initialize` | ✅ | legacy ハンドシェイク：要求版が対応なら反響し、そうでなければ `2025-11-25` へフォールバック；`serverInfo` は自己記述（スナップショットファイルの最上位ではない） |
 | `notifications/initialized` | ✅ 静黙 | 通知は id を持たず、応答しません |
@@ -152,7 +153,7 @@ pattern / module / pipeline / asset）は次を満たすこと——`{var}` の�
 ### 一、対外標識
 
 | フィールド | 値 |
-|---|---|
+| --- | --- |
 | 名称（Name） | `NinFenz Content Gate` |
 | 一言（One-liner） | あらゆる AI agent に検証可能なコンテンツ規範と資産基盤を——まず契約を引き、それから筆を執る。 |
 | カテゴリ（Category） | `content-creation` |

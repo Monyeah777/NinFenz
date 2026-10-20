@@ -7,7 +7,7 @@
 ## 清单（schema nf-test-vectors/1）
 
 | 文件 | 内容 | 判据 |
-|---|---|---|
+| --- | --- | --- |
 | harness.json | P-C0 走通件：算术自证 + 工具链探针（probe 只探在场，不比对输出） | 结构形状 |
 | jcs_basic.json | P-C1 单条真契约向量（jcs_conformance 的子集） | 三实现逐字节 |
 | jcs_conformance.json | 8 条 JCS 正例（键序 / ES 数字形态 / 最小转义 / 嵌套排序） | 三实现逐字节 |

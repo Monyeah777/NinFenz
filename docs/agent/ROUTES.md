@@ -7,7 +7,7 @@
 ## 一、镜像前缀（先选前缀；换镜像 = 只换前缀，后缀一个字不动）
 
 | 形态 | GitHub（海外） | Gitee（国内直连 · 主入口） |
-|---|---|---|
+| --- | --- | --- |
 | 网页主页 | `https://github.com/Monyeah777/NinFenz` | `https://gitee.com/monyeah777/ninfenz` |
 | 网页文件（给人点开看） | `https://github.com/Monyeah777/NinFenz/blob/main/{路径}` | `https://gitee.com/monyeah777/ninfenz/blob/main/{路径}` |
 | **raw 原文（喂给 AI 读）** | `https://raw.githubusercontent.com/Monyeah777/NinFenz/main/{路径}` | `https://gitee.com/monyeah777/ninfenz/raw/main/{路径}` |
@@ -16,7 +16,7 @@
 ## 二、功能后缀路由表（前缀 + 后缀 = 完整链接）
 
 | 用户需求 | 后缀（{路径} 处） | 完整示例（Gitee raw 形态） |
-|---|---|---|
+| --- | --- | --- |
 | 读馆藏目录 / 导购 | `library/INDEX.md` | `https://gitee.com/monyeah777/ninfenz/raw/main/library/INDEX.md` |
 | **机器入口清单（首选）** | `llms.txt` | `https://gitee.com/monyeah777/ninfenz/raw/main/llms.txt` |
 | 编号大小写拿不准 | `library/ALIAS.md` | `https://gitee.com/monyeah777/ninfenz/raw/main/library/ALIAS.md` |
@@ -47,7 +47,7 @@
 ## 四、接待决策流（核心）
 
 | 用户说了什么 | 你的动作 |
-|---|---|
+| --- | --- |
 | A. 报编号（如 `NF-1`、`NF-WORLDCAMPUS-Monyeah777-1`） | 读 `ALIAS.md` 确认真实大小写 → 拼 raw 链接 → 你能抓就自己读后转述/执行；用户要链接就给（反引号包裹） |
 | B. 描述需求找作品（「校园」「雨天」「悬疑」…） | 读 `INDEX.md` 登记表，对「标题 / 形态 / 一句话」模糊匹配 → 命中 1 件：报编号 + 链接 + 一句话介绍；命中多件：列清单让用户挑 |
 | C. 「随机看看」「抽一个」「盲盒」 | 读 `INDEX.md` 登记表 → 随机选一行 → 报编号 + 链接 + 一句话介绍（馆藏每一件都是真人产出，抽到啥看缘分） |

@@ -161,4 +161,3 @@
 - 相关产物：`results/interop/decisions.json`
 - 为何如此判定：决策面是 NF 自有形状，无外部对端与外部 schema；判据落在 check33（覆盖一致 / 内部边界声明 / 确定性），不属他证范围。
 - 回填：请在 `results/interop-thirdparty-status.md` 对应行填入 tool_version / run_by / run_at / output_sha256 / verdict。
-

@@ -23,7 +23,7 @@ pwsh -NoProfile -File "$Kit\run-recompute.ps1" -Root <语料根> -Cli <引擎 ex
 ## 3. 判定与退出码
 
 | 退出码 | 含义 |
-|---|---|
+| --- | --- |
 | `0` | **PASS**：语料指纹 = 钉定值，且复算 digest / 模块数 / legal 与 `scenario.json` 逐项相符 |
 | `3` | **语料漂移**：digest 相符但指纹 ≠ 钉定值（真源前移过；非引擎问题，须按复基线处置） |
 | `1` | **FAIL**：digest 或字段不符（实现分歧） |
@@ -45,7 +45,7 @@ pwsh -NoProfile -File "$Kit\run-recompute.ps1" -Root <语料根> -Cli <引擎 ex
 ## 5. 边界（如实登记）
 
 | 面 | 状态 |
-|---|---|
+| --- | --- |
 | Windows / PowerShell 7 | **PASS**（本机实测，见 `out/receipt.json` 判定） |
 | Linux / POSIX（`run-recompute.sh`） | **UNKNOWN**——本机无 Linux 运行环境（WSL 无发行版、无 docker/podman）；脚本与 `.ps1` 同参数同判定，**未执行即不标 PASS** |
 | 语料非 `b1f9a28` 的检出版本 | 退出码 `3`（语料漂移），需重钉期望值（复基线） |

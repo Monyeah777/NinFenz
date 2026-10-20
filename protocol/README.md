@@ -8,7 +8,7 @@
 ## schema/ · 五份契约定义（本层机器真相）
 
 | schema 文件 | 校验对象 | 真相形态 |
-|---|---|---|
+| --- | --- | --- |
 | `contract.schema.json` | 模块头 `machine_contract` 机读块（01 §1.1 九键 + 可选 `tool_face` / `world_model`） | 04_模块库 + community/*/modules 模块文档内的 yaml 围栏 |
 | `module.schema.json` | 注册表模块条目 | `desktop/src/core/registry.json` `modules[]`（02 §2 投影） |
 | `pipeline.schema.json` | 管线声明 `Pipeline` | 03_管线库 + community/*/pipelines 管线文档内的 yaml 围栏 |

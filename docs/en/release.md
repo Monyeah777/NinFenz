@@ -1,4 +1,5 @@
 # Release orchestration (release)
+>
 > ⛔ Operating instruction: this file is the **human-readable projection** of the release policy. The machine source is `protocol/release_policy.json` (validated against `protocol/schema/release.schema.json`); the machine-checked preflight is check38's `release_gate` sub-scan. Read it and run it.
 > 最后更新：2026-10-11 (last updated)
 
@@ -30,7 +31,7 @@ Receipts must run **last**, after all content changes; otherwise the root covers
 Three registrations must not dangle (recompute rules live in `core/quality_baseline.py` and in VERSION-MATRIX's own two-way check):
 
 | Face | Source | Action at release |
-|---|---|---|
+| --- | --- | --- |
 | `CHANGELOG.md` | latest section `## [X.Y.Z]` | flip "unreleased" to released and record the PASS baseline |
 | `docs/meta/VERSION-MATRIX.md` | version × plan × capability row | add a row (version / date-status / plan / capability) |
 | `README.md` version block | the "current" row | move the current row to the new version |

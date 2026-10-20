@@ -6,7 +6,7 @@
 ## 一、样例对象
 
 | 项 | 值 |
-|---|---|
+| --- | --- |
 | 域包 | `community/AI系统域包`（系统卡 + 概念图 48 节点 + 闭包产物 + 自带装配流 P07） |
 | 交付形态 | 技术文档（techdoc）——交付物 `evidence/deliverable.md` |
 | 客户侧输入 | [`brief.md`](brief.md)（客户需求） |
@@ -23,7 +23,7 @@ python scripts/fde_sample_run.py --check   # 逐字节比对证据与当前仓�
 ## 三、五道门（样例的验收判据）
 
 | 门 | 判据 | 为什么它算「中游」证据 |
-|---|---|---|
+| --- | --- | --- |
 | G1 | 包内 `outputs/INDEX.json` 声明的产出面全部在场且可解析 | 交付面不是口头承诺，是声明 + 实物 |
 | G2 | T2 schema ↔ T3 data 逐对通过 JSON Schema 子集校验 | 客户拿到的产物有契约，不是自由文本 |
 | G3 | `assets/CONCEPT_GRAPH.md` 概念图健康（无环 / 无悬空 / 别名唯一 / 分支完备） | 装配前提可机检 |

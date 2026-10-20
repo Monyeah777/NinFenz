@@ -39,7 +39,7 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 下表每一行的「唯一真源」都逐项断言，漂移即红。
 
 | 体系 | 语义 | 唯一真源 | 升级规则 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 协议 / 内容 vX.Y.Z | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [X.Y.Z]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
 | 门禁 verify vA.B | verify.sh 的判据集版本 | protocol/repo_stats.json（verify_version / verify_checks / baseline_pass）= core.quality_baseline 期望值 = llms.txt 质量凭证串 | scripts/bump_verify.sh 换标；判据集变即升 A.B |
 | CLI / npm / MCP 1.0.x | 启动器与 npm 包版本 | scripts/nf.py 的 NF_CLI_VERSION = packaging/npm/package.json = packaging/mcp/server.json（version 与 packages[0].version） | 发 npm 版时三处同改（stage-payload / test_mcp_packaging / site sync-numbers 均判死） |
@@ -63,16 +63,19 @@ python3 -m compileall -q desktop/src scripts
 ## 4. 改动域细则
 
 ### 4.1 协议层（01–07 + 08/09 方案）
+
 - 结构性改动走 **06 §10 修改规程四步闭环**：按协议声明 → 登记真相源 → verify.sh 自检 → 提交同步导航面。
 - 动 01/02/06 契约触发 **01 §7 V2 bump**（结构性变更 + 迁移说明）；registry_schema_version / save_schema_version 双字段联动升级。
 - 新增方案文档（08→09→…）须同步 README L32 协议链与 ROADMAP §1 总览表，不在多处重复维护任务清单。
 
 ### 4.2 代码层（desktop/ scripts/）
+
 - **core 零第三方依赖**（纯标准库）；确需引入第三方依赖先开 Issue 讨论。
 - 新增可测逻辑放 desktop/tests/，纳入 unittest 体系（check12）；暂不做端到端 / GUI 测试入 CI。
 - **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
 
 ### 4.3 社区领域包（community/）
+
 - 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。
 - 资产须登记溯源索引（assets/README.md）并满足 EXT 闭合（起始/终止行溯源注释 + 外部完整实体源标注），`bash scripts/reconcile_assets.sh --quiet` 应全清。
 
@@ -81,31 +84,38 @@ python3 -m compileall -q desktop/src scripts
 > **收口锚点**：兑现 10_v0.7.0_自定义协议方案 §6 开放问题 4——第三方包从提交到登记的协作流程（PR/评审/发布）原「不属 v0.7.0 协议层范畴……流程治理留待 v1.0.0 生态收口」，本版以文档化收口：**人读流程 = 本节五步**（提交 → PR 评审 → 登记 → 发布，含前置协议合规自检），**机读门禁 = verify.sh check 断言配套**（check14/check15/check16，见 02 §9.2）。流程治理本版 = 文档化，不做平台化/工具化（PR 机器人 / 自动登记流水线留后续，同防范围蔓延纪律）。适用对象：向 community/ 贡献新社区领域包（02 §8.1/8.2 同型）或组合管线包（02 §8.4 同型）的第三方。
 
 **① 协议合规自检（提交前，贡献者必过）**
+
 - **protocol.yaml 三要件齐备**（02 §8.3）：包根机读协议声明在场（01 §6.1 Schema 必填 12 字段，check14 ①-⑥ 断言）；登记要素（包目录/管线/模块/资产/类别）齐备；组合包另须 references 合规（02 §8.4 四规则：在册可寻址 / 依赖闭包闭合 / 同层 default 唯一 / 契约断裂 FAIL 阻断 + 自动仲裁）。
 - **本地自检单**：`bash verify.sh` 全绿（0 WARN / 0 FAIL；其中 check14 注册门禁 / check15 组合门禁为社区包专项）——**不钉运行时计数**（check 数与 PASS 基线见 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区，钉死必漂）；代码/语法按 §3 三步验证门槛全过；资产经 asset_get 寻址、登记溯源索引并满足 EXT 闭合，`bash scripts/reconcile_assets.sh --quiet` 全清（§4.3）。
 
 **② 提交（分支 / commit / 引用规范）**
+
 - 分支策略按 §2（单主干 main 直推或短命分支合并）；commit 信息遵循 §1 Conventional Commits——type 取 `feat`（新包落盘）/ `docs`（协议改动），scope 取 `community`。
 - 方案文档引用：结构性协议改动须可溯方案文档（README L32 协议链）与登记真相源 02，不在多处重复维护任务清单（§4.1）。
 
 **③ PR 评审（reviewer 判据）**
+
 - 使用 .github/PULL_REQUEST_TEMPLATE.md，勾选「社区包」改动域 + 门禁自检清单（§5）。
 - **协议层 reviewer 判据 = 02 §8.1–8.4 登记规则 + check 全绿**：整包登记对照 §8.3 登记三要件、组合登记对照 §8.4 登记判定四规则；**`bash verify.sh` 全绿（WARN 0 / FAIL 0）为合并前提**——当前 check 数与 PASS 基线以 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区为准，**本文件不钉运行时计数**（钉死会漂，2026-09-30 实测此处曾落后到 check1-36/PASS=59）。
 - 评审范围含题材/资产合规：模块遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；资产 EXT 闭合 + 溯源索引在册（§4.3）。
 
 **④ 登记（协作流程终点的机读落地）**
+
 - 02 §8 登记表登记（新领域包走 §8.1/8.2 同型、组合管线包走 §8.4）：**模块编号**落 `M91–M99 机制段` 或本包 **R2 独占类别**的 `<类别>:Mxx` **类内段**（每类 00-99 独立空间，类别须在本包 categories 在册、类内号唯一），两通道均不占官方核心 13 件与既有社区包编号（§8.3）；**管线编号**须全库唯一且避让层位 id（P00–P80）与官方管线 id（P00/P01/P90）（check14 ⑤/⑧）；同步 registry.json `protocols[]` 投影（02 §9.1 字段映射；check14 ⑦ 断言）。
 - 三要件缺一即不被平台门禁识别（02 §8.3）；**登记 = 协作流程终点的机读落地**（02 §9.2 协作流程纪律）。
 
 **⑤ 发布（README 双源声明 + 版本行同步 + 发布纪律）**
+
 - 包 README 装载手册声明登记指针——「登记三要件见 02 §8.3，组合登记见 02 §8.4」（对齐既有两包形态）；根 README 开箱即玩社区预设段与 07 §3 索引同步增补（双源声明一致，I5）。
 - 版本行同步：schema_version / registry_schema_version 等字段级改动走 01 §7 V1（只增不删）/ V2（结构性变更 bump + 迁移记录）规则。
 - 发布纪律：tag vX.Y.Z 为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
 
 ### 4.5 方案文档纪律（NN_ 方案模板必填两段，v2.2.0 B1/B2 起）
+
 新增/修订方案文档（`NN_<版本>_<主题>方案.md`）**必含**以下两段，位置在「核心」段之后：
 
 **B1 五问自检（Clarify 自检，每方案回答五问）**
+
 1. **谁消费本功能**——具体消费方（模块/CLI/verify check/文档/外部产物格式），不接受「将来可能有用」。
 2. **何时/如何验证被消费**——验证动作 + 时机（如「nf CLI 冒烟输出」「verify checkNN 绿」「单测断言」），可独立跑、有可观察结果。
 3. **与非目标边界**——明确不做（对照 01 §5 I5 / L3_FROZEN 冻结面 / ROADMAP 条件池），一句话边界声明。
@@ -113,6 +123,7 @@ python3 -m compileall -q desktop/src scripts
 5. **失败定义**——什么算验收不通过（RED 判据），与 §3 验证门槛对齐。
 
 **B2 消费方声明（防 C-a 无消费方能力重演，并入 B1 五问 ①/②）**
+
 - 以表格或清单声明：**功能** → **谁消费** → **怎么验证被消费**。消费方为空的条目不得进入方案（须先裁掉或绑定后续立项）。
 - 追溯锚点：落地后 README L32 协议链 / CHANGELOG 条目须能指回该方案（治理指针 2），verify 新增 check 须在头部配套说明引方案号。
 
@@ -121,11 +132,13 @@ python3 -m compileall -q desktop/src scripts
 **推荐段（可选，非门禁——v2.6-A 钢人论证 / M_AUDIT 协议设计审计）**：重大方向性决策（域包立项 / 协议设计前置 / 线体取舍 / 发布节奏）可选用协议设计审计工作单理清支持/反对/盲区——`nf design audit init "<问题>" --target T --mode {steelman,blindspot,full}` 生成，`--check` 结构自检（verdict 三态/论据与清单边界/meta 在场），`ls` 列审计索引。full 模式含盲区双问（Q1 低置信度 / Q2 遗漏）——反幻觉与反思维惯性；`nf design steelman` 为其钢人子集兼容入口。**措辞为推荐非必做**：默认缺席、按需装载，不强制任何决策走审计（「也许有人需要而有人不需要」）；审计产物（audit.md）是过程档案，与方案文档（产物）互补，可回溯决策依据。
 
 ## 5. Issue / PR 规范
+
 - **缺陷上报**：使用 .github/ISSUE_TEMPLATE/bug_report.yml（结构化表单；环境信息按字段填写）。
 - **功能请求**：使用 .github/ISSUE_TEMPLATE/feature_request.yml（结构化表单）。
 - **PR**：使用 .github/PULL_REQUEST_TEMPLATE.md，勾选改动域（协议层 / 代码层 / 社区包）+ 门禁自检清单（verify.sh 全绿 / unittest 用例 / py_compile 通过）。
 
 ## 6. 安全章程（40 总纲 S8，2026-09-06）
+
 - **密钥零落盘**：不提交/不 cat/不 read `.env`、`credentials.*`、`*token*`、`*secret*` 等文件；发现即警告并中止（项目硬性闸门）。
 - **Token 轮换 SOP**：任何出现在对话/日志/文档/commit 中的 token 视为已泄露——立即到 GitHub → Settings → Developer settings → Personal access tokens 撤销重建；新 token 仅经环境变量注入，不写入文件/提交。CI 一律用 `GITHUB_TOKEN`（workflow 内最小权限），不使用个人 PAT。
 - **workflow 最小权限**：顶层默认 `contents: read`；需要写 Release/推送的 job 单独声明 `contents: write`——新增 workflow 或步骤前对照现有 permissions 模式（ci-verify/e2e 只读、build job 单提权）。

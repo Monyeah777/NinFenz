@@ -17,7 +17,7 @@
 跑真源、打印期望值、并把 Rust 判据直接写进对应的 `src/*.rs`。
 
 | 脚本 | 面 | 踩的分支 |
-|---|---|---|
+| --- | --- | --- |
 | `gen_knowledge_expected.py` + `emit_knowledge_tests.py` | `knowledge.verify_transform` / `verify_usage` | 14 + 6 条（含 1 条全绿样本） |
 | `gen_coupling_expected.py` + `emit_coupling_tests.py` | `coupling_metrics` | 10 种 import 写法 |
 | `gen_workflow_expected.py` + `emit_workflow_tests.py` | `workflow_policy` | 11 个分支 |
@@ -62,7 +62,7 @@ cargo test --release --manifest-path engine/rust/Cargo.toml
 ### 二、普查 / 审计脚本（`survey_*.py` / `audit_engine_reads.py`）
 
 | 脚本 | 作用 |
-|---|---|
+| --- | --- |
 | `survey_all_scalars.py` | 普查全部模块文档围栏块里的标量类型（界定 mini-YAML 要复刻多少 YAML 1.1） |
 | `survey_yaml.py` / `survey_yaml_types.py` | 普查真源 YAML 用到的形态与类型 |
 | `audit_engine_reads.py` | `sys.addaudithook` 审计：证明 `conformance` 对 `engine/` **零读取**（零侵入的构建性证明） |
@@ -99,7 +99,7 @@ python engine/rust/tools/check_native_sync.py
 22 个生成器里坏了 18 个，靠"括号内含 `ensure_ascii` 即回退"精确修回）：
 
 | 用法 | 形态 | 怎么办 |
-|---|---|---|
+| --- | --- | --- |
 | **Rust 字面量** | `'%s' % json.dumps(k)`（**不带** `ensure_ascii`） | 用 `rs()` |
 | **JSON 夹具内容** | `write_text(json.dumps(obj, ensure_ascii=False))`、`rj(json.dumps(obj))` | **保持 `json.dumps`**——文件内容要可读中文；原始字符串里也不能转义引号 |
 
@@ -150,12 +150,13 @@ python engine/rust/tools/audit_unported_consumers.py    # 发现缺口即退出�
 说明"记住就行"不成立，故立两道闸：
 
 | 出处 | 用途 |
-|---|---|
+| --- | --- |
 | [`_rustlit.py`](_rustlit.py) 的 `rs()` | **Rust 普通字符串字面量**（键、短文本）：非 ASCII 原样保留、引号反斜杠按 Rust 转义、残余 `\uXXXX` → `\u{XXXX}` |
 | 同文件的 `raw()` | **Rust 原始字符串**，分隔符按内容**自动升级**（`r#"…"#` → `r##"…"##`）——内容里含 `"#` 时会提前终止，实测踩到（夹具里有 `"## 块"`） |
 | [`audit_rust_literals.py`](audit_rust_literals.py) | lint：**整调用**分析，凡 `json.dumps(...)` 调用里**没有** `ensure_ascii` 就报错 |
 
 lint 的判据刻意能区分两类用法（早期逐行版有多行调用的假阳性，已改整调用）：
+
 - **不带** `ensure_ascii` ⇒ 输出会当 Rust 字面量 ⇒ 应改走 `rs()` ⇒ **报错**；
 - **带** `ensure_ascii=False` ⇒ 是写 JSON 夹具内容（文件要可读中文）⇒ 正常。
 
@@ -168,7 +169,7 @@ lint 的判据刻意能区分两类用法（早期逐行版有多行调用的假
 而是**判据自身可信度**的不变量：
 
 | 脚本 | 守的是什么 | 会怎么红 |
-|---|---|---|
+| --- | --- | --- |
 | `check_native_sync.py` | 两处手写自算集 == 快线实际自算面 | 少列一条即 FAIL（该条分派断掉不会红，是真实盲区） |
 | `audit_pub_readers.py` | 无「全仓零引用的 pub 项」 | 植入死代码即 FAIL（**已做反向对照**） |
 | `audit_unported_consumers.py` | 未移植模块不落在已移植面的判据链上 | 有依赖即 FAIL |

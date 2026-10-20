@@ -8,7 +8,7 @@
 ## 件
 
 | 件 | 作用 |
-|---|---|
+| --- | --- |
 | sha256/ | **参考插件（CLI 形态）**：Rust std-only，编到 wasm32-wasip1 |
 | sha256-component/ | **参考插件（Component Model 形态）**：WIT 类型接口 + Canonical ABI，编到 wasm32-unknown-unknown 再组件化 |
 | ninfenz-plugin.wit | 插件接口契约（P5-03.1）；装载期用它校验清单声明的方法名 |
@@ -33,7 +33,7 @@
 宿主一律**显式 deny**（不靠默认值）：
 
 | 面 | 做法 | 效果 |
-|---|---|---|
+| --- | --- | --- |
 | 文件系统 | 不给 `--dir` | 无 preopens，读不到任何宿主文件 |
 | 网络 | 不给 `-S inherit-network` | 无网络 |
 | 环境变量 | `-S inherit-env=n` | 连 `PATH` 都看不到 |
@@ -55,7 +55,7 @@
 §18.4 的三条缺一不可。`python scripts/plugin_promote.py --json` 的输出（2026-10-12 本机）：
 
 | 输入 | 字节等价 | 工具链成本 | 加速 | 判定 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 MiB | 仲裁 PASS | 在场 · 1 | **2.77×** | **晋升** |
 | 32 MiB | 仲裁 PASS | 在场 · 1 | **0.80×** | **不晋升** |
 
@@ -80,7 +80,7 @@ machine-readable 的 `reason`（如 `fuel_exhausted`），**绝不静默**。宿
 ## 两种形态：为什么都留着
 
 | | CLI 形态（sha256/） | 组件形态（sha256-component/） |
-|---|---|---|
+| --- | --- | --- |
 | 接口 | argv + stdin/stdout 的**约定** | **WIT 类型**（装载期可从二进制类型段读出） |
 | 输入通道 | stdin 管道 | Canonical ABI 具名调用（WAVE 字面量经 argv） |
 | 隔离/计量 | wasmtime 的 `-S` / `-W` 开关全套可用 | 同上（不带 WASI import ⇒ 能力面结构化地不存在） |
@@ -98,7 +98,7 @@ machine-readable 的 `reason`（如 `fuel_exhausted`），**绝不静默**。宿
 ## 同一轨道的相邻面（不在本目录，但同属 P5）
 
 | 项 | 位置 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | P5-07 绑定层 | engine/rust/ffi（C ABI）+ engine/rust/pyo3（PyO3 + maturin wheel） | 见 engine/rust/BINDINGS.md；本机实测两条路径都真装载并报同一 ABI 版本 |
 | P5-08 NativeAOT | engine/dotnet/tools/nf-canonical（dist-aot） | AOT 单文件 1,478,656 B；14 条向量与规范逐字节等价，且无需 DOTNET_ROOT |
 | P5-09 剖析 | scripts/hotspot_profile.py | cProfile 取数 + 可复算排名；py-spy/hyperfine 缺席如实记 UNKNOWN |

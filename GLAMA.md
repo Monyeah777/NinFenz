@@ -13,7 +13,7 @@
 ## 0. 你截图里的每一项是什么意思
 
 | 页面文字 | 真实含义 | 现在要不要处理 |
-|---|---|---|
+| --- | --- | --- |
 | `score 33%` / `TDQS` | 33% 是 **Discovery / Profile completion**；TDQS 是工具定义质量分，**未构建就没有分** | 先不用管 33%，先做构建 |
 | `GitHub Badge` | Glama 给的 README 徽章；本仓 README 已加 card + score 徽章 | 已完成 |
 | `Repository: Monyeah777/NinFenz` | 关联的 GitHub 仓库；创建后不能改 | 已完成 |
@@ -83,7 +83,7 @@
 页面字段名可能随 Glama 版本略有差异，按语义对应：
 
 | 字段 | 填什么 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | Dockerfile | Use repository Dockerfile | 仓库根已有 |
 | Build steps | **留空** | 没有 `pip install`、没有编译；标准库直接跑 |
 | CMD arguments | `["python", "scripts/nf.py", "serve"]` | 如果页面是逐行表单，就填三行：`python` / `scripts/nf.py` / `serve` |
@@ -126,7 +126,7 @@
 期望结果：
 
 | 项 | 期望 |
-|---|---|
+| --- | --- |
 | Build 状态 | Success / 绿色 |
 | Tools | 12 个：`pipeline_list` `spec_list` `registry_search` `library_search` `library_read` `pattern_list` `pattern_read` `knowledge_order_read` `module_read` `pipeline_read` `asset_list` `asset_read` |
 | Prompts | 1 个：`assemble_guide` |
@@ -137,7 +137,7 @@
 ### Build 失败的常见原因
 
 | 日志/现象 | 原因 | 处理 |
-|---|---|---|
+| --- | --- | --- |
 | 找不到 Dockerfile | Admin 没选 Use repository Dockerfile | 重新选；确认 GitHub 默认分支有 `Dockerfile` |
 | COPY 失败 | `.dockerignore` 排除了运行时要读的目录 | 检查 `.dockerignore`；本仓已保留 03/04/05/community/library/patterns/protocol/docs |
 | Build 成功但 No tools | CMD 起的是 CLI 而不是 `serve`；stdout 被日志污染 | CMD 必须是 `python scripts/nf.py serve`；启动横幅只允许走 stderr |
@@ -259,7 +259,7 @@ printf '%s\n' \
 Glama Listing 三个等级：
 
 | 等级 | 来源 | 本仓现状 |
-|---|---|---|
+| --- | --- | --- |
 | License | 仓库许可证 | A（MIT） |
 | Quality | TDQS 总体分 | 构建后实评；预评估 A |
 | Maintenance | 活跃度 / Release / 响应 | Release 后实评 |
@@ -277,7 +277,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 本仓 12 个工具的人工预评估：
 
 | 工具 | Purpose 25% | Usage 20% | Behavior 20% | Params 15% | Conciseness 10% | Completeness 10% | 估算 TDQS |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | pipeline_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | spec_list | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
 | registry_search | 5 | 5 | 4 | 4 | 4 | 4 | 4.5 |
@@ -306,7 +306,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 ## 10. 排障：按你现在的页面文字查
 
 | 页面文字 | 处理 |
-|---|---|
+| --- | --- |
 | `Repository Not Ready` | 第 1 步 Admin → Repository → Sync；等 10–30 分钟；仍不行邮件 support |
 | `score 33%` | 第 7 节的资料完整度清单；不是质量分 |
 | `No releases yet` | 第 5 步 Make Release（必须先 Build 成功） |
@@ -319,13 +319,13 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 ## 11. 提交文案（可直接粘贴）
 
 | 字段 | 值 |
-|---|---|
+| --- | --- |
 | Name | NinFenz Content Gate |
 | One-liner (EN) | Read-only MCP server for a content contract layer: protocol, modules, pipelines, assets, library. |
 | One-liner (ZH) | 给任何 AI agent 一个可校验的内容规范与资产底座——先查契约，再落笔。 |
 | Description | 只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。12 个只读工具 + 1 个 prompt（assemble_guide）；支持 modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；无写路径。 |
-| Repo | https://github.com/Monyeah777/NinFenz |
-| Site | https://ninfenz.dev/ |
+| Repo | <https://github.com/Monyeah777/NinFenz> |
+| Site | <https://ninfenz.dev/> |
 | Install | `npx -y ninfenz serve`（或容器：`docker build -t ninfenz-glama . && docker run --rm -i ninfenz-glama`） |
 | Category | content-creation（备选 developer-tools / knowledge-management） |
 | Tags | mcp, content-contract, spec-driven, verification, knowledge-base, python, llm |
@@ -346,7 +346,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 ### Glama 侧（需要你登录后点）
 
 | 操作 | 在哪 |
-|---|---|
+| --- | --- |
 | Sync repository | Admin → Repository |
 | Build / Deploy | Admin → Dockerfile |
 | Make Release / Create Release | Build 成功后的测试列表 |
@@ -360,7 +360,7 @@ Glama 本次修改前的实评（2026-10-18）：**descriptionQuality 4.5 · coh
 coherence 的反馈与处理如下：
 
 | 反馈 | 处理 |
-|---|---|
+| --- | --- |
 | 多数工具针对明显不同的资源；描述交叉引用替代方案 | 保留；每个工具都写明“何时用 / 何时改用哪个工具” |
 | `spec_list` 与 `registry_search` 的协议包元数据轻微重叠 | `spec_list` 描述已明确为**权威协议包目录**；`registry_search` 明确为**模块查询**，协议命中只是 secondary lookup。行为不变（跨语言契约，避免 Rust/.NET 双实现漂移） |
 | `pipeline_list` / `pipeline_read` 是标准列表/读取对，但可能混淆 | `pipeline_list` 只返回 path/title 元数据；`pipeline_read` 返回全文；两者描述互相指向 |
@@ -405,7 +405,7 @@ MCP 描述实证研究放在一起对照，结论更清楚。
 ### 15.1 参考标准
 
 | 标准 | 核心要求 | 对本仓的含义 |
-|---|---|---|
+| --- | --- | --- |
 | [MCP Tools 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools) | `name` / `title` / `description` / `inputSchema` / `outputSchema` / annotations；错误语义；确定性顺序 | 我们已齐全；`structuredContent` + 文本 fallback |
 | [Anthropic Tool Design](https://github.com/anthropics/claude-plugins-official/blob/main/plugins/mcp-server-dev/skills/build-mcp-server/references/tool-design.md) | 描述是契约：做什么、返回什么、**不做什么**；兄弟工具互相指向；参数逐个说明；错误可恢复；1–15 工具最佳 | 本仓 12 工具；`asset_read` 明确不用来枚举/读模块/读管线 |
 | [TDQS rubric](https://github.com/glama-ai/tool-definition-quality-score) + [风格指南](https://github.com/logly/mureo/blob/main/docs/tdqs-style-guide.md) | 六维；模板“动词+资源 → 返回 → 副作用 → 默认值 → when/prefer”；典型 50–100 词，复杂工具最多约 150 | `asset_read` 从 109 压到 **100 词**，正好落在上限 |
@@ -497,7 +497,7 @@ coherence 4.8–5.0 · mean 4.9 · min 4.8–4.9
 `resource_operation`：
 
 | 旧名 | 新名 |
-|---|---|
+| --- | --- |
 | `pipeline_ls` | `pipeline_list` |
 | `spec_ls` | `spec_list` |
 | `pattern_ls` | `pattern_list` |

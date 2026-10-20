@@ -38,7 +38,7 @@
 ## 五、本仓已有的安全机制（供报告前自查）
 
 | 机制 | 载体 | 判据 |
-|---|---|---|
+| --- | --- | --- |
 | 危险 sink 面（动态执行/反序列化/递归删除） | `desktop/src/core/purity_scan.py` | check27 R6（放行须登记理由） |
 | 明文密钥扫描 | `ci-verify.yml` | 命中即红 |
 | 依赖固定 + 版本审计 | `.github/requirements-*.txt` + `dependency-audit.yml` | 每周 + push |

@@ -1,8 +1,8 @@
 # llms-install.md — 给 agent 的安装说明书（NinFenz / NF）
 
 > 用途：任何 agent（Cline / Claude Code / Cursor / Codex / 自研）**只读这一份**就能把 NF 装好、自检、接上 MCP。
-> 机器入口：https://ninfenz.dev/llms.txt　事实源：https://ninfenz.dev/facts.json　完整单文件：https://ninfenz.dev/llms-full.txt
-> 许可 MIT —— 使用请保留 LICENSE 与署名；官方唯一入口 https://ninfenz.dev，**无付费版**，不需要下载任何第三方客户端。
+> 机器入口：<https://ninfenz.dev/llms.txt>　事实源：<https://ninfenz.dev/facts.json>　完整单文件：<https://ninfenz.dev/llms-full.txt>
+> 许可 MIT —— 使用请保留 LICENSE 与署名；官方唯一入口 <https://ninfenz.dev，**无付费版**，不需要下载任何第三方客户端。>
 
 ## 0 一句话
 
@@ -12,7 +12,7 @@ NinFenz（宁封子，简称 NF）是**内容契约层**：用「协议 + 确定
 ## 1 前置
 
 | 需要 | 说明 |
-|---|---|
+| --- | --- |
 | Python ≥ 3.11 | **仅标准库**，零第三方依赖 |
 | Node ≥ 20 | 仅在使用 npm 包入口（`npx -y ninfenz`）时需要 |
 | git | 仅克隆路线需要 |
@@ -93,19 +93,19 @@ python scripts/nf.py conformance    # 一致性分级（只读面不虚标）
 ## 5 常见问题
 
 | 现象 | 原因与处理 |
-|---|---|
+| --- | --- |
 | `npx ninfenz` 报 404 | 本地 npm 指向镜像且镜像滞后：加 `--registry https://registry.npmjs.org` |
 | `nf serve` 无输出 | 它是 stdio 服务，**等 stdin 的 JSON-RPC 帧**；直接回车不会打印菜单 |
 | 门禁很慢 | 全量含 `约 2500` 个单测；只做日常检查用 `nf doctor` / `nf stats --check` |
-| 想读全部协议 | https://ninfenz.dev/llms-full.txt（单文件）或 MCP 的 `library_search` / `spec_list` |
+| 想读全部协议 | <https://ninfenz.dev/llms-full.txt（单文件）或> MCP 的 `library_search` / `spec_list` |
 
 ## 6 出口面（agent 可直接抓）
 
 | 入口 | 地址 |
-|---|---|
-| 站点（官方唯一） | https://ninfenz.dev/ |
-| 清单 | https://ninfenz.dev/llms.txt |
-| 完整单文件 | https://ninfenz.dev/llms-full.txt |
-| 机读事实 | https://ninfenz.dev/facts.json |
-| npm | https://www.npmjs.com/package/ninfenz |
-| 仓库 | https://github.com/Monyeah777/NinFenz |
+| --- | --- |
+| 站点（官方唯一） | <https://ninfenz.dev/> |
+| 清单 | <https://ninfenz.dev/llms.txt> |
+| 完整单文件 | <https://ninfenz.dev/llms-full.txt> |
+| 机读事实 | <https://ninfenz.dev/facts.json> |
+| npm | <https://www.npmjs.com/package/ninfenz> |
+| 仓库 | <https://github.com/Monyeah777/NinFenz> |

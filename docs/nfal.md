@@ -46,7 +46,7 @@ type: string / minLength: 1），仓内多处管线把它写成中文散文—�
 命名空间（不另造层级，直接借登记真源）：
 
 | 写法 | 真源 | 语义 |
-|---|---|---|
+| --- | --- | --- |
 | WorldState.time.day 一类 | protocol/world_slots.json 的 slots 全名 | 世界状态量（也接受 state. 前缀） |
 | event.<name> | protocol/event_registry.json 的 events | 事件是否发生（bool） |
 | token.<name> | 模块 machine_contract 的 outputs | 产出令牌（类型取 io_types） |

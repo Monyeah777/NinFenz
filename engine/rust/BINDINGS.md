@@ -6,7 +6,7 @@
 ## 两条路径，都在场
 
 | 路径 | 件 | 产物（本机实测） | 装载方 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | C ABI（P5-07.3） | ffi/ | `nf_ffi.dll` 1,216,134 B | `core/engine_loader.py` + ctypes |
 | PyO3（P5-07.1） | pyo3/ | `nf_pyengine.dll` 1,647,957 B | CPython `import nf_pyengine` |
 | maturin wheel（P5-07.2） | pyo3/pyproject.toml | `ninfenz_pyengine-0.1.0-cp311-cp311-win_amd64.whl` 615,758 B | `pip install` |
@@ -18,7 +18,7 @@
 ## C ABI 契约（导出的符号面，逐条枚举）
 
 | 符号 | 签名 | 语义 |
-|---|---|---|
+| --- | --- | --- |
 | `nf_engine_abi_version` | `() -> u32` | ABI 版本；`engine_loader.engine_abi()` 读的就是它 |
 | `nf_engine_abi_self_test` | `() -> u32` | 自证一次；把「装载成功」与「版本对」分开判 |
 | `nf_engine_abi_tag` | `() -> *const c_char` | `nf-ffi/1` |

@@ -25,7 +25,6 @@ python scripts/engine_status.py --abi      # dlopen + 调用一次（机制自�
 
 （`nf_engine_abi_version()` 的载入与调用实证见内部档案 63 §二十。）
 
-
 ## 评审者速览（2026-10-04 现值）
 
 **一句话**：本线是只读的**第二实现**，与 Python 真源**逐字节对账**；写面、执行层一概不碰。
@@ -147,7 +146,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 ### 落地到什么程度
 
 | 面 | 状态 |
-|---|---|
+| --- | --- |
 | `receipts` / `stats` / `layers --verify` | **逐字节一致**（含退出码），冷测 **6.4× / 3.7× / 4.2×**（同序） |
 | `conformance` 封缄内核 + 差分核对 | **逐字节一致**；27 条契约 digest 独立复核 27/27 |
 | `conformance` 契约 | **27/27 全部**逐字节一致（含 `purity-clean`——随内置解析器一并移植） |
@@ -184,7 +183,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 选 Rust 的依据是**内部实测**（本机 2026-10-03，同一语料 8,074 文件 / 807 MB），不是"语言偏好"：
 
 | 维度 | Python 侧 | Rust 侧 | 判定 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 进程冷启动 | 33.3 ms 裸解释器 / `nf --version` 93.1 ms | **11 ms** | 见下「一处已修正的旧数」 |
 | 目录遍历 | 275 ms（`os.scandir`） | 303 ms | **打平**——内核 I/O 受限，换语言不省 |
 | 遍历 + SHA-256 全仓 | 4,828 ms | **1,130 ms** | **4.3×**——CPU 受限，真优势 |
@@ -206,7 +205,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 ——否则第二次起量到的是"热"数；各取 **min of 7**。
 
 | 面 | Python 真源 | Rust 快线 | 倍数 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `stats --json` | 194.3 ms | **52.3 ms** | **3.7×** |
 | `layers --verify --json` | 1053.6 ms | **252.3 ms** | **4.2×** |
 | `receipts`（协议层回执） | 150.0 ms | **23.3 ms** | **6.4×** |
@@ -220,7 +219,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 ## 覆盖现状
 
 | 面 | 现状（实测） |
-|---|---|
+| --- | --- |
 | `nf receipts`（协议层回执单根 · RFC 6962 折叠） | **逐字节一致**：55,727 B / 同一 sha256；含 `subjects` 顺序与 `selfcheck` 折叠回根 |
 | `nf stats`（自述数字实算 · `repo_stats.compute` + `check`） | **逐字节一致**：662 B / 同一 sha256；**退出码同真源**（有 issue ⇔ 1） |
 | `nf layers --verify --json`（抽象阶梯体检 L1–L10） | **逐字节一致**：189 B / 同一 sha256；退出码同真源。含 `render_markdown` 渲染比对（L10）与 L6 反向 import 检测 |
@@ -240,7 +239,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 再钉成 Rust 判据。生成器都在 [`tools/`](tools/README.md)（`gen_*_branches.py` / `gen_*_expected.py`），期望值**从真源生成、勿手改**。
 
 | 面 | 夹具踩的形态 | 结果 |
-|---|---|---|
+| --- | --- | --- |
 | `schema_lint` | 280 条合成 `instance × schema` | 逐条一致 |
 | `knowledge` | 14 条 transform + 6 条 usage 分支（含 1 条**全绿样本**证明不空转） | 逐条一致，并**抓到 `preserve_order` 缺口** |
 | `coupling` | 10 种 import 写法（普通/多别名/点号模块/相对无模块/相对 core/相对带模块/括号多行/别名/字符串与注释里的假 import/`__init__` 忽略） | deps·Ca·Ce·I·环·SDP 全一致 |
@@ -314,7 +313,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 写在这里是为了让「为什么不移植」也可被复核，而不是一句"边界外"了事。
 
 | 判据 | 挡住它的东西 | 实证 |
-|---|---|---|
+| --- | --- | --- |
 | `purity` | **Python AST** | `purity_scan.py` `import ast`，R1-R7 与 L1-L4 阶梯都建立在语法树与调用图之上 |
 | `code_metrics` | **Python AST** | `code_metrics.py` `import ast`，规模/复杂度按 `ast.walk` 统计 |
 | `asset_contract` | **Python AST**（且是**控制流分析**） | `asset_contract.py` 有 `_scan_block` / `_none_deref` / `_always_exits` / `_guard` / `_derefs` 等十余处 `ast.*`——不是"顺带用一下 AST"，而是整条判据就是一套数据流检查 |
@@ -336,7 +335,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 `score` 6 个信号源里本线自算 4 个；余下 2 个：
 
 | 信号源 | 挡住它的东西 | 实证 |
-|---|---|---|
+| --- | --- | --- |
 | `purity_clean` | **Python AST** | `purity_scan.py` 530 行里 **22 处 `ast.`**，R1-R7 全靠语法树 |
 | `depth_clean` | **体量**（**不是**边界） | `quality_depth_scan.py` 聚合 **13 个子扫描器**；本线已移植 5 个（`asset_density` / `asset_ledger_projection` / `conformance_scan` / `instruction_step_audit` / `payload_registry`），余 8 个合计 **5,513 行**：`domain_pack` 1928 · `output_forms` 1293 · `pack_combo` 1154 · `world_model` 622 · `concept_graph` 345 · `world_slots` 74 · `tool_face` 59 · `payload_consumer` 38 |
 
@@ -382,6 +381,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 在真仓库上两者一致（`root` 就是仓库根），故契约行照旧逐字节相同；只有传给别的 `root` 时才分叉。
 这是一处**有意保留的分歧**：与其复刻一个纯度 bug，不如把「结论只依赖 root」这条性质守住。
 夹具里该路改用真仓库的值，使分支本身仍可比。
+
 ### `preserve_order`：一个只有"逐条踩分支"才抓得到的保真度缺口
 
 `knowledge-sources` 在真语料上是**全绿**的（三条子判据各 0 issues）——只靠契约对账，
@@ -396,6 +396,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 
 教训：**"契约行一致"不等于"判据正确"**。真源全绿的判据，其错误分支必须用合成夹具单独核——
 这和 `subset_validate` 那次的差分测试是同一条道理。
+
 ### 契约表的**退出码语义**（一处我自己埋的判定错误）
 
 对账门（面 5）与同行常驻判据**都**曾写「已移植契约 rc≠0 即不一致」。这是错的：**真源自己就会判某些契约
@@ -404,6 +405,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 
 正确判据是「**rc == 真源 ok 的映射**（true→0 / false→1）**且**行照比」。
 两侧都已改正；改完后门禁从「32 PASS + 1 FAIL」变成「33 PASS + 0 FAIL」，且 false 侧现在真的受核。
+
 ### `verify_report` 内核（门禁的机器可读出口）
 
 真源把 **28 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
@@ -482,6 +484,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 有一处口径极易踩空：`root_digest` 的源串是 CPython `json.dumps` 的**默认分隔符**
 （`", "` / `": "`，**带空格**），不是紧凑模式，也不是 `indent=2`。差一个空格摘要就全变。
 为此给 `pyjson` 补了第三种排版 `dumps_default`，并单列判据钉住。
+
 ### 行尾约定（**重要偏差披露**）
 
 本线所有输出统一为 **LF、无 BOM、文末有换行**。
@@ -554,7 +557,7 @@ half-away-from-zero 且引入二次误差）。
 ### 性能现状（min of 7，同机同语料；**冷算口径**）
 
 | 面 | 真源（冷算） | 本线 | |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `conformance` 封缄（27 条） | 1502 ms | **11 ms** | 130× |
 | `receipts` | 118 ms | **20 ms** | 5.9× |
 | `stats --json` | 193 ms | **50 ms** | 3.9× |
@@ -598,7 +601,7 @@ double 上（如精确值 `153838026194641.125`）。CPython 取**正确舍入�
 **剩余 23 条的移植性普查**（2026-10-03，按真源内核的依赖面分类）：
 
 | 类别 | 契约 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | **已移植 26 条** | `canonical-digest-determinism` · `decisions` · `declaration` · `audit` · `doc-kinds` · `event-backing` · `handover` · `knowledge-sources` · `library-projection` · `library-verify` · `modeling` · `module-signature` · `patterns` · `postmortem` · `public-surface` · `schema-clean` · `state-front` · `st-quality` · `rfc-heads` · `cognition` · `assertions` · `endpoint-contract` · `io-types` · `type-backlog` · `mcp-package` · `pipeline-dryrun` | `doc-kinds` 走 `doc_hygiene.rs`（纯表驱动）；`module-signature`/`event-backing` 走 `miniyaml.rs`；`modeling` 走 `pyconsts.rs`；`handover`/`postmortem` 走 `mdblocks.rs` |
 | 依赖 Python 源码里的运行期数据 | `mcp-package` | 需解析 `mcp_runtime.py` 的 `PROMPT_DEFS` 等——**刻意不做**：解析 Python 源码换覆盖率，代价是脆性 |
 | 已用**常量表**绕开（本轮） | ~~`endpoint-contract`~~ | 真源 `TOOL_DEFS` 是**代码常量**（与 `root` 无关），故本线用转录的常量表复刻其名字集——**不算"解析 Python 源码"**。两张表已收进 [`src/mcp_tables.rs`](src/mcp_tables.rs)（`tools/gen_mcp_tables.py` 生成）。**守护已就位**：`mcp-package` 契约判「声明的 tools/prompts 与运行时逐名一致」——真源增删工具面时它会红 |

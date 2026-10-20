@@ -41,7 +41,7 @@ Before changing anything, ask three questions; the answers are written in the ta
 ### The abstraction axis: four rungs
 
 | Rung | Source-of-truth surface | Interface surface (the only thing cross-rung dependency may rely on) | Existing criteria | Status / change class |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **Contract** | `01_核心协议.md`, `02_联动注册表.md`, `06_Agent执行协议.md`, `07_官方核心出厂与社区预设导航.md`, `STRATEGY.md`, `protocol/*.md`, `protocol/*.json`, `protocol/schema/*.json`, `desktop/src/core/registry.json`, `integrations/*/integration.json` | `protocol/schema/*.json`, `protocol/CONFORMANCE.md`, `desktop/src/core/registry.json` | check13, check28, check29, check30, check31 | active (bump) |
 | **Asset** | `03_管线库/*.md`, `04_模块库/*/*.md`, `05_资产库/**/*`, `community/**/*`, `library/*.md`, `patterns/*/PATTERN.md` | `community/*/protocol.yaml`, `05_资产库/provenance.json` | check7, check8, check9, check10, check11, check14, check15, check16, check23, check24, check34 | active (additive) |
 | **Engine** | `desktop/src/core/*.py`, `desktop/tests/**/*.py`, `desktop/scripts/*.py`, `scripts/*.py`, `scripts/*.sh`, `scripts/nf`, `scripts/nf.cmd` | `scripts/nf.py` | check12, check17, check18, check19, check20, check21, check22, check27, check32, check33 | active (additive) |
@@ -50,7 +50,7 @@ Before changing anything, ask three questions; the answers are written in the ta
 ### The five sublevels of the asset rung (heterogeneous within one cell — assess their costs separately)
 
 | Sublevel | Source-of-truth surface | Existing criteria | Framing |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Declaration** | `community/*/protocol.yaml` | check14 | An instance of the contract: changing it must go through the three registration requirements (01 §6.1 + 02 §8.3 + registry projection). |
 | **Content** | `03_管线库/*.md`, `04_模块库/*/*.md`, `community/*/modules/*.md`, `community/*/pipelines/*.md` | check7, check9, check24 | Module and pipeline bodies: bound by the numbering namespace and the mount layers. |
 | **Data** | `05_资产库/**/*`, `community/*/assets/*.md` | check8, check11, check23 | Asset keys and the provenance ledger: the criteria are addressable / traceable / no orphan keys. |
@@ -60,7 +60,7 @@ Before changing anything, ask three questions; the answers are written in the ta
 ### Entry surface (registers roles only, never a source of truth)
 
 | Surface | Entry artifact | Serves rung | Framing |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Human–machine entry** | `scripts/nf`, `scripts/nf.cmd`, `scripts/nf.py` | engine | With no arguments it enters the terminal (nf shell → desktop/src/core/terminal.py); all other arguments pass through to the CLI. |
 | **AI assembly line** | `docs/agent/AGENT_START.md`, `docs/agent/agent_组装指令包_v0.2.md`, `docs/agent/AI_ROUTING.md` | asset | Any agent can self-serve and assemble the "full edition" from the repository URL alone; the same tier as line A (human–machine), with no model presupposed. |
 | **MCP service surface** | `docs/mcp.md`, `protocol/mcp_package.json` | engine | Long-running runtime entry = nf serve (the CLI surface of the engine rung); this surface registers only the contract and the usage documentation. |
@@ -69,7 +69,7 @@ Before changing anything, ask three questions; the answers are written in the ta
 ### Verification vertical slice (cuts across all four rungs, not a layer)
 
 | Artifact | Landing point | Existing criteria |
-|---|---|---|
+| --- | --- | --- |
 | **verify** | `verify.sh` | check27 |
 | **conformance** | `protocol/conformance_report.json` | check35 |
 | **audit** | `results/audit` | check36 |

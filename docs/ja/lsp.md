@@ -1,4 +1,5 @@
 # エディタ接続（LSP）
+>
 > 最后更新：2026-10-07 (last updated)
 
 ## これは何か
@@ -16,7 +17,7 @@
 ### 能力表
 
 | 能力 | LSP メソッド | 説明 |
-|---|---|---|
+| --- | --- | --- |
 | 同期 | `initialize` → `textDocumentSync` | full-sync（openClose + save）。**増分同期はしない** |
 | 診断 | `textDocument/publishDiagnostics` | 二つの源（`nf` 機械規則 / `nf-prose` 本文 lint）。各行・各列が実位置 |
 | 修復 | `textDocument/codeAction` | `quickfix`：最小の行単位編集（再生検証に通らなければ全文置換へ後退） |

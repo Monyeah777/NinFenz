@@ -13,7 +13,7 @@
 ## 二、FDE 侧的交付判定（把诉求翻译成可判定项）
 
 | 客户诉求 | 可判定项 | 本样例的落点 |
-|---|---|---|
+| --- | --- | --- |
 | 概念先后写清 | 概念前置图健康 + 闭包/装载序可复算 | G3 + `evidence/deliverable.md` §2 |
 | 依据什么 | 每条细分绑定在册标准（主锚 + 辅锚） | `protocol/standards_binding.json` · `docs/standards/index.md` |
 | 怎么验收 | 单入口门禁 + 逐门判据 | G1–G5 + `evidence/gates.txt` |

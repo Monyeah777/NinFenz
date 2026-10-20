@@ -1,4 +1,5 @@
 # NinFenz MCP access (`nf serve` · plan 40 v2.7 Wave A S1-E3 / X2)
+>
 > 最后更新：2026-10-18 (last updated)
 
 > **Status**: the public documentation landed with base layer v2.7; **the E3 protocol-level load test passed on 2026-09-08** (a direct stdio JSON-RPC frame-sequence test of all five methods came back green — see the record at the end of this document; it fixed two P06 pipeline gaps — a missing closing ``` / a missing techdoc declaration). 41 Wave C C7 (2026-09-08) opened read-only tools/prompts (local stdio smoke test passed; see docs/41_波C_C7_实测记录.md). **Host-class clients (GUI loading such as Claude Desktop) still need user-side backfill** — the README's MCP claims stay as they are (the S13 gate opens per the docs_external-validation-v2.7.md rules), and "promotion" is filled in after the backfill.
@@ -82,7 +83,7 @@ From 41 Wave C C7 onward, an agent can also call read-only retrieval tools: `pip
 ## Capability table (one-to-one with the mcp_runtime implementation)
 
 | Method | Implementation | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `server/discover` | ✅ | modern-required: returns `supportedVersions` / `capabilities` / `_meta.serverInfo` + `instructions`/`ttlMs` in one shot |
 | `initialize` | ✅ | legacy handshake: echoes the requested version when supported, otherwise falls back to `2025-11-25`; `serverInfo` is self-described (not the snapshot file's top level) |
 | `notifications/initialized` | ✅ silent | notifications have no id and get no response |
@@ -152,7 +153,7 @@ the filter had taken effect) — all "looks normal" wrong answers.
 ### 1. External identity
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | Name | `NinFenz Content Gate` |
 | One-liner | Give any AI agent a verifiable content specification and asset foundation — check the contract first, then write. |
 | Category | `content-creation` |

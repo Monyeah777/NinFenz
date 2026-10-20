@@ -1,4 +1,5 @@
 # 互操作导出（interop）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-21
 
@@ -8,7 +9,7 @@
 **不新增真源**，因此不存在"导出面与真源漂移"这种故障模式。
 
 | 导出种类 | 真源（唯一） | 形状 | 消费方 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `openapi` | `protocol/endpoint_contract.json` | OpenAPI 3.1 | OpenAPI 校验器 / 客户端生成器 |
 | `asyncapi` | `protocol/event_registry.json` + `external_events.json` | AsyncAPI 3.0（含 CloudEvents 1.0 属性） | 事件网关 / 代码生成器 |
 | `intoto` | `protocol/RECEIPTS.json` | in-toto Statement v1 | in-toto / cosign 系校验器 |
@@ -79,7 +80,7 @@ python scripts/check_interop_schemas.py --fetch --write results/interop-schema-v
 （`results/interop-schema-validation.md`）。已知实测（2026-09-21）：
 
 | 面 | 官方 schema | 实测 |
-|---|---|---|
+| --- | --- | --- |
 | openapi | `spec.openapis.org/oas/3.1/schema/2022-10-07` | **通过** |
 | asyncapi | `asyncapi/spec-json-schemas: schemas/3.0.0.json` | **通过**（draft-07 方言，须按 `$schema` 选 validator） |
 | sbom | `spdx/spdx-spec: schemas/spdx-schema-2-3.json` | **通过**（首轮 FAIL 两处，见下） |

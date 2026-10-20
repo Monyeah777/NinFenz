@@ -1,4 +1,5 @@
 # Editor integration (LSP)
+>
 > 最后更新：2026-10-07 (last updated)
 
 ## What this is
@@ -17,7 +18,7 @@ the MCP face).
 ### Capability table
 
 | Capability | LSP method | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Sync | `initialize` → `textDocumentSync` | full-sync (openClose + save); **no incremental sync** |
 | Diagnostics | `textDocument/publishDiagnostics` | two sources (`nf` mechanical rules / `nf-prose` prose lint), each with real line/column |
 | Fix | `textDocument/codeAction` | `quickfix`: minimal line-level edits (falls back to a whole-document replace if replay verification fails) |

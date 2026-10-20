@@ -1,6 +1,6 @@
 # 02 · Cline MCP Marketplace —— Issue 正文（复制整段）
 
-> 用途：打开 https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml 并粘进对应字段。
+> 用途：打开 <https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml> 并粘进对应字段。
 > **上传附件**：仓库里的 `packaging/mcp/assets/icon-400.png`（要求 400×400 PNG）。
 
 ```text

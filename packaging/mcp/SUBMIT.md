@@ -1,6 +1,7 @@
 # NinFenz Content Gate · 三个目录的提交教程
 
 > 目标：把 **NinFenz Content Gate** 提交到
+>
 > 1. **GitHub 官方 MCP Registry**（`registry.modelcontextprotocol.io`）
 > 2. **Awesome MCP Servers**（`punkpeye/awesome-mcp-servers`）
 > 3. **AgentSkillsHub**（`agentskillshub.dev`）
@@ -13,7 +14,7 @@
 ## 0. 先看当前状态（避免重复提交）
 
 | 项目 | 当前值 |
-|---|---|
+| --- | --- |
 | 官方 Registry 名称 | `io.github.Monyeah777/ninfenz` |
 | 官方 Registry 版本 | **1.0.1（已上架）** |
 | npm 包 | `ninfenz@1.0.1`，包内已有 `mcpName` |
@@ -21,8 +22,8 @@
 | 工具面 | **12 个只读工具 + 1 个 prompt**，无写路径 |
 | 安装（零安装） | `npx -y ninfenz serve` |
 | 安装（有检出） | `python scripts/nf.py serve` |
-| 仓库 | https://github.com/Monyeah777/NinFenz |
-| 站点 | https://ninfenz.dev/ |
+| 仓库 | <https://github.com/Monyeah777/NinFenz> |
+| 站点 | <https://ninfenz.dev/> |
 | 许可 | MIT |
 
 **先判断你要做哪一种：**
@@ -37,9 +38,9 @@
 
 官方文档：
 
-- Quickstart：https://modelcontextprotocol.io/registry/quickstart
-- 认证：https://modelcontextprotocol.io/registry/authentication
-- Registry：https://registry.modelcontextprotocol.io/
+- Quickstart：<https://modelcontextprotocol.io/registry/quickstart>
+- 认证：<https://modelcontextprotocol.io/registry/authentication>
+- Registry：<https://registry.modelcontextprotocol.io/>
 
 > Registry 目前是 **preview**，可能发生 breaking change 或数据重置；以官方文档为准。
 
@@ -162,7 +163,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 ### 1.7 常见错误
 
 | 报错 | 原因 | 处理 |
-|---|---|---|
+| --- | --- | --- |
 | `missing 'mcpName' field` | npm 包没有 `mcpName`，或 Registry 查的是旧版本 | 确认 npm 包里 `mcpName` 存在，且 `server.json` 版本 = npm 已发布版本 |
 | `Registry validation failed for package` | 包类型/版本/字段不合法 | 对照官方 `server.json` schema，先确认 npm 包已发布 |
 | `You do not have permission to publish this server` | 登录账号与 `io.github.<user>` 不匹配 | 用仓库属主 GitHub 账号登录，或改 `name` |
@@ -195,8 +196,8 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 
 ## 2. Awesome MCP Servers
 
-仓库：https://github.com/punkpeye/awesome-mcp-servers
-投稿规则：https://github.com/punkpeye/awesome-mcp-servers/blob/main/CONTRIBUTING.md
+仓库：<https://github.com/punkpeye/awesome-mcp-servers>
+投稿规则：<https://github.com/punkpeye/awesome-mcp-servers/blob/main/CONTRIBUTING.md>
 
 ### 2.1 适合放在哪个分类
 
@@ -226,7 +227,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 
 ### 2.3 网页操作（最省事）
 
-1. 打开 https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md
+1. 打开 <https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md>
 2. GitHub 会自动 fork；
 3. 在 **Knowledge & Memory** 区找 `N` 段（例如 `NicolasPrimeau/artel` 附近），插入上面那一行；
 4. 保持一行一个 server，不要动其它行；
@@ -278,14 +279,14 @@ tools plus one assembly prompt; there are no write paths.
 
 ## 3. AgentSkillsHub
 
-提交页：https://agentskillshub.dev/submit/
+提交页：<https://agentskillshub.dev/submit/>
 
 它是**人工审核**的目录；提交免费，但不保证收录，也没有承诺审核时限。
 
 ### 3.1 表单怎么填
 
 | 字段 | 填什么 |
-|---|---|
+| --- | --- |
 | **GitHub Repository URL** | `https://github.com/Monyeah777/NinFenz` |
 | **Primary Category** | **Development**（备选：Productivity） |
 | **Maintainer Email** | 你能收信的邮箱（只用于审核联系，不必公开） |
@@ -370,13 +371,13 @@ python scripts/nf.py serve
 ### 4.5 关键链接
 
 | 用途 | 链接 |
-|---|---|
-| 仓库 | https://github.com/Monyeah777/NinFenz |
-| npm | https://www.npmjs.com/package/ninfenz |
-| 站点 | https://ninfenz.dev/ |
-| 安装说明 | https://github.com/Monyeah777/NinFenz/blob/main/llms-install.md |
-| 官方 Registry 查询 | https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFenz |
-| Glama | https://glama.ai/mcp/servers/Monyeah777/NinFenz |
+| --- | --- |
+| 仓库 | <https://github.com/Monyeah777/NinFenz> |
+| npm | <https://www.npmjs.com/package/ninfenz> |
+| 站点 | <https://ninfenz.dev/> |
+| 安装说明 | <https://github.com/Monyeah777/NinFenz/blob/main/llms-install.md> |
+| 官方 Registry 查询 | <https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFenz> |
+| Glama | <https://glama.ai/mcp/servers/Monyeah777/NinFenz> |
 
 ---
 

@@ -1,4 +1,5 @@
 # 编辑器接入（LSP）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的配置与判定，勿当资料阅读。
 > 最后更新：2026-10-07
 
@@ -15,7 +16,7 @@
 ### 能力表
 
 | 能力 | LSP 方法 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | 同步 | `initialize` → `textDocumentSync` | full-sync（openClose + save）；**不做增量同步** |
 | 诊断 | `textDocument/publishDiagnostics` | 两类源（`nf` 机械规则 / `nf-prose` 正文 lint），逐条带真实行/列 |
 | 修复 | `textDocument/codeAction` | `quickfix`：最小行级编辑（回放校验不过则退整文档替换） |

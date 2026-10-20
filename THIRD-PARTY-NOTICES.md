@@ -12,7 +12,7 @@
 ## 清单
 
 | 组件 | 版本 | 许可证 | 主页 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `boolean-py` | 5.0 | **BSD-2-Clause** | [链接](https://github.com/bastikr/boolean.py) |
 | `cachecontrol` | 0.14.4 | **Apache-2.0** | [链接](https://pypi.org/project/CacheControl/) |
 | `certifi` | 2026.7.22 | **Mozilla Public License 2.0 (MPL 2.0)** | [链接](https://github.com/certifi/python-certifi) |

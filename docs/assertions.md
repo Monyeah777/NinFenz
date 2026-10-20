@@ -1,4 +1,5 @@
 # 断言表（assertions）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-15
 
@@ -19,7 +20,7 @@ python scripts/nf.py lint --kinds          # 四型写法判据（信息类型�
 ## 判据（kind 为**封闭集**，不自造 DSL）
 
 | kind | 用途 | 必填 params |
-|---|---|---|
+| --- | --- | --- |
 | `regex_absent` | 某类件里**不得**出现某模式（如绝对路径泄漏） | `globs`、`pattern` |
 | `regex_present` | 某件必须含若干锚点 | `path`、`patterns` |
 | `count_at_least` | 匹配件数下限（如 IDL 五定义在场） | `glob`、`min` |

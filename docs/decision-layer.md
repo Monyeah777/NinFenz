@@ -1,4 +1,5 @@
 # 决策层（decide）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-22
 
@@ -55,7 +56,7 @@ python scripts/pull_decision_model.py --candidate laya-multilingual --run --yes
 ## 候选模型（2026-09-21 取回模型卡与配置的实证）
 
 | 候选 | 来源 | 许可 | 规模 / 形态 | 语言 | 实证要点 | 边界 |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | `laya-typed-decisions` | `hf:convaiinnovations/laya-typed-decisions` | Apache-2.0 | ModernBERT-large · 421M · ctx 1024 | en | accuracy 0.766 / Brier 0.062 / **ECE 0.213**；四 workflow 专用 | 英文专用；作者自述 specialist，勿作静默默认；选项建议 <20 |
 | `laya-multilingual` | `hf:convaiinnovations/laya-multilingual` | Apache-2.0 | mmBERT-base · 322M · ctx 1024 | **100+ 语言（含中文）** | 同族多语面 | 中文 state 应优先此变体而非英文专用 checkpoint |
 | `open-jev-9b` | `hf:ZefanCai/Open-Jev-9B` | Apache-2.0 | Qwen3.5-9B 的 **LoRA 适配器 + 决策头**（非自回归） | 取决于 base | 只评调用方给的候选；`/v1/systemone` 服务口径；需 base 精确 revision `c2022362…` | 需 GPU + Open-Jev loader；`AutoPeftModel` 直调不实现该接口 |

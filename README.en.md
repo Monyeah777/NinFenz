@@ -4,7 +4,7 @@
 
 [![verify gate ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
-**Live site**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
+**Live site**: <https://ninfenz.dev> · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
 **NF terminal (TUI) demo** — a full-screen human entry built on the standard library only; its menu and actions are controlled callers of the real `nf` CLI.
 Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `↑↓` moves inside the focused pane, `/` filters, `?` opens the keymap.
@@ -115,7 +115,7 @@ AI assembly:
 ## Protocol chain and documentation map
 
 | Layer | Entry |
-|---|---|
+| --- | --- |
 | Direction | `STRATEGY.md` |
 | Protocol | `01_核心协议.md` · `02_联动注册表.md` · `06_Agent执行协议.md` · `07_官方核心出厂与社区预设导航.md` · `protocol/WORLD_MODEL.md` |
 | Library | `03_管线库/` · `04_模块库/` · `05_资产库/` |
@@ -128,7 +128,7 @@ AI assembly:
 ## Version block
 
 | Version | Status |
-|---|---|
+| --- | --- |
 | v2.11.0 | current (2026-09-10) · world_model deterministic abstract-state contract + world_slots |
 | v2.10.0 | released 2026-09-09 · 45 quality depth + foundation-layer wave A |
 | v2.9.0 | released 2026-09-08 · STRATEGY + waves 43/44 |

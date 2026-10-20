@@ -6,13 +6,14 @@
 ## 0. 三条日常命令
 
 | 目的 | 命令 |
-|---|---|
+| --- | --- |
 | 一键门（聚合 11 件 + 227 例自检 + 性能基线） | `pwsh -NoProfile -File engine/dotnet/run-gate.ps1 -Root <语料> -Cli <nf-dotnet>` |
 | 全量判据跑批（默认 core 档） | `pwsh -NoProfile -File engine/dotnet/run-probes.ps1 -Tier core` |
 | 单条判据 | `python engine/dotnet/probes/<probe>.py --snap <语料> --cli <nf-dotnet>` |
 
 两个 PS1 的默认值按「**环境变量 → `probes/_paths.local.json` → PATH 通用名**」三级解析：换机器时只写本地配置，或设
 `NF_SNAPSHOT` / `NF_SNAPSHOT_OTHER` / `NF_CLI` / `NF_PYTHON` / `NF_DOTNET` / `NF_BASH`。
+
 ## 0.1 C ABI 共享库出口（`src/Nf.Engine.Native/`）
 
 给 `desktop/src/core/engine_loader.py` 一个**可 dlopen 的原生库**：`NativeExports.cs` 用
@@ -30,7 +31,6 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
 > `nf_engine_native.dll`（1.1 MB），`engine_loader.engine_abi(...)` → **1**（真 dlopen + 调 C ABI），
 > `python scripts/engine_status.py` 列出该候选库。产物落 `engine/dotnet/dist/`（`.gitignore` 的 `dist/`，不入库）。
 > 本件是**独立的"原生出口壳"**，不改 `Nf.Engine` 主库的 **BCL-only** 依赖姿态（ADR-0005）。
-
 
 ## 1. 加一条判据（标准流程）
 

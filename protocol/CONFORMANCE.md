@@ -1,4 +1,5 @@
 # NF 一致性声明（CONFORMANCE）
+>
 > ⛔ 操作指令：本文件是**机检声明**——三段（声明 / 范围 / 排除）由 `nf conformance --declaration` 逐条断言；改数字改不动门禁（版本一律与真源比对）。
 > 最后更新：2026-09-25
 
@@ -9,7 +10,7 @@
 ## 声明
 
 | 规范 | 版本 | 真源 |
-|---|---|---|
+| --- | --- | --- |
 | protocol.yaml schema | `2` | 01 §6.1 / 各包 `protocol.yaml` |
 | registry schema | `2` | 02 头部 + `desktop/src/core/registry.json` |
 | machine_contract schema | `1` | `protocol/schema/contract.schema.json` |
@@ -46,7 +47,7 @@
 > 「允许不存在」标注的条目为运行期/本地件（可不在库内，缺省不算缺口）；其余条目路径须真实存在。
 
 | 路径 | 理由 |
-|---|---|
+| --- | --- |
 | `.rivet` | 本地 AI 协作工作区（运行时状态与内部档案，不入库；**允许不存在**——运行期/本地件，fresh clone 无此目录属预期） |
 | `results` | 审计与外部实测记录（历史时点事实，不随现状更新） |
 | `docs/41_*` | 波 C 逐波实测记录（历史） |

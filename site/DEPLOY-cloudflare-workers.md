@@ -4,7 +4,6 @@
 > 站内 canonical / hreflang / og:url / JSON-LD @id / sitemap / robots / llms.txt **已全部指向该地址**（自洽）。
 > 买下 `ninfenz.dev` 后切回：`node site/tools/set-origin.mjs https://ninfenz.dev --write && npx wrangler deploy`。
 
-
 > 对应文档：Workers Builds → Settings → Build（字段名与默认值取自 Cloudflare 官方文档，2026-09-22 / 10-01 更新）。
 > 本仓库是**纯静态站**（`site/`），因此走 **Workers 静态资产（assets-only，无 `main` 脚本）**，不需要任何构建步骤。
 
@@ -13,7 +12,7 @@
 ## 一、面板四个字段（照抄）
 
 | 字段 | 填什么 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | **构建命令**（Build command，可选） | **留空** | 站点是预构建的静态 HTML，没有构建步骤。留空即跳过（Cloudflare 仍会尝试依赖安装，但仓库根无 `package.json`/锁文件，等于无操作）。 |
 | **部署命令**（Deploy command） | `npx wrangler deploy` | 即默认值。它读取仓库根的 `wrangler.jsonc`，把 `./site` 作为静态资产上传并发布。 |
 | **预览命令**（Preview command） | `npx wrangler versions upload` | 二选一，见下方「预览命令怎么选」。 |
@@ -22,7 +21,7 @@
 ### 预览命令怎么选
 
 | 选项 | 产物 | 何时用 |
-|---|---|---|
+| --- | --- | --- |
 | `npx wrangler preview`（**Cloudflare 默认**） | 一个 **Preview**（含 Preview URL），切换生产流量时才需要 promote | 想看「改动后的整站」并且要一个稳定 URL 给人点开 |
 | `npx wrangler versions upload`（**推荐**） | 一个 **Worker Version**（含 Version URL） | 静态站改动的常规评审：更快、更轻；不产生分支隔离资源 |
 
@@ -33,7 +32,7 @@
 ## 二、高级设置（逐项）
 
 | 项 | 我们的取值 | 备注 |
-|---|---|---|
+| --- | --- | --- |
 | **根目录 / Root directory** | 留空 | 若将来把站点挪到子目录（如 monorepo），这里填子目录路径 |
 | **构建输出目录 / Build output directory** | **不存在这一项** | 那是 **Pages** 的字段。Workers 的资产目录由 `wrangler.jsonc` 的 `assets.directory`（=`./site`）决定 |
 | **构建变量与密钥 / Build variables and secrets** | 可选：`WRANGLER_SEND_METRICS=false` | 只在构建期可见，运行期不可见；构建镜像相关的变量以官方 Build image 文档为准 |
@@ -47,7 +46,7 @@
 ## 三、配套文件（已在仓库里）
 
 | 文件 | 作用 |
-|---|---|
+| --- | --- |
 | `wrangler.jsonc` | Worker 名 `ninfenz`；`assets.directory = ./site`；`html_handling = auto-trailing-slash`；`not_found_handling = 404-page` |
 | `site/_headers` | 安全头（nosniff / Referrer-Policy / X-Frame-Options / Permissions-Policy）+ 缓存策略（`/assets/*` 长缓存；HTML 不缓存；llms.txt/robots/sitemap 短缓存） |
 | `site/.assetsignore` | 不把 `CNAME`、`README.md`、`.nojekyll`、`_headers` 当资产上传 |
@@ -87,7 +86,7 @@ curl -s  https://ninfenz.dev/nope | findstr /I "404"             # 应回站内 
 ## 七、网址形状与 canonical（`ninfenz.<账号subdomain>.workers.dev` 是什么）
 
 | 网址 | 由什么决定 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | `ninfenz.<账号subdomain>.workers.dev`（例：`ninfenz.1764861918.workers.dev`） | Worker `name`（= `ninfenz`，见 `wrangler.jsonc`）+ **账号级** workers.dev subdomain | 官方规则：`<YOUR_WORKER_NAME>.<YOUR_SUBDOMAIN>.workers.dev`。`1764861918` 这种数字段是**账号的 subdomain**，可在 **Workers & Pages →「Your subdomain」旁的 Change** 修改；改一次，该账号下**所有** Worker 的 workers.dev 网址一起变 |
 | `https://ninfenz.dev` | 自定义域（Settings → Domains & Routes → Add custom domain） | **官方明确建议生产用 route 或自定义域**；workers.dev 被当作 Free website，定位是个人 / 爱好项目，不适合business-critical |
 
@@ -101,7 +100,7 @@ curl -s  https://ninfenz.dev/nope | findstr /I "404"             # 应回站内 
 ## 八、上线后的实际架构（2026-10-06 定稿）
 
 | 组成 | 说明 |
-|---|---|
+| --- | --- |
 | `wrangler.jsonc` · `main: site/worker.js` | 从 assets-only 升级为**静态资产 + 轻量 Worker**：Worker 只做 `www.*` → 裸域 **301**，其余原样交回 `env.ASSETS.fetch()` |
 | `assets.binding: "ASSETS"` | **必需**。`run_worker_first: true` 时若不声明绑定，`env.ASSETS` 是 `undefined`（本波 dry-run 实测拦下，否则全站崩） |
 | `assets.run_worker_first: true` | 每个请求先过 Worker（www 跳转必须），非 www 再交回资产层——`_headers` 规则实测照旧生效 |
@@ -129,6 +128,7 @@ node site/tools/sync-numbers.mjs --write  # 同步写入
 ```bash
 node site/tools/site-check.mjs https://ninfenz.dev
 ```
+
 ---
 
 ## 九、机器面（2026-10-07 增补：让 AI 客户端与 agent 直取）
@@ -136,7 +136,7 @@ node site/tools/site-check.mjs https://ninfenz.dev
 站点从「给人看的页面」扩到「给机器直取的面」。全部同源、纯静态、无构建步骤：
 
 | 面 | 给谁 | 内容 |
-|---|---|---|
+| --- | --- | --- |
 | `/llms.txt` | 检索 / AI（索引） | 有哪些面可读（llms.txt 惯例清单） |
 | `/llms-full.txt` | AI（完整） | 一文件读全：定义 / 事实 / 术语表 / 上手四条路径 / FAQ / 引用格式 |
 | `/nf.txt` | 客户端 AI | 装载指令：三条铁律 + 分支表 + 取件基底（读到即执行） |
@@ -174,4 +174,3 @@ node site/tools/site-check.mjs              # 联网判据（部署后）：状�
 
 CI 里已接 `sync-numbers.mjs` 与 `site-check.mjs --offline` 两步（.github/workflows/ci-verify.yml），
 所以站点数字或机器面漂移会与仓库门禁一起红。
-

@@ -1,4 +1,5 @@
 # リリース編成（release）
+>
 > ⛔ 操作指示：本ファイルはリリース方針の**人読投影**です。機読真源は `protocol/release_policy.json`（`protocol/schema/release.schema.json` で検証）、機検前置は check38 の `release_gate` 子スキャンです。読んだら実行してください。
 > 最后更新：2026-10-11 (last updated)
 
@@ -30,7 +31,7 @@ python scripts/nf.py release --freeze --apply --by <承認者> --note "<波の�
 三か所の登録が宙に浮いてはいけません（再計算口径は `core/quality_baseline.py` と VERSION-MATRIX 自身の双方向検証）：
 
 | 面 | 真源 | リリース時の操作 |
-|---|---|---|
+| --- | --- | --- |
 | `CHANGELOG.md` | 最新節 `## [X.Y.Z]` | 未公開 → 公開済みにし、PASS 基準を記録 |
 | `docs/meta/VERSION-MATRIX.md` | 版 × 方案 × 能力の行 | 一行追加（版 / 日付状態 / 方案 / 能力） |
 | `README.md` 版ブロック | 「現行」行 | 現行行を新版へ移す |

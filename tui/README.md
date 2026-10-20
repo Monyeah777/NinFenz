@@ -31,7 +31,7 @@ python tui/nf.py --exec "nf doctor"   # 非交互执行一条命令（脚本面�
 焦点模型是这类终端的第一条纪律：**`↑↓` 只在当前面板内移动，换面板另有其键**。
 
 | 键 | 作用 |
-|---|---|
+| --- | --- |
 | `Tab` · `←/→` · `h`/`l` | 切换面板（能力区 → 动作 → 输出，循环） |
 | `↑`/`↓` 或 `k`/`j` | 在**当前**面板内移动选择；输出面板上为逐行滚动 |
 | `Enter` | 运行选中动作；缺参数时逐项追问（路径参数过包含性判据） |
@@ -48,7 +48,7 @@ python tui/nf.py --exec "nf doctor"   # 非交互执行一条命令（脚本面�
 ## 给 agent 的四个面（无 TTY 也能用）
 
 | 面 | 用途 | 输出契约 |
-|---|---|---|
+| --- | --- | --- |
 | `python tui/nf.py --list-actions --json` | 发现全部动作、argv 模板与参数名 | 对象，顶层 `kind=nf-tui-actions` + `actions` / `exit_codes` / `surfaces` / `surface`（投影 schema·摘要·命令区数·重生命令） |
 | `python tui/nf.py --exec "nf doctor"` | 跑一条命令并透传其退出码 | stdout/stderr 即子命令原样；退出码 = 子命令退出码 |
 | `python tui/nf.py --selftest --json` | 安全底线自检 | 对象，顶层 `kind=nf-tui-selftest` + `ok` + 逐条 `rows` |
@@ -77,7 +77,7 @@ python tui/nf.py --exec "nf doctor"   # 非交互执行一条命令（脚本面�
 ## 退出码
 
 | 码 | 含义 | 典型触发 |
-|---|---|---|
+| --- | --- | --- |
 | 0 | 成功 | 命令跑完且退出 0 |
 | 1 | 失败 | 子命令非 0 退出 / 自检不通过 |
 | 2 | 用法错误 | argv 解析失败、动词不在白名单 |

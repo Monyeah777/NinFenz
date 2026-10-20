@@ -1,6 +1,6 @@
 # 搜索引擎提交：站点地图 · IndexNow · 各站控制台（详细流程）
 
-> 适用对象：NinFenz 站点（https://ninfenz.dev）。本文件是**操作手册**，不参与站点资产上传（已在 .assetsignore 里排除）。
+> 适用对象：NinFenz 站点（<https://ninfenz.dev）。本文件是**操作手册**，不参与站点资产上传（已在> .assetsignore 里排除）。
 > 最后更新：2026-10-08
 
 ---
@@ -8,7 +8,7 @@
 ## 0 一页速览：要提交什么、提交到哪、谁来做
 
 | 通道 | 覆盖引擎 | 提交物 | 谁做 | 状态 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | IndexNow（api.indexnow.org） | **Bing · Yandex · Seznam · Naver** | 4 个 URL（或整站） | 自动化，一条命令 | 已提交（见 §2 证据） |
 | Google Search Console | Google | sitemap.xml + 逐 URL 请求编入 | 你（需 Google 账号） | 待你操作（§3） |
 | Bing Webmaster Tools | Bing（供 DuckDuckGo/Ecosia 等下游） | 从 GSC 导入或自行验证 + sitemap | 你（微软/Google 账号） | 待你操作（§4） |
@@ -47,8 +47,8 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 
 1. 生成密钥：ninfenzff1511339a8885ca8dbee4b8（8–128 位字母数字）
 2. 放到站点根，文件内容就是密钥本身：
-   https://ninfenz.dev/ninfenzff1511339a8885ca8dbee4b8.txt
-3. 向 https://api.indexnow.org/indexnow POST 了 4 个 URL（见下方"响应码"与 §10 验收）
+   <https://ninfenz.dev/ninfenzff1511339a8885ca8dbee4b8.txt>
+3. 向 <https://api.indexnow.org/indexnow> POST 了 4 个 URL（见下方"响应码"与 §10 验收）
 
 复跑（任何时候改了页面就跑）：
 
@@ -62,7 +62,7 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 响应码怎么读：
 
 | 码 | 含义 | 处理 |
-|---|---|---|
+| --- | --- | --- |
 | 200 | 已接收 | 正常 |
 | 202 | 已接收，待处理 | 正常 |
 | 400 | 请求格式错误 | 检查 JSON |
@@ -70,7 +70,7 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 | 422 | URL 不属于该 host 或格式非法 | 检查 URL |
 | 429 | 提交过频 | 等一天再试，别轮询 |
 
-各引擎也可直接收：https://www.bing.com/indexnow · https://yandex.com/indexnow · https://search.seznam.cz/indexnow · https://searchadvisor.naver.com/indexnow。用 api.indexnow.org 一次即可（它负责分发）。
+各引擎也可直接收：<https://www.bing.com/indexnow> · <https://yandex.com/indexnow> · <https://search.seznam.cz/indexnow> · <https://searchadvisor.naver.com/indexnow。用> api.indexnow.org 一次即可（它负责分发）。
 
 ---
 
@@ -79,11 +79,11 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 ### 3.1 建属性：选"网域（Domain）"
 
 | 类型 | 覆盖 | 验证方式 |
-|---|---|---|
+| --- | --- | --- |
 | 网域 | ninfenz.dev 全部子域与协议（推荐） | 仅 DNS TXT |
 | 网址前缀 | 仅你写的那个前缀 | HTML 文件 / meta 标签 / DNS / GA / GTM |
 
-1. 打开 https://search.google.com/search-console → 添加资源 → 选 **网域** → 填 ninfenz.dev
+1. 打开 <https://search.google.com/search-console> → 添加资源 → 选 **网域** → 填 ninfenz.dev
 2. Google 给一条 TXT 记录：名称填 @（或 ninfenz.dev），值为 google-site-verification=XXXXXXXX
 3. **把这条值发我，我用 Cloudflare API 直接加进 DNS**（我们的 token 对该 Zone 有 DNS 编辑权）；或你自己加：Cloudflare 面板 → ninfenz.dev → DNS → 记录 → 添加记录 → 类型 TXT / 名称 @ / 内容粘贴 / TTL Auto → 保存
 4. 回控制台点"验证"。DNS 生效通常 1–5 分钟；失败就等 10 分钟再点（Google 会缓存失败结果）
@@ -97,7 +97,7 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 
 ### 3.3 逐个 URL 请求编入（可选，新站推荐）
 
-顶部搜索框粘 https://ninfenz.dev/ → 回车 → "请求编入索引"。每天配额有限，只对 / 与 /use/ 用。
+顶部搜索框粘 <https://ninfenz.dev/> → 回车 → "请求编入索引"。每天配额有限，只对 / 与 /use/ 用。
 
 ### 3.4 看什么指标
 
@@ -107,17 +107,17 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 
 ## 4 Bing Webmaster Tools
 
-1. https://www.bing.com/webmasters → 用微软或 Google 账号登录
+1. <https://www.bing.com/webmasters> → 用微软或 Google 账号登录
 2. 首选路径：**从 Google Search Console 导入**（省一次验证；前提是 §3 已完成）
 3. 独立验证也可以：加一条 BingSiteAuth.xml 或 DNS TXT（值发我，我加）
-4. 提交站点地图：左侧"站点地图" → 填 https://ninfenz.dev/sitemap.xml
+4. 提交站点地图：左侧"站点地图" → 填 <https://ninfenz.dev/sitemap.xml>
 5. IndexNow：Bing 侧无需额外配置；§2 的提交会体现在"URL 提交"日志里
 
 **本次已就位的三个验证面（2026-10-08 实测）**
 
 | 方式 | 落地 | 实测 |
-|---|---|---|
-| 文件 | site/BingSiteAuth.xml（内容 user = BC986533673F959259865E7DE5291890） | https://ninfenz.dev/BingSiteAuth.xml → HTTP 200，内容逐字一致 |
+| --- | --- | --- |
+| 文件 | site/BingSiteAuth.xml（内容 user = BC986533673F959259865E7DE5291890） | <https://ninfenz.dev/BingSiteAuth.xml> → HTTP 200，内容逐字一致 |
 | meta | 两语首页 head 的 msvalidate.01 | / 与 /en/ 的 head 均含该标签 |
 | CNAME | 8cc813b1e1544d36dcad3a23c48528da → verify.bing.com | Cloudflare 记录 proxied=false（**DNS-only**），已创建 |
 
@@ -129,20 +129,20 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 
 ## 5 Yandex Webmaster（可选）
 
-1. https://webmaster.yandex.com → 添加站点 → 验证选 DNS TXT（值发我）或 meta 标签
-2. "索引" →"站点地图" → 添加 https://ninfenz.dev/sitemap.xml
+1. <https://webmaster.yandex.com> → 添加站点 → 验证选 DNS TXT（值发我）或 meta 标签
+2. "索引" →"站点地图" → 添加 <https://ninfenz.dev/sitemap.xml>
 3. Yandex 是 IndexNow 参与方，§2 已覆盖即时提交
 
 ---
 
 ## 6 百度搜索资源平台（中国区主要入口；可选）
 
-1. https://ziyuan.baidu.com → 注册/登录（需实名）→ 用户中心 → 站点管理 → 添加网站，填 https://ninfenz.dev
+1. <https://ziyuan.baidu.com> → 注册/登录（需实名）→ 用户中心 → 站点管理 → 添加网站，填 <https://ninfenz.dev>
 2. 验证三选一：
    - **DNS 验证**（推荐）：百度给一条 TXT，值发我 → 我加进 Cloudflare DNS
    - 文件验证：下载 baidu_verify_*.html 放到 site/ 根 → 我重新部署
    - CNAME 验证：可做，会多一条记录
-3. 提交 sitemap：普通收录 → 资源提交 → sitemap → 填 https://ninfenz.dev/sitemap.xml
+3. 提交 sitemap：普通收录 → 资源提交 → sitemap → 填 <https://ninfenz.dev/sitemap.xml>
 4. **主动推送 API**（比 sitemap 快，有配额）：token 在"普通收录 → 资源提交 → 推送接口"页
 
        curl -sS -H 'Content-Type:text/plain' --data-binary @urls.txt 'http://data.zz.baidu.com/urls?site=https://ninfenz.dev&token=你的TOKEN'
@@ -155,11 +155,11 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 ## 7 中国其它入口（按性价比，可选）
 
 | 平台 | 入口 | 说明 |
-|---|---|---|
-| 360 搜索 | https://info.so.com/site_submit.html | 填域名 + sitemap；收录慢但成本低 |
-| 神马（移动） | https://zhanzhang.sm.cn | 移动端份额不小，需注册 |
-| 搜狗 | https://zhanzhang.sogou.com | 与微信搜索有协同，需注册 |
-| 头条搜索 | https://zhanzhang.toutiao.com | 有 sitemap/推送入口 |
+| --- | --- | --- |
+| 360 搜索 | <https://info.so.com/site_submit.html> | 填域名 + sitemap；收录慢但成本低 |
+| 神马（移动） | <https://zhanzhang.sm.cn> | 移动端份额不小，需注册 |
+| 搜狗 | <https://zhanzhang.sogou.com> | 与微信搜索有协同，需注册 |
+| 头条搜索 | <https://zhanzhang.toutiao.com> | 有 sitemap/推送入口 |
 
 建议顺序：百度 → 360 → 神马 → 其余。后面几家基本是"填同一个 sitemap"，边际成本低。
 （注：这些平台普遍偏好 www 主域，而本项目 canonical 是裸域；要不要做属于作者裁量，本节只记事实与入口。）
@@ -168,8 +168,8 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 
 ## 8 其它区域（按需）
 
-- Naver（韩）：https://searchadvisor.naver.com → 站点验证 + sitemap；已在 IndexNow 参与方内
-- Seznam（捷）：https://search.seznam.cz → 同一套；IndexNow 参与方
+- Naver（韩）：<https://searchadvisor.naver.com> → 站点验证 + sitemap；已在 IndexNow 参与方内
+- Seznam（捷）：<https://search.seznam.cz> → 同一套；IndexNow 参与方
 - DuckDuckGo / Brave / Startpage：**没有提交口**。DDG 与 Startpage 主要吃 Bing/Google 索引；Brave 用自己的爬虫，靠 robots.txt 允许 + 时间。不要为它们做额外动作。
 
 ---
@@ -179,12 +179,12 @@ IndexNow 是 Bing 发起、Yandex / Seznam / Naver 共同采纳的即时提交�
 ChatGPT / Claude / Perplexity / Gemini / Copilot 等**不提供站点地图提交**，它们的抓取与引用取决于下列面（我们已全部就位）：
 
 | 面 | 状态 |
-|---|---|
+| --- | --- |
 | robots.txt 显式欢迎 20+ AI 抓取 UA（GPTBot / OAI-SearchBot / ChatGPT-User / ClaudeBot / PerplexityBot / Google-Extended / Applebot-Extended / Bytespider …） | 已做 |
 | Content-Signal: search=yes, ai-input=yes, ai-train=yes | 已做 |
-| 机器入口 llms.txt（清单） | https://ninfenz.dev/llms.txt |
-| 完整单文件 llms-full.txt（定义/事实/术语表/FAQ/引用格式） | https://ninfenz.dev/llms-full.txt |
-| 机读事实 facts.json（每条带真源） | https://ninfenz.dev/facts.json |
+| 机器入口 llms.txt（清单） | <https://ninfenz.dev/llms.txt> |
+| 完整单文件 llms-full.txt（定义/事实/术语表/FAQ/引用格式） | <https://ninfenz.dev/llms-full.txt> |
+| 机读事实 facts.json（每条带真源） | <https://ninfenz.dev/facts.json> |
 | 内容协商 Accept: text/markdown（首页直接回完整单文件） | 已做 |
 | 可引用锚点 #fact-* | 已做 |
 
@@ -202,14 +202,14 @@ ChatGPT / Claude / Perplexity / Gemini / Copilot 等**不提供站点地图提�
 ## 10 验收：怎么确认"真的被收录了"
 
 | 检查 | 命令 / 位置 | 期望 |
-|---|---|---|
-| robots 允许 | curl -s https://ninfenz.dev/robots.txt | 含 Sitemap 与各 AI UA |
-| sitemap 合法 | curl -s https://ninfenz.dev/sitemap.xml | 4 个 loc，XML 可解析 |
+| --- | --- | --- |
+| robots 允许 | curl -s <https://ninfenz.dev/robots.txt> | 含 Sitemap 与各 AI UA |
+| sitemap 合法 | curl -s <https://ninfenz.dev/sitemap.xml> | 4 个 loc，XML 可解析 |
 | Google 收录 | 搜 site:ninfenz.dev | 出现主页/子页 |
 | Bing 收录 | Bing 搜 site:ninfenz.dev | 同上（通常比 Google 快） |
 | GSC | 网址检查 → 测试实际网址 | "网址在 Google 上"/"已发现" |
 | IndexNow | §2 命令返回 200/202 | 已分发 Bing/Yandex/Seznam/Naver |
-| 结构化数据 | https://search.google.com/test/rich-results?url=https://ninfenz.dev/ | 识别 SoftwareApplication / FAQPage / DefinedTerm |
+| 结构化数据 | <https://search.google.com/test/rich-results?url=https://ninfenz.dev/> | 识别 SoftwareApplication / FAQPage / DefinedTerm |
 
 ---
 
@@ -225,7 +225,7 @@ ChatGPT / Claude / Perplexity / Gemini / Copilot 等**不提供站点地图提�
 ## 12 附录：DNS TXT 怎么加（我可以代劳）
 
 | 平台 | 记录名 | 值来源 |
-|---|---|---|
+| --- | --- | --- |
 | Google GSC | @ | google-site-verification=… |
 | Bing | @ | 若不用 GSC 导入，则给一条 |
 | 百度 | @ | baidu-site-verification=… |

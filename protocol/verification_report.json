@@ -292,32 +292,39 @@
     },
     {
       "id": "conformance_report",
-      "issues": 0,
+      "issues": 2,
       "name": "一致性报告（已提交 == 实时重算）",
-      "sample": [],
+      "sample": [
+        "报告过期或被改：root 记录=b581fd3820391adb 实测=a48c6de944d1e059（修复指引：nf conformance --write）",
+        "verdict 不一致：记录=conformant 实测=non-conformant"
+      ],
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
-        "verdict": "conformant"
+        "passed": 24,
+        "root": "a48c6de944d1e0596fd50397e0dafd2b27ecd37820f54247ad9be0c050821bba",
+        "verdict": "non-conformant"
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 0,
+      "issues": 60,
       "name": "审计件被审对象 digest",
-      "sample": [],
+      "sample": [
+        "AUD-0004：被审对象已变，旧审计失效：.github/PULL_REQUEST_TEMPLATE.md（修复指引：重审并更新 digest）",
+        "AUD-0004：被审对象已变，旧审计失效：CONTRIBUTING.md（修复指引：重审并更新 digest）",
+        "AUD-0006：被审对象已变，旧审计失效：CONTRIBUTING.md（修复指引：重审并更新 digest）"
+      ],
       "source": "audit.scan",
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 329,
         "with_header": 46
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 1
     },
     {
@@ -369,8 +376,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 301,
-        "files": 301,
+        "baseline": 302,
+        "files": 302,
         "max_fn_cc": 115,
         "max_fn_lines": 1254,
         "max_lines": 7544
@@ -457,9 +464,13 @@
     },
     {
       "id": "drill_fidelity",
-      "issues": 0,
+      "issues": 3,
       "name": "演练保真度（执行演练 + 回合级回放 = 100%）",
-      "sample": [],
+      "sample": [
+        "真实语料裁定：真实语料已变（sha256 不匹配）——逐条裁定表须重做：docs/完整版样本_西幻生存流P03.md（修复指引：按变更重做 real_corpus.adjudications，不得放宽判据）",
+        "真实语料裁定：真实语料非空行数变了（裁定表记 185，实测 186）——裁定表须重做（修复指引：按变更重做 real_corpus.adjudications，不得放宽判据）",
+        "正例对照失效：正例对照源语料已变（sha256 不匹配）——须重生成变体：docs/完整版样本_西幻生存流P03.md（修复指引：注入必须被捕获——判据不得被改弱到什么都不报）"
+      ],
       "source": "drill_fidelity.scan",
       "stats": {
         "cases": 74,
@@ -468,7 +479,7 @@
         "passed": 74,
         "round_samples": 6
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -521,12 +532,14 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 0,
+      "issues": 1,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [],
+      "sample": [
+        "② protocol/role_coordinates.json 与实时重算不一致（记录 f596feb7e468 / 实测 98a7761a8439）（修复指引：nf layers --write）"
+      ],
       "source": "role_model.scan",
       "stats": {
-        "files": 3817,
+        "files": 3820,
         "kernel": 1987,
         "kernel_no_self": 309,
         "rules": 9,
@@ -534,16 +547,16 @@
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     }
   ],
-  "root_digest": "936380089e4e004ba3d17706c6b8237f2047973c0b2793ec0571ba06b4798f48",
+  "root_digest": "74517de417b7a72631fce2f33369e89207894b3b7fd5815128c49c7f6af846b5",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
-    "warn": 2
+    "fail": 4,
+    "pass": 26,
+    "warn": 1
   }
 }

@@ -29,7 +29,7 @@ Any command passes straight through, e.g. `nf doctor`, `nf market --list`, `nf a
 ## Capability menu (the desktop shell’s seven zones → the CLI command surface)
 
 | Key | Capability zone | Corresponding command surface (examples) |
-|---|---|---|
+| --- | --- | --- |
 | 0 | Environment self-check | `nf doctor` |
 | 1 | One-command world demo | `nf demo` |
 | 2 | Requirement → assembly plan | `nf assemble "<需求>"` · `nf assemble … --check <成品.md>` |
@@ -45,7 +45,7 @@ The menu’s source of truth is `ZONES` in `desktop/src/core/terminal.py`; **the
 ## Interactive syntax
 
 | Input | Behavior |
-|---|---|
+| --- | --- |
 | `0`–`8` | See the description and copy-pasteable examples of that capability zone |
 | `/menu` `/zone 4` | Redisplay the menu / see one zone’s examples |
 | `/find <词>` (`/search` is a synonym) | Search across **all command surfaces** (a hit gives the command + a one-line purpose; a miss gives candidates) |
@@ -109,7 +109,7 @@ Four disciplines: ① evidence lines **only read the repository** (a flag such a
 The terminal surface has only **one source of truth**: the curation tables in `desktop/src/core/terminal.py` (`ZONES` capability zones + action catalog / `FAMILIES` capability families / `FORMS` write forms / the three write-gate tables / `BLOCKED_IN_SHELL`), plus the argparse surface in `scripts/nf.py` (a command’s **existence**). Everything else is a **projection** of it:
 
 | View | What it presents | Entry point |
-|---|---|---|
+| --- | --- | --- |
 | Line-mode terminal | menu examples / capability-family map / write-form item-by-item prompting | `nf shell` (the sections above in this file) |
 | Full-screen TUI | action catalog (including the **write-form zone**: each of the 13 forms is an enter-to-run action) | `python tui/nf.py` |
 | Machine face | whole-surface snapshot (JSON) | `nf shell --surface --json` |
@@ -167,7 +167,7 @@ The terminal’s two kinds of efficiency each have their own criterion:
 Measured (this machine, single runs):
 
 | Scenario | Before | After |
-|---|---|---|
+| --- | --- | --- |
 | `nf shell --verify --deep` (64 `--help` runs + one `layers --verify`) | ~11.3 s | **~1.9 s** |
 | `nf shell --baseline` (17 lines, one by one) | seconds-scale (dragged down by rebuilds) | **1.95 s** (16 lines ≤ 4.3 ms) |
 | `nf shell --commands` (cold start) | 363 ms | **281 ms** |
@@ -251,7 +251,7 @@ There are only two ways to let it through: answer `yes` in place in an interacti
 Every `nf <命令>` starts an interpreter. Measured on this machine (2026-09-29, min of N): **bare interpreter 47 ms**, `nf --version` **215 ms** — the fixed cost ≈ interpreter startup + imports (~10 ms) + **argparse command-surface construction (measured 117 ms, 65 subcommands)**. `nf daemon` moves execution into a resident process, and the client does a single socket round trip (in a hot process, `--version` **1.5 ms**; measured with bash’s built-in `$EPOCHREALTIME`, zero forks, no `date` bias).
 
 | Path | `--version` | `stats --check` | `doctor` |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | python direct run (original path, one interpreter per command) | 215 ms | 288 ms | 634 ms |
 | `scripts/nf` launcher (**no daemon**: falls back to a direct python run) | 296 ms | 365 ms | 713 ms |
 | `scripts/nf` launcher (through the daemon) | 48 ms | 48 ms | 48 ms |
@@ -265,7 +265,7 @@ The launcher itself now has only **the bash startup floor (~39 ms on this machin
 Residency is just as effective for **heavy commands** (content-keyed caches persist across requests; measured on this machine, min of N):
 
 | Command | Cold-start direct run | Daemon steady state |
-|---|---|---|
+| --- | --- | --- |
 | `nf score` | 7.5–8.4 s | **~3.5 s** (after derived results are content-keyed) |
 | `nf doctor` | 697 ms | **212–385 ms** (within same-machine jitter) |
 | `nf conformance` | 3.07 s | **2.19 s** |
@@ -275,7 +275,7 @@ The criterion face (all in check12, machine-independent): AST-fact **content-key
 Command-surface latency panorama (24 representative commands; cold = a fresh process’s direct run, daemon = resident hot run; measured on this machine):
 
 | Command | Cold | Daemon |
-|---|---|---|
+| --- | --- | --- |
 | `nf score` | 7729 ms | **3624 ms** |
 | `nf conformance` | 3202 ms | **2403 ms** |
 | `nf layers --verify` / `nf doctor` / `nf pipeline dryrun --all` | 550 / 716 / 555 ms | **304 / 227 / 204 ms** |
@@ -291,7 +291,7 @@ That is: **apart from two "full-repo tools", the whole command surface is down t
 The path of "inferring whether something changed from mtime/size" was explicitly rejected (an unchanged fingerprint ≠ an unchanged file; Windows timestamp granularity ~15.6 ms). This wave takes a path that **does not ask "does it look changed" but only "has it changed"**: the daemon installs a directory watcher (on Windows: `ReadDirectoryChangesW`, recursive over subtrees), maintains a **tree generation**, caches the **entire response** of read-only commands by `(argv, cwd)`, and **reuses it only when the generation is unchanged**.
 
 | Path | `nf score` |
-|---|---|
+| --- | --- |
 | Cold-start direct run | 7.7 s |
 | Daemon steady state (a genuine recompute every time) | ~2.2 s |
 | **Daemon + `--watch` (tree unchanged → whole-response reuse)** | **~0.18 s** (the difference is `bash scripts/nf`’s process startup) |
@@ -317,7 +317,7 @@ The response cache only covers the "tree unchanged" tier; what about **after one
 This wave adds a **resident layer** (`conformance_scan._RESIDENT`: text + directory entries), installed only when the daemon has a **healthy watcher**, covering only files **under the watch root**, and invalidated **only by the known paths the watcher provides**: text is deleted per file, directory entries per parent directory (an add or a delete both change the parent’s listing). **If it cannot be stated clearly, invalidate the whole batch** (buffer overflow / an unparseable path / a generation bump with no paths given).
 
 | Scenario (daemon hot run, the first `nf score` right after an edit) | Resident layer off | Resident layer on |
-|---|---|---|
+| --- | --- | --- |
 | Editing a file such as `CHANGELOG.md` that is **not on any input face** | 1591 ms | **872 ms** |
 | Dropping a file into `04_模块库/通用类/` (**landing inside an input face**) | 1625 ms | **951 ms** |
 
@@ -333,7 +333,7 @@ The next layer down is **derived results**: a scanner’s results are all "pure 
 And the **witness** itself has been driven to nearly zero: **per-file digests live in the resident layer alongside the text**, invalidated **per file** by watcher changes. Measured across 8 input faces (including a wide face with 3439 files), the witness cost went **228 → ~30 ms**, with the **fingerprint values bit-for-bit unchanged** (same file, same payload ⇒ same digest). End to end (this machine, median of 3 independent rounds, a fresh daemon each round):
 
 | The first `nf score` right after an edit | Before | After |
-|---|---|---|
+| --- | --- | --- |
 | Unrelated change (editing a file not on any input face) | 1591 ms | **545 ms** |
 | Related change (editing a file on an input face, **a genuinely new content state**, end to end) | 1625 ms (4.6–6.3 s before Aho) | **≈1.25 s** (a repeat of the same state ~52 ms) |
 | Tree unchanged (whole-response reuse) | — | **51 ms** |

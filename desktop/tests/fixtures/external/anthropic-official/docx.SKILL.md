@@ -16,7 +16,7 @@ license: NF-Test-Fixture-1.0 (self-authored for parser tolerance tests; not thir
 ## 任务的三种形态
 
 | 任务 | 做法 |
-|---|---|
+| --- | --- |
 | 新建文档 | 从模板派生 `word/document.xml` |
 | 编辑既有文档 | 解包 → 改 XML → 重新打包 |
 | 读取内容 | 直接解析 XML 各部件 |

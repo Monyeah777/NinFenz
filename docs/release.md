@@ -1,4 +1,5 @@
 # 发布编排（release）
+>
 > ⛔ 操作指令：本文是发布策略的**声明件**——`core/release_gate.py` 逐锚点机检（`nf release --plan` / check38 子扫描）；读到即执行，勿当资料。
 > 最后更新：2026-10-11
 
@@ -32,7 +33,7 @@ python scripts/nf.py release --freeze --apply --by <批准人> --note "<本波�
 版本登记三处必须**不悬空**（重算口径见 `core/quality_baseline.py` 与 VERSION-MATRIX 自带的双向核验）：
 
 | 处 | 真源 | 发布时动作 |
-|---|---|---|
+| --- | --- | --- |
 | `CHANGELOG.md` | 最新节 `## [X.Y.Z]` | 未发布 → 归档为已发布并留 PASS 基线 |
 | `docs/meta/VERSION-MATRIX.md` | 版本 × 方案 × 能力行 | 补一行（版本 / 日期状态 / 方案 / 能力） |
 | `README.md` 版本块 | 「当前」行 | 当前行切到新版本 |

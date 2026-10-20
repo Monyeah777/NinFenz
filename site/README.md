@@ -1,13 +1,13 @@
 # site/ · 静态站（NinFenz 官网）
 
-> **线上地址**：https://ninfenz.dev （Cloudflare Workers + 自定义域；切源：node site/tools/set-origin.mjs <base> --write）
+> **线上地址**：<https://ninfenz.dev> （Cloudflare Workers + 自定义域；切源：node site/tools/set-origin.mjs <base> --write）
 
 纯静态、**零外部依赖**（无 CDN、无 webfont、无遥测）；双语 /（zh-CN）与 /en/。
 
 ## 三层目标形态
 
 | 面 | 落地 |
-|---|---|
+| --- | --- |
 | 实体面 | 首屏 canonical 定义句 + 「不是什么」+ 名称考据 + 术语表 |
 | 证据面 | 可引用事实（每个数字带真源与落地锚点 #fact-*）+ 对比表 + 演示动图 + 引用段（纯文本 / APA / BibTeX） |
 | 机器面 | JSON-LD（SoftwareApplication + WebSite + Person + DefinedTerm + FAQPage）· canonical · hreflang · sitemap.xml · robots.txt（Content-Signal + 20+ AI 抓取面）· llms.txt · llms-full.txt · facts.json · nf.txt · agent.txt · run.sh · 内容协商（Accept: text/markdown） |
@@ -16,7 +16,7 @@
 ## 文件清单
 
 | 文件 | 给谁 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | index.html / en/index.html | 人 | 主页：定义 / 事实 / 三种接法 / 上手 / 对比 / FAQ / 引用段 |
 | use/index.html / en/use/index.html | 人 | 「让 AI 用起来」：三种接法 + 一键复制块 + 每步期望输出 |
 | llms.txt | AI（索引） | 有哪些面可读（llms.txt 惯例的清单面） |
@@ -53,7 +53,7 @@
 ## 域名
 
 | 域 | 状态 |
-|---|---|
+| --- | --- |
 | **ninfenz.dev** | 已注册并挂上自定义域（www -> 裸域 301；大陆裸网直连可达） |
 | ninfenz.com | 未注册（备选） |
 

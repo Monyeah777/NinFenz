@@ -17,7 +17,7 @@ short_description: Run real NinFenz read-only gates in the browser
 ## 能做什么
 
 | 模式 | 跑的其实是 | 回答的问题 |
-|---|---|---|
+| --- | --- | --- |
 | 文档语义体检 | `nf lint <你的文本>` | 这段内容过不过仓库的文档判据 |
 | 自述数字核对 | `nf stats --check` | README / llms.txt 里的数字与实算是否一致 |
 | 契约一致性 | `nf conformance` | 协议件与 registry 是否自洽 |
@@ -41,6 +41,6 @@ git clone https://github.com/Monyeah777/NinFenz && cd NinFenz && bash verify.sh
 
 ## 链接
 
-- 仓库（canonical）：https://github.com/Monyeah777/NinFenz
-- 机器入口 `llms.txt`：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt
+- 仓库（canonical）：<https://github.com/Monyeah777/NinFenz>
+- 机器入口 `llms.txt`：<https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt>
 - 许可：MIT

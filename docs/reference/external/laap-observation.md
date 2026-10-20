@@ -12,7 +12,7 @@ Living Agent Application Protocol：自称「生命计算范式 / 数字生命�
 ## 2. 渠道与版本（快照）
 
 | 项 | 内容 |
-|---|---|
+| --- | --- |
 | 渠道 | 官网 laap.cn（Studio / EB 具身 / Web4 / ANIMA 四线）· CSDN（v2.1 认知架构文 + v3.0 技术自传）· GitHub（30⭐ / 7 fork，95 MB，Python）· PyPI（laap 包） |
 | 版本 | v2.1.0（2026-06，PSI-RSI 双驱）→ **v3.0**（2026-08-24：活体自适应 / 异构多智能体集群 / CEN 因果等价网络） |
 

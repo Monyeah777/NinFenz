@@ -32,7 +32,7 @@ nf doctor
 ## 前置条件
 
 | 项 | 要求 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | Node.js | **>= 18.17** | 只用于启动器（无第三方依赖） |
 | Python | **>= 3.11** | NF CLI 本体；纯标准库，无 pip 依赖 |
 
@@ -44,7 +44,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 ## 入口面
 
 | 入口 | 命令 | 用途 |
-|---|---|---|
+| --- | --- | --- |
 | npx | `npx -y ninfenz <子命令>` | 一次性体验 / CI 里临时调用 |
 | 全局 | `npm i -g ninfenz` → `nf <子命令>` | 常驻终端入口 |
 | 已有检出 | `nf --repo <目录> <子命令>` | 跳过解包，直接跑你的工作树 |
@@ -59,6 +59,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 - 门禁 `verify.sh` 与其单测 `desktop/tests/**`
 
 > **自证门禁的正确方式**：payload 是**运行时 / 协议树**（不含 `.github/`、`results/`、`.git`）。`install --dest` 得到的是可用工作树（CLI / TUI / MCP 正常），**要跑完整 check1-40 门禁请 git clone 后 `bash verify.sh`**——`verify.sh` 依赖上述仓库件，这是设计而非缺陷。
+
 - 清单 `payload/payload-manifest.json`：逐文件 sha256 + 聚合 `tree_sha256`
 
 当前体积：**2927 件 · 解包 22.85 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
@@ -74,7 +75,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 ## 环境变量
 
 | 变量 | 作用 |
-|---|---|
+| --- | --- |
 | `NINFENZ_PYTHON` | 指定 Python 解释器 |
 | `NINFENZ_CACHE` | 指定解包缓存目录 |
 | `PYTHONUTF8` / `PYTHONIOENCODING` | 启动器自动设为 `1` / `utf-8`（中文输出必需） |
@@ -84,11 +85,11 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 
 ## 链接
 
-- **站点（官方唯一入口）**：https://ninfenz.dev/　机器面：/llms.txt · /llms-full.txt · /facts.json
-- 仓库（canonical）：https://github.com/Monyeah777/NinFenz
-- 国内镜像：https://gitee.com/monyeah777/ninfenz
-- 机器入口 `llms.txt`：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt
-- MCP 接入：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/mcp.md
+- **站点（官方唯一入口）**：<https://ninfenz.dev/>　机器面：/llms.txt · /llms-full.txt · /facts.json
+- 仓库（canonical）：<https://github.com/Monyeah777/NinFenz>
+- 国内镜像：<https://gitee.com/monyeah777/ninfenz>
+- 机器入口 `llms.txt`：<https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt>
+- MCP 接入：<https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/mcp.md>
 - 许可：MIT（见包内 `LICENSE`）
 
 ## 维护者：发布流程

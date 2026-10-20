@@ -1,4 +1,5 @@
 # NinFenz MCP 接入（`nf serve` · 40 总纲 v2.7 波A S1-E3 / X2）
+>
 > 最后更新：2026-10-18
 
 > **状态**：公开化文档已随基础层 v2.7 落地；**E3 协议级装载实测已于 2026-09-08 通过**（stdio JSON-RPC 帧序列直测五方法全绿，见文末记录；修复 P06 管线两缺口——缺闭合 ``` / 缺 techdoc 声明）。41 波C C7（2026-09-08）开放只读 tools/prompts（本机 stdio 冒烟通过，见 docs/41_波C_C7_实测记录.md）。**宿主类客户端（Claude Desktop 等 GUI 装载）仍建议用户侧补录**——README 对 MCP 的宣告维持现状（S13 门按 docs_external-validation-v2.7.md 规则开），回填后补「转正」。
@@ -82,7 +83,7 @@ stdio 服务随调用进程生命周期运行（`Ctrl+C` 结束）。也可用 `
 ## 能力表（与 mcp_runtime 实现一一对应）
 
 | 方法 | 实现 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | `server/discover` | ✅ | modern 必备：一次返回 `supportedVersions` / `capabilities` / `_meta.serverInfo` + `instructions`/`ttlMs` |
 | `initialize` | ✅ | legacy 握手：请求版本受支持则回显，否则回落 `2025-11-25`；`serverInfo` 自述（非快照文件顶层） |
 | `notifications/initialized` | ✅ 静默 | 通知无 id，不应答 |
@@ -153,7 +154,7 @@ pattern / module / pipeline / asset）须满足——只许 `{var}` 简单展开
 ### 一、对外标识
 
 | 字段 | 取值 |
-|---|---|
+| --- | --- |
 | 名称（Name） | `NinFenz Content Gate` |
 | 一句话（One-liner） | 给任何 AI agent 一个可校验的内容规范与资产底座——先查契约，再落笔。 |
 | 类目（Category） | `content-creation` |

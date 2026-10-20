@@ -1,6 +1,6 @@
 # 01 · awesome-mcp-servers —— 要粘的那一行
 
-> 用途：打开 https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md （会自动 fork），在 **Knowledge & Memory** 分类的 `N` 段插入下面这一行，然后 Commit → Propose changes 建 PR。
+> 用途：打开 <https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md> （会自动 fork），在 **Knowledge & Memory** 分类的 `N` 段插入下面这一行，然后 Commit → Propose changes 建 PR。
 
 ## 整行（复制这一整行）
 

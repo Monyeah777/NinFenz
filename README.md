@@ -4,7 +4,7 @@
 
 [![门禁 ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
-**站点（线上）**：https://ninfenz.dev · 机器入口 [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
+**站点（线上）**：<https://ninfenz.dev> · 机器入口 [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
 **NF 终端（TUI）演示** —— 全屏人机入口（纯标准库）；菜单与动作是 `nf` CLI 真命令的受控调用方。
 键位按顶尖终端约定：`Tab` 切面板、`↑↓` 在当前面板内移动、`/` 过滤、`?` 看键位。
@@ -111,7 +111,7 @@ AI 装配：
 ## 协议链与文档导航
 
 | 层 | 入口 |
-|---|---|
+| --- | --- |
 | 方向 | `STRATEGY.md` |
 | 协议 | `01_核心协议.md` · `02_联动注册表.md` · `06_Agent执行协议.md` · `07_官方核心出厂与社区预设导航.md` · `protocol/WORLD_MODEL.md` |
 | 库 | `03_管线库/` · `04_模块库/` · `05_资产库/` |
@@ -126,7 +126,7 @@ AI 装配：
 本项目有**三条独立的版本线**，各自自洽（机检见 `desktop/tests/test_version_map.py`）：
 
 | 线 | 当前 | 口径 |
-|---|---|---|
+| --- | --- | --- |
 | 内容 / 协议 | **v2.12.0** | `CHANGELOG.md` 最新已发布节 == `docs/meta/VERSION-MATRIX.md` 末行；git tag `vX.Y.Z` 标记发布点 |
 | 门禁 | 见 `nf stats --check` 生成区 | `protocol/repo_stats.json` == `quality_baseline` 期望值 == `llms.txt` 凭证串（**活文档不钉计数**） |
 | CLI / npm / MCP | **1.0.2** | `scripts/nf.py` 的 `NF_CLI_VERSION` == npm `package.json` == MCP `server.json`（两处） |
@@ -134,7 +134,7 @@ AI 装配：
 内容线最近三版：
 
 | 版本 | 状态 |
-|---|---|
+| --- | --- |
 | v2.12.0 | 当前（2026-10-05）· 知识层 + 终端线 + 顶尖对标补齐 + 数字资产契约层 |
 | v2.11.0 | 已发布 2026-09-10 · world_model 确定性抽象状态契约 + world_slots |
 | v2.10.0 | 已发布 2026-09-09 · 45 质量纵深 + 基础层 A 组收口 |

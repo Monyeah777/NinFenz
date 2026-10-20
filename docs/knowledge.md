@@ -1,4 +1,5 @@
 # 双源知识层（knowledge）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-15
 
@@ -31,7 +32,7 @@ MCP 侧：工具 `knowledge_order_read`（入参 `clearance` 可选）。
 ## 判据（可证）
 
 | 规矩 | 机检判据 |
-|---|---|
+| --- | --- |
 | 权威分层 | `authority ∈ {contract, reference}`；**reference 级必须 `requires_source_label: true`**（外部数据须标注来源、不得写死）；contract 级必须 `false` 且 `kind=local-compiled` |
 | 防纸面源 | 每个 `locator` 必须指向仓库内**真实存在**的路径 |
 | 查询有序 | `query_order` 必须是全部源 id 的一个排列，且**全部 contract 级排在全部 reference 级之前** |

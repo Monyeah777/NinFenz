@@ -41,7 +41,7 @@ python scripts/nf.py layers --write    # 刷新本文件的生成区（改真源
 ### 抽象轴：四阶
 
 | 阶 | 真源面 | 接口面（跨阶唯一可依赖） | 既有判据 | 状态 / 变更档 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **契约** | `01_核心协议.md`、`02_联动注册表.md`、`06_Agent执行协议.md`、`07_官方核心出厂与社区预设导航.md`、`STRATEGY.md`、`protocol/*.md`、`protocol/*.json`、`protocol/schema/*.json`、`desktop/src/core/registry.json`、`integrations/*/integration.json` | `protocol/schema/*.json`、`protocol/CONFORMANCE.md`、`desktop/src/core/registry.json` | check13、check28、check29、check30、check31 | active（bump） |
 | **资产** | `03_管线库/*.md`、`04_模块库/*/*.md`、`05_资产库/**/*`、`community/**/*`、`library/*.md`、`patterns/*/PATTERN.md` | `community/*/protocol.yaml`、`05_资产库/provenance.json` | check7、check8、check9、check10、check11、check14、check15、check16、check23、check24、check34 | active（additive） |
 | **引擎** | `desktop/src/core/*.py`、`desktop/tests/**/*.py`、`desktop/scripts/*.py`、`scripts/*.py`、`scripts/*.sh`、`scripts/nf`、`scripts/nf.cmd` | `scripts/nf.py` | check12、check17、check18、check19、check20、check21、check22、check27、check32、check33 | active（additive） |
@@ -50,7 +50,7 @@ python scripts/nf.py layers --write    # 刷新本文件的生成区（改真源
 ### 资产阶五子级（同一格内异质，分开看代价）
 
 | 子级 | 真源面 | 既有判据 | 口径 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **声明** | `community/*/protocol.yaml` | check14 | 契约的实例：改它要走登记三要件（01 §6.1 + 02 §8.3 + registry 投影）。 |
 | **内容** | `03_管线库/*.md`、`04_模块库/*/*.md`、`community/*/modules/*.md`、`community/*/pipelines/*.md` | check7、check9、check24 | 模块与管线正文：受编号命名空间与挂载层约束。 |
 | **数据** | `05_资产库/**/*`、`community/*/assets/*.md` | check8、check11、check23 | 资产键与溯源台账：判据是可寻址 / 可溯源 / 键无孤儿。 |
@@ -60,7 +60,7 @@ python scripts/nf.py layers --write    # 刷新本文件的生成区（改真源
 ### 入口面（只登记角色，永不作为真源）
 
 | 面 | 入口件 | 服务阶 | 口径 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **人机入口** | `scripts/nf`、`scripts/nf.cmd`、`scripts/nf.py` | engine | 无参数进终端（nf shell → desktop/src/core/terminal.py）；其余参数透传 CLI。 |
 | **AI 装配线** | `docs/agent/AGENT_START.md`、`docs/agent/agent_组装指令包_v0.2.md`、`docs/agent/AI_ROUTING.md` | asset | 任意 agent 仅凭仓库地址自助取件组装「完整版」；与 A 线（人机）同等级，不预设模型。 |
 | **MCP 服务面** | `docs/mcp.md`、`protocol/mcp_package.json` | engine | 长驻运行时入口 = nf serve（引擎阶 CLI 面）；本面只登记契约与用法文档。 |
@@ -69,7 +69,7 @@ python scripts/nf.py layers --write    # 刷新本文件的生成区（改真源
 ### 验证纵切（贯穿四阶，不是层）
 
 | 件 | 落点 | 既有判据 |
-|---|---|---|
+| --- | --- | --- |
 | **verify** | `verify.sh` | check27 |
 | **conformance** | `protocol/conformance_report.json` | check35 |
 | **audit** | `results/audit` | check36 |

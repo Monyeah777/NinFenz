@@ -1,4 +1,5 @@
 # Locales and localization (locales)
+>
 > ⛔ Operating instruction: this file is the **declaration** of the language and localization policy; the judge lives in check34 (core/locales.py). Read it and run it.
 > 最后更新：2026-10-05 (last updated)
 

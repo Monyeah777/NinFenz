@@ -10,7 +10,7 @@
 ## 提案（每条均带依据与开放项）
 
 | 事件 | 来源 | 建议 payload 字段 | 开放项 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | doc_structure_ready（M90 发布） | M90 产出 DocState 骨架 | `doc_id, title, version, sections[]` | sections 结构粒度待 M90 补全 |
 | doc_delta_committed（M90 发布） | M98 订阅后 `changes=diff(prev,cur)` | `doc_id, prev_ver, new_ver, changes[]` | changes 条目类型待定 |
 | intent_received（P90 装载输入闭环） | C3 补发布方时建立 | `intent_id, mode, text` | 字段名待作者定 |

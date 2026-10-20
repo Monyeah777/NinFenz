@@ -41,7 +41,7 @@ python scripts/nf.py layers --write    # 本ファイルの生成区を再描画
 ### 抽象軸：四階
 
 | 階 | 真源面 | インターフェース面（階をまたいで依存できる唯一の面） | 既存の判定 | 状態 / 変更区分 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **契約** | `01_核心协议.md`、`02_联动注册表.md`、`06_Agent执行协议.md`、`07_官方核心出厂与社区预设导航.md`、`STRATEGY.md`、`protocol/*.md`、`protocol/*.json`、`protocol/schema/*.json`、`desktop/src/core/registry.json`、`integrations/*/integration.json` | `protocol/schema/*.json`、`protocol/CONFORMANCE.md`、`desktop/src/core/registry.json` | check13、check28、check29、check30、check31 | active（bump） |
 | **資産** | `03_管线库/*.md`、`04_模块库/*/*.md`、`05_资产库/**/*`、`community/**/*`、`library/*.md`、`patterns/*/PATTERN.md` | `community/*/protocol.yaml`、`05_资产库/provenance.json` | check7、check8、check9、check10、check11、check14、check15、check16、check23、check24、check34 | active（additive） |
 | **エンジン** | `desktop/src/core/*.py`、`desktop/tests/**/*.py`、`desktop/scripts/*.py`、`scripts/*.py`、`scripts/*.sh`、`scripts/nf`、`scripts/nf.cmd` | `scripts/nf.py` | check12、check17、check18、check19、check20、check21、check22、check27、check32、check33 | active（additive） |
@@ -50,7 +50,7 @@ python scripts/nf.py layers --write    # 本ファイルの生成区を再描画
 ### 資産階の五つの子階（同一セル内で異質。コストは別々に見る）
 
 | 子階 | 真源面 | 既存の判定 | 口径 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **宣言** | `community/*/protocol.yaml` | check14 | 契約の実例：変更には登録三要件（01 §6.1 + 02 §8.3 + registry 投影）を経ること。 |
 | **内容** | `03_管线库/*.md`、`04_模块库/*/*.md`、`community/*/modules/*.md`、`community/*/pipelines/*.md` | check7、check9、check24 | モジュールとパイプラインの本文：番号名前空間とマウント層に拘束されます。 |
 | **データ** | `05_资产库/**/*`、`community/*/assets/*.md` | check8、check11、check23 | 資産キーと来歴台帳：判定は「アドレス可能 / 追跡可能 / 孤児キーなし」。 |
@@ -60,7 +60,7 @@ python scripts/nf.py layers --write    # 本ファイルの生成区を再描画
 ### 入口面（役割のみを登録し、真源にはならない）
 
 | 面 | 入口件 | 提供先の階 | 口径 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **人機入口** | `scripts/nf`、`scripts/nf.cmd`、`scripts/nf.py` | engine | 引数なしで端末に入ります（nf shell → desktop/src/core/terminal.py）。その他の引数は CLI に透過します。 |
 | **AI アセンブリライン** | `docs/agent/AGENT_START.md`、`docs/agent/agent_组装指令包_v0.2.md`、`docs/agent/AI_ROUTING.md` | asset | 任意の agent がリポジトリ URL だけで自助的に取り出し、「完全版」をアセンブルできます。A ライン（人機）と同格で、モデルを前提にしません。 |
 | **MCP サービス面** | `docs/mcp.md`、`protocol/mcp_package.json` | engine | 常駐ランタイムの入口 = nf serve（エンジン階の CLI 面）。本面は契約と用法文書のみを登録します。 |
@@ -69,7 +69,7 @@ python scripts/nf.py layers --write    # 本ファイルの生成区を再描画
 ### 検証縦断（四階を貫く。層ではない）
 
 | 件 | 落点 | 既存の判定 |
-|---|---|---|
+| --- | --- | --- |
 | **verify** | `verify.sh` | check27 |
 | **conformance** | `protocol/conformance_report.json` | check35 |
 | **audit** | `results/audit` | check36 |

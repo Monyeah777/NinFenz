@@ -1,8 +1,10 @@
 <!-- nf-asset: key="TECH_TEMPLATES" version="1.0" status="active" -->
 # 资产键 TECH_TEMPLATES · 技术文档章节骨架模板
+>
 > 05_资产库/用户自定义 扩展资产（P90 技术文档演示，asset_register 登记于 2026-09-03）
 
 ## schema
+
 ```yaml
 key: TECH_TEMPLATES
 required_fields: [id, doc_type, sections, required_fields]
@@ -15,6 +17,7 @@ id_prefix: T9xx   # 用户自定义 900+ 命名空间
 ```
 
 ## 条目
+
 | id | doc_type | sections | required_fields |
 | --- | --- | --- | --- |
 | T901 | guide | [概述, 快速开始, 概念, 操作步骤, 故障排查, 修订记录] | [概述, 修订记录] |

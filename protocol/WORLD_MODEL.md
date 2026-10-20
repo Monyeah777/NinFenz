@@ -12,7 +12,7 @@
 JEPA/H-JEPA 的核心不是预测像素或下一词元，而是**在表征空间中预测未来抽象状态**（LeCun 2022；arXiv:2211.10831，arXiv:2306.02572）。NF 只在协议层吸收以下三条可验证的机制：
 
 | JEPA 机制 | NF world_model 对应 | 可机检含义 |
-|---|---|---|
+| --- | --- | --- |
 | 抽象表征而非原始输出 | `abstract_state.variables[]` | 只声明有限状态变量与类型，不建模文本生成 |
 | 表征预测的有限状态动力 | `transition.phases[]` | 每个相位显式声明 `next/guard/writes`，迁移图闭合 |
 | 防表征坍缩的约束 | `invariants[]` | 长期不变式如 `tick 单调不减`、`phase 有限` 可静态断言 |

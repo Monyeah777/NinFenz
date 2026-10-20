@@ -1,4 +1,5 @@
 # 内容建模三件（modeling）
+>
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-09-15
 
@@ -8,7 +9,7 @@
 normative·informative 二分 / 数据契约要素）：
 
 | 件 | 真源 | 回答什么 |
-|---|---|---|
+| --- | --- | --- |
 | 词表登记册 | `protocol/vocabularies.json` | 全仓词表**有哪些、以谁为准**——真源变了册子没跟就 FAIL |
 | 规范件与说明件 | `protocol/normative.json` | 哪些件**有约束力**、哪些只是解释 |
 | 数据契约登记 | `protocol/data_contracts.json` | 每个机读件**谁管、按什么规则判、坏了怎么重建** |
@@ -26,7 +27,7 @@ python scripts/nf.py model --json
 ## 判据（可证）
 
 | 件 | 判据 |
-|---|---|
+| --- | --- |
 | 词表 | scheme id 唯一；status 在册；值 ≥2 且不重复、不与 alias 撞车；**probe 指回真源后逐项比对**（`python_attr` / `json_path` / `literal`）；真源取不到即 FAIL |
 | 词表（literal） | `probe.kind=literal` 表示以册为准（无代码真源），此时不比对只查形式 |
 | 规范/说明 | 两名单交集为空；规范件必须**有主**（被 `protocol/RECEIPTS.json` 锚定，或显式 `covered_by` 且 `checkN` 真实存在）；**说明件不得被回执锚定** |

@@ -3,6 +3,7 @@
 ## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+
 - **门禁矩阵化（2026-10-18）**：CI 全量门禁拆成「静态 1 台 + 测试 **32 台并行**」——`verify.sh` 新增 `--checks-only` / `--tests-only --shard i/n`，`ci-verify.yml` 改为 `static-checks` + `unit-tests`（matrix 32 片）+ `gate`（needs 两者，任一片红即整条红）三个作业；32 片的分配与本地分片用**同一套权重/LPT**，`--plan 32` 可在本地校验「并集 == discover 全集」。动机：实测同机并行收益在 16 片后饱和（8 片 502 s / 16 片 396 s），跨机器没有争用才是"全量 1 分钟"的唯一实现路径。契约测试 `test_ci_visibility` 同步改为：CI 必须恰好一次 `--checks-only` + 一次 `--tests-only --shard ${{ matrix.shard }}/N`，且 N ≥ 16 且矩阵真的声明到 N-1。
 - **check12 门禁提速（P0–P3，2026-10-18）**：把 check12（3131 条测试、串行 ~1080 s）从"单进程全量"改成"分层 + 分片 + 内容寻址缓存"：
   ① **分层**：`bash verify.sh` 默认 **quick**（42 条静态 check + 受影响测试），`--full` 才跑全量；`nf release` 与 CI 固定 `--full --no-cache`，`test_ci_visibility` 的契约同步改为"CI 必须 full 档"（原"必须裸跑"在分层后反而是子集）；
@@ -39,18 +40,19 @@
   ⑥ **验收**：`rebind` 6 例单测（漂移重绑 / 幂等 / 空理由拒绝 / dry-run 不写 / legacy 跳过）；`conformance` 27/27；`verify_report` 31 条 PASS 29；`hygiene / role / asset / modeling / audit drift` 全 0。
 
 -
- 
-*
-*
+
+-
+-
+
 数
 字
 资
 产
 契
 约
- 
+
 S
- 
+
 档
 ：
 包
@@ -58,9 +60,9 @@ S
 述
 对
 账
- 
+
 /
- 
+
 F
 r
 i
@@ -73,16 +75,16 @@ l
 e
 s
 s
- 
+
 导
 出
- 
+
 /
- 
+
 可
 移
 植
- 
+
 s
 c
 h
@@ -92,10 +94,10 @@ a
 （
 计
 划
- 
+
 1
 0
- 
+
 项
 收
 尾
@@ -121,22 +123,20 @@ a
 ）
 ：
 
-
- 
- 
 ①
- 
-*
-*
+
+-
+-
+
 S
 1
- 
+
 包
 自
 述
- 
+
 ↔
- 
+
 实
 况
 双
@@ -151,7 +151,7 @@ S
 第
 四
 面
- 
+
 `
 i
 n
@@ -165,7 +165,7 @@ x
 包
 自
 带
- 
+
 `
 o
 u
@@ -191,6 +191,7 @@ n
 n
 f
 -
+
 o
 u
 t
@@ -198,6 +199,7 @@ p
 u
 t
 -
+
 i
 n
 d
@@ -210,7 +212,7 @@ x
 本
 就
 有
- 
+
 p
 a
 t
@@ -252,25 +254,25 @@ s
 明
 的
 件
- 
+
 /
- 
+
 s
 c
 h
 e
 m
 a
- 
+
 /
- 
+
 i
 n
 p
 u
 t
 s
- 
+
 必
 须
 在
@@ -288,7 +290,7 @@ t
 s
 /
 `
- 
+
 下
 的
 实
@@ -315,7 +317,7 @@ s
 *
 ：
 4
- 
+
 个
 组
 合
@@ -330,7 +332,7 @@ s
 写
 出
 的
- 
+
 `
 o
 u
@@ -380,7 +382,7 @@ n
 生
 成
 器
- 
+
 `
 c
 o
@@ -424,9 +426,9 @@ y
 产
 物
 化
- 
+
 4
- 
+
 个
 组
 合
@@ -435,7 +437,7 @@ y
 `
 n
 f
- 
+
 c
 o
 m
@@ -443,7 +445,7 @@ b
 i
 n
 e
- 
+
 m
 a
 t
@@ -461,28 +463,27 @@ d
 i
 f
 f
- 
+
 仅
- 
-+
+
+-
+
 7
- 
+
 行
 /
 包
 ）
 。
 
-
- 
- 
 ②
- 
-*
-*
+
+-
+-
+
 S
 3
- 
+
 导
 出
 面
@@ -492,13 +493,13 @@ S
 `
 n
 f
- 
+
 a
 s
 s
 e
 t
- 
+
 c
 o
 n
@@ -507,9 +508,10 @@ r
 a
 c
 t
- 
+
 -
 -
+
 e
 x
 p
@@ -517,9 +519,9 @@ o
 r
 t
 `
- 
+
 →
- 
+
 `
 p
 r
@@ -586,12 +588,12 @@ l
 e
 s
 s
- 
+
 D
 a
 t
 a
- 
+
 P
 a
 c
@@ -599,15 +601,16 @@ k
 a
 g
 e
- 
+
 ·
- 
-*
-*
+
+-
+-
+
 9
 4
 5
- 
+
 资
 源
 *
@@ -626,7 +629,7 @@ e
 对
 （
 ④
- 
+
 判
 漂
 移
@@ -640,21 +643,21 @@ l
 d
 s
 `
- 
+
 是
- 
+
 J
 S
 O
 N
- 
+
 S
 c
 h
 e
 m
 a
- 
+
 的
 *
 *
@@ -667,31 +670,34 @@ a
 ，
 原
 始
- 
+
 s
 c
 h
 e
 m
 a
- 
+
 逐
 字
 段
 留
 在
- 
+
 `
 x
 -
+
 n
 f
 -
+
 j
 s
 o
 n
 -
+
 s
 c
 h
@@ -716,16 +722,14 @@ a
 丢
 。
 
-
- 
- 
 ③
- 
-*
-*
+
+-
+-
+
 S
 2
- 
+
 可
 移
 植
@@ -785,7 +789,7 @@ n
 规
 范
 面
- 
+
 `
 p
 r
@@ -815,15 +819,15 @@ n
 I
 D
 L
- 
+
 集
- 
+
 8
 →
 9
 ）
 +
- 
+
 `
 d
 o
@@ -851,19 +855,19 @@ d
 （
 四
 面
- 
+
 /
- 
+
 原
 语
- 
+
 /
- 
+
 导
 出
- 
+
 /
- 
+
 怎
 么
 带
@@ -890,7 +894,7 @@ d
 不
 符
 即
- 
+
 F
 A
 I
@@ -907,13 +911,11 @@ L
 设
 。
 
-
- 
- 
 ④
- 
-*
-*
+
+-
+-
+
 收
 口
 修
@@ -924,13 +926,13 @@ L
 `
 n
 f
- 
+
 a
 s
 s
 e
 t
- 
+
 c
 o
 n
@@ -940,7 +942,7 @@ a
 c
 t
 `
- 
+
 帮
 助
 面
@@ -953,7 +955,7 @@ t
 ④
 /
 ⑤
- 
+
 仅
 在
 *
@@ -969,13 +971,15 @@ t
 （
 `
 -
+
 -
+
 f
 a
 c
 e
 `
- 
+
 是
 显
 式
@@ -989,14 +993,14 @@ e
 与
 便
 携
- 
+
 s
 c
 h
 e
 m
 a
- 
+
 进
 登
 记
@@ -1011,7 +1015,7 @@ a
 4
 *
 *
- 
+
 条
 ）
 与
@@ -1022,13 +1026,11 @@ a
 面
 。
 
-
- 
- 
 ⑤
- 
-*
-*
+
+-
+-
+
 验
 收
 *
@@ -1037,13 +1039,13 @@ a
 `
 n
 f
- 
+
 a
 s
 s
 e
 t
- 
+
 c
 o
 n
@@ -1053,9 +1055,9 @@ a
 c
 t
 `
- 
+
 0
- 
+
 i
 s
 s
@@ -1068,52 +1070,52 @@ e
 2
 7
 4
- 
+
 件
 *
 *
- 
+
 ·
- 
+
 数
 据
- 
+
 1
 0
- 
+
 ·
- 
+
 代
 码
- 
+
 6
- 
+
 ·
- 
+
 脚
 本
- 
+
 4
- 
+
 ·
- 
+
 包
 清
 单
- 
+
 1
- 
+
 ·
- 
+
 链
- 
+
 1
 ）
 ；
 `
 n
 f
- 
+
 c
 o
 n
@@ -1126,7 +1128,7 @@ n
 c
 e
 `
- 
+
 2
 7
 /
@@ -1136,7 +1138,7 @@ e
 `
 n
 f
- 
+
 r
 e
 c
@@ -1146,10 +1148,10 @@ p
 t
 s
 `
- 
+
 6
 9
- 
+
 件
 ；
 `
@@ -1167,27 +1169,27 @@ o
 r
 t
 `
- 
+
 3
 1
- 
+
 条
- 
+
 P
 A
 S
 S
- 
+
 2
 9
- 
+
 /
- 
+
 F
 A
 I
 L
- 
+
 0
 ；
 `
@@ -1198,16 +1200,16 @@ i
 e
 n
 e
- 
+
 /
- 
+
 r
 o
 l
 e
- 
+
 /
- 
+
 m
 o
 d
@@ -1216,9 +1218,9 @@ l
 i
 n
 g
- 
+
 /
- 
+
 c
 o
 d
@@ -1231,9 +1233,9 @@ r
 i
 c
 s
- 
+
 /
- 
+
 c
 o
 u
@@ -1242,9 +1244,9 @@ l
 i
 n
 g
- 
+
 /
- 
+
 s
 c
 h
@@ -1256,9 +1258,9 @@ l
 i
 n
 t
- 
+
 /
- 
+
 b
 a
 s
@@ -1267,35 +1269,36 @@ l
 i
 n
 e
- 
+
 /
- 
+
 a
 u
 d
 i
 t
- 
+
 d
 r
 i
 f
 t
 `
- 
+
 全
- 
+
 0
 ；
 测
 试
- 
-*
-*
+
+-
+-
+
 3
 0
 9
- 
+
 例
 全
 绿
@@ -1323,10 +1326,10 @@ a
 c
 t
 `
- 
+
 5
 7
- 
+
 例
 ，
 S
@@ -1337,7 +1340,7 @@ S
 /
 S
 3
- 
+
 各
 有
 正
@@ -1346,13 +1349,11 @@ S
 ）
 。
 
-
- 
- 
 ⑥
- 
-*
-*
+
+-
+-
+
 计
 划
 收
@@ -1365,30 +1366,31 @@ D
 –
 D
 4
- 
+
 ·
- 
+
 E
 1
 –
 E
 3
- 
+
 ·
- 
+
 S
 1
 –
 S
 3
- 
+
 共
- 
-*
-*
+
+-
+-
+
 1
 0
- 
+
 项
 全
 部
@@ -1398,14 +1400,12 @@ S
 *
 。
 
-
 - **数字资产契约续批（D3 写通道契约化 / E2 第二实现线结构契约 / D4 回执锚定面 58→67 件）**（**作者指令**：「继续」）：
   ① **D3 写通道契约化**：`roles.write_exceptions` 的值从自由文本升级为 `{why, artifact}`；新增判据「写入口必须声明落点件，且该件已在 `data_contracts` 登记、`owner` **按文件名点名**该模块」——首跑即抓到一条存量「谁都不是 owner」（`asset_line_baseline.json` 原 owner 写的是『机制维护（check 即 owner）』）。同轮补 7 条基线/记录件登记（`code_metrics_baseline` / `coupling_baseline` / `drill_fidelity` / `instruction_evidence` / `perf_budget` / `repo_stats`（check38）/ `sast_baseline`），登记册 45→**52** 条。
   ② **E2 第二实现线结构契约**：代码面新增**结构模式**（`forbid_regex` + `regex_limits` 计数棘轮，**不做 AST、也不假装 AST**）——Rust 禁 `unsafe`（实测 0 处）、`extern "C"` 上限 1（实测 1，只减不增）；C# 禁 `unsafe` / `DllImport` / `extern`（实测各 0）。受约件 956→**1168**。
   ③ **D4 回执锚定面扩展**：`receipts.py` 的固定锚定清单补入资产册、职能投影与 7 份基线/记录件——回执 **58 → 67 件**，新真源与基线从「本地声明」升级为「可证明某时点已在册」。
   ④ **验收**：`nf asset contract` 0 issue（**1168 件** · 数据 10 · 代码 6 · 脚本 4 · 链 1）；`nf receipts` 67 件单根；`nf conformance` 27/27；`verify_report` 31 条 PASS 29；`role / modeling / code_metrics / text_hygiene / audit drift` 全 0；测试 `test_role_model` + `test_asset_contract` 全绿（新增写通道 4 例、结构契约 3 例）。
   ⑤ **仍留**：S1 包自带 `outputs/contracts.json` 骨架、S3 导出 Frictionless/ODCS、S2 可移植 `*.contract.json` 规范（S2 依赖 S3 定型）。
-
 
 - **数字资产契约深化（D2/D1/E1/E3）：把「手挑 11 件样本」升成「按约定自动发现 + 两册合一登记」**（**作者指令**：「按照最优决策，全做」）：
   ① **D2 包产物自动发现**：新增 `schema_siblings`（`schemas/{stem}.schema.json`、`schemas/DOMAIN_REPORT.schema.json` 候选）与 `required_any_columns`（表头**族**各不相同——实测 CASES.csv 有 11 种表头，故只判「至少含族内一个 id 列」）两个声明原语；受约件从 **11 → 956**（216 对同名 schema 校验全绿；无 schema 的 206 件计入 `no_schema` 可减缺口，不判死）。
@@ -1490,6 +1490,7 @@ S
 - **待作者侧动作**：GitHub 仓库改名 → Gitee 镜像改名 → npm 以 `ninfenz` 发布首版 → 站点上线（`site/` 已按新名生成）。
 - **NFA-L 落地（声明式 + 命令式混合语言，不新增 check）**：新增 core/nf_expr.py（词法/语法）、core/nfal.py（符号面/类型检查/三值求值/NF-IR）、core/nfal_cli.py 与 nf nfal 入口（parse / check / build / eval / schema-check）；Pipeline 的 condition 现可用以 = 开头的封闭 guard 表达式记写，既静态可查又执行可判，散文 condition 仍只记 advisory A0201；pipeline.schema.json 的 condition 仅补描述（additive）；新增 docs/nfal.md 与 packaging/nfal/Dockerfile（零第三方依赖，镜像即分发单元）；测试 desktop/tests/test_nfal.py（26 例：词法/优先级/类型/三值/NF-IR 确定性/真仓散文回归）；code_metrics 棘轮按工具指引评审后重冻（scripts/nf.py +17 行）。
 - **NFA-L 收口续波（不新增 check）**：110 条管线 condition 由散文迁移为 nf-expr（统一取 M50 已声明相位 roll：`=data_bus.round.phase == "roll"`；M10 同拍者叠加 `&& event.tick_day`）；`nf lsp` 新增 nfal-guard 诊断（源/码/UTF-16 定位，见 docs/nfal.md）；终端能力族登记 `nfal` 并重生成 `tui/_surface.py`；修复 check12 的 12 项（命令面策展 / 投影同步 / 静默返回）与 check35/check39；`code_metrics` 棘轮按工具指引重冻 lsp_doc.py / terminal.py。
+
 ## [2.12.0] - 2026-10-05
 
 - **基线声明同源（PASS 70→72）+ ja 入口纳入生成区**（2026-10-05）：check38 子扫描由四增至六，运行时 PASS 由 70 升至 **72**，而 `quality_baseline.EXPECTED_PASS` 仍停在 70——四处自洽断言与实跑出现「声明 ≠ 实跑」的隐性漂移。本波把 `EXPECTED_PASS` 同步为 **PASS=72**、`nf stats --write` 重生成入口生成区，并把 `README.ja.md` 纳入 `repo_stats.BLOCK_FILES`（新增 `_ja` 渲染器）——第三语言的统计块不再是手写。verify v2.30 · check1-40 · **PASS=72**。
@@ -1533,7 +1534,6 @@ S
   ③ **接线缺口**——发布工作流的两条自检 `packaging/npm/test/smoke.test.mjs` 与 `tools/verify-package.mjs`（点文件泄漏 / `__pycache__` / 体积预算 / LICENSE / bin 双别名）此前常驻面从不执行，现由 `desktop/tests/test_npm_package.py` 常驻跑；套件级由 `desktop/tests/test_suite_wiring.py` 兜住（要么进 discover 面、要么登记「由谁跑」，两个方向都断言）。
   ⑤ **同波补齐 npm 交付线的真跑面（该文件 7 例）**：① 两条发布前自检（上）；② **零网络承诺**——静态扫 `bin/lib/tools` 的 JS 无 `fetch`/`http(s)://`/埋点原语（README 承诺「零网络请求、零遥测」）；③ **零安装脚本**——`package.json` 不得有 `preinstall/install/postinstall`（供应链最常用的一环；含防呆断言）；④ **解包主机制**——`npx ninfenz doctor` 那条路（无 `--repo` 且 cwd 不在仓库树内 → payload 解到缓存 → 从缓存跑起来）；⑤ **物化路径**——`install --dest` 真落成运行时树（含「不含 `.git/.github/results`」这条承诺）且**非空目标 fail-closed**（rc=3 + 修复指引）、显式 `--force` 才覆盖。此前 `install` 只被正则断言过「帮助文本里提到了它」，**从未真的执行**。
   ④ **同波**——实践包 `patterns/verifier-must-run`（判据必须接线）；同口径复核 `scripts/**` **34 件**（25 `.py` + 8 `.sh` + 1 `.cmd`）**零孤儿**（每件都被别处引用，含 `protocol/instruction_evidence.json` 的指令登记面）。
-
 
 - **协议真源口径统一（02/06/07）：执行顺序「10 步 vs 17 步」范围标注 + 认知边界「四层」计数校正 + 陈配套件修正**（外部实测 P2 待裁三项收口）：① **执行顺序两表分标范围**——`02 §6` 明标「官方核心装配（P01）10 步真相源」、`06 §3` 明标「跨预设并集 17 步」，两表互不覆盖；`02 §6` 增「预设级差异（R3）」条（社区预设可把模块降为 allowed 备选，如西幻 P03 的 M03/M23），消解 P03「M23 不默认挂载」与 02 §6 第 5 步的读法冲突；`07 §4` 系统提示骨架不再写死「17 步」。② **认知边界计数**——`06 §4` 标题/正文「四层」与列表 ①–⑤ 五段的矛盾修正：⑤ 锚点回验标注为**收尾校验（不计入四层）**，四层命名与 M23/各包 README 保持一致。③ **陈配套件**——`06` 头部与角色表：04_模块库 32→13 件、P02/P03 由「03_管线库」改指 community 两包、校园/西幻资产改述为随包分发。变更属 `editorial`（无机器字段增删改义，见 `protocol/EXTENSION.md`）；协议层回执已重签（`nf receipts --scope protocol --write`）。
 
@@ -1616,7 +1616,7 @@ S
   ② **辨别与修法**：这 8 篇是 wave-41/42 的**存档记录**（一次性实测 / 演练集 / 普查 / 评估 / 收口）——**不是墓碑**，其结论早已落进 CHANGELOG 与常驻判据，本件供追溯，故**不删**（删了就少一份追溯证据）；也**不硬塞**进 `llms.txt`（策展清单）或 README 文件表（刻意只列主入口，塞进去只会把导航面撑坏）。改为**逐条登记为「有意不链接」**，让**新增**的未链接文档当场判红。
   ③ **判据**：`test_doc_reachability.UnlinkedDocTest` 三件——① 每篇 `docs/**/*.md` 要么被别处引用、要么在 `ARCHIVE_DOCS` 里写明理由（件数 < 80 判空转）；② **登记表只许缩小**：条目一旦被引用或已不在场即红，防它变成掩盖新孤儿的黑洞；③ **变异自证**：零引用件必判红，路径引用 / 文件名引用都不许误报，且 `CHANGELOG.md` / `results/` / 判据自身**不算链接来源**（与同文件的 `_living_docs` 同一套口径——变更日志是历史流水、结果归档是生成物，都不是导航入口）。
 
-- **零引用**模块级常量** 12 处（含退役端壳遗留）——判据此前只管函数/模块**（**作者指令**：「清除逻辑垃圾（注意辨别）」「清理墓碑代码」）：
+- **零引用**模块级常量**12 处（含退役端壳遗留）——判据此前只管函数/模块**（**作者指令**：「清除逻辑垃圾（注意辨别）」「清理墓碑代码」）：
   ① **取证（2026-10-01 普查）**：`desktop/src/core` 的 440 个模块级大写常量里，**12 个全仓只有定义行一处**（我自己那句「除定义行外出现过即算引用」的口径已把「同文件自身使用」算进去，故这 12 个是真无人用）：`domain_pack.DOMAIN_LIST_ANCHOR` / `ANCHOR_PROBED_THRESHOLD`、`export_schema.CCV3_CHARA_OPT`、`generator.DOC_TEMPLATE`、`market_analyzer.VALID_GRADES`、`mcp_runtime.META_CLIENT_INFO` / `META_CLIENT_CAPABILITIES`、`models.PIPELINE_ALIASES`、`output_forms.TIER_MEANING`、`pipeline_scaffold.DEFAULT_TEMPLATE`、`workflow_policy.REQS_GLOB`、`world_model.SLOT_REGISTRY_PATH`（连它唯一的依赖 `_ROOT` 一并失效）。**辨别**：其中 `DOC_TEMPLATE` 正文写着「由宁封子桌面工具生成」、`PIPELINE_ALIASES` 注释写着「桌面工具指令集功能C」——**退役端壳的遗留**；其余是重构后的孤儿。
   ② **修法**：逐条删除（12 + 1 处），`compileall` 与全量门禁复验通过；常量数 440 → 428、零引用 → **0**。
   ③ **判据**：`test_dead_code.ConstantRuleTest` 两件——① 真仓**零引用常量必须为空**；② **变异自证**（无人用的大写常量必判红；同文件使用、跨文件使用、文档提及、短名都不许误报）。
@@ -1970,7 +1970,7 @@ S
   ③ **写面幂等**：把 14 条 `--write` 类命令（含本波新入闸的 `module types --harvest` / `pipeline dryrun --write-advisory` / `combine plan --certify`）各跑两遍、比对**整棵工作树指纹**（tracked + 未跟踪）——**14/14 幂等**（第二遍不改树）。这正是「默认路径开、agent 密集重复调用」的前提：写面重跑不漂移，门禁绿就稳定绿。
 
 - **文档命令面判据不认 argparse 别名（`nf terminal` 被误判「不是 CLI 子命令」）**（**作者指令**：「内外口径统一」「路径保证一定可达」）：
-  ① **取证（判据自己抓到的）**：本轮把 `nf terminal` 写进 `docs/terminal.md` 后，`test_prose_lint` 与 check33 的正文 lint **双双判红**：`docs/terminal.md 命令面：`nf terminal` 不是 CLI 子命令`。核对后确认——`nf terminal` 是 `add_parser("shell", aliases=["terminal"])` 的**真别名**（`nf terminal --help` 可跑、`nf shell --commands` 里也确在册），被误判的是**判据**：注册表由 `sub.add_parser("名"` 正则而来，**只认主名**。
+  ① **取证（判据自己抓到的）**：本轮把 `nf terminal` 写进 `docs/terminal.md` 后，`test_prose_lint` 与 check33 的正文 lint **双双判红**：`docs/terminal.md 命令面：`nf terminal`不是 CLI 子命令`。核对后确认——`nf terminal` 是 `add_parser("shell", aliases=["terminal"])` 的**真别名**（`nf terminal --help` 可跑、`nf shell --commands` 里也确在册），被误判的是**判据**：注册表由 `sub.add_parser("名"` 正则而来，**只认主名**。
   ② **修法**：`prose_lint.command_face` 的注册表并入 `aliases=[…]`（口径与 `nf shell --commands` 一致）。修后本仓文档命令面归零。
   ③ **判据**：`test_prose_lint` +1 例（合成树里 `add_parser("shell", aliases=["terminal"])` + 文档写 `nf terminal` ⇒ 必须零 issue；别名不进表就红）。
 
@@ -2120,8 +2120,8 @@ S
 - **死引用清扫（ruff 泛选）：28 处「看起来有人用」的死件，27 删 1 留（并补上判据盲区）**（**作者指令**：「清理墓碑代码（注意辨别）」「清除逻辑垃圾（注意辨别）」）：
   ① **扫法**：仓库的 `ruff.toml` **刻意**只开语法级规则（E9/F63/F7/F82，「不启用全库风格规则」）——故「死引用」这一类从没被扫过。按泛选集（`F401`/`F841`/`F541`/`E722`/`B006`/`B008`/`F811`）只读跑一遍：**28 处命中**，逐条辨别。
   ② **两处「注意辨别」的实证**：
-     - `core/library.py` 的 `parse_frontmatter` 看着是「import 未用」，实为**对外转发面**（`audit` / `decisions` / `handover` / `patterns` / `postmortem` 都 `from core.library import parse_frontmatter`）——**保留**并登记 `# noqa: F401` + 理由；同处的 `ENTRY_GLOB` / `read_entry` 才是真死转发（全仓零消费者）⇒ 删。删前先跑测试的做法当场兑现：`test_library.TestFrontmatter` 两例 ERROR 把它抓了回来。
-     - **墓碑判据的盲区**：`.github/scripts/library_ingest.py::rebuild_alias` 定义后**从未被调用**（ALIAS 早已改由 `core.library.write_projection` 全量重生成），却因 `gitee_ingest.py` 有一行 import 而**骗过**既有 `test_dead_code`（口径是「名字出现过一次即算有人用」）⇒ 删函数 + 该 import，并**给判据补一档** `import_only_defs`（把 import 行剔掉再数引用）+ 变异自证。
+  - `core/library.py` 的 `parse_frontmatter` 看着是「import 未用」，实为**对外转发面**（`audit` / `decisions` / `handover` / `patterns` / `postmortem` 都 `from core.library import parse_frontmatter`）——**保留**并登记 `# noqa: F401` + 理由；同处的 `ENTRY_GLOB` / `read_entry` 才是真死转发（全仓零消费者）⇒ 删。删前先跑测试的做法当场兑现：`test_library.TestFrontmatter` 两例 ERROR 把它抓了回来。
+  - **墓碑判据的盲区**：`.github/scripts/library_ingest.py::rebuild_alias` 定义后**从未被调用**（ALIAS 早已改由 `core.library.write_projection` 全量重生成），却因 `gitee_ingest.py` 有一行 import 而**骗过**既有 `test_dead_code`（口径是「名字出现过一次即算有人用」）⇒ 删函数 + 该 import，并**给判据补一档** `import_only_defs`（把 import 行剔掉再数引用）+ 变异自证。
   ③ **其余按类删除**：6 处拆环后残留的 `from core import import_graph as _ig`（`domain_pack` 自己的注释就写着「持久层不再反向依赖解析层」）、`disk_cache` 的 `Dict/Tuple`、`domain_pack` 的 `os`、`output_forms` 的 `contextlib`、`verify_report` 的 `os/Optional`、`workflow_policy` 的 `os`、`interop_thirdparty_kit` 的 `subprocess`；未用局部量 5 处（`domain_pack` ×3、`pack_combo` 的 `profiles(root)` 死调用、`terminal.render_baseline` 的死 `w`、`fde_sample_run` 的死 `manifest_path`）与两处 ingest 前端的死 `form`、一处空 f-string。
   ④ **判据**：泛选 ruff 复扫 **0 命中**；仓库自己的 lint 集（E9/F63/F7/F82）全绿；`test_dead_code` 由 4 例扩到 **8 例**——把这三类死引用都钉成**纯 stdlib 常驻判据**（`import_only_defs`＝只被 import 引用、`unused_imports`＝导入未用、`test_only_modules`＝模块只被自己单测引用），每档各带变异自证（真被调用 / 文档提及 / 字符串派发 / `__future__` / 兼容转发面都不许误报）。
 
@@ -3169,7 +3169,7 @@ S
   ② **14 个域包落地（168 条细分，全部真内容 + 权威锚逐条实测）**：A01 大语言模型 / A02 多模态大模型 / A03 视觉模型 / A04 语音识别与合成 / A05 音频与音乐生成 / A06 视频生成与理解 / A07 图像生成与编辑 / A09 代码大模型 / A11 嵌入与检索表示 / A13 具身智能与机器人 / B01 文本生成与创作 / B02 摘要与信息压缩 / B03 机器翻译与本地化 / B04 分类与情感分析。每包 12 条细分各含「定义口径 / 可机检判据 / 常见失效模式 / 权威锚」，锚可达性本机实测（168 条中仅少数需替换为可达替代锚，含 PyPI/标准/文档类锚；**不可达如实记 ✗ 并换锚**，不假装可达）。
   ③ **功能性 + 可机验 ≥95%（硬门）**：每包含 **T4 可复算面**（域报告由夹具按声明度量族重算，`check32` 逐字段比对）+ 契约/数据/图表/图结构面；**可机验产出占比 1.0000**（10/10 面 ≥T2，门槛 0.95，低于即 FAIL），包级比率（含散文面）0.7692 并列记。check32 新增 `domain_packs` 子扫描：名录 ↔ 盘上实况一致 + 占比门槛 + **每包必有 T4 面**。
   ④ **决策模型干活（非门禁）**：Laya（本地 systemone-http）在 12 个候选里选出下一批域包 **A13（p=0.1989）/ A11（0.1547）/ A09（0.1324）**，继续扩面 p=0.8978，并按「能否落成可复算度量」判据落地；Jev 契约冷链（真伪 → 类别 → 归属）对本波三条断言给出可判定性 p≈0.99 与归属意见，记录于内部档案。
-  ⑤ **本波实测修掉的四处真问题**：`nf register --apply` 写 registry.json **CRLF**（Windows 文本模式，编码卫生判 FAIL）；**事件名跨域重名**触发「发布方唯一」违约（check16 ④）→ 改为按域码命名空间 `<码>_spec_ready|conflict` 并清理 4 条自造死注册；`check7` 段号正则 `^### 8\.1` **误命中 §8.10**（域包 ≥10 个即误取在册数）→ 锚定 `### 8.N `；AUD-0017 误绑派生件（`output_forms_baseline.json`）→ 审计 subjects 去派生物。
+  ⑤ **本波实测修掉的四处真问题**：`nf register --apply` 写 registry.json **CRLF**（Windows 文本模式，编码卫生判 FAIL）；**事件名跨域重名**触发「发布方唯一」违约（check16 ④）→ 改为按域码命名空间 `<码>_spec_ready|conflict` 并清理 4 条自造死注册；`check7` 段号正则 `^### 8\.1` **误命中 §8.10**（域包 ≥10 个即误取在册数）→ 锚定 `### 8.N`；AUD-0017 误绑派生件（`output_forms_baseline.json`）→ 审计 subjects 去派生物。
   ⑥ **文档与口径**：新增 `docs/domain-packs.md`（域包是什么 / 16 件结构 / ≥95% 口径与两个比率 / 14 包表 / 度量族表 / 边界）；`tests/test_domain_pack.py`（15 例：口径公式逐条钉、夹具确定性、生成器幂等 dry-run、唯一性守卫、占比门槛、负例规格拒绝）。实测：`bash verify.sh` **PASS=61 · WARN=0 · FAIL=0**；`nf conformance` **27/27**；机验面 **154 件 / T4 16 件**；事件类型覆盖 55.7% → **75.4%**（顺带收益）。审计片：AUD-0018。
 
 - **产出形态层 + 两域包机验产出面**（**作者指令**：两个域包「产出几乎都是文本…没有功能性」→ 要求数据/图表/结构/规范/接口全形态支持，以**功能完备程度 + 可机验率**定质量，缺则从零构建）：
@@ -3304,7 +3304,7 @@ S
 ## 历史版本
 
 | 版本 | 日期 | 结果摘要 |
-|---|---|---|
+| --- | --- | --- |
 | v2.8.0 | 2026-09-08 | 41 质量编译 + 42 质量纵深随波收口 |
 | v2.7.0 | 2026-09-07 | 无壳基础层整合发布 |
 | v2.6.0 | 2026-09-06 | 端壳接线波收口 |

@@ -9,7 +9,7 @@
 ## 0 渠道总表（先看谁做什么）
 
 | 渠道 | 提交形式 | 谁执行 | 前置 | 当前状态 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 官方 MCP Registry | `mcp-publisher` CLI | **我** | 已满足（npm 1.0.1 带 `mcpName`） | ✅ **已上架 v1.0.1**（2026-10-08） |
 | **awesome-mcp-servers**（最大聚合列表） | GitHub **PR** 改 README | 你（浏览器 2 分钟） | 无 | 待做（下面给现成整行） |
 | **Cline MCP Marketplace** | GitHub **Issue**（模板） | 你 | 400×400 PNG ✅ · `llms-install.md` ✅ · Cline 实测一次 | 待做 |
@@ -29,39 +29,39 @@
 ### A 你需要点开的（提交 / 认领）
 
 | # | 渠道 | 直达链接 | 实测 | 你要做的动作 |
-|---|---|---|---|---|
-| 1 | awesome-mcp-servers | https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md | 302（→ 登录页，浏览器正常） | 粘 §2.1 那一行 → Propose changes → PR 标题末尾加 `🤖🤖🤖` |
-| 1b | ↑ 投稿规则 | https://github.com/punkpeye/awesome-mcp-servers/blob/main/CONTRIBUTING.md | 200 | 读一眼格式与 agent 快速通道说明 |
-| 2 | Cline Marketplace | https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml | 302（→ 登录页） | 填仓库 URL + 上传 `icon-400.png` + 粘贴描述 + 勾实测确认 |
-| 3 | mcp.so | https://mcp.so/submit | 403（机器人拦截，浏览器正常） | 粘 §1 材料包 |
-| 4 | Glama | https://glama.ai/mcp/servers?query=ninfenz | 200 | 有条目 → Claim；没有 → 提交仓库地址 |
-| 5 | PulseMCP | https://www.pulsemcp.com/submit | 403（机器人拦截） | 粘 §1 材料包 |
-| 6 | 魔搭 ModelScope | https://modelscope.cn/mcp | 200 | 需魔搭账号，粘中文块 |
-| 7 | mcpservers.org | https://mcpservers.org/submit | 200 | 表单 |
-| 8 | mcpmarket.com | https://mcpmarket.com/ | 200 | 页脚提交入口 |
-| — | mcpdirectory.ai | https://mcpdirectory.ai/ | **000（本次不可达）** | 建议跳过 |
+| --- | --- | --- | --- | --- |
+| 1 | awesome-mcp-servers | <https://github.com/punkpeye/awesome-mcp-servers/edit/main/README.md> | 302（→ 登录页，浏览器正常） | 粘 §2.1 那一行 → Propose changes → PR 标题末尾加 `🤖🤖🤖` |
+| 1b | ↑ 投稿规则 | <https://github.com/punkpeye/awesome-mcp-servers/blob/main/CONTRIBUTING.md> | 200 | 读一眼格式与 agent 快速通道说明 |
+| 2 | Cline Marketplace | <https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml> | 302（→ 登录页） | 填仓库 URL + 上传 `icon-400.png` + 粘贴描述 + 勾实测确认 |
+| 3 | mcp.so | <https://mcp.so/submit> | 403（机器人拦截，浏览器正常） | 粘 §1 材料包 |
+| 4 | Glama | <https://glama.ai/mcp/servers?query=ninfenz> | 200 | 有条目 → Claim；没有 → 提交仓库地址 |
+| 5 | PulseMCP | <https://www.pulsemcp.com/submit> | 403（机器人拦截） | 粘 §1 材料包 |
+| 6 | 魔搭 ModelScope | <https://modelscope.cn/mcp> | 200 | 需魔搭账号，粘中文块 |
+| 7 | mcpservers.org | <https://mcpservers.org/submit> | 200 | 表单 |
+| 8 | mcpmarket.com | <https://mcpmarket.com/> | 200 | 页脚提交入口 |
+| — | mcpdirectory.ai | <https://mcpdirectory.ai/> | **000（本次不可达）** | 建议跳过 |
 
 ### B 我这边用、你也可以自查的
 
 | 用途 | 直达链接 | 实测 |
-|---|---|---|
-| 官方注册表（人看） | https://registry.modelcontextprotocol.io/ | 200 |
-| 官方注册表（机器查） | https://registry.modelcontextprotocol.io/v0/servers?search=ninfenz | 脚本 000（本机代理路径不稳），发布器可正常读写 |
-| MCP 发布器下载 | https://github.com/modelcontextprotocol/registry/releases/latest | 302→release |
-| npm 包页 | https://www.npmjs.com/package/ninfenz | 403（机器人拦截，浏览器正常） |
-| 发布工作流（可看运行历史） | https://github.com/Monyeah777/NinFenz/actions/workflows/npm-publish.yml | 200 |
-| 站点机器入口 | https://ninfenz.dev/llms.txt | 200 |
-| 完整单文件 | https://ninfenz.dev/llms-full.txt | 200 |
-| 机读事实 | https://ninfenz.dev/facts.json | 200 |
-| 仓库根安装说明（待推送后生效） | https://github.com/Monyeah777/NinFenz/blob/main/llms-install.md | 待推送 |
-| 图标下载（待推送后生效） | https://raw.githubusercontent.com/Monyeah777/NinFenz/main/packaging/mcp/assets/icon-400.png | 待推送 |
+| --- | --- | --- |
+| 官方注册表（人看） | <https://registry.modelcontextprotocol.io/> | 200 |
+| 官方注册表（机器查） | <https://registry.modelcontextprotocol.io/v0/servers?search=ninfenz> | 脚本 000（本机代理路径不稳），发布器可正常读写 |
+| MCP 发布器下载 | <https://github.com/modelcontextprotocol/registry/releases/latest> | 302→release |
+| npm 包页 | <https://www.npmjs.com/package/ninfenz> | 403（机器人拦截，浏览器正常） |
+| 发布工作流（可看运行历史） | <https://github.com/Monyeah777/NinFenz/actions/workflows/npm-publish.yml> | 200 |
+| 站点机器入口 | <https://ninfenz.dev/llms.txt> | 200 |
+| 完整单文件 | <https://ninfenz.dev/llms-full.txt> | 200 |
+| 机读事实 | <https://ninfenz.dev/facts.json> | 200 |
+| 仓库根安装说明（待推送后生效） | <https://github.com/Monyeah777/NinFenz/blob/main/llms-install.md> | 待推送 |
+| 图标下载（待推送后生效） | <https://raw.githubusercontent.com/Monyeah777/NinFenz/main/packaging/mcp/assets/icon-400.png> | 待推送 |
 
 ---
 
 ## 0.6 每个渠道要粘/要传的直达文件（一键复制）
 
 | 渠道 | 要粘贴 / 要上传的文件 | 内容形态 |
-|---|---|---|
+| --- | --- | --- |
 | awesome-mcp-servers | [submissions/01-awesome-mcp-servers.md](submissions/01-awesome-mcp-servers.md) | 一整行 markdown + PR 标题 |
 | Cline Marketplace | [submissions/02-cline-marketplace.md](submissions/02-cline-marketplace.md) + **上传** [assets/icon-400.png](assets/icon-400.png) | Issue 正文整段 + 400×400 PNG |
 | mcp.so | [submissions/03-mcp-so.md](submissions/03-mcp-so.md) | 表单逐字段 |
@@ -79,7 +79,7 @@
 ## 1 通用材料包（备一次，处处粘贴）
 
 | 字段 | 取值 |
-|---|---|
+| --- | --- |
 | 名称（registry name） | `io.github.Monyeah777/ninfenz` |
 | 展示名 | **NinFenz Content Gate** |
 | 一句话（EN） | Read-only MCP server for a content contract layer: protocol, modules, pipelines, assets, library. |
@@ -91,8 +91,8 @@
 | 安装（检出） | `python scripts/nf.py serve` |
 | 工具面 | 12 只读工具 + 1 prompt（`assemble_guide`）；**无写路径** |
 | 许可 | MIT |
-| 仓库 | https://github.com/Monyeah777/NinFenz |
-| 站点 | https://ninfenz.dev/ |
+| 仓库 | <https://github.com/Monyeah777/NinFenz> |
+| 站点 | <https://ninfenz.dev/> |
 | 图标 | `packaging/mcp/assets/icon-400.png`（Cline 要 400×400）· `icon-512.png`（其它站） |
 | 安装说明书 | 仓库根 `llms-install.md`（agent 只读这一份即可装） |
 
@@ -118,7 +118,7 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 
 ### 2.1 awesome-mcp-servers（先做这个：一次 PR 覆盖最大受众）
 
-入口：https://github.com/punkpeye/awesome-mcp-servers
+入口：<https://github.com/punkpeye/awesome-mcp-servers>
 
 1. 打开 README，点右上角铅笔（Edit）→ GitHub 会自动帮你 fork 一份；
 2. 在 Servers 列表里按字母序找到插入位置（`M` 段附近），**粘这一行**：
@@ -127,15 +127,15 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 - [Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) 🐍 🏠 - Content contract layer as a read-only MCP server: protocol specs, modules, pipelines, assets and the knowledge library for long-form content (Python stdlib only, no write paths).
 ```
 
-3. 提交：Commit changes → Propose changes → 创建 PR；
-4. **在 PR 标题末尾加 `🤖🤖🤖`**：官方 CONTRIBUTING 写明这是**agent PR 快速通道**（"Just add 🤖🤖🤖 to the end of the PR title to opt-in. Merging your PR will be fast-tracked."）；
-5. 注意格式：条目前是 `- [owner/repo](url)`，后接 **legend emoji** —— `🐍`（Python 代码库）、`🏠`（本地服务）；描述一句话，句末不加句号也可（照抄上面的行最省事）。
+1. 提交：Commit changes → Propose changes → 创建 PR；
+2. **在 PR 标题末尾加 `🤖🤖🤖`**：官方 CONTRIBUTING 写明这是**agent PR 快速通道**（"Just add 🤖🤖🤖 to the end of the PR title to opt-in. Merging your PR will be fast-tracked."）；
+3. 注意格式：条目前是 `- [owner/repo](url)`，后接 **legend emoji** —— `🐍`（Python 代码库）、`🏠`（本地服务）；描述一句话，句末不加句号也可（照抄上面的行最省事）。
 
 > 该列表只收「有公开仓库、可自行安装」的 server（远程托管型另去 awesome-remote-mcp-servers）—— 我们满足。
 
 ### 2.2 Cline MCP Marketplace
 
-入口（提交 issue，模板已就绪）：https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml
+入口（提交 issue，模板已就绪）：<https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml>
 
 1. **GitHub Repo URL**：`https://github.com/Monyeah777/NinFenz`（嵌套路径也行）；
 2. **Logo**：上传 `packaging/mcp/assets/icon-400.png`（要求 400×400 PNG）；
@@ -145,7 +145,7 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 
 ### 2.3 mcp.so
 
-入口：https://mcp.so/submit
+入口：<https://mcp.so/submit>
 
 1. 打开表单，字段以页面为准（通常：名称 / 一句话 / 仓库 URL / 安装命令 / 类目 / 图标）。页面是前端渲染，我这边取不到字段文本，**你照着 §1 粘贴即可**；
 2. 名称填 `NinFenz Content Gate`，仓库填 GitHub 地址，安装命令填 `npx -y ninfenz serve`；
@@ -153,7 +153,7 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 
 ### 2.4 Glama
 
-入口：https://glama.ai/mcp/servers
+入口：<https://glama.ai/mcp/servers>
 
 1. 用 GitHub 登录；Glama 会自己扫 GitHub 上的 MCP 仓库，先在站内搜 `NinFenz` 或 `ninfenz`；
 2. 若已有条目 → 点 **Claim** 认领（证明你是仓库属主）；若没有 → 用站内 "Add server / Submit" 提交仓库地址 + §1 描述；
@@ -161,7 +161,7 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 
 ### 2.5 PulseMCP
 
-入口：https://www.pulsemcp.com/submit
+入口：<https://www.pulsemcp.com/submit>
 
 > 提示：该站有 Cloudflare 人机校验，我这边的出口 IP 被拦（返回 "Attention Required"），所以只能你用自己的浏览器提交。
 
@@ -170,15 +170,15 @@ Install: npx -y ninfenz serve    Repo: https://github.com/Monyeah777/NinFenz    
 
 ### 2.6 魔搭 ModelScope MCP 广场（可选，中国区）
 
-入口：https://modelscope.cn/mcp　· 需要魔搭账号；字段同上（名称/描述/仓库/安装命令），中文材料直接用 §1 中文块。
+入口：<https://modelscope.cn/mcp>　· 需要魔搭账号；字段同上（名称/描述/仓库/安装命令），中文材料直接用 §1 中文块。
 
 ### 2.7 轻量目录（可选，几分钟）
 
 | 站点 | 入口 | 说明 |
-|---|---|---|
-| mcpservers.org | https://mcpservers.org/submit | 表单 |
-| mcpmarket.com | https://mcpmarket.com/ | 提交入口在页脚 |
-| mcpdirectory.ai | https://mcpdirectory.ai/ | 表单 |
+| --- | --- | --- |
+| mcpservers.org | <https://mcpservers.org/submit> | 表单 |
+| mcpmarket.com | <https://mcpmarket.com/> | 提交入口在页脚 |
+| mcpdirectory.ai | <https://mcpdirectory.ai/> | 表单 |
 
 ### 2.8 官方 MCP Registry（回顾：已自动化）
 
@@ -207,7 +207,7 @@ npx -y --registry https://registry.npmjs.org ninfenz serve   # 应进入 stdio�
 ## 4 缺件与责任人
 
 | 事项 | 谁 | 状态 |
-|---|---|---|
+| --- | --- | --- |
 | 400×400 PNG 图标 | 我 | ✅ `packaging/mcp/assets/icon-400.png`（同目录 512 版） |
 | `llms-install.md`（Cline 一键安装要读） | 我 | ✅ 仓库根已新增 |
 | 官方注册表发布 | 我 | ⏳ 等 1.0.1 |
@@ -218,7 +218,7 @@ npx -y --registry https://registry.npmjs.org ninfenz serve   # 应进入 stdio�
 ## 5 时效与预期
 
 | 渠道 | 通常时长 |
-|---|---|
+| --- | --- |
 | 官方 MCP Registry | 分钟级（发布即生效） |
 | awesome-mcp-servers PR | 几小时–几天（标题带 `🤖🤖🤖` 走快速通道） |
 | Cline Marketplace | 数天–数周（人工审核，看社区指标） |
