@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:1d1450c51eefbc0233bf0a9367ce5cde9919b26754bb9585af7a5b088111b669
 ---
+> 重审（2026-10-20）：compliance green 1
+
 > 重审（2026-10-20）：stdio pin 1
 
 > 重审（2026-10-20）：compliance closure 1

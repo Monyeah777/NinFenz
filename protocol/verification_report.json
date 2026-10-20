@@ -20,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 10,
+        "imports": 11,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -372,8 +372,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 302,
-        "files": 302,
+        "baseline": 310,
+        "files": 310,
         "max_fn_cc": 115,
         "max_fn_lines": 1254,
         "max_lines": 7544
@@ -383,17 +383,19 @@
     },
     {
       "id": "redos",
-      "issues": 0,
+      "issues": 1,
       "name": "正则失控回溯（形态 + 增长律；Y3 接线）",
-      "sample": [],
+      "sample": [
+        "scripts/repo_doctor.py:32 正则超线性回溯：65536 字符的 run:' ' 输入耗时 4081 ms > 预算 1500 ms（修复指引：给贪婪量词加前缀边界，或先按分隔符切分再匹配）"
+      ],
       "source": "redos_scan.scan",
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 214,
-        "probed": 214
+        "patterns": 228,
+        "probed": 228
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -496,10 +498,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 61,
+        "pinned_uses": 79,
         "requirements_files": 4,
-        "with_explicit_permissions": 18,
-        "workflows": 18
+        "with_explicit_permissions": 24,
+        "workflows": 24
       },
       "status": "pass",
       "warns": 0
@@ -509,7 +511,7 @@
       "issues": 1,
       "name": "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
       "sample": [
-        "数据件 protocol/LAYERS.json 摘要不符（记录 0285b8b1fdf2 / 实测 5aa3bfd6c814）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"
+        "数据件 protocol/LAYERS.json 摘要不符（记录 0285b8b1fdf2 / 实测 e43d86232dbd）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"
       ],
       "source": "asset_contract.scan",
       "stats": {
@@ -529,12 +531,12 @@
       "issues": 1,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
       "sample": [
-        "② protocol/role_coordinates.json 与实时重算不一致（记录 3337cd0951cd / 实测 10e5d27c62e7）（修复指引：nf layers --write）"
+        "② protocol/role_coordinates.json 与实时重算不一致（记录 3337cd0951cd / 实测 2894ba2dd81e）（修复指引：nf layers --write）"
       ],
       "source": "role_model.scan",
       "stats": {
-        "files": 3819,
-        "kernel": 1987,
+        "files": 3836,
+        "kernel": 1992,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -545,12 +547,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "6b4bb8beec01b2dd30267014ea82922080de368245ff477fbba4a8ee6e9b98dc",
+  "root_digest": "2ed828c2696c5f6cf4dbdb976734cdd90c4cf82e57a5cbb495e90adfbe28a724",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 3,
-    "pass": 27,
+    "fail": 4,
+    "pass": 26,
     "warn": 1
   }
 }

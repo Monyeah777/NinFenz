@@ -1290,15 +1290,40 @@
       "max_fn_cc": 14,
       "max_fn_lines": 50
     },
+    "scripts/check_added_large_files.py": {
+      "lines": 146,
+      "max_fn_cc": 10,
+      "max_fn_lines": 26
+    },
     "scripts/check_external_links.py": {
       "lines": 336,
       "max_fn_cc": 17,
       "max_fn_lines": 71
     },
+    "scripts/check_gitignore_coverage.py": {
+      "lines": 98,
+      "max_fn_cc": 7,
+      "max_fn_lines": 23
+    },
+    "scripts/check_internal_links.py": {
+      "lines": 205,
+      "max_fn_cc": 22,
+      "max_fn_lines": 53
+    },
     "scripts/check_interop_schemas.py": {
       "lines": 391,
       "max_fn_cc": 22,
       "max_fn_lines": 69
+    },
+    "scripts/check_repo_hygiene.py": {
+      "lines": 155,
+      "max_fn_cc": 18,
+      "max_fn_lines": 71
+    },
+    "scripts/check_untracked_artifacts.py": {
+      "lines": 112,
+      "max_fn_cc": 6,
+      "max_fn_lines": 20
     },
     "scripts/code_metrics.py": {
       "lines": 57,
@@ -1380,6 +1405,11 @@
       "max_fn_cc": 18,
       "max_fn_lines": 52
     },
+    "scripts/issue_guard.py": {
+      "lines": 96,
+      "max_fn_cc": 9,
+      "max_fn_lines": 25
+    },
     "scripts/jcs.py": {
       "lines": 209,
       "max_fn_cc": 15,
@@ -1445,6 +1475,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 39
     },
+    "scripts/repo_doctor.py": {
+      "lines": 411,
+      "max_fn_cc": 11,
+      "max_fn_lines": 42
+    },
     "scripts/rewrite_text.py": {
       "lines": 136,
       "max_fn_cc": 9,
@@ -1459,6 +1494,11 @@
       "lines": 236,
       "max_fn_cc": 12,
       "max_fn_lines": 30
+    },
+    "scripts/sensitive_scan.py": {
+      "lines": 116,
+      "max_fn_cc": 10,
+      "max_fn_lines": 26
     },
     "scripts/serve_decision_model.py": {
       "lines": 288,

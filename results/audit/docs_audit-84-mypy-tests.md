@@ -14,7 +14,7 @@ subjects:
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
-  - desktop/tests/test_live_doc_counts.py:2a855eb4c497d977055d0ac159060775f47bc4b05fe8c1e8a0d0b06586d8ee79
+  - desktop/tests/test_live_doc_counts.py:fc243743d289e742df30449ab73d5b2ab240d84843a480706f5db4da3a122da9
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
   - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
@@ -23,7 +23,7 @@ subjects:
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
-  - desktop/tests/test_doc_reachability.py:8ef6a2a5a8c22cfbc353ea5c316a6554dcf85c4b500b9058755af9bd21a3c4e0
+  - desktop/tests/test_doc_reachability.py:de866bc323d9e2f0048745e3161d942c7e4c7ec1af717961f7eb05e21bcb64eb
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-20）：compliance green 1
+
 > 重审（2026-10-20）：stdio pin 1
 
 > 重审（2026-10-20）：hygiene + version governance

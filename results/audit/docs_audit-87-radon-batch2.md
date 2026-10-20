@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:1d1450c51eefbc0233bf0a9367ce5cde9919b26754bb9585af7a5b088111b669
 ---
+> 重审（2026-10-20）：compliance green 1
+
 > 重审（2026-10-20）：stdio pin 1
 
 > 重审（2026-10-20）：compliance closure 1
