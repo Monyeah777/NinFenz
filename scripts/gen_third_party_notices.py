@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import sys
 import urllib.parse
@@ -19,6 +18,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core import json_doc  # noqa: E402 - 读 JSON 走仓库唯一读点（json_shape_contracts）
+
 OUT = ROOT / "THIRD-PARTY-NOTICES.md"
 PIN_FILES = sorted((ROOT / ".github").glob("requirements-*.txt"))
 
@@ -69,7 +72,7 @@ def pypi(name: str) -> dict:
     # 下方 urlopen 的入参已由上面两道校验钉死为「https + pypi.org」常量前缀，
     # 故 bandit B310 / ruff S310（动态 URL）在此站点是**已消除的**风险面。
     with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310
-        return json.load(resp)
+        return json_doc.loads(resp.read().decode("utf-8"), dict, what="PyPI " + name)
 
 
 def main(argv=None) -> int:
