@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:3341c8bc2afb4590471c28c1bcb222ec434e39b9e556cf2d0bfb8269e4aeeda8
+  - protocol/code_metrics_baseline.json:a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b
 ---
+> 重审（2026-10-20）：version governance + daemon leak fix
+
 > 重审（2026-10-20）：D 盘迁移：跨盘 relpath 修复（nf.py 展示面 + trust_boundary 用例）
 
 > 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算

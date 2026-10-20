@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:6690b7df7eddcbe0fff22715f0c8937e0dedcb27c63d94f13f34b3cf01e226ae
-  - protocol/code_metrics_baseline.json:3341c8bc2afb4590471c28c1bcb222ec434e39b9e556cf2d0bfb8269e4aeeda8
+  - desktop/src/core/terminal.py:3e5b107dfc1a068325282a63a68112113e53a61c43f21c8cb52f4c4f731695d5
+  - protocol/code_metrics_baseline.json:a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b
 ---
+> 重审（2026-10-20）：version governance + daemon leak fix
+
 > 重审（2026-10-20）：D 盘迁移：跨盘 relpath 修复（nf.py 展示面 + trust_boundary 用例）
 
 > 重审（2026-10-20）：drill 正例对照（注入必红/原版必绿）后重算

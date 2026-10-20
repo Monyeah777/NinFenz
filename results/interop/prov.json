@@ -186,7 +186,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "3341c8bc2afb4590471c28c1bcb222ec434e39b9e556cf2d0bfb8269e4aeeda8"
+      "nf:sha256": "a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",

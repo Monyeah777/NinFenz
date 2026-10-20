@@ -226,7 +226,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 769,
+      "lines": 770,
       "max_fn_cc": 14,
       "max_fn_lines": 70
     },
@@ -1381,9 +1381,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7543,
+      "lines": 7544,
       "max_fn_cc": 115,
-      "max_fn_lines": 1253
+      "max_fn_lines": 1254
     },
     "scripts/nf_client.py": {
       "lines": 189,

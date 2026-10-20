@@ -25,15 +25,17 @@ subjects:
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
-  - desktop/tests/test_daemon_parity.py:56b5b09e6417f8b7d755ef30e83e4a5623c6e0b14a9450f7219a2af5189657f2
+  - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
   - desktop/tests/test_cli_json_face.py:1eb5cc107bde93e9f92fa50e380c605ef8a9cdb19c4978bb54fa89d8c5531da6
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:b9f8f6fecd185f9a9bb99cb391e937d7fb76998a84360a251bd33ab3c05bf503
-  - desktop/tests/test_nf_cli.py:55f3dbe5adc15441fbe6b6dae5f090ce3bd3f5909a790a10c525bc099e494ac0
+  - desktop/tests/test_terminal.py:46a1b762320c65f0cf3bf984f3bbf66990f649278e5caac9e1e71453c35f7ae1
+  - desktop/tests/test_nf_cli.py:ddfbaa24b4a686cf9daac01c88f0b39739ef6f7f0bd4a56d570e088897763853
 ---
+> 重审（2026-10-20）：version governance + daemon leak fix
+
 > 重审（2026-10-19）：干净树重冻；修正外部 WIP 污染（AUD-0036 subject 从 WIP 版 0d431643 回到干净版 ad0bab51）
 
 > 重审（2026-10-19）：gate_labels 真值缓存指纹 + heredoc 修复
