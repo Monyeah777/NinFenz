@@ -3081,8 +3081,7 @@ def _cmd_attest(args):
                          sig.get("scheme") or "digest_only",
                          att["envelope_digest"][:12]))
             if args.out:
-                print("  写入：%s" % os.path.relpath(
-                    os.path.abspath(out_path), ROOT).replace("\\", "/"))
+                print("  写入：%s" % _rel_display(out_path))
             if not key:
                 print("  提示：未加 --key-file → digest_only 级（只证一致，"
                       "不证诚实性）；对外可验证需 hmac 密钥或 sigstore 外挂锚。",
@@ -4664,6 +4663,21 @@ def _utf8_text_issue(args) -> str:
     return ""
 
 
+def _rel_display(path):
+    """展示用相对路径：**跨盘时退回绝对路径**（Windows 不同盘符下 `os.path.relpath` 会抛
+    `ValueError: path is on mount 'C:', start on mount 'D:'`）。
+
+    为什么要这一条（2026-10-20 实测）：仓库在 D 盘、用户 `--out` 落在 C 盘临时目录时，
+    `_cmd_attest` 的**一行友好显示**直接抛异常，把整条命令判成失败——为展示而挂掉功能。
+    `relpath` 在没有共同挂载点时本来就无解，退回绝对路径是唯一正确语义（落点由用户显式给出）。
+    """
+    target = os.path.abspath(path)
+    try:
+        return os.path.relpath(target, os.path.abspath(ROOT)).replace("\\", "/")
+    except ValueError:
+        return target.replace("\\", "/")
+
+
 def _rel_out(path):
     """收路径旗标的落点归一：**绝对路径按原样**（用户显式给出的仓外落点是设计面——CI 产物目录、
     临时导出），**相对路径一律相对仓库根**，且相对写法**不得含 `..` / 盘符**。
@@ -5373,8 +5387,7 @@ def _cmd_score(args):
                       % (r["signal"], r["from"], r["to"], r["drop"]),
                       file=sys.stderr)
             if args.write_baseline:
-                print("  基线已写入：%s" % os.path.relpath(
-                    os.path.abspath(base_path), ROOT).replace("\\", "/"))
+                print("  基线已写入：%s" % _rel_display(base_path))
         return 0 if out["ok"] else 1
     except (OSError, ValueError, _json.JSONDecodeError) as exc:
         return _machine_fail(args, str(exc), 1)

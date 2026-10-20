@@ -272,7 +272,12 @@ class ToolPathContainmentTest(unittest.TestCase):
 
     def test_pipeline_read_refuses_escape_writes(self):
         canary = self._canary()
-        rel = os.path.relpath(canary, ROOT).replace(os.sep, "/")
+        # 跨盘（Windows 仓库与临时目录不同挂载点）时 relpath 无解：退回绝对路径，
+        # 三条 payload「都在仓外」这一点不变——穿越语义仍被测到（见下方断言）。
+        try:
+            rel = os.path.relpath(canary, ROOT).replace(os.sep, "/")
+        except ValueError:
+            rel = str(canary).replace(os.sep, "/")
         payloads = [
             "community/x/pipelines/" + "../" * 3 + rel,     # 相对穿越（旧判据被骗）
             str(canary).replace(os.sep, "/"),               # 绝对路径写法

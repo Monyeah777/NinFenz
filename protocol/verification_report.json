@@ -373,7 +373,7 @@
         "files": 301,
         "max_fn_cc": 115,
         "max_fn_lines": 1253,
-        "max_lines": 7530
+        "max_lines": 7543
       },
       "status": "pass",
       "warns": 0
@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1274,
+        "files": 1264,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "7792016b0873e018af4157a20c476246372da69621051c8ea56884dccca19032",
+  "root_digest": "0c52848ddf5d274b2da61b67ecbecaa857f92d05066b6675b461db868a8cc471",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
