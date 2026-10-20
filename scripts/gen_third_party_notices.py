@@ -14,6 +14,7 @@ import argparse
 import json
 import re
 import sys
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -57,8 +58,14 @@ def pins() -> list[tuple[str, str]]:
 
 
 def pypi(name: str) -> dict:
-    url = "https://pypi.org/pypi/%s/json" % name
-    with urllib.request.urlopen(url, timeout=25) as resp:
+    """取 PyPI 官方元数据。**只允许 https + pypi.org**（防 URL 注入 / 明文降级）。"""
+    url = "https://pypi.org/pypi/%s/json" % urllib.parse.quote(name, safe="")
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https" or parsed.netloc != "pypi.org":
+        raise ValueError("拒绝非 PyPI 官方地址：%s" % url)
+    # 下方 urlopen 的入参已由上面两道校验钉死为「https + pypi.org」常量前缀，
+    # 故 bandit B310 / ruff S310（动态 URL）在此站点是**已消除的**风险面。
+    with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310  # noqa: S310
         return json.load(resp)
 
 
