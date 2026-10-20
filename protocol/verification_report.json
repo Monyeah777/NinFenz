@@ -386,7 +386,7 @@
       "issues": 1,
       "name": "正则失控回溯（形态 + 增长律；Y3 接线）",
       "sample": [
-        "scripts/repo_doctor.py:32 正则超线性回溯：65536 字符的 run:' ' 输入耗时 4081 ms > 预算 1500 ms（修复指引：给贪婪量词加前缀边界，或先按分隔符切分再匹配）"
+        "scripts/repo_doctor.py:32 正则超线性回溯：65536 字符的 run:' ' 输入耗时 4076 ms > 预算 1500 ms（修复指引：给贪婪量词加前缀边界，或先按分隔符切分再匹配）"
       ],
       "source": "redos_scan.scan",
       "stats": {
@@ -547,7 +547,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "2ed828c2696c5f6cf4dbdb976734cdd90c4cf82e57a5cbb495e90adfbe28a724",
+  "root_digest": "412fd57fa5d0b15d2921d2a5496e7e665000e2d1a2db7347e27854f8d4c4e295",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
