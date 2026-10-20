@@ -2,6 +2,9 @@
 
 <!-- nf:locales --> 语言 / Languages：[中文](README.md) · **[English](README.en.md)** · [日本語](README.ja.md)
 
+> **Canonical repository**: https://github.com/Monyeah777/NinFenz | npm `ninfenz` | GitHub Packages `@monyeah777/ninfenz`
+> Same-named repositories under other accounts are **unauthorised mirror snapshots**; they do not represent this project and accept no issues or PRs.
+
 [![verify gate ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
 **Live site**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)

@@ -2,6 +2,9 @@
 
 <!-- nf:locales --> 语言 / Languages：[中文](README.md) · [English](README.en.md) · **[日本語](README.ja.md)**
 
+> **唯一の公式リポジトリ**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
+> 他アカウントの同名リポジトリは**無断のミラー**であり、本プロジェクトを代表しません（Issue/PR も受け付けません）。
+
 [![ゲート ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
 **サイト（公開）**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
