@@ -7,7 +7,7 @@
 
 手册 SP-01 的白名单是 src/docs/tests 型项目模板。本仓是内容契约仓：
 
-- 根目录的 `01_核心协议.md` / `02_联动注册表.md` / `06` / `07` 是协议真源，verify check1-16 直接读；
+- 根目录的 `01_核心协议.md` / `02_联动注册表.md` / `06` / `07` 是协议真源，verify 段 A 的协议一致性判据直接读；
 - `STRATEGY.md` 是 `protocol/RECEIPTS.json` 的回执锚（收据链以它为固定件），迁出即断链；
 - `verify.sh` 是 42 条 check 的门禁本体，被 AGENTS/CONTRIBUTING/文档大量引用；
 - `handovers/` `postmortems/` `results/` 与 `desktop/src/core` 的 Python、Rust、.NET 三面实现互相读路径。

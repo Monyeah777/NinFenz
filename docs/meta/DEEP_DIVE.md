@@ -44,6 +44,8 @@ AI 消费 NF 的完整循环：**读 → 判 → 配 → 装 → 执 → 验**�
 
 ## §6 深读路径
 
+施工与治理登记另有：`docs/meta/ROOT-MANIFEST.md`（根目录清单口径）、`docs/meta/BUILD-DECLARATIONS.md`（不适用/未做项与触发条件）。
+
 先读 STRATEGY → AGENT_START → 01 → 02 → 06 → 07；需要操作再读 `docs/agent/agent_组装指令包_v0.2.md`、`docs/mcp.md`、`docs/agent/AI_ROUTING.md`。看每个文件时：读“是什么”和“怎么被校验”，不逐行背方案正文。
 
 ## §7 自检十问

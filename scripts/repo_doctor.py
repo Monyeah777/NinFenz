@@ -347,7 +347,8 @@ RULES = (
 def run(root="."):
     root = Path(root).resolve()
     if _git(root, "rev-parse", "--git-dir").returncode != 0:
-        raise SystemExit(f"不是 git 仓库：{root}（修复指引：在仓库根目录运行，或用 --repo 指向 git 仓库）")
+        raise SystemExit(
+            f"不是 git 仓库：{root}（修复指引：在仓库根运行，或 --repo 指向仓库）")
     ctx = {}
     rows, groups = [], {g: {"score": 0.0, "max": 0, "rules": []} for g in GROUPS}
     for rid, group, title, fn in RULES:
