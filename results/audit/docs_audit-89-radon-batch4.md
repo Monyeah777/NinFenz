@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a
+  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
 ---
+> 重审（2026-10-20）：notices generator hardened
+
 > 重审（2026-10-20）：third-party notices + community provenance gate
 
 > 重审（2026-10-20）：version governance + daemon leak fix

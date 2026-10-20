@@ -1351,7 +1351,7 @@
       "max_fn_lines": 59
     },
     "scripts/gen_third_party_notices.py": {
-      "lines": 125,
+      "lines": 132,
       "max_fn_cc": 11,
       "max_fn_lines": 57
     },

@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a
+  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
 ---
+> 重审（2026-10-20）：notices generator hardened
+
 > 重审（2026-10-20）：third-party notices + community provenance gate
 
 > 重审（2026-10-20）：version governance + daemon leak fix

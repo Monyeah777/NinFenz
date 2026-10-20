@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:104d54825183329b72f403aaac355f86398ce360b466e75d212f11ecc4a1b12f
-  - protocol/code_metrics_baseline.json:34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a
+  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
 ---
+> 重审（2026-10-20）：notices generator hardened
+
 > 重审（2026-10-20）：third-party notices + community provenance gate
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a
+  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
 ---
+> 重审（2026-10-20）：notices generator hardened
+
 > 重审（2026-10-20）：third-party notices + community provenance gate
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
