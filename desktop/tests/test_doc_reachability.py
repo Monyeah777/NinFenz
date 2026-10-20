@@ -58,6 +58,9 @@ def _looks_like_rel_path(tok: str, tops: set) -> bool:
     s = tok.strip()
     if not s or " " in s or "://" in s or s.startswith(("-", "/", "~")):
         return False
+    # worktree 里 .git 是指针文件（不是目录），.git/* 无法解析，不算「相对路径未达」
+    if s.split("/", 1)[0] == ".git" and not (ROOT / ".git").is_dir():
+        return False
     if any(mark in s for mark in _PLACEHOLDER):
         return False
     if any(c in _WILDCARD or c in _BAD_CHARS for c in s):

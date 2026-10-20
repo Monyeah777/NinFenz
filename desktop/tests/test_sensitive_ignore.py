@@ -48,7 +48,10 @@ class SensitiveIgnoreTest(unittest.TestCase):
         # `-z` 是必须的：默认输出把**非 ASCII 路径**转义加引号（`"05_\346\265..."`），
         # 于是 `.pem` 变成 `.pem"`、正则 $ 锚点失配——中文名敏感件会被**静默放过**。
         listed = _git("ls-files", "-z").split("\0")
-        bad = [f for f in listed if f and MUST_NOT_TRACK.search(f)]
+        # .env.example 是模板（全占位符、真值禁填；手册 FX-04 要求它在场）——
+        # 它是「.env 的样例」而不是「.env」，按模板放行。
+        bad = [f for f in listed
+               if f and MUST_NOT_TRACK.search(f) and not f.endswith('.env.example')]
         self.assertEqual([], bad, "已跟踪敏感文件（撤凭据 + 从历史移除后重建）")
 
     def test_check_ignore_has_catch_power(self):
