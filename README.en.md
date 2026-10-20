@@ -1,6 +1,6 @@
 # NinFenz · Document Generation Workshop (spec-driven) — English mirror
 
-<!-- nf:locales --> 🌐 [简体中文](README.md) · **English** · [日本語](README.ja.md)
+<!-- nf:locales --> 语言 / Languages：[中文](README.md) · **[English](README.en.md)** · [日本語](README.ja.md)
 
 [![verify gate ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
@@ -124,17 +124,6 @@ AI assembly:
 | Tooling | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
 | Integrations | `integrations/README.md` (MCP / LSP / CLI / TUI / library / Skill / npm / Rust / .NET / A2A) |
 | Collection | `library/INDEX.md` · `docs/agent/ROUTES.md` |
-
-## Version block
-
-| Version | Status |
-|---|---|
-| v2.11.0 | current (2026-09-10) · world_model deterministic abstract-state contract + world_slots |
-| v2.10.0 | released 2026-09-09 · 45 quality depth + foundation-layer wave A |
-| v2.9.0 | released 2026-09-08 · STRATEGY + waves 43/44 |
-| v2.8.0 | released 2026-09-08 · waves 41/42 quality closure |
-
-Full version history: `CHANGELOG.md` and `docs/meta/VERSION-MATRIX.md`.
 
 ## Versions
 

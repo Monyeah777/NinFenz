@@ -1,6 +1,6 @@
 # NinFenz · 文档生成工坊（规范驱动）
 
-<!-- nf:locales --> 🌐 **简体中文** · [English](README.en.md) · [日本語](README.ja.md)
+<!-- nf:locales --> 语言 / Languages：**[中文](README.md)** · [English](README.en.md) · [日本語](README.ja.md)
 
 [![门禁 ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 

@@ -24,9 +24,9 @@ def _pin_stdio() -> None:
             stream.reconfigure(encoding="utf-8")
 
 SWITCH = {
-    "zh": "🌐 **简体中文** · [English](README.en.md) · [日本語](README.ja.md)",
-    "en": "🌐 [简体中文](README.md) · **English** · [日本語](README.ja.md)",
-    "ja": "🌐 [简体中文](README.md) · [English](README.en.md) · **日本語**",
+    X,
+    "en": "语言 / Languages：[中文](README.md) · **[English](README.en.md)** · [日本語](README.ja.md)",
+    "ja": "语言 / Languages：[中文](README.md) · [English](README.en.md) · **[日本語](README.ja.md)**",
 }
 
 VERSIONS = {
