@@ -123,12 +123,21 @@ AI 装配：
 
 ## 版本块
 
+本项目有**三条独立的版本线**，各自自洽（机检见 `desktop/tests/test_version_map.py`）：
+
+| 线 | 当前 | 口径 |
+|---|---|---|
+| 内容 / 协议 | **v2.12.0** | `CHANGELOG.md` 最新已发布节 == `docs/meta/VERSION-MATRIX.md` 末行；git tag `vX.Y.Z` 标记发布点 |
+| 门禁 | **verify v2.30 · check1-42 · PASS=76** | `protocol/repo_stats.json` == `quality_baseline` 期望值 == `llms.txt` 凭证串 |
+| CLI / npm / MCP | **1.0.2** | `scripts/nf.py` 的 `NF_CLI_VERSION` == npm `package.json` == MCP `server.json`（两处） |
+
+内容线最近三版：
+
 | 版本 | 状态 |
 |---|---|
 | v2.12.0 | 当前（2026-10-05）· 知识层 + 终端线 + 顶尖对标补齐 + 数字资产契约层 |
 | v2.11.0 | 已发布 2026-09-10 · world_model 确定性抽象状态契约 + world_slots |
 | v2.10.0 | 已发布 2026-09-09 · 45 质量纵深 + 基础层 A 组收口 |
-| v2.9.0 | 已发布 2026-09-08 · STRATEGY + 43/44 随波 |
-| v2.8.0 | 已发布 2026-09-08 · 41/42 波 C 质量收口 |
 
-详细版本演进见 `CHANGELOG.md` 与 `docs/meta/VERSION-MATRIX.md`。
+> **tag 纪律**：发布即打 `vX.Y.Z`，且只打在内容线发布点上；CLI/npm/MCP 用独立补丁号（`1.0.x`），不再另打 tag。
+> 历史演进见 `CHANGELOG.md` 与 `docs/meta/VERSION-MATRIX.md`。

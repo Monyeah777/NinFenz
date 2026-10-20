@@ -673,7 +673,8 @@ def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
         return False
 
 
-def start(root: Path, idle_timeout: float = 3600.0, wait: float = 15.0,
+def start(root: Path, idle_timeout: float = float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
+          wait: float = 15.0,
           watch: bool = False) -> Tuple[bool, str]:
     """拉起守护（后台子进程）→ (是否成功, 说明)。已在跑则直接返回 True。"""
     if ping():
@@ -751,7 +752,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                                  description="NF 执行层常驻守护（内部入口）")
     ap.add_argument("--serve", action="store_true", help="前台跑守护循环（供 start 拉起）")
     ap.add_argument("--root", default=str(Path(__file__).resolve().parents[3]))
-    ap.add_argument("--idle", type=float, default=3600.0,
+    ap.add_argument("--idle", type=float, default=float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
                     help="空闲多少秒后自动退出（0=不退出）")
     ap.add_argument("--force", action="store_true",
                     help="已有守护在运行时仍另起一个（会顶掉先起者的状态登记，默认拒绝）")

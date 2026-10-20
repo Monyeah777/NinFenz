@@ -41,7 +41,7 @@ from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回
 from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
 interp_diet.restore()
 
-NF_CLI_VERSION = "1.0.1"
+NF_CLI_VERSION = "1.0.2"
 NF_CLI_EPILOG = (
     "入门：\n"
     "  nf shell              # 交互终端（能力菜单 + 命令直通；端壳退役后的人机入口）\n"
@@ -1255,7 +1255,8 @@ def _make_parser() -> argparse.ArgumentParser:
                           description="拉起执行层常驻守护：后台子进程、只绑 127.0.0.1 + 一次性令牌"
                               "，"
                                       "状态落在 <NF_HOME>/daemon.json。已在运行则幂等返回。")
-    dst.add_argument("--idle", type=float, default=3600.0,
+    dst.add_argument("--idle", type=float,
+                     default=float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
                      help="空闲多少秒后自动退出（0=不退出）")
     dst.add_argument("--watch", action="store_true",
                      help="启用目录监听 + 只读命令响应缓存（树没变即整条复用；平台不支持时自动降级"

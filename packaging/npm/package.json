@@ -1,6 +1,6 @@
 {
   "name": "ninfenz",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "mcpName": "io.github.Monyeah777/ninfenz",
   "description": "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. One-click launcher for the NF CLI (offline, MIT).",
   "keywords": [

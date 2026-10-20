@@ -191,6 +191,11 @@ class _DaemonFixture(unittest.TestCase):
         cls.home = tempfile.mkdtemp(prefix="nf_parity_home_")
         cls._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
         os.environ["NARRATIVE_FORGE_HOME"] = cls.home
+        # 守护 idle 收紧（2026-10-20）：默认 3600s 会让测试拉起的守护在本机常驻数十个
+        # （实测一晚 24+ 个），既占内存、又会锁住工作区目录、还会让后续判据读到旧状态。
+        # 测试夹具用短 idle，泄漏自然自灭；生产 CLI 仍用默认 3600s（可用 NF_DAEMON_IDLE 覆盖）。
+        cls._old_idle = os.environ.get("NF_DAEMON_IDLE")
+        os.environ["NF_DAEMON_IDLE"] = "10"
         # 墙钟面（`attest` 的 `issued_at`）按可复现惯例钉死：否则「跨秒的两次运行必然不同」
         # 会把等价/确定性判据变成偶发红（`core.attest.issue_stamp`）。
         cls._old_sde = os.environ.get("SOURCE_DATE_EPOCH")
@@ -205,7 +210,17 @@ class _DaemonFixture(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         dm.stop()
+        # 收尾再兜一次：夹具内可能还有未被 dm 记录的守护（例如 launcher 快路自启的），
+        # 统一按 home 记录停掉，避免残留进程锁住工作区。
+        try:  # noqa: SIM105 —— 收尾尽力而为，失败不影响判据结论
+            dm.stop(timeout=3.0)
+        except Exception:  # 为何可以吞：收尾路径，守护可能已随短 idle 自行退出
+            pass
         os.chdir(cls._old_cwd)
+        if getattr(cls, "_old_idle", None) is None:
+            os.environ.pop("NF_DAEMON_IDLE", None)
+        else:
+            os.environ["NF_DAEMON_IDLE"] = cls._old_idle
         if cls._old_home is None:
             os.environ.pop("NARRATIVE_FORGE_HOME", None)
         else:

@@ -58,6 +58,18 @@ jobs:
             sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           fi
           python -m pip install -r .github/requirements-ci.txt
+      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项全量门禁必红）
+        shell: bash
+        run: |
+          # 这 4 项都是 **gitignored 或 empty-by-design**，干净 clone 里不存在，
+          # 而 verify.sh --full 的若干 check 会读它们。实测来源见 docs/ONBOARDING 与
+          # .rivet 归档《新工作区上手说明》。缺一项的表现：
+          #   .gitee/ISSUE_TEMPLATE → check32 红；engine/dotnet/dist 与 obj → asset_contract 计数不符；
+          #   wasm 产物 → test_plugin_wasm_host 红；canonical/target → 并发测试报「工具越权写」。
+          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+          if [ "$RUNNER_OS" = "Linux" ] || [ "$RUNNER_OS" = "Windows" ] || [ "$RUNNER_OS" = "macOS" ]; then
+            echo "前置目录已建"
+          fi
       - name: 全量门禁（三平台同口径：bash verify.sh --full；日志落盘供失败诊断）
         shell: bash
         env:

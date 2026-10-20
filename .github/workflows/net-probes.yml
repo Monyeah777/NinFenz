@@ -22,10 +22,12 @@ name: net-probes
 #
 # 为什么 long 档（6 条重型：双门同判 / 规模 / 模糊 / 敌意输入 / 可复现构建 / 规模对照）不进 CI：
 # 跑批超时预算与墙钟（探针单条 timeout 默认 3600 s）。要跑全量用 workflow_dispatch 输入 tier=all。
+# 触发口径（2026-10-20 治理）：
+#   · **不再随 push/PR 触发** —— 本 workflow 依赖「金标语料快照」，而快照锚定的是一个
+#     **具体历史提交**；历史重写（commit message 规范化）之后该提交已不存在，push 触发只会
+#     产出常年红。金标是否前移仍在裁决中（见 Plan 仓《金标快照决策数据》）。
+#   · 改为手动 + 每周定时：既保留可执行性，又不污染每次推送的信号面。
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
     inputs:
       tier:
@@ -34,6 +36,8 @@ on:
         default: core
         type: choice
         options: [core, all]
+  schedule:
+    - cron: '0 3 * * 1'        # 每周一 03:00 UTC
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -50,12 +54,17 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 75
+    # 金标基线裁决未定（见 Plan《金标快照决策数据》）⇒ 允许失败，只作为诊断信号。
+    continue-on-error: true
     env:
       # 与净引擎门同口径：Windows runner 默认 ANSI 码页，子进程 CJK 输出会 UnicodeEncodeError。
       PYTHONUTF8: "1"
       PYTHONIOENCODING: utf-8
       # 跑批档位：push/PR 固定 core；手动触发可 all。
       NF_PROBE_TIER: ${{ github.event.inputs.tier || 'core' }}
+      # 金标语料快照的锚定 ref：历史重写后旧 SHA 不再存在，故参数化。
+      # 改这里即可换基线（金标前移裁决后应指向新的基线 tag）。
+      NF_SNAP_REF: ${{ vars.NF_SNAP_REF || 'v2.11.0' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -70,14 +79,14 @@ jobs:
           dotnet --list-sdks | grep -q '^8\.' || { echo "::error::缺 .NET 8 SDK"; exit 1; }
           pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
           bash --version | head -1
-      - name: 金标语料快照（git archive aa259d7 → nf-snap-h16；指纹须 == CorpusStamp.Baseline）
+      - name: 金标语料快照（git archive ${{ vars.NF_SNAP_REF || 'v2.11.0' }} → nf-snap-h16；指纹须 == CorpusStamp.Baseline）
         shell: pwsh
         run: |
           $snap = Join-Path $env:RUNNER_TEMP 'nf-snap-h16'
           $tar = Join-Path $env:RUNNER_TEMP 'nf-snap.tar'
           New-Item -ItemType Directory -Force -Path $snap | Out-Null
-          git archive --format=tar --output=$tar aa259d7
-          if ($LASTEXITCODE -ne 0) { throw 'git archive aa259d7 失败（快照提交不在历史里？）' }
+          git archive --format=tar --output=$tar $env:NF_SNAP_REF
+          if ($LASTEXITCODE -ne 0) { throw "git archive $env:NF_SNAP_REF 失败（快照 ref 不在历史里？用 vars.NF_SNAP_REF 指定）" }
           # **不要用 tar.exe 解包**（RUNBOOK 已记）：Windows 自带 bsdtar 解 CJK 路径会报
           # 「Invalid empty pathname」并丢文件 ⇒ 用 Python tarfile（两侧都通，CJK 名安全）。
           $py = if ($env:RUNNER_OS -eq 'Windows') { 'python' } else { 'python3' }

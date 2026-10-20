@@ -3,6 +3,16 @@
 
 覆盖子命令参数面与装配链 smoke（替代手工冒烟；不依赖 GUI/端壳）。
 """
+def _cli_version() -> str:
+    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
+    import re as _re
+    from pathlib import Path as _Path
+    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
+    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
+    return m.group(1) if m else "?"
+
+
+CLI_VERSION = _cli_version()
 import argparse
 import ast
 import builtins
@@ -685,7 +695,7 @@ class NfCliSmokeTest(unittest.TestCase):
             capture_output=True, text=True, encoding="utf-8", timeout=60,
         )
         self.assertEqual(proc.returncode, 0)
-        self.assertIn("nf 1.0.1", proc.stdout)
+        self.assertIn(f"nf {CLI_VERSION}", proc.stdout)
 
 
 SKIP_DESTS = {"help", "cmd"}
@@ -864,7 +874,7 @@ class VersionShortCircuitTest(unittest.TestCase):
              str(ROOT / "scripts" / "nf.py"), "--version"],
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
         self.assertEqual(0, proc.returncode, proc.stderr[-400:])
-        self.assertIn("nf 1.0.1", proc.stdout)
+        self.assertIn(f"nf {CLI_VERSION}", proc.stdout)
         self.assertNotIn("_make_parser", proc.stdout, "命令面被建了（入口没把 argv 递进去？）")
         self.assertNotIn("add_subparsers", proc.stdout, "命令面被建了（入口没把 argv 递进去？）")
 

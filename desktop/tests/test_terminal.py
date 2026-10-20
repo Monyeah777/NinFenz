@@ -7,6 +7,16 @@
 3. **CLI 集成**：`nf shell --exec` 的确定性、退出码、JSON 机器面，以及
    「菜单示例必须指向真实子命令」（与 verify check39 同一判据，单测先兜一层）。
 """
+def _cli_version() -> str:
+    """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
+    import re as _re
+    from pathlib import Path as _Path
+    txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
+    m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
+    return m.group(1) if m else "?"
+
+
+CLI_VERSION = _cli_version()
 import argparse
 import ast
 import contextlib
@@ -445,7 +455,7 @@ class SessionTest(unittest.TestCase):
             print("  体检：3/3 通过")
             return 0
         if argv and argv[0] == "--version":
-            print("nf 1.0.1")
+            print(f"nf {CLI_VERSION}")
             return 0
         if argv and argv[0] == "help":
             return 0
@@ -1745,7 +1755,7 @@ class MachineFaceTest(unittest.TestCase):
     def test_terminal_alias_works(self):
         code, out = _run(["terminal", "--exec", "nf --version", "--no-banner"])
         self.assertEqual(code, 0)
-        self.assertIn("nf 1.0.1", out)
+        self.assertIn(f"nf {CLI_VERSION}", out)
 
     def test_help_and_description_present(self):
         tree = nf._collect_cli_tree()
