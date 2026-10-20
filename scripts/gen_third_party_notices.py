@@ -62,7 +62,10 @@ def pypi(name: str) -> dict:
     url = f"https://pypi.org/pypi/{urllib.parse.quote(name, safe='')}/json"
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or parsed.netloc != "pypi.org":
-        raise ValueError(f"拒绝非 PyPI 官方地址：{url}")
+        raise ValueError(
+            f"拒绝非 PyPI 官方地址：{url}（修复指引：只允许 https 的 pypi.org —— 本脚本仅取"
+            "官方元数据，不访问任意站点）"
+        )
     # 下方 urlopen 的入参已由上面两道校验钉死为「https + pypi.org」常量前缀，
     # 故 bandit B310 / ruff S310（动态 URL）在此站点是**已消除的**风险面。
     with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310
