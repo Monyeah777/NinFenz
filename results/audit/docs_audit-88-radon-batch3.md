@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:104d54825183329b72f403aaac355f86398ce360b466e75d212f11ecc4a1b12f
-  - protocol/code_metrics_baseline.json:a8b9d10cf4fde3777c05ea5ef26b568c0af54dbf836ba1a6bc3ee404b4bb3e51
+  - protocol/code_metrics_baseline.json:61c115ae155717c0070ff8c47f44c48145918b0af25364fc427d3b0c841e28c1
 ---
+> 重审（2026-10-20）：compliance closure 1
+
 > 重审（2026-10-20）：compliance final-1
 
 > 重审（2026-10-20）：compliance final

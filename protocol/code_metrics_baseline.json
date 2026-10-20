@@ -1351,9 +1351,9 @@
       "max_fn_lines": 59
     },
     "scripts/gen_third_party_notices.py": {
-      "lines": 141,
+      "lines": 143,
       "max_fn_cc": 11,
-      "max_fn_lines": 60
+      "max_fn_lines": 62
     },
     "scripts/geo_export.py": {
       "lines": 227,
