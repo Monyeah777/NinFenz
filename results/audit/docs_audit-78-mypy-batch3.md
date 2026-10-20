@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:7809791700eea201f84a6fbba3edd3b7f9f8026460086c138a349ea1aafea143
   - desktop/src/core/conformance_scan.py:f45dc7dfa355f3dadcb5d1f59207de97bdf48d6a71762696ca7bdfad8b4348b7
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
+  - protocol/code_metrics_baseline.json:5d6ddbf16b7223ef0c5c272f0d7a955e1d77c90df1b98bf1422d52c2a06ccd5b
 ---
+> 重审（2026-10-20）：compliance final
+
 > 重审（2026-10-20）：compliance style fix
 
 > 重审（2026-10-20）：notices generator hardened

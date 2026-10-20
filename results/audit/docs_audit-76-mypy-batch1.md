@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
+  - protocol/code_metrics_baseline.json:5d6ddbf16b7223ef0c5c272f0d7a955e1d77c90df1b98bf1422d52c2a06ccd5b
 ---
+> 重审（2026-10-20）：compliance final
+
 > 重审（2026-10-20）：compliance style fix
 
 > 重审（2026-10-20）：notices generator hardened

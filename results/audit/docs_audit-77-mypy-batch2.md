@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
+  - protocol/code_metrics_baseline.json:5d6ddbf16b7223ef0c5c272f0d7a955e1d77c90df1b98bf1422d52c2a06ccd5b
 ---
+> 重审（2026-10-20）：compliance final
+
 > 重审（2026-10-20）：compliance style fix
 
 > 重审（2026-10-20）：notices generator hardened

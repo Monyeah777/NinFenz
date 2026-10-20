@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "gen_third_party_notices.py:65 raise 消息缺修复指引：拒绝非 PyPI 官方地址：",
-      "digest": "336ef46f280435d4277fcfac35029f32917121aff133276736a8bbeef8a8b2e4",
+      "detail": "纯度零违规",
+      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
       "id": "purity-clean",
-      "ok": false
+      "ok": true
     },
     {
       "description": "文档四型覆盖",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 26,
-  "root": "e7903637fed223f6a99d9761873094ae7cd84bd90e7b0f2669dd1caeeda4b96c",
+  "passed": 27,
+  "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "non-conformant"
+  "verdict": "conformant"
 }

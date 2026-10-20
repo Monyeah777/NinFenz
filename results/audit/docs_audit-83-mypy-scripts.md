@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
+  - protocol/code_metrics_baseline.json:5d6ddbf16b7223ef0c5c272f0d7a955e1d77c90df1b98bf1422d52c2a06ccd5b
 ---
+> 重审（2026-10-20）：compliance final
+
 > 重审（2026-10-20）：compliance style fix
 
 > 重审（2026-10-20）：notices generator hardened

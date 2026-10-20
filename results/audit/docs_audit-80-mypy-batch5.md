@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
-  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
+  - protocol/code_metrics_baseline.json:5d6ddbf16b7223ef0c5c272f0d7a955e1d77c90df1b98bf1422d52c2a06ccd5b
 ---
+> 重审（2026-10-20）：compliance final
+
 > 重审（2026-10-20）：compliance style fix
 
 > 重审（2026-10-20）：notices generator hardened
