@@ -186,7 +186,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b"
+      "nf:sha256": "34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -326,7 +326,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "9b9103ca367fd18e7cfdbd46569b8ca057a47e0df145e9481d3208b09a80fec0"
+      "nf:sha256": "b06986813cf7fc55943be14d3bb5cce13b38542d8fc5a8b1dfcf6ee3141f8297"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

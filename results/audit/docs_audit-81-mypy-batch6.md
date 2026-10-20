@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b
+  - protocol/code_metrics_baseline.json:34dcb425ebdeb8485e12b2f9e974ee12752aed26fcddb16938d6e8444356c51a
 ---
+> 重审（2026-10-20）：third-party notices + community provenance gate
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix
