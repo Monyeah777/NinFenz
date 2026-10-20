@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:61c115ae155717c0070ff8c47f44c48145918b0af25364fc427d3b0c841e28c1
+  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
 ---
+> 重审（2026-10-20）：stdio pin 1
+
 > 重审（2026-10-20）：compliance closure 1
 
 > 重审（2026-10-20）：compliance final-1

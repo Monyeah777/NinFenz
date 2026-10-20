@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
-  - protocol/code_metrics_baseline.json:61c115ae155717c0070ff8c47f44c48145918b0af25364fc427d3b0c841e28c1
+  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
 ---
+> 重审（2026-10-20）：stdio pin 1
+
 > 重审（2026-10-20）：compliance closure 1
 
 > 重审（2026-10-20）：compliance final-1

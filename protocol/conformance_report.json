@@ -149,10 +149,10 @@
     },
     {
       "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
-      "detail": "审计 57 件（带审计头 46 · legacy 11）· 绑定对象 389",
-      "digest": "44ad0acb0e46ed2772b109a8cb8d7272aa140ff4b4ce0bc9e66dd76451ca8161",
+      "detail": "AUD-0004：被审对象不存在：CONTRIBUTING.md; AUD-0006：被审对象不存在：CONTRIBUTING.md",
+      "digest": "e5cdb6b87ad5012256662d7b5e445a4b04170bb4e8076b1c2cf2b1f431eb7e49",
       "id": "audit",
-      "ok": true
+      "ok": false
     },
     {
       "description": "认知族（术语表 + 执行分档）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 27,
-  "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
+  "passed": 26,
+  "root": "8517882bea9d5db2f847852ad13ae1105ae8f26ef656e9e1fe04699db8e50a6d",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "conformant"
+  "verdict": "non-conformant"
 }
