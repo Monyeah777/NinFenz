@@ -75,7 +75,20 @@ def pypi(name: str) -> dict:
         return json_doc.loads(resp.read().decode("utf-8"), dict, what="PyPI " + name)
 
 
+def _pin_stdio() -> None:
+    """入口打印中文 ⇒ 钉 UTF-8 stdio（Windows 默认 GBK 会 UnicodeEncodeError）。
+
+    与 `scripts/nf.py` 同口径（`test_stdio_encoding` 判据要求每个打印 CJK 的入口都钉）。
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+        except (AttributeError, OSError):  # 为何可以吞：非 tty / 旧解释器无 reconfigure，退回默认编码即可
+            pass
+
+
 def main(argv=None) -> int:
+    _pin_stdio()
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", action="store_true", help="写入 THIRD-PARTY-NOTICES.md")
     args = ap.parse_args(argv)

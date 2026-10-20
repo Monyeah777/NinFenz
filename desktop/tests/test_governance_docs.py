@@ -11,8 +11,9 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-REQUIRED = ("CODE_OF_CONDUCT.md", "MAINTAINERS.md", "SUPPORT.md", "CONTRIBUTING.md",
-            "SECURITY.md", "REUSE.toml", "LICENSES/MIT.txt",
+REQUIRED = (".github/CODE_OF_CONDUCT.md", ".github/MAINTAINERS.md", ".github/SUPPORT.md",
+            ".github/CONTRIBUTING.md", ".github/SECURITY.md",
+            "REUSE.toml", "LICENSES/MIT.txt",
             "LICENSES/LicenseRef-Community-Submission.txt")
 
 
@@ -38,22 +39,22 @@ class GovernanceDocsTest(unittest.TestCase):
         self.assertEqual([], missing, "治理件缺失（Z6）：%s" % missing)
 
     def test_code_of_conduct_has_enforcement_and_appeal(self):
-        text = (ROOT / "CODE_OF_CONDUCT.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "CODE_OF_CONDUCT.md").read_text(encoding="utf-8")
         for needle in ("举报", "处置", "申诉", "适用范围"):
             self.assertIn(needle, text, "行为准则缺 %s（Z6）" % needle)
 
     def test_support_has_report_and_appeal_channels(self):
-        text = (ROOT / "SUPPORT.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "SUPPORT.md").read_text(encoding="utf-8")
         for needle in ("举报", "申诉", "SECURITY.md"):
             self.assertIn(needle, text, "支持件缺 %s（Z6）" % needle)
 
     def test_maintainers_names_an_owner(self):
-        text = (ROOT / "MAINTAINERS.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "MAINTAINERS.md").read_text(encoding="utf-8")
         self.assertRegex(text, r"\|\s*Owner", "维护者名单未点名 Owner（Z6）")
         self.assertIn("CODE_OF_CONDUCT.md", text, "维护者件未指向行为准则")
 
     def test_contributing_declares_inbound_outbound(self):
-        text = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+        text = (ROOT / ".github" / "CONTRIBUTING.md").read_text(encoding="utf-8")
         self.assertTrue(re.search(r"DCO|Developer Certificate of Origin", text),
                         "贡献指南缺 DCO（Z6）")
         self.assertTrue(re.search(r"inbound\s*=\s*outbound|入站\s*=\s*出站", text),

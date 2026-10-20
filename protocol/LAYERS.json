@@ -558,8 +558,6 @@
           ".github/**",
           "packaging/**",
           "site/**",
-          "CONTRIBUTING.md",
-          "SECURITY.md",
           "CHANGELOG.md",
           "VERSION-MATRIX.md",
           "CITATION.cff",
