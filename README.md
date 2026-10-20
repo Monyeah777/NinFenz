@@ -1,6 +1,6 @@
 # NinFenz · 文档生成工坊（规范驱动）
 
-<!-- nf:locales --> 语言 / Languages：**[中文](README.md)** · [English](README.en.md) · [日本語](README.ja.md)
+<!-- nf:locales --> 🌐 **简体中文** · [English](README.en.md) · [日本語](README.ja.md)
 
 [![门禁 ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
@@ -121,23 +121,32 @@ AI 装配：
 | 接入面 | `integrations/README.md`（MCP / LSP / CLI / TUI / 图书馆 / Skill / npm / Rust / .NET / A2A） |
 | 馆 | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 
-## 版本块
+## 版本
 
-本项目有**三条独立的版本线**，各自自洽（机检见 `desktop/tests/test_version_map.py`）：
+现在安装就是 **`ninfenz` 1.0.4**（npm 与 GitHub Packages 同步发布），装上即可用：
 
-| 线 | 当前 | 口径 |
+```bash
+npm i -g ninfenz@latest   # 装或升级
+nf --version             # 看当前版本
+nf stats                 # 看门禁与仓库状态
+```
+
+同一份代码里有三条版本线，各自独立升：
+
+| 线 | 当前 | 这条线管什么 |
 |---|---|---|
-| 内容 / 协议 | **v2.12.0** | `CHANGELOG.md` 最新已发布节 == `docs/meta/VERSION-MATRIX.md` 末行；git tag `vX.Y.Z` 标记发布点 |
-| 门禁 | 见 `nf stats --check` 生成区 | `protocol/repo_stats.json` == `quality_baseline` 期望值 == `llms.txt` 凭证串（**活文档不钉计数**） |
-| CLI / npm / MCP | **1.0.4** | `scripts/nf.py` 的 `NF_CLI_VERSION` == npm `package.json` == MCP `server.json`（两处） |
+| **内容与协议** | **v2.12.0** | 文档模板、领域包、规范本身 —— 决定「能生成什么」 |
+| **命令行工具** | **1.0.4** | `nf` 命令 / npm 包 / MCP 服务 —— 决定「怎么用」 |
+| **质量门禁** | 见 `nf stats` | 仓库自检通过情况 —— 决定「有没有改坏」 |
 
-内容线最近三版：
+最近三版内容线，按**加了什么功能**排（不是按编号堆）：
 
-| 版本 | 状态 |
-|---|---|
-| v2.12.0 | 当前（2026-10-05）· 知识层 + 终端线 + 顶尖对标补齐 + 数字资产契约层 |
-| v2.11.0 | 已发布 2026-09-10 · world_model 确定性抽象状态契约 + world_slots |
-| v2.10.0 | 已发布 2026-09-09 · 45 质量纵深 + 基础层 A 组收口 |
+| 版本 | 时间 | 这一版加了什么 |
+|---|---|---|
+| v2.12.0 | 2026-10-05 | 知识层检索、终端形态、数字资产契约（资产可跨项目复用） |
+| v2.11.0 | 2026-09-10 | 世界状态模型：确定性抽象状态 + 槽位（同一输入必得同一输出） |
+| v2.10.0 | 2026-09-09 | 质量纵深 45 项 + 基础层 A 组收口 |
 
-> **tag 纪律**：发布即打 `vX.Y.Z`，且只打在内容线发布点上；CLI/npm/MCP 用独立补丁号（`1.0.x`），不再另打 tag。
-> 历史演进见 `CHANGELOG.md` 与 `docs/meta/VERSION-MATRIX.md`。
+发版规则：内容线 `v2.x.y`（新增能力升次版本、纯修复升补丁），CLI 线 `1.0.x` 独立编号；
+每次发版同步写 `CHANGELOG.md`，tag 只打在**带功能的那次提交**上。
+

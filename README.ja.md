@@ -1,6 +1,6 @@
 # NinFenz · ドキュメント生成工房（仕様駆動）
 
-<!-- nf:locales --> 语言 / Languages：[中文](README.md) · [English](README.en.md) · **[日本語](README.ja.md)**
+<!-- nf:locales --> 🌐 [简体中文](README.md) · [English](README.en.md) · **日本語**
 
 [![ゲート ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
@@ -84,13 +84,32 @@ AI による組立：
 | 接続面 | `integrations/README.md`（MCP / LSP / CLI / TUI / 図書館 / Skill / npm / Rust / .NET / A2A） |
 | 書庫 | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 
-## バージョンブロック
+## バージョン
 
-| バージョン | 状態 |
-|---|---|
-| v2.11.0 | 現行（2026-09-10）· world_model 決定的抽象状態契約 + world_slots |
-| v2.10.0 | 公開済み 2026-09-09 · 45 品質縦深 + 基盤層 A 群の収口 |
-| v2.9.0 | 公開済み 2026-09-08 · STRATEGY + 43/44 随波 |
-| v2.8.0 | 公開済み 2026-09-08 · 41/42 波 C 品質収口 |
+**`ninfenz` 1.0.4** をそのまま導入できます（npm と GitHub Packages の同時公開）:
 
-詳細なバージョン履歴は `CHANGELOG.md` と `docs/meta/VERSION-MATRIX.md` を参照してください。
+```bash
+npm i -g ninfenz@latest   # 導入・更新
+nf --version             # 現在のバージョン
+nf stats                 # ゲートとリポジトリの状態
+```
+
+同じリポジトリから 3 本のバージョン系列を独立して出しています:
+
+| 系列 | 現在 | 何を決めるか |
+|---|---|---|
+| **コンテンツ / プロトコル** | **v2.12.0** | テンプレート・ドメインパック・仕様 —「何を生成できるか」 |
+| **コマンドラインツール** | **1.0.4** | `nf` コマンド / npm パッケージ / MCP サーバー —「どう使うか」 |
+| **品質ゲート** | `nf stats` を参照 | 自己検査の状態 —「壊れていないか」 |
+
+直近 3 つのコンテンツ版（番号ではなく**追加された機能**で）:
+
+| バージョン | 日付 | この版で増えたもの |
+|---|---|---|
+| v2.12.0 | 2026-10-05 | 知識層の検索、ターミナル形態、デジタル資産契約（資産を横断再利用） |
+| v2.11.0 | 2026-09-10 | 世界状態モデル：決定的な抽象状態＋スロット（同じ入力なら同じ出力） |
+| v2.10.0 | 2026-09-09 | 品質纵深 45 項目＋基盤層 A |
+
+リリース規則：コンテンツ系列は `v2.x.y`（機能追加は minor、修正は patch）、CLI 系列は
+`1.0.x` で独立。リリースごとに `CHANGELOG.md` を更新し、タグは**機能を含むコミット**に打ちます。
+

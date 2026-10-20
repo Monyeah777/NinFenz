@@ -1,6 +1,6 @@
 # NinFenz · Document Generation Workshop (spec-driven) — English mirror
 
-<!-- nf:locales --> 语言 / Languages：[中文](README.md) · **[English](README.en.md)** · [日本語](README.ja.md)
+<!-- nf:locales --> 🌐 [简体中文](README.md) · **English** · [日本語](README.ja.md)
 
 [![verify gate ci-verify](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg)](https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml) [![Glama MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/card.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) [![Glama quality score](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz/score)
 
@@ -135,3 +135,34 @@ AI assembly:
 | v2.8.0 | released 2026-09-08 · waves 41/42 quality closure |
 
 Full version history: `CHANGELOG.md` and `docs/meta/VERSION-MATRIX.md`.
+
+## Versions
+
+Install **`ninfenz` 1.0.4** today — published to both npm and GitHub Packages:
+
+```bash
+npm i -g ninfenz@latest   # install or upgrade
+nf --version             # show current version
+nf stats                 # show gate and repo status
+```
+
+Three independent version lines ship from the same repository:
+
+| Line | Current | What it governs |
+|---|---|---|
+| **Content & protocol** | **v2.12.0** | Templates, domain packs, specs — *what* can be generated |
+| **Command-line tool** | **1.0.4** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
+
+Last three content releases, described by **what they add**:
+
+| Version | Date | What this release adds |
+|---|---|---|
+| v2.12.0 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
+| v2.11.0 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
+| v2.10.0 | 2026-09-09 | 45-point quality depth plus foundation layer A |
+
+Release rules: content line uses `v2.x.y` (minor for new capability, patch for fixes); the CLI line
+is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed
+on the commit that **carries the feature**.
+
