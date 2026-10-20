@@ -68,7 +68,7 @@ body:
     attributes:
       label: 版本（verify 基线 / tag）
       description: 跑 nf --version 与 nf doctor 后贴回
-      placeholder: nf 1.0.4 · verify v2.30 · tag v1.0.4
+      placeholder: nf 1.0.5 · verify v2.30 · tag v1.0.5
     validations:
       required: true
   - type: input
