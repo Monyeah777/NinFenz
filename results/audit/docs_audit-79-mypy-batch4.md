@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:cf90eb177c363d437ae9d56b46a446b6e390b8a5bfa95fb23cf3662bad6f882c
+  - protocol/code_metrics_baseline.json:acf91f44555fda0013cd30c6a8dc199ecbf9390865ef7dfe70709157fd5cb53e
 ---
+> 重审（2026-10-20）：release line 0.x 1
+
 > 重审（2026-10-20）：0.x renumber 1
 
 > 重审（2026-10-20）：readme/tag 治理 1

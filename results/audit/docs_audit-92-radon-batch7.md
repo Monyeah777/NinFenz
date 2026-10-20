@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:cf90eb177c363d437ae9d56b46a446b6e390b8a5bfa95fb23cf3662bad6f882c
+  - protocol/code_metrics_baseline.json:acf91f44555fda0013cd30c6a8dc199ecbf9390865ef7dfe70709157fd5cb53e
 ---
+> 重审（2026-10-20）：release line 0.x 1
+
 > 重审（2026-10-20）：0.x renumber 1
 
 > 重审（2026-10-20）：readme/tag 治理 1

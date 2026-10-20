@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:cf90eb177c363d437ae9d56b46a446b6e390b8a5bfa95fb23cf3662bad6f882c
+  - protocol/code_metrics_baseline.json:acf91f44555fda0013cd30c6a8dc199ecbf9390865ef7dfe70709157fd5cb53e
 ---
+> 重审（2026-10-20）：release line 0.x 1
+
 > 重审（2026-10-20）：0.x renumber 1
 
 > 重审（2026-10-20）：readme/tag 治理 1
