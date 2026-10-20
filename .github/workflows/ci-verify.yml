@@ -109,6 +109,9 @@ jobs:
       - name: 测试矩阵第 ${{ matrix.shard }}/32 片
         env:
           NF_VERIFY_TMP: .nf-logs
+          # 分片的**完整**输出只有设这个变量才落盘（verify_tests.py: NF_SHARD_LOG_DIR）；
+          # 不设的话 FAIL 行既不进 job 日志也不进工件，等于没有诊断。
+          NF_SHARD_LOG_DIR: .nf-logs
         run: |
           # 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。
           # 2026-10-21：此前失败时日志被 tee 吞进工件、job 日志里看不到**失败用例名**，
@@ -119,7 +122,11 @@ jobs:
           if [ "$rc" -ne 0 ]; then
             echo "::group::失败用例（分片 ${{ matrix.shard }}）"
             grep -E "^(FAIL|ERROR):" verify-tests.log | head -40 || true
-            grep -E "^(FAILED|ERROR) \(" verify-tests.log | head -5 || true
+            for f in .nf-logs/shard*.log; do
+              [ -f "$f" ] || continue
+              echo "---- $f ----"
+              grep -E "^(FAIL|ERROR):|^FAILED \(|AssertionError" "$f" | head -25 || true
+            done
             echo "::endgroup::"
           fi
           exit "$rc"
