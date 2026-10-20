@@ -82,7 +82,7 @@ English: NinFenz (NF) is a content contract layer: a protocol plus deterministic
     pattern_read / asset_list / asset_read / module_read / pipeline_read，以及装载引导 prompt assemble_guide。
 
 前置：Python >= 3.11（核心纯标准库，无 pip 依赖）；Node >= 18.17（仅 npx 免 clone 路径需要）。
-npm 包已发布：ninfenz v1.0.1（npmjs.com，2026-10-08，2953 文件，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
+npm 包已发布：ninfenz v1.0.2（npmjs.com，2026-10-08，2953 文件，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
 
 ## 五、术语表（对齐实体，供生成式引擎消歧）
 
@@ -165,7 +165,7 @@ https://ninfenz.dev/facts.json         机读事实（每条带真源与锚点�
 https://ninfenz.dev/run.sh             免安装引导脚本（默认只读；--full 追加全量门禁）
 https://ninfenz.dev/sitemap.xml        站点地图
 https://ninfenz.dev/robots.txt         抓取规则（显式欢迎 AI 检索与引用）
-https://www.npmjs.com/package/ninfenz  npm 包（ninfenz v1.0.1，带 SLSA provenance 来源证明）
+https://www.npmjs.com/package/ninfenz  npm 包（ninfenz v1.0.2，带 SLSA provenance 来源证明）
 https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz  官方 MCP Registry 条目（io.github.Monyeah777/ninfenz）
 https://registry.npmjs.org/ninfenz     registry 元数据（版本 / 完整性 / attestations）
 https://ninfenz.dev/                   中文主页 · https://ninfenz.dev/en/ 英文主页
