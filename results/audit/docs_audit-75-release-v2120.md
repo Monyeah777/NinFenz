@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:1b0a76e810f1f79aa2329aabefef5087c509c4039ebae73d773c052ccd9683c1
+  - CHANGELOG.md:ef0d0d7e752b58950311883a895263bb7945af40d89312322a35408e1b776b99
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:727117d513a804cf483e0f9f369ca7c90f7da3c48ed548d7c343e6f7396a95f6
+  - README.md:53a58a2a975aadd3434b61d16aaf42144b1f2c4612887a0430a6a4b931653ba9
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:e731b135d6454aec1a5dd2e43b721a6c43f3d1f82831336b35f480cb0fce6322
 
 ---
+> 重审（2026-10-20）：readme/tag 治理 1
+
 > 重审（2026-10-20）：release 1.0.4 1
 
 > 重审（2026-10-20）：hygiene + version governance

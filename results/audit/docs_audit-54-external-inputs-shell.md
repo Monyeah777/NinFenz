@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:dbf42d06dc1a351683648b02fac481a5701b35ce93f49430b7bd1da2644a16e6
+  - CONTRIBUTING.md:d57de9d4325f3a11a68c2887b9bbbc87e2060982aa478a7081c8590eb45fb9d3
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:df515dc5b7ef9572eeac5583cde42fa0f47eea3c7d7ceb3767e3953d9f2bed03
 
 ---
+> 重审（2026-10-20）：readme/tag 治理 1
+
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

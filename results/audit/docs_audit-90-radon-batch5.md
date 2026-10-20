@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:a841928a46875adf0d0eacd39f30f3d456e43d180620ee2ef70f915311f7849b
 ---
+> 重审（2026-10-20）：readme/tag 治理 1
+
 > 重审（2026-10-20）：compliance 1
 
 > 重审（2026-10-20）：version governance + daemon leak fix

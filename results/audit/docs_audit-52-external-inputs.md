@@ -7,11 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
-  - CONTRIBUTING.md:dbf42d06dc1a351683648b02fac481a5701b35ce93f49430b7bd1da2644a16e6
+  - CONTRIBUTING.md:d57de9d4325f3a11a68c2887b9bbbc87e2060982aa478a7081c8590eb45fb9d3
   - desktop/src/core/asset_density.py:a1f8eb7199ea0ecf25634303f30b3d90d8fc0f4d0a33eca432195b65393f1b99
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-10-20）：readme/tag 治理 1
+
 
 > 重审（2026-10-13 · 投稿面整体架构对齐）：被审对象随本轮改动（issue 模板 / INDEX 须知 / intake.json submission 段 / verify.sh check34 接线）而变，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（同 §15 约定）——本轮不主张新的语义审计，只把既有结论重新绑定到新对象。
 

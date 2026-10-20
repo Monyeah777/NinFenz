@@ -1475,6 +1475,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },
+    "scripts/sync_readme_versions.py": {
+      "lines": 151,
+      "max_fn_cc": 3,
+      "max_fn_lines": 21
+    },
     "scripts/verify_cache.py": {
       "lines": 156,
       "max_fn_cc": 7,
