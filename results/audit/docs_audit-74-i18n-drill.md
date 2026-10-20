@@ -7,17 +7,17 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - protocol/locales.json:f3c161634feafbeeecc0b3aea8bde8a3733fa45b01bc42bc5713e6206f4afc34
-  - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
-  - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
-  - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:0653be472bb4888c814d3fc3696e7d882b35c6e49b965cf09b84d41d34c8d6f0
-  - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
-  - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
-  - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
-  - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
-  - docs/ja/layers.md:1f3edfbad694b98228bb720574a54267f7b3b544fbc89436179d77950fde3d57
-  - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - docs/45_M2_回合级drill.md:55bf60d989aba4fe653bd30396b59c12af587151a3b100da9b65f3d2979429e0
+  - docs/locales.md:3b4605f6c756c2612fe9b4a870bfbfa2945a436211a745a233fcd6346d80f321
+  - docs/en/locales.md:5c456d86ba19c499378ee7a548a6641cbf4d44f5345c3fc53ee30440132ec0e0
+  - docs/ja/locales.md:0d355a1fe0f093c4502872c5cf937fc51c3caa3ab38a34cee1b3b9e2ea717811
+  - docs/en/mcp.md:6a6a362680072339ecdd7d51a27b51d82a9151d4dbc43f91ffe5b3df3b1751be
+  - docs/ja/mcp.md:c13d42c554ccd1be38ddfb688541215a029fe4edba82fffcd359d460398ae263
+  - docs/en/terminal.md:c4b62dd8f3cef23588dfd0136a7cffbe9202720c3674fe19a7476188986eb78d
+  - docs/ja/terminal.md:0f8092e382c65744c4e7ef3b22603bff545022b063458b3802d4aa4152c202e1
+  - docs/en/layers.md:617aed0ff1fc6096705fbd3f209475a48193ae98f1cf31f924474a83a34c779d
+  - docs/ja/layers.md:4e8b789a68df9d4700d8fcedb6339456c7acad158e2b92b3241eed12a3e0d3f0
+  - docs/44_M1_执行演练扩展.md:281b389d65b50de761be4caa598f7922d3b5ef0a946849195e8ede36694e4528
+  - docs/45_M2_回合级drill.md:1c977f297b40829111a77933623230ba5b409708d27f41a1682d50790c18c103
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
   - desktop/src/core/drill_fidelity.py:a53d9366287ab64431787b2d5b389c3179f22b0cd6c0ca7a091cb86ac07ae190
   - desktop/tests/test_execution_drill.py:f9df38b1f586fd4a705e608bf849b510ed217c8b38fd1dd68ab78176b2dcb02d
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：compliance 1
 
 > 重审（2026-10-20）：version governance + daemon leak fix

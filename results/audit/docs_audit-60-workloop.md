@@ -12,9 +12,11 @@ subjects:
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
-  - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
+  - docs/decision-layer.md:c8b3513916410b89099efe16b069403af236a6df111e67e9afb66b57a0007e9c
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

@@ -13,8 +13,8 @@ subjects:
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
-  - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
-  - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
+  - docs/layers.md:c0d1e2be55538c5669039165931a9ef028b6259bfa060c116cb4925ca8f295f4
+  - docs/L3_FROZEN.md:8cc11c5f6cda41c4c243bdf3d23f97705aa5cae9d26dd301cfd9484700bfe386
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
@@ -24,6 +24,8 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

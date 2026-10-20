@@ -10,11 +10,13 @@ subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
-  - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
+  - docs/interop.md:98811fdc7264a48df5367a561774f6adf6df0e729e26a1d61efdc60442d43ba4
   - desktop/tests/test_interop_export.py:2308d682b075fef25982c6577c67d41714980c94db1f4f538fee26ec7239a847
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

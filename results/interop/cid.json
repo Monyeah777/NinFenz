@@ -2,29 +2,29 @@
   "codec": "raw (0x71)",
   "entries": [
     {
-      "cid": "bafyreibipkk6lr2gv3cxjryaldued6fdkvibfpzczh7myogazyg72wa6ea",
+      "cid": "bafyreiak4xvt4qs3qgxuzmwehgw7lkcihedr3acdsa62glgxc7j3mgxyby",
       "path": "STRATEGY.md",
-      "sha256": "287a95e5c746aec574c70058e841f8a3555012bf22c9fecc38c0ce0dfd581e20"
+      "sha256": "0ae5eb3e425b81af4cb2c439adf5a84839071d8043903da32cd717d3b61af80e"
     },
     {
-      "cid": "bafyreidt6viis3e7ummfxzzbhgw75ujhppyzhowxunr7vmqh266dzxyjne",
+      "cid": "bafyreih7ricd4u4h3xnjwljy3wrm7qfhllq3qca4dbxdf5vsuef3e5owzy",
       "path": "01_核心协议.md",
-      "sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
+      "sha256": "ff8a043e5387ddda9b2d38dda2cfc0a75ae1b8081c186e32f6b2a10bb275d6ce"
     },
     {
-      "cid": "bafyreidin2i6ro5wavpx37xkrtm35lqgjxeudv5tcjrzbhgblhsyir7dxi",
+      "cid": "bafyreihufxztq3yjbtusmegxnuzqjnl5y3l3vhmyvxlaej5mxm3yum6dmm",
       "path": "02_联动注册表.md",
-      "sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
+      "sha256": "f42df3386f090ce92610d76d3304b57dc6d7ba9d98add60227acbb378a33c363"
     },
     {
-      "cid": "bafyreieesub677mu6hl5uhk2vmwj3qv4mej3wpvi3zhw7imeizuvxkh5ki",
+      "cid": "bafyreiffxro6glegb2dw6fncdtam3d3qlkax432clwdeo5scpuivziue7m",
       "path": "06_Agent执行协议.md",
-      "sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
+      "sha256": "a5bc5de32c860e876f15a21cc0cd8f705a817e6f425d864776427d115ca284fb"
     },
     {
-      "cid": "bafyreighyurp2tydobtuzqwbsgcvyl7bjbe7xicppjoywldiwq35rq2cgm",
+      "cid": "bafyreibllrle2z4n4bk2ggn4kdeddc3pst4mi5zmlbdgiihxh6ie5xq7ee",
       "path": "07_官方核心出厂与社区预设导航.md",
-      "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
+      "sha256": "2b5c564d678de055a319bc50c8318b6f94f8c4772c58466420f73f904ede1f21"
     },
     {
       "cid": "bafyreif2t5dpqd5oqrggcs7l6uvi2ojga3xfsekpkgqjnfvsbrb5nfotka",
@@ -32,14 +32,14 @@
       "sha256": "ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350"
     },
     {
-      "cid": "bafyreig7kfo4ln7psvzo5lcvqpg6il5a6r7oupd5ptvtoz7dsu6z6k7nam",
+      "cid": "bafyreicphensjcwu7tlrz2wrujmunecfabfi3psgl4qcn6jxh6klrop6pi",
       "path": "library/INDEX.md",
-      "sha256": "df515dc5b7ef9572eeac5583cde42fa0f47eea3c7d7ceb3767e3953d9f2bed03"
+      "sha256": "4f391b248ad4fcd71cead1a259469045004a8dbe465f2026f9373f94b8b9fe7a"
     },
     {
-      "cid": "bafyreidmvkjbly6u74mxusyc7374o7532u6waztwahnhbqeb4t3fwuufyq",
+      "cid": "bafyreifwhdeueo44ddyoy6nviehckjzyzfe4akjtbn7hsytiojlcelai5q",
       "path": "library/ALIAS.md",
-      "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+      "sha256": "b638c9423b9c18f0ec79b5410e252738c949c029330b7e7962687256222c08ec"
     },
     {
       "cid": "bafyreibqlthxbcjto5mi363mysnxlngpn75nptoa7donzg7bvv53s5zebe",
@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreigj45d6jqe45gn26fas7ajljrb6r7ywjdvrlmib4qzgt3wkkpexqi",
+      "cid": "bafyreie3mwfbknegbtfj4qqu7hcl75eq73hfebhj4fk6xqz6ajqopxuk6a",
       "path": "protocol/conformance_report.json",
-      "sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+      "sha256": "9b658a1534860cca9e4214f9c4bff490fece5204e9e155ebc33e0260e7de8af0"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -147,9 +147,9 @@
       "sha256": "984858ba9029da2abc6b1b7c44ee1f98a4b6f166e05208ca41ea8cfecc6f1338"
     },
     {
-      "cid": "bafyreiaannlhjc3nvlzedg7ebjssi7mq57lcshuhztlbyzjh5uksnnvu4q",
+      "cid": "bafyreibfle42txd57lc45gmaxwu6zcllcnqc5de34rxnlgkgnmzd3ptw3u",
       "path": "protocol/CONFORMANCE.md",
-      "sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
+      "sha256": "255939a9dc7dfac5ce9980bda9ec896b13602e8c9be46ed599466b323dbe76dd"
     },
     {
       "cid": "bafyreigsbxn44kavcw34rhfaf4idkk65f4y6trvlqcshfkn23mdhqb7asm",
@@ -217,9 +217,9 @@
       "sha256": "6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0"
     },
     {
-      "cid": "bafyreiepk3mmygtuthk4ce3mjg2b4ykdey5zdiqp7kew4hujulwcngnq2m",
+      "cid": "bafyreieifrmtg4swyjyew3gfjlnzwgh73eyzzzy233vtqzywvzeph2l3au",
       "path": "decisions/INDEX.md",
-      "sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
+      "sha256": "882c59337256c2704b6cc54adb9b18ffd9319ce71adeeb386716ae48f3e97b05"
     },
     {
       "cid": "bafyreidpsmrdixkrxrpflye44bb6qa7kvmqt5ujdytxf2xiseog54oelg4",

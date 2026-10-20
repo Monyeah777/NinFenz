@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:1b0a76e810f1f79aa2329aabefef5087c509c4039ebae73d773c052ccd9683c1
-  - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:93cc910a327ac4290695e398e41aa29c0bac47530567877cc735d48c74e429d8
+  - CHANGELOG.md:df207a40e8daf312c16ca633e08fad7cbe4d2f6289e895e0570be353e883d5c5
+  - docs/meta/VERSION-MATRIX.md:1c25a7b2273f8e7a38ab9d81fe84868f56cdde203672dfeb7b8d5eb1f5a6d5f8
+  - README.md:486c4b8f93b63ec2375afe9693f8e231f89c38bb24aac941b97c579995a4916d
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
-  - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
+  - docs/release.md:fe2c7ccf9519c9e0549eff968ead88bba6b77ccb97f656270401fcf5e6e13853
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：hygiene + version governance
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

@@ -6,13 +6,13 @@ scope: 作者指令「把管线/模块/资产牵扯到叙述的全部删除，�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - 01_核心协议.md:73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969
-  - 02_联动注册表.md:686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba
-  - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
-  - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
-  - 03_管线库/P00_通用文档生成管线.md:e3acba0c5111b7e67094c4d82d815cd941bd2ebf6b36d5b71f8574241c2e06a2
-  - 03_管线库/P01_标准管线.md:45176d7415faa9b63055892717f8262538e6ead83fff2d3ee83c11ad6df375ee
-  - 03_管线库/P90_结构装配管线.md:b44562314643a042781a22f50a609785d339642c41c57db7ab134a732720b0dc
+  - 01_核心协议.md:ff8a043e5387ddda9b2d38dda2cfc0a75ae1b8081c186e32f6b2a10bb275d6ce
+  - 02_联动注册表.md:f42df3386f090ce92610d76d3304b57dc6d7ba9d98add60227acbb378a33c363
+  - 06_Agent执行协议.md:a5bc5de32c860e876f15a21cc0cd8f705a817e6f425d864776427d115ca284fb
+  - 07_官方核心出厂与社区预设导航.md:2b5c564d678de055a319bc50c8318b6f94f8c4772c58466420f73f904ede1f21
+  - 03_管线库/P00_通用文档生成管线.md:4b55427b3b4da5fc3ab0d86dc560b45c30d1334d5d8da45a9f0a17cd97463a37
+  - 03_管线库/P01_标准管线.md:01eb119a840bff42f00e9eb1b5f9e4846ea6e8c1db5c57753a2e8521dc7c02ad
+  - 03_管线库/P90_结构装配管线.md:d4ab55e98671ed075fe5ea1bd7dd4eda7a08fe18ae0feb0c4c7c0a2da8211db1
   - 04_模块库/通用类/M00_数据槽总线.md:dd9a95691343370a880b4aad605716901d7cb794859094da62c4099eac5795c9
   - 04_模块库/通用类/M10_节拍推进.md:d5e92a58ce3c0d5d144366828f919f3ce6eb7e2cc3234ad62a1c98535d77aacb
   - 04_模块库/通用类/M23_可见性边界.md:9635fe2d9f74a8f1d7e5060bfac3c44dc3545f81c9de515aae134205bb51f007
@@ -26,15 +26,17 @@ subjects:
   - 04_模块库/事件类/M22_事件编排.md:b9b9d9728621912f954a67ae5d5ce80dc5ee7ec7945441a6b602b37fbfc9ad1a
   - 04_模块库/世界类/M08_环境状态.md:eb27707703c93a787150a8f32ecb0d5a2a273d56a8e93d2b4789def281c5fb81
   - 04_模块库/技术文档类/M90_结构装配.md:7ed8a8435be582e59aa070a10d5d6a6b234dfc127a0613507bd5842bf5a876a4
-  - 05_资产库/README.md:7f8d241a8e6ce0f2b65a8e37b7708fa260044aec78b44f1efa986f7b57bf49bb
+  - 05_资产库/README.md:2f01833dfc3bebfb65138920e58e755b3582592403e6267140b0abe63b14b8b2
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
-  - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
-  - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
+  - 05_资产库/用户自定义/README.md:51ec6f7acf66e5996750f4d20f85e5cff994b630522317b14cd15e1aab11dba2
+  - 05_资产库/用户自定义/STYLE_DNA.md:594496cece35ecafc22522d27c148959caabe4b42cf17d976bbb4ee94fb057dd
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-19）：check39 挂载五分钟入口判据（docs/quickstart.md ↔ scripts/quickstart_check.sh），verify.sh 结构性新增子判据
 
 > 重审（2026-10-19）：verify.sh 恢复并补 _NF_BG_TESTS_PID 声明

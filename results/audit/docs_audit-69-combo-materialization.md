@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
-  - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
+  - docs/combos.md:f7942c14c5af8db7080be26166ba8d3d8e9015a2918893e4c39858e0728a532c
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

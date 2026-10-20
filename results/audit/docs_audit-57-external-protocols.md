@@ -20,13 +20,15 @@ subjects:
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
-  - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
-  - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
-  - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
-  - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
+  - docs/interop.md:98811fdc7264a48df5367a561774f6adf6df0e729e26a1d61efdc60442d43ba4
+  - docs/text-hygiene.md:3a94c61ad19ad7298157469425af3ef4f1671807d0db3c6ec4a129485ff14076
+  - docs/endpoint.md:51bdf9a5740f6fa353480bb7e92627d05c3c7aa0778d5edccf1976a2f369c5ed
+  - docs/mcp.md:9cb8a27b1916eb542f70b38d828ed79f5ec9737446f16a210b759d0dced392dc
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

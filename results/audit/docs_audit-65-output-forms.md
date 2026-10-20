@@ -14,11 +14,13 @@ subjects:
   - protocol/output_forms.json:aff71eccf1cd0b57c51a86681c613580e79d346bb6e5dfdd97a873a2436943e9
   - community/量化金融域包/outputs/INDEX.json:cfe9272a362e138f9cb6d15615176cbb348716336d31b372bf411645f74a7bb6
   - community/AI系统域包/outputs/INDEX.json:95103926c6736571fb38e5c95f8234b76dddf26ee286270e3bdbdf3fd4c33a99
-  - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
+  - docs/output-forms.md:5d214cacafacde14cc1e67c24cb527a3880a3831788bde703cfcaa64d3a0865a
   - desktop/tests/test_output_forms.py:9fd1c65068880d1e7cf535add2342e7750b5f54650c8e68b2810070ffc9d10a3
   - desktop/tests/test_quant_metrics.py:4f8b0d358f6b132f98cf355e75e33917e700f33033421085197fe56edd02f0c4
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

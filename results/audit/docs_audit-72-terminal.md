@@ -14,11 +14,13 @@ subjects:
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
-  - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
+  - docs/terminal.md:7759ab01630b56415c0d664116de79dceb55380c65544315ed8bb668d2a356c8
+  - docs/L3_FROZEN.md:8cc11c5f6cda41c4c243bdf3d23f97705aa5cae9d26dd301cfd9484700bfe386
+  - protocol/CONFORMANCE.md:255939a9dc7dfac5ce9980bda9ec896b13602e8c9be46ed599466b323dbe76dd
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：hygiene + version governance
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

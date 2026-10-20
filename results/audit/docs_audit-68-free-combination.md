@@ -11,11 +11,13 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
-  - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
+  - docs/combos.md:f7942c14c5af8db7080be26166ba8d3d8e9015a2918893e4c39858e0728a532c
   - desktop/tests/test_pack_combo.py:38d6fbc122264bcd205e6d5cb8baac1a1a581f1cb8a43da2c12691e57314b0a6
   - community/校园西幻轻混组合包/protocol.yaml:093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

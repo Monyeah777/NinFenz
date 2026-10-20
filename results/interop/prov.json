@@ -71,27 +71,27 @@
     {
       "@id": "nf:file/01_核心协议.md",
       "@type": "prov:Entity",
-      "nf:sha256": "73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969"
+      "nf:sha256": "ff8a043e5387ddda9b2d38dda2cfc0a75ae1b8081c186e32f6b2a10bb275d6ce"
     },
     {
       "@id": "nf:file/02_联动注册表.md",
       "@type": "prov:Entity",
-      "nf:sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
+      "nf:sha256": "f42df3386f090ce92610d76d3304b57dc6d7ba9d98add60227acbb378a33c363"
     },
     {
       "@id": "nf:file/06_Agent执行协议.md",
       "@type": "prov:Entity",
-      "nf:sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
+      "nf:sha256": "a5bc5de32c860e876f15a21cc0cd8f705a817e6f425d864776427d115ca284fb"
     },
     {
       "@id": "nf:file/07_官方核心出厂与社区预设导航.md",
       "@type": "prov:Entity",
-      "nf:sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
+      "nf:sha256": "2b5c564d678de055a319bc50c8318b6f94f8c4772c58466420f73f904ede1f21"
     },
     {
       "@id": "nf:file/STRATEGY.md",
       "@type": "prov:Entity",
-      "nf:sha256": "287a95e5c746aec574c70058e841f8a3555012bf22c9fecc38c0ce0dfd581e20"
+      "nf:sha256": "0ae5eb3e425b81af4cb2c439adf5a84839071d8043903da32cd717d3b61af80e"
     },
     {
       "@id": "nf:file/decisions/ADR-0001-双源知识层落位.md",
@@ -131,7 +131,7 @@
     {
       "@id": "nf:file/decisions/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
+      "nf:sha256": "882c59337256c2704b6cc54adb9b18ffd9319ce71adeeb386716ae48f3e97b05"
     },
     {
       "@id": "nf:file/desktop/src/core/registry.json",
@@ -141,12 +141,12 @@
     {
       "@id": "nf:file/library/ALIAS.md",
       "@type": "prov:Entity",
-      "nf:sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+      "nf:sha256": "b638c9423b9c18f0ec79b5410e252738c949c029330b7e7962687256222c08ec"
     },
     {
       "@id": "nf:file/library/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "df515dc5b7ef9572eeac5583cde42fa0f47eea3c7d7ceb3767e3953d9f2bed03"
+      "nf:sha256": "4f391b248ad4fcd71cead1a259469045004a8dbe465f2026f9373f94b8b9fe7a"
     },
     {
       "@id": "nf:file/llms.txt",
@@ -156,7 +156,7 @@
     {
       "@id": "nf:file/protocol/CONFORMANCE.md",
       "@type": "prov:Entity",
-      "nf:sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
+      "nf:sha256": "255939a9dc7dfac5ce9980bda9ec896b13602e8c9be46ed599466b323dbe76dd"
     },
     {
       "@id": "nf:file/protocol/LAYERS.json",
@@ -196,7 +196,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+      "nf:sha256": "9b658a1534860cca9e4214f9c4bff490fece5204e9e155ebc33e0260e7de8af0"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",

@@ -14,18 +14,20 @@ subjects:
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
-  - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
-  - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
+  - docs/lsp.md:47f279f33e62201389a934849dfec17758c549390cfe3207d9c595b932b0a30a
+  - docs/mcp.md:9cb8a27b1916eb542f70b38d828ed79f5ec9737446f16a210b759d0dced392dc
+  - docs/decision-layer.md:c8b3513916410b89099efe16b069403af236a6df111e67e9afb66b57a0007e9c
   - protocol/driver.json:d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093
   - integrations/site/integration.json:4a0b13e80d195f74e2c9965b899f87576e38d9c0b42190defb10bb13184e1374
   - integrations/site/strings.json:4d19bc7e32eb8bb9f7d368261c8bf464c02837ff828cbce364da4da229c4e59c
   - integrations/lsp/integration.json:2a0a752a3138db7bfd0d7c1c912c375f98e1eaf3fe783744ecb61a4d28e2a41e
   - integrations/lsp/strings.json:880d4cfd99a9c5ffe7c342af52f312f108d8c2e3455119dc538b77743fcb194b
-  - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
+  - skills/ninfenz/SKILL.md:48992bc157dd3d19091b3ba59c03390b0aaab470615eff87189c68eee81fc5d4
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

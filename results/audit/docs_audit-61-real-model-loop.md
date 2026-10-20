@@ -12,10 +12,12 @@ subjects:
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - community/通用核心基础包/modules/M94_通用节拍桥.md:5c9605e3becbec64e87d5d3ab32b7e25a22150d949d3b8cf787eaa1e01f0e2c4
   - community/校园西幻轻混组合包/modules/M92_轻混装配执行.md:1e261dcc10d0b7134d8194f6e548ecae0d7230d9ba8e258d48825627503360d6
-  - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
+  - docs/decision-layer.md:c8b3513916410b89099efe16b069403af236a6df111e67e9afb66b57a0007e9c
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-19）：CRLF 归一后派生面重算：被审承重件 digest 校准，审计结论未变
 
 > 重审（2026-10-18）：P3：缓存脚本去掉删除面（保 Rust 快线 purity 口径一致）

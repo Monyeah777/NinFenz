@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "纯度零违规",
-      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
+      "detail": "L10 docs/layers.md 生成区与实时渲染不一致（修复指引：跑 nf layers --write 刷新）",
+      "digest": "c1f13ba0f29c0bb4f153fc2f56e682a8855ed97d61c2b4472d26bdad7f756168",
       "id": "purity-clean",
-      "ok": true
+      "ok": false
     },
     {
       "description": "文档四型覆盖",
@@ -37,10 +37,10 @@
     },
     {
       "description": "INDEX/ALIAS 投影一致",
-      "detail": "投影一致",
-      "digest": "5fe250ece716fcdbe260f7a16f0cf305657f20541ab4cd3c0448866b15a02f78",
+      "detail": "INDEX 生成区「library-mirror -->」与实时重算不一致（跑 nf library reindex）; INDEX 生成区「library-index -->」与实时重算不一致（跑 nf library reindex）",
+      "digest": "0de95858b7e8bfadc47aff86c84125b1a5f98d844e41308a4a68f8a991cd31bc",
       "id": "library-projection",
-      "ok": true
+      "ok": false
     },
     {
       "description": "管线抽象执行零 hard 缺陷",
@@ -93,10 +93,10 @@
     },
     {
       "description": "实践包品类",
-      "detail": "实践包 7 条（格式/可证/投影）",
-      "digest": "088daf2f577b270b03bf696107856a9e7be9f7efc4bcfbd22a14841d65bacde0",
+      "detail": "patterns 登记表与实时重算不一致（跑 nf patterns reindex）",
+      "digest": "10c1baeed2e59b24360c8282dad835638a0044fba3a12874a0358c2dffe6f656",
       "id": "patterns",
-      "ok": true
+      "ok": false
     },
     {
       "description": "服务端点契约指向真实性",
@@ -128,10 +128,10 @@
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "决策 7 条（accepted 6 · 取代链 1）",
-      "digest": "0bceeddd54adb6a000e8cabd1795eab64ec9e127a9f7431532bf6b06a615cdb6",
+      "detail": "决策登记表与实时重算不一致（跑 nf decisions reindex）",
+      "digest": "d020d6e2a509805c8587a25cc16bb60f09aaf97f311dfe33257ccd9b619783e2",
       "id": "decisions",
-      "ok": true
+      "ok": false
     },
     {
       "description": "接力协议（SBAR 五段 + 未决带判据）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 27,
-  "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
+  "passed": 23,
+  "root": "5374b055eab5b99ee042de48be6042696749f4c42def4c6865d59139df54d1af",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "conformant"
+  "verdict": "non-conformant"
 }

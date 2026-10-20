@@ -13,13 +13,15 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
-  - docs/fde-stack.md:79633a484dcf01cd92c03deac96d7b59f85489c1aa0ec4ad5489768d2702da8a
-  - docs/fde-sample/README.md:c17984ad90f50d39131fd932c37915b978e28bf606f9c397128de1c8417e4168
-  - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
+  - protocol/CONFORMANCE.md:255939a9dc7dfac5ce9980bda9ec896b13602e8c9be46ed599466b323dbe76dd
+  - docs/fde-stack.md:77358216a818be78cb8bde73605ee866efdbec3665766dd978dfb4f25e478692
+  - docs/fde-sample/README.md:e4856ef061de55082ad0613cb977c152f3ced71f4f42dfa6a72184953e7f332f
+  - docs/interop-thirdparty.md:ef25daac24feb9d38fde04b7610a1cfb3095174dfea9c1763300f2663bff06c9
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

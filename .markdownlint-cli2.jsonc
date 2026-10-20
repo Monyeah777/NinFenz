@@ -1,5 +1,5 @@
 {
-  "config": ".markdownlint.json",
+  "_说明": "markdownlint-cli2 的扫描面与排除面；规则本体在 .markdownlint.json（用 --config 指定，两处不重复声明规则）。",
   "globs": [
     "**/*.md"
   ],

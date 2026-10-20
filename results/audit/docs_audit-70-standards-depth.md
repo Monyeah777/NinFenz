@@ -10,9 +10,11 @@ subjects:
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
-  - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
+  - docs/domain-packs.md:0c9a604b6f03cb1e54857e3b95fa00832bd7d496571b299557c3450b1c630b54
 
 ---
+> 重审（2026-10-20）：compliance 2
+
 > 重审（2026-10-19）：check39 挂载五分钟入口判据（docs/quickstart.md ↔ scripts/quickstart_check.sh），verify.sh 结构性新增子判据
 
 > 重审（2026-10-19）：verify.sh 恢复并补 _NF_BG_TESTS_PID 声明
