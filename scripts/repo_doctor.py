@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
-from core import json_doc  # core.json_doc 是结构契约唯一读点
+from core import atomic_write, json_doc  # 写面单源 + 结构读点单源
 
 TOOL_VERSION = "1.0.0"
 GROUPS = ("Hygiene", "Security", "Basics", "Community", "Build", "Reproducibility")
@@ -414,8 +414,7 @@ def main(argv=None):
         / (f"repo_doctor-baseline-{datetime.date.today().isoformat()}.json"))
     if not args.no_write:
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
-                       encoding="utf-8", newline="\n")
+        atomic_write.write_text(out, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:

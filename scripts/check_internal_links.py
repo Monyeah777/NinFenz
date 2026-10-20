@@ -28,7 +28,7 @@ import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
-from core import json_doc  # core.json_doc 是结构契约唯一读点
+from core import atomic_write, json_doc  # 写面单源 + 结构读点单源
 
 BASELINE_REL = "scripts/internal_link_baseline.json"
 EXTERNAL_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
@@ -181,8 +181,8 @@ def main(argv=None):
     res = scan(args.root, include_untracked=not args.tracked_only, baseline_path=args.baseline)
     if args.report:
         Path(args.report).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.report).write_text(json.dumps(res, ensure_ascii=False, indent=2) + "\n",
-                                     encoding="utf-8")
+        atomic_write.write_text(Path(args.report),
+                                json.dumps(res, ensure_ascii=False, indent=2) + "\n")
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     elif res.get("error"):
