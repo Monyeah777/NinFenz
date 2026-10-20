@@ -64,3 +64,10 @@ desktop/tmp*/
 # 五分钟入口的**手工复跑**产物目录（docs/quickstart.md 的 --dest 落点；
 # 脚本 scripts/quickstart_check.sh 自己用系统临时目录，不落仓内）
 .nf-quickstart/
+
+# ── 运行产物（曾被误提交进根目录；写入源本身用系统临时目录，这里只是防回潮）──
+nf_baseline_*/
+nf_agents_*/
+nf-locks/
+shell_history
+trace.json
