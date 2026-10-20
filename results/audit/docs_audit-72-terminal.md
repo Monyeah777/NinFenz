@@ -6,8 +6,8 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:104d54825183329b72f403aaac355f86398ce360b466e75d212f11ecc4a1b12f
-  - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
+  - desktop/src/core/terminal.py:3e4ddde31b8bcc8f10c968f05507404428d130351b243592888df0665298319f
+  - scripts/nf.py:e731b135d6454aec1a5dd2e43b721a6c43f3d1f82831336b35f480cb0fce6322
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-10-20）：release 1.0.4 1
+
 > 重审（2026-10-20）：hygiene + version governance
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
