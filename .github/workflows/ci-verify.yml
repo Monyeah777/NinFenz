@@ -111,8 +111,18 @@ jobs:
           NF_VERIFY_TMP: .nf-logs
         run: |
           # 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。
-          set -o pipefail
+          # 2026-10-21：此前失败时日志被 tee 吞进工件、job 日志里看不到**失败用例名**，
+          # 只能靠猜平台差异。现在无论成败都把 FAIL/ERROR 行打到 job 日志（诊断优先）。
+          set +e
           bash verify.sh --tests-only --shard "${{ matrix.shard }}/32" 2>&1 | tee verify-tests.log
+          rc=${PIPESTATUS[0]}
+          if [ "$rc" -ne 0 ]; then
+            echo "::group::失败用例（分片 ${{ matrix.shard }}）"
+            grep -E "^(FAIL|ERROR):" verify-tests.log | head -40 || true
+            grep -E "^(FAILED|ERROR) \(" verify-tests.log | head -5 || true
+            echo "::endgroup::"
+          fi
+          exit "$rc"
       - name: 上传分片日志（失败时同样上传）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
