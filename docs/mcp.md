@@ -250,5 +250,5 @@ printf '%s\n' \
 ```
 
 Glama Admin 页的 Build steps 留空、CMD arguments 填 `["python","scripts/nf.py","serve"]`、
-环境变量 schema 为空对象；完整步骤与评分口径见根目录 `GLAMA.md`。镜像没有端口 /
+环境变量 schema 为空对象；完整步骤与评分口径见`docs/meta/GLAMA.md`。镜像没有端口 /
 出站网络，行为和本地 `nf serve` 是同一套实现。

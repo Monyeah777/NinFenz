@@ -251,5 +251,5 @@ printf '%s\n' \
 
 On the Glama Admin page leave Build steps empty, set CMD arguments to
 `["python","scripts/nf.py","serve"]`, and use an empty environment-variable schema; the full
-steps and scoring rubric are in the repository-root `GLAMA.md`. The image exposes no port and
+steps and scoring rubric are in the `docs/meta/GLAMA.md`. The image exposes no port and
 makes no outbound network calls; its behavior is the same `nf serve` implementation as local.

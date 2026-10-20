@@ -95,8 +95,8 @@
 - [CHANGELOG.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/CHANGELOG.md)：版本演进流水（长，短上下文可跳过）
 - [docs/meta/VERSION-MATRIX.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/meta/VERSION-MATRIX.md)：版本 × 能力矩阵
 - [STRATEGY.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/STRATEGY.md)：方向与质量准绳（最高层）
-- [CONTRIBUTING.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/CONTRIBUTING.md)：贡献与提交纪律
-- [SECURITY.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/SECURITY.md)：安全边界与漏洞报告
+- [CONTRIBUTING.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/.github/CONTRIBUTING.md)：贡献与提交纪律
+- [SECURITY.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/.github/SECURITY.md)：安全边界与漏洞报告
 - [docs/agent/ROUTES.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/agent/ROUTES.md)：取货路线图
 - [community/README.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/community/README.md)：社区域包总览（按域检索）
 - [docs/standards/index.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/standards/index.md)：标准目录全量索引（每条稳定锚，适合逐条引用）

@@ -63,7 +63,7 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
     checks = []
 
     # ① gitignore 覆盖度
-    script = root / "scripts" / "check_gitignore_coverage.py"
+    script = Path(__file__).resolve().parent / "check_gitignore_coverage.py"
     if script.is_file():
         p = subprocess.run([sys.executable, str(script), "--repo", str(root), "--json"],
                            capture_output=True)

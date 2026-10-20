@@ -58,5 +58,7 @@ jobs:
           python-version: '3.11'
       - name: gitignore 覆盖度（五类各至少一条路径规则；FX-07 必过位）
         run: python scripts/check_gitignore_coverage.py
+      - name: 索引层产物检查（FX-06 必过位：产物重新进入索引即红）
+        run: python scripts/check_untracked_artifacts.py
       - name: 卫生三项（gitignore 覆盖 / 虚拟环境入库 / 仓库体积）
         run: python scripts/check_repo_hygiene.py

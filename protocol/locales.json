@@ -31,11 +31,11 @@
       "translations": {
         "en": {
           "path": "docs/en/release.md",
-          "source_sha256": "7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379"
+          "source_sha256": "fe2c7ccf9519c9e0549eff968ead88bba6b77ccb97f656270401fcf5e6e13853"
         },
         "ja": {
           "path": "docs/ja/release.md",
-          "source_sha256": "7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379"
+          "source_sha256": "fe2c7ccf9519c9e0549eff968ead88bba6b77ccb97f656270401fcf5e6e13853"
         }
       }
     },
@@ -44,11 +44,11 @@
       "translations": {
         "en": {
           "path": "docs/en/locales.md",
-          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+          "source_sha256": "3b4605f6c756c2612fe9b4a870bfbfa2945a436211a745a233fcd6346d80f321"
         },
         "ja": {
           "path": "docs/ja/locales.md",
-          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+          "source_sha256": "3b4605f6c756c2612fe9b4a870bfbfa2945a436211a745a233fcd6346d80f321"
         }
       }
     },
@@ -57,11 +57,11 @@
       "translations": {
         "en": {
           "path": "docs/en/mcp.md",
-          "source_sha256": "c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78"
+          "source_sha256": "06c3d51ae07d154bb95d66c0d0cfbcb5969acf1648babd8624231a449dc8c7e6"
         },
         "ja": {
           "path": "docs/ja/mcp.md",
-          "source_sha256": "c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78"
+          "source_sha256": "06c3d51ae07d154bb95d66c0d0cfbcb5969acf1648babd8624231a449dc8c7e6"
         }
       }
     },
@@ -70,11 +70,11 @@
       "translations": {
         "en": {
           "path": "docs/en/terminal.md",
-          "source_sha256": "b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b"
+          "source_sha256": "7759ab01630b56415c0d664116de79dceb55380c65544315ed8bb668d2a356c8"
         },
         "ja": {
           "path": "docs/ja/terminal.md",
-          "source_sha256": "b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b"
+          "source_sha256": "7759ab01630b56415c0d664116de79dceb55380c65544315ed8bb668d2a356c8"
         }
       }
     },
@@ -96,11 +96,11 @@
       "translations": {
         "en": {
           "path": "docs/en/lsp.md",
-          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+          "source_sha256": "47f279f33e62201389a934849dfec17758c549390cfe3207d9c595b932b0a30a"
         },
         "ja": {
           "path": "docs/ja/lsp.md",
-          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+          "source_sha256": "47f279f33e62201389a934849dfec17758c549390cfe3207d9c595b932b0a30a"
         }
       }
     }

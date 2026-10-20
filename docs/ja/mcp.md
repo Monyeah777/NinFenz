@@ -250,5 +250,5 @@ printf '%s\n' \
 
 Glama Admin ページでは Build steps を空にし、CMD arguments を
 `["python","scripts/nf.py","serve"]`、環境変数 schema を空オブジェクトにします。
-詳細手順と評価基準はリポジトリルートの `GLAMA.md` にあります。イメージはポートを公開せず、
+詳細手順と評価基準は`docs/meta/GLAMA.md` にあります。イメージはポートを公開せず、
 外部ネットワークも使いません。動作はローカルの `nf serve` と同じ実装です。
