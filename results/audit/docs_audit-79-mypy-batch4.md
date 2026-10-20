@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
+  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
 ---
+> 重审（2026-10-20）：compliance style fix
+
 > 重审（2026-10-20）：notices generator hardened
 
 > 重审（2026-10-20）：third-party notices + community provenance gate

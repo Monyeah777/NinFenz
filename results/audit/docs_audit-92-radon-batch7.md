@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
+  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
 ---
+> 重审（2026-10-20）：compliance style fix
+
 > 重审（2026-10-20）：notices generator hardened
 
 > 重审（2026-10-20）：third-party notices + community provenance gate

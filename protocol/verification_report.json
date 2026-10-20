@@ -9,9 +9,11 @@
   "items": [
     {
       "id": "purity",
-      "issues": 0,
+      "issues": 1,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [],
+      "sample": [
+        "gen_third_party_notices.py:65 raise 消息缺修复指引：拒绝非 PyPI 官方地址："
+      ],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -32,7 +34,7 @@
         "raises": 63,
         "sinks": 20
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -298,9 +300,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
-        "verdict": "conformant"
+        "passed": 26,
+        "root": "e7903637fed223f6a99d9761873094ae7cd84bd90e7b0f2669dd1caeeda4b96c",
+        "verdict": "non-conformant"
       },
       "status": "pass",
       "warns": 0
@@ -538,12 +540,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "4f2e9a908deb0f0ac0b0b39b793904b9bdbef248109c06992f38be6dbe1f30ca",
+  "root_digest": "15969e0ddf310a3f6751bd232537e561d38efae2ece39f5579d5fbbd571828f3",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

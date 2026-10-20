@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:1bce86d5bc842525b33d44344f84bb5db1d3924ed023e6efb605eb99764203be
+  - protocol/code_metrics_baseline.json:adaad308850f8dc6592d1c07415847c27444d8838e00e8e5b40ea5634874c82a
 ---
+> 重审（2026-10-20）：compliance style fix
+
 > 重审（2026-10-20）：notices generator hardened
 
 > 重审（2026-10-20）：third-party notices + community provenance gate

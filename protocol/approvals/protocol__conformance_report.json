@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-20",
   "approved_by": "lead",
-  "note": "hardened",
+  "note": "style",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+  "subject_digest": "67734dd73a22040495cc64c9e13ad61f9d20b8bdb454e784cd5afb36b0507b91"
 }
