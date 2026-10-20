@@ -30,7 +30,7 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 ## 2. 分支策略：单主干 + 版本锚点
 
 - 主干 main 为唯一长期分支，改动直接推 main（大改动可短命分支合并后删除）。
-- **版本锚点**：发布即打 annotated tag（vX.Y.Z），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
+- **版本锚点**：发布即打 annotated tag（内容线 `v0.xx` / CLI 线 `v1.0.x`），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
 - 开工前工作树须干净（当前版本锚点 = 最新 annotated tag，见 §2）。
 
 ### 2.1 编号体系映射表（四套口径 · 唯一真源）
@@ -40,7 +40,7 @@ scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `c
 
 | 体系 | 语义 | 唯一真源 | 升级规则 |
 |---|---|---|---|
-| 协议 / 内容 vX.Y.Z | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [X.Y.Z]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
+| 协议 / 内容 v0.xx | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [0.xx]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
 | 门禁 verify vA.B | verify.sh 的判据集版本 | protocol/repo_stats.json（verify_version / verify_checks / baseline_pass）= core.quality_baseline 期望值 = llms.txt 质量凭证串 | scripts/bump_verify.sh 换标；判据集变即升 A.B |
 | CLI / npm / MCP 1.0.x | 启动器与 npm 包版本 | scripts/nf.py 的 NF_CLI_VERSION = packaging/npm/package.json = packaging/mcp/server.json（version 与 packages[0].version） | 发 npm 版时三处同改（stage-payload / test_mcp_packaging / site sync-numbers 均判死） |
 
@@ -54,28 +54,28 @@ CITATION.cff 刻意不钉版本号（见其文件头），不在断言面内。
 | 问题 | 是 → | 否 → |
 |---|---|---|
 | 有没有改到**用户能感知的能力**（新命令 / 新协议件 / 新领域包 / 行为变化）？ | 打 tag | 不打 tag |
-| 是**新增**还是**修正**？ | 新增 → **次版本** +1（2.12.0 → 2.13.0） | 修正 → **补丁** +1（2.13.1） |
-| 有没有**破坏兼容**（旧产物/旧命令失效）？ | **主版本** +1（3.0.0），且必须写迁移说明 | 按上两行 |
+| 这次变化有多大？ | **稍有突破** → **+0.01**（0.01 → 0.02） | **小更新** → **合并进当前版本**，不单独发版 |
+| 有没有**创新突破**（新能力线/新引擎/新协议层）？ | **+0.1**（0.02 → 0.12），破坏兼容时另写迁移说明 | 按上一行 |
 
 三条硬约束：
 
 1. **tag 必须打在"带该功能的那次提交"上**——不能打在后续的 `chore:`/`ci:` 收尾提交上。
 2. **tag 注释必须写清"这一版加了什么功能"**（一两句人话，不写内部字段名）；空注释或只写版本号视为不合规。
-3. **CLI 线 tag（`v1.0.x`）与 npm 包版本严格同号**：`v1.0.4` ⟺ `package.json` 1.0.4。内容线（`v2.x.y`）与 CLI 线各自独立，互不牵连。
+3. **CLI 线 tag（`v1.0.x`）与 npm 包版本严格同号**：`v1.0.4` ⟺ `package.json` 1.0.4。内容线（`v0.xx`）与 CLI 线各自独立，互不牵连。
 
 发布流程（缺一步就不算发版）：
 
 ```bash
 # ① 功能已合并、CHANGELOG 已写、门禁绿
 # ② 在功能提交上打附注 tag（注释写功能摘要）
-git tag -a v2.13.0 -m "v2.13.0 …（这一版新增/修正了什么）"
+git tag -a v0.13 -m "v0.13 …（这一版新增/修正了什么）"
 # ③ 推 tag（CI 的 release-gate / npm-publish 由此触发）
-git push origin refs/tags/v2.13.0
+git push origin refs/tags/v0.13
 ```
 
-> 历史遗留：v0.1.0–v0.3.2、v2.9.0 曾是**轻量 tag**（无注释），已补成附注 tag；
-> v0.6.0 从未发布（版本号跳号）；v1.0.2 tag 因指向 CI 修复提交且 npm 版本已废弃，已删除。
-> 这三类不再回改，见 `D:\NF-Plan\tag-audit-2026-10-20.md`。
+> 2026-10-20 重排：内容线由 v0.x / v1.x / v2.x 混杂改为 **0.xx 两位小数单序列**；
+> 纯修复/打点的 5 个历史 tag（0.3.0 / 0.3.1 / 0.3.2 / 0.3.3 / 0.5.0）按「小更新合并」并入 v0.11；
+> 备档 bundle 见 `D:\_NF-Archive\NinFenz-BEFORE-renumber-*.bundle`。
 
 ## 3. 验证门槛（提交前三步，全部通过）
 
@@ -130,7 +130,7 @@ python3 -m compileall -q desktop/src scripts
 **⑤ 发布（README 双源声明 + 版本行同步 + 发布纪律）**
 - 包 README 装载手册声明登记指针——「登记三要件见 02 §8.3，组合登记见 02 §8.4」（对齐既有两包形态）；根 README 开箱即玩社区预设段与 07 §3 索引同步增补（双源声明一致，I5）。
 - 版本行同步：schema_version / registry_schema_version 等字段级改动走 01 §7 V1（只增不删）/ V2（结构性变更 bump + 迁移记录）规则。
-- 发布纪律：tag vX.Y.Z 为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
+- 发布纪律：tag（内容线 v0.xx / CLI v1.0.x）为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
 
 ### 4.5 方案文档纪律（NN_ 方案模板必填两段，v2.2.0 B1/B2 起）
 新增/修订方案文档（`NN_<版本>_<主题>方案.md`）**必含**以下两段，位置在「核心」段之后：

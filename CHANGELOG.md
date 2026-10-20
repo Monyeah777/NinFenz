@@ -1452,27 +1452,27 @@ S
   ⑨ **再追加**：修掉 `docs/lsp.md`（含 en/ja）指向「不存在的 `lsp` 回填行」这处无法履行的承诺，并立同型判据（文档指向回填表具体行必须在册）。
   ⑩ **再追加**：站点中英页四维平价 + `facts.json` 锚落点判据（`site/en` 此前无判据）；`uri ↔ 路径` 往返判据（盘符 / 空格 / 中文）。
   ⑪ **再追加**：决策端口 HTTP 服务修掉「不读完请求体就回 404/413 ⇒ 客户端连接重置」（`_drain`，有界 1 MiB）；错误路径判据改为带 64 KiB 真请求体（该缺陷只在全量套件下暴露）。
-  ⑫ **再追加**：编辑器面补**端到端帧级金标**（`scripts/build_lsp_transcript.py` + `desktop/tests/fixtures/lsp/session.json`；帧回放逐字节对账、根路径折占位符便携（字符集内，键也折））；`integrations/lsp` 2.0.0 → 2.1.0（证据 additive）。
+  ⑫ **再追加**：编辑器面补**端到端帧级金标**（`scripts/build_lsp_transcript.py` + `desktop/tests/fixtures/lsp/session.json`；帧回放逐字节对账、根路径折占位符便携（字符集内，键也折））；`integrations/lsp` 0.45 → 0.46（证据 additive）。
   ⑬ **再追加**：站点机器面点名的 MCP 能力须在运行时（含 self-check 与下限）；根 `llms.txt` 的仓库路径承诺须在场（实测抓出 `core/locales.py` 这一处简称误当路径，已改全路径）。
   ⑭ **再追加**：他证说明页抽成 `render_doc()` 并立逐字投影判据（`emit` 会重置第三方回填表，故真仓不可重跑它）；指令档头部 `DRIVER OVERRIDE` 声明的工具集/提示与 `protocol/driver.json` 逐名对账（只取连续引用块）。
   ⑮ **再追加**：编辑器面修掉「每请求重扫仓库」的真实卡顿——索引签名复查加 TTL（1s）+ `build(root, sig)` 复用签名 + `didSave` 强制失效；实测**暖补全 158.33 ms → 0.51 ms/请求**，判据用调用计数（不看墙钟）。
-  ⑯ **再追加**：LSP `serverInfo` 版本改单一来源（`SERVER_NAME`/`SERVER_VERSION` + 接入面卡对账，改版本时帧级金标当场拦住未重签）；`lsp.py` 805 行越过上限 → 拆出 `core/lsp_client.py`（编辑器装配面独立变化原因），接入面卡 2.1.0 → 2.2.0。
+  ⑯ **再追加**：LSP `serverInfo` 版本改单一来源（`SERVER_NAME`/`SERVER_VERSION` + 接入面卡对账，改版本时帧级金标当场拦住未重签）；`lsp.py` 805 行越过上限 → 拆出 `core/lsp_client.py`（编辑器装配面独立变化原因），接入面卡 0.46 → 0.47。
   ⑰ **再追加**：`site/run.sh`（对外最先执行的一件）并入机器入口承诺判据（路径在场 + `nf` 子命令在册，含 `"$PY" scripts/nf.py <cmd>` 形态）；同波一条「已具备不重做」——MCP 红线散文计数早有一条判据，新增件撤回。
   ⑱ **再追加**：Agent Skill 的命令面进判据（`skills/**` 此前不在 `command_face` 扫描面内）；CLI 注册表抽取收敛为 `prose_lint.cli_commands()`（行为逐字不变）。
-  ⑲ **再追加**：编辑器面补**参数准入**——四类不合形参数旧路径回 `-32603` 内部错误，现回 `-32602` + 修复指引（通知则丢弃且不进状态）；准入层独立成 `core/lsp_params.py`（lsp.py 曾到 843 行/函数 37 行，两处棘轮同时亮），接入面卡 2.2.0 → 2.3.0。
-  ⑳ **再追加**：MCP `tools/call` 的 `arguments` 静默降级修掉（旧写法把 `[]`/`""`/`0` 当「没传参数」继续执行），现非对象一律 `-32602` + 修复指引；判据落真进程；接入面卡 1.0.0 → 1.1.0。
+  ⑲ **再追加**：编辑器面补**参数准入**——四类不合形参数旧路径回 `-32603` 内部错误，现回 `-32602` + 修复指引（通知则丢弃且不进状态）；准入层独立成 `core/lsp_params.py`（lsp.py 曾到 843 行/函数 37 行，两处棘轮同时亮），接入面卡 0.47 → 0.48。
+  ⑳ **再追加**：MCP `tools/call` 的 `arguments` 静默降级修掉（旧写法把 `[]`/`""`/`0` 当「没传参数」继续执行），现非对象一律 `-32602` + 修复指引；判据落真进程；接入面卡 0.34 → 0.35。
   ㉑ **再追加**：决策端口把「客户端错/服务端错」分开（入参形状错 → 400 + 契约指引，推理失败仍 500），未支持方法回 405 JSON（旧为 HTML 501），HEAD 只回表头；另立**无效转义序列**卫生判据并修掉三处（含两处本波自查出的自家笔误）。
-  ㉒ **再追加**：站点 Worker 立**行为判据**（`site/tools/worker-check.mjs` 16 条：协商/`q=0`/通配/回落/www 301/透传），删掉 `site-check.mjs` 里两条空转的字符串判据；顺带修掉 `Accept: text/markdown;q=0` 被误当同意这处真缺陷；接入面卡 1.0.0 → 1.1.0。
-  ㉓ **再追加**：编辑器面补 **LSP 会话状态机**（未 initialize → `-32002`；重复 initialize / shutdown 后请求 → `-32600`；未握手前的通知不做）；传输分帧独立成 `core/lsp_framing.py`；接入面卡 2.3.0 → 2.4.0。
-  ㉔ **再追加**：`$/` **请求**改为回 `-32601`（旧实现静默吞掉，合规客户端会一直等）；端到端帧级金标 11 → **20 条应答**（willSave / willSaveWaitUntil / watchedFiles / configuration / $ 心跳 / didSave / 悬停与符号无命中 / 未知方法与 $/ 请求 / 连续全量同步 / 关闭后补全 / shutdown 后请求），判据同步钉语义；接入面卡 2.4.0 → 2.5.0。
+  ㉒ **再追加**：站点 Worker 立**行为判据**（`site/tools/worker-check.mjs` 16 条：协商/`q=0`/通配/回落/www 301/透传），删掉 `site-check.mjs` 里两条空转的字符串判据；顺带修掉 `Accept: text/markdown;q=0` 被误当同意这处真缺陷；接入面卡 0.34 → 0.35。
+  ㉓ **再追加**：编辑器面补 **LSP 会话状态机**（未 initialize → `-32002`；重复 initialize / shutdown 后请求 → `-32600`；未握手前的通知不做）；传输分帧独立成 `core/lsp_framing.py`；接入面卡 0.48 → 0.49。
+  ㉔ **再追加**：`$/` **请求**改为回 `-32601`（旧实现静默吞掉，合规客户端会一直等）；端到端帧级金标 11 → **20 条应答**（willSave / willSaveWaitUntil / watchedFiles / configuration / $ 心跳 / didSave / 悬停与符号无命中 / 未知方法与 $/ 请求 / 连续全量同步 / 关闭后补全 / shutdown 后请求），判据同步钉语义；接入面卡 0.49 → 0.59。
   ㉕ **再追加**：立**两轴同族判据**（`test_two_faces_jsonrpc.py`：未知请求/通知/非法参数/ping 在 LSP 与 MCP 两面逐条对齐，带变异负例）；它当场抓到 LSP 面对「请求当通知发」会回 `id=null` 应答（JSON-RPC §4.1 禁止），已修，并在帧级金标里补该入站帧（应答条数不变即证静默）。
   ㉖ **再追加**：新增机械改写工装 `scripts/rewrite_text.py`（**默认干跑** + 逐行前后对照 + 爆炸半径闸门 + `atomic_write` 落盘 + `--check` 复验），判据 `desktop/tests/test_rewrite_tool.py` 五例；`CONTRIBUTING` §4.2 补「不做无对照的全仓替换」纪律。
-  ㉗ **再追加**：编辑器面新增 **`textDocument/references`**（只认 `registry.json` 登记关系：事件↔发布/订阅、模块↔挂载层、管线←域包，每条带 why；未登记一律空表，不做全文搜索）；帧级金标 20 → **21 条应答**；`lsp.py` 越 800 行 → 拆出 `core/lsp_doc.py`（打印边界 + 验证三件套）；文档三语同步；接入面卡 2.5.0 → 2.6.0。
-  ㉘ **再追加**：MCP 面把「只读」红线写成**协议层可机读**形式——10 个工具逐条声明 `annotations.readOnlyHint: true`（客户端可自动放行只读调用），判据四例（含「注解必须真出现在 `tools/list` 上」与变异负例）；文档三语同步；接入面卡 1.1.0 → 1.2.0。
+  ㉗ **再追加**：编辑器面新增 **`textDocument/references`**（只认 `registry.json` 登记关系：事件↔发布/订阅、模块↔挂载层、管线←域包，每条带 why；未登记一律空表，不做全文搜索）；帧级金标 20 → **21 条应答**；`lsp.py` 越 800 行 → 拆出 `core/lsp_doc.py`（打印边界 + 验证三件套）；文档三语同步；接入面卡 0.59 → 0.60。
+  ㉘ **再追加**：MCP 面把「只读」红线写成**协议层可机读**形式——10 个工具逐条声明 `annotations.readOnlyHint: true`（客户端可自动放行只读调用），判据四例（含「注解必须真出现在 `tools/list` 上」与变异负例）；文档三语同步；接入面卡 0.35 → 1.2.0。
   ㉙ **再追加**：MCP 资源模板从「发布即承诺」变成「发布即验证」——修掉 `nf://repo/asset/{package}/{key}` 的替身（未编码）写法读不出的缺口（读入时转义等价归一，白名单不变），并补**反方向**判据 `test_template_substitution_is_readable`；接入面卡 1.2.0 → 1.3.0。
   ㉚ **再追加**：MCP 工具面「声明即承诺」——删掉 `spec_ls` 从未实现的 `tier` 过滤声明（registry 无分级数据，旧行为是静默降级返回全量），并立通则判据 `ToolSchemaEffectTest`（每个声明属性置「绝无此值」后响应必须变化，含豁免表与变异负例）；接入面卡 1.3.0 → 1.4.0。
   ㉛ **再追加**：编辑器配置面补**能用性判据**（四种根含 Windows/空格路径的 Helix 生成件须能过 `tomllib` 解析、Lua/elisp 括号平衡、**文档里那段三语都是合法 TOML**），门禁 check33 同步改为真解析 Helix 段；另补量模板反向覆盖（5 条模板皆命中真实 uri，无幽灵模板）。
-  ㉜ **再追加**：编辑器面新增 **`textDocument/foldingRange`**（标题小节 + 代码围栏；单行区间与尾部空行不折）——派生自大纲同一份标题口径；门禁增折叠体检、帧级金标 21 → **22 条应答**、三语文档同步；接入面卡 2.6.0 → 2.7.0。
+  ㉜ **再追加**：编辑器面新增 **`textDocument/foldingRange`**（标题小节 + 代码围栏；单行区间与尾部空行不折）——派生自大纲同一份标题口径；门禁增折叠体检、帧级金标 21 → **22 条应答**、三语文档同步；接入面卡 0.60 → 0.70。
   ㉝ **再追加**：接入面卡的**命令承诺**纳入门禁——`entry.command` 里的 `nf <子命令>` 须与 `prose_lint.cli_commands()`（CLI 注册表单一真相）对上；拼错的 `nf srve` 此前全绿，现被抓，且注册表不在场时不误判（三例含变异负例）。
 - **路径改名**：`skills/narrativeforge/` → `skills/ninfenz/`（5 件，含 `references/` 三件与 `agents/openai.yaml`）。
 - **机器面刻意不变**（保住 NF 缩写的全部收益）：CLI `nf` · 契约 schema id `nf-*/1` · 统计标记 `<!-- nf:stats:begin -->` · 环境变量前缀语义面已随 `NINFENZ_*` 收敛但保留 `NF_*` 计数位 · 目录 `03/04/05_*`。
@@ -1490,7 +1490,7 @@ S
 - **待作者侧动作**：GitHub 仓库改名 → Gitee 镜像改名 → npm 以 `ninfenz` 发布首版 → 站点上线（`site/` 已按新名生成）。
 - **NFA-L 落地（声明式 + 命令式混合语言，不新增 check）**：新增 core/nf_expr.py（词法/语法）、core/nfal.py（符号面/类型检查/三值求值/NF-IR）、core/nfal_cli.py 与 nf nfal 入口（parse / check / build / eval / schema-check）；Pipeline 的 condition 现可用以 = 开头的封闭 guard 表达式记写，既静态可查又执行可判，散文 condition 仍只记 advisory A0201；pipeline.schema.json 的 condition 仅补描述（additive）；新增 docs/nfal.md 与 packaging/nfal/Dockerfile（零第三方依赖，镜像即分发单元）；测试 desktop/tests/test_nfal.py（26 例：词法/优先级/类型/三值/NF-IR 确定性/真仓散文回归）；code_metrics 棘轮按工具指引评审后重冻（scripts/nf.py +17 行）。
 - **NFA-L 收口续波（不新增 check）**：110 条管线 condition 由散文迁移为 nf-expr（统一取 M50 已声明相位 roll：`=data_bus.round.phase == "roll"`；M10 同拍者叠加 `&& event.tick_day`）；`nf lsp` 新增 nfal-guard 诊断（源/码/UTF-16 定位，见 docs/nfal.md）；终端能力族登记 `nfal` 并重生成 `tui/_surface.py`；修复 check12 的 12 项（命令面策展 / 投影同步 / 静默返回）与 check35/check39；`code_metrics` 棘轮按工具指引重冻 lsp_doc.py / terminal.py。
-## [2.12.0] - 2026-10-05
+## [0.93] - 2026-10-05
 
 - **基线声明同源（PASS 70→72）+ ja 入口纳入生成区**（2026-10-05）：check38 子扫描由四增至六，运行时 PASS 由 70 升至 **72**，而 `quality_baseline.EXPECTED_PASS` 仍停在 70——四处自洽断言与实跑出现「声明 ≠ 实跑」的隐性漂移。本波把 `EXPECTED_PASS` 同步为 **PASS=72**、`nf stats --write` 重生成入口生成区，并把 `README.ja.md` 纳入 `repo_stats.BLOCK_FILES`（新增 `_ja` 渲染器）——第三语言的统计块不再是手写。verify v2.30 · check1-40 · **PASS=72**。
 
@@ -3152,7 +3152,7 @@ S
   ① **引擎**：新增 `core/pack_combo.py` + `nf combine plan|breadth|verify` —— 任取若干包（或直接点模块/资产）→ 求解**五条不变量**（模块可定位 / 依赖闭合 / 事件闭合 / 层位堆叠确定 / 资产可寻址）+ **传递闭包**（`references` 借入递归拉入其 inputs 与事件发布方，逐步记理由）。
   ② **广度证明（不靠枚举）**：**全部两两 5671 组 100% 合法**、定种子抽样三元 **400/400**、四元 **200/200**、**极限（全 107 包同装）合法**（235 模块 / 0 悬挂 / 0 未桥）；check32 新增 `combos` 子扫描（证书复算 + 广度）≈ 3 s；单次组合求解 < 2 ms（画像 + 索引进程级缓存，初版 174 s → 3.2 s）。
   ③ **可机验产出**：`protocol/combo_certificates.json` **13 条声明证书**（极限 / 跨段对 / 三元 / 四元 / 先例 / **组件级混搭**），每条第含包清单 / 模块集 / 层栈 / 依赖闭包 / 事件闭包 / 资产借阅 / 模块借入 / 合法性 / 规范摘要；机检三层 = 证书 schema（自家 JSON Schema 子集）+ **按输入重算逐字段比对（T4）** + 广度不变量；`data_contracts` 登记 29 件。
-  ④ **引擎抓出并修掉的真实缺口**：既有 **校园西幻轻混组合包** 的事件依赖（`confession_event`/`npc_action`/`relationship_change`）未在 `references` 声明 → 补 3 条只读引用 + 包版本 `1.0.0→1.1.0`（additive）+ 02 §9.6 四步迁移记录；核心发布事件漏算 → 计入闭包；层栈顺序依赖调用者给序 → 改规范序（digest 稳定）；旧包 `module_id_range` 行式写法解析漏项 → 兼容并集。
+  ④ **引擎抓出并修掉的真实缺口**：既有 **校园西幻轻混组合包** 的事件依赖（`confession_event`/`npc_action`/`relationship_change`）未在 `references` 声明 → 补 3 条只读引用 + 包版本 `0.34→0.35`（additive）+ 02 §9.6 四步迁移记录；核心发布事件漏算 → 计入闭包；层栈顺序依赖调用者给序 → 改规范序（digest 稳定）；旧包 `module_id_range` 行式写法解析漏项 → 兼容并集。
   ⑤ **文档/测试**：新增 `docs/combos.md`（五不变量 / 广度口径 / 证书三层机检 / 边界）；`desktop/tests/test_pack_combo.py`（10 例：层栈规范序 / 全包合法 / references 传递闭包 / 组件级混搭 / 未知包负例 / 证书复算 / 证书 schema 负例 / 广度抽样）。实测 `bash verify.sh` **PASS=61 · WARN=0 · FAIL=0**；`nf conformance` **27/27**。审计片：AUD-0020。
   ⑥ **引擎连带修掉的三处旧实现缺陷**：`market_analyzer.dependencies` 与 `verify.sh` check15 ② 把「同一源包的多条 references」判成「依赖闭包成环」（两处独立实现同根因）→ 均改为**包级依赖去重**并加回归测试；`test_protocol_projection` 硬编码引用条数 `==2` → 改为从声明件推导；references 里裸 `M22`（与官方 `事件:M22` 重号）→ 改类别限定 `情感:M22`。
 
@@ -3176,7 +3176,7 @@ S
   ① **外部全量检索产出类别**（逐条实证，**不引外部作质量背书**）：本机 GET 实测 **116 条**形态（12 类别：结构化数据 / 表格 / 图表 / 图示 / 图结构 / 契约 / 接口 / 时序 / 打包 / 文档 / 金融专业面 / AI 专业面），**可达 110**、不可达 6（ISO 付费墙 403 / 限流 429 / 链接漂移 404，如实记档）；GitHub API 元数据检索 4 组命中（json-schema 4207 / backtesting 4658 / data-validation 1750 / model-card 60 仓），另 2 组撞限流已记。
   ② **从零构建产出形态机制**：`protocol/output_forms.json`（形态清单真源：每条带规范入口 + 可达性实证 sha256 + 档位 + 状态）、`core/output_forms.py`（**自带 JSON Schema 2020-12 子集校验器** + 形态识别/结构校验器 + 双源一致 + **T4 复算** + 机验率计量）、`protocol/output_forms_baseline.json`（机验率基线，**回退即 FAIL**）、`nf output`（list / check / verify / render / meter）、`docs/output-forms.md`；`desktop/tests/test_output_forms.py`（18 例，含「宣称的 engine 必须真实存在」「不支持的官方关键字显式上报」等负例）。**档位 = 本仓判定强度**：T0 散文 → T1 良构 → T2 形状 → T3 语义 → T4 **可复算**。
   ③ **两域包产出从散文升级为机验面（功能性从零到有）**：**量化金融域包**新增 `outputs/`（8 件）——口径注册表（与资产 §2–§4 双源一致，**16 条键双向对齐**；每个 `engine` 必须在 `core/quant_metrics.py` 真实存在）、**绩效报告（T4：由净值数据重算，check32 逐字段比对）**、净值/回撤图（Vega-Lite，由数据生成）、口径声明依赖图（Mermaid）；配套 `core/quant_metrics.py` 按资产口径**逐条实现**简单/对数收益、年化因子、年化波动、夏普、最大回撤、卡尔玛、换手、IC（秩相关含并列平均秩）、IR，输出确定性四舍五入（同输入逐字节一致），披露面显式声明**非 GIPS 合规**。**AI系统域包**新增 `outputs/`（6 件）——系统卡（用途/限制/数据/评测/人审/NIST AI RMF 字段映射/**不宣称**清单）、**闭包产物（T4：由概念图重算 C42 闭包与全图装载序）**、概念图两形态（Mermaid 按层分组 / GraphML，确定性派生）。机验率：AI系统域包 **0.8571**、量化金融域包 **0.6667**（合计 14 机验面 / 2 功能面）。
-  ④ **门禁接入（不新增 check 序号）**：check32 增 `output_forms` 子扫描（形态清单自洽 + 包级产出面逐件校验（形态/档位/schema/双源/T4 复算）+ 机验率基线不回落）；两包 `package.version` additively bump（AI系统 1.1.0→**1.2.0**、量化金融 1.0.0→**1.1.0**）并落 02 §9.5 四步迁移记录（check30）。实测：`bash verify.sh` **PASS=61 · WARN=0 · FAIL=0**；`nf conformance` **27/27**；新增单测 30 例全绿。审计片：AUD-0017。
+  ④ **门禁接入（不新增 check 序号）**：check32 增 `output_forms` 子扫描（形态清单自洽 + 包级产出面逐件校验（形态/档位/schema/双源/T4 复算）+ 机验率基线不回落）；两包 `package.version` additively bump（AI系统 0.35→**1.2.0**、量化金融 0.34→**0.35**）并落 02 §9.5 四步迁移记录（check30）。实测：`bash verify.sh` **PASS=61 · WARN=0 · FAIL=0**；`nf conformance` **27/27**；新增单测 30 例全绿。审计片：AUD-0017。
   ⑤ **推送阶段暴露的两处存量缺口（同波收口）**：`git push` 的 pre-push 体检（`nf release`）先撞 **`_cov_tmp.json`**（覆盖率脚本中断残留 → 编码卫生当仓库件扫，check12/check33 双红）→ 根因修：`text_hygiene.EXCLUDE_FILES` + `.gitignore` 补排除（与 `.mypy_cache` 同类）；再撞 **逐模块覆盖率 `gap_review.py` 0.0%**（AUD-0015 无随行单测）→ 补 `desktop/tests/test_gap_review.py` 6 例（含「无确定性证据不得进 fixable」的双轨纪律断言），实测 `files=109 below=0（min=30）`。修后体检全过，双端推送三处 ref 一致（`7a5637a`）。
 
 - **代码审查工具线 + 双模型热冷审查 + 按类修补**（作者指令）：① **拉取 13 个代码审查类仓库**并提取规则目录（浅克隆，报告 `.rivet/private_archive/cr_scan/2026-09-22_catalog.json`）：**可数规则 3236 条**——ruff 969 / codeql 1076 / sonar-python 444 / pylint 408 / semgrep-rules 112 / flake8+pyflakes 101 / pyright 81 / prospector 29 / vulture 12 / radon 4（另含 bandit、pydocstyle、pyupgrade、Open-Jev）；**可执行分析器实测 408 条发现**（bandit 49 安全 / radon 240 复杂度 / mypy 106 类型 / flake8 12 / vulture 1）。② **双模型热冷两层审查**：**热路径 = Laya**（本地 systemone-http）对按严重度排序的前 **120 条**逐条快判（noul 真伪 + score 优先级，全部 p≥0.5：HIGH 93 / MEDIUM 27）；**冷链 = Jev 契约的三步类型化链**（真伪 → 类别 → 归属，12 条，每步答案进入下一步 state）。**Jev 9B 本机不可跑的边界如实记档**：Jev venv 的 torch 为 CPU 版、物理内存 **15.7GB < 9B fp16 ≈18GB** → 冷链由 Laya 按 Jev 的 `/v1/systemone` + choice/noul/score 契约执行（换 Jev 只需改 endpoint）；Jev 侧已完成克隆 + 独立 venv + 运行时安装 + `jev.server --help` 接口核对，其**可运行前置**（CUDA torch + ≥24GB 内存或支持 4-bit 的 loader）已登记。③ **按类修补（实测归零）**：**bandit 49 → 0**（B310 五处 `urlopen` 加 **scheme ∈ {http,https} 白名单**；B110/B112 三十处补**成文理由**并 `# nosec` 标注；B404/B603/B607 十四处明确 argv 列表/绝对路径理由）、**flake8 12 → 0**（含未用导入/变量、**`_cmd_audit` 重名 F811** 等）、**vulture 1 → 0**（`check_agents_md` 的 `A if False else B` 死条件清理）；ruff/compileall 零违规。**本轮修出一处被遮蔽的真 bug**：`nf design audit` 与 `nf audit` 同名（`_cmd_audit`）→ Python 后定义者覆盖前者，实测 `nf design audit ls` 打出的是 `== nf audit（26 件）==`；暴露出的旧实现又依赖**已退役 API**（`core.audit.init_audit`）→ 该子命令长期不可用。修法两层：重命名 `_cmd_design_audit` + 修正调用点；按**单源委托**补回 M_AUDIT 门面（`init_audit/check_audit/scan_audit` → 委托 `core.steelman`，未实装的 blindspot/full **fail-closed 并给修复指引**，不编造语义）。**缓存面收口**：mypy/pylint/pytest 本地缓存目录入 `.gitignore` 与编码卫生扫描排除表（此前 `.mypy_cache` 的 CRLF 会假红）。④ **双端推送**：GitHub（`github.com:443` 本机不通 → 走 **SSH over 443** 备用通道）+ Gitee，三处 ref 一致。verify 基线不变（`check1-37` · `PASS=61` · `WARN=0`）；`nf conformance` 27/27。审计片：AUD-0016。
@@ -3201,7 +3201,7 @@ S
 
 - 互操作导出面**外部权威校验**（同一波收口；非门禁 · 联网取证，机制="自述合规 ≠ 合规"）：新增 `scripts/check_interop_schemas.py`——`--fetch` 拉各标准**官方 meta-schema** 用 `jsonschema` 逐面校验、`--write` 落 `results/interop-schema-validation.md`，默认只列目标不联网（守住"门禁静态可复现"红线）。实测：**openapi（`spec.openapis.org` 3.1 meta-schema）/ asyncapi（官方 3.0.0 schema，draft-07 方言须按 `$schema` 选 validator）/ sbom（SPDX 2.3 schema）三面通过**；slsa / intoto / a2a **官方无 JSON Schema**（分别以 CUE+Proto、Markdown 规范、.proto 发布）→ 如实记 `no-schema`，不假装校验过；prov（`w3.org/ns/prov.jsonld`）本机 HTTP 300 → 记 `unavailable`，不据此判派生面不合格。**外部校验当场抓出并修掉两处真缺陷**：① SBOM `creationInfo.created` 缺失（SPDX 2.3 必填）→ 取「仓内声明日期最大值」`<date>T00:00:00Z`（**非墙钟**，否则破坏「两次渲染逐字节一致」判据），并在门禁新增 `created` 须为 ISO 8601 UTC 的判据；② 首版写的 `documentComment` 不在 SPDX 词表（根级 `additionalProperties: false` 实测拦下）→ 改根级 `comment`。修复后复验全绿；`nf interop --check` 七面一致（8 端点 / 43 通道 / 48 subject / 4 包 / 48 SLSA subject / 8 skills / 59 PROV 节点）。测试 +7 例（外部校验工具 5 + SBOM `created`/`documentComment` 断言 2）。
 
-- 外部协议清单吸收波·**第四轮**（同一波续做；清单判定定稿为**已具备 74 / 部分覆盖 18 / 净吸收 26（归并 20 项机制）/ 挂账候选 6 / 不适面 38**）：① **SPDX 许可表达式**（D8）：`license_gate.expression_issue` 把入库许可门从「单一词表命中」升级为**词法级表达式判定**（`AND`/`OR`/`WITH`/括号/`+` 后缀/`LicenseRef-<自定义>`，并判运算符首尾与缺操作数）——投稿人写 `MIT OR Apache-2.0` 不再被误判越词表，`Apache 2.0`（少连字符）/`MIT AND`（缺操作数）/括号不配平照旧拦下；NF 专属占位（`专有` / `未声明`）保持原语义。② **SemVer 2.0.0 版本词法**（F12）：`text_hygiene.semver_issue` + 域包 `version` 面扫描（**7 个域包版本位在扫**）——schema 只挡到「三段数字」，挡不住 `01.0.0`（前导零）/`1.0`（缺段）/`1.0.0-`（空预发布段）；**边界写明**：资产槽位 `assets[].version` 是自由槽版本（schema 只约束 minLength，既有值 2 段），不入本判据。③ **标识「值」面词法**（A12）：此前的标识判据只覆盖**键**与事件名——登记册里作为**值**出现的 id/类别/键（`registry.json` 的 `modules[].id`/`modules[].category`、`vocabularies.json` 的 `schemes[].id`/`values[]`、`provenance.json` 的 `assets[].key`/`module`，**95 个值在扫**）同样过 NFC + 字符集判据，堵住「键查值不查」的同形后门（负例：西里尔 `М00` 冒充 `M00`）。④ **PROV-O 溯源图导出**（F4）：`nf interop --kind prov` —— 实体（资产 / 馆藏条目 / 回执绑定文件）/ 活动（入库 / 消化）/ 代理（投稿人 / 门禁本体）三元组，**空面如实为空**（`transform_log` 当前 0 条 → 图里就没有消化活动）；门禁判「节点 id 唯一 + 关系指向在册节点 + 资产台账全覆盖」——初版因同一投稿人重复入图被门禁**当场抓住**并改为去重入图（59 节点：53 实体 / 3 活动 / 3 代理）。同波顺带修掉一个真缺陷：`nf interop --kind` 的 CLI choices 未随第三轮新增的 slsa/a2a 同步（`--kind slsa` 会直接报错）——现为 `openapi|asyncapi|intoto|sbom|slsa|a2a|prov` 七面，并逐面实测可渲染。测试 +6 例（SemVer 2 / 值面 1 / PROV 2 / 种类面更新 1）；verify 基线不变（`check1-37` · `PASS=61` · `WARN=0`）。
+- 外部协议清单吸收波·**第四轮**（同一波续做；清单判定定稿为**已具备 74 / 部分覆盖 18 / 净吸收 26（归并 20 项机制）/ 挂账候选 6 / 不适面 38**）：① **SPDX 许可表达式**（D8）：`license_gate.expression_issue` 把入库许可门从「单一词表命中」升级为**词法级表达式判定**（`AND`/`OR`/`WITH`/括号/`+` 后缀/`LicenseRef-<自定义>`，并判运算符首尾与缺操作数）——投稿人写 `MIT OR Apache-2.0` 不再被误判越词表，`Apache 2.0`（少连字符）/`MIT AND`（缺操作数）/括号不配平照旧拦下；NF 专属占位（`专有` / `未声明`）保持原语义。② **SemVer 0.45 版本词法**（F12）：`text_hygiene.semver_issue` + 域包 `version` 面扫描（**7 个域包版本位在扫**）——schema 只挡到「三段数字」，挡不住 `01.0.0`（前导零）/`1.0`（缺段）/`0.34-`（空预发布段）；**边界写明**：资产槽位 `assets[].version` 是自由槽版本（schema 只约束 minLength，既有值 2 段），不入本判据。③ **标识「值」面词法**（A12）：此前的标识判据只覆盖**键**与事件名——登记册里作为**值**出现的 id/类别/键（`registry.json` 的 `modules[].id`/`modules[].category`、`vocabularies.json` 的 `schemes[].id`/`values[]`、`provenance.json` 的 `assets[].key`/`module`，**95 个值在扫**）同样过 NFC + 字符集判据，堵住「键查值不查」的同形后门（负例：西里尔 `М00` 冒充 `M00`）。④ **PROV-O 溯源图导出**（F4）：`nf interop --kind prov` —— 实体（资产 / 馆藏条目 / 回执绑定文件）/ 活动（入库 / 消化）/ 代理（投稿人 / 门禁本体）三元组，**空面如实为空**（`transform_log` 当前 0 条 → 图里就没有消化活动）；门禁判「节点 id 唯一 + 关系指向在册节点 + 资产台账全覆盖」——初版因同一投稿人重复入图被门禁**当场抓住**并改为去重入图（59 节点：53 实体 / 3 活动 / 3 代理）。同波顺带修掉一个真缺陷：`nf interop --kind` 的 CLI choices 未随第三轮新增的 slsa/a2a 同步（`--kind slsa` 会直接报错）——现为 `openapi|asyncapi|intoto|sbom|slsa|a2a|prov` 七面，并逐面实测可渲染。测试 +6 例（SemVer 2 / 值面 1 / PROV 2 / 种类面更新 1）；verify 基线不变（`check1-37` · `PASS=61` · `WARN=0`）。
 
 - 外部协议清单吸收波（**作者指示；清单 162 条 → 逐条实证 → 判定「已具备 74 / 部分覆盖 26 / 净吸收 15（归并 10 项机制）/ 挂账候选 9 / 不适面剔除 38」→ 净吸收全部落地**；判据均并入 check33 既有通道，**不新增 check 序号、不改 Schema、不动 01/02**）：以「内容契约层」的承载面为靶心，把此前**只判语义、不判承载**的空白补成机检——① **编码卫生**（新增 `desktop/src/core/text_hygiene.py` + 仓库根 `.gitattributes`）：RFC 3629（UTF-8 / 无 BOM）、RFC 8259 §4 与 RFC 7493 I-JSON（**JSON 键唯一**——重复键在多数解析器里后值覆盖前值、静默丢数据）、UAX #15（标识面 NFC）、UTS #39（隐形/同形字符：零宽、NBSP、全角字母数字）四下判据一次落地，扫描面 **580 文本件 / 65 JSON / 6634 键，实测零违规**（零返工）——**行尾问题同波收口**：实测工作区 6 件被 Windows 侧写成 CRLF（`.gitignore` / `05_资产库/provenance.json` / 两件用户自定义资产 / 两件 E1 外部验证样本），而 git 侧 blob 全是 LF（`git hash-object` == `git rev-parse HEAD:` 逐件核验）→ 结论：**仓库内容本就干净，漂移只发生在工作区**；修法取「声明 + 判据」双落地（`.gitattributes` 的 `* text=auto eol=lf` 属性优先于 `core.autocrlf`，任何平台检出即 LF），**不改任何文件内容**（逐件字节核验 blob 一致）。② **互操作导出面**（新增 `desktop/src/core/interop_export.py` + `nf interop`）：把既有声明件**纯派生**为外部标准工具可读的文档——OpenAPI 3.1（8 端点，含 RFC 9457 错误映射）、AsyncAPI 3.0（43 事件通道，含 CloudEvents 1.0 属性派生）、in-toto Statement v1（48 条协议层回执 subject + sha256）、SPDX 2.3 SBOM（依赖登记面 4 包），**不新增真源**、门禁判「覆盖完整 + 形状合法 + 两次渲染逐字节一致 + 真源缺失 fail-closed」。③ **文档命令面一致性**（`prose_lint.command_face`）：README / ROUTES / 导航 / `docs/**` 里**当作命令呈现**的 `nf <子命令>` 与 `（MCP 工具）` 标记须在 CLI 注册表 / `TOOL_DEFS` 内——实测 **62 文档 / 153 处命令提及零漂移**（此前只有 `driver.json` 锚住三个指令档，写错子命令的门禁一条都不会红）。④ **JSON-RPC 2.0 §4/§5 结构约束**（MCP 面硬化）：`params` 若在场 MUST 为结构化（原始类型 → `-32600`；数组 → `-32602`——本运行时无位置参数面）、`id` MUST 为字符串/数字/null（结构体 → `-32600`），且 **id 可判定时 MUST 回显**（§5）——实测原实现三处静默放行（`params="raw"` / `params=[1]` / `id={...}` 全部按成功返回），现全部拦下。清单侧判定逐条留档（内部台账 `57`）：**已具备不重做 74 条**（如 Schematron↔断言表、Diátaxis↔文档四型、SBAR↔交接族、in-toto/Sigstore↔回执单根与内容绑定批准、RFC 8785/RFC 6962↔规范化摘要口径、SKOS↔词表登记册、OpenAPI 弃用+RFC 8594↔端点日落语义）、**部分覆盖 26 条**、**不适面剔除 38 条**（需运行时/网络/模型通道或与「不产没人消费的东西」冲突）、**挂账候选 9 条**（幂等键声明 / 透明日志 / CycloneDX / VC 凭证 / C2PA / CID 寻址 / A2A 卡片 / CWE 编码 / 内容分级——均写明触发条件）。重审同步：AUD-0005/AUD-0008 的 `verify.sh` 摘要重绑、一致性报告重写 AUD-0009 建档后重签（`protocol/RECEIPTS.json` 48 件逐条折叠到根）、`protocol/approvals/protocol__conformance_report.json.json` 重批准（批准人如实记「执行者（作者授权本波裁决）」，非作者自签）。verify 基线不变（`check1-37` · `PASS=61` · `WARN=0`）；unittest **907 例**全绿（本波新增 26 例：编码卫生 10 / 互操作 9 / JSON-RPC 结构 4 / 文档命令面 3）；`nf conformance` 27/27 conformant；`nf interop --check` 绿；ruff / compileall 零违规；`nf doctor` 16/16。审计片：AUD-0009。
 
@@ -3241,7 +3241,7 @@ S
 
 - 正文正规性扫描（**awesome 索引线逐条吸收 · 第 5 条**）：**捞出一条系统性缺陷**——NF 的正文解析（`machine_contract` 围栏提取）与渲染都依赖围栏配平，此前却无判据；实测 206 件自产正文 **3 件围栏未配平**，其中 **2 件正文本身是 mojibake**（各 158 行命中 GBK-mojibake 特征字：`docs/examples/state-front/techdoc_front.md` 与 `library/NF-TECHDOC-Monyeah777-1.md`，同源生成产物；第三件为 `community/西幻生存领域包/assets/11_魔法系统_MAGIC.md` 的孤立收尾围栏）。新增 `doc_hygiene.text_sanity()`（围栏偶校验 + mojibake 特征行判定）+ check33 第 8 面（**WARN 挂账不判死**，计数入 stats 行）+ `test_doc_hygiene` 2 例变异注入。存量 WARN 0→5 **显式可数**；不改正文内容、不影响 `nf score`（`doc_hygiene` 信号只读 `check_markers`）。同批实证判定（T3 线）：**Regex / Design Systems / Terraform-Nix / 图数据库 / CMS 内容建模 / NLG / 游戏生产 / 游戏数据集 / 学习资源 / magictools / 无障碍 / 翻译**落为**已覆盖 / 不适面剔除 / 仅存参考**；**DDD 与 Code Review** 原文已补齐抓取（jsDelivr 镜像），**Public Datasets** 仍未取到原文（记缺口）。verify 基线不变（`check1-37` · `PASS=61`；WARN=5 为存量挂账）。
 
-- 包内容版本语义（**awesome 索引线逐条吸收 · 第 1 条**）：`package.version` 此前只叫「语义化版本」而无判据也无档位语义——02 §8 补 **SemVer 档位映射**（`bump`→MAJOR / `additive`→MINOR / `editorial`→PATCH，档位名对齐 `protocol/EXTENSION.md` 影响度三档）+ check14 ⑦ 补**格式断言**（`MAJOR.MINOR.PATCH`；存量 5 包全 "1.0.0" 零返工）；档位与变更是否匹配明确交评审判（机检只判格式，不假称已机检）。同批实证判定：SPDX 许可标识（library 许可证门已有 SPDX 子集词表 + 双源声明）、Conventional Commits（CONTRIBUTING 已采用）、各家提案流程（`protocol/rfc_index.json` + decisions ADR + 五问自检）三项**已覆盖**，不重复吸收；commit-msg 机检与端点安全清单**挂账**（提交面/端点面尚无消费方）。verify 基线不变（`check1-37` · `PASS=61`）。
+- 包内容版本语义（**awesome 索引线逐条吸收 · 第 1 条**）：`package.version` 此前只叫「语义化版本」而无判据也无档位语义——02 §8 补 **SemVer 档位映射**（`bump`→MAJOR / `additive`→MINOR / `editorial`→PATCH，档位名对齐 `protocol/EXTENSION.md` 影响度三档）+ check14 ⑦ 补**格式断言**（`MAJOR.MINOR.PATCH`；存量 5 包全 "0.34" 零返工）；档位与变更是否匹配明确交评审判（机检只判格式，不假称已机检）。同批实证判定：SPDX 许可标识（library 许可证门已有 SPDX 子集词表 + 双源声明）、Conventional Commits（CONTRIBUTING 已采用）、各家提案流程（`protocol/rfc_index.json` + decisions ADR + 五问自检）三项**已覆盖**，不重复吸收；commit-msg 机检与端点安全清单**挂账**（提交面/端点面尚无消费方）。verify 基线不变（`check1-37` · `PASS=61`）。
 
 - 规范化摘要口径声明（**awesome 索引线逐条吸收 · 第 2 条**）：canonical digest 口径此前**只存在于实现**（`receipts.py` / `attest.py` / `mvu_adapter.py` / `knowledge_sig.py` + 读者侧 `scripts/nf_verify.py`），无成文声明——`protocol/CONFORMANCE.md` 增「规范化摘要口径」段（SHA-256 + `sort_keys` / `ensure_ascii=False` / 紧凑分隔符 + RFC 6962 风格 Merkle 域分隔 `0x00`/`0x01` + **与 RFC 8785 JCS 的三点差异与「不声明兼容」**）+ `protocol/assertions.json` 增 `canonical-digest-declared` 五锚点断言。不改实现、不改既有摘要取值；verify 基线不变（`check1-37` · `PASS=61`；断言 5→6 条）。同批实证判定：severity 分级 + 可抑制规则 + 基线/回归面（static-analysis 线）在 NF 已由 `assertions.json` fail/warn + WARN 挂账 + `quality_baseline`/`score_baseline` 覆盖；**豁免（suppression）机制与 Node 系 Markdown 工具链列入不适面剔除**（前者削弱 fail-closed，后者违背零依赖红线）。
 
@@ -3281,7 +3281,7 @@ S
 
 - 知识层收口（check37）：**双源知识声明**（`protocol/knowledge_sources.json`：权威分层 `contract`/`reference`、查询有序 `query_order`、时效策略、可见性，**reference 级必须标注来源**、`locator` 必须指向真实件防纸面源）· **消化可追溯**（`protocol/transform_log.json`：源 ↔ 产物 `digest` 绑定，产物一改记录即失效；转正须齐三档证据 + 复核双签）· **晋升规则**（缺证据一律 `stay-reference`，不许用推测填）· **认知裁剪**（`cognition.filter_module` 必须指向在册模块）· **知识层巡检**（悬空引用 / 孤儿条目 FAIL，时效缺失 WARN）· 机器面 `nf knowledge [order|lint|transform]`。同波：一致性报告扩到 **17/17 契约**（增 `knowledge-sources`）、协议层回执覆盖面 **28 → 30 件**。基线 verify v2.27，check1-37，PASS=61。
 
-## [2.11.0] - 2026-09-14
+## [0.92] - 2026-09-14
 
 - 治理面收口（check36）：**一致性声明**（`protocol/CONFORMANCE.md`：`## 声明` 版本表逐条与真源比对 + `## 范围` 白名单 + `## 排除` 显式清单，scope∩排除=∅，声明了真源没有的规范项即 FAIL；`nf conformance` 增 `declaration` 契约）· **协议件 RFC 版本史**（01/02/06/07 头部机器可读 RFC 头：编号/Category/Date/Status/Supersedes/Superseded by；`nf rfc` + `protocol/rfc_index.json`，日期须等于「最后更新」、链可解析不成环）· **指令档机器面路由**（`protocol/driver.json` + 组装指令包 / `docs/agent/AI_ROUTING.md` / `docs/ai-menu.md` 头部 `DRIVER OVERRIDE` 块：有 MCP 实现就走 MCP，派发失败即停、**禁止回退成文本步骤**；工具名与 `mcp_runtime.TOOL_DEFS` 逐名一致）· **实践包品类**（`patterns/<id>/PATTERN.md` frontmatter 为真源 + `patterns/INDEX.md` 投影；`applies_to`/`evidence` 须在仓库内可证；`nf patterns ls/show/for/verify/reindex` + MCP `pattern_read` 工具 + `nf://repo/pattern/{id}` 资源）· **执行结果跑分台**（`nf bench run/compare/report`：对任意产物做五维确定性评分，用例下限判级，多跑出逐维均值/极差/相对最佳回落——外部实测的容器）· **服务端点契约**（`protocol/endpoint_contract.json`，`status: proposed`：8 端点映射到现存 CLI 子命令或 MCP 工具，`maps_to` 不许指向空气；`nf endpoint`）。同波：一致性报告扩到 **16/16 契约**、协议层回执覆盖面 24 → **28 件**（治理面机读件入锚）、`check36` 加入 段 C。基线 verify v2.26，check1-36，PASS=59。
 - 新增 `machine_contract.world_model`：JEPA-inspired 确定性抽象状态契约，含 M00 slot 注册表绑定、M00 锚定独立体检、具体状态映射、机器 checks、`WorldModelRuntime` 重放、SHA-256 轨迹指纹与 `nf worldmodel --run [--state STATE.json] [--json]`（M50 首战 + check32 硬门）。
@@ -3293,11 +3293,11 @@ S
 
 - 缺口收口波：**回执单根扩到协议层**（`nf receipts`：01–07/schema/baseline 24 件各带 inclusion proof）· **修掉一个真 bug**（inclusion proof 早期自顶向下、折叠自底向上 → n≥3 全部折叠不到根；馆藏只有 2 件把它掩盖了，现由 1–100 叶规模回归钉住）· **类型面收口**（正文载荷收割 `nf module types --harvest` + 不可推断类型进**积压台账** `--backlog`，104 项显式可数，不许无声增长）· **全仓事件背书门禁**（`nf events`：36 事件零未背书、9 条跨包可见，外部通道须 `protocol/external_events.json` 挂账）· **advisory 分类台账**（82 条分 3 类，可追踪收敛）· **300 件馆藏规模回归**（投影/检索/回执/读者工具/审计路径 <12 步）· **工程面补齐**（9 个新模块 docs 说明档并入 doc_hygiene；覆盖率 79%→85%；ruff 本地安装且 lint 全绿；MCP dual-era 真 stdio 端到端；LSP 编辑器配置样张；`nf approve` 首条记录）。基线 verify v2.25，check1-35，PASS=57。
 
-## [2.10.0] - 2026-09-09
+## [0.82] - 2026-09-09
 
 - 45 质量纵深与基础层 A 组收口；事件载荷注册、回合级执行、AI 通道内容与自组装落地。
 
-## [2.9.0] - 2026-09-08
+## [0.72] - 2026-09-08
 
 - STRATEGY 战略层建立；43 协议层元工具与 44 CLI/动态 drill/AI 通道随波发布。
 
@@ -3305,21 +3305,21 @@ S
 
 | 版本 | 日期 | 结果摘要 |
 |---|---|---|
-| v2.8.0 | 2026-09-08 | 41 质量编译 + 42 质量纵深随波收口 |
-| v2.7.0 | 2026-09-07 | 无壳基础层整合发布 |
-| v2.6.0 | 2026-09-06 | 端壳接线波收口 |
-| v2.5.0 | 2026-09-06 | 协议 V2 与 MCP 运行时 |
-| v2.4.0 | 2026-09-06 | 外部规范体检 |
-| v2.3.0 | 2026-09-05 | 基础层深化首波 |
-| v2.2.0 | 2026-09-05 | 外部吸收首波 |
-| v2.1.0 | 2026-09-05 | 基础层深化 |
+| v0.71 | 2026-09-08 | 41 质量编译 + 42 质量纵深随波收口 |
+| v0.70 | 2026-09-07 | 无壳基础层整合发布 |
+| v0.60 | 2026-09-06 | 端壳接线波收口 |
+| v0.59 | 2026-09-06 | 协议 V2 与 MCP 运行时 |
+| v0.49 | 2026-09-06 | 外部规范体检 |
+| v0.48 | 2026-09-05 | 基础层深化首波 |
+| v0.47 | 2026-09-05 | 外部吸收首波 |
+| v0.46 | 2026-09-05 | 基础层深化 |
 | v1.2.0-v2.0.x | 2026-09-05 | 导出层序列 |
-| v1.1.0 | 2026-09-04 | 通用核心基础包 |
-| v1.0.0 | 2026-09-04 | 全平台正式版 |
-| v0.9.0 | 2026-09-04 | Android 同步门禁修复 |
-| v0.8.0 | 2026-09-04 | 自定义模块组合 |
-| v0.7.0 | 2026-09-04 | 自定义协议 |
+| v0.35 | 2026-09-04 | 通用核心基础包 |
+| v0.34 | 2026-09-04 | 全平台正式版 |
+| v0.24 | 2026-09-04 | Android 同步门禁修复 |
+| v0.23 | 2026-09-04 | 自定义模块组合 |
+| v0.22 | 2026-09-04 | 自定义协议 |
 | v0.6.0 | 2026-09-04 | 协议中转站 |
-| v0.5.0 | 2026-09-04 | 优化版雏形 |
+| v0.11 | 2026-09-04 | 优化版雏形 |
 
 完整版本映射见 `docs/meta/VERSION-MATRIX.md`；过程性计划已内部归档。

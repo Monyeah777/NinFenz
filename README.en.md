@@ -15,7 +15,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 <summary>Demo frame text - byte-for-byte the `--demo` renderer output, kept for search/copy</summary>
 
 ```
-┌ NF TUI v1.0.0 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
+┌ NF TUI v0.34 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
 │仓库 NinFenz · 能力区 9                                           焦点 动作 · 就绪（0 项待办）│
 ├────────────────────────┬─────────────────────────────────────────────────────────────────────┤
 │  能力区 1/9            │▍ 动作 · 环境自检（2）                                               │
@@ -139,7 +139,7 @@ Three independent version lines ship from the same repository:
 
 | Line | Current | What it governs |
 |---|---|---|
-| **Content & protocol** | **v2.12.0** | Templates, domain packs, specs — *what* can be generated |
+| **Content & protocol** | **v0.93** | Templates, domain packs, specs — *what* can be generated |
 | **Command-line tool** | **1.0.4** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
@@ -147,11 +147,11 @@ Last three content releases, described by **what they add**:
 
 | Version | Date | What this release adds |
 |---|---|---|
-| v2.12.0 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
-| v2.11.0 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
-| v2.10.0 | 2026-09-09 | 45-point quality depth plus foundation layer A |
+| v0.93 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
+| v0.92 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
+| v0.82 | 2026-09-09 | 45-point quality depth plus foundation layer A |
 
-Release rules: content line uses `v2.x.y` (minor for new capability, patch for fixes); the CLI line
+Release rules (since 2026-10-20): the content line uses `v0.xx` — small updates fold into the current release, a modest breakthrough adds **0.01**, an innovation adds **0.1**; the CLI line
 is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed
 on the commit that **carries the feature**.
 

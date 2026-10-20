@@ -64,14 +64,18 @@ class GateVersionTest(unittest.TestCase):
 
 
 class ContentVersionTest(unittest.TestCase):
-    """第一套口径：CHANGELOG 最新已发布节 == VERSION-MATRIX 末行。"""
+    """第一套口径：CHANGELOG 最新已发布节 == VERSION-MATRIX 末行。
+
+    版本号格式 2026-10-20 起为内容线 0.x 两位小数（作者裁决：突破 +0.01 / 创新 +0.1），
+    故正则同时接受 `0.93` 与旧 `2.12.0` 两种写法；不变量本身不变。
+    """
 
     def test_changelog_and_matrix_agree(self):
         ch = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        versions = re.findall(r"^## \[(\d+\.\d+\.\d+)\]", ch, re.M)
+        versions = re.findall(r"^## \[(\d+\.\d+(?:\.\d+)?)\]", ch, re.M)
         self.assertTrue(versions, "CHANGELOG 没有已发布版本节")
         matrix = (ROOT / "docs" / "meta" / "VERSION-MATRIX.md").read_text(encoding="utf-8")
-        rows = re.findall(r"^\| v(\d+\.\d+\.\d+)", matrix, re.M)
+        rows = re.findall(r"^\| v(\d+\.\d+(?:\.\d+)?)", matrix, re.M)
         self.assertTrue(rows, "VERSION-MATRIX 没有版本行")
         self.assertEqual(versions[0], rows[-1],
                          "CHANGELOG 最新已发布版本 != VERSION-MATRIX 末行")
