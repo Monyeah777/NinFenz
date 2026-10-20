@@ -17,6 +17,11 @@ jobs:
     name: npm-publish-provenance
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # 作业级再声明一次：workflow 级 permissions 在部分 fork/复用场景会被覆盖，
+    # 而 OIDC（trusted publishing）缺 id-token 时的表现就是「静默回退成 token 认证 → ENEEDAUTH」。
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -60,15 +65,26 @@ jobs:
           # 2026-10-07 首次运行实证：本文件此前多写了反斜杠转义 —— YAML 那一层让密钥表达式不被求值，
           # bash 那一层让变量不被展开，于是 .npmrc 里落的是字面量而不是 token，publish 必然 401/404。
           # 现在改成不转义的写法，并加一步 whoami 自检（token 坏了就当场红，不再拖到最后一步）。
+          # 2026-10-20 实证：secret 为空但 OIDC 未被采用时，publish 会以 ENEEDAUTH 结束；
+          # 故这里先打印 OIDC 环境是否就绪（缺 ACTIONS_ID_TOKEN_REQUEST_URL ⇒ 权限没给到）。
+          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "oidc=ready"
+          else
+            echo "::warning::ACTIONS_ID_TOKEN_REQUEST_URL 缺失：本作业拿不到 OIDC 身份，trusted publishing 不可用"
+          fi
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > .npmrc
             echo "auth=token"
-            npm whoami || { echo "::error::NPM_TOKEN 无效或权限不足（whoami 失败）：建议用 Automation token，或 granular token 选 All packages: read and write"; exit 1; }
+            npm whoami || { echo "::error::NPM_TOKEN 无效或权限不足（whoami 失败）：建议改用 trusted publishing（删掉 secret 即可走 OIDC），或换成 Automation token"; exit 1; }
           else
             echo "auth=oidc(trusted publishing)"
           fi
       - name: 发布（带 provenance；同版本已存在即跳过 = 幂等重跑）
         working-directory: packaging/npm
+        env:
+          # 显式打开 provenance：trusted publishing 的 OIDC 交换与来源证明同源，
+          # package.json 里 publishConfig.provenance 已为 true，这里再加一层防被 --no-provenance 覆盖。
+          NPM_CONFIG_PROVENANCE: "true"
         run: |
           # 幂等：重跑 workflow 时该版本已在 registry 上，再发必 409/403。跳过而不是失败——
           # "这个版本已发布" 正是重跑想要的结果（要真重发请先 bump package.json 版本）。
