@@ -59,13 +59,13 @@ def pins() -> list[tuple[str, str]]:
 
 def pypi(name: str) -> dict:
     """取 PyPI 官方元数据。**只允许 https + pypi.org**（防 URL 注入 / 明文降级）。"""
-    url = "https://pypi.org/pypi/%s/json" % urllib.parse.quote(name, safe="")
+    url = f"https://pypi.org/pypi/{urllib.parse.quote(name, safe='')}/json"
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or parsed.netloc != "pypi.org":
-        raise ValueError("拒绝非 PyPI 官方地址：%s" % url)
+        raise ValueError(f"拒绝非 PyPI 官方地址：{url}")
     # 下方 urlopen 的入参已由上面两道校验钉死为「https + pypi.org」常量前缀，
     # 故 bandit B310 / ruff S310（动态 URL）在此站点是**已消除的**风险面。
-    with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310  # noqa: S310
+    with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310
         return json.load(resp)
 
 
@@ -82,8 +82,8 @@ def main(argv=None) -> int:
                        meta.get("classifiers") or [])
             home = meta.get("home_page") or meta.get("project_url") or ""
             rows.append((name, version, lic, home))
-        except Exception as exc:  # noqa: BLE001 —— 单包查询失败不该让整份声明生成失败
-            rows.append((name, version, "（查询失败：%s）" % type(exc).__name__, ""))
+        except Exception as exc:
+            rows.append((name, version, f"（查询失败：{type(exc).__name__}）", ""))
 
     lines = [
         "# 第三方组件声明（THIRD-PARTY NOTICES）",
@@ -92,10 +92,13 @@ def main(argv=None) -> int:
         "",
         "## 范围说明",
         "",
-        "- **运行时**：NinFenz 核心与 npm 包**不依赖任何第三方运行库**（Python stdlib + Node 标准库）。",
-        "- **本文所列**：仓库**门禁与开发工具链**依赖（用于跑 `verify.sh` 与 CI 检查，不随产品分发）。",
+        "- **运行时**：NinFenz 核心与 npm 包**不依赖任何第三方运行库**"
+        "（Python stdlib + Node 标准库）。",
+        "- **本文所列**：仓库**门禁与开发工具链**依赖（用于跑 `verify.sh` 与 CI 检查，"
+        "不随产品分发）。",
         "- 各组件按其自身许可证分发；本仓代码/文档为 MIT（见 `LICENSE`）。",
-        "- 投稿/社区内容的版权与再分发条款见 `LICENSES/LicenseRef-Community-Submission.txt` 与 `REUSE.toml`。",
+        "- 投稿/社区内容的版权与再分发条款见 "
+        "`LICENSES/LicenseRef-Community-Submission.txt` 与 `REUSE.toml`。",
         "",
         "## 清单",
         "",
@@ -103,8 +106,8 @@ def main(argv=None) -> int:
         "|---|---|---|---|",
     ]
     for name, version, lic, home in rows:
-        home_cell = ("[链接](%s)" % home) if home else "—"
-        lines.append("| `%s` | %s | **%s** | %s |" % (name, version, lic, home_cell))
+        home_cell = f"[链接]({home})" if home else "—"
+        lines.append(f"| `{name}` | {version} | **{lic}** | {home_cell} |")
     lines += [
         "",
         "## 已知注意项",
@@ -122,7 +125,7 @@ def main(argv=None) -> int:
     text = "\n".join(lines) + "\n"
     if args.write:
         OUT.write_text(text, encoding="utf-8", newline="\n")
-        print("✓ 已写入 %s（%d 个组件）" % (OUT.name, len(rows)))
+        print(f"OK 已写入 {OUT.name}（{len(rows)} 个组件）")
     else:
         print(text[:1200])
     return 0

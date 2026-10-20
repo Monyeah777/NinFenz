@@ -1,8 +1,7 @@
 """图书馆入库许可证门单测（登记行合表 + 内联声明双源）。"""
+import os
 import re
 import sys
-import tempfile
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -128,9 +127,10 @@ class CommunityProvenanceTest(unittest.TestCase):
             text = p.read_text(encoding="utf-8", errors="replace")
             if self.THIRD_PARTY.search(text) and not self.DECLARED.search(text):
                 bad.append(str(p.relative_to(ROOT)))
-        self.assertEqual([], bad[:10],
-                         "社区投稿含第三方许可文本但未注明来源/许可（修复指引：在文件头补"
-                         "「> 来源：…」与「> 许可：…」，或移除未授权内容）：%s" % bad[:10])
+        self.assertEqual(
+            [], bad[:10],
+            "社区投稿含第三方许可文本但未注明来源/许可（修复指引：在文件头补"
+            "「> 来源：…」与「> 许可：…」，或移除未授权内容）：" + str(bad[:10]))
 
     def test_predicate_catches_the_mutation(self):
         """变异自证：有版权声明却无来源 ⇒ 必判；自撰内容 ⇒ 不误报。"""
