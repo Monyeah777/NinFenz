@@ -93,11 +93,15 @@ def _version(root: Path) -> Tuple[str, int, int]:
 
 
 def release_line(root: str = ".") -> str:
-    """待发布版本线（CHANGELOG 最新节的 X.Y.Z；无则空串）。"""
+    """待发布版本线（CHANGELOG 最新节的版本号；无则空串）。
+
+    版本号格式 2026-10-20 起内容线用两位小数（`0.93`；作者裁决：突破 +0.01 / 创新 +0.1），
+    旧三段式 `2.12.0` 仍须能读 —— 两式都接受，判据不变量不变。
+    """
     p = Path(root) / "CHANGELOG.md"
     if not p.is_file():
         return ""
-    m = re.search(r"(?m)^## \[([0-9]+\.[0-9]+\.[0-9]+)\]", p.read_text(encoding="utf-8"))
+    m = re.search(r"(?m)^## \[([0-9]+\.[0-9]+(?:\.[0-9]+)?)\]", p.read_text(encoding="utf-8"))
     return m.group(1) if m else ""
 
 
