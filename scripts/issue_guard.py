@@ -21,6 +21,10 @@ import contextlib
 import json
 import re
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # core.json_doc 是结构契约唯一读点
 
 MIN_CHARS = 20
 NO_RESPONSE_RE = re.compile(r"_?No response_?", re.I)
@@ -73,8 +77,7 @@ def main(argv=None):
                     help="把 action/reason 写进该文件（$GITHUB_OUTPUT）")
     args = ap.parse_args(argv)
     try:
-        with open(args.payload, encoding="utf-8") as fh:
-            payload = json.load(fh)
+        payload = json_doc.load(args.payload, dict, what="issues payload")
     except (OSError, ValueError) as exc:
         print(f"[ERROR] payload 读取失败：{exc}")
         return 2

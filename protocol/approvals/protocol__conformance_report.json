@@ -1,7 +1,7 @@
 {
-  "approved_at": "2026-10-20",
+  "approved_at": "2026-10-21",
   "approved_by": "lead",
-  "note": "建设层收口：报告随真源最终态重签",
+  "note": "施工收口：报告重签",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "389b20df1d5d83ce8d0c4a049fb49dd968db9da28dd72aa3963148d216785b44"

@@ -27,6 +27,9 @@ import sys
 import urllib.parse
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # core.json_doc 是结构契约唯一读点
+
 BASELINE_REL = "scripts/internal_link_baseline.json"
 EXTERNAL_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})\s*([^\s]*)\s*$")
@@ -40,7 +43,7 @@ def _utf8_stdout():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
+    except Exception:  # 为何可以吞：只读探测，读不到的件由文档完整性门禁另报
         pass
 
 
@@ -94,7 +97,7 @@ def _exact_exists(root, rel_parts):
             continue
         try:
             entries = os.listdir(cur)
-        except OSError:
+        except OSError:  # 为何可以吞：读不到目录即判「路径不存在」，链接门禁据此报死链
             return False
         if part not in entries:
             return False
@@ -148,7 +151,8 @@ def scan(root=".", include_untracked=True, baseline_path=None):
     bp = Path(baseline_path) if baseline_path else (root / BASELINE_REL)
     if bp.is_file():
         try:
-            data = json.loads(bp.read_text(encoding="utf-8"))
+            data = json_doc.loads(bp.read_text(encoding="utf-8"), dict,
+                                     what="链接白名单")
             baseline = data.get("unresolved") or []
         except (OSError, ValueError) as exc:
             return {"ok": False, "error": f"baseline 解析失败：{exc}", "dead": dead}

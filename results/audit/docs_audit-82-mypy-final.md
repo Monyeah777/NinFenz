@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:295cc494a1d8e661302bc4f474f7afaa6bf4de5a4614dad4df6c0acbebfb148f
 ---
+> 重审（2026-10-21）：建设层施工：脚本/测试/属性件改动后机械重绑 digest（内容改动见同批提交）
+
 > 重审（2026-10-20）：compliance 1
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

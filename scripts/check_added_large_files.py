@@ -30,7 +30,7 @@ def _utf8_stdout():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
+    except Exception:  # 为何可以吞：只读探测，读不到的对象由 large-files 门禁另报
         pass
 
 
@@ -76,7 +76,7 @@ def blob_size(root, rev, path):
         return None
     try:
         return int(p.stdout.strip())
-    except ValueError:
+    except ValueError:  # 为何可以吞：空输出/非整数即视为「无大文件」，粒度由 git 层判据兜底
         return None
 
 

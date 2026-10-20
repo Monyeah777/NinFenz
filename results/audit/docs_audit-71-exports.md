@@ -16,10 +16,12 @@ subjects:
   - protocol/CONFORMANCE.md:255939a9dc7dfac5ce9980bda9ec896b13602e8c9be46ed599466b323dbe76dd
   - docs/fde-stack.md:77358216a818be78cb8bde73605ee866efdbec3665766dd978dfb4f25e478692
   - docs/fde-sample/README.md:e4856ef061de55082ad0613cb977c152f3ced71f4f42dfa6a72184953e7f332f
-  - docs/interop-thirdparty.md:ef25daac24feb9d38fde04b7610a1cfb3095174dfea9c1763300f2663bff06c9
+  - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-10-21）：施工收口：语料/变体/脚本 digest 重绑（内容同步自主线）
+
 > 重审（2026-10-20）：compliance 2
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

@@ -22,7 +22,6 @@ protocol/generated/*.json text eol=lf
 
 # 平台脚本面：保持 CRLF 的仅限显式声明件
 *.bat text eol=crlf
-*.cmd text eol=crlf
 
 # 脚本强制 LF（FX-09）：判据是索引里的实际存储行尾，不是规则文本；
 # gitattributes 的通配对子目录同样生效（实测 scripts/*.sh 与 site/*.sh 均为 i/lf）。

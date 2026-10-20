@@ -27,10 +27,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # core.json_doc 是结构契约唯一读点
+
 TOOL_VERSION = "1.0.0"
 GROUPS = ("Hygiene", "Security", "Basics", "Community", "Build", "Reproducibility")
-PIN_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9._,-]+\])?==[0-9][^#\s]*\s*\\?$")
-USES_RE = re.compile(r"(?m)^\s*-?\s*uses:\s*(\S+)\s*(?:#.*)?$")
+PIN_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9._,-]+\])?==[0-9][^#\s]*\\?$")
+USES_RE = re.compile(r"(?m)^[ \t]*(?:-[ \t]*)?uses:[ \t]*(\S+)[ \t]*(?:#.*)?$")
 PINNED_RE = re.compile(r"^[^@/\s]+/[^@\s]+@[0-9a-f]{40}$")
 SECRET_RE = (r"ghp_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{22,}|gho_[0-9A-Za-z]{36}|"
              r"sk-[0-9A-Za-z]{20,}|AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|"
@@ -54,7 +57,9 @@ def _run_script(root, name, *args):
     p = subprocess.run([sys.executable, str(path), "--repo", str(root), "--json"],
                        capture_output=True)
     try:
-        data = json.loads(p.stdout.decode("utf-8", "replace") or "{}")
+        data = json_doc.loads(
+            p.stdout.decode("utf-8", "replace") or "{}", dict,
+            what="子脚本输出：" + name)
     except ValueError:
         return {"ok": False, "error": f"输出不是 JSON：{name}"}
     return data
@@ -71,7 +76,7 @@ def _tracked_sizes(root):
     for f, s in zip(files, out, strict=False):
         try:
             sizes.append((int(s), f))
-        except ValueError:
+        except ValueError:  # 为何可以吞：规则内子探测失败记 fail 并继续，不吞结论
             continue
     return files, sizes
 
@@ -80,7 +85,7 @@ def _yaml(path):
     import yaml
     try:
         return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    except (OSError, yaml.YAMLError):
+    except (OSError, yaml.YAMLError):  # 为何可以吞：workflow 解析失败由 R2 规则记 fail 并继续
         return {}
 
 

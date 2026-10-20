@@ -23,6 +23,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # core.json_doc 是结构契约唯一读点
+
 DEFAULT_MAX_TRACKED_MB = 64.0
 DEFAULT_MAX_BLOB_MB = 5.0
 DEFAULT_MAX_GIT_MB = 256.0
@@ -49,7 +52,7 @@ def _tracked_sizes(root):
     for f, s in zip(files, out, strict=False):
         try:
             sizes.append((int(s), f))
-        except ValueError:
+        except ValueError:  # 为何可以吞：子脚本输出异常记 fail，不中断其余检查
             continue
     return files, sizes
 
@@ -67,7 +70,9 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
         p = subprocess.run([sys.executable, str(script), "--repo", str(root), "--json"],
                            capture_output=True)
         try:
-            data = json.loads(p.stdout.decode("utf-8", "replace") or "{}")
+            data = json_doc.loads(
+                p.stdout.decode("utf-8", "replace") or "{}", dict,
+                what="覆盖度脚本输出")
         except ValueError:
             data = {"ok": False, "error": "覆盖度脚本输出不可解析"}
         if data.get("ok"):

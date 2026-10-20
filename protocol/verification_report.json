@@ -9,11 +9,9 @@
   "items": [
     {
       "id": "purity",
-      "issues": 1,
+      "issues": 0,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [
-        "L10 docs/layers.md 生成区与实时渲染不一致（修复指引：跑 nf layers --write 刷新）"
-      ],
+      "sample": [],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -22,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 10,
+        "imports": 11,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -34,7 +32,7 @@
         "raises": 63,
         "sinks": 20
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -271,16 +269,12 @@
     },
     {
       "id": "library_projection",
-      "issues": 3,
+      "issues": 0,
       "name": "图书馆 INDEX/ALIAS 实时一致",
-      "sample": [
-        "INDEX 生成区「library-mirror -->」与实时重算不一致（跑 nf library reindex）",
-        "INDEX 生成区「library-index -->」与实时重算不一致（跑 nf library reindex）",
-        "ALIAS 与实时重算不一致（跑 nf library reindex）"
-      ],
+      "sample": [],
       "source": "library.check_projection",
       "stats": {},
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -304,9 +298,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 23,
-        "root": "5374b055eab5b99ee042de48be6042696749f4c42def4c6865d59139df54d1af",
-        "verdict": "non-conformant"
+        "passed": 27,
+        "root": "a3322318df81ae309f80951d16250ae7b2e64cf42e78b692dd344a8efd5076c6",
+        "verdict": "conformant"
       },
       "status": "pass",
       "warns": 0
@@ -375,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 302,
-        "files": 302,
+        "baseline": 311,
+        "files": 311,
         "max_fn_cc": 115,
         "max_fn_lines": 1254,
         "max_lines": 7544
@@ -393,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 214,
-        "probed": 214
+        "patterns": 229,
+        "probed": 229
       },
       "status": "pass",
       "warns": 0
@@ -463,13 +457,9 @@
     },
     {
       "id": "drill_fidelity",
-      "issues": 3,
+      "issues": 0,
       "name": "演练保真度（执行演练 + 回合级回放 = 100%）",
-      "sample": [
-        "真实语料裁定：真实语料已变（sha256 不匹配）——逐条裁定表须重做：docs/完整版样本_西幻生存流P03.md（修复指引：按变更重做 real_corpus.adjudications，不得放宽判据）",
-        "真实语料裁定：真实语料非空行数变了（裁定表记 185，实测 186）——裁定表须重做（修复指引：按变更重做 real_corpus.adjudications，不得放宽判据）",
-        "正例对照失效：正例对照源语料已变（sha256 不匹配）——须重生成变体：docs/完整版样本_西幻生存流P03.md（修复指引：注入必须被捕获——判据不得被改弱到什么都不报）"
-      ],
+      "sample": [],
       "source": "drill_fidelity.scan",
       "stats": {
         "cases": 74,
@@ -478,7 +468,7 @@
         "passed": 74,
         "round_samples": 6
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -503,10 +493,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 63,
+        "pinned_uses": 94,
         "requirements_files": 4,
-        "with_explicit_permissions": 19,
-        "workflows": 19
+        "with_explicit_permissions": 28,
+        "workflows": 28
       },
       "status": "pass",
       "warns": 0
@@ -521,7 +511,7 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1264,
+        "files": 1258,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -531,31 +521,29 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 1,
+      "issues": 0,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [
-        "② protocol/role_coordinates.json 与实时重算不一致（记录 f596feb7e468 / 实测 c1c15d1e2ae5）（修复指引：nf layers --write）"
-      ],
+      "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3821,
-        "kernel": 1987,
+        "files": 3854,
+        "kernel": 1993,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     }
   ],
-  "root_digest": "cc9c8877375cc1da0d6ac8486ff64a3fcd5cc422c35dd2cf15fc21cd2cdff85e",
+  "root_digest": "585f37ada61e6766a8cc7ef77ce8f8b75c41d37657243fe80922875af4408513",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 4,
-    "pass": 25,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:295cc494a1d8e661302bc4f474f7afaa6bf4de5a4614dad4df6c0acbebfb148f
 ---
+> 重审（2026-10-21）：建设层施工：脚本/测试/属性件改动后机械重绑 digest（内容改动见同批提交）
+
 > 重审（2026-10-20）：compliance 1
 
 > 重审（2026-10-20）：version governance + daemon leak fix

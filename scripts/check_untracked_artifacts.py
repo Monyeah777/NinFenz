@@ -40,7 +40,7 @@ def _utf8_stdout():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
+    except Exception:  # 为何可以吞：只读探测，索引读不到由 CI 环境把关
         pass
 
 

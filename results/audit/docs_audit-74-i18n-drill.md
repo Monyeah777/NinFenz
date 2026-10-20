@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:295cc494a1d8e661302bc4f474f7afaa6bf4de5a4614dad4df6c0acbebfb148f
 ---
+> 重审（2026-10-21）：建设层施工：脚本/测试/属性件改动后机械重绑 digest（内容改动见同批提交）
+
 > 重审（2026-10-20）：compliance 2
 
 > 重审（2026-10-20）：compliance 1

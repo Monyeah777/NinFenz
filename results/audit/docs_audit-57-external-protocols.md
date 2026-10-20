@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
-  - .gitattributes:c817d0d92f28264756f1f5392554356bfe5d13b61d49ec1a02d1cc245c2ad449
+  - .gitattributes:90096981075788164fc7b2088b56be4e1df09cd8a756af7c8aaff92cc4732158
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:fe2c79f932923d5f3648ecde31c4a6adb9be16cb7ed6a6bb257c606ea96d66b2
 
 ---
+> 重审（2026-10-21）：建设层施工：脚本/测试/属性件改动后机械重绑 digest（内容改动见同批提交）
+
 > 重审（2026-10-20）：compliance 2
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized

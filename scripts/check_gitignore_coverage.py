@@ -35,7 +35,7 @@ def _utf8_stdout():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
+    except Exception:  # 为何可以吞：只读探测，git 不可用由 CI 落地环境把关
         pass
 
 

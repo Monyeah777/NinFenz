@@ -21,6 +21,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "desktop" / "src"))
+from core import json_doc  # core.json_doc 是结构契约唯一读点
+
 RULES_REL = Path("scripts") / "sensitive_patterns.json"
 
 
@@ -32,7 +35,8 @@ def _utf8_stdout():
 
 def load_rules(root="."):
     path = Path(root) / RULES_REL
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json_doc.loads(path.read_text(encoding="utf-8"), dict,
+                           what="敏感规则表")
     rules = []
     for rule in data.get("rules", []):
         rules.append({
@@ -92,8 +96,8 @@ def main(argv=None):
     ap.add_argument("--github-output", default=None)
     args = ap.parse_args(argv)
     try:
-        with open(args.payload, encoding="utf-8") as fh:
-            payload = json.load(fh)
+        payload = json_doc.load(args.payload, dict,
+                                what="PR/Issue payload")
     except (OSError, ValueError) as exc:
         print(f"[ERROR] payload 读取失败：{exc}")
         return 2

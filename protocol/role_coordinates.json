@@ -4,8 +4,8 @@
     "entry": 26,
     "floor": 5,
     "prod": 1037,
-    "projection": 130,
-    "support": 245,
+    "projection": 133,
+    "support": 247,
     "verify": 951
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -11891,7 +11891,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "根目录白名单/清单门禁（SP-01 的本仓口径）。",
+      "function": "根目录清单门禁（SP-01 的本仓口径）。",
       "path": "scripts/check_root_manifest.py",
       "role": "verify",
       "rule": "R-verify"
@@ -11970,15 +11970,15 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d1b2c697e7125977bbaca83d94418f3aefd61427a746e428d13fff1798663d0d",
+  "root_digest": "cd3642b886f0b336f94af3ff77edfbd788293615dbaee638b47f724c96b1f28b",
   "rule_counts": {
     "R-app": 1454,
     "R-catch": 92,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 115,
-    "R-support": 128,
+    "R-projection": 118,
+    "R-support": 130,
     "R-verify": 835,
     "auto:R-core": 249
   },

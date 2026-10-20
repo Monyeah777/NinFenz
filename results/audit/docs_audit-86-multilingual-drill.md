@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:281b389d65b50de761be4caa598f7922d3b5ef0a946849195e8ede36694e4528
-  - protocol/code_metrics_baseline.json:2e8d3e78d61025c5a12bd813a54fb93d664bfa7410352469bc00653943cc3080
+  - protocol/code_metrics_baseline.json:295cc494a1d8e661302bc4f474f7afaa6bf4de5a4614dad4df6c0acbebfb148f
 ---
+> 重审（2026-10-21）：建设层施工：脚本/测试/属性件改动后机械重绑 digest（内容改动见同批提交）
+
 > 重审（2026-10-20）：compliance 2
 
 > 重审（2026-10-20）：compliance 1
