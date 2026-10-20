@@ -107,8 +107,8 @@
     },
     {
       "id": "npm",
-      "claim_zh": "分发：npm 包 ninfenz v1.0.2（2026-10-08 发布于 npmjs.com，2953 文件 / 解包 20.25 MB，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布，无长期令牌）",
-      "claim_en": "Distribution: npm package ninfenz v1.0.2 (published 2026-10-08 on npmjs.com, 2953 files / 20.25 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
+      "claim_zh": "分发：npm 包 ninfenz v1.0.4（2026-10-08 发布于 npmjs.com，2953 文件 / 解包 20.25 MB，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.0.4 (published 2026-10-08 on npmjs.com, 2953 files / 20.25 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
       "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"
@@ -125,7 +125,7 @@
     "sitemap": "https://ninfenz.dev/sitemap.xml",
     "robots": "https://ninfenz.dev/robots.txt",
     "npm": "https://www.npmjs.com/package/ninfenz",
-    "npm_provenance": "https://registry.npmjs.org/-/npm/v1/attestations/ninfenz@1.0.2",
+    "npm_provenance": "https://registry.npmjs.org/-/npm/v1/attestations/ninfenz@1.0.4",
     "mcp_registry": "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
   },
   "citation": {

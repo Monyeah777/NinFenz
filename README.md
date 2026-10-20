@@ -129,7 +129,7 @@ AI 装配：
 |---|---|---|
 | 内容 / 协议 | **v2.12.0** | `CHANGELOG.md` 最新已发布节 == `docs/meta/VERSION-MATRIX.md` 末行；git tag `vX.Y.Z` 标记发布点 |
 | 门禁 | 见 `nf stats --check` 生成区 | `protocol/repo_stats.json` == `quality_baseline` 期望值 == `llms.txt` 凭证串（**活文档不钉计数**） |
-| CLI / npm / MCP | **1.0.2** | `scripts/nf.py` 的 `NF_CLI_VERSION` == npm `package.json` == MCP `server.json`（两处） |
+| CLI / npm / MCP | **1.0.4** | `scripts/nf.py` 的 `NF_CLI_VERSION` == npm `package.json` == MCP `server.json`（两处） |
 
 内容线最近三版：
 

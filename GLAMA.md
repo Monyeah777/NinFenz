@@ -32,7 +32,7 @@
 1. **Sync Repository**：Admin → Repository 页点 **Sync repository / Refresh**，等 commit 数据出现。
 2. **Dockerfile 页**：选仓库 Dockerfile；Build steps 留空；CMD 填 `["python","scripts/nf.py","serve"]`；
    env schema 填空对象；点 **Deploy**（有的页面叫 **Build**）。
-3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.2`，发布。
+3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.4`，发布。
 4. 打开 Schema / Score 页验收：应有 12 个工具、1 个 prompt；Quality 开始评分。
 
 如果你只想记一条：**先去 Repository 页点 Sync，再去 Dockerfile 页点 Deploy，成功后再点 Make Release。**
@@ -152,7 +152,7 @@
 
 1. 在测试列表里点 **Make Release**；
    如果进了测试详情页，点 **Create Release**。
-2. 版本填 **`1.0.2`**（与 `pyproject.toml` 一致）。
+2. 版本填 **`1.0.4`**（与 `pyproject.toml` 一致）。
 3. Changelog 可填：
 
    ```text
@@ -165,7 +165,7 @@
 如果页面只有 **Build & Release**：
 
 - 点它，Glama 会构建并自动选版本发布；
-- 发布后在 Releases 里确认版本是 `1.0.2`，不是别的版本。
+- 发布后在 Releases 里确认版本是 `1.0.4`，不是别的版本。
 
 发布后：
 
