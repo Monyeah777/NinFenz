@@ -49,7 +49,7 @@ def _git(root, *args):
 def check(root="."):
     root = Path(root)
     if _git(root, "rev-parse", "--git-dir").returncode != 0:
-        return {"ok": False, "error": "不是 git 仓库：%s" % root, "categories": []}
+        return {"ok": False, "error": f"不是 git 仓库：{root}", "categories": []}
     if not (root / ".gitignore").is_file():
         return {"ok": False, "error": "缺 .gitignore：%s" % (root / ".gitignore"), "categories": []}
     rows, missing = [], []
@@ -79,16 +79,16 @@ def main(argv=None):
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     elif res.get("error"):
-        print("[ERROR] %s" % res["error"])
+        print("[ERROR] {}".format(res["error"]))
     else:
         print(".gitignore 覆盖度（按 git check-ignore 判定，非文本匹配）：")
         for row in res["categories"]:
             if row["ok"]:
-                print("  [PASS] %s  样例=%s  规则=%s" % (row["category"], row["sample"], row["rule"]))
+                print("  [PASS] {}  样例={}  规则={}".format(row["category"], row["sample"], row["rule"]))
             else:
-                print("  [FAIL] %s  样例均未被忽略：%s" % (row["category"], ", ".join(row["samples"])))
+                print("  [FAIL] {}  样例均未被忽略：{}".format(row["category"], ", ".join(row["samples"])))
         if res["missing"]:
-            print("修复指引：在 .gitignore 补 %s 类路径规则（注释里写关键词不算覆盖）" % "、".join(res["missing"]))
+            print("修复指引：在 .gitignore 补 {} 类路径规则（注释里写关键词不算覆盖）".format("、".join(res["missing"])))
         else:
             print("通过：五类各至少命中一条路径规则")
     return 0 if res["ok"] else 1

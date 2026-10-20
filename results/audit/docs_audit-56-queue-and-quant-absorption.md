@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
-  - README.en.md:083787d118f037a3af35162411ff3b1c1be30c1165498428ddc0f7fcb91b7250
+  - README.en.md:b612bbc4a3eee84f5386ecc30fb0e86a367575954b5fb5fbe8de8f9c7ead73fd
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -148,3 +148,5 @@ subjects:
 | ③ 英文入口扩到全量 | `README.en.md` 重写为**逐节镜像**（5 个 H2 与 `README.md` 一一对应：AI/Agent 入口 / 快速开始 / 能力与资产 / 协议链导航 / 版本块），并顺带**校正中文 README 的能力块陈旧数字**（44 模块 · 8 管线 · 5 社区包 · 55 档/165 键 · 馆藏 2 件 → 48 模块 · 10 管线 · 7 社区包 · 60 档/326 键 · 概念图 2 · 馆藏 3 件）；check34 增两条断言：**H2 章节数一致** + **中文入口引用的 ASCII 名 .md 件在英文入口同样出现** | 单测同步加 2 例；「双语面腐烂」类事故因此变成门禁可拦 |
 
 **取回失败与修正如实记录**：arXiv API 端点返回 406（改走摘要页）· Merton 1973 的 DOI 失效（1 条未取回）· MIT OCW `/pages/calendar/` 重定向环、`/pages/lecture-notes/` 讲座清单为前端渲染、QuantEcon 站点返回 JS 桩 → **课程体系序未取回**，故量化图仍无 orderings（不造序）· 一次 arXiv ID 猜测取回无关论文（1904.08900 = CornerNet-Lite）**已弃用不入图例**。
+
+> 重审（2026-10-20）：README.en.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

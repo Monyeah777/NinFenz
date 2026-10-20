@@ -17,6 +17,7 @@
 负例自证：空正文 / 短正文 / 占位符 三种模拟 payload 必须 close；完整正文必须 keep。
 """
 import argparse
+import contextlib
 import json
 import re
 import sys
@@ -31,10 +32,8 @@ QUOTE_META_RE = re.compile(r"^\s*>\s.*$", re.M)
 
 def _utf8_stdout():
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(Exception):
             stream.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
 
 
 def meaningful_text(body):
@@ -76,13 +75,13 @@ def main(argv=None):
         with open(args.payload, encoding="utf-8") as fh:
             payload = json.load(fh)
     except (OSError, ValueError) as exc:
-        print("[ERROR] payload 读取失败：%s" % exc)
+        print(f"[ERROR] payload 读取失败：{exc}")
         return 2
     res = decide(payload)
     if args.github_output:
         with open(args.github_output, "a", encoding="utf-8") as fh:
-            fh.write("action=%s\n" % res["action"])
-            fh.write("reason=%s\n" % res["reason"])
+            fh.write("action={}\n".format(res["action"]))
+            fh.write("reason={}\n".format(res["reason"]))
             fh.write("chars=%d\n" % res["chars"])
     if args.json:
         print(json.dumps(res, ensure_ascii=False))

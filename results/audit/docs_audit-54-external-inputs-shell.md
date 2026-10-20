@@ -6,9 +6,9 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:38a328bf2e35d174d92f5a00781b51c6ddfbf05b0e4701a65687f429e3656ab0
+  - .github/CONTRIBUTING.md:38a328bf2e35d174d92f5a00781b51c6ddfbf05b0e4701a65687f429e3656ab0
   - skills/ninfenz/SKILL.md:48992bc157dd3d19091b3ba59c03390b0aaab470615eff87189c68eee81fc5d4
-  - library/INDEX.md:4f391b248ad4fcd71cead1a259469045004a8dbe465f2026f9373f94b8b9fe7a
+  - library/INDEX.md:52f12136b0151d44b180ee355551cf6c7ca0906b8dc2243d98d66cf0c38af8f3
 
 ---
 > 重审（2026-10-20）：compliance 2
@@ -67,3 +67,5 @@ subjects:
 - 本批**未改任何资产 / 模块 / 门禁**（无净吸收项 → 不产无消费者的变更）；仅本记录 + RESULTS 索引 + 内部档案。
 - 门禁：`bash verify.sh` 全绿；`nf conformance` conformant（审计件数变化 → 报告重签）。
 - 作者裁决队列（本批新增一条）：**多语言入口面**是否需要（若需要，须带一致性判据）。
+
+> 重审（2026-10-20）：library/INDEX.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

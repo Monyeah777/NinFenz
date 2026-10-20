@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "L10 docs/layers.md 生成区与实时渲染不一致（修复指引：跑 nf layers --write 刷新）",
-      "digest": "c1f13ba0f29c0bb4f153fc2f56e682a8855ed97d61c2b4472d26bdad7f756168",
+      "detail": "纯度零违规",
+      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
       "id": "purity-clean",
-      "ok": false
+      "ok": true
     },
     {
       "description": "文档四型覆盖",
@@ -37,10 +37,10 @@
     },
     {
       "description": "INDEX/ALIAS 投影一致",
-      "detail": "INDEX 生成区「library-mirror -->」与实时重算不一致（跑 nf library reindex）; INDEX 生成区「library-index -->」与实时重算不一致（跑 nf library reindex）",
-      "digest": "0de95858b7e8bfadc47aff86c84125b1a5f98d844e41308a4a68f8a991cd31bc",
+      "detail": "投影一致",
+      "digest": "5fe250ece716fcdbe260f7a16f0cf305657f20541ab4cd3c0448866b15a02f78",
       "id": "library-projection",
-      "ok": false
+      "ok": true
     },
     {
       "description": "管线抽象执行零 hard 缺陷",
@@ -93,10 +93,10 @@
     },
     {
       "description": "实践包品类",
-      "detail": "patterns 登记表与实时重算不一致（跑 nf patterns reindex）",
-      "digest": "10c1baeed2e59b24360c8282dad835638a0044fba3a12874a0358c2dffe6f656",
+      "detail": "实践包 7 条（格式/可证/投影）",
+      "digest": "088daf2f577b270b03bf696107856a9e7be9f7efc4bcfbd22a14841d65bacde0",
       "id": "patterns",
-      "ok": false
+      "ok": true
     },
     {
       "description": "服务端点契约指向真实性",
@@ -121,17 +121,17 @@
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2394 · 数据契约 54",
-      "digest": "ea71d397a73b3c8b71eb3c69256590e69307c20d870b994990bd3e3de20832b1",
+      "detail": "词表 12 · 规范件 37 / 说明件 2403 · 数据契约 54",
+      "digest": "9a70250fb7c09c29aa1b27db2fcb52e39b38917c3ada831d79597ebfd605920c",
       "id": "modeling",
       "ok": true
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "决策登记表与实时重算不一致（跑 nf decisions reindex）",
-      "digest": "d020d6e2a509805c8587a25cc16bb60f09aaf97f311dfe33257ccd9b619783e2",
+      "detail": "决策 7 条（accepted 6 · 取代链 1）",
+      "digest": "0bceeddd54adb6a000e8cabd1795eab64ec9e127a9f7431532bf6b06a615cdb6",
       "id": "decisions",
-      "ok": false
+      "ok": true
     },
     {
       "description": "接力协议（SBAR 五段 + 未决带判据）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 23,
-  "root": "5374b055eab5b99ee042de48be6042696749f4c42def4c6865d59139df54d1af",
+  "passed": 27,
+  "root": "a3322318df81ae309f80951d16250ae7b2e64cf42e78b692dd344a8efd5076c6",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "non-conformant"
+  "verdict": "conformant"
 }

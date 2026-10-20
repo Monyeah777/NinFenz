@@ -14,7 +14,7 @@ subjects:
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
-  - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
+  - desktop/tests/test_live_doc_counts.py:0e31ebdbfa3d0c23c9d3048a4789f673500204ff0b8ce061ba019ffda390178f
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
   - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
@@ -23,7 +23,7 @@ subjects:
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
-  - desktop/tests/test_doc_reachability.py:069e8f4b5bdab33c733c3f08272f00624b0638c8b61664cbde34f2607b96d9de
+  - desktop/tests/test_doc_reachability.py:76e9ca8b17416b9b5b77366f8b985a854f7b514eb418292b81fee405df3c7f11
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
@@ -114,3 +114,6 @@ subjects:
 | 架构纯度 | → | 只改测试内标注/断言/命名 |
 | 资产密度 | → | 不新增内容资产 |
 | 文档可执行性 | → | 文档未动 |
+
+> 重审（2026-10-20）：desktop/tests/test_live_doc_counts.py 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。
+> 重审（2026-10-20）：desktop/tests/test_doc_reachability.py 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

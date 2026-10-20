@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
-  - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
+  - .gitattributes:c817d0d92f28264756f1f5392554356bfe5d13b61d49ec1a02d1cc245c2ad449
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
   - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
@@ -23,8 +23,8 @@ subjects:
   - docs/interop.md:98811fdc7264a48df5367a561774f6adf6df0e729e26a1d61efdc60442d43ba4
   - docs/text-hygiene.md:3a94c61ad19ad7298157469425af3ef4f1671807d0db3c6ec4a129485ff14076
   - docs/endpoint.md:51bdf9a5740f6fa353480bb7e92627d05c3c7aa0778d5edccf1976a2f369c5ed
-  - docs/mcp.md:9cb8a27b1916eb542f70b38d828ed79f5ec9737446f16a210b759d0dced392dc
-  - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
+  - docs/mcp.md:06c3d51ae07d154bb95d66c0d0cfbcb5969acf1648babd8624231a449dc8c7e6
+  - llms.txt:fe2c79f932923d5f3648ecde31c4a6adb9be16cb7ed6a6bb257c606ea96d66b2
 
 ---
 > 重审（2026-10-20）：compliance 2
@@ -253,3 +253,7 @@ subjects:
 7. **采集面如实记档**：GitHub API 元数据（24 仓）+ RFC Editor 官方索引（8995 条解析，逐编号核对 28 条 RFC 标题）+ 规范原文取样落 `.rivet/private_archive/57_采集回执_GitHub与检索.md`；本轮**检索通道**（DuckDuckGo HTML/Lite、Wikipedia API）在本机网络口径下超时，标准在场性改由 GitHub 元数据与 RFC 原文回执承担——**不把「搜不到」当「不存在」**（见采集回执 §三口径说明）。
 8. **退避重试仍是「非门禁工具面」**：外链巡检不进 verify 基线（STRATEGY 的静态可复现红线），重试只提升巡检的定性准确度，不改变门禁口径。
 9. **本机网络口径实测（如实记）**：外链巡检 `--fetch` 在**本机**探测 20 条取样 → 失败 11 条，失败集中在 `github.com` / `raw.githubusercontent.com`（`URLError` / `TimeoutError`），而 `api.github.com` 与 `spec.openapis.org` / `rfc-editor.org` 可达——即**本机出口对部分 GitHub 域名不通**，不是链接死了（同一批 URL 在 CI 侧由 weekly workflow 复核）。附带一条自曝：**默认重试（2 次）会让不可达域的探测最坏耗时 ≈ 单条 34s**（10s 超时 ×3 + 退避 1.5/3s），30 条取样本机跑了 9 分钟仍未收口——受限网络下建议 `--retries 0 --timeout 4`（已实测 20 条 77s 收口）。这条写在这里而不是写进工具默认值：**重试是给瞬态故障的**，把默认值调小会削弱它对抖动的价值；取舍交给调用方。
+
+> 重审（2026-10-20）：.gitattributes 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。
+> 重审（2026-10-20）：docs/mcp.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。
+> 重审（2026-10-20）：llms.txt 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

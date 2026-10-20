@@ -19,6 +19,7 @@ results/audit/repo_doctor-baseline-<日期>.json，后续改动可拿它当对�
   python scripts/repo_doctor.py --out /tmp/x.json
 """
 import argparse
+import contextlib
 import datetime
 import json
 import re
@@ -38,10 +39,8 @@ SECRET_RE = (r"ghp_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{22,}|gho_[0-9A-Za-z]{
 
 def _utf8_stdout():
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(Exception):
             stream.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
 
 
 def _git(root, *args, **kw):
@@ -51,13 +50,13 @@ def _git(root, *args, **kw):
 def _run_script(root, name, *args):
     path = Path(root) / "scripts" / name
     if not path.is_file():
-        return {"ok": False, "error": "脚本不在场：%s" % path}
+        return {"ok": False, "error": f"脚本不在场：{path}"}
     p = subprocess.run([sys.executable, str(path), "--repo", str(root), "--json"],
                        capture_output=True)
     try:
         data = json.loads(p.stdout.decode("utf-8", "replace") or "{}")
     except ValueError:
-        return {"ok": False, "error": "输出不是 JSON：%s" % name}
+        return {"ok": False, "error": f"输出不是 JSON：{name}"}
     return data
 
 
@@ -66,10 +65,10 @@ def _tracked_sizes(root):
     files = [x.decode("utf-8") for x in raw.split(b"\0") if x]
     if not files:
         return files, []
-    inp = ("\n".join(":%s" % f for f in files) + "\n").encode("utf-8")
+    inp = ("\n".join(f":{f}" for f in files) + "\n").encode("utf-8")
     out = _git(root, "cat-file", "--batch-check=%(objectsize)", input=inp).stdout.decode().split()
     sizes = []
-    for f, s in zip(files, out):
+    for f, s in zip(files, out, strict=False):
         try:
             sizes.append((int(s), f))
         except ValueError:
@@ -86,8 +85,7 @@ def _yaml(path):
 
 
 def _triggers(doc):
-    trig = doc.get(True, doc.get("on"))
-    return trig
+    return doc.get(True, doc.get("on"))
 
 
 def _has_pr_trigger(trig):
@@ -108,16 +106,16 @@ def _find(root, *rels):
 def rule_h1(root, ctx):
     data = _run_script(root, "check_gitignore_coverage.py")
     if data.get("ok"):
-        rules = ["%s -> %s" % (row["category"], row.get("rule", "")) for row in data.get("categories", [])]
+        rules = ["{} -> {}".format(row["category"], row.get("rule", "")) for row in data.get("categories", [])]
         return "pass", "五类各命中一条路径规则", {"rules": rules}
-    return "fail", "缺类别：%s" % ", ".join(data.get("missing") or [data.get("error", "?")]), data
+    return "fail", "缺类别：{}".format(", ".join(data.get("missing") or [data.get("error", "?")])), data
 
 
 def rule_h2(root, ctx):
     data = _run_script(root, "check_untracked_artifacts.py")
     if data.get("ok"):
         return "pass", "索引层无产物路径（检查 %d 件）" % data.get("checked", 0), {}
-    return "fail", "产物进入索引：%s" % ", ".join(data.get("violations", [])[:5]), data
+    return "fail", "产物进入索引：{}".format(", ".join(data.get("violations", [])[:5])), data
 
 
 def rule_h3(root, ctx):
@@ -127,9 +125,9 @@ def rule_h3(root, ctx):
            or f.split("/")[0] in (".venv", "venv", "env")]
     local = [d for d in (".venv", "venv", "env") if (Path(root) / d).is_dir()]
     if bad:
-        return "fail", "虚拟环境文件进入索引：%s" % ", ".join(bad[:5]), {"tracked": bad[:10]}
+        return "fail", "虚拟环境文件进入索引：{}".format(", ".join(bad[:5])), {"tracked": bad[:10]}
     if local:
-        return "warn", "本地虚拟环境在场但未入索引（%s）——属正常开发态" % ", ".join(local), {"local": local}
+        return "warn", "本地虚拟环境在场但未入索引（{}）——属正常开发态".format(", ".join(local)), {"local": local}
     return "pass", "无虚拟环境入库，本地也没有残留环境目录", {}
 
 
@@ -146,14 +144,14 @@ def rule_h4(root, ctx):
               "limits": limits, "tracked_files": len(files)}
     bad = []
     if total > limits["tracked_mb"] * 1048576:
-        bad.append("tracked 体积 %.2f MiB > %.0f" % (detail["tracked_mb"], limits["tracked_mb"]))
+        bad.append("tracked 体积 {:.2f} MiB > {:.0f}".format(detail["tracked_mb"], limits["tracked_mb"]))
     if largest[0] > limits["blob_mb"] * 1048576:
-        bad.append("最大文件 %s %.2f MiB > %.0f" % (largest[1], detail["largest"]["mb"], limits["blob_mb"]))
+        bad.append("最大文件 {} {:.2f} MiB > {:.0f}".format(largest[1], detail["largest"]["mb"], limits["blob_mb"]))
     if git_bytes > limits["git_mb"] * 1048576:
-        bad.append(".git %.2f MiB > %.0f" % (detail["git_mb"], limits["git_mb"]))
+        bad.append(".git {:.2f} MiB > {:.0f}".format(detail["git_mb"], limits["git_mb"]))
     if bad:
         return "fail", "；".join(bad), detail
-    return "pass", "tracked %.2f MiB / 最大 %s %.2f MiB / .git %.2f MiB" % (
+    return "pass", "tracked {:.2f} MiB / 最大 {} {:.2f} MiB / .git {:.2f} MiB".format(
         detail["tracked_mb"], largest[1], detail["largest"]["mb"], detail["git_mb"]), detail
 
 
@@ -165,7 +163,7 @@ def rule_s1(root, ctx):
     has_channel = any(k in text.lower() for k in
                       ("security/advisories", "security policy", "report a vulnerability",
                        "@", "advisory"))
-    return ("pass", "SECURITY.md 在场且有可报告通道（%s）" % p.relative_to(root).as_posix(), {}) \
+    return ("pass", f"SECURITY.md 在场且有可报告通道（{p.relative_to(root).as_posix()}）", {}) \
         if has_channel else ("fail", "SECURITY.md 在场但没有可报告通道", {})
 
 
@@ -191,9 +189,9 @@ def rule_s3(root, ctx):
                 continue
             total += 1
             if not PINNED_RE.match(ref):
-                unpinned.append("%s -> %s" % (f.name, ref))
+                unpinned.append(f"{f.name} -> {ref}")
     if unpinned:
-        return "fail", "未固定到提交 SHA 的 action：%s" % "; ".join(unpinned[:5]), {"unpinned": unpinned}
+        return "fail", "未固定到提交 SHA 的 action：{}".format("; ".join(unpinned[:5])), {"unpinned": unpinned}
     return "pass", "全部 %d 处 action 引用固定到 40 位提交 SHA" % total, {"pinned_refs": total}
 
 
@@ -213,7 +211,7 @@ def rule_b1(root, ctx):
 
 def rule_b2(root, ctx):
     lic = [p for p in Path(root).glob("LICENSE*") if p.is_file()]
-    return ("pass", "LICENSE 在场（%s）" % lic[0].name, {}) if lic else ("fail", "缺 LICENSE", {})
+    return ("pass", f"LICENSE 在场（{lic[0].name}）", {}) if lic else ("fail", "缺 LICENSE", {})
 
 
 def rule_b3(root, ctx):
@@ -228,13 +226,13 @@ def rule_b3(root, ctx):
 
 def rule_c1(root, ctx):
     p = _find(root, ".github/CONTRIBUTING.md", "CONTRIBUTING.md")
-    return ("pass", "CONTRIBUTING 在场（%s）" % p.relative_to(root).as_posix(), {}) \
+    return ("pass", f"CONTRIBUTING 在场（{p.relative_to(root).as_posix()}）", {}) \
         if p else ("fail", "缺 CONTRIBUTING", {})
 
 
 def rule_c2(root, ctx):
     p = _find(root, ".github/CODE_OF_CONDUCT.md", "CODE_OF_CONDUCT.md")
-    return ("pass", "CODE_OF_CONDUCT 在场（%s）" % p.relative_to(root).as_posix(), {}) \
+    return ("pass", f"CODE_OF_CONDUCT 在场（{p.relative_to(root).as_posix()}）", {}) \
         if p else ("fail", "缺 CODE_OF_CONDUCT", {})
 
 
@@ -249,7 +247,7 @@ def rule_c3(root, ctx):
         missing.append("Issue 模板")
     if not pr:
         missing.append("PR 模板")
-    return "fail", "缺 %s" % "、".join(missing), {}
+    return "fail", "缺 {}".format("、".join(missing)), {}
 
 
 def rule_d1(root, ctx):
@@ -264,7 +262,7 @@ def rule_d1(root, ctx):
 def rule_d2(root, ctx):
     for f in sorted((Path(root) / ".github" / "workflows").glob("*.yml")):
         if _has_pr_trigger(_triggers(_yaml(f))):
-            return "pass", "CI 有 pull_request 触发（%s）" % f.name, {}
+            return "pass", f"CI 有 pull_request 触发（{f.name}）", {}
     return "fail", "没有任何 workflow 在 PR 上触发", {}
 
 
@@ -279,11 +277,11 @@ def rule_r1(root, ctx):
             if not line or line.startswith("#") or line.startswith("-"):
                 continue
             if not PIN_RE.match(line):
-                bad.append("%s: %s" % (p.name, line))
+                bad.append(f"{p.name}: {line}")
     ci = Path(root) / ".github" / "requirements-ci.txt"
     hashed = ci.is_file() and "--hash=sha256:" in ci.read_text(encoding="utf-8", errors="replace")
     if bad:
-        return "fail", "未精确钉版：%s" % "; ".join(bad[:5]), {"bad": bad}
+        return "fail", "未精确钉版：{}".format("; ".join(bad[:5])), {"bad": bad}
     if hashed:
         return "pass", "%d 份 requirements 全部精确钉版，主清单含 sha256 哈希" % len(reqs), {}
     return "warn", "requirements 精确钉版，但主清单无 --hash", {"files": [p.name for p in reqs]}
@@ -296,7 +294,7 @@ def rule_r2(root, ctx):
         for jid, job in (doc.get("jobs") or {}).items():
             total += 1
             if not isinstance(job, dict) or job.get("timeout-minutes") in (None, ""):
-                missing.append("%s:%s" % (f.name, jid))
+                missing.append(f"{f.name}:{jid}")
     if missing:
         return "fail", ("%d 个 job 缺 timeout-minutes（共 %d 个 job）：%s"
                         % (len(missing), total, ", ".join(missing[:6]))), {"missing": missing}
@@ -327,14 +325,14 @@ RULES = (
 def run(root="."):
     root = Path(root).resolve()
     if _git(root, "rev-parse", "--git-dir").returncode != 0:
-        raise SystemExit("不是 git 仓库：%s" % root)
+        raise SystemExit(f"不是 git 仓库：{root}（修复指引：在仓库根目录运行，或用 --repo 指向 git 仓库）")
     ctx = {}
     rows, groups = [], {g: {"score": 0.0, "max": 0, "rules": []} for g in GROUPS}
     for rid, group, title, fn in RULES:
         try:
             status, detail, extra = fn(root, ctx)
         except Exception as exc:  # 规则自身异常不应静默变绿
-            status, detail, extra = "fail", "规则执行异常：%s" % exc, {}
+            status, detail, extra = "fail", f"规则执行异常：{exc}", {}
         score = {"pass": 1.0, "warn": 0.5, "fail": 0.0}.get(status, 0.0)
         groups[group]["max"] += 1
         groups[group]["score"] += score
@@ -347,7 +345,7 @@ def run(root="."):
     head = _git(root, "rev-parse", "--short", "HEAD").stdout.decode("utf-8", "replace").strip()
     branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.decode("utf-8", "replace").strip()
     percent = round(100.0 * total / max_score, 1) if max_score else 0.0
-    report = {
+    return {
         "schema": "repo-doctor/1",
         "tool": "scripts/repo_doctor.py",
         "tool_version": TOOL_VERSION,
@@ -360,12 +358,11 @@ def run(root="."):
         "groups": {g: {"score": v["score"], "max": v["max"], "rules": v["rules"]}
                    for g, v in groups.items()},
         "rules": rows,
-        "missing": ["%s %s：%s" % (r["id"], r["title"], r["detail"])
+        "missing": ["{} {}：{}".format(r["id"], r["title"], r["detail"])
                     for r in rows if r["status"] == "fail"],
-        "warnings": ["%s %s：%s" % (r["id"], r["title"], r["detail"])
+        "warnings": ["{} {}：{}".format(r["id"], r["title"], r["detail"])
                      for r in rows if r["status"] == "warn"],
     }
-    return report
 
 
 def main(argv=None):
@@ -381,10 +378,11 @@ def main(argv=None):
     report = run(args.root)
     out = Path(args.out) if args.out else (
         Path(args.root) / "results" / "audit"
-        / ("repo_doctor-baseline-%s.json" % datetime.date.today().isoformat()))
+        / (f"repo_doctor-baseline-{datetime.date.today().isoformat()}.json"))
     if not args.no_write:
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                       encoding="utf-8", newline="\n")
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
@@ -392,16 +390,16 @@ def main(argv=None):
         for group in GROUPS:
             g = report["groups"][group]
             items = [r for r in report["rules"] if r["group"] == group]
-            marks = " ".join("%s:%s" % (r["id"], {"pass": "PASS", "warn": "WARN", "fail": "FAIL"}[r["status"]])
+            marks = " ".join("{}:{}".format(r["id"], {"pass": "PASS", "warn": "WARN", "fail": "FAIL"}[r["status"]])
                              for r in items)
             print("  %-16s %4.1f/%-2d  %s" % (group, g["score"], g["max"], marks))
         print("总分：%.1f/%d（%.1f%%）  git %s@%s"
               % (report["score"], report["max_score"], report["percent"],
                  report["git"]["head"], report["git"]["branch"]))
         for item in report["missing"]:
-            print("  [MISSING] %s" % item)
+            print(f"  [MISSING] {item}")
         for item in report["warnings"]:
-            print("  [WARN] %s" % item)
+            print(f"  [WARN] {item}")
     if args.min_score is not None and report["score"] < args.min_score:
         return 1
     return 0

@@ -15,7 +15,7 @@ subjects:
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
   - docs/lsp.md:47f279f33e62201389a934849dfec17758c549390cfe3207d9c595b932b0a30a
-  - docs/mcp.md:9cb8a27b1916eb542f70b38d828ed79f5ec9737446f16a210b759d0dced392dc
+  - docs/mcp.md:06c3d51ae07d154bb95d66c0d0cfbcb5969acf1648babd8624231a449dc8c7e6
   - docs/decision-layer.md:c8b3513916410b89099efe16b069403af236a6df111e67e9afb66b57a0007e9c
   - protocol/driver.json:d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093
   - integrations/site/integration.json:4a0b13e80d195f74e2c9965b899f87576e38d9c0b42190defb10bb13184e1374
@@ -778,3 +778,5 @@ JSON-RPC 2.0 §4.1：**通知没有应答位，禁止应答**。后果是客户�
 
 - 本件只证**内部链**（verify/单测/真跑工装）；外部装载、联网自检、npm 注册表事实均标为未核。
 - 「生产级适配」按 STRATEGY §二 的五维定义，不引用任何外部项目或外部评价作论据。
+
+> 重审（2026-10-20）：docs/mcp.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

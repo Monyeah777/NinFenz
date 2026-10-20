@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-20",
   "approved_by": "lead",
-  "note": "c2",
+  "note": "建设层收口：报告随真源最终态重签",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "9b658a1534860cca9e4214f9c4bff490fece5204e9e155ebc33e0260e7de8af0"
+  "subject_digest": "389b20df1d5d83ce8d0c4a049fb49dd968db9da28dd72aa3963148d216785b44"
 }

@@ -6,12 +6,12 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:f3c161634feafbeeecc0b3aea8bde8a3733fa45b01bc42bc5713e6206f4afc34
+  - protocol/locales.json:9be41e05ba2bda5bae3044e393a20e959c3f948fed596c45f354f14be6435d31
   - docs/locales.md:3b4605f6c756c2612fe9b4a870bfbfa2945a436211a745a233fcd6346d80f321
   - docs/en/locales.md:5c456d86ba19c499378ee7a548a6641cbf4d44f5345c3fc53ee30440132ec0e0
   - docs/ja/locales.md:0d355a1fe0f093c4502872c5cf937fc51c3caa3ab38a34cee1b3b9e2ea717811
-  - docs/en/mcp.md:6a6a362680072339ecdd7d51a27b51d82a9151d4dbc43f91ffe5b3df3b1751be
-  - docs/ja/mcp.md:c13d42c554ccd1be38ddfb688541215a029fe4edba82fffcd359d460398ae263
+  - docs/en/mcp.md:8ddf2a8d5f188140c48d1d3237fe49ad73abb5a0726d2ab83b5a2f5e9e07ba9f
+  - docs/ja/mcp.md:f5325109d7cb8a39b52f41e3056fe03d92a4b9694e231c6f102d14df1b6d2414
   - docs/en/terminal.md:c4b62dd8f3cef23588dfd0136a7cffbe9202720c3674fe19a7476188986eb78d
   - docs/ja/terminal.md:0f8092e382c65744c4e7ef3b22603bff545022b063458b3802d4aa4152c202e1
   - docs/en/layers.md:617aed0ff1fc6096705fbd3f209475a48193ae98f1cf31f924474a83a34c779d
@@ -234,3 +234,7 @@ subjects:
 | 架构纯度 | → | 新判据落在既有 `execution_drill` 单一实现内，不新增模块/check 序号 |
 | 资产密度 | ↑ | +6 份译件、+4 条演练语料（含一组新对照） |
 | 文档可执行性 | ↑ | 对接方第一跳 mcp / 终端 / 台阶三份指南补齐 en/ja；演练口径随实现同步 |
+
+> 重审（2026-10-20）：protocol/locales.json 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。
+> 重审（2026-10-20）：docs/en/mcp.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。
+> 重审（2026-10-20）：docs/ja/mcp.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

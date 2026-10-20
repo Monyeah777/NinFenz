@@ -76,12 +76,12 @@
 - `council-europe-ai` · AI 框架公约 · HTTP 403 · HTTPError: Forbidden
 - `bwf` · 广播 WAV（BWF） · HTTP 403 · HTTPError: Forbidden
 - `ebucore` · EBUCore 媒体元数据 · HTTP 403 · HTTPError: Forbidden
-- `onix` · ONIX 出版元数据 · HTTP 202 ·
+- `onix` · ONIX 出版元数据 · HTTP 202 · 
 - `eu-accessibility-act` · 欧洲无障碍法案 · HTTP 0 · URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify fai
 - `fatf-recommendations` · FATF 反洗钱建议 · HTTP 403 · HTTPError: Forbidden
 - `hipaa-security` · HIPAA 安全规则 · HTTP 403 · HTTPError: Forbidden
-- `hl7-cda` · HL7 CDA 临床文档 · HTTP 202 ·
-- `hl7-v2` · HL7 v2 消息 · HTTP 202 ·
+- `hl7-cda` · HL7 CDA 临床文档 · HTTP 202 · 
+- `hl7-v2` · HL7 v2 消息 · HTTP 202 · 
 - `adsb` · ADS-B 广播式自动相关监视 · HTTP 404 · HTTPError: Not Found
 - `ipmi` · IPMI 服务器管理 · HTTP 403 · HTTPError: Forbidden
 - `iso-8601` · 日期时间（含 8601-2 扩展） · HTTP 403 · HTTPError: Forbidden

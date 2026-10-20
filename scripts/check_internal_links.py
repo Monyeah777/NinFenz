@@ -80,8 +80,7 @@ def _strip_noise(text):
         out.append("" if in_fence else line)
     body = "\n".join(out)
     body = HTML_COMMENT_RE.sub("", body)
-    body = INLINE_CODE_RE.sub("", body)
-    return body
+    return INLINE_CODE_RE.sub("", body)
 
 
 def _exact_exists(root, rel_parts):
@@ -114,7 +113,7 @@ def scan(root=".", include_untracked=True, baseline_path=None):
     root = Path(root).resolve()
     files = _md_files(root, include_untracked=include_untracked)
     if files is None:
-        return {"ok": False, "error": "不是 git 仓库：%s" % root, "dead": []}
+        return {"ok": False, "error": f"不是 git 仓库：{root}", "dead": []}
     dead, skipped_bare, total = [], [], 0
     for rel in files:
         path = root / rel
@@ -152,7 +151,7 @@ def scan(root=".", include_untracked=True, baseline_path=None):
             data = json.loads(bp.read_text(encoding="utf-8"))
             baseline = data.get("unresolved") or []
         except (OSError, ValueError) as exc:
-            return {"ok": False, "error": "baseline 解析失败：%s" % exc, "dead": dead}
+            return {"ok": False, "error": f"baseline 解析失败：{exc}", "dead": dead}
     known = {(e.get("file"), e.get("target")) for e in baseline}
     suppressed, unexpected = [], []
     for d in dead:
@@ -182,20 +181,19 @@ def main(argv=None):
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     elif res.get("error"):
-        print("[ERROR] %s" % res["error"])
+        print("[ERROR] {}".format(res["error"]))
     else:
         print("内链检查：md %d 件 / 相对链接 %d 条 / 死链 %d 条（白名单抑制 %d，裸标识符忽略 %d）"
               % (res["scanned_files"], res["relative_links"], len(res["dead"]),
                  len(res["suppressed"]), len(res["ignored_bare_identifiers"])))
         for d in res["unexpected"]:
-            print("[FAIL] %s:%s -> %s" % (d["file"], d.get("line", "?"), d["target"]))
+            print("[FAIL] {}:{} -> {}".format(d["file"], d.get("line", "?"), d["target"]))
         for d in res["suppressed"]:
-            print("  [baseline] %s:%s -> %s" % (d["file"], d.get("line", "?"), d["target"]))
+            print("  [baseline] {}:{} -> {}".format(d["file"], d.get("line", "?"), d["target"]))
         for s in res["stale_baseline"]:
-            print("  [baseline-stale] %s -> %s（已不再死链，可删除该条）"
-                  % (s.get("file"), s.get("target")))
+            print("  [baseline-stale] {} -> {}（已不再死链，可删除该条）".format(s.get("file"), s.get("target")))
         if res["unexpected"]:
-            print("修复指引：改正相对路径或补文件；若确属存量欠账，登记到 %s" % BASELINE_REL)
+            print(f"修复指引：改正相对路径或补文件；若确属存量欠账，登记到 {BASELINE_REL}")
         else:
             print("通过：无新增内链 404")
     return 0 if res["ok"] else 1

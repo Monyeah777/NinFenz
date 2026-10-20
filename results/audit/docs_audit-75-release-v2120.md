@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:df207a40e8daf312c16ca633e08fad7cbe4d2f6289e895e0570be353e883d5c5
   - docs/meta/VERSION-MATRIX.md:1c25a7b2273f8e7a38ab9d81fe84868f56cdde203672dfeb7b8d5eb1f5a6d5f8
-  - README.md:486c4b8f93b63ec2375afe9693f8e231f89c38bb24aac941b97c579995a4916d
+  - README.md:1d0daec6eb239f527999c91fb12c7c2d6e20381b70f82b7fdfc64ea98c63d4f4
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -126,3 +126,5 @@ subjects:
 | 架构纯度 | → | 修复落在既有 `changelog_gen` 单点，不新增模块/check 序号 |
 | 资产密度 | → | 发布收口为主，不新增内容资产 |
 | 文档可执行性 | ↑ | `docs/release.md` 口径与实测一致；首例记录可复现（内部档 + 本件） |
+
+> 重审（2026-10-20）：README.md 随建设层施工（SP-03 归位 / FX 文件卫生 / 文档结构 / ruff 收敛）变更，digest 重算；审计结论不变。

@@ -5,7 +5,7 @@
 
 <!-- nf:integrations:begin -->
 | id | 面 | 类型 | 状态 | 版本 | 责任方 | 入口 | 文档 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|---|---|
 | a2a-card | A2A Agent Card 出口 | export | proposed | 0.1.0 | @Monyeah777 | results/interop/a2a.json | docs/interop-thirdparty.md |
 | agent-skill | Agent Skill 出口 | package | active | 1.0.0 | @Monyeah777 | skills/ninfenz/SKILL.md | skills/ninfenz/SKILL.md |
 | agents-rules | 项目规则出口（AGENTS / CLAUDE） | export | active | 1.0.0 | @Monyeah777 | python scripts/nf.py run --fmt agents | docs/agent/agent_组装指令包_v0.2.md |

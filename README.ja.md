@@ -76,6 +76,7 @@ AI による組立：
 | 層 | 入口 |
 | --- | --- |
 | 方向 | `STRATEGY.md` |
+| ロードマップ | [docs/meta/ROADMAP.md](docs/meta/ROADMAP.md) |
 | プロトコル | `01_核心协议.md` · `02_联动注册表.md` · `06_Agent执行协议.md` · `07_官方核心出厂与社区预设导航.md` · `protocol/WORLD_MODEL.md` |
 | ライブラリ | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | コミュニティ | `community/README.md` · `community/模板制作指令包.md` |

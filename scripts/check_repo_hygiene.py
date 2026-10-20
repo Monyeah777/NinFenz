@@ -17,6 +17,7 @@
   python scripts/check_repo_hygiene.py --repo DIR --json
 """
 import argparse
+import contextlib
 import json
 import subprocess
 import sys
@@ -29,10 +30,8 @@ DEFAULT_MAX_GIT_MB = 256.0
 
 def _utf8_stdout():
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(Exception):
             stream.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
 
 
 def _git(root, *args, **kw):
@@ -44,10 +43,10 @@ def _tracked_sizes(root):
     files = [x.decode("utf-8") for x in raw.split(b"\0") if x]
     if not files:
         return [], []
-    inp = ("\n".join(":%s" % f for f in files) + "\n").encode("utf-8")
+    inp = ("\n".join(f":{f}" for f in files) + "\n").encode("utf-8")
     out = _git(root, "cat-file", "--batch-check=%(objectsize)", input=inp).stdout.decode().split()
     sizes = []
-    for f, s in zip(files, out):
+    for f, s in zip(files, out, strict=False):
         try:
             sizes.append((int(s), f))
         except ValueError:
@@ -59,7 +58,7 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
           max_blob_mb=DEFAULT_MAX_BLOB_MB, max_git_mb=DEFAULT_MAX_GIT_MB):
     root = Path(root).resolve()
     if _git(root, "rev-parse", "--git-dir").returncode != 0:
-        return {"ok": False, "error": "不是 git 仓库：%s" % root, "checks": []}
+        return {"ok": False, "error": f"不是 git 仓库：{root}", "checks": []}
     checks = []
 
     # ① gitignore 覆盖度
@@ -75,7 +74,7 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
             "id": "gitignore-coverage",
             "ok": bool(data.get("ok")),
             "detail": ("五类各命中一条路径规则" if data.get("ok")
-                       else "缺类别：%s" % ", ".join(data.get("missing") or [data.get("error", "?")])),
+                       else "缺类别：{}".format(", ".join(data.get("missing") or [data.get("error", "?")]))),
             "extra": {"missing": data.get("missing") or []},
         })
     else:
@@ -89,12 +88,11 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
     local_venv = [d for d in (".venv", "venv", "env") if (root / d).is_dir()]
     if tracked_venv:
         checks.append({"id": "untracked-venv", "ok": False,
-                       "detail": "虚拟环境文件进入索引：%s" % ", ".join(tracked_venv[:5]),
+                       "detail": "虚拟环境文件进入索引：{}".format(", ".join(tracked_venv[:5])),
                        "extra": {"tracked": tracked_venv[:10]}})
     else:
         checks.append({"id": "untracked-venv", "ok": True,
-                       "detail": ("索引无虚拟环境文件；本地环境目录 %s（已忽略，未入索引）"
-                                  % ", ".join(local_venv) if local_venv
+                       "detail": ("索引无虚拟环境文件；本地环境目录 {}（已忽略，未入索引）".format(", ".join(local_venv)) if local_venv
                                   else "索引无虚拟环境文件"),
                        "extra": {"local": local_venv}})
 
@@ -105,12 +103,11 @@ def check(root=".", max_tracked_mb=DEFAULT_MAX_TRACKED_MB,
     git_bytes = sum(p.stat().st_size for p in gitdir.rglob("*") if p.is_file()) if gitdir.is_dir() else 0
     problems = []
     if total > max_tracked_mb * 1048576:
-        problems.append("tracked %.2f MiB > %.0f MiB" % (total / 1048576.0, max_tracked_mb))
+        problems.append(f"tracked {total / 1048576.0:.2f} MiB > {max_tracked_mb:.0f} MiB")
     if largest[0] > max_blob_mb * 1048576:
-        problems.append("单文件 %s %.2f MiB > %.0f MiB"
-                        % (largest[1], largest[0] / 1048576.0, max_blob_mb))
+        problems.append(f"单文件 {largest[1]} {largest[0] / 1048576.0:.2f} MiB > {max_blob_mb:.0f} MiB")
     if git_bytes > max_git_mb * 1048576:
-        problems.append(".git %.2f MiB > %.0f MiB" % (git_bytes / 1048576.0, max_git_mb))
+        problems.append(f".git {git_bytes / 1048576.0:.2f} MiB > {max_git_mb:.0f} MiB")
     checks.append({
         "id": "repo-volume",
         "ok": not problems,
@@ -141,7 +138,7 @@ def main(argv=None):
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     elif res.get("error"):
-        print("[ERROR] %s" % res["error"])
+        print("[ERROR] {}".format(res["error"]))
     else:
         print("卫生项专项（MT-02）：")
         for c in res["checks"]:

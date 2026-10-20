@@ -6,25 +6,25 @@
       "id": "secret-github-token",
       "category": "secret",
       "regex": "gh[pousr]_[0-9A-Za-z]{20,}",
-      "why": "GitHub token 片段（假值样例：ghp_FAKE000000000000000000000000000000）"
+      "why": "GitHub token 前缀（规则文件不存任何形似真值的字面样例；构造样例只在 evidence 的临时 payload 里）"
     },
     {
       "id": "secret-openai-key",
       "category": "secret",
       "regex": "sk-[0-9A-Za-z]{20,}",
-      "why": "OpenAI 风格密钥片段（假值样例：sk-FAKE000000000000000000000000）"
+      "why": "OpenAI 风格密钥前缀（字面样例不入库，避免仓库自身被密钥扫描误报）"
     },
     {
       "id": "secret-aws-key",
       "category": "secret",
       "regex": "AKIA[0-9A-Z]{16}",
-      "why": "AWS access key 片段（假值样例：AKIAFAKEFAKEFAKEFAKE）"
+      "why": "AWS access key 前缀（字面样例不入库）"
     },
     {
       "id": "secret-private-key-block",
       "category": "secret",
       "regex": "BEGIN (RSA |EC |OPENSSH |PGP )?PRIVATE KEY",
-      "why": "私钥块头（假值样例只写块头，不贴正文）"
+      "why": "私钥块头（只匹配块头标记，不匹配正文）"
     },
     {
       "id": "secret-assignment",

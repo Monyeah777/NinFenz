@@ -117,6 +117,7 @@ AI assembly:
 | Layer | Entry |
 | --- | --- |
 | Direction | `STRATEGY.md` |
+| Roadmap | [docs/meta/ROADMAP.md](docs/meta/ROADMAP.md) |
 | Protocol | `01_核心协议.md` · `02_联动注册表.md` · `06_Agent执行协议.md` · `07_官方核心出厂与社区预设导航.md` · `protocol/WORLD_MODEL.md` |
 | Library | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | Community | `community/README.md` · `community/模板制作指令包.md` |

@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 70,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "3afcf7aca668ca1a42e0e968ee9c52ac0cdde4b333114e369de7792ebcd6177f",
+    "root": "fee519fb36e3e647326fefdef33455626f2ed304cb1d9332ec0814380c7d08d0",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -41,19 +41,19 @@
     },
     {
       "digest": {
-        "sha256": "ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350"
+        "sha256": "fe2c79f932923d5f3648ecde31c4a6adb9be16cb7ed6a6bb257c606ea96d66b2"
       },
       "name": "llms.txt"
     },
     {
       "digest": {
-        "sha256": "4f391b248ad4fcd71cead1a259469045004a8dbe465f2026f9373f94b8b9fe7a"
+        "sha256": "52f12136b0151d44b180ee355551cf6c7ca0906b8dc2243d98d66cf0c38af8f3"
       },
       "name": "library/INDEX.md"
     },
     {
       "digest": {
-        "sha256": "b638c9423b9c18f0ec79b5410e252738c949c029330b7e7962687256222c08ec"
+        "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
       },
       "name": "library/ALIAS.md"
     },
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "9b658a1534860cca9e4214f9c4bff490fece5204e9e155ebc33e0260e7de8af0"
+        "sha256": "389b20df1d5d83ce8d0c4a049fb49dd968db9da28dd72aa3963148d216785b44"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -125,7 +125,7 @@
     },
     {
       "digest": {
-        "sha256": "777bdadb96267742fb3dabe085a7caedbc3e1ef3fd73bd0cb117c869340a1a75"
+        "sha256": "6ad37ee72cc05809e7cf93846ff30656af22b348c3c4de1c4704c414ace5eb0b"
       },
       "name": "protocol/asset_contracts.json"
     },
@@ -137,7 +137,7 @@
     },
     {
       "digest": {
-        "sha256": "9b9103ca367fd18e7cfdbd46569b8ca057a47e0df145e9481d3208b09a80fec0"
+        "sha256": "a96a78648c698f2201af2ff0d42bd7a0ca272afece311654988cc2b5469b9ec4"
       },
       "name": "protocol/role_coordinates.json"
     },
@@ -233,13 +233,13 @@
     },
     {
       "digest": {
-        "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"
+        "sha256": "e43d86232dbd83aa136b25918987c27df3196f24f1f21a0f117d41e118681f07"
       },
       "name": "protocol/LAYERS.json"
     },
     {
       "digest": {
-        "sha256": "f3c161634feafbeeecc0b3aea8bde8a3733fa45b01bc42bc5713e6206f4afc34"
+        "sha256": "9be41e05ba2bda5bae3044e393a20e959c3f948fed596c45f354f14be6435d31"
       },
       "name": "protocol/locales.json"
     },
@@ -257,7 +257,7 @@
     },
     {
       "digest": {
-        "sha256": "c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825"
+        "sha256": "659b7f93a1241dd3619c4d4551e0fd168e8d23c22bf06ab38cdd361e9fc49e07"
       },
       "name": "protocol/normative.json"
     },
@@ -269,7 +269,7 @@
     },
     {
       "digest": {
-        "sha256": "882c59337256c2704b6cc54adb9b18ffd9319ce71adeeb386716ae48f3e97b05"
+        "sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
       },
       "name": "decisions/INDEX.md"
     },

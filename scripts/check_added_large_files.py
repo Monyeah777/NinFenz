@@ -56,7 +56,7 @@ def range_files(root, rev_range):
     if not _:
         start, _, end = rev_range.partition("..")
     if not end:
-        raise SystemExit("--range 需要 A..B 或 A...B 形式：%s" % rev_range)
+        raise SystemExit(f"--range 需要 A..B 或 A...B 形式：{rev_range}")
     if set(start) == {"0"}:  # 首次推送：before 为全零
         start = EMPTY_TREE
     raw = git(root, "diff", "--name-only", "--diff-filter=ACMR", "-z", start, end).stdout
@@ -70,7 +70,7 @@ def head_commit_files(root):
 
 
 def blob_size(root, rev, path):
-    spec = ("%s:%s" % (rev, path)) if rev else (":%s" % path)
+    spec = (f"{rev}:{path}") if rev else (f":{path}")
     p = git(root, "cat-file", "-s", spec, check=False)
     if p.returncode != 0:
         return None
@@ -89,13 +89,13 @@ def scan(root, max_bytes, staged=False, rev_range=None, allow=()):
     root = Path(root)
     if not (root / ".git").exists() and git(root, "rev-parse", "--git-dir", check=False).returncode != 0:
         return {"ok": False, "mode": "none", "checked": 0, "violations": [],
-                "error": "不是 git 仓库：%s" % root}
+                "error": f"不是 git 仓库：{root}"}
     if staged:
         paths, rev = staged_files(root)
         mode = "staged"
     elif rev_range:
         paths, rev = range_files(root, rev_range)
-        mode = "range:%s" % rev_range
+        mode = f"range:{rev_range}"
     else:
         paths, rev = head_commit_files(root)
         mode = "head-commit"
@@ -130,15 +130,15 @@ def main(argv=None):
     max_bytes = int(args.max_mb * 1048576) if args.max_mb is not None else args.max_bytes
     res = scan(args.repo, max_bytes, staged=args.staged, rev_range=args.rev_range, allow=args.allow)
     if res["error"]:
-        print("[ERROR] %s" % res["error"])
+        print("[ERROR] {}".format(res["error"]))
         return 2
     print("大文件拦截：模式=%s 阈值=%s 检查件数=%d" % (res["mode"], _fmt(max_bytes), res["checked"]))
     if res["violations"]:
         for v in res["violations"]:
-            print("[FAIL] %s 超过阈值：%s" % (v["path"], _fmt(v["bytes"])))
+            print("[FAIL] {} 超过阈值：{}".format(v["path"], _fmt(v["bytes"])))
         print("修复指引：删除该文件或改用外部存储/发布制品；确属必要须在 evidence 登记并调整 --allow")
         return 1
-    print("通过：本次新增/变更内容均未超过 %s" % _fmt(max_bytes))
+    print(f"通过：本次新增/变更内容均未超过 {_fmt(max_bytes)}")
     return 0
 
 

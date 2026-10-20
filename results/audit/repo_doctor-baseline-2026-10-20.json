@@ -2,15 +2,15 @@
   "schema": "repo-doctor/1",
   "tool": "scripts/repo_doctor.py",
   "tool_version": "1.0.0",
-  "generated_at": "2026-10-20T20:21:03+08:00",
+  "generated_at": "2026-10-20T20:27:13+08:00",
   "root": ".",
   "git": {
-    "head": "746e7097",
+    "head": "e964b6a6",
     "branch": "main"
   },
-  "score": 16.0,
+  "score": 17.0,
   "max_score": 17,
-  "percent": 94.1,
+  "percent": 100.0,
   "groups": {
     "Hygiene": {
       "score": 4.0,
@@ -23,7 +23,7 @@
       ]
     },
     "Security": {
-      "score": 2.0,
+      "score": 3.0,
       "max": 3,
       "rules": [
         "S1",
@@ -88,7 +88,7 @@
       "group": "Hygiene",
       "title": "索引层零产物",
       "status": "pass",
-      "detail": "索引层无产物路径（检查 3843 件）",
+      "detail": "索引层无产物路径（检查 3849 件）",
       "extra": {}
     },
     {
@@ -104,20 +104,20 @@
       "group": "Hygiene",
       "title": "仓库体积红线",
       "status": "pass",
-      "detail": "tracked 33.02 MiB / 最大 protocol/generated/asset_contract.frictionless.json 2.87 MiB / .git 32.31 MiB",
+      "detail": "tracked 33.05 MiB / 最大 protocol/generated/asset_contract.frictionless.json 2.87 MiB / .git 32.46 MiB",
       "extra": {
-        "tracked_mb": 33.02,
+        "tracked_mb": 33.05,
         "largest": {
           "path": "protocol/generated/asset_contract.frictionless.json",
           "mb": 2.87
         },
-        "git_mb": 32.31,
+        "git_mb": 32.46,
         "limits": {
           "tracked_mb": 64.0,
           "blob_mb": 5.0,
           "git_mb": 256.0
         },
-        "tracked_files": 3843
+        "tracked_files": 3849
       }
     },
     {
@@ -132,14 +132,9 @@
       "id": "S2",
       "group": "Security",
       "title": "明文密钥零命中",
-      "status": "fail",
-      "detail": "疑似明文密钥命中 2 行",
-      "extra": {
-        "hits": [
-          "scripts/sensitive_patterns.json:15:      \"why\": \"OpenAI 风格密钥片段（假值样例：<masked>）\"",
-          "scripts/sensitive_patterns.json:21:      \"why\": \"AWS access key 片段（假值样例：<masked>）\""
-        ]
-      }
+      "status": "pass",
+      "detail": "明文密钥扫描零命中",
+      "extra": {}
     },
     {
       "id": "S3",
@@ -234,8 +229,6 @@
       }
     }
   ],
-  "missing": [
-    "S2 明文密钥零命中：疑似明文密钥命中 2 行"
-  ],
+  "missing": [],
   "warnings": []
 }

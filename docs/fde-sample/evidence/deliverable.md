@@ -19,7 +19,7 @@
 ## 3. 交付面清单（包自持声明）
 
 | 面 | 形态 | 档位 | 角色 |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `outputs/schemas/SYSTEM_CARD.schema.json` | json-schema | T2 | schema |
 | `outputs/SYSTEM_CARD.json` | system-card | T3 | data |
 | `outputs/schemas/CONCEPT_CLOSURE.schema.json` | json-schema | T2 | schema |
@@ -38,7 +38,7 @@
 ## 5. 验收判据（本样例实跑的四道门 + 中游层核验）
 
 | 门 | 判据 | 证据 |
-| --- | --- | --- |
+|---|---|---|
 | G1 | 声明产出面全部在场且可解析 | `evidence/gates.txt` |
 | G2 | T2 schema ↔ T3 data 逐对合规 | `evidence/gates.txt` |
 | G3 | 概念图健康（无环/无悬空/别名唯一/分支完备） | `evidence/gates.txt` |

@@ -15,6 +15,7 @@ scripts/sensitive_patterns.json（样例必须是明显假值），命中后由 
 负例自证：假密钥/假内网路径/假 CVE 的模拟 payload 必须命中；普通正文必须零命中。
 """
 import argparse
+import contextlib
 import json
 import re
 import sys
@@ -25,10 +26,8 @@ RULES_REL = Path("scripts") / "sensitive_patterns.json"
 
 def _utf8_stdout():
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(Exception):
             stream.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
 
 
 def load_rules(root="."):
@@ -96,19 +95,19 @@ def main(argv=None):
         with open(args.payload, encoding="utf-8") as fh:
             payload = json.load(fh)
     except (OSError, ValueError) as exc:
-        print("[ERROR] payload 读取失败：%s" % exc)
+        print(f"[ERROR] payload 读取失败：{exc}")
         return 2
     res = scan(payload, args.root)
     if args.github_output:
         with open(args.github_output, "a", encoding="utf-8") as fh:
             fh.write("matched=%s\n" % ("true" if res["matched"] else "false"))
-            fh.write("categories=%s\n" % ",".join(res["categories"]))
+            fh.write("categories={}\n".format(",".join(res["categories"])))
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     else:
         print("敏感扫描：%d 处命中" % len(res["hits"]))
         for h in res["hits"]:
-            print("  [%s] %s -> %s" % (h["category"], h["field"], h["match"]))
+            print("  [{}] {} -> {}".format(h["category"], h["field"], h["match"]))
     return 0
 
 

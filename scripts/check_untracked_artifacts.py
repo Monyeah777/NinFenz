@@ -72,7 +72,7 @@ def _match(path, patterns):
 def check(root="."):
     root = Path(root)
     if _git(root, "rev-parse", "--git-dir").returncode != 0:
-        return {"ok": False, "error": "不是 git 仓库：%s" % root, "violations": [], "checked": 0}
+        return {"ok": False, "error": f"不是 git 仓库：{root}", "violations": [], "checked": 0}
     raw = _git(root, "ls-files", "-z").stdout
     tracked = [x.decode("utf-8") for x in raw.split(b"\0") if x]
     allow = _load_allowlist(root)
@@ -96,12 +96,12 @@ def main(argv=None):
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     elif res["error"]:
-        print("[ERROR] %s" % res["error"])
+        print("[ERROR] {}".format(res["error"]))
     else:
         print("索引层产物检查：已检查 tracked 文件 %d 件" % res["checked"])
         if res["violations"]:
             for v in res["violations"]:
-                print("[FAIL] 产物路径进入索引：%s" % v)
+                print(f"[FAIL] 产物路径进入索引：{v}")
             print("修复指引：git rm --cached <路径> 并在 .gitignore 覆盖该形态（FX-01..FX-05）")
         else:
             print("通过：索引层无产物路径")
