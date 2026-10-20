@@ -1,9 +1,20 @@
 # Changelog
 
-## [未发布] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
+## [Unreleased] - 2026-10-14 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+
+### Added
 - **门禁矩阵化（2026-10-18）**：CI 全量门禁拆成「静态 1 台 + 测试 **32 台并行**」——`verify.sh` 新增 `--checks-only` / `--tests-only --shard i/n`，`ci-verify.yml` 改为 `static-checks` + `unit-tests`（matrix 32 片）+ `gate`（needs 两者，任一片红即整条红）三个作业；32 片的分配与本地分片用**同一套权重/LPT**，`--plan 32` 可在本地校验「并集 == discover 全集」。动机：实测同机并行收益在 16 片后饱和（8 片 502 s / 16 片 396 s），跨机器没有争用才是"全量 1 分钟"的唯一实现路径。契约测试 `test_ci_visibility` 同步改为：CI 必须恰好一次 `--checks-only` + 一次 `--tests-only --shard ${{ matrix.shard }}/N`，且 N ≥ 16 且矩阵真的声明到 N-1。
+- **门禁扩到 check1-42：新增构建隔离（check41）与不可伪造 provenance（check42）**（门禁能力化重构 · 步骤4）：
+  ① **check41 构建隔离**（SLSA L3 Build isolation）：构建入口不得出现取网/取包命令、容器基座按 `@sha256` 钉、工具链定版（node `engines` / `Cargo.lock` / CI 版本号）；
+  ② **check42 不可伪造 provenance**（SLSA L3 Non-falsifiable）：**独立子进程**验 hmac 级 attestation，且把主体摘要改一位后必须判否——证明「验签方 ≠ 签名方」；本仓外锚（cosign）缺位时如实 WARN，不假装已不可伪造；
+  ③ **基线联动**：`quality_baseline.EXPECTED_*` 40/72 → 42/76；README / protocol/CONFORMANCE / VERSION-MATRIX 基线句同步；`nf explain 41/42` 补齐修复指引；`capability_index` 补 41/42（能力覆盖仍 42/42）；
+  ④ **验收**：verify v2.30 **check1-42 · PASS=76**；新增 11 条变异夹具（两条新判据都能被置红）。
+- **待作者侧动作**：GitHub 仓库改名 → Gitee 镜像改名 → npm 以 `ninfenz` 发布首版 → 站点上线（`site/` 已按新名生成）。
+- **NFA-L 落地（声明式 + 命令式混合语言，不新增 check）**：新增 core/nf_expr.py（词法/语法）、core/nfal.py（符号面/类型检查/三值求值/NF-IR）、core/nfal_cli.py 与 nf nfal 入口（parse / check / build / eval / schema-check）；Pipeline 的 condition 现可用以 = 开头的封闭 guard 表达式记写，既静态可查又执行可判，散文 condition 仍只记 advisory A0201；pipeline.schema.json 的 condition 仅补描述（additive）；新增 docs/nfal.md 与 packaging/nfal/Dockerfile（零第三方依赖，镜像即分发单元）；测试 desktop/tests/test_nfal.py（26 例：词法/优先级/类型/三值/NF-IR 确定性/真仓散文回归）；code_metrics 棘轮按工具指引评审后重冻（scripts/nf.py +17 行）。
+
+### Changed
 - **check12 门禁提速（P0–P3，2026-10-18）**：把 check12（3131 条测试、串行 ~1080 s）从"单进程全量"改成"分层 + 分片 + 内容寻址缓存"：
   ① **分层**：`bash verify.sh` 默认 **quick**（42 条静态 check + 受影响测试），`--full` 才跑全量；`nf release` 与 CI 固定 `--full --no-cache`，`test_ci_visibility` 的契约同步改为"CI 必须 full 档"（原"必须裸跑"在分层后反而是子集）；
   ② **分片**：`scripts/verify_tests.py` 一次 discover 产出测试 id → 逐测试权重（`protocol/check12_weights.json`，311 模块 / 3141 条实测）→ LPT 分配到 N 个进程（分片数按核数自适应）；分片并集必须逐项等于 discover 全集，不等即 exit 1；
@@ -12,11 +23,6 @@
   ⑤ **实测**：quick 冷跑 **148 s**、full 冷跑 **587 s**（原 1158 s）、两档命中缓存 **1.6 s**；均为 `PASS=76 WARN=1 FAIL=0`；
   ⑥ **等价性取证**：两条全命令面普查切片化后做**逐面差分**（旧实现扫全量 vs 新实现 4 片并集，同输入同树）：156 张无参面、105 张 `--json` 面，**逐面 verdict 0 差异**；分片化本身以"并集 == discover 全集"断言兜底；重测试切片（机器面 8 片、CLI 普查 4 片）每片都断言"切片非空 + 片内逐条比完"；
   ⑦ **两处根因被本波抓到并修掉**：Rust 快线二进制落后于源码会让 parity 假红（`cargo build --release` 重编即恢复，target/ 不入库）；判定缓存脚本若含删除面，会与 Rust 侧 purity 允许表口径分叉（已改为不含删除面）。
-- **门禁扩到 check1-42：新增构建隔离（check41）与不可伪造 provenance（check42）**（门禁能力化重构 · 步骤4）：
-  ① **check41 构建隔离**（SLSA L3 Build isolation）：构建入口不得出现取网/取包命令、容器基座按 `@sha256` 钉、工具链定版（node `engines` / `Cargo.lock` / CI 版本号）；
-  ② **check42 不可伪造 provenance**（SLSA L3 Non-falsifiable）：**独立子进程**验 hmac 级 attestation，且把主体摘要改一位后必须判否——证明「验签方 ≠ 签名方」；本仓外锚（cosign）缺位时如实 WARN，不假装已不可伪造；
-  ③ **基线联动**：`quality_baseline.EXPECTED_*` 40/72 → 42/76；README / protocol/CONFORMANCE / VERSION-MATRIX 基线句同步；`nf explain 41/42` 补齐修复指引；`capability_index` 补 41/42（能力覆盖仍 42/42）；
-  ④ **验收**：verify v2.30 **check1-42 · PASS=76**；新增 11 条变异夹具（两条新判据都能被置红）。
 - **门禁能力化 · 步骤5：合并同类项（只合并可无损等价的一组）**：
   ① **实测结论**：五组「同类」里只有 check1/3/4/5/6 的判定形状真正同构（在场 / 关键词在场），已收敛到 `verify.sh` 的
   `_decl_check` 引擎（声明清单 × 文件系统 → 逐条 verdict，**文案仍由各 check 给**，逐字不变）；
@@ -1422,23 +1428,6 @@ S
   ④ **取代链「互指」判据补齐**：此前只在模块自述里、代码不判（变异实证：单向 `supersedes` 通过、`chains: 0`）——判据落测层（同 ERRATA 先例），core 自述与判据对齐（同行替换，不涨行）。
   ⑤ **验收**：`nf decisions verify` 6 条 · accepted 5 全一致；`nf conformance` **27/27 conformant**；`nf receipts --scope protocol` 58 件单根一致；`verify_report` 31 条 PASS 29 / FAIL 0；`code_metrics` 0；测试切片 65 OK（含 `test_role_model` 13 例，三条判据各有变异自证）。**审计机械重绑 17 条记录**——一次改 `LAYERS.json`/基线扇出 17 份审计，是本波测得的**扇出成本**。
 
-- **全仓审计 V3 修复波（2026-10-10，结果形态）**：按审计 §15 执行计划落地 P0/P1 与 P1 候选、部分 P2/P3——
-  ① 守护单条坏输入零隔离修复（CLI 与守护共用 guarded_main 错误面 + 请求/连接级隔离 + 结构化错误帧）；
-  ② npm payload 排除 desktop/tests 并换自写夹具，发布边界补「清单外文件」判据与点段判据；
-  ③ LSP 读取加 realpath 包含性、initialize.rootUri 钳制到启动根；
-  ④ 性能预算增 P95/标准差/真中位/预热，判据改 P95 ≤ 预算并重录证据；
-  ⑤ Rust 自证 233/233（receipts 常量 44、两个用例生成器幂等化后重跑夹具）；
-  ⑥ 投稿 frontmatter 结构注入闸门（两个前端共用压平与形状判据）；
-  ⑦ 7 处二次回溯正则收口 + core/redos_scan 独立判据（接进 verify_report）；
-  ⑧ schema_lint / json_schema 枚举严格相等（叶子件 json_equal，Rust 端口同步）；
-  ⑨ assemble 走 lazy_yaml、doctor 缺 PyYAML 判 FAIL 且 --json 带 degraded；
-  ⑩ N1–N10 运行时形状契约（原子写/退出码/顶层类型/BOM/监听件唯一写入口/启动器带外回退）；
-  ⑪ 发布 provenance A1/A2/A6（脏树 fail-closed、source_commit 对 HEAD、README 不再静默改写）；
-  ⑫ 治理与依赖入口：pyproject.toml、SBOM 版本与 purl、REUSE/CoC/MAINTAINERS/SUPPORT/DCO/出口声明；
-  ⑬ P3 卫生：冗余 coding 声明清 250 件、SPDX 大小写、行尾/末尾换行、风格棘轮（E,W,F,B,UP,I,C4,SIM,RET）独立成门。
-  口径：不追 verify.sh 全绿（作者裁决，审计 §14）；code_metrics 评审后重冻、receipts/interop/verification_report 重签刷新；
-  audit 摘要与 NF-1 attestation 留待作者重审/重签。
-
 - **三轴接入生产级适配第一波：编辑器面从布尔到协议行为 · 站点面进常驻判据 · 对外文档对账门**（2026-10-07 内部差距实证，三轴只读审计逐条带 file:line 证据面；AUD-0045）：
   ① **IDE**：新增叶子模块 `core/nf_language.py`（模块 id 取模块文件自身 `machine_contract.id/name`——域包 `大语言模型:M01` 落在 `A01a_*.md`，按文件名反解必漏；层位/订阅/事件/资产/管线全部单源派生；**歧义不猜**，`M10`/`P00` 同名候选列全、跳定义失败关闭）；`nf lsp` 由「full-sync 诊断 + quickfix」升级为完整编辑器面（utf-16 位码口径、didClose、rootUri 采纳、真实诊断定位、最小行级编辑且回放自校验、补全/悬停/跳定义/大纲/工作区符号、未 shutdown 的 exit 退出码 1），并新增 `nf lsp --print-config {neovim,emacs,helix}` 生成现成配置；check33 第 5 面由「codeActionProvider 为真」改为 `lsp.check` 真跑协议行为。
   ② **文档平台**：`integrations/site/` 登记文档门户为接入面（status=proposed——件与本地判据在场，线上部署与联网自检待作者侧发布后回填）；新增 `desktop/tests/test_site_face.py` 把 `sync-numbers.mjs` 与 `site-check.mjs --offline` 纳入常驻套件（此前只在 CI 跑，同 test_npm_package 先例），并把 `site/facts.json` 的 quality/core/mcp/terminal 四类事实绑定到机读真源。
@@ -1479,16 +1468,35 @@ S
 - **按冻结链重生成**：`nf stats --write` → `nf locales --write`（10 条文档译件 `source_sha256` 重签）→ `nf library receipts --write`（根 `11d183057abb90e5`）→ `nf conformance --write`（**27/27 conformant**，root `7be9711887ef905d`）→ `nf approve` → `nf receipts --scope protocol --write`（根 `f46d0711d622b414` · 57 件，联动刷新 `protocol/generated/receipt_chain.json` 与 `results/interop/*.json` 12 面）→ `scripts/verify_report.py --write`（判据 28 条：PASS 26 · FAIL 0 · WARN 2）。**顺序即判据**：任一写回落后于内容变更，conformance 的 `schema-clean` / `audit` 契约立即转红（本波实测复现）。
 - **审计摘要重冻 31 件**：`results/audit/*.md` 的 `subjects: 路径:sha256` 按改名后内容重算（机械改名不改语义，故重签而非重审）。
 - **README 演示帧重生成**：`README.md` / `README.en.md` 顶部演示帧改为 `TUI.demo_frame(96, 26)` 的逐字输出（渲染器标题含规范名，改名后必然漂移）。
+- **本地闸门过程记录（含一处自纠）**：`engine/rust/target/release/nf-rs.exe` 初判为「陈旧预构建」；实测本机 Rust 工具链**已安装但不在 PATH**（`~/.cargo/bin/cargo.exe` 1.99.0，已配 rsproxy 镜像），故可重建。真正的差异源是 `WASM`…（见上条：`engine/` 里的硬编码基底字面量）。
+
+### Removed
 - **engine/ 一并入面（11 文件）**：首轮曾把 `engine/` 当作「退役冻结线」排除在外，并据 `git grep narrativeforge -- engine` 只命中 dotnet
   判定「Rust 源码不含旧名」——**该结论是错的**：`git grep` 是大小写与连字符敏感的，漏掉了 `engine/rust/src/library.rs` 里
   `https://raw.githubusercontent.com/Monyeah777/NarrativeForge/main/` 这类**硬编码镜像基底字面量**（Python 真源 `core/library.py` 有同一份）。
   两侧渲染基底不同 → `library-projection` 与 `verify-report` 两条 fastlane 平价判据转红（已用「改名前的提交 + 同一二进制」交叉验证过：那两测在改名前是 PASS）。
   修法：把 `engine/` 纳入改名（同 6 条规则，逐文件备份）+ `cargo build --release` 重编（1m53s）→ **两条平价判据 PASS**。
-- **本地闸门过程记录（含一处自纠）**：`engine/rust/target/release/nf-rs.exe` 初判为「陈旧预构建」；实测本机 Rust 工具链**已安装但不在 PATH**（`~/.cargo/bin/cargo.exe` 1.99.0，已配 rsproxy 镜像），故可重建。真正的差异源是 `WASM`…（见上条：`engine/` 里的硬编码基底字面量）。
-- **由此暴露的一处仓库脆弱点（值得另立一项收口）**：受跟踪的 `handovers/HO-0002-顶尖化两线与收口.md` 引用了**被忽略的构建产物** `engine/rust/target/release/nf-rs.exe`，而 `test_doc_reachability` 要求在场文档引用的相对路径必须存在——于是本机出现「有二进制则平价测红、无二进制则路径可达红」的两难，两种状态各留 1 项 FAIL。**该耦合与本次改名无关**，但会让「本机 verify 全绿」依赖一次本地 Rust 构建。
 - **处置**：保留二进制（不删不改路径，避免用移出判定面的方式把红项变成跳过），如实记录残留；**待补**：装 Rust 工具链 → `engine/rust/check_parity.ps1`（含 `cargo build --release`）→ 两条平价判据纳入验收。不得以「已跳过」当作已通过。
-- **待作者侧动作**：GitHub 仓库改名 → Gitee 镜像改名 → npm 以 `ninfenz` 发布首版 → 站点上线（`site/` 已按新名生成）。
-- **NFA-L 落地（声明式 + 命令式混合语言，不新增 check）**：新增 core/nf_expr.py（词法/语法）、core/nfal.py（符号面/类型检查/三值求值/NF-IR）、core/nfal_cli.py 与 nf nfal 入口（parse / check / build / eval / schema-check）；Pipeline 的 condition 现可用以 = 开头的封闭 guard 表达式记写，既静态可查又执行可判，散文 condition 仍只记 advisory A0201；pipeline.schema.json 的 condition 仅补描述（additive）；新增 docs/nfal.md 与 packaging/nfal/Dockerfile（零第三方依赖，镜像即分发单元）；测试 desktop/tests/test_nfal.py（26 例：词法/优先级/类型/三值/NF-IR 确定性/真仓散文回归）；code_metrics 棘轮按工具指引评审后重冻（scripts/nf.py +17 行）。
+
+### Fixed
+- **全仓审计 V3 修复波（2026-10-10，结果形态）**：按审计 §15 执行计划落地 P0/P1 与 P1 候选、部分 P2/P3——
+  ① 守护单条坏输入零隔离修复（CLI 与守护共用 guarded_main 错误面 + 请求/连接级隔离 + 结构化错误帧）；
+  ② npm payload 排除 desktop/tests 并换自写夹具，发布边界补「清单外文件」判据与点段判据；
+  ③ LSP 读取加 realpath 包含性、initialize.rootUri 钳制到启动根；
+  ④ 性能预算增 P95/标准差/真中位/预热，判据改 P95 ≤ 预算并重录证据；
+  ⑤ Rust 自证 233/233（receipts 常量 44、两个用例生成器幂等化后重跑夹具）；
+  ⑥ 投稿 frontmatter 结构注入闸门（两个前端共用压平与形状判据）；
+  ⑦ 7 处二次回溯正则收口 + core/redos_scan 独立判据（接进 verify_report）；
+  ⑧ schema_lint / json_schema 枚举严格相等（叶子件 json_equal，Rust 端口同步）；
+  ⑨ assemble 走 lazy_yaml、doctor 缺 PyYAML 判 FAIL 且 --json 带 degraded；
+  ⑩ N1–N10 运行时形状契约（原子写/退出码/顶层类型/BOM/监听件唯一写入口/启动器带外回退）；
+  ⑪ 发布 provenance A1/A2/A6（脏树 fail-closed、source_commit 对 HEAD、README 不再静默改写）；
+  ⑫ 治理与依赖入口：pyproject.toml、SBOM 版本与 purl、REUSE/CoC/MAINTAINERS/SUPPORT/DCO/出口声明；
+  ⑬ P3 卫生：冗余 coding 声明清 250 件、SPDX 大小写、行尾/末尾换行、风格棘轮（E,W,F,B,UP,I,C4,SIM,RET）独立成门。
+  口径：不追 verify.sh 全绿（作者裁决，审计 §14）；code_metrics 评审后重冻、receipts/interop/verification_report 重签刷新；
+  audit 摘要与 NF-1 attestation 留待作者重审/重签。
+
+- **由此暴露的一处仓库脆弱点（值得另立一项收口）**：受跟踪的 `handovers/HO-0002-顶尖化两线与收口.md` 引用了**被忽略的构建产物** `engine/rust/target/release/nf-rs.exe`，而 `test_doc_reachability` 要求在场文档引用的相对路径必须存在——于是本机出现「有二进制则平价测红、无二进制则路径可达红」的两难，两种状态各留 1 项 FAIL。**该耦合与本次改名无关**，但会让「本机 verify 全绿」依赖一次本地 Rust 构建。
 - **NFA-L 收口续波（不新增 check）**：110 条管线 condition 由散文迁移为 nf-expr（统一取 M50 已声明相位 roll：`=data_bus.round.phase == "roll"`；M10 同拍者叠加 `&& event.tick_day`）；`nf lsp` 新增 nfal-guard 诊断（源/码/UTF-16 定位，见 docs/nfal.md）；终端能力族登记 `nfal` 并重生成 `tui/_surface.py`；修复 check12 的 12 项（命令面策展 / 投影同步 / 静默返回）与 check35/check39；`code_metrics` 棘轮按工具指引重冻 lsp_doc.py / terminal.py。
 ## [0.93] - 2026-10-05
 

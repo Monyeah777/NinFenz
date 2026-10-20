@@ -1,0 +1,42 @@
+# 本地提交前钩子（CI-03）
+# 自动修复类钩子在 commit 时由 pre-commit 自动把修复重新加回暂存区（pre-commit >= 2.18 内置行为），
+# 因此修复真正进入提交。逃逸口：git commit --no-verify（须在提交说明里写明原因）。
+default_install_hook_types: [pre-commit, commit-msg]
+fail_fast: false
+
+exclude: |
+  (?x)^(
+    community/.*|
+    packaging/npm/payload/.*|
+    .*\.gif|
+    .*\.png
+  )$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        # markdown 用两个空格做硬换行；行尾空白由 text_hygiene 的语义判据独立把关。
+        exclude: ^(.*\.md|community/.*)$
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.8
+    hooks:
+      - id: ruff
+        args: [--config, ruff.toml]
+
+  - repo: local
+    hooks:
+      - id: commit-msg-conventional
+        name: conventional commit 类型前缀（scripts/commit_msg_check.py）
+        entry: python scripts/commit_msg_check.py
+        language: system
+        stages: [commit-msg]
+        pass_filenames: false

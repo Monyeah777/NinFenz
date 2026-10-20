@@ -1,0 +1,25 @@
+# NF 统一编辑器基线（FX-12 / FX-13）
+# 真源唯一：本文件是空白与行尾的基线，按语言覆写在下方分段；仓储层面的强制面在
+# .gitattributes（eol）与 verify check33（text_hygiene）。覆写请加新段，不要改基线 [*]。
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.{py,cs,rs,toml}]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+# markdown 中文排版用两个空格的硬换行；本扩展不清理，pre-commit 的 trailing-whitespace 也排除 *.md。
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml,json,jsonc}]
+indent_size = 2

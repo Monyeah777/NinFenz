@@ -20,5 +20,19 @@
 protocol/asset_line_baseline.json text eol=lf
 protocol/generated/*.json text eol=lf
 
-# 平台脚本面（若将来引入）：保持 CRLF 的仅限显式声明件
+# 平台脚本面：保持 CRLF 的仅限显式声明件
 *.bat text eol=crlf
+
+# 脚本强制 LF（FX-09）：判据是索引里的实际存储行尾，不是规则文本；
+# gitattributes 通配对子目录同样生效（实测 scripts/*.sh、site/*.sh 均 i/lf）。
+*.sh text eol=lf
+*.bash text eol=lf
+
+# 导出去噪（FX-11）：git archive 产物只留交付物，开发侧文件不进 tarball。
+# 边界：GitHub 自动源码包不遵守 .gitattributes，本规则只对 git archive 生效。
+.editorconfig export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
+.pre-commit-config.yaml export-ignore
+.env.example export-ignore
