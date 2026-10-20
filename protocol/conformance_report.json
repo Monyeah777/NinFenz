@@ -149,10 +149,10 @@
     },
     {
       "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
-      "detail": "AUD-0008：被审对象已变，旧审计失效：README.en.md（修复指引：重审并更新 digest）; AUD-0027：被审对象已变，旧审计失效：README.md（修复指引：重审并更新 digest）",
-      "digest": "7ec5f52173184be0fc2531e61daba26a8659ce518ea2382e44f2cdbc231b9b87",
+      "detail": "审计 57 件（带审计头 46 · legacy 11）· 绑定对象 389",
+      "digest": "44ad0acb0e46ed2772b109a8cb8d7272aa140ff4b4ce0bc9e66dd76451ca8161",
       "id": "audit",
-      "ok": false
+      "ok": true
     },
     {
       "description": "认知族（术语表 + 执行分档）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 26,
-  "root": "ccc4f8feaff0b92018b2bb0827348f61833a90873c505238abba8db0c9754134",
+  "passed": 27,
+  "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "non-conformant"
+  "verdict": "conformant"
 }
