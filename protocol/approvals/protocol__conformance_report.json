@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-20",
   "approved_by": "lead",
-  "note": "converge-3",
+  "note": "final",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "8a945e56bba283eb35349b222fa96fd44bf3cd4cb184c86a5707112266045638"
