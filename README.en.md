@@ -18,7 +18,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 <summary>Demo frame text - byte-for-byte the `--demo` renderer output, kept for search/copy</summary>
 
 ```
-┌ NF TUI v0.34 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
+┌ NF TUI v1.0.0 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
 │仓库 NinFenz · 能力区 9                                           焦点 动作 · 就绪（0 项待办）│
 ├────────────────────────┬─────────────────────────────────────────────────────────────────────┤
 │  能力区 1/9            │▍ 动作 · 环境自检（2）                                               │
