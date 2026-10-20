@@ -27,7 +27,8 @@ from core import repo_face as _repo_face  # noqa: E402
 #: 入口文档面（agent 与人的第一跳）：新增入口文档须同步入表，否则本门禁漏检。
 ENTRY_DOCS = (
     "README.md", "README.en.md", "llms.txt", "docs/agent/ROUTES.md", "docs/agent/AGENT_START.md",
-    "docs/agent/AI_ROUTING.md", "docs/meta/DEEP_DIVE.md", "AGENTS.md", ".github/CONTRIBUTING.md", ".github/SECURITY.md",
+    "docs/agent/AI_ROUTING.md", "docs/meta/DEEP_DIVE.md", "AGENTS.md", ".github/CONTRIBUTING.md",
+    ".github/SECURITY.md",
     "docs/mcp.md", "docs/terminal.md", "docs/ai-menu.md", "docs/library.md",
     "docs/nfal.md", "docs/conformance.md",
 )
@@ -516,11 +517,13 @@ ARCHIVE_DOCS = {
 
 
 class UnlinkedDocTest(unittest.TestCase):
-    """**在场文档不得成为孤儿**：`docs/` 下的 .md 每篇要么被别处引用，要么在 `ARCHIVE_DOCS` 里登记理由。
+    """**在场文档不得成为孤儿**：`docs/` 下的 .md 每篇要么被别处引用，要么在 `ARCHIVE_DOCS`
+    里登记理由。
 
     依据（2026-10-01 反向可达性普查）：仓里已有「样例/夹具不得成孤儿」（`OrphanArtifactTest`）
     与「文档写的路径必须在场」（正向），但**手册本身有没有人指向它**此前无人核——实测
-    `docs/` 下 86 篇 .md 里 8 篇零引用（wave-41/42 的实测记录 / 演练集 / 普查报告 / 评估报告 / 收口记录）。
+    `docs/` 下 86 篇 .md 里 8 篇零引用（wave-41/42 的实测记录 / 演练集 / 普查报告 / 评估报告 /
+    收口记录）。
     逐条辨别：那是**存档记录**（一次性取证/演练/评估/收口），**不是墓碑**，故**不删**；也不硬塞进
     `llms.txt`（策展清单）或 README 文件表（刻意只列主入口），而是**逐条登记为「有意不链接」**，
     让**新增**的未链接文档即红。

@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import re
 import sys
 import urllib.parse
@@ -81,10 +82,9 @@ def _pin_stdio() -> None:
     与 `scripts/nf.py` 同口径（`test_stdio_encoding` 判据要求每个打印 CJK 的入口都钉）。
     """
     for stream in (sys.stdout, sys.stderr):
-        try:
+        # 为何可以吞：非 tty / 旧解释器无 reconfigure，退回默认编码即可
+        with contextlib.suppress(AttributeError, OSError):
             stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
-        except (AttributeError, OSError):  # 为何可以吞：非 tty / 旧解释器无 reconfigure，退回默认编码即可
-            pass
 
 
 def main(argv=None) -> int:

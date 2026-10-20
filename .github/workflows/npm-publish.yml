@@ -40,6 +40,10 @@ jobs:
           # 故本作业改为纯 OIDC 发布；NPM_TOKEN secret 一旦删除即自动走 OIDC 分支。
           npm install -g npm@latest
           npm --version
+          # CI-08 说明（本仓口径）：packaging/npm 没有 package-lock.json，package.json 不含 dependencies，
+          # 发布链路**不安装项目依赖**——唯一一处 npm install 是上面这条 -g 工具链自举，
+          # 它只写全局前缀、不写仓库锁文件。所以这里不用 npm ci（无锁文件可用），
+          # 改为在 npm 步骤跑完后断言「packaging/npm 下受跟踪文件未被改写」（见下方锁文件纯净步骤）。
       - name: payload 暂存 + 发布前自检 + 冒烟
         working-directory: packaging/npm
         run: |
@@ -52,6 +56,21 @@ jobs:
       - name: 打包产物逐字节核对（A3：tarball 与 payload 清单，补上最后一跳判据）
         working-directory: packaging/npm
         run: node tools/verify-tarball.mjs
+      - name: 锁文件纯净断言（CI-08：npm 步骤不得改写受跟踪文件）
+        # 为什么断言而不是 npm ci：本仓 packaging/npm 无 package-lock.json、无 dependencies，
+        # 发布链路本身不安装项目依赖；没有锁文件时 npm ci 会直接失败（can only install with an
+        # existing package-lock.json），硬引锁文件属于另立项（见 evidence 的 amend 依据）。
+        # 这里用「跑完一整串 npm 步骤后 packaging/npm 受跟踪文件零改动」钉住 CI-08 要的语义：
+        # 装得上 != 装的是锁文件里那一份；不写锁文件同样要能被证明。
+        run: |
+          set -euo pipefail
+          dirty="$(git status --porcelain --untracked-files=no -- packaging/npm)"
+          if [ -n "$dirty" ]; then
+            echo "::error::npm 步骤改写了 packaging/npm 下的受跟踪文件（锁文件纯净判据）"
+            printf '%s\n' "$dirty"
+            exit 1
+          fi
+          echo "通过：npm 链路未改写 packaging/npm 受跟踪文件（无锁文件可被改写）"
       - name: 配置 registry 认证（有 token 写 .npmrc，否则走 OIDC）
         working-directory: packaging/npm
         env:

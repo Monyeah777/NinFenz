@@ -24,12 +24,16 @@
   `<!-- nf:stats:begin --> … <!-- nf:stats:end -->` 的生成区（`nf stats --write` 刷新）。
 - 历史留痕：同一行里出现「曾 / 历史 / 此前 / 漂移 / 旧 / 年份」即视为刻意留痕，放行
   （例：`CONTRIBUTING.md` 把「曾落后到 check1-36/PASS=59」写进句中，正是要留这段证据）。
-- **协议根文档（`01_核心协议.md` / `02_联动注册表.md` / `06_` / `07_`）刻意不在面内（2026-10-04 实测）**：
-  前两件在「校验回读」块里逐波记 `PASS=20/22/57/61`、`check1-35/37` 等**当时值**（01 有 16 行、02 有 1 行），
+- **协议根文档（`01_核心协议.md` / `02_联动注册表.md` / `06_` / `07_`）刻意不在面内（2026-10-04
+    实测）**：
+  前两件在「校验回读」块里逐波记 `PASS=20/22/57/61`、`check1-35/37` 等**当时值**（01 有 16 行、02 有 1
+    行），
   而这些**行内不含**上一条的历史留痕词（「保持」「校验回读」都不是）⇒ 纳入面会**当场假红**。
   要给它们补留痕词也不便宜：`01_核心协议.md` 在 **receipts / normative 面内**（
-  `protocol/generated/receipt_chain.json`、`protocol/normative.json`、`protocol/LAYERS.json` 都引用它），
-  改它即让回执链过期——那是冻结链的活，不是顺手改的活。故本判据只覆盖**入口文档 + `docs/` + `scripts/` + `skills/`**；
+  `protocol/generated/receipt_chain.json`、`protocol/normative.json`、`protocol/LAYERS.json`
+    都引用它），
+  改它即让回执链过期——那是冻结链的活，不是顺手改的活。故本判据只覆盖**入口文档 + `docs/` + `scripts/` +
+    `skills/`**；
   要收 01/02 的正确顺序是：**先给那些行补历史留痕词 → 再纳入面 → 最后走冻结链刷新回执**。
 """
 import json
@@ -41,7 +45,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ENTRY_DOCS = ("README.md", "README.en.md", ".github/CONTRIBUTING.md", "docs/agent/AGENT_START.md", "docs/ag"
+ENTRY_DOCS = ("README.md", "README.en.md", ".github/CONTRIBUTING.md", "docs/agent/AGENT_START.md",
+    "docs/ag"
     "ent/AI_ROUTING.md",
               "docs/meta/DEEP_DIVE.md",
  "docs/meta/ROADMAP.md",

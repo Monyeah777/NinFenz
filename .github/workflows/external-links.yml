@@ -33,13 +33,25 @@ jobs:
       - name: Scan mode (offline, always green)
         run: python scripts/check_external_links.py
 
-      - name: Fetch mode (network; failures turn this job red; 日志落盘)
+      - name: Fetch mode (network; 失败仅告警——外链抖动不该让巡检整体变红)
+        # DC-06 分级：仓内相对链接 404 = fail（docs-links.yml 必过）；外链可达性受网络/第三方站点
+        # 影响，天天抖动会把红灯变成噪声，最终被整体关掉。故这里 continue-on-error，失败只发 warning。
+        id: fetch
+        continue-on-error: true
         run: |
           set -o pipefail
           mkdir -p .artifacts
           python scripts/check_external_links.py --fetch --json \
             --write results/external-links-report.json 2>&1 | tee .artifacts/external-links.log
-          cp results/external-links-report.json .artifacts/external-links-report.json
+
+      - name: 外链失败降级为告警（只提示，不阻断）
+        if: steps.fetch.outcome == 'failure'
+        run: |
+          echo "::warning::外链巡检有不可达链接（仅告警；报告见 artifact external-links-report）"
+
+      - name: 归档本次报告（失败时也尽量归档）
+        if: always()
+        run: cp -f results/external-links-report.json .artifacts/external-links-report.json 2>/dev/null || true
 
       - name: Upload report（本 run 的新鲜副本；**不**上传受跟踪的 results/ 原件）
         # N1 同类（审计 Z5）：受跟踪文件在失败时可能是**上一次提交的旧结论**。

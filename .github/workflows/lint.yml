@@ -31,7 +31,7 @@ jobs:
           python-version: '3.11'
       - name: 安装 ruff
         run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
-      - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82）
+      - name: ruff 语法级静态检查（pyproject.toml [tool.ruff]：E9/F63/F7/F82）
         run: ruff check desktop/src scripts
 
   style-ratchet:

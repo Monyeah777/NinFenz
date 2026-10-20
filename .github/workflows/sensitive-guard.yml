@@ -1,0 +1,69 @@
+name: sensitive-guard
+# FG-03 敏感词转私密：Issue **和** PR 双侧检测（Issue 是最容易贴日志的地方）。
+#   规则在 scripts/sensitive_patterns.json（样例均为明显假值）；命中后：
+#   打 sensitive 标签 + 评论提示走 SECURITY.md 私密通道。不自动删改正文（可能需要取证）。
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited]
+
+concurrency:
+  group: sensitive-guard-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  scan:
+    name: scan-issue-and-pr
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - name: 敏感内容扫描（命中即写 matched=true）
+        id: scan
+        run: |
+          set -o pipefail
+          mkdir -p .artifacts
+          python scripts/sensitive_scan.py --payload "$GITHUB_EVENT_PATH" \
+            --github-output "$GITHUB_OUTPUT" --json | tee .artifacts/sensitive-scan.json
+      - name: 命中时打标并提示转私密
+        if: steps.scan.outputs.matched == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh label create sensitive --color B60205 \
+            --description "含疑似密钥/内部路径，需走私密通道" 2>/dev/null || true
+          BODY="$(cat <<'EOF'
+          本内容命中了敏感模式（疑似密钥片段 / 内部路径 / 漏洞线索，详见工作流 artifact）。
+          已加 sensitive 标签。请：
+          1) 立即删除正文中的凭据并**撤销**对应 token；
+          2) 安全类问题改走 .github/SECURITY.md 的私密通道（仓库页 → Security → Report a vulnerability），
+             不要留在公开 Issue/PR 里。
+          维护者会在私密通道跟进。
+          EOF
+          )"
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            gh issue edit "${{ github.event.issue.number }}" --add-label sensitive
+            gh issue comment "${{ github.event.issue.number }}" --body "$BODY"
+          else
+            gh pr edit "${{ github.event.pull_request.number }}" --add-label sensitive
+            gh pr comment "${{ github.event.pull_request.number }}" --body "$BODY"
+          fi
+      - name: 上传扫描结果（失败时同样上传）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: sensitive-scan-report
+          path: .artifacts/sensitive-scan.json
+          if-no-files-found: warn
