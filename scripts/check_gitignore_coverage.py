@@ -84,11 +84,15 @@ def main(argv=None):
         print(".gitignore 覆盖度（按 git check-ignore 判定，非文本匹配）：")
         for row in res["categories"]:
             if row["ok"]:
-                print("  [PASS] {}  样例={}  规则={}".format(row["category"], row["sample"], row["rule"]))
+                print(f"  [PASS] {row['category']}  样例={row['sample']}  "
+                      f"规则={row['rule']}")
             else:
-                print("  [FAIL] {}  样例均未被忽略：{}".format(row["category"], ", ".join(row["samples"])))
+                print(f"  [FAIL] {row['category']}  样例均未被忽略："
+                      f"{chr(44).join(row['samples'])}")
         if res["missing"]:
-            print("修复指引：在 .gitignore 补 {} 类路径规则（注释里写关键词不算覆盖）".format("、".join(res["missing"])))
+            missing = "、".join(res["missing"])
+            print(f"修复指引：在 .gitignore 补 {missing} 类路径规则"
+                  "（注释里写关键词不算覆盖）")
         else:
             print("通过：五类各至少命中一条路径规则")
     return 0 if res["ok"] else 1

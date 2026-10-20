@@ -14,7 +14,7 @@ results/audit/repo_doctor-baseline-<日期>.json，后续改动可拿它当对�
   Reproducibility(2) R1 requirements 精确钉版 / R2 全部 job 有 timeout-minutes
 
 用法：
-  python scripts/repo_doctor.py                       # 默认写 results/audit/repo_doctor-baseline-<today>.json
+  python scripts/repo_doctor.py          # 默认写 results/audit/repo_doctor-baseline-<today>.json
   python scripts/repo_doctor.py --no-write --json     # 只打印
   python scripts/repo_doctor.py --out /tmp/x.json
 """
@@ -106,15 +106,20 @@ def _find(root, *rels):
 def rule_h1(root, ctx):
     data = _run_script(root, "check_gitignore_coverage.py")
     if data.get("ok"):
-        rules = ["{} -> {}".format(row["category"], row.get("rule", "")) for row in data.get("categories", [])]
+        rules = [
+            f"{row['category']} -> {row.get('rule', '')}"
+            for row in data.get("categories", [])
+        ]
         return "pass", "五类各命中一条路径规则", {"rules": rules}
-    return "fail", "缺类别：{}".format(", ".join(data.get("missing") or [data.get("error", "?")])), data
+    missing = ", ".join(data.get("missing") or [data.get("error", "?")])
+    return "fail", f"缺类别：{missing}", data
 
 
 def rule_h2(root, ctx):
     data = _run_script(root, "check_untracked_artifacts.py")
     if data.get("ok"):
-        return "pass", "索引层无产物路径（检查 %d 件）" % data.get("checked", 0), {}
+        checked = data.get("checked", 0)
+        return "pass", f"索引层无产物路径（检查 {checked} 件）", {}
     return "fail", "产物进入索引：{}".format(", ".join(data.get("violations", [])[:5])), data
 
 
@@ -127,7 +132,9 @@ def rule_h3(root, ctx):
     if bad:
         return "fail", "虚拟环境文件进入索引：{}".format(", ".join(bad[:5])), {"tracked": bad[:10]}
     if local:
-        return "warn", "本地虚拟环境在场但未入索引（{}）——属正常开发态".format(", ".join(local)), {"local": local}
+        joined = ", ".join(local)
+        return "warn", f"本地虚拟环境在场但未入索引（{joined}）——属正常开发态", {
+            "local": local}
     return "pass", "无虚拟环境入库，本地也没有残留环境目录", {}
 
 
@@ -136,7 +143,10 @@ def rule_h4(root, ctx):
     total = sum(s for s, _ in sizes)
     largest = max(sizes) if sizes else (0, "")
     gitdir = Path(root) / ".git"
-    git_bytes = sum(p.stat().st_size for p in gitdir.rglob("*") if p.is_file()) if gitdir.is_dir() else 0
+    git_bytes = (
+        sum(p.stat().st_size for p in gitdir.rglob("*") if p.is_file())
+        if gitdir.is_dir() else 0
+    )
     limits = {"tracked_mb": 64.0, "blob_mb": 5.0, "git_mb": 256.0}
     detail = {"tracked_mb": round(total / 1048576.0, 2),
               "largest": {"path": largest[1], "mb": round(largest[0] / 1048576.0, 2)},
@@ -144,9 +154,15 @@ def rule_h4(root, ctx):
               "limits": limits, "tracked_files": len(files)}
     bad = []
     if total > limits["tracked_mb"] * 1048576:
-        bad.append("tracked 体积 {:.2f} MiB > {:.0f}".format(detail["tracked_mb"], limits["tracked_mb"]))
+        bad.append(
+            f"tracked 体积 {detail['tracked_mb']:.2f} MiB "
+            f"> {limits['tracked_mb']:.0f}"
+        )
     if largest[0] > limits["blob_mb"] * 1048576:
-        bad.append("最大文件 {} {:.2f} MiB > {:.0f}".format(largest[1], detail["largest"]["mb"], limits["blob_mb"]))
+        bad.append(
+            f"最大文件 {largest[1]} {detail['largest']['mb']:.2f} MiB "
+            f"> {limits['blob_mb']:.0f}"
+        )
     if git_bytes > limits["git_mb"] * 1048576:
         bad.append(".git {:.2f} MiB > {:.0f}".format(detail["git_mb"], limits["git_mb"]))
     if bad:
@@ -172,11 +188,11 @@ def rule_s2(root, ctx):
     if p.returncode == 1:
         return "pass", "明文密钥扫描零命中", {}
     if p.returncode != 0:
-        return "warn", "git grep 执行失败（%d）" % p.returncode, {}
+        return "warn", f"git grep 执行失败（{p.returncode}）", {}
     hits = []
     for line in p.stdout.decode("utf-8", "replace").splitlines()[:10]:
         hits.append(re.sub(SECRET_RE, "<masked>", line))
-    return "fail", "疑似明文密钥命中 %d 行" % len(hits), {"hits": hits}
+    return "fail", f"疑似明文密钥命中 {len(hits)} 行", {"hits": hits}
 
 
 def rule_s3(root, ctx):
@@ -191,8 +207,11 @@ def rule_s3(root, ctx):
             if not PINNED_RE.match(ref):
                 unpinned.append(f"{f.name} -> {ref}")
     if unpinned:
-        return "fail", "未固定到提交 SHA 的 action：{}".format("; ".join(unpinned[:5])), {"unpinned": unpinned}
-    return "pass", "全部 %d 处 action 引用固定到 40 位提交 SHA" % total, {"pinned_refs": total}
+        joined = "; ".join(unpinned[:5])
+        return "fail", f"未固定到提交 SHA 的 action：{joined}", {
+            "unpinned": unpinned}
+    return "pass", f"全部 {total} 处 action 引用固定到 40 位提交 SHA", {
+        "pinned_refs": total}
 
 
 def rule_b1(root, ctx):
@@ -200,7 +219,8 @@ def rule_b1(root, ctx):
     if not p.is_file():
         return "fail", "缺 README.md", {}
     text = p.read_text(encoding="utf-8", errors="replace")
-    has_quick = any(k in text for k in ("快速开始", "Quick Start", "quickstart", "5 分钟", "五分钟"))
+    quick_markers = ("快速开始", "Quick Start", "quickstart", "5 分钟", "五分钟")
+    has_quick = any(k in text for k in quick_markers)
     has_en = (Path(root) / "README.en.md").is_file()
     if has_quick and has_en:
         return "pass", "README 有快速开始且中英双入口在场", {}
@@ -241,7 +261,7 @@ def rule_c3(root, ctx):
     n = len(list(tdir.glob("*"))) if tdir.is_dir() else 0
     pr = _find(root, ".github/PULL_REQUEST_TEMPLATE.md", "PULL_REQUEST_TEMPLATE.md")
     if n and pr:
-        return "pass", "Issue 模板 %d 件 + PR 模板在场" % n, {}
+        return "pass", f"Issue 模板 {n} 件 + PR 模板在场", {}
     missing = []
     if not n:
         missing.append("Issue 模板")
@@ -283,7 +303,7 @@ def rule_r1(root, ctx):
     if bad:
         return "fail", "未精确钉版：{}".format("; ".join(bad[:5])), {"bad": bad}
     if hashed:
-        return "pass", "%d 份 requirements 全部精确钉版，主清单含 sha256 哈希" % len(reqs), {}
+        return "pass", f"{len(reqs)} 份 requirements 全部精确钉版，主清单含 sha256 哈希", {}
     return "warn", "requirements 精确钉版，但主清单无 --hash", {"files": [p.name for p in reqs]}
 
 
@@ -296,9 +316,11 @@ def rule_r2(root, ctx):
             if not isinstance(job, dict) or job.get("timeout-minutes") in (None, ""):
                 missing.append(f"{f.name}:{jid}")
     if missing:
-        return "fail", ("%d 个 job 缺 timeout-minutes（共 %d 个 job）：%s"
-                        % (len(missing), total, ", ".join(missing[:6]))), {"missing": missing}
-    return "pass", "全部 %d 个 job 都有 timeout-minutes" % total, {"jobs": total}
+        first = ", ".join(missing[:6])
+        return "fail", (
+            f"{len(missing)} 个 job 缺 timeout-minutes（共 {total} 个 job）：{first}"
+        ), {"missing": missing}
+    return "pass", f"全部 {total} 个 job 都有 timeout-minutes", {"jobs": total}
 
 
 RULES = (
@@ -343,13 +365,18 @@ def run(root="."):
     total = sum(r["score"] for r in groups.values())
     max_score = sum(g["max"] for g in groups.values())
     head = _git(root, "rev-parse", "--short", "HEAD").stdout.decode("utf-8", "replace").strip()
-    branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").stdout.decode("utf-8", "replace").strip()
+    branch = (
+        _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+        .stdout.decode("utf-8", "replace").strip()
+    )
     percent = round(100.0 * total / max_score, 1) if max_score else 0.0
     return {
         "schema": "repo-doctor/1",
         "tool": "scripts/repo_doctor.py",
         "tool_version": TOOL_VERSION,
-        "generated_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "generated_at": (
+            datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+        ),
         "root": ".",
         "git": {"head": head, "branch": branch},
         "score": total,
@@ -390,12 +417,12 @@ def main(argv=None):
         for group in GROUPS:
             g = report["groups"][group]
             items = [r for r in report["rules"] if r["group"] == group]
-            marks = " ".join("{}:{}".format(r["id"], {"pass": "PASS", "warn": "WARN", "fail": "FAIL"}[r["status"]])
-                             for r in items)
-            print("  %-16s %4.1f/%-2d  %s" % (group, g["score"], g["max"], marks))
-        print("总分：%.1f/%d（%.1f%%）  git %s@%s"
-              % (report["score"], report["max_score"], report["percent"],
-                 report["git"]["head"], report["git"]["branch"]))
+            label = {"pass": "PASS", "warn": "WARN", "fail": "FAIL"}
+            marks = " ".join(f"{r['id']}:{label[r['status']]}" for r in items)
+            print(f"  {group:<16} {g['score']:4.1f}/{g['max']:<2d}  {marks}")
+        print(f"总分：{report['score']:.1f}/{report['max_score']}"
+              f"（{report['percent']:.1f}%）  git "
+              f"{report['git']['head']}@{report['git']['branch']}")
         for item in report["missing"]:
             print(f"  [MISSING] {item}")
         for item in report["warnings"]:

@@ -69,7 +69,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="空 Issue 判定（<20 字符或必填项为空即关闭）")
     ap.add_argument("--payload", required=True, help="GitHub issues 事件 JSON 路径")
     ap.add_argument("--json", action="store_true")
-    ap.add_argument("--github-output", default=None, help="把 action/reason 写进该文件（$GITHUB_OUTPUT）")
+    ap.add_argument("--github-output", default=None,
+                    help="把 action/reason 写进该文件（$GITHUB_OUTPUT）")
     args = ap.parse_args(argv)
     try:
         with open(args.payload, encoding="utf-8") as fh:
@@ -82,12 +83,12 @@ def main(argv=None):
         with open(args.github_output, "a", encoding="utf-8") as fh:
             fh.write("action={}\n".format(res["action"]))
             fh.write("reason={}\n".format(res["reason"]))
-            fh.write("chars=%d\n" % res["chars"])
+            fh.write(f"chars={res['chars']}\n")
     if args.json:
         print(json.dumps(res, ensure_ascii=False))
     else:
-        print("判定：%s（%s，有效正文 %d 字符） #%s"
-              % (res["action"], res["reason"], res["chars"], res["number"]))
+        print(f"判定：{res['action']}（{res['reason']}，有效正文 "
+              f"{res['chars']} 字符） #{res['number']}")
     return 0
 
 

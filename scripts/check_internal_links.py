@@ -168,7 +168,8 @@ def main(argv=None):
     _utf8_stdout()
     ap = argparse.ArgumentParser(description="Markdown 内链检查（内链 404 直接失败）")
     ap.add_argument("--root", default=".")
-    ap.add_argument("--baseline", default=None, help="存量白名单（默认 scripts/internal_link_baseline.json）")
+    ap.add_argument("--baseline", default=None,
+                    help="存量白名单（默认 scripts/internal_link_baseline.json）")
     ap.add_argument("--tracked-only", action="store_true", help="只扫 tracked 文件")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--report", default=None, help="把 JSON 报告写到该路径")
@@ -183,15 +184,16 @@ def main(argv=None):
     elif res.get("error"):
         print("[ERROR] {}".format(res["error"]))
     else:
-        print("内链检查：md %d 件 / 相对链接 %d 条 / 死链 %d 条（白名单抑制 %d，裸标识符忽略 %d）"
-              % (res["scanned_files"], res["relative_links"], len(res["dead"]),
-                 len(res["suppressed"]), len(res["ignored_bare_identifiers"])))
+        print(f"内链检查：md {res['scanned_files']} 件 / 相对链接 {res['relative_links']} 条 "
+              f"/ 死链 {len(res['dead'])} 条（白名单抑制 {len(res['suppressed'])}，"
+              f"裸标识符忽略 {len(res['ignored_bare_identifiers'])}）")
         for d in res["unexpected"]:
             print("[FAIL] {}:{} -> {}".format(d["file"], d.get("line", "?"), d["target"]))
         for d in res["suppressed"]:
             print("  [baseline] {}:{} -> {}".format(d["file"], d.get("line", "?"), d["target"]))
         for s in res["stale_baseline"]:
-            print("  [baseline-stale] {} -> {}（已不再死链，可删除该条）".format(s.get("file"), s.get("target")))
+            print(f"  [baseline-stale] {s.get('file')} -> {s.get('target')}"
+                  "（已不再死链，可删除该条）")
         if res["unexpected"]:
             print(f"修复指引：改正相对路径或补文件；若确属存量欠账，登记到 {BASELINE_REL}")
         else:

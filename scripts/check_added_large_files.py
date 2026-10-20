@@ -87,7 +87,8 @@ def _allowed(path, patterns):
 
 def scan(root, max_bytes, staged=False, rev_range=None, allow=()):
     root = Path(root)
-    if not (root / ".git").exists() and git(root, "rev-parse", "--git-dir", check=False).returncode != 0:
+    probe = git(root, "rev-parse", "--git-dir", check=False)
+    if not (root / ".git").exists() and probe.returncode != 0:
         return {"ok": False, "mode": "none", "checked": 0, "violations": [],
                 "error": f"不是 git 仓库：{root}"}
     if staged:
@@ -114,7 +115,7 @@ def scan(root, max_bytes, staged=False, rev_range=None, allow=()):
 
 
 def _fmt(n):
-    return "%.2f MiB (%d bytes)" % (n / 1048576.0, n)
+    return f"{n / 1048576.0:.2f} MiB ({n} bytes)"
 
 
 def main(argv=None):
@@ -125,18 +126,21 @@ def main(argv=None):
     ap.add_argument("--max-mb", type=float, default=None)
     ap.add_argument("--staged", action="store_true", help="检查索引（暂存区）里的内容")
     ap.add_argument("--range", dest="rev_range", default=None, help="检查 A..B / A...B 的新增内容")
-    ap.add_argument("--allow", nargs="*", default=[], help="放行路径 glob（谨慎使用，需在 evidence 说明）")
+    ap.add_argument("--allow", nargs="*", default=[],
+                    help="放行路径 glob（谨慎使用，需在 evidence 说明）")
     args = ap.parse_args(argv)
     max_bytes = int(args.max_mb * 1048576) if args.max_mb is not None else args.max_bytes
     res = scan(args.repo, max_bytes, staged=args.staged, rev_range=args.rev_range, allow=args.allow)
     if res["error"]:
         print("[ERROR] {}".format(res["error"]))
         return 2
-    print("大文件拦截：模式=%s 阈值=%s 检查件数=%d" % (res["mode"], _fmt(max_bytes), res["checked"]))
+    print(f"大文件拦截：模式={res['mode']} 阈值={_fmt(max_bytes)} "
+          f"检查件数={res['checked']}")
     if res["violations"]:
         for v in res["violations"]:
             print("[FAIL] {} 超过阈值：{}".format(v["path"], _fmt(v["bytes"])))
-        print("修复指引：删除该文件或改用外部存储/发布制品；确属必要须在 evidence 登记并调整 --allow")
+        print("修复指引：删除该文件或改用外部存储/发布制品；"
+              "确属必要须在 evidence 登记并调整 --allow")
         return 1
     print(f"通过：本次新增/变更内容均未超过 {_fmt(max_bytes)}")
     return 0

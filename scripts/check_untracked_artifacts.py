@@ -98,7 +98,7 @@ def main(argv=None):
     elif res["error"]:
         print("[ERROR] {}".format(res["error"]))
     else:
-        print("索引层产物检查：已检查 tracked 文件 %d 件" % res["checked"])
+        print(f"索引层产物检查：已检查 tracked 文件 {res['checked']} 件")
         if res["violations"]:
             for v in res["violations"]:
                 print(f"[FAIL] 产物路径进入索引：{v}")

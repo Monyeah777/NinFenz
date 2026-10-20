@@ -105,7 +105,7 @@ def main(argv=None):
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     else:
-        print("敏感扫描：%d 处命中" % len(res["hits"]))
+        print(f"敏感扫描：{len(res['hits'])} 处命中")
         for h in res["hits"]:
             print("  [{}] {} -> {}".format(h["category"], h["field"], h["match"]))
     return 0
