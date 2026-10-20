@@ -31,9 +31,11 @@ subjects:
   - desktop/tests/test_cli_json_face.py:1eb5cc107bde93e9f92fa50e380c605ef8a9cdb19c4978bb54fa89d8c5531da6
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:3433fe893d28e9dbca2a2acfa4fcc87799eb15c0ee049223fe5ee89e6b64096b
-  - desktop/tests/test_nf_cli.py:98ae8163afcd1c21fd58fb4cdfdb519f7d6e9fd8d49fbf28e4b6c8b95a99f59f
+  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
+  - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-20）：hygiene + version governance
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix

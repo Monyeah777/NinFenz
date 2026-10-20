@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:1b0a76e810f1f79aa2329aabefef5087c509c4039ebae73d773c052ccd9683c1
   - docs/meta/VERSION-MATRIX.md:87bca1a8be69cb9d14b18a16374a6b7f8ef8be49382792724b03994b516daab0
-  - README.md:52e80f4d28ea385258415820ec9f6002f73894b7d706ce6b94d6228a68c846ef
+  - README.md:93cc910a327ac4290695e398e41aa29c0bac47530567877cc735d48c74e429d8
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
 
 ---
+> 重审（2026-10-20）：hygiene + version governance
+
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
 
 > 重审（2026-10-20）：version governance + daemon leak fix
