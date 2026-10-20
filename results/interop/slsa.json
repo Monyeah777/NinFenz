@@ -230,7 +230,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "dcf74de74b283918",
+        "invocationId": "06bedf2143517c3f",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -341,7 +341,7 @@
     },
     {
       "digest": {
-        "sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+        "sha256": "021e77b3a918ce49438abec1d583befcad4dee6d2794b558c2f5a8cafd0214b7"
       },
       "name": "protocol/conformance_report.json"
     },

@@ -298,26 +298,30 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
-        "verdict": "conformant"
+        "passed": 26,
+        "root": "d08e93289d894a39288ba7bea6854a113638de735ec8b3896e4b3d843a91135b",
+        "verdict": "non-conformant"
       },
       "status": "pass",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 0,
+      "issues": 21,
       "name": "审计件被审对象 digest",
-      "sample": [],
+      "sample": [
+        "AUD-0008：被审对象已变，旧审计失效：README.en.md（修复指引：重审并更新 digest）",
+        "AUD-0009：被审对象已变，旧审计失效：scripts/nf.py（修复指引：重审并更新 digest）",
+        "AUD-0011：被审对象已变，旧审计失效：scripts/nf.py（修复指引：重审并更新 digest）"
+      ],
       "source": "audit.scan",
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 368,
         "with_header": 46
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 1
     },
     {
@@ -538,12 +542,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "67048931e546e3c238fb39e885385d2b078485fbe14b2f9f2cde6e7603ca9c33",
+  "root_digest": "67a9d1e92ff707866344ae55c9db431a3a4bea6a8d717d4136557dcd7574fa92",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
+    "fail": 1,
     "pass": 29,
-    "warn": 2
+    "warn": 1
   }
 }
