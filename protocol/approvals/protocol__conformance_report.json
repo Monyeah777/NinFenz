@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-20",
   "approved_by": "lead",
-  "note": "fin1",
+  "note": "fin2",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c6324defb23f3748ea0b04297461f462921bda9015c2b1881bc121fe683c37ab"
