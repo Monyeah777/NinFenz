@@ -128,8 +128,8 @@
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "决策 6 条（accepted 5 · 取代链 1）",
-      "digest": "b343a22824f60e29ef4db69abae033e52f2ce7190fd242548d81d7266ee71063",
+      "detail": "决策 7 条（accepted 6 · 取代链 1）",
+      "digest": "0bceeddd54adb6a000e8cabd1795eab64ec9e127a9f7431532bf6b06a615cdb6",
       "id": "decisions",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "caad4ff4b34623749eeaf35a5a9ac48c5f971c540134971bbc7cf653ae66e548",
+  "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

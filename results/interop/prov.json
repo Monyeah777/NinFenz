@@ -124,9 +124,14 @@
       "nf:sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
     },
     {
+      "@id": "nf:file/decisions/ADR-0007-计划内容不进产品仓.md",
+      "@type": "prov:Entity",
+      "nf:sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
+    },
+    {
       "@id": "nf:file/decisions/INDEX.md",
       "@type": "prov:Entity",
-      "nf:sha256": "4eb7e47cabae9d472c6475edeb70fb4959b5b762727bf33fb64ca97e24a93109"
+      "nf:sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
     },
     {
       "@id": "nf:file/desktop/src/core/registry.json",
@@ -191,7 +196,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "ec72347fbb8888dcf87616560e34a9eb3c9813a57d457b3498a5047355a03e4c"
+      "nf:sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
@@ -321,7 +326,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "4e5b69aec693e828078d5dc9453a59d7a2194b83631ee440d304e60367000af6"
+      "nf:sha256": "7a3c2157d8f3fe2cfdd4dfbfa782a839c605e8f1d5468220aa54f690245a71d7"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
@@ -432,6 +437,6 @@
   "x-nf-counts": {
     "activities": 3,
     "agents": 3,
-    "entities": 74
+    "entities": 75
   }
 }

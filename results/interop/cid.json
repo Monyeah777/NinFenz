@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreihmoi2h7o4irdopq5qwkyhdjkplhsmbhjl5iv5tjgffarzvlib6jq",
+      "cid": "bafyreigj45d6jqe45gn26fas7ajljrb6r7ywjdvrlmib4qzgt3wkkpexqi",
       "path": "protocol/conformance_report.json",
-      "sha256": "ec72347fbb8888dcf87616560e34a9eb3c9813a57d457b3498a5047355a03e4c"
+      "sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,9 +107,9 @@
       "sha256": "13b711c64920942efc2bc0c61cc7ba6b57b9299945f95c37823f97b552b06325"
     },
     {
-      "cid": "bafyreicolnu25rut5auapdk5zfctuwoxuimuxa3dd3sebuye4ybwoaak6y",
+      "cid": "bafyreid2hqqvpwht7ywp3vg7x6tyfkbzyyc6r4ovi2bcbksu62iciwtr24",
       "path": "protocol/role_coordinates.json",
-      "sha256": "4e5b69aec693e828078d5dc9453a59d7a2194b83631ee440d304e60367000af6"
+      "sha256": "7a3c2157d8f3fe2cfdd4dfbfa782a839c605e8f1d5468220aa54f690245a71d7"
     },
     {
       "cid": "bafyreibtihelykx3iwieohbiyg6leixminhdtopfk3hs2c73qju6jlxnva",
@@ -217,9 +217,9 @@
       "sha256": "6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0"
     },
     {
-      "cid": "bafyreicow7shzk5otvdsyzdv5xvxb62jlg23oytsppzt7nsmvf7cjkjrbe",
+      "cid": "bafyreiepk3mmygtuthk4ce3mjg2b4ykdey5zdiqp7kew4hujulwcngnq2m",
       "path": "decisions/INDEX.md",
-      "sha256": "4eb7e47cabae9d472c6475edeb70fb4959b5b762727bf33fb64ca97e24a93109"
+      "sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
     },
     {
       "cid": "bafyreidpsmrdixkrxrpflye44bb6qa7kvmqt5ujdytxf2xiseog54oelg4",
@@ -345,6 +345,11 @@
       "cid": "bafyreignlbgztaesqjxvx5mbjc2hqvffn4bj6uldfqyhllierxaxr5roqu",
       "path": "decisions/ADR-0006-职能坐标与核内逐件定位.md",
       "sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
+    },
+    {
+      "cid": "bafyreibtkiorivs5zg3vl4zoueivhbbosyplifp6gzjnj5iyvl7gyodxby",
+      "path": "decisions/ADR-0007-计划内容不进产品仓.md",
+      "sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
     }
   ],
   "multibase": "base32 (lowercase, no padding, prefix 'b')",
