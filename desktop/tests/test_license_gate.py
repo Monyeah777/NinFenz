@@ -1,4 +1,5 @@
 """图书馆入库许可证门单测（登记行合表 + 内联声明双源）。"""
+import re
 import sys
 import tempfile
 import os
@@ -101,6 +102,41 @@ class LicenseExpressionTest(unittest.TestCase):
             issues, stats = lg.scan(tmp)
             self.assertEqual(issues, [], issues)
             self.assertEqual(stats["declared"], 1)
+
+
+class CommunityProvenanceTest(unittest.TestCase):
+    """社区投稿的**来源可追溯**不变量（侵权风险面）。
+
+    为什么并入本文件而不是新增 check（ADR-0002）：这也是"许可/归属"面，同一条判据族。
+    判据只咬**可判定的事实**：文件里出现第三方许可标识（CC-BY / Copyright © / SPDX /
+    "Licensed under" / GPL 等）却没写「来源/许可/授权」声明 ⇒ 视为未授权的第三方内容。
+    纯自撰内容不要求来源字段（避免把 822 份原创投稿判成红）。
+    """
+
+    THIRD_PARTY = re.compile(
+        r"(?i)(CC[ -]BY|Copyright\s*©|All rights reserved|SPDX-License-Identifier"
+        r"|licensed under|MIT License|Apache License|GNU (?:GPL|LGPL))"
+    )
+    DECLARED = re.compile(
+        r"(?m)^\s*(>\s*)?(来源|出处|sources?|许可|授权|license)\s*[:：]|nf-sources"
+    )
+
+    def test_community_third_party_text_is_declared(self):
+        base = Path(ROOT) / "community"
+        bad = []
+        for p in sorted(base.rglob("*.md")):
+            text = p.read_text(encoding="utf-8", errors="replace")
+            if self.THIRD_PARTY.search(text) and not self.DECLARED.search(text):
+                bad.append(str(p.relative_to(ROOT)))
+        self.assertEqual([], bad[:10],
+                         "社区投稿含第三方许可文本但未注明来源/许可（修复指引：在文件头补"
+                         "「> 来源：…」与「> 许可：…」，或移除未授权内容）：%s" % bad[:10])
+
+    def test_predicate_catches_the_mutation(self):
+        """变异自证：有版权声明却无来源 ⇒ 必判；自撰内容 ⇒ 不误报。"""
+        self.assertTrue(self.THIRD_PARTY.search("Copyright © 2026 Someone. All rights reserved."))
+        self.assertFalse(self.DECLARED.search("本件正文自撰，无外部引用。"))
+        self.assertTrue(self.DECLARED.search("> 来源：某标准文档（已获授权）"))
 
 
 if __name__ == "__main__":
