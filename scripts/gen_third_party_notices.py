@@ -20,8 +20,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import json_doc  # noqa: E402 - 读 JSON 走仓库唯一读点（json_shape_contracts）
-
 OUT = ROOT / "THIRD-PARTY-NOTICES.md"
 PIN_FILES = sorted((ROOT / ".github").glob("requirements-*.txt"))
 
@@ -63,6 +61,8 @@ def pins() -> list[tuple[str, str]]:
 def pypi(name: str) -> dict:
     """取 PyPI 官方元数据。**只允许 https + pypi.org**（防 URL 注入 / 明文降级）。"""
     url = f"https://pypi.org/pypi/{urllib.parse.quote(name, safe='')}/json"
+    from core import json_doc  # 读 JSON 走仓库唯一读点（json_shape_contracts）
+
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or parsed.netloc != "pypi.org":
         raise ValueError(
@@ -130,7 +130,9 @@ def main(argv=None) -> int:
     ]
     text = "\n".join(lines) + "\n"
     if args.write:
-        OUT.write_text(text, encoding="utf-8", newline="\n")
+        from core import atomic_write  # 落盘走仓库唯一写点（裸写判据）
+
+        atomic_write.write_text(OUT, text)
         print(f"OK 已写入 {OUT.name}（{len(rows)} 个组件）")
     else:
         print(text[:1200])
