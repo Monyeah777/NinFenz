@@ -6,9 +6,9 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:3e5b107dfc1a068325282a63a68112113e53a61c43f21c8cb52f4c4f731695d5
-  - scripts/nf.py:25f9dde23bec1b41ca67cebfad6e9e615f96ffc25da00fbc856c5803d2ae5d19
-  - desktop/tests/test_terminal.py:46a1b762320c65f0cf3bf984f3bbf66990f649278e5caac9e1e71453c35f7ae1
+  - desktop/src/core/terminal.py:104d54825183329b72f403aaac355f86398ce360b466e75d212f11ecc4a1b12f
+  - scripts/nf.py:401d29a53a51ecfda4f68fa5e02e5339660464c66fdcf0f35705cacd2b51147a
+  - desktop/tests/test_terminal.py:3433fe893d28e9dbca2a2acfa4fcc87799eb15c0ee049223fe5ee89e6b64096b
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
+
 > 重审（2026-10-20）：version governance + daemon leak fix
 
 > 重审（2026-10-20）：D 盘迁移：跨盘 relpath 修复（nf.py 展示面 + trust_boundary 用例）

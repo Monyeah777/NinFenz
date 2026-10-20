@@ -27,11 +27,13 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
-  - desktop/src/core/daemon.py:c4be5f4cb4c7b18875a919f4589a1afeff1ecd1811cb9e6727ded2fad0ca9cc2
+  - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
   - protocol/code_metrics_baseline.json:a8860a62fcac96128fc25c6c5063a2c6c99d980dfdf58ec8186a17c8e744676b
 ---
+> 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
+
 > 重审（2026-10-20）：version governance + daemon leak fix
 
 > 重审（2026-10-20）：D 盘迁移：跨盘 relpath 修复（nf.py 展示面 + trust_boundary 用例）

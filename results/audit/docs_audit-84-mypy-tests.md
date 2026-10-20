@@ -31,9 +31,11 @@ subjects:
   - desktop/tests/test_cli_json_face.py:1eb5cc107bde93e9f92fa50e380c605ef8a9cdb19c4978bb54fa89d8c5531da6
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:46a1b762320c65f0cf3bf984f3bbf66990f649278e5caac9e1e71453c35f7ae1
-  - desktop/tests/test_nf_cli.py:ddfbaa24b4a686cf9daac01c88f0b39739ef6f7f0bd4a56d570e088897763853
+  - desktop/tests/test_terminal.py:3433fe893d28e9dbca2a2acfa4fcc87799eb15c0ee049223fe5ee89e6b64096b
+  - desktop/tests/test_nf_cli.py:98ae8163afcd1c21fd58fb4cdfdb519f7d6e9fd8d49fbf28e4b6c8b95a99f59f
 ---
+> 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
+
 > 重审（2026-10-20）：version governance + daemon leak fix
 
 > 重审（2026-10-19）：干净树重冻；修正外部 WIP 污染（AUD-0036 subject 从 WIP 版 0d431643 回到干净版 ad0bab51）
