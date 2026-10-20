@@ -31,13 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30          # 挂死上限（2026-10-01 统一：CI 不许把 runner 占满 6h 默认）
     steps:
-      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
-        shell: bash
-        run: |
-          # 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让
-          # check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。
-          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
-          echo "前置目录已建"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           persist-credentials: false
@@ -58,6 +51,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
+      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
+        shell: bash
+        run: |
+          # 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让
+          # check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。
+          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+          echo "前置目录已建"
       - name: 静态 42 条 check（不含 unittest；测试交给矩阵）
         env:
           # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ 失败日志可下载。
@@ -152,13 +152,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
-        shell: bash
-        run: |
-          # 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让
-          # check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。
-          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
-          echo "前置目录已建"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           persist-credentials: false
@@ -172,6 +165,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt
+      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
+        shell: bash
+        run: |
+          # 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让
+          # check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。
+          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+          echo "前置目录已建"
       - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
         # N1（审计 P2 实锤）：此前 if: always() 上传的是 git 跟踪的 protocol/verification_report.json
         # ——红跑也会产出一份写着 fail=0 的 artifact。现在改成**本 run 现算**的 .artifacts/ 副本。
