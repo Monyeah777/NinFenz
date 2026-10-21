@@ -88,14 +88,7 @@ pub fn scan(root: &Path) -> RatingScan {
 
     // Z3：把「声明在场」与「真被定级」拆成两个数（真源 scan 的口径）。
     // 未定级记号来自声明 rating.undecided，缺省 unrated。
-    let tok = crate::library::intake_doc(root)
-        .and_then(|d| {
-            get(&d, "rating")
-                .and_then(|r| get(r, "undecided"))
-                .map(plain_str)
-        })
-        .filter(|s| !s.is_empty())
-        .unwrap_or_else(|| "unrated".to_string());
+    let tok = undecided_token(root);
     let n_unrated = *counts.get(&tok).unwrap_or(&0);
     let stats = Json::Object(vec![
         ("entries".to_string(), Json::Int(rows.len() as i64)),
@@ -119,6 +112,50 @@ pub fn scan(root: &Path) -> RatingScan {
         ("unrated".to_string(), Json::Int(n_unrated)),
         ("undecided_token".to_string(), Json::Str(tok)),
         ("issues".to_string(), Json::Int(issues.len() as i64)),
+    ]);
+    RatingScan { issues, stats }
+}
+
+/// 真源 `undecided_token`：「未定级」记号的声明真源（`rating.undecided`，缺省 `unrated`）。
+pub fn undecided_token(root: &Path) -> String {
+    crate::library::intake_doc(root)
+        .and_then(|d| get(&d, "rating").and_then(|r| get(r, "undecided")).map(plain_str))
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "unrated".to_string())
+}
+
+/// 真源 `decided` → `(issues, stats)`：内容**是否真被定级**（审计 Z3）。
+///
+/// `scan()` 判「声明在场且合词表」——显式 `unrated` 也算合格，于是覆盖率恒 100%；
+/// 本判据判第二层：只声明未定级的件算不算数。策略真源 = `library/intake.json` 的
+/// `rating.allow_unrated`（缺省 false ⇒ **fail-closed**）。
+pub fn decided(root: &Path) -> RatingScan {
+    let decl = crate::library::intake_doc(root).unwrap_or(Json::Object(vec![]));
+    let allow = crate::pyval::py_truthy(
+        get(&decl, "rating").and_then(|r| get(r, "allow_unrated")).unwrap_or(&Json::Null),
+    );
+    let tok = undecided_token(root);
+    let rows = crate::library::entry_rows(root);
+    let unrated_ids: Vec<String> = rows
+        .iter()
+        .filter(|(_, fm)| py_str(get(fm, "rating")).trim() == tok)
+        .map(|(id, _)| id.clone())
+        .collect();
+    let mut issues: Vec<String> = Vec::new();
+    if !unrated_ids.is_empty() && !allow {
+        issues.push(format!(
+            "馆藏 {} 件只声明「未定级」（{}）：{}（修复指引：给出真实分级；确需允许未定级，则在 {} 的 rating.allow_unrated=true 成文说明，不要用 100% 覆盖掩盖未定级）",
+            unrated_ids.len(), tok,
+            unrated_ids.iter().take(5).cloned().collect::<Vec<_>>().join("、"),
+            INTAKE_REL
+        ));
+    }
+    let stats = Json::Object(vec![
+        ("entries".to_string(), Json::Int(rows.len() as i64)),
+        ("decided".to_string(), Json::Int(rows.len() as i64 - unrated_ids.len() as i64)),
+        ("unrated".to_string(), Json::Int(unrated_ids.len() as i64)),
+        ("undecided_token".to_string(), Json::Str(tok)),
+        ("allow_unrated".to_string(), Json::Bool(allow)),
     ]);
     RatingScan { issues, stats }
 }
@@ -231,4 +268,60 @@ mod tests {
         }
     }
 
+
+    /// 真源 `decided` 的策略分支（台账 Z3：声明在场 ≠ 真被定级）。
+    ///
+    /// 覆盖 `allow_unrated` 缺省（fail-closed）/ 显式放行 / 自定义 undecided 记号 / 缺字段不计数。
+    fn decided_fixture(decl: Option<&str>, entries: &[(&str, Option<&str>)]) -> std::path::PathBuf {
+        let root = crate::testutil::fixture("rating-decided-rt");
+        std::fs::create_dir_all(root.join("library")).unwrap();
+        if let Some(d) = decl {
+            std::fs::write(root.join("library/intake.json"), d).unwrap();
+        }
+        for (id, rating) in entries {
+            let mut s = format!("---\nid: {}\ntype: t\ntitle: {}\n", id, id);
+            if let Some(r) = rating {
+                s.push_str(&format!("rating: {}\n", r));
+            }
+            s.push_str("---\n正文\n");
+            std::fs::write(root.join("library").join(format!("NF-{}.md", id)), s).unwrap();
+        }
+        root
+    }
+
+    #[test]
+    fn decided_policy_branches() {
+        // ① fail-closed：两件 unrated、未声明 allow ⇒ 必报 1 条
+        let r = decided_fixture(None, &[("1", Some("general")), ("2", Some("unrated")), ("3", Some("unrated"))]);
+        let got = decided(&r);
+        assert_eq!(got.issues.len(), 1, "缺省 fail-closed 应报一条：{:?}", got.issues);
+        assert!(got.issues[0].contains("只声明「未定级」"), "文案：{}", got.issues[0]);
+        // `dumps_default` 是 CPython 默认分隔符（", " / ": "，带空格）
+        assert!(
+            got.stats.dumps_default().contains("\"unrated\": 2"),
+            "{}",
+            got.stats.dumps_default()
+        );
+        let _ = std::fs::remove_dir_all(&r);
+
+        // ② 显式 allow_unrated=true ⇒ 放行
+        let r = decided_fixture(Some("{\"rating\": {\"allow_unrated\": true}}"),
+                                &[("1", Some("general")), ("2", Some("unrated"))]);
+        assert!(decided(&r).issues.is_empty(), "显式放行时不该报");
+        let _ = std::fs::remove_dir_all(&r);
+
+        // ③ 自定义 undecided 记号跟随声明
+        let r = decided_fixture(Some("{\"rating\": {\"undecided\": \"pending\"}}"),
+                                &[("1", Some("pending")), ("2", Some("general"))]);
+        let got = decided(&r);
+        assert_eq!(got.issues.len(), 1, "自定义记号应被判为未定级：{:?}", got.issues);
+        assert!(got.issues[0].contains("pending"), "{}", got.issues[0]);
+        let _ = std::fs::remove_dir_all(&r);
+
+        // ④ 缺 rating 字段不归 decided 管（两层判据必须可分）
+        let r = decided_fixture(Some("{\"rating\": {}}"), &[("1", None)]);
+        assert!(decided(&r).issues.is_empty(), "缺字段不归 decided 管");
+        assert!(scan(&r).issues.iter().any(|i| i.contains("缺 frontmatter")), "scan 应报缺字段");
+        let _ = std::fs::remove_dir_all(&r);
+    }
 }

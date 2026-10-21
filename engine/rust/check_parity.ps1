@@ -429,7 +429,7 @@ sys.path.insert(0, 'desktop/src')
 from core import verify_report as vr
 root = r'$Root'
 # 本线已自主算出 25 条；其余喂入子结果（未移植的扫描器；asset_contract 自 2026-10-14 退出原生面）
-NATIVE = {'schema', 'doc_markers', 'baseline', 'self_stats', 'payload', 'assets_ledger', 'instruction', 'key_naming', 'intake', 'library', 'library_projection', 'rating', 'audit', 'workflow_policy', 'judgement_coverage', 'license', 'coupling', 'contract', 'knowledge', 'conformance', 'receipts', 'drill_fidelity', 'purity', 'conformance_report', 'code_metrics'}
+NATIVE = {'schema', 'doc_markers', 'baseline', 'self_stats', 'payload', 'assets_ledger', 'instruction', 'key_naming', 'intake', 'library', 'library_projection', 'rating', 'audit', 'workflow_policy', 'judgement_coverage', 'license', 'coupling', 'contract', 'knowledge', 'conformance', 'receipts', 'drill_fidelity', 'purity', 'conformance_report', 'code_metrics', 'rating_decided'}
 res = {}
 for spec in vr.SPECS:
     if spec[0] in NATIVE: continue
