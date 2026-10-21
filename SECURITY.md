@@ -46,7 +46,7 @@
 | 入库通道的凭据与内容边界 | `.github/scripts/*_ingest.py` | 令牌不落盘、密钥形状拒收、超长拒收 |
 | 静态检查（含未定义名） | `nf release` → ruff | 本地 pre-push 即拦 |
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
-| 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
+| 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（过程评分，**不衡量功能正确性/不衡量无 Bug**；结果可见） |
 
 ## Supported Versions（支持的版本范围）
 
