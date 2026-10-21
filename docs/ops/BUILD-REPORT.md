@@ -36,9 +36,9 @@
 
 | 波次 | 条目 | 结果 | 门禁 |
 |---|---|---|---|
-| wave1 | 10 条（FX-01..05、CW-03/04、RL-02、CI-03、FG-02） | 10/10 建成 | PASS=76 FAIL=0（e765c593） |
-| wave2 | 25 条（治理/SLA/维护文档、workflow 权限下沉） | 25/25 建成 | PASS=76 FAIL=0（ed28a6d8） |
-| wave3 | 32 条（CI 接线/供应链/发布线/覆盖率趋势等） | 31 PASS + 1 部分（DC-06） | PASS=76 FAIL=0（43a382cc） |
+| wave1 | 10 条（FX-01..05、CW-03/04、RL-02、CI-03、FG-02） | 10/10 建成 | 全绿（提交 e765c593） |
+| wave2 | 25 条（治理/SLA/维护文档、workflow 权限下沉） | 25/25 建成 | 全绿（提交 ed28a6d8） |
+| wave3 | 32 条（CI 接线/供应链/发布线/覆盖率趋势等） | 31 PASS + 1 部分（DC-06） | 全绿（提交 43a382cc） |
 | wave4 | 16 条 | 3 已完成（FX-08/09/12）+ 3 不适用 + 10 方案 | 方案见 WAVE4-PROPOSALS.md |
 | wave5 | 10 条转人工 | 清单见 WAVE5-UI-LIST.md | — |
 | wave6 | 9 条 | 7 方案 + 2 UNKNOWN | 方案见 WAVE6-PROPOSALS.md |
@@ -53,8 +53,8 @@
 ## 6. 复现
 
     git switch build/manual-main
-    bash verify.sh --full --no-cache      # 期望 PASS=76 WARN=1 FAIL=0
-    python scripts/repo_doctor.py         # 期望 17.0/17
+    bash verify.sh --full --no-cache      # 期望全绿（PASS 计数以本次运行为准，不在此写死）
+    python scripts/repo_doctor.py         # 期望全项 PASS
     bash scripts/check_markdown_structure.sh
     python scripts/check_workflow_permissions.py
     python scripts/check_internal_links.py --json
