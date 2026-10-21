@@ -1,0 +1,13 @@
+# 关闭空白 Issue（CW-01）：必须走模板，模板必填项由 GitHub 表单校验；
+# 但保留「去哪问问题 / 去哪报私密漏洞」两个真实入口，不把入口一起关死。
+blank_issues_enabled: false
+contact_links:
+  - name: 提问 / 讨论（先读 SUPPORT）
+    url: https://github.com/Monyeah777/NinFenz/blob/main/SUPPORT.md
+    about: 使用问题与讨论请先读 SUPPORT.md 的分流说明
+  - name: 私密报告安全漏洞
+    url: https://github.com/Monyeah777/NinFenz/security/advisories/new
+    about: 不要在公开 Issue 讨论漏洞细节
+  - name: 投稿作品（图书馆）
+    url: https://github.com/Monyeah777/NinFenz/blob/main/CONTRIBUTING.md
+    about: 投稿前请读 CONTRIBUTING 的授权与格式要求

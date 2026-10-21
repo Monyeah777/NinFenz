@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:ef23f498717b2d582072c453b3844e8725057cba9d736e591df586e54213dd85
+  - CONTRIBUTING.md:b4242365afb289996b1d436d4e78c41efe268aa19499028af3e4cefcc1683153
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:df515dc5b7ef9572eeac5583cde42fa0f47eea3c7d7ceb3767e3953d9f2bed03
 
 ---
+> 重审（2026-10-21）：wave2 施工：治理/维护文档与 workflow 权限下沉后重绑 digest
+
 > 重审（2026-10-20）：0.x renumber 1
 
 > 重审（2026-10-20）：readme/tag 治理 1

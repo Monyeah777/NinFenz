@@ -175,3 +175,28 @@ python3 -m compileall -q desktop/src scripts
 - **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，
   已按「排除发布面 + 换自写夹具」修复）。
 - **沙箱意识**：工具执行限项目目录内。路径逃逸的拦截由**宿主 harness 的工具层**负责——仓库不对该层作实现承诺（旧文案写「被 validatePath 拦截」，而仓库内并无该实现，属虚假保证；2026-09-24 起文档只写真实载体）。仓库内组件之间的包含性判据 = `desktop/src/core/paths.py::validate_path`（**资产台账**与**产出面清单**已收敛到它，有单测 `desktop/tests/test_paths.py` + `desktop/tests/test_output_path_escape.py`），不得绕过。
+
+## 评审预期时长（单人维护的真实承诺）
+
+本仓由单人维护（见 `.github/GOVERNANCE.md`）。承诺的是**可兑现**的部分：
+
+- **首次响应**：工作日内 **3 天**内给出「已收到 / 需要更多信息 / 驳回及理由」三种之一；不做「48 小时修复」这类无法兑现的承诺。
+- **评审深度**：涉及协议、门禁、契约面的 PR 会逐条核对证据；纯文档修订通常一轮内结论。
+- **长时间无响应**：超过 14 天无回复的 PR 会被留言询问是否继续，30 天静默后关闭（可随时重开）。
+- 若你是第一次投稿，先读 `docs/agent/AGENT_START.md` 与 `llms.txt` 可显著缩短往返。
+
+## 提交信息正反示例（Conventional Commits）
+
+正例（类型前缀 + 动机，不逐行复述 diff）：
+
+- `fix(gate): check12 分片缓存键漏了运行时版本，导致换 Python 后命中旧绿`
+- `docs(release): 补 1.0.x 发布线到 VERSION-MATRIX，避免版本面悬空`
+- `refactor(core): 把 receipts 重签拆成独立函数（不改判定语义）`
+
+反例（会被 `scripts/commit_msg_check.py` 拒绝，或在评审中被打回）：
+
+- `update stuff` —— 无类型前缀、无对象、无动机
+- `fix: 修了一堆问题` —— 一次提交混多个目的，bisect 失效
+- `feat: 格式化全仓` —— 格式化与逻辑混在同一次提交
+
+类型枚举（与 hook 同源）：feat / fix / docs / refactor / chore / test / perf / ci。

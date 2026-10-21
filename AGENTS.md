@@ -47,3 +47,12 @@
 - **公开文案纪律**：仓库文档只承载结果/状态/正式协议；不写决策过程、不引作者原话、不写内部流水账。
 - **封闭式发育**：外部实测线（E1/E2/Y5/B1 触发实测等）封存挂账；**一次性完整外部验证仅由作者显式触发**，agent 不主动安排/推进外部实测。
 - 方向与验收边界见 `STRATEGY.md`；与之冲突时以 STRATEGY + 本条为准。
+
+## 治理与维护文档入口（交付给协作者）
+
+- 治理与决策路径：`.github/GOVERNANCE.md`
+- 发布节奏：`docs/meta/RELEASE-CADENCE.md`；版本矩阵：`docs/meta/VERSION-MATRIX.md`
+- 评分语义（Scorecard 不衡量功能正确性）：`docs/meta/SCORECARD-SEMANTICS.md`
+- 已知不一致 / 未复验：`docs/meta/UNVERIFIED.md`（修复后必须删条目）
+- 文档命令与数字抽查：`docs/meta/DOC-AUDIT.md`
+- workflow 权限台账：`docs/meta/WORKFLOW-PERMISSIONS.md`

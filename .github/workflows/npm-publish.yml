@@ -10,8 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
-  id-token: write          # provenance / trusted publishing 必需
+  contents: read   # 顶默认只读；id-token 下发到 publish job（provenance 必需）
 jobs:
   publish:
     name: npm-publish-provenance

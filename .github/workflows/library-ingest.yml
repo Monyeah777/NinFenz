@@ -13,12 +13,14 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  issues: write
+  contents: read   # 顶默认只读
 jobs:
   ingest:
     if: startsWith(github.event.issue.title, '【NF投稿】')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 入库要 push
+      issues: write     # 回评并关闭 Issue
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4

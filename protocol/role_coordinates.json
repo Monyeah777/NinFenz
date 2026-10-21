@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1449,
+    "app": 1454,
     "entry": 25,
     "floor": 5,
     "prod": 1037,
     "projection": 129,
-    "support": 232,
-    "verify": 945
+    "support": 236,
+    "verify": 946
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11867,6 +11867,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "workflow 权限最小化审计（BR-05）。",
+      "path": "scripts/check_workflow_permissions.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "代码规模/复杂度上限（CLI）：棘轮式冻结 + 只增不减校验。",
       "path": "scripts/code_metrics.py",
       "role": "verify",
@@ -11934,16 +11940,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f7176cb87fc696ba29f1a024b6d345dfddf1c3a03468802e92097e9f0974a86e",
+  "root_digest": "f74a2c469cdcbadd68f1ad724371bcd574e22ffb565d266edb30b6e56b29e886",
   "rule_counts": {
-    "R-app": 1449,
+    "R-app": 1454,
     "R-catch": 91,
     "R-entry": 25,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
-    "R-support": 116,
-    "R-verify": 829,
+    "R-support": 120,
+    "R-verify": 830,
     "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"

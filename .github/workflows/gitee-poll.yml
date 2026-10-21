@@ -16,11 +16,13 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read   # 顶默认只读
 
 jobs:
   poll:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 入库要 git push（唯一写点）
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）：轮询入库卡住不许拖到下个周期
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
