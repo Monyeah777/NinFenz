@@ -1,6 +1,9 @@
 # NinFenz · ドキュメント生成工房（仕様駆動）<sub>Spec-driven documentation workshop</sub>
 
-<!-- nf:locales --> [简体中文](README.md) | [English](README.en.md) | **[日本语](README.ja.md)**
+<!-- nf:locales -->
+<p align="center">
+  <a href="README.md">简体中文</a> · <a href="README.en.md">English</a> · <strong><a href="README.ja.md">日本语</a></strong>
+</p>
 
 <p align="left">
   <a href="https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml"><img src="https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg" alt="ci-verify ゲート" height="20"></a>

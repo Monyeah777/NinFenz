@@ -82,14 +82,32 @@ def label(lang: str) -> str:
     return _LANG_LABEL.get(lang, lang)
 
 
+def _switch_block(txt: str) -> str:
+    """取出语言切换块（marker 行起、到 </p> 止）；缺失返回空串。"""
+    lines = txt.splitlines()
+    for i, ln in enumerate(lines):
+        if ln.startswith(SWITCH_MARK):
+            out = [ln]
+            for nxt in lines[i + 1:i + 4]:
+                out.append(nxt)
+                if nxt.strip().startswith("</p>"):
+                    break
+            return "\n".join(out)
+    return ""
+
+
 def switcher(locales: List[Tuple[str, str]], current: str) -> str:
     """语言切换行：当前语言加粗不链接，其余给链接——逐条列出**全部在场语言**。"""
     # 每项都可点（当前语言用加粗链接标明"你在这里"）——GitHub 上一点即切换，不必先猜哪个能点。
     # 不用 emoji：issue 消息会把期望行原样回吐，而 GBK 控制台编不出 U+1F310。
-    # 2026-10-21 作者定调：去掉「语言 / Languages」前缀，纯三个可点链接，竖线分隔（顶部更干净）。
-    return "%s %s" % (SWITCH_MARK, " | ".join(
-        ("**[%s](%s)**" if lang == current else "[%s](%s)") % (label(lang), fn)
-        for lang, fn in locales))
+    # 2026-10-21 作者二改：注释与链接不能同行——GitHub 把以 `<!--` 开头的整行当 HTML 块，
+    # 行内 Markdown 不解析，链接会退化成纯文本。改用纯 HTML 居中块：<a> 本身就是链接，
+    # 不依赖任何 Markdown 解析；当前语言用 <strong> 标出。
+    items = " · ".join(
+        ('<strong><a href="%s">%s</a></strong>' if lang == current else '<a href="%s">%s</a>')
+        % (fn, label(lang))
+        for lang, fn in locales)
+    return "%s\n<p align=\"center\">\n  %s\n</p>" % (SWITCH_MARK, items)
 
 
 def anchors() -> Tuple[str, ...]:
@@ -211,8 +229,9 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         if not re.search(r"v\d+\.\d+", txt):
             issues.append("%s 缺版本号（vX.Y）" % fn)
         line = switcher(locs, lang)
-        found = re.search(r"(?m)^" + re.escape(SWITCH_MARK) + r".*$", txt)
-        if not found or found.group(0).strip() != line:
+        # 切换块是**多行 HTML**（marker 行 + <p> + 链接行 + </p>）：逐行比对到 </p> 为止。
+        got = _switch_block(txt)
+        if got != line:
             issues.append("%s 缺/错语言切换行（期望逐字：%s）" % (fn, line))
         if fn != CANONICAL:
             h2 = len(_H2_RE.findall(txt))
