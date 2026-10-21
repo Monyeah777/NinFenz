@@ -31,7 +31,7 @@ SWITCH_MARK = "<!-- nf:locales -->"
 #: 覆盖面词表：entry = 只译入口；entry+guides = 入口 + registry 声明的指南。
 COVERAGES = ("entry", "entry+guides")
 _LOCALE_RE = re.compile(r"^README\.([A-Za-z][A-Za-z0-9-]*)\.md$")
-_LANG_LABEL = {"zh": "中文", "en": "English", "ja": "日本語", "ko": "한국어", "fr": "Français"}
+_LANG_LABEL = {"zh": "简体中文", "en": "English", "ja": "日本语", "ko": "한국어", "fr": "Français"}
 _H2_RE = re.compile(r"(?m)^## ")
 #: 同 integrations._PATH_TOKEN：负向后顾把起点钉在 token 首字符，避免每个起点各回溯一遍（O(n²)）。
 _MD_REF_RE = re.compile(r"(?<![A-Za-z0-9_\-\./])[A-Za-z0-9_\-\./]+\.md")
@@ -86,7 +86,8 @@ def switcher(locales: List[Tuple[str, str]], current: str) -> str:
     """语言切换行：当前语言加粗不链接，其余给链接——逐条列出**全部在场语言**。"""
     # 每项都可点（当前语言用加粗链接标明"你在这里"）——GitHub 上一点即切换，不必先猜哪个能点。
     # 不用 emoji：issue 消息会把期望行原样回吐，而 GBK 控制台编不出 U+1F310。
-    return "%s 语言 / Languages：%s" % (SWITCH_MARK, " · ".join(
+    # 2026-10-21 作者定调：去掉「语言 / Languages」前缀，纯三个可点链接，竖线分隔（顶部更干净）。
+    return "%s %s" % (SWITCH_MARK, " | ".join(
         ("**[%s](%s)**" if lang == current else "[%s](%s)") % (label(lang), fn)
         for lang, fn in locales))
 
