@@ -55,3 +55,29 @@ updates:
         update-types:
           - minor
           - patch
+
+  # —— 容器（根 Dockerfile / packaging 下 Dockerfile）——
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule: { interval: "weekly" }
+    labels: ["dependencies", "docker"]
+  - package-ecosystem: "docker"
+    directory: "/packaging/nfal"
+    schedule: { interval: "weekly" }
+    labels: ["dependencies", "docker"]
+
+  # —— Rust（引擎线）——
+  - package-ecosystem: "cargo"
+    directory: "/engine/rust"
+    schedule: { interval: "weekly" }
+    labels: ["dependencies", "rust"]
+  - package-ecosystem: "cargo"
+    directory: "/engine/rust/pyo3"
+    schedule: { interval: "weekly" }
+    labels: ["dependencies", "rust"]
+
+  # —— 根 Python 依赖（requirements.txt + pyproject.toml）——
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule: { interval: "weekly" }
+    labels: ["dependencies", "python"]

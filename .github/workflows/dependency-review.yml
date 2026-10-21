@@ -1,0 +1,43 @@
+name: dependency-review
+# SC-03 依赖审查门禁（2026-10-20 建设层）。
+#
+# 定位：补充门禁，不替代门禁。SC-03 要的建成状态是「更新 PR 与人工 PR 走同一套检查，
+# 不存在机器人 PR 免检」——那一层由 ci-verify / lint / cross-lang 的 pull_request 触发器
+# 保证：全仓 workflow 内没有任何 actor 豁免条件（grep 实测 0 命中 dependabot[bot]）。
+# 本 workflow 补的是差异面：新增/升级依赖时，对变更的依赖清单做漏洞与许可证审查。
+#
+# dependabot 开出的 PR 同样触发本 workflow（pull_request 事件不区分 actor），
+# 因此不存在「给机器人单独开绿灯」——这正是手册 SC-03 伪解表里要拦的第一条。
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read            # 读 PR 的 diff 与依赖清单
+  pull-requests: write      # comment-summary-in-pr 需要写 PR 评论
+
+jobs:
+  review:
+    name: dependency-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 依赖差异审查（高危/严重即红；许可证黑名单）
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48  # v4.9.0
+        with:
+          # fail-on-severity=high：critical/high 必红。不用 moderate——本仓 CI 工具链
+          # 全量固定版本，moderate 级几乎必然来自间接依赖，设成 moderate 会每月红一次
+          # 而无人处理（常红的门禁等于没有门禁）。
+          fail-on-severity: high
+          # 许可证审查：NF 是 MIT 分发物，GPL/AGPL 进入运行依赖会污染分发口径。
+          # 只放「明确不可接受」的几项，其余交给人判断（避免门禁变成法务猜谜）。
+          deny-licenses: GPL-2.0, GPL-3.0, AGPL-3.0
+          comment-summary-in-pr: on-failure
+          retry-on-snapshot-warnings: true

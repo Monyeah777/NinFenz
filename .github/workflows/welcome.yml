@@ -1,0 +1,35 @@
+name: welcome
+# CW-06：首次贡献者自动欢迎（只对首次生效；同类第二次不再打扰）。
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: welcome-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  welcome:
+    name: first-interaction
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: 首次贡献欢迎
+        uses: actions/first-interaction@fb2402657b4a28582200150d0a145671d0e50597  # v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            感谢你的第一个 Issue！请先读 CONTRIBUTING.md 与 SUPPORT.md 的分流说明。
+            安全漏洞请不要开公开 Issue，走 SECURITY.md 的私密通道。
+          pr-message: |
+            感谢你的第一个 PR！请确认：说明解决什么 / 关联 Issue / 如何验证 / 是否有破坏性变更。
+            首次响应时效见 CONTRIBUTING.md 的“评审预期时长”。

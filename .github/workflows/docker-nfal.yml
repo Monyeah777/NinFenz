@@ -23,6 +23,9 @@ jobs:
     name: build-nfal-image
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write   # 推 GHCR 需要
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -31,6 +34,19 @@ jobs:
         run: docker build -f packaging/nfal/Dockerfile -t nfal:ci .
       - name: 冒烟：容器内入口可跑（--help）
         run: docker run --rm nfal:ci --help
+      - name: 登录 GHCR（仅 tag / 手动）
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: 推送镜像（tag / 手动）
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          IMAGE=ghcr.io/monyeah777/ninfenz/nfal
+          TAG=${{ github.ref_name }}
+          docker tag nfal:ci "$IMAGE:$TAG"
+          docker push "$IMAGE:$TAG"
 
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。

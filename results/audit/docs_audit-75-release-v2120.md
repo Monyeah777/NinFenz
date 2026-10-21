@@ -6,9 +6,9 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:e1103e82d2f6a5200b96009b52764429e587ea0259258647e9b061de464023d6
+  - CHANGELOG.md:044632098ec555cd3788f5b716910f7efac889534d2f6da04db18140a15cd529
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:5fda431f9bd738d429b20e55987d605f7ddb126807fa50ad673e08db6270d686
+  - README.md:8a1012f481042cce1bdde902c42d19877d52e414f2ccb1905eda52ff359cb570
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
 
 ---
+> 重审（2026-10-21）：wave3 施工：CI 接线/供应链/发布线/workflow 权限并发收口后重绑 digest
+
 > 重审（2026-10-21）：wave2 施工：治理/维护文档与 workflow 权限下沉后重绑 digest
 
 > 重审（2026-10-21）：1.0.5 收口 1

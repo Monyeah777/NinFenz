@@ -1,0 +1,71 @@
+name: codeql
+# SC-04 静态代码扫描（2026-10-20 建设层）。
+#
+# 语言清单与仓库实际构成对照（git ls-files 实测 2026-10-20）：
+#   .py 762（主实现）· .cs 109（engine/dotnet 对拍实现）· .rs 89（engine/rust 只读快线）
+#   · .mjs/.js 17（packaging/npm 工具链与 scripts）· workflow 文件 25 个
+# CodeQL 官方支持语言集（docs.github.com · about-code-scanning-with-codeql，2026-10-20 抓取）：
+#   C/C++ · C# · Go · Java/Kotlin · JavaScript/TypeScript · Python · Ruby · Rust · Swift · Actions
+# => 本仓落在支持集内的五种全部纳入：python / csharp / rust / javascript-typescript / actions。
+#    未纳入的 C/C++/Go/Java/Ruby/Swift 在本仓不存在源码，不是被排除。
+#
+# 触发器同时覆盖默认分支与 PR：只在 PR 上跑会让默认分支的历史问题永远不出现
+# （SC-04 伪解第二条：只在 PR 上跑而从不在默认分支跑）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 2 * * 2'      # 每周二 02:17 UTC：规则集随 CodeQL 版本更新而变，需周期重扫
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read            # 读源码
+  actions: read             # actions 语言分析需要 workflow 运行元数据
+  security-events: write    # 上传 SARIF（code scanning 结果面）
+
+jobs:
+  analyze:
+    name: analyze-${{ matrix.language }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # build-mode: none = 不执行项目构建，直接抽取源码。五种全用 none：
+        # 本仓没有「必须构建才存在」的源码，走 autobuild 只会把时间花在还原工具链上。
+        include:
+          - language: python
+            build-mode: none
+          - language: csharp
+            build-mode: none
+          - language: rust
+            build-mode: none
+          - language: javascript-typescript
+            build-mode: none
+          - language: actions
+            build-mode: none
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 初始化 CodeQL（language=${{ matrix.language }}）
+        uses: github/codeql-action/init@1190a975f95ce23525efb6a3fc21ea29567c1b52  # v3.38.2
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # 规则集范围写清楚（SC-04 补充：零告警只等于「这套规则没发现」）：
+          # security-and-quality = 安全查询 + 代码质量查询，比默认 security 集更严。
+          queries: security-and-quality
+      - name: 分析并上传 SARIF
+        uses: github/codeql-action/analyze@1190a975f95ce23525efb6a3fc21ea29567c1b52  # v3.38.2
+        with:
+          category: /language:${{ matrix.language }}
+          # 结果上传失败（如 fork PR 无 security-events 权限）不该让扫描本身判红：
+          # 「扫描跑没跑」与「结果能不能上传」是两件事。
+          upload: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}

@@ -1,0 +1,48 @@
+name: mermaid-check
+# DC-07 图表可编译：扫描**全部 md**（README / CHANGELOG / docs 都在内），
+#   用 mermaid 官方解析器（mermaid@11.12.0 + jsdom@26.1.0）逐块真语法校验；
+#   只检查「有没有 mermaid 块」不算数，解析失败即红。
+#   依赖装到 runner 临时目录（不污染仓库工作树），并用 actions/cache 按固定版本缓存。
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - 'scripts/check_mermaid.mjs'
+      - '.github/workflows/mermaid-check.yml'
+  pull_request:
+    paths:
+      - '**/*.md'
+      - 'scripts/check_mermaid.mjs'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mermaid-parse:
+    name: mermaid-parse-all-md
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+        with:
+          node-version: '20.19.0'
+      - name: 缓存校验器依赖（key 含固定版本号，版本变即失效）
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
+        with:
+          path: ${{ runner.temp }}/mermaid-check
+          key: mermaid-check-${{ runner.os }}-node20-mermaid-11.12.0-jsdom-26.1.0
+      - name: 安装 mermaid 校验器（固定版本，装到临时目录）
+        run: |
+          npm install --prefix "$RUNNER_TEMP/mermaid-check" --no-save --no-audit --no-fund \
+            mermaid@11.12.0 jsdom@26.1.0
+      - name: 全部 md 的 mermaid 块语法校验
+        run: node scripts/check_mermaid.mjs --modules "$RUNNER_TEMP/mermaid-check/node_modules"

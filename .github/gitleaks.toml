@@ -1,0 +1,37 @@
+# gitleaks 配置（SC-05 凭据扫描 · 2026-10-20 建设层）
+#
+# 口径：默认规则全开，只对「已逐条核实为假阳性」的少数命中做窄口径豁免。
+# 每条豁免都要能回答：是什么 / 为什么不是凭据 / 什么时候重判。
+# 宽口径豁免（整仓 path 放行、通用 token 正则放行）一律不允许——那等于把扫描关掉。
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "NF 已核实假阳性（2026-10-20 全树实测 8 条命中，逐条核实后分类豁免）"
+
+paths = [
+  # ① 构建产物：__pycache__ 在 .gitignore 面，不进 git 历史；CI 扫历史时本就不出现，
+  #    放行它是为了消除「本地 dir 扫工作树红、CI 历史扫描绿」的假警报。
+  '''__pycache__/''',
+  # ② 审计报告的资产 sha256 清单：64 位十六进制被 generic-api-key 的熵阈值当成了 key。
+  #    该目录是「文件摘要清单」的固定形态，不含凭据。
+  #    重判条件：results/audit/ 若开始存放凭据类内容（真发生则该修的是报告生成器）。
+  '''results/audit/.*[.]md''',
+  # ③ .NET 对拍夹具：内容是对拍测试 JSON 的 base64（解码为 {"a":1} / {"e_key":1} 一类），
+  #    不是凭据。只豁免这两个夹具文件，不放行 engine/dotnet 目录整体。
+  '''engine/dotnet/probes/_fixtures/_text_hygiene_golden[.]json''',
+  '''engine/dotnet/src/Nf[.]Engine/SelfTest[.]cs''',
+  # ④ IndexNow 校验密钥的载体（值本身按协议必须公开，见下方 regex 说明）
+  '''site/tools/indexnow[.]json''',
+  '''site/DEPLOY-search-submit[.]md''',
+  '''packaging/npm/payload/site/tools/indexnow[.]json''',
+  '''packaging/npm/payload/site/DEPLOY-search-submit[.]md''',
+]
+
+regexTarget = "match"
+regexes = [
+  # IndexNow 的 key 按协议必须公开（部署为 https://<host>/<key>.txt 供搜索引擎回读），
+  # 泄露它没有攻击面；但它长得像 API key，故按值放行而不是按文件放行（口径更窄）。
+  '''ninfenzff1511339a8885ca8dbee4b8''',
+]

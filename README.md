@@ -130,6 +130,9 @@ AI 装配：
 
 ```bash
 npm i -g ninfenz@latest   # 装或升级
+
+# 或取容器镜像（NFA-L，tag 与发布线一致）
+docker pull ghcr.io/monyeah777/ninfenz/nfal:<tag>
 nf --version             # 看当前版本
 nf stats                 # 看门禁与仓库状态
 ```

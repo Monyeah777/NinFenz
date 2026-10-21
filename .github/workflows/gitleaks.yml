@@ -1,0 +1,42 @@
+name: gitleaks
+# SC-05 凭据扫描（2026-10-20 建设层）。
+#
+# 两段同时存在：
+#   推送前（本地）：gitleaks protect --staged --config .github/gitleaks.toml，可放进 pre-commit；
+#     本仓不替既有 scripts/install_hooks.sh 抢钩子，命令写在这里，由使用者决定装不装。
+#   推送后（CI）：本 workflow 对 PR 与默认分支跑扫描，命中即红。
+#
+# 平台侧 secret scanning + push protection 是仓库设置开关（需账号主人在页面上开），
+# 本机无 API 权限取证 ⇒ 见 evidence SC-05 的 unverified 字段（人工取证路径）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '41 4 * * 3'      # 每周三 04:41 UTC：规则库随版本更新，需周期重扫
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read            # 只读历史；不需要写权限
+
+jobs:
+  scan:
+    name: gitleaks-scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0          # 全历史：密钥若已在历史里，PR 增量扫描看不见
+          persist-credentials: false
+      - name: 全历史凭据扫描（命中即红）
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 配置里 [extend] useDefault=true：默认规则全开，只豁免已核实的假阳性。
+          GITLEAKS_CONFIG: .github/gitleaks.toml
+          # 公开个人仓库无需 license（organization 才需要 GITLEAKS_LICENSE）。

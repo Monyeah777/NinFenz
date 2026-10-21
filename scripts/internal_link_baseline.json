@@ -1,0 +1,26 @@
+{
+  "schema": "internal-link-baseline/1",
+  "note": "存量内链 404 白名单（逐条 file+target）。新增死链不在此表内会直接红；表项被修复后应删除（脚本会报 stale）。",
+  "unresolved": [
+    {
+      "file": ".github/MAINTAINERS.md",
+      "target": "STRATEGY.md",
+      "reason": "文档搬迁后（SP-03：根目录 -> .github/）相对链接未同步，应改为 ../STRATEGY.md；由 Lead/hygiene 修复"
+    },
+    {
+      "file": ".github/MAINTAINERS.md",
+      "target": "AGENTS.md",
+      "reason": "同上，应改为 ../AGENTS.md"
+    },
+    {
+      "file": "results/RESULTS.md",
+      "target": "../VERSION-MATRIX.md",
+      "reason": "链接文字指向 docs/meta/VERSION-MATRIX.md，实际文件已迁到 docs/meta/；href 应为 ../docs/meta/VERSION-MATRIX.md"
+    },
+    {
+      "file": "results/RESULTS.md",
+      "target": "../ROADMAP.md",
+      "reason": "同上，href 应为 ../docs/meta/ROADMAP.md"
+    }
+  ]
+}

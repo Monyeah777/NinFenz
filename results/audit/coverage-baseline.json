@@ -1,0 +1,6 @@
+{
+  "_comment": "RL-06 覆盖率基线：CI 每跑一次与当前值比较；下降 >0.5 告警、>2 或 <80 失败。评审后可用 scripts/coverage_trend.py --update 更新。",
+  "totals": {
+    "percent_covered": 80
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "_comment": "SC-06 处置表：高危/严重漏洞必须在此登记 reason + review_by；过期即 FAIL。空表 = 当前依赖树无未处置高危（由 sbom-vuln workflow 每次核对）",
+  "accepted": []
+}

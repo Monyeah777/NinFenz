@@ -20,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 10,
+        "imports": 11,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "b7b575c53c471dadb4af085d10e2ef4ad5458b1298dfe8c3afb9ab230c9d91dd",
+        "root": "55e4386996de3ba2a24c7e9874d7033893d3c6a8c2de64eb7d224d58e8b6f40f",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -370,7 +370,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 302,
-        "files": 303,
+        "files": 313,
         "max_fn_cc": 115,
         "max_fn_lines": 1254,
         "max_lines": 7544
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 214,
-        "probed": 214
+        "patterns": 228,
+        "probed": 228
       },
       "status": "pass",
       "warns": 0
@@ -493,10 +493,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 61,
+        "pinned_uses": 108,
         "requirements_files": 4,
-        "with_explicit_permissions": 18,
-        "workflows": 18
+        "with_explicit_permissions": 32,
+        "workflows": 32
       },
       "status": "pass",
       "warns": 0
@@ -521,29 +521,31 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 0,
+      "issues": 1,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [],
+      "sample": [
+        "② protocol/role_coordinates.json 与实时重算不一致（记录 f74a2c469cdc / 实测 ad0b6675c58d）（修复指引：nf layers --write）"
+      ],
       "source": "role_model.scan",
       "stats": {
-        "files": 3833,
-        "kernel": 1988,
+        "files": 3865,
+        "kernel": 1993,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     }
   ],
-  "root_digest": "1c312b6aa470a5ba77f5ab2ea46e2f86deab8057ec484e35e71e068ecd3bfcf1",
+  "root_digest": "408fae93b2702d7cd8799c4921a8bd2e4f77db6f71768be76eb3af0b170d25a9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

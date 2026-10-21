@@ -37,6 +37,13 @@ jobs:
           coverage run --source=desktop/src/core -m unittest discover -s desktop/tests 2>&1 | tee coverage.log
           coverage report --fail-under=80 --include="desktop/src/core/*" 2>&1 | tee -a coverage.log
 
+      - name: 覆盖率趋势软门禁（RL-06：下降 >0.5 告警、>2 或 <80 失败）
+        run: |
+          set -o pipefail
+          mkdir -p .artifacts
+          coverage json -o .artifacts/coverage.json --include="desktop/src/core/*"
+          python scripts/coverage_trend.py --current .artifacts/coverage.json
+
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
         if: always()

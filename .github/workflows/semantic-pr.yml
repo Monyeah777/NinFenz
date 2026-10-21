@@ -1,0 +1,49 @@
+name: semantic-pr
+# CW-05：PR 标题必须带 Conventional Commits 前缀；合规后自动打类型标签。
+# 契约测试同源：scripts/check_pr_title.py（类型枚举与 CONTRIBUTING 一致）。
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: semantic-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  title:
+    name: pr-title-conventional
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - name: 校验标题（不合规即红）
+        id: check
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$PR_TITLE" | grep -Eq '^(feat|fix|docs|refactor|chore|test|perf|ci)(\([^)]+\))?!?: .+' ; then
+            echo "::error::PR 标题不合规：$PR_TITLE（应为 <type>(<scope>)?: <摘要>，type 见 CONTRIBUTING）"
+            exit 1
+          fi
+          TYPE=$(printf '%s' "$PR_TITLE" | sed -E 's/^([a-z]+).*/\1/')
+          echo "label=$TYPE" >> "$GITHUB_OUTPUT"
+          echo "PR 标题合规：type=$TYPE"
+      - name: 打类型标签
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: ${{ steps.check.outputs.label }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR" --add-label "$LABEL" || echo "标签 $LABEL 不存在，跳过打标（不阻断）"

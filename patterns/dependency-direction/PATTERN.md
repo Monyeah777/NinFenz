@@ -18,6 +18,8 @@ evidence:
   - protocol/coupling_baseline.json
 ---
 
+# 依赖方向：需要低层能力时由调用方注入
+
 ## 为什么
 
 稳定依赖原则（Martin）说：依赖必须指向**更稳定**的方向。NF 把它做成机检——每个

@@ -1,0 +1,234 @@
+{
+  "schema": "repo-doctor/1",
+  "tool": "scripts/repo_doctor.py",
+  "tool_version": "1.0.0",
+  "generated_at": "2026-10-21T11:13:52+08:00",
+  "root": ".",
+  "git": {
+    "head": "ed28a6d8",
+    "branch": "build/manual-main"
+  },
+  "score": 17.0,
+  "max_score": 17,
+  "percent": 100.0,
+  "groups": {
+    "Hygiene": {
+      "score": 4.0,
+      "max": 4,
+      "rules": [
+        "H1",
+        "H2",
+        "H3",
+        "H4"
+      ]
+    },
+    "Security": {
+      "score": 3.0,
+      "max": 3,
+      "rules": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "Basics": {
+      "score": 3.0,
+      "max": 3,
+      "rules": [
+        "B1",
+        "B2",
+        "B3"
+      ]
+    },
+    "Community": {
+      "score": 3.0,
+      "max": 3,
+      "rules": [
+        "C1",
+        "C2",
+        "C3"
+      ]
+    },
+    "Build": {
+      "score": 2.0,
+      "max": 2,
+      "rules": [
+        "D1",
+        "D2"
+      ]
+    },
+    "Reproducibility": {
+      "score": 2.0,
+      "max": 2,
+      "rules": [
+        "R1",
+        "R2"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "H1",
+      "group": "Hygiene",
+      "title": "gitignore 五类覆盖",
+      "status": "pass",
+      "detail": "五类各命中一条路径规则",
+      "extra": {
+        "rules": [
+          "依赖 -> .gitignore:14:node_modules/\tnode_modules/pkg/index.js",
+          "产物 -> .gitignore:24:/dist/\tdist/app.js",
+          "运行时 -> .gitignore:35:/logs/\tlogs/app.log",
+          "环境密钥 -> .gitignore:49:.env\t.env",
+          "编辑器 -> .gitignore:1:.DS_Store\t.DS_Store"
+        ]
+      }
+    },
+    {
+      "id": "H2",
+      "group": "Hygiene",
+      "title": "索引层零产物",
+      "status": "pass",
+      "detail": "索引层无产物路径（检查 3833 件）",
+      "extra": {}
+    },
+    {
+      "id": "H3",
+      "group": "Hygiene",
+      "title": "无虚拟环境入库",
+      "status": "pass",
+      "detail": "无虚拟环境入库，本地也没有残留环境目录",
+      "extra": {}
+    },
+    {
+      "id": "H4",
+      "group": "Hygiene",
+      "title": "仓库体积红线",
+      "status": "pass",
+      "detail": "tracked 32.96 MiB / 最大 protocol/generated/asset_contract.frictionless.json 2.87 MiB / .git 0.00 MiB",
+      "extra": {
+        "tracked_mb": 32.96,
+        "largest": {
+          "path": "protocol/generated/asset_contract.frictionless.json",
+          "mb": 2.87
+        },
+        "git_mb": 0.0,
+        "limits": {
+          "tracked_mb": 64.0,
+          "blob_mb": 5.0,
+          "git_mb": 256.0
+        },
+        "tracked_files": 3833
+      }
+    },
+    {
+      "id": "S1",
+      "group": "Security",
+      "title": "SECURITY.md 可报告通道",
+      "status": "pass",
+      "detail": "SECURITY.md 在场且有可报告通道（SECURITY.md）",
+      "extra": {}
+    },
+    {
+      "id": "S2",
+      "group": "Security",
+      "title": "明文密钥零命中",
+      "status": "pass",
+      "detail": "明文密钥扫描零命中",
+      "extra": {}
+    },
+    {
+      "id": "S3",
+      "group": "Security",
+      "title": "action 全 SHA 固定",
+      "status": "pass",
+      "detail": "全部 108 处 action 引用固定到 40 位提交 SHA",
+      "extra": {
+        "pinned_refs": 108
+      }
+    },
+    {
+      "id": "B1",
+      "group": "Basics",
+      "title": "README 定位与快速开始",
+      "status": "pass",
+      "detail": "README 有快速开始且中英双入口在场",
+      "extra": {}
+    },
+    {
+      "id": "B2",
+      "group": "Basics",
+      "title": "LICENSE",
+      "status": "pass",
+      "detail": "LICENSE 在场（LICENSE）",
+      "extra": {}
+    },
+    {
+      "id": "B3",
+      "group": "Basics",
+      "title": "行尾基线 .gitattributes",
+      "status": "pass",
+      "detail": ".gitattributes 声明 eol=lf",
+      "extra": {}
+    },
+    {
+      "id": "C1",
+      "group": "Community",
+      "title": "CONTRIBUTING",
+      "status": "pass",
+      "detail": "CONTRIBUTING 在场（CONTRIBUTING.md）",
+      "extra": {}
+    },
+    {
+      "id": "C2",
+      "group": "Community",
+      "title": "CODE_OF_CONDUCT",
+      "status": "pass",
+      "detail": "CODE_OF_CONDUCT 在场（CODE_OF_CONDUCT.md）",
+      "extra": {}
+    },
+    {
+      "id": "C3",
+      "group": "Community",
+      "title": "Issue + PR 模板",
+      "status": "pass",
+      "detail": "Issue 模板 5 件 + PR 模板在场",
+      "extra": {}
+    },
+    {
+      "id": "D1",
+      "group": "Build",
+      "title": "verify.sh 门禁入口",
+      "status": "pass",
+      "detail": "verify.sh 门禁入口在场（含 check12 分段）",
+      "extra": {}
+    },
+    {
+      "id": "D2",
+      "group": "Build",
+      "title": "CI 有 PR 触发",
+      "status": "pass",
+      "detail": "CI 有 pull_request 触发（ci-hygiene.yml）",
+      "extra": {}
+    },
+    {
+      "id": "R1",
+      "group": "Reproducibility",
+      "title": "requirements 精确钉版",
+      "status": "pass",
+      "detail": "4 份 requirements 全部精确钉版，主清单含 sha256 哈希",
+      "extra": {}
+    },
+    {
+      "id": "R2",
+      "group": "Reproducibility",
+      "title": "全 job timeout 保护",
+      "status": "pass",
+      "detail": "全部 42 个 job 都有 timeout-minutes",
+      "extra": {
+        "jobs": 42
+      }
+    }
+  ],
+  "missing": [],
+  "warnings": []
+}
