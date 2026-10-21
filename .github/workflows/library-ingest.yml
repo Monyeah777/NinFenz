@@ -24,6 +24,10 @@ jobs:
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          # 不在 .git/config 留 token（workflow_hardening 判据）；推送前脚本用一次性
+          # x-access-token URL 显式认证（见 library_ingest.py 推送前的 remote set-url）。
+          persist-credentials: false
       - name: 自动入库（解析 → 编号 → 写文件 → 更新 INDEX → 推送 → 回评）
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
