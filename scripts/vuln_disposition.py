@@ -3,18 +3,19 @@
 
 输入：
   --audit   pip-audit -f json 的产物
-  --disposition 处置表 results/audit/vuln-disposition.json（{accepted:[{id,reason,review_by}]}）
-判定：severity 为 high/critical 且不在 accepted 里 → FAIL（缺处置）；review_by 早于今天 → FAIL（过期）。
+  --disposition 处置表 results/audit/vuln-disposition.json
+               （{accepted:[{id,reason,review_by}]}）
+判定：high/critical 且不在 accepted 里 → FAIL（缺处置）；
+      review_by 早于今天 → FAIL（处置过期）。
 """
 import argparse
 import contextlib
 import datetime
-import json
 import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "desktop" / "src"))
-from core import json_doc  # noqa: E402
+from core import json_doc
 
 SEV = ("high", "critical")
 
@@ -52,18 +53,19 @@ def main(argv=None) -> int:
     for name, ver, vid, sev in findings(audit):
         rec = disp.get(str(vid).upper())
         if not rec:
-            problems.append("%s %s %s（%s）无处置记录" % (name, ver, vid, sev))
+            problems.append(f"{name} {ver} {vid}（{sev}）无处置记录")
             continue
         by = str(rec.get("review_by") or "")
         try:
             if datetime.date.fromisoformat(by) < today:
-                problems.append("%s 处置复核日期已过（review_by=%s）" % (vid, by))
+                problems.append(f"{vid} 处置复核日期已过（review_by={by}）")
         except ValueError:
-            problems.append("%s 处置缺合法 review_by（应为 YYYY-MM-DD）" % vid)
+            problems.append(f"{vid} 处置缺合法 review_by（应为 YYYY-MM-DD）")
     for p in problems:
         print("[FAIL] " + p)
     if not problems:
-        print("通过：依赖树无未登记/过期处置的高危或严重漏洞（%d 条 accepted）" % len(disp))
+        print("通过：依赖树无未登记/过期处置的高危或严重漏洞"
+              f"（{len(disp)} 条 accepted）")
     return 0 if not problems else 1
 
 

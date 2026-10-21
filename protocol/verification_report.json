@@ -494,7 +494,7 @@
       "source": "workflow_policy.scan",
       "stats": {
         "pinned_uses": 108,
-        "requirements_files": 4,
+        "requirements_files": 5,
         "with_explicit_permissions": 32,
         "workflows": 32
       },
@@ -521,14 +521,12 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 1,
+      "issues": 0,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [
-        "② protocol/role_coordinates.json 与实时重算不一致（记录 f74a2c469cdc / 实测 ad0b6675c58d）（修复指引：nf layers --write）"
-      ],
+      "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3865,
+        "files": 3866,
         "kernel": 1993,
         "kernel_no_self": 309,
         "rules": 9,
@@ -536,16 +534,16 @@
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     }
   ],
-  "root_digest": "408fae93b2702d7cd8799c4921a8bd2e4f77db6f71768be76eb3af0b170d25a9",
+  "root_digest": "ad149358707091d47e64bc02644fcf1e99e3b8701a40632d3f840d3e1cf915c0",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 28,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }

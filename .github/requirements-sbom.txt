@@ -1,0 +1,3 @@
+# SBOM / vulnerability scanning tools (SC-06). Pinned versions only; bump via PR.
+cyclonedx-bom==6.2.0
+pip-audit==2.7.3

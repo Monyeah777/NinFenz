@@ -1,6 +1,6 @@
 name: semantic-pr
 # CW-05：PR 标题必须带 Conventional Commits 前缀；合规后自动打类型标签。
-# 契约测试同源：scripts/check_pr_title.py（类型枚举与 CONTRIBUTING 一致）。
+# 类型枚举与 CONTRIBUTING 的提交类型表一致（内联 grep，不额外依赖脚本）。
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]

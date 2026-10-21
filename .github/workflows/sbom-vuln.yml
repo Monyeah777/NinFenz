@@ -37,7 +37,7 @@ jobs:
       - name: 生成 CycloneDX SBOM
         run: |
           set -euo pipefail
-          pip install cyclonedx-bom
+          pip install -r .github/requirements-sbom.txt
           cyclonedx-py requirements .github/requirements-ci.txt -o sbom.cdx.json
           ls -l sbom.cdx.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
@@ -61,7 +61,7 @@ jobs:
       - name: pip-audit 取漏洞树
         run: |
           set -euo pipefail
-          pip install pip-audit
+          pip install -r .github/requirements-sbom.txt
           pip-audit -r .github/requirements-ci.txt -f json -o audit.json || true
           test -s audit.json
       - name: 处置核对（高危/严重必须有 reason 与 review_by）

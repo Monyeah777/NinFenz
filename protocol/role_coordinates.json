@@ -1,12 +1,12 @@
 {
   "counts": {
     "app": 1454,
-    "entry": 25,
+    "entry": 26,
     "floor": 5,
     "prod": 1037,
-    "projection": 129,
-    "support": 236,
-    "verify": 946
+    "projection": 132,
+    "support": 260,
+    "verify": 951
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -11855,14 +11855,44 @@
       "rule": "R-verify"
     },
     {
+      "function": "新增/变更文件的体积拦截（CI-04）：只看**提交内容**，不看工作区。",
+      "path": "scripts/check_added_large_files.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "外部链接巡检（**非门禁** · 可选联网 · 只读）。",
       "path": "scripts/check_external_links.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "gitignore 覆盖度自检（FX-07）：按**路径**断言五类各自至少命中一条规则。",
+      "path": "scripts/check_gitignore_coverage.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Markdown 内链检查（DC-06）：仓内相对链接 404 直接失败；外链不在这里判（见 external-links.yml）。",
+      "path": "scripts/check_internal_links.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "互操作导出面的**外部权威校验**（非门禁 · 可选联网 · 只读）。",
       "path": "scripts/check_interop_schemas.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "卫生项专项（MT-02）：gitignore 覆盖度 / 未提交虚拟环境 / 仓库体积 三项进 CI。",
+      "path": "scripts/check_repo_hygiene.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "索引层产物检查（FX-06）：产物路径重新进入索引即失败。",
+      "path": "scripts/check_untracked_artifacts.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11940,16 +11970,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f74a2c469cdcbadd68f1ad724371bcd574e22ffb565d266edb30b6e56b29e886",
+  "root_digest": "fce2975efad6838a64f3e5d13de2fb5123a752b6515b8b276c8318f686fe47f7",
   "rule_counts": {
     "R-app": 1454,
-    "R-catch": 91,
-    "R-entry": 25,
+    "R-catch": 99,
+    "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 114,
-    "R-support": 120,
-    "R-verify": 830,
+    "R-projection": 117,
+    "R-support": 136,
+    "R-verify": 835,
     "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"

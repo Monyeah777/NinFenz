@@ -13,6 +13,8 @@
 #   docs/examples/**            示例产物（演示用渲染结果，不是说明文档）
 #   .github/ISSUE_TEMPLATE/**   平台表单/模板（fragment，由平台 schema 与 CW-01 判据守）
 #   .github/PULL_REQUEST_TEMPLATE.md  同上
+#   desktop/tests/fixtures/**   字节级测试夹具（roundtrip 必须逐字节还原；改一个字节就会让
+#                               test_import_adapter 的 byte-exact 判据失效——它们不是文档）
 # 用法：bash scripts/check_markdown_structure.sh [--fix]
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
@@ -20,7 +22,8 @@ VERSION="markdownlint-cli2@0.23.3"
 ARGS=( "**/*.md"
        "#community/**" "#packaging/npm/payload/**" "#results/**" "#library/NF-*.md"
        "#docs/standards/**" "#changes/**" "#docs/examples/**"
-       "#.github/ISSUE_TEMPLATE/**" "#.github/PULL_REQUEST_TEMPLATE.md" )
+       "#.github/ISSUE_TEMPLATE/**" "#.github/PULL_REQUEST_TEMPLATE.md"
+       "#desktop/tests/fixtures/**" )
 FIX=""
 [ "${1:-}" = "--fix" ] && FIX="--fix"
 if command -v markdownlint-cli2 >/dev/null 2>&1; then
