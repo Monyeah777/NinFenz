@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:d0e080decbab9c39d75e38b2ff362ccb7e0a518525da15a984844d8acedb0030
+  - protocol/code_metrics_baseline.json:54356415382fef20fb2e8f208f9252e29374416c51afc50c4c5fe09fc3220be8
 ---
+> 重审（2026-10-21）：locales html 1
+
 > 重审（2026-10-21）：readme head 1
 
 > 重审（2026-10-21）：1.0.5 收口 1
