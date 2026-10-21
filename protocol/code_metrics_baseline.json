@@ -631,9 +631,9 @@
       "max_fn_lines": 17
     },
     "desktop/src/core/locales.py": {
-      "lines": 296,
-      "max_fn_cc": 54,
-      "max_fn_lines": 132
+      "lines": 315,
+      "max_fn_cc": 53,
+      "max_fn_lines": 133
     },
     "desktop/src/core/lsp.py": {
       "lines": 712,
