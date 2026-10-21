@@ -1,7 +1,11 @@
 # NinFenz · 文档生成工坊（规范驱动）
 
-<!-- nf:locales --> 语言 / Languages：**[中文](README.md)** · [English](README.en.md) · [日本語](README.ja.md)
-
+<!-- nf:locales --> 语言 / Languages：
+<div align="center">
+  <a href="README.md">简体中文</a> | 
+  <a href="README.en.md">English</a> | 
+  <a href="README.ja.md">日本語</a>
+</div>
 > **唯一官方仓库**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
 > 其他账号下的同名仓库均为**未经授权的镜像快照**，不代表本项目，也不接受 Issue/PR。
 
