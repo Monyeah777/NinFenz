@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:54356415382fef20fb2e8f208f9252e29374416c51afc50c4c5fe09fc3220be8
+  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
 ---
+> 重审（2026-10-21）：diag shard 1
+
 > 重审（2026-10-21）：locales html 1
 
 > 重审（2026-10-21）：readme head 1
