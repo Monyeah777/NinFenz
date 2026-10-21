@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-21",
   "approved_by": "lead",
-  "note": "wave4/5/6 方案与 preflight/pruned/rulings/deviations 登记件落地",
+  "note": "登记件 HEAD 同步后重签",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "56e8e46897ee7df6dba57c65d1851010b23321ba01998d4f802415cbcf2b615b"

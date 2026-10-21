@@ -6,9 +6,9 @@
 
 ## 1. 快照（P1，2026-10-21）
 
-- head：43a382cc（本分支；基线 origin/main=9f0e7386）
+- head：53054dfe（本分支；基线 origin/main=9f0e7386）
 - branch：build/manual-main；dirty_lines：0
-- root_entries：67；file_count：3866
+- root_entries：67；file_count：3875
 - 关键文件在位：README(155 行)、LICENSE、AGENTS.md、CHANGELOG、verify.sh、CONTRIBUTING、SECURITY、.gitignore、.gitattributes、.editorconfig、.pre-commit-config.yaml、.markdownlint.json、.env.example、.github/CODEOWNERS
 - 明细见 docs/ops/preflight.json
 

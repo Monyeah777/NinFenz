@@ -1,11 +1,11 @@
 {
   "checked_at": "2026-10-21T11:31:40+08:00",
-  "head": "43a382ccfb11dfba1fe1940aca9832b8f52b0cbe",
+  "head": "53054dfe7b5b1d8cc05d7ebfb0175310c7249751",
   "branch": "build/manual-main",
   "dirty_lines": 0,
   "last_commit_at": "2026-10-21T11:22:17+08:00",
   "root_entries": 67,
-  "file_count": 3866,
+  "file_count": 3875,
   "key_files": {
     "README.md": {
       "exists": true,
