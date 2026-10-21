@@ -1445,11 +1445,6 @@
       "max_fn_cc": 13,
       "max_fn_lines": 39
     },
-    "scripts/renumber_versions_0x.py": {
-      "lines": 133,
-      "max_fn_cc": 4,
-      "max_fn_lines": 14
-    },
     "scripts/rewrite_text.py": {
       "lines": 136,
       "max_fn_cc": 9,
@@ -1479,11 +1474,6 @@
       "lines": 180,
       "max_fn_cc": 19,
       "max_fn_lines": 36
-    },
-    "scripts/sync_readme_versions.py": {
-      "lines": 151,
-      "max_fn_cc": 3,
-      "max_fn_lines": 21
     },
     "scripts/verify_cache.py": {
       "lines": 156,
