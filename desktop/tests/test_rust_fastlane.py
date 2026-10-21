@@ -521,7 +521,8 @@ class RustFastLaneParityTest(unittest.TestCase):
         """
         from core import verify_report as vr  # noqa: PLC0415
 
-        native = {"schema",
+        native = {"rating_decided",
+                  "schema",
  "doc_markers",
  "baseline",
  "self_stats",

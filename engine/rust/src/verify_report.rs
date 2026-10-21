@@ -4,9 +4,12 @@
 //! 逐条归一到 `(issues, warns, stats)` → 定 status → 汇总 counts + 声明面 → 主体规范化 sha256 作
 //! `root_digest`（报告被手改即对不上）→ 按 `indent=2, sort_keys=True` 渲染。
 //!
-//! **本线已自主算出 4/28 条**（`schema` / `doc_markers` / `baseline` / `self_stats`），
-//! 其余 24 条由 `--results` 喂入各自的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一
-//! 增量法：每移植一个扫描器，喂入面就小一格，内核不动。
+//! **本线已自主算出 26/31 条**，其余 5 条由 `--results` 喂入各自的 `(issues, warns, stats)`
+//! ——与 `score` 的 `--signals` 同一增量法：每移植一个扫描器，喂入面就小一格，内核不动。
+//!
+//! 喂入的 5 条：`redos` / `instruction_evidence` / `perf_budget` / `asset_contract` /
+//! `role_coordinates`（`asset_contract` 为**已裁定**退出原生面，见 `docs/asset_contract.md`）。
+//! ⚠️ 数字**不得凭记忆手写**：以 `engine/rust/tools/check_native_sync.py` 实测输出为准。
 //!
 //! **口径提醒**：`root_digest` 的源串用 CPython **默认分隔符**（`", "` / `": "`，带空格），
 //! 不是紧凑模式——差一个空格摘要就全变（见 `pyjson::dumps_default`）。
@@ -273,6 +276,17 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
                 issues: w.issues,
                 warns: w.warns,
                 stats: w.stats,
+            })
+        }
+        "rating_decided" => {
+            // Z3：`scan` 判「声明在场且合词表」（显式 unrated 也算合格 ⇒ 覆盖率恒 100%）；
+            // 本判据判第二层：只声明未定级的件算不算数（`rating.allow_unrated` fail-closed）。
+            let got = crate::rating_gate::decided(root);
+            Some(Called {
+                status: status_of(&got.issues, &[]),
+                issues: got.issues,
+                warns: Vec::new(),
+                stats: got.stats,
             })
         }
         "rating" => {
