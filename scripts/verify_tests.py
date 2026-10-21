@@ -430,6 +430,18 @@ def main(argv=None) -> int:
         else:
             print("  分片 %s：测试 %d · %.1f s · rc=%d" % (args.shard, res["tests"],
                                                         res["wall"], res["rc"]))
+        # 2026-10-21：CI 上分片红只看到 rc=1（unittest 明细被 subprocess 捕获吞掉），
+        # 诊断成本极高。失败时把「失败用例名 + 末段堆栈」打到 stderr，job 日志可直接读。
+        if res["rc"] != 0:
+            out = res.get("out") or ""
+            marks = [ln for ln in out.splitlines()
+                     if ln.startswith(("FAIL:", "ERROR:")) or "AssertionError" in ln]
+            print("---- 分片 %s 失败用例（最多 20 行）----" % args.shard, file=sys.stderr)
+            for ln in marks[:20]:
+                print("  " + ln.strip(), file=sys.stderr)
+            print("---- 分片 %s 末 40 行 ----" % args.shard, file=sys.stderr)
+            for ln in out.splitlines()[-40:]:
+                print("  " + ln.rstrip(), file=sys.stderr)
         return 0 if res["rc"] == 0 else 1
 
     if args.mods:
