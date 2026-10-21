@@ -30,6 +30,10 @@ jobs:
     name: static-checks-42
     runs-on: ubuntu-latest
     timeout-minutes: 30          # 挂死上限（2026-10-01 统一：CI 不许把 runner 占满 6h 默认）
+    env:
+      # 2026-10-21 实测：Ubuntu runner 无 display，PySide6 默认平台插件会直接 abort，
+      # 连带 check17/18/19/21/22 的 unittest 全红。offscreen 是无头环境的标准口径。
+      QT_QPA_PLATFORM: offscreen
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -84,6 +88,8 @@ jobs:
   unit-tests:
     name: unit-tests-${{ matrix.shard }}-of-32
     runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
     timeout-minutes: 30
     strategy:
       fail-fast: false          # 单片红不影响其余片跑完——诊断信息越多越好；汇总由 gate 判
