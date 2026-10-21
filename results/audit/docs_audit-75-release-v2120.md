@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:9a37e864f0267cdab1a648c7bc3120a2de4bf9307255cce7eb08d2d2c52e52c5
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:5fda431f9bd738d429b20e55987d605f7ddb126807fa50ad673e08db6270d686
+  - README.md:73e9d449aacf85caf2be2ebf2d6098f6b7139bd430eaa300ad251dd50bfb0f20
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
 
 ---
+> 重审（2026-10-21）：readme head 1
+
 > 重审（2026-10-21）：1.0.5 收口 1
 
 > 重审（2026-10-21）：README 官方源声明与演示帧重建
