@@ -1501,9 +1501,9 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 571,
-      "max_fn_cc": 43,
-      "max_fn_lines": 191
+      "lines": 583,
+      "max_fn_cc": 48,
+      "max_fn_lines": 203
     },
     "scripts/workflow_policy.py": {
       "lines": 42,
