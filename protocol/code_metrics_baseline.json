@@ -631,7 +631,7 @@
       "max_fn_lines": 17
     },
     "desktop/src/core/locales.py": {
-      "lines": 295,
+      "lines": 296,
       "max_fn_cc": 54,
       "max_fn_lines": 132
     },
