@@ -1,0 +1,90 @@
+[
+  {
+    "id": "FX-06",
+    "kind": "stricter",
+    "what": "补 check_untracked_artifacts.py（索引层产物逐条扫）并接入 ci-hygiene/repo-health",
+    "why": "判据判词 PASS 只代表当时干净，不能防止回潮；要的是可重复判定",
+    "impact": "任何产物路径被 git add 即红（误报可用该脚本的 --json 定位）",
+    "revert": "删 scripts/check_untracked_artifacts.py 及两处 workflow 步；其余判定不受影响"
+  },
+  {
+    "id": "FX-07",
+    "kind": "stricter",
+    "what": "check_gitignore_coverage.py 用 git check-ignore 实测五类样例，而不是 grep 规则文本",
+    "why": "手册禁止「文本匹配 gitignore」伪解，必须实测忽略行为",
+    "impact": "规则存在但样例不命中也会红",
+    "revert": "删脚本 + ci-hygiene 的 gitignore-coverage 步"
+  },
+  {
+    "id": "DC-06",
+    "kind": "stricter",
+    "what": "内链 404 必红（存量欠账走 baseline），外链仍为失败即红（手册要求仅告警）",
+    "why": "内链是确定性问题应挡；外链当前实现比手册更严",
+    "impact": "外链偶发 5xx 会让 docs-links/external-links 变红，需人工重跑",
+    "revert": "把 external-links.yml 的失败步改为 continue-on-error: true 即回到手册口径"
+  },
+  {
+    "id": "CW-01",
+    "kind": "stricter",
+    "what": "blank_issues_enabled: false + 3 个 contact_links",
+    "why": "模板必填只对表单生效；空白 Issue 会绕开必填项",
+    "impact": "用户必须先读分流说明才能提问",
+    "revert": "删 .github/ISSUE_TEMPLATE/config.yml"
+  },
+  {
+    "id": "SC-09",
+    "kind": "extra",
+    "what": "release.yml 生成 SHA256SUMS 并随 Release 发布（cosign 签名 + provenance attestation 同链）",
+    "why": "判据要「制品可验证来源」，只有校验和不足以证明来源",
+    "impact": "发布线需 OIDC（id-token/attestations 写权限），仅 v1.* tag 触发",
+    "revert": "删 release.yml 的签名/attestation/Release 步，只留 sha256sum"
+  },
+  {
+    "id": "RL-05",
+    "kind": "extra",
+    "what": "docker-nfal 增 GHCR 推送（tag/手动）+ README docker pull 行",
+    "why": "判据要「别人能拿到镜像」，只 build 不 push 无法取用",
+    "impact": "需要 packages: write；fork 触发时自动跳过",
+    "revert": "删登录/推送两步与 README 取用段"
+  },
+  {
+    "id": "SC-06",
+    "kind": "extra",
+    "what": "新增 .github/requirements-sbom.txt 并扩 test_ci_supply_chain 的清单集合断言",
+    "why": "pip 安装必须走固定清单（仓库已有硬约束），新工具要有自己的清单",
+    "impact": "requirements 清单集合变化会让该测试红（这是有意的守卫）",
+    "revert": "删 requirements-sbom.txt，把测试集合改回 4 项，cbom workflow 改回裸 pip"
+  },
+  {
+    "id": "FX-14",
+    "kind": "alternative",
+    "what": "markdownlint 排除 desktop/tests/fixtures/**",
+    "why": "夹具是逐字节 roundtrip 数据，补行尾换行会破坏 test_import_adapter 的 byte-exact 判据",
+    "impact": "夹具自身结构不做 lint；其正确性由 roundtrip 测试守",
+    "revert": "删 check_markdown_structure.sh 的排除项并恢复夹具字节（会立即红，见 §F 记录）"
+  },
+  {
+    "id": "FX-12",
+    "kind": "alternative",
+    "what": "保留根目录 .editorconfig（不搬 .config/）",
+    "why": "编辑器只认根级/就近文件；搬进 .config/ 主流编辑器不读",
+    "impact": "SP-02「配置收纳」的根目录条目数因此不降",
+    "revert": "删除 .editorconfig；各编辑器回退各自配置"
+  },
+  {
+    "id": "CI-07",
+    "kind": "alternative",
+    "what": "写型工作流统一 concurrency group=library-write（release 并入）",
+    "why": "workflow_hardening 判据要求写同一分支的工作流共享并发组，避免并发写",
+    "impact": "release 与入库串行；发布期间入库排队",
+    "revert": "release.yml 改回 release-${{ github.ref }}（会红）"
+  },
+  {
+    "id": "RL-02",
+    "kind": "alternative",
+    "what": "CHANGELOG 顶部改 ## [Unreleased] 并把 23 条 bullet 分入 Added/Changed/Removed/Fixed",
+    "why": "手册要求 Unreleased+六类；仓库原为「未发布」单段堆叠",
+    "impact": "Deprecated/Security 空类不出现（按需使用）；release_gate 的版本节解析不受影响",
+    "revert": "把标题改回 ## [未发布] 并去掉 ### 分类行（内容行数不变，可逆）"
+  }
+]

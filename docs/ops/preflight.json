@@ -1,0 +1,105 @@
+{
+  "checked_at": "2026-10-21T11:31:40+08:00",
+  "head": "43a382ccfb11dfba1fe1940aca9832b8f52b0cbe",
+  "branch": "build/manual-main",
+  "dirty_lines": 0,
+  "last_commit_at": "2026-10-21T11:22:17+08:00",
+  "root_entries": 67,
+  "file_count": 3866,
+  "key_files": {
+    "README.md": {
+      "exists": true,
+      "bytes": 11954
+    },
+    "LICENSE": {
+      "exists": true,
+      "bytes": 1067
+    },
+    "AGENTS.md": {
+      "exists": true,
+      "bytes": 6291
+    },
+    "CHANGELOG.md": {
+      "exists": true,
+      "bytes": 605161
+    },
+    "verify.sh": {
+      "exists": true,
+      "bytes": 175570
+    },
+    "CONTRIBUTING.md": {
+      "exists": true,
+      "bytes": 18930
+    },
+    "SECURITY.md": {
+      "exists": true,
+      "bytes": 4457
+    },
+    ".gitignore": {
+      "exists": true,
+      "bytes": 3450
+    },
+    ".gitattributes": {
+      "exists": true,
+      "bytes": 1278
+    },
+    ".editorconfig": {
+      "exists": true,
+      "bytes": 697
+    },
+    ".pre-commit-config.yaml": {
+      "exists": true,
+      "bytes": 1328
+    },
+    ".markdownlint.json": {
+      "exists": true,
+      "bytes": 713
+    },
+    ".env.example": {
+      "exists": true,
+      "bytes": 384
+    },
+    ".github/CODEOWNERS": {
+      "exists": true,
+      "bytes": 997
+    }
+  },
+  "drift": [
+    {
+      "id": "SP-01",
+      "kind": "changed",
+      "note": "手册快照 53 条 / 超白名单 21；现测 67 条（本轮新增 .editorconfig/.env.example/.pre-commit-config.yaml/.markdownlint.json）"
+    },
+    {
+      "id": "RL-01",
+      "kind": "changed",
+      "note": "版本形态由三段式改为 0.xx 单序列 + 1.0.x（作者裁决），手册字面为 MAJOR.MINOR.PATCH"
+    },
+    {
+      "id": "CI-01",
+      "kind": "changed",
+      "note": "手册点名 ci.yml/security.yml/release.yml；现仓以 ci-verify/ci-hygiene/sast... 承载，release.yml 本轮补齐"
+    },
+    {
+      "id": "FX-06",
+      "kind": "changed",
+      "note": "索引层已由 check_untracked_artifacts.py + ci-hygiene 覆盖（原判词 PASS，实测需可重复检查）"
+    },
+    {
+      "id": "RP-01",
+      "kind": "changed",
+      "note": "About 三项已由 main 设置（description/homepage/topics）"
+    },
+    {
+      "id": "GF-10",
+      "kind": "changed",
+      "note": "NarrativeForge 残留 5 文件仍存在（改名未收尾）"
+    }
+  ],
+  "anchors": {
+    "manual_sha256": "57cf37d7de3b12b409bfed51aae7ab69cf9c89228b98cc4b82f1fb301f93f583",
+    "manual_items": 105,
+    "baseline_head": "2a94759e",
+    "base_branch": "main"
+  }
+}

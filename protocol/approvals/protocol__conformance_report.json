@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-21",
   "approved_by": "lead",
-  "note": "wave3 收口重签",
+  "note": "wave4/5/6 方案与 preflight/pruned/rulings/deviations 登记件落地",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "6b11ada692f6457e701534dbcef42de2b6576a4500c4b2b50c91f1ca384dae67"
+  "subject_digest": "56e8e46897ee7df6dba57c65d1851010b23321ba01998d4f802415cbcf2b615b"
 }

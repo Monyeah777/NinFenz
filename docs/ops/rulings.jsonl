@@ -1,0 +1,74 @@
+{"id": "BR-04", "ruling": "exec", "reason_code": "", "evidence": "CODEOWNERS 24 行：* + 8 个敏感面逐条 @Monyeah777（映射表见 ledger 说明）；账号权限状态 unverified（无 gh）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "BR-05", "ruling": "exec", "reason_code": "", "evidence": "新增 scripts/check_workflow_permissions.py（顶层 write 或缺 permissions 即 FAIL，18/18 通过）；写权限下沉到 job：npm-publish(id-token)/gitee-poll(contents)/library-ingest", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-01", "ruling": "amend", "reason_code": "", "evidence": "32 个工作流按目的分类", "note": "", "at": "2026-10-21T11:32:15+08:00", "from": "ci.yml / security.yml / release.yml 三名", "to": "ci-verify + ci-hygiene 承载 CI；sast/codeql/gitleaks/dependency-review/sbom-vuln 承载 security；release.yml 已补"}
+{"id": "CI-02", "ruling": "exec", "reason_code": "", "evidence": "ci-hygiene.yml 有 pre-commit-all-files job（钩子缓存 key 含配置 hash，不许 continue-on-error）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-03", "ruling": "exec", "reason_code": "", "evidence": ".pre-commit-config.yaml 五条最低钩子 + commit-msg 机检", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-04", "ruling": "exec", "reason_code": "", "evidence": "large-files.yml + scripts/check_added_large_files.py（阈值 1MiB；本地实跑通过）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-05", "ruling": "exec", "reason_code": "", "evidence": "9 个 pip 安装工作流全部带 actions/setup-python cache: pip + requirements 依赖路径（9/9）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-06", "ruling": "exec", "reason_code": "", "evidence": "32 个工作流共 42 处 timeout-minutes（每个 workflow 至少 1 处）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-07", "ruling": "exec", "reason_code": "", "evidence": "32/32 workflow 有 concurrency（写型统一 library-write，读型 workflow+ref）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CI-08", "ruling": "amend", "reason_code": "", "evidence": "requirements-ci.txt 全带 sha256", "note": "", "at": "2026-10-21T11:32:15+08:00", "from": "npm ci 要求有 lockfile", "to": "本仓 npm 包无 package-lock.json，npm ci 前置不成立；改为「安装不改写受跟踪件」判据 + pip --require-hashes"}
+{"id": "CW-01", "ruling": "exec", "reason_code": "", "evidence": "新增 ISSUE_TEMPLATE/config.yml（blank_issues_enabled: false + 3 个 contact_links）；required: true 计数 bug=8/feature=4", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-02", "ruling": "exec", "reason_code": "", "evidence": "PULL_REQUEST_TEMPLATE.md 四必答+门禁自检+Fixes", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-03", "ruling": "exec", "reason_code": "", "evidence": "commit_msg_check.py + pre-commit commit-msg 钩子；CONTRIBUTING 10 行 type 表", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-04", "ruling": "exec", "reason_code": "", "evidence": "可指认纯格式化提交 97f8c928/3fb22f7b；changes/unreleased 单主题片段", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-05", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/semantic-pr.yml：标题前缀内联校验 + 合规后 gh pr edit 打类型标签", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-06", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/welcome.yml：first-interaction v1（SHA 锁）对首个 Issue/PR 欢迎，带 concurrency 与写权限下沉", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "DC-01", "ruling": "exec", "reason_code": "", "evidence": "README 155 行（<=300）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "DC-04", "ruling": "exec", "reason_code": "", "evidence": "llms.txt 104 行：定位+入口链+协议 raw 链接（本轮未改）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "DC-05", "ruling": "exec", "reason_code": "", "evidence": "AGENTS.md 49 行约束 + 追加治理文档入口段", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "DC-07", "ruling": "exec", "reason_code": "", "evidence": "mermaid-check.yml + scripts/check_mermaid.mjs（node 编译全部 .mmd/.md 图表）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "DC-08", "ruling": "exec", "reason_code": "", "evidence": "docs/meta/DOC-AUDIT.md：5 条命令可直接执行 + 5 个数字来源表", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FG-01", "ruling": "exec", "reason_code": "", "evidence": "issue-guard.yml + scripts/issue_guard.py（空白/模板外 Issue 拦截并说明缺什么）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FG-02", "ruling": "exec", "reason_code": "", "evidence": "AGENTS.md 硬性闸门 + verify fail-closed", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FG-03", "ruling": "exec", "reason_code": "", "evidence": "sensitive-guard.yml + scripts/sensitive_scan.py + sensitive_patterns.json（命中即打标/转私密）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FG-04", "ruling": "exec", "reason_code": "", "evidence": "docs/meta/UNVERIFIED.md：3 条现存不一致 + 失效判据 + 发布前抽查纪律；AGENTS 入口引用", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-01", "ruling": "exec", "reason_code": "", "evidence": "五类依赖目录 check-ignore 逐条命中；索引命中 0", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-02", "ruling": "exec", "reason_code": "", "evidence": "产物类全覆盖且根级锚定；误伤负例 packaging/npm/bin NOT-IGNORED；索引 0", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-03", "ruling": "exec", "reason_code": "", "evidence": "*.log/logs/*.db/*.sqlite*/*.pid/tmp/*.cache 逐条命中；索引 0", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-04", "ruling": "exec", "reason_code": "", "evidence": "双向实测：.env/.env.local 忽略、.env.example NOT-IGNORED；模板全占位", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-05", "ruling": "exec", "reason_code": "", "evidence": ".vscode/.idea/Thumbs.db/desktop.ini 全命中；整目录忽略取舍理由成文", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-06", "ruling": "amend", "reason_code": "", "evidence": "脚本实跑 0 命中；ci-hygiene 每次跑", "note": "", "at": "2026-10-21T11:32:15+08:00", "from": "索引层产物为 0（判词 PASS）", "to": "PASS 只说明当时干净，不构成可重复判定；本轮补 check_untracked_artifacts.py + CI 接线"}
+{"id": "FX-07", "ruling": "exec", "reason_code": "", "evidence": "scripts/check_gitignore_coverage.py 用 git check-ignore 实测五类样例全命中，接入 ci-hygiene", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-08", "ruling": "exec", "reason_code": "", "evidence": "*.gitattributes: * text=auto eol=lf；git ls-files --eol 文本件全部 i/lf", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-09", "ruling": "exec", "reason_code": "", "evidence": "*.sh/*.bash text eol=lf 显式声明；.bat 保留 eol=crlf（唯一平台例外）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-10", "ruling": "exec", "reason_code": "", "evidence": "12 条二进制声明在场（png/jpg/jpeg/ico/gif/gz/zip/pdf/woff/woff2/ttf）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-11", "ruling": "exec", "reason_code": "", "evidence": "git archive 产物 .github/.editorconfig/.env.example/.pre-commit 计数=0（export-ignore 生效）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-12", "ruling": "exec", "reason_code": "", "evidence": ".editorconfig root=true：charset/end_of_line/insert_final_newline/trim/indent 基线段全场", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-13", "ruling": "exec", "reason_code": "", "evidence": ".editorconfig 覆写段：py/cs/rs/toml=4、Makefile=tab、md trim off；基线 [*] 未改", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-14", "ruling": "exec", "reason_code": "", "evidence": ".markdownlint.json 显式启用 MD001/009/025/041/047 + scripts/check_markdown_structure.sh 单入口 + ci-hygiene markdownlint job（本地实跑 0 issues）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "FX-15", "ruling": "exec", "reason_code": "", "evidence": ".markdownlint.json MD013=false 且理由成文；其余结构规则显式开", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-01", "ruling": "exec", "reason_code": "", "evidence": "README 155 行（<=300）；徽章/图 4 个；快速开始命令实跑：python scripts/nf.py --version -> nf 1.0.5", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-02", "ruling": "exec", "reason_code": "", "evidence": "LICENSE MIT 21 行；API About license=MIT；README License 行三处一致", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-03", "ruling": "exec", "reason_code": "", "evidence": "CONTRIBUTING 追加「评审预期时长」（首次响应 3 工作日/超期 14+30 天处理）+ Conventional 正反示例", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-04", "ruling": "exec", "reason_code": "", "evidence": "SECURITY 追加 Supported Versions 三线与 SLA（首次响应 3 工作日；修复不承诺固定天数；7 天披露）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-05", "ruling": "exec", "reason_code": "", "evidence": "CODE_OF_CONDUCT.md 在场（举报渠道/处置/申诉）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-06", "ruling": "exec", "reason_code": "", "evidence": "SUPPORT.md 三分流在场；Discussions 未开已写替代通道", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-07", "ruling": "exec", "reason_code": "", "evidence": ".github/GOVERNANCE.md：BDFL 事实 + 决策路径 + 可观测触发条件（3 条）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-08", "ruling": "exec", "reason_code": "", "evidence": ".github/FUNDING.yml 只有注释（无平台键，不显示 Sponsor）+ SUPPORT 显式「暂无赞助通道」", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "GF-09", "ruling": "exec", "reason_code": "", "evidence": "MAINTAINERS 追加职责/晋升三条件/180 天不活跃移除 + 30 天确认", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "HS-03", "ruling": "exec", "reason_code": "", "evidence": "git count-objects -vH：size-pack 26.23 MiB；最大 3.01MB（<1GB 目标/<5GB 硬限）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "MT-01", "ruling": "exec", "reason_code": "", "evidence": "scripts/repo_doctor.py 17/17 PASS（实跑 100%）；repo-health.yml 定时跑", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "MT-02", "ruling": "exec", "reason_code": "", "evidence": "卫生专项工作流成组：ci-hygiene / repo-health / docs-links / mermaid-check / large-files（各自独立红）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "MT-03", "ruling": "exec", "reason_code": "", "evidence": "scorecard.yml（周更 + 5 jobs，SHA 锁，SARIF 上传）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "MT-04", "ruling": "exec", "reason_code": "", "evidence": "docs/meta/SCORECARD-SEMANTICS.md + SECURITY 评分行补限定语（过程评分，不衡量功能正确性）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RL-02", "ruling": "exec", "reason_code": "", "evidence": "## [Unreleased] + Added/Changed/Removed/Fixed 分类；23 bullets 分桶，非空行 2808→2812（+4 分类标题）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RL-04", "ruling": "exec", "reason_code": "", "evidence": "release.yml 用原生 generate_release_notes（Conventional Commits 起草）+ 人工校对通道", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RL-05", "ruling": "exec", "reason_code": "", "evidence": "docker-nfal.yml 增 GHCR 推送（tag/手动，packages: write 下沉到 job）+ README 增 docker pull 行", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RL-06", "ruling": "exec", "reason_code": "", "evidence": "coverage.yml 增覆盖率趋势软门禁（scripts/coverage_trend.py：>0.5 告警、>2 或 <80 失败；基线 results/audit/coverage-baseline.json）；实跑 pass/warn/fail 三档", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RL-07", "ruling": "exec", "reason_code": "", "evidence": "docs/meta/RELEASE-CADENCE.md：23 个 tag 的日期与间隔表（git tag 生成）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-01", "ruling": "exec", "reason_code": "", "evidence": "dependabot 9 条目：github-actions/pip×2/npm/cargo×2/docker×2（根 + packaging/nfal）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-02", "ruling": "exec", "reason_code": "", "evidence": "dependabot 分组：actions-minor-patch / pip-minor-patch（major 不分组）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-03", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/dependency-review.yml（v4 SHA 锁，PR 阶段依赖审查）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-04", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/codeql.yml（v3 SHA 锁，python/javascript 双语言 + SARIF 上传）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-05", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/gitleaks.yml + .github/gitleaks.toml；另有 sensitive-guard.yml 推送前/后兜底", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-06", "ruling": "exec", "reason_code": "", "evidence": ".github/workflows/sbom-vuln.yml：CycloneDX SBOM 归档 + pip-audit 处置核对（scripts/vuln_disposition.py + results/audit/vuln-disposition.json，review_by 过期即 FAI", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-07", "ruling": "exec", "reason_code": "", "evidence": "release.yml 用 actions/attest-build-provenance v2 对 SHA256SUMS 出 provenance（验证端 gh attestation verify）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-08", "ruling": "exec", "reason_code": "", "evidence": "release.yml 用 sigstore/cosign-installer + cosign sign-blob --yes keyless 签 SHA256SUMS；WARN 说明 cosign 本地缺位仍由 check41/42 记录", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-09", "ruling": "exec", "reason_code": "", "evidence": "release.yml 生成 dist/SHA256SUMS（sha256sum 排序可复现）并随 Release 发布", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "SC-10", "ruling": "exec", "reason_code": "", "evidence": "61 处 uses 全部锁 40 位 SHA（unpinned=0）", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "CW-08", "ruling": "reject", "reason_code": "D2", "from": "单人仓库无 merge queue 平台能力（GitHub merge queue 需组织/并发 PR）", "to": "", "evidence": "单人仓库无 merge queue 平台能力（需组织级分支保护 + 并发 PR）", "alternative": "保留单人单 PR 串行节奏；分支保护勾选项见 docs/ops/manual-actions.md", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "HS-01", "ruling": "reject", "reason_code": "D2", "from": "仓库无二进制大件（最大文件 3.01MB 为文本 JSON），无 LFS 对象", "to": "", "evidence": "无二进制大件，LFS 前提不成立", "alternative": "large-files.yml 1MiB 拦截 + gitignore 五类 + count-objects 体积记录", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "HS-02", "ruling": "reject", "reason_code": "D2", "from": "无 >100MB blob，历史清理前提不成立", "to": "", "evidence": "无 >100MB blob，历史清理前提不成立", "alternative": "同上 + HS-03 体积记录；若将来出现按 §3.5 先停问作者", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "HS-04", "ruling": "reject", "reason_code": "D2", "from": "HS-02 未执行，无历史改写收尾对象", "to": "", "evidence": "HS-02 未执行，无历史改写收尾对象", "alternative": "本轮不做历史改写；将来若做，收尾检查清单随改写脚本一起交付", "note": "", "at": "2026-10-21T11:32:15+08:00"}
+{"id": "RP-05", "ruling": "reject", "reason_code": "D2", "from": "未部署公网/无在线 Demo，落地页判据前提不成立", "to": "", "evidence": "未部署公网/无在线 Demo，落地页判据前提不成立", "alternative": "README 定位段 + llms.txt + GitHub About 三项作为等价入口", "note": "", "at": "2026-10-21T11:32:15+08:00"}

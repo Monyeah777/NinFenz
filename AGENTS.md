@@ -56,3 +56,10 @@
 - 已知不一致 / 未复验：`docs/meta/UNVERIFIED.md`（修复后必须删条目）
 - 文档命令与数字抽查：`docs/meta/DOC-AUDIT.md`
 - workflow 权限台账：`docs/meta/WORKFLOW-PERMISSIONS.md`
+
+## 施工登记件（BUILD_MANUAL 执行记录）
+
+- 台账与报告：`docs/ops/BUILD-REPORT.md`、`docs/ops/preflight.json`
+- 剪枝/裁定/偏差：`docs/ops/pruned.json`、`docs/ops/rulings.jsonl`、`docs/ops/deviations.json`
+- 人工与方案：`docs/ops/manual-actions.md`、`docs/ops/WAVE4-PROPOSALS.md`、`docs/ops/WAVE5-UI-LIST.md`、`docs/ops/WAVE6-PROPOSALS.md`
+- 纪律：登记件是执行记录，不是标准；判据以 BUILD_MANUAL 为准。

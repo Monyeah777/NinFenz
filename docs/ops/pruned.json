@@ -1,0 +1,365 @@
+{
+  "total": 105,
+  "satisfied": [
+    {
+      "id": "BR-04",
+      "evidence": "CODEOWNERS 24 行：* + 8 个敏感面逐条 @Monyeah777（映射表见 ledger 说明）；账号权限状态 unverified（无 gh）"
+    },
+    {
+      "id": "BR-05",
+      "evidence": "新增 scripts/check_workflow_permissions.py（顶层 write 或缺 permissions 即 FAIL，18/18 通过）；写权限下沉到 job：npm-publish(id-token)/gitee-poll(contents)/library-ingest(contents+issues)；台账 docs/meta"
+    },
+    {
+      "id": "CI-01",
+      "evidence": "32 个工作流按目的分类：ci-verify(ci)、sast/codeql/gitleaks/dependency-review/sbom-vuln(security)、release/npm-publish(release)、ci-hygiene/coverage/repo-health/docs-links/mermaid/large-files/is"
+    },
+    {
+      "id": "CI-02",
+      "evidence": "ci-hygiene.yml 有 pre-commit-all-files job（钩子缓存 key 含配置 hash，不许 continue-on-error）"
+    },
+    {
+      "id": "CI-03",
+      "evidence": ".pre-commit-config.yaml 五条最低钩子 + commit-msg 机检"
+    },
+    {
+      "id": "CI-04",
+      "evidence": "large-files.yml + scripts/check_added_large_files.py（阈值 1MiB；本地实跑通过）"
+    },
+    {
+      "id": "CI-05",
+      "evidence": "9 个 pip 安装工作流全部带 actions/setup-python cache: pip + requirements 依赖路径（9/9）"
+    },
+    {
+      "id": "CI-06",
+      "evidence": "32 个工作流共 42 处 timeout-minutes（每个 workflow 至少 1 处）"
+    },
+    {
+      "id": "CI-07",
+      "evidence": "32/32 workflow 有 concurrency（写型统一 library-write，读型 workflow+ref）"
+    },
+    {
+      "id": "CI-08",
+      "evidence": "ci-hygiene lockfile-purity job（requirements 固定 + 无锁文件时禁 npm ci）；requirements-ci 带 sha256 哈希"
+    },
+    {
+      "id": "CW-01",
+      "evidence": "新增 ISSUE_TEMPLATE/config.yml（blank_issues_enabled: false + 3 个 contact_links）；required: true 计数 bug=8/feature=4"
+    },
+    {
+      "id": "CW-02",
+      "evidence": "PULL_REQUEST_TEMPLATE.md 四必答+门禁自检+Fixes"
+    },
+    {
+      "id": "CW-03",
+      "evidence": "commit_msg_check.py + pre-commit commit-msg 钩子；CONTRIBUTING 10 行 type 表"
+    },
+    {
+      "id": "CW-04",
+      "evidence": "可指认纯格式化提交 97f8c928/3fb22f7b；changes/unreleased 单主题片段"
+    },
+    {
+      "id": "CW-05",
+      "evidence": ".github/workflows/semantic-pr.yml：标题前缀内联校验 + 合规后 gh pr edit 打类型标签"
+    },
+    {
+      "id": "CW-06",
+      "evidence": ".github/workflows/welcome.yml：first-interaction v1（SHA 锁）对首个 Issue/PR 欢迎，带 concurrency 与写权限下沉"
+    },
+    {
+      "id": "DC-01",
+      "evidence": "README 155 行（<=300）"
+    },
+    {
+      "id": "DC-04",
+      "evidence": "llms.txt 104 行：定位+入口链+协议 raw 链接（本轮未改）"
+    },
+    {
+      "id": "DC-05",
+      "evidence": "AGENTS.md 49 行约束 + 追加治理文档入口段"
+    },
+    {
+      "id": "DC-07",
+      "evidence": "mermaid-check.yml + scripts/check_mermaid.mjs（node 编译全部 .mmd/.md 图表）"
+    },
+    {
+      "id": "DC-08",
+      "evidence": "docs/meta/DOC-AUDIT.md：5 条命令可直接执行 + 5 个数字来源表"
+    },
+    {
+      "id": "FG-01",
+      "evidence": "issue-guard.yml + scripts/issue_guard.py（空白/模板外 Issue 拦截并说明缺什么）"
+    },
+    {
+      "id": "FG-02",
+      "evidence": "AGENTS.md 硬性闸门 + verify fail-closed"
+    },
+    {
+      "id": "FG-03",
+      "evidence": "sensitive-guard.yml + scripts/sensitive_scan.py + sensitive_patterns.json（命中即打标/转私密）"
+    },
+    {
+      "id": "FG-04",
+      "evidence": "docs/meta/UNVERIFIED.md：3 条现存不一致 + 失效判据 + 发布前抽查纪律；AGENTS 入口引用"
+    },
+    {
+      "id": "FX-01",
+      "evidence": "五类依赖目录 check-ignore 逐条命中；索引命中 0"
+    },
+    {
+      "id": "FX-02",
+      "evidence": "产物类全覆盖且根级锚定；误伤负例 packaging/npm/bin NOT-IGNORED；索引 0"
+    },
+    {
+      "id": "FX-03",
+      "evidence": "*.log/logs/*.db/*.sqlite*/*.pid/tmp/*.cache 逐条命中；索引 0"
+    },
+    {
+      "id": "FX-04",
+      "evidence": "双向实测：.env/.env.local 忽略、.env.example NOT-IGNORED；模板全占位"
+    },
+    {
+      "id": "FX-05",
+      "evidence": ".vscode/.idea/Thumbs.db/desktop.ini 全命中；整目录忽略取舍理由成文"
+    },
+    {
+      "id": "FX-06",
+      "evidence": "scripts/check_untracked_artifacts.py 索引层产物检查（3833 件）；ci-hygiene/repo-health 工作流实跑该脚本"
+    },
+    {
+      "id": "FX-07",
+      "evidence": "scripts/check_gitignore_coverage.py 用 git check-ignore 实测五类样例全命中，接入 ci-hygiene"
+    },
+    {
+      "id": "FX-08",
+      "evidence": "*.gitattributes: * text=auto eol=lf；git ls-files --eol 文本件全部 i/lf"
+    },
+    {
+      "id": "FX-09",
+      "evidence": "*.sh/*.bash text eol=lf 显式声明；.bat 保留 eol=crlf（唯一平台例外）"
+    },
+    {
+      "id": "FX-10",
+      "evidence": "12 条二进制声明在场（png/jpg/jpeg/ico/gif/gz/zip/pdf/woff/woff2/ttf）"
+    },
+    {
+      "id": "FX-11",
+      "evidence": "git archive 产物 .github/.editorconfig/.env.example/.pre-commit 计数=0（export-ignore 生效）"
+    },
+    {
+      "id": "FX-12",
+      "evidence": ".editorconfig root=true：charset/end_of_line/insert_final_newline/trim/indent 基线段全场"
+    },
+    {
+      "id": "FX-13",
+      "evidence": ".editorconfig 覆写段：py/cs/rs/toml=4、Makefile=tab、md trim off；基线 [*] 未改"
+    },
+    {
+      "id": "FX-14",
+      "evidence": ".markdownlint.json 显式启用 MD001/009/025/041/047 + scripts/check_markdown_structure.sh 单入口 + ci-hygiene markdownlint job（本地实跑 0 issues）"
+    },
+    {
+      "id": "FX-15",
+      "evidence": ".markdownlint.json MD013=false 且理由成文；其余结构规则显式开"
+    },
+    {
+      "id": "GF-01",
+      "evidence": "README 155 行（<=300）；徽章/图 4 个；快速开始命令实跑：python scripts/nf.py --version -> nf 1.0.5"
+    },
+    {
+      "id": "GF-02",
+      "evidence": "LICENSE MIT 21 行；API About license=MIT；README License 行三处一致"
+    },
+    {
+      "id": "GF-03",
+      "evidence": "CONTRIBUTING 追加「评审预期时长」（首次响应 3 工作日/超期 14+30 天处理）+ Conventional 正反示例"
+    },
+    {
+      "id": "GF-04",
+      "evidence": "SECURITY 追加 Supported Versions 三线与 SLA（首次响应 3 工作日；修复不承诺固定天数；7 天披露）"
+    },
+    {
+      "id": "GF-05",
+      "evidence": "CODE_OF_CONDUCT.md 在场（举报渠道/处置/申诉）"
+    },
+    {
+      "id": "GF-06",
+      "evidence": "SUPPORT.md 三分流在场；Discussions 未开已写替代通道"
+    },
+    {
+      "id": "GF-07",
+      "evidence": ".github/GOVERNANCE.md：BDFL 事实 + 决策路径 + 可观测触发条件（3 条）"
+    },
+    {
+      "id": "GF-08",
+      "evidence": ".github/FUNDING.yml 只有注释（无平台键，不显示 Sponsor）+ SUPPORT 显式「暂无赞助通道」"
+    },
+    {
+      "id": "GF-09",
+      "evidence": "MAINTAINERS 追加职责/晋升三条件/180 天不活跃移除 + 30 天确认"
+    },
+    {
+      "id": "HS-03",
+      "evidence": "git count-objects -vH：size-pack 26.23 MiB；最大 3.01MB（<1GB 目标/<5GB 硬限）"
+    },
+    {
+      "id": "MT-01",
+      "evidence": "scripts/repo_doctor.py 17/17 PASS（实跑 100%）；repo-health.yml 定时跑"
+    },
+    {
+      "id": "MT-02",
+      "evidence": "卫生专项工作流成组：ci-hygiene / repo-health / docs-links / mermaid-check / large-files（各自独立红）"
+    },
+    {
+      "id": "MT-03",
+      "evidence": "scorecard.yml（周更 + 5 jobs，SHA 锁，SARIF 上传）"
+    },
+    {
+      "id": "MT-04",
+      "evidence": "docs/meta/SCORECARD-SEMANTICS.md + SECURITY 评分行补限定语（过程评分，不衡量功能正确性）"
+    },
+    {
+      "id": "RL-02",
+      "evidence": "## [Unreleased] + Added/Changed/Removed/Fixed 分类；23 bullets 分桶，非空行 2808→2812（+4 分类标题）"
+    },
+    {
+      "id": "RL-04",
+      "evidence": "release.yml 用原生 generate_release_notes（Conventional Commits 起草）+ 人工校对通道"
+    },
+    {
+      "id": "RL-05",
+      "evidence": "docker-nfal.yml 增 GHCR 推送（tag/手动，packages: write 下沉到 job）+ README 增 docker pull 行"
+    },
+    {
+      "id": "RL-06",
+      "evidence": "coverage.yml 增覆盖率趋势软门禁（scripts/coverage_trend.py：>0.5 告警、>2 或 <80 失败；基线 results/audit/coverage-baseline.json）；实跑 pass/warn/fail 三档"
+    },
+    {
+      "id": "RL-07",
+      "evidence": "docs/meta/RELEASE-CADENCE.md：23 个 tag 的日期与间隔表（git tag 生成）"
+    },
+    {
+      "id": "SC-01",
+      "evidence": "dependabot 9 条目：github-actions/pip×2/npm/cargo×2/docker×2（根 + packaging/nfal）"
+    },
+    {
+      "id": "SC-02",
+      "evidence": "dependabot 分组：actions-minor-patch / pip-minor-patch（major 不分组）"
+    },
+    {
+      "id": "SC-03",
+      "evidence": ".github/workflows/dependency-review.yml（v4 SHA 锁，PR 阶段依赖审查）"
+    },
+    {
+      "id": "SC-04",
+      "evidence": ".github/workflows/codeql.yml（v3 SHA 锁，python/javascript 双语言 + SARIF 上传）"
+    },
+    {
+      "id": "SC-05",
+      "evidence": ".github/workflows/gitleaks.yml + .github/gitleaks.toml；另有 sensitive-guard.yml 推送前/后兜底"
+    },
+    {
+      "id": "SC-06",
+      "evidence": ".github/workflows/sbom-vuln.yml：CycloneDX SBOM 归档 + pip-audit 处置核对（scripts/vuln_disposition.py + results/audit/vuln-disposition.json，review_by 过期即 FAIL）"
+    },
+    {
+      "id": "SC-07",
+      "evidence": "release.yml 用 actions/attest-build-provenance v2 对 SHA256SUMS 出 provenance（验证端 gh attestation verify）"
+    },
+    {
+      "id": "SC-08",
+      "evidence": "release.yml 用 sigstore/cosign-installer + cosign sign-blob --yes keyless 签 SHA256SUMS；WARN 说明 cosign 本地缺位仍由 check41/42 记录"
+    },
+    {
+      "id": "SC-09",
+      "evidence": "release.yml 生成 dist/SHA256SUMS（sha256sum 排序可复现）并随 Release 发布"
+    },
+    {
+      "id": "SC-10",
+      "evidence": "61 处 uses 全部锁 40 位 SHA（unpinned=0）"
+    }
+  ],
+  "not_applicable": [
+    {
+      "id": "CW-08",
+      "trigger": "单人仓库无 merge queue 平台能力（GitHub merge queue 需组织/并发 PR）",
+      "risk": "并发合并把主干弄坏、排队不可控",
+      "substitute": "单人单 PR 串行节奏 + verify 唯一合并前置（勾选项见 manual-actions）",
+      "recheck": "出现第二位日常提交者或并发 PR >2 时重判"
+    },
+    {
+      "id": "HS-01",
+      "trigger": "仓库无二进制大件（最大文件 3.01MB 为文本 JSON），无 LFS 对象",
+      "risk": "二进制进历史导致 clone 体积失控",
+      "substitute": "large-files.yml 1MiB 拦截 + gitignore 五类",
+      "recheck": "单二进制 >10MB 或 clone >100MB 时重判"
+    },
+    {
+      "id": "HS-02",
+      "trigger": "无 >100MB blob，历史清理前提不成立",
+      "risk": "超大 blob 永久留史、clone 不可用",
+      "substitute": "同上 + HS-03 体积记录",
+      "recheck": "pack >50MB 或出现 >50MB blob 时重判"
+    },
+    {
+      "id": "HS-04",
+      "trigger": "HS-02 未执行，无历史改写收尾对象",
+      "risk": "历史改写后残留旧引用/未通知协作者",
+      "substitute": "本轮未做历史改写；将来若做按 §3.5 先停问作者",
+      "recheck": "一旦执行任何历史改写立即重判"
+    },
+    {
+      "id": "RP-05",
+      "trigger": "未部署公网/无在线 Demo，落地页判据前提不成立",
+      "risk": "外部人找不到可信入口/看不懂项目",
+      "substitute": "README 定位段 + llms.txt + About 三项",
+      "recheck": "发布站点或 Demo 时重判"
+    }
+  ],
+  "unknown": [
+    "BR-06",
+    "IN-01",
+    "IN-02"
+  ],
+  "platform_ui": [
+    "BR-01",
+    "BR-02",
+    "BR-03",
+    "CW-09",
+    "MT-07",
+    "RL-03",
+    "RP-01",
+    "RP-02",
+    "RP-03",
+    "RP-04"
+  ],
+  "applicable": [
+    "CW-07",
+    "DC-02",
+    "DC-03",
+    "DC-06",
+    "GF-10",
+    "IN-03",
+    "MT-05",
+    "MT-06",
+    "MT-08",
+    "MT-09",
+    "RL-01",
+    "SC-11",
+    "SC-12",
+    "SP-01",
+    "SP-02",
+    "SP-03",
+    "SP-04",
+    "SP-05"
+  ],
+  "denominator": {
+    "orig": 105,
+    "na": 5,
+    "sat": 69,
+    "unknown": 3,
+    "platform_ui": 10,
+    "applicable": 18,
+    "effective": 105,
+    "note": "剪枝只影响本轮施工范围；105 分制历史分母不变（未走 reject 的条目不得重算得分）"
+  }
+}
