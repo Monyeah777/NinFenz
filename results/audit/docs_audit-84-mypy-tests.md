@@ -10,7 +10,7 @@ subjects:
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
-  - desktop/tests/test_rust_fastlane.py:ad0bab51b9c29d816845b3632f1d5a3011b3dcdfcb777188e84afcce1933b1c6
+  - desktop/tests/test_rust_fastlane.py:0d431643b45bb920c517543f905d773480f4654bad56042b07011932daaa62a6
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
   - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-21）：rating_decided 1
+
 > 重审（2026-10-20）：hygiene + version governance
 
 > 重审（2026-10-20）：repo hygiene: junk dirs removed, LF normalized
