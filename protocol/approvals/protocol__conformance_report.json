@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-22",
   "approved_by": "lead",
-  "note": "H1 重冻",
+  "note": "CI 合入后重冻",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
