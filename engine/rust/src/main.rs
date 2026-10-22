@@ -97,12 +97,14 @@ mod output_tables;
 mod workflow_policy;
 
 mod stats;
+mod serve;
 #[cfg(test)]
 mod testutil;
 
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::Mutex;
 
 const USAGE: &str = "\
 nf-rs —— NF 只读快线（与 Python 真源逐字节对账）
@@ -132,16 +134,51 @@ fn main() -> ExitCode {
     }
 }
 
+/// 常驻 worker 的 stdout 捕获缓冲（仅 `serve` 模式置位；CLI 模式恒为 None）。
+///
+/// 这是「零分叉面逻辑」的关键：worker 复用 `run()` 整段分派，只把 stdout 从真实流换成
+/// 内存缓冲。任何新增只读面自动可被 worker 服务，字节一致性天然继承。
+static STDOUT_CAPTURE: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+
 fn emit(bytes: &[u8], out: &Option<PathBuf>) -> Result<(), String> {
     match out {
         Some(p) => std::fs::write(p, bytes).map_err(|e| format!("写 {} 失败：{}", p.display(), e)),
         None => {
+            let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+            if let Some(buf) = cap.as_mut() {
+                buf.extend_from_slice(bytes);
+                return Ok(());
+            }
+            drop(cap);
             let stdout = std::io::stdout();
             let mut lock = stdout.lock();
             lock.write_all(bytes).map_err(|e| format!("写标准输出失败：{}", e))?;
             lock.flush().map_err(|e| format!("刷新标准输出失败：{}", e))
         }
     }
+}
+
+/// 在捕获模式下跑一遍 `run()`，取回 stdout 字节与退出码。
+///
+/// 只给常驻 worker（`serve`）用：CLI 正常路径的 `emit` 仍走真实 stdout（捕获恒为 None）。
+/// 退出码口径与 `run()` 一致：`Err` 折算 2（与 `main` 的兜底同款）。
+pub(crate) fn run_capture(args: &[String]) -> (Vec<u8>, i32) {
+    {
+        let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+        *cap = Some(Vec::new());
+    }
+    let code = match run(args) {
+        Ok(c) => i32::from(u8::from(c)),
+        Err(msg) => {
+            eprintln!("nf-rs: {}", msg);
+            2
+        }
+    };
+    let out = {
+        let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+        cap.take().unwrap_or_default()
+    };
+    (out, code)
 }
 
 fn require_dir(root: &PathBuf) -> Result<(), String> {
@@ -176,6 +213,7 @@ fn run(args: &[String]) -> Result<ExitCode, String> {
         "score" => run_score(&args[1..]),
         "verify-report" => run_verify_report(&args[1..]),
         "pyval" => run_pyval(&args[1..]),
+        "serve" => crate::serve::run_serve(&args[1..]),
         other => Err(format!("未知命令：{}（修复指引：nf-rs --help）", other)),
     }
 }
