@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:737e95ad29adfc9d1e41ce9faa41ae2ad7e668ecdc34a9b0468ce6afedc4d384
-  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
+  - protocol/code_metrics_baseline.json:416142c759e3c49da768f91dc1bc62d9bfe8734c4075f27e049f05a6e8bc9111
 ---
+> 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）
+
 > 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
 
 > 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
