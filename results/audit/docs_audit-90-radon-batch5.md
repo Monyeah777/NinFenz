@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:05492875b61a1ca7d861d12a27b3e9f81ab53512e49cad7527375e1b427fc839
+  - protocol/code_metrics_baseline.json:16d8f8b3a6601605b43617c7c3b0ae3be57c3df84ace4580c9b842bbf903a513
 ---
+> 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
+
 > 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变
 
 > 重审（2026-10-21）：diag shard 1

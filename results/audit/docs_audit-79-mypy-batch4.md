@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
-  - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:05492875b61a1ca7d861d12a27b3e9f81ab53512e49cad7527375e1b427fc839
+  - desktop/src/core/asset_contract.py:721e8d6b90c3d70511ce2fbc8b7e58f7582f29d1e7110b891f423eda4e7c7ca6
+  - protocol/code_metrics_baseline.json:16d8f8b3a6601605b43617c7c3b0ae3be57c3df84ace4580c9b842bbf903a513
 ---
+> 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
+
 > 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变
 
 > 重审（2026-10-21）：diag shard 1

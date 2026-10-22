@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 228,
-    "verify": 945
+    "verify": 946
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7229,6 +7229,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "F3（VULN-02）· `engine-rust-ffi` 契约面的注入自证（真源侧）。",
+      "path": "desktop/tests/test_asset_contract_ffi_warn.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "45 W3 · 资产键语义密度体检单测。",
       "path": "desktop/tests/test_asset_density.py",
       "role": "verify",
@@ -11934,7 +11940,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6ec81e729b5924b86bc93e08ae42d5a8b35152c6afdfc172e9dcdf5f113f38fb",
+  "root_digest": "a51cd84421fdb03db88fdf9f06a264b916cc585a28fea0f32542f3e8b20c4158",
   "rule_counts": {
     "R-app": 1449,
     "R-catch": 90,
@@ -11943,7 +11949,7 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 113,
-    "R-verify": 829,
+    "R-verify": 830,
     "auto:R-core": 249
   },
   "schema": "nf-role-coordinates/1"
