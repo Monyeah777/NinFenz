@@ -33,12 +33,13 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 import re
 import unittest
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from core import atomic_write, json_doc
+from core import atomic_write, json_doc, repo_face
 
 DECL_REL = "protocol/asset_contracts.json"
 EXPORT_REL = "protocol/generated/asset_contract.frictionless.json"
@@ -76,8 +77,43 @@ def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
         return None, "%s 不是 UTF-8：%s（修复指引：转成 UTF-8 再入库）" % (rel, exc)
 
 
+#: root → 仓库件集合（或 None = 采集失败：退回全量 glob）。一次进程内记忆。
+_REPO_FILES: dict[str, set | None] = {}
+
+
+def _repo_files(root: str) -> set | None:
+    """→ 仓库件集合（根相对 posix 路径）；采集失败 → None（退回文件系统 glob）。
+
+    为什么需要（2026-10-22 基线修复）：`glob` 会把**构建产物**也算进 `files` 统计——实测
+    `engine/dotnet/**/*.cs` 在「build 过」的树上多出 3–9 个 `obj/` 生成件，于是同一个提交
+    在不同机器上得到不同的 `files` 计数，机器可读报告（root_digest）因此**不可复核**。
+    口径复用 `core.repo_face.walk_repo_paths`（全仓扫描面的**单一出处**：跳过 VCS/工具缓存/
+    `.gitignore` 覆盖面）⇒ 计数只看仓库件，与「build 没 build」无关。
+    非 git 目录（单测夹具 / 临时树）：`walk_repo_paths` 只按静态目录名剪枝，仍回全量件，
+    夹具语义不变。
+    """
+    base = Path(os.path.abspath(str(root)))       # walk 产出绝对路径：基准同口径，才不 ValueError
+    # 只对**仓根**（含 linked worktree 的 .git 指针文件）记忆：单测夹具目录会在同一进程里
+    # 继续加件，缓存会把后加的件吞掉（实测 test_asset_contract 的 schema_siblings 用例）。
+    cacheable = (base / ".git").exists()
+    key = str(base)
+    if cacheable and key in _REPO_FILES:
+        return _REPO_FILES[key]
+    got: set | None = None
+    try:
+        got = {p.relative_to(base).as_posix() for p in repo_face.walk_repo_paths(str(root))}
+    except (OSError, ValueError):
+        got = None
+    if cacheable:
+        _REPO_FILES[key] = got
+    return got
+
+
 def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
-    """声明 → 命中的仓库相对路径列表（`path` 单件 / `glob` 多件，后者稳定排序）。"""
+    """声明 → 命中的仓库相对路径列表（`path` 单件 / `glob` 多件，后者稳定排序）。
+
+    `glob` 命中面按**受跟踪件**收窄（见 `_tracked_files`）：构建产物不算契约面。
+    """
     r = Path(root)
     if spec.get("path"):
         rel = str(spec["path"]).replace("\\", "/")
@@ -85,7 +121,11 @@ def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
     pat = str(spec.get("glob") or "")
     if not pat:
         return []
-    return sorted(p.relative_to(r).as_posix() for p in r.glob(pat) if p.is_file())
+    hits = [p for p in r.glob(pat) if p.is_file()]
+    repo_files = _repo_files(root)
+    if repo_files is not None:
+        hits = [p for p in hits if p.relative_to(r).as_posix() in repo_files]
+    return sorted(p.relative_to(r).as_posix() for p in hits)
 
 
 def _dig(obj: Any, path: str) -> Any:

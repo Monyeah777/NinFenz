@@ -13,6 +13,7 @@ import ast
 import importlib.util
 import io
 import re
+import subprocess
 import sys
 import tokenize
 import unittest
@@ -145,6 +146,35 @@ def _is_exempt(cand: str) -> bool:
     return any(cand == k or cand.startswith(k + "/") for k in LIVING_PATH_EXEMPT)
 
 
+def _git_managed_path(cand: str) -> Path:
+    """`.git/**` → 真实落点（linked worktree 兼容；解析不到时退回字面路径）。
+
+    为什么（2026-10-22）：linked worktree 的根 `.git` 是 **gitfile** 而非目录，`.git/config`
+    与 `.git/info/exclude` 按字面拼接必然「不存在」；但它们是 **git 管理面**、不是仓库内容，
+    只有 `git rev-parse --git-path` 能拿到真实落点（正常 clone 下与字面路径一致）。
+    只对 `.git`/`.git/**` 生效，不放宽其它面，也不 skip 判据。
+    """
+    rel = "." if cand == ".git" else cand[len(".git/"):]
+    try:
+        proc = subprocess.run(["git", "rev-parse", "--git-path", rel], cwd=str(ROOT),
+                              capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return ROOT / cand
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return ROOT / cand
+    got = Path(proc.stdout.strip())
+    return got if got.is_absolute() else ROOT / got
+
+
+def _repo_path_exists(cand: str) -> bool:
+    """仓库相对路径在场？`.git/**` 走 git 管理面解析（worktree-aware），其余按字面拼接。"""
+    if (ROOT / cand).exists():
+        return True
+    if cand == ".git" or cand.startswith(".git/"):
+        return _git_managed_path(cand).exists()
+    return False
+
+
 def _unresolved_paths(tokens: list, tops: set) -> list:
     """文档 token 里**写成了真路径却走不到**的（含豁免；供判据与变异自证共用）。"""
     out = []
@@ -156,7 +186,7 @@ def _unresolved_paths(tokens: list, tops: set) -> list:
         cand = tok.strip().split("::", 1)[0]
         if _is_exempt(cand):
             continue
-        if not (ROOT / cand).exists():
+        if not _repo_path_exists(cand):
             out.append(cand)
     return out
 
@@ -416,7 +446,7 @@ class GuidancePathReachabilityTest(unittest.TestCase):
             if not _looks_like_rel_path(tok, self.tops):
                 continue
             cand = tok.split("::", 1)[0]
-            if not (ROOT / cand).exists():
+            if not _repo_path_exists(cand):
                 bad.append(cand)
         return bad
 
