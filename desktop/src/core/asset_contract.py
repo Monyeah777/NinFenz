@@ -33,7 +33,9 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 import re
+import subprocess
 import unittest
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -76,8 +78,46 @@ def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
         return None, "%s 不是 UTF-8：%s（修复指引：转成 UTF-8 再入库）" % (rel, exc)
 
 
+#: root → 受跟踪文件集（或 None = 非 git 仓根）。一次进程内记忆：同一根只问一次 git。
+_TRACKED: dict[str, set | None] = {}
+
+
+def _tracked_files(root: str) -> set | None:
+    """→ 仓库**受跟踪**文件集（仓库根相对 posix 路径）；root 不是 git 仓根 → None。
+
+    为什么需要（2026-10-22 基线修复）：`glob` 会把**构建产物**也算进 `files` 统计——实测
+    `engine/dotnet/**/*.cs` 在「build 过」的树上多出 3–9 个 `obj/` 生成件，于是同一个提交
+    在不同机器上得到不同的 `files` 计数，机器可读报告（root_digest）因此**不可复核**。
+    只认受跟踪件 ⇒ 计数与「build 没 build」无关（生成物不是仓库内容）。
+    非 git 仓根（单测夹具 / 临时树）保持原语义：按文件系统 glob（不能因为夹具没 .git 就判空）。
+    """
+    key = os.path.normcase(os.path.abspath(str(root)))
+    if key in _TRACKED:
+        return _TRACKED[key]
+    got: set | None = None
+    try:
+        top = subprocess.run(["git", "-C", key, "rev-parse", "--show-toplevel"],
+                             capture_output=True, text=True, encoding="utf-8",
+                             timeout=120)
+        if top.returncode == 0 and top.stdout.strip():
+            top_path = os.path.normcase(os.path.abspath(top.stdout.strip()))
+            if top_path == key:            # **仓根**才按跟踪面收窄（子目录夹具照旧走 glob）
+                ls = subprocess.run(["git", "-C", key, "ls-files", "-z"],
+                                    capture_output=True, timeout=120)
+                if ls.returncode == 0:
+                    got = {x.replace("\\", "/") for x in
+                           ls.stdout.decode("utf-8", "replace").split("\0") if x}
+    except (OSError, subprocess.SubprocessError):
+        got = None
+    _TRACKED[key] = got
+    return got
+
+
 def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
-    """声明 → 命中的仓库相对路径列表（`path` 单件 / `glob` 多件，后者稳定排序）。"""
+    """声明 → 命中的仓库相对路径列表（`path` 单件 / `glob` 多件，后者稳定排序）。
+
+    `glob` 命中面按**受跟踪件**收窄（见 `_tracked_files`）：构建产物不算契约面。
+    """
     r = Path(root)
     if spec.get("path"):
         rel = str(spec["path"]).replace("\\", "/")
@@ -85,7 +125,11 @@ def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
     pat = str(spec.get("glob") or "")
     if not pat:
         return []
-    return sorted(p.relative_to(r).as_posix() for p in r.glob(pat) if p.is_file())
+    hits = [p for p in r.glob(pat) if p.is_file()]
+    tracked = _tracked_files(root)
+    if tracked is not None:
+        hits = [p for p in hits if p.relative_to(r).as_posix() in tracked]
+    return sorted(p.relative_to(r).as_posix() for p in hits)
 
 
 def _dig(obj: Any, path: str) -> Any:

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - protocol/code_metrics_baseline.json:298d85b7a156eddb9a9848db13ea0b88be885ab230c4598fd3a9b74ae061fec2
 ---
+> 重审（2026-10-22）：基线修复：asset_contract 计数只认受跟踪件 + doc 可达性 worktree-aware
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1

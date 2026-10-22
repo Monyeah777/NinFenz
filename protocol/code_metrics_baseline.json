@@ -56,7 +56,7 @@
       "max_fn_lines": 73
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 1173,
+      "lines": 1217,
       "max_fn_cc": 28,
       "max_fn_lines": 61
     },

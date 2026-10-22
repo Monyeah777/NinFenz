@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - protocol/code_metrics_baseline.json:298d85b7a156eddb9a9848db13ea0b88be885ab230c4598fd3a9b74ae061fec2
 ---
+> 重审（2026-10-22）：基线修复：asset_contract 计数只认受跟踪件 + doc 可达性 worktree-aware
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1

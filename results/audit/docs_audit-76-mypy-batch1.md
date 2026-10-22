@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - protocol/code_metrics_baseline.json:298d85b7a156eddb9a9848db13ea0b88be885ab230c4598fd3a9b74ae061fec2
 ---
+> 重审（2026-10-22）：基线修复：asset_contract 计数只认受跟踪件 + doc 可达性 worktree-aware
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1
