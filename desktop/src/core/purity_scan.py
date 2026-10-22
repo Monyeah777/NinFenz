@@ -163,8 +163,9 @@ SINK_ALLOW = {
         "临时区写权限探针的**自清**：探针名含 uuid，落点由 resolve() 裁决（scratch 根），"
         "删的是本模块刚建的那一个文件；不接收外部路径参数",
     "scratch.py:shutil.rmtree":
-        "scratch 上下文退出与 TTL GC 的**整目录回收**：落点同样由 resolve() 裁决，"
-        "且只删 nf* 前缀的子目录（gc 显式跳过非 nf*），无法指向仓库根/主目录/盘根",
+        "scratch 上下文退出与 TTL GC 的**整目录回收**：落点由 resolve() 裁决（S1：只收养空目录/"
+        "带 .nf-scratch 标记的区），且只删 nf-<12hex> 命名的子目录（GC 显式跳过其余条目、"
+        "缺标记即拒绝），无法指向仓库根/主目录/盘根",
     "atomic_write.py:unlink":
         "原子写的**失败清理**：临时件由本模块 tempfile.mkstemp 现造（名与落点皆非外部输入），"
         "只删自己刚写的那一个 .tmp；`os.replace` 成功路径不删除任何东西",

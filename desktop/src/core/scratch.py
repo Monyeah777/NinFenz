@@ -14,6 +14,10 @@
 - resolve() 按固定优先级挑候选：NF_SCRATCH → NF_HOME/scratch → 系统临时区 →
   （仅在显式 NF_ALLOW_REPO_SCRATCH=1 时）仓内 .rivet/tmp。
 - 候选必须真实可写（建目录 + 探针写入 + 删除）；不可写就换下一个。
+- 收养闸门（S1，2026-10-22）：根目录只有「空」或「已是本模块的区（含 .nf-scratch 标记
+  或只由 nf-<12hex> 目录组成）」才被采纳——拒绝把 $HOME 这类别人的目录当临时区。
+- GC 只删 `new_dir()` 生成的 `nf-<12hex>` 目录；其余条目一律跳过并计入 skipped，
+  且 GC 前必须看到 `.nf-scratch` 标记，缺标记即拒绝（不可逆删除前的第二道闸）。
 - 仓内候选默认拒绝：宁可抛 ScratchUnavailable，也不静默落到仓库里。
 - 全部候选不可用 ⇒ 抛 ScratchUnavailable（带修复指引），绝不返回 cwd。
 - ensure_process_tempdir() 把裁决结果写进 tempfile.tempdir 与 TEMP/TMP/TMPDIR，
@@ -27,6 +31,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -40,6 +45,10 @@ ENV_ALLOW_REPO = "NF_ALLOW_REPO_SCRATCH"
 ENV_TTL_HOURS = "NF_SCRATCH_TTL_HOURS"
 DEFAULT_TTL_HOURS = 24.0
 PROBE_NAME = ".nf_write_probe"
+#: scratch 根标记（S1）：首次收养时写入；GC 前校验。缺标记的目录不是本模块的临时区。
+MARKER = ".nf-scratch"
+#: 只有 `new_dir()` 生成的目录名才归 GC 管：`nf-` + 12 位小写十六进制。
+_NAME_RE = re.compile(r"^nf-[0-9a-f]{12}$")
 
 _CACHE: dict = {}
 
@@ -94,6 +103,31 @@ def _candidates() -> list:
     return out
 
 
+def _adopt_root(d: Path) -> tuple:
+    """收养闸门 → (是否可收养, 拒绝原因)。`$HOME` 这类非空且无标记的目录**一律拒绝**。
+
+    S1（2026-10-22 安全审计，CWE-73/22）：`NF_SCRATCH` 可指向任意目录；若不设闸门，
+    `gc()` 的递归删除就会作用到别人的目录上（不可逆数据丢失）。收养条件：
+      - 已有 `.nf-scratch` 标记（本模块建的区）；或
+      - 目录为空（首次创建）；或
+      - 非空但**只由** `nf-<12hex>` 目录组成（旧版本留下的本模块区）。
+    """
+    mark = d / MARKER
+    if mark.is_file():
+        return True, ""
+    try:
+        entries = list(d.iterdir())
+    except OSError as exc:
+        return False, f"（读不到目录内容：{exc}）"
+    if entries and not all(e.is_dir() and _NAME_RE.match(e.name) for e in entries):
+        return False, f"（非空且无 {MARKER} 标记：不是本模块的临时区，拒绝收养）"
+    try:
+        mark.write_text("nf-scratch/1\n", encoding="utf-8")
+        return True, ""
+    except OSError as exc:
+        return False, f"（标记写入失败：{exc}）"
+
+
 def resolve() -> Path:
     """裁决 scratch 根（进程内记忆）。不可用抛 ScratchUnavailable，绝不回退 cwd。"""
     if "root" in _CACHE:
@@ -109,6 +143,10 @@ def resolve() -> Path:
             continue
         if not _probe_writable(cand):
             tried.append(f"{cand}（不可写）")
+            continue
+        ok, why = _adopt_root(cand)
+        if not ok:
+            tried.append(f"{cand}{why}")
             continue
         _CACHE["root"] = cand
         return cand
@@ -136,28 +174,43 @@ def ensure_process_tempdir() -> Path | None:
     return root
 
 
-def gc() -> int:
-    """按 TTL 清理本区下的 nf* 子目录（不碰别人的），返回删掉的目录数。"""
+def gc() -> dict:
+    """按 TTL 清理本区下的 `nf-<12hex>` 子目录 → `{"removed": n, "skipped": m}`。
+
+    S1（2026-10-22 安全审计）：删除面只有「本模块生成的目录名」才归我们管——
+    其它条目（用户文件/别的目录/不匹配命名的目录）一律计入 `skipped`，**绝不删**。
+    GC 前必须看到 `.nf-scratch` 根标记（缺标记 ⇒ 拒绝，见 `ScratchUnavailable`），
+    防止 `NF_SCRATCH` 指向别人的目录时发生不可逆删除（CWE-73/22）。
+    """
     root = resolve()
+    if not (root / MARKER).is_file():
+        raise ScratchUnavailable(
+            f"scratch 根缺 {MARKER} 标记，拒绝 GC（修复指引：确认 {ENV_ROOT} 指向的是本工具"
+            "创建的临时区；旧区可先手工创建该标记再重跑）")
     ttl_h = float(os.environ.get(ENV_TTL_HOURS) or DEFAULT_TTL_HOURS)
     cutoff = time.time() - ttl_h * 3600.0
     removed = 0
+    skipped = 0
     try:
         entries = list(root.iterdir())
     # 区根读不到＝没有可清理项（scratch 不是事实；清了只是省空间，不为此报错）
     except OSError:
-        return 0
+        return {"removed": 0, "skipped": 0}
     for entry in entries:
-        if not entry.is_dir() or not entry.name.startswith("nf"):
+        # 只认 new_dir() 的产物名；文件/别人目录/旧命名一律跳过（S1 的核心边界）
+        if not entry.is_dir() or not _NAME_RE.match(entry.name):
+            skipped += 1
             continue
         try:
             if entry.stat().st_mtime > cutoff:
+                skipped += 1
                 continue
             shutil.rmtree(entry, ignore_errors=True)
             removed += 1
         except OSError:  # 单条 stat/删失败＝跳过它继续（GC 是尽力而为，不因一条失败中断）
+            skipped += 1
             continue
-    return removed
+    return {"removed": removed, "skipped": skipped}
 
 
 def new_dir(prefix: str = "nf") -> Path:
