@@ -454,6 +454,13 @@ class TestIndexTtl(unittest.TestCase):
         real = nf_language.signature
         nf_language.signature = lambda root: (calls.append(1), real(root))[1]
         self.addCleanup(setattr, nf_language, "signature", real)
+        # TTL 是 1 s 的**调参值**；本判据要证的是「窗口内只扫一次签名」，不该被机器负载判红
+        #（满负载下首次 build 索引就可能 >1 s，于是"窗口"在两次调用之间就已经过期——实测
+        # 2026-10-22 两次全量门禁各红一次）。这里把窗口临时撑大：复用语义照判，过期语义由
+        # `test_ttl_expiry_forces_a_rescan` 单独判（它自己拨 `_sig_at`，与真实时钟无关）。
+        old_ttl = lsp.INDEX_TTL_S
+        lsp.INDEX_TTL_S = old_ttl * 60.0
+        self.addCleanup(setattr, lsp, "INDEX_TTL_S", old_ttl)
         srv = _ready(lsp.LspServer(root=ROOT, explicit_root=True))
         first = srv.symbols()
         for _ in range(5):
