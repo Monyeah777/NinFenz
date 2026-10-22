@@ -703,8 +703,138 @@ def _code_structural(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[s
     return issues, stats
 
 
+# ---------------------------------------------------------------- 代码面·告警面（WARN）
+def _line_no(text: str, pos: int) -> int:
+    """字符偏移 → 1 基行号（与 ruff/编译器同口径）。"""
+    return text.count(chr(10), 0, pos) + 1
+
+
+def _warn_cut(text: str, rule: Dict[str, Any]) -> int:
+    """`skip_after` 标记之前的区域才判（测试区是脚手架，不是出口契约）。"""
+    skip_after = str(rule.get("skip_after") or "")
+    cut = text.find(skip_after) if skip_after else -1
+    return len(text) if cut < 0 else cut
+
+
+def _is_code_line(line: str) -> bool:
+    """该行是否为**代码**（不是注释/文档）——规则只判代码，避免被注释里的词自命中。"""
+    s = line.strip()
+    if not s:
+        return False
+    return not (s.startswith("//") or s.startswith("/*") or s.startswith("*")
+                or s.startswith("///") or s.startswith("//!"))
+
+
+def _warn_unsafe_safety(sid: str, rel: str, text: str, rule: Dict[str, Any]) -> List[str]:
+    """规则①：每处 `unsafe` 前 within 行内必须有 SAFETY: 注释（说明调用方前置条件）。
+
+    只判**代码行**上的 `unsafe`：注释里提到 unsafe（含 SAFETY: 注释自身）不算出口面。
+    """
+    rx = re.compile(str(rule.get("pattern") or r"\bunsafe\b"))
+    marker = str(rule.get("marker") or "SAFETY:")
+    within = int(rule.get("within") or 3)
+    cut = _warn_cut(text, rule)
+    lines = text.splitlines()
+    out: List[str] = []
+    for m in rx.finditer(text):
+        if m.start() >= cut:
+            break
+        ln = _line_no(text, m.start())
+        if not _is_code_line(lines[ln - 1]):
+            continue
+        lo = max(0, ln - 1 - within)
+        if not any(marker in lines[i] for i in range(lo, ln - 1)):
+            out.append("代码契约 %s 告警：%s:%d 的 unsafe 前 %d 行内缺 %s 注释"
+                       "（修复指引：在 unsafe 块/签名紧邻上方写「%s 调用方前置条件」，"
+                       "让审查面可读）" % (sid, rel, ln, within, marker, marker))
+    return out
+
+
+def _warn_null_guard(sid: str, rel: str, text: str, rule: Dict[str, Any]) -> List[str]:
+    """规则②：每处 `from_raw_parts` 前 within 行内必须有空指针检查（只判代码行）。"""
+    rx = re.compile(str(rule.get("pattern") or "from_raw_parts"))
+    guard = str(rule.get("guard") or "is_null")
+    within = int(rule.get("within") or 20)
+    cut = _warn_cut(text, rule)
+    lines = text.splitlines()
+    out: List[str] = []
+    for m in rx.finditer(text):
+        if m.start() >= cut:
+            break
+        ln = _line_no(text, m.start())
+        if not _is_code_line(lines[ln - 1]):
+            continue
+        lo = max(0, ln - 1 - within)
+        if not any(guard in lines[i] for i in range(lo, ln - 1)):
+            out.append("代码契约 %s 告警：%s:%d 的 from_raw_parts 前 %d 行内无空指针检查"
+                       "（修复指引：先 `if ptr.is_null() { return 0; }` 再构造切片——"
+                       "null 即使 len=0 也是 UB）" % (sid, rel, ln, within))
+    return out
+
+
+def _warn_export_no_panic(sid: str, rel: str, text: str, rule: Dict[str, Any]) -> List[str]:
+    """规则③：导出面（`#[no_mangle]` 起的区块）不得 panic/unwrap/expect/assert。
+
+    区块 = 本次 `#[no_mangle]` 到**下一个** `#[no_mangle]`（或 `skip_after` 标记/文末）；
+    只看代码行，注释里写 `panic!` 不算。
+    """
+    rx = re.compile(str(rule.get("pattern") or r"#\[no_mangle\]"))
+    forbid = [str(x) for x in rule.get("forbid") or []]
+    cut = _warn_cut(text, rule)
+    starts = [m.start() for m in rx.finditer(text) if m.start() < cut]
+    lines = text.splitlines()
+    out: List[str] = []
+    for i, pos in enumerate(starts):
+        end = starts[i + 1] if i + 1 < len(starts) else cut
+        ln = _line_no(text, pos)
+        for offset, line in enumerate(lines[ln - 1:_line_no(text, max(end - 1, pos))]):
+            if not _is_code_line(line):
+                continue
+            for bad in forbid:
+                if bad in line:
+                    out.append("代码契约 %s 告警：%s:%d 起的导出面含 %r"
+                               "（修复指引：C ABI 出口以错误码返回，"
+                               "不 panic/unwrap/expect/assert——越过 ABI 边界 panic 是未定义行为）"
+                               % (sid, rel, ln + offset, bad))
+    return out
+
+
+_WARN_RULES = {
+    "unsafe_safety_comment": _warn_unsafe_safety,
+    "null_guard_before": _warn_null_guard,
+    "export_no_panic": _warn_export_no_panic,
+}
+
+
+def _code_warns(root: str, spec: Dict[str, Any]) -> List[str]:
+    """代码面的**告警面**（WARN 级，不 FAIL）：由声明里的 `warn_rules` 驱动。
+
+    为什么单开一路：FFI 出口**必然**要 `unsafe`（C ABI 本质），「禁 unsafe」不能简单套用；
+    而「unsafe 须带 SAFETY 注释 / `from_raw_parts` 前须挡空指针 / 导出面不许 panic」这类
+    治理规则在**存量未清**时按 FAIL 接入，会立刻逼人重冻或删判据。故先按 WARN 接入：
+    看得见、能逐条清；清零后再把规则搬进 `forbid_regex` / 新判据升 FAIL。
+    """
+    rules = spec.get("warn_rules")
+    if not isinstance(rules, dict) or not rules:
+        return []
+    rels = resolve(root, spec)
+    if not rels:
+        return []                     # 未命中面的事由 `_check_code` 的 issues 报，不重复告警
+    warns: List[str] = []
+    for rel in rels:
+        text, err = _read(root, rel)
+        if err:
+            continue                  # 读件失败同样由 issues 面报
+        for name, rule in rules.items():
+            fn = _WARN_RULES.get(str(name))
+            if fn is None or not isinstance(rule, dict):
+                continue
+            warns += fn(str(spec.get("id") or "?"), rel, text or "", rule)
+    return warns
+
+
 def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
-    if spec.get("forbid_regex") or spec.get("regex_limits"):
+    if spec.get("forbid_regex") or spec.get("regex_limits") or spec.get("warn_rules"):
         return _code_structural(root, spec)
     rel = str(spec.get("path") or "")
     if str(spec.get("lang") or "python") != "python":
@@ -1087,6 +1217,7 @@ def scan(root: str = ".", faces: Iterable[str] = ()
                 sub, s = _check_data(root, spec)
             elif face == "code":
                 sub, s = _check_code(root, spec)
+                warns += _code_warns(root, spec)   # WARN 级治理面，不进 issues（见 _code_warns）
             elif face == "index":
                 sub, s = _check_index(root, spec)
             else:

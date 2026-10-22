@@ -939,9 +939,187 @@ fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     (issues, Json::Object(stats))
 }
 
+// ---------------------------------------------------------------- 代码面·告警面（WARN）
+
+/// 真源 `_line_no`：字符偏移 → 1 基行号（与编译器/ruff 同口径；换行是单字节，按字节切安全）。
+fn line_no(text: &str, pos: usize) -> usize {
+    text[..pos].matches('\n').count() + 1
+}
+
+/// 真源 `_warn_cut`：`skip_after` 标记之前的区域才判（测试区是脚手架，不是出口契约）。
+fn warn_cut(text: &str, rule: &Json) -> usize {
+    let marker = sg_str(rule, "skip_after");
+    if marker.is_empty() {
+        return text.len();
+    }
+    text.find(&marker).unwrap_or(text.len())
+}
+
+/// 真源 `_is_code_line`：只判**代码行**，注释里的词不算出口面（否则 SAFETY 注释自身也会自命中）。
+fn is_code_line(line: &str) -> bool {
+    let s = line.trim();
+    if s.is_empty() {
+        return false;
+    }
+    !(s.starts_with("//") || s.starts_with("/*") || s.starts_with('*'))
+}
+
+fn rule_lines(text: &str) -> Vec<&str> {
+    text.split('\n').map(|l| l.strip_suffix('\r').unwrap_or(l)).collect()
+}
+
+/// 真源 `_warn_unsafe_safety`（规则①）：每处 `unsafe` 前 within 行内须有 SAFETY: 注释。
+fn warn_unsafe_safety(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { r"\bunsafe\b".to_string() } else { p }
+    };
+    let marker = {
+        let m = sg_str(rule, "marker");
+        if m.is_empty() { "SAFETY:".to_string() } else { m }
+    };
+    let within = pyval::py_int_or(obj_get(rule, "within"), 3).max(0) as usize;
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let mut out: Vec<String> = Vec::new();
+    for m in rx.find_iter(&text[..cut]) {
+        let ln = line_no(text, m.start());
+        if !is_code_line(lines[ln - 1]) {
+            continue;
+        }
+        let lo = ln.saturating_sub(1 + within);
+        let hit = (lo..ln.saturating_sub(1)).any(|i| lines[i].contains(&marker));
+        if !hit {
+            out.push(format!(
+                "代码契约 {} 告警：{}:{} 的 unsafe 前 {} 行内缺 {} 注释（修复指引：在 unsafe 块/签名紧邻上方写「{} 调用方前置条件」，让审查面可读）",
+                sid, rel, ln, within, marker, marker
+            ));
+        }
+    }
+    out
+}
+
+/// 真源 `_warn_null_guard`（规则②）：每处 `from_raw_parts` 前 within 行内须有空指针检查。
+fn warn_null_guard(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { "from_raw_parts".to_string() } else { p }
+    };
+    let guard = {
+        let g = sg_str(rule, "guard");
+        if g.is_empty() { "is_null".to_string() } else { g }
+    };
+    let within = pyval::py_int_or(obj_get(rule, "within"), 20).max(0) as usize;
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let mut out: Vec<String> = Vec::new();
+    for m in rx.find_iter(&text[..cut]) {
+        let ln = line_no(text, m.start());
+        if !is_code_line(lines[ln - 1]) {
+            continue;
+        }
+        let lo = ln.saturating_sub(1 + within);
+        let hit = (lo..ln.saturating_sub(1)).any(|i| lines[i].contains(&guard));
+        if !hit {
+            out.push(format!(
+                "代码契约 {} 告警：{}:{} 的 from_raw_parts 前 {} 行内无空指针检查（修复指引：先 `if ptr.is_null() {{ return 0; }}` 再构造切片——null 即使 len=0 也是 UB）",
+                sid, rel, ln, within
+            ));
+        }
+    }
+    out
+}
+
+/// 真源 `_warn_export_no_panic`（规则③）：`#[no_mangle]` 起的导出区块不得 panic/unwrap。
+fn warn_export_no_panic(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { r"#\[no_mangle\]".to_string() } else { p }
+    };
+    let forbid: Vec<String> = sg_array(rule, "forbid").iter().map(|x| pyval::plain_str(x)).collect();
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let starts: Vec<usize> = rx.find_iter(&text[..cut]).map(|m| m.start()).collect();
+    let mut out: Vec<String> = Vec::new();
+    for (i, &pos) in starts.iter().enumerate() {
+        let end = starts.get(i + 1).copied().unwrap_or(cut);
+        let ln = line_no(text, pos);
+        let end_ln = line_no(text, if end > pos { end - 1 } else { pos });
+        for idx in (ln - 1)..end_ln {
+            let line = lines.get(idx).copied().unwrap_or("");
+            if !is_code_line(line) {
+                continue;
+            }
+            for bad in &forbid {
+                if line.contains(bad.as_str()) {
+                    out.push(format!(
+                        "代码契约 {} 告警：{}:{} 起的导出面含 {}（修复指引：C ABI 出口以错误码返回，不 panic/unwrap/expect/assert——越过 ABI 边界 panic 是未定义行为）",
+                        sid,
+                        rel,
+                        idx + 1,
+                        pyval::py_repr(&Json::Str(bad.clone()))
+                    ));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// 真源 `_code_warns`：代码面的**告警面**（WARN 级，不 FAIL），由声明里的 `warn_rules` 驱动。
+///
+/// 为什么单开一路：FFI 出口**必然**要 `unsafe`（C ABI 本质），「禁 unsafe」不能简单套用；
+/// 而「unsafe 须带 SAFETY 注释 / `from_raw_parts` 前须挡空指针 / 导出面不许 panic」这类治理
+/// 规则在**存量未清**时按 FAIL 接入会立刻逼人重冻或删判据。故先按 WARN 接入：看得见、能逐条
+/// 清；清零后再把规则搬进 `forbid_regex` / 新判据升 FAIL。
+pub fn code_warns(root: &Path, spec: &Json) -> Vec<String> {
+    let rules: Vec<(String, Json)> = match obj_get(spec, "warn_rules") {
+        Some(Json::Object(o)) if !o.is_empty() => o.clone(),
+        _ => return Vec::new(),
+    };
+    let rels = resolve(root, spec);
+    if rels.is_empty() {
+        return Vec::new();     // 未命中面的事由 `check_code` 的 issues 报，不重复告警
+    }
+    let sid = {
+        let s = sg_str(spec, "id");
+        if s.is_empty() { "?".to_string() } else { s }
+    };
+    let mut warns: Vec<String> = Vec::new();
+    for rel in &rels {
+        let (text, err) = sread(root, rel);
+        if err.is_some() {
+            continue;          // 读件失败同样由 issues 面报
+        }
+        let text = text.unwrap_or_default();
+        for (name, rule) in &rules {
+            if !matches!(rule, Json::Object(_)) {
+                continue;
+            }
+            match name.as_str() {
+                "unsafe_safety_comment" => {
+                    warns.extend(warn_unsafe_safety(&sid, rel, &text, rule))
+                }
+                "null_guard_before" => warns.extend(warn_null_guard(&sid, rel, &text, rule)),
+                "export_no_panic" => {
+                    warns.extend(warn_export_no_panic(&sid, rel, &text, rule))
+                }
+                _ => {}
+            }
+        }
+    }
+    warns
+}
+
 /// 真源 `_check_code`。
 pub fn check_code(root: &Path, spec: &Json) -> (Vec<String>, Json) {
-    if !sg_array(spec, "forbid_regex").is_empty() || !sg_array(spec, "regex_limits").is_empty() {
+    if !sg_array(spec, "forbid_regex").is_empty()
+        || !sg_array(spec, "regex_limits").is_empty()
+        || obj_get(spec, "warn_rules").is_some()
+    {
         return check_code_structural(root, spec);
     }
     let rel = sg_str(spec, "path");
@@ -1690,7 +1868,7 @@ pub fn load(root: &Path) -> (Json, Vec<String>) {
 /// 真源 `scan(root, faces=())` → `(issues, warns, stats)`。
 pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
     let (doc, mut issues) = load(root);
-    let warns: Vec<String> = Vec::new();
+    let mut warns: Vec<String> = Vec::new();
     let mut counts: Vec<(String, i64)> =
         FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
     let mut files = 0i64;
@@ -1719,7 +1897,11 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             }
             let (sub, s) = match face {
                 "data" => check_data(root, &spec),
-                "code" => check_code(root, &spec),
+                "code" => {
+                    // WARN 级治理面：由声明里 `warn_rules` 驱动，不进 issues（见 code_warns）。
+                    warns.extend(code_warns(root, &spec));
+                    check_code(root, &spec)
+                }
                 "index" => check_index(root, &spec),
                 _ => check_script(root, &spec),
             };
