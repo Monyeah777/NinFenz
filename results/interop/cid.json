@@ -112,14 +112,14 @@
       "sha256": "b226bcfdf18f480d3646d7f29051050aa6e305cfc8e0c445eaee1875b877c096"
     },
     {
-      "cid": "bafyreic4t22nb56o5fkksohzu65j4ippt2xabnagw3yhxdr77yzl4bx7uq",
+      "cid": "bafyreiccwvmdrewalt4xqwvbb2ce7alpdgeusvlftzztz7hwerpyhvyrsy",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "5c9eb4d0f7cee954a938f9a7ba9e21ef9eae00b406b6f07b8e3ffe32be06ffa4"
+      "sha256": "42b5583892c05cf9785aa10e844f816f19894955659e733cfcf6245f83d71196"
     },
     {
-      "cid": "bafyreicn5fvwl2txadou2q7grgwjdlvsojq2ywbzngbezzidr44mz7kia4",
+      "cid": "bafyreiaoprqnltkzkv3uvflrt6nchfthkncwnce6tingtet6aal3gke7re",
       "path": "protocol/coupling_baseline.json",
-      "sha256": "4de96b65ea7700dd4d43e689ac91aeb27261ac583969824ce5038f38ccfd4807"
+      "sha256": "0e7c60d5cd5955774a95719f9a239667534566889e9a1a69927e0017b3289f89"
     },
     {
       "cid": "bafyreicilosiaopuzd6wa7564pkc4gy7xqsuibcfmjkivd2s3sh37masny",
