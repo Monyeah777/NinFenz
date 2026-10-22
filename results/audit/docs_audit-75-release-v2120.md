@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:9a37e864f0267cdab1a648c7bc3120a2de4bf9307255cce7eb08d2d2c52e52c5
+  - CHANGELOG.md:0786c35efe46c8aac3b0d6ad89f1676be15b8283b12994fc12c80ec928a601f4
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
   - README.md:62618715f838bc7f878fe2512216f5f7425a70d7d5e7f581075123d5fc89f358
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
@@ -16,6 +16,10 @@ subjects:
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
 
 ---
+> 重审（2026-10-21）：CHANGELOG 增加 2026-10-21 全仓一致性修复结果条目；既有审计结论不变
+
+> 重审（2026-10-21）：修复 CHANGELOG 一字一行源件损坏；按 Git 历史与连续文本恢复段落，既有审计结论不变
+
 > 重审（2026-10-21）：locales html 1
 
 > 重审（2026-10-21）：readme head 1

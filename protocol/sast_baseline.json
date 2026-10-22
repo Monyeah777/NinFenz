@@ -30,7 +30,7 @@
         "scripts/verify_cache.py::B603": 1,
         "scripts/verify_run.py::B404": 1,
         "scripts/verify_tests.py::B404": 1,
-        "scripts/verify_tests.py::B603": 3,
+        "scripts/verify_tests.py::B603": 2,
         "scripts/verify_tests.py::B607": 2
       },
       "meta": {
@@ -38,24 +38,25 @@
           "severities": [
             [
               "LOW",
-              38
+              37
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 43
+          "total": 42
         },
         "ruff": {
-          "total": 83
+          "total": 85
         }
       },
       "ruff": {
         ".github/scripts/gitee_ingest.py::S310": 2,
         ".github/scripts/library_ingest.py::S310": 1,
         "desktop/src/core/assemble_plan.py::S112": 1,
-        "desktop/src/core/atoms/proc.py::S603": 1,
+        "desktop/src/core/atoms/proc.py::S603": 3,
+        "desktop/src/core/atoms/proc.py::S607": 1,
         "desktop/src/core/attest.py::S603": 4,
         "desktop/src/core/closure_scan.py::S112": 1,
         "desktop/src/core/community_inventory.py::S112": 3,
@@ -96,7 +97,6 @@
         "scripts/verify_cache.py::S603": 1,
         "scripts/verify_parallel.py::S603": 1,
         "scripts/verify_run.py::S603": 1,
-        "scripts/verify_tests.py::S603": 1,
         "scripts/verify_tests.py::S607": 2
       }
     },
