@@ -54,7 +54,7 @@ if _SRC not in sys.path:
     sys.path.insert(0, _SRC)
 
 # 必须在补好 sys.path **之后**才能 import core.*（引擎可被当脚本直接跑）。
-from core import gate_inproc, gate_labels, gate_native  # noqa: E402
+from core import gate_inproc, gate_labels, gate_native, repo_trust  # noqa: E402
 from core.gate_labels import Labels  # noqa: E402
 
 #: 代码面：改了这些文件必须换键（沿用 disk_cache 的「算法面进键」纪律）。
@@ -240,6 +240,22 @@ SCRIPT_CHECKS: tuple[tuple[str, int], ...] = (("scripts/check37_knowledge.py", 3
 #: 不发一条占位文案冒充门禁输出。
 
 
+def _trust_gate(num: int, title: str, root: Path) -> Verdict | None:
+    """H1（2026-10-22 安全审计）：执行目标仓库自带代码前的信任门。
+
+    `nf verify` 的 inproc/script 面会把目标仓库 verify.sh 的 heredoc Python 当本机进程
+    代码执行（CWE-94）。目标仓库 origin owner 不在允许列表时**默认拒绝执行**，需显式
+    `--trust-repo`（NF_TRUST_REPO=1）。返回 None = 放行；返回 Verdict = 拒绝并如实报 FAIL
+    （**不假装 PASS**：拒绝本身是协议面结论，与 bash 的判据不同形，但明确写出原因）。
+    """
+    ok, why = repo_trust.trust_status(str(root))
+    if ok:
+        return None
+    v = Verdict(name=f"check{num}", title=title, status=FAIL)
+    v.verdicts.append((FAIL, repo_trust.refusal_message(str(root), why)))
+    return v
+
+
 def _script(rel: str, num: int, title: str, labels: Labels) -> Callable[[Path], Verdict]:
     """「独立脚本」型 check：直接 `runpy` 跑该脚本，按退出码定胜负。
 
@@ -249,6 +265,9 @@ def _script(rel: str, num: int, title: str, labels: Labels) -> Callable[[Path], 
     脚本自己调 `sys.exit(n)` 由 `gate_inproc.run_script` 收成返回值，**不杀门禁进程**。
     """
     def run(root: Path) -> Verdict:
+        refused = _trust_gate(num, title, root)
+        if refused is not None:
+            return refused
         v = Verdict(name="check%d" % num, title=title, status=PASS)
         code, out = gate_inproc.run_script(root / rel, root, "check%d" % num)
         if code == 0:
@@ -282,6 +301,9 @@ def _inproc(num: int, title: str, labels: Labels) -> Callable[[Path], Verdict]:
         exact = False
 
     def run(root: Path) -> Verdict:
+        refused = _trust_gate(num, title, root)
+        if refused is not None:
+            return refused
         v = Verdict(name="check%d" % num, title=title, status=PASS)
         text = _verify_sh() or ""
         if exact:
@@ -533,9 +555,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--memo", action="store_true", help="打开内容寻址 memo（默认关）")
     ap.add_argument("--json", action="store_true", help="机器面")
     ap.add_argument("--repeat", type=int, default=1, help="连跑 N 遍（看 memo 收益）")
+    ap.add_argument("--trust-repo", dest="trust_repo", action="store_true",
+                    help="显式信任目标仓库（H1）：允许执行其 verify.sh 内嵌代码；外来仓库默认拒绝")
     ap.add_argument("--quiet-time", action="store_true",
                     help="输出里不带墙钟耗时（**确定性输出**用；见下）")
     a = ap.parse_args(argv)
+    if getattr(a, "trust_repo", False):
+        os.environ[repo_trust.ENV_TRUST] = "1"
 
     # 不确定性面**默认不进输出**（2026-10-15 实测教训）：`nf verify` 曾被
     # test_daemon_parity 抓到「直跑 vs 守护」输出逐字节不同（3480 vs 3478 字节），

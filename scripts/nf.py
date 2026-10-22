@@ -1312,6 +1312,10 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="并行跑各条 check 的进程数（0=串行，缺省）。每条 check 仍在"
                           "**独立子进程**里跑 `nf verify --only N --json`，判据一字不改；"
                           "合并按 check 号排序，输出与串行逐字节一致（实测 8 路 ≈3.2×）")
+    vfy.add_argument("--trust-repo", dest="trust_repo", action="store_true",
+                     help="显式信任目标仓库：允许引擎在**本进程内执行**其 verify.sh 内嵌代码"
+                          "（H1/CWE-94 面）。默认只信任 origin owner 在白名单的仓库；"
+                          "外来/不可信仓库不加本旗标一律拒绝执行（自担风险）")
 
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
     # 命令面实现收在 core.nfal_cli（此处只做入口，避免与 nf 命令面重复定义旗标）。
@@ -6902,6 +6906,28 @@ def _cmd_verify(args) -> int:
     import os as _os
 
     from core import gate_engine as ge
+    from core import repo_trust as _rt
+
+    # H1（2026-10-22 安全审计）：nf verify 的 inproc/script 面会把目标仓库 verify.sh 的
+    # heredoc Python 当本机进程代码执行（CWE-94）。信任门在**执行之前**判：不可信仓库
+    # （origin owner 不在白名单）默认拒绝，需显式 --trust-repo 自担风险。
+    if getattr(args, "trust_repo", False):
+        _os.environ[_rt.ENV_TRUST] = "1"
+        print("WARN: --trust-repo 已启用：将执行目标仓库自带的门禁脚本（含内嵌 Python，"
+              "CWE-94 面），风险自担", file=sys.stderr)
+    _trusted, _why = _rt.trust_status(str(ge.ROOT))
+    if not _trusted:
+        _msg = _rt.refusal_message(str(ge.ROOT), _why)
+        if args.json:
+            print(_json.dumps({"kind": "nf-verify", "schema": "nf-verify/1", "ok": False,
+                               "fails": 1, "checks": [], "pending": [], "complete": False,
+                               "gate_of_record": "bash verify.sh",
+                               "error": {"code": "untrusted_repo", "message": _why}},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf verify（门禁单进程引擎 · 已因信任门拒绝执行）==")
+        print(_msg, file=sys.stderr)
+        return 2
 
     ge.build_registry()
     only = [int(x) for x in str(args.only).split(",") if x.strip()] if args.only else None
