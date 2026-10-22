@@ -175,10 +175,10 @@ def affected_selection(ids: list) -> tuple:
     changed = changed_paths()
     if not changed:
         keep = [t for t in ids if module_of(t) in ALWAYS_MODULES]
-        return keep, "干净树（只跑常驻集 %d 个模块）" % len(keep and {module_of(t) for t in keep})
+        return keep, f"干净树（只跑常驻集 {len(keep and {module_of(t) for t in keep})} 个模块）"
     non_core = [p for p in changed if not p.startswith("desktop/src/core/")]
     if non_core:
-        return list(ids), "非 core 变更 %d 个 → 全量兜底" % len(non_core)
+        return list(ids), f"非 core 变更 {len(non_core)} 个 → 全量兜底"
     changed_core = {Path(p).stem for p in changed if p.endswith(".py")}
     closure = _core_reverse_closure(changed_core)
     sources = _test_sources()
@@ -187,7 +187,7 @@ def affected_selection(ids: list) -> tuple:
         mod = module_of(tid)
         if mod in ALWAYS_MODULES or (_core_imports(sources.get(mod, "")) & closure):
             keep.append(tid)
-    return keep, "core 变更 %d 个 → 反向依赖闭包 %d 个模块" % (len(changed_core), len(closure))
+    return keep, f"core 变更 {len(changed_core)} 个 → 反向依赖闭包 {len(closure)} 个模块"
 
 
 def load_weights() -> dict:
