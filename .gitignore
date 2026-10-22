@@ -32,6 +32,11 @@ id_ed25519*
 .rivet/
 .rivet.md
 
+# 判据缓存（C1，2026-10-22）：默认落**用户级**缓存（~/.cache/ninfenz/<repo-hash>/ 或
+# %LOCALAPPDATA%）；仅当用户缓存目录不可写时回退仓内 `.nf-cache/` 并 WARN——回退面也必须
+# 被忽略，否则 `git add -A` 会把缓存件（可能被预置伪造）提交进产品仓。
+.nf-cache/
+
 # CI 失败诊断产物（Z5：verify.sh 的日志与实时报告；由 workflow 上传为 artifact，不入仓）
 .nf-logs/
 .artifacts/
