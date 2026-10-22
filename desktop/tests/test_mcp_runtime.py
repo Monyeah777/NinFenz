@@ -485,6 +485,37 @@ class TestMcpRuntime(unittest.TestCase):
         msg = json.loads(out.getvalue().strip())
         self.assertEqual(msg["error"]["code"], -32603)
 
+    def test_internal_error_is_redacted_from_protocol_face(self):
+        """R2（2026-10-22 安全审计，CWE-209）：内部异常只回稳定错误码 + 通用文案。
+
+        异常原文常带绝对路径（本仓大量「{path} 不存在」形态），回给 MCP 客户端等于泄露
+        服务端目录结构。判据：协议面 message 逐字 ==「Internal error」、不含路径/异常类名；
+        id 仍按 §5 回显；诊断细节必须只落在 stderr。
+        """
+        import contextlib
+        from io import StringIO
+        secret = "C:\\secret\\id_rsa 不存在"
+
+        class _LeakSrv(McpRuntime):
+            def _dispatch(self, method, params):
+                if method == "boom":
+                    raise OSError(secret)
+                return super()._dispatch(method, params)
+
+        srv = _LeakSrv(self.snap)
+        out, err = StringIO(), StringIO()
+        with contextlib.redirect_stderr(err):
+            srv.serve_stdio(stdin=StringIO(json.dumps(
+                {"jsonrpc": "2.0", "id": 11, "method": "boom"}) + "\n"), stdout=out)
+        msg = json.loads(out.getvalue().strip())
+        self.assertEqual(msg["error"]["code"], -32603)
+        self.assertEqual(msg["id"], 11, "id 可判定时 MUST 回显（§5）")
+        self.assertEqual(msg["error"]["message"], "Internal error",
+                         "对外文案必须是稳定通用文案（不得回显异常原文）")
+        self.assertNotIn(secret, out.getvalue(), "协议面泄露了异常里的绝对路径")
+        self.assertNotIn("OSError", out.getvalue(), "协议面泄露了异常类名")
+        self.assertIn(secret, err.getvalue(), "诊断细节必须落在 stderr")
+
 
     # —— JSON-RPC 2.0 §4 / §5 结构约束（本波净吸收：params 结构性与 id 类型）——
     def test_params_must_be_structured(self):
