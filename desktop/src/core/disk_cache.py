@@ -11,7 +11,11 @@
 - **运行时标签**：Python 版本 / 平台 / PyYAML 是否在场——软依赖的有无会改变结果。
 - **调用方给的各段键**：各自的输入面内容指纹（例如产出面的 `INDEX_INPUTS`）。
 
-落点：`<NF_HOME>/cache/<tag>/<key>.json`（**不在仓库内**，故仓库纯净与门禁不受影响）。
+落点（C1，2026-10-22）：**默认用户级、按被审仓库分段**——
+`<用户缓存>/ninfenz/<repo-hash>/<tag>/<key>.json`（Windows 用 `%LOCALAPPDATA%`，
+其余 `$XDG_CACHE_HOME`/`~/.cache`）。`NF_CACHE_DIR` 可显式指定；显式 `NARRATIVE_FORGE_HOME`
+（测试/便携隔离）仍落 `<NF_HOME>/cache`。用户缓存不可写时**回退仓内 `.nf-cache/` 并 WARN**，
+且回退目录必须带 `.nf-cache-owner` 标记（预置的伪造缓存目录无标记 ⇒ 拒绝收养/拒读）。
 
 纪律（fail-closed）：
 1. 读回必须**校验**（调用方给 `validate`）：结构不对 / 键集不符 / 半截 JSON → 一律当没命中；
@@ -25,11 +29,20 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 from core import json_doc
 
 ENV_OFF = "NF_NO_DISK_CACHE"
+#: C1（2026-10-22 安全审计）：缓存根显式覆盖（最高优先级）。
+ENV_DIR = "NF_CACHE_DIR"
+#: 仓内回退目录的所有权标记：无标记的预置缓存目录**不收养**（防被审仓库预置伪造判定）。
+MARKER = ".nf-cache-owner"
+#: 缓存根裁决结果与「全不可用」禁用标记（进程内一次记忆；测试用 _reset_root_state 清）。
+_ROOT: dict[str, Any] = {}
+_DISABLED = False
 KEEP = 16
 #: 大集合标签（每份文件一条的那种，如 AST 事实）裁剪频次：每 N 次写入裁一次。
 #: 为什么不一写一裁：一写一裁＝每次都要把目录整个 scandir+stat 一遍，**每份文件一条**的标签
@@ -148,7 +161,7 @@ def defer_flush() -> int:
 
 
 def enabled() -> bool:
-    return not os.environ.get(ENV_OFF)
+    return not os.environ.get(ENV_OFF) and not _DISABLED
 
 
 def canonical(value: Any) -> Any:
@@ -165,9 +178,111 @@ def canonical(value: Any) -> Any:
                         None, what="cache 规范化")
 
 
+def _user_cache_base() -> Path:
+    """用户级缓存根（跨平台，C1）：Windows `%LOCALAPPDATA%
+infenz`，其余 `~/.cache/ninfenz`。"""
+    if os.name == "nt":
+        env_name, parts = "LOCALAPPDATA", ("AppData", "Local")
+    else:
+        env_name, parts = "XDG_CACHE_HOME", (".cache",)
+    base = os.environ.get(env_name) or os.path.join(os.path.expanduser("~"), *parts)
+    return Path(base) / "ninfenz"
+
+
+def _repo_tag() -> str:
+    """被审仓库分段：当前工作目录真实路径的短哈希（同仓多次运行稳定、跨仓不串味）。"""
+    try:
+        where = str(Path.cwd().resolve())
+    except OSError:                            # cwd 已消失等异常状态：退回未解析形态（不抛）
+        where = os.getcwd()
+    return hashlib.sha256(where.encode("utf-8")).hexdigest()[:16]
+
+
+def _probe_writable(d: Path) -> bool:
+    """真实可写判据：建目录 → 写探针 → 读回（临时目录出块自清，不留残留）。
+
+    失败语义：探针失败＝该候选不可用（**不抛**；由 `_resolve_root` 汇总后降级/回退）。
+    """
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix=".nf_write_probe.", dir=str(d)) as td:
+            probe = Path(td) / "p"
+            probe.write_text("ok", encoding="utf-8")
+            return probe.read_text(encoding="utf-8") == "ok"
+    except OSError:  # 建目录/写探针失败＝候选不可用（语义见 docstring：降级而非抛）
+        return False
+
+
+def _adopt_fallback(d: Path) -> bool:
+    """仓内回退目录的收养闸门（C1 第二道闸）：只收养**空目录**或**带所有权标记**的目录。
+
+    为什么：回退目录落在被审仓库里——若仓库预置了一份伪造缓存（含假的 PASS 判定），
+    直接收养等于把 C1 原样复活。无标记的非空目录一律拒绝（宁可关缓存，也不拿可疑判定）。
+    """
+    mark = d / MARKER
+    try:
+        if mark.is_file():
+            return True
+        d.mkdir(parents=True, exist_ok=True)
+        if any(d.iterdir()):
+            return False
+        mark.write_text(str(Path.cwd().resolve()), encoding="utf-8")
+        return True
+    except OSError:  # 建目录/写标记失败＝回退不可用（调用方据此禁用缓存，fail-closed）
+        return False
+
+
+def _root_key() -> tuple:
+    """缓存根的**环境指纹**：任一来源变化（测试/守护会在同进程里换 NF_HOME/cwd）都要重裁决。"""
+    return (os.environ.get(ENV_DIR), os.environ.get("NARRATIVE_FORGE_HOME"),
+            os.environ.get("LOCALAPPDATA"), os.environ.get("XDG_CACHE_HOME"),
+            os.getcwd(), os.name)
+
+
+def _resolve_root() -> Path:
+    """缓存根裁决（C1）：NF_CACHE_DIR → 显式 NF_HOME → 用户级（按仓分段）→ 仓内回退。"""
+    global _DISABLED
+    key = _root_key()
+    hit = _ROOT.get("root")
+    if hit is not None and _ROOT.get("key") == key:
+        return hit
+    _DISABLED = False        # 环境变了：重新裁决（上一次的禁用结论只对它那一组环境成立）
+    explicit = os.environ.get(ENV_DIR)
+    home = os.environ.get("NARRATIVE_FORGE_HOME")
+    if explicit:
+        root = Path(explicit).expanduser()
+    elif home:
+        # 测试/便携隔离：显式 NF_HOME 保持旧口径（<NF_HOME>/cache）
+        root = Path(home).expanduser() / "cache"
+    else:
+        root = _user_cache_base() / _repo_tag()
+    if _probe_writable(root):
+        _ROOT["root"], _ROOT["key"] = root, key
+        return root
+    fallback = Path.cwd() / ".nf-cache"
+    if _adopt_fallback(fallback):
+        print(f"WARN: 用户缓存目录不可写（{root}），判据缓存回退仓内 {fallback}："
+              "该目录可能被仓库内容影响，只应作降级运行", file=sys.stderr)
+        _ROOT["root"], _ROOT["key"] = fallback, key
+        return fallback
+    # 两处都不可用：关闭缓存（读=未命中、写=失败），绝不回落到可疑位置
+    _DISABLED = True
+    print(f"WARN: 没有可写的判据缓存目录（用户级 {root} 与仓内 {fallback} 均不可用）："
+          "本次运行**禁用缓存**", file=sys.stderr)
+    _ROOT["root"], _ROOT["key"] = root, key
+    return root
+
+
 def root_dir() -> Path:
-    from core import storage
-    return storage.cache_root()
+    """缓存根（C1）：默认用户级、按被审仓库分段；见 `_resolve_root`。"""
+    return _resolve_root()
+
+
+def _reset_root_state() -> None:
+    """测试隔离：清缓存根裁决与禁用标记（生产调用方不应使用）。"""
+    global _DISABLED
+    _ROOT.clear()
+    _DISABLED = False
 
 
 def dir_for(tag: str) -> Path:
