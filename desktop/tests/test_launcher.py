@@ -30,12 +30,14 @@ if str(Path(ROOT) / "desktop" / "src") not in sys.path:
 from core import posix_shell as psh  # noqa: E402
 from core import repo_face as _repo_face  # noqa: E402
 
-try:
-    BASH = shutil.which("bash") or psh.posix_shell()
-except Exception:                      # noqa: BLE001 - 解析不到就按原口径跳过
-    BASH = None
-if BASH and not os.path.isfile(BASH):
-    BASH = None
+BASH = psh.find_posix_shell()
+
+
+def _bash_python() -> str:
+    """→ 当前解释器的 POSIX 路径；避免 Git Bash 回落到 Windows Store 的 python3 桩。"""
+    p = Path(sys.executable).as_posix()
+    m = re.match(r"^([A-Za-z]):/(.*)$", p)
+    return f"/{m.group(1).lower()}/{m.group(2)}" if m else p
 
 
 def _stop_daemon(home, wait=10.0):
@@ -70,7 +72,10 @@ class LauncherFallbackTest(unittest.TestCase):
     def _run(self, *argv, timeout=180):
         return subprocess.run([BASH, "scripts/nf", *argv], cwd=ROOT, env=self.env,
                               capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=timeout)
+                              errors="replace", timeout=timeout, stdin=subprocess.DEVNULL)
+
+    def test_resolved_shell_is_not_a_store_stub(self):
+        self.assertNotIn("windowsapps", BASH.lower())
 
     def test_fallback_runs_without_daemon(self):
         p = self._run("--version")
@@ -240,7 +245,7 @@ class AutostartTest(unittest.TestCase):
             env["NF_AUTOSTART"] = autostart
         return subprocess.run([BASH, "scripts/nf", *argv], cwd=ROOT, env=env,
                               capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=300)
+                              errors="replace", timeout=300, stdin=subprocess.DEVNULL)
 
     def _sleepy_shim(self, home, sleep_seconds=5):
         """PATH shim：只在 `daemon start` 那一跑里先睡 N 秒——用来判「拉起**非阻塞**」。
@@ -250,8 +255,7 @@ class AutostartTest(unittest.TestCase):
         bin_dir = os.path.join(home, "shim")
         os.makedirs(bin_dir, exist_ok=True)
         log = os.path.join(home, "starts.log")
-        real = subprocess.run([BASH, "-c", "command -v python || command -v python3"],
-                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
+        real = _bash_python()
         body = ('#!/bin/sh\n'
                 'printf "%s %s\\n" "$0" "$*" >> "' + log.replace("\\", "/") + '"\n'
                 'case "$*" in *"daemon start"*) sleep ' + str(sleep_seconds) + ' ;; esac\n'
@@ -374,9 +378,7 @@ class InterpreterLaunchBudgetTest(unittest.TestCase):
 
     def _real_py(self):
         """真解释器（MSYS 形态路径）——由 bash 自己解析，避免 Windows 路径形态的坑。"""
-        r = subprocess.run([BASH, "-c", "command -v python || command -v python3"],
-                           capture_output=True, text=True, encoding="utf-8")
-        return r.stdout.strip()
+        return _bash_python()
 
     def _shim_env(self, stub_python3=False, autostart="0"):
         """PATH 最前挂一个只放 shim 的目录：`python`/`python3` 先记一笔再 `exec` 真解释器。
@@ -413,7 +415,7 @@ class InterpreterLaunchBudgetTest(unittest.TestCase):
     def _run(self, *argv, env, timeout=300):
         return subprocess.run([BASH, "scripts/nf", *argv], cwd=ROOT, env=env,
                               capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=timeout)
+                              errors="replace", timeout=timeout, stdin=subprocess.DEVNULL)
 
     def test_fast_path_starts_no_interpreter(self):
         """守护在跑时启动器**一次解释器都不许起**——起一次就是 50–300 ms 的固定成本。"""
@@ -626,7 +628,8 @@ class InterpreterDietTest(unittest.TestCase):
     def _run(self, *argv, env=None, timeout=300):
         return subprocess.run([BASH, "scripts/nf", *argv], cwd=ROOT,
                               env=env or dict(os.environ), capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", timeout=timeout)
+                              encoding="utf-8", errors="replace", timeout=timeout,
+                              stdin=subprocess.DEVNULL)
 
     def _home(self):
         home = tempfile.mkdtemp(prefix="nf_diet_")
@@ -638,8 +641,7 @@ class InterpreterDietTest(unittest.TestCase):
         bin_dir = os.path.join(home, "shim")
         os.makedirs(bin_dir, exist_ok=True)
         log = os.path.join(home, "starts.log")
-        real = subprocess.run([BASH, "-c", "command -v python || command -v python3"],
-                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
+        real = _bash_python()
         body = ('#!/bin/sh\n'
                 'printf "%s %s\\n" "$0" "$*" >> "' + log.replace("\\", "/") + '"\n'
                 'exec "' + real + '" "$@"\n')

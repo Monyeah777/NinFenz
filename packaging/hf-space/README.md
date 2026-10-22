@@ -21,7 +21,7 @@ short_description: Run real NinFenz read-only gates in the browser
 | 文档语义体检 | `nf lint <你的文本>` | 这段内容过不过仓库的文档判据 |
 | 自述数字核对 | `nf stats --check` | README / llms.txt 里的数字与实算是否一致 |
 | 契约一致性 | `nf conformance` | 协议件与 registry 是否自洽 |
-| 只读体检 | `nf doctor` | 仓库级 16 项只读体检 |
+| 只读体检 | `nf doctor` | 仓库级 17 项只读体检 |
 
 ## 实现纪律
 
@@ -33,9 +33,9 @@ short_description: Run real NinFenz read-only gates in the browser
 
 ```bash
 npm i -g ninfenz
-ninfenz doctor                                    # 16 项只读体检
+ninfenz doctor                                    # 17 项只读体检
 
-# 完整 check1-40 门禁需要真实检出（verify.sh 依赖 .git / .github / results）
+# 完整 check1-42 门禁需要真实检出（verify.sh 依赖 .git / .github / results）
 git clone https://github.com/Monyeah777/NinFenz && cd NinFenz && bash verify.sh
 ```
 

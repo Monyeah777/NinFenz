@@ -30,7 +30,7 @@ MODES = (
     ('lint', '文档语义体检（nf lint）', '把文本当作待检 .md，跑仓库 lint 判据', True),
     ('stats', '自述数字核对（nf stats --check）', '校验 README/llms.txt 的数字与实算一致', False),
     ('conformance', '契约一致性（nf conformance）', '跑协议件 ↔ registry 的一致性判据', False),
-    ('doctor', '只读体检（nf doctor）', '仓库级 16 项只读体检', False),
+    ('doctor', '只读体检（nf doctor）', '仓库级 17 项只读体检', False),
 )
 
 
@@ -113,7 +113,7 @@ PAGE = '''<!doctype html>
 <textarea id="text" placeholder="粘贴要体检的 markdown（仅 lint 模式使用）"></textarea>
 <div class="meta" id="meta">就绪</div>
 <pre id="out">点击「运行」开始。</pre>
-<p class="sub" style="margin-top:18px">完整 check1-40 门禁与离线复跑：<code>npx -y ninfenz install --dest ./nf &amp;&amp; cd nf &amp;&amp; bash verify.sh</code> · 仓库 <a style="color:var(--acc)" href="https://github.com/Monyeah777/NinFenz">Monyeah777/NinFenz</a></p>
+<p class="sub" style="margin-top:18px">完整 check1-42 门禁与离线复跑：<code>npx -y ninfenz install --dest ./nf &amp;&amp; cd nf &amp;&amp; bash verify.sh</code> · 仓库 <a style="color:var(--acc)" href="https://github.com/Monyeah777/NinFenz">Monyeah777/NinFenz</a></p>
 </div><script>
 const MODES=__MODES__;
 const sel=document.getElementById('mode'),ta=document.getElementById('text'),hint=document.getElementById('hint');

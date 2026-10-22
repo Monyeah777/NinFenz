@@ -17,6 +17,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const SITE = path.resolve(HERE, '..');
@@ -53,6 +54,75 @@ if (want !== want2) {
 
 // ---- 质量凭证面 ----
 const write = process.argv.includes('--write');
+const LIVE_FILES = [...new Set(REQUIRED.concat(OPTIONAL, ['run.sh']))];
+
+// canonical 串存在，不代表同一面上的**局部计数**也正确。这里把 check 数、
+// PASS 数与 doctor 期望单独对账，防止“页脚写对了、正文仍写旧值”的假绿。
+for (const f of LIVE_FILES) {
+  const p = path.join(SITE, f);
+  if (!fs.existsSync(p)) continue;
+  let t = read(p);
+  const badChecks = [...new Set([...t.matchAll(/check1-(\d+)/g)].map((x) => x[1])
+    .filter((n) => n !== String(stats.verify_checks)))];
+  const badPasses = [...new Set([...t.matchAll(/PASS=(\d+)/g)].map((x) => x[1])
+    .filter((n) => n !== String(stats.baseline_pass)))];
+  if (badChecks.length) {
+    console.error('✗ site/' + f + ' 局部 check 数漂移：check1-' + badChecks.join(' / check1-')
+                  + '（真源 check1-' + stats.verify_checks + '）');
+    fail = 1;
+    if (write) {
+      t = t.replace(/check1-\d+/g, 'check1-' + stats.verify_checks);
+      fs.writeFileSync(p, t, 'utf8');
+    }
+  }
+  if (badPasses.length) {
+    console.error('✗ site/' + f + ' 局部 PASS 数漂移：PASS=' + badPasses.join(' / PASS=')
+                  + '（真源 PASS=' + stats.baseline_pass + '）');
+    fail = 1;
+    if (write) {
+      t = t.replace(/PASS=\d+/g, 'PASS=' + stats.baseline_pass);
+      fs.writeFileSync(p, t, 'utf8');
+    }
+  }
+}
+
+// doctor 的检查项数是运行时行为，不能从页脚的质量凭证串推断。直接问
+// `doctor --json`，再核对所有公开命令提示里的 N/N 期望。
+const py = process.env.NF_PYTHON || 'python';
+const doctorProc = spawnSync(py, [path.join(ROOT, 'scripts', 'nf.py'), 'doctor', '--json'], {
+  cwd: ROOT, encoding: 'utf8', env: { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' }
+});
+let doctorWant = '';
+try {
+  const doctor = JSON.parse(doctorProc.stdout || '{}');
+  if (doctorProc.status === 0 && Number.isInteger(doctor.passed) && Number.isInteger(doctor.total)) {
+    doctorWant = doctor.passed + '/' + doctor.total;
+  }
+} catch {
+  // 解析失败统一在下一条报错中说明。
+}
+if (!doctorWant) {
+  console.error('✗ 无法从 `python scripts/nf.py doctor --json` 取得体检计数');
+  fail = 1;
+} else {
+  for (const f of LIVE_FILES) {
+    const p = path.join(SITE, f);
+    if (!fs.existsSync(p)) continue;
+    const t = read(p);
+    const pairs = [
+      ...t.matchAll(/\bdoctor\b[^\n]{0,12}?[（(]?(\d+)\s*\/\s*(\d+)/g),
+      ...t.matchAll(/体检[:：][^\n]{0,12}?(\d+)\s*\/\s*(\d+)/g),
+    ];
+    const bad = [...new Set(pairs.map((x) => x[1] + '/' + x[2])
+      .filter((x) => x !== doctorWant))];
+    if (bad.length) {
+      console.error('✗ site/' + f + ' doctor 期望值漂移：' + bad.join(' / ')
+                    + '（真源 ' + doctorWant + '）');
+      fail = 1;
+    }
+  }
+}
+
 for (const f of REQUIRED.concat(OPTIONAL)) {
   const p = path.join(SITE, f);
   if (!fs.existsSync(p)) {
@@ -164,6 +234,29 @@ if (NPM_V) {
   }
   if (counts.size > 1) { console.error('✗ 站点 npm 件数口径不唯一：' + [...counts].join(' / ')); fail = 1; }
   if (sizes.size > 1) { console.error('✗ 站点 npm 体积口径不唯一：' + [...sizes].join(' / ')); fail = 1; }
+  const payloadPath = path.join(ROOT, 'packaging', 'npm', 'payload', 'payload-manifest.json');
+  if (fs.existsSync(payloadPath)) {
+    try {
+      const payload = JSON.parse(read(payloadPath));
+      const wantCount = String(payload.count);
+      const wantMb = (payload.total_bytes / 1048576).toFixed(2);
+      if (counts.size && !(counts.size === 1 && counts.has(wantCount))) {
+        console.error('✗ 站点 npm 件数与 payload 清单不一致：' + [...counts].join(' / ')
+                      + '（清单 ' + wantCount + '）');
+        fail = 1;
+      }
+      if (sizes.size && !(sizes.size === 1 && sizes.has(wantMb))) {
+        console.error('✗ 站点 npm 体积与 payload 清单不一致：' + [...sizes].join(' / ')
+                      + '（清单 ' + wantMb + ' MB）');
+        fail = 1;
+      }
+    } catch (e) {
+      console.error('✗ packaging/npm/payload/payload-manifest.json 不可解析：' + e.message);
+      fail = 1;
+    }
+  } else {
+    console.log('  npm payload 清单不在场（忽略：忽略面，需先 stage）');
+  }
   if (!counts.size && !sizes.size) { console.log('  站点未见 npm 件数/体积声明（跳过口径一致性）'); }
   if (!fail) {
     console.log('  npm: 版本 v' + NPM_V + ' · 件数 ' + ([...counts][0] || '—')
