@@ -26,7 +26,12 @@ const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
 // （`.release-frozen/` 曾在此列：2026-10-11 该 golden master 机制退役，目录与生成脚本已删除，
 // 故不再需要排除项——保留注释是为了下次有人「重建快照」时记得它必须自带门禁。）
 const EXCLUDE_DIRS = ['engine/', 'results/', '.github/', '.gitee/', 'packaging/', '.git/',
-                      'desktop/tests/'];
+                      'desktop/tests/',
+                      // M1（2026-10-22 安全审计）：`changes/` 是内部开发流水（未发布变更记录/审计），
+                      // 不属于运行时面。此前漏排除 ⇒ `npm i ninfenz` 会把内部材料分发到用户机器
+                      // （CWE-200 / SLSA L2「构建产物只含声明内容」）。发布面只用白名单思路修，
+                      // 这里仍是黑名单兜底（N2 待白名单化）。
+                      'changes/'];
 const EXCLUDE_ANY = ['__pycache__/', '.pyc', 'tui/dist/', '.DS_Store'];
 //: 单件排除（脚手架残留，2026-10-10 审计 P2-14）：仓库根 `trace.json` 是 `nf assemble --trace`
 //: 留下的 404 B 占位件（phase=clarify / requirement="需求"），不是运行时依赖，不该进发布物。
