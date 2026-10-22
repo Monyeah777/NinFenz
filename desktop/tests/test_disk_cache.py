@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """内容寻址持久缓存（`core.disk_cache`）单测：键的构成 + 不可信即重算 + 有界 + 可关闭。"""
+import contextlib
 import json
 import os
 import shutil
 import sys
 import tempfile
 import unittest
+from io import StringIO
 from pathlib import Path
 
 ROOT = str(Path(__file__).resolve().parents[2])
@@ -158,6 +160,102 @@ class DiskCacheTest(unittest.TestCase):
         with open(dc.dir_for("t") / ("%s.json" % ckey), encoding="utf-8") as fh:
             raw = json.load(fh)
         self.assertEqual([["a"], {"n": 1}], raw)
+
+
+class CacheRootC1Test(unittest.TestCase):
+    """C1（2026-10-22 安全审计）：缓存根移出仓库 + `NF_CACHE_DIR` 覆盖 + 不可写回退带所有权标记。"""
+
+    def setUp(self):
+        self._cwd = os.getcwd()
+        self._env = {k: os.environ.get(k) for k in (
+            dc.ENV_DIR, "NARRATIVE_FORGE_HOME", "LOCALAPPDATA", "XDG_CACHE_HOME")}
+        dc._reset_root_state()
+        self.addCleanup(self._restore)
+
+    def _restore(self):
+        os.chdir(self._cwd)
+        for k, v in self._env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        dc._reset_root_state()
+
+    def _dir(self) -> Path:
+        d = tempfile.mkdtemp(prefix="nf_c1_")
+        self.addCleanup(shutil.rmtree, d, True)
+        return Path(d)
+
+    def _set_user_base(self, base: Path) -> None:
+        """把用户级缓存根指到 base（跨平台），并清掉其它覆盖源。"""
+        if os.name == "nt":
+            os.environ["LOCALAPPDATA"] = str(base)
+        else:
+            os.environ["XDG_CACHE_HOME"] = str(base)
+        os.environ.pop(dc.ENV_DIR, None)
+        os.environ.pop("NARRATIVE_FORGE_HOME", None)
+
+    def test_default_root_is_user_level_not_in_repo(self):
+        """验收：仓内预置伪造 .nf-cache/ 后，默认仍落用户级 → 伪造缓存不被命中。"""
+        user = self._dir() / "userbase"
+        repo = self._dir()
+        fake_dir = repo / ".nf-cache"
+        fake_dir.mkdir()
+        fake = fake_dir / "deadbeef.json"
+        fake.write_text('{"fake": "PASS"}', encoding="utf-8")
+        self._set_user_base(user)
+        os.chdir(repo)
+        root = dc.root_dir()
+        self.assertTrue(str(root).startswith(str(user)), root)
+        self.assertNotEqual(root, fake_dir, "默认缓存根不得落在被审仓库内")
+        ckey = dc.key("c1", "p")
+        self.assertIsNone(dc.load("c1", ckey), "仓内伪造缓存不得被读")
+        dc.store("c1", ckey, {"ok": True})
+        self.assertEqual({"ok": True}, dc.load("c1", ckey))
+        self.assertTrue(list((root / "c1").glob("*.json")), "写只落用户级缓存")
+        self.assertEqual('{"fake": "PASS"}', fake.read_text(encoding="utf-8"),
+                         "不得改写仓内预置件")
+
+    def test_env_override_wins(self):
+        target = self._dir() / "custom"
+        os.chdir(self._dir())
+        os.environ[dc.ENV_DIR] = str(target)
+        os.environ.pop("NARRATIVE_FORGE_HOME", None)
+        self.assertEqual(dc.root_dir(), target)
+        dc.store("c1o", dc.key("c1o", "x"), {"V": 1})
+        self.assertTrue((target / "c1o").is_dir(), "覆盖目录必须真的被用")
+
+    def test_unwritable_falls_back_to_marked_repo_cache_with_warn(self):
+        repo = self._dir()
+        os.chdir(repo)
+        blocker = self._dir() / "blocker"
+        blocker.write_text("x", encoding="utf-8")       # 让用户级 base 落在一个文件之下
+        self._set_user_base(blocker)
+        dc._reset_root_state()
+        err = StringIO()
+        with contextlib.redirect_stderr(err):
+            root = dc.root_dir()
+        self.assertEqual(root, repo / ".nf-cache", "用户级不可写 → 回退仓内并 WARN")
+        self.assertTrue((root / dc.MARKER).is_file(), "回退目录必须打所有权标记")
+        self.assertIn("WARN", err.getvalue())
+
+    def test_preseeded_repo_cache_is_not_adopted(self):
+        """伪造回退面：用户级不可写 + 仓内已有未标记的 .nf-cache ⇒ 拒绝收养（禁用缓存）。"""
+        repo = self._dir()
+        os.chdir(repo)
+        fake_dir = repo / ".nf-cache"
+        fake_dir.mkdir()
+        (fake_dir / "deadbeef.json").write_text('{"fake": "PASS"}', encoding="utf-8")
+        blocker = self._dir() / "blocker"
+        blocker.write_text("x", encoding="utf-8")
+        self._set_user_base(blocker)
+        dc._reset_root_state()
+        err = StringIO()
+        with contextlib.redirect_stderr(err):
+            dc.root_dir()
+        self.assertFalse(dc.enabled(), "无可信缓存根 ⇒ 整体禁用缓存（fail-closed）")
+        self.assertIsNone(dc.load("c1", dc.key("c1", "p")), "预置伪造缓存不得被读")
+        self.assertFalse((fake_dir / dc.MARKER).exists(), "不得给伪造目录打标记")
 
 
 class ImportGraphCacheTest(unittest.TestCase):
