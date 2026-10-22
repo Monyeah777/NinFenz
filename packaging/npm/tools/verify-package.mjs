@@ -83,6 +83,11 @@ if (!fs.existsSync(manifestPath)) {
   need(dots.length === 0, 'payload 含点文件/点目录（npm 打包含剔除，会导致 tarball 与清单不一致）：' + dots.slice(0, 3).join(', '));
   const pyc = paths.filter(function (r) { return r.indexOf('__pycache__') >= 0 || r.endsWith('.pyc'); });
   need(pyc.length === 0, 'payload 混入字节码缓存：' + pyc.slice(0, 3).join(', '));
+  // M1（2026-10-22 安全审计）：内部开发记录不得随包发布。`changes/` 里是未发布变更与审计流水，
+  // 属内部材料（CWE-200；SLSA L2「产物只含声明内容」）。stage 侧已排除，这里是**判据**：
+  // 排除表被误删/改回时本断言必须红，而不是静默把内部件发出去。
+  const devrec = paths.filter(function (r) { return r === 'changes' || r.startsWith('changes/'); });
+  need(devrec.length === 0, 'payload 含内部开发记录 changes/（信息暴露）：' + devrec.slice(0, 3).join(', '));
   // 目录实况 == 清单（审计 P1-9）：只查「清单里的」不查「多出来的」，等于给发布边界留后门。
   const listed = new Set(paths);
   const extras = listFiles(PAYLOAD_DIR).filter(function (r) {
