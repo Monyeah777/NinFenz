@@ -1952,7 +1952,12 @@ class McpRuntime:
                 except Exception as exc:  # 防御：单条消息异常不杀循环
                     # JSON-RPC 2.0 §5：id 可判定时错误响应 MUST 回显——否则调用方按 id 匹配时
                     # 「看不到」这次失败（实测此前一律回 id=null）。
-                    resp = _err_at(INTERNAL_ERROR, f"Internal error: {exc}", _echoable_id(msg))
+                    # R2（2026-10-22 安全审计，CWE-209）：对外只回**稳定错误码 + 通用文案**。
+                    # 异常原文常带绝对路径（本仓大量「{path} 不存在」形态），回给 MCP 客户端
+                    # 等于泄露服务端目录结构；细节只走 stderr（诊断面保留、不进协议面）。
+                    print(f"mcp_runtime: handle() 内部异常：{type(exc).__name__}: {exc}",
+                          file=sys.stderr)
+                    resp = _err_at(INTERNAL_ERROR, "Internal error", _echoable_id(msg))
                 if resp is not None:
                     stdout.write(encode_message(resp) or "")
                     stdout.flush()
