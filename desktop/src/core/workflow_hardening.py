@@ -12,7 +12,7 @@ About code owners；Scorecard §Dependency-Update-Tool）：
 1. 每件须显式 `concurrency:`；**写入型**（`contents: write` 或含 `git push`）必须
    `cancel-in-progress: false`（取消写者会留下半推送状态），且所有写入型**共享同一 group**
    ——本仓两个入库前端都会 `git push origin`，并发即写竞态。
-2. 非写入型的 checkout 须显式 `persist-credentials: false`（否则 token 留在 `.git/config`）。
+2. 非写入型的 checkout 须显式 `persist-credentials: false`（否则 token 留在 Git 仓库配置里）。
 3. 凡真跑 `pip install` 的须声明 `cache: pip} + `cache-dependency-path`（注：见文末
    的写法说明——判据串是 cache 与 pip 的组合）。
 4. `CODEOWNERS` 在场且含 `*` 兜底规则。
@@ -81,7 +81,7 @@ def _credential_issues(rel: str, text: str, writer: bool) -> list:
     if "persist-credentials" in text:
         return []
     return [f"{rel} 的 checkout 未关凭据持久化（修复指引：with 下加 persist-credentials: false"
-            f"——actions/checkout 默认把 GITHUB_TOKEN 写进 .git/config，后续步骤都能读到）"]
+            f"——actions/checkout 默认把 GITHUB_TOKEN 写进 Git 仓库配置，后续步骤都能读到）"]
 
 
 def _cache_issues(rel: str, text: str) -> list:
