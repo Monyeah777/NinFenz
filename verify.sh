@@ -53,10 +53,38 @@ if [ -z "${NFL_TMP:-}" ] || [ ! -d "${NFL_TMP:-}" ]; then
   echo '无法创建诊断日志目录（TMPDIR / /tmp / .rivet/tmp 均不可写）——请设 NF_VERIFY_TMP 指向可写目录' >&2
   exit 2
 fi
-# **把可写临时目录传给所有子进程**（2026-10-19 实测的硬伤）：如果 TEMP/TMP 指向的目录不可写，
-# Python 的 tempfile 会退到 os.getcwd()——于是 atomic_write / disk_cache 把临时件建在**仓库根**，
-# 既污染仓库（repo_clean 判据红），又让全仓扫描越跑越慢。这里统一指到 NFL_TMP。
-export TMPDIR="$NFL_TMP" TEMP="$NFL_TMP" TMP="$NFL_TMP"
+# ---- 诊断目录绝对化（2026-10-22 修）----
+# 为什么：`NF_VERIFY_TMP` 允许相对路径（CI 传 `.nf-logs`），而 check17/18/19/21/22 的
+# 日志重定向写在 `( cd desktop && … >"$NFL_TMP"/… )` 子 shell 里——相对路径在 `cd desktop`
+# 之后解析成 `desktop/.nf-logs/…`，必然 ENOENT（实测 ci-verify 静态作业 5 连 FAIL，
+# 本地 `NF_VERIFY_TMP=.nf-logs bash verify.sh --checks-only` 逐字复现）。入口处按仓库根
+# 归一成绝对路径后，所有重定向与子 shell 的 cwd 无关。
+NFL_TMP="$(cd "$NFL_TMP" 2>/dev/null && pwd)" || {
+  echo '诊断日志目录无法归一为绝对路径（NF_VERIFY_TMP 不可进入）' >&2; exit 2;
+}
+# ---- 子进程临时目录（2026-10-22 修）----
+# 诉求①（原）：TEMP/TMP 指向不可写目录时，Python 的 tempfile 会退到 os.getcwd()，于是
+#   atomic_write / disk_cache 把临时件建在**仓库根**（污染 repo_clean 判据）。
+# 诉求②（新实测）：**不许**把 TMPDIR 指进仓库树——
+#   · check39 `session-persist`：`terminal.py` 的基线临时目录取 `tempfile.gettempdir()`，
+#     落仓内会被写盘闸门拦（ci-verify static 的第 6 条 FAIL 就来自这里）；
+#   · `test_suite_isolation`：套件 home 必须在系统临时目录；分片 home 落仓内还会被
+#     `test_conformance_scan` 的读取面审计记成"越界读取"；
+#   · `test_cli_json_face`：仓内绝对路径会从成功面回吐，命中"机器路径泄漏"判据。
+# 故：**先探测**系统临时目录是否可写；可写就保持原样，不可写才退化到 NFL_TMP。
+_nf_tmp_ok() {
+  local d="${1:-}"
+  [ -n "$d" ] || return 0
+  ( mkdir -p "$d/nf_tmp_probe_$$" && rmdir "$d/nf_tmp_probe_$$" ) 2>/dev/null
+}
+if [ -n "${TMPDIR:-}" ] && [ -d "${TMPDIR:-}" ]; then
+  TMPDIR="$(cd "$TMPDIR" && pwd)"; export TMPDIR
+fi
+if _nf_tmp_ok "${TMPDIR:-/tmp}" && _nf_tmp_ok "${TEMP:-}" && _nf_tmp_ok "${TMP:-}"; then
+  :   # 系统临时目录可写 —— 保持不动（尤其不要把 TMPDIR 指进仓库）
+else
+  export TMPDIR="$NFL_TMP" TEMP="$NFL_TMP" TMP="$NFL_TMP"
+fi
 # ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
 # 档位（2026-10-18 起）：
 #   bash verify.sh         quick 档 = 42 条静态 check + **受影响测试**（按变更面的 core 反向依赖
