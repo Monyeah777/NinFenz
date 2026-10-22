@@ -150,21 +150,74 @@ class ScratchDirTest(_Base):
 
 class GcTest(_Base):
     def test_gc_removes_only_stale_prefixed_dirs(self):
+        """S1（2026-10-22）：GC 只删 `nf-<12hex>` 目录；用户文件与其它条目绝不删。"""
         root = self._tmpdir()
         os.environ[scratch.ENV_ROOT] = str(root)
-        stale = root / "nf-stale"
-        fresh = root / "nf-fresh"
+        self.assertEqual(scratch.resolve(), root, "先收养空根（写 .nf-scratch 标记）")
+        stale = root / "nf-abc123def456"
+        fresh = root / "nf-0123456789ab"
+        legacy = root / "nf-stale"
         other = root / "keep-me"
-        for d in (stale, fresh, other):
+        keep = root / "keep.txt"
+        for d in (stale, fresh, legacy, other):
             d.mkdir()
+        keep.write_text("用户数据", encoding="utf-8")
         old = time.time() - 48 * 3600
-        os.utime(stale, (old, old))
-        os.utime(other, (old, old))
-        removed = scratch.gc()
-        self.assertEqual(removed, 1)
-        self.assertFalse(stale.exists())
-        self.assertTrue(fresh.exists())
+        for p in (stale, legacy, other):
+            os.utime(p, (old, old))
+        result = scratch.gc()
+        self.assertEqual(result["removed"], 1, result)
+        self.assertFalse(stale.exists(), "matche nf-<12hex> 的过期目录必删")
+        self.assertTrue(fresh.exists(), "未过期的 nf-<12hex> 目录保留")
+        self.assertTrue(legacy.exists(), "不匹配 nf-<12hex> 的目录不归本模块管，绝不删")
         self.assertTrue(other.exists(), "非 nf* 目录不归本模块管，绝不删")
+        self.assertTrue(keep.exists(), "S1：用户放的同级文件必须原样保留")
+        self.assertGreaterEqual(result["skipped"], 4, result)
+
+    def test_gc_skips_keep_txt_and_deletes_hex_dir(self):
+        """工单验收形态：根下放 keep.txt + nf-abc123def456/ ⇒ GC 后 keep.txt 在、目录被删。"""
+        root = self._tmpdir()
+        os.environ[scratch.ENV_ROOT] = str(root)
+        self.assertEqual(scratch.resolve(), root, "先收养空根（写 .nf-scratch 标记）")
+        keep = root / "keep.txt"
+        keep.write_text("不要删我", encoding="utf-8")
+        target = root / "nf-abc123def456"
+        target.mkdir()
+        old = time.time() - 48 * 3600
+        os.utime(target, (old, old))
+        result = scratch.gc()
+        self.assertEqual(result["removed"], 1, result)
+        self.assertFalse(target.exists())
+        self.assertTrue(keep.exists(), "S1：keep.txt 必须还在")
+        self.assertEqual(keep.read_text(encoding="utf-8"), "不要删我")
+
+    def test_gc_refuses_root_without_marker(self):
+        """S1：缺 `.nf-scratch` 根标记 ⇒ 拒绝 GC（防 NF_SCRATCH 指到别人的目录）。"""
+        root = self._tmpdir()
+        os.environ[scratch.ENV_ROOT] = str(root)
+        self.assertEqual(scratch.resolve(), root)
+        keep = root / "keep.txt"
+        keep.write_text("x", encoding="utf-8")
+        target = root / "nf-abc123def456"
+        target.mkdir()
+        os.utime(target, (time.time() - 48 * 3600,) * 2)
+        (root / scratch.MARKER).unlink()     # 模拟：标记被删/根不是本模块建的
+        with self.assertRaises(scratch.ScratchUnavailable) as ctx:
+            scratch.gc()
+        self.assertIn(scratch.MARKER, str(ctx.exception))
+        self.assertTrue(keep.exists())
+        self.assertTrue(target.exists(), "拒绝时必须一个都不删")
+
+    def test_refuses_to_adopt_home_like_dir(self):
+        """S1：非空、无标记且含非本模块条目的目录不被收养（$HOME 形态）。"""
+        home_like = self._tmpdir()
+        (home_like / "documents").mkdir()
+        (home_like / "keep.txt").write_text("x", encoding="utf-8")
+        with (mock.patch.object(scratch, "_candidates", return_value=[home_like]),
+              self.assertRaises(scratch.ScratchUnavailable)):
+            scratch.resolve()
+        self.assertTrue((home_like / "keep.txt").exists())
+        self.assertFalse((home_like / scratch.MARKER).exists(), "拒绝收养时不得写标记")
 
 
 class InRepoTest(unittest.TestCase):
