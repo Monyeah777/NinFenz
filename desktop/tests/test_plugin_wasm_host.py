@@ -35,6 +35,10 @@ WIT_READY = not [i for i in ISSUES if "WIT" in i]
 
 
 class LoadTest(unittest.TestCase):
+    # 2026-10-22：本文件头写明「wasmtime 或 .wasm 产物不在场即 skip（target/ 是忽略面，
+    # 这里不构建）」——但这两条断言装载无 issue，而产物缺席本身就会进 ISSUES，CI 必红。
+    # 按同一姿态补 skip 守卫：产物在场时断言照旧全跑，不删断言、不降判据。
+    @unittest.skipUnless(ARTIFACT_READY, "插件产物缺席（target/ 是忽略面）")
     def test_declared_manifest_is_loadable_without_issues(self):
         self.assertEqual([], ISSUES, "自带清单+WIT 不该有装载问题")
 
@@ -116,6 +120,7 @@ class FallbackTest(unittest.TestCase):
         self.assertFalse(got["ok"])
         self.assertEqual("method_not_declared", got["meta"]["reason"])
 
+    @unittest.skipUnless(ARTIFACT_READY, "插件产物缺席（target/ 是忽略面）")
     def test_host_self_test_passes(self):
         self.assertEqual(0, host._self_test())
 
