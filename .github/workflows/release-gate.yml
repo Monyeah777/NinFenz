@@ -19,6 +19,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           persist-credentials: false
+          # 2026-10-22：发布前体检含全量 discover（p6_evaluations 依赖 git tag/全历史）；浅克隆必红。
+          fetch-depth: 0
+          fetch-tags: true
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           cache-dependency-path: .github/requirements-*.txt
