@@ -22,17 +22,21 @@
 use crate::pyjson::Json;
 
 /// 真源 `FENCE = re.compile(r"(?ms)```yaml\s*(.*?)```")`。
-fn fence_re() -> &'static regex::Regex {
-    static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| {
-        regex::Regex::new(r"(?s)```yaml\s*(.*?)```").expect("围栏正则固定合法")
-    })
+///
+/// 返回 `Option`：本函数是**解析入口**的一部分，M2 要求入口不得 panic——正则编译失败
+/// （理论上不可能，模式是常量）就按「无该块」处理（`fence_yaml` → `None`），而不是
+/// `expect` 裸崩。语义与真源「except → None」同向。
+fn fence_re() -> Option<&'static regex::Regex> {
+    static RE: std::sync::OnceLock<Option<regex::Regex>> = std::sync::OnceLock::new();
+    RE.get_or_init(|| regex::Regex::new(r"(?s)```yaml\s*(.*?)```").ok())
+        .as_ref()
 }
 
 /// 真源 `_fence_yaml(text, marker)`：取**含 marker 的第一个** ```yaml 块并解析；
 /// 未命中 / 解析失败 / 顶层不是映射 → `None`（等价于"本件无该块"）。
 pub fn fence_yaml(text: &str, marker: &str) -> Option<Json> {
-    for cap in fence_re().captures_iter(text) {
+    let re = fence_re()?;                 // 入口不 panic：正则不可用 ⇒ 无该块
+    for cap in re.captures_iter(text) {
         let body = cap.get(1).map(|m| m.as_str()).unwrap_or("");
         if !body.contains(marker) {
             continue;
@@ -534,18 +538,22 @@ fn resolve_float(t: &str) -> Option<f64> {
 /// 真源里 `inputs: [通用:M10]`、`通用:M10: untyped` 都属此列。踩过一次：
 /// 一律拒含冒号的标量 ⇒ 大批模块被丢弃 ⇒ `event-backing` 凭空报缺口。
 fn looks_out_of_subset(t: &str) -> bool {
-    static DATE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = DATE.get_or_init(|| {
-        regex::Regex::new(r"^\d{4}-\d{2}-\d{2}([Tt ].*)?$").expect("日期正则固定合法")
-    });
-    if re.is_match(t) {
-        return true;
+    // 入口不 panic：正则不可用（理论上不可能）⇒ 视为「不在子集外」即落回字符串标量，
+    // 与"固定合法模式永不失败"的既有语义一致，但不再用 `expect` 裸崩。
+    static DATE: std::sync::OnceLock<Option<regex::Regex>> = std::sync::OnceLock::new();
+    if let Some(re) = DATE
+        .get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}([Tt ].*)?$").ok())
+        .as_ref()
+    {
+        if re.is_match(t) {
+            return true;
+        }
     }
-    static SEXAGESIMAL: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let sx = SEXAGESIMAL.get_or_init(|| {
-        regex::Regex::new(r"^[-+]?\d+(:[0-5]?\d)+(\.\d+)?$").expect("六十进制正则固定合法")
-    });
-    sx.is_match(t)
+    static SEXAGESIMAL: std::sync::OnceLock<Option<regex::Regex>> = std::sync::OnceLock::new();
+    SEXAGESIMAL
+        .get_or_init(|| regex::Regex::new(r"^[-+]?\d+(:[0-5]?\d)+(\.\d+)?$").ok())
+        .as_ref()
+        .is_some_and(|sx| sx.is_match(t))
 }
 
 #[cfg(test)]
@@ -762,5 +770,46 @@ mod tests {
         let v = parse("a: \"L2\"\nb: 'it''s'\n").unwrap();
         assert_eq!(crate::pyval::get(&v, "a"), Some(&Json::Str("L2".into())));
         assert_eq!(crate::pyval::get(&v, "b"), Some(&Json::Str("it's".into())));
+    }
+    /// M2 收口的**回归锁**：解析入口对任意畸形输入只许 `Ok/Err`、`Some/None`，**不许 panic**。
+    ///
+    /// 极简 fuzz（不用 cargo-fuzz：那要额外依赖面/CI 成本）：确定性 LCG 生成 1000 轮噪声，
+    /// 一半是纯字节噪声、一半是把 YAML 元字符拼成「像 YAML 但不合法」的结构噪声。
+    /// 任何一处 panic（含索引越界、切片越界、expect 裸崩）都会让本用例直接红。
+    #[test]
+    fn fuzz_malformed_input_never_panics() {
+        // 覆盖真语料里出现过的元字符 + 边界字符（NUL / DEL / 反斜杠 / CR）。
+        let alphabet: &[u8] = b"-:#[]{}\"'|>&*!%@`,. \t\r\n\\/0129aZ\x00\x7f";
+        let mut state: u64 = 0x5eed_1234_abcd_0001;
+        let mut next = |n: usize| -> usize {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            ((state >> 33) as usize) % n.max(1)
+        };
+        for _round in 0..1000 {
+            let len = next(96);
+            let mut noise = String::new();
+            for _ in 0..len {
+                noise.push(alphabet[next(alphabet.len())] as char);
+            }
+            let _ = parse(&noise);
+            let _ = fence_yaml(&noise, "machine_contract");
+
+            let mut structured = String::new();
+            for _ in 0..next(6) {
+                let indent = " ".repeat(next(5));
+                let frag = ["- ", "k: ", "k: [", "]", "{", "}", "\"", "|", ">", "\n"]
+                    [next(10)];
+                structured.push_str(&indent);
+                structured.push_str(frag);
+                structured.push('\n');
+            }
+            let _ = parse(&structured);
+            let _ = fence_yaml(&structured, "machine_contract");
+        }
+        // 空输入与纯空白也必须给出确定结果（真源：空文档 → None/Null）。
+        assert_eq!(parse("").unwrap(), Json::Null);
+        assert!(parse("   \n\t\n").is_ok());
     }
 }
