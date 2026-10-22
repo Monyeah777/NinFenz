@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:467ad10fee36f5db01ffe5ab5e725868f79ed17b27ae2f9605b564861c2a4d02
   - desktop/src/core/asset_contract.py:a79488e2bfbbc58c137881dab9116809feeadacb899efcd1583cf9369b78f082
-  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
+  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
 ---
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
+
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
+
 > 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）

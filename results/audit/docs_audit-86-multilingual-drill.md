@@ -12,8 +12,12 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
+  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
 ---
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
+
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
+
 > 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）

@@ -30,8 +30,12 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
+  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
 ---
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
+
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
+
 > 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
