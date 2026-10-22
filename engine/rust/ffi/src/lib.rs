@@ -37,9 +37,8 @@ pub extern "C" fn nf_engine_abi_version() -> u32 {
 /// # Safety
 /// 调用方须保证 input[0..len] 与 out[0..cap] 是可读/可写的有效区间；
 /// 这是 C ABI 的固有前提。
-// SAFETY: 本函数是 `unsafe extern "C"`（C ABI 出口必然 unsafe）。它把「调用方承诺的有效
-// 区间」收窄成**可判的前置条件**：任一指针为空即拒绝返回 0，绝不把可能为空的指针交给
-// `from_raw_parts`（见下方 F2 守卫）；两段切片长度都取自调用方声明的 len。
+// SAFETY: C ABI 出口必然 `unsafe`；本函数把调用方承诺的有效区间收窄成**可判前置条件**：
+// 任一指针为空即拒绝返回 0，绝不把可能为空的指针交给 `from_raw_parts`（见下方 F2 守卫）。
 #[no_mangle]
 pub unsafe extern "C" fn nf_reverse_bytes(input: *const u8, len: usize, out: *mut u8,
                                           cap: usize) -> usize {
