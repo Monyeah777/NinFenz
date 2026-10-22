@@ -64,6 +64,11 @@ def _looks_like_rel_path(tok: str, tops: set) -> bool:
         return False
     if not (s.endswith(_FILEY) or "/" in s):
         return False
+    # `.git/**` 是 git 元数据，不是仓库内容：链接工作树（worktree）里 `.git` 是**文件**
+    # （gitdir 指针），`.git/config` 因此无法解析——但它本就不该被当作文档引用的仓库件。
+    # 实测（2026-10-22）：D:\nf-wt-arch 链接工作树下本判据假红，主 clone 下真绿。
+    if s.split("/", 1)[0] == ".git":
+        return False
     return s.split("/", 1)[0] in tops
 
 

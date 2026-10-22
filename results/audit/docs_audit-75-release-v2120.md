@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
+  - scripts/nf.py:50b98b8ee4ebec6ce6c1e34e23deaa5096c98d423e07ff6aeaed8380706ed7a8
 
 ---
+> 重审（2026-10-22）：架构方案 01 判据账本落地：verify.sh 增判据账本段（check35）、scripts/nf.py 增 R3 读面面；仅重绑被审对象 digest，未改既有 42 条判据语义
+
 > 重审（2026-10-21）：locales html 1
 
 > 重审（2026-10-21）：readme head 1

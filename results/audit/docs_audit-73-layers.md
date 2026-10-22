@@ -11,8 +11,8 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
-  - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
-  - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
+  - scripts/nf.py:50b98b8ee4ebec6ce6c1e34e23deaa5096c98d423e07ff6aeaed8380706ed7a8
+  - verify.sh:95d95f1328bd87571e5821fecc8d32109324cb122a65220159b467196ae4ba4f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
@@ -24,6 +24,10 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-22）：判据账本灰度：check35 判据段只在既有子扫描全绿后运行（parity 聚合门诊断口径不污染）；重绑 verify.sh digest
+
+> 重审（2026-10-22）：架构方案 01 判据账本落地：verify.sh 增判据账本段（check35）、scripts/nf.py 增 R3 读面面；仅重绑被审对象 digest，未改既有 42 条判据语义
+
 > 重审（2026-10-21）：1.0.5 收口 1
 
 > 重审（2026-10-20）：release 1.0.4 1

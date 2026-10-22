@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 302,
-        "files": 302,
+        "baseline": 304,
+        "files": 304,
         "max_fn_cc": 115,
         "max_fn_lines": 1254,
-        "max_lines": 7544
+        "max_lines": 7553
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 214,
-        "probed": 214
+        "patterns": 218,
+        "probed": 218
       },
       "status": "pass",
       "warns": 0
@@ -430,10 +430,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 4,
+        "metrics_missing": 1,
         "metrics_recorded": 251,
-        "modules": 251,
+        "modules": 252,
         "registered_cycles": 0,
         "registered_sdp": 9,
         "sdp": 9
@@ -478,10 +478,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 66,
+        "consumed": 67,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 68
+        "scanners": 69
       },
       "status": "pass",
       "warns": 0
@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1264,
+        "files": 1255,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3820,
-        "kernel": 1987,
+        "files": 3825,
+        "kernel": 1990,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "b69e3a54442143ca8d955a54b588ec05f8577feb1ab706f248181a96f236be78",
+  "root_digest": "daeb5eb6eba5ed86d00790ac3ce4345642594b4ebc46be8f856f78bb6994acd9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

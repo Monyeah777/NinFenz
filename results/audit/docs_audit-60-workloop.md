@@ -6,15 +6,19 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
+  - verify.sh:95d95f1328bd87571e5821fecc8d32109324cb122a65220159b467196ae4ba4f
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
-  - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
+  - scripts/nf.py:50b98b8ee4ebec6ce6c1e34e23deaa5096c98d423e07ff6aeaed8380706ed7a8
   - desktop/tests/test_decision_layer.py:5a8b93b3af9bb732e09954b8e7d6ac8511a97003ccb83f5679e8f23375dacb61
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-22）：判据账本灰度：check35 判据段只在既有子扫描全绿后运行（parity 聚合门诊断口径不污染）；重绑 verify.sh digest
+
+> 重审（2026-10-22）：架构方案 01 判据账本落地：verify.sh 增判据账本段（check35）、scripts/nf.py 增 R3 读面面；仅重绑被审对象 digest，未改既有 42 条判据语义
+
 > 重审（2026-10-21）：1.0.5 收口 1
 
 > 重审（2026-10-20）：release 1.0.4 1

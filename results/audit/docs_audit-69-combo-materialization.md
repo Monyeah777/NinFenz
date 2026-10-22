@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:c5ae2f7154e8962afb08c86efcec45f01e17d30f0850180d07e5b116fa761ca8
-  - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
+  - scripts/nf.py:50b98b8ee4ebec6ce6c1e34e23deaa5096c98d423e07ff6aeaed8380706ed7a8
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-22）：架构方案 01 判据账本落地：verify.sh 增判据账本段（check35）、scripts/nf.py 增 R3 读面面；仅重绑被审对象 digest，未改既有 42 条判据语义
+
 > 重审（2026-10-21）：1.0.5 收口 1
 
 > 重审（2026-10-20）：release 1.0.4 1

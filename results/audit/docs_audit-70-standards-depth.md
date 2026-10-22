@@ -9,10 +9,14 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
+  - verify.sh:95d95f1328bd87571e5821fecc8d32109324cb122a65220159b467196ae4ba4f
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
 
 ---
+> 重审（2026-10-22）：判据账本灰度：check35 判据段只在既有子扫描全绿后运行（parity 聚合门诊断口径不污染）；重绑 verify.sh digest
+
+> 重审（2026-10-22）：架构方案 01 判据账本落地：verify.sh 增判据账本段（check35）、scripts/nf.py 增 R3 读面面；仅重绑被审对象 digest，未改既有 42 条判据语义
+
 > 重审（2026-10-19）：check39 挂载五分钟入口判据（docs/quickstart.md ↔ scripts/quickstart_check.sh），verify.sh 结构性新增子判据
 
 > 重审（2026-10-19）：verify.sh 恢复并补 _NF_BG_TESTS_PID 声明

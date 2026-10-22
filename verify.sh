@@ -2431,6 +2431,52 @@ PYEOF
   else
     wn 'python3 不在 PATH（跳过 check35）'
   fi
+  # ---- 判据账本（架构方案 01：R1 清单一致 / R2 活性 / #17 改基线实验单）----
+  # 灰度第 1 版：不新增 check 号（保持 check1-42 / PASS=76 基线），既有判据语义只增不改。
+  # R1、#17 违例 = FAIL（方案写明第一步即判死）；R2 违例先 WARN（灰度两版后升 FAIL）。
+  # R3 读面合规只在 memo 观测模式开（NF_CHECK_REGISTRY_MEMO=1；另有 nf verify --memo 面）。
+  # 成功面无 PASS 行（不改变 PASS=76）：用 [i] 行留证据（parity 差分只比 verdict 行）。
+  # 只在既有深化面子扫描全绿时跑：失败面（含 parity 的假解释器转桩）不再追加明细，
+  # 否则「N 条子面明细 + 1 条汇总」的既有诊断口径会被第二来源污染。
+  if [ "$err" -eq 0 ] && [ -n "$PY3" ]; then
+    local _line=""
+    _ledger_memo=0; [ "${NF_CHECK_REGISTRY_MEMO:-0}" = "1" ] && _ledger_memo=1
+    if "$PY3" - "$_ledger_memo" <<'PYEOF' >"$NFL_TMP"/nf_check35_ledger.log 2>&1
+import os, sys
+sys.path.insert(0, os.path.join('desktop', 'src'))
+try:
+    from core import check_registry as cr
+except Exception as exc:
+    print('[FAIL] 判据账本：导入失败 %s（修复指引：核对 core/check_registry.py）' % exc)
+    sys.exit(1)
+memo = len(sys.argv) > 1 and sys.argv[1] == '1'
+issues, warns, stats = cr.scan('.', memo=memo)
+for i in issues:
+    print('[FAIL] %s' % i)
+for w in warns:
+    print('[WARN] %s' % w)
+print('[INFO] 判据账本：R1 %(r1)s · R2 %(r2)s · R3 %(r3)s · #17 %(exp)s' % stats)
+sys.exit(1 if issues else 0)
+PYEOF
+    then
+      while IFS= read -r _line || [ -n "$_line" ]; do
+        _line="${_line%$'\r'}"
+        case "$_line" in
+          "[INFO]"*) echo "  [i] ${_line#"[INFO] "}";;
+          "[WARN]"*) wn "${_line#"[WARN] "}";;
+        esac
+      done < "$NFL_TMP"/nf_check35_ledger.log
+    else
+      while IFS= read -r _line || [ -n "$_line" ]; do
+        _line="${_line%$'\r'}"
+        case "$_line" in
+          "[FAIL]"*) no "${_line#"[FAIL] "}"; err=1;;
+          "[WARN]"*) wn "${_line#"[WARN] "}";;
+          "[INFO]"*) echo "  [i] ${_line#"[INFO] "}";;
+        esac
+      done < "$NFL_TMP"/nf_check35_ledger.log
+    fi
+  fi
   if [ "$err" -eq 0 ]; then ok '深化面门禁全绿（check35：抽象执行 GraphSpec + MMR 回执 + 边界签名 + 内容绑定批准 + 报告工件）'
   fi
 }
