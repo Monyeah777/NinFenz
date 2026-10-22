@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
+  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
 ---
+> 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
+
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
 
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）

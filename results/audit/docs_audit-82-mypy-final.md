@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
+  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
 ---
+> 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
+
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
 
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）

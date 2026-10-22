@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
+  - desktop/src/core/purity_scan.py:467ad10fee36f5db01ffe5ab5e725868f79ed17b27ae2f9605b564861c2a4d02
   - desktop/src/core/asset_contract.py:a79488e2bfbbc58c137881dab9116809feeadacb899efcd1583cf9369b78f082
-  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
+  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
 ---
+> 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
+
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
 
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）

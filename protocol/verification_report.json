@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 63,
+        "raises": 64,
         "sinks": 20
       },
       "status": "pass",
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 214,
-        "probed": 214
+        "patterns": 215,
+        "probed": 215
       },
       "status": "pass",
       "warns": 0
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "e52953fc6aa6f3d311abcabe20ea62d197cdefc083850e365319ae6a17bf7b27",
+  "root_digest": "0c65d842a6655897b0d41b1f578669bd40f622cc6b44b31768becfc1fc6e1fef",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
