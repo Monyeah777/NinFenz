@@ -15,7 +15,7 @@ subjects:
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
+  - desktop/src/core/purity_scan.py:467ad10fee36f5db01ffe5ab5e725868f79ed17b27ae2f9605b564861c2a4d02
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
+
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻·修订）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）

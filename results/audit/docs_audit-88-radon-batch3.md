@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:37c4486281a7ba74eca28079fa4198d3cfb484457259996a082dc0c629edddef
-  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
+  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
 ---
+> 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
+
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
 
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）
