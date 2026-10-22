@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Put it to work · NinFenz (a content contract layer)</title>
-<meta name="description" content="Three ways to hook NinFenz (NF) up: point any AI client at the loader /nf.txt; run the whole project locally as an agent via /agent.txt (doctor 16/16, bash verify.sh PASS=72); or attach the read-only MCP server nf serve. Copy blocks and expected outputs included.">
+<meta name="description" content="Three ways to hook NinFenz (NF) up: point any AI client at the loader /nf.txt; run the whole project locally as an agent via /agent.txt (doctor 17/17, bash verify.sh PASS=76); or attach the read-only MCP server nf serve. Copy blocks and expected outputs included.">
 <link rel="canonical" href="https://ninfenz.dev/en/use/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/use/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/use/">
@@ -40,7 +40,7 @@
       "tool": [{ "@type": "HowToTool", "name": "any AI client that can read a link" }, { "@type": "HowToTool", "name": "Python >= 3.11" }, { "@type": "HowToTool", "name": "git" }],
       "step": [
         { "@type": "HowToStep", "position": 1, "name": "Point a client AI at the loader", "url": "https://ninfenz.dev/en/use/#client-ai", "text": "Have the model read https://ninfenz.dev/nf.txt and follow it; if it cannot open links, paste the essentials from that file." },
-        { "@type": "HowToStep", "position": 2, "name": "Run the whole project locally", "url": "https://ninfenz.dev/en/use/#agent", "text": "git clone, then python scripts/nf.py doctor (16/16), then bash verify.sh (check1-40, PASS=72)." },
+        { "@type": "HowToStep", "position": 2, "name": "Run the whole project locally", "url": "https://ninfenz.dev/en/use/#agent", "text": "git clone, then python scripts/nf.py doctor (17/17), then bash verify.sh (check1-42, PASS=76)." },
         { "@type": "HowToStep", "position": 3, "name": "Attach the read-only MCP server", "url": "https://ninfenz.dev/en/use/#mcp", "text": "Run python scripts/nf.py serve and declare mcpServers.ninfenz in your MCP client." }
       ]
     },
@@ -91,21 +91,21 @@ Then ask me one question: assemble a complete edition, fetch by ID, run the gate
 <p>For agents that can execute commands. The full sequence with expected outputs is in <a href="../agent.txt">/agent.txt</a>; the minimal one:</p>
 <button class="copy" data-for="c2" data-label="Copy commands">Copy commands</button>
 <pre id="c2">git clone https://github.com/Monyeah777/NinFenz && cd NinFenz
-python scripts/nf.py doctor          # expect last line: 16/16 checks passed
+python scripts/nf.py doctor          # expect last line: 17/17 checks passed
 python tui/nf.py --selftest --json   # expect: {"kind":"nf-tui-selftest","ok":true, ...}
-bash verify.sh                       # expect last line: 结果统计: PASS=72  WARN=0  FAIL=0</pre>
+bash verify.sh                       # expect last line: 结果统计: PASS=76  WARN=0  FAIL=0</pre>
 <table>
 <tr><th>Command</th><th>Expected</th></tr>
-<tr><td><code>python scripts/nf.py doctor</code></td><td>last line <code>16/16 checks passed</code>, exit code 0</td></tr>
+<tr><td><code>python scripts/nf.py doctor</code></td><td>last line <code>17/17 checks passed</code>, exit code 0</td></tr>
 <tr><td><code>python tui/nf.py --selftest --json</code></td><td><code>{"ok": true}</code>, 9 assertions all true</td></tr>
 <tr><td><code>python tui/nf.py</code></td><td>full-screen TUI (standard library only, offline; demo mode without a checkout)</td></tr>
-<tr><td><code>bash verify.sh</code></td><td>check1-40 all PASS, last line <code>结果统计: PASS=72  WARN=0  FAIL=0</code></td></tr>
+<tr><td><code>bash verify.sh</code></td><td>check1-42 all PASS, last line <code>结果统计: PASS=76  WARN=0  FAIL=0</code></td></tr>
 <tr><td><code>python scripts/nf.py release</code></td><td>adds per-module coverage, ruff, end-to-end smoke, report freshness</td></tr>
 <tr><td><code>python scripts/nf.py conformance</code></td><td>verdict = conformant (27/27 contracts)</td></tr>
 </table>
 <p>Or one line (the script does three things only: clone, cd, run the official commands above - printing each command before running it):</p>
 <pre><code>curl -fsSL https://ninfenz.dev/run.sh | sh               # default: clone + read-only checks
-curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full   # adds: all check1-40 gates</code></pre>
+curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full   # adds: all check1-42 gates</code></pre>
 
 <h2 id="mcp">3. MCP (deepest, needs a local checkout)</h2>
 <p>A read-only MCP server: retrieval and content access, <strong>no write path</strong>; unknown URIs and unknown tools are refused. Start it and declare it:</p>

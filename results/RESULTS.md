@@ -4,7 +4,7 @@
 
 ## 门禁与状态
 
-- [README.md](../README.md) · [CHANGELOG.md](../CHANGELOG.md) · [docs/meta/VERSION-MATRIX.md](../VERSION-MATRIX.md) · [docs/meta/ROADMAP.md](../ROADMAP.md)
+- [README.md](../README.md) · [CHANGELOG.md](../CHANGELOG.md) · [docs/meta/VERSION-MATRIX.md](../docs/meta/VERSION-MATRIX.md) · [docs/release.md](../docs/release.md)
 
 ## 审计与收口
 

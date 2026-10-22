@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>让 AI 用起来 · 宁封子 NinFenz（内容契约层）</title>
-<meta name="description" content="宁封子 NinFenz（NF）的三种接法：客户端 AI 网页直取装载指令 /nf.txt；agent 按 /agent.txt 在本地跑通全项目（doctor 16/16 · bash verify.sh PASS=72）；MCP 只读接入 nf serve。含一键复制块与每步期望输出。">
+<meta name="description" content="宁封子 NinFenz（NF）的三种接法：客户端 AI 网页直取装载指令 /nf.txt；agent 按 /agent.txt 在本地跑通全项目（doctor 17/17 · bash verify.sh PASS=76）；MCP 只读接入 nf serve。含一键复制块与每步期望输出。">
 <link rel="canonical" href="https://ninfenz.dev/use/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/use/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/use/">
@@ -40,7 +40,7 @@
       "tool": [{ "@type": "HowToTool", "name": "任意能读链接的 AI 客户端" }, { "@type": "HowToTool", "name": "Python >= 3.11" }, { "@type": "HowToTool", "name": "git" }],
       "step": [
         { "@type": "HowToStep", "position": 1, "name": "客户端 AI 直取装载指令", "url": "https://ninfenz.dev/use/#client-ai", "text": "让 AI 读 https://ninfenz.dev/nf.txt 并按它执行；不能联网时把该文件要点整段粘贴过去。" },
-        { "@type": "HowToStep", "position": 2, "name": "agent 跑通整个项目", "url": "https://ninfenz.dev/use/#agent", "text": "git clone 仓库 → python scripts/nf.py doctor（16/16）→ bash verify.sh（check1-40，PASS=72）。" },
+        { "@type": "HowToStep", "position": 2, "name": "agent 跑通整个项目", "url": "https://ninfenz.dev/use/#agent", "text": "git clone 仓库 → python scripts/nf.py doctor（17/17）→ bash verify.sh（check1-42，PASS=76）。" },
         { "@type": "HowToStep", "position": 3, "name": "MCP 只读接入", "url": "https://ninfenz.dev/use/#mcp", "text": "python scripts/nf.py serve，并在 MCP 客户端声明 mcpServers.ninfenz 指向该命令。" }
       ]
     },
@@ -91,21 +91,21 @@
 <p>给能执行命令的 agent。完整命令序列与每步期望输出写在 <a href="../agent.txt">/agent.txt</a>；最小一段如下。</p>
 <button class="copy" data-for="c2" data-label="复制命令">复制命令</button>
 <pre id="c2">git clone https://github.com/Monyeah777/NinFenz && cd NinFenz
-python scripts/nf.py doctor          # 期望末行：体检：16/16 通过
+python scripts/nf.py doctor          # 期望末行：体检：17/17 通过
 python tui/nf.py --selftest --json   # 期望：{"kind":"nf-tui-selftest","ok":true, ...}
-bash verify.sh                       # 期望末行：结果统计: PASS=72  WARN=0  FAIL=0</pre>
+bash verify.sh                       # 期望末行：结果统计: PASS=76  WARN=0  FAIL=0</pre>
 <table>
 <tr><th>命令</th><th>期望</th></tr>
-<tr><td><code>python scripts/nf.py doctor</code></td><td>末行 <code>体检：16/16 通过</code>，退出码 0</td></tr>
+<tr><td><code>python scripts/nf.py doctor</code></td><td>末行 <code>体检：17/17 通过</code>，退出码 0</td></tr>
 <tr><td><code>python tui/nf.py --selftest --json</code></td><td><code>{"ok": true}</code>，9 行判据全 true</td></tr>
 <tr><td><code>python tui/nf.py</code></td><td>全屏 TUI（纯标准库、离线；无仓库时进演示模式）</td></tr>
-<tr><td><code>bash verify.sh</code></td><td>check1-40 逐条 PASS，末行 <code>结果统计: PASS=72  WARN=0  FAIL=0</code></td></tr>
+<tr><td><code>bash verify.sh</code></td><td>check1-42 逐条 PASS，末行 <code>结果统计: PASS=76  WARN=0  FAIL=0</code></td></tr>
 <tr><td><code>python scripts/nf.py release</code></td><td>追加覆盖率 / ruff / 端到端冒烟 / 报告新鲜度</td></tr>
 <tr><td><code>python scripts/nf.py conformance</code></td><td>verdict = conformant（27/27 契约）</td></tr>
 </table>
 <p>或者一键（脚本只做三件事：clone、按需 cd、跑上面这些官方命令；逐条先打印再执行）：</p>
 <pre><code>curl -fsSL https://ninfenz.dev/run.sh | sh              # 默认：clone + 只读体检
-curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full  # 追加：check1-40 全量门禁</code></pre>
+curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full  # 追加：check1-42 全量门禁</code></pre>
 
 <h2 id="mcp">三、MCP（有本地检出时，接得最深）</h2>
 <p>只读 MCP：检索与取件能力，<strong>无写路径</strong>；未知 uri 与未知工具一律拒。起服务与客户端声明：</p>

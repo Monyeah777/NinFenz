@@ -34,10 +34,7 @@ def _bash():
     Git for Windows，bash 不在 PATH）**整类跳过**——判据不在场就是假绿；
     `core.posix_shell` 会做同样解析（`scripts/instruction_evidence.py` 早已这么用）。
     """
-    try:
-        return shutil.which("bash") or psh.posix_shell()
-    except Exception:                    # noqa: BLE001 - 解析不到按原口径跳过
-        return None
+    return psh.find_posix_shell()
 
 
 def _plain_request(sock, token, argv, cwd):

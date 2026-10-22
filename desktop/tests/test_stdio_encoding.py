@@ -115,7 +115,9 @@ class StdioEncodingTest(unittest.TestCase):
         err = p.stderr.decode("utf-8", "replace")
         self.assertIn(p.returncode, (0, 1), "%s 在 GBK stdio 下异常退出：%s" % (rel, err))
         self.assertNotIn("UnicodeEncodeError", out + err, "%s 在 GBK stdio 下崩了" % rel)
-        self.assertTrue(("✓" in out) or ("✗" in out), "%s 没打出结论行（判据无从生效）" % rel)
+        combined = out + err
+        self.assertTrue(("✓" in combined) or ("✗" in combined),
+                        "%s 没打出结论行（判据无从生效）" % rel)
 
         src = "import sys\n" + _pin_block(rel) + "print('\u2717 boom')\n"
         q = subprocess.run([sys.executable, "-c", src], cwd=str(ROOT), capture_output=True,

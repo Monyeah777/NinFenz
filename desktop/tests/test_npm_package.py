@@ -206,7 +206,13 @@ class NpmPackageGateTest(unittest.TestCase):
     def test_package_verifier_passes(self):
         """发布前自检 `tools/verify-package.mjs`：须 0 issue（查冒烟套件不查的打包面）。"""
         node = _node_or_skip(self)
-        proc = subprocess.run([node, "tools/verify-package.mjs"], cwd=str(PKG),
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                               cwd=str(ROOT), capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        args = [node, "tools/verify-package.mjs"]
+        if dirty.returncode == 0 and (dirty.stdout or "").strip():
+            args.append("--allow-dirty")
+        proc = subprocess.run(args, cwd=str(PKG),
                               capture_output=True, timeout=900)
         out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
         self.assertEqual(0, proc.returncode, "npm 发布前自检未过：\n%s" % out[-1500:])
@@ -239,6 +245,8 @@ class PublishingProvenanceGateTest(unittest.TestCase):
         self.assertIn("rev-parse", src, "verify 未取 HEAD（A2）")
         self.assertIn("source_commit", src, "verify 未比对 source_commit（A2）")
         self.assertIn("worktree_dirty", src, "verify 未判脏树暂存（A1/A2）")
+        self.assertIn("--allow-dirty", src, "verify 缺开发态显式放行开关")
+        self.assertIn("status", src, "verify 未核对**当前**工作树状态")
 
     def test_tarball_matches_payload_manifest(self):
         """A3（2026-10-10 审计）：npm pack 真打出来的 tarball 必须与 payload 清单逐字节一致。

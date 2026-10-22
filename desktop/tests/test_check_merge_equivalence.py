@@ -16,13 +16,17 @@ bash 循环。旧 check 一旦有**独有**判定（如 check20 的模块文档�
 """
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "desktop" / "src"))
+from core import posix_shell as psh  # noqa: E402
+
 VERIFY = ROOT / "verify.sh"
-BASH = shutil.which("bash")
+BASH = psh.find_posix_shell()
 CHECKS = (1, 3, 4, 5, 6)
 DECL_KINDS = ("file", "dir", "token", "all")
 

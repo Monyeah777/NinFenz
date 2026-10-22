@@ -10,6 +10,7 @@ import { verifyTree, treeSha256, listFiles } from '../lib/payload.mjs';
 const pkg = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 const issues = [];
 const warns = [];
+const allowDirty = process.argv.includes('--allow-dirty');
 function need(cond, msg) { if (!cond) issues.push(msg); }
 
 // 1) 供应链：禁安装脚本（npm 生态最常被投放的一环）。
@@ -51,9 +52,22 @@ if (!fs.existsSync(manifestPath)) {
          'payload source_commit 与 HEAD 不一致：清单=' + String(manifest.source_commit).slice(0, 12)
          + ' HEAD=' + head.slice(0, 12) + '（修复指引：npm run stage 重新暂存后提交）');
   }
-  need(manifest.worktree_dirty !== true,
-       'payload 由脏工作树暂存（worktree_dirty=true）：内容不来自纯提交'
-       + '（修复指引：提交后重新暂存）');
+  const status = spawnSync('git', ['status', '--porcelain', '--untracked-files=no'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  const treeDirty = status.status === 0 && String(status.stdout || '').trim().length > 0;
+  if (treeDirty) {
+    need(manifest.worktree_dirty === true,
+         'payload 已落后当前脏工作树（清单标 clean，但仓库有未提交改动）'
+         + '（修复指引：npm run stage -- --allow-dirty，或提交后重新暂存）');
+    need(allowDirty,
+         '当前工作树有未提交改动：发布自检仅在 --allow-dirty 下做开发态运行'
+         + '（提交后再跑默认严格模式）');
+    if (allowDirty) warns.push('开发态：payload 来自脏工作树，不可作为发布 provenance');
+  } else {
+    need(manifest.worktree_dirty !== true,
+         'payload 由脏工作树暂存（worktree_dirty=true）：内容不来自纯提交'
+         + '（修复指引：提交后重新暂存）');
+  }
   const bad = verifyTree(PAYLOAD_DIR, manifest);
   need(bad.length === 0, 'payload 逐文件校验不过：' + bad.slice(0, 3).join(', '));
   need(treeSha256(manifest) === manifest.tree_sha256, 'payload.tree_sha256 自洽性不过');

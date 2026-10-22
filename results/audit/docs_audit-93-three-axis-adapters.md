@@ -12,7 +12,7 @@ subjects:
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
-  - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
+  - verify.sh:1b53ec76ba52a0e106008d223c5eaec2f6d6648b1e84b5f5e7dfbd569e4b42c8
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-22）：测试执行器、进程原子与 Windows shell 解析修复后重算代码度量基线与角色投影；既有审计结论不变
+
 > 重审（2026-10-21）：1.0.5 收口 1
 
 > 重审（2026-10-20）：release 1.0.4 1

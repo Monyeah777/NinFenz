@@ -58,8 +58,8 @@ English: NinFenz (NF) is a content contract layer: a protocol plus deterministic
 路径 1 · 人 / 开发者（唯一必需 clone 的路径）
     git clone https://github.com/Monyeah777/NinFenz
     cd NinFenz
-    python scripts/nf.py doctor      # 只读体检，期望：体检 16/16 通过
-    bash verify.sh                   # check1-40 全量门禁，期望末行 结果统计: PASS=72  WARN=0  FAIL=0
+    python scripts/nf.py doctor      # 只读体检，期望：体检 17/17 通过
+    bash verify.sh                   # check1-42 全量门禁，期望末行 结果统计: PASS=76  WARN=0  FAIL=0
 国内镜像（只换前缀，后缀不动）：https://gitee.com/monyeah777/ninfenz
 
 路径 2 · 客户端 AI（零安装）
@@ -68,7 +68,7 @@ English: NinFenz (NF) is a content contract layer: a protocol plus deterministic
 
 路径 3 · agent（本地跑通全项目）
     curl -fsSL https://ninfenz.dev/run.sh | sh                 默认：clone 到 ./NinFenz + 只读体检
-    curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full    追加：check1-40 全量门禁
+    curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full    追加：check1-42 全量门禁
     也可以照 https://ninfenz.dev/agent.txt 逐步执行并核对每步期望输出。
 
 路径 4 · MCP（把仓库能力只读暴露给客户端）
@@ -82,7 +82,7 @@ English: NinFenz (NF) is a content contract layer: a protocol plus deterministic
     pattern_read / asset_list / asset_read / module_read / pipeline_read，以及装载引导 prompt assemble_guide。
 
 前置：Python >= 3.11（核心纯标准库，无 pip 依赖）；Node >= 18.17（仅 npx 免 clone 路径需要）。
-npm 包已发布：ninfenz v1.0.5（npmjs.com，2026-10-08，2953 文件，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
+npm 包已发布：ninfenz v1.0.5（npmjs.com，2929 文件 / 解包 22.88 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
 
 ## 五、术语表（对齐实体，供生成式引擎消歧）
 

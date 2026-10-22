@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - protocol/code_metrics_baseline.json:05492875b61a1ca7d861d12a27b3e9f81ab53512e49cad7527375e1b427fc839
 ---
+> 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1

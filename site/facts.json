@@ -61,7 +61,7 @@
       "entry_point": "bash verify.sh",
       "anchor": "https://ninfenz.dev/#fact-quality",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
-      "note": "单入口；check1-40 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
+      "note": "单入口；check1-42 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
     },
     {
       "id": "scale",
@@ -107,8 +107,8 @@
     },
     {
       "id": "npm",
-      "claim_zh": "分发：npm 包 ninfenz v1.0.5（2026-10-08 发布于 npmjs.com，2953 文件 / 解包 20.25 MB，带 SLSA provenance 来源证明；经 OIDC trusted publishing 发布，无长期令牌）",
-      "claim_en": "Distribution: npm package ninfenz v1.0.5 (published 2026-10-08 on npmjs.com, 2953 files / 20.25 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
+      "claim_zh": "分发：npm 包 ninfenz v1.0.5（2929 文件 / 解包 22.88 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.0.5 (2929 files / 22.88 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
       "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"

@@ -145,7 +145,7 @@ def main():
         ("", FG),
         ("✔ 只读体检通过", OK),
         ("E2E DESKTOP HEADLESS PASSED", OK),
-        ("verify v2.30 · check1-40 · PASS=72", FG),
+        ("verify v2.30 · check1-42 · PASS=76", FG),
         ("", FG),
         ("菜单与动作都是 nf CLI 真命令的受控调用方", DIM),
     ], font_path=font_path)

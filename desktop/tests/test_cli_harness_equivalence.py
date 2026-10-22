@@ -46,6 +46,14 @@ class EquivalenceTest(unittest.TestCase):
         print("\n[P-I3] warm=%.4fs · spawn=%.4fs · 比值 %.1f×"
               % (warm, cold, cold / warm if warm else float("inf")))
 
+    def test_stdin_reading_faces_see_eof_not_the_host_terminal(self):
+        """`nf lsp` 无参会读 stdin；进程内验证必须和 DEVNULL 一样立即见 EOF。"""
+        t0 = time.perf_counter()
+        rc, _out, err = h.run_cli(["lsp"])
+        elapsed = time.perf_counter() - t0
+        self.assertLess(elapsed, 10.0, "进程内 CLI 继承了宿主 stdin，可能永久等待")
+        self.assertEqual(0, rc, err[-500:])
+
 
 if __name__ == "__main__":
     unittest.main()
