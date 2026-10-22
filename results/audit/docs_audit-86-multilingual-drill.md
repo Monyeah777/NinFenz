@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:b989c0fe793dca4cc634f9b5a0fb8deac64d7db39f92493e3297107e37af93b3
+  - protocol/code_metrics_baseline.json:e73b8a55381287134ae76485250ad5c58d07d32e0de131fd4f2a825f65a1daea
 ---
+> 重审（2026-10-22）：check12 串行段扩容后重绑
+
 > 重审（2026-10-22）：F1-F3+M2 后重绑：FFI 契约面/FFI 实现/miniyaml 解析入口/asset_contract 告警面变更
 
 > 重审（2026-10-21）：diag shard 1

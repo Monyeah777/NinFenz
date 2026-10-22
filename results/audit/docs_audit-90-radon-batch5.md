@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:b989c0fe793dca4cc634f9b5a0fb8deac64d7db39f92493e3297107e37af93b3
+  - protocol/code_metrics_baseline.json:e73b8a55381287134ae76485250ad5c58d07d32e0de131fd4f2a825f65a1daea
 ---
+> 重审（2026-10-22）：check12 串行段扩容后重绑
+
 > 重审（2026-10-22）：F1-F3+M2 后重绑：FFI 契约面/FFI 实现/miniyaml 解析入口/asset_contract 告警面变更
 
 > 重审（2026-10-21）：diag shard 1

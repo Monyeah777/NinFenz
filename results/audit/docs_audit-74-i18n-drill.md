@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:b989c0fe793dca4cc634f9b5a0fb8deac64d7db39f92493e3297107e37af93b3
+  - protocol/code_metrics_baseline.json:e73b8a55381287134ae76485250ad5c58d07d32e0de131fd4f2a825f65a1daea
 ---
+> 重审（2026-10-22）：check12 串行段扩容后重绑
+
 > 重审（2026-10-22）：F1-F3+M2 后重绑：FFI 契约面/FFI 实现/miniyaml 解析入口/asset_contract 告警面变更
 
 > 重审（2026-10-21）：diag shard 1

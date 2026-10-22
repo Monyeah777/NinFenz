@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:b989c0fe793dca4cc634f9b5a0fb8deac64d7db39f92493e3297107e37af93b3
+  - protocol/code_metrics_baseline.json:e73b8a55381287134ae76485250ad5c58d07d32e0de131fd4f2a825f65a1daea
 ---
+> 重审（2026-10-22）：check12 串行段扩容后重绑
+
 > 重审（2026-10-22）：F1-F3+M2 后重绑：FFI 契约面/FFI 实现/miniyaml 解析入口/asset_contract 告警面变更
 
 > 重审（2026-10-21）：diag shard 1

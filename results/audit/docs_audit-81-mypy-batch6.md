@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:b989c0fe793dca4cc634f9b5a0fb8deac64d7db39f92493e3297107e37af93b3
+  - protocol/code_metrics_baseline.json:e73b8a55381287134ae76485250ad5c58d07d32e0de131fd4f2a825f65a1daea
 ---
+> 重审（2026-10-22）：check12 串行段扩容后重绑
+
 > 重审（2026-10-22）：F1-F3+M2 后重绑：FFI 契约面/FFI 实现/miniyaml 解析入口/asset_contract 告警面变更
 
 > 重审（2026-10-21）：diag shard 1
