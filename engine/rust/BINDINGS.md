@@ -22,7 +22,7 @@
 | `nf_engine_abi_version` | `() -> u32` | ABI 版本；`engine_loader.engine_abi()` 读的就是它 |
 | `nf_engine_abi_self_test` | `() -> u32` | 自证一次；把「装载成功」与「版本对」分开判 |
 | `nf_engine_abi_tag` | `() -> *const c_char` | `nf-ffi/1` |
-| `nf_reverse_bytes` | `(in, len, out, cap) -> usize` | 两步式：容量不足**不写**、只报所需长度 |
+| `nf_reverse_bytes` | `(in, len, out, cap) -> usize` | 成功返回 `len`；**非法输出缓冲（out 空 / cap<len）拒绝并返回 0**（不写、不暗示所需长度，VULN-02 F1）；输入空指针返回 0 |
 
 版本升级判据：**导出面**（符号名 / 签名 / 语义）任一变化即 +1；纯内部重构不动它。
 

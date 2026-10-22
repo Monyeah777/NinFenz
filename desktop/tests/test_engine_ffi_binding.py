@@ -65,11 +65,16 @@ class CAbiTest(unittest.TestCase):
         self.assertEqual(6, n)
         self.assertEqual(b"fedcba", buf.raw[:6])
 
-    def test_two_step_capacity_contract_is_enforced_by_the_library(self):
+    def test_invalid_out_buffer_is_refused_by_the_library(self):
+        # F1（VULN-02）：非法输出缓冲必须**拒绝**（返回 0），不许用返回值暗示所需长度——
+        # 否则调用方会把「一个字节都没写」当成功（静默失败 / CWE-393）。
         small = ctypes.create_string_buffer(2)
         n = self.lib.nf_reverse_bytes(b"abc", 3, small, 2)
-        self.assertEqual(3, n, "容量不足时只报所需长度")
-        self.assertEqual(b"\x00\x00", small.raw[:2], "容量不足时不许写")
+        self.assertEqual(0, n, "容量不足必须拒绝（返回 0），不得用返回值暗示所需长度")
+        self.assertEqual(b"\x00\x00", small.raw[:2], "拒绝时一个字节都不许写")
+        self.assertEqual(0, self.lib.nf_reverse_bytes(b"abc", 3, None, 0), "out 为空必须拒绝")
+        self.assertEqual(0, self.lib.nf_reverse_bytes(b"abc", 3, None, 3),
+                         "out 为空且 cap 足够也必须拒绝")
 
     def test_null_input_is_refused_not_crashed(self):
         self.assertEqual(0, self.lib.nf_reverse_bytes(None, 5, None, 0))
