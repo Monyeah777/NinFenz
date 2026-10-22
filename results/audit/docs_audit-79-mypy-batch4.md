@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
   - desktop/src/core/asset_contract.py:721e8d6b90c3d70511ce2fbc8b7e58f7582f29d1e7110b891f423eda4e7c7ca6
-  - protocol/code_metrics_baseline.json:16d8f8b3a6601605b43617c7c3b0ae3be57c3df84ace4580c9b842bbf903a513
+  - protocol/code_metrics_baseline.json:5c9eb4d0f7cee954a938f9a7ba9e21ef9eae00b406b6f07b8e3ffe32be06ffa4
 ---
+> 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑
+
 > 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
 
 > 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变
