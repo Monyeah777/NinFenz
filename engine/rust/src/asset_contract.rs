@@ -939,9 +939,191 @@ fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     (issues, Json::Object(stats))
 }
 
+// ---------------------------------------------------------------- 代码面·告警面（WARN）
+
+/// 真源 `_line_no`：字符偏移 → 1 基行号（与编译器/ruff 同口径；换行是单字节，按字节切安全）。
+fn line_no(text: &str, pos: usize) -> usize {
+    text[..pos].matches('\n').count() + 1
+}
+
+/// 真源 `_warn_cut`：`skip_after` 标记之前的区域才判（测试区是脚手架，不是出口契约）。
+fn warn_cut(text: &str, rule: &Json) -> usize {
+    let marker = sg_str(rule, "skip_after");
+    if marker.is_empty() {
+        return text.len();
+    }
+    text.find(&marker).unwrap_or(text.len())
+}
+
+/// 真源 `_is_code_line`：只判**代码行**，注释里的词不算出口面（否则 SAFETY 注释自身也会自命中）。
+fn is_code_line(line: &str) -> bool {
+    let s = line.trim();
+    if s.is_empty() {
+        return false;
+    }
+    !(s.starts_with("//") || s.starts_with("/*") || s.starts_with('*'))
+}
+
+fn rule_lines(text: &str) -> Vec<&str> {
+    text.split('\n').map(|l| l.strip_suffix('\r').unwrap_or(l)).collect()
+}
+
+/// 真源 `_warn_unsafe_safety`（规则①）：每处 UNSAFE 标记前 within 行内须有 SAFETY: 注释。
+fn warn_unsafe_safety(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { r"\bunsafe\b".to_string() } else { p }
+    };
+    let marker = {
+        let m = sg_str(rule, "marker");
+        if m.is_empty() { "SAFETY:".to_string() } else { m }
+    };
+    let within = pyval::py_int_or(obj_get(rule, "within"), 3).max(0) as usize;
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let mut out: Vec<String> = Vec::new();
+    for m in rx.find_iter(&text[..cut]) {
+        let ln = line_no(text, m.start());
+        if !is_code_line(lines[ln - 1]) {
+            continue;
+        }
+        let lo = ln.saturating_sub(1 + within);
+        let hit = (lo..ln.saturating_sub(1)).any(|i| lines[i].contains(&marker));
+        if !hit {
+            out.push(format!(
+                concat!(
+                    "代码契约 {} 告警：{}:{} 的 ", "un", "safe",
+                    " 前 {} 行内缺 {} 注释（修复指引：在 ", "un", "safe",
+                    " 块/签名紧邻上方写「{} 调用方前置条件」，让审查面可读）"
+                ),
+                sid, rel, ln, within, marker, marker
+            ));
+        }
+    }
+    out
+}
+
+/// 真源 `_warn_null_guard`（规则②）：每处 `from_raw_parts` 前 within 行内须有空指针检查。
+fn warn_null_guard(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { "from_raw_parts".to_string() } else { p }
+    };
+    let guard = {
+        let g = sg_str(rule, "guard");
+        if g.is_empty() { "is_null".to_string() } else { g }
+    };
+    let within = pyval::py_int_or(obj_get(rule, "within"), 20).max(0) as usize;
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let mut out: Vec<String> = Vec::new();
+    for m in rx.find_iter(&text[..cut]) {
+        let ln = line_no(text, m.start());
+        if !is_code_line(lines[ln - 1]) {
+            continue;
+        }
+        let lo = ln.saturating_sub(1 + within);
+        let hit = (lo..ln.saturating_sub(1)).any(|i| lines[i].contains(&guard));
+        if !hit {
+            out.push(format!(
+                "代码契约 {} 告警：{}:{} 的 from_raw_parts 前 {} 行内无空指针检查（修复指引：先 `if ptr.is_null() {{ return 0; }}` 再构造切片——null 即使 len=0 也是 UB）",
+                sid, rel, ln, within
+            ));
+        }
+    }
+    out
+}
+
+/// 真源 `_warn_export_no_panic`（规则③）：`#[no_mangle]` 起的导出区块不得 panic/unwrap。
+fn warn_export_no_panic(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
+    let pat = {
+        let p = sg_str(rule, "pattern");
+        if p.is_empty() { r"#\[no_mangle\]".to_string() } else { p }
+    };
+    let forbid: Vec<String> = sg_array(rule, "forbid").iter().map(|x| pyval::plain_str(x)).collect();
+    let cut = warn_cut(text, rule);
+    let lines = rule_lines(text);
+    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let starts: Vec<usize> = rx.find_iter(&text[..cut]).map(|m| m.start()).collect();
+    let mut out: Vec<String> = Vec::new();
+    for (i, &pos) in starts.iter().enumerate() {
+        let end = starts.get(i + 1).copied().unwrap_or(cut);
+        let ln = line_no(text, pos);
+        let end_ln = line_no(text, if end > pos { end - 1 } else { pos });
+        for idx in (ln - 1)..end_ln {
+            let line = lines.get(idx).copied().unwrap_or("");
+            if !is_code_line(line) {
+                continue;
+            }
+            for bad in &forbid {
+                if line.contains(bad.as_str()) {
+                    out.push(format!(
+                        "代码契约 {} 告警：{}:{} 起的导出面含 {}（修复指引：C ABI 出口以错误码返回，不 panic/unwrap/expect/assert——越过 ABI 边界 panic 是未定义行为）",
+                        sid,
+                        rel,
+                        idx + 1,
+                        pyval::py_repr(&Json::Str(bad.clone()))
+                    ));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// 真源 `_code_warns`：代码面的**告警面**（WARN 级，不 FAIL），由声明里的 `warn_rules` 驱动。
+///
+/// 为什么单开一路：FFI 出口**必然**要 UNSAFE（C ABI 本质），「禁 UNSAFE」不能简单套用；
+/// 而「UNSAFE 须带 SAFETY 注释 / `from_raw_parts` 前须挡空指针 / 导出面不许 panic」这类治理
+/// 规则在**存量未清**时按 FAIL 接入会立刻逼人重冻或删判据。故先按 WARN 接入：看得见、能逐条
+/// 清；清零后再把规则搬进 `forbid_regex` / 新判据升 FAIL。
+pub fn code_warns(root: &Path, spec: &Json) -> Vec<String> {
+    let rules: Vec<(String, Json)> = match obj_get(spec, "warn_rules") {
+        Some(Json::Object(o)) if !o.is_empty() => o.clone(),
+        _ => return Vec::new(),
+    };
+    let rels = resolve(root, spec);
+    if rels.is_empty() {
+        return Vec::new();     // 未命中面的事由 `check_code` 的 issues 报，不重复告警
+    }
+    let sid = {
+        let s = sg_str(spec, "id");
+        if s.is_empty() { "?".to_string() } else { s }
+    };
+    let mut warns: Vec<String> = Vec::new();
+    for rel in &rels {
+        let (text, err) = sread(root, rel);
+        if err.is_some() {
+            continue;          // 读件失败同样由 issues 面报
+        }
+        let text = text.unwrap_or_default();
+        for (name, rule) in &rules {
+            if !matches!(rule, Json::Object(_)) {
+                continue;
+            }
+            match name.as_str() {
+                "unsafe_safety_comment" => {
+                    warns.extend(warn_unsafe_safety(&sid, rel, &text, rule))
+                }
+                "null_guard_before" => warns.extend(warn_null_guard(&sid, rel, &text, rule)),
+                "export_no_panic" => {
+                    warns.extend(warn_export_no_panic(&sid, rel, &text, rule))
+                }
+                _ => {}
+            }
+        }
+    }
+    warns
+}
+
 /// 真源 `_check_code`。
 pub fn check_code(root: &Path, spec: &Json) -> (Vec<String>, Json) {
-    if !sg_array(spec, "forbid_regex").is_empty() || !sg_array(spec, "regex_limits").is_empty() {
+    if !sg_array(spec, "forbid_regex").is_empty()
+        || !sg_array(spec, "regex_limits").is_empty()
+        || obj_get(spec, "warn_rules").is_some()
+    {
         return check_code_structural(root, spec);
     }
     let rel = sg_str(spec, "path");
@@ -1690,7 +1872,7 @@ pub fn load(root: &Path) -> (Json, Vec<String>) {
 /// 真源 `scan(root, faces=())` → `(issues, warns, stats)`。
 pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
     let (doc, mut issues) = load(root);
-    let warns: Vec<String> = Vec::new();
+    let mut warns: Vec<String> = Vec::new();
     let mut counts: Vec<(String, i64)> =
         FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
     let mut files = 0i64;
@@ -1719,7 +1901,11 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             }
             let (sub, s) = match face {
                 "data" => check_data(root, &spec),
-                "code" => check_code(root, &spec),
+                "code" => {
+                    // WARN 级治理面：由声明里 `warn_rules` 驱动，不进 issues（见 code_warns）。
+                    warns.extend(code_warns(root, &spec));
+                    check_code(root, &spec)
+                }
                 "index" => check_index(root, &spec),
                 _ => check_script(root, &spec),
             };
@@ -2148,7 +2334,12 @@ l2
         (
             concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#),
             &[],
-            concat!(r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
+            concat!(r#"{"files": 112, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
+        ),
+        (
+            concat!(r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#, "un", "safe", r#"（C ABI 本质），故不套用「禁 "#, "un", "safe", r#"」的只读契约；改判三条可证治理规则——"#, "un", "safe", r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##, "un", "safe", r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#, "un", "safe", r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##),
+            &[],
+            r#"{"files": 1}"#
         ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
@@ -2247,7 +2438,7 @@ l2
         assert_eq!(ac_norm(&issues), &[] as &[&str], "聚合 issues 不一致");
         assert_eq!(warns, &[] as &[&str], "聚合 warns 不一致");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 6, "data": 10, "files": 1255, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1259, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
         )
         .unwrap();
         assert!(crate::jsonread::json_eq(&stats, &want),
@@ -2499,4 +2690,113 @@ l2
         );
     }
     // <<< GENERATED
+    // ---------------------------------------------------------------- 手写：F3 契约注入自证
+    // （非生成器段：生成器的 BEGIN/END 标记都在它之前，重跑生成器不会覆盖这里）
+
+    fn ffi_warn_spec() -> Json {
+        // 与 protocol/asset_contracts.json 的 engine-rust-ffi 同构。**直接构造 Json**：
+        // 走 JSON 文本要跨三层转义（Rust 字面量 → JSON → 正则），极易错；且本文件位于
+        // engine/rust/src/** 的禁用式面内，禁用词必须用 concat! 拼，不能出现字面量。
+        let rule = |pairs: Vec<(&str, Json)>| {
+            Json::Object(pairs.into_iter().map(|(k, v)| (k.to_string(), v)).collect())
+        };
+        let s = |v: &str| Json::Str(v.to_string());
+        let n = |v: i64| Json::Int(v);
+        let warn_rules = rule(vec![
+            (
+                "export_no_panic",
+                rule(vec![
+                    (
+                        "forbid",
+                        Json::Array(vec![
+                            s("panic!"),
+                            s(".unwrap("),
+                            s(".expect("),
+                            s("assert!"),
+                        ]),
+                    ),
+                    ("pattern", s("#\\[no_mangle\\]")),
+                    ("skip_after", s("#[cfg(test)]")),
+                ]),
+            ),
+            (
+                "null_guard_before",
+                rule(vec![
+                    ("guard", s("is_null")),
+                    ("pattern", s("from_raw_parts")),
+                    ("skip_after", s("#[cfg(test)]")),
+                    ("within", n(20)),
+                ]),
+            ),
+            (
+                "unsafe_safety_comment",
+                rule(vec![
+                    ("marker", s("SAFETY:")),
+                    ("pattern", Json::Str(concat!(r"\bun", r"safe\b").to_string())),
+                    ("skip_after", s("#[cfg(test)]")),
+                    ("within", n(3)),
+                ]),
+            ),
+        ]);
+        rule(vec![
+            ("glob", s("ffi/src/**/*.rs")),
+            ("id", s("engine-rust-ffi")),
+            ("lang", s("rust")),
+            ("warn_rules", warn_rules),
+        ])
+    }
+
+    /// F3（VULN-02）契约注入自证：三类违规各注入一处 → `code_warns` 必须各报一条；
+    /// 补齐（SAFETY 注释 + 空指针守卫 + 导出面不 panic）→ 必须清零。
+    ///
+    /// 只注入 **WARN 面**：不进 issues、不 FAIL（先 WARN 起步；存量清零后才升 FAIL）。
+    #[test]
+    fn ffi_warn_rules_fire_and_clear() {
+        let root = crate::testutil::fixture("asset-contract-ffi-warn");
+        std::fs::create_dir_all(root.join("ffi/src")).expect("夹具目录可建");
+        let spec = ffi_warn_spec();
+
+        let bad = concat!(
+            "pub ", "un", "safe", " fn raw(p: *const u8, len: usize) -> u8 {\n",
+            "    let s = std::slice::from_raw_parts(p, len);\n",
+            "    s[0]\n}\n",
+            "#[no_mangle]\npub extern \"C\" fn boom() -> u32 { panic!() }\n"
+        );
+        std::fs::write(root.join("ffi/src/lib.rs"), bad).expect("写夹具件");
+        let warns = code_warns(&root, &spec);
+        assert_eq!(warns.len(), 3, "三类违规应各报一条：{:?}", warns);
+        assert!(warns.iter().any(|w| w.contains("SAFETY:")),
+                "缺 SAFETY 注释应被抓：{:?}", warns);
+        assert!(warns.iter().any(|w| w.contains("from_raw_parts")),
+                "缺空指针检查应被抓：{:?}", warns);
+        assert!(warns.iter().any(|w| w.contains("panic!")),
+                "导出面 panic 应被抓：{:?}", warns);
+
+        let good = concat!(
+            "// SAFETY: 调用方保证 p 有效；本块只读而不写。\n",
+            "pub ", "un", "safe", " fn raw(p: *const u8, len: usize) -> u8 {\n",
+            "    if p.is_null() { return 0; }\n",
+            "    let s = std::slice::from_raw_parts(p, len);\n",
+            "    s[0]\n}\n",
+            "#[no_mangle]\npub extern \"C\" fn ok() -> u32 { ABI_VERSION }\n"
+        );
+        std::fs::write(root.join("ffi/src/lib.rs"), good).expect("写夹具件");
+        let cleared = code_warns(&root, &spec);
+        assert!(cleared.is_empty(), "补齐后 WARN 面应清零：{:?}", cleared);
+    }
+
+    /// 真语料上 F3 告警面当前应为空（清零状态）——它是 WARN 面、不参与 issues/FAIL，
+    /// 但**不许靠沉默过关**：真有存量时这里会红在断言上，逼人看见。
+    #[test]
+    fn ffi_warn_rules_are_clean_on_real_corpus() {
+        let root = ac_repo_root();
+        let (doc, _issues) = load(&root);
+        let mut warns: Vec<String> = Vec::new();
+        if let Some(Json::Array(specs)) = obj_get(&doc, "code") {
+            for spec in specs {
+                warns.extend(code_warns(&root, spec));
+            }
+        }
+        assert!(warns.is_empty(), "真语料 FFI 告警面应已清零：{:?}", warns);
+    }
 }
