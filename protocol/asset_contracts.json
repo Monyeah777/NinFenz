@@ -116,6 +116,36 @@
       "id": "engine-dotnet-structural",
       "lang": "cs",
       "note": "同上（实测三类各 0 处，故按零容忍声明）"
+    },
+    {
+      "glob": "engine/rust/ffi/src/**/*.rs",
+      "id": "engine-rust-ffi",
+      "lang": "rust",
+      "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 unsafe（C ABI 本质），故不套用「禁 unsafe」的只读契约；改判三条可证治理规则——unsafe 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL",
+      "warn_rules": {
+        "export_no_panic": {
+          "forbid": [
+            "panic!",
+            ".unwrap(",
+            ".expect(",
+            "assert!"
+          ],
+          "pattern": "#\\[no_mangle\\]",
+          "skip_after": "#[cfg(test)]"
+        },
+        "null_guard_before": {
+          "guard": "is_null",
+          "pattern": "from_raw_parts",
+          "skip_after": "#[cfg(test)]",
+          "within": 20
+        },
+        "unsafe_safety_comment": {
+          "marker": "SAFETY:",
+          "pattern": "\\bunsafe\\b",
+          "skip_after": "#[cfg(test)]",
+          "within": 3
+        }
+      }
     }
   ],
   "data": [
