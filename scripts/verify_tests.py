@@ -48,6 +48,13 @@ SERIAL_MODULES = frozenset({
     # test_lsp 的 warm 复用判据是时间窗口径（TTL 内只该扫一次签名）：并发把单次扫描拖到窗外
     # 就会"合法地"多扫一次而被判红——属负载敏感，保留串行。
     "test_lsp",
+    # 2026-10-22 补（gov/rust 复验实测，两次全量门禁各红一次）：
+    # - test_daemon_parity：分片 1 报 `_daemon()` 读帧 `TimeoutError: timed out`
+    #   （chunk5；并行段起守护 + 嵌套 `nf verify --json` 被拖到 300 s 外）；
+    # - test_watch：`nf verify --json` 同代际第二跑 cache hits=0，且两次输出里含
+    #   ms 级耗时字段（"…87 16" vs "…87 18"）——同一族「嵌套 nf 进程 × 并发」抖动。
+    # 两族都是时间/进程创建敏感，判据本身没问题；照既有机制进串行段（用例照跑不减）。
+    "test_daemon_parity", "test_watch",
 })
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
 # 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
