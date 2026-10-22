@@ -31,15 +31,21 @@ pub extern "C" fn nf_engine_abi_version() -> u32 {
 ///   「已加密 / 已写盘」——那是静默失败（VULN-02 F1，CWE-393 / ASVS V5.3）。
 ///   要拿所需长度就自己按输入长度算（本函数是**定长搬运**，所需长度恒等于 `len`）。
 /// - 成功写入返回 len；
-/// - 输入指针为空时返回 0（拒绝非法调用，不裸崩；任何 len 都不进 `from_raw_parts`）。
+/// - 输入指针为空时返回 0（拒绝非法调用，不裸崩）；**任何 len（含 0）都不进
+///   `from_raw_parts`**——`null + len=0` 也是 UB（VULN-02 F2，CWE-476 / CWE-758）。
 ///
 /// # Safety
 /// 调用方须保证 input[0..len] 与 out[0..cap] 是可读/可写的有效区间；
 /// 这是 C ABI 的固有前提。
+// SAFETY: 本函数是 `unsafe extern "C"`（C ABI 出口必然 unsafe）。它把「调用方承诺的有效
+// 区间」收窄成**可判的前置条件**：任一指针为空即拒绝返回 0，绝不把可能为空的指针交给
+// `from_raw_parts`（见下方 F2 守卫）；两段切片长度都取自调用方声明的 len。
 #[no_mangle]
 pub unsafe extern "C" fn nf_reverse_bytes(input: *const u8, len: usize, out: *mut u8,
                                           cap: usize) -> usize {
-    if input.is_null() && len > 0 {
+    if input.is_null() {
+        // F2：**任何** null 都拒绝，不只 len>0。`from_raw_parts(null, 0)` 仍是 UB
+        //（标准库要求指针非空且对齐，即使 len==0）。
         return 0;
     }
     if out.is_null() || cap < len {
@@ -112,6 +118,13 @@ mod tests {
     fn null_input_is_refused() {
         let n = unsafe { nf_reverse_bytes(std::ptr::null(), 5, std::ptr::null_mut(), 0) };
         assert_eq!(n, 0);
+        // F2（VULN-02）：`len == 0` 也必须拒绝——`from_raw_parts(null, 0)` 仍是 UB，
+        // 旧守卫只挡了 `len > 0`，会把它放进切片构造。
+        let n = unsafe { nf_reverse_bytes(std::ptr::null(), 0, std::ptr::null_mut(), 0) };
+        assert_eq!(n, 0, "input=null 且 len=0 也必须拒绝（不许进 from_raw_parts）");
+        let mut buf = [0u8; 1];
+        let n = unsafe { nf_reverse_bytes(std::ptr::null(), 0, buf.as_mut_ptr(), 1) };
+        assert_eq!(n, 0, "input=null 且 len=0（cap 足够）也必须拒绝");
     }
 
     #[test]
