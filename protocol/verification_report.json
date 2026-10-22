@@ -509,9 +509,9 @@
       "source": "asset_contract.scan",
       "stats": {
         "chains": 1,
-        "code": 6,
+        "code": 7,
         "data": 10,
-        "files": 1264,
+        "files": 1259,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3820,
-        "kernel": 1987,
+        "files": 3821,
+        "kernel": 1988,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "b69e3a54442143ca8d955a54b588ec05f8577feb1ab706f248181a96f236be78",
+  "root_digest": "86472befb102ab4867671c49922c05b842d14ff65a06b77201b77996476d6288",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

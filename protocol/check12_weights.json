@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-20",
+  "measured_at": "2026-10-22",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -13,6 +13,7 @@
     "test_assertions": 0.9,
     "test_asset_contract": 3.6,
     "test_asset_contract_faces": 0.2,
+    "test_asset_contract_ffi_warn": 2.7,
     "test_asset_density": 5.1,
     "test_asset_ledger": 1.7,
     "test_asset_ledger_projection": 0.9,
@@ -465,6 +466,8 @@
     "test_asset_contract.StructuralCodeTest.test_regex_limit_ratchet": 0.02,
     "test_asset_contract.StructuralCodeTest.test_structural_miss_is_issue": 0.0,
     "test_asset_contract_faces.AssetContractIntegralFacesTest.test_faces_and_scan_match_generated_expectations": 0.06,
+    "test_asset_contract_ffi_warn.FfiContractWarnTest.test_injected_violations_are_warned_then_cleared": 0.01,
+    "test_asset_contract_ffi_warn.FfiContractWarnTest.test_real_corpus_warn_face_is_clean": 2.51,
     "test_asset_density.AssetDensityTest.test_empty_asset_captured": 0.02,
     "test_asset_density.AssetDensityTest.test_repo_scan_clean": 0.24,
     "test_asset_density.AssetDensityTest.test_thickness_repo": 0.2,
@@ -3496,5 +3499,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.04,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1789.1
+  "total_s": 1791.8
 }
