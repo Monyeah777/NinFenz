@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-22",
-  "approved_by": "Codex",
-  "note": "全仓审计最终收口：npm 发布新鲜度与开发态显式放行",
+  "approved_by": "lead",
+  "note": "Codex 内容合入 + 远端删件后重冻（2026-10-22）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
