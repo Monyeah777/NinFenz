@@ -23,12 +23,15 @@ pub extern "C" fn nf_engine_abi_version() -> u32 {
     ABI_VERSION
 }
 
-/// 把 UTF-8 字节逐字节反转后写进调用方给的缓冲；返回**实际需要的**长度。
+/// 把 UTF-8 字节逐字节反转后写进调用方给的缓冲；成功时返回写出的字节数 `len`。
 ///
-/// 契约（调用方按此判错，不做隐式截断）：
-/// - out 为空或 cap < len 时**不写**，只返回所需长度（两步式：先问长度再取）；
+/// 契约（调用方按此判错，不做隐式截断，也**不**用返回值暗示「所需长度」）：
+/// - 非法输出缓冲（`out` 为空 / `cap < len`）一律**拒绝**：一个字节都不写、返回 **0**。
+///   为什么不再「返回所需长度」：调用方极易把返回值当「已写 `len` 字节」，而后据此判
+///   「已加密 / 已写盘」——那是静默失败（VULN-02 F1，CWE-393 / ASVS V5.3）。
+///   要拿所需长度就自己按输入长度算（本函数是**定长搬运**，所需长度恒等于 `len`）。
 /// - 成功写入返回 len；
-/// - 输入指针为空且 len > 0 时返回 0（拒绝非法调用，不裸崩）。
+/// - 输入指针为空时返回 0（拒绝非法调用，不裸崩；任何 len 都不进 `from_raw_parts`）。
 ///
 /// # Safety
 /// 调用方须保证 input[0..len] 与 out[0..cap] 是可读/可写的有效区间；
@@ -40,7 +43,8 @@ pub unsafe extern "C" fn nf_reverse_bytes(input: *const u8, len: usize, out: *mu
         return 0;
     }
     if out.is_null() || cap < len {
-        return len;
+        // F1：拒绝而不是「返回 len」。返回 len 会让调用方以为写成功（静默失败）。
+        return 0;
     }
     let src = std::slice::from_raw_parts(input, len);
     let dst = std::slice::from_raw_parts_mut(out, len);
@@ -51,13 +55,18 @@ pub unsafe extern "C" fn nf_reverse_bytes(input: *const u8, len: usize, out: *mu
 }
 
 /// 导出符号：自证一次（把 ABI 版本与「装载成功」分开判，避免两者被混为一谈）。
+///
+/// 自证里**同时**钉住失败语义（F1）：非法输出缓冲必须被拒（返回 0），不能只钉成功路径。
 #[no_mangle]
 pub extern "C" fn nf_engine_abi_self_test() -> u32 {
     let probe = b"nf-ffi";
     let mut buf = [0u8; 6];
     // SAFETY: probe 与 buf 都是本函数内的固定长度数组，长度一致。
     let n = unsafe { nf_reverse_bytes(probe.as_ptr(), probe.len(), buf.as_mut_ptr(), buf.len()) };
-    if n == probe.len() && &buf == b"iff-fn" {
+    // SAFETY: probe 是有效切片；out 传空指针正是本负例要验的「拒绝」路径——库内先判
+    // out.is_null() 再返回 0，不会解引用它。
+    let refused = unsafe { nf_reverse_bytes(probe.as_ptr(), probe.len(), std::ptr::null_mut(), 0) };
+    if n == probe.len() && &buf == b"iff-fn" && refused == 0 {
         ABI_VERSION
     } else {
         0
@@ -85,14 +94,18 @@ mod tests {
     }
 
     #[test]
-    fn two_step_capacity_contract() {
+    fn invalid_out_buffer_is_refused() {
+        // F1（VULN-02）：容量不足**不许**返回所需长度——那会让调用方误信「已写 len 字节」。
         let src = b"abc";
         let mut buf = [0u8; 2];
         let n = unsafe { nf_reverse_bytes(src.as_ptr(), 3, buf.as_mut_ptr(), 2) };
-        assert_eq!(n, 3);
-        assert_eq!(&buf, b"\0\0", "容量不足时不许写");
+        assert_eq!(n, 0, "容量不足必须拒绝（返回 0），不得用返回值暗示所需长度");
+        assert_eq!(&buf, b"\0\0", "拒绝时一个字节都不许写");
+        // 负例：out 为空（cap 也任取）必须返回 0。
         let n = unsafe { nf_reverse_bytes(src.as_ptr(), 3, std::ptr::null_mut(), 0) };
-        assert_eq!(n, 3);
+        assert_eq!(n, 0, "out 为空必须拒绝（返回 0）");
+        let n = unsafe { nf_reverse_bytes(src.as_ptr(), 3, std::ptr::null_mut(), 3) };
+        assert_eq!(n, 0, "out 为空且 cap 足够也必须拒绝（返回 0）");
     }
 
     #[test]
