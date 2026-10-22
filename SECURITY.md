@@ -47,3 +47,19 @@
 | 静态检查（含未定义名） | `nf release` → ruff | 本地 pre-push 即拦 |
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
+| 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
+
+## 六、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
+
+- **面**：`nf verify` 的引擎侧会对目标仓库 `verify.sh` 里的 heredoc Python 做 `exec`
+  （`desktop/src/core/gate_inproc.py`）——**在谁的仓库里跑，就执行谁的代码**
+  （CWE-94/95；OWASP A03:2021 – Injection；ASVS V5.2.1「不得对不可信数据求值」）。
+- **默认策略（fail-closed）**：目标仓库 `origin` 的 GitHub owner 在允许列表（默认仅本仓作者
+  `Monyeah777`）才执行；**无 origin / 非 git 检出 / 形态不认识 / owner 不在表 ⇒ 拒绝执行**，
+  `nf verify` 以退出码 2 打印风险与修复指引（不静默降级）。
+- **显式放行**：`nf verify --trust-repo`（等价 `NF_TRUST_REPO=1`），风险由调用者承担；
+  自建镜像 / fork CI 可用 `NF_TRUST_OWNERS`（逗号分隔）追加允许 owner（**只增不减须评审**）。
+- **纵深防御**：`core/gate_inproc.py` 的三个 `exec` 入口在直接调用时同样 `assert_trusted()`，
+  被拒时**不产生任何执行副作用**。
+- **判据**：`desktop/tests/test_repo_trust.py`（GitHub URL 形态解析、白名单、拒绝无副作用、
+  CLI 前置拒绝与 `--trust-repo` 放行）。

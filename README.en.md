@@ -92,6 +92,14 @@ Human (author/developer, 5 minutes):
 5. `python scripts/nf.py doctor`
 6. `python scripts/nf.py completion bash`
 
+> **Security boundary (`nf verify` executes the target repository's own gate scripts)**: the engine
+> runs the embedded Python from the target repo's `verify.sh` **in-process** (CWE-94). It therefore
+> only trusts repositories whose `origin` owner is allowlisted (default: `Monyeah777`); on foreign or
+> untrusted repositories it **refuses by default** (exit 2 + remediation guidance) — pass
+> `nf verify --trust-repo` explicitly to override (at your own risk), and extend the allowlist with
+> `NF_TRUST_OWNERS` for forks/mirrors. For read-only checks use `bash verify.sh`. See
+> [SECURITY.md](SECURITY.md).
+
 AI assembly:
 
 1. Read `docs/agent/AGENT_START.md`

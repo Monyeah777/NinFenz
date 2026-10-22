@@ -35,6 +35,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from core import repo_trust  # H1 信任门（叶子件：只做 origin 判定，无反向依赖）
+
 #: heredoc 起始行：`    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_checkNN.log 2>&1`
 #:
 #: **不要写成 `^\s*.*"…"`**（2026-10-15 实测被本仓 redos_scan 判红）：`\s*` 与 `.*` 匹配的
@@ -99,6 +101,9 @@ def run_inproc(src: str, root: Path, name: str) -> tuple[int, str]:
     不切 cwd 就会 `FileNotFoundError: desktop/scripts/nf.py`（实测踩过）。
     故这里显式切到 root，结束后还原（保留调用方原 cwd）。
     """
+    # H1 纵深防御（2026-10-22）：本函数会 exec 目标仓库的源码，任何直接调用也算跨信任边界。
+    # 引擎侧已有失败面文案（gate_engine._trust_gate）；这里拒绝**执行**本身（抛，不返回码）。
+    repo_trust.assert_trusted(str(root))
     src_dir = str(root / "desktop" / "src")
     if src_dir not in sys.path:
         sys.path.insert(0, src_dir)
@@ -143,6 +148,7 @@ def run_script(path: Any, root: Path, name: str) -> tuple[int, str]:
     与 `run_check_inproc` 同一纪律：不重写脚本判据，只省掉一层 bash 与一次解释器启动。
     脚本自己调 `sys.exit(n)` 时由 `_sys_shim` 收成返回值，**不杀门禁进程**。
     """
+    repo_trust.assert_trusted(str(root))       # H1 纵深防御：见 run_inproc 同款注释
     src_dir = str(root / "desktop" / "src")
     for p in (src_dir, str(root)):
         if p not in sys.path:
@@ -201,6 +207,7 @@ def run_check_inproc(body: str, root: Path, name: str) -> tuple[int, list[str], 
       - banner 那行替换成哨兵打印，用来观测「执行到哪一步」（bash 分支语义的锚点）；
       - `ok/no/wn` 按 verify.sh 的同名函数语义收集文案，故 PASS 文案就是**真执行到的那些**。
     """
+    repo_trust.assert_trusted(str(root))       # H1 纵深防御：exec 前拒绝不可信仓库
     for p in (str(root / "desktop" / "src"), str(root)):
         if p not in sys.path:
             sys.path.insert(0, p)
