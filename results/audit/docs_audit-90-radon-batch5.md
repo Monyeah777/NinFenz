@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
+  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
 ---
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
+
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
+
 > 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）

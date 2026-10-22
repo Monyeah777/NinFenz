@@ -266,7 +266,7 @@
       "max_fn_lines": 9
     },
     "desktop/src/core/disk_cache.py": {
-      "lines": 328,
+      "lines": 443,
       "max_fn_cc": 10,
       "max_fn_lines": 37
     },

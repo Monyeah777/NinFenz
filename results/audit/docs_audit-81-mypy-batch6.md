@@ -10,8 +10,12 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:814b2cf0c1e2a5f89ebbae432ba25a7cc65f8690653e9c244838a11834cd14ad
+  - protocol/code_metrics_baseline.json:2d7e5e13b2787c4be73316b5893ed0dadea00acf6fe2e5e682526b053bb8ca99
 ---
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻·修订）
+
+> 重审（2026-10-22）：C1：判据缓存移出仓库（用户级+回退标记）（重冻）
+
 > 重审（2026-10-22）：S1：scratch GC 只删 nf-<12hex> + 根标记（重冻）
 
 > 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
