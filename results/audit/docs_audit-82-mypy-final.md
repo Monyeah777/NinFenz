@@ -30,8 +30,12 @@ subjects:
   - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - protocol/code_metrics_baseline.json:6ae112350158302d6e36259e7be12f6c1dadf188df7c199299f1fe11f73b1f16
 ---
+> 重审（2026-10-22）：基线修复：asset_contract 契约面只认仓库件（与 build 状态解耦）+ doc 可达性 worktree-aware
+
+> 重审（2026-10-22）：基线修复：asset_contract 计数只认受跟踪件 + doc 可达性 worktree-aware
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1

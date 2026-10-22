@@ -8,9 +8,13 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
-  - desktop/src/core/asset_contract.py:21c60e07d781303fb3ca0174df7ca415e8f8917e4b41aba1636404465d104e9f
-  - protocol/code_metrics_baseline.json:f1f62127dcd988b58087cda75acd62f7f7566fef30b40700f28343d703acb876
+  - desktop/src/core/asset_contract.py:2d97427213aef2513621a7b749d92e1a1b30a36974324c961bfe407421b1a412
+  - protocol/code_metrics_baseline.json:6ae112350158302d6e36259e7be12f6c1dadf188df7c199299f1fe11f73b1f16
 ---
+> 重审（2026-10-22）：基线修复：asset_contract 契约面只认仓库件（与 build 状态解耦）+ doc 可达性 worktree-aware
+
+> 重审（2026-10-22）：基线修复：asset_contract 计数只认受跟踪件 + doc 可达性 worktree-aware
+
 > 重审（2026-10-21）：diag shard 1
 
 > 重审（2026-10-21）：locales html 1

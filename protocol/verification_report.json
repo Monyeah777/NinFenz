@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 6,
         "data": 10,
-        "files": 1264,
+        "files": 1255,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "b69e3a54442143ca8d955a54b588ec05f8577feb1ab706f248181a96f236be78",
+  "root_digest": "c8875b1410d232d816df987c20f4e56c760968cc5275f14d4cc37bbbcd87f7b0",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
