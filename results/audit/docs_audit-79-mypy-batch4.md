@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:69041ba0caeb640aceb4a242ad76fa0be954acdf06891027581a3fce150ae2f3
-  - desktop/src/core/asset_contract.py:721e8d6b90c3d70511ce2fbc8b7e58f7582f29d1e7110b891f423eda4e7c7ca6
-  - protocol/code_metrics_baseline.json:5c9eb4d0f7cee954a938f9a7ba9e21ef9eae00b406b6f07b8e3ffe32be06ffa4
+  - desktop/src/core/asset_contract.py:a79488e2bfbbc58c137881dab9116809feeadacb899efcd1583cf9369b78f082
+  - protocol/code_metrics_baseline.json:42b5583892c05cf9785aa10e844f816f19894955659e733cfcf6245f83d71196
 ---
+> 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）
+
 > 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑
 
 > 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
