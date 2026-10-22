@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:16d8f8b3a6601605b43617c7c3b0ae3be57c3df84ace4580c9b842bbf903a513
+  - protocol/code_metrics_baseline.json:5c9eb4d0f7cee954a938f9a7ba9e21ef9eae00b406b6f07b8e3ffe32be06ffa4
 ---
+> 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑
+
 > 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
 
 > 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变

@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/nf_language.py:ce28f875e4662957118c4abdb53d0f61c6ea857dc203d9ab75a55f88efed5de9
-  - desktop/tests/test_lsp.py:b75ff1b3ef4d2ba326975a7dab755e7dc996aa2c428f8f16decba2f44f09ab56
+  - desktop/tests/test_lsp.py:bbbad3904427e35fc7fc3c73311fd3cd97ed61fdb5db5284867a956201c9ae7e
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑
+
 > 重审（2026-10-22）：测试执行器、进程原子与 Windows shell 解析修复后重算代码度量基线与角色投影；既有审计结论不变
 
 > 重审（2026-10-21）：1.0.5 收口 1

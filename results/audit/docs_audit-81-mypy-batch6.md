@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:16d8f8b3a6601605b43617c7c3b0ae3be57c3df84ace4580c9b842bbf903a513
+  - protocol/code_metrics_baseline.json:5c9eb4d0f7cee954a938f9a7ba9e21ef9eae00b406b6f07b8e3ffe32be06ffa4
 ---
+> 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑
+
 > 重审（2026-10-22）：rust FFI 契约面合入后机械重绑（2026-10-22）
 
 > 重审（2026-10-22）：测试执行器与进程隔离修复后重算代码度量基线与角色投影；既有审计结论不变
