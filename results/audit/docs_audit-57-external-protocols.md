@@ -10,7 +10,7 @@ subjects:
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - desktop/src/core/mcp_runtime.py:e53de860fa8105960e205f35ba9e106836d096f14bb31a28f14a39d0be52211e
+  - desktop/src/core/mcp_runtime.py:737e95ad29adfc9d1e41ce9faa41ae2ad7e668ecdc34a9b0468ce6afedc4d384
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
@@ -27,6 +27,10 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻·修订）
+
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
+
 > 重审（2026-10-22）：测试执行器、进程原子与 Windows shell 解析修复后重算代码度量基线与角色投影；既有审计结论不变
 
 > 重审（2026-10-21）：1.0.5 收口 1

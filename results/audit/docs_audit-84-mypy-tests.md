@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_rust_fastlane.py:0d431643b45bb920c517543f905d773480f4654bad56042b07011932daaa62a6
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
-  - desktop/tests/test_mcp_runtime.py:050ee1ad8d0aa1ebbd7db46af8bc00f039b4fb586c150c7898d36ccf477ef630
+  - desktop/tests/test_mcp_runtime.py:0cdb18758aad7da99432d2b946aaf598fd24b4a1ba5d1d0b9e272554d018c71e
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
@@ -34,6 +34,10 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻·修订）
+
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
+
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）
 
 > 重审（2026-10-21）：rating_decided 1

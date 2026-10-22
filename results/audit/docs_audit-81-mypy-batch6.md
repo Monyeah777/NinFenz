@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - desktop/src/core/atomic_write.py:f9c723fbc7dc1b05ec8da28c7af512cc038fed8345c562c7e285d273db9c98ce
-  - protocol/code_metrics_baseline.json:42b5583892c05cf9785aa10e844f816f19894955659e733cfcf6245f83d71196
+  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
 ---
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
+
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）
 
 > 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑

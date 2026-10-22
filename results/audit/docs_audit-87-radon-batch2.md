@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:42b5583892c05cf9785aa10e844f816f19894955659e733cfcf6245f83d71196
+  - protocol/code_metrics_baseline.json:51e09a236e93e8513acf8a440f0568a625a2b029804c0ca58d1b46e3272ec577
 ---
+> 重审（2026-10-22）：R2：MCP 内部错误脱敏（重冻）
+
 > 重审（2026-10-22）：基线修复：契约面只认仓库件 + doc 可达性 worktree-aware（重冻）
 
 > 重审（2026-10-22）：rust 代码+串行段+TTL 修复合入后重绑

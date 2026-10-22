@@ -681,9 +681,9 @@
       "max_fn_lines": 49
     },
     "desktop/src/core/mcp_runtime.py": {
-      "lines": 2027,
+      "lines": 2032,
       "max_fn_cc": 30,
-      "max_fn_lines": 69
+      "max_fn_lines": 72
     },
     "desktop/src/core/md_blocks.py": {
       "lines": 36,
