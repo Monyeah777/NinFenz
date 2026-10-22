@@ -6,7 +6,7 @@ scope: 作者指令「把管线/模块/资产牵扯到叙述的全部删除，�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - 01_核心协议.md:73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969
+  - 01_核心协议.md:1cc028150defd572bb8c9e86a8bf25d048182071b5657a12f478298675fdfd5d
   - 02_联动注册表.md:686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba
   - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
   - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
@@ -35,6 +35,8 @@ subjects:
   - verify.sh:c2cd98816cc9021703e25899899b256d3f6b98a9a0524b6e62154f14efddf9bf
 
 ---
+> 重审（2026-10-22）：FFI 契约面/实现 + 解析入口 + 文档引用去 .git 元数据路径后重绑
+
 > 重审（2026-10-19）：check39 挂载五分钟入口判据（docs/quickstart.md ↔ scripts/quickstart_check.sh），verify.sh 结构性新增子判据
 
 > 重审（2026-10-19）：verify.sh 恢复并补 _NF_BG_TESTS_PID 声明
