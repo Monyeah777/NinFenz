@@ -24,10 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 #: Windows 反推 → Unix 常规位」解析（`instruction_evidence` 早已这么用）。
 from core import posix_shell as _psh  # noqa: E402
 
-try:
-    BASH = shutil.which("bash") or _psh.posix_shell()
-except Exception:                      # noqa: BLE001 - 解析不到按原口径跳过
-    BASH = None
+BASH = _psh.find_posix_shell()
 
 from core import daemon as dm  # noqa: E402
 from core import conformance_scan as csc  # noqa: E402

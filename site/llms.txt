@@ -17,7 +17,7 @@
 ## 按身份直取（机器面）
 
 - [nf.txt](https://ninfenz.dev/nf.txt)：客户端 AI 装载指令（贴给 AI 或让 AI 自己读；三条铁律 + 分支表 + 取件基底）
-- [agent.txt](https://ninfenz.dev/agent.txt)：agent 装载与运行指令（命令序列 + 每步期望输出：doctor 16/16 · verify.sh PASS=72 · conformance 27/27）
+- [agent.txt](https://ninfenz.dev/agent.txt)：agent 装载与运行指令（命令序列 + 每步期望输出：doctor 17/17 · verify.sh PASS=76 · conformance 27/27）
 - [facts.json](https://ninfenz.dev/facts.json)：机读事实（每条带真源与落地锚点）
 - [run.sh](https://ninfenz.dev/run.sh)：免安装引导（默认 clone + 只读体检；--full 追加全量门禁）
 

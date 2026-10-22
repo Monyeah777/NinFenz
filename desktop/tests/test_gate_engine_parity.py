@@ -43,11 +43,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import gate_engine  # noqa: E402
+from core import posix_shell as psh  # noqa: E402
 
 BANNER = re.compile(r"^== \[(\d+)/")
 VERDICT = re.compile(r"^\s*\[(PASS|FAIL|WARN)\] (.*)$")
 VERIFY_TEXT = (ROOT / "verify.sh").read_text(encoding="utf-8")
-BASH = shutil.which("bash")
+BASH = psh.find_posix_shell()
 
 #: 聚合门：失败时必须「N 条子面明细 + 1 条汇总」的四条（工作包 C）。
 #: 三条执行体不同（check32 委托 / check33/36 进程内 / check35 仍在 PENDING），

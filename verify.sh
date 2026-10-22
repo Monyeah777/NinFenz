@@ -2863,14 +2863,22 @@ except Exception as exc:
 # 墙钟 ≤ 300 s。入口任一侧改坏（增删步 / 换步号 / 写错子命令 / 命令跑不通）本 check 立刻红。
 # 为什么用子进程整份执行：静态步数对齐挡不住「命令参数写错但步数没变」，真跑才挡得住。
 import subprocess as _sp
+from core import posix_shell as _psh
 
-try:
-    _qs = _sp.run(['bash', 'scripts/quickstart_check.sh'], capture_output=True,
-                  encoding='utf-8', errors='replace', timeout=330)
-except _sp.TimeoutExpired:
-    problems.append('五分钟入口超时：bash scripts/quickstart_check.sh 330 s 未结束'
-                    '（修复指引：单步命令卡死；判据上限见脚本 NF_QUICKSTART_MAX_SECONDS=300）')
+_bash = _psh.find_posix_shell()
+if not _bash:
+    problems.append('五分钟入口缺可用 POSIX shell（修复指引：安装 Git for Windows/WSL，'
+                    '或设 NF_BASH；不得把 WindowsApps 应用别名桩当 bash）')
+    _qs = None
 else:
+    try:
+        _qs = _sp.run([_bash, 'scripts/quickstart_check.sh'], capture_output=True,
+                  encoding='utf-8', errors='replace', timeout=330)
+    except _sp.TimeoutExpired:
+        problems.append('五分钟入口超时：bash scripts/quickstart_check.sh 330 s 未结束'
+                        '（修复指引：单步命令卡死；判据上限见脚本 NF_QUICKSTART_MAX_SECONDS=300）')
+        _qs = None
+if _qs is not None:
     _qout = _qs.stdout or ''
     _qerr = _qs.stderr or ''
     if _qs.returncode != 0:

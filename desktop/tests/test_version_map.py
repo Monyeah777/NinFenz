@@ -11,9 +11,12 @@
 """
 import json
 import re
+import subprocess
 import sys
+import tomllib
 import unittest
 from pathlib import Path
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -38,6 +41,26 @@ class CliNpmMcpVersionTest(unittest.TestCase):
         pkg0 = (srv.get("packages") or [{}])[0]
         self.assertEqual(cli, pkg0.get("version"),
                          "NF_CLI_VERSION != server.json packages[0].version")
+
+        pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        self.assertEqual(cli, pyproject["project"]["version"],
+                         "NF_CLI_VERSION != pyproject.toml [project].version")
+
+        hf = (ROOT / "packaging" / "hf-space" / "Dockerfile").read_text(encoding="utf-8")
+        m = re.search(r"^ARG NF_VERSION=(\d+\.\d+\.\d+)$", hf, re.M)
+        self.assertIsNotNone(m, "HF Space Dockerfile 缺可解析的 NF_VERSION 默认值")
+        self.assertEqual(cli, m.group(1), "NF_CLI_VERSION != HF Space NF_VERSION")
+
+        dotnet = (ROOT / "engine" / "dotnet" / "tools" / "nf-dotnet" / "Program.cs").read_text(
+            encoding="utf-8")
+        m = re.search(r'const string NfCliVersion = "([^"]+)"', dotnet)
+        self.assertIsNotNone(m, ".NET CLI 缺可解析的 NfCliVersion")
+        self.assertEqual(cli, m.group(1), "NF_CLI_VERSION != .NET doctor 版本")
+
+        declaration = json.loads((ROOT / "protocol" / "mcp_package.json")
+                                 .read_text(encoding="utf-8"))
+        self.assertEqual(cli, declaration.get("version"),
+                         "NF_CLI_VERSION != protocol/mcp_package.json version")
 
 
 class GateVersionTest(unittest.TestCase):
@@ -94,6 +117,121 @@ class MappingTableTest(unittest.TestCase):
         """退役的第四套口径不得回流（2026-10-11 裁决）：映射表里再出现「冻结目录」即红。"""
         text = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
         self.assertNotIn("冻结目录", text, "CONTRIBUTING 仍在列已退役的冻结目录口径")
+
+
+_MD_LINK = re.compile(r"(?<!!)\[[^\]\n]*\]\(([^)\n]+)\)")
+_FENCED = re.compile(r"```.*?```|~~~.*?~~~", re.S)
+_INLINE_CODE = re.compile(r"`[^`\n]*`")
+
+
+def managed_markdown():
+    """公开/受治理的 Markdown 面；历史变更日志、社区内容和生成 payload 不计。"""
+    roots = {"docs", "results", "protocol", "packaging", "integrations"}
+    for p in ROOT.rglob("*.md"):
+        rel = p.relative_to(ROOT)
+        if any(part in {".git", ".rivet", "node_modules", "payload", "__pycache__"}
+               for part in rel.parts):
+            continue
+        if rel.parts[0] in {"community", "CHANGELOG.md"}:
+            continue
+        if len(rel.parts) == 1 or rel.parts[0] in roots:
+            yield p
+
+
+def missing_local_links():
+    """→ [(文档, 目标, 原因)]。只认真正的 Markdown 链接，跳过代码/锚点/外部 URL。"""
+    out = []
+    checked = 0
+    for p in managed_markdown():
+        try:
+            text = p.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        text = _FENCED.sub("", text)
+        text = _INLINE_CODE.sub("", text)
+        for m in _MD_LINK.finditer(text):
+            target = m.group(1).strip()
+            if not target or target.startswith(("#", "<")):
+                continue
+            if re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", target):
+                continue
+            target = target.split()[0].strip("<>")
+            target = unquote(target.split("#", 1)[0].split("?", 1)[0])
+            if not target or "{" in target or "}" in target or " " in target:
+                continue
+            checked += 1
+            resolved = (p.parent / target).resolve()
+            try:
+                resolved.relative_to(ROOT)
+            except ValueError:
+                out.append((p.relative_to(ROOT).as_posix(), target, "路径越出仓库"))
+                continue
+            if not resolved.exists():
+                out.append((p.relative_to(ROOT).as_posix(), target, "目标不存在"))
+    return out, checked
+
+
+class PublicSurfaceBindingTest(unittest.TestCase):
+    """公开入口的数字与链接必须能落到当前仓库事实。"""
+
+    def test_managed_markdown_local_links_resolve(self):
+        missing, checked = missing_local_links()
+        self.assertGreaterEqual(checked, 20, "本地链接扫描面塌缩（判据可能空转）")
+        self.assertEqual([], missing, f"公开文档存在失效相对链接：{missing[:10]}")
+
+    def test_instruction_prerequisites_are_publicly_reachable(self):
+        """开工前置不得依赖未随公开仓发布、且当前不存在的本地计划档案。"""
+        for rel in ("AGENTS.md", "STRATEGY.md"):
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            self.assertNotIn("40_未来计划总纲", text,
+                             f"{rel} 把不存在的本地计划写成通用开工前置")
+
+    def test_live_numeric_claims_match_runtime(self):
+        stats = json.loads((ROOT / "protocol" / "repo_stats.json")
+                           .read_text(encoding="utf-8"))
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "nf.py"),
+                               "doctor", "--json"], cwd=str(ROOT), capture_output=True,
+                              text=True, encoding="utf-8", errors="replace", timeout=120)
+        self.assertEqual(0, proc.returncode, f"doctor --json 未通过：{proc.stderr[-500:]}")
+        doctor = json.loads(proc.stdout)
+        self.assertEqual(doctor["passed"], doctor["total"])
+
+        live = [
+            "README.md", "README.en.md", "README.ja.md", "llms.txt", "llms-install.md",
+            "site/index.html", "site/en/index.html", "site/use/index.html",
+            "site/en/use/index.html", "site/agent.txt", "site/llms.txt", "site/llms-full.txt",
+            "site/facts.json", "site/nf.txt", "site/run.sh", "site/README.md",
+            "packaging/hf-space/README.md", "packaging/hf-space/server.py",
+            "site/tools/make-demo-gif.py",
+        ]
+        bad = []
+        seen = 0
+        for rel in live:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            for n in re.findall(r"check1-(\d+)", text):
+                seen += 1
+                if int(n) != stats["verify_checks"]:
+                    bad.append(f"{rel}: check1-{n}（真源 check1-{stats['verify_checks']}）")
+            for n in re.findall(r"PASS=(\d+)", text):
+                seen += 1
+                if int(n) != stats["baseline_pass"]:
+                    bad.append(f"{rel}: PASS={n}（真源 PASS={stats['baseline_pass']}）")
+            pairs = (re.findall(r"\bdoctor\b[^\n]{0,12}?[（(]?(\d+)\s*/\s*(\d+)", text)
+                     + re.findall(r"体检[:：][^\n]{0,12}?(\d+)\s*/\s*(\d+)", text))
+            for n in pairs:
+                seen += 1
+                if n != (str(doctor["passed"]), str(doctor["total"])):
+                    bad.append(
+                        f"{rel}: doctor {n[0]}/{n[1]}"
+                        f"（真源 {doctor['passed']}/{doctor['total']}）")
+            counts = (re.findall(r"\bdoctor\b[^\n]{0,20}?(\d+)\s*(?:项|checks?)", text)
+                      + re.findall(r"体检[^\n]{0,12}?(\d+)\s*项", text))
+            for n in counts:
+                seen += 1
+                if int(n) != doctor["total"]:
+                    bad.append(f"{rel}: doctor {n} 项（真源 {doctor['total']} 项）")
+        self.assertGreaterEqual(seen, 20, "公开数字扫描面塌缩（判据可能空转）")
+        self.assertEqual([], bad, f"公开入口数字与运行时真源不一致：{bad[:12]}")
 
 
 if __name__ == "__main__":

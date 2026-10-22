@@ -22,7 +22,7 @@
 | llms.txt | AI（索引） | 有哪些面可读（llms.txt 惯例的清单面） |
 | llms-full.txt | AI（完整） | 一文件读全：定义 / 事实 / 术语 / 上手 / FAQ / 引用 / 机器面清单 |
 | nf.txt | 客户端 AI | 装载指令：三条铁律 + 分支表 + 取件基底 + 判定（读到即执行） |
-| agent.txt | agent | 命令序列 + 每步期望输出（doctor 16/16 · verify.sh PASS=72 · conformance 27/27） |
+| agent.txt | agent | 命令序列 + 每步期望输出（doctor 17/17 · verify.sh PASS=76 · conformance 27/27） |
 | facts.json | AI（机读） | 事实清单：每条带真源与锚点；scale.values 与 repo_stats.json 机检对齐 |
 | run.sh | agent | 免安装引导（默认 clone + 只读体检；--full 追加全量门禁；逐条先打印再执行） |
 | robots.txt | 爬虫 | 显式欢迎 AI 检索/引用/训练取用 + Content-Signal + sitemap |
@@ -59,7 +59,7 @@
 
 ## 已知状态（诚实面）
 
-- **npm 包已发布**：ninfenz v1.0.5（2026-10-08，npmjs.com；2953 文件 / 20.25 MB 解包，带 SLSA provenance
+- **npm 包已发布**：ninfenz v1.0.5（npmjs.com；2929 文件 / 22.88 MB 解包，带 SLSA provenance
   来源证明）。发布通道 = .github/workflows/npm-publish.yml（tag 或手动 dispatch）；GitHub Packages 通道为
   @monyeah777/ninfenz。国内镜像（npmmirror）同步有延迟，站内已注明可用 --registry 绕开。
 - **workers.dev 域名**：已关闭（wrangler.jsonc 的 workers_dev: false）。大陆对该域 DNS 污染，别把它当入口。

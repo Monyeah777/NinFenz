@@ -6,6 +6,7 @@
 """
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -196,6 +197,54 @@ class SourceEscapeHygieneTest(unittest.TestCase):
                 compile(trap.read_text(encoding="utf-8"), str(trap), "exec")
             self.assertTrue([w for w in caught if "invalid escape sequence" in str(w.message)],
                             "变异负例未被抓到（判据失效）")
+
+
+def dense_line_runs(text, threshold=20):
+    """→ [(起始行, 行数)]：连续「每行至多一个字符」的损坏段（代码围栏不计）。"""
+    text = re.sub(r"```.*?```|~~~.*?~~~", "", text, flags=re.S)
+    runs, start = [], None
+    lines = text.splitlines()
+    for i, line in enumerate(lines, 1):
+        if len(line) <= 1:
+            if start is None:
+                start = i
+        elif start is not None:
+            if i - start >= threshold:
+                runs.append((start, i - start))
+            start = None
+    if start is not None and len(lines) + 1 - start >= threshold:
+        runs.append((start, len(lines) + 1 - start))
+    return runs
+
+
+class MarkdownLineDensityTest(unittest.TestCase):
+    """Markdown 不得被压成「一字一行」——格式坏了，链接/版本判据仍可能假绿。"""
+
+    def test_managed_markdown_has_no_character_per_line_corruption(self):
+        bad = []
+        seen = 0
+        for p in Path(ROOT).rglob("*.md"):
+            rel = p.relative_to(ROOT)
+            if any(part in {".git", ".rivet", "node_modules", "payload", "__pycache__"}
+                   for part in rel.parts):
+                continue
+            if rel.parts and rel.parts[0] == "community":
+                continue
+            seen += 1
+            try:
+                text = p.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                continue
+            for start, size in dense_line_runs(text):
+                bad.append(f"{rel.as_posix()}:{start}（连续 {size} 行）")
+        self.assertGreaterEqual(seen, 100, "Markdown 扫描面塌缩")
+        self.assertEqual([], bad[:10],
+                         "Markdown 被压成一字一行（修复指引：按原文恢复段落，勿逐字换行）")
+
+    def test_line_density_predicate_catches_the_mutation(self):
+        corrupted = "-\n \n*\n*\n" + "\n".join("数字资产") + "\n正常段落。\n"
+        self.assertTrue(dense_line_runs(corrupted, threshold=5))
+        self.assertEqual([], dense_line_runs("第一段\n\n第二段。\n", threshold=5))
 
 
 if __name__ == "__main__":

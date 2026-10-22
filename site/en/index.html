@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NinFenz · a content contract layer for AI long-form output</title>
-<meta name="description" content="NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral, model-agnostic. check1-40 gates, PASS=72, Merkle inclusion proofs, MIT, offline.">
+<meta name="description" content="NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. Domain-neutral, model-agnostic. check1-42 gates, PASS=76, Merkle inclusion proofs, MIT, offline.">
 <link rel="canonical" href="https://ninfenz.dev/en/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/">
@@ -172,7 +172,7 @@
 <h2>Three entry paths (pick by who you are)</h2>
 <div class="card">
 <p><strong>Client AI</strong> (zero install): have it read <a href="nf.txt">/nf.txt</a> and follow it. That loader carries three hard rules, a branch table and the fetch bases; if it cannot open links, paste the essentials.</p>
-<p><strong>Agent</strong> (run the whole project locally): follow <a href="agent.txt">/agent.txt</a> - clone, then <code>python scripts/nf.py doctor</code> (16/16), then <code>bash verify.sh</code> (check1-40, PASS=72). One line: <code>curl -fsSL https://ninfenz.dev/run.sh | sh</code> (read-only by default; <code>--full</code> adds all gates).</p>
+<p><strong>Agent</strong> (run the whole project locally): follow <a href="agent.txt">/agent.txt</a> - clone, then <code>python scripts/nf.py doctor</code> (17/17), then <code>bash verify.sh</code> (check1-42, PASS=76). One line: <code>curl -fsSL https://ninfenz.dev/run.sh | sh</code> (read-only by default; <code>--full</code> adds all gates).</p>
 <p><strong>MCP client</strong> (with a local checkout): <code>python scripts/nf.py serve</code> - a read-only MCP server for retrieval and content access, no write path.</p>
 <p class="src">Details and copy blocks: <a href="use/">Put it to work</a> · everything in one file: <a href="llms-full.txt">/llms-full.txt</a> · machine-readable facts: <a href="facts.json">/facts.json</a> · index: <a href="llms.txt">/llms.txt</a></p>
 </div>
@@ -191,7 +191,7 @@
 <li id="fact-verifiable">Verifiable artifacts: <strong>Merkle inclusion proofs (RFC 6962)</strong> plus optional hmac / ssh-sig / sigstore-keyless anchors; <strong>missing verifier = fail closed</strong>.</li>
 <li id="fact-mcp">Interop: read-only MCP surface (<code>nf serve</code>), dual-era 2026-07-28 / 2025-11-25; listed in the <strong>official MCP Registry</strong> (<code>io.github.Monyeah777/ninfenz</code>).</li>
 <li id="fact-terminal">Terminal: <code>python tui/nf.py</code> - a full-screen TUI in the pure standard library.</li>
-<li id="fact-npm">Distribution: npm package <strong>ninfenz v1.0.5</strong> (published 2026-10-08, 2953 files, with SLSA provenance) - repositories on GitHub / Gitee, site at <strong>ninfenz.dev</strong>.</li>
+<li id="fact-npm">Distribution: npm package <strong>ninfenz v1.0.5</strong> (2929 files / 22.88 MB unpacked, with SLSA provenance) - repositories on GitHub / Gitee, site at <strong>ninfenz.dev</strong>.</li>
 </ul>
 <p class="src">The same facts, machine-readable: <a href="facts.json">/facts.json</a> (each claim carries its source and an on-page anchor) · standards catalogue export: <a href="https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/geo_export.json">protocol/geo_export.json</a> (370 entries with reachability and probe date).</p>
 
@@ -199,8 +199,8 @@
 <pre><code># the whole project (the only path that needs a clone)
 git clone https://github.com/Monyeah777/NinFenz
 cd NinFenz
-python scripts/nf.py doctor     # read-only checks: 16/16 passed
-bash verify.sh                  # all check1-40 gates: PASS=72  WARN=0  FAIL=0
+python scripts/nf.py doctor     # read-only checks: 17/17 passed
+bash verify.sh                  # all check1-42 gates: PASS=76  WARN=0  FAIL=0
 
 # full-screen terminal UI (standard library only, offline)
 python tui/nf.py
@@ -217,7 +217,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><th></th><th>Prompt collection</th><th>NinFenz</th></tr>
 <tr><td>Deliverable</td><td>a block of text</td><td>protocol + gates + asset ledger</td></tr>
 <tr><td>Second run</td><td>random structure</td><td>isomorphic to the first (diffable against a baseline)</td></tr>
-<tr><td>Pass/fail</td><td>a human eyeballs it</td><td>check1-40 deterministic checks against a frozen baseline</td></tr>
+<tr><td>Pass/fail</td><td>a human eyeballs it</td><td>check1-42 deterministic checks against a frozen baseline</td></tr>
 <tr><td>Verifiable</td><td>no</td><td>Merkle inclusion proof + signature anchors, fail closed</td></tr>
 <tr><td>Boundary</td><td>-</td><td>structure and reproducibility, not prose quality</td></tr>
 </table>

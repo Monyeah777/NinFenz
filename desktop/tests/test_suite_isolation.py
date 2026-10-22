@@ -36,6 +36,18 @@ class SuiteHomeIsolationTest(unittest.TestCase):
         home = Path(os.environ.get("NARRATIVE_FORGE_HOME", "")).resolve()
         self.assertNotEqual(ROOT.resolve(), home, "套件 home 不该是仓库根")
 
+    def test_shard_runner_owns_cleanup_for_explicit_home(self):
+        """分片显式传 home 时，`desktop/tests/__init__.py` 的 atexit 不注册。"""
+        src = (ROOT / "scripts" / "verify_tests.py").read_text(encoding="utf-8")
+        for needle in ("_cleanup_shard_home", "daemon.json", "popen_capture",
+                       "NF_SHARD_TIMEOUT",
+                       'env.setdefault("NF_DAEMON_IDLE", "30")'):
+            self.assertIn(needle, src, f"分片执行器缺进程/守护回收判据：{needle}")
+        atom = (ROOT / "desktop" / "src" / "core" / "atoms" / "proc.py").read_text(
+            encoding="utf-8")
+        for needle in ("def kill_tree", "taskkill", "def popen_capture"):
+            self.assertIn(needle, atom, f"进程原子缺超时树回收判据：{needle}")
+
 
 if __name__ == "__main__":
     unittest.main()

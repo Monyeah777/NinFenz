@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DESKTOP = ROOT / "desktop"
 TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
-SHARD_TIMEOUT_S = 5400.0
+SHARD_TIMEOUT_S = float(os.environ.get("NF_SHARD_TIMEOUT", "1800"))
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
 SERIAL_MODULES = frozenset({
     "test_atomic_write", "test_daemon",
@@ -56,6 +56,7 @@ SERIAL_MODULES = frozenset({
 #: 落盘一律走 core.atomic_write（脚本面纪律：不得有裸写 sink）；权重是**仓内**协议件。
 sys.path.insert(0, str(DESKTOP / "src"))
 from core import atomic_write, json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
+from core.atoms import proc as proc_atom  # noqa: E402
 
 
 def discover_ids() -> list:
@@ -276,6 +277,7 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
         with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
+            env.setdefault("NF_DAEMON_IDLE", "30")
             # 内层并发闸（2026-10-19 实测）：test_daemon_parity 的直跑面默认开 6 路线程，
             # 16 片就是 96 个并发 python 进程——进程创建争用会把整片拖慢。
             # 分片越多、每个分片的内层线程越少，总量固定在 ~16 路。
@@ -289,20 +291,25 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
                 # 2 核 runner ≈ 1 路，20 核机 ≈ 6 路；不再假设"单分片就是最强机器"。
                 _inner = max(1, min(6, (os.cpu_count() or 4) // 2))
             env["NF_INNER_THREADS"] = str(_inner)
-            try:
-                proc = subprocess.run(
-                    [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],
-                    cwd=str(DESKTOP), env=env, capture_output=True, text=True,
-                    encoding="utf-8", errors="replace", timeout=SHARD_TIMEOUT_S)
-                rc, out = proc.returncode, (proc.stdout or "") + (proc.stderr or "")
-            except subprocess.TimeoutExpired:
-                rc, out = 124, "分片超时（%.0f s）" % SHARD_TIMEOUT_S
+            result = proc_atom.popen_capture(
+                [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],
+                cwd=str(DESKTOP), env=env, timeout=SHARD_TIMEOUT_S,
+                new_session=os.name != "nt")
+            rc = int(result["code"] if result["code"] is not None else 1)
+            out = result["out"] + result["err"]
+            if result["timed_out"]:
+                out += f"\n分片超时（{SHARD_TIMEOUT_S:.0f} s；已回收进程树）"
+            cleanup_ok, cleanup_msg = _cleanup_shard_home(Path(home))
+            if not cleanup_ok and rc == 0:
+                rc = 125
+            if cleanup_msg:
+                out += "\n[分片清理] " + cleanup_msg
     log_dir = os.environ.get("NF_SHARD_LOG_DIR")
     if log_dir:
         # 诊断用（默认关闭）：把每个分片的**完整**输出落盘——分片失败时只看末 40 行
         # 往往抓不到"哪条测试红"，而这正是并行敏感问题的唯一线索。
         try:
-            target = Path(log_dir) / ("shard%d.log" % index)
+            target = Path(log_dir) / f"shard{index}.log"
             target.parent.mkdir(parents=True, exist_ok=True)
             atomic_write.write_text(target, out)
         except OSError:
@@ -310,6 +317,33 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             pass
     return {"index": index, "rc": rc, "out": out,
             "wall": round(time.perf_counter() - t0, 1), "tests": len(ids)}
+
+
+def _cleanup_shard_home(home: Path) -> tuple:
+    """停掉分片临时 home 内的守护；显式 home 不触发套件级 atexit，故必须由执行器兜底。"""
+    state = home / "daemon.json"
+    if not state.exists():
+        return True, ""
+    src = str(DESKTOP / "src")
+    code = (
+        "import sys\n"
+        "from pathlib import Path\n"
+        f"sys.path.insert(0, {src!r})\n"
+        "from core import daemon as dm\n"
+        "ok, msg = dm.stop(timeout=3.0)\n"
+        "print(msg)\n"
+        "raise SystemExit(0 if ok else 1)\n"
+    )
+    env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
+               NARRATIVE_FORGE_HOME=str(home))
+    result = proc_atom.run_capture([sys.executable, "-c", code], cwd=str(DESKTOP), env=env,
+                                   timeout=15)
+    if result["code"] is None:
+        return False, f"守护清理失败：{result['err']}（临时 home：{home}）"
+    detail = (result["out"] + result["err"]).strip().splitlines()
+    msg = "；".join(detail[-2:]) or f"清理 rc={result['code']}"
+    ok = result["code"] == 0 or not state.exists() or "没有守护在运行" in msg
+    return ok, msg
 
 
 class _TimingResult(unittest.TextTestResult):

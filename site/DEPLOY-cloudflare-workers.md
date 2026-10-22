@@ -140,7 +140,7 @@ node site/tools/site-check.mjs https://ninfenz.dev
 | `/llms.txt` | 检索 / AI（索引） | 有哪些面可读（llms.txt 惯例清单） |
 | `/llms-full.txt` | AI（完整） | 一文件读全：定义 / 事实 / 术语表 / 上手四条路径 / FAQ / 引用格式 |
 | `/nf.txt` | 客户端 AI | 装载指令：三条铁律 + 分支表 + 取件基底（读到即执行） |
-| `/agent.txt` | agent | 命令序列 + 每步期望输出（doctor 16/16 · verify.sh PASS=72 · conformance 27/27） |
+| `/agent.txt` | agent | 命令序列 + 每步期望输出（doctor 17/17 · verify.sh PASS=76 · conformance 27/27） |
 | `/facts.json` | AI（机读） | 事实清单，每条带真源与落地锚点；scale.values 与 protocol/repo_stats.json 机检对齐 |
 | `/run.sh` | agent | 免安装引导（默认 clone + 只读体检；--full 追加全量门禁） |
 

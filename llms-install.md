@@ -23,7 +23,7 @@ NinFenz（宁封子，简称 NF）是**内容契约层**：用「协议 + 确定
 
 ```bash
 npx -y ninfenz --version       # 期望输出 nf 1.0.5
-npx -y ninfenz doctor          # 体检：期望 16/16 通过
+npx -y ninfenz doctor          # 体检：期望 17/17 通过
 npx -y ninfenz serve           # 启动只读 MCP（stdio JSON-RPC，Ctrl+C 退出）
 ```
 
@@ -72,7 +72,7 @@ Claude Desktop / Cursor / Cline 通用配置（零安装，走 npm 包）：
 ## 4 装完自检（agent 必做，全绿才算装好）
 
 ```bash
-npx -y ninfenz doctor             # 体检 16/16
+npx -y ninfenz doctor             # 体检 17/17
 python scripts/nf.py stats --check  # 数字口径一致
 python scripts/nf.py receipts       # 协议回执根一致
 python scripts/nf.py audit verify   # 审计件与声明一致

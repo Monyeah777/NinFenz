@@ -35,15 +35,20 @@ def run_cli(argv, cwd=None):
     nf = _load_nf()
     out, err = io.StringIO(), io.StringIO()
     old = os.getcwd()
+    old_stdin = sys.stdin
     try:
         if cwd:
             os.chdir(cwd)
+        # 真进程等价面使用 stdin=DEVNULL。进程内路径也必须显式给 EOF，否则
+        # `nf lsp` / `nf serve` 一类会读 stdin 的命令会继承宿主的交互终端并永久等待。
+        sys.stdin = io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             try:
                 rc = nf.main(list(argv))
             except SystemExit as exc:            # argparse/显式 sys.exit
                 rc = exc.code if isinstance(exc.code, int) else (0 if exc.code is None else 1)
     finally:
+        sys.stdin = old_stdin
         os.chdir(old)
     return int(rc or 0), out.getvalue(), err.getvalue()
 
@@ -53,6 +58,7 @@ def spawn_cli(argv, cwd=None):
     import subprocess
     proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "nf.py")] + list(argv),
                           cwd=str(cwd or ROOT), capture_output=True, text=True,
+                          stdin=subprocess.DEVNULL,
                           encoding="utf-8", errors="replace")
     return proc.returncode, proc.stdout, proc.stderr
 
