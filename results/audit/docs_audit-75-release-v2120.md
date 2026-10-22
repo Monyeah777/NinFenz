@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:0786c35efe46c8aac3b0d6ad89f1676be15b8283b12994fc12c80ec928a601f4
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:62618715f838bc7f878fe2512216f5f7425a70d7d5e7f581075123d5fc89f358
+  - README.md:9920d98f07619737e3246976e2dbff2b1b0c782eb9e2c6e8302bdcb2490210c4
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:99dd71e7b6673837eced19fdcebe90814148b8f48a35e2aa1125b83de4f940d2
+  - scripts/nf.py:72b169f6012c9031c80fad98a534e3585ee483b81f930012bcf09d6fc2784090
 
 ---
+> 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）
+
 > 重审（2026-10-21）：CHANGELOG 增加 2026-10-21 全仓一致性修复结果条目；既有审计结论不变
 
 > 重审（2026-10-21）：修复 CHANGELOG 一字一行源件损坏；按 Git 历史与连续文本恢复段落，既有审计结论不变

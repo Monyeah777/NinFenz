@@ -245,6 +245,7 @@
     "test_repeat_safety": 0.2,
     "test_repo_face": 0.9,
     "test_repo_stats": 0.4,
+    "test_repo_trust": 2.2,
     "test_report_meta": 0.1,
     "test_requirement_coverage": 0.1,
     "test_residual_registry": 0.1,
@@ -2878,6 +2879,17 @@
     "test_repo_stats.WriteCheckRoundTripTest.test_scan_delegates_to_check": 0.03,
     "test_repo_stats.WriteCheckRoundTripTest.test_write_reports_missing_entry_file": 0.03,
     "test_repo_stats.WriteCheckRoundTripTest.test_write_then_check_is_generation_consistent": 0.03,
+    "test_repo_trust.GateRefusalTest.test_cli_verify_preflight_allows_with_trust_repo": 0.13,
+    "test_repo_trust.GateRefusalTest.test_cli_verify_preflight_refuses_untrusted_repo": 0.12,
+    "test_repo_trust.GateRefusalTest.test_gate_engine_inproc_verdict_refuses": 0.13,
+    "test_repo_trust.GateRefusalTest.test_gate_inproc_executes_for_trusted_repo": 0.13,
+    "test_repo_trust.GateRefusalTest.test_gate_inproc_executes_with_explicit_trust": 0.13,
+    "test_repo_trust.GateRefusalTest.test_gate_inproc_refuses_and_does_not_execute": 0.12,
+    "test_repo_trust.OriginParseTest.test_allowlisted_owner_is_trusted": 0.12,
+    "test_repo_trust.OriginParseTest.test_env_trust_and_owner_extension": 0.13,
+    "test_repo_trust.OriginParseTest.test_non_git_dir_is_untrusted": 0.0,
+    "test_repo_trust.OriginParseTest.test_parses_github_url_forms": 0.49,
+    "test_repo_trust.OriginParseTest.test_unparseable_or_absent_origin_is_untrusted": 0.46,
     "test_report_meta.Test.test_digest_is_order_insensitive": 0.0,
     "test_report_meta.Test.test_tentative_requires_reason": 0.0,
     "test_report_meta.Test.test_valid_meta": 0.0,
@@ -3556,5 +3568,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 992.9
+  "total_s": 995.1
 }

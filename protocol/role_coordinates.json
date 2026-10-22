@@ -6,7 +6,7 @@
     "prod": 1037,
     "projection": 129,
     "support": 228,
-    "verify": 946
+    "verify": 948
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6719,6 +6719,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "仓库信任判定（H1）：`nf verify` 会执行目标仓库自带的门禁脚本，跨信任边界。",
+      "path": "desktop/src/core/repo_trust.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "需求 ↔ 判据双向覆盖台账（机制借鉴 poppyseed spec.ts:114-148 / objectui 覆盖度反向）。",
       "path": "desktop/src/core/requirement_coverage.py",
       "role": "verify",
@@ -8617,6 +8623,12 @@
     {
       "function": "自述数字实算真源（`core/repo_stats.py`）单测。",
       "path": "desktop/tests/test_repo_stats.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "H1（2026-10-22 安全审计）：`nf verify` 执行目标仓库代码前的**信任门**。",
+      "path": "desktop/tests/test_repo_trust.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11940,7 +11952,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a51cd84421fdb03db88fdf9f06a264b916cc585a28fea0f32542f3e8b20c4158",
+  "root_digest": "6542ab59a634820955678f961a96184ddc232f4a790342b38b7ad6bf862b60df",
   "rule_counts": {
     "R-app": 1449,
     "R-catch": 90,
@@ -11949,8 +11961,8 @@
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 113,
-    "R-verify": 830,
-    "auto:R-core": 249
+    "R-verify": 831,
+    "auto:R-core": 250
   },
   "schema": "nf-role-coordinates/1"
 }

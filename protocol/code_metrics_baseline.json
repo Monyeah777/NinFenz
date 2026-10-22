@@ -406,9 +406,9 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/gate_engine.py": {
-      "lines": 601,
-      "max_fn_cc": 18,
-      "max_fn_lines": 72
+      "lines": 627,
+      "max_fn_cc": 19,
+      "max_fn_lines": 75
     },
     "desktop/src/core/gate_faces.py": {
       "lines": 326,
@@ -421,9 +421,9 @@
       "max_fn_lines": 22
     },
     "desktop/src/core/gate_inproc.py": {
-      "lines": 267,
+      "lines": 274,
       "max_fn_cc": 12,
-      "max_fn_lines": 77
+      "max_fn_lines": 78
     },
     "desktop/src/core/gate_labels.py": {
       "lines": 257,
@@ -1000,6 +1000,11 @@
       "max_fn_cc": 20,
       "max_fn_lines": 81
     },
+    "desktop/src/core/repo_trust.py": {
+      "lines": 144,
+      "max_fn_cc": 7,
+      "max_fn_lines": 21
+    },
     "desktop/src/core/report_meta.py": {
       "lines": 43,
       "max_fn_cc": 11,
@@ -1386,9 +1391,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7544,
+      "lines": 7570,
       "max_fn_cc": 115,
-      "max_fn_lines": 1254
+      "max_fn_lines": 1258
     },
     "scripts/nf_client.py": {
       "lines": 189,
