@@ -1,0 +1,61 @@
+name: _diag-report-nondeterminism
+
+# 一次性诊断（用完即删）：在 ubuntu 上连跑两次 verify_report.build()，逐 item 对拍差异。
+# 目的：定位 CI 上「两次构建 root_digest 不同」的具体判据项。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Two builds diff
+        run: |
+          set -u
+          cd desktop
+          python - <<'PY'
+          import json, os, sys, hashlib
+          sys.path.insert(0, "src")
+          from core import verify_report as vr
+
+          a = vr.build("..")
+          b = vr.build("..")
+          print("root_a", a["root_digest"][:16])
+          print("root_b", b["root_digest"][:16])
+          print("committed", json.load(open("../protocol/verification_report.json", encoding="utf-8"))["root_digest"][:16])
+          differ = []
+          for x, y in zip(a["items"], b["items"]):
+              if x != y:
+                  differ.append(x["id"])
+                  print("=== DIFF item:", x["id"])
+                  print("  a.stats:", json.dumps(x.get("stats"), ensure_ascii=False, sort_keys=True)[:600])
+                  print("  b.stats:", json.dumps(y.get("stats"), ensure_ascii=False, sort_keys=True)[:600])
+                  print("  a.issues:", x.get("sample"))
+                  print("  b.issues:", y.get("sample"))
+          print("differ_items:", differ)
+          if a["declared"] != b["declared"]:
+              ka = set(a["declared"]) ; kb = set(b["declared"])
+              print("declared keys diff:", ka ^ kb)
+              for k in sorted(ka & kb):
+                  if a["declared"][k] != b["declared"][k]:
+                      print("  declared[%s] a=%r b=%r" % (k, a["declared"][k], b["declared"][k]))
+          # 与提交件逐 item 比
+          c = json.load(open("../protocol/verification_report.json", encoding="utf-8"))
+          for x, y in zip(c["items"], a["items"]):
+              if x != y:
+                  print("=== COMMITTED-vs-LIVE DIFF:", x["id"])
+                  print("  committed.stats:", json.dumps(x.get("stats"), ensure_ascii=False, sort_keys=True)[:600])
+                  print("  live.stats:", json.dumps(y.get("stats"), ensure_ascii=False, sort_keys=True)[:600])
+                  print("  committed.issues:", x.get("sample"))
+                  print("  live.issues:", y.get("sample"))
+          PY
