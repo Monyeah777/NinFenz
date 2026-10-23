@@ -8,6 +8,7 @@
 <p align="left">
   <a href="https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml"><img src="https://github.com/Monyeah777/NinFenz/actions/workflows/ci-verify.yml/badge.svg" alt="ci-verify ゲート" height="20"></a>
   <a href="https://glama.ai/mcp/servers/Monyeah777/NinFenz/score"><img src="https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg" alt="Glama code quality score AAA" height="20"></a>
+  <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="Awesome MCP Servers に掲載" height="20"></a>
 </p>
 
 > **唯一の公式リポジトリ**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
