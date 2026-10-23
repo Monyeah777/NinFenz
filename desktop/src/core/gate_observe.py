@@ -14,6 +14,7 @@ from __future__ import annotations
 import concurrent.futures as cf
 import json
 import os
+import re
 import subprocess  # nosec B404 - 只跑仓库内测试（argv 列表、无 shell、路径自仓库）
 import sys
 import tempfile
@@ -87,6 +88,11 @@ if _LOG:
 _SKIP_PREFIX = (".rivet/", ".git/", "__pycache__/")
 _SKIP_SUFFIX = (".pyc", ".pyo")
 
+#: 盘符/UNC 形态（`C:\…`、`C:/…`、`\\server\share`）。POSIX 上 `os.path.isabs` 对它们返回
+#: False，若按相对路径拼到 workdir 下就会被误当"仓内读面"（CI 2026-10-23 run#43 实测）。
+#: 与 `gate_select._rel` 同一口径；Windows 上它们本就是正常绝对路径，不在此短路。
+_WIN_ABS = re.compile(r"^(?:[A-Za-z]:[\\/]|\\\\)")
+
 
 def faces_path() -> Path:
     """与 gate_select 同一落点（缓存区）。"""
@@ -100,6 +106,8 @@ def normalize_reads(root: str, paths, workdir: str | None = None) -> list:
     out = set()
     for p in paths:
         raw = str(p)
+        if os.name != "nt" and _WIN_ABS.match(raw):
+            continue                      # 盘符/UNC：任何 POSIX 根外，直接丢
         cand = raw if os.path.isabs(raw) else os.path.join(base, raw)
         n = os.path.normcase(os.path.abspath(cand))
         if not (n == rp or n.startswith(rp + os.sep)):
