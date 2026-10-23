@@ -20,6 +20,7 @@
 import os
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date
@@ -41,7 +42,6 @@ from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026
     MAX_BODY_CHARS,
     SEG_RE,
     clean_val,
-    fail,
     flatten_fm_value,
     fm_fields_ok,
     injection_probe,
@@ -72,11 +72,37 @@ DRY = os.environ.get('DRY_RUN', '') == '1'
 MAX_SEG = 16
 
 
+class GiteeAPIError(RuntimeError):
+    """Categorized Gitee failure. Raw response bodies are never rendered."""
+
+    def __init__(self, category, status=None):
+        self.category = str(category)
+        self.status = status
+        suffix = f" http_status={status}" if status is not None else ""
+        super().__init__(f"Gitee API failure category={self.category}{suffix}")
 
 
+def _classify_http_failure(status, body=""):
+    """Map HTTP failures to stable categories without exposing response bodies."""
+    lowered = str(body or "").lower()
+    if status == 401:
+        return "token_invalid"
+    if status == 403:
+        if "rate limit" in lowered or "too many requests" in lowered:
+            return "rate_limited"
+        return "forbidden"
+    if status == 404:
+        return "endpoint_not_found"
+    if status == 429:
+        return "rate_limited"
+    if 500 <= int(status) <= 599:
+        return "upstream_error"
+    return "http_error"
 
 
-
+def _api_failure_line(exc):
+    suffix = f" http_status={exc.status}" if exc.status is not None else ""
+    return f"ERROR Gitee 轮询诊断: category={exc.category}{suffix}"
 
 
 def gitee_api(path, params=None, method='GET'):
@@ -93,16 +119,19 @@ def gitee_api(path, params=None, method='GET'):
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             raw = r.read()
-            return json_doc.loads(raw, dict, what='Gitee API 响应') if raw else {}
+            if not raw:
+                return {}
+            try:
+                return json_doc.loads(raw, (dict, list), what='Gitee API 响应')
+            except ValueError as exc:
+                raise GiteeAPIError('invalid_json') from exc
     except urllib.error.HTTPError as e:
-        body = e.read().decode()[:300]
-        print(f'⚠ Gitee API HTTP {e.code}: {body}')
-        if e.code == 401:
-            fail('GITEE_TOKEN 无效或权限不足（需 issues 读写 + 仓库推送）')
-        return None
-    except Exception as e:
-        print(f'⚠ Gitee API 异常: {e}')
-        return None
+        body = e.read().decode('utf-8', 'replace')
+        raise GiteeAPIError(_classify_http_failure(e.code, body), e.code) from None
+    except GiteeAPIError:
+        raise
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise GiteeAPIError('network_error') from exc
 
 
 def gitee_comment(number, text):
@@ -132,10 +161,10 @@ def fetch_open_submissions():
             f'/repos/{GITEE_OWNER}/{GITEE_REPO}/issues',
             {'state': 'open', 'sort': 'created', 'direction': 'asc',
              'page': page, 'per_page': 100})
-        if batch is None:
-            return issues
         if not batch:
             break
+        if not isinstance(batch, list) or any(not isinstance(i, dict) for i in batch):
+            raise GiteeAPIError('response_shape')
         issues += batch
         if len(batch) < 100:
             break
@@ -400,16 +429,24 @@ def process(issue):
 
 def main():
     if not TOKEN:
-        fail('缺少 GITEE_TOKEN 环境变量')
+        print(_api_failure_line(GiteeAPIError('missing_token')))
+        return 1
     print(f'🔍 轮询 Gitee（{GITEE_OWNER}/{GITEE_REPO}）开放投稿…')
-    subs = fetch_open_submissions()
-    print(f'  发现 {len(subs)} 条待处理投稿')
-    for issue in subs:
-        try:
-            process(issue)
-        except Exception as e:
-            print(f'  ⚠ Issue #{issue.get("number")} 处理异常: {e}')
-    print('✅ 本轮轮询结束')
+    try:
+        subs = fetch_open_submissions()
+        print(f'  发现 {len(subs)} 条待处理投稿')
+        for issue in subs:
+            try:
+                process(issue)
+            except GiteeAPIError:
+                raise
+            except Exception as e:
+                print(f'  ⚠ Issue #{issue.get("number")} 处理异常: {e}')
+        print('✅ 本轮轮询结束')
+        return 0
+    except GiteeAPIError as exc:
+        print(_api_failure_line(exc))
+        return 1
 
 
 if __name__ == '__main__':
@@ -417,4 +454,4 @@ if __name__ == '__main__':
     for _stream in (sys.stdout, sys.stderr):
         if hasattr(_stream, "reconfigure"):
             _stream.reconfigure(encoding="utf-8")
-    main()
+    raise SystemExit(main())
