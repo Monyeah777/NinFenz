@@ -76,7 +76,8 @@ class GiteeAPIError(RuntimeError):
     """Categorized Gitee failure. Raw response bodies are never rendered."""
 
     def __init__(self, category, status=None):
-        self.category = str(category)
+        raw = str(category)
+        self.category = raw.partition('（')[0]
         self.status = status
         suffix = f" http_status={status}" if status is not None else ""
         super().__init__(f"Gitee API failure category={self.category}{suffix}")
@@ -124,14 +125,23 @@ def gitee_api(path, params=None, method='GET'):
             try:
                 return json_doc.loads(raw, (dict, list), what='Gitee API 响应')
             except ValueError as exc:
-                raise GiteeAPIError('invalid_json') from exc
+                raise GiteeAPIError(
+                    'invalid_json（修复指引：检查 Gitee API 是否返回错误页或代理拦截页，'
+                    '勿把非 JSON 当空结果）',
+                ) from exc
     except urllib.error.HTTPError as e:
         body = e.read().decode('utf-8', 'replace')
-        raise GiteeAPIError(_classify_http_failure(e.code, body), e.code) from None
+        raise GiteeAPIError(
+            f'{_classify_http_failure(e.code, body)}'
+            '（修复指引：按 category 检查 GITEE_TOKEN、权限、限流或上游服务状态）',
+            e.code,
+        ) from None
     except GiteeAPIError:
         raise
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
-        raise GiteeAPIError('network_error') from exc
+        raise GiteeAPIError(
+            'network_error（修复指引：检查 runner 出网与 gitee.com API 可达性，再重跑本轮轮询）',
+        ) from exc
 
 
 def gitee_comment(number, text):
@@ -164,7 +174,10 @@ def fetch_open_submissions():
         if not batch:
             break
         if not isinstance(batch, list) or any(not isinstance(i, dict) for i in batch):
-            raise GiteeAPIError('response_shape')
+            raise GiteeAPIError(
+                'response_shape（修复指引：核对 Gitee API 版本与响应字段，'
+                '形状未知时不得按零条投稿通过）',
+            )
         issues += batch
         if len(batch) < 100:
             break

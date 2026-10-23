@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreigj45d6jqe45gn26fas7ajljrb6r7ywjdvrlmib4qzgt3wkkpexqi",
+      "cid": "bafyreibbla3un6k2fptyatbg2uypatuqvflkju64xbl2egl5hyqmcvecei",
       "path": "protocol/conformance_report.json",
-      "sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+      "sha256": "21583746f95a2be7804c26d530f04e90a956a4d3dcb857a2197d3e20c1548222"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,9 +107,9 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreiacyimn5bwwmv2iegjrtcyticubogq6akto4widuh4aqjqn5u4lg4",
+      "cid": "bafyreiaxpiudfzc5oj5zzauazv6ezk43gjamkuosjbsfefby32tqj6gcu4",
       "path": "protocol/role_coordinates.json",
-      "sha256": "02c218de86d6657482193198b1340a8171a1e02a6ee5903a1f808260ded38b37"
+      "sha256": "177a2832e45d727b9c8280cd7c4cab9b3240c551d24864521438dea704f8c2a7"
     },
     {
       "cid": "bafyreiha2sqgyfovs6rogbtrkmj55egpa6xq3zwmktckvgd62cjgw2oahi",
@@ -217,9 +217,9 @@
       "sha256": "6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0"
     },
     {
-      "cid": "bafyreiepk3mmygtuthk4ce3mjg2b4ykdey5zdiqp7kew4hujulwcngnq2m",
+      "cid": "bafyreigdujzj6g6yo5bd767amyh3v72bsoiknxn64hdpxc5dnw4zsebjky",
       "path": "decisions/INDEX.md",
-      "sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
+      "sha256": "c3a2729f1bd877423ffbe0660fbaff419390a6ddbee1c6fb8ba36db999102956"
     },
     {
       "cid": "bafyreidpsmrdixkrxrpflye44bb6qa7kvmqt5ujdytxf2xiseog54oelg4",
@@ -350,6 +350,11 @@
       "cid": "bafyreibtkiorivs5zg3vl4zoueivhbbosyplifp6gzjnj5iyvl7gyodxby",
       "path": "decisions/ADR-0007-计划内容不进产品仓.md",
       "sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
+    },
+    {
+      "cid": "bafyreigcgjf3rhoerom5npayofrpj4htxjjxpgp7mgusjflebfnysrfbb4",
+      "path": "decisions/ADR-0008-外部一致性运行器边界.md",
+      "sha256": "c2324bb89dc48b99d6bc187162f4f0f3ba537799ff61a9249564095b8944a10f"
     },
     {
       "cid": "bafyreigq44iwbq5vcxlniovxgbmoe4yansoa756fckgccag2hedhwnwpye",
