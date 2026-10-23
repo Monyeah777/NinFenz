@@ -30,6 +30,20 @@
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT" || { echo '无法进入仓库根目录'; exit 2; }
+# ---- 同仓门禁排他（2026-10-24，CI-014）----
+# verify 会生成/刷新忽略面 payload；同仓两份门禁并行时，第二份可能读到第一份
+# 尚未完成的中间态，产生与输入无关的假红。锁按仓库根隔离，跨机器/独立 clone
+# 不互相阻塞；同仓第二份默认等待，超时给出明确指引。
+if [ ! -f scripts/verify_guard.sh ]; then
+  echo '缺少门禁排他件 scripts/verify_guard.sh' >&2
+  exit 2
+fi
+# shellcheck source=scripts/verify_guard.sh
+. scripts/verify_guard.sh
+verify_guard_acquire "$ROOT" || exit $?
+# 参数校验/临时目录探测也可能提前退出；从取得锁的第一刻就挂释放 trap，
+# 后续再用完整 cleanup_all 原子替换，不能把锁留给下一个门禁。
+trap verify_guard_release EXIT INT TERM
 # ---- 临时文件隔离（并发安全：每次运行独立目录，避免共享固定路径互相覆盖日志）----
 # 背景：本仓库常有并发 agent 会话同时跑门禁；固定 /tmp 路径会让 B 会话的失败日志
 #       覆盖 A 会话的诊断输出，导致「看到的失败不是自己的」。原生 Windows（无 Git Bash）下
@@ -138,7 +152,11 @@ cleanup_nfl(){
   fi
   return 0
 }
-trap cleanup_nfl EXIT INT TERM
+cleanup_all(){
+  cleanup_nfl
+  verify_guard_release
+}
+trap cleanup_all EXIT INT TERM
 # ---- 子进程编码统一（三平台同口径）----
 # Windows 默认 ANSI 码页：把 CJK 写进**文件或管道**的 Python 子进程会
 # `UnicodeEncodeError: 'charmap' codec ...` 崩栈（实测 2026-09-29 三平台门禁 Windows 腿：
