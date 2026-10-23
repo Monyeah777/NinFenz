@@ -17,6 +17,7 @@
 use std::collections::HashSet;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
+use std::time::UNIX_EPOCH;
 
 /// 与 `desktop/src/core/repo_face.py::SKIP_DIR_NAMES` **逐项一致**。
 const SKIP_DIR_NAMES: &[&str] = &[
@@ -25,6 +26,28 @@ const SKIP_DIR_NAMES: &[&str] = &[
 ];
 
 static SCOPE: Mutex<Option<(String, Arc<HashSet<String>>)>> = Mutex::new(None);
+static IGNORED_CACHE: Mutex<Option<(String, String, Arc<HashSet<String>>)>> = Mutex::new(None);
+static ROOT_IGNORED_CACHE: Mutex<Option<(String, String, bool)>> = Mutex::new(None);
+
+fn stat_stamp(path: &Path) -> String {
+    match std::fs::metadata(path) {
+        Ok(meta) => {
+            let nanos = meta.modified().ok()
+                .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                .map(|d| d.as_nanos())
+                .unwrap_or(0);
+            format!("{}:{}", nanos, meta.len())
+        }
+        Err(_) => "0:0".to_string(),
+    }
+}
+
+fn repo_stamp(root: &Path) -> String {
+    format!("{}|{}|{}",
+            stat_stamp(&root.join(".gitignore")),
+            stat_stamp(&root.join(".git/info/exclude")),
+            stat_stamp(&root.join(".git/index")))
+}
 
 /// 开始一次判据面：构造并缓存该 root 的可见件集合（`scan` 起始调用）。
 pub fn begin_scope(root: &Path) {
@@ -68,17 +91,40 @@ pub fn visible(root: &Path) -> Option<Arc<HashSet<String>>> {
 /// 用于区分「真实仓库扫描」与「仓内临时夹具」：后者（如 `target/test-fixtures/...`）
 /// 必须按临时树语义全量收件，否则夹具件会被自己的构建产物规则滤掉。
 fn root_itself_ignored(root: &Path) -> bool {
-    std::process::Command::new("git")
+    let key = root.to_string_lossy().to_string();
+    let stamp = repo_stamp(root);
+    {
+        let g = ROOT_IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        if let Some((k, s, v)) = g.as_ref() {
+            if k == &key && s == &stamp {
+                return *v;
+            }
+        }
+    }
+    let got = std::process::Command::new("git")
         .arg("-C")
         .arg(root)
         .args(["check-ignore", "-q", "--", "."])
         .status()
         .map(|s| s.success())
-        .unwrap_or(false)
+        .unwrap_or(false);
+    let mut g = ROOT_IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+    *g = Some((key, stamp, got));
+    got
 }
 
 /// `.gitignore` 覆盖面（posix 相对、去尾斜杠）；git 缺席/非 git 检出 → 空集（同真源）。
-fn ignored_paths(root: &Path) -> HashSet<String> {
+fn ignored_paths(root: &Path) -> Arc<HashSet<String>> {
+    let key = root.to_string_lossy().to_string();
+    let stamp = repo_stamp(root);
+    {
+        let g = IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        if let Some((k, s, v)) = g.as_ref() {
+            if k == &key && s == &stamp {
+                return Arc::clone(v);
+            }
+        }
+    }
     let mut out = HashSet::new();
     let Ok(o) = std::process::Command::new("git")
         .arg("-C")
@@ -86,10 +132,16 @@ fn ignored_paths(root: &Path) -> HashSet<String> {
         .args(["ls-files", "-o", "-i", "--exclude-standard"])
         .output()
     else {
-        return out;
+        let set = Arc::new(out);
+        let mut g = IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        *g = Some((key, stamp, Arc::clone(&set)));
+        return set;
     };
     if !o.status.success() {
-        return out;
+        let set = Arc::new(out);
+        let mut g = IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        *g = Some((key, stamp, Arc::clone(&set)));
+        return set;
     }
     for line in String::from_utf8_lossy(&o.stdout).lines() {
         let s = line.trim().trim_end_matches('/');
@@ -97,7 +149,10 @@ fn ignored_paths(root: &Path) -> HashSet<String> {
             out.insert(s.replace('\\', "/"));
         }
     }
-    out
+    let set = Arc::new(out);
+    let mut g = IGNORED_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+    *g = Some((key, stamp, Arc::clone(&set)));
+    set
 }
 
 /// `rel` 本身或其任一父目录被忽略。

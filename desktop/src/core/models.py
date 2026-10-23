@@ -4,6 +4,8 @@
 """
 from __future__ import annotations
 
+import types
+import typing
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Optional
@@ -28,6 +30,39 @@ def fid_key(fid: str) -> str:
 LAYER_IDS = ["P00", "P10", "P20", "P30", "P40", "P50", "P60", "P70", "P80"]
 
 
+def _type_ok(value, expected) -> bool:
+    """轻量类型守卫（Optional/Union + 基础容器）。"""
+    if expected is typing.Any:
+        return True
+    origin = typing.get_origin(expected)
+    if origin in (typing.Union, types.UnionType):
+        return any(_type_ok(value, arg) for arg in typing.get_args(expected))
+    if expected is type(None):
+        return value is None
+    if expected is bool:
+        return isinstance(value, bool)
+    if expected is int:
+        return isinstance(value, int) and not isinstance(value, bool)
+    if expected in (list, dict, str, float):
+        return isinstance(value, expected)
+    return True
+
+
+def _apply_fields(instance, data: dict, cls) -> None:
+    """只写声明字段；已知字段类型不符即 fail-loud（未知键向后兼容地忽略）。"""
+    if not isinstance(data, dict):
+        raise ValueError("%s.from_json 需要对象，实为 %s" % (cls.__name__, type(data).__name__))
+    hints = typing.get_type_hints(cls)
+    for key, value in data.items():
+        if key not in hints:
+            continue
+        if not _type_ok(value, hints[key]):
+            raise ValueError("%s.%s 须为 %s，实为 %s（修复指引：按 module.json/pipeline.json "
+                             "的声明类型修正）" % (cls.__name__, key, hints[key],
+                                                   type(value).__name__))
+        setattr(instance, key, value)
+
+
 
 @dataclass
 class Module:
@@ -49,6 +84,7 @@ class Module:
     source_md: str = ""               # 原始 markdown 全文（装配时拼接）
     enabled: bool = True
     installed_at: str = ""
+    source_path: str = ""             # 来源件的仓库相对路径（快照信任标注用）
 
     @property
     def full_id(self) -> str:
@@ -63,9 +99,7 @@ class Module:
     @staticmethod
     def from_json(d: dict) -> "Module":
         m = Module()
-        for k, v in d.items():
-            if hasattr(m, k):
-                setattr(m, k, v)
+        _apply_fields(m, d, Module)
         return m
 
     def __repr__(self) -> str:
@@ -114,14 +148,19 @@ class Pipeline:
 
     @staticmethod
     def from_json(d: dict) -> "Pipeline":
-        p = Pipeline(id=d.get("id", "P01"), name=d.get("name", ""),
-                     description=d.get("description", ""),
-                     structure_type=d.get("structure_type", "linear"),
-                     dependencies=d.get("dependencies", []),
-                     tags=d.get("tags", []))
-        p.layers = [PipelineLayer(**{k: v for k, v in l.items() if k in
-                                     PipelineLayer.__dataclass_fields__})
-                    for l in d.get("layers", [])]
+        p = Pipeline()
+        raw_layers = d.get("layers", [])
+        if not isinstance(raw_layers, list):
+            raise ValueError("Pipeline.layers 须为 list，实为 %s" % type(raw_layers).__name__)
+        _apply_fields(p, {k: v for k, v in d.items() if k != "layers"}, Pipeline)
+        p.layers = []
+        for item in raw_layers:
+            if not isinstance(item, dict):
+                raise ValueError("Pipeline.layers 的元素须为对象，实为 %s"
+                                 % type(item).__name__)
+            layer = PipelineLayer()
+            _apply_fields(layer, item, PipelineLayer)
+            p.layers.append(layer)
         return p
 
     def __repr__(self) -> str:
@@ -143,9 +182,7 @@ class AssetPack:
     @staticmethod
     def from_json(d: dict) -> "AssetPack":
         a = AssetPack()
-        for k, v in d.items():
-            if hasattr(a, k):
-                setattr(a, k, v)
+        _apply_fields(a, d, AssetPack)
         return a
 
     def __repr__(self) -> str:
@@ -167,9 +204,7 @@ class Preset:
     @staticmethod
     def from_json(d: dict) -> "Preset":
         p = Preset()
-        for k, v in d.items():
-            if hasattr(p, k):
-                setattr(p, k, v)
+        _apply_fields(p, d, Preset)
         return p
 
     def __repr__(self) -> str:

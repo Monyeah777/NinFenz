@@ -366,5 +366,31 @@ class SchemaScanTest(unittest.TestCase):
             self.assertEqual(sl.subset_key_violations(s), [])
 
 
+class SchemaDepthGuardTest(unittest.TestCase):
+    def test_schema_depth_limit(self):
+        schema = {"type": "object"}
+        cur = schema
+        for _ in range(100):
+            nxt = {"type": "object"}
+            cur["properties"] = {"x": nxt}
+            cur = nxt
+        issues = sl.subset_key_violations(schema)
+        self.assertTrue(any("深度" in i for i in issues), issues[:2])
+
+    def test_instance_depth_limit(self):
+        schema = {"type": "object"}
+        inst = {}
+        cs, ci = schema, inst
+        for _ in range(100):
+            nxt = {"type": "object"}
+            cs["properties"] = {"x": nxt}
+            cs = nxt
+            ni = {}
+            ci["x"] = ni
+            ci = ni
+        issues = sl.subset_validate(inst, schema)
+        self.assertTrue(any("深度" in i for i in issues), issues[:2])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -62,6 +62,29 @@ _EXFIL = re.compile(_SEND + r"[^\n]{0,12}" + _CRED + r"|" + _CRED + r"[^\n]{0,12
 #: 隐藏通道：零宽与双向控制字符（正文里不应出现，常被用来绕过审阅）。
 _HIDDEN = re.compile("[\u200b-\u200f\u202a-\u202e\u2060\u2066-\u2069\ufeff]")
 
+#: 正文扫描上限（1 MiB 字符）：超出只扫前段并记一条 `truncated`（防超长单行卡顿）。
+MAX_SCAN_CHARS = 1_000_000
+
+#: 同形异义归一化（仅用于匹配；返回的 snippet 保留原文）。
+_HOMOGLYPHS = {
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x",
+    "і": "i", "ј": "j", "ѕ": "s", "ԁ": "d", "һ": "h", "ӏ": "l",
+    "А": "A", "Е": "E", "О": "O", "Р": "P", "С": "C", "У": "Y", "Х": "X",
+    "І": "I", "Ј": "J", "Ѕ": "S",
+    "α": "a", "β": "b", "ε": "e", "ι": "i", "κ": "k", "ν": "v", "ο": "o",
+    "ρ": "p", "τ": "t", "υ": "u", "χ": "x",
+    "Α": "A", "Β": "B", "Ε": "E", "Ζ": "Z", "Η": "H", "Ι": "I", "Κ": "K",
+    "Μ": "M", "Ν": "N", "Ο": "O", "Ρ": "P", "Τ": "T", "Υ": "Y", "Χ": "X",
+}
+_TRANSLATE = {ord(k): v for k, v in _HOMOGLYPHS.items()}
+_TRANSLATE.update({code: chr(code - 0xFEE0) for code in range(0xFF01, 0xFF5F)})
+_TRANSLATE[0x3000] = " "
+
+
+def _normalize(text: str) -> str:
+    """全角 ASCII + 常见 Cyrillic/Greek 同形字 → ASCII（匹配用）。"""
+    return text.translate(_TRANSLATE)
+
 #: 越界绝对写法（`/` `\` `C:\` `~`）——**取件面额外严格**：`~` 在账本面按字面落在根内，
 #: 参数面按家目录语义拒（对账测试 `extra_strict` 已逐条登记）。
 _ABSOLUTE = re.compile(r"^([\\/]|[A-Za-z]:[\\/]|~)")
@@ -95,13 +118,19 @@ def detect(text: str) -> List[Dict[str, Any]]:
     """
     if not text:
         return []
+    body = text[:MAX_SCAN_CHARS]
+    truncated = len(text) > MAX_SCAN_CHARS
     out: List[Dict[str, Any]] = []
-    for lineno, line in enumerate(text.splitlines(), 1):
+    for lineno, line in enumerate(body.splitlines(), 1):
+        normalized = _normalize(line)
         for rule, pat in _RULES:
-            if pat.search(line):
+            if pat.search(normalized):
                 out.append({"rule": rule, "line": lineno,
                             "snippet": line.strip()[:80]})
                 break
+    if truncated:
+        out.append({"rule": "truncated", "line": body.count("\n") + 1,
+                    "snippet": "正文超过 %d 字符，仅扫描前段" % MAX_SCAN_CHARS})
     return out
 
 

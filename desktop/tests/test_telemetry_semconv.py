@@ -72,5 +72,22 @@ class TestTelemetrySemconv(unittest.TestCase):
             self.assertEqual(len(ts.load_trace(str(p2))), 2)
 
 
+class StrictOtlpIdsTest(unittest.TestCase):
+    def test_ids_are_fixed_length_hex(self):
+        span = ts.to_span(RECORD)
+        self.assertEqual(32, len(span["traceId"]))
+        self.assertEqual(16, len(span["spanId"]))
+        self.assertTrue(all(ch in "0123456789abcdef" for ch in span["traceId"]))
+        self.assertTrue(all(ch in "0123456789abcdef" for ch in span["spanId"]))
+        padded = ts.to_span(RECORD, span_id="abc")
+        self.assertEqual("abc" + "0" * 13, padded["spanId"])
+
+    def test_status_is_tristate(self):
+        without = {k: v for k, v in RECORD.items() if k != "ok"}
+        self.assertEqual(0, ts.to_span(without)["status"]["code"])
+        self.assertEqual(1, ts.to_span(dict(RECORD, ok=True))["status"]["code"])
+        self.assertEqual(2, ts.to_span(dict(RECORD, ok=False))["status"]["code"])
+
+
 if __name__ == "__main__":
     unittest.main()

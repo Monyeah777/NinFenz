@@ -6,8 +6,8 @@ scope: ① 执行作者裁决队列六项（闭包跨域形态 / 证据强度入
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
-  - verify.sh:bb69717b205769f5bf1e558e9dd15e7225f31de78cc0a4f18ffdea77f4a06dca
+  - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
+  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
   - README.en.md:f3339b07b006449873bd6210c1186864ea2222217d3f0c01c2fb2bcc761a2d06
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,10 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-22）：CI 三刀合入后重绑（诊断目录绝对化/fetch-tags/wasm skip）
 
 > 重审（2026-10-22）：H1：nf verify 仓库信任门 + README.en/ja 安全声明（重冻）

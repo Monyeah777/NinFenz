@@ -234,7 +234,6 @@ class Registry:
         except (OSError, UnicodeDecodeError):  # registry 坏件 ⇒ None（等价于「未找到」，由调用方给指引）
             return None
 
-@lru_cache(maxsize=4)
 def load_registry(path: Optional[Union[str, Path]] = None) -> Registry:
     """读取 registry.json → Registry（进程内缓存，只读不写）。
 
@@ -244,6 +243,19 @@ def load_registry(path: Optional[Union[str, Path]] = None) -> Registry:
     显式暴露，不静默回退硬编码。
     """
     p = Path(path) if path is not None else Path(__file__).with_name("registry.json")
+    try:
+        st = p.stat()
+    except OSError:
+        # 缺件仍走读取分支，保留原 FileNotFoundError 语义
+        return _load_registry_cached(str(p.resolve()), 0, 0)
+    return _load_registry_cached(str(p.resolve()), int(st.st_mtime_ns), int(st.st_size))
+
+
+@lru_cache(maxsize=4)
+def _load_registry_cached(path: str, mtime_ns: int, size: int) -> Registry:
+    """按 (path, mtime, size) 缓存解析结果；文件变即换键。"""
+    _ = (mtime_ns, size)
+    p = Path(path)
     # 读侧短重试（2026-09-30）：registry.json 会被 `nf register/rename --apply` 原子重写，
     # 并发下 Windows 读者会瞬时 PermissionError（WinError 5/32）——见 atomic_write 实测。
     # BOM 容错（2026-10-10 审计 N4）：只在本 JSON 解析入口显式去 BOM——不把通用读口改成
@@ -266,3 +278,7 @@ def load_registry(path: Optional[Union[str, Path]] = None) -> Registry:
         subscriptions=raw.get("subscriptions", {}),
         protocols=raw.get("protocols", []),
     )
+
+
+load_registry.cache_clear = _load_registry_cached.cache_clear  # type: ignore[attr-defined]
+load_registry.cache_info = _load_registry_cached.cache_info    # type: ignore[attr-defined]

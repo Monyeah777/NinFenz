@@ -19,11 +19,13 @@ E5 承接 E4（方案 21）：zone_g 从「本地已装检索」扩到「communi
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from itertools import islice
 from pathlib import Path
 from typing import List, Optional
 
-from .models import Module, Pipeline
+from .models import CATEGORIES, Module, Pipeline
 from .storage import Store
 
 
@@ -36,6 +38,92 @@ class CommunityItem:
     name: str
     layer: str = ""          # 仅 module
     installed: bool = False  # 已装判定（module: store 命中；pipeline: cache 含 id）
+
+
+_MODULE_HEAD = re.compile(
+    r"#\s*模块\s*([A-Za-z\u4e00-\u9fff]+)?:?(M?\d+)\s*[·.、\-]?\s*(.+)")
+_PIPELINE_HEAD = re.compile(r"#\s*管线\s+(P\d+)\s*[·.、\-]?\s*(.+)")
+_CATEGORY = re.compile(r"类别\s*[:：]\s*([^｜|\s]+)")
+_MOUNT = re.compile(r"挂载点\s*[:：]\s*(P\d\d)")
+_YAML_LAYER = re.compile(r"(?m)^\s*layer\s*:\s*(P\d\d)\s*$")
+_YAML_NAME = re.compile(r"(?m)^\s+name\s*:\s*(.+?)\s*$")
+_META_CACHE: dict = {}
+_PIPE_META_CACHE: dict = {}
+
+
+def _read_head(path: Path, limit: int = 40) -> str:
+    """只读文件头（元数据提取用，避免 catalog 逐件全文解析）。"""
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        return "".join(islice(fh, limit))
+
+
+def light_module_meta(path: Path) -> Optional[tuple[str, str, str]]:
+    """模块头 → (full_id, name, layer)；不识别返回 None（调用方回退完整 parse）。"""
+    try:
+        st = path.stat()
+    except OSError:
+        # 无法 stat 的元数据件按未识别处理，调用方会回退完整解析并报告缺口。
+        return None
+    cache_key = (str(path), st.st_mtime_ns, st.st_size)
+    if cache_key in _META_CACHE:
+        return _META_CACHE[cache_key]
+    try:
+        head = _read_head(path)
+    except OSError:
+        # 读不到文件头时不做猜测；完整解析路径会给出可诊断错误。
+        return None
+    title = next((ln for ln in head.splitlines() if ln.startswith("# ")), "")
+    match = _MODULE_HEAD.match(title)
+    if not match:
+        result = None
+    else:
+        prefix = match.group(1) or ""
+        num = "M" + match.group(2).lstrip("M").rjust(2, "0")
+        cat_map = {c.rstrip("类"): c for c in CATEGORIES}
+        cat_raw = _CATEGORY.search(head)
+        if cat_raw:
+            raw = cat_raw.group(1).strip().rstrip("类")
+            category = cat_map.get(raw, raw + "类")
+        else:
+            category = cat_map.get(prefix, "通用类")
+        mount = _MOUNT.search(head) or _YAML_LAYER.search(head)
+        layer = mount.group(1) if mount else "P40"
+        result = ("%s:%s" % (category, num), match.group(3).strip(), layer)
+    if len(_META_CACHE) >= 4096:
+        _META_CACHE.clear()
+    _META_CACHE[cache_key] = result
+    return result
+
+
+def light_pipeline_meta(path: Path) -> Optional[tuple[str, str]]:
+    """管线头 → (id, name)；不识别返回 None（调用方回退完整 parse）。"""
+    try:
+        st = path.stat()
+    except OSError:
+        # 无法 stat 的管线件按未识别处理，由调用方回退完整解析。
+        return None
+    cache_key = (str(path), st.st_mtime_ns, st.st_size)
+    if cache_key in _PIPE_META_CACHE:
+        return _PIPE_META_CACHE[cache_key]
+    try:
+        head = _read_head(path, 30)
+    except OSError:
+        # 读不到文件头时不做猜测；完整解析路径会给出可诊断错误。
+        return None
+    title = next((ln for ln in head.splitlines() if ln.startswith("# ")), "")
+    match = _PIPELINE_HEAD.match(title)
+    if match:
+        name = match.group(2).strip()
+        yaml_name = _YAML_NAME.search(head)
+        if yaml_name:
+            name = yaml_name.group(1).strip().strip("'\"")
+        result = (match.group(1), name)
+    else:
+        result = None
+    if len(_PIPE_META_CACHE) >= 1024:
+        _PIPE_META_CACHE.clear()
+    _PIPE_META_CACHE[cache_key] = result
+    return result
 
 
 def _community_root() -> Optional[Path]:
@@ -99,7 +187,12 @@ def load_community_module(pkg: str, full_id: str,
     if f is None:
         return None
     try:
-        return parse_module(f.read_text(encoding="utf-8"))
+        module = parse_module(f.read_text(encoding="utf-8"))
+        try:
+            module.source_path = f.relative_to(root).as_posix()
+        except ValueError:
+            module.source_path = ""
+        return module
     except Exception:  # 件不可读/不可解析 ⇒ None（调用方据此报「不可用」）
         return None
 
@@ -141,32 +234,40 @@ def catalog(store: Store) -> List[CommunityItem]:
         if (pkg_dir / "modules").is_dir():
             mod_files = _pkg_files("community-modules", pkg, "modules", cache=files_cache)
             for f in mod_files:
-                try:
-                    m = load_community_module(pkg, f.stem.split("_")[0], files=mod_files)
-                except Exception:
-                    m = None
-                if m is None:
-                    # 文件主名可能非 <id>_<名>；退回整名匹配
+                meta = light_module_meta(f)
+                if meta is None:
+                    # 非标准头：回退完整 parse（保持既有兼容面）
                     try:
                         from .parser import parse_module
                         m = parse_module(f.read_text(encoding="utf-8"))
-                    except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
+                    except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+                        # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
                         continue
-                installed = fid_key(m.full_id) in installed_mods
+                    full_id, name, layer = m.full_id, m.name, m.layer
+                else:
+                    full_id, name, layer = meta
+                installed = fid_key(full_id) in installed_mods
                 items.append(CommunityItem(
-                    kind="community_module", pkg=pkg, ref=m.full_id,
-                    name=m.name, layer=m.layer, installed=installed))
+                    kind="community_module", pkg=pkg, ref=full_id,
+                    name=name, layer=layer, installed=installed))
         if (pkg_dir / "pipelines").is_dir():
             for f in _pkg_files("community-pipelines", pkg, "pipelines", cache=files_cache):
-                try:
-                    from .pipeline_loader import load_pipeline_file
-                    pl = load_pipeline_file(f)
-                except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
-                    continue
-                if pl is not None:
-                    items.append(CommunityItem(
-                        kind="community_pipeline", pkg=pkg, ref=pl.id,
-                        name=pl.name, installed=pl.id in installed_pipes))
+                meta = light_pipeline_meta(f)
+                if meta is None:
+                    try:
+                        from .pipeline_loader import load_pipeline_file
+                        pl = load_pipeline_file(f)
+                    except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+                        # 坏管线件不进入社区目录；对应门禁会单独报告解析失败。
+                        continue
+                    if pl is None:
+                        continue
+                    pid, name = pl.id, pl.name
+                else:
+                    pid, name = meta
+                items.append(CommunityItem(
+                    kind="community_pipeline", pkg=pkg, ref=pid,
+                    name=name, installed=pid in installed_pipes))
     return items
 
 

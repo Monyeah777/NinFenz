@@ -17,17 +17,25 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import conformance_scan as csc  # noqa: E402
 from core import disk_cache as dc  # noqa: E402
+from core import pack_combo as pc  # noqa: E402
+from core import repo_index as ri  # noqa: E402
 from core import response_cache as rc  # noqa: E402
 
 #: 常驻容器 → 其上限常量（新增常驻容器必须在此登记，否则本判据不知情）
 CAPS = (
     (rc, "MAX_ENTRIES"),
     (csc, "_FENCE_CACHE_MAX"),
+    (csc, "_FENCE_CACHE_MAX_BYTES"),
     (csc, "_BODY_CACHE_MAX"),
+    (csc, "_BODY_CACHE_MAX_BYTES"),
     (csc, "_RESIDENT_DIR_MAX"),
     (csc, "_RESIDENT_TEXT_MAX"),
+    (csc, "_RESIDENT_RAW_MAX_BYTES"),
     (csc, "_FACE_FP_MAX"),
     (dc, "KEEP"),
+    (pc, "_CACHE_MAX"),
+    (pc, "_CONTENT_CACHE_MAX"),
+    (ri, "MAX_INDEXES"),
 )
 
 

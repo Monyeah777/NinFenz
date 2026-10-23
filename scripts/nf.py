@@ -6917,10 +6917,10 @@ def _cmd_verify(args) -> int:
     # heredoc Python 当本机进程代码执行（CWE-94）。信任门在**执行之前**判：不可信仓库
     # （origin owner 不在白名单）默认拒绝，需显式 --trust-repo 自担风险。
     if getattr(args, "trust_repo", False):
-        _os.environ[_rt.ENV_TRUST] = "1"
         print("WARN: --trust-repo 已启用：将执行目标仓库自带的门禁脚本（含内嵌 Python，"
               "CWE-94 面），风险自担", file=sys.stderr)
-    _trusted, _why = _rt.trust_status(str(ge.ROOT))
+    _trusted, _why = ((True, "显式 --trust-repo") if getattr(args, "trust_repo", False)
+                      else _rt.trust_status(str(ge.ROOT)))
     if not _trusted:
         _msg = _rt.refusal_message(str(ge.ROOT), _why)
         if args.json:
@@ -6957,7 +6957,16 @@ def _cmd_verify(args) -> int:
         # 再按 check 号排序合并。逐字节一致的守门判据见 `test_verify_parallel_checks`。
         from core import verify_checks as _vc
         nums = sorted(ge.REGISTRY)
-        payloads, broken = _vc.run_checks_parallel(ge.ROOT, nums, jobs=_jobs)
+        _saved_trust = _os.environ.get(_rt.ENV_TRUST)
+        if getattr(args, "trust_repo", False):
+            _os.environ[_rt.ENV_TRUST] = "1"
+        try:
+            payloads, broken = _vc.run_checks_parallel(ge.ROOT, nums, jobs=_jobs)
+        finally:
+            if _saved_trust is None:
+                _os.environ.pop(_rt.ENV_TRUST, None)
+            else:
+                _os.environ[_rt.ENV_TRUST] = _saved_trust
         if broken:
             print("并行子 check 不可信：%s（修复指引：去掉 --jobs 用串行复现）"
                   % ",".join(str(b) for b in broken), file=sys.stderr)
@@ -6983,7 +6992,17 @@ def _cmd_verify(args) -> int:
                   % (len(pending), " ".join(str(n) for n in pending)))
             print("  ⚠ 本条结论**不等于全量门禁**——全量请跑：bash verify.sh")
         return 1 if fails else 0
-    verdicts = ge.run_checks(ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)))
+    _saved_trust = _os.environ.get(_rt.ENV_TRUST)
+    if getattr(args, "trust_repo", False):
+        _os.environ[_rt.ENV_TRUST] = "1"
+    try:
+        verdicts = ge.run_checks(
+            ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)))
+    finally:
+        if _saved_trust is None:
+            _os.environ.pop(_rt.ENV_TRUST, None)
+        else:
+            _os.environ[_rt.ENV_TRUST] = _saved_trust
 
     fails = sum(v.fails for v in verdicts)
     pending = sorted(set(ge.PENDING) - (set(only) if only else set()))

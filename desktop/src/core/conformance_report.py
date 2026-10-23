@@ -115,7 +115,12 @@ def _c_io_types(root: str) -> Tuple[bool, str]:
 
 def _c_type_backlog(root: str) -> Tuple[bool, str]:
     from core import payload_harvest as ph
-    issues, stats = ph.verify_backlog(root)
+    try:
+        issues, stats = ph.verify_backlog(root)
+    except ValueError:
+        # 缺事件登记/台账时给出与目录是否存在无关的稳定诊断；不泄漏 OS errno。
+        return False, ("类型积压真源缺失（修复指引：补 protocol/event_registry.json "
+                       "与 protocol/type_backlog.json 后重跑）")
     return (not issues, "不可推断 untyped %d 项（台账同步）" % stats.get("untyped", 0)
             if not issues else "; ".join(issues[:2]))
 

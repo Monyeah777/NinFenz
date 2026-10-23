@@ -85,5 +85,21 @@ class PipelineLoaderTest(unittest.TestCase):
         self.assertEqual(pl.discover_pipelines(str(ROOT / "no_such_dir")), [])
 
 
+class PipelineGuardTest(unittest.TestCase):
+    def test_tree_depth_limit(self):
+        root = pl._Node(0, "root")
+        cur = root
+        for _ in range(100):
+            nxt = pl._Node(cur.indent + 1, "k")
+            cur.children.append(nxt)
+            cur = nxt
+        with self.assertRaises(ValueError):
+            pl._tree_to_dict(root)
+
+    def test_text_size_limit(self):
+        with self.assertRaises(ValueError):
+            pl.parse_pipeline_md("x" * (pl.MAX_PIPELINE_BYTES + 1))
+
+
 if __name__ == "__main__":
     unittest.main()

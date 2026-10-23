@@ -30,6 +30,7 @@ import atexit
 import os
 import socket
 import subprocess
+import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -58,6 +59,8 @@ _START_INTERVAL = 0.05
 #: `_start()` 拉起的子进程句柄（回收它，避免解释器退出时的 ResourceWarning——与 core/daemon.py
 #: 的 `_CHILD` 同一条纪律）。
 _CHILD: Optional[subprocess.Popen] = None
+_PERSIST_LOCK = threading.Lock()
+_PERSIST: Optional[Dict[str, Any]] = None
 
 
 def _reap_child() -> None:
@@ -74,6 +77,65 @@ def _reap_child() -> None:
 
 
 atexit.register(_reap_child)
+
+
+def _close_persistent_locked() -> None:
+    global _PERSIST
+    if _PERSIST is not None:
+        try:
+            _PERSIST["sock"].close()
+        except OSError:
+            # 关闭失败只影响资源回收；持久连接状态随后仍置空并重建。
+            pass
+    _PERSIST = None
+
+
+def _close_persistent() -> None:
+    with _PERSIST_LOCK:
+        _close_persistent_locked()
+
+
+atexit.register(_close_persistent)
+
+
+def _persistent(doc: Dict[str, Any], timeout: float) -> Optional[Dict[str, Any]]:
+    """取/建持久连接（调用方持 `_PERSIST_LOCK`）。"""
+    global _PERSIST
+    port = doc.get("port")
+    token = doc.get("token")
+    if not isinstance(port, int) or not isinstance(token, str) or not token:
+        return None
+    if (_PERSIST is not None and _PERSIST.get("port") == port
+            and _PERSIST.get("token") == token):
+        try:
+            _PERSIST["sock"].settimeout(timeout)
+            return _PERSIST
+        except OSError:
+            # 陈旧/半关闭 socket：清掉后走下方的一次重建路径。
+            _close_persistent_locked()
+    _close_persistent_locked()
+    sock = None
+    try:
+        sock = socket.create_connection((BIND_HOST, port),
+                                        timeout=min(timeout, _CONNECT_TIMEOUT))
+        sock.settimeout(timeout)
+        try:
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        except OSError:
+            # TCP_NODELAY 是延迟优化；平台拒绝时连接仍可正确工作。
+            pass
+        _PERSIST = {"port": port, "token": token, "sock": sock,
+                    "fh": sock.makefile("rb")}
+    except OSError:
+        if sock is not None:
+            try:
+                sock.close()
+            except OSError:
+                # 建连失败路径的关闭失败不覆盖原始连接错误。
+                pass
+        _PERSIST = None
+        return None
+    return _PERSIST
 
 
 def repo_root() -> Path:
@@ -117,6 +179,7 @@ def _load_state(sp: Path) -> Optional[Dict[str, Any]]:
     try:
         doc = json.loads(sp.read_text(encoding="utf-8"))
     except (OSError, ValueError):
+        # 状态文件缺失/损坏等价于 worker 不可用，由上层走受控回退。
         return None
     return doc if isinstance(doc, dict) else None
 
@@ -127,34 +190,31 @@ def _talk(doc: Dict[str, Any], argv: List[str], timeout: float) -> Optional[Tupl
     token = doc.get("token")
     if not isinstance(port, int) or not isinstance(token, str) or not token:
         return None
-    sock = None
-    try:
-        # 连接超时与**读超时分开**：连接应快（回环），但重面（verify-report / conformance）
-        # 的计算可远超 3s。此前把连接超时当读超时 ⇒ 重面超时后误判「worker 不可用」并再拉一只，
-        # 旧 worker 成孤儿（实测累积 5 只）。
-        sock = socket.create_connection((BIND_HOST, port), timeout=min(timeout, _CONNECT_TIMEOUT))
-        sock.settimeout(timeout)
-        frame = json.dumps({"proto": PROTO, "token": token, "argv": list(argv)},
-                           ensure_ascii=False) + "\n"
-        sock.sendall(frame.encode("utf-8"))
-        fh = sock.makefile("rb")
-        head = [fh.readline() for _ in range(3)]
-        if any(not line or not line.strip() for line in head):
-            return None
-        code = int(head[0].strip())
-        out_len = int(head[1].strip())
-        err_len = int(head[2].strip())
-        out = fh.read(out_len) if out_len else b""
-        err = fh.read(err_len) if err_len else b""
-        return (code, out)
-    except (OSError, ValueError):
-        return None
-    finally:
-        if sock is not None:
+    frame = json.dumps({"proto": PROTO, "token": token, "argv": list(argv)},
+                       ensure_ascii=False) + "\n"
+    with _PERSIST_LOCK:
+        for attempt in (0, 1):
+            if attempt:
+                _close_persistent_locked()
+            conn = _persistent(doc, timeout)
+            if conn is None:
+                return None
             try:
-                sock.close()
-            except OSError:
-                pass
+                conn["sock"].sendall(frame.encode("utf-8"))
+                fh = conn["fh"]
+                head = [fh.readline() for _ in range(3)]
+                if any(not line or not line.strip() for line in head):
+                    _close_persistent_locked()
+                    continue
+                code = int(head[0].strip())
+                out_len = int(head[1].strip())
+                err_len = int(head[2].strip())
+                out = fh.read(out_len) if out_len else b""
+                _err = fh.read(err_len) if err_len else b""
+                return (code, out)
+            except (OSError, ValueError):
+                _close_persistent_locked()
+        return None
 
 
 def _kill_pid(pid: int) -> None:
@@ -166,12 +226,14 @@ def _kill_pid(pid: int) -> None:
         else:
             os.kill(pid, 15)
     except (OSError, subprocess.SubprocessError):
+        # 旧 worker 已退出或无法回收时无需故障升级；状态文件校验会决定是否重建。
         pass
 
 
 def _start(root: Path, sp: Path) -> bool:
     """非阻塞拉起常驻 worker，并**有界**等待状态文件出现。"""
     global _CHILD
+    _close_persistent()          # 旧连接随旧 worker 失效
     exe = binary(root)
     if exe is None:
         return False
@@ -186,6 +248,7 @@ def _start(root: Path, sp: Path) -> bool:
         if sp.exists():
             sp.unlink()
     except OSError:
+        # 状态目录不可写时 worker 不可启动，由调用方回退 Python 真源。
         return False
     cmd = [str(exe), "serve", "--state", str(sp), "--root", str(root)]
     flags = 0
@@ -199,6 +262,7 @@ def _start(root: Path, sp: Path) -> bool:
             try:
                 old.wait(timeout=0.0)
             except (subprocess.TimeoutExpired, OSError):
+                # 已退出子进程的回收是尽力而为；worker 状态文件才是活性依据。
                 pass
         _CHILD = subprocess.Popen(cmd, cwd=str(root), stdin=subprocess.DEVNULL,
                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
@@ -219,6 +283,7 @@ def _run_cli(exe: Path, root: Path, argv: List[str], timeout: float) -> Optional
         proc = subprocess.run([str(exe), *argv], cwd=str(root), capture_output=True,
                               timeout=timeout)
     except (OSError, subprocess.SubprocessError):
+        # CLI 兜底不可启动时返回 None，调用方回退 Python 真源。
         return None
     return (proc.returncode, proc.stdout)
 
@@ -262,10 +327,48 @@ def run_json(argv: List[str], root: Optional[Path] = None,
     if code != 0:
         return None
     try:
-        return json.loads(out.decode("utf-8"))
+        doc = json.loads(out.decode("utf-8"))
     except (ValueError, UnicodeDecodeError):
+        # Rust 输出不可解析时按该快线不可用处理，保留 Python 诊断回退。
         return None
+    if not isinstance(doc, (dict, list)):
+        return None
+    return doc
+
+
+def worker_stats(timeout: float = 5.0) -> Optional[Dict[str, Any]]:
+    """worker 只读计数（requests / bytes_in / bytes_out）；不可用 → None。"""
+    doc = _load_state(state_path())
+    if not doc:
+        return None
+    frame = json.dumps({"proto": PROTO, "token": doc.get("token"), "op": "stats"}) + "\n"
+    with _PERSIST_LOCK:
+        conn = _persistent(doc, timeout)
+        if conn is None:
+            return None
+        try:
+            conn["sock"].sendall(frame.encode("utf-8"))
+            fh = conn["fh"]
+            head = [fh.readline() for _ in range(3)]
+            if any(not line or not line.strip() for line in head):
+                _close_persistent_locked()
+                return None
+            code = int(head[0].strip())
+            out_len = int(head[1].strip())
+            err_len = int(head[2].strip())
+            out = fh.read(out_len) if out_len else b""
+            _err = fh.read(err_len) if err_len else b""
+            if code != 0:
+                return None
+            got = json.loads(out.decode("utf-8"))
+            if not isinstance(got, dict):
+                return None
+            return got
+        except (OSError, ValueError, UnicodeDecodeError):
+            _close_persistent_locked()
+            # 观测帧不可解析时关闭连接；worker 仍可由下一条请求重建。
+            return None
 
 
 __all__ = ["PROTO", "ENV_DISABLE", "ENV_ENGINE", "binary", "disabled", "requested",
-           "repo_root", "run_face", "run_json", "state_path"]
+           "repo_root", "run_face", "run_json", "state_path", "worker_stats"]

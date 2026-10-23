@@ -41,6 +41,13 @@ CORE13 = list(official_core.CORE_MODULES)   # 单一实现（审计 Z1 F6）
 #: 必要性（实测 2026-09-23）：广度证明要跑 C(N,2)+抽样数千次组合，若每次重解析
 #: 235 个模块文档，代价 O(N²·files) 直接跑不完——缓存后单次组合降为纯集合运算。
 _CACHE: Dict[str, Dict[str, Any]] = {}
+_CACHE_MAX = 32
+
+
+def _root_cache(key: str) -> Dict[str, Any]:
+    if key not in _CACHE and len(_CACHE) >= _CACHE_MAX:
+        _CACHE.clear()
+    return _CACHE.setdefault(key, {})
 
 
 def _cache_key(root: str) -> str:
@@ -64,6 +71,13 @@ def cache_clear() -> None:
 #: 输入没变 ⇒ 派生结果必然相同；输入一变指纹就变。故它可以跨请求复用，不必清。
 #: 收益（实测）：广度证明 ~0.92 s、包画像 0.3–0.5 s，每次重命令都白交一遍。
 _CONTENT_CACHE: Dict[Any, Any] = {}
+_CONTENT_CACHE_MAX = 32
+
+
+def _content_store(key: Any, value: Any) -> None:
+    if key not in _CONTENT_CACHE and len(_CONTENT_CACHE) >= _CONTENT_CACHE_MAX:
+        _CONTENT_CACHE.clear()
+    _CONTENT_CACHE[key] = copy.deepcopy(value)
 
 
 #: 包画像 / 广度证明的**输入面**（协议声明 + 模块契约 + 核心模块 + 资产台账 + registry）。
@@ -180,7 +194,7 @@ def _face_paths(root: str, pattern: str) -> List[Path]:
 def _module_contracts(root: str = ".") -> Dict[str, Dict[str, Any]]:
     """community/*/modules/*.md → {module id（全限定与裸号均可查）: 契约摘要}。"""
     key = _cache_key(root)
-    cached = _CACHE.get(key) or {}
+    cached = _root_cache(key)
     if cached.get("contracts"):
         return cached["contracts"]
     fp = csc.face_fingerprint(root, MODULE_CONTRACT_PATTERNS)
@@ -259,7 +273,7 @@ def indexes(root: str = ".") -> Tuple[Dict[str, Dict[str, Any]], Dict[str, List[
     """组合闭包用的三类索引（一次构建、供广度证明复用）：
     module id → 契约、事件 → 发布方列表、核心发布事件集。"""
     key = _cache_key(root)
-    cached = _CACHE.get(key) or {}
+    cached = _root_cache(key)
     if cached.get("by_id") is not None:
         return cached["by_id"], cached["pub_index"], cached["core_pub"]
     contracts = _module_contracts(root)
@@ -293,7 +307,7 @@ def _asset_index(root: str = ".") -> Dict[Tuple[str, str], Dict[str, Any]]:
     0.44 s）。它只依赖 `profiles(root)`，故随同一份 `_CACHE` 缓存。
     """
     key = _cache_key(root)
-    cached = _CACHE.get(key) or {}
+    cached = _root_cache(key)
     if cached.get("asset_index") is not None:
         return cached["asset_index"]
     out = {(pr["package"], a["key"]): a
@@ -310,7 +324,7 @@ def profiles(root: str = ".") -> Dict[str, Dict[str, Any]]:
     （`_CONTENT_CACHE`，输入没变就直接复用；输入一变指纹就变，故无陈旧风险）。
     """
     key = _cache_key(root)
-    cached = _CACHE.get(key) or {}
+    cached = _root_cache(key)
     if cached.get("prof"):
         return cached["prof"]
     fp = csc.face_fingerprint(root, PROFILE_PATTERNS)          # 只按**真读面**取键（见其常量说明）
@@ -324,7 +338,7 @@ def profiles(root: str = ".") -> Dict[str, Dict[str, Any]]:
                                    validate=lambda v: isinstance(v, dict) and bool(v))
         if got_disk is not None:
             hit = got_disk
-            _CONTENT_CACHE[("prof", fp)] = copy.deepcopy(got_disk)
+            _content_store(("prof", fp), got_disk)
     if hit is not None:
         got = copy.deepcopy(hit)
         _CACHE.setdefault(key, {})["prof"] = got      # 顺手回填本次扫描的缓存，供 indexes() 复用
@@ -356,7 +370,7 @@ def profiles(root: str = ".") -> Dict[str, Dict[str, Any]]:
         }
     cached.update({"prof": out, "contracts": contracts})
     _CACHE[key] = cached
-    _CONTENT_CACHE[("prof", fp)] = copy.deepcopy(out)
+    _content_store(("prof", fp), out)
     if dkey is not None:
         disk_cache.store("pack-prof", dkey, out)
     return out
@@ -616,7 +630,7 @@ def breadth(root: str = ".", triple_sample: int = 400, quad_sample: int = 200,
         hit = disk_cache.load("pack-breadth", dkey,
                              validate=lambda v: isinstance(v, dict) and bool(v))
         if hit is not None:
-            _CONTENT_CACHE[content_key] = copy.deepcopy(hit)
+            _content_store(content_key, hit)
     if hit is not None:
         return copy.deepcopy(hit)
     key = _cache_key(root)
@@ -624,7 +638,7 @@ def breadth(root: str = ".", triple_sample: int = 400, quad_sample: int = 200,
     contracts = _module_contracts(root)
     # 逐组合判决缓存的全局见证（本轮算一遍；`scan()` 已算过就直接复用）
     witness = _witness or _combo_witness(root, prof, contracts)
-    cached = _CACHE.get(key) or {}
+    cached = _root_cache(key)
     cached.update({"prof": prof, "contracts": contracts})
     _CACHE[key] = cached
     names = sorted(prof)
@@ -676,7 +690,7 @@ def breadth(root: str = ".", triple_sample: int = 400, quad_sample: int = 200,
         and stats["quads"] == stats["quads_legal"]
         and stats["quints"] == stats["quints_legal"]
         and stats["sexts"] == stats["sexts_legal"])
-    _CONTENT_CACHE[content_key] = copy.deepcopy(stats)
+    _content_store(content_key, stats)
     if dkey is not None:
         disk_cache.store("pack-breadth", dkey, stats)
     return stats

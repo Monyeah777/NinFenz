@@ -14,7 +14,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List
+from types import MappingProxyType
+from typing import Iterator, List
 
 
 # ------------------------------------------------------------------ 结构
@@ -25,6 +26,7 @@ class IRModule:
     name: str = ""
     layer: str = ""
     content: str = ""          # 归一正文（标题提升后；供外部格式折叠）
+    source_path: str = ""      # 来源件的仓库相对路径（MCP 快照信任标注用）
 
     def to_md_block(self) -> str:
         """模块块：head + 归一正文（对齐原 generator _module_block）。"""
@@ -119,11 +121,11 @@ def _asset_appendix(ir: IRDocument) -> str:
     return "\n".join(out)
 
 
-def ir_to_md(ir: IRDocument) -> str:
-    """IR → MD（默认原生适配器）。输出格式对齐原 generate_document。"""
+def iter_md(ir: IRDocument) -> Iterator[str]:
+    """流式 IR → MD 片段（调用方可逐块写盘，避免一次性持有整篇字符串）。"""
     ts = ir.meta.get("timestamp") or datetime.now().strftime("%Y-%m-%d %H:%M")  # noqa: DTZ005 - 产物墙钟时间戳是有意语义（本地时间，供人读）
     asset_text = ir.meta.get("asset_text") or "无"
-    header = f"""# {ir.title}
+    yield f"""# {ir.title}
 
 > 由宁封子桌面工具生成
 > 管线：{ir.pipeline_name}（{ir.pipeline_id}）｜ 模块 {sum(len(l.modules) for l in ir.layers) + len(ir.extra_modules)} 个 ｜ 资产包：{asset_text}
@@ -132,16 +134,39 @@ def ir_to_md(ir: IRDocument) -> str:
 {_toc(ir)}
 ---
 """
-    parts = [header]
     for layer in ir.layers:
-        parts.append(layer.to_md_header())
-        parts.extend(m.to_md_block() for m in layer.modules)
+        yield layer.to_md_header()
+        for m in layer.modules:
+            yield m.to_md_block()
     if ir.extra_modules:
         last = None
         for m in ir.extra_modules:
             if m.layer != last:
-                parts.append(f"\n## 层 {m.layer}（未在管线中声明）\n")
+                yield f"\n## 层 {m.layer}（未在管线中声明）\n"
                 last = m.layer
-            parts.append(m.to_md_block())
-    parts.append(_asset_appendix(ir))
-    return "\n\n".join(parts)
+            yield m.to_md_block()
+    yield _asset_appendix(ir)
+
+
+def ir_to_md(ir: IRDocument) -> str:
+    """IR → MD（默认原生适配器）。输出格式对齐原 generate_document。"""
+    return "\n\n".join(iter_md(ir))
+
+
+def freeze(ir: IRDocument) -> IRDocument:
+    """只读快照（tuple + MappingProxyType）；原 IR 不变，适配器可按只读面消费。"""
+    layers = tuple(
+        IRLayer(id=l.id, name=l.name, description=l.description,
+                modules=tuple(IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
+                                       content=m.content, source_path=m.source_path)
+                              for m in l.modules))
+        for l in ir.layers)
+    extra = tuple(IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
+                           content=m.content, source_path=m.source_path)
+                  for m in ir.extra_modules)
+    return IRDocument(  # type: ignore[arg-type] - 刻意用 tuple/MappingProxyType 提供只读视图
+        type=ir.type, title=ir.title, pipeline_id=ir.pipeline_id,
+        pipeline_name=ir.pipeline_name, layers=layers, extra_modules=extra,
+        asset_refs=MappingProxyType(dict(ir.asset_refs)),
+        asset_missing=tuple(ir.asset_missing), warnings=tuple(ir.warnings),
+        meta=MappingProxyType(dict(ir.meta)))

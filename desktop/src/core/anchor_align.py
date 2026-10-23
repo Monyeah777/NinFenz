@@ -13,6 +13,7 @@ protocol/standards_binding.json 的 100 包 × 1200 条绑定只实际引用 68 
 """
 from __future__ import annotations
 
+import functools
 import json
 import re
 from pathlib import Path
@@ -91,15 +92,20 @@ def unbound(root: str = ".", layer: str = "") -> List[Dict[str, Any]]:
     return sorted(rows, key=lambda s: str(s.get("id")))
 
 
-def _terms(text: Any) -> List[str]:
+@functools.lru_cache(maxsize=1024)
+def _terms_cached(text: str) -> tuple:
     """词元：英文 [a-z0-9_] 词 + 中文整段与 2-gram（中英混排口径，同 core.library 检索精神）。"""
-    s = str(text or "").lower()
+    s = text.lower()
     out = _TOKEN.findall(s)
     for h in _HAN.findall(s):
         out.append(h)
         if len(h) > 1:
             out.extend(h[i:i + 2] for i in range(len(h) - 1))
-    return out
+    return tuple(out)
+
+
+def _terms(text: Any) -> List[str]:
+    return list(_terms_cached(str(text or "")))
 
 
 def intersect(root: str = ".", term: str = "", layer: str = "",
@@ -120,7 +126,8 @@ def intersect(root: str = ".", term: str = "", layer: str = "",
             continue
         if look and str(s.get("layer")) != look:
             continue
-        hay = set(_terms(sid) + _terms(s.get("title")) + _terms(s.get("body")))
+        hay = set(_terms_cached(sid) + _terms_cached(str(s.get("title") or ""))
+                  + _terms_cached(str(s.get("body") or "")))
         hit = sum(1 for t in want if t in hay)
         if hit:
             rows.append({"id": sid, "layer": str(s.get("layer") or ""),

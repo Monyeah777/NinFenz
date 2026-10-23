@@ -84,6 +84,15 @@ class McpTrustMetaTest(unittest.TestCase):
         self.assertEqual(fake, meta["injection_hits"])
         self.assertEqual(1, meta["injection_hit_count"])
 
+    def test_snapshot_resource_with_source_carries_trust_note(self):
+        srv = mrt.McpRuntime({"mcp": {"name": "snap", "version": "0", "resources": [
+            {"uri": "nf://snap/1", "name": "snap", "mimeType": "text/markdown",
+             "text": "正文", "source": "community/demo/x.md"}]}})
+        meta = _trust(_read(srv, "nf://snap/1"))
+        self.assertIsNotNone(meta)
+        self.assertTrue(meta["untrusted"])
+        self.assertEqual(["community/demo/x.md"], meta["sources"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -195,6 +195,22 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
 
 
 class AtomicWriteTest(unittest.TestCase):
+    def test_write_lines_streams_lazily_and_normalizes_newlines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            seen = []
+
+            def parts():
+                seen.append("start")
+                yield "alpha\r\n"
+                seen.append("middle")
+                yield "beta\r"
+                seen.append("end")
+
+            target = Path(tmp, "stream.md")
+            aw.write_lines(target, parts(), separator="\n\n")
+            self.assertEqual(["start", "middle", "end"], seen)
+            self.assertEqual("alpha\n\n\nbeta\n", target.read_text(encoding="utf-8"))
+
     def test_lock_file_serializes_and_times_out(self):
         """排他锁语义：同名目标互斥（先入先出），等待超时**如实报错**并带修复指引。"""
         import threading
@@ -252,7 +268,8 @@ class AtomicWriteTest(unittest.TestCase):
                 procs = [subprocess.Popen(
                     [sys.executable, "-c", child, str(target), tag,
                      str(Path(__file__).resolve().parent.parent / "src")],
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE) for tag in ("A", "B")]
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    for tag in ("A", "B")]
                 for pr in procs:
                     pr.wait(timeout=60)
                 entries = json.loads(target.read_text(encoding="utf-8"))["entries"]

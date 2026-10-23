@@ -33,6 +33,19 @@ def _ir():
 
 
 class TestExport(unittest.TestCase):
+    def test_md_is_a_first_class_streaming_export(self):
+        ir = IRDocument(type="techdoc", title="原生出口", pipeline_id="P90",
+                        pipeline_name="技术文档",
+                        layers=[IRLayer(id="P10", name="文档", modules=[
+                            IRModule(full_id="技术文档类:M90", name="说明",
+                                     layer="P10", content="正文")])])
+        with tempfile.TemporaryDirectory() as tmp:
+            res = export(ir, "md", tmp)
+            self.assertEqual(1, len(res.files))
+            text = Path(res.files[0]).read_text(encoding="utf-8")
+            self.assertIn("# 原生出口", text)
+            self.assertIn("技术文档类:M90", text)
+
     def setUp(self):
         self.ir = _ir()
         self.dest = tempfile.mkdtemp(prefix="nf_exp_")

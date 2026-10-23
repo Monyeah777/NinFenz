@@ -32,6 +32,8 @@ from typing import List, Optional
 from .models import Pipeline, PipelineLayer
 
 YAML_FENCE_RE = re.compile(r"```ya?ml\s*\n(.*?)\n```", re.S)
+MAX_PIPELINE_BYTES = 8 * 1024 * 1024
+MAX_TREE_DEPTH = 64
 
 
 # ---------------------------------------------------------------- yaml 子集
@@ -123,16 +125,18 @@ def _build_tree(lines: List[str]) -> List[_Node]:
     return roots
 
 
-def _tree_to_dict(root: _Node):
+def _tree_to_dict(root: _Node, _depth: int = 0):
     """把单棵节点树转 dict/list。
 
     - 列表容器（children 为 "- " 项）→ list[dict]
     - 列表项节点（自带 key/value + 子 scalar）→ dict（自身键值并入）
     - 普通容器 → dict
     """
+    if _depth > MAX_TREE_DEPTH:
+        raise ValueError("管线 YAML 嵌套深度超过 %d（修复指引：拆平结构）" % MAX_TREE_DEPTH)
     items = [c for c in root.children if c.is_list_item]
     if items:
-        return [_tree_to_dict(c) for c in items]
+        return [_tree_to_dict(c, _depth + 1) for c in items]
     d: dict = {}
     if root.is_list_item and root.key:
         d[root.key] = root.value
@@ -140,7 +144,7 @@ def _tree_to_dict(root: _Node):
         if c.is_list_item:
             continue
         if c.children:
-            d[c.key] = _tree_to_dict(c)
+            d[c.key] = _tree_to_dict(c, _depth + 1)
         else:
             d[c.key] = c.value
     return d
@@ -166,6 +170,9 @@ def _norm_module_ref(ref: str) -> str:
 
 def parse_pipeline_md(text: str) -> Optional[Pipeline]:
     """从管线 md 全文解析 Pipeline。失败返回 None。"""
+    if len(text) > MAX_PIPELINE_BYTES:
+        raise ValueError("管线文本过大（%d > %d 字符）（修复指引：拆分管线或去掉内嵌正文）"
+                         % (len(text), MAX_PIPELINE_BYTES))
     m = YAML_FENCE_RE.search(text)
     if not m:
         return None
@@ -217,6 +224,9 @@ def load_pipeline_file(path: Path | str) -> Optional[Pipeline]:
     p = Path(path)
     if not p.exists():
         return None
+    if p.stat().st_size > MAX_PIPELINE_BYTES:
+        raise ValueError("管线文件过大（%d > %d 字节）：%s" % (p.stat().st_size,
+                                                              MAX_PIPELINE_BYTES, p))
     return parse_pipeline_md(p.read_text(encoding="utf-8"))
 
 
@@ -231,6 +241,7 @@ def discover_pipelines(directory: Path | str) -> List[Pipeline]:
             pl = load_pipeline_file(f)
             if pl:
                 out.append(pl)
-        except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
+        except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+            # 发现面只收可解析管线；损坏件由加载/门禁面单独报告。
             continue
     return out

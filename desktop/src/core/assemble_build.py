@@ -132,8 +132,6 @@ def _section2(root: Path, plan: Dict[str, Any]) -> List[str]:
         lines.append("")
         return lines
     try:
-        import sys
-        sys.path.insert(0, str(root / "desktop" / "src"))
         from core.pipeline_loader import load_pipeline_file
         pipe = load_pipeline_file(root / files[0])
     except Exception:

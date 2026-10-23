@@ -12,18 +12,66 @@
 
 from __future__ import annotations
 
-import json
+import hashlib
+import platform
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from core import json_doc
+
 _ROOT = Path(__file__).resolve().parents[3]
+MAX_TRACE_BYTES = 16 * 1024 * 1024
+MAX_SOURCE_BYTES = 16 * 1024 * 1024
+TRACE_FORMAT_VERSION = "1"
+
+
+def _read_bounded(path: Path, limit: int) -> Tuple[str | None, str | None]:
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        return None, "文件不存在或不可读：%s（%s）" % (path, exc)
+    if size > limit:
+        return None, "文件过大（%d > %d 字节）" % (size, limit)
+    try:
+        return path.read_text(encoding="utf-8-sig"), None
+    except (OSError, UnicodeError) as exc:
+        return None, "文件不可读：%s（%s）" % (path, exc)
+
+
+def env_fingerprint(root: Path) -> str:
+    raw = "%s|%s|%s" % (platform.python_version(), platform.system(), root.resolve())
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def _fingerprint_issues(trace: Dict[str, Any], root: Path) -> List[str]:
+    issues: List[str] = []
+    version = trace.get("generator_version")
+    if version and str(version) != TRACE_FORMAT_VERSION:
+        issues.append("trace 生成器版本 %s ≠ 当前 %s（修复指引：用当前版本重跑 --trace）"
+                      % (version, TRACE_FORMAT_VERSION))
+    env = trace.get("env")
+    if isinstance(env, dict):
+        expect = {"python": platform.python_version(), "platform": platform.system()}
+        for key, value in expect.items():
+            if key in env and str(env[key]) != value:
+                issues.append("trace 环境指纹 %s 不一致：记录 %s / 当前 %s"
+                              % (key, env[key], value))
+        if env.get("root_fingerprint") and str(env["root_fingerprint"]) != env_fingerprint(root):
+            issues.append("trace 仓库根指纹不一致（修复指引：在同一检出上重跑 --trace）")
+    return issues
 
 
 def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     r = Path(root)
     issues: List[str] = []
     # utf-8-sig：容忍外来件开头 BOM（审计 N4）——否则带 BOM 的 trace 被误报成「不是 JSON」。
-    trace = json.loads(Path(trace_path).read_text(encoding="utf-8-sig"))
+    raw, err = _read_bounded(Path(trace_path), MAX_TRACE_BYTES)
+    if err is not None:
+        return ([err], {})
+    try:
+        trace = json_doc.loads(raw or "", None, what=str(trace_path), strict_constants=True)
+    except ValueError as exc:
+        return (["trace 不是合法 JSON：%s（修复指引：用 nf assemble --check --trace 产物）" % exc], {})
     # 审计 N3（P2）：顶层非对象时此前会在 trace.get 抛 AttributeError，一路冒成「内部错误：
     # 'list' object has no attribute 'get'」——设计好的诊断分支因此不可达。这里先判形状。
     if not isinstance(trace, dict):
@@ -37,13 +85,17 @@ def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]
     transcript = Path(source) if Path(source).is_absolute() else r / source
     if not transcript.is_file():
         return ["trace.source 文件不存在：%s" % source], {}
+    text, err = _read_bounded(transcript, MAX_SOURCE_BYTES)
+    if err is not None:
+        return ([err], {})
 
     from core import assemble_plan as ap
     from core import round_drill as rd
 
     plan_ = ap.plan(requirement)
     allowed = plan_.get("allowed_module_ids") or []
-    r_issues, r_stats = rd.scan(transcript.read_text(encoding="utf-8"), allowed)
+    r_issues, r_stats = rd.scan(text or "", allowed)
+    issues += _fingerprint_issues(trace, r)
     # 判定口径分档（2026-09-30）：`nf assemble --check --trace` 的总判定 `ok` 只在加了
     # `--rounds` 时才含回合级；新写法的 trace 逐字带 `rounds:{checked,ok}`。有它就用它
     # （checked=False ⇒ **不适用**，不做漂移断言，详见返回的 verdict_scope），
@@ -65,4 +117,6 @@ def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]
                       % (expected_ok, verdict_scope, actual_ok, r_issues[:3]))
     return issues, {"transcript_turns": r_stats["turns"],
                     "expected_ok": expected_ok, "actual_ok": actual_ok,
-                    "verdict_scope": verdict_scope}
+                    "verdict_scope": verdict_scope,
+                    "env_fingerprint": env_fingerprint(r),
+                    "trace_version": trace.get("generator_version", "")}

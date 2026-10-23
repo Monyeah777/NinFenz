@@ -6,6 +6,7 @@
 import json
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -372,6 +373,59 @@ class RealToolFaceDispatchTest(unittest.TestCase):
         self.assertEqual("ls", out["stopped_at"])
         self.assertFalse(out["results"][0]["ok"])
         self.assertIn("缺证据", out["results"][0]["detail"])
+
+
+class DispatchResilienceTest(unittest.TestCase):
+    """两个韧性扩展：预算 fail-closed、跨调用熔断/半开（默认关闭，不影响既有调用）。"""
+
+    PLAN = {"order": ["a", "b"],
+            "steps": {"a": {"id": "a", "tool": "x", "args": {}},
+                      "b": {"id": "b", "tool": "y", "args": {}}}}
+
+    def test_step_budget_fails_closed(self):
+        def call(_tool, _args):
+            time.sleep(0.02)
+            return {"ok": True}
+
+        out = orch.dispatch(self.PLAN["order"], self.PLAN["steps"], call,
+                            max_step_seconds=0.001)
+        self.assertEqual("timeout", out["stopped_reason"])
+        self.assertEqual("failed", out["states"]["a"])
+        self.assertEqual("skipped", out["states"]["b"])
+
+    def test_total_budget_skips_remaining(self):
+        def call(tool, _args):
+            if tool == "x":
+                time.sleep(0.01)
+            return {"ok": True}
+
+        out = orch.dispatch(self.PLAN["order"], self.PLAN["steps"], call,
+                            max_seconds=0.001)
+        self.assertEqual("timeout", out["stopped_reason"])
+        self.assertEqual("done", out["states"]["a"])
+        self.assertEqual("skipped", out["states"]["b"])
+        self.assertEqual(["b"], out["not_executed"])
+
+    def test_circuit_breaker_opens_and_half_open_probes(self):
+        key = "test-breaker-%d" % time.time_ns()
+
+        def bad(_tool, _args):
+            raise RuntimeError("boom")
+
+        first = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
+                              breaker_key=key, failure_threshold=1,
+                              cooldown_seconds=0.05)
+        self.assertTrue(first["circuit_open"])
+        second = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
+                               breaker_key=key, failure_threshold=1,
+                               cooldown_seconds=0.05)
+        self.assertEqual("circuit_open", second["status"])
+        self.assertEqual([], second["executed"])
+        time.sleep(0.06)
+        third = orch.dispatch(self.PLAN["order"][:1], self.PLAN["steps"], bad,
+                              breaker_key=key, failure_threshold=1,
+                              cooldown_seconds=0.05)
+        self.assertEqual("stopped", third["status"], "半开探测仍失败应再次停")
 
 
 if __name__ == "__main__":

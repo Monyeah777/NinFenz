@@ -14,24 +14,36 @@ subjects:
   - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
   - desktop/src/core/knowledge_sig.py:2e1177ae8701b38cff3b26e92892b3cbef4a347a48b986dd8b1f95934f60323b
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
-  - desktop/src/core/pipeline_loader.py:4c58b842a8b79abdce6917305f8f5c307e4334cfa377cb3dc1b9d6f226871588
-  - desktop/src/core/community_inventory.py:1cd42c4d2588a5facbb26aa3b1216e39d8b0ba0e407694ef441ab9c51e38cf00
+  - desktop/src/core/pipeline_loader.py:0efbfa0c0e0f8ae5817a79aed429da24504632a97679727ae9d947bf59dc7104
+  - desktop/src/core/community_inventory.py:939924e6f37e0d17143d3e15c196882bd40fb98ddd22fb83479200487f3137f0
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/src/core/lazy_yaml.py:127a18733214df1a721ad9e2fad8c0bc8cc195a4ee2f7fc782a60f85eb24d641
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/orchestration.py:6c860bebc068000dbd8f7a68103b300ab662c0666c912159226f015cea43327c
+  - desktop/src/core/orchestration.py:c1af716bbb08fc06b8d75edc96a662b50f57bb91b5d06b3f8ecd3f19289e8084
   - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
-  - desktop/src/core/daemon.py:2e028d8f43860579117497de3b5f856f5803cdcd873a58005e4b392b0042a7bd
+  - desktop/src/core/daemon.py:be283dc1a655945b2286a2595b2cd82b94ed34e4089ed393528bba5a6b549ed0
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
-  - desktop/src/core/exporter.py:d396f742ccf012331c855c4f52f0925daebc6100cadff30d4e1f510a9dff4c04
-  - protocol/code_metrics_baseline.json:a8d035b9673af3397644e09f0e28d0b4523b34d3930e8093c741c43cbbcdcc67
+  - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
+  - protocol/code_metrics_baseline.json:bdbea5e6d558a05185a6eb28814f4a6b6b8475be07b36a879fe396262df88cde
 ---
+> 重审（2026-10-23）：预算计时改 perf_counter：修复 Windows monotonic 低分辨率导致超预算假通过
+
+> 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
+
+> 重审（2026-10-23）：终局稳定性：原子写 sink 收敛、测试隔离修复、验证卡册与 payload 重签
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改最终重绑：索引池、持久 IPC、原生绑定、缓存预算、OTLP 与协议防护
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护；最终生成链重绑
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）

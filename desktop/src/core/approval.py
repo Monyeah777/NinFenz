@@ -11,7 +11,6 @@ NF 现状：所有「作者裁决」只存在于散文（代码注释与文档�
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 from datetime import date
@@ -19,15 +18,36 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import atomic_write, json_doc
+from core.atoms import hash as hash_atom
 
 SCHEMA = "nf-approval/1"
 DIR_REL = "protocol/approvals"
+ENV_APPROVERS = "NF_APPROVERS"
+
+
+def allowed_approvers(root: str) -> frozenset:
+    """当前仓库允许的批准人；显式环境变量优先，真实 git 检出退回信任 owner 白名单。"""
+    if ENV_APPROVERS in os.environ:
+        return frozenset(x.strip() for x in
+                         (os.environ.get(ENV_APPROVERS) or "").split(",") if x.strip())
+    if (Path(root) / ".git").exists():
+        try:
+            from core.repo_trust import ALLOWED_OWNERS
+            return frozenset(ALLOWED_OWNERS)
+        except ImportError:
+            return frozenset()
+    return frozenset()
 
 
 def subject_digest(root: str, subject: str) -> str:
     """被批准对象的整文件摘要（不含批准记录本身——记录是独立文件，无自指问题）。"""
     p = Path(root) / subject
-    return hashlib.sha256(p.read_bytes()).hexdigest()
+    # 批准是完整性锚点：不得用 (mtime,size) 缓存。NTFS 快速同尺寸覆写可能保留同一
+    # 时间戳，缓存会给旧内容假签收；这里直接分块重算（仍不整文件读入内存）。
+    got = hash_atom.sha256_file(p)
+    if got is None:
+        raise ValueError("被批准对象不可读：%s（修复指引：确认路径存在且可读）" % subject)
+    return got
 
 
 def approve(root: str, subject: str, approved_by: str, note: str = "",
@@ -35,6 +55,10 @@ def approve(root: str, subject: str, approved_by: str, note: str = "",
     """写一条批准记录 → 相对路径。"""
     if not approved_by.strip():
         raise ValueError("批准人不能为空（修复指引：--by <批准人标识>）")
+    allowed = allowed_approvers(root)
+    if allowed and approved_by.strip() not in allowed:
+        raise ValueError("批准人 %s 不在允许列表 %s（修复指引：由获授权者批准，或显式设置 %s）"
+                         % (approved_by.strip(), sorted(allowed), ENV_APPROVERS))
     p = Path(root) / subject
     if not p.is_file():
         raise ValueError("被批准对象不存在：%s（修复指引：给出仓库内真实文件路径）" % subject)
@@ -76,6 +100,7 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
     rows = records(root)
     stale = []
+    allowed = allowed_approvers(root)
     for rec in rows:
         subj = str(rec.get("subject") or "")
         if rec.get("schema") != SCHEMA:
@@ -83,6 +108,9 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             continue
         if not str(rec.get("approved_by") or "").strip():
             issues.append("批准记录缺批准人：%s" % subj)
+        elif allowed and str(rec.get("approved_by")).strip() not in allowed:
+            issues.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
+                          % (rec.get("approved_by"), subj))
         if not os.path.isfile(os.path.join(root, subj)):
             issues.append("批准对象不存在：%s" % subj)
             continue

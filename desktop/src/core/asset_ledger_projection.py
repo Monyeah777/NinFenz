@@ -21,6 +21,7 @@ from core import conformance_scan as csc   # 共享语料：一次只读调用�
 
 _ROOT = Path(__file__).resolve().parents[3]
 _LEDGER = "protocol/community_asset_ledger.json"
+MAX_KEYS_PER_FILE = 4096
 
 
 def _file_keys(path: Path, text: Optional[str] = None) -> List[str]:
@@ -50,13 +51,21 @@ def build(root: str = ".") -> List[Dict[str, Any]]:
             pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
             text = csc.read_text_cached(p)
             lines = text.splitlines()
-            for k in _file_keys(p, text):
-                line = 1
+            keys = _file_keys(p, text)
+            if len(keys) > MAX_KEYS_PER_FILE:
+                raise ValueError("%s 的资产键 %d 个，超过单件上限 %d（修复指引：拆分资产文件）"
+                                 % (rel, len(keys), MAX_KEYS_PER_FILE))
+            first_line: Dict[str, int] = {}
+            if keys:
+                needle = re.compile(
+                    r"\b(?:" + "|".join(re.escape(k) for k in
+                                       sorted(keys, key=len, reverse=True)) + r")\b")
                 for idx, ln in enumerate(lines, 1):
-                    if re.search(r"\b" + re.escape(k) + r"\b", ln):
-                        line = idx
-                        break
-                rows.append({"key": k, "package": pkg, "file": rel, "line": line})
+                    for match in needle.finditer(ln):
+                        first_line.setdefault(match.group(0), idx)
+            for k in keys:
+                rows.append({"key": k, "package": pkg, "file": rel,
+                             "line": first_line.get(k, 1)})
     rows.sort(key=lambda x: (x["package"], x["key"], x["file"]))
     return rows
 

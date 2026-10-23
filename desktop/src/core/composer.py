@@ -37,18 +37,16 @@ def _repo_root() -> Path:
 
 def _protocol_refs(_store: Store, pipeline_id: str) -> List[dict]:
     """registry protocols[] 按 id 找 references（I5）。异常返回 []。"""
-    try:
-        from .registry_loader import load_registry
-        reg = load_registry()
-        for p in (reg.protocols or []):
-            if p.get("id") == pipeline_id or p.get("pipeline") == pipeline_id:
-                return list(p.get("references") or [])
-    except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-        pass
+    from .registry_loader import load_registry
+    reg = load_registry()
+    for p in (reg.protocols or []):
+        if p.get("id") == pipeline_id or p.get("pipeline") == pipeline_id:
+            return list(p.get("references") or [])
     return []
 
 
-def _load_source_module(pkg_name: str, module_ref: str) -> Optional[Module]:
+def _load_source_module(pkg_name: str, module_ref: str,
+                        files: Optional[List[Path]] = None) -> Optional[Module]:
     """从 community/<pkg>/modules/<id>_*.md parse 装载引用模块。"""
     from .parser import parse_module
     root = _repo_root()
@@ -56,11 +54,12 @@ def _load_source_module(pkg_name: str, module_ref: str) -> Optional[Module]:
     if not mod_dir.is_dir():
         return None
     num = str(module_ref).split(":")[-1]
-    for f in sorted(mod_dir.glob("*.md")):
+    for f in (files if files is not None else sorted(mod_dir.glob("*.md"))):
         if f.name.startswith(num + "_") or f.stem == num:
             try:
                 return parse_module(f.read_text(encoding="utf-8"))
-            except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
+            except (OSError, ValueError, TypeError, UnicodeError, KeyError):
+                # 坏模块件跳过本次匹配；组合门禁会报告该文件解析失败。
                 continue
     return None
 
@@ -74,20 +73,34 @@ def resolve_combination(store: Store, pipeline: Pipeline) -> Combination:
     - reference：registry references 引用的 source 模块（parse 装载正文）
     """
     combo = Combination(pipeline_id=pipeline.id)
-    for ref in _protocol_refs(store, pipeline.id):
+    root = _repo_root()
+    try:
+        refs = _protocol_refs(store, pipeline.id)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        combo.warnings.append("registry references 读取失败：%s（修复指引：先跑 "
+                              "nf registry verify）" % exc)
+        return combo
+    files_by_pkg: Dict[str, List[Path]] = {}
+    seen = set()
+    for ref in refs:
         pkg = ref.get("source_package")
         mid = ref.get("module_id")
         if not pkg or not mid:
             continue
-        m = _load_source_module(pkg, mid)
+        if pkg not in files_by_pkg:
+            mod_dir = root / "community" / str(pkg) / "modules"
+            files_by_pkg[str(pkg)] = (sorted(mod_dir.glob("*.md"))
+                                      if mod_dir.is_dir() else [])
+        m = _load_source_module(str(pkg), str(mid), files=files_by_pkg[str(pkg)])
         if m is None:
             combo.warnings.append(
                 f"引用模块 {mid}（{pkg}）解析失败——源文件缺失或格式不识别")
             continue
-        # 去重：同 full_id 已装载则跳过
-        if any(fid_key(m.full_id) == fid_key(x.full_id)
-               for x in combo.reference_modules):
+        # O(1) 去重：同 full_id 已装载则跳过
+        key = fid_key(m.full_id)
+        if key in seen:
             continue
+        seen.add(key)
         combo.reference_modules.append(m)
     return combo
 

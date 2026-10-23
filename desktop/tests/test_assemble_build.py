@@ -63,6 +63,11 @@ class AssembleBuildTest(unittest.TestCase):
         _, (b, _) = self._build(requirement)
         self.assertEqual(a, b, "组装式命令必须同输入同输出（禁写入时间戳）")
 
+    def test_build_does_not_mutate_sys_path(self):
+        before = list(sys.path)
+        self._build("帮我组装一个校园情感世界的完整版")
+        self.assertEqual(before, sys.path)
+
 
 class DestGuardTest(unittest.TestCase):
     """落点安全（agent 密集重复调用面）：真源面默认拒写，仓库外/普通目录放行。"""

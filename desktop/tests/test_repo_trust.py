@@ -8,6 +8,7 @@
 - `gate_inproc` 纵深防御：直接调用 exec 入口也拒绝，且**没有产生任何执行副作用**。
 """
 import os
+import importlib.util
 import subprocess
 import sys
 import tempfile
@@ -21,6 +22,15 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from core import gate_engine, gate_inproc, gate_labels, repo_trust  # noqa: E402
+
+
+def _load_nf():
+    """按路径加载 CLI；裸 `import nf` 在分片进程里会撞同名包/缓存。"""
+    spec = importlib.util.spec_from_file_location("nfcli_repo_trust", ROOT / "scripts" / "nf.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def _repo(origin: str = "") -> Path:
@@ -126,7 +136,7 @@ class GateRefusalTest(_Base):
     def test_cli_verify_preflight_refuses_untrusted_repo(self):
         """`nf verify` 在**执行前**拒绝（rc=2 + 风险文案），而不是跑完再报失败。"""
         evil = self._tmp_repo("https://github.com/evil/repo.git")
-        import nf  # scripts/nf.py
+        nf = _load_nf()
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
@@ -137,7 +147,7 @@ class GateRefusalTest(_Base):
     def test_cli_verify_preflight_allows_with_trust_repo(self):
         """`--trust-repo` 放行：走完预检（后续执行用 mock 收口，避免真跑全量引擎）。"""
         evil = self._tmp_repo("https://github.com/evil/repo.git")
-        import nf  # scripts/nf.py
+        nf = _load_nf()
 
         args = Namespace(only="", json=True, memo=False, cached=False, jobs=0,
                          trust_repo=True)

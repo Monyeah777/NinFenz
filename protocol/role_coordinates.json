@@ -3,10 +3,10 @@
     "app": 1449,
     "entry": 25,
     "floor": 5,
-    "prod": 1039,
+    "prod": 1040,
     "projection": 129,
-    "support": 230,
-    "verify": 952
+    "support": 232,
+    "verify": 954
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6713,6 +6713,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "仓库只读索引池（RepoIndex）：把 MCP 工具的「每次全仓扫描」收敛为一次懒构建 + O(1) 查询。",
+      "path": "desktop/src/core/repo_index.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "出口自动化 · 自述数字实算真源（check38 子扫描 1）。",
       "path": "desktop/src/core/repo_stats.py",
       "role": "verify",
@@ -7237,6 +7243,12 @@
     {
       "function": "数字资产契约层（core/asset_contract）回归 —— 数据 / 代码 / 脚本三面。",
       "path": "desktop/tests/test_asset_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "asset_contract._REPO_FILES 的新鲜度判据（2026-10-23）。",
+      "path": "desktop/tests/test_asset_contract_cache.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8039,6 +8051,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "严格 ISO-8601 解析判据（2026-10-23）。",
+      "path": "desktop/tests/test_iso8601.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
@@ -8183,7 +8201,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "MCP 工具面的**读取面预算**（稳态毫秒级的计数判据，不测墙钟）。",
+      "function": "MCP 工具面的**读取面预算**（稳态计数判据，不测墙钟）。",
       "path": "desktop/tests/test_mcp_read_budget.py",
       "role": "verify",
       "rule": "R-verify"
@@ -11988,17 +12006,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f1bd97ade0ccb58f53151951ab3b02af4ad3c40a33903fda021fb4dfc4cfe12d",
+  "root_digest": "f1ecc4deb6f4289228698b1b8a93fd561ed088c37c7338a7a37517cf5bb9daf7",
   "rule_counts": {
     "R-app": 1449,
-    "R-catch": 92,
+    "R-catch": 93,
     "R-entry": 25,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 113,
-    "R-verify": 835,
-    "auto:R-core": 252
+    "R-verify": 837,
+    "auto:R-core": 254
   },
   "schema": "nf-role-coordinates/1"
 }

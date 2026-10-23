@@ -14,3 +14,12 @@ class Test(unittest.TestCase):
 
     def test_claims_listed(self):
         self.assertEqual(1, len(G.absence_claims("没有找到任何锚点。")))
+
+    def test_boundary_does_not_leak_across_far_clauses(self):
+        self.assertTrue(G.check("检索面覆盖了 A。B 条目在场。C 依赖不存在。"))
+
+    def test_negation_is_not_flagged(self):
+        self.assertEqual([], G.check("并非不存在，只是未安装。"))
+
+    def test_english_absence_is_flagged(self):
+        self.assertTrue(G.check("The dependency is not found."))

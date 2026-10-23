@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
@@ -16,6 +17,14 @@ from core import disk_cache as dc  # noqa: E402
 
 
 class KeyCountEquivalenceTest(unittest.TestCase):
+    def test_memory_bounds_fail_loudly(self):
+        with mock.patch.object(ad, "MAX_BLOB_TEXT", 2):
+            with self.assertRaises(ValueError):
+                ad.count_keys("abc", ["a"])
+        with mock.patch.object(ad, "MAX_MATCHER_NODES", 1):
+            with self.assertRaises(ValueError):
+                ad._Matcher(["AB"])
+
     """`count_keys`（Aho–Corasick + 非重叠贪心）必须与逐键 `str.count` **逐字节同语义**。
 
     依据（实测）：`{k: blob.count(k) for k in keys}` 在真语料上是「1499 键 × 3.5 MB」= 5.2 GB 扫描

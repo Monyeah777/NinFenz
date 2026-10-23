@@ -38,6 +38,11 @@ _FILE_COUNT_CACHE_MAX = 4096
 #: 的纯函数——改 `04_模块库`、文档、代码这类与资产无关的件时结果必然不变。
 _KEYS_OF_CACHE: Dict[Any, List[str]] = {}
 _KEYS_OF_CACHE_MAX = 4096
+MAX_KEYS = 100_000
+MAX_KEY_CHARS = 8 * 1024 * 1024
+MAX_BLOB_TEXT = 64 * 1024 * 1024
+MAX_MATCHER_NODES = 1_000_000
+MAX_ASSET_FILE_BYTES = 16 * 1024 * 1024
 
 #: `usage_scan` 的**语料面**（就是它数的那些件）。指纹走常驻层**逐件摘要**，不再把 3.5 MB 正文
 #: 逐件 `encode()` 后重哈希一遍（实测那条 2815 件的哈希环占 `usage_scan` 的三分之一）。
@@ -65,6 +70,8 @@ def _keys_of(path: Path, text: Optional[str] = None) -> List[str]:
     keys.update(re.findall(r"\"([A-Z][A-Z0-9_-]{2,})\"\s*:", head))
     keys.update(re.findall(r"##\s*([A-Z][A-Z0-9_-]{2,})", head))
     got = sorted(keys)
+    if len(got) > MAX_KEYS:
+        raise ValueError("%s 的键数 %d 超过上限 %d" % (path, len(got), MAX_KEYS))
     if len(_KEYS_OF_CACHE) >= _KEYS_OF_CACHE_MAX:
         _KEYS_OF_CACHE.clear()
     _KEYS_OF_CACHE[ck] = got
@@ -93,15 +100,24 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         for rel in csc.iter_files(root, pat):
             if rel.rsplit("/", 1)[-1] == "README.md":
                 continue
+            path = Path(root) / rel
             try:
-                text = csc.read_text_cached(Path(root) / rel)
+                size = path.stat().st_size
+                if size > MAX_ASSET_FILE_BYTES:
+                    issues.append("%s 过大（%d > %d 字节）" % (rel, size, MAX_ASSET_FILE_BYTES))
+                    continue
+                text = csc.read_text_cached(path)
             except OSError as exc:
                 issues.append("%s 不可读：%s" % (rel, exc))
                 continue
             if not text.strip():
                 issues.append("%s 为空档（0 字符）" % rel)
                 continue
-            keys = _keys_of(Path(rel), text)
+            try:
+                keys = _keys_of(Path(rel), text)
+            except ValueError as exc:
+                issues.append(str(exc))
+                continue
             pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
             rows.append({"package": pkg, "file": rel,
                          "keys": len(keys), "key_list": keys,
@@ -129,6 +145,9 @@ class _Matcher:
     def __init__(self, keys):
         from collections import deque
         self.keys = [str(k) for k in keys]
+        key_chars = sum(len(k) for k in self.keys)
+        if len(self.keys) > MAX_KEYS or key_chars > MAX_KEY_CHARS:
+            raise ValueError("键集超限（%d 键 / %d 字符）" % (len(self.keys), key_chars))
         goto: List[Dict[str, int]] = [{}]
         out: List[List[str]] = [[]]
         fail: List[int] = [0]
@@ -137,6 +156,8 @@ class _Matcher:
             for ch in k:
                 nxt = goto[node].get(ch)
                 if nxt is None:
+                    if len(goto) >= MAX_MATCHER_NODES:
+                        raise ValueError("自动机节点数超过上限 %d" % MAX_MATCHER_NODES)
                     nxt = len(goto)
                     goto.append({})
                     out.append([])
@@ -207,7 +228,11 @@ def count_keys(blob: str, keys) -> Dict[str, int]:
     同一批数字只要 ~0.3 s。等价性由 `test_asset_density.KeyCountEquivalenceTest` 守着
     （随机串 400 例 + 重叠/嵌套/空键边界 + 真语料逐键比对）。
     """
+    if len(blob) > MAX_BLOB_TEXT:
+        raise ValueError("待计数文本过大（%d > %d 字符）" % (len(blob), MAX_BLOB_TEXT))
     str_keys = [str(k) for k in keys]
+    if len(str_keys) > MAX_KEYS or sum(map(len, str_keys)) > MAX_KEY_CHARS:
+        raise ValueError("键集超过计数上限（修复指引：缩小资产键集或拆分资产文件）")
     matcher = _matcher(str_keys)
     if matcher is None:
         return {k: blob.count(k) for k in str_keys}
@@ -233,12 +258,16 @@ def count_keys_additive(texts, keys, digests=None) -> Dict[str, int]:
     摘要口径与这里现算的完全一致（同一 payload 语义，见 `conformance_scan._payload_digest`）。
     """
     keys = [str(k) for k in keys]
+    if len(keys) > MAX_KEYS or sum(map(len, keys)) > MAX_KEY_CHARS:
+        raise ValueError("键集超过计数上限（修复指引：缩小资产键集或拆分资产文件）")
     if any("\n" in k for k in keys):
         return count_keys("\n".join(texts), keys)
     keys_key = hashlib.sha256("\x01".join(sorted(keys)).encode("utf-8")).hexdigest()
     matcher = _matcher(keys)                        # 自动机按**键集**复用（别逐件重建，实测慢 6 倍）
     totals = {k: 0 for k in keys}
     for idx, text in enumerate(texts):
+        if len(text) > MAX_BLOB_TEXT:
+            raise ValueError("单件文本过大（%d > %d 字符）" % (len(text), MAX_BLOB_TEXT))
         dg = digests[idx] if digests is not None else \
             hashlib.sha256(text.encode("utf-8")).hexdigest()
         ck = (dg, keys_key)
@@ -267,11 +296,21 @@ def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         for rel in csc.iter_files(root, pat):
             if rel.rsplit("/", 1)[-1] == "README.md":
                 continue
+            path = Path(root) / rel
+            try:
+                if path.stat().st_size > MAX_ASSET_FILE_BYTES:
+                    continue
+            except OSError:
+                # 不可读件由对应门禁另行报告；本统计不重复吞成零值。
+                continue
             # 路径必须锚在 `root` 上：`Path(rel)` 是按 **CWD** 解析的，读不到时 `_keys_of`
             # 的自带兜底会**静默降级**成「仅文件名令牌」（实测同树上 键 8→4 / 引用 24→12 且不报 issu
             # e）。
-            for k in _keys_of(Path(root) / rel):
-                keys.setdefault(k, rel)
+            try:
+                for k in _keys_of(path):
+                    keys.setdefault(k, rel)
+            except (OSError, ValueError):
+                continue
     # 内容键：**语料面指纹**（常驻层逐件摘要，不读正文）＋ 键集。口径与旧实现一致（同一批件、
     # 同一 payload 语义），但不再把 3.5 MB 正文逐件 `encode()` + 重哈希——而且键能**先算**，
     # 于是命中时**根本不必把 2815 份语料读成列表**（旧实现是「先全读、再查表」）。
@@ -345,12 +384,19 @@ def _thickness_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             if rel.rsplit("/", 1)[-1] == "README.md":
                 continue
             try:
-                text = csc.read_text_cached(Path(root) / rel)
+                path = Path(root) / rel
+                if path.stat().st_size > MAX_ASSET_FILE_BYTES:
+                    continue
+                text = csc.read_text_cached(path)
             except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
                 continue
             if not text.strip():
                 continue
-            keys = _keys_of(Path(rel), text)
+            try:
+                keys = _keys_of(Path(rel), text)
+            except ValueError:
+                # 键集超限已由 scan 的面级问题报告；厚度统计跳过该件。
+                continue
             lines = text.splitlines()
             sections = sum(1 for ln in lines if _re.match(r"^#{1,3}\s", ln))
             tables = sum(1 for ln in lines if ln.lstrip().startswith("|"))

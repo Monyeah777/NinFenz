@@ -22,6 +22,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "desktop" / "src") not in sys.path:
@@ -139,6 +140,38 @@ class RustEngineClientTest(unittest.TestCase):
         doc = re.run_json(["stats", "--root", str(ROOT), "--json"], root=ROOT)
         self.assertIsNotNone(doc)
         self.assertIn("core_modules", doc)
+
+    def test_stale_persistent_socket_is_closed_and_rebuilt(self) -> None:
+        class _Sock:
+            def __init__(self, stale=False):
+                self.stale = stale
+                self.closed = False
+
+            def settimeout(self, _timeout):
+                if self.stale:
+                    raise OSError("stale socket")
+
+            def setsockopt(self, *_args):
+                pass
+
+            def makefile(self, _mode):
+                return mock.Mock()
+
+            def close(self):
+                self.closed = True
+
+        stale = _Sock(stale=True)
+        fresh = _Sock()
+        old = re._PERSIST
+        re._PERSIST = {"port": 45678, "token": "token", "sock": stale, "fh": mock.Mock()}
+        try:
+            with mock.patch.object(re.socket, "create_connection", return_value=fresh):
+                got = re._persistent({"port": 45678, "token": "token"}, 1.0)
+            self.assertTrue(stale.closed)
+            self.assertIs(fresh, got["sock"])
+        finally:
+            re._close_persistent_locked()
+            re._PERSIST = old
 
     def test_conformance_run_parity(self) -> None:
         """`conformance run --json` 与 `nf conformance --json` 逐字节相等（除行尾）。"""

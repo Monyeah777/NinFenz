@@ -5,7 +5,7 @@
       "bandit": {
         ".github/scripts/gitee_ingest.py::B310": 1,
         ".github/scripts/library_ingest.py::B310": 1,
-        "desktop/src/core/daemon.py::B110": 7,
+        "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
         "desktop/src/core/gate_inproc.py::B102": 2,
@@ -14,6 +14,10 @@
         "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
         "desktop/src/core/provenance_external.py::B404": 1,
+        "desktop/src/core/rust_engine.py::B110": 1,
+        "desktop/src/core/rust_engine.py::B404": 1,
+        "desktop/src/core/rust_engine.py::B603": 3,
+        "desktop/src/core/rust_engine.py::B607": 1,
         "desktop/src/core/watch.py::B110": 1,
         "scripts/check_external_links.py::B104": 1,
         "scripts/instruction_evidence.py::B404": 1,
@@ -38,17 +42,17 @@
           "severities": [
             [
               "LOW",
-              37
+              44
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 42
+          "total": 49
         },
         "ruff": {
-          "total": 85
+          "total": 83
         }
       },
       "ruff": {
@@ -59,24 +63,23 @@
         "desktop/src/core/atoms/proc.py::S607": 1,
         "desktop/src/core/attest.py::S603": 4,
         "desktop/src/core/closure_scan.py::S112": 1,
-        "desktop/src/core/community_inventory.py::S112": 3,
-        "desktop/src/core/composer.py::S110": 1,
-        "desktop/src/core/composer.py::S112": 1,
-        "desktop/src/core/daemon.py::S110": 7,
+        "desktop/src/core/community_inventory.py::S112": 1,
+        "desktop/src/core/daemon.py::S110": 8,
         "desktop/src/core/decision_layer.py::S310": 4,
         "desktop/src/core/gate_inproc.py::S102": 2,
         "desktop/src/core/ingest_common.py::S603": 1,
         "desktop/src/core/ingest_common.py::S607": 1,
         "desktop/src/core/interop_export.py::S110": 1,
         "desktop/src/core/library.py::S110": 1,
-        "desktop/src/core/mcp_runtime.py::S110": 3,
         "desktop/src/core/mvu_adapter.py::S110": 1,
         "desktop/src/core/output_forms.py::S314": 2,
         "desktop/src/core/pack_combo.py::S311": 1,
-        "desktop/src/core/pipeline_loader.py::S112": 1,
         "desktop/src/core/protocol_golden.py::S112": 1,
         "desktop/src/core/provenance_external.py::S603": 1,
         "desktop/src/core/retriever.py::S110": 2,
+        "desktop/src/core/rust_engine.py::S110": 1,
+        "desktop/src/core/rust_engine.py::S603": 3,
+        "desktop/src/core/rust_engine.py::S607": 1,
         "desktop/src/core/storage.py::S110": 1,
         "desktop/src/core/storage.py::S112": 5,
         "desktop/src/core/verify_checks.py::S603": 1,

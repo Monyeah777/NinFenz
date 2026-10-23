@@ -168,12 +168,14 @@ def render_ir(pipeline: Pipeline,
             name=layer.name if layer else "",
             description=layer.description if layer else "",
             modules=[IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
-                              content=_ir_content(m)) for m in lm]))
+                              content=_ir_content(m),
+                              source_path=getattr(m, "source_path", "")) for m in lm]))
 
     extra: List[IRModule] = []
     for lm in by_layer.values():
         extra.extend(IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
-                              content=_ir_content(m)) for m in lm)
+                              content=_ir_content(m),
+                              source_path=getattr(m, "source_path", "")) for m in lm)
 
     keys: List[str] = []
     for m in ordered:

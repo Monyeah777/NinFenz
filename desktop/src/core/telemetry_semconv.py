@@ -19,11 +19,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 #: 本模块输出的 scope 名（采集侧识别用）
 SCOPE_NAME = "nf.telemetry"
 SCOPE_VERSION = "1.0.0"
+MAX_TRACE_BYTES = 16 * 1024 * 1024
 
 #: semconv 属性名（照抄规范，不做同义改写）
 A_OPERATION = "gen_ai.operation.name"
@@ -35,6 +37,13 @@ A_AGENT_NAME = "gen_ai.agent.name"
 A_CONVERSATION = "gen_ai.conversation.id"
 
 OP_EXECUTE_TOOL = "execute_tool"
+_HEX = set("0123456789abcdef")
+
+
+def _hex_pad(value: Any, length: int) -> str:
+    """十六进制补齐：只保留 hex 字符，截断/补零到固定长度。"""
+    raw = "".join(ch for ch in str(value or "").lower() if ch in _HEX)
+    return raw[:length].ljust(length, "0")
 
 #: trace 字段 → 调用参数面（入参）/ 结果面（出参）
 _ARG_FIELDS = ("requirement", "phase", "status")
@@ -89,14 +98,18 @@ def to_span(record: Dict[str, Any], span_id: str = "",
             agent_name: str = "ninfenz") -> Dict[str, Any]:
     """trace 记录 → OTLP 形状 span（无 trace 时间戳：timeUnixNano 留空由采集方外套）。"""
     name = "%s %s" % (OP_EXECUTE_TOOL, tool_name_of(record))
+    call_id = call_id_of(record)
+    trace_id = hashlib.sha256(("trace|" + call_id).encode("utf-8")).hexdigest()[:32]
+    generated_span = hashlib.sha256(("span|" + call_id).encode("utf-8")).hexdigest()[:16]
     return {
         "name": name,
         "kind": 1,  # SPAN_KIND_INTERNAL
-        "traceId": "",
-        "spanId": span_id or call_id_of(record)[3:19],
+        "traceId": trace_id,
+        "spanId": _hex_pad(span_id or generated_span, 16),
         "attributes": [{"key": k, "value": _otlp_value(v)}
                        for k, v in sorted(attributes_for(record, agent_name).items())],
-        "status": {"code": 1 if record.get("ok", True) else 2},
+        "status": {"code": 0 if record.get("ok") is None
+                   else (1 if record.get("ok") is True else 2)},
     }
 
 
@@ -142,6 +155,12 @@ def load_trace(path: str) -> List[Dict[str, Any]]:
     def _reject_constant(name: str):
         raise ValueError("含非有限数 %s（JSON 无 NaN/Infinity）" % name)
 
+    try:
+        size = Path(path).stat().st_size
+    except OSError as exc:
+        raise ValueError("trace 不可读：%s（%s）" % (path, exc)) from exc
+    if size > MAX_TRACE_BYTES:
+        raise ValueError("trace 过大（%d > %d 字节）" % (size, MAX_TRACE_BYTES))
     with open(path, encoding="utf-8-sig") as fh:   # 容忍外来件 BOM（审计 N4）
         text = fh.read()
     try:
