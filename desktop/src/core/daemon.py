@@ -169,6 +169,11 @@ def reset_process_caches() -> None:
         registry_loader.load_registry.cache_clear()
     except Exception:                                    # noqa: BLE001
         pass
+    try:
+        from core import asset_contract
+        asset_contract.clear_repo_files_cache()
+    except Exception:                                    # noqa: BLE001
+        pass
 
 
 class _LineReader:

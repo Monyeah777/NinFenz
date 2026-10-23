@@ -6,10 +6,12 @@
 ③ `docs/mcp.md` 的「上架材料」节必须逐项复述真源（否则人读面会与机读面分叉）。
 """
 import json
+import builtins
 import re
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -217,6 +219,38 @@ class McpToolDefinitionQualityTest(unittest.TestCase):
         self.assertIn("structuredContent", result)
         self.assertEqual(["items"], list(result["structuredContent"]))
         self.assertIsInstance(result["structuredContent"]["items"], list)
+
+
+class McpPackageFingerprintTest(unittest.TestCase):
+    """工具面指纹防漂移：声明 hash 与运行时不一致必须 FAIL。"""
+
+    def test_tools_hash_drift_is_detected(self):
+        import tempfile
+        from core import mcp_package
+
+        root = Path(__file__).resolve().parents[2]
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "protocol").mkdir()
+            doc = json.loads((root / "protocol" / "mcp_package.json").read_text(encoding="utf-8"))
+            doc["package"]["tools_hash"] = "0" * 64
+            (Path(tmp) / "protocol" / "mcp_package.json").write_text(
+                json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            issues, _warns, _stats = mcp_package.scan(tmp)
+            self.assertTrue(any("指纹漂移" in i for i in issues), issues)
+
+    def test_runtime_import_failure_is_a_clean_gate_issue(self):
+        from core import mcp_package
+
+        real_import = builtins.__import__
+
+        def guarded(name, *args, **kwargs):
+            if name == "core.mcp_runtime":
+                raise ImportError("synthetic runtime import failure")
+            return real_import(name, *args, **kwargs)
+
+        with mock.patch("builtins.__import__", side_effect=guarded):
+            issues, _warns, _stats = mcp_package.scan(str(ROOT))
+        self.assertTrue(any("不可导入" in i for i in issues), issues)
 
 
 if __name__ == "__main__":

@@ -83,6 +83,18 @@ class TestAssertionsNegatives(unittest.TestCase):
         self.assertFalse(results[0]["ok"])
         self.assertTrue(any("不通过" in i for i in issues))
 
+    def test_catastrophic_nested_quantifier_is_rejected_before_execution(self):
+        with self.assertRaises(ValueError):
+            A._compiled("(a+)+$")
+
+    def test_unsafe_regex_is_a_scan_issue(self):
+        tmp = tempfile.mkdtemp()
+        self._write(tmp, _decl(assertions=[{
+            "id": "redos", "severity": "fail", "kind": "regex_absent",
+            "params": {"globs": [], "pattern": "(a+)+$"}, "message": "m", "fix": "f"}]))
+        self.assertTrue(any("ReDoS" in i or "不可安全执行" in i
+                            for i in A.scan(tmp)[0]))
+
     def test_warn_severity_does_not_block(self):
         tmp = tempfile.mkdtemp()
         _mk(tmp, "a.txt", "x")

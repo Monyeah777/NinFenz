@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
-from core import verify_report as vr  # noqa: E402
+from core import atomic_write, verify_report as vr  # noqa: E402
 
 
 #: Rust `verify-report` **不自算**的 5 条（其余 26 条由 engine/rust 自算并逐字节对账）。
@@ -58,7 +58,7 @@ def _rust_report():
     fed = _fed_results()
     with tempfile.TemporaryDirectory(prefix="nf-vr-") as tmp:
         p = Path(tmp) / "results.json"
-        p.write_text(json.dumps(fed, ensure_ascii=False), encoding="utf-8")
+        atomic_write.write_text(p, json.dumps(fed, ensure_ascii=False))
         return re.run_face(["verify-report", "--root", ROOT, "--results", str(p), "--json"],
                            root=ROOT)
 
@@ -82,6 +82,8 @@ def main(argv=None) -> int:
             try:
                 _doc = json.loads(_out.decode("utf-8"))
             except (ValueError, UnicodeDecodeError):
+                _doc = None
+            if _doc is not None and not isinstance(_doc, dict):
                 _doc = None
             # 喂入面漂移护栏：若某条判据既非 Rust native、又没被本脚本喂入，Rust 会报
             # 「未移植且未喂入结果」；此时回退 Python 权威报告，绝不吐一份带缺口的报告。

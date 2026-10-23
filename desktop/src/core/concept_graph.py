@@ -24,6 +24,7 @@
 """
 from __future__ import annotations
 
+import heapq
 import glob
 import os
 import re
@@ -260,16 +261,16 @@ def toposort(graph: Dict[str, Any]) -> List[str]:
             if p in indeg:                      # 包外前置不参与排序
                 indeg[i] += 1
                 children[p].append(i)
-    ready = sorted(i for i in ids if indeg[i] == 0)
+    ready = [i for i in ids if indeg[i] == 0]
+    heapq.heapify(ready)
     out: List[str] = []
     while ready:
-        cur = ready.pop(0)
+        cur = heapq.heappop(ready)
         out.append(cur)
-        for nxt in sorted(children[cur]):
+        for nxt in children[cur]:
             indeg[nxt] -= 1
             if indeg[nxt] == 0:
-                ready.append(nxt)
-        ready.sort()
+                heapq.heappush(ready, nxt)
     if len(out) != len(ids):
         raise ClosureError("概念图存在环，无法给出装载序"
                            "（修复指引：按资产 §4 conflict_rules 归并并列节点）")

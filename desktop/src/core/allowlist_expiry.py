@@ -7,14 +7,26 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from core import iso8601
+
 
 def expired(entries: List[Dict[str, Any]], as_of: str) -> List[str]:
     """expires < as_of → 到期复红。"""
+    cutoff = iso8601.parse_instant(as_of)
+    if cutoff is None:
+        return ["as_of 不是 ISO-8601 日期/时间：%r（修复指引：用 YYYY-MM-DD 或带时区的 ISO 时间）"
+                % (as_of,)]
     out: List[str] = []
     for e in entries:
-        exp = str(e.get("expires") or "")
-        if exp and exp < as_of:
-            out.append("登记 %s 已于 %s 到期（修复指引：处理掉或重新评审续期）" % (e.get("id"), exp))
+        raw = e.get("expires")
+        if not str(raw or "").strip():
+            continue
+        exp = iso8601.parse_instant(raw)
+        if exp is None:
+            out.append("登记 %s 的 expires 非 ISO-8601：%r（修复指引：用 YYYY-MM-DD 或带时区的 "
+                       "ISO 时间）" % (e.get("id"), raw))
+        elif exp < cutoff:
+            out.append("登记 %s 已于 %s 到期（修复指引：处理掉或重新评审续期）" % (e.get("id"), raw))
     return out
 
 
@@ -32,4 +44,7 @@ def validate(entries: List[Dict[str, Any]]) -> List[str]:
         for k in ("id", "reason", "expires"):
             if not str(e.get(k) or "").strip():
                 issues.append("登记缺 %s：%r（修复指引：补该字段；无期挂账禁止）" % (k, e.get("id")))
+        if str(e.get("expires") or "").strip() and not iso8601.is_iso_instant(e.get("expires")):
+            issues.append("登记 %s 的 expires 非 ISO-8601：%r（修复指引：用 YYYY-MM-DD 或带时区的 "
+                          "ISO 时间）" % (e.get("id"), e.get("expires")))
     return issues

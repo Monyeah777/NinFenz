@@ -16,6 +16,7 @@ from __future__ import annotations
 import importlib
 import json
 import re
+import functools
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -27,6 +28,8 @@ VOCAB_SCHEMA = "nf-vocabularies/1"
 NORM_SCHEMA = "nf-normative/1"
 DC_SCHEMA = "nf-data-contracts/1"
 _CHECK_RE = re.compile(r"^check(\d+)$")
+_SAFE_PROBE_MODULE = re.compile(r"^core(?:\.[A-Za-z_][A-Za-z0-9_]*)+$")
+_SAFE_PROBE_ATTR = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
 
 
 def _read(root: str, rel: str) -> Dict[str, Any]:
@@ -42,13 +45,25 @@ def _as_values(obj: Any) -> List[str]:
     return []
 
 
+@functools.lru_cache(maxsize=64)
+def _python_probe_values(module: str, attr: str) -> tuple:
+    mod = importlib.import_module(module)
+    return tuple(_as_values(getattr(mod, attr)))
+
+
 def _probe(root: str, probe: Dict[str, Any]) -> Tuple[List[str], str]:
     kind = str(probe.get("kind") or "")
     if kind == "literal":
         return [], "literal（以本册为准）"
     if kind == "python_attr":
-        mod = importlib.import_module(str(probe.get("module") or ""))
-        return _as_values(getattr(mod, str(probe.get("attr") or ""))), "python_attr"
+        module = str(probe.get("module") or "")
+        attr = str(probe.get("attr") or "")
+        if not _SAFE_PROBE_MODULE.fullmatch(module) or not _SAFE_PROBE_ATTR.fullmatch(attr):
+            return [], "python_attr 模块/属性不在安全白名单形态：%s.%s" % (module, attr)
+        try:
+            return list(_python_probe_values(module, attr)), "python_attr"
+        except (ImportError, AttributeError, TypeError) as exc:
+            return [], "python_attr 取不到：%s.%s（%s）" % (module, attr, exc)
     if kind == "json_path":
         doc: Any = _read(root, str(probe.get("file") or ""))
         for part in str(probe.get("path") or "").split("."):
@@ -91,7 +106,10 @@ def verify_vocabularies(root: str = ".") -> Tuple[List[str], List[str], Dict[str
         if str(probe.get("kind")) not in kinds:
             issues.append("词表 %s 的 probe.kind 不在册：%s" % (sid, probe.get("kind")))
             continue
-        live, note = _probe(root, probe)
+        try:
+            live, note = _probe(root, probe)
+        except (ImportError, AttributeError, TypeError) as exc:
+            live, note = [], "探针异常：%s" % exc
         if str(probe.get("kind")) == "literal":
             continue
         if not live:

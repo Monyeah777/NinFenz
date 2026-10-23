@@ -12,9 +12,19 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:737e95ad29adfc9d1e41ce9faa41ae2ad7e668ecdc34a9b0468ce6afedc4d384
-  - protocol/code_metrics_baseline.json:a8d035b9673af3397644e09f0e28d0b4523b34d3930e8093c741c43cbbcdcc67
+  - desktop/src/core/mcp_runtime.py:654ac230f117d5ff33a4863fe6c6e1192943f57ee2639b23de89bf0da13a552a
+  - protocol/code_metrics_baseline.json:bdbea5e6d558a05185a6eb28814f4a6b6b8475be07b36a879fe396262df88cde
 ---
+> 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
+
+> 重审（2026-10-23）：终局稳定性：原子写 sink 收敛、测试隔离修复、验证卡册与 payload 重签
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改最终重绑：索引池、持久 IPC、原生绑定、缓存预算、OTLP 与协议防护
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护；最终生成链重绑
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）

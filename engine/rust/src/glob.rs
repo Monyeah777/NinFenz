@@ -17,6 +17,22 @@
 //! 隐藏文件**照收**：`Path.glob` 不像 shell 那样跳过点开头项。
 
 use std::path::Path;
+use std::cell::RefCell;
+
+thread_local! {
+    /// 一次 `nf-rs` 命令（或一次 serve 请求）内共享的 glob 缓存。
+    static REQUEST_CACHE: RefCell<Option<Cache>> = const { RefCell::new(None) };
+}
+
+/// 开始一次命令级 glob 缓存（`main::run` 入口调用）。
+pub fn begin_request_cache() {
+    REQUEST_CACHE.with(|slot| *slot.borrow_mut() = Some(Cache::new()));
+}
+
+/// 结束命令级 glob 缓存（`main::run` 出口调用）。
+pub fn end_request_cache() {
+    REQUEST_CACHE.with(|slot| *slot.borrow_mut() = None);
+}
 
 /// 是否含通配符（与真源 `_is_glob` 同判据）。
 pub fn has_wildcard(pattern: &str) -> bool {
@@ -102,7 +118,13 @@ fn walk_files(dir: &Path, root: &Path, out: &mut Vec<String>) {
 /// 真源 `assertions._glob` 返回的是 `str(Path(root)/p)`（含 root 前缀、平台分隔符）；
 /// 本函数只回相对路径，需要那个形态时用 [`py_path_str`] 拼。
 pub fn expand(root: &Path, pattern: &str) -> Vec<String> {
-    Cache::new().expand(root, pattern)
+    REQUEST_CACHE.with(|slot| {
+        let mut slot = slot.borrow_mut();
+        match slot.as_mut() {
+            Some(cache) => cache.expand(root, pattern),
+            None => Cache::new().expand(root, pattern),
+        }
+    })
 }
 
 /// 一次只读扫描内的 glob 缓存。**三层**，各治一类重复：

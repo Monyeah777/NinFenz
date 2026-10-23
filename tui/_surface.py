@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:900e20f1490c7e705d5174b449f90ccb1fcdb345fd3975790519f4b58c6e85b8'
+DIGEST = 'sha256:5ee2ad1c277f809c6ea07dfa46bf853410f08cd8f25758437a36a7edc1bca139'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -89,7 +89,7 @@ COMMANDS = ['approve',
  'who-refers',
  'workloop',
  'worldmodel']
-ROOT_FLAGS = ['--help', '--version', '-h']
+ROOT_FLAGS = ['--engine', '--help', '--version', '-h']
 
 ZONES = [{'key': '0',
   'id': 'doctor',

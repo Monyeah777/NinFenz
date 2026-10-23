@@ -14,10 +14,45 @@ isinstance 检查——顶层是 [1,2,3] / "hello" / 42 / null 时，读点要�
     rows = json_doc.loads(text, list, what="trace 记录")
 """
 import json
+import functools
 from pathlib import Path
 from typing import Any
 
 from core import atomic_write
+
+MAX_JSON_DEPTH = 256
+
+
+def _too_deep(text: str) -> bool:
+    """迭代式 JSON 括号深度预检（字符串/转义内不计），在递归解析前 fail-closed。"""
+    depth = 0
+    in_string = False
+    escaped = False
+    for ch in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch in "[{":
+            depth += 1
+            if depth > MAX_JSON_DEPTH:
+                return True
+        elif ch in "]}":
+            depth = max(0, depth - 1)
+    return False
+
+
+@functools.lru_cache(maxsize=256)
+def _read_text_cached(path: str, mtime_ns: int, size: int) -> str:
+    """按 (path, mtime, size) 缓存文件文本（同一批读取不再重复 I/O）。"""
+    _ = (mtime_ns, size)          # 键的一部分；正文读取只看 path
+    return atomic_write.read_text(Path(path))
 
 
 def _name(value: Any) -> str:
@@ -64,8 +99,12 @@ def loads(text: str, expect: Any = dict, *, what: str = "JSON 文本",
         kwargs["parse_constant"] = _reject_constant
     if pairs_hook is not None:
         kwargs["object_pairs_hook"] = pairs_hook
+    body = text.lstrip("\ufeff")
+    if _too_deep(body):
+        raise ValueError("%s 嵌套过深（上限 %d）（修复指引：拆平结构或改为引用，不把树深当协议）"
+                         % (what, MAX_JSON_DEPTH))
     try:
-        doc = json.loads(text.lstrip("\ufeff"), **kwargs)
+        doc = json.loads(body, **kwargs)
     except ValueError as exc:
         raise ValueError("%s 不是合法 JSON：%s（修复指引：核对该件是否被写坏 / 含注释 / 截断）"
                          % (what, exc)) from exc
@@ -77,7 +116,8 @@ def load(path: Any, expect: Any = dict, *, what: str = "", pairs_hook: Any = Non
     p = Path(path)
     name = what or p.as_posix()
     try:
-        text = atomic_write.read_text(p)
+        st = p.stat()
+        text = _read_text_cached(str(p.resolve()), int(st.st_mtime_ns), int(st.st_size))
     except OSError as exc:
         raise ValueError("%s 读取失败：%s（修复指引：确认路径存在且可读）" % (name, exc)) from exc
     return loads(text, expect, what=name, pairs_hook=pairs_hook)

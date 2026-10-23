@@ -7,11 +7,11 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:37c4486281a7ba74eca28079fa4198d3cfb484457259996a082dc0c629edddef
-  - scripts/nf.py:7b858aefa3f13fcb86063439716d870311088677ee914d0c2ea78b01e4d675b4
+  - scripts/nf.py:0547b6270060eb99ad6de8c14e55e90470dcfb22ad40c26a601ef4ab64d976db
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:bb69717b205769f5bf1e558e9dd15e7225f31de78cc0a4f18ffdea77f4a06dca
+  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
@@ -19,6 +19,10 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：CI 三刀合入后重绑（诊断目录绝对化/fetch-tags/wasm skip）

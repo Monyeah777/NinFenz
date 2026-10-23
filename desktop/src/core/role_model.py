@@ -31,8 +31,9 @@ import hashlib
 import json
 import os
 import re
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from core import atomic_write
 from core import json_doc
@@ -43,6 +44,40 @@ PROJECTION_REL = "protocol/role_coordinates.json"
 SCHEMA = "nf-role-coordinates/1"
 ROLES = ("floor", "prod", "verify", "projection", "support", "app", "entry")
 KERNEL_ROLES = ("floor", "prod", "verify")
+
+#: 一次只读扫描内的文本/自述/信号缓存（出口即清；直接调用不复用，防陈旧）。
+_TEXT_MEMO: Optional[Dict[Tuple[str, str], Optional[str]]] = None
+_SELF_MEMO: Optional[Dict[Tuple[str, str], str]] = None
+_SIGNAL_MEMO: Optional[Dict[Tuple[str, str], str]] = None
+
+
+@contextmanager
+def _text_scope():
+    """框定一次只读调用：同一文件只读一次、自述/信号只算一次。"""
+    global _TEXT_MEMO, _SELF_MEMO, _SIGNAL_MEMO
+    outermost = _TEXT_MEMO is None
+    if outermost:
+        _TEXT_MEMO, _SELF_MEMO, _SIGNAL_MEMO = {}, {}, {}
+    try:
+        yield
+    finally:
+        if outermost:
+            _TEXT_MEMO = _SELF_MEMO = _SIGNAL_MEMO = None
+
+
+def _text_of(root: str, rel: str) -> Optional[str]:
+    """读文件（作用域内只读一次）；不可读 → None。"""
+    global _TEXT_MEMO
+    key = (root, rel)
+    if _TEXT_MEMO is not None and key in _TEXT_MEMO:
+        return _TEXT_MEMO[key]
+    try:
+        text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        text = None
+    if _TEXT_MEMO is not None:
+        _TEXT_MEMO[key] = text
+    return text
 #: 写盘入口的名字面（结构判据用 AST，避免把测试件里**字符串样例**误判成写入口）
 _WRITE_NAMES = ("write", "refresh", "freeze", "sync", "record", "rewrite")
 _SCAN_DEF = re.compile(r"^def scan\(", re.M)
@@ -143,10 +178,19 @@ def writes_disk(text: str) -> bool:
 
 def self_line(root: str, rel: str) -> str:
     """件的**自述首句**（职能句的唯一来源）：.py 取 docstring / .md 取首标题 / .json 取 note·title·schema。"""
-    p = Path(root) / rel
-    try:
-        text = p.read_text(encoding="utf-8", errors="replace")
-    except OSError:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
+    global _SELF_MEMO
+    key = (root, rel)
+    if _SELF_MEMO is not None and key in _SELF_MEMO:
+        return _SELF_MEMO[key]
+    result = _self_line_uncached(root, rel)
+    if _SELF_MEMO is not None:
+        _SELF_MEMO[key] = result
+    return result
+
+
+def _self_line_uncached(root: str, rel: str) -> str:
+    text = _text_of(root, rel)
+    if text is None:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
         return ""
     if rel.endswith(".py"):
         m = _DOC.search(text) or _DOC2.search(text)
@@ -179,9 +223,19 @@ def self_line(root: str, rel: str) -> str:
 
 def _signal_role(root: str, rel: str) -> str:
     """核内件的**逐件收窄**：结构信号优先（可证），自述动词兜底（可驳）。"""
-    try:
-        text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
-    except OSError:
+    global _SIGNAL_MEMO
+    key = (root, rel)
+    if _SIGNAL_MEMO is not None and key in _SIGNAL_MEMO:
+        return _SIGNAL_MEMO[key]
+    result = _signal_role_uncached(root, rel)
+    if _SIGNAL_MEMO is not None:
+        _SIGNAL_MEMO[key] = result
+    return result
+
+
+def _signal_role_uncached(root: str, rel: str) -> str:
+    text = _text_of(root, rel)
+    if text is None:
         return "support"
     if rel.rsplit("/", 1)[-1].startswith("registry"):
         return "floor"
@@ -216,6 +270,11 @@ def coordinate(root: str, rel: str, rules: List[Dict[str, Any]],
 
 def projection(root: str = ".") -> Dict[str, Any]:
     """生成投影（确定性）：**核内逐件** + 规则批量统计 + 摘要。"""
+    with _text_scope():
+        return _projection_impl(root)
+
+
+def _projection_impl(root: str = ".") -> Dict[str, Any]:
     roles = load(root)
     # 投影件**不进自己的摘要**（否则写盘/未写盘两态的文件面不同 → 自指漂移，实测踩过）
     files = [x for x in files_of(root) if x != PROJECTION_REL]
@@ -351,9 +410,8 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
             continue
         if coordinate(root, rel, rules, overrides)["role"] != "verify":
             continue
-        try:
-            text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
-        except OSError:
+        text = _text_of(root, rel)
+        if text is None:
             # 可吞：该件读不到 → 本判据跳过；「件不在场」另有 ① 覆盖判据兜着，不重复报。
             continue
         if writes_disk(text):
@@ -370,6 +428,11 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """三条可判定性 → (issues, stats)；并入 check27 的阶梯面（R7）。"""
+    with _text_scope():
+        return _scan_impl(root)
+
+
+def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     roles = load(root)
     if not roles:
         return ["protocol/LAYERS.json 缺 roles 段（修复指引：补 vocabulary/rules/overrides）"], {}

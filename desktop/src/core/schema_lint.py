@@ -56,10 +56,13 @@ SUBSET_ALLOWED_KEYS = {
     "required", "properties", "propertyNames", "additionalProperties", "items",
     "enum", "pattern", "minLength", "minimum", "minItems", "maxItems",
 }
+MAX_DEPTH = 64
 
 
-def subset_key_violations(schema: Any, path: str = "schema") -> List[str]:
+def subset_key_violations(schema: Any, path: str = "schema", _depth: int = 0) -> List[str]:
     """递归扫描 schema 定义里校验器未实现的关键字（越界即 FAIL）。"""
+    if _depth > MAX_DEPTH:
+        return [f"{path}: schema 嵌套深度超过 {MAX_DEPTH}（修复指引：拆平 schema，禁止无限递归）"]
     if not isinstance(schema, dict):
         return []
     out = [
@@ -71,24 +74,27 @@ def subset_key_violations(schema: Any, path: str = "schema") -> List[str]:
     props = schema.get("properties")
     if isinstance(props, dict):
         for pname, sub in props.items():
-            out += subset_key_violations(sub, f"{path}/properties/{pname}")
+            out += subset_key_violations(sub, f"{path}/properties/{pname}", _depth + 1)
     items = schema.get("items")
     if isinstance(items, dict):
-        out += subset_key_violations(items, f"{path}/items")
+        out += subset_key_violations(items, f"{path}/items", _depth + 1)
     extra = schema.get("additionalProperties")
     if isinstance(extra, dict):
-        out += subset_key_violations(extra, f"{path}/additionalProperties")
+        out += subset_key_violations(extra, f"{path}/additionalProperties", _depth + 1)
     pnames = schema.get("propertyNames")
     if isinstance(pnames, dict):
-        out += subset_key_violations(pnames, f"{path}/propertyNames")
+        out += subset_key_violations(pnames, f"{path}/propertyNames", _depth + 1)
     return out
 
 
 # ---------------------------------------------------------------- 子集校验器
 def subset_validate(
-    instance: Any, schema: Any, path: str = "instance"
+    instance: Any, schema: Any, path: str = "instance", _depth: int = 0
 ) -> List[str]:
     """JSON-schema 子集校验；返回违例消息列表（空 = 通过）。"""
+    if _depth > MAX_DEPTH:
+        return [f"{path}: instance/schema 嵌套深度超过 {MAX_DEPTH}（修复指引：拆平数据，"
+                "禁止无限递归）"]
     if schema is None:
         return []
     if not isinstance(schema, dict):
@@ -114,10 +120,11 @@ def subset_validate(
         pnames = schema.get("propertyNames")
         if isinstance(pnames, dict):
             for key in instance:
-                out += subset_validate(key, pnames, f"{path}/{key}（键名）")
+                out += subset_validate(key, pnames, f"{path}/{key}（键名）", _depth + 1)
         for key in props:
             if key in instance:
-                out += subset_validate(instance[key], props[key], f"{path}/{key}")
+                out += subset_validate(instance[key], props[key], f"{path}/{key}",
+                                       _depth + 1)
         extra = schema.get("additionalProperties")
         for key in instance:
             if key in props:
@@ -125,7 +132,7 @@ def subset_validate(
             if extra is False:
                 out.append(f"{path}: 未知字段 {key}（不在该 schema 词表内）")
             elif isinstance(extra, dict):
-                out += subset_validate(instance[key], extra, f"{path}/{key}")
+                out += subset_validate(instance[key], extra, f"{path}/{key}", _depth + 1)
         return out
 
     if stype == "array":
@@ -137,7 +144,7 @@ def subset_validate(
             out.append(f"{path}: 数组长度 {len(instance)} > maxItems {schema['maxItems']}")
         items = schema.get("items")
         for i, item in enumerate(instance):
-            out += subset_validate(item, items, f"{path}[{i}]")
+            out += subset_validate(item, items, f"{path}[{i}]", _depth + 1)
         return out
 
     if stype == "string":

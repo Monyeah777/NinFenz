@@ -1,6 +1,7 @@
 """摘要原子：字节 / 文件 / 目录树 → sha256 十六进制串（只回摘要，**不比对**）。"""
 from __future__ import annotations
 
+import functools
 import hashlib
 from collections.abc import Iterable
 from pathlib import Path
@@ -29,6 +30,23 @@ def sha256_file(path: Path) -> str | None:
     return digest.hexdigest()
 
 
+@functools.lru_cache(maxsize=256)
+def _sha256_file_key(path: str, mtime_ns: int, size: int) -> str | None:
+    """（path, mtime, size）→ 分块摘要；键含 mtime/size，内容变即换键。"""
+    _ = (mtime_ns, size)
+    return sha256_file(Path(path))
+
+
+def sha256_file_cached(path: Path) -> str | None:
+    """带 (mtime,size) 失效键的分块文件摘要；不可读 → None。"""
+    p = Path(path)
+    try:
+        st = p.stat()
+    except OSError:
+        return None
+    return _sha256_file_key(str(p.resolve()), int(st.st_mtime_ns), int(st.st_size))
+
+
 def tree_digest(root: Path, skip: Iterable[str] = ()) -> str | None:
     """目录树的稳定摘要：按相对路径排序后，逐件混入 (路径, 文件 sha256)；根不在场 → None。
 
@@ -42,6 +60,6 @@ def tree_digest(root: Path, skip: Iterable[str] = ()) -> str | None:
     for rel in fs.walk_files(root, skip):
         digest.update(rel.encode("utf-8"))
         digest.update(b"\0")
-        digest.update((sha256_file(root_path / rel) or "").encode("ascii"))
+        digest.update((sha256_file_cached(root_path / rel) or "").encode("ascii"))
         digest.update(b"\n")
     return digest.hexdigest()

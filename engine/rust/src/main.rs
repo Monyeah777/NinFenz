@@ -140,6 +140,11 @@ fn main() -> ExitCode {
 /// 这是「零分叉面逻辑」的关键：worker 复用 `run()` 整段分派，只把 stdout 从真实流换成
 /// 内存缓冲。任何新增只读面自动可被 worker 服务，字节一致性天然继承。
 static STDOUT_CAPTURE: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+/// 并发连接共享同一捕获缓冲/全局缓存 ⇒ 判据执行串行（确定性优先，仅网络等待可并发）。
+static RUN_LOCK: Mutex<()> = Mutex::new(());
+/// worker 捕获缓冲复用池（容量上限 4 MiB；大输出不复用，避免常驻膨胀）。
+static REUSE_BUF: Mutex<Vec<u8>> = Mutex::new(Vec::new());
+const REUSE_BUF_CAP: usize = 4 * 1024 * 1024;
 
 fn emit(bytes: &[u8], out: &Option<PathBuf>) -> Result<(), String> {
     match out {
@@ -164,9 +169,15 @@ fn emit(bytes: &[u8], out: &Option<PathBuf>) -> Result<(), String> {
 /// 只给常驻 worker（`serve`）用：CLI 正常路径的 `emit` 仍走真实 stdout（捕获恒为 None）。
 /// 退出码口径与 `run()` 一致：`Err` 折算 2（与 `main` 的兜底同款）。
 pub(crate) fn run_capture(args: &[String]) -> (Vec<u8>, i32) {
+    let _run_guard = RUN_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let mut reused = {
+        let mut slot = REUSE_BUF.lock().unwrap_or_else(|e| e.into_inner());
+        std::mem::take(&mut *slot)
+    };
+    reused.clear();
     {
         let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
-        *cap = Some(Vec::new());
+        *cap = Some(reused);
     }
     let code = match run(args) {
         // `ExitCode` 的数值面在稳定 Rust 里不可读回，故用「是否 SUCCESS」还原：
@@ -190,6 +201,18 @@ pub(crate) fn run_capture(args: &[String]) -> (Vec<u8>, i32) {
     (out, code)
 }
 
+/// 把捕获缓冲交回复用池（仅保留 ≤ 4 MiB 容量）。
+pub(crate) fn recycle_capture_buf(mut buf: Vec<u8>) {
+    if buf.capacity() > REUSE_BUF_CAP {
+        return;
+    }
+    buf.clear();
+    let mut slot = REUSE_BUF.lock().unwrap_or_else(|e| e.into_inner());
+    if slot.capacity() < buf.capacity() {
+        *slot = buf;
+    }
+}
+
 fn require_dir(root: &PathBuf) -> Result<(), String> {
     if root.is_dir() {
         Ok(())
@@ -199,6 +222,14 @@ fn require_dir(root: &PathBuf) -> Result<(), String> {
 }
 
 fn run(args: &[String]) -> Result<ExitCode, String> {
+    // 一次命令/请求内共享 glob 缓存：27 契约、多面扫描不再各自重枚举目录。
+    glob::begin_request_cache();
+    let result = run_inner(args);
+    glob::end_request_cache();
+    result
+}
+
+fn run_inner(args: &[String]) -> Result<ExitCode, String> {
     if args.is_empty() || args[0] == "--help" || args[0] == "-h" {
         print!("{}", USAGE);
         return Ok(ExitCode::SUCCESS);

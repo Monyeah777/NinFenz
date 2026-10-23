@@ -79,6 +79,16 @@ class TestMcpAdapter(unittest.TestCase):
         self.assertEqual(len(data["mcp"]["resources"]), 2,
                          "层外模块也入 resources（不静默丢）")
 
+    def test_resource_carries_source_path_for_trust(self):
+        ir = _techdoc_ir()
+        ir.layers[0].modules[0].source_path = "community/demo/modules/M90_x.md"
+        res = export(ir, "mcp", dest_dir=self.dest)
+        data = json.loads(Path(res.files[0]).read_text(encoding="utf-8"))
+        first = data["mcp"]["resources"][0]
+        self.assertEqual("community/demo/modules/M90_x.md", first["source"])
+        self.assertEqual("community/demo/modules/M90_x.md",
+                         first["_meta"]["nf.source"])
+
     def test_narrative_rejected_no_file(self):
         res = export(_narrative_ir(), "mcp", dest_dir=self.dest)
         self.assertEqual(res.files, [])

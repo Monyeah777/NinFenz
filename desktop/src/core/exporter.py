@@ -14,19 +14,31 @@
 from __future__ import annotations
 
 import base64
+import importlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
-from .ir import IRDocument
-from .ccv3_adapter import map_ir_to_ccv3, world_entries
+from .ir import IRDocument, iter_md
 from core import atomic_write
-from .skill_adapter import export_skill
-from .agent_rules_adapter import export_agents, export_claude
-from .mcp_adapter import export_mcp
-from .mvu_adapter import export_mvu
-from .import_adapter import parse_skill, parse_ccv3   # 读入反向符号（34 方案 A4）
+from .import_adapter import parse_ccv3, parse_skill
+
+if TYPE_CHECKING:          # 静态引用（dead-code 判据可见），运行时按需 import
+    from .ccv3_adapter import map_ir_to_ccv3, world_entries  # noqa: F401
+    from .skill_adapter import export_skill  # noqa: F401
+    from .agent_rules_adapter import export_agents, export_claude  # noqa: F401
+    from .mcp_adapter import export_mcp  # noqa: F401
+    from .mvu_adapter import export_mvu  # noqa: F401
+
+
+def _lazy(module: str, func: str) -> Callable[..., Any]:
+    """按需导入适配器（微内核注册表：新增出口不改本文件的分派逻辑）。"""
+    def call(*args: Any, **kwargs: Any) -> Any:
+        mod = importlib.import_module(module, __package__)
+        return getattr(mod, func)(*args, **kwargs)
+    call.__name__ = func
+    return call
 
 
 @dataclass
@@ -38,6 +50,7 @@ class ExportResult:
 
 # ------------------------------------------------------------------ 适配器
 def _export_ccv3(ir: IRDocument, dest_dir: Path, res: ExportResult) -> None:
+    from .ccv3_adapter import map_ir_to_ccv3, world_entries
     chara = map_ir_to_ccv3(ir)
     world: Dict[str, Any] = {
         "name": f"{ir.title} · 世界书",
@@ -61,13 +74,23 @@ def _export_ccv3(ir: IRDocument, dest_dir: Path, res: ExportResult) -> None:
                             + "、".join(unmapped))
 
 
+def _export_md(ir: IRDocument, dest_dir: Path, res: ExportResult) -> None:
+    """IR → 原生 Markdown（顶层核心出口；流式原子写）。"""
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    path = dest_dir / "document.md"
+    atomic_write.write_lines(path, iter_md(ir))
+    if str(path) not in res.files:
+        res.files.append(str(path))
+
+
 _REGISTRY = {
-    "mvu": export_mvu,
+    "md": _export_md,
+    "mvu": _lazy(".mvu_adapter", "export_mvu"),
     "ccv3": _export_ccv3,
-    "skill": export_skill,
-    "agents": export_agents,
-    "claude": export_claude,
-    "mcp": export_mcp,
+    "skill": _lazy(".skill_adapter", "export_skill"),
+    "agents": _lazy(".agent_rules_adapter", "export_agents"),
+    "claude": _lazy(".agent_rules_adapter", "export_claude"),
+    "mcp": _lazy(".mcp_adapter", "export_mcp"),
 }
 
 # 读入反向符号登记（v2.3.0 34 方案：A4 双向读入——外部→NF 反向解析层）。
@@ -94,6 +117,7 @@ def export(ir: IRDocument, fmt: str = "ccv3",
 
 def write_png_card(ir: IRDocument, path: Optional[str | Path] = None) -> str:
     """产单卡 PNG（tEXt 'chara' = base64 chara JSON）。返回文件路径。"""
+    from .ccv3_adapter import map_ir_to_ccv3
     chara = map_ir_to_ccv3(ir)
     payload = base64.b64encode(
         json.dumps(chara, ensure_ascii=False).encode("utf-8")).decode("ascii")

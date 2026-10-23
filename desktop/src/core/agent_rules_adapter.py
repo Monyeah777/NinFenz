@@ -30,29 +30,31 @@ def _slug(name: str) -> str:
     return s.lower()
 
 
-def _build_agents_md(ir: IRDocument) -> str:
-    """project_rules IR → AGENTS.md 文本（章节按层/模块组织，项目约定语义）。"""
-    body_parts = ["# Agent Operating Rules", ""]
-    n_blocks = 0
+def _agents_parts(ir: IRDocument):
+    """project_rules IR → AGENTS.md 片段流（顶层不拼整篇）。"""
+    yield "# Agent Operating Rules"
+    yield ""
     for layer in ir.layers:
-        body_parts.append(f"## {layer.name or layer.id}")
+        yield f"## {layer.name or layer.id}"
         for m in layer.modules:
-            body_parts.append(f"### {m.full_id} · {m.name}")
-            body_parts.append(m.content or "（无正文）")
-            n_blocks += 1
+            yield f"### {m.full_id} · {m.name}"
+            yield m.content or "（无正文）"
     if ir.extra_modules:
-        body_parts.append("## 附加规则")
+        yield "## 附加规则"
         for m in ir.extra_modules:
-            body_parts.append(f"### {m.full_id} · {m.name}")
-            body_parts.append(m.content or "（无正文）")
-            n_blocks += 1
+            yield f"### {m.full_id} · {m.name}"
+            yield m.content or "（无正文）"
     if ir.asset_refs:
-        body_parts.append("## 资产引用")
+        yield "## 资产引用"
         for k, v in ir.asset_refs.items():
             if v is None:
                 continue
-            body_parts.append(f"### {k}\n\n{v}")
-    return "\n\n".join(body_parts)
+            yield f"### {k}\n\n{v}"
+
+
+def _append_once(values, value: str) -> None:
+    if value not in values:
+        values.append(value)
 
 
 def export_agents(ir: IRDocument, dest_dir: Path, res) -> None:
@@ -66,8 +68,8 @@ def export_agents(ir: IRDocument, dest_dir: Path, res) -> None:
     dest_dir = Path(dest_dir)
     dest_dir.mkdir(parents=True, exist_ok=True)
     agents_path = dest_dir / "AGENTS.md"
-    atomic_write.write_text(agents_path, _build_agents_md(ir))   # 原子写：交付件不留半截
-    res.files.append(str(agents_path))
+    atomic_write.write_lines(agents_path, _agents_parts(ir), separator="\n\n")
+    _append_once(res.files, str(agents_path))
 
 
 def export_claude(ir: IRDocument, dest_dir: Path, res) -> None:
@@ -80,5 +82,5 @@ def export_claude(ir: IRDocument, dest_dir: Path, res) -> None:
     dest_dir = Path(dest_dir)
     dest_dir.mkdir(parents=True, exist_ok=True)
     claude_path = dest_dir / "CLAUDE.md"
-    atomic_write.write_text(claude_path, _build_agents_md(ir))   # 原子写：交付件不留半截
-    res.files.append(str(claude_path))
+    atomic_write.write_lines(claude_path, _agents_parts(ir), separator="\n\n")
+    _append_once(res.files, str(claude_path))

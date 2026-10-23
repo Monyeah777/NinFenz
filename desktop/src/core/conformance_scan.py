@@ -41,9 +41,13 @@ _T = chr(96) * 3
 # 。
 _FENCE_CACHE: Dict[Tuple[str, str], Any] = {}
 _FENCE_CACHE_MAX = 4096
+_FENCE_CACHE_MAX_BYTES = 64 * 1024 * 1024
+_FENCE_CACHE_BYTES = 0
 #: 围栏**正文**缓存（键 = 正文本身）：给「自己抽正文」的调用方用（与 `_fence_yaml` 互补）。
 _BODY_CACHE: Dict[str, Any] = {}
 _BODY_CACHE_MAX = 4096
+_BODY_CACHE_MAX_BYTES = 64 * 1024 * 1024
+_BODY_CACHE_BYTES = 0
 
 #: 「一次**只读**扫描内共享语料」的**四层作用域缓存**（`read_memo()` 框定、出口即清；聚合入口都是
 #: 纯读 ⇒ 冷却语义与「新起进程」一致）：读文本 / 列目录 / 按模式枚举 / 子树清单。实测一次
@@ -65,6 +69,7 @@ _RESIDENT: Optional[Dict[str, Any]] = None
 #: 常驻层的容量上界（目录条数与正文条数）：超出即停止收录（不影响正确性，只是退回按需读）。
 _RESIDENT_DIR_MAX = 8192
 _RESIDENT_TEXT_MAX = 16384
+_RESIDENT_RAW_MAX_BYTES = 64 * 1024 * 1024
 
 
 class _Entry:
@@ -94,6 +99,7 @@ def install_resident(root) -> None:
     global _RESIDENT
     root_abs = os.path.normcase(os.path.abspath(str(root)))
     _RESIDENT = {"root": root_abs, "dirs": {}, "text": {}, "bytes": {}, "digest": {}, "raw": {},
+                 "raw_bytes": 0,
                  #: **确知变更面**（见 `changed_paths`）：装层时为空且**未确知**（fail-closed——
                  #: 新装的层不知道装之前发生过什么，任何「跳过重算」的推理都不许建立在这上面）。
                  "changed": set(), "changed_known": False}
@@ -144,6 +150,12 @@ def matches_any(rel: str, patterns) -> bool:
         if _match_parts(segs, _compiled_parts(str(pat).replace("\\", "/").lower())):
             return True
     return False
+
+
+def match_rel(rel: str, pattern: str) -> bool:
+    """仓库相对路径是否匹配段级 glob（与 `iter_files` / `Path.glob` 同口径）。"""
+    segs = [s for s in str(rel).replace("\\", "/").split("/") if s]
+    return _match_parts(segs, _compiled_parts(str(pattern)))
 
 
 #: **面指纹**缓存（键 = (绝对 root, 模式元组)）：确知这批变更没一件落在该面内就整个复用（不枚举、
@@ -296,7 +308,9 @@ def drop_resident(paths) -> None:
         res["text"].pop(key, None)
         res["bytes"].pop(key, None)
         res["digest"].pop(key, None)
-        res["raw"].pop(key, None)
+        old_raw = res["raw"].pop(key, None)
+        if old_raw is not None:
+            res["raw_bytes"] = max(0, int(res.get("raw_bytes") or 0) - len(old_raw))
         res["dirs"].pop(os.path.dirname(key), None)
         res["dirs"].pop(key, None)          # 路径本身也可能是目录（整棵子树增删）
 
@@ -622,7 +636,10 @@ def _raw_bytes(path, key: str) -> bytes:
         _READ_MEMO["b:" + key] = raw
     if _RESIDENT is not None and _resident_under(key) \
             and len(_RESIDENT["raw"]) < _RESIDENT_TEXT_MAX:
-        _RESIDENT["raw"][key] = raw
+        used = int(_RESIDENT.get("raw_bytes") or 0)
+        if used + len(raw) <= _RESIDENT_RAW_MAX_BYTES:
+            _RESIDENT["raw"][key] = raw
+            _RESIDENT["raw_bytes"] = used + len(raw)
     return raw
 
 
@@ -767,12 +784,17 @@ def load_yaml_cached(body: str) -> Any:
     概念图加载器各自用正则抽出正文后直接解析，过去因此**每轮全量重解析**（实测热跑 score
     里仍有 325 次 YAML 解析）。解析失败按原样抛出、不缓存（确定性）。
     """
+    global _BODY_CACHE_BYTES
     if body in _BODY_CACHE:
         return _BODY_CACHE[body]
     got = load_yaml(body)
-    if len(_BODY_CACHE) >= _BODY_CACHE_MAX:
+    size = len(body)
+    if (len(_BODY_CACHE) >= _BODY_CACHE_MAX
+            or _BODY_CACHE_BYTES + size > _BODY_CACHE_MAX_BYTES):
         _BODY_CACHE.clear()
+        _BODY_CACHE_BYTES = 0
     _BODY_CACHE[body] = got
+    _BODY_CACHE_BYTES += size
     return got
 
 
@@ -801,11 +823,16 @@ def _parse_fence_yaml(text: str, marker: str) -> Any:
 
 def _fence_yaml_cached(text: str, marker: str) -> Any:
     """`(marker, 文本)` → 解析结果（None = 没找到该围栏或解析失败）。见 `_fence_yaml`。"""
+    global _FENCE_CACHE_BYTES
     key = (marker, text)
     if key not in _FENCE_CACHE:
-        if len(_FENCE_CACHE) >= _FENCE_CACHE_MAX:
+        size = len(text)
+        if (len(_FENCE_CACHE) >= _FENCE_CACHE_MAX
+                or _FENCE_CACHE_BYTES + size > _FENCE_CACHE_MAX_BYTES):
             _FENCE_CACHE.clear()
+            _FENCE_CACHE_BYTES = 0
         _FENCE_CACHE[key] = _parse_fence_yaml(text, marker)
+        _FENCE_CACHE_BYTES += size
     return _FENCE_CACHE[key]
 
 

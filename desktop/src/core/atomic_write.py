@@ -78,6 +78,15 @@ def _ensure_target(path: str | os.PathLike) -> Path:
     return p
 
 
+def _discard_tmp(tmp: str) -> None:
+    """删除本模块刚创建的临时件；失败不覆盖主异常。"""
+    try:
+        os.unlink(tmp)
+    except OSError:
+        # 临时件清理失败不覆盖主异常；下次写入会重新创建最终由宿主清理。
+        pass
+
+
 def write_text(path: str | os.PathLike, text: str) -> None:
     """把 `text` 原子地写到 `path`（LF 落盘；失败不留半截目标文件）。"""
     _ensure_target(path)
@@ -95,13 +104,38 @@ def write_text(path: str | os.PathLike, text: str) -> None:
                 os.fsync(fh.fileno())
             _replace(tmp, p)        # 原子替换：读者只会看到旧全量或新全量
         except BaseException:
-            try:
-                os.unlink(tmp)      # 只删本模块现造的临时件（见 purity_scan.SINK_ALLOW）
-            except OSError:
-                pass
+            _discard_tmp(tmp)      # 只删本模块现造的临时件（见 purity_scan.SINK_ALLOW）
             raise
 
     _retry_transient(_once)         # 瞬时占用错（EINVAL 22 / WinError 5）短重试
+
+
+def write_lines(path: str | os.PathLike, lines, separator: str = "\n") -> None:
+    """把可迭代文本片段**流式**原子写到 `path`（不先拼成整篇字符串）。"""
+    _ensure_target(path)
+
+    def _once() -> None:
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(prefix="." + p.name + ".", suffix=".tmp",
+                                   dir=str(p.parent))
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
+                first = True
+                for part in lines:
+                    if not first:
+                        fh.write(separator)
+                    text = str(part).replace("\r\n", "\n").replace("\r", "\n")
+                    fh.write(text)
+                    first = False
+                fh.flush()
+                os.fsync(fh.fileno())
+            _replace(tmp, p)
+        except BaseException:
+            _discard_tmp(tmp)
+            raise
+
+    _retry_transient(_once)
 
 
 def write_bytes(path: str | os.PathLike, data: bytes) -> None:
@@ -124,10 +158,7 @@ def write_bytes(path: str | os.PathLike, data: bytes) -> None:
                 os.fsync(fh.fileno())
             _replace(tmp, p)        # 原子替换：读者只会看到旧全量或新全量
         except BaseException:
-            try:
-                os.unlink(tmp)      # 只删本模块现造的临时件
-            except OSError:
-                pass
+            _discard_tmp(tmp)      # 只删本模块现造的临时件
             raise
 
     _retry_transient(_once)         # 瞬时占用错（EINVAL 22 / WinError 5）短重试

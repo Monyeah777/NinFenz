@@ -8,9 +8,19 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
-  - desktop/src/core/asset_contract.py:a79488e2bfbbc58c137881dab9116809feeadacb899efcd1583cf9369b78f082
-  - protocol/code_metrics_baseline.json:a8d035b9673af3397644e09f0e28d0b4523b34d3930e8093c741c43cbbcdcc67
+  - desktop/src/core/asset_contract.py:51a3962439f1cdcf4a5621af282c337b6b68e0b485c2ef2512dea140e387588c
+  - protocol/code_metrics_baseline.json:bdbea5e6d558a05185a6eb28814f4a6b6b8475be07b36a879fe396262df88cde
 ---
+> 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
+
+> 重审（2026-10-23）：终局稳定性：原子写 sink 收敛、测试隔离修复、验证卡册与 payload 重签
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改最终重绑：索引池、持久 IPC、原生绑定、缓存预算、OTLP 与协议防护
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护；最终生成链重绑
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）

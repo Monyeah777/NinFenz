@@ -9,10 +9,12 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:bb69717b205769f5bf1e558e9dd15e7225f31de78cc0a4f18ffdea77f4a06dca
+  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
 
 ---
+> 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
+
 > 重审（2026-10-22）：CI 三刀合入后重绑（诊断目录绝对化/fetch-tags/wasm skip）
 
 > 重审（2026-10-22）：测试执行器、进程原子与 Windows shell 解析修复后重算代码度量基线与角色投影；既有审计结论不变

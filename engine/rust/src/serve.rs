@@ -16,6 +16,7 @@ use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use serde_json::{json, Value};
 
@@ -29,6 +30,12 @@ const MAX_ARGV_CHARS: usize = 8192;
 const MAX_ARGV_TOTAL: usize = 65536;
 /// 本 worker 拒跑的命令（自指/长驻；与 daemon.py 的 REFUSED_COMMANDS 同纪律）。
 const REFUSED: &[&str] = &["serve", "daemon", "shell", "terminal", "lsp"];
+
+static REQUESTS: AtomicU64 = AtomicU64::new(0);
+static BYTES_IN: AtomicU64 = AtomicU64::new(0);
+static BYTES_OUT: AtomicU64 = AtomicU64::new(0);
+static ACTIVE: AtomicUsize = AtomicUsize::new(0);
+const MAX_CONNECTIONS: usize = 16;
 
 pub fn run_serve(args: &[String]) -> Result<ExitCode, String> {
     let mut state: Option<PathBuf> = None;
@@ -83,58 +90,104 @@ pub fn run_serve(args: &[String]) -> Result<ExitCode, String> {
             Ok(s) => s,
             Err(_) => continue,
         };
-        // 串行处理：一次一个连接（确定性优先）。失败不打断 accept 循环。
-        let _ = handle(stream, &token);
+        // 每连接一线程（keep-alive/idle 不阻塞 accept）；判据执行仍由 RUN_LOCK 串行。
+        if ACTIVE.fetch_add(1, Ordering::SeqCst) >= MAX_CONNECTIONS {
+            ACTIVE.fetch_sub(1, Ordering::SeqCst);
+            let mut stream = stream;
+            let _ = respond(&mut stream, 2, b"", "worker 连接数已满".as_bytes());
+            continue;
+        }
+        let token = token.clone();
+        std::thread::spawn(move || {
+            let _ = handle(stream, &token);
+            ACTIVE.fetch_sub(1, Ordering::SeqCst);
+        });
     }
     Ok(ExitCode::SUCCESS)
 }
 
 fn handle(mut stream: TcpStream, token: &str) -> std::io::Result<()> {
+    let _ = stream.set_nodelay(true);
     let _ = stream.set_read_timeout(Some(std::time::Duration::from_secs(30)));
     let _ = stream.set_write_timeout(Some(std::time::Duration::from_secs(30)));
 
-    let line = match read_request_line(&mut stream) {
-        Ok(l) => l,
-        Err(e) => return respond(&mut stream, 2, b"", format!("请求不可读：{}", e).as_bytes()),
-    };
-    if line.len() > MAX_REQUEST_BYTES {
-        return respond(&mut stream, 2, b"", "请求超上限".as_bytes());
-    }
-
-    let req: Value = match serde_json::from_str(line.trim()) {
-        Ok(v) => v,
-        Err(e) => return respond(&mut stream, 2, b"", format!("请求不是合法 JSON：{}", e).as_bytes()),
-    };
-    let proto = req.get("proto").and_then(|v| v.as_u64()).unwrap_or(0);
-    if proto != PROTO {
-        return respond(&mut stream, 2, b"", "proto 不符".as_bytes());
-    }
-    let got_token = req.get("token").and_then(|v| v.as_str()).unwrap_or("");
-    if got_token != token {
-        return respond(&mut stream, 2, b"", "token 不符".as_bytes());
-    }
-    let argv: Vec<String> = match req.get("argv").and_then(|v| v.as_array()) {
-        Some(arr) => arr
-            .iter()
-            .filter_map(|x| x.as_str())
-            .map(|s| s.to_string())
-            .collect(),
-        None => return respond(&mut stream, 2, b"", "缺 argv".as_bytes()),
-    };
-    if argv.is_empty() {
-        return respond(&mut stream, 2, b"", "argv 为空".as_bytes());
-    }
-    if !argv_size_ok(&argv) {
-        return respond(&mut stream, 2, b"", "argv 超上限".as_bytes());
-    }
-    if let Some(first) = argv.first() {
-        if REFUSED.contains(&first.as_str()) {
-            return respond(&mut stream, 2, b"", "拒跑长驻/自指命令".as_bytes());
+    // 一条连接可承载多请求（keep-alive）；EOF/空行/协议错误即关闭。
+    loop {
+        let line = match read_request_line(&mut stream) {
+            Ok(l) => l,
+            Err(_) => break,
+        };
+        if line.trim().is_empty() {
+            break;
         }
-    }
+        REQUESTS.fetch_add(1, Ordering::Relaxed);
+        BYTES_IN.fetch_add(line.len() as u64, Ordering::Relaxed);
+        if line.len() > MAX_REQUEST_BYTES {
+            respond(&mut stream, 2, b"", "请求超上限".as_bytes())?;
+            break;
+        }
 
-    let (out, code) = crate::run_capture(&argv);
-    respond(&mut stream, code, &out, b"")
+        let req: Value = match serde_json::from_str(line.trim()) {
+            Ok(v) => v,
+            Err(e) => {
+                respond(&mut stream, 2, b"", format!("请求不是合法 JSON：{}", e).as_bytes())?;
+                break;
+            }
+        };
+        let proto = req.get("proto").and_then(|v| v.as_u64()).unwrap_or(0);
+        if proto != PROTO {
+            respond(&mut stream, 2, b"", "proto 不符".as_bytes())?;
+            break;
+        }
+        let got_token = req.get("token").and_then(|v| v.as_str()).unwrap_or("");
+        if got_token != token {
+            respond(&mut stream, 2, b"", "token 不符".as_bytes())?;
+            break;
+        }
+        // 只读观测面：请求/字节计数（RSS 由宿主侧取）。
+        if req.get("op").and_then(|v| v.as_str()) == Some("stats") {
+            let payload = json!({
+                "pid": std::process::id(),
+                "proto": PROTO,
+                "requests": REQUESTS.load(Ordering::Relaxed),
+                "bytes_in": BYTES_IN.load(Ordering::Relaxed),
+                "bytes_out": BYTES_OUT.load(Ordering::Relaxed),
+            }).to_string();
+            BYTES_OUT.fetch_add(payload.len() as u64, Ordering::Relaxed);
+            respond(&mut stream, 0, payload.as_bytes(), b"")?;
+            continue;
+        }
+        let argv: Vec<String> = match req.get("argv").and_then(|v| v.as_array()) {
+            Some(arr) => arr
+                .iter()
+                .filter_map(|x| x.as_str())
+                .map(|s| s.to_string())
+                .collect(),
+            None => {
+                respond(&mut stream, 2, b"", "缺 argv".as_bytes())?;
+                break;
+            }
+        };
+        if argv.is_empty() {
+            respond(&mut stream, 2, b"", "argv 为空".as_bytes())?;
+            break;
+        }
+        if !argv_size_ok(&argv) {
+            respond(&mut stream, 2, b"", "argv 超上限".as_bytes())?;
+            break;
+        }
+        if let Some(first) = argv.first() {
+            if REFUSED.contains(&first.as_str()) {
+                respond(&mut stream, 2, b"", "拒跑长驻/自指命令".as_bytes())?;
+                break;
+            }
+        }
+        let (out, code) = crate::run_capture(&argv);
+        BYTES_OUT.fetch_add(out.len() as u64, Ordering::Relaxed);
+        respond(&mut stream, code, &out, b"")?;
+        crate::recycle_capture_buf(out);
+    }
+    Ok(())
 }
 
 fn read_request_line(stream: &mut TcpStream) -> std::io::Result<String> {

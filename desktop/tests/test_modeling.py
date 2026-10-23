@@ -67,6 +67,18 @@ class TestVocabNegatives(unittest.TestCase):
         _mk(tmp, M.VOCAB_REL, json.dumps(doc, ensure_ascii=False))
         self.assertTrue(any("alias 与值撞车" in i for i in M.verify_vocabularies(tmp)[0]))
 
+    def test_python_probe_cannot_import_arbitrary_modules(self):
+        live, note = M._probe(".", {"kind": "python_attr", "module": "os",
+                                    "attr": "environ"})
+        self.assertEqual([], live)
+        self.assertIn("安全白名单", note)
+
+    def test_python_probe_cache_preserves_core_module_allowlist(self):
+        live, note = M._probe(".", {"kind": "python_attr",
+                                    "module": "core.assertions", "attr": "KINDS"})
+        self.assertTrue(live)
+        self.assertEqual("python_attr", note)
+
 
 class TestNormativeAndContractsNegatives(unittest.TestCase):
     def _base(self, tmp):

@@ -28,6 +28,8 @@
               "library_read", "pattern_list", "pattern_read", "knowledge_order_read",
               "module_read", "pipeline_read", "asset_list", "asset_read"],
     "prompts": ["assemble_guide"],
+    "tools_hash": "9a8fa91cd36f108495832a3a6b4b753a44eef5ceae9021b2d6d736b4f3ef4aff",
+    "prompts_hash": "3c35139c12aee2dd311efb4e203d4e0fc2d87aa15beb249601bc097c0b2be08b",
     "entry": "nf serve（缺省 = 实时仓库面，无需快照）｜快照面（可选）：nf run --fmt mcp → nf serve <mcp.json>",
     "default_surface": "live-repo（实时仓库面：缺省即用，agent 密集调用无需先产快照）",
     "snapshot_required": false

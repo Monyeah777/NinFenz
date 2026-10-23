@@ -11,8 +11,8 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
-  - scripts/nf.py:7b858aefa3f13fcb86063439716d870311088677ee914d0c2ea78b01e4d675b4
-  - verify.sh:bb69717b205769f5bf1e558e9dd15e7225f31de78cc0a4f18ffdea77f4a06dca
+  - scripts/nf.py:0547b6270060eb99ad6de8c14e55e90470dcfb22ad40c26a601ef4ab64d976db
+  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
@@ -24,6 +24,10 @@ subjects:
   - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：CI 三刀合入后重绑（诊断目录绝对化/fetch-tags/wasm skip）

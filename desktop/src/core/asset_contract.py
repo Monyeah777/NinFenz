@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import ast
 import csv
+import functools
 import hashlib
 import importlib.util
 import io
@@ -40,6 +41,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from core import atomic_write, json_doc, repo_face
+from core.atoms import hash as hash_atom
 
 DECL_REL = "protocol/asset_contracts.json"
 EXPORT_REL = "protocol/generated/asset_contract.frictionless.json"
@@ -63,7 +65,51 @@ def _strict_json(text: str) -> Any:
 
 def digest_of(path: Path) -> str:
     """文件内容摘要（防篡改判据的单一口径：sha256 十六进制）。"""
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    got = hash_atom.sha256_file_cached(path)
+    if got is None:
+        raise OSError("文件不可读：%s" % path)
+    return got
+
+
+@functools.lru_cache(maxsize=256)
+def _schema_doc_cached(path: str, mtime_ns: int, size: int) -> Dict[str, Any]:
+    _ = (mtime_ns, size)
+    doc = _strict_json(Path(path).read_text(encoding="utf-8"))
+    return doc if isinstance(doc, dict) else {}
+
+
+@functools.lru_cache(maxsize=16)
+def _declaration_doc_cached(path: str, mtime_ns: int, size: int) -> Dict[str, Any]:
+    _ = (mtime_ns, size)
+    doc = _strict_json(Path(path).read_text(encoding="utf-8"))
+    return doc if isinstance(doc, dict) else {}
+
+
+def _declaration_doc(root: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    p = Path(root) / DECL_REL
+    if not p.is_file():
+        return None, ("缺数字资产契约声明 %s（修复指引：新建并写入 schema=%s 与 data/code/script 三面）"
+                      % (DECL_REL, SCHEMA))
+    try:
+        st = p.stat()
+        return _declaration_doc_cached(str(p.resolve()), int(st.st_mtime_ns),
+                                       int(st.st_size)), None
+    except OSError as exc:
+        return None, "%s 不可读：%s（修复指引：修好权限或路径）" % (DECL_REL, exc)
+    except ValueError as exc:
+        return None, "%s 不可读或不是合法 JSON：%s（修复指引：修好语法）" % (DECL_REL, exc)
+
+
+def _schema_doc(root: str, rel: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    """schema 内容按 `(path, mtime, size)` 只读一次；扫描热路径不再逐件重开同一 schema。"""
+    p = Path(root) / rel
+    try:
+        st = p.stat()
+        return _schema_doc_cached(str(p.resolve()), int(st.st_mtime_ns), int(st.st_size)), None
+    except OSError as exc:
+        return None, "读不到 %s：%s（修复指引：核对声明里的路径在场）" % (rel, exc)
+    except ValueError as exc:
+        return None, "%s 不是合法 JSON：%s" % (rel, exc)
 
 
 def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
@@ -79,6 +125,9 @@ def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
 
 #: root → 仓库件集合（或 None = 采集失败：退回全量 glob）。一次进程内记忆。
 _REPO_FILES: dict[str, set | None] = {}
+_RESOLVE_MEMO: dict[tuple[str, str, str], List[str]] | None = None
+#: 只在一次 `scan()` 作用域内复用仓库件集合；直接 `resolve()` 调用一律现算（防陈旧缓存）。
+_REPO_SCOPE = False
 
 
 def _repo_files(root: str) -> set | None:
@@ -97,16 +146,38 @@ def _repo_files(root: str) -> set | None:
     # 继续加件，缓存会把后加的件吞掉（实测 test_asset_contract 的 schema_siblings 用例）。
     cacheable = (base / ".git").exists()
     key = str(base)
-    if cacheable and key in _REPO_FILES:
+    if cacheable and _REPO_SCOPE and key in _REPO_FILES:
         return _REPO_FILES[key]
     got: set | None = None
     try:
         got = {p.relative_to(base).as_posix() for p in repo_face.walk_repo_paths(str(root))}
     except (OSError, ValueError):
         got = None
-    if cacheable:
+    if cacheable and _REPO_SCOPE:
         _REPO_FILES[key] = got
     return got
+
+
+def clear_repo_files_cache() -> None:
+    """清空仓库件集合缓存（daemon 每请求 / 显式失效用）。"""
+    global _REPO_SCOPE, _RESOLVE_MEMO
+    _REPO_FILES.clear()
+    _RESOLVE_MEMO = None
+    _REPO_SCOPE = False
+
+
+def _begin_repo_scope() -> None:
+    global _REPO_SCOPE, _RESOLVE_MEMO
+    _REPO_FILES.clear()
+    _RESOLVE_MEMO = {}
+    _REPO_SCOPE = True
+
+
+def _end_repo_scope() -> None:
+    global _REPO_SCOPE, _RESOLVE_MEMO
+    _REPO_FILES.clear()
+    _RESOLVE_MEMO = None
+    _REPO_SCOPE = False
 
 
 def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
@@ -117,15 +188,29 @@ def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
     r = Path(root)
     if spec.get("path"):
         rel = str(spec["path"]).replace("\\", "/")
-        return [rel] if (r / rel).is_file() else []
+        key = (str(r.resolve()), "path", rel)
+        if _RESOLVE_MEMO is not None and key in _RESOLVE_MEMO:
+            return list(_RESOLVE_MEMO[key])
+        got = [rel] if (r / rel).is_file() else []
+        if _RESOLVE_MEMO is not None:
+            _RESOLVE_MEMO[key] = list(got)
+        return got
     pat = str(spec.get("glob") or "")
     if not pat:
         return []
-    hits = [p for p in r.glob(pat) if p.is_file()]
+    key = (str(r.resolve()), "glob", pat)
+    if _RESOLVE_MEMO is not None and key in _RESOLVE_MEMO:
+        return list(_RESOLVE_MEMO[key])
     repo_files = _repo_files(root)
     if repo_files is not None:
-        hits = [p for p in hits if p.relative_to(r).as_posix() in repo_files]
-    return sorted(p.relative_to(r).as_posix() for p in hits)
+        from core import conformance_scan as csc
+        got = sorted(rel for rel in repo_files if csc.match_rel(rel, pat))
+    else:
+        got = sorted(p.relative_to(r).as_posix()
+                     for p in r.glob(pat) if p.is_file())
+    if _RESOLVE_MEMO is not None:
+        _RESOLVE_MEMO[key] = list(got)
+    return got
 
 
 def _dig(obj: Any, path: str) -> Any:
@@ -160,13 +245,13 @@ def _data_json(root: str, rel: str, text: str, spec: Dict[str, Any]
                 sch_rel = cand
                 break
     if sch_rel:
-        sch_text, err = _read(root, sch_rel)
+        sch, err = _schema_doc(root, sch_rel)
         if err:
             issues.append("数据件 %s 的 schema 读不到：%s" % (rel, err))
         else:
             from core import json_schema as js
             try:
-                errs = js.json_schema_check(obj, _strict_json(sch_text or ""))
+                errs = js.json_schema_check(obj, sch or {})
             except ValueError as exc:
                 errs = ["schema 本身不是合法 JSON：%s" % exc]
             issues += ["数据件 %s 不符 schema %s：%s" % (rel, sch_rel, e) for e in errs[:5]]
@@ -297,11 +382,11 @@ def _schema_of(root: str, rel: str, spec: Dict[str, Any]) -> str:
 def _schema_issues(root: str, rel: str, obj: Any, sch_rel: str) -> List[str]:
     """按 schema 校验已解析对象（四格式共用：YAML/TOML 解析后与 JSON 同一数据模型）。"""
     from core import json_schema as js
-    sch_text, err = _read(root, sch_rel)
+    sch, err = _schema_doc(root, sch_rel)
     if err:
         return ["数据件 %s 的 schema 读不到：%s" % (rel, err)]
     try:
-        errs = js.json_schema_check(obj, _strict_json(sch_text))
+        errs = js.json_schema_check(obj, sch or {})
     except ValueError as exc:
         errs = ["schema 本身不是合法 JSON：%s" % exc]
     return ["数据件 %s 不符 schema %s：%s" % (rel, sch_rel, e) for e in errs[:5]]
@@ -1123,15 +1208,9 @@ def _registry_issues(root: str, doc: Dict[str, Any]) -> List[str]:
 
 def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     """读契约声明件 → (doc, issues)。缺件/坏件如实报，不抛裸异常。"""
-    p = Path(root) / DECL_REL
-    if not p.is_file():
-        return {}, ["缺数字资产契约声明 %s（修复指引：新建并写入 schema=%s 与 data/code/script 三面"
-            "）"
-                    % (DECL_REL, SCHEMA)]
-    try:
-        doc = _strict_json(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        return {}, ["%s 不可读或不是合法 JSON：%s（修复指引：修好语法）" % (DECL_REL, exc)]
+    doc, err = _declaration_doc(root)
+    if err:
+        return {}, [err]
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         return {}, ["%s schema 不匹配（期望 %s）（修复指引：改为声明件当前形态）" % (DECL_REL,
  SCHEMA)]
@@ -1166,12 +1245,8 @@ def frictionless_export(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
                 item["format"] = fmt
             sch_rel = _schema_of(root, rel, spec)
             if sch_rel:
-                stext, err = _read(root, sch_rel)
+                sch, err = _schema_doc(root, sch_rel)
                 if not err:
-                    try:
-                        sch = _strict_json(stext)
-                    except ValueError:
-                        sch = {}
                     keep = ("type", "required", "properties", "$schema", "title", "description")
                     if sch:
                         item["x-nf-json-schema"] = {k: sch[k] for k in keep if k in sch}
@@ -1205,7 +1280,9 @@ def _schema_self_check(root: str) -> List[str]:
     if not sp.is_file():
         return ["⑤ 缺可移植 schema %s（修复指引：补该件——对外可移植契约靠它定型）" % SCHEMA_REL]
     try:
-        doc = _strict_json((Path(root) / DECL_REL).read_text(encoding="utf-8"))
+        doc, err = _declaration_doc(root)
+        if err:
+            raise ValueError(err)
         sch = _strict_json(sp.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return ["⑤ 声明或 schema 不可读：%s（修复指引：修好 JSON）" % exc]
@@ -1234,6 +1311,15 @@ def _export_drift(root: str) -> List[str]:
 def scan(root: str = ".", faces: Iterable[str] = ()
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；门禁入口（check40 同源）。"""
+    _begin_repo_scope()
+    try:
+        return _scan_impl(root, faces)
+    finally:
+        _end_repo_scope()
+
+
+def _scan_impl(root: str = ".", faces: Iterable[str] = ()
+               ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     doc, issues = load(root)
     warns: List[str] = []
     stats: Dict[str, Any] = {f: 0 for f in FACES}

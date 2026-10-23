@@ -6,6 +6,8 @@
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -14,6 +16,14 @@ from core import json_doc
 DECL_REL = "protocol/mcp_package.json"
 SCHEMA = "nf-mcp-package/1"
 CATEGORIES = ("content-creation", "developer-tools", "knowledge-management")
+
+
+def surface_hash(defs: List[Dict[str, Any]], keys: Tuple[str, ...]) -> str:
+    """工具/提示面指纹（排序后的 name + schema/description 规范 JSON 的 sha256）。"""
+    payload = [{k: d.get(k) for k in keys} for d in defs]
+    text = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def decl(root: str = ".") -> Dict[str, Any]:
@@ -45,15 +55,33 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     if str(pkg.get("category")) not in CATEGORIES:
         issues.append("类目越词表：%s" % pkg.get("category"))
     # 红线「只读面不变」：与运行时逐名一致
+    tool_defs: List[Dict[str, Any]] = []
+    prompt_defs: List[Dict[str, Any]] = []
     try:
         from core.mcp_runtime import PROMPT_DEFS, TOOL_DEFS
-        live_tools = [t["name"] for t in TOOL_DEFS]
-        live_prompts = [p["name"] for p in PROMPT_DEFS]
+        tool_defs = list(TOOL_DEFS)
+        prompt_defs = list(PROMPT_DEFS)
+        live_tools = [t["name"] for t in tool_defs]
+        live_prompts = [p["name"] for p in prompt_defs]
     except Exception as exc:                      # 运行时可导入性本身也是判据
         issues.append("mcp_runtime 不可导入，无法核对工具面：%s" % exc)
         live_tools, live_prompts = [], []
     got_tools = [str(x) for x in (pkg.get("tools") or [])]
     got_prompts = [str(x) for x in (pkg.get("prompts") or [])]
+    tools_hash = surface_hash(tool_defs, ("name", "inputSchema"))
+    prompts_hash = surface_hash(prompt_defs, ("name", "description"))
+    want_tools_hash = str(pkg.get("tools_hash") or "")
+    want_prompts_hash = str(pkg.get("prompts_hash") or "")
+    if want_tools_hash and want_tools_hash != tools_hash:
+        issues.append("工具面指纹漂移：声明 %s / 运行时 %s（修复指引：核对 TOOL_DEFS 的 "
+                      "inputSchema 后重算 tools_hash）" % (want_tools_hash[:12], tools_hash[:12]))
+    elif not want_tools_hash:
+        warns.append("包装声明缺 tools_hash（修复指引：补工具面指纹，防 inputSchema 静默漂移）")
+    if want_prompts_hash and want_prompts_hash != prompts_hash:
+        issues.append("提示面指纹漂移：声明 %s / 运行时 %s" % (want_prompts_hash[:12],
+                                                              prompts_hash[:12]))
+    elif not want_prompts_hash:
+        warns.append("包装声明缺 prompts_hash（修复指引：补提示面指纹）")
     if sorted(got_tools) != sorted(live_tools):
         issues.append("工具面与运行时不一致（上架材料会漂移）：声明 %d 个 / 运行时 %d 个"
                       "（多：%s；少：%s）"
@@ -68,5 +96,6 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                      % (len(d["pending"]), "；".join(d["pending"][:2])))
     stats = {"tools": len(got_tools), "prompts": len(got_prompts),
              "targets": len(pkg.get("targets") or []),
-             "category": str(pkg.get("category"))}
+             "category": str(pkg.get("category")),
+             "tools_hash": tools_hash, "prompts_hash": prompts_hash}
     return issues, warns, stats

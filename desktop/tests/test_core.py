@@ -443,6 +443,12 @@ class TestModels(unittest.TestCase):
         m = Module(id="M22", category="情感类")
         self.assertEqual(m.full_id, "情感类:M22")
 
+    def test_module_source_path_is_declared_and_roundtrips(self):
+        rel = "community/demo/modules/M90_x.md"
+        m = Module(id="M90", category="通用类", source_path=rel)
+        self.assertEqual(rel, m.to_json()["source_path"])
+        self.assertEqual(rel, Module.from_json({"source_path": rel}).source_path)
+
     def test_pipeline_layer_lookup(self):
         p = make_pipeline()
         self.assertEqual(p.layer_ids, ["P00", "P40", "P80"])
@@ -459,6 +465,22 @@ class TestModels(unittest.TestCase):
     def test_constants(self):
         self.assertIn("情感类", CATEGORIES)
         self.assertEqual(len(LAYER_IDS), 9)
+
+
+class ModelTypeGuardTest(unittest.TestCase):
+    def test_module_from_json_rejects_wrong_types(self):
+        from core.models import Module
+
+        with self.assertRaises(ValueError):
+            Module.from_json({"inputs": "abc"})
+        with self.assertRaises(ValueError):
+            Module.from_json({"replaceable": "yes"})
+
+    def test_pipeline_from_json_rejects_bad_layers(self):
+        from core.models import Pipeline
+
+        with self.assertRaises(ValueError):
+            Pipeline.from_json({"layers": "x"})
 
 
 if __name__ == "__main__":

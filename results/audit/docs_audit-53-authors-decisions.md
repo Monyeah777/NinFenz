@@ -6,14 +6,18 @@ scope: 收口四项作者裁决的挂账（均取自本会话外挂账队列）�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/concept_graph.py:103122752de0b17b21865803e4b935e134133680c14704d1cccad0d8abf9a25b
+  - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:bb69717b205769f5bf1e558e9dd15e7225f31de78cc0a4f18ffdea77f4a06dca
+  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
 
 ---
+> 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
+
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-22）：CI 三刀合入后重绑（诊断目录绝对化/fetch-tags/wasm skip）
 
 > 重审（2026-10-22）：测试执行器、进程原子与 Windows shell 解析修复后重算代码度量基线与角色投影；既有审计结论不变

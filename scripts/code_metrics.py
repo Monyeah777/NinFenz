@@ -43,6 +43,9 @@ def _rust_scan():
     try:
         doc = json.loads(res[1].decode("utf-8"))
     except (ValueError, UnicodeDecodeError):
+        # Rust 输出不可解析时回退 Python 真源，保留完整诊断能力。
+        return None
+    if not isinstance(doc, dict):
         return None
     return doc.get("issues") or [], doc.get("warns") or [], doc.get("stats") or {}
 

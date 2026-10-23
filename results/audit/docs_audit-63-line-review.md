@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:7b858aefa3f13fcb86063439716d870311088677ee914d0c2ea78b01e4d675b4
+  - scripts/nf.py:0547b6270060eb99ad6de8c14e55e90470dcfb22ad40c26a601ef4ab64d976db
 ---
+> 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
+
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步
 
 > 重审（2026-10-22）：H1：nf verify 仓库信任门（重冻）

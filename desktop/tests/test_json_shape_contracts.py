@@ -149,6 +149,13 @@ class JsonDocHelperTest(unittest.TestCase):
         self.assertIn("不是合法 JSON", str(ctx.exception))
         self.assertIn("修复指引", str(ctx.exception))
 
+    def test_excessive_nesting_fails_before_recursive_parse(self):
+        too_deep = "[" * (json_doc.MAX_JSON_DEPTH + 1) + "]" * (json_doc.MAX_JSON_DEPTH + 1)
+        with self.assertRaisesRegex(ValueError, "嵌套过深"):
+            json_doc.loads(too_deep, list, what="deep")
+        ok = "[" * json_doc.MAX_JSON_DEPTH + "]" * json_doc.MAX_JSON_DEPTH
+        self.assertIsInstance(json_doc.loads(ok, list, what="ok"), list)
+
     def test_load_reports_missing_file_and_shape(self):
         with tempfile.TemporaryDirectory() as tmp:
             missing = Path(tmp) / "nope.json"

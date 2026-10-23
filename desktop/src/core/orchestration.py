@@ -31,6 +31,8 @@
 from __future__ import annotations
 
 import re
+import time
+from collections import deque
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from core import json_doc
@@ -282,32 +284,136 @@ def compile_plan(root: str = ".", plan: Optional[Dict[str, Any]] = None,
             "steps": steps, "issues": issues}
 
 
+_CIRCUIT: Dict[str, Dict[str, float]] = {}
+
+
+def _circuit_blocked(key: str, threshold: int, cooldown: float) -> bool:
+    if not key:
+        return False
+    rec = _CIRCUIT.get(key)
+    if not rec or rec.get("failures", 0) < threshold:
+        return False
+    if time.perf_counter() - rec.get("opened_at", 0.0) < cooldown:
+        return True
+    rec["failures"] = max(0, threshold - 1)   # half-open：放行一次探测
+    return False
+
+
+def _circuit_record(key: str, ok: bool, threshold: int) -> bool:
+    """记录一次结果 → 熔断是否处于打开态。"""
+    if not key:
+        return False
+    rec = _CIRCUIT.setdefault(key, {"failures": 0.0, "opened_at": 0.0})
+    if ok:
+        rec["failures"] = 0.0
+        rec["opened_at"] = 0.0
+        return False
+    rec["failures"] = rec.get("failures", 0.0) + 1
+    if rec["failures"] >= threshold:
+        rec["opened_at"] = time.perf_counter()
+        return True
+    return False
+
+
+def _skip_remaining(states: Dict[str, str], queue: deque) -> None:
+    for rest in queue:
+        states[rest] = "skipped"
+
+
 def dispatch(order: List[str], steps: Dict[str, Dict[str, Any]],
-             call: Callable[[str, Dict[str, Any]], Any]) -> Dict[str, Any]:
+             call: Callable[[str, Dict[str, Any]], Any], *,
+             max_seconds: Optional[float] = None,
+             max_step_seconds: Optional[float] = None,
+             breaker_key: str = "",
+             failure_threshold: int = 3,
+             cooldown_seconds: float = 60.0) -> Dict[str, Any]:
     """按编译出的序派发：**首个失败即停**（fail-closed），如实回执已执行 / 停在 / 未执行。
 
     每步若声明了 `expects`，则在**派发时**按此验收：返回值不是对象、或缺任一字段即视为失败
     （证据不齐不得往下走——「完成了」不是证据，产物字段才是）。
+
+    韧性扩展（2026-10-23，默认关闭以保持既有语义）：
+    - `max_seconds` / `max_step_seconds`：总/单步预算。Python 不能抢占已阻塞的同步调用，
+      故单步超时在调用返回后判定并 fail-closed（需要硬抢占时把 `call` 放到进程边界）；
+    - `breaker_key` + `failure_threshold` + `cooldown_seconds`：跨调用熔断；打开期间直接返回
+      `status=circuit_open`，冷却后放行一次半开探测；
+    - `states`：pending / running / done / failed / skipped 两阶段状态。
     """
     results: List[Dict[str, Any]] = []
-    for i, sid in enumerate(order):
+    states: Dict[str, str] = {sid: "pending" for sid in order}
+    started = time.perf_counter()
+    queue = deque(order)
+    if _circuit_blocked(breaker_key, failure_threshold, cooldown_seconds):
+        return {"executed": [], "results": [],
+                "stopped_at": order[0] if order else None,
+                "not_executed": list(order), "states": {sid: "skipped" for sid in order},
+                "status": "circuit_open", "stopped_reason": "circuit_open",
+                "circuit_open": True, "elapsed_s": 0.0}
+
+    while queue:
+        sid = queue.popleft()
         step = steps.get(sid) or {}
+        if (results and max_seconds is not None
+                and time.perf_counter() - started > max_seconds):
+            states[sid] = "skipped"
+            _skip_remaining(states, queue)
+            _circuit_record(breaker_key, False, failure_threshold)
+            return {"executed": [r["id"] for r in results], "results": results,
+                    "stopped_at": sid, "not_executed": [sid] + list(queue),
+                    "states": states, "status": "stopped",
+                    "stopped_reason": "timeout", "circuit_open": False,
+                    "elapsed_s": time.perf_counter() - started}
+        states[sid] = "running"
+        step_started = time.perf_counter()
         try:
             out = call(str(step.get("tool") or ""), dict(step.get("args") or {}))
         except Exception as exc:                              # noqa: BLE001 - 派发失败即停：异常也是「停」的证据
-            results.append({"id": sid, "tool": step.get("tool"), "ok": False, "detail": str(exc)})
+            states[sid] = "failed"
+            _skip_remaining(states, queue)
+            results.append({"id": sid, "tool": step.get("tool"), "ok": False, "detail": str(exc),
+                            "elapsed_s": time.perf_counter() - step_started})
+            opened = _circuit_record(breaker_key, False, failure_threshold)
             return {"executed": [r["id"] for r in results], "results": results,
-                    "stopped_at": sid, "not_executed": list(order[i + 1:])}
+                    "stopped_at": sid, "not_executed": list(queue),
+                    "states": states, "status": "stopped",
+                    "stopped_reason": "exception", "circuit_open": opened,
+                    "elapsed_s": time.perf_counter() - started}
+        elapsed = time.perf_counter() - step_started
+        if max_step_seconds is not None and elapsed > max_step_seconds:
+            states[sid] = "failed"
+            _skip_remaining(states, queue)
+            results.append({"id": sid, "tool": step.get("tool"), "ok": False,
+                            "detail": "单步超预算：%.3fs > %.3fs（修复指引：把该工具放到可抢占的"
+                                      "进程边界，或提高预算）" % (elapsed, max_step_seconds),
+                            "elapsed_s": elapsed})
+            opened = _circuit_record(breaker_key, False, failure_threshold)
+            return {"executed": [r["id"] for r in results], "results": results,
+                    "stopped_at": sid, "not_executed": list(queue),
+                    "states": states, "status": "stopped",
+                    "stopped_reason": "timeout", "circuit_open": opened,
+                    "elapsed_s": time.perf_counter() - started}
         missing = [str(k) for k in (step.get("expects") or [])
                    if not isinstance(out, dict) or str(k) not in out]
         if missing:
+            states[sid] = "failed"
+            _skip_remaining(states, queue)
             results.append({"id": sid, "tool": step.get("tool"), "ok": False,
-                            "detail": "缺证据：%s（该步 expects 未满足）" % "、".join(missing)})
+                            "detail": "缺证据：%s（该步 expects 未满足）" % "、".join(missing),
+                            "elapsed_s": elapsed})
+            opened = _circuit_record(breaker_key, False, failure_threshold)
             return {"executed": [r["id"] for r in results], "results": results,
-                    "stopped_at": sid, "not_executed": list(order[i + 1:])}
-        results.append({"id": sid, "tool": step.get("tool"), "ok": True, "detail": out})
+                    "stopped_at": sid, "not_executed": list(queue),
+                    "states": states, "status": "stopped",
+                    "stopped_reason": "evidence", "circuit_open": opened,
+                    "elapsed_s": time.perf_counter() - started}
+        states[sid] = "done"
+        _circuit_record(breaker_key, True, failure_threshold)
+        results.append({"id": sid, "tool": step.get("tool"), "ok": True, "detail": out,
+                        "elapsed_s": elapsed})
     return {"executed": [r["id"] for r in results], "results": results,
-            "stopped_at": None, "not_executed": []}
+            "stopped_at": None, "not_executed": [], "states": states,
+            "status": "complete", "stopped_reason": None, "circuit_open": False,
+            "elapsed_s": time.perf_counter() - started}
 
 
 def _sample_args(spec: Dict[str, Any]) -> Dict[str, Any]:

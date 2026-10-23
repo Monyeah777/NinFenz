@@ -6,6 +6,7 @@
    逐条对拍（防修复器漂移）。
 """
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -76,6 +77,23 @@ class TestInvalidCorpus(unittest.TestCase):
             subject.write_text("# v2\n", encoding="utf-8")
             issues = approval.verify(tmp)[0]
             self.assertTrue(any("批准已失效" in i for i in issues), issues)
+
+    def test_approval_actor_must_be_in_explicit_allowlist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            subject = Path(tmp, "doc.md")
+            subject.write_text("# v1\n", encoding="utf-8")
+            old = os.environ.get(approval.ENV_APPROVERS)
+            os.environ[approval.ENV_APPROVERS] = "alice"
+            try:
+                with self.assertRaises(ValueError):
+                    approval.approve(tmp, "doc.md", "mallory")
+                approval.approve(tmp, "doc.md", "alice")
+                self.assertEqual([], approval.verify(tmp)[0])
+            finally:
+                if old is None:
+                    os.environ.pop(approval.ENV_APPROVERS, None)
+                else:
+                    os.environ[approval.ENV_APPROVERS] = old
 
     def test_invalid_module_boundary_drift(self):
         with tempfile.TemporaryDirectory() as tmp:

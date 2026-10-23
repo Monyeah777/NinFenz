@@ -2051,7 +2051,7 @@ if l_issues:
 
 # 7 遥测 semconv：属性映射 + 结构化入参/出参 + OTLP 形状/确定性（2026-10-07 扩面：
 #   旧判据只查两个属性名，而 to_span/to_export 的 OTLP 形状、属性列表形态、
-#   同输入确定性、traceId 留空纪律都无门禁项——声明「OTLP 形状对齐」却只判两点。）
+#   同输入确定性、OTLP ID 定长 hex 纪律都无门禁项——声明「OTLP 形状对齐」却只判两点。）
 try:
     _rec = {'tool': 'nf assemble', 'phase': 'plan', 'requirement': 'r',
             'matched': 1, 'ok': True}
@@ -2081,8 +2081,12 @@ try:
         problems.append('OTLP 形状：attributes 须为 {key,value} 列表')
     if ts.to_export([_rec, _rec]) != _exp:
         problems.append('OTLP 形状：同输入两次导出不一致（非确定性）')
-    if _span['traceId'] != '':
-        problems.append('OTLP 形状：traceId 应留空（时间戳纪律：由采集方外套）')
+    if (len(_span['traceId']) != 32
+            or any(c not in '0123456789abcdef' for c in _span['traceId'])):
+        problems.append('OTLP 形状：traceId 须为 32 位小写 hex')
+    if (len(_span['spanId']) != 16
+            or any(c not in '0123456789abcdef' for c in _span['spanId'])):
+        problems.append('OTLP 形状：spanId 须为 16 位小写 hex')
     _ts_line = 'span 键 %d · 属性 %d · scope %s' % (len(_need), len(_span['attributes']),
                                                    ts.SCOPE_NAME)
 except Exception as _exc:

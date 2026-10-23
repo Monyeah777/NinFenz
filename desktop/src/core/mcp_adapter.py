@@ -18,6 +18,7 @@ skill/agents 拒出纪律）。
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -34,12 +35,19 @@ def _slug(name: str) -> str:
 def _resource(pid: str, layer_id: str, module) -> dict:
     """IR 模块 → MCP Resource（uri 层级编码 pipeline/layer/module）。"""
     num = str(module.full_id).split(":")[-1]
+    # 唯一命名空间：layer + full_id 的密码学短哈希，防同名/同号模块撞 URI。
+    ns = "%s/%s/%s" % (pid, layer_id or "extra", module.full_id)
+    short = hashlib.sha256(ns.encode("utf-8")).hexdigest()[:8]
+    source = str(getattr(module, "source_path", "") or module.full_id)
     return {
         "uri": f"nf://{pid}/{layer_id or 'extra'}/{_slug(module.name)}"
-               f"-{num}",
+               f"-{num}-{short}",
         "name": f"{module.full_id} · {module.name}",
         "mimeType": "text/markdown",
         "text": module.content or "（无正文）",
+        # 溯源/信任元数据：运行时据此对社区来源打 nf.trust 标注（官方来源无前缀则不标）。
+        "source": source,
+        "_meta": {"nf.source": source},
     }
 
 
@@ -47,11 +55,22 @@ def _build_mcp_json(ir: IRDocument) -> dict:
     """techdoc IR → MCP server 定义 dict（capabilities.resources 声明）。"""
     name = f"{ir.pipeline_id}-mcp" if ir.pipeline_id else "nf-mcp"
     resources = []
+    seen = set()
     for layer in ir.layers:
         for m in layer.modules:
-            resources.append(_resource(ir.pipeline_id, layer.id, m))
+            item = _resource(ir.pipeline_id, layer.id, m)
+            if item["uri"] in seen:
+                raise ValueError("MCP 资源 uri 重复：%s（修复指引：核对模块 full_id/layer）"
+                                 % item["uri"])
+            seen.add(item["uri"])
+            resources.append(item)
     for m in ir.extra_modules:
-        resources.append(_resource(ir.pipeline_id, m.layer, m))
+        item = _resource(ir.pipeline_id, m.layer, m)
+        if item["uri"] in seen:
+            raise ValueError("MCP 资源 uri 重复：%s（修复指引：核对模块 full_id/layer）"
+                             % item["uri"])
+        seen.add(item["uri"])
+        resources.append(item)
     return {
         "mcp": {
             "name": name,
@@ -74,5 +93,6 @@ def export_mcp(ir: IRDocument, dest_dir: Path, res) -> None:
     mcp_path = dest_dir / "mcp.json"
     # 原子写（2026-09-30 收口）：交付件不留半截（MCP 客户端会在装载时读它）。
     atomic_write.write_text(mcp_path, json.dumps(_build_mcp_json(ir),
-                                                 ensure_ascii=False, indent=2))
+                                                 ensure_ascii=False, indent=2,
+                                                 sort_keys=True))
     res.files.append(str(mcp_path))

@@ -12,17 +12,55 @@
 """
 from __future__ import annotations
 
-import json
+import functools
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import json_doc
+from core import redos_scan
 
 DECL_REL = "protocol/assertions.json"
 SCHEMA = "nf-assertions/1"
 SEVERITIES = ("fail", "warn")
 REQUIRED = ("id", "severity", "kind", "params", "message", "fix")
+MAX_ASSERT_FILE_BYTES = 8 * 1024 * 1024
+MAX_PATTERN_CHARS = 4096
+_NESTED_QUANTIFIER = re.compile(r"\(([^()]*)\)\s*(?:[+*]|\{\d*,?\d*\})")
+
+
+@functools.lru_cache(maxsize=256)
+def _compiled(pattern: str) -> re.Pattern[str]:
+    """断言正则只编译一次（模式是纯函数）。"""
+    if len(pattern) > MAX_PATTERN_CHARS:
+        raise ValueError("正则过长（%d > %d）（修复指引：拆分断言或改用有界字符类）"
+                         % (len(pattern), MAX_PATTERN_CHARS))
+    if re.search(r"\\[1-9]", pattern):
+        raise ValueError("正则含反向引用（回溯风险，封闭集不允许；修复指引：改写为无反向引用的模式）")
+    shape = redos_scan.suspicious_nesting(pattern)
+    if shape:
+        raise ValueError("正则含量词套量词（ReDoS 风险，封闭集不允许；修复指引：增加强制分隔符）：%s"
+                         % shape)
+    for match in _NESTED_QUANTIFIER.finditer(pattern):
+        body = match.group(1)
+        if "|" in body or re.search(r"(?:[+*]|\{\d*,?\d*\})", body):
+            raise ValueError("正则含嵌套重复/歧义分支（ReDoS 风险，封闭集不允许）：%s"
+                             % match.group(0))
+    return re.compile(pattern)
+
+
+def _read_bounded(path: Path) -> Tuple[str | None, str | None]:
+    """有上限地读文本 → (text, error)；超过上限/不可读一律 fail-closed。"""
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        return None, "不可读：%s" % exc
+    if size > MAX_ASSERT_FILE_BYTES:
+        return None, "文件过大（%d > %d 字节）" % (size, MAX_ASSERT_FILE_BYTES)
+    try:
+        return path.read_text(encoding="utf-8"), None
+    except (OSError, UnicodeError) as exc:
+        return None, "不可读：%s" % exc
 
 
 def load(root: str = ".") -> Dict[str, Any]:
@@ -39,12 +77,16 @@ def _glob(root: str, pattern: str) -> List[str]:
 
 
 def _k_regex_absent(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
-    pat = re.compile(str(params.get("pattern") or ""))
+    pat = _compiled(str(params.get("pattern") or ""))
     hits = []
     for g in params.get("globs") or []:
         for f in _glob(root, str(g)):
-            if pat.search(Path(f).read_text(encoding="utf-8")):
+            text, err = _read_bounded(Path(f))
+            if err is not None:
+                return False, "%s：%s" % (f, err)
+            if pat.search(text or ""):
                 hits.append(f)
+                return False, "命中：%s" % f
     return (not hits, "零命中" if not hits else "命中：%s" % ", ".join(hits[:2]))
 
 
@@ -52,7 +94,9 @@ def _k_regex_present(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
     path = Path(root) / str(params.get("path") or "")
     if not path.is_file():
         return False, "目标件不存在：%s" % params.get("path")
-    text = path.read_text(encoding="utf-8")
+    text, err = _read_bounded(path)
+    if err is not None:
+        return False, "%s：%s" % (params.get("path"), err)
     miss = [p for p in (params.get("patterns") or []) if p not in text]
     return (not miss, "%d 锚点齐" % len(params.get("patterns") or [])
             if not miss else "缺：%s" % ", ".join(miss[:3]))
@@ -68,8 +112,11 @@ def _k_json_value(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
     path = Path(root) / str(params.get("path") or "")
     if not path.is_file():
         return False, "目标件不存在：%s" % params.get("path")
+    text, err = _read_bounded(path)
+    if err is not None:
+        return False, "%s：%s" % (params.get("path"), err)
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(text or "", None, what=str(path))
     except ValueError as exc:
         return False, "JSON 不可解析：%s" % exc
     cur: Any = doc
@@ -212,6 +259,11 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             issues.append("断言 %s severity 越词表：%s" % (aid, a.get("severity")))
         if str(a.get("kind")) not in KINDS:
             issues.append("断言 %s kind 不在封闭集：%s" % (aid, a.get("kind")))
+        elif str(a.get("kind")) == "regex_absent":
+            try:
+                _compiled(str((a.get("params") or {}).get("pattern") or ""))
+            except (ValueError, re.error) as exc:
+                issues.append("断言 %s 的正则不可安全执行：%s" % (aid, exc))
         if not str(a.get("fix") or "").strip():
             issues.append("断言 %s 缺 fix（无修复指引不许入表）" % aid)
     cap_issues, cap_stats = capability_report(root)

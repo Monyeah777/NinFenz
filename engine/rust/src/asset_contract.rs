@@ -131,18 +131,18 @@ pub fn resolve(root: &Path, spec: &Json) -> Vec<String> {
 }
 
 /// 真源 `_dig`：按点号路径取值；取不到 → `None`（哨兵）。
-pub fn dig(obj: &Json, path: &str) -> Option<Json> {
-    let mut cur = obj.clone();
+pub fn dig_ref<'a>(obj: &'a Json, path: &str) -> Option<&'a Json> {
+    let mut cur = obj;
     for part in path.split('.') {
-        match &cur {
+        match cur {
             Json::Object(o) => match o.iter().find(|(k, _)| k == part) {
-                Some((_, v)) => cur = v.clone(),
+                Some((_, v)) => cur = v,
                 None => return None,
             },
             Json::Array(a) => {
                 let idx: Option<usize> = part.parse().ok();
                 match idx {
-                    Some(i) if i < a.len() => cur = a[i].clone(),
+                    Some(i) if i < a.len() => cur = &a[i],
                     _ => return None,
                 }
             }
@@ -150,6 +150,11 @@ pub fn dig(obj: &Json, path: &str) -> Option<Json> {
         }
     }
     Some(cur)
+}
+
+/// 需要所有权时的兼容包装（只克隆最终值，不克隆整棵树）。
+pub fn dig(obj: &Json, path: &str) -> Option<Json> {
+    dig_ref(obj, path).cloned()
 }
 
 // ---------------------------------------------------------------- CSV（Python csv.reader 默认方言）
@@ -267,7 +272,7 @@ fn fields_issues(rel: &str, obj: &Json, spec: &Json) -> Vec<String> {
     if let Some(Json::Array(req)) = obj_get(spec, "required_fields") {
         for field in req {
             let f = pyval::plain_str(field);
-            if dig(obj, &f).is_none() {
+            if dig_ref(obj, &f).is_none() {
                 issues.push(format!(
                     "数据件 {} 缺必填字段 {}（修复指引：补字段或从声明里删掉——声明即契约）",
                     rel, f
@@ -439,8 +444,8 @@ fn data_link(root: &Path, rel: &str, spec: &Json, obj: &Json) -> Vec<String> {
     let link = sg(spec, "link");
     let mut issues: Vec<String> = Vec::new();
     let path_field = sg_str(&link, "path_field");
-    let target = match dig(obj, &path_field) {
-        Some(Json::Str(s)) if !s.is_empty() => s,
+    let target = match dig_ref(obj, &path_field) {
+        Some(Json::Str(s)) if !s.is_empty() => s.clone(),
         _ => {
             return vec![format!(
                 "数据件 {} 的 link.path_field={} 取不到字符串路径（修复指引：核对字段名）",
@@ -473,7 +478,7 @@ fn data_link(root: &Path, rel: &str, spec: &Json, obj: &Json) -> Vec<String> {
     };
     let rows_field = sg_str(&link, "rows_field");
     if !rows_field.is_empty() {
-        let want = dig(obj, &rows_field).unwrap_or(Json::Null);
+        let want = dig_ref(obj, &rows_field).cloned().unwrap_or(Json::Null);
         let got = std::fs::read_to_string(&fpath)
             .map(|t| csv_rows(&t).len().saturating_sub(1))
             .unwrap_or(0);
@@ -576,7 +581,7 @@ fn data_jsonl(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
             }
         };
         for f in sg_strs(spec, "required_fields") {
-            if dig(&obj, &f).is_none() {
+            if dig_ref(&obj, &f).is_none() {
                 issues.push(format!(
                     "数据件 {} 第 {} 行缺必填字段 {}（修复指引：补字段）",
                     rel,

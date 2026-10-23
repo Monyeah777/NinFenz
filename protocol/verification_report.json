@@ -20,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 10,
+        "imports": 11,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 64,
+        "raises": 67,
         "sinks": 20
       },
       "status": "pass",
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 303,
-        "files": 303,
-        "max_fn_cc": 115,
-        "max_fn_lines": 1258,
-        "max_lines": 7570
+        "baseline": 307,
+        "files": 307,
+        "max_fn_cc": 116,
+        "max_fn_lines": 1263,
+        "max_lines": 7646
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 216,
-        "probed": 216
+        "patterns": 229,
+        "probed": 229
       },
       "status": "pass",
       "warns": 0
@@ -432,11 +432,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 252,
-        "modules": 252,
+        "metrics_recorded": 256,
+        "modules": 256,
         "registered_cycles": 0,
-        "registered_sdp": 9,
-        "sdp": 9
+        "registered_sdp": 10,
+        "sdp": 10
       },
       "status": "pass",
       "warns": 0
@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 7,
         "data": 10,
-        "files": 1256,
+        "files": 1258,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -526,9 +526,9 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3823,
-        "kernel": 1990,
-        "kernel_no_self": 309,
+        "files": 3835,
+        "kernel": 1999,
+        "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "f65b8114f7c76721996eaffa10963abf53b08f8a7d0c58c59dee7875e3f9e6e9",
+  "root_digest": "d4d89ffea6114a2b10d3c8539045e76bcad4e5522ea2bbdd0c03a9ac909bfce0",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
