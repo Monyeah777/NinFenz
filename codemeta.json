@@ -1,0 +1,30 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "ninfenz",
+  "name": "NinFenz",
+  "alternateName": "NF",
+  "description": "NinFenz is a model-agnostic content contract layer for loadable, verifiable, and reproducible long-form content production.",
+  "version": "1.0.5",
+  "license": "MIT",
+  "codeRepository": "https://github.com/Monyeah777/NinFenz",
+  "url": "https://ninfenz.dev/",
+  "author": {
+    "@type": "Person",
+    "givenName": "Monyeah777",
+    "url": "https://github.com/Monyeah777"
+  },
+  "programmingLanguage": [
+    "Python",
+    "Rust",
+    "JavaScript"
+  ],
+  "keywords": [
+    "content contract layer",
+    "long-form content",
+    "model-agnostic protocol",
+    "quality gate",
+    "MCP"
+  ]
+}
+
