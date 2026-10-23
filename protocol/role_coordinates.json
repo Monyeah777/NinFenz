@@ -3,10 +3,10 @@
     "app": 1449,
     "entry": 25,
     "floor": 5,
-    "prod": 1037,
+    "prod": 1039,
     "projection": 129,
-    "support": 229,
-    "verify": 948
+    "support": 230,
+    "verify": 952
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6785,6 +6785,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Rust 只读快线（engine/rust · nf-rs）的 Python 客户端：可选加速 + 干净回退。",
+      "path": "desktop/src/core/rust_engine.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "PyO3 扩展（nf_pyengine）的进程内原语包装：sha256 / float_repr，含 stdlib 回退。",
+      "path": "desktop/src/core/rust_pyext.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "43 A1 —— 协议层 IDL 校验器（自实现 JSON-schema 子集 + 全量件扫描）。",
       "path": "desktop/src/core/schema_lint.py",
       "role": "verify",
@@ -8717,6 +8729,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Rust 只读快线客户端（core.rust_engine）的常驻回归。",
+      "path": "desktop/tests/test_rust_engine.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Rust 只读快线（engine/rust · nf-rs）与 Python 真源的逐字节对账门禁。",
       "path": "desktop/tests/test_rust_fastlane.py",
       "role": "verify",
@@ -8725,6 +8743,12 @@
     {
       "function": "AOT 快线的**模块接线**判据：每个 .rs 都参与编译、每个模块都真的被用上。",
       "path": "desktop/tests/test_rust_module_wiring.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "PyO3 原语包装（core.rust_pyext）的常驻回归。",
+      "path": "desktop/tests/test_rust_pyext.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -10391,7 +10415,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "进程内绑定的业务原语单源 = engine/rust 的 rlib（不重抄 sha256 / float repr，避免两份口径）。",
       "path": "engine/rust/pyo3/Cargo.toml",
       "role": "verify",
       "rule": "R-verify"
@@ -10865,6 +10889,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/repo_paths.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[derive(Default, Clone, Debug, PartialEq)]",
       "path": "engine/rust/src/schema_lint.rs",
       "role": "verify",
@@ -10873,6 +10903,12 @@
     {
       "function": "[derive(Default, Clone)]",
       "path": "engine/rust/src/score.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/serve.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11952,17 +11988,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "748a4122699d95818b280bc6d96a0a7c7e2a1833ed35127b4557f874d11ac312",
+  "root_digest": "f1bd97ade0ccb58f53151951ab3b02af4ad3c40a33903fda021fb4dfc4cfe12d",
   "rule_counts": {
     "R-app": 1449,
-    "R-catch": 91,
+    "R-catch": 92,
     "R-entry": 25,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
     "R-support": 113,
-    "R-verify": 831,
-    "auto:R-core": 250
+    "R-verify": 835,
+    "auto:R-core": 252
   },
   "schema": "nf-role-coordinates/1"
 }

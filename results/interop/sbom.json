@@ -3,7 +3,7 @@
   "comment": "派生面非真源；created = max(仓内声明日期: score_baseline / provenance / approvals)（保确定性，非墙钟）。",
   "creationInfo": {
     "comment": "由纯度扫描登记面（HARD_ALLOW / SOFT_IMPORTS）实时派生；created = 仓内声明日期最大值（非墙钟，保确定性）",
-    "created": "2026-10-22T00:00:00Z",
+    "created": "2026-10-23T00:00:00Z",
     "creators": [
       "Tool: nf interop --kind sbom"
     ]
@@ -72,6 +72,13 @@
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "laya"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-nf_pyengine",
+      "comment": "软依赖（可选，须 try/except 守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "nf_pyengine"
     }
   ],
   "relationships": [
@@ -99,6 +106,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-laya"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-nf_pyengine"
     }
   ],
   "spdxVersion": "SPDX-2.3"

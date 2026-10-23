@@ -43,6 +43,7 @@ fancy-regex = "0.14"
 # TOML 读取（真源 output_forms._check_toml 用 tomllib）——纯 Rust，实测依赖树无
 # windows-sys / windows-link / iana-time / chrono / winapi ⇒ 不触发 dlltool 陷阱。
 toml = "0.8"
+rayon = "1"
 rustpython-parser = "0.4"
 # `visitor` 特性在 `rustpython-ast` 上（`rustpython-parser` 不转发）——本线要用它做带深度的遍历
 # 以还原 CPython `ast.walk` 的 **BFS** 序；`unparse` 用于调用目标名的重建。

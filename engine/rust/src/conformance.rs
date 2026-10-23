@@ -279,6 +279,12 @@ pub fn run_live(root: &Path) -> Json {
 pub const REPORT_REL: &str = "protocol/conformance_report.json";
 
 pub fn verify_committed(root: &Path) -> (Vec<String>, Json) {
+    let live = run_live(root);
+    verify_committed_with(root, &live)
+}
+
+/// 同 `verify_committed`，但**复用调用方已算出的 live 报告**（避免全套契约跑两遍）。
+pub fn verify_committed_with(root: &Path, live: &Json) -> (Vec<String>, Json) {
     let p = root.join(REPORT_REL);
     if !p.is_file() {
         return (
@@ -298,7 +304,6 @@ pub fn verify_committed(root: &Path) -> (Vec<String>, Json) {
         Ok(v) => v,
         Err(e) => return (vec![format!("报告 JSON 不可解析：{}", e)], Json::Object(vec![])),
     };
-    let live = run_live(root);
     let mut issues: Vec<String> = Vec::new();
     let g = |v: &Json, k: &str| -> Option<Json> {
         match v {
@@ -306,31 +311,31 @@ pub fn verify_committed(root: &Path) -> (Vec<String>, Json) {
             _ => None,
         }
     };
-    if g(&committed, "root") != g(&live, "root") {
+    if g(&committed, "root") != g(live, "root") {
         issues.push(format!(
             "报告过期或被改：root 记录={} 实测={}（修复指引：nf conformance --write）",
             crate::pyval::plain_str(&g(&committed, "root").unwrap_or(Json::Null))
                 .chars()
                 .take(16)
                 .collect::<String>(),
-            crate::pyval::plain_str(&g(&live, "root").unwrap_or(Json::Null))
+            crate::pyval::plain_str(&g(live, "root").unwrap_or(Json::Null))
                 .chars()
                 .take(16)
                 .collect::<String>(),
         ));
     }
-    if g(&committed, "verdict") != g(&live, "verdict") {
+    if g(&committed, "verdict") != g(live, "verdict") {
         issues.push(format!(
             "verdict 不一致：记录={} 实测={}",
             crate::pyval::py_str(Some(&g(&committed, "verdict").unwrap_or(Json::Null))),
-            crate::pyval::py_str(Some(&g(&live, "verdict").unwrap_or(Json::Null))),
+            crate::pyval::py_str(Some(&g(live, "verdict").unwrap_or(Json::Null))),
         ));
     }
     let stats = Json::Object(vec![
-        ("contracts".to_string(), g(&live, "total").unwrap_or(Json::Int(0))),
-        ("passed".to_string(), g(&live, "passed").unwrap_or(Json::Int(0))),
-        ("verdict".to_string(), g(&live, "verdict").unwrap_or(Json::Null)),
-        ("root".to_string(), g(&live, "root").unwrap_or(Json::Null)),
+        ("contracts".to_string(), g(live, "total").unwrap_or(Json::Int(0))),
+        ("passed".to_string(), g(live, "passed").unwrap_or(Json::Int(0))),
+        ("verdict".to_string(), g(live, "verdict").unwrap_or(Json::Null)),
+        ("root".to_string(), g(live, "root").unwrap_or(Json::Null)),
     ]);
     (issues, stats)
 }

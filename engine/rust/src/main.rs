@@ -86,6 +86,7 @@ mod quant_metrics;
 mod rating_gate;
 mod receipts;
 mod receipts_verify;
+mod repo_paths;
 mod verify_report;
 mod world_model;
 mod xmlmini;
@@ -97,12 +98,14 @@ mod output_tables;
 mod workflow_policy;
 
 mod stats;
+mod serve;
 #[cfg(test)]
 mod testutil;
 
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::Mutex;
 
 const USAGE: &str = "\
 nf-rs —— NF 只读快线（与 Python 真源逐字节对账）
@@ -132,16 +135,59 @@ fn main() -> ExitCode {
     }
 }
 
+/// 常驻 worker 的 stdout 捕获缓冲（仅 `serve` 模式置位；CLI 模式恒为 None）。
+///
+/// 这是「零分叉面逻辑」的关键：worker 复用 `run()` 整段分派，只把 stdout 从真实流换成
+/// 内存缓冲。任何新增只读面自动可被 worker 服务，字节一致性天然继承。
+static STDOUT_CAPTURE: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+
 fn emit(bytes: &[u8], out: &Option<PathBuf>) -> Result<(), String> {
     match out {
         Some(p) => std::fs::write(p, bytes).map_err(|e| format!("写 {} 失败：{}", p.display(), e)),
         None => {
+            let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+            if let Some(buf) = cap.as_mut() {
+                buf.extend_from_slice(bytes);
+                return Ok(());
+            }
+            drop(cap);
             let stdout = std::io::stdout();
             let mut lock = stdout.lock();
             lock.write_all(bytes).map_err(|e| format!("写标准输出失败：{}", e))?;
             lock.flush().map_err(|e| format!("刷新标准输出失败：{}", e))
         }
     }
+}
+
+/// 在捕获模式下跑一遍 `run()`，取回 stdout 字节与退出码。
+///
+/// 只给常驻 worker（`serve`）用：CLI 正常路径的 `emit` 仍走真实 stdout（捕获恒为 None）。
+/// 退出码口径与 `run()` 一致：`Err` 折算 2（与 `main` 的兜底同款）。
+pub(crate) fn run_capture(args: &[String]) -> (Vec<u8>, i32) {
+    {
+        let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+        *cap = Some(Vec::new());
+    }
+    let code = match run(args) {
+        // `ExitCode` 的数值面在稳定 Rust 里不可读回，故用「是否 SUCCESS」还原：
+        // 本线 faces 只产 SUCCESS(0) 或 from(1)（有 issue）；usage 错误走 Err（main 折算 2）。
+        Ok(c) => {
+            if c == ExitCode::SUCCESS {
+                0
+            } else {
+                1
+            }
+        }
+        Err(msg) => {
+            eprintln!("nf-rs: {}", msg);
+            2
+        }
+    };
+    let out = {
+        let mut cap = STDOUT_CAPTURE.lock().unwrap_or_else(|e| e.into_inner());
+        cap.take().unwrap_or_default()
+    };
+    (out, code)
 }
 
 fn require_dir(root: &PathBuf) -> Result<(), String> {
@@ -176,6 +222,7 @@ fn run(args: &[String]) -> Result<ExitCode, String> {
         "score" => run_score(&args[1..]),
         "verify-report" => run_verify_report(&args[1..]),
         "pyval" => run_pyval(&args[1..]),
+        "serve" => crate::serve::run_serve(&args[1..]),
         other => Err(format!("未知命令：{}（修复指引：nf-rs --help）", other)),
     }
 }
@@ -212,12 +259,8 @@ fn run_depth_scan(args: &[String]) -> Result<ExitCode, String> {
         ("stats".to_string(), stats),
     ]);
     let text = doc.dumps_file();
-    match out {
-        Some(path) => {
-            std::fs::write(&path, text).map_err(|e| format!("写 {} 失败：{}", path, e))?;
-        }
-        None => print!("{}", text),
-    }
+    // 统一走 emit：CLI 写 stdout/文件，常驻 worker 写捕获缓冲（print! 绕过捕获会返回空字节）。
+    emit(text.as_bytes(), &out.map(PathBuf::from))?;
     if issues.is_empty() {
         Ok(ExitCode::SUCCESS)
     } else {
@@ -253,10 +296,7 @@ fn run_code_metrics(args: &[String]) -> Result<ExitCode, String> {
         ("stats".to_string(), stats),
     ]);
     let bytes = doc.dumps_file().into_bytes();
-    match out {
-        Some(o) => std::fs::write(&o, &bytes).map_err(|e| format!("写 {} 失败：{}", o, e))?,
-        None => print!("{}", String::from_utf8_lossy(&bytes)),
-    }
+    emit(&bytes, &out.map(PathBuf::from))?;
     Ok(ExitCode::SUCCESS)
 }
 
@@ -291,10 +331,7 @@ fn run_purity_scan(args: &[String]) -> Result<ExitCode, String> {
     ]);
     // 落盘走 `dumps_file`（带尾换行），与真源侧 json.dumps(...) + "\n" 同形
     let bytes = doc.dumps_file().into_bytes();
-    match out {
-        Some(o) => std::fs::write(&o, &bytes).map_err(|e| format!("写 {} 失败：{}", o, e))?,
-        None => print!("{}", String::from_utf8_lossy(&bytes)),
-    }
+    emit(&bytes, &out.map(PathBuf::from))?;
     Ok(ExitCode::SUCCESS)
 }
 
@@ -322,10 +359,7 @@ fn run_purity_facts(args: &[String]) -> Result<ExitCode, String> {
     }
     let doc = crate::pyast::facts_dump(&root);
     let bytes = doc.dumps().into_bytes();
-    match out {
-        Some(o) => std::fs::write(&o, &bytes).map_err(|e| format!("写 {} 失败：{}", o, e))?,
-        None => print!("{}", String::from_utf8_lossy(&bytes)),
-    }
+    emit(&bytes, &out.map(PathBuf::from))?;
     Ok(ExitCode::SUCCESS)
 }
 
@@ -336,6 +370,7 @@ fn run_receipts(args: &[String]) -> Result<ExitCode, String> {
     let mut root: Option<PathBuf> = None;
     let mut scope = "protocol".to_string();
     let mut out: Option<PathBuf> = None;
+    let mut json = false;
     let mut i = 1;
     while i < args.len() {
         match args[i].as_str() {
@@ -351,6 +386,7 @@ fn run_receipts(args: &[String]) -> Result<ExitCode, String> {
                 i += 1;
                 out = Some(PathBuf::from(args.get(i).ok_or("--out 后缺路径")?));
             }
+            "--json" => json = true,
             other => return Err(format!("未知参数：{}", other)),
         }
         i += 1;
@@ -377,6 +413,44 @@ fn run_receipts(args: &[String]) -> Result<ExitCode, String> {
             for i in &issues {
                 eprintln!("[FAIL] {}", i);
             }
+            if issues.is_empty() {
+                Ok(ExitCode::SUCCESS)
+            } else {
+                Ok(ExitCode::from(1))
+            }
+        }
+        // `nf receipts --json` 的同形物：在盘回执 == 实时重算（根 + 逐件摘要 + 包含证明）。
+        "verify" => {
+            if !json {
+                return Err(
+                    "本线只实现 receipts verify --json（修复指引：加 --json）".into(),
+                );
+            }
+            let p = root.join("protocol/RECEIPTS.json");
+            let raw = std::fs::read_to_string(&p)
+                .map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
+            let v: serde_json::Value = serde_json::from_str(&raw)
+                .map_err(|e| format!("{} 不是合法 JSON：{}", p.display(), e))?;
+            let doc = jsonread::convert(&v)
+                .map_err(|e| format!("{} 转换失败：{}", p.display(), e))?;
+            let (issues, stats) = receipts::verify_scope(&doc, &root);
+            let out_doc = pyjson::Json::Object(vec![
+                (
+                    "kind".to_string(),
+                    pyjson::Json::Str("receipts".to_string()),
+                ),
+                (
+                    "issues".to_string(),
+                    pyjson::Json::Array(
+                        issues
+                            .iter()
+                            .map(|s| pyjson::Json::Str(s.clone()))
+                            .collect(),
+                    ),
+                ),
+                ("stats".to_string(), stats),
+            ]);
+            emit(out_doc.dumps_file().as_bytes(), &out)?;
             if issues.is_empty() {
                 Ok(ExitCode::SUCCESS)
             } else {
@@ -990,8 +1064,71 @@ fn int_field(j: &pyjson::Json, k: &str) -> i64 {
 
 /// 裁决行 → 封缄报告。输入可以是**契约行数组**，也可以是含 `contracts` 的真源报告对象；
 /// 行内若自带 `digest` 则顺带做差分核对（**不信任输入摘要**）。
+/// `nf-rs conformance run --root <仓库根> --json [--out <文件>]`：
+/// 全量实时重算 27 条契约 → 封缄报告 + 与在盘报告比对（真源 `nf conformance --json` 的同形物）。
+/// 人类可读面留在 Python 真源；本线只服务机器面（`--json`）。
+fn run_conformance_run(args: &[String]) -> Result<ExitCode, String> {
+    let mut root: Option<PathBuf> = None;
+    let mut json = false;
+    let mut out: Option<PathBuf> = None;
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--root" => {
+                i += 1;
+                root = Some(PathBuf::from(args.get(i).ok_or("--root 后缺路径")?));
+            }
+            "--json" => json = true,
+            "--out" => {
+                i += 1;
+                out = Some(PathBuf::from(args.get(i).ok_or("--out 后缺路径")?));
+            }
+            other => return Err(format!("未知参数：{}", other)),
+        }
+        i += 1;
+    }
+    let root = root.ok_or("缺 --root（修复指引：传仓库根目录）")?;
+    require_dir(&root)?;
+    if !json {
+        return Err(
+            "本线只实现 --json（修复指引：nf-rs conformance run --root <根> --json）".into()
+        );
+    }
+    let live = conformance::run_live(&root);
+    let (issues, _stats) = conformance::verify_committed_with(&root, &live);
+    let ok_verdict = match pyval::get(&live, "verdict") {
+        Some(pyjson::Json::Str(s)) => s == "conformant",
+        _ => false,
+    };
+    let doc = pyjson::Json::Object(vec![
+        (
+            "kind".to_string(),
+            pyjson::Json::Str("conformance".to_string()),
+        ),
+        ("report".to_string(), live),
+        (
+            "issues".to_string(),
+            pyjson::Json::Array(
+                issues
+                    .iter()
+                    .map(|s| pyjson::Json::Str(s.clone()))
+                    .collect(),
+            ),
+        ),
+    ]);
+    emit(doc.dumps_file().as_bytes(), &out)?;
+    if issues.is_empty() && ok_verdict {
+        Ok(ExitCode::SUCCESS)
+    } else {
+        Ok(ExitCode::from(1))
+    }
+}
+
 fn run_conformance(args: &[String]) -> Result<ExitCode, String> {
     let sub = args.first().map(|s| s.as_str()).ok_or("conformance 后缺子命令")?;
+    if sub == "run" {
+        return run_conformance_run(&args[1..]);
+    }
     if sub == "contract" {
         return run_conformance_contract(&args[1..]);
     }
@@ -1006,7 +1143,7 @@ fn run_conformance(args: &[String]) -> Result<ExitCode, String> {
     }
     if sub != "seal" {
         return Err(format!(
-            "conformance 未知子命令：{}（修复指引：seal | contract <id> | list）",
+            "conformance 未知子命令：{}（修复指引：run | seal | contract <id> | list）",
             sub
         ));
     }

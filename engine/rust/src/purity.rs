@@ -42,9 +42,13 @@ const DOMAIN_TERMS: [&str; 28] = [
 const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 3] = [
+const SOFT_IMPORTS: [(&str, &str); 4] = [
     ("jsonschema", "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）"),
     ("PySide6", "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）"),
+    (
+        "nf_pyengine",
+        "PyO3 扩展为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr",
+    ),
     (
         "laya",
         "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
@@ -79,7 +83,8 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
-const SINK_ALLOW: [(&str, &str); 13] = [
+const SINK_ALLOW: [(&str, &str); 14] = [
+    ("rust_engine.py:unlink", ""),
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),
@@ -350,16 +355,23 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         }
     }
     core_files.sort();
-    for fname in &core_files {
-        let rel = format!("{}/{}", core_rel, fname);
-        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
-        if let Some(d) = file_findings(&rel, &text, root) {
-            issues.extend(d.issues);
-            raises += d.raises;
-            imports += d.imports;
-            *sinks.get_or_insert(0) += d.sinks;
-            residue.extend(d.residue.into_iter().map(Json::Str));
-        }
+    // Rayon 按文件并行解析（`par_iter().map()` 是 IndexedParallelIterator，collect 保序）；
+    // 聚合仍按原顺序串行执行，issues/residue 的次序与真源逐项一致。
+    use rayon::prelude::*;
+    let r4: Vec<Option<FileFindings>> = core_files
+        .par_iter()
+        .map(|fname| {
+            let rel = format!("{}/{}", core_rel, fname);
+            let text = std::fs::read_to_string(root.join(&rel)).ok()?;
+            file_findings(&rel, &text, root)
+        })
+        .collect();
+    for d in r4.into_iter().flatten() {
+        issues.extend(d.issues);
+        raises += d.raises;
+        imports += d.imports;
+        *sinks.get_or_insert(0) += d.sinks;
+        residue.extend(d.residue.into_iter().map(Json::Str));
     }
 
     // R5：IMPORT_SCAN 面（跳过 core/*，R4 已算过）
@@ -369,17 +381,21 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     }
     rels.sort();
     rels.dedup();
-    for rel in &rels {
-        if rel.starts_with("desktop/src/core/") {
-            continue;
-        }
-        let Ok(text) = std::fs::read_to_string(root.join(rel)) else { continue };
-        if let Some(d) = file_findings(rel, &text, root) {
-            issues.extend(d.issues);
-            imports += d.imports; // raises 只在 R4 那一段计
-            *sinks.get_or_insert(0) += d.sinks;
-            residue.extend(d.residue.into_iter().map(Json::Str));
-        }
+    let r5: Vec<Option<FileFindings>> = rels
+        .par_iter()
+        .map(|rel| {
+            if rel.starts_with("desktop/src/core/") {
+                return None;
+            }
+            let text = std::fs::read_to_string(root.join(rel)).ok()?;
+            file_findings(rel, &text, root)
+        })
+        .collect();
+    for d in r5.into_iter().flatten() {
+        issues.extend(d.issues);
+        imports += d.imports; // raises 只在 R4 那一段计
+        *sinks.get_or_insert(0) += d.sinks;
+        residue.extend(d.residue.into_iter().map(Json::Str));
     }
 
     // R6 自洽面：登记表自身的判据

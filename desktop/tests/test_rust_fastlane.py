@@ -71,6 +71,10 @@ COVERED_FACES = {
     "schema-validate": "messages 与 core.schema_lint.subset_validate() 逐条相等",
     "verify-report": "28 条判据聚合 + 声明面 + root_digest + 渲染逐字节相等"
                      "（本线自算 20 条、其余 8 条喂子结果）",
+    "conformance run": "与 `nf conformance --json` 逐字节相等（report + issues 信封；"
+                       "27 条契约全量 + 在盘报告比对）",
+    "serve": "常驻 worker 协议；oracle = desktop/tests/test_rust_engine.py"
+             "（往返 / NF_HOME 隔离 / 缺件回退 / ResourceWarning 清白）",
     # 差分对账**入口**（不是判据面）：把内置 Python 解析器算出的 AST 事实导出，供与真源
     # `purity_scan._ast_facts` 逐文件比对。它的 oracle 在**本线自己的门禁**里——
     # `check_parity.ps1` 的**面 13e**（另见 `engine/rust/tools/check_ast_facts_inert.py`：
@@ -254,7 +258,8 @@ class FaceCoverageRuleTest(unittest.TestCase):
 
     def test_predicate_flags_unregistered_and_spares_registered(self):
         self.assertEqual([], _ungated_faces(sorted(COVERED_FACES)))
-        self.assertEqual(["conformance run"], _ungated_faces(["conformance run"]),
+        probe = "__probe_unregistered_face__"
+        self.assertEqual([probe], _ungated_faces([probe]),
                          "新增面没被认出 —— 这条元判据是空转")
 
 
