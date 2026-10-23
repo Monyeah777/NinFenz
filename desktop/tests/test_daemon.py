@@ -166,12 +166,31 @@ class DaemonHardeningTest(DaemonHarness):
 
 class DaemonFreshnessTest(DaemonHarness):
     def test_path_keyed_caches_are_cleared_per_request(self):
-        """按路径/根键的缓存必须逐请求清空——否则热进程会拿旧仓库事实回话。"""
+        """按路径/根键的缓存必须逐请求清空——否则热进程会拿旧仓库事实回话。
+
+        钉法（2026-10-23 CI run#43/#45 分片 13 实测）：`dm.execute` 的 `_sync_code` 在
+        代码面指纹变化（含**进程内首请求**）时会把除 `core.daemon` 之外的 `core.*` 全部
+        从 `sys.modules` 摘掉重载——直接 patch 调用方手里的 `pack_combo` 模块对象会被
+        这次重载连根丢掉，断言便看到 0 次清理（本地串行常绿、分片/乱序必红）。
+        因此改为 patch **`dm.reset_process_caches`**（daemon 模块自身不参与重载），在它
+        内部对"当前这份" `pack_combo` 打计数补丁后再调用原函数：无论中途是否重载，被计数
+        的都将是真正被调用到的那个模块。断言不变：逐请求至少清一次。
+        """
         from core import pack_combo
-        pack_combo.profiles(ROOT)                      # 预热
+        pack_combo.profiles(ROOT)                      # 预热数据层（让清理真的有东西可清）
         calls = []
-        orig = pack_combo.cache_clear
-        pack_combo.cache_clear = lambda: (calls.append(1), orig())[1]
+        real_reset = dm.reset_process_caches
+
+        def _spy_reset():
+            from core import pack_combo as fresh        # 重载后这才是"当前"模块
+            orig = fresh.cache_clear
+            fresh.cache_clear = lambda: (calls.append(1), orig())[1]
+            try:
+                real_reset()
+            finally:
+                fresh.cache_clear = orig
+
+        dm.reset_process_caches = _spy_reset
         try:
             # 用**独有 cwd** 强制走满整条执行路径：响应缓存按 (argv, gen, cwd) 命中，
             # 若同一进程里别的用例刚跑过 --version，这里会**提前 return**、根本到不了
@@ -179,7 +198,7 @@ class DaemonFreshnessTest(DaemonHarness):
             with tempfile.TemporaryDirectory() as tmp:
                 dm.execute(["--version"], ROOT, cwd=tmp)
         finally:
-            pack_combo.cache_clear = orig
+            dm.reset_process_caches = real_reset
         self.assertGreaterEqual(len(calls), 1, "执行前后必须清空 pack_combo 进程缓存")
 
     def test_content_keyed_caches_are_kept(self):
