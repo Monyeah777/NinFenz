@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1040,
     "projection": 129,
-    "support": 232,
-    "verify": 954
+    "support": 237,
+    "verify": 955
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7781,6 +7781,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "External metadata must stay machine-readable and version-coherent.",
+      "path": "desktop/tests/test_external_metadata.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "极端渗透（八向）暴露问题的回归测试 —— 2026-09-28 波。",
       "path": "desktop/tests/test_extreme_hardening.py",
       "role": "verify",
@@ -12006,16 +12012,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f1ecc4deb6f4289228698b1b8a93fd561ed088c37c7338a7a37517cf5bb9daf7",
+  "root_digest": "538fdb91b618fa8a7d324312039786975ca0c677fbcff0bee1242ab51fcd8b67",
   "rule_counts": {
     "R-app": 1449,
-    "R-catch": 93,
+    "R-catch": 95,
     "R-entry": 25,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 114,
-    "R-support": 113,
-    "R-verify": 837,
+    "R-support": 116,
+    "R-verify": 838,
     "auto:R-core": 254
   },
   "schema": "nf-role-coordinates/1"
