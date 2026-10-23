@@ -184,11 +184,16 @@ class TestReceiptScope(unittest.TestCase):
     def test_protocol_scope_roundtrip_and_tamper(self):
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "protocol").mkdir(parents=True)
+            (Path(tmp) / "postmortems").mkdir(parents=True)
             (Path(tmp) / "01_核心协议.md").write_text("# 核心协议\n", encoding="utf-8")
+            (Path(tmp) / "postmortems" / "PO-1-closed.md").write_text(
+                "---\nstatus: closed\n---\n", encoding="utf-8")
             for name in ("a.json", "b.json", "c.json"):
                 (Path(tmp) / "protocol" / name).write_text('{"k": 1}', encoding="utf-8")
             subs = rc.protocol_subjects(tmp)
             self.assertTrue(subs)
+            self.assertIn("postmortems/PO-1-closed.md", subs,
+                          "closed 复盘必须进入协议回执锚定面")
             doc = rc.build_scope(tmp, ["protocol/a.json", "protocol/b.json", "protocol/c.json"])
             self.assertEqual(doc["count"], 3)
             self.assertEqual(rc.verify_scope(doc, tmp)[0], [], "三叶也必须折叠到根")

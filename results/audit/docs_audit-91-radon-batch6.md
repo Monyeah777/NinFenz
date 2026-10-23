@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:f46d3af033b79c612db468229d4f8059daabbf4c0a611cb47ee38637ce4b38ce
+  - protocol/code_metrics_baseline.json:738674fb750a7333f1469ee7357f4c9f4dac6ee8e3d6e52702d20004c2133b8c
 ---
+> 重审（2026-10-24）：DOC-004 收口：协议回执纳入 closed 复盘件，修复 closed 状态无法满足锚定判据的循环
+
 > 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外
 
 > 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑

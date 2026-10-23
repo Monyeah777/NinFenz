@@ -214,6 +214,9 @@ def protocol_subjects(root: str = ".") -> List[str]:
     r = Path(root)
     fixed += [p.relative_to(r).as_posix() for p in sorted(r.glob("protocol/schema/*.json"))]
     fixed += [p.relative_to(r).as_posix() for p in sorted(r.glob("decisions/ADR-*.md"))]
+    # closed 复盘件必须先被回执锚定；把真源复盘件纳入协议回执面，
+    # 否则 postmortem 的 closed 判据永远无法从正常重建路径满足。
+    fixed += [p.relative_to(r).as_posix() for p in sorted(r.glob("postmortems/PO-*.md"))]
     return [s for s in fixed if (r / s).is_file()]
 
 
