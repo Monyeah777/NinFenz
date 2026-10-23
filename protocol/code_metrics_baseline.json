@@ -926,7 +926,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 566,
+      "lines": 572,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1064,6 +1064,16 @@
       "lines": 92,
       "max_fn_cc": 6,
       "max_fn_lines": 15
+    },
+    "desktop/src/core/rust_engine.py": {
+      "lines": 271,
+      "max_fn_cc": 13,
+      "max_fn_lines": 42
+    },
+    "desktop/src/core/rust_pyext.py": {
+      "lines": 50,
+      "max_fn_cc": 3,
+      "max_fn_lines": 12
     },
     "desktop/src/core/schema_lint.py": {
       "lines": 446,
@@ -1306,9 +1316,9 @@
       "max_fn_lines": 69
     },
     "scripts/code_metrics.py": {
-      "lines": 57,
+      "lines": 78,
       "max_fn_cc": 9,
-      "max_fn_lines": 30
+      "max_fn_lines": 21
     },
     "scripts/commit_msg_check.py": {
       "lines": 155,
@@ -1391,9 +1401,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7570,
-      "max_fn_cc": 115,
-      "max_fn_lines": 1258
+      "lines": 7627,
+      "max_fn_cc": 116,
+      "max_fn_lines": 1263
     },
     "scripts/nf_client.py": {
       "lines": 189,
@@ -1496,9 +1506,9 @@
       "max_fn_lines": 64
     },
     "scripts/verify_report.py": {
-      "lines": 81,
-      "max_fn_cc": 18,
-      "max_fn_lines": 47
+      "lines": 151,
+      "max_fn_cc": 35,
+      "max_fn_lines": 78
     },
     "scripts/verify_run.py": {
       "lines": 32,

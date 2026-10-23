@@ -113,8 +113,12 @@ fn payload_bytes(rel: &str, digest_hex: &str) -> Vec<u8> {
 
 /// 真源 `build_scope(root, scope="protocol")` 的等价物（以 `Json` 值形态返回）。
 pub fn build_scope(root: &Path, scope: &str) -> Json {
-    let rels = protocol_subjects(root);
+    build_scope_for(root, &protocol_subjects(root), scope)
+}
 
+/// 按**给定件序**构回执（真源 `build_scope(root, subjects)` 的等价物）。
+/// `verify_scope` 用它按在盘 entries 的 id 子集重建（与真源同口径）。
+pub fn build_scope_for(root: &Path, rels: &[String], scope: &str) -> Json {
     struct Row {
         rel: String,
         digest: String,
@@ -125,14 +129,14 @@ pub fn build_scope(root: &Path, scope: &str) -> Json {
     let mut leaves: Vec<Hash> = Vec::with_capacity(rels.len());
 
     for rel in rels {
-        let bytes = match std::fs::read(root.join(&rel)) {
+        let bytes = match std::fs::read(root.join(rel.as_str())) {
             Ok(b) => b,
             Err(_) => continue, // 真源在此亦跳过；subjects 已按 is_file 过滤，此处为兜底
         };
         let digest = merkle::hex(&merkle::sha256(&bytes));
-        let payload = payload_bytes(&rel, &digest);
+        let payload = payload_bytes(rel.as_str(), &digest);
         leaves.push(merkle::leaf_hash(&payload));
-        rows.push(Row { rel, digest, payload });
+        rows.push(Row { rel: rel.clone(), digest, payload });
     }
 
     let root_hash = merkle::merkle_root(&leaves);
@@ -228,6 +232,127 @@ pub fn self_check(root: &Path, scope: &str) -> Vec<String> {
         }
     }
     issues
+}
+
+/// 真源 `receipts.verify_scope`：在盘回执 == 实时重算（根 + 逐件摘要 + 包含证明）。
+///
+/// 与 `self_check` 的分工：`self_check` 核对**实时重算**文档自身的证明折叠；
+/// 本函数核对**在盘文档**（entries 顺序即 live 重建顺序）与实时重算是否一致。
+pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
+    let Json::Object(pairs) = doc else {
+        return (vec!["协议回执 schema 不匹配".to_string()], Json::Object(vec![]));
+    };
+    let g = |k: &str| pairs.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+    if !matches!(g("schema"), Some(Json::Str(s)) if s == SCHEMA) {
+        return (vec!["协议回执 schema 不匹配".to_string()], Json::Object(vec![]));
+    }
+    let committed_root = match g("root") {
+        Some(Json::Str(s)) => s.clone(),
+        _ => String::new(),
+    };
+    let entries: &[Json] = match g("entries") {
+        Some(Json::Array(a)) => a.as_slice(),
+        _ => &[],
+    };
+    // 真源 `build_scope(root, [e["id"] ...])`：按在盘 entries 的顺序/子集重建。
+    let mut ids: Vec<String> = Vec::with_capacity(entries.len());
+    for e in entries {
+        let Json::Object(ep) = e else {
+            return (vec!["回执条目不是对象".to_string()], Json::Object(vec![]));
+        };
+        match ep.iter().find(|(n, _)| n == "id").map(|(_, v)| v) {
+            Some(Json::Str(id)) => ids.push(id.clone()),
+            _ => return (vec!["回执条目缺 id".to_string()], Json::Object(vec![])),
+        }
+    }
+    let live = build_scope_for(root, &ids, "protocol");
+    let Json::Object(lp) = &live else {
+        return (vec!["内部错误：回执非对象".to_string()], Json::Object(vec![]));
+    };
+    let lg = |k: &str| lp.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+    let live_root = match lg("root") {
+        Some(Json::Str(s)) => s.clone(),
+        _ => String::new(),
+    };
+    let mut issues: Vec<String> = Vec::new();
+    if committed_root != live_root {
+        issues.push(format!(
+            "协议回执根不一致：记录={} 实测={}（修复指引：nf receipts --scope protocol --write）",
+            committed_root.chars().take(16).collect::<String>(),
+            live_root.chars().take(16).collect::<String>(),
+        ));
+    }
+    let mut live_by: Vec<(&str, &str)> = Vec::new();
+    if let Some(Json::Array(le)) = lg("entries") {
+        for e in le {
+            let Json::Object(ep) = e else { continue };
+            let id = ep.iter().find(|(n, _)| n == "id").and_then(|(_, v)| match v {
+                Json::Str(s) => Some(s.as_str()),
+                _ => None,
+            });
+            let dg = ep.iter().find(|(n, _)| n == "digest").and_then(|(_, v)| match v {
+                Json::Str(s) => Some(s.as_str()),
+                _ => None,
+            });
+            if let (Some(i), Some(d)) = (id, dg) {
+                live_by.push((i, d));
+            }
+        }
+    }
+    for e in entries {
+        let Json::Object(ep) = e else { continue };
+        let eg = |k: &str| ep.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+        let id = match eg("id") {
+            Some(Json::Str(s)) => s.clone(),
+            _ => continue,
+        };
+        let committed_digest = match eg("digest") {
+            Some(Json::Str(s)) => s.as_str(),
+            _ => "",
+        };
+        let live_digest = live_by
+            .iter()
+            .find(|(i, _)| *i == id)
+            .map(|(_, d)| *d)
+            .unwrap_or("");
+        if live_digest != committed_digest {
+            issues.push(format!("文件内容已变：{}", id));
+        }
+        let leaf_hex = match eg("leaf") {
+            Some(Json::Str(s)) => s.as_str(),
+            _ => "",
+        };
+        let mut leaf = [0u8; 32];
+        if !unhex_into(leaf_hex, &mut leaf) {
+            issues.push(format!("回执 leaf 非法：{}", id));
+            continue;
+        }
+        let proof: &[Json] = match eg("proof") {
+            Some(Json::Array(a)) => a.as_slice(),
+            _ => &[],
+        };
+        let mut steps = Vec::with_capacity(proof.len());
+        for st in proof {
+            let Json::Object(sp) = st else { continue };
+            let sg = |k: &str| sp.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+            let (Some(Json::Str(h)), Some(Json::Str(side))) = (sg("hash"), sg("side")) else {
+                continue;
+            };
+            let mut hb = [0u8; 32];
+            if !unhex_into(h, &mut hb) {
+                continue;
+            }
+            steps.push(merkle::ProofStep { sibling_is_left: side == "left", hash: hb });
+        }
+        if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != committed_root {
+            issues.push(format!("包含证明不折叠到根：{}", id));
+        }
+    }
+    let stats = Json::Object(vec![
+        ("entries".to_string(), Json::Int(entries.len() as i64)),
+        ("root".to_string(), Json::Str(live_root)),
+    ]);
+    (issues, stats)
 }
 
 fn unhex_into(s: &str, out: &mut [u8; 32]) -> bool {

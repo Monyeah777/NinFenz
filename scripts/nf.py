@@ -19,7 +19,7 @@
 import argparse
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 # argparse 的每个**内建** help 串都要过一次 `gettext.translation`（本机实测：建一次命令面 **432 次
 # → 0.11 s**，每次都去 stat locale 目录），而本 CLI 不做本地化（help 全是中文字面量）。把翻译钩子
@@ -84,6 +84,11 @@ def _make_parser() -> argparse.ArgumentParser:
     p.add_argument("--version", action="version",
                    version="nf %s" % NF_CLI_VERSION,
                    help="显示版本号后退出")
+    p.add_argument("--engine", dest="engine", default=None,
+                   choices=("python", "rust", "auto"),
+                   help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
+                        "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
+                        "python）。NF_ENGINE 环境变量可作缺省。")
     sub = p.add_subparsers(dest="cmd", required=False)
 
     st = sub.add_parser("stats",
@@ -7216,6 +7221,55 @@ def _cmd_nfal(args) -> int:
     return nfal_cli.main(list(getattr(args, "nfal_args", []) or []))
 
 
+def _rust_engine_argv(args) -> Optional[list]:
+    """**已实测为净收益**的面才映射成 nf-rs argv；其余返回 None（走 Python 真源）。
+
+    热进程内对照（2026-10-22，同机同语料，median of 6）：
+      - layers 626ms → 229ms（2.73×）→ 接管；
+      - stats 11.5ms → 49ms（0.23×）/ receipts 18ms → 30ms（0.60×）/
+        conformance 2.0s → 3.2s（0.63×）/ purity 0.73× / schema 0.94× / depth 0.04×
+        → **不接管**（Rust 快线仍可由 nf-rs 直接调用，但不得拖慢默认热路径）。
+    写面（--write）与人类可读面永远留在 Python 真源。
+    """
+    if args.cmd == "layers":
+        if (getattr(args, "write", False) or not getattr(args, "verify", False)
+                or not getattr(args, "json", False)):
+            return None
+        return ["layers", "--root", ROOT, "--verify", "--json"]
+    return None
+
+
+def _try_rust_face(args) -> Optional[int]:
+    """opt-in 只读快线：--engine rust|auto 时把已对账的 JSON 读面交给 nf-rs，失败回退 Python。
+
+    返回 None = 未接管（调用方继续走 Python 真源）；返回 int = 已接管（作为 main 的退出码）。
+    只读纪律：只加速 exit==0 且字节已对账的面；快线退出非零（有 issue/异常）时回退 Python
+    以保留完整诊断面——绝不静默丢掉诊断。
+    """
+    engine = str(getattr(args, "engine", None) or os.environ.get("NF_ENGINE", "") or "").strip().lower()
+    if engine not in ("rust", "auto"):
+        return None
+    argv = _rust_engine_argv(args)
+    if argv is None:
+        return None
+    from core import rust_engine as re
+    if re.disabled():
+        return None
+    res = re.run_face(argv, root=ROOT)
+    if res is None:
+        if engine == "rust":
+            print("  [WARN] NF_ENGINE=rust 但 nf-rs 不可用（回退 Python 真源）", file=sys.stderr)
+        return None
+    code, out = res
+    if code != 0:
+        if engine == "rust":
+            print("  [WARN] nf-rs 退出 %d（回退 Python 真源保留诊断面）" % code, file=sys.stderr)
+        return None
+    sys.stdout.buffer.write(out)
+    sys.stdout.buffer.flush()
+    return 0
+
+
 def main(argv=None) -> int:
     # 效率：`--version` 是最常被调用的探测命令，而构建 argparse 面 ≈100 ms——
     # 它不需要命令面，直接短路（输出与 argparse 的 version 动作逐字一致）。
@@ -7277,6 +7331,9 @@ def main(argv=None) -> int:
     _coding = _utf8_text_issue(args)
     if _coding:
         return _machine_fail(args, _coding, 2)
+    _rust_rc = _try_rust_face(args)
+    if _rust_rc is not None:
+        return _rust_rc
     if args.cmd in ("shell", "terminal"):
         return _cmd_shell(args)
     if args.cmd == "layers":

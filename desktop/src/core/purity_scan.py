@@ -102,6 +102,8 @@ HARD_ALLOW = {
 SOFT_IMPORTS = {
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
     "PySide6": "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+    "nf_pyengine": "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；"
+        "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
     "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指"
         "引",
 }
@@ -141,6 +143,10 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
+    "rust_engine.py:unlink":
+        "常驻 worker 状态文件（<NF_HOME>/rust_worker.json）的**自清**：落点由 "
+        "core.storage.default_home 单源决定（用户态，不接收外部路径参数），删的是本模块上一轮"
+        "自己写的状态文件，用于避免陈旧 port/token 被复用；worker 随后重写该件",
     "regression_score.py:__import__":
         "模块名取自内部常量表 SIGNAL_SPECS（非用户输入），用于按名调用既有扫描器",
     "e2e_desktop_headless.py:shutil.rmtree":

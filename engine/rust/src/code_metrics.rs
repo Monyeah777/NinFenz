@@ -67,7 +67,8 @@ pub fn metrics_of(path: &Path) -> Metrics {
 
 /// 全量度量 → 按仓库相对路径排序的 `(rel, 度量)`。
 pub fn measure(root: &Path) -> Vec<(String, Metrics)> {
-    let mut out: Vec<(String, Metrics)> = Vec::new();
+    // 先按真源同序收集文件清单（SCAN_DIRS 顺序 + 目录内文件名排序）。
+    let mut rels: Vec<String> = Vec::new();
     for d in SCAN_DIRS {
         let dir = root.join(d);
         let Ok(rd) = std::fs::read_dir(&dir) else { continue };
@@ -78,12 +79,15 @@ pub fn measure(root: &Path) -> Vec<(String, Metrics)> {
             .collect();
         names.sort();
         for n in names {
-            let rel = format!("{}/{}", d, n);
-            let m = metrics_of(&root.join(&rel));
-            out.push((rel, m));
+            rels.push(format!("{}/{}", d, n));
         }
     }
-    out
+    // Rayon 数据并行：按文件解析 AST；`par_iter().map().collect()` 是 IndexedParallelIterator，
+    // **保序**——与真源「清单顺序即输出顺序」逐项同序（并列函数的最先到达语义不受影响）。
+    use rayon::prelude::*;
+    rels.par_iter()
+        .map(|rel| (rel.clone(), metrics_of(&root.join(rel.as_str()))))
+        .collect()
 }
 
 /// 真源 `load_baseline`：`doc["files"] or {}`；缺件/坏件 → 空。
