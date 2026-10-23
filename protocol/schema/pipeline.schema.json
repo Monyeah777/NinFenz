@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pipeline.schema.json",
+  "$id": "https://ninfenz.dev/schema/pipeline.schema.json",
   "title": "管线声明 Pipeline（01 §2）",
   "description": "管线文档内 Pipeline yaml 围栏的 IDL 定义（id/structure/flow/layers）。",
   "type": "object",

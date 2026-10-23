@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "nf:release-policy",
+  "$id": "https://ninfenz.dev/schema/release.schema.json",
   "title": "NF 发布策略（release policy）",
   "description": "protocol/release_policy.json 的单一真相定义：冻结链顺序 / 必需产物 / 版本面 / 变更条目目录。人读投影见 docs/release.md。",
   "type": "object",

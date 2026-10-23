@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "protocol.schema.json",
+  "$id": "https://ninfenz.dev/schema/protocol.schema.json",
   "title": "社区包协议声明 protocol.yaml（01 §6.1）",
   "description": "community/*/protocol.yaml 的 IDL 定义；R1/R2/R3 机读载体。",
   "type": "object",

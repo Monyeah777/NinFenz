@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "asset.schema.json",
+  "$id": "https://ninfenz.dev/schema/asset.schema.json",
   "title": "资产台账条目（05 provenance.json assets[]）",
   "description": "05_资产库/provenance.json assets[] 单条的 IDL 定义（S2 台账机读真相）。",
   "type": "object",

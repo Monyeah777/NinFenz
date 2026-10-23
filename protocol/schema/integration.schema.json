@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "nf:integration",
+  "$id": "https://ninfenz.dev/schema/integration.schema.json",
   "title": "NF 接入面描述件（integration descriptor）",
   "description": "integrations/<id>/integration.json 的单一真相定义：封闭词表的 kind/status/tier + 入口 + 文档 + 证据（件在场由 core/integrations.py 另判）。",
   "type": "object",

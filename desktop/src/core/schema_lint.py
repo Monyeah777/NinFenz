@@ -209,6 +209,12 @@ def check_schema_files(root: str) -> Tuple[List[str], List[Dict[str, Any]]]:
             issues.append("%s: $schema=%r 与校验器实现的方言不一致（预期 %s；"
                           "修复指引：改声明或先扩展校验器再改声明）"
                           % (name, data.get("$schema"), DIALECT))
+        want_id = "https://ninfenz.dev/schema/" + name
+        if data.get("$id") != want_id:
+            issues.append(
+                "%s: $id=%r 必须是稳定绝对 URI %s（修复指引：只改标识，不改业务字段）"
+                % (name, data.get("$id"), want_id)
+            )
         if data.get("type") != "object":
             issues.append(f"{name}: schema.type 应为 object")
         if not isinstance(data.get("properties"), dict):
@@ -221,11 +227,19 @@ def check_schema_files(root: str) -> Tuple[List[str], List[Dict[str, Any]]]:
 
 
 def load_schema(root: str, name: str) -> Optional[Dict[str, Any]]:
-    """按 $id 取单份 schema 定义（供测试/生成物复用）。"""
+    """按 $id 或 schema 文件名取单份定义（文件名参数为向后兼容别名）。
+
+    ``$id`` 是对外稳定绝对 URI；内部大量调用仍以文件名定位。这里只把
+    *文件名* 当作别名，任意相对路径或前缀模糊匹配仍拒绝。
+    """
     _, schemas = check_schema_files(root)
     for s in schemas:
-        if s.get("$id") == name:
+        sid = s.get("$id")
+        if sid == name:
             return s
+        if isinstance(sid, str) and name.endswith(".schema.json"):
+            if sid.rsplit("/", 1)[-1] == name:
+                return s
     return None
 
 

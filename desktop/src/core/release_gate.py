@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional, Tuple
 POLICY_DOC = "docs/release.md"
 #: 机读策略真源（配置即契约）。
 POLICY_JSON = "protocol/release_policy.json"
-POLICY_SCHEMA_ID = "nf:release-policy"
+POLICY_SCHEMA_ID = "https://ninfenz.dev/schema/release.schema.json"
 #: 策略件必须写明的锚点（缺一即 FAIL——写了却没人看与没写同等不可核）。
 POLICY_ANCHORS: Tuple[str, ...] = (
     "## 冻结链", "## 版本面", "## 变更条目",
@@ -119,7 +119,7 @@ def plan(root: str = ".") -> List[Dict[str, str]]:
          "judge": "无未提交改动；发布提交即 tag 指向的提交"},
         {"id": "pre-2", "title": "发布策略件",
          "cmd": "读 " + POLICY_DOC + " 三段声明 + " + POLICY_JSON + "（过 schema）",
-         "out": POLICY_JSON, "judge": "策略 JSON 过 nf:release-policy schema；人读件锚点齐"},
+         "out": POLICY_JSON, "judge": "策略 JSON 过 release.schema.json；人读件锚点齐"},
         {"id": "gate-1", "title": "全量门禁",
          "cmd": "bash verify.sh", "out": "PASS=%d / WARN=0 / FAIL=0" % expected_pass,
          "judge": "退出码 0（check1-%d 全过）" % checks},

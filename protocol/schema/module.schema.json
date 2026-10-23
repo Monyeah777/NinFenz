@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "module.schema.json",
+  "$id": "https://ninfenz.dev/schema/module.schema.json",
   "title": "注册表模块条目（02 §2 / registry.json modules[] 投影）",
   "description": "registry.json modules[] 单条的 IDL 定义；编号/类别/来源/挂载点位。",
   "type": "object",
