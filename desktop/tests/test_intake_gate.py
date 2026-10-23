@@ -57,7 +57,7 @@ class RepoIntakeTest(unittest.TestCase):
         issues, stats = ik.scan(str(ROOT))
         self.assertEqual(issues, [], issues)
         self.assertEqual(stats["channels"], 2)
-        self.assertEqual(stats["modes"], ["author_only", "open"])
+        self.assertEqual(stats["modes"], ["author_only"])
 
     def test_repo_bots_are_wired(self):
         for rel in ik.BOTS:
