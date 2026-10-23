@@ -1093,6 +1093,7 @@
     "desktop/tests/test_cot_exposure.py::I001": 1,
     "desktop/tests/test_cot_exposure.py::UP031": 3,
     "desktop/tests/test_coupling_metrics.py::UP031": 3,
+    "desktop/tests/test_daemon.py::I001": 1,
     "desktop/tests/test_daemon.py::RUF100": 1,
     "desktop/tests/test_daemon.py::SIM102": 1,
     "desktop/tests/test_daemon.py::SIM105": 1,
