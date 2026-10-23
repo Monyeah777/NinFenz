@@ -151,13 +151,23 @@ class FilterTest(unittest.TestCase):
 
     def test_filters_private_and_bytecode(self):
         with tempfile.TemporaryDirectory() as tmp:
+            # 仓外路径用「tmp 的兄弟目录」构造（跨平台都是绝对路径）：早期这里硬编码
+            # `C:/outside/y.py`，在 Linux 上 `os.path.isabs` 为 False ⇒ 被当仓内相对路径
+            # ⇒ 断言失败（CI 2026-10-23 run#42）。
+            outside = str(Path(tmp).parent / "nf-outside" / "y.py")
             p = _faces(tmp, {"test_plain": {
                 "status": "ok", "seconds": 1,
                 "reads": [str(Path(tmp) / ".rivet" / "x.json"),
                           str(Path(tmp) / "a.pyc"), str(Path(tmp) / "src" / "x.py"),
-                          "C:/outside/y.py"]}})
+                          outside]}})
             got = gs.load_faces(tmp, p)
             self.assertEqual(got["test_plain"]["reads"], ["src/x.py"])
+
+    def test_windows_drive_letter_is_outside_everywhere(self):
+        """盘符/UNC 形态在任何平台都判「仓外」——不依赖 `os.path.isabs` 的平台语义。"""
+        self.assertIsNone(gs._rel(".", "C:/outside/y.py"))
+        self.assertIsNone(gs._rel(".", r"C:\outside\y.py"))
+        self.assertIsNone(gs._rel(".", r"\\server\share\y.py"))
 
 
 if __name__ == "__main__":

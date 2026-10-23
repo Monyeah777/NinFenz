@@ -38,7 +38,11 @@ _TOKEN = re.compile(r"`([^`\n]+)`")
 _NF_CMD = re.compile(r"\bnf(?:\.py)?\s+([a-z][a-z0-9-]*)")
 _SECOND = re.compile(r"\bnf\s+([a-z][a-z0-9-]*)\s+([a-z][a-z0-9-]*)\b")
 #: 占位符/通配写法（不是真路径，跳过）
-_PLACEHOLDER = ("XXXX", "NNNN", "<", ">", "\u2026", "::")
+#: `"..."`（ASCII 三点）**必须**在这里：Win32 会忽略路径结尾的点，于是
+#: `desktop/src/core/...` 在 Windows 上被 `Path.exists()` 判成在场的 `desktop/src/core`，
+#: 而 Linux 上不存在 —— 同一判据在两平台得出相反结论（CI 2026-10-23 run#42 实测：
+#: 本地全绿、Linux 九分片红）。占位符本来就不是路径，这里显式排除以恢复**跨平台确定性**。
+_PLACEHOLDER = ("XXXX", "NNNN", "<", ">", "\u2026", "::", "...")
 _WILDCARD = set("*?|{}$")
 _BAD_CHARS = frozenset("\uFF08\uFF09\u3010\u3011\u201C\u201D\u2018\u2019,\uFF0C\u3001\uFF1A\uFF1B")
 _FILEY = (".md", ".json", ".py", ".yaml", ".yml", ".txt", ".sh", ".cmd")
