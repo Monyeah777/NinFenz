@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 from core import disk_cache, json_doc
@@ -44,13 +45,24 @@ def _posix(p: object) -> str:
     return str(p).replace("\\", "/")
 
 
+#: 跨平台绝对路径形态：Windows 盘符（`C:\…` / `C:/…`）与 UNC（`\\server\share`）。
+#: 为什么单独判：`os.path.isabs("C:/x")` 在 Linux 上是 **False**，若按"相对路径"处理
+#: 就会把它当成仓内读面（CI 2026-10-23 run#42 实测：Windows 绿、Linux 红）。
+_WIN_ABS = re.compile(r"^(?:[A-Za-z]:[\\/]|\\\\)")
+
+
 def _rel(root: str, p: object) -> str | None:
     """路径 → 仓库相对 posix；不在根内（临时目录等）→ None。
 
     两种口径都收：观测器落盘的是**仓库相对**；早期/私有数据是**绝对**路径。
     相对路径**不能**拿 cwd 去 abspath——那会按调用者所在目录解析（曾因此把读面清空）。
+    盘符/UNC 形态先判：它们在任何平台都**不可能**落在 POSIX 根内 ⇒ 直接 None（跨平台一致）。
     """
     raw = str(p)
+    # 仅在 POSIX 上把盘符/UNC 判为仓外：Windows 上它们就是**正常绝对路径**，
+    # 要走下面的前缀比较（否则会把本仓自身的 `C:\…` 读面全丢掉）。
+    if os.name != "nt" and _WIN_ABS.match(raw):
+        return None
     if not os.path.isabs(raw):
         return _posix(raw).lstrip("/")
     rp = os.path.normcase(os.path.abspath(str(root)))

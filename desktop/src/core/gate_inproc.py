@@ -96,7 +96,7 @@ def run_inproc(src: str, root: Path, name: str) -> tuple[int, str]:
     """在当前进程内跑一段 heredoc 源码 → (退出码, 捕获的输出)。
 
     **必须在仓库根下执行**：verify.sh 的 heredoc 大量使用相对路径
-    （`scripts/nf.py`、`desktop/src/core/...`、`04_模块库/...`）。bash 跑门禁时 cwd 就是
+    （`scripts/nf.py`、`desktop/src/core/*.py`、`04_模块库/*`）。bash 跑门禁时 cwd 就是
     仓库根，而引擎可能被从任意目录调起（例如 `cd desktop && python -m unittest`），
     不切 cwd 就会 `FileNotFoundError: desktop/scripts/nf.py`（实测踩过）。
     故这里显式切到 root，结束后还原（保留调用方原 cwd）。
