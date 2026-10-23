@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 71,
+    "count": 72,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "398eda9d540cda05e95ce429d0bfe71fac1ff50ee0c753b03ef753416676705e",
+    "root": "845726f3d6403c811c11fa1063d0ddc26ca43129d80ab6190732468cfcb8f696",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+        "sha256": "21583746f95a2be7804c26d530f04e90a956a4d3dcb857a2197d3e20c1548222"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,7 +137,7 @@
     },
     {
       "digest": {
-        "sha256": "02c218de86d6657482193198b1340a8171a1e02a6ee5903a1f808260ded38b37"
+        "sha256": "177a2832e45d727b9c8280cd7c4cab9b3240c551d24864521438dea704f8c2a7"
       },
       "name": "protocol/role_coordinates.json"
     },
@@ -269,7 +269,7 @@
     },
     {
       "digest": {
-        "sha256": "8f56d8cc1a7499d5c1136c49b41e6143263b91a20ffa896e1e89a2ec2699b0d3"
+        "sha256": "c3a2729f1bd877423ffbe0660fbaff419390a6ddbee1c6fb8ba36db999102956"
       },
       "name": "decisions/INDEX.md"
     },
@@ -428,6 +428,12 @@
         "sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
       },
       "name": "decisions/ADR-0007-计划内容不进产品仓.md"
+    },
+    {
+      "digest": {
+        "sha256": "c2324bb89dc48b99d6bc187162f4f0f3ba537799ff61a9249564095b8944a10f"
+      },
+      "name": "decisions/ADR-0008-外部一致性运行器边界.md"
     },
     {
       "digest": {

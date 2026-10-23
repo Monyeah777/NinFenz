@@ -78,6 +78,19 @@ class TestRealRepo(unittest.TestCase):
         codes = [i.code for i in dc.analyze(str(ROOT)).issues]
         self.assertEqual(codes, [i.code for i in dc.analyze(str(ROOT)).issues])
 
+    def test_external_runner_boundary_is_decided(self):
+        hit = next(e for e in dc.entries(str(ROOT))
+                   if e["fm"].get("id") == "ADR-0008")
+        self.assertEqual("accepted", hit["fm"].get("status"))
+        body = hit["body"]
+        for phrase in (
+            "独立仓库或独立进程",
+            "不得只调用 NF 的",
+            "范围显式",
+            "未执行不等于通过",
+        ):
+            self.assertIn(phrase, body)
+
 
 class TestNegatives(unittest.TestCase):
     def test_id_filename_mismatch_is_fail(self):

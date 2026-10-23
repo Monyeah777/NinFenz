@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1449,
+    "app": 1450,
     "entry": 26,
     "floor": 5,
     "prod": 1041,
-    "projection": 129,
-    "support": 239,
-    "verify": 957
+    "projection": 130,
+    "support": 248,
+    "verify": 958
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7901,6 +7901,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Gitee polling failures must be categorized, visible, and fail closed.",
+      "path": "desktop/tests/test_gitee_diagnostics.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "社区与内容治理件判据（审计 Z6：治理件在场且**承担语义**，不是占位文件）。",
       "path": "desktop/tests/test_governance_docs.py",
       "role": "verify",
@@ -12030,16 +12036,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "48df5fd7cc28b44b3490c6a79c5db30de0d97852f5f89a7dd853b4bcf4323c69",
+  "root_digest": "3da88a01e674413ee7b5492a58e69caa1c9948ae3a6604c7e643f2a7a3e5347b",
   "rule_counts": {
-    "R-app": 1449,
-    "R-catch": 97,
+    "R-app": 1450,
+    "R-catch": 106,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 114,
+    "R-projection": 115,
     "R-support": 116,
-    "R-verify": 840,
+    "R-verify": 841,
     "auto:R-core": 255
   },
   "schema": "nf-role-coordinates/1"

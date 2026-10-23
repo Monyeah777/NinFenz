@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-24",
   "approved_by": "Monyeah777",
-  "note": "作者授权夜间收口：关闭 HO-0001/PO-0001，修复复盘回执锚定并同步版本真源",
+  "note": "overnight product-owner-directed consolidation",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
+  "subject_digest": "21583746f95a2be7804c26d530f04e90a956a4d3dcb857a2197d3e20c1548222"
 }

@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
+        "root": "ce1f869039442319109ea3237cfb3799bfe0e0d830b0e6693ba4cc8e9369188c",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -492,7 +492,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 61,
+        "pinned_uses": 62,
         "requirements_files": 4,
         "with_explicit_permissions": 18,
         "workflows": 18
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3847,
-        "kernel": 2003,
+        "files": 3859,
+        "kernel": 2004,
         "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "07d7f570f43d44240ed97ce76038651253096689e62d23ec7294b73dd22d8cc6",
+  "root_digest": "9804d7ef77503facfa635335749c153fc0886036b943ff72e1dce88a13317a6c",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
