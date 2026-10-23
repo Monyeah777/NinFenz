@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:86030648b18d3d2bad386459b1730e9cfcb7ad0f7109a960863db547ccee9b5b
+  - protocol/code_metrics_baseline.json:f46d3af033b79c612db468229d4f8059daabbf4c0a611cb47ee38637ce4b38ce
 ---
+> 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外
+
 > 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
 
 > 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中

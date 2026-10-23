@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-23",
   "approved_by": "Monyeah777",
-  "note": "A 类跨平台修复（尾点占位/盘符路径）重冻",
+  "note": "A2 同族修复重冻",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"

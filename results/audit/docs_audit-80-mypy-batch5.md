@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:654ac230f117d5ff33a4863fe6c6e1192943f57ee2639b23de89bf0da13a552a
-  - protocol/code_metrics_baseline.json:86030648b18d3d2bad386459b1730e9cfcb7ad0f7109a960863db547ccee9b5b
+  - protocol/code_metrics_baseline.json:f46d3af033b79c612db468229d4f8059daabbf4c0a611cb47ee38637ce4b38ce
 ---
+> 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外
+
 > 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
 
 > 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
