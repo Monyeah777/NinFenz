@@ -72,6 +72,15 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(len(vr.SPECS), len(r["items"]))
         self.assertNotIn(None, [i["status"] for i in r["items"]])
 
+    def test_report_digest_is_portable_across_checkout_paths(self):
+        with tempfile.TemporaryDirectory() as one, tempfile.TemporaryDirectory() as two:
+            first = vr.build(one)
+            second = vr.build(two)
+            self.assertEqual(first["root_digest"], second["root_digest"])
+            rendered = vr.render(first) + vr.render(second)
+            self.assertNotIn(str(Path(one).resolve()), rendered)
+            self.assertNotIn(str(Path(two).resolve()), rendered)
+
 
 class CheckTest(unittest.TestCase):
     def test_missing_report_reports_guidance(self):
