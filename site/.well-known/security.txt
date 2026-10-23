@@ -1,0 +1,8 @@
+# Security disclosure metadata (RFC 9116).
+# Do not replace the advisory URL with an email address until receive/send is verified.
+Contact: https://github.com/Monyeah777/NinFenz/security/advisories/new
+Expires: 2027-10-21T00:00:00Z
+Canonical: https://ninfenz.dev/.well-known/security.txt
+Preferred-Languages: zh, en
+Policy: https://github.com/Monyeah777/NinFenz/security/policy
+
