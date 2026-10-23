@@ -50,6 +50,49 @@ jobs:
           name: scorecard-sarif
           path: results.sarif
           retention-days: 5
+      - name: 生成可追溯运行摘要
+        # 摘要只记录本次平台运行的事实。不得提交为静态基线，也不得把空结果
+        # 解释成“无风险”；发布负责人如需归档，另按 commit/run 留存。
+        env:
+          NF_SCORECARD_COMMIT: ${{ github.sha }}
+          NF_SCORECARD_RUN_ID: ${{ github.run_id }}
+          NF_SCORECARD_SERVER: ${{ github.server_url }}
+          NF_SCORECARD_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          sarif = Path("results.sarif")
+          try:
+              runs = json.loads(sarif.read_text(encoding="utf-8")).get("runs", [])
+              result_count = sum(len(run.get("results", [])) for run in runs)
+          except (OSError, ValueError, TypeError):
+              result_count = None
+          run_id = os.environ["NF_SCORECARD_RUN_ID"]
+          repo = os.environ["NF_SCORECARD_REPOSITORY"]
+          doc = {
+              "schema": "nf-scorecard-snapshot/1",
+              "commit": os.environ["NF_SCORECARD_COMMIT"],
+              "run_id": run_id,
+              "workflow_url": f"{os.environ['NF_SCORECARD_SERVER']}/{repo}/actions/runs/{run_id}",
+              "result_count": result_count,
+              "sarif_sha256": hashlib.sha256(sarif.read_bytes()).hexdigest(),
+              "empty_results_are_not_clean": True,
+          }
+          Path("scorecard-summary.json").write_text(
+              json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: 留工件（可追溯摘要）
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: scorecard-summary
+          path: scorecard-summary.json
+          retention-days: 30
       - name: 上传到代码扫描（Security 页可见）
         uses: github/codeql-action/upload-sarif@1190a975f95ce23525efb6a3fc21ea29567c1b52  # v3
         with:
