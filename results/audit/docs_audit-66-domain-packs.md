@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
 
 > 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护

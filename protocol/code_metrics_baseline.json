@@ -501,7 +501,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/ingest_common.py": {
-      "lines": 226,
+      "lines": 227,
       "max_fn_cc": 8,
       "max_fn_lines": 19
     },
@@ -529,6 +529,11 @@
       "lines": 97,
       "max_fn_cc": 27,
       "max_fn_lines": 51
+    },
+    "desktop/src/core/intake_quota.py": {
+      "lines": 81,
+      "max_fn_cc": 7,
+      "max_fn_lines": 17
     },
     "desktop/src/core/intake_surface.py": {
       "lines": 226,

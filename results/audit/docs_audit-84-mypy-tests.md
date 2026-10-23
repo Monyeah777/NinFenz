@@ -19,7 +19,7 @@ subjects:
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
   - desktop/tests/test_judgement_coverage.py:d63adb43b766905494859941818d5eb6c5fc5eb4f19d9f5353df7b0d869c9f24
   - desktop/tests/test_judge_references.py:4166744627ab477eddfff9fe782eee5f6bb457d8f4c93beb23df584087c8bf53
-  - desktop/tests/test_intake_gate.py:7b0fd39f903557abed07f6e10a562904bb043204d4843ced89d47df064f83fb2
+  - desktop/tests/test_intake_gate.py:3c6786fe00d913603509ac1345208c031def063287c2230682636af439ae5a48
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
 
 > 重审（2026-10-23）：Rust 快线加速收口：新增常驻 worker / PyO3 原语 / Rayon 解析并行与 code_metrics 接线；被审判据语义未变，digest 随实现同步

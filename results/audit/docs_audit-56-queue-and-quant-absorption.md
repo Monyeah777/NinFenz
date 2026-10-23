@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - README.en.md:39b007b7f015e5bdf2de220126175264c167954630d586d09493074a81fb1633
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-23）：合并远端 README badge 后重绑审计摘要：仅文档变化
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno

@@ -10,10 +10,12 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
-  - library/intake.json:bf8c7552cafad2fde4b5273c83ba025e099e6e9b5edd894935638ca63ee881ee
-  - verify.sh:7e83a27780636736347dbd35b7c23875a83b61bbb7544b8782a5198c1b7aa9f2
+  - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
 
 > 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护

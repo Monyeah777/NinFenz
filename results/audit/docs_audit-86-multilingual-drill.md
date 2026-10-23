@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:738674fb750a7333f1469ee7357f4c9f4dac6ee8e3d6e52702d20004c2133b8c
+  - protocol/code_metrics_baseline.json:e0d4a06c15d597a2e306715313de90cf07af0de6cc54c4aa987ed0926b69c03a
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-24）：DOC-004 收口：协议回执纳入 closed 复盘件，修复 closed 状态无法满足锚定判据的循环
 
 > 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外
