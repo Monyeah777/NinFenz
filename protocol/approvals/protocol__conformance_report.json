@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-23",
   "approved_by": "Monyeah777",
-  "note": "终态签字：预算高分辨率计时、I/O/内存/IPC 全链收口",
+  "note": "合并远端 README badge 后重签 conformance 与回执",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c9e747e4c09ce99baf1412f812b4c43e8ff1648eb15b101e43269eeca53c9782"
