@@ -10,12 +10,13 @@ import path from 'node:path';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const SITE = path.resolve(HERE, '..');
+const ROOT = path.resolve(SITE, '..');
 const OFFLINE = process.argv.includes('--offline');
 const idx = fs.readFileSync(path.join(SITE, 'index.html'), 'utf8');
 const origin = (process.argv.slice(2).find((a) => !a.startsWith('--')) ||
   (idx.match(/rel="canonical" href="(https:\/\/[^\/"]+)/) || [])[1] || '').replace(/\/+$/, '');
 const KNOWN_BASES = ['https://ninfenz.dev', 'https://ninfenz.1764861918.workers.dev', 'https://monyeah777.github.io/NinFenz', 'https://monyeah777.github.io'];
-const MACHINE = ['/llms.txt', '/llms-full.txt', '/nf.txt', '/agent.txt', '/facts.json', '/run.sh', '/robots.txt', '/sitemap.xml', '/use/', '/en/use/', '/404.html', '/assets/site.css'];
+const MACHINE = ['/llms.txt', '/llms-full.txt', '/nf.txt', '/agent.txt', '/facts.json', '/run.sh', '/robots.txt', '/sitemap.xml', '/.well-known/security.txt', '/use/', '/en/use/', '/404.html', '/assets/site.css'];
 const rows = [];
 const check = (name, ok, detail) => rows.push({ 判据: name, 结果: ok ? 'PASS' : 'FAIL', 详情: String(detail) });
 
@@ -43,8 +44,27 @@ if (OFFLINE) {
   check('首页 canonical 自指', canon === origin + '/', canon || '(缺失)');
   check('首页 hreflang 三向', ['zh-CN', 'en', 'x-default'].every((l) => idx.includes('hreflang="' + l + '"')), 'zh-CN/en/x-default');
   check('防伪声明在两语首页', read('index.html').includes('官方唯一指定入口') && read('en/index.html').includes('only official entry point'), 'zh + en');
-  for (const p of ['llms.txt', 'llms-full.txt', 'nf.txt', 'agent.txt', 'facts.json', 'run.sh', 'robots.txt', 'sitemap.xml', 'worker.js', '_headers']) {
+  for (const p of ['llms.txt', 'llms-full.txt', 'nf.txt', 'agent.txt', 'facts.json', 'run.sh', 'robots.txt', 'sitemap.xml', '.well-known/security.txt', 'worker.js', '_headers']) {
     check('机器面在场 ' + p, has(p), has(p) ? String(fs.statSync(path.join(SITE, p)).size) + 'B' : '缺');
+  }
+  if (has('.well-known/security.txt')) {
+    const sec = read('.well-known/security.txt');
+    check('security.txt 私密报告通道',
+      sec.includes('Contact: https://github.com/Monyeah777/NinFenz/security/advisories/new'),
+      'GitHub Security Advisories');
+    check('security.txt canonical', sec.includes('Canonical: https://ninfenz.dev/.well-known/security.txt'), 'canonical');
+    const expiry = (sec.match(/^Expires:\s*(.+)$/m) || [])[1];
+    check('security.txt 未过期', !!expiry && Date.parse(expiry) > Date.now(), expiry || '(缺失)');
+  }
+  const metaPath = path.join(ROOT, 'codemeta.json');
+  let meta = null;
+  try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); }
+  catch (e) { check('CodeMeta 可解析', false, e.message); }
+  if (meta) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'packaging/npm/package.json'), 'utf8'));
+    check('CodeMeta 标识', meta.identifier === 'ninfenz', meta.identifier || '(缺失)');
+    check('CodeMeta 代码仓库', meta.codeRepository === 'https://github.com/Monyeah777/NinFenz', meta.codeRepository || '(缺失)');
+    check('CodeMeta 版本与 npm 一致', meta.version === pkg.version, `${meta.version} / ${pkg.version}`);
   }
   let fj = null;
   try { fj = JSON.parse(read('facts.json')); } catch (e) { check('facts.json 可解析', false, e.message); }
