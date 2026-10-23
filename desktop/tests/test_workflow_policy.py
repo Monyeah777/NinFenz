@@ -150,5 +150,46 @@ class CiReferenceReachabilityTest(unittest.TestCase):
         self.assertEqual([], missing, "CI/闸门引用了不存在的 nf 子命令：%s" % missing)
 
 
+class ExternalSecurityEvidenceTest(unittest.TestCase):
+    POLICIES = (
+        "branch_protection.yaml",
+        "dangerous_workflow.yaml",
+        "binary_artifacts.yaml",
+        "outside.yaml",
+        "security.yaml",
+    )
+
+    def test_allstar_policy_set_is_local_and_non_secret(self):
+        import yaml
+
+        allstar = ROOT / ".allstar"
+        main = yaml.safe_load((allstar / "allstar.yaml").read_text(encoding="utf-8"))
+        self.assertTrue(main["optConfig"]["optOutStrategy"])
+        for name in self.POLICIES:
+            doc = yaml.safe_load((allstar / name).read_text(encoding="utf-8"))
+            self.assertTrue(doc["optConfig"]["optOutStrategy"], name)
+            self.assertEqual("issue", doc["action"], name)
+            lowered = (allstar / name).read_text(encoding="utf-8").lower()
+            self.assertNotIn("token:", lowered, name)
+            self.assertNotIn("secret:", lowered, name)
+
+    def test_scorecard_workflow_retains_traceable_summary(self):
+        text = (ROOT / ".github" / "workflows" / "scorecard.yml").read_text(encoding="utf-8")
+        for needle in (
+            "results.sarif",
+            "scorecard-summary.json",
+            "nf-scorecard-snapshot/1",
+            "${{ github.sha }}",
+            "${{ github.run_id }}",
+            "sarif_sha256",
+        ):
+            self.assertIn(needle, text)
+
+    def test_scorecard_evidence_doc_does_not_claim_platform_activation(self):
+        text = (ROOT / "results" / "scorecard" / "README.md").read_text(encoding="utf-8")
+        self.assertIn("配置已就绪", text)
+        self.assertIn("平台启用证据", text)
+
+
 if __name__ == "__main__":
     unittest.main()

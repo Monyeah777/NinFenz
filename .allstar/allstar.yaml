@@ -1,0 +1,8 @@
+# Repository policy configuration for self-hosted Allstar.
+# Committing this file records configuration readiness only; it is not proof
+# that an Allstar runner or GitHub App has been enabled for the repository.
+optConfig:
+  optOutStrategy: true
+issueLabel: allstar
+issueFooter: Review this repository policy finding against SECURITY.md before changing configuration.
+
