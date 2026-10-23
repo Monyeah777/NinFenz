@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:f52629f35c9e449e1f29e20c681064111db0598b2dafcd47a2579ab3b153be68
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:bdbea5e6d558a05185a6eb28814f4a6b6b8475be07b36a879fe396262df88cde
+  - protocol/code_metrics_baseline.json:86030648b18d3d2bad386459b1730e9cfcb7ad0f7109a960863db547ccee9b5b
 ---
+> 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
+
 > 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
 
 > 重审（2026-10-23）：终局稳定性：原子写 sink 收敛、测试隔离修复、验证卡册与 payload 重签

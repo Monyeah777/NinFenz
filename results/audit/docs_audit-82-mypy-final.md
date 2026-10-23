@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:be283dc1a655945b2286a2595b2cd82b94ed34e4089ed393528bba5a6b549ed0
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:bdbea5e6d558a05185a6eb28814f4a6b6b8475be07b36a879fe396262df88cde
+  - protocol/code_metrics_baseline.json:86030648b18d3d2bad386459b1730e9cfcb7ad0f7109a960863db547ccee9b5b
 ---
+> 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
+
 > 重审（2026-10-23）：预算计时改 perf_counter：修复 Windows monotonic 低分辨率导致超预算假通过
 
 > 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
