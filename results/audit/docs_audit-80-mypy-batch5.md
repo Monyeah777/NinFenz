@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:654ac230f117d5ff33a4863fe6c6e1192943f57ee2639b23de89bf0da13a552a
-  - protocol/code_metrics_baseline.json:738674fb750a7333f1469ee7357f4c9f4dac6ee8e3d6e52702d20004c2133b8c
+  - protocol/code_metrics_baseline.json:e0d4a06c15d597a2e306715313de90cf07af0de6cc54c4aa987ed0926b69c03a
 ---
+> 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
+
 > 重审（2026-10-24）：DOC-004 收口：协议回执纳入 closed 复盘件，修复 closed 状态无法满足锚定判据的循环
 
 > 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外

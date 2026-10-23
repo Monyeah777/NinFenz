@@ -14,7 +14,6 @@ import os
 import re
 import subprocess
 import sys
-from datetime import date
 from glob import glob
 
 from core import json_doc
@@ -33,8 +32,6 @@ MAX_BODY_CHARS = 256 * 1024
 B36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 MAX_SEG = 16
-
-_DAILY_QUOTA_STATE = None
 
 SEG_RE = re.compile(r'^[A-Za-z0-9]{1,%d}$' % MAX_SEG)
 
@@ -124,77 +121,6 @@ def load_rating_vocab():
         print(f'⚠ 分级词表不可读（{exc}）：修复指引：确认 {INTAKE_REL} 存在且 rating.vocabulary 合法')
     return ['general', 'teen', 'mature', 'unrated']
 
-
-def load_quota():
-    """读取投稿日配额；缺省或非法值回退为保守上限 (2, 20)。"""
-    try:
-        with open(INTAKE_REL, encoding='utf-8') as f:
-            data = json_doc.loads(f.read(), dict, what=INTAKE_REL)
-        q = ((data.get('submission') or {}).get('quota') or {})
-        per_author = int(q.get('per_author_per_day', 2))
-        global_limit = int(q.get('global_per_day', 20))
-        if per_author >= 1 and global_limit >= 1:
-            return per_author, global_limit
-    except Exception as exc:
-        print(f'⚠ 投稿配额不可读（{exc}）：使用保守默认 2/20')
-    return 2, 20
-
-
-def _frontmatter_scalar(text, key):
-    m = re.search(r'(?m)^%s:\s*(.+?)\s*$' % re.escape(key), text)
-    return m.group(1).strip().strip('\'"') if m else ''
-
-
-def daily_usage(day=None):
-    """按现有 library 条目统计当日投稿：({author: n}, total)。"""
-    target = day or date.today().isoformat()
-    by_author = {}
-    total = 0
-    for path in glob('library/NF-*.md'):
-        try:
-            with open(path, encoding='utf-8') as fh:
-                text = fh.read(4096)
-        except OSError:
-            continue
-        if _frontmatter_scalar(text, 'generated') != target:
-            continue
-        author = _frontmatter_scalar(text, 'author').lower() or 'unknown'
-        by_author[author] = by_author.get(author, 0) + 1
-        total += 1
-    return by_author, total
-
-
-def reset_quota_state():
-    """测试与长驻进程显式重置入口。"""
-    global _DAILY_QUOTA_STATE
-    _DAILY_QUOTA_STATE = None
-
-
-def quota_denial(author):
-    """→ 拒收原因（允许时为空串）。状态由磁盘当日条目惰性载入。"""
-    global _DAILY_QUOTA_STATE
-    if _DAILY_QUOTA_STATE is None:
-        _DAILY_QUOTA_STATE = daily_usage()
-    by_author, total = _DAILY_QUOTA_STATE
-    per_author, global_limit = load_quota()
-    who = str(author or 'unknown').strip().lower() or 'unknown'
-    used = by_author.get(who, 0)
-    if used >= per_author:
-        return '同一投稿人当日已达 %d 条上限' % per_author
-    if total >= global_limit:
-        return '全仓当日投稿已达 %d 条上限' % global_limit
-    return ''
-
-
-def record_quota(author):
-    """成功写入一条候选投稿后记账；提交失败重试时磁盘扫描会自然补回。"""
-    global _DAILY_QUOTA_STATE
-    who = str(author or 'unknown').strip().lower() or 'unknown'
-    if _DAILY_QUOTA_STATE is None:
-        _DAILY_QUOTA_STATE = daily_usage()
-    by_author, total = _DAILY_QUOTA_STATE
-    by_author[who] = by_author.get(who, 0) + 1
-    _DAILY_QUOTA_STATE = (by_author, total + 1)
 
 def fail(msg):
     print('❌ ' + msg)

@@ -42,14 +42,13 @@ from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026
     load_gate,
     load_rating_vocab,
     parse_nfname,
-    quota_denial,
-    record_quota,
     redact,
     run_git,
     scan_existing,
     secret_shape_hit,
     to_b36,
 )
+from core.intake_quota import quota_denial, record_quota  # noqa: E402
 
 
 def _redact(text):

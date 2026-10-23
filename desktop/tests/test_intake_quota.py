@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import ingest_common as ic  # noqa: E402
+from core import intake_quota as iq  # noqa: E402
 
 
 class QuotaTest(unittest.TestCase):
@@ -25,11 +25,11 @@ class QuotaTest(unittest.TestCase):
         }), encoding="utf-8")
         self.old = os.getcwd()
         os.chdir(self.root)
-        ic.reset_quota_state()
+        iq.reset_quota_state()
 
     def tearDown(self):
         os.chdir(self.old)
-        ic.reset_quota_state()
+        iq.reset_quota_state()
         self.td.cleanup()
 
     def _entry(self, name, author, generated="2026-10-24"):
@@ -41,30 +41,30 @@ class QuotaTest(unittest.TestCase):
     def test_per_author_limit_rejects_third_submission(self):
         self._entry("NF-1.md", "alice")
         self._entry("NF-2.md", "alice")
-        self.assertIn("2 条上限", ic.quota_denial("ALICE"))
-        self.assertEqual("", ic.quota_denial("bob"))
+        self.assertIn("2 条上限", iq.quota_denial("ALICE"))
+        self.assertEqual("", iq.quota_denial("bob"))
 
     def test_global_limit_and_in_run_accounting(self):
         self._entry("NF-1.md", "alice")
         self._entry("NF-2.md", "bob")
         self._entry("NF-3.md", "carol")
-        self.assertIn("全仓当日", ic.quota_denial("dave"))
-        ic.reset_quota_state()
+        self.assertIn("全仓当日", iq.quota_denial("dave"))
+        iq.reset_quota_state()
         (self.root / "library" / "NF-3.md").unlink()
-        self.assertEqual("", ic.quota_denial("dave"))
-        ic.record_quota("dave")
-        self.assertIn("全仓当日", ic.quota_denial("erin"))
+        self.assertEqual("", iq.quota_denial("dave"))
+        iq.record_quota("dave")
+        self.assertIn("全仓当日", iq.quota_denial("erin"))
 
     def test_old_days_do_not_consume_quota(self):
         self._entry("NF-1.md", "alice", "2026-10-23")
-        self.assertEqual("", ic.quota_denial("alice"))
+        self.assertEqual("", iq.quota_denial("alice"))
 
     def test_invalid_quota_declaration_fails_to_conservative_default(self):
         (self.root / "library" / "intake.json").write_text(
             '{"submission":{"quota":{"per_author_per_day":0,"global_per_day":-1}}}',
             encoding="utf-8",
         )
-        self.assertEqual((2, 20), ic.load_quota())
+        self.assertEqual((2, 20), iq.load_quota())
 
 
 class GiteeWriteBoundaryTest(unittest.TestCase):
