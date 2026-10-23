@@ -446,7 +446,7 @@
       "max_fn_lines": 28
     },
     "desktop/src/core/gate_select.py": {
-      "lines": 170,
+      "lines": 182,
       "max_fn_cc": 12,
       "max_fn_lines": 34
     },

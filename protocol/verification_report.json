@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 229,
-        "probed": 229
+        "patterns": 230,
+        "probed": 230
       },
       "status": "pass",
       "warns": 0
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "d4d89ffea6114a2b10d3c8539045e76bcad4e5522ea2bbdd0c03a9ac909bfce0",
+  "root_digest": "e89803e2b7503c9389f1344efe74966338da7e74509bedcb6ce2a1319d0eb1df",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
