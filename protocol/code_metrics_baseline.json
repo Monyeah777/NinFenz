@@ -436,7 +436,7 @@
       "max_fn_lines": 22
     },
     "desktop/src/core/gate_observe.py": {
-      "lines": 211,
+      "lines": 219,
       "max_fn_cc": 11,
       "max_fn_lines": 35
     },

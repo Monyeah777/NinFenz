@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:86030648b18d3d2bad386459b1730e9cfcb7ad0f7109a960863db547ccee9b5b
+  - protocol/code_metrics_baseline.json:f46d3af033b79c612db468229d4f8059daabbf4c0a611cb47ee38637ce4b38ce
 ---
+> 重审（2026-10-23）：A2 同族修复：gate_observe 盘符/UNC 判仓外
+
 > 重审（2026-10-23）：A 类跨平台修复（尾点占位/盘符路径）后重绑
 
 > 重审（2026-10-23）：完整性锚点去缓存：批准与产物清单直接分块哈希，修复同 mtime/size 陈旧假命中
