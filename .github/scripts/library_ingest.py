@@ -42,6 +42,8 @@ from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026
     load_gate,
     load_rating_vocab,
     parse_nfname,
+    quota_denial,
+    record_quota,
     redact,
     run_git,
     scan_existing,
@@ -179,6 +181,12 @@ def main():
         comment('⏳ 收到投稿意图，但本通道当前仅接受白名单投稿人（闸门声明 '
                 f'{INTAKE_REL}）。外部投稿请走 Gitee 通道或联系作者。')
         print(f'非白名单投稿人（{AUTHOR}），已礼貌拒绝')
+        sys.exit(0)
+    quota_error = quota_denial(AUTHOR)
+    if quota_error:
+        comment(f'⏸ 投稿未入库：{quota_error}（配额真源：{INTAKE_REL}）。')
+        close_issue()
+        print(f'{quota_error}，已拒绝并关闭')
         sys.exit(0)
     # 正文按下述优先级取：文件 > env > **议题 API**（生产真源，不受单条 env 字符串
     # 131072 字节硬限约束——见 resolve_body 的事故留痕）。
@@ -350,6 +358,7 @@ def main():
     )
     # 入库件是**公开边界**的产物：半截写入会被随后 git push 带进公开仓（2026-10-01 普查）
     atomic_write.write_text(fname, frontmatter + header + body_main.rstrip() + '\n')
+    record_quota(AUTHOR)
     print(f'已写入 {fname}（{len(body_main)} 字符）')
 
     # ---- 5. 重生成 INDEX 生成区 + ALIAS（投影；真源 = 条目 frontmatter）----

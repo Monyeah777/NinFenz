@@ -176,8 +176,7 @@
       "stats": {
         "channels": 2,
         "modes": [
-          "author_only",
-          "open"
+          "author_only"
         ]
       },
       "status": "pass",
@@ -292,32 +291,39 @@
     },
     {
       "id": "conformance_report",
-      "issues": 0,
+      "issues": 2,
       "name": "一致性报告（已提交 == 实时重算）",
-      "sample": [],
+      "sample": [
+        "报告过期或被改：root 记录=b581fd3820391adb 实测=24dfabf6f2431f3c（修复指引：nf conformance --write）",
+        "verdict 不一致：记录=conformant 实测=non-conformant"
+      ],
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "b581fd3820391adb23ab949682c79f7fd679806481437505bb72d6af8c2ada8b",
-        "verdict": "conformant"
+        "passed": 26,
+        "root": "24dfabf6f2431f3c29cce8039f84343b4ae65b72d5af9c63e533afc0d2fb6a30",
+        "verdict": "non-conformant"
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
       "id": "audit",
-      "issues": 0,
+      "issues": 4,
       "name": "审计件被审对象 digest",
-      "sample": [],
+      "sample": [
+        "AUD-0005：被审对象已变，旧审计失效：library/intake.json（修复指引：重审并更新 digest）",
+        "AUD-0006：被审对象已变，旧审计失效：library/INDEX.md（修复指引：重审并更新 digest）",
+        "AUD-0010：被审对象已变，旧审计失效：library/intake.json（修复指引：重审并更新 digest）"
+      ],
       "source": "audit.scan",
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 385,
         "with_header": 46
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 1
     },
     {
@@ -364,9 +370,11 @@
     },
     {
       "id": "code_metrics",
-      "issues": 0,
+      "issues": 1,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [],
+      "sample": [
+        "desktop/src/core/ingest_common.py 模块行数 301 > 冻结值 226（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+      ],
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 308,
@@ -375,7 +383,7 @@
         "max_fn_lines": 1263,
         "max_lines": 7646
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -521,29 +529,31 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 0,
+      "issues": 1,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [],
+      "sample": [
+        "② protocol/role_coordinates.json 与实时重算不一致（记录 538fdb91b618 / 实测 37768458584c）（修复指引：nf layers --write）"
+      ],
       "source": "role_model.scan",
       "stats": {
-        "files": 3841,
-        "kernel": 2000,
+        "files": 3843,
+        "kernel": 2001,
         "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     }
   ],
-  "root_digest": "94b8212c8f2491dbcf6deb9e79e1a0077f5f55426dab36ee573bfd135f91faaf",
+  "root_digest": "645c70a8d5ed4a755335a9e1344c62f3475e785e5478472403498140cf26604f",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
-    "warn": 2
+    "fail": 4,
+    "pass": 26,
+    "warn": 1
   }
 }

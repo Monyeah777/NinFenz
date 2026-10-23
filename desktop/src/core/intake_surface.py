@@ -152,7 +152,7 @@ def _check_gitee(root: str, sub: dict, templates: dict, issues: list[str]) -> No
     if state == "empty-by-design":
         if not d.is_dir():
             issues.append(f"gitee_surface.dir 不存在：{gdir}（empty-by-design 须目录在场且为空）")
-        elif any(d.iterdir()):
+        elif any(p.name != ".gitkeep" for p in d.iterdir()):
             issues.append(f"gitee_surface.dir 声明 empty-by-design，但目录非空：{gdir}")
         routes = _read(root, ROUTES_REL)
         for rel in (templates.get("gitee") or []):
