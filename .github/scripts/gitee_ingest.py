@@ -37,6 +37,7 @@ from core import (
 # （`rebuild_alias` 已于 2026-10-01 删除：ALIAS 改由 `core.library.write_projection`
 #   全量重生成——该函数是它的旧实现，定义后从未被调用，只有本文件的 import 在“装作”被用）
 from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026-10-14 core 抽取）
+    INTAKE_REL,
     MAX_BODY_CHARS,
     SEG_RE,
     clean_val,
@@ -47,6 +48,8 @@ from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026
     load_gate,
     load_rating_vocab,
     parse_nfname,
+    quota_denial,
+    record_quota,
     redact,
     run_git,
     scan_existing,
@@ -179,6 +182,13 @@ def process(issue):
     if already_processed(number):
         print('  ⏭ 已入库过（防重），仅尝试关闭')
         gitee_close(number)
+        return
+
+    quota_error = quota_denial(author)
+    if quota_error:
+        gitee_comment(number, f'⏸ 投稿未入库：{quota_error}（配额真源：{INTAKE_REL}）。')
+        gitee_close(number)
+        print(f'  ✋ {quota_error}，已拒绝并关闭')
         return
 
     if not body.strip():
@@ -349,6 +359,7 @@ def process(issue):
     )
     # 入库件是**公开边界**的产物：半截写入会被随后 git push 带进公开仓（2026-10-01 普查）
     atomic_write.write_text(fname, frontmatter + header + body_main.rstrip() + '\n')
+    record_quota(author)
     print(f'  已写入 {fname}（{len(body_main)} 字符）')
 
     # 重生成 INDEX 生成区 + ALIAS（投影；真源 = 条目 frontmatter）

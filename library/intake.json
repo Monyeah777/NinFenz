@@ -2,14 +2,17 @@
   "after_action": "lifecycle",
   "channels": {
     "gitee": {
+      "allowlist": [
+        "monyeah777"
+      ],
       "gate": [
         "self_contained",
         "numbering",
         "license_warn",
         "rating_warn"
       ],
-      "index_label": "公开开放 · 零门槛",
-      "mode": "open"
+      "index_label": "仅作者本人自投",
+      "mode": "author_only"
     },
     "github": {
       "allowlist": [
@@ -49,6 +52,11 @@
     "fields": ["标题", "形态/领域自述", "一句话", "许可", "分级", "档位词", "自定义段"],
     "explicit_required": ["分级"],
     "forbidden_attributions": ["（平台限制）"],
+    "quota": {
+      "per_author_per_day": 2,
+      "global_per_day": 20,
+      "note": "按投稿人/全仓的日配额；机器人读本段并在入库前拒绝超额投稿。配额按 library 条目 frontmatter 的 generated 日期与 author 计数，不依赖进程内易失状态。"
+    },
     "templates": {
       "github": [".github/ISSUE_TEMPLATE/library_submission.md"],
       "gitee": [".github/ISSUE_TEMPLATE/NF投稿.md"]
