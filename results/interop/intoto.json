@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 70,
+    "count": 71,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "b2a7526129e8a0207406cfe7efd756404aca2c146e22380b4093f75161275a74",
+    "root": "9da4bf676947b47dbb1d34d81c51e141ca55fcfe2211db5d6248f8c743106919",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -131,7 +131,7 @@
     },
     {
       "digest": {
-        "sha256": "13b711c64920942efc2bc0c61cc7ba6b57b9299945f95c37823f97b552b06325"
+        "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
       },
       "name": "protocol/schema/asset_contracts.schema.json"
     },
@@ -143,7 +143,7 @@
     },
     {
       "digest": {
-        "sha256": "f46d3af033b79c612db468229d4f8059daabbf4c0a611cb47ee38637ce4b38ce"
+        "sha256": "738674fb750a7333f1469ee7357f4c9f4dac6ee8e3d6e52702d20004c2133b8c"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -335,55 +335,55 @@
     },
     {
       "digest": {
-        "sha256": "3c9564582f6cc563d64518f943f5def2f2a8d09c3e34895ddd67296a9fc05068"
+        "sha256": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f"
       },
       "name": "protocol/schema/asset.schema.json"
     },
     {
       "digest": {
-        "sha256": "13b711c64920942efc2bc0c61cc7ba6b57b9299945f95c37823f97b552b06325"
+        "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
       },
       "name": "protocol/schema/asset_contracts.schema.json"
     },
     {
       "digest": {
-        "sha256": "12de90b153bc72ba944889090d16f544bec1537424155fa41934ea1546941826"
+        "sha256": "5a68d3969a99adaf15bbf69f4d8319b394ba70515b83c55a95e9f303d2b30872"
       },
       "name": "protocol/schema/contract.schema.json"
     },
     {
       "digest": {
-        "sha256": "e158ec7a2998774a8605e0cb1325c8d961460234576bf07f4ada46b4ba162a40"
+        "sha256": "11289408fd1b1dbd20f28ad34da72b4136a69a9df005440a513f18776e9eab91"
       },
       "name": "protocol/schema/integration.schema.json"
     },
     {
       "digest": {
-        "sha256": "bc17666f19fc8fb9c7cb2b6556c78ebbd8bc8eaf93363aeeb6d670505daa9d0d"
+        "sha256": "c8394c0824e6591cf61c64b03d2f7c208e049648d5f768270a8c111c1036c52f"
       },
       "name": "protocol/schema/integration_strings.schema.json"
     },
     {
       "digest": {
-        "sha256": "4271c47cdd643524684f19a81c2d23dd6f9a1d85da704d7a49be870927e059b2"
+        "sha256": "912b9c2b02d84015fac80032d2e101c3425a8e2161e5a29e03d9b91d917bed2a"
       },
       "name": "protocol/schema/module.schema.json"
     },
     {
       "digest": {
-        "sha256": "477b35cce423a9b12581cfbca743663154dec264746aece800612e48c08cb4b8"
+        "sha256": "104775cad9f18c31b55683eeb6adc7dd5b9e4a124baa9a1cca3c493343692834"
       },
       "name": "protocol/schema/pipeline.schema.json"
     },
     {
       "digest": {
-        "sha256": "7ee456048a6365d28ed82358998dedd72263cc99d13bd1a466934f46ada9a5d3"
+        "sha256": "94f38c06de72f3c633daa22f47f3ee85a39f859aaf83907e7a4331e9cd554035"
       },
       "name": "protocol/schema/protocol.schema.json"
     },
     {
       "digest": {
-        "sha256": "4a0826e339becae4a2f278f9ca781542874802caf6d239453aeed2aa367165e1"
+        "sha256": "3b43958fafb0d9e03506214d7c373fca641397c0636fb3e112d9a30ddb326bb6"
       },
       "name": "protocol/schema/release.schema.json"
     },
@@ -428,6 +428,12 @@
         "sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
       },
       "name": "decisions/ADR-0007-计划内容不进产品仓.md"
+    },
+    {
+      "digest": {
+        "sha256": "d0e71160c3b515d6d43ab73058e273006c9c0ff7c5128c2100da39067b36cfc1"
+      },
+      "name": "postmortems/PO-0001-冻结顺序事故.md"
     }
   ]
 }

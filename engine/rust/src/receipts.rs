@@ -92,11 +92,12 @@ fn glob_sorted(root: &Path, rel_dir: &str, prefix: &str, suffix: &str) -> Vec<St
 }
 
 /// 真源 `protocol_subjects(root)`：固定段（原序）→ `protocol/schema/*.json`（排序）
-/// → `decisions/ADR-*.md`（排序）→ 过滤掉不存在的件。
+/// → `decisions/ADR-*.md`（排序）→ `postmortems/PO-*.md`（排序）→ 过滤掉不存在的件。
 pub fn protocol_subjects(root: &Path) -> Vec<String> {
     let mut subs: Vec<String> = FIXED.iter().map(|s| (*s).to_string()).collect();
     subs.extend(glob_sorted(root, "protocol/schema", "", ".json"));
     subs.extend(glob_sorted(root, "decisions", "ADR-", ".md"));
+    subs.extend(glob_sorted(root, "postmortems", "PO-", ".md"));
     subs.retain(|rel| root.join(rel).is_file());
     subs
 }
