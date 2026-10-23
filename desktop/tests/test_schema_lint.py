@@ -306,6 +306,16 @@ class DirectEnumerationTest(unittest.TestCase):
 
 
 class SchemaScanTest(unittest.TestCase):
+    def test_schema_ids_are_absolute_unique_and_match_filename(self):
+        ids = []
+        schema_dir = Path(ROOT) / "protocol" / "schema"
+        for path in sorted(schema_dir.glob("*.schema.json")):
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            want = "https://ninfenz.dev/schema/" + path.name
+            self.assertEqual(want, doc.get("$id"), path.name)
+            ids.append(want)
+        self.assertEqual(len(ids), len(set(ids)))
+
     def test_schema_files_meta(self):
         issues, schemas = sl.check_schema_files(ROOT)
         self.assertEqual(issues, [])
@@ -349,7 +359,8 @@ class SchemaScanTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             sdir = os.path.join(tmp, "protocol", "schema")
             os.makedirs(sdir)
-            ok_doc = {"$schema": sl.DIALECT, "$id": "x.schema.json", "title": "t",
+            ok_doc = {"$schema": sl.DIALECT,
+                      "$id": "https://ninfenz.dev/schema/x.schema.json", "title": "t",
                       "type": "object", "properties": {}}
             bad_doc = dict(ok_doc, **{"$schema": "http://json-schema.org/draft-07/schema#"})
             with open(os.path.join(sdir, "x.schema.json"), "w", encoding="utf-8") as fh:

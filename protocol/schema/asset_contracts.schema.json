@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "nf:asset-contracts",
+  "$id": "https://ninfenz.dev/schema/asset_contracts.schema.json",
   "title": "NF 数字资产契约声明（asset contracts）",
   "description": "protocol/asset_contracts.json 的单一真相定义（S2 可移植规范）：四面 = 数据 / 代码 / 脚本 / 包清单 + I/O 链。声明即契约：**指不出判据的资产不许登记**。",
   "type": "object",

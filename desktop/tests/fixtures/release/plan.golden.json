@@ -50,5 +50,5 @@
       "打标"
     ]
   ],
-  "policy_schema": "nf:release-policy"
+  "policy_schema": "https://ninfenz.dev/schema/release.schema.json"
 }

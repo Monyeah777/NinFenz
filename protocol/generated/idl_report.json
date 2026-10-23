@@ -2829,14 +2829,14 @@
     }
   ],
   "schema_ids": [
-    "asset.schema.json",
-    "contract.schema.json",
-    "module.schema.json",
-    "nf:asset-contracts",
-    "nf:integration",
-    "nf:integration-strings",
-    "nf:release-policy",
-    "pipeline.schema.json",
-    "protocol.schema.json"
+    "https://ninfenz.dev/schema/asset.schema.json",
+    "https://ninfenz.dev/schema/asset_contracts.schema.json",
+    "https://ninfenz.dev/schema/contract.schema.json",
+    "https://ninfenz.dev/schema/integration.schema.json",
+    "https://ninfenz.dev/schema/integration_strings.schema.json",
+    "https://ninfenz.dev/schema/module.schema.json",
+    "https://ninfenz.dev/schema/pipeline.schema.json",
+    "https://ninfenz.dev/schema/protocol.schema.json",
+    "https://ninfenz.dev/schema/release.schema.json"
   ]
 }

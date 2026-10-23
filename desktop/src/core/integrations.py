@@ -28,8 +28,8 @@ KINDS = ("server", "client", "cli", "library", "editor", "package", "export", "c
 STATUSES = ("active", "proposed", "deprecated")
 REQUIRED = ("schema", "id", "title", "kind", "status", "version", "codeowner", "tier",
             "entry", "docs", "evidence")
-SCHEMA_ID = "nf:integration"
-STRINGS_SCHEMA_ID = "nf:integration-strings"
+SCHEMA_ID = "https://ninfenz.dev/schema/integration.schema.json"
+STRINGS_SCHEMA_ID = "https://ninfenz.dev/schema/integration_strings.schema.json"
 STRINGS_NAME = "strings.json"
 #: 多字符类 + 必需字面量：**必须带「不在类内」的负向后顾**（2026-10-10 ReDoS 扫描扫出）——
 #: 否则在长 token 上每个起点各回溯一遍 ⇒ O(n²)（实测 64 KB 纯字母数字 3.2 s）。后顾只让
