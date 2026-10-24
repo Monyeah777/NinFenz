@@ -259,7 +259,7 @@ def _resolve_root() -> Path:
     if _probe_writable(root):
         _ROOT["root"], _ROOT["key"] = root, key
         return root
-    fallback = Path.cwd() / ".nf-cache"
+    fallback = (Path.cwd() / ".nf-cache").resolve()
     if _adopt_fallback(fallback):
         print(f"WARN: 用户缓存目录不可写（{root}），判据缓存回退仓内 {fallback}："
               "该目录可能被仓库内容影响，只应作降级运行", file=sys.stderr)
