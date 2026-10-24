@@ -531,9 +531,9 @@
       "max_fn_lines": 51
     },
     "desktop/src/core/intake_quota.py": {
-      "lines": 81,
+      "lines": 82,
       "max_fn_cc": 7,
-      "max_fn_lines": 17
+      "max_fn_lines": 18
     },
     "desktop/src/core/intake_surface.py": {
       "lines": 226,
@@ -1091,7 +1091,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/schema_lint.py": {
-      "lines": 453,
+      "lines": 464,
       "max_fn_cc": 46,
       "max_fn_lines": 103
     },
@@ -1506,7 +1506,7 @@
       "max_fn_lines": 36
     },
     "scripts/sync_llms.py": {
-      "lines": 61,
+      "lines": 59,
       "max_fn_cc": 5,
       "max_fn_lines": 29
     },
