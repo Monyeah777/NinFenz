@@ -34,25 +34,30 @@ def _git_executable() -> str:
     return shutil.which("git") or ""
 
 
+def _git_paths(root: str, args: tuple[str, ...]) -> list[str]:
+    """Run one fixed, argv-only git path query and return NUL-separated entries."""
+    exe = _git_executable()
+    if not exe:
+        return []
+    try:
+        proc = subprocess.run(  # nosec B603  # noqa: S603 - fixed argv list, no shell
+            [exe, "-C", str(root), *args],
+            capture_output=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if proc.returncode != 0:
+        return []
+    return proc.stdout.decode("utf-8", "replace").split("\0")
+
+
 def ignored_paths(root: str) -> Set[str]:
     """根下**被 `.gitignore` 覆盖**的路径集（posix 相对、已去尾斜杠；目录覆盖其下全部）。
 
     git 不在场 / 调用失败 / 非 git 检出（含临时目录里的单测）→ 返回空集。
     """
-    exe = _git_executable()
-    if not exe:
-        return set()
-    try:
-        proc = subprocess.run(  # nosec B603  # noqa: S603 - argv 列表、无 shell、子命令固定
-            [exe, "-C", str(root), "ls-files", "-o", "-i", "--exclude-standard",
-             "--directory", "-z"],
-            capture_output=True, timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return set()
-    if proc.returncode != 0:
-        return set()
     out: Set[str] = set()
-    for raw in proc.stdout.decode("utf-8", "replace").split("\0"):
+    args = ("ls-files", "-o", "-i", "--exclude-standard", "--directory", "-z")
+    for raw in _git_paths(root, args):
         rel = raw.strip().replace("\\", "/").strip("/")
         if rel and ".." not in rel.split("/"):
             out.add(rel)
@@ -108,19 +113,8 @@ def tracked_paths(root: str) -> list[Path]:
     an untracked file in the checkout. Callers that need that stability use this
     helper and fall back to :func:`walk_repo_paths` for synthetic non-git trees.
     """
-    exe = _git_executable()
-    if not exe:
-        return []
-    try:
-        proc = subprocess.run(  # nosec B603 - argv list, no shell
-            [exe, "-C", str(root), "ls-files", "-z"],
-            capture_output=True, timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return []
-    if proc.returncode != 0:
-        return []
     out: list[Path] = []
-    for raw in proc.stdout.decode("utf-8", "replace").split("\0"):
+    for raw in _git_paths(root, ("ls-files", "-z")):
         rel = raw.strip().replace("\\", "/")
         if not rel or ".." in rel.split("/"):
             continue
