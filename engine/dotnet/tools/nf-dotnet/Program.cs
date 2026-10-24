@@ -14,6 +14,7 @@ const string Version = "0.1.0";
 
 string? root = null;
 string scope = "protocol";
+var scopeSet = false;
 string? samplesPath = null;
 string? benchBaselinePath = null;
 string? benchWritePath = null;
@@ -106,6 +107,7 @@ for (var i = 0; i < args.Length; i++)
         case "--scope":
             if (++i >= args.Length) return Usage("--scope 需要 protocol|library");
             scope = args[i];
+            scopeSet = true;
             break;
         case "--packs":
             if (++i >= args.Length) return Usage("--packs 需要逗号分隔的包名");
@@ -534,7 +536,7 @@ int ReceiptsCommand()
         : Receipts.VerifyProtocolReceipts(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["stats"] = new Dictionary<string, object?>
@@ -559,7 +561,7 @@ int TransparencyCommand()
     var result = Receipts.VerifyTransparencyChain(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["stats"] = new Dictionary<string, object?>
@@ -652,7 +654,7 @@ int PatternsCommand()
         var rows = Patterns.Entries(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(rows.Select(e => (object?)new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(rows.Select(e => (object?)new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["id"] = Fm(e, "id"),
                 ["name"] = Fm(e, "name"),
@@ -685,10 +687,11 @@ int PatternsCommand()
         }
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["id"] = want,
                 ["path"] = hit.Path,
+                ["_meta"] = new Dictionary<string, object?>(StringComparer.Ordinal),
                 ["frontmatter"] = hit.Fm,
             }));
             return 0;
@@ -710,7 +713,7 @@ int PatternsCommand()
         var hits = Patterns.ForPath(root!, target);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(hits.Cast<object?>().ToList()));
+            Console.WriteLine(JsonFor(hits.Cast<object?>().ToList()));
         }
         else
         {
@@ -725,7 +728,7 @@ int PatternsCommand()
     var projection = Patterns.CheckProjection(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["issues"] = issues.Cast<object?>().ToList(),
             ["warns"] = warns.Cast<object?>().ToList(),
@@ -767,6 +770,101 @@ static string PadCp(string s, int width)
 {
     var len = PyScalar.PyLen(s);
     return len >= width ? s : s + new string(' ', width - len);
+}
+
+/// <summary>
+/// Python CLI 的公共 JSON 信封：映射补 <c>kind</c>；列表补
+/// <c>{kind,count,rows}</c>（patterns for 另带 target）。这里只作用于本进程的
+/// 现代只读命令，已有 <c>kind</c> 的映射保持原样。
+/// </summary>
+string JsonFor(object? value, string? explicitKind = null)
+{
+    var kind = explicitKind ?? JsonKind();
+    if (value is Dictionary<string, object?> map)
+    {
+        if (kind is not null && !map.ContainsKey("kind"))
+        {
+            map = new Dictionary<string, object?>(map, StringComparer.Ordinal) { ["kind"] = kind };
+        }
+        return PythonJson.Indented(map);
+    }
+    if (kind is not null && value is System.Collections.IEnumerable sequence and not string)
+    {
+        var rows = sequence.Cast<object?>().ToList();
+        var envelope = new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["kind"] = kind,
+            ["count"] = (long)rows.Count,
+            ["rows"] = rows,
+        };
+        if (kind == "patterns-for" && positional.Count >= 3) envelope["target"] = positional[2];
+        return PythonJson.Indented(envelope);
+    }
+    return PythonJson.Indented(value);
+}
+
+string? JsonKind()
+{
+    if (positional.Count == 0) return null;
+    var cmd = positional[0];
+    var sub = positional.Count >= 2 ? positional[1] : "";
+    return cmd switch
+    {
+        "receipts" => scope == "library" ? "library-receipts" : "receipts",
+        "transparency" => "transparency",
+        "assertions" => "assertions",
+        "decisions" => "decisions-verify",
+        "cognition" => "cognition",
+        "library" => "library-verify",
+        "model" => "model",
+        "patterns" => sub switch
+        {
+            "ls" => "patterns-ls", "show" => "patterns-show",
+            "for" => "patterns-for", _ => "patterns-verify",
+        },
+        "pipeline" => "pipeline-dryrun",
+        "module" when sub == "types" => "module-types",
+        "module" when sub == "signature" => "module-signature",
+        "handover" => sub == "verify" ? "handover-verify"
+            : sub == "check" ? "handover-check" : "handover-ls",
+        "postmortem" => sub == "verify" ? "postmortem-verify"
+            : sub == "check" ? "postmortem-check" : "postmortem-ls",
+        "audit" => sub == "verify" ? "audit-verify"
+            : sub == "check" ? "audit-check" : "audit-ls",
+        "sig" => "sig",
+        "rfc" => "rfc",
+        "endpoint" => "endpoint",
+        "events" => "events",
+        "toolface" => "toolface",
+        "knowledge" => sub switch
+        {
+            "frequency" => "knowledge-frequency",
+            "order" => "knowledge-order",
+            "visible" => "knowledge-visible",
+            "transform" => "knowledge-transform",
+            "lint" => "knowledge-lint",
+            _ => "knowledge",
+        },
+        "state-front" => stateFrontAb ? "state-front-ab"
+            : stateFrontCheck ? "state-front-check" : "state-front",
+        "interop" when interopCheck => "interop-verify",
+        "workloop" => workloopList ? "workloop-ls" : "workloop",
+        "license" => "license",
+        "score" => "score",
+        "review" => "review",
+        "decide" => decideDryRun ? "decide-dryrun" : "decide",
+        "doctor" => "doctor",
+        "diff" => "diff",
+        "driver" => sub.Length > 0 ? "driver-resolve" : "driver",
+        "telemetry" when flags.Contains("--otlp") => "telemetry-otlp",
+        "output" => sub switch
+        {
+            "list" => "output-list", "check" => "output-check",
+            "render" => "output-render", "meter" => "output-meter",
+            _ => "output-verify",
+        },
+        _ => null,
+    };
 }
 
 int AssetCommand()
@@ -954,7 +1052,7 @@ int AssetCommand()
         var filtered = AssetLedger.FilterRows(all, assetPkg, assetTier, assetStatus);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["kind"] = "asset-ls",
                 ["rows"] = filtered.Cast<object?>().ToList(),
@@ -1100,7 +1198,7 @@ int OutputCommand()
         var (issues, stats) = OutputForms.Scan(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["stats"] = stats,
@@ -1128,7 +1226,7 @@ int OutputCommand()
         var (issues, rows) = OutputForms.RenderOutputs(root!, outputPackage);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["rows"] = rows.Cast<object?>().ToList(),
@@ -1148,7 +1246,7 @@ int OutputCommand()
         var (_, stats) = OutputForms.Meter(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(stats));
+            Console.WriteLine(JsonFor(stats));
             return 0;
         }
         Console.WriteLine("  " + PadCp("包", 18) + " " + PadCp("机验面", 8) + " " + PadCp("功能面", 8)
@@ -1176,7 +1274,7 @@ int OutputCommand()
             .ToList();
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(rows.Cast<object?>().ToList()));
+            Console.WriteLine(JsonFor(rows.Cast<object?>().ToList()));
             return 0;
         }
         Console.WriteLine("  " + PadCp("形态", 28) + " " + PadCp("类别", 14) + " " + PadCp("档位", 4)
@@ -1229,7 +1327,7 @@ int OutputCommand()
     }
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(blob.Cast<object?>().ToList()));
+        Console.WriteLine(JsonFor(blob.Cast<object?>().ToList()));
         return bad > 0 ? 1 : 0;
     }
     foreach (var r in blob)
@@ -1282,7 +1380,7 @@ int DiffCommand()
                                       KnowledgeSig.BuildSignature(rb, root!));
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(diff));
+            Console.WriteLine(JsonFor(diff));
             return 0;
         }
         Console.WriteLine("== nf diff ==");
@@ -1446,7 +1544,9 @@ int MarketCommand()
             }));
             return regIssues.Count > 0 ? 1 : 0;
         }
-        Console.WriteLine("  registry protocols[] 无条目——无 references 可查");
+        Console.WriteLine($"  ✗ 包 {pkgId} 不在 registry protocols[]——无 references 可查"
+                          + "（修复指引：核对包名（`nf market --list` 可枚举已登记包）；若是新包，"
+                          + "先按 02 §8.3 登记三要件完成登记）");
         return regIssues.Count > 0 ? 1 : 0;
     }
     var data = MarketAnalyzer.PackData(root!);
@@ -1455,7 +1555,7 @@ int MarketCommand()
     var grades = MarketAnalyzer.GradesOfPackage(prots, pkgId);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["kind"] = "market-package",
             ["pkg_id"] = pkgId,
@@ -1509,7 +1609,8 @@ int ImpactCommand()
     Console.WriteLine($"== 删除影响面预检: {target} ==");
     if (impact.GetValueOrDefault("error") is string error)
     {
-        Console.WriteLine($"  [拒绝] {error}");
+        Console.WriteLine($"  [拒绝] {error}（修复指引：目标须是 registry 在册的 module / protocol id"
+                          + "（如 M00 / 通用:M10 / 校园情感领域包）；`nf market --list` 与 `nf module ls` 可枚举）");
         return 1;
     }
 
@@ -1700,7 +1801,7 @@ int WorkloopCommand()
         var rows = Workloop.Items(root!, Math.Max(1, topCount), source);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(rows.Cast<object?>().ToList()));
+            Console.WriteLine(JsonFor(rows.Cast<object?>().ToList()));
             return 0;
         }
         foreach (var it in rows)
@@ -1722,7 +1823,7 @@ int WorkloopCommand()
     var doc = Workloop.Plan(root!, adapterFlag, Math.Max(1, topCount), source);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(doc));
+        Console.WriteLine(JsonFor(doc));
     }
     else
     {
@@ -1737,7 +1838,7 @@ int LicenseCommand()
     var scan = LicenseGate.Scan(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["issues"] = scan.Issues.Cast<object?>().ToList(),
             ["stats"] = scan.Stats,
@@ -1842,7 +1943,7 @@ int DecideCommand()
         var scan = DecisionLayer.Scan(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["issues"] = scan.Issues.Cast<object?>().ToList(),
                 ["stats"] = scan.Stats,
@@ -1872,7 +1973,7 @@ int DecideCommand()
     var output = DecisionLayer.Decide(request, adapterFlag, endpointFlag, modelFlag, root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(output));
+        Console.WriteLine(JsonFor(output));
     }
     else if (PyS(output.GetValueOrDefault("status")) == "abstained")
     {
@@ -1955,7 +2056,6 @@ int DoctorCommand()
         Chk("registry 可解析", false, "desktop/src/core/registry.json: " + exc.Message);
     }
 
-    // 真源 `os.path.join(ROOT, "protocol", "schema")` → **原生分隔符的绝对路径**（该串直接进输出，故必须原生）
     var schemaDir = Path.Combine(root!, "protocol", "schema");
     var schemaCount = 0;
     try
@@ -1967,7 +2067,7 @@ int DoctorCommand()
         Chk("IDL schema 定义在场", false, exc.Message);
     }
     if (Directory.Exists(schemaDir))
-        Chk($"IDL schema 定义在场（{schemaCount} 份）", schemaCount == 5, schemaDir);
+        Chk($"IDL schema 定义在场（{schemaCount} 份）", schemaCount == 9, "protocol/schema");
 
     // 声明边界①：真源靠 Python import 成功，引擎只验文件在场
     Chk("核心库可导入（schema_lint）",
@@ -1989,7 +2089,7 @@ int DoctorCommand()
     try
     {
         var (schemaIssues, schemas) = SchemaLint.CheckSchemaFiles(root!);
-        Chk("schema 标准对照（jsonschema）", schemaIssues.Count == 0 && schemas.Count == 5,
+        Chk("schema 标准对照（jsonschema）", schemaIssues.Count == 0 && schemas.Count == 9,
             "CI 与本地同跑");
     }
     catch (Exception exc)
@@ -2029,13 +2129,22 @@ int DoctorCommand()
         Chk("world_model/world_slots", false, exc.Message);
     }
 
+    // 真源 `doctor` 的最后一个运行前提：PyYAML 在场时 YAML 字段不降级。
+    // 引擎无 Python，读同一份钉版声明作为存在性代理；详情与真源一致写 `PyYAML`。
+    var pyproject = Path.Combine(root!, "pyproject.toml");
+    var optionalYaml = File.Exists(pyproject)
+        && File.ReadAllText(pyproject, new System.Text.UTF8Encoding(false))
+            .Contains("pyyaml==", StringComparison.OrdinalIgnoreCase);
+    Chk("可选依赖 PyYAML 在场（YAML 字段不降级）", optionalYaml, "PyYAML");
+
     var passed = checks.Count(c => c["ok"] is true);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["version"] = NfCliVersion, ["ok"] = passed == checks.Count, ["passed"] = (long)passed,
-            ["total"] = (long)checks.Count, ["checks"] = checks.Cast<object?>().ToList(),
+            ["total"] = (long)checks.Count, ["degraded"] = false,
+            ["checks"] = checks.Cast<object?>().ToList(),
         }));
     }
     else
@@ -2090,18 +2199,25 @@ int ReviewCommand()
         Console.Error.WriteLine("错误：--write 是写面（审查报告落盘；真源还禁写 protocol/）——只读门不落盘，不提供");
         return 2;
     }
-    var scope = (sourceFlag ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-    // 照抄真源一处**空转**：`_cmd_review` 先用 classes 过滤出一份 rows，却从不使用它——
-    // 真正入库的 `review()` 内部自行重算候选（不带 classes）。故 `--scope` 对输出**无影响**，本件同样不接。
-    _ = scope;
-    var doc = GapReview.Review(root!, adapterFlag, endpointFlag, limitCount, batchCount);
+    var classes = (scopeSet ? scope : "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    var unknown = classes.Where(c => Array.IndexOf(GapReview.Classes, c) < 0).ToList();
+    if (unknown.Count > 0)
+    {
+        Console.Error.WriteLine($"  ✗ 未知 --scope：{string.Join("、", unknown)}"
+                                + $"（可枚举：{string.Join(" / ", GapReview.Classes)}）"
+                                + "（修复指引：--scope 只收这些类别，逗号分隔；不带 --scope 即全类）");
+        return 2;
+    }
+    var doc = GapReview.Review(root!, adapterFlag, endpointFlag, limitCount, batchCount, classes);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(doc));
+        Console.WriteLine(JsonFor(doc));
         return 0;
     }
     Console.WriteLine($"== nf review（逐行缺口审查 · 适配器 {adapterFlag}）==");
     Console.WriteLine("  " + GapReview.Summary(doc));
+    foreach (var issue in doc.GetValueOrDefault("issues") as List<object?> ?? new List<object?>())
+        Console.Error.WriteLine("  [FAIL] " + PyS(issue));
     var fixable = doc.GetValueOrDefault("fixable") as List<object?> ?? new List<object?>();
     foreach (var item in fixable.Take(40))
     {
@@ -2305,7 +2421,7 @@ int InteropCommand()
         var (checkIssues, checkStats) = Interop.Verify(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["issues"] = checkIssues.Cast<object?>().ToList(),
                 ["stats"] = checkStats,
@@ -2410,7 +2526,7 @@ int DriverCommand()
         var resolved = Driver.Resolve(root!, workflow);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["resolve"] = resolved,
                 ["issues"] = scan.Issues.Cast<object?>().ToList(),
@@ -2438,7 +2554,7 @@ int DriverCommand()
     var document = Driver.Load(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["driver"] = document,
             ["issues"] = scan.Issues.Cast<object?>().ToList(),
@@ -2519,7 +2635,13 @@ int TelemetryCommand()
     }
     if (flags.Contains("--otlp"))
     {
-        Console.WriteLine(PythonJson.IndentedUnsorted(TelemetrySemconv.ToExport(records)));
+        var exported = TelemetrySemconv.ToExport(records);
+        if (exported is Dictionary<string, object?> doc)
+            exported = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["kind"] = "telemetry-otlp",
+            }.Concat(doc).ToDictionary(kv => kv.Key, kv => kv.Value, StringComparer.Ordinal);
+        Console.WriteLine(PythonJson.IndentedUnsorted(exported));
         return 0;
     }
     Console.WriteLine($"== nf telemetry（{records.Count} 记录 → semconv 属性）==");
@@ -2592,7 +2714,7 @@ int EventsCommand()
     var (issues, warns, stats) = EventBacking.Scan(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["issues"] = issues.Cast<object?>().ToList(),
             ["warns"] = warns.Cast<object?>().ToList(),
@@ -2616,7 +2738,7 @@ int ToolFaceCommand()
     var (issues, stats) = ToolFace.Scan(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["kind"] = "toolface",
             ["issues"] = issues.Cast<object?>().ToList(),
@@ -2646,7 +2768,7 @@ int RfcCommand()
     var idx = Rfc.IndexDoc(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["index"] = idx,
             ["issues"] = issues.Cast<object?>().ToList(),
@@ -2681,7 +2803,7 @@ int EndpointCommand()
     var doc = EndpointContract.Load(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["contract"] = doc,
             ["issues"] = issues.Cast<object?>().ToList(),
@@ -2735,7 +2857,7 @@ int SigCommand()
         var (issues, stats) = KnowledgeSig.VerifyReproducible(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["stats"] = stats,
@@ -2753,7 +2875,7 @@ int SigCommand()
     var scan = KnowledgeSig.Scan(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(scan.Records));
+        Console.WriteLine(JsonFor(scan.Records));
     }
     else
     {
@@ -2776,7 +2898,7 @@ int ModelCommand()
     var result = Modeling.Run(root!, part);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["stats"] = result.Stats,
@@ -2884,7 +3006,7 @@ int LibraryCommand()
     var failed = result.Issues.Count + result.Projection.Count;
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["projection"] = result.Projection.Cast<object?>().ToList(),
@@ -2907,7 +3029,7 @@ int CognitionCommand()
     var result = Cognition.Run(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["stats"] = result.Stats,
@@ -2932,7 +3054,7 @@ int DecisionsCommand()
     var failed = result.Issues.Count + result.Projection.Count;
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["projection"] = result.Projection.Cast<object?>().ToList(),
@@ -2952,10 +3074,12 @@ int DecisionsCommand()
 int AssertionsCommand()
 {
     var result = Assertions.Run(root!);
+    var capabilities = Assertions.CapabilityReport(root!);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
+            ["capabilities"] = capabilities,
             ["issues"] = result.Issues.Cast<object?>().ToList(),
             ["results"] = result.Results,
         }));
@@ -3055,7 +3179,7 @@ int KnowledgeCommand()
         var (freqIssues, _freqWarns, freqStats) = KnowledgeSources.VerifyUsage(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>(StringComparer.Ordinal)
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["counts"] = counts,
                 ["written"] = false,
@@ -3080,7 +3204,7 @@ int KnowledgeCommand()
             ? knowledgeClearance : "");
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["clearance"] = knowledgeClearance.Length == 0 ? "不裁剪" : knowledgeClearance,
                 ["query_order"] = rows.Cast<object?>().ToList(),
@@ -3110,7 +3234,7 @@ int KnowledgeCommand()
         }).ToList();
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["clearance"] = clearance, ["sources"] = rows.Cast<object?>().ToList(),
             }));
@@ -3131,7 +3255,7 @@ int KnowledgeCommand()
         var entries = KnowledgeSources.LogEntries(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["stats"] = stats,
@@ -3155,7 +3279,7 @@ int KnowledgeCommand()
         var (issues, warns, stats) = KnowledgeSources.Lint(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["warns"] = warns.Cast<object?>().ToList(),
@@ -3176,7 +3300,7 @@ int KnowledgeCommand()
     if (json)
     {
         using var declDoc = JsonIo.ReadFile(Path.Combine(root!, "protocol", "knowledge_sources.json"));
-        Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+        Console.WriteLine(JsonFor(new Dictionary<string, object?>
         {
             ["declaration"] = PythonJson.ToGraph(declDoc.RootElement),
             ["issues"] = declIssues.Cast<object?>().ToList(),
@@ -3218,7 +3342,7 @@ int StateFrontCommand()
         var manifest = StateFront.AbManifest(text);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(manifest));
+            Console.WriteLine(JsonFor(manifest));
         }
         else
         {
@@ -3238,10 +3362,10 @@ int StateFrontCommand()
         var issues = StateFront.CheckOrder(text);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
-            }, 2));
+            }));
         }
         else
         {
@@ -3259,7 +3383,7 @@ int StateFrontCommand()
         // 同 Python：这里用的是 **非缩进** json.dumps（默认分隔符 ", " / ": "、不排序键）
         var chars = PyScalar.PyLen(output);
         var front = StateFront.CheckOrder(output).Count == 0;
-        Console.WriteLine("{\"mode\": " + PythonJson.Quote(stateFrontMode) +
+        Console.WriteLine("{\"kind\": \"state-front\", \"mode\": " + PythonJson.Quote(stateFrontMode) +
                           ", \"chars\": " + chars +
                           ", \"state_front\": " + (front ? "true" : "false") + "}");
     }
@@ -3294,7 +3418,7 @@ int GovernanceCommand(string family)
     {
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["warns"] = warns.Cast<object?>().ToList(),
@@ -3338,7 +3462,7 @@ int GovernanceCommand(string family)
         };
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["path"] = path,
                 ["issues"] = docIssues.Cast<object?>().ToList(),
@@ -3373,7 +3497,7 @@ int GovernanceCommand(string family)
     var rows = DocContractIo.Entries(root!, glob);
     if (json)
     {
-        Console.WriteLine(PythonJson.Indented(rows.Select(r => (object?)listKeys.ToDictionary(
+        Console.WriteLine(JsonFor(rows.Select(r => (object?)listKeys.ToDictionary(
             k => k, k => r.Fm.TryGetValue(k, out var v) ? v : null, StringComparer.Ordinal)).ToList()));
         return 0;
     }
@@ -3418,7 +3542,7 @@ int PipelineCommand()
             var (issues, tot) = PipelineDryrun.Sweep(root!);
             if (json)
             {
-                Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+                Console.WriteLine(JsonFor(new Dictionary<string, object?>
                 {
                     ["issues"] = issues.Cast<object?>().ToList(),
                     ["stats"] = tot,
@@ -3452,7 +3576,7 @@ int PipelineCommand()
         }
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["schema"] = "nf-graphspec/1",
                 ["pipeline"] = new Dictionary<string, object?>
@@ -3524,7 +3648,7 @@ int ModuleCommand()
         var coverage = IoTypes.Coverage(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["warns"] = warns.Cast<object?>().ToList(),
@@ -3551,7 +3675,7 @@ int ModuleCommand()
         var (issues, warns, stats) = ModuleSignature.Verify(root!);
         if (json)
         {
-            Console.WriteLine(PythonJson.Indented(new Dictionary<string, object?>
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>
             {
                 ["issues"] = issues.Cast<object?>().ToList(),
                 ["warns"] = warns.Cast<object?>().ToList(),

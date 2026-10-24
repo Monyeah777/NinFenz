@@ -19,6 +19,83 @@ public static class Assertions
 
     public sealed record RunResult(List<object?> Results, List<string> Issues);
 
+    /// <summary>等价 Python <c>assertions.capability_report()</c> 的统计面。</summary>
+    public static Dictionary<string, object?> CapabilityReport(string root)
+    {
+        using var declaration = Load(root);
+        if (declaration is null)
+            return new Dictionary<string, object?>(StringComparer.Ordinal) { ["declared"] = false };
+        var doc = declaration.RootElement;
+        if (!doc.TryGetProperty("capability_vocabulary", out var vocabNode)
+            || vocabNode.ValueKind != JsonValueKind.Array)
+        {
+            return new Dictionary<string, object?>(StringComparer.Ordinal) { ["declared"] = false };
+        }
+        var vocabulary = vocabNode.EnumerateArray()
+            .Where(x => x.ValueKind == JsonValueKind.String)
+            .Select(x => x.GetString()!)
+            .ToList();
+        if (vocabulary.Count == 0)
+            return new Dictionary<string, object?>(StringComparer.Ordinal) { ["declared"] = false };
+
+        var index = doc.TryGetProperty("capability_index", out var indexNode)
+                    && indexNode.ValueKind == JsonValueKind.Object
+            ? indexNode
+            : default;
+        var allNumbers = new HashSet<int>();
+        var covered = new HashSet<int>();
+        const string aggregate = "CAP_AGGREGATE_SUMMARY";
+        foreach (var capability in vocabulary)
+        {
+            if (index.ValueKind != JsonValueKind.Object
+                || !index.TryGetProperty(capability, out var rows)
+                || rows.ValueKind != JsonValueKind.Array)
+                continue;
+            var nums = rows.EnumerateArray()
+                .Where(x => x.ValueKind == JsonValueKind.Number && x.TryGetInt32(out _))
+                .Select(x => x.GetInt32())
+                .ToList();
+            allNumbers.UnionWith(nums);
+            if (capability != aggregate) covered.UnionWith(nums);
+        }
+
+        var checks = VerifyShChecks(root);
+        var assertions = doc.TryGetProperty("assertions", out var assertionNode)
+                         && assertionNode.ValueKind == JsonValueKind.Array
+            ? assertionNode.EnumerateArray().ToList()
+            : new List<JsonElement>();
+        var stats = new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["declared"] = true,
+            ["capabilities"] = (long)vocabulary.Count(c => c != aggregate),
+            ["aggregate_present"] = vocabulary.Contains(aggregate, StringComparer.Ordinal),
+            ["checks"] = (long)checks.Count,
+            ["covered"] = (long)checks.Intersect(allNumbers).Count(),
+            ["assertions"] = (long)assertions.Count,
+            ["mapped_assertions"] = (long)assertions.Count(a =>
+                a.ValueKind == JsonValueKind.Object
+                && a.TryGetProperty("capability", out var cap)
+                && cap.ValueKind == JsonValueKind.String
+                && cap.GetString()!.Length > 0),
+        };
+        if (checks.Count > 0)
+        {
+            stats["aggregate_only"] = checks.Except(covered).OrderBy(x => x)
+                .Select(x => (object?)(long)x).ToList();
+        }
+        return stats;
+    }
+
+    private static HashSet<int> VerifyShChecks(string root)
+    {
+        var path = Path.Combine(root, "verify.sh");
+        if (!File.Exists(path)) return new HashSet<int>();
+        var text = File.ReadAllText(path, new UTF8Encoding(false));
+        return Regex.Matches(text, @"(?m)^check(\d+)\s*\(\)")
+            .Select(m => int.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
+            .ToHashSet();
+    }
+
     public static RunResult Run(string root)
     {
         var declaration = Load(root);
@@ -69,6 +146,7 @@ public static class Assertions
                 ["message"] = Str(assertion, "message"),
                 ["fix"] = Str(assertion, "fix"),
                 ["evidence"] = Str(assertion, "evidence"),
+                ["capability"] = Str(assertion, "capability"),
             });
             if (!ok && severity == "fail")
             {

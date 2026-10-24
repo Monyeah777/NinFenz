@@ -14,8 +14,8 @@ namespace Nf.Engine;
 public static class QualityBaseline
 {
     public const string VerifyRel = "verify.sh";
-    public const int ExpectedChecks = 39;
-    public const int ExpectedPass = 68;
+    public const int ExpectedChecks = 42;
+    public const int ExpectedPass = 76;
 
     private static readonly Regex VersionRe = new(@"# 版本 : (v\d+\.\d+)", RegexOptions.CultureInvariant);
     private static readonly Regex CheckFnRe = new(@"^check(\d+)\(\)\{", RegexOptions.Multiline);

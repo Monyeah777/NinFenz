@@ -17,7 +17,10 @@ public static class PayloadHarvest
     private static readonly Regex FenceRe = new(@"```(?:yaml|yml)\n(.*?)```", RegexOptions.Singleline);
     private static readonly Regex EventRe = new(@"^\s*(?:event|name)\s*:\s*([a-z_][a-z0-9_]*)");
     private static readonly Regex PublishRe = new(@"^\s*(?:publish|produce)\s*:\s*\[?\s*([a-z_][a-z0-9_]*)");
+    private static readonly Regex BlockPublishRe = new(@"^\s*(?:publish|produce)\s*:\s*$");
+    private static readonly Regex BlockEventRe = new(@"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:");
     private static readonly Regex PayloadLineRe = new(@"^\s*payload\s*:\s*\{(.*)\}\s*$");
+    private static readonly Regex AnnotationRe = new(@"[（(][^()（）]*[)）]\s*$");
     private static readonly Regex NumberRe = new(@"^\d+(\.\d+)?$");
     private static readonly Regex UnitRe = new(@"回合|tick|日|分钟|数|量");
 
@@ -27,6 +30,12 @@ public static class PayloadHarvest
         ["integer"] = "integer", ["str"] = "string", ["string"] = "string",
         ["float"] = "number", ["number"] = "number", ["list"] = "array",
         ["array"] = "array", ["object"] = "object", ["dict"] = "object",
+    };
+    private static readonly HashSet<string> NotEventKeys = new(StringComparer.Ordinal)
+    {
+        "payload", "subscribers", "subscribe", "publish", "produce", "emit",
+        "description", "inputs", "output", "outputs", "type", "domain", "name",
+        "event", "events", "fields", "note", "notes", "version", "status", "steps",
     };
 
     /// <summary>按顶层逗号切分（跳过 <c>{}</c> / <c>[]</c> 内部）；顶层的逗号**本身被吃掉**。</summary>
@@ -55,6 +64,12 @@ public static class PayloadHarvest
 
     /// <summary>单个字段 token → (字段名, 类型)。规则全部来自文本字面形式。</summary>
     public static (string Name, string Kind) FieldType(string token)
+    {
+        var (name, kind) = FieldTypeRaw(token);
+        return (AnnotationRe.Replace(name, "").Trim(), kind);
+    }
+
+    private static (string Name, string Kind) FieldTypeRaw(string token)
     {
         token = token.Trim().TrimEnd('?');
         if (token.Length == 0) return ("", "");
@@ -93,28 +108,65 @@ public static class PayloadHarvest
         {
             var body = fence.Groups[1].Value;
             var ev = "";
-            var payloadRaw = "";
+            var blockEvent = "";
+            var inPublish = false;
+            var publishIndent = -1;
+            var eventIndent = -1;
             foreach (var line in body.Split('\n'))
             {
+                if (line.Trim().Length == 0) continue;
+                var indent = line.Length - line.TrimStart().Length;
                 var m = EventRe.Match(line);
-                if (m.Success) ev = m.Groups[1].Value;
+                if (m.Success)
+                {
+                    ev = m.Groups[1].Value;
+                    inPublish = false;
+                    eventIndent = -1;
+                }
                 var m2 = PublishRe.Match(line);
-                if (m2.Success && ev.Length == 0) ev = m2.Groups[1].Value;
+                if (m2.Success && ev.Length == 0)
+                {
+                    ev = m2.Groups[1].Value;
+                    inPublish = false;
+                    eventIndent = -1;
+                }
+                else if (BlockPublishRe.IsMatch(line))
+                {
+                    inPublish = true;
+                    publishIndent = indent;
+                    eventIndent = -1;
+                    blockEvent = "";
+                }
+                else if (inPublish)
+                {
+                    var mk = BlockEventRe.Match(line);
+                    if (indent <= publishIndent)
+                    {
+                        inPublish = false;
+                        eventIndent = -1;
+                        blockEvent = "";
+                    }
+                    else if (mk.Success && !NotEventKeys.Contains(mk.Groups[1].Value))
+                    {
+                        if (eventIndent < 0) eventIndent = indent;
+                        if (indent == eventIndent) blockEvent = mk.Groups[1].Value;
+                    }
+                }
                 var m3 = PayloadLineRe.Match(line);
                 if (!m3.Success) continue;
-                payloadRaw = m3.Groups[1].Value;
-                if (ev.Length == 0) continue;   // 真源此处有一段**空转**的 for 循环（无副作用），不实现
+                var currentEvent = ev.Length > 0 ? ev : blockEvent;
+                if (currentEvent.Length == 0) continue;
                 var fields = new Dictionary<string, string>(StringComparer.Ordinal);
-                foreach (var tok in SplitTopLevel(payloadRaw))
+                foreach (var tok in SplitTopLevel(m3.Groups[1].Value))
                 {
                     var (name, kind) = FieldType(tok);
                     if (name.Length > 0) fields[name] = kind;
                 }
                 if (fields.Count == 0) continue;
-                if (!outMap.TryGetValue(ev, out var slot))
+                if (!outMap.TryGetValue(currentEvent, out var slot))
                 {
                     slot = new Dictionary<string, string>(StringComparer.Ordinal);
-                    outMap[ev] = slot;
+                    outMap[currentEvent] = slot;
                 }
                 foreach (var (key, value) in fields) slot[key] = value;
             }

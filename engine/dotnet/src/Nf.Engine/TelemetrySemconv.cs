@@ -15,7 +15,7 @@ namespace Nf.Engine;
 ///
 /// **不宣称 OTLP 传输兼容**（无 protobuf / 无导出端点，只有**形状与属性命名**对齐）；
 /// <c>schema_url</c> 未填 = semconv 官方站点尚标 TODO，**不杜撰**。
-/// <c>traceId</c> / <c>timeUnixNano</c> 留空由采集方外套（trace 无时间戳纪律：调用 id 由内容摘要派生，可复现）。
+/// <c>traceId</c> / <c>spanId</c> 均由调用 id 确定性派生；<c>timeUnixNano</c> 留给采集方外套。
 /// </summary>
 public static class TelemetrySemconv
 {
@@ -104,15 +104,20 @@ public static class TelemetrySemconv
             })
             .ToList();
         var callId = CallIdOf(record);
-        var ok = record.TryGetValue("ok", out var okValue) ? PyTruthy(okValue) : true;
+        var traceId = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+            Encoding.UTF8.GetBytes("trace|" + callId))).ToLowerInvariant()[..32];
+        var generatedSpan = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+            Encoding.UTF8.GetBytes("span|" + callId))).ToLowerInvariant()[..16];
+        var statusCode = !record.TryGetValue("ok", out var okValue) || okValue is null
+            ? 0L : PyTruthy(okValue) is true ? 1L : 2L;
         return new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["name"] = name,
             ["kind"] = 1L,   // SPAN_KIND_INTERNAL
-            ["traceId"] = "",
-            ["spanId"] = spanId.Length > 0 ? spanId : callId[3..19],
+            ["traceId"] = traceId,
+            ["spanId"] = spanId.Length > 0 ? spanId : generatedSpan,
             ["attributes"] = attributes,
-            ["status"] = new Dictionary<string, object?>(StringComparer.Ordinal) { ["code"] = ok ? 1L : 2L },
+            ["status"] = new Dictionary<string, object?>(StringComparer.Ordinal) { ["code"] = statusCode },
         };
     }
 
