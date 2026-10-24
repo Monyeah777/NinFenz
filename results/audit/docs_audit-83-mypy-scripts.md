@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:5ba981e617eb15a49119387b2c2a40f8f13542b34fc32b7878c50e49416937d0
+  - scripts/nf.py:14c48492f9c92cbf2a79b47ff97a035bfc7e4e744fd88badeeab583e04331918
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - protocol/code_metrics_baseline.json:afa8dcb93110119adba72b050e0fb826093a06176afdeeb804d35b266b74f9a8
 ---
+> 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
+
 > 重审（2026-10-24）：CI 收口：修复 workflow cargo 版本探测、补齐 Rust parity 的 Python 固定依赖、移除 Rust 死代码，并扩展报告临时根脱敏覆盖。
 
 > 重审（2026-10-24）：CI 跨平台稳定性修复：角色投影只认 Git 跟踪面、报告路径脱敏、ReDoS 负例与 GUIDANCE 豁免判据同步，重审当前测试与门禁对象。

@@ -2608,24 +2608,24 @@ def _portable_path(p: object) -> str:
     """把本机绝对路径渲染成**可移植**写法：家目录前缀 → `~`，仓库根前缀 → `.`。
 
     为什么（2026-10-01 取证）：`nf daemon status --json` 的 `root` / `state_file` 会把
-    `C:\\Users\\<用户名>\\…` 原样写进机器面——同一份纪律（`_no_machine_paths`、公开面
-    `_c_public_surface`、`test_leak_surface`）此前只覆盖**失败消息**与**入仓文件**，
-    成功面的这两处漏网。改造后信息不丢（仍是完整定位），只是不再回吐用户名。
+    `C:\\Users\\<用户名>\\…` 原样写进机器面；改造后仍保留完整定位，但不再回吐用户名。
     """
     s = str(p or "")
     if not s:
         return s
-    home = os.path.expanduser("~")
-    for pref, repl in ((home, "~"), (ROOT, "."), (os.path.realpath(ROOT), ".")):
+    canon = os.path.realpath(os.path.expanduser(s))
+    for pref, repl in ((os.path.expanduser("~"), "~"), (ROOT, ".")):
         if not pref:
             continue
-        if s == pref:
+        base = os.path.realpath(pref)
+        ns, nb = os.path.normcase(canon), os.path.normcase(base)
+        if ns == nb:
             # 路径就是家目录/仓库根本身时也要折（2026-10-10 跨平台实测：daemon status 的
             # root 恰等于仓库根，此前只判 startswith(pref+sep) 而漏掉等值）。
             return repl
-        for sep in (os.sep, "/"):
-            if s.startswith(pref + sep):
-                return (repl + "/" + s[len(pref) + len(sep):]).replace("\\", "/")
+        prefix = nb.rstrip("\\/") + os.sep
+        if ns.startswith(prefix):
+            return (repl + "/" + canon[len(base) + 1:]).replace("\\", "/")
     return s
 
 

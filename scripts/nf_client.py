@@ -136,24 +136,22 @@ def _maybe_autostart() -> bool:
     marker = os.path.join(home, "daemon.starting")
     now = time.time()
     try:
-        with open(marker, encoding="utf-8") as fh:
-            prev = float(fh.read().strip() or 0)
-    except (OSError, ValueError):
-        prev = 0.0
-    if now - prev < START_MARKER_TTL:
-        return False                      # 上一轮已经拉过 -> 连发命令不重复拉（防赛出多个守护）
-    try:
         os.makedirs(home, exist_ok=True)
-        # 落盘走仓库统一的原子写（`core.atomic_write`，脚本面落盘单一出处）。**只在自动拉起
-        # 这条冷路径导入**：热路径（读状态 → 发帧 → 回写字节）仍然不 import 仓库任何模块。
         _src = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             "desktop", "src")
-        if _src not in sys.path:
-            sys.path.insert(0, _src)
+        sys.path.insert(0, _src)
         from core import atomic_write              # noqa: PLC0415
-        atomic_write.write_text(marker, "%.0f\n" % now)
-    except (OSError, ImportError):
-        marker_ok = False                 # 标记写不进 -> 本轮不保证「串行化」，但仍照常回退
+        with atomic_write.lock_file(marker, what="daemon autostart"):
+            try:
+                with open(marker, encoding="utf-8") as fh:
+                    prev = float(fh.read().strip() or 0)
+            except (OSError, ValueError):
+                prev = 0.0
+            if now - prev < START_MARKER_TTL:
+                return False
+            atomic_write.write_text(marker, "%.0f\n" % now)
+    except (OSError, ImportError, TimeoutError):
+        return False
     else:
         marker_ok = True
     root = os.path.dirname(os.path.abspath(__file__))

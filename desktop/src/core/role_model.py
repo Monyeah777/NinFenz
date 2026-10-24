@@ -112,8 +112,8 @@ def files_of(root: str = ".") -> List[str]:
     out = []
     # 提交投影必须只由 Git-tracked 面决定；测试/工具留下的未跟踪临时件不能改变
     # `protocol/role_coordinates.json`。合成树没有 Git 时回退到完整扫描面，保留单测语义。
-    tracked = repo_face.tracked_paths(root)
-    paths = tracked if tracked else list(repo_face.walk_repo_paths(root))
+    tracked = repo_face.tracked_paths(str(r))
+    paths = tracked if tracked else list(repo_face.walk_repo_paths(str(r)))
     for p in paths:
         try:
             out.append(os.path.relpath(str(p), str(r)).replace(os.sep, "/"))
