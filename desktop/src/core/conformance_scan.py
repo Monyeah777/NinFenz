@@ -37,8 +37,7 @@ def __getattr__(name):                        # PEP 562：旧名字照旧可用�
 FENCE = re.compile(r"(?ms)```yaml\s*(.*?)```")
 _T = chr(96) * 3
 #: 围栏 YAML 解析缓存：键 = (marker, **文本本身**)，值 = 解析结果或 None（见 `_fence_yaml`）。
-# : **负结果（勿重复尝试）**：与 `_BODY_CACHE` 一样**不落盘**——575 块「纯解析」139 ms vs 读回 108 ms
-# 。
+#: **负结果（勿重复尝试）**：与 `_BODY_CACHE` 一样**不落盘**；解析器缺席不是文本结果，永不入缓存。
 _FENCE_CACHE: Dict[Tuple[str, str], Any] = {}
 _FENCE_CACHE_MAX = 4096
 _FENCE_CACHE_MAX_BYTES = 64 * 1024 * 1024
@@ -48,7 +47,6 @@ _BODY_CACHE: Dict[str, Any] = {}
 _BODY_CACHE_MAX = 4096
 _BODY_CACHE_MAX_BYTES = 64 * 1024 * 1024
 _BODY_CACHE_BYTES = 0
-
 #: 「一次**只读**扫描内共享语料」的**四层作用域缓存**（`read_memo()` 框定、出口即清；聚合入口都是
 #: 纯读 ⇒ 冷却语义与「新起进程」一致）：读文本 / 列目录 / 按模式枚举 / 子树清单。实测一次
 #: `evaluate` 打开 7833 次文件而只有 2354 个不同文件（70% 冗余读），并建过 5403 次 `scandir`。
@@ -826,6 +824,8 @@ def _fence_yaml_cached(text: str, marker: str) -> Any:
     global _FENCE_CACHE_BYTES
     key = (marker, text)
     if key not in _FENCE_CACHE:
+        if _lyaml.module() is None:
+            return None
         size = len(text)
         if (len(_FENCE_CACHE) >= _FENCE_CACHE_MAX
                 or _FENCE_CACHE_BYTES + size > _FENCE_CACHE_MAX_BYTES):

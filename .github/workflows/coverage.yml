@@ -34,11 +34,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
           pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
+      - name: 冷启动前置（干净 clone 缺的目录）
+        shell: bash
+        run: mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
       - name: 核心层覆盖率门槛（desktop/src/core ≥80%；日志落盘）
+        env:
+          NF_COVERAGE: "1"
+          NF_TEST_JOBS: "4"
         run: |
           set -o pipefail
-          coverage run --source=desktop/src/core -m unittest discover -s desktop/tests 2>&1 | tee coverage.log
-          coverage report --fail-under=80 --include="desktop/src/core/*" 2>&1 | tee -a coverage.log
+          rc=0
+          python scripts/verify_tests.py --jobs 4 2>&1 | tee coverage.log || rc=$?
+          python -m coverage combine 2>&1 | tee -a coverage.log || rc=$?
+          python -m coverage report --fail-under=80 --include="desktop/src/core/*" 2>&1 | tee -a coverage.log || rc=$?
+          exit "$rc"
 
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
@@ -51,3 +60,4 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+          include-hidden-files: true

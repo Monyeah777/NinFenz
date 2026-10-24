@@ -48,6 +48,11 @@ pub fn strip_comments_and_strings(src: &str) -> String {
                     i += 2;
                     continue;
                 }
+                if raw && c == q && odd_backslashes(&chars, i) {
+                    out.push(' ');
+                    i += 1;
+                    continue;
+                }
                 if triple && c == q && i + 2 < n && chars[i + 1] == q && chars[i + 2] == q {
                     out.push_str("   ");
                     i += 3;
@@ -85,6 +90,17 @@ pub fn strip_comments_and_strings(src: &str) -> String {
         }
     }
     out
+}
+
+/// raw 字符串仍允许用反斜杠转义引号；只有奇数个前置反斜杠才阻止闭合。
+fn odd_backslashes(chars: &[char], at: usize) -> bool {
+    let mut odd = false;
+    let mut j = at;
+    while j > 0 && chars[j - 1] == '\\' {
+        odd = !odd;
+        j -= 1;
+    }
+    odd
 }
 
 /// 引号前是否是 raw 字符串前缀（`r"…"` / `rb"…"` / `fr"…"`）。

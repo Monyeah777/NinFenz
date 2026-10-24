@@ -285,21 +285,21 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
             env.setdefault("NF_DAEMON_IDLE", "30")
-            # 内层并发闸（2026-10-19 实测）：test_daemon_parity 的直跑面默认开 6 路线程，
-            # 16 片就是 96 个并发 python 进程——进程创建争用会把整片拖慢。
-            # 分片越多、每个分片的内层线程越少，总量固定在 ~16 路。
-            # 总并发上限按 8 路算：16 片时内层 = 1（一片同一时刻只 spawn 一个子进程）。
-            # 2026-10-19 实测：16 片 × 2 线程仍把单条重测试拖到 352 s，降为 1 路才真正削峰。
+            # 内层并发闸：分片越多，单分片内层线程越少；总 spawn 上限控制在 8 路。
+            # 实测 16 片 × 2 线程仍会拖长重测试，故分片模式把内层降到 1 路。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
             if _jobs_hint > 1:
                 _inner = max(1, min(6, 8 // max(1, _jobs_hint)))
             else:
-                # 单分片（CI 矩阵的一台 runner / --shard 模式）：按核数的一半算——
-                # 2 核 runner ≈ 1 路，20 核机 ≈ 6 路；不再假设"单分片就是最强机器"。
+                # 单分片（CI 矩阵的一台 runner）按核数一半算，不假设最强机器。
                 _inner = max(1, min(6, (os.cpu_count() or 4) // 2))
             env["NF_INNER_THREADS"] = str(_inner)
+            cmd = [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)]
+            if os.environ.get("NF_COVERAGE") == "1":
+                env.setdefault("COVERAGE_FILE", str(ROOT / ".coverage"))
+                cmd[1:1] = ["-m", "coverage", "run", "--parallel-mode"]
             result = proc_atom.popen_capture(
-                [sys.executable, str(Path(__file__).resolve()), "--run-shard", str(spec)],
+                cmd,
                 cwd=str(DESKTOP), env=env, timeout=SHARD_TIMEOUT_S,
                 new_session=os.name != "nt")
             rc = int(result["code"] if result["code"] is not None else 1)

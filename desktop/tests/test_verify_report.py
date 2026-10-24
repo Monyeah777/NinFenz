@@ -87,6 +87,18 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual("<root>/docs/x.md", first["sample"][0])
 
+    def test_macos_volatile_temp_paths_are_canonicalized(self):
+        first = vr._portable(
+            {"sample": ["/private/var/folders/aa/bb/T/tmp.one/docs/x.md"]},
+            "/var/folders/aa/bb/T/tmp.one",
+        )
+        second = vr._portable(
+            {"sample": ["/private/var/folders/cc/dd/T/tmp.two/docs/x.md"]},
+            "/var/folders/cc/dd/T/tmp.two",
+        )
+        self.assertEqual(first, second)
+        self.assertEqual("<root>/docs/x.md", first["sample"][0])
+
 
 class CheckTest(unittest.TestCase):
     def test_missing_report_reports_guidance(self):

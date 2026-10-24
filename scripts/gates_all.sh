@@ -28,8 +28,13 @@ fi
 
 echo "== 闸门 2/3 · coverage（desktop/src/core ≥80%）=="
 if python -m coverage --version >/dev/null 2>&1; then
-  python -m coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
-  python -m coverage report --fail-under=80 --include="desktop/src/core/*"
+  coverage_rc=0
+  jobs="${NF_TEST_JOBS:-4}"
+  COVERAGE_FILE="$PWD/.coverage" NF_COVERAGE=1 NF_TEST_JOBS="$jobs" \
+    python scripts/verify_tests.py --jobs "$jobs" || coverage_rc=$?
+  python -m coverage combine || coverage_rc=$?
+  python -m coverage report --fail-under=80 --include="desktop/src/core/*" || coverage_rc=$?
+  [ "$coverage_rc" -eq 0 ] || exit "$coverage_rc"
 else
   echo "  skip：本地未装 coverage（CI coverage job 兜底）"
 fi

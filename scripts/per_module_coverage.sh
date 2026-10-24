@@ -4,8 +4,12 @@
 set -e
 cd "$(dirname "$0")/.."
 MIN="${1:-50}"
-python -m coverage run --source=desktop/src/core -m unittest discover -s desktop/tests >/dev/null 2>&1 || true
-python -m coverage json --include="desktop/src/core/*" -o _cov_tmp.json
+jobs="${NF_TEST_JOBS:-4}"
+cov_rc=0
+COVERAGE_FILE="$PWD/.coverage" NF_COVERAGE=1 NF_TEST_JOBS="$jobs" \
+  python scripts/verify_tests.py --jobs "$jobs" || cov_rc=$?
+python -m coverage combine || cov_rc=$?
+python -m coverage json --include="desktop/src/core/*" -o _cov_tmp.json || cov_rc=$?
 python - <<PY
 import json
 data = json.load(open("_cov_tmp.json", encoding="utf-8"))
@@ -23,3 +27,4 @@ for path, pct in sorted(bad):
 exit(1 if bad else 0)
 PY
 rm -f _cov_tmp.json
+exit "$cov_rc"

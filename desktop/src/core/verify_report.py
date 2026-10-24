@@ -140,9 +140,9 @@ def _portable(value: Any, root: str) -> Any:
         for token in variants:
             if token:
                 value = value.replace(token, "<root>")
-        # `TemporaryDirectory` may surface through a canonicalized/sandboxed spelling
-        # different from `root`; absolute temp roots are diagnostics, never stable evidence.
-        value = re.sub(r"(?<![A-Za-z0-9])/(?:private/)?tmp/[^/\\\s\"']+", "<root>", value)
+        # Volatile canonicalized temp roots are diagnostics, never stable evidence.
+        value = re.sub(r"(?<![A-Za-z0-9])(?:/(?:private/)?tmp/|"
+                       r"/(?:private/)?var/folders/[^/]+/[^/]+/T/)[^/]+", "<root>", value)
         return re.sub(
             r"(?i)(?<![A-Za-z0-9])[A-Z]:[\\/](?:[^\\/\s\"']+[\\/])*Temp[\\/][^\\/\s\"']+",
             "<root>", value,
