@@ -21,8 +21,17 @@ use std::time::UNIX_EPOCH;
 
 /// 与 `desktop/src/core/repo_face.py::SKIP_DIR_NAMES` **逐项一致**。
 const SKIP_DIR_NAMES: &[&str] = &[
-    ".git", ".rivet", "__pycache__", ".ruff_cache", ".mypy_cache",
-    ".pylint.d", ".pytest_cache", ".tox", ".venv", "venv", "node_modules",
+    ".git",
+    ".rivet",
+    "__pycache__",
+    ".ruff_cache",
+    ".mypy_cache",
+    ".pylint.d",
+    ".pytest_cache",
+    ".tox",
+    ".venv",
+    "venv",
+    "node_modules",
 ];
 
 static SCOPE: Mutex<Option<(String, Arc<HashSet<String>>)>> = Mutex::new(None);
@@ -32,7 +41,9 @@ static ROOT_IGNORED_CACHE: Mutex<Option<(String, String, bool)>> = Mutex::new(No
 fn stat_stamp(path: &Path) -> String {
     match std::fs::metadata(path) {
         Ok(meta) => {
-            let nanos = meta.modified().ok()
+            let nanos = meta
+                .modified()
+                .ok()
                 .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
                 .map(|d| d.as_nanos())
                 .unwrap_or(0);
@@ -43,10 +54,12 @@ fn stat_stamp(path: &Path) -> String {
 }
 
 fn repo_stamp(root: &Path) -> String {
-    format!("{}|{}|{}",
-            stat_stamp(&root.join(".gitignore")),
-            stat_stamp(&root.join(".git/info/exclude")),
-            stat_stamp(&root.join(".git/index")))
+    format!(
+        "{}|{}|{}",
+        stat_stamp(&root.join(".gitignore")),
+        stat_stamp(&root.join(".git/info/exclude")),
+        stat_stamp(&root.join(".git/index"))
+    )
 }
 
 /// 开始一次判据面：构造并缓存该 root 的可见件集合（`scan` 起始调用）。
@@ -176,7 +189,9 @@ fn walk(root: &Path) -> Option<HashSet<String>> {
     let mut out = HashSet::new();
     let mut stack: Vec<(std::path::PathBuf, String)> = vec![(root.to_path_buf(), String::new())];
     while let Some((dir, rel_dir)) = stack.pop() {
-        let Ok(rd) = std::fs::read_dir(&dir) else { continue };
+        let Ok(rd) = std::fs::read_dir(&dir) else {
+            continue;
+        };
         for entry in rd.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
             let rel = if rel_dir.is_empty() {

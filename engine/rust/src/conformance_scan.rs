@@ -132,7 +132,10 @@ fn export_manifest_issues(root: &Path, verify_txt: &str, manifest: &Json) -> (Ve
         }
         let iid = py_str(get(item, "id"));
         if py_str(get(item, "conformance")) != "L3" {
-            issues.push(format!("导出面 {}: conformance 应为 L3（导出门禁锁定面）", iid));
+            issues.push(format!(
+                "导出面 {}: conformance 应为 L3（导出门禁锁定面）",
+                iid
+            ));
         }
         for ev in arr_items(get(item, "evidence")) {
             let e = py_str(Some(ev));
@@ -154,7 +157,10 @@ fn export_manifest_issues(root: &Path, verify_txt: &str, manifest: &Json) -> (Ve
                 continue;
             }
             if !calls.contains(num) {
-                issues.push(format!("导出面 {}: 证据门禁 {} 未在主执行体调用（声明了却不跑）", iid, gid));
+                issues.push(format!(
+                    "导出面 {}: 证据门禁 {} 未在主执行体调用（声明了却不跑）",
+                    iid, gid
+                ));
                 continue;
             }
             let body = defs.get(num).map(String::as_str).unwrap_or("");
@@ -206,7 +212,9 @@ pub fn scan(root: &Path) -> ScanResult {
         if get(&parsed, "machine_contract").is_none() {
             continue;
         }
-        let mc = get(&parsed, "machine_contract").cloned().unwrap_or(Json::Null);
+        let mc = get(&parsed, "machine_contract")
+            .cloned()
+            .unwrap_or(Json::Null);
         let mid = py_str(get(&mc, "id"));
         if !mid.is_empty() {
             if let Some((_, prev)) = seen_mc_id.iter().find(|(m, _)| *m == mid) {
@@ -228,9 +236,7 @@ pub fn scan(root: &Path) -> ScanResult {
             ));
             continue;
         }
-        let provable = if matches!(get(&mc, "id"), Some(Json::Str(_)))
-            && evidence.contains(&mid)
-        {
+        let provable = if matches!(get(&mc, "id"), Some(Json::Str(_))) && evidence.contains(&mid) {
             2
         } else {
             1
@@ -249,7 +255,10 @@ pub fn scan(root: &Path) -> ScanResult {
     let mut packages = 0i64;
     for rel in crate::glob::expand(root, "community/*/protocol.yaml") {
         let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
-            issues.push(format!("{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）", rel));
+            issues.push(format!(
+                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                rel
+            ));
             continue;
         };
         let data = match miniyaml::parse(&text) {

@@ -70,7 +70,9 @@ pub fn scan(root: &Path) -> CrossScan {
             "官方核心".to_string()
         };
         let mid = py_str(get(&mc, "id"));
-        let Some(ev) = get(&mc, "events") else { continue };
+        let Some(ev) = get(&mc, "events") else {
+            continue;
+        };
         for e in arr_items(get(ev, "publish")) {
             publishers
                 .entry(plain_str(e))
@@ -185,7 +187,11 @@ mod tests {
         )
         .unwrap();
         let got = scan(&tmp);
-        assert!(got.issues.is_empty(), "跨包是 WARN 不是 FAIL：{:?}", got.issues);
+        assert!(
+            got.issues.is_empty(),
+            "跨包是 WARN 不是 FAIL：{:?}",
+            got.issues
+        );
         assert_eq!(got.cross_pkg, 1);
         let _ = std::fs::remove_dir_all(&tmp);
     }

@@ -20,7 +20,11 @@ pub const DEFAULT_BASELINE: &str = "protocol/score_baseline.json";
 /// 真源 `SIGNAL_SPECS`：(名, 权重, 说明)。权重和 = 1.0。
 pub const SIGNAL_SPECS: [(&str, f64, &str); 6] = [
     ("schema_clean", 0.20, "IDL schema 零漂移（schema_lint）"),
-    ("conformance_clean", 0.20, "机读契约/一致性分级零虚标（conformance_scan）"),
+    (
+        "conformance_clean",
+        0.20,
+        "机读契约/一致性分级零虚标（conformance_scan）",
+    ),
     ("purity_clean", 0.15, "架构纯度零违规（purity_scan）"),
     ("doc_hygiene", 0.15, "文档卫生零缺口（doc_hygiene）"),
     ("depth_clean", 0.15, "质量纵深零缺口（quality_depth_scan）"),
@@ -137,7 +141,11 @@ pub fn evaluate(root: &Path, sup: &Supplied) -> Current {
     let (_di, dstats) = asset_density::scan(root);
     let keys = dstats.keys as i64;
     let files = dstats.files as i64;
-    let density = if files != 0 { keys as f64 / files as f64 } else { 0.0 };
+    let density = if files != 0 {
+        keys as f64 / files as f64
+    } else {
+        0.0
+    };
     values.push((
         "asset_density",
         (density / asset_density::DENSITY_TARGET).clamp(0.0, 1.0),
@@ -149,7 +157,11 @@ pub fn evaluate(root: &Path, sup: &Supplied) -> Current {
     let mut signals: Vec<(String, f64, f64, String)> = Vec::new();
     let mut total = 0.0f64;
     for (name, weight, desc) in SIGNAL_SPECS {
-        let raw = values.iter().find(|(n, _)| *n == name).map(|(_, v)| *v).unwrap_or(0.0);
+        let raw = values
+            .iter()
+            .find(|(n, _)| *n == name)
+            .map(|(_, v)| *v)
+            .unwrap_or(0.0);
         let v = pyfloat::round_to(raw, 4);
         total += weight * v;
         signals.push((name.to_string(), weight, v, desc.to_string()));
@@ -203,8 +215,16 @@ pub fn compare(
     let mut regressed: Vec<Json> = Vec::new();
     let mut exempted: Vec<Json> = Vec::new();
     for name in &names {
-        let b = base_sig.iter().find(|(n, _)| n == name).map(|(_, v)| *v).unwrap_or(0.0);
-        let c = cur_sig.iter().find(|(n, _)| n == name).map(|(_, v)| *v).unwrap_or(0.0);
+        let b = base_sig
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| *v)
+            .unwrap_or(0.0);
+        let c = cur_sig
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| *v)
+            .unwrap_or(0.0);
         if c < b - EPS {
             let mut pairs = vec![
                 ("signal".to_string(), Json::Str(name.clone())),
@@ -235,7 +255,11 @@ pub fn compare(
     for e in &exempted {
         let sig = plain_str_opt(get(e, "signal"));
         let drop = f64_of(get(e, "drop"));
-        exempt_budget += weights.iter().find(|(n, _)| *n == sig).map(|(_, w)| *w).unwrap_or(0.0)
+        exempt_budget += weights
+            .iter()
+            .find(|(n, _)| *n == sig)
+            .map(|(_, w)| *w)
+            .unwrap_or(0.0)
             * drop
             * 100.0;
     }
@@ -275,7 +299,12 @@ pub fn compare(
 }
 
 /// `nf score --json` 的输出字节（`print` 的换行也含在内）。
-pub fn render_bytes(current: &Current, baseline: &Json, tolerance: f64, exceptions: &[(String, String)]) -> Vec<u8> {
+pub fn render_bytes(
+    current: &Current,
+    baseline: &Json,
+    tolerance: f64,
+    exceptions: &[(String, String)],
+) -> Vec<u8> {
     let cmp = compare(current, baseline, tolerance, exceptions);
     Json::Object(vec![
         ("kind".to_string(), Json::Str("score".to_string())),
@@ -287,8 +316,16 @@ pub fn render_bytes(current: &Current, baseline: &Json, tolerance: f64, exceptio
 }
 
 /// 退出码：`0 if out["ok"] else 1`。
-pub fn is_ok(current: &Current, baseline: &Json, tolerance: f64, exceptions: &[(String, String)]) -> bool {
-    matches!(get(&compare(current, baseline, tolerance, exceptions), "ok"), Some(Json::Bool(true)))
+pub fn is_ok(
+    current: &Current,
+    baseline: &Json,
+    tolerance: f64,
+    exceptions: &[(String, String)],
+) -> bool {
+    matches!(
+        get(&compare(current, baseline, tolerance, exceptions), "ok"),
+        Some(Json::Bool(true))
+    )
 }
 
 #[cfg(test)]
@@ -350,11 +387,17 @@ mod tests {
         .unwrap();
         let c = cur(&[("purity_clean", 0.15, 0.9)]);
         // 不豁免 → 回落
-        assert_eq!(get(&compare(&c, &baseline, 0.0, &[]), "ok"), Some(&Json::Bool(false)));
+        assert_eq!(
+            get(&compare(&c, &baseline, 0.0, &[]), "ok"),
+            Some(&Json::Bool(false))
+        );
         // 豁免 → 进 exempted 且释放额度
         let exc = vec![("purity_clean".to_string(), "已批准".to_string())];
         let out = compare(&c, &baseline, 0.0, &exc);
-        assert_eq!(get(&out, "exempted").map(|v| matches!(v, Json::Array(a) if a.len() == 1)), Some(true));
+        assert_eq!(
+            get(&out, "exempted").map(|v| matches!(v, Json::Array(a) if a.len() == 1)),
+            Some(true)
+        );
         assert!(plain_str_opt(get(&out, "verdict")).contains("审计例外"));
     }
 }

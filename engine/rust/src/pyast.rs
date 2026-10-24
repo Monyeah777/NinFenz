@@ -93,10 +93,11 @@ fn try_guards_import(t: &past::StmtTry) -> bool {
     for h in &t.handlers {
         let past::ExceptHandler::ExceptHandler(h) = h;
         // 裸 `except:` ⇒ 兜住了
-        let Some(ty) = h.type_.as_deref() else { return true };
-        let hit = |id: &str| {
-            id == "ImportError" || id == "ModuleNotFoundError" || id == "Exception"
+        let Some(ty) = h.type_.as_deref() else {
+            return true;
         };
+        let hit =
+            |id: &str| id == "ImportError" || id == "ModuleNotFoundError" || id == "Exception";
         match ty {
             past::Expr::Name(n) if hit(n.id.as_str()) => return true,
             past::Expr::Tuple(tup) => {
@@ -125,11 +126,13 @@ impl past::Visitor for ImportLinenos<'_> {
         match &node {
             past::Stmt::Import(i) => {
                 for _ in &i.names {
-                    self.out.push(self.ls.line_of(u32::from(node.range().start())));
+                    self.out
+                        .push(self.ls.line_of(u32::from(node.range().start())));
                 }
             }
             past::Stmt::ImportFrom(_) => {
-                self.out.push(self.ls.line_of(u32::from(node.range().start())));
+                self.out
+                    .push(self.ls.line_of(u32::from(node.range().start())));
             }
             _ => {}
         }
@@ -300,7 +303,10 @@ impl past::Visitor for Collector<'_> {
             past::Stmt::Try(t) => {
                 if try_guards_import(t) {
                     for sub in &t.body {
-                        let mut c = ImportLinenos { ls: self.ls, out: Vec::new() };
+                        let mut c = ImportLinenos {
+                            ls: self.ls,
+                            out: Vec::new(),
+                        };
                         c.visit_stmt(sub.clone());
                         for l in c.out {
                             self.guarded.insert(l);
@@ -321,7 +327,10 @@ impl past::Visitor for Collector<'_> {
         if let past::Expr::Call(c) = &node {
             let ln = self.ls.line_of(u32::from(node.range().start()));
             let shell = c.keywords.iter().any(|k| {
-                k.arg.as_ref().map(|a| a.as_str() == "shell").unwrap_or(false)
+                k.arg
+                    .as_ref()
+                    .map(|a| a.as_str() == "shell")
+                    .unwrap_or(false)
                     && matches!(&k.value, past::Expr::Constant(kk)
                         if matches!(kk.value, past::Constant::Bool(true)))
             });
@@ -397,7 +406,13 @@ impl past::Visitor for Collector<'_> {
 pub fn purity_facts(text: &str) -> Option<PurityFacts> {
     let suite = parse(text, Mode::Module, "<nf>").ok()?;
     let ls = LineStarts::new(text);
-    let mut c = Collector { ls: &ls, depth: 0, seq: 0, evs: Vec::new(), guarded: BTreeSet::new() };
+    let mut c = Collector {
+        ls: &ls,
+        depth: 0,
+        seq: 0,
+        evs: Vec::new(),
+        guarded: BTreeSet::new(),
+    };
     match &suite {
         past::Mod::Module(m) => {
             for st in &m.body {
@@ -422,7 +437,11 @@ pub fn purity_facts(text: &str) -> Option<PurityFacts> {
             Ev::Raise(l, m) => out.raises.push(RaiseFact { lineno: l, msg: m }),
             Ev::Import(v) => out.modules.extend(v),
             Ev::ImportFrom(m, l) => out.modules.push((m, l)),
-            Ev::Call(l, c, s) => out.sinks.push(SinkFact { lineno: l, call: c, shell_true: s }),
+            Ev::Call(l, c, s) => out.sinks.push(SinkFact {
+                lineno: l,
+                call: c,
+                shell_true: s,
+            }),
         }
     }
     Some(out)
@@ -431,8 +450,11 @@ pub fn purity_facts(text: &str) -> Option<PurityFacts> {
 // ---------------------------------------------------------------- 差分对账入口
 
 /// 真源 `purity_scan.IMPORT_SCAN` 的三条面。
-pub const IMPORT_SCAN: [&str; 3] =
-    ["desktop/src/core/*.py", "scripts/*.py", ".github/scripts/*.py"];
+pub const IMPORT_SCAN: [&str; 3] = [
+    "desktop/src/core/*.py",
+    "scripts/*.py",
+    ".github/scripts/*.py",
+];
 
 /// 把 `_ast_facts` 的事实导成 JSON（供与真源**逐文件**差分对账）。
 ///
@@ -448,7 +470,9 @@ pub fn facts_dump(root: &std::path::Path) -> crate::pyjson::Json {
     rels.sort();
     rels.dedup();
     for rel in rels {
-        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+            continue;
+        };
         let Some(f) = purity_facts(&text) else {
             out.push((rel, Json::Null));
             continue;
@@ -541,7 +565,14 @@ impl MetricCollector<'_> {
     fn leaving_fn(&mut self) {
         self.depth -= 1;
         if let Some((name, lineno, end_lineno, cc, depth, seq)) = self.stack.pop() {
-            self.out.push(FnMetric { name, lineno, end_lineno, cc, depth, seq });
+            self.out.push(FnMetric {
+                name,
+                lineno,
+                end_lineno,
+                cc,
+                depth,
+                seq,
+            });
         }
     }
     /// 普通节点进出（只为**深度**正确）
@@ -666,7 +697,13 @@ impl past::Visitor for MetricCollector<'_> {
 pub fn metric_facts(text: &str) -> Option<MetricFacts> {
     let suite = parse(text, Mode::Module, "<nf>").ok()?;
     let ls = LineStarts::new(text);
-    let mut c = MetricCollector { ls: &ls, stack: Vec::new(), out: Vec::new(), depth: 0, seq: 0 };
+    let mut c = MetricCollector {
+        ls: &ls,
+        stack: Vec::new(),
+        out: Vec::new(),
+        depth: 0,
+        seq: 0,
+    };
     match &suite {
         past::Mod::Module(m) => {
             for st in &m.body {
@@ -682,4 +719,3 @@ pub fn metric_facts(text: &str) -> Option<MetricFacts> {
     fns.sort_by_key(|f| (f.depth, f.seq));
     Some(MetricFacts { fns })
 }
-

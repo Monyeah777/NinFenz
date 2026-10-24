@@ -30,8 +30,9 @@ pub const LANGS: [&str; 3] = ["python", "bash", "vba"];
 /// 真源 `FORMATS`（D3 写通道契约化后扩到 9 个：yaml/toml/jsonl/graphml/mmd 逐条对应
 /// `asset_contracts.json` 里新增的数据件声明）。顺序须与真源元组**逐字同序**——
 /// 报错文案里 `"/".join(FORMATS)` 会进判据。
-pub const FORMATS: [&str; 9] =
-    ["json", "csv", "markdown", "text", "yaml", "toml", "jsonl", "graphml", "mmd"];
+pub const FORMATS: [&str; 9] = [
+    "json", "csv", "markdown", "text", "yaml", "toml", "jsonl", "graphml", "mmd",
+];
 /// 真源 `_MMD_KINDS`：Mermaid 首关键词词表（结构判据：只认「这是一张什么图」）。
 pub const MMD_KINDS: [&str; 17] = [
     "graph",
@@ -97,13 +98,19 @@ pub fn sread(root: &Path, rel: &str) -> (Option<String>, Option<String>) {
     match std::fs::read(&p) {
         Err(e) => (
             None,
-            Some(format!("读不到 {}：{}（修复指引：核对声明里的路径在场）", rel, e)),
+            Some(format!(
+                "读不到 {}：{}（修复指引：核对声明里的路径在场）",
+                rel, e
+            )),
         ),
         Ok(b) => match String::from_utf8(b) {
             Ok(s) => (Some(s), None),
             Err(e) => (
                 None,
-                Some(format!("{} 不是 UTF-8：{}（修复指引：转成 UTF-8 再入库）", rel, e)),
+                Some(format!(
+                    "{} 不是 UTF-8：{}（修复指引：转成 UTF-8 再入库）",
+                    rel, e
+                )),
             ),
         },
     }
@@ -114,7 +121,11 @@ pub fn resolve(root: &Path, spec: &Json) -> Vec<String> {
     if let Some(p) = obj_get(spec, "path") {
         if pyval::py_truthy(p) {
             let rel = pyval::plain_str(p).replace('\\', "/");
-            return if root.join(&rel).is_file() { vec![rel] } else { vec![] };
+            return if root.join(&rel).is_file() {
+                vec![rel]
+            } else {
+                vec![]
+            };
         }
     }
     let pat = sg_str(spec, "glob");
@@ -222,7 +233,9 @@ fn path_stem(rel: &str) -> String {
 
 /// `Path(rel).parent`：去掉末段（`.` → 空串，与 `Path("x").parent == "."` 的拼接效果等价）。
 fn path_parent(rel: &str) -> String {
-    rel.rsplit_once('/').map(|(d, _)| d.to_string()).unwrap_or_default()
+    rel.rsplit_once('/')
+        .map(|(d, _)| d.to_string())
+        .unwrap_or_default()
 }
 
 /// 真源 `_schema_of`：显式 `schema` 优先，其次 `schema_siblings` 里**第一个在场**的兄弟候选。
@@ -296,7 +309,10 @@ fn data_json(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
         Ok(v) => v,
         Err(e) => {
             return (
-                vec![format!("数据件 {} 不是合法 JSON：{}（修复指引：修好语法或换 format）", rel, e)],
+                vec![format!(
+                    "数据件 {} 不是合法 JSON：{}（修复指引：修好语法或换 format）",
+                    rel, e
+                )],
                 Json::Object(vec![]),
             )
         }
@@ -322,17 +338,25 @@ fn data_csv(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
     let rows = csv_rows(text);
     if rows.is_empty() {
         return (
-            vec![format!("数据件 {} 是空 CSV（修复指引：至少要有表头行）", rel)],
+            vec![format!(
+                "数据件 {} 是空 CSV（修复指引：至少要有表头行）",
+                rel
+            )],
             Json::Object(vec![("rows".to_string(), Json::Int(0))]),
         );
     }
     let header: Vec<String> = rows[0].iter().map(|c| c.trim().to_string()).collect();
     if header.iter().any(|c| c.is_empty()) {
-        issues.push(format!("数据件 {} 表头有空列名（修复指引：每列都要有名字）", rel));
+        issues.push(format!(
+            "数据件 {} 表头有空列名（修复指引：每列都要有名字）",
+            rel
+        ));
     }
     let width = header.len();
-    let data: Vec<&Vec<String>> =
-        rows[1..].iter().filter(|r| !(r.len() == 1 && r[0].is_empty())).collect();
+    let data: Vec<&Vec<String>> = rows[1..]
+        .iter()
+        .filter(|r| !(r.len() == 1 && r[0].is_empty()))
+        .collect();
     let bad: Vec<usize> = data
         .iter()
         .enumerate()
@@ -411,7 +435,10 @@ pub fn md_tables(text: &str) -> Vec<Vec<Vec<String>>> {
 fn data_markdown(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
     let mut issues: Vec<String> = Vec::new();
     if pyval::py_truthy(&sg(spec, "frontmatter")) && !text.starts_with("---") {
-        issues.push(format!("数据件 {} 缺 frontmatter（修复指引：件首补 --- 块）", rel));
+        issues.push(format!(
+            "数据件 {} 缺 frontmatter（修复指引：件首补 --- 块）",
+            rel
+        ));
     }
     let mut n = 0i64;
     for table in md_tables(text) {
@@ -424,8 +451,7 @@ fn data_markdown(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
             .iter()
             .filter(|r| !r.iter().all(|c| c.chars().all(|ch| ch == '-' || ch == ':')))
             .collect();
-        let ragged: Vec<&&Vec<String>> =
-            body.iter().filter(|r| r.len() != header.len()).collect();
+        let ragged: Vec<&&Vec<String>> = body.iter().filter(|r| r.len() != header.len()).collect();
         if let Some(first) = ragged.first() {
             issues.push(format!(
                 "数据件 {} 有一张表列数不齐：表头 {} 列 vs 数据 {} 列（修复指引：对齐竖线）",
@@ -436,7 +462,10 @@ fn data_markdown(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
         }
         n += 1;
     }
-    (issues, Json::Object(vec![("tables".to_string(), Json::Int(n))]))
+    (
+        issues,
+        Json::Object(vec![("tables".to_string(), Json::Int(n))]),
+    )
 }
 
 /// 真源 `_data_link`。
@@ -454,12 +483,18 @@ fn data_link(root: &Path, rel: &str, spec: &Json, obj: &Json) -> Vec<String> {
             )]
         }
     };
-    let rel_dir = rel.rsplit_once('/').map(|(d, _)| d.to_string()).unwrap_or_default();
+    let rel_dir = rel
+        .rsplit_once('/')
+        .map(|(d, _)| d.to_string())
+        .unwrap_or_default();
     let base = sg_str(&link, "base");
     let bases: Vec<String> = if !base.is_empty() {
         vec![base]
     } else {
-        let parent = rel_dir.rsplit_once('/').map(|(d, _)| d.to_string()).unwrap_or_default();
+        let parent = rel_dir
+            .rsplit_once('/')
+            .map(|(d, _)| d.to_string())
+            .unwrap_or_default();
         vec![rel_dir.clone(), parent]
     };
     let mut found: Option<std::path::PathBuf> = None;
@@ -504,7 +539,10 @@ fn data_yaml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
         Ok(v) => v,
         Err(e) => {
             return (
-                vec![format!("数据件 {} 不是合法 YAML：{}（修复指引：修好缩进/语法）", rel, e)],
+                vec![format!(
+                    "数据件 {} 不是合法 YAML：{}（修复指引：修好缩进/语法）",
+                    rel, e
+                )],
                 Json::Object(vec![]),
             )
         }
@@ -517,7 +555,10 @@ fn data_yaml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
     issues.extend(fields_issues(rel, &obj, spec));
     (
         issues,
-        Json::Object(vec![("fields".to_string(), Json::Int(required_fields_len(spec)))]),
+        Json::Object(vec![(
+            "fields".to_string(),
+            Json::Int(required_fields_len(spec)),
+        )]),
     )
 }
 
@@ -531,7 +572,9 @@ fn toml_to_json(v: &toml::Value) -> Json {
         toml::Value::Datetime(d) => Json::Str(d.to_string()),
         toml::Value::Array(a) => Json::Array(a.iter().map(toml_to_json).collect()),
         toml::Value::Table(t) => Json::Object(
-            t.iter().map(|(k, v)| (k.clone(), toml_to_json(v))).collect(),
+            t.iter()
+                .map(|(k, v)| (k.clone(), toml_to_json(v)))
+                .collect(),
         ),
     }
 }
@@ -542,7 +585,10 @@ fn data_toml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
         Ok(v) => toml_to_json(&v),
         Err(e) => {
             return (
-                vec![format!("数据件 {} 不是合法 TOML：{}（修复指引：修好语法或换 format）", rel, e)],
+                vec![format!(
+                    "数据件 {} 不是合法 TOML：{}（修复指引：修好语法或换 format）",
+                    rel, e
+                )],
                 Json::Object(vec![]),
             )
         }
@@ -555,7 +601,10 @@ fn data_toml(root: &Path, rel: &str, text: &str, spec: &Json) -> (Vec<String>, J
     issues.extend(fields_issues(rel, &obj, spec));
     (
         issues,
-        Json::Object(vec![("fields".to_string(), Json::Int(required_fields_len(spec)))]),
+        Json::Object(vec![(
+            "fields".to_string(),
+            Json::Int(required_fields_len(spec)),
+        )]),
     )
 }
 
@@ -598,7 +647,10 @@ fn data_jsonl(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
             rel, rows, min_rows
         ));
     }
-    (issues, Json::Object(vec![("rows".to_string(), Json::Int(rows))]))
+    (
+        issues,
+        Json::Object(vec![("rows".to_string(), Json::Int(rows))]),
+    )
 }
 
 /// 真源 `_data_graphml`：XML 良构 + 节点/边计数（入口先拒 DTD/实体声明）。
@@ -616,7 +668,10 @@ fn data_graphml(rel: &str, text: &str, spec: &Json) -> (Vec<String>, Json) {
         Ok(n) => n,
         Err(e) => {
             return (
-                vec![format!("数据件 {} 不是良构 XML：{}（修复指引：修好 XML）", rel, e)],
+                vec![format!(
+                    "数据件 {} 不是良构 XML：{}（修复指引：修好 XML）",
+                    rel, e
+                )],
                 Json::Object(vec![]),
             )
         }
@@ -654,7 +709,10 @@ fn data_mmd(rel: &str, text: &str) -> (Vec<String>, Json) {
     }
     if first.is_empty() {
         return (
-            vec![format!("数据件 {} 是空 Mermaid 图（修复指引：补图声明）", rel)],
+            vec![format!(
+                "数据件 {} 是空 Mermaid 图（修复指引：补图声明）",
+                rel
+            )],
             Json::Object(vec![]),
         );
     }
@@ -673,7 +731,10 @@ fn data_mmd(rel: &str, text: &str) -> (Vec<String>, Json) {
             Json::Object(vec![]),
         );
     }
-    (Vec::new(), Json::Object(vec![("kind".to_string(), Json::Str(first))]))
+    (
+        Vec::new(),
+        Json::Object(vec![("kind".to_string(), Json::Str(first))]),
+    )
 }
 
 /// 真源 `_check_data`。
@@ -845,7 +906,10 @@ fn check_tests(root: &Path, rel: &str, spec: &Json) -> Vec<String> {
             .unwrap_or_default();
         if crate::pyast::parse_module(&text).is_none() {
             // 真源在这里给 CPython 的 SyntaxError 文本 ⇒ **已知偏差**（见模块头）
-            issues.push(format!("测试件 {} 语法坏：<TEXT>（修复指引：先修语法）", trel));
+            issues.push(format!(
+                "测试件 {} 语法坏：<TEXT>（修复指引：先修语法）",
+                trel
+            ));
             continue;
         }
         if !text.contains(stem) {
@@ -881,7 +945,10 @@ fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     let rels = resolve(root, spec);
     if rels.is_empty() {
         return (
-            vec![format!("代码契约 {} 未命中任何文件（修复指引：修正 path/glob）", sid)],
+            vec![format!(
+                "代码契约 {} 未命中任何文件（修复指引：修正 path/glob）",
+                sid
+            )],
             Json::Object(vec![("files".to_string(), Json::Int(0))]),
         );
     }
@@ -897,12 +964,13 @@ fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
         texts.push((rel.clone(), text.unwrap_or_default()));
     }
     let mut issues: Vec<String> = Vec::new();
-    let mut stats: Vec<(String, Json)> =
-        vec![("files".to_string(), Json::Int(rels.len() as i64))];
+    let mut stats: Vec<(String, Json)> = vec![("files".to_string(), Json::Int(rels.len() as i64))];
     for rule in sg_array(spec, "forbid_regex") {
         let name = sg_str(&rule, "name");
         let pat = sg_str(&rule, "pattern");
-        let Ok(rx) = regex::Regex::new(&pat) else { continue };
+        let Ok(rx) = regex::Regex::new(&pat) else {
+            continue;
+        };
         let mut hits: Vec<String> = Vec::new();
         for (rel, text) in &texts {
             for m in rx.find_iter(text) {
@@ -934,8 +1002,13 @@ fn check_code_structural(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     for rule in sg_array(spec, "regex_limits") {
         let name = sg_str(&rule, "name");
         let pat = sg_str(&rule, "pattern");
-        let Ok(rx) = regex::Regex::new(&pat) else { continue };
-        let n: i64 = texts.iter().map(|(_, t)| rx.find_iter(t).count() as i64).sum();
+        let Ok(rx) = regex::Regex::new(&pat) else {
+            continue;
+        };
+        let n: i64 = texts
+            .iter()
+            .map(|(_, t)| rx.find_iter(t).count() as i64)
+            .sum();
         let cap = pyval::py_int_or(obj_get(&rule, "max"), 0);
         stats.push((format!("limit:{}", name), Json::Int(n)));
         if n > cap {
@@ -974,23 +1047,35 @@ fn is_code_line(line: &str) -> bool {
 }
 
 fn rule_lines(text: &str) -> Vec<&str> {
-    text.split('\n').map(|l| l.strip_suffix('\r').unwrap_or(l)).collect()
+    text.split('\n')
+        .map(|l| l.strip_suffix('\r').unwrap_or(l))
+        .collect()
 }
 
 /// 真源 `_warn_unsafe_safety`（规则①）：每处 UNSAFE 标记前 within 行内须有 SAFETY: 注释。
 fn warn_unsafe_safety(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
     let pat = {
         let p = sg_str(rule, "pattern");
-        if p.is_empty() { r"\bunsafe\b".to_string() } else { p }
+        if p.is_empty() {
+            r"\bunsafe\b".to_string()
+        } else {
+            p
+        }
     };
     let marker = {
         let m = sg_str(rule, "marker");
-        if m.is_empty() { "SAFETY:".to_string() } else { m }
+        if m.is_empty() {
+            "SAFETY:".to_string()
+        } else {
+            m
+        }
     };
     let within = pyval::py_int_or(obj_get(rule, "within"), 3).max(0) as usize;
     let cut = warn_cut(text, rule);
     let lines = rule_lines(text);
-    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let Ok(rx) = regex::Regex::new(&pat) else {
+        return Vec::new();
+    };
     let mut out: Vec<String> = Vec::new();
     for m in rx.find_iter(&text[..cut]) {
         let ln = line_no(text, m.start());
@@ -1002,8 +1087,12 @@ fn warn_unsafe_safety(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<Stri
         if !hit {
             out.push(format!(
                 concat!(
-                    "代码契约 {} 告警：{}:{} 的 ", "un", "safe",
-                    " 前 {} 行内缺 {} 注释（修复指引：在 ", "un", "safe",
+                    "代码契约 {} 告警：{}:{} 的 ",
+                    "un",
+                    "safe",
+                    " 前 {} 行内缺 {} 注释（修复指引：在 ",
+                    "un",
+                    "safe",
                     " 块/签名紧邻上方写「{} 调用方前置条件」，让审查面可读）"
                 ),
                 sid, rel, ln, within, marker, marker
@@ -1017,16 +1106,26 @@ fn warn_unsafe_safety(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<Stri
 fn warn_null_guard(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
     let pat = {
         let p = sg_str(rule, "pattern");
-        if p.is_empty() { "from_raw_parts".to_string() } else { p }
+        if p.is_empty() {
+            "from_raw_parts".to_string()
+        } else {
+            p
+        }
     };
     let guard = {
         let g = sg_str(rule, "guard");
-        if g.is_empty() { "is_null".to_string() } else { g }
+        if g.is_empty() {
+            "is_null".to_string()
+        } else {
+            g
+        }
     };
     let within = pyval::py_int_or(obj_get(rule, "within"), 20).max(0) as usize;
     let cut = warn_cut(text, rule);
     let lines = rule_lines(text);
-    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let Ok(rx) = regex::Regex::new(&pat) else {
+        return Vec::new();
+    };
     let mut out: Vec<String> = Vec::new();
     for m in rx.find_iter(&text[..cut]) {
         let ln = line_no(text, m.start());
@@ -1049,12 +1148,21 @@ fn warn_null_guard(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String>
 fn warn_export_no_panic(sid: &str, rel: &str, text: &str, rule: &Json) -> Vec<String> {
     let pat = {
         let p = sg_str(rule, "pattern");
-        if p.is_empty() { r"#\[no_mangle\]".to_string() } else { p }
+        if p.is_empty() {
+            r"#\[no_mangle\]".to_string()
+        } else {
+            p
+        }
     };
-    let forbid: Vec<String> = sg_array(rule, "forbid").iter().map(|x| pyval::plain_str(x)).collect();
+    let forbid: Vec<String> = sg_array(rule, "forbid")
+        .iter()
+        .map(|x| pyval::plain_str(x))
+        .collect();
     let cut = warn_cut(text, rule);
     let lines = rule_lines(text);
-    let Ok(rx) = regex::Regex::new(&pat) else { return Vec::new() };
+    let Ok(rx) = regex::Regex::new(&pat) else {
+        return Vec::new();
+    };
     let starts: Vec<usize> = rx.find_iter(&text[..cut]).map(|m| m.start()).collect();
     let mut out: Vec<String> = Vec::new();
     for (i, &pos) in starts.iter().enumerate() {
@@ -1095,17 +1203,21 @@ pub fn code_warns(root: &Path, spec: &Json) -> Vec<String> {
     };
     let rels = resolve(root, spec);
     if rels.is_empty() {
-        return Vec::new();     // 未命中面的事由 `check_code` 的 issues 报，不重复告警
+        return Vec::new(); // 未命中面的事由 `check_code` 的 issues 报，不重复告警
     }
     let sid = {
         let s = sg_str(spec, "id");
-        if s.is_empty() { "?".to_string() } else { s }
+        if s.is_empty() {
+            "?".to_string()
+        } else {
+            s
+        }
     };
     let mut warns: Vec<String> = Vec::new();
     for rel in &rels {
         let (text, err) = sread(root, rel);
         if err.is_some() {
-            continue;          // 读件失败同样由 issues 面报
+            continue; // 读件失败同样由 issues 面报
         }
         let text = text.unwrap_or_default();
         for (name, rule) in &rules {
@@ -1113,13 +1225,9 @@ pub fn code_warns(root: &Path, spec: &Json) -> Vec<String> {
                 continue;
             }
             match name.as_str() {
-                "unsafe_safety_comment" => {
-                    warns.extend(warn_unsafe_safety(&sid, rel, &text, rule))
-                }
+                "unsafe_safety_comment" => warns.extend(warn_unsafe_safety(&sid, rel, &text, rule)),
                 "null_guard_before" => warns.extend(warn_null_guard(&sid, rel, &text, rule)),
-                "export_no_panic" => {
-                    warns.extend(warn_export_no_panic(&sid, rel, &text, rule))
-                }
+                "export_no_panic" => warns.extend(warn_export_no_panic(&sid, rel, &text, rule)),
                 _ => {}
             }
         }
@@ -1207,13 +1315,18 @@ pub fn parse_io_header(text: &str) -> Option<(Vec<String>, Vec<String>)> {
     let mut ins: Vec<String> = Vec::new();
     let mut outs: Vec<String> = Vec::new();
     for token in m[1].split_whitespace() {
-        let Some((key, val)) = token.split_once('=') else { continue };
+        let Some((key, val)) = token.split_once('=') else {
+            continue;
+        };
         let key = key.trim().to_lowercase();
         let v = val.trim();
         let list: Vec<String> = if v == "-" || v.is_empty() {
             Vec::new()
         } else {
-            v.split(',').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect()
+            v.split(',')
+                .map(|x| x.trim().to_string())
+                .filter(|x| !x.is_empty())
+                .collect()
         };
         match key.as_str() {
             "inputs" => ins = list,
@@ -1229,7 +1342,9 @@ pub fn observed_paths(text: &str, lang: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     match lang {
         "python" => {
-            let Some(tree) = crate::pyast::parse_module(text) else { return out };
+            let Some(tree) = crate::pyast::parse_module(text) else {
+                return out;
+            };
             let ls = crate::pyast::LineStarts::new(text);
             for (_, _, _, name, args) in crate::asset_code::calls_with_args(&tree, &ls) {
                 if name != "open" && name != "Path" && name != "pathlib.Path" {
@@ -1246,7 +1361,10 @@ pub fn observed_paths(text: &str, lang: &str) -> Vec<String> {
             let re = regex::Regex::new(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)").unwrap();
             for c in re.captures_iter(text) {
                 out.push(
-                    c.get(1).or_else(|| c.get(2)).map(|m| m.as_str().to_string()).unwrap_or_default(),
+                    c.get(1)
+                        .or_else(|| c.get(2))
+                        .map(|m| m.as_str().to_string())
+                        .unwrap_or_default(),
                 );
             }
         }
@@ -1289,13 +1407,19 @@ pub fn check_script(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     let rel = sg_str(spec, "path");
     if !root.join(&rel).is_file() {
         return (
-            vec![format!("脚本契约 {} 的件不在场：{}（修复指引：修正 path）", sid, rel)],
+            vec![format!(
+                "脚本契约 {} 的件不在场：{}（修复指引：修正 path）",
+                sid, rel
+            )],
             Json::Object(vec![("files".to_string(), Json::Int(0))]),
         );
     }
     let (text, err) = sread(root, &rel);
     if let Some(e) = err {
-        return (vec![e], Json::Object(vec![("files".to_string(), Json::Int(1))]));
+        return (
+            vec![e],
+            Json::Object(vec![("files".to_string(), Json::Int(1))]),
+        );
     }
     let text = text.unwrap_or_default();
     let mut issues: Vec<String> = Vec::new();
@@ -1310,21 +1434,34 @@ pub fn check_script(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             (Vec::new(), Vec::new())
         }
     };
-    for (key, declared, embedded) in
-        [("inputs", sg_strs(spec, "inputs"), emb_in), ("outputs", sg_strs(spec, "outputs"), emb_out)]
-    {
+    for (key, declared, embedded) in [
+        ("inputs", sg_strs(spec, "inputs"), emb_in),
+        ("outputs", sg_strs(spec, "outputs"), emb_out),
+    ] {
         if declared != embedded {
             issues.push(format!(
                 "脚本 {} 的 {} 双源不一致：声明={} / 头={}（修复指引：让两边逐字一致）",
                 rel,
                 key,
-                pyval::py_repr_list(&declared.iter().map(|s| Json::Str(s.clone())).collect::<Vec<_>>()),
-                pyval::py_repr_list(&embedded.iter().map(|s| Json::Str(s.clone())).collect::<Vec<_>>())
+                pyval::py_repr_list(
+                    &declared
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect::<Vec<_>>()
+                ),
+                pyval::py_repr_list(
+                    &embedded
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect::<Vec<_>>()
+                )
             ));
         }
     }
-    let declared_all: std::collections::BTreeSet<String> =
-        sg_strs(spec, "inputs").into_iter().chain(sg_strs(spec, "outputs")).collect();
+    let declared_all: std::collections::BTreeSet<String> = sg_strs(spec, "inputs")
+        .into_iter()
+        .chain(sg_strs(spec, "outputs"))
+        .collect();
     let mut extra: Vec<String> = observed_paths(&text, &lang)
         .into_iter()
         .filter(|x| !declared_all.contains(x))
@@ -1342,8 +1479,14 @@ pub fn check_script(root: &Path, spec: &Json) -> (Vec<String>, Json) {
         issues,
         Json::Object(vec![
             ("files".to_string(), Json::Int(1)),
-            ("inputs".to_string(), Json::Int(sg_strs(spec, "inputs").len() as i64)),
-            ("outputs".to_string(), Json::Int(sg_strs(spec, "outputs").len() as i64)),
+            (
+                "inputs".to_string(),
+                Json::Int(sg_strs(spec, "inputs").len() as i64),
+            ),
+            (
+                "outputs".to_string(),
+                Json::Int(sg_strs(spec, "outputs").len() as i64),
+            ),
         ]),
     )
 }
@@ -1362,7 +1505,8 @@ pub fn check_chain(specs: &[(String, Json)], chain: &Json) -> (Vec<String>, Json
             Json::Object(vec![]),
         );
     };
-    let norm = |v: Vec<String>| -> Vec<String> { v.into_iter().map(|x| x.replace('\\', "/")).collect() };
+    let norm =
+        |v: Vec<String>| -> Vec<String> { v.into_iter().map(|x| x.replace('\\', "/")).collect() };
     let ao = norm(sg_strs(a, "outputs"));
     let bi = norm(sg_strs(b, "inputs"));
     let mut issues: Vec<String> = Vec::new();
@@ -1406,14 +1550,19 @@ pub fn check_chain(specs: &[(String, Json)], chain: &Json) -> (Vec<String>, Json
         }
     }
     let matched = ao.iter().filter(|x| bi.contains(x)).count() as i64;
-    (issues, Json::Object(vec![("matched".to_string(), Json::Int(matched))]))
+    (
+        issues,
+        Json::Object(vec![("matched".to_string(), Json::Int(matched))]),
+    )
 }
 
 // ---------------------------------------------------------------- 包清单面（S1）
 
 /// 递归收集 `dir` 下的全部文件（相对 `base` 的 POSIX 路径）。真源 `rglob("*") if is_file()`。
 fn walk_files(dir: &Path, base: &Path, out: &mut Vec<String>) {
-    let Ok(rd) = std::fs::read_dir(dir) else { return };
+    let Ok(rd) = std::fs::read_dir(dir) else {
+        return;
+    };
     let mut names: Vec<std::path::PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
     names.sort();
     for p in names {
@@ -1443,7 +1592,10 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     let rels = resolve(root, spec);
     if rels.is_empty() {
         return (
-            vec![format!("包清单契约 {} 未命中任何清单（修复指引：修正 glob）", sid)],
+            vec![format!(
+                "包清单契约 {} 未命中任何清单（修复指引：修正 glob）",
+                sid
+            )],
             Json::Object(vec![("files".to_string(), Json::Int(0))]),
         );
     }
@@ -1483,7 +1635,10 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             }
             let pth = sg_str(item, "path");
             if pth.is_empty() {
-                issues.push(format!("包清单 {} 有一条无 path 的声明（修复指引：补 path）", rel));
+                issues.push(format!(
+                    "包清单 {} 有一条无 path 的声明（修复指引：补 path）",
+                    rel
+                ));
                 continue;
             }
             declared.insert(pth.clone());
@@ -1496,7 +1651,10 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             }
             let sch = sg_str(item, "schema");
             if !sch.is_empty() && !root.join(&base).join(&sch).is_file() {
-                issues.push(format!("包清单 {} 声明的 schema {} 不在场（修复指引：补件）", rel, sch));
+                issues.push(format!(
+                    "包清单 {} 声明的 schema {} 不在场（修复指引：补件）",
+                    rel, sch
+                ));
             }
             // 真源 `item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])`
             let mut ins: Vec<String> = sg_strs(item, "inputs");
@@ -1516,7 +1674,11 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             }
         }
         let mut on_disk: Vec<String> = Vec::new();
-        walk_files(&root.join(&base).join("outputs"), &root.join(&base), &mut on_disk);
+        walk_files(
+            &root.join(&base).join("outputs"),
+            &root.join(&base),
+            &mut on_disk,
+        );
         // 真源 `self_rel = Path(rel).relative_to(base).as_posix()`：清单自身不是产出面（它是清单）。
         let self_rel: String = if let Some(rest) = rel.strip_prefix(&base) {
             rest.trim_start_matches('/').to_string()
@@ -1526,9 +1688,7 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
         let mut missing: Vec<String> = on_disk
             .into_iter()
             .filter(|x| {
-                !declared.contains(x)
-                    && *x != self_rel
-                    && !x.starts_with("outputs/samples/")
+                !declared.contains(x) && *x != self_rel && !x.starts_with("outputs/samples/")
             })
             .collect();
         missing.sort();
@@ -1677,7 +1837,14 @@ pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
                     if err.is_none() {
                         let sch = strict_json(&stext.unwrap_or_default())
                             .unwrap_or_else(|_| Json::Object(vec![]));
-                        let keep = ["type", "required", "properties", "$schema", "title", "description"];
+                        let keep = [
+                            "type",
+                            "required",
+                            "properties",
+                            "$schema",
+                            "title",
+                            "description",
+                        ];
                         let mut sub: Vec<(String, Json)> = Vec::new();
                         if let Json::Object(kv) = &sch {
                             for k in keep.iter() {
@@ -1713,10 +1880,7 @@ pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
                         if !fields.is_empty() {
                             item.push((
                                 "schema".to_string(),
-                                Json::Object(vec![(
-                                    "fields".to_string(),
-                                    Json::Array(fields),
-                                )]),
+                                Json::Object(vec![("fields".to_string(), Json::Array(fields))]),
                             ));
                         }
                     }
@@ -1727,7 +1891,10 @@ pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
     }
     let pkg = Json::Object(vec![
         ("profile".to_string(), Json::Str("data-package".to_string())),
-        ("name".to_string(), Json::Str("ninfenz-asset-contracts".to_string())),
+        (
+            "name".to_string(),
+            Json::Str("ninfenz-asset-contracts".to_string()),
+        ),
         (
             "title".to_string(),
             Json::Str("NinFenz 数字资产契约（Frictionless Data Package 导出）".to_string()),
@@ -1853,7 +2020,10 @@ pub fn load(root: &Path) -> (Json, Vec<String>) {
         Err(e) => {
             return (
                 Json::Object(vec![]),
-                vec![format!("{} 不可读或不是合法 JSON：{}（修复指引：修好语法）", DECL_REL, e)],
+                vec![format!(
+                    "{} 不可读或不是合法 JSON：{}（修复指引：修好语法）",
+                    DECL_REL, e
+                )],
             )
         }
     };
@@ -1862,7 +2032,10 @@ pub fn load(root: &Path) -> (Json, Vec<String>) {
         Err(e) => {
             return (
                 Json::Object(vec![]),
-                vec![format!("{} 不可读或不是合法 JSON：{}（修复指引：修好语法）", DECL_REL, e)],
+                vec![format!(
+                    "{} 不可读或不是合法 JSON：{}（修复指引：修好语法）",
+                    DECL_REL, e
+                )],
             )
         }
     };
@@ -1890,14 +2063,15 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
 fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
     let (doc, mut issues) = load(root);
     let mut warns: Vec<String> = Vec::new();
-    let mut counts: Vec<(String, i64)> =
-        FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
+    let mut counts: Vec<(String, i64)> = FACES.iter().map(|f| ((*f).to_string(), 0i64)).collect();
     let mut files = 0i64;
     let mut chains = 0i64;
     let mut no_schema = 0i64;
     if !issues.is_empty() {
-        let mut kv: Vec<(String, Json)> =
-            counts.iter().map(|(k, v)| (k.clone(), Json::Int(*v))).collect();
+        let mut kv: Vec<(String, Json)> = counts
+            .iter()
+            .map(|(k, v)| (k.clone(), Json::Int(*v)))
+            .collect();
         kv.push(("files".to_string(), Json::Int(0)));
         kv.push(("chains".to_string(), Json::Int(0)));
         return (issues, warns, Json::Object(kv));
@@ -1913,7 +2087,10 @@ fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         };
         for spec in specs {
             if !matches!(spec, Json::Object(_)) {
-                issues.push(format!("契约 {} 面有非对象条目（修复指引：每条须是对象）", face));
+                issues.push(format!(
+                    "契约 {} 面有非对象条目（修复指引：每条须是对象）",
+                    face
+                ));
                 continue;
             }
             let (sub, s) = match face {
@@ -1936,23 +2113,26 @@ fn scan_inner(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         }
     }
     let specs: Vec<(String, Json)> = match obj_get(&doc, "script") {
-        Some(Json::Array(a)) => a
-            .iter()
-            .map(|s| (sg_str(s, "id"), s.clone()))
-            .collect(),
+        Some(Json::Array(a)) => a.iter().map(|s| (sg_str(s, "id"), s.clone())).collect(),
         _ => Vec::new(),
     };
     if let Some(Json::Array(cs)) = obj_get(&doc, "chains") {
         for c in cs {
             let empty = Json::Object(vec![]);
-            let chain = if matches!(c, Json::Object(_)) { c } else { &empty };
+            let chain = if matches!(c, Json::Object(_)) {
+                c
+            } else {
+                &empty
+            };
             let (sub, _) = check_chain(&specs, chain);
             issues.extend(sub);
             chains += 1;
         }
     }
-    let mut kv: Vec<(String, Json)> =
-        counts.iter().map(|(k, v)| (k.clone(), Json::Int(*v))).collect();
+    let mut kv: Vec<(String, Json)> = counts
+        .iter()
+        .map(|(k, v)| (k.clone(), Json::Int(*v)))
+        .collect();
     kv.push(("files".to_string(), Json::Int(files)));
     kv.push(("chains".to_string(), Json::Int(chains)));
     kv.push(("no_schema".to_string(), Json::Int(no_schema)));
@@ -1965,63 +2145,115 @@ mod tests {
     // >>> GENERATED HELPER by tools/gen_asset_data_cases.py（勿手改；重跑生成器覆盖本段）
     /// 合成夹具的内容（与 `tools/gen_asset_data_cases.py` 里 Python 侧那份**逐字同源**）。
     const AC_FIX_FILES: [(&str, &str); 18] = [
-        (r#"bad.json"#, r#"{"a": "x"}
-"#),
-        (r#"badschema.json"#, r#"{"type": }
-"#),
-        (r#"blankhdr.csv"#, r#"a,,c
+        (
+            r#"bad.json"#,
+            r#"{"a": "x"}
+"#,
+        ),
+        (
+            r#"badschema.json"#,
+            r#"{"type": }
+"#,
+        ),
+        (
+            r#"blankhdr.csv"#,
+            r#"a,,c
 1,2,3
-"#),
+"#,
+        ),
         (r#"empty.csv"#, r#""#),
-        (r#"link.csv"#, r#"h
+        (
+            r#"link.csv"#,
+            r#"h
 1
 2
 3
-"#),
-        (r#"link.json"#, r#"{"p": "link.csv", "n": 3}
-"#),
-        (r#"linkbad.json"#, r#"{"p": "link.csv", "n": 9}
-"#),
-        (r#"linkmiss.json"#, r#"{"p": "nope.csv", "n": 1}
-"#),
-        (r#"nofm.md"#, r#"| a |
+"#,
+        ),
+        (
+            r#"link.json"#,
+            r#"{"p": "link.csv", "n": 3}
+"#,
+        ),
+        (
+            r#"linkbad.json"#,
+            r#"{"p": "link.csv", "n": 9}
+"#,
+        ),
+        (
+            r#"linkmiss.json"#,
+            r#"{"p": "nope.csv", "n": 1}
+"#,
+        ),
+        (
+            r#"nofm.md"#,
+            r#"| a |
 | --- |
 | 1 |
-"#),
-        (r#"nonan.json"#, r#"{"a": NaN}
-"#),
-        (r#"ok.csv"#, r#"a,b
+"#,
+        ),
+        (
+            r#"nonan.json"#,
+            r#"{"a": NaN}
+"#,
+        ),
+        (
+            r#"ok.csv"#,
+            r#"a,b
 1,2
 3,4
-"#),
-        (r#"ok.json"#, r#"{"a": 1, "n": 3}
-"#),
-        (r#"ok.md"#, r#"---
+"#,
+        ),
+        (
+            r#"ok.json"#,
+            r#"{"a": 1, "n": 3}
+"#,
+        ),
+        (
+            r#"ok.md"#,
+            r#"---
 x: 1
 ---
 
 | a | b |
 | --- | --- |
 | 1 | 2 |
-"#),
-        (r#"plain.txt"#, r#"l1
+"#,
+        ),
+        (
+            r#"plain.txt"#,
+            r#"l1
 l2
-"#),
-        (r#"quoted.csv"#, r#"a,b
+"#,
+        ),
+        (
+            r#"quoted.csv"#,
+            r#"a,b
 "x,1",2
-"#),
-        (r#"ragged.csv"#, r#"a,b
+"#,
+        ),
+        (
+            r#"ragged.csv"#,
+            r#"a,b
 1,2,3
 4,5
-"#),
-        (r#"ragged.md"#, r#"---
+"#,
+        ),
+        (
+            r#"ragged.md"#,
+            r#"---
 
 | a | b |
 | --- | --- |
 | 1 |
-"#),
-        (r#"sch.json"#, r#"{"type": "object", "required": ["a"]}
-"#),    ];
+"#,
+        ),
+        (
+            r#"sch.json"#,
+            r#"{"type": "object", "required": ["a"]}
+"#,
+        ),
+    ];
 
     fn write_asset_data_fixture(root: &std::path::Path) {
         for (rel, body) in AC_FIX_FILES {
@@ -2050,8 +2282,12 @@ l2
         issues
             .iter()
             .map(|x| {
-                for pat in ["不是合法 JSON：", "schema 本身不是合法 JSON：", "读不到 ",
-                            " 不是 UTF-8："] {
+                for pat in [
+                    "不是合法 JSON：",
+                    "schema 本身不是合法 JSON：",
+                    "读不到 ",
+                    " 不是 UTF-8：",
+                ] {
                     if let Some(i) = x.find(pat) {
                         return format!("{}<TEXT>", &x[..i + pat.len()]);
                     }
@@ -2065,56 +2301,56 @@ l2
     fn asset_data_real_declarations_match_truth_source() {
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
-        (
-            r#"{"format": "json", "glob": "community/*/outputs/*.json", "id": "pack-outputs-vs-schemas", "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死", "schema_siblings": ["schemas/{stem}.schema.json"]}"#,
-            &[],
-            r#"{"fields": 0, "files": 422, "format": "json", "no_schema": 206}"#
-        ),
-        (
-            r#"{"format": "json", "glob": "community/*/outputs/REPORT.json", "id": "pack-reports-io", "link": {"path_field": "sample", "rows_field": "sample_rows"}, "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）", "schema_siblings": ["schemas/{stem}.schema.json", "schemas/DOMAIN_REPORT.schema.json"]}"#,
-            &[],
-            r#"{"fields": 0, "files": 100, "format": "json"}"#
-        ),
-        (
-            r#"{"format": "csv", "glob": "community/*/outputs/samples/CASES.csv", "id": "pack-cases-csv", "min_rows": 1, "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」", "required_any_columns": ["case_id", "task_id", "query_id", "bucket"]}"#,
-            &[],
-            r#"{"columns": 4, "files": 100, "format": "csv", "rows": 20}"#
-        ),
-        (
-            r#"{"format": "markdown", "id": "library-index", "path": "library/INDEX.md"}"#,
-            &[],
-            r#"{"files": 1, "format": "markdown", "tables": 2}"#
-        ),
-        (
-            r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"}"#,
-            &[],
-            r#"{"fields": 3, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"{"format": "yaml", "glob": "community/*/protocol.yaml", "id": "pack-protocol-yaml", "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）", "schema": "protocol/schema/protocol.schema.json"}"#,
-            &[],
-            r#"{"fields": 0, "files": 111, "format": "yaml"}"#
-        ),
-        (
-            r#"{"format": "mmd", "glob": "community/*/outputs/charts/*.mmd", "id": "pack-charts-mermaid", "note": "图表资产：只判「首关键词是合法 Mermaid 图型」，不解析图内容"}"#,
-            &[],
-            r#"{"files": 106, "format": "mmd", "kind": "flowchart"}"#
-        ),
-        (
-            r#"{"format": "graphml", "glob": "community/*/outputs/**/*.graphml", "id": "pack-charts-graphml", "min_nodes": 1, "note": "图结构资产：XML 良构 + 节点/边计数"}"#,
-            &[],
-            r#"{"edges": 49, "files": 105, "format": "graphml", "nodes": 24}"#
-        ),
-        (
-            r#"{"format": "json", "id": "asset-contracts-self", "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据", "path": "protocol/asset_contracts.json", "required_fields": ["schema", "data", "code", "script"]}"#,
-            &[],
-            r#"{"fields": 4, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"{"format": "json", "id": "role-coordinates", "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判", "path": "protocol/role_coordinates.json", "required_fields": ["schema", "counts", "kernel", "root_digest"]}"#,
-            &[],
-            r#"{"fields": 4, "files": 1, "format": "json"}"#
-        ),
+            (
+                r#"{"format": "json", "glob": "community/*/outputs/*.json", "id": "pack-outputs-vs-schemas", "note": "包产物 ↔ 同名 schema 约定（D2 自动发现）：实测 216 对全绿；无 schema 的件计入 no_schema 缺口，不判死", "schema_siblings": ["schemas/{stem}.schema.json"]}"#,
+                &[],
+                r#"{"fields": 0, "files": 422, "format": "json", "no_schema": 206}"#,
+            ),
+            (
+                r#"{"format": "json", "glob": "community/*/outputs/REPORT.json", "id": "pack-reports-io", "link": {"path_field": "sample", "rows_field": "sample_rows"}, "note": "输入输出一致性：REPORT.sample 指向的 CSV 行数必须等于 sample_rows（base 缺省按产物目录与其父目录两候选解析）", "schema_siblings": ["schemas/{stem}.schema.json", "schemas/DOMAIN_REPORT.schema.json"]}"#,
+                &[],
+                r#"{"fields": 0, "files": 100, "format": "json"}"#,
+            ),
+            (
+                r#"{"format": "csv", "glob": "community/*/outputs/samples/CASES.csv", "id": "pack-cases-csv", "min_rows": 1, "note": "样例集表头**族**各不相同（实测 11 种），故只判「至少含族内一个 id 列」", "required_any_columns": ["case_id", "task_id", "query_id", "bucket"]}"#,
+                &[],
+                r#"{"columns": 4, "files": 100, "format": "csv", "rows": 20}"#,
+            ),
+            (
+                r#"{"format": "markdown", "id": "library-index", "path": "library/INDEX.md"}"#,
+                &[],
+                r#"{"files": 1, "format": "markdown", "tables": 2}"#,
+            ),
+            (
+                r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"}"#,
+                &[],
+                r#"{"fields": 3, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"{"format": "yaml", "glob": "community/*/protocol.yaml", "id": "pack-protocol-yaml", "note": "包协议声明：YAML 解析后过 check28 用的同一份 protocol.schema.json（不另造方言）", "schema": "protocol/schema/protocol.schema.json"}"#,
+                &[],
+                r#"{"fields": 0, "files": 111, "format": "yaml"}"#,
+            ),
+            (
+                r#"{"format": "mmd", "glob": "community/*/outputs/charts/*.mmd", "id": "pack-charts-mermaid", "note": "图表资产：只判「首关键词是合法 Mermaid 图型」，不解析图内容"}"#,
+                &[],
+                r#"{"files": 106, "format": "mmd", "kind": "flowchart"}"#,
+            ),
+            (
+                r#"{"format": "graphml", "glob": "community/*/outputs/**/*.graphml", "id": "pack-charts-graphml", "min_nodes": 1, "note": "图结构资产：XML 良构 + 节点/边计数"}"#,
+                &[],
+                r#"{"edges": 49, "files": 105, "format": "graphml", "nodes": 24}"#,
+            ),
+            (
+                r#"{"format": "json", "id": "asset-contracts-self", "note": "本册自检（自指但可证）：声明件自身必须含 schema 与三面键——check40 因此成为它自己的判据", "path": "protocol/asset_contracts.json", "required_fields": ["schema", "data", "code", "script"]}"#,
+                &[],
+                r#"{"fields": 4, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"{"format": "json", "id": "role-coordinates", "note": "职能坐标冻结投影（ADR-0006）：核内逐件 + 计数 + 摘要；漂移由 role_model 另判", "path": "protocol/role_coordinates.json", "required_fields": ["schema", "counts", "kernel", "root_digest"]}"#,
+                &[],
+                r#"{"fields": 4, "files": 1, "format": "json"}"#,
+            ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2122,14 +2358,26 @@ l2
             )
             .unwrap();
             let (issues, stats) = check_data(&root, &spec);
-            assert_eq!(ac_norm(&issues), ac_norm(&want_issues.iter().map(|s| s.to_string()).collect::<Vec<_>>()),
-                       "真实声明 issues 不一致");
+            assert_eq!(
+                ac_norm(&issues),
+                ac_norm(
+                    &want_issues
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                ),
+                "真实声明 issues 不一致"
+            );
             let want: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(crate::jsonread::json_eq(&stats, &want),
-                    "真实声明 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+            assert!(
+                crate::jsonread::json_eq(&stats, &want),
+                "真实声明 stats 不一致\n  实得 {}\n  期望 {}",
+                stats.dumps(),
+                want.dumps()
+            );
         }
     }
 
@@ -2138,162 +2386,180 @@ l2
         let root = crate::testutil::fixture("asset-data-cases-src");
         write_asset_data_fixture(&root);
         let cases: &[(&str, &str, &[&str], &str)] = &[
-        (
-            r#"ok-json-schema"#,
-            r#"{"format": "json", "id": "s1", "path": "ok.json", "schema": "sch.json"}"#,
-            &[],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"bad-json-schema"#,
-            r#"{"format": "json", "id": "s2", "path": "bad.json", "schema": "sch.json"}"#,
-            &[],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"non-rfc8259"#,
-            r#"{"format": "json", "id": "s3", "path": "nonan.json"}"#,
-            &[r#"数据件 nonan.json 不是合法 JSON：资产契约文本 不是合法 JSON：按 RFC 8259 不接受 NaN（修复指引：改用 null 或有限数字）（修复指引：核对该件是否被写坏 / 含注释 / 截断）（修复指引：修好语法或换 format）"#],
-            r#"{"files": 1, "format": "json"}"#
-        ),
-        (
-            r#"bad-schema-json"#,
-            r#"{"format": "json", "id": "s4", "path": "ok.json", "schema": "badschema.json"}"#,
-            &[r#"数据件 ok.json 不符 schema badschema.json：schema 本身不是合法 JSON：资产契约文本 不是合法 JSON：Expecting value: line 1 column 10 (char 9)（修复指引：核对该件是否被写坏 / 含注释 / 截断）"#],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"schema-missing"#,
-            r#"{"format": "json", "id": "s5", "path": "ok.json", "schema": "nope.json"}"#,
-            &[r#"数据件 ok.json 的 schema 读不到：读不到 nope.json：[Errno 2] No such file or directory: 'C:\\Users\\mon_7\\Downloads\\nf-wt-rustrf\\engine\\rust\\target\\test-fixtures\\asset-data-cases\\nope.json'（修复指引：核对声明里的路径在场）"#],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"required-missing"#,
-            r#"{"format": "json", "id": "s6", "path": "bad.json", "required_fields": ["zz"]}"#,
-            &[r#"数据件 bad.json 缺必填字段 zz（修复指引：补字段或从声明里删掉——声明即契约）"#],
-            r#"{"fields": 1, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"format-invalid"#,
-            r#"{"format": "xml", "id": "s7", "path": "ok.json"}"#,
-            &[r#"数据契约 s7 的 format='xml' 不在词表 json/csv/markdown/text/yaml/toml/jsonl/graphml/mmd（修复指引：改用词表内格式）"#],
-            r#"{"files": 1}"#
-        ),
-        (
-            r#"path-missing"#,
-            r#"{"format": "json", "id": "s8", "path": "nope.json"}"#,
-            &[r#"数据契约 s8 未命中任何文件（修复指引：修正 path/glob —— 空气不是契约）"#],
-            r#"{"files": 0}"#
-        ),
-        (
-            r#"glob-empty"#,
-            r#"{"format": "json", "glob": "*.nope", "id": "s9"}"#,
-            &[r#"数据契约 s9 未命中任何文件（修复指引：修正 path/glob —— 空气不是契约）"#],
-            r#"{"files": 0}"#
-        ),
-        (
-            r#"sha-multi"#,
-            r#"{"format": "csv", "glob": "*.csv", "id": "s10", "sha256": "00"}"#,
-            &[r#"数据契约 s10 声明了 sha256 却命中 6 件（修复指引：sha256 只用于 path 单件）"#],
-            r#"{"files": 6}"#
-        ),
-        (
-            r#"sha-mismatch"#,
-            r#"{"format": "csv", "id": "s11", "path": "ok.csv", "sha256": "00"}"#,
-            &[r#"数据件 ok.csv 摘要不符（记录 00 / 实测 b94851485464）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"#],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#
-        ),
-        (
-            r#"csv-ok"#,
-            r#"{"format": "csv", "id": "s12", "path": "ok.csv", "required_columns": ["a"]}"#,
-            &[],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#
-        ),
-        (
-            r#"csv-empty"#,
-            r#"{"format": "csv", "id": "s13", "path": "empty.csv"}"#,
-            &[r#"数据件 empty.csv 是空 CSV（修复指引：至少要有表头行）"#],
-            r#"{"files": 1, "format": "csv", "rows": 0}"#
-        ),
-        (
-            r#"csv-blank-header"#,
-            r#"{"format": "csv", "id": "s14", "path": "blankhdr.csv"}"#,
-            &[r#"数据件 blankhdr.csv 表头有空列名（修复指引：每列都要有名字）"#],
-            r#"{"columns": 3, "files": 1, "format": "csv", "rows": 1}"#
-        ),
-        (
-            r#"csv-ragged"#,
-            r#"{"format": "csv", "id": "s15", "path": "ragged.csv"}"#,
-            &[r#"数据件 ragged.csv 第 2 行列数 != 表头 2（修复指引：补齐/删除多余的分隔符）"#],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#
-        ),
-        (
-            r#"csv-missing-col"#,
-            r#"{"format": "csv", "id": "s16", "path": "ok.csv", "required_columns": ["zz"]}"#,
-            &[r#"数据件 ok.csv 缺必需列 zz（修复指引：加列或改声明）"#],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#
-        ),
-        (
-            r#"csv-min-rows"#,
-            r#"{"format": "csv", "id": "s17", "min_rows": 99, "path": "ok.csv"}"#,
-            &[r#"数据件 ok.csv 数据行 2 < min_rows 99（修复指引：补样例或下调声明）"#],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#
-        ),
-        (
-            r#"csv-quoted"#,
-            r#"{"format": "csv", "id": "s18", "path": "quoted.csv", "required_columns": ["a", "b"]}"#,
-            &[],
-            r#"{"columns": 2, "files": 1, "format": "csv", "rows": 1}"#
-        ),
-        (
-            r#"md-ok"#,
-            r#"{"format": "markdown", "frontmatter": true, "id": "s19", "path": "ok.md"}"#,
-            &[],
-            r#"{"files": 1, "format": "markdown", "tables": 1}"#
-        ),
-        (
-            r#"md-ragged"#,
-            r#"{"format": "markdown", "frontmatter": true, "id": "s20", "path": "ragged.md"}"#,
-            &[r#"数据件 ragged.md 有一张表列数不齐：表头 2 列 vs 数据 1 列（修复指引：对齐竖线）"#],
-            r#"{"files": 1, "format": "markdown", "tables": 1}"#
-        ),
-        (
-            r#"md-no-frontmatter"#,
-            r#"{"format": "markdown", "frontmatter": true, "id": "s21", "path": "nofm.md"}"#,
-            &[r#"数据件 nofm.md 缺 frontmatter（修复指引：件首补 --- 块）"#],
-            r#"{"files": 1, "format": "markdown", "tables": 1}"#
-        ),
-        (
-            r#"text-lines"#,
-            r#"{"format": "text", "id": "s22", "path": "plain.txt"}"#,
-            &[],
-            r#"{"files": 1, "format": "text", "lines": 2}"#
-        ),
-        (
-            r#"link-ok"#,
-            r#"{"format": "json", "id": "s23", "link": {"path_field": "p", "rows_field": "n"}, "path": "link.json"}"#,
-            &[],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"link-mismatch"#,
-            r#"{"format": "json", "id": "s24", "link": {"path_field": "p", "rows_field": "n"}, "path": "linkbad.json"}"#,
-            &[r#"数据件 linkbad.json 的 n=9 与 link.csv 数据行 3 不一致（修复指引：重算或改声明）"#],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"link-missing"#,
-            r#"{"format": "json", "id": "s25", "link": {"path_field": "p"}, "path": "linkmiss.json"}"#,
-            &[r#"数据件 linkmiss.json 指向的 nope.csv 不在场（修复指引：补件或修正 link.base）"#],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
-        (
-            r#"link-no-path-field"#,
-            r#"{"format": "json", "id": "s26", "link": {"path_field": "nope"}, "path": "link.json"}"#,
-            &[r#"数据件 link.json 的 link.path_field=nope 取不到字符串路径（修复指引：核对字段名）"#],
-            r#"{"fields": 0, "files": 1, "format": "json"}"#
-        ),
+            (
+                r#"ok-json-schema"#,
+                r#"{"format": "json", "id": "s1", "path": "ok.json", "schema": "sch.json"}"#,
+                &[],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"bad-json-schema"#,
+                r#"{"format": "json", "id": "s2", "path": "bad.json", "schema": "sch.json"}"#,
+                &[],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"non-rfc8259"#,
+                r#"{"format": "json", "id": "s3", "path": "nonan.json"}"#,
+                &[
+                    r#"数据件 nonan.json 不是合法 JSON：资产契约文本 不是合法 JSON：按 RFC 8259 不接受 NaN（修复指引：改用 null 或有限数字）（修复指引：核对该件是否被写坏 / 含注释 / 截断）（修复指引：修好语法或换 format）"#,
+                ],
+                r#"{"files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"bad-schema-json"#,
+                r#"{"format": "json", "id": "s4", "path": "ok.json", "schema": "badschema.json"}"#,
+                &[
+                    r#"数据件 ok.json 不符 schema badschema.json：schema 本身不是合法 JSON：资产契约文本 不是合法 JSON：Expecting value: line 1 column 10 (char 9)（修复指引：核对该件是否被写坏 / 含注释 / 截断）"#,
+                ],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"schema-missing"#,
+                r#"{"format": "json", "id": "s5", "path": "ok.json", "schema": "nope.json"}"#,
+                &[
+                    r#"数据件 ok.json 的 schema 读不到：读不到 nope.json：[Errno 2] No such file or directory: 'C:\\Users\\mon_7\\Downloads\\nf-wt-rustrf\\engine\\rust\\target\\test-fixtures\\asset-data-cases\\nope.json'（修复指引：核对声明里的路径在场）"#,
+                ],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"required-missing"#,
+                r#"{"format": "json", "id": "s6", "path": "bad.json", "required_fields": ["zz"]}"#,
+                &[r#"数据件 bad.json 缺必填字段 zz（修复指引：补字段或从声明里删掉——声明即契约）"#],
+                r#"{"fields": 1, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"format-invalid"#,
+                r#"{"format": "xml", "id": "s7", "path": "ok.json"}"#,
+                &[
+                    r#"数据契约 s7 的 format='xml' 不在词表 json/csv/markdown/text/yaml/toml/jsonl/graphml/mmd（修复指引：改用词表内格式）"#,
+                ],
+                r#"{"files": 1}"#,
+            ),
+            (
+                r#"path-missing"#,
+                r#"{"format": "json", "id": "s8", "path": "nope.json"}"#,
+                &[r#"数据契约 s8 未命中任何文件（修复指引：修正 path/glob —— 空气不是契约）"#],
+                r#"{"files": 0}"#,
+            ),
+            (
+                r#"glob-empty"#,
+                r#"{"format": "json", "glob": "*.nope", "id": "s9"}"#,
+                &[r#"数据契约 s9 未命中任何文件（修复指引：修正 path/glob —— 空气不是契约）"#],
+                r#"{"files": 0}"#,
+            ),
+            (
+                r#"sha-multi"#,
+                r#"{"format": "csv", "glob": "*.csv", "id": "s10", "sha256": "00"}"#,
+                &[r#"数据契约 s10 声明了 sha256 却命中 6 件（修复指引：sha256 只用于 path 单件）"#],
+                r#"{"files": 6}"#,
+            ),
+            (
+                r#"sha-mismatch"#,
+                r#"{"format": "csv", "id": "s11", "path": "ok.csv", "sha256": "00"}"#,
+                &[
+                    r#"数据件 ok.csv 摘要不符（记录 00 / 实测 b94851485464）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"#,
+                ],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#,
+            ),
+            (
+                r#"csv-ok"#,
+                r#"{"format": "csv", "id": "s12", "path": "ok.csv", "required_columns": ["a"]}"#,
+                &[],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#,
+            ),
+            (
+                r#"csv-empty"#,
+                r#"{"format": "csv", "id": "s13", "path": "empty.csv"}"#,
+                &[r#"数据件 empty.csv 是空 CSV（修复指引：至少要有表头行）"#],
+                r#"{"files": 1, "format": "csv", "rows": 0}"#,
+            ),
+            (
+                r#"csv-blank-header"#,
+                r#"{"format": "csv", "id": "s14", "path": "blankhdr.csv"}"#,
+                &[r#"数据件 blankhdr.csv 表头有空列名（修复指引：每列都要有名字）"#],
+                r#"{"columns": 3, "files": 1, "format": "csv", "rows": 1}"#,
+            ),
+            (
+                r#"csv-ragged"#,
+                r#"{"format": "csv", "id": "s15", "path": "ragged.csv"}"#,
+                &[r#"数据件 ragged.csv 第 2 行列数 != 表头 2（修复指引：补齐/删除多余的分隔符）"#],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#,
+            ),
+            (
+                r#"csv-missing-col"#,
+                r#"{"format": "csv", "id": "s16", "path": "ok.csv", "required_columns": ["zz"]}"#,
+                &[r#"数据件 ok.csv 缺必需列 zz（修复指引：加列或改声明）"#],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#,
+            ),
+            (
+                r#"csv-min-rows"#,
+                r#"{"format": "csv", "id": "s17", "min_rows": 99, "path": "ok.csv"}"#,
+                &[r#"数据件 ok.csv 数据行 2 < min_rows 99（修复指引：补样例或下调声明）"#],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 2}"#,
+            ),
+            (
+                r#"csv-quoted"#,
+                r#"{"format": "csv", "id": "s18", "path": "quoted.csv", "required_columns": ["a", "b"]}"#,
+                &[],
+                r#"{"columns": 2, "files": 1, "format": "csv", "rows": 1}"#,
+            ),
+            (
+                r#"md-ok"#,
+                r#"{"format": "markdown", "frontmatter": true, "id": "s19", "path": "ok.md"}"#,
+                &[],
+                r#"{"files": 1, "format": "markdown", "tables": 1}"#,
+            ),
+            (
+                r#"md-ragged"#,
+                r#"{"format": "markdown", "frontmatter": true, "id": "s20", "path": "ragged.md"}"#,
+                &[
+                    r#"数据件 ragged.md 有一张表列数不齐：表头 2 列 vs 数据 1 列（修复指引：对齐竖线）"#,
+                ],
+                r#"{"files": 1, "format": "markdown", "tables": 1}"#,
+            ),
+            (
+                r#"md-no-frontmatter"#,
+                r#"{"format": "markdown", "frontmatter": true, "id": "s21", "path": "nofm.md"}"#,
+                &[r#"数据件 nofm.md 缺 frontmatter（修复指引：件首补 --- 块）"#],
+                r#"{"files": 1, "format": "markdown", "tables": 1}"#,
+            ),
+            (
+                r#"text-lines"#,
+                r#"{"format": "text", "id": "s22", "path": "plain.txt"}"#,
+                &[],
+                r#"{"files": 1, "format": "text", "lines": 2}"#,
+            ),
+            (
+                r#"link-ok"#,
+                r#"{"format": "json", "id": "s23", "link": {"path_field": "p", "rows_field": "n"}, "path": "link.json"}"#,
+                &[],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"link-mismatch"#,
+                r#"{"format": "json", "id": "s24", "link": {"path_field": "p", "rows_field": "n"}, "path": "linkbad.json"}"#,
+                &[
+                    r#"数据件 linkbad.json 的 n=9 与 link.csv 数据行 3 不一致（修复指引：重算或改声明）"#,
+                ],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"link-missing"#,
+                r#"{"format": "json", "id": "s25", "link": {"path_field": "p"}, "path": "linkmiss.json"}"#,
+                &[
+                    r#"数据件 linkmiss.json 指向的 nope.csv 不在场（修复指引：补件或修正 link.base）"#,
+                ],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
+            (
+                r#"link-no-path-field"#,
+                r#"{"format": "json", "id": "s26", "link": {"path_field": "nope"}, "path": "link.json"}"#,
+                &[
+                    r#"数据件 link.json 的 link.path_field=nope 取不到字符串路径（修复指引：核对字段名）"#,
+                ],
+                r#"{"fields": 0, "files": 1, "format": "json"}"#,
+            ),
         ];
         for (name, spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2301,16 +2567,28 @@ l2
             )
             .unwrap();
             let (issues, stats) = check_data(&root, &spec);
-            assert_eq!(ac_norm(&issues),
-                       ac_norm(&want_issues.iter().map(|s| s.to_string()).collect::<Vec<_>>()),
-                       "合成用例 {} 的 issues 不一致", name);
+            assert_eq!(
+                ac_norm(&issues),
+                ac_norm(
+                    &want_issues
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                ),
+                "合成用例 {} 的 issues 不一致",
+                name
+            );
             let want: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(crate::jsonread::json_eq(&stats, &want),
-                    "合成用例 {} 的 stats 不一致\n  实得 {}\n  期望 {}", name,
-                    stats.dumps(), want.dumps());
+            assert!(
+                crate::jsonread::json_eq(&stats, &want),
+                "合成用例 {} 的 stats 不一致\n  实得 {}\n  期望 {}",
+                name,
+                stats.dumps(),
+                want.dumps()
+            );
         }
     }
     // <<< GENERATED
@@ -2323,41 +2601,87 @@ l2
     fn asset_code_real_declarations_match_truth_source() {
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
-        (
-            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "asset-contract", "lang": "python", "path": "desktop/src/core/asset_contract.py", "tests": ["desktop/tests/test_asset_contract.py"]}"#,
-            &[],
-            r#"{"files": 1}"#
-        ),
-        (
-            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "json-schema-leaf", "lang": "python", "path": "desktop/src/core/json_schema.py", "tests": ["desktop/tests/test_output_forms.py"]}"#,
-            &[],
-            r#"{"files": 1}"#
-        ),
-        (
-            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "content-face-leaf", "lang": "python", "path": "desktop/src/core/content_face.py", "tests": ["desktop/tests/test_content_face.py"]}"#,
-            &[],
-            r#"{"files": 1}"#
-        ),
-        (
-            r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "role-model", "lang": "python", "path": "desktop/src/core/role_model.py", "tests": ["desktop/tests/test_role_model.py"]}"#,
-            &[],
-            r#"{"files": 1}"#
-        ),
-        (
-            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是**只读判据**；"#, "un", "safe", r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#),
-            &[],
-            concat!(r#"{"files": 86, "forbid:"#, "un", "safe", r#"": 0, "limit:extern-c": 1}"#)
-        ),
-        (
-            concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#),
-            &[],
-            concat!(r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
-        ),
-        (
-            concat!(r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#, "un", "safe", r#"（C ABI 本质），故不套用「禁 "#, "un", "safe", r#"」的只读契约；改判三条可证治理规则——"#, "un", "safe", r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##, "un", "safe", r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#, "un", "safe", r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##),
-            &[],
-            r#"{"files": 1}"#
-        ),
+            (
+                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "asset-contract", "lang": "python", "path": "desktop/src/core/asset_contract.py", "tests": ["desktop/tests/test_asset_contract.py"]}"#,
+                &[],
+                r#"{"files": 1}"#,
+            ),
+            (
+                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "json-schema-leaf", "lang": "python", "path": "desktop/src/core/json_schema.py", "tests": ["desktop/tests/test_output_forms.py"]}"#,
+                &[],
+                r#"{"files": 1}"#,
+            ),
+            (
+                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system"], "id": "content-face-leaf", "lang": "python", "path": "desktop/src/core/content_face.py", "tests": ["desktop/tests/test_content_face.py"]}"#,
+                &[],
+                r#"{"files": 1}"#,
+            ),
+            (
+                r#"{"deny_calls": ["eval", "exec", "__import__", "os.system", "pickle.loads", "marshal.loads"], "id": "role-model", "lang": "python", "path": "desktop/src/core/role_model.py", "tests": ["desktop/tests/test_role_model.py"]}"#,
+                &[],
+                r#"{"files": 1}"#,
+            ),
+            (
+                concat!(
+                    r#"{"forbid_regex": [{"name": ""#,
+                    "un",
+                    "safe",
+                    r#"", "pattern": "\\b"#,
+                    "un",
+                    "safe",
+                    r#"\\b", "why": "第二实现线是**只读判据**；"#,
+                    "un",
+                    "safe",
+                    r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#
+                ),
+                &[],
+                concat!(
+                    r#"{"files": 86, "forbid:"#,
+                    "un",
+                    "safe",
+                    r#"": 0, "limit:extern-c": 1}"#
+                ),
+            ),
+            (
+                concat!(
+                    r#"{"forbid_regex": [{"name": ""#,
+                    "un",
+                    "safe",
+                    r#"", "pattern": "\\b"#,
+                    "un",
+                    "safe",
+                    r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#
+                ),
+                &[],
+                concat!(
+                    r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#,
+                    "un",
+                    "safe",
+                    r#"": 0}"#
+                ),
+            ),
+            (
+                concat!(
+                    r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#,
+                    "un",
+                    "safe",
+                    r#"（C ABI 本质），故不套用「禁 "#,
+                    "un",
+                    "safe",
+                    r#"」的只读契约；改判三条可证治理规则——"#,
+                    "un",
+                    "safe",
+                    r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##,
+                    "un",
+                    "safe",
+                    r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#,
+                    "un",
+                    "safe",
+                    r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##
+                ),
+                &[],
+                r#"{"files": 1}"#,
+            ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2365,14 +2689,24 @@ l2
             )
             .unwrap();
             let (issues, stats) = check_code(&root, &spec);
-            assert_eq!(ac_norm(&issues),
-                       ac_norm(&want_issues.iter().map(|s| s.to_string()).collect::<Vec<_>>()),
-                       "代码面 issues 不一致");
+            assert_eq!(
+                ac_norm(&issues),
+                ac_norm(
+                    &want_issues
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                ),
+                "代码面 issues 不一致"
+            );
             let want: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(crate::jsonread::json_eq(&stats, &want), "代码面 stats 不一致");
+            assert!(
+                crate::jsonread::json_eq(&stats, &want),
+                "代码面 stats 不一致"
+            );
         }
     }
 
@@ -2380,26 +2714,26 @@ l2
     fn asset_script_real_declarations_match_truth_source() {
         let root = ac_repo_root();
         let cases: &[(&str, &[&str], &str)] = &[
-        (
-            r#"{"id": "cards", "inputs": ["verify.sh"], "lang": "python", "outputs": ["docs/verification-cards.md"], "path": "scripts/build_verification_cards.py"}"#,
-            &[],
-            r#"{"files": 1, "inputs": 1, "outputs": 1}"#
-        ),
-        (
-            r#"{"id": "geo-export", "inputs": ["protocol/standards_catalog.json", "protocol/standards_binding.json"], "lang": "python", "outputs": ["docs/standards/index.md", "docs/standards/answer-cards.md", "protocol/geo_export.json", "docs/standards/layer-data.md", "docs/standards/layer-eng.md", "docs/standards/layer-form.md", "docs/standards/layer-gov.md", "docs/standards/layer-iface.md"], "path": "scripts/geo_export.py"}"#,
-            &[],
-            r#"{"files": 1, "inputs": 2, "outputs": 8}"#
-        ),
-        (
-            r#"{"id": "external-links", "inputs": ["README.md", "README.en.md", "llms.txt", "docs/agent/AGENT_START.md", "docs/agent/ROUTES.md", "docs/verification-cards.md"], "lang": "python", "outputs": ["results/external-links-report.json"], "path": "scripts/check_external_links.py"}"#,
-            &[],
-            r#"{"files": 1, "inputs": 6, "outputs": 1}"#
-        ),
-        (
-            r#"{"id": "quality-all", "inputs": ["verify.sh"], "lang": "bash", "outputs": [], "path": "scripts/quality_all.sh"}"#,
-            &[],
-            r#"{"files": 1, "inputs": 1, "outputs": 0}"#
-        ),
+            (
+                r#"{"id": "cards", "inputs": ["verify.sh"], "lang": "python", "outputs": ["docs/verification-cards.md"], "path": "scripts/build_verification_cards.py"}"#,
+                &[],
+                r#"{"files": 1, "inputs": 1, "outputs": 1}"#,
+            ),
+            (
+                r#"{"id": "geo-export", "inputs": ["protocol/standards_catalog.json", "protocol/standards_binding.json"], "lang": "python", "outputs": ["docs/standards/index.md", "docs/standards/answer-cards.md", "protocol/geo_export.json", "docs/standards/layer-data.md", "docs/standards/layer-eng.md", "docs/standards/layer-form.md", "docs/standards/layer-gov.md", "docs/standards/layer-iface.md"], "path": "scripts/geo_export.py"}"#,
+                &[],
+                r#"{"files": 1, "inputs": 2, "outputs": 8}"#,
+            ),
+            (
+                r#"{"id": "external-links", "inputs": ["README.md", "README.en.md", "llms.txt", "docs/agent/AGENT_START.md", "docs/agent/ROUTES.md", "docs/verification-cards.md"], "lang": "python", "outputs": ["results/external-links-report.json"], "path": "scripts/check_external_links.py"}"#,
+                &[],
+                r#"{"files": 1, "inputs": 6, "outputs": 1}"#,
+            ),
+            (
+                r#"{"id": "quality-all", "inputs": ["verify.sh"], "lang": "bash", "outputs": [], "path": "scripts/quality_all.sh"}"#,
+                &[],
+                r#"{"files": 1, "inputs": 1, "outputs": 0}"#,
+            ),
         ];
         for (spec_s, want_issues, want_stats) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -2412,7 +2746,10 @@ l2
                 &serde_json::from_str::<serde_json::Value>(want_stats).unwrap(),
             )
             .unwrap();
-            assert!(crate::jsonread::json_eq(&stats, &want), "脚本面 stats 不一致");
+            assert!(
+                crate::jsonread::json_eq(&stats, &want),
+                "脚本面 stats 不一致"
+            );
         }
     }
 
@@ -2426,13 +2763,11 @@ l2
                 _ => Vec::new(),
             }
         };
-        let cases: &[(&str, &[&str], &str)] = &[
-        (
+        let cases: &[(&str, &[&str], &str)] = &[(
             r#"{"feeds": [{"input": "docs/verification-cards.md", "output": "docs/verification-cards.md"}], "from": "cards", "id": "cards-to-external-links", "to": "external-links"}"#,
             &[],
-            r#"{"matched": 1}"#
-        ),
-        ];
+            r#"{"matched": 1}"#,
+        )];
         for (chain_s, want_issues, want_stats) in cases {
             let chain: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(chain_s).unwrap(),
@@ -2458,8 +2793,12 @@ l2
             &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1258, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want),
-                "聚合 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "聚合 stats 不一致\n  实得 {}\n  期望 {}",
+            stats.dumps(),
+            want.dumps()
+        );
     }
     // <<< GENERATED
     // >>> GENERATED by tools/gen_asset_contract_faces.py（勿手改；重跑生成器覆盖本段）
@@ -2485,11 +2824,19 @@ l2
         AcFaceFixture {
             name: r#"clean"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts",
   "profile": "data-package",
   "resources": [],
@@ -2497,11 +2844,18 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
-                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
+                (
+                    r#"protocol/schema/asset_contracts.schema.json"#,
+                    r#"{"type": "object"}
+"#,
+                ),
             ],
             registry: &[],
             export_drift: &[],
@@ -2512,11 +2866,19 @@ l2
         AcFaceFixture {
             name: r#"registration_missing"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts",
   "profile": "data-package",
   "resources": [],
@@ -2524,26 +2886,45 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
-                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
+                (
+                    r#"protocol/schema/asset_contracts.schema.json"#,
+                    r#"{"type": "object"}
+"#,
+                ),
             ],
-            registry: &[r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#],
+            registry: &[
+                r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#,
+            ],
             export_drift: &[],
             schema_self: &[],
-            scan_issues: &[r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#],
+            scan_issues: &[
+                r#"资产 protocol/probe.json 未在 protocol/data_contracts.json 登记（修复指引：补一条契约——同一 artifact 不许只在资产册出现）"#,
+            ],
             scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
         },
         AcFaceFixture {
             name: r#"export_drift"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts-drift",
   "profile": "data-package",
   "resources": [],
@@ -2551,26 +2932,45 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
-                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
+                (
+                    r#"protocol/schema/asset_contracts.schema.json"#,
+                    r#"{"type": "object"}
+"#,
+                ),
             ],
             registry: &[],
-            export_drift: &[r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#],
+            export_drift: &[
+                r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#,
+            ],
             schema_self: &[],
-            scan_issues: &[r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#],
+            scan_issues: &[
+                r#"④ protocol/generated/asset_contract.frictionless.json 与实时导出不一致（修复指引：nf asset contract --export）"#,
+            ],
             scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
         },
         AcFaceFixture {
             name: r#"schema_missing"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts",
   "profile": "data-package",
   "resources": [],
@@ -2578,24 +2978,40 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
             ],
             registry: &[],
             export_drift: &[],
-            schema_self: &[r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#],
-            scan_issues: &[r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#],
+            schema_self: &[
+                r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#,
+            ],
+            scan_issues: &[
+                r#"⑤ 缺可移植 schema protocol/schema/asset_contracts.schema.json（修复指引：补该件——对外可移植契约靠它定型）"#,
+            ],
             scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
         },
         AcFaceFixture {
             name: r#"schema_violation"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts",
   "profile": "data-package",
   "resources": [],
@@ -2603,26 +3019,45 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
-                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"required": ["schema", "no_such_key"], "type": "object"}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
+                (
+                    r#"protocol/schema/asset_contracts.schema.json"#,
+                    r#"{"required": ["schema", "no_such_key"], "type": "object"}
+"#,
+                ),
             ],
             registry: &[],
             export_drift: &[],
-            schema_self: &[r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#],
-            scan_issues: &[r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#],
+            schema_self: &[
+                r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#,
+            ],
+            scan_issues: &[
+                r#"⑤ 声明不符可移植 schema protocol/schema/asset_contracts.schema.json：$: 缺必填字段 no_such_key（修复指引：改声明或改 schema——两者只能有一个对）"#,
+            ],
             scan_stats: r#"{"chains": 0, "code": 0, "data": 1, "files": 1, "index": 0, "no_schema": 0, "script": 0}"#,
         },
         AcFaceFixture {
             name: r#"restored"#,
             files: &[
-                (r#"protocol/asset_contracts.json"#, r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
-"#),
-                (r#"protocol/data_contracts.json"#, r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
-"#),
-                (r#"protocol/generated/asset_contract.frictionless.json"#, r#"{
+                (
+                    r#"protocol/asset_contracts.json"#,
+                    r#"{"chains": [], "code": [], "data": [{"format": "json", "id": "probe", "path": "protocol/probe.json"}], "index": [], "schema": "nf-asset-contracts/1", "script": []}
+"#,
+                ),
+                (
+                    r#"protocol/data_contracts.json"#,
+                    r#"{"contracts": [{"artifact": "protocol/probe.json", "id": "probe"}], "schema": "nf-data-contracts/1"}
+"#,
+                ),
+                (
+                    r#"protocol/generated/asset_contract.frictionless.json"#,
+                    r#"{
   "name": "ninfenz-asset-contracts",
   "profile": "data-package",
   "resources": [],
@@ -2630,11 +3065,18 @@ l2
   "x-nf-generated-by": "nf asset contract --export",
   "x-nf-note": "由已声明契约面确定性导出；领域包产物按同名 schema 约定带 fields 映射"
 }
-"#),
-                (r#"protocol/probe.json"#, r#"{"a": 1}
-"#),
-                (r#"protocol/schema/asset_contracts.schema.json"#, r#"{"type": "object"}
-"#),
+"#,
+                ),
+                (
+                    r#"protocol/probe.json"#,
+                    r#"{"a": 1}
+"#,
+                ),
+                (
+                    r#"protocol/schema/asset_contracts.schema.json"#,
+                    r#"{"type": "object"}
+"#,
+                ),
             ],
             registry: &[],
             export_drift: &[],
@@ -2657,7 +3099,11 @@ l2
     /// 三个声明面（D1 / ④ / ⑤）的 issues —— 与真源 `scan` 里的调用序一致。
     fn ac_face_issues(root: &std::path::Path) -> (Vec<String>, Vec<String>, Vec<String>) {
         let (doc, _load_issues) = load(root);
-        (registry_issues(root, &doc), export_drift(root), schema_self_check(root))
+        (
+            registry_issues(root, &doc),
+            export_drift(root),
+            schema_self_check(root),
+        )
     }
 
     #[test]
@@ -2666,11 +3112,27 @@ l2
             let root = crate::testutil::fixture(&format!("asset-contract-faces-{}", case.name));
             write_ac_face_fixture(&root, case.files);
             let (reg, exp, sch) = ac_face_issues(&root);
-            assert_eq!(reg, case.registry, "{} 的 D1 登记册 issues 不一致", case.name);
-            assert_eq!(exp, case.export_drift, "{} 的 ④ 导出漂移 issues 不一致", case.name);
-            assert_eq!(sch, case.schema_self, "{} 的 ⑤ 声明自检 issues 不一致", case.name);
+            assert_eq!(
+                reg, case.registry,
+                "{} 的 D1 登记册 issues 不一致",
+                case.name
+            );
+            assert_eq!(
+                exp, case.export_drift,
+                "{} 的 ④ 导出漂移 issues 不一致",
+                case.name
+            );
+            assert_eq!(
+                sch, case.schema_self,
+                "{} 的 ⑤ 声明自检 issues 不一致",
+                case.name
+            );
             let (issues, _warns, stats) = scan(&root);
-            assert_eq!(issues, case.scan_issues, "{} 的 scan issues 不一致", case.name);
+            assert_eq!(
+                issues, case.scan_issues,
+                "{} 的 scan issues 不一致",
+                case.name
+            );
             let want: Json = crate::jsonread::convert(
                 &serde_json::from_str::<serde_json::Value>(case.scan_stats).unwrap(),
             )
@@ -2693,13 +3155,21 @@ l2
     fn asset_contract_integral_faces_clean_on_real_corpus() {
         let root = ac_repo_root();
         let (doc, load_issues) = load(&root);
-        assert!(load_issues.is_empty(), "真语料声明件须可读：{:?}", load_issues);
+        assert!(
+            load_issues.is_empty(),
+            "真语料声明件须可读：{:?}",
+            load_issues
+        );
         assert_eq!(
             registry_issues(&root, &doc),
             Vec::<String>::new(),
             "真语料 D1 登记册面须空"
         );
-        assert_eq!(export_drift(&root), Vec::<String>::new(), "真语料 ④ 导出漂移面须空");
+        assert_eq!(
+            export_drift(&root),
+            Vec::<String>::new(),
+            "真语料 ④ 导出漂移面须空"
+        );
         assert_eq!(
             schema_self_check(&root),
             Vec::<String>::new(),
@@ -2749,7 +3219,10 @@ l2
                 "unsafe_safety_comment",
                 rule(vec![
                     ("marker", s("SAFETY:")),
-                    ("pattern", Json::Str(concat!(r"\bun", r"safe\b").to_string())),
+                    (
+                        "pattern",
+                        Json::Str(concat!(r"\bun", r"safe\b").to_string()),
+                    ),
                     ("skip_after", s("#[cfg(test)]")),
                     ("within", n(3)),
                 ]),
@@ -2774,7 +3247,10 @@ l2
         let spec = ffi_warn_spec();
 
         let bad = concat!(
-            "pub ", "un", "safe", " fn raw(p: *const u8, len: usize) -> u8 {\n",
+            "pub ",
+            "un",
+            "safe",
+            " fn raw(p: *const u8, len: usize) -> u8 {\n",
             "    let s = std::slice::from_raw_parts(p, len);\n",
             "    s[0]\n}\n",
             "#[no_mangle]\npub extern \"C\" fn boom() -> u32 { panic!() }\n"
@@ -2782,16 +3258,28 @@ l2
         std::fs::write(root.join("ffi/src/lib.rs"), bad).expect("写夹具件");
         let warns = code_warns(&root, &spec);
         assert_eq!(warns.len(), 3, "三类违规应各报一条：{:?}", warns);
-        assert!(warns.iter().any(|w| w.contains("SAFETY:")),
-                "缺 SAFETY 注释应被抓：{:?}", warns);
-        assert!(warns.iter().any(|w| w.contains("from_raw_parts")),
-                "缺空指针检查应被抓：{:?}", warns);
-        assert!(warns.iter().any(|w| w.contains("panic!")),
-                "导出面 panic 应被抓：{:?}", warns);
+        assert!(
+            warns.iter().any(|w| w.contains("SAFETY:")),
+            "缺 SAFETY 注释应被抓：{:?}",
+            warns
+        );
+        assert!(
+            warns.iter().any(|w| w.contains("from_raw_parts")),
+            "缺空指针检查应被抓：{:?}",
+            warns
+        );
+        assert!(
+            warns.iter().any(|w| w.contains("panic!")),
+            "导出面 panic 应被抓：{:?}",
+            warns
+        );
 
         let good = concat!(
             "// SAFETY: 调用方保证 p 有效；本块只读而不写。\n",
-            "pub ", "un", "safe", " fn raw(p: *const u8, len: usize) -> u8 {\n",
+            "pub ",
+            "un",
+            "safe",
+            " fn raw(p: *const u8, len: usize) -> u8 {\n",
             "    if p.is_null() { return 0; }\n",
             "    let s = std::slice::from_raw_parts(p, len);\n",
             "    s[0]\n}\n",

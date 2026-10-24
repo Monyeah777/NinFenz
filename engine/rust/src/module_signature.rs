@@ -13,8 +13,15 @@ use std::path::Path;
 
 pub const BASELINE_REL: &str = "protocol/module_signatures.json";
 /// 真源 `_BOUNDARY_KEYS` —— 摘要覆盖面的**单一真相源**（issue 文案也从它生成）。
-const BOUNDARY_KEYS: [&str; 7] =
-    ["inputs", "outputs", "events", "interfaces", "layer", "category", "io_types"];
+const BOUNDARY_KEYS: [&str; 7] = [
+    "inputs",
+    "outputs",
+    "events",
+    "interfaces",
+    "layer",
+    "category",
+    "io_types",
+];
 
 /// 真源 `_module_docs`：`04_模块库/**/*.md` + `community/*/modules/*.md`，排序。
 pub(crate) fn module_docs(root: &Path) -> Vec<String> {
@@ -82,7 +89,9 @@ pub fn verify_issues(root: &Path) -> Vec<String> {
         return missing();
     }
 
-    let base_mods = get(&base, "modules").cloned().unwrap_or(Json::Object(Vec::new()));
+    let base_mods = get(&base, "modules")
+        .cloned()
+        .unwrap_or(Json::Object(Vec::new()));
     let mut sigs = signatures(root);
     sigs.sort_by(|a, b| a.0.cmp(&b.0));
 

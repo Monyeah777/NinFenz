@@ -26,10 +26,18 @@ pub fn repr(x: f64) -> String {
         return "nan".to_string();
     }
     if x.is_infinite() {
-        return if x > 0.0 { "inf".to_string() } else { "-inf".to_string() };
+        return if x > 0.0 {
+            "inf".to_string()
+        } else {
+            "-inf".to_string()
+        };
     }
     if x == 0.0 {
-        return if x.is_sign_negative() { "-0.0".to_string() } else { "0.0".to_string() };
+        return if x.is_sign_negative() {
+            "-0.0".to_string()
+        } else {
+            "0.0".to_string()
+        };
     }
 
     let neg = x.is_sign_negative();
@@ -199,8 +207,18 @@ mod tests {
     fn every_value_round_trips_back_to_itself() {
         // 最强自证：解析回去必须得到同一个 f64（最短往返语义）
         let vals = [
-            0.1, 0.2, 1.0 / 3.0, 9999999999999998.0, 1e15, 1e16, 1e-4, 1e-5, 5e-324,
-            1.7976931348623157e308, 123456789012345.0, 2.5e-10,
+            0.1,
+            0.2,
+            1.0 / 3.0,
+            9999999999999998.0,
+            1e15,
+            1e16,
+            1e-4,
+            1e-5,
+            5e-324,
+            1.7976931348623157e308,
+            123456789012345.0,
+            2.5e-10,
         ];
         for v in vals {
             let s = repr(v);

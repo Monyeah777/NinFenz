@@ -43,7 +43,9 @@ struct TextCache {
 
 impl TextCache {
     fn new() -> Self {
-        Self { texts: HashMap::new() }
+        Self {
+            texts: HashMap::new(),
+        }
     }
     fn get(&mut self, root: &Path, rel: &str) -> Option<&str> {
         if !self.texts.contains_key(rel) {
@@ -61,7 +63,8 @@ fn esc(name: &str) -> String {
 /// 真源 `candidates`：定义了 `def scan(` 的 core 模块（按 stem 排序）。
 pub fn candidates(root: &Path) -> Vec<String> {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"(?m)^def scan\(").expect("scan 定义正则固定合法"));
+    let re =
+        RE.get_or_init(|| regex::Regex::new(r"(?m)^def scan\(").expect("scan 定义正则固定合法"));
     let mut out: Vec<String> = crate::glob::expand(root, "desktop/src/core/*.py")
         .into_iter()
         .filter(|rel| {
@@ -94,11 +97,19 @@ fn consumers_of(name: &str, root: &Path, cache: &mut TextCache) -> Vec<String> {
 
     let mut out: Vec<String> = Vec::new();
     for rel in CONSUMERS {
-        let Some(text) = cache.get(root, rel) else { continue };
+        let Some(text) = cache.get(root, rel) else {
+            continue;
+        };
         let mut hit = call_re.as_ref().map(|r| r.is_match(text)).unwrap_or(false)
-            || import_re.as_ref().map(|r| r.is_match(text)).unwrap_or(false);
+            || import_re
+                .as_ref()
+                .map(|r| r.is_match(text))
+                .unwrap_or(false);
         if !hit && REGISTRY_FILES.contains(&rel) {
-            hit = quoted_re.as_ref().map(|r| r.is_match(text)).unwrap_or(false);
+            hit = quoted_re
+                .as_ref()
+                .map(|r| r.is_match(text))
+                .unwrap_or(false);
         }
         if hit {
             out.push(rel.to_string());
@@ -107,13 +118,22 @@ fn consumers_of(name: &str, root: &Path, cache: &mut TextCache) -> Vec<String> {
     let mut cores = crate::glob::expand(root, "desktop/src/core/*.py");
     cores.sort();
     for rel in cores {
-        let stem = rel.rsplit('/').next().unwrap_or(&rel).trim_end_matches(".py");
+        let stem = rel
+            .rsplit('/')
+            .next()
+            .unwrap_or(&rel)
+            .trim_end_matches(".py");
         if stem == name {
             continue;
         }
-        let Some(text) = cache.get(root, &rel) else { continue };
+        let Some(text) = cache.get(root, &rel) else {
+            continue;
+        };
         if call_re.as_ref().map(|r| r.is_match(text)).unwrap_or(false)
-            || import_re.as_ref().map(|r| r.is_match(text)).unwrap_or(false)
+            || import_re
+                .as_ref()
+                .map(|r| r.is_match(text))
+                .unwrap_or(false)
         {
             out.push(rel.clone());
         }
@@ -138,7 +158,10 @@ fn declaration(root: &Path) -> (Option<Json>, Vec<String>) {
     let Some(doc) = jsonread::read_file(root, DECL_REL) else {
         return (
             None,
-            vec![format!("{} 不是合法 JSON（修复指引：修好 JSON 语法）", DECL_REL)],
+            vec![format!(
+                "{} 不是合法 JSON（修复指引：修好 JSON 语法）",
+                DECL_REL
+            )],
         );
     };
     if py_str(get(&doc, "schema")) != SCHEMA {
@@ -209,5 +232,9 @@ pub fn scan(root: &Path) -> CoverageScan {
         ("orphans".to_string(), Json::Int(orphans.len() as i64)),
     ]);
     let _ = plain_str(&Json::Null);
-    CoverageScan { issues, warns, stats }
+    CoverageScan {
+        issues,
+        warns,
+        stats,
+    }
 }

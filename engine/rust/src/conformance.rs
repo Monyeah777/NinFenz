@@ -68,7 +68,9 @@ pub fn seal(rows: &[Row]) -> Json {
         .zip(digests.iter())
         .map(|(r, d)| merkle::leaf_hash(&leaf_payload(&r.id, d)))
         .collect();
-    let root = merkle::merkle_root(&leaves).map(|h| merkle::hex(&h)).unwrap_or_default();
+    let root = merkle::merkle_root(&leaves)
+        .map(|h| merkle::hex(&h))
+        .unwrap_or_default();
 
     let contracts: Vec<Json> = rows
         .iter()
@@ -93,7 +95,14 @@ pub fn seal(rows: &[Row]) -> Json {
         ("root".to_string(), Json::Str(root)),
         (
             "verdict".to_string(),
-            Json::Str(if rows.iter().all(|r| r.ok) { "conformant" } else { "non-conformant" }.to_string()),
+            Json::Str(
+                if rows.iter().all(|r| r.ok) {
+                    "conformant"
+                } else {
+                    "non-conformant"
+                }
+                .to_string(),
+            ),
         ),
     ])
 }
@@ -109,7 +118,10 @@ pub fn row_json(row: &Row) -> Json {
         ("id".to_string(), Json::Str(row.id.clone())),
         ("ok".to_string(), Json::Bool(row.ok)),
         ("detail".to_string(), Json::Str(row.detail.clone())),
-        ("description".to_string(), Json::Str(row.description.clone())),
+        (
+            "description".to_string(),
+            Json::Str(row.description.clone()),
+        ),
         ("digest".to_string(), Json::Str(row_digest(row))),
     ])
 }
@@ -177,7 +189,13 @@ mod tests {
     #[test]
     fn one_contract_digest_is_stable_across_field_order() {
         let a = row("x", false, "boom");
-        let b = Row { id: "x".into(), ok: false, detail: "boom".into(), description: "zzz".into(), recorded_digest: None };
+        let b = Row {
+            id: "x".into(),
+            ok: false,
+            detail: "boom".into(),
+            description: "zzz".into(),
+            recorded_digest: None,
+        };
         // description 不参与摘要 —— 只有 (id, ok, detail) 进载荷
         assert_eq!(row_digest(&a), row_digest(&b));
     }
@@ -288,7 +306,10 @@ pub fn verify_committed_with(root: &Path, live: &Json) -> (Vec<String>, Json) {
     let p = root.join(REPORT_REL);
     if !p.is_file() {
         return (
-            vec![format!("缺一致性报告 {}（修复指引：nf conformance --write）", REPORT_REL)],
+            vec![format!(
+                "缺一致性报告 {}（修复指引：nf conformance --write）",
+                REPORT_REL
+            )],
             Json::Object(vec![]),
         );
     }
@@ -297,12 +318,17 @@ pub fn verify_committed_with(root: &Path, live: &Json) -> (Vec<String>, Json) {
         Err(e) => return (vec![format!("报告不可读：{}", e)], Json::Object(vec![])),
     };
     let committed = match crate::jsonread::convert(
-        &serde_json::from_str::<serde_json::Value>(&raw).map_err(|e| e.to_string()).unwrap_or(
-            serde_json::Value::Null,
-        ),
+        &serde_json::from_str::<serde_json::Value>(&raw)
+            .map_err(|e| e.to_string())
+            .unwrap_or(serde_json::Value::Null),
     ) {
         Ok(v) => v,
-        Err(e) => return (vec![format!("报告 JSON 不可解析：{}", e)], Json::Object(vec![])),
+        Err(e) => {
+            return (
+                vec![format!("报告 JSON 不可解析：{}", e)],
+                Json::Object(vec![]),
+            )
+        }
     };
     let mut issues: Vec<String> = Vec::new();
     let g = |v: &Json, k: &str| -> Option<Json> {
@@ -332,11 +358,19 @@ pub fn verify_committed_with(root: &Path, live: &Json) -> (Vec<String>, Json) {
         ));
     }
     let stats = Json::Object(vec![
-        ("contracts".to_string(), g(live, "total").unwrap_or(Json::Int(0))),
-        ("passed".to_string(), g(live, "passed").unwrap_or(Json::Int(0))),
-        ("verdict".to_string(), g(live, "verdict").unwrap_or(Json::Null)),
+        (
+            "contracts".to_string(),
+            g(live, "total").unwrap_or(Json::Int(0)),
+        ),
+        (
+            "passed".to_string(),
+            g(live, "passed").unwrap_or(Json::Int(0)),
+        ),
+        (
+            "verdict".to_string(),
+            g(live, "verdict").unwrap_or(Json::Null),
+        ),
         ("root".to_string(), g(live, "root").unwrap_or(Json::Null)),
     ]);
     (issues, stats)
 }
-

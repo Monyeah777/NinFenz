@@ -53,7 +53,10 @@ fn read_json_opt(root: &Path, rel: &str) -> Option<Json> {
 
 /// 真源 `_core_ids()`。
 pub fn core_ids() -> BTreeSet<String> {
-    let mut out: BTreeSet<String> = crate::output_tables::CORE13.iter().map(|s| s.to_string()).collect();
+    let mut out: BTreeSet<String> = crate::output_tables::CORE13
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
     for x in crate::output_tables::CORE13 {
         out.insert(x.rsplit(':').next().unwrap_or(x).to_string());
     }
@@ -87,7 +90,9 @@ pub struct Proto {
 
 /// 真源 `_parse_protocol`。
 pub fn parse_protocol(path: &Path) -> Proto {
-    let text = std::fs::read(path).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default();
+    let text = std::fs::read(path)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .unwrap_or_default();
     let dir = path
         .parent()
         .and_then(|p| p.file_name())
@@ -100,10 +105,14 @@ pub fn parse_protocol(path: &Path) -> Proto {
         .map(|c| c[1].to_string())
         .unwrap_or_else(|| dir.clone());
     let re_pipe = regex::Regex::new(r"(?m)^\s*pipeline:\s*(P\d{2,3})\s*$").expect("固定合法");
-    out.pipeline = re_pipe.captures(&text).map(|c| c[1].to_string()).unwrap_or_default();
+    out.pipeline = re_pipe
+        .captures(&text)
+        .map(|c| c[1].to_string())
+        .unwrap_or_default();
     // 行式清单：全限定与裸号两种写法并集（保持出现序、去重）
     let mut ids: Vec<String> = Vec::new();
-    let re_full = regex::Regex::new(r#"(?m)^\s*-\s*"([^"]+:M\d{2,3})"\s*(?:#.*)?$"#).expect("固定合法");
+    let re_full =
+        regex::Regex::new(r#"(?m)^\s*-\s*"([^"]+:M\d{2,3})"\s*(?:#.*)?$"#).expect("固定合法");
     for c in re_full.captures_iter(&text) {
         let v = c[1].to_string();
         if !ids.contains(&v) {
@@ -118,10 +127,14 @@ pub fn parse_protocol(path: &Path) -> Proto {
         }
     }
     if ids.is_empty() {
-        let re_flow = regex::Regex::new(r"(?m)^\s*module_id_range\s*:\s*\[([^\]]*)\]").expect("固定合法");
+        let re_flow =
+            regex::Regex::new(r"(?m)^\s*module_id_range\s*:\s*\[([^\]]*)\]").expect("固定合法");
         if let Some(c) = re_flow.captures(&text) {
             for x in c[1].split(',') {
-                let v = x.trim().trim_matches(|ch| ch == '\'' || ch == '"').to_string();
+                let v = x
+                    .trim()
+                    .trim_matches(|ch| ch == '\'' || ch == '"')
+                    .to_string();
                 if !v.is_empty() {
                     ids.push(v);
                 }
@@ -129,20 +142,25 @@ pub fn parse_protocol(path: &Path) -> Proto {
         }
     }
     out.module_ids = ids;
-    let re_layer =
-        regex::Regex::new(r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]").expect("固定合法");
+    let re_layer = regex::Regex::new(r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]")
+        .expect("固定合法");
     for c in re_layer.captures_iter(&text) {
         let mods: Vec<String> = c[2]
             .split(',')
-            .map(|x| x.trim().trim_matches(|ch| ch == '\'' || ch == '"').to_string())
+            .map(|x| {
+                x.trim()
+                    .trim_matches(|ch| ch == '\'' || ch == '"')
+                    .to_string()
+            })
             .filter(|x| !x.is_empty())
             .collect();
         if !mods.is_empty() {
             out.mount_layers.insert(c[1].to_string(), mods);
         }
     }
-    let re_ref = regex::Regex::new(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)")
-        .expect("固定合法");
+    let re_ref =
+        regex::Regex::new(r"(?ms)^\s*-\s*source_package:\s*(\S+)\s*\n\s*module_id:\s*(\S+)")
+            .expect("固定合法");
     for c in re_ref.captures_iter(&text) {
         out.references.push((
             c[1].trim_matches(|ch| ch == '\'' || ch == '"').to_string(),
@@ -176,7 +194,9 @@ pub fn module_contracts(root: &Path) -> Vec<(String, Json)> {
             Some(p) => p,
             None => continue,
         };
-        let mc = obj_get(&parsed, "machine_contract").cloned().unwrap_or(Json::Object(vec![]));
+        let mc = obj_get(&parsed, "machine_contract")
+            .cloned()
+            .unwrap_or(Json::Object(vec![]));
         if !matches!(mc, Json::Object(_)) || matches!(&mc, Json::Object(o) if o.is_empty()) {
             continue;
         }
@@ -197,16 +217,30 @@ pub fn module_contracts(root: &Path) -> Vec<(String, Json)> {
                 v
             }
         };
-        let events = obj_get(&mc, "events").cloned().unwrap_or(Json::Object(vec![]));
+        let events = obj_get(&mc, "events")
+            .cloned()
+            .unwrap_or(Json::Object(vec![]));
         let rec = Json::Object(vec![
             ("id".to_string(), Json::Str(id.clone())),
             ("stem".to_string(), Json::Str(stem.clone())),
             ("pack".to_string(), Json::Str(pack)),
             ("layer".to_string(), Json::Str(s_of(obj_get(&mc, "layer")))),
-            ("inputs".to_string(), str_json(&str_list(obj_get(&mc, "inputs")))),
-            ("outputs".to_string(), str_json(&str_list(obj_get(&mc, "outputs")))),
-            ("publish".to_string(), str_json(&str_list(obj_get(&events, "publish")))),
-            ("subscribe".to_string(), str_json(&str_list(obj_get(&events, "subscribe")))),
+            (
+                "inputs".to_string(),
+                str_json(&str_list(obj_get(&mc, "inputs"))),
+            ),
+            (
+                "outputs".to_string(),
+                str_json(&str_list(obj_get(&mc, "outputs"))),
+            ),
+            (
+                "publish".to_string(),
+                str_json(&str_list(obj_get(&events, "publish"))),
+            ),
+            (
+                "subscribe".to_string(),
+                str_json(&str_list(obj_get(&events, "subscribe"))),
+            ),
             ("path".to_string(), Json::Str(rel.clone())),
         ]);
         // ⚠️ 三个键的语义**不同**（真源是 `out[id] = rec` + 两次 `setdefault`）：
@@ -247,7 +281,9 @@ pub fn core_contracts(root: &Path) -> Vec<(String, Json)> {
             Some(p) => p,
             None => continue,
         };
-        let mc = obj_get(&parsed, "machine_contract").cloned().unwrap_or(Json::Object(vec![]));
+        let mc = obj_get(&parsed, "machine_contract")
+            .cloned()
+            .unwrap_or(Json::Object(vec![]));
         if !matches!(mc, Json::Object(_)) || matches!(&mc, Json::Object(o) if o.is_empty()) {
             continue;
         }
@@ -267,12 +303,20 @@ pub fn core_contracts(root: &Path) -> Vec<(String, Json)> {
                 v
             }
         };
-        let events = obj_get(&mc, "events").cloned().unwrap_or(Json::Object(vec![]));
+        let events = obj_get(&mc, "events")
+            .cloned()
+            .unwrap_or(Json::Object(vec![]));
         let rec = Json::Object(vec![
             ("id".to_string(), Json::Str(id.clone())),
             ("stem".to_string(), Json::Str(stem.clone())),
-            ("publish".to_string(), str_json(&str_list(obj_get(&events, "publish")))),
-            ("subscribe".to_string(), str_json(&str_list(obj_get(&events, "subscribe")))),
+            (
+                "publish".to_string(),
+                str_json(&str_list(obj_get(&events, "publish"))),
+            ),
+            (
+                "subscribe".to_string(),
+                str_json(&str_list(obj_get(&events, "subscribe"))),
+            ),
             ("path".to_string(), Json::Str(rel.clone())),
         ]);
         if !out.iter().any(|(k, _)| *k == id) {
@@ -287,8 +331,11 @@ pub fn core_contracts(root: &Path) -> Vec<(String, Json)> {
 
 /// 真源 `_pack_assets`。
 fn pack_assets(root: &Path, pkg_dir: &str) -> Vec<Json> {
-    let doc = read_json_opt(root, &format!("community/{}/assets/provenance.json", pkg_dir))
-        .unwrap_or(Json::Object(vec![]));
+    let doc = read_json_opt(
+        root,
+        &format!("community/{}/assets/provenance.json", pkg_dir),
+    )
+    .unwrap_or(Json::Object(vec![]));
     arr_of(obj_get(&doc, "assets"))
         .iter()
         .map(|a| {
@@ -310,10 +357,17 @@ pub fn profiles(root: &Path) -> Vec<(String, Json)> {
         let proto = parse_protocol(&root.join("community").join(&d).join("protocol.yaml"));
         let mut own: Vec<Json> = Vec::new();
         for mid in &proto.module_ids {
-            let rec = contracts.iter().find(|(k, _)| k == mid).map(|(_, v)| v.clone()).or_else(|| {
-                let tail = mid.rsplit(':').next().unwrap_or(mid);
-                contracts.iter().find(|(k, _)| k == tail).map(|(_, v)| v.clone())
-            });
+            let rec = contracts
+                .iter()
+                .find(|(k, _)| k == mid)
+                .map(|(_, v)| v.clone())
+                .or_else(|| {
+                    let tail = mid.rsplit(':').next().unwrap_or(mid);
+                    contracts
+                        .iter()
+                        .find(|(k, _)| k == tail)
+                        .map(|(_, v)| v.clone())
+                });
             own.push(rec.unwrap_or_else(|| {
                 Json::Object(vec![
                     ("id".to_string(), Json::Str(mid.clone())),
@@ -365,7 +419,11 @@ pub fn profiles(root: &Path) -> Vec<(String, Json)> {
             ("pipeline".to_string(), Json::Str(proto.pipeline.clone())),
             (
                 "modules".to_string(),
-                str_json(&own.iter().map(|r| s_of(obj_get(r, "id"))).collect::<Vec<_>>()),
+                str_json(
+                    &own.iter()
+                        .map(|r| s_of(obj_get(r, "id")))
+                        .collect::<Vec<_>>(),
+                ),
             ),
             ("module_recs".to_string(), Json::Array(own)),
             (
@@ -399,7 +457,11 @@ pub fn profiles(root: &Path) -> Vec<(String, Json)> {
     out
 }
 
-type Index = (Vec<(String, Json)>, Vec<(String, Vec<Json>)>, BTreeSet<String>);
+type Index = (
+    Vec<(String, Json)>,
+    Vec<(String, Vec<Json>)>,
+    BTreeSet<String>,
+);
 
 /// 真源 `indexes`：`(by_id, pub_index, core_pub)`。
 pub fn indexes(root: &Path, contracts: &[(String, Json)]) -> Index {
@@ -442,7 +504,10 @@ pub fn canon(obj: &Json) -> String {
 pub fn digest_of_cert(obj: &Json) -> String {
     let stripped = match obj {
         Json::Object(o) => Json::Object(
-            o.iter().filter(|(k, _)| k != "digest").map(|(k, v)| (k.clone(), v.clone())).collect(),
+            o.iter()
+                .filter(|(k, _)| k != "digest")
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
         ),
         other => other.clone(),
     };
@@ -450,19 +515,37 @@ pub fn digest_of_cert(obj: &Json) -> String {
 }
 
 /// 真源 `_combo_witness`。
-pub fn combo_witness(prof: &[(String, Json)], contracts: &[(String, Json)], by_id: &Index) -> String {
-    let decl_keys =
-        ["package", "pipeline", "references", "assets", "layers", "publishes", "subscribes"];
+pub fn combo_witness(
+    prof: &[(String, Json)],
+    contracts: &[(String, Json)],
+    by_id: &Index,
+) -> String {
+    let decl_keys = [
+        "package",
+        "pipeline",
+        "references",
+        "assets",
+        "layers",
+        "publishes",
+        "subscribes",
+    ];
     // 真源是增量 `hashlib.sha256().update(...)`；本线的 merkle 模块只给一次性接口 ⇒
     // 累积字节后一次哈希。**结果逐位相同**（同一串字节、同一算法），且少一次 API 改动。
     let mut buf: Vec<u8> = Vec::new();
     let mut names: Vec<&String> = prof.iter().map(|(k, _)| k).collect();
     names.sort();
     for p in names {
-        let rec = prof.iter().find(|(k, _)| k == p).map(|(_, v)| v.clone()).unwrap_or(Json::Object(vec![]));
+        let rec = prof
+            .iter()
+            .find(|(k, _)| k == p)
+            .map(|(_, v)| v.clone())
+            .unwrap_or(Json::Object(vec![]));
         let mut decl: Vec<(String, Json)> = Vec::new();
         for k in decl_keys {
-            decl.push((k.to_string(), obj_get(&rec, k).cloned().unwrap_or(Json::Null)));
+            decl.push((
+                k.to_string(),
+                obj_get(&rec, k).cloned().unwrap_or(Json::Null),
+            ));
         }
         let payload = Json::Array(vec![
             Json::Str("decl".to_string()),
@@ -474,9 +557,16 @@ pub fn combo_witness(prof: &[(String, Json)], contracts: &[(String, Json)], by_i
     let mut mids: Vec<&String> = contracts.iter().map(|(k, _)| k).collect();
     mids.sort();
     for mid in mids {
-        let rec = contracts.iter().find(|(k, _)| k == mid).map(|(_, v)| v.clone()).unwrap_or(Json::Null);
-        let payload =
-            Json::Array(vec![Json::Str("contract".to_string()), Json::Str(mid.clone()), rec]);
+        let rec = contracts
+            .iter()
+            .find(|(k, _)| k == mid)
+            .map(|(_, v)| v.clone())
+            .unwrap_or(Json::Null);
+        let payload = Json::Array(vec![
+            Json::Str("contract".to_string()),
+            Json::Str(mid.clone()),
+            rec,
+        ]);
         buf.extend_from_slice(canon(&payload).as_bytes());
     }
     let core: Vec<Json> = by_id.2.iter().map(|s| Json::Str(s.clone())).collect();

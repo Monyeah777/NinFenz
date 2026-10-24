@@ -29,7 +29,5 @@ pub const TOOL_NAMES: [&str; 12] = [
 // <<< GENERATED TOOL_NAMES
 
 // >>> GENERATED PROMPT_NAMES by tools/gen_mcp_tables.py（勿手改；重跑生成器覆盖本段）
-pub const PROMPT_NAMES: [&str; 1] = [
-    "assemble_guide",
-];
+pub const PROMPT_NAMES: [&str; 1] = ["assemble_guide"];
 // <<< GENERATED PROMPT_NAMES

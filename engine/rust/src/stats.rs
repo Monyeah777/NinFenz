@@ -51,14 +51,25 @@ impl Stats {
             ("registered_packs".into(), Json::Int(self.registered_packs)),
             (
                 "core_pipelines".into(),
-                Json::Array(self.core_pipelines.iter().map(|s| Json::Str(s.clone())).collect()),
+                Json::Array(
+                    self.core_pipelines
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect(),
+                ),
             ),
             ("pack_dirs".into(), Json::Int(self.pack_dirs)),
             ("pack_assets".into(), Json::Int(self.pack_assets)),
             ("concept_graphs".into(), Json::Int(self.concept_graphs)),
             ("standards_total".into(), Json::Int(self.standards_total)),
-            ("standards_reachable".into(), Json::Int(self.standards_reachable)),
-            ("standards_unreachable".into(), Json::Int(self.standards_unreachable)),
+            (
+                "standards_reachable".into(),
+                Json::Int(self.standards_reachable),
+            ),
+            (
+                "standards_unreachable".into(),
+                Json::Int(self.standards_unreachable),
+            ),
             ("standards_bodies".into(), Json::Int(self.standards_bodies)),
             ("standards_edges".into(), Json::Int(self.standards_edges)),
             (
@@ -70,12 +81,21 @@ impl Stats {
                         .collect(),
                 ),
             ),
-            ("standard_bindings".into(), Json::Int(self.standard_bindings)),
+            (
+                "standard_bindings".into(),
+                Json::Int(self.standard_bindings),
+            ),
             ("domain_packs".into(), Json::Int(self.domain_packs)),
-            ("subdivisions_total".into(), Json::Int(self.subdivisions_total)),
+            (
+                "subdivisions_total".into(),
+                Json::Int(self.subdivisions_total),
+            ),
             ("library_items".into(), Json::Int(self.library_items)),
             ("verify_checks".into(), Json::Int(self.verify_checks)),
-            ("verify_version".into(), Json::Str(self.verify_version.clone())),
+            (
+                "verify_version".into(),
+                Json::Str(self.verify_version.clone()),
+            ),
             ("baseline_checks".into(), Json::Int(self.baseline_checks)),
             ("baseline_pass".into(), Json::Int(self.baseline_pass)),
         ])
@@ -109,7 +129,15 @@ fn layer_of(j: Option<&Json>) -> Vec<(String, i64)> {
     match j {
         Some(Json::Object(pairs)) => pairs
             .iter()
-            .map(|(k, v)| (k.clone(), match v { Json::Int(i) => *i, _ => 0 }))
+            .map(|(k, v)| {
+                (
+                    k.clone(),
+                    match v {
+                        Json::Int(i) => *i,
+                        _ => 0,
+                    },
+                )
+            })
             .collect(),
         _ => Vec::new(),
     }
@@ -185,7 +213,9 @@ fn count_checks(text: &str) -> i64 {
 /// `^# 版本\s*:\s*v([0-9][0-9.]*)` 的首个捕获组（无匹配 → 空串，与真源同语义）。
 fn parse_version(text: &str) -> String {
     for line in text.lines() {
-        let Some(rest) = line.strip_prefix("# 版本") else { continue };
+        let Some(rest) = line.strip_prefix("# 版本") else {
+            continue;
+        };
         let mut it = rest.chars().peekable();
         while it.peek().map(|c| c.is_whitespace()).unwrap_or(false) {
             it.next();
@@ -225,14 +255,27 @@ fn parse_version(text: &str) -> String {
 pub(crate) fn py_int_const(text: &str, name: &str) -> Option<i64> {
     for line in text.lines() {
         let t = line.trim_start();
-        let Some(rest) = t.strip_prefix(name) else { continue };
+        let Some(rest) = t.strip_prefix(name) else {
+            continue;
+        };
         // 防前缀误伤（EXPECTED_CHECKS_SOMETHING）
-        if rest.chars().next().map(|c| c == '_' || c.is_alphanumeric()).unwrap_or(false) {
+        if rest
+            .chars()
+            .next()
+            .map(|c| c == '_' || c.is_alphanumeric())
+            .unwrap_or(false)
+        {
             continue;
         }
         let rest = rest.trim_start();
-        let Some(rest) = rest.strip_prefix('=') else { continue };
-        let digits: String = rest.trim_start().chars().take_while(|c| c.is_ascii_digit()).collect();
+        let Some(rest) = rest.strip_prefix('=') else {
+            continue;
+        };
+        let digits: String = rest
+            .trim_start()
+            .chars()
+            .take_while(|c| c.is_ascii_digit())
+            .collect();
         if !digits.is_empty() {
             return digits.parse().ok();
         }
@@ -281,9 +324,19 @@ pub fn compute(root: &Path) -> (Stats, Vec<String>) {
     s.pack_assets = count_suffix_in_subdirs(&root.join("community"), "assets", ".md");
     s.concept_graphs = count_in_subdirs(&root.join("community"), "assets", "CONCEPT_GRAPH.md");
 
-    let cat = jsonread::read_file(root, "protocol/standards_catalog.json").unwrap_or(Json::Object(Vec::new()));
-    let cov = obj_get(&cat, "coverage").cloned().unwrap_or(Json::Object(Vec::new()));
-    for key in ["standards", "reachable", "unreachable", "bodies", "depends_edges", "by_layer"] {
+    let cat = jsonread::read_file(root, "protocol/standards_catalog.json")
+        .unwrap_or(Json::Object(Vec::new()));
+    let cov = obj_get(&cat, "coverage")
+        .cloned()
+        .unwrap_or(Json::Object(Vec::new()));
+    for key in [
+        "standards",
+        "reachable",
+        "unreachable",
+        "bodies",
+        "depends_edges",
+        "by_layer",
+    ] {
         if obj_get(&cov, key).is_none() {
             issues.push(format!("标准目录 coverage 缺 {}（口径不完整）", key));
         }
@@ -295,10 +348,12 @@ pub fn compute(root: &Path) -> (Stats, Vec<String>) {
     s.standards_edges = int_of(obj_get(&cov, "depends_edges"));
     s.standards_by_layer = layer_of(obj_get(&cov, "by_layer"));
 
-    let bind = jsonread::read_file(root, "protocol/standards_binding.json").unwrap_or(Json::Object(Vec::new()));
+    let bind = jsonread::read_file(root, "protocol/standards_binding.json")
+        .unwrap_or(Json::Object(Vec::new()));
     s.standard_bindings = int_of(obj_get(&bind, "bindings_total"));
 
-    let manifest = jsonread::read_file(root, "protocol/domain_packs.json").unwrap_or(Json::Object(Vec::new()));
+    let manifest =
+        jsonread::read_file(root, "protocol/domain_packs.json").unwrap_or(Json::Object(Vec::new()));
     s.domain_packs = int_of(obj_get(&manifest, "count"));
     s.subdivisions_total = int_of(obj_get(&manifest, "subdivisions_total"));
 
@@ -332,7 +387,10 @@ pub fn compute(root: &Path) -> (Stats, Vec<String>) {
         Err(e) => {
             s.baseline_checks = s.verify_checks;
             s.baseline_pass = 0;
-            issues.push(format!("取不到 quality_baseline.EXPECTED_*：{}（基线句无法生成）", e));
+            issues.push(format!(
+                "取不到 quality_baseline.EXPECTED_*：{}（基线句无法生成）",
+                e
+            ));
         }
     }
     if s.baseline_checks != s.verify_checks {
@@ -357,9 +415,10 @@ pub fn check(root: &Path) -> (Vec<String>, Stats) {
         };
         match replace_block(&text, block) {
             None => issues.push(format!("{} 缺 marker 区", rel)),
-            Some(new) if new != text => {
-                issues.push(format!("{} 的生成区与实算不一致（跑 `nf stats --write` 重写）", rel))
-            }
+            Some(new) if new != text => issues.push(format!(
+                "{} 的生成区与实算不一致（跑 `nf stats --write` 重写）",
+                rel
+            )),
             Some(_) => {}
         }
     }
@@ -406,7 +465,10 @@ fn layer_txt(stats: &Stats) -> String {
     }
     let mut ls = stats.standards_by_layer.clone();
     ls.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
-    ls.iter().map(|(k, v)| format!("{} {}", k, v)).collect::<Vec<_>>().join(" · ")
+    ls.iter()
+        .map(|(k, v)| format!("{} {}", k, v))
+        .collect::<Vec<_>>()
+        .join(" · ")
 }
 
 fn pipes_txt(stats: &Stats) -> String {
@@ -519,7 +581,10 @@ mod tests {
 
     #[test]
     fn py_int_const_not_fooled_by_longer_name() {
-        assert_eq!(py_int_const("EXPECTED_CHECKS_EXTRA = 9\n", "EXPECTED_CHECKS"), None);
+        assert_eq!(
+            py_int_const("EXPECTED_CHECKS_EXTRA = 9\n", "EXPECTED_CHECKS"),
+            None
+        );
     }
 
     #[test]

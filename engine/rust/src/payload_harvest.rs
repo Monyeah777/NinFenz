@@ -32,7 +32,11 @@ pub struct Backlog {
 /// 真源 `backlog`：把**不可从证据推断**的 untyped 字段显式化（可数、不隐身）。
 pub fn backlog(root: &Path) -> Backlog {
     let Some(data) = jsonread::read_file(root, EVENT_REGISTRY) else {
-        return Backlog { missing_note: Vec::new(), count: 0, unavailable: true };
+        return Backlog {
+            missing_note: Vec::new(),
+            count: 0,
+            unavailable: true,
+        };
     };
     let mut missing_note: Vec<String> = Vec::new();
     let mut count = 0i64;
@@ -42,7 +46,9 @@ pub fn backlog(root: &Path) -> Backlog {
         let mut evs: Vec<(&String, &Json)> = events.iter().map(|(k, v)| (k, v)).collect();
         evs.sort_by(|a, b| a.0.cmp(b.0));
         for (ev, body) in evs {
-            let Some(Json::Object(fields)) = get(body, "fields") else { continue };
+            let Some(Json::Object(fields)) = get(body, "fields") else {
+                continue;
+            };
             let mut fs: Vec<(&String, &Json)> = fields.iter().map(|(k, v)| (k, v)).collect();
             fs.sort_by(|a, b| a.0.cmp(b.0));
             for (f, spec) in fs {
@@ -57,7 +63,11 @@ pub fn backlog(root: &Path) -> Backlog {
             }
         }
     }
-    Backlog { missing_note, count, unavailable: false }
+    Backlog {
+        missing_note,
+        count,
+        unavailable: false,
+    }
 }
 
 /// 真源 `verify_backlog` → `(issues, stats)`。
@@ -77,7 +87,12 @@ pub fn verify_backlog(root: &Path) -> (Vec<String>, Json) {
     if !live.missing_note.is_empty() {
         issues.push(format!(
             "存在无 note 的 untyped 字段（无声增长）：{}",
-            live.missing_note.iter().take(3).cloned().collect::<Vec<_>>().join("、")
+            live.missing_note
+                .iter()
+                .take(3)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("、")
         ));
     }
     let p = root.join(BACKLOG_REL);
@@ -116,7 +131,8 @@ mod tests {
     /// 四场景：无声增长 + count 不符 / 有 note 但台账缺件 / 台账坏 JSON / 全绿。
     /// 分支：无 note 的 untyped（无声增长）/ 缺台账 / 台账不可解析 / 台账过期（count 不符）/ 全绿。
     const TB_REG_KITCHEN: &str = r#"{"schema": "x", "events": {"e1": {"fields": {"a": {"type": "untyped"}, "b": {"type": "untyped", "note": "有据"}}}, "e2": {"fields": {"c": {"type": "string"}}}}}"#;
-    const TB_REG_NOLEDGER: &str = r#"{"schema": "x", "events": {"e1": {"fields": {"a": {"type": "untyped", "note": "n"}}}}}"#;
+    const TB_REG_NOLEDGER: &str =
+        r#"{"schema": "x", "events": {"e1": {"fields": {"a": {"type": "untyped", "note": "n"}}}}}"#;
 
     fn build_tb_fixture(scenario: &str, reg: &str, ledger: Option<&str>) -> std::path::PathBuf {
         let root = crate::testutil::fixture(&format!("type-backlog-branches-{}", scenario));

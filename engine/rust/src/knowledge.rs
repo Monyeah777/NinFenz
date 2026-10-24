@@ -64,7 +64,9 @@ fn module_ids(root: &Path) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     for pat in ["04_模块库/*/*.md", "community/*/modules/*.md"] {
         for rel in crate::glob::expand(root, pat) {
-            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+                continue;
+            };
             for c in module_id_re().captures_iter(&text) {
                 out.insert(c[1].to_string());
             }
@@ -74,7 +76,10 @@ fn module_ids(root: &Path) -> BTreeSet<String> {
 }
 
 fn sources(decl: &Json) -> Vec<Json> {
-    arr_items(get(decl, "sources")).into_iter().cloned().collect()
+    arr_items(get(decl, "sources"))
+        .into_iter()
+        .cloned()
+        .collect()
 }
 
 /// 真源 `_auth`。
@@ -109,7 +114,10 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         Ok(None) => {
             return KnowledgeScan {
                 status: None,
-                issues: vec![format!("缺知识源声明 {}（修复指引：见 docs/knowledge.md）", DECL_REL)],
+                issues: vec![format!(
+                    "缺知识源声明 {}（修复指引：见 docs/knowledge.md）",
+                    DECL_REL
+                )],
                 warns,
                 stats: empty_stats(),
             }
@@ -152,7 +160,11 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             if get(s, k).is_none() {
                 issues.push(format!(
                     "源 {} 缺必填字段：{}",
-                    if sid.is_empty() { "(无名)" } else { sid.as_str() },
+                    if sid.is_empty() {
+                        "(无名)"
+                    } else {
+                        sid.as_str()
+                    },
                     k
                 ));
             }
@@ -185,7 +197,10 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         let labelled = py_truthy(get(s, "requires_source_label").unwrap_or(&Json::Null));
         if auth == "reference" {
             if kind != "external-retrieval" {
-                issues.push(format!("源 {} 为 reference 级但 kind 非 external-retrieval", sid));
+                issues.push(format!(
+                    "源 {} 为 reference 级但 kind 非 external-retrieval",
+                    sid
+                ));
             }
             if !labelled {
                 issues.push(format!(
@@ -197,7 +212,11 @@ pub fn scan(root: &Path) -> KnowledgeScan {
                 issues.push(format!(
                     "源 {} 为 reference 级但时效策略非法：{}（需 {}）",
                     sid,
-                    if pol.is_empty() { "(缺)".to_string() } else { pol.clone() },
+                    if pol.is_empty() {
+                        "(缺)".to_string()
+                    } else {
+                        pol.clone()
+                    },
                     FRESH_REFERENCE.join(" / ")
                 ));
             } else if pol == "ttl" {
@@ -208,7 +227,10 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             }
         } else if auth == "contract" {
             if kind != "local-compiled" {
-                issues.push(format!("源 {} 为 contract 级但 kind 非 local-compiled", sid));
+                issues.push(format!(
+                    "源 {} 为 contract 级但 kind 非 local-compiled",
+                    sid
+                ));
             }
             if labelled {
                 issues.push(format!(
@@ -220,7 +242,11 @@ pub fn scan(root: &Path) -> KnowledgeScan {
                 issues.push(format!(
                     "源 {} 为 contract 级但时效策略非法：{}（需 stale_after）",
                     sid,
-                    if pol.is_empty() { "(缺)".to_string() } else { pol.clone() }
+                    if pol.is_empty() {
+                        "(缺)".to_string()
+                    } else {
+                        pol.clone()
+                    }
                 ));
             }
         }
@@ -241,9 +267,18 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             py_list(&extra)
         ));
     } else {
-        let pos: Vec<(String, usize)> =
-            order.iter().cloned().enumerate().map(|(i, s)| (s, i)).collect();
-        let at = |sid: &String| pos.iter().find(|(s, _)| s == sid).map(|(_, i)| *i).unwrap_or(0);
+        let pos: Vec<(String, usize)> = order
+            .iter()
+            .cloned()
+            .enumerate()
+            .map(|(i, s)| (s, i))
+            .collect();
+        let at = |sid: &String| {
+            pos.iter()
+                .find(|(s, _)| s == sid)
+                .map(|(_, i)| *i)
+                .unwrap_or(0)
+        };
         let ref_idx: Vec<usize> = ids
             .iter()
             .filter(|i| auth_of(&rows, i) == "reference")
@@ -258,9 +293,8 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             let max_con = con_idx.iter().copied().max().unwrap_or(0);
             let min_ref = ref_idx.iter().copied().min().unwrap_or(0);
             if max_con > min_ref {
-                issues.push(
-                    "query_order 未把全部合同级排在参考级之前（查询有序被破坏）".to_string(),
-                );
+                issues
+                    .push("query_order 未把全部合同级排在参考级之前（查询有序被破坏）".to_string());
             }
         }
     }
@@ -288,7 +322,9 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         issues.push("promotion 缺 rule（晋升标准必须成文）".to_string());
     }
     if py_str(get(&prom, "on_missing_evidence")) != "stay-reference" {
-        issues.push("promotion.on_missing_evidence 必须为 stay-reference（缺证据不得转正）".to_string());
+        issues.push(
+            "promotion.on_missing_evidence 必须为 stay-reference（缺证据不得转正）".to_string(),
+        );
     }
     let rev = sub("review");
     if arr_items(get(&rev, "machine_gates")).is_empty() {
@@ -319,7 +355,10 @@ pub fn scan(root: &Path) -> KnowledgeScan {
     };
     let transforms = match &log {
         None => {
-            issues.push(format!("缺消化记录 {}（修复指引：见 docs/knowledge.md）", LOG_REL));
+            issues.push(format!(
+                "缺消化记录 {}（修复指引：见 docs/knowledge.md）",
+                LOG_REL
+            ));
             0
         }
         Some(l) => {
@@ -334,11 +373,19 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         ("sources".to_string(), Json::Int(rows.len() as i64)),
         (
             "contract".to_string(),
-            Json::Int(rows.iter().filter(|s| py_str(get(s, "authority")) == "contract").count() as i64),
+            Json::Int(
+                rows.iter()
+                    .filter(|s| py_str(get(s, "authority")) == "contract")
+                    .count() as i64,
+            ),
         ),
         (
             "reference".to_string(),
-            Json::Int(rows.iter().filter(|s| py_str(get(s, "authority")) == "reference").count() as i64),
+            Json::Int(
+                rows.iter()
+                    .filter(|s| py_str(get(s, "authority")) == "reference")
+                    .count() as i64,
+            ),
         ),
         (
             "order".to_string(),
@@ -346,7 +393,12 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         ),
         ("transforms".to_string(), Json::Int(transforms as i64)),
     ]);
-    KnowledgeScan { status: None, issues, warns, stats }
+    KnowledgeScan {
+        status: None,
+        issues,
+        warns,
+        stats,
+    }
 }
 
 /// Python `str(list[str])`。
@@ -355,16 +407,23 @@ fn py_list(v: &[String]) -> String {
     format!("[{}]", inner.join(", "))
 }
 
-
 // ---------------------------------------------------------------- 消化记录 / 频率台账
 
 pub const USAGE_REL: &str = "protocol/knowledge_usage.json";
 pub const USAGE_SCHEMA: &str = "nf-knowledge-usage/1";
-const REQUIRED_ENTRY: [&str; 6] = ["from", "to", "digest", "reviewed_by", "reviewed_at", "evidence"];
+const REQUIRED_ENTRY: [&str; 6] = [
+    "from",
+    "to",
+    "digest",
+    "reviewed_by",
+    "reviewed_at",
+    "evidence",
+];
 
 fn is_dated(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
+    let re =
+        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
     re.is_match(s)
 }
 
@@ -402,7 +461,10 @@ pub fn verify_transform(root: &Path) -> PairIssues {
         Ok(Some(l)) => l,
         Ok(None) => Json::Object(Vec::new()),
         Err(e) => {
-            return PairIssues { issues: vec![e], stats: empty_stats() }
+            return PairIssues {
+                issues: vec![e],
+                stats: empty_stats(),
+            }
         }
     };
     let entries = arr_items(get(&log, "entries"));
@@ -440,9 +502,16 @@ pub fn verify_transform(root: &Path) -> PairIssues {
                 }
             }
         }
-        let ev: Vec<String> = arr_items(get(e, "evidence")).iter().map(|v| py_str(Some(v))).collect();
+        let ev: Vec<String> = arr_items(get(e, "evidence"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
         if py_truthy(get(e, "promoted").unwrap_or(&Json::Null)) {
-            let missing: Vec<&str> = TIERS.iter().copied().filter(|t| !ev.contains(&t.to_string())).collect();
+            let missing: Vec<&str> = TIERS
+                .iter()
+                .copied()
+                .filter(|t| !ev.contains(&t.to_string()))
+                .collect();
             if !missing.is_empty() {
                 issues.push(format!("{} 声明转正但缺证据档：{}", tag, missing.join("/")));
             }
@@ -452,7 +521,10 @@ pub fn verify_transform(root: &Path) -> PairIssues {
         }
         if let Some(rc) = get(e, "reuse_count") {
             if !is_nonneg_int(rc) {
-                issues.push(format!("{} 的 reuse_count 非非负整数（频次判据不可复算）", tag));
+                issues.push(format!(
+                    "{} 的 reuse_count 非非负整数（频次判据不可复算）",
+                    tag
+                ));
             }
         }
         let ra = py_str(get(e, "reviewed_at"));
@@ -462,7 +534,9 @@ pub fn verify_transform(root: &Path) -> PairIssues {
     }
     let promoted = entries
         .iter()
-        .filter(|e| matches!(e, Json::Object(_)) && py_truthy(get(e, "promoted").unwrap_or(&Json::Null)))
+        .filter(|e| {
+            matches!(e, Json::Object(_)) && py_truthy(get(e, "promoted").unwrap_or(&Json::Null))
+        })
         .count();
     let stats = Json::Object(vec![
         ("entries".to_string(), Json::Int(entries.len() as i64)),
@@ -477,7 +551,10 @@ pub fn verify_usage(root: &Path) -> PairIssues {
         Ok(Some(d)) => d,
         Ok(None) => Json::Object(Vec::new()),
         Err(e) => {
-            return PairIssues { issues: vec![e], stats: empty_stats() }
+            return PairIssues {
+                issues: vec![e],
+                stats: empty_stats(),
+            }
         }
     };
     if crate::pyval::obj_is_empty(&doc) {
@@ -595,7 +672,6 @@ mod tests {
             "频次不可复算：ext-x 的记录 reuse_count=4，频率台账=-1（修复指引：按 trace 重算，不要手写频次）",
     ];
 
-
     static LOG_HEAD: std::sync::OnceLock<serde_json::Value> = std::sync::OnceLock::new();
     fn log_head() -> &'static serde_json::Value {
         LOG_HEAD.get_or_init(|| serde_json::from_str(r#"{"schema": "nf-transform-log/1", "entries": ["不是对象", {}, {"from": "ghost", "to": "no/such.md", "digest": "x", "reviewed_by": "a", "reviewed_at": "2026-13-99", "evidence": [], "reuse_count": -1, "promoted": true}, {"from": "ext-x", "to": "protocol/LAYERS.json", "digest": "deadbeef", "reviewed_by": "  ", "reviewed_at": "2026-01-01", "evidence": [], "promoted": true}]}"#).unwrap())
@@ -641,10 +717,8 @@ mod tests {
         assert_eq!(got.issues, WANT_USAGE, "逐条消息须与真源一致");
         assert!(crate::jsonread::json_eq(
             &got.stats,
-            &crate::jsonread::convert(
-                &serde_json::json!({"events": 6, "sources_with_usage": 3})
-            )
-            .unwrap()
+            &crate::jsonread::convert(&serde_json::json!({"events": 6, "sources_with_usage": 3}))
+                .unwrap()
         ));
     }
 }

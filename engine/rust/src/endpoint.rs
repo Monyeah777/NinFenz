@@ -96,7 +96,11 @@ pub fn scan(root: &Path) -> EndpointScan {
     }
     let status = py_str(get(&doc, "status"));
     if !STATUSES.contains(&status.as_str()) {
-        issues.push(format!("status 越词表：{}（{}）", status, STATUSES.join("/")));
+        issues.push(format!(
+            "status 越词表：{}（{}）",
+            status,
+            STATUSES.join("/")
+        ));
     }
 
     let conv = get(&doc, "conventions")
@@ -133,12 +137,18 @@ pub fn scan(root: &Path) -> EndpointScan {
         if py_truthy(get(ep, "streaming").unwrap_or(&Json::Null))
             && !py_truthy(get(&conv, "streaming").unwrap_or(&Json::Null))
         {
-            issues.push(format!("{} 声明 streaming 但 conventions 未定义 SSE 约定", eid));
+            issues.push(format!(
+                "{} 声明 streaming 但 conventions 未定义 SSE 约定",
+                eid
+            ));
         }
         let maps = py_str(get(ep, "maps_to"));
         if let Some(c) = mcp_re().captures(&maps) {
             if !tools.contains(&c[1]) {
-                issues.push(format!("{} 的 maps_to 指向不存在的 MCP 工具：{}", eid, &c[1]));
+                issues.push(format!(
+                    "{} 的 maps_to 指向不存在的 MCP 工具：{}",
+                    eid, &c[1]
+                ));
             }
         } else {
             match cli_re().captures(&maps) {
@@ -165,7 +175,10 @@ pub fn scan(root: &Path) -> EndpointScan {
                 ));
             }
             if !py_truthy(get(&conv, "deprecation").unwrap_or(&Json::Null)) {
-                issues.push(format!("{} 声明 deprecated 但 conventions 未定义弃用约定", eid));
+                issues.push(format!(
+                    "{} 声明 deprecated 但 conventions 未定义弃用约定",
+                    eid
+                ));
             }
             let sunset = py_str(get(ep, "sunset"));
             if !dated_re().is_match(&sunset) {
@@ -262,7 +275,10 @@ pub fn scan(root: &Path) -> EndpointScan {
         ("endpoints".to_string(), Json::Int(endpoints.len() as i64)),
         ("streaming".to_string(), Json::Int(streaming as i64)),
         ("cli_commands".to_string(), Json::Int(cmds.len() as i64)),
-        ("mcp_tools".to_string(), Json::Int(crate::mcp_tables::TOOL_NAMES.len() as i64)),
+        (
+            "mcp_tools".to_string(),
+            Json::Int(crate::mcp_tables::TOOL_NAMES.len() as i64),
+        ),
         (
             "idempotency_exceptions".to_string(),
             Json::Int(exceptions.len() as i64),

@@ -116,7 +116,9 @@ impl past::Visitor for NameCollector {
 }
 
 pub fn assigned_names(stmt: &past::Stmt) -> BTreeSet<String> {
-    let mut c = NameCollector { out: BTreeSet::new() };
+    let mut c = NameCollector {
+        out: BTreeSet::new(),
+    };
     c.visit_stmt(stmt.clone());
     c.out
 }
@@ -151,7 +153,9 @@ fn guard(stmt: &past::Stmt) -> Option<(String, &'static str)> {
         past::Stmt::Assert(a) => &a.test,
         _ => return None,
     };
-    let past::Expr::Compare(c) = test.as_ref() else { return None };
+    let past::Expr::Compare(c) = test.as_ref() else {
+        return None;
+    };
     if c.ops.len() != 1 || c.comparators.len() != 1 {
         return None;
     }
@@ -170,9 +174,13 @@ fn guard(stmt: &past::Stmt) -> Option<(String, &'static str)> {
 
 /// 真源 `_always_exits`。
 fn always_exits(stmts: &[past::Stmt]) -> bool {
-    let Some(last) = stmts.last() else { return false };
+    let Some(last) = stmts.last() else {
+        return false;
+    };
     match last {
-        past::Stmt::Return(_) | past::Stmt::Raise(_) | past::Stmt::Continue(_)
+        past::Stmt::Return(_)
+        | past::Stmt::Raise(_)
+        | past::Stmt::Continue(_)
         | past::Stmt::Break(_) => true,
         past::Stmt::If(i) => {
             !i.orelse.is_empty() && always_exits(&i.body) && always_exits(&i.orelse)
@@ -297,7 +305,11 @@ impl past::Visitor for DerefCollector<'_> {
 
 /// 真源 `_derefs`。
 fn derefs(stmt: &past::Stmt, names: &BTreeSet<String>, ls: &crate::pyast::LineStarts) -> Vec<u32> {
-    let mut c = DerefCollector { names, ls, out: Vec::new() };
+    let mut c = DerefCollector {
+        names,
+        ls,
+        out: Vec::new(),
+    };
     match head_exprs(stmt) {
         Head::Exprs(v) => {
             for e in v {
@@ -320,7 +332,11 @@ fn scan_block(
     let mut cur = cur.clone();
     for st in stmts {
         for lineno in derefs(st, &cur, ls) {
-            out.push((rel.to_string(), lineno, cur.iter().cloned().collect::<Vec<_>>().join(",")));
+            out.push((
+                rel.to_string(),
+                lineno,
+                cur.iter().cloned().collect::<Vec<_>>().join(","),
+            ));
         }
         match st {
             past::Stmt::Assign(_) | past::Stmt::AnnAssign(_) | past::Stmt::AugAssign(_) => {
@@ -514,9 +530,12 @@ pub fn none_deref(tree: &past::Mod, rel: &str, ls: &crate::pyast::LineStarts) ->
         past::Mod::Module(m) => m.body.clone(),
         _ => Vec::new(),
     };
-    let mut seeds: Vec<(Vec<past::Stmt>, BTreeSet<String>)> =
-        vec![(module_body, BTreeSet::new())];
-    let mut c = SeedCollector { depth: 0, seq: 0, out: Vec::new() };
+    let mut seeds: Vec<(Vec<past::Stmt>, BTreeSet<String>)> = vec![(module_body, BTreeSet::new())];
+    let mut c = SeedCollector {
+        depth: 0,
+        seq: 0,
+        out: Vec::new(),
+    };
     let empty: Vec<past::Stmt> = Vec::new();
     let body = match tree {
         past::Mod::Module(m) => &m.body,
@@ -584,7 +603,8 @@ impl past::Visitor for CallCollector<'_> {
         let s = self.seq;
         self.seq += 1;
         if let past::Expr::Call(c) = &node {
-            self.out.push((d, s, line_of(&node, self.ls), dotted(&c.func)));
+            self.out
+                .push((d, s, line_of(&node, self.ls), dotted(&c.func)));
         }
         self.depth += 1;
         self.generic_visit_expr(node);
@@ -623,8 +643,18 @@ impl past::Visitor for CallCollector<'_> {
 }
 
 /// 真源 `_denied_calls`。
-pub fn denied_calls(tree: &past::Mod, rel: &str, deny: &BTreeSet<String>, ls: &crate::pyast::LineStarts) -> Vec<String> {
-    let mut c = CallCollector { depth: 0, seq: 0, ls, out: Vec::new() };
+pub fn denied_calls(
+    tree: &past::Mod,
+    rel: &str,
+    deny: &BTreeSet<String>,
+    ls: &crate::pyast::LineStarts,
+) -> Vec<String> {
+    let mut c = CallCollector {
+        depth: 0,
+        seq: 0,
+        ls,
+        out: Vec::new(),
+    };
     let empty: Vec<past::Stmt> = Vec::new();
     let body = match tree {
         past::Mod::Module(m) => &m.body,
@@ -680,7 +710,8 @@ pub fn calls_with_args(
                         _ => None,
                     })
                     .collect();
-                self.out.push((d, s, line_of(&node, self.ls), dotted(&c.func), args));
+                self.out
+                    .push((d, s, line_of(&node, self.ls), dotted(&c.func), args));
             }
             self.depth += 1;
             self.generic_visit_expr(node);
@@ -722,7 +753,12 @@ pub fn calls_with_args(
         past::Mod::Module(m) => &m.body,
         _ => &empty,
     };
-    let mut c = C { depth: 0, seq: 0, ls, out: Vec::new() };
+    let mut c = C {
+        depth: 0,
+        seq: 0,
+        ls,
+        out: Vec::new(),
+    };
     for st in body {
         c.visit_stmt(st.clone());
     }
@@ -731,4 +767,3 @@ pub fn calls_with_args(
     out.sort_by_key(|(d, s, _, _, _)| (*d, *s));
     out
 }
-

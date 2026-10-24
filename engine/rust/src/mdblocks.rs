@@ -127,7 +127,10 @@ mod tests {
         // 真源口径：`key:value`、`key: 通用:M10` 都在**第一个冒号**处切
         let (fm, _) = parse_frontmatter("---\na:b\nc: 通用:M10\n---\nbody\n");
         assert_eq!(crate::pyval::get(&fm, "a"), Some(&Json::Str("b".into())));
-        assert_eq!(crate::pyval::get(&fm, "c"), Some(&Json::Str("通用:M10".into())));
+        assert_eq!(
+            crate::pyval::get(&fm, "c"),
+            Some(&Json::Str("通用:M10".into()))
+        );
     }
 
     #[test]
@@ -136,11 +139,17 @@ mod tests {
             parse_frontmatter("---\nrefs: [a, b]\nnotes:\n  - one\n  - two\nq: 'x'\n---\nB\n");
         assert_eq!(
             crate::pyval::get(&fm, "refs"),
-            Some(&Json::Array(vec![Json::Str("a".into()), Json::Str("b".into())]))
+            Some(&Json::Array(vec![
+                Json::Str("a".into()),
+                Json::Str("b".into())
+            ]))
         );
         assert_eq!(
             crate::pyval::get(&fm, "notes"),
-            Some(&Json::Array(vec![Json::Str("one".into()), Json::Str("two".into())]))
+            Some(&Json::Array(vec![
+                Json::Str("one".into()),
+                Json::Str("two".into())
+            ]))
         );
         assert_eq!(crate::pyval::get(&fm, "q"), Some(&Json::Str("x".into())));
         assert_eq!(body, "B");
@@ -163,6 +172,13 @@ mod tests {
     #[test]
     fn bullet_blocks_join_indented_continuations() {
         let got = bullet_blocks("- a\n  cont\n- b\n\n- c\n");
-        assert_eq!(got, vec!["- a\n  cont".to_string(), "- b".to_string(), "- c".to_string()]);
+        assert_eq!(
+            got,
+            vec![
+                "- a\n  cont".to_string(),
+                "- b".to_string(),
+                "- c".to_string()
+            ]
+        );
     }
 }

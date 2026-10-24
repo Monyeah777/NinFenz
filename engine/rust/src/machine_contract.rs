@@ -21,8 +21,7 @@ use std::path::Path;
 fn title_re() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
     RE.get_or_init(|| {
-        regex::Regex::new(r"#\s*模块\s*(M\d{2})\s*[·:：]?\s*(.*)$")
-            .expect("模块标题正则固定合法")
+        regex::Regex::new(r"#\s*模块\s*(M\d{2})\s*[·:：]?\s*(.*)$").expect("模块标题正则固定合法")
     })
 }
 
@@ -60,7 +59,9 @@ pub fn scan(root: &Path) -> McScan {
             continue;
         }
         checked += 1;
-        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+            continue;
+        };
         let parsed = crate::miniyaml::fence_yaml(&text, "machine_contract");
         let mc = parsed
             .as_ref()
@@ -77,7 +78,11 @@ pub fn scan(root: &Path) -> McScan {
         }
         let spec_id = header_id(&text, &rel);
         // 官方限定写法（事件:M22 / 通用:M10）与裸号同义——按裸号比对，避免误报
-        let a = py_str(get(&mc, "id")).rsplit(':').next().unwrap_or("").to_string();
+        let a = py_str(get(&mc, "id"))
+            .rsplit(':')
+            .next()
+            .unwrap_or("")
+            .to_string();
         let b = spec_id.rsplit(':').next().unwrap_or("").to_string();
         if a != b {
             issues.push(format!(
@@ -102,7 +107,11 @@ pub fn scan(root: &Path) -> McScan {
             Json::Array(l0.into_iter().map(Json::Str).collect()),
         ),
     ]);
-    McScan { issues, warns, stats }
+    McScan {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 #[cfg(test)]

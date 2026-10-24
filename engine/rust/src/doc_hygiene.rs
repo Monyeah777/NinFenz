@@ -11,7 +11,7 @@
 //! **常量表来自 [`crate::doc_tables`]**（真源转录，勿手改）。
 //! 真源里 `check_markers` 有一层按正文取键的缓存；对账只看**结论**，故本线不移植缓存。
 
-use crate::doc_tables::{DOC_KINDS, INSTRUCTION_DOCS, KIND_RULES, KINDS, REQUIRED_DOCS};
+use crate::doc_tables::{DOC_KINDS, INSTRUCTION_DOCS, KINDS, KIND_RULES, REQUIRED_DOCS};
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -79,7 +79,10 @@ pub fn kind_rules(root: &Path) -> Vec<String> {
                 Err(_) => false,
             });
         if !hit {
-            warns.push(format!("{} 属 {} 型但缺「{}」（写法未定型）", rel, kind, rule.2));
+            warns.push(format!(
+                "{} 属 {} 型但缺「{}」（写法未定型）",
+                rel, kind, rule.2
+            ));
         }
     }
     warns
@@ -109,7 +112,11 @@ pub fn check_markers(root: &Path) -> Vec<String> {
             Some(text) => {
                 let head: Vec<&str> = text.lines().take(8).collect();
                 if !head.iter().any(|ln| ln.starts_with(LAST_UPDATED_PREFIX)) {
-                    issues.push(format!("{} 缺「最后更新」位（头部 {} 行内）", rel, head.len()));
+                    issues.push(format!(
+                        "{} 缺「最后更新」位（头部 {} 行内）",
+                        rel,
+                        head.len()
+                    ));
                 }
             }
         }
@@ -118,7 +125,10 @@ pub fn check_markers(root: &Path) -> Vec<String> {
         let Some(text) = lookup(rel) else { continue };
         let head: Vec<&str> = text.lines().take(8).collect();
         if !head.iter().any(|ln| ln.contains(INSTRUCTION_MARK)) {
-            issues.push(format!("{} 缺「⛔ 操作指令」标识头（指令类文档须全覆盖）", rel));
+            issues.push(format!(
+                "{} 缺「⛔ 操作指令」标识头（指令类文档须全覆盖）",
+                rel
+            ));
         }
     }
     issues
@@ -158,7 +168,9 @@ mod tests {
         std::fs::write(tmp.join("01_核心协议.md"), &body).unwrap();
         let issues = check_markers(&tmp);
         assert!(
-            issues.iter().any(|i| i.contains("01_核心协议.md") && i.contains("最后更新")),
+            issues
+                .iter()
+                .any(|i| i.contains("01_核心协议.md") && i.contains("最后更新")),
             "第 9 行的最后更新位不得被采纳；实得 {:?}",
             issues
         );

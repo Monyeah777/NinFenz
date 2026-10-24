@@ -46,7 +46,10 @@ fn probe(root: &Path, pr: &Json) -> (Vec<String>, String) {
             let module = plain_str_opt(get(pr, "module"));
             let attr = plain_str_opt(get(pr, "attr"));
             match pyconsts::lookup(&module, &attr) {
-                Some(vals) => (vals.iter().map(|s| (*s).to_string()).collect(), "python_attr".to_string()),
+                Some(vals) => (
+                    vals.iter().map(|s| (*s).to_string()).collect(),
+                    "python_attr".to_string(),
+                ),
                 None => (
                     Vec::new(),
                     format!("python_attr 未登记：{}.{}", module, attr),
@@ -56,7 +59,10 @@ fn probe(root: &Path, pr: &Json) -> (Vec<String>, String) {
         "json_path" => {
             let rel = py_str(get(pr, "file"));
             let Some(mut doc) = read(root, &rel) else {
-                return (Vec::new(), format!("json_path 断链：{}", py_str(get(pr, "path"))));
+                return (
+                    Vec::new(),
+                    format!("json_path 断链：{}", py_str(get(pr, "path"))),
+                );
             };
             for part in py_str(get(pr, "path")).split('.') {
                 let next = match &doc {
@@ -108,9 +114,16 @@ fn verify_vocabularies(root: &Path) -> (Vec<String>, usize, usize) {
         }
         seen.insert(sid.clone());
         if !statuses.contains(&plain_str_opt(get(s, "status"))) {
-            issues.push(format!("词表 {} status 越词表：{}", sid, plain_str_opt(get(s, "status"))));
+            issues.push(format!(
+                "词表 {} status 越词表：{}",
+                sid,
+                plain_str_opt(get(s, "status"))
+            ));
         }
-        let vals: Vec<String> = arr_items(get(s, "values")).iter().map(|v| plain_str(v)).collect();
+        let vals: Vec<String> = arr_items(get(s, "values"))
+            .iter()
+            .map(|v| plain_str(v))
+            .collect();
         if vals.len() < 2 {
             issues.push(format!("词表 {} 少于两个值（不成词表）", sid));
         }
@@ -123,7 +136,10 @@ fn verify_vocabularies(root: &Path) -> (Vec<String>, usize, usize) {
                 issues.push(format!("词表 {} 的 alias 与值撞车：{}", sid, plain_str(a)));
             }
         }
-        let pr = get(s, "probe").filter(|v| matches!(v, Json::Object(_))).cloned().unwrap_or(Json::Object(Vec::new()));
+        let pr = get(s, "probe")
+            .filter(|v| matches!(v, Json::Object(_)))
+            .cloned()
+            .unwrap_or(Json::Object(Vec::new()));
         if !kinds.contains(&py_str(get(&pr, "kind"))) {
             issues.push(format!(
                 "词表 {} 的 probe.kind 不在册：{}",
@@ -206,18 +222,28 @@ fn verify_normative(root: &Path) -> (Vec<String>, usize, usize) {
         for c in covered {
             if let Some(cap) = judge_check_re().captures(&c) {
                 if !checks.contains(&cap[1]) {
-                    issues.push(format!("规范件 {} 的 covered_by 指向不存在的 check：{}", rel, c));
+                    issues.push(format!(
+                        "规范件 {} 的 covered_by 指向不存在的 check：{}",
+                        rel, c
+                    ));
                 }
             }
         }
     }
 
     let mut info_hits: BTreeSet<String> = BTreeSet::new();
-    for g in arr_items(get(&doc, "informative")).iter().map(|v| plain_str(v)) {
+    for g in arr_items(get(&doc, "informative"))
+        .iter()
+        .map(|v| plain_str(v))
+    {
         // 真源 `pat = g + "/*" if g.endswith("/**") else g` —— 是**在 g 后面追加** `/*`，
         // 不是把 `/**` 换成 `/*`（`docs/**` → `docs/**/*`）。抄成后者会丢掉 `**`，
         // 说明件数从 2352 掉到 75，且**不会**被 ok/not-ok 察觉（只错一个计数）。
-        let pat = if g.ends_with("/**") { format!("{}/*", g) } else { g.clone() };
+        let pat = if g.ends_with("/**") {
+            format!("{}/*", g)
+        } else {
+            g.clone()
+        };
         let hits = crate::glob::expand(root, &pat);
         for h in hits {
             info_hits.insert(h);
@@ -276,11 +302,19 @@ fn verify_contracts(root: &Path) -> (Vec<String>, usize) {
             issues.push(format!(
                 "契约 {} 的 artifact 不存在：{}",
                 cid,
-                if art.is_empty() { "(缺)" } else { art.as_str() }
+                if art.is_empty() {
+                    "(缺)"
+                } else {
+                    art.as_str()
+                }
             ));
         }
         if !statuses.contains(&plain_str_opt(get(c, "status"))) {
-            issues.push(format!("契约 {} status 越词表：{}", cid, plain_str_opt(get(c, "status"))));
+            issues.push(format!(
+                "契约 {} status 越词表：{}",
+                cid,
+                plain_str_opt(get(c, "status"))
+            ));
         }
         if py_str(get(c, "owner")).trim().is_empty() {
             issues.push(format!("契约 {} 缺 owner（无人认领的契约不许登记）", cid));
@@ -291,17 +325,27 @@ fn verify_contracts(root: &Path) -> (Vec<String>, usize) {
         let rule = py_str(get(c, "quality_rule"));
         if let Some(rest) = rule.strip_prefix("check") {
             if !checks.contains(rest) {
-                issues.push(format!("契约 {} 的 quality_rule 指向不存在的 check：{}", cid, rule));
+                issues.push(format!(
+                    "契约 {} 的 quality_rule 指向不存在的 check：{}",
+                    cid, rule
+                ));
             }
         } else if let Some(rest) = rule.strip_prefix("assertion:") {
             if !assertion_ids.contains(rest) {
-                issues.push(format!("契约 {} 的 quality_rule 指向不存在的断言：{}", cid, rule));
+                issues.push(format!(
+                    "契约 {} 的 quality_rule 指向不存在的断言：{}",
+                    cid, rule
+                ));
             }
         } else {
             issues.push(format!(
                 "契约 {} 的 quality_rule 无法解析（须 checkN 或 assertion:<id>）：{}",
                 cid,
-                if rule.is_empty() { "(缺)" } else { rule.as_str() }
+                if rule.is_empty() {
+                    "(缺)"
+                } else {
+                    rule.as_str()
+                }
             ));
         }
     }
@@ -468,28 +512,58 @@ mod tests {
             std::fs::create_dir_all(root.join(rel)).unwrap();
         }
         for (rel, body) in [
-            ("docs/ex/one.md", r#"# one
-"#),
-            ("docs/ex/two.md", r#"# two
-"#),
-            ("docs/norm-a.md", r#"# a
-"#),
-            ("docs/norm-b.md", r#"# b
-"#),
-            ("protocol/RECEIPTS.json", r#"{"schema": "nf-receipts/1", "entries": [{"id": "docs/norm-b.md"}]}"#),
-            ("protocol/assertions.json", r#"{"assertions": [{"id": "a1"}]}"#),
-            ("protocol/data_contracts.json", r#"{"schema": "wrong/1", "status_vocabulary": ["active"], "rule_prefixes": ["check"], "contracts": [{"id": "c1", "artifact": "docs/norm-a.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "check1"}, {"id": "c1", "artifact": "no/such", "status": "bogus", "owner": "", "freshness": "", "quality_rule": "assertion:nope"}, {"id": "c3", "artifact": "docs/norm-a.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "不能解析"}, {"id": "c4", "artifact": "docs/norm-b.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "assertion:a1"}]}"#),
-            ("protocol/normative.json", r#"{"schema": "wrong/1", "normative": [{"path": ""}, "docs/missing.md", {"path": "docs/norm-a.md"}, {"path": "docs/norm-a.md", "covered_by": ["check99"]}, {"path": "docs/norm-b.md", "covered_by": ["check1"]}, {"path": "docs/ex/one.md"}], "informative": ["docs/ex/**", "docs/none/**"]}"#),
+            (
+                "docs/ex/one.md",
+                r#"# one
+"#,
+            ),
+            (
+                "docs/ex/two.md",
+                r#"# two
+"#,
+            ),
+            (
+                "docs/norm-a.md",
+                r#"# a
+"#,
+            ),
+            (
+                "docs/norm-b.md",
+                r#"# b
+"#,
+            ),
+            (
+                "protocol/RECEIPTS.json",
+                r#"{"schema": "nf-receipts/1", "entries": [{"id": "docs/norm-b.md"}]}"#,
+            ),
+            (
+                "protocol/assertions.json",
+                r#"{"assertions": [{"id": "a1"}]}"#,
+            ),
+            (
+                "protocol/data_contracts.json",
+                r#"{"schema": "wrong/1", "status_vocabulary": ["active"], "rule_prefixes": ["check"], "contracts": [{"id": "c1", "artifact": "docs/norm-a.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "check1"}, {"id": "c1", "artifact": "no/such", "status": "bogus", "owner": "", "freshness": "", "quality_rule": "assertion:nope"}, {"id": "c3", "artifact": "docs/norm-a.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "不能解析"}, {"id": "c4", "artifact": "docs/norm-b.md", "status": "active", "owner": "o", "freshness": "f", "quality_rule": "assertion:a1"}]}"#,
+            ),
+            (
+                "protocol/normative.json",
+                r#"{"schema": "wrong/1", "normative": [{"path": ""}, "docs/missing.md", {"path": "docs/norm-a.md"}, {"path": "docs/norm-a.md", "covered_by": ["check99"]}, {"path": "docs/norm-b.md", "covered_by": ["check1"]}, {"path": "docs/ex/one.md"}], "informative": ["docs/ex/**", "docs/none/**"]}"#,
+            ),
             ("protocol/other.json", r#"{"words": ["x", "z"]}"#),
-            ("protocol/vocabularies.json", r#"{"schema": "wrong/1", "status_vocabulary": ["active"], "probe_kinds": ["literal", "json_path", "python_attr"], "schemes": [{"id": "v-literal", "status": "active", "values": ["a", "b"], "probe": {"kind": "literal"}}, {"id": "v-literal", "status": "active", "values": ["a"], "probe": {"kind": "literal"}}, {"id": "v-status", "status": "bogus", "values": ["a", "b"], "probe": {"kind": "literal"}}, {"id": "v-dup", "status": "active", "values": ["a", "a"], "aliases": ["a"], "probe": {"kind": "literal"}}, {"id": "v-kind", "status": "active", "values": ["a", "b"], "probe": {"kind": "nope"}}, {"id": "v-broken", "status": "active", "values": ["a", "b"], "probe": {"kind": "json_path", "file": "protocol/other.json", "path": "nope.deep"}}, {"id": "v-drift", "status": "active", "values": ["x", "y"], "probe": {"kind": "json_path", "file": "protocol/other.json", "path": "words"}}, {"id": "v-attr", "status": "deprecated", "values": ["tutorial", "how-to", "reference", "explanation"], "probe": {"kind": "python_attr", "module": "core.doc_hygiene", "attr": "KINDS"}}]}"#),
-            ("verify.sh", r#"#!/bin/bash
+            (
+                "protocol/vocabularies.json",
+                r#"{"schema": "wrong/1", "status_vocabulary": ["active"], "probe_kinds": ["literal", "json_path", "python_attr"], "schemes": [{"id": "v-literal", "status": "active", "values": ["a", "b"], "probe": {"kind": "literal"}}, {"id": "v-literal", "status": "active", "values": ["a"], "probe": {"kind": "literal"}}, {"id": "v-status", "status": "bogus", "values": ["a", "b"], "probe": {"kind": "literal"}}, {"id": "v-dup", "status": "active", "values": ["a", "a"], "aliases": ["a"], "probe": {"kind": "literal"}}, {"id": "v-kind", "status": "active", "values": ["a", "b"], "probe": {"kind": "nope"}}, {"id": "v-broken", "status": "active", "values": ["a", "b"], "probe": {"kind": "json_path", "file": "protocol/other.json", "path": "nope.deep"}}, {"id": "v-drift", "status": "active", "values": ["x", "y"], "probe": {"kind": "json_path", "file": "protocol/other.json", "path": "words"}}, {"id": "v-attr", "status": "deprecated", "values": ["tutorial", "how-to", "reference", "explanation"], "probe": {"kind": "python_attr", "module": "core.doc_hygiene", "attr": "KINDS"}}]}"#,
+            ),
+            (
+                "verify.sh",
+                r#"#!/bin/bash
 check1(){
   true
 }
 check2(){
   true
 }
-"#),
+"#,
+            ),
         ] {
             std::fs::write(root.join(rel), body).unwrap();
         }
@@ -506,5 +580,4 @@ check2(){
         assert_eq!(got.informative_files, 2);
         assert_eq!(got.contracts, 3);
     }
-
 }

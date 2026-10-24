@@ -12,8 +12,8 @@
 //! 本模块是 `nf verify-report` 的 `assets_ledger` 判据，**不单独开 CLI 面**。
 
 use crate::jsonread;
-use crate::pyjson::Json;
 use crate::jsonread::json_eq;
+use crate::pyjson::Json;
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -71,7 +71,9 @@ pub fn build(root: &Path) -> Vec<Json> {
             if rel.rsplit('/').next().unwrap_or("") == "README.md" {
                 continue;
             }
-            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+                continue;
+            };
             let stem = Path::new(&rel)
                 .file_stem()
                 .map(|s| s.to_string_lossy().to_string())
@@ -141,7 +143,9 @@ pub fn verify(root: &Path) -> (Vec<String>, Option<Json>) {
         return (vec![format!("{} 不是合法 JSON", LEDGER_REL)], None);
     };
     let current = build(root);
-    let recorded = crate::pyval::get(&data, "entries").cloned().unwrap_or(Json::Null);
+    let recorded = crate::pyval::get(&data, "entries")
+        .cloned()
+        .unwrap_or(Json::Null);
     let mut issues = Vec::new();
     if !json_eq(&recorded, &Json::Array(current.clone())) {
         issues.push(format!("{} 过期：与资产扫描不一致（refresh）", LEDGER_REL));
@@ -166,7 +170,11 @@ mod tests {
         assert!(got.contains(&"AAA".to_string()), "{:?}", got);
         assert!(got.contains(&"BBB".to_string()), "{:?}", got);
         assert!(got.contains(&"CCC".to_string()), "{:?}", got);
-        assert!(!got.contains(&"C01-01".to_string()), "连字符不在本件字符集：{:?}", got);
+        assert!(
+            !got.contains(&"C01-01".to_string()),
+            "连字符不在本件字符集：{:?}",
+            got
+        );
     }
 
     #[test]

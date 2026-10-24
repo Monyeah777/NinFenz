@@ -28,8 +28,11 @@ const LIMITS: [(&str, i64); 3] = [("lines", 800), ("max_fn_lines", 120), ("max_f
 /// 扫描面：core 与 scripts 的 `.py`（与 purity R5/R6 同口径）。
 pub const SCAN_DIRS: [&str; 2] = ["desktop/src/core", "scripts"];
 /// 三项度量的（键, 中文标签），顺序即真源的遍历顺序。
-const KEYS: [(&str, &str); 3] =
-    [("lines", "模块行数"), ("max_fn_lines", "最长函数行数"), ("max_fn_cc", "最大圈复杂度")];
+const KEYS: [(&str, &str); 3] = [
+    ("lines", "模块行数"),
+    ("max_fn_lines", "最长函数行数"),
+    ("max_fn_cc", "最大圈复杂度"),
+];
 
 #[derive(Clone, Debug, Default)]
 pub struct Metrics {
@@ -44,11 +47,13 @@ pub fn metrics_of(path: &Path) -> Metrics {
     // 真源用 `errors="replace"` 读 ⇒ 非法字节换成 U+FFFD
     let raw = std::fs::read(path).unwrap_or_default();
     let text = String::from_utf8_lossy(&raw).into_owned();
-    let mut out = Metrics { lines: pyval::splitlines_count(&text) as i64, ..Default::default() };
+    let mut out = Metrics {
+        lines: pyval::splitlines_count(&text) as i64,
+        ..Default::default()
+    };
     let Some(facts) = crate::pyast::metric_facts(&text) else {
-        out.syntax_error = Some(
-            "语法不可解析（修复指引：先修语法，度量需要可解析的 AST）".to_string(),
-        );
+        out.syntax_error =
+            Some("语法不可解析（修复指引：先修语法，度量需要可解析的 AST）".to_string());
         return out;
     };
     for f in &facts.fns {
@@ -71,7 +76,9 @@ pub fn measure(root: &Path) -> Vec<(String, Metrics)> {
     let mut rels: Vec<String> = Vec::new();
     for d in SCAN_DIRS {
         let dir = root.join(d);
-        let Ok(rd) = std::fs::read_dir(&dir) else { continue };
+        let Ok(rd) = std::fs::read_dir(&dir) else {
+            continue;
+        };
         let mut names: Vec<String> = rd
             .flatten()
             .map(|e| e.file_name().to_string_lossy().to_string())
@@ -96,10 +103,18 @@ pub fn load_baseline(root: &Path) -> Vec<(String, Vec<(String, i64)>)> {
     if !p.is_file() {
         return Vec::new();
     }
-    let Ok(text) = std::fs::read_to_string(&p) else { return Vec::new() };
-    let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) else { return Vec::new() };
-    let Ok(doc) = crate::jsonread::convert(&v) else { return Vec::new() };
-    let Json::Object(o) = &doc else { return Vec::new() };
+    let Ok(text) = std::fs::read_to_string(&p) else {
+        return Vec::new();
+    };
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return Vec::new();
+    };
+    let Ok(doc) = crate::jsonread::convert(&v) else {
+        return Vec::new();
+    };
+    let Json::Object(o) = &doc else {
+        return Vec::new();
+    };
     let Some((_, Json::Object(files))) = o.iter().find(|(k, _)| k == "files") else {
         return Vec::new();
     };
@@ -157,7 +172,11 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             }
             None => {
                 for (key, label) in KEYS {
-                    let lim = LIMITS.iter().find(|(k, _)| *k == key).map(|(_, v)| *v).unwrap_or(0);
+                    let lim = LIMITS
+                        .iter()
+                        .find(|(k, _)| *k == key)
+                        .map(|(_, v)| *v)
+                        .unwrap_or(0);
                     let val = match key {
                         "lines" => m.lines,
                         "max_fn_lines" => m.max_fn_lines,
@@ -173,9 +192,8 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
             }
         }
     }
-    let max_of = |f: fn(&Metrics) -> i64| -> i64 {
-        cur.iter().map(|(_, m)| f(m)).max().unwrap_or(0)
-    };
+    let max_of =
+        |f: fn(&Metrics) -> i64| -> i64 { cur.iter().map(|(_, m)| f(m)).max().unwrap_or(0) };
     if base.is_empty() {
         warns.push(format!(
             "无基线 {}（当前按新文件限值判；修复指引：python scripts/code_metrics.py --write 冻结存量）",
@@ -186,7 +204,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Vec<String>, Json) {
         ("files".to_string(), Json::Int(cur.len() as i64)),
         ("baseline".to_string(), Json::Int(base.len() as i64)),
         ("max_lines".to_string(), Json::Int(max_of(|m| m.lines))),
-        ("max_fn_lines".to_string(), Json::Int(max_of(|m| m.max_fn_lines))),
+        (
+            "max_fn_lines".to_string(),
+            Json::Int(max_of(|m| m.max_fn_lines)),
+        ),
         ("max_fn_cc".to_string(), Json::Int(max_of(|m| m.max_fn_cc))),
     ]);
     (issues, warns, stats)
@@ -249,7 +270,11 @@ mod tests {
     }
 
     fn build_code_metrics_fixture(with_baseline: bool) -> std::path::PathBuf {
-        let name = if with_baseline { "code-metrics-branches" } else { "code-metrics-nobase" };
+        let name = if with_baseline {
+            "code-metrics-branches"
+        } else {
+            "code-metrics-nobase"
+        };
         let root = crate::testutil::fixture(name);
         let write = |rel: &str, body: &str| {
             let p = root.join(rel);
@@ -289,7 +314,18 @@ mod tests {
     fn code_metrics_matches_truth_source_branch_by_branch() {
         let root = build_code_metrics_fixture(true);
         let (issues, warns, stats) = scan(&root);
-        assert_eq!(cm_norm(&issues), &[r#"desktop/src/core/zz_big.py 模块行数 63 > 冻结值 1（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#, r#"desktop/src/core/zz_big.py 最长函数行数 63 > 冻结值 2（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#, r#"desktop/src/core/zz_big.py 最大圈复杂度 32 > 冻结值 3（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#, r#"scripts/zz_new_bigfunc.py 新文件 最大圈复杂度 32 > 限值 25（修复指引：拆分后再入库；确需放宽须评审后冻结基线）"#, r#"scripts/zz_new_long.py 新文件 模块行数 801 > 限值 800（修复指引：拆分后再入库；确需放宽须评审后冻结基线）"#, r#"scripts/zz_syntax.py <SYNTAX>"#] as &[&str], "issues 须逐字且同序（语法支已归一）");
+        assert_eq!(
+            cm_norm(&issues),
+            &[
+                r#"desktop/src/core/zz_big.py 模块行数 63 > 冻结值 1（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#,
+                r#"desktop/src/core/zz_big.py 最长函数行数 63 > 冻结值 2（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#,
+                r#"desktop/src/core/zz_big.py 最大圈复杂度 32 > 冻结值 3（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"#,
+                r#"scripts/zz_new_bigfunc.py 新文件 最大圈复杂度 32 > 限值 25（修复指引：拆分后再入库；确需放宽须评审后冻结基线）"#,
+                r#"scripts/zz_new_long.py 新文件 模块行数 801 > 限值 800（修复指引：拆分后再入库；确需放宽须评审后冻结基线）"#,
+                r#"scripts/zz_syntax.py <SYNTAX>"#
+            ] as &[&str],
+            "issues 须逐字且同序（语法支已归一）"
+        );
         assert_eq!(warns, &[] as &[&str], "warns 须逐字且同序");
         let want: Json = crate::jsonread::convert(
             &serde_json::from_str::<serde_json::Value>(r#"{"baseline": 3, "files": 6, "max_fn_cc": 32, "max_fn_lines": 63, "max_lines": 801}"#).unwrap(),
@@ -308,7 +344,12 @@ mod tests {
         let root = build_code_metrics_fixture(false);
         let (issues, warns, _stats) = scan(&root);
         assert!(issues.is_empty(), "缺基线不该产生 issue：{:?}", issues);
-        assert_eq!(warns, &[r#"无基线 protocol/code_metrics_baseline.json（当前按新文件限值判；修复指引：python scripts/code_metrics.py --write 冻结存量）"#] as &[&str]);
+        assert_eq!(
+            warns,
+            &[
+                r#"无基线 protocol/code_metrics_baseline.json（当前按新文件限值判；修复指引：python scripts/code_metrics.py --write 冻结存量）"#
+            ] as &[&str]
+        );
     }
     // <<< GENERATED
 }

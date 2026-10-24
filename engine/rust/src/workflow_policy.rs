@@ -61,8 +61,13 @@ fn timeout_issues(rel: &str, text: &str) -> Vec<String> {
 fn pin_issues(rel: &str, text: &str) -> Vec<String> {
     let mut out = Vec::new();
     for (i, line) in text.lines().enumerate() {
-        let Some(c) = re_uses().captures(line) else { continue };
-        let ref_ = c[1].trim_end_matches(',').trim_matches(|ch| ch == '"' || ch == '\'').to_string();
+        let Some(c) = re_uses().captures(line) else {
+            continue;
+        };
+        let ref_ = c[1]
+            .trim_end_matches(',')
+            .trim_matches(|ch| ch == '"' || ch == '\'')
+            .to_string();
         if ref_.starts_with("./") {
             continue;
         }
@@ -94,9 +99,11 @@ fn pin_issues(rel: &str, text: &str) -> Vec<String> {
 /// 真源 `_perm_issues`。
 fn perm_issues(rel: &str, text: &str) -> Vec<String> {
     static TOP: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let top = TOP.get_or_init(|| regex::Regex::new(r"^permissions:\s*").expect("权限行正则固定合法"));
+    let top =
+        TOP.get_or_init(|| regex::Regex::new(r"^permissions:\s*").expect("权限行正则固定合法"));
     static IND: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let ind = IND.get_or_init(|| regex::Regex::new(r"^\s+permissions:\s*").expect("权限行正则固定合法"));
+    let ind =
+        IND.get_or_init(|| regex::Regex::new(r"^\s+permissions:\s*").expect("权限行正则固定合法"));
     let mut out = Vec::new();
     let perms: Vec<&str> = text
         .lines()
@@ -109,7 +116,8 @@ fn perm_issues(rel: &str, text: &str) -> Vec<String> {
         ));
     } else {
         static WA: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-        let wa = WA.get_or_init(|| regex::Regex::new(r"\bwrite-all\b").expect("write-all 正则固定合法"));
+        let wa =
+            WA.get_or_init(|| regex::Regex::new(r"\bwrite-all\b").expect("write-all 正则固定合法"));
         if perms.iter().any(|ln| wa.is_match(ln)) {
             out.push(format!(
                 "{} 使用 write-all（修复指引：改为按需最小集，见 §Token-Permissions）",
@@ -138,8 +146,14 @@ pub fn scan(root: &Path) -> WfScan {
         issues.extend(perm_issues(rel, &text));
         issues.extend(timeout_issues(rel, &text));
         for line in text.lines() {
-            let Some(c) = re_uses().captures(line) else { continue };
-            let rev = c[1].trim_end_matches(',').rsplit_once('@').map(|(_, r)| r).unwrap_or("");
+            let Some(c) = re_uses().captures(line) else {
+                continue;
+            };
+            let rev = c[1]
+                .trim_end_matches(',')
+                .rsplit_once('@')
+                .map(|(_, r)| r)
+                .unwrap_or("");
             if re_sha().is_match(rev) {
                 pinned += 1;
                 if !c[2].contains('#') {
@@ -202,7 +216,11 @@ pub fn scan(root: &Path) -> WfScan {
             Json::Int(reqs.len() as i64),
         ),
     ]);
-    WfScan { issues, warns, stats }
+    WfScan {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 #[cfg(test)]
@@ -216,7 +234,9 @@ mod tests {
     /// 钉了无注释 / 缺 permissions / write-all / 缺 timeout / 全绿 / 非 .yml 忽略 /
     /// requirements 已钉与未钉（`-` 开头跳过）。
     const WF_FILES: [(&str, &str); 5] = [
-        ("clean.yml", r#"name: clean
+        (
+            "clean.yml",
+            r#"name: clean
 on: push
 permissions:
   contents: read
@@ -226,8 +246,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v4
-"#),
-        ("mixed.yml", r#"name: mixed
+"#,
+        ),
+        (
+            "mixed.yml",
+            r#"name: mixed
 on: push
 permissions:
   contents: read
@@ -241,18 +264,27 @@ jobs:
       - uses: ./local-action
       - uses: actions/cache@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa # v3
       - uses: actions/upload-artifact@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-"#),
-        ("noperms.yml", r#"name: noperms
+"#,
+        ),
+        (
+            "noperms.yml",
+            r#"name: noperms
 on: push
 jobs:
   j:
     runs-on: ubuntu-latest
     steps:
       - run: echo hi
-"#),
-        ("notes.txt", r#"uses: actions/checkout@v4
-"#),
-        ("writeall.yml", r#"name: wa
+"#,
+        ),
+        (
+            "notes.txt",
+            r#"uses: actions/checkout@v4
+"#,
+        ),
+        (
+            "writeall.yml",
+            r#"name: wa
 on: push
 permissions: write-all
 jobs:
@@ -261,16 +293,23 @@ jobs:
     timeout-minutes: 3
     steps:
       - run: echo hi
-"#),
+"#,
+        ),
     ];
     const WF_REQS: [(&str, &str); 2] = [
-        ("requirements-a.txt", r#"pyyaml==6.0
+        (
+            "requirements-a.txt",
+            r#"pyyaml==6.0
 # 注释
 -r other.txt
 requests
-"#),
-        ("requirements-b.txt", r#"numpy==1.26.0
-"#),
+"#,
+        ),
+        (
+            "requirements-b.txt",
+            r#"numpy==1.26.0
+"#,
+        ),
     ];
     const WANT_WF_ISSUES: [&str; 6] = [
         ".github/workflows/mixed.yml:10 未钉提交 SHA：actions/checkout@v4（修复指引：钉 40 位 SHA——`@v4` 这类可变引用可被上游改写；改法见 ossf/scorecard docs/checks.md §Pinned-Dependencies）",

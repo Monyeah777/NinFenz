@@ -238,14 +238,14 @@ fn graph_with(
                     || same_layer.contains(&dep_id)
                     || same_layer.contains(&bare_dep)
                 {
-                    notes += 1;   // 真源：category=同层依赖序
+                    notes += 1; // 真源：category=同层依赖序
                 } else if dep_layer.is_some_and(|dl| dl > idx) {
                     issues.push(format!(
                         "依赖序违约：{} 依赖 {}，但 {} 未在其之前执行（修复指引：前移提供方层位，或把该模块移出本层 default）",
                         mid, dep_id, dep_id
                     ));
                 } else {
-                    notes += 1;   // 真源：category=跨包/外部依赖
+                    notes += 1; // 真源：category=跨包/外部依赖
                 }
             }
             done.insert(mid.clone());
@@ -274,14 +274,16 @@ fn graph_with(
             let mut uniq: Vec<String> = subs.clone();
             uniq.sort();
             uniq.dedup();
-            notes += 1;   // 真源：category=跨包/外部事件
+            notes += 1; // 真源：category=跨包/外部事件
         }
     }
 
     // 类型面（io_types）：仅在本执行集内判**可证**事项（未收窄不判死）
     let mut kind_of_token: Vec<(String, String)> = Vec::new();
     for mid in &executed {
-        let Some(rec) = resolve(mid, index) else { continue };
+        let Some(rec) = resolve(mid, index) else {
+            continue;
+        };
         let Some(Json::Object(outs)) = rec.io_types.as_ref().and_then(|io| get(io, "outputs"))
         else {
             continue;
@@ -305,7 +307,9 @@ fn graph_with(
         }
     }
     for mid in &executed {
-        let Some(rec) = resolve(mid, index) else { continue };
+        let Some(rec) = resolve(mid, index) else {
+            continue;
+        };
         let Some(Json::Object(ins)) = rec.io_types.as_ref().and_then(|io| get(io, "inputs")) else {
             continue;
         };
@@ -314,7 +318,9 @@ fn graph_with(
             if want == "untyped" || want == "state" {
                 continue;
             }
-            let Some(dep_rec) = resolve(&dep, index) else { continue };
+            let Some(dep_rec) = resolve(&dep, index) else {
+                continue;
+            };
             let mut got: Vec<String> = Vec::new();
             if let Some(Json::Object(outs)) =
                 dep_rec.io_types.as_ref().and_then(|io| get(io, "outputs"))
@@ -340,7 +346,7 @@ fn graph_with(
         }
     }
 
-    let _ = modules_count;   // 真源 stats.modules 只进 advisory 汇总，契约不读
+    let _ = modules_count; // 真源 stats.modules 只进 advisory 汇总，契约不读
     Ok(Graph {
         pipeline_id: pl.id.clone(),
         issues,
@@ -352,7 +358,10 @@ fn graph_with(
 fn py_list(v: &[String]) -> String {
     format!(
         "[{}]",
-        v.iter().map(|x| format!("'{}'", x)).collect::<Vec<_>>().join(", ")
+        v.iter()
+            .map(|x| format!("'{}'", x))
+            .collect::<Vec<_>>()
+            .join(", ")
     )
 }
 
@@ -400,7 +409,11 @@ pub fn sweep(root: &Path) -> Result<Sweep, String> {
             issues.push(format!("{}：{}", g.pipeline_id, i));
         }
     }
-    Ok(Sweep { issues, pipelines, notes })
+    Ok(Sweep {
+        issues,
+        pipelines,
+        notes,
+    })
 }
 
 #[cfg(test)]
@@ -420,7 +433,9 @@ mod tests {
     /// `sweep` 路径上**不可达**——`layer_of` 只在处理当前层时写入，层按升序处理 ⇒ 任何值都
     /// ≤ 当前 idx，`>` 永不成立。**不编造夹具去"覆盖"死代码**。
     const PB_KITCHEN: [(&str, &str); 7] = [
-        ("03_管线库/P01_测试.md", r#"```yaml
+        (
+            "03_管线库/P01_测试.md",
+            r#"```yaml
 Pipeline:
   id: P01
   name: 测试
@@ -434,22 +449,31 @@ Pipeline:
     - id: L3
       default_modules: [情感:M22]
 ```
-"#),
-        ("04_模块库/情感类/M22_c.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/情感类/M22_c.md",
+            r#"```yaml
 machine_contract:
   id: 情感类:M22
   outputs: [toke]
 ```
-"#),
-        ("04_模块库/通用类/M00_基座.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M00_基座.md",
+            r#"```yaml
 machine_contract:
   id: M00
   outputs: [tok0]
   events:
     publish: [ev_base]
 ```
-"#),
-        ("04_模块库/通用类/M10_a.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M10_a.md",
+            r#"```yaml
 machine_contract:
   id: M10
   inputs: [M99, M11, Ghostx]
@@ -462,8 +486,11 @@ machine_contract:
     inputs:
       M11: object
 ```
-"#),
-        ("04_模块库/通用类/M11_b.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M11_b.md",
+            r#"```yaml
 machine_contract:
   id: M11
   outputs: [tokd]
@@ -472,29 +499,47 @@ machine_contract:
       tokc: string
       tokd: number
 ```
-"#),
-        ("04_模块库/通用类/README.md", r#"# 说明，必须被跳过
-"#),
-        ("desktop/src/core/registry.json", r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#),
+"#,
+        ),
+        (
+            "04_模块库/通用类/README.md",
+            r#"# 说明，必须被跳过
+"#,
+        ),
+        (
+            "desktop/src/core/registry.json",
+            r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#,
+        ),
     ];
     const PB_BAD: [(&str, &str); 7] = [
-        ("03_管线库/P02_坏件.md", r#"没有围栏的正文
-"#),
-        ("04_模块库/情感类/M22_c.md", r#"```yaml
+        (
+            "03_管线库/P02_坏件.md",
+            r#"没有围栏的正文
+"#,
+        ),
+        (
+            "04_模块库/情感类/M22_c.md",
+            r#"```yaml
 machine_contract:
   id: 情感类:M22
   outputs: [toke]
 ```
-"#),
-        ("04_模块库/通用类/M00_基座.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M00_基座.md",
+            r#"```yaml
 machine_contract:
   id: M00
   outputs: [tok0]
   events:
     publish: [ev_base]
 ```
-"#),
-        ("04_模块库/通用类/M10_a.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M10_a.md",
+            r#"```yaml
 machine_contract:
   id: M10
   inputs: [M99, M11, Ghostx]
@@ -507,8 +552,11 @@ machine_contract:
     inputs:
       M11: object
 ```
-"#),
-        ("04_模块库/通用类/M11_b.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M11_b.md",
+            r#"```yaml
 machine_contract:
   id: M11
   outputs: [tokd]
@@ -517,27 +565,42 @@ machine_contract:
       tokc: string
       tokd: number
 ```
-"#),
-        ("04_模块库/通用类/README.md", r#"# 说明，必须被跳过
-"#),
-        ("desktop/src/core/registry.json", r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#),
+"#,
+        ),
+        (
+            "04_模块库/通用类/README.md",
+            r#"# 说明，必须被跳过
+"#,
+        ),
+        (
+            "desktop/src/core/registry.json",
+            r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#,
+        ),
     ];
     const PB_NONE: [(&str, &str); 6] = [
-        ("04_模块库/情感类/M22_c.md", r#"```yaml
+        (
+            "04_模块库/情感类/M22_c.md",
+            r#"```yaml
 machine_contract:
   id: 情感类:M22
   outputs: [toke]
 ```
-"#),
-        ("04_模块库/通用类/M00_基座.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M00_基座.md",
+            r#"```yaml
 machine_contract:
   id: M00
   outputs: [tok0]
   events:
     publish: [ev_base]
 ```
-"#),
-        ("04_模块库/通用类/M10_a.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M10_a.md",
+            r#"```yaml
 machine_contract:
   id: M10
   inputs: [M99, M11, Ghostx]
@@ -550,8 +613,11 @@ machine_contract:
     inputs:
       M11: object
 ```
-"#),
-        ("04_模块库/通用类/M11_b.md", r#"```yaml
+"#,
+        ),
+        (
+            "04_模块库/通用类/M11_b.md",
+            r#"```yaml
 machine_contract:
   id: M11
   outputs: [tokd]
@@ -560,10 +626,17 @@ machine_contract:
       tokc: string
       tokd: number
 ```
-"#),
-        ("04_模块库/通用类/README.md", r#"# 说明，必须被跳过
-"#),
-        ("desktop/src/core/registry.json", r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#),
+"#,
+        ),
+        (
+            "04_模块库/通用类/README.md",
+            r#"# 说明，必须被跳过
+"#,
+        ),
+        (
+            "desktop/src/core/registry.json",
+            r#"{"modules": [{"id": "M00"}, {"id": "M99"}]}"#,
+        ),
     ];
 
     fn build_pb_fixture(scenario: &str, files: &[(&str, &str)]) -> std::path::PathBuf {

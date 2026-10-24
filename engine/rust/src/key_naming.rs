@@ -18,8 +18,10 @@ use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/asset_keys.json";
 const HEADER_GLOBS: [&str; 2] = ["05_资产库/**/*.md", "community/*/assets/*.md"];
-const PROVENANCE_GLOBS: [&str; 2] =
-    ["05_资产库/**/provenance.json", "community/*/assets/provenance.json"];
+const PROVENANCE_GLOBS: [&str; 2] = [
+    "05_资产库/**/provenance.json",
+    "community/*/assets/provenance.json",
+];
 
 pub struct KeyScan {
     pub status: Option<&'static str>,
@@ -43,16 +45,25 @@ fn declaration(root: &Path) -> (Option<Json>, Vec<String>) {
     let Some(doc) = jsonread::read_file(root, DECL_REL) else {
         return (
             None,
-            vec![format!("{} 不是合法 JSON（修复指引：修好 JSON 语法）", DECL_REL)],
+            vec![format!(
+                "{} 不是合法 JSON（修复指引：修好 JSON 语法）",
+                DECL_REL
+            )],
         );
     };
     let mut issues = Vec::new();
     if py_str(get(&doc, "pattern")).trim().is_empty() {
-        issues.push(format!("{} 缺 pattern（修复指引：写明键的形态正则）", DECL_REL));
+        issues.push(format!(
+            "{} 缺 pattern（修复指引：写明键的形态正则）",
+            DECL_REL
+        ));
     }
     let keys_ok = matches!(get(&doc, "keys"), Some(Json::Object(p)) if !p.is_empty());
     if !keys_ok {
-        issues.push(format!("{} 缺 keys 词表（修复指引：把在册键逐条写进 keys）", DECL_REL));
+        issues.push(format!(
+            "{} 缺 keys 词表（修复指引：把在册键逐条写进 keys）",
+            DECL_REL
+        ));
     }
     (Some(doc), issues)
 }
@@ -60,11 +71,12 @@ fn declaration(root: &Path) -> (Option<Json>, Vec<String>) {
 /// 真源 `collect` → `{key: [仓库相对路径,…]}`。
 fn collect(root: &Path) -> Vec<(String, Vec<String>)> {
     let mut found: Vec<(String, Vec<String>)> = Vec::new();
-    let add = |k: String, rel: String, found: &mut Vec<(String, Vec<String>)>| {
-        match found.iter_mut().find(|(n, _)| *n == k) {
-            Some((_, v)) => v.push(rel),
-            None => found.push((k, vec![rel])),
-        }
+    let add = |k: String, rel: String, found: &mut Vec<(String, Vec<String>)>| match found
+        .iter_mut()
+        .find(|(n, _)| *n == k)
+    {
+        Some((_, v)) => v.push(rel),
+        None => found.push((k, vec![rel])),
     };
     static HRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
     let hre = HRE.get_or_init(|| {
@@ -72,7 +84,9 @@ fn collect(root: &Path) -> Vec<(String, Vec<String>)> {
     });
     for pat in HEADER_GLOBS {
         for rel in crate::glob::expand(root, pat) {
-            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+                continue;
+            };
             // 真源 `[:600]` 按**字符**切
             let head: String = text.chars().take(600).collect();
             if let Some(c) = hre.captures(&head) {
@@ -82,7 +96,9 @@ fn collect(root: &Path) -> Vec<(String, Vec<String>)> {
     }
     for pat in PROVENANCE_GLOBS {
         for rel in crate::glob::expand(root, pat) {
-            let Some(doc) = jsonread::read_file(root, &rel) else { continue };
+            let Some(doc) = jsonread::read_file(root, &rel) else {
+                continue;
+            };
             for a in arr_items(get(&doc, "assets")) {
                 let k = py_str(get(a, "key"));
                 if !k.is_empty() {
@@ -131,7 +147,10 @@ pub fn scan(root: &Path) -> KeyScan {
     let Ok(rx) = regex::Regex::new(&format!("^(?:{})", pattern)) else {
         return KeyScan {
             status: Some("error"),
-            issues: vec![format!("key_naming.scan 抛 error：pattern 不是合法正则：{}", pattern)],
+            issues: vec![format!(
+                "key_naming.scan 抛 error：pattern 不是合法正则：{}",
+                pattern
+            )],
             warns,
             stats: base_stats(0, 0),
         };
@@ -173,7 +192,11 @@ pub fn scan(root: &Path) -> KeyScan {
             DECL_REL
         ));
     }
-    let max_len = found.iter().map(|(k, _)| k.chars().count()).max().unwrap_or(0);
+    let max_len = found
+        .iter()
+        .map(|(k, _)| k.chars().count())
+        .max()
+        .unwrap_or(0);
     KeyScan {
         status: None,
         issues,

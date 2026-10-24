@@ -92,11 +92,17 @@ fn walk(sub: &[Hash], i: usize, out: &mut Vec<ProofStep>) {
     let mid = split(sub.len());
     if i < mid {
         let sib = merkle_root(&sub[mid..]).expect("右半非空");
-        out.push(ProofStep { sibling_is_left: false, hash: sib });
+        out.push(ProofStep {
+            sibling_is_left: false,
+            hash: sib,
+        });
         walk(&sub[..mid], i, out);
     } else {
         let sib = merkle_root(&sub[..mid]).expect("左半非空");
-        out.push(ProofStep { sibling_is_left: true, hash: sib });
+        out.push(ProofStep {
+            sibling_is_left: true,
+            hash: sib,
+        });
         walk(&sub[mid..], i - mid, out);
     }
 }
@@ -119,7 +125,9 @@ mod tests {
     use super::*;
 
     fn leaves(n: usize) -> Vec<Hash> {
-        (0..n).map(|i| leaf_hash(format!("leaf-{}", i).as_bytes())).collect()
+        (0..n)
+            .map(|i| leaf_hash(format!("leaf-{}", i).as_bytes()))
+            .collect()
     }
 
     #[test]

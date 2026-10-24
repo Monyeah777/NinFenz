@@ -75,7 +75,9 @@ pub fn read_json(p: &Path) -> Option<Json> {
 }
 
 fn read_text(p: &Path) -> String {
-    std::fs::read(p).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default()
+    std::fs::read(p)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .unwrap_or_default()
 }
 
 /// 真源 `standards_catalog` → `{标准 id: 条目}`。
@@ -96,7 +98,10 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
             Vec::new(),
             Json::Object(vec![
                 ("packs".to_string(), Json::Int(0)),
-                ("note".to_string(), Json::Str("无域包名录（域包工程未启用）".to_string())),
+                (
+                    "note".to_string(),
+                    Json::Str("无域包名录（域包工程未启用）".to_string()),
+                ),
             ]),
         );
     }
@@ -104,10 +109,14 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
     let thr = py_float_or(obj_get(&doc, "machine_verifiable_threshold"), 0.95);
     let cat = standards_catalog(root);
     let dens_min = py_float_or(obj_get(&doc, "concept_density_threshold"), 1.0);
-    let auth_min =
-        py_float_or(obj_get(&doc, "data_authenticity_threshold"), AUTHENTICITY_THRESHOLD);
-    let reach_min =
-        py_float_or(obj_get(&doc, "reachable_ratio_threshold"), REACHABLE_RATIO_THRESHOLD);
+    let auth_min = py_float_or(
+        obj_get(&doc, "data_authenticity_threshold"),
+        AUTHENTICITY_THRESHOLD,
+    );
+    let reach_min = py_float_or(
+        obj_get(&doc, "reachable_ratio_threshold"),
+        REACHABLE_RATIO_THRESHOLD,
+    );
     let (mut packs, mut faces_n, mut functional) = (0i64, 0i64, 0i64);
     let reg = read_json(&root.join(REGISTRY_REL)).unwrap_or(Json::Object(vec![]));
     let by_id: Vec<Json> = arr_of(obj_get(&reg, "protocols"));
@@ -140,8 +149,12 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
                 pkg
             )),
             Some(regp) => {
-                let a = obj_get(regp, "pipeline").map(pyval::plain_str).unwrap_or_default();
-                let b = obj_get(&p, "pipeline").map(pyval::plain_str).unwrap_or_default();
+                let a = obj_get(regp, "pipeline")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
+                let b = obj_get(&p, "pipeline")
+                    .map(pyval::plain_str)
+                    .unwrap_or_default();
                 if a != b {
                     issues.push(format!(
                         "{}：管线不一致（名录 {} / registry {}）",
@@ -175,7 +188,11 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
                 issues.push(format!("{}：protocol.yaml 缺名录声明 {}", pkg, t));
             }
         }
-        let idx_path = root.join("community").join(&pkg).join("outputs").join("INDEX.json");
+        let idx_path = root
+            .join("community")
+            .join(&pkg)
+            .join("outputs")
+            .join("INDEX.json");
         if !idx_path.is_file() {
             issues.push(format!("{}：缺 outputs/INDEX.json", pkg));
             continue;
@@ -203,7 +220,10 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
             .iter()
             .any(|e| matches!(obj_get(e, "tier"), Some(Json::Str(s)) if s == "T4"))
         {
-            issues.push(format!("{}：无 T4 可复算面（域包必须有一个可重算产出）", pkg));
+            issues.push(format!(
+                "{}：无 T4 可复算面（域包必须有一个可重算产出）",
+                pkg
+            ));
         }
         let of = pyval::py_int_or(obj_get(&p, "output_faces"), 0);
         if of != faces.len() as i64 {
@@ -239,8 +259,11 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
                 .map(|s| pyval::py_str(obj_get(s, "id")))
                 .collect();
             if !bad_ref.is_empty() {
-                let head: Vec<Json> =
-                    bad_ref.iter().take(4).map(|s| Json::Str(s.clone())).collect();
+                let head: Vec<Json> = bad_ref
+                    .iter()
+                    .take(4)
+                    .map(|s| Json::Str(s.clone()))
+                    .collect();
                 issues.push(format!(
                     "{}：细分未绑可扩展标准或引用不在册：{}",
                     pkg,
@@ -301,7 +324,9 @@ pub fn manifest_verify(root: &Path) -> (Vec<String>, Json) {
             let bad_binding: Vec<Json> = bindings
                 .iter()
                 .filter(|r| {
-                    let st = obj_get(r, "standard").map(pyval::plain_str).unwrap_or_default();
+                    let st = obj_get(r, "standard")
+                        .map(pyval::plain_str)
+                        .unwrap_or_default();
                     let sup = obj_get(r, "support_standard")
                         .map(pyval::plain_str)
                         .unwrap_or_default();
@@ -355,11 +380,18 @@ mod tests {
         let (issues, stats) = scan(&root);
         assert_eq!(issues, &[] as &[&str], "issues 须逐字且同序");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"faces": 1000, "functional": 100, "packs": 100}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(
+                r#"{"faces": 1000, "functional": 100, "packs": 100}"#,
+            )
+            .unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want),
-                "stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "stats 不一致\n  实得 {}\n  期望 {}",
+            stats.dumps(),
+            want.dumps()
+        );
     }
 
     /// 缺名录时的**中性通过**支（真语料有名录，踩不到）。
@@ -369,10 +401,16 @@ mod tests {
         let (issues, stats) = scan(&root);
         assert_eq!(issues, &[] as &[&str]);
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"note": "无域包名录（域包工程未启用）", "packs": 0}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(
+                r#"{"note": "无域包名录（域包工程未启用）", "packs": 0}"#,
+            )
+            .unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want), "缺名录 stats 不一致");
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "缺名录 stats 不一致"
+        );
     }
     // <<< GENERATED
 }

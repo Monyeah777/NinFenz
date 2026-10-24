@@ -33,9 +33,7 @@ const OPERATORS: [&str; 3] = ["AND", "OR", "WITH"];
 
 fn expr_token() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| {
-        regex::Regex::new(r"\(|\)|[A-Za-z0-9.+\-]+").expect("表达式词法正则固定合法")
-    })
+    RE.get_or_init(|| regex::Regex::new(r"\(|\)|[A-Za-z0-9.+\-]+").expect("表达式词法正则固定合法"))
 }
 
 fn ws_re() -> &'static regex::Regex {
@@ -79,7 +77,11 @@ pub fn expression_issue(expr: &str) -> String {
         if ALLOWED.contains(&base) || base.starts_with("LicenseRef-") {
             continue;
         }
-        let mut allowed: Vec<&str> = ALLOWED.iter().copied().filter(|x| *x != UNDECLARED).collect();
+        let mut allowed: Vec<&str> = ALLOWED
+            .iter()
+            .copied()
+            .filter(|x| *x != UNDECLARED)
+            .collect();
         allowed.sort();
         return format!(
             "许可 id 不在词表：{}（允许：{}；或用 `LicenseRef-<自定义>` 显式自造）",
@@ -116,7 +118,9 @@ pub fn parse_index(root: &Path) -> Vec<IndexRow> {
         regex::Regex::new(r"^\|\s*(NF-[A-Za-z0-9\-]+)\s*\|").expect("登记行正则固定合法")
     });
     let path = root.join(INDEX_REL);
-    let Ok(text) = std::fs::read_to_string(&path) else { return Vec::new() };
+    let Ok(text) = std::fs::read_to_string(&path) else {
+        return Vec::new();
+    };
     let mut rows = Vec::new();
     for ln in text.lines() {
         if !row_re.is_match(ln) {
@@ -134,7 +138,11 @@ pub fn parse_index(root: &Path) -> Vec<IndexRow> {
         rows.push(IndexRow {
             id: cells[0].clone(),
             // 真源 `c[5] if len(c) >= 7 else ""` —— 注意是**列数**门槛，不是取值判断
-            license: if cells.len() >= 7 { cells[5].clone() } else { String::new() },
+            license: if cells.len() >= 7 {
+                cells[5].clone()
+            } else {
+                String::new()
+            },
         });
     }
     rows
@@ -248,7 +256,6 @@ pub fn scan(root: &Path) -> LicenseScan {
     LicenseScan { issues, stats }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -296,7 +303,9 @@ mod tests {
     fn build_license_fixture() -> std::path::PathBuf {
         let root = crate::testutil::fixture("license-branches");
         std::fs::create_dir_all(root.join("library")).unwrap();
-        std::fs::write(root.join("library/INDEX.md"), r#"# 馆藏
+        std::fs::write(
+            root.join("library/INDEX.md"),
+            r#"# 馆藏
 
 | 编号 | 标题 | 形态/领域 | 投稿人 | 入库日期 | 许可 | 分级 | 状态 | 一句话 |
 |---|---|---|---|---|---|---|---|---|
@@ -308,22 +317,41 @@ mod tests {
 | NF-6 | 全绿 | t | a | 2026-01-01 | Apache-2.0 | g | active | s |
 | NF-7 | 表达式合法 | t | a | 2026-01-01 | MIT OR Apache-2.0 | g | active | s |
 | NF-8 |
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         for (name, body) in [
-            ("NF-1.md", r#"# x
-"#),
-            ("NF-2.md", r#"# x
-"#),
-            ("NF-3.md", r#"> 许可：未声明
-"#),
-            ("NF-4.md", r#"# x
-"#),
-            ("NF-5.md", r#"> 许可：BSD-3-Clause
-"#),
-            ("NF-6.md", r#"> 许可：Apache-2.0
-"#),
-            ("NF-7.md", r#"# x
-"#),
+            (
+                "NF-1.md", r#"# x
+"#,
+            ),
+            (
+                "NF-2.md", r#"# x
+"#,
+            ),
+            (
+                "NF-3.md",
+                r#"> 许可：未声明
+"#,
+            ),
+            (
+                "NF-4.md", r#"# x
+"#,
+            ),
+            (
+                "NF-5.md",
+                r#"> 许可：BSD-3-Clause
+"#,
+            ),
+            (
+                "NF-6.md",
+                r#"> 许可：Apache-2.0
+"#,
+            ),
+            (
+                "NF-7.md", r#"# x
+"#,
+            ),
         ] {
             std::fs::write(root.join("library").join(name), body).unwrap();
         }
@@ -346,5 +374,4 @@ mod tests {
             .unwrap()
         ));
     }
-
 }

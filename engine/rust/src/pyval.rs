@@ -60,7 +60,13 @@ pub fn str_list(j: Option<&Json>) -> Vec<String> {
 pub fn plain_str(j: &Json) -> String {
     match j {
         Json::Null => "None".into(),
-        Json::Bool(b) => if *b { "True".into() } else { "False".into() },
+        Json::Bool(b) => {
+            if *b {
+                "True".into()
+            } else {
+                "False".into()
+            }
+        }
         Json::Int(i) => i.to_string(),
         Json::Float(f) => crate::pyfloat::repr(*f),
         Json::Str(s) => s.clone(),
@@ -118,7 +124,13 @@ pub fn py_eq(a: &Json, b: &Json) -> bool {
 /// Python `int(x or default)`：**0 是假值**，会落到 default。
 pub fn py_int_or(j: Option<&Json>, default: i64) -> i64 {
     match j {
-        Some(Json::Int(i)) => if *i == 0 { default } else { *i },
+        Some(Json::Int(i)) => {
+            if *i == 0 {
+                default
+            } else {
+                *i
+            }
+        }
         Some(Json::Bool(true)) => 1,
         _ => default,
     }
@@ -182,7 +194,13 @@ fn py_isprintable(c: char) -> bool {
 pub fn py_repr(j: &Json) -> String {
     match j {
         Json::Null => "None".into(),
-        Json::Bool(b) => if *b { "True".into() } else { "False".into() },
+        Json::Bool(b) => {
+            if *b {
+                "True".into()
+            } else {
+                "False".into()
+            }
+        }
         Json::Int(i) => i.to_string(),
         Json::Float(f) => crate::pyfloat::repr(*f),
         Json::Str(s) => format!("'{}'", repr_str(s)),
@@ -217,7 +235,10 @@ mod tests {
         assert_eq!(py_str(Some(&Json::Bool(false))), "");
         // 真值上二者一致
         assert_eq!(plain_str(&Json::Int(7)), py_str(Some(&Json::Int(7))));
-        assert_eq!(plain_str(&Json::Str("x".into())), py_str(Some(&Json::Str("x".into()))));
+        assert_eq!(
+            plain_str(&Json::Str("x".into())),
+            py_str(Some(&Json::Str("x".into())))
+        );
     }
 
     #[test]
@@ -260,8 +281,15 @@ pub fn splitlines_count(s: &str) -> usize {
     let breaks = |c: char| {
         matches!(
             c,
-            '\n' | '\r' | '\u{0b}' | '\u{0c}' | '\u{1c}' | '\u{1d}' | '\u{1e}' | '\u{85}'
-                | '\u{2028}' | '\u{2029}'
+            '\n' | '\r'
+                | '\u{0b}'
+                | '\u{0c}'
+                | '\u{1c}'
+                | '\u{1d}'
+                | '\u{1e}'
+                | '\u{85}'
+                | '\u{2028}'
+                | '\u{2029}'
         )
     };
     let mut n = 0usize;
