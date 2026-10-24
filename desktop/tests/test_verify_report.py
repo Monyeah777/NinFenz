@@ -81,6 +81,12 @@ class BuildTest(unittest.TestCase):
             self.assertNotIn(str(Path(one).resolve()), rendered)
             self.assertNotIn(str(Path(two).resolve()), rendered)
 
+    def test_temporary_roots_are_removed_even_when_canonicalized(self):
+        first = vr._portable({"sample": ["/tmp/checkout-a/docs/x.md"]}, "/tmp/checkout-a")
+        second = vr._portable({"sample": ["/tmp/checkout-b/docs/x.md"]}, "/tmp/checkout-b")
+        self.assertEqual(first, second)
+        self.assertEqual("<root>/docs/x.md", first["sample"][0])
+
 
 class CheckTest(unittest.TestCase):
     def test_missing_report_reports_guidance(self):
