@@ -83,7 +83,7 @@ jobs:
           bash verify.sh --full 2>&1 | tee verify.log
       - name: 上传门禁日志（三平台各留一份；失败时同样上传）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: verify-log-${{ matrix.os }}
           path: |
@@ -101,7 +101,7 @@ jobs:
           python scripts/verify_report.py --check
       - name: 上传门禁报告（三平台各留一份·本 run 结论）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: verification-report-${{ matrix.os }}
           path: .artifacts/verification-report.json
