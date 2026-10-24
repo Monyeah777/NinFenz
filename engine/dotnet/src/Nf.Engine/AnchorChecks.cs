@@ -115,17 +115,17 @@ public static class AnchorChecks
         var fail = 0;
         var err = false;
         void No(string message) { fail++; log.Add("  [FAIL] " + message); err = true; }
-        foreach (var word in new[] { "事实管线", "事实快照", "认知裁剪", "裁剪渲染", "锚点回验" })
+        foreach (var word in new[] { "事实管线", "事实快照", "可见性裁剪", "裁剪渲染", "锚点回验" })
         {
-            if (!Has(root, "06_Agent执行协议.md", word)) No($"06 §4 缺认知层名: {word}");
+            if (!Has(root, "06_Agent执行协议.md", word)) No($"06 §4 缺可见性层名: {word}");
         }
-        foreach (var word in new[] { "视角裁剪", "可见域", "推断域", "隐藏域", "fail", "白描" })
+        foreach (var word in new[] { "可见性裁剪", "可见域", "推断域", "隐藏域", "fail" })
         {
-            if (!Has(root, "04_模块库/通用类/M23_可见性边界.md", word)) No($"M23 缺认知域措辞: {word}");
+            if (!Has(root, "04_模块库/通用类/M23_可见性边界.md", word)) No($"M23 缺可见性域措辞: {word}");
         }
         if (!err)
         {
-            log.Add("  [PASS] 06 §4 认知五步与 M23 认知域措辞语义一致（快照/裁剪/隐藏域/fail/白描）");
+            log.Add("  [PASS] 06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）");
             return new Result(log, 1, 0, 0);
         }
         return new Result(log, 0, fail, 0);
@@ -139,18 +139,18 @@ public static class AnchorChecks
         void No(string message) { fail++; log.Add("  [FAIL] " + message); err = true; }
         foreach (var word in new[]
                  {
-                     "pass:", "warn:", "fail:", "白描", "隐藏域直述", "gate_action", "gate_decision_record",
+                     "pass:", "warn:", "fail:", "gate_action", "gate_decision_record",
                  })
         {
             if (!Has(root, "04_模块库/通用类/M80_输出质检门.md", word)) No($"M80 gate 缺: {word}");
         }
-        foreach (var word in new[] { "pass", "warn", "fail", "隐藏域直述", "白描" })
+        foreach (var word in new[] { "pass", "warn", "fail", "隐藏域直述", "最小可读" })
         {
             if (!Has(root, "06_Agent执行协议.md", word)) No($"06 §5 gate 缺呼应: {word}");
         }
         if (!err)
         {
-            log.Add("  [PASS] M80 gate_action 声明式流水线（pass/warn/fail + 白描降级 + 决策记录）与 06 §5 呼应一致");
+            log.Add("  [PASS] M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致");
             return new Result(log, 1, 0, 0);
         }
         return new Result(log, 0, fail, 0);

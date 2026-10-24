@@ -27,8 +27,8 @@
   "expected": {
    "issues": [],
    "stats": {
-    "declared": 442,
-    "pending": 1,
+    "declared": 443,
+    "pending": 0,
     "registered": 443,
     "used": 443
    }
@@ -1280,7 +1280,8 @@
      "f10_spec_ready": [
       "产业与商业落地:M02"
      ],
-     "factor_spec_conflict": [
+    "faction_event": [],
+    "factor_spec_conflict": [
       "量化金融:M32"
      ],
      "factor_spec_ready": [
@@ -1379,7 +1380,7 @@
      "weather_state": []
     },
     "events_consumed": 430,
-    "events_declared": 442
+    "events_declared": 443
    }
   },
   "files": {},

@@ -7,9 +7,9 @@
  "cases": {
   "workloop_real": {
    "log": [
-    "构建回路：待办 1229 项（未定型字段 86 · advisory 1142）· 适配器 3 · 已拉取候选 ['laya-multilingual'] · stub 工单 WO-2e887a3d069d"
+        "构建回路：待办 1244 项（未定型字段 101 · advisory 1142）· 适配器 3 · 已拉取候选 ['laya-multilingual'] · stub 工单 WO-3860566253c8"
    ],
-   "digest32": "fb09f03eaf08d2aaad0e54098a6b79f4",
+      "digest32": "d579529100e3474ea5b131fc1d204d80",
    "fails": 0
   },
   "workloop_synthetic": {

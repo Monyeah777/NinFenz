@@ -2,14 +2,14 @@
  "schema": "nf-prose-lint-golden/1",
  "generated": "2026-09-27",
  "source": "desktop/src/core/prose_lint.py 原文导入执行（快照内那份），统一渲染规则见探针头",
- "snapshot": "nf-snap-h16",
+ "snapshot": "nf-snap-h17c",
  "digest_rule": "sha256(\"\\n\".join(渲染行))[:32]  ← 与引擎侧摘要同式",
  "cases": {
   "real_command_face": {
    "log": [
-    "[STAT] docs=72 commands_checked=327 cli_commands=102 mcp_tools=10"
+    "[STAT] docs=78 commands_checked=433 cli_commands=109 mcp_tools=12"
    ],
-   "digest32": "fd1f1ccacc0e980f84d87dc99e74fd2d",
+   "digest32": "84c6dcebe29d26231197c1c42468c273",
    "fails": 0
   },
   "synthetic_command_face": {
@@ -17,13 +17,13 @@
     "[FAIL] README.md 命令面：`nf nope` 不是 CLI 子命令（修复指引：核对 scripts/nf.py 注册表改文档，或先实现该命令）",
     "[FAIL] README.md 命令面：not_a_tool 不是已登记 MCP 工具（修复指引：核对 core/mcp_runtime.TOOL_DEFS，工具名与实现须逐名一致）",
     "[FAIL] README.md 命令面：`nf bogus-cmd` 不是 CLI 子命令（修复指引：核对 scripts/nf.py 注册表改文档，或先实现该命令）",
-    "[STAT] docs=2 commands_checked=7 cli_commands=2 mcp_tools=10"
+    "[STAT] docs=2 commands_checked=7 cli_commands=2 mcp_tools=12"
    ],
-   "digest32": "70929b995db28c674b3b2f79dd40d5eb",
+   "digest32": "f49f9632490448f1df6f7afba7d561ce",
    "fails": 3,
    "files_b64": {
     "scripts/nf.py": "IiIi5o6i6ZKI5ZCI5oiQ6K+t5paZ77ya5Y+q5o+Q5L6bIGFkZF9wYXJzZXIg5rOo5YaM5ZCN77yM5L6bIGNvbW1hbmRfZmFjZSDmir3lj5bjgIIiIiIKaW1wb3J0IGFyZ3BhcnNlCgpzdWIgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigpLmFkZF9zdWJwYXJzZXJzKCkKcCA9IHN1Yi5hZGRfcGFyc2VyKCJhc3NlbWJsZSIpCnAgPSBzdWIuYWRkX3BhcnNlcigidmVyaWZ5IikK",
-    "README.md": "IyDlkIjmiJDor63mlpkgwrcg5YWl5Y+j5paH5qGjCgrnlKggYG5mIGFzc2VtYmxlYCDoo4XphY3kuIDkuKrnu4TlkIjljIXjgIIKCueUqCBgbmYgbm9wZWAg5piv5LiN5a2Y5Zyo55qE5a2Q5ZG95Luk77yI5bqU5Yik5Ye677yJ44CCCgpgcmVnaXN0cnlfcXVlcnnvvIhNQ1Ag5bel5YW377yJYCDlnKjlhozvvJtgbm90X2FfdG9vbO+8iE1DUCDlt6XlhbfvvIlgIOS4jeWcqOWGjO+8iOW6lOWIpOWHuu+8ieOAggoKYGBgYmFzaApuZiB2ZXJpZnkgLS1hbGwKbmYgYm9ndXMtY21kCmBgYAo=",
+    "README.md": "IyDlkIjmiJDor63mlpkgwrcg5YWl5Y+j5paH5qGjCgrnlKggYG5mIGFzc2VtYmxlYCDoo4XphY3kuIDkuKrnu4TlkIjljIXjgIIKCueUqCBgbmYgbm9wZWAg5piv5LiN5a2Y5Zyo55qE5a2Q5ZG95Luk77yI5bqU5Yik5Ye677yJ44CCCgpgcmVnaXN0cnlfc2VhcmNo77yITUNQIOW3peWFt++8iWAg5Zyo5YaM77ybYG5vdF9hX3Rvb2zvvIhNQ1Ag5bel5YW377yJYCDkuI3lnKjlhozvvIjlupTliKTlh7rvvInjgIIKCmBgYGJhc2gKbmYgdmVyaWZ5IC0tYWxsCm5mIGJvZ3VzLWNtZApgYGAK",
     "docs/x.md": "IyDlkIjmiJDor63mlpkgwrcgZG9jcyDpnaIKCuaVo+aWh+mHjOWGmSBuZiDkuI3luKblj43lvJXlj7fkuI3nrpflkb3ku6TpnaLvvIjmnKzooYzkuI3or6XooqvliKTvvInjgIIKCmBuZiBhc3NlbWJsZWAg5Zyo5YaM77yI5LiN6K+l6KKr5Yik77yJ44CCCg==",
     "prose_sample.md": "IyDlkIjmiJDor63mlpkgwrcg5q2j5paHIGxpbnQKCuWcqOi/meS4qumXrumimOS4iu+8jOaIkeS7rOmcgOimgeiwqOaFjuOAggoK5oC76ICM6KiA5LmL77yM5oiR5Lus5bqU6K+l57un57ut44CCCgrov5nkuI3mmK/pgJ/luqbpl67popjvvIzogIzmmK/mlrnlkJHpl67popjjgIIKCue7n+etueWFvOmhvuOAgeeos+S4reaxgui/m+OAgei/m+mAgOacieaNruWcsOaOqOi/m+OAggoK6L+Z5piv5LiA5Y+l5Lit5paHLOW4puiLseaWh+mAl+WPt+OAggoK54S26ICM5oOF5Ya15YWI5Y+Y5LqG44CCCgrnhLbogIzml7bpl7Tlj4jkuI3lpJ/jgIIKCuS5n+iuuOWkp+amguaIluiuuOS8vOS5juS7v+S9m+WPr+iDveafkOenjeeoi+W6puS4iu+8jOS6i+aDhei/mOaciei9rOacuuOAggo="
    }

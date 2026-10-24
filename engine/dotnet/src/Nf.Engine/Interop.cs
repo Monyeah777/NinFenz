@@ -50,6 +50,12 @@ public static class Interop
     private static readonly Regex Sha256Re = new(@"^[0-9a-f]{64}$", RegexOptions.CultureInvariant);
     private static readonly Regex ExpectedChecksRe = new(@"^\s*EXPECTED_CHECKS\s*=\s*([0-9]+)", RegexOptions.Multiline);
     private static readonly Regex ExpectedPassRe = new(@"^\s*EXPECTED_PASS\s*=\s*([0-9]+)", RegexOptions.Multiline);
+    private static readonly Regex PinnedRequirementRe = new(
+        @"^([^#=\s]+)\s*==\s*([^#;\\]+)", RegexOptions.CultureInvariant);
+    private static readonly Regex PinnedTomlRe = new(
+        @"""([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^""]+)""", RegexOptions.CultureInvariant);
+    private static readonly Dictionary<string, string> DependencyAliases =
+        new(StringComparer.Ordinal) { ["yaml"] = "pyyaml" };
 
     /// <summary>确定性渲染（键排序 + UTF-8 + LF 尾）——同输入两次调用逐字节一致。</summary>
     public static byte[] Render(string kind, string root)
@@ -987,6 +993,7 @@ public static class Interop
             if (m.Success) nfVersion = m.Groups[1].Value;
         }
         var (hard, soft) = PurityTables.Entries;
+        var pinned = PinnedVersions(root);
 
         var packages = new List<object?>
         {
@@ -1005,27 +1012,31 @@ public static class Interop
         foreach (var (name, why) in hard.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
             var pkg = $"SPDXRef-Dependency-{name}";
-            packages.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+            var package = new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["SPDXID"] = pkg,
                 ["name"] = name,
                 ["downloadLocation"] = "NOASSERTION",
                 ["licenseConcluded"] = "NOASSERTION",
                 ["comment"] = $"硬依赖（登记）：{why}",
-            });
+            };
+            AddPinnedMetadata(package, name, pinned, spdx: true);
+            packages.Add(package);
             deps.Add((pkg, "DEPENDENCY_OF"));
         }
         foreach (var (name, why) in soft.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
             var pkg = $"SPDXRef-Optional-{name}";
-            packages.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+            var package = new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["SPDXID"] = pkg,
                 ["name"] = name,
                 ["downloadLocation"] = "NOASSERTION",
                 ["licenseConcluded"] = "NOASSERTION",
                 ["comment"] = $"软依赖（可选，须 try/except 守卫）：{why}",
-            });
+            };
+            AddPinnedMetadata(package, name, pinned, spdx: true);
+            packages.Add(package);
             deps.Add((pkg, "OPTIONAL_DEPENDENCY_OF"));
         }
 
@@ -1135,6 +1146,7 @@ public static class Interop
     {
         var sbom = Sbom(root);
         var (hard, soft) = PurityTables.Entries;
+        var pinned = PinnedVersions(root);
         var ns = sbom.GetValueOrDefault("documentNamespace") as string ?? "";
         var seed = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(ns))).ToLowerInvariant();
         var serial = $"urn:uuid:{seed[..8]}-{seed[8..12]}-{seed[12..16]}-{seed[16..20]}-{seed[20..32]}";
@@ -1142,19 +1154,23 @@ public static class Interop
         var components = new List<object?>();
         foreach (var (name, why) in hard.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
-            components.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+            var component = new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["type"] = "library", ["bom-ref"] = $"dep:{name}", ["name"] = name,
                 ["scope"] = "required", ["description"] = $"硬依赖（登记）：{why}",
-            });
+            };
+            AddPinnedMetadata(component, name, pinned, spdx: false);
+            components.Add(component);
         }
         foreach (var (name, why) in soft.OrderBy(kv => kv.Key, StringComparer.Ordinal))
         {
-            components.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+            var component = new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["type"] = "library", ["bom-ref"] = $"opt:{name}", ["name"] = name,
                 ["scope"] = "optional", ["description"] = $"软依赖（可选，须守卫）：{why}",
-            });
+            };
+            AddPinnedMetadata(component, name, pinned, spdx: false);
+            components.Add(component);
         }
 
         var packages = (sbom.GetValueOrDefault("packages") as List<object?>) ?? new List<object?>();
@@ -1369,6 +1385,83 @@ public static class Interop
 
     // ------------------------------------------------------------------ 工具
 
+    /// <summary>
+    /// 与 <c>interop_export._pinned_versions</c> 同口径：先读 <c>.github/requirements-*.txt</c>，
+    /// 再由 <c>pyproject.toml</c> 的钉版字符串补齐；只取已声明版本，不猜 latest。
+    /// </summary>
+    private static Dictionary<string, string> PinnedVersions(string root)
+    {
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        var github = Path.Combine(root, ".github");
+        if (Directory.Exists(github))
+        {
+            foreach (var path in Directory.GetFiles(github, "requirements-*.txt")
+                         .OrderBy(p => p, StringComparer.Ordinal))
+            {
+                IEnumerable<string> lines;
+                try
+                {
+                    lines = File.ReadAllLines(path, StrictUtf8);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                foreach (var raw in lines)
+                {
+                    var body = raw.Split('#', 2)[0].Trim();
+                    if (body.Length == 0 || body.StartsWith('-') || !body.Contains("==", StringComparison.Ordinal))
+                        continue;
+                    var match = PinnedRequirementRe.Match(body);
+                    if (!match.Success) continue;
+                    var name = match.Groups[1].Value.Trim().ToLowerInvariant();
+                    var bracket = name.IndexOf('[');
+                    if (bracket >= 0) name = name[..bracket].Trim();
+                    var version = match.Groups[2].Value.Split(';', 2)[0].Trim().TrimEnd('\\').Trim();
+                    if (name.Length > 0 && version.Length > 0) result.TryAdd(name, version);
+                }
+            }
+        }
+
+        // Python 用 tomllib 读取 optional-dependencies。这里提取形如 "pkg==ver" 的 TOML 字符串，
+        // 覆盖项目既有钉版形态，且不会把注释中的示例误当依赖。
+        var pyproject = Path.Combine(root, "pyproject.toml");
+        if (File.Exists(pyproject))
+        {
+            foreach (Match match in PinnedTomlRe.Matches(File.ReadAllText(pyproject, StrictUtf8)))
+            {
+                var name = match.Groups[1].Value.Trim().ToLowerInvariant();
+                var version = match.Groups[2].Value.Trim();
+                if (name.Length > 0 && version.Length > 0) result.TryAdd(name, version);
+            }
+        }
+        return result;
+    }
+
+    private static void AddPinnedMetadata(
+        Dictionary<string, object?> target, string dependency, Dictionary<string, string> pinned, bool spdx)
+    {
+        var lower = dependency.ToLowerInvariant();
+        var project = DependencyAliases.GetValueOrDefault(lower, lower);
+        if (!pinned.TryGetValue(project, out var version) || version.Length == 0) return;
+        if (spdx)
+        {
+            target["versionInfo"] = version;
+            target["externalRefs"] = new List<object?>
+            {
+                new Dictionary<string, object?>(StringComparer.Ordinal)
+                {
+                    ["referenceCategory"] = "PACKAGE-MANAGER",
+                    ["referenceType"] = "purl",
+                    ["referenceLocator"] = $"pkg:pypi/{project}@{version}",
+                },
+            };
+            return;
+        }
+        target["version"] = version;
+        target["purl"] = $"pkg:pypi/{project}@{version}";
+    }
+
     /// <summary>仓内声明日期的最大值（YYYY-MM-DD）；取不到返回空串。</summary>
     public static string DeclaredMaxDate(string root)
     {
@@ -1449,6 +1542,8 @@ public static class PurityTables
         {
             ["jsonschema"] = "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
             ["PySide6"] = "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+            ["nf_pyengine"] = "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；" +
+                              "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
             ["laya"] = "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
         });
 }

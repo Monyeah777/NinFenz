@@ -26,7 +26,7 @@ _SIBLING: Path = ENGINE.parent
 RECORDS_DIR: str = os.environ.get("NF_RECORDS_DIR") or str(_SIBLING)
 #: 金标基线快照。**第一百二十一片复基线**：真源前移到 348577d 后，基线从 `nf-snap-h5` 移到 `nf-snap-h7`
 #: （h5 留作「上一版基线」，用于语料身份/漂移归因的对照）。
-SNAP: str = os.environ.get("NF_SNAPSHOT") or str(_SIBLING / "nf-snap-h16")
+SNAP: str = os.environ.get("NF_SNAPSHOT") or str(_SIBLING / "nf-snap-h18")
 SNAP_OTHER: str = os.environ.get("NF_SNAPSHOT_OTHER") or str(_SIBLING / "nf-snap-h5")
 ENGINE_ROOT: str = str(ENGINE)
 FIXTURES: Path = ENGINE / "probes" / "_fixtures"

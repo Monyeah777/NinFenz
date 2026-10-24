@@ -2,7 +2,7 @@
  "schema": "nf-shell-check-golden/1",
  "generated": "2026-09-27",
  "source": "verify.sh 抽出 check1/check7 函数本体 + 真源同款 ok/no/wn 助手，交 bash.exe 执行",
- "snapshot": "nf-snap-h5",
+ "snapshot": "nf-snap-h17c",
  "digest_rule": "sha256(\"\\n\".join(仅 [PASS]/[FAIL]/[WARN] 行))[:32]",
  "cases": {
   "real": {
@@ -19,7 +19,7 @@
   },
   "synthetic_empty": {
    "bash_exit": 0,
-   "digest32": "08f7cdb2594f9e67398c311d963a736e",
+   "digest32": "8cb8349d89842fb7a35f3d0b2ed74826",
    "pass": 1,
    "fail": 24,
    "warn": 2,
@@ -56,7 +56,7 @@
   },
   "synthetic_mismatch": {
    "bash_exit": 0,
-   "digest32": "2f82352292fd37d8be2467cf4c657a0d",
+   "digest32": "e1db73b8b1f4e4d916711f7790245e76",
    "pass": 0,
    "fail": 28,
    "warn": 0,

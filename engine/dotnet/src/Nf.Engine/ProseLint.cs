@@ -51,6 +51,8 @@ public static class ProseLint
     private static readonly Regex NfCallRe = new("\\b(?:nf|nf\\.py)\\s+([a-z][a-z0-9-]*)", RegexOptions.Compiled);
     private static readonly Regex McpToolMentionRe = new("([a-z][a-z0-9_]{2,})（MCP 工具）", RegexOptions.Compiled);
     private static readonly Regex NfAddParserRe = new("sub\\.add_parser\\(\\s*\"([a-z0-9-]+)\"", RegexOptions.Compiled);
+    private static readonly Regex NfAliasesRe = new("aliases\\s*=\\s*\\[([^\\]]*)\\]", RegexOptions.Compiled);
+    private static readonly Regex QuotedNameRe = new("\"([a-z0-9-]+)\"", RegexOptions.Compiled);
 
     public const string CustomAsset = "05_资产库/用户自定义/PROSE_LINT.md";
 
@@ -226,6 +228,10 @@ public static class ProseLint
         if (!File.Exists(path)) return result;
         var text = File.ReadAllText(path, new UTF8Encoding(false));
         foreach (Match m in NfAddParserRe.Matches(text)) result.Add(m.Groups[1].Value);
+        foreach (Match group in NfAliasesRe.Matches(text))
+        {
+            foreach (Match m in QuotedNameRe.Matches(group.Groups[1].Value)) result.Add(m.Groups[1].Value);
+        }
         return result;
     }
 

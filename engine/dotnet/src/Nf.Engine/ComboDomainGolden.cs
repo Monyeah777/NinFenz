@@ -29,7 +29,7 @@ public static class ComboDomainGolden
      ""triples"": 400,
      ""triples_legal"": 400
     },
-    ""declared_certificates"": 17
+    ""declared_certificates"": 18
    }
   },
   ""files"": {},

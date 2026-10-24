@@ -23,7 +23,7 @@
 param(
   [string]$Engine   = $PSScriptRoot,
   # 默认值**不写死机器路径**（第一百一十九片）：环境变量优先，缺省取「引擎工作区上一级的同级快照」
-  [string]$Snap     = $(if ($env:NF_SNAPSHOT) { $env:NF_SNAPSHOT } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'nf-snap-h16' }),
+  [string]$Snap     = $(if ($env:NF_SNAPSHOT) { $env:NF_SNAPSHOT } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'nf-snap-h18' }),
   [string]$Other    = $(if ($env:NF_SNAPSHOT_OTHER) { $env:NF_SNAPSHOT_OTHER } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'nf-snap-h5' }),
   [string]$Cli      = '',
   [string]$Parity   = '',

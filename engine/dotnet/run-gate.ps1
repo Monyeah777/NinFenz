@@ -22,7 +22,7 @@ param(
     # 自第八十六片起：导出态断金标摘要，工作区态（带 .git）断语义不变量——两种根都能跑，但**默认**取快照。
     # 要对着当前工作区体检：`run-gate.ps1 -Root <你的仓库路径>`
     # 默认值**不写死机器路径**（第一百一十九片）：可用 NF_SNAPSHOT 环境变量覆盖，缺省取「本脚本上一级的 nf-snap-h5」。
-    [string]$Root = $(if ($env:NF_SNAPSHOT) { $env:NF_SNAPSHOT } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'nf-snap-h16' }),
+    [string]$Root = $(if ($env:NF_SNAPSHOT) { $env:NF_SNAPSHOT } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'nf-snap-h18' }),
     # 默认 CLI = **源码构建产物**（`dotnet build` 后永远最新）。旧默认指向最早的那个 dist 目录
     # （`dist/nf-dotnet-win-x64`，聚合 10 件 / 自检 18 例的老二进制），会把门跑成「老引擎 PASS」的假象。
     # 要验**交付形态**，显式指到当片产物：`-Cli <…/dist/nf-dotnet-<rid>-fNN-<日期>/nf-dotnet[.exe]>`

@@ -87,7 +87,11 @@ def extract_function(text: str, name: str) -> str:
 
 
 def build_harness(functions: list, names: list) -> str:
-    body = "".join(extract_function(f, n) + "\n" for n, f in zip(names, functions))
+    verify = functions[0]
+    decl_users = {"check1", "check2", "check3", "check4", "check5"}
+    helpers = ["_decl_check"] if decl_users.intersection(names) else []
+    body = "".join(extract_function(verify, n) + "\n" for n in helpers)
+    body += "".join(extract_function(f, n) + "\n" for n, f in zip(names, functions))
     tail = "; ".join(names) + '; printf "COUNTS=%s/%s/%s\\n" "$PASS" "$FAIL" "$WARN"\n'
     return HELPERS + body + tail
 
@@ -190,7 +194,8 @@ def main() -> int:
             "cases": results,
         }
         fixture_path.parent.mkdir(parents=True, exist_ok=True)
-        fixture_path.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        fixture_path.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
+                                encoding="utf-8", newline="\n")
         print(f"已写金标向量：{fixture_path}")
     else:
         if not fixture_path.exists():
