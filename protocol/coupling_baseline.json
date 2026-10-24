@@ -497,9 +497,9 @@
       "i": 0.2222
     },
     "ingest_common": {
-      "ca": 0,
+      "ca": 1,
       "ce": 2,
-      "i": 1.0
+      "i": 0.6667
     },
     "injection_budget": {
       "ca": 1,
@@ -525,6 +525,11 @@
       "ca": 0,
       "ce": 0,
       "i": 0.0
+    },
+    "intake_quota": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
     },
     "intake_surface": {
       "ca": 1,
@@ -572,9 +577,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 74,
+      "ca": 75,
       "ce": 1,
-      "i": 0.0133
+      "i": 0.0132
     },
     "json_schema": {
       "ca": 5,

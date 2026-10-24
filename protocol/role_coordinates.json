@@ -5,7 +5,7 @@
     "floor": 5,
     "prod": 1041,
     "projection": 130,
-    "support": 249,
+    "support": 251,
     "verify": 958
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -10955,7 +10955,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[cfg(unix)]",
       "path": "engine/rust/src/serve.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -12036,10 +12036,10 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "874ff2fb4f6ee8899489324c1bf968d815ba075dc9814153b340bbe249ca6dcb",
+  "root_digest": "8e8c76fafb6c608d7d75f322a267839e45e0b1b07a2257d1d9fc2660b3fc49ca",
   "rule_counts": {
     "R-app": 1450,
-    "R-catch": 107,
+    "R-catch": 109,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,

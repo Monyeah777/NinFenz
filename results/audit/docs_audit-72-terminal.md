@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:37c4486281a7ba74eca28079fa4198d3cfb484457259996a082dc0c629edddef
-  - scripts/nf.py:0547b6270060eb99ad6de8c14e55e90470dcfb22ad40c26a601ef4ab64d976db
+  - scripts/nf.py:5ba981e617eb15a49119387b2c2a40f8f13542b34fc32b7878c50e49416937d0
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:5e09824dc5c31ccdf7aaa70f7bf15720f3a6ac902adea6b754ed29f85e4fd53c
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-10-24）：夜间收口：Rust worker 安全、投稿配额、元数据、schema 与 postmortem 跨平台回执路径修复后按新输入重绑
+
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno

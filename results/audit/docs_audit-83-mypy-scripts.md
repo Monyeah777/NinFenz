@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:0547b6270060eb99ad6de8c14e55e90470dcfb22ad40c26a601ef4ab64d976db
+  - scripts/nf.py:5ba981e617eb15a49119387b2c2a40f8f13542b34fc32b7878c50e49416937d0
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:e0d4a06c15d597a2e306715313de90cf07af0de6cc54c4aa987ed0926b69c03a
+  - protocol/code_metrics_baseline.json:49b30ec5ebc4f52326b2e32a1fd84802841462cae11ddc472e2e4a6f5766a31c
 ---
+> 重审（2026-10-24）：夜间收口：Rust worker 安全、投稿配额、元数据、schema 与 postmortem 跨平台回执路径修复后按新输入重绑
+
+> 重审（2026-10-24）：夜间收口：Rust worker 安全、投稿配额、元数据与 schema 修复后按新输入重绑
+
 > 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
 
 > 重审（2026-10-24）：DOC-004 收口：协议回执纳入 closed 复盘件，修复 closed 状态无法满足锚定判据的循环

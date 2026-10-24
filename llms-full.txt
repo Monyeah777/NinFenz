@@ -82,7 +82,7 @@ English: NinFenz (NF) is a content contract layer: a protocol plus deterministic
     pattern_read / asset_list / asset_read / module_read / pipeline_read，以及装载引导 prompt assemble_guide。
 
 前置：Python >= 3.11（核心纯标准库，无 pip 依赖）；Node >= 18.17（仅 npx 免 clone 路径需要）。
-npm 包已发布：ninfenz v1.0.5（npmjs.com，2907 文件 / 解包 23.01 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
+npm 包已发布：ninfenz v1.0.5（npmjs.com，2913 文件 / 解包 23.05 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing）——npx -y ninfenz doctor 与 npx -y ninfenz tui 免 clone 可用；本机 npm 若指向尚未同步的国内镜像，加 --registry https://registry.npmjs.org。
 
 ## 五、术语表（对齐实体，供生成式引擎消歧）
 

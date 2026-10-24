@@ -9,11 +9,13 @@ subjects:
   - desktop/src/core/execution_drill.py:61337ffd5f93bca3cc2519e0f84c9f02f15d44c55ee74ed14acadc63538dd48b
   - desktop/src/core/drill_fidelity.py:a53d9366287ab64431787b2d5b389c3179f22b0cd6c0ca7a091cb86ac07ae190
   - desktop/tests/fixtures/execution/p07_en_drill_cases.json:0fea6393ea0cbaf089e0499dd59364ca10f5f51c0ef9080cf34a747cafde9bb7
-  - engine/rust/src/drill_fidelity.rs:ed1c1112691cab67646cc81a9457e548c1a1c2c10fdfe879fe863ad7e11b75db
+  - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:e0d4a06c15d597a2e306715313de90cf07af0de6cc54c4aa987ed0926b69c03a
+  - protocol/code_metrics_baseline.json:49b30ec5ebc4f52326b2e32a1fd84802841462cae11ddc472e2e4a6f5766a31c
 ---
+> 重审（2026-10-24）：夜间收口：Rust worker 安全、投稿配额、元数据与 schema 修复后按新输入重绑
+
 > 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
 
 > 重审（2026-10-24）：DOC-004 收口：协议回执纳入 closed 复盘件，修复 closed 状态无法满足锚定判据的循环
