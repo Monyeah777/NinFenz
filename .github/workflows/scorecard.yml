@@ -50,6 +50,25 @@ jobs:
           name: scorecard-sarif
           path: results.sarif
           retention-days: 5
+      - name: 上传到代码扫描（Security 页可见）
+        uses: github/codeql-action/upload-sarif@1190a975f95ce23525efb6a3fc21ea29567c1b52  # v3
+        with:
+          sarif_file: results.sarif
+
+  summary:
+    name: scorecard-summary
+    needs: analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: 下载 SARIF
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: scorecard-sarif
+          path: scorecard-artifact
       - name: 生成可追溯运行摘要
         # 摘要只记录本次平台运行的事实。不得提交为静态基线，也不得把空结果
         # 解释成“无风险”；发布负责人如需归档，另按 commit/run 留存。
@@ -65,7 +84,7 @@ jobs:
           import os
           from pathlib import Path
 
-          sarif = Path("results.sarif")
+          sarif = Path("scorecard-artifact/results.sarif")
           try:
               runs = json.loads(sarif.read_text(encoding="utf-8")).get("runs", [])
               result_count = sum(len(run.get("results", [])) for run in runs)
@@ -93,7 +112,3 @@ jobs:
           name: scorecard-summary
           path: scorecard-summary.json
           retention-days: 30
-      - name: 上传到代码扫描（Security 页可见）
-        uses: github/codeql-action/upload-sarif@1190a975f95ce23525efb6a3fc21ea29567c1b52  # v3
-        with:
-          sarif_file: results.sarif
