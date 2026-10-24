@@ -7,12 +7,10 @@ import argparse
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import atomic_write  # noqa: E402
-
 
 SOURCE = ROOT / "site" / "llms-full.txt"
 TARGET = ROOT / "llms-full.txt"

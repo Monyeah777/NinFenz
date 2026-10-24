@@ -10,7 +10,6 @@ import urllib.error
 from pathlib import Path
 from unittest import mock
 
-
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 sys.path.insert(0, str(ROOT / ".github" / "scripts"))
@@ -57,9 +56,11 @@ class GiteeDiagnosticsTest(unittest.TestCase):
             {},
             io.BytesIO(b'{"message":"bad token secret-value"}'),
         )
-        with mock.patch.object(self.bot.urllib.request, "urlopen", side_effect=err):
-            with self.assertRaises(self.bot.GiteeAPIError) as caught:
-                self.bot.gitee_api("/repos/x/issues")
+        with (
+            mock.patch.object(self.bot.urllib.request, "urlopen", side_effect=err),
+            self.assertRaises(self.bot.GiteeAPIError) as caught,
+        ):
+            self.bot.gitee_api("/repos/x/issues")
         exc = caught.exception
         self.assertEqual("forbidden", exc.category)
         self.assertEqual(403, exc.status)
@@ -68,19 +69,23 @@ class GiteeDiagnosticsTest(unittest.TestCase):
         self.assertNotIn("secret-value", rendered)
 
     def test_transport_error_is_network_category(self) -> None:
-        with mock.patch.object(
-            self.bot.urllib.request,
-            "urlopen",
-            side_effect=urllib.error.URLError("offline"),
+        with (
+            mock.patch.object(
+                self.bot.urllib.request,
+                "urlopen",
+                side_effect=urllib.error.URLError("offline"),
+            ),
+            self.assertRaises(self.bot.GiteeAPIError) as caught,
         ):
-            with self.assertRaises(self.bot.GiteeAPIError) as caught:
-                self.bot.gitee_api("/repos/x/issues")
+            self.bot.gitee_api("/repos/x/issues")
         self.assertEqual("network_error", caught.exception.category)
 
     def test_unexpected_payload_shape_fails_closed(self) -> None:
-        with mock.patch.object(self.bot, "gitee_api", return_value={"message": "changed"}):
-            with self.assertRaises(self.bot.GiteeAPIError) as caught:
-                self.bot.fetch_open_submissions()
+        with (
+            mock.patch.object(self.bot, "gitee_api", return_value={"message": "changed"}),
+            self.assertRaises(self.bot.GiteeAPIError) as caught,
+        ):
+            self.bot.fetch_open_submissions()
         self.assertEqual("response_shape", caught.exception.category)
 
     def test_missing_token_is_explicit(self) -> None:

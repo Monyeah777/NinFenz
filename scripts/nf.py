@@ -4355,7 +4355,7 @@ def _cmd_postmortem(args):
                       % args.path, 1)
         issues, actions = [], 0
         for one in matched:
-            rel = os.path.relpath(one, ROOT)
+            rel = os.path.relpath(one, ROOT).replace(os.sep, "/")
             i_one, st_one = pm.check_doc(ROOT, rel)
             issues += ["%s：%s" % (rel, i) for i in i_one]
             actions += int((st_one or {}).get("actions", 0) or 0)

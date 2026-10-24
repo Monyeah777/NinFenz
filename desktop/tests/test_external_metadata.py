@@ -54,7 +54,10 @@ class ExternalMetadataTests(unittest.TestCase):
     def test_root_llms_full_matches_site_source(self):
         sync = _load_sync_module()
         self.assertTrue(sync.synchronized())
-        self.assertEqual((ROOT / "llms-full.txt").read_bytes(), (ROOT / "site/llms-full.txt").read_bytes())
+        self.assertEqual(
+            (ROOT / "llms-full.txt").read_bytes(),
+            (ROOT / "site/llms-full.txt").read_bytes(),
+        )
 
     def test_sync_write_is_idempotent_and_check_detects_drift(self):
         sync = _load_sync_module()
