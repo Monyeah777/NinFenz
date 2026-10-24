@@ -450,6 +450,8 @@ class GuidancePathReachabilityTest(unittest.TestCase):
             if not _looks_like_rel_path(tok, self.tops):
                 continue
             cand = tok.split("::", 1)[0]
+            if _is_exempt(cand):
+                continue
             if not _repo_path_exists(cand):
                 bad.append(cand)
         return bad

@@ -1001,7 +1001,7 @@
       "max_fn_lines": 78
     },
     "desktop/src/core/repo_face.py": {
-      "lines": 101,
+      "lines": 130,
       "max_fn_cc": 11,
       "max_fn_lines": 29
     },
@@ -1056,7 +1056,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 457,
+      "lines": 461,
       "max_fn_cc": 19,
       "max_fn_lines": 35
     },
@@ -1251,9 +1251,9 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 204,
+      "lines": 223,
       "max_fn_cc": 10,
-      "max_fn_lines": 26
+      "max_fn_lines": 27
     },
     "desktop/src/core/watch.py": {
       "lines": 348,
