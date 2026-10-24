@@ -61,7 +61,10 @@ pub fn load_equity_curve(path: &Path) -> Result<Json, String> {
         if !cols.iter().any(|c| c == need) {
             // 真源是 `sorted(cols)` 的 **Python 列表 repr**（单引号）：`['date', 'value']`
             let shown = crate::pyval::py_repr_list(
-                &cols.iter().map(|c| Json::Str(c.clone())).collect::<Vec<_>>(),
+                &cols
+                    .iter()
+                    .map(|c| Json::Str(c.clone()))
+                    .collect::<Vec<_>>(),
             );
             return Err(format!("缺列 {}（实际列：{}）", need, shown));
         }
@@ -106,7 +109,10 @@ pub fn load_equity_curve(path: &Path) -> Result<Json, String> {
             "dates".to_string(),
             Json::Array(dates.into_iter().map(Json::Str).collect()),
         ),
-        ("equity".to_string(), Json::Array(equity.into_iter().map(Json::Float).collect())),
+        (
+            "equity".to_string(),
+            Json::Array(equity.into_iter().map(Json::Float).collect()),
+        ),
         (
             "benchmark".to_string(),
             if has_bench {
@@ -137,12 +143,16 @@ fn nums(series: &Json, key: &str) -> Vec<f64> {
 
 /// 真源 `simple_returns`。
 pub fn simple_returns(prices: &[f64]) -> Vec<f64> {
-    (1..prices.len()).map(|i| prices[i] / prices[i - 1] - 1.0).collect()
+    (1..prices.len())
+        .map(|i| prices[i] / prices[i - 1] - 1.0)
+        .collect()
 }
 
 /// 真源 `log_returns`。
 pub fn log_returns(prices: &[f64]) -> Vec<f64> {
-    (1..prices.len()).map(|i| (prices[i] / prices[i - 1]).ln()).collect()
+    (1..prices.len())
+        .map(|i| (prices[i] / prices[i - 1]).ln())
+        .collect()
 }
 
 /// 真源 `returns(prices, kind)`。
@@ -264,7 +274,11 @@ pub fn information_ratio(rets: &[f64], bench: &[f64], af: i64) -> f64 {
 /// 真源 `_rank`（平均秩，并列取平均）。
 pub fn rank(xs: &[f64]) -> Vec<f64> {
     let mut order: Vec<usize> = (0..xs.len()).collect();
-    order.sort_by(|a, b| xs[*a].partial_cmp(&xs[*b]).unwrap_or(std::cmp::Ordering::Equal));
+    order.sort_by(|a, b| {
+        xs[*a]
+            .partial_cmp(&xs[*b])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     let mut ranks = vec![0.0; xs.len()];
     let mut i = 0usize;
     while i < order.len() {
@@ -316,7 +330,9 @@ pub fn turnover(weights: &[Vec<f64>], single_side: bool) -> Vec<f64> {
     let mut out = Vec::new();
     for i in 1..weights.len() {
         let m = weights[i].len().min(weights[i - 1].len());
-        let gross: f64 = (0..m).map(|j| (weights[i][j] - weights[i - 1][j]).abs()).sum();
+        let gross: f64 = (0..m)
+            .map(|j| (weights[i][j] - weights[i - 1][j]).abs())
+            .sum();
         out.push(if single_side { gross / 2.0 } else { gross });
     }
     out
@@ -330,7 +346,10 @@ fn block(prices: &[f64], af: i64, rf: f64, kind: &str) -> Result<Json, String> {
     Ok(Json::Object(vec![
         ("cumulative".to_string(), r6(cumulative_return(prices))),
         ("annualized".to_string(), r6(ann)),
-        ("volatility_annualized".to_string(), r6(annualized_volatility(&rets, af))),
+        (
+            "volatility_annualized".to_string(),
+            r6(annualized_volatility(&rets, af)),
+        ),
         ("sharpe".to_string(), r6(sharpe(&rets, rf, af))),
         ("max_drawdown".to_string(), r6(mdd)),
         ("calmar".to_string(), r6(calmar(ann, mdd))),
@@ -377,7 +396,10 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
             keys.sort();
             // 真源是 `sorted(ANNUAL_FACTORS)` 的 **Python 列表 repr**（单引号）
             let shown = crate::pyval::py_repr_list(
-                &keys.iter().map(|k| Json::Str(k.to_string())).collect::<Vec<_>>(),
+                &keys
+                    .iter()
+                    .map(|k| Json::Str(k.to_string()))
+                    .collect::<Vec<_>>(),
             );
             return Err(format!(
                 "频率须在 {} 中，实为 {}",
@@ -404,7 +426,11 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
     let rf_txt = crate::pyfloat::repr(rn(rf));
     let fee_txt = crate::pyfloat::repr(rn(fee));
     let slip_txt = crate::pyfloat::repr(rn(slip));
-    let effective_as_of = if as_of.is_empty() { period_end.clone() } else { as_of.clone() };
+    let effective_as_of = if as_of.is_empty() {
+        period_end.clone()
+    } else {
+        as_of.clone()
+    };
     // ⚠️ `benchmark` / `excess` 先在占位处写 `null`，真有值时**必须覆盖**（真源是
     // `doc["benchmark"] = {...}`）。append 会让同一份 JSON 出现**两个同名键**——
     // 实测（2026-10-04）由此整份报告对不上。
@@ -473,7 +499,11 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
     if has_bench {
         let mut bblock: Vec<(String, Json)> = vec![(
             "id".to_string(),
-            Json::Str(if benchmark_id.is_empty() { "UNSPECIFIED".to_string() } else { benchmark_id }),
+            Json::Str(if benchmark_id.is_empty() {
+                "UNSPECIFIED".to_string()
+            } else {
+                benchmark_id
+            }),
         )];
         if let Json::Object(o) = block(&bench, af, rf, &return_basis)? {
             bblock.extend(o);
@@ -490,8 +520,14 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
             "excess",
             Json::Object(vec![
                 ("annualized".to_string(), r6(gross_ann - bench_ann)),
-                ("tracking_error".to_string(), r6(tracking_error(&rets, &brets, af))),
-                ("information_ratio".to_string(), r6(information_ratio(&rets, &brets, af))),
+                (
+                    "tracking_error".to_string(),
+                    r6(tracking_error(&rets, &brets, af)),
+                ),
+                (
+                    "information_ratio".to_string(),
+                    r6(information_ratio(&rets, &brets, af)),
+                ),
             ]),
         );
     }
@@ -682,36 +718,54 @@ mod tests {
     /// 「读不到 good.csv」而不是红在真问题上。现在改用 `testutil::fixture`（带进程号 +
     /// 序号，天然并发隔离）建唯一目录后写入 ⇒ 不依赖生成器跑过，也不把生成物塞进仓库。
     const QUANT_FIX_FILES: [(&str, &str); 6] = [
-        (r#"good.csv"#, r#"date,equity,benchmark
+        (
+            r#"good.csv"#,
+            r#"date,equity,benchmark
 2026-01-01,1.00,1.00
 2026-01-02,1.02,1.01
 2026-01-03,1.01,1.005
 2026-01-04,1.05,1.02
 2026-01-05,1.03,1.015
-"#),
-        (r#"nobench.csv"#, r#"date,equity
+"#,
+        ),
+        (
+            r#"nobench.csv"#,
+            r#"date,equity
 2026-01-01,1.00
 2026-01-02,0.98
 2026-01-03,1.04
 2026-01-04,1.02
-"#),
-        (r#"badcol.csv"#, r#"date,value
+"#,
+        ),
+        (
+            r#"badcol.csv"#,
+            r#"date,value
 2026-01-01,1.00
-"#),
-        (r#"short.csv"#, r#"date,equity
+"#,
+        ),
+        (
+            r#"short.csv"#,
+            r#"date,equity
 2026-01-01,1.00
 2026-01-02,1.01
-"#),
-        (r#"nonpos.csv"#, r#"date,equity
+"#,
+        ),
+        (
+            r#"nonpos.csv"#,
+            r#"date,equity
 2026-01-01,1.00
 2026-01-02,0.00
 2026-01-03,1.02
-"#),
-        (r#"badnum.csv"#, r#"date,equity
+"#,
+        ),
+        (
+            r#"badnum.csv"#,
+            r#"date,equity
 2026-01-01,1.00
 2026-01-02,abc
 2026-01-03,1.02
-"#),
+"#,
+        ),
     ];
 
     fn quant_fixture_dir() -> std::path::PathBuf {
@@ -727,9 +781,12 @@ mod tests {
     #[test]
     fn quant_metrics_matches_truth_source_over_corpus() {
         let root = crate::testutil::repo_root();
-        let cases: &[(&str, &str, &str, &str)] = &[
-        (r#"量化金融域包"#, r#"community/量化金融域包/outputs/samples/EQUITY_CURVE.csv"#, r#"{"as_of": "2026-08-21", "benchmark_id": "NF-SAMPLE-INDEX", "cost_bps_fee": 3.0, "cost_bps_slippage": 5.0, "currency": "CNY", "fill_rule": "next_open", "frequency": "daily", "period_end": "2026-08-21", "period_start": "2026-06-01", "return_basis": "simple", "risk_free_rate_annual": 0.015, "single_side_turnover": true}"#, r#"{"annual_factor": 252, "as_of": "2026-08-21", "benchmark": {"annualized": 0.143635, "calmar": 8.516894, "cumulative": 0.031922, "id": "NF-SAMPLE-INDEX", "max_drawdown": 0.016865, "sharpe": 6.473536, "volatility_annualized": 0.018464}, "costs": {"fee_bps": 3.0, "fill_rule": "next_open", "slippage_bps": 5.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.015", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=3.0 bps, slippage=5.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.190837, "information_ratio": 8.40542, "tracking_error": 0.018409}, "frequency": "daily", "gross": {"annualized": 0.334472, "calmar": 15.541439, "cumulative": 0.069888, "max_drawdown": 0.021521, "sharpe": 9.049606, "volatility_annualized": 0.030307}, "kind": "nf-performance/1", "period": {"end": "2026-08-21", "observations": 60, "start": "2026-06-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.015}"#),
-        ];
+        let cases: &[(&str, &str, &str, &str)] = &[(
+            r#"量化金融域包"#,
+            r#"community/量化金融域包/outputs/samples/EQUITY_CURVE.csv"#,
+            r#"{"as_of": "2026-08-21", "benchmark_id": "NF-SAMPLE-INDEX", "cost_bps_fee": 3.0, "cost_bps_slippage": 5.0, "currency": "CNY", "fill_rule": "next_open", "frequency": "daily", "period_end": "2026-08-21", "period_start": "2026-06-01", "return_basis": "simple", "risk_free_rate_annual": 0.015, "single_side_turnover": true}"#,
+            r#"{"annual_factor": 252, "as_of": "2026-08-21", "benchmark": {"annualized": 0.143635, "calmar": 8.516894, "cumulative": 0.031922, "id": "NF-SAMPLE-INDEX", "max_drawdown": 0.016865, "sharpe": 6.473536, "volatility_annualized": 0.018464}, "costs": {"fee_bps": 3.0, "fill_rule": "next_open", "slippage_bps": 5.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.015", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=3.0 bps, slippage=5.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.190837, "information_ratio": 8.40542, "tracking_error": 0.018409}, "frequency": "daily", "gross": {"annualized": 0.334472, "calmar": 15.541439, "cumulative": 0.069888, "max_drawdown": 0.021521, "sharpe": 9.049606, "volatility_annualized": 0.030307}, "kind": "nf-performance/1", "period": {"end": "2026-08-21", "observations": 60, "start": "2026-06-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.015}"#,
+        )];
         let mut ok = 0usize;
         for (pkg, src, params_s, want_s) in cases {
             let series = load_equity_curve(&root.join(src))
@@ -765,12 +822,18 @@ mod tests {
         // 夹具**运行期**重建（`target/` 是 gitignore 生成物，干净检出/CI 上没有）。
         let fix = quant_fixture_dir();
         let cases: &[(&str, &str)] = &[
-        (r#"good.csv"#, r#""#),
-        (r#"nobench.csv"#, r#""#),
-        (r#"badcol.csv"#, r#"缺列 equity（实际列：['date', 'value']）"#),
-        (r#"short.csv"#, r#"样本过短（< 3 个净值点）"#),
-        (r#"nonpos.csv"#, r#"净值须为正数（口径：净值序列，非累计收益）"#),
-        (r#"badnum.csv"#, r#"第 3 行数值不可解析"#),
+            (r#"good.csv"#, r#""#),
+            (r#"nobench.csv"#, r#""#),
+            (
+                r#"badcol.csv"#,
+                r#"缺列 equity（实际列：['date', 'value']）"#,
+            ),
+            (r#"short.csv"#, r#"样本过短（< 3 个净值点）"#),
+            (
+                r#"nonpos.csv"#,
+                r#"净值须为正数（口径：净值序列，非累计收益）"#,
+            ),
+            (r#"badnum.csv"#, r#"第 3 行数值不可解析"#),
         ];
         for (name, err) in cases {
             let got = load_equity_curve(&fix.join(name));
@@ -793,12 +856,36 @@ mod tests {
         let fix = quant_fixture_dir();
         let series = load_equity_curve(&fix.join("good.csv")).expect("读 good.csv");
         let cases: &[(&str, &str, &str)] = &[
-        (r#"默认"#, r#"{"period_end": "2026-01-05", "period_start": "2026-01-01"}"#, r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 5.842306, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.516079, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#),
-        (r#"基准"#, r#"{"benchmark_id": "CSI300", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#, r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "CSI300", "max_drawdown": 0.00495, "sharpe": 5.842306, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.516079, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#),
-        (r#"log 口径"#, r#"{"period_end": "2026-01-05", "period_start": "2026-01-01", "return_basis": "log"}"#, r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 5.795338, "volatility_annualized": 0.161851}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = log；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.460144, "tracking_error": 0.267105}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.382818, "volatility_annualized": 0.424887}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "log", "risk_free_rate_annual": 0.0}"#),
-        (r#"周频"#, r#"{"frequency": "weekly", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#, r#"{"annual_factor": 52, "as_of": "2026-01-05", "benchmark": {"annualized": 0.213552, "calmar": 43.137594, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 2.653907, "volatility_annualized": 0.073834}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 52（weekly）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.254982, "information_ratio": 1.658705, "tracking_error": 0.122887}, "frequency": "weekly", "gross": {"annualized": 0.468534, "calmar": 24.59802, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 2.051459, "volatility_annualized": 0.194877}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#),
-        (r#"月频"#, r#"{"benchmark_id": "B1", "frequency": "monthly", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#, r#"{"annual_factor": 12, "as_of": "2026-01-05", "benchmark": {"annualized": 0.045678, "calmar": 9.227032, "cumulative": 0.015, "id": "B1", "max_drawdown": 0.00495, "sharpe": 1.274896, "volatility_annualized": 0.035469}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 12（monthly）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.047049, "information_ratio": 0.796816, "tracking_error": 0.059033}, "frequency": "monthly", "gross": {"annualized": 0.092727, "calmar": 4.868167, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 0.985489, "volatility_annualized": 0.093616}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#),
-        (r#"非默认参数"#, r#"{"as_of": "2026-02-01", "benchmark_id": "SPX", "cost_bps_fee": 8.5, "cost_bps_slippage": 3.25, "currency": "USD", "fill_rule": "close", "period_end": "2026-01-05", "period_start": "2026-01-01", "risk_free_rate_annual": 0.03, "single_side_turnover": false}"#, r#"{"annual_factor": 252, "as_of": "2026-02-01", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "SPX", "max_drawdown": 0.00495, "sharpe": 5.660437, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 8.5, "fill_rule": "close", "slippage_bps": 3.25, "turnover_basis": "double_side"}, "currency": "USD", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.03", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=8.5 bps, slippage=3.25 bps）", "成交价假设 = close（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.447174, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.03}"#),
+            (
+                r#"默认"#,
+                r#"{"period_end": "2026-01-05", "period_start": "2026-01-01"}"#,
+                r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 5.842306, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.516079, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#,
+            ),
+            (
+                r#"基准"#,
+                r#"{"benchmark_id": "CSI300", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#,
+                r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "CSI300", "max_drawdown": 0.00495, "sharpe": 5.842306, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.516079, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#,
+            ),
+            (
+                r#"log 口径"#,
+                r#"{"period_end": "2026-01-05", "period_start": "2026-01-01", "return_basis": "log"}"#,
+                r#"{"annual_factor": 252, "as_of": "2026-01-05", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 5.795338, "volatility_annualized": 0.161851}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = log；年化因子 = 252（daily）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.460144, "tracking_error": 0.267105}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.382818, "volatility_annualized": 0.424887}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "log", "risk_free_rate_annual": 0.0}"#,
+            ),
+            (
+                r#"周频"#,
+                r#"{"frequency": "weekly", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#,
+                r#"{"annual_factor": 52, "as_of": "2026-01-05", "benchmark": {"annualized": 0.213552, "calmar": 43.137594, "cumulative": 0.015, "id": "UNSPECIFIED", "max_drawdown": 0.00495, "sharpe": 2.653907, "volatility_annualized": 0.073834}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 52（weekly）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.254982, "information_ratio": 1.658705, "tracking_error": 0.122887}, "frequency": "weekly", "gross": {"annualized": 0.468534, "calmar": 24.59802, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 2.051459, "volatility_annualized": 0.194877}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#,
+            ),
+            (
+                r#"月频"#,
+                r#"{"benchmark_id": "B1", "frequency": "monthly", "period_end": "2026-01-05", "period_start": "2026-01-01"}"#,
+                r#"{"annual_factor": 12, "as_of": "2026-01-05", "benchmark": {"annualized": 0.045678, "calmar": 9.227032, "cumulative": 0.015, "id": "B1", "max_drawdown": 0.00495, "sharpe": 1.274896, "volatility_annualized": 0.035469}, "costs": {"fee_bps": 0.0, "fill_rule": "next_open", "slippage_bps": 0.0, "turnover_basis": "single_side"}, "currency": "CNY", "disclosures": ["收益口径 = simple；年化因子 = 12（monthly）；无风险利率年化 = 0.0", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=0.0 bps, slippage=0.0 bps）", "成交价假设 = next_open（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 0.047049, "information_ratio": 0.796816, "tracking_error": 0.059033}, "frequency": "monthly", "gross": {"annualized": 0.092727, "calmar": 4.868167, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 0.985489, "volatility_annualized": 0.093616}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.0}"#,
+            ),
+            (
+                r#"非默认参数"#,
+                r#"{"as_of": "2026-02-01", "benchmark_id": "SPX", "cost_bps_fee": 8.5, "cost_bps_slippage": 3.25, "currency": "USD", "fill_rule": "close", "period_end": "2026-01-05", "period_start": "2026-01-01", "risk_free_rate_annual": 0.03, "single_side_turnover": false}"#,
+                r#"{"annual_factor": 252, "as_of": "2026-02-01", "benchmark": {"annualized": 1.554822, "calmar": 314.074061, "cumulative": 0.015, "id": "SPX", "max_drawdown": 0.00495, "sharpe": 5.660437, "volatility_annualized": 0.162537}, "costs": {"fee_bps": 8.5, "fill_rule": "close", "slippage_bps": 3.25, "turnover_basis": "double_side"}, "currency": "USD", "disclosures": ["收益口径 = simple；年化因子 = 252（daily）；无风险利率年化 = 0.03", "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee=8.5 bps, slippage=3.25 bps）", "成交价假设 = close（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）", "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间", "口径与披露面（收益口径/年化因子/无风险利率/基准/费用与成交假设）逐项显式；**非 GIPS 合规声明**——合规需第三方鉴证与合成组合全量数据"], "excess": {"annualized": 3.883092, "information_ratio": 3.65147, "tracking_error": 0.270524}, "frequency": "daily", "gross": {"annualized": 5.437914, "calmar": 285.490474, "cumulative": 0.03, "max_drawdown": 0.019048, "sharpe": 4.447174, "volatility_annualized": 0.429001}, "kind": "nf-performance/1", "period": {"end": "2026-01-05", "observations": 5, "start": "2026-01-01"}, "return_basis": "simple", "risk_free_rate_annual": 0.03}"#,
+            ),
         ];
         for (name, params_s, want_s) in cases {
             let spec: Json = crate::jsonread::convert(
@@ -826,7 +913,10 @@ mod tests {
         let bad = vec![("frequency".to_string(), Json::Str("hourly".to_string()))];
         match performance_report(&series, &bad) {
             Ok(_) => panic!("错频竟然成功"),
-            Err(e) => assert_eq!(e, r#"频率须在 ['daily', 'monthly', 'weekly'] 中，实为 'hourly'"#, "错频报错文本"),
+            Err(e) => assert_eq!(
+                e, r#"频率须在 ['daily', 'monthly', 'weekly'] 中，实为 'hourly'"#,
+                "错频报错文本"
+            ),
         }
     }
     /// ===== ④ 家族助手与几何口径（真语料的判据路径**不经过**它们，必须单独核）=====
@@ -858,25 +948,40 @@ mod tests {
         };
         assert_eq!(
             Json::Array(rank(&factor).iter().map(|x| r6(*x)).collect()),
-            ranks[0], "rank(factor)");
+            ranks[0],
+            "rank(factor)"
+        );
         assert_eq!(
             Json::Array(rank(&tied).iter().map(|x| r6(*x)).collect()),
-            ranks[1], "rank(并列)");
+            ranks[1],
+            "rank(并列)"
+        );
         assert_eq!(
             Json::Array(rank(&[5.0]).iter().map(|x| r6(*x)).collect()),
-            ranks[2], "rank(单元素)");
+            ranks[2],
+            "rank(单元素)"
+        );
         assert_eq!(
             Json::Array(rank(&[]).iter().map(|x| r6(*x)).collect()),
-            ranks[3], "rank(空表)");
+            ranks[3],
+            "rank(空表)"
+        );
         let ps = match get("pearson") {
             Json::Array(a) => a,
             _ => Vec::new(),
         };
-        for (i, (x, y)) in [(&factor[..], &fwd[..]), (&tied[..], &factor[..])].iter().enumerate() {
+        for (i, (x, y)) in [(&factor[..], &fwd[..]), (&tied[..], &factor[..])]
+            .iter()
+            .enumerate()
+        {
             assert_eq!(r6(pearson(x, y)), ps[i], "pearson 第 {} 例", i);
         }
         assert_eq!(r6(pearson(&[1.0], &[2.0])), ps[2], "pearson 样本不足");
-        assert_eq!(r6(pearson(&[1.0, 1.0], &[2.0, 3.0])), ps[3], "pearson 零方差");
+        assert_eq!(
+            r6(pearson(&[1.0, 1.0], &[2.0, 3.0])),
+            ps[3],
+            "pearson 零方差"
+        );
         let ics = match get("ic_spearman") {
             Json::Array(a) => a,
             _ => Vec::new(),
@@ -902,9 +1007,17 @@ mod tests {
         );
         match information_coefficient(&factor, &fwd, "kendall") {
             Ok(_) => panic!("IC 错口径竟然成功"),
-            Err(e) => assert_eq!(e, r#"IC 口径只支持 spearman / pearson，实为 'kendall'"#, "IC 错口径报错文本"),
+            Err(e) => assert_eq!(
+                e, r#"IC 口径只支持 spearman / pearson，实为 'kendall'"#,
+                "IC 错口径报错文本"
+            ),
         }
-        let w1 = vec![vec![0.5, 0.5], vec![0.6, 0.4], vec![0.3, 0.7], vec![0.3, 0.7]];
+        let w1 = vec![
+            vec![0.5, 0.5],
+            vec![0.6, 0.4],
+            vec![0.3, 0.7],
+            vec![0.3, 0.7],
+        ];
         let ts = match get("turnover_single") {
             Json::Array(a) => a,
             _ => Vec::new(),
@@ -950,13 +1063,21 @@ mod tests {
             g("information_ratio_zero_sd")
         );
         assert_eq!(
-            Json::Array(log_returns(&[1.0, 1.1, 1.21]).iter().map(|x| r6(*x)).collect()),
+            Json::Array(
+                log_returns(&[1.0, 1.1, 1.21])
+                    .iter()
+                    .map(|x| r6(*x))
+                    .collect()
+            ),
             g("log_returns")
         );
         assert_eq!(r6(cumulative_return(&[1.0, 1.5])), g("cumulative_return"));
         match returns(&[1.0, 2.0], "log2") {
             Ok(_) => panic!("returns 错口径竟然成功"),
-            Err(e) => assert_eq!(e, r#"收益口径只支持 simple / log，实为 'log2'"#, "returns 错口径报错文本"),
+            Err(e) => assert_eq!(
+                e, r#"收益口径只支持 simple / log，实为 'log2'"#,
+                "returns 错口径报错文本"
+            ),
         }
     }
     // <<< GENERATED

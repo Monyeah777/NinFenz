@@ -9,8 +9,8 @@
 use crate::jsonread;
 use crate::pyjson::Json;
 use crate::pyval::{
-    arr_is_empty, arr_items, get, obj_is_empty, plain_str, plain_str_opt, py_eq, py_int_or,
-    py_str, py_truthy, str_list,
+    arr_is_empty, arr_items, get, obj_is_empty, plain_str, plain_str_opt, py_eq, py_int_or, py_str,
+    py_truthy, str_list,
 };
 use std::path::Path;
 
@@ -119,9 +119,17 @@ fn declaration(root: &Path) -> (bool, String) {
     let s = crate::declaration::scan(root);
     let ok = s.issues.is_empty();
     let detail = if ok {
-        format!("版本 {} · scope {} · 排除 {}", s.versions, s.scope, s.excluded)
+        format!(
+            "版本 {} · scope {} · 排除 {}",
+            s.versions, s.scope, s.excluded
+        )
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -134,7 +142,12 @@ fn decisions(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("决策 {} 条（accepted {} · 取代链 {}）", n, accepted, chains)
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -156,7 +169,12 @@ fn mcp_package(root: &Path) -> (bool, String) {
             g("targets")
         )
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -171,9 +189,17 @@ fn pipeline_dryrun(root: &Path) -> (bool, String) {
         Ok(s) => {
             let ok = s.issues.is_empty();
             let detail = if ok {
-                format!("管线 {} 条零 hard 缺陷（advisory {}）", s.pipelines, s.notes)
+                format!(
+                    "管线 {} 条零 hard 缺陷（advisory {}）",
+                    s.pipelines, s.notes
+                )
             } else {
-                s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+                s.issues
+                    .iter()
+                    .take(2)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join("; ")
             };
             (ok, detail)
         }
@@ -192,7 +218,12 @@ fn type_backlog(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("不可推断 untyped {} 项（台账同步）", n)
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -204,7 +235,12 @@ fn purity_clean(root: &Path) -> (bool, String) {
     let detail = if ok {
         "纯度零违规".to_string()
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -231,7 +267,12 @@ fn io_types_contract(root: &Path) -> (bool, String) {
             typed + untyped
         )
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -251,7 +292,12 @@ fn endpoint_contract(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("端点 {}（status={}）", gn("endpoints"), gs("status", "?"))
     } else {
-        e.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        e.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -280,7 +326,12 @@ fn knowledge_sources(root: &Path) -> (bool, String) {
             gi(&usage.stats, "events")
         )
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (issues.is_empty(), detail)
 }
@@ -296,10 +347,18 @@ fn audit_contract(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!(
             "审计 {} 件（带审计头 {} · legacy {}）· 绑定对象 {}",
-            g("audits"), g("with_header"), g("legacy"), g("subjects_ok")
+            g("audits"),
+            g("with_header"),
+            g("legacy"),
+            g("subjects_ok")
         )
     } else {
-        a.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        a.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -311,7 +370,12 @@ fn library_projection(root: &Path) -> (bool, String) {
     let detail = if ok {
         "投影一致".to_string()
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -323,7 +387,12 @@ fn library_verify(root: &Path) -> (bool, String) {
     let detail = if ok {
         "馆藏 frontmatter 真源零 FAIL".to_string()
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -336,7 +405,12 @@ fn schema_clean(root: &Path) -> (bool, String) {
         // 真源 `len(stats)` 取的是 stats 字典的**键数**（恒为 6），不是某个计数
         format!("schema 零漂移（{} 类件）", 6)
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     let _ = stats;
     (ok, detail)
@@ -350,7 +424,12 @@ fn patterns(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("实践包 {} 条（格式/可证/投影）", n)
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -362,7 +441,12 @@ fn handover(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("交接件 {} 件 · 未决 {} 条", s.handovers, s.pending)
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -374,7 +458,12 @@ fn postmortem(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("复盘 {} 件 · 行动项 {} 条", s.postmortems, s.actions)
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -389,7 +478,12 @@ fn modeling(root: &Path) -> (bool, String) {
             s.schemes, s.normative, s.informative_files, s.contracts
         )
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -399,9 +493,17 @@ fn event_backing(root: &Path) -> (bool, String) {
     let s = crate::registry_cross::scan(root);
     let ok = s.issues.is_empty();
     let detail = if ok {
-        format!("事件 {} · 跨包 {} · 挂账 {}", s.events, s.cross_pkg, s.allowlisted)
+        format!(
+            "事件 {} · 跨包 {} · 挂账 {}",
+            s.events, s.cross_pkg, s.allowlisted
+        )
     } else {
-        s.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        s.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -413,7 +515,12 @@ fn module_signature(root: &Path) -> (bool, String) {
     let detail = if ok {
         "模块边界零漂移".to_string()
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -426,7 +533,12 @@ fn doc_kinds(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("四型全覆盖 · 写法 WARN {}", warns.len())
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -466,7 +578,14 @@ fn st_quality(root: &Path) -> (bool, String) {
         Ok((issues, _warns, stats)) => {
             let ok = issues.is_empty();
             let detail = if ok {
-                let lv = |k: &str| stats.by_level.iter().find(|(n, _)| n == k).map(|(_, v)| *v).unwrap_or(0);
+                let lv = |k: &str| {
+                    stats
+                        .by_level
+                        .iter()
+                        .find(|(n, _)| n == k)
+                        .map(|(_, v)| *v)
+                        .unwrap_or(0)
+                };
                 format!(
                     "规则 {} 条（M {} / S {} / R {}）· 落产物判 {}",
                     stats.rules,
@@ -476,7 +595,12 @@ fn st_quality(root: &Path) -> (bool, String) {
                     stats.artifact_checked
                 )
             } else {
-                issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+                issues
+                    .iter()
+                    .take(2)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join("; ")
             };
             (ok, detail)
         }
@@ -504,7 +628,9 @@ fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, StStats), S
         return Ok((vec![format!("缺 ST 制卡质量规范 {}", ST_REL)], warns, stats));
     }
     let d = jsonread::read_file(root, ST_REL).ok_or_else(|| format!("{} 不是合法 JSON", ST_REL))?;
-    let Json::Object(_) = &d else { return Err(format!("{} 不是对象", ST_REL)) };
+    let Json::Object(_) = &d else {
+        return Err(format!("{} 不是对象", ST_REL));
+    };
     if obj_is_empty(&d) {
         // 真源 `if not d:` —— 空对象与缺件同判
         return Ok((vec![format!("缺 ST 制卡质量规范 {}", ST_REL)], warns, stats));
@@ -539,7 +665,11 @@ fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, StStats), S
     let mut arts: Vec<String> = Vec::new();
     for r in arr_items(get(&d, "rules")) {
         let rid = py_str(get(r, "id"));
-        let tag = if rid.is_empty() { "(无名)".to_string() } else { rid.clone() };
+        let tag = if rid.is_empty() {
+            "(无名)".to_string()
+        } else {
+            rid.clone()
+        };
         if seen.contains(&rid) {
             issues.push(format!("规则 id 重复：{}", rid));
         }
@@ -548,7 +678,10 @@ fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, StStats), S
         if !scopes.contains(&scope) {
             issues.push(format!("{} scope 越词表：{}", tag, scope));
         } else if !rid.is_empty() && !rid.starts_with(&scope) {
-            issues.push(format!("{} 的 id 前缀与 scope 不一致（应 {} 开头）", tag, scope));
+            issues.push(format!(
+                "{} 的 id 前缀与 scope 不一致（应 {} 开头）",
+                tag, scope
+            ));
         }
         let lv = py_str(get(r, "level"));
         if !levels.contains(&lv) {
@@ -574,7 +707,11 @@ fn st_quality_scan(root: &Path) -> Result<(Vec<String>, Vec<String>, StStats), S
     if !arr_is_empty(get(&d, "pending")) {
         let p = arr_items(get(&d, "pending"));
         let head: Vec<String> = p.iter().take(2).map(|v| py_str(Some(v))).collect();
-        warns.push(format!("规范为草案：{} 项待补（{}）", p.len(), head.join("；")));
+        warns.push(format!(
+            "规范为草案：{} 项待补（{}）",
+            p.len(),
+            head.join("；")
+        ));
     }
     stats.rules = seen.len();
     stats.artifact_checked = arts.len();
@@ -612,7 +749,10 @@ fn check_v2(root: &Path) -> Vec<String> {
     if extra.is_empty() {
         Vec::new()
     } else {
-        vec![format!("V2：初始值含未声明变量 {}（initial 与变量表不一一对应）", extra.join("、"))]
+        vec![format!(
+            "V2：初始值含未声明变量 {}（initial 与变量表不一一对应）",
+            extra.join("、")
+        )]
     }
 }
 
@@ -651,8 +791,12 @@ fn check_checklist(root: &Path, d: &Json) -> Vec<String> {
 // ---------------------------------------------------------------- rfc-heads
 
 const RFC_INDEX_REL: &str = "protocol/rfc_index.json";
-const RFC_CATEGORIES: [&str; 4] =
-    ["Standards Track", "Informational", "Experimental", "Process"];
+const RFC_CATEGORIES: [&str; 4] = [
+    "Standards Track",
+    "Informational",
+    "Experimental",
+    "Process",
+];
 /// 真源头格式用的分隔符与占位符（`—` 是 U+2014，不是 `-`）。
 const DASHES: [&str; 2] = ["—", "-"];
 
@@ -663,7 +807,12 @@ fn rfc_heads(root: &Path) -> (bool, String) {
     let detail = if ok {
         format!("RFC 件 {} · 链 {}", stats.docs, stats.chains)
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -707,7 +856,9 @@ fn parse_head(text: &str) -> Option<RfcHead> {
     let head = text.lines().take(8).collect::<Vec<_>>().join("\n");
     let caps = rfc_head_re().captures(&head)?;
     let g = |n: &str| {
-        caps.name(n).map(|m| m.as_str().trim().to_string()).unwrap_or_default()
+        caps.name(n)
+            .map(|m| m.as_str().trim().to_string())
+            .unwrap_or_default()
     };
     Some(RfcHead {
         rfc: g("rfc"),
@@ -729,7 +880,12 @@ fn parse_head(text: &str) -> Option<RfcHead> {
 fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
     let mut issues: Vec<String> = Vec::new();
     let mut stats = RfcStats::default();
-    let missing = || format!("缺 RFC 索引 {}（修复指引：见 protocol/rfc_index.json）", RFC_INDEX_REL);
+    let missing = || {
+        format!(
+            "缺 RFC 索引 {}（修复指引：见 protocol/rfc_index.json）",
+            RFC_INDEX_REL
+        )
+    };
 
     if !root.join(RFC_INDEX_REL).is_file() {
         return (vec![missing()], stats);
@@ -766,11 +922,17 @@ fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
 
         let text = std::fs::read_to_string(&p).unwrap_or_default();
         let Some(head) = parse_head(&text) else {
-            issues.push(format!("{} 缺 RFC 头（修复指引：见 docs 或 core/rfc.py 头格式）", rel));
+            issues.push(format!(
+                "{} 缺 RFC 头（修复指引：见 docs 或 core/rfc.py 头格式）",
+                rel
+            ));
             continue;
         };
         if head.rfc != rfc {
-            issues.push(format!("{} 头部 RFC 与索引不一致：头={} 索引={}", rel, head.rfc, rfc));
+            issues.push(format!(
+                "{} 头部 RFC 与索引不一致：头={} 索引={}",
+                rel, head.rfc, rfc
+            ));
         }
         if !RFC_CATEGORIES.contains(&head.cat.as_str()) {
             issues.push(format!(
@@ -781,7 +943,12 @@ fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
             ));
         }
         if !vocab.contains(&head.status) {
-            issues.push(format!("{} Status 越词表：{}（{}）", rel, head.status, vocab.join("/")));
+            issues.push(format!(
+                "{} Status 越词表：{}（{}）",
+                rel,
+                head.status,
+                vocab.join("/")
+            ));
         }
         if !head.last_updated.is_empty() && head.date != head.last_updated {
             issues.push(format!(
@@ -811,7 +978,10 @@ fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
 
     for (rfc, target) in &supby {
         if !seen.iter().any(|(r, _)| r == target) {
-            issues.push(format!("{} 的 Superseded by 指向不在册的编号：{}", rfc, target));
+            issues.push(format!(
+                "{} 的 Superseded by 指向不在册的编号：{}",
+                rfc, target
+            ));
             continue;
         }
         let mut cur = target.clone();
@@ -851,7 +1021,12 @@ fn cognition(root: &Path) -> (bool, String) {
             g.terms, g.uses, m.modes, m.instances_ok
         )
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -892,8 +1067,13 @@ fn doc_or_missing(root: &Path, rel: &str, missing_msg: String) -> Result<Json, V
 fn verify_glossary(root: &Path) -> (Vec<String>, Vec<String>, GlossaryStats) {
     let mut issues: Vec<String> = Vec::new();
     let mut stats = GlossaryStats::default();
-    let Ok(doc) = doc_or_missing(root, GLOSSARY_REL, format!("缺术语表 {}", GLOSSARY_REL)) else {
-        return (vec![format!("缺术语表 {}", GLOSSARY_REL)], Vec::new(), stats);
+    let Ok(doc) = doc_or_missing(root, GLOSSARY_REL, format!("缺术语表 {}", GLOSSARY_REL))
+    else {
+        return (
+            vec![format!("缺术语表 {}", GLOSSARY_REL)],
+            Vec::new(),
+            stats,
+        );
     };
     if py_str(get(&doc, "schema")) != G_SCHEMA {
         issues.push(format!("术语表 schema 不匹配（期望 {}）", G_SCHEMA));
@@ -953,8 +1133,13 @@ fn verify_glossary(root: &Path) -> (Vec<String>, Vec<String>, GlossaryStats) {
 fn verify_modes(root: &Path) -> (Vec<String>, Vec<String>, ModesStats) {
     let mut issues: Vec<String> = Vec::new();
     let mut stats = ModesStats::default();
-    let Ok(doc) = doc_or_missing(root, MODES_REL, format!("缺执行分档声明 {}", MODES_REL)) else {
-        return (vec![format!("缺执行分档声明 {}", MODES_REL)], Vec::new(), stats);
+    let Ok(doc) = doc_or_missing(root, MODES_REL, format!("缺执行分档声明 {}", MODES_REL))
+    else {
+        return (
+            vec![format!("缺执行分档声明 {}", MODES_REL)],
+            Vec::new(),
+            stats,
+        );
     };
     if py_str(get(&doc, "schema")) != M_SCHEMA {
         issues.push(format!("执行分档 schema 不匹配（期望 {}）", M_SCHEMA));
@@ -973,7 +1158,10 @@ fn verify_modes(root: &Path) -> (Vec<String>, Vec<String>, ModesStats) {
             .map(|b| plain_str(b))
             .collect();
         if blocks.is_empty() {
-            issues.push(format!("mode {} 缺 required_blocks（该档必备结构必须成文）", mid));
+            issues.push(format!(
+                "mode {} 缺 required_blocks（该档必备结构必须成文）",
+                mid
+            ));
         }
         let rows = arr_items(get(m, "instances"));
         if rows.is_empty() {
@@ -985,7 +1173,11 @@ fn verify_modes(root: &Path) -> (Vec<String>, Vec<String>, ModesStats) {
                 continue;
             }
             let txt = read_text(root, &rel);
-            let miss: Vec<String> = blocks.iter().filter(|b| !txt.contains(*b)).cloned().collect();
+            let miss: Vec<String> = blocks
+                .iter()
+                .filter(|b| !txt.contains(*b))
+                .cloned()
+                .collect();
             if miss.is_empty() {
                 insts += 1;
             } else {
@@ -1023,7 +1215,12 @@ fn state_front(root: &Path) -> (bool, String) {
             stats.declared, stats.family_rules, stats.family_members
         )
     } else {
-        issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -1098,7 +1295,10 @@ fn state_front_scan(root: &Path) -> (Vec<String>, StateFrontStats) {
     for rel in &hits {
         let bad = check_order(&read_text(root, rel));
         if !bad.is_empty() {
-            issues.push(format!("族内件未通过 condition-first：{}（{}）", rel, bad[0]));
+            issues.push(format!(
+                "族内件未通过 condition-first：{}（{}）",
+                rel, bad[0]
+            ));
         }
     }
     for r in &rows {
@@ -1113,7 +1313,10 @@ fn state_front_scan(root: &Path) -> (Vec<String>, StateFrontStats) {
         }
         let bad = check_order(&read_text(root, &rp));
         if !bad.is_empty() {
-            issues.push(format!("登记为 condition-first 但未通过：{}（{}）", rp, bad[0]));
+            issues.push(format!(
+                "登记为 condition-first 但未通过：{}（{}）",
+                rp, bad[0]
+            ));
         }
     }
     stats.declared = rows.len();
@@ -1130,7 +1333,12 @@ const SEVERITIES: [&str; 2] = ["fail", "warn"];
 const REQUIRED: [&str; 6] = ["id", "severity", "kind", "params", "message", "fix"];
 /// `kind` 封闭集。真源是 **dict 字面量**（Python 3.7+ 保序，非 set）——
 /// 故 `tuple(KINDS)` 的顺序是确定的，可与 `kind_vocabulary` 逐项比序（已实测六种 hash 种子下同序）。
-const KINDS: [&str; 4] = ["regex_absent", "regex_present", "count_at_least", "json_value"];
+const KINDS: [&str; 4] = [
+    "regex_absent",
+    "regex_present",
+    "count_at_least",
+    "json_value",
+];
 
 /// 真源 `_c_assertions`：跑一遍断言表，fail 级不通过即 FAIL。
 fn assertions(root: &Path) -> (bool, String) {
@@ -1144,7 +1352,12 @@ fn assertions(root: &Path) -> (bool, String) {
             KINDS.len()
         )
     } else {
-        run.issues.iter().take(2).cloned().collect::<Vec<_>>().join("; ")
+        run.issues
+            .iter()
+            .take(2)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("; ")
     };
     (ok, detail)
 }
@@ -1163,11 +1376,17 @@ fn assertions_run(root: &Path) -> AssertionsRun {
     let mut passed = 0usize;
 
     let Some(doc) = jsonread::read_file(root, ASSERTIONS_REL) else {
-        return AssertionsRun { results, passed, issues };
+        return AssertionsRun {
+            results,
+            passed,
+            issues,
+        };
     };
     for a in arr_items(get(&doc, "assertions")) {
         let kind = plain_str_opt(get(a, "kind"));
-        let params = get(a, "params").cloned().unwrap_or(Json::Object(Vec::new()));
+        let params = get(a, "params")
+            .cloned()
+            .unwrap_or(Json::Object(Vec::new()));
         let outcome = match kind.as_str() {
             "regex_absent" => k_regex_absent(root, &params),
             "regex_present" => k_regex_present(root, &params),
@@ -1196,7 +1415,11 @@ fn assertions_run(root: &Path) -> AssertionsRun {
             ));
         }
     }
-    AssertionsRun { results, passed, issues }
+    AssertionsRun {
+        results,
+        passed,
+        issues,
+    }
 }
 
 /// 真源 `assertions.scan`（断言表自身的合法性）。
@@ -1212,10 +1435,16 @@ fn assertions_scan(root: &Path) -> (Vec<String>, usize) {
         return (vec![format!("缺断言表 {}", ASSERTIONS_REL)], 0);
     }
     if py_str(get(&doc, "schema")) != ASSERTIONS_SCHEMA {
-        issues.push(format!("断言表 schema 不匹配（期望 {}）", ASSERTIONS_SCHEMA));
+        issues.push(format!(
+            "断言表 schema 不匹配（期望 {}）",
+            ASSERTIONS_SCHEMA
+        ));
     }
     if str_list(get(&doc, "severity_vocabulary")) != SEVERITIES {
-        issues.push(format!("severity 词表与判据不一致（期望 {}）", SEVERITIES.join("/")));
+        issues.push(format!(
+            "severity 词表与判据不一致（期望 {}）",
+            SEVERITIES.join("/")
+        ));
     }
     if str_list(get(&doc, "kind_vocabulary")) != KINDS {
         issues.push(format!(
@@ -1233,7 +1462,11 @@ fn assertions_scan(root: &Path) -> (Vec<String>, usize) {
             let falsy = !v.map(py_truthy).unwrap_or(false);
             let empty_obj = matches!(v, Some(Json::Object(p)) if p.is_empty());
             if falsy && !empty_obj {
-                let tag = if aid.is_empty() { "(无名)" } else { aid.as_str() };
+                let tag = if aid.is_empty() {
+                    "(无名)"
+                } else {
+                    aid.as_str()
+                };
                 issues.push(format!("断言 {} 缺必填字段：{}", tag, k));
             }
         }
@@ -1339,11 +1572,19 @@ fn k_json_value(root: &Path, params: &Json) -> (bool, String) {
     let key = py_str(get(params, "key"));
     for part in key.split('.') {
         let Json::Object(pairs) = &cur else {
-            return (false, format!("缺键：{}", plain_str_opt(get(params, "key"))));
+            return (
+                false,
+                format!("缺键：{}", plain_str_opt(get(params, "key"))),
+            );
         };
         match pairs.iter().find(|(k, _)| k == part) {
             Some((_, v)) => cur = v.clone(),
-            None => return (false, format!("缺键：{}", plain_str_opt(get(params, "key")))),
+            None => {
+                return (
+                    false,
+                    format!("缺键：{}", plain_str_opt(get(params, "key"))),
+                )
+            }
         }
     }
     let op = py_str(get(params, "op"));
@@ -1370,7 +1611,10 @@ fn k_json_value(root: &Path, params: &Json) -> (bool, String) {
             )
         }
         "contains_keys" => {
-            let want: Vec<String> = arr_items(val.as_ref()).iter().map(|v| plain_str(v)).collect();
+            let want: Vec<String> = arr_items(val.as_ref())
+                .iter()
+                .map(|v| plain_str(v))
+                .collect();
             let miss: Vec<String> = want
                 .iter()
                 .filter(|k| match &cur {
@@ -1455,7 +1699,10 @@ mod tests {
     fn str_list_treats_missing_as_empty() {
         assert!(str_list(None).is_empty());
         assert_eq!(
-            str_list(Some(&Json::Array(vec![Json::Str("M".into()), Json::Str("S".into())]))),
+            str_list(Some(&Json::Array(vec![
+                Json::Str("M".into()),
+                Json::Str("S".into())
+            ]))),
             vec!["M".to_string(), "S".to_string()]
         );
     }
@@ -1514,14 +1761,20 @@ mod tests {
 
         // regex_present：缺锚点要指名
         std::fs::write(clean.join("t.txt"), "alpha beta").unwrap();
-        let p4: Json =
-            jsonread::convert(&serde_json::json!({"path": "t.txt", "patterns": ["alpha", "gamma"]})).unwrap();
+        let p4: Json = jsonread::convert(
+            &serde_json::json!({"path": "t.txt", "patterns": ["alpha", "gamma"]}),
+        )
+        .unwrap();
         let (ok4, d4) = k_regex_present(&clean, &p4);
         assert!(!ok4);
         assert_eq!(d4, "缺：gamma");
 
         // json_value：equals / contains_keys / 未知 op
-        std::fs::write(clean.join("j.json"), br#"{"a": {"b": 2}, "flags": {"f": false}}"#).unwrap();
+        std::fs::write(
+            clean.join("j.json"),
+            br#"{"a": {"b": 2}, "flags": {"f": false}}"#,
+        )
+        .unwrap();
         let p5: Json = jsonread::convert(
             &serde_json::json!({"path": "j.json", "key": "a.b", "op": "equals", "value": 2}),
         )
@@ -1540,7 +1793,8 @@ mod tests {
         assert!(!ok7);
         assert_eq!(d7, "缺：z");
         let p8: Json =
-            jsonread::convert(&serde_json::json!({"path": "j.json", "key": "a", "op": "nope"})).unwrap();
+            jsonread::convert(&serde_json::json!({"path": "j.json", "key": "a", "op": "nope"}))
+                .unwrap();
         assert!(!k_json_value(&clean, &p8).0);
 
         let _ = std::fs::remove_dir_all(&tmp);
@@ -1655,7 +1909,11 @@ mod tests {
         write_modes_fixture(&tmp);
         let (ok, detail) = run("cognition", &tmp).unwrap();
         assert!(!ok, "术语不在其 source 中逐字出现时必须判红");
-        assert!(detail.contains("未在其 source 中逐字出现"), "got: {}", detail);
+        assert!(
+            detail.contains("未在其 source 中逐字出现"),
+            "got: {}",
+            detail
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 
@@ -1677,51 +1935,51 @@ mod tests {
         assert!(ok, "空串 used_in 应被当作空表；实际判红：{}", detail);
         let _ = std::fs::remove_dir_all(&tmp);
     }
-#[cfg(test)]
-mod state_front_tests {
-    use super::*;
-    // >>> GENERATED by tools/gen_state_front_branches.py（勿手改；重跑生成器覆盖本段）
-    /// ===== 分支级差分判据（期望值由 `tools/gen_state_front_branches.py` 从真源生成）=====
-    ///
-    /// 三场景：kitchen（逐分支踩）/ 缺声明 / 空声明（门禁空转 warn）。
-    /// 分支：schema / 族规则缺 glob / 族成员不足 / 族内件未过 condition-first /
-    /// 声明条目缺 path / 登记件不存在 / 登记件未过 condition-first / 全绿。
-    /// 注：真源 `scan` 的 warns 在本面无消费者（契约只看 issues），故本线未纳入移植面。
-    const SF_GOOD: &str = r#"# 标题
+    #[cfg(test)]
+    mod state_front_tests {
+        use super::*;
+        // >>> GENERATED by tools/gen_state_front_branches.py（勿手改；重跑生成器覆盖本段）
+        /// ===== 分支级差分判据（期望值由 `tools/gen_state_front_branches.py` 从真源生成）=====
+        ///
+        /// 三场景：kitchen（逐分支踩）/ 缺声明 / 空声明（门禁空转 warn）。
+        /// 分支：schema / 族规则缺 glob / 族成员不足 / 族内件未过 condition-first /
+        /// 声明条目缺 path / 登记件不存在 / 登记件未过 condition-first / 全绿。
+        /// 注：真源 `scan` 的 warns 在本面无消费者（契约只看 issues），故本线未纳入移植面。
+        const SF_GOOD: &str = r#"# 标题
 
 > 适用条件：X 成立时。
 
 ## 正文
 内容
 "#;
-    const SF_BAD: &str = r#"## 正文
+        const SF_BAD: &str = r#"## 正文
 内容
 "#;
 
-    fn build_sf_fixture(scenario: &str, decl: Option<&str>) -> std::path::PathBuf {
-        let root = crate::testutil::fixture(&format!("state-front-branches-{}", scenario));
-        std::fs::create_dir_all(root.join("protocol")).unwrap();
-        if let Some(d) = decl {
-            std::fs::write(root.join("protocol/state_front.json"), d).unwrap();
-        }
-        if scenario != "empty" {
-            for (rel, body) in [
-                ("docs/fam/a.md", SF_GOOD),
-                ("docs/fam/b.md", SF_BAD),
-                ("docs/one.md", SF_BAD),
-                ("docs/two.md", SF_GOOD),
-            ] {
-                let p = root.join(rel);
-                std::fs::create_dir_all(p.parent().unwrap()).unwrap();
-                std::fs::write(p, body).unwrap();
+        fn build_sf_fixture(scenario: &str, decl: Option<&str>) -> std::path::PathBuf {
+            let root = crate::testutil::fixture(&format!("state-front-branches-{}", scenario));
+            std::fs::create_dir_all(root.join("protocol")).unwrap();
+            if let Some(d) = decl {
+                std::fs::write(root.join("protocol/state_front.json"), d).unwrap();
             }
+            if scenario != "empty" {
+                for (rel, body) in [
+                    ("docs/fam/a.md", SF_GOOD),
+                    ("docs/fam/b.md", SF_BAD),
+                    ("docs/one.md", SF_BAD),
+                    ("docs/two.md", SF_GOOD),
+                ] {
+                    let p = root.join(rel);
+                    std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+                    std::fs::write(p, body).unwrap();
+                }
+            }
+            root
         }
-        root
-    }
 
-    #[test]
-    fn the_contract_matches_the_truth_source_branch_by_branch() {
-        for (scenario, decl, want) in [
+        #[test]
+        fn the_contract_matches_the_truth_source_branch_by_branch() {
+            for (scenario, decl, want) in [
             ("kitchen", Some(r#"{"schema": "wrong/1", "declared": [{"path": ""}, {"path": "docs/nope.md"}, {"path": "docs/one.md"}, {"path": "docs/two.md"}], "family_rules": [{"glob": ""}, {"glob": "docs/fam/*.md", "min_members": 5}, {"glob": "docs/fam/*.md"}, {"glob": "docs/none/*.md", "min_members": 1}]}"#), &["声明 schema 不匹配（期望 nf-state-front/1）", "族规则缺 glob", "族 docs/fam/*.md 成员不足：2 < 5（修复指引：按 sources 重新生成）", "族 docs/none/*.md 成员不足：0 < 1（修复指引：按 sources 重新生成）", "族内件未通过 condition-first：docs/fam/a.md（缺状态块——无状态文本代理可前置）", "族内件未通过 condition-first：docs/fam/b.md（缺状态块——无状态文本代理可前置）", "族内件未通过 condition-first：docs/fam/a.md（缺状态块——无状态文本代理可前置）", "族内件未通过 condition-first：docs/fam/b.md（缺状态块——无状态文本代理可前置）", "声明条目缺 path", "登记件不存在：docs/nope.md", "登记为 condition-first 但未通过：docs/one.md（缺状态块——无状态文本代理可前置）", "登记为 condition-first 但未通过：docs/two.md（缺状态块——无状态文本代理可前置）"] as &[&str]),
             ("nodecl", None, &["缺条件先行声明 protocol/state_front.json"] as &[&str]),
             ("empty", Some(r#"{"schema": "nf-state-front/1", "declared": [], "family_rules": []}"#), &[] as &[&str]),
@@ -1730,9 +1988,9 @@ mod state_front_tests {
             let (issues, _stats) = state_front_scan(&root);
             assert_eq!(issues, want, "场景 {} 的 issues", scenario);
         }
+        }
+        // <<< GENERATED
     }
-    // <<< GENERATED
-}
 
     // >>> GENERATED by tools/gen_cognition_branches.py（勿手改；重跑生成器覆盖本段）
     /// ===== 分支级差分判据（期望值由 `tools/gen_cognition_branches.py` 从真源生成）=====
@@ -1744,19 +2002,31 @@ mod state_front_tests {
     const CG_GLOSSARY: &str = r#"{"schema": "wrong/1", "rules": [], "terms": [{"definition": "无 term"}, {"term": "甲", "definition": "定义甲", "source": "docs/s.md"}, {"term": "甲", "definition": "定义甲2", "source": "docs/s.md"}, {"term": "乙"}, {"term": "丙", "definition": "定义丙", "source": "no/such.md"}, {"term": "丁", "definition": "定义丁", "source": "docs/s.md"}, {"term": "戊", "definition": "定义戊", "used_in": ["no/such.md"]}, {"term": "己", "definition": "定义己", "used_in": ["docs/u.md"]}]}"#;
     const CG_MODES: &str = r###"{"schema": "wrong/1", "modes": [{"id": "m1", "required_blocks": ["## 块"], "instances": ["docs/inst-ok.md"]}, {"id": "m1", "required_blocks": [], "instances": []}, {"id": "m2", "required_blocks": ["## 块"], "instances": ["no/such.md"]}, {"id": "m3", "required_blocks": ["## 块"], "instances": ["docs/inst-bad.md"]}]}"###;
     const CG_DOCS: [(&str, &str); 4] = [
-        ("docs/inst-bad.md", r#"# 实例
+        (
+            "docs/inst-bad.md",
+            r#"# 实例
 没有那个结构块
-"#),
-        ("docs/inst-ok.md", r#"# 实例
+"#,
+        ),
+        (
+            "docs/inst-ok.md",
+            r#"# 实例
 ## 块
 内容
-"#),
-        ("docs/s.md", r#"# 源
+"#,
+        ),
+        (
+            "docs/s.md",
+            r#"# 源
 甲 在这里逐字出现
-"#),
-        ("docs/u.md", r#"# 使用面
+"#,
+        ),
+        (
+            "docs/u.md",
+            r#"# 使用面
 （不含那个术语）
-"#),
+"#,
+        ),
     ];
 
     fn build_cognition_fixture() -> std::path::PathBuf {
@@ -1775,11 +2045,37 @@ mod state_front_tests {
     fn cognition_matches_truth_source_branch_by_branch() {
         let root = build_cognition_fixture();
         let (issues, _g, _m) = cognition_scan(&root);
-        assert_eq!(issues, &["术语表 schema 不匹配（期望 nf-glossary/1）", "术语表 rules 不得为空（登记纪律必须成文）", "存在无 term 的条目", "术语重复：甲", "术语 乙 缺 definition", "术语 乙 的 source 不存在：", "术语 丙 的 source 不存在：no/such.md", "术语 丁 未在其 source 中逐字出现：docs/s.md（定义必须落在真源里）", "术语 戊 的 source 不存在：", "术语 戊 的 used_in 不存在：no/such.md", "术语 己 的 source 不存在：", "术语 己 的 used_in 未逐字出现该术语：docs/u.md（防登记没人用的行话）", "执行分档 schema 不匹配（期望 nf-execution-modes/1）", "mode id 重复：m1", "mode m1 缺 required_blocks（该档必备结构必须成文）", "mode m1 无实例（声明了档却没有件属于它）", "mode m2 的实例不存在：no/such.md", "实例 docs/inst-bad.md 不属于 m3 档：缺结构块 ## 块"] as &[&str], "issues 须逐字且同序");
+        assert_eq!(
+            issues,
+            &[
+                "术语表 schema 不匹配（期望 nf-glossary/1）",
+                "术语表 rules 不得为空（登记纪律必须成文）",
+                "存在无 term 的条目",
+                "术语重复：甲",
+                "术语 乙 缺 definition",
+                "术语 乙 的 source 不存在：",
+                "术语 丙 的 source 不存在：no/such.md",
+                "术语 丁 未在其 source 中逐字出现：docs/s.md（定义必须落在真源里）",
+                "术语 戊 的 source 不存在：",
+                "术语 戊 的 used_in 不存在：no/such.md",
+                "术语 己 的 source 不存在：",
+                "术语 己 的 used_in 未逐字出现该术语：docs/u.md（防登记没人用的行话）",
+                "执行分档 schema 不匹配（期望 nf-execution-modes/1）",
+                "mode id 重复：m1",
+                "mode m1 缺 required_blocks（该档必备结构必须成文）",
+                "mode m1 无实例（声明了档却没有件属于它）",
+                "mode m2 的实例不存在：no/such.md",
+                "实例 docs/inst-bad.md 不属于 m3 档：缺结构块 ## 块"
+            ] as &[&str],
+            "issues 须逐字且同序"
+        );
         // 契约层：ok + detail（detail 里嵌了 terms/uses/modes/instances_ok 四项计数）
         let (ok, detail) = cognition(&root);
         assert_eq!(ok, false);
-        assert_eq!(detail, "术语表 schema 不匹配（期望 nf-glossary/1）; 术语表 rules 不得为空（登记纪律必须成文）");
+        assert_eq!(
+            detail,
+            "术语表 schema 不匹配（期望 nf-glossary/1）; 术语表 rules 不得为空（登记纪律必须成文）"
+        );
     }
     // <<< GENERATED
 
@@ -1794,12 +2090,18 @@ mod state_front_tests {
     /// ② **`kind_rules` 的两个分支**：路径在场但写法不符该型 ⇒ WARN；在场且合规 ⇒ 不 WARN；
     ///    其余路径不在场 ⇒ 走「跳过」分支。
     const DK_FILES: [(&str, &str); 2] = [
-        ("06_Agent执行协议.md", r#"# 章节
+        (
+            "06_Agent执行协议.md",
+            r#"# 章节
 只有说明文字，没有命令块。
-"#),
-        ("docs/meta/DEEP_DIVE.md", r#"# 说明
+"#,
+        ),
+        (
+            "docs/meta/DEEP_DIVE.md",
+            r#"# 说明
 这里解释**机制**与取舍。
-"#),
+"#,
+        ),
     ];
 
     fn build_doc_kinds_fixture() -> std::path::PathBuf {
@@ -1816,14 +2118,21 @@ mod state_front_tests {
     fn doc_kinds_matches_truth_source() {
         let root = build_doc_kinds_fixture();
         // ① 常量表一致性（真源这两个函数里，只有 kind_coverage 与 root 无关）
-        assert_eq!(crate::doc_hygiene::kind_coverage(), &[] as &[&str], "四型覆盖（常量表一致性）");
+        assert_eq!(
+            crate::doc_hygiene::kind_coverage(),
+            &[] as &[&str],
+            "四型覆盖（常量表一致性）"
+        );
         // ② kind_rules 的两个分支
-        assert_eq!(crate::doc_hygiene::kind_rules(&root), &["06_Agent执行协议.md 属 how-to 型但缺「可执行命令块」（写法未定型）"] as &[&str], "写法 WARN 须逐字且同序");
+        assert_eq!(
+            crate::doc_hygiene::kind_rules(&root),
+            &["06_Agent执行协议.md 属 how-to 型但缺「可执行命令块」（写法未定型）"] as &[&str],
+            "写法 WARN 须逐字且同序"
+        );
         // ③ 契约层 detail
         let (ok, detail) = doc_kinds(&root);
         assert_eq!(ok, true);
         assert_eq!(detail, "四型全覆盖 · 写法 WARN 1");
     }
     // <<< GENERATED
-
 }

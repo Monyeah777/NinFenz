@@ -27,78 +27,78 @@ mod conformance_scan;
 mod code_metrics;
 mod contracts;
 mod coupling_metrics;
-mod depth_small;
 mod decisions;
 mod declaration;
+mod depth_small;
 mod doc_hygiene;
 mod doc_tables;
 mod domain_metrics;
 mod domain_pack;
-mod endpoint;
 mod drill_fidelity;
+mod endpoint;
 mod glob;
 mod handover;
 mod instruction_step_audit;
 mod intake;
 mod io_types;
-mod key_naming;
-mod judgement_coverage;
-mod jsonmini;
 mod json_schema;
+mod jsonmini;
 mod jsonread;
-mod license_gate;
-mod library;
-mod library_entries;
+mod judgement_coverage;
+mod key_naming;
 mod knowledge;
 mod layers;
-mod miniyaml;
-mod modeling;
-mod module_signature;
+mod library;
+mod library_entries;
+mod license_gate;
 mod machine_contract;
 mod mcp_package;
 mod mcp_tables;
 mod mdblocks;
 mod merkle;
-mod payload_registry;
-mod pipeline_loader;
-mod pipelinerun;
-mod paths;
-mod pack_combo;
-mod patterns;
-mod pack_combo_core;
-mod payload_harvest;
-mod postmortem;
-mod pyast;
-mod pyconsts;
-mod pyfloat;
-mod pyjson;
-mod purity;
-mod public_surface;
-mod py_stdlib;
-mod pyrandom;
-mod pyval;
-mod quality_depth_scan;
-mod pysrc;
-mod registry_cross;
-mod schema_lint;
-mod score;
-mod quant_metrics;
-mod rating_gate;
-mod receipts;
-mod receipts_verify;
-mod repo_paths;
-mod verify_report;
-mod world_model;
-mod xmlmini;
+mod miniyaml;
+mod modeling;
+mod module_signature;
 mod output_forms;
 mod output_forms_checks;
 mod output_forms_gen;
 mod output_forms_verify;
 mod output_tables;
+mod pack_combo;
+mod pack_combo_core;
+mod paths;
+mod patterns;
+mod payload_harvest;
+mod payload_registry;
+mod pipeline_loader;
+mod pipelinerun;
+mod postmortem;
+mod public_surface;
+mod purity;
+mod py_stdlib;
+mod pyast;
+mod pyconsts;
+mod pyfloat;
+mod pyjson;
+mod pyrandom;
+mod pysrc;
+mod pyval;
+mod quality_depth_scan;
+mod quant_metrics;
+mod rating_gate;
+mod receipts;
+mod receipts_verify;
+mod registry_cross;
+mod repo_paths;
+mod schema_lint;
+mod score;
+mod verify_report;
 mod workflow_policy;
+mod world_model;
+mod xmlmini;
 
-mod stats;
 mod serve;
+mod stats;
 #[cfg(test)]
 mod testutil;
 
@@ -158,7 +158,8 @@ fn emit(bytes: &[u8], out: &Option<PathBuf>) -> Result<(), String> {
             drop(cap);
             let stdout = std::io::stdout();
             let mut lock = stdout.lock();
-            lock.write_all(bytes).map_err(|e| format!("写标准输出失败：{}", e))?;
+            lock.write_all(bytes)
+                .map_err(|e| format!("写标准输出失败：{}", e))?;
             lock.flush().map_err(|e| format!("刷新标准输出失败：{}", e))
         }
     }
@@ -285,7 +286,12 @@ fn run_depth_scan(args: &[String]) -> Result<ExitCode, String> {
     let doc = pyjson::Json::Object(vec![
         (
             "issues".to_string(),
-            pyjson::Json::Array(issues.iter().map(|s| pyjson::Json::Str(s.clone())).collect()),
+            pyjson::Json::Array(
+                issues
+                    .iter()
+                    .map(|s| pyjson::Json::Str(s.clone()))
+                    .collect(),
+            ),
         ),
         ("stats".to_string(), stats),
     ]);
@@ -320,7 +326,9 @@ fn run_code_metrics(args: &[String]) -> Result<ExitCode, String> {
         }
     }
     let (issues, warns, stats) = crate::code_metrics::scan(&root);
-    let arr = |v: Vec<String>| crate::pyjson::Json::Array(v.into_iter().map(crate::pyjson::Json::Str).collect());
+    let arr = |v: Vec<String>| {
+        crate::pyjson::Json::Array(v.into_iter().map(crate::pyjson::Json::Str).collect())
+    };
     let doc = crate::pyjson::Json::Object(vec![
         ("issues".to_string(), arr(issues)),
         ("warns".to_string(), arr(warns)),
@@ -397,7 +405,10 @@ fn run_purity_facts(args: &[String]) -> Result<ExitCode, String> {
 // ---------------------------------------------------------------- receipts 面
 
 fn run_receipts(args: &[String]) -> Result<ExitCode, String> {
-    let sub = args.first().map(|s| s.as_str()).ok_or("receipts 后缺子命令")?;
+    let sub = args
+        .first()
+        .map(|s| s.as_str())
+        .ok_or("receipts 后缺子命令")?;
     let mut root: Option<PathBuf> = None;
     let mut scope = "protocol".to_string();
     let mut out: Option<PathBuf> = None;
@@ -453,17 +464,15 @@ fn run_receipts(args: &[String]) -> Result<ExitCode, String> {
         // `nf receipts --json` 的同形物：在盘回执 == 实时重算（根 + 逐件摘要 + 包含证明）。
         "verify" => {
             if !json {
-                return Err(
-                    "本线只实现 receipts verify --json（修复指引：加 --json）".into(),
-                );
+                return Err("本线只实现 receipts verify --json（修复指引：加 --json）".into());
             }
             let p = root.join("protocol/RECEIPTS.json");
             let raw = std::fs::read_to_string(&p)
                 .map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
             let v: serde_json::Value = serde_json::from_str(&raw)
                 .map_err(|e| format!("{} 不是合法 JSON：{}", p.display(), e))?;
-            let doc = jsonread::convert(&v)
-                .map_err(|e| format!("{} 转换失败：{}", p.display(), e))?;
+            let doc =
+                jsonread::convert(&v).map_err(|e| format!("{} 转换失败：{}", p.display(), e))?;
             let (issues, stats) = receipts::verify_scope(&doc, &root);
             let out_doc = pyjson::Json::Object(vec![
                 (
@@ -534,13 +543,20 @@ fn run_stats(args: &[String]) -> Result<ExitCode, String> {
         ));
         s.push_str(&format!(
             "  社区规模：登记包 {} · 资产档 {} · 概念图 {} · 域包 {}/{} 细分\n",
-            st.registered_packs, st.pack_assets, st.concept_graphs, st.domain_packs,
+            st.registered_packs,
+            st.pack_assets,
+            st.concept_graphs,
+            st.domain_packs,
             st.subdivisions_total
         ));
         s.push_str(&format!(
             "  标准目录：{} 条（可达 {} / 不可达 {} · 机构 {} · {} 边） · 绑定 {} 条\n",
-            st.standards_total, st.standards_reachable, st.standards_unreachable,
-            st.standards_bodies, st.standards_edges, st.standard_bindings
+            st.standards_total,
+            st.standards_reachable,
+            st.standards_unreachable,
+            st.standards_bodies,
+            st.standards_edges,
+            st.standard_bindings
         ));
         s.push_str(&format!(
             "  质量凭证：verify check1-{} 常驻（脚本 v{}） · 馆藏 {} 件\n",
@@ -640,8 +656,8 @@ fn run_pyval(args: &[String]) -> Result<ExitCode, String> {
         if h.is_empty() {
             continue;
         }
-        let bits =
-            u64::from_str_radix(h, 16).map_err(|e| format!("位模式不是十六进制：{}（{}）", h, e))?;
+        let bits = u64::from_str_radix(h, 16)
+            .map_err(|e| format!("位模式不是十六进制：{}（{}）", h, e))?;
         lines.push_str(&pyfloat::repr(f64::from_bits(bits)));
         lines.push('\n');
     }
@@ -775,19 +791,36 @@ fn run_schema_lint(args: &[String]) -> Result<ExitCode, String> {
     let doc = pyjson::Json::Object(vec![
         (
             "issues".to_string(),
-            pyjson::Json::Array(issues.iter().map(|x| pyjson::Json::Str(x.clone())).collect()),
+            pyjson::Json::Array(
+                issues
+                    .iter()
+                    .map(|x| pyjson::Json::Str(x.clone()))
+                    .collect(),
+            ),
         ),
         (
             "stats".to_string(),
             pyjson::Json::Object(vec![
-                ("schema_files".to_string(), pyjson::Json::Int(s.schema_files as i64)),
-                ("module_docs".to_string(), pyjson::Json::Int(s.module_docs as i64)),
+                (
+                    "schema_files".to_string(),
+                    pyjson::Json::Int(s.schema_files as i64),
+                ),
+                (
+                    "module_docs".to_string(),
+                    pyjson::Json::Int(s.module_docs as i64),
+                ),
                 (
                     "contract_covered".to_string(),
                     pyjson::Json::Int(s.contract_covered as i64),
                 ),
-                ("pipelines".to_string(), pyjson::Json::Int(s.pipelines as i64)),
-                ("protocols".to_string(), pyjson::Json::Int(s.protocols as i64)),
+                (
+                    "pipelines".to_string(),
+                    pyjson::Json::Int(s.pipelines as i64),
+                ),
+                (
+                    "protocols".to_string(),
+                    pyjson::Json::Int(s.protocols as i64),
+                ),
                 (
                     "asset_entries".to_string(),
                     pyjson::Json::Int(s.asset_entries as i64),
@@ -877,7 +910,12 @@ fn run_density(args: &[String]) -> Result<ExitCode, String> {
     let doc = pyjson::Json::Object(vec![
         (
             "issues".to_string(),
-            pyjson::Json::Array(issues.iter().map(|x| pyjson::Json::Str(x.clone())).collect()),
+            pyjson::Json::Array(
+                issues
+                    .iter()
+                    .map(|x| pyjson::Json::Str(x.clone()))
+                    .collect(),
+            ),
         ),
         (
             "stats".to_string(),
@@ -953,8 +991,8 @@ fn run_score(args: &[String]) -> Result<ExitCode, String> {
 
     let sup = match &signals {
         Some(p) => {
-            let text =
-                std::fs::read_to_string(p).map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
+            let text = std::fs::read_to_string(p)
+                .map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
             let v: serde_json::Value = serde_json::from_str(&text)
                 .map_err(|e| format!("{} 不是合法 JSON：{}", p.display(), e))?;
             let n = |k: &str| v.get(k).and_then(|x| x.as_i64());
@@ -976,8 +1014,8 @@ fn run_score(args: &[String]) -> Result<ExitCode, String> {
     let baseline = if base_path.is_file() {
         let text = std::fs::read_to_string(&base_path)
             .map_err(|e| format!("读 {} 失败：{}", base_path.display(), e))?;
-        let raw: serde_json::Value = serde_json::from_str(&text)
-            .map_err(|e| format!("基线不是合法 JSON：{}", e))?;
+        let raw: serde_json::Value =
+            serde_json::from_str(&text).map_err(|e| format!("基线不是合法 JSON：{}", e))?;
         jsonread::convert(&raw).map_err(|e| format!("基线含不支持的值：{}", e))?
     } else {
         pyjson::Json::Object(vec![(
@@ -988,10 +1026,10 @@ fn run_score(args: &[String]) -> Result<ExitCode, String> {
 
     let exceptions: Vec<(String, String)> = match &exceptions_path {
         Some(p) => {
-            let text =
-                std::fs::read_to_string(p).map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
-            let v: serde_json::Value = serde_json::from_str(&text)
-                .map_err(|e| format!("例外表不是合法 JSON：{}", e))?;
+            let text = std::fs::read_to_string(p)
+                .map_err(|e| format!("读 {} 失败：{}", p.display(), e))?;
+            let v: serde_json::Value =
+                serde_json::from_str(&text).map_err(|e| format!("例外表不是合法 JSON：{}", e))?;
             v.as_array()
                 .map(|a| {
                     a.iter()
@@ -1007,7 +1045,10 @@ fn run_score(args: &[String]) -> Result<ExitCode, String> {
         None => Vec::new(),
     };
 
-    emit(&score::render_bytes(&current, &baseline, tolerance, &exceptions), &out)?;
+    emit(
+        &score::render_bytes(&current, &baseline, tolerance, &exceptions),
+        &out,
+    )?;
     if score::is_ok(&current, &baseline, tolerance, &exceptions) {
         Ok(ExitCode::SUCCESS)
     } else {
@@ -1049,7 +1090,9 @@ fn run_layers(args: &[String]) -> Result<ExitCode, String> {
     let root = root.ok_or("缺 --root（修复指引：传仓库根目录）")?;
     require_dir(&root)?;
     if !verify {
-        return Err("本线只实现 --verify（修复指引：nf-rs layers --root <仓库根> --verify）".into());
+        return Err(
+            "本线只实现 --verify（修复指引：nf-rs layers --root <仓库根> --verify）".into(),
+        );
     }
 
     let (issues, stats) = layers::scan(&root);
@@ -1122,7 +1165,7 @@ fn run_conformance_run(args: &[String]) -> Result<ExitCode, String> {
     require_dir(&root)?;
     if !json {
         return Err(
-            "本线只实现 --json（修复指引：nf-rs conformance run --root <根> --json）".into()
+            "本线只实现 --json（修复指引：nf-rs conformance run --root <根> --json）".into(),
         );
     }
     let live = conformance::run_live(&root);
@@ -1156,7 +1199,10 @@ fn run_conformance_run(args: &[String]) -> Result<ExitCode, String> {
 }
 
 fn run_conformance(args: &[String]) -> Result<ExitCode, String> {
-    let sub = args.first().map(|s| s.as_str()).ok_or("conformance 后缺子命令")?;
+    let sub = args
+        .first()
+        .map(|s| s.as_str())
+        .ok_or("conformance 后缺子命令")?;
     if sub == "run" {
         return run_conformance_run(&args[1..]);
     }
@@ -1226,7 +1272,9 @@ fn parse_rows(v: &serde_json::Value) -> Result<Vec<conformance::Row>, String> {
     };
     let mut rows = Vec::with_capacity(arr.len());
     for (i, item) in arr.iter().enumerate() {
-        let o = item.as_object().ok_or_else(|| format!("第 {} 行不是对象", i))?;
+        let o = item
+            .as_object()
+            .ok_or_else(|| format!("第 {} 行不是对象", i))?;
         let id = o
             .get("id")
             .and_then(|x| x.as_str())
@@ -1238,9 +1286,20 @@ fn parse_rows(v: &serde_json::Value) -> Result<Vec<conformance::Row>, String> {
         rows.push(conformance::Row {
             id: id.to_string(),
             ok,
-            detail: o.get("detail").and_then(|x| x.as_str()).unwrap_or("").to_string(),
-            description: o.get("description").and_then(|x| x.as_str()).unwrap_or("").to_string(),
-            recorded_digest: o.get("digest").and_then(|x| x.as_str()).map(|s| s.to_string()),
+            detail: o
+                .get("detail")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            description: o
+                .get("description")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            recorded_digest: o
+                .get("digest")
+                .and_then(|x| x.as_str())
+                .map(|s| s.to_string()),
         });
     }
     Ok(rows)

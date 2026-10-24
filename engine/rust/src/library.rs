@@ -68,15 +68,14 @@ const MIRRORS: [(&str, &str, &str, &str); 2] = [
 
 fn is_date(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
+    let re =
+        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
     re.is_match(s)
 }
 
 fn is_hex64(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"^[0-9a-fA-F]{64}$").expect("摘要正则固定合法")
-    });
+    let re = RE.get_or_init(|| regex::Regex::new(r"^[0-9a-fA-F]{64}$").expect("摘要正则固定合法"));
     re.is_match(s)
 }
 
@@ -126,10 +125,19 @@ pub fn verify(root: &Path) -> LibVerify {
         }
         let st = {
             let s = py_str(get(fm, "status"));
-            if s.is_empty() { "active".to_string() } else { s }
+            if s.is_empty() {
+                "active".to_string()
+            } else {
+                s
+            }
         };
         if !STATUSES.contains(&st.as_str()) {
-            issues.push(format!("{} status 不在词表：{}（{}）", eid, st, STATUSES.join("/")));
+            issues.push(format!(
+                "{} status 不在词表：{}（{}）",
+                eid,
+                st,
+                STATUSES.join("/")
+            ));
         }
         if st == "superseded" && py_str(get(fm, "superseded_by")).trim().is_empty() {
             issues.push(format!("{} status=superseded 但缺 superseded_by", eid));
@@ -156,7 +164,10 @@ pub fn verify(root: &Path) -> LibVerify {
             let mut drifted = false;
             if !is_hex64(&att) {
                 let head: String = att.chars().take(16).collect();
-                issues.push(format!("{} attestation 非 64 位十六进制摘要：{}", eid, head));
+                issues.push(format!(
+                    "{} attestation 非 64 位十六进制摘要：{}",
+                    eid, head
+                ));
             } else {
                 let live = library_entries::entry_digest(root, &e.path);
                 drifted = live != att.to_lowercase();
@@ -169,7 +180,10 @@ pub fn verify(root: &Path) -> LibVerify {
                         eid
                     ));
                 } else {
-                    warns.push(format!("{} attestation 与当前内容不符（内容已改，需重签）", eid));
+                    warns.push(format!(
+                        "{} attestation 与当前内容不符（内容已改，需重签）",
+                        eid
+                    ));
                 }
             }
             if !scheme.is_empty() {
@@ -192,7 +206,11 @@ pub fn verify(root: &Path) -> LibVerify {
         .iter()
         .filter(|e| {
             let s = py_str(get(&e.fm, "status"));
-            (if s.is_empty() { "active".to_string() } else { s }) == "active"
+            (if s.is_empty() {
+                "active".to_string()
+            } else {
+                s
+            }) == "active"
         })
         .count();
     let stats = Json::Object(vec![
@@ -207,7 +225,11 @@ pub fn verify(root: &Path) -> LibVerify {
             Json::Array(warns.iter().map(|w| Json::Str(w.clone())).collect()),
         ),
     ]);
-    LibVerify { issues, warns, stats }
+    LibVerify {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 /// 真源 `_cell`。
@@ -217,7 +239,11 @@ fn cell(v: Option<&Json>) -> String {
         Some(other) => plain_str(other),
         None => String::new(),
     };
-    let s = if crate::pyval::py_truthy(v.unwrap_or(&Json::Null)) { s } else { String::new() };
+    let s = if crate::pyval::py_truthy(v.unwrap_or(&Json::Null)) {
+        s
+    } else {
+        String::new()
+    };
     s.replace('|', "\\|").trim().to_string()
 }
 
@@ -262,19 +288,35 @@ pub fn render_index_block(root: &Path) -> String {
         let fm = &e.fm;
         let title = {
             let t = cell(get(fm, "title"));
-            if t.is_empty() { e.id.clone() } else { t }
+            if t.is_empty() {
+                e.id.clone()
+            } else {
+                t
+            }
         };
         let generated = {
             let g = cell(get(fm, "generated"));
-            if g.is_empty() { cell(get(fm, "added")) } else { g }
+            if g.is_empty() {
+                cell(get(fm, "added"))
+            } else {
+                g
+            }
         };
         let rating = {
             let r = cell(get(fm, "rating"));
-            if r.is_empty() { "unrated".to_string() } else { r }
+            if r.is_empty() {
+                "unrated".to_string()
+            } else {
+                r
+            }
         };
         let status = {
             let s = cell(get(fm, "status"));
-            if s.is_empty() { "active".to_string() } else { s }
+            if s.is_empty() {
+                "active".to_string()
+            } else {
+                s
+            }
         };
         out.push(format!(
             "| {} | {} | {} | {} | {} | {} | {} | {} | {} |",
@@ -317,7 +359,11 @@ pub fn render_alias(root: &Path) -> String {
     for e in &rows {
         let st = {
             let s = py_str(get(&e.fm, "status"));
-            if s.is_empty() { "active".to_string() } else { s }
+            if s.is_empty() {
+                "active".to_string()
+            } else {
+                s
+            }
         };
         out.push(format!(
             "| {} | {} | {} | {}library/{}.md | {}library/{}.md |",
@@ -351,7 +397,11 @@ pub fn check_projection(root: &Path) -> Vec<String> {
             let i = text.find(begin).unwrap_or(0);
             let j = text.find(end).unwrap_or(0) + end.len();
             if text[i..j] != block {
-                let label = begin.split(':').next_back().unwrap_or("").trim_matches(|c| c == ' ' || c == '-');
+                let label = begin
+                    .split(':')
+                    .next_back()
+                    .unwrap_or("")
+                    .trim_matches(|c| c == ' ' || c == '-');
                 issues.push(format!(
                     "INDEX 生成区「{}」与实时重算不一致（跑 nf library reindex）",
                     label
@@ -399,17 +449,25 @@ mod tests {
     ///
     /// ⚠️ **刻意避开依赖"当天日期"的分支**——那类夹具会随日历变红。本面的日期判据只做**格式**校验。
     const LB_FILES: [(&str, &str); 11] = [
-        ("NF-1.md", r#"没有 frontmatter 的正文
-"#),
-        ("NF-10.md", r#"---
+        (
+            "NF-1.md",
+            r#"没有 frontmatter 的正文
+"#,
+        ),
+        (
+            "NF-10.md",
+            r#"---
 id: NF-10
 type: t
 title: X
 attestation: zz
 ---
 正文
-"#),
-        ("NF-11.md", r#"---
+"#,
+        ),
+        (
+            "NF-11.md",
+            r#"---
 id: NF-11
 type: t
 title: X
@@ -418,44 +476,62 @@ status: active
 sources: [a]
 ---
 正文
-"#),
-        ("NF-2.md", r#"---
+"#,
+        ),
+        (
+            "NF-2.md",
+            r#"---
 id: NF-2
 ---
 正文
-"#),
-        ("NF-3.md", r#"---
+"#,
+        ),
+        (
+            "NF-3.md",
+            r#"---
 id: NF-其他
 type: t
 title: X
 ---
 正文
-"#),
-        ("NF-4.md", r#"---
+"#,
+        ),
+        (
+            "NF-4.md",
+            r#"---
 id: NF-4
 type: t
 title: X
 license: Frobnicate
 ---
 正文
-"#),
-        ("NF-5.md", r#"---
+"#,
+        ),
+        (
+            "NF-5.md",
+            r#"---
 id: NF-5
 type: t
 title: X
 status: bogus
 ---
 正文
-"#),
-        ("NF-6.md", r#"---
+"#,
+        ),
+        (
+            "NF-6.md",
+            r#"---
 id: NF-6
 type: t
 title: X
 status: superseded
 ---
 正文
-"#),
-        ("NF-7.md", r#"---
+"#,
+        ),
+        (
+            "NF-7.md",
+            r#"---
 id: NF-7
 type: t
 title: X
@@ -463,8 +539,11 @@ status: superseded
 superseded_by: NF-999
 ---
 正文
-"#),
-        ("NF-8.md", r#"---
+"#,
+        ),
+        (
+            "NF-8.md",
+            r#"---
 id: NF-8
 type: t
 title: X
@@ -472,8 +551,11 @@ status: superseded
 superseded_by: NF-8
 ---
 正文
-"#),
-        ("NF-9.md", r#"---
+"#,
+        ),
+        (
+            "NF-9.md",
+            r#"---
 id: NF-9
 type: t
 title: X
@@ -482,7 +564,8 @@ verified: 2026-1-1
 stale_after: x
 ---
 正文
-"#),
+"#,
+        ),
     ];
 
     fn build_lb_fixture() -> std::path::PathBuf {
@@ -498,8 +581,101 @@ stale_after: x
     fn verify_matches_truth_source_branch_by_branch() {
         let root = build_lb_fixture();
         let got = verify(&root);
-        assert_eq!(got.issues, &["NF-1 缺 YAML frontmatter（真源要求：type/id/title 起）", "NF-10 attestation 非 64 位十六进制摘要：zz", "NF-2 frontmatter 缺必填键：type", "NF-2 frontmatter 缺必填键：title", "NF-3 frontmatter id 与文件名不一致：NF-其他", "NF-4 license 不在词表：Frobnicate", "NF-5 status 不在词表：bogus（active/deprecated/superseded）", "NF-6 status=superseded 但缺 superseded_by", "NF-7 superseded_by 指向不存在的条目：NF-999", "NF-8 superseded_by 指向自身（取代链成环）", "NF-9 generated 非 YYYY-MM-DD：2026/01/01", "NF-9 verified 非 YYYY-MM-DD：2026-1-1", "NF-9 stale_after 非 YYYY-MM-DD：x"] as &[&str], "issues 须逐字且同序");
-        assert_eq!(got.warns, &["NF-10 缺 sources（provenance 未声明）", "NF-10 缺推荐键：description", "NF-10 缺推荐键：license", "NF-10 缺推荐键：sources", "NF-10 缺推荐键：generated", "NF-10 缺推荐键：status", "NF-10 缺推荐键：tags", "NF-10 缺推荐键：author", "NF-11 缺推荐键：description", "NF-11 缺推荐键：generated", "NF-11 缺推荐键：tags", "NF-11 缺推荐键：author", "NF-2 缺 sources（provenance 未声明）", "NF-2 缺推荐键：description", "NF-2 缺推荐键：license", "NF-2 缺推荐键：sources", "NF-2 缺推荐键：generated", "NF-2 缺推荐键：status", "NF-2 缺推荐键：tags", "NF-2 缺推荐键：author", "NF-3 缺 sources（provenance 未声明）", "NF-3 缺推荐键：description", "NF-3 缺推荐键：license", "NF-3 缺推荐键：sources", "NF-3 缺推荐键：generated", "NF-3 缺推荐键：status", "NF-3 缺推荐键：tags", "NF-3 缺推荐键：author", "NF-4 缺 sources（provenance 未声明）", "NF-4 缺推荐键：description", "NF-4 缺推荐键：sources", "NF-4 缺推荐键：generated", "NF-4 缺推荐键：status", "NF-4 缺推荐键：tags", "NF-4 缺推荐键：author", "NF-5 缺 sources（provenance 未声明）", "NF-5 缺推荐键：description", "NF-5 缺推荐键：license", "NF-5 缺推荐键：sources", "NF-5 缺推荐键：generated", "NF-5 缺推荐键：tags", "NF-5 缺推荐键：author", "NF-6 缺 sources（provenance 未声明）", "NF-6 缺推荐键：description", "NF-6 缺推荐键：license", "NF-6 缺推荐键：sources", "NF-6 缺推荐键：generated", "NF-6 缺推荐键：tags", "NF-6 缺推荐键：author", "NF-7 缺 sources（provenance 未声明）", "NF-7 缺推荐键：description", "NF-7 缺推荐键：license", "NF-7 缺推荐键：sources", "NF-7 缺推荐键：generated", "NF-7 缺推荐键：tags", "NF-7 缺推荐键：author", "NF-8 缺 sources（provenance 未声明）", "NF-8 缺推荐键：description", "NF-8 缺推荐键：license", "NF-8 缺推荐键：sources", "NF-8 缺推荐键：generated", "NF-8 缺推荐键：tags", "NF-8 缺推荐键：author", "NF-9 缺 sources（provenance 未声明）", "NF-9 缺推荐键：description", "NF-9 缺推荐键：license", "NF-9 缺推荐键：sources", "NF-9 缺推荐键：status", "NF-9 缺推荐键：tags", "NF-9 缺推荐键：author"] as &[&str], "warns 须逐字且同序");
+        assert_eq!(
+            got.issues,
+            &[
+                "NF-1 缺 YAML frontmatter（真源要求：type/id/title 起）",
+                "NF-10 attestation 非 64 位十六进制摘要：zz",
+                "NF-2 frontmatter 缺必填键：type",
+                "NF-2 frontmatter 缺必填键：title",
+                "NF-3 frontmatter id 与文件名不一致：NF-其他",
+                "NF-4 license 不在词表：Frobnicate",
+                "NF-5 status 不在词表：bogus（active/deprecated/superseded）",
+                "NF-6 status=superseded 但缺 superseded_by",
+                "NF-7 superseded_by 指向不存在的条目：NF-999",
+                "NF-8 superseded_by 指向自身（取代链成环）",
+                "NF-9 generated 非 YYYY-MM-DD：2026/01/01",
+                "NF-9 verified 非 YYYY-MM-DD：2026-1-1",
+                "NF-9 stale_after 非 YYYY-MM-DD：x"
+            ] as &[&str],
+            "issues 须逐字且同序"
+        );
+        assert_eq!(
+            got.warns,
+            &[
+                "NF-10 缺 sources（provenance 未声明）",
+                "NF-10 缺推荐键：description",
+                "NF-10 缺推荐键：license",
+                "NF-10 缺推荐键：sources",
+                "NF-10 缺推荐键：generated",
+                "NF-10 缺推荐键：status",
+                "NF-10 缺推荐键：tags",
+                "NF-10 缺推荐键：author",
+                "NF-11 缺推荐键：description",
+                "NF-11 缺推荐键：generated",
+                "NF-11 缺推荐键：tags",
+                "NF-11 缺推荐键：author",
+                "NF-2 缺 sources（provenance 未声明）",
+                "NF-2 缺推荐键：description",
+                "NF-2 缺推荐键：license",
+                "NF-2 缺推荐键：sources",
+                "NF-2 缺推荐键：generated",
+                "NF-2 缺推荐键：status",
+                "NF-2 缺推荐键：tags",
+                "NF-2 缺推荐键：author",
+                "NF-3 缺 sources（provenance 未声明）",
+                "NF-3 缺推荐键：description",
+                "NF-3 缺推荐键：license",
+                "NF-3 缺推荐键：sources",
+                "NF-3 缺推荐键：generated",
+                "NF-3 缺推荐键：status",
+                "NF-3 缺推荐键：tags",
+                "NF-3 缺推荐键：author",
+                "NF-4 缺 sources（provenance 未声明）",
+                "NF-4 缺推荐键：description",
+                "NF-4 缺推荐键：sources",
+                "NF-4 缺推荐键：generated",
+                "NF-4 缺推荐键：status",
+                "NF-4 缺推荐键：tags",
+                "NF-4 缺推荐键：author",
+                "NF-5 缺 sources（provenance 未声明）",
+                "NF-5 缺推荐键：description",
+                "NF-5 缺推荐键：license",
+                "NF-5 缺推荐键：sources",
+                "NF-5 缺推荐键：generated",
+                "NF-5 缺推荐键：tags",
+                "NF-5 缺推荐键：author",
+                "NF-6 缺 sources（provenance 未声明）",
+                "NF-6 缺推荐键：description",
+                "NF-6 缺推荐键：license",
+                "NF-6 缺推荐键：sources",
+                "NF-6 缺推荐键：generated",
+                "NF-6 缺推荐键：tags",
+                "NF-6 缺推荐键：author",
+                "NF-7 缺 sources（provenance 未声明）",
+                "NF-7 缺推荐键：description",
+                "NF-7 缺推荐键：license",
+                "NF-7 缺推荐键：sources",
+                "NF-7 缺推荐键：generated",
+                "NF-7 缺推荐键：tags",
+                "NF-7 缺推荐键：author",
+                "NF-8 缺 sources（provenance 未声明）",
+                "NF-8 缺推荐键：description",
+                "NF-8 缺推荐键：license",
+                "NF-8 缺推荐键：sources",
+                "NF-8 缺推荐键：generated",
+                "NF-8 缺推荐键：tags",
+                "NF-8 缺推荐键：author",
+                "NF-9 缺 sources（provenance 未声明）",
+                "NF-9 缺推荐键：description",
+                "NF-9 缺推荐键：license",
+                "NF-9 缺推荐键：sources",
+                "NF-9 缺推荐键：status",
+                "NF-9 缺推荐键：tags",
+                "NF-9 缺推荐键：author"
+            ] as &[&str],
+            "warns 须逐字且同序"
+        );
     }
     // <<< GENERATED
 }

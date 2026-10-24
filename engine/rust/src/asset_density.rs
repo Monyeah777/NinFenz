@@ -6,9 +6,9 @@
 //!
 //! 本扫描器是 `nf score` 的 `asset_density` 信号源与 `metrics` 的唯一出处。
 
+use crate::pyjson::Json;
 use std::collections::BTreeSet;
 use std::path::Path;
-use crate::pyjson::Json;
 
 /// 真源 `ASSET_INPUTS`：两条**资产面**（都很窄，故改文档/代码不作废其缓存）。
 pub const ASSET_INPUTS: [&str; 2] = ["community/*/assets/*.md", "05_资产库/用户自定义/*.md"];
@@ -55,9 +55,7 @@ fn re_stem() -> &'static regex::Regex {
 
 fn re_backtick() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| {
-        regex::Regex::new(r"`([A-Z][A-Z0-9_-]{2,})`").expect("反引号键正则固定合法")
-    })
+    RE.get_or_init(|| regex::Regex::new(r"`([A-Z][A-Z0-9_-]{2,})`").expect("反引号键正则固定合法"))
 }
 
 fn re_jsonkey() -> &'static regex::Regex {
@@ -69,9 +67,7 @@ fn re_jsonkey() -> &'static regex::Regex {
 
 fn re_heading() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| {
-        regex::Regex::new(r"##\s*([A-Z][A-Z0-9_-]{2,})").expect("标题键正则固定合法")
-    })
+    RE.get_or_init(|| regex::Regex::new(r"##\s*([A-Z][A-Z0-9_-]{2,})").expect("标题键正则固定合法"))
 }
 
 /// 真源 `_scan_impl` → `(issues, stats)`。
@@ -118,7 +114,6 @@ pub fn scan(root: &Path) -> (Vec<String>, DensityStats) {
     )
 }
 
-
 /// 真源 `CORPUS_PATTERNS`：引用度普查的**语料面**。
 pub const CORPUS_PATTERNS: [&str; 3] = ["04_模块库/**/*.md", "community/**/*.md", "docs/**/*.md"];
 
@@ -130,7 +125,10 @@ impl DensityStats {
             ("keys".to_string(), Json::Int(self.keys as i64)),
             ("unkeyed".to_string(), Json::Int(self.unkeyed as i64)),
             ("tiny".to_string(), Json::Int(self.tiny as i64)),
-            ("avg_keys_per_file".to_string(), Json::Float(self.avg_keys_per_file)),
+            (
+                "avg_keys_per_file".to_string(),
+                Json::Float(self.avg_keys_per_file),
+            ),
         ])
     }
 }
@@ -159,7 +157,10 @@ pub fn thickness_scan(root: &Path) -> (Vec<String>, Json) {
             let keys = keys_of(&stem, &text);
             let lines: Vec<&str> = text.split('\n').collect();
             let sections = lines.iter().filter(|l| section_re.is_match(l)).count();
-            let tables = lines.iter().filter(|l| l.trim_start().starts_with('|')).count();
+            let tables = lines
+                .iter()
+                .filter(|l| l.trim_start().starts_with('|'))
+                .count();
             let chars = text.chars().count();
             let low = chars < 200 || (keys.is_empty() && sections == 0);
             let pkg = if rel.starts_with("community") {
@@ -170,14 +171,17 @@ pub fn thickness_scan(root: &Path) -> (Vec<String>, Json) {
             rows.push((pkg, rel, chars, keys.len(), sections, tables, low));
         }
     }
-    let mut low_files: Vec<String> =
-        rows.iter().filter(|r| r.6).map(|r| r.1.clone()).collect();
+    let mut low_files: Vec<String> = rows.iter().filter(|r| r.6).map(|r| r.1.clone()).collect();
     low_files.sort();
     let n = rows.len();
-    let avg_chars =
-        crate::pyfloat::round_to(rows.iter().map(|r| r.2).sum::<usize>() as f64 / n.max(1) as f64, 0);
-    let avg_sections =
-        crate::pyfloat::round_to(rows.iter().map(|r| r.4).sum::<usize>() as f64 / n.max(1) as f64, 0);
+    let avg_chars = crate::pyfloat::round_to(
+        rows.iter().map(|r| r.2).sum::<usize>() as f64 / n.max(1) as f64,
+        0,
+    );
+    let avg_sections = crate::pyfloat::round_to(
+        rows.iter().map(|r| r.4).sum::<usize>() as f64 / n.max(1) as f64,
+        0,
+    );
     (
         Vec::new(),
         Json::Object(vec![
@@ -232,7 +236,11 @@ pub fn usage_scan(root: &Path) -> (Vec<String>, Json) {
             }
         }
     }
-    let mut zero: Vec<String> = counts.iter().filter(|(_, n)| *n == 0).map(|(k, _)| k.clone()).collect();
+    let mut zero: Vec<String> = counts
+        .iter()
+        .filter(|(_, n)| *n == 0)
+        .map(|(k, _)| k.clone())
+        .collect();
     zero.sort();
     let total: i64 = counts.iter().map(|(_, n)| *n).sum();
     (
@@ -240,7 +248,10 @@ pub fn usage_scan(root: &Path) -> (Vec<String>, Json) {
         Json::Object(vec![
             ("assets".to_string(), Json::Int(keys.len() as i64)),
             ("zero_usage".to_string(), Json::Int(zero.len() as i64)),
-            ("used".to_string(), Json::Int(keys.len() as i64 - zero.len() as i64)),
+            (
+                "used".to_string(),
+                Json::Int(keys.len() as i64 - zero.len() as i64),
+            ),
             ("total_refs".to_string(), Json::Int(total)),
             (
                 "zero_keys".to_string(),
@@ -262,7 +273,11 @@ mod tests {
         assert!(got.contains(&"C01-01".to_string()), "反引号键：{:?}", got);
         assert!(got.contains(&"A08-07".to_string()), "JSON 键：{:?}", got);
         assert!(got.contains(&"B12-3".to_string()), "标题键：{:?}", got);
-        assert!(!got.contains(&"BARE_WORD".to_string()), "裸词不得入册：{:?}", got);
+        assert!(
+            !got.contains(&"BARE_WORD".to_string()),
+            "裸词不得入册：{:?}",
+            got
+        );
         // 文件名令牌：`[A-Z][A-Z0-9_]*` 在 "M08_环境状态" 上只吃到 "M08_"（CJK 停住）
         assert!(got.contains(&"M08_".to_string()), "文件名令牌：{:?}", got);
     }
@@ -279,7 +294,11 @@ mod tests {
         let mut text = "a".repeat(6001);
         text.push_str("`ZZZKEY`");
         let got = keys_of("X", &text);
-        assert!(!got.contains(&"ZZZKEY".to_string()), "超出 6000 码点的键不得入册：{:?}", got);
+        assert!(
+            !got.contains(&"ZZZKEY".to_string()),
+            "超出 6000 码点的键不得入册：{:?}",
+            got
+        );
     }
 
     #[test]

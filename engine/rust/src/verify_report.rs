@@ -40,37 +40,192 @@ impl Spec {
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
 pub const SPECS: [Spec; 31] = [
-    Spec { id: "purity", name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）", module: "purity_scan", entry: "scan" },
-    Spec { id: "schema", name: "协议层 IDL schema 门禁", module: "schema_lint", entry: "scan" },
-    Spec { id: "conformance", name: "社区领域包 conformance 分级", module: "conformance_scan", entry: "scan" },
-    Spec { id: "contract", name: "机读契约面（官方核心 13 件 id/标题一致）", module: "machine_contract", entry: "scan" },
-    Spec { id: "knowledge", name: "双源知识层（权威分层/顺序/时效/巡检）", module: "knowledge", entry: "scan" },
-    Spec { id: "rating", name: "馆藏内容分级声明", module: "rating_gate", entry: "scan" },
-    Spec { id: "rating_decided", name: "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）", module: "rating_gate", entry: "decided" },
-    Spec { id: "license", name: "许可证门", module: "license_gate", entry: "scan" },
-    Spec { id: "intake", name: "投稿闸门三方一致", module: "intake", entry: "scan" },
-    Spec { id: "payload", name: "事件载荷注册表", module: "payload_registry", entry: "scan" },
-    Spec { id: "doc_markers", name: "文档 marker 卫生", module: "doc_hygiene", entry: "check_markers" },
-    Spec { id: "assets_ledger", name: "资产 ledger 投影一致", module: "asset_ledger_projection", entry: "verify" },
-    Spec { id: "instruction", name: "指令档步骤审计", module: "instruction_step_audit", entry: "scan" },
-    Spec { id: "baseline", name: "基线自描述一致（verify 版本 / check 数）", module: "quality_baseline", entry: "scan" },
-    Spec { id: "library", name: "图书馆 frontmatter + 投影一致", module: "library", entry: "verify" },
-    Spec { id: "library_projection", name: "图书馆 INDEX/ALIAS 实时一致", module: "library", entry: "check_projection" },
-    Spec { id: "receipts", name: "馆藏回执折叠到根", module: "receipts", entry: "verify_wrapped" },
-    Spec { id: "conformance_report", name: "一致性报告（已提交 == 实时重算）", module: "conformance_report", entry: "verify_committed" },
-    Spec { id: "audit", name: "审计件被审对象 digest", module: "audit", entry: "scan" },
-    Spec { id: "self_stats", name: "自述数字 == 实算（README/llms 生成区）", module: "repo_stats", entry: "check_strict" },
-    Spec { id: "code_metrics", name: "代码规模/复杂度上限（棘轮冻结）", module: "code_metrics", entry: "scan" },
-    Spec { id: "redos", name: "正则失控回溯（形态 + 增长律；Y3 接线）", module: "redos_scan", entry: "scan" },
-    Spec { id: "key_naming", name: "资产键命名规范（形态 + 声明词表）", module: "key_naming", entry: "scan" },
-    Spec { id: "instruction_evidence", name: "规范入口指令实测记录（新鲜 + 退出码 0）", module: "instruction_evidence", entry: "scan" },
-    Spec { id: "coupling", name: "模块级耦合（Martin 包度量 / SDP / 环 · 只许收敛）", module: "coupling_metrics", entry: "scan" },
-    Spec { id: "perf_budget", name: "性能预算（中位耗时 ≤ 预算 + 记录新鲜）", module: "perf_budget", entry: "scan" },
-    Spec { id: "drill_fidelity", name: "演练保真度（执行演练 + 回合级回放 = 100%）", module: "drill_fidelity", entry: "scan" },
-    Spec { id: "judgement_coverage", name: "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）", module: "judgement_coverage", entry: "scan" },
-    Spec { id: "workflow_policy", name: "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", module: "workflow_policy", entry: "scan" },
-    Spec { id: "asset_contract", name: "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）", module: "asset_contract", entry: "scan" },
-    Spec { id: "role_coordinates", name: "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）", module: "role_model", entry: "scan" },
+    Spec {
+        id: "purity",
+        name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
+        module: "purity_scan",
+        entry: "scan",
+    },
+    Spec {
+        id: "schema",
+        name: "协议层 IDL schema 门禁",
+        module: "schema_lint",
+        entry: "scan",
+    },
+    Spec {
+        id: "conformance",
+        name: "社区领域包 conformance 分级",
+        module: "conformance_scan",
+        entry: "scan",
+    },
+    Spec {
+        id: "contract",
+        name: "机读契约面（官方核心 13 件 id/标题一致）",
+        module: "machine_contract",
+        entry: "scan",
+    },
+    Spec {
+        id: "knowledge",
+        name: "双源知识层（权威分层/顺序/时效/巡检）",
+        module: "knowledge",
+        entry: "scan",
+    },
+    Spec {
+        id: "rating",
+        name: "馆藏内容分级声明",
+        module: "rating_gate",
+        entry: "scan",
+    },
+    Spec {
+        id: "rating_decided",
+        name: "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）",
+        module: "rating_gate",
+        entry: "decided",
+    },
+    Spec {
+        id: "license",
+        name: "许可证门",
+        module: "license_gate",
+        entry: "scan",
+    },
+    Spec {
+        id: "intake",
+        name: "投稿闸门三方一致",
+        module: "intake",
+        entry: "scan",
+    },
+    Spec {
+        id: "payload",
+        name: "事件载荷注册表",
+        module: "payload_registry",
+        entry: "scan",
+    },
+    Spec {
+        id: "doc_markers",
+        name: "文档 marker 卫生",
+        module: "doc_hygiene",
+        entry: "check_markers",
+    },
+    Spec {
+        id: "assets_ledger",
+        name: "资产 ledger 投影一致",
+        module: "asset_ledger_projection",
+        entry: "verify",
+    },
+    Spec {
+        id: "instruction",
+        name: "指令档步骤审计",
+        module: "instruction_step_audit",
+        entry: "scan",
+    },
+    Spec {
+        id: "baseline",
+        name: "基线自描述一致（verify 版本 / check 数）",
+        module: "quality_baseline",
+        entry: "scan",
+    },
+    Spec {
+        id: "library",
+        name: "图书馆 frontmatter + 投影一致",
+        module: "library",
+        entry: "verify",
+    },
+    Spec {
+        id: "library_projection",
+        name: "图书馆 INDEX/ALIAS 实时一致",
+        module: "library",
+        entry: "check_projection",
+    },
+    Spec {
+        id: "receipts",
+        name: "馆藏回执折叠到根",
+        module: "receipts",
+        entry: "verify_wrapped",
+    },
+    Spec {
+        id: "conformance_report",
+        name: "一致性报告（已提交 == 实时重算）",
+        module: "conformance_report",
+        entry: "verify_committed",
+    },
+    Spec {
+        id: "audit",
+        name: "审计件被审对象 digest",
+        module: "audit",
+        entry: "scan",
+    },
+    Spec {
+        id: "self_stats",
+        name: "自述数字 == 实算（README/llms 生成区）",
+        module: "repo_stats",
+        entry: "check_strict",
+    },
+    Spec {
+        id: "code_metrics",
+        name: "代码规模/复杂度上限（棘轮冻结）",
+        module: "code_metrics",
+        entry: "scan",
+    },
+    Spec {
+        id: "redos",
+        name: "正则失控回溯（形态 + 增长律；Y3 接线）",
+        module: "redos_scan",
+        entry: "scan",
+    },
+    Spec {
+        id: "key_naming",
+        name: "资产键命名规范（形态 + 声明词表）",
+        module: "key_naming",
+        entry: "scan",
+    },
+    Spec {
+        id: "instruction_evidence",
+        name: "规范入口指令实测记录（新鲜 + 退出码 0）",
+        module: "instruction_evidence",
+        entry: "scan",
+    },
+    Spec {
+        id: "coupling",
+        name: "模块级耦合（Martin 包度量 / SDP / 环 · 只许收敛）",
+        module: "coupling_metrics",
+        entry: "scan",
+    },
+    Spec {
+        id: "perf_budget",
+        name: "性能预算（中位耗时 ≤ 预算 + 记录新鲜）",
+        module: "perf_budget",
+        entry: "scan",
+    },
+    Spec {
+        id: "drill_fidelity",
+        name: "演练保真度（执行演练 + 回合级回放 = 100%）",
+        module: "drill_fidelity",
+        entry: "scan",
+    },
+    Spec {
+        id: "judgement_coverage",
+        name: "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
+        module: "judgement_coverage",
+        entry: "scan",
+    },
+    Spec {
+        id: "workflow_policy",
+        name: "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）",
+        module: "workflow_policy",
+        entry: "scan",
+    },
+    Spec {
+        id: "asset_contract",
+        name: "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
+        module: "asset_contract",
+        entry: "scan",
+    },
+    Spec {
+        id: "role_coordinates",
+        name: "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
+        module: "role_model",
+        entry: "scan",
+    },
 ];
 
 /// 未移植判据的喂入结果（`--results` 的一条）。
@@ -85,7 +240,12 @@ pub struct Supplied {
 
 impl Default for Supplied {
     fn default() -> Self {
-        Self { issues: Vec::new(), warns: Vec::new(), stats: empty_obj(), status: None }
+        Self {
+            issues: Vec::new(),
+            warns: Vec::new(),
+            stats: empty_obj(),
+            status: None,
+        }
     }
 }
 
@@ -182,7 +342,10 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
         }
         "receipts" => {
             // 真源 `_call` 对这条有**前置在场检查**：文件不在 → 直接记 fail 并给修复指引
-            if !root.join(crate::receipts_verify::LIBRARY_RECEIPTS_REL).is_file() {
+            if !root
+                .join(crate::receipts_verify::LIBRARY_RECEIPTS_REL)
+                .is_file()
+            {
                 Some(Called {
                     status: "fail".to_string(),
                     issues: vec![format!(
@@ -223,7 +386,10 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
         "knowledge" => {
             let k = crate::knowledge::scan(root);
             Some(Called {
-                status: k.status.map(|s| s.to_string()).unwrap_or_else(|| status_of(&k.issues, &k.warns)),
+                status: k
+                    .status
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| status_of(&k.issues, &k.warns)),
                 issues: k.issues,
                 warns: k.warns,
                 stats: k.stats,
@@ -240,7 +406,12 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
         }
         "license" => {
             let l = crate::license_gate::scan(root);
-            Some(Called { status: status_of(&l.issues, &[]), issues: l.issues, warns: Vec::new(), stats: l.stats })
+            Some(Called {
+                status: status_of(&l.issues, &[]),
+                issues: l.issues,
+                warns: Vec::new(),
+                stats: l.stats,
+            })
         }
         "coupling" => {
             let c = crate::coupling_metrics::scan(root);
@@ -320,8 +491,16 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
         "key_naming" => {
             let k = crate::key_naming::scan(root);
             // 三态：issues 非空 = fail；否则 warns 非空 = warn；都空 = pass
-            let status = k.status.map(|s| s.to_string()).unwrap_or_else(|| status_of(&k.issues, &k.warns));
-            Some(Called { status, issues: k.issues, warns: k.warns, stats: k.stats })
+            let status = k
+                .status
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| status_of(&k.issues, &k.warns));
+            Some(Called {
+                status,
+                issues: k.issues,
+                warns: k.warns,
+                stats: k.stats,
+            })
         }
         "intake" => {
             let k = crate::intake::scan(root);
@@ -431,12 +610,14 @@ pub fn build(root: &Path, supplied: &HashMap<String, Supplied>) -> Json {
     let mut counts: HashMap<&str, i64> = HashMap::new();
     for spec in SPECS.iter() {
         let c = call(spec, root, supplied);
-        *counts.entry(match c.status.as_str() {
-            "pass" => "pass",
-            "fail" => "fail",
-            "warn" => "warn",
-            _ => "error",
-        }).or_insert(0) += 1;
+        *counts
+            .entry(match c.status.as_str() {
+                "pass" => "pass",
+                "fail" => "fail",
+                "warn" => "warn",
+                _ => "error",
+            })
+            .or_insert(0) += 1;
         let sample: Vec<Json> = c
             .issues
             .iter()
@@ -492,8 +673,8 @@ pub fn check(root: &Path, supplied: &HashMap<String, Supplied>) -> (Vec<String>,
             live,
         );
     }
-    let recorded = jsonread::read_file(root, REPORT_REL)
-        .unwrap_or_else(|| Json::Object(Vec::new()));
+    let recorded =
+        jsonread::read_file(root, REPORT_REL).unwrap_or_else(|| Json::Object(Vec::new()));
     let mut issues: Vec<String> = Vec::new();
     if py_str(get(&recorded, "root_digest")) != py_str(get(&live, "root_digest")) {
         let a = py_str(get(&recorded, "root_digest"));
@@ -560,10 +741,19 @@ mod tests {
 
     #[test]
     fn unported_spec_without_supplied_result_is_reported_as_error() {
-        let spec = Spec { id: "nope", name: "x", module: "m", entry: "scan" };
+        let spec = Spec {
+            id: "nope",
+            name: "x",
+            module: "m",
+            entry: "scan",
+        };
         let got = call(&spec, Path::new("."), &HashMap::new());
         assert_eq!(got.status, "error");
-        assert!(got.issues[0].contains("未移植且未喂入结果"), "{:?}", got.issues);
+        assert!(
+            got.issues[0].contains("未移植且未喂入结果"),
+            "{:?}",
+            got.issues
+        );
     }
 
     #[test]
@@ -578,7 +768,12 @@ mod tests {
                 status: None,
             },
         );
-        let spec = Spec { id: "nope", name: "x", module: "m", entry: "scan" };
+        let spec = Spec {
+            id: "nope",
+            name: "x",
+            module: "m",
+            entry: "scan",
+        };
         assert_eq!(call(&spec, Path::new("."), &m).status, "warn");
     }
 

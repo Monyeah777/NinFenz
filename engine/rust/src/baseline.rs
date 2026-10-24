@@ -45,8 +45,12 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
 
     let verify_text = std::fs::read_to_string(root.join("verify.sh")).unwrap_or_default();
     static VRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let vre = VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v\d+\.\d+)").expect("版本行正则固定合法"));
-    let ver = vre.captures(&verify_text).map(|c| c[1].to_string()).unwrap_or_default();
+    let vre =
+        VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v\d+\.\d+)").expect("版本行正则固定合法"));
+    let ver = vre
+        .captures(&verify_text)
+        .map(|c| c[1].to_string())
+        .unwrap_or_default();
 
     static CRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
     let cre = CRE.get_or_init(|| {
@@ -65,7 +69,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
     }
     let want: Vec<i64> = (1..=expected_checks).collect();
     if n_checks != expected_checks || nums != want {
-        issues.push(format!("verify.sh check 函数数/编号异常：{}", py_int_list(&nums)));
+        issues.push(format!(
+            "verify.sh check 函数数/编号异常：{}",
+            py_int_list(&nums)
+        ));
     }
 
     // 三处声明：README 要求三串**同时**在场；CHANGELOG / VERSION-MATRIX 数 PASS= 出现次数
@@ -76,13 +83,26 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
         && readme.contains(&format!("check1-{}", expected_checks))
         && readme.contains(&pass_tok);
     let changelog = std::fs::read_to_string(root.join("CHANGELOG.md")).unwrap_or_default();
-    let head = changelog.split("\n## [2.8.0]").next().unwrap_or("").to_string();
-    let matrix = std::fs::read_to_string(root.join("docs/meta/VERSION-MATRIX.md")).unwrap_or_default();
+    let head = changelog
+        .split("\n## [2.8.0]")
+        .next()
+        .unwrap_or("")
+        .to_string();
+    let matrix =
+        std::fs::read_to_string(root.join("docs/meta/VERSION-MATRIX.md")).unwrap_or_default();
 
     let checks: [(&str, &str, i64); 3] = [
         ("README", "基线句", if readme_ok { 1 } else { 0 }),
-        ("CHANGELOG 最新节", "PASS=", count_occurrences(&head, &pass_tok)),
-        ("VERSION-MATRIX", "PASS=", count_occurrences(&matrix, &pass_tok)),
+        (
+            "CHANGELOG 最新节",
+            "PASS=",
+            count_occurrences(&head, &pass_tok),
+        ),
+        (
+            "VERSION-MATRIX",
+            "PASS=",
+            count_occurrences(&matrix, &pass_tok),
+        ),
     ];
     for (name, what, n) in checks {
         if n < 1 {
@@ -95,7 +115,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
 
     (
         issues,
-        Some(BaselineStats { verify_version: ver, checks: n_checks }),
+        Some(BaselineStats {
+            verify_version: ver,
+            checks: n_checks,
+        }),
     )
 }
 

@@ -54,7 +54,9 @@ fn py_type_name(j: &Json) -> &'static str {
 
 /// 真源 `subset_key_violations`：递归扫描未实现的关键字。
 pub fn subset_key_violations(schema: &Json, path: &str) -> Vec<String> {
-    let Json::Object(pairs) = schema else { return Vec::new() };
+    let Json::Object(pairs) = schema else {
+        return Vec::new();
+    };
     let mut out: Vec<String> = pairs
         .iter()
         .filter(|(k, _)| !SUBSET_ALLOWED_KEYS.contains(&k.as_str()))
@@ -67,7 +69,10 @@ pub fn subset_key_violations(schema: &Json, path: &str) -> Vec<String> {
         .collect();
     if let Some(Json::Object(props)) = get(schema, "properties") {
         for (pname, sub) in props {
-            out.extend(subset_key_violations(sub, &format!("{}/properties/{}", path, pname)));
+            out.extend(subset_key_violations(
+                sub,
+                &format!("{}/properties/{}", path, pname),
+            ));
         }
     }
     if let Some(items) = get(schema, "items") {
@@ -77,11 +82,17 @@ pub fn subset_key_violations(schema: &Json, path: &str) -> Vec<String> {
     }
     if let Some(Json::Object(extra)) = get(schema, "additionalProperties") {
         let extra = Json::Object(extra.clone());
-        out.extend(subset_key_violations(&extra, &format!("{}/additionalProperties", path)));
+        out.extend(subset_key_violations(
+            &extra,
+            &format!("{}/additionalProperties", path),
+        ));
     }
     if let Some(pn) = get(schema, "propertyNames") {
         if matches!(pn, Json::Object(_)) {
-            out.extend(subset_key_violations(pn, &format!("{}/propertyNames", path)));
+            out.extend(subset_key_violations(
+                pn,
+                &format!("{}/propertyNames", path),
+            ));
         }
     }
     out
@@ -151,7 +162,11 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
     match name.as_str() {
         "object" => {
             let Json::Object(inst) = instance else {
-                return vec![format!("{}: 应为 object，实为 {}", path, py_type_name(instance))];
+                return vec![format!(
+                    "{}: 应为 object，实为 {}",
+                    path,
+                    py_type_name(instance)
+                )];
             };
             let props: Vec<(String, Json)> = match get(schema, "properties") {
                 Some(Json::Object(p)) => p.clone(),
@@ -199,19 +214,33 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
         }
         "array" => {
             let Json::Array(items) = instance else {
-                return vec![format!("{}: 应为 array，实为 {}", path, py_type_name(instance))];
+                return vec![format!(
+                    "{}: 应为 array，实为 {}",
+                    path,
+                    py_type_name(instance)
+                )];
             };
             if let Some(m) = get(schema, "minItems") {
                 if let Some(n) = as_int(m) {
                     if (items.len() as i64) < n {
-                        out.push(format!("{}: 数组长度 {} < minItems {}", path, items.len(), n));
+                        out.push(format!(
+                            "{}: 数组长度 {} < minItems {}",
+                            path,
+                            items.len(),
+                            n
+                        ));
                     }
                 }
             }
             if let Some(m) = get(schema, "maxItems") {
                 if let Some(n) = as_int(m) {
                     if (items.len() as i64) > n {
-                        out.push(format!("{}: 数组长度 {} > maxItems {}", path, items.len(), n));
+                        out.push(format!(
+                            "{}: 数组长度 {} > maxItems {}",
+                            path,
+                            items.len(),
+                            n
+                        ));
                     }
                 }
             }
@@ -220,14 +249,22 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
                 if let Some(s) = sub {
                     out.extend(subset_validate(item, s, &format!("{}[{}]", path, i)));
                 } else {
-                    out.extend(subset_validate(item, &Json::Null, &format!("{}[{}]", path, i)));
+                    out.extend(subset_validate(
+                        item,
+                        &Json::Null,
+                        &format!("{}[{}]", path, i),
+                    ));
                 }
             }
             out
         }
         "string" => {
             let Json::Str(s) = instance else {
-                return vec![format!("{}: 应为 string，实为 {}", path, py_type_name(instance))];
+                return vec![format!(
+                    "{}: 应为 string，实为 {}",
+                    path,
+                    py_type_name(instance)
+                )];
             };
             if let Some(m) = get(schema, "minLength") {
                 if let Some(n) = as_int(m) {
@@ -271,7 +308,12 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
             if let Some(m) = get(schema, "minimum") {
                 if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
                     if v < n {
-                        out.push(format!("{}: 值 {} < minimum {}", path, plain_str(instance), plain_str(m)));
+                        out.push(format!(
+                            "{}: 值 {} < minimum {}",
+                            path,
+                            plain_str(instance),
+                            plain_str(m)
+                        ));
                     }
                 }
             }
@@ -280,12 +322,21 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
         "number" => {
             let ok = matches!(instance, Json::Int(_) | Json::Float(_));
             if !ok {
-                return vec![format!("{}: 应为 number，实为 {}", path, py_type_name(instance))];
+                return vec![format!(
+                    "{}: 应为 number，实为 {}",
+                    path,
+                    py_type_name(instance)
+                )];
             }
             if let Some(m) = get(schema, "minimum") {
                 if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
                     if v < n {
-                        out.push(format!("{}: 值 {} < minimum {}", path, plain_str(instance), plain_str(m)));
+                        out.push(format!(
+                            "{}: 值 {} < minimum {}",
+                            path,
+                            plain_str(instance),
+                            plain_str(m)
+                        ));
                     }
                 }
             }
@@ -329,12 +380,18 @@ pub fn check_schema_files(root: &Path) -> (Vec<String>, Vec<Json>) {
     let mut issues: Vec<String> = Vec::new();
     let mut schemas: Vec<Json> = Vec::new();
     if !root.join(SCHEMA_DIR).is_dir() {
-        return (vec![format!("{}/ 缺失（协议层 IDL 未落盘）", SCHEMA_DIR)], schemas);
+        return (
+            vec![format!("{}/ 缺失（协议层 IDL 未落盘）", SCHEMA_DIR)],
+            schemas,
+        );
     }
     for rel in crate::glob::expand(root, "protocol/schema/*.json") {
         let name = rel.rsplit('/').next().unwrap_or(&rel).to_string();
         let Some(data) = jsonread::read_file(root, &rel) else {
-            issues.push(format!("{}: JSON 解析失败（本线不复制 Python 异常文本）", name));
+            issues.push(format!(
+                "{}: JSON 解析失败（本线不复制 Python 异常文本）",
+                name
+            ));
             continue;
         };
         if !matches!(data, Json::Object(_)) {
@@ -389,8 +446,16 @@ pub fn discover(
     root: &Path,
     cache: &mut crate::glob::Cache,
 ) -> (Vec<String>, Vec<String>, Vec<String>) {
-    let module_docs = face(root, &["04_模块库/**/*.md", "community/*/modules/*.md"], cache);
-    let pipeline_docs = face(root, &["03_管线库/**/*.md", "community/*/pipelines/*.md"], cache);
+    let module_docs = face(
+        root,
+        &["04_模块库/**/*.md", "community/*/modules/*.md"],
+        cache,
+    );
+    let pipeline_docs = face(
+        root,
+        &["03_管线库/**/*.md", "community/*/pipelines/*.md"],
+        cache,
+    );
     let protocol_files = face(root, &["community/*/protocol.yaml"], cache);
     (module_docs, pipeline_docs, protocol_files)
 }
@@ -409,8 +474,14 @@ impl LintStats {
     /// 进 `verify_report` / CLI 的 stats 字典（键序由 JSON 出口排序）。
     pub fn to_json(&self) -> Json {
         Json::Object(vec![
-            ("schema_files".to_string(), Json::Int(self.schema_files as i64)),
-            ("module_docs".to_string(), Json::Int(self.module_docs as i64)),
+            (
+                "schema_files".to_string(),
+                Json::Int(self.schema_files as i64),
+            ),
+            (
+                "module_docs".to_string(),
+                Json::Int(self.module_docs as i64),
+            ),
             (
                 "contract_covered".to_string(),
                 Json::Int(self.contract_covered as i64),
@@ -426,7 +497,13 @@ impl LintStats {
 }
 
 /// 真源 `_lint_doc_cached` 的**无缓存实现**（缓存是纯函数优化，不改语义）。
-fn lint_doc(text: &str, marker: &str, schema: Option<&Json>, prefix: &str, obj_key: &str) -> Option<Vec<String>> {
+fn lint_doc(
+    text: &str,
+    marker: &str,
+    schema: Option<&Json>,
+    prefix: &str,
+    obj_key: &str,
+) -> Option<Vec<String>> {
     let parsed = miniyaml::fence_yaml(text, marker)?;
     let want = if obj_key.is_empty() { marker } else { obj_key };
     let obj = match get(&parsed, want) {
@@ -437,7 +514,11 @@ fn lint_doc(text: &str, marker: &str, schema: Option<&Json>, prefix: &str, obj_k
         Some(s) => subset_validate(&obj, s, PLACEHOLDER),
         None => Vec::new(),
     };
-    Some(errs.into_iter().map(|m| m.replace(PLACEHOLDER, prefix)).collect())
+    Some(
+        errs.into_iter()
+            .map(|m| m.replace(PLACEHOLDER, prefix))
+            .collect(),
+    )
 }
 
 /// 真源 `_lint_obj_cached` 的**无缓存实现**。
@@ -460,7 +541,14 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
     issues.extend(schema_issues);
     let by_name: Vec<(String, Json)> = schemas
         .iter()
-        .filter_map(|s| get(s, "$id").map(|id| (plain_str(id).rsplit('/').next().unwrap_or("").to_string(), s.clone())))
+        .filter_map(|s| {
+            get(s, "$id").map(|id| {
+                (
+                    plain_str(id).rsplit('/').next().unwrap_or("").to_string(),
+                    s.clone(),
+                )
+            })
+        })
         .collect();
     let pick = |n: &str| by_name.iter().find(|(k, _)| k == n).map(|(_, v)| v.clone());
 
@@ -491,7 +579,10 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
     }
 
     let reg_modules: Vec<Json> = match jsonread::read_file(root, "desktop/src/core/registry.json") {
-        Some(reg) => crate::pyval::arr_items(get(&reg, "modules")).into_iter().cloned().collect(),
+        Some(reg) => crate::pyval::arr_items(get(&reg, "modules"))
+            .into_iter()
+            .cloned()
+            .collect(),
         None => {
             issues.push("registry.json 读取/解析失败（本线不复制 Python 异常文本）".to_string());
             Vec::new()
@@ -525,20 +616,27 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
         let text = match read_text(root, rel) {
             Ok(t) => t,
             Err(_) => {
-                issues.push(format!("{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）", rel));
+                issues.push(format!(
+                    "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                    rel
+                ));
                 continue;
             }
         };
         match miniyaml::parse(&text) {
             Ok(data) => issues.extend(lint_obj(&data, protocol_schema.as_ref(), rel)),
-            Err(_) => {
-                issues.push(format!("{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）", rel))
-            }
+            Err(_) => issues.push(format!(
+                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                rel
+            )),
         }
     }
 
     let prov_entries: Vec<Json> = match jsonread::read_file(root, "05_资产库/provenance.json") {
-        Some(prov) => crate::pyval::arr_items(get(&prov, "assets")).into_iter().cloned().collect(),
+        Some(prov) => crate::pyval::arr_items(get(&prov, "assets"))
+            .into_iter()
+            .cloned()
+            .collect(),
         None => {
             issues.push("provenance.json 读取/解析失败（本线不复制 Python 异常文本）".to_string());
             Vec::new()
@@ -604,7 +702,11 @@ mod tests {
         assert!(got[0].contains("未知字段 b"), "{:?}", got);
         // 缺必填
         let got2 = subset_validate(&j(serde_json::json!({"b": 1})), &schema, "p");
-        assert!(got2.iter().any(|m| m.contains("缺必填字段 a")), "{:?}", got2);
+        assert!(
+            got2.iter().any(|m| m.contains("缺必填字段 a")),
+            "{:?}",
+            got2
+        );
     }
 
     #[test]
@@ -620,7 +722,12 @@ mod tests {
         ] {
             let got = subset_validate(&j(v), &schema, "p");
             assert_eq!(got.len(), 1);
-            assert!(got[0].ends_with(want), "期望 {} 收尾，实得 {:?}", want, got[0]);
+            assert!(
+                got[0].ends_with(want),
+                "期望 {} 收尾，实得 {:?}",
+                want,
+                got[0]
+            );
         }
     }
 
@@ -650,10 +757,22 @@ mod tests {
         assert_eq!(got.len(), 1, "boolean enum 必须判违例：{:?}", got);
         assert!(got[0].contains("不在枚举"), "{:?}", got);
         // 严格相等：False 不能冒充 0 / True 不能冒充 1；数字之间 1 == 1.0
-        assert!(json_equal(&j(serde_json::json!(true)), &j(serde_json::json!(true))));
-        assert!(!json_equal(&j(serde_json::json!(true)), &j(serde_json::json!(1))));
-        assert!(!json_equal(&j(serde_json::json!(false)), &j(serde_json::json!(0))));
-        assert!(json_equal(&j(serde_json::json!(1)), &j(serde_json::json!(1.0))));
+        assert!(json_equal(
+            &j(serde_json::json!(true)),
+            &j(serde_json::json!(true))
+        ));
+        assert!(!json_equal(
+            &j(serde_json::json!(true)),
+            &j(serde_json::json!(1))
+        ));
+        assert!(!json_equal(
+            &j(serde_json::json!(false)),
+            &j(serde_json::json!(0))
+        ));
+        assert!(json_equal(
+            &j(serde_json::json!(1)),
+            &j(serde_json::json!(1.0))
+        ));
         // 无 type 时 enum 违例不得被吞掉（真源这一支此前 return []）
         let s2 = j(serde_json::json!({"enum": ["a"]}));
         let g2 = subset_validate(&j(serde_json::json!("b")), &s2, "p");

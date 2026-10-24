@@ -25,7 +25,8 @@ const SCHEMA: &str = "nf-intake/1";
 
 fn is_dated(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
+    let re =
+        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
     re.is_match(s)
 }
 
@@ -79,7 +80,10 @@ pub fn scan(root: &Path) -> IntakeScan {
         _ => Vec::new(),
     };
     if channels.is_empty() {
-        issues.push(format!("{} channels 为空（修复指引：至少声明一条接收通道）", INTAKE_REL));
+        issues.push(format!(
+            "{} channels 为空（修复指引：至少声明一条接收通道）",
+            INTAKE_REL
+        ));
     }
 
     let idx = root.join(INDEX_REL);
@@ -93,7 +97,11 @@ pub fn scan(root: &Path) -> IntakeScan {
     let mut sorted = channels.clone();
     sorted.sort_by(|a, b| a.0.cmp(&b.0));
     for (name, ch) in &sorted {
-        let ch = if matches!(ch, Json::Object(_)) { ch.clone() } else { Json::Object(Vec::new()) };
+        let ch = if matches!(ch, Json::Object(_)) {
+            ch.clone()
+        } else {
+            Json::Object(Vec::new())
+        };
         let mode = py_str(get(&ch, "mode"));
         if !MODES.contains(&mode.as_str()) {
             // 真源是 `%r`（带引号）：`通道 bad-mode mode 非法：'sometimes'（取值 …）`
@@ -136,7 +144,10 @@ pub fn scan(root: &Path) -> IntakeScan {
     for rel in BOTS {
         let p = root.join(rel);
         if !p.is_file() {
-            issues.push(format!("缺入库机器人脚本 {}（修复指引：闸门须有执行面）", rel));
+            issues.push(format!(
+                "缺入库机器人脚本 {}（修复指引：闸门须有执行面）",
+                rel
+            ));
             continue;
         }
         let text = std::fs::read_to_string(&p).unwrap_or_default();
@@ -190,13 +201,21 @@ mod tests {
         std::fs::create_dir_all(root.join("library")).unwrap();
         std::fs::create_dir_all(root.join(".github/scripts")).unwrap();
         std::fs::write(root.join("library/intake.json"), r#"{"schema": "wrong/1", "updated": "2026/01/01", "after_action": "  ", "channels": {"bad-mode": {"mode": "sometimes"}, "auth-only": {"mode": "author_only", "allowlist": ["  ", ""], "index_label": "不存在的措辞"}, "good": {"mode": "open", "index_label": "开放投稿"}, "paused-ok": {"mode": "paused", "index_label": "暂停接收"}}}"#).unwrap();
-        std::fs::write(root.join("library/INDEX.md"), r#"# 馆藏
+        std::fs::write(
+            root.join("library/INDEX.md"),
+            r#"# 馆藏
 
 > 开放投稿
 > 暂停接收
-"#).unwrap();
-        std::fs::write(root.join(".github/scripts/library_ingest.py"), r#"# 读 library/intake.json
-"#).unwrap();
+"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join(".github/scripts/library_ingest.py"),
+            r#"# 读 library/intake.json
+"#,
+        )
+        .unwrap();
         root
     }
 

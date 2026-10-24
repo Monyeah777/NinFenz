@@ -49,7 +49,6 @@ use std::path::Path;
 pub const EXEC_GLOB: &str = "desktop/tests/fixtures/execution/p*_drill_cases.json";
 pub const ROUND_GLOB: &str = "desktop/tests/fixtures/execution/rounds/*.json";
 
-
 /// 真源 `VERDICT_MAP`：样本侧写 good/bad，drill 侧吐 conformant/non-conformant。
 fn verdict_map(s: &str) -> Option<&'static str> {
     match s {
@@ -71,27 +70,69 @@ fn module_token_re() -> &'static regex::Regex {
 }
 
 /// 真源 `execution_drill._DECISION_WORDS`（缺省中文；用例可在 fixture 的 lexicon 里覆盖）。
-const EXEC_DECISION: [&str; 8] = ["应", "应该", "必须", "禁止", "不得", "下一步", "输出", "结论"];
+const EXEC_DECISION: [&str; 8] = [
+    "应",
+    "应该",
+    "必须",
+    "禁止",
+    "不得",
+    "下一步",
+    "输出",
+    "结论",
+];
 
 /// 真源 `execution_drill._DECISION_GLUE`：单字判定词的构词排除表（(词, (前字集, 后字集))）。
 /// 真实语料实测：`元素反应`/`对应件`/`应用` 里的 `应` 不是「应当」义。
 const EXEC_DECISION_GLUE: [(&str, (&str, &str)); 1] = [(
     "应",
-    ("反对适响供效相顺答呼照策接报感", "用急对变聘邀酬届试运付缴纳计答战征招"),
+    (
+        "反对适响供效相顺答呼照策接报感",
+        "用急对变聘邀酬届试运付缴纳计答战征招",
+    ),
 )];
 
 /// 真源 `execution_drill._ASSERT_ABSENT_CUES`：编号断言的否定语境谓词。
 /// **只认显式谓词**（不做「句内有『不』就豁免」的粗口径，否则真失范会被误豁免）。
 const ASSERT_ABSENT_CUES: [&str; 22] = [
-    "不命中", "未命中", "不适用", "不含", "不包含", "未包含", "不参与", "未参与", "不涉及",
-    "未涉及", "未采用", "未使用", "不使用", "不得使用", "禁止使用", "不挂载", "未挂载",
-    "不纳入", "未纳入", "跳过", "已移除", "未生效",
+    "不命中",
+    "未命中",
+    "不适用",
+    "不含",
+    "不包含",
+    "未包含",
+    "不参与",
+    "未参与",
+    "不涉及",
+    "未涉及",
+    "未采用",
+    "未使用",
+    "不使用",
+    "不得使用",
+    "禁止使用",
+    "不挂载",
+    "未挂载",
+    "不纳入",
+    "未纳入",
+    "跳过",
+    "已移除",
+    "未生效",
 ];
 
 /// 真源 `execution_drill._ASSERT_HISTORY_CUES`：编号断言的历史语境谓词。
 const ASSERT_HISTORY_CUES: [&str; 13] = [
-    "曾", "此前", "上一版", "旧版", "历史", "原编号", "旧编号", "残留", "遗留", "已废弃",
-    "已下线", "已迁移", "旧名",
+    "曾",
+    "此前",
+    "上一版",
+    "旧版",
+    "历史",
+    "原编号",
+    "旧编号",
+    "残留",
+    "遗留",
+    "已废弃",
+    "已下线",
+    "已迁移",
+    "旧名",
 ];
 
 /// 真源 `_ASSERT_CTX_BEFORE` / `_ASSERT_CTX_AFTER`（单位：**码点**，与 Python 切片一致）。
@@ -159,7 +200,10 @@ fn bigrams(text: &str) -> BTreeSet<String> {
 }
 
 fn mention_tokens(output: &str) -> Vec<String> {
-    module_token_re().find_iter(output).map(|m| m.as_str().to_string()).collect()
+    module_token_re()
+        .find_iter(output)
+        .map(|m| m.as_str().to_string())
+        .collect()
 }
 
 /// 真源 `execution_drill._id_tokens`：**可作编号断言的**模块号（排除路径/文件名前缀）。
@@ -191,7 +235,11 @@ fn exec_id_token_spans(output: &str) -> Vec<(String, usize, usize)> {
 /// 真源 `_assertion_context`：取编号前后**同句内**的语境窗（不跨 。！？；换行）。
 fn assertion_context(output: &str, start: usize, end: usize) -> (String, String) {
     let before_raw = tail_chars(&output[..start], ASSERT_CTX_BEFORE);
-    let before = split_re().split(before_raw).last().unwrap_or("").to_string();
+    let before = split_re()
+        .split(before_raw)
+        .last()
+        .unwrap_or("")
+        .to_string();
     let after_raw = head_chars(&output[end..], ASSERT_CTX_AFTER);
     let after = split_re().split(after_raw).next().unwrap_or("").to_string();
     (before, after)
@@ -237,7 +285,10 @@ fn has_decision(output: &str, decision: &[String]) -> bool {
         let Some(first) = word.chars().next() else {
             continue;
         };
-        let glue = EXEC_DECISION_GLUE.iter().find(|(w, _)| *w == word.as_str()).map(|(_, g)| *g);
+        let glue = EXEC_DECISION_GLUE
+            .iter()
+            .find(|(w, _)| *w == word.as_str())
+            .map(|(_, g)| *g);
         for (i, ch) in output.char_indices() {
             if ch != first {
                 continue;
@@ -415,10 +466,16 @@ fn exec_lexicon(lexicon: Option<&Json>) -> (Vec<String>, Vec<String>, regex::Reg
     (decision, progress, citation)
 }
 
-
 /// 真源 `execution_drill.run_case` → 命中的失范规则名列表（**顺序即判据**）。
-fn run_case(case: &Json, real_ids: &[String], semantics: Option<&Json>, source_text: &str,
-            other_ids: &[String], asset_keys: &[String], lexicon: Option<&Json>) -> Vec<String> {
+fn run_case(
+    case: &Json,
+    real_ids: &[String],
+    semantics: Option<&Json>,
+    source_text: &str,
+    other_ids: &[String],
+    asset_keys: &[String],
+    lexicon: Option<&Json>,
+) -> Vec<String> {
     let (decision, progress, citation) = exec_lexicon(lexicon);
     let output = py_str(get(case, "output"));
     let mut hits: Vec<String> = Vec::new();
@@ -435,7 +492,11 @@ fn run_case(case: &Json, real_ids: &[String], semantics: Option<&Json>, source_t
         Some(v) => py_str(Some(v)),
         None => String::new(),
     };
-    let src = if source_text.is_empty() { case_src } else { source_text.to_string() };
+    let src = if source_text.is_empty() {
+        case_src
+    } else {
+        source_text.to_string()
+    };
     let hit = check_browse_repeat(&output, &src, &progress);
     if !hit.is_empty() {
         hits.push(hit.to_string());
@@ -477,7 +538,9 @@ fn round_scan(transcript: &str, allowed: &[String]) -> (Vec<String>, i64, Vec<(i
     }
     char_byte.push(b);
     let char_of = |byte: usize| -> usize {
-        char_byte.binary_search(&byte).unwrap_or_else(|i| i.min(chars.len()))
+        char_byte
+            .binary_search(&byte)
+            .unwrap_or_else(|i| i.min(chars.len()))
     };
 
     let matches: Vec<(usize, usize, i64)> = re
@@ -495,7 +558,10 @@ fn round_scan(transcript: &str, allowed: &[String]) -> (Vec<String>, i64, Vec<(i
 
     let mut turns: Vec<(i64, String)> = Vec::new();
     for (i, (_, end, num)) in matches.iter().enumerate() {
-        let stop = matches.get(i + 1).map(|(s, _, _)| *s).unwrap_or(chars.len());
+        let stop = matches
+            .get(i + 1)
+            .map(|(s, _, _)| *s)
+            .unwrap_or(chars.len());
         let body: String = chars[*end..stop].iter().collect();
         turns.push((*num, body));
     }
@@ -515,7 +581,10 @@ fn round_scan(transcript: &str, allowed: &[String]) -> (Vec<String>, i64, Vec<(i
         if !ROUND_PROGRESS.iter().any(|k| body.contains(k)) {
             issues.push(format!("第 {} 回合无推进/状态留痕（R-R2）", num));
         }
-        for tok in module_token_re().find_iter(body).map(|m| m.as_str().to_string()) {
+        for tok in module_token_re()
+            .find_iter(body)
+            .map(|m| m.as_str().to_string())
+        {
             if !allowed_set.contains(&tok) && !allowed_tails.contains(&tail_after_colon(&tok)) {
                 issues.push(format!("第 {} 回合出现允许集外编号 {}（R-R3）", num, tok));
             }
@@ -569,7 +638,9 @@ fn exec_sets(root: &Path) -> Vec<ExecSet> {
         let name = rel.rsplit('/').next().unwrap_or(&rel).to_string();
         let Some(data) = jsonread::read_file(root, &rel) else {
             out.push(ExecSet {
-                error: Some(format!("JSON 不可解析：（本线不复刻 CPython 解析器原文，见模块头）")),
+                error: Some(format!(
+                    "JSON 不可解析：（本线不复刻 CPython 解析器原文，见模块头）"
+                )),
                 set: name,
                 cases: 0,
                 passed: 0,
@@ -585,12 +656,18 @@ fn exec_sets(root: &Path) -> Vec<ExecSet> {
             });
             continue;
         }
-        let real_ids: Vec<String> =
-            arr_items(get(&data, "real_ids")).iter().map(|v| py_str(Some(v))).collect();
-        let other_ids: Vec<String> =
-            arr_items(get(&data, "other_ids")).iter().map(|v| py_str(Some(v))).collect();
-        let asset_keys: Vec<String> =
-            arr_items(get(&data, "asset_keys")).iter().map(|v| py_str(Some(v))).collect();
+        let real_ids: Vec<String> = arr_items(get(&data, "real_ids"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
+        let other_ids: Vec<String> = arr_items(get(&data, "other_ids"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
+        let asset_keys: Vec<String> = arr_items(get(&data, "asset_keys"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
         let semantics = get(&data, "semantics");
         let lexicon = get(&data, "lexicon");
         // 真源 `data.get("source_text", "")`：**键不在场**才取默认；在场为 null 则传 None 下去
@@ -604,9 +681,19 @@ fn exec_sets(root: &Path) -> Vec<ExecSet> {
                 n += 1;
                 continue;
             }
-            let hits = run_case(case, &real_ids, semantics, &src, &other_ids, &asset_keys, lexicon);
-            let expect: Vec<String> =
-                arr_items(get(case, "expect_captured")).iter().map(|v| py_str(Some(v))).collect();
+            let hits = run_case(
+                case,
+                &real_ids,
+                semantics,
+                &src,
+                &other_ids,
+                &asset_keys,
+                lexicon,
+            );
+            let expect: Vec<String> = arr_items(get(case, "expect_captured"))
+                .iter()
+                .map(|v| py_str(Some(v)))
+                .collect();
             let good = (expect.is_empty() && hits.is_empty())
                 || expect.iter().all(|e| hits.iter().any(|h| h == e));
             n += 1;
@@ -614,7 +701,12 @@ fn exec_sets(root: &Path) -> Vec<ExecSet> {
                 ok += 1;
             }
         }
-        out.push(ExecSet { set: name, cases: n, passed: ok, error: None });
+        out.push(ExecSet {
+            set: name,
+            cases: n,
+            passed: ok,
+            error: None,
+        });
     }
     out
 }
@@ -663,10 +755,16 @@ fn round_samples(root: &Path) -> Vec<RoundSample> {
             continue;
         }
         let transcript = py_str(get(&d, "transcript"));
-        let allowed: Vec<String> =
-            arr_items(get(&d, "allowed")).iter().map(|v| py_str(Some(v))).collect();
+        let allowed: Vec<String> = arr_items(get(&d, "allowed"))
+            .iter()
+            .map(|v| py_str(Some(v)))
+            .collect();
         let (issues, turns, _gaps) = round_scan(&transcript, &allowed);
-        let live = if issues.is_empty() { "conformant" } else { "non-conformant" };
+        let live = if issues.is_empty() {
+            "conformant"
+        } else {
+            "non-conformant"
+        };
         let declared = declared_of(&d);
         // 真源：`label_status`/`verdict` 为 pending ⇒ 未裁定（不参与「声明 vs 实测」分子分母）。
         let pending = py_str(get(&d, "label_status")).to_lowercase() == "pending"
@@ -788,8 +886,11 @@ mod tests {
     const DF_ROUND_NOTURN: &str = r#"{"schema": "nf-round-transcript/1", "verdict": "bad", "transcript": "这里一个回合标记也没有。\n", "allowed": []}"#;
     const DF_ROUND_TAIL: &str = r#"{"schema": "nf-round-transcript/1", "verdict": "good", "transcript": "回合 1：引用 06 §3 推进，M10 写回状态。\n", "allowed": ["通用:M10"]}"#;
 
-    fn build_df_fixture(scenario: &str, exec_doc: Option<&str>,
-                        rounds: &[(&str, &str)]) -> std::path::PathBuf {
+    fn build_df_fixture(
+        scenario: &str,
+        exec_doc: Option<&str>,
+        rounds: &[(&str, &str)],
+    ) -> std::path::PathBuf {
         let root = crate::testutil::fixture(&format!("drill-fidelity-branches-{}", scenario));
         let base = root.join("desktop/tests/fixtures/execution");
         std::fs::create_dir_all(base.join("rounds")).unwrap();
@@ -851,7 +952,11 @@ mod tests {
         let (issues, _w, stats) = scan(&root);
         assert_eq!(issues.len(), 2, "{:?}", issues);
         assert!(issues[0].starts_with("找不到执行演练用例"), "{}", issues[0]);
-        assert!(issues[1].starts_with("bad.json JSON 不可解析："), "{}", issues[1]);
+        assert!(
+            issues[1].starts_with("bad.json JSON 不可解析："),
+            "{}",
+            issues[1]
+        );
         assert!(crate::jsonread::json_eq(
             &stats,
             &crate::jsonread::convert(&serde_json::json!({
@@ -865,7 +970,11 @@ mod tests {
     fn badexec_needs_a_self_authored_prefix() {
         // ⚠️ 已知偏差：真源 issue 尾部是 CPython `JSONDecodeError` 原文，本线措辞自拟。
         // 这里只断言「件名 + 自拟前缀」，不伪造真源文本。
-        let root = build_df_fixture("badexec", Some("{ \"broken\": "), &[("good.json", DF_ROUND_GOOD)]);
+        let root = build_df_fixture(
+            "badexec",
+            Some("{ \"broken\": "),
+            &[("good.json", DF_ROUND_GOOD)],
+        );
         let (issues, _w, _s) = scan(&root);
         // 真源这里同样是 **2 条**：执行集坏掉 ⇒ `cases == 0` ⇒ 连带触发「找不到执行演练用例」
         assert_eq!(issues.len(), 2, "{:?}", issues);
@@ -885,37 +994,84 @@ mod tests {
     #[test]
     fn context_boundary_matches_the_truth_source() {
         let ids = vec!["M00".to_string()];
-        let run = |out: &str| run_case(&crate::jsonread::convert(&serde_json::json!(
-            {"output": out})).unwrap(), &ids, None, "", &[], &[], None);
+        let run = |out: &str| {
+            run_case(
+                &crate::jsonread::convert(&serde_json::json!(
+            {"output": out}))
+                .unwrap(),
+                &ids,
+                None,
+                "",
+                &[],
+                &[],
+                None,
+            )
+        };
         // 构词粘连：不算决策词 ⇒ 无失范
-        for out in ["技能应用说明。", "混沌事件响应链。", "种族适应与亚种。",
-                    "材料供应清单。", "地形效应修正。"] {
+        for out in [
+            "技能应用说明。",
+            "混沌事件响应链。",
+            "种族适应与亚种。",
+            "材料供应清单。",
+            "地形效应修正。",
+        ] {
             assert!(run(out).is_empty(), "构词粘连被当决策词：{}", out);
         }
         // 真决策句仍捕获
-        for out in ["应当输出结算结果。", "必须先写回状态。", "下一步进入结算。",
-                    "结论：按此推进。", "禁止跳过质检门。"] {
-            assert_eq!(run(out), vec!["no_citation".to_string()], "真决策句漏报：{}", out);
+        for out in [
+            "应当输出结算结果。",
+            "必须先写回状态。",
+            "下一步进入结算。",
+            "结论：按此推进。",
+            "禁止跳过质检门。",
+        ] {
+            assert_eq!(
+                run(out),
+                vec!["no_citation".to_string()],
+                "真决策句漏报：{}",
+                out
+            );
         }
         // 否定语境：只认显式谓词
-        for out in ["步 14 M65 幽灵沉淀不命中。", "M99 未使用。", "M99 不参与本回合。",
-                    "不得使用 M98 作为编号。"] {
+        for out in [
+            "步 14 M65 幽灵沉淀不命中。",
+            "M99 未使用。",
+            "M99 不参与本回合。",
+            "不得使用 M98 作为编号。",
+        ] {
             assert!(run(out).is_empty(), "否定语境误报：{}", out);
         }
-        for out in ["M99 输出不完整。", "M99 未完待续。", "由 M99 完成本条推进。"] {
-            assert_eq!(run(out), vec!["fabricated_id".to_string()],
-                       "否定语境豁免过宽，真失范漏报：{}", out);
+        for out in [
+            "M99 输出不完整。",
+            "M99 未完待续。",
+            "由 M99 完成本条推进。",
+        ] {
+            assert_eq!(
+                run(out),
+                vec!["fabricated_id".to_string()],
+                "否定语境豁免过宽，真失范漏报：{}",
+                out
+            );
         }
         // 历史语境 + 守卫
-        for out in ["源编号残留 M21，职能归 M00。", "旧版 M98 已下线。",
-                    "此前曾由 M97 承担。"] {
+        for out in [
+            "源编号残留 M21，职能归 M00。",
+            "旧版 M98 已下线。",
+            "此前曾由 M97 承担。",
+        ] {
             assert!(run(out).is_empty(), "历史语境误报：{}", out);
         }
-        assert_eq!(run("由 M21 结算经济。"), vec!["fabricated_id".to_string()],
-                   "当前断言里的编造编号被历史语境规则吃掉");
+        assert_eq!(
+            run("由 M21 结算经济。"),
+            vec!["fabricated_id".to_string()],
+            "当前断言里的编造编号被历史语境规则吃掉"
+        );
         // 语境窗不跨句
-        assert_eq!(run("该模块未启用。由 M99 完成推进。"),
-                   vec!["fabricated_id".to_string()], "跨句豁免（否定词在上一句）");
+        assert_eq!(
+            run("该模块未启用。由 M99 完成推进。"),
+            vec!["fabricated_id".to_string()],
+            "跨句豁免（否定词在上一句）"
+        );
     }
 
     /// ===== 正例对照（2026-10-20，非生成段：与真源 `drill_fidelity.positive_controls` 同夹具）=====
@@ -958,7 +1114,12 @@ mod tests {
                 .join("desktop/tests/fixtures/execution/positive_controls")
                 .join(&variant);
             let text = std::fs::read_to_string(&vpath).expect("变体件不可读");
-            assert_eq!(text, format!("{}{}\n", base, injection), "变体须等于「语料+注入」：{}", id);
+            assert_eq!(
+                text,
+                format!("{}{}\n", base, injection),
+                "变体须等于「语料+注入」：{}",
+                id
+            );
             let line_no = source_lines + 1;
             let hits = probe_line_hits(&text, &real_ids);
             let at_line: Vec<String> = hits
@@ -990,8 +1151,8 @@ mod tests {
             if line.trim().is_empty() {
                 continue;
             }
-            let case: Json = crate::jsonread::convert(&serde_json::json!({"output": line}))
-                .expect("case 构造");
+            let case: Json =
+                crate::jsonread::convert(&serde_json::json!({"output": line})).expect("case 构造");
             for rule in run_case(&case, real_ids, None, "", &[], &[], None) {
                 out.push((i + 1, rule));
             }

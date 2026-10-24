@@ -143,7 +143,11 @@ fn strip_unc(p: &Path) -> PathBuf {
 /// 真源 `contained`。
 pub fn contained(root: &Path, target: &Path) -> bool {
     let r = realpath(root);
-    let t = if target.is_absolute() { target.to_path_buf() } else { r.join(target) };
+    let t = if target.is_absolute() {
+        target.to_path_buf()
+    } else {
+        r.join(target)
+    };
     let t = realpath(&t);
     t == r || t.starts_with(format!("{}{}", r.display(), std::path::MAIN_SEPARATOR))
 }

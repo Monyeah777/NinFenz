@@ -46,8 +46,12 @@ pub fn load_slots(root: &Path) -> Vec<(String, Json)> {
     if !root.join(rel).is_file() {
         return Vec::new();
     }
-    let Ok(text) = std::fs::read_to_string(root.join(rel)) else { return Vec::new() };
-    let Ok(data) = crate::asset_contract::strict_json(&text) else { return Vec::new() };
+    let Ok(text) = std::fs::read_to_string(root.join(rel)) else {
+        return Vec::new();
+    };
+    let Ok(data) = crate::asset_contract::strict_json(&text) else {
+        return Vec::new();
+    };
     match obj_get(&data, "slots") {
         Some(Json::Object(o)) => o.clone(),
         _ => Vec::new(),
@@ -77,11 +81,7 @@ pub fn matches(value: &Json, kind: &str, item_kind: Option<&str>) -> bool {
 }
 
 /// 真源 `validate_contract`。
-pub fn validate_contract(
-    wm: &Json,
-    label: &str,
-    slot_registry: &[(String, Json)],
-) -> Vec<String> {
+pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)]) -> Vec<String> {
     let mut issues: Vec<String> = Vec::new();
     if !matches!(wm, Json::Object(_)) {
         return vec![format!("{}: 非对象", label)];
@@ -180,9 +180,7 @@ pub fn validate_contract(
             };
             match slot_str {
                 None => issues.push(format!("{}.slot: 非空字符串", at)),
-                Some(s) if s.trim().is_empty() => {
-                    issues.push(format!("{}.slot: 非空字符串", at))
-                }
+                Some(s) if s.trim().is_empty() => issues.push(format!("{}.slot: 非空字符串", at)),
                 Some(s) => {
                     if slots.contains(&s) {
                         issues.push(format!(
@@ -243,9 +241,7 @@ pub fn validate_contract(
                 _ => None,
             };
             let value = obj_get(init, &name).cloned().unwrap_or(Json::Null);
-            if KINDS.contains(&kind.as_str())
-                && !matches(&value, &kind, item_kind.as_deref())
-            {
+            if KINDS.contains(&kind.as_str()) && !matches(&value, &kind, item_kind.as_deref()) {
                 issues.push(format!(
                     "{}.abstract_state.initial.{}: 值 {} 不匹配 kind={}",
                     label,
@@ -264,9 +260,7 @@ pub fn validate_contract(
         Some(t @ Json::Object(_)) => {
             let ip = get(t, "initial_phase");
             match &ip {
-                Some(Json::Str(s)) if !s.trim().is_empty() => {
-                    initial_phase = Some(s.clone())
-                }
+                Some(Json::Str(s)) if !s.trim().is_empty() => initial_phase = Some(s.clone()),
                 _ => {
                     issues.push(format!("{}.transition.initial_phase: 非空字符串", label));
                 }
@@ -325,7 +319,10 @@ pub fn validate_contract(
         if !writes_ok {
             issues.push(format!("{}.writes: 字符串数组（可为空）", at));
         }
-        if let (Json::Str(p), Json::Str(n)) = (&pname_v.clone().unwrap_or(Json::Null), &nxt_v.clone().unwrap_or(Json::Null)) {
+        if let (Json::Str(p), Json::Str(n)) = (
+            &pname_v.clone().unwrap_or(Json::Null),
+            &nxt_v.clone().unwrap_or(Json::Null),
+        ) {
             // ⚠️ 真源 `edges` 是 **dict**（`edges[pname] = nxt`）⇒ **后者覆盖前者**，且**保留首次
             // 插入的位置**。用 Vec 追加会同时改变两处结论：①「next 无对应相位」会报出已被覆盖
             // 的旧值；② `all(n in phase_set ...)` 会因旧值悬空而**整段跳过**，漏报不可达相位。
@@ -383,7 +380,10 @@ pub fn validate_contract(
                     "{}.transition: 从 initial_phase 不可达的相位 {}",
                     label,
                     pyval::py_repr_list(
-                        &unreachable.iter().map(|s| Json::Str(s.clone())).collect::<Vec<_>>()
+                        &unreachable
+                            .iter()
+                            .map(|s| Json::Str(s.clone()))
+                            .collect::<Vec<_>>()
                     )
                 ));
             }
@@ -464,7 +464,8 @@ pub fn validate_contract(
                     let ok = match &values_v {
                         Some(Json::Array(v)) => {
                             !v.is_empty()
-                                && v.iter().all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty()))
+                                && v.iter()
+                                    .all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty()))
                         }
                         _ => false,
                     };
@@ -478,7 +479,10 @@ pub fn validate_contract(
                         .map(|(_, k)| k.clone())
                         .unwrap_or_default();
                     if k != "integer" && k != "number" {
-                        issues.push(format!("{}.field: monotonic 只能用于 integer/number 变量", at));
+                        issues.push(format!(
+                            "{}.field: monotonic 只能用于 integer/number 变量",
+                            at
+                        ));
                     }
                 }
                 if kind == "finite_sequence" {
@@ -490,9 +494,9 @@ pub fn validate_contract(
                     if k != "array" {
                         issues.push(format!("{}.field: finite_sequence 只能用于 array 变量", at));
                     } else {
-                        let spec = valid_vars.iter().find(|v| {
-                            matches!(get(v, "name"), Some(Json::Str(n)) if *n == field)
-                        });
+                        let spec = valid_vars
+                            .iter()
+                            .find(|v| matches!(get(v, "name"), Some(Json::Str(n)) if *n == field));
                         let ik = spec.and_then(|s| get(s, "item_kind"));
                         if !matches!(ik, None | Some(Json::Null))
                             && !matches!(&ik, Some(Json::Str(s)) if s == "string")
@@ -586,8 +590,7 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     let mut models: Vec<Json> = Vec::new();
 
     for rel in crate::depth_small::module_docs(root) {
-        let text = std::fs::read(root.join(&rel))
-            .map(|b| String::from_utf8_lossy(&b).into_owned());
+        let text = std::fs::read(root.join(&rel)).map(|b| String::from_utf8_lossy(&b).into_owned());
         let text = match text {
             Ok(t) => t,
             Err(e) => {
@@ -603,7 +606,9 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
             Some(m @ Json::Object(_)) => m.clone(),
             _ => continue,
         };
-        let Some(wm) = obj_get(&mc, "world_model").cloned() else { continue };
+        let Some(wm) = obj_get(&mc, "world_model").cloned() else {
+            continue;
+        };
         for issue in validate_contract(&wm, &format!("{}.world_model", rel), &slot_registry) {
             issues.push(issue);
         }
@@ -670,7 +675,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
             ("invariants".to_string(), Json::Int(invariants)),
             ("checks".to_string(), Json::Int(checks)),
             ("slots".to_string(), Json::Int(slots)),
-            ("slot_registry".to_string(), Json::Int(slot_registry.len() as i64)),
+            (
+                "slot_registry".to_string(),
+                Json::Int(slot_registry.len() as i64),
+            ),
             ("models".to_string(), Json::Array(models)),
         ]),
     )
@@ -690,8 +698,12 @@ mod tests {
             &serde_json::from_str::<serde_json::Value>(r#"{"checks": 3, "invariants": 5, "models": [{"checks": 3, "initial_phase": "begin", "invariants": 5, "module": "M50", "phases": 5, "slots": 4, "source": "04_模块库/通用类/M50_调度器.md"}], "modules": 1, "phases": 5, "slot_registry": 10, "slots": 4, "variables": 4}"#).unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want),
-                "真语料 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "真语料 stats 不一致\n  实得 {}\n  期望 {}",
+            stats.dumps(),
+            want.dumps()
+        );
     }
 
     /// ===== 合成分支夹具（逐支踩 `validate_contract`）=====
@@ -703,7 +715,9 @@ mod tests {
     /// 相位重名·ghost next·不可达相位）/ invariants 面 / checks 面（非法 kind·未声明 field·
     /// values 非法·monotonic 用错类型·finite_sequence 用错类型与元素类型）。
     const WM_FILES: [(&str, &str); 5] = [
-        (r#"04_模块库/通用类/M90_测试.md"#, r#"---
+        (
+            r#"04_模块库/通用类/M90_测试.md"#,
+            r#"---
 module: M90
 ---
 
@@ -717,8 +731,11 @@ machine_contract:
     transition: "not-an-object"
 
 ```
-"#),
-        (r#"04_模块库/通用类/M91_测试.md"#, r#"---
+"#,
+        ),
+        (
+            r#"04_模块库/通用类/M91_测试.md"#,
+            r#"---
 module: M91
 ---
 
@@ -774,8 +791,11 @@ machine_contract:
     invariants: []
 
 ```
-"#),
-        (r#"04_模块库/通用类/M92_测试.md"#, r#"---
+"#,
+        ),
+        (
+            r#"04_模块库/通用类/M92_测试.md"#,
+            r#"---
 module: M92
 ---
 
@@ -819,8 +839,11 @@ machine_contract:
     invariants: ["", "ok"]
 
 ```
-"#),
-        (r#"04_模块库/通用类/M93_测试.md"#, r#"---
+"#,
+        ),
+        (
+            r#"04_模块库/通用类/M93_测试.md"#,
+            r#"---
 module: M93
 ---
 
@@ -868,8 +891,11 @@ machine_contract:
       - "not-an-object"
 
 ```
-"#),
-        (r#"protocol/world_slots.json"#, r#"{
+"#,
+        ),
+        (
+            r#"protocol/world_slots.json"#,
+            r#"{
   "schema_version": "1",
   "slots": {
     "s.drifdowner": {
@@ -891,7 +917,8 @@ machine_contract:
     }
   }
 }
-"#),
+"#,
+        ),
     ];
 
     fn build_wm_fixture() -> std::path::PathBuf {
@@ -908,13 +935,64 @@ machine_contract:
     fn world_model_matches_truth_source_branch_by_branch() {
         let root = build_wm_fixture();
         let (issues, stats) = scan(&root);
-        assert_eq!(issues, &[r#"04_模块库/通用类/M90_测试.md.world_model.abstract_state: 缺失或非对象"#, r#"04_模块库/通用类/M90_测试.md.world_model.transition: 缺失或非对象"#, r#"04_模块库/通用类/M90_测试.md.world_model.invariants: 非空数组"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].name: 非空字符串"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].kind: 非法类型 'widget'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].source: 非空字符串"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[1].item_kind: 仅 kind=array 可用"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[2].name: 变量重名 'v1'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[2].item_kind: 非法元素类型 'widget'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[4].slot: 槽位重复 's.ok'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[8]: 非对象"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 未声明变量 'undeclared'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 '' 的初始值"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v1: 值 5 不匹配 kind='string'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v1: 值 5 不匹配 kind='array'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v3: 值 'x' 不匹配 kind='integer'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v4' 的初始值"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v5' 的初始值"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v6' 的初始值"#, r#"04_模块库/通用类/M91_测试.md.world_model.transition.initial_phase: 非空字符串"#, r#"04_模块库/通用类/M91_测试.md.world_model.transition.phases: 非空数组"#, r#"04_模块库/通用类/M91_测试.md.world_model.invariants: 非空数组"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: 类型漂移 slot='integer' var='array'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: 元素类型漂移 slot=None var='string'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: owner 漂移 slot='M99' var.source='M91'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v3'].slot: owner 漂移 slot='M99' var.source='M91'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v4'].slot: 未在 protocol/world_slots.json 注册 's.nope'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v5'].slot: owner 漂移 slot='M99' var.source='M91'"#, r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v6'].slot: owner 漂移 slot='M98' var.source='M91'"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[0].phase: 非空字符串"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[1].guard: 非空守卫说明"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[1].writes: 字符串数组（可为空）"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[2].phase: 相位重名 'begin'"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[5]: 非对象"#, r#"04_模块库/通用类/M92_测试.md.world_model.transition: 从 initial_phase 不可达的相位 ['b', 'c']"#, r#"04_模块库/通用类/M92_测试.md.world_model.invariants[0]: 非空字符串"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[0].kind: 非法检查类型 'widget'"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[0].field: 未声明变量 'nope'"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[2].field: monotonic 只能用于 integer/number 变量"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[3].field: finite_sequence 只能用于 array 变量"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[4].field: finite_sequence 的 array 元素应为 string"#, r#"04_模块库/通用类/M93_测试.md.world_model.checks[5]: 非对象"#] as &[&str], "合成 issues 须逐字且同序");
+        assert_eq!(
+            issues,
+            &[
+                r#"04_模块库/通用类/M90_测试.md.world_model.abstract_state: 缺失或非对象"#,
+                r#"04_模块库/通用类/M90_测试.md.world_model.transition: 缺失或非对象"#,
+                r#"04_模块库/通用类/M90_测试.md.world_model.invariants: 非空数组"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].name: 非空字符串"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].kind: 非法类型 'widget'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[0].source: 非空字符串"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[1].item_kind: 仅 kind=array 可用"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[2].name: 变量重名 'v1'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[2].item_kind: 非法元素类型 'widget'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[4].slot: 槽位重复 's.ok'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables[8]: 非对象"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 未声明变量 'undeclared'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 '' 的初始值"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v1: 值 5 不匹配 kind='string'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v1: 值 5 不匹配 kind='array'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial.v3: 值 'x' 不匹配 kind='integer'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v4' 的初始值"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v5' 的初始值"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.initial: 缺变量 'v6' 的初始值"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.transition.initial_phase: 非空字符串"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.transition.phases: 非空数组"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.invariants: 非空数组"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: 类型漂移 slot='integer' var='array'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: 元素类型漂移 slot=None var='string'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v2'].slot: owner 漂移 slot='M99' var.source='M91'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v3'].slot: owner 漂移 slot='M99' var.source='M91'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v4'].slot: 未在 protocol/world_slots.json 注册 's.nope'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v5'].slot: owner 漂移 slot='M99' var.source='M91'"#,
+                r#"04_模块库/通用类/M91_测试.md.world_model.abstract_state.variables['v6'].slot: owner 漂移 slot='M98' var.source='M91'"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[0].phase: 非空字符串"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[1].guard: 非空守卫说明"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[1].writes: 字符串数组（可为空）"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[2].phase: 相位重名 'begin'"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition.phases[5]: 非对象"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.transition: 从 initial_phase 不可达的相位 ['b', 'c']"#,
+                r#"04_模块库/通用类/M92_测试.md.world_model.invariants[0]: 非空字符串"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[0].kind: 非法检查类型 'widget'"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[0].field: 未声明变量 'nope'"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[2].field: monotonic 只能用于 integer/number 变量"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[3].field: finite_sequence 只能用于 array 变量"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[4].field: finite_sequence 的 array 元素应为 string"#,
+                r#"04_模块库/通用类/M93_测试.md.world_model.checks[5]: 非对象"#
+            ] as &[&str],
+            "合成 issues 须逐字且同序"
+        );
         let want: Json = crate::jsonread::convert(
             &serde_json::from_str::<serde_json::Value>(r#"{"checks": 6, "invariants": 3, "models": [{"checks": 0, "initial_phase": null, "invariants": 0, "module": "M90", "phases": 0, "slots": 0, "source": "04_模块库/通用类/M90_测试.md"}, {"checks": 0, "initial_phase": "", "invariants": 0, "module": "M91", "phases": 0, "slots": 5, "source": "04_模块库/通用类/M91_测试.md"}, {"checks": 0, "initial_phase": "begin", "invariants": 2, "module": "M92", "phases": 6, "slots": 0, "source": "04_模块库/通用类/M92_测试.md"}, {"checks": 6, "initial_phase": "begin", "invariants": 1, "module": "M93", "phases": 1, "slots": 0, "source": "04_模块库/通用类/M93_测试.md"}], "modules": 4, "phases": 7, "slot_registry": 4, "slots": 5, "variables": 12}"#).unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want),
-                "合成 stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "合成 stats 不一致\n  实得 {}\n  期望 {}",
+            stats.dumps(),
+            want.dumps()
+        );
     }
     // <<< GENERATED
 }

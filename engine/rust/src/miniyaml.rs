@@ -35,7 +35,7 @@ fn fence_re() -> Option<&'static regex::Regex> {
 /// 真源 `_fence_yaml(text, marker)`：取**含 marker 的第一个** ```yaml 块并解析；
 /// 未命中 / 解析失败 / 顶层不是映射 → `None`（等价于"本件无该块"）。
 pub fn fence_yaml(text: &str, marker: &str) -> Option<Json> {
-    let re = fence_re()?;                 // 入口不 panic：正则不可用 ⇒ 无该块
+    let re = fence_re()?; // 入口不 panic：正则不可用 ⇒ 无该块
     for cap in re.captures_iter(text) {
         let body = cap.get(1).map(|m| m.as_str()).unwrap_or("");
         if !body.contains(marker) {
@@ -120,11 +120,7 @@ fn strip_comment(line: &str) -> String {
     out
 }
 
-fn parse_block(
-    lines: &[(usize, String)],
-    i: &mut usize,
-    indent: usize,
-) -> Result<Json, String> {
+fn parse_block(lines: &[(usize, String)], i: &mut usize, indent: usize) -> Result<Json, String> {
     if lines[*i].1.starts_with("- ") || lines[*i].1 == "-" {
         return parse_seq(lines, i, indent);
     }
@@ -262,7 +258,10 @@ fn split_inline_pair(s: &str) -> Option<(&str, &str)> {
                     quote = Some(c);
                 } else if c == b':' {
                     let next = b.get(i + 1).copied();
-                    let is_sep = matches!(next, None | Some(b' ') | Some(b',') | Some(b'}') | Some(b']'));
+                    let is_sep = matches!(
+                        next,
+                        None | Some(b' ') | Some(b',') | Some(b'}') | Some(b']')
+                    );
                     if is_sep {
                         return Some((&s[..i], &s[i + 1..]));
                     }
@@ -505,7 +504,8 @@ fn resolve_int(t: &str) -> Option<i64> {
         return radix_prefixed(&clean[..2], 2);
     }
     // YAML 1.1：前导 0 且全为 0-7 ⇒ 八进制
-    if clean.len() > 1 && clean.starts_with('0') && clean.chars().all(|c| ('0'..='7').contains(&c)) {
+    if clean.len() > 1 && clean.starts_with('0') && clean.chars().all(|c| ('0'..='7').contains(&c))
+    {
         return i64::from_str_radix(&clean, 8).ok().map(|v| v * sign);
     }
     if !clean.is_empty() && clean.chars().all(|c| c.is_ascii_digit()) {
@@ -609,7 +609,10 @@ mod tests {
         // 真源语料里真的有 `outputs: {}` —— 当成字符串会让边界摘要在该件上漂移
         let v = parse("io_types:\n  outputs: {}\n  inputs: []\n").unwrap();
         let io = crate::pyval::get(&v, "io_types").unwrap();
-        assert_eq!(crate::pyval::get(io, "outputs"), Some(&Json::Object(vec![])));
+        assert_eq!(
+            crate::pyval::get(io, "outputs"),
+            Some(&Json::Object(vec![]))
+        );
         assert_eq!(crate::pyval::get(io, "inputs"), Some(&Json::Array(vec![])));
         // 非空流式映射**现已支持**（真源 protocol.yaml 的 `mount_layers:` 需要它——
         // 早先 fail-closed 曾让 111 份 protocol.yaml 整件解析失败）
@@ -631,14 +634,18 @@ mod tests {
         let v = parse(body).expect("列表项是映射时必须可解析");
         let mc = crate::pyval::get(&v, "machine_contract").unwrap();
         let tf = crate::pyval::get(mc, "tool_face").unwrap();
-        let Json::Array(items) = tf else { panic!("tool_face 应是列表") };
+        let Json::Array(items) = tf else {
+            panic!("tool_face 应是列表")
+        };
         assert_eq!(items.len(), 1);
         assert_eq!(
             crate::pyval::get(&items[0], "purpose"),
             Some(&Json::Str("三轨换算".into()))
         );
         let cands = crate::pyval::get(&items[0], "candidates").unwrap();
-        let Json::Array(cs) = cands else { panic!("candidates 应是列表") };
+        let Json::Array(cs) = cands else {
+            panic!("candidates 应是列表")
+        };
         assert_eq!(
             crate::pyval::get(&cs[0], "repo"),
             Some(&Json::Str("https://github.com/arrow-py/arrow".into()))
@@ -652,16 +659,46 @@ mod tests {
 
     #[test]
     fn scalar_types_follow_yaml_1_1() {
-        assert_eq!(parse("k: 0\n").unwrap(), Json::Object(vec![("k".into(), Json::Int(0))]));
-        assert_eq!(parse("k: 12\n").unwrap(), Json::Object(vec![("k".into(), Json::Int(12))]));
-        assert_eq!(parse("k: -3\n").unwrap(), Json::Object(vec![("k".into(), Json::Int(-3))]));
-        assert_eq!(parse("k: 010\n").unwrap(), Json::Object(vec![("k".into(), Json::Int(8))]));
-        assert_eq!(parse("k: 0x1f\n").unwrap(), Json::Object(vec![("k".into(), Json::Int(31))]));
-        assert_eq!(parse("k: true\n").unwrap(), Json::Object(vec![("k".into(), Json::Bool(true))]));
-        assert_eq!(parse("k: no\n").unwrap(), Json::Object(vec![("k".into(), Json::Bool(false))]));
-        assert_eq!(parse("k: ~\n").unwrap(), Json::Object(vec![("k".into(), Json::Null)]));
-        assert_eq!(parse("k: 1.5\n").unwrap(), Json::Object(vec![("k".into(), Json::Float(1.5))]));
-        assert_eq!(parse("k: untyped\n").unwrap(), Json::Object(vec![("k".into(), Json::Str("untyped".into()))]));
+        assert_eq!(
+            parse("k: 0\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Int(0))])
+        );
+        assert_eq!(
+            parse("k: 12\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Int(12))])
+        );
+        assert_eq!(
+            parse("k: -3\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Int(-3))])
+        );
+        assert_eq!(
+            parse("k: 010\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Int(8))])
+        );
+        assert_eq!(
+            parse("k: 0x1f\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Int(31))])
+        );
+        assert_eq!(
+            parse("k: true\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Bool(true))])
+        );
+        assert_eq!(
+            parse("k: no\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Bool(false))])
+        );
+        assert_eq!(
+            parse("k: ~\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Null)])
+        );
+        assert_eq!(
+            parse("k: 1.5\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Float(1.5))])
+        );
+        assert_eq!(
+            parse("k: untyped\n").unwrap(),
+            Json::Object(vec![("k".into(), Json::Str("untyped".into()))])
+        );
     }
 
     #[test]
@@ -799,8 +836,7 @@ mod tests {
             let mut structured = String::new();
             for _ in 0..next(6) {
                 let indent = " ".repeat(next(5));
-                let frag = ["- ", "k: ", "k: [", "]", "{", "}", "\"", "|", ">", "\n"]
-                    [next(10)];
+                let frag = ["- ", "k: ", "k: [", "]", "{", "}", "\"", "|", ">", "\n"][next(10)];
                 structured.push_str(&indent);
                 structured.push_str(frag);
                 structured.push('\n');

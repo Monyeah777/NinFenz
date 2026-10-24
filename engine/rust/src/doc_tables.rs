@@ -10,10 +10,26 @@ pub const KINDS: [&str; 4] = [r#"tutorial"#, r#"how-to"#, r#"reference"#, r#"exp
 
 /// 四型**写法**判据：(kind, must_any 正则, label)。
 pub const KIND_RULES: [(&str, &[&str], &str); 4] = [
-    (r#"how-to"#, &[r#"```"#, r#"python scripts/nf\.py"#, r#">\s*⛔"#], r#"可执行命令块"#),
-    (r#"reference"#, &[r#"^\|.+\|"#, r#"词表"#, r#"字段"#], r#"词表或字段表"#),
-    (r#"tutorial"#, &[r#"^\s*\d+[.、]\s"#, r#"步骤"#, r#"演练"#], r#"步骤序列"#),
-    (r#"explanation"#, &[r#"为什么"#, r#"权衡"#, r#"机制"#, r#"原理"#], r#"为什么或权衡"#),
+    (
+        r#"how-to"#,
+        &[r#"```"#, r#"python scripts/nf\.py"#, r#">\s*⛔"#],
+        r#"可执行命令块"#,
+    ),
+    (
+        r#"reference"#,
+        &[r#"^\|.+\|"#, r#"词表"#, r#"字段"#],
+        r#"词表或字段表"#,
+    ),
+    (
+        r#"tutorial"#,
+        &[r#"^\s*\d+[.、]\s"#, r#"步骤"#, r#"演练"#],
+        r#"步骤序列"#,
+    ),
+    (
+        r#"explanation"#,
+        &[r#"为什么"#, r#"权衡"#, r#"机制"#, r#"原理"#],
+        r#"为什么或权衡"#,
+    ),
 ];
 
 /// 文档 → 四型归属。

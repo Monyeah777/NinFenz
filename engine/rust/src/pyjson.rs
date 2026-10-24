@@ -218,7 +218,10 @@ mod tests {
     #[test]
     fn nested_layout_matches_cpython_indent2() {
         // 对照 CPython：json.dumps({"a":[{"b":1}]}, ensure_ascii=False, indent=2, sort_keys=True)
-        let v = obj(vec![("a", Json::Array(vec![obj(vec![("b", Json::Int(1))])]))]);
+        let v = obj(vec![(
+            "a",
+            Json::Array(vec![obj(vec![("b", Json::Int(1))])]),
+        )]);
         let expect = "{\n  \"a\": [\n    {\n      \"b\": 1\n    }\n  ]\n}";
         assert_eq!(v.dumps(), expect);
     }
@@ -230,7 +233,10 @@ mod tests {
 
     #[test]
     fn control_chars_use_cpython_shortcuts() {
-        assert_eq!(Json::Str("\n\t\u{8}\u{c}".into()).dumps(), "\"\\n\\t\\b\\f\"");
+        assert_eq!(
+            Json::Str("\n\t\u{8}\u{c}".into()).dumps(),
+            "\"\\n\\t\\b\\f\""
+        );
         assert_eq!(Json::Str("\u{1}".into()).dumps(), "\"\\u0001\"");
     }
 

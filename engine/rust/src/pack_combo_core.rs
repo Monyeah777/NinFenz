@@ -45,7 +45,13 @@ pub struct Ctx {
 impl Ctx {
     pub fn build(root: &Path, contracts: Vec<(String, Json)>, prof: Vec<(String, Json)>) -> Ctx {
         let (by_id, pub_index, core_pub) = pc::indexes(root, &contracts);
-        Ctx { prof, contracts, by_id, pub_index, core_pub }
+        Ctx {
+            prof,
+            contracts,
+            by_id,
+            pub_index,
+            core_pub,
+        }
     }
 }
 
@@ -139,7 +145,9 @@ pub fn combine(
         for (m, r) in &snapshot {
             for dep in str_list(obj_get(r, "inputs")) {
                 let tail = dep.rsplit(':').next().unwrap_or(&dep).to_string();
-                if core.contains(&dep) || core.contains(&tail) || mods.iter().any(|(k, _)| *k == dep)
+                if core.contains(&dep)
+                    || core.contains(&tail)
+                    || mods.iter().any(|(k, _)| *k == dep)
                 {
                     continue;
                 }
@@ -150,13 +158,20 @@ pub fn combine(
                         // ⚠️ 必须在 `mods.push` **之前**取 pack —— push 会把 rec 移走。
                         let from_pack = s_of(obj_get(&rec, "pack"));
                         mods.push((id.clone(), rec));
-                        let by = if m.is_empty() { "<组件级>".to_string() } else { m.clone() };
+                        let by = if m.is_empty() {
+                            "<组件级>".to_string()
+                        } else {
+                            m.clone()
+                        };
                         borrowed.push(Json::Object(vec![
                             ("module".to_string(), Json::Str(id)),
                             ("from".to_string(), Json::Str(from_pack)),
                             ("by".to_string(), Json::Str(by)),
                             ("mode".to_string(), Json::Str("closure_pull".to_string())),
-                            ("why".to_string(), Json::Str(format!("依赖 {} 的 inputs 需要 {}", m, dep))),
+                            (
+                                "why".to_string(),
+                                Json::Str(format!("依赖 {} 的 inputs 需要 {}", m, dep)),
+                            ),
                         ]));
                         grew = true;
                     }
@@ -175,7 +190,11 @@ pub fn combine(
                 if published_now.contains(&ev) {
                     continue;
                 }
-                let Some(recs) = ctx.pub_index.iter().find(|(k, _)| *k == ev).map(|(_, v)| v.clone())
+                let Some(recs) = ctx
+                    .pub_index
+                    .iter()
+                    .find(|(k, _)| *k == ev)
+                    .map(|(_, v)| v.clone())
                 else {
                     continue;
                 };
@@ -184,13 +203,20 @@ pub fn combine(
                     if !mods.iter().any(|(k, _)| *k == id) {
                         let from_pack = s_of(obj_get(&rec, "pack"));
                         mods.push((id.clone(), rec));
-                        let by = if m.is_empty() { "<组件级>".to_string() } else { m.clone() };
+                        let by = if m.is_empty() {
+                            "<组件级>".to_string()
+                        } else {
+                            m.clone()
+                        };
                         borrowed.push(Json::Object(vec![
                             ("module".to_string(), Json::Str(id)),
                             ("from".to_string(), Json::Str(from_pack)),
                             ("by".to_string(), Json::Str(by)),
                             ("mode".to_string(), Json::Str("closure_pull".to_string())),
-                            ("why".to_string(), Json::Str(format!("事件 {} 需要发布方（{} 订阅）", ev, m))),
+                            (
+                                "why".to_string(),
+                                Json::Str(format!("事件 {} 需要发布方（{} 订阅）", ev, m)),
+                            ),
                         ]));
                         grew = true;
                     }
@@ -252,8 +278,11 @@ pub fn combine(
     let mut canon_packs: Vec<String> = packs.to_vec();
     canon_packs.sort();
     canon_packs.dedup();
-    let order: BTreeMap<String, usize> =
-        canon_packs.iter().enumerate().map(|(i, p)| (p.clone(), i)).collect();
+    let order: BTreeMap<String, usize> = canon_packs
+        .iter()
+        .enumerate()
+        .map(|(i, p)| (p.clone(), i))
+        .collect();
     let mut stacks: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for pr in &chosen {
         if let Some(Json::Object(ls)) = obj_get(pr, "layers") {
@@ -296,7 +325,10 @@ pub fn combine(
         .map(|(k, v)| {
             Json::Object(vec![
                 ("layer".to_string(), Json::Str(k.clone())),
-                ("modules".to_string(), Json::Array(v.iter().map(|s| Json::Str(s.clone())).collect())),
+                (
+                    "modules".to_string(),
+                    Json::Array(v.iter().map(|s| Json::Str(s.clone())).collect()),
+                ),
             ])
         })
         .collect();
@@ -393,9 +425,15 @@ pub fn combine(
         ("events_unpublished".to_string(), str_json(&unpublished)),
         ("assets_borrowed".to_string(), Json::Array(borrow_sorted)),
         ("modules_borrowed".to_string(), Json::Array(borrowed_sorted)),
-        ("references_unresolved".to_string(), Json::Array(refs_sorted)),
+        (
+            "references_unresolved".to_string(),
+            Json::Array(refs_sorted),
+        ),
         ("assets_unresolved".to_string(), str_json(&unresolved)),
-        ("module_missing_contract".to_string(), str_json(&missing_contracts)),
+        (
+            "module_missing_contract".to_string(),
+            str_json(&missing_contracts),
+        ),
     ]);
     let legal = unknown.is_empty()
         && dangling.is_empty()
@@ -451,8 +489,16 @@ pub fn verify_certificate(ctx: &Ctx, cert: &Json) -> (Vec<String>, Json) {
     (
         issues,
         Json::Object(vec![
-            ("legal".to_string(), obj_get(&fresh, "legal").cloned().unwrap_or(Json::Null)),
-            ("modules".to_string(), obj_get(&fresh, "module_count").cloned().unwrap_or(Json::Null)),
+            (
+                "legal".to_string(),
+                obj_get(&fresh, "legal").cloned().unwrap_or(Json::Null),
+            ),
+            (
+                "modules".to_string(),
+                obj_get(&fresh, "module_count")
+                    .cloned()
+                    .unwrap_or(Json::Null),
+            ),
         ]),
     )
 }
@@ -470,14 +516,16 @@ pub fn breadth(
     let verdict = |names: &[String]| -> (bool, Vec<Json>, Vec<Json>) {
         let cert = combine(ctx, names, &[], &[]);
         let legal = matches!(obj_get(&cert, "legal"), Some(Json::Bool(true)));
-        let dangling = arr_of(obj_get(&cert, "dependency_closure").and_then(|d| obj_get(d, "dangling")))
-            .into_iter()
-            .take(2)
-            .collect();
-        let unbridged = arr_of(obj_get(&cert, "event_closure").and_then(|d| obj_get(d, "unbridged")))
-            .into_iter()
-            .take(2)
-            .collect();
+        let dangling =
+            arr_of(obj_get(&cert, "dependency_closure").and_then(|d| obj_get(d, "dangling")))
+                .into_iter()
+                .take(2)
+                .collect();
+        let unbridged =
+            arr_of(obj_get(&cert, "event_closure").and_then(|d| obj_get(d, "unbridged")))
+                .into_iter()
+                .take(2)
+                .collect();
         (legal, dangling, unbridged)
     };
     let mut names: Vec<String> = ctx.prof.iter().map(|(k, _)| k.clone()).collect();
@@ -576,10 +624,16 @@ pub fn breadth(
 /// 真源 `declared`。
 pub fn declared(root: &Path) -> Json {
     let text = std::fs::read_to_string(root.join(crate::output_tables::CERT_REL));
-    match text.ok().and_then(|t| crate::jsonmini::parse(&t).ok().map(|r| r.value)) {
+    match text
+        .ok()
+        .and_then(|t| crate::jsonmini::parse(&t).ok().map(|r| r.value))
+    {
         Some(v) => v,
         None => Json::Object(vec![
-            ("schema".to_string(), Json::Str("nf-combo-certificates/1".to_string())),
+            (
+                "schema".to_string(),
+                Json::Str("nf-combo-certificates/1".to_string()),
+            ),
             ("certificates".to_string(), Json::Array(vec![])),
         ]),
     }
@@ -622,7 +676,15 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     let contracts = pc::module_contracts(root);
     let prof = pc::profiles(root);
     let ctx = Ctx::build(root, contracts.clone(), prof.clone());
-    let witness = pc::combo_witness(&prof, &contracts, &(ctx.by_id.clone(), ctx.pub_index.clone(), ctx.core_pub.clone()));
+    let witness = pc::combo_witness(
+        &prof,
+        &contracts,
+        &(
+            ctx.by_id.clone(),
+            ctx.pub_index.clone(),
+            ctx.core_pub.clone(),
+        ),
+    );
     let _ = witness;
     for cert in &certs {
         issues.extend(certificate_lines(&ctx, cert));
@@ -649,21 +711,29 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     (
         issues,
         Json::Object(vec![
-            ("declared_certificates".to_string(), Json::Int(certs.len() as i64)),
+            (
+                "declared_certificates".to_string(),
+                Json::Int(certs.len() as i64),
+            ),
             ("breadth".to_string(), br),
         ]),
     )
 }
 
-
 /// 真源 `pack_combo.prof_get_module`：按 id（或末段）取模块记录。
 pub fn prof_get_module(root: &Path, module_id: &str) -> Json {
     let contracts = pc::module_contracts(root);
     let (by_id, _pub, _core) = pc::indexes(root, &contracts);
-    let mut hit = by_id.iter().find(|(k, _)| k == module_id).map(|(_, v)| v.clone());
+    let mut hit = by_id
+        .iter()
+        .find(|(k, _)| k == module_id)
+        .map(|(_, v)| v.clone());
     if hit.is_none() {
         let tail = module_id.rsplit(':').next().unwrap_or(module_id);
-        hit = by_id.iter().find(|(k, _)| k == tail).map(|(_, v)| v.clone());
+        hit = by_id
+            .iter()
+            .find(|(k, _)| k == tail)
+            .map(|(_, v)| v.clone());
     }
     hit.unwrap_or(Json::Object(vec![]))
 }
@@ -697,8 +767,12 @@ mod tests {
             &serde_json::from_str::<serde_json::Value>(r#"{"breadth": {"all_legal": true, "failures": [], "packs": 111, "pairs": 6105, "pairs_legal": 6105, "quads": 200, "quads_legal": 200, "quints": 120, "quints_legal": 120, "sexts": 60, "sexts_legal": 60, "triples": 400, "triples_legal": 400}, "declared_certificates": 18}"#).unwrap(),
         )
         .unwrap();
-        assert!(crate::jsonread::json_eq(&stats, &want),
-                "stats 不一致\n  实得 {}\n  期望 {}", stats.dumps(), want.dumps());
+        assert!(
+            crate::jsonread::json_eq(&stats, &want),
+            "stats 不一致\n  实得 {}\n  期望 {}",
+            stats.dumps(),
+            want.dumps()
+        );
     }
     // <<< GENERATED
 }

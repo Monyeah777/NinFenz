@@ -12,8 +12,8 @@
 use crate::glob;
 use crate::jsonread;
 use crate::pyjson::Json;
-use crate::pyval::{arr_items, get, plain_str, plain_str_opt, py_str, str_list};
 use crate::pysrc;
+use crate::pyval::{arr_items, get, plain_str, plain_str_opt, py_str, str_list};
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::path::Path;
 
@@ -48,10 +48,16 @@ pub fn load(root: &Path) -> Result<Json, String> {
         .map_err(|e| format!("阶梯真源 {} 读取失败：{}", DECL_REL, e))?;
     let raw: serde_json::Value = serde_json::from_str(&text).map_err(|e| {
         // 真源把 json.JSONDecodeError 的文本拼进消息——**该措辞不做逐字节承诺**
-        format!("阶梯真源 {} 不是合法 JSON：{}（修复指引：修 JSON 语法后重跑）", DECL_REL, e)
+        format!(
+            "阶梯真源 {} 不是合法 JSON：{}（修复指引：修 JSON 语法后重跑）",
+            DECL_REL, e
+        )
     })?;
     let doc = jsonread::convert(&raw).map_err(|e| {
-        format!("阶梯真源 {} 含不支持的值：{}（修复指引：修 JSON 语法后重跑）", DECL_REL, e)
+        format!(
+            "阶梯真源 {} 含不支持的值：{}（修复指引：修 JSON 语法后重跑）",
+            DECL_REL, e
+        )
     })?;
     if py_str(get(&doc, "schema")) != SCHEMA {
         return Err(format!(
@@ -264,7 +270,10 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
     for t in &tiers {
         graph.insert(
             plain_str_opt(get(t, "id")),
-            arr_items(get(t, "depends_on")).iter().map(|d| plain_str(d)).collect(),
+            arr_items(get(t, "depends_on"))
+                .iter()
+                .map(|d| plain_str(d))
+                .collect(),
         );
     }
     let mut walker = CycleWalker {
@@ -298,8 +307,7 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
     }
 
     // ---- L6 引擎不反向 import 入口面
-    for rel in ctx.one("desktop/src/core/*.py")
-    {
+    for rel in ctx.one("desktop/src/core/*.py") {
         let Ok(src) = std::fs::read_to_string(root.join(&rel)) else {
             continue;
         };
@@ -333,7 +341,11 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             }
         }
         if !status_vocab.contains(&status) {
-            issues.push(format!("L7 阶 {} 的 status 越词表：{}", plain_str_opt(get(tier, "id")), status));
+            issues.push(format!(
+                "L7 阶 {} 的 status 越词表：{}",
+                plain_str_opt(get(tier, "id")),
+                status
+            ));
         }
     }
 
@@ -413,7 +425,10 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
 
     // ---- L10 生成区 == 实时渲染
     if !root.join(DOC_REL).exists() {
-        issues.push(format!("L10 缺阶梯文档 {}（修复指引：补件并跑 nf layers --write）", DOC_REL));
+        issues.push(format!(
+            "L10 缺阶梯文档 {}（修复指引：补件并跑 nf layers --write）",
+            DOC_REL
+        ));
     } else {
         let body = std::fs::read_to_string(root.join(DOC_REL)).unwrap_or_default();
         let got = region_of(&body);
@@ -451,8 +466,10 @@ impl CycleWalker<'_> {
             let joined = path.join(" → ");
             if !self.reported.contains(&joined) {
                 self.reported.insert(joined.clone());
-                self.issues
-                    .push(format!("L4 依赖图存在环：{}（修复指引：断开上行依赖）", joined));
+                self.issues.push(format!(
+                    "L4 依赖图存在环：{}（修复指引：断开上行依赖）",
+                    joined
+                ));
             }
             return;
         }
@@ -512,7 +529,9 @@ pub fn render_markdown(doc: &Json) -> String {
         rows.push(vec![
             format!("**{}**", plain_str_opt(get(t, "name"))),
             backtick_join(&arr_items(get(t, "source").and_then(|s| get(s, "globs")))),
-            backtick_join(&arr_items(get(t, "interface").and_then(|s| get(s, "globs")))),
+            backtick_join(&arr_items(
+                get(t, "interface").and_then(|s| get(s, "globs")),
+            )),
             arr_items(get(t, "judged_by"))
                 .iter()
                 .map(|v| plain_str(v))
@@ -525,7 +544,16 @@ pub fn render_markdown(doc: &Json) -> String {
             ),
         ]);
     }
-    lines.extend(table(&rows, &["阶", "真源面", "接口面（跨阶唯一可依赖）", "既有判据", "状态 / 变更档"]));
+    lines.extend(table(
+        &rows,
+        &[
+            "阶",
+            "真源面",
+            "接口面（跨阶唯一可依赖）",
+            "既有判据",
+            "状态 / 变更档",
+        ],
+    ));
     lines.push(String::new());
     lines.push("### 资产阶五子级（同一格内异质，分开看代价）".into());
     lines.push(String::new());
@@ -577,7 +605,9 @@ pub fn render_markdown(doc: &Json) -> String {
     }
     lines.extend(table(&rows4, &["件", "落点", "既有判据"]));
     lines.push(String::new());
-    lines.push("> 本区由 `nf layers --write` 渲染，禁止手改；真源 = `protocol/LAYERS.json`。".into());
+    lines.push(
+        "> 本区由 `nf layers --write` 渲染，禁止手改；真源 = `protocol/LAYERS.json`。".into(),
+    );
     lines.join("\n")
 }
 
@@ -600,7 +630,10 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     };
     let issues = rule_issues(root, &doc);
     let stats = Json::Object(vec![
-        ("tiers".into(), Json::Int(arr_items(get(&doc, "tiers")).len() as i64)),
+        (
+            "tiers".into(),
+            Json::Int(arr_items(get(&doc, "tiers")).len() as i64),
+        ),
         (
             "asset_levels".into(),
             Json::Int(arr_items(get(&doc, "asset_levels")).len() as i64),
@@ -611,10 +644,18 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         ),
         (
             "crosscut".into(),
-            Json::Int(arr_items(get(&doc, "crosscut").and_then(|c| get(c, "components"))).len() as i64),
+            Json::Int(
+                arr_items(get(&doc, "crosscut").and_then(|c| get(c, "components"))).len() as i64,
+            ),
         ),
-        ("rules".into(), Json::Int(arr_items(get(&doc, "rules")).len() as i64)),
-        ("derived".into(), Json::Int(arr_items(get(&doc, "derived")).len() as i64)),
+        (
+            "rules".into(),
+            Json::Int(arr_items(get(&doc, "rules")).len() as i64),
+        ),
+        (
+            "derived".into(),
+            Json::Int(arr_items(get(&doc, "derived")).len() as i64),
+        ),
     ]);
     (issues, stats)
 }
@@ -671,11 +712,17 @@ mod tests {
     fn entry_import_detection_ignores_prose_and_strings() {
         // 真源本体就长这样：文档字符串里写「不许 import nf」，AST 不判、裸行扫描会假红
         let src = "\"\"\"core 不许出现 import nf / from scripts …\"\"\"\n# from scripts import x\nimport os\n";
-        assert!(pysrc::entry_imports(src).is_empty(), "散文/注释不得被当成 import");
+        assert!(
+            pysrc::entry_imports(src).is_empty(),
+            "散文/注释不得被当成 import"
+        );
         let real = "import os\nimport nf\n";
         assert_eq!(pysrc::entry_imports(real), vec![(2usize, "nf".to_string())]);
         let rel = "from scripts.nf import y\n";
-        assert_eq!(pysrc::entry_imports(rel), vec![(1usize, "scripts".to_string())]);
+        assert_eq!(
+            pysrc::entry_imports(rel),
+            vec![(1usize, "scripts".to_string())]
+        );
     }
 
     #[test]

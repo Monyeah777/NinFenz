@@ -25,17 +25,45 @@ pub const PROTO_DOCS: [&str; 4] = [
 ];
 
 /// 真源 `IMPORT_SCAN`（R5 的取件面）。
-pub const IMPORT_SCAN: [&str; 3] =
-    ["desktop/src/core/*.py", "scripts/*.py", ".github/scripts/*.py"];
+pub const IMPORT_SCAN: [&str; 3] = [
+    "desktop/src/core/*.py",
+    "scripts/*.py",
+    ".github/scripts/*.py",
+];
 
 /// 真源 `core/domain_neutral.FACE`（R8 的被扫面）。
 pub const DOMAIN_FACE: [&str; 2] = ["03_管线库/**/*.md", "04_模块库/**/*.md"];
 
 /// 真源 `core/domain_neutral.DOMAIN_TERMS`（顺序即判定序：最左优先、同位置按表序取首个）。
 const DOMAIN_TERMS: [&str; 28] = [
-    "叙事", "叙述", "故事", "剧情", "主角", "玩家", "NPC", "台词", "情感", "情绪", "好感", "冲动",
-    "遗憾", "幽灵", "战斗", "魔法", "校园", "西幻", "文风", "白描", "恋爱", "悬疑", "恐怖", "情书",
-    "情敌", "角色卡", "人物卡", "三冲动",
+    "叙事",
+    "叙述",
+    "故事",
+    "剧情",
+    "主角",
+    "玩家",
+    "NPC",
+    "台词",
+    "情感",
+    "情绪",
+    "好感",
+    "冲动",
+    "遗憾",
+    "幽灵",
+    "战斗",
+    "魔法",
+    "校园",
+    "西幻",
+    "文风",
+    "白描",
+    "恋爱",
+    "悬疑",
+    "恐怖",
+    "情书",
+    "情敌",
+    "角色卡",
+    "人物卡",
+    "三冲动",
 ];
 
 /// 真源 `HARD_ALLOW`：登记的第三方硬依赖（允许直接 import）。
@@ -43,8 +71,14 @@ const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
 const SOFT_IMPORTS: [(&str, &str); 4] = [
-    ("jsonschema", "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）"),
-    ("PySide6", "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）"),
+    (
+        "jsonschema",
+        "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
+    ),
+    (
+        "PySide6",
+        "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+    ),
     (
         "nf_pyengine",
         "PyO3 扩展为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr",
@@ -68,9 +102,18 @@ const DANGEROUS_CALLS: [(&str, &str); 12] = [
     ("pickle.load", "CWE-502 不安全反序列化（可执行任意代码）"),
     ("pickle.loads", "CWE-502 不安全反序列化（可执行任意代码）"),
     ("marshal.loads", "CWE-502 不安全反序列化"),
-    ("yaml.load", "CWE-502 非安全 YAML 载入（改用 yaml.safe_load）"),
-    ("shutil.rmtree", "CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根）"),
-    ("os.remove", "CWE-73 删除外部可控路径（须证明来源不可被外部左右）"),
+    (
+        "yaml.load",
+        "CWE-502 非安全 YAML 载入（改用 yaml.safe_load）",
+    ),
+    (
+        "shutil.rmtree",
+        "CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根）",
+    ),
+    (
+        "os.remove",
+        "CWE-73 删除外部可控路径（须证明来源不可被外部左右）",
+    ),
     ("os.rmdir", "CWE-73 删除外部可控目录"),
 ];
 
@@ -183,7 +226,11 @@ pub fn doc_facts(text: &str) -> DocFacts {
         }
     }
     let dup_titles = seen.into_iter().filter(|(_, v)| v.len() > 1).collect();
-    DocFacts { shell, private, dup_titles }
+    DocFacts {
+        shell,
+        private,
+        dup_titles,
+    }
 }
 
 /// 真源 `_is_local`。
@@ -216,7 +263,10 @@ pub fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFindings>
     }
     let facts = pyast::purity_facts(text)?;
     let fname = rel.rsplit('/').next().unwrap_or(rel);
-    let residue: Option<&str> = IMPORT_RESIDUE.iter().find(|(r, _)| *r == rel).map(|(_, v)| *v);
+    let residue: Option<&str> = IMPORT_RESIDUE
+        .iter()
+        .find(|(r, _)| *r == rel)
+        .map(|(_, v)| *v);
     let mut out: Vec<String> = Vec::new();
     let mut delta = FileFindings {
         issues: Vec::new(),
@@ -277,7 +327,10 @@ pub fn file_findings(rel: &str, text: &str, root: &Path) -> Option<FileFindings>
             flags.push((method.clone(), method.clone()));
         }
         if s.shell_true {
-            flags.push(("subprocess(shell=True)".to_string(), "subprocess".to_string()));
+            flags.push((
+                "subprocess(shell=True)".to_string(),
+                "subprocess".to_string(),
+            ));
         }
         for (name, key_name) in flags {
             delta.sinks += 1;
@@ -323,7 +376,9 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         if !p.exists() {
             continue;
         }
-        let Ok(text) = std::fs::read_to_string(&p) else { continue };
+        let Ok(text) = std::fs::read_to_string(&p) else {
+            continue;
+        };
         docs += 1;
         let f = doc_facts(&text);
         // 端壳残留**只在前两份**判
@@ -337,7 +392,12 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
         }
         for (title, lines) in &f.dup_titles {
             let ls: Vec<String> = lines.iter().map(|x| x.to_string()).collect();
-            issues.push(format!("{} 重复标题「{}」：行 {}", name, title, ls.join(",")));
+            issues.push(format!(
+                "{} 重复标题「{}」：行 {}",
+                name,
+                title,
+                ls.join(",")
+            ));
         }
     }
 
@@ -591,7 +651,24 @@ def clean(p):
     fn purity_matches_truth_source_branch_by_branch() {
         let root = build_purity_fixture();
         let (issues, stats) = scan(&root);
-        assert_eq!(issues, &[r#"01_核心协议.md:2 端壳/APK 残留：本节提到 android 端的旧方案（应为端壳残留）。"#, r#"01_核心协议.md:3 私货/可变物：路径 D:\private\x 与 /home/someone/y 属私货；TODO 也该清。"#, r#"01_核心协议.md 重复标题「同名小节」：行 4,6"#, r#"02_联动注册表.md 重复标题「也重复」：行 2,4"#, r#"zz_fixture.py:8 raise 消息缺修复指引：坏了"#, r#"scripts/zz_fixture.py:3 第三方 jsonschema 未软导入（须 try/except ImportError 守卫；登记理由：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面））"#, r#"scripts/zz_fixture.py:8 第三方 import 未登记：requests（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#, r#"scripts/zz_fixture.py:9 第三方 import 未登记：nosuchlocal（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#, r#"scripts/zz_fixture.py:15 危险 sink os.system（CWE-78 shell 命令（改用 subprocess 列表参数））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:16 危险 sink unlink（CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左右））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:17 危险 sink subprocess(shell=True)（shell=True 命令注入面）——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#, r#"scripts/zz_fixture.py:18 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#] as &[&str], "issues 须逐字且同序");
+        assert_eq!(
+            issues,
+            &[
+                r#"01_核心协议.md:2 端壳/APK 残留：本节提到 android 端的旧方案（应为端壳残留）。"#,
+                r#"01_核心协议.md:3 私货/可变物：路径 D:\private\x 与 /home/someone/y 属私货；TODO 也该清。"#,
+                r#"01_核心协议.md 重复标题「同名小节」：行 4,6"#,
+                r#"02_联动注册表.md 重复标题「也重复」：行 2,4"#,
+                r#"zz_fixture.py:8 raise 消息缺修复指引：坏了"#,
+                r#"scripts/zz_fixture.py:3 第三方 jsonschema 未软导入（须 try/except ImportError 守卫；登记理由：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面））"#,
+                r#"scripts/zz_fixture.py:8 第三方 import 未登记：requests（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#,
+                r#"scripts/zz_fixture.py:9 第三方 import 未登记：nosuchlocal（修复指引：改为软导入并在 purity_scan.SOFT_IMPORTS 登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）"#,
+                r#"scripts/zz_fixture.py:15 危险 sink os.system（CWE-78 shell 命令（改用 subprocess 列表参数））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#,
+                r#"scripts/zz_fixture.py:16 危险 sink unlink（CWE-73 删除外部可控文件（`Path.unlink` 等价 `os.remove`，同样须证明来源不可被外部左右））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#,
+                r#"scripts/zz_fixture.py:17 危险 sink subprocess(shell=True)（shell=True 命令注入面）——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#,
+                r#"scripts/zz_fixture.py:18 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"#
+            ] as &[&str],
+            "issues 须逐字且同序"
+        );
         let want: Json = crate::jsonread::convert(
             &serde_json::from_str::<serde_json::Value>(r#"{"docs": 3, "import_residue": [], "imports": 5, "layers": {"skipped": "缺 protocol/LAYERS.json（另由断言表与规范性名单判）"}, "raises": 3, "sinks": 5, "domain_neutral": {"files": 0, "hits": 0}}"#).unwrap(),
         )

@@ -19,6 +19,9 @@ crate-type = ["cdylib", "rlib"]
 # windows-gnu host 上构建。本线只用 std + sha2，实测干净通过。
 [dependencies]
 sha2 = "0.10"
+# Worker 状态文件里的能力令牌必须来自 OS CSPRNG，不能用 pid/port/时间拼哈希。
+# getrandom 在 Windows 走系统熵接口，且不引入 Windows raw-dylib 依赖。
+getrandom = "0.2"
 # 只需**读**真源的机读件（registry / standards_catalog / standards_binding / domain_packs）。
 # 写出仍走本线自己的 pyjson（serde_json 的排版与 CPython 不同形，用它写就变"近似对账"）。
 # `preserve_order`：**必须开**。Python 的 `dict` 迭代是**插入序**，而 serde_json 默认用

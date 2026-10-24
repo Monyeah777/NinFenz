@@ -17,8 +17,8 @@
 //! 本模块是 `nf verify-report` 的 `coupling` 判据，**不单独开 CLI 面**。
 
 use crate::jsonread;
-use crate::pyjson::Json;
 use crate::pyfloat;
+use crate::pyjson::Json;
 use crate::pysrc;
 use crate::pyval::{arr_items, get, plain_str, py_str};
 use std::collections::{BTreeMap, BTreeSet};
@@ -109,13 +109,24 @@ pub fn graph(root: &Path) -> Graph {
     files.sort();
     let known: BTreeSet<String> = files
         .iter()
-        .map(|rel| rel.rsplit('/').next().unwrap_or(rel).trim_end_matches(".py").to_string())
+        .map(|rel| {
+            rel.rsplit('/')
+                .next()
+                .unwrap_or(rel)
+                .trim_end_matches(".py")
+                .to_string()
+        })
         .filter(|s| s != "__init__")
         .collect();
 
     let mut deps: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for rel in &files {
-        let stem = rel.rsplit('/').next().unwrap_or(rel).trim_end_matches(".py").to_string();
+        let stem = rel
+            .rsplit('/')
+            .next()
+            .unwrap_or(rel)
+            .trim_end_matches(".py")
+            .to_string();
         if stem == "__init__" {
             continue;
         }
@@ -233,7 +244,10 @@ fn metrics_face(base: &Option<Json>, g: &Graph) -> (Vec<String>, i64, i64, i64) 
             continue;
         };
         if ca < 0 || ce < 0 || !(0.0..=1.0).contains(&i) {
-            issues.push(format!("基线 metrics[{}] 越界（ca={} ce={} i={}）", m, ca, ce, i));
+            issues.push(format!(
+                "基线 metrics[{}] 越界（ca={} ce={} i={}）",
+                m, ca, ce, i
+            ));
             continue;
         }
         let want = if ca + ce != 0 {
@@ -280,7 +294,10 @@ pub fn scan(root: &Path) -> CouplingScan {
     let cyc = cycles(&g.deps);
     let sdp = sdp_violations(&g);
     let base = load_baseline(root);
-    let base_present = base.as_ref().map(|b| !crate::pyval::obj_is_empty(b)).unwrap_or(false);
+    let base_present = base
+        .as_ref()
+        .map(|b| !crate::pyval::obj_is_empty(b))
+        .unwrap_or(false);
 
     let mut known_cyc: BTreeSet<Vec<String>> = BTreeSet::new();
     let mut known_sdp: BTreeSet<(String, String)> = BTreeSet::new();
@@ -364,15 +381,16 @@ pub fn scan(root: &Path) -> CouplingScan {
             "registered_sdp".to_string(),
             Json::Int(known_sdp.len() as i64),
         ),
-        (
-            "metrics_recorded".to_string(),
-            Json::Int(metrics_recorded),
-        ),
+        ("metrics_recorded".to_string(), Json::Int(metrics_recorded)),
         ("metrics_drift".to_string(), Json::Int(metrics_drift)),
         ("metrics_missing".to_string(), Json::Int(metrics_missing)),
     ]);
     let _ = py_str(None);
-    CouplingScan { issues, warns, stats }
+    CouplingScan {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 #[cfg(test)]
@@ -389,7 +407,10 @@ mod tests {
         let got = module_deps(src, "self", &known);
         assert_eq!(
             got,
-            ["a", "b", "c", "d", "e"].iter().map(|s| s.to_string()).collect()
+            ["a", "b", "c", "d", "e"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect()
         );
     }
 
@@ -415,30 +436,60 @@ mod tests {
     /// 本夹具逐形态踩：普通 / 多别名 / 点号模块 / 相对无模块 / 相对 core / 相对带模块 /
     /// 括号多行 / 别名 / 字符串与注释里的假 import / `__init__` 忽略。
     const SRC: [(&str, &str); 10] = [
-        ("__init__", r#"from core.aa import x
-"#),
-        ("aa", r#"import core.bb
+        (
+            "__init__",
+            r#"from core.aa import x
+"#,
+        ),
+        (
+            "aa",
+            r#"import core.bb
 from core import cc, dd
-"#),
-        ("bb", r#"from core.aa import x
-"#),
-        ("cc", r#"from . import ee
-"#),
-        ("dd", r#"from .core import ff
-"#),
-        ("ee", r#"from ..pkg.sub import gg
-"#),
-        ("ff", r#"from core import (hh,
+"#,
+        ),
+        (
+            "bb",
+            r#"from core.aa import x
+"#,
+        ),
+        (
+            "cc",
+            r#"from . import ee
+"#,
+        ),
+        (
+            "dd",
+            r#"from .core import ff
+"#,
+        ),
+        (
+            "ee",
+            r#"from ..pkg.sub import gg
+"#,
+        ),
+        (
+            "ff",
+            r#"from core import (hh,
     ii)
-"#),
-        ("gg", r#"import core.hh as hh
-"#),
-        ("hh", r#"S = "from core import zzz"
+"#,
+        ),
+        (
+            "gg",
+            r#"import core.hh as hh
+"#,
+        ),
+        (
+            "hh",
+            r#"S = "from core import zzz"
 # import core.yyy
-"#),
-        ("ii", r#"import os
+"#,
+        ),
+        (
+            "ii",
+            r#"import os
 import json
-"#),
+"#,
+        ),
     ];
 
     fn build_fixture() -> std::path::PathBuf {
@@ -456,7 +507,10 @@ import json
         let root = build_fixture();
         let g = graph(&root);
         let want: Vec<(String, Vec<String>)> = vec![
-            ("aa".to_string(), vec!["bb".to_string(), "cc".to_string(), "dd".to_string()]),
+            (
+                "aa".to_string(),
+                vec!["bb".to_string(), "cc".to_string(), "dd".to_string()],
+            ),
             ("bb".to_string(), vec!["aa".to_string()]),
             ("cc".to_string(), vec!["ee".to_string()]),
             ("dd".to_string(), vec!["ff".to_string()]),
@@ -501,9 +555,7 @@ import json
         let root = build_fixture();
         let g = graph(&root);
         let cyc = cycles(&g.deps);
-        let want: Vec<Vec<String>> = vec![
-            vec!["aa".to_string(), "bb".to_string()],
-        ];
+        let want: Vec<Vec<String>> = vec![vec!["aa".to_string(), "bb".to_string()]];
         assert_eq!(cyc, want, "环集合");
         let sdp = sdp_violations(&g);
         let want_sdp: Vec<(String, String)> = vec![
@@ -517,13 +569,38 @@ import json
     fn scan_reports_both_cycle_and_sdp_with_exact_wording() {
         let root = build_fixture();
         let got = scan(&root);
-        assert_eq!(got.issues.len(), 4, "1 个环 + 2 处 SDP + 缺 metrics 面：{:?}", got.issues);
-        assert!(got.issues[0].starts_with("新增模块级环：aa → bb → aa（"), "{:?}", got.issues[0]);
-        assert!(got.issues[1].starts_with("新增 SDP 违例：bb(I=0.50) 依赖了更不稳的 aa(I=0.75)（"), "{:?}", got.issues[1]);
-        assert!(got.issues[2].starts_with("新增 SDP 违例：dd(I=0.50) 依赖了更不稳的 ff(I=0.67)（"), "{:?}", got.issues[2]);
-        assert!(got.issues[3].starts_with("耦合基线缺 metrics 面（"), "{:?}", got.issues[3]);
+        assert_eq!(
+            got.issues.len(),
+            4,
+            "1 个环 + 2 处 SDP + 缺 metrics 面：{:?}",
+            got.issues
+        );
+        assert!(
+            got.issues[0].starts_with("新增模块级环：aa → bb → aa（"),
+            "{:?}",
+            got.issues[0]
+        );
+        assert!(
+            got.issues[1].starts_with("新增 SDP 违例：bb(I=0.50) 依赖了更不稳的 aa(I=0.75)（"),
+            "{:?}",
+            got.issues[1]
+        );
+        assert!(
+            got.issues[2].starts_with("新增 SDP 违例：dd(I=0.50) 依赖了更不稳的 ff(I=0.67)（"),
+            "{:?}",
+            got.issues[2]
+        );
+        assert!(
+            got.issues[3].starts_with("耦合基线缺 metrics 面（"),
+            "{:?}",
+            got.issues[3]
+        );
         assert_eq!(got.warns.len(), 1);
-        assert!(got.warns[0].starts_with("无耦合基线 protocol/coupling_baseline.json"), "{:?}", got.warns[0]);
+        assert!(
+            got.warns[0].starts_with("无耦合基线 protocol/coupling_baseline.json"),
+            "{:?}",
+            got.warns[0]
+        );
         assert!(crate::jsonread::json_eq(
             &got.stats,
             &crate::jsonread::convert(&serde_json::json!({
@@ -534,5 +611,4 @@ import json
             .unwrap()
         ));
     }
-
 }

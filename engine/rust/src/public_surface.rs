@@ -43,7 +43,9 @@ pub fn scan(root: &Path) -> (Vec<String>, String) {
                 continue;
             }
             // 尽力而为：跳过不可读/非 UTF-8 项（该类缺口由对应门禁另行报出，见真源 AUD-0016）
-            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else { continue };
+            let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+                continue;
+            };
             if abs_path_re().is_match(&text).unwrap_or(false) {
                 bad.push(format!("{} 含绝对路径", rel));
             }
@@ -75,21 +77,42 @@ mod tests {
     /// 驱动器号 + `\Users\` / `/Users/` / `/home/x`；另加「后缀不在白名单 ⇒ 跳过」与
     /// 「前一个字符是字母数字 ⇒ 后顾断言不命中」两个边界。
     const PS_FILES: [(&str, &str); 7] = [
-        ("desktop/tests/fixtures/external/sub/adjacent.md", r#"abcC:/x
-"#),
-        ("desktop/tests/fixtures/external/sub/deep.md", r#"D:/x
-"#),
-        ("docs/external-validation-assets/clean.txt", r#"没有绝对路径
-"#),
-        ("docs/external-validation-assets/drive.md", r#"# x
+        (
+            "desktop/tests/fixtures/external/sub/adjacent.md",
+            r#"abcC:/x
+"#,
+        ),
+        (
+            "desktop/tests/fixtures/external/sub/deep.md",
+            r#"D:/x
+"#,
+        ),
+        (
+            "docs/external-validation-assets/clean.txt",
+            r#"没有绝对路径
+"#,
+        ),
+        (
+            "docs/external-validation-assets/drive.md",
+            r#"# x
 见 C:\Users\bob\nf
-"#),
-        ("docs/external-validation-assets/lin.yaml", r#"p: /home/bob/nf
-"#),
-        ("docs/external-validation-assets/mac.json", r#"{"p": "/Users/bob/nf"}
-"#),
-        ("docs/external-validation-assets/skip.png", r#"C:\Users\bob
-"#),
+"#,
+        ),
+        (
+            "docs/external-validation-assets/lin.yaml",
+            r#"p: /home/bob/nf
+"#,
+        ),
+        (
+            "docs/external-validation-assets/mac.json",
+            r#"{"p": "/Users/bob/nf"}
+"#,
+        ),
+        (
+            "docs/external-validation-assets/skip.png",
+            r#"C:\Users\bob
+"#,
+        ),
     ];
 
     fn build_ps_fixture() -> std::path::PathBuf {
@@ -114,7 +137,13 @@ mod tests {
         // **不发明期望值**（这是本线对"期望值只能来自真源"的具体执行）。
         let (issues, _d) = scan(&root);
         assert!(issues.len() >= 2, "至少应命中 detail 里那两条");
-        for (i, want) in ["desktop/tests/fixtures/external/sub/deep.md 含绝对路径", "docs/external-validation-assets/drive.md 含绝对路径"].iter().enumerate() {
+        for (i, want) in [
+            "desktop/tests/fixtures/external/sub/deep.md 含绝对路径",
+            "docs/external-validation-assets/drive.md 含绝对路径",
+        ]
+        .iter()
+        .enumerate()
+        {
             assert_eq!(&issues[i], want, "第 {} 条", i + 1);
         }
     }

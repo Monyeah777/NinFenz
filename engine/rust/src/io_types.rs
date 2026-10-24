@@ -76,7 +76,10 @@ pub fn parse_io_types(text: &str) -> Option<Json> {
             continue;
         }
         if let Some(pm) = pair_re().captures(ln) {
-            let key = pm[2].trim().trim_matches(|c| c == '\'' || c == '"').to_string();
+            let key = pm[2]
+                .trim()
+                .trim_matches(|c| c == '\'' || c == '"')
+                .to_string();
             let val = Json::Str(pm[3].to_string());
             match sub.as_deref() {
                 Some("outputs") => {
@@ -149,7 +152,11 @@ pub fn scan(root: &Path) -> IoTypesScan {
         let mc = miniyaml::fence_yaml(&text, "machine_contract")
             .and_then(|p| get(&p, "machine_contract").cloned())
             .unwrap_or(Json::Null);
-        let mc = if matches!(mc, Json::Null) { Json::Object(Vec::new()) } else { mc };
+        let mc = if matches!(mc, Json::Null) {
+            Json::Object(Vec::new())
+        } else {
+            mc
+        };
         mods.push((rel, text, mc));
     }
 
@@ -160,11 +167,16 @@ pub fn scan(root: &Path) -> IoTypesScan {
             continue;
         }
         let Some(io) = parse_io_types(text) else {
-            warns.push(format!("{} 未标 io_types（修复指引：nf module types --write）", mid));
+            warns.push(format!(
+                "{} 未标 io_types（修复指引：nf module types --write）",
+                mid
+            ));
             continue;
         };
         for sec in ["outputs", "inputs"] {
-            let Some(Json::Object(pairs)) = get(&io, sec) else { continue };
+            let Some(Json::Object(pairs)) = get(&io, sec) else {
+                continue;
+            };
             for (key, kind) in pairs.clone() {
                 let kind = py_str(Some(&kind));
                 if !KINDS.contains(&kind.as_str()) {
@@ -213,8 +225,12 @@ pub fn scan(root: &Path) -> IoTypesScan {
         if mid.is_empty() {
             continue;
         }
-        let Some(io) = parse_io_types(text) else { continue };
-        let Some(Json::Object(ins)) = get(&io, "inputs") else { continue };
+        let Some(io) = parse_io_types(text) else {
+            continue;
+        };
+        let Some(Json::Object(ins)) = get(&io, "inputs") else {
+            continue;
+        };
         for (dep, want) in ins {
             let want = py_str(Some(want));
             if want == "untyped" || want == "state" {
@@ -247,12 +263,19 @@ pub fn scan(root: &Path) -> IoTypesScan {
         ));
     }
     let stats = Json::Object(vec![
-        ("modules_with_contract".to_string(), Json::Int(modules_with_contract as i64)),
+        (
+            "modules_with_contract".to_string(),
+            Json::Int(modules_with_contract as i64),
+        ),
         ("l0_modules".to_string(), Json::Int(l0.len() as i64)),
         ("typed_fields".to_string(), Json::Int(typed)),
         ("untyped_fields".to_string(), Json::Int(untyped)),
     ]);
-    IoTypesScan { issues, warns, stats }
+    IoTypesScan {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 /// 真源 `coverage`：`stats` 再加 `coverage`（百分比，一位小数）。
@@ -294,7 +317,10 @@ fn py_sorted_list(v: &[String]) -> String {
     s.sort();
     format!(
         "[{}]",
-        s.iter().map(|x| format!("'{}'", x)).collect::<Vec<_>>().join(", ")
+        s.iter()
+            .map(|x| format!("'{}'", x))
+            .collect::<Vec<_>>()
+            .join(", ")
     )
 }
 
@@ -318,16 +344,24 @@ mod tests {
     /// 类型不匹配（提供方有声明但无一匹配）/ `state` 与 `untyped` 跳过 / 含冒号的跨包键 /
     /// 显式空段 `outputs: {}` / 全绿。
     const IOT_MODS: [(&str, &str); 7] = [
-        ("M90-l0.md", r#"# 无契约
+        (
+            "M90-l0.md",
+            r#"# 无契约
 正文
-"#),
-        ("M91-unmarked.md", r#"```yaml
+"#,
+        ),
+        (
+            "M91-unmarked.md",
+            r#"```yaml
 machine_contract:
   id: M91
   outputs: [a]
 ```
-"#),
-        ("M92-badkind.md", r#"```yaml
+"#,
+        ),
+        (
+            "M92-badkind.md",
+            r#"```yaml
 machine_contract:
   id: M92
   outputs: [a]
@@ -339,8 +373,11 @@ machine_contract:
     inputs:
       y: untyped
 ```
-"#),
-        ("M93-provider.md", r#"```yaml
+"#,
+        ),
+        (
+            "M93-provider.md",
+            r#"```yaml
 machine_contract:
   id: M93
   outputs: [foo]
@@ -348,8 +385,11 @@ machine_contract:
     outputs:
       foo: number
 ```
-"#),
-        ("M94-consumer.md", r#"```yaml
+"#,
+        ),
+        (
+            "M94-consumer.md",
+            r#"```yaml
 machine_contract:
   id: M94
   inputs: [M93, M95, M96]
@@ -360,8 +400,11 @@ machine_contract:
       M95: state
       M96: untyped
 ```
-"#),
-        ("M95-colonkey.md", r#"```yaml
+"#,
+        ),
+        (
+            "M95-colonkey.md",
+            r#"```yaml
 machine_contract:
   id: M95
   outputs: []
@@ -370,8 +413,11 @@ machine_contract:
     inputs:
       'AI保险:M01': untyped
 ```
-"#),
-        ("M96-green.md", r#"```yaml
+"#,
+        ),
+        (
+            "M96-green.md",
+            r#"```yaml
 machine_contract:
   id: M96
   outputs: [g]
@@ -381,7 +427,8 @@ machine_contract:
       g: event
     inputs: {}
 ```
-"#),
+"#,
+        ),
     ];
 
     fn build_io_types_fixture() -> std::path::PathBuf {
@@ -399,7 +446,17 @@ machine_contract:
         let root = build_io_types_fixture();
         let got = scan(&root);
         assert_eq!(got.issues, &["M92 io_types.outputs.b 类型越词表：不存在的类型（string/integer/number/boolean/array/object/event/state/untyped）", "类型不匹配：M94 期望 M93 提供 string，但 M93 声明输出类型为 ['number']（修复指引：对齐 io_types 或改依赖）"] as &[&str], "issues 须逐字且同序");
-        assert_eq!(got.warns, &["M91 未标 io_types（修复指引：nf module types --write）", "M92 io_types.outputs 与 outputs 键集不一致（缺 ['a'] / 多 ['b', 'c']）", "M92 io_types.inputs 与 inputs 键集不一致（缺 ['x'] / 多 ['y']）", "M95 io_types.inputs 与 inputs 键集不一致（缺 [] / 多 ['AI保险:M01']）", "无机读契约（L0，无法承载 io_types）共 1 件：04_模块库/通用类/M90-l0.md"] as &[&str], "warns 须逐字且同序");
+        assert_eq!(
+            got.warns,
+            &[
+                "M91 未标 io_types（修复指引：nf module types --write）",
+                "M92 io_types.outputs 与 outputs 键集不一致（缺 ['a'] / 多 ['b', 'c']）",
+                "M92 io_types.inputs 与 inputs 键集不一致（缺 ['x'] / 多 ['y']）",
+                "M95 io_types.inputs 与 inputs 键集不一致（缺 [] / 多 ['AI保险:M01']）",
+                "无机读契约（L0，无法承载 io_types）共 1 件：04_模块库/通用类/M90-l0.md"
+            ] as &[&str],
+            "warns 须逐字且同序"
+        );
         assert!(crate::jsonread::json_eq(
             &got.stats,
             &crate::jsonread::convert(&serde_json::json!({

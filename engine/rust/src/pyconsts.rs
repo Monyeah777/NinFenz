@@ -22,13 +22,23 @@ pub const ENTRIES: &[ConstEntry] = &[
     (
         "core.assertions",
         "KINDS",
-        &["regex_absent", "regex_present", "count_at_least", "json_value"],
+        &[
+            "regex_absent",
+            "regex_present",
+            "count_at_least",
+            "json_value",
+        ],
     ),
     // desktop/src/core/rfc.py :: CATEGORIES
     (
         "core.rfc",
         "CATEGORIES",
-        &["Standards Track", "Informational", "Experimental", "Process"],
+        &[
+            "Standards Track",
+            "Informational",
+            "Experimental",
+            "Process",
+        ],
     ),
     // desktop/src/core/patterns.py :: STATUSES
     ("core.patterns", "STATUSES", &["active", "deprecated"]),

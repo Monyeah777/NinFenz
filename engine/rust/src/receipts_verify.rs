@@ -43,14 +43,20 @@ pub fn verify(root: &Path) -> (Vec<String>, Json) {
         Some(d) => d,
         None => {
             return (
-                vec![format!("回执文件 schema 不匹配（期望 {}）", crate::receipts::SCHEMA)],
+                vec![format!(
+                    "回执文件 schema 不匹配（期望 {}）",
+                    crate::receipts::SCHEMA
+                )],
                 empty,
             )
         }
     };
     if !matches!(doc, Json::Object(_)) || py_str(get(&doc, "schema")) != crate::receipts::SCHEMA {
         return (
-            vec![format!("回执文件 schema 不匹配（期望 {}）", crate::receipts::SCHEMA)],
+            vec![format!(
+                "回执文件 schema 不匹配（期望 {}）",
+                crate::receipts::SCHEMA
+            )],
             empty,
         );
     }
@@ -65,7 +71,9 @@ pub fn verify(root: &Path) -> (Vec<String>, Json) {
         leaves.push(merkle::leaf_hash(&payload));
         live_by_id.push((e.id.clone(), digest));
     }
-    let live_root = merkle::merkle_root(&leaves).map(|h| merkle::hex(&h)).unwrap_or_default();
+    let live_root = merkle::merkle_root(&leaves)
+        .map(|h| merkle::hex(&h))
+        .unwrap_or_default();
 
     let mut issues: Vec<String> = Vec::new();
     if py_str(get(&doc, "root")) != live_root {
@@ -90,7 +98,10 @@ pub fn verify(root: &Path) -> (Vec<String>, Json) {
             continue;
         };
         if py_str(get(e, "digest")) != *live_digest {
-            issues.push(format!("条目内容已变：{}（修复指引：重签该条并重建回执）", eid));
+            issues.push(format!(
+                "条目内容已变：{}（修复指引：重签该条并重建回执）",
+                eid
+            ));
         }
         if fold_of(e) != live_root {
             issues.push(format!("包含证明不折叠到根：{}", eid));
@@ -131,7 +142,10 @@ fn fold_of(e: &Json) -> String {
             if !unhex(h, &mut hb) {
                 return String::new();
             }
-            steps.push(merkle::ProofStep { sibling_is_left: side == "left", hash: hb });
+            steps.push(merkle::ProofStep {
+                sibling_is_left: side == "left",
+                hash: hb,
+            });
         }
     }
     merkle::hex(&merkle::fold_proof(&leaf, &steps))

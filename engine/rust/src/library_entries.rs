@@ -90,7 +90,6 @@ pub fn entry_digest(root: &Path, rel: &str) -> String {
     crate::merkle::hex(&crate::merkle::sha256(kept.join("\n").as_bytes()))
 }
 
-
 /// 真源 `k not in fm` 是**键在场**判断，不是真值判断。
 pub fn has_key(fm: &Json, k: &str) -> bool {
     get(fm, k).is_some()
@@ -128,10 +127,18 @@ mod tests {
         // 改正文：必须变
         std::fs::write(
             tmp.join("library/NF-1.md"),
-            format!("{}attestation: {}\nanchor_mac: x\n", "---\nid: NF-1\ntitle: t\n---\nBODY2\n", "f".repeat(64)),
+            format!(
+                "{}attestation: {}\nanchor_mac: x\n",
+                "---\nid: NF-1\ntitle: t\n---\nBODY2\n",
+                "f".repeat(64)
+            ),
         )
         .unwrap();
-        assert_ne!(b, entry_digest(&tmp, "library/NF-1.md"), "正文改动必须改摘要");
+        assert_ne!(
+            b,
+            entry_digest(&tmp, "library/NF-1.md"),
+            "正文改动必须改摘要"
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 

@@ -49,7 +49,10 @@ fn section(text: &str, title: &str) -> Vec<String> {
             continue;
         }
         if start.is_some() && ln.starts_with("## ") {
-            return lines[start.unwrap()..i].iter().map(|s| (*s).to_string()).collect();
+            return lines[start.unwrap()..i]
+                .iter()
+                .map(|s| (*s).to_string())
+                .collect();
         }
     }
     match start {
@@ -76,12 +79,18 @@ pub fn parse(root: &Path) -> Decl {
 
     let mut versions: Vec<(String, String, String)> = Vec::new();
     for ln in section(&text, "声明") {
-        let Some(c) = re_row().captures(ln.trim()) else { continue };
+        let Some(c) = re_row().captures(ln.trim()) else {
+            continue;
+        };
         let name = c[1].trim().to_string();
         if name == "规范" || re_sep().is_match(&name) {
             continue;
         }
-        let rec = (name.clone(), c[2].trim().to_string(), c[3].trim().to_string());
+        let rec = (
+            name.clone(),
+            c[2].trim().to_string(),
+            c[3].trim().to_string(),
+        );
         match versions.iter_mut().find(|(n, _, _)| *n == name) {
             Some(slot) => *slot = rec,
             None => versions.push(rec),
@@ -98,7 +107,10 @@ pub fn parse(root: &Path) -> Decl {
     let mut excluded: Vec<(String, String)> = Vec::new();
     for ln in section(&text, "排除") {
         let m = re_row2().captures(ln.trim());
-        let cell = m.as_ref().map(|c| c[1].trim().to_string()).unwrap_or_default();
+        let cell = m
+            .as_ref()
+            .map(|c| c[1].trim().to_string())
+            .unwrap_or_default();
         if let Some(c) = m {
             if cell != "路径" && !re_sep().is_match(&cell) {
                 excluded.push((c[1].trim().to_string(), c[2].trim().to_string()));
@@ -106,7 +118,11 @@ pub fn parse(root: &Path) -> Decl {
         }
     }
 
-    Decl { versions, scope, excluded }
+    Decl {
+        versions,
+        scope,
+        excluded,
+    }
 }
 
 /// 真源 `live_versions`：版本真源（声明必须与这里一致）。
@@ -123,14 +139,19 @@ pub fn live_versions(root: &Path) -> Vec<(String, String)> {
 
     let contract = root.join("protocol/schema/contract.schema.json");
     if contract.is_file() {
-        let enum_vals: Vec<String> = jsonread::read_file(root, "protocol/schema/contract.schema.json")
-            .map(|d| {
-                crate::pyval::arr_items(get(&d, "properties").and_then(|p| get(p, "schema")).and_then(|s| get(s, "enum")))
+        let enum_vals: Vec<String> =
+            jsonread::read_file(root, "protocol/schema/contract.schema.json")
+                .map(|d| {
+                    crate::pyval::arr_items(
+                        get(&d, "properties")
+                            .and_then(|p| get(p, "schema"))
+                            .and_then(|s| get(s, "enum")),
+                    )
                     .iter()
                     .map(|v| plain_str_opt(Some(v)))
                     .collect()
-            })
-            .unwrap_or_default();
+                })
+                .unwrap_or_default();
         out.push(("machine_contract schema".to_string(), enum_vals.join(",")));
     }
 
@@ -143,7 +164,9 @@ pub fn live_versions(root: &Path) -> Vec<(String, String)> {
         });
         out.push((
             "protocol.yaml schema".to_string(),
-            re.captures(&text).map(|c| c[1].to_string()).unwrap_or_default(),
+            re.captures(&text)
+                .map(|c| c[1].to_string())
+                .unwrap_or_default(),
         ));
     }
 
@@ -157,7 +180,8 @@ pub fn live_versions(root: &Path) -> Vec<(String, String)> {
         String::new()
     };
     static VRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let vre = VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v[\d.]+)").expect("版本行正则固定合法"));
+    let vre =
+        VRE.get_or_init(|| regex::Regex::new(r"# 版本 : (v[\d.]+)").expect("版本行正则固定合法"));
     let vm = vre.captures(&verify).map(|c| c[1].to_string());
     let qb_text = std::fs::read_to_string(root.join("desktop/src/core/quality_baseline.py"))
         .unwrap_or_default();
@@ -165,7 +189,12 @@ pub fn live_versions(root: &Path) -> Vec<(String, String)> {
     let pass = crate::stats::py_int_const(&qb_text, "EXPECTED_PASS").unwrap_or(0);
     out.push((
         "基线".to_string(),
-        format!("{} · check1-{} · PASS={}", vm.unwrap_or_else(|| "?".to_string()), checks, pass),
+        format!(
+            "{} · check1-{} · PASS={}",
+            vm.unwrap_or_else(|| "?".to_string()),
+            checks,
+            pass
+        ),
     ));
 
     out
@@ -201,7 +230,11 @@ pub fn scan(root: &Path) -> DeclScan {
             issues.push(format!(
                 "声明与真源不一致：{} 声明={} 真源={}（修复指引：改声明对齐真源）",
                 name,
-                if got.is_empty() { "(缺)" } else { got.as_str() },
+                if got.is_empty() {
+                    "(缺)"
+                } else {
+                    got.as_str()
+                },
                 want
             ));
         }
@@ -219,7 +252,10 @@ pub fn scan(root: &Path) -> DeclScan {
     }
     for rel in &decl.scope {
         if !root.join(rel).exists() {
-            issues.push(format!("范围里的路径不存在：{}（修复指引：删掉或改正）", rel));
+            issues.push(format!(
+                "范围里的路径不存在：{}（修复指引：删掉或改正）",
+                rel
+            ));
         }
     }
     if decl.excluded.is_empty() {
@@ -235,14 +271,24 @@ pub fn scan(root: &Path) -> DeclScan {
                 issues.push(format!("排除项 glob 无匹配：{}", rel));
             }
         } else if !optional && !root.join(rel).exists() {
-            issues.push(format!("排除项路径不存在：{}（修复指引：删除该条或修正路径）", rel));
+            issues.push(format!(
+                "排除项路径不存在：{}（修复指引：删除该条或修正路径）",
+                rel
+            ));
         }
     }
-    let scope_set: Vec<String> = decl.scope.iter().map(|s| s.trim_end_matches('/').to_string()).collect();
+    let scope_set: Vec<String> = decl
+        .scope
+        .iter()
+        .map(|s| s.trim_end_matches('/').to_string())
+        .collect();
     for (rel_raw, _) in &decl.excluded {
         let rel = rel_raw.trim_end_matches('/').to_string();
         for s in &scope_set {
-            if rel == *s || rel.starts_with(&format!("{}/", s)) || s.starts_with(&format!("{}/", rel)) {
+            if rel == *s
+                || rel.starts_with(&format!("{}/", s))
+                || s.starts_with(&format!("{}/", rel))
+            {
                 issues.push(format!(
                     "scope 与排除重叠：{} ↔ {}（同一条不能既在范围又排除）",
                     s, rel
@@ -286,7 +332,8 @@ mod tests {
 
     #[test]
     fn scope_and_exclusion_overlap_is_flagged() {
-        let text = "## 声明\n| s | v | src |\n## 范围\n- `docs/a/`\n## 排除\n| docs/a/x.md | 理由 |\n";
+        let text =
+            "## 声明\n| s | v | src |\n## 范围\n- `docs/a/`\n## 排除\n| docs/a/x.md | 理由 |\n";
         let tmp = crate::testutil::fixture("decl-overlap");
         std::fs::create_dir_all(tmp.join("protocol")).unwrap();
         std::fs::create_dir_all(tmp.join("docs/a")).unwrap();
@@ -299,7 +346,7 @@ mod tests {
             got.issues
         );
         let _ = std::fs::remove_dir_all(&tmp);
-    }    // >>> GENERATED by tools/gen_declaration_branches.py（勿手改；重跑生成器覆盖本段）
+    } // >>> GENERATED by tools/gen_declaration_branches.py（勿手改；重跑生成器覆盖本段）
 
     /// ===== 分支级差分判据（期望值由 `tools/gen_declaration_branches.py` 从真源生成）=====
     ///
@@ -335,8 +382,11 @@ mod tests {
             if let Some(rest) = line.strip_prefix(name) {
                 let rest = rest.trim_start();
                 if let Some(rest) = rest.strip_prefix('=') {
-                    let digits: String =
-                        rest.trim().chars().take_while(|c| c.is_ascii_digit()).collect();
+                    let digits: String = rest
+                        .trim()
+                        .chars()
+                        .take_while(|c| c.is_ascii_digit())
+                        .collect();
                     if let Ok(n) = digits.parse() {
                         return n;
                     }
@@ -361,19 +411,38 @@ mod tests {
 
     fn build_declaration_fixture() -> std::path::PathBuf {
         let root = crate::testutil::fixture("declaration-branches");
-        for rel in ["protocol/schema", "community/p1", "desktop/src/core", "docs"] {
+        for rel in [
+            "protocol/schema",
+            "community/p1",
+            "desktop/src/core",
+            "docs",
+        ] {
             std::fs::create_dir_all(root.join(rel)).unwrap();
         }
         for (rel, body) in [
-            ("community/p1/protocol.yaml", r#"protocol:
+            (
+                "community/p1/protocol.yaml",
+                r#"protocol:
   schema_version: "2"
-"#),
-            ("desktop/src/core/quality_baseline.py", r#"# 由判据在测试时以真仓库那份覆盖
-"#),
-            ("desktop/src/core/registry.json", r#"{"registry_schema_version": 2}"#),
-            ("docs/a.md", r#"# a
-"#),
-            ("protocol/CONFORMANCE.md", r#"# 一致性声明
+"#,
+            ),
+            (
+                "desktop/src/core/quality_baseline.py",
+                r#"# 由判据在测试时以真仓库那份覆盖
+"#,
+            ),
+            (
+                "desktop/src/core/registry.json",
+                r#"{"registry_schema_version": 2}"#,
+            ),
+            (
+                "docs/a.md",
+                r#"# a
+"#,
+            ),
+            (
+                "protocol/CONFORMANCE.md",
+                r#"# 一致性声明
 
 ## 声明
 
@@ -395,10 +464,16 @@ mod tests {
 | `docs/a.md` | 存量 |
 | `docs/b.md` | 允许不存在 |
 | `zzz/**` | 存量 |
-"#),
-            ("protocol/schema/contract.schema.json", r#"{"properties": {"schema": {"enum": ["1"]}}}"#),
+"#,
+            ),
+            (
+                "protocol/schema/contract.schema.json",
+                r#"{"properties": {"schema": {"enum": ["1"]}}}"#,
+            ),
             ("protocol/schema/other.schema.json", r#"{"$id": "other"}"#),
-            ("verify.sh", r#"#!/bin/bash
+            (
+                "verify.sh",
+                r#"#!/bin/bash
 # 版本 : (v9.9)
 check1(){
   true
@@ -406,7 +481,8 @@ check1(){
 check2(){
   true
 }
-"#),
+"#,
+            ),
         ] {
             std::fs::write(root.join(rel), body).unwrap();
         }
@@ -433,5 +509,4 @@ check2(){
         assert_eq!(got.excluded, 3, "排除条数");
     }
     // <<< GENERATED
-
 }

@@ -54,19 +54,33 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<PayloadStats>) {
         );
     }
     let Some(schema) = jsonread::read_file(root, "protocol/event_payload.schema.json") else {
-        return (vec!["protocol/event_payload.schema.json 不是合法 JSON".to_string()], None);
+        return (
+            vec!["protocol/event_payload.schema.json 不是合法 JSON".to_string()],
+            None,
+        );
     };
     let Some(registry) = jsonread::read_file(root, "protocol/event_registry.json") else {
-        return (vec!["protocol/event_registry.json 不是合法 JSON".to_string()], None);
+        return (
+            vec!["protocol/event_registry.json 不是合法 JSON".to_string()],
+            None,
+        );
     };
     let mut issues = crate::schema_lint::subset_validate(&registry, &schema, "event_registry");
 
     let mut used: BTreeSet<String> = BTreeSet::new();
     for rel in crate::module_signature::module_docs(root) {
-        let Ok(txt) = std::fs::read_to_string(root.join(&rel)) else { continue };
-        let Some(parsed) = miniyaml::fence_yaml(&txt, "machine_contract") else { continue };
-        let mc = get(&parsed, "machine_contract").cloned().unwrap_or_else(|| Json::Object(Vec::new()));
-        let ev = get(&mc, "events").cloned().unwrap_or_else(|| Json::Object(Vec::new()));
+        let Ok(txt) = std::fs::read_to_string(root.join(&rel)) else {
+            continue;
+        };
+        let Some(parsed) = miniyaml::fence_yaml(&txt, "machine_contract") else {
+            continue;
+        };
+        let mc = get(&parsed, "machine_contract")
+            .cloned()
+            .unwrap_or_else(|| Json::Object(Vec::new()));
+        let ev = get(&mc, "events")
+            .cloned()
+            .unwrap_or_else(|| Json::Object(Vec::new()));
         for k in ["publish", "subscribe"] {
             for v in crate::pyval::arr_items(get(&ev, k)) {
                 used.insert(plain_str(v));
@@ -90,12 +104,18 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<PayloadStats>) {
     let mut dead: Vec<String> = registered.difference(&used).cloned().collect();
     dead.sort();
     if !dead.is_empty() {
-        issues.push(format!("已登记事件无 machine 引用（死注册）：{}", dead.join(", ")));
+        issues.push(format!(
+            "已登记事件无 machine 引用（死注册）：{}",
+            dead.join(", ")
+        ));
     }
     let mut unregistered: Vec<String> = used.difference(&registered).cloned().collect();
     unregistered.sort();
     if !unregistered.is_empty() {
-        issues.push(format!("机器事件未登记载荷（漏登）：{}", unregistered.join(", ")));
+        issues.push(format!(
+            "机器事件未登记载荷（漏登）：{}",
+            unregistered.join(", ")
+        ));
     }
 
     let declared = registered_pairs
@@ -135,15 +155,23 @@ mod tests {
         std::fs::create_dir_all(root.join("04_模块库/通用类")).unwrap();
         std::fs::write(root.join("protocol/event_payload.schema.json"), r#"{"$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "required": ["schema", "events"], "properties": {"schema": {"type": "string", "enum": ["community-event-registry/1"]}, "events": {"type": "object"}}}"#).unwrap();
         std::fs::write(root.join("protocol/event_registry.json"), r#"{"schema": "wrong/1", "events": {"a": {"fields": ["f1"]}, "b": {}, "dead_ev": {"fields": ["f2"]}}}"#).unwrap();
-        std::fs::write(root.join("04_模块库/通用类/M01_x.md"), r#"```yaml
+        std::fs::write(
+            root.join("04_模块库/通用类/M01_x.md"),
+            r#"```yaml
 machine_contract:
   id: M01
   events:
     publish: [a]
     subscribe: [b, unregistered_ev]
 ```
-"#).unwrap();
-        std::fs::write(root.join("desktop/src/core/registry.json"), r#"{"subscriptions": {"sub_ev": {}}}"#).unwrap();
+"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("desktop/src/core/registry.json"),
+            r#"{"subscriptions": {"sub_ev": {}}}"#,
+        )
+        .unwrap();
         root
     }
 
@@ -153,7 +181,9 @@ machine_contract:
         let (issues, stats) = scan(&root);
         assert_eq!(issues, WANT_PL_ISSUES, "逐条消息与次序都须与真源一致");
         assert!(crate::jsonread::json_eq(
-            &stats.map(|s| s.to_json()).unwrap_or_else(|| Json::Object(Vec::new())),
+            &stats
+                .map(|s| s.to_json())
+                .unwrap_or_else(|| Json::Object(Vec::new())),
             &crate::jsonread::convert(&serde_json::json!({
                 "registered": 3, "used": 4,
                 "declared": 2, "pending": 1

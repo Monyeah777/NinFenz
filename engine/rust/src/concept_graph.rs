@@ -16,8 +16,9 @@ use crate::pyval;
 use std::path::Path;
 
 pub const BLOCK_MARKER: &str = "concept_graph";
-pub const LAYERS: [&str; 9] =
-    ["P00", "P10", "P20", "P30", "P40", "P50", "P60", "P70", "P80"];
+pub const LAYERS: [&str; 9] = [
+    "P00", "P10", "P20", "P30", "P40", "P50", "P60", "P70", "P80",
+];
 /// 真源 `SHELF_GLOBS`（资产货架，单层）。
 pub const SHELF_GLOBS: [&str; 2] = ["community/*/assets/*.md", "05_资产库/用户自定义/*.md"];
 const PROVENANCE_STRENGTHS: [&str; 4] = ["external", "mixed", "domain-logic", "inferred"];
@@ -154,10 +155,7 @@ pub fn branch_map(graph: &Json) -> Vec<(String, Vec<String>)> {
         let Json::Object(_) = &br else { continue };
         if let Some(id) = obj_get(&br, "id") {
             if pyval::py_truthy(id) {
-                out.push((
-                    s(id),
-                    arr_of(obj_get(&br, "nodes")).iter().map(s).collect(),
-                ));
+                out.push((s(id), arr_of(obj_get(&br, "nodes")).iter().map(s).collect()));
             }
         }
     }
@@ -284,8 +282,10 @@ pub fn toposort(graph: &Json) -> Result<Vec<String>, String> {
         ready.sort();
     }
     if out.len() != ids.len() {
-        return Err("概念图存在环，无法给出装载序（修复指引：按资产 §4 conflict_rules 归并并列节点）"
-            .to_string());
+        return Err(
+            "概念图存在环，无法给出装载序（修复指引：按资产 §4 conflict_rules 归并并列节点）"
+                .to_string(),
+        );
     }
     Ok(out)
 }
@@ -319,7 +319,11 @@ pub fn problems(graph: &Json) -> Vec<String> {
         ));
     } else {
         let (covered, total) = external_coverage(graph);
-        let ratio = if total != 0 { covered as f64 / total as f64 } else { 0.0 };
+        let ratio = if total != 0 {
+            covered as f64 / total as f64
+        } else {
+            0.0
+        };
         if strength == "external" && ratio < 1.0 {
             issues.push(format!(
                 "provenance_strength=external 但外部覆盖仅 {}/{}（修复指引：补齐每节点的外部来源锚，或按实况降为 mixed / domain-logic）",
@@ -352,7 +356,10 @@ pub fn problems(graph: &Json) -> Vec<String> {
         seen_nodes.push(nid.clone());
         let name = obj_get(&node, "name").cloned().unwrap_or(Json::Null);
         if s(&name).trim().is_empty() {
-            issues.push(format!("节点 {} 缺 name（修复指引：每个概念须有可读名）", nid));
+            issues.push(format!(
+                "节点 {} 缺 name（修复指引：每个概念须有可读名）",
+                nid
+            ));
         }
         let prov = arr_of(obj_get(&node, "provenance"));
         if prov.is_empty() {
@@ -386,7 +393,10 @@ pub fn problems(graph: &Json) -> Vec<String> {
     for (nid, ps) in &sorted_prereqs {
         for p in ps {
             if !declared.contains(p) {
-                issues.push(format!("悬空前置：{} ← {}（前置不在节点表 / 外部前置族中）", nid, p));
+                issues.push(format!(
+                    "悬空前置：{} ← {}（前置不在节点表 / 外部前置族中）",
+                    nid, p
+                ));
             }
             if p == nid {
                 issues.push(format!("自环：{} ← {}", nid, p));
@@ -401,7 +411,10 @@ pub fn problems(graph: &Json) -> Vec<String> {
         .collect();
     unbranched.sort();
     for nid in unbranched {
-        issues.push(format!("概念 {} 未归入任何分支（修复指引：在图 branches 段登记）", nid));
+        issues.push(format!(
+            "概念 {} 未归入任何分支（修复指引：在图 branches 段登记）",
+            nid
+        ));
     }
     let mut ghost: Vec<String> = bids
         .iter()
@@ -410,7 +423,10 @@ pub fn problems(graph: &Json) -> Vec<String> {
         .collect();
     ghost.sort();
     for nid in ghost {
-        issues.push(format!("分支声明了不存在的概念：{}（修复指引：核对 branches.nodes）", nid));
+        issues.push(format!(
+            "分支声明了不存在的概念：{}（修复指引：核对 branches.nodes）",
+            nid
+        ));
     }
     let flat: Vec<String> = branch_map(graph).into_iter().flat_map(|(_, v)| v).collect();
     let mut uniq = flat.clone();
@@ -458,7 +474,6 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     )
 }
 
-
 /// 真源 `DEFAULT_ASSET`。
 pub const DEFAULT_ASSET: &str = "community/AI系统域包/assets/CONCEPT_GRAPH.md";
 
@@ -469,7 +484,8 @@ pub fn node_meta(graph: &Json) -> Vec<(String, Json)> {
         if let Some(Json::Array(nodes)) = o.iter().find(|(k, _)| k == "nodes").map(|(_, v)| v) {
             for n in nodes {
                 if let Json::Object(no) = n {
-                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v) {
+                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v)
+                    {
                         let mut rec = no.clone();
                         rec.push(("external".to_string(), Json::Bool(false)));
                         out.push((id.clone(), Json::Object(rec)));
@@ -477,12 +493,15 @@ pub fn node_meta(graph: &Json) -> Vec<(String, Json)> {
                 }
             }
         }
-        if let Some(Json::Array(ext)) =
-            o.iter().find(|(k, _)| k == "external_prereqs").map(|(_, v)| v)
+        if let Some(Json::Array(ext)) = o
+            .iter()
+            .find(|(k, _)| k == "external_prereqs")
+            .map(|(_, v)| v)
         {
             for n in ext {
                 if let Json::Object(no) = n {
-                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v) {
+                    if let Some(Json::Str(id)) = no.iter().find(|(k, _)| k == "id").map(|(_, v)| v)
+                    {
                         if !out.iter().any(|(k, _)| k == id) {
                             let mut rec = no.clone();
                             rec.push(("external".to_string(), Json::Bool(true)));
@@ -570,7 +589,10 @@ mod tests {
         let (issues, stats) = scan(&root);
         assert_eq!(issues, &[] as &[&str], "issues 须逐字且同序");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"edges": 4840, "graphs": 102, "nodes": 2635}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(
+                r#"{"edges": 4840, "graphs": 102, "nodes": 2635}"#,
+            )
+            .unwrap(),
         )
         .unwrap();
         assert!(
@@ -585,7 +607,113 @@ mod tests {
     #[test]
     fn concept_graph_asset_enumeration_matches_truth_source() {
         let root = crate::testutil::repo_root();
-        assert_eq!(graph_assets(&root), &[r#"community/AI人力资源与招聘域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI保险域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI农业域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI制药与生物域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI制造业域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI医疗健康域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI政务与公共事务域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI教育域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI法律与合规域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI系统域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI能源与电力域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI金融投研与风控域包/assets/CONCEPT_GRAPH.md"#, r#"community/AI食品与餐饮域包/assets/CONCEPT_GRAPH.md"#, r#"community/三维与世界模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/上下文工程与长上下文域包/assets/CONCEPT_GRAPH.md"#, r#"community/世界书与设定库域包/assets/CONCEPT_GRAPH.md"#, r#"community/个人助理与日常生活域包/assets/CONCEPT_GRAPH.md"#, r#"community/交通与出行域包/assets/CONCEPT_GRAPH.md"#, r#"community/产业与商业落地域包/assets/CONCEPT_GRAPH.md"#, r#"community/代码与软件工程域包/assets/CONCEPT_GRAPH.md"#, r#"community/代码大模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/代码审查与缺陷检测域包/assets/CONCEPT_GRAPH.md"#, r#"community/代码生成与补全域包/assets/CONCEPT_GRAPH.md"#, r#"community/企业培训与组织学习域包/assets/CONCEPT_GRAPH.md"#, r#"community/传媒与新闻域包/assets/CONCEPT_GRAPH.md"#, r#"community/信息抽取与结构化域包/assets/CONCEPT_GRAPH.md"#, r#"community/具身智能与机器人域包/assets/CONCEPT_GRAPH.md"#, r#"community/内容分发与社区运营域包/assets/CONCEPT_GRAPH.md"#, r#"community/内容改写与风格迁移域包/assets/CONCEPT_GRAPH.md"#, r#"community/分类与情感分析域包/assets/CONCEPT_GRAPH.md"#, r#"community/参数高效微调域包/assets/CONCEPT_GRAPH.md"#, r#"community/可观测性成本与可靠性域包/assets/CONCEPT_GRAPH.md"#, r#"community/可解释性与审计域包/assets/CONCEPT_GRAPH.md"#, r#"community/合成数据生成域包/assets/CONCEPT_GRAPH.md"#, r#"community/合规与监管域包/assets/CONCEPT_GRAPH.md"#, r#"community/向量库与检索管线域包/assets/CONCEPT_GRAPH.md"#, r#"community/图像生成与编辑域包/assets/CONCEPT_GRAPH.md"#, r#"community/图像生成与视觉创作域包/assets/CONCEPT_GRAPH.md"#, r#"community/图像生成与视觉设计域包/assets/CONCEPT_GRAPH.md"#, r#"community/多智能体协同域包/assets/CONCEPT_GRAPH.md"#, r#"community/多模态大模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/多语翻译与本地化域包/assets/CONCEPT_GRAPH.md"#, r#"community/多轮对话与角色扮演域包/assets/CONCEPT_GRAPH.md"#, r#"community/大语言模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/安全与对齐域包/assets/CONCEPT_GRAPH.md"#, r#"community/对话与客服域包/assets/CONCEPT_GRAPH.md"#, r#"community/对齐与偏好优化域包/assets/CONCEPT_GRAPH.md"#, r#"community/嵌入与检索表示域包/assets/CONCEPT_GRAPH.md"#, r#"community/平台与基础设施域包/assets/CONCEPT_GRAPH.md"#, r#"community/建筑与房地产域包/assets/CONCEPT_GRAPH.md"#, r#"community/开源与开发者生态域包/assets/CONCEPT_GRAPH.md"#, r#"community/强化学习与决策域包/assets/CONCEPT_GRAPH.md"#, r#"community/推理优化与加速域包/assets/CONCEPT_GRAPH.md"#, r#"community/推理服务与部署域包/assets/CONCEPT_GRAPH.md"#, r#"community/推荐排序与广告域包/assets/CONCEPT_GRAPH.md"#, r#"community/提示工程与指令设计域包/assets/CONCEPT_GRAPH.md"#, r#"community/提示工程与提示模板域包/assets/CONCEPT_GRAPH.md"#, r#"community/搜索与信息聚合域包/assets/CONCEPT_GRAPH.md"#, r#"community/摘要与信息压缩域包/assets/CONCEPT_GRAPH.md"#, r#"community/数字人与虚拟形象域包/assets/CONCEPT_GRAPH.md"#, r#"community/数学与形式化推理域包/assets/CONCEPT_GRAPH.md"#, r#"community/数据分析与决策支持域包/assets/CONCEPT_GRAPH.md"#, r#"community/数据分析与表格理解域包/assets/CONCEPT_GRAPH.md"#, r#"community/数据标注与标注质量域包/assets/CONCEPT_GRAPH.md"#, r#"community/数据采集与清洗域包/assets/CONCEPT_GRAPH.md"#, r#"community/文旅与酒店域包/assets/CONCEPT_GRAPH.md"#, r#"community/文本生成与创作域包/assets/CONCEPT_GRAPH.md"#, r#"community/文档解析与版面理解域包/assets/CONCEPT_GRAPH.md"#, r#"community/智能体与工作流编排域包/assets/CONCEPT_GRAPH.md"#, r#"community/智能体框架与工具调用域包/assets/CONCEPT_GRAPH.md"#, r#"community/机器翻译与本地化域包/assets/CONCEPT_GRAPH.md"#, r#"community/模型运营与成本域包/assets/CONCEPT_GRAPH.md"#, r#"community/测试与用例生成域包/assets/CONCEPT_GRAPH.md"#, r#"community/游戏与互动娱乐域包/assets/CONCEPT_GRAPH.md"#, r#"community/版权与知识产权域包/assets/CONCEPT_GRAPH.md"#, r#"community/物流与供应链域包/assets/CONCEPT_GRAPH.md"#, r#"community/监督微调域包/assets/CONCEPT_GRAPH.md"#, r#"community/知识管理与检索增强域包/assets/CONCEPT_GRAPH.md"#, r#"community/知识问答与检索增强域包/assets/CONCEPT_GRAPH.md"#, r#"community/科研与实验域包/assets/CONCEPT_GRAPH.md"#, r#"community/端侧与边缘小模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/红队越狱与安全测试域包/assets/CONCEPT_GRAPH.md"#, r#"community/编辑校对与出版域包/assets/CONCEPT_GRAPH.md"#, r#"community/视觉模型域包/assets/CONCEPT_GRAPH.md"#, r#"community/视频生成与剪辑域包/assets/CONCEPT_GRAPH.md"#, r#"community/视频生成与理解域包/assets/CONCEPT_GRAPH.md"#, r#"community/视频生成与自动剪辑域包/assets/CONCEPT_GRAPH.md"#, r#"community/角色扮演与角色卡域包/assets/CONCEPT_GRAPH.md"#, r#"community/记忆体与个性化域包/assets/CONCEPT_GRAPH.md"#, r#"community/评测与基准域包/assets/CONCEPT_GRAPH.md"#, r#"community/评测基准与排行榜域包/assets/CONCEPT_GRAPH.md"#, r#"community/语音合成与配音域包/assets/CONCEPT_GRAPH.md"#, r#"community/语音识别与合成域包/assets/CONCEPT_GRAPH.md"#, r#"community/语音转写与会议记录域包/assets/CONCEPT_GRAPH.md"#, r#"community/量化金融域包/assets/QUANT_GRAPH.md"#, r#"community/长文本与小说创作域包/assets/CONCEPT_GRAPH.md"#, r#"community/隐私与数据治理域包/assets/CONCEPT_GRAPH.md"#, r#"community/零售与电商域包/assets/CONCEPT_GRAPH.md"#, r#"community/音频与音乐生成域包/assets/CONCEPT_GRAPH.md"#, r#"community/音频音乐与语音域包/assets/CONCEPT_GRAPH.md"#, r#"community/预测异常与风险域包/assets/CONCEPT_GRAPH.md"#, r#"community/预训练与继续预训练域包/assets/CONCEPT_GRAPH.md"#] as &[&str]);
+        assert_eq!(
+            graph_assets(&root),
+            &[
+                r#"community/AI人力资源与招聘域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI保险域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI农业域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI制药与生物域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI制造业域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI医疗健康域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI政务与公共事务域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI教育域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI法律与合规域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI系统域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI能源与电力域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI金融投研与风控域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/AI食品与餐饮域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/三维与世界模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/上下文工程与长上下文域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/世界书与设定库域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/个人助理与日常生活域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/交通与出行域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/产业与商业落地域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/代码与软件工程域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/代码大模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/代码审查与缺陷检测域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/代码生成与补全域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/企业培训与组织学习域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/传媒与新闻域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/信息抽取与结构化域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/具身智能与机器人域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/内容分发与社区运营域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/内容改写与风格迁移域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/分类与情感分析域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/参数高效微调域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/可观测性成本与可靠性域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/可解释性与审计域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/合成数据生成域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/合规与监管域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/向量库与检索管线域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/图像生成与编辑域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/图像生成与视觉创作域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/图像生成与视觉设计域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/多智能体协同域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/多模态大模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/多语翻译与本地化域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/多轮对话与角色扮演域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/大语言模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/安全与对齐域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/对话与客服域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/对齐与偏好优化域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/嵌入与检索表示域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/平台与基础设施域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/建筑与房地产域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/开源与开发者生态域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/强化学习与决策域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/推理优化与加速域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/推理服务与部署域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/推荐排序与广告域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/提示工程与指令设计域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/提示工程与提示模板域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/搜索与信息聚合域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/摘要与信息压缩域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数字人与虚拟形象域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数学与形式化推理域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数据分析与决策支持域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数据分析与表格理解域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数据标注与标注质量域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/数据采集与清洗域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/文旅与酒店域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/文本生成与创作域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/文档解析与版面理解域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/智能体与工作流编排域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/智能体框架与工具调用域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/机器翻译与本地化域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/模型运营与成本域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/测试与用例生成域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/游戏与互动娱乐域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/版权与知识产权域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/物流与供应链域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/监督微调域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/知识管理与检索增强域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/知识问答与检索增强域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/科研与实验域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/端侧与边缘小模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/红队越狱与安全测试域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/编辑校对与出版域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/视觉模型域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/视频生成与剪辑域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/视频生成与理解域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/视频生成与自动剪辑域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/角色扮演与角色卡域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/记忆体与个性化域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/评测与基准域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/评测基准与排行榜域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/语音合成与配音域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/语音识别与合成域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/语音转写与会议记录域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/量化金融域包/assets/QUANT_GRAPH.md"#,
+                r#"community/长文本与小说创作域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/隐私与数据治理域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/零售与电商域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/音频与音乐生成域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/音频音乐与语音域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/预测异常与风险域包/assets/CONCEPT_GRAPH.md"#,
+                r#"community/预训练与继续预训练域包/assets/CONCEPT_GRAPH.md"#
+            ] as &[&str]
+        );
     }
     // <<< GENERATED
 }

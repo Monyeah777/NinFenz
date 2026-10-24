@@ -25,7 +25,8 @@ const DEFAULT_VERDICTS: [&str; 3] = ["pass", "fail", "warn"];
 
 fn is_date(s: &str) -> bool {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
+    let re =
+        RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"));
     re.is_match(s)
 }
 
@@ -49,7 +50,11 @@ fn entries(root: &Path) -> Vec<Row> {
             let text = std::fs::read_to_string(root.join(&rel)).unwrap_or_default();
             let (fm, _body) = parse_frontmatter(&text);
             let file = rel.rsplit('/').next().unwrap_or(&rel).to_string();
-            Row { path: rel, file, fm }
+            Row {
+                path: rel,
+                file,
+                fm,
+            }
         })
         .collect()
 }
@@ -66,7 +71,10 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
     if !p.is_file() {
         return (
             vec![format!("审计件不存在：{}", rel)],
-            DocCheck { legacy: false, subjects: 0 },
+            DocCheck {
+                legacy: false,
+                subjects: 0,
+            },
         );
     }
     let d = decl(root);
@@ -75,7 +83,10 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
     if !py_truthy(get(&fm, "id").unwrap_or(&Json::Null)) {
         return (
             Vec::new(),
-            DocCheck { legacy: true, subjects: 0 },
+            DocCheck {
+                legacy: true,
+                subjects: 0,
+            },
         );
     }
     let mut issues: Vec<String> = Vec::new();
@@ -84,7 +95,11 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
             .iter()
             .map(|v| plain_str(v))
             .collect();
-        if f.is_empty() { DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect() } else { f }
+        if f.is_empty() {
+            DEFAULT_FIELDS.iter().map(|s| (*s).to_string()).collect()
+        } else {
+            f
+        }
     };
     for k in fields {
         if !py_truthy(get(&fm, &k).unwrap_or(&Json::Null)) {
@@ -96,7 +111,11 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
             .iter()
             .map(|x| plain_str(x))
             .collect();
-        if v.is_empty() { DEFAULT_VERDICTS.iter().map(|s| (*s).to_string()).collect() } else { v }
+        if v.is_empty() {
+            DEFAULT_VERDICTS.iter().map(|s| (*s).to_string()).collect()
+        } else {
+            v
+        }
     };
     if !vocab.contains(&py_str(get(&fm, "verdict"))) {
         issues.push(format!(
@@ -152,7 +171,13 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
     {
         issues.push("有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）".to_string());
     }
-    (issues, DocCheck { legacy: false, subjects: ok_subs })
+    (
+        issues,
+        DocCheck {
+            legacy: false,
+            subjects: ok_subs,
+        },
+    )
 }
 
 pub struct AuditScan {
@@ -197,7 +222,11 @@ pub fn scan(root: &Path) -> AuditScan {
         }
         let tag = {
             let id = py_str(get(&e.fm, "id"));
-            if id.is_empty() { e.file.clone() } else { id }
+            if id.is_empty() {
+                e.file.clone()
+            } else {
+                id
+            }
         };
         issues.extend(i.into_iter().map(|x| format!("{}：{}", tag, x)));
         subs += st.subjects;
@@ -222,7 +251,11 @@ pub fn scan(root: &Path) -> AuditScan {
         ("legacy".to_string(), Json::Int(legacy.len() as i64)),
         ("subjects_ok".to_string(), Json::Int(subs)),
     ]);
-    AuditScan { issues, warns, stats }
+    AuditScan {
+        issues,
+        warns,
+        stats,
+    }
 }
 
 #[cfg(test)]
@@ -243,9 +276,7 @@ mod tests {
         "AUD-0002：被审对象已变，旧审计失效：subject.md（修复指引：重审并更新 digest）",
         "AUD-0002：有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）",
     ];
-    const WANT_AUDIT_WARNS: [&str; 1] = [
-        "存量审计件无审计头（legacy，按回合收）：1 件 —— A1.md",
-    ];
+    const WANT_AUDIT_WARNS: [&str; 1] = ["存量审计件无审计头（legacy，按回合收）：1 件 —— A1.md"];
 
     fn build_audit_fixture() -> std::path::PathBuf {
         let root = crate::testutil::fixture("audit-branches");
@@ -254,11 +285,15 @@ mod tests {
         std::fs::write(root.join("protocol/audit.json"), r#"{"schema": "nf-audit/1", "verdict_vocabulary": ["pass", "fail", "warn"], "rules": ["r"]}"#).unwrap();
         std::fs::write(root.join("subject.md"), "hello\n").unwrap();
         let good = crate::merkle::hex(&crate::merkle::sha256(b"hello\n"));
-        std::fs::write(root.join("results/audit/A1.md"), r#"---
+        std::fs::write(
+            root.join("results/audit/A1.md"),
+            r#"---
 title: 无编号
 ---
 正文
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let a2 = r#"---
 id: AUD-0002
 scope: s
@@ -275,9 +310,9 @@ accepted_at: 不是日期
 ---
 正文
 "#
-            .replace("@GOOD@", &good)
-            .replace("@Z64@", &"0".repeat(64))
-            .replace("@O64@", &"1".repeat(64));
+        .replace("@GOOD@", &good)
+        .replace("@Z64@", &"0".repeat(64))
+        .replace("@O64@", &"1".repeat(64));
         std::fs::write(root.join("results/audit/A2.md"), a2).unwrap();
         let a3 = r#"---
 id: AUD-0003
@@ -291,7 +326,8 @@ accepted_by: 李四
 accepted_at: 2026-01-03
 ---
 正文
-"#.replace("@GOOD@", &good);
+"#
+        .replace("@GOOD@", &good);
         std::fs::write(root.join("results/audit/A3.md"), a3).unwrap();
         root
     }
@@ -300,7 +336,10 @@ accepted_at: 2026-01-03
     fn scan_matches_truth_source_branch_by_branch() {
         let root = build_audit_fixture();
         let got = scan(&root);
-        assert_eq!(got.issues, WANT_AUDIT_ISSUES, "逐条消息与次序都须与真源一致");
+        assert_eq!(
+            got.issues, WANT_AUDIT_ISSUES,
+            "逐条消息与次序都须与真源一致"
+        );
         assert_eq!(got.warns, WANT_AUDIT_WARNS);
         assert!(crate::jsonread::json_eq(
             &got.stats,

@@ -16,8 +16,8 @@
 //!
 //! 隐藏文件**照收**：`Path.glob` 不像 shell 那样跳过点开头项。
 
-use std::path::Path;
 use std::cell::RefCell;
+use std::path::Path;
 
 thread_local! {
     /// 一次 `nf-rs` 命令（或一次 serve 请求）内共享的 glob 缓存。
@@ -99,7 +99,9 @@ fn to_posix(p: &Path) -> String {
 }
 
 fn walk_files(dir: &Path, root: &Path, out: &mut Vec<String>) {
-    let Ok(rd) = std::fs::read_dir(dir) else { return };
+    let Ok(rd) = std::fs::read_dir(dir) else {
+        return;
+    };
     for e in rd.flatten() {
         let Ok(ft) = e.file_type() else { continue };
         let p = e.path();
@@ -226,7 +228,11 @@ impl Cache {
         if let Some(v) = self.trees.get(prefix) {
             return v.clone();
         }
-        let base = if prefix.is_empty() { root.to_path_buf() } else { root.join(prefix) };
+        let base = if prefix.is_empty() {
+            root.to_path_buf()
+        } else {
+            root.join(prefix)
+        };
         let mut v = Vec::new();
         walk_files(&base, root, &mut v);
         self.trees.insert(prefix.to_string(), v.clone());
@@ -234,7 +240,9 @@ impl Cache {
     }
 
     fn walk_segments(&mut self, root: &Path, dir: &Path, segs: &[String], out: &mut Vec<String>) {
-        let Some((head, tail)) = segs.split_first() else { return };
+        let Some((head, tail)) = segs.split_first() else {
+            return;
+        };
         if is_literal_seg(head) {
             let next = dir.join(head);
             if tail.is_empty() {
@@ -271,8 +279,6 @@ fn is_literal_seg(s: &str) -> bool {
     !s.chars().any(|c| c == '*' || c == '?' || c == '[')
 }
 
-
-
 /// **含目录**的展开 —— 复刻 Python `glob.glob(pattern, recursive=True)` 的存在性语义。
 ///
 /// 真源 `patterns.scan` 用它判 `applies_to` 通配是否命中真实件，而 Python 的 `glob` 模块
@@ -294,7 +300,11 @@ pub fn expand_any(root: &Path, pattern: &str) -> Vec<String> {
     }
     let re = to_regex(pattern);
     let prefix = fixed_prefix(pattern);
-    let base = if prefix.is_empty() { root.to_path_buf() } else { root.join(&prefix) };
+    let base = if prefix.is_empty() {
+        root.to_path_buf()
+    } else {
+        root.join(&prefix)
+    };
     let mut all = Vec::new();
     walk_entries(&base, root, &mut all);
     let mut out: Vec<String> = all.into_iter().filter(|rel| re.is_match(rel)).collect();
@@ -307,7 +317,9 @@ pub fn expand_any(root: &Path, pattern: &str) -> Vec<String> {
 }
 
 fn walk_entries(dir: &Path, root: &Path, out: &mut Vec<String>) {
-    let Ok(rd) = std::fs::read_dir(dir) else { return };
+    let Ok(rd) = std::fs::read_dir(dir) else {
+        return;
+    };
     for e in rd.flatten() {
         let p = e.path();
         if let Ok(rel) = p.strip_prefix(root) {
@@ -325,7 +337,11 @@ pub fn py_path_str(root: &Path, rel: &str) -> String {
     if root_s.len() > 1 {
         root_s = root_s.trim_end_matches('/').to_string();
     }
-    let body = if cfg!(windows) { rel.replace('/', "\\") } else { rel.to_string() };
+    let body = if cfg!(windows) {
+        rel.replace('/', "\\")
+    } else {
+        rel.to_string()
+    };
     if root_s.is_empty() || root_s == "." {
         return body;
     }
@@ -368,7 +384,10 @@ mod tests {
 
     #[test]
     fn fixed_prefix_stops_at_first_wildcard_segment() {
-        assert_eq!(fixed_prefix("docs/examples/state-front/*.md"), "docs/examples/state-front");
+        assert_eq!(
+            fixed_prefix("docs/examples/state-front/*.md"),
+            "docs/examples/state-front"
+        );
         assert_eq!(fixed_prefix("a/**/b/*.md"), "a");
         assert_eq!(fixed_prefix("*.md"), "");
     }
@@ -389,10 +408,17 @@ mod tests {
         std::fs::write(tmp.join("d/b.md"), b"x").unwrap();
         std::fs::write(tmp.join("d/a.md"), b"x").unwrap();
         std::fs::write(tmp.join("d/sub/c.md"), b"x").unwrap();
-        assert_eq!(expand(&tmp, "d/*.md"), vec!["d/a.md".to_string(), "d/b.md".to_string()]);
+        assert_eq!(
+            expand(&tmp, "d/*.md"),
+            vec!["d/a.md".to_string(), "d/b.md".to_string()]
+        );
         assert_eq!(
             expand(&tmp, "d/**/*.md"),
-            vec!["d/a.md".to_string(), "d/b.md".to_string(), "d/sub/c.md".to_string()]
+            vec![
+                "d/a.md".to_string(),
+                "d/b.md".to_string(),
+                "d/sub/c.md".to_string()
+            ]
         );
         assert_eq!(expand(&tmp, "d/a.md"), vec!["d/a.md".to_string()]);
         assert!(expand(&tmp, "d/none.md").is_empty());
@@ -419,8 +445,13 @@ mod tests {
         // 命中整模式缓存
         assert_eq!(c.expand(&tmp, "community/*/assets/*.md").len(), 2);
         // 单层目录清单已缓存 ⇒ 换个模式不必重列 `community/`
-        assert!(c.dirs.contains_key(&tmp.join("community").to_string_lossy().to_string()));
-        assert_eq!(c.expand(&tmp, "community/*/modules/*.md"), vec!["community/p1/modules/M.md"]);
+        assert!(c
+            .dirs
+            .contains_key(&tmp.join("community").to_string_lossy().to_string()));
+        assert_eq!(
+            c.expand(&tmp, "community/*/modules/*.md"),
+            vec!["community/p1/modules/M.md"]
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 
@@ -436,14 +467,28 @@ mod tests {
         assert_eq!(wide.len(), 2);
         assert!(c.trees.contains_key("community"), "宽模式应留下全递归清单");
         assert!(c.dirs.is_empty(), "走了全递归就不该再列单层目录");
-        assert_eq!(c.expand(&tmp, "community/*/assets/*.md"), vec!["community/p1/assets/A.md"]);
+        assert_eq!(
+            c.expand(&tmp, "community/*/assets/*.md"),
+            vec!["community/p1/assets/A.md"]
+        );
         let _ = std::fs::remove_dir_all(&tmp);
     }
 
     #[test]
     fn py_path_str_drops_dot_root_and_uses_platform_separator() {
-        assert_eq!(py_path_str(Path::new("."), "a/b.md"), if cfg!(windows) { "a\\b.md" } else { "a/b.md" });
+        assert_eq!(
+            py_path_str(Path::new("."), "a/b.md"),
+            if cfg!(windows) { "a\\b.md" } else { "a/b.md" }
+        );
         let got = py_path_str(Path::new("C:/x/y/"), "a/b.md");
-        assert!(got.ends_with(if cfg!(windows) { "y\\a\\b.md" } else { "y/a/b.md" }), "got: {}", got);
+        assert!(
+            got.ends_with(if cfg!(windows) {
+                "y\\a\\b.md"
+            } else {
+                "y/a/b.md"
+            }),
+            "got: {}",
+            got
+        );
     }
 }

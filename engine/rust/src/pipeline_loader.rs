@@ -23,9 +23,7 @@ use std::path::Path;
 /// 真源 `YAML_FENCE_RE`（`re.S`）。
 fn yaml_fence_re() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| {
-        regex::Regex::new(r"(?s)```ya?ml\s*\n(.*?)\n```").expect("围栏正则固定合法")
-    })
+    RE.get_or_init(|| regex::Regex::new(r"(?s)```ya?ml\s*\n(.*?)\n```").expect("围栏正则固定合法"))
 }
 
 /// 真源 `PipelineLayer` 里**本链真正读到**的字段。
@@ -76,7 +74,11 @@ pub fn parse_pipeline_md(text: &str) -> Option<Pipeline> {
     };
     let pid = {
         let s = raw_id.trim().to_string();
-        if s.is_empty() { "P00".to_string() } else { s }
+        if s.is_empty() {
+            "P00".to_string()
+        } else {
+            s
+        }
     };
     let mut layers: Vec<PipelineLayer> = Vec::new();
     if let Some(Json::Array(lys)) = get(&pnode, "layers") {
@@ -90,7 +92,9 @@ pub fn parse_pipeline_md(text: &str) -> Option<Pipeline> {
             };
             let mods = |k: &str| -> Vec<String> {
                 match get(ly, k) {
-                    Some(Json::Array(a)) if !a.is_empty() => a.iter().map(norm_module_ref).collect(),
+                    Some(Json::Array(a)) if !a.is_empty() => {
+                        a.iter().map(norm_module_ref).collect()
+                    }
                     _ => Vec::new(),
                 }
             };

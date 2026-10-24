@@ -68,7 +68,11 @@ impl P<'_> {
     fn value(&mut self) -> Result<Json, String> {
         self.ws();
         match self.peek() {
-            None => Err(format!("Expecting value: line {} column {}", self.line(), self.col())),
+            None => Err(format!(
+                "Expecting value: line {} column {}",
+                self.line(),
+                self.col()
+            )),
             Some('{') => self.object(),
             Some('[') => self.array(),
             Some('"') => Ok(Json::Str(self.string()?)),
@@ -228,8 +232,11 @@ impl P<'_> {
                         'r' => s.push('\r'),
                         't' => s.push('\t'),
                         'u' => {
-                            let hex: String =
-                                self.c.get(self.i..self.i + 4).map(|v| v.iter().collect()).unwrap_or_default();
+                            let hex: String = self
+                                .c
+                                .get(self.i..self.i + 4)
+                                .map(|v| v.iter().collect())
+                                .unwrap_or_default();
                             if hex.len() != 4 {
                                 return Err("Invalid \\uXXXX escape".to_string());
                             }
@@ -307,7 +314,11 @@ impl P<'_> {
         }
         match text.parse::<f64>() {
             Ok(f) => Ok(Json::Float(f)),
-            Err(_) => Err(format!("Expecting value: line {} column {}", self.line(), self.col())),
+            Err(_) => Err(format!(
+                "Expecting value: line {} column {}",
+                self.line(),
+                self.col()
+            )),
         }
     }
 }
@@ -330,5 +341,8 @@ pub fn parse(text: &str) -> Result<Parsed, String> {
             p.i
         ));
     }
-    Ok(Parsed { value: v, dups: p.dups })
+    Ok(Parsed {
+        value: v,
+        dups: p.dups,
+    })
 }

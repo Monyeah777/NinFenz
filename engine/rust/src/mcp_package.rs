@@ -14,8 +14,11 @@ use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/mcp_package.json";
 pub const SCHEMA: &str = "nf-mcp-package/1";
-pub const CATEGORIES: [&str; 3] =
-    ["content-creation", "developer-tools", "knowledge-management"];
+pub const CATEGORIES: [&str; 3] = [
+    "content-creation",
+    "developer-tools",
+    "knowledge-management",
+];
 
 pub struct McpScan {
     pub issues: Vec<String>,
@@ -35,7 +38,10 @@ pub fn scan(root: &Path) -> McpScan {
         issues.push(format!("包装声明 schema 不匹配（期望 {}）", SCHEMA));
     }
     if str_list(get(&d, "category_vocabulary")) != CATEGORIES.to_vec() {
-        issues.push(format!("类目词表与判据不一致（期望 {}）", CATEGORIES.join("/")));
+        issues.push(format!(
+            "类目词表与判据不一致（期望 {}）",
+            CATEGORIES.join("/")
+        ));
     }
     if crate::pyval::arr_is_empty(get(&d, "red_lines")) {
         issues.push("红线不得为空（上架包的纪律必须成文）".to_string());
@@ -58,10 +64,14 @@ pub fn scan(root: &Path) -> McpScan {
     }
 
     // 红线「只读面不变」：与运行时逐名一致（名字表见 `mcp_tables`）
-    let live_tools: Vec<String> =
-        crate::mcp_tables::TOOL_NAMES.iter().map(|s| (*s).to_string()).collect();
-    let live_prompts: Vec<String> =
-        crate::mcp_tables::PROMPT_NAMES.iter().map(|s| (*s).to_string()).collect();
+    let live_tools: Vec<String> = crate::mcp_tables::TOOL_NAMES
+        .iter()
+        .map(|s| (*s).to_string())
+        .collect();
+    let live_prompts: Vec<String> = crate::mcp_tables::PROMPT_NAMES
+        .iter()
+        .map(|s| (*s).to_string())
+        .collect();
     let got_tools: Vec<String> = str_list(get(&pkg, "tools"));
     let got_prompts: Vec<String> = str_list(get(&pkg, "prompts"));
 
@@ -76,8 +86,16 @@ pub fn scan(root: &Path) -> McpScan {
             "工具面与运行时不一致（上架材料会漂移）：声明 {} 个 / 运行时 {} 个（多：{}；少：{}）",
             got_tools.len(),
             live_tools.len(),
-            if extra.is_empty() { "无".to_string() } else { py_repr_list(&extra) },
-            if missing.is_empty() { "无".to_string() } else { py_repr_list(&missing) }
+            if extra.is_empty() {
+                "无".to_string()
+            } else {
+                py_repr_list(&extra)
+            },
+            if missing.is_empty() {
+                "无".to_string()
+            } else {
+                py_repr_list(&missing)
+            }
         ));
     }
     let mut c = got_prompts.clone();
@@ -97,11 +115,12 @@ pub fn scan(root: &Path) -> McpScan {
         ("prompts".to_string(), Json::Int(got_prompts.len() as i64)),
         (
             "targets".to_string(),
-            Json::Int(
-                crate::pyval::arr_items(get(&pkg, "targets")).len() as i64,
-            ),
+            Json::Int(crate::pyval::arr_items(get(&pkg, "targets")).len() as i64),
         ),
-        ("category".to_string(), Json::Str(py_str(get(&pkg, "category")))),
+        (
+            "category".to_string(),
+            Json::Str(py_str(get(&pkg, "category"))),
+        ),
     ]);
     McpScan { issues, stats }
 }
@@ -117,7 +136,10 @@ fn py_repr_list(v: &[String]) -> String {
     s.dedup();
     format!(
         "[{}]",
-        s.iter().map(|x| format!("'{}'", x)).collect::<Vec<_>>().join(", ")
+        s.iter()
+            .map(|x| format!("'{}'", x))
+            .collect::<Vec<_>>()
+            .join(", ")
     )
 }
 

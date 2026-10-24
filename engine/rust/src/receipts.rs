@@ -137,7 +137,11 @@ pub fn build_scope_for(root: &Path, rels: &[String], scope: &str) -> Json {
         let digest = merkle::hex(&merkle::sha256(&bytes));
         let payload = payload_bytes(rel.as_str(), &digest);
         leaves.push(merkle::leaf_hash(&payload));
-        rows.push(Row { rel: rel.clone(), digest, payload });
+        rows.push(Row {
+            rel: rel.clone(),
+            digest,
+            payload,
+        });
     }
 
     let root_hash = merkle::merkle_root(&leaves);
@@ -154,7 +158,12 @@ pub fn build_scope_for(root: &Path, rels: &[String], scope: &str) -> Json {
                         (
                             "side".to_string(),
                             Json::Str(
-                                if step.sibling_is_left { "left" } else { "right" }.to_string(),
+                                if step.sibling_is_left {
+                                    "left"
+                                } else {
+                                    "right"
+                                }
+                                .to_string(),
                             ),
                         ),
                     ])
@@ -225,7 +234,10 @@ pub fn self_check(root: &Path, scope: &str) -> Vec<String> {
                 if !unhex_into(h, &mut hb) {
                     continue;
                 }
-                steps.push(merkle::ProofStep { sibling_is_left: side == "left", hash: hb });
+                steps.push(merkle::ProofStep {
+                    sibling_is_left: side == "left",
+                    hash: hb,
+                });
             }
             if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != root_hex {
                 issues.push(format!("包含证明不折叠到根：{}", id));
@@ -241,11 +253,17 @@ pub fn self_check(root: &Path, scope: &str) -> Vec<String> {
 /// 本函数核对**在盘文档**（entries 顺序即 live 重建顺序）与实时重算是否一致。
 pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
     let Json::Object(pairs) = doc else {
-        return (vec!["协议回执 schema 不匹配".to_string()], Json::Object(vec![]));
+        return (
+            vec!["协议回执 schema 不匹配".to_string()],
+            Json::Object(vec![]),
+        );
     };
     let g = |k: &str| pairs.iter().find(|(n, _)| n == k).map(|(_, v)| v);
     if !matches!(g("schema"), Some(Json::Str(s)) if s == SCHEMA) {
-        return (vec!["协议回执 schema 不匹配".to_string()], Json::Object(vec![]));
+        return (
+            vec!["协议回执 schema 不匹配".to_string()],
+            Json::Object(vec![]),
+        );
     }
     let committed_root = match g("root") {
         Some(Json::Str(s)) => s.clone(),
@@ -268,7 +286,10 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
     }
     let live = build_scope_for(root, &ids, "protocol");
     let Json::Object(lp) = &live else {
-        return (vec!["内部错误：回执非对象".to_string()], Json::Object(vec![]));
+        return (
+            vec!["内部错误：回执非对象".to_string()],
+            Json::Object(vec![]),
+        );
     };
     let lg = |k: &str| lp.iter().find(|(n, _)| n == k).map(|(_, v)| v);
     let live_root = match lg("root") {
@@ -287,14 +308,20 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
     if let Some(Json::Array(le)) = lg("entries") {
         for e in le {
             let Json::Object(ep) = e else { continue };
-            let id = ep.iter().find(|(n, _)| n == "id").and_then(|(_, v)| match v {
-                Json::Str(s) => Some(s.as_str()),
-                _ => None,
-            });
-            let dg = ep.iter().find(|(n, _)| n == "digest").and_then(|(_, v)| match v {
-                Json::Str(s) => Some(s.as_str()),
-                _ => None,
-            });
+            let id = ep
+                .iter()
+                .find(|(n, _)| n == "id")
+                .and_then(|(_, v)| match v {
+                    Json::Str(s) => Some(s.as_str()),
+                    _ => None,
+                });
+            let dg = ep
+                .iter()
+                .find(|(n, _)| n == "digest")
+                .and_then(|(_, v)| match v {
+                    Json::Str(s) => Some(s.as_str()),
+                    _ => None,
+                });
             if let (Some(i), Some(d)) = (id, dg) {
                 live_by.push((i, d));
             }
@@ -343,7 +370,10 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
             if !unhex_into(h, &mut hb) {
                 continue;
             }
-            steps.push(merkle::ProofStep { sibling_is_left: side == "left", hash: hb });
+            steps.push(merkle::ProofStep {
+                sibling_is_left: side == "left",
+                hash: hb,
+            });
         }
         if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != committed_root {
             issues.push(format!("包含证明不折叠到根：{}", id));

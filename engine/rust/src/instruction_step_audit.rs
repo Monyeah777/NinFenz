@@ -50,13 +50,14 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
     let subs_re = SUBS.get_or_init(|| {
         regex::Regex::new(r#"add_parser\(\s*"([^"]+)""#).expect("子命令正则固定合法")
     });
-    let nf_subs: std::collections::BTreeSet<String> =
-        subs_re.captures_iter(&nf_text).map(|c| c[1].to_string()).collect();
+    let nf_subs: std::collections::BTreeSet<String> = subs_re
+        .captures_iter(&nf_text)
+        .map(|c| c[1].to_string())
+        .collect();
 
     static CMD: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let cmd_re = CMD.get_or_init(|| {
-        regex::Regex::new(r"`([^`\n]{1,160})`").expect("内联命令正则固定合法")
-    });
+    let cmd_re =
+        CMD.get_or_init(|| regex::Regex::new(r"`([^`\n]{1,160})`").expect("内联命令正则固定合法"));
     static REPO_PATH: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
     let repo_re = REPO_PATH.get_or_init(|| {
         regex::Regex::new(r"(?:community|docs|protocol|03_管线库)/").expect("仓库路径正则固定合法")
@@ -80,7 +81,11 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
                 }
             } else if let Some(rest) = code.strip_prefix("python scripts/") {
                 steps += 1;
-                let fname = rest.split_whitespace().next().unwrap_or("").trim_start_matches("./");
+                let fname = rest
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("")
+                    .trim_start_matches("./");
                 if !root.join(fname).exists() {
                     issues.push(format!("{}: 引用脚本不存在 {}", rel, fname));
                 }
@@ -96,6 +101,9 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<StepStats>) {
     }
     (
         issues,
-        Some(StepStats { docs: AUDIT_DOCS.len(), steps }),
+        Some(StepStats {
+            docs: AUDIT_DOCS.len(),
+            steps,
+        }),
     )
 }
