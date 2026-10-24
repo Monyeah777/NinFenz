@@ -136,10 +136,10 @@ def _portable(value: Any, root: str) -> Any:
     }
     variants = tuple(v for item in variants for v in (item, item.replace("\\", "/"),
                                                        item.replace("/", "\\")) if v)
+    variants = tuple(sorted(variants, key=len, reverse=True))
     if isinstance(value, str):
         for token in variants:
-            if token:
-                value = value.replace(token, "<root>")
+            value = value.replace(token, "<root>")
         # Volatile canonicalized temp roots are diagnostics, never stable evidence.
         value = re.sub(r"(?<![A-Za-z0-9])(?:/(?:private/)?tmp/|"
                        r"/(?:private/)?var/folders/[^/]+/[^/]+/T/)[^/]+", "<root>", value)
