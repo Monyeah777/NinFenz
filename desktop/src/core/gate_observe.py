@@ -101,15 +101,15 @@ def faces_path() -> Path:
 
 def normalize_reads(root: str, paths, workdir: str | None = None) -> list:
     """路径 → 仓库相对 posix；仓外、私有面、字节码一律丢弃（去重排序）。"""
-    base = os.path.abspath(workdir or root)
-    rp = os.path.normcase(os.path.abspath(root))
+    base = os.path.realpath(workdir or root)
+    rp = os.path.normcase(os.path.realpath(root))
     out = set()
     for p in paths:
         raw = str(p)
         if os.name != "nt" and _WIN_ABS.match(raw):
             continue                      # 盘符/UNC：任何 POSIX 根外，直接丢
         cand = raw if os.path.isabs(raw) else os.path.join(base, raw)
-        n = os.path.normcase(os.path.abspath(cand))
+        n = os.path.normcase(os.path.realpath(cand))
         if not (n == rp or n.startswith(rp + os.sep)):
             continue
         rel = n[len(rp):].lstrip("\\/").replace("\\", "/")

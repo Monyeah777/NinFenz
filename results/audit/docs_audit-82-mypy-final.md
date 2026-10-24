@@ -27,11 +27,13 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
-  - desktop/src/core/daemon.py:ac1a4f680b9b763ff121af3b5c459eb9c32608b0f144f77fd5aec9e69d3057a3
+  - desktop/src/core/daemon.py:2218319ec0e8578eebbec5097af4b68771562513458c15a5b898065429cd7cff
   - desktop/src/core/decision_layer.py:f230aa31538f795d3a75a9cef9a109d323374cd8edbfc79c577df3e6378c31b7
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
   - protocol/code_metrics_baseline.json:afa8dcb93110119adba72b050e0fb826093a06176afdeeb804d35b266b74f9a8
 ---
+> 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
+
 > 重审（2026-10-24）：修正跨平台临时路径归一化正则的分组闭合，保持 macOS/Unix 临时根稳定清洗
 
 > 重审（2026-10-24）：修复可选 YAML 负缓存污染、macOS 临时根归一化与守护状态并发写串行化；补跨平台隐藏诊断日志上传

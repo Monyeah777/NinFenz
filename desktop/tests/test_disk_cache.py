@@ -235,7 +235,8 @@ class CacheRootC1Test(unittest.TestCase):
         err = StringIO()
         with contextlib.redirect_stderr(err):
             root = dc.root_dir()
-        self.assertEqual(root, repo / ".nf-cache", "用户级不可写 → 回退仓内并 WARN")
+        self.assertEqual(root, repo.resolve() / ".nf-cache",
+                         "用户级不可写 → 回退仓内并 WARN")
         self.assertTrue((root / dc.MARKER).is_file(), "回退目录必须打所有权标记")
         self.assertIn("WARN", err.getvalue())
 

@@ -107,9 +107,11 @@ def state_path() -> Path:
 
 def read_state() -> Optional[Dict[str, Any]]:
     """读守护状态；文件缺失/不可解析/版本不符 → None（一律按「没有守护」处理）。"""
+    from core import atomic_write
     try:
-        doc = json.loads(state_path().read_text(encoding="utf-8"))
-    except (OSError, ValueError):  # 无状态文件/坏件 ⇒ None（等价于「守护未运行」，调用方回退直跑）
+        with _STATE_WRITE_LOCK, atomic_write.lock_file(state_path(), what="守护状态读取"):
+            doc = json.loads(atomic_write.read_text(state_path(), encoding="utf-8"))
+    except (OSError, ValueError):  # 无状态文件/坏件 ⇒ None（调用方回退直跑）
         return None
     if not isinstance(doc, dict) or doc.get("proto") != PROTO:
         return None
@@ -126,10 +128,8 @@ def write_state(doc: Dict[str, Any]) -> None:
     否则在多用户主机上，同机另一个用户读到令牌即可连回环口、以属主身份执行命令。
     Windows 上 ACL 随用户目录继承（`chmod` 无对应语义），故只在 posix 分支收紧。
 
-    **并发安全**（2026-10-10 审计 N1，P1）：此前用**固定名** `daemon.json.tmp` 手工两段写，
-    无锁无重试——4 进程 × 300 次实测：成功 326/1200、PermissionError 868、读者 270/2088
-    （12.9%）解析失败（同载荷走 `atomic_write.write_text` 则 1200/1200、0 撕裂）。现统一走
-    `write_text`：唯一临时名 + fsync + `replace` + 短重试；POSIX `mkstemp` 即 0600，replace 后保持。
+    **并发安全**（2026-10-10 审计 N1，P1）：固定名两段写在 1200 次并发实测中失败 868 次、
+    读者 12.9% 撕裂；现统一原子写（唯一临时名 + fsync + `replace` + 短重试）。
     下面再显式收紧一次兜底。
     """
     p = state_path()
@@ -679,7 +679,7 @@ def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
 
 
 def start(root: Path, idle_timeout: float = float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
-          wait: float = 15.0,
+          wait: float = 30.0,
           watch: bool = False) -> Tuple[bool, str]:
     """拉起守护（后台子进程）→ (是否成功, 说明)。已在跑则直接返回 True。"""
     if ping():

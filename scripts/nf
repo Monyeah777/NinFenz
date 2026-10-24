@@ -192,8 +192,10 @@ if [ -n "${BASH_VERSION:-}" ]; then
             nf_pick_py
             _dm_dir=${_dm_marker%/*}
             [ "$_dm_dir" = "$_dm_marker" ] || mkdir -p "$_dm_dir" 2>/dev/null || true
-            printf '%s\n' "$_dm_now" > "$_dm_marker" 2>/dev/null || true
-            { "$NF_PY" $(nf_diet_flag) "$NF_ROOT/nf.py" daemon start --watch >/dev/null 2>&1 & } || true
+            if [ "$_dm_prev" -gt 0 ]; then rm -f -- "$_dm_marker" 2>/dev/null || true; fi
+            if (set -C; printf '%s\n' "$_dm_now" > "$_dm_marker") 2>/dev/null; then
+              { "$NF_PY" $(nf_diet_flag) "$NF_ROOT/nf.py" daemon start --watch >/dev/null 2>&1 & } || true
+            fi
           fi
           ;;
       esac

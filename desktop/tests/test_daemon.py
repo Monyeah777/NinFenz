@@ -719,6 +719,7 @@ class DaemonStateWriteRaceTest(unittest.TestCase):
     def test_concurrent_writes_never_tear(self):
         import threading
         stop = threading.Event()
+        started = threading.Event()
         tears, errors = [], []
 
         def writer(i):
@@ -726,23 +727,17 @@ class DaemonStateWriteRaceTest(unittest.TestCase):
                 try:
                     dm.write_state({"proto": dm.PROTO, "pid": i, "port": 2000 + i,
                                     "token": "t" * 8, "root": ".", "started": n})
+                    started.set()
                 except Exception as exc:                     # noqa: BLE001
                     errors.append(exc)
 
         def reader():
             while not stop.is_set():
-                try:
-                    raw = dm.state_path().read_text(encoding="utf-8")
-                except (FileNotFoundError, PermissionError):
-                    continue                                  # 瞬时占用/未落盘：不是撕裂
-                except OSError:
+                if not started.is_set():
                     continue
-                if not raw.strip():
-                    continue
-                try:
-                    json.loads(raw)
-                except ValueError as exc:
-                    tears.append(str(exc))
+                doc = dm.read_state()
+                if doc is None:
+                    tears.append("状态不可读")
 
         writers = [threading.Thread(target=writer, args=(i,), daemon=True) for i in range(4)]
         readers = [threading.Thread(target=reader, daemon=True) for _ in range(3)]
