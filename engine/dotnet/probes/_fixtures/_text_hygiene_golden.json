@@ -2,16 +2,16 @@
  "schema": "nf-text-hygiene-golden/1",
  "generated": "2026-09-27",
  "source": "desktop/src/core/text_hygiene.py 原文复制后按脚本执行（真源 __main__ 同一段代码，逐字节 stdout）",
- "snapshot": "nf-snap-h16",
+ "snapshot": "NinFenz",
  "digest_rule": "sha256(\"\\n\".join(stdout.splitlines()))[:32]  ← 与引擎 Result.LogDigest 同式",
  "cases": {
   "real": {
    "python_exit": 0,
-   "digest32": "a49d33b5f3f8819840d0da3f564578de",
+   "digest32": "c3ab20bb64f41353fc321e58afeb8414",
    "fails": 0,
-   "summary": "文本 2773 件 / JSON 1033 件 / 键 168425 个 / 版本 111 个 / BOM 0 / CRLF 0",
+   "summary": "文本 3858 件 / JSON 1146 件 / 键 251701 个 / 版本 111 个 / BOM 0 / CRLF 0",
    "log": [
-    "文本 2773 件 / JSON 1033 件 / 键 168425 个 / 版本 111 个 / BOM 0 / CRLF 0"
+    "文本 3858 件 / JSON 1146 件 / 键 251701 个 / 版本 111 个 / BOM 0 / CRLF 0"
    ]
   },
   "synthetic_mixed": {

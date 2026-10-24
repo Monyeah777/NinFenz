@@ -84,6 +84,11 @@ def run_source(snap: Path, tree: Path) -> tuple[int, str, str]:
         copy = Path(srcdir) / "text_hygiene.py"
         shutil.copyfile(snap / SOURCE_REL, copy)
         env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+        # text_hygiene 当前通过 core.repo_face/json_doc 复用仓库读面；
+        # 复制成临时脚本后仍需把快照的 desktop/src 放进导入路径，才是真源同一执行环境。
+        env["PYTHONPATH"] = os.pathsep.join(
+            [str(snap / "desktop" / "src"), env.get("PYTHONPATH", "")]
+        ).rstrip(os.pathsep)
         proc = subprocess.run([sys.executable, str(copy), str(tree)], cwd=str(tree), env=env,
                               capture_output=True, text=True, encoding="utf-8", timeout=900)
     return proc.returncode, proc.stdout, proc.stderr
