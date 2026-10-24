@@ -18,6 +18,8 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -127,12 +129,24 @@ def _declared(root: str) -> Dict[str, Any]:
 def _portable(value: Any, root: str) -> Any:
     """Remove checkout-specific absolute roots from report values before sealing."""
     absolute = str(Path(root).resolve())
-    variants = (absolute, absolute.replace("\\", "/"), absolute.replace("/", "\\"))
+    variants = {
+        absolute,
+        os.path.abspath(root),
+        os.path.realpath(root),
+    }
+    variants = tuple(v for item in variants for v in (item, item.replace("\\", "/"),
+                                                       item.replace("/", "\\")) if v)
     if isinstance(value, str):
         for token in variants:
             if token:
                 value = value.replace(token, "<root>")
-        return value
+        # `TemporaryDirectory` may surface through a canonicalized/sandboxed spelling
+        # different from `root`; absolute temp roots are diagnostics, never stable evidence.
+        value = re.sub(r"(?<![A-Za-z0-9])/(?:private/)?tmp/[^/\\\s\"']+", "<root>", value)
+        return re.sub(
+            r"(?i)(?<![A-Za-z0-9])[A-Z]:[\\/](?:[^\\/\s\"']+[\\/])*Temp[\\/][^\\/\s\"']+",
+            "<root>", value,
+        )
     if isinstance(value, list):
         return [_portable(v, root) for v in value]
     if isinstance(value, dict):

@@ -1001,7 +1001,7 @@
       "max_fn_lines": 78
     },
     "desktop/src/core/repo_face.py": {
-      "lines": 130,
+      "lines": 124,
       "max_fn_cc": 11,
       "max_fn_lines": 29
     },
@@ -1251,7 +1251,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 223,
+      "lines": 237,
       "max_fn_cc": 10,
       "max_fn_lines": 27
     },
