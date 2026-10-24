@@ -23,14 +23,14 @@ namespace Nf.Engine;
 public static class CorpusStamp
 {
     /// <summary>
-    /// 金标语料（**`nf-snap-h16` · HEAD `aa259d7` 导出快照**）的指纹。
-    /// **第一百二十二片复基线**：真源前移（348577d → b1f9a28）后语料指纹由 `b1bb5b3bae754750`
-    /// 变为 `17fb5a632888dd75`，文档命令面计数随之移到 302 处；`nf-snap-h5` / `nf-snap-h7`
+    /// 金标语料（**`nf-snap-h18` · HEAD `b3bb3cd5528a0c43ffe94a472b4eb3d1e0eb193b` 导出快照**）的指纹。
+    /// **第一百二十三片复基线**：parity 修复叠加后语料指纹由 `47d8382924efca36`
+    /// 变为 `452710d7a37807e8`；`nf-snap-h5` / `nf-snap-h7`
     /// 降为对照快照，仅用于漂移归因。
     /// **勿手改本段**：它由 `run-rebaseline.ps1 -SnapName <s> -Head <sha>` 断言式重写；
     /// 手改会与 `_paths.py` 的默认快照名脱节（出处守卫会判红）。
     /// </summary>
-    public const string Baseline = "fe8e8f3eb215a57d";
+    public const string Baseline = "452710d7a37807e8";
 
     public sealed record Result(string Fingerprint, string Baseline, bool Matches, bool IsSnapshot);
 

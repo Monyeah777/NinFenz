@@ -20,7 +20,8 @@ public static class IoTypes
 
     private static readonly Regex IoLine = new(@"^(\s*)io_types:\s*$");
     private static readonly Regex SubLine = new(@"^(\s*)(outputs|inputs):\s*(\{\})?\s*$");
-    private static readonly Regex PairLine = new(@"^(\s*)([^:\s]+):\s*(\S+)\s*$");
+    // 键允许冒号（跨包依赖键如 `AI保险:M01`）——与 Python 的 `(\S+?)` 同口径。
+    private static readonly Regex PairLine = new(@"^(\s*)(\S+?):\s*(\S+)\s*$");
     private static readonly System.Text.UTF8Encoding StrictUtf8 = new(false, throwOnInvalidBytes: true);
 
     /// <summary>从正文读 io_types 行块（无 <c>io_types:</c> 行 → null）。</summary>
@@ -60,7 +61,7 @@ public static class IoTypes
             }
             var pair = PairLine.Match(line);
             if (pair.Success && section is not null && result.ContainsKey(section))
-                result[section][pair.Groups[2].Value] = pair.Groups[3].Value;
+                result[section][pair.Groups[2].Value.Trim('\'', '"')] = pair.Groups[3].Value;
         }
         return result;
     }
@@ -117,6 +118,13 @@ public static class IoTypes
             {
                 warns.Add($"{id} io_types.outputs 与 outputs 键集不一致（缺 {PyList(declared.Except(marked))} / " +
                           $"多 {PyList(marked.Except(declared))}）");
+            }
+            var declaredIn = Strings(contract, "inputs").ToHashSet(StringComparer.Ordinal);
+            var markedIn = io["inputs"].Keys.ToHashSet(StringComparer.Ordinal);
+            if (!declaredIn.SetEquals(markedIn))
+            {
+                warns.Add($"{id} io_types.inputs 与 inputs 键集不一致（缺 {PyList(declaredIn.Except(markedIn))} / " +
+                          $"多 {PyList(markedIn.Except(declaredIn))}）");
             }
             provided[id] = io["outputs"];
         }

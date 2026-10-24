@@ -2476,7 +2476,7 @@ public static class SelfTest
         // ① 真材料：真仓生成物 == 实时重算（**这一条绿就等价于两个生成物逐字节一致**）+ 统计数
         var (realIssues, realStats) = ProtocolGolden.VerifyGolden(repoRoot);
         checks.Add(new Check("协议生成物 golden·真仓（check31：生成物 == 实时重算 · 摘要 %s 字节 / schema %s 份）",
-            realIssues.Count == 0 && Convert.ToInt64(realStats["schema_ids"]) == 5
+            realIssues.Count == 0 && Convert.ToInt64(realStats["schema_ids"]) == 9
             && Convert.ToInt64(realStats["report_bytes"]) > 50000,
             $"问题 {realIssues.Count} · report {realStats["report_bytes"]} 字节 · schema {realStats["schema_ids"]} 份"));
 
@@ -2648,10 +2648,10 @@ public static class SelfTest
     private static void RegressionCases(List<Check> checks, string work, string repoRoot)
     {
         const string CscReal = "9519e11e210362720ff3ef9523ac39ec";
-        const string CscNegative = "f5f0809f803efdf76e4a3280df867f96";
+        const string CscNegative = "1ac028549cd02b6764acc75a3eadf7ac";
         const string DepthReal = "6258b79e9313ea3fac4cceb8f6eccfb6";
         const string MarkersReal = "405738e515e30e94ce29d5ccf59b01e2";
-        const string MarkersNegative = "3c10e35d1319e23adfebd296ed4054e4";
+        const string MarkersNegative = "c699a73cf3863d9e3c1809dce4860bbb";
         const string ScoreReal = "9ffe6f5ce4088211a35880403abeea8e";
         const string CompareGolden = "e27d94b51aa676d41137b0657afd011d";
 
@@ -2669,10 +2669,11 @@ public static class SelfTest
         var cscNegative = ConformanceScan.Scan(cscNegativeRoot);
         var cscText = string.Join(" | ", cscNegative.Issues);
         checks.Add(new Check("回归面·conformance·合成虚标（L3>L1 虚标 · L0 非法 · 包不在册 · 导出面缺证据/门禁 · mc.id 重复）",
-            cscNegative.Issues.Count == 7 && cscNegative.LogDigest() == CscNegative
+            cscNegative.Issues.Count == 8 && cscNegative.LogDigest() == CscNegative
             && cscText.Contains("conformance 虚标 L3 > 可证 L1（'M99' 不在装配在册证据）")
             && cscText.Contains("conformance 虚标 L2 > 可证 L1（包不在 registry protocols[]）")
-            && cscText.Contains("证据文件缺失 missing.txt") && cscText.Contains("证据门禁 check99 不在 verify.sh")
+            && cscText.Contains("证据文件缺失 missing.txt")
+            && cscText.Contains("证据门禁 check99 在 verify.sh 无 check 定义")
             && cscText.Contains("导出面 y: conformance 应为 L3（导出门禁锁定面）")
             && cscText.Contains("模块 id 与"),   // 真源 348577d 新增的重复 id 判据（D3）在这份合成语料上必须命中
             $"FAIL {cscNegative.Issues.Count} · 摘要 {cscNegative.LogDigest()}（真源金标 {CscNegative}）"));
@@ -2738,15 +2739,15 @@ public static class SelfTest
     /// </summary>
     private static void WorkloopCases(List<Check> checks, string work, string repoRoot)
     {
-        const string Real = "fb09f03eaf08d2aaad0e54098a6b79f4";
+        const string Real = "d579529100e3474ea5b131fc1d204d80";
         const string Syn = "440b2a6a5f4c1b597dd5c9e54755c028";
         const string Empty = "acfeff33bd0f55d5315fecf706575719";
 
         var real = Workloop.Scan(repoRoot);
-        checks.Add(new Check("构建回路·真仓（待办 1229 项 · 适配器 3 · stub 工单确定 · 与真源原文逐字节同摘要）",
+        checks.Add(new Check("构建回路·真仓（待办 1244 项 · 适配器 3 · stub 工单确定 · 与真源原文逐字节同摘要）",
             real.Ok && real.LogDigest == Real
-            && Convert.ToInt64(real.Stats["items"]) == 1229
-            && Convert.ToInt64(real.Stats["untyped"]) == 86
+            && Convert.ToInt64(real.Stats["items"]) == 1244
+            && Convert.ToInt64(real.Stats["untyped"]) == 101
             && Convert.ToInt64(real.Stats["advisories"]) == 1142
             && Convert.ToInt64(real.Stats["adapters"]) == 3
             && PyScalar.PyRepr(real.Stats["pulled_candidates"]) == "['laya-multilingual']",
@@ -2979,7 +2980,7 @@ public static class SelfTest
         var real = Receipts.VerifyLibraryReceipts(repoRoot);
         checks.Add(new Check("馆藏回执·真仓（3 条 · 逐条折叠到根 + 根与实时重算一致 · 与真源原文逐字节同摘要）",
             real.Ok && Receipts.LibraryLogDigest(real) == Real && real.Count == 3
-            && real.Root.StartsWith("be9562d619c4", StringComparison.Ordinal),
+            && real.Root.StartsWith("42e1522438c6", StringComparison.Ordinal),
             $"FAIL {real.Issues.Count} · 摘要 {Receipts.LibraryLogDigest(real)}（真源金标 {Real}）"));
 
         var tampered = Case("lib-entry-tampered", LibEntryTamperedFiles);
@@ -3309,9 +3310,9 @@ public static class SelfTest
     /// </summary>
     private static void AnchorChecksCases(List<Check> checks, string work, string repoRoot)
     {
-        const string RealGoldenDigest = "e91bb18ae9b38ca79fa8c067d57a78b2";
-        const string EmptyGoldenDigest = "34e35b85054e2dd7319bd04e1699d1ca";
-        const string MismatchGoldenDigest = "f6a08900f5d2515ec8071a665a27572b";
+        const string RealGoldenDigest = "33652f7e44841384691bcecd0e3f7047";
+        const string EmptyGoldenDigest = "a8642a50a6a8635d295e340897b2ac32";
+        const string MismatchGoldenDigest = "7b15a0ea239cb5da4e264fc7129c8dad";
 
         var real = AnchorChecks.Run(repoRoot);
         checks.Add(new Check("锚点面·真仓（check2/3/4/5/6/9/10/11 八条 · 与真源 shell 逐字节同摘要）",
@@ -3321,8 +3322,8 @@ public static class SelfTest
         var emptyRoot = Path.Combine(work, "anchor-empty");
         Fresh(emptyRoot);
         var empty = AnchorChecks.Run(emptyRoot);
-        checks.Add(new Check("锚点面·空树（八条逐项报缺 75 条 + 1 WARN · 含 awk 缺件空位与「脚本不在场仍报对账全清」两处照抄）",
-            empty.Fail == 75 && empty.Pass == 1 && empty.Warn == 1 && empty.LogDigest == EmptyGoldenDigest
+        checks.Add(new Check("锚点面·空树（八条逐项报缺 72 条 + 1 WARN · 含 awk 缺件空位与「脚本不在场仍报对账全清」两处照抄）",
+            empty.Fail == 72 && empty.Pass == 1 && empty.Warn == 1 && empty.LogDigest == EmptyGoldenDigest
             && empty.Log.Any(l => l.Contains("01 §5 缺不变式: 三正交分离"))
             && empty.Log.Any(l => l.Contains("02_联动注册表.md 含  处未类别限定的 M10/M22 引用"))
             && empty.Log.Any(l => l.Contains("导航目标缺失: 03_管线库 目录")),
@@ -3332,8 +3333,8 @@ public static class SelfTest
         Fresh(mismatchRoot);
         foreach (var (rel, b64) in StructureGateSyntheticFiles) WriteBase64(mismatchRoot, rel, b64);
         var mismatch = AnchorChecks.Run(mismatchRoot);
-        checks.Add(new Check("锚点面·跨源不一致（同一棵合成树上八条断言 72 条判出 + 1 WARN · 与真源 shell 逐字节同摘要）",
-            mismatch.Fail == 72 && mismatch.Pass == 1 && mismatch.Warn == 1 && mismatch.LogDigest == MismatchGoldenDigest,
+        checks.Add(new Check("锚点面·跨源不一致（同一棵合成树上八条断言 69 条判出 + 1 WARN · 与真源 shell 逐字节同摘要）",
+            mismatch.Fail == 69 && mismatch.Pass == 1 && mismatch.Warn == 1 && mismatch.LogDigest == MismatchGoldenDigest,
             $"PASS {mismatch.Pass} · FAIL {mismatch.Fail} · 摘要 {mismatch.LogDigest}"
             + $"（真源 shell 金标 {MismatchGoldenDigest}）"));
     }
@@ -3347,8 +3348,8 @@ public static class SelfTest
     private static void StructureGateCases(List<Check> checks, string work, string repoRoot)
     {
         const string RealGoldenDigest = "18fe2537249ee3be05eafcf7b09f2b05";
-        const string EmptyGoldenDigest = "08f7cdb2594f9e67398c311d963a736e";
-        const string MismatchGoldenDigest = "2f82352292fd37d8be2467cf4c657a0d";
+        const string EmptyGoldenDigest = "8cb8349d89842fb7a35f3d0b2ed74826";
+        const string MismatchGoldenDigest = "e1db73b8b1f4e4d916711f7790245e76";
 
         var real = StructureGate.Run(repoRoot);
         checks.Add(new Check("结构面·真仓（check1 官方目录结构 + check7 社区两包 T6 在册数一致 · 与真源 shell 逐字节同摘要）",
@@ -3686,19 +3687,19 @@ public static class SelfTest
     /// </summary>
     private static void ProseLintCases(List<Check> checks, string work, string repoRoot)
     {
-        const string RealGoldenDigest = "fd1f1ccacc0e980f84d87dc99e74fd2d";
-        const string SyntheticFaceGoldenDigest = "70929b995db28c674b3b2f79dd40d5eb";
+        const string RealGoldenDigest = "84c6dcebe29d26231197c1c42468c273";
+        const string SyntheticFaceGoldenDigest = "f49f9632490448f1df6f7afba7d561ce";
         const string SyntheticLintGoldenDigest = "174fe1ed64ad984ec8e05bc096290f89";
 
         var real = ProseLint.CommandFace(repoRoot);
         var pinned = IsPinnedSnapshot(repoRoot);
-        checks.Add(new Check("文档面·真仓命令面（零问题 · 导出态断 72 文档/327 处与金标摘要 / 工作区态断语义）",
+        checks.Add(new Check("文档面·真仓命令面（零问题 · 导出态断 78 文档/433 处与金标摘要 / 工作区态断语义）",
             real.Ok
-            && Convert.ToInt64(real.Stats["cli_commands"]) == 102
-            && Convert.ToInt64(real.Stats["mcp_tools"]) == 10
+            && Convert.ToInt64(real.Stats["cli_commands"]) == 109
+            && Convert.ToInt64(real.Stats["mcp_tools"]) == 12
             && (!pinned || (DigestOf(CommandFaceLog(real)) == RealGoldenDigest
-                            && Convert.ToInt64(real.Stats["docs"]) == 72
-                            && Convert.ToInt64(real.Stats["commands_checked"]) == 327)),
+                            && Convert.ToInt64(real.Stats["docs"]) == 78
+                            && Convert.ToInt64(real.Stats["commands_checked"]) == 433)),
             $"docs {real.Stats["docs"]} · checked {real.Stats["commands_checked"]} · cli {real.Stats["cli_commands"]}"
             + $" · mcp {real.Stats["mcp_tools"]} · FAIL {real.Issues.Count} · 摘要 {DigestOf(CommandFaceLog(real))}"
             + $"（真源金标 {RealGoldenDigest}）"
@@ -3707,7 +3708,7 @@ public static class SelfTest
         // MCP 工具表镜像核验：真源那 10 个基名必须仍在引擎的 MCP 工具面里（否则命令面判据会偏松）
         var engineTools = McpServer.ToolNames.ToHashSet(StringComparer.Ordinal);
         var missingTools = ProseLint.SourceMcpToolNames.Where(t => !engineTools.Contains(t)).ToList();
-        checks.Add(new Check("文档面·MCP 工具表镜像（真源 10 基名 ⊆ 引擎 MCP 工具面）",
+        checks.Add(new Check("文档面·MCP 工具表镜像（真源 12 基名 ⊆ 引擎 MCP 工具面）",
             missingTools.Count == 0 && engineTools.Count >= 28,
             $"引擎工具 {engineTools.Count} 个 · 真源基名缺 {missingTools.Count} 个"));
 
@@ -3725,7 +3726,7 @@ public static class SelfTest
             && Convert.ToInt64(synth.Stats["docs"]) == 2
             && Convert.ToInt64(synth.Stats["commands_checked"]) == 7
             && Convert.ToInt64(synth.Stats["cli_commands"]) == 2
-            && Convert.ToInt64(synth.Stats["mcp_tools"]) == 10,
+            && Convert.ToInt64(synth.Stats["mcp_tools"]) == 12,
             $"docs {synth.Stats["docs"]} · checked {synth.Stats["commands_checked"]} · FAIL {synth.Issues.Count}"
             + $" · 摘要 {DigestOf(synthLog)}（真源金标 {SyntheticFaceGoldenDigest}）"));
 
@@ -3806,7 +3807,7 @@ public static class SelfTest
     private static readonly (string Rel, string B64)[] ProseLintSyntheticFiles =
     {
         ("scripts/nf.py", "IiIi5o6i6ZKI5ZCI5oiQ6K+t5paZ77ya5Y+q5o+Q5L6bIGFkZF9wYXJzZXIg5rOo5YaM5ZCN77yM5L6bIGNvbW1hbmRfZmFjZSDmir3lj5bjgIIiIiIKaW1wb3J0IGFyZ3BhcnNlCgpzdWIgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigpLmFkZF9zdWJwYXJzZXJzKCkKcCA9IHN1Yi5hZGRfcGFyc2VyKCJhc3NlbWJsZSIpCnAgPSBzdWIuYWRkX3BhcnNlcigidmVyaWZ5IikK"),
-        ("README.md", "IyDlkIjmiJDor63mlpkgwrcg5YWl5Y+j5paH5qGjCgrnlKggYG5mIGFzc2VtYmxlYCDoo4XphY3kuIDkuKrnu4TlkIjljIXjgIIKCueUqCBgbmYgbm9wZWAg5piv5LiN5a2Y5Zyo55qE5a2Q5ZG95Luk77yI5bqU5Yik5Ye677yJ44CCCgpgcmVnaXN0cnlfcXVlcnnvvIhNQ1Ag5bel5YW377yJYCDlnKjlhozvvJtgbm90X2FfdG9vbO+8iE1DUCDlt6XlhbfvvIlgIOS4jeWcqOWGjO+8iOW6lOWIpOWHuu+8ieOAggoKYGBgYmFzaApuZiB2ZXJpZnkgLS1hbGwKbmYgYm9ndXMtY21kCmBgYAo="),
+        ("README.md", "IyDlkIjmiJDor63mlpkgwrcg5YWl5Y+j5paH5qGjCgrnlKggYG5mIGFzc2VtYmxlYCDoo4XphY3kuIDkuKrnu4TlkIjljIXjgIIKCueUqCBgbmYgbm9wZWAg5piv5LiN5a2Y5Zyo55qE5a2Q5ZG95Luk77yI5bqU5Yik5Ye677yJ44CCCgpgcmVnaXN0cnlfc2VhcmNo77yITUNQIOW3peWFt++8iWAg5Zyo5YaM77ybYG5vdF9hX3Rvb2zvvIhNQ1Ag5bel5YW377yJYCDkuI3lnKjlhozvvIjlupTliKTlh7rvvInjgIIKCmBgYGJhc2gKbmYgdmVyaWZ5IC0tYWxsCm5mIGJvZ3VzLWNtZApgYGAK"),
         ("docs/x.md", "IyDlkIjmiJDor63mlpkgwrcgZG9jcyDpnaIKCuaVo+aWh+mHjOWGmSBuZiDkuI3luKblj43lvJXlj7fkuI3nrpflkb3ku6TpnaLvvIjmnKzooYzkuI3or6XooqvliKTvvInjgIIKCmBuZiBhc3NlbWJsZWAg5Zyo5YaM77yI5LiN6K+l6KKr5Yik77yJ44CCCg=="),
         ("prose_sample.md", "IyDlkIjmiJDor63mlpkgwrcg5q2j5paHIGxpbnQKCuWcqOi/meS4qumXrumimOS4iu+8jOaIkeS7rOmcgOimgeiwqOaFjuOAggoK5oC76ICM6KiA5LmL77yM5oiR5Lus5bqU6K+l57un57ut44CCCgrov5nkuI3mmK/pgJ/luqbpl67popjvvIzogIzmmK/mlrnlkJHpl67popjjgIIKCue7n+etueWFvOmhvuOAgeeos+S4reaxgui/m+OAgei/m+mAgOacieaNruWcsOaOqOi/m+OAggoK6L+Z5piv5LiA5Y+l5Lit5paHLOW4puiLseaWh+mAl+WPt+OAggoK54S26ICM5oOF5Ya15YWI5Y+Y5LqG44CCCgrnhLbogIzml7bpl7Tlj4jkuI3lpJ/jgIIKCuS5n+iuuOWkp+amguaIluiuuOS8vOS5juS7v+S9m+WPr+iDveafkOenjeeoi+W6puS4iu+8jOS6i+aDhei/mOaciei9rOacuuOAggo="),
     };
@@ -3877,18 +3878,18 @@ public static class SelfTest
         // 金标来源：probes/text_hygiene_probe.py 把真源 core/text_hygiene.py **原文复制后执行**
         // （真源 __main__ 同一段代码），逐字节 stdout 摘要见 _fixtures/_text_hygiene_golden.json。
         // 合成树以 base64 记录 → 两侧比的是**同一棵树**。
-        const string RealGoldenDigest = "a49d33b5f3f8819840d0da3f564578de";
+        const string RealGoldenDigest = "2330be8837eca8ee25191bdc42ec27fb";
         const string MixedGoldenDigest = "62705da4c6d1a6647f46aef038689209";
         const string BadUtf8Prefix = "c_bad.txt 不是合法 UTF-8：";
 
         var real = TextHygiene.Scan(repoRoot);
         var pinned = IsPinnedSnapshot(repoRoot);
-        checks.Add(new Check("编码卫生·真仓（零问题 · 导出态另断 2773/1033/168425/111 与金标摘要）",
+        checks.Add(new Check("编码卫生·真仓（零问题 · 导出态另断 3858/1146/251702/111 与金标摘要）",
             real.Ok && Convert.ToInt64(real.Stats["versions_checked"]) > 0
             && (!pinned || (real.LogDigest == RealGoldenDigest
-                            && Convert.ToInt64(real.Stats["text"]) == 2773
-                            && Convert.ToInt64(real.Stats["json"]) == 1033
-                            && Convert.ToInt64(real.Stats["keys_checked"]) == 168425
+                            && Convert.ToInt64(real.Stats["text"]) == 3858
+                            && Convert.ToInt64(real.Stats["json"]) == 1146
+                            && Convert.ToInt64(real.Stats["keys_checked"]) == 251702
                             && Convert.ToInt64(real.Stats["versions_checked"]) == 111)),
             $"{real.SummaryLine} · 摘要 {real.LogDigest}（真源金标 {RealGoldenDigest}）"
             + $" · 模式={(pinned ? "导出快照·断金标" : "工作区·断语义")}"));

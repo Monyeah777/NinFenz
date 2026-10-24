@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Nf.Engine;
 
@@ -143,6 +144,8 @@ public static class ConformanceScan
             var verifyText = File.Exists(verifyPath)
                 ? File.ReadAllText(verifyPath, new System.Text.UTF8Encoding(false, throwOnInvalidBytes: true))
                 : "";
+            var gateDefs = GateDefinitions(verifyText);
+            var gateCalls = GateCalls(verifyText);
             foreach (var item in ObjList(manifestMap.GetValueOrDefault("items")))
             {
                 exportItems++;
@@ -162,8 +165,29 @@ public static class ConformanceScan
                 foreach (var gate in ObjList(row.GetValueOrDefault("gates")))
                 {
                     var gateText = PyStr(gate);
-                    if (!verifyText.Contains(gateText, StringComparison.Ordinal))
-                        issues.Add($"导出面 {PyStr(row.GetValueOrDefault("id"))}: 证据门禁 {gateText} 不在 verify.sh");
+                    var num = gateText.StartsWith("check", StringComparison.Ordinal)
+                        && gateText.Length > 5
+                        && gateText[5..].All(char.IsAsciiDigit)
+                        ? gateText[5..]
+                        : "";
+                    if (num.Length == 0 || !gateDefs.ContainsKey(num))
+                    {
+                        issues.Add($"导出面 {PyStr(row.GetValueOrDefault("id"))}: 证据门禁 {gateText} 在 verify.sh 无 check 定义"
+                                   + "（修复指引：只声明真存在的 checkN）");
+                        continue;
+                    }
+                    if (!gateCalls.Contains(num))
+                    {
+                        issues.Add($"导出面 {PyStr(row.GetValueOrDefault("id"))}: 证据门禁 {gateText} 未在主执行体调用（声明了却不跑）");
+                        continue;
+                    }
+                    var body = gateDefs[num];
+                    if (!new[] { "err=1", "problems.append", "no \"", "no '" }
+                        .Any(tok => body.Contains(tok, StringComparison.Ordinal)))
+                    {
+                        issues.Add($"导出面 {PyStr(row.GetValueOrDefault("id"))}: 证据门禁 {gateText} 无可失败路径"
+                                   + "（判据空转：该 check 任何分支都不会红）");
+                    }
                 }
             }
         }
@@ -174,6 +198,44 @@ public static class ConformanceScan
             ["packages"] = packages,
             ["export_items"] = exportItems,
         });
+    }
+
+    private static Dictionary<string, string> GateDefinitions(string verifyText)
+    {
+        var defs = new Dictionary<string, string>(StringComparer.Ordinal);
+        string? current = null;
+        var body = new List<string>();
+        foreach (var line in verifyText.Split('\n'))
+        {
+            var clean = line.TrimEnd('\r');
+            if (current is null)
+            {
+                var match = Regex.Match(clean, "^check(\\d+)\\(\\)\\{$");
+                if (match.Success)
+                {
+                    current = match.Groups[1].Value;
+                    body.Clear();
+                }
+                continue;
+            }
+            if (clean == "}")
+            {
+                defs[current] = string.Join("\n", body);
+                current = null;
+                continue;
+            }
+            body.Add(clean);
+        }
+        return defs;
+    }
+
+    private static HashSet<string> GateCalls(string verifyText)
+    {
+        var marker = verifyText.IndexOf("主执行体", StringComparison.Ordinal);
+        var run = marker >= 0 ? verifyText[(marker + "主执行体".Length)..] : verifyText;
+        return Regex.Matches(run, "\\bcheck(\\d+)\\b")
+            .Select(m => m.Groups[1].Value)
+            .ToHashSet(StringComparer.Ordinal);
     }
 
     /// <summary>官方 registry <c>modules[].id</c> + <c>protocols[].module_ids[]</c>（装配在册证据）。</summary>

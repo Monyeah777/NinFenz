@@ -39,8 +39,8 @@ public static class AuxGolden
   ""expected"": {
    ""issues"": [],
    ""stats"": {
-    ""declared"": 442,
-    ""pending"": 1,
+    ""declared"": 443,
+    ""pending"": 0,
     ""registered"": 443,
     ""used"": 443
    }
@@ -1292,6 +1292,7 @@ public static class AuxGolden
      ""f10_spec_ready"": [
       ""产业与商业落地:M02""
      ],
+     ""faction_event"": [],
      ""factor_spec_conflict"": [
       ""量化金融:M32""
      ],
@@ -1391,7 +1392,7 @@ public static class AuxGolden
      ""weather_state"": []
     },
     ""events_consumed"": 430,
-    ""events_declared"": 442
+    ""events_declared"": 443
    }
   },
   ""files"": {},

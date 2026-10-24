@@ -2,7 +2,7 @@
  "schema": "nf-regression-score-golden/1",
  "generated": "2026-09-27",
  "source": "真源模块原文：regression_score.evaluate/compare · conformance_scan.scan · quality_depth_scan.scan · doc_hygiene.check_markers",
- "snapshot": "nf-snap-h16",
+ "snapshot": "nf-snap-h17c",
  "digest_rule": "sha256(\"\\n\".join(渲染行))[:32]  ← 与引擎侧同式",
  "boundary": [
   "purity_clean"
@@ -424,12 +424,13 @@
     "[FAIL] 04_模块库/通用类/T03.md: machine_contract 缺/非法 conformance 声明 'L0'",
     "[FAIL] community/测试包/protocol.yaml: conformance 虚标 L2 > 可证 L1（包不在 registry protocols[]）",
     "[FAIL] 导出面 x: 证据文件缺失 missing.txt",
-    "[FAIL] 导出面 x: 证据门禁 check99 不在 verify.sh",
+    "[FAIL] 导出面 x: 证据门禁 check18 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
+    "[FAIL] 导出面 x: 证据门禁 check99 在 verify.sh 无 check 定义（修复指引：只声明真存在的 checkN）",
     "[FAIL] 导出面 y: conformance 应为 L3（导出门禁锁定面）",
     "Conformance 统计：机读块 3 / 协议包 2 / 导出面 2"
    ],
-   "digest32": "f5f0809f803efdf76e4a3280df867f96",
-   "fails": 7,
+   "digest32": "1ac028549cd02b6764acc75a3eadf7ac",
+   "fails": 8,
    "files_b64": {
     "desktop/src/core/registry.json": "ewogIm1vZHVsZXMiOiBbCiAgewogICAiaWQiOiAiTTAxIgogIH0KIF0sCiAicHJvdG9jb2xzIjogWwogIHsKICAgImlkIjogIlAwMSIsCiAgICJtb2R1bGVfaWRzIjogWwogICAgIk0wMiIKICAgXQogIH0KIF0KfQ==",
     "verify.sh": "IyDniYjmnKwgOiB2MS4wCmNoZWNrMTgKY2hlY2syMgo=",
@@ -491,7 +492,7 @@
     "[FAIL] docs/ai-menu.md 缺「⛔ 操作指令」标识头（指令类文档须全覆盖）",
     "文档卫生：FAIL 45"
    ],
-   "digest32": "3c10e35d1319e23adfebd296ed4054e4",
+   "digest32": "c699a73cf3863d9e3c1809dce4860bbb",
    "fails": 45,
    "files_b64": {
     "01_核心协议.md": "IyDmoLjlv4PljY/orq4K5q2j5paHCg==",
