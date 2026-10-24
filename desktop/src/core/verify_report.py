@@ -124,6 +124,22 @@ def _declared(root: str) -> Dict[str, Any]:
     return out
 
 
+def _portable(value: Any, root: str) -> Any:
+    """Remove checkout-specific absolute roots from report values before sealing."""
+    absolute = str(Path(root).resolve())
+    variants = (absolute, absolute.replace("\\", "/"), absolute.replace("/", "\\"))
+    if isinstance(value, str):
+        for token in variants:
+            if token:
+                value = value.replace(token, "<root>")
+        return value
+    if isinstance(value, list):
+        return [_portable(v, root) for v in value]
+    if isinstance(value, dict):
+        return {k: _portable(v, root) for k, v in value.items()}
+    return value
+
+
 def build(root: str = ".") -> Dict[str, Any]:
     """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。"""
     items: List[Dict[str, Any]] = []
@@ -144,7 +160,10 @@ def build(root: str = ".") -> Dict[str, Any]:
     declared["coverage_note"] = ("判据级抽查面 %d 条，各对应 verify.sh 的一道或多道门禁；"
                                  "≠ 声明 check 总数 %s（两者不可互替）"
                                  % (len(items), declared.get("expected_checks")))
-    body = {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared}
+    body = _portable(
+        {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared},
+        root,
+    )
     digest_src = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
     body["root_digest"] = hashlib.sha256(digest_src).hexdigest()
     return body

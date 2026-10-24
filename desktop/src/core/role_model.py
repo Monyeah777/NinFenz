@@ -110,7 +110,11 @@ def files_of(root: str = ".") -> List[str]:
     """仓库件面（**只枚举一次**）→ 排序的相对路径列表。"""
     r = Path(root).resolve()
     out = []
-    for p in repo_face.walk_repo_paths(root):
+    # 提交投影必须只由 Git-tracked 面决定；测试/工具留下的未跟踪临时件不能改变
+    # `protocol/role_coordinates.json`。合成树没有 Git 时回退到完整扫描面，保留单测语义。
+    tracked = repo_face.tracked_paths(root)
+    paths = tracked if tracked else list(repo_face.walk_repo_paths(root))
+    for p in paths:
         try:
             out.append(os.path.relpath(str(p), str(r)).replace(os.sep, "/"))
         except ValueError:            # 跨盘符等异常：跳过而非崩（判据另行报缺口）

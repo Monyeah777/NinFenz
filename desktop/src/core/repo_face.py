@@ -99,3 +99,32 @@ def walk_repo_paths(root: str) -> Iterator[Path]:
             if is_ignored(rel, ignored):
                 continue
             yield Path(dirpath) / name
+
+
+def tracked_paths(root: str) -> list[Path]:
+    """Git-tracked files under *root* (empty when git or a repository is unavailable).
+
+    Committed projections must not change merely because a test or local tool leaves
+    an untracked file in the checkout. Callers that need that stability use this
+    helper and fall back to :func:`walk_repo_paths` for synthetic non-git trees.
+    """
+    exe = _git_executable()
+    if not exe:
+        return []
+    try:
+        proc = subprocess.run(  # nosec B603 - argv list, no shell
+            [exe, "-C", str(root), "ls-files", "-z"],
+            capture_output=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if proc.returncode != 0:
+        return []
+    out: list[Path] = []
+    for raw in proc.stdout.decode("utf-8", "replace").split("\0"):
+        rel = raw.strip().replace("\\", "/")
+        if not rel or ".." in rel.split("/"):
+            continue
+        path = Path(root) / rel
+        if path.is_file():
+            out.append(path)
+    return out

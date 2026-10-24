@@ -20,8 +20,9 @@ if str(ROOT / "desktop" / "src") not in sys.path:
 from core import redos_scan as rs  # noqa: E402
 from core import round_drill, assemble_plan  # noqa: E402
 
-#: 探针规模与预算：坏形态在 32 KB 上约 0.7 s（远超 600 ms），好形态毫秒级（余量 >100×）。
-N = 32768
+#: 探针规模与预算：坏形态在 48 KB 上稳定超过 600 ms（CI 实测 32 KB 仅 527 ms，
+#: 临界值会随宿主波动假红）；好形态仍为毫秒级。
+N = 49152
 BUDGET_MS = 600.0
 
 
