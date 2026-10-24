@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "desktop" / "src") not in sys.path:
@@ -98,6 +99,15 @@ class BuildTest(unittest.TestCase):
         )
         self.assertEqual(first, second)
         self.assertEqual("<root>/docs/x.md", first["sample"][0])
+
+    def test_short_temp_root_alias_cannot_leave_a_private_prefix(self):
+        root = "/var/folders/aa/bb/T/tmp.one"
+        with (mock.patch.object(vr.Path, "resolve", return_value=Path(root)),
+              mock.patch.object(vr.os.path, "abspath", return_value=root),
+              mock.patch.object(vr.os.path, "realpath", return_value=root)):
+            got = vr._portable(
+                {"sample": ["/private/var/folders/aa/bb/T/tmp.one/docs/x.md"]}, root)
+        self.assertEqual("<root>/docs/x.md", got["sample"][0])
 
 
 class CheckTest(unittest.TestCase):
