@@ -236,6 +236,7 @@ public static class Decisions
         {
             ["decisions"] = ids.Count,
             ["accepted"] = rows.Count(e => Str(e.Fm, "status") == "accepted"),
+            ["superseded"] = rows.Count(e => Str(e.Fm, "status") == "superseded"),
             ["chains"] = supBy.Count,
         };
         return (issues, warns, stats);

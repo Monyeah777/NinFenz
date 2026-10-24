@@ -172,6 +172,12 @@ public static class Driver
             ["fallback_files"] = (long)workflows.Values
                 .OfType<Dictionary<string, object?>>()
                 .Count(w => PyOr(w.GetValueOrDefault("fallback")).Length > 0),
+            ["orchestration"] = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["mapped"] = (long)PyList(bind.GetValueOrDefault("mcp.tools")).Count,
+                ["tools"] = (long)liveTools.Count,
+                ["workflows"] = (long)workflowNames.Count,
+            },
         };
         return new Result(issues, warns, stats);
     }

@@ -1672,11 +1672,11 @@ public static class SelfTest
 
         // ① 修复指引表：机械导出件的长度与**码点序**键序（"10" 排在 "2" 前），缺键必须是 null
         var keys = CheckGuide.SortedKeys();
-        checks.Add(new Check("小口·修复指引表（32 条 · 码点序键序 · 缺键 null）",
-            CheckGuide.Count == 32 && keys.Count == 32
+        checks.Add(new Check("小口·修复指引表（42 条 · 码点序键序 · 缺键 null）",
+            CheckGuide.Count == 42 && keys.Count == 42
             && string.Join(",", keys.Take(4)) == "1,10,11,12"
             && keys[^1] == "9"
-            && CheckGuide.Get("33") is null && CheckGuide.Get("32")!.Contains("质量纵深汇总"),
+            && CheckGuide.Get("42") is not null && CheckGuide.Get("32")!.Contains("质量纵深汇总"),
             $"条目 {CheckGuide.Count} · 前三键 {string.Join(",", keys.Take(3))} · 末键 {keys[^1]}"));
 
         // ② 引用反查：**类别感知**匹配（合成 registry —— 真仓被引声明恰好都是裸号，正向对账看不出这条差别）
@@ -3627,7 +3627,8 @@ public static class SelfTest
             && result is not null && Convert.ToString(result.GetValueOrDefault("pipeline")) == "P03"
             && Convert.ToString(span.GetValueOrDefault("name")) == "execute_tool nf.assemble"
             && Convert.ToInt64(spanStatus?["code"]) == 1 && Convert.ToInt64(badStatus?["code"]) == 2
-            && Convert.ToString(span.GetValueOrDefault("spanId")) == GoldenCallId[3..19]
+            && Convert.ToString(span.GetValueOrDefault("traceId")) == "0d19d6f19529a5084490fd40c071b15b"
+            && Convert.ToString(span.GetValueOrDefault("spanId")) == "8010a58cf08cc46c"
             && Convert.ToString(firstResourceAttr?.GetValueOrDefault("key")) == "service.name"
             && spans?.Count == 2
             && Convert.ToString(scope?.GetValueOrDefault("name")) == TelemetrySemconv.ScopeName

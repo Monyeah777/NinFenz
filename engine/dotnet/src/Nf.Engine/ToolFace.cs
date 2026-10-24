@@ -38,7 +38,7 @@ public static class ToolFace
             faces.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["module"] = id,
-                ["source"] = abs,
+                ["source"] = rel,
                 ["entries"] = face.Count,
             });
             foreach (var entry in face)

@@ -17,8 +17,17 @@ public static class GapReview
 {
     public const string Schema = "nf-gap-review/1";
     public const double ModelThreshold = 0.5;
+    public static readonly string[] Classes =
+    {
+        "unharvestable-payload", "payload-no-evidence", "silent-skip", "missing-quality-rule",
+    };
+    private static readonly string[] QualityRuleInputs =
+    {
+        "protocol/data_contracts.json", "protocol/normative.json",
+    };
     private static readonly Regex PayloadLineRe = new(@"payload\s*:\s*\{([^}]*)\}");
     private static readonly Regex ExceptRe = new(@"^\s*except\b");
+    private static readonly Regex TryRe = new(@"^\s*try\s*:");
     private static readonly System.Text.UTF8Encoding StrictUtf8 = new(false, throwOnInvalidBytes: true);
 
     public static List<Dictionary<string, object?>> PayloadCandidates(string root)
@@ -80,33 +89,115 @@ public static class GapReview
         foreach (var file in files)
         {
             var lines = KnowledgeSig.SplitLines(StrictUtf8.GetString(File.ReadAllBytes(file)));
-            for (var i = 0; i < lines.Count; i++)
+            var code = MaskPythonStrings(lines);
+            for (var i = 0; i < code.Count; i++)
             {
-                var line = lines[i];
-                if (!ExceptRe.IsMatch(line)) continue;
-                var next = lines.Skip(i + 1).Take(2).Select(l => l.Trim()).ToList();
-                if (next.Count == 0 || (next[0] != "pass" && next[0] != "continue")) continue;
-                var prev = i > 0 ? lines[i - 1].Trim() : "";
-                // 说明可以写在上一行，也可以内联在 except 行（仓库既有写法）
-                if (prev.StartsWith('#')) continue;
-                var afterColon = line.Contains(':') ? line.Split(':', 2)[1] : line;
-                if (afterColon.Contains('#')) continue;
-                outList.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+                if (!TryRe.IsMatch(code[i])) continue;
+                var tryIndent = Indent(code[i]);
+                for (var h = i + 1; h < code.Count; h++)
                 {
-                    ["class"] = "silent-skip",
-                    ["file"] = Posix(root, file),
-                    ["line"] = (long)(i + 2),
-                    ["detail"] = $"except → {next[0]} 且无说明",
-                    ["snippet"] = $"{PySlice(line.Trim(), 80)} / {next[0]}",
-                });
+                    if (code[h].Trim().Length == 0) continue;
+                    var handlerIndent = Indent(code[h]);
+                    if (handlerIndent < tryIndent) break;
+                    if (handlerIndent != tryIndent) continue;
+                    var candidate = code[h].TrimStart();
+                    if (!ExceptRe.IsMatch(code[h]))
+                    {
+                        if (!candidate.StartsWith("else:") && !candidate.StartsWith("finally:")) break;
+                        continue;
+                    }
+
+                    var bodyIndex = NextStatement(code, h + 1);
+                    if (bodyIndex < 0) continue;
+                    var body = code[bodyIndex].Trim();
+                    if (body is not ("pass" or "continue")) continue;
+                    var after = NextStatement(code, bodyIndex + 1);
+                    if (after >= 0 && Indent(lines[after]) > tryIndent) continue;
+
+                    var reasonStart = Math.Max(0, i - 3);
+                    var reasonBlock = lines.Skip(reasonStart).Take(i - reasonStart)
+                        .Concat(lines.Skip(i).Take(bodyIndex - i + 1));
+                    if (reasonBlock.Any(text => text.Contains('#'))) continue;
+
+                    outList.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
+                    {
+                        ["class"] = "silent-skip",
+                        ["file"] = Posix(root, file),
+                        ["line"] = (long)(bodyIndex + 1),
+                        ["detail"] = $"except → {body} 且无说明",
+                        ["snippet"] = $"{PySlice(lines[h].Trim(), 80)} / {PySlice(body, 20)}",
+                    });
+                }
             }
         }
         return outList;
     }
 
+    /// <summary>把 Python 三引号块与行尾注释遮空，避免把字符串里的示例当成真实 try/except。</summary>
+    private static List<string> MaskPythonStrings(IReadOnlyList<string> lines)
+    {
+        var outList = new List<string>(lines.Count);
+        string? triple = null;
+        foreach (var raw in lines)
+        {
+            var line = raw;
+            if (triple is not null)
+            {
+                var close = line.IndexOf(triple, StringComparison.Ordinal);
+                if (close < 0)
+                {
+                    outList.Add("");
+                    continue;
+                }
+                line = new string(' ', close + triple.Length) + line[(close + triple.Length)..];
+                triple = null;
+            }
+
+            var starts = new[] { line.IndexOf("\"\"\"", StringComparison.Ordinal),
+                                 line.IndexOf("'''", StringComparison.Ordinal) }
+                .Where(i => i >= 0).DefaultIfEmpty(-1).Min();
+            if (starts >= 0)
+            {
+                var mark = line.Substring(starts, 3);
+                var tail = line[(starts + 3)..];
+                var close = tail.IndexOf(mark, StringComparison.Ordinal);
+                if (close < 0)
+                {
+                    triple = mark;
+                    line = line[..starts];
+                }
+                else
+                {
+                    line = line[..starts] + new string(' ', close + 6)
+                           + tail[(close + 3)..];
+                }
+            }
+
+            var comment = line.IndexOf('#');
+            if (comment >= 0) line = line[..comment];
+            outList.Add(line);
+        }
+        return outList;
+    }
+
+    private static int Indent(string line) => line.Length - line.TrimStart().Length;
+
+    private static int NextStatement(IReadOnlyList<string> lines, int start)
+    {
+        for (var i = start; i < lines.Count; i++)
+        {
+            var text = lines[i].Trim();
+            if (text.Length > 0 && !text.StartsWith('#')) return i;
+        }
+        return -1;
+    }
+
     public static List<Dictionary<string, object?>> QualityRuleCandidates(string root)
     {
         var outList = new List<Dictionary<string, object?>>();
+        if (!QualityRuleInputs.All(rel =>
+                File.Exists(Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar)))))
+            return outList;
         var contracts = ReadMap(root, "protocol/data_contracts.json");
         var normative = ReadMap(root, "protocol/normative.json");
         var registered = new HashSet<string>(StringComparer.Ordinal);
@@ -202,9 +293,12 @@ public static class GapReview
 
     /// <summary>模型逐行判定 + 证据复核 → fixable / suspected 两张清单。</summary>
     public static Dictionary<string, object?> Review(string root, string adapter = "stub", string endpoint = "",
-                                                     int limit = 0, int batch = 8)
+                                                     int limit = 0, int batch = 8,
+                                                     IReadOnlyList<string>? classes = null)
     {
-        var rows = Candidates(root);
+        var missing = QualityRuleInputs.Where(rel =>
+            !File.Exists(Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar)))).ToList();
+        var rows = Candidates(root, classes);
         if (limit > 0) rows = rows.Take(limit).ToList();
         var verdicts = new List<Dictionary<string, object?>>();
         var step = Math.Max(1, batch);
@@ -289,6 +383,13 @@ public static class GapReview
         {
             ["schema"] = Schema, ["adapter"] = adapter, ["scanned"] = (long)verdicts.Count,
             ["by_class"] = byClass,
+            ["issues"] = missing.Count == 0
+                ? new List<object?>()
+                : new List<object?>
+                {
+                    "缺 " + string.Join("、", missing)
+                    + "（修复指引：在 NF 仓库根运行本审查——缺失时 missing-quality-rule 一类候选无从判定）",
+                },
             ["fixable"] = verdicts.Where(r => PyStr(r.GetValueOrDefault("verdict")) == "fixable")
                 .Select(r => (object?)r).ToList(),
             ["suspected"] = verdicts.Where(r => PyStr(r.GetValueOrDefault("verdict")) == "suspected")

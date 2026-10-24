@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -405,6 +406,7 @@ public static class TextHygiene
     private static List<string> Walk(string root)
     {
         var files = new List<string>();
+        var ignored = IgnoredPaths(root);
         void Recurse(string dir)
         {
             string[] dirs;
@@ -421,12 +423,16 @@ public static class TextHygiene
             foreach (var sub in dirs)
             {
                 if (ExcludeDirs.Contains(Path.GetFileName(sub))) continue;
+                var rel = Path.GetRelativePath(root, sub).Replace('\\', '/');
+                if (IsIgnored(rel, ignored)) continue;
                 Recurse(sub);
             }
             foreach (var file in entries)
             {
                 var name = Path.GetFileName(file);
                 if (ExcludeFiles.Contains(name)) continue;
+                var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
+                if (name == ".git" || IsIgnored(rel, ignored)) continue;
                 if (BinaryExt.Contains(PyExtLower(name))) continue;
                 files.Add(file);
             }
@@ -434,6 +440,45 @@ public static class TextHygiene
         Recurse(root);
         files.Sort(StringComparer.Ordinal);
         return files;
+    }
+
+    private static HashSet<string> IgnoredPaths(string root)
+    {
+        var result = new HashSet<string>(StringComparer.Ordinal);
+        try
+        {
+            var start = new ProcessStartInfo("git")
+            {
+                WorkingDirectory = root,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+            foreach (var arg in new[] { "ls-files", "-o", "-i", "--exclude-standard", "--directory", "-z" })
+                start.ArgumentList.Add(arg);
+            using var proc = Process.Start(start);
+            if (proc is null) return result;
+            var output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit(30_000);
+            if (!proc.HasExited || proc.ExitCode != 0) return new HashSet<string>(StringComparer.Ordinal);
+            foreach (var raw in output.Split('\0'))
+            {
+                var rel = raw.Trim().Replace('\\', '/').Trim('/');
+                if (rel.Length > 0 && !rel.Split('/').Contains("..", StringComparer.Ordinal))
+                    result.Add(rel);
+            }
+        }
+        catch (Exception)
+        {
+            return new HashSet<string>(StringComparer.Ordinal);
+        }
+        return result;
+    }
+
+    private static bool IsIgnored(string rel, HashSet<string> ignored)
+    {
+        var path = rel.Trim('/');
+        return ignored.Any(entry => path == entry || path.StartsWith(entry + "/", StringComparison.Ordinal));
     }
 
     /// <summary>Python <c>os.path.splitext</c> 的扩展名规则（前导点不算扩展名分隔符）。</summary>
