@@ -163,11 +163,6 @@ pub fn dig_ref<'a>(obj: &'a Json, path: &str) -> Option<&'a Json> {
     Some(cur)
 }
 
-/// 需要所有权时的兼容包装（只克隆最终值，不克隆整棵树）。
-pub fn dig(obj: &Json, path: &str) -> Option<Json> {
-    dig_ref(obj, path).cloned()
-}
-
 // ---------------------------------------------------------------- CSV（Python csv.reader 默认方言）
 
 /// Python `csv.reader` 默认方言：分隔 `,`、引号 `"`、`""` 转义、**不**跳过空白。
