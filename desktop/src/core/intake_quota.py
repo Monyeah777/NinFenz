@@ -27,7 +27,7 @@ def load_quota():
 
 def _frontmatter_scalar(text, key):
     import re
-    m = re.search(r'(?m)^%s:\s*(.+?)\s*$' % re.escape(key), text)
+    m = re.search(rf'(?m)^{re.escape(key)}:\s*(.+?)\s*$', text)
     return m.group(1).strip().strip('\'"') if m else ''
 
 
@@ -41,6 +41,7 @@ def daily_usage(day=None):
             with open(path, encoding='utf-8') as fh:
                 text = fh.read(4096)
         except OSError:
+            # 不可读投稿件不能参与配额计数；入库门禁会单独报告该文件问题。
             continue
         if _frontmatter_scalar(text, 'generated') != target:
             continue
@@ -64,9 +65,9 @@ def quota_denial(author):
     per_author, global_limit = load_quota()
     who = str(author or 'unknown').strip().lower() or 'unknown'
     if by_author.get(who, 0) >= per_author:
-        return '同一投稿人当日已达 %d 条上限' % per_author
+        return f'同一投稿人当日已达 {per_author} 条上限'
     if total >= global_limit:
-        return '全仓当日投稿已达 %d 条上限' % global_limit
+        return f'全仓当日投稿已达 {global_limit} 条上限'
     return ''
 
 

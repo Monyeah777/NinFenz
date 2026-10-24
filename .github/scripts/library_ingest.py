@@ -48,7 +48,7 @@ from core.ingest_common import (  # noqa: E402  —— 两前端共用件（2026
     secret_shape_hit,
     to_b36,
 )
-from core.intake_quota import quota_denial, record_quota  # noqa: E402
+from core.intake_quota import quota_denial, record_quota
 
 
 def _redact(text):

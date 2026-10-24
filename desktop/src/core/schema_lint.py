@@ -24,8 +24,9 @@ import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-from core import conformance_scan as _csc   # 统一 YAML 加载器 / 围栏解析缓存真源
+from core import conformance_scan as _csc  # 统一 YAML 加载器 / 围栏解析缓存真源
 from core import json_doc
+
 # enum/const 的值相等口径复用叶子件 json_schema.json_equal（唯一实现）——2026-10-10 审计 Y4：
 # 此前 enum 只写在 string 分支里，{type: boolean, enum: [true]} 对 False 静默放行，而
 # json_schema 会拒；同一语义两套校验器宽窄分叉，且分叉点落在「放过去」的那一侧。
@@ -206,10 +207,15 @@ def check_schema_files(root: str) -> Tuple[List[str], List[Dict[str, Any]]]:
             if key not in data:
                 issues.append(f"{name}: schema 缺 {key}")
         if data.get("$schema") != DIALECT:
-            issues.append("%s: $schema=%r 与校验器实现的方言不一致（预期 %s；"
-                          "修复指引：改声明或先扩展校验器再改声明）"
-                          % (name, data.get("$schema"), DIALECT))
-        if data.get("$id") != "https://ninfenz.dev/schema/" + name: issues.append("%s: $id=%r 必须是稳定绝对 URI https://ninfenz.dev/schema/%s（修复指引：只改标识，不改业务字段）" % (name, data.get("$id"), name))
+            issues.append(
+                f"{name}: $schema={data.get('$schema')!r} 与校验器实现的方言不一致"
+                f"（预期 {DIALECT}；修复指引：改声明或先扩展校验器再改声明）"
+            )
+        if data.get("$id") != f"https://ninfenz.dev/schema/{name}":
+            issues.append(
+                f"{name}: $id={data.get('$id')!r} 必须是稳定绝对 URI "
+                f"https://ninfenz.dev/schema/{name}（修复指引：只改标识，不改业务字段）"
+            )
         if data.get("type") != "object":
             issues.append(f"{name}: schema.type 应为 object")
         if not isinstance(data.get("properties"), dict):
@@ -225,7 +231,12 @@ def load_schema(root: str, name: str) -> Optional[Dict[str, Any]]:
     """按 $id 或 schema 文件名取单份定义（文件名为兼容别名）。"""
     _, schemas = check_schema_files(root)
     for s in schemas:
-        if s.get("$id") == name or (name.endswith(".schema.json") and str(s.get("$id")).rsplit("/", 1)[-1] == name): return s
+        matched_name = (
+            name.endswith(".schema.json")
+            and str(s.get("$id")).rsplit("/", 1)[-1] == name
+        )
+        if s.get("$id") == name or matched_name:
+            return s
     return None
 
 
