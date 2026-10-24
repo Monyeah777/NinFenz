@@ -46,12 +46,14 @@ class RepoTruthWritersUseAtomicWriteTest(unittest.TestCase):
 
     def test_trace_writer_keeps_old_content_on_failed_replace(self):
         from unittest import mock
+
+        from core import atomic_write as live_aw
         nf = _load_nf()
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "trace.json")
             self.assertTrue(nf._write_trace_file(str(p), {"a": 1}))
             before = p.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with mock.patch.object(live_aw, "_replace", side_effect=PermissionError("busy")):
                 self.assertFalse(nf._write_trace_file(str(p), {"a": 2}),
                                  "写失败须如实回 False（自身失败面）")
             self.assertEqual(before, p.read_bytes(),
