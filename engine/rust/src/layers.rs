@@ -735,4 +735,16 @@ mod tests {
         // 行结构（含换行）必须保留，否则 L6 行号会漂
         assert_eq!(stripped.lines().count(), src.lines().count());
     }
+
+    #[test]
+    fn raw_string_escaped_quote_does_not_swallow_following_import() {
+        let src = r#"x = r"\""
+from core import atomic_write
+"#;
+        let stripped = pysrc::strip_comments_and_strings(src);
+        assert!(
+            stripped.contains("from core import atomic_write"),
+            "raw string 内的 \\\" 不得提前闭合词法状态：{stripped:?}"
+        );
+    }
 }

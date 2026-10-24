@@ -81,7 +81,7 @@ REFUSED_COMMANDS = ("serve", "shell", "terminal", "lsp", "daemon")
 #: 连接读写超时（秒）：客户端卡住不得拖死守护。
 SOCKET_TIMEOUT = 30.0
 STATE_NAME = "daemon.json"
-
+_STATE_WRITE_LOCK = threading.Lock()
 #: bash 快路模板（`nf daemon shell-init bash` 原样输出，供 `eval "$(…)"` 装进交互 shell）。
 #: 关键点：**全部用 bash 内建**（/dev/tcp + printf + read -N），因此 `nf …` 是当前 shell 里的
 #: 一次函数调用 + 一次套接字往返——没有子进程、没有解释器启动，这才是真正的毫秒级客户端。
@@ -129,13 +129,13 @@ def write_state(doc: Dict[str, Any]) -> None:
     **并发安全**（2026-10-10 审计 N1，P1）：此前用**固定名** `daemon.json.tmp` 手工两段写，
     无锁无重试——4 进程 × 300 次实测：成功 326/1200、PermissionError 868、读者 270/2088
     （12.9%）解析失败（同载荷走 `atomic_write.write_text` 则 1200/1200、0 撕裂）。现统一走
-    `atomic_write.write_text`：`mkstemp` 唯一临时名 + fsync + `os.replace` + 瞬时错短重试，
-    与全仓其它落盘面**同一出处**。`mkstemp` 在 POSIX 上即 0600，replace 后保持不变；
+    `write_text`：唯一临时名 + fsync + `replace` + 短重试；POSIX `mkstemp` 即 0600，replace 后保持。
     下面再显式收紧一次兜底。
     """
     p = state_path()
     from core import atomic_write
-    atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, sort_keys=True) + "\n")
+    with _STATE_WRITE_LOCK, atomic_write.lock_file(p, what="守护状态"):
+        atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, sort_keys=True) + "\n")
     _harden_perms(p)
 
 

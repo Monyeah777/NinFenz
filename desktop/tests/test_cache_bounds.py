@@ -9,6 +9,7 @@
 """
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import sys
 
@@ -17,6 +18,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import conformance_scan as csc  # noqa: E402
 from core import disk_cache as dc  # noqa: E402
+from core import lazy_yaml  # noqa: E402
 from core import pack_combo as pc  # noqa: E402
 from core import repo_index as ri  # noqa: E402
 from core import response_cache as rc  # noqa: E402
@@ -40,6 +42,26 @@ CAPS = (
 
 
 class CacheBoundsTest(unittest.TestCase):
+    def test_yaml_unavailable_is_not_cached_as_a_content_result(self):
+        """可选依赖暂时不可用时，不得把 None 固化进内容键缓存并污染后续请求。"""
+        text = "```yaml\nmachine_contract:\n  id: M00\n```\n"
+        key = ("machine_contract", text)
+        saved = csc._FENCE_CACHE.copy()
+        saved_bytes = csc._FENCE_CACHE_BYTES
+        try:
+            csc._FENCE_CACHE.pop(key, None)
+            with mock.patch.object(lazy_yaml, "module", return_value=None):
+                self.assertIsNone(csc._fence_yaml_opt(text, "machine_contract"))
+            self.assertEqual(
+                {"machine_contract": {"id": "M00"}},
+                csc._fence_yaml_opt(text, "machine_contract"),
+                "依赖恢复后仍读到旧 None ⇒ 可选依赖降级污染了内容键缓存",
+            )
+        finally:
+            csc._FENCE_CACHE.clear()
+            csc._FENCE_CACHE.update(saved)
+            csc._FENCE_CACHE_BYTES = saved_bytes
+
     def test_response_cache_evicts_at_its_cap(self):
         rc.clear()
         self.addCleanup(rc.clear)

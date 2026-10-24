@@ -48,6 +48,29 @@ class SuiteHomeIsolationTest(unittest.TestCase):
         for needle in ("def kill_tree", "taskkill", "def popen_capture"):
             self.assertIn(needle, atom, f"进程原子缺超时树回收判据：{needle}")
 
+    def test_coverage_entries_use_the_isolated_shard_runner(self):
+        """覆盖率入口必须经分片执行器（独立 home/进程），不得裸跑单进程 discover。"""
+        paths = (
+            ROOT / ".github" / "workflows" / "coverage.yml",
+            ROOT / "scripts" / "coverage_summary.sh",
+            ROOT / "scripts" / "gates_all.sh",
+            ROOT / "scripts" / "per_module_coverage.sh",
+        )
+        stale = []
+        for p in paths:
+            text = p.read_text(encoding="utf-8")
+            if "verify_tests.py" not in text or "NF_COVERAGE" not in text:
+                stale.append(str(p.relative_to(ROOT)))
+        self.assertEqual([], stale,
+                         "覆盖率入口绕过了进程隔离（修复指引：经 verify_tests.py + NF_COVERAGE=1）")
+
+    def test_coverage_workflow_bootstraps_clean_clone_dirs(self):
+        """coverage 单 job 也须补齐 CI 忽略目录，否则文档可达性与资产面在干净 clone 必红。"""
+        text = (ROOT / ".github" / "workflows" / "coverage.yml").read_text(encoding="utf-8")
+        for rel in (".gitee/ISSUE_TEMPLATE", "engine/dotnet/dist",
+                    "engine/rust/canonical/target"):
+            self.assertIn(rel, text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import sys
@@ -32,7 +33,8 @@ class QuotaTest(unittest.TestCase):
         iq.reset_quota_state()
         self.td.cleanup()
 
-    def _entry(self, name, author, generated="2026-10-24"):
+    def _entry(self, name, author, generated=None):
+        generated = generated or datetime.date.today().isoformat()
         (self.root / "library" / name).write_text(
             f"---\nauthor: {author}\ngenerated: {generated}\n---\n",
             encoding="utf-8",
@@ -56,7 +58,8 @@ class QuotaTest(unittest.TestCase):
         self.assertIn("全仓当日", iq.quota_denial("erin"))
 
     def test_old_days_do_not_consume_quota(self):
-        self._entry("NF-1.md", "alice", "2026-10-23")
+        old = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+        self._entry("NF-1.md", "alice", old)
         self.assertEqual("", iq.quota_denial("alice"))
 
     def test_invalid_quota_declaration_fails_to_conservative_default(self):

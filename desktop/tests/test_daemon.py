@@ -19,6 +19,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -684,6 +685,36 @@ class DaemonStateWriteRaceTest(unittest.TestCase):
         else:
             os.environ["NARRATIVE_FORGE_HOME"] = self._old
         shutil.rmtree(self.home, ignore_errors=True)
+
+    def test_state_writers_are_serialized(self):
+        """同目标的状态写入先串行，避免 Windows 上多个 replace 互相放大占用冲突。"""
+        from core import atomic_write as aw
+        guard = threading.Lock()
+        active = 0
+        peak = 0
+        original = aw.write_text
+
+        def slow_write(*args, **kwargs):
+            nonlocal active, peak
+            with guard:
+                active += 1
+                peak = max(peak, active)
+            try:
+                time.sleep(0.03)
+                return original(*args, **kwargs)
+            finally:
+                with guard:
+                    active -= 1
+
+        with mock.patch.object(aw, "write_text", side_effect=slow_write):
+            workers = [threading.Thread(target=dm.write_state,
+                                        args=({"proto": dm.PROTO, "pid": i},))
+                       for i in range(3)]
+            for th in workers:
+                th.start()
+            for th in workers:
+                th.join(timeout=10)
+        self.assertEqual(1, peak, "同目标状态写入未串行，多个 replace 会互相抢占用")
 
     def test_concurrent_writes_never_tear(self):
         import threading

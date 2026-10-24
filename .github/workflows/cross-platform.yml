@@ -90,6 +90,7 @@ jobs:
             verify.log
             .nf-logs/
           if-no-files-found: warn
+          include-hidden-files: true
       - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
         # N1（审计 P2）：同 ci-verify —— 失败时上传的必须是本 run 现算的结论。
         if: always()
