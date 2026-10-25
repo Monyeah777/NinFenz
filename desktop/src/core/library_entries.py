@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from core import atomic_write
 
-
 ENTRY_GLOB = "library/NF-*.md"
 
 def parse_frontmatter(text: str) -> Tuple[Dict[str, Any], str]:
@@ -82,7 +81,8 @@ def read_entry(path: str) -> Dict[str, Any]:
 def entries(root: str = ".") -> List[Dict[str, Any]]:
     """全量条目（按编号排序；path 一律归一为仓库相对路径）。"""
     r = Path(root)
-    out = [read_entry(str(p)) for p in sorted(r.glob(ENTRY_GLOB))]
+    out = [read_entry(str(p)) for p in sorted(r.glob(ENTRY_GLOB))
+           if p.is_file() and not p.is_symlink()]
     for e in out:
         e["path"] = os.path.relpath(e["path"], str(r)).replace("\\", "/")
     out.sort(key=lambda e: e["id"])

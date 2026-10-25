@@ -42,7 +42,8 @@ def _root_digest(files: Dict[str, str]) -> str:
 
 def _surface_files(root: str) -> set:
     base = Path(root)
-    return {p.relative_to(base).as_posix() for p in base.rglob("*") if p.is_file()}
+    return {p.relative_to(base).as_posix() for p in base.rglob("*")
+            if p.is_file() and not p.is_symlink()}
 
 
 def build(root: str, paths: Iterable[str], generator: str, coverage: str,

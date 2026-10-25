@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 67,
+        "raises": 96,
         "sinks": 20
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "ce1f869039442319109ea3237cfb3799bfe0e0d830b0e6693ba4cc8e9369188c",
+        "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -313,7 +313,7 @@
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 388,
         "with_header": 46
       },
       "status": "warn",
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 231,
-        "probed": 231
+        "patterns": 230,
+        "probed": 230
       },
       "status": "pass",
       "warns": 0
@@ -525,7 +525,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3863,
+        "files": 3851,
         "kernel": 2004,
         "kernel_no_self": 309,
         "rules": 9,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "3365b3965d30d5cda97bb4d245bd89c052bb91762d96a8106928560d7f91ae94",
+  "root_digest": "7315d16df7083d8999d6ec160df3c34510feb37d85ea407ce25c409a1736993c",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

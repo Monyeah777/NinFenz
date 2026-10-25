@@ -21,6 +21,8 @@ from typing import Any
 from core import atomic_write
 
 MAX_JSON_DEPTH = 256
+#: 单件 JSON 文本/文件上限（32 MiB）：所有真源读取共用，防止外来大件把解析器内存打爆。
+MAX_JSON_BYTES = 32 * 1024 * 1024
 
 
 def _too_deep(text: str) -> bool:
@@ -100,6 +102,8 @@ def loads(text: str, expect: Any = dict, *, what: str = "JSON 文本",
     if pairs_hook is not None:
         kwargs["object_pairs_hook"] = pairs_hook
     body = text.lstrip("\ufeff")
+    if len(body) > MAX_JSON_BYTES:
+        raise ValueError(f"{what} 超过上限 {MAX_JSON_BYTES} 字符（修复指引：拆分或分页）")
     if _too_deep(body):
         raise ValueError("%s 嵌套过深（上限 %d）（修复指引：拆平结构或改为引用，不把树深当协议）"
                          % (what, MAX_JSON_DEPTH))
@@ -117,6 +121,9 @@ def load(path: Any, expect: Any = dict, *, what: str = "", pairs_hook: Any = Non
     name = what or p.as_posix()
     try:
         st = p.stat()
+        if int(st.st_size) > MAX_JSON_BYTES:
+            raise ValueError(f"{name} 超过上限 {MAX_JSON_BYTES} 字节"
+                             "（修复指引：拆分或分页）")
         text = _read_text_cached(str(p.resolve()), int(st.st_mtime_ns), int(st.st_size))
     except OSError as exc:
         raise ValueError("%s 读取失败：%s（修复指引：确认路径存在且可读）" % (name, exc)) from exc

@@ -92,6 +92,8 @@ def walk_repo_paths(root: str) -> Iterator[Path]:
         for name in dirnames:
             if name in SKIP_DIR_NAMES:
                 continue
+            if os.path.islink(os.path.join(dirpath, name)):
+                continue
             rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
             if is_ignored(rel, ignored):
                 continue
@@ -99,6 +101,8 @@ def walk_repo_paths(root: str) -> Iterator[Path]:
         dirnames[:] = keep
         for name in filenames:
             if name == ".git":          # 链接工作树：`.git` 是指针文件（见 docstring）
+                continue
+            if os.path.islink(os.path.join(dirpath, name)):
                 continue
             rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
             if is_ignored(rel, ignored):

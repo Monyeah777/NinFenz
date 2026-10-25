@@ -42,6 +42,8 @@ ENV_ENGINE = "NF_ENGINE"
 
 BIND_HOST = "127.0.0.1"
 STATE_FILENAME = "rust_worker.json"
+MAX_RESPONSE_BYTES = 16 << 20
+MAX_STATE_BYTES = 64 << 10
 
 #: 候选二进制路径（release 优先，其次 debug；与 test_rust_fastlane.CANDIDATES 同源）。
 CANDIDATES: Tuple[str, ...] = (
@@ -177,11 +179,32 @@ def state_path() -> Path:
 
 def _load_state(sp: Path) -> Optional[Dict[str, Any]]:
     try:
-        doc = json.loads(sp.read_text(encoding="utf-8"))
+        raw = sp.read_bytes()
+        if len(raw) > MAX_STATE_BYTES:
+            return None
+        doc = json.loads(raw.decode("utf-8"))
     except (OSError, ValueError):
         # 状态文件缺失/损坏等价于 worker 不可用，由上层走受控回退。
         return None
     return doc if isinstance(doc, dict) else None
+
+
+def _read_frame(fh) -> tuple[int, bytes]:
+    """读取 Rust worker 三行头 + 载荷；负数/超长/截断一律拒绝。"""
+    head = [fh.readline(64) for _ in range(3)]
+    if any(not line or not line.strip() or not line.endswith(b"\n") for line in head):
+        raise ValueError("响应头缺失或超长")
+    try:
+        code, out_len, err_len = (int(line.strip()) for line in head)
+    except ValueError as exc:
+        raise ValueError("响应头不是整数") from exc
+    if out_len < 0 or err_len < 0 or out_len + err_len > MAX_RESPONSE_BYTES:
+        raise ValueError("响应长度越界")
+    out = fh.read(out_len) if out_len else b""
+    _err = fh.read(err_len) if err_len else b""
+    if len(out) != out_len:
+        raise ValueError("响应载荷提前结束")
+    return code, out
 
 
 def _talk(doc: Dict[str, Any], argv: List[str], timeout: float) -> Optional[Tuple[int, bytes]]:
@@ -202,15 +225,7 @@ def _talk(doc: Dict[str, Any], argv: List[str], timeout: float) -> Optional[Tupl
             try:
                 conn["sock"].sendall(frame.encode("utf-8"))
                 fh = conn["fh"]
-                head = [fh.readline() for _ in range(3)]
-                if any(not line or not line.strip() for line in head):
-                    _close_persistent_locked()
-                    continue
-                code = int(head[0].strip())
-                out_len = int(head[1].strip())
-                err_len = int(head[2].strip())
-                out = fh.read(out_len) if out_len else b""
-                _err = fh.read(err_len) if err_len else b""
+                code, out = _read_frame(fh)
                 return (code, out)
             except (OSError, ValueError):
                 _close_persistent_locked()
@@ -349,15 +364,7 @@ def worker_stats(timeout: float = 5.0) -> Optional[Dict[str, Any]]:
         try:
             conn["sock"].sendall(frame.encode("utf-8"))
             fh = conn["fh"]
-            head = [fh.readline() for _ in range(3)]
-            if any(not line or not line.strip() for line in head):
-                _close_persistent_locked()
-                return None
-            code = int(head[0].strip())
-            out_len = int(head[1].strip())
-            err_len = int(head[2].strip())
-            out = fh.read(out_len) if out_len else b""
-            _err = fh.read(err_len) if err_len else b""
+            code, out = _read_frame(fh)
             if code != 0:
                 return None
             got = json.loads(out.decode("utf-8"))

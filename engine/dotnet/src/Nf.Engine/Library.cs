@@ -30,6 +30,7 @@ public static class Library
         { "description", "license", "sources", "generated", "status", "tags", "author" };
     private static readonly string[] Statuses = { "active", "deprecated", "superseded" };
     private static readonly Regex DateRe = new(@"^\d{4}-\d{2}-\d{2}$");
+    private const int MaxEntryBytes = 8 * 1024 * 1024;
 
     private static readonly HashSet<string> AllowedLicenses = new(StringComparer.Ordinal)
     {
@@ -55,6 +56,7 @@ public static class Library
         var dir = Path.Combine(root, "library");
         if (!Directory.Exists(dir)) return new List<Entry>();
         var list = Directory.GetFiles(dir, "NF-*.md")
+            .Where(f => (File.GetAttributes(f) & FileAttributes.ReparsePoint) == 0)
             .OrderBy(f => Relative(root, f), StringComparer.Ordinal)
             .Select(f =>
             {
@@ -358,7 +360,7 @@ public static class Library
     };
 
     private static string ReadText(string path)
-        => new UTF8Encoding(false).GetString(File.ReadAllBytes(path));
+        => new UTF8Encoding(false).GetString(ReadBoundedBytes(path));
 
     /// <summary>
     /// 严格 UTF-8 读取；失败则**替换字符降级**并返回问题文案（复刻真源 `read_entry` 的
@@ -366,7 +368,7 @@ public static class Library
     /// </summary>
     private static (string Text, string DecodeIssue) ReadTextUtf8Strict(string path)
     {
-        var raw = File.ReadAllBytes(path);
+        var raw = ReadBoundedBytes(path);
         try
         {
             return (new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(raw), "");
@@ -379,6 +381,19 @@ public static class Library
             return (text, $"{Path.GetFileName(path)} 非合法 UTF-8（{exc.Message}）；已按替换字符降级读取"
                            + "（修复指引：把该文件另存为 UTF-8 后重跑 nf library verify）");
         }
+    }
+
+    private static byte[] ReadBoundedBytes(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
+                                          FileShare.ReadWrite | FileShare.Delete);
+        if (stream.Length > MaxEntryBytes)
+            throw new IOException(
+                $"{Path.GetFileName(path)} 超过单件上限 {MaxEntryBytes} 字节"
+                + "（修复指引：拆分馆藏条目）");
+        var raw = new byte[(int)stream.Length];
+        stream.ReadExactly(raw);
+        return raw;
     }
 
     private static string Relative(string root, string full)
