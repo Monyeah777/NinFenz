@@ -63,3 +63,21 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+
+  # REUSE 3.3 合规（Linux 基金会规范；发布物/法务面黄马甲）
+  # 版本钉死保证可复现：升级需同步更新 .reuse 规则与 LICENSES/。
+  reuse-lint:
+    name: reuse-compliance-3.3
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - name: 安装 REUSE（钉版本）
+        run: pip install reuse==6.2.0
+      - name: REUSE lint（Spec 3.3）
+        run: reuse lint

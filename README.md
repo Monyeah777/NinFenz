@@ -1,5 +1,7 @@
 # NinFenz · 文档生成工坊（规范驱动）<sub>Spec-driven documentation workshop</sub>
 
+[![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
+
 <!-- nf:locales -->
 <p align="center">
   <strong><a href="README.md">简体中文</a></strong> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本语</a>

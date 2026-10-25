@@ -26,7 +26,21 @@ SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
-path = ["LICENSE", "LICENSING.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "COMMERCIAL.md", "CLA.md"]
+path = ["LICENSE", "LICENSING.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "CLA.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "CC-BY-4.0"
+
+#: 商业许可文档本体 → LicenseRef-Commercial（让 REUSE 能定位该许可文本）
+[[annotations]]
+path = ["COMMERCIAL.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "LicenseRef-Commercial"
+
+#: 历史 MIT 授权通知 → MIT（让 REUSE 能定位历史许可文本；该文件本身以 MIT 授权）
+[[annotations]]
+path = ["MIT-NOTICE.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "MIT"
