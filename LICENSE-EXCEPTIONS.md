@@ -1,5 +1,9 @@
 # 附加许可（AGPL-3.0-only §7 additional permissions）
 
+> **免责声明：本文件不构成法律意见。THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.**
+> 本文件只授予**额外许可**（§7），**不含任何费用、罚则或审计义务**——那类条款若写进许可证即属
+> "further restriction"（AGPL §10 允许被许可人移除），故只能出现在 `COMMERCIAL.md` 的商业合同语境里。
+
 > 依 AGPL-3.0 第 7 节授予的**additional permissions**：只增加权利，不增加限制。
 > 若某条款与 AGPL 冲突，以 AGPL 为准（§7 明确：额外限制无效）。
 > 本文件只公开**许可性质**的条款；小实体定价、商业触发阈值等商务内容在商业协议内（COMMERCIAL.md）。
