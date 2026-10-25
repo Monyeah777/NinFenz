@@ -5,6 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
+import { ALLOW_DIRS, EXCLUDE_DIRS, EXCLUDE_ANY, EXCLUDE_FILES } from './payload-policy.mjs';
 
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
@@ -25,17 +26,6 @@ const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
 // 该夹具已一并换成自写件（同一次修复的第 ② 步），本行是纵深（换件失误也不会外泄）。
 // （`.release-frozen/` 曾在此列：2026-10-11 该 golden master 机制退役，目录与生成脚本已删除，
 // 故不再需要排除项——保留注释是为了下次有人「重建快照」时记得它必须自带门禁。）
-const EXCLUDE_DIRS = ['engine/', 'results/', '.github/', '.gitee/', 'packaging/', '.git/',
-                      'desktop/tests/',
-                      // M1（2026-10-22 安全审计）：`changes/` 是内部开发流水（未发布变更记录/审计），
-                      // 不属于运行时面。此前漏排除 ⇒ `npm i ninfenz` 会把内部材料分发到用户机器
-                      // （CWE-200 / SLSA L2「构建产物只含声明内容」）。发布面只用白名单思路修，
-                      // 这里仍是黑名单兜底（N2 待白名单化）。
-                      'changes/'];
-const EXCLUDE_ANY = ['__pycache__/', '.pyc', 'tui/dist/', '.DS_Store'];
-//: 单件排除（脚手架残留，2026-10-10 审计 P2-14）：仓库根 `trace.json` 是 `nf assemble --trace`
-//: 留下的 404 B 占位件（phase=clarify / requirement="需求"），不是运行时依赖，不该进发布物。
-const EXCLUDE_FILES = ['trace.json'];
 const EPOCH = new Date('2020-01-01T00:00:00Z');
 
 function trackedFiles() {
@@ -52,8 +42,16 @@ function keep(rel) {
   // 内部冻结件就这样随 npm 发布物外泄（已实测在 1.0.1 的 tarball 里）。npm 打包剔除的是
   // **点名/点目录**，语义本来就按段，两处口径现在唯一。
   if (rel.split('/').some(function (seg) { return seg.startsWith('.'); })) return false;
-  if (EXCLUDE_FILES.indexOf(rel) >= 0) return false;
-  for (const d of EXCLUDE_DIRS) if (rel.startsWith(d)) return false;
+  const parts = rel.split('/');
+  if (parts.length === 1) {
+    // 顶层文件：扁平面全收（逐件可 review），只拒点名残留件
+    if (EXCLUDE_FILES.indexOf(rel) >= 0) return false;
+  } else {
+    // 顶层目录：**默认拒绝**——不在白名单里就不进包（N2/L2 的根因修法）
+    if (ALLOW_DIRS.indexOf(parts[0] + '/') < 0) return false;
+    // 白名单内部仍需排除的子面（专有夹具等，见 EXCLUDE_DIRS 注释）
+    for (const d of EXCLUDE_DIRS) if (rel.startsWith(d)) return false;
+  }
   for (const a of EXCLUDE_ANY) if (rel.indexOf(a) >= 0) return false;
   return true;
 }
