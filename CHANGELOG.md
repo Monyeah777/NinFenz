@@ -11,7 +11,15 @@
   `TRADEMARK.md`、`COMMERCIAL.md`、`LICENSES/AGPL-3.0-only.txt`、`LICENSES/CC-BY-4.0.txt`、
   `LICENSES/LicenseRef-Commercial.txt`；根 `LICENSE` 改为指引页；`REUSE.toml` 同步四层映射。
 - `package.json` 许可字段 `MIT` → `AGPL-3.0-only`；`pyproject.toml` → `AGPL-3.0-only OR LicenseRef-Commercial`。
-- `CONTRIBUTING.md` §7：inbound 由 MIT 改为 **AGPL-3.0-only + 同意纳入商业版**；仍为 **DCO，不要求 CLA**。
+- AGPL 含义**不自造解释**：`LICENSING.md §3` 直接引用 GNU 官方 FAQ 原文（#InternalDistribution / #UnreleasedMods /
+  #AGPLv3InteractingRemotely / #AGPLv3CorrespondingSource / #AGPLGPL）。
+- 免责声明：`LICENSING.md` / `COMMERCIAL.md` / `LICENSE-EXCEPTIONS.md` 顶部写明"不构成法律意见，商业授权需双方签署正式合同"
+  与 `THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND`。
+- 违规结算：`COMMERCIAL.md §4` 给出**参考价机制**（自首次违规之日按年计），并明确它是对 AGPL 的追加条款无效、
+  只在商业合同或书面和解中适用。
+- **贡献授权改用标准 CLA**：新增 `CLA.md`（Harmony Combined Contributor Agreement v1.0 **Option Five**，其 §2.3 明确可再许可为
+  copyleft/permissive/**commercial/proprietary**）；`CONTRIBUTING.md` §7 改为"必须签 CLA"，并纠正旧文案——
+  **DCO 不构成商业再许可授权**（DCO 仅声明有权提交，效果是按项目当前许可 AGPL 发布）。
 - MIT 时代终点已打 tag **`v1.0.5-mit-final`**。
 
 ## [未发布] - 2026-10-21 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波

@@ -26,7 +26,7 @@ SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
-path = ["LICENSE", "LICENSING.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "COMMERCIAL.md"]
+path = ["LICENSE", "LICENSING.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "COMMERCIAL.md", "CLA.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "CC-BY-4.0"
