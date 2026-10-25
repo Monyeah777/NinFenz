@@ -4,6 +4,9 @@ name: release-gate
 on:
   push:
     tags: ['v*']
+  # 手动触发（2026-10-25 增）：tag 触发之外，允许在任意主干提交上做**发布前体检**，
+  # 便于发版前证明门禁全绿（此前只能等打 tag 才知道，存量红因此拖到发版当天才暴露）。
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
