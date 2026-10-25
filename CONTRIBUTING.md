@@ -166,6 +166,7 @@ python3 -m compileall -q desktop/src scripts
 
 > 依据：`STRATEGY.md §四`、`LICENSING.md §6`；双授权需要贡献者**明示授权**作者以商业/专有许可再许可。
 
+- **inbound = outbound（Z6 口径）**：你提交的贡献以**项目当前许可**（代码层 AGPL-3.0-only）发布；**商业再许可**不靠该口径，而由 CLA §2.3 单独明示授权。
 - **必须签署 CLA**：贡献者需签署 `CLA.md`（改编自 **Harmony Combined Contributor Agreement v1.0 · Option Five**）。
   其 §2.3 原文：*"We may license the Contribution under any license, including copyleft, permissive,
   **commercial, or proprietary** licenses."* —— 这是商业闭源再许可的**唯一**合法授权来源。
