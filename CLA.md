@@ -126,8 +126,8 @@ BASED.
 
 ### 6. Miscellaneous
 
-6.1 This Agreement will be governed by and construed in accordance with the laws of **[JURISDICTION]** excluding its
-conflicts of law provisions. Under certain circumstances, the governing law in this section might be superseded by the
+6.1 This Agreement will be governed by and construed in accordance with the laws of **the People's Republic of China
+(excluding the Hong Kong SAR, Macao SAR and Taiwan region)** excluding its conflicts of law provisions. Under certain circumstances, the governing law in this section might be superseded by the
 United Nations Convention on Contracts for the International Sale of Goods ("UN Convention") and the parties intend to
 avoid the application of the UN Convention to this Agreement and, thus, exclude the application of the UN Convention in
 its entirety to this Agreement.
@@ -142,6 +142,9 @@ the assignment, that third party must agree in writing to abide by all the right
 situation shall not affect the right of a party to require such performance at any time in the future. A waiver of
 performance under a provision in one situation shall not be considered a waiver of the performance of the provision in
 the future or a waiver of the provision in its entirety.
+
+6.6 **【本地化补充条款 · 非 Harmony 模板原文】** 因本协议引起的或与之相关的争议，双方应先友好协商；协商不成的，
+提交**作者住所地**有管辖权的人民法院诉讼解决。本条仅为确定争议解决地点，不改变第 6.1 条的准据法。
 
 6.5 If any provision of this Agreement is found void and unenforceable, such provision will be replaced to the extent
 possible with a provision that comes closest to the meaning of the original provision and which is enforceable. The
@@ -171,4 +174,7 @@ Entity 版本，或提供第三方许可证明。
 ---
 
 **版本**：CLA v1.0（基于 Harmony Combined Contributor Agreement Template v1.0 · Option Five）
+
+**版本政策（说明性，不改变模板条款）**：本 CLA 的修订**只对修订生效后提交的贡献适用**，不追溯改变已签署者
+对既有贡献的授权；修订时须更新版本号并在 PR 模板与仓库中公示。
 **适用项目许可**：代码层 `AGPL-3.0-only`（或商业许可）—— 见 `LICENSING.md`
