@@ -1,5 +1,19 @@
 # Changelog
 
+## [未发布] · **License change（1.1.0 起）** — 分层双许可
+
+> 生效于**下一个 minor 版本（1.1.0）**；v1.0.5 及更早版本仍为 MIT，且已分发副本的 MIT 权利永久有效。
+
+- **代码层**（`desktop/`、`scripts/`、`engine/`、`tui/`、`verify.sh`、`packaging/`）：**AGPL-3.0-only 或商业许可**（二选一）。
+- **协议规范文本**（01–07、`protocol/`、`docs/`）：**CC BY 4.0**（署名即可实现与引用）。
+- **社区投稿**（`library/`、`community/`）：保持 `LicenseRef-Community-Submission` 不变。
+- 新增 `LICENSING.md`（边界第一真源）、`LICENSE-EXCEPTIONS.md`（AGPL §7 附加许可 E1/E2/E3/E5/E6/E9）、
+  `TRADEMARK.md`、`COMMERCIAL.md`、`LICENSES/AGPL-3.0-only.txt`、`LICENSES/CC-BY-4.0.txt`、
+  `LICENSES/LicenseRef-Commercial.txt`；根 `LICENSE` 改为指引页；`REUSE.toml` 同步四层映射。
+- `package.json` 许可字段 `MIT` → `AGPL-3.0-only`；`pyproject.toml` → `AGPL-3.0-only OR LicenseRef-Commercial`。
+- `CONTRIBUTING.md` §7：inbound 由 MIT 改为 **AGPL-3.0-only + 同意纳入商业版**；仍为 **DCO，不要求 CLA**。
+- MIT 时代终点已打 tag **`v1.0.5-mit-final`**。
+
 ## [未发布] - 2026-10-21 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。

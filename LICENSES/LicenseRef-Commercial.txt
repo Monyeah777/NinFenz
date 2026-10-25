@@ -1,0 +1,7 @@
+NinFenz Commercial License (LicenseRef-Commercial)
+
+这是**商业许可**的引用标识（SPDX LicenseRef），不是完整条款。
+完整商业条款由作者与采购方单独签署的《NinFenz 商业授权协议》构成；
+索取方式见 COMMERCIAL.md。
+
+在商业协议签署前，代码的可用许可为 AGPL-3.0-only（见 LICENSES/AGPL-3.0-only.txt）。
