@@ -75,7 +75,7 @@ EXTERNAL_EVENTS_REL = "protocol/external_events.json"
 RECEIPTS_REL = "protocol/RECEIPTS.json"
 
 #: NF 项目自身的许可结论（与 LICENSE 同源）
-LICENSE_NAME = "MIT"
+LICENSE_NAME = "AGPL-3.0-only"
 
 #: SBOM `created` 的派生源（N=非墙钟）：从仓内**已声明日期**取最大值——
 #: 目的有二：① SPDX 2.3 的 `creationInfo.created` 是必填（外部 meta-schema 实测会 FAIL）；

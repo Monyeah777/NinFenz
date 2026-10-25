@@ -6,11 +6,17 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:ef23f498717b2d582072c453b3844e8725057cba9d736e591df586e54213dd85
+  - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径
+
+> 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价
+
+> 重审（2026-10-25）：分层双许可（1.1.0 起）
+
 > 重审（2026-10-24）：2026-10-24 投稿写面收口：Gitee 改为作者白名单，加入日配额与跨平台空目录占位，重绑投影响应文件
 
 > 重审（2026-10-20）：0.x renumber 1

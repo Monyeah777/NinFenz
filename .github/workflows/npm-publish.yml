@@ -11,7 +11,6 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write          # provenance / trusted publishing 必需
 jobs:
   publish:
     name: npm-publish-provenance
@@ -102,6 +101,11 @@ jobs:
 
   publish-github-packages:
     name: npm-publish-github-packages
+    # GitHub Packages 是**可选镜像**通道（npmjs.org 才是发布主面）。
+    # 403 write_package 属 packages 侧命名空间/仓库关联配置，不影响 npm 正式发布；
+    # 故本作业失败不判整条 workflow 红（真实失败仍会显示在作业列表里）。
+    continue-on-error: true
+
     # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
     # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
     if: github.event_name == 'workflow_dispatch' || startsWith(github.ref_name, 'v1.')

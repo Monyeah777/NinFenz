@@ -49,7 +49,7 @@
       "licenses": [
         {
           "license": {
-            "id": "MIT"
+            "id": "AGPL-3.0-only"
           }
         }
       ],
@@ -66,7 +66,7 @@
         "value": "与 SPDX 面同源；timestamp 取仓内声明日期最大值（非墙钟）。"
       }
     ],
-    "timestamp": "2026-10-25T00:00:00Z",
+    "timestamp": "2026-10-26T00:00:00Z",
     "tools": [
       {
         "name": "nf interop --kind cyclonedx",

@@ -5,7 +5,8 @@
 
 ## 一、如何私密报告
 
-请用 **GitHub Security Advisories** 的私密通道报告（仓库页 → Security → Report a vulnerability）。
+请用 **GitHub Security Advisories** 的私密通道报告：
+<https://github.com/Monyeah777/NinFenz/security/advisories/new>。
 不要用公开 Issue 报安全问题——公开 Issue 会触发**云端代收站**的自动入库机器人（见下），
 等于把细节先公开分发一次。
 

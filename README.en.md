@@ -1,5 +1,7 @@
 # NinFenz · Documentation Workshop (spec-driven)<sub>文档生成工坊（规范驱动）</sub>
 
+[![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
+
 <!-- nf:locales -->
 <p align="center">
   <a href="README.md">简体中文</a> · <strong><a href="README.en.md">English</a></strong> · <a href="README.ja.md">日本语</a>
@@ -60,7 +62,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked. A single-file executable is shipped alongside.
 Details: `tui/README.md`.
 
-> MIT License · original open source · please cite the source when deriving/referencing
+> Layered dual licensing (code AGPL-3.0-only or commercial; spec text CC BY 4.0) · see `LICENSING.md` · please cite the source when deriving/referencing
 
 **In one sentence**: NF is a **content contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces long-form content"; narrative is only the first official domain package, while the protocol itself is domain-neutral and model-agnostic.
 
@@ -117,7 +119,7 @@ AI assembly:
 - **Which models are supported?** Model-agnostic: any text-capable AI can assemble and load the protocols; nothing is bound to a vendor or a connection protocol.
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
-- **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
+- **How do I cite it?** Code layer is AGPL-3.0-only (or commercial), spec text is CC BY 4.0 — see `LICENSING.md` for boundaries; please credit the source. Machine-readable metadata lives in `CITATION.cff` at the repository root.
 - **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
 
 ## Capabilities and assets

@@ -1,5 +1,7 @@
 # NinFenz · 文档生成工坊（规范驱动）<sub>Spec-driven documentation workshop</sub>
 
+[![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
+
 <!-- nf:locales -->
 <p align="center">
   <strong><a href="README.md">简体中文</a></strong> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本语</a>
@@ -59,7 +61,7 @@
 （无 TTY 亦可：`--list-actions --json` 给 agent 列动作与退出码）。命令在后台线程跑，运行中 `Ctrl-C` 只取消该命令；
 路径参数过仓库包含性判据、写盘需键入 `yes` 确认、密钥只从环境变量读并遮蔽显示。细节见 `tui/README.md`。
 
-> MIT License · 原创开源 · 衍生/引用请注明来源
+> 双许可（分层）· 代码 AGPL-3.0-only 或商业许可 · 协议文本 CC BY 4.0 · 见 `LICENSING.md`
 
 NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质量与资产标准；协议本身域中立、模型无关。
 
@@ -110,7 +112,7 @@ AI 装配：
 - **支持哪些模型？** 模型无关：任何能读文本的 AI 都能按协议装配与装载，不绑定某家模型或某个连接协议。
 - **必须联网吗？** 不必。仓库本身就是 markdown 源件；`bash verify.sh` 只读本地，可离线跑。
 - **产出怎么判合格？** 判据只来自内部链：verify 门禁（静态可核）+ 五维纵深自评 + 真实战例；外部评价不作为质量背书。
-- **怎么引用？** MIT 许可；引用请注明来源，机读元数据见仓库根引用文件（`CITATION.cff`）。
+- **怎么引用？** 代码层 AGPL-3.0-only（或商业许可），协议文本 CC BY 4.0；引用请注明来源，边界见 `LICENSING.md`，机读元数据见 `CITATION.cff`。
 - **出口与合规？** 密码学只走标准库 + 外部 `ssh-keygen`（不自制算法）；出口管制读法见 `docs/EXPORT.md`。
 
 ## 能力与资产

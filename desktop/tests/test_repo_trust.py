@@ -148,7 +148,9 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
-        with mock.patch.object(gate_engine, "ROOT", evil):
+        with (mock.patch.object(gate_engine, "ROOT", evil),
+              mock.patch.object(repo_trust, "trust_status",
+                                return_value=(False, "untrusted fixture"))):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
 

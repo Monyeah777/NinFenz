@@ -26,7 +26,7 @@
       "max_fn_lines": 36
     },
     "desktop/src/core/approval.py": {
-      "lines": 136,
+      "lines": 133,
       "max_fn_cc": 11,
       "max_fn_lines": 30
     },
@@ -226,7 +226,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 945,
+      "lines": 944,
       "max_fn_cc": 16,
       "max_fn_lines": 70
     },

@@ -162,14 +162,20 @@ python3 -m compileall -q desktop/src scripts
 - **Release 校验和**：发布资产随行 `sha256sum` 校验和文件（用户下载后可验完整性）。
 - **secret 扫描**：提交前自查常见 token 前缀（`ghp_` / `gho_` / `sk-` 等）；完整自动扫描入 ci-verify 为波 A 项（40 总纲 S8 全量，v2.7）。
 
-## 7. 贡献授权（inbound = outbound · DCO）
+## 7. 贡献授权（CLA · 双授权必需）
 
-> 依据：2026-10-10 全仓审计 §11af（贡献者条款此前 DCO/CLA/inbound/outbound 全 0）。
+> 依据：`STRATEGY.md §四`、`LICENSING.md §6`；双授权需要贡献者**明示授权**作者以商业/专有许可再许可。
 
-- **inbound = outbound**：你提交到本仓库的任何贡献（代码 / 文档 / 协议补丁 / 社区包）均按本仓库的
-  **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
-- **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
-  条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
+- **inbound = outbound（Z6 口径）**：你提交的贡献以**项目当前许可**（代码层 AGPL-3.0-only）发布；**商业再许可**不靠该口径，而由 CLA §2.3 单独明示授权。
+- **必须签署 CLA**：贡献者需签署 `CLA.md`（改编自 **Harmony Combined Contributor Agreement v1.0 · Option Five**）。
+  其 §2.3 原文：*"We may license the Contribution under any license, including copyleft, permissive,
+  **commercial, or proprietary** licenses."* —— 这是商业闭源再许可的**唯一**合法授权来源。
+  签署方式见 `CLA.md` 的 SUBMISSION_INSTRUCTIONS（CLA Assistant 机器人回复一句话即可）。
+- **DCO 不是授权工具**：DCO 只声明"我有权提交该作品"，其效果是把贡献按**项目当前许可**（AGPL）发布，
+  **不包含**商业再许可授权。本仓**不**用 DCO 承载商业授权（旧文案曾误写，2026-10-25 已纠正）。
+  仍建议 `git commit -s`（便于追溯作者与来源），但它是**补充**，不是替代 CLA 的授权。
+- **你保留版权**；CLA 是**许可**（非版权转让，本仓采用 License 版而非 Assignment 版）。
+- **实体贡献**：受雇期间产出需雇主签 Entity 版本（`CLA.md` 已含 Entity 条款）。
 - **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
   或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
 - **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，

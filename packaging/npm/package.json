@@ -1,6 +1,6 @@
 {
   "name": "ninfenz",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "mcpName": "io.github.Monyeah777/ninfenz",
   "description": "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. One-click launcher for the NF CLI (offline, MIT).",
   "keywords": [
@@ -19,7 +19,7 @@
     "merkle",
     "reproducible"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "engines": {
     "node": ">=18.17"
