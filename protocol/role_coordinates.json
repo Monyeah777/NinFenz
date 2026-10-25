@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1439,
+    "app": 1444,
     "entry": 26,
     "floor": 5,
     "prod": 1041,
     "projection": 130,
     "support": 251,
-    "verify": 958
+    "verify": 959
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8573,6 +8573,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "公开仓发布边界：决策 / 交接 / 复盘三类内部材料**只能留模板**。",
+      "path": "desktop/tests/test_publish_boundary.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M3 —— 纯度体检 check27 单测（四规则 + 变异注入捕获力 = check 的 check）。",
       "path": "desktop/tests/test_purity_scan.py",
       "role": "verify",
@@ -12036,16 +12042,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "706f4fecc829a62662e6edac99f481dd4166b884c2bc2ba42ea97df0870b7cf5",
+  "root_digest": "415d331c3acc60095fbbc5c0d3f514bfb6dface496f1a6c0ee7d1f06cdcf7e2e",
   "rule_counts": {
-    "R-app": 1439,
+    "R-app": 1444,
     "R-catch": 108,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 115,
     "R-support": 117,
-    "R-verify": 841,
+    "R-verify": 842,
     "auto:R-core": 255
   },
   "schema": "nf-role-coordinates/1"

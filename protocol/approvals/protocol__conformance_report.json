@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-25",
   "approved_by": "Monyeah777",
-  "note": "安全收口与发布边界迁移后最终冻结",
+  "note": "安全与发布边界收口最终冻结",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5e803f1e41ed37c1dfd12647e4cfb51385e1d4e7278c76f96db2bf3bdcb49ff4"

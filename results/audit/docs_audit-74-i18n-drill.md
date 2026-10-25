@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:6bc367c494fdeda5c21a43b16023ecd2d04e8fff0b52b813ac5e739900b42cb6
+  - protocol/locales.json:f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:aac67632da41255a98dafba6eefe7b6b46dd4d999d4fab84bf7bb3e641a8c3ef
 ---
+> 重审（2026-10-25）：安全与发布边界收口：译件、角色坐标、回执和验证报告最终重签
+
 > 重审（2026-10-25）：安全收口：仓库信任根收紧、IPC/MCP/插件/投稿读取资源上限与路径包含性加固重审
 
 > 重审（2026-10-25）：D1 常量时间比较 + N2/L2 发布面白名单化
