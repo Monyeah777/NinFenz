@@ -8,7 +8,7 @@
 #
 # 发新版时：把 NF_VERSION 与 packaging/npm/package.json 的 version 同步；release 链已判两处一致性。
 FROM node:22-slim AS nfpayload
-ARG NF_VERSION=1.0.5
+ARG NF_VERSION=1.1.0
 WORKDIR /tmp/nf
 RUN npm pack "ninfenz@${NF_VERSION}" \
  && tar -xzf ninfenz-*.tgz \

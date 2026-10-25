@@ -41,7 +41,7 @@ from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回
 from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
 interp_diet.restore()
 
-NF_CLI_VERSION = "1.0.5"
+NF_CLI_VERSION = "1.1.0"
 NF_CLI_EPILOG = (
     "入门：\n"
     "  nf shell              # 交互终端（能力菜单 + 命令直通；端壳退役后的人机入口）\n"

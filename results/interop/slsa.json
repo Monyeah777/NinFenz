@@ -236,7 +236,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "023af41067c59d83",
+        "invocationId": "c36099f557b8b544",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -545,7 +545,7 @@
     },
     {
       "digest": {
-        "sha256": "db80976e922b08cc9becac78512326ec49ee02795a6274ae20c84c9ad3d00887"
+        "sha256": "0c310bbf890681b77b2155f99235c9d592163104c7d6193a7b0578ed6dae2e42"
       },
       "name": "protocol/mcp_package.json"
     },

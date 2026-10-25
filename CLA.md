@@ -159,7 +159,7 @@ Agreement or any limited remedy to the maximum extent possible under law.
    - 个人：`I have read the NinFenz CLA and I hereby sign the CLA`
    - 实体：`I have read the NinFenz CLA and I hereby sign the CLA on behalf of <公司名>`
 2. 未接机器人时：把填好的本文件（姓名/地址/日期/签名）发到 `MAINTAINERS.md` 列出的维护者邮箱。
-3. 签署记录留档（PR 链接 + 签署时间 + CLA 版本号），供日后追溯。
+3. 签署记录留档在仓库内 `signatures/version1/cla.json`（PR 链接 + 时间 + 版本号），随 git 历史可审计、可迁移。
 
 ## NONOWNER_INSTRUCTIONS · 非完整版权情形
 

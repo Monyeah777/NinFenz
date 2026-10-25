@@ -1,0 +1,63 @@
+name: cla
+# 贡献者许可协议（CLA）门禁：PR 必须签署 CLA.md 才可合并。
+# 依据：LICENSING.md §6（双授权需要贡献者明示授权作者以商业/专有许可再许可）。
+# 实现：CLA Assistant Lite（GitHub Action 版，无需安装 App/无需外网服务）——
+#   签署记录以 JSON 形式提交到本仓 signatures/version1/cla.json，可审计、可迁移。
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: write          # 允许重跑
+  contents: write         # 写 signatures/version1/cla.json
+  pull-requests: write    # 在 PR 上留言
+  statuses: write         # 回写 CLA 状态检查
+
+jobs:
+  cla-assistant:
+    name: cla-assistant
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # 只在相关事件上跑（评论只处理签署/重签指令），避免无谓消耗
+    if: |
+      (github.event_name == 'pull_request_target') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request &&
+       (contains(github.event.comment.body, 'recreate cla-file') ||
+        contains(github.event.comment.body, 'I have read the NinFenz CLA')))
+    steps:
+      - name: CLA Assistant
+        uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08  # v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: 'signatures/version1/cla.json'
+          path-to-document: 'https://github.com/Monyeah777/NinFenz/blob/main/CLA.md'
+          branch: 'main'
+          # 作者本人、机器人、以及历史贡献者（v1.0.5 及更早的 MIT 贡献无需 CLA）免签
+          allowlist: 'Monyeah777,dependabot[bot],renovate[bot],github-actions[bot]'
+          custom-pr-sign-comment: 'I have read the NinFenz CLA and I hereby sign the CLA'
+          custom-notsigned-prcomment: |
+            感谢贡献！本仓库采用**双许可**（代码 AGPL-3.0-only 或商业许可），因此需要你签署贡献者许可协议（CLA）。
+            请回复下面这句话以完成签署：
+
+            > I have read the NinFenz CLA and I hereby sign the CLA
+
+            个人贡献者请用上面这句；代表公司贡献的请回复：
+
+            > I have read the NinFenz CLA and I hereby sign the CLA on behalf of <公司名>
+
+            为什么必须签：`CLA.md` 第 2.3 条（Harmony Option Five）是你授权本项目以**商业/专有许可**再许可的唯一来源；
+            DCO 只声明"有权提交"，**不含**商业再许可授权。详见 `LICENSING.md §6` 与 `CONTRIBUTING.md §7`。
+          custom-signed-prcomment: |
+            已记录你的 CLA 签署 ✅（`signatures/version1/cla.json`）。
+            你保留贡献的版权；本项目据此可在 AGPL-3.0-only 与商业许可下分发该贡献。
+          custom-pr-sign-comment-on-behalf-of: 'I have read the NinFenz CLA and I hereby sign the CLA on behalf of'
+          signed-commit-message: 'chore(cla): 记录贡献者签署 ($contributor)'
+          lock-pullrequest-aftermerge: true
