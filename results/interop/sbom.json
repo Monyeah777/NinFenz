@@ -16,8 +16,8 @@
       "SPDXID": "SPDXRef-Package-ninfenz",
       "copyrightText": "NOASSERTION",
       "downloadLocation": "NOASSERTION",
-      "licenseConcluded": "MIT",
-      "licenseDeclared": "MIT",
+      "licenseConcluded": "AGPL-3.0-only",
+      "licenseDeclared": "AGPL-3.0-only",
       "name": "NinFenz",
       "versionInfo": "v2.30"
     },
