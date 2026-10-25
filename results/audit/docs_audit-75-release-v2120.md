@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:396370e4e6e59ef652de09ccbcf4ef283d8db747bcbf3bcb8d52d133d73dd2c0
+  - CHANGELOG.md:268de0c2922c0f6c4cb85f30e2609b8936554edb295c915760451c23b4055e65
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
   - README.md:f925660a6f4fda6eb544037afb83962b37bce476741ae0ac75eed25d49354a7b
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:14c48492f9c92cbf2a79b47ff97a035bfc7e4e744fd88badeeab583e04331918
+  - scripts/nf.py:67269637feaa44867cf01bc3ec44853788c5ab40a2b798c479cde66892e8c926
 
 ---
+> 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
+
 > 重审（2026-10-25）：准据法与争议解决 + 法律依据
 
 > 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价
