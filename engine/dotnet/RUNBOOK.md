@@ -28,7 +28,7 @@ python -c "import sys;sys.path.insert(0,'desktop/src');from core import engine_l
 > 缺它时 ILC 报 `Platform linker not found`（ILCompiler 8.0.31）；`dotnet build` 本身零警告零错误。
 > 本机装 VS Build Tools（`VC.Tools.x86.x64` + `Windows11SDK.22621`）后 **publish 成功**：产出
 > `nf_engine_native.dll`（1.1 MB），`engine_loader.engine_abi(...)` → **1**（真 dlopen + 调 C ABI），
-> `python scripts/engine_status.py` 列出该候选库。产物落 `engine/dotnet/dist/`（`.gitignore` 的 `dist/`，不入库）。
+> `python scripts/engine_status.py` 列出该候选库。产物落 engine/dotnet/dist/ 目录（该目录被 .gitignore 的 dist/ 规则忽略，**不入库**，故不存在于干净检出中——本行刻意不用反引号，避免被`test_doc_reachability` 当成必须存在的路径）。
 > 本件是**独立的"原生出口壳"**，不改 `Nf.Engine` 主库的 **BCL-only** 依赖姿态（ADR-0005）。
 
 
