@@ -5,7 +5,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
-import { ALLOW_DIRS, EXCLUDE_DIRS, EXCLUDE_ANY, EXCLUDE_FILES } from './payload-policy.mjs';
+import { ALLOW_DIRS, EXCLUDE_DIRS, EXCLUDE_ANY, EXCLUDE_FILES,
+         INTERNAL_DIRS, INTERNAL_ROOT_FILES } from './payload-policy.mjs';
 
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
@@ -44,11 +45,13 @@ function keep(rel) {
   if (rel.split('/').some(function (seg) { return seg.startsWith('.'); })) return false;
   const parts = rel.split('/');
   if (parts.length === 1) {
-    // 顶层文件：扁平面全收（逐件可 review），只拒点名残留件
+    // 顶层文件：扁平面全收（逐件可 review），只拒点名残留件与内部治理件
     if (EXCLUDE_FILES.indexOf(rel) >= 0) return false;
+    if (INTERNAL_ROOT_FILES.indexOf(rel) >= 0) return false;
   } else {
     // 顶层目录：**默认拒绝**——不在白名单里就不进包（N2/L2 的根因修法）
     if (ALLOW_DIRS.indexOf(parts[0] + '/') < 0) return false;
+    if (INTERNAL_DIRS.indexOf(parts[0] + '/') >= 0) return false;   // 内部治理内容不进包
     // 白名单内部仍需排除的子面（专有夹具等，见 EXCLUDE_DIRS 注释）
     for (const d of EXCLUDE_DIRS) if (rel.startsWith(d)) return false;
   }
