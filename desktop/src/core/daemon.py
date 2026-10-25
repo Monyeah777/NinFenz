@@ -29,6 +29,7 @@
 from __future__ import annotations
 
 import contextlib
+import hmac
 import io
 import json
 import os
@@ -516,7 +517,11 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except (ValueError, OSError, UnicodeDecodeError) as exc:
         send_framed(conn, 2, b"", ("请求不可读：%s\n" % exc).encode("utf-8"))
         return False
-    if req.get("token") != token:
+    # D1（2026-10-22 安全审计）：令牌是**唯一信任边界**，比较必须常量时间。
+    # 同时拒绝非字符串形态（旧实现里 `!=` 对 dict/list 只是"不相等"，语义上等于合法比较，
+    # 但会把"类型错"混进"令牌错"，诊断面就分不清）。
+    got_token = req.get("token")
+    if not isinstance(got_token, str) or not hmac.compare_digest(got_token, token):
         # 回环不是信任边界：无令牌（或令牌不符）一律拒绝执行
         send_framed(conn, 2, b"", "令牌缺失或不符：拒绝执行"
                                   "（修复指引：用 scripts/nf 启动器，或 nf daemon status）\n"
