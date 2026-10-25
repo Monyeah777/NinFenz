@@ -23,3 +23,6 @@ ruff==0.16.8 \
     --hash=sha256:d075e820af612102ce217f07cc93e69f9490b10ec13ea85fa87bd03d996cef8a \
     --hash=sha256:efa3e7a16d1baaa79957888dfdf8be9ef2e44db81cb032af06d76632ab59e773
     # via -r .github/requirements-lint.txt
+
+# REUSE 3.3 compliance checker (manual pin; no hash chain yet, no dependencies)
+reuse==6.2.0

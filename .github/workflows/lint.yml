@@ -78,6 +78,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: 安装 REUSE（钉版本）
-        run: pip install reuse==6.2.0
+        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: REUSE lint（Spec 3.3）
         run: reuse lint
