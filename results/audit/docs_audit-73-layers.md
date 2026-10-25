@@ -2,7 +2,7 @@
 id: AUD-0025
 title: 抽象阶梯 v2 落地 —— 两轴 + 纵切 + 适应度函数（契约/资产/引擎/出口 × 入口面 × 验证纵切）
 date: 2026-09-26
-scope: 作者指令「对标顶尖架构设计再改一版」。把 NF 的分层从「混装的梯子」收成两轴 + 纵切，并落成有判据的协议件：真源 protocol/LAYERS.json + 语义判据 core/layer_model.py（并入 check27 R7）+ 生成投影 docs/layers.md + ADR-0004。外部只作机制借鉴（多视图描述 / 稳定依赖与依赖倒置 / 适应度函数 / 单一真源+生成投影 / ADR / 退役治理），开工依据全部来自仓库内部差距实证（见正文），不作立项理由或质量背书（STRATEGY §3.2/§3.3）。
+scope: 作者指令「对标顶尖架构设计再改一版」。把 NF 的分层从「混装的梯子」收成两轴 + 纵切，并落成有判据的协议件（2026-10-25：ADR-0004 随决策外置迁私有仓，见 decisions/ADR-0000；本审计保留其余被审对象）：真源 protocol/LAYERS.json + 语义判据 core/layer_model.py（并入 check27 R7）+ 生成投影 docs/layers.md + ADR-0004。外部只作机制借鉴（多视图描述 / 稳定依赖与依赖倒置 / 适应度函数 / 单一真源+生成投影 / ADR / 退役治理），开工依据全部来自仓库内部差距实证（见正文），不作立项理由或质量背书（STRATEGY §3.2/§3.3）。
 verdict: pass
 auditor: 本轮执行者
 subjects:
@@ -18,12 +18,17 @@ subjects:
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/glossary.json:4561ddb5a221f8fc5beca4cfcca07580b3ea4dd403eb23434549a8eaa8409a60
+  - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-25）：术语 used_in 改指在场件
+
+> 重审（2026-10-25）：glossary/daemon 收尾修正
+
+> 重审（2026-10-25）：ADR-0004 迁私有仓：AUD-0025 移除该被审对象
+
 > 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
 
 > 重审（2026-10-24）：夜间收口：Rust worker 安全、投稿配额、元数据、schema 与 postmortem 跨平台回执路径修复后按新输入重绑

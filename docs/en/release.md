@@ -17,7 +17,7 @@ python scripts/nf.py release --freeze --apply --by <approver> --note "<wave note
 
 ## Freeze chain
 
-The order must not be reversed (see `decisions/ADR-0005-新增NET引擎线.md` and the PO-0001 postmortem): content frozen → conformance report recomputed → content-bound approval → protocol receipts re-signed.
+The order must not be reversed (see `decisions/ADR-0000-决策记录外置到私有仓.md` and the PO-9000 postmortem template): content frozen → conformance report recomputed → content-bound approval → protocol receipts re-signed.
 
 1. `python scripts/nf.py conformance --write` (produces `protocol/conformance_report.json`, must be `conformant`)
 2. `nf approve protocol/conformance_report.json --by <approver> --note <note>` (content-bound; invalidated the moment the object changes)

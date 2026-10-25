@@ -6,9 +6,9 @@
   "credentialSubject": {
     "contracts": 27,
     "id": "nf:conformance_report",
-    "receiptCount": 72,
-    "receiptRoot": "93ea375d58ce16561d269c44fef3557a94b89e19c07c727bdb25d5894e8f6180",
-    "verdict": "conformant"
+    "receiptCount": 67,
+    "receiptRoot": "f257fb2d42244401df67724fe883e8b96d932322d79da42298e9b97b609bd657",
+    "verdict": "non-conformant"
   },
   "issuer": "Monyeah777",
   "type": [

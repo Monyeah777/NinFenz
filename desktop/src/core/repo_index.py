@@ -22,8 +22,11 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 from core import json_doc
+from core import paths as _paths
 
 DEFAULT_TTL = 2.0
+#: 单件仓库正文读取上限（字节）：MCP/索引都是请求级读取，不允许外来大文件无界入内存。
+MAX_RESOURCE_BYTES = 8 << 20
 _MODULE_TITLE = re.compile(r"#\s*模块\s+([^\s·]+)")
 _ASSET_TOKEN = re.compile(r"[A-Z][A-Z0-9_]*")
 
@@ -45,6 +48,23 @@ def _stat(path: Path) -> Optional[Tuple[int, int]]:
     return (int(st.st_mtime_ns), int(st.st_size))
 
 
+def safe_path(root: str | Path, rel: str) -> Path:
+    """把仓库相对路径解析为 realpath；越根或符号链接逃逸一律抛 PathEscapeError。"""
+    return Path(_paths.validate_path(str(root), str(rel)))
+
+
+def read_text(root: str | Path, rel: str) -> str:
+    """仓库相对路径 → 有界 UTF-8 文本；越根、超大与非 UTF-8 一律 fail-closed。"""
+    path = safe_path(root, rel)
+    with path.open("rb") as fh:
+        raw = fh.read(MAX_RESOURCE_BYTES + 1)
+    if len(raw) > MAX_RESOURCE_BYTES:
+        raise ValueError(f"仓库文本超过上限 {MAX_RESOURCE_BYTES} 字节：{rel}"
+                         "（修复指引：拆分文件，或改用支持分页的产出面）")
+    text = raw.decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def _rel(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
 
@@ -52,7 +72,14 @@ def _rel(root: Path, path: Path) -> str:
 def _glob(root: Path, patterns: Iterable[str]) -> List[str]:
     out: List[str] = []
     for pat in patterns:
-        out.extend(_rel(root, p) for p in sorted(root.glob(pat)) if p.is_file())
+        for p in sorted(root.glob(pat)):
+            try:
+                target = safe_path(root, _rel(root, p))
+            except (_paths.PathEscapeError, OSError, ValueError):
+                # 符号链接/连接点指向仓外时，索引不得把它登记成可读资源。
+                continue
+            if target.is_file():
+                out.append(_rel(root, p))
     return out
 
 
@@ -60,8 +87,9 @@ def _keys_of_file(path: Path) -> List[str]:
     """资产文件内登记的键（文件名令牌 ∪ 正文键声明）。与 mcp_runtime 同口径。"""
     keys = set(_ASSET_TOKEN.findall(path.stem))
     try:
-        head = path.read_text(encoding="utf-8")[:6000]
-    except OSError:
+        with path.open("rb") as fh:
+            head = fh.read(6000).decode("utf-8")
+    except (OSError, UnicodeDecodeError):
         return sorted(keys)
     keys.update(re.findall(r"`([A-Z][A-Z0-9_]{2,})`", head))
     keys.update(re.findall(r"\"([A-Z][A-Z0-9_]{2,})\"\s*:", head))
@@ -105,7 +133,10 @@ class RepoIndex:
         rel = entry.get("rel") or entry.get("path")
         if not rel:
             return True
-        return _stat(self.root / rel) == entry.get("stat")
+        try:
+            return _stat(safe_path(self.root, rel)) == entry.get("stat")
+        except (_paths.PathEscapeError, OSError, ValueError):
+            return False
 
     def _validate_all(self, name: str, build: Callable[[], Any],
                       stamp: Callable[[], Any]) -> Any:
@@ -117,17 +148,24 @@ class RepoIndex:
     # ------------------------------------------------------------ modules
     def _module_paths(self) -> List[str]:
         from core import conformance_scan as csc
-        return sorted(_rel(self.root, Path(p)) for p in csc._module_docs(str(self.root))
-                     if Path(p).is_file())
+        out = []
+        for p in csc._module_docs(str(self.root)):
+            try:
+                target = safe_path(self.root, _rel(self.root, Path(p)))
+            except (_paths.PathEscapeError, OSError, ValueError):
+                continue
+            if target.is_file():
+                out.append(_rel(self.root, Path(p)))
+        return sorted(out)
 
     def _build_modules(self) -> List[Dict[str, Any]]:
         from core import conformance_scan as csc
         out: List[Dict[str, Any]] = []
         for rel in self._module_paths():
-            path = self.root / rel
+            path = safe_path(self.root, rel)
             try:
-                text = path.read_text(encoding="utf-8")
-            except OSError:
+                text = read_text(self.root, rel)
+            except (OSError, UnicodeError, ValueError):
                 # 索引不收录不可读模块；MCP 读取会按未命中返回明确错误。
                 continue
             parsed = csc._fence_yaml(text, "machine_contract")
@@ -180,10 +218,10 @@ class RepoIndex:
     def _build_pipelines(self) -> List[Dict[str, Any]]:
         out = []
         for rel in self._pipeline_paths():
-            path = self.root / rel
+            path = safe_path(self.root, rel)
             try:
-                text = path.read_text(encoding="utf-8")
-            except OSError:
+                text = read_text(self.root, rel)
+            except (OSError, UnicodeError, ValueError):
                 # 索引不收录不可读管线；读取会按未命中返回明确错误。
                 continue
             out.append({"id": path.name.split("_", 1)[0], "rel": rel,
@@ -218,7 +256,7 @@ class RepoIndex:
     def _build_assets(self) -> List[Dict[str, Any]]:
         out = []
         for rel in self._asset_paths():
-            path = self.root / rel
+            path = safe_path(self.root, rel)
             keys = _keys_of_file(path)
             if not keys:
                 continue
@@ -253,9 +291,18 @@ class RepoIndex:
 
     def _build_library(self) -> Dict[str, Any]:
         from core import library as nflib
-        rows = nflib.entries(str(self.root))
+        from core.library_entries import read_entry
+        rows = []
+        for rel in self._library_paths():
+            path = safe_path(self.root, rel)
+            if path.stat().st_size > MAX_RESOURCE_BYTES:
+                continue
+            rows.append(read_entry(str(path)))
         for row in rows:
-            row["stat"] = _stat(self.root / row["path"])
+            row["path"] = _rel(self.root, Path(row["path"]))
+        for row in rows:
+            row["stat"] = _stat(safe_path(self.root, row["path"]))
+        rows.sort(key=lambda e: e["id"])
         by_id = {str(r["id"]).lower(): r for r in rows}
         index = nflib.build_index(str(self.root), rows=rows)
         return {"rows": rows, "by_id": by_id, "index": index}
@@ -318,10 +365,10 @@ class RepoIndex:
         from core.library_entries import parse_frontmatter
         out = []
         for rel in self._pattern_paths():
-            path = self.root / rel
+            path = safe_path(self.root, rel)
             try:
-                text = path.read_text(encoding="utf-8")
-            except OSError:
+                text = read_text(self.root, rel)
+            except (OSError, UnicodeError, ValueError):
                 # 索引不收录不可读实践包；读取会按未命中返回明确错误。
                 continue
             fm, _body = parse_frontmatter(text)
@@ -351,7 +398,7 @@ class RepoIndex:
     # ----------------------------------------------------------- registry
     def registry(self) -> Dict[str, Any]:
         rel = "desktop/src/core/registry.json"
-        path = self.root / rel
+        path = safe_path(self.root, rel)
 
         def build():
             return json_doc.load(path, dict, what=rel)
@@ -361,20 +408,18 @@ class RepoIndex:
     # -------------------------------------------------------------- docs
     def _doc_paths(self) -> List[str]:
         root = self.root
-        out = []
-        for p in sorted(root.glob("*.md")):
-            if p.name.startswith(("0", "4")) or p.name[:2].isdigit():
-                out.append(p.name)
+        out = [rel for rel in _glob(root, ("*.md",))
+               if Path(rel).name.startswith(("0", "4")) or Path(rel).name[:2].isdigit()]
         out.extend(_glob(root, ("docs/*.md", "community/*/README.md")))
         return out
 
     def _build_docs(self) -> List[Dict[str, Any]]:
         out = []
         for rel in self._doc_paths():
-            path = self.root / rel
+            path = safe_path(self.root, rel)
             try:
-                text = path.read_text(encoding="utf-8")
-            except OSError:
+                text = read_text(self.root, rel)
+            except (OSError, UnicodeError, ValueError):
                 # 文档索引只收可读件；不可读件由文档门禁报告。
                 continue
             out.append({"path": rel, "title": md_title(text), "stat": _stat(path)})
@@ -432,6 +477,8 @@ class RepoIndex:
         if len(parts) < 4 or parts[0] != "nf:" or parts[2] != "repo":
             raise KeyError(uri)
         kind = parts[3]
+        if kind != "asset" and len(parts) != 5:
+            raise KeyError(uri)
         if kind == "library":
             eid = _up.unquote(parts[4])
             hit = self.library_entry(eid)
@@ -454,6 +501,8 @@ class RepoIndex:
                 raise KeyError(uri)
             return hit["rel"]
         if kind == "asset":
+            if len(parts) != 6:
+                raise KeyError(uri)
             package = _up.unquote(parts[4])
             key = _up.unquote(parts[5])
             hits = self.asset_matches(key, package)
@@ -486,4 +535,4 @@ def clear(root: Optional[str | Path] = None) -> None:
         _INDEXES.pop(str(Path(root).resolve()), None)
 
 
-__all__ = ["RepoIndex", "clear", "get", "md_title"]
+__all__ = ["RepoIndex", "clear", "get", "md_title", "read_text", "safe_path"]

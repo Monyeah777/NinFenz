@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Nf.Engine;
 
@@ -28,6 +29,11 @@ public static class McpServer
     private const int InvalidParams = -32602;
     private const int InternalError = -32603;
     private const int UnsupportedProtocolVersion = -32022;
+    internal const int MaxRequestChars = 8 * 1024 * 1024;
+    private const int MaxArgs = 8;
+    private const int MaxArgChars = 4096;
+    private const int MaxArrayItems = 128;
+    private const int MaxToolTextBytes = 8 * 1024 * 1024;
 
     public const string ServerName = "nf-dotnet-engine";
     public const string ServerVersion = "0.1.0";
@@ -79,7 +85,7 @@ public static class McpServer
         }
         return new Dictionary<string, object?>(StringComparer.Ordinal)
         {
-            ["type"] = "object", ["properties"] = props,
+            ["type"] = "object", ["properties"] = props, ["additionalProperties"] = false,
         };
     }
 
@@ -224,12 +230,18 @@ public static class McpServer
             !parameters.TryGetProperty("name", out var nameElement) || nameElement.ValueKind != JsonValueKind.String)
             throw new ArgumentException("tools/call 需 params{name, arguments}");
         var name = nameElement.GetString()!;
-        var args = parameters.TryGetProperty("arguments", out var a) && a.ValueKind == JsonValueKind.Object ? a : default;
-
         if (Tools.All(t => t.Name != name))
         {
             throw new ArgumentException($"未知工具：{name}（只读工具面 = {string.Join("、", Tools.Select(t => t.Name).OrderBy(x => x, StringComparer.Ordinal))}）");
         }
+        var args = default(JsonElement);
+        if (parameters.TryGetProperty("arguments", out var a) && a.ValueKind != JsonValueKind.Null)
+        {
+            if (a.ValueKind != JsonValueKind.Object)
+                throw new ArgumentException("arguments 须为对象（修复指引：按 inputSchema 传 {name: value}）");
+            args = a;
+        }
+        ValidateArguments(name, args);
 
         object? payload = name switch
         {
@@ -613,7 +625,7 @@ public static class McpServer
         {
             keys.Add(m.Value);
         }
-        var text = new System.Text.UTF8Encoding(false).GetString(File.ReadAllBytes(file));
+        var text = new System.Text.UTF8Encoding(false).GetString(ReadToolBytes(file));
         var head = text.Length > 6000 ? text[..6000] : text;
         foreach (var pattern in new[] { "`([A-Z][A-Z0-9_]{2,})`", "\"([A-Z][A-Z0-9_]{2,})\"\\s*:", "##\\s*([A-Z][A-Z0-9_]{2,})" })
         {
@@ -627,6 +639,7 @@ public static class McpServer
 
     private static List<Dictionary<string, object?>> AssetLs(string root, string package)
     {
+        RequireSafePackage(package);
         var patterns = package.Length > 0
             ? new[] { $"community/{package}/assets/*.md" }
             : new[] { "community/*/assets/*.md", "05_资产库/用户自定义/*.md" };
@@ -636,9 +649,18 @@ public static class McpServer
             foreach (var file in Assertions.Glob(root, pattern))
             {
                 if (Path.GetFileName(file) == "README.md") continue;
+                var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
+                try
+                {
+                    _ = RepoPath(root, rel, "资产路径");
+                }
+                catch (ArgumentException)
+                {
+                    // 越根项不得进入列出面，更不能被随后的键扫描读取。
+                    continue;
+                }
                 var keys = AssetKeysOfFile(file);
                 if (keys.Count == 0) continue;
-                var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
                 rows.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
                 {
                     ["package"] = rel.StartsWith("community/", StringComparison.Ordinal) ? rel.Split('/')[1] : "官方",
@@ -652,6 +674,7 @@ public static class McpServer
 
     private static Dictionary<string, object?> AssetGet(string root, string key, string package)
     {
+        RequireSafePackage(package);
         var req = key.Trim();
         var patterns = package.Length > 0
             ? new[] { $"community/{package}/assets/*.md" }
@@ -662,8 +685,9 @@ public static class McpServer
             foreach (var file in Assertions.Glob(root, pattern))
             {
                 if (Path.GetFileName(file) == "README.md") continue;
-                if (!AssetKeysOfFile(file).Contains(req, StringComparer.Ordinal)) continue;
                 var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
+                _ = RepoPath(root, rel, "资产路径");
+                if (!AssetKeysOfFile(file).Contains(req, StringComparer.Ordinal)) continue;
                 hits.Add((rel.StartsWith("community/", StringComparison.Ordinal) ? rel.Split('/')[1] : "官方", rel));
             }
         }
@@ -687,11 +711,149 @@ public static class McpServer
     private static List<string> DictList(Dictionary<string, object?> map, string key)
         => map.TryGetValue(key, out var value) && value is List<string> list ? list : new List<string>();
 
+    private static void ValidateArguments(string toolName, JsonElement args)
+    {
+        if (args.ValueKind == JsonValueKind.Undefined)
+            return;
+        if (args.ValueKind != JsonValueKind.Object)
+            throw new ArgumentException("arguments 须为对象");
+        var properties = args.EnumerateObject().ToList();
+        if (properties.Count > MaxArgs)
+            throw new ArgumentException($"工具 {toolName} 参数过多（{properties.Count} > {MaxArgs}）");
+        var schema = Tools.First(t => t.Name == toolName).Schema;
+        var allowed = (Dictionary<string, object?>)schema["properties"]!;
+        foreach (var property in properties)
+        {
+            if (!allowed.TryGetValue(property.Name, out var rawRule))
+                throw new ArgumentException($"工具 {toolName} 不接受参数 {property.Name}（修复指引：按 inputSchema 传参）");
+            var rule = rawRule as Dictionary<string, object?>;
+            var expected = rule is not null && rule.TryGetValue("type", out var type) ? type as string : null;
+            ValidateArgumentValue(toolName, property.Name, property.Value, expected);
+        }
+    }
+
+    private static void ValidateArgumentValue(string toolName, string name, JsonElement value,
+                                              string? expected)
+    {
+        switch (expected)
+        {
+            case "string":
+                if (value.ValueKind != JsonValueKind.String)
+                    throw new ArgumentException($"工具 {toolName} 参数 {name} 须为字符串");
+                RequireArgText(toolName, name, value.GetString()!);
+                return;
+            case "boolean":
+                if (value.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+                    throw new ArgumentException($"工具 {toolName} 参数 {name} 须为布尔");
+                return;
+            case "array":
+                if (value.ValueKind != JsonValueKind.Array)
+                    throw new ArgumentException($"工具 {toolName} 参数 {name} 须为数组");
+                if (value.GetArrayLength() > MaxArrayItems)
+                    throw new ArgumentException($"工具 {toolName} 参数 {name} 数组过长");
+                foreach (var item in value.EnumerateArray())
+                {
+                    if (item.ValueKind != JsonValueKind.String)
+                        throw new ArgumentException($"工具 {toolName} 参数 {name} 只能包含字符串");
+                    RequireArgText(toolName, name, item.GetString()!);
+                }
+                return;
+            default:
+                throw new ArgumentException($"工具 {toolName} 参数 {name} 的声明类型未知");
+        }
+    }
+
+    private static void RequireArgText(string toolName, string name, string text)
+    {
+        if (text.Length > MaxArgChars)
+            throw new ArgumentException($"工具 {toolName} 参数 {name} 超长（{text.Length} > {MaxArgChars}）");
+        if (text.Any(ch => char.IsControl(ch)))
+            throw new ArgumentException($"工具 {toolName} 参数 {name} 含控制字符");
+    }
+
+    private static void RequireSafePackage(string package)
+    {
+        if (package.Length == 0)
+            return;
+        if (package.Length > 128 || package.IndexOfAny(new[] { '/', '\\', ':', '*', '?' }) >= 0 ||
+            package is "." or "..")
+            throw new ArgumentException("package 必须是单个包目录名（不含路径分隔符与通配符）");
+    }
+
+    private static string RepoPath(string root, string rel, string label)
+    {
+        if (string.IsNullOrWhiteSpace(rel) || rel.Any(ch => char.IsControl(ch)))
+            throw new ArgumentException($"{label} 为空或含控制字符");
+        if (Path.IsPathRooted(rel) || rel.StartsWith("~", StringComparison.Ordinal) ||
+            Regex.IsMatch(rel, @"^[A-Za-z]:(?![\\/])") || rel.StartsWith("\\\\", StringComparison.Ordinal))
+            throw new ArgumentException($"{label} 不接受绝对路径/盘符相对写法：{rel}");
+        if (rel.Contains(':') || Regex.IsMatch(rel, @"\.[A-Za-z0-9]{1,8}:[^\\/\s]"))
+            throw new ArgumentException($"{label} 不接受 NTFS 备用数据流写法：{rel}");
+        var parts = rel.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Any(part => part == ".."))
+            throw new ArgumentException($"{label} 含 .. 越界段：{rel}");
+        if (parts.Any(part => Regex.IsMatch(
+                part, @"^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.[^.]*)?$")))
+            throw new ArgumentException($"{label} 指向 Windows 设备名：{rel}");
+        var rootFull = Path.GetFullPath(root);
+        var full = Path.GetFullPath(Path.Combine(rootFull,
+            rel.Replace('/', Path.DirectorySeparatorChar)));
+        var prefix = rootFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                     + Path.DirectorySeparatorChar;
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        if (!full.Equals(rootFull, comparison) && !full.StartsWith(prefix, comparison))
+            throw new ArgumentException($"{label} 越出仓库根：{rel}");
+        if (File.Exists(full))
+        {
+            var target = ResolveExistingTarget(rootFull, full);
+            if (!target.Equals(rootFull, comparison) && !target.StartsWith(prefix, comparison))
+                throw new ArgumentException($"{label} 经符号链接越出仓库根：{rel}");
+        }
+        return full;
+    }
+
+    private static string ResolveExistingTarget(string rootFull, string full)
+    {
+        var current = rootFull;
+        var relative = Path.GetRelativePath(rootFull, full);
+        foreach (var part in relative.Split(
+                     new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
+                     StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (part == ".") continue;
+            current = Path.Combine(current, part);
+            FileSystemInfo info = Directory.Exists(current)
+                ? new DirectoryInfo(current)
+                : new FileInfo(current);
+            if (!info.Exists || info.LinkTarget is null) continue;
+            var resolved = info.ResolveLinkTarget(returnFinalTarget: true)?.FullName;
+            if (resolved is null) continue;
+            current = resolved;
+        }
+        return Path.GetFullPath(current);
+    }
+
+    private static byte[] ReadToolBytes(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
+                                          FileShare.ReadWrite | FileShare.Delete);
+        if (stream.Length > MaxToolTextBytes)
+            throw new ArgumentException(
+                $"仓库文本超过上限 {MaxToolTextBytes} 字节（修复指引：拆分文件）");
+        if (stream.Length > Array.MaxLength)
+            throw new ArgumentException("仓库文本长度超出运行时数组上限");
+        var raw = new byte[(int)stream.Length];
+        stream.ReadExactly(raw);
+        return raw;
+    }
+
     /// <summary>等价 Python <c>Path.read_text(encoding="utf-8")</c>：UTF-8 解码 + 通用换行归一；返回文本与归一后的字节数。</summary>
     private static (string Text, int Bytes) ReadRepoText(string root, string rel)
     {
-        var raw = new System.Text.UTF8Encoding(false).GetString(
-            File.ReadAllBytes(Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar))));
+        var full = RepoPath(root, rel, "资源路径");
+        var raw = new System.Text.UTF8Encoding(false).GetString(ReadToolBytes(full));
         var text = KnowledgeSig.Norm(raw);
         return (text, System.Text.Encoding.UTF8.GetByteCount(text));
     }
@@ -732,9 +894,7 @@ public static class McpServer
     /// 因为 MCP 消费方（外部 agent）的世界观是"这一个仓库"。
     /// </summary>
     private static string ResolvePath(string root, string rel)
-        => string.IsNullOrEmpty(rel) || Path.IsPathRooted(rel)
-            ? rel
-            : Path.Combine(root, rel.Replace('/', Path.DirectorySeparatorChar));
+        => RepoPath(root, rel, "工具路径");
 
     /// <summary>自述数字实算的机读面（与 CLI <c>stats --json</c> 同源；只实算一遍）。</summary>
     private static Dictionary<string, object?> RepoStatsPayload(string root)
@@ -830,7 +990,8 @@ public static class McpServer
         foreach (var doc in docs.OrderBy(d => Path.GetRelativePath(root, d).Replace('\\', '/'), StringComparer.Ordinal))
         {
             var rel = Path.GetRelativePath(root, doc).Replace('\\', '/');
-            var text = new System.Text.UTF8Encoding(false).GetString(File.ReadAllBytes(doc));
+            _ = RepoPath(root, rel, "模块路径");
+            var text = new System.Text.UTF8Encoding(false).GetString(ReadToolBytes(doc));
             var body = MiniYaml.ExtractFence(text, "machine_contract");
             string? mcId = null;
             if (body is not null)
@@ -882,17 +1043,18 @@ public static class McpServer
     private static Dictionary<string, object?> PipelineRead(string root, string pipeline)
     {
         var req = pipeline.Trim();
-        var candidate = Path.Combine(root, req.Replace('/', Path.DirectorySeparatorChar));
+        var candidate = RepoPath(root, req, "管线路径");
         if (req.EndsWith(".md", StringComparison.Ordinal) && File.Exists(candidate))
         {
             var allowed = req.StartsWith("03_管线库/", StringComparison.Ordinal) ||
                           req.Contains("/pipelines/", StringComparison.Ordinal);
             if (!allowed)
                 throw new ArgumentException("管线路径越界：只读 03_管线库 与 community/*/pipelines（修复指引：路径须指向仓库内管线件，如 03_管线库/P90….md）");
-            var (text, bytes) = ReadRepoText(root, req);
+            var safeRel = Path.GetRelativePath(root, candidate).Replace('\\', '/');
+            var (text, bytes) = ReadRepoText(root, safeRel);
             return new Dictionary<string, object?>(StringComparer.Ordinal)
             {
-                ["found"] = true, ["path"] = req, ["bytes"] = bytes, ["text"] = text,
+                ["found"] = true, ["path"] = safeRel, ["bytes"] = bytes, ["text"] = text,
             };
         }
 
@@ -931,9 +1093,10 @@ public static class McpServer
         {
             foreach (var file in Assertions.Glob(root, pattern))
             {
-                var text = new System.Text.UTF8Encoding(false).GetString(File.ReadAllBytes(file));
-                var title = MdTitle(text);
                 var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
+                _ = RepoPath(root, rel, "管线路径");
+                var text = new System.Text.UTF8Encoding(false).GetString(ReadToolBytes(file));
+                var title = MdTitle(text);
                 if (query.Length > 0 && !rel.Contains(query, StringComparison.Ordinal) &&
                     !title.Contains(query, StringComparison.Ordinal)) continue;
                 output.Add(new Dictionary<string, object?>(StringComparer.Ordinal)
@@ -1067,12 +1230,61 @@ public static class McpServer
             .Select(x => x.GetString()!).ToList();
     }
 
+    /// <summary>按行读取且有硬上限；超限只排空到行尾，不把整条恶意消息读进内存。</summary>
+    private sealed class BoundedLineReader
+    {
+        private readonly TextReader _reader;
+        private readonly int _maxChars;
+        private readonly char[] _buffer = new char[8192];
+        private int _position;
+        private int _length;
+
+        public BoundedLineReader(TextReader reader, int maxChars)
+        {
+            _reader = reader;
+            _maxChars = maxChars;
+        }
+
+        public string? ReadLine(out bool tooLong)
+        {
+            tooLong = false;
+            var line = new StringBuilder();
+            while (true)
+            {
+                if (_position >= _length)
+                {
+                    _length = _reader.Read(_buffer, 0, _buffer.Length);
+                    _position = 0;
+                    if (_length == 0)
+                        return line.Length == 0 ? null : line.ToString();
+                }
+                var ch = _buffer[_position++];
+                if (ch == '\n')
+                {
+                    if (line.Length > 0 && line[^1] == '\r')
+                        line.Length--;
+                    return line.ToString();
+                }
+                if (line.Length < _maxChars)
+                    line.Append(ch);
+                else
+                    tooLong = true;
+            }
+        }
+    }
+
     /// <summary>stdio 会话：逐行读 JSON-RPC、逐行写响应；stdout 只写 MCP 消息。</summary>
     public static int ServeStdio(string root, TextReader input, TextWriter output)
     {
-        string? line;
-        while ((line = input.ReadLine()) is not null)
+        var reader = new BoundedLineReader(input, MaxRequestChars);
+        while (reader.ReadLine(out var tooLong) is { } line)
         {
+            if (tooLong)
+            {
+                output.WriteLine(EncodeMessage(Err(root, ParseError, "Parse error", null, null)));
+                output.Flush();
+                continue;
+            }
             if (line.Trim().Length == 0) continue;
             JsonDocument doc;
             try
@@ -1106,7 +1318,8 @@ public static class McpServer
                 catch (Exception exc)
                 {
                     // 防御：**单条消息异常不许杀循环**（同 core/mcp_runtime.py 的 INTERNAL_ERROR 分支）
-                    response = Err(root, InternalError, "Internal error: " + exc.Message, idElement, null);
+                    _ = exc;
+                    response = Err(root, InternalError, "Internal error", idElement, null);
                 }
             }
             if (response is null) continue;
