@@ -4562,7 +4562,7 @@
         "reachable": true,
         "http_status": 200,
         "title": "SP 800-142, Practical Combinatorial Testing | CSRC",
-        "sha256_sample": "bb0c92c0a7c17a193fb3a2c32d7e8065b7290324141e2fbb2809a29b4b34aaa7",
+        "sha256_sample": "bb0c92c0a7c17a193fb3a2c32d7e8065b7290424141e2fbb2809a29b4b34aaa7",
         "probe_date": "2026-09-24",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
