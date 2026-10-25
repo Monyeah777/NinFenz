@@ -1,0 +1,462 @@
+﻿2026-10-25T07:16:46.0482510Z Current runner version: '2.338.0'
+2026-10-25T07:16:46.0506001Z ##[group]Runner Image Provisioner
+2026-10-25T07:16:46.0506884Z Hosted Compute Agent
+2026-10-25T07:16:46.0507777Z Version: 20261021.618
+2026-10-25T07:16:46.0508424Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-25T07:16:46.0509132Z Build Date: 2026-10-21T00:45:21Z
+2026-10-25T07:16:46.0509907Z Worker ID: {fcba77f7-92b9-4f60-8076-83be6c7e0a85}
+2026-10-25T07:16:46.0510679Z Region: westus3
+2026-10-25T07:16:46.0511241Z Cloud: Azure
+2026-10-25T07:16:46.0511767Z ##[endgroup]
+2026-10-25T07:16:46.0513035Z ##[group]Operating System
+2026-10-25T07:16:46.0513690Z Ubuntu
+2026-10-25T07:16:46.0514205Z 24.04.5
+2026-10-25T07:16:46.0514752Z LTS
+2026-10-25T07:16:46.0515257Z ##[endgroup]
+2026-10-25T07:16:46.0515834Z ##[group]Runner Image
+2026-10-25T07:16:46.0516532Z Image: ubuntu-24.04
+2026-10-25T07:16:46.0517100Z Version: 20261012.334.1
+2026-10-25T07:16:46.0518789Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-25T07:16:46.0520435Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-25T07:16:46.0521471Z ##[endgroup]
+2026-10-25T07:16:46.0522592Z ##[group]GITHUB_TOKEN Permissions
+2026-10-25T07:16:46.0524671Z Contents: read
+2026-10-25T07:16:46.0525236Z Metadata: read
+2026-10-25T07:16:46.0525783Z ##[endgroup]
+2026-10-25T07:16:46.0528021Z Secret source: Actions
+2026-10-25T07:16:46.0528926Z Cache mode: write
+2026-10-25T07:16:46.0529651Z Prepare workflow directory
+2026-10-25T07:16:46.0914124Z Prepare all required actions
+2026-10-25T07:16:46.0962378Z Getting action download info
+2026-10-25T07:16:46.4226545Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-25T07:16:46.5462331Z Download action repository 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-25T07:16:46.7085331Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-25T07:16:46.9531791Z Complete job name: unit-tests-12-of-32
+2026-10-25T07:16:47.0326824Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-25T07:16:47.0328476Z with:
+2026-10-25T07:16:47.0329121Z   persist-credentials: false
+2026-10-25T07:16:47.0329765Z   fetch-depth: 0
+2026-10-25T07:16:47.0330293Z   fetch-tags: true
+2026-10-25T07:16:47.0330873Z   repository: Monyeah777/NinFenz
+2026-10-25T07:16:47.0335325Z   token: ***
+2026-10-25T07:16:47.0335840Z   ssh-strict: true
+2026-10-25T07:16:47.0336440Z   ssh-user: git
+2026-10-25T07:16:47.0336953Z   clean: true
+2026-10-25T07:16:47.0337693Z   sparse-checkout-cone-mode: true
+2026-10-25T07:16:47.0338478Z   show-progress: true
+2026-10-25T07:16:47.0339002Z   lfs: false
+2026-10-25T07:16:47.0339564Z   submodules: false
+2026-10-25T07:16:47.0340125Z   set-safe-directory: true
+2026-10-25T07:16:47.0341359Z   allow-unsafe-pr-checkout: false
+2026-10-25T07:16:47.0342664Z env:
+2026-10-25T07:16:47.0343302Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:47.0344127Z ##[endgroup]
+2026-10-25T07:16:47.1516728Z Syncing repository: Monyeah777/NinFenz
+2026-10-25T07:16:47.1520353Z ##[group]Getting Git version info
+2026-10-25T07:16:47.1521756Z Working directory is '/home/runner/work/NinFenz/NinFenz'
+2026-10-25T07:16:47.1523591Z [command]/usr/bin/git version
+2026-10-25T07:16:47.1616079Z git version 2.55.0
+2026-10-25T07:16:47.1642076Z ##[endgroup]
+2026-10-25T07:16:47.1657135Z Temporarily overriding HOME='/home/runner/work/_temp/3af95d1e-20b3-4a4a-8a15-4e9c2ce31d18' before making global git config changes
+2026-10-25T07:16:47.1660325Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-25T07:16:47.1665016Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:16:47.1723716Z Deleting the contents of '/home/runner/work/NinFenz/NinFenz'
+2026-10-25T07:16:47.1732146Z ##[group]Initializing the repository
+2026-10-25T07:16:47.1736464Z [command]/usr/bin/git init /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:16:47.1825755Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-25T07:16:47.1828658Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-25T07:16:47.1830312Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-25T07:16:47.1831641Z hint: call:
+2026-10-25T07:16:47.1832421Z hint:
+2026-10-25T07:16:47.1833212Z hint: 	git config --global init.defaultBranch <name>
+2026-10-25T07:16:47.1834246Z hint:
+2026-10-25T07:16:47.1835080Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-25T07:16:47.1836303Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-25T07:16:47.1837467Z hint:
+2026-10-25T07:16:47.1838221Z hint: 	git branch -m <name>
+2026-10-25T07:16:47.1839164Z hint:
+2026-10-25T07:16:47.1840158Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-25T07:16:47.1841478Z Initialized empty Git repository in /home/runner/work/NinFenz/NinFenz/.git/
+2026-10-25T07:16:47.1843726Z [command]/usr/bin/git remote add origin https://github.com/Monyeah777/NinFenz
+2026-10-25T07:16:47.1885024Z ##[endgroup]
+2026-10-25T07:16:47.1886043Z ##[group]Disabling automatic garbage collection
+2026-10-25T07:16:47.1889845Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-25T07:16:47.1919919Z ##[endgroup]
+2026-10-25T07:16:47.1920913Z ##[group]Setting up auth
+2026-10-25T07:16:47.1928057Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:16:47.1963073Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:16:47.2281233Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:16:47.2310492Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:16:47.2497054Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:16:47.2525628Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:16:47.2707702Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-25T07:16:47.2741661Z ##[endgroup]
+2026-10-25T07:16:47.2742797Z ##[group]Fetching the repository
+2026-10-25T07:16:47.2751059Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-25T07:16:50.1411237Z From https://github.com/Monyeah777/NinFenz
+2026-10-25T07:16:50.1414193Z  * [new branch]        build/manual-main  -> origin/build/manual-main
+2026-10-25T07:16:50.1417705Z  * [new branch]        dependabot/github_actions/actions-minor-patch-dd3649b633 -> origin/dependabot/github_actions/actions-minor-patch-dd3649b633
+2026-10-25T07:16:50.1422339Z  * [new branch]        dependabot/github_actions/actions/checkout-7.0.1 -> origin/dependabot/github_actions/actions/checkout-7.0.1
+2026-10-25T07:16:50.1426150Z  * [new branch]        dependabot/github_actions/actions/setup-python-7.0.0 -> origin/dependabot/github_actions/actions/setup-python-7.0.0
+2026-10-25T07:16:50.1430531Z  * [new branch]        dependabot/github_actions/actions/upload-artifact-7.0.2 -> origin/dependabot/github_actions/actions/upload-artifact-7.0.2
+2026-10-25T07:16:50.1434947Z  * [new branch]        dependabot/github_actions/github/codeql-action/upload-sarif-4.39.0 -> origin/dependabot/github_actions/github/codeql-action/upload-sarif-4.39.0
+2026-10-25T07:16:50.1439686Z  * [new branch]        dependabot/pip/dot-github/pip-minor-patch-4ab8a10d8c -> origin/dependabot/pip/dot-github/pip-minor-patch-4ab8a10d8c
+2026-10-25T07:16:50.1442980Z  * [new branch]        gov/ci             -> origin/gov/ci
+2026-10-25T07:16:50.1444694Z  * [new branch]        gov/rust           -> origin/gov/rust
+2026-10-25T07:16:50.1446685Z  * [new branch]        gov/security       -> origin/gov/security
+2026-10-25T07:16:50.1449481Z  * [new branch]        main               -> origin/main
+2026-10-25T07:16:50.1451697Z  * [new branch]        wip/codex-20261022 -> origin/wip/codex-20261022
+2026-10-25T07:16:50.1454163Z  * [new tag]           v0.01              -> v0.01
+2026-10-25T07:16:50.1456267Z  * [new tag]           v0.11              -> v0.11
+2026-10-25T07:16:50.1458678Z  * [new tag]           v0.12              -> v0.12
+2026-10-25T07:16:50.1460283Z  * [new tag]           v0.22              -> v0.22
+2026-10-25T07:16:50.1461783Z  * [new tag]           v0.23              -> v0.23
+2026-10-25T07:16:50.1463665Z  * [new tag]           v0.24              -> v0.24
+2026-10-25T07:16:50.1465190Z  * [new tag]           v0.34              -> v0.34
+2026-10-25T07:16:50.1466691Z  * [new tag]           v0.35              -> v0.35
+2026-10-25T07:16:50.1468391Z  * [new tag]           v0.45              -> v0.45
+2026-10-25T07:16:50.1470242Z  * [new tag]           v0.46              -> v0.46
+2026-10-25T07:16:50.1472114Z  * [new tag]           v0.47              -> v0.47
+2026-10-25T07:16:50.1474400Z  * [new tag]           v0.48              -> v0.48
+2026-10-25T07:16:50.1476969Z  * [new tag]           v0.49              -> v0.49
+2026-10-25T07:16:50.1480111Z  * [new tag]           v0.59              -> v0.59
+2026-10-25T07:16:50.1482685Z  * [new tag]           v0.60              -> v0.60
+2026-10-25T07:16:50.1484878Z  * [new tag]           v0.70              -> v0.70
+2026-10-25T07:16:50.1487060Z  * [new tag]           v0.71              -> v0.71
+2026-10-25T07:16:50.1489551Z  * [new tag]           v0.72              -> v0.72
+2026-10-25T07:16:50.1491399Z  * [new tag]           v0.82              -> v0.82
+2026-10-25T07:16:50.1493440Z  * [new tag]           v0.92              -> v0.92
+2026-10-25T07:16:50.1495440Z  * [new tag]           v0.93              -> v0.93
+2026-10-25T07:16:50.1497315Z  * [new tag]           v1.0.4             -> v1.0.4
+2026-10-25T07:16:50.1499669Z  * [new tag]           v1.0.5             -> v1.0.5
+2026-10-25T07:16:50.1503996Z [command]/usr/bin/git branch --list --remote origin/main
+2026-10-25T07:16:50.1506154Z   origin/main
+2026-10-25T07:16:50.1509798Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2026-10-25T07:16:50.1511714Z 1d937c0c579053c066f62482b6471fc4de0467d8
+2026-10-25T07:16:50.1515649Z ##[endgroup]
+2026-10-25T07:16:50.1517726Z ##[group]Determining the checkout info
+2026-10-25T07:16:50.1519965Z ##[endgroup]
+2026-10-25T07:16:50.1521319Z [command]/usr/bin/git sparse-checkout disable
+2026-10-25T07:16:50.1538854Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-25T07:16:50.1566495Z ##[group]Checking out the ref
+2026-10-25T07:16:50.1568998Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-25T07:16:50.3632063Z Switched to a new branch 'main'
+2026-10-25T07:16:50.3634482Z branch 'main' set up to track 'origin/main'.
+2026-10-25T07:16:50.3648394Z ##[endgroup]
+2026-10-25T07:16:50.3689144Z [command]/usr/bin/git log -1 --format=%H
+2026-10-25T07:16:50.3711308Z 1d937c0c579053c066f62482b6471fc4de0467d8
+2026-10-25T07:16:50.3718455Z ##[group]Removing auth
+2026-10-25T07:16:50.3721818Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:16:50.3747317Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:16:50.3936030Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:16:50.3958449Z http.https://github.com/.extraheader
+2026-10-25T07:16:50.3963952Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-25T07:16:50.3998246Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:16:50.4196944Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:16:50.4222838Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:16:50.4404931Z ##[endgroup]
+2026-10-25T07:16:50.4766869Z ##[group]Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+2026-10-25T07:16:50.4768713Z with:
+2026-10-25T07:16:50.4769847Z   cache-dependency-path: .github/requirements-*.txt
+2026-10-25T07:16:50.4771278Z   cache: pip
+2026-10-25T07:16:50.4772230Z   python-version: 3.11
+2026-10-25T07:16:50.4773324Z   check-latest: false
+2026-10-25T07:16:50.4782051Z   token: ***
+2026-10-25T07:16:50.4783076Z   update-environment: true
+2026-10-25T07:16:50.4784240Z   allow-prereleases: false
+2026-10-25T07:16:50.4785356Z   freethreaded: false
+2026-10-25T07:16:50.4786390Z env:
+2026-10-25T07:16:50.4787330Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:50.4788528Z ##[endgroup]
+2026-10-25T07:16:50.6101910Z ##[group]Installed versions
+2026-10-25T07:16:50.6526270Z (node:2144) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-25T07:16:50.6530739Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-25T07:16:50.6533687Z Successfully set up CPython (3.11.17)
+2026-10-25T07:16:50.6536720Z ##[endgroup]
+2026-10-25T07:16:50.6914714Z [command]/opt/hostedtoolcache/Python/3.11.17/x64/bin/pip cache dir
+2026-10-25T07:16:52.0528897Z /home/runner/.cache/pip
+2026-10-25T07:16:52.2940789Z Cache hit for: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.17-pip-8e8cb52455b78aa0f787d363f929ae2bb9e4fcaec2481d986a66a11540617991
+2026-10-25T07:16:52.3040645Z (node:2144) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-25T07:16:53.5126818Z Received 11142734 of 11142734 (100.0%), 11.1 MBs/sec
+2026-10-25T07:16:53.5127629Z Cache Size: ~11 MB (11142734 B)
+2026-10-25T07:16:53.5152193Z [command]/usr/bin/tar -xf /home/runner/work/_temp/bf5383ec-5172-453e-b092-5e490867361f/cache.tzst -P -C /home/runner/work/NinFenz/NinFenz --use-compress-program unzstd
+2026-10-25T07:16:53.5333372Z Cache restored successfully
+2026-10-25T07:16:53.5343054Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.17-pip-8e8cb52455b78aa0f787d363f929ae2bb9e4fcaec2481d986a66a11540617991
+2026-10-25T07:16:53.5485917Z ##[group]Run sudo apt-get update
+2026-10-25T07:16:53.5486431Z [36;1msudo apt-get update[0m
+2026-10-25T07:16:53.5486924Z [36;1msudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3[0m
+2026-10-25T07:16:53.5487485Z [36;1mpip install -r .github/requirements-ci.txt[0m
+2026-10-25T07:16:53.5661058Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:16:53.5661689Z env:
+2026-10-25T07:16:53.5662168Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:53.5662793Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:53.5663355Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:16:53.5663890Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:53.5664437Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:53.5665039Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:53.5665540Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:16:53.5666121Z ##[endgroup]
+2026-10-25T07:16:53.6353543Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-25T07:16:53.6779298Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-25T07:16:53.6856293Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-25T07:16:53.6899110Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-25T07:16:53.6932936Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-25T07:16:53.6971160Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-25T07:16:53.7464504Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [598 kB]
+2026-10-25T07:16:53.7661476Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.4 kB]
+2026-10-25T07:16:53.7718999Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [660 kB]
+2026-10-25T07:16:53.8410820Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1400 kB]
+2026-10-25T07:16:53.8490080Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [310 kB]
+2026-10-25T07:16:53.8508988Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1706 kB]
+2026-10-25T07:16:53.8602413Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [342 kB]
+2026-10-25T07:16:53.8618849Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1805 kB]
+2026-10-25T07:16:53.8689461Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+2026-10-25T07:16:53.9348519Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1146 kB]
+2026-10-25T07:16:53.9400845Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+2026-10-25T07:16:53.9416175Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1222 kB]
+2026-10-25T07:16:53.9467283Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+2026-10-25T07:16:53.9909048Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1713 kB]
+2026-10-25T07:16:53.9982333Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [392 kB]
+2026-10-25T07:17:03.2619305Z Fetched 12.6 MB in 1s (9401 kB/s)
+2026-10-25T07:17:04.2343049Z Reading package lists...
+2026-10-25T07:17:04.2690237Z Reading package lists...
+2026-10-25T07:17:04.4804513Z Building dependency tree...
+2026-10-25T07:17:04.4809770Z Reading state information...
+2026-10-25T07:17:04.6533334Z libgl1 is already the newest version (1.7.0-1build1).
+2026-10-25T07:17:04.6534531Z libgl1 set to manually installed.
+2026-10-25T07:17:04.6535273Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-25T07:17:04.6536162Z libxkbcommon0 set to manually installed.
+2026-10-25T07:17:04.6537695Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-25T07:17:04.6538503Z libdbus-1-3 set to manually installed.
+2026-10-25T07:17:04.6539336Z The following additional packages will be installed:
+2026-10-25T07:17:04.6542871Z   libegl-mesa0
+2026-10-25T07:17:04.6700909Z The following NEW packages will be installed:
+2026-10-25T07:17:04.6706872Z   libegl-mesa0 libegl1
+2026-10-25T07:17:04.6875211Z 0 upgraded, 2 newly installed, 0 to remove and 100 not upgraded.
+2026-10-25T07:17:04.6875828Z Need to get 146 kB of archives.
+2026-10-25T07:17:04.6876263Z After this operation, 502 kB of additional disk space will be used.
+2026-10-25T07:17:04.6876810Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-25T07:17:04.7759867Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libegl-mesa0 amd64 25.2.8-0ubuntu0.24.04.4 [117 kB]
+2026-10-25T07:17:04.8432152Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libegl1 amd64 1.7.0-1build1 [28.7 kB]
+2026-10-25T07:17:05.1007928Z Fetched 146 kB in 0s (872 kB/s)
+2026-10-25T07:17:05.1219311Z Selecting previously unselected package libegl-mesa0:amd64.
+2026-10-25T07:17:05.1408371Z (Reading database ... 
+2026-10-25T07:17:05.1409320Z (Reading database ... 5%
+2026-10-25T07:17:05.1410070Z (Reading database ... 10%
+2026-10-25T07:17:05.1410828Z (Reading database ... 15%
+2026-10-25T07:17:05.1411343Z (Reading database ... 20%
+2026-10-25T07:17:05.1411763Z (Reading database ... 25%
+2026-10-25T07:17:05.1412404Z (Reading database ... 30%
+2026-10-25T07:17:05.1413022Z (Reading database ... 35%
+2026-10-25T07:17:05.1413534Z (Reading database ... 40%
+2026-10-25T07:17:05.1413995Z (Reading database ... 45%
+2026-10-25T07:17:05.1414418Z (Reading database ... 50%
+2026-10-25T07:17:05.1448408Z (Reading database ... 55%
+2026-10-25T07:17:05.2731229Z (Reading database ... 60%
+2026-10-25T07:17:05.4799469Z (Reading database ... 65%
+2026-10-25T07:17:05.6869640Z (Reading database ... 70%
+2026-10-25T07:17:05.8735298Z (Reading database ... 75%
+2026-10-25T07:17:06.0354189Z (Reading database ... 80%
+2026-10-25T07:17:06.2256695Z (Reading database ... 85%
+2026-10-25T07:17:06.4089319Z (Reading database ... 90%
+2026-10-25T07:17:06.6000452Z (Reading database ... 95%
+2026-10-25T07:17:06.6000937Z (Reading database ... 100%
+2026-10-25T07:17:06.6001533Z (Reading database ... 203540 files and directories currently installed.)
+2026-10-25T07:17:06.6047252Z Preparing to unpack .../libegl-mesa0_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+2026-10-25T07:17:06.6170026Z Unpacking libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-25T07:17:06.6379594Z Selecting previously unselected package libegl1:amd64.
+2026-10-25T07:17:06.6503906Z Preparing to unpack .../libegl1_1.7.0-1build1_amd64.deb ...
+2026-10-25T07:17:06.6515809Z Unpacking libegl1:amd64 (1.7.0-1build1) ...
+2026-10-25T07:17:06.6845683Z Setting up libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-25T07:17:06.6872153Z Setting up libegl1:amd64 (1.7.0-1build1) ...
+2026-10-25T07:17:06.6897390Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-25T07:17:07.4104630Z 
+2026-10-25T07:17:07.4105527Z Running kernel seems to be up-to-date.
+2026-10-25T07:17:07.4105910Z 
+2026-10-25T07:17:07.4106057Z No services need to be restarted.
+2026-10-25T07:17:07.4106309Z 
+2026-10-25T07:17:07.4106612Z No containers need to be restarted.
+2026-10-25T07:17:07.4106867Z 
+2026-10-25T07:17:07.4107072Z No user sessions are running outdated binaries.
+2026-10-25T07:17:07.4107314Z 
+2026-10-25T07:17:07.4107746Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-25T07:17:09.7166553Z Collecting attrs==26.1.0 (from -r .github/requirements-ci.txt (line 6))
+2026-10-25T07:17:09.8075539Z   Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-25T07:17:10.2212912Z Collecting coverage==7.16.1 (from -r .github/requirements-ci.txt (line 12))
+2026-10-25T07:17:10.2325323Z   Downloading coverage-7.16.1-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (256 kB)
+2026-10-25T07:17:10.2861690Z Collecting jsonschema==4.26.0 (from -r .github/requirements-ci.txt (line 135))
+2026-10-25T07:17:10.2964623Z   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+2026-10-25T07:17:10.3239972Z Collecting jsonschema-specifications==2025.9.1 (from -r .github/requirements-ci.txt (line 139))
+2026-10-25T07:17:10.3342863Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-25T07:17:10.3606929Z Collecting pyside6==6.11.2 (from -r .github/requirements-ci.txt (line 143))
+2026-10-25T07:17:10.3724573Z   Downloading pyside6-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (572 kB)
+2026-10-25T07:17:10.4264324Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.1/572.1 kB 11.7 MB/s  0:00:00
+2026-10-25T07:17:10.4496202Z Collecting pyside6-addons==6.11.2 (from -r .github/requirements-ci.txt (line 150))
+2026-10-25T07:17:10.4600019Z   Downloading pyside6_addons-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (175.1 MB)
+2026-10-25T07:17:12.0885583Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 175.1/175.1 MB 108.7 MB/s  0:00:01
+2026-10-25T07:17:12.2531537Z Collecting pyside6-essentials==6.11.2 (from -r .github/requirements-ci.txt (line 157))
+2026-10-25T07:17:12.2649994Z   Downloading pyside6_essentials-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (80.1 MB)
+2026-10-25T07:17:12.8644715Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.1/80.1 MB 133.8 MB/s  0:00:00
+2026-10-25T07:17:12.9862158Z Collecting pyyaml==6.0.3 (from -r .github/requirements-ci.txt (line 166))
+2026-10-25T07:17:12.9965685Z   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+2026-10-25T07:17:13.0020541Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 171.9 MB/s  0:00:00
+2026-10-25T07:17:13.0244360Z Collecting referencing==0.37.0 (from -r .github/requirements-ci.txt (line 241))
+2026-10-25T07:17:13.0346165Z   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-25T07:17:13.2601160Z Collecting rpds-py==2026.9.1 (from -r .github/requirements-ci.txt (line 247))
+2026-10-25T07:17:13.2706453Z   Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (375 kB)
+2026-10-25T07:17:13.2971073Z Collecting shiboken6==6.11.2 (from -r .github/requirements-ci.txt (line 379))
+2026-10-25T07:17:13.3083060Z   Downloading shiboken6-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (272 kB)
+2026-10-25T07:17:13.3294794Z Collecting typing-extensions==4.16.0 (from -r .github/requirements-ci.txt (line 389))
+2026-10-25T07:17:13.3396437Z   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-25T07:17:13.4889839Z Installing collected packages: typing-extensions, shiboken6, rpds-py, pyyaml, coverage, attrs, referencing, pyside6-essentials, pyside6-addons, jsonschema-specifications, pyside6, jsonschema
+2026-10-25T07:17:17.2012912Z 
+2026-10-25T07:17:17.2025022Z Successfully installed attrs-26.1.0 coverage-7.16.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 pyside6-6.11.2 pyside6-addons-6.11.2 pyside6-essentials-6.11.2 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.9.1 shiboken6-6.11.2 typing-extensions-4.16.0
+2026-10-25T07:17:17.2904730Z ##[group]Run # 与 cross-platform.yml 同一口径：这 4 项 gitignored / empty-by-design，
+2026-10-25T07:17:17.2905439Z [36;1m# 与 cross-platform.yml 同一口径：这 4 项 gitignored / empty-by-design，[0m
+2026-10-25T07:17:17.2906018Z [36;1m# 干净 clone 里不存在，但部分 check 会读它们（实测：Gitee 模板 → check32；[0m
+2026-10-25T07:17:17.2906539Z [36;1m# dotnet dist/obj → asset_contract 计数；wasm 产物 → test_plugin_wasm_host；[0m
+2026-10-25T07:17:17.2907009Z [36;1m# canonical/target → 并发测试报「工具越权写」）。[0m
+2026-10-25T07:17:17.2907610Z [36;1mmkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target[0m
+2026-10-25T07:17:17.2908159Z [36;1mecho "前置目录已建"[0m
+2026-10-25T07:17:17.2949664Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-25T07:17:17.2950101Z env:
+2026-10-25T07:17:17.2950463Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:17.2950897Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.2951557Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:17.2952063Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.2952525Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.2953065Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.2953526Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:17.2953948Z ##[endgroup]
+2026-10-25T07:17:17.3026325Z 前置目录已建
+2026-10-25T07:17:17.3064583Z ##[group]Run # 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。
+2026-10-25T07:17:17.3065088Z [36;1m# 每片只跑自己的 1/32（同一套权重 + 同一套 LPT ⇒ 32 片并集 == discover 全集）。[0m
+2026-10-25T07:17:17.3065577Z [36;1m# 2026-10-21：此前失败时日志被 tee 吞进工件、job 日志里看不到**失败用例名**，[0m
+2026-10-25T07:17:17.3066151Z [36;1m# 只能靠猜平台差异。现在无论成败都把 FAIL/ERROR 行打到 job 日志（诊断优先）。[0m
+2026-10-25T07:17:17.3066632Z [36;1mset +e[0m
+2026-10-25T07:17:17.3067148Z [36;1mbash verify.sh --tests-only --shard "12/32" 2>&1 | tee verify-tests.log[0m
+2026-10-25T07:17:17.3067755Z [36;1mrc=${PIPESTATUS[0]}[0m
+2026-10-25T07:17:17.3068128Z [36;1mif [ "$rc" -ne 0 ]; then[0m
+2026-10-25T07:17:17.3068614Z [36;1m  echo "::group::失败用例（分片 12）"[0m
+2026-10-25T07:17:17.3069074Z [36;1m  grep -E "^(FAIL|ERROR):" verify-tests.log | head -40 || true[0m
+2026-10-25T07:17:17.3069549Z [36;1m  for f in .nf-logs/shard*.log; do[0m
+2026-10-25T07:17:17.3069919Z [36;1m    [ -f "$f" ] || continue[0m
+2026-10-25T07:17:17.3070371Z [36;1m    echo "---- $f ----"[0m
+2026-10-25T07:17:17.3070822Z [36;1m    grep -E "^(FAIL|ERROR):|^FAILED \(|AssertionError" "$f" | head -25 || true[0m
+2026-10-25T07:17:17.3071318Z [36;1m  done[0m
+2026-10-25T07:17:17.3071624Z [36;1m  echo "::endgroup::"[0m
+2026-10-25T07:17:17.3071954Z [36;1mfi[0m
+2026-10-25T07:17:17.3072284Z [36;1mexit "$rc"[0m
+2026-10-25T07:17:17.3105329Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:17:17.3105671Z env:
+2026-10-25T07:17:17.3106019Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:17.3106469Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.3107008Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:17.3107614Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.3108101Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.3108579Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.3109042Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:17.3109475Z   NF_VERIFY_TMP: .nf-logs
+2026-10-25T07:17:17.3109846Z   NF_SHARD_LOG_DIR: .nf-logs
+2026-10-25T07:17:17.3110154Z ##[endgroup]
+2026-10-25T07:17:59.7440832Z ---- 分片 12/32 失败用例（最多 20 行）----
+2026-10-25T07:17:59.7441924Z   FAIL: test_sync_numbers_reports_no_drift (test_site_face.TestSiteToolsRunResident.test_sync_numbers_reports_no_drift)
+2026-10-25T07:17:59.7443055Z   AssertionError: 0 != 1 : 真源（llms.txt）      : verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:59.7443735Z ---- 分片 12/32 末 40 行 ----
+2026-10-25T07:17:59.7444245Z       self.assertEqual(0, p.returncode, (p.stdout or "") + (p.stderr or ""))
+2026-10-25T07:17:59.7445126Z   AssertionError: 0 != 1 : 真源（llms.txt）      : verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:59.7445756Z   真源（repo_stats.json）: verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:59.7446471Z     index.html: 1 处一致
+2026-10-25T07:17:59.7446847Z     en/index.html: 1 处一致
+2026-10-25T07:17:59.7447286Z     llms.txt: 1 处一致
+2026-10-25T07:17:59.7447915Z     llms-full.txt: 1 处一致
+2026-10-25T07:17:59.7448555Z     facts.json: 3 处一致
+2026-10-25T07:17:59.7448922Z     nf.txt: 1 处一致
+2026-10-25T07:17:59.7449238Z     agent.txt: 1 处一致
+2026-10-25T07:17:59.7449789Z     use/index.html: 1 处一致
+2026-10-25T07:17:59.7450197Z     en/use/index.html: 1 处一致
+2026-10-25T07:17:59.7450637Z     robots.txt: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:59.7451069Z     sitemap.xml: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:59.7451451Z     404.html: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:59.7452044Z     README.md: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:59.7452663Z     index.html: 规模 8 个数齐全
+2026-10-25T07:17:59.7453091Z     en/index.html: 规模 8 个数齐全
+2026-10-25T07:17:59.7453507Z     llms.txt: 规模 8 个数齐全
+2026-10-25T07:17:59.7453908Z     llms-full.txt: 规模 8 个数齐全
+2026-10-25T07:17:59.7454511Z     facts.json: scale.values 与真源一致（8 项）
+2026-10-25T07:17:59.7454933Z     npm payload 清单不在场（忽略：忽略面，需先 stage）
+2026-10-25T07:17:59.7455527Z   ✗ site/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7456471Z   ✗ site/en/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7457197Z   ✗ site/llms.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7457983Z   ✗ site/llms-full.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7458564Z   ✗ site/facts.json npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7459231Z   ✗ site/agent.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7459832Z   ✗ site/README.md npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7460440Z   ✗ site/use/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7461308Z   ✗ site/en/use/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:59.7461929Z   ✗ 站点数字未过：跑 node site/tools/sync-numbers.mjs --write 同步可自动改写的项，其余按上面指引手改
+2026-10-25T07:17:59.7462348Z   
+2026-10-25T07:17:59.7462646Z   
+2026-10-25T07:17:59.7463011Z   ----------------------------------------------------------------------
+2026-10-25T07:17:59.7463457Z   Ran 121 tests in 39.138s
+2026-10-25T07:17:59.7463768Z   
+2026-10-25T07:17:59.7464056Z   FAILED (failures=1, skipped=1)
+2026-10-25T07:17:59.7464447Z   
+2026-10-25T07:17:59.7464735Z   [分片清理] 没有守护在运行
+2026-10-25T07:17:59.7465128Z   分片 12/32：测试 121 · 39.6 s · rc=1
+2026-10-25T07:17:59.8065320Z ##[group]失败用例（分片 12）
+2026-10-25T07:17:59.8080963Z ---- .nf-logs/shard12.log ----
+2026-10-25T07:17:59.8093643Z FAIL: test_sync_numbers_reports_no_drift (test_site_face.TestSiteToolsRunResident.test_sync_numbers_reports_no_drift)
+2026-10-25T07:17:59.8096314Z AssertionError: 0 != 1 : 真源（llms.txt）      : verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:59.8096876Z FAILED (failures=1, skipped=1)
+2026-10-25T07:17:59.8098200Z ##[endgroup]
+2026-10-25T07:17:59.8110006Z ##[error]Process completed with exit code 1.
+2026-10-25T07:17:59.8198578Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-25T07:17:59.8199081Z with:
+2026-10-25T07:17:59.8199412Z   name: unit-tests-log-12
+2026-10-25T07:17:59.8199798Z   path: verify-tests.log
+.nf-logs/
+
+2026-10-25T07:17:59.8200218Z   if-no-files-found: warn
+2026-10-25T07:17:59.8200572Z   compression-level: 6
+2026-10-25T07:17:59.8200900Z   overwrite: false
+2026-10-25T07:17:59.8201585Z   include-hidden-files: false
+2026-10-25T07:17:59.8201988Z env:
+2026-10-25T07:17:59.8202334Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:59.8202757Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:59.8203275Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:59.8203841Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:59.8204465Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:59.8205038Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:59.8205597Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:59.8206019Z ##[endgroup]
+2026-10-25T07:17:59.9932462Z (node:2758) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-25T07:17:59.9934403Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-25T07:17:59.9993706Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-25T07:17:59.9996808Z The least common ancestor is /home/runner/work/NinFenz/NinFenz. This will be the root directory of the artifact
+2026-10-25T07:17:59.9998130Z With the provided path, there will be 1 file uploaded
+2026-10-25T07:17:59.9999795Z Artifact name is valid!
+2026-10-25T07:18:00.0001269Z Root directory input is valid!
+2026-10-25T07:18:00.3558871Z Beginning upload of artifact content to blob storage
+2026-10-25T07:18:00.3716678Z (node:2758) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-25T07:18:00.6044016Z Uploaded bytes 1041
+2026-10-25T07:18:00.6731066Z Finished uploading artifact content to blob storage!
+2026-10-25T07:18:00.6732517Z SHA256 digest of uploaded artifact zip is 3f1da493ab5a88cf6ce7da51159facabe2e1f4a74927719deac82e3061517533
+2026-10-25T07:18:00.6733645Z Finalizing artifact upload
+2026-10-25T07:18:01.1228034Z Artifact unit-tests-log-12.zip successfully finalized. Artifact ID 12590502717
+2026-10-25T07:18:01.1239502Z Artifact unit-tests-log-12 has been successfully uploaded! Final size is 1041 bytes. Artifact ID is 12590502717
+2026-10-25T07:18:01.1249043Z Artifact download URL: https://github.com/Monyeah777/NinFenz/actions/runs/40172167091/artifacts/12590502717
+2026-10-25T07:18:01.1434682Z Post job cleanup.
+2026-10-25T07:18:01.2253736Z [command]/usr/bin/git version
+2026-10-25T07:18:01.2297035Z git version 2.55.0
+2026-10-25T07:18:01.2339245Z Temporarily overriding HOME='/home/runner/work/_temp/45829a26-637d-4539-a00e-8d041b4471fd' before making global git config changes
+2026-10-25T07:18:01.2340579Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-25T07:18:01.2346247Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:18:01.2385895Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:18:01.2418212Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:18:01.2644011Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:18:01.2680573Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:18:01.2913165Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:18:01.2946129Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:18:01.3308257Z Cleaning up orphan processes
+2026-10-25T07:18:01.3599168Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

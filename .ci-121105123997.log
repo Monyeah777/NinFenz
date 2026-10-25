@@ -1,0 +1,547 @@
+﻿2026-10-25T07:16:45.6841566Z Current runner version: '2.338.0'
+2026-10-25T07:16:45.6859545Z ##[group]Runner Image Provisioner
+2026-10-25T07:16:45.6860076Z Hosted Compute Agent
+2026-10-25T07:16:45.6860479Z Version: 20261021.618
+2026-10-25T07:16:45.6860890Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-25T07:16:45.6861306Z Build Date: 2026-10-21T00:45:21Z
+2026-10-25T07:16:45.6861742Z Worker ID: {58a15bdf-14bc-4555-b78a-94500a337ef8}
+2026-10-25T07:16:45.6862174Z Region: westus3
+2026-10-25T07:16:45.6862649Z Cloud: Azure
+2026-10-25T07:16:45.6863010Z ##[endgroup]
+2026-10-25T07:16:45.6863761Z ##[group]Operating System
+2026-10-25T07:16:45.6864159Z Ubuntu
+2026-10-25T07:16:45.6864464Z 24.04.5
+2026-10-25T07:16:45.6864757Z LTS
+2026-10-25T07:16:45.6865131Z ##[endgroup]
+2026-10-25T07:16:45.6865452Z ##[group]Runner Image
+2026-10-25T07:16:45.6865816Z Image: ubuntu-24.04
+2026-10-25T07:16:45.6866188Z Version: 20261012.334.1
+2026-10-25T07:16:45.6866959Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-25T07:16:45.6867843Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-25T07:16:45.6868451Z ##[endgroup]
+2026-10-25T07:16:45.6869074Z ##[group]GITHUB_TOKEN Permissions
+2026-10-25T07:16:45.6870347Z Contents: read
+2026-10-25T07:16:45.6870684Z Metadata: read
+2026-10-25T07:16:45.6871003Z ##[endgroup]
+2026-10-25T07:16:45.6872505Z Secret source: Actions
+2026-10-25T07:16:45.6873033Z Cache mode: write
+2026-10-25T07:16:45.6873558Z Prepare workflow directory
+2026-10-25T07:16:45.7117753Z Prepare all required actions
+2026-10-25T07:16:45.7150172Z Getting action download info
+2026-10-25T07:16:46.0189512Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-25T07:16:46.1306269Z Download action repository 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-25T07:16:46.2781101Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-25T07:16:46.4694669Z Complete job name: static-checks-42
+2026-10-25T07:16:46.5187505Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-10-25T07:16:46.5187992Z with:
+2026-10-25T07:16:46.5188228Z   persist-credentials: false
+2026-10-25T07:16:46.5188501Z   repository: Monyeah777/NinFenz
+2026-10-25T07:16:46.5190538Z   token: ***
+2026-10-25T07:16:46.5190766Z   ssh-strict: true
+2026-10-25T07:16:46.5190994Z   ssh-user: git
+2026-10-25T07:16:46.5191218Z   clean: true
+2026-10-25T07:16:46.5191450Z   sparse-checkout-cone-mode: true
+2026-10-25T07:16:46.5191723Z   fetch-depth: 1
+2026-10-25T07:16:46.5191949Z   fetch-tags: false
+2026-10-25T07:16:46.5192184Z   show-progress: true
+2026-10-25T07:16:46.5192545Z   lfs: false
+2026-10-25T07:16:46.5192759Z   submodules: false
+2026-10-25T07:16:46.5192996Z   set-safe-directory: true
+2026-10-25T07:16:46.5193266Z   allow-unsafe-pr-checkout: false
+2026-10-25T07:16:46.5193626Z env:
+2026-10-25T07:16:46.5193843Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:46.5194096Z ##[endgroup]
+2026-10-25T07:16:46.5833175Z Syncing repository: Monyeah777/NinFenz
+2026-10-25T07:16:46.5834670Z ##[group]Getting Git version info
+2026-10-25T07:16:46.5835246Z Working directory is '/home/runner/work/NinFenz/NinFenz'
+2026-10-25T07:16:46.5836117Z [command]/usr/bin/git version
+2026-10-25T07:16:46.5875113Z git version 2.55.0
+2026-10-25T07:16:46.5890442Z ##[endgroup]
+2026-10-25T07:16:46.5905418Z Temporarily overriding HOME='/home/runner/work/_temp/0fda21d7-08a0-4ba6-bdd2-d606e185a07c' before making global git config changes
+2026-10-25T07:16:46.5906619Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-25T07:16:46.5910860Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:16:46.5966466Z Deleting the contents of '/home/runner/work/NinFenz/NinFenz'
+2026-10-25T07:16:46.5971428Z ##[group]Initializing the repository
+2026-10-25T07:16:46.5974583Z [command]/usr/bin/git init /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:16:46.6078367Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-25T07:16:46.6080056Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-25T07:16:46.6080902Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-25T07:16:46.6081557Z hint: call:
+2026-10-25T07:16:46.6081919Z hint:
+2026-10-25T07:16:46.6082505Z hint: 	git config --global init.defaultBranch <name>
+2026-10-25T07:16:46.6083030Z hint:
+2026-10-25T07:16:46.6083531Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-25T07:16:46.6084381Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-25T07:16:46.6084996Z hint:
+2026-10-25T07:16:46.6085328Z hint: 	git branch -m <name>
+2026-10-25T07:16:46.6085709Z hint:
+2026-10-25T07:16:46.6086251Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-25T07:16:46.6087139Z Initialized empty Git repository in /home/runner/work/NinFenz/NinFenz/.git/
+2026-10-25T07:16:46.6098888Z [command]/usr/bin/git remote add origin https://github.com/Monyeah777/NinFenz
+2026-10-25T07:16:46.6143593Z ##[endgroup]
+2026-10-25T07:16:46.6144238Z ##[group]Disabling automatic garbage collection
+2026-10-25T07:16:46.6147306Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-25T07:16:46.6178288Z ##[endgroup]
+2026-10-25T07:16:46.6178698Z ##[group]Setting up auth
+2026-10-25T07:16:46.6185132Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:16:46.6214959Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:16:46.6534148Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:16:46.6570207Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:16:46.6786192Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:16:46.6816206Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:16:46.6996859Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-25T07:16:46.7030849Z ##[endgroup]
+2026-10-25T07:16:46.7031481Z ##[group]Fetching the repository
+2026-10-25T07:16:46.7037969Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +1d937c0c579053c066f62482b6471fc4de0467d8:refs/remotes/origin/main
+2026-10-25T07:16:48.3094774Z From https://github.com/Monyeah777/NinFenz
+2026-10-25T07:16:48.3095629Z  * [new ref]         1d937c0c579053c066f62482b6471fc4de0467d8 -> origin/main
+2026-10-25T07:16:48.3098264Z ##[endgroup]
+2026-10-25T07:16:48.3098737Z ##[group]Determining the checkout info
+2026-10-25T07:16:48.3101906Z ##[endgroup]
+2026-10-25T07:16:48.3117569Z [command]/usr/bin/git sparse-checkout disable
+2026-10-25T07:16:48.3171888Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-25T07:16:48.3209565Z ##[group]Checking out the ref
+2026-10-25T07:16:48.3212663Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-25T07:16:48.5127548Z Switched to a new branch 'main'
+2026-10-25T07:16:48.5129998Z branch 'main' set up to track 'origin/main'.
+2026-10-25T07:16:48.5141563Z ##[endgroup]
+2026-10-25T07:16:48.5185999Z [command]/usr/bin/git log -1 --format=%H
+2026-10-25T07:16:48.5210535Z 1d937c0c579053c066f62482b6471fc4de0467d8
+2026-10-25T07:16:48.5221849Z ##[group]Removing auth
+2026-10-25T07:16:48.5225644Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:16:48.5253188Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:16:48.5452132Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:16:48.5475678Z http.https://github.com/.extraheader
+2026-10-25T07:16:48.5482912Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-25T07:16:48.5551975Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:16:48.5730908Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:16:48.5757979Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:16:48.5938774Z ##[endgroup]
+2026-10-25T07:16:48.6142753Z ##[group]Run if grep -rnEI --exclude-dir=.git --exclude-dir=.gitee 'ghp_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{22,}|gho_[0-9A-Za-z]{36}|sk-[0-9A-Za-z]{20,}|AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|xox[baprs]-[0-9A-Za-z-]{10,}' .; then
+2026-10-25T07:16:48.6145699Z [36;1mif grep -rnEI --exclude-dir=.git --exclude-dir=.gitee 'ghp_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{22,}|gho_[0-9A-Za-z]{36}|sk-[0-9A-Za-z]{20,}|AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|xox[baprs]-[0-9A-Za-z-]{10,}' .; then[0m
+2026-10-25T07:16:48.6147584Z [36;1m  echo "::error::检测到疑似明文密钥——立即撤销该 token 并改用 secrets 注入"[0m
+2026-10-25T07:16:48.6148396Z [36;1m  exit 1[0m
+2026-10-25T07:16:48.6148981Z [36;1mfi[0m
+2026-10-25T07:16:48.6149583Z [36;1mecho '密钥扫描通过（无常见 token 前缀命中）'[0m
+2026-10-25T07:16:48.6357947Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:16:48.6358629Z env:
+2026-10-25T07:16:48.6359233Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:48.6359909Z ##[endgroup]
+2026-10-25T07:16:48.7057975Z 密钥扫描通过（无常见 token 前缀命中）
+2026-10-25T07:16:48.7198337Z ##[group]Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+2026-10-25T07:16:48.7199199Z with:
+2026-10-25T07:16:48.7199779Z   cache-dependency-path: .github/requirements-*.txt
+2026-10-25T07:16:48.7200487Z   cache: pip
+2026-10-25T07:16:48.7200992Z   python-version: 3.11
+2026-10-25T07:16:48.7201537Z   check-latest: false
+2026-10-25T07:16:48.7206426Z   token: ***
+2026-10-25T07:16:48.7206988Z   update-environment: true
+2026-10-25T07:16:48.7207656Z   allow-prereleases: false
+2026-10-25T07:16:48.7208301Z   freethreaded: false
+2026-10-25T07:16:48.7208854Z env:
+2026-10-25T07:16:48.7209348Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:48.7209911Z ##[endgroup]
+2026-10-25T07:16:48.8201003Z ##[group]Installed versions
+2026-10-25T07:16:48.8666634Z (node:2150) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-25T07:16:48.8667314Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-25T07:16:48.8667779Z Successfully set up CPython (3.11.17)
+2026-10-25T07:16:48.8668123Z ##[endgroup]
+2026-10-25T07:16:48.9065209Z [command]/opt/hostedtoolcache/Python/3.11.17/x64/bin/pip cache dir
+2026-10-25T07:16:50.1824413Z /home/runner/.cache/pip
+2026-10-25T07:16:50.4257413Z Cache hit for: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.17-pip-8e8cb52455b78aa0f787d363f929ae2bb9e4fcaec2481d986a66a11540617991
+2026-10-25T07:16:50.4328101Z (node:2150) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-25T07:16:51.4532522Z Received 11142734 of 11142734 (100.0%), 13.4 MBs/sec
+2026-10-25T07:16:51.4532960Z Cache Size: ~11 MB (11142734 B)
+2026-10-25T07:16:51.4551464Z [command]/usr/bin/tar -xf /home/runner/work/_temp/0403bcad-81b7-47dc-8af4-0f891499aa0f/cache.tzst -P -C /home/runner/work/NinFenz/NinFenz --use-compress-program unzstd
+2026-10-25T07:16:51.4857481Z Cache restored successfully
+2026-10-25T07:16:51.4872048Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.17-pip-8e8cb52455b78aa0f787d363f929ae2bb9e4fcaec2481d986a66a11540617991
+2026-10-25T07:16:51.5008112Z ##[group]Run sudo apt-get update
+2026-10-25T07:16:51.5008309Z [36;1msudo apt-get update[0m
+2026-10-25T07:16:51.5008512Z [36;1msudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3[0m
+2026-10-25T07:16:51.5008806Z [36;1mpip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）[0m
+2026-10-25T07:16:51.5064391Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:16:51.5064564Z env:
+2026-10-25T07:16:51.5064707Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:16:51.5064900Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:51.5065169Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:16:51.5065411Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:51.5065617Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:51.5065827Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:16:51.5066041Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:16:51.5066252Z ##[endgroup]
+2026-10-25T07:16:51.6080022Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-25T07:16:51.6293700Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-25T07:16:51.6491576Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-25T07:16:51.6502701Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-25T07:16:51.6560397Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-25T07:16:51.6609664Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-25T07:16:51.7207814Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [660 kB]
+2026-10-25T07:16:51.7379605Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [598 kB]
+2026-10-25T07:16:51.7417614Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.4 kB]
+2026-10-25T07:16:51.8221222Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1400 kB]
+2026-10-25T07:16:51.8289644Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [310 kB]
+2026-10-25T07:16:51.8309399Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1706 kB]
+2026-10-25T07:16:51.8378720Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [342 kB]
+2026-10-25T07:16:51.8403549Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1805 kB]
+2026-10-25T07:16:51.8482821Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+2026-10-25T07:16:51.9050001Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1146 kB]
+2026-10-25T07:16:51.9094196Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+2026-10-25T07:16:51.9113800Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1222 kB]
+2026-10-25T07:16:51.9170296Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+2026-10-25T07:16:51.9611485Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1713 kB]
+2026-10-25T07:16:51.9670253Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [392 kB]
+2026-10-25T07:17:01.1603277Z Fetched 12.6 MB in 1s (12.6 MB/s)
+2026-10-25T07:17:01.7558017Z Reading package lists...
+2026-10-25T07:17:01.7811289Z Reading package lists...
+2026-10-25T07:17:01.9514084Z Building dependency tree...
+2026-10-25T07:17:01.9519120Z Reading state information...
+2026-10-25T07:17:02.0795638Z libgl1 is already the newest version (1.7.0-1build1).
+2026-10-25T07:17:02.0795896Z libgl1 set to manually installed.
+2026-10-25T07:17:02.0796094Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-25T07:17:02.0796288Z libxkbcommon0 set to manually installed.
+2026-10-25T07:17:02.0797018Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-25T07:17:02.0797214Z libdbus-1-3 set to manually installed.
+2026-10-25T07:17:02.0797394Z The following additional packages will be installed:
+2026-10-25T07:17:02.0798642Z   libegl-mesa0
+2026-10-25T07:17:02.1034456Z The following NEW packages will be installed:
+2026-10-25T07:17:02.1036756Z   libegl-mesa0 libegl1
+2026-10-25T07:17:02.1172002Z 0 upgraded, 2 newly installed, 0 to remove and 100 not upgraded.
+2026-10-25T07:17:02.1172550Z Need to get 146 kB of archives.
+2026-10-25T07:17:02.1172848Z After this operation, 502 kB of additional disk space will be used.
+2026-10-25T07:17:02.1173238Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-25T07:17:02.2153362Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libegl-mesa0 amd64 25.2.8-0ubuntu0.24.04.4 [117 kB]
+2026-10-25T07:17:02.2920237Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libegl1 amd64 1.7.0-1build1 [28.7 kB]
+2026-10-25T07:17:02.4812647Z Fetched 146 kB in 0s (792 kB/s)
+2026-10-25T07:17:02.5123728Z Selecting previously unselected package libegl-mesa0:amd64.
+2026-10-25T07:17:02.5803717Z (Reading database ... 
+2026-10-25T07:17:02.5803991Z (Reading database ... 5%
+2026-10-25T07:17:02.5804134Z (Reading database ... 10%
+2026-10-25T07:17:02.5804268Z (Reading database ... 15%
+2026-10-25T07:17:02.5804398Z (Reading database ... 20%
+2026-10-25T07:17:02.5804526Z (Reading database ... 25%
+2026-10-25T07:17:02.5804838Z (Reading database ... 30%
+2026-10-25T07:17:02.5805020Z (Reading database ... 35%
+2026-10-25T07:17:02.5805198Z (Reading database ... 40%
+2026-10-25T07:17:02.5805423Z (Reading database ... 45%
+2026-10-25T07:17:02.5805612Z (Reading database ... 50%
+2026-10-25T07:17:02.6195720Z (Reading database ... 55%
+2026-10-25T07:17:02.9346292Z (Reading database ... 60%
+2026-10-25T07:17:03.1926972Z (Reading database ... 65%
+2026-10-25T07:17:03.4382130Z (Reading database ... 70%
+2026-10-25T07:17:03.7109009Z (Reading database ... 75%
+2026-10-25T07:17:04.0280161Z (Reading database ... 80%
+2026-10-25T07:17:04.5349439Z (Reading database ... 85%
+2026-10-25T07:17:05.1413733Z (Reading database ... 90%
+2026-10-25T07:17:06.2756674Z (Reading database ... 95%
+2026-10-25T07:17:06.2756975Z (Reading database ... 100%
+2026-10-25T07:17:06.2757246Z (Reading database ... 203540 files and directories currently installed.)
+2026-10-25T07:17:06.2795278Z Preparing to unpack .../libegl-mesa0_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+2026-10-25T07:17:06.2894616Z Unpacking libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-25T07:17:06.3145472Z Selecting previously unselected package libegl1:amd64.
+2026-10-25T07:17:06.3243768Z Preparing to unpack .../libegl1_1.7.0-1build1_amd64.deb ...
+2026-10-25T07:17:06.3251351Z Unpacking libegl1:amd64 (1.7.0-1build1) ...
+2026-10-25T07:17:06.3542413Z Setting up libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+2026-10-25T07:17:06.3560917Z Setting up libegl1:amd64 (1.7.0-1build1) ...
+2026-10-25T07:17:06.3580797Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-25T07:17:09.2075230Z 
+2026-10-25T07:17:09.2075746Z Running kernel seems to be up-to-date.
+2026-10-25T07:17:09.2077112Z 
+2026-10-25T07:17:09.2077220Z No services need to be restarted.
+2026-10-25T07:17:09.2079826Z 
+2026-10-25T07:17:09.2079911Z No containers need to be restarted.
+2026-10-25T07:17:09.2080025Z 
+2026-10-25T07:17:09.2080111Z No user sessions are running outdated binaries.
+2026-10-25T07:17:09.2080238Z 
+2026-10-25T07:17:09.2080352Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-25T07:17:11.1637412Z Collecting attrs==26.1.0 (from -r .github/requirements-ci.txt (line 6))
+2026-10-25T07:17:11.2017785Z   Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-25T07:17:11.4639278Z Collecting coverage==7.16.1 (from -r .github/requirements-ci.txt (line 12))
+2026-10-25T07:17:11.4677094Z   Downloading coverage-7.16.1-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (256 kB)
+2026-10-25T07:17:11.4908720Z Collecting jsonschema==4.26.0 (from -r .github/requirements-ci.txt (line 135))
+2026-10-25T07:17:11.4940030Z   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+2026-10-25T07:17:11.5110813Z Collecting jsonschema-specifications==2025.9.1 (from -r .github/requirements-ci.txt (line 139))
+2026-10-25T07:17:11.5143774Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-25T07:17:11.5341953Z Collecting pyside6==6.11.2 (from -r .github/requirements-ci.txt (line 143))
+2026-10-25T07:17:11.5388263Z   Downloading pyside6-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (572 kB)
+2026-10-25T07:17:11.5462635Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.1/572.1 kB 75.7 MB/s  0:00:00
+2026-10-25T07:17:11.5664233Z Collecting pyside6-addons==6.11.2 (from -r .github/requirements-ci.txt (line 150))
+2026-10-25T07:17:11.5718338Z   Downloading pyside6_addons-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (175.1 MB)
+2026-10-25T07:17:13.2634925Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 175.1/175.1 MB 103.4 MB/s  0:00:01
+2026-10-25T07:17:13.3705704Z Collecting pyside6-essentials==6.11.2 (from -r .github/requirements-ci.txt (line 157))
+2026-10-25T07:17:13.3759450Z   Downloading pyside6_essentials-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (80.1 MB)
+2026-10-25T07:17:14.2289184Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.1/80.1 MB 93.8 MB/s  0:00:00
+2026-10-25T07:17:14.3129601Z Collecting pyyaml==6.0.3 (from -r .github/requirements-ci.txt (line 166))
+2026-10-25T07:17:14.3163132Z   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+2026-10-25T07:17:14.3203003Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 224.6 MB/s  0:00:00
+2026-10-25T07:17:14.3382019Z Collecting referencing==0.37.0 (from -r .github/requirements-ci.txt (line 241))
+2026-10-25T07:17:14.3411764Z   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-25T07:17:14.4789762Z Collecting rpds-py==2026.9.1 (from -r .github/requirements-ci.txt (line 247))
+2026-10-25T07:17:14.4827731Z   Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (375 kB)
+2026-10-25T07:17:14.5040846Z Collecting shiboken6==6.11.2 (from -r .github/requirements-ci.txt (line 379))
+2026-10-25T07:17:14.5084646Z   Downloading shiboken6-6.11.2-cp310-abi3-manylinux_2_34_x86_64.whl (272 kB)
+2026-10-25T07:17:14.5258888Z Collecting typing-extensions==4.16.0 (from -r .github/requirements-ci.txt (line 389))
+2026-10-25T07:17:14.5289955Z   Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-25T07:17:14.6583524Z Installing collected packages: typing-extensions, shiboken6, rpds-py, pyyaml, coverage, attrs, referencing, pyside6-essentials, pyside6-addons, jsonschema-specifications, pyside6, jsonschema
+2026-10-25T07:17:16.9808364Z 
+2026-10-25T07:17:16.9817133Z Successfully installed attrs-26.1.0 coverage-7.16.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 pyside6-6.11.2 pyside6-addons-6.11.2 pyside6-essentials-6.11.2 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.9.1 shiboken6-6.11.2 typing-extensions-4.16.0
+2026-10-25T07:17:17.0611315Z ##[group]Run # 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让
+2026-10-25T07:17:17.0611618Z [36;1m# 与 cross-platform.yml 同口径。实测：缺 .gitee/ISSUE_TEMPLATE 会让[0m
+2026-10-25T07:17:17.0611898Z [36;1m# check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。[0m
+2026-10-25T07:17:17.0612377Z [36;1mmkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target[0m
+2026-10-25T07:17:17.0612617Z [36;1mecho "前置目录已建"[0m
+2026-10-25T07:17:17.0664497Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-25T07:17:17.0664832Z env:
+2026-10-25T07:17:17.0664948Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:17.0665124Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0665355Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:17.0665581Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0665830Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0666039Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0666251Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:17.0666431Z ##[endgroup]
+2026-10-25T07:17:17.0743837Z 前置目录已建
+2026-10-25T07:17:17.0780235Z ##[group]Run # P3（2026-10-18）：CI 是发布闸门 → 显式 --checks-only（默认档 quick 是开发回路）；
+2026-10-25T07:17:17.0780526Z [36;1m# P3（2026-10-18）：CI 是发布闸门 → 显式 --checks-only（默认档 quick 是开发回路）；[0m
+2026-10-25T07:17:17.0780739Z [36;1m# --no-cache 保证每次真跑、不复用本地判定缓存（半份门禁的绿不进缓存）。[0m
+2026-10-25T07:17:17.0780927Z [36;1m# `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。[0m
+2026-10-25T07:17:17.0781113Z [36;1mset -o pipefail[0m
+2026-10-25T07:17:17.0781308Z [36;1mbash verify.sh --checks-only --no-cache 2>&1 | tee verify-checks.log[0m
+2026-10-25T07:17:17.0824883Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:17:17.0825023Z env:
+2026-10-25T07:17:17.0825138Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:17.0825315Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0825548Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:17.0825770Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0825998Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0826203Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:17.0826407Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:17.0826588Z   NF_VERIFY_TMP: .nf-logs
+2026-10-25T07:17:17.0826713Z ##[endgroup]
+2026-10-25T07:17:17.1243090Z ==================================================
+2026-10-25T07:17:17.1244616Z  NinFenz 三段式验收门禁  v2.30（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）
+2026-10-25T07:17:17.1245448Z ==================================================
+2026-10-25T07:17:17.1245875Z  档位：quick（42 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）
+2026-10-25T07:17:17.1246220Z —— 段 A：官方核心出厂（无 community 亦须通过）——
+2026-10-25T07:17:17.1246552Z == [1/6·A] 官方核心目录结构（07 §7 项1）==
+2026-10-25T07:17:17.1255962Z   [PASS] 根级 6 件；03 官方三管线（P00/P01/P90）；04 核心 13 件逐件在场；05=README+用户自定义
+2026-10-25T07:17:17.1256312Z == [2/6·A] 重号 ID 全限定·官方层（07 §7 项5）==
+2026-10-25T07:17:17.1440637Z   [PASS] 04 核心两重号在场（M10/M22 各 1 件）；02 注册两限定 ID；02/06/07 全类别前缀限定
+2026-10-25T07:17:17.1441029Z == [3/6·A] 五条不变式落点（01 §5 ↔ 07 §7 项6）==
+2026-10-25T07:17:17.1597794Z   [PASS] I1-I5 五条不变式 + I4 五接口 + I2 核心锚点全部落于 01 §5
+2026-10-25T07:17:17.1598180Z == [4/6·A] 可见性边界（06 §4 管线 ↔ M23 可见性域）==
+2026-10-25T07:17:17.1710860Z   [PASS] 06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）
+2026-10-25T07:17:17.1711119Z == [5/6·A] 质检门（M80 gate_action 流水线 ↔ 06 §5）==
+2026-10-25T07:17:17.1820989Z   [PASS] M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致
+2026-10-25T07:17:17.1821271Z == [6/6·A] 入口导航（README → 07 → 协议链/官方目录）==
+2026-10-25T07:17:17.1894083Z   [PASS] README→07→01/02/06/03/05 官方入口导航闭环可访问
+2026-10-25T07:17:17.1894406Z —— 段 B：社区领域包（两包在场执行，缺包 WARN 跳过）——
+2026-10-25T07:17:17.1894692Z == [7/4·B] 社区两包结构完整（07 §7 项2，T6 在册数一致性）==
+2026-10-25T07:17:17.1996015Z   [PASS] 校园 9 模块+29 资产+P02+README（与 02 §8.1 在册 9 一致）；西幻 14 模块+23 资产+P03+README（与 02 §8.2 在册 14 一致）结构完整
+2026-10-25T07:17:17.1996685Z == [8/4·B] 社区资产行数溯源（07 §7 项3）==
+2026-10-25T07:17:17.2474444Z   [PASS] 行数溯源一致（基线可重签）：AI人力资源与招聘域包 3 文件 435 行 / AI保险域包 3 文件 414 行 / AI农业域包 3 文件 466 行 / AI制药与生物域包 3 文件 446 行 / AI制造业域包 3 文件 477 行 / AI医疗健康域包 3 文件 425 行 / AI政务与公共事务域包 3 文件 478 行 / AI教育域包 3 文件 414 行 / AI法律与合规域包 3 文件 446 行 / AI系统域包 1 文件 306 行 / AI能源与电力域包 3 文件 466 行 / AI金融投研与风控域包 3 文件 415 行 / AI食品与餐饮域包 3 文件 404 行 / 三维与世界模型域包 3 文件 405 行 / 上下文工程与长上下文域包 3 文件 426 行 / 世界书与设定库域包 3 文件 395 行 / 个人助理与日常生活域包 3 文件 384 行 / 交通与出行域包 3 文件 456 行 / 产业与商业落地域包 3 文件 394 行 / 代码与软件工程域包 3 文件 466 行 / 代码大模型域包 3 文件 447 行 / 代码审查与缺陷检测域包 3 文件 405 行 / 代码生成与补全域包 3 文件 406 行 / 企业培训与组织学习域包 3 文件 414 行 / 传媒与新闻域包 3 文件 414 行 / 信息抽取与结构化域包 3 文件 417 行 / 具身智能与机器人域包 3 文件 468 行 / 内容分发与社区运营域包 3 文件 394 行 / 内容改写与风格迁移域包 3 文件 384 行 / 分类与情感分析域包 3 文件 405 行 / 参数高效微调域包 3 文件 446 行 / 可观测性成本与可靠性域包 3 文件 457 行 / 可解释性与审计域包 3 文件 414 行 / 合成数据生成域包 3 文件 466 行 / 合规与监管域包 3 文件 394 行 / 向量库与检索管线域包 3 文件 435 行 / 图像生成与编辑域包 3 文件 469 行 / 图像生成与视觉创作域包 3 文件 404 行 / 图像生成与视觉设计域包 3 文件 426 行 / 多智能体协同域包 3 文件 415 行 / 多模态大模型域包 3 文件 468 行 / 多语翻译与本地化域包 3 文件 446 行 / 多轮对话与角色扮演域包 3 文件 469 行 / 大语言模型域包 3 文件 436 行 / 安全与对齐域包 3 文件 436 行 / 对话与客服域包 3 文件 405 行 / 对齐与偏好优化域包 3 文件 426 行 / 嵌入与检索表示域包 3 文件 394 行 / 平台与基础设施域包 3 文件 425 行 / 建筑与房地产域包 3 文件 394 行 / 开源与开发者生态域包 3 文件 466 行 / 强化学习与决策域包 3 文件 425 行 / 推理优化与加速域包 3 文件 447 行 / 推理服务与部署域包 3 文件 459 行 / 推荐排序与广告域包 3 文件 438 行 / 提示工程与指令设计域包 3 文件 415 行 / 提示工程与提示模板域包 3 文件 394 行 / 搜索与信息聚合域包 3 文件 427 行 / 摘要与信息压缩域包 3 文件 416 行 / 数字人与虚拟形象域包 3 文件 403 行 / 数学与形式化推理域包 3 文件 447 行 / 数据分析与决策支持域包 3 文件 415 行 / 数据分析与表格理解域包 3 文件 448 行 / 数据标注与标注质量域包 3 文件 393 行 / 数据采集与清洗域包 3 文件 405 行 / 文旅与酒店域包 3 文件 458 行 / 文本生成与创作域包 3 文件 385 行 / 文档解析与版面理解域包 3 文件 396 行 / 智能体与工作流编排域包 3 文件 426 行 / 智能体框架与工具调用域包 3 文件 426 行 / 机器翻译与本地化域包 3 文件 416 行 / 校园情感领域包 29 文件 1575 行 / 模型运营与成本域包 3 文件 436 行 / 测试与用例生成域包 3 文件 416 行 / 游戏与互动娱乐域包 3 文件 404 行 / 版权与知识产权域包 3 文件 424 行 / 物流与供应链域包 3 文件 445 行 / 监督微调域包 3 文件 445 行 / 知识管理与检索增强域包 3 文件 501 行 / 知识问答与检索增强域包 3 文件 386 行 / 科研与实验域包 3 文件 458 行 / 端侧与边缘小模型域包 3 文件 509 行 / 红队越狱与安全测试域包 3 文件 435 行 / 组合包-受监管行业 0 文件 0 行 / 组合包-数据管线 0 文件 0 行 / 组合包-检索栈 0 文件 0 行 / 组合包-轻混与保险 0 文件 0 行 / 编辑校对与出版域包 3 文件 447 行 / 西幻生存领域包 23 文件 4284 行 / 视觉模型域包 3 文件 456 行 / 视频生成与剪辑域包 3 文件 405 行 / 视频生成与理解域包 3 文件 426 行 / 视频生成与自动剪辑域包 3 文件 416 行 / 角色扮演与角色卡域包 3 文件 415 行 / 记忆体与个性化域包 3 文件 415 行 / 评测与基准域包 3 文件 456 行 / 评测基准与排行榜域包 3 文件 384 行 / 语音合成与配音域包 3 文件 435 行 / 语音识别与合成域包 3 文件 447 行 / 语音转写与会议记录域包 3 文件 468 行 / 量化金融域包 4 文件 414 行 / 长文本与小说创作域包 3 文件 384 行 / 隐私与数据治理域包 3 文件 436 行 / 零售与电商域包 3 文件 404 行 / 音频与音乐生成域包 3 文件 436 行 / 音频音乐与语音域包 3 文件 394 行 / 预测异常与风险域包 3 文件 488 行 / 预训练与继续预训练域包 3 文件 415 行
+2026-10-25T07:17:17.2477253Z == [9/4·B] 模块-资产引用可寻址 + 社区 README 重号限定（07 §7 项4/5）==
+2026-10-25T07:17:17.2514351Z   [PASS] 代表键 ATTR_TEMPLATES/LOCATIONS/EMOTION_WHEEL/JOB/WORLD_KNOWLEDGE 在两包 assets 可寻址；两包 README 的 M10/M22 全类别前缀限定
+2026-10-25T07:17:17.2514878Z == [10/4·B] EXT 闭合 + 社区红线落地（07 §7 项2/8）==
+2026-10-25T07:17:17.2686209Z   [PASS] 西幻01/20 EXT 闭合+溯源注释+已填充；冲动-社会关系隔离三落点一致（M22 §7/校园 README/06 §9 红线7）
+2026-10-25T07:17:17.2686854Z == [11/5·B] 资产-模块三方对账（08 方案 T5 A5；02 §8.1 ↔ modules/ ↔ assets/README）==
+2026-10-25T07:17:17.5951199Z 对账汇总: 幽灵编号=0  孤儿模块=0  未登记模块=0
+2026-10-25T07:17:17.5951615Z >>> 对账全清：零幽灵（源编号残留已豁免）/ 零孤儿 / 零未登记，变更可提交 <<<
+2026-10-25T07:17:17.5952743Z   [PASS] 资产三方对账全清：幽灵编号=0（源编号残留已豁免）/ 孤儿模块=0 / 未登记模块=0
+2026-10-25T07:17:17.5953203Z —— 段 C：代码层门禁（L2 core：check12-check40 无条件执行；android 相关已随 L3 冻结移出）——
+2026-10-25T07:17:17.5953626Z == [12/代码层] 桌面核心单元测试 + 全量 py_compile 语法抽查（v0.6.0 治理补漏）==
+2026-10-25T07:17:17.5953944Z   [WARN] desktop/tests 不在场（跳过代码层 unittest）
+2026-10-25T07:17:17.5971782Z ##[warning]desktop/tests 不在场（跳过代码层 unittest）
+2026-10-25T07:17:17.9978004Z   [PASS] 全量 py_compile 语法抽查通过（desktop/src scripts）
+2026-10-25T07:17:17.9978505Z   [PASS] 代码层门禁全绿：unittest 全量 + py_compile（L2 核心层）
+2026-10-25T07:17:17.9980681Z == [13/段C] 协议版本一致性 + 迁移完整性（09 方案 T2.3）==
+2026-10-25T07:17:18.0150661Z   [PASS] 协议版本两处一致：02 头部 = desktop registry.json = "2"
+2026-10-25T07:17:18.0248712Z   [PASS] 迁移记录在场：02 §9.3 四步齐备（现状快照/bump 声明/迁移说明/校验回读）
+2026-10-25T07:17:18.0399676Z   [PASS] 模块逐条一致：02 §2 模块表 13 件 == registry.json modules（ID 集合全等）
+2026-10-25T07:17:18.0400219Z   [PASS] 协议版本一致性 + 迁移完整性全绿（check13：两处版本一致 + §9.3 四步在场 + 13 件模块全等）
+2026-10-25T07:17:18.0402659Z == [14/段C] 社区协议登记门禁（v0.7.0 check14：01 §6.1 Schema + 02 §8.3 登记三要件 + registry protocols[] 投影）==
+2026-10-25T07:17:18.2880352Z   [PASS] 社区协议登记门禁全绿（check14 八项：①protocol.yaml 在场 ②Schema 必填 12 字段 ③R2 类别不冲突 ④R1 依赖边界 ⑤编号在册一致+M91-M99 不占用+编号命名空间（类别在册/类内号唯一/全库不重号/新包裸号限段） ⑥双源一致 ⑦protocols[] 投影一致 ⑧管线 id 避让层位/官方 id 且全库唯一）
+2026-10-25T07:17:18.2882840Z == [15/段C] 组合引用门禁（v0.8.0 check15：02 §8.4 references 五断言）==
+2026-10-25T07:17:18.4821292Z   [PASS] 组合引用门禁全绿（check15 五断言：①references 在册可寻址 ②依赖闭包闭合官方核心 ③挂载层 default 无冲突 ④schema_version v1/v2 兼容 ⑤双源一致）
+2026-10-25T07:17:18.4821810Z == [16/段C] 契约仲裁门禁（v1.0.0 check16：01 §1.1 machine_contract 机读结构 + 02 §8.4 规则④ references 装配自动仲裁 + 运行时寻址授权一致）==
+2026-10-25T07:17:19.2558044Z   [PASS] 契约仲裁全绿（check16-A：官方核心 13 件 machine_contract 机读结构解析 + references 装配 publish⊆subscribe 无违约）
+2026-10-25T07:17:19.2943661Z   [PASS] 运行时寻址授权一致（check16-B：registry references.asset_readonly ↔ _readonly_sources ↔ asset_get 三方一致，空白名单全拒）
+2026-10-25T07:17:19.2944128Z == [17/段C] 质量治理门禁（v1.4.0 check17：16_v1.4.0_质量治理闭环方案.md）==
+2026-10-25T07:17:19.4541258Z   [PASS] 质量治理门 unittest 全绿（test_quality_gate：空装配/缺锚点 fail、资产悬空/层外 warn、合法装配 ok；ok()=fail==0 可信任度不变量）
+2026-10-25T07:17:19.4541771Z == [18/段C] 导出契约门禁（v2.0.0 check18：17_v2.0.0_导出层CCV3方案.md）==
+2026-10-25T07:17:19.9894331Z   [PASS] 导出契约 unittest 全绿（ccv3_adapter：映射层引擎锚点排除/资产条目/无静默丢弃；exporter：chara spec 锚点/world 条目/PNG tEXt 回读）
+2026-10-25T07:17:19.9894877Z == [19/段C] 导出产物 schema 合规（v2.2.0 A1：export_schema 5 格式 shape 自检）==
+2026-10-25T07:17:20.1058439Z   [PASS] 导出产物 schema 校验全绿（ccv3/skill/agents/claude/mcp 5 格式 shape 自检：合法产物通过 + 篡改检出）
+2026-10-25T07:17:20.1058898Z   [PASS] 导出产物 schema 合规门禁全绿（check19：A1 外部吸收——产物 shape 不漂移）
+2026-10-25T07:17:20.1060806Z == [20/段C] 文档完整性门禁（v2.2.0 A3：模块文档必填项——对齐 check16 过渡策略分层）==
+2026-10-25T07:17:20.1260609Z   [PASS] 文档完整性门禁全绿（check20：A3 模块必填项——官方强校验 + 社区机读完备强校验，未完备 WARN 统计）
+2026-10-25T07:17:20.1261167Z == [21/段C] registry 引用图闭合门禁（v2.2.0 A4：impact_check 变更影响面——registry 自洽无悬空引用/无裸号重复）==
+2026-10-25T07:17:20.1756941Z   [PASS] registry 引用图闭合校验全绿（A4 impact_check：隔离构造悬空引用/重复检出 + registry.json 真源自洽 smoke）
+2026-10-25T07:17:20.1757534Z   [PASS] registry 引用图闭合门禁全绿（check21：A4 外部吸收——registry 自洽无悬空 source_package/module_id、无同包裸号重复）
+2026-10-25T07:17:20.1758335Z == [22/段C] 导出物规范体检门禁（v2.4.0 A4：export_schema 硬约束——spec_version 数值/name 规范/description 上限）==
+2026-10-25T07:17:20.2491493Z   [PASS] 导出物规范体检全绿（A4 export_schema：ccv3 spec_version 3.0-4.0 数值 + skill name a-z0-9-/≤64/匹配父目录 + description ≤1024）
+2026-10-25T07:17:20.2492046Z   [PASS] 导出物规范体检门禁全绿（check22：A4 外部吸收——A1/A2 核查硬约束机读化，spec_version bug 拦截）
+2026-10-25T07:17:20.2493372Z == [23/段C] 资产供应链闭合门禁（40 总纲 v2.7 波A S2：每资产可溯源/可发现/键无孤儿；台账=provenance.json + 文件头双源一致）==
+2026-10-25T07:17:20.3314444Z   [PASS] 资产供应链台账闭合（S2：托管资产 可溯源/可发现/键无孤儿）
+2026-10-25T07:17:20.3315219Z   [PASS] 资产供应链闭合门禁全绿（check23：40 总纲 v2.7 S2——入库/溯源/版本/淘汰四环机读闭环，键无孤儿）
+2026-10-25T07:17:20.3315797Z == [24/段C] 模块生命周期门禁（40 总纲 v2.8 波B S5：模块 status 位 + deprecate/restore + 引用门禁——deprecated/retired 不得被引用）==
+2026-10-25T07:17:20.3638508Z   [PASS] 模块状态扫描与引用门禁通过（S5：全部模块状态位可读，无 deprecated/retired 被引用）
+2026-10-25T07:17:20.3639648Z   [PASS] 模块生命周期门禁全绿（check24：40 总纲 v2.8 波B S5——status 位 + 引用门禁闭环，流转战例在册）
+2026-10-25T07:17:20.3640196Z == [25/段C] 协议知识签名门禁（41 波C C2：01-36 全量文档签名两遍可复现——知识指纹稳定 = 编译期冲突可发现）==
+2026-10-25T07:17:20.3966676Z   [PASS] 协议知识签名全量可复现（C1/C2：01-36 覆盖，两遍逐字节一致）
+2026-10-25T07:17:20.3967214Z   [PASS] 协议知识签名门禁全绿（check25：41 波C C2——01-36 签名可复现，签名 = 新增可计算摘要）
+2026-10-25T07:17:20.3969186Z == [26/段C] 语义矛盾扫描门禁（41 波C C3：techdoc 链事件契约断链 + 挂载点/类别漂移——补 check15/21 结构自洽之上的语义空白）==
+2026-10-25T07:17:20.4309065Z   [PASS] 语义矛盾扫描通过（C3：techdoc 链事件契约闭合，无挂载点/类别漂移）
+2026-10-25T07:17:20.4309684Z   [PASS] 语义矛盾扫描门禁全绿（check26：41 波C C3——事件契约断链/漂移为零，编译期矛盾拦截）
+2026-10-25T07:17:20.4764438Z == [27/段C] 架构纯度体检门禁（42 M3：端壳残留/私货可变物/重复标题 grep 断言族 + core raise 消息修复指引审计 + 抽象阶梯归属与越界 R7 + 核心文面去叙述 R8）==
+2026-10-25T07:17:21.6447544Z   [PASS] 架构纯度体检通过（M3：协议层无端壳残留/私货/重复标题 + 阶梯归属互斥/接口子集/依赖向下 + raise 消息修复指引零缺失 + 03/04 核心文面去叙述零命中 R8）
+2026-10-25T07:17:21.6447916Z   [PASS] 架构纯度体检门禁全绿（check27：42 M3 + R8 去叙述——纯度体检制度化，PASS 39→41）
+2026-10-25T07:17:21.6448548Z == [28/段C] 协议层 IDL schema 门禁（43 A1：protocol/schema 全定义在场 + 全量件过 schema——machine_contract/registry 投影/管线声明/协议包/资产台账/发布策略/接入面，任一字段漂移即 FAIL）==
+2026-10-25T07:17:21.8545979Z   [PASS] 协议层 IDL 全量件过 schema（A1：protocol/schema 全定义在场 + 零漂移）
+2026-10-25T07:17:21.8546665Z   [PASS] 协议层 IDL schema 门禁全绿（check28：43 A1——IDL 单一真相落盘机检，PASS 41→43）
+2026-10-25T07:17:21.8547343Z == [29/段C] Conformance 一致性分级门禁（43 A2：01 §1.2 分级——模块机读块/协议包/导出 manifest 声明 ≤ 可证级别，防虚标）==
+2026-10-25T07:17:21.9642605Z   [PASS] Conformance 声明 ≤ 可证级别（A2：模块机读块/协议包/导出面零虚标）
+2026-10-25T07:17:21.9643267Z   [PASS] Conformance 一致性分级门禁全绿（check29：43 A2——分级标注齐 + 零虚标，PASS 43→45）
+2026-10-25T07:17:21.9644092Z == [30/段C] 扩展策略 + bump 迁移门禁（43 A3：EXTENSION 判据在场 + 版本字段结构性变更须带 01 §7/02 §9.3 迁移记录）==
+2026-10-25T07:17:22.1539452Z   [PASS] 扩展策略 + bump 迁移门禁通过（A3：EXTENSION 判据在场，版本 bump 均带迁移四步）
+2026-10-25T07:17:22.1539868Z   [PASS] 扩展策略 + bump 迁移门禁全绿（check30：43 A3——EXTENSION 判据常驻，PASS 45→47）
+2026-10-25T07:17:22.2899706Z == [31/段C] 生成物同仓 golden 门禁（43 A4：schema 定义 → 生成物可复现，仓库内产物 == 实时重算——双源不一致即过期 FAIL）==
+2026-10-25T07:17:22.2900499Z   [PASS] 生成物同仓 golden 一致（A4：schema↔生成物双源可复现，无过期）
+2026-10-25T07:17:22.2900841Z   [PASS] 生成物同仓 golden 门禁全绿（check31：43 A4——生成物双源一致，PASS 47→49）
+2026-10-25T07:17:22.2901643Z == [32/段C] 质量纵深汇总门禁（45 W28：载荷注册表/资产 ledger/指令审计/概念图健康/资产密度·厚度·零引用 + world_model/world_slots）==
+2026-10-25T07:17:24.4698234Z   [PASS] 质量纵深汇总扫描通过（载荷/ledger/指令/概念图/资产/world_model/world_slots 零缺口）
+2026-10-25T07:17:24.4698727Z   [PASS] 质量纵深汇总门禁全绿（check32：45 W28 + 概念图健康 + world_model/world_slots——纵深统一硬门，PASS 49→51）
+2026-10-25T07:17:24.4700177Z == [33/段C] 新面汇总门禁（MCP dual-era / stdio 帧纪律 / attestation / 基线回归评分 / 机械修复 / 正文 lint / 许可证门 / 遥测 semconv / 编码卫生 / 互操作导出（含入仓一致性）/ 文档命令面 / 决策层面 / 构建回路）==
+2026-10-25T07:17:26.1050246Z   [PASS] 新面扫描通过（MCP dual-era / stdio 帧纪律 / attestation / 评分 / 机械修复 / 正文 lint / 编辑器面（能力·定位·生命周期·领域智能·配置）/ 许可证 / 遥测 / 编码卫生 / 互操作导出与入仓面一致 / 文档命令面 / 决策层面 / 构建回路）
+2026-10-25T07:17:26.1050930Z   [PASS] 新面汇总门禁全绿（check33：MCP 版本对齐/stdio 帧纪律/内容外挂签名/回归评分/编辑器面/正文 lint/许可证门/遥测 semconv/编码卫生/互操作导出含入仓/文档命令面/决策层 typed-decision 端口/构建回路）
+2026-10-25T07:17:26.1052876Z == [34/段C] 云端图书馆面门禁（frontmatter 真源 / INDEX·ALIAS 投影一致 / 生命周期 / 四型覆盖 / llms.txt 入口 / 内容分级声明 / 投稿面一致）==
+2026-10-25T07:17:26.1433221Z   [PASS] 图书馆面扫描通过（frontmatter 真源 / 投影一致 / 四型覆盖 / llms.txt 入口 / 检索可用）
+2026-10-25T07:17:26.1433594Z   [PASS] 云端图书馆面门禁全绿（check34：单一真相源 I5 + 生命周期 + Diátaxis 四型 + llms.txt 机器入口）
+2026-10-25T07:17:26.1435574Z == [35/段C] 深化面门禁（管线抽象执行 / 馆藏回执单根 / 模块边界冻结 / 内容绑定批准 / 一致性报告工件 / 无效语料）==
+2026-10-25T07:17:27.0149001Z   [PASS] 深化面扫描通过（dry-run / 回执单根 / 边界冻结 / 批准记录 / 一致性报告 / 语料）
+2026-10-25T07:17:27.0149558Z   [PASS] 深化面门禁全绿（check35：抽象执行 GraphSpec + MMR 回执 + 边界签名 + 内容绑定批准 + 报告工件）
+2026-10-25T07:17:27.0151924Z == [36/段C] 治理面门禁（一致性声明 / RFC 版本史 / 指令档机器面路由 / 实践包 / 跑分台 / 端点契约）==
+2026-10-25T07:17:27.6680904Z   [PASS] 治理面扫描通过（声明 / RFC / driver / 实践包 / 跑分 / 端点）
+2026-10-25T07:17:27.6681307Z   [PASS] 治理面门禁全绿（check36：一致性声明 + RFC 版本史 + 指令档路由 + 实践包 + 跑分台 + 端点契约）
+2026-10-25T07:17:27.6681648Z == [37/段C] 知识层门禁（双源知识：权威分层 / 查询有序 / 时效 / 消化可追溯 / 认知裁剪）==
+2026-10-25T07:17:27.7148950Z   [PASS] 知识层扫描通过（权威分层 / 查询有序 / 时效 / 溯源 / 巡检）
+2026-10-25T07:17:27.7149481Z   [PASS] 知识层门禁全绿（check37：双源知识——声明 + 顺序 + 溯源 + 巡检，PASS 59→61）
+2026-10-25T07:17:27.7151248Z == [38/段C] 出口自动化门禁（自述数字 / 他证通道 / GEO 出口 / FDE 样例 / 发布编排 / 接入面）==
+2026-10-25T07:17:27.7937254Z   [PASS] 出口面全绿：自述数字（check38 子扫描）
+2026-10-25T07:17:27.8208271Z   [PASS] 出口面全绿：他证通道（check38 子扫描）
+2026-10-25T07:17:27.9220246Z   [PASS] 出口面全绿：GEO 出口（check38 子扫描）
+2026-10-25T07:17:28.0854822Z   [PASS] 出口面全绿：FDE 样例（check38 子扫描）
+2026-10-25T07:17:28.1318158Z   [PASS] 出口面全绿：发布编排（check38 子扫描）
+2026-10-25T07:17:28.1840688Z   [PASS] 出口面全绿：接入面（check38 子扫描）
+2026-10-25T07:17:28.1841188Z   [PASS] 出口自动化门禁全绿（check38：自述数字 + 他证通道 + GEO 出口 + FDE 样例 + 发布编排 + 接入面 六子扫描）
+2026-10-25T07:17:28.1841549Z == [39/段C] 终端与端壳残留门禁（端壳退役已成事实 + 终端入口在场 + 命令面全策展可达 + 顶尖 CLI 基线逐条可核）==
+2026-10-25T07:17:30.2635236Z   [PASS] 端壳残留零在场 + 终端入口在场 + 命令面全策展可达 + 五分钟入口可跑（check39 子扫描：源件/入口/打包线 + terminal.self_check 单源判据 + 检索/地图/自检/补全/限长/无色/写盘表单/活体档/纯 JSON + 单真值源投影对账（tui/_surface.py 逐字节 + 视图闸门不弱于真源）+ 顶尖 CLI 基线逐行，行数不写死 + docs/quickstart.md ↔ scripts/quickstart_check.sh 步数/命令/墙钟）
+2026-10-25T07:17:30.2636488Z   [PASS] 终端与端壳残留门禁全绿（check39：端壳零回潮 + 终端三件在场 + 菜单无死命令 + 命令面全策展可达 + 单真值源投影同源 + 输出确定 + 五分钟入口文档步数==脚本步数）
+2026-10-25T07:17:30.2636837Z == [40/段C] 数字资产契约门禁（数据/代码/脚本三面：格式 + 字段完整性 + 防篡改 + AST 规范 + 可证空指针 + 脚本 I/O 对齐）==
+2026-10-25T07:17:31.2154338Z   [PASS] 数字资产契约三面全绿（check40：数据格式/字段完整性/防篡改 + 代码 AST 规范/可证空指针/测试在场 + 脚本 nf-io 双源一致与链对齐）
+2026-10-25T07:17:31.2154906Z   [PASS] 数字资产契约门禁全绿（check40：声明即契约 + 只判可证；数据/代码/脚本三面真源 protocol/asset_contracts.json）
+2026-10-25T07:17:31.2155352Z —— 段 D：供应链面（check41-42 无条件执行：构建隔离 + 不可伪造 provenance）——
+2026-10-25T07:17:31.2157976Z == [41/段D] 构建隔离门禁（SLSA L3 Build isolation：构建入口不联网 + 基座按 digest 钉 + 工具链定版）==
+2026-10-25T07:17:31.2331974Z   [PASS] 构建隔离通过（构建入口零取网、容器基座按 digest 钉、工具链定版）
+2026-10-25T07:17:31.2332540Z   [PASS] 构建隔离门禁全绿（check41：SLSA L3 Build isolation——构建期读面不被宿主污染）
+2026-10-25T07:17:31.2332996Z == [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）==
+2026-10-25T07:17:31.3106323Z   [WARN] 仓库自身 provenance 缺签名外锚（cosign 不在场）：本检查只证明外部验签机制可用且对篡改敏感，不等于本仓 provenance 已不可伪造
+2026-10-25T07:17:31.3109870Z ##[warning]仓库自身 provenance 缺签名外锚（cosign 不在场）：本检查只证明外部验签机制可用且对篡改敏感，不等于本仓 provenance 已不可伪造
+2026-10-25T07:17:31.3111876Z   [PASS] 不可伪造 provenance 检查通过（独立进程验签 + 篡改必红）
+2026-10-25T07:17:31.3112816Z   [PASS] 不可伪造 provenance 门禁全绿（check42：SLSA L3 Non-falsifiable——验签方 ≠ 签名方）
+2026-10-25T07:17:31.3113143Z ==================================================
+2026-10-25T07:17:31.3113446Z 结果统计: PASS=75  WARN=2  FAIL=0
+2026-10-25T07:17:31.3113712Z >>> 全部通过（WARN 仅提示非致命），变更可提交 <<<
+2026-10-25T07:17:31.3114169Z   [i] 诊断日志保留在：/home/runner/work/NinFenz/NinFenz/.nf-logs（NF_VERIFY_TMP 指定，不清理）
+2026-10-25T07:17:31.3171262Z ##[group]Run node site/tools/sync-numbers.mjs
+2026-10-25T07:17:31.3171465Z [36;1mnode site/tools/sync-numbers.mjs[0m
+2026-10-25T07:17:31.3222558Z shell: /usr/bin/bash -e {0}
+2026-10-25T07:17:31.3222701Z env:
+2026-10-25T07:17:31.3222818Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:31.3223157Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:31.3223393Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:31.3223623Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:31.3223833Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:31.3224049Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:31.3224258Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:31.3224435Z ##[endgroup]
+2026-10-25T07:17:36.3011394Z 真源（llms.txt）      : verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:36.3011992Z 真源（repo_stats.json）: verify v2.30 · check1-42 · PASS=76
+2026-10-25T07:17:36.5573571Z   index.html: 1 处一致
+2026-10-25T07:17:36.5573909Z   en/index.html: 1 处一致
+2026-10-25T07:17:36.5574140Z   llms.txt: 1 处一致
+2026-10-25T07:17:36.5575306Z   llms-full.txt: 1 处一致
+2026-10-25T07:17:36.5576629Z   facts.json: 3 处一致
+2026-10-25T07:17:36.5577425Z   nf.txt: 1 处一致
+2026-10-25T07:17:36.5578594Z   agent.txt: 1 处一致
+2026-10-25T07:17:36.5580148Z   use/index.html: 1 处一致
+2026-10-25T07:17:36.5580772Z   en/use/index.html: 1 处一致
+2026-10-25T07:17:36.5581262Z   robots.txt: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:36.5581727Z   sitemap.xml: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:36.5582322Z   404.html: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:36.5584536Z   README.md: 未出现该组数字（非必含面，跳过）
+2026-10-25T07:17:36.6518025Z   index.html: 规模 8 个数齐全
+2026-10-25T07:17:36.6519896Z   en/index.html: 规模 8 个数齐全
+2026-10-25T07:17:36.6520498Z   llms.txt: 规模 8 个数齐全
+2026-10-25T07:17:36.6522956Z   llms-full.txt: 规模 8 个数齐全
+2026-10-25T07:17:36.6524848Z   facts.json: scale.values 与真源一致（8 项）
+2026-10-25T07:17:36.7098616Z ✗ site/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7101883Z ✗ site/en/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7103411Z ✗ site/llms.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7104157Z ✗ site/llms-full.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7107710Z ✗ site/facts.json npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7108310Z ✗ site/agent.txt npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7109639Z ✗ site/README.md npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7110212Z ✗ site/use/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7110977Z ✗ site/en/use/index.html npm 版本口径漂移：v1.0.5 ≠ packaging/npm/package.json=1.1.0
+2026-10-25T07:17:36.7111922Z ✗ 站点数字未过：跑 node site/tools/sync-numbers.mjs --write 同步可自动改写的项，其余按上面指引手改
+2026-10-25T07:17:36.7112445Z   npm payload 清单不在场（忽略：忽略面，需先 stage）
+2026-10-25T07:17:37.3183917Z ##[error]Process completed with exit code 1.
+2026-10-25T07:17:37.3235345Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-25T07:17:37.3235576Z with:
+2026-10-25T07:17:37.3235688Z   name: verify-log
+2026-10-25T07:17:37.3235979Z   path: verify-checks.log
+.nf-logs/
+
+2026-10-25T07:17:37.3236134Z   if-no-files-found: warn
+2026-10-25T07:17:37.3236267Z   compression-level: 6
+2026-10-25T07:17:37.3236389Z   overwrite: false
+2026-10-25T07:17:37.3236510Z   include-hidden-files: false
+2026-10-25T07:17:37.3236641Z env:
+2026-10-25T07:17:37.3236751Z   QT_QPA_PLATFORM: offscreen
+2026-10-25T07:17:37.3236920Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:37.3237155Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-25T07:17:37.3237385Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:37.3237595Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:37.3237802Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-25T07:17:37.3238044Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-25T07:17:37.3238222Z ##[endgroup]
+2026-10-25T07:17:37.4264542Z (node:3482) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-25T07:17:37.4264972Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-25T07:17:37.4305956Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-25T07:17:37.4308349Z The least common ancestor is /home/runner/work/NinFenz/NinFenz. This will be the root directory of the artifact
+2026-10-25T07:17:37.4308853Z With the provided path, there will be 1 file uploaded
+2026-10-25T07:17:37.4313178Z Artifact name is valid!
+2026-10-25T07:17:37.4313669Z Root directory input is valid!
+2026-10-25T07:17:37.7741803Z Beginning upload of artifact content to blob storage
+2026-10-25T07:17:37.7850628Z (node:3482) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-25T07:17:38.0147624Z Uploaded bytes 8906
+2026-10-25T07:17:38.0778053Z Finished uploading artifact content to blob storage!
+2026-10-25T07:17:38.0778614Z SHA256 digest of uploaded artifact zip is a5374d2cba8dd22a90fb2ab34b0535a6ed1e084efca41f48a8a02735c772d21f
+2026-10-25T07:17:38.0779421Z Finalizing artifact upload
+2026-10-25T07:17:38.5058016Z Artifact verify-log.zip successfully finalized. Artifact ID 12590572602
+2026-10-25T07:17:38.5058471Z Artifact verify-log has been successfully uploaded! Final size is 8906 bytes. Artifact ID is 12590572602
+2026-10-25T07:17:38.5063598Z Artifact download URL: https://github.com/Monyeah777/NinFenz/actions/runs/40172167091/artifacts/12590572602
+2026-10-25T07:17:38.5225932Z Post job cleanup.
+2026-10-25T07:17:38.5753024Z [command]/usr/bin/git version
+2026-10-25T07:17:38.5783708Z git version 2.55.0
+2026-10-25T07:17:38.5805749Z Temporarily overriding HOME='/home/runner/work/_temp/5a26766a-6ae1-49b5-8dfb-686713f503e3' before making global git config changes
+2026-10-25T07:17:38.5806420Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-25T07:17:38.5809483Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/NinFenz/NinFenz
+2026-10-25T07:17:38.5840296Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-25T07:17:38.5867673Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-25T07:17:38.6069420Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-25T07:17:38.6127127Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-25T07:17:38.6327178Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-25T07:17:38.6357822Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-25T07:17:38.6654412Z Cleaning up orphan processes
+2026-10-25T07:17:38.6900239Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
