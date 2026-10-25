@@ -7,11 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
-  - CONTRIBUTING.md:ef23f498717b2d582072c453b3844e8725057cba9d736e591df586e54213dd85
+  - CONTRIBUTING.md:3df25c4698c25d9e43adb34a81df8e662ecac96c7c743564e3f216272f64f581
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-10-25）：分层双许可（1.1.0 起）
+
 > 重审（2026-10-23）：I/O/内存/IPC 审计整改：RepoIndex、缓存新鲜度、ISO/信任/协议防护
 
 > 重审（2026-10-20）：0.x renumber 1
