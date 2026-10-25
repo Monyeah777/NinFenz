@@ -122,7 +122,24 @@ modules are libraries.*
 | 参考协议文本写自己的实现 | 遵守 CC BY 4.0：署名 + 标注是否修改 |
 | 不想承担 copyleft 义务 | 购买商业许可（`COMMERCIAL.md`） |
 
-## 8. 免责与生效
+## 8. 法律依据（判例与成文法，用于支撑本仓做法）
+
+- **开源协议在中国法下的性质**：最高人民法院知识产权法庭 **(2021)最高法知民终51号**（2023-10-12 判决）明确：
+  涉开源软件的纠纷中，开发者是否尽到开源义务与其是否享有著作权**相对独立**；被诉侵权人仅以"未按开源协议开源"
+  抗辩不侵权的，**一般不予支持**。要旨见最高人民法院知识产权法庭官网：
+  <https://ipc.court.gov.cn/zh-cn/news/view-3773.html>。
+  → 实践含义：即使存在许可争议，**违反 AGPL 的一方仍可能承担侵权责任**；反之，违约与侵权可分别主张。
+- **电子签署效力**：《中华人民共和国民法典》第 469 条明确"数据电文"属于**书面形式**；第 491 条认可网络方式
+  订立的合同。故 `CLA.md` 的点击签署（CLA Assistant / PR 回复）在满足**可追溯留痕**（PR 链接 + 时间 + 版本号）时
+  具备合同效力。
+- **模板来源**：`CLA.md` 采用 **Harmony Combined Contributor Agreement v1.0 · Option Five**
+  （<https://www.harmonyagreements.org/agreements>，模板 CC BY 3.0；其 Guide 明确 Option Five =
+  "Any license, with the promise back that the contribution will also be licensed under the original licenses"，
+  且允许项目采用电子签署）。
+- **免责条款可执行性提示**：中国法下《民法典》第 506 条规定造成人身损害、因故意或重大过失造成对方财产损失的
+  免责条款无效；`LICENSING.md`/`COMMERCIAL.md` 的 "AS IS" 免责在其范围内有效，但不排除上述强制条款。
+
+## 9. 免责与生效
 
 > **本文件不构成法律意见，也不是商业合同。商业授权需双方签署正式合同。
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO

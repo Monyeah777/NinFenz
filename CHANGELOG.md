@@ -13,6 +13,9 @@
 - `package.json` 许可字段 `MIT` → `AGPL-3.0-only`；`pyproject.toml` → `AGPL-3.0-only OR LicenseRef-Commercial`。
 - AGPL 含义**不自造解释**：`LICENSING.md §3` 直接引用 GNU 官方 FAQ 原文（#InternalDistribution / #UnreleasedMods /
   #AGPLv3InteractingRemotely / #AGPLv3CorrespondingSource / #AGPLGPL）。
+- 法律依据（`LICENSING.md §8`）：最高法 **(2021)最高法知民终51号**（开源协议按许可合同处理；违反开源义务不导致著作权丧失，
+  侵权可独立主张）、**《民法典》第 469/491 条**（数据电文属书面形式 ⇒ 点击签署的 CLA 有效）、Harmony Guide
+  （Option Five 语义与电子签署允许性）。CLA 准据法填为**中华人民共和国**（排除港澳台），争议提交作者住所地法院。
 - 免责声明：`LICENSING.md` / `COMMERCIAL.md` / `LICENSE-EXCEPTIONS.md` 顶部写明"不构成法律意见，商业授权需双方签署正式合同"
   与 `THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND`。
 - 违规结算：`COMMERCIAL.md §4` 给出**参考价机制**（自首次违规之日按年计），并明确它是对 AGPL 的追加条款无效、
