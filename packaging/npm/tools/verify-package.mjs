@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
+import { ALLOW_DIRS } from './payload-policy.mjs';
 
 const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
 import { verifyTree, treeSha256, listFiles } from '../lib/payload.mjs';
@@ -88,6 +89,18 @@ if (!fs.existsSync(manifestPath)) {
   // 排除表被误删/改回时本断言必须红，而不是静默把内部件发出去。
   const devrec = paths.filter(function (r) { return r === 'changes' || r.startsWith('changes/'); });
   need(devrec.length === 0, 'payload 含内部开发记录 changes/（信息暴露）：' + devrec.slice(0, 3).join(', '));
+
+  // N2/L2（2026-10-25）：发布面是**白名单**——payload 的每个顶层目录都必须在 ALLOW_DIRS 里。
+  // 这是结构性断言：即使将来有人往生成端加回黑名单逻辑，只要包内出现白名单外的顶层目录就红。
+  {
+    const tops = new Set();
+    for (const r of paths) {
+      const parts = r.split('/');
+      if (parts.length > 1) tops.add(parts[0] + '/');
+    }
+    const stray = [...tops].filter(function (d) { return ALLOW_DIRS.indexOf(d) < 0; }).sort();
+    need(stray.length === 0, 'payload 含白名单外的顶层目录（默认拒绝）：' + stray.slice(0, 5).join(', '));
+  }
   // 目录实况 == 清单（审计 P1-9）：只查「清单里的」不查「多出来的」，等于给发布边界留后门。
   const listed = new Set(paths);
   const extras = listFiles(PAYLOAD_DIR).filter(function (r) {
