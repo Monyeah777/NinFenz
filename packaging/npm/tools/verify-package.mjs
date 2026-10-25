@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
-import { ALLOW_DIRS } from './payload-policy.mjs';
+import { ALLOW_DIRS, INTERNAL_DIRS, INTERNAL_ROOT_FILES } from './payload-policy.mjs';
 
 const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
 import { verifyTree, treeSha256, listFiles } from '../lib/payload.mjs';
@@ -100,6 +100,15 @@ if (!fs.existsSync(manifestPath)) {
     }
     const stray = [...tops].filter(function (d) { return ALLOW_DIRS.indexOf(d) < 0; }).sort();
     need(stray.length === 0, 'payload 含白名单外的顶层目录（默认拒绝）：' + stray.slice(0, 5).join(', '));
+  }
+
+  // 内部治理内容不得随包发布（STRATEGY §四：决策意图/交接/复盘属内部材料）
+  {
+    const internal = paths.filter(function (r) {
+      return INTERNAL_DIRS.some(function (d) { return r === d.slice(0, -1) || r.startsWith(d); })
+        || INTERNAL_ROOT_FILES.indexOf(r) >= 0;
+    });
+    need(internal.length === 0, 'payload 含内部治理内容（决策/交接/复盘/CI 取证）：' + internal.slice(0, 5).join(', '));
   }
   // 目录实况 == 清单（审计 P1-9）：只查「清单里的」不查「多出来的」，等于给发布边界留后门。
   const listed = new Set(paths);

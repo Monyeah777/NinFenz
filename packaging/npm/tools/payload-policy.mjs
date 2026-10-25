@@ -23,6 +23,13 @@ export const ALLOW_DIRS = [
 export const EXCLUDE_DIRS = ['engine/', 'results/', '.github/', '.gitee/', 'packaging/', '.git/',
                              'desktop/tests/', 'changes/'];
 export const EXCLUDE_ANY = ['__pycache__/', '.pyc', 'tui/dist/', '.DS_Store'];
+
+//: **内部治理内容**（决策记录 / 接力 / 复盘）：不进发布物。
+//: 依据 STRATEGY §四「计划类文档不发布公开仓库」「结果状态才入库」——决策意图、交接上下文、
+//: 复盘的归因过程属于内部材料，随 npm 分发给终端用户等于把作者的判断过程公开（意图暴露）。
+//: 运行时**目录本身**仍可由 `nf decisions/handover/postmortem` 按需创建；这里只拒绝既有内容。
+export const INTERNAL_DIRS = ['decisions/', 'handovers/', 'postmortems/', 'changes/'];
+export const INTERNAL_ROOT_FILES = ['CI-RED-TRIAGE.md'];
 //: 单件排除（脚手架残留，2026-10-10 审计 P2-14）：仓库根 `trace.json` 是 `nf assemble --trace`
 //: 留下的 404 B 占位件（phase=clarify / requirement="需求"），不是运行时依赖，不该进发布物。
 export const EXCLUDE_FILES = ['trace.json'];
