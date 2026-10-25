@@ -31,7 +31,7 @@ class ExternalMetadataTests(unittest.TestCase):
         self.assertEqual(codemeta["@type"], "SoftwareSourceCode")
         self.assertEqual(codemeta["version"], pyproject["project"]["version"])
         self.assertEqual(codemeta["version"], npm["version"])
-        self.assertEqual(codemeta["license"], "MIT")
+        self.assertEqual(codemeta["license"], "AGPL-3.0-only")
 
     def test_security_txt_has_required_machine_fields(self):
         text = (ROOT / "site/.well-known/security.txt").read_text(encoding="utf-8")
