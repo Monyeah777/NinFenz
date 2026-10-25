@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:51a3962439f1cdcf4a5621af282c337b6b68e0b485c2ef2512dea140e387588c
-  - protocol/code_metrics_baseline.json:afa8dcb93110119adba72b050e0fb826093a06176afdeeb804d35b266b74f9a8
+  - protocol/code_metrics_baseline.json:786bb8ac604ed2878a89f9f38b249cc3a46619d608ba05567057bd5dd5f81e4a
 ---
+> 重审（2026-10-25）：D1 常量时间比较 + N2/L2 发布面白名单化
+
 > 重审（2026-10-24）：CI 收口：修复 workflow cargo 版本探测、补齐 Rust parity 的 Python 固定依赖、移除 Rust 死代码，并扩展报告临时根脱敏覆盖。
 
 > 重审（2026-10-24）：CI 跨平台稳定性修复：角色投影只认 Git 跟踪面、报告路径脱敏、ReDoS 负例与 GUIDANCE 豁免判据同步，重审当前测试与门禁对象。
