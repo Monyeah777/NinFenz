@@ -42,7 +42,7 @@ jobs:
       - name: 固定 Node 工具链与 npm registry
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
         with:
-          node-version: '24'
+          node-version: '24.10'
           registry-url: https://registry.npmjs.org
       - name: 工具链自述 + 把 npm 升到支持 trusted publishing 的版本
         run: |
