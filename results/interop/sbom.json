@@ -22,6 +22,13 @@
       "versionInfo": "v2.30"
     },
     {
+      "SPDXID": "SPDXRef-Dependency-scripts",
+      "comment": "硬依赖（登记）：同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "scripts"
+    },
+    {
       "SPDXID": "SPDXRef-Dependency-yaml",
       "comment": "硬依赖（登记）：PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
       "downloadLocation": "NOASSERTION",
@@ -100,6 +107,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "DESCRIBES",
       "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Dependency-scripts"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",

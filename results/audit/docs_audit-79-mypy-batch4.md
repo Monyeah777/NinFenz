@@ -7,11 +7,17 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:e5a0a39a18268104ca4c983df2f6708c44d52d4cadcf9af85a38f2aa004bdaf6
+  - desktop/src/core/purity_scan.py:7669e6b93b6baada4819559bff38e172fddabfb396b2082d5cf67418515b9f41
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
+  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
-> 重审（2026-10-26）：合并结构化性能计数器与扫描作用域更新，并复核供应链发布门的核心纯度登记与语言面签名
+> 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
+
+> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+
+> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
 
 > 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
 

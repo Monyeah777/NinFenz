@@ -9,7 +9,7 @@ subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:e5a0a39a18268104ca4c983df2f6708c44d52d4cadcf9af85a38f2aa004bdaf6
+  - desktop/src/core/purity_scan.py:7669e6b93b6baada4819559bff38e172fddabfb396b2082d5cf67418515b9f41
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
@@ -23,7 +23,9 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
-> 重审（2026-10-26）：发布文档新增可复现工件、SBOM、OIDC provenance 与消费者验签说明，复核后重绑摘要
+> 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
 
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
 

@@ -9,8 +9,14 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
+  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
+> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+
+> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
+
 > 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
 
 > 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
