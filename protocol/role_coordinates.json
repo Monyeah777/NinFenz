@@ -13014,7 +13014,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a0edbcbc5382e24c762f29fa788d0b2d85ffe2553865871417dbb5876ec0efce",
+  "root_digest": "6995faf6e426f5616098ba1bd20508d1d2bf7a89569e977312b56eae0f9677c0",
   "rule_counts": {
     "R-app": 1444,
     "R-catch": 119,
@@ -13024,7 +13024,7 @@
     "R-projection": 115,
     "R-support": 119,
     "R-verify": 1003,
-    "auto:R-core": 255
+    "auto:R-core": 256
   },
   "schema": "nf-role-coordinates/1"
 }
