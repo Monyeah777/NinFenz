@@ -315,7 +315,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
          "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",
      "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
-                  "nfal")},
+                  "nfal", "security", "ir")},
     {"id": "library", "name": "图书馆与知识",
      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面",
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",
