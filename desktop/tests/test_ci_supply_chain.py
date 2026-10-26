@@ -150,6 +150,19 @@ class CiRequirementsPinTest(unittest.TestCase):
         self.assertIn("requirements-audit.txt", text,
                       "审计器自身版本也须固定（否则审计器随上游漂移）")
 
+    def test_pull_requests_block_high_severity_dependency_regressions(self):
+        wf = WORKFLOWS / "dependency-review.yml"
+        self.assertTrue(wf.is_file(), "缺 dependency-review 工作流：PR 依赖回归没有合并前闸门")
+        text = wf.read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^  pull_request:\s*$")
+        self.assertIn(
+            "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+            text,
+        )
+        self.assertIn("fail-on-severity: high", text)
+        self.assertIn("pull-requests: write", text,
+                      "依赖审查失败摘要无法回写 PR（诊断面缺失）")
+
     def test_audit_requirements_file_is_pinned(self):
         audit_req = ROOT / ".github" / "requirements-audit.txt"
         self.assertTrue(audit_req.is_file())
