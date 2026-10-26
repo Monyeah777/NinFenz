@@ -3,7 +3,7 @@
     "app": 1444,
     "entry": 26,
     "floor": 5,
-    "prod": 1041,
+    "prod": 1042,
     "projection": 130,
     "support": 264,
     "verify": 1120
@@ -6805,6 +6805,12 @@
     {
       "function": "PyO3 扩展（nf_pyengine）的进程内原语包装：sha256 / float_repr，含 stdlib 回退。",
       "path": "desktop/src/core/rust_pyext.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "一次扫描内的**共享读面 + 派生事实面**（`verify_report` 结构性去重的底座）。",
+      "path": "desktop/src/core/scan_memo.py",
       "role": "prod",
       "rule": "auto:R-core"
     },

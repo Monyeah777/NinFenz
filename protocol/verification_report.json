@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 309,
-        "files": 309,
+        "baseline": 310,
+        "files": 310,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7678
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 257,
-        "modules": 257,
+        "metrics_recorded": 258,
+        "modules": 258,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10

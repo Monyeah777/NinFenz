@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+from . import scan_memo
 import os
 import re
 from pathlib import Path
@@ -152,21 +153,22 @@ def _portable(value: Any, root: str) -> Any:
 
 
 def build(root: str = ".") -> Dict[str, Any]:
-    """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。"""
+    """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。
+
+    31 条判据共用一份「读面 + AST + 派生事实」缓存（`scan_memo`）：它们扫同一批文件，
+    各自重读重解析纯属浪费（实测 io.open 3.3 万次 / ast.walk 197 万次）。
+    """
+    scan_memo.begin()
     items: List[Dict[str, Any]] = []
-    for spec in SPECS:
-        sid, name, mod, entry, _form = spec
-        status, issues, warns, stats = _call(spec, root)
+    for sid, name, mod, entry, _form in SPECS:
+        status, issues, warns, stats = _call((sid, name, mod, entry, _form), root)
         items.append({"id": sid, "name": name, "source": "%s.%s" % (mod, entry),
                       "status": status, "issues": len(issues), "warns": len(warns),
                       "stats": stats, "sample": [str(x)[:200] for x in issues[:3]]})
-    summary = {k: sum(1 for i in items if i["status"] == k) for k in ("pass",
- "fail",
- "warn",
- "error")}
+    summary = {k: sum(1 for i in items if i["status"] == k)
+               for k in ("pass", "fail", "warn", "error")}
     declared = _declared(root)
-    # Z3（审计 §11ag F-04）：本报告是**判据级抽查面**，条数不等于 verify 的 check 总数；
-    # 把「对外宣称 40 条」与「报告实际 N 条」的差写在声明面里，读者不能把两者当同一件事。
+    # Z3（审计 §11ag F-04）：本报告是判据级抽查面，条数 ≠ verify 的 check 总数，差异写进声明面。
     declared["report_items"] = len(items)
     declared["coverage_note"] = ("判据级抽查面 %d 条，各对应 verify.sh 的一道或多道门禁；"
                                  "≠ 声明 check 总数 %s（两者不可互替）"
@@ -177,6 +179,7 @@ def build(root: str = ".") -> Dict[str, Any]:
     )
     digest_src = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
     body["root_digest"] = hashlib.sha256(digest_src).hexdigest()
+    scan_memo.end()                     # 作用域收尾：清缓存，避免跨次 build 吃旧值
     return body
 
 

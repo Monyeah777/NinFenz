@@ -183,7 +183,7 @@
       "chain": "c12301d06733953fc40b713fec279b3012ef31de1a2193b0397e5c4ae08019f0",
       "digest": "4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23",
       "index": 23,
-      "leaf": "081d94e0162af32433600760c496331e41592eed1a9a8c0af0e61c360b2fda21",
+      "leaf": "3dba60a45bb059e762049cbf3cd3ca0b823962412ae29d6dbb4b883c41e1bd41",
       "path": "protocol/code_metrics_baseline.json",
       "prev": "7e20dbeaaba931dd54a3cdac3ce481150abd90fd1285892bb2dbcdd925df01a3"
     },
@@ -191,7 +191,7 @@
       "chain": "40be7e78105d0f2ecf14ec21e9593478cc778219c0e4dd0aa08ceef8e5a74387",
       "digest": "4e2c8e977f4e895be15c787e7abfc282e9d255f16918bfe29a8948ab1ac0be33",
       "index": 24,
-      "leaf": "7f697a70ee13c904fdef19bb4a8c34fdf0997fefb449c8eb3cdc677b06ff6d2b",
+      "leaf": "c5503b11fdf69bdd4fa619784c1e79ba49edac5854af685f080eb8d63063853e",
       "path": "protocol/coupling_baseline.json",
       "prev": "c12301d06733953fc40b713fec279b3012ef31de1a2193b0397e5c4ae08019f0"
     },

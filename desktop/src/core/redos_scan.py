@@ -22,6 +22,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from . import scan_memo
+
 #: 扫描面（与 sast_check 的 SCAN_TARGETS 同口径；额外含 tui）。
 SCAN_DIRS = ("desktop/src", "scripts", "tui", ".github/scripts")
 
@@ -60,6 +62,13 @@ def probe_inputs(n: int) -> List[Tuple[str, str]]:
 
 
 def probe(pattern: str, n: int = 65536, budget_ms: float = 1500.0) -> Tuple[float, str]:
+    """探一次（同一 pattern 在作用域内只探一次；同一 pattern 常出现在多个文件/多条规则里）。"""
+    return scan_memo.pure("redos.probe:%d:%s" % (n, budget_ms), pattern,
+                          lambda: _probe_uncached(pattern, n=n, budget_ms=budget_ms))
+
+
+def _probe_uncached(pattern: str, n: int = 65536,
+                    budget_ms: float = 1500.0) -> Tuple[float, str]:
     """→ (最坏耗时 ms, 最坏输入的说明)；编译失败 → (0.0, "")（语法坏不归本面管）。
 
     只用 `search`：仓内正则绝大多数是「在长文本里找一处」的用法。

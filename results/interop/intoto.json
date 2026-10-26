@@ -143,13 +143,13 @@
     },
     {
       "digest": {
-        "sha256": "4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23"
+        "sha256": "93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "4e2c8e977f4e895be15c787e7abfc282e9d255f16918bfe29a8948ab1ac0be33"
+        "sha256": "4b0554a5ab73f2ad796b1ea1b1a079ea0567a2e6fb9b166666ac7a96a2fac500"
       },
       "name": "protocol/coupling_baseline.json"
     },
