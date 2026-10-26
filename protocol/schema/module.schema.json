@@ -15,6 +15,11 @@
     "name": { "type": "string", "minLength": 1 },
     "category": { "type": "string", "minLength": 1 },
     "source": { "type": "string", "minLength": 1 },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "所属域包名或 slug（域隔离 join key，T1.2 W2）；官方核心件留空 = 域中立"
+    },
     "scheduler": { "type": "boolean" },
     "mounts": {
       "type": "array",

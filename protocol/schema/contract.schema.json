@@ -43,11 +43,21 @@
       "properties": {
         "publish": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "description": "事件名标识面词法（01 §1.1：ASCII 小写蛇形，≤40 字符）；不合词法即 FAIL"
+          }
         },
         "subscribe": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "description": "同 publish：订阅侧事件名同受标识面词法约束（01 §1.1）"
+          }
         },
         "host_consumed": {
           "type": "array",

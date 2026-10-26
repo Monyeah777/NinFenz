@@ -8,6 +8,11 @@
   "properties": {
     "id": { "type": "string", "pattern": "^P[0-9]{2,3}$" },
     "name": { "type": "string", "minLength": 1 },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "该装配管线服务的目标域包名或 slug（域隔离 join key，T1.2 W2）；缺省 = 域中立/未声明"
+    },
     "structure": {
       "type": "object",
       "required": ["type", "flow"],

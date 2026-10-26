@@ -45,6 +45,97 @@ _DECISION = re.compile(r"(应|应该|必须|禁止|不得|下一步|输出|结�
 _CITATION = re.compile(r"(§\s*\d+(?:[.-]\d+)*|第\s*\d+\s*(?:节|步|章)|L\d+|"
                        r"\b[0-9A-Za-z_]+:[MTP]\d{2,3}|\b\d{1,3}\b\s*行)")
 
+#: 管线 id → 包 id（T1.2 W2 跨域门的声明面归一；DOMAIN_MAP 的逆向索引）。
+PIPELINE_TO_PACKAGE = {pipe: pkg for _keys, (pkg, pipe) in DOMAIN_MAP}
+
+#: 装配产物「声明域」的锚定证据（只认结构化锚点，不做 P\d{2} 全文扫描——
+#: 层位 id P00–P80 与管线 id 同形，全文扫描必然误报）。
+_DECLARED_PIPELINE = (
+    re.compile(r"^#\s*叙事世界完整版：[^\n]*?[（(]\s*(P\d{2})\s*[)）]", re.M),
+    re.compile(r"active_pipeline\s*[=:：]\s*\**\s*(P\d{2})", re.I),
+    re.compile(r"命中预设[^\n]{0,100}?管线\s*\**\s*(P\d{2})"),
+    re.compile(r"pipelines/(P\d{2})[_-]"),
+    re.compile(r"^domain\s*[：:]\s*[\"']?(P\d{2})\b", re.M),
+)
+_DECLARED_PACKAGE = re.compile(r"^#\s*叙事世界完整版：\s*([^\n（(]+)", re.M)
+_PRESET_PACKAGE = re.compile(r"命中预设\s*\**\s*([A-Za-z0-9\u4e00-\u9fff_]+)")
+
+
+def expected_domain(plan_: Dict[str, Any]) -> Dict[str, str]:
+    """需求侧域：命中预设时 = (包, 管线)；自定义/未命中 = 空（不做跨域判定）。"""
+    if not plan_.get("matched"):
+        return {"package": "", "pipeline": ""}
+    return {"package": str(plan_.get("package") or ""),
+            "pipeline": str(plan_.get("pipeline") or "")}
+
+
+def declared_domain(output_md: str) -> Dict[str, Any]:
+    """产物侧声明域：从八段骨架的标题/§0 装配记录/管线路径取锚定证据。
+
+    `pipelines` 为**集**：同一产物可引用官方线（如「P01 不参与本世界装配」）而不命中
+    标题锚点，故判定用「需求域 ∈ 声明集」，不用单选。
+    """
+    pipes = set()
+    for pat in _DECLARED_PIPELINE:
+        pipes.update(m.group(1) for m in pat.finditer(output_md))
+    pkg = ""
+    m = _DECLARED_PACKAGE.search(output_md)
+    if m:
+        pkg = m.group(1).strip()
+    if not pkg:
+        m = _PRESET_PACKAGE.search(output_md)
+        if m:
+            pkg = m.group(1).strip()
+    if not pkg and len(pipes) == 1:
+        pkg = PIPELINE_TO_PACKAGE.get(next(iter(pipes)), "")
+    return {"package": pkg, "pipelines": sorted(pipes)}
+
+
+def domain_issues(output_md: str, plan_: Dict[str, Any],
+                  expected_pipeline: Optional[str] = None) -> Tuple[List[str], Dict[str, Any]]:
+    """T1.2 W2 跨域门：需求域 vs 产物声明域 → (issues, info)。
+
+    判定口径（fail-closed 仅对**已声明的冲突**）：
+    - 需求命中预设且产物声明了域，需求管线 ∉ 声明集 → FAIL；
+    - 产物未声明域 → 不判死（记账 `checked=False`，修复指引见 info.reason）；
+    - 需求为自定义（无预设域）→ 不判（域未声明，不做域比较）。
+    """
+    exp = expected_domain(plan_)
+    if expected_pipeline:
+        exp = {"package": exp["package"], "pipeline": str(expected_pipeline).strip()}
+    declared = declared_domain(output_md)
+    info: Dict[str, Any] = {"expected": exp, "declared": declared,
+                            "checked": False, "ok": None}
+    if not exp["pipeline"]:
+        info["reason"] = "需求未命中既有域（custom），不做跨域判定"
+        return [], info
+    if not declared["pipelines"] and not declared["package"]:
+        info["reason"] = ("产物未声明域（标题无「（Pxx）」、§0 无 active_pipeline/管线 Pxx）"
+                          "——不判死；修复指引：让产物在标题或 §0 写明 active_pipeline")
+        return [], info
+    info["checked"] = True
+    if declared["pipelines"]:
+        if exp["pipeline"] in declared["pipelines"]:
+            info["ok"] = True
+            return [], info
+        msg = ("跨域装配：需求域 %s（管线 %s）≠ 产物声明域（%s）"
+               "（修复指引：按需求域重跑 `nf assemble \"<需求>\" --build --dest <目录>`；"
+               "确要跨域混装须走组合包 references 白名单（01 §6 R1），不得直接混装）"
+               % (exp["package"] or exp["pipeline"], exp["pipeline"],
+                  "、".join(declared["pipelines"])))
+        info["ok"] = False
+        return [msg], info
+    ok_pkgs = {exp["package"], PIPELINE_TO_PACKAGE.get(exp["pipeline"], "")}
+    ok_pkgs.discard("")
+    if declared["package"] in ok_pkgs:
+        info["ok"] = True
+        return [], info
+    info["ok"] = False
+    return [("跨域装配：需求域 %s（管线 %s）≠ 产物声明的包 %s"
+             "（修复指引：按需求域重跑 `nf assemble \"<需求>\" --build`；"
+             "跨域混装须走组合包 references 白名单，01 §6 R1）"
+             % (exp["package"] or exp["pipeline"], exp["pipeline"], declared["package"]))], info
+
 
 def _official_core_ids() -> List[str]:
     reg = json_doc.load(_ROOT / "desktop/src/core/registry.json", dict, what="desktop/src/core/regi"
@@ -192,9 +283,12 @@ def plan(requirement: str) -> Dict[str, Any]:
     }
 
 
-def check(output_md: str, plan_: Dict[str, Any]) -> Tuple[List[str], Dict[str, int]]:
-    """成品机器验收：八段骨架 / 编号在允许集 / 决策句带引用 / 无编造编号。"""
+def check(output_md: str, plan_: Dict[str, Any],
+          expected_pipeline: Optional[str] = None) -> Tuple[List[str], Dict[str, int]]:
+    """成品机器验收：跨域门 / 八段骨架 / 编号在允许集 / 决策句带引用 / 无编造编号。"""
     issues: List[str] = []
+    dom_issues, dom_info = domain_issues(output_md, plan_, expected_pipeline)
+    issues.extend(dom_issues)
     segs = {int(m.group(1)) for m in _SEG.finditer(output_md)}
     missing = [i for i in range(8) if i not in segs]
     if missing:
@@ -237,5 +331,6 @@ def check(output_md: str, plan_: Dict[str, Any]) -> Tuple[List[str], Dict[str, i
         "segments": len(segs),
         "modules_mentioned": len(mentioned),
         "allowed": len(allowed),
+        "domain": dom_info,
     }
     return issues, stats

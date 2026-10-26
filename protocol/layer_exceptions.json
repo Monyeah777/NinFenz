@@ -1,0 +1,37 @@
+{
+  "schema": "nf-layer-exceptions/1",
+  "note": "层序闭包（T1.2 W1）既存例外登记：consumer←producer 层序倒挂先 WARN 不判死。判据 = rank(producer) ≤ rank(consumer)；未登记倒挂仍 FAIL。例外清空后本表可删并升 FAIL。",
+  "severity": "warn",
+  "exceptions": [
+    {
+      "consumer": "M06",
+      "producer": "M20",
+      "reason": "任务流程状态机（P30）读知识条目库（P70）背景常识做流程实例化——先读后写，层序倒挂为既有设计",
+      "evidence": "04_模块库/事件类/M06_流程状态机.md:12-13；04_模块库/事件类/M20_知识条目库.md:12"
+    },
+    {
+      "consumer": "M12",
+      "producer": "M13",
+      "reason": "模板检索与实体状态互查（M12 ↔ M13 双向耦合）；本向 rank 已满足（P30→P50），登记以记录双向设计、供清账时比对",
+      "evidence": "04_模块库/事件类/M12_模板检索库.md:12-13；04_模块库/事件类/M13_实体交互.md:12-13"
+    },
+    {
+      "consumer": "M12",
+      "producer": "M20",
+      "reason": "模板检索按知识条目库常识做条件供给（P70 → P50 倒挂）",
+      "evidence": "04_模块库/事件类/M12_模板检索库.md:12-13"
+    },
+    {
+      "consumer": "M13",
+      "producer": "M12",
+      "reason": "实体交互按模板检索库供给的内容模板产交互（P50 → P30 倒挂，双向耦合的另一向）",
+      "evidence": "04_模块库/事件类/M13_实体交互.md:12-13"
+    },
+    {
+      "consumer": "M13",
+      "producer": "M20",
+      "reason": "实体交互读知识条目库背景（P70 → P30 倒挂）",
+      "evidence": "04_模块库/事件类/M13_实体交互.md:12-13"
+    }
+  ]
+}
