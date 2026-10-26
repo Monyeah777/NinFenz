@@ -28,12 +28,14 @@ subjects:
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:f8cf7e36c4cf9cc3b1d2a8b1c41442e2abd9efe13e0a09b08fcc4a27a3d548f9
+  - desktop/tests/test_cli_json_face.py:1b52486ec249b566e476b1dbc02a9e955df6d5d0992f76ec8e39d4489fdf2862
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3008b3771c49209f9497190841e1088d5782d1bcd72f50705f0d892775a8431e
 ---
+> 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime
+
 > 重审（2026-10-26）：T7.2 内容 IR：新增 desktop/src/core/content_ir.py 与 nf ir check 命令（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

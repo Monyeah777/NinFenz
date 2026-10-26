@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 96,
+        "raises": 99,
         "sinks": 20
       },
       "status": "pass",
@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 321,
-        "files": 321,
-        "max_fn_cc": 117,
-        "max_fn_lines": 1299,
-        "max_lines": 7788
+        "baseline": 324,
+        "files": 324,
+        "max_fn_cc": 119,
+        "max_fn_lines": 1335,
+        "max_lines": 7890
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 270,
-        "probed": 270
+        "patterns": 289,
+        "probed": 289
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 265,
-        "modules": 265,
+        "metrics_recorded": 268,
+        "modules": 268,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -477,13 +477,13 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 67,
+        "consumed": 68,
         "exceptions": 3,
-        "orphans": 3,
+        "orphans": 2,
         "scanners": 70
       },
-      "status": "pass",
-      "warns": 0
+      "status": "warn",
+      "warns": 1
     },
     {
       "id": "workflow_policy",
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4091,
-        "kernel": 2214,
+        "files": 4097,
+        "kernel": 2220,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,12 +537,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "6c1ee794212db8f434c0c6db0a96e9fc973a000c9f20cfe52435921e21bec039",
+  "root_digest": "799800817d1e97f0eb1a05fea4f7ce34428acaf0b2ad0bcdbae8bfebf641982a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 29,
-    "warn": 2
+    "pass": 28,
+    "warn": 3
   }
 }

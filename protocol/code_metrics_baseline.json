@@ -225,6 +225,11 @@
       "max_fn_cc": 9,
       "max_fn_lines": 12
     },
+    "desktop/src/core/contract_semantics.py": {
+      "lines": 666,
+      "max_fn_cc": 44,
+      "max_fn_lines": 91
+    },
     "desktop/src/core/coupling_metrics.py": {
       "lines": 202,
       "max_fn_cc": 15,
@@ -356,7 +361,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/exec_record.py": {
-      "lines": 330,
+      "lines": 343,
       "max_fn_cc": 22,
       "max_fn_lines": 47
     },
@@ -456,7 +461,7 @@
       "max_fn_lines": 35
     },
     "desktop/src/core/gate_profile.py": {
-      "lines": 304,
+      "lines": 303,
       "max_fn_cc": 23,
       "max_fn_lines": 41
     },
@@ -1115,6 +1120,11 @@
       "max_fn_cc": 6,
       "max_fn_lines": 15
     },
+    "desktop/src/core/runtime.py": {
+      "lines": 426,
+      "max_fn_cc": 17,
+      "max_fn_lines": 61
+    },
     "desktop/src/core/rust_engine.py": {
       "lines": 381,
       "max_fn_cc": 13,
@@ -1236,7 +1246,7 @@
       "max_fn_lines": 39
     },
     "desktop/src/core/terminal.py": {
-      "lines": 2421,
+      "lines": 2422,
       "max_fn_cc": 37,
       "max_fn_lines": 89
     },
@@ -1476,9 +1486,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7831,
-      "max_fn_cc": 118,
-      "max_fn_lines": 1314
+      "lines": 7890,
+      "max_fn_cc": 119,
+      "max_fn_lines": 1335
     },
     "scripts/nf_client.py": {
       "lines": 187,

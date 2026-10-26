@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:35f1162863e81b7ab764b68b2b2a0a9eb8fbb82c97ff6e0e74d722243af56c68
+  - protocol/code_metrics_baseline.json:1b60f0b8f92ab36d7ff912f27a4a16be0e9813b5aeda3ac98a1d4dc2bcee45ba
 ---
+> 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime
+
 > 重审（2026-10-26）：T7.2 内容 IR：新增 desktop/src/core/content_ir.py 与 nf ir check 命令（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
 
 > 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard

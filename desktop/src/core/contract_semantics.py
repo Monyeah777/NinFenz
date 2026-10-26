@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -344,7 +343,6 @@ def _w1_layer_closure(model: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 def _w2_domain_isolation(model: Dict[str, Any]) -> List[Dict[str, Any]]:
     issues: List[Dict[str, Any]] = []
-    core = set(model["core_modules"])
     for pid, pk in sorted(model["packages"].items()):
         refs = {_base(x) for x in pk["references"]}
         own_dom = pk["domain"]

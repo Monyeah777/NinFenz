@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
-  - protocol/code_metrics_baseline.json:35f1162863e81b7ab764b68b2b2a0a9eb8fbb82c97ff6e0e74d722243af56c68
+  - desktop/src/core/terminal.py:34879c7454747ba56224b91001173646da32e9855a4f7f4f2ba0bb2e1e4b4ae1
+  - protocol/code_metrics_baseline.json:1b60f0b8f92ab36d7ff912f27a4a16be0e9813b5aeda3ac98a1d4dc2bcee45ba
 ---
+> 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime
+
 > 重审（2026-10-26）：T7.2 内容 IR：新增 desktop/src/core/content_ir.py 与 nf ir check 命令（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
 
 > 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard

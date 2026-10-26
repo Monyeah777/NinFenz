@@ -6,8 +6,8 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
-  - scripts/nf.py:6f473c3d05cd322d5edec5606a4c6cac8820e077ba1f1f6bd3c4897ff78f6fc8
+  - desktop/src/core/terminal.py:34879c7454747ba56224b91001173646da32e9855a4f7f4f2ba0bb2e1e4b4ae1
+  - scripts/nf.py:c41189d07368390ea3fdb0098809856f91e992496e588bf58153ccacf8cd4bfe
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d
 
 ---
+> 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime
+
 > 重审（2026-10-26）：T7.2 内容 IR：新增 desktop/src/core/content_ir.py 与 nf ir check 命令（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
 
 > 重审（2026-10-26）：Merge W6: schema set 11 (exec_record+bench_result); maturity declarations M1

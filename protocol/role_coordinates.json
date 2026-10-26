@@ -3,10 +3,10 @@
     "app": 1447,
     "entry": 26,
     "floor": 5,
-    "prod": 1063,
+    "prod": 1065,
     "projection": 134,
     "support": 269,
-    "verify": 1146
+    "verify": 1150
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6005,9 +6005,21 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "内容 IR（T7.2）：把 Markdown 产物升成**带类型的节点图**（content IR）。",
+      "path": "desktop/src/core/content_ir.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "上游契约 pin + 逐字段对账 + 数量钉死（机制借鉴 OpenAgentCore upstream_contract_test）。",
       "path": "desktop/src/core/contract_pin.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "T7.1 · 契约语义可判定核心（nf-contract-semantics/1）。",
+      "path": "desktop/src/core/contract_semantics.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -6941,6 +6953,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "NF 参考运行时（T7.3）：确定性 harness + record/replay，**不接真实模型、不发网络请求**。",
+      "path": "desktop/src/core/runtime.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "Rust 只读快线（engine/rust · nf-rs）的 Python 客户端：可选加速 + 干净回退。",
       "path": "desktop/src/core/rust_engine.py",
       "role": "prod",
@@ -7745,8 +7763,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "内容 IR（T7.2）单测：节点图 / 规范形往返 / 稳定 id / 悬空负例 / 确定性。",
+      "path": "desktop/tests/test_content_ir.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_contract_pin.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T7.1 · 契约语义核心（五概念 + W1/W2/W3 + 规范形）单测。",
+      "path": "desktop/tests/test_contract_semantics.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9019,6 +9049,12 @@
     {
       "function": "协议多出口 rules 渲染单测（v2.5.0 Wave4 A3：protocol.yaml → agents/claude/skill）。",
       "path": "desktop/tests/test_rules_render.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T7.3 参考运行时回归（确定性 harness + record/replay）——五组判据钉住「可复现」这个词。",
+      "path": "desktop/tests/test_runtime.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13296,7 +13332,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "30755c61c502c04b14745b0df87b088e63e7ded3a8078378b5d40b85846a7dbe",
+  "root_digest": "2836110213ce42e9c33b984bc6b9feab386858ef49fcc16264c1168da2d5b530",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 124,
@@ -13305,8 +13341,8 @@
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 1025,
-    "auto:R-core": 263
+    "R-verify": 1028,
+    "auto:R-core": 266
   },
   "schema": "nf-role-coordinates/1"
 }
