@@ -56,7 +56,7 @@
       "max_fn_lines": 73
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 1435,
+      "lines": 1438,
       "max_fn_cc": 28,
       "max_fn_lines": 62
     },
@@ -161,7 +161,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/code_metrics.py": {
-      "lines": 146,
+      "lines": 152,
       "max_fn_cc": 12,
       "max_fn_lines": 33
     },
@@ -591,9 +591,9 @@
       "max_fn_lines": 32
     },
     "desktop/src/core/judgement_coverage.py": {
-      "lines": 113,
-      "max_fn_cc": 11,
-      "max_fn_lines": 30
+      "lines": 137,
+      "max_fn_cc": 14,
+      "max_fn_lines": 31
     },
     "desktop/src/core/key_naming.py": {
       "lines": 98,
@@ -850,6 +850,11 @@
       "max_fn_cc": 23,
       "max_fn_lines": 47
     },
+    "desktop/src/core/perf_counters.py": {
+      "lines": 106,
+      "max_fn_cc": 3,
+      "max_fn_lines": 43
+    },
     "desktop/src/core/pipeline.py": {
       "lines": 91,
       "max_fn_cc": 9,
@@ -971,7 +976,7 @@
       "max_fn_lines": 48
     },
     "desktop/src/core/redos_scan.py": {
-      "lines": 146,
+      "lines": 150,
       "max_fn_cc": 12,
       "max_fn_lines": 24
     },
@@ -1056,7 +1061,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 472,
+      "lines": 480,
       "max_fn_cc": 19,
       "max_fn_lines": 35
     },
@@ -1091,7 +1096,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/scan_memo.py": {
-      "lines": 240,
+      "lines": 277,
       "max_fn_cc": 25,
       "max_fn_lines": 46
     },
@@ -1449,6 +1454,11 @@
       "lines": 128,
       "max_fn_cc": 22,
       "max_fn_lines": 45
+    },
+    "scripts/perf_counters.py": {
+      "lines": 124,
+      "max_fn_cc": 10,
+      "max_fn_lines": 22
     },
     "scripts/pkg.py": {
       "lines": 122,

@@ -144,3 +144,7 @@ def scan(root: str = ".", n: int = 65536, budget_ms: float = 1500.0
 
 
 scan_repo = scan
+
+
+#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
+scan = scan_memo.scoped(scan)
