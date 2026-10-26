@@ -20,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 11,
+        "imports": 13,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 312,
-        "files": 312,
+        "baseline": 313,
+        "files": 313,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7678
@@ -525,7 +525,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4037,
+        "files": 4038,
         "kernel": 2170,
         "kernel_no_self": 436,
         "rules": 9,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "dfaf4f029d7335291b15c2e1e5530ee5ec251bdd6a1eec537cc5e7cad2c66980",
+  "root_digest": "146937cff575aada122316ed4a4f47ad94df8bfc4a2af4ecea0d641382a4e4e6",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
