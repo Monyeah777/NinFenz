@@ -3,8 +3,6 @@
   "platforms": {
     "nt": {
       "bandit": {
-        ".github/scripts/gitee_ingest.py::B310": 1,
-        ".github/scripts/library_ingest.py::B310": 1,
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
@@ -13,6 +11,8 @@
         "desktop/src/core/ingest_common.py::B603": 1,
         "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
+        "desktop/src/core/perf_counters.py::B110": 1,
+        "desktop/src/core/perf_counters.py::B404": 1,
         "desktop/src/core/provenance_external.py::B404": 1,
         "desktop/src/core/rust_engine.py::B110": 1,
         "desktop/src/core/rust_engine.py::B404": 1,
@@ -42,17 +42,17 @@
           "severities": [
             [
               "LOW",
-              44
+              46
             ],
             [
               "MEDIUM",
-              5
+              3
             ]
           ],
           "total": 49
         },
         "ruff": {
-          "total": 83
+          "total": 84
         }
       },
       "ruff": {
@@ -74,6 +74,7 @@
         "desktop/src/core/mvu_adapter.py::S110": 1,
         "desktop/src/core/output_forms.py::S314": 2,
         "desktop/src/core/pack_combo.py::S311": 1,
+        "desktop/src/core/perf_counters.py::S110": 1,
         "desktop/src/core/protocol_golden.py::S112": 1,
         "desktop/src/core/provenance_external.py::S603": 1,
         "desktop/src/core/retriever.py::S110": 2,

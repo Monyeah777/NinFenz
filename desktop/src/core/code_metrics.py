@@ -23,6 +23,8 @@ import ast
 from core import atomic_write
 import json
 from pathlib import Path
+
+from . import scan_memo
 from typing import Any, Dict, List, Tuple
 
 BASELINE_REL = "protocol/code_metrics_baseline.json"
@@ -144,3 +146,7 @@ def write(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
  sort_keys=True) + "\n")
     issues = [rel for rel, m in cur.items() if m.get("syntax_error")]
     return issues, doc
+
+
+#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
+scan = scan_memo.scoped(scan)

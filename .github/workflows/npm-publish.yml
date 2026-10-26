@@ -39,19 +39,15 @@ jobs:
             exit 1
           fi
           echo "tag=$TAG 与包版本 v$V 一致"
-      - name: 固定 Node 工具链与 npm registry
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
-        with:
-          node-version: '24.10'
-          registry-url: https://registry.npmjs.org
       - name: 工具链自述 + 把 npm 升到支持 trusted publishing 的版本
         run: |
           node --version
           npm --version
-          # setup-node 24.10 自带 npm 11.6.1，已满足 trusted publishing（OIDC）
-          # 的 npm >= 11.5.1 要求；不再执行浮动的 `npm install -g npm@latest`。
-          # 实测（2026-10-26）：npm 12.2.1 要求 Node >=24.15，而工具链固定 24.10，
-          # 浮动升级会在发布前被 EBADENGINE 拒绝。
+          # npm trusted publishing（OIDC，免令牌）要求 npm >= 11.5.1；runner 自带的 10.x 不够。
+          # 2026-10-08 实证：带发布权的 bypass-2FA 令牌正在被 npm 弃用（2027-01 取消），令牌路线不可持续，
+          # 故本作业改为纯 OIDC 发布；NPM_TOKEN secret 一旦删除即自动走 OIDC 分支。
+          npm install -g npm@latest
+          npm --version
       - name: payload 暂存 + 发布前自检 + 冒烟
         working-directory: packaging/npm
         run: |
@@ -112,7 +108,7 @@ jobs:
 
     # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
     # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
-    if: github.event_name == 'push' && startsWith(github.ref_name, 'v1.')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref_name, 'v1.')
 
     # GitHub Packages 只接受 scoped 包（@owner/name），故两通道**包名不同**：
     #   npmjs.com        → ninfenz（unscoped，面向公众）

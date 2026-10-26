@@ -27,6 +27,12 @@ from typing import Any
 _TEXT: dict[tuple, str] = {}
 _AST: dict[tuple, Any] = {}
 _FACTS: dict[tuple, Any] = {}
+#: 作用域深度（可重入）：公开入口（`scan`/`_run_uncached`/`build`）各自 begin/end，
+#: 嵌套调用共享同一份缓存，最外层退出才清。
+#: **不缓存 stat 结果**：实测缓存 stat 会让"改文件后重扫"读到旧键（`test_regex_limit_ratchet`
+#: 直接踩到）。重复 stat 的正确解法是**减少调用次数**（见 judgement_coverage 的 signals 表），
+#: 不是把 stat 结果记住。
+_DEPTH = 0
 _STATS = {"read": 0, "read_hit": 0, "parse": 0, "parse_hit": 0, "facts": 0, "facts_hit": 0}
 
 
@@ -42,9 +48,13 @@ def _key(path: Any) -> tuple | None:
         return None
     try:
         ab = os.path.abspath(os.fspath(path))
+    except (TypeError, ValueError):
+        # 可吞：路径不可表达（None/非路径对象）→ 调用方直接计算，与"未命中缓存"同语义。
+        return None
+    try:
         st = os.stat(ab)
-    except (TypeError, ValueError, OSError):
-        # 可吞：路径不可表达或文件不存在 → 调用方退化为直接计算（与"未命中缓存"同语义）。
+    except OSError:
+        # 可吞：文件不存在 → 调用方退化为直接计算（与"未命中缓存"同语义）。
         return None
     return (ab, st.st_mtime_ns, st.st_size)
 
@@ -217,12 +227,19 @@ def signals(path: Any) -> dict:
 
 
 def begin() -> None:
-    """开一次扫描作用域（清空全部缓存与计数）。"""
-    reset()
+    """开一次扫描作用域（**可重入**：嵌套入口共享同一份缓存，最外层退出才清）。"""
+    global _DEPTH
+    if _DEPTH == 0:
+        reset()
+    _DEPTH += 1
 
 
 def end() -> dict[str, int]:
-    """结束作用域：返回统计并清空。"""
+    """结束作用域（最外层退出时清空并返回统计；嵌套内层只减深度）。"""
+    global _DEPTH
+    _DEPTH = max(0, _DEPTH - 1)
+    if _DEPTH > 0:
+        return stats()
     got = stats()
     reset()
     return got
@@ -238,3 +255,23 @@ def reset() -> None:
 
 def stats() -> dict[str, int]:
     return dict(_STATS)
+
+
+def scoped(fn):
+    """把公开入口包成"自成作用域"（**不改名**：源码里仍是 `def scan(`，靠它做静态识别的判据不受影响）。
+
+    为什么不做成重命名 + 薄包装：本仓有判据按源码文本识别「模块是否定义 `def scan(`」
+    （judgement_coverage / 死码 / 层级面），改名会让这些判据**静默失真**——实测改名的第一版
+    直接让 verify_report 的判据结论与已冻结报告对不上。
+    """
+    import functools
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        begin()
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            end()
+
+    return wrapper

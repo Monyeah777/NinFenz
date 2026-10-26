@@ -13,8 +13,16 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:26a196ccb09d035a7aac7bf8706cc96c1bf4d9add4250eb5765b7754ef4c98e2
+  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
 ---
+> 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
+
+> 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
+
+> 重审（2026-10-26）：结构计数器 + scoped 作用域 + signals 表化
+
+> 重审（2026-10-26）：结构计数器 + 作用域装饰器 + 预筛/共享读面
+
 > 重审（2026-10-26）：json_doc 深度预检摘要缓存（file_facts 实验回退）
 
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）

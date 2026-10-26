@@ -778,11 +778,10 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
             issues.append("代码件 %s 声明的测试件不在场：%s（修复指引：先写测试再登记）" % (rel,
  trel))
             continue
-        text = p.read_text(encoding="utf-8", errors="replace")
-        try:
-            ast.parse(text)
-        except SyntaxError as exc:
-            issues.append("测试件 %s 语法坏：%s（修复指引：先修语法）" % (trel, exc))
+        text = scan_memo.read_text(p) or ""
+        if scan_memo.parse(p) is None:
+            # 同一测试件常被多条契约登记：读与解析都走共享面（一次扫描只做一遍）
+            issues.append("测试件 %s 语法坏：%s（修复指引：先修语法）" % (trel, "SyntaxError"))
             continue
         if stem not in text:
             issues.append("测试件 %s 未点名被测模块 %s（修复指引：在测试里 import 或引用该模块）"
@@ -1433,3 +1432,7 @@ def run_tests(root: str = ".", ids: Iterable[str] = ()) -> Tuple[List[str], Dict
             issues += sub
             out["tests"] += ran
     return issues, out
+
+
+#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
+scan = scan_memo.scoped(scan)
