@@ -32,4 +32,4 @@ export const INTERNAL_DIRS = ['decisions/', 'handovers/', 'postmortems/', 'chang
 export const INTERNAL_ROOT_FILES = ['CI-RED-TRIAGE.md'];
 //: 单件排除（脚手架残留，2026-10-10 审计 P2-14）：仓库根 `trace.json` 是 `nf assemble --trace`
 //: 留下的 404 B 占位件（phase=clarify / requirement="需求"），不是运行时依赖，不该进发布物。
-export const EXCLUDE_FILES = ['trace.json'];
+export const EXCLUDE_FILES = ['trace.json', 'setup.py'];

@@ -131,7 +131,7 @@
     {
       "@id": "nf:file/llms.txt",
       "@type": "prov:Entity",
-      "nf:sha256": "75a1e63d3b95e688bf102acd5469872f0ef491d2bd3d59610e8ea2ecfab1b9ed"
+      "nf:sha256": "72336b8ee68ca7e3fbc031753be2cf8c29db0d48d1af325c8b2eb171c067d74f"
     },
     {
       "@id": "nf:file/postmortems/PO-9000-示例-复盘模板.md",
@@ -141,7 +141,7 @@
     {
       "@id": "nf:file/protocol/CONFORMANCE.md",
       "@type": "prov:Entity",
-      "nf:sha256": "1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d"
+      "nf:sha256": "c1bf2658130912a66180936aaf12a689634e4a4d64a47c25f32e8c7c01eec5c8"
     },
     {
       "@id": "nf:file/protocol/LAYERS.json",
@@ -151,7 +151,7 @@
     {
       "@id": "nf:file/protocol/assertions.json",
       "@type": "prov:Entity",
-      "nf:sha256": "5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba"
+      "nf:sha256": "62debb4fcff5ec64c7569c30465a0784fb8f5a6ea244d2618ef936248da2a28d"
     },
     {
       "@id": "nf:file/protocol/asset_contracts.json",
@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "ddc6dfd800dd25e1697c8eb1e227930bd3cbdd2bef75a3af9631b2adc6c38ff5"
+      "nf:sha256": "0b820dd84a794de88bc6d841eb06856fba4ab9b10e36d613805380f0de087e0a"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -301,7 +301,7 @@
     {
       "@id": "nf:file/protocol/repo_stats.json",
       "@type": "prov:Entity",
-      "nf:sha256": "c1daa6b708675daf372686a2fb5527f099890d2df68adef2eae103be855be8e2"
+      "nf:sha256": "52e6ee2527bccf5e157201d268abc3a5b9ae298dab35f27908ef7cd66a649c0a"
     },
     {
       "@id": "nf:file/protocol/rfc_index.json",

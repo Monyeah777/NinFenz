@@ -1410,6 +1410,11 @@
       "max_fn_cc": 22,
       "max_fn_lines": 69
     },
+    "scripts/check_pypi_package.py": {
+      "lines": 276,
+      "max_fn_cc": 20,
+      "max_fn_lines": 41
+    },
     "scripts/code_metrics.py": {
       "lines": 81,
       "max_fn_cc": 10,

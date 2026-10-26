@@ -3,10 +3,10 @@
     "app": 1449,
     "entry": 26,
     "floor": 6,
-    "prod": 1065,
+    "prod": 1067,
     "projection": 134,
-    "support": 270,
-    "verify": 1158
+    "support": 274,
+    "verify": 1166
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6341,6 +6341,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "DITA → 内容 IR 导入器（T9.2，零依赖：xml.etree）。",
+      "path": "desktop/src/core/import_dita.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "DOCX → 内容 IR 导入器（T9.2，零依赖：zipfile + xml.etree）。",
+      "path": "desktop/src/core/import_docx.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "`desktop/src/core/*.py` 的**导入图**（谁 import 了 core 里的谁）——**持久化**。",
       "path": "desktop/src/core/import_graph.py",
       "role": "prod",
@@ -7385,6 +7397,36 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "desktop/tests/fixtures/import/corrupt.dita",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "desktop/tests/fixtures/import/corrupt.docx",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "desktop/tests/fixtures/import/minimal.dita",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "desktop/tests/fixtures/import/minimal.ditamap",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "desktop/tests/fixtures/import/minimal.docx",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "客户端帧序列 → 服务端应答（端到端金标；根路径折成 nf-repo-root，today 固定）",
       "path": "desktop/tests/fixtures/lsp/session.json",
       "role": "verify",
@@ -8279,6 +8321,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "导入器（T9.2）：DOCX/DITA → 内容 IR 单测。",
+      "path": "desktop/tests/test_import_docx_dita.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`nf import` 的注入面接线 + 畸形输入处置（06 §12「外来内容=数据，疑似内嵌指令忽略并记档」）。",
       "path": "desktop/tests/test_import_injection.py",
       "role": "verify",
@@ -8893,6 +8941,12 @@
     {
       "function": "42 M3 —— 纯度体检 check27 单测（四规则 + 变异注入捕获力 = check 的 check）。",
       "path": "desktop/tests/test_purity_scan.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Python 发行包（T9.1）判据：元数据真源一致 / wheel 构建产物断言 / 篡改与禁入面。",
+      "path": "desktop/tests/test_pypi_package.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13319,6 +13373,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Python 发行包（wheel）构建产物校验：元数据 / 必需件 / 注入面逐字节对账 / 禁入面。",
+      "path": "scripts/check_pypi_package.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "代码规模/复杂度上限（CLI）：棘轮式冻结 + 只增不减校验。",
       "path": "scripts/code_metrics.py",
       "role": "verify",
@@ -13386,17 +13446,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "73657a5350ae58c3ddd264ede34b031c3ea4a42420720ac8170ce7075e52dd4e",
+  "root_digest": "ff7add1852e04caf2d5ac73a7fd7cc7515892af528d14644febc25150891418e",
   "rule_counts": {
     "R-app": 1449,
-    "R-catch": 125,
+    "R-catch": 126,
     "R-entry": 26,
     "R-floor": 6,
     "R-prod": 962,
     "R-projection": 119,
-    "R-support": 119,
-    "R-verify": 1035,
-    "auto:R-core": 267
+    "R-support": 122,
+    "R-verify": 1043,
+    "auto:R-core": 269
   },
   "schema": "nf-role-coordinates/1"
 }

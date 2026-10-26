@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:ddc6dfd800dd25e1697c8eb1e227930bd3cbdd2bef75a3af9631b2adc6c38ff5
+  - protocol/code_metrics_baseline.json:0b820dd84a794de88bc6d841eb06856fba4ab9b10e36d613805380f0de087e0a
 ---
+> 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging
+
 > 重审（2026-10-26）：T9.2 导入器：新增 core/import_docx.py、core/import_dita.py 与 nf import docx|dita（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
 
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
