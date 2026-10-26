@@ -199,10 +199,15 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     spc = sub.add_parser("spec",
-                         help="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）",
- description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）")
-    spc.add_argument("action", nargs="?", default="ls", choices=["ls"],
-                     help="动作（ls 列 spec 版本清单）")
+                         help="Spec Registry 查询（v2.5.0 Wave3）+ 契约语义可判定（T7.1）",
+ description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）；T7.1 增契约语义核心："
+             "`nf spec check --core [--json]`（五概念模型 + W1 层序闭包 / W2 域隔离 / W3 门全性）"
+             "与 `nf spec canonical [--json]`（registry 子集规范形 SHA256，幂等）")
+    spc.add_argument("action", nargs="?", default="ls", choices=["ls", "check", "canonical"],
+                     help="动作：ls 列 spec 版本清单 / check 契约语义三规则 / canonical 规范形摘要")
+    spc.add_argument("--core", action="store_true",
+                     help="check 的语义核心范围 = 官方核心 + 包登记面（本轮仅实现 --core）")
+    spc.add_argument("--json", action="store_true", help="结构化 JSON 输出")
     spc.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
@@ -1849,11 +1854,31 @@ def _cmd_import(args) -> int:
 
 
 def _cmd_spec(args) -> int:
-    """nf spec ls：Spec Registry 查询（v2.5.0 Wave3：版本化 spec 清单）。"""
+    """nf spec：ls（Spec Registry 查询）｜check（契约语义三规则）｜canonical（规范形）。"""
+    action = getattr(args, "action", None) or "ls"
+    if action == "check":
+        from core import contract_semantics as cs
+        return cs.run_check(ROOT, core_only=bool(getattr(args, "core", False)),
+                            as_json=bool(getattr(args, "json", False)))
+    if action == "canonical":
+        from core import contract_semantics as cs
+        return cs.run_canonical(ROOT, as_json=bool(getattr(args, "json", False)))
     from core.registry_loader import load_registry
 
     reg_path = args.registry or os.path.join(ROOT, "desktop", "src", "core", "registry.json")
     reg = load_registry(reg_path)
+    if getattr(args, "json", False):
+        import json as _json
+        print(_json.dumps({
+            "kind": "spec-registry",
+            "registry_schema_version": reg.registry_schema_version,
+            "modules": len(reg.modules),
+            "protocols": [{"id": p.get("id"), "schema_version": p.get("schema_version"),
+                           "version": p.get("version") or "1.0.0",
+                           "modules": len(p.get("module_ids") or [])}
+                          for p in reg.protocols or []],
+        }, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
     print("== nf spec ls ==")
     print(f"  registry_schema_version: {reg.registry_schema_version}")
     print(f"  官方核心模块: {len(reg.modules)} 件")
