@@ -163,6 +163,17 @@ class CiRequirementsPinTest(unittest.TestCase):
         self.assertIn("pull-requests: write", text,
                       "依赖审查失败摘要无法回写 PR（诊断面缺失）")
 
+    def test_npm_release_workflow_is_a_detectable_pinned_packaging_workflow(self):
+        text = (WORKFLOWS / "npm-publish.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            text,
+        )
+        self.assertIn("registry-url: https://registry.npmjs.org", text)
+        self.assertIn("npm publish --provenance --access public", text)
+        self.assertIn("github.event_name == 'push'", text,
+                      "可选 GitHub Packages 镜像不得拖累主发布工作流的成功结论")
+
     def test_audit_requirements_file_is_pinned(self):
         audit_req = ROOT / ".github" / "requirements-audit.txt"
         self.assertTrue(audit_req.is_file())
