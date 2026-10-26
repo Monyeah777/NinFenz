@@ -56,7 +56,7 @@
       "max_fn_lines": 73
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 1430,
+      "lines": 1435,
       "max_fn_cc": 28,
       "max_fn_lines": 62
     },
@@ -196,7 +196,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/conformance_report.py": {
-      "lines": 396,
+      "lines": 404,
       "max_fn_cc": 8,
       "max_fn_lines": 26
     },
@@ -591,9 +591,9 @@
       "max_fn_lines": 32
     },
     "desktop/src/core/judgement_coverage.py": {
-      "lines": 116,
+      "lines": 113,
       "max_fn_cc": 11,
-      "max_fn_lines": 34
+      "max_fn_lines": 30
     },
     "desktop/src/core/key_naming.py": {
       "lines": 98,
@@ -971,7 +971,7 @@
       "max_fn_lines": 48
     },
     "desktop/src/core/redos_scan.py": {
-      "lines": 137,
+      "lines": 146,
       "max_fn_cc": 12,
       "max_fn_lines": 24
     },
@@ -1056,7 +1056,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/role_model.py": {
-      "lines": 461,
+      "lines": 472,
       "max_fn_cc": 19,
       "max_fn_lines": 35
     },
@@ -1089,6 +1089,11 @@
       "lines": 50,
       "max_fn_cc": 3,
       "max_fn_lines": 12
+    },
+    "desktop/src/core/scan_memo.py": {
+      "lines": 240,
+      "max_fn_cc": 25,
+      "max_fn_lines": 46
     },
     "desktop/src/core/schema_lint.py": {
       "lines": 464,
@@ -1251,9 +1256,9 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 234,
+      "lines": 237,
       "max_fn_cc": 10,
-      "max_fn_lines": 27
+      "max_fn_lines": 29
     },
     "desktop/src/core/watch.py": {
       "lines": 348,
