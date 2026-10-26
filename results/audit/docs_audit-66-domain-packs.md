@@ -11,13 +11,15 @@ subjects:
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:c66cb01d76cc469c9d3dd425edde76e9a685fad0d3dad09c0d0812206b3e321d
+  - scripts/nf.py:f4959434678083ffe08267d44bae87633187be5fb31e3a12747ecd7dc88ec847
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:27f93c0ec2ee9f7388dd7bd6a73d79a2168ca5d013b6828c78e0293978e1deba
+  - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
 
 ---
+> 重审（2026-10-27）：W12 T12.1 基线扩展 check46-47：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
 
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts

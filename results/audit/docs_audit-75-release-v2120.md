@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:665f3fb40ac05aedb2ff016ae83c06e287ee321554282641153081abbefd1fe9
-  - docs/meta/VERSION-MATRIX.md:0d6b7ba72049d36354119deb1764d736433acdb1d06be767621ceeaf4cfdc1ce
-  - README.md:be9a500b02a95692e8c62d90e6c70ce2e0a6a50555efe046952a6c829f8eddae
+  - CHANGELOG.md:22a91769566525f48532af50049a32c824405cce7f11a1e3a14fcacc83a045b5
+  - docs/meta/VERSION-MATRIX.md:a487956d0012f828536f7c50721cd714186d55a12b1da8cc905e443c93414554
+  - README.md:e5795fd9c0c644cd228dfd9cdd101b56d2a1ebd97cef88b8d834e7faca526f2f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:c66cb01d76cc469c9d3dd425edde76e9a685fad0d3dad09c0d0812206b3e321d
+  - scripts/nf.py:f4959434678083ffe08267d44bae87633187be5fb31e3a12747ecd7dc88ec847
 
 ---
+> 重审（2026-10-27）：W12 T12.1 基线扩展 check46-47：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
 
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts

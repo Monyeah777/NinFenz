@@ -2,9 +2,9 @@
   "schema": "nf-gates/1",
   "source": {
     "file": "verify.sh",
-    "sha256": "4d55b38050b36ffc530e0e8ca8d6fb4161339ca7022f85ed30f718fab0a30342",
+    "sha256": "eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615",
     "verify_version": "v2.30",
-    "check_count": 45,
+    "check_count": 47,
     "baseline_checks": 45,
     "baseline_pass": 79
   },
@@ -20,7 +20,7 @@
     "impl=null 表示该 gate 在 gate_engine 里尚未迁入（PENDING），不假装有实现。"
   ],
   "coverage": {
-    "gates": 45,
+    "gates": 47,
     "migrated": [
       1,
       3,
@@ -46,7 +46,9 @@
       40,
       43,
       44,
-      45
+      45,
+      46,
+      47
     ],
     "pending": [
       2,
@@ -1102,6 +1104,52 @@
       ],
       "output": {
         "log": "nf_check45.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": 6000,
+      "tier": "static"
+    },
+    {
+      "id": "privacy-airgap",
+      "legacy_check": 46,
+      "title": "== [46/段D] 隐私与 air-gap 门禁（T12.1：PII / 本机路径 / 凭据 critical 判死 + 网络站点静态审计；warn 只报）==",
+      "segment": "D",
+      "kind": "delegated",
+      "impl": "scripts/nf.py::privacy scan + privacy check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check46_scan.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": 15000,
+      "tier": "static"
+    },
+    {
+      "id": "cli-map",
+      "legacy_check": 47,
+      "title": "== [47/段D] CLI IA 门禁（T11.3：命令目录/族覆盖/机器面；生成件与实时重算逐字节一致）==",
+      "segment": "D",
+      "kind": "delegated",
+      "impl": "scripts/nf.py::cli map --check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check47.log",
         "verdict_lines": "[PASS]/[FAIL]/[WARN]",
         "machine": null
       },

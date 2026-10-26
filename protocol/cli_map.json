@@ -333,7 +333,9 @@
         ]
       },
       "one_line": "CLI IA 机读层（T11.3）：从 argparse 命令面 + terminal.FAMILIES 构建 nf-cli-map/1（命令→族→用途→flags/has_json/相关文档），生成件 protocol/cli_map.…",
-      "related_docs": [],
+      "related_docs": [
+        "docs/verification-cards.md"
+      ],
       "usage": "usage: nf cli [-h] {map} ..."
     },
     {
@@ -1484,7 +1486,8 @@
       },
       "one_line": "隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / 凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 scripts 的网络站点（requests/urllib.…",
       "related_docs": [
-        "docs/security/airgap-and-privacy.md"
+        "docs/security/airgap-and-privacy.md",
+        "docs/verification-cards.md"
       ],
       "usage": "usage: nf privacy [-h] {scan,check} ..."
     },
@@ -2094,7 +2097,7 @@
     "stray": [],
     "uncurated": []
   },
-  "digest": "sha256:5b91967aa4ef07a345110c55a72af1cec0b8f6bb611632555cfc9c558cbf0a8d",
+  "digest": "sha256:9d09ad258bf86bb0831053d04a215a75e028d01c0d9daf38d8474676baee9ecd",
   "families": [
     {
       "commands": [

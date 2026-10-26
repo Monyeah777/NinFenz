@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
+  - protocol/code_metrics_baseline.json:52eb808ade16b304ee2eb6a350c13be67cf41fd099b196983d4bf2c0adbd9573
 ---
+> 重审（2026-10-27）：W12 T12.1 基线扩展 check46-47：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-27）：W11: purity guidance fix in content_ops
 
 > 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix

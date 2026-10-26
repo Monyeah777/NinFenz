@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
+  - protocol/code_metrics_baseline.json:52eb808ade16b304ee2eb6a350c13be67cf41fd099b196983d4bf2c0adbd9573
 ---
+> 重审（2026-10-27）：W12 T12.1 基线扩展 check46-47：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-27）：W11: purity guidance fix in content_ops
 
 > 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix

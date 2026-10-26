@@ -29,7 +29,7 @@ English: NinFenz (NF) is a deliverable contract layer: a protocol plus determini
 
 ## 二、可引用事实（每个数字带真源；不要在正文里手抄，引用本文件或 facts.json）
 
-1. 质量凭证：verify v2.30 · check1-45 · PASS=79 —— 单入口 bash verify.sh，逐条 PASS 且 PASS 数等于基线。
+1. 质量凭证：verify v2.30 · check1-47 · PASS=81 —— 单入口 bash verify.sh，逐条 PASS 且 PASS 数等于基线。
    锚点 https://ninfenz.dev/#fact-quality · 真源仓库根 llms.txt 的 nf:stats 生成区
 2. 规模：111 登记包 · 363 资产档 · 101 概念图 · 标准目录 370 条（可达 332 / 不可达 38）· 标准绑定 1200 条 · 馆藏 3 件。
    锚点 https://ninfenz.dev/#fact-scale · 真源 protocol/repo_stats.json
@@ -59,7 +59,7 @@ English: NinFenz (NF) is a deliverable contract layer: a protocol plus determini
     git clone https://github.com/Monyeah777/NinFenz
     cd NinFenz
     python scripts/nf.py doctor      # 只读体检，期望：体检 17/17 通过
-    bash verify.sh                   # check1-45 全量门禁，期望末行 结果统计: PASS=79  WARN=0  FAIL=0
+    bash verify.sh                   # check1-47 全量门禁，期望末行 结果统计: PASS=81  WARN=0  FAIL=0
 国内镜像（只换前缀，后缀不动）：https://gitee.com/monyeah777/ninfenz
 
 路径 2 · 客户端 AI（零安装）
@@ -68,7 +68,7 @@ English: NinFenz (NF) is a deliverable contract layer: a protocol plus determini
 
 路径 3 · agent（本地跑通全项目）
     curl -fsSL https://ninfenz.dev/run.sh | sh                 默认：clone 到 ./NinFenz + 只读体检
-    curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full    追加：check1-45 全量门禁
+    curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full    追加：check1-47 全量门禁
     也可以照 https://ninfenz.dev/agent.txt 逐步执行并核对每步期望输出。
 
 路径 4 · MCP（把仓库能力只读暴露给客户端）

@@ -8,7 +8,7 @@
     "id": "nf:conformance_report",
     "receiptCount": 69,
     "receiptRoot": "e95e428d0058c88adda9786d242c6946925578b4bb462f2e874552671ed159c2",
-    "verdict": "non-conformant"
+    "verdict": "conformant"
   },
   "issuer": "Monyeah777",
   "type": [

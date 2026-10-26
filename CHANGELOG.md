@@ -2,8 +2,8 @@
 
 ## [1.1.0] - 2026-10-25
 
-> 当前验收基线（2026-10-26，W9 新能力接入门禁）：**check1-45 · PASS=79**——
-> check43（契约语义 W1-W3）/ check44（注册表 CID）/ check45（内容安全）接入段 D，
+> 当前验收基线（2026-10-27，W12 新能力接入门禁）：**check1-47 · PASS=81**——
+> check46（隐私与 air-gap）/ check47（CLI IA）接入段 D；W9 的 check43-45 已在链。
 > 真源 `quality_baseline.EXPECTED_*` 与 `protocol/repo_stats.json` 同源同步。
 
 ### 许可变更（1.1.0 生效）— 分层双许可

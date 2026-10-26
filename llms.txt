@@ -8,7 +8,7 @@
 - 国内 raw 基底：`https://gitee.com/monyeah777/ninfenz/raw/main/{路径}`
 - 本仓库全部内容本身就是 markdown 源文件——不存在 HTML 版，因此 llms.txt v2 的 `page.md` 孪生约定天然满足；本文件即仓库描述文件（等价 `rel="describedby"` 指向物）。
 <!-- nf:stats:begin -->
-- 质量凭证（可静态实算）：verify v2.30 · check1-45 · PASS=79（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`，本行由生成器写入）。
+- 质量凭证（可静态实算）：verify v2.30 · check1-47 · PASS=81（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`，本行由生成器写入）。
 - 规模（实算真源 `protocol/repo_stats.json`）：111 登记包 · 381 资产档 · 101 概念图 · 标准目录 370 条（可达 332） · 标准绑定 1200 条 · 馆藏 3 件。
 - 标准目录 GEO 出口（可引用）：`docs/standards/index.md` · 机读 `protocol/geo_export.json`。
 <!-- nf:stats:end -->
