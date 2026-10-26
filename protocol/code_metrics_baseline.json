@@ -1410,6 +1410,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 59
     },
+    "scripts/gate_defect_bench.py": {
+      "lines": 763,
+      "max_fn_cc": 26,
+      "max_fn_lines": 125
+    },
     "scripts/gate_manifest.py": {
       "lines": 450,
       "max_fn_cc": 19,
@@ -1461,7 +1466,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_facts.py": {
-      "lines": 677,
+      "lines": 680,
       "max_fn_cc": 17,
       "max_fn_lines": 202
     },

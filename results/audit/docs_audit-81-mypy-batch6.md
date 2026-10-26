@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:87ead8599f78f321d0c29b04e78554e58be6b24319d21042342ff6dc42544e16
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
+  - protocol/code_metrics_baseline.json:1acd89a938b64bab4fd18242362874fc1c590474af0aa0c24ddd471b7811c939
 ---
+> 重审（2026-10-26）：Merge t-measure: gate defect bench (new scripts/results/tests)
+
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
 
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules

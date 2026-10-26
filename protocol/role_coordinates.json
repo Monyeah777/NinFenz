@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1063,
-    "projection": 130,
-    "support": 266,
-    "verify": 1134
+    "projection": 131,
+    "support": 267,
+    "verify": 1137
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7331,6 +7331,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "AI 内容合规证据包（样例：内容合规声明）",
+      "path": "desktop/tests/fixtures/gate_defects/regulatory_base.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "示例产品使用说明书",
+      "path": "desktop/tests/fixtures/gate_defects/techdoc_base.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "客户端帧序列 → 服务端应答（端到端金标；根路径折成 nf-repo-root，today 固定）",
       "path": "desktop/tests/fixtures/lsp/session.json",
       "role": "verify",
@@ -8023,6 +8035,12 @@
     {
       "function": "P-A5 差分自证：规则层路由（DAG/朴素/半朴素三后端）必须与影响图闭包同结果。",
       "path": "desktop/tests/test_gate_datalog.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Gate profile 缺陷注入台回归（T5.3）——把「检出率/误报率」从报告数字变成可执行断言。",
+      "path": "desktop/tests/test_gate_defect_bench.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13224,16 +13242,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4000963a1de805f7efb2f19ba37532c99cf14b659e81954ee104782e7af25a0c",
+  "root_digest": "149f57f5f58db535e8470a82f895fcb044e2c685d455ad5a0a6867a5abf91920",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 121,
+    "R-catch": 122,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 962,
-    "R-projection": 115,
+    "R-projection": 116,
     "R-support": 119,
-    "R-verify": 1015,
+    "R-verify": 1018,
     "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"
