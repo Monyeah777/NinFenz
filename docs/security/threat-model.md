@@ -5,7 +5,9 @@
 > 缓解由哪个真实载体承担、哪些面**尚未覆盖**。只写仓库里真实存在的载体；未实现的防护不写。
 > 最后更新：2026-10-26（T8.3 内容供应链安全扫描闭环）
 > 配套件：`desktop/src/core/content_security.py`（扫描器）｜`nf security scan`（命令面）｜
-> `desktop/src/core/trust_boundary.py`（注入面单一实现）｜`SECURITY.md`（报告通道与机制清单）
+> `desktop/src/core/trust_boundary.py`（注入面单一实现）｜`docs/security/airgap-and-privacy.md`
+> （隐私与离线保证：PII/本机路径/凭据扫描 + core·scripts 网络站点静态审计）｜`SECURITY.md`
+> （报告通道与机制清单）
 
 ## 1. 资产（真实载体）
 
@@ -37,7 +39,7 @@
 |---|---|---|---|---|
 | 1 | 指令注入（正文冒充运行时指令：伪造前缀 / 覆盖式指令 / 角色重定义 / 系统提示套取 / 凭据外带） | 外来内容三面正文 | `core/trust_boundary.detect()`（6 条规则 + 同形字归一化）；入库前端 `ingest_common.injection_probe()` 在**公开边界**记档回评；MCP 资源面读入时同样记档（`core/mcp_runtime.py` 调 `detect`） | 检测是**咨询面**：命中不等于处置（讨论注入防御的合法正文也会命中），由人裁定 |
 | 2 | 可执行/主动内容（`<script>` / `javascript:` / `data:text/html` / 事件处理器 / 可执行文件下载链接） | 内容件正文；`outputs/**` 的 HTML/SVG/GraphML | 本任务新增 `core/content_security.py` 的 `executable_content`（critical） | 只做形态命中，不做浏览器语义/渲染器差异判定 |
-| 3 | 明文凭据/私钥进仓 | 任意内容件、脚本、日志 | CI 明文密钥扫描（`.github/workflows/ci-verify.yml` 的 grep 面）；入库前端 `ingest_common.secret_shape_hit()` 拒收；本任务新增 `secret_material`（critical，**只回 4 字符掩码**） | 只认已知形状（CI 同源 6 组 + 私钥头）；自定义内部令牌形态不覆盖 |
+| 3 | 明文凭据/私钥进仓 | 任意内容件、脚本、日志 | CI 明文密钥扫描（`.github/workflows/ci-verify.yml` 的 grep 面）；入库前端 `ingest_common.secret_shape_hit()` 拒收；本任务新增 `secret_material`（critical，**只回 4 字符掩码**） | 只认已知形状（CI 同源 7 组 + GitLab 令牌形态，`ingest_common` 共 8 组 + 私钥头）；自定义内部令牌形态不覆盖 |
 | 4 | 隐藏通道（零宽/双向控制字符）与 C0/C1 控制字符 | 内容件正文 | `trust_boundary` 的 `hidden_channel`；本任务新增 `control_character` 规则 | 不做「同形字伪装成正常文本」的语义判定 |
 | 5 | 超长单行 / base64 大块（吞上下文预算、拖渲染、藏载荷） | 内容件正文 | 本任务新增 `long_line`（>4000 字符）与 `base64_blob`（≥256 字符单行） | **按行**检测：换行包裹的大块不聚合（见 §5） |
 | 6 | 可疑外链（明文 http / 短链 / 裸 IP / punycode 域名） | 内容件正文 | 本任务新增 `external_link` 规则（排除 XML 命名空间声明，避免内容件误报） | 不联网核实域名信誉；不做钓鱼页内容判定 |
@@ -80,7 +82,7 @@
    本扫描器**未接入** `verify.sh`（默认不阻断 CI 流水线）。
 4. **按行检测**：换行包裹的 base64 大块、多行拼接的载荷不聚合；跨行语义不做推断。
 5. **二进制/压缩包/超大件不解析**：>4 MiB、含 NUL、非 UTF-8 一律记「不可判定」（exit 2）。
-6. **凭据形状限定**：只认 CI 同源 6 组 + 私钥头；自定义内部令牌、加密/双重编码载荷不覆盖。
+6. **凭据形状限定**：只认 CI 同源 7 组 + GitLab 令牌形态（`ingest_common` 共 8 组）+ 私钥头；自定义内部令牌、加密/双重编码载荷不覆盖。
 7. **内容面以外不覆盖**：SSRF、依赖漏洞、IPC 鉴权、插件逃逸等运行时面各有载体（§3 第 8–11 行），
    不在本扫描器范围。
 8. **`SECURITY.md` §五 的机制清单尚未并入本扫描器**（本轮未改该文件；合入后由维护者补一行）。

@@ -934,6 +934,29 @@ def _make_parser() -> argparse.ArgumentParser:
                                             "（真实模型 0 行、M2 0 条）的 UNKNOWN 不算失败")
     ops_chk.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ops_chk.add_argument("--no-live", action="store_true", help="跳过现场只读扫描")
+    prv = sub.add_parser("privacy",
+                         help="隐私与 air-gap 静态审计（PII/本机路径/凭据 + core·scripts 网络站点）",
+                         description="隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / "
+                                     "凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 "
+                                     "scripts 的网络站点（requests/urllib.request/socket/… 与 "
+                                     "subprocess curl|wget|nc）。只读、离线、不执行被扫内容；"
+                                     "不宣称绝对离线（未覆盖项见 docs/security/airgap-and-privacy.md）")
+    prvsub = prv.add_subparsers(dest="privacy_cmd", required=True)
+    prv_sc = prvsub.add_parser("scan", help="内容面扫描（缺省 docs/ site/ protocol/ community/ library/）",
+                               description="内容面扫描：缺省扫 docs/ site/ protocol/ community/ "
+                                           "library/；合成测试样本（desktop/tests/fixtures/privacy/）"
+                                           "默认跳过并登记，显式传参时仍逐条报出但不计入退出码。"
+                                           "退出码：0 干净 / 1 有 critical / 2 不可判定")
+    prv_sc.add_argument("paths", nargs="*", default=None,
+                        help="待扫路径（文件或目录；缺省 = docs/ site/ protocol/ community/ library/）")
+    prv_sc.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
+    prv_sc.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    prv_ck = prvsub.add_parser("check", help="air-gap 静态审计（core/ 与 scripts/ 的网络站点）",
+                               description="静态审计：AST 扫描 core/ 与 scripts/ 的 import/调用网络面，"
+                                           "合法站点须在白名单登记理由；无命中即红（名单不得变黑洞）")
+    prv_ck.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
+    prv_ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
+>>>>>>> t-priv
     dm = sub.add_parser("domain",
                         help="域包工厂（AI 品类清单工程：从一个域规格生成整套过门禁的域包）",
                         description="域包工厂：读内部域规格（.rivet/private_archive/ai_packs/specs/"
@@ -7875,6 +7898,42 @@ def _cmd_security(args) -> int:
     return int(report.get("exit") or 0)
 
 
+def _cmd_privacy(args) -> int:
+    """nf privacy：隐私与 air-gap 静态审计族（T11.2；只读、离线、不执行被扫内容）。
+
+    两个子命令：
+    - `scan`：内容面 PII / 本机路径 / 凭据（凭据单源复用 content_security）；
+    - `check`：AST 静态审计 core/ 与 scripts/ 的网络站点（白名单逐条理由，陈旧即红）。
+    退出码 = 报告里的 `exit`（0 干净 / 1 有 critical / 2 不可判定），与 `--json` 同源。
+    """
+    import json as _json
+    from core import privacy_scan as ps
+    sub = str(getattr(args, "privacy_cmd", "") or "")
+    try:
+        if sub == "scan":
+            report = ps.scan(getattr(args, "paths", None) or None,
+                             root=getattr(args, "root", ROOT) or ROOT)
+            render = ps.render_scan_text
+        elif sub == "check":
+            report = ps.audit_network(root=getattr(args, "root", ROOT) or ROOT)
+            render = ps.render_check_text
+        else:
+            print("  ✗ 需要子命令：`nf privacy scan [PATH...] [--json]` 或 `nf privacy check "
+                  "[--json]`", file=sys.stderr)
+            return 2
+    except OSError as exc:                        # 盘/权限：框成可修正的用户问题
+        return _machine_fail(args, "审计失败：%s（修复指引：确认 --root 与路径可读）"
+                             % _no_machine_paths(str(exc)), 2)
+    # 机器面纪律：错误原因里可能带 OSError 的绝对路径——统一过 `_no_machine_paths`。
+    for item in report.get("errors") or []:
+        item["reason"] = _no_machine_paths(str(item.get("reason") or ""))
+    if getattr(args, "json", False):
+        print(_json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(render(report))
+    return int(report.get("exit") or 0)
+
+
 def main(argv=None) -> int:
     # 效率：`--version` 是最常被调用的探测命令，而构建 argparse 面 ≈100 ms——
     # 它不需要命令面，直接短路（输出与 argparse 的 version 动作逐字一致）。
@@ -8029,6 +8088,8 @@ def main(argv=None) -> int:
         return _cmd_security(args)
     if args.cmd == "ops":
         return _cmd_ops(args)
+    if args.cmd == "privacy":
+        return _cmd_privacy(args)
     if args.cmd == "domain":
         return _cmd_domain(args)
     if args.cmd == "combine":

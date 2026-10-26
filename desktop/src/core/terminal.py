@@ -313,10 +313,10 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "verify", "name": "质检与验证",
      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、"
          "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译、契约注册表内容寻址（CID）、"
-         "内容 SRE 观测（SLI/SLO）",
+         "内容 SRE 观测（SLI/SLO）、隐私与 air-gap 静态审计",
      "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
-                  "nfal", "registry", "security", "ir", "ops")},
+                  "nfal", "registry", "security", "ir", "ops", "privacy")},
     {"id": "library", "name": "图书馆与知识",
      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面",
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",
