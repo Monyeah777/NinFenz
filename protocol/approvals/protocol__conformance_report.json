@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-26",
   "approved_by": "Monyeah777",
-  "note": "T4.1：基线重冻后 conformance root 机械重签（27/27 conformant）",
+  "note": "T7.2：content_ir 新增 + code/coupling 基线重冻后 conformance root 机械重签（27/27 conformant）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "0533d5816375a92d95cb82b939168208c619fd6336b52841e9137b9c946c18f7"
+  "subject_digest": "d565c1a88382b4b0ac0496685cac8972a02ab6f93449fb14a14fe1fa44953d51"
 }

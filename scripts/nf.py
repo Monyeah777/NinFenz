@@ -1405,6 +1405,21 @@ def _make_parser() -> argparse.ArgumentParser:
                                      "（无用户函数/循环/赋值/IO）；用法见 docs/nfal.md")
     nfl.add_argument("nfal_args", nargs=argparse.REMAINDER,
                      help="透传给 NFA-L 的参数；完整用法见 nf nfal help")
+
+    # 内容 IR（T7.2）：markdown 产物 → 带类型节点图，供节点级门禁与局部重写。
+    irp = sub.add_parser(
+        "ir",
+        help="内容 IR：产物 → 带类型节点图（parse/render；节点级检查）",
+        description="内容 IR（T7.2）：document/section/paragraph/claim/citation/entity/slot_ref "
+                    "节点图；每节点稳定 id（路径+内容哈希）；render 规范形逐字节确定性；"
+                    "check 输出 section/claim/无归属引用/悬空实体，并以 IR 节点为执行面重跑 "
+                    "techdoc-strict 的 3 条文本规则（标题句式/标题末尾标点/单空格）")
+    irsub = irp.add_subparsers(dest="ir_cmd")
+    ir_ck = irsub.add_parser(
+        "check", help="节点级检查（section/claim/无归属引用/悬空实体/IR 文本规则）",
+        description="节点级检查：parse 产物 → 统计 + 悬空引用/实体 + 3 条文本规则（IR 节点执行）")
+    ir_ck.add_argument("file", help="待检 markdown 路径（仓库相对或绝对）")
+    ir_ck.add_argument("--json", action="store_true", help="输出结构化 JSON 报告")
     return p
 
 
@@ -4313,6 +4328,32 @@ def _cmd_state_front(args):
         if args.out:
             print("  已写入：%s" % args.out)
     return 0
+
+
+def _cmd_ir(args) -> int:
+    """nf ir：内容 IR（T7.2）——节点级检查（parse→render 规范形 + 悬空 + IR 文本规则）。"""
+    from core import content_ir as cir
+    import json as _json
+
+    if getattr(args, "ir_cmd", "") != "check":
+        print("  ✗ 缺子命令（用法：nf ir check <file> [--json]；"
+              "内容 IR 节点图另见 core.content_ir）", file=sys.stderr)
+        return 2
+    target = args.file if os.path.isabs(args.file) else os.path.join(ROOT, args.file)
+    if not os.path.isfile(target):
+        return _machine_fail(
+            args, "目标不存在：%s（修复指引：给出在场 markdown 产物路径——相对仓库根或绝对皆可；"
+                  "典型输入 = `nf assemble \"…\" --build --dest out` 的产物）" % args.file)
+    try:
+        rep = cir.check_file(target, root=ROOT)
+    except OSError as exc:
+        return _machine_fail(args, "读取产物失败：%s（修复指引：确认文件可读且为 UTF-8）" % exc)
+    rep["path"] = args.file
+    if args.json:
+        print(_json.dumps(rep, ensure_ascii=False, indent=2, sort_keys=False))
+    else:
+        print(cir.format_report(rep))
+    return 0 if rep.get("ok") else 1
 
 
 def _cmd_st_validate(args):
@@ -7628,6 +7669,8 @@ def main(argv=None) -> int:
         return _cmd_st_validate(args)
     if args.cmd == "state-front":
         return _cmd_state_front(args)
+    if args.cmd == "ir":
+        return _cmd_ir(args)
     if args.cmd == "diff":
         return _cmd_diff(args)
     if args.cmd == "related":
