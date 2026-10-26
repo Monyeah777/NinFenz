@@ -4174,7 +4174,7 @@ public static class SelfTest
     /// 语料去比死摘要，只会把「语料漂了」误报成「引擎错了」（第八十六片实测：一键门直接打活仓库时
     /// 文档命令面与扩展策略面各红一条，而两者都只是 HEAD 前移/带 .git 所致）。
     /// </summary>
-    private static bool IsPinnedSnapshot(string root) => !Directory.Exists(Path.Combine(root, ".git"));
+    private static bool IsPinnedSnapshot(string root) => !RepoCache.IsWorkingTree(root);
 
     private static void WriteCase(string root, string doc, string registryJson)
     {

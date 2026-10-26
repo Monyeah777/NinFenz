@@ -7,6 +7,7 @@
 同时要求 dependabot 在场，避免「固定」退化成「冻结」。
 """
 import re
+import tomllib
 import unittest
 from pathlib import Path
 
@@ -168,6 +169,43 @@ class CiRequirementsPinTest(unittest.TestCase):
                     offenders.append(f"{path.relative_to(ROOT)}:{i} {line}")
         self.assertEqual([], offenders,
                          f"容器基础镜像必须按 digest 固定：{offenders}")
+
+    def test_rust_locks_do_not_regress_to_unmaintained_parser_dependencies(self):
+        """rustpython-parser 的默认后端曾引入 8 个 OSV 告警依赖。
+
+        路径依赖是修复的一部分：只改入口清单但不锁住 parser/ast/literal，
+        fuzz 或 PyO3 仍可能重新解析到 crates.io 的旧依赖图。
+        """
+        forbidden = {
+            "malachite",
+            "malachite-base",
+            "malachite-bigint",
+            "malachite-nz",
+            "malachite-q",
+            "paste",
+            "unic-char-property",
+            "unic-char-range",
+            "unic-common",
+            "unic-emoji-char",
+            "unic-ucd-category",
+            "unic-ucd-ident",
+            "unic-ucd-version",
+        }
+        local = {"rustpython-ast", "rustpython-literal", "rustpython-parser"}
+        lockfiles = [
+            ROOT / "engine" / "rust" / "Cargo.lock",
+            ROOT / "engine" / "rust" / "fuzz" / "Cargo.lock",
+            ROOT / "engine" / "rust" / "pyo3" / "Cargo.lock",
+        ]
+        for path in lockfiles:
+            with open(path, "rb") as fh:
+                packages = tomllib.load(fh)["package"]
+            names = {pkg["name"] for pkg in packages}
+            self.assertEqual(set(), names & forbidden, f"{path} 重新引入未维护依赖")
+            for pkg in packages:
+                if pkg["name"] in local:
+                    self.assertNotIn("source", pkg,
+                                     f"{path} 的 {pkg['name']} 必须走本仓 vendored 路径")
 
 
 if __name__ == "__main__":

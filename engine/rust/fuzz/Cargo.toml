@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-rustpython-parser = "0.4"
+rustpython-parser = { path = "../vendor/rustpython-parser", default-features = false, features = ["location", "num-bigint"] }
 
 [[bin]]
 name = "python_parser"

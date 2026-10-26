@@ -3454,6 +3454,19 @@ int GovernanceCommand(string family)
     {
         if (positional.Count < 3) return Fail($"{family} check 需要一个件路径");
         var path = positional[2];
+        var fullPath = Path.IsPathRooted(path) ? path : Path.Combine(root!, path);
+        if (family == "handover" && !File.Exists(fullPath))
+        {
+            return MachineFail(
+                $"交接件不存在：{path}（修复指引：给**在场**接力件 md 路径（相对仓库根或" +
+                "绝对皆可）；`nf handover` 可枚举既有接力件）", 1);
+        }
+        if (family == "postmortem" && !File.Exists(fullPath))
+        {
+            return MachineFail(
+                $"未匹配到复盘件**文件**：{path}（修复指引：`nf postmortem ls` 可枚举既有" +
+                "复盘件；通配由本命令自行展开，无需依赖 shell；目录不会被展开为文件）", 1);
+        }
         var (docIssues, docStats) = family switch
         {
             "handover" => Handover.CheckDoc(root!, path),
@@ -3523,6 +3536,21 @@ int GovernanceCommand(string family)
         }
     }
     return 0;
+}
+
+int MachineFail(string message, int code = 1)
+{
+    if (json)
+    {
+        Console.WriteLine(PythonJson.SortedWithSpaces(new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["error"] = message,
+            ["exit"] = (long)code,
+            ["ok"] = false,
+        }));
+    }
+    Console.Error.WriteLine("  ✗ " + message);
+    return code;
 }
 
 // 把三件治理契约的 scan 结果统一成 CLI 面所需的形状

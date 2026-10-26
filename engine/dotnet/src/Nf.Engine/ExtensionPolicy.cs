@@ -73,7 +73,7 @@ public static class ExtensionPolicy
         if (miss.Count > 0) issues.Add("EXTENSION.md 缺判据词：" + string.Join(",", miss));
 
         // bump 面：只在**非仓库导出态**照抄真源的空判；工作区态显式不判（三态纪律）。
-        var isWorkingTree = Directory.Exists(Path.Combine(root, ".git"));
+        var isWorkingTree = RepoCache.IsWorkingTree(root);
         var bumps = new List<string>();
         var boundary = isWorkingTree
             ? "工作区态（root 下有 .git）：bump 面 = `git diff HEAD` 的版本字段结构性变更面，"
