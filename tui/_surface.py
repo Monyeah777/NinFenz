@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:babef2c8d55ef9cf844c3978a59f5de33ead3fe04d06a4cf44f1996679aafbdf'
+DIGEST = 'sha256:69d5a81f697677f3c4061189746f39d7ad36506e1e7256f73b41aaf672da23ae'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -78,6 +78,7 @@ COMMANDS = ['approve',
  'run',
  'runtime',
  'score',
+ 'security',
  'serve',
  'shell',
  'sig',
@@ -500,6 +501,7 @@ FAMILIES = [{'id': 'start',
                'telemetry',
                'nfal',
                'registry',
+               'security',
                'ir']},
  {'id': 'library',
   'name': '图书馆与知识',

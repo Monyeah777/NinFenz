@@ -884,6 +884,22 @@ def _make_parser() -> argparse.ArgumentParser:
     of_mt.add_argument("--write", action="store_true",
                        help="重签 protocol/output_forms_baseline.json")
     of_mt.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    sec = sub.add_parser("security",
+                         help="内容供应链安全（域包/投稿正文的外来内容形态扫描：注入/可执行/凭据/结构）",
+                         description="内容供应链安全扫描：把 community/ 与 library/ 的正文当**外来"
+                                     "内容**做只读形态扫描（不联网、不执行、不改写）——指令注入标记"
+                                     "（单源 core.trust_boundary）、可执行/主动内容、明文凭据（只回"
+                                     "掩码）、隐藏/控制字符、超长单行、base64 大块、可疑外链。退出码"
+                                     "：0 干净 / 1 有 critical / 2 不可判定")
+    secsub = sec.add_subparsers(dest="security_cmd", required=True)
+    sec_sc = secsub.add_parser("scan", help="扫描路径（缺省 community/ 与 library/）",
+                               description="扫描：缺省扫 community/ 与 library/；显式测试样本"
+                                           "（desktop/tests/fixtures/security/ 等白名单前缀）默认跳过"
+                                           "并登记，显式传参时仍逐条报出但不计入退出码")
+    sec_sc.add_argument("paths", nargs="*", default=None,
+                        help="待扫路径（文件或目录；缺省 = community/ 与 library/）")
+    sec_sc.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
+    sec_sc.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dm = sub.add_parser("domain",
                         help="域包工厂（AI 品类清单工程：从一个域规格生成整套过门禁的域包）",
                         description="域包工厂：读内部域规格（.rivet/private_archive/ai_packs/specs/"
@@ -7573,6 +7589,33 @@ def _try_rust_face(args) -> Optional[int]:
     return 0
 
 
+def _cmd_security(args) -> int:
+    """nf security：内容供应链安全扫描族（T8.3；只读、离线、不执行被扫内容）。
+
+    退出码 = 报告里的 `exit`（0 干净 / 1 有 critical / 2 不可判定），与 `--json` 的
+    `exit` 字段同源——脚本消费方读一个口径就够。
+    """
+    import json as _json
+    from core import content_security as cs
+    if str(getattr(args, "security_cmd", "") or "") != "scan":
+        print("  ✗ 需要子命令：`nf security scan [PATH...] [--json]`", file=sys.stderr)
+        return 2
+    try:
+        report = cs.scan(getattr(args, "paths", None) or None,
+                         root=getattr(args, "root", ROOT) or ROOT)
+    except OSError as exc:                        # 盘/权限：框成可修正的用户问题
+        return _machine_fail(args, "扫描失败：%s（修复指引：确认 --root 与路径可读）"
+                             % _no_machine_paths(str(exc)), 2)
+    # 机器面纪律：错误原因里可能带 OSError 的绝对路径——统一过 `_no_machine_paths`。
+    for item in report.get("errors") or []:
+        item["reason"] = _no_machine_paths(str(item.get("reason") or ""))
+    if getattr(args, "json", False):
+        print(_json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(cs.render_text(report))
+    return int(report.get("exit") or 0)
+
+
 def main(argv=None) -> int:
     # 效率：`--version` 是最常被调用的探测命令，而构建 argparse 面 ≈100 ms——
     # 它不需要命令面，直接短路（输出与 argparse 的 version 动作逐字一致）。
@@ -7721,6 +7764,8 @@ def main(argv=None) -> int:
         return _cmd_transparency(args)
     if args.cmd == "output":
         return _cmd_output(args)
+    if args.cmd == "security":
+        return _cmd_security(args)
     if args.cmd == "domain":
         return _cmd_domain(args)
     if args.cmd == "combine":

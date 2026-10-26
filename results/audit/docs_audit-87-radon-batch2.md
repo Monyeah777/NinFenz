@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:5629fae737e14bb45645ded9a85f68ef00dcc125b2110331adc604c4bf16d1c3
+  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
 ---
+> 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
+
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)
 
 > 重审（2026-10-26）：W7 cleanup: remove dead imports/locals in semantics/gate_profile

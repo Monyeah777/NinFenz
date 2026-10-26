@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
+    "app": 1449,
     "entry": 26,
-    "floor": 5,
+    "floor": 6,
     "prod": 1065,
     "projection": 134,
-    "support": 269,
-    "verify": 1150
+    "support": 270,
+    "verify": 1158
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6011,6 +6011,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "内容供应链安全扫描（T8.3：域包/投稿正文 = 外来内容，形态可扫描可拦截）。",
+      "path": "desktop/src/core/content_security.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "上游契约 pin + 逐字段对账 + 数量钉死（机制借鉴 OpenAgentCore upstream_contract_test）。",
       "path": "desktop/src/core/contract_pin.py",
       "role": "prod",
@@ -6845,6 +6851,12 @@
       "rule": "R-floor"
     },
     {
+      "function": "契约注册表内容寻址（CID）索引：协议包的「内容指纹」正式产物。",
+      "path": "desktop/src/core/registry_index.py",
+      "role": "floor",
+      "rule": "R-floor"
+    },
+    {
       "function": "注册表机读加载器（v0.6.0 T1.2 · 09 方案 §4 动作 1）。",
       "path": "desktop/src/core/registry_loader.py",
       "role": "floor",
@@ -7385,6 +7397,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "内容件样例（干净）",
+      "path": "desktop/tests/fixtures/security/clean.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "内容件样例（显式测试样本 · 故意含恶意片段）",
+      "path": "desktop/tests/fixtures/security/malicious_sample.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "示例设备使用说明书",
       "path": "desktop/tests/fixtures/techdoc/techdoc_bad.md",
       "role": "verify",
@@ -7769,6 +7793,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "T8.3 内容供应链安全扫描单测（`core/content_security.py` + `nf security scan`）。",
+      "path": "desktop/tests/test_content_security.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_contract_pin.py",
       "role": "verify",
@@ -7801,6 +7831,12 @@
     {
       "function": "模块级耦合度量（`core/coupling_metrics.py`）回归测试 —— Martin 包度量 / SDP / 环。",
       "path": "desktop/tests/test_coupling_metrics.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T8.1 跨实现差分回归（Python canonical ⇄ Node 零依赖第二实现）。",
+      "path": "desktop/tests/test_cross_impl.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8917,6 +8953,12 @@
     {
       "function": "正则失控回溯（ReDoS）回归 —— 2026-10-10 全仓审计 Y3。",
       "path": "desktop/tests/test_redos_patterns.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "契约注册表 CID 索引（T8.2）判据：确定性 / 幂等 / 篡改 / 增删 / 顺序无关 / 空集合。",
+      "path": "desktop/tests/test_registry_index.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -10657,6 +10699,12 @@
     {
       "function": "",
       "path": "engine/dotnet/tools/nfparity/nfparity.csproj",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "!/usr/bin/env node",
+      "path": "engine/js/nf_canonical.js",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13091,6 +13139,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-registry-index/1",
+      "path": "protocol/registry_index.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-release-policy/1",
       "path": "protocol/release_policy.json",
       "role": "verify",
@@ -13332,17 +13386,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2836110213ce42e9c33b984bc6b9feab386858ef49fcc16264c1168da2d5b530",
+  "root_digest": "73657a5350ae58c3ddd264ede34b031c3ea4a42420720ac8170ce7075e52dd4e",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 124,
+    "R-app": 1449,
+    "R-catch": 125,
     "R-entry": 26,
-    "R-floor": 5,
+    "R-floor": 6,
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 1028,
-    "auto:R-core": 266
+    "R-verify": 1035,
+    "auto:R-core": 267
   },
   "schema": "nf-role-coordinates/1"
 }

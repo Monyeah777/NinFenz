@@ -82,7 +82,7 @@
       "i": 0.0
     },
     "atomic_write": {
-      "ca": 53,
+      "ca": 54,
       "ce": 0,
       "i": 0.0
     },
@@ -214,6 +214,11 @@
     "content_ir": {
       "ca": 0,
       "ce": 1,
+      "i": 1.0
+    },
+    "content_security": {
+      "ca": 0,
+      "ce": 2,
       "i": 1.0
     },
     "contract_pin": {
@@ -532,9 +537,9 @@
       "i": 0.2222
     },
     "ingest_common": {
-      "ca": 1,
+      "ca": 2,
       "ce": 2,
-      "i": 0.6667
+      "i": 0.5
     },
     "injection_budget": {
       "ca": 1,
@@ -1016,6 +1021,11 @@
       "ce": 2,
       "i": 0.6667
     },
+    "registry_index": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "registry_loader": {
       "ca": 6,
       "ce": 2,
@@ -1267,9 +1277,9 @@
       "i": 0.6667
     },
     "trust_boundary": {
-      "ca": 2,
+      "ca": 3,
       "ce": 1,
-      "i": 0.3333
+      "i": 0.25
     },
     "unknown_policy": {
       "ca": 1,

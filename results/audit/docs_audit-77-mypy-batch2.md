@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:5629fae737e14bb45645ded9a85f68ef00dcc125b2110331adc604c4bf16d1c3
+  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
 ---
+> 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
+
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)
 
 > 重审（2026-10-26）：W7 cleanup: remove dead imports/locals in semantics/gate_profile

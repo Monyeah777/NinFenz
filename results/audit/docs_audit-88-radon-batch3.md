@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:34879c7454747ba56224b91001173646da32e9855a4f7f4f2ba0bb2e1e4b4ae1
-  - protocol/code_metrics_baseline.json:5629fae737e14bb45645ded9a85f68ef00dcc125b2110331adc604c4bf16d1c3
+  - desktop/src/core/terminal.py:e8ca3b61956d709e8ac48ab7b5503e259a392cd3de8aba8a2df4460905cf334a
+  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
 ---
+> 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
+
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)
 
 > 重审（2026-10-26）：W7 cleanup: remove dead imports/locals in semantics/gate_profile

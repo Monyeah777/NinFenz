@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "a714d2acbbe326b868bde81afe43b31aacf091c1c212c009dd60996c63efab76",
+        "root": "e2569e1cbbb32b8a4eff1009228614366b82d41482de4838a87d8dc6407a9d31",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 324,
-        "files": 324,
-        "max_fn_cc": 119,
-        "max_fn_lines": 1335,
-        "max_lines": 7890
+        "baseline": 327,
+        "files": 327,
+        "max_fn_cc": 121,
+        "max_fn_lines": 1364,
+        "max_lines": 7983
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 289,
-        "probed": 289
+        "patterns": 301,
+        "probed": 301
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 268,
-        "modules": 268,
+        "metrics_recorded": 270,
+        "modules": 270,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 68,
+        "consumed": 70,
         "exceptions": 3,
         "orphans": 2,
-        "scanners": 70
+        "scanners": 72
       },
       "status": "warn",
       "warns": 1
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4097,
-        "kernel": 2220,
+        "files": 4109,
+        "kernel": 2229,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "799800817d1e97f0eb1a05fea4f7ce34428acaf0b2ad0bcdbae8bfebf641982a",
+  "root_digest": "7e13bf90c314dc792adfe73fbfbbb0e689c0238dbf04cd52732ae4d4358c94b1",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
