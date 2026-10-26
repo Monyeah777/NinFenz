@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-26",
   "approved_by": "Monyeah777",
-  "note": "T7.2：content_ir 新增 + code/coupling 基线重冻后 conformance root 机械重签（27/27 conformant）",
+  "note": "T9.2：导入器新增 + code/coupling 基线重冻后 conformance root 机械重签（27/27 conformant）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "d565c1a88382b4b0ac0496685cac8972a02ab6f93449fb14a14fe1fa44953d51"
+  "subject_digest": "0d355bc43b51096643cf34017aba69aa0dc1324afabf1bdea2f05c5cdb04fef7"
 }

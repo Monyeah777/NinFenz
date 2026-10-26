@@ -10,11 +10,13 @@ subjects:
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - scripts/nf.py:b258b71ca8ab52637bda2f1029ae4925591c53df988ea33aef8667bcf0ffc7b1
+  - scripts/nf.py:e9c308b9645894a64e2f92c93ba56ec37a360167e6945c5575b48b99bd36b2da
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-26）：T9.2 导入器：新增 core/import_docx.py、core/import_dita.py 与 nf import docx|dita（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime

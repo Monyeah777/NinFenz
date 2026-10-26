@@ -535,6 +535,16 @@
       "max_fn_cc": 20,
       "max_fn_lines": 73
     },
+    "desktop/src/core/import_dita.py": {
+      "lines": 418,
+      "max_fn_cc": 23,
+      "max_fn_lines": 63
+    },
+    "desktop/src/core/import_docx.py": {
+      "lines": 335,
+      "max_fn_cc": 17,
+      "max_fn_lines": 56
+    },
     "desktop/src/core/import_graph.py": {
       "lines": 228,
       "max_fn_cc": 17,
@@ -1501,9 +1511,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7983,
+      "lines": 8088,
       "max_fn_cc": 121,
-      "max_fn_lines": 1364
+      "max_fn_lines": 1372
     },
     "scripts/nf_client.py": {
       "lines": 187,

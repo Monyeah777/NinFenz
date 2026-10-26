@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:b258b71ca8ab52637bda2f1029ae4925591c53df988ea33aef8667bcf0ffc7b1
+  - scripts/nf.py:e9c308b9645894a64e2f92c93ba56ec37a360167e6945c5575b48b99bd36b2da
 ---
+> 重审（2026-10-26）：T9.2 导入器：新增 core/import_docx.py、core/import_dita.py 与 nf import docx|dita（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime
