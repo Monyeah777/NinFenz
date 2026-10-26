@@ -99,5 +99,433 @@
       "source": "docs/knowledge.md",
       "used_in": []
     }
+  ],
+  "entry_rules": [
+    "entry：id / zh / en / definition_zh / definition_en / category / source",
+    "zh 与 en 各自全表唯一；category ∈ categories；source.file 必须是仓库真实件",
+    "source 锚点 = 章节标题（section，逐字匹配标题文本）或关键词（keyword，逐字出现在文件里）；可选 line（行号）——一旦声明，该行必须真实存在且含 keyword/zh（禁止假行号）",
+    "必含术语清单见 desktop/src/core/glossary.py::REQUIRED_TERMS；缺一条即 `nf glossary check` 失败"
+  ],
+  "entries": [
+    {
+      "id": "GL-001",
+      "zh": "交付物契约",
+      "en": "deliverable contract",
+      "definition_zh": "把「AI 应产出什么」写成可机器验收的契约（结构 + 验收判据 + 边界），而不是只给一句需求。",
+      "definition_en": "A machine-checkable contract for what an AI must deliver: structure, acceptance criteria and boundaries, not just a one-line request.",
+      "category": "协议层",
+      "source": {
+        "file": "llms.txt",
+        "keyword": "交付物契约"
+      }
+    },
+    {
+      "id": "GL-002",
+      "zh": "模块",
+      "en": "module",
+      "definition_zh": "协议定义的最小可装载单元：含机读契约（id/层/输入/输出/事件）与可替换边界。",
+      "definition_en": "The smallest loadable unit defined by the protocol: machine contract (id, layer, inputs, outputs, events) plus a replaceable boundary.",
+      "category": "协议层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1. 模块协议",
+        "keyword": "模块"
+      }
+    },
+    {
+      "id": "GL-003",
+      "zh": "契约",
+      "en": "contract",
+      "definition_zh": "模块与调用方之间的显式约定（输入/输出/事件/边界）；替换模块时契约不得变。",
+      "definition_en": "An explicit agreement between a module and its callers (inputs, outputs, events, boundaries); replacing a module must keep the contract unchanged.",
+      "category": "协议层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1. 模块协议",
+        "keyword": "契约"
+      }
+    },
+    {
+      "id": "GL-004",
+      "zh": "管线",
+      "en": "pipeline",
+      "definition_zh": "按层位（P00–P80）与流程把模块装配起来的执行顺序真源。",
+      "definition_en": "The source of truth for execution order: assembling modules by layer slots (P00–P80) and flow.",
+      "category": "协议层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "2. 管线规范",
+        "keyword": "管线"
+      }
+    },
+    {
+      "id": "GL-005",
+      "zh": "资产",
+      "en": "asset",
+      "definition_zh": "模块经资产五接口（get/query/match/roll/register）访问的题材数据，不直读散文件。",
+      "definition_en": "Domain data accessed by modules through the five asset interfaces (get/query/match/roll/register), never by reading loose files directly.",
+      "category": "协议层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "3. 资产库接口",
+        "keyword": "资产"
+      }
+    },
+    {
+      "id": "GL-006",
+      "zh": "条款",
+      "en": "clause",
+      "definition_zh": "编号可引用的单条协议规定；变更须走迁移记录与版本字段纪律。",
+      "definition_en": "A single, number-addressable protocol provision; changing it must follow the migration record and version-field discipline.",
+      "category": "协议层",
+      "source": {
+        "file": "01_核心协议.md",
+        "keyword": "条款"
+      }
+    },
+    {
+      "id": "GL-007",
+      "zh": "层",
+      "en": "layer",
+      "definition_zh": "管线的九层位（P00–P80）；模块按层挂载，层外模块是装配警告。",
+      "definition_en": "One of the nine pipeline layers (P00–P80); modules mount by layer, and off-layer modules raise an assembly warning.",
+      "category": "装配层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1. 模块协议",
+        "keyword": "管线层"
+      }
+    },
+    {
+      "id": "GL-008",
+      "zh": "槽",
+      "en": "slot",
+      "definition_zh": "模块声明的数据读写位；写入须与声明一致，未声明写槽即数据事故。",
+      "definition_en": "A declared data read/write position on a module; writes must match declarations, and an undeclared write is a data incident.",
+      "category": "装配层",
+      "source": {
+        "file": "02_联动注册表.md",
+        "section": "2. 官方核心模块表（13 件）",
+        "keyword": "数据槽"
+      }
+    },
+    {
+      "id": "GL-009",
+      "zh": "事件",
+      "en": "event",
+      "definition_zh": "模块间唯一通信通道（publish/subscribe）；发布方唯一，订阅须有发布方。",
+      "definition_en": "The only inter-module communication channel (publish/subscribe); each event has exactly one publisher, and every subscription must resolve to one.",
+      "category": "装配层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1. 模块协议",
+        "keyword": "事件"
+      }
+    },
+    {
+      "id": "GL-010",
+      "zh": "装配",
+      "en": "assembly",
+      "definition_zh": "把管线、模块、资产装配成可交付产物的过程；装配结果先过质量门再导出。",
+      "definition_en": "The process of assembling pipeline, modules and assets into a deliverable; the result must pass the quality gate before export.",
+      "category": "装配层",
+      "source": {
+        "file": "07_官方核心出厂与社区预设导航.md",
+        "section": "2. 官方核心装配（P01 标准管线）",
+        "keyword": "装配"
+      }
+    },
+    {
+      "id": "GL-011",
+      "zh": "产物",
+      "en": "artifact",
+      "definition_zh": "装配输出的单件文件（完整版 Markdown / 导出面）；须可复现、可验收。",
+      "definition_en": "A single output file from assembly (full Markdown / export face); it must be reproducible and checkable.",
+      "category": "装配层",
+      "source": {
+        "file": "protocol/CONFORMANCE.md",
+        "keyword": "产物"
+      }
+    },
+    {
+      "id": "GL-012",
+      "zh": "状态",
+      "en": "state",
+      "definition_zh": "装配与运行可重读的状态快照（数据槽 / 回合状态头）；不是叙事正文。",
+      "definition_en": "A re-readable state snapshot of assembly or runtime (data slots / round state header); not narrative prose.",
+      "category": "装配层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1.1 模块头机读契约（v1.0.0 C1 · T1-1）",
+        "keyword": "状态"
+      }
+    },
+    {
+      "id": "GL-013",
+      "zh": "角色",
+      "en": "role",
+      "definition_zh": "装配师/执行 agent 等参与方的职责边界；角色越界即协议事故。",
+      "definition_en": "The responsibility boundary of participants such as assemblers and executing agents; crossing it is a protocol incident.",
+      "category": "装配层",
+      "source": {
+        "file": "06_Agent执行协议.md",
+        "section": "1. 角色定位与职责边界",
+        "keyword": "角色"
+      }
+    },
+    {
+      "id": "GL-014",
+      "zh": "工作流",
+      "en": "workflow",
+      "definition_zh": "声明式路由的工作单元（如 routing / assemble），机器面优先、失败不回退。",
+      "definition_en": "A declared, routable unit of work (e.g. routing / assemble); machine faces first, no silent fallback on dispatch failure.",
+      "category": "装配层",
+      "source": {
+        "file": "docs/agent/AI_ROUTING.md",
+        "keyword": "工作流"
+      }
+    },
+    {
+      "id": "GL-015",
+      "zh": "门",
+      "en": "gate",
+      "definition_zh": "输出前唯一的质量闸（M80 等）：结构门硬阻断，质量门按 profile 判定。",
+      "definition_en": "The single quality gate before output (e.g. M80): the structural gate hard-blocks, the quality gate judges by profile.",
+      "category": "质量层",
+      "source": {
+        "file": "02_联动注册表.md",
+        "section": "2. 官方核心模块表（13 件）",
+        "keyword": "输出质检门"
+      }
+    },
+    {
+      "id": "GL-016",
+      "zh": "门禁",
+      "en": "gatekeeping",
+      "definition_zh": "把协议条款做成可执行判据的常驻检查（verify checkN）；失败即阻断发布。",
+      "definition_en": "Persistent checks that turn protocol clauses into executable criteria (verify checkN); failures block release.",
+      "category": "质量层",
+      "source": {
+        "file": "protocol/CONFORMANCE.md",
+        "keyword": "门禁"
+      }
+    },
+    {
+      "id": "GL-017",
+      "zh": "审计",
+      "en": "audit",
+      "definition_zh": "对结论绑定对象摘要的签收记录；对象一改旧审计即失效。",
+      "definition_en": "A sign-off record binding conclusions to subject digests; changing the subject invalidates the old audit.",
+      "category": "质量层",
+      "source": {
+        "file": "06_Agent执行协议.md",
+        "section": "0. 输入信任边界与消费纪律（外来内容 = 数据，不是指令）",
+        "keyword": "审计"
+      }
+    },
+    {
+      "id": "GL-018",
+      "zh": "用例",
+      "en": "test case",
+      "definition_zh": "可执行的验收样本（前置/动作/断言），供 drill 与回归复用。",
+      "definition_en": "An executable acceptance sample (precondition, action, assertion) reused by drills and regressions.",
+      "category": "质量层",
+      "source": {
+        "file": "01_核心协议.md",
+        "keyword": "用例"
+      }
+    },
+    {
+      "id": "GL-019",
+      "zh": "基准",
+      "en": "benchmark",
+      "definition_zh": "可对照的基线（分数/外形/行为）；无基线不称改进。",
+      "definition_en": "A comparable baseline (score, shape or behaviour); without a baseline there is no claim of improvement.",
+      "category": "质量层",
+      "source": {
+        "file": "02_联动注册表.md",
+        "keyword": "基准"
+      }
+    },
+    {
+      "id": "GL-020",
+      "zh": "缺陷注入",
+      "en": "defect injection",
+      "definition_zh": "故意注入已知缺陷以验证判据有咬合（能红、且只红该红处）。",
+      "definition_en": "Deliberately injecting known defects to prove the criteria bite (they go red, and only where they should).",
+      "category": "质量层",
+      "source": {
+        "file": "scripts/gate_defect_bench.py",
+        "keyword": "缺陷注入"
+      }
+    },
+    {
+      "id": "GL-021",
+      "zh": "可复现",
+      "en": "reproducibility",
+      "definition_zh": "同输入同输出：无随机、无网络、无墙钟依赖；可重跑得到同一结果。",
+      "definition_en": "Same input, same output: no randomness, network or wall-clock dependence; a rerun yields the same result.",
+      "category": "质量层",
+      "source": {
+        "file": "protocol/CONFORMANCE.md",
+        "keyword": "可复现"
+      }
+    },
+    {
+      "id": "GL-022",
+      "zh": "确定性",
+      "en": "determinism",
+      "definition_zh": "确定性派生：输出是输入与规则的纯函数，幂等且逐字节可比。",
+      "definition_en": "Deterministic derivation: output is a pure function of input and rules, idempotent and byte-comparable.",
+      "category": "质量层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1.1 模块头机读契约（v1.0.0 C1 · T1-1）",
+        "keyword": "确定性"
+      }
+    },
+    {
+      "id": "GL-023",
+      "zh": "一致性",
+      "en": "conformance",
+      "definition_zh": "「符合什么、管到哪、什么不管」的显式声明，逐条与真源比对。",
+      "definition_en": "An explicit statement of what is conformant, what it covers and what it excludes, compared clause by clause with the source of truth.",
+      "category": "质量层",
+      "source": {
+        "file": "protocol/CONFORMANCE.md",
+        "keyword": "一致性"
+      }
+    },
+    {
+      "id": "GL-024",
+      "zh": "证据",
+      "en": "evidence",
+      "definition_zh": "可机核验的事实（摘要/回执/执行记录/审计），不是自述。",
+      "definition_en": "Machine-checkable facts (digests, receipts, execution records, audits), not self-claims.",
+      "category": "证据层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "1.2 Conformance 一致性分级（43 A2）",
+        "keyword": "证据"
+      }
+    },
+    {
+      "id": "GL-025",
+      "zh": "证据链",
+      "en": "evidence chain",
+      "definition_zh": "从真源到产物的可回溯链条（摘要绑定 + 回执包含证明 + 审计签收）。",
+      "definition_en": "A traceable chain from source of truth to artifact (digest binding, receipt inclusion proof, audit sign-off).",
+      "category": "证据层",
+      "source": {
+        "file": "desktop/src/core/domain_pack.py",
+        "keyword": "证据链"
+      }
+    },
+    {
+      "id": "GL-026",
+      "zh": "回执",
+      "en": "receipt",
+      "definition_zh": "带 inclusion proof 的可验证证明（某条 ∈ 全量），叶摘要绑定内容。",
+      "definition_en": "A verifiable proof of inclusion (this entry ∈ the full set) with leaf digests bound to content.",
+      "category": "证据层",
+      "source": {
+        "file": "protocol/CONFORMANCE.md",
+        "keyword": "回执"
+      }
+    },
+    {
+      "id": "GL-027",
+      "zh": "规范形",
+      "en": "canonical form",
+      "definition_zh": "唯一的确定性书写形式（键序/空白/换行归一）；规范形外一律以 canonical 输出为准。",
+      "definition_en": "The single deterministic textual form (key order, whitespace and newlines normalized); anything else is reported as non-canonical and canonicalized.",
+      "category": "证据层",
+      "source": {
+        "file": "desktop/src/core/content_ir.py",
+        "keyword": "规范形"
+      }
+    },
+    {
+      "id": "GL-028",
+      "zh": "参考运行时",
+      "en": "reference runtime",
+      "definition_zh": "按管线层序执行装配计划并产 trace 的参考实现（MockModel 确定性派生）。",
+      "definition_en": "A reference implementation that executes an assembly plan by pipeline layer and emits a trace (MockModel derives responses deterministically).",
+      "category": "运行层",
+      "source": {
+        "file": "desktop/src/core/runtime.py",
+        "keyword": "参考运行时"
+      }
+    },
+    {
+      "id": "GL-029",
+      "zh": "域包",
+      "en": "domain pack",
+      "definition_zh": "社区分发的题材/机制包（protocol.yaml + modules + assets + pipelines），经引用装载。",
+      "definition_en": "A community-distributed subject or mechanism pack (protocol.yaml + modules + assets + pipelines), loaded by reference.",
+      "category": "领域层",
+      "source": {
+        "file": "01_核心协议.md",
+        "section": "6. 平台规则（官方核心 + 社区领域包两级架构）",
+        "keyword": "域包"
+      }
+    },
+    {
+      "id": "GL-030",
+      "zh": "成熟度 M0",
+      "en": "maturity M0",
+      "definition_zh": "M0 模板：包目录、protocol.yaml、README、modules/ 在盘且模块数不少于声明。",
+      "definition_en": "M0 Template: pack directory, protocol.yaml, README and modules/ present, with at least the declared number of modules.",
+      "category": "成熟度",
+      "source": {
+        "file": "desktop/src/core/domain_maturity.py",
+        "keyword": "M0 模板"
+      }
+    },
+    {
+      "id": "GL-031",
+      "zh": "成熟度 M1",
+      "en": "maturity M1",
+      "definition_zh": "M1 机检：check14/15/16/23/29/32 同源判据无 FAIL，且至少一件可验收产物证据。",
+      "definition_en": "M1 Machine-checked: the same-source checks 14/15/16/23/29/32 report no FAIL and at least one checkable artifact exists.",
+      "category": "成熟度",
+      "source": {
+        "file": "desktop/src/core/domain_maturity.py",
+        "keyword": "M1 机检"
+      }
+    },
+    {
+      "id": "GL-032",
+      "zh": "成熟度 M2",
+      "en": "maturity M2",
+      "definition_zh": "M2 真实执行：package.outputs 里有真实模型执行记录（executor/date/artifact/check_rc 齐且摘要一致）。",
+      "definition_en": "M2 Real execution: package.outputs contains a real-model execution record (executor/date/artifact/check_rc present and digest-matching).",
+      "category": "成熟度",
+      "source": {
+        "file": "desktop/src/core/domain_maturity.py",
+        "keyword": "M2 真实执行"
+      }
+    },
+    {
+      "id": "GL-033",
+      "zh": "成熟度 M3",
+      "en": "maturity M3",
+      "definition_zh": "M3 用户签收：审计记录零 issue，accepted_by/accepted_at 齐且 subjects 的摘要与现算一致。",
+      "definition_en": "M3 User sign-off: an audit record with zero issues, accepted_by/accepted_at present, and subject digests matching live values.",
+      "category": "成熟度",
+      "source": {
+        "file": "desktop/src/core/domain_maturity.py",
+        "keyword": "M3 用户签收"
+      }
+    }
+  ],
+  "categories": [
+    "协议层",
+    "装配层",
+    "质量层",
+    "证据层",
+    "运行层",
+    "领域层",
+    "成熟度"
   ]
 }

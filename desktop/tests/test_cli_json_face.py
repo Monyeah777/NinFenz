@@ -261,6 +261,8 @@ CANON = {
     # T9.2 导入面：旧面 SKILL 导入的 --json 机器面（docx/dita 导入器见
     # test_import_docx_dita.py；此面真跑，报告带 schema 判别键）。
     "import": ["import", "desktop/tests/fixtures/external/anthropic-official/docx.SKILL.md"],
+    # T12.2 英文术语层：校验面（只读；报告带 schema 面判别键）。
+    "glossary check": ["glossary", "check"],
     "diff": ["diff", "01_核心协议.md", "01_核心协议.md"],
     "domain build": ["domain", "build", "--spec", "A01"],
     "library search": ["library", "search", "验收"],

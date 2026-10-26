@@ -761,6 +761,32 @@
         "--help",
         "-h"
       ],
+      "group": "verify",
+      "has_json": false,
+      "name": "glossary",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "render": [
+          "--help",
+          "--out",
+          "-h"
+        ]
+      },
+      "one_line": "英文术语层（T12.2）：protocol/glossary.json 的 entries 逐条给出 zh/en/双语定义/category 与**真实锚点**（file + section/keyword，禁假行号）；check 校验 …",
+      "related_docs": [
+        "docs/protocol/glossary.en.md"
+      ],
+      "usage": "usage: nf glossary [-h] {check,render} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
       "group": "govern",
       "has_json": false,
       "name": "handover",
@@ -2086,15 +2112,15 @@
     }
   ],
   "coverage": {
-    "commands": 79,
-    "covered": 79,
+    "commands": 80,
+    "covered": 80,
     "duplicates": {},
     "empty_families": [],
     "families": 8,
     "stray": [],
     "uncurated": []
   },
-  "digest": "sha256:5b91967aa4ef07a345110c55a72af1cec0b8f6bb611632555cfc9c558cbf0a8d",
+  "digest": "sha256:9e5fc770f2185b437be57cff89578a91c029455057854de9a81cfa1f79120588",
   "families": [
     {
       "commands": [
@@ -2212,6 +2238,7 @@
         "conformance",
         "diff",
         "explain",
+        "glossary",
         "ir",
         "license",
         "lint",

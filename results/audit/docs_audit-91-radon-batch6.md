@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
+  - protocol/code_metrics_baseline.json:d647b5dbbc09bce440842a8c9eb3481d35a9667ad59f707ece92d97dd5340e87
 ---
+> 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
+
 > 重审（2026-10-27）：W11: purity guidance fix in content_ops
 
 > 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix

@@ -6,8 +6,8 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:5f57d14bb06858696f2968cf6af9690c8b898fca7ec4b5a2a758021573840806
-  - scripts/nf.py:c66cb01d76cc469c9d3dd425edde76e9a685fad0d3dad09c0d0812206b3e321d
+  - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
+  - scripts/nf.py:291c212272bd18ac4d44ee1c6cc89b718b76f7c5b03a3ff65a3005be76886cfe
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:c1bf2658130912a66180936aaf12a689634e4a4d64a47c25f32e8c7c01eec5c8
 
 ---
+> 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
+
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
 
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts

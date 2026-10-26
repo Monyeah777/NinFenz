@@ -33,6 +33,7 @@ NF 是**内容契约层**，不是叙事生成器。它定义“AI 稳定产出�
 | desktop/core | 逻辑本体 | CLI/MCP/壳 |
 | community | 领域包内容 | 装配器 |
 | library | 云端成品馆 | 任意 AI |
+| `docs/protocol/glossary.en.md`（[相对链接](../protocol/glossary.en.md)） | 英文术语层：核心术语 zh/en 双语定义，逐条可追溯到中文协议锚点（术语层，非全文翻译） | 外部读者、国际论文 |
 
 ## §4 运行心智
 

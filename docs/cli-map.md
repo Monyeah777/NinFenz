@@ -7,9 +7,9 @@
 
 | 项 | 值 |
 |---|---|
-| 顶层命令 | 79 |
+| 顶层命令 | 80 |
 | 能力族 | 8 |
-| 已归族 | 79 |
+| 已归族 | 80 |
 | 未归族 | 无 |
 | 重复归族 | 无 |
 | 空族 | 无 |
@@ -45,6 +45,7 @@
 | `nf events` | 服务与集成（integrate） | 全仓事件背书核对（补 check16/26 之外：社区域包订阅是否真有发布方） | JSON | docs/interop.md |
 | `nf explain` | 质检与验证（verify） | check 修复指引（41 波C C5：缺什么/补什么/示例 三段式） | 文本 | docs/41_波C_C1_C2_实测记录.md、docs/迁移指南-基于nf-sig-diff.md |
 | `nf facts` | 上手与自检（start） | SSOT：唯一机读事实产物 protocol/facts.json；--check 做逐字节比对 + 跨源不变量 + 字面量禁区断言（历史 MIT 句单独放行） | JSON | — |
+| `nf glossary` | 质检与验证（verify） | 英文术语层（T12.2）：protocol/glossary.json 的 entries 逐条给出 zh/en/双语定义/category 与**真实锚点**（file + section/keyword，禁假行号）；check 校验 … | 文本 | docs/protocol/glossary.en.md |
 | `nf handover` | 治理与决策（govern） | 接力协议（机制借鉴 SBAR；空未决即不合格交接） | 文本 | — |
 | `nf help` | 命令面与终端（meta） | 显示 nf 或指定子命令的帮助 | 文本 | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf impact` | 图书馆与知识（library） | 变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响） | 文本 | — |
@@ -109,7 +110,7 @@
 | meta | 命令面与终端 | `nf cli`, `nf completion`, `nf daemon`, `nf help`, `nf shell`, `nf terminal` |
 | shelf | 资产与货架 | `nf asset`, `nf combine`, `nf domain`, `nf market`, `nf module`, `nf output`, `nf pipeline`, `nf rename` |
 | start | 上手与自检 | `nf demo`, `nf doctor`, `nf facts`, `nf layers`, `nf stats` |
-| verify | 质检与验证 | `nf assertions`, `nf changelog`, `nf conformance`, `nf diff`, `nf explain`, `nf ir`, `nf license`, `nf lint`, `nf nfal`, `nf ops`, `nf privacy`, `nf registry`, `nf release`, `nf score`, `nf security`, `nf sig`, `nf st-validate`, `nf telemetry`, `nf verify` |
+| verify | 质检与验证 | `nf assertions`, `nf changelog`, `nf conformance`, `nf diff`, `nf explain`, `nf glossary`, `nf ir`, `nf license`, `nf lint`, `nf nfal`, `nf ops`, `nf privacy`, `nf registry`, `nf release`, `nf score`, `nf security`, `nf sig`, `nf st-validate`, `nf telemetry`, `nf verify` |
 
 ## 复跑
 

@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:5f57d14bb06858696f2968cf6af9690c8b898fca7ec4b5a2a758021573840806
-  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
+  - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
+  - protocol/code_metrics_baseline.json:d647b5dbbc09bce440842a8c9eb3481d35a9667ad59f707ece92d97dd5340e87
 ---
+> 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
+
 > 重审（2026-10-27）：W11: purity guidance fix in content_ops
 
 > 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix

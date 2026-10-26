@@ -316,7 +316,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
          "内容 SRE 观测（SLI/SLO）、隐私与 air-gap 静态审计",
      "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
-                  "nfal", "registry", "security", "ir", "ops", "privacy")},
+                  "nfal", "registry", "security", "ir", "ops", "privacy", "glossary")},
     {"id": "library", "name": "图书馆与知识",
      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面",
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",

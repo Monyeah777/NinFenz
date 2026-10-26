@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:eed4013d8e598c7115300ab6442fa1d6dbb69e7cb4f28b3a15c2f03392c4fd72
   - verify.sh:27f93c0ec2ee9f7388dd7bd6a73d79a2168ca5d013b6828c78e0293978e1deba
-  - scripts/nf.py:c66cb01d76cc469c9d3dd425edde76e9a685fad0d3dad09c0d0812206b3e321d
+  - scripts/nf.py:291c212272bd18ac4d44ee1c6cc89b718b76f7c5b03a3ff65a3005be76886cfe
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
+
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
 
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts

@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:c66cb01d76cc469c9d3dd425edde76e9a685fad0d3dad09c0d0812206b3e321d
+  - scripts/nf.py:291c212272bd18ac4d44ee1c6cc89b718b76f7c5b03a3ff65a3005be76886cfe
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
+
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
 
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts

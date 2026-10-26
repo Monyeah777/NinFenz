@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:e668f9c944a735dcd07550de87f2b0b701fa80f26e41c179e9a0c47046744fec'
+DIGEST = 'sha256:0c956fa743be85859cef16c4593cf71869f7993022863879711bbae799cf3c86'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -46,6 +46,7 @@ COMMANDS = ['agent',
  'events',
  'explain',
  'facts',
+ 'glossary',
  'handover',
  'help',
  'impact',
@@ -516,7 +517,8 @@ FAMILIES = [{'id': 'start',
                'security',
                'ir',
                'ops',
-               'privacy']},
+               'privacy',
+               'glossary']},
  {'id': 'library',
   'name': '图书馆与知识',
   'summary': '馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面',
