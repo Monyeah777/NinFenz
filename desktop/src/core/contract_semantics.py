@@ -378,7 +378,6 @@ def _w2_domain_isolation(model: Dict[str, Any]) -> List[Dict[str, Any]]:
             % len(model["asset_domain_unknown"]),
             evidence=["protocol/schema/asset.schema.json:8-17", "05_资产库/provenance.json:1-30"],
             fix="为 provenance assets[] 补 domain（T2.1 已留可选字段）"))
-    pipe_unbound = []  # 门绑定缺失归 W3（避免同码 WARN 双报）
     # 管线 domain 一致性（若显式声明）
     for pipe_id, pipe in sorted(model["pipelines"].items()):
         pkg_doms = sorted({model["packages"][p]["domain"] for p in pipe.get("packages") or []

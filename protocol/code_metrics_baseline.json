@@ -226,7 +226,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/contract_semantics.py": {
-      "lines": 666,
+      "lines": 663,
       "max_fn_cc": 44,
       "max_fn_lines": 91
     },
@@ -991,7 +991,7 @@
       "max_fn_lines": 53
     },
     "desktop/src/core/quality_gate.py": {
-      "lines": 103,
+      "lines": 102,
       "max_fn_cc": 7,
       "max_fn_lines": 24
     },

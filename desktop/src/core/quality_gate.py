@@ -13,7 +13,6 @@
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import Callable, List, Optional
 
 from .ir import IRDocument

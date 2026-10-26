@@ -48,7 +48,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 SCHEMA = "nf-gate-profile/1"
 REPORT_SCHEMA = "nf-gate-profile-report/1"
