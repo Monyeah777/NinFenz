@@ -10,6 +10,7 @@
        用户一条正常投稿即可远程触发）。本测试真跑一次入库（DRY_RUN，落临时目录），
        断言产物带 rating 且过 rating_gate / library.verify。
 """
+import io
 import os
 import shutil
 import subprocess
@@ -257,6 +258,10 @@ class BodyChannelTest(unittest.TestCase):
             self.assertEqual("", m.resolve_body())
         finally:
             m.BODY, m.REPO, m.TOKEN, m.N, m.api = saved
+
+    def test_shared_bounded_reader_refuses_oversized_streams(self):
+        with self.assertRaises(ValueError):
+            bot_module()._read_bounded(io.BytesIO(b"x" * 9), 8, "测试响应")
 
     def test_guard_refuses_oversized_payload_over_env(self):
         """护栏：想把 ≥128 KiB 载荷经 env 塞给子进程的用例，在**任何 OS**上都当场判死。

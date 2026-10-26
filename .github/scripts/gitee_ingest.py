@@ -70,6 +70,16 @@ GH_REPO = os.environ.get('REPO', 'Monyeah777/NinFenz')
 TOKEN = os.environ.get('GITEE_TOKEN', '')
 DRY = os.environ.get('DRY_RUN', '') == '1'
 MAX_SEG = 16
+MAX_API_RESPONSE_BYTES = 2 * 1024 * 1024
+#: 单轮最多拉取 10 页 × 100 条；防止异常 API 无限给满页拖住工作流。
+MAX_ISSUE_PAGES = 10
+
+
+def _read_bounded(stream, limit: int, what: str = "响应") -> bytes:
+    raw = stream.read(int(limit) + 1)
+    if len(raw) > limit:
+        raise ValueError(f"{what}超过上限 {limit} 字节（修复指引：缩小载荷或分页）")
+    return raw
 
 
 class GiteeAPIError(RuntimeError):
@@ -119,7 +129,7 @@ def gitee_api(path, params=None, method='GET'):
                                      method=method)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            raw = r.read()
+            raw = _read_bounded(r, MAX_API_RESPONSE_BYTES, "Gitee API 响应")
             if not raw:
                 return {}
             try:
@@ -130,7 +140,14 @@ def gitee_api(path, params=None, method='GET'):
                     '勿把非 JSON 当空结果）',
                 ) from exc
     except urllib.error.HTTPError as e:
-        body = e.read().decode('utf-8', 'replace')
+        try:
+            body = _read_bounded(e, MAX_API_RESPONSE_BYTES,
+                                 "Gitee API 错误响应").decode('utf-8', 'replace')
+        except ValueError as exc:
+            raise GiteeAPIError(
+                'response_too_large（修复指引：检查上游是否返回异常大页）',
+                e.code,
+            ) from exc
         raise GiteeAPIError(
             f'{_classify_http_failure(e.code, body)}'
             '（修复指引：按 category 检查 GITEE_TOKEN、权限、限流或上游服务状态）',
@@ -138,6 +155,10 @@ def gitee_api(path, params=None, method='GET'):
         ) from None
     except GiteeAPIError:
         raise
+    except ValueError as exc:
+        raise GiteeAPIError(
+            'response_too_large（修复指引：检查上游是否返回异常大页或缓存错误页）',
+        ) from exc
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         raise GiteeAPIError(
             'network_error（修复指引：检查 runner 出网与 gitee.com API 可达性，再重跑本轮轮询）',
@@ -166,7 +187,7 @@ def fetch_open_submissions():
     """拉取全部 open 投稿 Issue（标题【NF投稿】），按创建时间升序（旧稿先入 = 序号稳定）。"""
     issues = []
     page = 1
-    while True:
+    while page <= MAX_ISSUE_PAGES:
         batch = gitee_api(
             f'/repos/{GITEE_OWNER}/{GITEE_REPO}/issues',
             {'state': 'open', 'sort': 'created', 'direction': 'asc',
@@ -182,6 +203,10 @@ def fetch_open_submissions():
         if len(batch) < 100:
             break
         page += 1
+    else:
+        raise GiteeAPIError(
+            'page_limit（修复指引：先人工清理积压投稿，再重跑本轮轮询）',
+        )
     return [i for i in issues if i.get('title', '').startswith('【NF投稿】')]
 
 

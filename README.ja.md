@@ -52,11 +52,11 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 
 > **セキュリティ境界（`nf verify` は対象リポジトリ自身のゲートスクリプトを実行します）**：エンジンは
 > 対象リポジトリの `verify.sh` に埋め込まれた Python を**同一プロセス内**で実行します（CWE-94）。
-> そのため `origin` の owner が許可リスト（既定は `Monyeah777`）にあるリポジトリのみを信頼し、
-> 外部／信頼できないリポジトリでは**既定で拒否**します（終了コード 2 + 修復手順）。明示的に
+> そのため**現在実行中のコードを含むインストールルートだけ**を自動信頼します。外部リポジトリは
+> 公式 `origin` を偽装していても**既定で拒否**します（終了コード 2 + 修復手順）。明示的に
 > `nf verify --trust-repo` を付けた場合のみ実行します（自己責任）。fork/ミラーは
-> `NF_TRUST_OWNERS` で owner を追加できます。読み取り専用の検査は `bash verify.sh` を使用して
-> ください。詳細は [SECURITY.md](SECURITY.md)。
+> `NF_TRUST_OWNERS` で owner を明示的に opt-in できます。読み取り専用の検査は
+> `bash verify.sh` を使用してください。詳細は [SECURITY.md](SECURITY.md)。
 
 AI による組立：
 

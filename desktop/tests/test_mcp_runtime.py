@@ -18,12 +18,14 @@ import tempfile
 import unittest
 from io import StringIO
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core.exporter import export  # noqa: E402
 from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
 from core import mcp_runtime as mrt  # noqa: E402
+from core import repo_index
 from core.mcp_runtime import (INVALID_PARAMS, INVALID_REQUEST,  # noqa: E402
                               McpRuntime, encode_message, is_single_line_message,
                               load_snapshot, template_matches, uri_template_issue,
@@ -893,6 +895,51 @@ class LiveResourceReachabilityTest(unittest.TestCase):
                 bad.append("%s :: %s" % (raw, str(resp.get("error"))[:60]))
         self.assertEqual([], bad, "模板替身读不出（agent 按模板代入就会撞墙）：%s" % bad)
         self.assertGreaterEqual(decoded_differs, 1, "所有 uri 都没有转义差异（判据可能空转）")
+
+
+class ResourceSourceContainmentTest(unittest.TestCase):
+    """纵深防线：即使登记源被污染成绝对路径，resources/read 也不得越出仓库根。"""
+
+    def test_repo_resource_source_cannot_escape_root(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_outside_") as outside:
+            canary = Path(outside) / "secret.md"
+            canary.write_text("# 仓外金丝雀\n不得读取。\n", encoding="utf-8")
+            rt = mrt.McpRuntime({"mcp": {"name": "probe", "version": "0",
+                                         "resources": []}})
+            uri = "nf://repo/module/poisoned"
+            rt._repo_metas = lambda: {
+                uri: {"uri": uri, "name": "poisoned",
+                      "mimeType": "text/markdown", "source": str(canary)},
+            }
+            resp = rt.handle({"jsonrpc": "2.0", "id": 1, "method": "resources/read",
+                              "params": {"uri": uri}})
+            self.assertEqual(mrt.INVALID_PARAMS, (resp.get("error") or {}).get("code"),
+                             f"仓外 source 被当成可读资源：{resp}")
+
+    def test_repo_text_read_has_a_hard_size_cap(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_large_") as root:
+            path = Path(root) / "large.md"
+            path.write_bytes(b"x" * 11)
+            with mock.patch.object(repo_index, "MAX_RESOURCE_BYTES", 10), \
+                    self.assertRaises(ValueError):
+                repo_index.read_text(root, "large.md")
+
+    def test_snapshot_file_has_a_hard_size_cap(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_snapshot_") as root:
+            path = Path(root) / "mcp.json"
+            path.write_text('{"mcp":{"resources":[]}}', encoding="utf-8")
+            with mock.patch.object(mrt, "MAX_SNAPSHOT_BYTES", 8), \
+                    self.assertRaises(ValueError):
+                mrt.load_snapshot(str(path))
+
+    def test_outbound_message_has_a_hard_size_cap(self):
+        stdout = StringIO()
+        with mock.patch.object(mrt, "MAX_RESPONSE_MESSAGE_BYTES", 64):
+            mrt._write_response(stdout, {"jsonrpc": "2.0", "id": 7,
+                                         "result": {"text": "x" * 1000}})
+        got = json.loads(stdout.getvalue())
+        self.assertEqual(7, got["id"])
+        self.assertEqual(mrt.INTERNAL_ERROR, got["error"]["code"])
 
 
 class DeclaredSurfaceVsHandlersTest(unittest.TestCase):

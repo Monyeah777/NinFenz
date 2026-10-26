@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -24,6 +25,11 @@ REQ = {"state": "雨天走廊 校园情感 中文 场景；候选 P02 校园情�
 
 
 class DecisionLayerTest(unittest.TestCase):
+    def test_remote_json_response_has_a_hard_size_cap(self):
+        with mock.patch.object(dl, "MAX_REMOTE_JSON_BYTES", 8), \
+                self.assertRaises(ValueError):
+            dl._read_json_response(io.BytesIO(b"x" * 9))
+
     def test_repo_declaration_is_clean(self):
         issues, stats = dl.scan(str(ROOT))
         self.assertEqual(issues, [], issues)

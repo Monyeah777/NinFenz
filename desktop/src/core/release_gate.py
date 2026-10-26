@@ -2,7 +2,7 @@
 
 为什么需要（内部差距实证 2026-10-05）：发布动作此前散在四处——`nf release`（体检）、
 原 golden master 快照脚本（**2026-10-11 裁决退役并删除**）、`scripts/bump_verify.sh`（版本换标）、
-`docs/42_M5_Release-checklist.md`（人工清单），再加 `decisions/ADR-0005-新增NET引擎线.md`
+`docs/42_M5_Release-checklist.md`（人工清单），再加 `decisions/README.md`（真实 ADR 已迁私有仓）
 记载的**冻结链**（conformance --write → approve → receipts --write）——**顺序**与**前置**只在
 文档与人的记忆里。
 

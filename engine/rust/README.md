@@ -1,7 +1,7 @@
 # NF Rust 引擎线（`engine/rust/`）
 
 > **定位：只读快线的第三个实现面。**与 Python 侧（`verify.sh` + `desktop/src`）**并列**——不替代、不写盘、不改 `verify.sh` 基线。
-> 治理范式同 `engine/dotnet/`（见 `decisions/ADR-0005-新增NET引擎线.md`）：**只读判据面 + 与 Python 真源逐字节对账 + 写面不实现**。
+> 治理范式同 `engine/dotnet/`（见私有 Plan 仓 ADR-0005）：**只读判据面 + 与 Python 真源逐字节对账 + 写面不实现**。
 
 ## C ABI 共享库（给动态加载面）
 

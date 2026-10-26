@@ -79,3 +79,7 @@ trace.json
 
 # CI 排障日志（临时）
 .ci-*.log
+
+# cargo-fuzz build and crash output
+engine/rust/fuzz/target/
+engine/rust/fuzz/artifacts/

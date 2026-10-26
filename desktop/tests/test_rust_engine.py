@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 
+import io
 import json
 import os
 import subprocess
@@ -62,6 +63,12 @@ def _kill_worker(doc: dict) -> None:
 
 
 class RustEngineClientTest(unittest.TestCase):
+    def test_frame_rejects_negative_and_oversized_lengths(self):
+        for head in (b"0\n-1\n0\n", b"0\n0\n-1\n",
+                     f"0\n{re.MAX_RESPONSE_BYTES + 1}\n0\n".encode()):
+            with self.subTest(head=head), self.assertRaises(ValueError):
+                re._read_frame(io.BytesIO(head))
+
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory(prefix="nf-rust-engine-")
         self._saved_home = os.environ.get("NARRATIVE_FORGE_HOME")

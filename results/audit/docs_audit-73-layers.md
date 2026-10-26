@@ -11,19 +11,20 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
-  - scripts/nf.py:67269637feaa44867cf01bc3ec44853788c5ab40a2b798c479cde66892e8c926
+  - scripts/nf.py:2d765276c47c85beb5f7350c4f53f4b58f84074bc4cb17b35a2a6a7fa84809a7
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
-  - protocol/glossary.json:4561ddb5a221f8fc5beca4cfcca07580b3ea4dd403eb23434549a8eaa8409a60
+  - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
   - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - decisions/ADR-0004-抽象阶梯两轴与纵切.md:3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196
 
 ---
+> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+
 > 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
 
 > 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
@@ -191,7 +192,7 @@ subjects:
 | 形状类断言 | `protocol/assertions.json` 增 3 条（layers-declaration-in-place / layers-generated-region / layers-no-abs-path），11 → 14 条（kind 仍封闭四类，ADR-0003） |
 | 生成投影 | `docs/layers.md` 阶梯表进 `nf:layers` 生成区，`nf layers --write` 渲染（L10 断言逐字一致） |
 | CLI | `nf layers` / `--json` / `--verify` / `--write` |
-| 决策 | `decisions/ADR-0004-抽象阶梯两轴与纵切.md`（accepted，已入回执锚定），`decisions/INDEX.md` 重投影 |
+| 决策 | 真实决策已按 `decisions/ADR-0000` 迁入私有 Plan 仓；公开仓保留模板与 `decisions/INDEX.md` 投影 |
 | 术语 | `protocol/glossary.json` 增 **抽象阶梯**、**验证纵切**（逐字命中真源与使用面） |
 | 登记 | `protocol/normative.json` 收 LAYERS.json；`protocol/data_contracts.json` 29 → 30 件（quality_rule=check27）；`protocol/RECEIPTS.json` 49 → 51 件（+LAYERS.json +ADR-0004） |
 | 单元测试 | `test_layer_model.py` 21 例（L1–L10 各一变异样本 + 真仓库零 issue + 渲染幂等 + LF 落盘 + CLI 面）；`test_purity_scan.py` 增 R7 接线与「无阶梯件不误伤」2 例 |

@@ -1,7 +1,7 @@
 # NF .NET 引擎线（`engine/dotnet/`）
 
 > **定位：只读判据的第二个实现。**与 Python 侧（`verify.sh` + `desktop/src`）**并列**——不替代、不写盘、不改 `verify.sh` 基线。
-> 依据：`decisions/ADR-0005-新增NET引擎线.md`；**维护手册见 `RUNBOOK.md`**。
+> 依据：私有 Plan 仓 ADR-0005（真实决策已外置）；**维护手册见 `RUNBOOK.md`**。
 
 ## 这是什么
 
@@ -24,7 +24,7 @@
 - **不能替代 `verify.sh`**：本线是**第二道门**，真源仍在 Python 侧；
 - **写面不实现**：所有 `--write` 类命令一律 **fail-closed 拒绝**（只读门不落盘；实测写面 20 条全拒、且母树指纹零改动）；
 - **执行层/交互层不提供**，且**显式拒绝**而非"未知命令"：`daemon` / `shell` / `terminal` / `lsp` / `completion` / `demo` / `run` / `help`；写面/工厂 `register` / `rename` / `import` / `approve` / `attest` / `design` / `domain` 同（共 **16 条**，由 `probes/cli_surface_probe.py` 守帮助表可达）；
-- 未移植项与已知缺口的逐条清单见 `RUNBOOK.md` §5 与 ADR-0005 的「代价与风险」段；**未移植的读面**：`layers`（与 check27 R7 同源）/ `release`（verify+doctor 组合）。
+- 未移植项与已知缺口的逐条清单见 `RUNBOOK.md` §5 与私有 ADR-0005 的「代价与风险」段；**未移植的读面**：`layers`（与 check27 R7 同源）/ `release`（verify+doctor 组合）。
 
 ## 构建与运行
 

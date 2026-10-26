@@ -423,6 +423,7 @@ public static class TextHygiene
             foreach (var sub in dirs)
             {
                 if (ExcludeDirs.Contains(Path.GetFileName(sub))) continue;
+                if ((File.GetAttributes(sub) & FileAttributes.ReparsePoint) != 0) continue;
                 var rel = Path.GetRelativePath(root, sub).Replace('\\', '/');
                 if (IsIgnored(rel, ignored)) continue;
                 Recurse(sub);
@@ -431,6 +432,7 @@ public static class TextHygiene
             {
                 var name = Path.GetFileName(file);
                 if (ExcludeFiles.Contains(name)) continue;
+                if ((File.GetAttributes(file) & FileAttributes.ReparsePoint) != 0) continue;
                 var rel = Path.GetRelativePath(root, file).Replace('\\', '/');
                 if (name == ".git" || IsIgnored(rel, ignored)) continue;
                 if (BinaryExt.Contains(PyExtLower(name))) continue;

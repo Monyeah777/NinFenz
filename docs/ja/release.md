@@ -17,7 +17,7 @@ python scripts/nf.py release --freeze --apply --by <承認者> --note "<波の�
 
 ## 凍結チェーン
 
-順序は逆にできません（`decisions/ADR-0005-新增NET引擎线.md` と PO-0001 事故の教訓）：内容確定 → 一致性レポート再計算 → 内容バインド承認 → プロトコル層レシート再署名。
+順序は逆にできません（`decisions/ADR-0000-决策记录外置到私有仓.md` と PO-9000 事故の教訓）：内容確定 → 一致性レポート再計算 → 内容バインド承認 → プロトコル層レシート再署名。
 
 1. `python scripts/nf.py conformance --write`（`protocol/conformance_report.json` を生成、`conformant` 必須）
 2. `nf approve protocol/conformance_report.json --by <承認者> --note <説明>`（内容バインド。対象が変われば即失効）

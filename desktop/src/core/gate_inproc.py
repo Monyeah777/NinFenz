@@ -35,7 +35,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from core import repo_trust  # H1 信任门（叶子件：只做 origin 判定，无反向依赖）
+from core import repo_trust  # H1 信任门（安装根自动信任；外部仓库须显式 opt-in）
 
 #: heredoc 起始行：`    if "$PY3" - <<'PYEOF' >"$NFL_TMP"/nf_checkNN.log 2>&1`
 #:

@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / ".github" / "workflows"
 DEPENDABOT = ROOT / ".github" / "dependabot.yml"
+CODEOWNERS = ROOT / ".github" / "CODEOWNERS"
 
 #: 第三方 action 引用：<owner>/<repo>@<40 位十六进制 SHA>（可选 `# vX` 注释）
 _PINNED = re.compile(r"^[^@/\s]+/[^@\s]+@[0-9a-f]{40}$")
@@ -48,6 +49,30 @@ class WorkflowActionPinningTest(unittest.TestCase):
             text = fh.read()
         self.assertIn("github-actions", text,
                       "dependabot 须覆盖 github-actions 生态才能跟进固定值")
+
+    def test_codeowners_is_ascii_for_openssf_parser(self):
+        self.assertTrue(CODEOWNERS.is_file(), "缺 CODEOWNERS：Scorecard 无法确认代码所有者")
+        raw = CODEOWNERS.read_bytes()
+        bad = [b for b in raw if b > 127]
+        self.assertEqual([], bad,
+                         "CODEOWNERS 必须保持 ASCII；Scorecard 的解析器会拒绝非 ASCII 路径")
+        rules = [
+            line.strip()
+            for line in raw.decode("ascii").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        self.assertIn("* @Monyeah777", rules)
+
+    def test_sast_runs_on_pull_requests_and_codeql(self):
+        text = (WORKFLOWS / "sast.yml").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^  pull_request:\s*$")
+        self.assertIn("github/codeql-action/init@", text)
+        self.assertIn("github/codeql-action/analyze@", text)
+
+    def test_rust_fuzz_target_is_present(self):
+        target = ROOT / "engine" / "rust" / "fuzz" / "fuzz_targets" / "python_parser.rs"
+        self.assertTrue(target.is_file(), "缺 cargo-fuzz target：OpenSSF Fuzzing 仍为 0")
+        self.assertIn("libfuzzer_sys", target.read_text(encoding="utf-8"))
 
 
 class CiRequirementsPinTest(unittest.TestCase):
@@ -125,6 +150,24 @@ class CiRequirementsPinTest(unittest.TestCase):
         self.assertTrue(audit_req.is_file())
         for line in self._pins(audit_req):
             self.assertRegex(line, self._PIN, "审计器未固定版本：%s" % line)
+
+    def test_known_vulnerable_audit_pins_are_fixed(self):
+        text = (ROOT / ".github" / "requirements-audit.txt").read_text(encoding="ascii")
+        self.assertIn("certifi==2026.10.19", text)
+        self.assertIn("filelock==4.2.1", text)
+
+    def test_container_bases_are_digest_pinned(self):
+        offenders = []
+        for path in sorted(ROOT.glob("**/Dockerfile*")):
+            if ".git" in path.parts or "engine/rust/fuzz" in path.as_posix():
+                continue
+            for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if line.startswith("FROM ") and "@sha256:" not in line:
+                    if "${" in line:
+                        continue
+                    offenders.append(f"{path.relative_to(ROOT)}:{i} {line}")
+        self.assertEqual([], offenders,
+                         f"容器基础镜像必须按 digest 固定：{offenders}")
 
 
 if __name__ == "__main__":

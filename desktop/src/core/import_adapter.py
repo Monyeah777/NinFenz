@@ -205,7 +205,7 @@ def _scan_resources(skill_dir: Path) -> List[str]:
         if not sub.is_dir():
             continue
         for f in sorted(sub.rglob("*")):
-            if f.is_file():
+            if f.is_file() and not f.is_symlink():
                 out.append(str(f.relative_to(skill_dir)).replace("\\", "/"))
     return out
 

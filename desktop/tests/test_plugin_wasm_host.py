@@ -120,6 +120,28 @@ class FallbackTest(unittest.TestCase):
         self.assertFalse(got["ok"])
         self.assertEqual("method_not_declared", got["meta"]["reason"])
 
+    def test_oversized_input_is_refused_before_spawning_host(self):
+        data = b"x" * (host.MAX_PLUGIN_INPUT_BYTES + 1)
+        got = host.invoke(DOC, ARTIFACT, "sha256", data, wasmtime="never-spawn")
+        self.assertFalse(got["ok"])
+        self.assertEqual("input_too_large", got["meta"]["reason"])
+
+    def test_subprocess_output_is_capped_and_drained(self):
+        rc, out, err, timed_out, overflow = host._run_bounded(
+            [sys.executable, "-c", "import sys; sys.stdout.write('x' * 1000)"],
+            cwd=str(ROOT), input_data=None, timeout_s=5, output_cap=64)
+        self.assertTrue(overflow)
+        self.assertFalse(timed_out)
+        self.assertLessEqual(len(out) + len(err), 64)
+        self.assertNotEqual(0, rc)
+
+    def test_component_argv_has_a_command_line_budget(self):
+        entry = {"io": {"invoke": "sha256"}}
+        with self.assertRaises(ValueError):
+            host.component_argv("wasmtime", Path("x.wasm"), entry,
+                                b"\xff" * (host.MAX_COMPONENT_INPUT_BYTES + 1),
+                                host.MAX_PLUGIN_OUTPUT_BYTES, 1000)
+
     @unittest.skipUnless(ARTIFACT_READY, "插件产物缺席（target/ 是忽略面）")
     def test_host_self_test_passes(self):
         self.assertEqual(0, host._self_test())

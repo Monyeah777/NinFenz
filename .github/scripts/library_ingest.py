@@ -78,6 +78,15 @@ GITEE_REPO = 'ninfenz'
 #: 现生产路径改为**经 API 取正文**（与自家 Gitee 通道 `gitee_ingest.py` 同构）；
 #: env / 文件通道只服务离线与测试。
 MAX_EXEC_STRLEN = 131072
+MAX_API_RESPONSE_BYTES = 2 * 1024 * 1024
+MAX_BODY_FILE_BYTES = MAX_BODY_CHARS * 4 + 65536
+
+
+def _read_bounded(stream, limit: int, what: str = "响应") -> bytes:
+    raw = stream.read(int(limit) + 1)
+    if len(raw) > limit:
+        raise ValueError(f"{what}超过上限 {limit} 字节（修复指引：缩小载荷或分页）")
+    return raw
 
 
 
@@ -121,10 +130,16 @@ def api(path, data=None, method=None):
         })
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            raw = r.read()
+            raw = _read_bounded(r, MAX_API_RESPONSE_BYTES, "GitHub API 响应")
             return json_doc.loads(raw, dict, what='intake API 响应') if raw else {}
     except urllib.error.HTTPError as e:
-        print(f'API HTTP {e.code}: {e.read().decode()[:300]}')
+        try:
+            detail = _read_bounded(
+                e, MAX_API_RESPONSE_BYTES, "GitHub API 错误响应"
+            ).decode("utf-8", "replace")
+        except ValueError:
+            detail = "<错误响应超上限>"
+        print(f'API HTTP {e.code}: {detail[:300]}')
         sys.exit(1)
     except Exception as e:
         print(f'API 异常: {e}')
@@ -150,8 +165,8 @@ def resolve_body():
     """
     path = os.environ.get('ISSUE_BODY_FILE', '')
     if path:
-        with open(path, encoding='utf-8') as f:
-            return f.read()
+        with open(path, "rb") as f:
+            return _read_bounded(f, MAX_BODY_FILE_BYTES, "投稿正文文件").decode("utf-8")
     if BODY:
         return BODY
     if REPO and TOKEN and N:

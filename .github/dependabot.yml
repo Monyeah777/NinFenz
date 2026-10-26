@@ -55,3 +55,48 @@ updates:
         update-types:
           - minor
           - patch
+  # ④ Rust engines and fuzz targets.
+  - package-ecosystem: cargo
+    directory: /engine/rust
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "cargo"
+    labels:
+      - dependencies
+  - package-ecosystem: cargo
+    directory: /engine/rust/pyo3
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "cargo"
+    labels:
+      - dependencies
+  - package-ecosystem: cargo
+    directory: /engine/rust/fuzz
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "cargo"
+    labels:
+      - dependencies
+  # ⑤ Container digests are pinned, but must still follow upstream security fixes.
+  - package-ecosystem: docker
+    directory: /packaging/nfal
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "docker"
+    labels:
+      - dependencies
+  - package-ecosystem: docker
+    directory: /packaging/hf-space
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "docker"
+    labels:
+      - dependencies

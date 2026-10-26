@@ -12,8 +12,8 @@ subjects:
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/mcp_runtime.py:654ac230f117d5ff33a4863fe6c6e1192943f57ee2639b23de89bf0da13a552a
-  - desktop/src/core/import_adapter.py:7b68a8c20b1a1cc4acf78ca0b27e0752d49d509d49916539ce4a7ad38622cf1b
+  - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
+  - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02

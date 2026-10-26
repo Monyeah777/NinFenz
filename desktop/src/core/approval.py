@@ -17,7 +17,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write, json_doc
+from core import atomic_write, json_doc, paths, repo_trust
 from core.atoms import hash as hash_atom
 
 SCHEMA = "nf-approval/1"
@@ -26,22 +26,17 @@ ENV_APPROVERS = "NF_APPROVERS"
 
 
 def allowed_approvers(root: str) -> frozenset:
-    """当前仓库允许的批准人；显式环境变量优先，真实 git 检出退回信任 owner 白名单。"""
+    """当前仓库允许的批准人；显式环境变量优先，仅可信安装根退回 owner 白名单。"""
     if ENV_APPROVERS in os.environ:
         return frozenset(x.strip() for x in
                          (os.environ.get(ENV_APPROVERS) or "").split(",") if x.strip())
-    if (Path(root) / ".git").exists():
-        try:
-            from core.repo_trust import ALLOWED_OWNERS
-            return frozenset(ALLOWED_OWNERS)
-        except ImportError:
-            return frozenset()
-    return frozenset()
+    return (frozenset(repo_trust.ALLOWED_OWNERS)
+            if repo_trust.trust_status(root)[0] else frozenset())
 
 
 def subject_digest(root: str, subject: str) -> str:
     """被批准对象的整文件摘要（不含批准记录本身——记录是独立文件，无自指问题）。"""
-    p = Path(root) / subject
+    p = Path(paths.validate_path(root, subject))
     # 批准是完整性锚点：不得用 (mtime,size) 缓存。NTFS 快速同尺寸覆写可能保留同一
     # 时间戳，缓存会给旧内容假签收；这里直接分块重算（仍不整文件读入内存）。
     got = hash_atom.sha256_file(p)
@@ -59,7 +54,7 @@ def approve(root: str, subject: str, approved_by: str, note: str = "",
     if allowed and approved_by.strip() not in allowed:
         raise ValueError("批准人 %s 不在允许列表 %s（修复指引：由获授权者批准，或显式设置 %s）"
                          % (approved_by.strip(), sorted(allowed), ENV_APPROVERS))
-    p = Path(root) / subject
+    p = Path(paths.validate_path(root, subject))
     if not p.is_file():
         raise ValueError("被批准对象不存在：%s（修复指引：给出仓库内真实文件路径）" % subject)
     rec = {"schema": SCHEMA, "subject": subject.replace("\\", "/"),
@@ -111,10 +106,12 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         elif allowed and str(rec.get("approved_by")).strip() not in allowed:
             issues.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
                           % (rec.get("approved_by"), subj))
-        if not os.path.isfile(os.path.join(root, subj)):
-            issues.append("批准对象不存在：%s" % subj)
+        try:
+            changed = subject_digest(root, subj) != str(rec.get("subject_digest") or "")
+        except (paths.PathEscapeError, ValueError) as exc:
+            issues.append(f"批准对象不可用：{subj}（{exc}）")
             continue
-        if subject_digest(root, subj) != str(rec.get("subject_digest") or ""):
+        if changed:
             stale.append(subj)
             issues.append("批准已失效（对象内容已改）：%s（修复指引：重新批准）" % subj)
     stats = {"records": len(rows), "stale": stale,

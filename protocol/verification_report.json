@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 67,
+        "raises": 96,
         "sinks": 20
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "ce1f869039442319109ea3237cfb3799bfe0e0d830b0e6693ba4cc8e9369188c",
+        "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -313,7 +313,7 @@
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 388,
         "with_header": 46
       },
       "status": "warn",
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 231,
-        "probed": 231
+        "patterns": 230,
+        "probed": 230
       },
       "status": "pass",
       "warns": 0
@@ -492,10 +492,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 68,
+        "pinned_uses": 73,
         "requirements_files": 4,
-        "with_explicit_permissions": 19,
-        "workflows": 19
+        "with_explicit_permissions": 20,
+        "workflows": 20
       },
       "status": "pass",
       "warns": 0
@@ -526,8 +526,8 @@
       "source": "role_model.scan",
       "stats": {
         "files": 3873,
-        "kernel": 2004,
-        "kernel_no_self": 309,
+        "kernel": 2009,
+        "kernel_no_self": 311,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "4e78df49460441314025844e19df12eba950e10050f2e2a2a7744924bfb591ed",
+  "root_digest": "63171cc9ff1da009b93fabc25822115f986d950eee15c3a591c57c7b748f4bd9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

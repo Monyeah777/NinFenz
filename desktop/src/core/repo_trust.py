@@ -9,10 +9,10 @@
 
 ## 信任模型（fail-closed）
 
-- 目标仓库的 `origin` 指向 GitHub 且 owner 在 `ALLOWED_OWNERS`（默认只有本仓作者）⇒ 可信；
-- 否则（无 origin / 非 git 检出 / 非 GitHub 形态 / owner 不在表）⇒ **不可信**：
+- **只有当前运行代码所在的安装根自动可信**；外部仓库伪造官方 `origin` 仍不可信；
+- 否则（无 origin / 非 git 检出 / 非 GitHub 形态 / owner 无显式 opt-in）⇒ **不可信**：
   `nf verify` 默认拒绝执行 inproc，需显式 `--trust-repo`（等价 `NF_TRUST_REPO=1`）；
-- `NF_TRUST_OWNERS`（逗号分隔）可**追加**允许的 owner（fork CI / 自建镜像用）；
+- `NF_TRUST_OWNERS`（逗号分隔）是外部仓库 owner 的**显式 opt-in**（fork CI / 自建镜像用）；
 - 判定只读；判不出就是不可信，不猜。
 
 ## 实现口径
@@ -38,12 +38,15 @@ ENV_TRUST = "NF_TRUST_REPO"
 ENV_OWNERS = "NF_TRUST_OWNERS"
 #: 默认允许的 origin owner（本仓作者）。**只增不减**须评审：每条都是「允许执行谁的代码」。
 ALLOWED_OWNERS = frozenset({"Monyeah777"})
+INSTALL_ROOT = Path(__file__).resolve().parents[3]
 
 #: GitHub 仓库 URL 形态：`https://github.com/<owner>/<repo>`、`git@github.com:<owner>/<repo>`
 #: `ssh://git@github.com/<owner>/<repo>`（`.git` 后缀可选）。只认 GitHub——其它托管不猜。
-_GH_RE = re.compile(
-    r"github\.com(?::\d+)?[:/](?P<owner>[A-Za-z0-9_.-]+)/(?P<repo>[A-Za-z0-9_.-]+?)(?:\.git)?/?$",
-    re.I)
+_OWNER = r"(?P<owner>[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)"
+_REPO = r"(?P<repo>[A-Za-z0-9._-]+?)(?:\.git)?"
+_GH_WEB = re.compile(rf"^https?://github\.com/{_OWNER}/{_REPO}/?$", re.I)
+_GH_SSH = re.compile(rf"^ssh://git@github\.com(?::\d+)?/{_OWNER}/{_REPO}/?$", re.I)
+_GH_SCP = re.compile(rf"^git@github\.com:{_OWNER}/{_REPO}$", re.I)
 
 
 class UntrustedRepoError(RuntimeError):
@@ -95,7 +98,7 @@ def origin_owner(root: str) -> str | None:
     url = origin_url(root)
     if not url:
         return None
-    m = _GH_RE.search(url)
+    m = _GH_WEB.fullmatch(url) or _GH_SSH.fullmatch(url) or _GH_SCP.fullmatch(url)
     return m.group("owner") if m else None
 
 
@@ -107,14 +110,19 @@ def allowed_owners() -> frozenset:
 
 def trust_status(root: str) -> tuple:
     """→ (是否可信, 理由)。**任何判不出的情形都返回不可信**（fail-closed）。"""
+    if os.path.normcase(os.path.realpath(root)) == os.path.normcase(str(INSTALL_ROOT)):
+        return True, f"目标仓库就是当前运行代码的安装根（{INSTALL_ROOT}）"
     if os.environ.get(ENV_TRUST) == "1":
         return True, f"显式放行（{ENV_TRUST}=1，用户自担风险）"
     owner = origin_owner(root)
-    if owner and owner in allowed_owners():
-        return True, f"origin owner={owner} 在允许列表"
+    explicit = frozenset(x.strip() for x in (os.environ.get(ENV_OWNERS) or "").split(",")
+                         if x.strip())
+    if owner and owner in explicit:
+        return True, f"origin owner={owner} 经 {ENV_OWNERS} 显式放行（用户自担风险）"
     if owner:
-        return False, f"origin owner={owner!r} 不在允许列表 {sorted(allowed_owners())}"
-    return False, "无法判定 origin owner（无 origin / 非 git 检出 / 非 GitHub 形态）"
+        return False, (f"origin owner={owner!r} 不构成自动信任；外部仓库须显式设置 "
+                       f"{ENV_OWNERS} 或使用 --trust-repo")
+    return False, "无法判定 origin owner（无 origin / 非 git 检出 / 非 GitHub 形态；须显式信任）"
 
 
 def refusal_message(root: str, reason: str = "") -> str:

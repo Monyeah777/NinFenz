@@ -598,6 +598,55 @@ public static class SelfTest
             var detail = $"exit={code} · 响应 {parsed.Count} 条 · 末条 ping 有答={pingAnswered} · 工具异常转 -32603={internalError}";
             return (code == 0 && pingAnswered && internalError, detail);
         }));
+
+        var outsidePipelines = Path.Combine(work, "outside-pipelines", "pipelines");
+        Directory.CreateDirectory(outsidePipelines);
+        var outsidePipeline = Path.Combine(outsidePipelines, "secret.md");
+        File.WriteAllText(outsidePipeline, "# 仓外金丝雀\n不得读取。\n");
+        checks.Add(Guarded("敌意输入·.NET MCP 路径工具拒绝绝对路径越界", () =>
+        {
+            var pipelineArg = outsidePipeline.Replace('\\', '/');
+            using var pipelineDoc = JsonIo.Parse(JsonSerializer.Serialize(new
+            {
+                jsonrpc = "2.0", id = 601, method = "tools/call",
+                @params = new { name = "pipeline_read", arguments = new { pipeline = pipelineArg } },
+            }));
+            var pipelineResp = McpServer.Handle(mcpRoot, pipelineDoc.RootElement);
+            var pipelineCode = (pipelineResp?["error"] as Dictionary<string, object?>)?["code"] as int?;
+
+            using var stDoc = JsonIo.Parse(JsonSerializer.Serialize(new
+            {
+                jsonrpc = "2.0", id = 602, method = "tools/call",
+                @params = new { name = "nf_st_validate", arguments = new { path = pipelineArg } },
+            }));
+            var stResp = McpServer.Handle(mcpRoot, stDoc.RootElement);
+            var stCode = (stResp?["error"] as Dictionary<string, object?>)?["code"] as int?;
+
+            using var adsDoc = JsonIo.Parse(JsonSerializer.Serialize(new
+            {
+                jsonrpc = "2.0", id = 603, method = "tools/call",
+                @params = new { name = "nf_st_validate",
+                    arguments = new { path = "docs/examples/card.json:hidden" } },
+            }));
+            var adsResp = McpServer.Handle(mcpRoot, adsDoc.RootElement);
+            var adsCode = (adsResp?["error"] as Dictionary<string, object?>)?["code"] as int?;
+            return (pipelineCode == -32602 && stCode == -32602 && adsCode == -32602,
+                    $"pipeline_read={pipelineCode} · nf_st_validate={stCode} · ADS={adsCode}"
+                    + "（均须 -32602）");
+        }));
+
+        checks.Add(Guarded("敌意输入·.NET 批准对象拒绝路径逃逸", () =>
+        {
+            try
+            {
+                Approval.SubjectDigest(mcpRoot, "../secret.md");
+                return (false, "越界 subject 未被拒绝");
+            }
+            catch (ArgumentException)
+            {
+                return (true, "../secret.md → ArgumentException");
+            }
+        }));
     }
 
     // ------------------------------------------------------ ⑦ 文档四型（镜像表自洽）

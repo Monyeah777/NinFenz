@@ -68,10 +68,10 @@ class BenchDocExampleTest(unittest.TestCase):
 
 
 class PostmortemAndAttestDocExampleTest(unittest.TestCase):
-    """同轮从文档示例里抓到的另两处：`postmortems/PO-0001-*.md` 通配、`--ssh-key ~/…`。"""
+    """同轮从文档示例里抓到的另两处：复盘模板通配、`--ssh-key ~/…`。"""
 
     def test_postmortem_glob_form_runs(self):
-        p = _run("postmortem", "check", "postmortems/PO-0001-*.md")
+        p = _run("postmortem", "check", "postmortems/PO-9000-*.md")
         self.assertEqual(0, p.returncode, p.stdout + p.stderr)
         self.assertIn("行动项", p.stdout)
         self.assertIn("四段齐", p.stdout)

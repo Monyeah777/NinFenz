@@ -1130,7 +1130,8 @@ def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, 
                     issues.append("包清单 %s 声明的输入 %s 不在场"
                                   "（修复指引：补件或改声明）" % (rel, inp))
         on_disk = {q.relative_to(Path(root) / base).as_posix()
-                   for q in sorted((Path(root) / base / "outputs").rglob("*")) if q.is_file()}
+                   for q in sorted((Path(root) / base / "outputs").rglob("*"))
+                   if q.is_file() and not q.is_symlink()}
         self_rel = Path(rel).relative_to(base).as_posix()   # 清单自身不是产出面（它是清单）
         missing = sorted(x for x in on_disk
                          if x not in declared and x != self_rel

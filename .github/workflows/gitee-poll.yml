@@ -16,12 +16,14 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   poll:
     runs-on: ubuntu-latest
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）：轮询入库卡住不许拖到下个周期
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:

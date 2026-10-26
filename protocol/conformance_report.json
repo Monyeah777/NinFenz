@@ -128,29 +128,29 @@
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "决策 8 条（accepted 7 · 取代链 1）",
-      "digest": "cba2c1498d1004da0db1a2c0e529acc82ec4b5208734d954e56447f1cbbaa8bc",
+      "detail": "决策 3 条（accepted 1 · 取代链 0）",
+      "digest": "3baf8ac57c7becca5fa1ef0d1c75bdb14e7b3be3ab021018d859937d6b50d0f5",
       "id": "decisions",
       "ok": true
     },
     {
       "description": "接力协议（SBAR 五段 + 未决带判据）",
-      "detail": "交接件 2 件 · 未决 12 条",
-      "digest": "c68f82f021754691fc89ebf6415602b427b8d13666604d9cd2eacd3787379405",
+      "detail": "交接件 1 件 · 未决 1 条",
+      "digest": "dad1037a082c2ed6bf684e2d74c477f6d116b88657416e54682b3e2f8e39467f",
       "id": "handover",
       "ok": true
     },
     {
       "description": "复盘（无指责 + 根因指向机制 + 行动项闭环）",
-      "detail": "复盘 1 件 · 行动项 2 条",
-      "digest": "6141ca85efef093f1e030b4f66bfbab6505a57cebd5c06db618ad0a31e466bca",
+      "detail": "复盘 1 件 · 行动项 1 条",
+      "digest": "35a9c0384b685992e13ac10330dad9ab3a9e2c5c7fbe389c5905c41f8ae5cca4",
       "id": "postmortem",
       "ok": true
     },
     {
       "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
-      "detail": "审计 57 件（带审计头 46 · legacy 11）· 绑定对象 389",
-      "digest": "44ad0acb0e46ed2772b109a8cb8d7272aa140ff4b4ce0bc9e66dd76451ca8161",
+      "detail": "审计 57 件（带审计头 46 · legacy 11）· 绑定对象 388",
+      "digest": "e8c024c3aa2c55390fbb870cfa0ec30e5cb7f163a06f0d3d4f00697ace6e4818",
       "id": "audit",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "ce1f869039442319109ea3237cfb3799bfe0e0d830b0e6693ba4cc8e9369188c",
+  "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

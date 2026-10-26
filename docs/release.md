@@ -17,7 +17,7 @@ python scripts/nf.py release --freeze --apply --by <批准人> --note "<本波�
 
 ## 冻结链
 
-**顺序不可颠倒**（依据 `decisions/ADR-0005-新增NET引擎线.md` 与 `postmortems/PO-0001-冻结顺序事故.md` 的教训）：内容定稿 →
+**顺序不可颠倒**（依据 `decisions/ADR-0000-决策记录外置到私有仓.md` 与 `postmortems/PO-9000-示例-复盘模板.md` 记载的教训）：内容定稿 →
 一致性报告重算 → 内容绑定批准 → 协议层回执重签。
 
 1. `python scripts/nf.py conformance --write`（产出 `protocol/conformance_report.json`，须 `conformant`）

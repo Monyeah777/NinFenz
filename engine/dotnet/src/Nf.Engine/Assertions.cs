@@ -409,6 +409,8 @@ public static class Assertions
             {
                 foreach (var dir in Directory.GetDirectories(current))
                 {
+                    if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) != 0)
+                        continue;                    // 符号链接/连接点可把扫描带出根，只读 glob 不进
                     Walk(dir, segments, index, matches);
                 }
             }
@@ -425,6 +427,8 @@ public static class Assertions
         var regex = WildcardRegex(segment);
         foreach (var entry in Directory.GetFileSystemEntries(current))
         {
+            if ((File.GetAttributes(entry) & FileAttributes.ReparsePoint) != 0)
+                continue;
             if (regex.IsMatch(Path.GetFileName(entry))) Walk(entry, segments, index + 1, matches);
         }
     }

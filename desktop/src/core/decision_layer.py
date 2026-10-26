@@ -40,6 +40,16 @@ PRIMITIVES = ("choice", "noul", "score")
 #: 若坚持 1e-6，等于把每一个真实校准模型都拒在门外。故取 1e-3（4 位小数的量化误差上界），
 #: 且适配器侧**先归一化再入档**、把原始和记进 meta（判据放松，证据不放松）。
 PROB_TOL = 1e-3
+#: 远端 JSON 响应上限（8 MiB）：端点由调用方给出，不能把无界响应读进内存。
+MAX_REMOTE_JSON_BYTES = 8 * 1024 * 1024
+
+
+def _read_json_response(resp) -> dict[str, Any]:
+    raw = resp.read(MAX_REMOTE_JSON_BYTES + 1)
+    if len(raw) > MAX_REMOTE_JSON_BYTES:
+        raise ValueError(f"决策端点响应超过上限 {MAX_REMOTE_JSON_BYTES} 字节"
+                         "（修复指引：端点须返回有界 JSON）")
+    return json_doc.loads(raw.decode("utf-8"), dict, what="决策端点响应")
 
 
 # ---------------------------------------------------------------- 声明面
@@ -207,7 +217,7 @@ def _post_json(url: str, payload: Dict[str, Any], timeout: float) -> Dict[str, A
         raise ValueError("只允许 http/https 端点（修复指引：端点须显式给 scheme）："
                          + repr(url))
     with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310 —— 已在上方校验 scheme ∈ {http,https}；端点由调用方显式给出
-        return json_doc.loads(resp.read().decode("utf-8"), dict, what="决策端点响应")
+        return _read_json_response(resp)
 
 
 def systemone_decide(req: Dict[str, Any], endpoint: str,
@@ -277,7 +287,7 @@ def openai_json_decide(req: Dict[str, Any], endpoint: str, model: str,
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     r = urllib.request.Request(endpoint, data=data, method="POST", headers=headers)
     with urllib.request.urlopen(r, timeout=timeout) as resp:  # nosec B310 —— 已在上方校验 scheme ∈ {http,https}；端点由调用方显式给出
-        body = json_doc.loads(resp.read().decode("utf-8"), dict, what="决策端点响应")
+        body = _read_json_response(resp)
     text = body["choices"][0]["message"]["content"]
     raw = json_doc.loads(text, dict, what="决策模型 JSON 文本")
     answers: Dict[str, Any] = {}

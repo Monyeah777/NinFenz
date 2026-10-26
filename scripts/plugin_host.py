@@ -20,10 +20,12 @@
     python scripts/plugin_host.py --self-test
 """
 import argparse
+import contextlib
 import importlib.util
 import json
 import subprocess  # nosec B404 - 只跑本仓声明的产物与在场工具链
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -45,6 +47,13 @@ WIT_REL = "engine/wasm/ninfenz-plugin.wit"
 #: wasmtime 报告「燃料耗尽」时的 stderr 片段（实测措辞："wasm trap: all fuel consumed
 #: by WebAssembly"）。刻意不放裸词 "fuel"——那会把任何提到燃料的报错都误判成耗尽。
 FUEL_MARKERS = ("all fuel consumed", "out of fuel", "fuel has been consumed")
+#: 插件输入/输出硬上限（8 MiB，与 MCP 入站同口径）。燃料只约束 wasm 计算，
+#: 不约束宿主管道与巨大输出；这两条必须由宿主自己兜住。
+MAX_PLUGIN_INPUT_BYTES = 8 << 20
+MAX_PLUGIN_OUTPUT_BYTES = 8 << 20
+#: Component Model 走 WAVE argv，受操作系统单条命令行上限约束；按最坏 4 字符/字节预算。
+MAX_COMPONENT_ARGV_CHARS = 30_000
+MAX_COMPONENT_INPUT_BYTES = (MAX_COMPONENT_ARGV_CHARS - 2) // 4
 
 
 def resolve_wasmtime():
@@ -111,6 +120,11 @@ def component_argv(wasmtime: str, artifact: Path, entry: dict, data: bytes,
     这是有意的分工：「装载期类型校验 + 小样本互证」用组件，「跑量」用 CLI 形态——
     两者能力面不同，谁也不是谁的替代品。
     """
+    if len(data) > MAX_COMPONENT_INPUT_BYTES:
+        raise ValueError(
+            f"组件 WAVE 输入 {len(data)} 字节 > 上限 {MAX_COMPONENT_INPUT_BYTES}"
+            "（修复指引：类型化插件只跑小样本，跑量请用 CLI ABI）"
+        )
     invoke = str((entry.get("io") or {}).get("invoke") or "")
     literal = "[" + ",".join(str(b) for b in data) + "]"
     return [wasmtime, "run",
@@ -139,6 +153,88 @@ def parse_wave_result(text: str) -> bytes | None:
         return None
 
 
+class _OutputBudget:
+    """stdout+stderr 共用一份上限；越界立即 kill，但仍排空管道避免子进程卡死。"""
+
+    def __init__(self, cap: int) -> None:
+        self.remaining = cap
+        self.exceeded = False
+        self._lock = threading.Lock()
+
+    def take(self, chunk: bytes) -> bytes:
+        with self._lock:
+            if self.exceeded:
+                return b""
+            allowed = min(len(chunk), max(0, self.remaining))
+            if len(chunk) > allowed:
+                self.exceeded = True
+            self.remaining -= allowed
+            return chunk[:allowed]
+
+
+def _drain_pipe(stream, budget: _OutputBudget, proc) -> bytes:
+    parts = []
+    try:
+        while True:
+            chunk = stream.read(65536)
+            if not chunk:
+                break
+            kept = budget.take(chunk)
+            if kept:
+                parts.append(kept)
+            if budget.exceeded:
+                with contextlib.suppress(OSError):
+                    proc.kill()
+    finally:
+        stream.close()
+    return b"".join(parts)
+
+
+def _feed_stdin(stream, data: bytes | None) -> None:
+    try:
+        if data:
+            stream.write(data)
+    except (BrokenPipeError, OSError):  # 子进程已退出/关管道：输入无需再送
+        pass
+    finally:
+        with contextlib.suppress(OSError):
+            stream.close()
+
+
+def _run_bounded(argv, *, cwd: str, input_data: bytes | None, timeout_s: float,
+                 output_cap: int = MAX_PLUGIN_OUTPUT_BYTES):
+    """跑子进程，stdin/stdout/stderr 都有界；返回 (rc, out, err, timeout, overflow)。"""
+    proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.PIPE,  # nosec B603  # noqa: S603
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+    budget = _OutputBudget(output_cap)
+    out_parts: list[bytes] = []
+    err_parts: list[bytes] = []
+
+    def read_out():
+        out_parts.append(_drain_pipe(proc.stdout, budget, proc))
+
+    def read_err():
+        err_parts.append(_drain_pipe(proc.stderr, budget, proc))
+
+    threads = [threading.Thread(target=read_out, daemon=True),
+               threading.Thread(target=read_err, daemon=True),
+               threading.Thread(target=_feed_stdin, args=(proc.stdin, input_data),
+                                daemon=True)]
+    for th in threads:
+        th.start()
+    timed_out = False
+    try:
+        rc = proc.wait(timeout=timeout_s)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        proc.kill()
+        rc = proc.wait()
+    for th in threads:
+        th.join(timeout=5)
+    return rc, out_parts[0] if out_parts else b"", err_parts[0] if err_parts else b"", \
+        timed_out, budget.exceeded
+
+
 #: 「自动解析宿主」的哨兵：与 None（**明确缺席**）区分开——自证要能真的走缺席分支。
 _AUTO = object()
 
@@ -153,6 +249,10 @@ def invoke(doc, artifact, method: str, data: bytes, *, wasmtime=_AUTO, root: Pat
     if entry is None:
         meta.update(reason="method_not_declared", detail=f"清单未声明方法 {method}")
         return {"ok": False, "data": None, "meta": meta}
+    if len(data) > MAX_PLUGIN_INPUT_BYTES:
+        meta.update(reason="input_too_large",
+                    detail=f"插件输入 {len(data)} 字节 > 上限 {MAX_PLUGIN_INPUT_BYTES}")
+        return {"ok": False, "data": None, "meta": meta}
     fuel = fuel_for(entry, len(data))
     timeout_ms = int(entry.get("wall_timeout_ms") or 30000)
     meta["fuel"] = fuel
@@ -164,7 +264,11 @@ def invoke(doc, artifact, method: str, data: bytes, *, wasmtime=_AUTO, root: Pat
         return {"ok": False, "data": None, "meta": meta}
     component = str(doc.get("abi") or "") == "wasi-preview2-component"
     if component:
-        argv = component_argv(wasmtime, Path(artifact), entry, data, fuel, timeout_ms)
+        try:
+            argv = component_argv(wasmtime, Path(artifact), entry, data, fuel, timeout_ms)
+        except ValueError as exc:
+            meta.update(reason="component_input_too_large", detail=str(exc))
+            return {"ok": False, "data": None, "meta": meta}
         stdin = None
     else:
         argv = isolation_argv(wasmtime, Path(artifact), fuel, timeout_ms, method)
@@ -172,25 +276,29 @@ def invoke(doc, artifact, method: str, data: bytes, *, wasmtime=_AUTO, root: Pat
     meta["abi"] = str(doc.get("abi") or "")
     started = time.perf_counter()
     try:
-        proc = subprocess.run(argv, cwd=str(root), input=stdin, capture_output=True,  # nosec B603  # noqa: S603
-                              timeout=min(timeout_s, timeout_ms / 1000.0 + 5.0))
-    except subprocess.TimeoutExpired:
-        meta.update(reason="timeout", wall_ms=round((time.perf_counter() - started) * 1000, 3),
-                    detail=f"宿主超时（{timeout_s:.1f}s）")
-        return {"ok": False, "data": None, "meta": meta}
+        rc, stdout, stderr_raw, timed_out, overflow = _run_bounded(
+            argv, cwd=str(root), input_data=stdin,
+            timeout_s=min(timeout_s, timeout_ms / 1000.0 + 5.0))
     except OSError as exc:
         meta.update(reason="host_unusable", detail=f"起不了宿主：{exc}")
         return {"ok": False, "data": None, "meta": meta}
     wall_ms = round((time.perf_counter() - started) * 1000, 3)
     meta["wall_ms"] = wall_ms
-    stderr = proc.stderr.decode("utf-8", "replace")
-    if proc.returncode != 0:
+    if timed_out:
+        meta.update(reason="timeout", detail=f"宿主超时（{timeout_s:.1f}s）")
+        return {"ok": False, "data": None, "meta": meta}
+    if overflow:
+        meta.update(reason="output_too_large",
+                    detail=f"插件输出超过上限 {MAX_PLUGIN_OUTPUT_BYTES} 字节")
+        return {"ok": False, "data": None, "meta": meta}
+    stderr = stderr_raw.decode("utf-8", "replace")
+    if rc != 0:
         low = stderr.lower()
         reason = "fuel_exhausted" if any(m in low for m in FUEL_MARKERS) else "exit_nonzero"
         meta.update(reason=reason,
-                    detail=f"退出码 {proc.returncode}：{stderr.strip()[:200]}")
+                    detail=f"退出码 {rc}：{stderr.strip()[:200]}")
         return {"ok": False, "data": None, "meta": meta}
-    out = proc.stdout.decode("utf-8", "replace").strip()
+    out = stdout.decode("utf-8", "replace").strip()
     if component:
         parsed = parse_wave_result(out)
         if parsed is None:
@@ -260,7 +368,14 @@ def main(argv=None) -> int:
     if issues:
         print("装载被拒：\n  " + "\n  ".join(issues), file=sys.stderr)
         return 2
-    data = Path(args.inp).read_bytes() if args.inp else sys.stdin.buffer.read()
+    if args.inp:
+        with open(args.inp, "rb") as fh:
+            data = fh.read(MAX_PLUGIN_INPUT_BYTES + 1)
+    else:
+        data = sys.stdin.buffer.read(MAX_PLUGIN_INPUT_BYTES + 1)
+    if len(data) > MAX_PLUGIN_INPUT_BYTES:
+        print(f"装载被拒：插件输入超过 {MAX_PLUGIN_INPUT_BYTES} 字节", file=sys.stderr)
+        return 2
     got = invoke_with_fallback(doc, artifact, args.method, data)
     if args.json:
         print(json.dumps({"kind": "nf-plugin-invoke", "data": got["data"], **got["meta"]},

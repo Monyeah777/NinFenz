@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:dbb5b2b45ebba8d67770a41056e944506f017dd243522edab79878886284d92e
-  - protocol/code_metrics_baseline.json:786bb8ac604ed2878a89f9f38b249cc3a46619d608ba05567057bd5dd5f81e4a
+  - protocol/code_metrics_baseline.json:7156093310de1be529e60a5cceb733faa64a95844f85934ba0aa5e8e5f445f20
 ---
+> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+
 > 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
 
 > 重审（2026-10-25）：D1 常量时间比较 + N2/L2 发布面白名单化

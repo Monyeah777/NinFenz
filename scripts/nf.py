@@ -1319,7 +1319,7 @@ def _make_parser() -> argparse.ArgumentParser:
                           "合并按 check 号排序，输出与串行逐字节一致（实测 8 路 ≈3.2×）")
     vfy.add_argument("--trust-repo", dest="trust_repo", action="store_true",
                      help="显式信任目标仓库：允许引擎在**本进程内执行**其 verify.sh 内嵌代码"
-                          "（H1/CWE-94 面）。默认只信任 origin owner 在白名单的仓库；"
+                          "（H1/CWE-94 面）。默认只信任当前运行代码所在的安装根；"
                           "外来/不可信仓库不加本旗标一律拒绝执行（自担风险）")
 
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
@@ -6915,7 +6915,7 @@ def _cmd_verify(args) -> int:
 
     # H1（2026-10-22 安全审计）：nf verify 的 inproc/script 面会把目标仓库 verify.sh 的
     # heredoc Python 当本机进程代码执行（CWE-94）。信任门在**执行之前**判：不可信仓库
-    # （origin owner 不在白名单）默认拒绝，需显式 --trust-repo 自担风险。
+    # （外部仓库默认不可信，伪造 origin 也不放行），需显式 --trust-repo 自担风险。
     if getattr(args, "trust_repo", False):
         print("WARN: --trust-repo 已启用：将执行目标仓库自带的门禁脚本（含内嵌 Python，"
               "CWE-94 面），风险自担", file=sys.stderr)

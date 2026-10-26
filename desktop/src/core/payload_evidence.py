@@ -29,11 +29,11 @@ def _module_docs(root: str = ".") -> List[Path]:
     r = Path(root)
     out = []
     for sub in ("04_模块库",):
-        out += sorted((r / sub).rglob("*.md"))
+        out += sorted(p for p in (r / sub).rglob("*.md") if not p.is_symlink())
     for pkg in sorted((r / "community").iterdir()) if (r / "community").is_dir() else []:
         mdir = pkg / "modules"
         if mdir.is_dir():
-            out += sorted(mdir.glob("*.md"))
+            out += sorted(p for p in mdir.glob("*.md") if not p.is_symlink())
     return out
 
 

@@ -1,24 +1,17 @@
-# 代码所有者（CODEOWNERS）
+# Code owners
 #
-# 本项目为单人维护：全仓默认归维护者，故 `*` 一条即可生效。
-# 下列敏感面**显式列出**（CODEOWNERS 取最后一条匹配），便于将来增加第二位 reviewer 时
-# 只需改这几行，而不用重新判断哪些面承重。
-#
-# 判据（谁承重）：改这些面会波及全部下游或供应链——协议件、门禁本体、方向文件、
-# 机器契约真源、核心库、CI 与入库通道。
+# The repository is maintained by a single owner. Keep this file ASCII-only:
+# OpenSSF Scorecard's CODEOWNERS parser rejects non-ASCII path patterns.
+* @Monyeah777
 
-*                        @Monyeah777
+# Protocol and machine-readable contracts.
+/protocol/ @Monyeah777
 
-# —— 协议与机器契约（改即波及全部下游）——
-/01_核心协议.md           @Monyeah777
-/02_联动注册表.md         @Monyeah777
-/protocol/               @Monyeah777
+# Gates and project direction.
+/verify.sh @Monyeah777
+/STRATEGY.md @Monyeah777
 
-# —— 门禁与方向（质量法官本体）——
-/verify.sh               @Monyeah777
-/STRATEGY.md             @Monyeah777
-
-# —— 核心库与投稿/供应链面 ——
-/desktop/src/core/       @Monyeah777
-/library/intake.json     @Monyeah777
-/.github/                @Monyeah777
+# Core code, intake, and supply-chain controls.
+/desktop/src/core/ @Monyeah777
+/library/intake.json @Monyeah777
+/.github/ @Monyeah777

@@ -15,6 +15,8 @@ if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core import asset_ledger as al  # noqa: E402
+from core import conformance_scan as csc
+from core import library_entries as le
 from core import paths  # noqa: E402
 from core.storage import Store  # noqa: E402
 
@@ -94,6 +96,30 @@ class ValidatePathTest(unittest.TestCase):
                 self.skipTest("当前环境无法创建符号链接")
             with self.assertRaises(paths.PathEscapeError):
                 paths.validate_path(root, "link/escape.md")
+
+    def test_repository_scanner_never_follows_symlinked_files(self):
+        """遍历器读的是仓库内容，不是本机任意文件；符号链接文件一律不收入扫描面。"""
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as out:
+            canary = Path(out) / "secret.md"
+            canary.write_text("outside secret", encoding="utf-8")
+            link = Path(root) / "leak.md"
+            try:
+                link.symlink_to(canary, target_is_directory=False)
+            except (OSError, NotImplementedError, AttributeError):
+                self.skipTest("当前环境无法创建符号链接")
+            self.assertEqual([], csc.iter_files(root, "**/*.md"))
+
+    def test_library_entry_enumeration_skips_symlinks(self):
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as out:
+            canary = Path(out) / "NF-999.md"
+            canary.write_text("---\nid: NF-999\n---\noutside", encoding="utf-8")
+            lib = Path(root) / "library"
+            lib.mkdir()
+            try:
+                (lib / "NF-999.md").symlink_to(canary)
+            except (OSError, NotImplementedError, AttributeError):
+                self.skipTest("当前环境无法创建符号链接")
+            self.assertEqual([], le.entries(root))
 
     def test_control_chars_are_rejected(self):
         """控制字符（NUL 等）不是可落盘的文件名：Windows 静默截断 / POSIX 抛 `ValueError`。
