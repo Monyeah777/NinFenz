@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/exec_record.schema.json",
+  "title": "NF 真实模型执行记录（nf-exec-record/1 · M2 证据）",
+  "description": "域包成熟度 M2「真实模型执行」的正式证据格式：一次真实模型运行 → 可复算的 artifact + 机检结果。判据：artifact 在仓内且 sha256 可复算、check_rc==0、executor 是模型标识（非工具/装配器）、date 合法、package 在册。模板（template:true）显式标记「未执行」，不构成 M2 证据。",
+  "type": "object",
+  "required": ["schema", "run_id", "package", "executor", "date", "profile", "brief",
+               "artifact", "contract_digest", "check_rc", "notes"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["nf-exec-record/1"],
+      "description": "记录格式版本（独立演进，01 §7 V3）"
+    },
+    "template": {
+      "type": "boolean",
+      "description": "true = 模板/示例，显式未执行；校验器给「未执行」状态，不冒充 M2 证据"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$",
+      "description": "运行标识（小写字母数字开头，含 . _ -，3–64 字符）；落盘文件名 = <run_id>.json"
+    },
+    "package": {
+      "type": "string",
+      "minLength": 1,
+      "description": "域包名（须在 registry.json protocols[].id 在册）"
+    },
+    "executor": {
+      "type": "object",
+      "required": ["model", "provider", "version"],
+      "properties": {
+        "model": { "type": "string", "minLength": 1,
+                   "description": "模型标识（如 gpt-4o / claude-sonnet-4-5）；工具/agent/装配器不算" },
+        "provider": { "type": "string", "minLength": 1,
+                      "description": "提供方（如 openai / anthropic / 本地 endpoint 标识）" },
+        "version": { "type": "string", "minLength": 1,
+                     "description": "模型版本/快照（可复算证据必须能定位到具体版本）" }
+      },
+      "additionalProperties": false
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "真实执行日（YYYY-MM-DD）；不得晚于今天（未来日期 = 伪造面）"
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "本次执行使用的 gate profile / 质量门口径标识"
+    },
+    "brief": {
+      "type": "string",
+      "minLength": 1,
+      "description": "喂给模型的 brief/需求原话（可追溯本次执行目标）"
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1,
+                  "description": "仓内相对路径（单个文件；禁绝对路径/通配/说明文字）" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$",
+                    "description": "artifact 字节的 SHA-256（小写十六进制）" }
+      },
+      "additionalProperties": false
+    },
+    "contract_digest": {
+      "type": "string",
+      "pattern": "^(sha256:)?[0-9a-f]{64}$",
+      "description": "本次运行所依据的契约摘要（format-only；重算口径未定义前不校验取值）"
+    },
+    "check_rc": {
+      "type": "integer",
+      "enum": [0],
+      "description": "对 artifact 跑 `nf assemble ... --check` 的返回码；非 0 = 机检未过，不算真实执行"
+    },
+    "notes": {
+      "type": "string",
+      "description": "备注（缺口/限制/复现命令）；可为空字符串"
+    }
+  },
+  "propertyNames": {
+    "type": "string",
+    "pattern": "^[a-z][a-z0-9_]{0,31}$"
+  },
+  "additionalProperties": false
+}

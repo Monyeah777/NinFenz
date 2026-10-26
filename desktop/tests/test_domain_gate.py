@@ -37,13 +37,18 @@ def _sample_p03():
 
 
 class SchemaMetaTest(unittest.TestCase):
-    """10 件 schema 的元校验 + domain/事件名词法的增量语义。"""
+    """protocol/schema 面件数的元校验 + domain/事件名词法的增量语义。"""
 
     @unittest.skipIf(jsonschema is None, "jsonschema 未安装（可选对照依赖）")
     def test_all_schemas_are_valid_draft2020(self):
         files = sorted((ROOT / "protocol" / "schema").glob("*.json"))
-        # T6.3（2026-10-26）：新增 bench_result.schema.json（公开 benchmark 结果行），9 → 10。
-        self.assertEqual(10, len(files), "protocol/schema 面件数应为 10：%s" % files)
+        # T6.2/T6.3（2026-10-26）：新增 exec_record.schema.json 与
+        # bench_result.schema.json，面件数 9 → 11；断言只增不减，防 schema 静默消失。
+        names = [f.name for f in files]
+        self.assertGreaterEqual(
+            len(files), 11, "protocol/schema 面件数应 ≥11：%s" % names)
+        self.assertIn("exec_record.schema.json", names)
+        self.assertIn("bench_result.schema.json", names)
         for f in files:
             data = json.loads(f.read_text(encoding="utf-8"))
             Validator.check_schema(data)          # 不是合法 draft 2020-12 即抛
