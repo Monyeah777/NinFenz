@@ -6,12 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:d2d3c9ff0504b928f960b740535209c884ea109046a24e6dcfdf1a1f4195466b
-  - desktop/src/core/assemble_plan.py:022192dd985bc622446c799bb8223b3d659eaaf1d87240d8a6cebde09dca6888
+  - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
+  - desktop/src/core/assemble_plan.py:87ead8599f78f321d0c29b04e78554e58be6b24319d21042342ff6dc42544e16
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

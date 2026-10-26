@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

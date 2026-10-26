@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:3c7883f654aaaf6f324a4abeac2ff79b2031c0909504c60f13aed9dee570443f
+  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）

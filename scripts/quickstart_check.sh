@@ -180,14 +180,14 @@ step_demo(){
   printf '%s\n' "$out" | grep -q '质量门：' || die '步 3 输出缺「质量门：」行'
   printf '%s\n' "$out" | grep -q 'FAIL 0' || die '步 3 质量门 FAIL 非 0'
   printf '%s\n' "$out" | grep -q '产物：' || die '步 3 未打印产物路径'
-  say '质量门 FAIL 0；产物已生成'
+  say '质量门 FAIL 0；交付物（Markdown）已生成'
 }
 
 # nf-step: 4 assemble
 step_assemble(){
   enter_step 4 assemble
   rm -rf "$WORK/out1"
-  "$PY" scripts/nf.py assemble "写一份关于雨天的校园短篇" --build --dest "$WORK/out1" \
+  "$PY" scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest "$WORK/out1" \
     >"$WORK/04.log" 2>&1 \
     || die '步 4 失败：nf assemble --build 退出码非 0'
   A1="$(find "$WORK/out1" -maxdepth 1 -name '*.md' -type f 2>/dev/null | head -1)"
@@ -199,7 +199,7 @@ step_assemble(){
 step_reproducible(){
   enter_step 5 reproducible
   rm -rf "$WORK/out2"
-  "$PY" scripts/nf.py assemble "写一份关于雨天的校园短篇" --build --dest "$WORK/out2" \
+  "$PY" scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest "$WORK/out2" \
     >"$WORK/05.log" 2>&1 \
     || die '步 5 失败：第二次 nf assemble --build 退出码非 0'
   A2="$(find "$WORK/out2" -maxdepth 1 -name '*.md' -type f 2>/dev/null | head -1)"
@@ -211,7 +211,7 @@ step_reproducible(){
 # nf-step: 6 check
 step_check(){
   enter_step 6 check
-  "$PY" scripts/nf.py assemble "写一份关于雨天的校园短篇" --check "$A1" \
+  "$PY" scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check "$A1" \
     >"$WORK/06.log" 2>&1 \
     || die '步 6 失败：nf assemble --check 退出码非 0'
   tr -d '\r' < "$WORK/06.log" | grep -q '成品通过自组装机器验收' \

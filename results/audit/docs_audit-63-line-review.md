@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:3c7883f654aaaf6f324a4abeac2ff79b2031c0909504c60f13aed9dee570443f
+  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）

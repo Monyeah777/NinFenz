@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:3c7883f654aaaf6f324a4abeac2ff79b2031c0909504c60f13aed9dee570443f
+  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

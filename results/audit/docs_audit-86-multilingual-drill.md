@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

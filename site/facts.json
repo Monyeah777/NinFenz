@@ -32,9 +32,9 @@
     "canonical_name": "NinFenz",
     "short_name": "NF",
     "zh_name": "宁封子",
-    "kind": "content contract layer（内容契约层）",
-    "definition_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。",
-    "definition_en": "NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. The protocol is domain-neutral and model-agnostic; narrative is only the first official domain pack.",
+    "kind": "deliverable contract layer（交付物契约层）",
+    "definition_zh": "宁封子（NinFenz，简称 NF）是交付物契约层（deliverable contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出可交付内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，交付物 = 技术文档、合规清单、研究报告、规格说明等，叙事是其中一类域包。",
+    "definition_en": "NinFenz (NF) is a deliverable contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI deliverable content can be loaded, checked and reproduced. The protocol is domain-neutral and model-agnostic; deliverables include technical documents, compliance checklists, research reports and specifications, with narrative as one domain pack.",
     "is_not": [
       "模型 (a model)",
       "提示词模板集 (a prompt-template collection)",
@@ -45,8 +45,8 @@
       "NinFenz",
       "NF",
       "宁封子",
-      "content contract layer",
-      "内容契约层"
+      "deliverable contract layer",
+      "交付物契约层"
     ],
     "license": "AGPL-3.0-only OR LicenseRef-Commercial",
     "homepage": "https://ninfenz.dev/",
@@ -130,10 +130,10 @@
     "mcp_registry": "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
   },
   "citation": {
-    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz",
-    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. code AGPL-3.0-only or commercial; protocol text CC BY 4.0. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}, note = {verify v2.30 · check1-42 · PASS=76}}",
-    "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
+    "plain": "NinFenz（NF）— 交付物契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz",
+    "apa": "Monyeah777. (2026). NinFenz (宁封子): a deliverable contract layer [Computer software]. code AGPL-3.0-only or commercial; protocol text CC BY 4.0. https://ninfenz.dev/",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - deliverable contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}, note = {verify v2.30 · check1-42 · PASS=76}}",
+    "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是交付物契约层（deliverable contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出可交付内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {
     "gates_scope": "结构与可复现；不管文笔好坏",

@@ -9,7 +9,7 @@ subjects:
   - 01_核心协议.md:73f550896c9fa3185be72139adfed1277bf193bad7a363fab207d7bc3cdf0969
   - 02_联动注册表.md:ecd38824fd7e007616def4fa86de7f65718c53002eb7ebf93f97cb8352c8b7b6
   - 06_Agent执行协议.md:849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52
-  - 07_官方核心出厂与社区预设导航.md:c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233
+  - 07_官方核心出厂与社区预设导航.md:5640aedff0f878a3ef3c40d85990108fa9ec3bf0d08edb4984db50c0649fef7c
   - 03_管线库/P00_通用文档生成管线.md:e3acba0c5111b7e67094c4d82d815cd941bd2ebf6b36d5b71f8574241c2e06a2
   - 03_管线库/P01_标准管线.md:45176d7415faa9b63055892717f8262538e6ead83fff2d3ee83c11ad6df375ee
   - 03_管线库/P90_结构装配管线.md:b44562314643a042781a22f50a609785d339642c41c57db7ab134a732720b0dc
@@ -30,11 +30,15 @@ subjects:
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
   - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
-  - protocol/asset_keys.json:0d89c32df05b6393515d86e7a1adab825498bb95071913c50e21d1db3d65ab1c
+  - protocol/asset_keys.json:144a06d6c44a403baad68373c3ed1ae7f70c32fb07a4dce0a8199eb46b215b45
   - desktop/src/core/registry.json:33635f4cf78acae7233b620d93bf313a148372b21f7d78f2b9d96a3f1fe2beea
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-10-26）：EOL normalize: asset_keys/judgement_coverage to LF
+
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Wave2 merge: register techdoc asset keys + layer_closure exception
 
 > 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 9 资产与 gate_profiles 严格 profile，触发 library/INDEX.md 与 README.en.md 生成区刷新；按审计协议机械重绑对象 digest（对象一改旧审计即失效）

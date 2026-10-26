@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - scripts/nf.py:3c7883f654aaaf6f324a4abeac2ff79b2031c0909504c60f13aed9dee570443f
+  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
@@ -20,6 +20,8 @@ subjects:
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）

@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

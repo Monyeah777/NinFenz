@@ -6,9 +6,11 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:d2d3c9ff0504b928f960b740535209c884ea109046a24e6dcfdf1a1f4195466b
-  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
+  - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
+  - protocol/code_metrics_baseline.json:8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

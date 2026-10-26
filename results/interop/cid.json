@@ -22,24 +22,24 @@
       "sha256": "849503effd94f1d7da1d5aab2c9dc2bc6113bb3ea8de4f6fa18446695ba8fd52"
     },
     {
-      "cid": "bafyreighyurp2tydobtuzqwbsgcvyl7bjbe7xicppjoywldiwq35rq2cgm",
+      "cid": "bafyreicwicxn74hypcr66pca3bmzaeepvhwdx4gqr3nutbg3kdagjh7ppq",
       "path": "07_官方核心出厂与社区预设导航.md",
-      "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
+      "sha256": "5640aedff0f878a3ef3c40d85990108fa9ec3bf0d08edb4984db50c0649fef7c"
     },
     {
-      "cid": "bafyreifvlxobp35wvxii3ikenegxqnm5yjyq2qcotn6uiwdbzviobewq3y",
+      "cid": "bafyreia464f4eqm4uxduqpy3i2cpojmoq2euncm3hmrghgg657voepttsy",
       "path": "llms.txt",
-      "sha256": "b55ddc17efb6add08da144690d78359dc2710d404e9b7d445861cd50e092d0de"
+      "sha256": "1cf70bc2419ca5c7483f1b4684f7258e868946899b3b226398deefeae23e7396"
     },
     {
-      "cid": "bafyreibfzwhbthl3e3u2a4mm7ijev7v5djtoctkut6zks6k4lectcmghxm",
+      "cid": "bafyreidz4xztj5c7xqiyfmcudnqt4hlljeicureplor7paoq7dwgdakwby",
       "path": "library/INDEX.md",
-      "sha256": "25cd8e199d7b26e9a0718cfa124afebd1a66e14d549fb2a9795c59053130c7bb"
+      "sha256": "79e5f334f45fbc1182b0541b613e1d6b49102a448f5ba3f781d0f8ec6181560e"
     },
     {
-      "cid": "bafyreidmvkjbly6u74mxusyc7374o7532u6waztwahnhbqeb4t3fwuufyq",
+      "cid": "bafyreieyblhio3pnv2f3awulhs5ybb4rfjwcqgqk7aabsimjdpc6dw2c5y",
       "path": "library/ALIAS.md",
-      "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+      "sha256": "980ace876dedae8bb05a8b3cbb8087912a6c281a0af8001921891bc5e1db42ee"
     },
     {
       "cid": "bafyreibqlthxbcjto5mi363mysnxlngpn75nptoa7donzg7bvv53s5zebe",
@@ -112,9 +112,9 @@
       "sha256": "d70d1fdfc5bcda09448a3a09c50c4d4e2ee7492d6b122892612a370aee60fa9a"
     },
     {
-      "cid": "bafyreiddhirsgylnx74yhhdhvr2j6g4ffeoqea72or6eptbficneevr7pa",
+      "cid": "bafyreiejkkylc3577ksynyveet77guxs3sjqz56hvuapqksnojod3urymy",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78"
+      "sha256": "8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866"
     },
     {
       "cid": "bafyreibblrffp7cte5gnomayxjbabqu5d5d37f3mrj4eciy2jgay5nvyiq",

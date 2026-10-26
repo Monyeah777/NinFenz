@@ -1107,7 +1107,7 @@ def render_lines(ui: Ui, width=100, height=30) -> list:
     w, h, split = lay["w"], lay["h"], lay["split"]
     clamp_ui(ui, lay)
     rows = []
-    head = " NF TUI v%s · NinFenz 内容契约层 " % VERSION
+    head = " NF TUI v%s · NinFenz 交付物契约层 " % VERSION
     rows.append(("┌%s┐" % (head + "─" * max(0, w - 2 - display_width(head))), "frame"))
     scope = ui.zone_filter or ui.action_filter
     left = "%s · 能力区 %d" % (("仓库 %s" % ui.repo) if ui.repo else "未发现仓库（演示模式）",

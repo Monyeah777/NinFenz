@@ -221,7 +221,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "de30f89a5facb93e",
+        "invocationId": "2b1e98feba9af521",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -254,25 +254,25 @@
     },
     {
       "digest": {
-        "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
+        "sha256": "5640aedff0f878a3ef3c40d85990108fa9ec3bf0d08edb4984db50c0649fef7c"
       },
       "name": "07_官方核心出厂与社区预设导航.md"
     },
     {
       "digest": {
-        "sha256": "b55ddc17efb6add08da144690d78359dc2710d404e9b7d445861cd50e092d0de"
+        "sha256": "1cf70bc2419ca5c7483f1b4684f7258e868946899b3b226398deefeae23e7396"
       },
       "name": "llms.txt"
     },
     {
       "digest": {
-        "sha256": "25cd8e199d7b26e9a0718cfa124afebd1a66e14d549fb2a9795c59053130c7bb"
+        "sha256": "79e5f334f45fbc1182b0541b613e1d6b49102a448f5ba3f781d0f8ec6181560e"
       },
       "name": "library/INDEX.md"
     },
     {
       "digest": {
-        "sha256": "6caa9215e3d4ff197a4b02feffc77fbbd53d60667601da70c081e4f65b5285c4"
+        "sha256": "980ace876dedae8bb05a8b3cbb8087912a6c281a0af8001921891bc5e1db42ee"
       },
       "name": "library/ALIAS.md"
     },
@@ -362,7 +362,7 @@
     },
     {
       "digest": {
-        "sha256": "633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78"
+        "sha256": "8952b0b16fbffaa586e2a424fff352f2dc930cf7c7ad00f82a4d725c3dd23866"
       },
       "name": "protocol/code_metrics_baseline.json"
     },

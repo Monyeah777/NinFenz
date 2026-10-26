@@ -14,7 +14,7 @@ subjects:
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
+  - desktop/src/core/library.py:449a20597c768d608d9f9ae69df50b3e6b46ad5682809309b1f83611b0a73286
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
@@ -22,6 +22,8 @@ subjects:
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
 
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-25）：分层双许可（1.1.0 起）
 
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步

@@ -148,18 +148,22 @@ ZONES: tuple[dict[str, Any], ...] = (
          {"key": "doctor-json", "title": "体检（机器面）", "argv": ("doctor", "--json"),
           "params": (), "note": ""},
      )},
-    {"key": "1", "id": "demo", "title": "一键演示世界",
+    {"key": "1", "id": "demo", "title": "一键交付物演示",
      "family": "start",
-     "summary": "P04 轻混全链跑一遍（retrieve→compose→gate→export）并产出 CCV3 卡",
-     "examples": ("nf demo",),
+     "summary": "P06 技术文档全链跑一遍（retrieve→compose→gate→export）产出可交付 "
+                "Markdown；叙事域用 `nf demo narrative`（P04→CCV3 卡）",
+     "examples": ("nf demo", "nf demo narrative"),
      "actions": (
-         {"key": "demo", "title": "跑一遍 P04 全链", "argv": ("demo",), "params": (), "note": ""},
+         {"key": "demo", "title": "跑一遍技术文档全链", "argv": ("demo",), "params": (),
+          "note": ""},
+         {"key": "demo-narrative", "title": "跑一遍叙事域全链", "argv": ("demo", "narrative"),
+          "params": (), "note": ""},
      )},
     {"key": "2", "id": "assemble", "title": "需求 → 装配计划",
      "family": "forge",
      "summary": "一句话需求 → 命中预设包或转用户自定义流；--check 验收成品",
-     "examples": ("nf assemble \"帮我组装一个西幻生存世界的完整版\"",
-                  "nf assemble 西幻生存 --check sample.md"),
+     "examples": ("nf assemble \"写一份技术文档，要术语表和修订记录\"",
+                  "nf assemble \"写一份合规审查清单\" --check sample.md"),
      "actions": (
          {"key": "assemble", "title": "一句话→装配计划", "argv": ("assemble", "{need}"),
           "params": ({"name": "need", "label": "需求（一句话）", "kind": "text",
@@ -174,9 +178,9 @@ ZONES: tuple[dict[str, Any], ...] = (
     {"key": "3", "id": "run", "title": "全链生产",
      "family": "forge",
      "summary": "选管线与模块 → 装配 → 质量门 → 导出（--seed 装载官方核心 + 社区包）",
-     "examples": ("nf run --pipeline community/校园西幻轻混组合包/pipelines/"
-                  "P04_轻混装配流管线.md --modules 通用类:M00,轻混类:M91,"
-                  "轻混类:M92,通用类:M80 --seed",),
+     "examples": ("nf run --pipeline community/技术文档域包/pipelines/"
+                  "P06_技术文档题材装配流管线.md --modules 通用类:M00,技术文档类:M97,"
+                  "技术文档类:M98,通用类:M80 --seed",),
      "actions": (
          {"key": "run", "title": "跑全链管线",
           "argv": ("run", "--pipeline", "{pipeline}", "--modules", "{modules}", "--seed"),
@@ -295,7 +299,7 @@ Intent = namedtuple("Intent", "kind payload raw")
 #: check39 与 `nf shell --verify` 共用同一判据：族分区必须恰好覆盖命令集（不缺不重不虚）。
 FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "start", "name": "上手与自检",
-     "summary": "第一次进 NF：体检、一键演示、自述数字、事实真源、抽象阶梯",
+     "summary": "第一次进 NF：体检、一键交付物演示、自述数字、事实真源、抽象阶梯",
      "commands": ("doctor", "demo", "stats", "facts", "layers")},
     {"id": "forge", "name": "装配与生产",
      "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"

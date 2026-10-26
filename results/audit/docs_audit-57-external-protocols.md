@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
-  - scripts/nf.py:3c7883f654aaaf6f324a4abeac2ff79b2031c0909504c60f13aed9dee570443f
+  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:b55ddc17efb6add08da144690d78359dc2710d404e9b7d445861cd50e092d0de
+  - llms.txt:1cf70bc2419ca5c7483f1b4684f7258e868946899b3b226398deefeae23e7396
 
 ---
+> 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
+
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

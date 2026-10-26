@@ -1,4 +1,4 @@
-# NinFenz · 文档生成工坊（规范驱动）<sub>Spec-driven documentation workshop</sub>
+# NinFenz · 交付物契约层（Deliverable Contract Layer）<sub>Spec-driven deliverable workshop</sub>
 
 [![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
 
@@ -18,6 +18,8 @@
 
 **站点（线上）**：https://ninfenz.dev · 机器入口 [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
+**30 秒交付物首屏**（人读 · 全程只读本地）：`python scripts/nf.py doctor` → `python scripts/nf.py demo`（技术文档 P06 → 可交付 Markdown）→ `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out` → `--check out/完整版_技术文档域包.md`；六步逐条见 [`docs/quickstart.md`](docs/quickstart.md)。
+
 **NF 终端（TUI）演示** —— 全屏人机入口（纯标准库）；菜单与动作是 `nf` CLI 真命令的受控调用方。
 键位按顶尖终端约定：`Tab` 切面板、`↑↓` 在当前面板内移动、`/` 过滤、`?` 看键位。
 
@@ -27,12 +29,12 @@
 <summary>演示帧文本 —— 与 `--demo` 渲染器逐字一致，便于检索/复制</summary>
 
 ```
-┌ NF TUI v1.0.0 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
+┌ NF TUI v1.0.0 · NinFenz 交付物契约层 ────────────────────────────────────────────────────────┐
 │仓库 NinFenz · 能力区 9                                           焦点 动作 · 就绪（0 项待办）│
 ├────────────────────────┬─────────────────────────────────────────────────────────────────────┤
 │  能力区 1/9            │▍ 动作 · 环境自检（2）                                               │
 │▸ 0 环境自检（2）       │❯ 只读体检   nf doctor                                               │
-│  1 一键演示世界（1）   │  体检（机器面）                                                     │
+│  1 一键交付物演示（2） │  体检（机器面）                                                     │
 │  2 需求 → 装配计划（2）│                                                                     │
 │  3 全链生产（2）       ├─────────────────────────────────────────────────────────────────────┤
 │  4 校验与体检（4）     │  输出 · 1-3/3 · 已跟随                                              │
@@ -63,9 +65,9 @@
 
 > 双许可（分层）· 代码 AGPL-3.0-only 或商业许可 · 协议文本 CC BY 4.0 · 见 `LICENSING.md`
 
-NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质量与资产标准；协议本身域中立、模型无关。
+NF 是**交付物契约层**（Deliverable Contract Layer）——把「AI 稳定产出可交付内容」定义成协议、质量与资产标准；协议本身域中立、模型无关。交付物 = 技术文档、合规清单、研究报告、规格说明、量化口径等，长内容只是其中一类。
 
-**别名与检索词**：NF · NinFenz · 宁封子 · 内容契约层（content contract layer）· 规范驱动的内容工厂 · 长内容生成协议 · 装配式内容生产 · 模块/管线/资产 · 质量门禁 · 域包 · MCP 接入。
+**别名与检索词**：NF · NinFenz · 宁封子 · 交付物契约层（deliverable contract layer）· 内容契约层（content contract layer，历史名）· 规范驱动的交付物工厂 · 可交付内容生成协议 · 装配式内容生产 · 模块/管线/资产 · 质量门禁 · 域包 · MCP 接入。
 
 **不是什么**：不是模型、不是提示词模板集、不是某厂商 SDK——协议本体域中立、模型无关；MCP 只是可对接的连接协议之一。
 
@@ -73,21 +75,23 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 
 ## ⚡ 如果你是 AI / Agent
 
-- 这是什么：规范驱动的文档工厂，装模块/管线/资产 → 校验 → 输出。
+- 这是什么：规范驱动的**交付物工厂**（技术文档/合规清单/研究报告/规格说明；叙事是其中一类域包），装模块/管线/资产 → 校验 → 输出。
 - 入口链：`docs/agent/AGENT_START.md`（开工）→ `docs/agent/AI_ROUTING.md`（选线）→ `docs/meta/DEEP_DIVE.md`（懂得深）。
 - 机器凭证：`bash verify.sh`（当前基线见下方生成区的「质量凭证」行，由 `nf stats --write` 写入）；机器入口清单见 `llms.txt`；语言面见 `README.en.md` · `README.ja.md`（三面的机读事实与语言切换行由 check34 的语言面扫描断言一致；注册表 = `protocol/locales.json`）。
 - 要懂 NF 为什么这样设计：读 [docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md)。
 
 ## 快速开始
 
-作者/开发者，5 分钟：第一跳照 [`docs/quickstart.md`](docs/quickstart.md) 的 6 步逐条复制粘贴；想一条命令自检用 `bash scripts/quickstart_check.sh`（判据：退出码 0 · 墙钟 ≤ 300 秒 · 文档步数 == 脚本步数）。
+**30 秒首屏**（交付物路径，缺省域 = 技术文档 P06；叙事域加 `demo narrative`）：
 
-1. `bash verify.sh`
-2. `python scripts/nf.py shell`（交互终端：端壳退役后的人机入口，见 `docs/terminal.md`）
-3. `python scripts/nf.py demo`
-4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
-6. `python scripts/nf.py completion bash`
+1. `python scripts/nf.py doctor`（只读体检：17/17 通过）
+2. `python scripts/nf.py demo`（技术文档全链 → 可交付 Markdown）
+3. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out`
+4. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check out/完整版_技术文档域包.md`
+5. `python scripts/nf.py shell`（交互终端；或 `bash verify.sh` 跑全量门禁，约 10 分钟）
+6. `python scripts/nf.py --help`（全命令面）
+
+一条命令自检：`bash scripts/quickstart_check.sh`（判据：退出码 0 · 墙钟 ≤ 300 秒 · 文档步数 == 脚本步数）。完整 6 步逐条复制粘贴见 [`docs/quickstart.md`](docs/quickstart.md)。
 
 > **安全边界（`nf verify` 会执行目标仓库自带的门禁脚本）**：`nf verify` 的引擎会在**本进程内**
 > 执行当前仓库 `verify.sh` 里的内嵌 Python（CWE-94 执行面）。故只有**当前运行代码所在的
@@ -107,7 +111,7 @@ AI 装配：
 
 ### 常见问题（FAQ）
 
-- **NF 是什么？** 内容契约层：把「AI 稳定产出长内容」定义成协议 + 质量门 + 资产标准，使产出可装载、可质检、可复现。
+- **NF 是什么？** 交付物契约层：把「AI 稳定产出可交付内容」定义成协议 + 质量门 + 资产标准，使产出可装载、可质检、可复现。
 - **NF 是 MCP 服务器吗？** 不是必须。协议与资产都是纯文本，克隆或直链即可装载；`nf serve` 才额外提供 MCP 接入面。
 - **支持哪些模型？** 模型无关：任何能读文本的 AI 都能按协议装配与装载，不绑定某家模型或某个连接协议。
 - **必须联网吗？** 不必。仓库本身就是 markdown 源件；`bash verify.sh` 只读本地，可离线跑。

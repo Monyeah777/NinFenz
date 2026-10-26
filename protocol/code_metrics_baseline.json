@@ -41,12 +41,12 @@
       "max_fn_lines": 22
     },
     "desktop/src/core/assemble_build.py": {
-      "lines": 337,
+      "lines": 338,
       "max_fn_cc": 22,
       "max_fn_lines": 42
     },
     "desktop/src/core/assemble_plan.py": {
-      "lines": 336,
+      "lines": 348,
       "max_fn_cc": 18,
       "max_fn_lines": 51
     },
@@ -641,12 +641,12 @@
       "max_fn_lines": 24
     },
     "desktop/src/core/library.py": {
-      "lines": 504,
+      "lines": 517,
       "max_fn_cc": 48,
       "max_fn_lines": 94
     },
     "desktop/src/core/library_entries.py": {
-      "lines": 104,
+      "lines": 122,
       "max_fn_cc": 17,
       "max_fn_lines": 37
     },
@@ -1221,7 +1221,7 @@
       "max_fn_lines": 39
     },
     "desktop/src/core/terminal.py": {
-      "lines": 2417,
+      "lines": 2421,
       "max_fn_cc": 37,
       "max_fn_lines": 89
     },
@@ -1451,9 +1451,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7701,
+      "lines": 7746,
       "max_fn_cc": 117,
-      "max_fn_lines": 1271
+      "max_fn_lines": 1276
     },
     "scripts/nf_client.py": {
       "lines": 187,
