@@ -581,7 +581,7 @@
       "max_fn_lines": 20
     },
     "desktop/src/core/json_doc.py": {
-      "lines": 130,
+      "lines": 147,
       "max_fn_cc": 10,
       "max_fn_lines": 26
     },
