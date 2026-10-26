@@ -195,6 +195,11 @@
       "max_fn_cc": 35,
       "max_fn_lines": 73
     },
+    "desktop/src/core/concept_index.py": {
+      "lines": 426,
+      "max_fn_cc": 19,
+      "max_fn_lines": 96
+    },
     "desktop/src/core/conformance_decl.py": {
       "lines": 139,
       "max_fn_cc": 25,
@@ -765,6 +770,11 @@
       "max_fn_cc": 4,
       "max_fn_lines": 7
     },
+    "desktop/src/core/model_check.py": {
+      "lines": 410,
+      "max_fn_cc": 51,
+      "max_fn_lines": 153
+    },
     "desktop/src/core/modeling.py": {
       "lines": 248,
       "max_fn_cc": 28,
@@ -1041,7 +1051,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/registry_index.py": {
-      "lines": 344,
+      "lines": 345,
       "max_fn_cc": 19,
       "max_fn_lines": 73
     },
@@ -1436,7 +1446,7 @@
       "max_fn_lines": 28
     },
     "scripts/cross_impl_check.py": {
-      "lines": 234,
+      "lines": 236,
       "max_fn_cc": 15,
       "max_fn_lines": 52
     },
@@ -1521,9 +1531,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8170,
+      "lines": 8237,
       "max_fn_cc": 122,
-      "max_fn_lines": 1392
+      "max_fn_lines": 1409
     },
     "scripts/nf_client.py": {
       "lines": 187,

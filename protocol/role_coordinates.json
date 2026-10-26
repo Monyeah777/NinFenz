@@ -3,10 +3,10 @@
     "app": 1449,
     "entry": 26,
     "floor": 6,
-    "prod": 1067,
+    "prod": 1068,
     "projection": 134,
     "support": 274,
-    "verify": 1166
+    "verify": 1172
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5795,6 +5795,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "多 agent 协作契约（T10.3）：角色=模块、交接=事件、验收=门。",
+      "path": "desktop/src/core/agent_contracts.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "登记条目带有效期（机制借鉴 openmake audit-gate.cjs:31-47）。",
       "path": "desktop/src/core/allowlist_expiry.py",
       "role": "prod",
@@ -5977,6 +5983,12 @@
     {
       "function": "概念图资产的门禁体检 + 图语义库（判据面收口，2026-09-20 作者裁决执行）。",
       "path": "desktop/src/core/concept_graph.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "资产本体索引：把 101 个域包的 `CONCEPT_GRAPH` 合并成一张可查询的本体图。",
+      "path": "desktop/src/core/concept_index.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -6577,6 +6589,12 @@
     {
       "function": "缺位哨兵：解析缺段必须显式化且判非法（机制借鉴 Yollama types/model/name.go:30-36）。",
       "path": "desktop/src/core/missing_sentinel.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "T10.1 · world_model 有限状态模型检查（不依赖 TLA+ 工具链）。",
+      "path": "desktop/src/core/model_check.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -7469,6 +7487,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "T10.3 多 agent 契约回归：两条域链 plan 形状 + 闭合负例 + CLI 面。",
+      "path": "desktop/tests/test_agent_contracts.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AGENTS/CLAUDE 出口适配器单测（v2.1.0 A1：techdoc+project_rules → AGENTS.md）。",
       "path": "desktop/tests/test_agent_rules_adapter.py",
       "role": "verify",
@@ -7807,6 +7831,12 @@
     {
       "function": "概念图健康门禁测试（check32 子扫描 `core.concept_graph` + 求值器同源校验）。",
       "path": "desktop/tests/test_concept_graph_gate.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "资产本体索引（T10.2）判据：合成 3+1 域 fixture / 真仓统计 / 篡改红。",
+      "path": "desktop/tests/test_concept_index.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8617,6 +8647,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_missing_sentinel.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T10.1 · world_model 有限状态模型检查单测。",
+      "path": "desktop/tests/test_model_check.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12977,6 +13013,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-concept-index/1",
+      "path": "protocol/concept_graph_index.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "存量耦合债登记（棘轮：只许减少；新增环/SDP 违例判 FAIL，除非评审后重登）",
       "path": "protocol/coupling_baseline.json",
       "role": "verify",
@@ -13446,7 +13488,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ff7add1852e04caf2d5ac73a7fd7cc7515892af528d14644febc25150891418e",
+  "root_digest": "810042e4ff16d5fb473c45b12172506ddb21a92dfda5212a31368b981d7b7afb",
   "rule_counts": {
     "R-app": 1449,
     "R-catch": 126,
@@ -13455,8 +13497,8 @@
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 122,
-    "R-verify": 1043,
-    "auto:R-core": 269
+    "R-verify": 1047,
+    "auto:R-core": 272
   },
   "schema": "nf-role-coordinates/1"
 }

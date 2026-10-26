@@ -3165,6 +3165,12 @@ CHECK_GUIDE = {
     "42": "缺什么：provenance 校验不过（回执单根形状坏 / 独立子进程验签失败 / 篡改未被检出）。补什么"
           "：nf receipts --scope protocol --write 重建单根；确认 nf attest --key-file 与"
           " core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
+    "43": "缺什么：契约语义规则不过（层序闭包/域隔离/门全性 FAIL）。补什么：跑 nf spec check "
+          "--core 看 rule/subject/evidence；修注册表或管线声明；不可判定项按 WARN 记录，不假装通过。",
+    "44": "缺什么：注册表 CID 与在盘索引不一致（包内文件被改/增删）。补什么："
+          "nf registry index --write 重签；确认改动是预期的，否则回滚该包文件。",
+    "45": "缺什么：内容供应链扫描出现 critical（可执行内容/明文凭据）。补什么："
+          "nf security scan 定位 file:line；删除或转义危险内容；合法安全研究样本走显式白名单。",
 }
 
 def _cmd_preset(args):

@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:0b820dd84a794de88bc6d841eb06856fba4ab9b10e36d613805380f0de087e0a
+  - protocol/code_metrics_baseline.json:12478c3386819f1dce8f7015bbbabde2c009f7bb37928402d00fd136002035d3
 ---
+> 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts
+
 > 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging
 
 > 重审（2026-10-26）：T9.2 导入器：新增 core/import_docx.py、core/import_dita.py 与 nf import docx|dita（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest

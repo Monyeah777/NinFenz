@@ -667,6 +667,18 @@
         "nf asset contract ⑤",
         "docs/asset_contract.md"
       ]
+    },
+    {
+      "id": "concept-graph-index",
+      "artifact": "protocol/concept_graph_index.json",
+      "quality_rule": "assertion:concept-index-nodes-present",
+      "owner": "概念图本体（core/concept_index.py）+ nf knowledge graph",
+      "status": "active",
+      "freshness": "重生成：nf knowledge graph --write（只读扫描 101 域概念图派生）",
+      "consumers": [
+        "nf knowledge graph --check",
+        "nf spec check --core（语义核复用）"
+      ]
     }
   ]
 }

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:0b820dd84a794de88bc6d841eb06856fba4ab9b10e36d613805380f0de087e0a
+  - protocol/code_metrics_baseline.json:12478c3386819f1dce8f7015bbbabde2c009f7bb37928402d00fd136002035d3
 ---
+> 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts
+
 > 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging
 
 > 重审（2026-10-26）：T9.2 导入器：新增 core/import_docx.py、core/import_dita.py 与 nf import docx|dita（scripts/nf.py 增长），按冻结上限重冻 code/coupling 基线；按审计协议重绑对象 digest

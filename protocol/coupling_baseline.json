@@ -87,7 +87,7 @@
       "i": 0.0
     },
     "atomic_write": {
-      "ca": 54,
+      "ca": 55,
       "ce": 0,
       "i": 0.0
     },
@@ -187,9 +187,14 @@
       "i": 0.8
     },
     "concept_graph": {
-      "ca": 2,
+      "ca": 3,
       "ce": 1,
-      "i": 0.3333
+      "i": 0.25
+    },
+    "concept_index": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
     },
     "conformance_decl": {
       "ca": 1,
@@ -207,9 +212,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 40,
+      "ca": 41,
       "ce": 6,
-      "i": 0.1304
+      "i": 0.1277
     },
     "content_face": {
       "ca": 3,
@@ -632,9 +637,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 81,
+      "ca": 82,
       "ce": 1,
-      "i": 0.0122
+      "i": 0.012
     },
     "json_schema": {
       "ca": 5,
@@ -760,6 +765,11 @@
       "ca": 1,
       "ce": 0,
       "i": 0.0
+    },
+    "model_check": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
     },
     "modeling": {
       "ca": 1,

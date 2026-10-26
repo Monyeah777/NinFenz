@@ -7,8 +7,8 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 69,
-    "receiptRoot": "347acfc44882c705c9250fd117d6d8b93b9184fc74bdae2bca3c8780410dce91",
-    "verdict": "conformant"
+    "receiptRoot": "f4ad6f732722a0e06c86769f35f99d719fd80d8092cdecd6e494d957194338b3",
+    "verdict": "non-conformant"
   },
   "issuer": "Monyeah777",
   "type": [

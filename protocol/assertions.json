@@ -514,6 +514,20 @@
       "message": "回执单根不在位或 schema 未自证（provenance 机制缺前提）",
       "fix": "跑 nf receipts --scope protocol --write 重新生成回执单根，别手改",
       "evidence": "check42 / conformance::assertions"
+    },
+    {
+      "id": "concept-index-nodes-present",
+      "severity": "warn",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/concept_graph_index.json",
+        "key": "nodes",
+        "op": "nonempty"
+      },
+      "message": "概念图本体索引缺 nodes（生成件缺失/未生成）",
+      "fix": "跑 nf knowledge graph --write 重生成索引",
+      "evidence": "nf knowledge graph --check"
     }
   ]
 }

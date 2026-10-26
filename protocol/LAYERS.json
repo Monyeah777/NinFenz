@@ -606,6 +606,10 @@
         "why": "代码度量基线重冻（--write；棘轮只增不减的显式评审动作）",
         "artifact": "protocol/code_metrics_baseline.json"
       },
+      "desktop/src/core/concept_index.py": {
+        "why": "nf knowledge graph --write：101 域概念图本体索引重生成（只读扫描派生件）",
+        "artifact": "protocol/concept_graph_index.json"
+      },
       "desktop/src/core/coupling_metrics.py": {
         "why": "耦合基线重冻（--write；同类棘轮）",
         "artifact": "protocol/coupling_baseline.json"
