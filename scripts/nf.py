@@ -915,6 +915,25 @@ def _make_parser() -> argparse.ArgumentParser:
                         help="待扫路径（文件或目录；缺省 = community/ 与 library/）")
     sec_sc.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     sec_sc.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ops = sub.add_parser("ops",
+                         help="内容 SRE：只用真实产物算 SLI/SLO（缺数据即 UNKNOWN）",
+                         description="内容 SRE 观测面（T11.1）：从既有真实产物（门禁缺陷 bench / "
+                                     "一致性报告 / 回执 / 审计 / verify 判据面 / benchmark 榜单 / "
+                                     "M2 执行记录 / 索引 root）+ 既有只读扫描器（安全扫描 / "
+                                     "modelcheck / 知识图 check）采集 SLI，逐条给 value/unit/"
+                                     "source/freshness/status∈OK|WARN|UNKNOWN；不编造、不判绿")
+    opssub = ops.add_subparsers(dest="ops_cmd", required=True)
+    ops_rep = opssub.add_parser("report", help="采集并打印 SLI/SLO 报告",
+                                description="报告：汇总 nf-ops-report/1；缺源/已知无数据如实标 "
+                                            "UNKNOWN（--no-live 跳过现场只读扫描）")
+    ops_rep.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ops_rep.add_argument("--no-live", action="store_true",
+                         help="跳过现场只读扫描（安全/modelcheck/知识图 check → UNKNOWN）")
+    ops_chk = opssub.add_parser("check", help="校验各源在场可解析（缺源 fail-closed）",
+                                description="校验：缺源/不可解析/值非法 → 非零退出；已知无数据"
+                                            "（真实模型 0 行、M2 0 条）的 UNKNOWN 不算失败")
+    ops_chk.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ops_chk.add_argument("--no-live", action="store_true", help="跳过现场只读扫描")
     dm = sub.add_parser("domain",
                         help="域包工厂（AI 品类清单工程：从一个域规格生成整套过门禁的域包）",
                         description="域包工厂：读内部域规格（.rivet/private_archive/ai_packs/specs/"
@@ -2914,7 +2933,7 @@ def _root_pair(args) -> tuple:
     """→ `(顶层命令, 二级子命令)`（`--root` 落点闸门用的分类键）。"""
     cmd = str(getattr(args, "cmd", "") or "")
     sub = ""
-    for att in ("asset_cmd", "module_cmd", "design_cmd", "registry_cmd"):
+    for att in ("asset_cmd", "module_cmd", "design_cmd", "registry_cmd", "ops_cmd"):
         val = getattr(args, att, None)
         if val:
             sub = str(val)
@@ -7781,6 +7800,54 @@ def _try_rust_face(args) -> Optional[int]:
     return 0
 
 
+def _print_ops_report(report) -> None:
+    """人读面：SLI 表 + 未覆盖面（机器面走 --json）。"""
+    counts = report.get("status_counts") or {}
+    print("== nf ops（内容 SRE · 真实产物 SLI · schema %s）==" % report.get("schema"))
+    print("  overall：%s · OK %s / WARN %s / UNKNOWN %s · window=%s"
+          % (report.get("overall"), counts.get("OK"), counts.get("WARN"),
+             counts.get("UNKNOWN"), report.get("window")))
+    print("  %-28s %-10s %-6s %-7s %s" % ("SLI", "value", "unit", "status", "source"))
+    for s in report.get("slis") or []:
+        val = "—" if s.get("value") is None else str(s.get("value"))
+        print("  %-28s %-10s %-6s %-7s %s%s"
+              % (str(s.get("id"))[:28], val[:10], str(s.get("unit"))[:6],
+                 s.get("status"), s.get("source"),
+                 ("；" + s["reason"]) if s.get("reason") else ""))
+    for u in report.get("uncovered") or []:
+        print("  [uncovered] %s" % u)
+
+
+def _cmd_ops(args) -> int:
+    """nf ops：内容 SRE（真实产物 → SLI/SLO；缺源 fail-closed，已知无数据如实 UNKNOWN）。"""
+    import json as _json
+    from core import content_ops as co
+
+    sub = str(getattr(args, "ops_cmd", "") or "")
+    live = not bool(getattr(args, "no_live", False))
+    want_json = bool(getattr(args, "json", False))
+    if sub == "report":
+        report = co.collect(ROOT, live=live)
+        if want_json:
+            print(_json.dumps({"kind": "ops-report", **report}, ensure_ascii=False,
+                              indent=2, sort_keys=True))
+        else:
+            _print_ops_report(report)
+        return 0
+    if sub == "check":
+        issues, report = co.check(ROOT, live=live)
+        if want_json:
+            print(_json.dumps({"kind": "ops-check", "issues": issues, "report": report},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            _print_ops_report(report)
+            for i in issues:
+                print("  [FAIL] %s" % i, file=sys.stderr)
+        return 1 if issues else 0
+    print("  ✗ ops 需要子命令：report / check（例：nf ops report --json）", file=sys.stderr)
+    return 2
+
+
 def _cmd_security(args) -> int:
     """nf security：内容供应链安全扫描族（T8.3；只读、离线、不执行被扫内容）。
 
@@ -7960,6 +8027,8 @@ def main(argv=None) -> int:
         return _cmd_output(args)
     if args.cmd == "security":
         return _cmd_security(args)
+    if args.cmd == "ops":
+        return _cmd_ops(args)
     if args.cmd == "domain":
         return _cmd_domain(args)
     if args.cmd == "combine":
