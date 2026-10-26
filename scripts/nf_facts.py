@@ -83,7 +83,10 @@ def _read(path: str) -> str:
 def _json(path: str) -> Any:
     try:
         with open(path, encoding="utf-8") as fh:
-            return json.load(fh)
+            doc = json.load(fh)
+        if not isinstance(doc, (dict, list)):
+            return None
+        return doc
     except Exception:                                        # noqa: BLE001 - 缺件按 issue 报
         return None
 

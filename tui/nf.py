@@ -1556,6 +1556,8 @@ def selftest(root: Path | None = None, python: str | None = None) -> tuple:
         assert res.code == 0, "nf shell --surface --json 退出码 %s：%s" % (
             res.code, (res.err or res.out or "").strip()[-200:])
         payload = json.loads(res.out)
+        assert isinstance(payload, dict), \
+            "投影 JSON 顶层不是对象：%s" % type(payload).__name__
         assert payload.get("schema") == _surface.SCHEMA, \
             "投影 schema 不一致：%s" % payload.get("schema")
         live = str(payload.get("digest") or "")
