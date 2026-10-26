@@ -874,6 +874,14 @@ def _make_parser() -> argparse.ArgumentParser:
     dm_l = dmsub.add_parser("specs", help="列出内部域规格与其状态",
                             description="列域规格：域码 / 名称 / 度量族 / 是否已建包")
     dm_l.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    dm_m = dmsub.add_parser("maturity", help="域包成熟度 M0–M3（按证据计算；--write 落盘）",
+                            description="域包成熟度：按证据逐级计算 M0 模板 / M1 机检 / M2 真实模型"
+                                        "执行 / M3 用户签收；声明位 package.maturity 不参与计算，"
+                                        "证据不足一律降级。--write 落 protocol/domain_maturity.json "
+                                        "并投影 registry protocols[].maturity")
+    dm_m.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    dm_m.add_argument("--write", action="store_true",
+                      help="落盘 protocol/domain_maturity.json 与 registry protocols[].maturity")
     dm_s = dmsub.add_parser("shells", help="派生空壳台账（域口径表：可数 + 只减不增棘轮）",
                             description="清点社区域包 DOMAIN_SPEC 的框架占位条目：逐包空壳数 / "
                                         "已填包数 / 双源（md↔json）一致性 / 与冻结基线比对（只减不"
@@ -3935,13 +3943,17 @@ def _cmd_combine(args):
 
 
 def _cmd_domain(args):
-    """nf domain：域包工厂（build / verify / specs）。"""
+    """nf domain：域包工厂（build / verify / specs / shells）+ 成熟度分级（maturity）。"""
     import json as _json
     import glob as _glob
 
     from core import domain_pack as dp
 
     sub = getattr(args, "domain_cmd", "") or "specs"
+    if sub == "maturity":
+        from core import domain_maturity as dmx
+        return dmx.run(ROOT, as_json=bool(getattr(args, "json", False)),
+                       write=bool(getattr(args, "write", False)))
     spec_dir = os.path.join(ROOT, dp.SPEC_DIR)
     codes = sorted(os.path.splitext(os.path.basename(p))[0]
                    for p in _glob.glob(os.path.join(spec_dir, "*.json")))

@@ -4,6 +4,7 @@ protocol:
   schema_version: "2"
 package:
   conformance: "L2"
+  maturity: "M1"                # 证据计算等级（nf domain maturity）：M2 未达——缺真实模型执行；声明位不参与计算
   id: 合规与监管域包
   name: 合规与监管域包
   version: "1.0.0"
@@ -35,6 +36,7 @@ package:
     date: "2026-10-26"
     artifact: "community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）"
     check_rc: 0
+    note: "缺真实模型执行：executor 为官方 assembler（工具），按判据不计 M2（M2 须真实模型标识/版本 + artifact digest 可复算）"
   mount_layers:
     P40 行为决策: {default: [合规与监管:M01], available: []}
     P60 长期演变: {default: [合规与监管:M02], available: []}

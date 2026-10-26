@@ -5,6 +5,7 @@ protocol:
   schema_version: "2"          # 引用 Schema 版本，v2 起支持 references；bump 走 01 §7 V1/V2/V3
 package:
   conformance: "L2"            # 装配可执行：自带模块在装配在册（registry protocols[].module_ids）
+  maturity: "M1"               # 证据计算等级（nf domain maturity）：M2 未达——缺真实模型执行；声明位不参与计算
   id: 量化金融域包              # 包目录名（机读唯一标识，与 02 §8 在册一致）
   name: 量化金融域包            # 显示名（与 README 标题一致）
   version: "1.1.0"             # additive 档（产出形态面：outputs/ 机验产出，见 outputs/INDEX.json 与 02 §9.5）
@@ -32,6 +33,7 @@ package:
     count: 8                    # 声明产出面件数（schema 2 / 数据 2 / 可复算 1 / 图表 2 / 图示 1）
     machine_verifiable: 8       # 其中可机验（档位 ≥ T2）件数——本包机验率见 nf output meter
     functional: 1               # 其中可复算（T4：绩效报告由净值数据重算比对）
+    note: "缺真实模型执行：本包无执行记录（M2 须真实模型标识/版本 + date + artifact digest 可复算）"
   mount_layers:                 # 挂载层声明（R3，对齐 02 §5 挂载点键名；同层 default 与既有包交集为空——类内段新编号，唯一 id）
     P40 行为决策: {default: [量化金融:M31], available: []}    # 因子口径层（读概念图与口径表；官方 M50 调度本体驻官方核心位，不搬移）
     P60 长期演变: {default: [量化金融:M32], available: []}    # 回测与绩效口径层（收口口径一致性，不含因子定义）

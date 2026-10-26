@@ -5,6 +5,7 @@ protocol:
   schema_version: "2"          # 引用 Schema 版本，v2 起支持 references；bump 走 01 §7 V1/V2/V3
 package:
   conformance: "L2"
+  maturity: "M0"                # 证据计算等级（nf domain maturity）；M1 未达：outputs/INDEX.json 缺失（产出面未在册）；声明位不参与计算
   id: 技术文档域包              # 包目录名（机读唯一标识，与 02 §8.5 在册一致）
   name: 技术文档域包            # 显示名（与 README 标题一致）
   version: "1.1.0"    # 包内容版本（v2.5.0 Wave2 版本槽位，V1 只增不删；1.1.0 = T4.1 资产+质量门纵深）
@@ -32,6 +33,7 @@ package:
     date: "2026-10-26"
     artifact: "out/*.md（nf assemble --build --dest out 产物，可重建）"
     check_rc: 0                 # nf assemble --check 退出码（0 = PASS）
+    note: "缺真实模型执行：executor 为官方 assembler（工具）且 artifact 非单个可复算文件路径，按判据不计 M2"
   mount_layers:                 # 挂载层声明（R3，对齐 02 §5 挂载点键名；同层 default 与既有包交集为空——M97/M98 是新编号唯一 id，check15 ③ 实证见反证）
     P40 行为决策: {default: [M97], available: []}    # 术语决策层：M97 维护 DocState.terms（与 M90 P90 位协作——官方 M90 挂 P90 非 P40；校园 P40 default 含 M40/情感:M22 等，与 M97 无交集）
     P60 长期演变: {default: [M98], available: []}    # 修订层：M98 维护 DocState.revision（校园 P60 default 含 M40/M65、西幻 P60 含 生存:M10 等，与 M98 无交集）

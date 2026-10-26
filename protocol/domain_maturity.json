@@ -1,0 +1,4948 @@
+{
+  "kind": "domain-maturity",
+  "levels": {
+    "M0": "模板：包目录 + protocol.yaml + README + modules 在盘（模块件数 ≥ 声明）",
+    "M1": "机检：check14/15/16/23/29/32 同源判据无 FAIL + outputs/INDEX.json 在册",
+    "M2": "真实执行：真实模型执行记录（executor 模型标识/版本 + date + artifact + check_rc=0 + digest 可复算）",
+    "M3": "用户签收：results/audit 审计记录 accepted_by+accepted_at 绑定被审对象 digest"
+  },
+  "machine_checks": [
+    14,
+    15,
+    16,
+    23,
+    29,
+    32
+  ],
+  "machine_gate": {
+    "checks": {
+      "14": {
+        "source": "gate_engine（与 verify.sh 判据逐字等价）",
+        "status": "PASS"
+      },
+      "15": {
+        "source": "gate_engine（与 verify.sh 判据逐字等价）",
+        "status": "PASS"
+      },
+      "16": {
+        "codes": [
+          0,
+          0
+        ],
+        "source": "verify.sh check16 内嵌 heredoc（进程内逐段执行 2 段）",
+        "status": "PASS"
+      },
+      "23": {
+        "source": "gate_engine（与 verify.sh 判据逐字等价）",
+        "status": "PASS"
+      },
+      "29": {
+        "source": "gate_engine（与 verify.sh 判据逐字等价）",
+        "status": "PASS"
+      },
+      "32": {
+        "source": "gate_engine（与 verify.sh 判据逐字等价）",
+        "status": "PASS"
+      }
+    },
+    "note": "机检是整仓判据（六条 check 本就是全仓扫描）：任一 FAIL ⇒ 全部包不计 M1（fail-closed，不假装逐包归因）",
+    "scope": "repo",
+    "source": "verify.sh 同源判据（gate_engine 已迁入 14/15/23/29/32 + check16 内嵌 heredoc 进程内执行）",
+    "status": "pass"
+  },
+  "note": "域包成熟度 M0–M3：按证据逐级计算（声明位 package.maturity 不参与计算；声明 > 计算 = 虚标）。口径见 core/domain_maturity.py。",
+  "packages": [
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI人力资源与招聘域包",
+      "path": "community/AI人力资源与招聘域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI保险域包",
+      "path": "community/AI保险域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI农业域包",
+      "path": "community/AI农业域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI制药与生物域包",
+      "path": "community/AI制药与生物域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI制造业域包",
+      "path": "community/AI制造业域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI医疗健康域包",
+      "path": "community/AI医疗健康域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI政务与公共事务域包",
+      "path": "community/AI政务与公共事务域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI教育域包",
+      "path": "community/AI教育域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI法律与合规域包",
+      "path": "community/AI法律与合规域包"
+    },
+    {
+      "declared": "M1",
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 6
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI系统域包",
+      "path": "community/AI系统域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI能源与电力域包",
+      "path": "community/AI能源与电力域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI金融投研与风控域包",
+      "path": "community/AI金融投研与风控域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "AI食品与餐饮域包",
+      "path": "community/AI食品与餐饮域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "三维与世界模型域包",
+      "path": "community/三维与世界模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "上下文工程与长上下文域包",
+      "path": "community/上下文工程与长上下文域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "世界书与设定库域包",
+      "path": "community/世界书与设定库域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "个人助理与日常生活域包",
+      "path": "community/个人助理与日常生活域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "交通与出行域包",
+      "path": "community/交通与出行域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "产业与商业落地域包",
+      "path": "community/产业与商业落地域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "代码与软件工程域包",
+      "path": "community/代码与软件工程域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "代码大模型域包",
+      "path": "community/代码大模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "代码审查与缺陷检测域包",
+      "path": "community/代码审查与缺陷检测域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "代码生成与补全域包",
+      "path": "community/代码生成与补全域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "企业培训与组织学习域包",
+      "path": "community/企业培训与组织学习域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "传媒与新闻域包",
+      "path": "community/传媒与新闻域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "信息抽取与结构化域包",
+      "path": "community/信息抽取与结构化域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "具身智能与机器人域包",
+      "path": "community/具身智能与机器人域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "内容分发与社区运营域包",
+      "path": "community/内容分发与社区运营域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "内容改写与风格迁移域包",
+      "path": "community/内容改写与风格迁移域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "分类与情感分析域包",
+      "path": "community/分类与情感分析域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "参数高效微调域包",
+      "path": "community/参数高效微调域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "可观测性成本与可靠性域包",
+      "path": "community/可观测性成本与可靠性域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "可解释性与审计域包",
+      "path": "community/可解释性与审计域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "合成数据生成域包",
+      "path": "community/合成数据生成域包"
+    },
+    {
+      "declared": "M1",
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": "community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）",
+          "artifact_sha256": null,
+          "check_rc": 0,
+          "date": "2026-10-26",
+          "digest_ok": false,
+          "executor": "python scripts/nf.py assemble \"自定义：AI 内容合规证据包（合规与监管域包 P98 装配）\" --check community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md",
+          "executor_kind": "tool",
+          "missing": [
+            "M2：缺真实模型执行：executor='python scripts/nf.py assemble \"自定义：AI 内容合规证据包（合规与监管域包 P98 装配）\" --check community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md' 命中工具/装配器信号 'python'（不计 M2）",
+            "M2：artifact 不是单个文件路径（含通配/说明文字）：'community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）'"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor='python scripts/nf.py assemble \"自定义：AI 内容合规证据包（合规与监管域包 P98 装配）\" --check community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md' 命中工具/装配器信号 'python'（不计 M2）",
+        "M2：artifact 不是单个文件路径（含通配/说明文字）：'community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）'"
+      ],
+      "next_level": "M2",
+      "package": "合规与监管域包",
+      "path": "community/合规与监管域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "向量库与检索管线域包",
+      "path": "community/向量库与检索管线域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "图像生成与编辑域包",
+      "path": "community/图像生成与编辑域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "图像生成与视觉创作域包",
+      "path": "community/图像生成与视觉创作域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "图像生成与视觉设计域包",
+      "path": "community/图像生成与视觉设计域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "多智能体协同域包",
+      "path": "community/多智能体协同域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "多模态大模型域包",
+      "path": "community/多模态大模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "多语翻译与本地化域包",
+      "path": "community/多语翻译与本地化域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "多轮对话与角色扮演域包",
+      "path": "community/多轮对话与角色扮演域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "大语言模型域包",
+      "path": "community/大语言模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "安全与对齐域包",
+      "path": "community/安全与对齐域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "对话与客服域包",
+      "path": "community/对话与客服域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "对齐与偏好优化域包",
+      "path": "community/对齐与偏好优化域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "嵌入与检索表示域包",
+      "path": "community/嵌入与检索表示域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "平台与基础设施域包",
+      "path": "community/平台与基础设施域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "建筑与房地产域包",
+      "path": "community/建筑与房地产域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "开源与开发者生态域包",
+      "path": "community/开源与开发者生态域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "强化学习与决策域包",
+      "path": "community/强化学习与决策域包"
+    },
+    {
+      "declared": "M0",
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": false,
+          "missing": [
+            "M1：outputs/INDEX.json 缺失（community/技术文档域包/outputs/INDEX.json）"
+          ],
+          "ok": false,
+          "outputs": 0
+        }
+      },
+      "maturity": "M0",
+      "misdeclared": false,
+      "missing": [
+        "M1：outputs/INDEX.json 缺失（community/技术文档域包/outputs/INDEX.json）"
+      ],
+      "next_level": "M1",
+      "package": "技术文档域包",
+      "path": "community/技术文档域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "推理优化与加速域包",
+      "path": "community/推理优化与加速域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "推理服务与部署域包",
+      "path": "community/推理服务与部署域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "推荐排序与广告域包",
+      "path": "community/推荐排序与广告域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "提示工程与指令设计域包",
+      "path": "community/提示工程与指令设计域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "提示工程与提示模板域包",
+      "path": "community/提示工程与提示模板域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "搜索与信息聚合域包",
+      "path": "community/搜索与信息聚合域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "摘要与信息压缩域包",
+      "path": "community/摘要与信息压缩域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数字人与虚拟形象域包",
+      "path": "community/数字人与虚拟形象域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数学与形式化推理域包",
+      "path": "community/数学与形式化推理域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数据分析与决策支持域包",
+      "path": "community/数据分析与决策支持域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数据分析与表格理解域包",
+      "path": "community/数据分析与表格理解域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数据标注与标注质量域包",
+      "path": "community/数据标注与标注质量域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "数据采集与清洗域包",
+      "path": "community/数据采集与清洗域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "文旅与酒店域包",
+      "path": "community/文旅与酒店域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "文本生成与创作域包",
+      "path": "community/文本生成与创作域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "文档解析与版面理解域包",
+      "path": "community/文档解析与版面理解域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "智能体与工作流编排域包",
+      "path": "community/智能体与工作流编排域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "智能体框架与工具调用域包",
+      "path": "community/智能体框架与工具调用域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "机器翻译与本地化域包",
+      "path": "community/机器翻译与本地化域包"
+    },
+    {
+      "declared": "M0",
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 9,
+          "modules_declared": 9,
+          "ok": true
+        },
+        "M1": {
+          "index": false,
+          "missing": [
+            "M1：outputs/INDEX.json 缺失（community/校园情感领域包/outputs/INDEX.json）"
+          ],
+          "ok": false,
+          "outputs": 0
+        }
+      },
+      "maturity": "M0",
+      "misdeclared": false,
+      "missing": [
+        "M1：outputs/INDEX.json 缺失（community/校园情感领域包/outputs/INDEX.json）"
+      ],
+      "next_level": "M1",
+      "package": "校园情感领域包",
+      "path": "community/校园情感领域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": false,
+          "missing": [
+            "M1：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）"
+          ],
+          "ok": false,
+          "outputs": 0
+        }
+      },
+      "maturity": "M0",
+      "misdeclared": false,
+      "missing": [
+        "M1：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）"
+      ],
+      "next_level": "M1",
+      "package": "校园西幻轻混组合包",
+      "path": "community/校园西幻轻混组合包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "模型运营与成本域包",
+      "path": "community/模型运营与成本域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "测试与用例生成域包",
+      "path": "community/测试与用例生成域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "游戏与互动娱乐域包",
+      "path": "community/游戏与互动娱乐域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "版权与知识产权域包",
+      "path": "community/版权与知识产权域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "物流与供应链域包",
+      "path": "community/物流与供应链域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "监督微调域包",
+      "path": "community/监督微调域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "知识管理与检索增强域包",
+      "path": "community/知识管理与检索增强域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "知识问答与检索增强域包",
+      "path": "community/知识问答与检索增强域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "科研与实验域包",
+      "path": "community/科研与实验域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "端侧与边缘小模型域包",
+      "path": "community/端侧与边缘小模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "红队越狱与安全测试域包",
+      "path": "community/红队越狱与安全测试域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 0,
+          "modules_declared": 0,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 9
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
+          "missing": [
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
+      ],
+      "next_level": "M2",
+      "package": "组合包-受监管行业",
+      "path": "community/组合包-受监管行业"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 0,
+          "modules_declared": 0,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 9
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
+          "missing": [
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
+      ],
+      "next_level": "M2",
+      "package": "组合包-数据管线",
+      "path": "community/组合包-数据管线"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 0,
+          "modules_declared": 0,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 9
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
+          "missing": [
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
+      ],
+      "next_level": "M2",
+      "package": "组合包-检索栈",
+      "path": "community/组合包-检索栈"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 0,
+          "modules_declared": 0,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 9
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
+          "missing": [
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
+      ],
+      "next_level": "M2",
+      "package": "组合包-轻混与保险",
+      "path": "community/组合包-轻混与保险"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "编辑校对与出版域包",
+      "path": "community/编辑校对与出版域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 14,
+          "modules_declared": 14,
+          "ok": true
+        },
+        "M1": {
+          "index": false,
+          "missing": [
+            "M1：outputs/INDEX.json 缺失（community/西幻生存领域包/outputs/INDEX.json）"
+          ],
+          "ok": false,
+          "outputs": 0
+        }
+      },
+      "maturity": "M0",
+      "misdeclared": false,
+      "missing": [
+        "M1：outputs/INDEX.json 缺失（community/西幻生存领域包/outputs/INDEX.json）"
+      ],
+      "next_level": "M1",
+      "package": "西幻生存领域包",
+      "path": "community/西幻生存领域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "视觉模型域包",
+      "path": "community/视觉模型域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "视频生成与剪辑域包",
+      "path": "community/视频生成与剪辑域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "视频生成与理解域包",
+      "path": "community/视频生成与理解域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "视频生成与自动剪辑域包",
+      "path": "community/视频生成与自动剪辑域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "角色扮演与角色卡域包",
+      "path": "community/角色扮演与角色卡域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "记忆体与个性化域包",
+      "path": "community/记忆体与个性化域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "评测与基准域包",
+      "path": "community/评测与基准域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "评测基准与排行榜域包",
+      "path": "community/评测基准与排行榜域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "语音合成与配音域包",
+      "path": "community/语音合成与配音域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "语音识别与合成域包",
+      "path": "community/语音识别与合成域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "语音转写与会议记录域包",
+      "path": "community/语音转写与会议记录域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 4,
+          "modules_declared": 4,
+          "ok": true
+        },
+        "M1": {
+          "index": false,
+          "missing": [
+            "M1：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）"
+          ],
+          "ok": false,
+          "outputs": 0
+        }
+      },
+      "maturity": "M0",
+      "misdeclared": false,
+      "missing": [
+        "M1：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）"
+      ],
+      "next_level": "M1",
+      "package": "通用核心基础包",
+      "path": "community/通用核心基础包"
+    },
+    {
+      "declared": "M1",
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 8
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "量化金融域包",
+      "path": "community/量化金融域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "长文本与小说创作域包",
+      "path": "community/长文本与小说创作域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "隐私与数据治理域包",
+      "path": "community/隐私与数据治理域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "零售与电商域包",
+      "path": "community/零售与电商域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "音频与音乐生成域包",
+      "path": "community/音频与音乐生成域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "音频音乐与语音域包",
+      "path": "community/音频音乐与语音域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "预测异常与风险域包",
+      "path": "community/预测异常与风险域包"
+    },
+    {
+      "declared": null,
+      "declared_valid": true,
+      "evidence": {
+        "M0": {
+          "missing": [],
+          "module_docs": 2,
+          "modules_declared": 2,
+          "ok": true
+        },
+        "M1": {
+          "index": true,
+          "missing": [],
+          "ok": true,
+          "outputs": 10
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": "unknown",
+          "missing": [
+            "M2：缺真实模型执行：executor 缺失",
+            "M2：执行日期非法（须 YYYY-MM-DD）：''",
+            "M2：artifact 缺失",
+            "M2：check_rc 缺失或非整数"
+          ],
+          "ok": false
+        }
+      },
+      "maturity": "M1",
+      "misdeclared": false,
+      "missing": [
+        "M2：缺真实模型执行：executor 缺失",
+        "M2：执行日期非法（须 YYYY-MM-DD）：''",
+        "M2：artifact 缺失",
+        "M2：check_rc 缺失或非整数"
+      ],
+      "next_level": "M2",
+      "package": "预训练与继续预训练域包",
+      "path": "community/预训练与继续预训练域包"
+    }
+  ],
+  "schema": "nf-domain-maturity/1",
+  "summary": {
+    "M0": 5,
+    "M1": 106,
+    "M2": 0,
+    "M3": 0,
+    "misdeclared": 0,
+    "total": 111,
+    "unrated": 0
+  }
+}
