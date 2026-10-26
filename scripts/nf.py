@@ -212,15 +212,22 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     spc = sub.add_parser("spec",
-                         help="Spec Registry 查询（v2.5.0 Wave3）+ 契约语义可判定（T7.1）",
- description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）；T7.1 增契约语义核心："
-             "`nf spec check --core [--json]`（五概念模型 + W1 层序闭包 / W2 域隔离 / W3 门全性）"
-             "与 `nf spec canonical [--json]`（registry 子集规范形 SHA256，幂等）")
-    spc.add_argument("action", nargs="?", default="ls", choices=["ls", "check", "canonical"],
-                     help="动作：ls 列 spec 版本清单 / check 契约语义三规则 / canonical 规范形摘要")
+                         help="Spec Registry 查询（v2.5.0 Wave3）+ 契约语义可判定（T7.1/T10.1）",
+ description="Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）；T7.1 契约语义核心："
+             "`nf spec check --core [--json]`（五概念模型 + W1/W2/W3）与 "
+             "`nf spec canonical [--json]`（registry 子集规范形 SHA256，幂等）；"
+             "T10.1 形式化模型检查：`nf spec modelcheck [--json] [--max-states N]`"
+             "（world_model 相位图 BFS：可达性/确定性/不变式/死锁/槽位）")
+    spc.add_argument("action", nargs="?", default="ls",
+                     choices=["ls", "check", "canonical", "modelcheck"],
+                     help="动作：ls 列 spec 版本清单 / check 契约语义三规则 / canonical 规范形摘要 / "
+                          "modelcheck world_model 有限状态检查")
     spc.add_argument("--core", action="store_true",
                      help="check 的语义核心范围 = 官方核心 + 包登记面（本轮仅实现 --core）")
     spc.add_argument("--json", action="store_true", help="结构化 JSON 输出")
+    spc.add_argument("--max-states", dest="max_states", type=int, default=None,
+                     metavar="N",
+                     help="modelcheck 的 BFS 状态上限（缺省 256；超限 exit 2 不假装通过）")
     spc.add_argument("--registry", default=None,
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
@@ -2048,8 +2055,13 @@ def _cmd_import_ir(args, fmt: str, rest: list) -> int:
 
 
 def _cmd_spec(args) -> int:
-    """nf spec：ls（Spec Registry 查询）｜check（契约语义三规则）｜canonical（规范形）。"""
+    """nf spec：ls｜check（契约语义三规则）｜canonical（规范形）｜modelcheck（相位图模型检查）。"""
     action = getattr(args, "action", None) or "ls"
+    if action == "modelcheck":
+        from core import model_check as mc
+        limit = getattr(args, "max_states", None)
+        return mc.run(ROOT, max_states=int(limit) if limit else mc.DEFAULT_MAX_STATES,
+                      as_json=bool(getattr(args, "json", False)))
     if action == "check":
         from core import contract_semantics as cs
         return cs.run_check(ROOT, core_only=bool(getattr(args, "core", False)),
