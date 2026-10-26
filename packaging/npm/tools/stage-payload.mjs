@@ -72,6 +72,18 @@ function sourceCommit() {
   return r.status === 0 ? String(r.stdout).trim() : 'unknown';
 }
 
+//: 可复现构建不能读墙钟。SOURCE_DATE_EPOCH 可显式覆盖；否则取源提交时间。
+//: 这样同一提交、同一源树在独立构建中得到逐字节一致的 payload 清单。
+function sourceEpoch() {
+  const env = process.env.SOURCE_DATE_EPOCH;
+  if (env && /^\d+$/.test(env)) return Number(env);
+  const r = spawnSync('git', ['show', '-s', '--format=%ct', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  return r.status === 0 && /^\d+$/.test(String(r.stdout).trim())
+    ? Number(String(r.stdout).trim())
+    : 0;
+}
+
 //: 工作树是否有**未提交的受跟踪改动**（A1）。null = 判不了（无 git）——不据此拒绝。
 function worktreeDirty() {
   const r = spawnSync('git', ['status', '--porcelain', '--untracked-files=no'],
@@ -123,6 +135,7 @@ entries.sort(function (a, b) { return a.path < b.path ? -1 : (a.path > b.path ? 
 const h = crypto.createHash('sha256');
 for (const e of entries) h.update(e.path + '\u0000' + e.sha256 + '\n');
 const tree = h.digest('hex');
+const epoch = sourceEpoch();
 
 const manifest = {
   schema: 'nf-npm-payload/1',
@@ -130,7 +143,8 @@ const manifest = {
   cli_version: cli,
   source_commit: sourceCommit(),
   worktree_dirty: dirty === true,
-  generated_at: new Date().toISOString(),
+  source_date_epoch: epoch,
+  generated_at: new Date(epoch * 1000).toISOString(),
   count: count,
   total_bytes: total,
   tree_sha256: tree,

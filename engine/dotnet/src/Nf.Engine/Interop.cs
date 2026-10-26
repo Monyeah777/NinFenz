@@ -1537,11 +1537,14 @@ public static class PurityTables
         (new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["yaml"] = "PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
+            ["scripts"] = "同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
         },
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["jsonschema"] = "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
             ["PySide6"] = "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+            ["cyclonedx"] = "SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
+            ["rdflib"] = "SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
             ["nf_pyengine"] = "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；" +
                               "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
             ["laya"] = "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",

@@ -51,3 +51,56 @@ jobs:
             .artifacts/
             *.log
           if-no-files-found: ignore
+
+  npm-surface:
+    name: npm-runtime-surface
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://registry.npmjs.org
+      - name: 发布包不得静默新增运行时依赖或 lifecycle script
+        working-directory: packaging/npm
+        run: |
+          node - <<'NODE'
+          const pkg = require('./package.json');
+          const deps = Object.keys(pkg.dependencies || {});
+          const scripts = Object.keys(pkg.scripts || {}).filter(
+            key => ['preinstall', 'install', 'postinstall'].includes(key));
+          if (deps.length) {
+            console.error('unregistered npm runtime dependencies:', deps);
+            process.exit(1);
+          }
+          if (scripts.length) {
+            console.error('install-time lifecycle scripts:', scripts);
+            process.exit(1);
+          }
+          console.log('npm runtime dependency surface: zero; install scripts: none');
+          NODE
+          npm ls --omit=dev --all
+
+  rust-audit:
+    name: rust-lockfiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 安装固定版 cargo-audit
+        run: cargo install cargo-audit --locked --version 0.22.2
+      - name: 审计三份 Rust 锁文件
+        run: |
+          for lock in engine/rust/Cargo.lock engine/rust/fuzz/Cargo.lock engine/rust/pyo3/Cargo.lock; do
+            echo "auditing $lock"
+            cargo audit --file "$lock"
+          done

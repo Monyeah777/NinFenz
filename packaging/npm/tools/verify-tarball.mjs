@@ -46,6 +46,11 @@ if (idx >= 0 && args[idx + 1]) {
     console.error('\u2717 指定的 tarball 不在场：' + tarball);
     process.exit(2);
   }
+  // 解包基准目录始终是本次临时目录；显式传入的 tarball 先复制进来，
+  // 避免跨盘 `tar -C` 与 GNU/BSD 参数语义差异。
+  const copy = path.join(tmp, path.basename(tarball));
+  if (path.resolve(copy) !== path.resolve(tarball)) fs.copyFileSync(tarball, copy);
+  tarball = copy;
 } else {
   // Windows 上 npm 是 .cmd 垫片：必须经 shell 才能 spawn（Node 对 .cmd 直接 spawn 返 EINVAL）。
   // 传**单个命令串**而不是「shell:true + 参数数组」，避开 DEP0190（参数不转义的告警）。

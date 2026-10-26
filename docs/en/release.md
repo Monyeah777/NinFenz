@@ -2,6 +2,20 @@
 > ⛔ Operating instruction: this file is the **human-readable projection** of the release policy. The machine source is `protocol/release_policy.json` (validated against `protocol/schema/release.schema.json`); the machine-checked preflight is check38's `release_gate` sub-scan. Read it and run it.
 > 最后更新：2026-10-11 (last updated)
 
+## Reproducible artifacts and provenance
+
+The npm release no longer ends with an unarchived tarball produced by an ad-hoc `npm pack`. A tag
+or an explicit attestation run calls `packaging/npm/tools/build_release.py`, builds the same tree
+twice, compares every byte, and emits the deterministic tarball, CycloneDX 1.6 and SPDX 3.0
+JSON-LD SBOMs, payload manifest, `SHA256SUMS`, release metadata, and a GitHub OIDC
+build-provenance attestation. The publish job consumes the tarball from that build job, and the
+GitHub Release ships the same tarball, SBOMs, checksums, and metadata.
+
+Consumer commands, supplier policy, and the threat model are in
+[supply-chain-security.md](../supply-chain-security.md). The workflow has the hosted build and
+authenticated provenance capabilities needed for SLSA Build L2; an L2 evidence claim exists only
+for a concrete tag/attestation run that successfully produced and stored the attestation.
+
 ## What this solves
 
 Release steps used to live in four places — `nf release` (preflight), the former golden-master snapshot script (retired 2026-10-11), `scripts/bump_verify.sh` (version relabeling) and a manual checklist — while the **order** and the **preconditions** existed only in prose. Two mechanisms from top-tier peers were adopted: **config-as-contract** (policy in `protocol/release_policy.json` + its JSON Schema, like release-please's `$schema` pattern) and **change collection** (`changes/unreleased/*.md`, like changesets).

@@ -40,7 +40,7 @@ WEIGHTS_REL = "protocol/check12_weights.json"
 SHARD_TIMEOUT_S = float(os.environ.get("NF_SHARD_TIMEOUT", "1800"))
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
 SERIAL_MODULES = frozenset({
-    "test_atomic_write", "test_daemon",
+    "test_atomic_write", "test_daemon", "test_npm_package", "test_release_artifacts",
     # 2026-10-19 复核：串行段一度扩到 9 个模块，结果串行段本身成了 367 s 的新瓶颈（j24 实测
     # 最大片 = 367 s）。逐条回看取证后发现：schema_lint / governance / quality_depth 那一族的
     # 红，全部发生在**工作树不干净**的跑次上（报告/回执/一致性面被判过期），不是读写竞争。
