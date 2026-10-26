@@ -1,0 +1,5343 @@
+{
+  "algorithm": {
+    "canonical": "json-sort-keys+compact+utf-8",
+    "cid": "sha256",
+    "path": "pack-relative posix，按码点序"
+  },
+  "entries": [
+    {
+      "cid": "655ae4882cafb00a7461bda7f3ec2c70c076971c089a1ab3206a9f2e88a5eb67",
+      "files": [
+        [
+          "README.md",
+          "7104f921b3a6db1897eb425348f3e7a0f4fe48c5d7a6505e26bc1feb3a9c3b27"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "2271ee182963c185e7390d1729b8c64f6912ea0bf2aec216d3673fb28bdb7c5e"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "b15e5a34e9b1bfcb3f32f14861c99c0f5d958af3d764ca53651f47320b379c84"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2aa18356a1794a4b412dd103da0d7e21368c1e8ffd67a409751ba116f39d4f09"
+        ],
+        [
+          "assets/provenance.json",
+          "a398dc3a3959c1c1b413fcda87edde2a45b23c96f9015ca37977623eb768607b"
+        ],
+        [
+          "modules/D14a_AI人力资源与招聘口径登记.md",
+          "aee59f622046bd1023d6358deaf3cfd497bd24d945549d440fe690e80f22fa9c"
+        ],
+        [
+          "modules/D14b_AI人力资源与招聘收口与形态派生.md",
+          "a1e997eeea556d69654eac19518c8fae5c25ebd7d60f07c56641a7bc6be3d3bd"
+        ],
+        [
+          "pipelines/P133_AI+人力资源与招聘装配流管线.md",
+          "cf2ddbddb972e5e9ae7fb799225b49b99e9ce3779c6741aaa56f54e38b5c30e9"
+        ],
+        [
+          "protocol.yaml",
+          "b0cf5ef74be21ea42e5d313fddf3f5c6426a2a477f5141f6ca88337ddce24dc7"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI人力资源与招聘域包",
+      "path": "community/AI人力资源与招聘域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "2ac6187004fc581531e82de17c039f3e175067e62e5ada5fda193de428c7a172",
+      "files": [
+        [
+          "README.md",
+          "dcab2d8e145e1481a7dbaaea1b98958779a08942a4ea04ee5984fc38394e7b6d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "91e125b47fe9146c6279bf74e82ea76ba0547bb608abc684cc8e187b502d9833"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "0e391ca5c06eb17fcbf5309fb0310818f33978593aff7f5e72ca5c5223fa8eef"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "e222561f622b10b0651ed976b197212829384c7d47f99b2441a002929b16b4d4"
+        ],
+        [
+          "assets/provenance.json",
+          "5c8382faaa64d5a908f5abf9dd6b6ae46bd6fa00fd89bb96219836d9acfc178c"
+        ],
+        [
+          "modules/D05a_AI保险口径登记.md",
+          "dd99dcee5856ba5a0bbcd59e842753ab1e61bc68508217893c8542a5eea010be"
+        ],
+        [
+          "modules/D05b_AI保险收口与形态派生.md",
+          "691162912ab500f7058e2d78665d3f02d5c7dad97f636697d547f8afa96c7f35"
+        ],
+        [
+          "pipelines/P127_AI+保险装配流管线.md",
+          "f9a41d4080bb26af604204e6770fe0e8b76c87861a13d5c2d3a2b6a18a41a806"
+        ],
+        [
+          "protocol.yaml",
+          "088afffdac71adebf11dfd2fd6f56704ffcdb35db068e78ee293f11c62b669dc"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI保险域包",
+      "path": "community/AI保险域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "506929c3a05cc6420574266c264a0e54c4f0c24e8536574ec8c6e9f6b372480b",
+      "files": [
+        [
+          "README.md",
+          "5f9c6358fc72be72055d046e953b4995772394cd58f1397ac4d61381ff7c342c"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "3b4b1706b1b89484ffa6a7a815c39ebc3e75e04afb5c865e30784aee40fde638"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "14619a6b5b00568320301acfe15ccdc6213239777b3ef60816e4a43348f50223"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "7897712b69b6a55a5297824a9bdf8239559f03848046479f10b871933489d689"
+        ],
+        [
+          "assets/provenance.json",
+          "2be324046477fd5bc288322352ddf1b14d26fc0c758231a43f4fe2357b59de7e"
+        ],
+        [
+          "modules/D10a_AI农业口径登记.md",
+          "579cdab65b9ed2870d96bc2a4f09b26c791bf648eb8410fc6a782325ed155b14"
+        ],
+        [
+          "modules/D10b_AI农业收口与形态派生.md",
+          "fb4bff1bd02aae1aa41dcaedcba11be7e6ef45ec4464d5e3768a1af0a8123d6b"
+        ],
+        [
+          "pipelines/P132_AI+农业装配流管线.md",
+          "2d1c650c6b8863a466e860f6b7037dd8cde970089162378fd737ca9b8b773433"
+        ],
+        [
+          "protocol.yaml",
+          "21aa1b9ac9268ea11c9659e295fa50a8b88529681e18a4e57be5d5417841a6ac"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI农业域包",
+      "path": "community/AI农业域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "78c538296e345b8e0b1b0bd0d4d16ec29e09dffdfcf9e1c94a881d1a2b64ab2a",
+      "files": [
+        [
+          "README.md",
+          "ec970b415ca0d5d7f16184e82786b1806e27305048fc82bdef063d2de7c355fe"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "146ab226450b7f65e02fbc5af39d7759bb00f70728bd3c241a536928498bc2ec"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "030aa157925ad9dd33aa40d425efc78e4403edadbc474c8cb2784dca45375df0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6aae10694e15578a30a626f2155c36c21283c6c08a8f0ca6260b3edae3ce5b4d"
+        ],
+        [
+          "assets/provenance.json",
+          "bcabc8e54b2262ae18175b3c759d7b3991f5ea87199dbfec65febf6d5cf6755f"
+        ],
+        [
+          "modules/D02a_AI制药与生物口径登记.md",
+          "e741c485a46d7c3aae4ac63c3458d9530cc1beae4f41e6b5968dc4700ae333ee"
+        ],
+        [
+          "modules/D02b_AI制药与生物收口与形态派生.md",
+          "66dfb2b3f5e04f6cb567ec5b6cc3ebb3bffafd735ebf883bb29aaba4847387c0"
+        ],
+        [
+          "pipelines/P124_AI+制药与生物装配流管线.md",
+          "77658a9bd14f1bfbde8007cad39e78134da14fa977bd807a0297b91fbe851cd3"
+        ],
+        [
+          "protocol.yaml",
+          "98b5b6e360978b44f74916c9c6831fa90f9a41f23fc3ec49ace85770bf7b790c"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI制药与生物域包",
+      "path": "community/AI制药与生物域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6087e6e4a2bdacf63d78ef9e80abd0a4f23fc817207382174ec2a123688f521b",
+      "files": [
+        [
+          "README.md",
+          "50f4009e93190166535be377438668f54c0b8ef7a42087d929bdbc231a19bccf"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "227a713c51aacdeb613a9b4b3de6bfd500a2ad7c19b47125c0bd87912c6c7dd1"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ca834d5ba201c1b75f837668f7f3ee236372358191b3b1f2516845ed5f9f3dbe"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2f6b04cef18ac612f0b585595b50109970346bfd5b0bf953e387d0c6fe7f7d76"
+        ],
+        [
+          "assets/provenance.json",
+          "c3dae1c51ba1c162b1180e57505693c5af42888f73e7078daff157c69c725cac"
+        ],
+        [
+          "modules/D08a_AI制造业口径登记.md",
+          "e139c7fec1e2641d5805ce342e7607457880bb4b11b216b7f5ff631842bd4a6a"
+        ],
+        [
+          "modules/D08b_AI制造业收口与形态派生.md",
+          "8697c179bf1b51c0d16f93bf87048c2a320012ba3bfb462d9a39a2b2d49a1850"
+        ],
+        [
+          "pipelines/P130_AI+制造业装配流管线.md",
+          "cc7593260fb89c60d15d9889334fbdd61695864040c588a917e4634f31e89165"
+        ],
+        [
+          "protocol.yaml",
+          "f05fb4586b97e107b756344963d5a0392e366eedcb61ededa44b0ac5ed0bb1e3"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI制造业域包",
+      "path": "community/AI制造业域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "ef1d82fa1737b8d26acda852abb215e6eb653d7d94f31ac12b11e0ef192b7aef",
+      "files": [
+        [
+          "README.md",
+          "eb76d57823f9b187c168f5dec2b5cfe62703c1e144cdeca7e35aeda572d4d4ac"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "80004f129e4608946e05f3bcaae19bfcf9635a9a9fc1ba0751edd45a13d24cbc"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "448aa12e40864d1846d7d8f9d3b9ca4d30a0df86d7c46e1e5df98fec61deaf57"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "3a078b386c7698b4bbbc740b69d4c8123b37bf274b4498b204bb45275c678c54"
+        ],
+        [
+          "assets/provenance.json",
+          "3f5f6395712a6ab4073cffb5d9ebc9db99ac088c03a52b0fc45c23043d0da310"
+        ],
+        [
+          "modules/D01a_AI医疗健康口径登记.md",
+          "00f69dc81d56d20b257f17beb843b09030896d174aec442833b6a6e086bfa053"
+        ],
+        [
+          "modules/D01b_AI医疗健康收口与形态派生.md",
+          "6b1105806e98d0c4685a80c7de9a08f05d43f533c14b8d703421375780b44b89"
+        ],
+        [
+          "pipelines/P123_AI+医疗健康装配流管线.md",
+          "8ae2ce86ec57947bcf448344131ab2a87ef81ff8c5b36ceb023944fef6f18d9e"
+        ],
+        [
+          "protocol.yaml",
+          "f10c7cc577311353585ded26e7397a452566dbc50e36edb252dda9eb2be80dac"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI医疗健康域包",
+      "path": "community/AI医疗健康域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "1638fab53b1a888677cb9b601fc0c540874a365907bb716a65da595312516657",
+      "files": [
+        [
+          "README.md",
+          "6f9e361dfb0c870136d4d113086c3b1f2b90c2d44486ce76dfd3f77d8cf57a57"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "15e86a51a3f810eddeb1608275559b9227524f7972e7a4a18adbad8ff429e21f"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "5a7398d2bc7fdafa7835ceefee9849264b233736837121bd4dca7906e7d2b8c8"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "d13c50837084cc504c6619b873c2ec07426fdd85abd86bca1843a6a5daab4507"
+        ],
+        [
+          "assets/provenance.json",
+          "51cae1f20843fa7a081d2b994ad097772727a39782addfe3ed6a12d3348760f2"
+        ],
+        [
+          "modules/D07a_AI政务与公共事务口径登记.md",
+          "a2ab7a38f295adf6fbb717575c3d1e22023222dd84b8ce77276d2f33c7da36ed"
+        ],
+        [
+          "modules/D07b_AI政务与公共事务收口与形态派生.md",
+          "9829b6f089c9b7469365014db0fcf98688cc68781f1dfb87a1c9a1d80a3b9707"
+        ],
+        [
+          "pipelines/P129_AI+政务与公共事务装配流管线.md",
+          "4b695cabe510e51962a146b16e1b97eb2d6eac1532f8fcfb0ab76344da1aa2a1"
+        ],
+        [
+          "protocol.yaml",
+          "0b2c5eeda4aa4bf2abb97f6ea891f04d9823e35a47763bfa199602d74d80cac4"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI政务与公共事务域包",
+      "path": "community/AI政务与公共事务域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "8893513b081d5348463a50d7a4999b0a73990fd5ae11b3d557d5cc06be631220",
+      "files": [
+        [
+          "README.md",
+          "d7270da0bf49c08247213b713fe808646f102e312dca73805178e105e2e948e6"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e014e0caaf61199f27628eedeb14cf26f1616f550099990b4947db4aa8cef2ad"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "d9087a3eff8c3152dd36bb4d8d00d5e1a898e9994a7ea60477d325c9861b683d"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "bfb13ab54960058de88e24a765c3e663c5edb78d526dc398402f200938cb9018"
+        ],
+        [
+          "assets/provenance.json",
+          "a853f5b4a4f52804accdae39007ab261007a5e90bac1d48d8fd1e5591f4514cb"
+        ],
+        [
+          "modules/D06a_AI教育口径登记.md",
+          "725dcf5be5705b746923e123c22a0fe0c5a9325a2ba3ea0488bb2b06ffb852b7"
+        ],
+        [
+          "modules/D06b_AI教育收口与形态派生.md",
+          "9c3aa50ebac73c1ffb49739fd05d964977f41a6416ec36ead1e5eb6350bcacf2"
+        ],
+        [
+          "pipelines/P128_AI+教育装配流管线.md",
+          "cd75f9bb36d39394de2da1f837b8763d823ecf396914b6593cea9aac77a01b26"
+        ],
+        [
+          "protocol.yaml",
+          "9aaf07cce4262b8c30acdfc308a3aa6a7b88c80a640a0956ee6e2a9deae6c1ad"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI教育域包",
+      "path": "community/AI教育域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6a5a657d2cc1f1dfa5aee78492392171cc9f7defde515ed386c6071dd7731c6e",
+      "files": [
+        [
+          "README.md",
+          "fb008a21ac0530e188871d4b7b9b8501b552291cfa0fb4f37a81b9533aab058c"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "ac12b6af524121be8c5c64bedf2e8b8f56a467fff9b98d4561cd204be2f62868"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "efc8881a9a7c4e3e10e320352bf0929c128daa583d5c8e2fadcb7bc50ad1575a"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "a32b8aebf9193c6606cb1417c1835e867bbe385d03e3fd346214581473d6b627"
+        ],
+        [
+          "assets/provenance.json",
+          "1622eb2cdfae77c60f928ca4796990e3967610b7b623175b059fcbbb0d4df85b"
+        ],
+        [
+          "modules/D03a_AI法律与合规口径登记.md",
+          "4bf7af07de5c20655f2f60a22dfb54abee4926fd6e4ae893a6fa2f324c22567e"
+        ],
+        [
+          "modules/D03b_AI法律与合规收口与形态派生.md",
+          "ad3d3c1111a2159a836f7e0673265175b36cbe5ba3e5ef7eb6f7ee882c2e2fb4"
+        ],
+        [
+          "pipelines/P125_AI+法律与合规装配流管线.md",
+          "3c87c34ab098149ce67e43dfded7e003e3dabbe82efa535ae64d9aa6cca90b44"
+        ],
+        [
+          "protocol.yaml",
+          "0ce971e3ad649fe2c9f60bb481ed52105944c1d5342e227def03ab2c85a1a868"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI法律与合规域包",
+      "path": "community/AI法律与合规域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "7d65ce16774039b80bdcde3d687851ec7e5301188184ada63a62075e11602c2e",
+      "files": [
+        [
+          "README.md",
+          "48c226f7f7bc8378ca9d6bf8d86c3673aefd05cdb5e3409e155eb9d283127d83"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "bd666baaf1bc9eccc0fbd319c37e922f2dc5abba09020003e74a1ec41c321894"
+        ],
+        [
+          "assets/provenance.json",
+          "ce0032d2167dcd6c4f2f0bf6dc7f7f34be4db8594a2a33c2e06178dd25dc5caa"
+        ],
+        [
+          "modules/M25_前置闭包求值.md",
+          "407a0cd4758d8390d04cfb8a3fd3b1bc4153b4e414cf023dc52f028e18ec353f"
+        ],
+        [
+          "modules/M26_装载序就绪门.md",
+          "997415ffd94150b0a6599359eaf04252001cf1b834495f0dfcfb95f5c50bddc3"
+        ],
+        [
+          "pipelines/P07_AI系统域装配流管线.md",
+          "313b348a348f4adf0456884a094fa75dcd34ebd9910124afdc32f0cadddf211f"
+        ],
+        [
+          "protocol.yaml",
+          "a2205ee193631093bf6186c1cec22389d38ca1c2154ae00aa579499cef6b7808"
+        ]
+      ],
+      "files_count": 7,
+      "id": "AI系统域包",
+      "path": "community/AI系统域包",
+      "sig": "",
+      "version": "1.2.0"
+    },
+    {
+      "cid": "664dad9168dec09482e4ec6cc5f04b945b28b572cc14c1919827f7301977a3a5",
+      "files": [
+        [
+          "README.md",
+          "bfc0d6f8ba54d8b5330774c09128db4a0d4bf82e3cb5f6f2f26cf1dc723d023e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "27149545e9e1834e715e9989f87f37346d2bc4bd453c8bf3c6cda3c6f1efcc1c"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "4c31822d033208962d380e3f28b2c56ae96559f521255b266a06bdd81a9ebe87"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "9d2d01b771e624f40dae2a59f05aa34fa14044a4e12f472b5300f4d70332d491"
+        ],
+        [
+          "assets/provenance.json",
+          "d6182f9ebb1adb587402384f406c7d343da9756291fe5ecc4458d9da047ed6ba"
+        ],
+        [
+          "modules/D09a_AI能源与电力口径登记.md",
+          "3e8fdae73ac5775a6e68dfd88c70a049879f5df59cc5ff0e50283564220e81b3"
+        ],
+        [
+          "modules/D09b_AI能源与电力收口与形态派生.md",
+          "c8cbfbaba8919b80b7d3f8ac1b34b388c60fa6e7b092aee63b189baa344b6232"
+        ],
+        [
+          "pipelines/P131_AI+能源与电力装配流管线.md",
+          "9cd4b9f866e958279bfd7e6c7422898219f168d939c4b6ecc9dd62d4b33c2576"
+        ],
+        [
+          "protocol.yaml",
+          "26f63522f9f6976f0772a8a347fce27fba1d3412d1b435d294a7305654031a4e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI能源与电力域包",
+      "path": "community/AI能源与电力域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "521c82c3578ee21a7d62d6fdeb164c190700cf9b5abfb886953ec44134f9fff2",
+      "files": [
+        [
+          "README.md",
+          "f6e13049f840f4f4b21c2b92487cccf23a84481b6ba4e736a3edf2ed2f01b39f"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4eae576e23003b0b77ce3fcc4f81f3daf29948f280b95761b20e57a0c34e851c"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "769d7c7ceb1294deb3e4d19aeab11835b601ec5ee24cf933c810e9ae8f29e7de"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "1e103184b60e634fb11da0071263638185cb44b2bd0e916ca137d0fe77df74b1"
+        ],
+        [
+          "assets/provenance.json",
+          "a62db57452308fa22b79def5fbceaec8dda07e1ca9026a17ab4a0ea41c93877f"
+        ],
+        [
+          "modules/D04a_AI金融投研与风控口径登记.md",
+          "564a902211f812fbde04f02cefaa6a05b0072ecdf162e8be5f04e610b3774c45"
+        ],
+        [
+          "modules/D04b_AI金融投研与风控收口与形态派生.md",
+          "7e63c4ad97081d0d2b58dcfda9492f12d151fb630357fa969e19cac15aebb62d"
+        ],
+        [
+          "pipelines/P126_AI+金融投研与风控装配流管线.md",
+          "ab0193aeb088dbad2c47c57922ee29a74111c622cf40ebe176554678d49b7bd3"
+        ],
+        [
+          "protocol.yaml",
+          "dca1eb0513fc3eef681c2934492e4be56a3d833164bec30ca9f2e5b184b70ae7"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI金融投研与风控域包",
+      "path": "community/AI金融投研与风控域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "493882c38edb71933698cd1a31d97875a8ac7862685dd263c9110a82325f2652",
+      "files": [
+        [
+          "README.md",
+          "71cbe8bc6db8bcebfb71687ab6f421ef4f068c7de106ce93f6bb887a1d986477"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "117f2188d275c2155906b0350605b1b5d9a42ea3d289cece34d08a84b00f90e5"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "83610d77c06b305262a451e7c82c44b9b5b4a90b0aa792a33f97c3c1571b533f"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "69d6b0515b04127a1bc968934ae396ca7c2d6f456d953c5ab659d5cc03a74a82"
+        ],
+        [
+          "assets/provenance.json",
+          "c47c8d2009cb09b8013f01d36d0a0b702623a6970b22ab303df2222ec23f018a"
+        ],
+        [
+          "modules/D16a_AI食品与餐饮口径登记.md",
+          "0a031ac56ecbe3b9acb6501aa745883985e545a4f3a4680c4b1f02f9ca678cf9"
+        ],
+        [
+          "modules/D16b_AI食品与餐饮收口与形态派生.md",
+          "0f89c5aa85a1bdc9433d53ab8fd21892408fd30c3bd5df0ce96057279768f9fc"
+        ],
+        [
+          "pipelines/P43_AI+食品与餐饮装配流管线.md",
+          "7be6b4b8a758b2d6b6f02e6cb4f634970657e34dea9369f183e8486cdc1fba9e"
+        ],
+        [
+          "protocol.yaml",
+          "e7aa035485907d4f88ab328b0eb493200ac21306d9e87f2d943e780fb358bb89"
+        ]
+      ],
+      "files_count": 9,
+      "id": "AI食品与餐饮域包",
+      "path": "community/AI食品与餐饮域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "df7bcc59c9775e16c4e89862dc908ad7beea607a67ed13d701555911d5e4e3b3",
+      "files": [
+        [
+          "README.md",
+          "5abcfa79d68edfb581ed7e7459fbda00cee764a2d03c5e33867c1a1f4315a05b"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "5efc15df6451b47757481ae14e051fcda2b4fe542f9cb797607b1a7a5afd8891"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2b26e6f2f99ca401adb339d1d1203ed5eab2024d3af637df047140d2ed15b729"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "7a1a8387b8fc8adc6f9f38a104f85667efba95fd70c842c9f18638968900272e"
+        ],
+        [
+          "assets/provenance.json",
+          "6c27f6fbbf0391b6faa959496ffb4859007dc7fa6f2fcde13228c1bd71f51052"
+        ],
+        [
+          "modules/A08a_三维口径登记.md",
+          "0d2636e94ac5b9f1cc1f0e004397a2ce7ffdd1b0c7a626b71688d63cbe509def"
+        ],
+        [
+          "modules/A08b_三维面收口与形态派生.md",
+          "23852679af1879aa8d909d636918f3cda947143510b14c832b8536c1fcbcb303"
+        ],
+        [
+          "pipelines/P25_三维与世界模型装配流管线.md",
+          "f50e2ecc7543317867db9a484640516f8397ae7d02d325f32b028963a2913c6f"
+        ],
+        [
+          "protocol.yaml",
+          "dfcb6712e717bab8efcffe392f9f5a24370c265b03e767a255eb43514699cf6d"
+        ]
+      ],
+      "files_count": 9,
+      "id": "三维与世界模型域包",
+      "path": "community/三维与世界模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "fdb420429a2d49f0a2ac4436030a78a76f80896eee9dfc434c57c609e5ff3579",
+      "files": [
+        [
+          "README.md",
+          "e3fbdc581a336da45404b470679aac151dbfdf47a1e348045c98b9ab2102d47d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "1385e0b9d94608ae0cd22f4125cadd55f58841c3b027a3becc83393833a133c7"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "81c85f38c02198e12d28332bd5222df133f024a5c537f71776f525be83c231d6"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2ca2b091e1ce90949b14e67f3ec8b0d9b48a77a2fe6801250eab5581d9bfefdb"
+        ],
+        [
+          "assets/provenance.json",
+          "ef3b29b74eba78bdcfa5f320177b881706be204604ba42930cd5cb431c15689b"
+        ],
+        [
+          "modules/C12a_上下文工程与长上下文口径登记.md",
+          "4127c8ba254cf1d5bf3e76b1a1f895f5f8d9bdfbde2035236711c157a4abae7f"
+        ],
+        [
+          "modules/C12b_上下文工程与长上下文收口与形态派生.md",
+          "ff26efec522843a9b59740c918e47874d38ab35411d9ec0de222f909f0911bf8"
+        ],
+        [
+          "pipelines/P55_上下文工程与长上下文装配流管线.md",
+          "2d4d03af0fccd5167c783a28ae4d40d4ebaf0820f96408dc9ddfc03a038cd36b"
+        ],
+        [
+          "protocol.yaml",
+          "b51ef7660c4895df24418135903e8df6161595db43937fe7502da8ea0aaa40c6"
+        ]
+      ],
+      "files_count": 9,
+      "id": "上下文工程与长上下文域包",
+      "path": "community/上下文工程与长上下文域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6981c73ed990d586ed7d7c94a9bf3919b22d9b6efeee71cbf7060a80eb690bbf",
+      "files": [
+        [
+          "README.md",
+          "de763240062f6875627e725cf042b88e9c7166252e86f483785061fb9e26e0e5"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "cad970b76a987754f39d0cbef5ef444c093ff63482ce0dd201209fc64fa36d42"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "bdabf628132f16a284bda903761aa12c7bc216c4dcaedb54eb89d7601bf9d4b2"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2315bc9f3f3a590ed4af4ed3d7247d0269ddd800b11ffa79871eb07ff481d450"
+        ],
+        [
+          "assets/provenance.json",
+          "68c4cf9c764b51b22db1d8e2b72fb5dab574318b942c86d78f2be720ad351e2e"
+        ],
+        [
+          "modules/E03a_世界书与设定库口径登记.md",
+          "e655befbaba663fbf2196f72d41c06ec961bc596d5e4d032017dde4e5c744211"
+        ],
+        [
+          "modules/E03b_世界书与设定库收口与形态派生.md",
+          "bfe9143cf8f9ec61619c0ca98ca1ab358bc08984611e969584df383b5cc4d7fa"
+        ],
+        [
+          "pipelines/P81_世界书与设定库装配流管线.md",
+          "cab97c643e7fb40b053228535a54b603cead76635c9f91bdabaeabd06da9ce03"
+        ],
+        [
+          "protocol.yaml",
+          "43d88e6649afd0060fcef1dfac34a756f95c6de3ea6495b78cafc7b1d3fe0830"
+        ]
+      ],
+      "files_count": 9,
+      "id": "世界书与设定库域包",
+      "path": "community/世界书与设定库域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "439d20df4459fe1c581ce700bd178579173c0906c38c51f6201e2b40e58136d3",
+      "files": [
+        [
+          "README.md",
+          "dc67548f56c5efc9bc1e0290aab83bc4c8abab8b4884aaa102bdaa887e2c8bd7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "71b9042fb972510e25eff1e83f146dca3f7552f71431ecdb34335c44e768fae6"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2f6a937545b1c95c9e733929939dd2f1026973620a6f3a2bdd5db2291f769188"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "e26101feec9f32473691dfaa95563ef594f486387aea836f56ae907f60a10740"
+        ],
+        [
+          "assets/provenance.json",
+          "ff5df083fa35d74196d4beb1b4efa8e643b14677e0306286eb45689444a4d1de"
+        ],
+        [
+          "modules/E16a_个人助理与日常生活口径登记.md",
+          "2d916f1a98149a4b9e5bcc8f610c8fd638f3e1ce62398ba90fd82db764edb0d1"
+        ],
+        [
+          "modules/E16b_个人助理与日常生活收口与形态派生.md",
+          "6ecd1e6218f014f3dba7c686511191307a6e163b649f0e7f63ff5fedf79d93e7"
+        ],
+        [
+          "pipelines/P93_个人助理与日常生活装配流管线.md",
+          "8182d0af8c0688b04ad42e69864cbc342fdfbd0ec1033e9d76ff6558b4ce35e2"
+        ],
+        [
+          "protocol.yaml",
+          "fc7bbb462526e288e6350eff918a3d96d66d376fb5e9a239912df093e9062b2a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "个人助理与日常生活域包",
+      "path": "community/个人助理与日常生活域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "97b609efe71852097c29883eab7a0b6b4a39c76c50790725c146d47e923303f1",
+      "files": [
+        [
+          "README.md",
+          "d2abfdd03e5ca5611c3d6760478f6db85d57ec2f55888cc28a64313464e9987b"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "232aa2f288d4d17d8134e481b4a723dc78297834f4689c040be5cb5aaed705e7"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "cf0a9ea7926c7f78a35e27813432df4161f23fb948e2a45c5ffe2b8be77feebb"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "015eed871f12555cea92974be2c422d48d6a230a3fc11654d1e3c25e40c79bfc"
+        ],
+        [
+          "assets/provenance.json",
+          "2145b3589b7e4ea963b937bc590b11fc1cef9fbaf4196b61b9fe4035d4b31cc5"
+        ],
+        [
+          "modules/D13a_交通与出行口径登记.md",
+          "807f065d874b0f70e996da86feed05c3922228672b342e9766e69b2c7330c4c2"
+        ],
+        [
+          "modules/D13b_交通与出行收口与形态派生.md",
+          "960dc070c2dee1ceda3c8d93fb209b4814933b14cd21052331239ea3211f83f7"
+        ],
+        [
+          "pipelines/P72_交通与出行装配流管线.md",
+          "d2feb18c82c9b6bfcfbaf23b1952ed0aa447e8ae12e22648f58af9321a5323c1"
+        ],
+        [
+          "protocol.yaml",
+          "1ed4f5409a0b6a141c44779b42232f1853a1d2c4076fd9b938f41993c5dc6070"
+        ]
+      ],
+      "files_count": 9,
+      "id": "交通与出行域包",
+      "path": "community/交通与出行域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "b56bfae7166481e7f8009fe84aa7c4d59dd1274d432b1bb986bbb2f4e6c3d68f",
+      "files": [
+        [
+          "README.md",
+          "02235db4b46bf9ff0ca68890413f9fe093110bf3ec032d7c3f8140db53b3dca3"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "1bd9cfecc0b12786d5f2466e85ec5bbcb03805bc1c66aeb9c4664a3c51f15876"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2aed717d5dacde8474f0b33af317fcff9dd9bd5c5c0620a52de50e77603c2d01"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "dc436066f089ff5e935f0d7f4cd508b89ab7d64eb29a0fa9b5f0718e1c77510c"
+        ],
+        [
+          "assets/provenance.json",
+          "7c30cfa45aec430c8d23bac10ecb507f1a493acb9e262ffab6615f275abc83c5"
+        ],
+        [
+          "modules/F10a_产业与商业落地口径登记.md",
+          "501b18e8a77dc15d894ae7171abf6c09a8ed0910a0e2e374e60a624bfae9362f"
+        ],
+        [
+          "modules/F10b_产业与商业落地收口与形态派生.md",
+          "9dd3dedd551b1bc30df42c287c4d1e9dd53f3d3f5e59a0c4b441f3116106d083"
+        ],
+        [
+          "pipelines/P106_产业与商业落地装配流管线.md",
+          "cf110c45d9b5fd4a223bd7cfeafe7cbbd24502b48be4059a4d6408a42840cf15"
+        ],
+        [
+          "protocol.yaml",
+          "b8da13ac6c7c63c55ef20be6641d8cbb32f980834160154ed23d7f9de6e2981e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "产业与商业落地域包",
+      "path": "community/产业与商业落地域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "4a92d86779de911d1e18bd33ff4434abd46330ea4ce1e69d6fb42744fe764c32",
+      "files": [
+        [
+          "README.md",
+          "ea1ca0a39acfc7427403a15b1c4836f840f91fc1419b10973001813f6a428911"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "07f7b6c84fbc66854b02b43a785703088a0241b3f7a3285b7a6f91840c8f61cd"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "7b1f844b4b73886f76238d084674879e65d32e4d685e1855c9d792274fae984b"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f8923d8880b021a617ac9d941d0810a75bbd968b4bb18fd0f76f59d4b8229121"
+        ],
+        [
+          "assets/provenance.json",
+          "6bc842ba4bb35c424a60f19b218ce6c03b419f302bb9bc579852e038ac6133f5"
+        ],
+        [
+          "modules/E13a_代码与软件工程口径登记.md",
+          "8a39930618b21dcc466237b16941bafc2728c85ba04ceda05be24bc0f5d32cce"
+        ],
+        [
+          "modules/E13b_代码与软件工程收口与形态派生.md",
+          "92d1667ff7b68432a83805357d69e5f83df6162e088838d999050305f41a2f25"
+        ],
+        [
+          "pipelines/P91_代码与软件工程装配流管线.md",
+          "5d2fa60b5ac1c0e6db25926732bad9fcb5aa3cc5cf9c57e49dd068603575bbcc"
+        ],
+        [
+          "protocol.yaml",
+          "3d88511c5d4a7dc48724c4542dd08999b9ea16d35de8f94f65808cf2e0d12dee"
+        ]
+      ],
+      "files_count": 9,
+      "id": "代码与软件工程域包",
+      "path": "community/代码与软件工程域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "7d2605d27ff2f448b30103cd772a1eb08c005f21c946582678ea2c3eb2646aeb",
+      "files": [
+        [
+          "README.md",
+          "fddd76cf6b56613a5b913ba1c068032916759289fbb3e5f4dab23d3cc75e08c2"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "9e5ec1c5290064ac112be6e89a701980471e265913469bf0333c6cf38db1a4ed"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "11f367c481f0b5b7381e402c1a1913e0692490191815ea5cc9a962945bf4aeb1"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2a0f78c6efa3fb279e3f8b7a02a4cff8004531dfbef2fa52f03e68f3c32d2189"
+        ],
+        [
+          "assets/provenance.json",
+          "be6f67522937a1ce8a4d26a591b1f97f6093ed42e4aceccd93a8f03eb9f85448"
+        ],
+        [
+          "modules/A09a_代码口径登记.md",
+          "5dfa17f29a4579188bf8235141d20a73e30e68626dc1700f33e97640c40e1e03"
+        ],
+        [
+          "modules/A09b_代码面收口与形态派生.md",
+          "492966d5bf0b1c4b551e81e8595cc70a4b54a96b25479420b07daaf1a0477500"
+        ],
+        [
+          "pipelines/P22_代码大模型装配流管线.md",
+          "a7065ee7a26482c83da708544f8014295f0bae9d8155164563bec2218ca8d610"
+        ],
+        [
+          "protocol.yaml",
+          "c79bbf0638c9ac0dc24de8fd83d20a3a5dae1c49092a204e621b764b9c7b8a28"
+        ]
+      ],
+      "files_count": 9,
+      "id": "代码大模型域包",
+      "path": "community/代码大模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "184f1003e87b421a69198dac6d32edfca6317768c62e7b7e296155e7e2e527b6",
+      "files": [
+        [
+          "README.md",
+          "93f8e8f2e788561d4432378df54e8efe028993baff207cd63bbc45333ce0ad6e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "5f0d8936ff1aa859122a395c66dff26f2b239e4267873bcb637f625d8d32ea37"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "43abfac8ad6505cc449f5463aba16c5b0068855b1c0e64e751a2d9ba40168876"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "a24fce1ffbc784340c33b083a29901dff597f4a82b3ccfc69252a3cd6b0c4b0e"
+        ],
+        [
+          "assets/provenance.json",
+          "19a7118848726135fd08f33ac28a2be35b3fb05d067efed870251f629c6fea08"
+        ],
+        [
+          "modules/B09a_审查口径登记.md",
+          "6a59314db5d3fd24d7dc313e30743cac54699f7cb5af3771f808980a64b0d7ea"
+        ],
+        [
+          "modules/B09b_审查面收口与形态派生.md",
+          "7b5a9ddbf50297c086fa7146f70539bdddc9097ba6a9503272ae0b9a5322f07c"
+        ],
+        [
+          "pipelines/P34_代码审查与缺陷检测装配流管线.md",
+          "a51bb1f75e5a4a3940a3fb58914dc8f0328870be7daaa7c6e3e9852371fcea0d"
+        ],
+        [
+          "protocol.yaml",
+          "e27533c24d15e3b1709d20b612e161df63ed3b30fcc07cce6ac7753aff0e7644"
+        ]
+      ],
+      "files_count": 9,
+      "id": "代码审查与缺陷检测域包",
+      "path": "community/代码审查与缺陷检测域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "f7b5a3f5fc71c4bb81418ff36b6a7913635f6c09840d68fce87d86b88e16d3f5",
+      "files": [
+        [
+          "README.md",
+          "d14df5cf57f998c2f4ed1a8172a876df832de0aa8d3e6cda2fd9dfdfc4619306"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "305fda2c12c29c4e03445286c3577319610334d1e809c22d8fdc3fc0081c20c4"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "5c80f3527cbe52f712046ac14e07d385004ae4540074685aa675b381f04e0ae9"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6804104c0d9728e608ed6cd924d9d76865f96c093997141597fc78a8b5b08ae5"
+        ],
+        [
+          "assets/provenance.json",
+          "76b96611b6ec9e1fbe76f7c500e16821d08bcebca5d6f0c142a3349493f38dd6"
+        ],
+        [
+          "modules/B08a_代码生成口径登记.md",
+          "7896b0c37f6294c6635bd7ffb38ca2739f7428f8dd0862767813af112aa8cf75"
+        ],
+        [
+          "modules/B08b_生成面收口与形态派生.md",
+          "c079a3aa7f909b628b56d11fd14e9a7732da9185239bb9f457b2f1aef3a4fa92"
+        ],
+        [
+          "pipelines/P33_代码生成与补全装配流管线.md",
+          "2add6339da421a7a15d5fb7e22e37435bd1554c0bb2cc93d7082807d63a17056"
+        ],
+        [
+          "protocol.yaml",
+          "5be095f48b2b39c17e6cf2940fa04ea770b8737a8425577e69a98e3c7eced0e9"
+        ]
+      ],
+      "files_count": 9,
+      "id": "代码生成与补全域包",
+      "path": "community/代码生成与补全域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "91c57692d27d979ab5e852b3f107d36c1485ea6326b6dcb21046d1fb83bd36ff",
+      "files": [
+        [
+          "README.md",
+          "9f2fa8c07baed481cb939ec18ed9cefac4feb307b933cba871e1091af3d81d37"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "37972119fab7273a4b0a5c90bd4d23fb38a7aaa25faeb1dec0716ea74e80aa37"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "868a7f07781c44fa6479fa9ed5229ac1f0d107b62a727a918a2e044d8f908c4a"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "13fc0e3db39a1cd7830f1b757ac80165f55fae75fc9704c9cff27bf14cbd6c6f"
+        ],
+        [
+          "assets/provenance.json",
+          "9fb98444027003186febdbf2ac290aa7ab987a4d350ec3f94c2a51231cb4c890"
+        ],
+        [
+          "modules/E15a_企业培训与组织学习口径登记.md",
+          "84003619c1c71b179eae731d379ac2c3f85f65ea0ebf222bea3f9800e087fe54"
+        ],
+        [
+          "modules/E15b_企业培训与组织学习收口与形态派生.md",
+          "ae35780f18cbc4b2473ec4ebed2deef1d47e33e190a16cf5789cfdb7320a4a8f"
+        ],
+        [
+          "pipelines/P115_企业培训与组织学习装配流管线.md",
+          "c56209badbefb647d451379b7217afdca8ac80abf6e13d21894fb6ec45dd6b6a"
+        ],
+        [
+          "protocol.yaml",
+          "79c837d77ab0f04571a832d47c602d4e04cfc6838a68ccae82a629a718e15c4a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "企业培训与组织学习域包",
+      "path": "community/企业培训与组织学习域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "64270f16ae50aa95712ddd09295171649e4231fcb8405b18d35182d3ca76da2d",
+      "files": [
+        [
+          "README.md",
+          "0b93d1f855f7b0c48f7645d6ce520bc19823c04eb49078a74373ad8ed6723a71"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "353a59e61296fcced8fb410d071d69390ad4f5d1bd6944e7cd720552786c1ca6"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "c25cc59d8662cb6631b9ba980d91c82bc5cc5b3b3665a2c4b415dfea5b9b075c"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "80e52256bd63e402e469170191ff8277590ab9ae6999d64fd00613d6d75ad8ea"
+        ],
+        [
+          "assets/provenance.json",
+          "e093b43be6465a27e00771ce3289303b8e1aec29581b8c37b32a8048e7d97468"
+        ],
+        [
+          "modules/D17a_传媒与新闻口径登记.md",
+          "23df23a16b9f724a143bc07925d42390d7d17d1e0b57d4eb3aa0f12d43e7253a"
+        ],
+        [
+          "modules/D17b_传媒与新闻收口与形态派生.md",
+          "65f94d6e73140962f34f14c603e0d10182d7758111e53bc6f451aa3e09666f40"
+        ],
+        [
+          "pipelines/P76_传媒与新闻装配流管线.md",
+          "8f4cefeb541d1715e684cb0515944a45cebaea1325a7774a523fc1a7cc648a86"
+        ],
+        [
+          "protocol.yaml",
+          "1e112253733a795b53038b34ebb7c26b80fdd58d41949d3315ea2f587e9a0436"
+        ]
+      ],
+      "files_count": 9,
+      "id": "传媒与新闻域包",
+      "path": "community/传媒与新闻域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "731c23c796f1b55a85112b51668e854ff8c37c6e014f397ac5fb9ffa21ab2b41",
+      "files": [
+        [
+          "README.md",
+          "c852b7fce6e42fbf176c9a97ed0959a96994d93396e89c63f8517f61ae3e89c9"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "45d1934d25911a5f35b74ca37824a752c4b3e4de5840d9810d2f42f39f8e5c1b"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "e6829f70f8233aa14d3ceddf9269051747a06a788d7d891106d689a2005f47c6"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "cb01a4d2e92e27aa24897bc9d76792a31350ca9766f52fad56a9b1451e8df1e0"
+        ],
+        [
+          "assets/provenance.json",
+          "c47fda2d200ca99a5ee3eca9d93f8b52d0ec862a096eff1ea60bca5bc87b5692"
+        ],
+        [
+          "modules/B05a_抽取口径登记.md",
+          "8396e68905c1f3d176d6eed1b5ba8293e65294b8097c39e64ac5c8c54675fdc4"
+        ],
+        [
+          "modules/B05b_抽取面收口与形态派生.md",
+          "285a0e1b7dd4cbeeea002f6a61ca5fa02f4cd87eaafefe9876c148cedcf0baf1"
+        ],
+        [
+          "pipelines/P29_信息抽取与结构化装配流管线.md",
+          "c54c69c37fd350a91253b0ebb6cef906483b9c7945ba509a8905f7903aa5b950"
+        ],
+        [
+          "protocol.yaml",
+          "82c293e7fb2d9d72f2c2205beb0f2f0b281aabf7e6750256e683f57565ae5d2b"
+        ]
+      ],
+      "files_count": 9,
+      "id": "信息抽取与结构化域包",
+      "path": "community/信息抽取与结构化域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "bfa2b8de45e42374b951b3478e2f1f06e8b8542c152d8bdd2e9e44ba72130da1",
+      "files": [
+        [
+          "README.md",
+          "f635d7c101f2ae4805e24bcd477a394cf2e3feded6da48e27346d17422fd26d8"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "a3431579523f7ea0297926dd8e926ceed996c12b8228dfdd4a762ec5469ca568"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "283718f3bbbf6c06157c729189b9cc246fd857e5f8353f80f35bd2eb6f5f5b9b"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "9f171266d6f0d5913aff4d77a4dc02c1db33efb90e5e0ba6adc2c27d26f2043d"
+        ],
+        [
+          "assets/provenance.json",
+          "e30d61786b913915dbc8eae7211a2511c38a31c2df53483724195036737165ac"
+        ],
+        [
+          "modules/A13a_具身口径登记.md",
+          "6aa4c3268aac16ea365d211b91654778a878169d659a33e79c08349f0fa72c10"
+        ],
+        [
+          "modules/A13b_具身面收口与形态派生.md",
+          "bb5d51ad93c4c0f96da02f6fe06dce8ebbf4e634135c387be3c45d830542f7b1"
+        ],
+        [
+          "pipelines/P24_具身智能与机器人装配流管线.md",
+          "2c50da981ed81344f676d837210c9bc6b01b6ec0c43ab48da8677908960a93f7"
+        ],
+        [
+          "protocol.yaml",
+          "7602b7772191fd86991d8a7c99bdda83cdf02a727737d3c33640cf5333c1ad30"
+        ]
+      ],
+      "files_count": 9,
+      "id": "具身智能与机器人域包",
+      "path": "community/具身智能与机器人域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "01a0f8f8158d2361a0e061dda63e45aa9f507ce6bf71c73cb074fc8c66aad7f4",
+      "files": [
+        [
+          "README.md",
+          "4c1ab35b996376de651286b659f23f9c209ffde77bdd0031d27689293ddb7b86"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "0b20693b808b2a01e3bdb628de418836c5cd241661e3de4c872c4654757dd061"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "832c5b4e75453954699d4c6cf0145fd1c18f2cebc8bb7aeccac2637b1c993070"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "a617ded1efcf305d0ca679066760d89bb22252486b932a5ceb08c23e4b020c1b"
+        ],
+        [
+          "assets/provenance.json",
+          "3d80ed575a5d8a1603081c1a0fd5b4c3f5fd6b8ff324c6228b8daa4e1b1c11e6"
+        ],
+        [
+          "modules/E19a_内容分发与社区运营口径登记.md",
+          "024c4433b1384973ab27fddab63035741b780c07bee71d328344a4bed1c1f6c4"
+        ],
+        [
+          "modules/E19b_内容分发与社区运营收口与形态派生.md",
+          "fd043ab455d5486505af6fe6fd71f3aab9d0a8a8dc77fedbbdccf571aeef9d63"
+        ],
+        [
+          "pipelines/P95_内容分发与社区运营装配流管线.md",
+          "48b7383b69182f08a12b56bb3fa29f788ec8b75513ff757b3d50535b1805a475"
+        ],
+        [
+          "protocol.yaml",
+          "cdbbb0af357d846dbab2a16af4010feebc7448ae0b8e6dbf897936829d5563b7"
+        ]
+      ],
+      "files_count": 9,
+      "id": "内容分发与社区运营域包",
+      "path": "community/内容分发与社区运营域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "44e78eb1ed09f406be91d392c0652379aa1bddc5f8546e9fd73707dde014397d",
+      "files": [
+        [
+          "README.md",
+          "a366f128995d5c1681a7d1cfdb1f1cf86c6a23f2e0ec1cf1dac477ebeb6f6f4d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "1bc8fe847d5a30230eaac690483d14ee3686cf01f7908ed985933fe36f13c97d"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "0752907de54fef4e91a0753240fa03dc0b7fa288b10f4136deead9f9b9d94bc7"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "5349cf43213e3d30d122d157ae0e289dce38baaee57ff699a2a9f2cfad0f9ded"
+        ],
+        [
+          "assets/provenance.json",
+          "1b0e307340ad75fd6184904f5e65cc677f02025608c8ad97b174e0cead83d7a4"
+        ],
+        [
+          "modules/E05a_内容改写与风格迁移口径登记.md",
+          "4e4018565bddbfe97da5c1fa480c4c04ddd7ce66541d8136152bebc405cce470"
+        ],
+        [
+          "modules/E05b_内容改写与风格迁移收口与形态派生.md",
+          "ac33d7d656e67c2035b6877c508cea39c17008eb7be85adbcbe950f772086b3e"
+        ],
+        [
+          "pipelines/P83_内容改写与风格迁移装配流管线.md",
+          "d48c91b028f8e6b3a8ae15898f546de8e6b883e57445abbe0779450188f0a7f7"
+        ],
+        [
+          "protocol.yaml",
+          "0f6291dafe47447821dd752214b425955d2c1ee0c17060fb5aa134c8dd37e338"
+        ]
+      ],
+      "files_count": 9,
+      "id": "内容改写与风格迁移域包",
+      "path": "community/内容改写与风格迁移域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "911109b3de294b44075ef73240dd48d7ce0f9c1ae0ac209b4dd6879a927285f6",
+      "files": [
+        [
+          "README.md",
+          "4fb798474c7746e9334f3d11b1a308d068509f1ad6dcb8b8e85eaa651438178a"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "c022c96a799b96e52a15e97587a9363c62eb703ad0ee9b4d954649008156953e"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "7ce42f772b4546c10fd8d765b7ca9c392a95a2127e681fc1f6b6df5fa99e8339"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "4356efc80266808d65cefa6a15de0f4d5a7387079fc64ed61019216659373942"
+        ],
+        [
+          "assets/provenance.json",
+          "ac2e348ff734bf31f75a41b70184ad23906e691b612d6ac945dcffd9b8c1ccfe"
+        ],
+        [
+          "modules/B04a_分类口径登记.md",
+          "5d6269438cd1c8ee750f8698ae160dc69f5523225dac318fd4d47146f543e32a"
+        ],
+        [
+          "modules/B04b_分类面收口与形态派生.md",
+          "3840f16cb27c59925041bbe33119d838d201ebe8792821d8fce553772024092a"
+        ],
+        [
+          "pipelines/P21_分类与情感分析装配流管线.md",
+          "92249a3aaf90780f4ea0135c9e97fc81ca2efb106eeaa43345309820ab9bfbf6"
+        ],
+        [
+          "protocol.yaml",
+          "e508e129feb1fa7b4c638a7ae7cb4f571faeaae891dbaabd5592dd5942d86e8e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "分类与情感分析域包",
+      "path": "community/分类与情感分析域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "520f9c372dee780d5222d3ff215f53b7143be11814a42cab8d76bc6076b2b797",
+      "files": [
+        [
+          "README.md",
+          "90eb3b833c4957b127de1e0ec36f9cd70857d1097dd2fef567c14e05f4753601"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4e46429709fa6c8daa75dc57011629d41ff7d26270232ee8619aa12a6999e83d"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "16a147f25932a64aca574e49886d48b3f8d484caec04a324f3284bc88f92a435"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f4ff5b341009f1956a8142a0eb43082999e9a463531d90a904d5afad68ad8acb"
+        ],
+        [
+          "assets/provenance.json",
+          "92e5e6999052ecb0e0a0426a146d68e935a5f53e42607a2da5c21d060dca35b5"
+        ],
+        [
+          "modules/C06a_参数高效微调口径登记.md",
+          "e99aa0cc7ed3cc0507f162d5e368341bbf99e11fcd7aba74387f4f504342948f"
+        ],
+        [
+          "modules/C06b_参数高效微调收口与形态派生.md",
+          "cc6b65c90b137edbe782bc745e7ae223751e61963268825d4bf1fdd01706f4f7"
+        ],
+        [
+          "pipelines/P49_参数高效微调装配流管线.md",
+          "642660aeb1d8e252a6e49e380f582e1dba3d2f575ef70dd043da0cc94f59f2fc"
+        ],
+        [
+          "protocol.yaml",
+          "568a97ee2bf44b1d7557f967e2d06d4ce01a79ef38671f2404b7fe7f90586b0d"
+        ]
+      ],
+      "files_count": 9,
+      "id": "参数高效微调域包",
+      "path": "community/参数高效微调域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9040996f901f30aa0b4d878e5984b3f95668c8694c8dae459d83056784e0c974",
+      "files": [
+        [
+          "README.md",
+          "56f9cfa04577e509df9f0c5eeb6d027c2633a12792e21dea6f5d6d7125a9b651"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "8e3835293c896ce5f3a2c1dec3670e1f6b8a68cebd344a87a24ae5b05ff3201f"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "27fe380a09f289846f4e594f8acaed42413c4bf1992d3a1d59f760a04b14c2ba"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "32170fd02bb82ed7379a11dde07da3feee1c3485ec6c4cf9da0a375e04766bf3"
+        ],
+        [
+          "assets/provenance.json",
+          "707b4e9549d95a52b902a4a4dce43abba6ca3ef4ba905efad8bf78a11852c6ce"
+        ],
+        [
+          "modules/C18a_可观测性成本与可靠性口径登记.md",
+          "1216b85482c6130e99456aa74ea7c822f95225c45a1ba262725f98264d7dd8d5"
+        ],
+        [
+          "modules/C18b_可观测性成本与可靠性收口与形态派生.md",
+          "01881eb977b5ed35921d3fc7ef81ebc71fb813ff995d9e03da9f00a87a9812de"
+        ],
+        [
+          "pipelines/P122_可观测性、成本与可靠性装配流管线.md",
+          "7064cb17fbed8d89b1fb99656c3475dba1adfb15fc409c25b43d040b1757d530"
+        ],
+        [
+          "protocol.yaml",
+          "f824c87f8cd20862e8df5ace7bf2436e670626779736b7f3614d9cf775395376"
+        ]
+      ],
+      "files_count": 9,
+      "id": "可观测性成本与可靠性域包",
+      "path": "community/可观测性成本与可靠性域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "1c49a228da9672867cafe50f55e6906a8576de1ebcd37d8978952b0de9be4fb0",
+      "files": [
+        [
+          "README.md",
+          "225f955746f28237f5a1dc401b76dcb58053e5aeb220469d7ad38878b0bb931d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4ac430924dea94e4c0ca3e44b6fba61aaed1dcacd2e9c20b18a0accb9d14156a"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "fcd347499144544b9a1c69e5c561fc66080a9a64b695bc54f0373026b7a4036e"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "1d2dce67b55760357a4a44bb825ec6d76e08bd568ebe8f93ebfe93717fcd3e2e"
+        ],
+        [
+          "assets/provenance.json",
+          "23aba8674610871de6ec288cccc4f6a3194106e4d80f4fcd122b7145da07689a"
+        ],
+        [
+          "modules/F06a_可解释性与审计口径登记.md",
+          "dc9499a7d39ebbd1bcdbe9579fcc42cab92e531ddca1299ebab8d81c6634ab9d"
+        ],
+        [
+          "modules/F06b_可解释性与审计收口与形态派生.md",
+          "55b18a10bc34e571ba77c40833b73806cee91332aefc49673e21c4c773215e02"
+        ],
+        [
+          "pipelines/P102_可解释性与审计装配流管线.md",
+          "1a8e01ad739a13afb9d6268c6f77133f871a0501626f47397812245b8078166f"
+        ],
+        [
+          "protocol.yaml",
+          "2df6b357a0d26c4499f81cf58daa7288d27bc4cc85f6c361e294b6b01c6fc93e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "可解释性与审计域包",
+      "path": "community/可解释性与审计域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "83038f0a57a0c3e786d79bc8558d0aff75d826668b723444e0b091a586d3f777",
+      "files": [
+        [
+          "README.md",
+          "1f2fd647f5a0c7c5633bafd30f7915ce3ba5bdf3acb85566bd1ddfc90e27f494"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "f160877991ae159000fca89e664c06ae3d55f8d07f915f3ae60ebfa395bd2bd4"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "5f05aaed480aacd1e98e3e20f1fe2ad3c9004ff60da5bccab140934a4411a3b9"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "24650e031c7e3c417db671dda39ec45d9af608f6587b02c49058303ac83474b5"
+        ],
+        [
+          "assets/provenance.json",
+          "c34c5dc36f295ed9a51bbd7ca6b57dc97d700b20a536b4f2bbf1626d053a899a"
+        ],
+        [
+          "modules/C03a_合成数据生成口径登记.md",
+          "7381a54af928e16eb84061a389beab1e95d2915bab1e6374cff56b51ee82b356"
+        ],
+        [
+          "modules/C03b_合成数据生成收口与形态派生.md",
+          "6ded289009dd1d30399839c496d67b7d590f8db6fe7dbfca525c36d5e637d839"
+        ],
+        [
+          "pipelines/P47_合成数据生成装配流管线.md",
+          "0ca7d1033f760c48e81420f774534c6fefbbe577523c06cf69a8cd403b2d1a26"
+        ],
+        [
+          "protocol.yaml",
+          "011313363768cded54820c97282c05b7d2ac2772888c40d2cc72e4d6b80c0c9d"
+        ]
+      ],
+      "files_count": 9,
+      "id": "合成数据生成域包",
+      "path": "community/合成数据生成域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "57ae472376e60e61f46e6fcf8f8b8d280b057532dca61a10b1946d62837661ce",
+      "files": [
+        [
+          "README.md",
+          "67f9cad0be73a226c5858c30450f4b0508b922f79f16d9a239cdd59e2e29e6f6"
+        ],
+        [
+          "assets/AI_TRANSPARENCY_NOTICE.md",
+          "2668994cb5dae63740327836060387597aeac387bfc971475d684adeb81bf004"
+        ],
+        [
+          "assets/AUDIT_LOG_SCHEMA.md",
+          "6d96732f904534fc26c8af0c83a6cfe2f491bca0f3c7a66a1d26755011be52d0"
+        ],
+        [
+          "assets/COMPLIANCE_STATEMENT.md",
+          "12e294e9ec87dd1e019f2eb3293190a803a0260c727342cd783edb6c34469b19"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4a73d295b1d176c1b97169188eb285aa812b6da5cfbbaa152d594a8603d7792a"
+        ],
+        [
+          "assets/DATA_PROVENANCE_LEDGER.md",
+          "c01e6f49e1cd184309380b94f749bfff9ba501d1a007c4530bc020be20115f8c"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "8cfa7b73f8521f8b6681a94d84460a784255af206ca5716c09b302927e94f1e0"
+        ],
+        [
+          "assets/EVIDENCE_PACK_INDEX.md",
+          "c51a7c247b390aba6e53d859ab6c85e5d6c725d5a0feec5ba9e47e1b9d32681a"
+        ],
+        [
+          "assets/HUMAN_OVERSIGHT.md",
+          "3377c45c87dbd3349ad3c745f15f7a38e5f0384576a95a88c8117409b9ae63aa"
+        ],
+        [
+          "assets/IMPACT_ASSESSMENT.md",
+          "6ef10da03be07a764785da34ee4e3b0f8876dd79621f2bc88567a9c52a049d26"
+        ],
+        [
+          "assets/RETENTION_CONTACT.md",
+          "81c0b5f66c2d8963319302f4fbff08b73f753d3871c6dbab5fe06a3122fe20ca"
+        ],
+        [
+          "assets/RISK_REGISTER.md",
+          "eff0c0a3ac2992d7ad6104bdeba8d1141356de8b7bf6028f66a8b88a7fced4e0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "ab4e0ea97bac83a03ca6075c4d3002b8181cc487e627f8f85a7bc943df8bfe45"
+        ],
+        [
+          "assets/provenance.json",
+          "a82541d6478da148f763d53903556b75350f48eeb9ad80020a4f27e70b61f3d2"
+        ],
+        [
+          "modules/F02a_合规与监管口径登记.md",
+          "a8cafbf1ded506d487bf315152eae1e608efed2bda2060cd5f654fc2a2c92f18"
+        ],
+        [
+          "modules/F02b_合规与监管收口与形态派生.md",
+          "81a6f9bb36d3067aace9c8c13c8fdf74ba902d261ac14b75301db434a4ebabe7"
+        ],
+        [
+          "pipelines/P98_合规与监管装配流管线.md",
+          "0132264170113b2306c8b6121b412847f17896c1d28023cb8d6b0b612dcad802"
+        ],
+        [
+          "protocol.yaml",
+          "7a75b1dc88680d10e8a7336cd0845d88a8098c20219ad37b324f95242c1e692a"
+        ]
+      ],
+      "files_count": 18,
+      "id": "合规与监管域包",
+      "path": "community/合规与监管域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "d56822f64837cd02856bc2caebc4af806b9c85c1ad7e27edf99f5ac75a5e7dc2",
+      "files": [
+        [
+          "README.md",
+          "26fbeee53d99379adb7fcfa0cc0b1688f57526126a1f9b23034e5af0eb85fc73"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "efbac5c1f08ce38de640f0c9c28ef20f28816eecf0f33df9bc4f974356d69d6f"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "30f888b82699985f9fdb06286d222343cfd744182fd94af03a224f38fe8294a0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "963cc298d8185207295f80d35b0fbbcf66e316d9cd1bd89fc61cb032ccc991b5"
+        ],
+        [
+          "assets/provenance.json",
+          "c196489b88d25f194d90129b9e26f92b47615186c8ecbf42e0478d48b1c626c0"
+        ],
+        [
+          "modules/C15a_向量库与检索管线口径登记.md",
+          "5101a54fec409ee164e7a66231f8c3286c43203188589cbb41019e793a502172"
+        ],
+        [
+          "modules/C15b_向量库与检索管线收口与形态派生.md",
+          "758854d772c75808bf9eb9a61c6b674c96dc7ac8f2534c597387b8997d2e8c9a"
+        ],
+        [
+          "pipelines/P58_向量库与检索管线装配流管线.md",
+          "1fe5a15cb0167683f9770fa0ed963352f61a516bb22f6233f2ec1b93e905e520"
+        ],
+        [
+          "protocol.yaml",
+          "7f6c20cb731c450e8098fbbd839dc32b4cb1ba65490ac49665c0b2d6dd7f76e6"
+        ]
+      ],
+      "files_count": 9,
+      "id": "向量库与检索管线域包",
+      "path": "community/向量库与检索管线域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "249b0a110040b6776b6d1b3591cd535f6f446c005e03406beacc53e16111f542",
+      "files": [
+        [
+          "README.md",
+          "2f22fa14ba3b2f5323438b9eafd8ade33e68d19c4c22da46f80909c5f599bb74"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "6f5ecaa090fe3ece300fab929fb9d53983f99b0eb0863f8ff8f985afffb6eba0"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ee256bde6b2e11581eb39860e470cea3d666b7dcbdd00e800370b6073b1417cc"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "1e4bf635793cf73c760ce521398dac12637748272e12843f9dcbb79ec8bd527d"
+        ],
+        [
+          "assets/provenance.json",
+          "a390c77e3aa8a3101fed1c30eaf18cc8f88f88c914605c2cf0aa1fe3ee0a0dc8"
+        ],
+        [
+          "modules/A07a_图像生成口径登记.md",
+          "41f35c7aa85f86335ab22a8c4711859129dede86cc2c4f028416784813be5938"
+        ],
+        [
+          "modules/A07b_生成面收口与形态派生.md",
+          "58d9340400e68880ad47bf0476cf2bd4b021ab3be91c1a7226210245f66e8468"
+        ],
+        [
+          "pipelines/P16_图像生成与编辑装配流管线.md",
+          "1d038a0c898279c048c3ff2ebed7817921c14d9d4ed3e8906847dcae9b348840"
+        ],
+        [
+          "protocol.yaml",
+          "0c58546ba87024d5aaeca404eab3dd0cf7167e6afcf06c68ffa417feb0807ecb"
+        ]
+      ],
+      "files_count": 9,
+      "id": "图像生成与编辑域包",
+      "path": "community/图像生成与编辑域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "c6f461d353b8852464a7cdc883d89be20b4a439f34ff9c2f68a1b156fa3afffa",
+      "files": [
+        [
+          "README.md",
+          "288ed655d70e80cc13c67bfb726287ae9ebab0c4c763875e7f0d3f2e90fd7c10"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "cebb3c64201a4cbfa09c509b6a11bb549d65b3307cb0f122a78fae13fab4454e"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "c4d117cd7bff3c40fd43b05f534f51ecc9af0e25d5608fcf536d34950ee995c0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "8bf36bc48004229c312e7d83795a018b811ba7dbfbeed59ede4fd379c005de3d"
+        ],
+        [
+          "assets/provenance.json",
+          "f2ceb724752f573188ff03b24177cc01510764b48cbc71b183c9149237203d44"
+        ],
+        [
+          "modules/E07a_图像生成与视觉创作口径登记.md",
+          "b014ef0e6735fe089e304ff20fe536bc8e8f93359c0bc2f8fc3cab9363694bfb"
+        ],
+        [
+          "modules/E07b_图像生成与视觉创作收口与形态派生.md",
+          "01992d13de19e6cc55ce5da0a4fa389bb4034b389307bec0b224f8ab4ca10525"
+        ],
+        [
+          "pipelines/P85_图像生成与视觉创作装配流管线.md",
+          "1b19a807d1b28a819f4d9e88c292ef1f569dc8e8984804f4f12ae3e167b32e82"
+        ],
+        [
+          "protocol.yaml",
+          "d6f848f587a0bb0481c5aba8eeb40c00901fd0e16241f8ea7dde10d72304878a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "图像生成与视觉创作域包",
+      "path": "community/图像生成与视觉创作域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "d5fc66ed1ca464ad888d5279762d530e426fe54a24a22b442e740b4298e0bd27",
+      "files": [
+        [
+          "README.md",
+          "37e4924609643a06d57f93a2faa2c5900eccc1f4a44a16cc77960042fedd2bbd"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "fea33821dcb5394aef1dca91fd519948a4818eff9da656c9b00bd6d3961f49e1"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ce2b5a302e65a5851f40ca08a99d6ac142cc881cc124c5123afb70fb22e4b001"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "0a4d565f632022f557c25a0bbe7aace7e278dd4a71d2b8905d222d438aa80af3"
+        ],
+        [
+          "assets/provenance.json",
+          "d3e75b8576410bbf78e0a1f532effce02c1b824c2eb41b8e471cd4b07e8d1384"
+        ],
+        [
+          "modules/B15a_图像生成与视觉设计口径登记.md",
+          "0ff2c2a82f311dff7dc24430fd928db9b79751c5d8c1de1b8a0991a6c3f00252"
+        ],
+        [
+          "modules/B15b_图像生成与视觉设计收口与形态派生.md",
+          "32817263e6c634ec38826c343fd9fe8428b859bcb53bdf33770318161fa7d052"
+        ],
+        [
+          "pipelines/P41_图像生成与视觉设计装配流管线.md",
+          "2ddfe7e712c543e6dfc904725f4a6acd79604d5e0a80b608a2130a4d0e687f1e"
+        ],
+        [
+          "protocol.yaml",
+          "669cd2a155d9d4bd6b6a2bbb61c86fd532b271c9a9df2840eafa119ec86a5462"
+        ]
+      ],
+      "files_count": 9,
+      "id": "图像生成与视觉设计域包",
+      "path": "community/图像生成与视觉设计域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "0323caf3c160d79735ba42f4a9a75ab6915debc09b9533ebf2704f03d0dc20d6",
+      "files": [
+        [
+          "README.md",
+          "47d8b21484fd0b5707e62c2878e4af4881c26582da8e5dae748ea02ddc0c786e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "5d620b7598f343c77687d4a88d751d403b5eb9a272a3da99563e4815b3a2e2ec"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "5641e8ca8cba13a69333e00d883b468e85b32a0fb7eab6a79ff372db2d032718"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "12fc0bf071d816e3ad36c13128b62d3f6d9dcad8e4d803cfa7452ccc99eb28e9"
+        ],
+        [
+          "assets/provenance.json",
+          "fd0d4631c617aff037fe2ac56c5c1fc03d298044e50c7b1f49cf971c355dc7d5"
+        ],
+        [
+          "modules/C17a_多智能体协同口径登记.md",
+          "29564d993445ee2a56ca3b5b6724b4107f4cf2567a522820efae6f83a2f6bb1f"
+        ],
+        [
+          "modules/C17b_多智能体协同收口与形态派生.md",
+          "4e49e33b13394e2de794a2c0f207437c37385054ea8c46e0c445f163663cc88f"
+        ],
+        [
+          "pipelines/P61_多智能体协同装配流管线.md",
+          "ba20d462d59f1608f107061064b756f0afe195ec60b126c7f1b10aaa0e45c623"
+        ],
+        [
+          "protocol.yaml",
+          "eb1e533dd5f1c88bea2c21493ab63725926cfd8016c2a6e1c74f1b5ab3cf5501"
+        ]
+      ],
+      "files_count": 9,
+      "id": "多智能体协同域包",
+      "path": "community/多智能体协同域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "ae36d416317905865751cb574eb49eaab66a94f23e697f9ec43ee9a80f45e8cc",
+      "files": [
+        [
+          "README.md",
+          "d59ff40d81d7f2dcc4f883cc94f40c9a8157568ccbbd51fa2ec435b77b4d48c7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "f18bb6e91bfb6d33fd9944bb257ff6d0cab942ec277e3779ee926a5786b1016b"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "a9f6412bb4e91690d6e6a0716f079482d96b2b269107484b93ba9dfd3912c884"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "cc95f462d59fa44b740e6f6b1c83937f906be9faad99b1a6d678831fa7cc17e8"
+        ],
+        [
+          "assets/provenance.json",
+          "68eff4dc06db6e010be3b832925672f55ba18aa4530788dd947f452cf0cefeb6"
+        ],
+        [
+          "modules/A02a_多模态口径登记.md",
+          "9a7a63d9942c3b219053ae6d3f36402202e95191cfab290d67006d05c8f13fa4"
+        ],
+        [
+          "modules/A02b_多模态面收口与形态派生.md",
+          "26124fca15382b1b6deaa16927ff573fad8c315a9c32f8913f8125698055de1d"
+        ],
+        [
+          "pipelines/P11_多模态大模型装配流管线.md",
+          "90c9dd407adc2a807eeb628c8d85c3b3d3b249fd320d66a94b8454ba6d9f8954"
+        ],
+        [
+          "protocol.yaml",
+          "db2a439e4a90cc2e7551df14c26c0c82d7369c6b8b92c0b2ee7501cb5f4ba7be"
+        ]
+      ],
+      "files_count": 9,
+      "id": "多模态大模型域包",
+      "path": "community/多模态大模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "746bf7b36e2c7a814a24b90aae2447dcb70f3667603752f1904b07dd61d1a1d0",
+      "files": [
+        [
+          "README.md",
+          "d40b9ac5562d38fa0935c92d7682978c4539081d6a14ba8935164917d2d34ba9"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "1b66c3fd346430c0eed565266ad486cef77ff6748155a25be454776bad4d3474"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "5bd98805e3bfec47ee245d5cfbd0c9c2a94c75adbddfdcf1c4d335a80962d9d5"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "55a2fb7b61e0742e9aa035df55cbd26a7710c62b29135fecaf2e0ff752786ac5"
+        ],
+        [
+          "assets/provenance.json",
+          "0a74faeb834e4e078f91307cb3fabe3d62891a67aa4582ab51042773ed6d0490"
+        ],
+        [
+          "modules/E06a_多语翻译与本地化口径登记.md",
+          "3aa302a21ba32c28d7b38a56fe05aaf314e5d47da974bf6768a8a3e3f90d79f8"
+        ],
+        [
+          "modules/E06b_多语翻译与本地化收口与形态派生.md",
+          "d68a5a4c73c0cf901d29942d107e278127d336181f58281b87400a699ad74e06"
+        ],
+        [
+          "pipelines/P84_多语翻译与本地化装配流管线.md",
+          "bb674e9b2c35189861a6189f355599fd353b3f895950e8c7f0264868485289b6"
+        ],
+        [
+          "protocol.yaml",
+          "faba352b3fd10e89a220666e47b4401ea95e493aa404bfca23694b9ec07be806"
+        ]
+      ],
+      "files_count": 9,
+      "id": "多语翻译与本地化域包",
+      "path": "community/多语翻译与本地化域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6e2a84629c32126f2ca21572e58e75c5867dac23617ead4140d4edc65f839ee5",
+      "files": [
+        [
+          "README.md",
+          "7c730819a0fddda89c5a2a494e37eab7c5ee02b6aa494a97421a83ddb90b0af1"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "631ef6ded10355d31a3f5a66d288854a751bed3720df5e35d655a5116bdc340f"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "e530a00dbf3fece09c8cc9b2a5147b962cd7fce1189573503117c6b2c8f8b5cd"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "4e43a42aa2c5ede188a83001b26847a6f37a0f9e57a02a98b7e50e4e1ccee200"
+        ],
+        [
+          "assets/provenance.json",
+          "6580e04ded878219cd84eb03d0edfc95c6a0376c7e2f60e26d0b2c05247d3dc4"
+        ],
+        [
+          "modules/B07a_角色扮演口径登记.md",
+          "af6a2cb5dcdd6149449f790a067c5ada25d0f34e51f1993fb881b573f3991320"
+        ],
+        [
+          "modules/B07b_对话面收口与形态派生.md",
+          "d468fbc8685c070990afff55464062bcbc530bbaaa18734dbc626bf1ff4313f1"
+        ],
+        [
+          "pipelines/P32_多轮对话与角色扮演装配流管线.md",
+          "2dbea718a588cea5843be561add019d7109529cf21faa44727f8ddfcfefd442e"
+        ],
+        [
+          "protocol.yaml",
+          "908d3c9b50ec5e22cbfafad3c496b45425e814d1e549c96f52b6dc4aeba09965"
+        ]
+      ],
+      "files_count": 9,
+      "id": "多轮对话与角色扮演域包",
+      "path": "community/多轮对话与角色扮演域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "e26a647dde5a08c0f01195c4691ee2134049e2e4d0149df0936f093dae3d9799",
+      "files": [
+        [
+          "README.md",
+          "147cb3c4cc3f89a5d411484f117b0eb9633da59ba151c63563069a93909f17a8"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "fe28a30ebb4c534853a98fcb4abec15f5d0ea7ce1c6be384c546218a4435b094"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "27387f8dc8e856128df05ecce187200c85f8faf63dbb31c34f2ad085df5e1b0e"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "235a8b18b3b5ac364f938e9f936c2b26e88fcc35728757425d6bf34c8ec59536"
+        ],
+        [
+          "assets/provenance.json",
+          "480b556011fa6517bb8f2b8e3cec519e5821b45e60df6eb414f572359797d7d1"
+        ],
+        [
+          "modules/A01a_模型与能力口径登记.md",
+          "7e149da3481413e6d9e419d98684e739117cdca3cb83dd8dc04d16e02e847ebd"
+        ],
+        [
+          "modules/A01b_能力面收口与形态派生.md",
+          "283a0c97b1fef71fc4b8d934f418c888fc9322f3cedde8e997a011126b6eaf41"
+        ],
+        [
+          "pipelines/P09_大语言模型装配流管线.md",
+          "3564af93a75b83ccb3dc1f19aedada669c4effe0ed669e9d6e957d35f47d296b"
+        ],
+        [
+          "protocol.yaml",
+          "f742cac19c39bada36c8af59cd20d5026723cf13d309eeed6f3084c173433572"
+        ]
+      ],
+      "files_count": 9,
+      "id": "大语言模型域包",
+      "path": "community/大语言模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "fe604377843b99245568cb0417022f514ce2ccaae2e0308ccfeefbff2ad3b904",
+      "files": [
+        [
+          "README.md",
+          "852d8a83361ba6430d094549687bab466b552da3cb0246859b771801411fd975"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "b379596604b3f9818e8f9ecf38be5be5f03d65c6a13672216f8e47eba616d285"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "3ea925493d6e51a5f6949879cd3f96fb902b77ad4f006d0aea964bf744368243"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6e0936ec893f6bcabd616298171dab027c7113680fe947aa88c3615f4cca8718"
+        ],
+        [
+          "assets/provenance.json",
+          "54a21511bdf3ea0ead18802ddc52d7feb173c684df2aa29600a0983c82a50fd5"
+        ],
+        [
+          "modules/F01a_安全与对齐口径登记.md",
+          "e65011f8f6f434a93b8744d6d87c9e91fcce2e6394b115ec6939705aade1b1d9"
+        ],
+        [
+          "modules/F01b_安全与对齐收口与形态派生.md",
+          "fec7d943471a4b5cc1dfca540d79cc173701ab58af4a9baab483e5e27b047404"
+        ],
+        [
+          "pipelines/P97_安全与对齐装配流管线.md",
+          "ffc3078a4eabf4506140dcfe26721c0d8224500db7f787abc32588f10f002440"
+        ],
+        [
+          "protocol.yaml",
+          "0fc63afeb62eceb5f0fad3f29aaee0561d59fd25c50a3e945ba1a0bb1a7448b9"
+        ]
+      ],
+      "files_count": 9,
+      "id": "安全与对齐域包",
+      "path": "community/安全与对齐域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "aa09900b2aec15248f9e488b8b532639ab36e89618a1b7698458c5814916a11b",
+      "files": [
+        [
+          "README.md",
+          "86e894d1a23b45d501740544879a4779a452d7e2323ae3a2ed92a491af2efeb4"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "b0b703d99e45701d99858c9e0f83441d4a1abd71612ed091002bf10cf91ca24c"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "8388abe4a464dc45f74577dd65e0c132907707ffb345f6d6504136f667463248"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "e4cea9f2375a4b4fbb264bddaa8a52bacddb57a8a67e478a228090b268780abd"
+        ],
+        [
+          "assets/provenance.json",
+          "857189cddedfd3a855f6224671582a2a849cc102690b00a8caf527c26ce821a4"
+        ],
+        [
+          "modules/E18a_对话与客服口径登记.md",
+          "368a16c56031b8ba0e155ac0087afb15b58ddc8a6b115815aa8d09fc7c0c2f76"
+        ],
+        [
+          "modules/E18b_对话与客服收口与形态派生.md",
+          "cfc1bd60e3a062a1d91bccacdac1aed082af75ccfc3aaa4421c5bea854bd3c1b"
+        ],
+        [
+          "pipelines/P116_对话与客服装配流管线.md",
+          "14443c3c8f71ecc30ee88c25079af3c6d84afd9732763d9a3d958e6dae867db4"
+        ],
+        [
+          "protocol.yaml",
+          "0875ffbb2833b669588571907d84327cf8829e98e9591addf6fee93acb5eac8b"
+        ]
+      ],
+      "files_count": 9,
+      "id": "对话与客服域包",
+      "path": "community/对话与客服域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "c6750d9f3d1a6b6a19d2736a2f76ff99f2a9497a887fffe6b03a7601bee14429",
+      "files": [
+        [
+          "README.md",
+          "e4560a8043763ac07681db9803265d2a3227cbb248a8955262361f455f9225ea"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "bc45e0c8e19570524b662f8b68d6178860ad9a69000a9e542e3b0bfa3bff1ea1"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "90bc48534c037a23b95810be6a1c47d9021ce50edf1e80f6599356b78734c538"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "d515b9e64017b943878e2033fe63f5957dfb5947e2882863742ca43fc6d8de05"
+        ],
+        [
+          "assets/provenance.json",
+          "871dd9b3fb5baa8aea36d8b5955275611fea349139d709709e80d2e9c7584bea"
+        ],
+        [
+          "modules/C07a_对齐与偏好优化口径登记.md",
+          "d6945d5a4aca9e99786791824a929fac30974c5f61814c1d97f59fbc5c436a91"
+        ],
+        [
+          "modules/C07b_对齐与偏好优化收口与形态派生.md",
+          "842a5af33a7b801d1d00f7b97bc7f55566decd52608a29c392eb1ec0bac1ed81"
+        ],
+        [
+          "pipelines/P51_对齐与偏好优化装配流管线.md",
+          "308c1c301d12e0b43ac692f98fbe524d882038e902e13b0652b3b9a86fc125dd"
+        ],
+        [
+          "protocol.yaml",
+          "2a3b4e3015fdff90ba4d24f49b3e99d02cb193f0f8092cc37e7c0857973baf9e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "对齐与偏好优化域包",
+      "path": "community/对齐与偏好优化域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "334a168a1712a467b83cf03ddb1af695159d135c650539189e5baf7a39e419a9",
+      "files": [
+        [
+          "README.md",
+          "c9ce7e1abec4b780942f9ed71f3f1462a9862e4d26613f113c1da85a4aca50f2"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e33cb0a6033766655dc81d31587217c9b6f89767aef48719c5157609e98b7915"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "f6ce3c27dcb0135454327be8253bada7c712708f44c6919a1e7322da1506dfc3"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2d0d830c4c77659ddb686a037a1dd879de8ba120c5ee7725c7891e60b79eb4cb"
+        ],
+        [
+          "assets/provenance.json",
+          "344e8c9ea47b693e1f2a12282edb386aeca5ac391ac334156912a911a0498703"
+        ],
+        [
+          "modules/A11a_嵌入口径登记.md",
+          "a29426c486d85751f730cc557f67f8bd00ff5d6acbaa65ef419238735643be9f"
+        ],
+        [
+          "modules/A11b_嵌入面收口与形态派生.md",
+          "81298cf9aa8150d1cb8ef7c732998aaf4199fd0dad42f0f88d5359a00aca5c80"
+        ],
+        [
+          "pipelines/P23_嵌入与检索表示装配流管线.md",
+          "75a2101d308bfc02360176dba97cad722428826262efe0f92fb3288c5396390d"
+        ],
+        [
+          "protocol.yaml",
+          "87a03029a8ebc97b760f08ac3c5fb977e3201757400f1e834d17b5c4b416318b"
+        ]
+      ],
+      "files_count": 9,
+      "id": "嵌入与检索表示域包",
+      "path": "community/嵌入与检索表示域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6faf7f9f9e234be9f57fd1959babb45121d00dee24d495fb7c618efca36363e7",
+      "files": [
+        [
+          "README.md",
+          "4f9d4bf2829017fbb408f829f23c3ad75ca63d645a1d9449d2afe37ea26a5fe7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "0b410fc8402940d17043fa65e62678fb2277cb578f9b04fad8633be1d0396390"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "4baeb3b4a4183b288b36a4713ce7d95acc2517d284559c6a263353e480dcddbc"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f72dd1c5ded3eb649b93c0fef0673cb63ada1f5c326a7949cc221c25194d9024"
+        ],
+        [
+          "assets/provenance.json",
+          "80b1e04ba392b32f99566c00337753630c6cca82d01b7858c9bee5cfec794dd0"
+        ],
+        [
+          "modules/F08a_平台与基础设施口径登记.md",
+          "cd0c67bcb3e5ed0d5dbfe6c2aa4a9a42d5946e42a74de17df71e28545dd658c4"
+        ],
+        [
+          "modules/F08b_平台与基础设施收口与形态派生.md",
+          "625dba84bc4ace96493ff3695089a6ccbdec7eb93e3819e0826522cef5dd3221"
+        ],
+        [
+          "pipelines/P104_平台与基础设施装配流管线.md",
+          "15cccbfe87516ba9e8d7ebaa3ce3f8c843ffea20f0f548fff9123245e76ee3d8"
+        ],
+        [
+          "protocol.yaml",
+          "c1933a3214491f2b653c7b4584e2e0cd2917fb76490d51672720b136cef4974a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "平台与基础设施域包",
+      "path": "community/平台与基础设施域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "79f5ea6fe2354d18e54a37946796e1905fec31cbf07b6eac5e16532e16654ea3",
+      "files": [
+        [
+          "README.md",
+          "8ec6f8fc842de5b550407bf001d69c5ef790ba45d12a5ee3007ea95f020ffcd7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "c0bab8502d6f85c9fe56c01c90c0100ee2c8b8e3c2201c67a820934dd4738d55"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "8a8f4e959f9046f504ef721af12393ba3d78ddfa0a71fa42fa62aede4e38b693"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "b2582ad6536cfd1929c3112450ac3310820c7e1ab9ddca1c3c58c5463bb0a25b"
+        ],
+        [
+          "assets/provenance.json",
+          "b6dda49539e5fc26451e5925e93fa4f88baa6f6d4b09302dda90014a74129993"
+        ],
+        [
+          "modules/D15a_建筑与房地产口径登记.md",
+          "de3f2fd7f02083869122aad7a462c389543e8db062817239e741f503718b67c6"
+        ],
+        [
+          "modules/D15b_建筑与房地产收口与形态派生.md",
+          "cd1f715f4d500379832e4bef33f03bf2e745b69ced9a33ed7aa823a3bd5acafa"
+        ],
+        [
+          "pipelines/P74_建筑与房地产装配流管线.md",
+          "c5df11e0ad97bf7742ee4fdb8e2f07cfb297f9e82fd4657d941913f3f935be6b"
+        ],
+        [
+          "protocol.yaml",
+          "a1b5deba26fe8799f3eaf61e30cf80f98e2568fa28160f9e469daceea2cd3aea"
+        ]
+      ],
+      "files_count": 9,
+      "id": "建筑与房地产域包",
+      "path": "community/建筑与房地产域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "859a92c11d98a2382c2a426e530ac2ffad9965a5fdf98e26ee4a7f9b267086f1",
+      "files": [
+        [
+          "README.md",
+          "2bf669d3a8ecce03ce35b22b44dc6e09fc4342263cd324940bcd8efb1cce78cf"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "caf260b61ad4f7914c7bfa93c639f3390583717ccc06fe1bcc877ecc837685e5"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "42d0833abfb836fc466d9bfc8d323402532161decc9a095a8b7897532d4c9034"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "25dd1274b05b7ace2003687c9e0c04b4d43b3061fdde490ea482e80dc9b99ca4"
+        ],
+        [
+          "assets/provenance.json",
+          "83a506a779aa5f1f4f4bda0f5656956d512a216aa9b749dcf7fdfaa460331dda"
+        ],
+        [
+          "modules/F09a_开源与开发者生态口径登记.md",
+          "9e6dc1d4cebff1725e00fca118560c502807dc11d5fc6c5b882fd9b27ee9c1b4"
+        ],
+        [
+          "modules/F09b_开源与开发者生态收口与形态派生.md",
+          "4d060ef2932fe5f048566908eb3ac2ba4e5d122e4ad9fc016a0db17a47b672cc"
+        ],
+        [
+          "pipelines/P105_开源与开发者生态装配流管线.md",
+          "9f3bb95942896d6de4692153de0845d619dff55f7f1649be176789c514d55df6"
+        ],
+        [
+          "protocol.yaml",
+          "ea1359a9410b4e7fd7e601b74d5044b672c031e64c604f7cd821b66e25aa3377"
+        ]
+      ],
+      "files_count": 9,
+      "id": "开源与开发者生态域包",
+      "path": "community/开源与开发者生态域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "7c3c5350da12d2f407ec8120f19aa9f41a3bc441e93981e77a79e81c2ed669b2",
+      "files": [
+        [
+          "README.md",
+          "c04ce2851573c93f335a2db2d3bc38e857fabe3c2a703c62ebb9746bd5ee2ece"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "7ac49c5cbb45f663557863059ac009bc3fe1954f247ce8a69be175a522475f86"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "1bf721f7b83a2b21add7b02070e609d4b9fbb97af59a7b2cf4e7e44c372374e7"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f0f8067b569ea9248bbabc85d2bb9c09a040e2b3f9f64528e540cdac400a2b63"
+        ],
+        [
+          "assets/provenance.json",
+          "be290884bc1ec91311698ae332edeec896915f13bdf35e072364ad47c6bec30e"
+        ],
+        [
+          "modules/A12a_决策口径登记.md",
+          "aadf602a891d7468b6dff55ac098bd43539ac9e40ae50f876529039d0f66f0b1"
+        ],
+        [
+          "modules/A12b_决策面收口与形态派生.md",
+          "5e320cebed9dd8f561d7e6ea5e2325f5c100c333ab8e555d08a87169b6371424"
+        ],
+        [
+          "pipelines/P27_强化学习与决策装配流管线.md",
+          "510976557bda21530a522892537206e1fca7783421ad3f6873e18f688146a6a7"
+        ],
+        [
+          "protocol.yaml",
+          "a21e92ceaae6e9c4776a01091f678daf662f41c48e3cd5ca39c3df1bb0fc424a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "强化学习与决策域包",
+      "path": "community/强化学习与决策域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9b2db706bc3e67d5001830f282d2a967147b4a433b0b1cdf79151a6624020260",
+      "files": [
+        [
+          "README.md",
+          "362e87912523e240bf1f3b5b402c93ef86aeb8aafa061ae9ffc69bed405d1066"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "c4b942bc87efa6fc069ed23b0f68b996601e3f5d76bceb70169cbc04847304a3"
+        ],
+        [
+          "assets/TECH_GLOSSARY.md",
+          "638464315e36345de230d9638e4dc6674944a0bd6214cfef0b3459dbd8f29a99"
+        ],
+        [
+          "assets/TECH_STYLE_RULES.md",
+          "e6fc125db14a602713e5f8679471048d20361713a3120f46924fe70d9db0fc19"
+        ],
+        [
+          "assets/TECH_TEMPLATE_INSTALLATION.md",
+          "e77f9c84540701933b244d1a7a55dbf5d335340400def61456463187222e6f9b"
+        ],
+        [
+          "assets/TECH_TEMPLATE_OPERATION.md",
+          "da14d242dd2ed273c013acd9373364266eedc8ef5960914ffd36b253379818ee"
+        ],
+        [
+          "assets/TECH_TEMPLATE_SAFETY.md",
+          "d818086c2125c4dd562f15f1d852f4617a25659c743b77ccca7e2baa89a14d3e"
+        ],
+        [
+          "assets/TECH_TEMPLATE_SPECIFICATION.md",
+          "09c59ae24dc1d8ee67219f2b50acf82ec8ca3b0778a26d6a81f1781d75abc7f8"
+        ],
+        [
+          "assets/TECH_TEMPLATE_TROUBLESHOOTING.md",
+          "94e544f6c4d56e693fc1ccf47114d6318b02c8fbca5062c03fafe3be7ece4988"
+        ],
+        [
+          "assets/TECH_TEMPLATE_UNBOXING.md",
+          "13214def9f70008290c90efbe739c96c08d33115268ce9a7b6a4f72e7a387363"
+        ],
+        [
+          "modules/M97_术语管理.md",
+          "c868027fe8d9df6eb6262faa77850ae88dce3959054cfc8c0b2fe9ae282da9c6"
+        ],
+        [
+          "modules/M98_修订记录.md",
+          "3dd627e76263395a173e0affbce9a6bf23ddd0e2e0cf8969d4ce699bb6b9a6c5"
+        ],
+        [
+          "pipelines/P06_技术文档题材装配流管线.md",
+          "18eaa554b4d0a034bed8af550955c26a1a9b7d61c25a76ece163526198f34e0d"
+        ],
+        [
+          "protocol.yaml",
+          "43a1afd530795e93616df92c77c8bced6af24d2ca74a7f7036cf6c57cdd0b7e3"
+        ]
+      ],
+      "files_count": 14,
+      "id": "技术文档域包",
+      "path": "community/技术文档域包",
+      "sig": "",
+      "version": "1.1.0"
+    },
+    {
+      "cid": "29ee5686bf100c9857616385b423d8041d674e5df3ab8345ea1efacb96736246",
+      "files": [
+        [
+          "README.md",
+          "9445cd9044d18bbd1c44c0ce2a18e792175f3eae4267a896f053f59e99f99780"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "d8c287b19047b1f5782f6619e84ef96d899bad41e816581e9d5a1cb5491e11b6"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "1977ff6d5952325a615fc9f7b46a3f5ba28d8e553f356ad6132fc0f0783b0114"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "e2a1cc005c36fa6afc1730e2be46ac046dec6b0b42dd42480cfd3cd08bdb4cf5"
+        ],
+        [
+          "assets/provenance.json",
+          "6c2182195195f4cbffef708424c075388f509998fc56e0748bdc201f041c0a6b"
+        ],
+        [
+          "modules/C10a_推理优化与加速口径登记.md",
+          "c033504915afc887a50ca3edf0883eba1f215576e6184657fc530d212cbd3882"
+        ],
+        [
+          "modules/C10b_推理优化与加速收口与形态派生.md",
+          "a7872251d97cfddcf409c54bf1beaffb1af8100869f0a80ae3e910498ed7261b"
+        ],
+        [
+          "pipelines/P53_推理优化与加速装配流管线.md",
+          "3936f1ff9e93c37bafe2391374273e3249d6c54e6afd77a2c8ad5702eeaf41bf"
+        ],
+        [
+          "protocol.yaml",
+          "c0af01f9dd8dd148baa95b754ac2ef311be51fdc6f09e01f32eded261a6af040"
+        ]
+      ],
+      "files_count": 9,
+      "id": "推理优化与加速域包",
+      "path": "community/推理优化与加速域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "a53a0c0c92489d598cc0fcf5f261b34ab2e29f123d71ff890479e41a3607223c",
+      "files": [
+        [
+          "README.md",
+          "1863a7273275a91a0e9935799336fe5195ad650d856dfc79231337627af30ea6"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "26a9b01db1b81d7cc74f8b2e7655d5e7476bd859f382e4f0bf232843351e00fe"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "95364e0df3ea74ad3a63d99746f09a8d73dd68ecac20c9881b5e2f03473cb7a0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "90009705cfafdef8f95c0263a0a3e34afe103fd8ded9d6c0b38678b976b6d5b7"
+        ],
+        [
+          "assets/provenance.json",
+          "a09d0211a623e1a84ef25af7d31378b65c8d6e5f60330b68776ca401b8cabfb5"
+        ],
+        [
+          "modules/C11a_推理服务与部署口径登记.md",
+          "3ddc4f723f21ac693e602c19c37f9da2d227055be6a341b5eee7c6dda0262b0f"
+        ],
+        [
+          "modules/C11b_推理服务与部署收口与形态派生.md",
+          "1b3288f84bac5bc2cb8c2aa40cf63af273f1693c8ee0b60d813bff7d3f6ea763"
+        ],
+        [
+          "pipelines/P54_推理服务与部署装配流管线.md",
+          "304112ebfc4ef9fbf249123147f07fdd13febaf9d40fc0cf09e4554e0cd9bcd4"
+        ],
+        [
+          "protocol.yaml",
+          "09864a7627cea6fe2f7bc54fc7ba8113a6a5a51954f1e794fd940e76656a79af"
+        ]
+      ],
+      "files_count": 9,
+      "id": "推理服务与部署域包",
+      "path": "community/推理服务与部署域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "f7183dc2c390a391d6e74b2e94bb76aecc04231b0b2de064d8dc0e4abe1668e6",
+      "files": [
+        [
+          "README.md",
+          "529e65b7c86f4e5890a3e0013f38db2f113e902164cf0bee1c118dc786c500f1"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e17a5a2ea21c1c04abbd144071a18f66041bc0c41d466fbd4d389907f923efb1"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "965e1db84a78affcc5a1cb37c5e6a3f75d1bd248dc62f0d95ad03bbe5d724751"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6484ffa9b9f92d514625fd2d0b18dc5cb305893c344c43ba9a37985a906ee93e"
+        ],
+        [
+          "assets/provenance.json",
+          "35c52f65a3802724c1ae7a354675bc400038a99208cb3b594d275f073f457574"
+        ],
+        [
+          "modules/B17a_推荐排序与广告口径登记.md",
+          "0a5581e4c148b6f35ac0b469c05121c10374e18ed68289ffacd94259de098c5a"
+        ],
+        [
+          "modules/B17b_推荐排序与广告收口与形态派生.md",
+          "7bb32937c876b57cea58811c1eddb501ff4fc01b45251aa745cbe361d5f8bbcf"
+        ],
+        [
+          "pipelines/P118_推荐、排序与广告装配流管线.md",
+          "9a8e2314073cac6d61cb0326fe49ae8e368a78e984029e11014f6c56a49837f0"
+        ],
+        [
+          "protocol.yaml",
+          "34685c4e5c29c82304301974d2132c6b89705f23a5353d020ecb3e0cc07c1767"
+        ]
+      ],
+      "files_count": 9,
+      "id": "推荐排序与广告域包",
+      "path": "community/推荐排序与广告域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "85dc925e46c33fbc5b866789149c01632f70b82799ed13434a2e9985e8e516eb",
+      "files": [
+        [
+          "README.md",
+          "3000b1c9df84fa4a476f30875d97d388eedeefad828d2966fb239b35271cd05a"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "19518076af0dcd43b55461292f76e2cae77487017f1fe8781a06b81921bc3f97"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "f99aac001c2da497453b391461968f7cdbf2308b63015a5371c49b6fe441fe0a"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "38b979a4f57dd35aea1853e3aa94d55bfe616d15fb56a8a075a0b73290ae2301"
+        ],
+        [
+          "assets/provenance.json",
+          "d7e05395d342d0d997c3e03f1fb473d01679f01eec0022b4e0dc8e1d84db78dd"
+        ],
+        [
+          "modules/E01a_提示工程与指令设计口径登记.md",
+          "496020e6b816be9c8ff0ae37c286a5659e49a128a4f089dfe01ecdaefcfb0cf9"
+        ],
+        [
+          "modules/E01b_提示工程与指令设计收口与形态派生.md",
+          "eb703d2124fe9c4458c7aae7dda75bcfa57996967f95389e4b676ef886e47111"
+        ],
+        [
+          "pipelines/P79_提示工程与指令设计装配流管线.md",
+          "67a39759de612f0bd359590cad5eab0b3d292538dee68e48c7ff638fd81d23cb"
+        ],
+        [
+          "protocol.yaml",
+          "32cc6598a8104d00bee713dc9b1ff22bf9389013f6c3cf003537a6d3b478624b"
+        ]
+      ],
+      "files_count": 9,
+      "id": "提示工程与指令设计域包",
+      "path": "community/提示工程与指令设计域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "0be3b0d7a8982b94495cb5210ac8b63c8f57745b07cd48ff8ccf5ced671f2fd6",
+      "files": [
+        [
+          "README.md",
+          "c5cb641ee92fb32b511d4c47ba06eb18d27a7fd77d9f804f59cea88cbd6da95b"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "08f5625a94414c7e9a085f598082752351dd077703acbb0f9930638aef1e20b8"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ac0b651c54db7c333c3f2b5a5cf9fd0714fd098a30b7e8a699a5ab720791f518"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "fc2e76d465c42e6b28d3e9e66f48b91e6a975cc2cb4af141d3c045c3e57a93b7"
+        ],
+        [
+          "assets/provenance.json",
+          "3496e1c27f051aca86520c836b01cf7a2451597d1f6527ec09dcd0b204453068"
+        ],
+        [
+          "modules/C13a_提示工程与提示模板口径登记.md",
+          "153b0d7bc731228aecdcaf4ba7697e8b84ad8b3f21df6b3233527a17ba03d19e"
+        ],
+        [
+          "modules/C13b_提示工程与提示模板收口与形态派生.md",
+          "00a90ad6041ba2e784446d615ec75d7a3be3af0ff95e48239aa84ecbd3bdfc13"
+        ],
+        [
+          "pipelines/P56_提示工程与提示模板装配流管线.md",
+          "bff809f6ec7fe9be1322312d7be613b4d8b48cfaae7a6a09897b373e6db3e3d6"
+        ],
+        [
+          "protocol.yaml",
+          "c8f63b05dbe30b03d66e6e790bcdb5b3de3a3614d470cf64ff013e2a5c3e7dd4"
+        ]
+      ],
+      "files_count": 9,
+      "id": "提示工程与提示模板域包",
+      "path": "community/提示工程与提示模板域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "17369742dd7295946aa3c17b861403b3e4484360fe8823bcc7c10a803421e010",
+      "files": [
+        [
+          "README.md",
+          "91d33df596040447367c7b7ca16dd78d36ebd89ecbd8a129c1fd9f0292546f27"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "957f1280dd80a151febf271cb31d51cd387bd66d019e23d955262da4c9f7d752"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "55aaa6df189af14d56f8de903611fedd3907b32b397f2bbf6df059a018be4c3e"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "00b28528dde38615271513c8010798beb3545a767620899977d9ebee2b84c5ce"
+        ],
+        [
+          "assets/provenance.json",
+          "bd4313c670381c98157e975d3bce5635154bb6d768ba4a6b019c6a7af2609a85"
+        ],
+        [
+          "modules/E17a_搜索与信息聚合口径登记.md",
+          "66cb614b49d45dec4915959ffac6704788ee07720863770f3e793df4fadbb21f"
+        ],
+        [
+          "modules/E17b_搜索与信息聚合收口与形态派生.md",
+          "8e3255e3d7b32e0921d3ef4cee54d20dcc51bc893d130526f04c86d7fc183748"
+        ],
+        [
+          "pipelines/P94_搜索与信息聚合装配流管线.md",
+          "626f99c10fc287fb2ae4e0e9e3b45bd8d2cfb3acb368ac97992d01bb7aad878e"
+        ],
+        [
+          "protocol.yaml",
+          "2ed14630500004d6b57a7b4a28cb5b36fae4bf4d7e5bc8bde76ad55437a583fb"
+        ]
+      ],
+      "files_count": 9,
+      "id": "搜索与信息聚合域包",
+      "path": "community/搜索与信息聚合域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "0f346d1ca149f5f48e9884d5d7d875f8ca6c2a8a24c06f5224946df9f51ba2ea",
+      "files": [
+        [
+          "README.md",
+          "906c9ddc71a58abdebd46cf16d807bd42175cc18075dc722b9bc81073eb876dd"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "9afc80b7ac79d179910b5362a4cb79568653643b8fbb4e23fe87103c31dfefd5"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "dc5330b379356c5d9b6258a30c87db37b68dbc3a32b7044097efbf7d5672f81b"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "e3df89d08d014f502f3993141cd92c1474d19df4782fd8aa6c279f7a34f9c03f"
+        ],
+        [
+          "assets/provenance.json",
+          "38ee6939a5f8ab8729912ed126713da826b7703a0c56b3647316c27cb314880b"
+        ],
+        [
+          "modules/B02a_摘要口径登记.md",
+          "e85c3608b1fec92c11eab9140dc42cfd9c08eb87e80c88dbe5edbf329496a938"
+        ],
+        [
+          "modules/B02b_摘要面收口与形态派生.md",
+          "28b7fb608d26782a838ac94e25cb11ba7c3be3b3607488e8519a8200fbd51e14"
+        ],
+        [
+          "pipelines/P18_摘要与信息压缩装配流管线.md",
+          "bb7dd9b2e0a0b79a7e52e539e5bfae583c47282439218f747e559af6c5fb1a7a"
+        ],
+        [
+          "protocol.yaml",
+          "5100d19a46df90f98dd838a9fe83d086924de8bd57b57b13dc64b7d7287695bb"
+        ]
+      ],
+      "files_count": 9,
+      "id": "摘要与信息压缩域包",
+      "path": "community/摘要与信息压缩域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "d739c29a01d8050fc56669c35dce12e546afc4b8a1a4435ee21843a9bc8d0f09",
+      "files": [
+        [
+          "README.md",
+          "e08a4d2b2143038436e47ba804e35d0ad3f62cb9ece815fdb4ae755805fcac74"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4113be27037da4af0e901aff3589c20ec05af7a56ca67731e8ebb9bf336a592c"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "8fb3c0b519dfd40a80f9484fca4b6de994873e51368c75f543669120034b4cd8"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "10b3a368ff0e2aa8b1cd293cb2bcda7dcdeffc41a6a15cfabf76779298449430"
+        ],
+        [
+          "assets/provenance.json",
+          "a1f89c0cbc984bcd2fe862d3a7afef33231ba8a0bf45ad130880ae7ddfa031d5"
+        ],
+        [
+          "modules/E20a_数字人与虚拟形象口径登记.md",
+          "b66a485bb83d9264895e0175c4fc9175834604d5d13a7c244e907f7dd03d4b1d"
+        ],
+        [
+          "modules/E20b_数字人与虚拟形象收口与形态派生.md",
+          "784ccb72ed3d851a4ffd161a2928c2091a193052d24c5890c0ee247f7268bfda"
+        ],
+        [
+          "pipelines/P96_数字人与虚拟形象装配流管线.md",
+          "77f5d95b35cd39b5b39bdd938866f4b7e394dc85bd84db4380113e756823af2f"
+        ],
+        [
+          "protocol.yaml",
+          "b23722cf111d8310dc0aa8ea5ae45f873a65eea120775d6c6d1ebdd229b2f344"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数字人与虚拟形象域包",
+      "path": "community/数字人与虚拟形象域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9b2716029bdd42ab64a5a128ac6e79caa009774b1acb0b17c73f4c8be3b2f120",
+      "files": [
+        [
+          "README.md",
+          "157f807f787246b2652d5268dd29c58f86eb8f1359ece2416c4b4331b42b4fbe"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "60a32612fdd672a3385d7e534a5229323b7f0e30d4c1754b293184cca743dc28"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "82efee67eaf901a57662c0288a12851e27d2163773c6b0cc39788a167f52bbab"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "b141e93ae837385449fb95ee46f8fafabe817d922b8f1bb7d7621ec595de36e1"
+        ],
+        [
+          "assets/provenance.json",
+          "d48084e871ee409bd5ef610994a697a16e7cc4b34322e17520ea73e856151d19"
+        ],
+        [
+          "modules/A10a_推理口径登记.md",
+          "5db6388dbbd49d79c261da205b5814a46b27a136129d1016391911daa855fae5"
+        ],
+        [
+          "modules/A10b_推理面收口与形态派生.md",
+          "05b1361712f1e53a1c8ce60b34930d9fe750493d0fec0a0459a816d2a69b8f10"
+        ],
+        [
+          "pipelines/P26_数学与形式化推理装配流管线.md",
+          "9c98a7ccc634a6ba9e6c14ecb1e2184c335380019b78500c5de67ad28c56b082"
+        ],
+        [
+          "protocol.yaml",
+          "477fa848f710ec883567b5b689675caf07b5458a9e8994c8a5fde5b8ec3dcd61"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数学与形式化推理域包",
+      "path": "community/数学与形式化推理域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "243c99fd14630cc09bcb039ca99d8bbf4eaada77d7b9a947e882ec1a2d029f33",
+      "files": [
+        [
+          "README.md",
+          "25598bbf5907174d0aef23c509db63bc2bdad4f23c6ddf3b7e623822416be075"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "be004baf5d9e23385b3c7cf93f8f589c248f433f7caf41b4f1ed1b2f8cea42eb"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "4c3140871490f49245dbbeb69ea6faf62fdcd78bf5256790aa87b30ccc682789"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "78a1901c71a6cbaa5e18fcee5fa0a3d9ba3b49f79aedab83a2b0feef4a7d83d3"
+        ],
+        [
+          "assets/provenance.json",
+          "cdff56e9b7cc61f45c228019317d4a52672fb94f7103f479cb53a3639c7d3ee6"
+        ],
+        [
+          "modules/E14a_数据分析与决策支持口径登记.md",
+          "9d49d9f822b8195e2ceae5ae8c57c27ff788daa93a2a3dcb4d0c4da2df512150"
+        ],
+        [
+          "modules/E14b_数据分析与决策支持收口与形态派生.md",
+          "63be856c1034867cefd1e82ff0738ba18c6b4ae56c412b30b16e85d79789633b"
+        ],
+        [
+          "pipelines/P92_数据分析与决策支持装配流管线.md",
+          "4e0ce47cfd7c26f0080b58ba57d290715520c1de73914f90035c2e717ea1850b"
+        ],
+        [
+          "protocol.yaml",
+          "0453284d4d88c372e510c2d1c842d67123262e7153da85531f9f20f725a411a0"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数据分析与决策支持域包",
+      "path": "community/数据分析与决策支持域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "044a6b86054cec1bd8759378f6b8417981bba173b875b1849c7afcb494439b4f",
+      "files": [
+        [
+          "README.md",
+          "b357485cae9fb178c7817450f206addb61a3758d3d7b7b475fd605cc7aadbd42"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "2e1aa8bc4e3a4aa73dcea292a135b60e08802be642e5fc1b3a67fdd1250cc38a"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "dc704faeb84011f9f92abe9415d86ccd0b51dd52a622902b40432f3890828811"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2d78ce63d8999fd2bff447a61bfc7ea927dd36ce748bf8dc1f1f221dd92a88b8"
+        ],
+        [
+          "assets/provenance.json",
+          "db08188864e470b11b22210fd1ad33b3c6a0a9a0787241cf427af334aa16a754"
+        ],
+        [
+          "modules/B11a_分析口径登记.md",
+          "336be511bd2d67c02930b9d148d39054e78a03663edcadc5ad80b7ff24446179"
+        ],
+        [
+          "modules/B11b_分析面收口与形态派生.md",
+          "65f7048c52ecefb1657f7f8c1ece5e1e573f91ba57e8adf63e6c3ec54e48b448"
+        ],
+        [
+          "pipelines/P36_数据分析与表格理解装配流管线.md",
+          "cc193b2da07bc612b9038f207f04bfdee73382f5c12e0e12df5fa346a0127078"
+        ],
+        [
+          "protocol.yaml",
+          "ca78121925cdbe5ddc272ebdc815119992175594ee325f92b030bfab5c6de1ee"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数据分析与表格理解域包",
+      "path": "community/数据分析与表格理解域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "7e66ca0abb52b99cf9fdcdc809d411477293e1660bacef31a3b2ceec41383d14",
+      "files": [
+        [
+          "README.md",
+          "a8e3951c7ac025bbe135842d58153c741b9b486dc7246c5527248f56ddde80e7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e0e9a3cc2c37fb3150ecd1e646e0c5acbccb8ea6de50a9b0764e3e3c601b11f1"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "7404a6eafeac58cc8f726e875c54dc32df38aabc59c499ea16de43928d355b67"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6385e85a362e38d9ea60b134293097b6d3ef23b5e82db4ecc20045ace3bf1e32"
+        ],
+        [
+          "assets/provenance.json",
+          "4f1d0d3b743e2038bb3c8e2b032bf0179b059ad8c3dd841bff14d28574c0da4f"
+        ],
+        [
+          "modules/C02a_数据标注与标注质量口径登记.md",
+          "300dc95ed2fb7ce08b94fc83f34709dc3649f9fbeb7d4c0e9eb56e0488a917cb"
+        ],
+        [
+          "modules/C02b_数据标注与标注质量收口与形态派生.md",
+          "beb09707837e506610b746f6d0b54c00987d2a31222564520a7549a8844a41e2"
+        ],
+        [
+          "pipelines/P46_数据标注与标注质量装配流管线.md",
+          "292c80e62e4a5e1d2ec5bbdf6fa26fb506dd9fab48e1d4d353dd1571d488d6c4"
+        ],
+        [
+          "protocol.yaml",
+          "98ecff60bfb8ee798465fdf407af3e17d88b97a34b1b677f3fbf90d954dd4975"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数据标注与标注质量域包",
+      "path": "community/数据标注与标注质量域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "23bc465134790634ade1cefa5263f69ab98fc527566ca703b1e292c176c7b9b9",
+      "files": [
+        [
+          "README.md",
+          "5a244c5677c5705e800905b8478c7c25797c85e80021465e28b685c4759b29d5"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "62a231952a72bc473c469a3be877141b7a260c854d14fd0e84234d164a05432b"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "24454e50c368e9024c85eb060497bfc10666ce822353dbb782fc75fbd1e6a02c"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "7f839c400084cb8f46846ea736306f47df8e58391d3e6fcfdbb71a0cd7e67673"
+        ],
+        [
+          "assets/provenance.json",
+          "aa68ebf34fc64f6f2bedc2805566ac8a32d4604622561f1fc978278598d9720e"
+        ],
+        [
+          "modules/C01a_采集与清洗口径登记.md",
+          "a89c23319aa0df775975329468042d9b77979124e48bfe935eb7ba5768b22001"
+        ],
+        [
+          "modules/C01b_数据面收口与形态派生.md",
+          "fc01344a81d9220c23a4059b98cfbb7596acc23216d360965eaf3a7c0ec48cdb"
+        ],
+        [
+          "pipelines/P45_数据采集与清洗装配流管线.md",
+          "d1f579fcba9401cae0934e4fc77683f3e6f7c7dd72205fccb0584c7583afa2b4"
+        ],
+        [
+          "protocol.yaml",
+          "f3ba4eb0a59c5523ba9fbb02e695c7973febc60edf7dcd6cae552c86b5856d8e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "数据采集与清洗域包",
+      "path": "community/数据采集与清洗域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "fe84c70179e60116b456d055454666803c8c54a11366e918d425482798a29e8e",
+      "files": [
+        [
+          "README.md",
+          "0f8936cf10de3f49af81b72622a81c02ad5455a0c6836ef71312ba56f6aaf5e7"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "712784b3c411a7d66b6967a1a8d0ee1a6b916e7021f45bbf80f03ad4c07deb45"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ec63d0e85cb0556973e60f3e61a611d41d6c446d1b57b1540eaf338b4899cd13"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "b70b7108759751570a99ba07bb5c85d9a58fd662d2b22c0860facfc62e8c01ab"
+        ],
+        [
+          "assets/provenance.json",
+          "8ebde2676ae6199228f7d6fd3314ec7ae78ac8ef51ecbdd349fc01c4f3856859"
+        ],
+        [
+          "modules/D19a_文旅与酒店口径登记.md",
+          "88d11bfe051b58a5cb176f0b8f980f6b0d953d822168e80647d8f7df302896e8"
+        ],
+        [
+          "modules/D19b_文旅与酒店收口与形态派生.md",
+          "ea16a97544868de61ce00f85c954666dcd94fe0b967c0689c5af1d845a229b23"
+        ],
+        [
+          "pipelines/P77_文旅与酒店装配流管线.md",
+          "4ddc98ab26dcc66cd75c85301538283d2da65bcdccecdd3dd8b9d11fd8c5621c"
+        ],
+        [
+          "protocol.yaml",
+          "24ba9882dbf61b8473feb9967f33dde5ef3d12eefa03c89604933a1e17884b1d"
+        ]
+      ],
+      "files_count": 9,
+      "id": "文旅与酒店域包",
+      "path": "community/文旅与酒店域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "47a410f9e0d32a848e359a65a364676df23d3368ee97185b01bf5a29cebb5e88",
+      "files": [
+        [
+          "README.md",
+          "d9321b9e8d867d9337906f7742a743af7426478a919801dfdfdc3c7f631d801a"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "39ba7b18e51d6a76ec4b63dcb17d984bcae199150a92befb38fa1010f369f366"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "e05e6be7cd9f82c50a3c2cfacad77812c4159f6589f7f7c89ee921b00d9d75c0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "70f9d0d46d6b27149f07d4daaf8cf7793190f68345ba037a7a0f45d98b92e299"
+        ],
+        [
+          "assets/provenance.json",
+          "0c1a7ca4de26aec0f5c042bdac2a8e276b23a8f1bf0174628f499df02f98406b"
+        ],
+        [
+          "modules/B01a_创作口径登记.md",
+          "4bab96af620b0ba74ed56051c4a21823594f5646983fd655ef97b2fafb03c042"
+        ],
+        [
+          "modules/B01b_创作面收口与形态派生.md",
+          "517d476076ac61448ffc17ecb42a55549c284d3fcc7aa8faf98538a8965618bb"
+        ],
+        [
+          "pipelines/P17_文本生成与创作装配流管线.md",
+          "11ba92934def948b1b246e3f055f2185962e8c5d8b6dd39bd33e30485f18c8a7"
+        ],
+        [
+          "protocol.yaml",
+          "a419d5e442cb19594e41d93b75bb1fc7ea49bc332fd017bf2d906b7c73561678"
+        ]
+      ],
+      "files_count": 9,
+      "id": "文本生成与创作域包",
+      "path": "community/文本生成与创作域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "04531c8772be46513c18f159e8bb77577e2d007f27c502d452166ce092fbb9ea",
+      "files": [
+        [
+          "README.md",
+          "66984c0a0923d00676dfacd299a9d02ae89817fe70a7c7c0f63d9d98fd0c95e2"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "bd0e661f50e160a6a6edd618b01f1012f67c18fb8463fd2e116af7e11958071e"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "d17ca056144b1ccde54a9d94318a7468f49a590a0768bb7d1fd8f6d87669bf9e"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "b7c03739c5a4101a5d122231dcd83c251a1feda1fa87ad8fc303fd887622016a"
+        ],
+        [
+          "assets/provenance.json",
+          "2ea397174b0cfa7662fab31a821e5f3c1179a2abb7a9a6a597c3b1c2b31bf757"
+        ],
+        [
+          "modules/B12a_解析口径登记.md",
+          "5a86652a9da609f6cbb425a37ce6708ed1746164600685455498c253cb1a9357"
+        ],
+        [
+          "modules/B12b_解析面收口与形态派生.md",
+          "b2ae6b73161a106c03f4ef32fa3bd0917ccaad95a3be3ce1b844833d85d9cb80"
+        ],
+        [
+          "pipelines/P37_文档解析与版面理解装配流管线.md",
+          "fcfe8dc762277b52c3167cb96cb1a8f8d29b90ff4c68e3de295e7f841c15f918"
+        ],
+        [
+          "protocol.yaml",
+          "182a46aebdc53b3f8fc41b05cc3d05c4393d03fffef4f502218127f0ef929279"
+        ]
+      ],
+      "files_count": 9,
+      "id": "文档解析与版面理解域包",
+      "path": "community/文档解析与版面理解域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "cc0d8dfdf45235a975dc20c3a7d2e28f0e89a23b2e0fb6bb50e389b691e9744e",
+      "files": [
+        [
+          "README.md",
+          "b88c1cb5122480542099a5385f9c128f4ba150abc8fa96ae0d410927654606ca"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "9cf47f27f7aa07b143ff43cc57035e64c007b4bae6eb5d3e9e5c166f5f24f3b8"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "122de0dabc2f08e1702f444cff875f4e8ea28ce447129806feb7872c780b8290"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "66bb7e12307eb343ee570471663a0c39d69c2b40f1b3d8e52e31f07ae1c470fe"
+        ],
+        [
+          "assets/provenance.json",
+          "76d75a05e03f4b75b29e3f2ca4033e00dee6723e8fa909553bed6c6c5eac9d4f"
+        ],
+        [
+          "modules/E12a_智能体与工作流编排口径登记.md",
+          "996e6572a284747b5b90c3f8042d1ecb566aab0e4585c3ac76c4d1d70d2d450c"
+        ],
+        [
+          "modules/E12b_智能体与工作流编排收口与形态派生.md",
+          "0cc37aafe6e3e147427504d781ea71d59659653ab718a2079fe878af3745c2d2"
+        ],
+        [
+          "pipelines/P89_智能体与工作流编排装配流管线.md",
+          "d77de01e904a5bf3520d1618cd74a00978e02c260ebfa9467379ae040680f58e"
+        ],
+        [
+          "protocol.yaml",
+          "4a2d4169cbc1c4ca4056b972a8d2c8232e651f9c3ffa6aa6ba8d973bbc3bd116"
+        ]
+      ],
+      "files_count": 9,
+      "id": "智能体与工作流编排域包",
+      "path": "community/智能体与工作流编排域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9638ab634ac31885aff320b7488fd7672f0f95fd9c893dd1d2bd8bb0b864857e",
+      "files": [
+        [
+          "README.md",
+          "42be3766c4896f41154f269da10440f1e46f4b6b2db5be94fa320961ce70699d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "0d8f4631271f44856d47ff5e867b329adef2f6364dbcfa7dafd2ddd3afac7d2d"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "07b91f25efadc29a04abfc5661ae201050130a7172f5cc163a27539599471104"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "8ce93349b1b461fdf3743b08841ce3583a5822b9d6ac1e1a98f851e1be0aef84"
+        ],
+        [
+          "assets/provenance.json",
+          "3c70e15d4e323f8a17c7981c831b421d76dad545757d99cb838be497d8c67525"
+        ],
+        [
+          "modules/C16a_智能体框架与工具调用口径登记.md",
+          "50251ab5dc226599ed790fe21299f393f6e9395b8b56c7f377c4536905ea023e"
+        ],
+        [
+          "modules/C16b_智能体框架与工具调用收口与形态派生.md",
+          "feeb55a3c212d57cf024e85b595a11539058e4e70de65d845c2af9f610c65a6d"
+        ],
+        [
+          "pipelines/P59_智能体框架与工具调用装配流管线.md",
+          "0771a783f493822b5c66e3c313fa6c0e2dba07d355221009f1afb1b558bdb191"
+        ],
+        [
+          "protocol.yaml",
+          "e645d9bac308df3b812a1403503ae93304ac622c309af652da94a4e03b7eb1fd"
+        ]
+      ],
+      "files_count": 9,
+      "id": "智能体框架与工具调用域包",
+      "path": "community/智能体框架与工具调用域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "5effc2da38dc41a0e65167fa4ebf8fab105ed7f634756e0782a7f36df74a0f22",
+      "files": [
+        [
+          "README.md",
+          "a33fb0c005e622ccf2a77431536e65441430befe6dcfa7c362b63ff134f6716f"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "38cb04e2f7bce5f1e838cae43f88c6750b04bcff1121c208fb4552ea9e649b46"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "6bcf641a2675475c829842b3601676c24dd7049a4a8142349882355ff1384737"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "84d47191c1aecb7073e24017fb47eee495ac23c109144e9d7046ac373f9a496f"
+        ],
+        [
+          "assets/provenance.json",
+          "a9738d740d02c0797ca4d961fa8c26e1e28b6c9983806a9396e533c9516b15e2"
+        ],
+        [
+          "modules/B03a_翻译口径登记.md",
+          "8da8adfead710f5abf90199e5eececc1d73316ee6c9f6c3b14f9141afc111ee3"
+        ],
+        [
+          "modules/B03b_本地化面收口与形态派生.md",
+          "6673277a638551f6d4bf48e12928181dd91efb0b0676758ee36bc28e10795513"
+        ],
+        [
+          "pipelines/P19_机器翻译与本地化装配流管线.md",
+          "1a13e1cdaeffe013ddf71b77a66ab4e1e1f1c52f485a6bc0ac717bc586c809d4"
+        ],
+        [
+          "protocol.yaml",
+          "3ba8668df18989104041168d1ddaec7ee138ff0c247a2d77a779b6c596d7526e"
+        ]
+      ],
+      "files_count": 9,
+      "id": "机器翻译与本地化域包",
+      "path": "community/机器翻译与本地化域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "fa872b212f116c86fa8470b3a59cab83a5f6fc555cc760d71d6bb83ac56426ed",
+      "files": [
+        [
+          "README.md",
+          "a1ba3f6243e5c4240cc9c28a79a3b3900302517f8c323d86fc631145d80588bc"
+        ],
+        [
+          "assets/ATTR_TEMPLATES.md",
+          "8c5ad4b6d3855bd1c5d3b7863672c7f701491c4d21c411298a1b4931b6d506a7"
+        ],
+        [
+          "assets/BEHAVIOR_SIGNALS.md",
+          "69bf65b546d734f7a29afc4d8d9a3fce9cbf214b64da6104cdf441d6c347f805"
+        ],
+        [
+          "assets/BIG5_INFER.md",
+          "fbeceb27e87796b8d0dd0446e80ca859bb3a405e80da14b54ea139e09cc7fc66"
+        ],
+        [
+          "assets/COGNITIVE_LOAD.md",
+          "2d54de024de4f16ac2011d30ff2e7251da5ab20b0bcfcd02b6aee2cb5e7415a4"
+        ],
+        [
+          "assets/DAILY_HABITS_SCHEDULE.md",
+          "73e7c028cda761152c803086283cdb45a25f8e61c7b52646d5402fb744af7932"
+        ],
+        [
+          "assets/EMOTION_WHEEL.md",
+          "697d563ea3c15bab9f84829f3b405c27d11a189ebf90429c1d853a0372642465"
+        ],
+        [
+          "assets/EVOLUTION_RULES.md",
+          "8989197ba5983e137810019345ccd0e7cc2b405cbeb3231ea1b36bb822b0fb2f"
+        ],
+        [
+          "assets/FAMILY_BACKGROUND.md",
+          "1d92ab95a3871a62b20fedd59fd49da6ab85f363778ba7df73599b1f6453049b"
+        ],
+        [
+          "assets/FEAR_LIBRARY.md",
+          "a542fdbce00717a0479dfe5a8358786db9868497ca1fba6e0dab02cb48a5fb5e"
+        ],
+        [
+          "assets/FORUM_POSTS.md",
+          "6a53fef2f8b59c5196deebfb9081451dc29df3709d9bfc34446f9f463c594520"
+        ],
+        [
+          "assets/GIFT_PREFS.md",
+          "2105c70f9d40699be45e4a1ca5991d51dad172148245cd1685aee83527eaa16b"
+        ],
+        [
+          "assets/GOSSIP_TOPICS.md",
+          "e1d741e60c37ec286055b65529d625bb3b2b2726a5e46b9fbbcddd320dae8aac"
+        ],
+        [
+          "assets/GROUP_CHAT.md",
+          "fadd5ccceba6632b6ac6e4b4fa7d3bb69c11db83c9463005f2635398af007656"
+        ],
+        [
+          "assets/HIDDEN_EVENTS.md",
+          "2ca9115bdbc55c0f361af44ad8c638561bdce7988ef83628405f8d7e3c860815"
+        ],
+        [
+          "assets/INTERACTION_DEPTH.md",
+          "411abfc79571fb19aaa2dbe6cc27c6c7d4e245d27ec859630f9dfe98eca2e6c6"
+        ],
+        [
+          "assets/LOCATIONS.md",
+          "836eb6e2a54be0dfa2cb003b91d2e0d4056fc8b1fe767e4b8c772dc96bfc96ec"
+        ],
+        [
+          "assets/NAME_LIBRARY.md",
+          "9eebe666b4380d3cb24743cc0f28f343343207be28201253cab6b1201bbd6e81"
+        ],
+        [
+          "assets/PART_TIME_JOB.md",
+          "e9d093b0ca8b05f16009ed60b1615e22364d5679178411964d3f86fbd8d670ec"
+        ],
+        [
+          "assets/PERSONALITY_LINK.md",
+          "41a21559fbfe7e52dc64bf854da4e7767ef66132d9d649ce1206427f71b750c3"
+        ],
+        [
+          "assets/PHONE_CALL.md",
+          "58fc9d7359d9a8a7eed2695be809ff8ccb4b5daf2d4e69ba472044313a7eaf6f"
+        ],
+        [
+          "assets/PRESSURE_RULES.md",
+          "0b83d395314c7cad92dc974152b5676b81af43dd0dda737e3fc4b097ea6ac187"
+        ],
+        [
+          "assets/README.md",
+          "328b16fc16122f57b07544f06734822e3825aee0176fa98933c741c866f44039"
+        ],
+        [
+          "assets/REGRET_LIBRARY.md",
+          "87c79e173734085d19352ef81553e9975ee22f22c339aef80ba50292712cc4f4"
+        ],
+        [
+          "assets/RIVAL_INFO.md",
+          "3c74a77c2da9e5c7994275db579dc97487b303a5df982c96e7195acf9af5b898"
+        ],
+        [
+          "assets/SOCIAL_FEED.md",
+          "13fabdc5e99943fd4c06dec63fe8f62ea6f3bbbc0fd9c52c03883df2965aaa58"
+        ],
+        [
+          "assets/WEATHER_MOOD.md",
+          "b1d5751e4104892799de30055ba7cc0c223179f2cff9c80630f96e37af4b0371"
+        ],
+        [
+          "assets/WEATHER_SEASON.md",
+          "9f3b45f46d2013bef906b0366c2c1a9e2a75a99c197c9f7dea921f159bff19a4"
+        ],
+        [
+          "assets/WRITING_STYLE.md",
+          "e42acfc10e864613d613af6924f9c8059ebdec60d7658e4ef498f200b7e9f9b0"
+        ],
+        [
+          "assets/附_生活情敌联动结算.md",
+          "9d609eeab51ba83d24e381069ab38db040ae1fd765b29a58d2cb6534c3ad86f5"
+        ],
+        [
+          "assets/附_社交系统触发联动.md",
+          "ade3f89e80b27a46c4dae7da48f9ba0ee8b2cd3cf6d09c41cb2b1d53e3a1987b"
+        ],
+        [
+          "modules/M22_三冲动驱动.md",
+          "472eecbfd392ed6c96418990ca35378c3367a1a4dfea2bccc5dbcb463494f1bb"
+        ],
+        [
+          "modules/M40_关系深度.md",
+          "f5e34de93423af01e2668961a4b298d7c319edaf89c0dc02fef35cc3f1f94500"
+        ],
+        [
+          "modules/M41_恋爱进阶.md",
+          "951c014749f88e970585add38235d8d9f7f61a99b0d594e72c121efcb114935b"
+        ],
+        [
+          "modules/M43_情敌系统.md",
+          "636bb2763a8544eb8fc902bea67f5ac1b6c5d5b880c5f4ff44e55f7920223d6d"
+        ],
+        [
+          "modules/M55_匿名情书.md",
+          "4875b82fb1a9b0f770af0048996e0628b481b2b47c760bc1ece250fae6d08a05"
+        ],
+        [
+          "modules/M57_朋友圈动态.md",
+          "ab0a4ec9c3ae519014ad2295f5496103b8d1bb82724d50a7f0767cf32df0ac39"
+        ],
+        [
+          "modules/M58_电话通讯.md",
+          "070892b2849c1bf6da1d045f0e69b6a97feb3d8cb1e54920d6f0ee7446d92534"
+        ],
+        [
+          "modules/M59_群聊系统.md",
+          "fe74296362ed7f1fbdc0c1d02e553241b2b500c679f141a49cda7512744d8295"
+        ],
+        [
+          "modules/M65_幽灵遗憾.md",
+          "8b0d97bc27eb4745fed75958ce6119d7d39a371eebda9aa2e53d1e1c05a14da3"
+        ],
+        [
+          "pipelines/P02_校园情感流管线.md",
+          "df88f6fad9021e07d6c9d2b9204c095317cf237d508f755d3b9da8edd521ef19"
+        ],
+        [
+          "protocol.yaml",
+          "502c826143c2e89b5dba9c4a3b03719312691c19a374d29a48367e05c0157306"
+        ]
+      ],
+      "files_count": 42,
+      "id": "校园情感领域包",
+      "path": "community/校园情感领域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "0b2a24cc0d141e856338f6e38cf9665b567117a42a0254654d1fa337449d2697",
+      "files": [
+        [
+          "README.md",
+          "86ba0e99fd1c6da4c341fb1a2bd37f857cf8a00268c2693e99c926294c5dd8a6"
+        ],
+        [
+          "modules/M91_异界身份桥.md",
+          "37707c4a670ddf7f97d6dfe799dbedd6ff8dff19bddd0ee36432980f057d4b02"
+        ],
+        [
+          "modules/M92_轻混装配执行.md",
+          "1e261dcc10d0b7134d8194f6e548ecae0d7230d9ba8e258d48825627503360d6"
+        ],
+        [
+          "pipelines/P04_轻混装配流管线.md",
+          "e49f73d671aa8cb8bbabc1f161cc0481bea9f968d3f1b033faf84885d1239742"
+        ],
+        [
+          "protocol.yaml",
+          "093cc817ae089981b7cfe4aaf57ec7f5d2374455bb63fc8b7af06dc2d29a02a3"
+        ]
+      ],
+      "files_count": 5,
+      "id": "校园西幻轻混组合包",
+      "path": "community/校园西幻轻混组合包",
+      "sig": "",
+      "version": "1.1.0"
+    },
+    {
+      "cid": "3be460b4216fea894e45a30fa4644c009bca41130212f850df420be179f6ac1c",
+      "files": [
+        [
+          "README.md",
+          "0f1edaf97f90f489f708b816e531120f6a9cafc7b73d3fec62676481191f0c4b"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "80efd5c073efd2e144b806b4f9a7d1623357154dc8a953ca5af990509f48e108"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2311d6ccddc8fa73d886afbc50a20cfc305fca68046128f74d0c8c0fa9694f9c"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "1884bb711f5bb352c0a4c1d2ca2515660aef3232201e303ee90e426b15100d5f"
+        ],
+        [
+          "assets/provenance.json",
+          "af1785cedde80ad541408e2fbc1ec109090bb9958b2c8801a0d43cd8b7a9f5c9"
+        ],
+        [
+          "modules/F07a_模型运营与成本口径登记.md",
+          "3b2898815ca44142cb3bf24e4b43512bda0577c07d036c484115f0553c96cfea"
+        ],
+        [
+          "modules/F07b_模型运营与成本收口与形态派生.md",
+          "fd7ec04eb6b081def078330a0edd0bee53e98bd5ea0f00f3f791bcd8d0d9b924"
+        ],
+        [
+          "pipelines/P103_模型运营与成本装配流管线.md",
+          "56cee3cd4d9e6eac0c4ff161b44de8d1eafa3bbffdd3ee78ae9e920cfba08942"
+        ],
+        [
+          "protocol.yaml",
+          "eea062e45ed78aa32fd69ef040f7f731de3bcc927209c6055c83f2b50e140580"
+        ]
+      ],
+      "files_count": 9,
+      "id": "模型运营与成本域包",
+      "path": "community/模型运营与成本域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "6cbfb433d7c54f276d4d532ed18e92787ff777f19d4537b9403f7ac57b042786",
+      "files": [
+        [
+          "README.md",
+          "ce087d06cca6043b05e6414c81c7f60cfe93d8f2b65f6df350c257f709e39f98"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e59b89c0c9f86367a0d39c87bb0b970e7487cbfef83bb0fc38cc35373e5e4773"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "8d112aa419fadae6b5fce81bbe9e78e4ef61f9f18930f3aeb9db3abf2d32125b"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "248bacdd04eab5b6bdf877064f2d4af0ee21c0fe5014ae9dc98a97377e7b0cde"
+        ],
+        [
+          "assets/provenance.json",
+          "c5c57c78369a7ffd2ea3e776809d179d8dfd4c72af9ec5b9381e6711092b53c0"
+        ],
+        [
+          "modules/B10a_测试口径登记.md",
+          "5942b7064335bc55c856930cca9d576610c107499f2b04f84e236a745ba53c5b"
+        ],
+        [
+          "modules/B10b_测试面收口与形态派生.md",
+          "92a8fdbbe05eb85bf2277b17dbb0352bf5ee4aa2bf006ac2779722f4d51a865f"
+        ],
+        [
+          "pipelines/P35_测试与用例生成装配流管线.md",
+          "685d5a3ddd833e2730ea0c5700f990ed395b7a7ae1a11990278d49b15b8e9b8a"
+        ],
+        [
+          "protocol.yaml",
+          "f6fe466278a5d6741fdc0031bc7124de613070332ad012ff5208ae0b638b6eff"
+        ]
+      ],
+      "files_count": 9,
+      "id": "测试与用例生成域包",
+      "path": "community/测试与用例生成域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "20f7d36b317c571b9dbd27bc02cdd62a81920a68eabc467442899576be6af3c0",
+      "files": [
+        [
+          "README.md",
+          "105ed3d35eafc5721abea24602cdf6bd07e7b1f5d225d687a3fed819f32b4993"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "2a6c435718705278a4d8d7cf22275d6b78203b4ba55b0e34faa73b6dac228eca"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2e8bf1b83c4eb362317d1ac30dc2d0ffa084f68ae86cbc1215b980189810047b"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "197bcd0eaa4ec658e89ea027d7cf98cdc835c33558ffe96b13b9c32d79beff54"
+        ],
+        [
+          "assets/provenance.json",
+          "7c758c6a3539881a4602665da5e7ad8c7286a6b8a9783ca39ffbc6b68c54633f"
+        ],
+        [
+          "modules/D18a_游戏与互动娱乐口径登记.md",
+          "2457832af780ce274928adeee2cceb2d2bd3cce23ed40f82d082a19517641dd8"
+        ],
+        [
+          "modules/D18b_游戏与互动娱乐收口与形态派生.md",
+          "e3a94a5c3ad7ddaf1c7acd5af664d9fc19787995ef1b3010cde9c1836db960ec"
+        ],
+        [
+          "pipelines/P112_游戏与互动娱乐装配流管线.md",
+          "d9f187fb1155445077a64bbada1e1cdc2e7760f80194cddd6977cb7613ea8d72"
+        ],
+        [
+          "protocol.yaml",
+          "0db5489b3651cd99d0cbffddb0bad4d2e2af583a9a7be9aca327d53ba7ad2d9d"
+        ]
+      ],
+      "files_count": 9,
+      "id": "游戏与互动娱乐域包",
+      "path": "community/游戏与互动娱乐域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "23a1237690e4a75a9c7bba85012cc3a3f35b1db70d34a2a6540a07fd9d5c5018",
+      "files": [
+        [
+          "README.md",
+          "dd9ad6db60761d7867f235e5eeef2b1725b860a36a22a7585ac3bc0bac4a41fb"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e899a12ee8a3dce12845b4c052292f93e3883502bead576beba245bf71eba556"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "55795dfdc15ac6547f6fdec7b9a22db8ef6a2769f8f93387078703a5c20014c4"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "a6c73f60c5f909b798b750ee1a648dd279dbc606fcd7fa83878ead3dd25b52ff"
+        ],
+        [
+          "assets/provenance.json",
+          "9a4dfec6d8de05ca39f279c134cf57dc48348d359bb5c09ecff52d340c5ca95e"
+        ],
+        [
+          "modules/F04a_版权与知识产权口径登记.md",
+          "54d907744a5c8f147186f11260ca10191f7f05cb88ad7435ce4c57a92192cf56"
+        ],
+        [
+          "modules/F04b_版权与知识产权收口与形态派生.md",
+          "3749f7236f22316da4d6a0e0319f9b9e8f54edfe94b2eb239609e4aa3838e0e4"
+        ],
+        [
+          "pipelines/P100_版权与知识产权装配流管线.md",
+          "b8a557de3521f7b9ee3a9580e2ea39938967f7233c599ddace40f722a1bf3b1a"
+        ],
+        [
+          "protocol.yaml",
+          "971ce89d52f48da803fcbbd52ce0a4342fb0f9fc19c95f66e0e0672aff956260"
+        ]
+      ],
+      "files_count": 9,
+      "id": "版权与知识产权域包",
+      "path": "community/版权与知识产权域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "30a2f2024e5f73c8f8adb53f0cb53b6a8d4d0e5be02b0cc0aa40368113ecdca1",
+      "files": [
+        [
+          "README.md",
+          "9505f289a75d2fb6910d3e439f9e6856f6104790e5ada79dc7a9ca93e73f2ee9"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "7973ba86e7d8009c0faf7bec5bae5cedd2b3dc3182040471ecde5d60e96852ae"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "cd7ca2994df37d74e6a055baac3e6ea0a616aa951ba10c870a90b2b191034273"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "20886eeb8d255599859cfbaa9814f698384863f72a1542fb75f81ea2029dbc1c"
+        ],
+        [
+          "assets/provenance.json",
+          "dfcc8e8a4c9462e39f8b4fbffbe1a5f745a8759f30a8db9500379b95e5cf87ff"
+        ],
+        [
+          "modules/D12a_物流与供应链口径登记.md",
+          "3eb48e48be7914e99e12dfc4b9561ed4a10a6df4dcdd69db97fd11454101ba10"
+        ],
+        [
+          "modules/D12b_物流与供应链收口与形态派生.md",
+          "d7a40ec32caa3f66f822c3f1e04920a09f72d565bf72113b0f1e181fe1b4d5ae"
+        ],
+        [
+          "pipelines/P71_物流与供应链装配流管线.md",
+          "5b450f96506af8c2f8af869ff78c21a716656ef5fcc9667d6aa51e8ceba7ea65"
+        ],
+        [
+          "protocol.yaml",
+          "15f60029d48362fbdc85f57be412891f962c9396c7b8b008af4a75939849f4a1"
+        ]
+      ],
+      "files_count": 9,
+      "id": "物流与供应链域包",
+      "path": "community/物流与供应链域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "ded7c2e2468dbf36d375aa3bc316d4226178a43de6cada13517daa0c096cccae",
+      "files": [
+        [
+          "README.md",
+          "717603a5ea1129561b026d1dde44a858f083f5a241fbbc6b5a0df1fcf82e7b5c"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "fd8dd6f0a0418d05decc460dd5ede1861f93e8762f9c7168f7578ecdbe47990b"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "69c0acf28525c1241e7fe4aa96d808e7128cb2de53226be66bffc70a5e0b2070"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "d38d79924d76eb295c6d8f9abbfecadf01a360af763ed77958e2f1c1f2528499"
+        ],
+        [
+          "assets/provenance.json",
+          "a22f90883ec9efd984c2226714e9e8c69dbfb6a2a69ef4513958ff5c78eeb2c5"
+        ],
+        [
+          "modules/C05a_监督微调口径登记.md",
+          "523b1113efb69a22f3c2c3547a196f1b5aab48ba173077d044c359acee196ba7"
+        ],
+        [
+          "modules/C05b_监督微调收口与形态派生.md",
+          "94f18ff88e8b0c69233d8b0919ab7deaf3823f53188058923bc5fb8ccc5d5702"
+        ],
+        [
+          "pipelines/P107_监督微调装配流管线.md",
+          "53e6c60ca6478f9c591770d52c9d904943441c91416a5e5ea9eb77223cad4663"
+        ],
+        [
+          "protocol.yaml",
+          "86b00f65ea7b4a566e366a225443858023646715f6b233d19ea5f8d4b48fa6d0"
+        ]
+      ],
+      "files_count": 9,
+      "id": "监督微调域包",
+      "path": "community/监督微调域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "a2e9d4dc797b98b6a8c0994a00ca0f5c47d4bd1447158a1da23da0deefccd3d1",
+      "files": [
+        [
+          "README.md",
+          "754fee40121c80e76050ca99bdaff71600e12bde836e8ac22ba60173746b84a6"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "b232a141692c14a7b0abe168977ac049fa87c7d0b162464ca3958f477b9eb0df"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "67ae340c90c4eafd2d32f109d606a663217bd0c25c18631fa0598b24b626b61c"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "174238291d6704f20c5219a2018d3dade7290a64b2ce477951765837688bb594"
+        ],
+        [
+          "assets/provenance.json",
+          "79e92ada08f68e446737e60bd456d95f3edf4c60241f3b66314ac9f93fd9006a"
+        ],
+        [
+          "modules/E11a_知识管理与检索增强口径登记.md",
+          "f3227d292b9a19e63b81bc3293f91d13070b94ad670cf6c635cb5b4b1d1c06e8"
+        ],
+        [
+          "modules/E11b_知识管理与检索增强收口与形态派生.md",
+          "3e976538b0fe418170cdc242dc0b649caa4170fcba67cd051a1054f54fc780c2"
+        ],
+        [
+          "pipelines/P114_知识管理与检索增强装配流管线.md",
+          "f6a0aebb476b13c243eda9e8d8378b5af7aedbdfee1de05855928b217c31606a"
+        ],
+        [
+          "protocol.yaml",
+          "fd310af9e38b29e741687578417b9810948cfd0dd863cee8cd78b1b1749f4cb9"
+        ]
+      ],
+      "files_count": 9,
+      "id": "知识管理与检索增强域包",
+      "path": "community/知识管理与检索增强域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "e50d538a5520c58731f336f9e586da0ae50494a5f72ef33e6f64baa9042f2c12",
+      "files": [
+        [
+          "README.md",
+          "92814087e00cbb413e2d8b5ba846e39c467801d34696fa71277cfd56056bd087"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "364a4eb8f8dd20adfe68d3185763e6408cc65f44fab5c593c710dfbaaea40434"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "2c093ba3133d030216519fadebc1d27e5a370c3740484a8899cd50144297d297"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "619d1d98a441b809a53ca68f0a920bdc1451db92604c8fa6b64f8f07a84414b1"
+        ],
+        [
+          "assets/provenance.json",
+          "9a4aed99f0eeb63758a26046c0d16ff62ef1387accb584458ca66c83add166b6"
+        ],
+        [
+          "modules/B06a_RAG 口径登记.md",
+          "1fcce02fdb67453785aebd34c951193669fb1b129d6b2c95e048c46b058ffa96"
+        ],
+        [
+          "modules/B06b_RAG 面收口与形态派生.md",
+          "33f2fb1d8e4cfa81cc0fc4bebdca6bff914dbe85fe9b7f50b1a1655dddd29503"
+        ],
+        [
+          "pipelines/P31_知识问答与检索增强装配流管线.md",
+          "bce8dd18a3599be1a25ca4fc8ef46bf355dcaba8e99455e06ef4a17aa36da491"
+        ],
+        [
+          "protocol.yaml",
+          "d7f90dba235b4785bca7d403fadfb195828b0cd7e1ecf381f116a0ee970ca885"
+        ]
+      ],
+      "files_count": 9,
+      "id": "知识问答与检索增强域包",
+      "path": "community/知识问答与检索增强域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "cc56336fe70c3adfc9a3e2c03b85a416799e5ea38e00b6832d3b1b270885cee4",
+      "files": [
+        [
+          "README.md",
+          "a304231580e28b5825bace5dfd9cdbdbd542681cf4cb83d01948a194e44d2389"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "7f6271d037f9f0b179f74317c0a0b0c0aae26d07e9cc1e6d3026a1b6bed07d37"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "456630d141626c4a75ca00f061ce66a40ad43e160846afbc331d9c40708f73c3"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "6ae7442c2b528fbbcc823fa67e2a4c5f569af549cc62f11828b63ee2454b4776"
+        ],
+        [
+          "assets/provenance.json",
+          "4a499007e42a1e84f1ef0554881bed1fe087e1104ca23fe25ccb15965ef2bcbe"
+        ],
+        [
+          "modules/D20a_科研与实验口径登记.md",
+          "2dc99a249b6b979afec0097004e0b955e10c82c5b1294332795360bb65bde446"
+        ],
+        [
+          "modules/D20b_科研与实验收口与形态派生.md",
+          "a115bcad5b353a713c566d2017fd26ed6233f444fa96a5c5ccf27ac5350fe1be"
+        ],
+        [
+          "pipelines/P78_科研与实验装配流管线.md",
+          "a3b71c5781006149be75372b9cfc2000552053c04efb6690f28fd2e7a42bda70"
+        ],
+        [
+          "protocol.yaml",
+          "6b7558a3f725ba8985da43db441c8b3611b6c87da524284e42eaab001e6a51d4"
+        ]
+      ],
+      "files_count": 9,
+      "id": "科研与实验域包",
+      "path": "community/科研与实验域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "b6f09557947ed72634cf21e6ed83553fda464ccaab9a6f8fbfe959ceeebf9eda",
+      "files": [
+        [
+          "README.md",
+          "dac7c09569f0b178c984c688b2a8f0d14e7c0d3420131e0bcef4f6d9cfa311c6"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "5115b6ff450d3c19fdda65b1239cf7795de2aedffd56228f0d4f1948f70a56ac"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "7360162c985b7a15b673f0d2f5f0f4b68cb3f966a717fcc50347a0eae5863f2d"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "70d6b5b43ca64d8c19fd4a0d37bdd98f5ff8c336b3e0600d0befe45337ec048d"
+        ],
+        [
+          "assets/provenance.json",
+          "7d573769a1fac310d3a7271330afaa821eb745ee4c1223f386af2a89492bf8c0"
+        ],
+        [
+          "modules/A14a_端侧口径登记.md",
+          "4919493d03a2ab9af525eb97b06dd4d8a83c265b6a5811c3330da39f6c05554a"
+        ],
+        [
+          "modules/A14b_端侧面收口与形态派生.md",
+          "53ac70d1e0ae9c0e41b706c050d622b7fb19402a9bf983b91c21a0992d3da734"
+        ],
+        [
+          "pipelines/P28_端侧与边缘小模型装配流管线.md",
+          "6cc83b3aa0ddc7a112ec8fdb20f48684b90fc890a3fdaf37245f5d514daa774f"
+        ],
+        [
+          "protocol.yaml",
+          "e05b0b51de7a90965ea0fd235e4ba0ab645922e3b7cbf2caf3da489c72668deb"
+        ]
+      ],
+      "files_count": 9,
+      "id": "端侧与边缘小模型域包",
+      "path": "community/端侧与边缘小模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "42d981ab30dc80c84e9a20017df6858b4e7793fd34f64451c2d662e54d6da4a2",
+      "files": [
+        [
+          "README.md",
+          "8d1b5ec71f37bf268b0cd8b757d781ee99778a5c8c7556b0e162a2a1ee1d51a1"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "a8d5f210f0a5f974d3aef8ab0ebf23cbbc4a2183e66d7ffbbbf63ee7e0873826"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "40cea498754b5a60bb73fe966bfd762485f1eecbc7fb533a4108b9b2995ca84f"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "2d8bb53a77748e3b1e762c10019cafae00ae639811134e6f7db032619745903e"
+        ],
+        [
+          "assets/provenance.json",
+          "5fc7269dac417e6f30d8be870c1cff88d923df1cac0b7e685b6bfbe17e1a3bb8"
+        ],
+        [
+          "modules/C09a_红队越狱与安全测试口径登记.md",
+          "839b2d97ffa16eb8c879e2ae26f93800ab81b06da4548b9282e4abc7479cf033"
+        ],
+        [
+          "modules/C09b_红队越狱与安全测试收口与形态派生.md",
+          "4933f5f1a3c1133bbe608b4d0c28beb01e94cbb7b3736f4c1fa574f8aa5ecb95"
+        ],
+        [
+          "pipelines/P121_红队、越狱与安全测试装配流管线.md",
+          "fd118aa6a30752620d3b9fef32abd7f334dc3082c4553404a8ed0e38a09d31a7"
+        ],
+        [
+          "protocol.yaml",
+          "45c526a67a26e26e0d6ae9de43e11800722e9755ed9b882b36db28e69edb7bdb"
+        ]
+      ],
+      "files_count": 9,
+      "id": "红队越狱与安全测试域包",
+      "path": "community/红队越狱与安全测试域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "97020ab8f5d75cbbecab9d9767da785a0f654c774c04bf212c641d2f11bb0dff",
+      "files": [
+        [
+          "README.md",
+          "80f94232a088e37dd52721503621319324c5c4b2e6bb9c9c39117ddb0eb7d57b"
+        ],
+        [
+          "assets/README.md",
+          "361e7bf79b074c75d7314d7d2de3611bcb970b94befee6d4123efe8f9935700f"
+        ],
+        [
+          "pipelines/P110_组合包-受监管行业装配流管线.md",
+          "0bdcc68cf191f072ab089f0b3b194bced2a54653aaca2a04d8e534c93fd5ed4c"
+        ],
+        [
+          "protocol.yaml",
+          "23215f528bbd29f5df87235328811b5eaa79dcecefc537017b4097ca2c7c9337"
+        ]
+      ],
+      "files_count": 4,
+      "id": "组合包-受监管行业",
+      "path": "community/组合包-受监管行业",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9e3f435e61d2b4faa35a183cd1f2d9fd318f458c223f5d49efd15acd02f9fdd4",
+      "files": [
+        [
+          "README.md",
+          "0584c836eccc1f2de3d6e11d00d7eb27fe27a2735617a53883dec5728e22362e"
+        ],
+        [
+          "assets/README.md",
+          "123328f87cc6281af69e8e5e58fc9c2f22693a497d610d99c742aec4585a03ba"
+        ],
+        [
+          "pipelines/P108_组合包-数据管线装配流管线.md",
+          "985d28da9a25bafac597f89723d82d899f8e3295862fb0e0a4aa25060b3eb8dd"
+        ],
+        [
+          "protocol.yaml",
+          "f43bd8c5754107ecae4b641271c2658fdc36c448796633254083e1bbbea5a607"
+        ]
+      ],
+      "files_count": 4,
+      "id": "组合包-数据管线",
+      "path": "community/组合包-数据管线",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "c6a9343272ec6d81f06a7e792fab7bf9149fb03e7fffefc05f85022db8e7fb04",
+      "files": [
+        [
+          "README.md",
+          "94704699cebb3b1e3c20026ec09b05c9e7692bd595715637094151809e959798"
+        ],
+        [
+          "assets/README.md",
+          "5ef1433be807a5dbdfb1a6ad2a66a85a7f33cb1f6bfac506a6e95b6bde3de2dc"
+        ],
+        [
+          "pipelines/P109_组合包-检索栈装配流管线.md",
+          "223f4525c4d9c4e7a89dcb017fd8c50bd9449afa9b077ce94af5a9a9706466aa"
+        ],
+        [
+          "protocol.yaml",
+          "d01c464853d3ddbeaa382c61e875aa8c7c610b068e7d4af7d01ed7cc870eec06"
+        ]
+      ],
+      "files_count": 4,
+      "id": "组合包-检索栈",
+      "path": "community/组合包-检索栈",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "bdd92a8d1bb196ee7fbaa9e3b445a68ceff398bea3705acfbc110df0b75533bc",
+      "files": [
+        [
+          "README.md",
+          "871d42f6bc653ce98d843a126c2f0ffe947fbaf09f53763c0e33d2d1a81b114a"
+        ],
+        [
+          "assets/README.md",
+          "c5ae925bf6cb3e562738c7ffb1a07d773c6b345b1bb528e148efa1f29bec6580"
+        ],
+        [
+          "pipelines/P111_组合包-轻混与保险装配流管线.md",
+          "8cfd7d3e18a7c1f3bcfa3a3e0dfcb18013143b4d436610006605f2aa09629c32"
+        ],
+        [
+          "protocol.yaml",
+          "0b4ccb10cf6bd6a9965f93a65345a5c7083138f866276b76e5d336b7400674f9"
+        ]
+      ],
+      "files_count": 4,
+      "id": "组合包-轻混与保险",
+      "path": "community/组合包-轻混与保险",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "dbaf72b30cf7de3443b937089af5f1d4ad0b752b9dc174969e39a7236f036fc1",
+      "files": [
+        [
+          "README.md",
+          "65ae5b260a11c788edcdf967148ddfe2d056f9c835c740a1a92f9820f3c38aed"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "66bf5879385015dce6e237e173f494134c0b9e328fc2612a33c40e8201561a82"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "505125cdfc0ee0f9a65c7af945a61f1a128edbbe268cc7e72bb1ececfe9b3438"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "d9d2c752767fb7eb7065758578d208b5b5a846854c7685e616d537adce8c31de"
+        ],
+        [
+          "assets/provenance.json",
+          "366696ee404e3f261b41cfb15b84151daf6e9c3f739e76afa7d4a8e9be93754b"
+        ],
+        [
+          "modules/E10a_编辑校对与出版口径登记.md",
+          "e53fcfed88e32fc35155b8b344fb694202c06e26df285eedc380d6aa2185e757"
+        ],
+        [
+          "modules/E10b_编辑校对与出版收口与形态派生.md",
+          "81a17169d2969e3d30e7d6e10fa3fc5c4d0c59bd10120ca676bf88683be888b6"
+        ],
+        [
+          "pipelines/P88_编辑校对与出版装配流管线.md",
+          "1e48f76caa1bc800d9f1ee7801b9ff1fe3f928477e8ad0d17091519ed1fc22cc"
+        ],
+        [
+          "protocol.yaml",
+          "2020b10b0b76df69a4a547f41ba998a5ae691c187079b18d3b77d6788a278f58"
+        ]
+      ],
+      "files_count": 9,
+      "id": "编辑校对与出版域包",
+      "path": "community/编辑校对与出版域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "9f6690762ad6d1421728deaef3152e1a761983ea2823511c5562f61de27c73bd",
+      "files": [
+        [
+          "README.md",
+          "10d903441690dbf987c9d8b39915bc5520cd7d6cec88412ce733bd46855ecd51"
+        ],
+        [
+          "assets/01_职业成长与基础属性_JOB.md",
+          "ff18a2ace1328f9f27a5705e30a50808d21ace533be794f2d21d2fa1a2c5f355"
+        ],
+        [
+          "assets/02_种族天赋_RACES.md",
+          "97c002fc0aa5b846a50198d788451ad32a790c3f632ef7338824bfde6c056ae7"
+        ],
+        [
+          "assets/03_技能系统_SKILLS.md",
+          "37944acbb99d461309e39c211bdd803133a5df9ec788171d50ddd1b431dd4a30"
+        ],
+        [
+          "assets/04_战斗系统_COMBAT.md",
+          "1fb5acddc180f777ed49973c1fdb9d447bd3a2f33ba053bf7c807b3707906109"
+        ],
+        [
+          "assets/05_物品装备_ITEMS.md",
+          "a5f506524b73118ad6ec472f36f99d8b89ad0a146fcc85fe8453462226ed8489"
+        ],
+        [
+          "assets/06_任务剧情_TASKS.md",
+          "0d8ed9552b2f43fb5942760d5600b7ffdb17b595547846cdc6255878925c0d38"
+        ],
+        [
+          "assets/07_区域地图_REGIONS.md",
+          "12a68da2d97747c3a01f8d8e8c244f17e40e73063b1818ece10c8301504fab8c"
+        ],
+        [
+          "assets/08_天气季节_WEATHER.md",
+          "b7a82a85fd38542f52500f9ed9a109e7db64559aed6ac357c1e8d7cfd7c0459e"
+        ],
+        [
+          "assets/09_经济贸易_ECONOMY.md",
+          "6dce4bc2a5fc785f6fc3273759f5c523138649a9154ef67a6571beb51cfd85da"
+        ],
+        [
+          "assets/10_死亡重生_DEATH.md",
+          "a08fca4ec193e51d90bf0a49c00d679fbd6f1475f3afa93eb6719de28a995ad2"
+        ],
+        [
+          "assets/11_魔法系统_MAGIC.md",
+          "70fcf54ab828354910909538d0720191b131995a593ebfa1ab439b6585ec5a5d"
+        ],
+        [
+          "assets/12_NPC对话_NPC_DIALOGUE.md",
+          "addc31e35e2dbe88dfaa0c318cb6d75316d534a0fc4495f8292c9139a4af24de"
+        ],
+        [
+          "assets/13_NPC交互_NPC_INTERACTION.md",
+          "d5aef3d13e7579a79410328b10acc335197be0f94787432f410a62a5d2695da3"
+        ],
+        [
+          "assets/14_势力阵营_FACTIONS.md",
+          "f54a5617b5052e5e9370cc6b31715657de691d6f7a1ed9e314dd8323ab36c07d"
+        ],
+        [
+          "assets/15_帮派势力_GANGS.md",
+          "cfa59841a84dfb3524a5464edd34108d3328773d7b845660716dfdbe24a7984c"
+        ],
+        [
+          "assets/16_建筑据点_SETTLEMENTS.md",
+          "4c05f5621b5b451efd56be441ed1989597dccdddc6da6f743bafaf059979e340"
+        ],
+        [
+          "assets/17_生产制造_CRAFTING.md",
+          "1d7fdd18e16c3c3dd912ecd23e6bb77b3eb7875eadc7d6cd3cc52138f2b5ee66"
+        ],
+        [
+          "assets/18_混沌事件_CHAOS.md",
+          "7614c73573f64c35db1fae54ac02be6dcc6716dd47243ff089786ff59f3fc721"
+        ],
+        [
+          "assets/19_遗传后代_GENETICS.md",
+          "a0cab94b961eac2bafbc22b6e16189f44805ca87136d9f78e141d48046b3322f"
+        ],
+        [
+          "assets/20_世界知识_WORLD_KNOWLEDGE.md",
+          "6593245ac3e33f15854e57fe0f867d102322239267d85721fca318c8340b887d"
+        ],
+        [
+          "assets/21_数据接口_EXTERNAL.md",
+          "964c9eaaaa6ef5560dd301c72db3f3e2771e85f43140fe8d08573bb3335ecb7b"
+        ],
+        [
+          "assets/22_事件叙事_EVENT_NARRATIVE.md",
+          "15241abd3676b60fe6bd6788bae789d9fc09d511a4b5b087823a94e0cdb7d643"
+        ],
+        [
+          "assets/23_组合扩展_COMBINE.md",
+          "81679d6033f3fbf18876032b71efdd22b4a1b5033e16002320fdc172431aef04"
+        ],
+        [
+          "assets/README.md",
+          "5d8c5d0ea122ce6d3f3ac3f4cb0d0c0bfd7378a5158ddcefe336e1841819ff96"
+        ],
+        [
+          "modules/M01_职业成长.md",
+          "f314b4e9a57f7db11079db560bca88f43b80aa54ac45b4ea8e98ef433473659f"
+        ],
+        [
+          "modules/M02_种族天赋.md",
+          "54d812c5858825fda0f351c396ad2333ad0513a6695354c51744258c02eb4b24"
+        ],
+        [
+          "modules/M03_技能融合.md",
+          "e23efb2e4c524edd598fa65ec79ca06aaea99bf8c7fb3eb287c2be4d3f344ce0"
+        ],
+        [
+          "modules/M04_战斗系统.md",
+          "f388f03a6d8316e4c3dda5967881e044dff8503adae0b051d557ed0479796271"
+        ],
+        [
+          "modules/M07_地图区域.md",
+          "0b861844be190779bd476bad497ea5a383767f0da4f7187b204521dbfd06feb5"
+        ],
+        [
+          "modules/M09_经济贸易.md",
+          "bdafa80629d3c6d50834312fb9a1bb40e9b833d79bb09aaee801250a34923b1e"
+        ],
+        [
+          "modules/M10_死亡重生.md",
+          "10201da0a09155c2a247a23803b1c04b38070d95e8e4dea9d029f7c01b8787dd"
+        ],
+        [
+          "modules/M11_文字魔法.md",
+          "4a39d8663c139e9601e81d3785d96a10f191418a13419cbebbde6ad9128d0109"
+        ],
+        [
+          "modules/M14_阵营声望.md",
+          "63b89f58f5aca02c58ad5b8a0db4336fdd6e4cf1743c8152cc17c8cba399c258"
+        ],
+        [
+          "modules/M15_帮派势力.md",
+          "eab841062740c0ff60028297eef11a53fd33d207b3234818edc7d6a43ab71d5b"
+        ],
+        [
+          "modules/M16_建筑据点.md",
+          "ab78ebe28b6b550ae457d20d687dffe9dd85028482ff52de3dbc8e1b2d9bc0a2"
+        ],
+        [
+          "modules/M17_生产制造.md",
+          "51d4416857b4e6dca74f3b375a6df993e36bd1f3742f9e28c0746ac6db961228"
+        ],
+        [
+          "modules/M18_混沌事件.md",
+          "6ebe7ca19a4886b0fab349d9aaf230db76d6d6eda80891e719293b28e8e9a8f8"
+        ],
+        [
+          "modules/M19_遗传后代.md",
+          "58c3ea0679dfadbf2c80c4b7bf7c60dcd14a95e26fbaa446248fffe8f5e4051a"
+        ],
+        [
+          "pipelines/P03_西幻生存流管线.md",
+          "e0976534d51bbc9a5e0bae00fc00770ac945b0ee22711b615f1a2ff0629fd898"
+        ],
+        [
+          "protocol.yaml",
+          "ed3f53bd4f1ca63dd0271b6164f50d7a66e22545a119e77f2282f4b887c405b3"
+        ]
+      ],
+      "files_count": 41,
+      "id": "西幻生存领域包",
+      "path": "community/西幻生存领域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "49bad1d41fbd6562770201e33d19febdad136a6c394d3eda64272973dd939916",
+      "files": [
+        [
+          "README.md",
+          "5b61c80cf1d9d68815d30698e0d059f11b2163a20c282976589267ee40fa9e87"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "1f70532a3f01a4aadc1d4ad1c97b5e626da5e7fb9b1cbb724a03dc50060bfe67"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "05d18d15f85cc1c6d2f32f99a6c2a1b3453fea5e98c4e76d9de7645c3fa88a60"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "ab1a1c451462dfee670511927314e2bc85e302201a4c5e5404cb825f12512b40"
+        ],
+        [
+          "assets/provenance.json",
+          "13a8deea995ad1b3ae7208f444b1cc54390ac28eba63ed22efa22f8db3644f8e"
+        ],
+        [
+          "modules/A03a_视觉任务口径登记.md",
+          "b226f8fd2d86af446845a1f58eea141feb67c8a339a30604af93cd08e161e8e8"
+        ],
+        [
+          "modules/A03b_视觉面收口与形态派生.md",
+          "0a6ebf0f42d9ecf8be660095c6a1907b4d4fc253bfbcb9e2604ac909503ba568"
+        ],
+        [
+          "pipelines/P12_视觉模型装配流管线.md",
+          "2c111956c6f97cfe0fbe2f9ac1a2c50cf8372f7eeb56cb61f2894c50ed013a54"
+        ],
+        [
+          "protocol.yaml",
+          "730f005751251e63d9bc2e542082eb89cfad4d22869835a3dcc15cea88943572"
+        ]
+      ],
+      "files_count": 9,
+      "id": "视觉模型域包",
+      "path": "community/视觉模型域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "31ec26f2dc577cfadaf1e31232ecb72e51f817f0e108e9154d8bb1e54cec5314",
+      "files": [
+        [
+          "README.md",
+          "cf162cce2d90db34cde49416af43d4f70789ad579c28a7451c7e760cdb30239c"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "6f0c2e7bd3a68ae498d1c05f31aa07b6c64635632b3386decd7b1d21c00668c2"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "c5fc1257a627cf5c5ee520f2dc4bc802fe34b68b820b1a434ddd36ee9701b6c4"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "669abc4acf7c973542bbb993b0ad976cf47d228c72a06344ee1225b590d1420c"
+        ],
+        [
+          "assets/provenance.json",
+          "7eec1246b989059a89fb91e61ab3f8767ccf0a62784468c8b72b097113991b11"
+        ],
+        [
+          "modules/E08a_视频生成与剪辑口径登记.md",
+          "a3d98a18fa4468862c6e17d89695cb17907b694d374fbd6b6316333dae011545"
+        ],
+        [
+          "modules/E08b_视频生成与剪辑收口与形态派生.md",
+          "4f6623e5f9cc0bd2dd25ca83cec49758c54b4e8e9fe7b1244d7b12021896bc01"
+        ],
+        [
+          "pipelines/P86_视频生成与剪辑装配流管线.md",
+          "c0b0d901c0e55981d5fdc5ff1e04209ea92ec6cadcced9d3d52e7e0de77993ec"
+        ],
+        [
+          "protocol.yaml",
+          "e0722873a3d19a2cfb6a89614ff2c001536ba4f5ae99dfe0c5f70f0cdd26541c"
+        ]
+      ],
+      "files_count": 9,
+      "id": "视频生成与剪辑域包",
+      "path": "community/视频生成与剪辑域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "a64886964f16e7487f20d755ee337dfa50c6d9a2f25c2663ed7cc533459fe5d3",
+      "files": [
+        [
+          "README.md",
+          "afcdc6142f227ce2e46751d508cc4454c6c6f228298cf85ef11b5a189fb0565a"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "9ce882f5bd33067d8ec6355b81c235c5cf6ffd3785236ee4212bbcc6e2ef3d20"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "307059fa47da2fb4ce10677717dc4fcce63d20a6bf527f7dcc0d552eb360ef3e"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "ce34aa5ade9eb61f4b5a565547858740680507567332f4ff1abdee95b9d8c7fb"
+        ],
+        [
+          "assets/provenance.json",
+          "338b686857f72c352d48d81fda559323f5912f7acb4a1f2c070563a732cc0038"
+        ],
+        [
+          "modules/A06a_视频口径登记.md",
+          "1ad773d78fad50367a413d34412473b22a13206439d22ab307c70f2e70746847"
+        ],
+        [
+          "modules/A06b_视频面收口与形态派生.md",
+          "b1801df0ec56973c8b4b5836c93c3a1e9ddb516fbde75ef4ead5f30b59c1d282"
+        ],
+        [
+          "pipelines/P15_视频生成与理解装配流管线.md",
+          "7cceb454d7d51151cb32e08bea4291deb8ec445e0482855cce045a9072fe7191"
+        ],
+        [
+          "protocol.yaml",
+          "23c8a8d466af317eff3b5337da88f2f2959d320c39c90fdf12ce566160dc9f2b"
+        ]
+      ],
+      "files_count": 9,
+      "id": "视频生成与理解域包",
+      "path": "community/视频生成与理解域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "bfca153f44fbd4143cd81badf05bea0f94af05a5df5f056bbdc0113ff3f352a5",
+      "files": [
+        [
+          "README.md",
+          "b03d34072b6d87710c6cb6c10382d1f34f246cb7ab9b64566401f6b3bca25b2f"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "bd66def3f2ac5382b1abf27158e8c5303d25196a777ba74eb3b863e307bcd71a"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "b15887cb1d7fa7e6b01e7031d336247f25d3b281fd008f6cf9733fee40c63ce5"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "dc96bb2b86aced130c84604db12c0831c285a7939bde082e9d435350726790a2"
+        ],
+        [
+          "assets/provenance.json",
+          "6c8260414bdb338cdcc96885bde1cb2772a1121d199a7cae8b4b184e673f4eed"
+        ],
+        [
+          "modules/B16a_视频生成与自动剪辑口径登记.md",
+          "f67071b253be15a11bae1291aa9d8cd93d1e5a9ec8d21bd647cbc526777255f3"
+        ],
+        [
+          "modules/B16b_视频生成与自动剪辑收口与形态派生.md",
+          "9a18590a9c2afe68819480d3dcb59ea9d964463344787d8bf54c93c9f7b10b4c"
+        ],
+        [
+          "pipelines/P42_视频生成与自动剪辑装配流管线.md",
+          "f74a3b59e114da35cb3c553558488c47e23b59f735d51a89946ca6ae39e8f0c6"
+        ],
+        [
+          "protocol.yaml",
+          "73af40d984300411df9679e5d16aee3e50f151dc161babc7db8f74e408b06215"
+        ]
+      ],
+      "files_count": 9,
+      "id": "视频生成与自动剪辑域包",
+      "path": "community/视频生成与自动剪辑域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "0ad52d93c41c4dfbd1931cc0d7352db2bba0296df0c28b43d4bdad1bc32afdca",
+      "files": [
+        [
+          "README.md",
+          "bd43e4050ef33743ac624dc36c7d9e1779b6aab4572ef55f55f20d7c67f72d59"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "413092e25adad303a2e3f162f8350235843a7d619eb2bcf83de0adb53683a672"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "83e877fdf9b16d2f18111b56dfb95d618878937925fe61695dc5a24c9a9142a9"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "ea17c65fea9ac3540c93608f197c49a93094b536d1baf4526eb7fefd645cda9f"
+        ],
+        [
+          "assets/provenance.json",
+          "d871b46ada266700b301cae9cb771fe6ceeeca60183b8fba1157e06829c378c4"
+        ],
+        [
+          "modules/E02a_角色扮演与角色卡口径登记.md",
+          "e1e24cfeb34ad8e16f617fa71ea45172feee4913083e6cc3b67fa77c5dab0192"
+        ],
+        [
+          "modules/E02b_角色扮演与角色卡收口与形态派生.md",
+          "42f5591121262f2d1a221760044711eeb74b527a33320ff57b75bd27a6baf736"
+        ],
+        [
+          "pipelines/P113_角色扮演与角色卡装配流管线.md",
+          "9d57f25f3fc9d3b5913085936adcba180bfc94702af87ae0ef5d3bd97a8f9fcf"
+        ],
+        [
+          "protocol.yaml",
+          "8f79b45b43469d720e4a7edadf265df91aa9271d2af07f1d3a6f3492fc322769"
+        ]
+      ],
+      "files_count": 9,
+      "id": "角色扮演与角色卡域包",
+      "path": "community/角色扮演与角色卡域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "7ece620b7c8a654e55751156f65a5fd5f96d02141932667e16351c62a4e77fe5",
+      "files": [
+        [
+          "README.md",
+          "3250042bd78ecb8f00208ebfadf184bdee71a855074c2015f32a9d2f9cd33365"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "8cda3ad0440030475a9dcacda51e5286ab5390cc3c6de2abde005ccb9ba1784a"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ad7ecb946a1f33b61dc941cb3451de1c818d961ccdd8361f590c71fa428f36cf"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f2622e65aa9ca9ebdd1e8ec50a0f854ecee5d2aac8d2f2de112925c5cb1a0b11"
+        ],
+        [
+          "assets/provenance.json",
+          "61a256da7d7e6ea19cfb8665aba4981fd4fa718a5c8c268a7c3575d357f635c5"
+        ],
+        [
+          "modules/C14a_记忆体与个性化口径登记.md",
+          "4b56469b0cc780576624ca7e56c5c69741b7cb167ee5d18272da801ffb240961"
+        ],
+        [
+          "modules/C14b_记忆体与个性化收口与形态派生.md",
+          "c19242c725f76b9690f7e90a53a1683f75c22907b922a35c0405f1ac2f60702f"
+        ],
+        [
+          "pipelines/P57_记忆体与个性化装配流管线.md",
+          "62f35688eef42170329b13b7446e4280b170f243f525357ee5bb3989501c1ad9"
+        ],
+        [
+          "protocol.yaml",
+          "dc7c5e0116562e07d66700d72fbdf422f43f970954a4f763c923bf3da0992db2"
+        ]
+      ],
+      "files_count": 9,
+      "id": "记忆体与个性化域包",
+      "path": "community/记忆体与个性化域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "62de5262a7519e845ca281ea4f7df6fe916579b6b61ef8b5fc1005da9d6eb13d",
+      "files": [
+        [
+          "README.md",
+          "cc976ea366134269ce65fc7811cca11588273b055ab5bb4247364024021a466e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "223c484d3c464961cdfa4f697f44ea2f534eef07ec5023a3e53a1866230020e6"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "be1ffb0f22b0d57e6cf2053eb53ccef1cc588eba3d1769b5ce2c061d49dad85d"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "348e440d37a821c0ccaf9cc0b15fce0153a8be5840c812bca110c3ac2d9d0ac0"
+        ],
+        [
+          "assets/provenance.json",
+          "2e1975916825e659c773b369f032d2ad3356be15ae90aa4d239c86cb1cdb4a77"
+        ],
+        [
+          "modules/F05a_评测与基准口径登记.md",
+          "239191a1e59f97e4e0e5d5af4d84304844e45aafc9cddc8da5196c01db623bb7"
+        ],
+        [
+          "modules/F05b_评测与基准收口与形态派生.md",
+          "314c34895a7c35825ea23d933ec35a76776d1c99ce818668cc613ef9cce49594"
+        ],
+        [
+          "pipelines/P101_评测与基准装配流管线.md",
+          "0d21040158e94ce950cf97b6dcfd7cc89f068028cf14b0da7e341fd28159a1ba"
+        ],
+        [
+          "protocol.yaml",
+          "39abfa250dc3b395f6b6e7c5e7170a38ba7440e187cb4f2653e72a32ba8cbb38"
+        ]
+      ],
+      "files_count": 9,
+      "id": "评测与基准域包",
+      "path": "community/评测与基准域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "c1a7016971a92c071f44447b36c5e1c28b221cc161352d163b1290cbb7d93913",
+      "files": [
+        [
+          "README.md",
+          "f9a5da31ad4bd1ef4557294ddd0d4255eac94fc37f717700a1fc4511982ad25d"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "44cb709a2cae23a8cf597bd0378aea959ea09ff02e1e31b6f3cadb8d6fff2341"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "dd9513bf68a2f04df97189c9846507b644192316e7d9999966b0ce9f9739a1b5"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "3ece969dd9ad509205836af16113ef281aa0eec13b2061cc424ee621e5e31737"
+        ],
+        [
+          "assets/provenance.json",
+          "b6b5fcd366bde1b44c57879536786991d38328c3dc5b96e38e9a22057753dcc4"
+        ],
+        [
+          "modules/C08a_评测基准与排行榜口径登记.md",
+          "3d5b0fdd0f5b881bcfb4a7bc9481450dc95a4b6f8c203cb3da52d7d9bef21b4f"
+        ],
+        [
+          "modules/C08b_评测基准与排行榜收口与形态派生.md",
+          "9b448f00fcc3743a6c1157faa43e77075399f8e4c6b9799335188d66a9fd807b"
+        ],
+        [
+          "pipelines/P120_评测、基准与排行榜装配流管线.md",
+          "482af128c5f99405e5606cb549e82fe62bd09832f17bf67e333b85344c17fa1e"
+        ],
+        [
+          "protocol.yaml",
+          "1d5235e5cfebfc955507744205bcfce3b41eddbd79ebd8fe59f284a8b041b8b2"
+        ]
+      ],
+      "files_count": 9,
+      "id": "评测基准与排行榜域包",
+      "path": "community/评测基准与排行榜域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "e5fff37cdad605032977acc3b9a621d72ed7de4c307c7d3ed5675bd7ee29137d",
+      "files": [
+        [
+          "README.md",
+          "50f2e67ba6b53bf58572933e1830592c877fb1e95cfbd9ee793d53cb50b2a7b6"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "605d241e0931e2d159837c2ed7a77570410352fd1ba2b7d6244e35d14e462bd2"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "bf75a1e25e993921f48a1f429f2a34f67ff1cd19ebd840b0454712941f4a86a9"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "98c585b170193b0a1ec2cf47e7f4c80dc380bd2d94d5384655cecd9d83028f27"
+        ],
+        [
+          "assets/provenance.json",
+          "31b48b176eef37e2435ce8a63075af745d32b68785e3d83f0c4b91c092c72d21"
+        ],
+        [
+          "modules/B14a_语音合成与配音口径登记.md",
+          "51455f97bfe9f67fb77b6d5fb7b6450cff9e7f6bc3a41d82366b7c8f7448cc10"
+        ],
+        [
+          "modules/B14b_语音合成与配音收口与形态派生.md",
+          "8f6f9fadc9691130746181f98975685a622452386685049e6d6890bfd7afe000"
+        ],
+        [
+          "pipelines/P39_语音合成与配音装配流管线.md",
+          "6fc5d59830fba28ab8b1fd7b909f931dad09d326a3218da1aad0ddfe5a0a35fb"
+        ],
+        [
+          "protocol.yaml",
+          "c7d581778154c1d030c3e3aa49487cd6e43fbb094d39fd9a38c6d3dd518cd005"
+        ]
+      ],
+      "files_count": 9,
+      "id": "语音合成与配音域包",
+      "path": "community/语音合成与配音域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "b06fc843386e65344319c622a22edcf7b0996df90bf4e9a883dfe5843f8251ae",
+      "files": [
+        [
+          "README.md",
+          "9328aacc75011f9d31f838a6c0f89b197e6782fda0fa81e16b5b93c2a2c3d2f3"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "bf3d2de52bfb35b298d659f8fac3d9c32e2bb16215c30b75e060e9db9ddd3cfb"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "bd7000d37ae0550a638a12c01218eb7b3b0373a6a76a03dca9554865740bea08"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "cf6b167bdbc4aab7152ea27bc6e72846cd23a0f678d388778da05154a5a2c3ff"
+        ],
+        [
+          "assets/provenance.json",
+          "401456614820b84d2822bb2410cd18c424d4924ca53bdce3258179fd671749b0"
+        ],
+        [
+          "modules/A04a_语音口径登记.md",
+          "59f0e93389e301a586c67b04e872b56f6c5c2c995530e2459ad7d7552f7cb2bf"
+        ],
+        [
+          "modules/A04b_语音面收口与形态派生.md",
+          "bdaa91f41b06cae32d0c5da5e2704b788b4dda0b52cf7c8ba4681ca6f3cdf60e"
+        ],
+        [
+          "pipelines/P13_语音识别与合成装配流管线.md",
+          "ea39774e0b206952fd572a0d87412a2c8b58fab3c0fcaf5f391229c0806aca21"
+        ],
+        [
+          "protocol.yaml",
+          "841518d36b36267a66abcd8a15ad006686501b674a4b2393b46c9217dcdae011"
+        ]
+      ],
+      "files_count": 9,
+      "id": "语音识别与合成域包",
+      "path": "community/语音识别与合成域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "67e182c7d94a6948ef818ee6bc56f422cc978542d4d77f971d9fe05143c285cf",
+      "files": [
+        [
+          "README.md",
+          "f5f584de523793874ec2fd0976ffd4f6d9532a4d74d1d643fb7ed68435f8d1ed"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "b43e6d42366ef1e368096909b9089ac30e26916ebcc7f10cf6dfab25e6e6680a"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "ba19e958296fdcac91c5c8b1ab1963b7f23079ef9a51297332cccec669399c59"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "296f9210103be13c12c33086d07770cd52b4d59a4d99aa086319401606149598"
+        ],
+        [
+          "assets/provenance.json",
+          "84e766e10fe89aaf9d3e69455732003f2cfb2e0383ef607a07fe5746106fed8c"
+        ],
+        [
+          "modules/B13a_语音转写与会议记录口径登记.md",
+          "1af8522d7f56107ebabac8d9ce16bc95992d67ae89d30215939c20926a188f42"
+        ],
+        [
+          "modules/B13b_语音转写与会议记录收口与形态派生.md",
+          "7ad224190cd1f4d9c98c86a802bb3cec19c5464ad29b2bc84ba4ac8d694f8360"
+        ],
+        [
+          "pipelines/P38_语音转写与会议记录装配流管线.md",
+          "9b40f1c2186838619e72ccb2ce9b44c29509d6107832922a7652b45d9d1eb300"
+        ],
+        [
+          "protocol.yaml",
+          "e9a40cf11b14acb71727fcd02ad43eaff3dc129db6e990df46d6b810ad2e8839"
+        ]
+      ],
+      "files_count": 9,
+      "id": "语音转写与会议记录域包",
+      "path": "community/语音转写与会议记录域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "5c35804a32200f41dea584ac64f24f5bb8ce287db476d01e64a4a8775f2b1c05",
+      "files": [
+        [
+          "README.md",
+          "826442836db420956c52013d2e0644f0eae9990c4bc777858fb47ea4f13dc9c8"
+        ],
+        [
+          "modules/M93_通用状态快照.md",
+          "96b5955a5c561de39eba0a5c957c774464346d1fb3b8e32699b20360f0604442"
+        ],
+        [
+          "modules/M94_通用节拍桥.md",
+          "5c9605e3becbec64e87d5d3ab32b7e25a22150d949d3b8cf787eaa1e01f0e2c4"
+        ],
+        [
+          "modules/M95_通用决策汇总.md",
+          "9220bc354ef8f1aef2d7b56f198fdb2febeefc23ef1d8d19d14a01ad6ac4c27f"
+        ],
+        [
+          "modules/M96_通用输出润色.md",
+          "d1c862a33960faa1c5673fedfa3c5b67d7c12411e7e999443235f7cefe153c25"
+        ],
+        [
+          "pipelines/P05_核心基础流管线.md",
+          "be6c972b5e2611934c4644a0c7171dea0225ca266d778273c2dce7006f5bac92"
+        ],
+        [
+          "protocol.yaml",
+          "849f363c7c7a82dae412030df4238b390d6f90b5ad0a372a04ea4493cd9f74a4"
+        ]
+      ],
+      "files_count": 7,
+      "id": "通用核心基础包",
+      "path": "community/通用核心基础包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "8857366850a0a2971818ebc35799462a6a5f717fcd64d7a2b92a8b49082c44e1",
+      "files": [
+        [
+          "README.md",
+          "68bbf3268f19109d25cf6169eeb417729428edee1208fcf728a939b95fe87a00"
+        ],
+        [
+          "assets/DATA_CONTRACT.md",
+          "3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1"
+        ],
+        [
+          "assets/QUANT_GRAPH.md",
+          "331d63943effe51462440c41832202df3b8e6bb2553734472947ac77927e094c"
+        ],
+        [
+          "assets/QUANT_METRICS.md",
+          "fd85b5a871729e04b9c4026cc177e66875e35ca44cd098808cadbeb46f19ef06"
+        ],
+        [
+          "assets/STRATEGY_SPECS.md",
+          "9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65"
+        ],
+        [
+          "assets/provenance.json",
+          "07a695c3c45ac09a7d9143195107ec9882b8bbf4def048b6645623e8efba70c0"
+        ],
+        [
+          "modules/M31_因子与信号口径.md",
+          "6404dd6093d63828e39b5ff69b9e289a54c50fed32e61e5c8e15832ef371fd00"
+        ],
+        [
+          "modules/M32_回测与绩效口径.md",
+          "30a5a15d78272ea2cc95418423fc356f053c58da313f2ab2cf33cb777b851d8e"
+        ],
+        [
+          "pipelines/P08_量化金融域装配流管线.md",
+          "925190c471938da22846bf2298fb8e7d10219a5ecbd37d2e945260e70344769c"
+        ],
+        [
+          "protocol.yaml",
+          "550fff0de0ceb1160253e1e81645225fa2e01bc73baedb586f2b090ebef1d5fe"
+        ]
+      ],
+      "files_count": 10,
+      "id": "量化金融域包",
+      "path": "community/量化金融域包",
+      "sig": "",
+      "version": "1.1.0"
+    },
+    {
+      "cid": "c0473a5a64a9aa7ac7617e048358dfd3f70f573698307bad142371f04e5b8897",
+      "files": [
+        [
+          "README.md",
+          "2ebb49fb5905ed5d57e7b3673137ca35d02c9458246411076a953a4a9a06f9b4"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "ae12dec0a8fbefd0981570f1bbbdf33d87883d2dd11d4c0f2bf4b6c18d1f5a87"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "973427355fcdc00adfc199efce17eeb105f1031049f02cefdbc1a95268584ec0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "556cff5aa3d67e1c539ba972a933b107a83bd1a2020fdeea2fc8648fda0f4bed"
+        ],
+        [
+          "assets/provenance.json",
+          "7b364bba21cb364f334bf55ceed1c0017476bdc189b9813385a9549862a2c517"
+        ],
+        [
+          "modules/E04a_长文本与小说创作口径登记.md",
+          "bf5a3f17f901f9631d2b03be5888687ce1d71f41306e61e889b375d832c6d636"
+        ],
+        [
+          "modules/E04b_长文本与小说创作收口与形态派生.md",
+          "1df2c52db8aebd33018ab3edf56f8d3e16f482509f1099f6d9070466d2dc79da"
+        ],
+        [
+          "pipelines/P82_长文本与小说创作装配流管线.md",
+          "104813fb00d8a2fae89f4b9678fbd4ed6efdc385c0bd97089118a30101819543"
+        ],
+        [
+          "protocol.yaml",
+          "832c0ee12bf4b9654ca9226417d0faa4ff35b8c3206c68ee80d3dedc8b1a692a"
+        ]
+      ],
+      "files_count": 9,
+      "id": "长文本与小说创作域包",
+      "path": "community/长文本与小说创作域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "d0e6405ebf3a8f1460ab0632bb20facc1a00a6065e627ab7c631e78d7875eb87",
+      "files": [
+        [
+          "README.md",
+          "48f6422a75ecae3b86f5229fd013d67c96a44e0cff5e7ee427562237a5419d1c"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "ff99bf4b9f66775a724ed58ca49bf4aea2bf0edc577abfddbcc58c2856cd14ad"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "686de8f0a89382ee899a0c6eebfd45d14744b78899c3b860fdfc9103d5febcad"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "4800c62b77a8c6d62160ec66bbdd77a87b1a1ddba920c03bb8869a23e1f09806"
+        ],
+        [
+          "assets/provenance.json",
+          "5946b2c3df48d138feb084f3e76279559d5becba99917130b9d8a6256259fa6d"
+        ],
+        [
+          "modules/F03a_隐私与数据治理口径登记.md",
+          "75e00429e5aa374ef30a52067ad4382996fc5f5aa6792b3969f7d17a7aaca4bf"
+        ],
+        [
+          "modules/F03b_隐私与数据治理收口与形态派生.md",
+          "a2217d55c04aa53327241d4854e7aea204178f84da882b8a2f226920ed4e269f"
+        ],
+        [
+          "pipelines/P99_隐私与数据治理装配流管线.md",
+          "9a58ba786f12af7ff424128bf9957bc81fcedecec2ac4dcaac0dc327363378da"
+        ],
+        [
+          "protocol.yaml",
+          "e8c4c432557842ff4bf9b4e87cc30f51366b650d1be9a5322e63a305155b7343"
+        ]
+      ],
+      "files_count": 9,
+      "id": "隐私与数据治理域包",
+      "path": "community/隐私与数据治理域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "dce43b980cfb8e961e5042a42af23d62e69fa614fbd3e9cbfc1c368be4e174af",
+      "files": [
+        [
+          "README.md",
+          "7b457a4633f74e1ca48a2d2f02cf3364072622a5678af40dc74c441d6497c026"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "4ec4e26e74908aee06be72c7d95f158c47059b32ee6ce21578a49ce1b114d442"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "e67e469d42ea3589afaf43e94bf65f007d7e3244efd87420c550c332323495c0"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "d03d8995ef2d7aa4f73500f84db9a0472f760322dea07ef6745f0faf63009cce"
+        ],
+        [
+          "assets/provenance.json",
+          "b7974936b931c2075c8db00073db7c8c11948cd0cf7e6298f5564129d9856fd6"
+        ],
+        [
+          "modules/D11a_零售与电商口径登记.md",
+          "0ed4087314c678e58f479e5429b1f85cb6edf9c02c5e1644dc1d42b1b31acd72"
+        ],
+        [
+          "modules/D11b_零售与电商收口与形态派生.md",
+          "247d6f8f9b219512b5d8aed8e513639cb3b9e27b43a93eae895bc542f6bf78b1"
+        ],
+        [
+          "pipelines/P117_零售与电商装配流管线.md",
+          "7265355b5efff4e0d9c82e7bc5efb489a60b5e57f5a3480c4d5ea544e9695a4b"
+        ],
+        [
+          "protocol.yaml",
+          "10478601777392a5afe2ef3ce4079725afbbb35e52411db6a2e96ea0e33bf029"
+        ]
+      ],
+      "files_count": 9,
+      "id": "零售与电商域包",
+      "path": "community/零售与电商域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "98673ed54588039e7292c13ca875f299ded5f69153f919fa2032d66abf535ef5",
+      "files": [
+        [
+          "README.md",
+          "9a6aa490833bdb4b829a18403279b38ceb2941b624ec57dee2a735460383101e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "c345f4b65cc170642522fe28363d46499dc89e9682ec80e43b06ce9ca598bc14"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "f746910c255e58ae223d7d6d53c7e4dc3ec4b1e0972a1e923f96f7221215ab59"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "b65eacb11771ac0f91d159146f753701548aeb57f0b2dc79cdab00dec6b31c24"
+        ],
+        [
+          "assets/provenance.json",
+          "336c7cbd11f2b783015954258ccb656c859b83ef160744cf81c1174a1a982a8c"
+        ],
+        [
+          "modules/A05a_音频音乐口径登记.md",
+          "dc0207fd538aebb64866562a3a2f09d8376de44bbc2b22ef1b0b92bafb7b9a80"
+        ],
+        [
+          "modules/A05b_音频面收口与形态派生.md",
+          "9ce514d9782900924b8766e896fed420177e22307853f3f3f22163dd90b6f48f"
+        ],
+        [
+          "pipelines/P14_音频与音乐生成装配流管线.md",
+          "c9fd986912351960b6b75eb02e0ba9276343f963574b68b4b8c7c37b3a744aa0"
+        ],
+        [
+          "protocol.yaml",
+          "63fe8fc11d0e12150c6779c21136a426586ba13141408f694f3d14a6454d3e0c"
+        ]
+      ],
+      "files_count": 9,
+      "id": "音频与音乐生成域包",
+      "path": "community/音频与音乐生成域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "4793bf52e897cb9f4a7ed78fbb44e66903182eaafdc5d7a5573cd15702f99b8d",
+      "files": [
+        [
+          "README.md",
+          "6de208af7f093c1b19ae772db45229091a1eb6b3b4d754d098b631f79018490e"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "e8022978e235830a19a0323b05aceec73035f4b7fb04bb0ce126edfd6d2d39e0"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "dca1c003fa10c410481c6b44af78a1882995dcd56174b30f2041baf11a1eda39"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "757fe15da6ca64a1aa68bd50daec01e644619743a8ba80b56cb5e7fd3ba4fd12"
+        ],
+        [
+          "assets/provenance.json",
+          "fd82870b65d17b38189fc1bbc7b26edc693e428567f50f6c41e3b7ca78ae1ecd"
+        ],
+        [
+          "modules/E09a_音频音乐与语音口径登记.md",
+          "a2eab3a12e80cb24cc2931b1ab6f81638d49371113b3a47aeee363123fade228"
+        ],
+        [
+          "modules/E09b_音频音乐与语音收口与形态派生.md",
+          "46a56b61c47e5d0369429b58d2f68efda2a2fc9d023c9248e2bfede78a5d1085"
+        ],
+        [
+          "pipelines/P87_音频音乐与语音装配流管线.md",
+          "1564fc495a1146b36a380b0d03ec1dffca70483b163c1ddaa0cfec6735472466"
+        ],
+        [
+          "protocol.yaml",
+          "5b78a4ef82521340d876df884e1bd7c4fdc237153e1b242d47be4f99631b0d95"
+        ]
+      ],
+      "files_count": 9,
+      "id": "音频音乐与语音域包",
+      "path": "community/音频音乐与语音域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "872b8be76d60f110614edef64e5f3afa0571315a955fb5e9f99114fd05791e12",
+      "files": [
+        [
+          "README.md",
+          "dd0cc6456f47726e816175d04e4225cd0904da692c26070b29d965237b959147"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "171fdde90c3278810954dbc190860650c6f58a7fe132c0b59e8bfab422ef8ed3"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "a86829815de6971aa119bc7ea8da3be88aba89df8a050cbb8f7cbec949979fe6"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "f8a7214861270dcc0c44b95057a9ae686d42730f324425fda1741b5dd6bca00e"
+        ],
+        [
+          "assets/provenance.json",
+          "02ec1d71fe8cc91ecb70b0b6638b77367da492d404b27f7ff5c3c1559f9bec3c"
+        ],
+        [
+          "modules/B18a_预测异常与风险口径登记.md",
+          "6fa19f385727e604ab44968cafe0a3febf0b20fcf4c43f2504aa7c03e0077e0c"
+        ],
+        [
+          "modules/B18b_预测异常与风险收口与形态派生.md",
+          "06c78d05a5860e5d3027d714bd360365bc30770e72c2af5efc83207e698c3c79"
+        ],
+        [
+          "pipelines/P119_预测、异常与风险装配流管线.md",
+          "5c759e7d8e342ed127352336cfbf0acd124e5bad32d65e9cdb62e51624cc2014"
+        ],
+        [
+          "protocol.yaml",
+          "d8fad948d9482591227503d46338133e7bf5e49d04f8d8c9a536df0d5eabb162"
+        ]
+      ],
+      "files_count": 9,
+      "id": "预测异常与风险域包",
+      "path": "community/预测异常与风险域包",
+      "sig": "",
+      "version": "1.0.0"
+    },
+    {
+      "cid": "f4deeac7c991742dea55cd171bf67c3c957ee3580440bfed053f3dacc26abfed",
+      "files": [
+        [
+          "README.md",
+          "a04843a77353ca15a3ae25b194aa72a45a29d1412444e39762ebb267e9f0abc9"
+        ],
+        [
+          "assets/CONCEPT_GRAPH.md",
+          "3ed7bf45d0f15780e8b80798fe7ed3209be6714785a4a76868df81631ee29ccf"
+        ],
+        [
+          "assets/DOMAIN_SPEC.md",
+          "cfcdcfa7235f15066b42fcf84cb3c5adb0e665dd3959a3e675a605a9d7b06108"
+        ],
+        [
+          "assets/STANDARDS_ANCHORS.md",
+          "56e089a641be7a2b57927143748781ec4dc06d220f977d24300ea1997686bf1f"
+        ],
+        [
+          "assets/provenance.json",
+          "cf75d53ccd106b15e63720632938c60c1c08bf29dcd41b3b7efd0e0cbb63ec3d"
+        ],
+        [
+          "modules/C04a_预训练与继续预训练口径登记.md",
+          "e0e8b78577c356a12da8bbe100573e1b57f03a77f324a85605b8d0a449707a5a"
+        ],
+        [
+          "modules/C04b_预训练与继续预训练收口与形态派生.md",
+          "38554c6b3a83d16cc5484b7e5be4ef9efc304fecc6186acd8086adda2c8d4372"
+        ],
+        [
+          "pipelines/P48_预训练与继续预训练装配流管线.md",
+          "89885fb32e0e31e8c7302b752da81bea0ae69331cbe1255223db3dd3862b34ed"
+        ],
+        [
+          "protocol.yaml",
+          "a90278cc6aeed06d3857b3fa18f778b536a4076ab262a6c08949502532dbdbc8"
+        ]
+      ],
+      "files_count": 9,
+      "id": "预训练与继续预训练域包",
+      "path": "community/预训练与继续预训练域包",
+      "sig": "",
+      "version": "1.0.0"
+    }
+  ],
+  "manifest_schema": "nf-pack-manifest/1",
+  "root": "ac72feef68446604fbd2c1b4b68df05934cb8e3d9c43dcfdc2e2c1e885572c67",
+  "schema": "nf-registry-index/1",
+  "signature": {
+    "note": "未签名：本产物只做内容寻址与篡改检测；签名接法见 desktop/src/core/registry_index.py 模块文档（attest 锚 + receipts 域分隔 Merkle）",
+    "scheme": ""
+  },
+  "source": {
+    "manifest_dirs": [
+      "modules",
+      "assets",
+      "pipelines"
+    ],
+    "manifest_root_files": [
+      "protocol.yaml",
+      "README.md"
+    ],
+    "packs": "community/<id>/protocol.yaml",
+    "registry": "desktop/src/core/registry.json"
+  }
+}

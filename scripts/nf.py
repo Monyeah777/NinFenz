@@ -183,6 +183,19 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
     reg.set_defaults(mode="check")
 
+    rgi = sub.add_parser("registry",
+                         help="契约注册表内容寻址（CID）：registry_index.json 生成/校验（T8.2）",
+ description="契约注册表内容寻址（T8.2）：每包 canonical manifest 的 SHA-256（CID）+ 顶层 root；"
+             "只读扫描、不改各包；本版不含签名（sig 留空，只做内容寻址与篡改检测）")
+    rgis = rgi.add_subparsers(dest="registry_cmd", required=True)
+    rgx = rgis.add_parser("index",
+                          help="生成/校验 protocol/registry_index.json（schema nf-registry-index/1）",
+ description="--write 生成索引；--check 与实时重算比对（文件级差异：索引行号 + 包内路径）；"
+             "--json 机读（kind=registry-index）")
+    rgx.add_argument("--write", action="store_true", help="重写 protocol/registry_index.json")
+    rgx.add_argument("--check", action="store_true", help="只校验（默认）")
+    rgx.add_argument("--json", action="store_true", help="打印机读结果")
+
     mkt = sub.add_parser("market",
                          help="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）",
  description="市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）")
@@ -1541,6 +1554,39 @@ def _cmd_register(args) -> int:
     return 0
 
 
+def _cmd_registry(args) -> int:
+    """契约注册表内容寻址（T8.2）：CID 索引生成/校验（实现在 core/registry_index.py）。"""
+    import json as _json          # 本文件按需局部导入（见其余 _cmd_* 的同一习惯）
+    from core import registry_index as ri
+
+    sub = str(getattr(args, "registry_cmd", "") or "")
+    if sub != "index":
+        print("  ✗ registry 子命令缺失（当前支持：index；例：nf registry index --write）",
+              file=sys.stderr)
+        return 2
+    if getattr(args, "write", False):
+        issues, doc = ri.write(ROOT)
+    else:
+        issues, doc = ri.check(ROOT)
+    if getattr(args, "json", False):
+        print(_json.dumps({"kind": "registry-index", "schema": ri.SCHEMA,
+                           "issues": issues, "index": doc},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print("== nf registry index（内容寻址 · 真源 %s）==" % ri.INDEX_REL)
+        print("  包 %d · root %s · 算法 %s"
+              % (len(doc.get("entries") or []), str(doc.get("root", ""))[:16],
+                 (doc.get("algorithm") or {}).get("cid", "?")))
+        signed = str((doc.get("signature") or {}).get("scheme") or "")
+        print("  签名：%s" % ("已声明 %s" % signed if signed
+                             else "未签名（sig 留空；本版只做内容寻址与篡改检测）"))
+        print("  模式：%s" % ("write（已重写索引）" if getattr(args, "write", False)
+                             else "check（只校验）"))
+        for i in issues:
+            print("  [FAIL] %s" % i, file=sys.stderr)
+    return 1 if issues else 0
+
+
 def _cmd_market(args) -> int:
     """nf market：依赖闭包 + 挂载冲突预检（B4 CLI 先行；信息查询，冲突不阻断）。"""
     import json
@@ -2709,7 +2755,7 @@ def _root_pair(args) -> tuple:
     """→ `(顶层命令, 二级子命令)`（`--root` 落点闸门用的分类键）。"""
     cmd = str(getattr(args, "cmd", "") or "")
     sub = ""
-    for att in ("asset_cmd", "module_cmd", "design_cmd"):
+    for att in ("asset_cmd", "module_cmd", "design_cmd", "registry_cmd"):
         val = getattr(args, att, None)
         if val:
             sub = str(val)
@@ -7625,6 +7671,8 @@ def main(argv=None) -> int:
         return _cmd_worldmodel(args)
     if args.cmd == "register":
         return _cmd_register(args)
+    if args.cmd == "registry":
+        return _cmd_registry(args)
     if args.cmd == "asset":
         return _cmd_asset(args)
     if args.cmd == "pipeline":
