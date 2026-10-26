@@ -72,8 +72,7 @@ class WorkflowActionPinningTest(unittest.TestCase):
         self.assertIn("github/codeql-action/analyze@", text)
         for language in ("python", "actions", "javascript-typescript"):
             self.assertIn(language, text,
-                          "CodeQL 扫描语言矩阵缺 %s（动作与发布脚本也是供应链代码面）"
-                          % language)
+                          f"CodeQL 扫描语言矩阵缺 {language}（动作与发布脚本也是供应链代码面）")
 
     def test_rust_fuzz_target_is_present(self):
         target = ROOT / "engine" / "rust" / "fuzz" / "fuzz_targets" / "python_parser.rs"
