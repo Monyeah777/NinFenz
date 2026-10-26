@@ -19,6 +19,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+MAX_PYPI_RESPONSE_BYTES = 8 * 1024 * 1024
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 OUT = ROOT / "THIRD-PARTY-NOTICES.md"
@@ -73,7 +74,11 @@ def pypi(name: str) -> dict:
     # 下方 urlopen 的入参已由上面两道校验钉死为「https + pypi.org」常量前缀，
     # 故 bandit B310 / ruff S310（动态 URL）在此站点是**已消除的**风险面。
     with urllib.request.urlopen(url, timeout=25) as resp:  # nosec B310
-        return json_doc.loads(resp.read().decode("utf-8"), dict, what="PyPI " + name)
+        raw = resp.read(MAX_PYPI_RESPONSE_BYTES + 1)
+        if len(raw) > MAX_PYPI_RESPONSE_BYTES:
+            raise ValueError(f"PyPI 响应超过上限 {MAX_PYPI_RESPONSE_BYTES} 字节"
+                             "（修复指引：检查上游是否返回异常大页）")
+        return json_doc.loads(raw.decode("utf-8"), dict, what="PyPI " + name)
 
 
 def _pin_stdio() -> None:

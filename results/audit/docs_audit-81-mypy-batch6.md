@@ -8,10 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:dbb5b2b45ebba8d67770a41056e944506f017dd243522edab79878886284d92e
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
-  - desktop/src/core/asset_ledger.py:245d911c417e3d37944a834e0a408ddf33b7491803edd7fe5bfaf132e8f8a6ba
+  - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:786bb8ac604ed2878a89f9f38b249cc3a46619d608ba05567057bd5dd5f81e4a
+  - protocol/code_metrics_baseline.json:7156093310de1be529e60a5cceb733faa64a95844f85934ba0aa5e8e5f445f20
 ---
+> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+
 > 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
 
 > 重审（2026-10-25）：D1 常量时间比较 + N2/L2 发布面白名单化

@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:268de0c2922c0f6c4cb85f30e2609b8936554edb295c915760451c23b4055e65
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:9592fcd624cebde5a387adfb5b1f7bc43f56c3886a88ce3a7f23eb6542b64335
+  - README.md:2933089d199c87fb8236d569c393ba6fe268c53c2488a19af0c10ff4a4d8b79c
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
-  - docs/release.md:7c7d2ee0e17a1bb0dd1584f0c6d92753cfad85f62ec148e2b74d4914be5ee379
-  - scripts/nf.py:67269637feaa44867cf01bc3ec44853788c5ab40a2b798c479cde66892e8c926
+  - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
+  - scripts/nf.py:2d765276c47c85beb5f7350c4f53f4b58f84074bc4cb17b35a2a6a7fa84809a7
 
 ---
+> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+
 > 重审（2026-10-25）：REUSE 3.3 合规（MIT-NOTICE + 徽章 + CI 作业）
 
 > 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价

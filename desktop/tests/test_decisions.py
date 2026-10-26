@@ -79,8 +79,13 @@ class TestRealRepo(unittest.TestCase):
         self.assertEqual(codes, [i.code for i in dc.analyze(str(ROOT)).issues])
 
     def test_external_runner_boundary_is_decided(self):
-        hit = next(e for e in dc.entries(str(ROOT))
-                   if e["fm"].get("id") == "ADR-0008")
+        # 2026-10-25：ADR-0008（外部一致性运行器边界）属**真实决策**，已随
+        # decisions/ADR-0000 的裁决迁入私有 Plan 仓归档；公开仓只留模板。
+        # 该断言只在 ADR 在场时生效——缺席时跳过（决策本身仍有效，只是不公开）。
+        hit = next((e for e in dc.entries(str(ROOT))
+                    if e["fm"].get("id") == "ADR-0008"), None)
+        if hit is None:
+            self.skipTest("ADR-0008 已迁私有仓（见 decisions/ADR-0000），公开面不校验内容")
         self.assertEqual("accepted", hit["fm"].get("status"))
         body = hit["body"]
         for phrase in (

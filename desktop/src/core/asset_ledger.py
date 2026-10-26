@@ -254,12 +254,14 @@ def _iter_md_candidates(ledger_dir: str) -> list:
     """台账目录下候选资产 md（排除 README*——包/库索引手册非内容资产，对齐 check7 口径）。"""
     out = []
     for base, dirs, files in os.walk(ledger_dir):
-        dirs[:] = [d for d in dirs if d not in (".git", ".gitee", "__pycache__")]
+        dirs[:] = [d for d in dirs if d not in (".git", ".gitee", "__pycache__")
+                   and not os.path.islink(os.path.join(base, d))]
         for fn in sorted(files):
             if fn.lower().startswith("readme"):
                 continue
-            if fn.endswith(".md"):
-                out.append(os.path.join(base, fn))
+            full = os.path.join(base, fn)
+            if fn.endswith(".md") and not os.path.islink(full):
+                out.append(full)
     return out
 
 
@@ -294,7 +296,11 @@ def verify_ledger_dir(ledger_dir: str, ledger_path: str | None = None) -> tuple:
             issues.append("[%s] 文件重复/为空: %r" % (lp, frel))
             continue
         seen_files.add(frel)
-        full = os.path.join(ledger_dir, frel)
+        try:
+            full = _safe_join(ledger_dir, frel)
+        except AssetLedgerError as exc:
+            issues.append(f"[{lp}] {exc}")
+            continue
         if not os.path.isfile(full):
             issues.append("[%s] 在册文件缺失（可发现性断裂）: %s" % (lp, frel))
             continue
@@ -350,7 +356,9 @@ def _walk_repo(root: str):
         rel = "" if rel == "." else rel
         dirs[:] = [d for d in dirs
                    if d not in (".git", ".gitee", "__pycache__")
+                   and not os.path.islink(os.path.join(base, d))
                    and not _repo_face.is_ignored(("%s/%s" % (rel, d)) if rel else d, ignored)]
+        files[:] = [f for f in files if not os.path.islink(os.path.join(base, f))]
         yield base, dirs, files
 
 

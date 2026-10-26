@@ -18,7 +18,7 @@ fn sha256<'py>(py: Python<'py>, data: &[u8]) -> Bound<'py, PyBytes> {
     // 与真源 `hashlib.sha256(data).digest()` 逐字节一致；Python bytes → Rust → Python bytes，
     // 无子进程、无序列化往返（内存直接交互）。
     let digest = nf_rs::merkle::sha256(data);
-    PyBytes::new_bound(py, &digest)
+    PyBytes::new(py, &digest)
 }
 
 #[pyfunction]
@@ -30,7 +30,7 @@ fn float_repr(x: f64) -> String {
 #[pyfunction]
 fn reverse_bytes<'py>(py: Python<'py>, data: &[u8]) -> Bound<'py, PyBytes> {
     let flipped: Vec<u8> = data.iter().rev().copied().collect();
-    PyBytes::new_bound(py, &flipped)
+    PyBytes::new(py, &flipped)
 }
 
 #[pymodule]

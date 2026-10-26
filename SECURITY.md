@@ -5,7 +5,8 @@
 
 ## 一、如何私密报告
 
-请用 **GitHub Security Advisories** 的私密通道报告（仓库页 → Security → Report a vulnerability）。
+请用 **GitHub Security Advisories** 的私密通道报告：
+<https://github.com/Monyeah777/NinFenz/security/advisories/new>。
 不要用公开 Issue 报安全问题——公开 Issue 会触发**云端代收站**的自动入库机器人（见下），
 等于把细节先公开分发一次。
 
@@ -43,7 +44,10 @@
 | 明文密钥扫描 | `ci-verify.yml` | 命中即红 |
 | 依赖固定 + 版本审计 | `.github/requirements-*.txt` + `dependency-audit.yml` | 每周 + push |
 | action 固定到 commit SHA | 全部 workflow | 回归测试 `test_ci_supply_chain.py` |
-| 入库通道的凭据与内容边界 | `.github/scripts/*_ingest.py` | 令牌不落盘、密钥形状拒收、超长拒收 |
+| 入库通道的凭据与内容边界 | `.github/scripts/*_ingest.py` | 令牌不落盘、密钥形状拒收、正文/API 响应/分页均有硬上限 |
+| 本机 daemon IPC | `desktop/src/core/daemon.py` | Windows 独占端口、常量时间令牌、严格 UTF-8 JSON、请求/响应/内存硬上限 |
+| MCP 只读资源面 | `desktop/src/core/mcp_runtime.py` + `repo_index.py` | URI 白名单、realpath 包含性、拒绝符号链接越界、快照/资源/出站消息上限 |
+| 插件宿主 | `scripts/plugin_host.py` | wasmtime fuel/超时、无 fs/net/env、stdin/stdout/stderr 有界、argv 长度预算 |
 | 静态检查（含未定义名） | `nf release` → ruff | 本地 pre-push 即拦 |
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
@@ -54,12 +58,13 @@
 - **面**：`nf verify` 的引擎侧会对目标仓库 `verify.sh` 里的 heredoc Python 做 `exec`
   （`desktop/src/core/gate_inproc.py`）——**在谁的仓库里跑，就执行谁的代码**
   （CWE-94/95；OWASP A03:2021 – Injection；ASVS V5.2.1「不得对不可信数据求值」）。
-- **默认策略（fail-closed）**：目标仓库 `origin` 的 GitHub owner 在允许列表（默认仅本仓作者
-  `Monyeah777`）才执行；**无 origin / 非 git 检出 / 形态不认识 / owner 不在表 ⇒ 拒绝执行**，
+- **默认策略（fail-closed）**：只有“当前运行代码所在的安装根”自动可信。外部仓库即使把
+  `origin` 伪造成官方 URL 也不自动可信——本地 remote 不是代码身份凭证。其它仓库一律拒绝执行，
   `nf verify` 以退出码 2 打印风险与修复指引（不静默降级）。
 - **显式放行**：`nf verify --trust-repo`（等价 `NF_TRUST_REPO=1`），风险由调用者承担；
-  自建镜像 / fork CI 可用 `NF_TRUST_OWNERS`（逗号分隔）追加允许 owner（**只增不减须评审**）。
+  自建镜像 / fork CI 可用 `NF_TRUST_OWNERS`（逗号分隔）显式 opt-in owner。两者都表示调用者
+  已人工审阅目标仓库，不是来源证明。
 - **纵深防御**：`core/gate_inproc.py` 的三个 `exec` 入口在直接调用时同样 `assert_trusted()`，
   被拒时**不产生任何执行副作用**。
-- **判据**：`desktop/tests/test_repo_trust.py`（GitHub URL 形态解析、白名单、拒绝无副作用、
-  CLI 前置拒绝与 `--trust-repo` 放行）。
+- **判据**：`desktop/tests/test_repo_trust.py`（URL 严格解析、伪造官方 origin 仍拒绝、安装根
+  自动信任、拒绝无副作用、CLI 前置拒绝与 `--trust-repo` 放行）。

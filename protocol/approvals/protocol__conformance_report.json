@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-25",
+  "approved_at": "2026-10-26",
   "approved_by": "Monyeah777",
-  "note": "回退手动触发",
+  "note": "OpenSSF Scorecard CI portability fix",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "21583746f95a2be7804c26d530f04e90a956a4d3dcb857a2197d3e20c1548222"
+  "subject_digest": "5e803f1e41ed37c1dfd12647e4cfb51385e1d4e7278c76f96db2bf3bdcb49ff4"
 }

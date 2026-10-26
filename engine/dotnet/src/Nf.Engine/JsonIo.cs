@@ -15,6 +15,7 @@ namespace Nf.Engine;
 public static class JsonIo
 {
     public const int MaxDepth = 1000;
+    internal const int MaxFileBytes = 16 * 1024 * 1024;
 
     public static readonly JsonDocumentOptions Options = new()
     {
@@ -27,5 +28,16 @@ public static class JsonIo
 
     public static JsonDocument Parse(string text) => JsonDocument.Parse(text, Options);
 
-    public static JsonDocument ReadFile(string path) => JsonDocument.Parse(File.ReadAllBytes(path), Options);
+    public static JsonDocument ReadFile(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
+                                          FileShare.ReadWrite | FileShare.Delete);
+        if (stream.Length > MaxFileBytes)
+            throw new InvalidDataException(
+                $"JSON 文件超过上限 {MaxFileBytes} 字节：{Path.GetFileName(path)}"
+                + "（修复指引：拆分文件或改为分页读取）");
+        var raw = new byte[(int)stream.Length];
+        stream.ReadExactly(raw);
+        return JsonDocument.Parse(raw, Options);
+    }
 }

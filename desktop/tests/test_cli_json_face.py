@@ -252,10 +252,10 @@ CANON = {
     "decide": ["decide", "--state", "@state", "--questions", "@questions",
                "--adapter", "stub"],
     # 复核纠正（2026-10-01）：这两张此前被我按「仓内 0 件」挂进 SKIP，**是错的**——
-    # 仓内本来就有 `handovers/HO-0001-W1到W2.md` 与 `postmortems/PO-0001-冻结顺序事故.md`
+    # 仓内本来就有 `handovers/HO-9000-示例-接力模板.md` 与 `postmortems/PO-9000-示例-复盘模板.md`
     # （`test_handover` / `test_postmortem` 的 RealRepo 用例一直断言 ≥1 件）。直接指真件真跑。
-    "handover check": ["handover", "check", "handovers/HO-0001-W1到W2.md"],
-    "postmortem check": ["postmortem", "check", "postmortems/PO-0001-冻结顺序事故.md"],
+    "handover check": ["handover", "check", "handovers/HO-9000-示例-接力模板.md"],
+    "postmortem check": ["postmortem", "check", "postmortems/PO-9000-示例-复盘模板.md"],
     "diff": ["diff", "01_核心协议.md", "01_核心协议.md"],
     "domain build": ["domain", "build", "--spec", "A01"],
     "library search": ["library", "search", "验收"],

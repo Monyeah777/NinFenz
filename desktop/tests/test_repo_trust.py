@@ -2,7 +2,8 @@
 
 判据面：
 - origin owner 解析（GitHub 形态；解析不出/无 origin ⇒ 不可信，fail-closed）；
-- 允许列表（默认含本仓作者；`NF_TRUST_OWNERS` 可追加）；
+- 自动信任只覆盖“当前运行代码所在的安装根”，外部仓库即便伪造官方 origin 也不可信；
+- `NF_TRUST_OWNERS` 只作为显式 opt-in；
 - `--trust-repo` / `NF_TRUST_REPO=1` 显式放行；
 - 引擎 inproc 面拒绝不可信仓库（如实 FAIL，不执行代码）；
 - `gate_inproc` 纵深防御：直接调用 exec 入口也拒绝，且**没有产生任何执行副作用**。
@@ -77,17 +78,25 @@ class OriginParseTest(_Base):
 
     def test_unparseable_or_absent_origin_is_untrusted(self):
         for origin in ("", "https://gitlab.com/evil/repo.git", "/local/path/repo",
-                       "https://github.com/evil/repo.git"):
+                       "https://github.com/evil/repo.git",
+                       "https://evil.example/github.com/Monyeah777/NinFenz.git",
+                       "https://github.com.evil.example/Monyeah777/NinFenz.git",
+                       "ssh://git@evil.example/github.com/Monyeah777/NinFenz.git"):
             with self.subTest(origin=origin):
                 d = self._tmp_repo(origin)
                 ok, why = repo_trust.trust_status(str(d))
                 self.assertFalse(ok, why)
 
-    def test_allowlisted_owner_is_trusted(self):
+    def test_forged_allowlisted_origin_is_not_automatic_trust(self):
         d = self._tmp_repo("git@github.com:Monyeah777/NinFenz.git")
         ok, why = repo_trust.trust_status(str(d))
+        self.assertFalse(ok, "任意本地仓库都能伪造 origin，URL 本身不能作为代码信任凭证")
+        self.assertIn("显式", why)
+
+    def test_running_installation_root_is_trusted(self):
+        ok, why = repo_trust.trust_status(str(ROOT))
         self.assertTrue(ok, why)
-        self.assertIn("Monyeah777", why)
+        self.assertIn("安装根", why)
 
     def test_non_git_dir_is_untrusted(self):
         with tempfile.TemporaryDirectory() as d:
@@ -113,8 +122,7 @@ class GateRefusalTest(_Base):
         self.assertFalse(marker.exists(), "被拒时不得执行目标仓库代码（无副作用）")
 
     def test_gate_inproc_executes_for_trusted_repo(self):
-        good = self._tmp_repo("https://github.com/Monyeah777/NinFenz.git")
-        code, _out = gate_inproc.run_inproc("x = 1", good, "checkX")
+        code, _out = gate_inproc.run_inproc("x = 1", ROOT, "checkX")
         self.assertEqual(0, code)
 
     def test_gate_inproc_executes_with_explicit_trust(self):
@@ -140,7 +148,9 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
-        with mock.patch.object(gate_engine, "ROOT", evil):
+        with (mock.patch.object(gate_engine, "ROOT", evil),
+              mock.patch.object(repo_trust, "trust_status",
+                                return_value=(False, "untrusted fixture"))):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
 

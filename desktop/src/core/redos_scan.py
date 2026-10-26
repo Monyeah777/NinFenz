@@ -92,7 +92,7 @@ def literal_patterns(root: str = ".", dirs: Tuple[str, ...] = SCAN_DIRS
         base = r / d
         if not base.is_dir():
             continue
-        for p in sorted(base.rglob("*.py")):
+        for p in sorted(p for p in base.rglob("*.py") if not p.is_symlink()):
             try:
                 tree = ast.parse(p.read_text(encoding="utf-8", errors="replace"))
             except (OSError, SyntaxError):

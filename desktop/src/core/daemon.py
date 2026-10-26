@@ -47,10 +47,22 @@ PROTO = 1
 BIND_HOST = "127.0.0.1"
 #: 请求体上限（1 MiB）：一条命令的 argv 远小于此；设上限防「自称超长」的无界读。
 MAX_REQUEST_BYTES = 1 << 20
+#: 单次响应载荷上限（16 MiB，与 Rust worker 同口径）：防止客户端按伪造/失控长度分配内存。
+MAX_RESPONSE_BYTES = 16 << 20
 #: 单条 argv 上限（字符）：参数是「命令 + 选项 + 标识符」，不是正文载荷。
 MAX_ARGV_CHARS = 8192
 #: argv 合计上限（字符）：防「一条 1 MB 请求 → CLI 回吐 200 KB 用法」这类放大。
 MAX_ARGV_TOTAL = 65536
+#: 工作目录上限（字符）；cwd 只是定位参数，不应成为超长内存/路径解析载荷。
+MAX_CWD_CHARS = 32768
+
+
+def _configure_server_socket(sock: socket.socket) -> None:
+    """Windows 用独占绑定；SO_REUSEADDR 在该平台允许别的本机进程抢绑同一端口。"""
+    if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+    elif os.name != "nt":
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 
 def _check_argv_size(argv) -> None:
@@ -81,6 +93,8 @@ def _check_argv_size(argv) -> None:
 REFUSED_COMMANDS = ("serve", "shell", "terminal", "lsp", "daemon")
 #: 连接读写超时（秒）：客户端卡住不得拖死守护。
 SOCKET_TIMEOUT = 30.0
+#: 帧接收超时（秒）：未认证连接最多占住串行 accept 这么久，随后即断开。
+HANDSHAKE_TIMEOUT = 5.0
 STATE_NAME = "daemon.json"
 _STATE_WRITE_LOCK = threading.Lock()
 #: bash 快路模板（`nf daemon shell-init bash` 原样输出，供 `eval "$(…)"` 装进交互 shell）。
@@ -183,17 +197,116 @@ class _LineReader:
     def __init__(self, sock: socket.socket) -> None:
         self._sock = sock
         self._buf = b""
+        self._total = 0
 
     def readline(self, limit: int = MAX_REQUEST_BYTES) -> bytes:
-        while b"\n" not in self._buf:
+        while True:
+            line, sep, rest = self._buf.partition(b"\n")
+            if sep:
+                self._buf = rest
+                return line
+            if len(self._buf) > limit:
+                raise ValueError(f"单行请求超过上限 {limit} 字节")
             chunk = self._sock.recv(65536)
             if not chunk:
-                break
+                line, self._buf = self._buf, b""
+                return line
+            self._total += len(chunk)
+            if self._total > MAX_REQUEST_BYTES:
+                raise ValueError(f"请求总计超过上限 {MAX_REQUEST_BYTES} 字节")
             self._buf += chunk
-            if len(self._buf) > limit:
-                raise ValueError("请求超过上限 %d 字节" % limit)
-        line, _, self._buf = self._buf.partition(b"\n")
-        return line
+
+
+class _BoundedBytesIO(io.BytesIO):
+    """内存采集硬上限：越界立即失败，不先分配再事后检查。"""
+
+    def __init__(self, cap: int) -> None:
+        super().__init__()
+        self._cap = int(cap)
+
+    def write(self, data) -> int:
+        size = len(data)
+        if self.tell() + size > self._cap:
+            raise ValueError(f"输出超过上限 {self._cap} 字节"
+                             "（修复指引：收窄查询范围，或改用 --write 落盘）")
+        return super().write(data)
+
+
+def _decode_frame(raw: bytes, what: str) -> str:
+    """协议文本一律严格 UTF-8；非法字节不得被替换字符静默洗白。"""
+    try:
+        return raw.decode()
+    except UnicodeDecodeError as exc:
+        raise ValueError(
+            f"{what}不是合法 UTF-8：{exc}（修复指引：客户端须发送 UTF-8 协议帧）"
+        ) from exc
+
+
+def _validated_cwd(root: Path, cwd: str | None) -> str | None:
+    """规范化客户端 cwd；空值表示使用守护自身 cwd。"""
+    if cwd is None:
+        return None
+    if not isinstance(cwd, str) or not cwd:
+        raise ValueError("cwd 必须是非空字符串（修复指引：客户端传绝对目录，或省略 cwd）")
+    if len(cwd) > MAX_CWD_CHARS:
+        raise ValueError(f"cwd 超过上限 {MAX_CWD_CHARS} 字符（修复指引：缩短路径或省略 cwd）")
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in cwd):
+        raise ValueError("cwd 含控制字符（修复指引：路径里不得含 \x00-\x1f）")
+    if os.name == "nt":
+        # Git Bash/MSYS 的原生客户端会送 `/d/repo`；显式映射，避免 isdir 失败后静默回退。
+        import re
+        match = re.match(r"^/([A-Za-z])/(.*)$", cwd)
+        if match:
+            tail = match.group(2).replace("/", "\\")
+            cwd = f"{match.group(1).upper()}:\\{tail}"
+    safe = os.path.realpath(cwd)
+    if not os.path.isdir(safe):
+        raise ValueError(f"cwd 不是现存目录：{safe}（修复指引：传仓库根的绝对路径，或省略 cwd）")
+    return safe
+
+
+def _check_json_nesting(text: str, limit: int = 32) -> None:
+    """JSON 请求只承载扁平控制字段；解析前先做线性深度闸，避开 RecursionError。"""
+    depth = 0
+    quoted = escaped = False
+    for ch in text:
+        if quoted:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                quoted = False
+            continue
+        if ch == '"':
+            quoted = True
+        elif ch in "[{":
+            depth += 1
+            if depth > limit:
+                raise ValueError(
+                    f"JSON 嵌套超过上限 {limit}（修复指引：请求体扁平化，嵌套不超过协议上限）"
+                )
+        elif ch in "]}":
+            depth -= 1
+
+
+def _strict_json_object(pairs):
+    out = {}
+    for key, value in pairs:
+        if key in out:
+            raise ValueError(f"JSON 重复键：{key}（修复指引：请求体里每个键只写一次）")
+        out[key] = value
+    return out
+
+
+def _parse_json_request(text: str):
+    from core import json_doc
+    _check_json_nesting(text)
+    try:
+        return json_doc.loads(text, dict, what="守护请求",
+                              strict_constants=True, pairs_hook=_strict_json_object)
+    except RecursionError as exc:
+        raise ValueError("JSON 嵌套过深（修复指引：请求体扁平化，嵌套不超过协议上限）") from exc
 
 
 def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
@@ -204,22 +317,22 @@ def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
       纯 bash 无需 JSON 编解码器即可发请求。明文框的 argv **不能含换行**（路径与命令参数
       的常规取值都不含；需要精确传递请走 JSON 框）。
     """
-    head = reader.readline().decode("utf-8", "replace")
+    head = _decode_frame(reader.readline(), "请求头")
     if head.startswith("NFREQ"):
         parts = head.split()
         if len(parts) != 3 or parts[1] != str(PROTO):
             raise ValueError("NFREQ 头格式错（期望 `NFREQ %d <token>`）" % PROTO)
-        cwd = reader.readline().decode("utf-8", "replace")
+        cwd = _decode_frame(reader.readline(), "NFREQ cwd")
         try:
-            n = int(reader.readline().decode("ascii", "replace").strip() or "0")
+            n = int(_decode_frame(reader.readline(), "NFREQ 条数").strip() or "0")
         except ValueError as exc:
             raise ValueError("NFREQ argv 条数不可解析：%s" % exc) from exc
         if n < 0 or n > 4096:
             raise ValueError("NFREQ argv 条数越界：%d" % n)
-        argv = [reader.readline().decode("utf-8", "replace") for _ in range(n)]
+        argv = [_decode_frame(reader.readline(), "NFREQ argv") for _ in range(n)]
         _check_argv_size(argv)
         return {"proto": PROTO, "token": parts[2], "cwd": cwd, "argv": argv}
-    req = json.loads(head or "{}")
+    req = _parse_json_request(head or "{}")
     if not isinstance(req, dict):
         raise ValueError("请求不是 JSON 对象")
     if "argv" in req:
@@ -229,18 +342,50 @@ def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
 
 def send_framed(sock: socket.socket, exit_code: int, out: bytes, err: bytes) -> None:
     """按协议写响应：三行头 + 原始载荷。"""
-    head = ("%d\n%d\n%d\n" % (int(exit_code), len(out), len(err))).encode("utf-8")
+    if len(out) + len(err) > MAX_RESPONSE_BYTES:
+        exit_code = 1
+        out = b""
+        err = (f"响应超过上限 {MAX_RESPONSE_BYTES} 字节"
+               "（修复指引：收窄查询范围，或改用 --write 落盘）\n").encode()
+    head = f"{int(exit_code)}\n{len(out)}\n{len(err)}\n".encode()
     sock.sendall(head + out + err)
 
 
 def read_framed(sock: socket.socket) -> Tuple[int, bytes, bytes]:
     """按协议读响应（客户端侧）：返回 (exit, stdout 字节, stderr 字节)。"""
     fh = sock.makefile("rb")
-    code = int(fh.readline().strip() or b"1")
-    out_len = int(fh.readline().strip() or b"0")
-    err_len = int(fh.readline().strip() or b"0")
-    out = fh.read(out_len) if out_len else b""
-    err = fh.read(err_len) if err_len else b""
+    def _length_line(label: str) -> int:
+        raw = fh.readline(64)
+        if not raw or not raw.endswith(b"\n"):
+            raise ValueError(f"响应帧 {label} 缺失或超长")
+        try:
+            value = int(raw.strip())
+        except ValueError as exc:
+            raise ValueError(f"响应帧 {label} 不是整数") from exc
+        if value < 0 or value > MAX_RESPONSE_BYTES:
+            raise ValueError(f"响应帧 {label} 越界：{value}")
+        return value
+
+    def _exact(n: int) -> bytes:
+        chunks, left = [], n
+        while left:
+            chunk = fh.read(left)
+            if not chunk:
+                raise ValueError(f"响应载荷提前结束（缺 {left} 字节）")
+            chunks.append(chunk)
+            left -= len(chunk)
+        return b"".join(chunks)
+
+    try:
+        code = _length_line("exit")
+        out_len = _length_line("stdout 长度")
+        err_len = _length_line("stderr 长度")
+        if out_len + err_len > MAX_RESPONSE_BYTES:
+            raise ValueError(f"响应载荷越界：{out_len} + {err_len} 字节")
+        out = _exact(out_len) if out_len else b""
+        err = _exact(err_len) if err_len else b""
+    finally:
+        fh.close()
     return code, out, err
 
 
@@ -441,6 +586,8 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
         msg = ("守护进程内拒跑长驻/嵌套命令 `nf %s`"
                "（修复指引：在普通终端里直接跑；守护只承载一次性命令）\n" % argv[0])
         return 2, b"", msg.encode("utf-8")
+    if cwd is not None:
+        cwd = _validated_cwd(root, cwd)
     _sync_resident(root)          # 常驻层按监听变更集失效（说不清就整批作废）——必须在任何读之前
     # 响应缓存：**只在「树没变」有可证信号时**才可能命中（判据与账本在 core.response_cache）。
     gen, allowed = _watch_generation(), bool(cacheable(argv))
@@ -450,7 +597,8 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
     _sync_code(root)          # 源码变了就先重载（否则会用旧逻辑回话）
     reset_process_caches()
     nf = _load_cli(root)
-    out_buf, err_buf = io.BytesIO(), io.BytesIO()
+    out_buf = _BoundedBytesIO(MAX_RESPONSE_BYTES)
+    err_buf = _BoundedBytesIO(MAX_RESPONSE_BYTES)
     out_txt = io.TextIOWrapper(out_buf, encoding="utf-8", write_through=True)
     err_txt = io.TextIOWrapper(err_buf, encoding="utf-8", write_through=True)
     old_cwd = os.getcwd()
@@ -517,6 +665,10 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except (ValueError, OSError, UnicodeDecodeError) as exc:
         send_framed(conn, 2, b"", ("请求不可读：%s\n" % exc).encode("utf-8"))
         return False
+    conn.settimeout(SOCKET_TIMEOUT)
+    if req.get("proto") != PROTO:
+        send_framed(conn, 2, b"", "proto 不符\n".encode())
+        return False
     # D1（2026-10-22 安全审计）：令牌是**唯一信任边界**，比较必须常量时间。
     # 同时拒绝非字符串形态（旧实现里 `!=` 对 dict/list 只是"不相等"，语义上等于合法比较，
     # 但会把"类型错"混进"令牌错"，诊断面就分不清）。
@@ -527,22 +679,34 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
                                   "（修复指引：用 scripts/nf 启动器，或 nf daemon status）\n"
                                   .encode("utf-8"))
         return False
-    if req.get("op") == "shutdown":
-        send_framed(conn, 0, b"", b"")
-        return True
-    if req.get("op") == "stats":
-        # 观测面必须**在守护进程内**取：缓存与监听件都是守护的进程状态，客户端看不到。
-        payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
-        send_framed(conn, 0, payload, b"")
+    op = req.get("op")
+    if op is not None:
+        if not isinstance(op, str):
+            send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
+            return False
+        if op == "shutdown":
+            send_framed(conn, 0, b"", b"")
+            return True
+        if op == "stats":
+            # 观测面必须**在守护进程内**取：缓存与监听件都是守护的进程状态，客户端看不到。
+            payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
+            send_framed(conn, 0, payload, b"")
+            return False
+        send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
         return False
     argv = req.get("argv")
     if not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
         send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode("utf-8"))
         return False
+    try:
+        cwd = _validated_cwd(root, req.get("cwd"))
+    except ValueError as exc:
+        send_framed(conn, 2, b"", f"请求不可读：{exc}\n".encode())
+        return False
     from core import disk_cache as _dc
     _dc.defer_begin()                # 请求期间：派生结果的写盘只入队
     try:
-        code, out, err = execute(argv, root, cwd=req.get("cwd"))
+        code, out, err = execute(argv, root, cwd=cwd)
     except SystemExit as exc:        # 请求级：裸 SystemExit 也归一（不得因它杀死守护）
         _dc.defer_drop()
         code, out, err = int(exc.code or 0), b"", b""
@@ -566,7 +730,7 @@ def _serve_conn(conn: socket.socket, token: str, root: Path) -> bool:
     （`send_framed` 抛 BrokenPipeError/ConnectionResetError）此前会让整个 `serve_forever` 退出，
     一条被中断的请求就带走常驻进程。现在记一行、继续 accept。
     """
-    conn.settimeout(SOCKET_TIMEOUT)
+    conn.settimeout(HANDSHAKE_TIMEOUT)
     try:
         return _handle_conn(conn, token, root)
     except OSError as exc:
@@ -611,7 +775,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
                   "行为与常规守护一致", file=sys.stderr)
     token = secrets.token_hex(32)
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    _configure_server_socket(srv)
     srv.bind((BIND_HOST, 0))              # 端口 0 = 内核分配（不抢占固定端口）
     srv.listen(8)
     port = int(srv.getsockname()[1])

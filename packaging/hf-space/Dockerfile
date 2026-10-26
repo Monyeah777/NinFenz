@@ -7,7 +7,7 @@
 # npm 包同源同版本」），且不再要求构建上下文里存在本地产物。
 #
 # 发新版时：把 NF_VERSION 与 packaging/npm/package.json 的 version 同步；release 链已判两处一致性。
-FROM node:22-slim AS nfpayload
+FROM node:22-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS nfpayload
 ARG NF_VERSION=1.1.0
 WORKDIR /tmp/nf
 RUN npm pack "ninfenz@${NF_VERSION}" \
@@ -15,7 +15,7 @@ RUN npm pack "ninfenz@${NF_VERSION}" \
  && test -d package/payload \
  && mv package/payload /nf
 
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:a0f57064cbdcd6285fa45f51237ab0b35ea8ebaed06a1f5973e89e19dfb86704
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONUTF8=1 \
