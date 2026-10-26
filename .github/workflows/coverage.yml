@@ -1,0 +1,63 @@
+name: coverage
+# 42 M5.1：核心层代码覆盖率量化（独立 job，不碰 verify.sh 零依赖红线）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  core-coverage:
+    name: core-coverage-ge-80
+    runs-on: ubuntu-latest
+    timeout-minutes: 45          # 挂死上限（2026-10-01 统一）
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          # 2026-10-22：全量 discover 含 p6_evaluations（依赖 git tag/全历史）；浅克隆必红。
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装测试依赖（coverage + pyyaml + PySide6 + EGL 系统库——与 ci-verify 对齐）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
+      - name: 冷启动前置（干净 clone 缺的目录）
+        shell: bash
+        run: mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+      - name: 核心层覆盖率门槛（desktop/src/core ≥80%；日志落盘）
+        env:
+          NF_COVERAGE: "1"
+          NF_TEST_JOBS: "4"
+        run: |
+          set -o pipefail
+          rc=0
+          python scripts/verify_tests.py --jobs 4 2>&1 | tee coverage.log || rc=$?
+          python -m coverage combine 2>&1 | tee -a coverage.log || rc=$?
+          python -m coverage report --fail-under=80 --include="desktop/src/core/*" 2>&1 | tee -a coverage.log || rc=$?
+          exit "$rc"
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: coverage-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore
+          include-hidden-files: true

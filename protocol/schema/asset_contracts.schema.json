@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/asset_contracts.schema.json",
+  "title": "NF 数字资产契约声明（asset contracts）",
+  "description": "protocol/asset_contracts.json 的单一真相定义（S2 可移植规范）：四面 = 数据 / 代码 / 脚本 / 包清单 + I/O 链。声明即契约：**指不出判据的资产不许登记**。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "data",
+    "code",
+    "script"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": [
+        "nf-asset-contracts/1"
+      ]
+    },
+    "note": {
+      "type": "string"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "format"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "path": {
+            "type": "string"
+          },
+          "glob": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "json",
+              "csv",
+              "markdown",
+              "text",
+              "yaml",
+              "toml",
+              "jsonl",
+              "graphml",
+              "mmd"
+            ]
+          },
+          "schema": {
+            "type": "string"
+          },
+          "schema_siblings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_any_columns": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "min_rows": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "min_nodes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "link": {
+            "type": "object"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "code": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "path": {
+            "type": "string"
+          },
+          "glob": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string"
+          },
+          "tests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deny_calls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbid_regex": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "pattern"
+              ]
+            }
+          },
+          "regex_limits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "pattern",
+                "max"
+              ]
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "script": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "lang"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "path": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "python",
+              "bash",
+              "vba",
+              "powershell"
+            ]
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "index": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "glob": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "from",
+          "to"
+        ]
+      }
+    }
+  }
+}

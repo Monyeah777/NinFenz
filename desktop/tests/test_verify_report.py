@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""门禁机器可读报告（`core/verify_report.py`）回归测试 —— 静态可核验面。
+
+覆盖：构建确定性 / 声明与实测并排 / 缺件与篡改可检出 / 坏判据记账为 error 而不崩 /
+真仓报告零 FAIL。
+"""
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT / "desktop" / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core import json_doc  # noqa: E402
+from core import verify_report as vr  # noqa: E402
+
+#: 真仓报告**按根缓存**（本文件 7 条判据都要读同一棵真仓）。
+#:
+#: 为什么要缓存（2026-10-15 实测）：`vr.build(真仓)` 单次 **22–30 s**（内部 31 个子扫描、
+#: 37051 次 `read_text`），而本文件 7 条判据各建一次 ⇒ 单文件 **190–240 s**。真仓在单次
+#: 测试进程内**不变化**，故整份报告可安全复用。
+#:
+#: **不缓存到生产代码里**：实测给 `Path.read_text` 加 mtime 缓存对同一构建只快 1.15×，
+#: 且会**改变报告结果**（9657 字节差异）——那种「拿判据换性能」的做法不做。
+_REPORT_CACHE: dict = {}
+
+
+def repo_report(root=None):
+    """真仓报告（进程内缓存）；`root` 省略即本仓。"""
+    key = str(root or ROOT)
+    if key not in _REPORT_CACHE:
+        _REPORT_CACHE[key] = vr.build(key)
+    return _REPORT_CACHE[key]
+
+
+class BuildTest(unittest.TestCase):
+    def test_build_is_deterministic(self):
+        """两次**独立**构建必须同根（判据不放松：仍是两份独立算出来的报告）。
+
+        P2（2026-10-17 → 10-18 实测）：一次 build 在真仓要 40 s 上下，连续两次 = 80 s。
+        现在第一份取**已提交的报告**——它是**另一个进程、另一个时刻**对该树算出来的
+        （更强意义上的独立构建），本进程只再算一份来比 root_digest。
+        「提交件是否新鲜」由 `RealRepoTest.test_committed_report_is_fresh` 单独判，
+        两者合起来仍然覆盖「同树同根 + 跨进程同根」。
+        """
+        committed = json_doc.load(ROOT / vr.REPORT_REL, dict, what=vr.REPORT_REL)
+        live = vr.build(str(ROOT))
+        self.assertEqual(committed["root_digest"], live["root_digest"],
+                         "同一棵树两次构建必须同根（否则报告不可核验）")
+
+    def test_items_cover_declared_specs(self):
+        r = repo_report()
+        self.assertEqual(len(vr.SPECS), len(r["items"]))
+        self.assertEqual({"pass", "fail", "warn", "error"},
+                         set(r["summary"]))
+        self.assertEqual(len(r["items"]),
+                         sum(r["summary"].values()), "汇总须等于逐条计数之和")
+
+    def test_declared_side_is_present(self):
+        d = repo_report()["declared"]
+        self.assertIsInstance(d.get("expected_checks"), int)
+        self.assertGreater(d["expected_checks"], 0)
+        self.assertTrue(str(d.get("verify_version") or ""), "声明面须含 verify 版本")
+
+    def test_broken_judgement_is_recorded_not_crashing(self):
+        """坏判据须记账为 error（报告本身必须出得来）。"""
+        with tempfile.TemporaryDirectory() as tmp:      # 空根 → 多条判据会报 fail/error
+            r = vr.build(tmp)
+        self.assertEqual(len(vr.SPECS), len(r["items"]))
+        self.assertNotIn(None, [i["status"] for i in r["items"]])
+
+    def test_report_digest_is_portable_across_checkout_paths(self):
+        with tempfile.TemporaryDirectory() as one, tempfile.TemporaryDirectory() as two:
+            first = vr.build(one)
+            second = vr.build(two)
+            self.assertEqual(first["root_digest"], second["root_digest"])
+            rendered = vr.render(first) + vr.render(second)
+            self.assertNotIn(str(Path(one).resolve()), rendered)
+            self.assertNotIn(str(Path(two).resolve()), rendered)
+
+    def test_temporary_roots_are_removed_even_when_canonicalized(self):
+        first = vr._portable({"sample": ["/tmp/checkout-a/docs/x.md"]}, "/tmp/checkout-a")
+        second = vr._portable({"sample": ["/tmp/checkout-b/docs/x.md"]}, "/tmp/checkout-b")
+        self.assertEqual(first, second)
+        self.assertEqual("<root>/docs/x.md", first["sample"][0])
+
+    def test_macos_volatile_temp_paths_are_canonicalized(self):
+        first = vr._portable(
+            {"sample": ["/private/var/folders/aa/bb/T/tmp.one/docs/x.md"]},
+            "/var/folders/aa/bb/T/tmp.one",
+        )
+        second = vr._portable(
+            {"sample": ["/private/var/folders/cc/dd/T/tmp.two/docs/x.md"]},
+            "/var/folders/cc/dd/T/tmp.two",
+        )
+        self.assertEqual(first, second)
+        self.assertEqual("<root>/docs/x.md", first["sample"][0])
+
+    def test_short_temp_root_alias_cannot_leave_a_private_prefix(self):
+        root = "/var/folders/aa/bb/T/tmp.one"
+        with (mock.patch.object(vr.Path, "resolve", return_value=Path(root)),
+              mock.patch.object(vr.os.path, "abspath", return_value=root),
+              mock.patch.object(vr.os.path, "realpath", return_value=root)):
+            got = vr._portable(
+                {"sample": ["/private/var/folders/aa/bb/T/tmp.one/docs/x.md"]}, root)
+        self.assertEqual("<root>/docs/x.md", got["sample"][0])
+
+
+class CheckTest(unittest.TestCase):
+    def test_missing_report_reports_guidance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            issues, _ = vr.check(tmp)
+        self.assertTrue(issues)
+        self.assertIn("修复指引", issues[0])
+        self.assertIn(vr.REPORT_REL, issues[0])
+
+    def test_tampered_report_is_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            vr.write(tmp)
+            p = Path(tmp) / vr.REPORT_REL
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["root_digest"] = "0" * 64
+            p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            issues, _ = vr.check(tmp)
+        self.assertTrue(any("不一致" in i for i in issues), issues)
+
+    def test_written_report_round_trips(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            vr.write(tmp)
+            issues, _ = vr.check(tmp)
+        self.assertEqual([], issues, "写后即读须一致")
+
+    def test_schema_mismatch_is_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            vr.write(tmp)
+            p = Path(tmp) / vr.REPORT_REL
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["schema"] = "bogus/0"
+            p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            issues, _ = vr.check(tmp)
+        self.assertTrue(any("schema" in i for i in issues), issues)
+
+
+class RealRepoTest(unittest.TestCase):
+    def test_real_repo_has_no_failing_judgement(self):
+        r = repo_report()
+        bad = [i["id"] for i in r["items"] if i["status"] in ("fail", "error")]
+        self.assertEqual([], bad, "真仓门禁报告不得有 FAIL/ERROR：%s" % bad)
+
+    def test_summary_line_mentions_declared_baseline(self):
+        line = vr.summary_line(repo_report())
+        self.assertIn("声明 check1-", line)
+        self.assertIn("PASS=", line)
+
+    def test_committed_report_is_fresh(self):
+        """**提交件 == 实时重算**——本地也要判（2026-10-01 取证）。
+
+        为什么缺这条会出事：`ci-verify.yml` 与 `release-gate.yml` 都是**先 `--write` 再
+        `--check`**（写一遍再比，天然通过），而 `verify.sh` **不跑** `verify_report`；
+        于是「提交的机器可读报告陈旧」在**本地与云端都不会红**——本轮实测：
+        `protocol/verification_report.json` 记录 `7ef20df0…` vs 实测 `1efe3d61…`（陈旧），
+        而门禁全绿。`nf release --fresh` 会红，但那是可选入口。本件把它钉进常驻单测。
+        """
+        # P2：把本进程已构建好的报告传进去（check 默认仍自己重算；判据不变，省一次 25 s 构建）
+        issues, live = vr.check(str(ROOT), live=repo_report())
+        self.assertEqual([], issues,
+                         "机器可读报告过期（修复指引：python scripts/verify_report.py --write）：%s"
+                         % issues)
+        self.assertEqual(vr.SCHEMA, live.get("schema"))
+
+
+if __name__ == "__main__":
+    unittest.main()

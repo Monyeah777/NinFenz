@@ -1,0 +1,548 @@
+{
+  "declared": {
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
+    "expected_checks": 42,
+    "expected_pass": 76,
+    "report_items": 31,
+    "verify_version": "v2.30"
+  },
+  "items": [
+    {
+      "id": "purity",
+      "issues": 0,
+      "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
+      "sample": [],
+      "source": "purity_scan.scan",
+      "stats": {
+        "docs": 4,
+        "domain_neutral": {
+          "files": 16,
+          "hits": 0
+        },
+        "import_residue": [],
+        "imports": 11,
+        "layers": {
+          "asset_levels": 5,
+          "crosscut": 6,
+          "derived": 7,
+          "rules": 10,
+          "surfaces": 4,
+          "tiers": 4
+        },
+        "raises": 96,
+        "sinks": 20
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "schema",
+      "issues": 0,
+      "name": "协议层 IDL schema 门禁",
+      "sample": [],
+      "source": "schema_lint.scan",
+      "stats": {
+        "asset_entries": 3,
+        "contract_covered": 248,
+        "module_docs": 248,
+        "pipelines": 114,
+        "protocols": 111,
+        "schema_files": 9
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "conformance",
+      "issues": 0,
+      "name": "社区领域包 conformance 分级",
+      "sample": [],
+      "source": "conformance_scan.scan",
+      "stats": {
+        "export_items": 4,
+        "modules_mc": 248,
+        "packages": 111
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "contract",
+      "issues": 0,
+      "name": "机读契约面（官方核心 13 件 id/标题一致）",
+      "sample": [],
+      "source": "machine_contract.scan",
+      "stats": {
+        "checked": 13,
+        "l0": 0,
+        "l0_list": []
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "knowledge",
+      "issues": 0,
+      "name": "双源知识层（权威分层/顺序/时效/巡检）",
+      "sample": [],
+      "source": "knowledge.scan",
+      "stats": {
+        "contract": 3,
+        "order": [
+          "nf-protocol",
+          "nf-library",
+          "nf-patterns",
+          "tool-face-candidates",
+          "ext-validation-assets",
+          "ext-fixtures"
+        ],
+        "reference": 3,
+        "sources": 6,
+        "transforms": 0
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "rating",
+      "issues": 0,
+      "name": "馆藏内容分级声明",
+      "sample": [],
+      "source": "rating_gate.scan",
+      "stats": {
+        "counts": {
+          "general": 2,
+          "teen": 1
+        },
+        "decided": 3,
+        "entries": 3,
+        "issues": 0,
+        "undecided_token": "unrated",
+        "unrated": 0,
+        "vocabulary": [
+          "general",
+          "teen",
+          "mature",
+          "unrated"
+        ]
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "rating_decided",
+      "issues": 0,
+      "name": "馆藏分级是否真被定级（Z3：显式 unrated 不算已定级）",
+      "sample": [],
+      "source": "rating_gate.decided",
+      "stats": {
+        "allow_unrated": false,
+        "decided": 3,
+        "entries": 3,
+        "undecided_token": "unrated",
+        "unrated": 0
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "license",
+      "issues": 0,
+      "name": "许可证门",
+      "sample": [],
+      "source": "license_gate.scan",
+      "stats": {
+        "declared": 2,
+        "entries": 3,
+        "mismatched": [],
+        "no_inline": [],
+        "undeclared": [
+          "NF-WORLDCAMPUS-Monyeah777-1"
+        ],
+        "unknown": [],
+        "warnings": [
+          "许可未声明（待投稿人确认）：NF-WORLDCAMPUS-Monyeah777-1"
+        ]
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "intake",
+      "issues": 0,
+      "name": "投稿闸门三方一致",
+      "sample": [],
+      "source": "intake.scan",
+      "stats": {
+        "channels": 2,
+        "modes": [
+          "author_only"
+        ]
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "payload",
+      "issues": 0,
+      "name": "事件载荷注册表",
+      "sample": [],
+      "source": "payload_registry.scan",
+      "stats": {
+        "declared": 443,
+        "pending": 0,
+        "registered": 443,
+        "used": 443
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "doc_markers",
+      "issues": 0,
+      "name": "文档 marker 卫生",
+      "sample": [],
+      "source": "doc_hygiene.check_markers",
+      "stats": {},
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "assets_ledger",
+      "issues": 0,
+      "name": "资产 ledger 投影一致",
+      "sample": [],
+      "source": "asset_ledger_projection.verify",
+      "stats": {
+        "entries": 924
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "instruction",
+      "issues": 0,
+      "name": "指令档步骤审计",
+      "sample": [],
+      "source": "instruction_step_audit.scan",
+      "stats": {
+        "docs": 5,
+        "steps": 9
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "baseline",
+      "issues": 0,
+      "name": "基线自描述一致（verify 版本 / check 数）",
+      "sample": [],
+      "source": "quality_baseline.scan",
+      "stats": {
+        "checks": 42,
+        "verify_version": "v2.30"
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "library",
+      "issues": 0,
+      "name": "图书馆 frontmatter + 投影一致",
+      "sample": [],
+      "source": "library.verify",
+      "stats": {
+        "active": 3,
+        "entries": 3,
+        "ids": [
+          "NF-1",
+          "NF-TECHDOC-Monyeah777-1",
+          "NF-WORLDCAMPUS-Monyeah777-1"
+        ],
+        "warns": [
+          "NF-1 attestation 与当前内容不符（内容已改，需重签）"
+        ]
+      },
+      "status": "warn",
+      "warns": 1
+    },
+    {
+      "id": "library_projection",
+      "issues": 0,
+      "name": "图书馆 INDEX/ALIAS 实时一致",
+      "sample": [],
+      "source": "library.check_projection",
+      "stats": {},
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "receipts",
+      "issues": 0,
+      "name": "馆藏回执折叠到根",
+      "sample": [],
+      "source": "receipts.verify_wrapped",
+      "stats": {
+        "entries": 3,
+        "root": "42e1522438c6a5e485c7f188c7d22435c69f8b8a15a95b2ccf80700c7622caa1"
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "conformance_report",
+      "issues": 0,
+      "name": "一致性报告（已提交 == 实时重算）",
+      "sample": [],
+      "source": "conformance_report.verify_committed",
+      "stats": {
+        "contracts": 27,
+        "passed": 27,
+        "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
+        "verdict": "conformant"
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "audit",
+      "issues": 0,
+      "name": "审计件被审对象 digest",
+      "sample": [],
+      "source": "audit.scan",
+      "stats": {
+        "audits": 57,
+        "legacy": 11,
+        "subjects_ok": 388,
+        "with_header": 46
+      },
+      "status": "warn",
+      "warns": 1
+    },
+    {
+      "id": "self_stats",
+      "issues": 0,
+      "name": "自述数字 == 实算（README/llms 生成区）",
+      "sample": [],
+      "source": "repo_stats.check_strict",
+      "stats": {
+        "baseline_checks": 42,
+        "baseline_pass": 76,
+        "concept_graphs": 101,
+        "core_modules": 13,
+        "core_pipelines": [
+          "P00",
+          "P01",
+          "P90"
+        ],
+        "domain_packs": 100,
+        "library_items": 3,
+        "pack_assets": 363,
+        "pack_dirs": 111,
+        "registered_packs": 111,
+        "schema": "nf-repo-stats/1",
+        "standard_bindings": 1200,
+        "standards_bodies": 194,
+        "standards_by_layer": {
+          "data": 148,
+          "eng": 38,
+          "form": 29,
+          "gov": 71,
+          "iface": 84
+        },
+        "standards_edges": 206,
+        "standards_reachable": 332,
+        "standards_total": 370,
+        "standards_unreachable": 38,
+        "subdivisions_total": 1200,
+        "verify_checks": 42,
+        "verify_version": "2.30"
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "code_metrics",
+      "issues": 0,
+      "name": "代码规模/复杂度上限（棘轮冻结）",
+      "sample": [],
+      "source": "code_metrics.scan",
+      "stats": {
+        "baseline": 310,
+        "files": 310,
+        "max_fn_cc": 116,
+        "max_fn_lines": 1263,
+        "max_lines": 7678
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "redos",
+      "issues": 0,
+      "name": "正则失控回溯（形态 + 增长律；Y3 接线）",
+      "sample": [],
+      "source": "redos_scan.scan",
+      "stats": {
+        "budget_ms": 1500.0,
+        "n": 65536,
+        "patterns": 230,
+        "probed": 230
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "key_naming",
+      "issues": 0,
+      "name": "资产键命名规范（形态 + 声明词表）",
+      "sample": [],
+      "source": "key_naming.scan",
+      "stats": {
+        "keys_seen": 10,
+        "max_key_len": 17,
+        "occurrences": 616,
+        "registered": 10
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "instruction_evidence",
+      "issues": 0,
+      "name": "规范入口指令实测记录（新鲜 + 退出码 0）",
+      "sample": [],
+      "source": "instruction_evidence.scan",
+      "stats": {
+        "declared": 7,
+        "recorded": 7,
+        "recorded_policy": 3
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "coupling",
+      "issues": 0,
+      "name": "模块级耦合（Martin 包度量 / SDP / 环 · 只许收敛）",
+      "sample": [],
+      "source": "coupling_metrics.scan",
+      "stats": {
+        "cycles": 0,
+        "metrics_drift": 0,
+        "metrics_missing": 0,
+        "metrics_recorded": 258,
+        "modules": 258,
+        "registered_cycles": 0,
+        "registered_sdp": 10,
+        "sdp": 10
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "perf_budget",
+      "issues": 0,
+      "name": "性能预算（中位耗时 ≤ 预算 + 记录新鲜）",
+      "sample": [],
+      "source": "perf_budget.scan",
+      "stats": {
+        "declared": 8,
+        "over_budget": 0,
+        "recorded": 8
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "drill_fidelity",
+      "issues": 0,
+      "name": "演练保真度（执行演练 + 回合级回放 = 100%）",
+      "sample": [],
+      "source": "drill_fidelity.scan",
+      "stats": {
+        "cases": 74,
+        "exec_sets": 8,
+        "fidelity": 1.0,
+        "passed": 74,
+        "round_samples": 6
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "judgement_coverage",
+      "issues": 0,
+      "name": "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
+      "sample": [],
+      "source": "judgement_coverage.scan",
+      "stats": {
+        "consumed": 66,
+        "exceptions": 2,
+        "orphans": 2,
+        "scanners": 68
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "workflow_policy",
+      "issues": 0,
+      "name": "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）",
+      "sample": [],
+      "source": "workflow_policy.scan",
+      "stats": {
+        "pinned_uses": 73,
+        "requirements_files": 4,
+        "with_explicit_permissions": 20,
+        "workflows": 20
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "asset_contract",
+      "issues": 0,
+      "name": "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
+      "sample": [],
+      "source": "asset_contract.scan",
+      "stats": {
+        "chains": 1,
+        "code": 7,
+        "data": 10,
+        "files": 1258,
+        "index": 1,
+        "no_schema": 206,
+        "script": 4
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "role_coordinates",
+      "issues": 0,
+      "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
+      "sample": [],
+      "source": "role_model.scan",
+      "stats": {
+        "files": 4032,
+        "kernel": 2167,
+        "kernel_no_self": 436,
+        "rules": 9,
+        "uncovered": 0,
+        "verify_writers": 10,
+        "write_exceptions": 10
+      },
+      "status": "pass",
+      "warns": 0
+    }
+  ],
+  "root_digest": "2ebbdb0e539147c0b8b756e3bc094714add25017c4c92bc3bd933ac38210a8ce",
+  "schema": "nf-verify-report/1",
+  "summary": {
+    "error": 0,
+    "fail": 0,
+    "pass": 29,
+    "warn": 2
+  }
+}

@@ -1,0 +1,443 @@
+"""内容寻址的**持久**缓存：把「内容的纯函数」结果移出进程生命周期。
+
+用途：执行层里最贵的几笔账（引用度普查、产出面逐件校验、一致性分级扫描…）都是**输入内容的
+纯函数**，但每开一个新进程就要重付一遍。把它们按内容寻址落到盘上，新进程直接取回。
+
+键 = `sha256(标签 | 代码面内容 | 运行时标签 | 调用方给的各段键)`
+
+- **代码面内容**（`desktop/src/**/*.py` + `scripts/**/*`，实测 157 件 / 41 ms）：把「算这段的
+  函数本身」也放进键里，于是 **改了算法必然换键**——不需要靠"记得手工 bump 版本标签"这种脆弱
+  纪律（漏 bump 就等于悄悄拿旧算法的结果当新结果）。
+- **运行时标签**：Python 版本 / 平台 / PyYAML 是否在场——软依赖的有无会改变结果。
+- **调用方给的各段键**：各自的输入面内容指纹（例如产出面的 `INDEX_INPUTS`）。
+
+落点（C1，2026-10-22）：**默认用户级、按被审仓库分段**——
+`<用户缓存>/ninfenz/<repo-hash>/<tag>/<key>.json`（Windows 用 `%LOCALAPPDATA%`，
+其余 `$XDG_CACHE_HOME`/`~/.cache`）。`NF_CACHE_DIR` 可显式指定；显式 `NARRATIVE_FORGE_HOME`
+（测试/便携隔离）仍落 `<NF_HOME>/cache`。用户缓存不可写时**回退仓内 `.nf-cache/` 并 WARN**，
+且回退目录必须带 `.nf-cache-owner` 标记（预置的伪造缓存目录无标记 ⇒ 拒绝收养/拒读）。
+
+纪律（fail-closed）：
+1. 读回必须**校验**（调用方给 `validate`）：结构不对 / 键集不符 / 半截 JSON → 一律当没命中；
+2. 一切 IO **尽力而为**：写不进、读不到都静默回落重算，绝不影响命令结果；
+3. `NF_NO_DISK_CACHE=1` 整体关闭（读写皆废）；
+4. 每个标签只留最近 `KEEP` 份（按 mtime 裁剪），缓存不得无界增长。
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
+from core import json_doc
+
+ENV_OFF = "NF_NO_DISK_CACHE"
+#: C1（2026-10-22 安全审计）：缓存根显式覆盖（最高优先级）。
+ENV_DIR = "NF_CACHE_DIR"
+#: 仓内回退目录的所有权标记：无标记的预置缓存目录**不收养**（防被审仓库预置伪造判定）。
+MARKER = ".nf-cache-owner"
+#: 缓存根裁决结果与「全不可用」禁用标记（进程内一次记忆；测试用 _reset_root_state 清）。
+_ROOT: dict[str, Any] = {}
+_DISABLED = False
+KEEP = 16
+#: 大集合标签（每份文件一条的那种，如 AST 事实）裁剪频次：每 N 次写入裁一次。
+#: 为什么不一写一裁：一写一裁＝每次都要把目录整个 scandir+stat 一遍，**每份文件一条**的标签
+#: 会变成 O(n²)（250 条 × 250 次 = 6 万次 stat，实测吃掉几百毫秒，把收益全抵消）。
+PRUNE_EVERY_BIG = 128
+#: **小集合标签**同样按批裁（2026-09-29 实测更正）：「小集合每次写都裁」不成立——一次新内容状态里
+#: 11 次 `store` 花 33–42 ms，其中 **20–23 ms 是 11 次 `prune`**（每次 `glob("*.json")` + 逐件
+#: `stat`）。按批后调用降到 1/8；代价是每标签最多多留 `PRUNE_EVERY_SMALL` 份（仍有界，判据在册）。
+PRUNE_EVERY_SMALL = 8
+# : 参与「代码面」的路径（改了算法即换键；不含 tests）。**别写 `scripts/**/*`**（2026-09-29 实测坑）
+# ：它连
+#: `scripts/__pycache__/*.pyc`（Python 自生成）一起收 ⇒ 一导入就改指纹 ⇒ 宽面派生缓存反复 miss。
+CODE_FACE = ("desktop/src/**/*.py", "scripts/**/*.py", "scripts/*.sh",
+             "scripts/nf", "scripts/nf.cmd")
+
+_CODE_FP: dict = {}                      # root → 代码面指纹（**按根记忆**：换根不得串味）
+_RUNTIME: Optional[str] = None
+_KEEP: dict = {}                         # tag → 上限（给大集合标签用）
+_PRUNE_COUNT: dict = {}
+#: **延迟写盘**模式（`defer_begin` 起、`defer_flush` 止）：`store()` 只入队不碰盘。
+#: 依据（实测 2026-09-29）：一次新内容状态里落盘合计 14–17 ms（守护口径的差值实测 20–80 ms），
+#: 而写盘**纯写**、结果只供**别的进程**（冷进程 / 守护重启）用 ⇒ 完全可以挪到「回包之后」再付：
+#: 客户端拿到响应就走，守护在这之后把队列落盘。fail-closed：中途崩了就丢这批缓存（缓存不是事实，
+#: 丢了只是下次重算），**不影响任何判定**。
+_DEFER: Optional[list] = None
+
+#: **总量上限**（2026-10-19 实测）：按标签裁剪只保证"单标签有界"，标签一多总量仍会失控
+#: （现场：~/.NinFenz/cache 涨到 1.1 万文件后，新建文件的 open() 在杀软/ACL 下开始卡住，
+#: 表现成整条判据"挂死"）。这里再加一道全局闸：超过上限就按 mtime 淘汰最旧的整份缓存。
+ENV_MAX_TOTAL = "NF_CACHE_MAX_TOTAL"
+MAX_TOTAL_DEFAULT = 20000
+#: 每多少次 store 检查一次总量（全量 scandir 有代价，按批做）
+ENFORCE_EVERY = 200
+_STORE_TICKS = 0
+
+
+def max_total() -> int:
+    """全局文件数上限（可由 NF_CACHE_MAX_TOTAL 覆盖；非法值退回默认）。"""
+    try:
+        got = int(os.environ.get(ENV_MAX_TOTAL) or MAX_TOTAL_DEFAULT)
+    except (TypeError, ValueError):
+        return MAX_TOTAL_DEFAULT
+    return got if got > 0 else MAX_TOTAL_DEFAULT
+
+
+def count_files() -> int:
+    """当前缓存根下的 `.json` 文件总数（只扫两层：<tag>/<key>.json）。"""
+    total = 0
+    try:
+        for tag_dir in root_dir().iterdir():
+            if tag_dir.is_dir():
+                total += sum(1 for _ in tag_dir.glob("*.json"))
+    # 缓存根不可读＝按 0 计（这是诊断/容量面，不参与任何判定）
+    except OSError:
+        return 0
+    return total
+
+
+def enforce_bounds(limit: int | None = None) -> int:
+    """把总量压到上限内（按 mtime 从旧到新删），返回删掉的份数。
+
+    边界：任何异常都吞（缓存不是事实，删不动只是多占空间，不得影响命令结果）。
+    """
+    cap = max_total() if limit is None else int(limit)
+    removed = 0
+    try:
+        entries = []
+        for tag_dir in root_dir().iterdir():
+            if not tag_dir.is_dir():
+                continue
+            for f in tag_dir.glob("*.json"):
+                try:
+                    entries.append((f.stat().st_mtime, f))
+                except OSError:  # 枚举与 stat 之间消失的条目＝当作不存在（并发写者的正常竞态）
+                    continue
+        if len(entries) <= cap:
+            return 0
+        entries.sort(key=lambda t: t[0])
+        for _mtime, f in entries[: len(entries) - cap]:
+            try:
+                f.unlink()
+                removed += 1
+            except OSError:  # 单份删不掉（被占用）＝跳过它，下一轮再试（不影响已删数量）
+                continue
+    # 整体枚举失败＝尽力而为（缓存不是事实；返回已删数量供观测）
+    except OSError:
+        return removed
+    return removed
+
+
+def defer_begin() -> None:
+    """进入延迟写盘模式（守护在**处理请求前**调用）。"""
+    global _DEFER
+    _DEFER = []
+
+
+def deferring() -> bool:
+    return _DEFER is not None
+
+
+def defer_drop() -> None:
+    """丢弃队列并退出延迟模式（异常路径用；缓存非事实，丢了只会重算）。"""
+    global _DEFER
+    _DEFER = None
+
+
+def defer_flush() -> int:
+    """把队列落盘并退出延迟模式（守护在**回包之后**调用）→ 写了几条。"""
+    global _DEFER
+    pending, _DEFER = _DEFER, None
+    n = 0
+    for tag, ckey, value, keep in pending or ():
+        store(tag, ckey, value, keep)
+        n += 1
+    return n
+
+
+def enabled() -> bool:
+    return not os.environ.get(ENV_OFF) and not _DISABLED
+
+
+def canonical(value: Any) -> Any:
+    """把「刚算出来的值」规范化到与**落盘再读回**完全相同的形状（键序固定）。
+
+    为什么（2026-10-01 取证）：`store` 落盘时用 `sort_keys=True`，而**未命中路径**是把内存里的
+    值直接交回调用方 ⇒ 同一份派生账，首跑按插入序打印、第二跑（命中）按字典序打印：
+    `nf layers --json` 实测首跑 sha `d265f466…` / 次跑 `4acfa0a3…`（**同长不同序**），
+    守护路径与直跑路径也因此逐字节不一致——「同一输入两次运行逐字节一致」这条口径
+    在**带缓存的机器面**上此前是假真。规范化一次（小对象往返，微秒级）就把两条路径收成一条，
+    且对**所有** `memo_pair` / `scan` 站点同时生效（不必逐个打印面排序）。
+    """
+    return json_doc.loads(json.dumps(value, ensure_ascii=False, sort_keys=True),
+                        None, what="cache 规范化")
+
+
+def _user_cache_base() -> Path:
+    """用户级缓存根（跨平台，C1）：Windows `%LOCALAPPDATA%
+infenz`，其余 `~/.cache/ninfenz`。"""
+    if os.name == "nt":
+        env_name, parts = "LOCALAPPDATA", ("AppData", "Local")
+    else:
+        env_name, parts = "XDG_CACHE_HOME", (".cache",)
+    base = os.environ.get(env_name) or os.path.join(os.path.expanduser("~"), *parts)
+    return Path(base) / "ninfenz"
+
+
+def _repo_tag() -> str:
+    """被审仓库分段：当前工作目录真实路径的短哈希（同仓多次运行稳定、跨仓不串味）。"""
+    try:
+        where = str(Path.cwd().resolve())
+    except OSError:                            # cwd 已消失等异常状态：退回未解析形态（不抛）
+        where = os.getcwd()
+    return hashlib.sha256(where.encode("utf-8")).hexdigest()[:16]
+
+
+def _probe_writable(d: Path) -> bool:
+    """真实可写判据：建目录 → 写探针 → 读回（临时目录出块自清，不留残留）。
+
+    失败语义：探针失败＝该候选不可用（**不抛**；由 `_resolve_root` 汇总后降级/回退）。
+    """
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix=".nf_write_probe.", dir=str(d)) as td:
+            probe = Path(td) / "p"
+            probe.write_text("ok", encoding="utf-8")
+            return probe.read_text(encoding="utf-8") == "ok"
+    except OSError:  # 建目录/写探针失败＝候选不可用（语义见 docstring：降级而非抛）
+        return False
+
+
+def _adopt_fallback(d: Path) -> bool:
+    """仓内回退目录的收养闸门（C1 第二道闸）：只收养**空目录**或**带所有权标记**的目录。
+
+    为什么：回退目录落在被审仓库里——若仓库预置了一份伪造缓存（含假的 PASS 判定），
+    直接收养等于把 C1 原样复活。无标记的非空目录一律拒绝（宁可关缓存，也不拿可疑判定）。
+    """
+    mark = d / MARKER
+    try:
+        if mark.is_file():
+            return True
+        d.mkdir(parents=True, exist_ok=True)
+        if any(d.iterdir()):
+            return False
+        mark.write_text(str(Path.cwd().resolve()), encoding="utf-8")
+        return True
+    except OSError:  # 建目录/写标记失败＝回退不可用（调用方据此禁用缓存，fail-closed）
+        return False
+
+
+def _root_key() -> tuple:
+    """缓存根的**环境指纹**：任一来源变化（测试/守护会在同进程里换 NF_HOME/cwd）都要重裁决。"""
+    return (os.environ.get(ENV_DIR), os.environ.get("NARRATIVE_FORGE_HOME"),
+            os.environ.get("LOCALAPPDATA"), os.environ.get("XDG_CACHE_HOME"),
+            os.getcwd(), os.name)
+
+
+def _resolve_root() -> Path:
+    """缓存根裁决（C1）：NF_CACHE_DIR → 显式 NF_HOME → 用户级（按仓分段）→ 仓内回退。"""
+    global _DISABLED
+    key = _root_key()
+    hit = _ROOT.get("root")
+    if hit is not None and _ROOT.get("key") == key:
+        return hit
+    _DISABLED = False        # 环境变了：重新裁决（上一次的禁用结论只对它那一组环境成立）
+    explicit = os.environ.get(ENV_DIR)
+    home = os.environ.get("NARRATIVE_FORGE_HOME")
+    if explicit:
+        root = Path(explicit).expanduser()
+    elif home:
+        # 测试/便携隔离：显式 NF_HOME 保持旧口径（<NF_HOME>/cache）
+        root = Path(home).expanduser() / "cache"
+    else:
+        root = _user_cache_base() / _repo_tag()
+    if _probe_writable(root):
+        _ROOT["root"], _ROOT["key"] = root, key
+        return root
+    fallback = (Path.cwd() / ".nf-cache").resolve()
+    if _adopt_fallback(fallback):
+        print(f"WARN: 用户缓存目录不可写（{root}），判据缓存回退仓内 {fallback}："
+              "该目录可能被仓库内容影响，只应作降级运行", file=sys.stderr)
+        _ROOT["root"], _ROOT["key"] = fallback, key
+        return fallback
+    # 两处都不可用：关闭缓存（读=未命中、写=失败），绝不回落到可疑位置
+    _DISABLED = True
+    print(f"WARN: 没有可写的判据缓存目录（用户级 {root} 与仓内 {fallback} 均不可用）："
+          "本次运行**禁用缓存**", file=sys.stderr)
+    _ROOT["root"], _ROOT["key"] = root, key
+    return root
+
+
+def root_dir() -> Path:
+    """缓存根（C1）：默认用户级、按被审仓库分段；见 `_resolve_root`。"""
+    return _resolve_root()
+
+
+def _reset_root_state() -> None:
+    """测试隔离：清缓存根裁决与禁用标记（生产调用方不应使用）。"""
+    global _DISABLED
+    _ROOT.clear()
+    _DISABLED = False
+
+
+def dir_for(tag: str) -> Path:
+    return root_dir() / str(tag)
+
+
+def runtime_tag() -> str:
+    """运行时标签：软依赖与解释器在场与否**会改变结果**，故必须进键。"""
+    global _RUNTIME
+    if _RUNTIME is None:
+        import sys
+        from core import lazy_yaml as _ly
+        ver = _ly.dist_version("PyYAML")               # 不导入 yaml 就取版本（实测 34.5 → 0.7 ms）
+        if not ver:                                    # 装法异常（vendored 等）→ 退回真导入，语义不变
+            try:
+                import yaml
+                ver = getattr(yaml, "__version__", "?")
+            except Exception:                          # noqa: BLE001 - 缺 PyYAML 是合法状态
+                ver = ""
+        yaml_bit = ("yaml=%s" % ver) if ver else "yaml=none"
+        _RUNTIME = "%d.%d.%d|%s|%s" % (sys.version_info[0], sys.version_info[1],
+                                       sys.version_info[2], os.name, yaml_bit)
+    return _RUNTIME
+
+
+def code_fingerprint(root: str = ".") -> str:
+    """代码面内容指纹（**按根**进程内记忆；实测 41 ms）。
+
+    按根记忆是必须的：早先写成单变量时，换一棵树会拿回上一棵树的指纹——判据当场抓住
+    （`test_code_fingerprint_tracks_code_content`）。守护在**判定代码已换版**时要调
+    `reset_code_fingerprint()`，否则会拿旧算法的键去命中盘上旧算法的账。
+    """
+    rkey = os.path.normcase(os.path.abspath(str(root)))
+    hit = _CODE_FP.get(rkey)
+    if hit is None:
+        from core import content_face as _cf      # 叶子件：持久层不反向依赖校验层
+        hit = _cf.code_face_digest(str(root), CODE_FACE)
+        _CODE_FP[rkey] = hit
+    return hit
+
+
+def reset_code_fingerprint(root: Optional[str] = None) -> None:
+    """清掉代码面指纹记忆（守护判定「代码已换版」后调用；不给 root 则全清）。"""
+    if root is None:
+        _CODE_FP.clear()
+        return
+    _CODE_FP.pop(os.path.normcase(os.path.abspath(str(root))), None)
+
+
+# : 仓库内模块的**导入图**（懒建、按 (根, 模块) 记忆）：模块名 → (文件相对路径, 依赖, 是否含动态导入
+# )。
+# : 只用来**划定代码面的范围**（谁真的依赖谁的代码），不参与任何判定；解析不出/含动态导入 → 退回整块
+# 。
+_CORE_DIR = ("desktop", "src", "core")
+
+
+
+
+def key(tag: str, *parts: str, root: str = ".", code_scope: Optional[str] = None) -> str:
+    """算缓存键：标签 + 代码面 + 运行时 + 调用方给的各段。
+
+    `code_scope` 是调用方算好的**导入闭包指纹**（`import_graph.code_scope_fingerprint`；闭包算不出
+    /含动态导入时给 `None`）——于是改别的模块不再换键（整块代码面 100+ 件，多数派生只依赖 3–21 件）。
+    闭包解析**不再由持久层自己做**（2026-09-29 拆环：`disk_cache → import_graph` 与
+    `import_graph → disk_cache` 组成模块级环；零环是硬判据）。`code_scope=None` ⇒ 退回整块代码面
+    （宁可多算，不可拿旧算法的账当新账）。
+    """
+    code_bit = code_scope or code_fingerprint(root)
+    h = hashlib.sha256()
+    for piece in ("v1", str(tag), code_bit, runtime_tag()) + tuple(
+            str(p) for p in parts):
+        h.update(piece.encode("utf-8"))
+        h.update(b"\x00")
+    return h.hexdigest()
+
+
+def _path(tag: str, ckey: str) -> Path:
+    return dir_for(tag) / ("%s.json" % ckey)
+
+
+#: 写失败观测（2026-10-10 审计 N7，P2）：缓存写不进是**降级**（读者重算即可），不该静默到
+#: 无法判别。此前 store 用固定名 p.name+".tmp" 手工写（4 进程 × 200 同键写实测 800 次全返回、
+#: 读者 55.5% FileNotFoundError）且 except 全吞。现在原子写 + 计数 + 最近原因。
+STORE_FAILURES = 0
+LAST_STORE_ERROR = ""
+
+
+def store_failures() -> Dict[str, Any]:
+    """写失败观测面 → {failures, last_error}（供 daemon stats / doctor 报出）。"""
+    return {"failures": STORE_FAILURES, "last_error": LAST_STORE_ERROR}
+
+
+def load(tag: str, ckey: str,
+         validate: Optional[Callable[[Any], bool]] = None) -> Any:
+    """读回缓存值；**任何不可信**一律返回 None（宁可重算，不可错答）。"""
+    if not enabled():
+        return None
+    try:
+        got = json_doc.load(_path(tag, ckey), None, what=ckey)
+    except Exception:                                  # noqa: BLE001 - 缺件/半截/不可读
+        return None
+    if validate is not None:
+        try:
+            if not validate(got):
+                return None
+        except Exception:                              # noqa: BLE001 - 校验器自己炸也算不可信
+            return None
+    return got
+
+
+def store(tag: str, ckey: str, value: Any, keep: Optional[int] = None) -> bool:
+    """写盘（尽力而为）：原子替换 + 有界裁剪；失败静默。
+
+    `keep` 给「每份文件一条」的大集合标签用（如 AST 事实 250 条）；小集合标签沿用 `KEEP`。
+    裁剪一律**按批**：大集合每 `PRUNE_EVERY_BIG` 次、小集合每 `PRUNE_EVERY_SMALL` 次写入裁一次
+    （每次都裁的代价实测占 `store` 的一半，见 `PRUNE_EVERY_SMALL` 的说明）。
+    """
+    global STORE_FAILURES, LAST_STORE_ERROR, _STORE_TICKS
+    if not enabled():
+        return False
+    if _DEFER is not None:                  # 延迟模式：只入队（守护回包之后再落盘，见 `defer_flush`）
+        _DEFER.append((tag, ckey, value, keep))
+        return True
+    try:
+        d = dir_for(tag)
+        d.mkdir(parents=True, exist_ok=True)
+        p = _path(tag, ckey)
+        # 并发安全（审计 N7）：固定名 `.tmp` 会被同键并发写互踩；统一走 atomic_write
+        # （mkstemp 唯一临时名 + fsync + os.replace + 瞬时错短重试），与全仓落盘面同一出处。
+        from core import atomic_write
+        atomic_write.write_text(p, json.dumps(value, ensure_ascii=False, sort_keys=True))
+        limit = int(keep if keep is not None else _KEEP.get(tag, KEEP))
+        n = _PRUNE_COUNT.get(tag, 0) + 1
+        every = PRUNE_EVERY_BIG if limit > 64 else PRUNE_EVERY_SMALL
+        if n >= every:
+            _PRUNE_COUNT[tag] = 0
+            prune(tag, limit)
+        else:
+            _PRUNE_COUNT[tag] = n
+        _STORE_TICKS += 1
+        if _STORE_TICKS % ENFORCE_EVERY == 0:
+            enforce_bounds()
+        return True
+    except Exception as exc:                           # noqa: BLE001 - 写不进不该让命令失败，但**要可观测**
+        STORE_FAILURES += 1
+        LAST_STORE_ERROR = "%s: %s" % (tag, exc)
+        return False
+
+
+def prune(tag: str, keep: int = KEEP) -> None:
+    """只留最近 `keep` 份（按 mtime）。"""
+    try:
+        d = dir_for(tag)
+        entries = sorted(d.glob("*.json"), key=lambda q: q.stat().st_mtime, reverse=True)
+        for old in entries[keep:]:
+            old.unlink()
+    except Exception:                                  # noqa: BLE001 - 裁剪失败不影响结果
+        return

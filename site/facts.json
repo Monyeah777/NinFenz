@@ -1,0 +1,143 @@
+{
+  "schema": "nf-facts/1",
+  "generated_from": [
+    "llms.txt#nf:stats",
+    "protocol/repo_stats.json",
+    "protocol/geo_export.json"
+  ],
+  "official": {
+    "entry": "https://ninfenz.dev/",
+    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev 。NinFenz 没有付费版，也不需要下载任何「客户端」，从不索取账号、手机号或支付信息；第三方站点（尤其带大量广告的游戏 / 资源 / 下载站）上的本项目内容与官方无关。",
+    "statement_en": "The only official entry point is https://ninfenz.dev. There is no paid version and no client to download, and no account, phone number or payment detail is ever requested; copies on third-party sites are not affiliated with the project.",
+    "official_repositories": [
+      "https://github.com/Monyeah777/NinFenz",
+      "https://gitee.com/monyeah777/ninfenz"
+    ],
+    "official_packages": [
+      "ninfenz (npmjs.com)",
+      "@monyeah777/ninfenz (GitHub Packages)"
+    ],
+    "never_asks_for": [
+      "payment",
+      "account credentials",
+      "phone number",
+      "client downloads",
+      "group joins"
+    ],
+    "license_allows": "MIT: redistribution and commercial use are allowed",
+    "license_requires": "keep LICENSE and attribution"
+  },
+  "subject": {
+    "canonical_name": "NinFenz",
+    "short_name": "NF",
+    "zh_name": "宁封子",
+    "kind": "content contract layer（内容契约层）",
+    "definition_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。",
+    "definition_en": "NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced. The protocol is domain-neutral and model-agnostic; narrative is only the first official domain pack.",
+    "is_not": [
+      "模型 (a model)",
+      "提示词模板集 (a prompt-template collection)",
+      "厂商 SDK (a vendor SDK)",
+      "托管服务 (a hosted service)"
+    ],
+    "aliases": [
+      "NinFenz",
+      "NF",
+      "宁封子",
+      "content contract layer",
+      "内容契约层"
+    ],
+    "license": "MIT",
+    "homepage": "https://ninfenz.dev/",
+    "repository": "https://github.com/Monyeah777/NinFenz",
+    "mirror": "https://gitee.com/monyeah777/ninfenz",
+    "citation_metadata": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/CITATION.cff"
+  },
+  "facts": [
+    {
+      "id": "quality",
+      "claim_zh": "质量凭证：verify v2.30 · check1-42 · PASS=76",
+      "claim_en": "Quality evidence: verify v2.30 · check1-42 · PASS=76",
+      "entry_point": "bash verify.sh",
+      "anchor": "https://ninfenz.dev/#fact-quality",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
+      "note": "单入口；check1-42 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
+    },
+    {
+      "id": "scale",
+      "values": {
+        "registered_packs": 111,
+        "pack_assets": 363,
+        "concept_graphs": 101,
+        "standards_total": 370,
+        "standards_reachable": 332,
+        "standards_unreachable": 38,
+        "standard_bindings": 1200,
+        "library_items": 3
+      },
+      "claim_zh": "规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 370 条（可达 332 / 不可达 38）· 标准绑定 1200 条 · 馆藏 3 件",
+      "anchor": "https://ninfenz.dev/#fact-scale",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/repo_stats.json"
+    },
+    {
+      "id": "core",
+      "claim_zh": "官方核心：13 模块 · 3 管线（P00 / P01 / P90）· 协议件 01–07",
+      "anchor": "https://ninfenz.dev/#fact-core",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/repo_stats.json"
+    },
+    {
+      "id": "verifiable",
+      "claim_zh": "可验证产物：Merkle inclusion proof（RFC 6962）+ hmac / ssh-sig / sigstore-keyless 签名锚；缺验证器 fail-closed",
+      "anchor": "https://ninfenz.dev/#fact-verifiable",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/library/RECEIPTS.json"
+    },
+    {
+      "id": "mcp",
+      "claim_zh": "接入面：只读 MCP（nf serve），双协议版本 2026-07-28 / 2025-11-25；已上架官方 MCP Registry（io.github.Monyeah777/ninfenz，可用 npx -y ninfenz serve 装载）",
+      "claim_en": "Integration: read-only MCP (nf serve), dual protocol era 2026-07-28 / 2025-11-25; listed in the official MCP Registry as io.github.Monyeah777/ninfenz (install with npx -y ninfenz serve)",
+      "anchor": "https://ninfenz.dev/#fact-mcp",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/mcp.md",
+      "note": "官方 MCP Registry 查询：https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
+    },
+    {
+      "id": "terminal",
+      "claim_zh": "终端：python tui/nf.py（纯标准库全屏 TUI）",
+      "anchor": "https://ninfenz.dev/#fact-terminal",
+      "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/terminal.md"
+    },
+    {
+      "id": "npm",
+      "claim_zh": "分发：npm 包 ninfenz v1.1.0（2907 文件 / 解包 23.13 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.1.0 (2907 files / 23.13 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
+      "anchor": "https://ninfenz.dev/#fact-npm",
+      "source": "https://registry.npmjs.org/ninfenz",
+      "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"
+    }
+  ],
+  "machine_endpoints": {
+    "index": "https://ninfenz.dev/llms.txt",
+    "full": "https://ninfenz.dev/llms-full.txt",
+    "loader_for_client_ai": "https://ninfenz.dev/nf.txt",
+    "loader_for_agents": "https://ninfenz.dev/agent.txt",
+    "facts": "https://ninfenz.dev/facts.json",
+    "bootstrap_script": "https://ninfenz.dev/run.sh",
+    "standards_export": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/geo_export.json",
+    "sitemap": "https://ninfenz.dev/sitemap.xml",
+    "robots": "https://ninfenz.dev/robots.txt",
+    "npm": "https://www.npmjs.com/package/ninfenz",
+    "npm_provenance": "https://registry.npmjs.org/-/npm/v1/attestations/ninfenz@1.1.0",
+    "mcp_registry": "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
+  },
+  "citation": {
+    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz",
+    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-42 · PASS=76}}",
+    "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
+  },
+  "limits": {
+    "gates_scope": "结构与可复现；不管文笔好坏",
+    "hosted_service": false,
+    "paid_tier": false,
+    "third_party_deps": "核心纯标准库"
+  }
+}

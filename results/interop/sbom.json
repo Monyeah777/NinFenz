@@ -1,0 +1,117 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "comment": "派生面非真源；created = max(仓内声明日期: score_baseline / provenance / approvals)（保确定性，非墙钟）。",
+  "creationInfo": {
+    "comment": "由纯度扫描登记面（HARD_ALLOW / SOFT_IMPORTS）实时派生；created = 仓内声明日期最大值（非墙钟，保确定性）",
+    "created": "2026-10-26T00:00:00Z",
+    "creators": [
+      "Tool: nf interop --kind sbom"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://ninfenz.dev/spdx/v2.30",
+  "name": "ninfenz-sbom",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-ninfenz",
+      "copyrightText": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "AGPL-3.0-only",
+      "licenseDeclared": "AGPL-3.0-only",
+      "name": "NinFenz",
+      "versionInfo": "v2.30"
+    },
+    {
+      "SPDXID": "SPDXRef-Dependency-yaml",
+      "comment": "硬依赖（登记）：PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:pypi/pyyaml@6.0.3",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "yaml",
+      "versionInfo": "6.0.3"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-PySide6",
+      "comment": "软依赖（可选，须 try/except 守卫）：CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:pypi/pyside6@6.11.2",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "PySide6",
+      "versionInfo": "6.11.2"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-jsonschema",
+      "comment": "软依赖（可选，须 try/except 守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:pypi/jsonschema@4.26.0",
+          "referenceType": "purl"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "name": "jsonschema",
+      "versionInfo": "4.26.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-laya",
+      "comment": "软依赖（可选，须 try/except 守卫）：决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指引",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "laya"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-nf_pyengine",
+      "comment": "软依赖（可选，须 try/except 守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "nf_pyengine"
+    }
+  ],
+  "relationships": [
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Dependency-yaml"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-PySide6"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-jsonschema"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-laya"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-nf_pyengine"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}

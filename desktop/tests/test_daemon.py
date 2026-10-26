@@ -1,0 +1,845 @@
+#!/usr/bin/env python3
+"""执行层常驻守护（core/daemon.py）单测：协议 / 令牌 / 拒绝面 / 等价性 / 新鲜度 / 相对加速。
+
+纪律与全仓一致：每条性质都要有**能在本机跑红**的判据——
+- 等价：守护跑出的 (exit, stdout, stderr) 与进程内直跑**逐字节相同**；
+- 新鲜度：每次请求清空按路径键的进程缓存、保留内容键缓存（前者随仓库变，后者键即内容）；
+- 安全：只回环、需令牌、请求有上限、长驻/自指命令拒跑——且拒绝之后守护**仍活着**；
+- 效率：相对判据（守护 < 冷启动/3），不写死毫秒，免得在慢机上抖。
+"""
+import io
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import unittest
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core import daemon as dm  # noqa: E402
+from core import posix_shell as psh  # noqa: E402
+
+
+def _bash():
+    """POSIX sh（启动器 / 快路判据用）：PATH → Git for Windows 反推 → Unix 常规位。
+
+    依据（2026-09-30 跳过审计）：原先只看 `shutil.which("bash")`，本机（Windows 原生 +
+    Git for Windows，bash 不在 PATH）**整类跳过**——判据不在场就是假绿；
+    `core.posix_shell` 会做同样解析（`scripts/instruction_evidence.py` 早已这么用）。
+    """
+    return psh.find_posix_shell()
+
+
+def _plain_request(sock, token, argv, cwd):
+    sock.sendall(("NFREQ 1 %s\n%s\n%d\n%s\n"
+                  % (token, cwd, len(argv), "\n".join(argv))).encode("utf-8"))
+
+
+class DaemonHarness(unittest.TestCase):
+    """共用夹具：把 NF_HOME 隔离到临时目录，起一个守护给所有用例复用。"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.home = tempfile.mkdtemp(prefix="nf_daemon_home_")
+        cls._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = cls.home
+        cls._old_cwd = os.getcwd()
+        os.chdir(ROOT)
+        ok, msg = dm.start(ROOT, idle_timeout=120.0)
+        assert ok, "守护启动失败：%s" % msg
+
+    @classmethod
+    def tearDownClass(cls):
+        dm.stop()
+        os.chdir(cls._old_cwd)
+        if cls._old_home is None:
+            os.environ.pop("NARRATIVE_FORGE_HOME", None)
+        else:
+            os.environ["NARRATIVE_FORGE_HOME"] = cls._old_home
+        shutil.rmtree(cls.home, ignore_errors=True)
+
+    # ---- 便利函数 ----
+    def _state(self):
+        doc = dm.read_state()
+        self.assertIsNotNone(doc, "守护状态文件应可读")
+        return doc
+
+    def _send(self, raw: bytes):
+        doc = self._state()
+        with socket.create_connection((dm.BIND_HOST, doc["port"]), timeout=10) as sock:
+            sock.settimeout(10)
+            sock.sendall(raw)
+            return dm.read_framed(sock)
+
+    def _direct(self, argv):
+        """对照组 = **真子进程直跑**（用户实际看到的那一次，含平台换行语义）。
+
+        不拿进程内 StringIO 当基准：那个没有 newline 翻译（Windows 上真进程写 `\\r\\n`），
+        用它比对会把「守护与真跑一致」误判成不一致。
+        """
+        r = subprocess.run([sys.executable, str(ROOT / "scripts" / "nf.py")] + list(argv),
+                           cwd=str(ROOT), capture_output=True)
+        return r.returncode, r.stdout, r.stderr
+
+
+class DaemonProtocolTest(DaemonHarness):
+    def test_output_matches_direct_run_byte_for_byte(self):
+        """核心判据：守护执行 = 进程内直跑（逐字节，含退出码）。"""
+        for argv in (["--version"], ["stats", "--check"], ["layers", "--verify"],
+                     ["market", "--list"], ["doctor"]):
+            code, out, err = dm.run_request(self._state(), argv, cwd=str(ROOT))
+            dcode, dout, derr = self._direct(argv)
+            self.assertEqual(code, dcode, "退出码不一致：%s" % argv)
+            self.assertEqual(out, dout, "stdout 不一致：%s" % argv)
+            self.assertEqual(err, derr, "stderr 不一致：%s" % argv)
+
+    def test_plain_and_json_framing_agree(self):
+        """明文框（shell 客户端）与 JSON 框（程序客户端）语义一致。"""
+        doc = self._state()
+        argv = ["--version"]
+        code, out, err = dm.run_request(doc, argv, cwd=str(ROOT))
+        with socket.create_connection((dm.BIND_HOST, doc["port"]), timeout=10) as sock:
+            sock.settimeout(10)
+            _plain_request(sock, doc["token"], argv, str(ROOT))
+            pcode, pout, perr = dm.read_framed(sock)
+        self.assertEqual((code, out, err), (pcode, pout, perr))
+
+
+class DaemonHardeningTest(DaemonHarness):
+    def test_token_is_required_and_daemon_survives_rejection(self):
+        doc = self._state()
+        with socket.create_connection((dm.BIND_HOST, doc["port"]), timeout=10) as sock:
+            sock.settimeout(10)
+            sock.sendall(json.dumps({"proto": dm.PROTO, "token": "wrong", "cwd": str(ROOT),
+                                     "argv": ["--version"]}).encode() + b"\n")
+            code, _out, err = dm.read_framed(sock)
+        self.assertEqual(2, code)
+        self.assertIn("令牌", err.decode("utf-8"))
+        self.assertTrue(dm.ping(), "拒绝之后守护必须仍然活着")
+
+    def test_long_running_commands_are_refused(self):
+        for argv in (["serve", "x.json"], ["shell"], ["daemon", "status"]):
+            code, _out, err = dm.run_request(self._state(), argv, cwd=str(ROOT))
+            self.assertEqual(2, code, "应拒跑长驻/自指命令：%s" % argv)
+            self.assertIn("拒跑", err.decode("utf-8"))
+        self.assertTrue(dm.ping())
+
+    def test_oversized_request_is_rejected(self):
+        doc = self._state()
+        code = None
+        try:
+            with socket.create_connection((dm.BIND_HOST, doc["port"]), timeout=10) as sock:
+                sock.settimeout(10)
+                sock.sendall(b"x" * (dm.MAX_REQUEST_BYTES + 10))
+                code, _out, _err = dm.read_framed(sock)
+        except OSError:
+            code = 2                      # 服务端判死并断开，也算拒绝
+        self.assertNotEqual(0, code, "超限请求不得被执行")
+        self.assertTrue(dm.ping())
+
+    def test_state_file_shape_and_token_not_leaked(self):
+        doc = self._state()
+        self.assertEqual(dm.PROTO, doc["proto"])
+        self.assertIsInstance(doc["port"], int)
+        self.assertEqual(64, len(doc["token"]))
+        self.assertEqual(str(ROOT), doc["root"])
+        out = io.StringIO()
+        import contextlib
+        nf = dm._cli_module(ROOT)
+        with contextlib.redirect_stdout(out):
+            nf.main(["daemon", "status"])
+        self.assertNotIn(doc["token"], out.getvalue(), "人读输出不得回显令牌")
+
+    def test_loopback_only(self):
+        self.assertEqual("127.0.0.1", dm.BIND_HOST)
+        src = (ROOT / "desktop" / "src" / "core" / "daemon.py").read_text(encoding="utf-8")
+        self.assertNotIn("--allow-non-loopback", src,
+                         "守护能执行任意 nf 命令，不得提供放行外网的开关")
+
+
+class DaemonFreshnessTest(DaemonHarness):
+    def test_path_keyed_caches_are_cleared_per_request(self):
+        """按路径/根键的缓存必须逐请求清空——否则热进程会拿旧仓库事实回话。
+
+        钉法（2026-10-23 CI run#43/#45 分片 13 实测）：`dm.execute` 的 `_sync_code` 在
+        代码面指纹变化（含**进程内首请求**）时会把除 `core.daemon` 之外的 `core.*` 全部
+        从 `sys.modules` 摘掉重载——直接 patch 调用方手里的 `pack_combo` 模块对象会被
+        这次重载连根丢掉，断言便看到 0 次清理（本地串行常绿、分片/乱序必红）。
+        因此改为 patch **`dm.reset_process_caches`**（daemon 模块自身不参与重载），在它
+        内部对"当前这份" `pack_combo` 打计数补丁后再调用原函数：无论中途是否重载，被计数
+        的都将是真正被调用到的那个模块。断言不变：逐请求至少清一次。
+        """
+        from core import pack_combo
+        pack_combo.profiles(ROOT)                      # 预热数据层（让清理真的有东西可清）
+        calls = []
+        real_reset = dm.reset_process_caches
+
+        def _spy_reset():
+            from core import pack_combo as fresh        # 重载后这才是"当前"模块
+            orig = fresh.cache_clear
+            fresh.cache_clear = lambda: (calls.append(1), orig())[1]
+            try:
+                real_reset()
+            finally:
+                fresh.cache_clear = orig
+
+        dm.reset_process_caches = _spy_reset
+        try:
+            # 用**独有 cwd** 强制走满整条执行路径：响应缓存按 (argv, gen, cwd) 命中，
+            # 若同一进程里别的用例刚跑过 --version，这里会**提前 return**、根本到不了
+            # 清缓存那一步（分片/乱序跑时实测必红；串行时只是碰巧没被预热）。
+            with tempfile.TemporaryDirectory() as tmp:
+                dm.execute(["--version"], ROOT, cwd=tmp)
+        finally:
+            dm.reset_process_caches = real_reset
+        self.assertGreaterEqual(len(calls), 1, "执行前后必须清空 pack_combo 进程缓存")
+
+    def test_content_keyed_caches_are_kept(self):
+        """内容键缓存（键即内容）跨请求保留——这正是热进程的收益来源。"""
+        from core import conformance_scan as csc
+        text = "```yaml\nmachine_contract:\n  id: M00\n```\n"
+        first = csc._fence_yaml(text, "machine_contract")
+        dm.execute(["--version"], ROOT)
+        cache_before = len(csc._FENCE_CACHE)
+        csc._fence_yaml(text, "machine_contract")      # 再取一次
+        self.assertEqual(first, csc._fence_yaml(text, "machine_contract"))
+        self.assertGreaterEqual(len(csc._FENCE_CACHE), 1, "内容键缓存不该被清空")
+        del cache_before
+
+    def test_source_fingerprint_triggers_reload(self):
+        """源码指纹变了 → 守护重载 CLI（不跑旧代码）。"""
+        dm.execute(["--version"], ROOT)
+        before = dm._CLI_CACHE.get("fp")
+        self.assertIsNotNone(before)
+        dm._CLI_CACHE["fp"] = (("fake.py", 1, 1),)     # 人为制造「源码已变」
+        dm.execute(["--version"], ROOT)
+        self.assertNotEqual((("fake.py", 1, 1),), dm._CLI_CACHE.get("fp"),
+                            "指纹不符时必须重新同步")
+
+
+class DaemonSpeedTest(DaemonHarness):
+    def test_daemon_is_much_faster_than_cold_start(self):
+        """相对判据（机器无关）：守护**稳态**往返 < 冷启动/3。
+
+        必须**先预热再测**：守护的**首次**请求还要把 CLI 模块载进来（导入 + 源码指纹，几十毫秒），
+        把它算进"稳态"会在解释器启动很快的机器（Linux CI 冷启动仅数十毫秒）上让 3× 判据不成立
+        ——那是测量口径错，不是性能不达标。故：预热一次 → 取 3 次最小值作稳态；冷启动取 2 次最小值。
+        """
+        argv = ["--version"]
+        doc = self._state()
+        dm.run_request(doc, argv, cwd=str(ROOT))            # 预热（首次请求含模块装载）
+        cold = []
+        for _ in range(2):
+            t0 = time.perf_counter()
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "nf.py")] + argv,
+                           cwd=str(ROOT), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            cold.append((time.perf_counter() - t0) * 1000)
+        warm = []
+        for _ in range(3):
+            t0 = time.perf_counter()
+            dm.run_request(doc, argv, cwd=str(ROOT))
+            warm.append((time.perf_counter() - t0) * 1000)
+        cold_ms, warm_ms = min(cold), min(warm)
+        self.assertGreater(cold_ms, 0)
+        self.assertLess(warm_ms * 3, cold_ms,
+                        "守护稳态往返 %.1f ms 应远小于冷启动 %.1f ms" % (warm_ms, cold_ms))
+
+    def test_shim_fast_path_beats_python_direct(self):
+        """**启动器快路**判据：`scripts/nf` 经守护必须快过「python 直跑」，且在 POSIX 上要快 3×。
+
+        动机：我在报告里主张「Linux 上是毫秒级」，但门禁此前只覆盖了守护协议与缓存——
+        **没有一个判据盯着启动器本身**。这条把它钉住：本机（Windows/MSYS）实测 178 ms vs 357 ms
+        （spawn 是地板，故只要求显著更小）；Linux（CI）上 bash spawn 只要几毫秒，故要求 3×。
+        """
+        bash = _bash()
+        if not bash:
+            self.skipTest("本机无 bash（启动器快路需要 bash 的 /dev/tcp）")
+        argv = ["--version"]
+        shim, direct = [], []
+        for _ in range(3):
+            t0 = time.perf_counter()
+            subprocess.run([bash, str(ROOT / "scripts" / "nf")] + argv, cwd=str(ROOT),
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            shim.append((time.perf_counter() - t0) * 1000)
+            t0 = time.perf_counter()
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "nf.py")] + argv,
+                           cwd=str(ROOT), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            direct.append((time.perf_counter() - t0) * 1000)
+        shim_ms, direct_ms = min(shim), min(direct)
+        self.assertLess(shim_ms, direct_ms,
+                        "启动器 %.1f ms 应快过 python 直跑 %.1f ms" % (shim_ms, direct_ms))
+        if os.name == "posix":
+            self.assertLess(shim_ms * 3, direct_ms,
+                            "POSIX 上启动器快路 %.1f ms 应远小于 python 直跑 %.1f ms（毫秒级主张）"
+                            % (shim_ms, direct_ms))
+
+
+class DaemonInProcessServerTest(unittest.TestCase):
+    """**进程内**起服务（线程）跑协议全路径——这也是覆盖率的关键：
+
+    守护通常在**子进程**里跑，那段代码在 CI 的 `coverage run … -s desktop/tests` 里是不可见的；
+    若只测子进程路径，`daemon.py` 的覆盖率会把 core 总覆盖率拖到 80% 线下（本仓 CI
+    `core-coverage-ge-80` 会判红——实测踩过）。故此处把服务循环放进本进程线程里跑。
+    """
+
+    def setUp(self):
+        self.home = tempfile.mkdtemp(prefix="nf_daemon_ip_")
+        self._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = self.home
+        self.port = None
+
+        def ready(port):
+            self.port = port
+
+        self.thread = threading.Thread(target=dm.serve_forever,
+                                       args=(ROOT, 30.0, ready), daemon=True)
+        self.thread.start()
+        for _ in range(300):
+            if self.port:
+                break
+            time.sleep(0.01)
+        self.assertIsNotNone(self.port, "进程内服务未能就绪")
+
+    def tearDown(self):
+        dm.stop()
+        self.thread.join(timeout=5)
+        if self._old_home is None:
+            os.environ.pop("NARRATIVE_FORGE_HOME", None)
+        else:
+            os.environ["NARRATIVE_FORGE_HOME"] = self._old_home
+        shutil.rmtree(self.home, ignore_errors=True)
+
+    def _raw(self, payload: bytes):
+        doc = dm.read_state()
+        self.assertIsNotNone(doc, "服务已在跑，状态文件必须可读")
+        with socket.create_connection((dm.BIND_HOST, doc["port"]), timeout=10) as sock:
+            sock.settimeout(10)
+            sock.sendall(payload)
+            return dm.read_framed(sock)
+
+    def test_json_and_plain_round_trip(self):
+        doc = dm.read_state()
+        req = json.dumps({"proto": dm.PROTO, "token": doc["token"], "cwd": str(ROOT),
+                          "argv": ["--version"]}).encode("utf-8") + b"\n"
+        code, out, err = self._raw(req)
+        self.assertEqual(0, code)
+        self.assertIn(b"nf ", out)
+        self.assertEqual(b"", err)
+        code2, out2, err2 = self._raw(
+            ("NFREQ %d %s\n%s\n1\n--version\n" % (dm.PROTO, doc["token"], str(ROOT)))
+            .encode("utf-8"))
+        self.assertEqual((code, out, err), (code2, out2, err2))
+
+    def test_malformed_requests_are_rejected_without_killing_server(self):
+        doc = dm.read_state()
+        cases = {
+            "非 JSON": b"not json at all\n",
+            "NFREQ 头错": ("NFREQ 9 %s\n%s\n0\n" % (doc["token"], str(ROOT))).encode(),
+            "argv 条数不可解析": ("NFREQ %d %s\n%s\nabc\n" % (dm.PROTO, doc["token"],
+                                                              str(ROOT))).encode(),
+            "argv 条数越界": ("NFREQ %d %s\n%s\n99999\n" % (dm.PROTO, doc["token"],
+                                                           str(ROOT))).encode(),
+            "argv 非列表": (json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                        "argv": "stats"}).encode() + b"\n"),
+        }
+        for label, payload in cases.items():
+            code, _out, err = self._raw(payload)
+            self.assertEqual(2, code, "应拒收：%s" % label)
+            self.assertTrue(err, "拒收要带原因：%s" % label)
+        self.assertTrue(dm.ping(), "畸形请求之后服务仍须可用")
+
+    def test_request_level_exception_is_isolated(self):
+        """请求级异常 → 结构化错误帧 + 服务继续（2026-10-10 审计 X0，P0）。
+
+        直接注入「`execute` 抛异常」这一层：它模拟的正是审计实测的崩溃路径
+        （`_handle_conn` → `execute` → 未捕获异常 → `serve_forever` 退出）。判据取两条：
+        ① 客户端拿到 rc=1 + 带「内部错误」的 stderr（不是零输出）；② 下一跳仍可达。
+        """
+        orig = dm.execute
+
+        def boom(argv, root, cwd=None):
+            raise RuntimeError("injected payload failure")
+
+        dm.execute = boom
+        try:
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["stats"]}).encode() + b"\n"
+            code, out, err = self._raw(payload)
+        finally:
+            dm.execute = orig
+        self.assertEqual(1, code, "请求级异常须归一成 rc=1")
+        self.assertEqual(b"", out)
+        self.assertIn("守护内部错误", err.decode("utf-8", "replace"))
+        self.assertTrue(dm.ping(), "单条请求异常之后服务必须仍可用")
+
+    def test_connection_level_oserror_is_isolated(self):
+        """连接级 OSError（客户端中途断开触发 send 失败）不得杀死服务（X0 同族）。"""
+        orig = dm._handle_conn
+
+        def boom(conn, token, root):
+            raise ConnectionResetError("client went away")
+
+        dm._handle_conn = boom
+        try:
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["--version"]}).encode() + b"\n"
+            try:
+                self._raw(payload)      # 服务端未回帧、直接关连接
+            except OSError:
+                # Windows 上半关闭会以 RST 收尾（WinError 10053），客户端侧本就是异常；
+                # 本判据只关心**服务端存活**，故连接层异常在此不算失败。
+                pass
+        finally:
+            dm._handle_conn = orig
+        self.assertTrue(dm.ping(), "连接级失败之后服务必须仍可用")
+
+    def test_corrupt_protocol_json_is_isolated(self):
+        """**真命令 + 真坏输入**：截断 `protocol/RECEIPTS.json` → `nf receipts` 必抛解析错。
+
+        这是审计 X0 的原始触发路径（18/18 条 protocol JSON 都会如此）。修复前该异常穿透守护、
+        进程直接消失（客户端收 rc=1 + 零输出）；修复后走 `nf.guarded_main` 的共用错误面。
+        判据只依赖「文件名 + 一半字节」，夹具在 finally 里按原字节还原（不改仓库事实）。
+        """
+        target = ROOT / "protocol" / "RECEIPTS.json"
+        self.assertTrue(target.is_file(), "协议层回执件必须在场（审计对象锁前提）")
+        original = target.read_bytes()
+        try:
+            target.write_bytes(b'{"entries": [')          # 合法前缀、整体非法 JSON
+            doc = dm.read_state()
+            payload = json.dumps({"proto": dm.PROTO, "token": doc["token"],
+                                  "cwd": str(ROOT), "argv": ["receipts"]}).encode() + b"\n"
+            code, out, err = self._raw(payload)
+        finally:
+            target.write_bytes(original)
+        self.assertEqual(1, code)
+        self.assertEqual(b"", out, "坏输入不得产出正常 stdout")
+        self.assertIn("内部错误", err.decode("utf-8", "replace"))
+        self.assertTrue(dm.ping(), "坏输入之后守护必须仍在线")
+
+    def test_shutdown_op_stops_the_loop(self):
+        doc = dm.read_state()
+        code, _out, _err = self._raw(
+            json.dumps({"proto": dm.PROTO, "token": doc["token"], "op": "shutdown"})
+            .encode() + b"\n")
+        self.assertEqual(0, code)
+        self.thread.join(timeout=5)
+        self.assertFalse(self.thread.is_alive(), "shutdown 帧应让服务循环退出")
+
+    def test_stop_reports_when_no_daemon_running(self):
+        """停掉本类的进程内服务 → 再停一次必须得到「没有守护」（而不是「守护未响应」）。
+
+        竞态说明（CI 实测抓出）：`stop()` 一发现 ping 失败就返回，而服务端 `finally` 里的
+        `clear_state()` 可能还没落盘——此刻登记在、端口已死，第二次 stop 会报「守护未响应」。
+        修法有两层：① 服务端**先清状态再关端口**；② 客户端把「拒连」判成「登记过期 = 没有守护」
+        并清掉过期登记。本判据同时钉住这两层（先等服务端清理落盘，再断言语义）。
+        """
+        ok, msg = dm.stop()
+        self.assertTrue(ok, msg)
+        deadline = time.time() + 5.0
+        while dm.read_state() is not None and time.time() < deadline:
+            time.sleep(0.05)                     # 等服务端 clear_state() 落盘
+        ok, msg = dm.stop()
+        self.assertFalse(ok)
+        self.assertIn("没有守护", msg)
+        self.assertFalse(dm.ping())
+
+    def test_stale_state_pointing_at_dead_port_reports_no_daemon(self):
+        """陈旧登记（端口拒连）必须被如实判成「没有守护」，并清除该登记。"""
+        dm.stop()                                 # 先停掉本类服务
+        dm.write_state({"proto": dm.PROTO, "pid": 1, "port": 9,   # 9 = discard，必然拒连
+                        "token": "0" * 64, "root": str(ROOT), "started": 0})
+        ok, msg = dm.stop()
+        self.assertFalse(ok)
+        self.assertIn("没有守护", msg)
+        self.assertIsNone(dm.read_state(), "过期登记应被清除")
+
+    def test_main_entry_help_and_short_serve(self):
+        self.assertEqual(2, dm.main([]), "缺 --serve 时应打印帮助并返回 2")
+        # 短服务用**自己的 NF_HOME**：同一 NF_HOME 下另起守护会覆盖状态文件，
+        # 把本类 setUp 起的服务变成「失联」——CI（Linux）就是这样把它暴露出来的。
+        tmp = tempfile.mkdtemp(prefix="nf_daemon_short_")
+        old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = tmp
+        try:
+            self.assertEqual(0, dm.main(["--serve", "--root", str(ROOT), "--idle", "0.05"]),
+                             "短空闲的 --serve 应自然退出 0")
+        finally:
+            if old is None:
+                os.environ.pop("NARRATIVE_FORGE_HOME", None)
+            else:
+                os.environ["NARRATIVE_FORGE_HOME"] = old
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_second_serve_in_same_home_is_refused(self):
+        """一个 NF_HOME 只许一个守护（缺省 fail-closed）——否则后起者会顶掉先起者的状态登记。"""
+        self.assertEqual(2, dm.serve_forever(ROOT, idle_timeout=0.05),
+                         "已有守护在运行时另起服务应被拒（除非显式 force）")
+        self.assertTrue(dm.ping(), "拒绝之后原服务必须仍然可用")
+
+    def test_code_fingerprint_and_sync_are_idempotent(self):
+        fp = dm._code_fingerprint(ROOT)
+        self.assertTrue(any(str(r[0]).endswith("daemon.py") for r in fp), fp[:3])
+        dm._sync_code(ROOT)
+        dm._sync_code(ROOT)          # 第二次指纹相同 → 直接返回
+        mod = dm._load_cli(ROOT)
+        self.assertTrue(hasattr(mod, "main"))
+
+
+class DaemonShellInitTest(unittest.TestCase):
+    def _generated(self):
+        """生成 `nf daemon shell-init bash` 的脚本文本（供语法与**行为**两级判据共用）。"""
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("nfcli_d", ROOT / "scripts" / "nf.py")
+        nf = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(nf)          # type: ignore[union-attr]
+        out = io.StringIO()
+        import contextlib
+        with contextlib.redirect_stdout(out):
+            code = nf.main(["daemon", "shell-init", "bash"])
+        self.assertEqual(0, code)
+        return out.getvalue()
+
+    def test_shell_init_emits_syntactically_valid_bash(self):
+        script = self._generated()
+        self.assertIn("nf() {", script)
+        self.assertIn(str(ROOT), script)
+        bash = _bash()
+        if not bash:
+            self.skipTest("本机无 bash（跳过语法检查）")
+        tmp = Path(tempfile.mkdtemp(prefix="nf_shell_init_")) / "init.sh"
+        tmp.write_text(script, encoding="utf-8", newline="\n")
+        r = subprocess.run([bash, "-n", str(tmp)], capture_output=True, text=True)
+        self.assertEqual(0, r.returncode, r.stderr)
+
+    def test_shell_init_function_actually_runs_without_daemon(self):
+        """**行为级**判据（语法检查抓不到）：守护不在时，`eval` 出来的 `nf` 必须能回退直跑。
+
+        依据（2026-09 实测缺陷）：模板把解释器路径**未加引号**嵌入——本机是
+        `C:\\Program Files\\Python311\\python.exe`，bash 会把它拆成命令 `C:\\Program`，于是
+        **守护不在（含默认 1 小时空闲自退之后）**时 `nf <任何命令>` →
+        **rc=127 + `C:Program: command not found`**。`bash -n` 对此完全无感（它语法合法），
+        所以本判据必须真的 `eval` 一次并在**没有守护**的环境里跑一条命令。
+        """
+        bash = _bash()
+        if not bash:
+            self.skipTest("本机无 bash（无法 eval 快路函数）")
+        script = self._generated()
+        home = tempfile.mkdtemp(prefix="nf_shell_init_nodaemon_")
+        env = dict(os.environ)
+        env["NARRATIVE_FORGE_HOME"] = home          # 隔离后看不到任何守护状态文件
+        try:
+            r = subprocess.run([bash, "-c", 'eval "$1"; nf --version', "nfinit", script],
+                               cwd=str(ROOT), env=env, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=180)
+        finally:
+            shutil.rmtree(home, ignore_errors=True)
+        self.assertEqual(0, r.returncode,
+                         "守护不在时函数必须回退 python 直跑（未加引号的解释器路径会 127）\n%s"
+                         % (r.stderr or r.stdout))
+        self.assertIn("nf ", r.stdout)
+
+    def test_shell_init_fast_path_matches_direct_with_daemon_up(self):
+        """**有守护时**：`eval` 出来的 `nf` 与直跑**逐字节一致**，且长驻命令必须绕过快路。
+
+        依据（2026-10-01）：这份模板是文档推荐的**毫秒级客户端**（`eval "$(nf daemon shell-init
+        bash)"`），但既有判据只盖了「语法合法」与「守护不在时能回退」两条 —— **快路真的接管时
+        输出是否与直跑一致**、以及长驻/自指命令是否被模板的排除表挡在快路外，此前没人验。
+        参考实现：`nf daemon exec` 那条路已有逐字节等价判据（test_daemon_parity），本件把**第三个
+        客户端**（bash 函数）补进同一口径。
+        """
+        bash = _bash()
+        if not bash:
+            self.skipTest("本机无 bash（无法 eval 快路函数）")
+        script = self._generated()
+        home = tempfile.mkdtemp(prefix="nf_shell_init_fast_")
+        old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = home
+        try:
+            ok, msg = dm.start(Path(ROOT), idle_timeout=300.0)
+            self.assertTrue(ok, "守护启动失败：%s" % msg)
+            try:
+                # `nf terminal` 会读 stdin：**必须显式 DEVNULL**，否则判据随宿主 stdin 变形——
+                # 2026-10-02 实测：本件在 pre-push 钩子里跑时，git 传给钩子的 ref 列表
+                # （`refs/heads/main …`）被终端当命令读走，多出一行「未知命令」→ 与快路客户端
+                # 逐字节比对当场红，而手工 `bash verify.sh`（stdin 为空）是绿的。
+                for argv in (["--version"], ["stats", "--check"], ["terminal"]):
+                    r = subprocess.run(
+                        [bash, "-c", 'eval "$1"; nf %s' % " ".join(argv), "nfinit", script],
+                        cwd=str(ROOT), env=dict(os.environ), capture_output=True, text=True,
+                        encoding="utf-8", errors="replace", timeout=300,
+                        stdin=subprocess.DEVNULL)
+                    d = subprocess.run(
+                        [sys.executable, str(Path(ROOT) / "scripts" / "nf.py")] + argv,
+                        cwd=str(ROOT), env=dict(os.environ), capture_output=True, text=True,
+                        encoding="utf-8", errors="replace", timeout=300,
+                        stdin=subprocess.DEVNULL)
+                    self.assertEqual((d.returncode, d.stdout), (r.returncode, r.stdout),
+                                     "shell-init 客户端与直跑不一致：%s\n%s"
+                                     % (argv, (r.stderr or "")[:200]))
+                    # 同一口径覆盖**启动器本体**（`scripts/nf`）：它是另一条被文档写成「快路」的入口
+                    # ，
+                    # 有守护时同样必须与直跑逐字节一致。
+                    lr = subprocess.run([bash, "scripts/nf"] + argv, cwd=str(ROOT),
+                                        env=dict(os.environ), capture_output=True, text=True,
+                                        encoding="utf-8", errors="replace", timeout=300,
+                                        stdin=subprocess.DEVNULL)
+                    self.assertEqual((d.returncode, d.stdout), (lr.returncode, lr.stdout),
+                                     "启动器 scripts/nf 与直跑不一致：%s\n%s"
+                                     % (argv, (lr.stderr or "")[:200]))
+            finally:
+                dm.stop()
+        finally:
+            if old is None:
+                os.environ.pop("NARRATIVE_FORGE_HOME", None)
+            else:
+                os.environ["NARRATIVE_FORGE_HOME"] = old
+            shutil.rmtree(home, ignore_errors=True)
+
+
+class DaemonLivenessTest(unittest.TestCase):
+    """**陈旧状态文件不算在线**（2026-09-30 补）：liveness 靠一次真往返，不靠文件在场。
+
+    依据：状态文件里可能有「上一轮守护留下」的 port/token（进程已死、端口已失效）。若把
+    「文件形状合法」当成在线，`nf daemon status` 会骗人，启动器也会把命令投给不存在的端点。
+    本判据伪造一份形状合法但连不上的状态文件，要求 `ping` 判假、CLI 面报「未运行」。
+    """
+
+    def test_stale_state_file_is_not_online(self):
+        home = tempfile.mkdtemp(prefix="nf_daemon_stale_")
+        self.addCleanup(shutil.rmtree, home, ignore_errors=True)
+        Path(home, "daemon.json").write_text(json.dumps(
+            {"proto": dm.PROTO, "port": 1, "token": "t" * 8, "pid": 999999,
+             "root": str(ROOT), "started": 0}), encoding="utf-8")
+        env = dict(os.environ, NARRATIVE_FORGE_HOME=home)
+        old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = home
+        try:
+            doc = dm.read_state()
+            self.assertIsNotNone(doc, "形状合法 ⇒ read_state 应读出（是否在线交给 ping 判）")
+            self.assertFalse(dm.ping(doc, timeout=1.0), "连不上 ⇒ 不得判在线")
+        finally:
+            if old is None:
+                os.environ.pop("NARRATIVE_FORGE_HOME", None)
+            else:
+                os.environ["NARRATIVE_FORGE_HOME"] = old
+        p = subprocess.run([sys.executable, "scripts/nf.py", "daemon", "status"],
+                           cwd=ROOT, env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=180)
+        self.assertIn("未运行", p.stdout, "CLI 面也须如实报「未运行」：%s" % (p.stdout or p.stderr))
+
+
+@unittest.skipUnless(os.name == "posix", "POSIX 权限语义（Windows 交回 ACL 继承）")
+class DaemonStatePermsTest(unittest.TestCase):
+    """状态文件含**一次性令牌**，而令牌就是守护的信任边界（回环不是）——须仅属主可读写。
+
+    依据（2026-09-30）：`write_state` 此前按默认 umask 落盘（常见 0644）。多用户主机上，同机
+    另一个用户读到 `daemon.json` 里的 token 就能连回环口、以属主身份执行命令。本件把「0600」
+    钉住。Windows 分支不判（chmod 无对应语义，ACL 由用户目录继承）。
+    """
+
+    def test_state_file_is_owner_only(self):
+        home = tempfile.mkdtemp(prefix="nf_daemon_perms_")
+        self.addCleanup(shutil.rmtree, home, ignore_errors=True)
+        old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = home
+        try:
+            dm.write_state({"proto": dm.PROTO, "port": 1, "token": "t" * 8, "pid": os.getpid(),
+                            "root": ".", "started": "now"})
+            p = dm.state_path()
+            self.assertEqual(0, p.stat().st_mode & 0o077,
+                             "含令牌的状态文件须仅属主可读写（实测 %o）"
+                                 "" % (p.stat().st_mode & 0o777))
+            self.assertIsNotNone(dm.read_state(), "权限收紧不得影响自读")
+        finally:
+            if old is None:
+                os.environ.pop("NARRATIVE_FORGE_HOME", None)
+            else:
+                os.environ["NARRATIVE_FORGE_HOME"] = old
+
+
+class DaemonStateWriteRaceTest(unittest.TestCase):
+    """N1（2026-10-10 审计 P1）：并发写状态文件不得撕裂。
+
+    修复前用**固定名** `daemon.json.tmp` 手工两段写 ⇒ 4 进程 × 300 次实测成功 326/1200、
+    读者 12.9% 解析失败。现走 `atomic_write.write_text`（mkstemp 唯一临时名 + replace）。
+    """
+
+    def setUp(self):
+        self.home = tempfile.mkdtemp(prefix="nf_daemon_state_race_")
+        self._old = os.environ.get("NARRATIVE_FORGE_HOME")
+        os.environ["NARRATIVE_FORGE_HOME"] = self.home
+
+    def tearDown(self):
+        if self._old is None:
+            os.environ.pop("NARRATIVE_FORGE_HOME", None)
+        else:
+            os.environ["NARRATIVE_FORGE_HOME"] = self._old
+        shutil.rmtree(self.home, ignore_errors=True)
+
+    def test_state_writers_are_serialized(self):
+        """同目标的状态写入先串行，避免 Windows 上多个 replace 互相放大占用冲突。"""
+        from core import atomic_write as aw
+        guard = threading.Lock()
+        active = 0
+        peak = 0
+        original = aw.write_text
+
+        def slow_write(*args, **kwargs):
+            nonlocal active, peak
+            with guard:
+                active += 1
+                peak = max(peak, active)
+            try:
+                time.sleep(0.03)
+                return original(*args, **kwargs)
+            finally:
+                with guard:
+                    active -= 1
+
+        with mock.patch.object(aw, "write_text", side_effect=slow_write):
+            workers = [threading.Thread(target=dm.write_state,
+                                        args=({"proto": dm.PROTO, "pid": i},))
+                       for i in range(3)]
+            for th in workers:
+                th.start()
+            for th in workers:
+                th.join(timeout=10)
+        self.assertEqual(1, peak, "同目标状态写入未串行，多个 replace 会互相抢占用")
+
+    def test_concurrent_writes_never_tear(self):
+        import threading
+        stop = threading.Event()
+        started = threading.Event()
+        tears, errors = [], []
+
+        def writer(i):
+            for n in range(150):
+                try:
+                    dm.write_state({"proto": dm.PROTO, "pid": i, "port": 2000 + i,
+                                    "token": "t" * 8, "root": ".", "started": n})
+                    started.set()
+                except Exception as exc:                     # noqa: BLE001
+                    errors.append(exc)
+
+        def reader():
+            while not stop.is_set():
+                if not started.is_set():
+                    continue
+                doc = dm.read_state()
+                if doc is None:
+                    tears.append("状态不可读")
+
+        writers = [threading.Thread(target=writer, args=(i,), daemon=True) for i in range(4)]
+        readers = [threading.Thread(target=reader, daemon=True) for _ in range(3)]
+        for th in readers + writers:
+            th.start()
+        for th in writers:
+            th.join(timeout=60)
+        stop.set()
+        for th in readers:
+            th.join(timeout=30)
+        self.assertEqual([], errors, "并发写出现异常（固定临时名互踩的特征）：%s" % errors[:3])
+        self.assertEqual([],
+ tears,
+ "读者看到了半截 JSON（%d 次撕裂）：%s" % (len(tears),
+ tears[:3]))
+        leftovers = [p.name for p in dm.state_path().parent.iterdir() if p.name.endswith(".tmp")]
+        self.assertEqual([],
+ leftovers,
+ "遗留临时件（原子写用 mkstemp，写完即 replace）：%s" % leftovers)
+
+
+class ResponseCacheWriteSafetyTest(unittest.TestCase):
+    """**写动作绝不进响应缓存**：闸门表（写面的穷举真源）与守护的缓存准入表必须互相负责。
+
+    依据（2026-10-01 取证）：守护的响应缓存按「命令前缀在 `CACHEABLE_COMMANDS` 里 + argv 里没有
+    写盘旗标」准入，而**这套准入此前没有任何判据**——`cacheable()` 的注释自己写着「宁可不缓存，
+    不可把旧输出当新输出」，但两条表（终端写盘闸门 ⇄ 守护缓存准入）从未对账：新写面入闸后，
+    若它恰好落在某个可缓存命令前缀下、又没进 `_WRITE_FLAG_PREFIXES`，第二次调用就会**回放写之前
+    的旧输出**（静默过期，最坏情况下命令根本没跑而调用方以为跑了）。
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+        from core import terminal as term
+        cls.term = term
+
+    def _inventory(self):
+        """命令面清单（与 test_cli_json_face / test_daemon_parity 同一真源）。"""
+        if not hasattr(self, "_rows"):
+            nf = str(ROOT / "scripts" / "nf.py")
+            p = subprocess.run([sys.executable, nf, "shell", "--commands", "--json"],
+                               capture_output=True, text=True, encoding="utf-8",
+                               errors="replace", timeout=300)
+            self._rows = json.loads(p.stdout).get("rows") or []
+        return self._rows
+
+    def test_every_gated_face_is_uncacheable(self):
+        """闸门表里每一项拿去问 `cacheable()`，必须一律 False。
+
+        旗标面按**真实用法**取（命令面清单里真存在的「可缓存命令 × 该旗标」组合）——`doctor --force`
+        这种 argparse 根本不接受的拼法不算洞，拿它当判据只会造出假红。
+        """
+        bad = []
+        for row in self._inventory():
+            toks = row["path"].split()
+            if not any(tuple(toks[:len(pre)]) == pre for pre in dm.CACHEABLE_COMMANDS):
+                continue
+            for flag in (row.get("flags") or []):
+                if flag in self.term.CONFIRM_FLAGS or flag in {f for _c,
+ f in self.term.CONFIRM_FLAG_PAIRS}:
+                    if dm.cacheable(toks + [flag]):
+                        bad.append("%s %s" % (row["path"], flag))
+        for cmd, sub in self.term.CONFIRM_VERBS:
+            argv = [cmd] + ([sub] if sub else [])
+            if dm.cacheable(argv):
+                bad.append(" ".join(argv))
+        for cmd, flag in self.term.CONFIRM_FLAG_PAIRS:
+            if dm.cacheable([cmd, flag]):
+                bad.append("%s %s" % (cmd, flag))
+        self.assertEqual([], bad, "写面被响应缓存接纳（会回放写之前的旧输出）：%s" % bad)
+
+    def test_pure_reads_are_still_cacheable(self):
+        """正例对照：只读面必须仍然可缓存（否则「全禁缓存」也能假绿）。"""
+        for argv in (["--version"], ["stats", "--check"], ["doctor"], ["module", "ls"],
+                     ["patterns", "ls"], ["decisions", "show"]):
+            self.assertTrue(dm.cacheable(argv), "只读面被误禁缓存：%s" % argv)
+
+    def test_gate_flags_on_cacheable_commands_have_a_write_prefix(self):
+        """**覆盖对账**：可缓存命令上真出现的闸门旗标，必须被 `_WRITE_FLAG_PREFIXES` 覆盖。
+
+        覆盖用前缀语义（`--write-baseline` 由 `--write` 覆盖），与 `cacheable()` 同一判据。
+        """
+        prefixes = tuple(dm._WRITE_FLAG_PREFIXES)
+        gate_flags = set(self.term.CONFIRM_FLAGS) | {f for _c, f in self.term.CONFIRM_FLAG_PAIRS}
+        orphans = []
+        checked = 0
+        for row in self._inventory():
+            toks = row["path"].split()
+            if not any(tuple(toks[:len(pre)]) == pre for pre in dm.CACHEABLE_COMMANDS):
+                continue
+            for flag in (row.get("flags") or []):
+                if flag not in gate_flags:
+                    continue
+                checked += 1
+                if not flag.startswith(prefixes):
+                    orphans.append("%s %s" % (row["path"], flag))
+        self.assertGreater(checked, 0, "没扫到任何「可缓存命令 × 闸门旗标」组合（判据可能已失效）")
+        self.assertEqual([], orphans,
+                         "可缓存命令上的闸门旗标没进 `_WRITE_FLAG_PREFIXES`（写会被缓存）：%s"
+                             "" % orphans)
+
+
+if __name__ == "__main__":
+    unittest.main()

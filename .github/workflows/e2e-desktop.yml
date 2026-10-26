@@ -1,0 +1,43 @@
+name: e2e-desktop
+# C7 · T3-1 端到端测试入 CI（缺口⑩闭环）：桌面端 headless 端到端断言。
+# 直驱 desktop core 真实链路（装载官方 13 件 + T2-2 组合包 M91/M92 + P04 轻混装配流管线
+# → 按层装配 → check_assembly → generate_document → 产物断言），无需 GUI、无需 Android 生成物。
+# 独立 workflow：桌面断言失败不牵连其它 workflow（原 Android 构建流已随 L3 端壳线退役移出）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+jobs:
+  e2e-headless:
+    name: desktop-headless-e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30          # 挂死上限（2026-10-01 统一）
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - name: 桌面端到端 headless 冒烟断言（T3-1 缺口⑩闭环）
+        run: |
+          set -o pipefail
+          python3 scripts/e2e_desktop_headless.py 2>&1 | tee e2e-desktop.log
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: e2e-desktop-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

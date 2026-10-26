@@ -1,0 +1,17 @@
+# Code owners
+#
+# The repository is maintained by a single owner. Keep this file ASCII-only:
+# OpenSSF Scorecard's CODEOWNERS parser rejects non-ASCII path patterns.
+* @Monyeah777
+
+# Protocol and machine-readable contracts.
+/protocol/ @Monyeah777
+
+# Gates and project direction.
+/verify.sh @Monyeah777
+/STRATEGY.md @Monyeah777
+
+# Core code, intake, and supply-chain controls.
+/desktop/src/core/ @Monyeah777
+/library/intake.json @Monyeah777
+/.github/ @Monyeah777

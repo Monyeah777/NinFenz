@@ -1,0 +1,486 @@
+{
+  "kind": "nf-domain-spec/1",
+  "code": "C05",
+  "domain": "监督微调",
+  "section": "C · AI 工程与运维",
+  "anchors_verified_on": "2026-09-22",
+  "standard_anchors_verified_on": "2026-09-24",
+  "metric_family": "drift",
+  "content_tier": "derived",
+  "data_authenticity": {
+    "standard_bindings": 24,
+    "in_catalog_ratio": 1.0,
+    "reachable_ratio": 1.0,
+    "probe_evidence_ratio": 1.0,
+    "anchor_probed_ratio": 1.0,
+    "score": 1.0,
+    "threshold": 0.95,
+    "bound_standards": [
+      "cncf-otel-semconv",
+      "commonmark",
+      "creativecommons",
+      "frictionless-table",
+      "ietf-json-schema",
+      "mermaid",
+      "mlcommons-bench",
+      "mlcommons-croissant",
+      "spdx-licenses",
+      "vega-lite",
+      "w3c-tabular-data"
+    ]
+  },
+  "subdivisions": [
+    {
+      "id": "C05-01",
+      "name": "指令数据集构造",
+      "definition": "指令数据集构造：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-croissant",
+      "standard_why": "关键词「数据集|元数据|标注」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-croissant",
+          "role": "primary",
+          "why": "关键词「数据集|元数据|标注」命中",
+          "layer": "data",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "schema-org"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-02",
+      "name": "多轮样本格式",
+      "definition": "多轮样本格式：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "C 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 1）",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "w3c-tabular-data",
+          "role": "support",
+          "why": "C 段载体锚（轮换 1；与主锚异层）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-03",
+      "name": "提示模板对齐",
+      "definition": "提示模板对齐：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "commonmark",
+      "standard_why": "关键词「提示|指令|模板」命中",
+      "standards": [
+        {
+          "ref": "commonmark",
+          "role": "primary",
+          "why": "关键词「提示|指令|模板」命中",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "support",
+          "why": "C 段载体锚（轮换 4；与主锚异层）",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-04",
+      "name": "过拟合控制",
+      "definition": "过拟合控制：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "cncf-otel-semconv",
+      "standard_why": "C 段默认绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 0）",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "C 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-05",
+      "name": "灾难性遗忘",
+      "definition": "灾难性遗忘：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "C 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 1）",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "C 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-06",
+      "name": "领域 SFT",
+      "definition": "领域 SFT：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "frictionless-table",
+      "standard_why": "C 段默认绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "frictionless-table",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 2）",
+          "layer": "data",
+          "body": "Frictionless",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "frictionless-package"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-07",
+      "name": "风格 SFT",
+      "definition": "风格 SFT：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "cncf-otel-semconv",
+      "standard_why": "C 段默认绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 0）",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-08",
+      "name": "样本配比",
+      "definition": "样本配比：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "C 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 1）",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-09",
+      "name": "训练超参",
+      "definition": "训练超参：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "C 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-10",
+      "name": "LoRA 与全参取舍",
+      "definition": "LoRA 与全参取舍：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "cncf-otel-semconv",
+      "standard_why": "C 段默认绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "primary",
+          "why": "C 段默认绑定（轮换 0）",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "w3c-tabular-data",
+          "role": "support",
+          "why": "C 段载体锚（轮换 1；与主锚异层）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-11",
+      "name": "评测对比",
+      "definition": "评测对比：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "关键词「评测|基准|排行榜|跑分」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "关键词「评测|基准|排行榜|跑分」命中",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "C 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C05-12",
+      "name": "SFT 数据许可",
+      "definition": "SFT 数据许可：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://mlcommons.org/benchmarks/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "creativecommons",
+      "standard_why": "关键词「许可|版权|知识产权|授权」命中",
+      "standards": [
+        {
+          "ref": "creativecommons",
+          "role": "primary",
+          "why": "关键词「许可|版权|知识产权|授权」命中",
+          "layer": "gov",
+          "body": "Creative Commons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "spdx-licenses",
+          "role": "support",
+          "why": "载体锚：产出形态「授权」的承载标准",
+          "layer": "gov",
+          "body": "SPDX",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    }
+  ]
+}

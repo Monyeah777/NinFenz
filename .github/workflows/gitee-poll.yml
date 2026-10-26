@@ -1,0 +1,47 @@
+name: gitee-poll
+# 📚 云端代收站 · Gitee 前端轮询（Y12′ 扩展 · 2026-09-07 · 零治理开放投稿）
+# 背景：投稿写入口原只在 GitHub Issues（国内进不去）；Gitee Issues 国内可达。
+# 流程：每 10 分钟醒来 → gitee_ingest.py 拉 Gitee open 投稿（标题【NF投稿】）
+#   → 同一入库核心（净化/空壳拒收/36进制编号/小写键查重/ALIAS 重建）
+#   → git 提交推双端（gitee 子令牌 + origin）→ Gitee Issue 回评双端链接 → 关闭
+# 依赖 Secrets：GITEE_TOKEN（Gitee 子令牌：issues 读写 + 仓库推送权限，作者在
+#   Gitee 设置生成——主令牌绝不共享，子令牌泄露可控）
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: library-write
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20          # 挂死上限（2026-10-01 统一）：轮询入库卡住不许拖到下个周期
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+      - name: Gitee 投稿轮询入库（拉取 → 入库 → 双端推送 → 回评关闭）
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: python3 .github/scripts/gitee_ingest.py
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: gitee-poll-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

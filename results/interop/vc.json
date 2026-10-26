@@ -1,0 +1,21 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://ninfenz.dev/ns/credentials/v1"
+  ],
+  "credentialSubject": {
+    "contracts": 27,
+    "id": "nf:conformance_report",
+    "receiptCount": 67,
+    "receiptRoot": "c3f1d109ff2c0dc83c9d55f2db46c82a494f9a060620311fd9781bf8cb481094",
+    "verdict": "conformant"
+  },
+  "issuer": "Monyeah777",
+  "type": [
+    "VerifiableCredential",
+    "NfConformanceCredential"
+  ],
+  "validFrom": "2026-10-26",
+  "x-nf-note": "派生自 protocol/conformance_report.json + protocol/RECEIPTS.json + protocol/approvals/*（纯派生，不新增真源）",
+  "x-nf-proof-status": "unsigned（本仓签名走 ssh 外挂锚 nf attest；未接 JWS/Data Integrity 签名套件——形状可读，不可验证，勿当凭证使用）"
+}

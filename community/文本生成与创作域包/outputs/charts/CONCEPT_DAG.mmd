@@ -1,0 +1,69 @@
+%% 概念前置图（由 community/文本生成与创作域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    B01-01
+    B01-03
+    B01-05
+    B01-07
+    B01-09
+    B01-11
+  end
+  subgraph P60[P60]
+    B01-02
+    B01-04
+    B01-06
+    B01-08
+    B01-10
+    B01-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-rdf11
+    STD-vega-lite
+    STD-w3c-prov-o
+    STD-w3c-tabular-data
+  end
+  B01-01 --> B01-03
+  B01-02 --> B01-03
+  B01-03 --> B01-04
+  B01-05 --> B01-06
+  B01-07 --> B01-08
+  B01-08 --> B01-09
+  B01-02 --> B01-09
+  B01-04 --> B01-11
+  B01-10 --> B01-12
+  B01-11 --> B01-12
+  B01-01 --> STD-commonmark
+  B01-07 --> STD-commonmark
+  B01-08 --> STD-commonmark
+  B01-09 --> STD-commonmark
+  B01-11 --> STD-commonmark
+  B01-03 --> STD-frictionless-table
+  B01-06 --> STD-frictionless-table
+  B01-09 --> STD-frictionless-table
+  B01-12 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  B01-01 --> STD-ietf-json-schema
+  B01-04 --> STD-ietf-json-schema
+  B01-07 --> STD-ietf-json-schema
+  B01-10 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  B01-02 --> STD-vega-lite
+  B01-03 --> STD-vega-lite
+  B01-05 --> STD-vega-lite
+  B01-06 --> STD-vega-lite
+  B01-10 --> STD-vega-lite
+  B01-12 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  B01-04 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o
+  B01-02 --> STD-w3c-tabular-data
+  B01-05 --> STD-w3c-tabular-data
+  B01-08 --> STD-w3c-tabular-data
+  B01-11 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

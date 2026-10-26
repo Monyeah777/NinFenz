@@ -1,0 +1,87 @@
+%% 概念前置图（由 community/AI能源与电力域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    D09-01
+    D09-03
+    D09-05
+    D09-07
+    D09-09
+    D09-11
+  end
+  subgraph P60[P60]
+    D09-02
+    D09-04
+    D09-06
+    D09-08
+    D09-10
+    D09-12
+  end
+  subgraph P80[P80]
+    STD-common-criteria
+    STD-cwe
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-gdpr
+    STD-hl7-fhir
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-nist-ai-rmf
+    STD-owasp-llm
+    STD-owasp-top10
+    STD-rdf11
+    STD-vega-lite
+    STD-w3c-prov-o
+    STD-w3c-tabular-data
+  end
+  D09-01 --> D09-02
+  D09-02 --> D09-03
+  D09-03 --> D09-04
+  D09-01 --> D09-04
+  D09-04 --> D09-05
+  D09-02 --> D09-05
+  D09-05 --> D09-06
+  D09-03 --> D09-06
+  D09-06 --> D09-07
+  D09-04 --> D09-07
+  D09-07 --> D09-08
+  D09-05 --> D09-08
+  D09-08 --> D09-09
+  D09-06 --> D09-09
+  D09-09 --> D09-10
+  D09-07 --> D09-10
+  D09-10 --> D09-11
+  D09-08 --> D09-11
+  D09-11 --> D09-12
+  D09-09 --> D09-12
+  D09-03 --> STD-common-criteria
+  D09-09 --> STD-common-criteria
+  D09-02 --> STD-cwe
+  D09-12 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  D09-11 --> STD-gdpr
+  D09-07 --> STD-hl7-fhir
+  D09-01 --> STD-ietf-json-schema
+  D09-05 --> STD-ietf-json-schema
+  D09-06 --> STD-ietf-json-schema
+  D09-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  D09-04 --> STD-mermaid
+  D09-09 --> STD-mermaid
+  D09-01 --> STD-nist-ai-rmf
+  D09-04 --> STD-nist-ai-rmf
+  D09-10 --> STD-nist-ai-rmf
+  D09-06 --> STD-owasp-llm
+  STD-owasp-top10 --> STD-owasp-llm
+  D09-02 --> STD-vega-lite
+  D09-03 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  D09-05 --> STD-w3c-prov-o
+  D09-08 --> STD-w3c-prov-o
+  D09-07 --> STD-w3c-prov-o
+  D09-12 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o
+  D09-08 --> STD-w3c-tabular-data
+  D09-10 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

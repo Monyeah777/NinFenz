@@ -1,0 +1,50 @@
+name: library-ingest
+# 📚 云端代收站（Y12 · 2026-09-07）
+# 痛点闭环：聊天 AI「会读不会写」——无法上传云端。
+# 解法：作者在 Issues 开题（标题【NF投稿】+ 粘贴产物全文）→ 本机器人自动
+#   分配 NF-编号 → 入库 library/NF-XXXX.md → 更新 INDEX → 推送 → 回评双端链接。
+# 「AI 不写，人只粘贴一次，剩下全自动」。
+# 注意：仅标题以【NF投稿】开头触发；作者白名单在脚本内校验（防公开仓库滥用）。
+on:
+  issues:
+    types: [opened]
+concurrency:
+  group: library-write
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+jobs:
+  ingest:
+    if: startsWith(github.event.issue.title, '【NF投稿】')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: 自动入库（解析 → 编号 → 写文件 → 更新 INDEX → 推送 → 回评）
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          # 正文**刻意不走 env**：Linux 对单条 env 字符串有 32 页（131072 字节）硬限，超限时
+          # 本步骤会直接 E2BIG（Errno 7）而起不来——那样 `MAX_BODY_CHARS` 的「超长拒收」
+          # 永远不生效（2026-09-24 起 CI 连红的成因）。机器人改为经 API 取正文
+          # （.github/scripts/library_ingest.py::resolve_body，与 Gitee 通道同构）。
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: python3 .github/scripts/library_ingest.py
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: library-ingest-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

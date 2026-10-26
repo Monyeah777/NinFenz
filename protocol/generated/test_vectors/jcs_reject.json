@@ -1,0 +1,318 @@
+{
+  "schema": "nf-test-vectors/1",
+  "note": "P-C3 L4 负例向量：不合法输入三实现都必须**非零退出且无标准输出**（不许静默降级为近似值）。",
+  "vectors": [
+    {
+      "id": "jcs/reject-dup-key",
+      "spec_clause": "RFC8785/3.1",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_dupkey.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "重复键（I-JSON 不许）",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_dupkey.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_dupkey.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_dupkey.badjson"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/reject-trailing-comma",
+      "spec_clause": "RFC8785/3.1",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_trailing_comma.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "尾随逗号",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_comma.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_comma.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_comma.badjson"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/reject-leading-zero",
+      "spec_clause": "RFC8785/3.1",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_leading_zero.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "前导零数字",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_leading_zero.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_leading_zero.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_leading_zero.badjson"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/reject-nan",
+      "spec_clause": "RFC8785/3.2.2.3",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_nan.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "非有限数",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_nan.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_nan.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_nan.badjson"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/reject-lone-surrogate",
+      "spec_clause": "RFC8785/3.2.2.2",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_lone_surrogate.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "孤立代理（I-JSON 不许）",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_lone_surrogate.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_lone_surrogate.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_lone_surrogate.badjson"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/reject-trailing-content",
+      "spec_clause": "RFC8785/3.1",
+      "level": "L4",
+      "expect": "fail",
+      "input": "protocol/generated/test_vectors/jcs_bad_trailing_content.badjson",
+      "compare_rule": "byte",
+      "expected": "",
+      "note": "尾随内容",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_content.badjson"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_content.badjson"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_bad_trailing_content.badjson"
+          ]
+        }
+      }
+    }
+  ]
+}

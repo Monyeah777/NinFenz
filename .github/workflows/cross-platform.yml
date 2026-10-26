@@ -1,0 +1,109 @@
+name: cross-platform
+# 三平台同口径门禁（顶层化目标 · 静态可核验「三平台CI全绿」）
+#
+# 为什么需要：此前 10 个工作流**全部只跑 ubuntu-latest**——而本仓大量缺陷恰恰是平台相关的
+# （Windows 实测过：GBK/locale 下 `pip install -r` 抛 UnicodeDecodeError、批量落盘偶发
+# EINVAL(22)、路径分隔符；macOS 的 bash 版本与 GNU 工具差异同理）。只测一平台 = 只在一种
+# 环境里证明「可复现」。
+#
+# 口径：三平台跑**同一套**全量门禁（bash verify.sh --full）+ 同一套机器可读报告新鲜度校验；
+# 依赖走固定清单（.github/requirements-ci.txt），平台专属系统库只在 Linux 装。
+#
+# 档位（2026-10-19 修）：此前这里只是裸跑 `bash verify.sh`——而 verify.sh 自 P3 分层起
+# **默认档已是 quick**（42 条静态 check + 受影响测试），只有 `--full` 才是发布结论
+# （verify.sh 参数区注释 + ci-verify.yml 的分层纪律）。裸跑 = 把开发档当发布档，属于
+# 「silent quick」：看起来三平台全绿，实际全量测试一条没跑。故显式 `--full`，
+# 并由 desktop/tests/test_ci_visibility.py::test_every_workflow_invocation_declares_tier
+# 把「任何 workflow 调 verify.sh 都必须显式给档位」立成机检，防回潮。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: gate-${{ matrix.os }}
+    strategy:
+      fail-fast: false          # 三平台各自出结论，不因一个红就掩盖另两个
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    env:
+      # Windows runner 默认 ANSI 码页：子进程把 CJK 写进文件/管道会 UnicodeEncodeError
+      # （实测 2026-09-29：verify.sh 内部已统一，本作业再兜一层，覆盖 verify.sh 之外的步骤）。
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          # 2026-10-22：全量 verify.sh 含 p6_evaluations（依赖 git tag/全历史）；浅克隆必红。
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装测试依赖（固定清单；Linux 另装 EGL 系统库）
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            sudo apt-get update
+            sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          fi
+          python -m pip install -r .github/requirements-ci.txt
+      - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项全量门禁必红）
+        shell: bash
+        run: |
+          # 这 4 项都是 **gitignored 或 empty-by-design**，干净 clone 里不存在，
+          # 而 verify.sh --full 的若干 check 会读它们。实测来源见 docs/ONBOARDING 与
+          # .rivet 归档《新工作区上手说明》。缺一项的表现：
+          #   .gitee/ISSUE_TEMPLATE → check32 红；engine/dotnet/dist 与 obj → asset_contract 计数不符；
+          #   wasm 产物 → test_plugin_wasm_host 红；canonical/target → 并发测试报「工具越权写」。
+          mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+          if [ "$RUNNER_OS" = "Linux" ] || [ "$RUNNER_OS" = "Windows" ] || [ "$RUNNER_OS" = "macOS" ]; then
+            echo "前置目录已建"
+          fi
+      - name: 全量门禁（三平台同口径：bash verify.sh --full；日志落盘供失败诊断）
+        shell: bash
+        env:
+          # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ check12 等明细日志可下载。
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          set -o pipefail
+          bash verify.sh --full 2>&1 | tee verify.log
+      - name: 上传门禁日志（三平台各留一份；失败时同样上传）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: verify-log-${{ matrix.os }}
+          path: |
+            verify.log
+            .nf-logs/
+          if-no-files-found: warn
+          include-hidden-files: true
+      - name: 门禁机器可读报告（本 run 实时重算 → 工件；**绝不**上传受跟踪的陈旧报告）
+        # N1（审计 P2）：同 ci-verify —— 失败时上传的必须是本 run 现算的结论。
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p .artifacts
+          python scripts/verify_report.py --write
+          python scripts/verify_report.py --json > .artifacts/verification-report.json || true
+          python scripts/verify_report.py --check
+      - name: 上传门禁报告（三平台各留一份·本 run 结论）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: verification-report-${{ matrix.os }}
+          path: .artifacts/verification-report.json
+          if-no-files-found: warn

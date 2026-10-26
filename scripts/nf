@@ -1,0 +1,210 @@
+#!/usr/bin/env sh
+# NF 终端启动器（POSIX）：无参数 = 直接进交互终端，其余参数原样透传 nf CLI。
+#
+# 用法：
+#   ./scripts/nf                 # 交互终端（能力菜单 + 命令直通）
+#   ./scripts/nf shell --exec "nf doctor"   # 非交互（CI/脚本）
+#   ./scripts/nf market --list   # 任意子命令透传
+#
+# 说明：本文件只是启动器，零逻辑——命令真源始终是 scripts/nf.py。
+#
+# 执行层常驻守护快路（2026-09-28）：`nf daemon start` 之后，本启动器优先把命令经
+# 127.0.0.1 的一次套接字往返交给常驻进程执行（热进程内 --version 1.7 ms）。
+# 客户端**只用 bash 内建**（/dev/tcp + printf + read -N）：MSYS/Windows 上每 spawn 一个
+# 外部进程（sed/head）约 100 ms，用外部命令会把收益吃光——实测踩过。
+# 任何一步不成立（没守护状态文件、没有 bash、连不上、头不是数字）都**静默回退**到
+# python 直跑，所以本快路只加速、不改可用性；`nf daemon stop` 即回到原路径。
+set -e
+# 仓库根：**不用外部 `dirname`**。实测（2026-09-29，min of 5）：启动器比「同一条命令 python 直跑」
+# 多花 164 ms，其中外部 `dirname` + 子 shell ≈ 58 ms、一次命令替换（`$(command -v …)`）≈ 30 ms、
+# 「真起一次解释器」的探针 ≈ 60 ms——**它们都是按「每条命令」计的固定成本**。这里改用参数展开 +
+# 内建 `cd`（零 fork），并把它压到 fast path 之前只做一次。
+_nf_pwd=${PWD:-.}
+case "$0" in
+  */*) _nf_dir=${0%/*} ;;
+  *)   _nf_dir=. ;;
+esac
+cd "$_nf_dir"
+NF_ROOT=$PWD
+cd "$_nf_pwd"
+unset _nf_dir _nf_pwd
+
+# 解释器选择 + 终判（**纯内建**，只在真要起解释器时才调用）。
+# ① 为什么 Windows 先要 `python`：`python3` 常是 Microsoft Store 的**应用别名桩**
+#    （`…/WindowsApps/python3`），起一次实测 ~300 ms 且跑不了仓库脚本（rc=49）——先按路径排掉它。
+# ② 为什么终判要**缓存**：真起一次能确诊「存在但跑不了」的解释器，但那就是一次完整解释器启动
+#    （本机 60–107 ms）。旧写法把它放在**每条命令**上，于是 `bash scripts/nf --version` 比
+#    `python scripts/nf.py --version` 还慢。现按「解释器名 + 平台」缓存结论，命中时只读一个小文件
+#    （`read` 内建，零 fork）；解释器换了（键变）或起不来（终判失败）都会重新确诊。
+nf_pick_py() {
+  case "${OSTYPE:-}" in
+    msys*|cygwin*|win32*)
+      local _n="" _c="" _hit=""
+      for _n in python python3; do
+        _c=$(command -v "$_n" 2>/dev/null) || continue
+        case "$_c" in *[Ww]indows[Aa]pps*) continue ;; esac
+        NF_PY=$_n; _hit=1; break
+      done
+      [ -n "$_hit" ] || NF_PY=python
+      ;;
+    *)
+      NF_PY=python3
+      command -v python3 >/dev/null 2>&1 || NF_PY=python
+      ;;
+  esac
+  nf_confirm_py
+}
+
+# 「解释器节食」：`-S` 起解释器能省掉本机 site 定制（实测 ≈60 ms/次：pywin32_bootstrap 33 ms +
+# _distutils_hack 22 ms + usercustomize），代价是 site-packages 也被一起关掉。而缺 PyYAML 的后果
+# **不是「慢一点」而是「静默算错」**：`lazy_yaml` 会按设计退回内置子集解析器——实测 `nf doctor`
+# 的 tool_face 1/1/1→0/0/0、world_model 1/4/3/4→0/0/0/0。故 `scripts/nf.py` 在 `-S` 下把
+# site-packages **显式加回**，而这里做一次**行为探针**（两模式下的「可导入第三方」必须逐字相同），
+# 结论按「解释器 + 平台」缓存：探针有任何异常/不一致 ⇒ 不加 `-S`（**只加速、不改可用性**）。
+# `NF_NO_DIET=1` 可整体关掉（诊断/对照用）。
+nf_diet_flag() {
+  case "${NF_NO_DIET:-}" in 1|true|yes|on) return 0 ;; esac
+  local _c="${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/diet.flag" _k _known=""
+  _k="$NF_PY|${OSTYPE:-}"
+  if [ -f "$_c" ]; then IFS= read -r _known < "$_c" 2>/dev/null || _known=""; fi
+  case "$_known" in
+    "$_k|-S") printf '%s' "-S"; return 0 ;;
+    "$_k|")   return 0 ;;
+  esac
+  local _p='import os, sys; sys.path.insert(0, os.path.join(sys.argv[1], "..", "desktop", "src")); from core import interp_diet as d; d.restore(); print("OK:" + d.available())'
+  local _a="" _b="" _flag=""
+  _a=$("$NF_PY" -S -c "$_p" "$NF_ROOT" 2>/dev/null) || _a=""
+  _b=$("$NF_PY" -c "$_p" "$NF_ROOT" 2>/dev/null) || _b=""
+  if [ -n "$_a" ] && [ "$_a" = "$_b" ]; then _flag="-S"; fi
+  _known=${_c%/*}
+  [ "$_known" = "$_c" ] || mkdir -p "$_known" 2>/dev/null || true
+  printf '%s\n' "$_k|$_flag" > "$_c" 2>/dev/null || true
+  printf '%s' "$_flag"
+}
+
+nf_confirm_py() {
+  local _ok="${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/interpreter.ok"
+  local _key="$NF_PY|${OSTYPE:-}"
+  local _known=""
+  if [ -f "$_ok" ]; then IFS= read -r _known < "$_ok" 2>/dev/null || _known=""; fi
+  if [ "$_known" = "$_key" ]; then return 0; fi
+  # 冷启动：先算「节食」判据——它的**普通那一跑**就是一次真解释器启动，兼作「这个解释器跑得起来
+  # 吗」的终判（省掉一条命令的固定成本）。判据为空有两种可能：真的不该节食，或解释器起不来。
+  local _d=""
+  _d=$(nf_diet_flag 2>/dev/null) || _d=""
+  if [ -z "$_d" ] && ! "$NF_PY" -c "" >/dev/null 2>&1; then
+    NF_PY=python
+    _key="python|${OSTYPE:-}"
+    nf_diet_flag >/dev/null 2>&1 || true         # 换了 NF_PY ⇒ 判据按键重算（新解释器可能能节食）
+  fi
+  _known=${_ok%/*}
+  [ "$_known" = "$_ok" ] || mkdir -p "$_known" 2>/dev/null || true
+  printf '%s\n' "$_key" > "$_ok" 2>/dev/null || true   # 落盘只为省下一次探测；失败即静默重探
+  return 0
+}
+
+# 守护快路（纯内建）：成功即 exit 用命令自身退出码；任何不确定 → return 127 走 python。
+daemon_try() {
+  [ -n "${BASH_VERSION:-}" ] || return 127          # 需要 bash 的 /dev/tcp
+  case "${1:-}" in
+    daemon|shell|terminal|serve|lsp) return 127 ;;  # 长驻/自指命令不走守护（与守护拒绝面一致）
+  esac
+  # 明文框是**逐行** argv：参数含换行会被拆开、**静默改变参数个数**（实测：`help` 收到
+  # `line1\nline2` 时只看到 `line1`）——这类命令不接快路，交 python 直跑（JSON 框才支持任意字符）。
+  local _nf_a=""
+  for _nf_a in "$@"; do
+    case "$_nf_a" in *$'\n'*) return 127 ;; esac
+  done
+  NF_STATE="${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/daemon.json"
+  [ -f "$NF_STATE" ] || return 127
+  local s rest
+  IFS= read -r s < "$NF_STATE" || return 127
+  case "$s" in
+    *'"port": '* ) ;; *) return 127 ;;
+  esac
+  rest=${s#*'"port": '}
+  NF_PORT=${rest%%[!0-9]*}
+  rest=${s#*'"token": "'}
+  NF_TOKEN=${rest%%\"*}
+  [ -n "$NF_PORT" ] && [ -n "$NF_TOKEN" ] || return 127
+  { exec 9<>"/dev/tcp/127.0.0.1/$NF_PORT"; } 2>/dev/null || return 127
+  printf 'NFREQ 1 %s\n%s\n%s\n' "$NF_TOKEN" "$PWD" "$#" >&9
+  local NF_A=""
+  for NF_A in "$@"; do printf '%s\n' "$NF_A" >&9; done
+  local NF_CODE="" NF_OLEN="" NF_ELEN=""
+  IFS= read -r NF_CODE <&9 || { exec 9<&-; return 127; }
+  IFS= read -r NF_OLEN <&9 || { exec 9<&-; return 127; }
+  IFS= read -r NF_ELEN <&9 || { exec 9<&-; return 127; }
+  case "$NF_CODE$NF_OLEN$NF_ELEN" in
+    *[!0-9]*) exec 9<&-; return 127 ;;             # 头不是数字 = 不是本协议，回退
+  esac
+  # 读正文：**不用 `read -N`** —— 它是 bash 4+ 才有的（macOS 自带 bash 3.2 没有，实测
+  # 2026-09-29 三平台门禁 macOS 腿：读空 + `|| true` 吞掉 ⇒ rc=0 却零输出）。改用 `-d ''`
+  # （分隔符设 NUL，故不会在正文换行处短读）+ `-n`（bash 2+ 即有）；LC_ALL=C 下按**字节**计。
+  if [ "$NF_OLEN" -gt 0 ]; then
+    local NF_OUT=""
+    LC_ALL=C IFS= read -r -d '' -n "$NF_OLEN" NF_OUT <&9 || true
+    printf '%s' "$NF_OUT"
+  fi
+  if [ "$NF_ELEN" -gt 0 ]; then
+    local NF_ERR=""
+    LC_ALL=C IFS= read -r -d '' -n "$NF_ELEN" NF_ERR <&9 || true
+    printf '%s' "$NF_ERR" >&2
+  fi
+  exec 9<&-
+  exit "$NF_CODE"
+}
+
+if [ "$#" -eq 0 ]; then
+  nf_pick_py
+  NF_DIET=$(nf_diet_flag)
+  exec "$NF_PY" ${NF_DIET} "$NF_ROOT/nf.py" shell
+fi
+if [ -n "${BASH_VERSION:-}" ]; then
+  # 快路**只加速、不改可用性**：`daemon_try` 用 `return 127` 表示「不接手」，而它在 `if` 的
+  # **分支体**里（不是条件位），`set -e` 下非零返回会**直接终止脚本**——`exec` 那行永远到不了。
+  # 实测后果：守护没在跑时 `nf <任何命令>` 一律 **rc=127 且零输出**（连 `nf shell` / `nf serve`
+  # 这种本来就必须回退的也一样）。故这里显式吞掉「不接手」：
+  daemon_try "$@" || true
+  # 自动拉起（**默认开 · 非阻塞**）：快路不接手（多半是守护不在）⇒ 把带 `--watch` 的守护
+  # **丢到后台**拉起，本条命令照常走 python 直跑、**不等它**。
+  # 为什么可以默认开（2026-09-29 实测）：起守护确实要 ~0.65 s，但后台起**不占本条命令的时间**
+  # （首条只多一次 fork ≈10 ms），而**从第二条起任命令 40–80 ms**（冷直跑 300–900 ms）。
+  # 旧「默认关」的理由是「首条要付 0.65 s」——非阻塞形态下这条不成立，故默认关 → 默认开。
+  # `NF_AUTOSTART=0|false|no|off` 可关；长驻/自指命令（daemon/shell/terminal/serve/lsp）照旧不拉。
+  case "${NF_AUTOSTART:-1}" in
+    0|false|no|off) : ;;
+    *)
+      case "${1:-}" in
+        daemon|shell|terminal|serve|lsp) : ;;          # 长驻/自指命令本就不走守护，别去起它
+        *)
+          # **串行化拉起**：`daemon start` 要 ~0.65 s 才写状态文件，而连发命令会在这个窗口里各拉一次
+          # ⇒ 赛出**多个守护**（各自空转到 idle；实测一次套件漏下 **13 个** 空转进程）。故先写一个
+          # 「正在拉起」标记（60 s 自愈：崩溃/半途失败不会永久封住），窗口内不重复拉。
+          _dm_marker="${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/daemon.starting"
+          _dm_now=${EPOCHSECONDS:-0}
+          _dm_prev=""
+          if [ -f "$_dm_marker" ]; then IFS= read -r _dm_prev < "$_dm_marker" 2>/dev/null || _dm_prev=""; fi
+          case "$_dm_prev" in ''|*[!0-9]*) _dm_prev=0 ;; esac
+          if [ "$_dm_now" -gt 0 ] && [ $((_dm_now - _dm_prev)) -lt 60 ]; then
+            :                                          # 上一轮已经拉过 ⇒ 本条不重复拉
+          else
+            nf_pick_py
+            _dm_dir=${_dm_marker%/*}
+            [ "$_dm_dir" = "$_dm_marker" ] || mkdir -p "$_dm_dir" 2>/dev/null || true
+            if [ "$_dm_prev" -gt 0 ]; then rm -f -- "$_dm_marker" 2>/dev/null || true; fi
+            if (set -C; printf '%s\n' "$_dm_now" > "$_dm_marker") 2>/dev/null; then
+              { "$NF_PY" $(nf_diet_flag) "$NF_ROOT/nf.py" daemon start --watch >/dev/null 2>&1 & } || true
+            fi
+          fi
+          ;;
+      esac
+      ;;
+  esac
+elif command -v bash >/dev/null 2>&1 \
+     && [ -f "${NARRATIVE_FORGE_HOME:-$HOME/.NinFenz}/daemon.json" ]; then
+  exec bash "$0" "$@"                                # 非 bash 外壳但守护在：换 bash 走快路
+fi
+# 解释器选择 + 终判（带缓存；见上方 nf_pick_py 的说明）——只在**真要起解释器**时才付这笔钱
+nf_pick_py
+exec "$NF_PY" $(nf_diet_flag) "$NF_ROOT/nf.py" "$@"

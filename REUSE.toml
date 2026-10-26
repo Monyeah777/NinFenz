@@ -1,0 +1,59 @@
+# REUSE 3.x 声明（2026-10-10 全仓审计 §11af：此前 REUSE 0/3490，无 LICENSES/）。
+# 口径（2026-10-25 分层许可）：代码/工具 = AGPL-3.0-only；协议规范文本 = CC BY 4.0；
+# library/ 与 community/ 的第三方投稿 = 投稿人版权（LicenseRef-Community-Submission，原样再分发）。
+version = 1
+SPDX-PackageName = "NinFenz"
+SPDX-PackageSupplier = "Monyeah777"
+SPDX-PackageDownloadLocation = "https://github.com/Monyeah777/NinFenz"
+
+[[annotations]]
+path = ["**/*"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = ["library/NF-*.md", "library/anchors/**", "community/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "投稿人（见文件头 author / sources）"
+SPDX-License-Identifier = "LicenseRef-Community-Submission"
+
+[[annotations]]
+path = ["01_核心协议.md", "02_联动注册表.md", "03_管线库/**", "04_模块库/**", "05_资产库/**",
+        "06_Agent执行协议.md", "07_*.md", "protocol/**", "docs/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["LICENSE"]
+precedence = "override"
+SPDX-FileCopyrightText = "Free Software Foundation, Inc."
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = ["LICENSING.md", "DUAL-LICENSING-NOTICE.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "CLA.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+#: 商业许可文档本体 → LicenseRef-Commercial（让 REUSE 能定位该许可文本）
+[[annotations]]
+path = ["COMMERCIAL.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "LicenseRef-Commercial"
+
+#: 历史 MIT 授权通知 → MIT（让 REUSE 能定位历史许可文本；该文件本身以 MIT 授权）
+[[annotations]]
+path = ["MIT-NOTICE.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Monyeah777"
+SPDX-License-Identifier = "MIT"
+
+#: RustPython parser snapshots retain their upstream MIT license and notices.
+[[annotations]]
+path = ["engine/rust/vendor/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "RustPython Team and contributors; local modifications 2026 Monyeah777"
+SPDX-License-Identifier = "MIT"

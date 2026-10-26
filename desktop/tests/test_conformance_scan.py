@@ -1,0 +1,1238 @@
+#!/usr/bin/env python3
+"""43 A2 —— Conformance 分级扫描单测（声明 ≤ 可证、防虚标）。"""
+import builtins
+import contextlib
+import io
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest import mock
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+
+from core import import_graph  # noqa: E402 - 闭包解析已迁到该件（2026-09-29 拆环）
+from core import asset_density as ad  # noqa: E402
+from core import asset_ledger_projection as alp  # noqa: E402
+from core import conformance_scan as cs  # noqa: E402
+from core import concept_graph as cg  # noqa: E402
+from core import repo_face as _repo_face  # noqa: E402
+from core import domain_pack as dpk  # noqa: E402
+from core import layer_model as lm  # noqa: E402
+from core import output_forms as of  # noqa: E402
+from core import pack_combo as pcb  # noqa: E402
+from core import purity_scan as ps  # noqa: E402
+from core import quality_depth_scan as qd  # noqa: E402
+from core import schema_lint as sl  # noqa: E402
+
+_ROOT_KEY = os.path.normcase(os.path.abspath(ROOT))
+
+
+def _key(path):
+    """读盘口径的路径键（绝对 + normcase）——与内容键缓存内部的口径保持一致。"""
+    try:
+        return os.path.normcase(os.path.abspath(str(path)))
+    except (TypeError, ValueError):
+        return ""
+
+
+@contextlib.contextmanager
+def _trace_opens():
+    """记录作用域内**尝试打开**与**成功打开**的文件（两种都要，判据不同）。
+
+    失败路径（`FileNotFoundError` 等）不会进 `reads`——探测不存在的文件不是输入依赖；
+    `tried` 保留它们，用来区分「合法探测」与「输入面漏声明」。
+    """
+    real_io, real_builtins = io.open, builtins.open
+    reads, tried = [], []
+
+    def spy(file, *a, **k):
+        tried.append(_key(file))
+        handle = real_io(file, *a, **k)
+        reads.append(_key(file))
+        return handle
+
+    io.open = spy
+    builtins.open = spy
+    try:
+        yield reads, tried
+    finally:
+        io.open = real_io
+        builtins.open = real_builtins
+
+
+def _covered(patterns):
+    """输入面 glob 展开出的文件键集（**只取文件**：`**/*` 会把目录也匹配进来）。"""
+    root = pathlib.Path(ROOT)
+    out = set()
+    for pat in patterns:
+        for p in root.glob(pat):
+            if p.is_file():
+                out.add(_key(p))
+    return out
+
+
+class ConformanceScanTest(unittest.TestCase):
+    def test_repo_scan_clean(self):
+        issues, stats = cs.scan(ROOT)
+        self.assertEqual(issues, [])
+        self.assertGreaterEqual(stats["modules_mc"], 23)
+        self.assertGreaterEqual(stats["packages"], 5)
+        self.assertGreaterEqual(stats["export_items"], 4)
+
+    def test_overclaim_detected(self):
+        """模块未在册却声明 L2/L3 = 虚标 → 被拒。"""
+        issues = []
+        order = {"L1": 1, "L2": 2, "L3": 3}
+        declared, provable = "L3", 2
+        if order[declared] > provable:
+            issues.append("虚标")
+        self.assertEqual(issues, ["虚标"])
+
+    def test_evidence_ids_cover_repo(self):
+        """装配在册证据集须覆盖全部机器可加载模块文档（44 = 13 官方 + 31 社区）。"""
+        evidence = set(cs._evidence_ids(ROOT))
+        self.assertIn("M00", evidence)
+        self.assertIn("通用:M10", evidence)
+
+
+class NestedMemoSharingTest(unittest.TestCase):
+    """嵌套 `read_memo()` 是**细化**不是隔离；冷却边界＝最外层那次只读调用。
+
+    依据（实测）：嵌套作用域过去各起一份空缓存，`evaluate`（外层）刚读过的语料在
+    `quality_depth_scan`（内层）里又读一遍——一次 evaluate 因此白开上千次文件。
+    改共享后：`os.scandir` 5403 → 3889（−28%），同进程交错 A/B 的 evaluate
+    2749 → **1883 ms（−31.5%）**。两条性质都要钉住：① 嵌套内必须复用语料；
+    ② **最外层出口仍要清空**——否则就变成跨调用陈旧。
+    """
+
+    @contextlib.contextmanager
+    def _count_opens(self, path):
+        opened = []
+        real = io.open
+
+        def spy(file, *a, **k):
+            opened.append(os.path.basename(str(file)))
+            return real(file, *a, **k)
+
+        io.open = spy
+        try:
+            yield opened
+        finally:
+            io.open = real
+
+    def test_nested_scope_reuses_outer_reads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp) / "a.txt"
+            p.write_text("一", encoding="utf-8")
+            with cs.read_memo():
+                self.assertEqual("一", cs.read_text_cached(p))
+                with self._count_opens(p) as opened:
+                    with cs.read_memo():                 # 嵌套：应命中外层缓存
+                        self.assertEqual("一", cs.read_text_cached(p))
+                self.assertEqual([], opened,
+                                 "嵌套作用域必须复用外层已读内容（不许重读）")
+
+    def test_outermost_exit_clears_and_next_scope_sees_new_content(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp) / "a.txt"
+            p.write_text("一", encoding="utf-8")
+            with cs.read_memo():
+                self.assertEqual("一", cs.read_text_cached(p))
+                with cs.read_memo():
+                    self.assertEqual("一", cs.read_text_cached(p))
+            p.write_text("二", encoding="utf-8")          # 最外层已退出 → 必须重读
+            with cs.read_memo():
+                self.assertEqual("二", cs.read_text_cached(p))
+                with cs.read_memo():
+                    self.assertEqual("二", cs.read_text_cached(p))
+            self.assertIsNone(cs._READ_MEMO, "最外层出口必须把共享缓存整体清掉")
+            self.assertIsNone(cs._TREE_MEMO)
+
+    def test_nested_scope_shares_pattern_and_tree_memo(self):
+        """枚举面（子树清单 / 模式结果）同样跨嵌套共享，且最外层出口即清。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp)
+            (p / "sub").mkdir()
+            (p / "sub" / "a.md").write_text("x", encoding="utf-8")
+            with cs.read_memo():
+                self.assertEqual(["sub/a.md"], cs.iter_files(tmp, "**/*.md"))
+                scans = []
+                real = os.scandir
+
+                def counting(path="."):
+                    scans.append(path)
+                    return real(path)
+
+                os.scandir = counting
+                try:
+                    with cs.read_memo():                 # 嵌套：不得重走文件系统
+                        self.assertEqual(["sub/a.md"], cs.iter_files(tmp, "**/*.md"))
+                finally:
+                    os.scandir = real
+                self.assertEqual([], scans, "嵌套内重复枚举不得重走文件系统")
+            (p / "sub" / "b.md").write_text("x", encoding="utf-8")
+            with cs.read_memo():
+                self.assertEqual(["sub/a.md", "sub/b.md"], cs.iter_files(tmp, "**/*.md"),
+                                 "新作用域必须看到新文件")
+
+
+class FaceReuseBudgetTest(unittest.TestCase):
+    """一次 `nf score` 的**面指纹重算次数**——**确定性判据**（本仓纪律：能数就别计时）。
+
+    依据（实测 2026-09-29，连测两轮逐位一致）：确知改 `docs/` ⇒ **1** 次；确知改产物件 ⇒ **2** 次；
+    确知改 `04_模块库` ⇒ **4** 次；**说不清 ⇒ 6 次**（fail-closed：一律全算）。
+
+    为什么值得立成判据：次数是**确定量**（CI 上墙钟会抖，次数不会），它能把「某个面又开始全量重算」
+    这类回归当场抓住——例如把 `face_fingerprint` 换回 `content_fingerprint`、或新增扫描器却忘了申报面。
+    改这些数字必须给依据。
+
+    **模块身份**（2026-09-29 实测踩到）：本判据必须观测**当前**的 `core.conformance_scan` 实例。
+    `test_watch.test_resident_layer_survives_a_code_reload` 会逼 `daemon._sync_code` 把 `core.*`
+    从 `sys.modules` 里摘掉重载（守护不跑旧代码的机制），于是进程里同时存在**新旧两份**模块对象：
+    而 `regression_score._count` 是 `__import__` 现取 ⇒ 它调的是**新**实例；本模块早先 import 的
+    `cs` 是**旧**实例。拿旧实例的 `_FACE_FP_STATS` 当观测面会读出「重算 0 次」（看着像 fail-closed
+    失效，其实是**看着像 bug 的读数**）。所以这里在用例内**重新 import** 一次，绑定当前实例。
+    """
+
+    KNOWN_CASES = (("改文档", ("docs/44_m2_ai通用数据规范.md",), 1),
+                   ("改包产物件", ("community/ai能力资源域包/outputs/index.json",), 2),
+                   ("改 04_模块库", ("04_模块库/通用类/m00_数据槽总线.md",), 4))
+    UNKNOWN_FULL_COUNT = 6
+
+    def test_fingerprint_recompute_budget(self):
+        import importlib
+        from core import daemon as dm
+        cs = importlib.import_module("core.conformance_scan")   # 绑**当前**实例（见类 docstring）
+        rs = importlib.import_module("core.regression_score")
+        qds = importlib.import_module("core.quality_depth_scan")
+
+        def count(known, paths):
+            cs.clear_changes()
+            if known:
+                cs.note_changes(paths)
+            dm.reset_process_caches()
+            before = cs._FACE_FP_STATS["recomputes"]
+            rs.evaluate(ROOT)
+            return cs._FACE_FP_STATS["recomputes"] - before
+
+        cs.install_resident(ROOT)
+        try:
+            rs.evaluate(ROOT)                        # 预热：把各面指纹填进缓存
+            with cs.read_memo():
+                cs.content_fingerprint(ROOT, qds.QD_INPUTS)
+            rs.evaluate(ROOT)
+            for label, paths, limit in self.KNOWN_CASES:
+                n = count(True, paths)
+                self.assertLessEqual(n, limit,
+                                     "%s 时重算了 %d 个面指纹（上限 %d）——复用是不是失效了？"
+                                     % (label, n, limit))
+            n_unknown = count(False, ())
+            self.assertGreaterEqual(n_unknown, max(c[2] for c in self.KNOWN_CASES),
+                                    "说不清时必须按「全都可能变了」处理（fail-closed）")
+            self.assertEqual(self.UNKNOWN_FULL_COUNT, n_unknown,
+                             "说不清时的全算是 %d 个面；这个数字变了要给依据"
+                             % self.UNKNOWN_FULL_COUNT)
+        finally:
+            cs.clear_changes()
+
+
+class FaceFingerprintTest(unittest.TestCase):
+    """`face_fingerprint`：值必须与 `content_fingerprint` **逐位相同**，且只在「确知没变」时复用。
+
+    依据（实测 2026-09-29）：`memo_pair` 的每个站点都要按面取指纹（各站点合计 ~60–80 ms/新状态），
+    而一次改动只碰得到其中少数几个面。把「确知变更面」用到键层后，其余面整个免算（逐包键那一处已实测
+    109 → 3 次）。
+    """
+
+    def test_value_matches_plain_fingerprint(self):
+        pats = ("04_模块库/*/*.md", "docs/*.md", "community/*/modules/*.md")
+        self.assertEqual(cs.content_fingerprint(ROOT, pats), cs.face_fingerprint(ROOT, pats),
+                         "复用不许改变指纹值（逐位相同）")
+
+    def test_incremental_equals_full_recompute(self):
+        """**增量路径必须与整面重算逐位相同**（成员不变 ⇒ 只更新摘要 + 重哈希，不许改值）。
+
+        依据（实测 2026-09-29）：本函数缓存了每张面的「有序路径 + 逐件摘要」⇒ 确知只改了内容时，
+        只需更新那几件的摘要再重哈希（帧格式与整面一致），省掉宽面 3000+ 次摘要查询（~10 ms）；
+        只有**成员集合变了**（新增/删除）才整面重建。这条判据把「省算」钉在「值不许变」上。
+
+        前提（守护的真实路径）：读层已按**同一批**路径精确失效（`drop_resident`＝失效正文/摘要 +
+        记下确知变更）。只调 `note_changes` 会让 `_payload_digest` 从常驻层取到**旧摘要**——
+        那是探针自己绕过了读层失效，不是实现缺陷。
+
+        另一条前提（实测踩到，故在这里钉死）：监听的相对路径是**小写**，`iter_files` 是**真实
+        大小写**（`Face/F1.md`）⇒ 判定「成员集合有没有变」必须**大小写不敏感**，否则改一件内容会被
+        误判成新增件、增量路径静默退化（安全但白算）。
+
+        夹具纪律（2026-09-29 CI 首跑红因）：模式的**固定段与后缀必须写成真实大小写**（`Face/*.md`）。
+        `_segment_regex` 只在 `os.name == "nt"` 时忽略大小写（对齐 `Path.glob` 的平台行为），故
+        POSIX 上小写模式匹配不到 `Face/` ⇒ 面为空 ⇒ 本判据**空转**（三平台 CI 里表现为「增量 0 次」）。
+        大小写不敏感只该落在**成员集合比对**这一处（监听小写 ↔ `iter_files` 真实大小写），
+        不该靠文件系统替我们兜。空转由下面的「面必须非空」断言当场拦下。
+
+        「监听的写法」按**本平台是否真有监听**取：`core.watch` 只在 Windows 落地
+        （`available()` ≡ `os.name == "nt"`），其路径约定是**小写**；无监听的平台没有这个约定
+        （常驻层只会被测试直接装）。两侧都用 `watch.available()` 选写法，效果相同——都让传入写法
+        与 index 键（已 `lower()`）**大小写不同**，从而都逼出「成员比对必须折叠大小写」；
+        将来 POSIX 监听落地时这里自动切回小写继续把关。
+        """
+        import pathlib
+        from core import watch as _watch
+        _spell = (lambda rel: rel.lower()) if _watch.available() else (lambda rel: rel)
+        with tempfile.TemporaryDirectory() as tmp:
+            d = pathlib.Path(tmp, "Face")
+            d.mkdir(parents=True)
+            for i in range(3):
+                (d / ("F%d.md" % i)).write_text("v1-%d\n" % i, encoding="utf-8")
+            pats = ("Face/*.md",)
+            cs.install_resident(tmp)
+            try:
+                cs._FACE_CACHE.clear()
+                cs.clear_changes()
+                fp1, _ = cs.face_digests(tmp, pats)
+                self.assertEqual(3, len(cs.iter_files(tmp, "Face/*.md")),
+                                 "夹具必须在本平台建出非空面——否则以下判据全部空转")
+                (d / "F1.md").write_text("v2\n", encoding="utf-8")
+                cs.drop_resident([_spell("Face/F1.md")])   # 监听写法（有监听的平台＝小写）
+                before = cs._FACE_FP_STATS["incremental"]
+                fp2, digs2 = cs.face_digests(tmp, pats)
+                self.assertEqual(before + 1, cs._FACE_FP_STATS["incremental"],
+                                 "只改内容时应走增量路径（大小写不同不算成员变化）")
+                self.assertNotEqual(fp1, fp2, "内容变了指纹必须变")
+                cs._FACE_CACHE.clear()
+                cs.clear_changes()
+                fp3, digs3 = cs.face_digests(tmp, pats)
+                self.assertEqual(fp2, fp3, "增量结果必须与整面重算逐位相同")
+                self.assertEqual(digs3, digs2, "增量更新后的逐件摘要必须与重算一致")
+                (d / "F9.md").write_text("new\n", encoding="utf-8")
+                cs.drop_resident([_spell("Face/F9.md")])
+                rec = cs._FACE_FP_STATS["recomputes"]
+                fp4, _ = cs.face_digests(tmp, pats)
+                self.assertEqual(rec + 1, cs._FACE_FP_STATS["recomputes"],
+                                 "新增件 ⇒ 成员集合变了 ⇒ 必须整面重建")
+                self.assertNotEqual(fp3, fp4)
+                os.remove(d / "F0.md")
+                cs.drop_resident([_spell("Face/F0.md")])
+                rec = cs._FACE_FP_STATS["recomputes"]
+                fp5, digs5 = cs.face_digests(tmp, pats)
+                self.assertEqual(rec + 1, cs._FACE_FP_STATS["recomputes"],
+                                 "删件 ⇒ 成员集合变了 ⇒ 必须整面重建")
+                self.assertNotIn("Face/F0.md", digs5, "删掉的件不许留在摘要表里")
+            finally:
+                cs.clear_changes()
+                cs.clear_resident()
+
+    def test_reuse_only_when_change_face_is_known_and_clean(self):
+        from unittest import mock
+        pats = ("04_模块库/*/*.md",)
+        cs._FACE_CACHE.clear()
+        base = cs._FACE_FP_STATS["recomputes"]
+        cs.face_fingerprint(ROOT, pats)                    # 第一次：没有上次的值，必算
+        self.assertEqual(base + 1, cs._FACE_FP_STATS["recomputes"])
+        with mock.patch.object(cs, "changed_paths", lambda: (False, set())):
+            cs.face_fingerprint(ROOT, pats)                # 说不清 → 必算（fail-closed）
+            self.assertEqual(base + 2, cs._FACE_FP_STATS["recomputes"])
+        with mock.patch.object(cs, "changed_paths", lambda: (True, {"docs/x.md"})):
+            cs.face_fingerprint(ROOT, pats)                # 确知没沾到 → 复用
+            self.assertEqual(base + 2, cs._FACE_FP_STATS["recomputes"])
+        inc = cs._FACE_FP_STATS["incremental"]
+        with mock.patch.object(cs, "changed_paths",
+                               lambda: (True, {"04_模块库/通用类/m00_数据槽总线.md"})):
+            # 确知沾到、但**盘上还在**（监听给的是小写，真名是 `M00_数据槽总线.md`）⇒ 成员集合没变，
+            # 走**增量**：不整面重建（`recomputes` 不动），只更新那一件的摘要再重哈希。
+            # 这条过去断言「必算」，是因为比对按大小写逐字做 ⇒ 每次都误判成新增件（安全但白算）。
+            cs.face_fingerprint(ROOT, pats)
+            self.assertEqual(base + 2, cs._FACE_FP_STATS["recomputes"],
+                             "只改了一件内容 ⇒ 不许整面重建")
+            self.assertEqual(inc + 1, cs._FACE_FP_STATS["incremental"])
+        with mock.patch.object(cs, "changed_paths",
+                               lambda: (True, {"04_模块库/通用类/_nf_absent.md"})):
+            cs.face_fingerprint(ROOT, pats)                # 确知沾到且**不在册** → 必算（新件）
+            self.assertEqual(base + 3, cs._FACE_FP_STATS["recomputes"])
+
+
+class LogicalReadFaceAuditTest(unittest.TestCase):
+    """**逻辑读**审计：每个派生站点的「真读面」必须落在它申报的输入面内——一次量到所有站点。
+
+    与 `DerivedResultCacheTest` 的分工（这是关键差别）：那条盯的是**物理打开**（`io.open`），
+    而常驻层命中的读**不开文件** ⇒ 看不见；而且它只清**站点自己的** memo，子缓存热的「读」也被藏住。
+    本判据改用 `read_text_cached` 级追踪 + **清空所有内容缓存**（含逐件/逐条/逐包/逐证书那些），
+    于是「读了却没申报」无处可躲。它已经抓到两个真洞（实测 2026-09-29）：
+    `output_forms.scan` 读了 `protocol/output_forms.json` 与 `protocol/output_forms_baseline.json`
+    却没申报（重签基线会命中旧结果）；`instruction_step_audit` 读 `docs/agent/agent_组装指令包_v0.2.md`
+    而 `QD_INPUTS` 没含它。
+    """
+
+    def _clear_all_content_caches(self):
+        from core import asset_density as ad
+        from core import layer_model as lm
+        from core import output_forms as of
+        from core import pack_combo as pcb
+        from core import purity_scan as ps
+        from core import schema_lint as sl
+        cs._DERIVED_MEMO.clear()
+        pcb.cache_clear()
+        for attr in ("_CONTENT_CACHE", "_CONTRACTS_CACHE", "_COMBO_CACHE", "_CERT_CACHE", "_CACHE"):
+            getattr(pcb, attr, {}).clear()
+        of._INDEX_CACHE.clear()
+        of._PACK_VERIFY_CACHE.clear()
+        sl._DOC_LINT_CACHE.clear()
+        ps._DOC_FACTS_CACHE.clear()
+        lm._ENTRY_IMPORT_CACHE.clear()
+        for attr in ("_CENSUS_CACHE", "_FILE_COUNT_CACHE", "_KEYS_OF_CACHE"):
+            getattr(ad, attr).clear()
+
+    def test_sites_only_read_inside_their_declared_face(self):
+        import builtins
+        import importlib
+        alp = importlib.import_module("core.asset_ledger_projection")
+        cg = importlib.import_module("core.concept_graph")
+        dpk = importlib.import_module("core.domain_pack")
+        of = importlib.import_module("core.output_forms")
+        pcb = importlib.import_module("core.pack_combo")
+        qds = importlib.import_module("core.quality_depth_scan")
+        sl = importlib.import_module("core.schema_lint")
+        ad = importlib.import_module("core.asset_density")
+        # 站点：(名字, 模块, impl 名, 申报面)。purity / layer 的面是组合面（自有 ∪ 阶梯），
+        # 同族的判据在 test_purity_scan.PurityKeyCompositionTest 与 test_layer_model 里。
+        sites = (("schema_lint.scan", sl, "_scan_impl", sl.LINT_INPUTS),
+                 ("asset_density.scan", ad, "_scan_impl", ad.ASSET_INPUTS),
+                 ("asset_ledger.verify", alp, "_verify_impl", alp.VERIFY_INPUTS),
+                 ("concept_graph.scan", cg, "_scan_impl", cg.CG_INPUTS),
+                 ("quality_depth.scan", qds, "_inner", qds.QD_INPUTS),
+                 ("output_forms.scan", of, "_scan_impl", of.INDEX_INPUTS),
+                 ("domain_pack.scan", dpk, "_scan_impl", dpk.SCAN_INPUTS),
+                 ("pack_combo.scan", pcb, "_scan_impl", pcb.SCAN_INPUTS))
+        reads = set()
+        orig_read = cs.read_text_cached
+        orig_open = builtins.open
+
+        def read_traced(path, *a, **k):
+            try:
+                reads.add(os.path.relpath(str(path), ROOT).replace(os.sep, "/"))
+            except ValueError:
+                pass
+            return orig_read(path, *a, **k)
+
+        def open_traced(file, *a, **k):
+            if isinstance(file, (str, bytes, os.PathLike)):
+                try:
+                    reads.add(os.path.relpath(str(file), ROOT).replace(os.sep, "/"))
+                except ValueError:
+                    pass
+            return orig_open(file, *a, **k)
+
+        for name, mod, impl, pats in sites:
+            covered = set(r for p in pats for r in cs.iter_files(ROOT, p))
+            self.assertTrue(covered, "%s 的申报面为空" % name)
+            self._clear_all_content_caches()
+            reads.clear()
+            cs.read_text_cached, builtins.open = read_traced, open_traced
+            try:
+                with cs.read_memo():
+                    getattr(mod, impl)(ROOT)
+            finally:
+                cs.read_text_cached, builtins.open = orig_read, orig_open
+            leak = sorted(r for r in reads
+                          if r and not r.startswith("..")
+                          and os.path.isfile(os.path.join(ROOT, *r.split("/")))
+                          and r not in covered)
+            self.assertEqual([], leak, "%s 读了申报面之外的件：%s" % (name, leak[:4]))
+
+
+class FastGlobTest(unittest.TestCase):
+    """`iter_files` 的快速枚举：**与 `Path.glob` 逐模式等价** + 作用域内记忆 + 出口不陈旧。
+
+    依据（实测）：指纹占一次 `evaluate` 的 **926 ms / 31%**，其中「枚举」一项 463 ms——
+    `community/*/outputs/**/*`（1156 件）单条就要 236 ms，因为 pathlib 的 `**` 逐层重入；
+    换 `os.scandir` 单遍后同一条 ~90 ms，指纹 821 → 497 ms。
+    **等价性是本判据的主题**：快而语义不同＝把门禁换成假绿。
+    """
+
+    def _reference(self, root, pattern):
+        base = pathlib.Path(root)
+        return sorted(p.relative_to(base).as_posix()
+                      for p in base.glob(str(pattern)) if p.is_file())
+
+    def test_equivalent_to_pathlib_glob_for_declared_input_faces(self):
+        """仓库真实输入面（8 条模式）必须**逐条一致**——不能只测一条就当等价。"""
+        pats = list(dict.fromkeys(list(of.INDEX_INPUTS) + list(cs.SCAN_INPUTS)))
+        self.assertTrue(pats)
+        for pat in pats:
+            with cs.read_memo():
+                got = cs.iter_files(ROOT, pat)
+            self.assertEqual(self._reference(ROOT, pat), got,
+                             "快速枚举与 Path.glob 不等价：%s" % pat)
+
+    def test_dotfiles_depth_and_question_mark_semantics(self):
+        """点文件必须收（pathlib 不隐藏）、`?` 单字符、`**` 可消费零层、字符类回退参考实现。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp)
+            (p / ".hidden.md").write_text("x", encoding="utf-8")
+            (p / "a.md").write_text("x", encoding="utf-8")
+            (p / "a1.md").write_text("x", encoding="utf-8")
+            (p / "sub").mkdir()
+            (p / "sub" / ".deep.md").write_text("x", encoding="utf-8")
+            (p / "sub" / "b.md").write_text("x", encoding="utf-8")
+            for pat in ("*.md", "a?.md", "**/*.md", "sub/*.md", "**/*", "**/*.json",
+                        "sub/[ab].md", "sub/**"):
+                with cs.read_memo():
+                    got = cs.iter_files(tmp, pat)
+                self.assertEqual(self._reference(tmp, pat), got, pat)
+
+    def test_scope_memo_walks_once_and_refreshes_next_scope(self):
+        """同作用域内重复枚举只走一遍文件系统；**出口即清**，下一个作用域必须看到新文件。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp)
+            (p / "sub").mkdir()
+            (p / "sub" / "a.md").write_text("x", encoding="utf-8")
+            scans = []
+            real = os.scandir
+
+            def counting(path="."):
+                scans.append(path)
+                return real(path)
+
+            os.scandir = counting
+            try:
+                with cs.read_memo():
+                    first = cs.iter_files(tmp, "**/*.md")
+                    mark = len(scans)
+                    second = cs.iter_files(tmp, "**/*.md")
+                self.assertEqual(first, second)
+                self.assertEqual(mark, len(scans), "同一作用域内重复枚举不得重走文件系统")
+                (p / "sub" / "b.md").write_text("x", encoding="utf-8")
+                with cs.read_memo():
+                    third = cs.iter_files(tmp, "**/*.md")
+            finally:
+                os.scandir = real
+            self.assertEqual(len(first), 1)
+            self.assertEqual(len(third), 2, "新作用域必须看到新文件（不许跨调用陈旧）")
+
+    def test_fingerprint_reacts_to_content_and_to_new_files(self):
+        """指纹＝（枚举面 + 每个文件的内容）：改内容要变，**新增文件也要变**。
+
+        后半条守的是本波新增的枚举路径：枚举若漏了新文件，内容键就漏输入 → 假绿。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            mod = pathlib.Path(tmp) / "community" / "包" / "modules"
+            mod.mkdir(parents=True)
+            f = mod / "m.md"
+            f.write_text("一", encoding="utf-8")
+            with cs.read_memo():
+                fp1 = cs.content_fingerprint(tmp, of.INDEX_INPUTS)
+            with cs.read_memo():
+                self.assertEqual(fp1, cs.content_fingerprint(tmp, of.INDEX_INPUTS),
+                                 "同内容必须同指纹")
+            f.write_text("二", encoding="utf-8")
+            with cs.read_memo():
+                self.assertNotEqual(fp1, cs.content_fingerprint(tmp, of.INDEX_INPUTS),
+                                    "内容一变指纹必须变")
+                before = cs.content_fingerprint(tmp, of.INDEX_INPUTS)
+            (mod / "n.md").write_text("二", encoding="utf-8")
+            with cs.read_memo():
+                self.assertNotEqual(before, cs.content_fingerprint(tmp, of.INDEX_INPUTS),
+                                    "新增文件必须改指纹（枚举面变了）")
+
+
+    def test_case_variant_suffix_matches_pathlib_on_windows(self):
+        """**Windows 后缀不分大小写**：`*.md` 必须匹配 `UPPER.MD`（点文件同面）。
+
+        依据（他证实测）：快速枚举器原先按大小写敏感匹配，Windows 上会**静默丢件**——
+        合成树实测 `Path.glob` 6 件 / `iter_files` 5 件（丢 `.../UPPER.MD`），
+        连带 `asset usage / density / thickness`、`output meter` 与 `content_fingerprint`
+        （**落盘缓存的键**）一起少算。本用例在修前必须失败（先证会红）。
+
+        语义锚点是**平台上的 `Path.glob`**：Windows 上两边都收 `UPPER.MD`，
+        POSIX 上两边都不收——所以本用例跨平台都成立。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            d = pathlib.Path(tmp) / "community" / "甲包" / "assets"
+            d.mkdir(parents=True)
+            (d / "ALPHA.md").write_text("a", encoding="utf-8")
+            (d / "UPPER.MD").write_text("u", encoding="utf-8")      # 大小写变体后缀
+            (d / ".hidden.md").write_text("h", encoding="utf-8")    # 点文件（pathlib 不隐藏）
+            for pat in ("community/*/assets/*.md", "**/*.md", "**/*",
+                        "community/*/assets/*"):
+                with cs.read_memo():
+                    got = cs.iter_files(tmp, pat)
+                self.assertEqual(self._reference(tmp, pat), got, pat)
+
+    def test_fingerprint_reacts_to_case_variant_new_file(self):
+        """指纹必须对**大小写变体**新增件敏感——它是**落盘缓存**的键。
+
+        依据（他证）：`disk_cache.CODE_FACE` / 各输入面都走同一个 `content_fingerprint`；
+        实测加大写后缀件后指纹**纹丝不动**（`629b9a97…` 不变），而 Windows 上 Python 照样
+        **能加载**该代码件 ⇒ 键不换而代码已变 ⇒ 落盘缓存可能返回旧结果。
+        故：Windows 上该断言必须成立；POSIX 上 `Path.glob` 本就大小写敏感，
+        此处只断言对照项（小写新件）必须改指纹。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            sub = pathlib.Path(tmp) / "sub"
+            sub.mkdir()
+            (sub / "a.md").write_text("一", encoding="utf-8")
+            face = ("sub/*.md",)
+            with cs.read_memo():
+                base = cs.content_fingerprint(tmp, face)
+            (sub / "b.MD").write_text("二", encoding="utf-8")        # 大小写变体后缀
+            with cs.read_memo():
+                after_variant = cs.content_fingerprint(tmp, face)
+            if os.name == "nt":
+                self.assertNotEqual(base, after_variant,
+                                    "Windows：加大写后缀件必须换指纹（否则落盘缓存会陈旧）")
+            (sub / "c.md").write_text("三", encoding="utf-8")        # 对照：小写新件
+            with cs.read_memo():
+                after_lower = cs.content_fingerprint(tmp, face)
+            self.assertNotEqual(after_variant, after_lower,
+                                "小写后缀新件必须换指纹（跨平台对照项）")
+
+
+class FingerprintRobustnessTest(unittest.TestCase):
+    """内容指纹对**非 UTF-8 附件**必须按字节取，不许整体崩掉。
+
+    依据（实测）：把输入面放宽到「整个仓库」时立刻踩到——`community/**/*`、`docs/**/*` 里只要
+    有一张图片/一个二进制附件，`read_text` 就抛 `UnicodeDecodeError`，**整条命令直接失败**。
+    这等于「多放一个附件」＝「命令崩」；指纹本就只需要"变了没有"，按字节哈希是更稳也更省的取法
+    （文本件仍走文本路径，故哈希值与既有口径逐位相同、不失效任何现有缓存）。
+    """
+
+    def test_binary_payload_is_hashed_by_bytes_and_stays_sensitive(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = pathlib.Path(tmp) / "community" / "包" / "assets"
+            d.mkdir(parents=True)
+            (d / "A.md").write_text("A01 键\n", encoding="utf-8")
+            (d / "cover.png").write_bytes(b"\x89PNG\r\n\x1a\n\xa7\xff")   # 非法 UTF-8 起始字节
+            face = ("community/*/assets/*",)
+            with cs.read_memo():
+                first = cs.content_fingerprint(tmp, face)
+                again = cs.content_fingerprint(tmp, face)
+            self.assertEqual(first, again, "同内容必须同指纹（含二进制件）")
+            (d / "cover.png").write_bytes(b"\x89PNG\r\n\x1a\n\xa7\xfe")   # 只改一个字节
+            with cs.read_memo():
+                changed = cs.content_fingerprint(tmp, face)
+            self.assertNotEqual(first, changed, "二进制件改了也必须换指纹")
+
+
+class DerivedResultCacheTest(unittest.TestCase):
+    """跨调用「内容键派生结果缓存」的两条判据：**输入面穷举** + **键即内容**。
+
+    这类缓存（`scan()` 与 `output_forms.index_verify()` 各有一份）唯一的真风险是「假绿」：
+    只要有一次读落在声明的输入面之外，输入变了指纹却不变 → 陈旧结果被当成新结果交给门禁。
+    所以本判据盯的不是速度，而是**读盘面 ⊆ 输入面**；将来给这两个函数加新读取，这里会先红，
+    逼着把新输入补进 `SCAN_INPUTS` / `INDEX_INPUTS`，而不是让缓存静默陈旧。
+
+    计数口径：按**成功打开**的文件算输入依赖。探测不存在的路径（例如缺 `provenance.json` 的
+    域包）不算——而这类路径一旦真出现，输入面的 glob 会立刻把它收进指纹，故不存在缺口。
+    """
+
+    #: 站点表：名字 → {输入面 / 清进程内缓存 / 真算入口（供替换计数）/ 入口}
+    #: 表驱动是为了「新站点接进来只加一行」，而不是每加一个就抄一遍 if/else。
+    @staticmethod
+    def _sites():
+        return {
+            "conformance_scan.scan": {
+                "patterns": cs.SCAN_INPUTS,
+                "clear": lambda: cs._SCAN_CACHE.clear(),
+                "owner": cs, "impl": "_scan_impl",
+                "run": lambda: cs.scan(ROOT)},
+            "output_forms.index_verify": {
+                "patterns": of.INDEX_INPUTS,
+                "clear": lambda: of._INDEX_CACHE.clear(),
+                "owner": of, "impl": "_index_verify_impl",
+                "run": lambda: of.index_verify(ROOT)},
+            "schema_lint.scan": {
+                "patterns": sl.LINT_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("schema-lint", None),
+                "owner": sl, "impl": "_scan_impl",
+                "run": lambda: sl.scan(ROOT)},
+            "asset_density.scan": {
+                "patterns": ad.ASSET_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("asset-density", None),
+                "owner": ad, "impl": "_scan_impl",
+                "run": lambda: ad.scan(ROOT)},
+            "asset_density.thickness_scan": {
+                "patterns": ad.ASSET_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("asset-thickness", None),
+                "owner": ad, "impl": "_thickness_impl",
+                "run": lambda: ad.thickness_scan(ROOT)},
+            "layer_model.scan": {
+                "patterns": lm.patterns(ROOT),
+                "clear": lambda: cs._DERIVED_MEMO.pop("layer-model", None),
+                "owner": lm, "impl": "_scan_impl",
+                "run": lambda: lm.scan(ROOT), "resident": True},
+            "purity_scan.scan": {
+                "patterns": ps.patterns(ROOT),
+                "clear": lambda: cs._DERIVED_MEMO.pop("purity-scan", None),
+                "owner": ps, "impl": "_scan_impl",
+                "run": lambda: ps.scan(ROOT), "resident": True},
+            "asset_ledger_projection.verify": {
+                "patterns": alp.VERIFY_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("asset-ledger-verify", None),
+                "owner": alp, "impl": "_verify_impl",
+                "run": lambda: alp.verify(ROOT), "resident": True},
+            "quality_depth_scan.scan": {
+                "patterns": qd.QD_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("quality-depth", None),
+                "owner": qd, "impl": "_inner",
+                "run": lambda: qd.scan(ROOT), "resident": True},
+            "concept_graph.scan": {
+                "patterns": cg.CG_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("concept-graph", None),
+                "owner": cg, "impl": "_scan_impl",
+                "run": lambda: cg.scan(ROOT), "resident": True},
+            "output_forms.scan": {
+                "patterns": of.INDEX_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("output-forms-scan", None),
+                "owner": of, "impl": "_scan_impl",
+                "run": lambda: of.scan(ROOT), "resident": True},
+            "domain_pack.scan": {
+                "patterns": dpk.SCAN_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("domain-pack-scan", None),
+                "owner": dpk, "impl": "_scan_impl",
+                "run": lambda: dpk.scan(ROOT), "resident": True},
+            "pack_combo.scan": {
+                "patterns": pcb.SCAN_INPUTS,
+                "clear": lambda: cs._DERIVED_MEMO.pop("pack-combo-scan", None),
+                "owner": pcb, "impl": "_scan_impl",
+                "run": lambda: pcb.scan(ROOT), "resident": True},
+        }
+
+    def _run(self, site):
+        site["clear"]()
+        return site["run"]()
+
+    @contextlib.contextmanager
+    def _cold(self):
+        """采集读盘面时**关掉持久缓存**：否则盘上已有同内容条目 ⇒ 根本不读盘 ⇒ 判据空转。
+
+        这条是判据强度的关键（2026-09-29 修订）：本机反复跑过之后，`<NF_HOME>/cache` 里什么都有，
+        不关它的话「读盘面 ⊆ 输入面」会**全绿却什么都没验**。
+        """
+        with mock.patch.dict(os.environ, {"NF_NO_DISK_CACHE": "1"}):
+            yield
+
+    @contextlib.contextmanager
+    def _resident(self, site):
+        """宽面的站点**只在常驻语料层在位时**才走缓存——判据也得按同一条件跑，否则它永远不命中。"""
+        if site.get("resident"):
+            cs.install_resident(ROOT)
+        try:
+            yield
+        finally:
+            if site.get("resident"):
+                cs.clear_resident()
+
+    def test_reads_stay_inside_declared_input_face(self):
+        for name, site in self._sites().items():
+            with self._resident(site), self._cold():
+                self._run(site)                   # 先跑一遍：把惰性 import 等一次性读盘做掉
+                covered = _covered(site["patterns"])   # glob 展开本身不开文件，可在采集前算好
+                with _trace_opens() as (reads, tried):
+                    self._run(site)               # 缓存已清 → 必走真实计算，读盘面被完整记录
+            leak = sorted(p for p in reads if p.startswith(_ROOT_KEY) and p not in covered)
+            self.assertEqual(
+                [os.path.relpath(p, _ROOT_KEY) for p in leak], [],
+                "%s() 读了声明输入面之外的文件 → 内容键缓存会陈旧（补进输入面）" % name)
+            ghost = sorted(p for p in tried
+                           if p.startswith(_ROOT_KEY) and p not in covered and os.path.exists(p))
+            self.assertEqual(
+                [os.path.relpath(p, _ROOT_KEY) for p in ghost], [],
+                "%s() 探测了输入面之外**存在**的文件 → 输入面不完整" % name)
+
+    def test_second_call_with_same_key_hits_cache(self):
+        """键即内容：同内容**第二次调用不得新增重算**，且两次结果一致。
+
+        判据口径（2026-09 修订）：本函数现在有两层缓存——进程内内容键 + **持久**内容键
+        （`core.disk_cache`）。于是**第一次调用也可能免算**（盘上已有同内容条目），
+        所以「两次调用总共只算 1 次」不再是真不变量；真不变量是**第二次相对于第一次零新增**
+        （缓存被拆掉时第二次就会新增，本判据照样当场红）。
+        """
+        for name, site in self._sites().items():
+            owner, attr = site["owner"], site["impl"]
+            real_impl = getattr(owner, attr)
+            calls = {"n": 0}
+
+            # 透传额外实参：有的站点会把「已经算好的面指纹」顺手传给自己的 impl
+            # （如 `purity_scan` 把阶梯面指纹交给 `_scan_impl`，免得同一张面枚举两遍）。
+            # 本判据只数**调用次数**，签名变化不该让它误报。
+            def counting(root=".", *extra, _real=real_impl, **kwargs):
+                calls["n"] += 1
+                return _real(root, *extra, **kwargs)
+
+            with self._resident(site):
+                site["clear"]()
+                setattr(owner, attr, counting)
+                try:
+                    first = site["run"]()
+                    after_first = calls["n"]
+                    second = site["run"]()
+                    after_second = calls["n"]
+                finally:
+                    setattr(owner, attr, real_impl)
+                    site["clear"]()
+            self.assertEqual(after_first, after_second,
+                             "%s() 同内容第二次调用白算了一遍（缓存没生效）" % name)
+            self.assertEqual(first, second, "%s() 命中缓存的结果必须与首算一致" % name)
+
+
+class InputFaceHygieneTest(unittest.TestCase):
+    """**输入面卫生**：声明面里的每一件都要是「小件」，且不得卷进无关大文件。
+
+    依据（2026-09-29 实测事故）：`domain_pack.SCAN_INPUTS` 原写 `.rivet/**/*`（整棵私档），于是
+    「见证」要把 **676 MB**（含一个 **628 MB** 的模型文件）读一遍算摘要 ✗，而该扫描器其实只读
+    那 100 份 specs。收窄之后判据仍绿。这条把它钉住：**宽面不许把大件卷进来**——输入面的宽度是
+    算力，不是免费的。
+    """
+
+    #: 单件上限：远大于仓库里任何**真被当语料读**的件（最大的模块文档 ~61 KB），但足以挡住
+    #: 模型/权重/压缩包这类「根本不是语料」的大件。
+    MAX_BYTES = 8 * 1024 * 1024
+
+    def test_no_declared_face_pulls_in_a_huge_file(self):
+        from core import asset_ledger_projection as _alp
+        from core import concept_graph as _cg
+        from core import domain_pack as _dpk
+        from core import layer_model as _lm
+        from core import pack_combo as _pcb
+        from core import purity_scan as _ps
+        from core import quality_depth_scan as _qd
+        from core import schema_lint as _sl
+        faces = {
+            "conformance_scan": cs.SCAN_INPUTS, "output_forms": of.INDEX_INPUTS,
+            "schema_lint": _sl.LINT_INPUTS, "asset_density": ad.ASSET_INPUTS,
+            "asset_ledger_projection": _alp.VERIFY_INPUTS, "concept_graph": _cg.CG_INPUTS,
+            "domain_pack": _dpk.SCAN_INPUTS, "pack_combo": _pcb.SCAN_INPUTS,
+            "quality_depth_scan": _qd.QD_INPUTS,
+            "layer_model": _lm.patterns(ROOT), "purity_scan": _ps.patterns(ROOT),
+        }
+        offenders = []
+        for name, patterns in faces.items():
+            for pat in patterns:
+                for rel in cs.iter_files(ROOT, str(pat)):
+                    path = os.path.join(ROOT, *rel.split("/"))
+                    try:
+                        size = os.path.getsize(path)
+                    except OSError:
+                        continue
+                    if size > self.MAX_BYTES:
+                        offenders.append((name, rel, size))
+        self.assertEqual([], ["%s: %s（%.1f MB）" % (n, r, s / 1048576)
+                              for n, r, s in offenders][:5],
+                         "输入面卷进了大件：见证会把它们整份读一遍（把面收窄到真读的件）")
+
+
+class ResidentRawEquivalenceTest(unittest.TestCase):
+    """共享读改成「**一次物理读服务两种口径**」之后，文本/字节的口径必须**逐字节不变**。
+
+    依据（2026-09-29）：`read_text_cached` 过去用 `Path.read_text`、`read_bytes_cached` 用
+    `Path.read_bytes` —— 同一份件既当文本又当字节读时**读两遍**（实测一次重算里 211 次重复读）。
+    现在底层只读一次原始字节、文本由 `io.TextIOWrapper(BytesIO(raw), encoding="utf-8",
+    newline=None)` 解出。判据就是「换实现不许换口径」：真语料逐件比对 + 换行/无尾换行/BOM 边界。
+    """
+
+    def test_text_matches_path_read_text_on_real_corpus(self):
+        csc_module = cs
+        csc_module.install_resident(ROOT)
+        self.addCleanup(csc_module.clear_resident)
+        checked = 0
+        for base in ("protocol", "docs", "04_模块库", "01_核心协议.md", "verify.sh"):
+            targets = ([base] if os.path.isfile(os.path.join(ROOT, base))
+                       else [os.path.join(dp, f)
+                             for dp, _dn, fs in os.walk(os.path.join(ROOT, base))
+                             for f in fs][:60])
+            for rel in targets:
+                path = os.path.join(ROOT, rel)
+                try:
+                    want = pathlib.Path(path).read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError):
+                    continue
+                checked += 1
+                self.assertEqual(want, csc_module.read_text_cached(path),
+                                 "共享读的文本口径漂了：%s" % rel)
+                self.assertEqual(pathlib.Path(path).read_bytes(),
+                                 csc_module.read_bytes_cached(path),
+                                 "共享读的字节口径漂了：%s" % rel)
+        self.assertGreater(checked, 40, "真语料样本太少，判据没意义")
+
+    def test_newline_and_bom_boundaries(self):
+        """CRLF / 单 \r / 无尾换行 / BOM —— 通用换行语义最容易在这几处漂。"""
+        cases = (b"a\r\nb\r\nc", b"a\rb\rc", b"a\nb\nc", b"a\nb\nc\n",
+                 b"\xef\xbb\xbfhello\n", b"", b"tail-no-newline")
+        cs.install_resident(ROOT)
+        self.addCleanup(cs.clear_resident)
+        with tempfile.TemporaryDirectory() as tmp:
+            for i, raw in enumerate(cases):
+                path = os.path.join(tmp, "n%d.txt" % i)
+                with open(path, "wb") as fh:
+                    fh.write(raw)
+                self.assertEqual(pathlib.Path(path).read_text(encoding="utf-8"),
+                                 cs.read_text_cached(path), raw)
+                self.assertEqual(raw, cs.read_bytes_cached(path))
+                cs.clear_resident()             # 每例都从空层走一遍真读
+                cs.install_resident(ROOT)
+
+
+class CodeScopeFaceTest(unittest.TestCase):
+    """代码面**按导入闭包**细化（`disk_cache.key(..., code_modules=…)`）：精度 / fail-closed / 完整性。
+
+    动机（实测）：整块代码面 119 件 ⇒ 改**任何**一个 core 文件都会让所有落盘派生换键，下一条重命令
+    付一次全量重建（~4–6 s）；而多数派生只依赖 3–21 件。三条判据分别盯三件事：
+    ① **精度**：闭包只含自己及其依赖（无关件如 `terminal.py` 不得在内）；
+    ② **fail-closed**：闭包里一旦出现动态导入构造（`__import__` / `importlib`）就判「说不清」
+       （返回 None ⇒ 调用方退回整块代码面，绝不拿不完整的闭包当键）；
+    ③ **完整性（运行时）**：在**全新解释器**里真跑一遍该派生，期间被导入的 `core.*` 模块
+       必须全部落在声明闭包内——静态分析漏判会在这里红。
+    """
+
+    #: 站点 → (自己的模块, 真算入口)。与各站点源码里的 `code_modules=` 声明一一对应（漂移即红）。
+    SITES = (("core.schema_lint", "_scan_impl"),
+             ("core.asset_density", "_thickness_impl"),
+             ("core.asset_ledger_projection", "_verify_impl"),
+             ("core.layer_model", "_scan_impl"),
+             ("core.purity_scan", "_scan_impl"),
+             ("core.quality_depth_scan", "_inner"),
+             ("core.conformance_scan", "_scan_impl"),
+             ("core.output_forms", "_index_verify_impl"),
+             ("core.pack_combo", "scan"))
+
+    def test_scope_is_precise_and_fails_closed(self):
+        scope = import_graph.code_scope_files(ROOT, ("core.schema_lint",))
+        self.assertIsNotNone(scope, "schema_lint 的闭包应当算得出")
+        self.assertIn("desktop/src/core/schema_lint.py", scope)
+        self.assertNotIn("desktop/src/core/terminal.py", scope,
+                         "无关模块不得进闭包（否则等于退回整块代码面）")
+        self.assertLess(len(scope), 20, "闭包应当远小于整块代码面（119 件）")
+        self.assertIsNone(import_graph.code_scope_files(ROOT, ("core.regression_score",)),
+                          "含动态导入构造（`__import__`）的模块必须判「说不清」→ 退回整块代码面")
+        with tempfile.TemporaryDirectory() as tmp:
+            core = pathlib.Path(tmp) / "desktop" / "src" / "core"
+            core.mkdir(parents=True)
+            (core / "a.py").write_text("from core import b  # noqa\n", encoding="utf-8")
+            (core / "b.py").write_text("x = 1\n", encoding="utf-8")
+            self.assertEqual(("desktop/src/core/a.py", "desktop/src/core/b.py"),
+                             import_graph.code_scope_files(tmp, ("core.a",)),
+                             "合成树：闭包应含 a 与被 a 依赖的 b")
+            (core / "b.py").write_text("x = __import__('os')\n", encoding="utf-8")
+            self.assertIsNone(import_graph.code_scope_files(tmp, ("core.a",)),
+                              "合成树：闭包里出现动态导入 ⇒ 判说不清（fail-closed）")
+            (core / "a.py").write_text("def (:\n", encoding="utf-8")   # 真·语法错
+            self.assertIsNone(import_graph.code_scope_files(tmp, ("core.a",)),
+                              "合成树：解析不出 ⇒ 判说不清")
+
+    def test_every_site_has_a_computable_scope(self):
+        for module, _fn in self.SITES:
+            scope = import_graph.code_scope_files(ROOT, (module,))
+            self.assertIsNotNone(scope, "%s 的代码闭包算不出（会退回整块代码面）" % module)
+            self.assertIn("desktop/src/core/%s.py" % module.split(".")[-1], scope)
+
+    #: 运行期完整性探针只挑 4 个站点跑（每个都得起一次全新解释器；全跑 9 个会把门禁时间拉长一倍），
+    #: 挑的是「hub + 三类叶子」：conformance_scan（被最多模块依赖）、schema_lint、layer_model、
+    #: asset_density。闭包算法对所有站点是同一个，抽样足够暴露「静态分析漏判」。
+    RUNTIME_SITES = (("core.conformance_scan", "_scan_impl"),
+                     ("core.schema_lint", "_scan_impl"),
+                     ("core.layer_model", "_scan_impl"),
+                     ("core.asset_density", "_thickness_impl"))
+
+    def test_runtime_imports_stay_inside_declared_scope(self):
+        """全新解释器里真跑一遍：**懒导入**的 `core.*` 模块必须都在声明闭包内。
+
+        （静态导入由闭包算法覆盖；这里盯的是「运行期才 import」的那一半——静态分析漏判会当场红。）
+        探针脚本写在**临时目录**里：单测不得往仓库里落任何件。
+        """
+        src = ("import json, os, sys\n"
+               "sys.path.insert(0, os.path.join(sys.argv[1], 'desktop', 'src'))\n"
+               "os.environ['NF_NO_DISK_CACHE'] = '1'\n"
+               "import importlib\n"
+               "mod = importlib.import_module(sys.argv[2])\n"
+               "fn = getattr(mod, sys.argv[3])\n"
+               "before = set(sys.modules)\n"
+               "fn('.')\n"
+               "print(json.dumps(sorted(m for m in set(sys.modules) - before\n"
+               "                        if m.startswith('core.'))))\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            probe = os.path.join(tmp, "scope_probe.py")
+            with open(probe, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(src)
+            for module, fn in self.RUNTIME_SITES:
+                scope = import_graph.code_scope_files(ROOT, (module,))
+                allowed = {os.path.basename(p)[:-3] for p in scope}
+                out = subprocess.run([sys.executable, probe, ROOT, module, fn], cwd=ROOT,
+                                     capture_output=True, text=True, encoding="utf-8",
+                                     timeout=600)
+                self.assertEqual(0, out.returncode, out.stderr[-400:])
+                lazy = set(json.loads(out.stdout.strip() or "[]"))
+                leak = sorted(m for m in lazy if m.split(".")[-1] not in allowed)
+                self.assertEqual([], leak,
+                                 "%s 运行期导入了闭包外的模块 → 闭包不完整，缓存会陈旧" % module)
+
+
+class ModuleDocsMemoTest(unittest.TestCase):
+    """`_module_docs` 的作用域缓存与**新鲜度**：同作用域两次一致，新作用域必须看见新增件。
+
+    口径（2026-09-29 修订）：本函数已改走**共享枚举器**（`iter_files`；目录清单在常驻层里），
+    不再是「一次 `os.walk`」，所以判据从「数 `os.walk` 次数」改成**行为**：同作用域稳定、
+    跨作用域不许陈旧。真仓库上的**逐件等价**由 `ModuleDocsEquivalenceTest` 另行守着。
+    """
+
+    def test_fresh_next_scope_and_stable_within_scope(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel in ("04_模块库/通用类/A01_x.md", "community/包甲/modules/M01_x.md"):
+                path = os.path.join(tmp, *rel.split("/"))
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "w", encoding="utf-8", newline="\n") as fh:
+                    fh.write("x\n")
+            with cs.read_memo():
+                first = cs._module_docs(tmp)
+                second = cs._module_docs(tmp)
+            self.assertEqual(first, second, "同一作用域内两次结果必须一致")
+            self.assertEqual(2, len(first), first)
+            with open(os.path.join(tmp, "community", "包甲", "modules", "M02_y.md"),
+                      "w", encoding="utf-8", newline="\n") as fh:
+                fh.write("y\n")
+            with cs.read_memo():
+                third = cs._module_docs(tmp)
+            self.assertEqual(3, len(third), "新作用域必须看见新增件（不许跨调用陈旧）")
+
+
+class ModuleDocsEquivalenceTest(unittest.TestCase):
+    """`_module_docs()` 换枚举器（`os.walk` + 逐包 `listdir` → `iter_files`）后面必须**逐件一致**。
+
+    依据（实测 2026-09-29）：旧写法在守护口径下每次新内容状态都要重付——**107 次 `listdir` +
+    113 次 `isdir` ≈ 21 ms**（占该状态 os/stat 面的四分之一）；共享枚举器同一张面 **~0.5 ms**。
+    """
+
+    def test_matches_legacy_enumeration(self):
+        legacy: list = []
+        for dirpath, _dirs, files in os.walk(os.path.join(ROOT, "04_模块库")):
+            legacy += [os.path.join(dirpath, f) for f in files if f.endswith(".md")]
+        pkg_dir = os.path.join(ROOT, "community")
+        for pkg in sorted(os.listdir(pkg_dir)):
+            mdir = os.path.join(pkg_dir, pkg, "modules")
+            if os.path.isdir(mdir):
+                legacy += [os.path.join(mdir, f) for f in sorted(os.listdir(mdir))
+                           if f.endswith(".md")]
+        want = sorted(legacy)
+        self.assertGreater(len(want), 100, "面太小，判据没测到东西")
+        self.assertEqual(want, cs._module_docs(ROOT), "面与旧枚举不一致（换实现改动了面）")
+
+
+class YamlLoaderEquivalenceTest(unittest.TestCase):
+    """统一加载器（libyaml 优先）必须与纯 Python 的 SafeLoader **逐块等价**。
+
+    依据：改用 C 实现是速度机制（实测 7.8×），但「快」不得改变任何解析结果——本断言把
+    等价性钉在真仓库上：全部 YAML 文本块（```yaml 围栏 + *.yaml/*.yml 整件）两种加载器
+    各解析一遍，**值与异常行为都必须一致**。缺 libyaml 时跳过（此时走的本来就是纯 Python
+    路径，不存在分叉）。
+    """
+
+    def test_repo_yaml_blocks_parse_identically(self):
+        import yaml
+        if getattr(yaml, "CSafeLoader", None) is None:
+            self.skipTest("本机 PyYAML 无 libyaml（CSafeLoader 不可用）")
+        from yaml import SafeLoader, CSafeLoader
+        texts = []
+        # 面 = 仓库件（core.repo_face）：被 .gitignore 覆盖的生成物（npm 暂存面等）不算语料，
+        # 否则同一份正文以第二份身份进面——既重复算，也会把生成物的排版差异算成真源问题。
+        for path in _repo_face.walk_repo_paths(ROOT):
+            if path.suffix not in (".md", ".yaml", ".yml"):
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if path.suffix == ".md":
+                texts += [m.group(1) for m in cs.FENCE.finditer(text)]
+            else:
+                texts.append(text)
+        self.assertGreater(len(texts), 100, "本仓 YAML 文本块数量异常（判据失效）")
+        for body in texts:
+            try:
+                plain, plain_err = yaml.load(body, Loader=SafeLoader), None
+            except Exception as exc:                      # noqa: BLE001 - 比对异常类型即可
+                plain, plain_err = None, type(exc).__name__
+            try:
+                fast, fast_err = yaml.load(body, Loader=CSafeLoader), None
+            except Exception as exc:                      # noqa: BLE001
+                fast, fast_err = None, type(exc).__name__
+            self.assertEqual(plain_err, fast_err, "异常行为不一致：%r" % body[:60])
+            if plain_err is None:
+                self.assertEqual(plain, fast, "解析结果不一致：%r" % body[:60])
+
+
+class DigestPayloadEquivalenceTest(unittest.TestCase):
+    """`_payload_digest` 的**值口径**：快路径（正文无 CR ⇒ 直接吃原始字节）必须与历史公式逐位相同。
+
+    历史公式 = `sha256(_decode_text(raw).encode("utf-8"))`，读不出 UTF-8 时 = `sha256(raw)`。
+    2026-09-29 起正文无 `\\r` 时跳过「解码再编码」（那是恒等变换：`\\r` 是通用换行翻译的唯一触发器）
+    ——一次冷跑省 ~100 ms（本仓 2799 件里 0 件含 CR），但**值一位都不许变**，故用五种边界件钉死。
+    """
+
+    def test_value_matches_historical_formula(self):
+        import hashlib
+        cases = {"plain.md": "纯文本\n第二行\n".encode("utf-8"),
+                 "crlf.md": "一\r\n二\r\n".encode("utf-8"),
+                 "cr_only.md": "一\r二\r".encode("utf-8"),
+                 "bom.md": "\ufeff正文\n".encode("utf-8"),
+                 "binary.bin": bytes(range(256))}
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, raw in cases.items():
+                with open(os.path.join(tmp, name), "wb") as fh:
+                    fh.write(raw)
+            with cs.read_memo():
+                for name, raw in cases.items():
+                    got = cs._payload_digest(tmp, name)
+                    try:
+                        want = hashlib.sha256(cs._decode_text(raw).encode("utf-8")).digest()
+                    except UnicodeDecodeError:
+                        want = hashlib.sha256(raw).digest()
+                    self.assertEqual(want, got, "摘要值口径漂移：%s" % name)
+
+
+class DirListMemoTest(unittest.TestCase):
+    """**一只读调用内每目录只列一遍**（确定性判据：数 `os.scandir`，不靠计时）。
+
+    依据（实测 2026-09-29）：冷进程一次 `evaluate` 曾列 **2768** 次目录而只覆盖 907 个（3.0 倍重复），
+    而 2000 次 `scandir` 本机要 ~306 ms——多张宽面各枚举一遍时，这笔重复是纯浪费。
+    修法＝作用域内的目录清单备忘（`_DIR_MEMO`，键带 `entries` 前缀，免得与 `_module_docs` 撞键）。
+
+    判据形状：同一作用域内**换一个模式**再枚举同一棵子树（模式备忘命中不了 ⇒ 必须重走查），
+    第二遍必须**一次 `scandir` 都不发**；换到新作用域则必须重新列（不许跨调用复用 ⇒ 不陈旧）。
+    """
+
+    def test_each_dir_listed_once_per_scope(self):
+        from unittest import mock
+        calls: list = []
+        real = os.scandir
+
+        def spy(path="."):
+            calls.append(os.path.normcase(os.path.abspath(str(path))))
+            return real(path)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel in ("sub/a.md", "sub/deep/b.md", "sub/deep/c.txt"):
+                p = os.path.join(tmp, *rel.split("/"))
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                with open(p, "w", encoding="utf-8") as fh:
+                    fh.write("x\n")
+            cs.clear_changes()
+            with mock.patch("os.scandir", spy):
+                with cs.read_memo():
+                    cs.iter_files(tmp, "sub/**/*.md")
+                    first = len(calls)
+                    cs.iter_files(tmp, "sub/**/*.txt")     # 换模式：模式备忘不命中，必须走查
+                    self.assertGreater(first, 0, "第一遍就没列目录？判据自身要有效")
+                    self.assertEqual(first, len(calls),
+                                     "同一只读作用域内第二次枚举又列了一遍目录（目录备忘失效）")
+                with cs.read_memo():
+                    cs.iter_files(tmp, "sub/**/*.md")      # 新作用域：必须重新列（不许陈旧）
+                self.assertGreater(len(calls), first, "跨作用域必须重列目录（否则会陈旧）")
+
+
+class FaceHygieneTest(unittest.TestCase):
+    """**输入面不许收 Python 自产字节码**（2026-09-29 实测坑，判据把坑封死）。
+
+    依据：`scripts/**/*` 会把 `scripts/__pycache__/*.pyc` 一起收进面——那 21 份是 **Python 自己
+    生成的**，任何一次导入（甚至换 Python 小版本）都会新建/改写它 ⇒ 面指纹**随机漂移** ⇒ 宽面派生
+    缓存的键跟着换、冷进程每次重算（实测 `quality-depth` / `purity-scan` / `layer-model` 反复 miss，
+    一次 `evaluate` 白多算约 0.5 s；修复前后实测见提交信息）。
+
+    判据形状：把**所有声明过的输入面**枚举一遍，断言一件 `.pyc` / `__pycache__` 都不在里面——
+    它把「按真读面穷举」这条纪律钉在每次提交上，而不是靠注释提醒。
+    """
+
+    def test_declared_faces_exclude_bytecode(self):
+        from core import disk_cache as dc
+        faces = {"disk_cache.CODE_FACE": dc.CODE_FACE,
+                 "quality_depth_scan.QD_INPUTS": qd.QD_INPUTS,
+                 "purity_scan.OWN_PATTERNS": ps.OWN_PATTERNS,
+                 "purity_scan.patterns": ps.patterns(ROOT),
+                 "layer_model.patterns": lm.patterns(ROOT)}
+        for site, spec in DerivedResultCacheTest._sites().items():
+            faces["site:" + site] = spec["patterns"]
+        dirty = {}
+        for name, pats in sorted(faces.items()):
+            junk = sorted({rel for pat in pats for rel in cs.iter_files(ROOT, pat)
+                           if rel.lower().endswith(".pyc") or "__pycache__" in rel.lower()})
+            if junk:
+                dirty[name] = junk[:3]
+        self.assertEqual({}, dirty,
+                         "输入面收了 Python 自产字节码（键会随导入漂移、缓存整体失效）：%s" % dirty)
+
+    def test_declared_faces_exclude_test_files(self):
+        """输入面也不许收**测试件**（`desktop/tests/**`）——裁决不读它们，收进来只是每次都白读。
+
+        依据（实测 2026-09-29）：全量重算（落盘缓存关）里规则级读共 **2580 件，`desktop/tests/**` 0 件**；
+        而 `quality_depth_scan.QD_INPUTS` 旧口径写 `desktop/**/*.py`，把 **129 件测试**收进了键面 ⇒
+        稳态每次冷跑白读 129 次（实测物理读 **2850 → 2721**）。`disk_cache.CODE_FACE` 早就写着
+        「不含 tests——测试不影响结果」，这条判据把同一条原则钉到**所有**声明面上。
+        """
+        from core import disk_cache as dc
+        # 只盯**内容面**（要逐件读进来取摘要的那些）；`layer_model.patterns()` / `purity_scan.patter
+        # ns()`
+        # 是**成员面**（只枚举路径、不读内容，见 `core.face_key`），里面出现 tests 无害。
+        faces = {"disk_cache.CODE_FACE": dc.CODE_FACE,
+                 "quality_depth_scan.QD_INPUTS": qd.QD_INPUTS,
+                 "purity_scan.OWN_PATTERNS": ps.OWN_PATTERNS,
+                 "layer_model._READ_FACE": lm._READ_FACE}
+        for site, spec in DerivedResultCacheTest._sites().items():
+            if site in ("purity_scan.scan", "layer_model.scan"):
+                continue
+            faces["site:" + site] = spec["patterns"]
+        dirty = {}
+        for name, pats in sorted(faces.items()):
+            junk = sorted({rel for pat in pats for rel in cs.iter_files(ROOT, pat)
+                           if rel.startswith("desktop/tests/")})
+            if junk:
+                dirty[name] = junk[:3]
+        self.assertEqual({}, dirty,
+                         "输入面收了测试件（裁决不读它们 ⇒ 每次冷跑白读）：%s" % dirty)
+
+
+class ReloadCoherenceTest(unittest.TestCase):
+    """**模块身份一致性**：进程内发生 `core.*` 重载（守护换版机制）之后，按**当前**实例取判据仍成立。
+
+    依据（2026-09-29 实测）：`daemon._sync_code` 会把 `core.*` 从 `sys.modules` 摘掉重载，于是进程里
+    同时存在新旧两份模块对象；`regression_score._count` 用 `__import__` 现取 ⇒ 调的是**新**实例。
+    任何「拿旧实例的模块级计数当观测面」的判据都会读出 0（`FaceReuseBudgetTest` 就这样被误伤过：
+    与 `test_daemon`/`test_watch`/`test_disk_cache` 同进程连跑时「说不清 ⇒ 0 次重算」）。
+    本判据在**子进程**里逼一次重载再量，避免自己成为新的泄漏源。
+    """
+
+    def test_budget_holds_after_in_process_reload(self):
+        import subprocess
+        code = (
+            "import importlib, sys, pathlib\n"
+            "root = %r\n"
+            "sys.path.insert(0, str(pathlib.Path(root, 'desktop', 'src')))\n"
+            "from core import daemon as dm\n"
+            "dm._code_fingerprint = lambda r: ('forced-code-change',)\n"
+            "import core.conformance_scan as csc   # 先 import，再逼重载（模拟老引用）\n"
+            "old = csc\n"
+            "dm._sync_code(pathlib.Path(root))\n"
+            "cs = importlib.import_module('core.conformance_scan')\n"
+            "rs = importlib.import_module('core.regression_score')\n"
+            "dm.reset_process_caches()\n"
+            "cs.install_resident(root)\n"
+            "rs.evaluate(root)\n"
+            "cs.clear_changes()\n"
+            "before = cs._FACE_FP_STATS['recomputes']\n"
+            "rs.evaluate(root)\n"
+            "print(cs._FACE_FP_STATS['recomputes'] - before, old is cs)\n"
+        ) % (ROOT,)
+        out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", cwd=ROOT, timeout=300)
+        self.assertEqual(0, out.returncode, out.stderr[-400:])
+        bare, same = out.stdout.strip().split()
+        self.assertNotEqual("True", same, "子进程里没逼出重载？判据自身要有效")
+        self.assertGreaterEqual(int(bare), 4,
+                                "重载之后按当前实例量，『说不清 ⇒ 全算』必须仍成立（否则观测面串了"
+                                    "）")
+
+
+if __name__ == "__main__":
+    unittest.main()

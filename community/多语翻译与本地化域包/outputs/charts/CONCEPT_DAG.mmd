@@ -1,0 +1,85 @@
+%% 概念前置图（由 community/多语翻译与本地化域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    E06-01
+    E06-03
+    E06-05
+    E06-07
+    E06-09
+    E06-11
+  end
+  subgraph P60[P60]
+    E06-02
+    E06-04
+    E06-06
+    E06-08
+    E06-10
+    E06-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-iso-8601
+    STD-mermaid
+    STD-oci-image
+    STD-rdf11
+    STD-rfc3339
+    STD-w3c-epub33
+    STD-w3c-skos
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  E06-01 --> E06-02
+  E06-02 --> E06-03
+  E06-03 --> E06-04
+  E06-01 --> E06-04
+  E06-04 --> E06-05
+  E06-02 --> E06-05
+  E06-05 --> E06-06
+  E06-03 --> E06-06
+  E06-06 --> E06-07
+  E06-04 --> E06-07
+  E06-07 --> E06-08
+  E06-05 --> E06-08
+  E06-08 --> E06-09
+  E06-06 --> E06-09
+  E06-09 --> E06-10
+  E06-07 --> E06-10
+  E06-10 --> E06-11
+  E06-08 --> E06-11
+  E06-11 --> E06-12
+  E06-09 --> E06-12
+  E06-04 --> STD-commonmark
+  E06-07 --> STD-commonmark
+  E06-01 --> STD-commonmark
+  E06-02 --> STD-commonmark
+  E06-05 --> STD-commonmark
+  E06-08 --> STD-commonmark
+  E06-11 --> STD-commonmark
+  E06-12 --> STD-commonmark
+  E06-12 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  E06-08 --> STD-ietf-json-schema
+  E06-06 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  E06-03 --> STD-mermaid
+  E06-03 --> STD-oci-image
+  E06-11 --> STD-rfc3339
+  STD-iso-8601 --> STD-rfc3339
+  E06-06 --> STD-w3c-epub33
+  E06-09 --> STD-w3c-epub33
+  E06-10 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  E06-01 --> STD-w3c-skos
+  STD-rdf11 --> STD-w3c-skos
+  E06-02 --> STD-w3c-tabular-data
+  E06-05 --> STD-w3c-tabular-data
+  E06-04 --> STD-w3c-tabular-data
+  E06-07 --> STD-w3c-tabular-data
+  E06-09 --> STD-w3c-tabular-data
+  E06-10 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

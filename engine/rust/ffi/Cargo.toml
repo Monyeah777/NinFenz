@@ -1,0 +1,17 @@
+[package]
+name = "nf-ffi"
+version = "0.1.0"
+edition = "2021"
+description = "NF C ABI 绑定层（cdylib）：导出 engine_loader.ABI_SYMBOL，供 ctypes 同进程调用"
+license = "MIT"
+
+# std-only，理由与插件一致：绑定层只做**搬运**，不留任何外部依赖面给「ABI 是否等价」这个问题。
+[dependencies]
+
+[lib]
+name = "nf_ffi"
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = 2
+lto = true

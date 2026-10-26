@@ -1,0 +1,34 @@
+{
+  "assertions": [
+    {
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.created",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture"
+          }
+        ]
+      },
+      "label": "c2pa.actions"
+    },
+    {
+      "data": {
+        "alg": "sha256",
+        "hash": "44d52b4c786593e38879a85815e2a4277ef21c91dcb30e7ea6e0862c0a0ea214",
+        "name": "STRATEGY.md"
+      },
+      "label": "c2pa.hash.data"
+    }
+  ],
+  "claim_generator": "NinFenz/1.0 (nf interop --kind c2pa)",
+  "claim_generator_info": [
+    {
+      "name": "NinFenz",
+      "version": "1.0.0"
+    }
+  ],
+  "format": "application/json",
+  "title": "NinFenz 协议层内容清单",
+  "x-nf-package-status": "未封装（无 JUMBF/CBOR 容器）、未签名（无 X.509 证书链）——只出 JSON 清单形状，不得当作可验证内容凭证",
+  "x-nf-source": "protocol/RECEIPTS.json（回执摘要）"
+}

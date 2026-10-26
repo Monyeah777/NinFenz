@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1
+# Dockerfile.crosscheck —— 跨语言契约对拍的**密封**跑法（计划 §16.6 / P-C5）。
+#
+# 原则借 Nix/Bazel：**输入可枚举 + 环境可复现 + 结果可哈希**。容器只是载体之一，故：
+#   - 基础镜像一律按 **digest** 钉（不是 tag）；
+#   - 无法用镜像钉住的输入（.NET SDK）按 **SHA-512** 钉并在构建期校验；
+#   - 三实现各自来自本仓源码，不引预编译产物。
+#
+# 本地无法执行（本机无容器引擎）时走**降级**：scripts/cross_lang_verify.py 的 --digest
+# 记录工具链版本与产物 sha256，等价地满足「结果可哈希」。两者都由
+# desktop/tests/test_sealed_crosscheck.py 钉住（digest 是否真钉、SDK 是否真校验）。
+ARG RUST_BASE=rust:1-slim-bookworm@sha256:2c3a22f0a5533ea2dd5a16627bc841228151faa2d4de2644ac9987e4a2f1f2fa
+ARG PY_BASE=python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
+
+FROM ${RUST_BASE} AS rustbuild
+WORKDIR /src
+COPY engine/rust/canonical/Cargo.toml engine/rust/canonical/Cargo.toml
+COPY engine/rust/canonical/src/ engine/rust/canonical/src/
+RUN cargo build --release --manifest-path engine/rust/canonical/Cargo.toml \
+ && install -m 0755 engine/rust/canonical/target/release/nf-canonical /out-nf-canonical
+
+FROM ${PY_BASE} AS crosscheck
+# .NET 8 SDK：按 SHA-512 钉（mcr 的 manifest 头在本机取不到，故用「官方 tarball + 哈希校验」
+# 这条同样密封的路；换版本必须同时换 URL 与哈希）。
+ARG DOTNET_SDK_URL=https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.425/dotnet-sdk-8.0.425-linux-x64.tar.gz
+ARG DOTNET_SDK_SHA512=934b8060a7190e5909ad1fd0785db542f487b3bbf6cdd14826b02095fdd0d0394298b1634085eff302928fccc33f7c1a7253e9b87df555fc36fce819bcd2e798
+ENV DOTNET_ROOT=/usr/share/dotnet \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+    DOTNET_NOLOGO=1 \
+    RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:/usr/share/dotnet:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl ca-certificates; \
+    curl -fsSL "${DOTNET_SDK_URL}" -o /tmp/dotnet.tar.gz; \
+    echo "${DOTNET_SDK_SHA512}  /tmp/dotnet.tar.gz" | sha512sum -c -; \
+    mkdir -p /usr/share/dotnet; \
+    tar -xzf /tmp/dotnet.tar.gz -C /usr/share/dotnet; \
+    rm -f /tmp/dotnet.tar.gz; \
+    rm -rf /var/lib/apt/lists/*; \
+    dotnet --list-sdks
+
+# Rust 工具链整份搬过来（清单里 rust 面的命令是 cargo run ⇒ 终态镜也要有 cargo）。
+COPY --from=rustbuild /usr/local/rustup /usr/local/rustup
+COPY --from=rustbuild /usr/local/cargo /usr/local/cargo
+COPY --from=rustbuild /out-nf-canonical /usr/local/bin/nf-canonical
+
+WORKDIR /repo
+COPY . /repo
+RUN dotnet build engine/dotnet/tools/nf-canonical/nf-canonical.csproj -c Release -v quiet
+
+# full 模式：UNKNOWN = 0（§16.5）。两条清单都跑，并落下可复核的 digest。
+RUN python3 scripts/cross_lang_verify.py \
+      --manifest protocol/generated/test_vectors/jcs_conformance.json --require-full --digest
+RUN python3 scripts/cross_lang_verify.py \
+      --manifest protocol/generated/test_vectors/jcs_reject.json --require-full
+RUN python3 scripts/cross_lang_verify.py --coverage

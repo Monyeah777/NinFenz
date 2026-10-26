@@ -1,0 +1,25 @@
+[package]
+name = "nf-plugin-sha256-component"
+version = "0.1.0"
+edition = "2021"
+description = "NF 微内核参考插件（Component Model 形态：WIT 类型接口 + Canonical ABI）"
+license = "MIT"
+
+# 组件形态与 CLI 形态并存，边界不同：
+#   CLI 形态（../sha256）：靠 WASI preview1 的 stdin/stdout 搬运，能用 wasmtime 的
+#                          能力开关/燃料/超时；但接口是**约定**（argv+管道），类型面靠清单校验。
+#   组件形态（本 crate）：接口是 **WIT 类型**，装载期可直接读二进制的类型段校验，
+#                         无需适配器；但能力面走 WASI preview2，隔离开关需另一套。
+# 两条都留：一个管「能力与计量」，一个管「类型与 ABI」，正好对应 P5-02/03 与 P5-05/06。
+[dependencies]
+wit-bindgen = "0.30"
+
+[lib]
+# rlib 让 cargo test 有宿主侧测试目标（cdylib 单独时单元测试无处挂）；
+# 组件化只吃 wasm32-unknown-unknown 的 cdylib 产物。
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

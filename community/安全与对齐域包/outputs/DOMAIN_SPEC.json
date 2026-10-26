@@ -1,0 +1,501 @@
+{
+  "kind": "nf-domain-spec/1",
+  "code": "F01",
+  "domain": "安全与对齐",
+  "section": "F · 治理、安全与产业生态",
+  "anchors_verified_on": "2026-09-22",
+  "standard_anchors_verified_on": "2026-09-24",
+  "metric_family": "agreement",
+  "content_tier": "derived",
+  "data_authenticity": {
+    "standard_bindings": 24,
+    "in_catalog_ratio": 1.0,
+    "reachable_ratio": 1.0,
+    "probe_evidence_ratio": 1.0,
+    "anchor_probed_ratio": 1.0,
+    "score": 1.0,
+    "threshold": 0.95,
+    "bound_standards": [
+      "c2pa-spec",
+      "commonmark",
+      "ietf-json-schema",
+      "mermaid",
+      "mlcommons-bench",
+      "owasp-llm",
+      "spdx-licenses",
+      "vega-lite",
+      "w3c-prov-o"
+    ]
+  },
+  "subdivisions": [
+    {
+      "id": "F01-01",
+      "name": "越狱与红队",
+      "definition": "越狱与红队：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "owasp-llm",
+      "standard_why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+      "standards": [
+        {
+          "ref": "owasp-llm",
+          "role": "primary",
+          "why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+          "layer": "gov",
+          "body": "OWASP",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "owasp-top10"
+          ]
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "F 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-02",
+      "name": "提示注入防御",
+      "definition": "提示注入防御：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "commonmark",
+      "standard_why": "关键词「提示|指令|模板」命中",
+      "standards": [
+        {
+          "ref": "commonmark",
+          "role": "primary",
+          "why": "关键词「提示|指令|模板」命中",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "w3c-prov-o",
+          "role": "support",
+          "why": "F 段载体锚（轮换 1；与主锚异层）",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-03",
+      "name": "有害内容拦截",
+      "definition": "有害内容拦截：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "spdx-licenses",
+      "standard_why": "F 段默认绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "spdx-licenses",
+          "role": "primary",
+          "why": "F 段默认绑定（轮换 2）",
+          "layer": "gov",
+          "body": "SPDX",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "F 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-04",
+      "name": "价值观对齐",
+      "definition": "价值观对齐：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "F 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-05",
+      "name": "拒答策略",
+      "definition": "拒答策略：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-prov-o",
+      "standard_why": "F 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "w3c-prov-o",
+          "role": "primary",
+          "why": "F 段默认绑定（轮换 1）",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "F 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-06",
+      "name": "多模态安全",
+      "definition": "多模态安全：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "owasp-llm",
+      "standard_why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+      "standards": [
+        {
+          "ref": "owasp-llm",
+          "role": "primary",
+          "why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+          "layer": "gov",
+          "body": "OWASP",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "owasp-top10"
+          ]
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "F 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-07",
+      "name": "水印与溯源",
+      "definition": "水印与溯源：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "c2pa-spec",
+      "standard_why": "关键词「水印|溯源|凭证|内容来源」命中",
+      "standards": [
+        {
+          "ref": "c2pa-spec",
+          "role": "primary",
+          "why": "关键词「水印|溯源|凭证|内容来源」命中",
+          "layer": "gov",
+          "body": "C2PA",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "cbor",
+            "cose"
+          ]
+        },
+        {
+          "ref": "w3c-prov-o",
+          "role": "support",
+          "why": "载体锚：产出形态「溯源」的承载标准",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-08",
+      "name": "滥用监测",
+      "definition": "滥用监测：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-prov-o",
+      "standard_why": "F 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "w3c-prov-o",
+          "role": "primary",
+          "why": "F 段默认绑定（轮换 1）",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "F 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-09",
+      "name": "边界声明",
+      "definition": "边界声明：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "spdx-licenses",
+      "standard_why": "F 段默认绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "spdx-licenses",
+          "role": "primary",
+          "why": "F 段默认绑定（轮换 2）",
+          "layer": "gov",
+          "body": "SPDX",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "F 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-10",
+      "name": "安全评测",
+      "definition": "安全评测：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "owasp-llm",
+      "standard_why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+      "standards": [
+        {
+          "ref": "owasp-llm",
+          "role": "primary",
+          "why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+          "layer": "gov",
+          "body": "OWASP",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "owasp-top10"
+          ]
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "F 段载体锚（轮换 4；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-11",
+      "name": "应急演练",
+      "definition": "应急演练：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-prov-o",
+      "standard_why": "F 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "w3c-prov-o",
+          "role": "primary",
+          "why": "F 段默认绑定（轮换 1）",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "F 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "F01-12",
+      "name": "安全运营",
+      "definition": "安全运营：口径 = 法规或标准引用 / 证据物 / 审计留痕 / 责任人 四件齐备（本条目按 F 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "owasp-llm",
+      "standard_why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+      "standards": [
+        {
+          "ref": "owasp-llm",
+          "role": "primary",
+          "why": "关键词「安全|越狱|红队|攻击|对抗」命中",
+          "layer": "gov",
+          "body": "OWASP",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "owasp-top10"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "F 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 条款引用 / 证据物清单 / 留痕字段 / 责任角色；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只写「合规」不引条款；证据物与留痕缺失导致不可审计（F 段常见失效模式；领域专属失效模式待补）。"
+    }
+  ]
+}

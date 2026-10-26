@@ -1,0 +1,22 @@
+[package]
+name = "nf-rs-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+rustpython-parser = { path = "../vendor/rustpython-parser", default-features = false, features = ["location", "num-bigint"] }
+
+[[bin]]
+name = "python_parser"
+path = "fuzz_targets/python_parser.rs"
+test = false
+doc = false
+bench = false
+
+[profile.release]
+debug = 1

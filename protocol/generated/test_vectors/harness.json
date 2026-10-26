@@ -1,0 +1,45 @@
+{
+  "schema": "nf-test-vectors/1",
+  "note": "P-C0 走通件：harness 自证用（probe 只探工具链；真契约向量自 P-C1 起）",
+  "vectors": [
+    {
+      "id": "harness/python-arith",
+      "spec_clause": "HARNESS/1",
+      "level": "L1",
+      "compare_rule": "byte",
+      "expected": "2\n",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "-c",
+            "print(1+1)"
+          ]
+        }
+      }
+    },
+    {
+      "id": "harness/toolchain-probe",
+      "spec_clause": "HARNESS/2",
+      "level": "L0",
+      "compare_rule": "byte",
+      "expected": "",
+      "langs": {
+        "rust": {
+          "cmd": [
+            "cargo",
+            "--version"
+          ],
+          "probe": true
+        },
+        "csharp": {
+          "cmd": [
+            "dotnet",
+            "--list-sdks"
+          ],
+          "probe": true
+        }
+      }
+    }
+  ]
+}

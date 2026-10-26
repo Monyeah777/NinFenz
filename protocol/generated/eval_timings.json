@@ -1,0 +1,24 @@
+{
+  "schema": "nf-timings/1",
+  "note": "P6-06 提速曲线的实测样本。纪律：每条必须带 source（无出处的数字不进报告）。刷新命令：scripts/hotspot_profile.py --benchmark / scripts/plugin_promote.py。",
+  "samples": [
+    {
+      "face": "gate-check/docs-incremental",
+      "before_s": 137.13,
+      "after_s": 11.71,
+      "source": "计划 §23.59 落地版实测（提交 b6c7f25b：观测器超时 + 车道保守）"
+    },
+    {
+      "face": "jcs-canonical/python-to-rust",
+      "before_s": 0.1061,
+      "after_s": 0.009,
+      "source": "本机 hyperfine 5 次（2026-10-12）：scripts/hotspot_profile.py --benchmark 'python scripts/jcs.py' 'nf-canonical.exe'"
+    },
+    {
+      "face": "plugin-sha256/1MiB",
+      "before_s": 0.0898,
+      "after_s": 0.0301,
+      "source": "本机 scripts/plugin_promote.py --size 1048576 --repeat 3（2026-10-12）"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+NF 社区投稿内容许可（LicenseRef-Community-Submission）
+
+适用于 `library/` 与 `community/` 下由第三方投稿的条目（文件头 author / sources 标注来源者）：
+
+投稿即声明：投稿人拥有该内容的权利，或已获得权利人的明确授权，并同意本项目以 MIT 许可
+（见 LICENSES/MIT.txt）分发其**元数据与索引投影**，同时同意该内容在本仓库与 npm 发布物中
+**原样公开再分发**。
+
+内容版权仍归投稿人；引用或衍生须注明来源。如需下架，请按 SECURITY.md 的私密通道联系维护者。

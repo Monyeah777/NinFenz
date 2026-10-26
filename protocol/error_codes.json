@@ -1,0 +1,5 @@
+{
+  "schema": "nf-error-codes/1",
+  "note": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。空表期间不得以此为由跳过登记——条目按实际错误面在重构波次迁移。",
+  "codes": []
+}

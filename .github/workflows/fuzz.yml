@@ -1,0 +1,49 @@
+name: fuzz
+
+on:
+  pull_request:
+  schedule:
+    - cron: '17 4 * * 2'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cargo-fuzz:
+    name: cargo-fuzz-python-parser
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: Install nightly rust and cargo-fuzz
+        run: |
+          rustup toolchain install nightly --profile minimal
+          rustup run nightly cargo install cargo-fuzz --version 0.13.2 --locked
+      - name: Fuzz the Rust Python parser bridge
+        working-directory: engine/rust/fuzz
+        run: |
+          rustup run nightly cargo fuzz run python_parser -- \
+            -max_total_time=60 \
+            -timeout=10 \
+            -rss_limit_mb=2048
+      - name: Collect crash artifacts outside the tracked tree
+        if: always()
+        run: |
+          mkdir -p .artifacts/cargo-fuzz
+          if [ -d engine/rust/fuzz/artifacts ]; then
+            cp -R engine/rust/fuzz/artifacts/. .artifacts/cargo-fuzz/
+          fi
+      - name: Upload crash artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: cargo-fuzz-artifacts
+          path: .artifacts/cargo-fuzz/
+          if-no-files-found: ignore

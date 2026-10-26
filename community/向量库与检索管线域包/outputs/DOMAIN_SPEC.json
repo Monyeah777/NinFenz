@@ -1,0 +1,491 @@
+{
+  "kind": "nf-domain-spec/1",
+  "code": "C15",
+  "domain": "向量库与检索管线",
+  "section": "C · AI 工程与运维",
+  "anchors_verified_on": "2026-09-22",
+  "standard_anchors_verified_on": "2026-09-24",
+  "metric_family": "contract_compliance",
+  "content_tier": "derived",
+  "data_authenticity": {
+    "standard_bindings": 24,
+    "in_catalog_ratio": 1.0,
+    "reachable_ratio": 1.0,
+    "probe_evidence_ratio": 1.0,
+    "anchor_probed_ratio": 1.0,
+    "score": 1.0,
+    "threshold": 0.95,
+    "bound_standards": [
+      "arrow",
+      "cncf-otel-semconv",
+      "frictionless-package",
+      "mermaid",
+      "mlcommons-bench",
+      "mlcommons-croissant",
+      "nist-800-188",
+      "parquet",
+      "vega-lite",
+      "w3c-vc"
+    ]
+  },
+  "subdivisions": [
+    {
+      "id": "C15-01",
+      "name": "索引与分片",
+      "definition": "索引与分片：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "arrow",
+      "standard_why": "域码 C15 专属绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "arrow",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 0）",
+          "layer": "data",
+          "body": "Apache",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-02",
+      "name": "ANN 算法选型",
+      "definition": "ANN 算法选型：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "parquet",
+      "standard_why": "域码 C15 专属绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "parquet",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 1）",
+          "layer": "data",
+          "body": "Apache",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-03",
+      "name": "元数据过滤",
+      "definition": "元数据过滤：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-croissant",
+      "standard_why": "关键词「数据集|元数据|标注」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-croissant",
+          "role": "primary",
+          "why": "关键词「数据集|元数据|标注」命中",
+          "layer": "data",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "schema-org"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-04",
+      "name": "混合检索权重",
+      "definition": "混合检索权重：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "frictionless-package",
+      "standard_why": "关键词「检索|向量|嵌入|召回」命中",
+      "standards": [
+        {
+          "ref": "frictionless-package",
+          "role": "primary",
+          "why": "关键词「检索|向量|嵌入|召回」命中",
+          "layer": "data",
+          "body": "Frictionless",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "C 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-05",
+      "name": "增量更新",
+      "definition": "增量更新：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "parquet",
+      "standard_why": "域码 C15 专属绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "parquet",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 1）",
+          "layer": "data",
+          "body": "Apache",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "support",
+          "why": "C 段载体锚（轮换 4；与主锚异层）",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-06",
+      "name": "多租户隔离",
+      "definition": "多租户隔离：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "frictionless-package",
+      "standard_why": "域码 C15 专属绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "frictionless-package",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 2）",
+          "layer": "data",
+          "body": "Frictionless",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-07",
+      "name": "召回延迟优化",
+      "definition": "召回延迟优化：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "frictionless-package",
+      "standard_why": "关键词「检索|向量|嵌入|召回」命中",
+      "standards": [
+        {
+          "ref": "frictionless-package",
+          "role": "primary",
+          "why": "关键词「检索|向量|嵌入|召回」命中",
+          "layer": "data",
+          "body": "Frictionless",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-08",
+      "name": "重建与迁移",
+      "definition": "重建与迁移：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "parquet",
+      "standard_why": "域码 C15 专属绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "parquet",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 1）",
+          "layer": "data",
+          "body": "Apache",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-09",
+      "name": "检索评测",
+      "definition": "检索评测：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "关键词「评测|基准|排行榜|跑分」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "关键词「评测|基准|排行榜|跑分」命中",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "C 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-10",
+      "name": "权限与脱敏",
+      "definition": "权限与脱敏：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "nist-800-188",
+      "standard_why": "关键词「权限|访问控制|治理」命中",
+      "standards": [
+        {
+          "ref": "nist-800-188",
+          "role": "primary",
+          "why": "关键词「权限|访问控制|治理」命中",
+          "layer": "gov",
+          "body": "NIST",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "nist-privacy"
+          ]
+        },
+        {
+          "ref": "w3c-vc",
+          "role": "support",
+          "why": "载体锚：产出形态「身份」的承载标准",
+          "layer": "gov",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "rdf11"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-11",
+      "name": "容量规划",
+      "definition": "容量规划：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "parquet",
+      "standard_why": "域码 C15 专属绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "parquet",
+          "role": "primary",
+          "why": "域码 C15 专属绑定（轮换 1）",
+          "layer": "data",
+          "body": "Apache",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "C 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "C15-12",
+      "name": "检索可观测性",
+      "definition": "检索可观测性：口径 = 输入规格 / 处理参数 / 输出契约 / 验收判据 四件齐备（本条目按 C 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://arxiv.org/abs/1603.09320",
+      "anchor_kind": "paper",
+      "anchor_status": 200,
+      "standard_ref": "cncf-otel-semconv",
+      "standard_why": "关键词「可观测|遥测|监控|日志|成本|可靠性」命中",
+      "standards": [
+        {
+          "ref": "cncf-otel-semconv",
+          "role": "primary",
+          "why": "关键词「可观测|遥测|监控|日志|成本|可靠性」命中",
+          "layer": "eng",
+          "body": "OpenTelemetry",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "C 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 版本 / 关键参数 / 对照基线 / 复现命令；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只报最优单次结果不报方差；工具与数据版本漂移未记录（C 段常见失效模式；领域专属失效模式待补）。"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+name: ✨ 功能请求
+description: 提出新功能或改进建议（说明消费方与验收口径，便于判断成熟度）
+title: '[FEAT] '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: 需求背景
+      description: 想解决什么问题 / 什么场景下需要
+    validations:
+      required: true
+  - type: textarea
+    id: capability
+    attributes:
+      label: 期望能力
+      description: 具体描述期望的行为或产出
+    validations:
+      required: true
+  - type: textarea
+    id: consumers
+    attributes:
+      label: 谁消费
+      description: 具体消费方（模块 / CLI / verify check / 文档 / 外部产物格式）；不接受「将来可能有用」（CONTRIBUTING §4.5 B1 五问之一）
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: 影响范围
+      description: 与 CONTRIBUTING §1「适用对象」同口径；代码面分类由 library/intake.json 的 submission.code_surfaces 单一真源校验
+      options:
+        - 协议层（01–07 / 08 / 09 方案）
+        - 代码层（scripts/ · desktop/ · tui/ · engine/ · integrations/ · site/）
+        - 社区领域包 community/
+        - 工程治理（docs/meta/ROADMAP.md / CHANGELOG / CONTRIBUTING / .github / verify.sh）
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案 / 反方（可选）
+      description: 你考虑过的其它做法、以及不做的代价（CONTRIBUTING §4.5 的钢人论证口径）
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收设想（可选）
+      description: 怎样算完成（可核的判据优先于主观描述）
+    validations:
+      required: false

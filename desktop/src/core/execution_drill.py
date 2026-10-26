@@ -1,0 +1,323 @@
+"""42 M1：协议可执行性内部自测 —— 执行失范捕获器（动态质量维基建）。
+
+把已观察的 AI 执行失范类别固化为可机检断言（内部演练替代外部实测，
+同构于「agent 读协议执行」且可复现）：
+
+R1 fabricated_id        编造编号：输出出现装配真实编号集外的模块号。
+R2 browse_repeat        浏览-复述：输出与源文本重合度高且无推进信号。
+R3 no_citation          无引用凭印象：决策性断言却无 §/编号/行号/章节引用。
+R4 semantic_misalignment 编号真实语义错位：提及模块但语句用词属其它模块职责。
+
+断言分级 = 42 M1 规范「硬断言（FAIL）」，样本诚实标注来源（fixtures source_note），
+变异自检 = guard 样本（不应误捕获）由 test_execution_drill 覆盖。
+"""
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+from core import json_doc
+
+_MODULE_TOKEN = re.compile(r"(?:[\u4e00-\u9fff]+:)?M\d{2,3}")
+#: 判定词表（缺省中文；用例可在 fixture 的 lexicon 里按语言覆盖——见 §多语协议执行）。
+_DECISION_WORDS = ("应", "应该", "必须", "禁止", "不得", "下一步", "输出", "结论")
+#: 单字判定词的**构词排除表**（2026-10-20 真实语料实测）。
+#: 键 = 单字判定词；值 = (不能紧邻其前的构词字, 不能紧邻其后的构词字)。
+#: 多字判定词（应该/必须/…）仍按子串匹配；这里只拦「不是独立判定用法」的粘连形态——
+#: 中文无空格，`元素反应`/`对应件`/`应用` 里的 `应` 不是「应当」义。
+_DECISION_GLUE: dict[str, tuple[str, str]] = {
+    "应": ("反对适响供效相顺答呼照策接报感",
+           "用急对变聘邀酬届试运付缴纳计答战征招"),
+}
+_CITATION_SRC = (r"§\s*\d+(?:[.-]\d+)*|第\s*\d+\s*(?:节|步|章)|L\d+|行号|"
+                 r"[0-9A-Za-z_]+:[MTP]\d{2,3}|/\d+|\b\d{1,3}\b\s*行")
+#: 资产键形态：**大写下划线**标识（至少一个下划线）——模块号/管线号无下划线，天然不入面。
+_ASSET_TOKEN = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
+_PROGRESS = ("回合推进", "进入回合", "已进入第", "时间推进", "推进至", "进入下一回合")
+_SPLIT = re.compile(r"[。！？；\n]+")
+#: 编号断言的否定/历史语境谓词（2026-10-20 真实语料实测，见 `_is_contextual_mention`）。
+#: **只认显式谓词**：不做「句内有『不』就豁免」的粗口径，否则 `M99 输出不完整` 这类真失范
+#: 会被误豁免——判据只能收紧，不能放宽。
+_ASSERT_ABSENT_CUES = ("不命中", "未命中", "不适用", "不含", "不包含", "未包含", "不参与",
+                       "未参与", "不涉及", "未涉及", "未采用", "未使用", "不使用",
+                       "不得使用", "禁止使用", "不挂载", "未挂载", "不纳入", "未纳入",
+                       "跳过", "已移除", "未生效")
+_ASSERT_HISTORY_CUES = ("曾", "此前", "上一版", "旧版", "历史", "原编号", "旧编号",
+                        "残留", "遗留", "已废弃", "已下线", "已迁移", "旧名")
+_ASSERT_CTX_BEFORE = 10
+_ASSERT_CTX_AFTER = 14
+
+
+def _compile_citation(patterns) -> re.Pattern[str]:
+    """引用判据：缺省用内置单模式；用例声明列表时按 (?:p1|p2|…) 合成（多语各写各的模式）。"""
+    if not patterns:
+        return re.compile("(?:%s)" % _CITATION_SRC)
+    return re.compile("|".join("(?:%s)" % str(p) for p in patterns))
+
+#: 硬断言 ↔ 判级器（06 §11 / round_header.LAWS）映射（带状态头执行口径）
+RULE_LAW = {
+    "no_citation": "L1",            # 引用后执行（必须）
+    "fabricated_id": "L2",          # 禁止编造编号
+    "cross_pipeline_id": "L2",      # 禁止越界编号（编号真实但属其它管线）
+    "fabricated_asset_key": "L2",   # 禁止编造资产键
+    "browse_repeat": "L3",          # 禁止浏览-复述
+    "semantic_misalignment": "L4",  # 职责自洽（必须）
+}
+
+
+def _bigrams(text: str) -> set:
+    flat = re.sub(r"\s+", "", text)
+    return {flat[i:i + 2] for i in range(len(flat) - 1)} or {flat}
+
+
+def _mention_tokens(output: str) -> list[str]:
+    """**原始**模块号提及（含路径/文件名里的前缀）——只作「有没有编号提及」用。"""
+    return _MODULE_TOKEN.findall(output)
+
+
+def _id_token_spans(output: str) -> list[tuple[str, int, int]]:
+    """**可作编号断言的**模块号 token 及其位置：排除路径/文件名的前缀。
+
+    2026-10-20 真实语料实测：唯一真实战例 `docs/完整版样本_西幻生存流P03.md` 第 109 行
+    `- 出处：community/西幻生存领域包/modules/M10_死亡重生.md` —— `M10` 是**文件名**的一部分，
+    旧实现照抓并判 `fabricated_id`（"文件名被当裸编号"的误报）。
+    判据：紧跟 ASCII 标识符字符（`M10_死亡重生`）或 `.<ASCII 扩展名>`（`M10.md`）的匹配
+    不是裸编号断言；中文紧邻（`M10的`）与列表分隔（`M02/M03`）照常算。
+    """
+    spans: list[tuple[str, int, int]] = []
+    for m in _MODULE_TOKEN.finditer(output):
+        nxt = output[m.end():m.end() + 2]
+        if nxt[:1] and nxt[0].isascii() and (nxt[0].isalnum() or nxt[0] == "_"):
+            continue
+        if nxt[:1] == "." and len(nxt) > 1 and nxt[1].isascii() and nxt[1].isalnum():
+            continue
+        spans.append((m.group(0), m.start(), m.end()))
+    return spans
+
+
+def _assertion_context(output: str, start: int, end: int) -> tuple[str, str]:
+    """取编号前后**同句内**的语境窗（不跨 。！？；换行），供否定/历史谓词判定。"""
+    before = output[max(0, start - _ASSERT_CTX_BEFORE):start]
+    before = _SPLIT.split(before)[-1]
+    after = output[end:end + _ASSERT_CTX_AFTER]
+    after = _SPLIT.split(after)[0]
+    return before, after
+
+
+def _is_contextual_mention(before: str, after: str) -> bool:
+    """否定/历史语境里的编号提及**不是当前断言**（见 `_ASSERT_ABSENT_CUES` 注释）。
+
+    真实语料实测两类：
+    - 第 100 行 `步 14 M65 幽灵沉淀**不命中**` —— 否定谓词作用于该步，不是「由 M65 执行」；
+    - 第 188 行 `源编号**残留** M21` —— 回顾性叙述指向过去，不是当前装配声明。
+    """
+    cues = _ASSERT_ABSENT_CUES + _ASSERT_HISTORY_CUES
+    return any(c in before or c in after for c in cues)
+
+
+def _has_decision(output: str, decision) -> bool:
+    """判定词命中（**带边界**）：多字词按子串；单字词排除构词粘连（反应/对应/应用…）。"""
+    for word in decision:
+        if len(word) > 1:
+            if word in output:
+                return True
+            continue
+        glue = _DECISION_GLUE.get(word)
+        start = 0
+        while True:
+            i = output.find(word, start)
+            if i < 0:
+                break
+            prev = output[i - 1] if i > 0 else ""
+            nxt = output[i + 1] if i + 1 < len(output) else ""
+            glued = bool(glue) and ((bool(prev) and prev in glue[0])
+                                    or (bool(nxt) and nxt in glue[1]))
+            if not glued:
+                return True
+            start = i + 1
+    return False
+
+
+def _clauses(output: str) -> list[str]:
+    return [c.strip() for c in _SPLIT.split(output) if c.strip()]
+
+
+def _tail(tok: str) -> str:
+    """编号尾段：`通用:M10` → `M10`（无冒号即整串）。"""
+    return tok.split(":", 1)[-1]
+
+
+def _check_fabricated_id(output: str, real_ids: list[str], other_ids: list[str]) -> str:
+    """编号断言：本管线真实编号放行；**其它管线真实编号**判「跨管线串号」；其余判编造。
+
+    **后缀归一**（2026-10-20 修）：装配真实集里写 `通用:M10` / `生存:M10`（重号须类别前缀限定），
+    执行正文里常写裸 `M10`——旧实现拿整串精确比较 ⇒ 同一模块被判「编造」。
+    现与 `round_drill.scan`（R-R3）和 `assemble_plan`（决策句编号校验，`assemble_plan.py:219`）
+    **同口径**：冒号后的尾段命中即放行。
+
+    **语境排除**（2026-10-20 修）：否定谓词（`不命中`/`未启用`/`不得使用`…）与历史谓词
+    （`曾`/`旧版`/`残留`…）作用于该提及时，它不是在断言「本回合由它执行」——详见
+    `_is_contextual_mention`；只认显式谓词，不按「句内有『不』」豁免。
+    """
+    real_set = set(real_ids or [])
+    real_tails = {_tail(r) for r in real_set}
+    other_set = set(other_ids or [])
+    other_tails = {_tail(r) for r in other_set}
+    for tok, start, end in _id_token_spans(output):
+        if tok in real_set or _tail(tok) in real_tails:
+            continue
+        before, after = _assertion_context(output, start, end)
+        if _is_contextual_mention(before, after):
+            continue
+        if tok in other_set or _tail(tok) in other_tails:
+            return "cross_pipeline_id"
+        return "fabricated_id"
+    return ""
+
+
+def _check_fabricated_asset_key(output: str, asset_keys: list[str]) -> str:
+    """资产键断言：只判「大写下划线键」且仅当调用方给了允许集（无允许集不判，防误报）。"""
+    allowed = set(asset_keys or [])
+    if not allowed:
+        return ""
+    for tok in _ASSET_TOKEN.findall(output):
+        if tok not in allowed:
+            return "fabricated_asset_key"
+    return ""
+
+
+def _check_browse_repeat(output: str, source_text: str, progress) -> str:
+    if not source_text or len(output) < 8:
+        return ""
+    src = _bigrams(source_text)
+    overlap = len(_bigrams(output) & src) / max(1, len(src))
+    if overlap >= 0.55 and not any(p in output for p in progress):
+        return "browse_repeat"
+    return ""
+
+
+def _check_no_citation(output: str, decision, citation) -> str:
+    if _has_decision(output, decision) and not citation.search(output):
+        # 仅当整句既无引用也无真实模块编号时判失范
+        if not _mention_tokens(output):
+            return "no_citation"
+    return ""
+
+
+def _check_semantic_misalignment(output: str, semantics: dict[str, list]) -> str:
+    if not semantics:
+        return ""
+    for clause in _clauses(output):
+        for tok in _mention_tokens(clause):
+            own = semantics.get(tok) or []
+            if not own:
+                continue
+            others = [w for m, ws in semantics.items() if m != tok for w in ws]
+            has_own = any(w in clause for w in own)
+            has_other = any(w in clause for w in others)
+            if has_other and not has_own:
+                return "semantic_misalignment"
+    return ""
+
+
+def run_case(case: dict, real_ids: list[str],
+                 semantics: dict[str, list] | None = None,
+             source_text: str = "", other_ids: list[str] | None = None,
+             asset_keys: list[str] | None = None,
+             lexicon: dict[str, list] | None = None) -> list[str]:
+    """对单样本输出跑全部硬断言 → 返回命中的失范规则名列表。
+
+    other_ids = 其它管线真实编号集（判跨管线串号）；asset_keys = 本装配允许的资产键集
+    （判编造资产键；缺省为空 ⇒ 该断言不判，防无载体误报）。
+    lexicon = 判定词表（decision/progress 为字面子串，citation 为 regex 源串列表）；
+    缺省沿用中文内置词表——多语用例在 fixture 里声明自己的词表，引擎不硬编码语言。
+    """
+    lex = lexicon or {}
+    decision = tuple(lex.get("decision") or _DECISION_WORDS)
+    progress = tuple(lex.get("progress") or _PROGRESS)
+    citation = _compile_citation(lex.get("citation"))
+    output = case.get("output") or ""
+    hits = []
+    hit = _check_fabricated_id(output, real_ids, other_ids or [])
+    if hit:
+        hits.append(hit)
+    hit = _check_fabricated_asset_key(output, asset_keys or [])
+    if hit:
+        hits.append(hit)
+    hit = _check_browse_repeat(output, source_text or case.get("source_text", ""), progress)
+    if hit:
+        hits.append(hit)
+    hit = _check_no_citation(output, decision, citation)
+    if hit:
+        hits.append(hit)
+    hit = _check_semantic_misalignment(output, semantics or {})
+    if hit:
+        hits.append(hit)
+    return hits
+
+
+def run_file(path: str) -> dict:
+    data = json_doc.load(Path(path), dict, what=str(path))
+    real_ids = list(data.get("real_ids") or [])
+    semantics = data.get("semantics") or {}
+    source_text = data.get("source_text", "")
+    other_ids = list(data.get("other_ids") or [])
+    asset_keys = list(data.get("asset_keys") or [])
+    lexicon = data.get("lexicon") or {}
+    results = []
+    for case in data.get("cases", []):
+        hits = run_case(case, real_ids, semantics, source_text, other_ids, asset_keys,
+                        lexicon)
+        expected = set(case.get("expect_captured") or [])
+        results.append({
+            "id": case.get("id"),
+            "hits": sorted(set(hits)),
+            "expected": sorted(expected),
+            "guard": bool(case.get("guard")),
+            "ok": (not expected and not hits) or expected <= set(hits),
+        })
+    return {"total": len(results), "results": results}
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = list(argv) if argv is not None else sys.argv[1:]
+    if not args:
+        print("用法: python -m core.execution_drill <cases.json>", file=sys.stderr)
+        return 2
+    data = json_doc.load(Path(args[0]), dict, what=str(args[0]))
+    real_ids = data.get("real_ids") or []
+    semantics = data.get("semantics") or {}
+    source_text = data.get("source_text", "")
+    other_ids = data.get("other_ids") or []
+    asset_keys = data.get("asset_keys") or []
+    lexicon = data.get("lexicon") or {}
+    bad = 0
+    print("== execution_drill（%s · %s）==" % (data.get("schema"), data.get("pipeline")))
+    for case in data.get("cases", []):
+        hits = run_case(case, real_ids, semantics, source_text, other_ids, asset_keys,
+                        lexicon)
+        expected = set(case.get("expect_captured") or [])
+        ok = (not expected and not hits) or expected <= set(hits)
+        bad += 0 if ok else 1
+        print("  [%s] %-28s 命中=%s 期望=%s" %
+              ("PASS" if ok else "FAIL", case.get("id"),
+               sorted(set(hits)), sorted(expected)))
+    if bad:
+        print(">>> 演练捕获不达标（%d 例失败），样本集自身需修" % bad)
+        return 1
+    print(">>> 演练集全过（%d 例）：捕获无漏报、guard 无误报" % len(data.get("cases", [])))
+    return 0
+
+
+if __name__ == "__main__":
+    # UTF-8 stdio（2026-10-01 实测）：本模块是**文档里可照抄的入口**
+    # （`docs/42_M1_协议可执行性自测规范.md`：`PYTHONPATH=desktop/src python -m core.execution_drill
+    # …`），
+    # 而此前没钉输出编码 ⇒ Windows 管道下逐例结果以 **GBK 字节**吐出（实测
+    # `== execution_drill��… ==`、`����=[]`），按 UTF-8 读全是乱码——与 `core.text_hygiene`
+    # 同一类缺陷（`test_stdio_encoding` 管的是 `scripts/` 面，模块入口此前无人扫）。
+    for _s in (sys.stdout, sys.stderr):
+        if hasattr(_s, "reconfigure"):
+            _s.reconfigure(encoding="utf-8")
+    sys.exit(main())

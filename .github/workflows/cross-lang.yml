@@ -1,0 +1,71 @@
+name: cross-lang
+# 跨语言契约对拍的**常驻**线上面（计划 P-C4/P-C5 的 CI 接线）。
+#
+# 与 ci-verify.yml 的分工：那边是基线门（跑 bash verify.sh）；这边**只跑跨语言矩阵**，
+# 且以 **full 模式**跑（--require-full ⇒ UNKNOWN = 0，§16.5）。刻意不调 verify.sh：
+# 「整仓基线门」有且只有 ci-verify 一份（test_ci_visibility 会钉这一点）。
+#
+# 铁律：只读——不写任何仓库文件、不改基线。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+jobs:
+  cross-lang-matrix:
+    name: cross-lang-full-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # ubuntu-latest 自带 Python 3 与 Rust（rustup 预装）；.NET 8 SDK 亦在镜像内，
+      # 故除 checkout 外**不引任何 action**——少一处需钉 SHA 的第三方依赖。
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4（与仓库既有 workflow 同钉法）
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（python3 / rust / dotnet）
+        run: |
+          python3 --version
+          rustc --version
+          cargo --version
+          dotnet --list-sdks
+          dotnet --list-sdks | grep -q '^8\.' || { echo "::error::缺 .NET 8 SDK"; exit 1; }
+
+      - name: 构建两实现（Rust 独立实现 + C# 独立实现）
+        run: |
+          cargo build --release --manifest-path engine/rust/canonical/Cargo.toml
+          dotnet build engine/dotnet/tools/nf-canonical/nf-canonical.csproj -c Release -v quiet
+
+      - name: 跨语言矩阵 · 正例（full：三实现齐、UNKNOWN=0）
+        run: |
+          python3 scripts/cross_lang_verify.py \
+            --manifest protocol/generated/test_vectors/jcs_conformance.json \
+            --require-full --digest
+
+      - name: 跨语言矩阵 · 负例（拒绝语义三家一致）
+        run: |
+          python3 scripts/cross_lang_verify.py \
+            --manifest protocol/generated/test_vectors/jcs_reject.json \
+            --require-full
+
+      - name: 覆盖棘轮（spec_clause 覆盖只增不减）
+        run: python3 scripts/cross_lang_verify.py --coverage
+
+      - name: 覆盖棘轮退化时留下可读证据（报告落 artifact，不入仓）
+        if: failure()
+        run: |
+          python3 scripts/cross_lang_verify.py \
+            --manifest protocol/generated/test_vectors/jcs_conformance.json \
+            --json --digest > cross-lang-report.json || true
+          python3 scripts/cross_lang_verify.py \
+            --manifest protocol/generated/test_vectors/jcs_reject.json --json >> cross-lang-report.json || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: failure()
+        with:
+          name: cross-lang-report
+          path: cross-lang-report.json

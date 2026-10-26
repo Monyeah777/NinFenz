@@ -1,0 +1,108 @@
+{
+  "schema": "nf-locales/1",
+  "canonical": "zh",
+  "note": "语言面注册表：逐语言入口 + 责任方 + 覆盖面（entry = 只译入口；entry+guides = 入口 + docs 声明的文档译件）。文档译件须路径镜像并登记 source_sha256（源件一改即过期）。判据见 core/locales.py 与 check34。",
+  "locales": [
+    {
+      "id": "zh",
+      "label": "简体中文",
+      "entry": "README.md",
+      "codeowner": "@Monyeah777",
+      "coverage": "entry+guides"
+    },
+    {
+      "id": "en",
+      "label": "English",
+      "entry": "README.en.md",
+      "codeowner": "@Monyeah777",
+      "coverage": "entry+guides"
+    },
+    {
+      "id": "ja",
+      "label": "日本语",
+      "entry": "README.ja.md",
+      "codeowner": "@Monyeah777",
+      "coverage": "entry+guides"
+    }
+  ],
+  "docs": [
+    {
+      "path": "docs/release.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/release.md",
+          "source_sha256": "a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb"
+        },
+        "ja": {
+          "path": "docs/ja/release.md",
+          "source_sha256": "a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb"
+        }
+      }
+    },
+    {
+      "path": "docs/locales.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/locales.md",
+          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+        },
+        "ja": {
+          "path": "docs/ja/locales.md",
+          "source_sha256": "cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7"
+        }
+      }
+    },
+    {
+      "path": "docs/mcp.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/mcp.md",
+          "source_sha256": "c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78"
+        },
+        "ja": {
+          "path": "docs/ja/mcp.md",
+          "source_sha256": "c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78"
+        }
+      }
+    },
+    {
+      "path": "docs/terminal.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/terminal.md",
+          "source_sha256": "b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b"
+        },
+        "ja": {
+          "path": "docs/ja/terminal.md",
+          "source_sha256": "b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b"
+        }
+      }
+    },
+    {
+      "path": "docs/layers.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/layers.md",
+          "source_sha256": "be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450"
+        },
+        "ja": {
+          "path": "docs/ja/layers.md",
+          "source_sha256": "be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450"
+        }
+      }
+    },
+    {
+      "path": "docs/lsp.md",
+      "translations": {
+        "en": {
+          "path": "docs/en/lsp.md",
+          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+        },
+        "ja": {
+          "path": "docs/ja/lsp.md",
+          "source_sha256": "db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1054 @@
+"""MCP Server 运行时单测（v2.5.0 Wave5 C1：快照 → stdio JSON-RPC 服务）。
+
+运行：cd desktop && python -m unittest tests.test_mcp_runtime -v
+33-A5 报告差距勾销（对照 33_v2.2.0_A5-MCP规范差距核查报告.md）：
+- G1 形态级：mcp.json 静态快照 → 运行时 JSON-RPC 会话（handle 逐消息应答）
+- G2 字段级：resources/list 返回去 text 元数据；正文经 resources/read contents[].text
+- G4 归属层：name/version 入 initialize 握手 serverInfo（快照顶层仅作数据源）
+- C2 最小安全层：只读 + uri 白名单（未知 uri → -32602）；41 波C C7 开放只读
+  tools/prompts 面（无写路径工具，未知工具/方法仍拒出）
+数据源 = mcp_adapter 真实产出（export(ir,'mcp') → mcp.json 快照）。
+"""
+from __future__ import annotations
+
+import json
+import io
+import sys
+import tempfile
+import unittest
+from io import StringIO
+from pathlib import Path
+from unittest import mock
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from core.exporter import export  # noqa: E402
+from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
+from core import mcp_runtime as mrt  # noqa: E402
+from core import repo_index
+from core.mcp_runtime import (INVALID_PARAMS, INVALID_REQUEST,  # noqa: E402
+                              McpRuntime, encode_message, is_single_line_message,
+                              load_snapshot, template_matches, uri_template_issue,
+                              MAX_MESSAGE_BYTES,
+                              _repo_resource_metas, _repo_resource_templates)
+
+
+def _techdoc_snapshot() -> dict:
+    """真实 techdoc IR → mcp.json 快照（与 test_mcp_adapter 同构，P90+M90）。"""
+    ir = IRDocument(
+        type="techdoc", title="模组协议规范", pipeline_id="P90",
+        pipeline_name="技术文档生成管线",
+        layers=[
+            IRLayer(id="P10", name="结构", modules=[
+                IRModule(full_id="技术文档类:M90", name="协议骨架", layer="P10",
+                         content="协议必含：前置声明/字段表/示例三段。")]),
+            IRLayer(id="P30", name="片段", modules=[
+                IRModule(full_id="技术文档类:M90", name="规则校验", layer="P30",
+                         content="字段命名：snake_case；引用闭合。")]),
+        ],
+        asset_refs={}, asset_missing=[], meta={})
+    tmp = Path(tempfile.mkdtemp(prefix="nf_mcp_rt_"))
+    res = export(ir, "mcp", dest_dir=tmp)
+    snap_path = next(Path(f) for f in res.files if f.endswith("mcp.json"))
+    return load_snapshot(str(snap_path))
+
+
+def _req(mid, method, params=None):
+    msg = {"jsonrpc": "2.0", "id": mid, "method": method}
+    if params is not None:
+        msg["params"] = params
+    return msg
+
+
+class TestMcpRuntime(unittest.TestCase):
+    def setUp(self):
+        self.snap = _techdoc_snapshot()
+        self.srv = McpRuntime(self.snap)
+
+    def test_initialize_handshake_g4(self):
+        """G4 勾销：serverInfo.name/version 出自 initialize 握手；capabilities.resources 在场。"""
+        resp = self.srv.handle(_req(1, "initialize", {
+            "protocolVersion": "2025-11-25",
+            "capabilities": {},
+            "clientInfo": {"name": "test-client", "version": "0.0.1"},
+        }))
+        self.assertEqual(resp["jsonrpc"], "2.0")
+        self.assertEqual(resp["id"], 1)
+        result = resp["result"]
+        self.assertEqual(result["protocolVersion"], "2025-11-25")
+        self.assertEqual(result["capabilities"]["resources"], {})
+        self.assertIn("tools", result["capabilities"])
+        self.assertIn("prompts", result["capabilities"])
+        self.assertEqual(result["serverInfo"]["name"], "P90-mcp")
+        self.assertTrue(result["serverInfo"]["version"])
+
+    def test_initialize_legacy_fallback_when_version_unsupported(self):
+        """dual-era：initialize 请求不支持的版本 → 回落最新 legacy 版本。"""
+        resp = self.srv.handle(_req(2, "initialize", {"protocolVersion": "1900-01-01"}))
+        self.assertEqual(resp["result"]["protocolVersion"], "2025-11-25")
+
+    def test_discover_modern_must(self):
+        """2026-07-28 §Discovery：server/discover 一次返回版本集/能力/身份。"""
+        resp = self.srv.handle(_req(3, "server/discover", {
+            "_meta": {"io.modelcontextprotocol/protocolVersion": "2026-07-28"}}))
+        result = resp["result"]
+        self.assertEqual(result["resultType"], "complete")
+        self.assertEqual(result["supportedVersions"], ["2026-07-28", "2025-11-25"])
+        self.assertIn("resources", result["capabilities"])
+        self.assertEqual(
+            result["_meta"]["io.modelcontextprotocol/serverInfo"]["name"], "P90-mcp")
+        self.assertIn("ttlMs", result)
+
+    def test_unsupported_version_request_error_32022(self):
+        """规范 §Protocol Version Negotiation：不支持版本 MUST 回 -32022 并列出支持集。"""
+        resp = self.srv.handle(_req(4, "resources/list", {
+            "_meta": {"io.modelcontextprotocol/protocolVersion": "1900-01-01"}}))
+        err = resp["error"]
+        self.assertEqual(err["code"], -32022)
+        self.assertEqual(err["data"]["requested"], "1900-01-01")
+        self.assertIn("2026-07-28", err["data"]["supported"])
+
+    def test_modern_request_with_supported_version_ok(self):
+        """modern 请求带受支持版本 _meta → 正常应答（无握手）。"""
+        resp = self.srv.handle(_req(5, "ping", {
+            "_meta": {"io.modelcontextprotocol/protocolVersion": "2026-07-28"}}))
+        self.assertEqual(resp["result"], {})
+
+    def test_stdio_dual_era_end_to_end(self):
+        """真 stdio 环上跑 dual-era：modern(discover→tools/list) 与 legacy(initialize→initialized)
+        两种客户端会话都能在同一进程内走通——不是只调 handle()。"""
+        from io import StringIO
+        mod = {"io.modelcontextprotocol/protocolVersion": "2026-07-28"}
+        frames = [
+            {"jsonrpc": "2.0", "id": 1, "method": "server/discover", "params": {"_meta": mod}},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {"_meta": mod}},
+            {"jsonrpc": "2.0", "id": 3, "method": "initialize",
+             "params": {"protocolVersion": "2025-11-25", "capabilities": {}}},
+            {"jsonrpc": "2.0", "method": "notifications/initialized"},
+            {"jsonrpc": "2.0", "id": 4, "method": "ping"},
+        ]
+        payload = "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in frames)
+        out = StringIO()
+        self.srv.serve_stdio(stdin=StringIO(payload), stdout=out)
+        msgs = [json.loads(x) for x in out.getvalue().strip().splitlines()]
+        self.assertEqual([m.get("id") for m in msgs], [1, 2, 3, 4],
+                         "通知不应答；请求按序应答")
+        self.assertEqual(msgs[0]["result"]["supportedVersions"],
+                         ["2026-07-28", "2025-11-25"])
+        self.assertTrue(msgs[1]["result"]["tools"])
+        self.assertEqual(msgs[2]["result"]["protocolVersion"], "2025-11-25")
+        self.assertEqual(msgs[3]["result"], {})
+
+    def test_initialized_notification_no_response(self):
+        """notifications/initialized 是通知——无 id，不应回响应。"""
+        self.assertIsNone(self.srv.handle(
+            {"jsonrpc": "2.0", "method": "notifications/initialized"}))
+
+    def test_list_resources_no_text_g2(self):
+        """G2 + 44 + A3：resources/list 分页返回快照+仓库资源元数据——条目绝无 text。"""
+        resources = []
+        cursor = None
+        # 分页上限随仓库规模增长（2026-09-23 实测：AI 品类域包 100 包后 30 页取不完
+        # ——模块 248 / 管线 107 / 资产 ~300，资源面总量翻数倍）；改为大步长上限。
+        for _ in range(2000):
+            params = {} if cursor is None else {"cursor": cursor}
+            resp = self.srv.handle(_req(50, "resources/list", params))
+            page = resp["result"]["resources"]
+            resources += page
+            cursor = resp["result"].get("nextCursor")
+            if not cursor:
+                break
+        self.assertGreaterEqual(len(resources), 2)
+        self.assertTrue(any(r["uri"].startswith("nf://repo/module/")
+                            for r in resources))
+        for r in resources:
+            self.assertIn("uri", r)
+            self.assertIn("name", r)
+            self.assertNotIn("text", r, f"list 元数据不得内嵌正文（G2）：{r}")
+
+    def test_resources_templates_list(self):
+        """A3：resources/templates/list 暴露仓库内容寻址模板。"""
+        resp = self.srv.handle(_req(51, "resources/templates/list"))
+        tpls = resp["result"]["resourceTemplates"]
+        self.assertEqual(len(tpls), 5)
+        self.assertTrue(any("nf://repo/module/" in t["uriTemplate"]
+                            for t in tpls))
+        self.assertTrue(any("nf://repo/library/" in t["uriTemplate"]
+                            for t in tpls))
+        self.assertTrue(any("nf://repo/pattern/" in t["uriTemplate"]
+                            for t in tpls))
+
+    def test_resources_list_filter_type(self):
+        uris = set()
+        cursor = None
+        for _ in range(20):
+            params = {"type": "module"}
+            if cursor:
+                params["cursor"] = cursor
+            resp = self.srv.handle(_req(52, "resources/list", params))
+            page = resp["result"]["resources"]
+            uris |= {r["uri"] for r in page}
+            cursor = resp["result"].get("nextCursor")
+            if not cursor:
+                break
+        self.assertTrue(uris)
+        self.assertTrue(all(u.startswith("nf://repo/module/") for u in uris))
+
+    def test_resources_list_filter_asset_package(self):
+        import urllib.parse as up
+        resp = self.srv.handle(_req(53, "resources/list",
+                                    {"type": "asset", "package": "官方"}))
+        page = resp["result"]["resources"]
+        self.assertTrue(page)
+        for r in page:
+            parts = r["uri"].split("/")
+            self.assertEqual(up.unquote(parts[4]), "官方")
+
+    def test_resources_list_filter_module_package(self):
+        resp = self.srv.handle(_req(54, "resources/list",
+                                    {"type": "module", "package": "官方"}))
+        page = resp["result"]["resources"]
+        self.assertTrue(page)
+        self.assertTrue(all(r["uri"].startswith("nf://repo/module/")
+                            for r in page))
+        self.assertTrue(all(r.get("package") == "官方" for r in page))
+
+    def test_resources_list_param_admission(self):
+        """资源面参数准入（2026-09-30 补）：非法 cursor / 非法 type / 陌生键一律 `-32602`。
+
+        依据：此前非法 cursor 被**静默当 0**（客户端以为从第一页开始）、非法 `type` **静默给
+        空表**（客户端以为「没有这类资源」）——只读面里的静默错答，与工具参数面同一类。
+        """
+        for params in ({"cursor": "abc"}, {"cursor": -5}, {"type": 123},
+                       {"typo": "x"}, {"type": "不存在"}):
+            resp = self.srv.handle(_req(60, "resources/list", params))
+            self.assertEqual(INVALID_PARAMS, resp["error"]["code"], params)
+            self.assertIn("修复指引", resp["error"]["message"], params)
+        for params in ({}, {"type": "module"}, {"cursor": "0"}, {"cursor": "20"}):
+            resp = self.srv.handle(_req(61, "resources/list", params))
+            self.assertIn("result", resp, params)
+
+    def test_method_level_param_admission(self):
+        """方法级参数准入：其余四个带参方法同样只认自己声明的键（2026-09-30 补）。
+
+        同一条纪律的收口：参数写法不被理解时宁可拒绝，也不静默忽略——`resources/read` 与
+        `prompts/get` 此前会忽略陌生键（客户端以为过滤生效了），`initialize` 连
+        `capabilities` 类型都不看。`_` 前缀是协议保留区（`_meta` 用于每请求版本协商），放行。
+        """
+        for method, params in (("resources/read", {"uri": "nf://repo/module/M90", "foo": 1}),
+                               ("prompts/get", {"name": "assemble_guide", "foo": 1}),
+                               ("server/discover", {"foo": 1}),
+                               ("initialize", {"protocolVersion": "2025-11-25",
+                                               "capabilities": {}, "clientInfo": {}, "foo": 1})):
+            resp = self.srv.handle(_req(70, method, params))
+            self.assertEqual(INVALID_PARAMS, resp["error"]["code"], (method, params))
+            self.assertIn("修复指引", resp["error"]["message"], method)
+        bad = self.srv.handle(_req(72, "initialize", {"protocolVersion": "2025-11-25",
+                                                     "capabilities": "x", "clientInfo": {}}))
+        self.assertEqual(INVALID_PARAMS, bad["error"]["code"], bad)
+        # 反向：合规形态与保留名不受影响
+        for method, params in (("resources/read", {"uri": "nf://repo/module/M90"}),
+                               ("prompts/get", {"name": "assemble_guide"}),
+                               ("initialize", {"protocolVersion": "2025-11-25",
+                                               "capabilities": {}, "clientInfo": {}}),
+                               ("tools/list", {"_meta": {"io.modelcontextprotocol/"
+                                                         "protocolVersion": "2026-07-28"}})):
+            self.assertIn("result", self.srv.handle(_req(71, method, params)), (method, params))
+
+    def test_read_repo_module_resource_content(self):
+        """44 深化：resources/read 经 nf://repo/… 取模块正文实质内容。"""
+        resp = self.srv.handle(_req(31, "resources/read",
+                                    {"uri": "nf://repo/module/M90"}))
+        contents = resp["result"]["contents"]
+        self.assertEqual(len(contents), 1)
+        self.assertIn("machine_contract", contents[0]["text"])
+
+    def test_channel_surface_end_to_end_deep(self):
+        """44 深化：资源面与内容工具端到端自检（模块/管线/资产三类代表件全可读）。"""
+        uris = set()
+        cursor = None
+        for _ in range(2000):
+            params = {} if cursor is None else {"cursor": cursor}
+            resp = self.srv.handle(_req(40, "resources/list", params))
+            page = resp["result"]["resources"]
+            uris |= {r["uri"] for r in page}
+            cursor = resp["result"].get("nextCursor")
+            if not cursor:
+                break
+        self.assertTrue(any(u.endswith("/repo/module/M90") for u in uris))
+        self.assertTrue(any(u.endswith("/repo/pipeline/P90") for u in uris))
+        self.assertTrue(any(u.endswith("/TECH_RULES") for u in uris))
+        for u in ("nf://repo/module/M90", "nf://repo/pipeline/P90"):
+            resp = self.srv.handle(_req(41, "resources/read", {"uri": u}))
+            self.assertIn("text", resp["result"]["contents"][0])
+            self.assertNotIn("error", resp)
+        # 资产：包内社区键也可经 asset_read 取正文
+        resp = self.srv.handle(_req(42, "tools/call", {
+            "name": "asset_read",
+            "arguments": {"key": "EMOTION_WHEEL", "package": "校园情感领域包"}}))
+        payload = json.loads(resp["result"]["content"][0]["text"])
+        self.assertGreater(len(payload["matches"][0]["text"]), 100)
+
+    def test_read_resource_returns_text_g2(self):
+        """G2 勾销：正文经 resources/read → contents[].text（TextResourceContents）。"""
+        listed = self.srv.handle(_req(2, "resources/list"))["result"]["resources"]
+        uri = listed[0]["uri"]
+        resp = self.srv.handle(_req(3, "resources/read", {"uri": uri}))
+        contents = resp["result"]["contents"]
+        self.assertEqual(len(contents), 1)
+        self.assertEqual(contents[0]["uri"], uri)
+        self.assertIn("text", contents[0])
+        self.assertTrue(contents[0]["text"])  # 正文非空
+
+    def test_read_unknown_uri_rejected_c2(self):
+        """C2 白名单：未知 uri → -32602 INVALID_PARAMS（只读拒绝，不泄露）。"""
+        resp = self.srv.handle(_req(4, "resources/read",
+                                   {"uri": "nf://P90/P10/不存在-XX"}))
+        self.assertEqual(resp["error"]["code"], -32602)
+
+    def test_unknown_method_not_found(self):
+        """未实现方法（非只读面方法）→ -32601 METHOD_NOT_FOUND。"""
+        resp = self.srv.handle(_req(5, "bogus/method", {}))
+        self.assertEqual(resp["error"]["code"], -32601)
+
+    def test_tools_list_exposes_read_tools_c7(self):
+        """41 波C C7 + 44：tools/list 暴露只读检索工具与内容通道工具（真实 inputSchema）。"""
+        resp = self.srv.handle(_req(20, "tools/list"))
+        tools = resp["result"]["tools"]
+        names = {t["name"] for t in tools}
+        self.assertEqual(names,
+                         {"library_search", "registry_search",
+                          "pipeline_list", "spec_list",
+                          "module_read", "pipeline_read", "asset_read",
+                          "library_read", "pattern_list", "pattern_read",
+                          "asset_list", "knowledge_order_read"})
+        for t in tools:
+            self.assertIn("inputSchema", t)
+
+    def test_tools_call_module_read_content(self):
+        """44 内容通道：module_read 返回模块正文实质内容（非仅元数据）。"""
+        resp = self.srv.handle(_req(25, "tools/call", {
+            "name": "module_read", "arguments": {"module_id": "M90"}}))
+        payload = json.loads(resp["result"]["content"][0]["text"])
+        self.assertTrue(payload["found"])
+        self.assertTrue(payload["bytes"] > 200)
+        self.assertIn("machine_contract", payload["text"])
+
+    def test_tools_call_module_read_content_only_module(self):
+        """44 深化：社区模块（L0 retro-fit 后带机读块）也可按 id 读取正文。"""
+        resp = self.srv.handle(_req(32, "tools/call", {
+            "name": "module_read", "arguments": {"module_id": "M40"}}))
+        payload = json.loads(resp["result"]["content"][0]["text"])
+        self.assertTrue(payload["found"])
+        self.assertTrue(payload["has_machine_contract"])
+        self.assertIn("关系深度", payload["text"])
+
+    def test_tools_call_pipeline_read_content(self):
+        """44 内容通道：pipeline_read 按 id 返回管线正文。"""
+        resp = self.srv.handle(_req(26, "tools/call", {
+            "name": "pipeline_read", "arguments": {"pipeline": "P90"}}))
+        payload = json.loads(resp["result"]["content"][0]["text"])
+        self.assertTrue(payload["found"])
+        self.assertIn("P90", payload["text"])
+
+    def test_tools_call_asset_read_content(self):
+        """44 内容通道：asset_read 返回资产正文（官方用户自定义 TECH_RULES）。"""
+        resp = self.srv.handle(_req(27, "tools/call", {
+            "name": "asset_read", "arguments": {"key": "TECH_RULES"}}))
+        payload = json.loads(resp["result"]["content"][0]["text"])
+        self.assertEqual(payload["matches"][0]["package"], "官方")
+        self.assertIn("text", payload["matches"][0])
+
+    def test_tools_call_content_unknown_rejected(self):
+        """44 内容通道：未知模块/资产 → -32602（参数级拒绝，不泄露）。"""
+        resp = self.srv.handle(_req(28, "tools/call", {
+            "name": "module_read", "arguments": {"module_id": "M99-X"}}))
+        self.assertEqual(resp["error"]["code"], -32602)
+
+    def test_prompts_list_exposes_guide_c7(self):
+        resp = self.srv.handle(_req(21, "prompts/list"))
+        self.assertEqual(resp["result"]["prompts"][0]["name"], "assemble_guide")
+
+    def test_tools_call_registry_search(self):
+        resp = self.srv.handle(_req(22, "tools/call", {
+            "name": "registry_search", "arguments": {"query": "M90"}}))
+        text = resp["result"]["content"][0]["text"]
+        self.assertIn("M90", text)
+
+    def test_tools_call_unknown_tool_rejected(self):
+        resp = self.srv.handle(_req(23, "tools/call", {"name": "evil_write"}))
+        self.assertEqual(resp["error"]["code"], -32602)
+
+    def test_prompts_get_guide(self):
+        resp = self.srv.handle(_req(24, "prompts/get",
+                                    {"name": "assemble_guide"}))
+        msg = resp["result"]["messages"][0]
+        self.assertEqual(msg["role"], "user")
+        self.assertIn("装配师", msg["content"]["text"])
+
+    def test_ping_empty_result(self):
+        resp = self.srv.handle(_req(6, "ping"))
+        self.assertEqual(resp["result"], {})
+
+    def test_invalid_jsonrpc_version(self):
+        resp = self.srv.handle({"jsonrpc": "1.0", "id": 7, "method": "ping"})
+        self.assertEqual(resp["error"]["code"], -32600)
+
+    def test_serve_stdio_line_delimited_roundtrip(self):
+        """G1 形态：serve_stdio 换行分隔循环——init/list/read 逐行往返，中文 uri 不丢。"""
+        from io import StringIO
+        uri = next(iter(self.snap["mcp"]["resources"]))["uri"]
+        self.assertIn("nf://", uri)
+        inbound = "\n".join([
+            json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize",
+                        "params": {"protocolVersion": "2025-11-25",
+                                   "capabilities": {},
+                                   "clientInfo": {"name": "t", "version": "0"}}},
+                       ensure_ascii=False),
+            json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}),
+            json.dumps({"jsonrpc": "2.0", "id": 3, "method": "resources/list"}),
+            json.dumps({"jsonrpc": "2.0", "id": 4, "method": "resources/read",
+                        "params": {"uri": uri}}, ensure_ascii=False),
+            "这不是 JSON\n",
+        ]) + "\n"
+        out = StringIO()
+        self.srv.serve_stdio(stdin=StringIO(inbound), stdout=out)
+        lines = [l for l in out.getvalue().splitlines() if l.strip()]
+        # init + list + read 三响应（notification 无响应；坏 JSON → -32700）
+        self.assertEqual(len(lines), 4)
+        msgs = [json.loads(l) for l in lines]
+        by_id = {m["id"]: m for m in msgs if "id" in m}
+        self.assertEqual(by_id[1]["result"]["serverInfo"]["name"], "P90-mcp")
+        listed = by_id[3]["result"]["resources"]
+        self.assertTrue(all("text" not in r for r in listed))
+        read = by_id[4]["result"]["contents"][0]
+        self.assertEqual(read["uri"], uri)
+        self.assertTrue(read["text"])
+        # 坏 JSON → PARSE_ERROR(-32700)
+        errs = [m for m in msgs if "error" in m]
+        self.assertTrue(errs and errs[0]["error"]["code"] == -32700)
+
+    def test_serve_stdio_client_disconnect_silent(self):
+        """client 断开（stdout BrokenPipeError）→ serve_stdio 静默退出，不 traceback。"""
+        from io import StringIO
+
+        class _BrokenStdout(StringIO):
+            def write(self, *a, **kw):
+                raise BrokenPipeError("Broken pipe")
+
+        out = _BrokenStdout()
+        rc = self.srv.serve_stdio(
+            stdin=StringIO(json.dumps({"jsonrpc": "2.0", "id": 1,
+                                       "method": "ping"}) + "\n"),
+            stdout=out)
+        self.assertEqual(rc, 0)
+
+    def test_serve_stdio_keyboard_interrupt_silent(self):
+        """Ctrl+C（KeyboardInterrupt）→ serve_stdio 静默退出，不 traceback。"""
+
+        class _IntrIn:
+            def __init__(self):
+                self._sent = False
+            def reconfigure(self, *a, **kw):
+                pass
+            def __iter__(self):
+                return self
+            def __next__(self):
+                if not self._sent:
+                    self._sent = True
+                    return json.dumps({"jsonrpc": "2.0", "id": 1,
+                                       "method": "ping"})
+                raise KeyboardInterrupt()
+
+        from io import StringIO
+        rc = self.srv.serve_stdio(stdin=_IntrIn(), stdout=StringIO())
+        self.assertEqual(rc, 130)
+
+    def test_internal_keyerror_not_masked_as_unknown_uri(self):
+        """未来新方法抛 KeyError 不得被 handle 吞成「未知资源 uri」(-32602)。
+
+        白名单拒绝信号须专用化：仅 resources/read 的 C2 拒绝才标 -32602；
+        其它内部 KeyError（真实 bug）须走 INTERNAL_ERROR 面而非伪装成
+        参数错误。RED 版（修复前）：except KeyError 把任意 KeyError 归为
+        -32602，本测试断言应失败。
+        """
+        from io import StringIO
+
+        class _BoomSrv(McpRuntime):
+            def _dispatch(self, method, params):
+                if method == "boom":
+                    raise KeyError("内部真实 bug：字典缺键")
+                return super()._dispatch(method, params)
+
+        srv = _BoomSrv(self.snap)
+        out = StringIO()
+        srv.serve_stdio(stdin=StringIO(json.dumps(
+            {"jsonrpc": "2.0", "id": 9, "method": "boom"}) + "\n"), stdout=out)
+        msg = json.loads(out.getvalue().strip())
+        self.assertEqual(msg["error"]["code"], -32603)
+
+    def test_internal_error_is_redacted_from_protocol_face(self):
+        """R2（2026-10-22 安全审计，CWE-209）：内部异常只回稳定错误码 + 通用文案。
+
+        异常原文常带绝对路径（本仓大量「{path} 不存在」形态），回给 MCP 客户端等于泄露
+        服务端目录结构。判据：协议面 message 逐字 ==「Internal error」、不含路径/异常类名；
+        id 仍按 §5 回显；诊断细节必须只落在 stderr。
+        """
+        import contextlib
+        from io import StringIO
+        secret = "C:\\secret\\id_rsa 不存在"
+
+        class _LeakSrv(McpRuntime):
+            def _dispatch(self, method, params):
+                if method == "boom":
+                    raise OSError(secret)
+                return super()._dispatch(method, params)
+
+        srv = _LeakSrv(self.snap)
+        out, err = StringIO(), StringIO()
+        with contextlib.redirect_stderr(err):
+            srv.serve_stdio(stdin=StringIO(json.dumps(
+                {"jsonrpc": "2.0", "id": 11, "method": "boom"}) + "\n"), stdout=out)
+        msg = json.loads(out.getvalue().strip())
+        self.assertEqual(msg["error"]["code"], -32603)
+        self.assertEqual(msg["id"], 11, "id 可判定时 MUST 回显（§5）")
+        self.assertEqual(msg["error"]["message"], "Internal error",
+                         "对外文案必须是稳定通用文案（不得回显异常原文）")
+        self.assertNotIn(secret, out.getvalue(), "协议面泄露了异常里的绝对路径")
+        self.assertNotIn("OSError", out.getvalue(), "协议面泄露了异常类名")
+        self.assertIn(secret, err.getvalue(), "诊断细节必须落在 stderr")
+
+
+    # —— JSON-RPC 2.0 §4 / §5 结构约束（本波净吸收：params 结构性与 id 类型）——
+    def test_params_must_be_structured(self):
+        for bad in ("raw", 7, True):
+            msg = self.srv.handle(
+                {"jsonrpc": "2.0", "id": 71, "method": "ping", "params": bad})
+            self.assertEqual(msg["error"]["code"], INVALID_REQUEST, msg)
+            self.assertEqual(msg["id"], 71, "id 可判定时 MUST 回显（§5）")
+
+    def test_positional_params_rejected_with_invalid_params(self):
+        msg = self.srv.handle(
+            {"jsonrpc": "2.0", "id": 72, "method": "ping", "params": [1, 2]})
+        self.assertEqual(msg["error"]["code"], INVALID_PARAMS, msg)
+        self.assertEqual(msg["id"], 72)
+
+    def test_id_must_be_string_number_or_null(self):
+        msg = self.srv.handle({"jsonrpc": "2.0", "id": {"x": 1}, "method": "ping"})
+        self.assertEqual(msg["error"]["code"], INVALID_REQUEST, msg)
+        self.assertIsNone(msg["id"], "id 无法判定时 MUST 为 null（§5）")
+        ok = self.srv.handle({"jsonrpc": "2.0", "id": "abc", "method": "ping"})
+        self.assertEqual(ok["id"], "abc")
+
+    def test_non_finite_id_is_refused(self):
+        """NaN / ±Infinity 不是合法 JSON（RFC 8259 §6）⇒ 不得当 id 放行。
+
+        依据（2026-10-01 实测）：Python `json.loads` 默认接受 `NaN`/`Infinity` 字面量，旧判据
+        `isinstance(rid, (str,int,float))` 放行 `float("nan")` ⇒ 响应把 id 原样写成 `NaN`，
+        严格客户端**整条回包解析不了**（实测 `{"id":NaN,"result":{}}`）。
+        """
+        for bad in (float("nan"), float("inf"), float("-inf")):
+            msg = self.srv.handle({"jsonrpc": "2.0", "id": bad, "method": "ping"})
+            self.assertEqual(msg["error"]["code"], INVALID_REQUEST, repr(bad))
+            self.assertIsNone(msg["id"], "非法 id 不得回显（§5：无法判定时为 null）")
+
+    def test_serve_stdio_rejects_non_finite_literals_as_parse_error(self):
+        """帧里裸写 NaN/Infinity → -32700（不是含 `NaN` 的非法回包），且会话继续。"""
+        payload = ('{"jsonrpc":"2.0","id":NaN,"method":"ping"}\n'
+                   '{"jsonrpc":"2.0","id":7,"method":"ping"}\n')
+        out = StringIO()
+        self.srv.serve_stdio(stdin=StringIO(payload), stdout=out)
+        lines = out.getvalue().splitlines()
+        self.assertEqual(2, len(lines), out.getvalue())
+        first = json.loads(lines[0])
+        self.assertEqual(-32700, first["error"]["code"], first)
+        self.assertIsNone(first["id"])
+        self.assertEqual(7, json.loads(lines[1])["id"])
+
+    def test_internal_error_echoes_request_id(self):
+        """§5：内部异常的错误响应也要回带 id——否则调用方按 id 匹配时「看不到」这次失败。"""
+        from io import StringIO
+
+        class _Boom(McpRuntime):
+            def _dispatch(self, method, params):
+                if method == "boom":
+                    raise KeyError("内部真实 bug")
+                return super()._dispatch(method, params)
+
+        out = StringIO()
+        _Boom(self.snap).serve_stdio(
+            stdin=StringIO(json.dumps({"jsonrpc": "2.0", "id": 42, "method": "boom"}) + "\n"),
+            stdout=out)
+        msg = json.loads(out.getvalue().strip())
+        self.assertEqual(-32603, msg["error"]["code"])
+        self.assertEqual(42, msg["id"], "内部异常响应丢了请求 id（§5）")
+
+    def test_params_null_and_absent_are_accepted(self):
+        for msg in ({"jsonrpc": "2.0", "id": 73, "method": "ping", "params": None},
+                    {"jsonrpc": "2.0", "id": 74, "method": "ping"}):
+            out = self.srv.handle(msg)
+            self.assertNotIn("error", out, out)
+
+    # —— stdio transport 帧纪律（本波净吸收：一条消息一行 + 行边界陷阱字符转义）——
+    def test_encode_message_is_single_line_and_escapes_traps(self):
+        msg = {"jsonrpc": "2.0", "id": 81,
+               "result": {"text": "第一行\n第二行\u2028LS\u2029PS\u0085NEL"}}
+        line = encode_message(msg)
+        self.assertTrue(line.endswith("\n"))
+        self.assertTrue(is_single_line_message(line), repr(line))
+        self.assertEqual(line.count("\n"), 1, "消息内不得出现裸换行（除结尾分隔符）")
+        self.assertIn("\\u2028", line)
+        self.assertIn("\\u0085", line)
+        self.assertNotIn("\u2028", line)
+        self.assertIsNone(encode_message(None), "通知无响应 → 不写行")
+
+    def test_serve_stdio_writes_one_line_per_response(self):
+        payload = json.dumps({"jsonrpc": "2.0", "id": 82, "method": "ping"}) + "\n"
+        out = StringIO()
+        self.srv.serve_stdio(stdin=StringIO(payload), stdout=out)
+        lines = out.getvalue().splitlines()
+        self.assertEqual(len(lines), 1, out.getvalue())
+        self.assertTrue(is_single_line_message(lines[0] + "\n"))
+
+    def test_serve_stdio_parse_error_recovered(self):
+        payload = '{"jsonrpc": "2.0", "id": 83, "method"\n' + \
+                  json.dumps({"jsonrpc": "2.0", "id": 84, "method": "ping"}) + "\n"
+        out = StringIO()
+        self.srv.serve_stdio(stdin=StringIO(payload), stdout=out)
+        lines = out.getvalue().splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertEqual(json.loads(lines[0])["error"]["code"], -32700)
+        self.assertEqual(json.loads(lines[1])["id"], 84)
+
+    def test_oversized_inbound_message_is_rejected_and_session_survives(self):
+        """入站资源闸门（2026-09-30 补）：超上限的单条消息干净拒，且**不打死会话**。
+
+        依据：此前 `for raw in buf` 读任意长度的一行——客户端只要不发换行，就能让服务端把整条
+        流灌进内存（实测 20 MB 单帧照单全收）。现在按 `MAX_MESSAGE_BYTES` 截断拒收并丢弃到行尾
+        （行对齐不破），后续消息照常服务。
+        """
+        class _FakeIn(io.StringIO):
+            def __init__(self, raw: bytes):
+                super().__init__("")
+                self.buffer = io.BytesIO(raw)  # type: ignore[misc]  # `_iter_lines` 走字节路径才受上限约束
+
+        big = (b'{"jsonrpc":"2.0","id":1,"method":"ping","params":{"x":"'
+               + b"y" * (MAX_MESSAGE_BYTES + 64) + b'"}}\n')
+        good = b'{"jsonrpc":"2.0","id":2,"method":"ping"}\n'
+        out = StringIO()
+        self.srv.serve_stdio(stdin=_FakeIn(big + good), stdout=out)
+        lines = [json.loads(ln) for ln in out.getvalue().splitlines() if ln.strip()]
+        self.assertEqual(2, len(lines), lines)
+        self.assertEqual(INVALID_REQUEST, lines[0]["error"]["code"])
+        self.assertIn("超上限", lines[0]["error"]["message"])
+        self.assertEqual(2, lines[1]["id"])          # 超长帧不污染后续消息
+
+    # —— 资源模板面（RFC 6570 一级子集）：模板合法 + 真实 uri 全覆盖 ——
+    def test_uri_template_subset_validated(self):
+        for good in ("nf://repo/library/{id}", "nf://repo/asset/{package}/{key}"):
+            self.assertEqual(uri_template_issue(good), "", good)
+        for bad, why in (("nf://repo/library/{+id}", "操作符"),
+                         ("nf://repo/{a}/{a}", "重复"),
+                         ("nf://repo/library/{id}?q={q}", "查询"),
+                         ("nf://repo/library/{}", "空变量"),
+                         ("nf://repo/library/{id", "配平")):
+            self.assertIn(why, uri_template_issue(bad), bad)
+
+    def test_template_matches_real_uris(self):
+        templates = _repo_resource_templates()
+        metas = _repo_resource_metas()
+        self.assertGreater(len(metas), 50, "仓库资源面应有真实条目")
+        uncovered = [m["uri"] for m in metas
+                     if not any(template_matches(t["uriTemplate"], m["uri"])
+                                for t in templates)]
+        self.assertEqual(uncovered, [], "真实资源 uri 须被模板覆盖：%s" % uncovered[:3])
+        self.assertFalse(template_matches("nf://repo/library/{id}", "nf://repo/library/"))
+        self.assertFalse(template_matches("nf://repo/library/{id}", "nf://repo/pattern/x"))
+
+    def test_cacheable_results_carry_modern_required_keys(self):
+        """外部实证（MCP 2026-07-28 官方 schema）：可缓存结果须带 resultType/ttlMs/cacheScope。"""
+        for method in ("server/discover", "resources/list", "tools/list", "prompts/list",
+                       "resources/templates/list"):
+            resp = self.srv.handle(_req(90, method, {
+                "_meta": {"io.modelcontextprotocol/protocolVersion": "2026-07-28"}}))
+            result = resp["result"]
+            for k in ("resultType", "ttlMs", "cacheScope"):
+                self.assertIn(k, result, "%s 缺 %s" % (method, k))
+            self.assertEqual(result["resultType"], "complete")
+            self.assertIsInstance(result["ttlMs"], int)
+            self.assertIn(result["cacheScope"], ("public", "private"))
+
+
+class VersionDeclarationKeyTest(unittest.TestCase):
+    """版本声明**只认规范键名**：`_meta["io.modelcontextprotocol/protocolVersion"]`。
+
+    依据（2026-10-01 实测，本判据的补面）：`-32022` 的判据已由既有用例覆盖（命名空间键 + 不支持
+    版本 ⇒ `-32022` + `supported`/`requested`），但**「用别的键名算不算声明」没有钉住**——
+    实测裸键 `_meta["protocolVersion"]` **不算声明**（服务端按 legacy 处理、不回 `-32022`）。
+    这条口径容易两头出错（客户端以为声明了、服务端根本没看到），故写进 `docs/mcp.md` 并在此钉住：
+    **只有规范键名触发版本校验**，裸键既不报错也不生效。
+    """
+
+    def setUp(self):
+        self.rt = mrt.McpRuntime({"mcp": {"name": "probe", "version": "0", "resources": []}})
+
+    def _list(self, meta):
+        return self.rt.handle({"jsonrpc": "2.0", "id": 1, "method": "resources/list",
+                               "params": {"_meta": meta}})
+
+    def test_only_the_namespaced_key_declares_a_version(self):
+        err = (self._list({"io.modelcontextprotocol/protocolVersion": "1900-01-01"})
+               .get("error") or {})
+        self.assertEqual(mrt.UNSUPPORTED_PROTOCOL_VERSION, err.get("code"),
+                         "命名空间键声明了不支持版本，必须 -32022")
+        self.assertIn("1900-01-01", str(err.get("data", {}).get("requested")))
+        # 裸键：不算版本声明 ⇒ 不报 -32022（按 legacy 处理），但仍须正常服务
+        ok = self._list({"protocolVersion": "1900-01-01"})
+        self.assertNotIn("error", ok, "裸键不构成版本声明，不该被当版本错误（口径见 docs/mcp.md）")
+        self.assertTrue(ok.get("result", {}).get("resources"), "裸键请求仍须正常返回资源")
+        # 规范键名 + 受支持版本 ⇒ 正常
+        good = self._list({"io.modelcontextprotocol/protocolVersion": "2026-07-28"})
+        self.assertNotIn("error", good)
+
+
+class PromptGetInteropTest(unittest.TestCase):
+    """`prompts/get` 必须接受**协议自带的空 `arguments`**（否则一部分客户端取不到模板）。
+
+    依据（2026-10-01 实测）：MCP 的 `prompts/get` 参数是 `{name, arguments?}`（后者可选），而很多
+    客户端会**总是**带上它。此前本服务把 `arguments` 当陌生键一律 `-32602` ⇒ 这类客户端调用
+    `{"name": "assemble_guide", "arguments": {}}` 直接失败。现在：**允许出现、须为空对象**
+    （本模板无参数）；非对象或非空 → 带指引的 `-32602`。
+    """
+
+    def setUp(self):
+        self.rt = mrt.McpRuntime({"mcp": {"name": "probe", "version": "0", "resources": []}})
+
+    def _get(self, params):
+        return self.rt.handle({"jsonrpc": "2.0", "id": 1, "method": "prompts/get",
+                               "params": params})
+
+    def test_empty_arguments_is_accepted(self):
+        for params in ({"name": "assemble_guide"},
+                       {"name": "assemble_guide", "arguments": {}}):
+            r = self._get(params)
+            self.assertNotIn("error", r, "协议合法的空 arguments 被拒：%s" % params)
+            msg = r["result"]["messages"][0]["content"]["text"]
+            self.assertIn("NinFenz", msg, "模板正文不得为空")
+
+    def test_non_empty_or_wrong_typed_arguments_carry_guidance(self):
+        for params in ({"name": "assemble_guide", "arguments": {"x": "1"}},
+                       {"name": "assemble_guide", "arguments": "x"}):
+            r = self._get(params)
+            err = r.get("error") or {}
+            self.assertEqual(mrt.INVALID_PARAMS, err.get("code"), params)
+            self.assertIn("修复指引", str(err.get("message")), params)
+
+    def test_unknown_prompt_is_refused_with_guidance(self):
+        err = (self._get({"name": "nope"}).get("error") or {})
+        self.assertEqual(mrt.INVALID_PARAMS, err.get("code"))
+        self.assertIn("prompts/list", str(err.get("message")), "拒收须指明可枚举面")
+
+
+class ResourceListPagingAndFilterTest(unittest.TestCase):
+    """`resources/list` 的**分页**与 **type / package 过滤**必须自洽（客户端只信这两件事）。
+
+    依据（2026-10-01 普查）：全量翻页 965 条**零重复、零漏项**，与运行时可寻址集合等长；
+    `type=<kind>` 逐类**只回该类**且条数与全量同型子集相等；`package=<原值>` 只回该包。
+    同轮排除一处**探针自身的错**：`package` 过滤要的是**列表项里 `package` 字段的原值**
+    （中文名本身），我首版传了 uri 里的百分号编码段 ⇒ 空表——那是调用方用错，不是实现错，
+    已在 `docs/mcp.md` 把这条口径写明，并在此把它钉住。
+    """
+
+    KINDS = ("module", "pipeline", "asset", "library", "pattern")
+
+    def setUp(self):
+        self.rt = mrt.McpRuntime({"mcp": {"name": "probe", "version": "0", "resources": []}})
+
+    def _list_all(self, **params) -> list:
+        out: list = []
+        cursor = ""
+        for _ in range(300):
+            p = dict(params)
+            if cursor:
+                p["cursor"] = cursor
+            body = self.rt.handle({"jsonrpc": "2.0", "id": 1, "method": "resources/list",
+                                   "params": p}).get("result") or {}
+            out += body.get("resources") or []
+            cursor = body.get("nextCursor") or ""
+            if not cursor:
+                break
+        return out
+
+    def test_paging_is_complete_and_duplicate_free(self):
+        rows = self._list_all()
+        uris = [r["uri"] for r in rows]
+        self.assertEqual(len(uris), len(set(uris)), "分页出现重复条目（游标不前进？）")
+        self.assertEqual(len(self.rt._repo_meta) + len(self.rt._meta), len(uris),
+                         "翻完所有页的总数与运行时可寻址集合不等（漏列或多列）")
+
+    def test_type_filter_is_exact(self):
+        full = self._list_all()
+        for kind in self.KINDS:
+            got = self._list_all(type=kind)
+            self.assertTrue(got, "type=%s 空表（判据可能已失效）" % kind)
+            self.assertTrue(all(r["uri"].split("/")[3] == kind for r in got),
+                            "type=%s 混入了别的类" % kind)
+            self.assertEqual(len([u for u in full if u["uri"].split("/")[3] == kind]), len(got),
+                             "type=%s 的条数与全量同型子集不等" % kind)
+
+    def test_package_filter_uses_the_item_field_value(self):
+        rows = [r for r in self._list_all(type="asset")]
+        self.assertTrue(rows, "没有 asset 类资源（判据可能已失效）")
+        pkg = rows[0]["package"]
+        got = self._list_all(type="asset", package=pkg)
+        self.assertTrue(got, "按列表项 package 字段过滤得到空表（口径分叉）")
+        self.assertTrue(all(r.get("package") == pkg for r in got),
+                        "package=%s 的过滤结果混入了别的包" % pkg)
+
+
+class LiveResourceReachabilityTest(unittest.TestCase):
+    """实时仓库面：**列出来的资源必须真读得出来**（客户端只做 list → read 两件事）。
+
+    依据（2026-10-01 全量普查）：`resources/list` 是**分页**的（默认每页 20，实测翻 **49 页**
+    共 **965** 条：asset 597 / module 248 / pipeline 114 / library 3 / pattern 3），逐条
+    `resources/read` **965/965 全部读出、零失败**（用时 23.8 s）。全量太贵，故本件钉三件更省的
+    强不变式：① 翻完所有页后总条数 == 运行时内部可寻址集合的大小（防「列了读不出」与「漏列」）；
+    ② 五种 kind 都在列；③ **每种 kind 抽 6 条**真读（含 uri 编码/包名/条目键三条路径），
+    任一条读不出即红。全量那一遍作为一次性取证留档。
+    """
+
+    KINDS = ("module", "pipeline", "asset", "library", "pattern")
+
+    def _rt(self):
+        return mrt.McpRuntime({"mcp": {"name": "probe", "version": "0", "resources": []}})
+
+    @staticmethod
+    def _call(rt, method, params=None):
+        return rt.handle({"jsonrpc": "2.0", "id": 1, "method": method, "params": params or {}})
+
+    def test_listed_resources_are_all_readable(self):
+        rt = self._rt()
+        uris, cursor, pages = [], "", 0
+        while True:
+            res = self._call(rt, "resources/list", {"cursor": cursor} if cursor else {})
+            body = res.get("result") or {}
+            uris += [r["uri"] for r in body.get("resources") or []]
+            pages += 1
+            cursor = body.get("nextCursor") or ""
+            if not cursor:
+                break
+            self.assertLess(pages, 200, "分页游标不收敛（客户端会死循环）")
+        self.assertGreater(len(uris), 100, "列出的资源太少（判据可能已失效）")
+        self.assertEqual(len(rt._repo_meta) + len(rt._meta), len(uris),
+                         "resources/list 的总数与运行时可寻址集合不一致（漏列或多列）")
+        by_kind = {}
+        for u in uris:
+            parts = u.split("/")
+            if len(parts) > 3:
+                by_kind.setdefault(parts[3], []).append(u)
+        for kind in self.KINDS:
+            self.assertTrue(by_kind.get(kind), "live 面缺少 %s 类资源" % kind)
+        bad = []
+        for kind, rows in sorted(by_kind.items()):
+            for uri in rows[:6]:
+                resp = self._call(rt, "resources/read", {"uri": uri})
+                if "error" in resp or not resp.get("result"):
+                    bad.append("%s :: %s" % (uri, str(resp.get("error"))[:60]))
+        self.assertEqual([], bad, "列出的资源读不出（客户端会拿到 -32602）：%s" % bad)
+        self.assertTrue(self._call(rt, "resources/templates/list").get("result", {})
+                        .get("resourceTemplates"), "模板面必须非空")
+
+    def test_template_substitution_is_readable(self):
+        """**按模板自然代入**的写法必须读得出来——模板不是装饰（2026-10-08 补）。
+
+        内部差距实证：`nf://repo/asset/{package}/{key}` 发布在 templates/list 上，但 resources/list
+        给的是 **percent-encoded** 形态；agent 按模板代入**中文包名**（未编码）去读 ⇒ 之前一律
+        「未知资源 uri」——即「模板可用」这条承诺无人核（上面那条只读了 list 给的形态）。
+        修法是读入时做一次**转义等价归一**（仍受白名单约束）；本件把该承诺钉住，并保证非空转：
+        至少要有一件「解码后与登记形态不同」的 uri，否则判据在打空气。
+        """
+        import urllib.parse as up
+
+        rt = self._rt()
+        listed, cursor = [], ""
+        while True:
+            body = self._call(rt, "resources/list", {"cursor": cursor} if cursor else {}).get("resu"
+                "lt") or {}
+            listed += [r["uri"] for r in body.get("resources") or []]
+            cursor = body.get("nextCursor") or ""
+            if not cursor:
+                break
+        by_kind = {}
+        for u in listed:
+            parts = u.split("/")
+            if len(parts) > 3:
+                by_kind.setdefault(parts[3], []).append(u)
+        decoded_differs, bad = 0, []
+        for kind in self.KINDS:
+            uri = (by_kind.get(kind) or [None])[0]
+            self.assertIsNotNone(uri, "live 面缺少 %s 类资源" % kind)
+            raw = up.unquote(uri)
+            if raw != uri:
+                decoded_differs += 1
+            resp = self._call(rt, "resources/read", {"uri": raw})
+            if "error" in resp or not resp.get("result"):
+                bad.append("%s :: %s" % (raw, str(resp.get("error"))[:60]))
+        self.assertEqual([], bad, "模板替身读不出（agent 按模板代入就会撞墙）：%s" % bad)
+        self.assertGreaterEqual(decoded_differs, 1, "所有 uri 都没有转义差异（判据可能空转）")
+
+
+class ResourceSourceContainmentTest(unittest.TestCase):
+    """纵深防线：即使登记源被污染成绝对路径，resources/read 也不得越出仓库根。"""
+
+    def test_repo_resource_source_cannot_escape_root(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_outside_") as outside:
+            canary = Path(outside) / "secret.md"
+            canary.write_text("# 仓外金丝雀\n不得读取。\n", encoding="utf-8")
+            rt = mrt.McpRuntime({"mcp": {"name": "probe", "version": "0",
+                                         "resources": []}})
+            uri = "nf://repo/module/poisoned"
+            rt._repo_metas = lambda: {
+                uri: {"uri": uri, "name": "poisoned",
+                      "mimeType": "text/markdown", "source": str(canary)},
+            }
+            resp = rt.handle({"jsonrpc": "2.0", "id": 1, "method": "resources/read",
+                              "params": {"uri": uri}})
+            self.assertEqual(mrt.INVALID_PARAMS, (resp.get("error") or {}).get("code"),
+                             f"仓外 source 被当成可读资源：{resp}")
+
+    def test_repo_text_read_has_a_hard_size_cap(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_large_") as root:
+            path = Path(root) / "large.md"
+            path.write_bytes(b"x" * 11)
+            with mock.patch.object(repo_index, "MAX_RESOURCE_BYTES", 10), \
+                    self.assertRaises(ValueError):
+                repo_index.read_text(root, "large.md")
+
+    def test_snapshot_file_has_a_hard_size_cap(self):
+        with tempfile.TemporaryDirectory(prefix="nf_mcp_snapshot_") as root:
+            path = Path(root) / "mcp.json"
+            path.write_text('{"mcp":{"resources":[]}}', encoding="utf-8")
+            with mock.patch.object(mrt, "MAX_SNAPSHOT_BYTES", 8), \
+                    self.assertRaises(ValueError):
+                mrt.load_snapshot(str(path))
+
+    def test_outbound_message_has_a_hard_size_cap(self):
+        stdout = StringIO()
+        with mock.patch.object(mrt, "MAX_RESPONSE_MESSAGE_BYTES", 64):
+            mrt._write_response(stdout, {"jsonrpc": "2.0", "id": 7,
+                                         "result": {"text": "x" * 1000}})
+        got = json.loads(stdout.getvalue())
+        self.assertEqual(7, got["id"])
+        self.assertEqual(mrt.INTERNAL_ERROR, got["error"]["code"])
+
+
+class DeclaredSurfaceVsHandlersTest(unittest.TestCase):
+    """声明面 ⇄ 实现面**逐名一致**：声明了没人接的工具是死面，接了没声明的工具是暗面。
+
+    依据（2026-10-01）：`TOOL_DEFS`（对客户端声明的 `inputSchema`）与 `TOOL_HANDLERS`（真派发）
+    此前**没有判据**对账——`test_mcp_packaging` 管的是「上架声明 ⇄ 运行时」，`test_mcp_runtime`
+    管的是「调用行为」，两份声明各自为真却可能整体分叉：加一个工具忘了接线 ⇒ 客户端能看见、
+    调用却回 `-32601`；加了处理器忘了声明 ⇒ 能力存在但没人知道。本件把三处（声明 / 派发 /
+    真调一次）钉在一起。
+    """
+
+    def test_declared_tools_match_handlers(self):
+        declared = {t["name"] for t in mrt.TOOL_DEFS}
+        handled = set(mrt.TOOL_HANDLERS)
+        self.assertTrue(declared, "声明面为空（判据可能已失效）")
+        self.assertEqual(declared, handled,
+                         "声明与派发分叉：只声明没接线=%s；只接线没声明=%s"
+                         % (sorted(declared - handled), sorted(handled - declared)))
+
+    def test_declared_prompts_match_runtime(self):
+        declared = {p["name"] for p in mrt.PROMPT_DEFS}
+        self.assertEqual({"assemble_guide"}, declared, "提示面与运行时分叉：%s" % sorted(declared))
+
+    def test_every_declared_tool_is_reachable(self):
+        """真派发一次：用声明里的必填参数名喂合法值，不得回 `-32601`（未知工具）。"""
+        rt = mrt.McpRuntime({"name": "declared", "version": "0", "resources": []})
+        samples = {"pipeline_list": {}, "spec_list": {}, "registry_search": {"query": "M90"},
+                   "library_search": {"query": "NF"}, "library_read": {"entry_id": "NF-1"},
+                   "pattern_list": {}, "pattern_read": {"pattern_id": "fail-closed-verification"},
+                   "asset_list": {}, "knowledge_order_read": {}, "module_read": {"module_id": "M90"},
+                   "pipeline_read": {"pipeline": "P01"}, "asset_read": {"key": "TECH_RULES"}}
+        for spec in mrt.TOOL_DEFS:
+            name = spec["name"]
+            self.assertIn(name, samples, "新工具 %s 没有抽样参数（判据需同步）" % name)
+            resp = rt.handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                              "params": {"name": name, "arguments": samples[name]}})
+            self.assertNotEqual(mrt.METHOD_NOT_FOUND, (resp.get("error") or {}).get("code"),
+                                "声明了却不可达：%s → %s" % (name, resp))
+
+
+
+#: 「声明了但置绝无此值不改变输出」的属性（每条须写明理由；本表**只许缩小**）
+NOOP_ALLOWED: dict = {}
+
+#: 每个工具的最小合法参数（用于「声明属性是否有效果」的行为普查）
+VALID_ARGS = {
+    "pipeline_list": {}, "spec_list": {}, "registry_search": {"query": "M08"},
+    "library_search": {"query": "叙事"}, "library_read": {"entry_id": "NF-1"},
+    "pattern_list": {}, "pattern_read": {"pattern_id": "single-source-truth"},
+    "asset_list": {}, "knowledge_order_read": {},
+    "module_read": {"module_id": "M08"}, "pipeline_read": {"pipeline": "P01"},
+    "asset_read": {"key": "QUANT_METRICS", "package": "量化金融域包"},
+}
+#: 「绝无此值」的探针串：任何正常输入都不该与它等价
+IMPOSSIBLE = "__nf_no_such_value__"
+
+
+class ToolSchemaEffectTest(unittest.TestCase):
+    """声明即承诺：inputSchema 声明的每个属性都必须**真的有效果**。
+
+    内部差距实证（2026-10-08）：spec_list 声明 tier「可选按分级过滤」，而 registry 的 protocols 里
+    根本没有分级字段——传任意 tier（含乱填）返回**完全相同**的全量清单，结果里也没有 tier 字段：
+    客户端以为筛过了，实际拿到全部（静默降级，比缺参数更坏）。修法是删掉该声明；本件把这条钉住：
+    声明了却在行为上无效果的属性必须进 NOOP_ALLOWED 并写明理由，否则红。
+    """
+
+    def _noop_properties(self, tool_name, props, call):
+        """→ 「置绝无此值后输出不变」的属性列表（与判据同源，便于变异负例复用）。"""
+        base = call(tool_name, dict(VALID_ARGS.get(tool_name, {})))
+        out = []
+        for p in props:
+            trial = dict(VALID_ARGS.get(tool_name, {}))
+            trial[p] = IMPOSSIBLE
+            if call(tool_name, trial) == base:
+                out.append(p)
+        return out
+
+    def test_every_declared_property_changes_the_response(self):
+        rt = mrt.McpRuntime({"mcp": {"name": "schema-effect", "version": "0", "resources": []}})
+        rt.handle({"jsonrpc": "2.0", "id": 0, "method": "resources/list"})   # 装载实时仓库面
+
+        def call(name, args):
+            return rt.handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                              "params": {"name": name, "arguments": args}})
+
+        checked, bad = 0, []
+        for t in mrt.TOOL_DEFS:
+            props = sorted(t["inputSchema"].get("properties") or {})
+            for p in self._noop_properties(t["name"], props, call):
+                if (t["name"], p) in NOOP_ALLOWED:
+                    continue
+                bad.append("%s.%s" % (t["name"], p))
+            checked += len(props)
+        self.assertGreaterEqual(checked, 8, "属性面塌缩（判据可能空转）")
+        self.assertEqual([], bad, "声明了却没有任何效果的属性（静默降级；修法：实现它或删掉声明）")
+
+    def test_check_detects_a_noop_property(self):
+        """变异负例：忽略参数的桩必须被判据助手抓到；真的用参数的桩不得误报。"""
+        def ignoring(name, args):
+            return {"result": {"content": [{"type": "text", "text": "恒定输出"}]}}
+
+        def honoring(name, args):
+            return {"result": {"content": [{"type": "text",
+                                            "text": json.dumps(args, sort_keys=True)}]}}
+
+        self.assertEqual(["query"], self._noop_properties("registry_search", ["query"], ignoring))
+        self.assertEqual([], self._noop_properties("registry_search", ["query"], honoring))
+
+
+if __name__ == "__main__":
+    unittest.main()

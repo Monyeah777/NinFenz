@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+"""编码卫生门禁单测（check33 新面：RFC 3629 / RFC 8259 §4 / UAX #15 / UTS #39）。
+
+每条规定一条**正例**（合规树零 issue）与**变异负例**（注入违规必须被抓）——
+「check 的 check」写法与 test_purity_scan 同源。
+"""
+import json
+import os
+import re
+import sys
+import tempfile
+import unittest
+import warnings
+from pathlib import Path
+
+if str(Path(__file__).resolve().parent.parent / "src") not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from core import text_hygiene as th  # noqa: E402
+
+ROOT = str(Path(__file__).resolve().parents[2])
+GA = "* text=auto eol=lf\n"
+
+
+def _write(root, rel, text, encoding="utf-8"):
+    path = os.path.join(root, rel)
+    os.makedirs(os.path.dirname(path) or root, exist_ok=True)
+    with open(path, "w", encoding=encoding, newline="") as fh:
+        fh.write(text)
+    return path
+
+
+def _write_bytes(root, rel, blob):
+    path = os.path.join(root, rel)
+    os.makedirs(os.path.dirname(path) or root, exist_ok=True)
+    with open(path, "wb") as fh:
+        fh.write(blob)
+    return path
+
+
+class TextHygieneTest(unittest.TestCase):
+    def test_clean_tree_has_no_issue(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write(tmp, "protocol/x.json", '{"a": 1, "模块:M01": {"b": "c"}}\n')
+            _write(tmp, "README.md", "# 标题\n")
+            issues, stats = th.scan(tmp)
+            self.assertEqual(issues, [])
+            self.assertEqual(stats["json"], 1)
+            self.assertEqual(stats["crlf"], 0)
+
+    def test_real_repo_is_clean(self):
+        issues, stats = th.scan(ROOT)
+        self.assertEqual(issues, [], "仓库自身编码卫生须零 issue：%s" % issues[:3])
+        self.assertGreater(stats["keys_checked"], 1000)
+
+    def test_mutation_missing_gitattributes_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "README.md", "# 标题\n")
+            issues, _ = th.scan(tmp)
+            self.assertTrue(any(".gitattributes" in i for i in issues), issues)
+
+    def test_mutation_gitattributes_without_lf_declaration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", "*.png binary\n")
+            issues, _ = th.scan(tmp)
+            self.assertTrue(any("eol=lf" in i for i in issues), issues)
+
+    def test_mutation_crlf_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write_bytes(tmp, "README.md", "# 标题\r\n第二行\r\n".encode("utf-8"))
+            issues, stats = th.scan(tmp)
+            self.assertEqual(stats["crlf"], 1)
+            self.assertTrue(any("CRLF" in i for i in issues), issues)
+
+    def test_mutation_bom_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write_bytes(tmp, "protocol/x.json", b"\xef\xbb\xbf{}\n")
+            issues, stats = th.scan(tmp)
+            self.assertEqual(stats["bom"], 1)
+            self.assertTrue(any("BOM" in i for i in issues), issues)
+
+    def test_mutation_bad_utf8_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write_bytes(tmp, "notes.txt", b"\xc3\x28 bad utf8 line\n")
+            issues, _ = th.scan(tmp)
+            self.assertTrue(any("UTF-8" in i for i in issues), issues)
+
+    def test_mutation_duplicate_json_key_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write(tmp, "protocol/x.json", '{"a": 1, "a": 2}\n')
+            issues, _ = th.scan(tmp)
+            self.assertTrue(any("重复键" in i for i in issues), issues)
+
+    def test_mutation_invisible_and_fullwidth_key_captured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write(tmp, "protocol/x.json",
+                   '{"a\u200bb": 1, "\uff21BC": 2}\n')
+            issues, _ = th.scan(tmp)
+            self.assertEqual(len([i for i in issues if "JSON 键" in i]), 2, issues)
+
+    def test_identifier_issue_units(self):
+        self.assertEqual(th.identifier_issue("M01"), "")
+        self.assertEqual(th.identifier_issue("通用:M10"), "")
+        self.assertEqual(th.identifier_issue("$schema"), "")
+        self.assertIn("NFC", th.identifier_issue("e\u0301"))
+        self.assertIn("隐形", th.identifier_issue("a\u00a0b"))
+        self.assertIn("越界", th.identifier_issue("a→b"))
+        self.assertIn("空", th.identifier_issue(""))
+
+    def test_semver_lexemes(self):
+        """SemVer 2.0.0 词法（§9/§10）：三段必填、数字标识禁前导零、预发布段非空。"""
+        for good in ("1.0.0", "1.1.0", "0.0.1", "1.0.0-alpha.1", "1.0.0+build.5",
+                     "1.0.0-rc.1+exp.sha.5114f85"):
+            self.assertEqual(th.semver_issue(good), "", good)
+        for bad, why in (("01.0.0", "前导零"), ("1.0", "缺补丁号"), ("1.0.0-", "空段"),
+                         ("1.0.0-01", "不符合"), ("v1.0.0", "不符合"), ("", "空")):
+            self.assertIn(why, th.semver_issue(bad), bad)
+
+    def test_version_source_scans_packages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write(tmp, "community/演示包/protocol.yaml",
+                   "package:\n  version: \"01.0.0\"\n")
+            issues, stats = th.scan(tmp)
+            self.assertEqual(stats["versions_checked"], 1)
+            self.assertTrue(any("版本值" in i and "前导零" in i for i in issues), issues)
+            _write(tmp, "community/演示包/protocol.yaml",
+                   "package:\n  version: \"1.0.0\"\n")
+            issues2, stats2 = th.scan(tmp)
+            self.assertEqual(stats2["versions_checked"], 1)
+            self.assertEqual([i for i in issues2 if "版本值" in i], [])
+
+    def test_repo_package_versions_are_semver(self):
+        _issues, stats = th.scan(ROOT)
+        self.assertGreaterEqual(stats["versions_checked"], 7, "七个域包版本位须在扫")
+
+    def test_identifier_value_face_scanned(self):
+        """标识**值**面：键有判据、值没有 = 给同形留后门（西里尔 М 当 M 用）。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, ".gitattributes", GA)
+            _write(tmp, "desktop/src/core/registry.json", json.dumps(
+                {"modules": [{"id": "\u041c00", "category": "通用类"}]},
+                ensure_ascii=False))
+            issues, stats = th.scan(tmp)
+            self.assertEqual(stats["values_checked"], 2)
+            self.assertTrue(any("modules[*].id" in i for i in issues), issues)
+        _issues, stats_repo = th.scan(ROOT)
+        self.assertGreaterEqual(stats_repo["values_checked"], 50,
+                                "仓库登记册标识值面须在扫")
+
+
+class SourceEscapeHygieneTest(unittest.TestCase):
+    """源文件不得含**无效转义序列**（如文档串里反引号或多出来的单反斜杠）。
+
+    为什么要立这条（2026-10-08 实测）：本仓新增模块的文档串里出现过「反斜杠 + 反引号」这类
+    生成笔误——今天只是 DeprecationWarning（IDE 里不显眼、门禁不红），未来 Python 版本会升级成
+    SyntaxError；同批还发现一处**既有**的 Windows 路径写法落在非 raw 文档串里。这类问题没有任何
+    常驻判据盯，只能靠人眼。判据用 compile() 的警告面：正例 = 全仓零命中，变异负例 = 合成违规必被抓。
+    """
+
+    def test_no_invalid_escape_sequences(self):
+        bad = []
+        files = sorted(Path(ROOT, "desktop").rglob("*.py"))
+        files += sorted(Path(ROOT, "scripts").rglob("*.py"))
+        self.assertGreater(len(files), 200, "扫描面塌缩（判据可能已失效）")
+        for path in files:
+            src = path.read_text(encoding="utf-8")
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                try:
+                    compile(src, str(path), "exec")
+                except SyntaxError as exc:
+                    bad.append("%s: %s" % (path.name, exc))
+                    continue
+            for w in caught:
+                if "invalid escape sequence" in str(w.message):
+                    bad.append("%s:%s %s" % (path.relative_to(ROOT).as_posix(),
+                                             getattr(w, "lineno", "?"), w.message))
+        self.assertEqual([], bad[:10], "源文件含无效转义序列（修复指引：改 raw 字符串或去掉多余反斜"
+            "杠）")
+
+    def test_check_catches_a_planted_violation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            trap = Path(tmp, "trap.py")
+            # 植入「反斜杠 + 点」：这是**无效转义**（编译给 DeprecationWarning），
+            # 不是真转义——用 \x 之类会变成 SyntaxError，考不到本判据要考的警告面。
+            planted = 'DOC = "' + "路径 " + chr(92) + '.x"' + chr(10)
+            trap.write_text(planted, encoding="utf-8", newline=chr(10))
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                compile(trap.read_text(encoding="utf-8"), str(trap), "exec")
+            self.assertTrue([w for w in caught if "invalid escape sequence" in str(w.message)],
+                            "变异负例未被抓到（判据失效）")
+
+
+def dense_line_runs(text, threshold=20):
+    """→ [(起始行, 行数)]：连续「每行至多一个字符」的损坏段（代码围栏不计）。"""
+    text = re.sub(r"```.*?```|~~~.*?~~~", "", text, flags=re.S)
+    runs, start = [], None
+    lines = text.splitlines()
+    for i, line in enumerate(lines, 1):
+        if len(line) <= 1:
+            if start is None:
+                start = i
+        elif start is not None:
+            if i - start >= threshold:
+                runs.append((start, i - start))
+            start = None
+    if start is not None and len(lines) + 1 - start >= threshold:
+        runs.append((start, len(lines) + 1 - start))
+    return runs
+
+
+class MarkdownLineDensityTest(unittest.TestCase):
+    """Markdown 不得被压成「一字一行」——格式坏了，链接/版本判据仍可能假绿。"""
+
+    def test_managed_markdown_has_no_character_per_line_corruption(self):
+        bad = []
+        seen = 0
+        for p in Path(ROOT).rglob("*.md"):
+            rel = p.relative_to(ROOT)
+            if any(part in {".git", ".rivet", "node_modules", "payload", "__pycache__"}
+                   for part in rel.parts):
+                continue
+            if rel.parts and rel.parts[0] == "community":
+                continue
+            seen += 1
+            try:
+                text = p.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                continue
+            for start, size in dense_line_runs(text):
+                bad.append(f"{rel.as_posix()}:{start}（连续 {size} 行）")
+        self.assertGreaterEqual(seen, 100, "Markdown 扫描面塌缩")
+        self.assertEqual([], bad[:10],
+                         "Markdown 被压成一字一行（修复指引：按原文恢复段落，勿逐字换行）")
+
+    def test_line_density_predicate_catches_the_mutation(self):
+        corrupted = "-\n \n*\n*\n" + "\n".join("数字资产") + "\n正常段落。\n"
+        self.assertTrue(dense_line_runs(corrupted, threshold=5))
+        self.assertEqual([], dense_line_runs("第一段\n\n第二段。\n", threshold=5))
+
+
+if __name__ == "__main__":
+    unittest.main()

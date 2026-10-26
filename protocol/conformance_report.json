@@ -1,0 +1,198 @@
+{
+  "contracts": [
+    {
+      "description": "规范化摘要可复现",
+      "detail": "canonical digest 两遍一致",
+      "digest": "3aacde7465e2a7b4b0f4b0ddb775ef1e8ec8328cf2c26856bc818cbd999b0880",
+      "id": "canonical-digest-determinism",
+      "ok": true
+    },
+    {
+      "description": "IDL 单一真相零漂移",
+      "detail": "schema 零漂移（6 类件）",
+      "digest": "2185c2d5fbd62001e6c3875ebd02c36c94ded3ed8cec407fe23731c3af50254b",
+      "id": "schema-clean",
+      "ok": true
+    },
+    {
+      "description": "架构纯度零违规",
+      "detail": "纯度零违规",
+      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
+      "id": "purity-clean",
+      "ok": true
+    },
+    {
+      "description": "文档四型覆盖",
+      "detail": "四型全覆盖 · 写法 WARN 3",
+      "digest": "06a3777455680c0dcf5acf6a618c67e7e41114744719b8ded1c29a350bc1b154",
+      "id": "doc-kinds",
+      "ok": true
+    },
+    {
+      "description": "馆藏 frontmatter 真源",
+      "detail": "馆藏 frontmatter 真源零 FAIL",
+      "digest": "5c4fedd1c0f792cc9b052a4b08ac08d82b7bde2f9a731bd675660b34096cbc4b",
+      "id": "library-verify",
+      "ok": true
+    },
+    {
+      "description": "INDEX/ALIAS 投影一致",
+      "detail": "投影一致",
+      "digest": "5fe250ece716fcdbe260f7a16f0cf305657f20541ab4cd3c0448866b15a02f78",
+      "id": "library-projection",
+      "ok": true
+    },
+    {
+      "description": "管线抽象执行零 hard 缺陷",
+      "detail": "管线 114 条零 hard 缺陷（advisory 1142）",
+      "digest": "efa38566dcf3d332bf98096806856eaa3433a4d78f601500c325e00815a4a386",
+      "id": "pipeline-dryrun",
+      "ok": true
+    },
+    {
+      "description": "模块边界冻结",
+      "detail": "模块边界零漂移",
+      "digest": "5f8395f07cad340e6283444c822f17a6b01c96ca095ac8544cb78fd1ba9e8c76",
+      "id": "module-signature",
+      "ok": true
+    },
+    {
+      "description": "I/O 类型面（可证不匹配）",
+      "detail": "可证不匹配 0 · 类型覆盖 26.9%（303/1125 字段）",
+      "digest": "717a771bed5815d7ffdb93c40446a617fee021c2f1ad1f9f3d25f39997b3c257",
+      "id": "io-types",
+      "ok": true
+    },
+    {
+      "description": "类型积压显式化",
+      "detail": "不可推断 untyped 101 项（台账同步）",
+      "digest": "6d3cd0e53464f4debd196203a9c6d006ae04d6d6ec0f8b69a610a395cfaf3f4b",
+      "id": "type-backlog",
+      "ok": true
+    },
+    {
+      "description": "全仓事件背书",
+      "detail": "事件 443 · 跨包 9 · 挂账 0",
+      "digest": "05b6aac852eeaea759e56aaed91cf46715da60f1ba0a8cc08eef0b4a6e65106d",
+      "id": "event-backing",
+      "ok": true
+    },
+    {
+      "description": "一致性声明",
+      "detail": "版本 5 · scope 19 · 排除 11",
+      "digest": "e7e76a4af8705ad67f06ece0cb0608ee71329bdf52e6872bae4fd514f271c16e",
+      "id": "declaration",
+      "ok": true
+    },
+    {
+      "description": "协议件版本史头",
+      "detail": "RFC 件 4 · 链 0",
+      "digest": "0ef42e8c8f8384e97e6a2a4a3b0466f62eb01970467ebdc06ccf06ddfb8acf0d",
+      "id": "rfc-heads",
+      "ok": true
+    },
+    {
+      "description": "实践包品类",
+      "detail": "实践包 7 条（格式/可证/投影）",
+      "digest": "088daf2f577b270b03bf696107856a9e7be9f7efc4bcfbd22a14841d65bacde0",
+      "id": "patterns",
+      "ok": true
+    },
+    {
+      "description": "服务端点契约指向真实性",
+      "detail": "端点 8（status=proposed）",
+      "digest": "93c25c44f2a9afe2d1a66d516f5a351fb8965d344ceaef525738ffeb497f6f87",
+      "id": "endpoint-contract",
+      "ok": true
+    },
+    {
+      "description": "双源知识层（权威分层/查询有序/时效/溯源）",
+      "detail": "源 6（合同 3 / 参考 3）· 消化记录 0 · 频次事件 0",
+      "digest": "6a8fd28eb015621f8eb629d0e944dbfec9ed49589cece9f6c699eb7a42294567",
+      "id": "knowledge-sources",
+      "ok": true
+    },
+    {
+      "description": "数据化断言表（形状类断言数据化）",
+      "detail": "断言 24 条（通过 24）· kind 封闭集 4 种",
+      "digest": "57d8fee97b2aa5b13ad7cfa62ce54b543a9bd803f97043e3b45e57a3266faa93",
+      "id": "assertions",
+      "ok": true
+    },
+    {
+      "description": "内容建模三件（词表/规范说明件/数据契约）",
+      "detail": "词表 12 · 规范件 37 / 说明件 2395 · 数据契约 54",
+      "digest": "3f948a366353ad5659f9ced1c9be68a644bce21f1f9089fd71c962b0c25334ce",
+      "id": "modeling",
+      "ok": true
+    },
+    {
+      "description": "决策记录（ADR：不可改 + 取代链）",
+      "detail": "决策 3 条（accepted 1 · 取代链 0）",
+      "digest": "3baf8ac57c7becca5fa1ef0d1c75bdb14e7b3be3ab021018d859937d6b50d0f5",
+      "id": "decisions",
+      "ok": true
+    },
+    {
+      "description": "接力协议（SBAR 五段 + 未决带判据）",
+      "detail": "交接件 1 件 · 未决 1 条",
+      "digest": "dad1037a082c2ed6bf684e2d74c477f6d116b88657416e54682b3e2f8e39467f",
+      "id": "handover",
+      "ok": true
+    },
+    {
+      "description": "复盘（无指责 + 根因指向机制 + 行动项闭环）",
+      "detail": "复盘 1 件 · 行动项 1 条",
+      "digest": "35a9c0384b685992e13ac10330dad9ab3a9e2c5c7fbe389c5905c41f8ae5cca4",
+      "id": "postmortem",
+      "ok": true
+    },
+    {
+      "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
+      "detail": "审计 57 件（带审计头 46 · legacy 11）· 绑定对象 388",
+      "digest": "e8c024c3aa2c55390fbb870cfa0ec30e5cb7f163a06f0d3d4f00697ace6e4818",
+      "id": "audit",
+      "ok": true
+    },
+    {
+      "description": "认知族（术语表 + 执行分档）",
+      "detail": "术语 11 条（使用面 16）· 执行档 2（合格实例 2）",
+      "digest": "a142d4c9c4c7130b5c6a79fa0d03c6774d4a3984de2168ed22a6b992b3af8665",
+      "id": "cognition",
+      "ok": true
+    },
+    {
+      "description": "ST 制卡质量规范（M/S/R 数据化 + 落产物判）",
+      "detail": "规则 29 条（M 6 / S 17 / R 6）· 落产物判 1",
+      "digest": "7b3442e727b4270a6b374125e182df2e62bf040b6d2f7614aa9a5e8abb4fe631",
+      "id": "st-quality",
+      "ok": true
+    },
+    {
+      "description": "B 线包装声明（工具面与运行时一致）",
+      "detail": "工具 12 · 提示 1 · 类目 content-creation · 目标平台 4",
+      "digest": "41f237792d749877c86f24d696eae022f2868bce484b88f0d709fa6b94bd1b95",
+      "id": "mcp-package",
+      "ok": true
+    },
+    {
+      "description": "条件先行（登记件须通过排布判据）",
+      "detail": "单件 0 · 族规则 1 · 族成员 3",
+      "digest": "cc1946483898ef7de45d2d36d262985c9ddb7671898264f93a19aefa0a71e58c",
+      "id": "state-front",
+      "ok": true
+    },
+    {
+      "description": "公开导出面零泄漏",
+      "detail": "公开导出面零泄漏",
+      "digest": "d90f0f64ce2bb95763db2d29f8644b1900632565cbcc71ebbd0f504cdf0c90c7",
+      "id": "public-surface",
+      "ok": true
+    }
+  ],
+  "passed": 27,
+  "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
+  "schema": "nf-conformance/1",
+  "total": 27,
+  "verdict": "conformant"
+}
