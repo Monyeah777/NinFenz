@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1449,
+    "app": 1452,
     "entry": 26,
     "floor": 6,
     "prod": 1068,
-    "projection": 134,
+    "projection": 135,
     "support": 274,
-    "verify": 1172
+    "verify": 1180
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6023,6 +6023,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "内容 SRE：只从**真实产物**采集 SLI，没有数据就 UNKNOWN（不编造、不判绿）。",
+      "path": "desktop/src/core/content_ops.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "内容供应链安全扫描（T8.3：域包/投稿正文 = 外来内容，形态可扫描可拦截）。",
       "path": "desktop/src/core/content_security.py",
       "role": "verify",
@@ -6797,6 +6803,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "隐私与 air-gap 静态审计（T11.2：把「保密/本地优先」从口号变成可机检面）。",
+      "path": "desktop/src/core/privacy_scan.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "正文级 lint（内部差距实证：NF 的风格门是 M80 的**档位 DNA 资产**——靠执行方自觉比对，",
       "path": "desktop/src/core/prose_lint.py",
       "role": "prod",
@@ -7451,6 +7463,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "内容件样例（干净）",
+      "path": "desktop/tests/fixtures/privacy/clean.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "内容件样例（显式测试样本 · 合成 PII）",
+      "path": "desktop/tests/fixtures/privacy/sample_allowlisted.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/fixtures/release/plan.golden.json",
       "role": "verify",
@@ -7763,6 +7787,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "T11.3 CLI IA 机读层回归：目录确定性 / 幂等 / 覆盖率负例 / 与 check39 同结论。",
+      "path": "desktop/tests/test_cli_catalog.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CLI 错误框定判据：失败必须是**干净错误 + 修复指引**（错误即微型文档）。",
       "path": "desktop/tests/test_cli_error_framing.py",
       "role": "verify",
@@ -7861,6 +7891,12 @@
     {
       "function": "内容 IR（T7.2）单测：节点图 / 规范形往返 / 稳定 id / 悬空负例 / 确定性。",
       "path": "desktop/tests/test_content_ir.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "内容 SRE（T11.1）判据：OK/WARN/UNKNOWN、缺源 fail-closed、确定性、真仓形状。",
+      "path": "desktop/tests/test_content_ops.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8935,6 +8971,12 @@
     {
       "function": "`nf preset` 面回归：退役端壳的预设语义接成 CLI 后，**真跑一遍全链**。",
       "path": "desktop/tests/test_preset_cli.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T11.2 隐私与 air-gap 静态审计单测（`core/privacy_scan.py` + `nf privacy scan|check`）。",
+      "path": "desktop/tests/test_privacy_scan.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12995,6 +13037,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-cli-map/1",
+      "path": "protocol/cli_map.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "存量冻结的规模/复杂度上限（棘轮：只可下降；上调须评审后重冻）",
       "path": "protocol/code_metrics_baseline.json",
       "role": "verify",
@@ -13488,17 +13536,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "810042e4ff16d5fb473c45b12172506ddb21a92dfda5212a31368b981d7b7afb",
+  "root_digest": "67420c7ebbed39c95b853abb2eb23d6f71475aa5271e1648cbbcb0eaa8fe8ef1",
   "rule_counts": {
-    "R-app": 1449,
+    "R-app": 1452,
     "R-catch": 126,
     "R-entry": 26,
     "R-floor": 6,
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 122,
-    "R-verify": 1047,
-    "auto:R-core": 272
+    "R-verify": 1053,
+    "auto:R-core": 275
   },
   "schema": "nf-role-coordinates/1"
 }

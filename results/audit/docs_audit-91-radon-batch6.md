@@ -7,8 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:12478c3386819f1dce8f7015bbbabde2c009f7bb37928402d00fd136002035d3
+  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
 ---
+> 重审（2026-10-27）：W11: purity guidance fix in content_ops
+
+> 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix
+
+> 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
+
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts
 
 > 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging

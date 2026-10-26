@@ -74,7 +74,10 @@ def _read_json(root: str, rel: str) -> Tuple[Optional[Dict[str, Any]], Optional[
         return None, None, "missing_source"
     try:
         with open(path, encoding="utf-8") as fh:
-            return json.load(fh), path, None
+            doc = json.load(fh)
+        if not isinstance(doc, dict):
+            return None, path, "malformed_source: 顶层不是对象"
+        return doc, path, None
     except (OSError, ValueError) as exc:
         return None, path, "malformed_source: %s" % exc
 
@@ -311,6 +314,9 @@ def _live_slis(root: str, now: float) -> List[Dict[str, Any]]:
         with redirect_stdout(buf):
             mc.run(root, as_json=True)
         doc = json.loads(buf.getvalue())
+        if not isinstance(doc, dict):
+            raise ValueError("modelcheck 输出顶层不是对象"
+                             "（修复指引：检查 core.model_check.run 的返回结构，勿改本采集器）")
         verdict = str(doc.get("verdict") or "")
         out.append(_sli("modelcheck_verdict", "模型检查 verdict", verdict, "verdict",
                         "core.model_check.run", _fresh("live", None, now),

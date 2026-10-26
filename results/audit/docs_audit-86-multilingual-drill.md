@@ -12,8 +12,14 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:12478c3386819f1dce8f7015bbbabde2c009f7bb37928402d00fd136002035d3
+  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
 ---
+> 重审（2026-10-27）：W11: purity guidance fix in content_ops
+
+> 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix
+
+> 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
+
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts
 
 > 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging

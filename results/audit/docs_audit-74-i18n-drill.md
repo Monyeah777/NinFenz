@@ -26,8 +26,14 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:12478c3386819f1dce8f7015bbbabde2c009f7bb37928402d00fd136002035d3
+  - protocol/code_metrics_baseline.json:e041e0f69fafc78761d88793182332dea44a0d205c71884211a36fcbe979f348
 ---
+> 重审（2026-10-27）：W11: purity guidance fix in content_ops
+
+> 重审（2026-10-27）：W11 integration: SRE/privacy/CLI map + security allowlist critical fix
+
+> 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
+
 > 重审（2026-10-26）：Merge W10: model check + concept index + agent contracts
 
 > 重审（2026-10-26）：Merge W9: gate43-45 + DOCX/DITA importers + PyPI packaging

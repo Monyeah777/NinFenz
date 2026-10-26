@@ -309,7 +309,8 @@ def scan(paths: Optional[Sequence[str]] = None, root: str = ".") -> Dict[str, An
                     skipped.append({"file": rel_f,
                                     "reason": "allowlist（显式测试样本）"})
     summary = {
-        "critical": sum(1 for f in findings if f["severity"] == "critical"),
+        "critical": sum(1 for f in findings
+                        if f["severity"] == "critical" and not f["allowlisted"]),
         "warn": sum(1 for f in findings if f["severity"] == "warn"),
         "undecidable": len(errors),
         "allowlisted": sum(1 for f in findings if f["allowlisted"]),

@@ -7,9 +7,9 @@
 
 | 项 | 值 |
 |---|---|
-| 顶层命令 | 77 |
+| 顶层命令 | 79 |
 | 能力族 | 8 |
-| 已归族 | 77 |
+| 已归族 | 79 |
 | 未归族 | 无 |
 | 重复归族 | 无 |
 | 空族 | 无 |
@@ -62,11 +62,13 @@
 | `nf model` | 治理与决策（govern） | 内容建模三件（机制借鉴 SKOS 概念方案 / 规范-说明件二分 / 数据契约要素） | JSON | docs/modeling.md |
 | `nf module` | 资产与货架（shelf） | 模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify） | 文本 | docs/en/terminal.md、docs/ja/terminal.md、docs/machine_contract.md、docs/terminal.md |
 | `nf nfal` | 质检与验证（verify） | NFA-L：声明层借既有 YAML + JSON-Schema IDL，命令层是封闭 guard 表达式（无用户函数/循环/赋值/IO）；用法见 docs/nfal.md | 文本 | docs/nfal.md |
+| `nf ops` | 质检与验证（verify） | 内容 SRE 观测面（T11.1）：从既有真实产物（门禁缺陷 bench / 一致性报告 / 回执 / 审计 / verify 判据面 / benchmark 榜单 / M2 执行记录 / 索引 root）+ 既有只读扫描器（安全扫描 /… | 文本 | docs/ops/content-slo.md |
 | `nf output` | 资产与货架（shelf） | 产出形态面：把「产出一律是散文」的缺口机制化——形态清单（protocol/output_forms.json）、包级产出面（community/<包>/outputs/INDEX.json）、T0–T4 档位判定、T4 可复算面重算比对… | 文本 | — |
 | `nf patterns` | 图书馆与知识（library） | 实践包品类（机制借鉴 ACP patterns：与内容域包并列的实践规范包） | 文本 | docs/patterns.md |
 | `nf pipeline` | 资产与货架（shelf） | 管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线） | 文本 | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf postmortem` | 治理与决策（govern） | 复盘（机制借鉴 SRE postmortem） | 文本 | — |
 | `nf preset` | 装配与生产（forge） | 预设配置（指令集 F：端壳退役后按「端壳能力一律落 CLI」把预设接成命令；落点 = NF_HOME，非仓库） | 文本 | — |
+| `nf privacy` | 质检与验证（verify） | 隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / 凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 scripts 的网络站点（requests/urllib.… | 文本 | docs/security/airgap-and-privacy.md |
 | `nf receipts` | 治理与决策（govern） | 协议层回执单根（把回执覆盖面从馆藏扩到协议层机读产物） | JSON | docs/interop.md |
 | `nf register` | 装配与生产（forge） | 协议登记本地助手（B3-B：protocol.yaml → registry protocols[]） | 文本 | — |
 | `nf registry` | 质检与验证（verify） | 契约注册表内容寻址（T8.2）：每包 canonical manifest 的 SHA-256（CID）+ 顶层 root；只读扫描、不改各包；本版不含签名（sig 留空，只做内容寻址与篡改检测） | 文本 | docs/verification-cards.md |
@@ -79,7 +81,7 @@
 | `nf run` | 装配与生产（forge） | 跑全链管道：模块选择→装配→质检→导出 | 文本 | docs/en/mcp.md、docs/en/terminal.md、docs/ja/mcp.md、docs/ja/terminal.md |
 | `nf runtime` | 装配与生产（forge） | 参考运行时（T7.3）：载入装配计划与状态，按管线层序执行并产 trace；MockModel 按 contract_digest+step 确定性派生响应（无随机/无网络）；record/replay 复现同一 trace 与产物 di… | 文本 | — |
 | `nf score` | 质检与验证（verify） | 基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归判据） | JSON | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
-| `nf security` | 质检与验证（verify） | 内容供应链安全扫描：把 community/ 与 library/ 的正文当**外来内容**做只读形态扫描（不联网、不执行、不改写）——指令注入标记（单源 core.trust_boundary）、可执行/主动内容、明文凭据（只回掩码）、… | 文本 | docs/security/threat-model.md、docs/verification-cards.md |
+| `nf security` | 质检与验证（verify） | 内容供应链安全扫描：把 community/ 与 library/ 的正文当**外来内容**做只读形态扫描（不联网、不执行、不改写）——指令注入标记（单源 core.trust_boundary）、可执行/主动内容、明文凭据（只回掩码）、… | 文本 | docs/security/airgap-and-privacy.md、docs/security/threat-model.md、docs/verification-cards.md |
 | `nf serve` | 服务与集成（integrate） | MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起） | 文本 | docs/41_波C_C8_transport评估.md、docs/44_M2_AI通道内容规范.md、docs/agent/AGENT_START.md、docs/agent/agent_组装指令包_v0.2.md |
 | `nf shell` | 命令面与终端（meta） | NF 终端（端壳退役后的人机交互入口）：把既有 CLI 命令面按能力菜单组织成可交互会话（数字 0-7 看菜单 / 任意 nf 命令直通 / /help /quit）。纯 stdlib、确定性；写入类命令须显式确认（--yes 或交互输入… | JSON | docs/en/layers.md、docs/en/terminal.md、docs/ja/layers.md、docs/ja/terminal.md |
 | `nf sig` | 质检与验证（verify） | 协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹） | JSON | docs/41_波C_C1_C2_实测记录.md、docs/41_波C_W3_实测记录.md、docs/42_M5_Release-checklist.md、docs/attest.md |
@@ -91,7 +93,7 @@
 | `nf terminal` | 命令面与终端（meta） | NF 终端（端壳退役后的人机交互入口）：把既有 CLI 命令面按能力菜单组织成可交互会话（数字 0-7 看菜单 / 任意 nf 命令直通 / /help /quit）。纯 stdlib、确定性；写入类命令须显式确认（--yes 或交互输入… | JSON | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf toolface` | 服务与集成（integrate） | 模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁） | JSON | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf transparency` | 治理与决策（govern） | 透明日志：由 protocol/RECEIPTS.json 确定性派生哈希链（RFC 6962 风格域分隔），并校验在盘生成物 | JSON | docs/receipts.md |
-| `nf verify` | 质检与验证（verify） | 门禁单进程引擎：把 verify.sh 的 check 收进**一个进程**跑，省掉每条一次的解释器启动（实测全量门禁起 42 次 $PY3）。判据**一字不改**——已迁入的 check 与 verify.sh 的输出逐字一致（由 te… | JSON | docs/security/threat-model.md |
+| `nf verify` | 质检与验证（verify） | 门禁单进程引擎：把 verify.sh 的 check 收进**一个进程**跑，省掉每条一次的解释器启动（实测全量门禁起 42 次 $PY3）。判据**一字不改**——已迁入的 check 与 verify.sh 的输出逐字一致（由 te… | JSON | docs/security/airgap-and-privacy.md、docs/security/threat-model.md |
 | `nf who-refers` | 图书馆与知识（library） | 引用反查（A2：谁引用了某模块，遍历 registry references） | 文本 | — |
 | `nf workloop` | 治理与决策（govern） | 构建回路：从公开待办真源（type_backlog / pipeline_advisory）组类型化问题问决策层，产出**工单**（含完成判据与验收命令）；决策模型只选择不落笔，工单只落内部档案 | JSON | — |
 | `nf worldmodel` | 服务与集成（integrate） | world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门） | JSON | docs/en/terminal.md、docs/ja/terminal.md、docs/meta/DEEP_DIVE.md、docs/terminal.md |
@@ -107,7 +109,7 @@
 | meta | 命令面与终端 | `nf cli`, `nf completion`, `nf daemon`, `nf help`, `nf shell`, `nf terminal` |
 | shelf | 资产与货架 | `nf asset`, `nf combine`, `nf domain`, `nf market`, `nf module`, `nf output`, `nf pipeline`, `nf rename` |
 | start | 上手与自检 | `nf demo`, `nf doctor`, `nf facts`, `nf layers`, `nf stats` |
-| verify | 质检与验证 | `nf assertions`, `nf changelog`, `nf conformance`, `nf diff`, `nf explain`, `nf ir`, `nf license`, `nf lint`, `nf nfal`, `nf registry`, `nf release`, `nf score`, `nf security`, `nf sig`, `nf st-validate`, `nf telemetry`, `nf verify` |
+| verify | 质检与验证 | `nf assertions`, `nf changelog`, `nf conformance`, `nf diff`, `nf explain`, `nf ir`, `nf license`, `nf lint`, `nf nfal`, `nf ops`, `nf privacy`, `nf registry`, `nf release`, `nf score`, `nf security`, `nf sig`, `nf st-validate`, `nf telemetry`, `nf verify` |
 
 ## 复跑
 

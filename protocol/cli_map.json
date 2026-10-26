@@ -1225,6 +1225,34 @@
         "--help",
         "-h"
       ],
+      "group": "verify",
+      "has_json": false,
+      "name": "ops",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "--no-live",
+          "-h"
+        ],
+        "report": [
+          "--help",
+          "--json",
+          "--no-live",
+          "-h"
+        ]
+      },
+      "one_line": "内容 SRE 观测面（T11.1）：从既有真实产物（门禁缺陷 bench / 一致性报告 / 回执 / 审计 / verify 判据面 / benchmark 榜单 / M2 执行记录 / 索引 root）+ 既有只读扫描器（安全扫描 /…",
+      "related_docs": [
+        "docs/ops/content-slo.md"
+      ],
+      "usage": "usage: nf ops [-h] {report,check} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
       "group": "shelf",
       "has_json": false,
       "name": "output",
@@ -1431,6 +1459,34 @@
       "one_line": "预设配置（指令集 F：端壳退役后按「端壳能力一律落 CLI」把预设接成命令；落点 = NF_HOME，非仓库）",
       "related_docs": [],
       "usage": "usage: nf preset [-h] {ls,show,apply,save,rm,export,import} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "privacy",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ],
+        "scan": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ]
+      },
+      "one_line": "隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / 凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 scripts 的网络站点（requests/urllib.…",
+      "related_docs": [
+        "docs/security/airgap-and-privacy.md"
+      ],
+      "usage": "usage: nf privacy [-h] {scan,check} ..."
     },
     {
       "flags": [
@@ -1691,6 +1747,7 @@
       },
       "one_line": "内容供应链安全扫描：把 community/ 与 library/ 的正文当**外来内容**做只读形态扫描（不联网、不执行、不改写）——指令注入标记（单源 core.trust_boundary）、可执行/主动内容、明文凭据（只回掩码）、…",
       "related_docs": [
+        "docs/security/airgap-and-privacy.md",
         "docs/security/threat-model.md",
         "docs/verification-cards.md"
       ],
@@ -1961,6 +2018,7 @@
       "nested": {},
       "one_line": "门禁单进程引擎：把 verify.sh 的 check 收进**一个进程**跑，省掉每条一次的解释器启动（实测全量门禁起 42 次 $PY3）。判据**一字不改**——已迁入的 check 与 verify.sh 的输出逐字一致（由 te…",
       "related_docs": [
+        "docs/security/airgap-and-privacy.md",
         "docs/security/threat-model.md"
       ],
       "usage": "usage: nf verify [-h] [--only ONLY] [--json] [--memo] [--cached] [--jobs JOBS] [--trust-repo]"
@@ -2028,15 +2086,15 @@
     }
   ],
   "coverage": {
-    "commands": 77,
-    "covered": 77,
+    "commands": 79,
+    "covered": 79,
     "duplicates": {},
     "empty_families": [],
     "families": 8,
     "stray": [],
     "uncurated": []
   },
-  "digest": "sha256:165656c91943e7eb4aa75b76862c41ea05aaaf0adea6472311d74a84aa824f12",
+  "digest": "sha256:5b91967aa4ef07a345110c55a72af1cec0b8f6bb611632555cfc9c558cbf0a8d",
   "families": [
     {
       "commands": [
@@ -2158,6 +2216,8 @@
         "license",
         "lint",
         "nfal",
+        "ops",
+        "privacy",
         "registry",
         "release",
         "score",
@@ -2169,7 +2229,7 @@
       ],
       "id": "verify",
       "name": "质检与验证",
-      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译、契约注册表内容寻址（CID）"
+      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译、契约注册表内容寻址（CID）、内容 SRE 观测（SLI/SLO）、隐私与 air-gap 静态审计"
     }
   ],
   "kind": "cli-map",

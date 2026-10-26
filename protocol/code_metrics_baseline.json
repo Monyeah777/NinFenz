@@ -160,6 +160,11 @@
       "max_fn_cc": 6,
       "max_fn_lines": 12
     },
+    "desktop/src/core/cli_catalog.py": {
+      "lines": 312,
+      "max_fn_cc": 18,
+      "max_fn_lines": 67
+    },
     "desktop/src/core/closure_scan.py": {
       "lines": 76,
       "max_fn_cc": 8,
@@ -231,14 +236,14 @@
       "max_fn_lines": 54
     },
     "desktop/src/core/content_ops.py": {
-      "lines": 444,
-      "max_fn_cc": 19,
-      "max_fn_lines": 53
+      "lines": 450,
+      "max_fn_cc": 20,
+      "max_fn_lines": 56
     },
     "desktop/src/core/content_security.py": {
-      "lines": 362,
-      "max_fn_cc": 17,
-      "max_fn_lines": 58
+      "lines": 363,
+      "max_fn_cc": 18,
+      "max_fn_lines": 59
     },
     "desktop/src/core/contract_pin.py": {
       "lines": 33,
@@ -985,6 +990,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 29
     },
+    "desktop/src/core/privacy_scan.py": {
+      "lines": 676,
+      "max_fn_cc": 20,
+      "max_fn_lines": 56
+    },
     "desktop/src/core/prose_lint.py": {
       "lines": 234,
       "max_fn_cc": 19,
@@ -1536,9 +1546,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8306,
-      "max_fn_cc": 123,
-      "max_fn_lines": 1428
+      "lines": 8448,
+      "max_fn_cc": 125,
+      "max_fn_lines": 1466
     },
     "scripts/nf_client.py": {
       "lines": 187,
