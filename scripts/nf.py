@@ -341,6 +341,25 @@ def _make_parser() -> argparse.ArgumentParser:
     imp2.add_argument("--out", default="",
                       help="把导入产物写成规范形 Markdown 到该路径（docx/dita；相对路径按仓库根）")
 
+    # nf glossary：英文术语层（T12.2，可追溯到中文协议锚点；不是全文翻译）。
+    glp = sub.add_parser("glossary",
+                         help="英文术语层（Terminology layer：zh/en 双语定义 + 真实协议锚点）",
+                         description="英文术语层（T12.2）：protocol/glossary.json 的 entries "
+                                     "逐条给出 zh/en/双语定义/category 与**真实锚点**"
+                                     "（file + section/keyword，禁假行号）；check 校验 schema/"
+                                     "唯一性/锚点/必含清单；render 生成 docs/protocol/"
+                                     "glossary.en.md（同源、确定性，非全文翻译）")
+    glsub = glp.add_subparsers(dest="glossary_cmd")
+    gl_ck = glsub.add_parser("check", help="术语层校验（失败非零）",
+                             description="校验 schema/术语唯一/锚点真实/必含术语清单齐全；"
+                                         "任一不过即非零退出")
+    gl_ck.add_argument("--json", action="store_true", help="输出结构化 JSON 报告")
+    gl_rd = glsub.add_parser("render", help="从同一数据渲染英文术语表（人读件）",
+                             description="按 category 分组渲染 docs/protocol/glossary.en.md"
+                                         "（同输入同字节；禁止手改生成件）")
+    gl_rd.add_argument("--out", default="docs/protocol/glossary.en.md",
+                       help="落点（缺省 docs/protocol/glossary.en.md；相对路径按仓库根）")
+
     # nf asset：资产供应链台账（40 总纲 v2.7 波 A S2——add/verify/inventory/ls/rm/deprecate/restore）
     ast = sub.add_parser("asset",
                          help="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏"
@@ -2139,6 +2158,32 @@ def _cmd_import_ir(args, fmt: str, rest: list) -> int:
     if not (report.get("warnings") or []):
         print("  ✓ 无未覆盖元素/无降级告警")
     return 0
+
+
+def _cmd_glossary(args) -> int:
+    """nf glossary：英文术语层（T12.2）——check 校验 / render 人读件（同源生成）。"""
+    from core import glossary as glg
+
+    sub = getattr(args, "glossary_cmd", "") or ""
+    if sub == "check":
+        return glg.run(as_json=bool(getattr(args, "json", False)), root=ROOT)
+    if sub == "render":
+        doc = glg.load(ROOT)
+        out = str(getattr(args, "out", "") or "docs/protocol/glossary.en.md")
+        target = out if os.path.isabs(out) else _rel_out(out)
+        try:
+            glg.write_markdown(doc, target)
+        except OSError as exc:
+            print("  ✗ 渲染落盘失败：%s（修复指引：给可写路径；相对路径按仓库根解析）"
+                  % exc, file=sys.stderr)
+            return 2
+        print("== nf glossary render ==")
+        print("  ✓ 已写入：%s（entries %d · 同源确定性）"
+              % (_rel_display(target), len(doc.get("entries") or [])))
+        return 0
+    print("  ✗ 缺子命令（用法：`nf glossary check [--json]` ｜ "
+          "`nf glossary render [--out docs/protocol/glossary.en.md]`）", file=sys.stderr)
+    return 2
 
 
 def _cmd_spec(args) -> int:
@@ -8077,6 +8122,8 @@ def main(argv=None) -> int:
         return _cmd_library(args)
     if args.cmd == "conformance":
         return _cmd_conformance(args)
+    if args.cmd == "glossary":
+        return _cmd_glossary(args)
     if args.cmd == "approve":
         return _cmd_approve(args)
     if args.cmd == "events":
