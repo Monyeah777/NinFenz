@@ -92,7 +92,9 @@ def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]
     from core import assemble_plan as ap
     from core import round_drill as rd
 
-    plan_ = ap.plan(requirement)
+    # T5.2：允许集有 scoped / --loose 两种口径，重建时必须与写 trace 时一致，
+    # 否则同一份 transcript 会因口径漂移被读成「判定漂移」（旧 trace 无该键 ⇒ 缺省 scoped）。
+    plan_ = ap.plan(requirement, loose=bool(trace.get("loose")))
     allowed = plan_.get("allowed_module_ids") or []
     r_issues, r_stats = rd.scan(text or "", allowed)
     issues += _fingerprint_issues(trace, r)

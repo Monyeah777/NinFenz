@@ -58,7 +58,7 @@ tags:
 - **选件决策**（`nf assemble` 装配计划实测输出）：
   - 匹配预设：技术文档域包 → 管线 **P06**（`community/技术文档域包/pipelines/P06_技术文档题材装配流管线.md`）
   - 取件模块：**M97 术语管理**（P40 行为决策）、**M98 修订记录**（P60 长期演变）
-  - 装配允许集：官方核心 + 包模块 = **44**；本件实际内嵌 **15** 件（核心 13 + 自带 2）
+  - 装配允许集（scoped）：官方核心 13 + P06 管线 default/allowed 2 = **15**；本件实际内嵌 **15** 件（核心 13 + 自带 2）
   - 资产：**9 文件**（术语表 1 + 章节模板 6 + 风格规则 1 + 标准锚点 1；键表见包 README §3，经资产五接口消费）
   - references：**0**（零跨包引用，`core_only: true`）
   - **L2 执行记录**：executor `nf assemble --build` · date 2026-10-26 · artifact `out/*.md` · check_rc 0（`nf assemble --check` PASS：八段骨架 + 编号允许集 + 决策引用）

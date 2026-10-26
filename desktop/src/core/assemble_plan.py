@@ -182,14 +182,14 @@ def _package_module_sets() -> Dict[str, List[str]]:
     return sets
 
 
-def clarify(requirement: str) -> Dict[str, Any]:
-    """需求收敛漏斗：信息不足 → 澄清问句；足够 → 直接进 plan。"""
+def clarify(requirement: str, loose: bool = False) -> Dict[str, Any]:
+    """需求收敛漏斗：信息不足 → 澄清问句；足够 → 直接进 plan（loose 透传以保口径一致）。"""
     req = requirement.strip()
     if not req:
         return {"status": "clarify", "requirement": req,
                 "questions": ["请描述交付物：类型（技术文档/合规清单/研究报告/规格说明…）、"
                               "受众与验收判据各是什么？"]}
-    p = plan(req)
+    p = plan(req, loose=loose)
     if p["matched"] or any(cue in req for cue in CUSTOM_CUES):
         return {"status": "ready", "requirement": req, "plan": p,
                 "questions": []}
@@ -219,7 +219,8 @@ def dossier(requirement: str, plan_: Dict[str, Any],
         "   领域判定：%s" % (
             "%s/%s" % (plan_.get("package"), plan_.get("pipeline"))
             if plan_.get("matched") else
-            "未命中官方预设 → 用户自定义（可借用包：%s）"
+            "未命中官方预设 → 用户自定义（scoped 允许集 = 官方核心 13；"
+            "跨域/自定义件用 --loose 恢复全库；可借用包：%s）"
             % ("、".join(plan_.get("known_packages") or []) or "—")),
         "   取件模块：%s" % "、".join(plan_.get("fetch_modules") or []),
         "5. 验收标准（可测断言）：nf assemble \"%s\" --check <out.md> 期望 PASS"
@@ -243,8 +244,65 @@ def dossier(requirement: str, plan_: Dict[str, Any],
     return "\n".join(lines) + "\n"
 
 
-def plan(requirement: str) -> Dict[str, Any]:
-    """需求 → 装配计划（预设包 + 取件清单）。"""
+def _package_protocol(pkg: str) -> Dict[str, Any]:
+    """读包 `protocol.yaml` 的 `package` 段（不可读/缺 PyYAML → `{}`，作用域按可证声明收窄）。"""
+    proto = _ROOT / "community" / pkg / "protocol.yaml"
+    yaml = _yaml_module()
+    if not proto.is_file() or yaml is None:
+        return {}
+    try:
+        data = yaml.safe_load(proto.read_text(encoding="utf-8")) or {}
+    except Exception:  # nosec B110/B112 —— 尽力而为：坏件由 check14 另行判死
+        return {}
+    pkg_doc = data.get("package")
+    return pkg_doc if isinstance(pkg_doc, dict) else {}
+
+
+def _pipeline_files(pkg: str, pipeline: str) -> List[str]:
+    """命中管线的件路径（包内 `pipelines/` 优先；官方 `03_管线库/` 兜底）→ 仓库相对路径。"""
+    for base in (_ROOT / "community" / pkg / "pipelines", _ROOT / "03_管线库"):
+        if not base.is_dir():
+            continue
+        hits = sorted(base.glob("%s*.md" % pipeline))
+        if hits:
+            return [p.relative_to(_ROOT).as_posix() for p in hits]
+    return []
+
+
+def _pipeline_scope(pipe_files: Sequence[str],
+                    package_modules: Sequence[str]) -> Tuple[List[str], str]:
+    """命中管线 `layers[].default_modules ∪ allowed_modules`；解析失败 → 包模块清单兜底（仍域内）。"""
+    from core import pipeline_loader
+
+    mods: List[str] = []
+    for rel in pipe_files:
+        try:
+            pipe = pipeline_loader.load_pipeline_file(_ROOT / rel)
+        except Exception:  # nosec B110/B112 —— 管线件坏形状由 check28/verify 另判，作用域退包内清单
+            pipe = None
+        if pipe is not None:
+            for lay in pipe.layers:
+                mods += list(lay.default_modules) + list(lay.allowed_modules)
+    if mods:
+        return mods, "pipeline-layers"
+    return list(package_modules), ("package-fallback" if package_modules else "empty")
+
+
+def _reference_modules(pkg: str) -> List[str]:
+    """组合包 `package.references[].module_id` 白名单（R1 受控跨包引用的允许面）。"""
+    refs = _package_protocol(pkg).get("references") or []
+    return [str(r.get("module_id")) for r in refs
+            if isinstance(r, dict) and r.get("module_id")]
+
+
+def plan(requirement: str, loose: bool = False) -> Dict[str, Any]:
+    """需求 → 装配计划（预设包 + 取件清单）。
+
+    允许集口径（T5.2 域作用域收窄）：
+    - 默认 scoped：官方核心 13 件 ∪ 命中管线 layers[].default/allowed ∪ 组合包 references；
+    - 未命中预设（custom）：官方核心 13 件（自定义件须先登记再 `--loose` 或改需求命中包域）；
+    - `loose=True`（CLI `--loose`）：恢复旧行为 = 全库已登记模块（逃生阀，显式声明）。
+    """
     req = requirement.strip()
     pkg: Optional[str] = None
     pipeline: Optional[str] = None
@@ -252,44 +310,48 @@ def plan(requirement: str) -> Dict[str, Any]:
         if any(k in req for k in keys):
             pkg, pipeline = hit
             break
-    modules: List[str] = []
     matched = bool(pkg)
+    package_modules: List[str] = []
     if pkg:
-        proto = _ROOT / "community" / pkg / "protocol.yaml"
-        if proto.is_file():
-            try:
-                _y = _yaml_module()
-                data = _y.safe_load(proto.read_text(encoding="utf-8")) if _y else {}
-                modules = [str(x) for x in (data.get("package") or {}).get("module_id_range") or []]
-            except Exception:
-                modules = []
+        package_modules = [str(x) for x in
+                           (_package_protocol(pkg).get("module_id_range") or [])]
     packages = _package_module_sets()
-    if pkg is None or not matched:
-        # 用户自定义/未命中：允许全域已登记模块（官方核心 + 各社区包），
-        # 并给出自定义预留槽位；自定义件须先按模板落库登记，验收才认。
-        for mids in packages.values():
-            modules += mids
-        modules = sorted(set(modules))
+    if not matched:
         known = sorted(packages)
+        fetch_modules = ([str(x) for mids in packages.values() for x in mids]
+                         if loose else [str(x) for x in _official_core_ids()])
     else:
         known = [pkg]
-    all_registered = _official_core_ids()
-    for mids in packages.values():
-        all_registered += mids
-    allowed = sorted(set(all_registered))
-    if pipeline and pkg:
-        pipeline_path = (_ROOT / "community" / pkg / "pipelines").glob("%s*.md" % pipeline)
-        pipe_files = [p.relative_to(_ROOT).as_posix() for p in pipeline_path]
+        fetch_modules = package_modules or [str(x) for x in _official_core_ids()]
+    pipe_files = _pipeline_files(pkg, pipeline) if (pkg and pipeline) else []
+    core = _official_core_ids()
+    if loose:
+        allowed = sorted(set(core) | {str(m) for mids in packages.values() for m in mids})
+        scope = "loose-all"
+        sources = {"core": len(core), "pipeline": 0, "references": 0,
+                   "registered": len(allowed)}
+    elif matched:
+        pipe_mods, pipe_src = _pipeline_scope(pipe_files, package_modules)
+        refs = _reference_modules(pkg)
+        allowed = sorted(set(core) | set(pipe_mods) | set(refs))
+        scope = "preset-pipeline" if pipe_src == "pipeline-layers" else "preset-fallback"
+        sources = {"core": len(core), "pipeline": len(set(pipe_mods)),
+                   "references": len(set(refs))}
     else:
-        pipe_files = []
+        allowed = sorted(set(core))
+        scope = "core-only"
+        sources = {"core": len(core), "pipeline": 0, "references": 0}
     return {
         "requirement": req,
         "matched": matched,
         "package": pkg,
         "pipeline": pipeline,
         "pipeline_files": pipe_files,
-        "fetch_modules": modules or [str(x) for x in _official_core_ids()],
+        "fetch_modules": fetch_modules or [str(x) for x in core],
         "allowed_module_ids": allowed,
+        "allowed_scope": scope,
+        "allowed_sources": sources,
+        "loose": bool(loose),
         "known_packages": known,
         "status": "preset" if matched else "custom",
     }
@@ -307,12 +369,24 @@ def check(output_md: str, plan_: Dict[str, Any],
         issues.append("八段骨架缺段：##%s" % ", ".join(str(i) for i in missing))
     allowed = set(plan_.get("allowed_module_ids") or [])
     mentioned = set()
-    _EXPL = ("残留", "不命中", "源编号", "未装配", "说明")
+    _EXPL = ("残留", "不命中", "源编号", "未装配", "说明",
+             "无交集", "规避", "对照")   # 对照/规避语境不是装配声明（P06 样本实测）
     narrative = {0, 1, 2}
     cur_seg = None
     in_code = False
+    in_state_block = False
     for line in output_md.splitlines():
         s = line.strip()
+        # 「状态块（条件先行摘要）」= 产物确定性提取的状态代理（非模型生成、非装配声明）；
+        # 其「模块/挂载编号」行是全库号段清单，不是本装配的取件集，故整块不参与编号判定。
+        if s.startswith("## 状态块"):
+            in_state_block = True
+            continue
+        if in_state_block:
+            if s.startswith("## "):
+                in_state_block = False
+            else:
+                continue
         if s.startswith("```"):
             in_code = not in_code
             continue
@@ -329,7 +403,9 @@ def check(output_md: str, plan_: Dict[str, Any],
                 continue
             if any(k in line for k in _EXPL):
                 continue
-            issues.append("编造/越界编号：%s（全库允许集外，且非残留/不命中说明）" % tok)
+            issues.append("编造/越界编号：%s（域作用域允许集外：官方核心 + 命中管线"
+                          "default/allowed + references；非残留/不命中说明。"
+                          "跨域/自定义件请显式加 `--loose` 或改需求命中包域）" % tok)
         if cur_seg not in narrative or s.startswith(("-", "*", "|")):
             continue
         for clause in re.split(r"[。！？；\n]+", line):

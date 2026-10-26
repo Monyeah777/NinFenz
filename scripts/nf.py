@@ -1140,6 +1140,9 @@ def _make_parser() -> argparse.ArgumentParser:
                           "（写→读回自证闭环；漂移即 exit 1）")
     asm.add_argument("--rounds", action="store_true",
                      help="回合级 drill：对成品转录按回合断言（引用/推进/编造，45 A2）")
+    asm.add_argument("--loose", action="store_true",
+                     help="放宽装配允许集：恢复旧行为 = 全库已登记模块（缺省 scoped：官方核心 13 + "
+                          "命中管线 default/allowed + 组合包 references；跨域/自定义件才需要）")
     asm.add_argument("--answer", action="append", default=None,
                      metavar="问答",
                      help="澄清回填（可多次，如 --answer \"题材：西幻生存\" --answer \"主轴：生存"
@@ -6443,8 +6446,8 @@ def _cmd_assemble(args):
         answers = prior + [a for a in answers if a not in prior]
     if answers:
         req_text = req_text + "（" + "；".join(answers) + "）"
-    funnel = ap.clarify(req_text)
-    plan_ = funnel.get("plan") or ap.plan(req_text)
+    funnel = ap.clarify(req_text, loose=bool(getattr(args, "loose", False)))
+    plan_ = funnel.get("plan") or ap.plan(req_text, loose=bool(getattr(args, "loose", False)))
     if args.save_path:
         text = ap.dossier(req_text, plan_,
                           funnel.get("questions") or [], answers)
@@ -6524,6 +6527,8 @@ def _cmd_assemble(args):
         if args.trace_path and not _write_trace_file(args.trace_path, {
                 "tool": "nf assemble", "phase": "build",
                 "requirement": args.requirement, "output": out_path,
+                "loose": bool(getattr(args, "loose", False)),
+                "allowed_scope": plan_.get("allowed_scope"),
                 "stats": bstats, "ok": not issues, "issues": issues,
         }):                       # 审计 N2：写失败 ⇒ rc≠0
             return 1
@@ -6568,6 +6573,8 @@ def _cmd_assemble(args):
                 "tool": "nf assemble", "phase": "check",
                 "requirement": args.requirement,
                 "source": args.check_md,
+                "loose": bool(getattr(args, "loose", False)),
+                "allowed_scope": plan_.get("allowed_scope"),
                 "matched": plan_.get("matched"),
                 "package": plan_.get("package"),
                 "pipeline": plan_.get("pipeline"),
@@ -6583,16 +6590,20 @@ def _cmd_assemble(args):
         print("  匹配预设：%s · 管线 %s" % (plan_["package"], plan_["pipeline"]))
         print("  管线件：%s" % ("、".join(plan_["pipeline_files"]) or "—"))
         print("  取件模块：%s" % "、".join(plan_["fetch_modules"]))
-        print("  装配允许集（官方核心 + 包模块）：%d"
-              % len(plan_["allowed_module_ids"]))
+        print("  装配允许集（%s）：%d"
+              % ("--loose 全库" if plan_.get("loose")
+                 else "官方核心 + 命中管线 default/allowed + references",
+                 len(plan_["allowed_module_ids"])))
         print("  下一步：读 docs/agent/agent_组装指令包_v0.2.md → 取件 → 输出完整版 → "
               "nf assemble \"%s\" --check <out.md> 验收" % args.requirement)
     else:
         print("  未命中预设 → 用户自定义流（custom）")
         print("  可借用已登记包：%s"
               % ("、".join(plan_["known_packages"]) or "—"))
-        print("  装配允许集（官方核心 + 全部已登记社区模块）：%d"
-              % len(plan_["allowed_module_ids"]))
+        print("  装配允许集（%s）：%d"
+              % ("--loose 全库" if plan_.get("loose")
+                 else "scoped = 官方核心 13；跨域/自定义件用 --loose",
+                 len(plan_["allowed_module_ids"])))
         print("  自定义预留槽位：模块 M91-M99 或 <本包独占类别>:Mxx 类内段 · 资产 900+ 命名空间 · "
               "新管线 Pxx（避让层位 id P00-P80 与官方/既有管线，见 02 §8.3）")
         print("  建件：按 community/模板制作指令包.md 做自定义模块/资产 → "
@@ -6608,6 +6619,8 @@ def _cmd_assemble(args):
             "matched": plan_.get("matched"),
             "package": plan_.get("package"),
             "pipeline": plan_.get("pipeline"),
+            "loose": bool(getattr(args, "loose", False)),
+            "allowed_scope": plan_.get("allowed_scope"),
             "allowed_modules": len(plan_.get("allowed_module_ids") or []),
     }):                       # 审计 N2：写失败 ⇒ rc≠0
         return 1

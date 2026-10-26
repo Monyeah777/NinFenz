@@ -50,6 +50,8 @@ python scripts/nf.py assemble "<需求>" --trace trace.json --rounds
 python scripts/nf.py assemble "<需求>" --check-trace trace.json
 ```
 
+`--check` 的允许集默认 **scoped**（官方核心 13 + 命中管线 default/allowed + 组合包 references）；
+跨域/自定义题材件不在作用域内时会被判「越界编号」，显式加 `--loose` 可恢复旧的全库口径。
 `--check` 与**无法解析**的需求一起用时会被明确拒（exit 2，提示「未执行验收」）：允许集来自
 需求解析，解析不出就不能假装核对过——脚本里的 `... --check 成品.md && 发布` 因此不会把
 「没验收」读成「验收通过」。
