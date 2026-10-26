@@ -22,7 +22,7 @@
 | llms.txt | AI（索引） | 有哪些面可读（llms.txt 惯例的清单面） |
 | llms-full.txt | AI（完整） | 一文件读全：定义 / 事实 / 术语 / 上手 / FAQ / 引用 / 机器面清单 |
 | nf.txt | 客户端 AI | 装载指令：三条铁律 + 分支表 + 取件基底 + 判定（读到即执行） |
-| agent.txt | agent | 命令序列 + 每步期望输出（doctor 17/17 · verify.sh PASS=76 · conformance 27/27） |
+| agent.txt | agent | 命令序列 + 每步期望输出（doctor 17/17 · verify.sh PASS=79 · conformance 27/27） |
 | facts.json | AI（机读） | 事实清单：每条带真源与锚点；scale.values 与 repo_stats.json 机检对齐 |
 | run.sh | agent | 免安装引导（默认 clone + 只读体检；--full 追加全量门禁；逐条先打印再执行） |
 | robots.txt | 爬虫 | 显式欢迎 AI 检索/引用/训练取用 + Content-Signal + sitemap |

@@ -75,7 +75,7 @@ def _load_json(path: Path, what: str) -> Any:
         return json_doc.load(path, dict, what=what)
     except ValueError as exc:
         raise RuntimeFailure("%s（修复指引：本件须是 UTF-8 JSON 对象；"
-                             "计划由 `nf assemble --plan-output` 样式的 assemble_plan.plan 产出）"
+                             "计划由 `nf assemble --trace` 导出的 assemble_plan.plan 产出）"
                              % exc) from exc
 
 

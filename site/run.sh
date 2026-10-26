@@ -4,7 +4,7 @@
 #
 # 用法：
 #   curl -fsSL https://ninfenz.dev/run.sh | sh                  默认：clone 到 ./NinFenz，跑只读体检
-#   curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full     追加：跑 check1-42 全量门禁
+#   curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --full     追加：跑 check1-45 全量门禁
 #   curl -fsSL https://ninfenz.dev/run.sh | sh -s -- --dir /tmp/nf --mirror gitee
 #
 # 本脚本只做三件事：1) git clone 仓库；2) 逐条打印将要执行的命令；3) 执行它。
@@ -32,7 +32,7 @@ while [ $# -gt 0 ]; do
       ;;
     -h|--help)
       echo "用法：sh run.sh [--full] [--mirror gitee] [--dir <目标目录>]"
-      echo "  --full         clone 后追加跑 bash verify.sh（check1-42 全量门禁）"
+      echo "  --full         clone 后追加跑 bash verify.sh（check1-45 全量门禁）"
       echo "  --mirror gitee 用 Gitee 镜像（国内可达）"
       exit 0
       ;;

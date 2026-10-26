@@ -84,7 +84,7 @@ AI による組立：
 <!-- nf:stats:begin -->
 **公式コア**：13 モジュール · 3 パイプライン（P00 / P01 / P90） · コアプロトコル 01–07
 **コミュニティ規模**：111 登録パッケージ · 381 資産ファイル · 101 概念グラフ · 100 ドメインパック／1200 細分類 · 標準カタログ 370 件（到達可能 332 ／ 不可達 38 · 機関 194 · 206 依存辺） · 標準バインディング 1200 件
-**品質証憑**：verify v2.30 · check1-42 · PASS=76（bash verify.sh の単一入口。期待基準は quality_baseline.EXPECTED_*） · 所蔵 3 件
+**品質証憑**：verify v2.30 · check1-45 · PASS=79（bash verify.sh の単一入口。期待基準は quality_baseline.EXPECTED_*） · 所蔵 3 件
 
 分层：data 148 · eng 38 · form 29 · gov 71 · iface 84 （標準カタログ layer 別）
 

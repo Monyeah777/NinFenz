@@ -63,7 +63,8 @@
       18,
       19,
       22,
-      28
+      28,
+      43
     ],
     "CAP_AUTH_COHERENT": [
       16
@@ -82,14 +83,16 @@
       25,
       31,
       40,
-      41
+      41,
+      44
     ],
     "CAP_TAMPER_EVIDENT": [
       23,
       25,
       31,
       40,
-      42
+      42,
+      44
     ],
     "CAP_LIFECYCLE_LEGAL": [
       17,
@@ -105,7 +108,8 @@
     "CAP_PURITY_BOUNDARY": [
       27,
       39,
-      40
+      40,
+      45
     ],
     "CAP_RUNTIME_EXECUTABLE": [
       12,
