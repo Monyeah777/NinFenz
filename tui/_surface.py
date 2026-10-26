@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:bec14d3a00d7297c7db53bed6eac60cee3893b5a038db8df85deddee9e5e911b'
+DIGEST = 'sha256:e9e3761c934ad267e49804e8955ad27998a761d3cbb418dcce332658b5fb1a6b'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -62,6 +62,7 @@ COMMANDS = ['agent',
  'model',
  'module',
  'nfal',
+ 'ops',
  'output',
  'patterns',
  'pipeline',
@@ -494,7 +495,7 @@ FAMILIES = [{'id': 'start',
  {'id': 'verify',
   'name': '质检与验证',
   'summary': '门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard '
-             '检查/编译、契约注册表内容寻址（CID）',
+             '检查/编译、契约注册表内容寻址（CID）、内容 SRE 观测（SLI/SLO）',
   'commands': ['verify',
                'lint',
                'conformance',
@@ -511,7 +512,8 @@ FAMILIES = [{'id': 'start',
                'nfal',
                'registry',
                'security',
-               'ir']},
+               'ir',
+               'ops']},
  {'id': 'library',
   'name': '图书馆与知识',
   'summary': '馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面',
