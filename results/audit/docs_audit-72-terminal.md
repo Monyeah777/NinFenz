@@ -7,18 +7,20 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
-  - scripts/nf.py:291c212272bd18ac4d44ee1c6cc89b718b76f7c5b03a3ff65a3005be76886cfe
+  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:27f93c0ec2ee9f7388dd7bd6a73d79a2168ca5d013b6828c78e0293978e1deba
-  - desktop/src/core/quality_baseline.py:db5c927c75dba1ffb1b40eb26358ff5ba9becb195f20f55760a7b52f156c1c23
+  - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
+  - desktop/src/core/quality_baseline.py:81e8fc3ff892071459016789f245d55712cfed16388b8402a874baac45a10578
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/CONFORMANCE.md:c1bf2658130912a66180936aaf12a689634e4a4d64a47c25f32e8c7c01eec5c8
+  - protocol/CONFORMANCE.md:945da2a83eaba05ebc0e7e435a6ab49fcf1b916e00f5a830272a9c91fa3681c8
 
 ---
+> 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
+
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
 
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map

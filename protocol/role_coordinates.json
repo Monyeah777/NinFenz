@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1452,
+    "app": 1453,
     "entry": 26,
     "floor": 6,
-    "prod": 1068,
+    "prod": 1069,
     "projection": 135,
     "support": 274,
-    "verify": 1180
+    "verify": 1181
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6329,6 +6329,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "英文术语层（glossary）：每条英文术语可追溯到中文协议里的**真实锚点**。",
+      "path": "desktop/src/core/glossary.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "数据槽声明 grain / unit / clock（机制借鉴 nuke data-machine.md:71-87,161）。",
       "path": "desktop/src/core/grain_units.py",
       "role": "prod",
@@ -8323,6 +8329,12 @@
     {
       "function": "Gitee polling failures must be categorized, visible, and fail closed.",
       "path": "desktop/tests/test_gitee_diagnostics.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "英文术语层（T12.2）单测：数据形状 / 唯一性 / 真实锚点 / 必含清单 / 渲染确定性 / 负例。",
+      "path": "desktop/tests/test_glossary.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13536,17 +13548,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "67420c7ebbed39c95b853abb2eb23d6f71475aa5271e1648cbbcb0eaa8fe8ef1",
+  "root_digest": "44a7bef7555191e4bbb710977cdeebdcf89b4374d8d3aa4eb3bd8b6322304354",
   "rule_counts": {
-    "R-app": 1452,
+    "R-app": 1453,
     "R-catch": 126,
     "R-entry": 26,
     "R-floor": 6,
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 122,
-    "R-verify": 1053,
-    "auto:R-core": 275
+    "R-verify": 1054,
+    "auto:R-core": 276
   },
   "schema": "nf-role-coordinates/1"
 }

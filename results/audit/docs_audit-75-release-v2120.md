@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:665f3fb40ac05aedb2ff016ae83c06e287ee321554282641153081abbefd1fe9
-  - docs/meta/VERSION-MATRIX.md:0d6b7ba72049d36354119deb1764d736433acdb1d06be767621ceeaf4cfdc1ce
-  - README.md:be9a500b02a95692e8c62d90e6c70ce2e0a6a50555efe046952a6c829f8eddae
+  - CHANGELOG.md:22a91769566525f48532af50049a32c824405cce7f11a1e3a14fcacc83a045b5
+  - docs/meta/VERSION-MATRIX.md:a487956d0012f828536f7c50721cd714186d55a12b1da8cc905e443c93414554
+  - README.md:e5795fd9c0c644cd228dfd9cdd101b56d2a1ebd97cef88b8d834e7faca526f2f
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:291c212272bd18ac4d44ee1c6cc89b718b76f7c5b03a3ff65a3005be76886cfe
+  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
 
 ---
+> 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
+
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest
 
 > 重审（2026-10-27）：Merge W11: content SRE + privacy/air-gap + CLI map
