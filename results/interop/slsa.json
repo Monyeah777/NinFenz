@@ -182,7 +182,13 @@
           "uri": "nf://repo/protocol/schema/asset_contracts.schema.json"
         },
         {
+          "uri": "nf://repo/protocol/schema/bench_result.schema.json"
+        },
+        {
           "uri": "nf://repo/protocol/schema/contract.schema.json"
+        },
+        {
+          "uri": "nf://repo/protocol/schema/exec_record.schema.json"
         },
         {
           "uri": "nf://repo/protocol/schema/integration.schema.json"
@@ -221,7 +227,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "1d290eda5d4facfe",
+        "invocationId": "e8312e3fad377a3d",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -332,7 +338,7 @@
     },
     {
       "digest": {
-        "sha256": "e0f3219948fe00eabf591d834ee3bed35e3247477ca76ab0a8524be6a5433e70"
+        "sha256": "0ea40fcb659e3c2d2ebd113514f754a7630842eda387efa4a409849fbfcc7a47"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -356,19 +362,19 @@
     },
     {
       "digest": {
-        "sha256": "7c62d4bb7477cdf5c294acb053ca8d9c570470bf064ab9a99f83fc82b89d5ebe"
+        "sha256": "d32e37c0927cd90d99ae7ff3aa39141fc682b12d84a5793963de78cde523eacd"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb"
+        "sha256": "7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "af27da61bc6f34963bc7282477124dc111a04969118d06a976c3b34de7167ed0"
+        "sha256": "19951ba607a96be6d0c17a4a43fa0a2c6298abe938d3d2496b0913f49b2e3e4f"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -404,7 +410,7 @@
     },
     {
       "digest": {
-        "sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
+        "sha256": "1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d"
       },
       "name": "protocol/CONFORMANCE.md"
     },
@@ -548,7 +554,7 @@
     },
     {
       "digest": {
-        "sha256": "1f7e0c3e3f632f6b0bfbeb76bd2516e9ec36b5f9bbb19ddc8bead44081206d23"
+        "sha256": "e9e540e487bcd345bb49354f4aeccf911bc01ab66b011db1bcfc2cbf25187474"
       },
       "name": "desktop/src/core/registry.json"
     },
@@ -566,9 +572,21 @@
     },
     {
       "digest": {
+        "sha256": "be2ee91a9509070b8f6f7c748437163c63c20dcce2ad072e30c7407ded552dd1"
+      },
+      "name": "protocol/schema/bench_result.schema.json"
+    },
+    {
+      "digest": {
         "sha256": "c02aba28724ecb8375776ecfd2531ef288900ddbb94f5c408f94cf7ce5f57c1f"
       },
       "name": "protocol/schema/contract.schema.json"
+    },
+    {
+      "digest": {
+        "sha256": "860ee57b0077ce76ef12781d7681e296ceeeab6107fded28e611dbba56bc3549"
+      },
+      "name": "protocol/schema/exec_record.schema.json"
     },
     {
       "digest": {

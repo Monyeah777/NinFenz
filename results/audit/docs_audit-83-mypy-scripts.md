@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:44a44c8bf9de5dd867b80c9596365e98c9a6e6843977a85530f07f5400a970a3
+  - scripts/nf.py:5a541081bccd006931ea5853a406033316edaa1b04234b53b621a708f2742d22
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
+  - protocol/code_metrics_baseline.json:7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

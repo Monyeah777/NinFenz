@@ -286,9 +286,9 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/domain_maturity.py": {
-      "lines": 680,
-      "max_fn_cc": 24,
-      "max_fn_lines": 55
+      "lines": 903,
+      "max_fn_cc": 26,
+      "max_fn_lines": 68
     },
     "desktop/src/core/domain_metrics.py": {
       "lines": 481,
@@ -349,6 +349,11 @@
       "lines": 60,
       "max_fn_cc": 12,
       "max_fn_lines": 23
+    },
+    "desktop/src/core/exec_record.py": {
+      "lines": 330,
+      "max_fn_cc": 22,
+      "max_fn_lines": 47
     },
     "desktop/src/core/execution_drill.py": {
       "lines": 323,
@@ -1335,6 +1340,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 71
     },
+    "scripts/bench_leaderboard.py": {
+      "lines": 423,
+      "max_fn_cc": 13,
+      "max_fn_lines": 48
+    },
     "scripts/build_lsp_transcript.py": {
       "lines": 223,
       "max_fn_cc": 8,
@@ -1461,9 +1471,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7771,
+      "lines": 7788,
       "max_fn_cc": 117,
-      "max_fn_lines": 1287
+      "max_fn_lines": 1299
     },
     "scripts/nf_client.py": {
       "lines": 187,

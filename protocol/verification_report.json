@@ -47,7 +47,7 @@
         "module_docs": 248,
         "pipelines": 114,
         "protocols": 111,
-        "schema_files": 9
+        "schema_files": 11
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "fadca20030b9394347429d447c25797d6f61ddaa914a82051dbbbaa6b8b40223",
+        "root": "a714d2acbbe326b868bde81afe43b31aacf091c1c212c009dd60996c63efab76",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 319,
-        "files": 319,
+        "baseline": 321,
+        "files": 321,
         "max_fn_cc": 117,
-        "max_fn_lines": 1287,
-        "max_lines": 7771
+        "max_fn_lines": 1299,
+        "max_lines": 7788
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 264,
-        "probed": 264
+        "patterns": 270,
+        "probed": 270
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 264,
-        "modules": 264,
+        "metrics_recorded": 265,
+        "modules": 265,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 66,
+        "consumed": 67,
         "exceptions": 3,
         "orphans": 3,
-        "scanners": 69
+        "scanners": 70
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4081,
-        "kernel": 2209,
+        "files": 4091,
+        "kernel": 2214,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "97d51dd9c2f15b4cd4ce44f72f1045fd3e520048f4c4a37a7f558573c1c7abad",
+  "root_digest": "6c1ee794212db8f434c0c6db0a96e9fc973a000c9f20cfe52435921e21bec039",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

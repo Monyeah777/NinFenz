@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
+  - protocol/code_metrics_baseline.json:7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

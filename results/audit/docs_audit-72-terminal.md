@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
-  - scripts/nf.py:44a44c8bf9de5dd867b80c9596365e98c9a6e6843977a85530f07f5400a970a3
+  - scripts/nf.py:5a541081bccd006931ea5853a406033316edaa1b04234b53b621a708f2742d22
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -16,9 +16,13 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
+  - protocol/CONFORMANCE.md:1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d
 
 ---
+> 重审（2026-10-26）：Merge W6: schema set 11 (exec_record+bench_result); maturity declarations M1
+
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

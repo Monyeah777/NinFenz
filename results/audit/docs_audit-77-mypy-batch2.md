@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
+  - protocol/code_metrics_baseline.json:7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

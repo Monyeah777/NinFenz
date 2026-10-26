@@ -116,7 +116,7 @@
     {
       "@id": "nf:file/desktop/src/core/registry.json",
       "@type": "prov:Entity",
-      "nf:sha256": "1f7e0c3e3f632f6b0bfbeb76bd2516e9ec36b5f9bbb19ddc8bead44081206d23"
+      "nf:sha256": "e9e540e487bcd345bb49354f4aeccf911bc01ab66b011db1bcfc2cbf25187474"
     },
     {
       "@id": "nf:file/library/ALIAS.md",
@@ -141,7 +141,7 @@
     {
       "@id": "nf:file/protocol/CONFORMANCE.md",
       "@type": "prov:Entity",
-      "nf:sha256": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4"
+      "nf:sha256": "1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d"
     },
     {
       "@id": "nf:file/protocol/LAYERS.json",
@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb"
+      "nf:sha256": "7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -181,12 +181,12 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "e0f3219948fe00eabf591d834ee3bed35e3247477ca76ab0a8524be6a5433e70"
+      "nf:sha256": "0ea40fcb659e3c2d2ebd113514f754a7630842eda387efa4a409849fbfcc7a47"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "af27da61bc6f34963bc7282477124dc111a04969118d06a976c3b34de7167ed0"
+      "nf:sha256": "19951ba607a96be6d0c17a4a43fa0a2c6298abe938d3d2496b0913f49b2e3e4f"
     },
     {
       "@id": "nf:file/protocol/data_contracts.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "7c62d4bb7477cdf5c294acb053ca8d9c570470bf064ab9a99f83fc82b89d5ebe"
+      "nf:sha256": "d32e37c0927cd90d99ae7ff3aa39141fc682b12d84a5793963de78cde523eacd"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
@@ -329,9 +329,19 @@
       "nf:sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
+      "@id": "nf:file/protocol/schema/bench_result.schema.json",
+      "@type": "prov:Entity",
+      "nf:sha256": "be2ee91a9509070b8f6f7c748437163c63c20dcce2ad072e30c7407ded552dd1"
+    },
+    {
       "@id": "nf:file/protocol/schema/contract.schema.json",
       "@type": "prov:Entity",
       "nf:sha256": "c02aba28724ecb8375776ecfd2531ef288900ddbb94f5c408f94cf7ce5f57c1f"
+    },
+    {
+      "@id": "nf:file/protocol/schema/exec_record.schema.json",
+      "@type": "prov:Entity",
+      "nf:sha256": "860ee57b0077ce76ef12781d7681e296ceeeab6107fded28e611dbba56bc3549"
     },
     {
       "@id": "nf:file/protocol/schema/integration.schema.json",
@@ -422,6 +432,6 @@
   "x-nf-counts": {
     "activities": 3,
     "agents": 3,
-    "entities": 72
+    "entities": 74
   }
 }

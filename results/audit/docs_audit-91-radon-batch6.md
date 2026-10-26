@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
+  - protocol/code_metrics_baseline.json:7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

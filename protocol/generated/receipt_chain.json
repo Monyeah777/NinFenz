@@ -1,7 +1,7 @@
 {
   "boundary": "append-only 顺序 + 防删改：链条可证；不可抵赖：**不提供**（需第三方见证/远程日志；NF 当前单人治理、无第二署名方）",
-  "count": 67,
-  "head": "80f96091d339614a70595380ecd727788ba5747b0200229d61e195c7e933c7f2",
+  "count": 69,
+  "head": "ddaafa1f72cb572880fd5390205df66aa27b596094fd53ffcee68e3bd974bd98",
   "links": [
     {
       "chain": "52edf4cee33821574792f4e177c1b563135e1d0fd3dfdf46998aa7b8a6c7031b",
@@ -140,407 +140,423 @@
       "prev": "224f7aa19a0d274c94b57caa5b8974717998ed2ea46393023340035b851ff0a5"
     },
     {
-      "chain": "1efd301ea50cd42c94e42846db86b9892877612d573597a9dc0611187aecbbe0",
-      "digest": "e0f3219948fe00eabf591d834ee3bed35e3247477ca76ab0a8524be6a5433e70",
+      "chain": "574b1bb4790d56c0dff7c4c2e932afecb5e61d64e78c49ae172a6b21b4d0e41f",
+      "digest": "0ea40fcb659e3c2d2ebd113514f754a7630842eda387efa4a409849fbfcc7a47",
       "index": 18,
-      "leaf": "8e25d051056d26f2dee49e4969970c4e78e5d556ee35604647a936c34bd62e45",
+      "leaf": "151dfdce362f30d33de05f2ecbe8dd6daec5892a0510fe6f1173a5bc74d12d9e",
       "path": "protocol/conformance_report.json",
       "prev": "3226953011660ac438260313655288c9ad5fb1f28fcb0520bb97e0ade3786a3f"
     },
     {
-      "chain": "4961ad853936fffb51c6b89eb659a7b29c7c0d85fd9ab80e6184f7e9fb3eac1b",
+      "chain": "e759a04c12471cba058adcbc88c1c70e0ace629df2d5dd7d6dc6d886f4be5375",
       "digest": "41d9f50faa892405c43737a129ef7ecfcb98e13597fdf4197b7b36f8b60f110e",
       "index": 19,
       "leaf": "f13b26c13eae9f49dd908730c590fb48e9d6248e67d40acb9d24f52a962785ac",
       "path": "protocol/asset_line_baseline.json",
-      "prev": "1efd301ea50cd42c94e42846db86b9892877612d573597a9dc0611187aecbbe0"
+      "prev": "574b1bb4790d56c0dff7c4c2e932afecb5e61d64e78c49ae172a6b21b4d0e41f"
     },
     {
-      "chain": "9947340647761b798bcfd5cbba2a2122c16c5bf572a879ce645380526662bc1a",
+      "chain": "3d1e9e46239235abdeb91ad08d2973995fe3671f3df0b910bd21b09cf46a8e75",
       "digest": "4a789c8d6a084e3ad8b67d6d835646daed00c587e1502afffcf59700f4444222",
       "index": 20,
       "leaf": "905809082b1355a8d4bc3835814514ffbaad530771e002b38dd738d271244f6d",
       "path": "protocol/asset_contracts.json",
-      "prev": "4961ad853936fffb51c6b89eb659a7b29c7c0d85fd9ab80e6184f7e9fb3eac1b"
+      "prev": "e759a04c12471cba058adcbc88c1c70e0ace629df2d5dd7d6dc6d886f4be5375"
     },
     {
-      "chain": "e2d15cf465e73c5825afbe3ccb43a4fcd1513acf58c7136584a31792d584e4a4",
+      "chain": "a7e2cb95ac9b9e7471abd9c8cb531a818f0e70c6d03d45b35e8d8b6b260827c8",
       "digest": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e",
       "index": 21,
       "leaf": "2cff6d034567100cf8b266d58a7216599ddac4a7c07b8a4e0efc30ddcad1529b",
       "path": "protocol/schema/asset_contracts.schema.json",
-      "prev": "9947340647761b798bcfd5cbba2a2122c16c5bf572a879ce645380526662bc1a"
+      "prev": "3d1e9e46239235abdeb91ad08d2973995fe3671f3df0b910bd21b09cf46a8e75"
     },
     {
-      "chain": "6406025930fe7d69b3f4966362ee21a799dd5891e3a5396b5d3acfefc5d9ac93",
-      "digest": "7c62d4bb7477cdf5c294acb053ca8d9c570470bf064ab9a99f83fc82b89d5ebe",
+      "chain": "24e7a5bb8653ab08c8893a4947893b7c7f46b1d89930f57ece1487f20140f39a",
+      "digest": "d32e37c0927cd90d99ae7ff3aa39141fc682b12d84a5793963de78cde523eacd",
       "index": 22,
-      "leaf": "82ae35a57a184f236ca377b2883dc9baa261f7b4f50c6229d32d79a7587afac0",
+      "leaf": "4ba37d56552e4efdc7c5c9439ff560106bde1e1aadaa05c2bea59c48d58f5643",
       "path": "protocol/role_coordinates.json",
-      "prev": "e2d15cf465e73c5825afbe3ccb43a4fcd1513acf58c7136584a31792d584e4a4"
+      "prev": "a7e2cb95ac9b9e7471abd9c8cb531a818f0e70c6d03d45b35e8d8b6b260827c8"
     },
     {
-      "chain": "e71438773720897e13b84fbf4a8351b9e2e0a88004251dbc6b28676ca4d5decd",
-      "digest": "4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb",
+      "chain": "cfc8f83609128b6c2b58dc41e05e40e92bb6d62c8ba345a5eb8701d07f6dcb92",
+      "digest": "7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394",
       "index": 23,
-      "leaf": "adaf70b1edc5395e37de39252799a8a4041cef16301de9f2f786ca08f18a94d8",
+      "leaf": "2fce1836c937c250392b9b0b9fc328708da6d1d5ff505ff46b9a66c62045c7e1",
       "path": "protocol/code_metrics_baseline.json",
-      "prev": "6406025930fe7d69b3f4966362ee21a799dd5891e3a5396b5d3acfefc5d9ac93"
+      "prev": "24e7a5bb8653ab08c8893a4947893b7c7f46b1d89930f57ece1487f20140f39a"
     },
     {
-      "chain": "9121ac39bfb37cca0bfc381f98bffe09f263e26462b928e3a4a761a1f7fdadea",
-      "digest": "af27da61bc6f34963bc7282477124dc111a04969118d06a976c3b34de7167ed0",
+      "chain": "08748ccec1620872f9c26f0ff63792d681c4d1a504f60c98e705f472aa64cd2e",
+      "digest": "19951ba607a96be6d0c17a4a43fa0a2c6298abe938d3d2496b0913f49b2e3e4f",
       "index": 24,
-      "leaf": "9b6fa822736a109d5b057fae781a4ddd51a8c9df1e23477d0c66ffbf42e9959e",
+      "leaf": "d4c1c0e809fcff0f381a744782a923f2330c0ed6e39b145d6214e102b8682443",
       "path": "protocol/coupling_baseline.json",
-      "prev": "e71438773720897e13b84fbf4a8351b9e2e0a88004251dbc6b28676ca4d5decd"
+      "prev": "cfc8f83609128b6c2b58dc41e05e40e92bb6d62c8ba345a5eb8701d07f6dcb92"
     },
     {
-      "chain": "7fb8a4655f4e2dd4ac79ad9f98f13e73fdddc78d2e5064d7b05e80af52bff250",
+      "chain": "c7d397a52f7ae0e817c5b49a08abcdcfc62a7c5496cb6f23d3e6822d96329666",
       "digest": "485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e",
       "index": 25,
       "leaf": "c360e81c9751ac9e45aaec7146f68bdf8d207340979936eb40588a28bfdf10ea",
       "path": "protocol/drill_fidelity.json",
-      "prev": "9121ac39bfb37cca0bfc381f98bffe09f263e26462b928e3a4a761a1f7fdadea"
+      "prev": "08748ccec1620872f9c26f0ff63792d681c4d1a504f60c98e705f472aa64cd2e"
     },
     {
-      "chain": "c765a6857507e8cd04699b34d86906883f004438c1b53362e1e3bb65138ed108",
+      "chain": "481013b3d0a2b7cffac133598341c155835fefa03db2f677371a41e037ee5dd7",
       "digest": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3",
       "index": 26,
       "leaf": "0ae5b45c059093a425ead8796710c7098dbe7d11b5f1cacd6d7724ea66c3e7c5",
       "path": "protocol/instruction_evidence.json",
-      "prev": "7fb8a4655f4e2dd4ac79ad9f98f13e73fdddc78d2e5064d7b05e80af52bff250"
+      "prev": "c7d397a52f7ae0e817c5b49a08abcdcfc62a7c5496cb6f23d3e6822d96329666"
     },
     {
-      "chain": "d33fa0cfc19d4fc0ff80b1a0cd798bd2bda67d1ee4895878b5658dc3a514314d",
+      "chain": "84402088f97a272ff846afd70f3e1f1ae1c3e270a11df4eb1c631f114127ba24",
       "digest": "bd408ead44d97cb6120a8c0207cd1cb7d5227297f17d50107933c7d03d45c6aa",
       "index": 27,
       "leaf": "ae306af046f89ba60afd757fa8320f54c94dfa6651df9e1e3f7dd993662070af",
       "path": "protocol/perf_budget.json",
-      "prev": "c765a6857507e8cd04699b34d86906883f004438c1b53362e1e3bb65138ed108"
+      "prev": "481013b3d0a2b7cffac133598341c155835fefa03db2f677371a41e037ee5dd7"
     },
     {
-      "chain": "31c61ed80f7730c6712822c91b9c35eb61eccee4ac792325d7251c2b539b7aa8",
+      "chain": "c083527e696a478f86f8b7e89844685e34fa3ed9922e503405c827177b0a9c1b",
       "digest": "c1daa6b708675daf372686a2fb5527f099890d2df68adef2eae103be855be8e2",
       "index": 28,
       "leaf": "f7babd1051eeec52cdbf31807d36b18b081ab923f1412e2bec794597f1429b30",
       "path": "protocol/repo_stats.json",
-      "prev": "d33fa0cfc19d4fc0ff80b1a0cd798bd2bda67d1ee4895878b5658dc3a514314d"
+      "prev": "84402088f97a272ff846afd70f3e1f1ae1c3e270a11df4eb1c631f114127ba24"
     },
     {
-      "chain": "1eb288421a96fd11a7ec6476d7f90621aeba041eec5b9e94df22765dd3df386b",
+      "chain": "3494c3690aaeda9e70aa20779dc13a72593bcfc325f87efc0968fe90a09cba76",
       "digest": "9457b786590bb5469fd999759483a735ac587ac729a1e0d0beeab628fae5e206",
       "index": 29,
       "leaf": "e9b66e7c849cc15cb5a0bd15b4cdac9263ad9e9917397c38233a4fc13a4e6bad",
       "path": "protocol/sast_baseline.json",
-      "prev": "31c61ed80f7730c6712822c91b9c35eb61eccee4ac792325d7251c2b539b7aa8"
+      "prev": "c083527e696a478f86f8b7e89844685e34fa3ed9922e503405c827177b0a9c1b"
     },
     {
-      "chain": "1416a727de3cb65994409cc23866f43dd8720a20e5eab5bf11c3982de881cb7c",
-      "digest": "006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4",
+      "chain": "a886173cf64fdcfd8a647a581063f48b19283ac58858d574fbaea64b335def53",
+      "digest": "1948789a0c47a2c0678964595eaec2949affde0f192c9e2b9a400b3fd794d26d",
       "index": 30,
-      "leaf": "4ee0ee8e743a4e423b4e42befc7dbddec0931043a5766be8ac2354f3860c9ed2",
+      "leaf": "849256f7c4dc2d2b2ea2b7bda014fd4766fa3c58a12724798552143bf5fbabb1",
       "path": "protocol/CONFORMANCE.md",
-      "prev": "1eb288421a96fd11a7ec6476d7f90621aeba041eec5b9e94df22765dd3df386b"
+      "prev": "3494c3690aaeda9e70aa20779dc13a72593bcfc325f87efc0968fe90a09cba76"
     },
     {
-      "chain": "a8db1fbac48173f82d9b85d2a06c4ba4dbfed2332f2fdddc1aa1f072290ede48",
+      "chain": "94806f42a316c7ed2826b6e63c49ae77c5de5e3bcc77277d4c850748030c68c0",
       "digest": "d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093",
       "index": 31,
       "leaf": "b73ddd26285b566a5903c1f9144be7cbaeb8ab4cbfd05d363a00f1313c54d832",
       "path": "protocol/driver.json",
-      "prev": "1416a727de3cb65994409cc23866f43dd8720a20e5eab5bf11c3982de881cb7c"
+      "prev": "a886173cf64fdcfd8a647a581063f48b19283ac58858d574fbaea64b335def53"
     },
     {
-      "chain": "43b225c6b2950e20dc78be522539302df9cff639b7beddb0e6ce01c25262f746",
+      "chain": "5b88b78bdf07c5d94eec6110634f70a851f8c462564390126b9d39b4f937ab98",
       "digest": "87de7ac68f9846b333323efecdbb7555adf24215ae8145d573fe8d0688b8e86d",
       "index": 32,
       "leaf": "ff5fe88b287d1040f8775351f53ee374b570df48988dbf944495b1ef3313f127",
       "path": "protocol/rfc_index.json",
-      "prev": "a8db1fbac48173f82d9b85d2a06c4ba4dbfed2332f2fdddc1aa1f072290ede48"
+      "prev": "94806f42a316c7ed2826b6e63c49ae77c5de5e3bcc77277d4c850748030c68c0"
     },
     {
-      "chain": "83b70aca601fe188e5042f95efd5a399449ae8b685de721aa9cd19244d0c6d31",
+      "chain": "a0074d3f175ecee8ab6813a0e097d9bb5fa7ac0b2a4cb8920824c075c32ef5d1",
       "digest": "6c5e58b522bdb7b7f363f89bf7bda218b04728e17ad62134eaf97d2dbd92d07e",
       "index": 33,
       "leaf": "b59906721490a141136f03bc84f7ced34f98b1663d19ce2b5ae455a98b15dc63",
       "path": "protocol/endpoint_contract.json",
-      "prev": "43b225c6b2950e20dc78be522539302df9cff639b7beddb0e6ce01c25262f746"
+      "prev": "5b88b78bdf07c5d94eec6110634f70a851f8c462564390126b9d39b4f937ab98"
     },
     {
-      "chain": "f743e3d670767d5e62b03597aee6a762cef84dc6a2e75ab20ce9d281cf8ac105",
+      "chain": "2980ad1db49612c668f8db3ee4a84c3724a493b6590397f05e114ec7cd990e7e",
       "digest": "e39b4e5319b94bb1a17e1ceaa6e53b0623eb0fa44051d94731dc363302b25390",
       "index": 34,
       "leaf": "3ed8385d1dd971755908dfaa299ddd778367db6418d4452993ea396e3f5194aa",
       "path": "protocol/knowledge_sources.json",
-      "prev": "83b70aca601fe188e5042f95efd5a399449ae8b685de721aa9cd19244d0c6d31"
+      "prev": "a0074d3f175ecee8ab6813a0e097d9bb5fa7ac0b2a4cb8920824c075c32ef5d1"
     },
     {
-      "chain": "68863034723a97b44ab7446a94b5e2e1f576bc76d03580a4acf5a5fe8fead103",
+      "chain": "97414656fec83fb7cf441ede49c98be60118136e47c41ee17a901bcbcadd2c2d",
       "digest": "89103feda2d144097222518bcbf9fe68e2da3ebdc410b14216cae3491e32042a",
       "index": 35,
       "leaf": "17f37dad125245ca722de257706a441326fd810ad62a9ab6eb4d77b2518fffb8",
       "path": "protocol/transform_log.json",
-      "prev": "f743e3d670767d5e62b03597aee6a762cef84dc6a2e75ab20ce9d281cf8ac105"
+      "prev": "2980ad1db49612c668f8db3ee4a84c3724a493b6590397f05e114ec7cd990e7e"
     },
     {
-      "chain": "09cdeeef454fcb1fe4e678c3e3c1219bd8604498c420f4e66e5f538acdc3cb23",
+      "chain": "8de75cf36640dc8032141d6b3ee83a44cc319a97e080b3d339afb40b707e9372",
       "digest": "c2b024386b746578e571c91085af09b8767b85e09862b733bd1c3f572ec99e44",
       "index": 36,
       "leaf": "e0257d80ab5ab5be728ff22baf58a48986bec65180a8aa0bc52285c296625971",
       "path": "protocol/knowledge_usage.json",
-      "prev": "68863034723a97b44ab7446a94b5e2e1f576bc76d03580a4acf5a5fe8fead103"
+      "prev": "97414656fec83fb7cf441ede49c98be60118136e47c41ee17a901bcbcadd2c2d"
     },
     {
-      "chain": "d11935675050aa411c94b4ddece69f71de2c69258c0581284e9960ca6244c0ed",
+      "chain": "70a632fc386438e5b9e5474ace978d9e0cac89d2244349d0e4fbd1c64bc47883",
       "digest": "5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba",
       "index": 37,
       "leaf": "8eda227b2c4f35ee45ab49744ec07527c41580cb0d79337b8f1f2c910bc37737",
       "path": "protocol/assertions.json",
-      "prev": "09cdeeef454fcb1fe4e678c3e3c1219bd8604498c420f4e66e5f538acdc3cb23"
+      "prev": "8de75cf36640dc8032141d6b3ee83a44cc319a97e080b3d339afb40b707e9372"
     },
     {
-      "chain": "dd800f2b7dcd539f933bcc3a7aada6b18c5a7f27f32d3ba7ae633bd277b43e7c",
+      "chain": "469929a0c613203fbe473c5014531a9cbd1500722ca9c4993cfb97eaf2060c0b",
       "digest": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023",
       "index": 38,
       "leaf": "600191dd8a68f80b627e959ae8a34f0984d4c19984a5fac6d6187b5610e59534",
       "path": "protocol/LAYERS.json",
-      "prev": "d11935675050aa411c94b4ddece69f71de2c69258c0581284e9960ca6244c0ed"
+      "prev": "70a632fc386438e5b9e5474ace978d9e0cac89d2244349d0e4fbd1c64bc47883"
     },
     {
-      "chain": "f9fb50eeca6e95de7b66606d0244f02a37d219433537764a73bee1e561da6b92",
+      "chain": "d545a952005f9295d6833d38ebfb7b7f59c2b65eb9992c67901f3eb218132e9f",
       "digest": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429",
       "index": 39,
       "leaf": "f951ed6d97094bc2920d82b67d3793f75a0a1a6e4a3c695bab2a4914227bfd5c",
       "path": "protocol/locales.json",
-      "prev": "dd800f2b7dcd539f933bcc3a7aada6b18c5a7f27f32d3ba7ae633bd277b43e7c"
+      "prev": "469929a0c613203fbe473c5014531a9cbd1500722ca9c4993cfb97eaf2060c0b"
     },
     {
-      "chain": "c35951574601cbb0a1f141b8f751f007c72c2e15b7c7894726926f358aedd120",
+      "chain": "95b10955b3ccc8ab037ad75438220341f2224817272047675f25ab9869f1b349",
       "digest": "1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66",
       "index": 40,
       "leaf": "b2319e368845e6e3a028bcc1796d07fcf702a24f46759924d7ef09b247aabf0a",
       "path": "protocol/release_policy.json",
-      "prev": "f9fb50eeca6e95de7b66606d0244f02a37d219433537764a73bee1e561da6b92"
+      "prev": "d545a952005f9295d6833d38ebfb7b7f59c2b65eb9992c67901f3eb218132e9f"
     },
     {
-      "chain": "1fa3f648d2d49a1233e80ff0554ce98e49133057fb852c3d371587f97cf33ba1",
+      "chain": "ff892567d92ccd5042dfee44872296cdc38fa226558c34c4667da71a8e776eca",
       "digest": "62fde4ac67cd01ac8dddf5428f20234560429e8dfced571be664f5920e068173",
       "index": 41,
       "leaf": "1b6119f0cc7499705638ed729afe16505e6b59134c68855288e239ccf7c1413d",
       "path": "protocol/vocabularies.json",
-      "prev": "c35951574601cbb0a1f141b8f751f007c72c2e15b7c7894726926f358aedd120"
+      "prev": "95b10955b3ccc8ab037ad75438220341f2224817272047675f25ab9869f1b349"
     },
     {
-      "chain": "06708afc57b72357388bbb2e4d02ffb0332913744a7952f795164a16bedf5fb4",
+      "chain": "0b36d1706a146ad71f1904a273331974246081b52b251b44c6d92cecffe2f262",
       "digest": "c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825",
       "index": 42,
       "leaf": "403fd622c53bafa1ab8c0b98fda5e97c9d6b807379ebdb0ce742f985849208b5",
       "path": "protocol/normative.json",
-      "prev": "1fa3f648d2d49a1233e80ff0554ce98e49133057fb852c3d371587f97cf33ba1"
+      "prev": "ff892567d92ccd5042dfee44872296cdc38fa226558c34c4667da71a8e776eca"
     },
     {
-      "chain": "ea8495602683bbc77076d902893ae03c07af4d156b55f4febb0a26715b9e430f",
+      "chain": "f97cbeb9f733bd1274bb818e9bc29b269a461e7ade174ef036885da5e5552293",
       "digest": "6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0",
       "index": 43,
       "leaf": "7d0c7c874b1e5a78cff0108f7b851829054dbfe512ca36616aa1ebdb248e10df",
       "path": "protocol/data_contracts.json",
-      "prev": "06708afc57b72357388bbb2e4d02ffb0332913744a7952f795164a16bedf5fb4"
+      "prev": "0b36d1706a146ad71f1904a273331974246081b52b251b44c6d92cecffe2f262"
     },
     {
-      "chain": "d5bb601929ab3993ba6d0e826e52e3281dbbf8dab399f891f6a23d64ae0e86c0",
+      "chain": "eacc14ca2e3c4a673690dfe453adf5e06a3e658691cf1bedb640d48c88c5a72e",
       "digest": "55c242222fa3e82ded6cbff46ab3430cb54c4a26108f187af4e67dfe75bbcc8e",
       "index": 44,
       "leaf": "ab1aa1e48a3a5061394b6396df898aa1819693d3740139673bbe28118b292495",
       "path": "decisions/INDEX.md",
-      "prev": "ea8495602683bbc77076d902893ae03c07af4d156b55f4febb0a26715b9e430f"
+      "prev": "f97cbeb9f733bd1274bb818e9bc29b269a461e7ade174ef036885da5e5552293"
     },
     {
-      "chain": "ea4bb768685de62db2971a1624ed75670054e0b1e4853a1d1f49a5d8998f4a65",
+      "chain": "22d3f143d62c62d161c48999dbd2478a20882f50702b5fc5c3e7a0a6ebe63d68",
       "digest": "6f9322345d51bc5e55e09ce043e803eaab213ed123c4ee5d5d12238dde388b37",
       "index": 45,
       "leaf": "acdde7a5b1303e6225df011977a28de6dc126668f5531cde9218b47ae7a28842",
       "path": "protocol/handover.json",
-      "prev": "d5bb601929ab3993ba6d0e826e52e3281dbbf8dab399f891f6a23d64ae0e86c0"
+      "prev": "eacc14ca2e3c4a673690dfe453adf5e06a3e658691cf1bedb640d48c88c5a72e"
     },
     {
-      "chain": "eaf3c11658e4a232eb3823911eed7346a3ba3bb26bcbfccc2b466225911f4a99",
+      "chain": "9988da6f761586769127b28b6a537542609acafe583e3d14530f08889594b745",
       "digest": "01f15c52959b4c6120931404d7fa62beaa14c649ddf35514d08b6e5d95b6fee3",
       "index": 46,
       "leaf": "62f20b46c660df770ddce5dbf94e84e375a44ea82862cb0e422ee6261eddee7e",
       "path": "protocol/postmortem.json",
-      "prev": "ea4bb768685de62db2971a1624ed75670054e0b1e4853a1d1f49a5d8998f4a65"
+      "prev": "22d3f143d62c62d161c48999dbd2478a20882f50702b5fc5c3e7a0a6ebe63d68"
     },
     {
-      "chain": "1e3782659a6f2ecab2a7c5bbbad32150d28ecdf959f456f87aa35f76f134e3fb",
+      "chain": "6df77fa217deca83a4bf7375dc690a6089bbd5004eafec85eacca794653aa138",
       "digest": "914c5dfe05763ecab52cea35cb72fd34026cd2522ca37fbebc0a86596a1d01eb",
       "index": 47,
       "leaf": "41ae17ebfbb36e8257ab2819114a315c96ea15c9571dce98469af93d7b6617ef",
       "path": "protocol/audit.json",
-      "prev": "eaf3c11658e4a232eb3823911eed7346a3ba3bb26bcbfccc2b466225911f4a99"
+      "prev": "9988da6f761586769127b28b6a537542609acafe583e3d14530f08889594b745"
     },
     {
-      "chain": "5c83abdc0562d6b29040a312ac352682d08f835f0935c2f10c3381a6817c1ab1",
+      "chain": "a443ee333e26159fd0988e2f14a38a188de01ec14a6347336f79c7f5b5dd377b",
       "digest": "0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7",
       "index": 48,
       "leaf": "45aa836c93da0711a5442fbf3fb744ada8573c21bb1405544658f511b5b0357e",
       "path": "protocol/glossary.json",
-      "prev": "1e3782659a6f2ecab2a7c5bbbad32150d28ecdf959f456f87aa35f76f134e3fb"
+      "prev": "6df77fa217deca83a4bf7375dc690a6089bbd5004eafec85eacca794653aa138"
     },
     {
-      "chain": "b45e59f84fe9bcef98fbded03ce5ee00fb7ebb769e15c0f49668714677ffc0b8",
+      "chain": "896cd52aea08519927b978e83821ce2d0d107278d1b739034b26830befaa298c",
       "digest": "6657720467a3db93ce21472901e28b807e76bfe17a3df112c8e1b689bd3d5cf2",
       "index": 49,
       "leaf": "db1cfd8937938ec3175adaf199f9f4762001cfd8a2b90e7d52244a3ecc4ea829",
       "path": "protocol/execution_modes.json",
-      "prev": "5c83abdc0562d6b29040a312ac352682d08f835f0935c2f10c3381a6817c1ab1"
+      "prev": "a443ee333e26159fd0988e2f14a38a188de01ec14a6347336f79c7f5b5dd377b"
     },
     {
-      "chain": "d1cd9215b8c1b240f1c892f987cf2e0b9451c10487673082f94bd27786ec9c5d",
+      "chain": "e5daa15db95191cb0dcfe91410a727edba3c8db215a7efd5ffc079605f4dba16",
       "digest": "21c8589b07247607bfefc6916cff01d8589988fe7fd73914f687df262fa14e2d",
       "index": 50,
       "leaf": "c865cc112b731a0806137dc0336eb5844374e98ec83d745961152cb31755a421",
       "path": "protocol/st_quality.json",
-      "prev": "b45e59f84fe9bcef98fbded03ce5ee00fb7ebb769e15c0f49668714677ffc0b8"
+      "prev": "896cd52aea08519927b978e83821ce2d0d107278d1b739034b26830befaa298c"
     },
     {
-      "chain": "0a6fdd2cbf15a5b44c15ca29e67c3285a0be3df22b6ce72876662a1fa39180ac",
+      "chain": "2aee65146928d226df487f079f0d9dc18635f7b9cf095d12b31e5ede08d33e77",
       "digest": "0c310bbf890681b77b2155f99235c9d592163104c7d6193a7b0578ed6dae2e42",
       "index": 51,
       "leaf": "b76252bca30c683cffaf65679f8ca639d4194791d72edf39ca2be855d0fbfbfa",
       "path": "protocol/mcp_package.json",
-      "prev": "d1cd9215b8c1b240f1c892f987cf2e0b9451c10487673082f94bd27786ec9c5d"
+      "prev": "e5daa15db95191cb0dcfe91410a727edba3c8db215a7efd5ffc079605f4dba16"
     },
     {
-      "chain": "8568910eddc4d2f35c559fdeb4c2661a0a7a3e5977580c90fc87dd9beba96a61",
+      "chain": "e528b2109ae9258266b2abe0f87035c27352606b8a37b1ff28a506ebe58adcb5",
       "digest": "1a542591cf38382ae3301cf5ac67c80a6a4d2fdcfd7c56fab27eccbbad0ca791",
       "index": 52,
       "leaf": "8584d4b563ccc1ed6f874c9e3eb6dd10b41f4bd9860a42cc23c454156cc269a6",
       "path": "protocol/state_front.json",
-      "prev": "0a6fdd2cbf15a5b44c15ca29e67c3285a0be3df22b6ce72876662a1fa39180ac"
+      "prev": "2aee65146928d226df487f079f0d9dc18635f7b9cf095d12b31e5ede08d33e77"
     },
     {
-      "chain": "3bf01d28afe97a5acf1cc10c315c3e4b3f833be93583309112bd6ced3b520e55",
+      "chain": "8a802a49f5d4d7b767e319903bd41a9ff239d33f105842fd5e9e779b5fbcd3cc",
       "digest": "9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06",
       "index": 53,
       "leaf": "0e1321233fbff93683b96ee01c42bd3b2ee0e89e845621b7ba5e05704873b6fd",
       "path": "protocol/decision_layer.json",
-      "prev": "8568910eddc4d2f35c559fdeb4c2661a0a7a3e5977580c90fc87dd9beba96a61"
+      "prev": "e528b2109ae9258266b2abe0f87035c27352606b8a37b1ff28a506ebe58adcb5"
     },
     {
-      "chain": "5eb0c6d9c4020e549bd93188b65e8f0a8b70eddb40198ac31605c5983df8e262",
-      "digest": "1f7e0c3e3f632f6b0bfbeb76bd2516e9ec36b5f9bbb19ddc8bead44081206d23",
+      "chain": "236a37f44bc2c96d650a360d78a8bd336fb3ad81b00337a5d01e60f598d590d3",
+      "digest": "e9e540e487bcd345bb49354f4aeccf911bc01ab66b011db1bcfc2cbf25187474",
       "index": 54,
-      "leaf": "4423e3473e36a0981b0f77e45484d5b137d7f33ec4ba76200c296807d6e7d10d",
+      "leaf": "21fefa05b653b9d5372d6048f8db1b716c4123e2be019393574117439ec04fca",
       "path": "desktop/src/core/registry.json",
-      "prev": "3bf01d28afe97a5acf1cc10c315c3e4b3f833be93583309112bd6ced3b520e55"
+      "prev": "8a802a49f5d4d7b767e319903bd41a9ff239d33f105842fd5e9e779b5fbcd3cc"
     },
     {
-      "chain": "aa23c0e9be256134ec1e153945b410e098d6ccf2ac9e37f839d0ab8f74a6fb16",
+      "chain": "cb351ad6718568308dbbecf4bdd907db0be03942a01945682688e744f6fb4d98",
       "digest": "f4d5f2a8cdef40a7876b4dbcaad9b08d1b724bd91370c72b5f1a64a9e7c7702c",
       "index": 55,
       "leaf": "2f7cfa24d9ab01948f8d86786303d6552d0ced20bd2445429357231cceaaf5b6",
       "path": "protocol/schema/asset.schema.json",
-      "prev": "5eb0c6d9c4020e549bd93188b65e8f0a8b70eddb40198ac31605c5983df8e262"
+      "prev": "236a37f44bc2c96d650a360d78a8bd336fb3ad81b00337a5d01e60f598d590d3"
     },
     {
-      "chain": "4d7762ea734d97810dc0478871d2aa9c1e7c0565c6662987af3203ae924379a7",
+      "chain": "83f952750f7d72f83c2981bd05908eee0b1ac685eedb8e44c7af6d3c7a2522da",
       "digest": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e",
       "index": 56,
       "leaf": "2cff6d034567100cf8b266d58a7216599ddac4a7c07b8a4e0efc30ddcad1529b",
       "path": "protocol/schema/asset_contracts.schema.json",
-      "prev": "aa23c0e9be256134ec1e153945b410e098d6ccf2ac9e37f839d0ab8f74a6fb16"
+      "prev": "cb351ad6718568308dbbecf4bdd907db0be03942a01945682688e744f6fb4d98"
     },
     {
-      "chain": "87850c180e3fdc62d6248024d8d1841dcecc5d1c1c1bc7963f551277fe898e1a",
-      "digest": "c02aba28724ecb8375776ecfd2531ef288900ddbb94f5c408f94cf7ce5f57c1f",
+      "chain": "758d541575e3854fbee3b78b597a4a60e3874911b47d5e31c4bad1ef9ccb66b0",
+      "digest": "be2ee91a9509070b8f6f7c748437163c63c20dcce2ad072e30c7407ded552dd1",
       "index": 57,
+      "leaf": "d472bfad3e6d3dc83b2c8d45e0b07de81bb60e3d26b1fa5831666ebe43a72bf6",
+      "path": "protocol/schema/bench_result.schema.json",
+      "prev": "83f952750f7d72f83c2981bd05908eee0b1ac685eedb8e44c7af6d3c7a2522da"
+    },
+    {
+      "chain": "55a2aaf6cd6fdd6d619b610bc52d2e362e95f65b66e54a8d91d8579371bfde7b",
+      "digest": "c02aba28724ecb8375776ecfd2531ef288900ddbb94f5c408f94cf7ce5f57c1f",
+      "index": 58,
       "leaf": "a704f732efdbc090446bd49dd6b5305e5e440a08fc8bf99db6b7156f933761b2",
       "path": "protocol/schema/contract.schema.json",
-      "prev": "4d7762ea734d97810dc0478871d2aa9c1e7c0565c6662987af3203ae924379a7"
+      "prev": "758d541575e3854fbee3b78b597a4a60e3874911b47d5e31c4bad1ef9ccb66b0"
     },
     {
-      "chain": "524217847a8599f50eb5b093f02abcebf2c43b878934f490e7dd144ce5896e9f",
+      "chain": "5ff7efeeb1735aab9b9b18972069df7d6869f8146363b69710ccc91ad028ab0e",
+      "digest": "860ee57b0077ce76ef12781d7681e296ceeeab6107fded28e611dbba56bc3549",
+      "index": 59,
+      "leaf": "f38aed23cf1bc09480fe338fc1d32744f966621cb7237848becd91ff731a6d01",
+      "path": "protocol/schema/exec_record.schema.json",
+      "prev": "55a2aaf6cd6fdd6d619b610bc52d2e362e95f65b66e54a8d91d8579371bfde7b"
+    },
+    {
+      "chain": "61f7f08915840c909484acad899242e02ce91826b78f325d41b0446c0a0919df",
       "digest": "11289408fd1b1dbd20f28ad34da72b4136a69a9df005440a513f18776e9eab91",
-      "index": 58,
+      "index": 60,
       "leaf": "8950ed3e65b800a5b3f208e3d400e82dfc0a15070d147c80571ffaf7d02c6d6d",
       "path": "protocol/schema/integration.schema.json",
-      "prev": "87850c180e3fdc62d6248024d8d1841dcecc5d1c1c1bc7963f551277fe898e1a"
+      "prev": "5ff7efeeb1735aab9b9b18972069df7d6869f8146363b69710ccc91ad028ab0e"
     },
     {
-      "chain": "bbe6c2e90b284a370e5ea6dddb54d111260a74eb71f86ead0a9efffa1631e8d1",
+      "chain": "029129b19b988a0ff7771faf9194e5b51f47013680e25a9a779176886a0ee841",
       "digest": "c8394c0824e6591cf61c64b03d2f7c208e049648d5f768270a8c111c1036c52f",
-      "index": 59,
+      "index": 61,
       "leaf": "c41361091a1919e82ba10b1947dfa8ffe69efd8adaaac13a82404b1bc475009e",
       "path": "protocol/schema/integration_strings.schema.json",
-      "prev": "524217847a8599f50eb5b093f02abcebf2c43b878934f490e7dd144ce5896e9f"
+      "prev": "61f7f08915840c909484acad899242e02ce91826b78f325d41b0446c0a0919df"
     },
     {
-      "chain": "179fb185f851128f7855847ef8ae2c5477b35913841cab6ae6a6bc35ca33b59b",
+      "chain": "7a36c47058dff9b01717e1e91173a3f8a79f21e5aa264c1f41d28a0f4036a0f8",
       "digest": "e26332669454e4943248ed12a0f04335472829c7472401cf4f9a2dd53990b8e5",
-      "index": 60,
+      "index": 62,
       "leaf": "e5ed67ae7d3626d8d832c67ef7d530ec73e1e12ab61c211a8a483d0051a5dedc",
       "path": "protocol/schema/module.schema.json",
-      "prev": "bbe6c2e90b284a370e5ea6dddb54d111260a74eb71f86ead0a9efffa1631e8d1"
+      "prev": "029129b19b988a0ff7771faf9194e5b51f47013680e25a9a779176886a0ee841"
     },
     {
-      "chain": "8954f87ff4c5b5995053a94a75f840bb0d3649c883d62d89e75f24372e1b6447",
+      "chain": "9ca0231229de1d87c1485aba06d31145fb188b9546d1381599fac9f214fb06c0",
       "digest": "2a3c366da8dfe2602ae7bbfe2ce8238eb0d67125adda915d20835c545cdab4fa",
-      "index": 61,
+      "index": 63,
       "leaf": "41e110865fd990fc82ee713015709d6f608705cdaa274e6b47ac412aab328d77",
       "path": "protocol/schema/pipeline.schema.json",
-      "prev": "179fb185f851128f7855847ef8ae2c5477b35913841cab6ae6a6bc35ca33b59b"
+      "prev": "7a36c47058dff9b01717e1e91173a3f8a79f21e5aa264c1f41d28a0f4036a0f8"
     },
     {
-      "chain": "30a86df998b03f1db061d5d11e3130077cfcadfdb7201dfedd31f4c1840b0c55",
+      "chain": "4301fba3388660cec41daeeb44dd59ba0e02ea3cbdb086ed6e8a5d2f37ac0da2",
       "digest": "dd73868d213ce2d3ff613f56809b145418854494945053c23fc43767107fa34e",
-      "index": 62,
+      "index": 64,
       "leaf": "1ba81eabda4c11cab2c7b3e3f26520cf416a863a15b7a34f9d809c6d5f386c54",
       "path": "protocol/schema/protocol.schema.json",
-      "prev": "8954f87ff4c5b5995053a94a75f840bb0d3649c883d62d89e75f24372e1b6447"
+      "prev": "9ca0231229de1d87c1485aba06d31145fb188b9546d1381599fac9f214fb06c0"
     },
     {
-      "chain": "c91e862443d41a551ddf0a93d39fd3bddd241b42f61035b5e05c0c88affde1d3",
+      "chain": "c4015ad83625172af9db86ae40ad9383ecd4a76c47f54a19b82982591c024d4a",
       "digest": "3b43958fafb0d9e03506214d7c373fca641397c0636fb3e112d9a30ddb326bb6",
-      "index": 63,
+      "index": 65,
       "leaf": "ad1eee2c1beb9461e5c559c5c3ae50cdeb35889e574b350afcddc4334ceb8c25",
       "path": "protocol/schema/release.schema.json",
-      "prev": "30a86df998b03f1db061d5d11e3130077cfcadfdb7201dfedd31f4c1840b0c55"
+      "prev": "4301fba3388660cec41daeeb44dd59ba0e02ea3cbdb086ed6e8a5d2f37ac0da2"
     },
     {
-      "chain": "1f2d9cc311c545085eedb89cf5975f8f21c397d7fb83d10a94fcf53fa302b12f",
+      "chain": "7123df475df6afef88c2b54659d8ce2c02a106db1d0c27d0749239c31ea68494",
       "digest": "353480fa44af3cd855767cf46f7c0c0da13460afc145a3ae4856909acf78afc2",
-      "index": 64,
+      "index": 66,
       "leaf": "228b7dc82f87bb3c35a6b94311c2f0d2211c5c099051a0db14cdd74ba907f581",
       "path": "decisions/ADR-0000-决策记录外置到私有仓.md",
-      "prev": "c91e862443d41a551ddf0a93d39fd3bddd241b42f61035b5e05c0c88affde1d3"
+      "prev": "c4015ad83625172af9db86ae40ad9383ecd4a76c47f54a19b82982591c024d4a"
     },
     {
-      "chain": "86628f327a782a5de924462877332d7081dd59a2220a1e80f7b573a9e9ac47bb",
+      "chain": "5424b7e3674d810508c11997de70ff019ff34c2741cf2d8a1a9f7cd4876e4d5d",
       "digest": "f71574dd81858e9713fdb4f5f6911adc84eb1f868a148446fce5f0d708f7a5d3",
-      "index": 65,
+      "index": 67,
       "leaf": "5f5c31216ad086ef8192295b8aaa7740f0aa2a1cfc0f782ce0f5254414eb9af0",
       "path": "decisions/ADR-9000-示例-决策格式模板.md",
-      "prev": "1f2d9cc311c545085eedb89cf5975f8f21c397d7fb83d10a94fcf53fa302b12f"
+      "prev": "7123df475df6afef88c2b54659d8ce2c02a106db1d0c27d0749239c31ea68494"
     },
     {
-      "chain": "450354c1b9f61cace6142bbd33420db491f32fe854d811ef2b3e83e5e48f0df8",
+      "chain": "7ecd9a2b5c18ce80ad103b56b696df15ebfac101fd9c09938503352ab5fb64d6",
       "digest": "715d04a1ac00abee6b5714d7d4de8c29438ef320d83a77e765b39cee43f92834",
-      "index": 66,
+      "index": 68,
       "leaf": "d995b897e2582cc1d8c1455058b16eeb04bb5264aa430b35d43febe60ae9a37c",
       "path": "decisions/ADR-9001-示例-证据必须可解析.md",
-      "prev": "86628f327a782a5de924462877332d7081dd59a2220a1e80f7b573a9e9ac47bb"
+      "prev": "5424b7e3674d810508c11997de70ff019ff34c2741cf2d8a1a9f7cd4876e4d5d"
     },
     {
-      "chain": "80f96091d339614a70595380ecd727788ba5747b0200229d61e195c7e933c7f2",
+      "chain": "ddaafa1f72cb572880fd5390205df66aa27b596094fd53ffcee68e3bd974bd98",
       "digest": "83a0a22c05139c2d5da6ad5464dcd0909beff4c872c16853aeee6963379790bd",
-      "index": 67,
+      "index": 69,
       "leaf": "1e6ad47df5b9b063fa97a41384be32ecf6ca34be42af1a2e6ec3c2ba0bd32c68",
       "path": "postmortems/PO-9000-示例-复盘模板.md",
-      "prev": "450354c1b9f61cace6142bbd33420db491f32fe854d811ef2b3e83e5e48f0df8"
+      "prev": "7ecd9a2b5c18ce80ad103b56b696df15ebfac101fd9c09938503352ab5fb64d6"
     }
   ],
   "note": "由 protocol/RECEIPTS.json 确定性派生（纯派生，不新增真源）；链节 = H(prev || leaf)，叶子 = H(path || digest)（域分隔前缀见实现）。",
-  "receipts_root": "1d290eda5d4facfea312341f09da84d1dab1a97bbd20ff46a055552bb2581104",
+  "receipts_root": "e8312e3fad377a3d3ba17de85c29e7a3d0de7cf2e48d1488dd4133f143848380",
   "schema": "nf-transparency/1"
 }

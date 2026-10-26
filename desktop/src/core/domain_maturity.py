@@ -12,8 +12,16 @@
 ------------------------------------
 - **M0 模板**：包目录 + `protocol.yaml` + README（`package.assets.readme`）+ `modules/` 在盘，
   且模块件数 ≥ `package.modules` 声明条数；
-- **M1 机检**：check14/15/16/23/29/32 **同源判据**无 FAIL + `outputs/INDEX.json` 在册
-  （可解析、`outputs[]` 非空、列出的产出路径逐件在盘、`package` 与包名一致）；
+- **M1 机检**：check14/15/16/23/29/32 **同源判据**无 FAIL + **至少一件可验收产物证据**
+  （二选一，均须机器可核验，不得人工白名单）：
+  a) `outputs/INDEX.json` 在册（可解析、`outputs[]` 非空、`package` 与包名一致、列出的产出
+     路径逐件在盘）**且每件通过 `nf output check`**（同源：`core.output_forms.detect` +
+     `_FORM_CHECK` 逐件机检）；
+  b) 官方样本产物在场且可追溯：`library/NF-*.md` 在 `library/INDEX.md` 台账行里指认本包
+     （行内声明本包管线 / 包名或类别）或 `docs/完整版样本_*.md` 明确声明本包管线，且样本路径
+     被 provenance/协议台账（`protocol/*.json` 溯源字段）指认；样本须通过 `nf assemble --check`
+     （同源：`core.assemble_plan.plan/check`，含跨域门——声明管线与本包管线不一致即 FAIL）；
+  手工编写但有可验收产物的官方包（techdoc/校园/西幻）因此不被错误压到 M0，机检门槛不降低。
 - **M2 真实执行**：`package.outputs` 里有**真实模型**执行记录——executor 是模型标识/版本
   （工具/agent/装配器不算）、date 合法、artifact 在盘为文件、check_rc=0、digest 与 artifact
   现算 sha256 一致；
@@ -62,6 +70,13 @@ REGISTRY_REL = "desktop/src/core/registry.json"
 COMMUNITY_REL = "community"
 PROTOCOL_REL = "protocol.yaml"
 INDEX_REL = "outputs/INDEX.json"
+#: M1 分支 b 的候选样本面（**glob 发现**，不写包名单=不搞人工白名单）。
+SAMPLE_LIBRARY_GLOB = "library/NF-*.md"
+SAMPLE_DOCS_GLOB = "docs/完整版样本_*.md"
+LIBRARY_INDEX_REL = "library/INDEX.md"
+PROTOCOL_GLOB = "protocol/*.json"
+#: 管线 id 的独立 token 匹配（避免把层位/正文里的长串数字误当管线声明）。
+_PIPELINE_TOKEN = re.compile(r"(?<![A-Za-z0-9])P[0-9]{2,3}(?![0-9])")
 
 #: 成熟度阶梯（低 → 高）。索引即等级序，供「声明 vs 计算」比较。
 LEVELS: Tuple[str, ...] = ("M0", "M1", "M2", "M3")
@@ -73,7 +88,8 @@ ENGINE_CHECKS: Tuple[int, ...] = (14, 15, 23, 29, 32)
 
 LEVEL_NOTES: Dict[str, str] = {
     "M0": "模板：包目录 + protocol.yaml + README + modules 在盘（模块件数 ≥ 声明）",
-    "M1": "机检：check14/15/16/23/29/32 同源判据无 FAIL + outputs/INDEX.json 在册",
+    "M1": "机检：check14/15/16/23/29/32 同源判据无 FAIL + 可验收产物证据（a：outputs/INDEX.json "
+          "在册且逐件过 nf output check；b：关联官方样本产物过 nf assemble --check）",
     "M2": "真实执行：真实模型执行记录（executor 模型标识/版本 + date + artifact + check_rc=0 "
           "+ digest 可复算）",
     "M3": "用户签收：results/audit 审计记录 accepted_by+accepted_at 绑定被审对象 digest",
@@ -293,12 +309,215 @@ def _gate_ok(gate: Optional[Dict[str, Any]]) -> bool:
     return bool(isinstance(gate, dict) and str(gate.get("status") or "") == "pass")
 
 
-def m1_evidence(root: Any, name: str, gate: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    """M1：机检无 FAIL + outputs/INDEX.json 在册（可解析 / 非空 / 路径逐件在盘）。"""
+def _output_check_issues(root: Path, repo_rel: str) -> List[str]:
+    """单件产出面机检（**与 `nf output check` 同源**：detect + _FORM_CHECK）。"""
+    from core import output_forms as of
+    try:
+        form, _tier = of.detect(str(root), repo_rel)
+        checker = of._FORM_CHECK.get(form)
+        return list(checker(str(root), repo_rel)) if checker else []
+    except Exception as exc:                                   # noqa: BLE001 - 坏件如实报
+        return ["产出面机检异常：%s" % exc]
+
+
+def _index_evidence(root: Path, name: str) -> Dict[str, Any]:
+    """M1 分支 a：`outputs/INDEX.json` 在册且列出的产出面逐件过机检。"""
+    pkg_dir = root / COMMUNITY_REL / name
+    ev: Dict[str, Any] = {"ok": False, "missing": [], "present": False, "outputs": 0,
+                          "checked": 0, "issues": []}
+    idx_path = pkg_dir / INDEX_REL
+    if not idx_path.is_file():
+        ev["missing"].append("M1a：outputs/INDEX.json 缺失（%s/%s）"
+                             % (_pkg_rel(name), INDEX_REL))
+        return ev
+    try:
+        doc = json.loads(_read_text(idx_path))
+    except ValueError as exc:
+        ev["missing"].append("M1a：outputs/INDEX.json 不可解析：%s" % exc)
+        return ev
+    ev["present"] = True
+    if not isinstance(doc, dict):
+        ev["missing"].append("M1a：outputs/INDEX.json 顶层非对象")
+        return ev
+    want_pkg = str(doc.get("package") or "")
+    if want_pkg and want_pkg != name:
+        ev["missing"].append("M1a：outputs/INDEX.json package=%r 与目录名 %r 不一致"
+                             % (want_pkg, name))
+    rows = doc.get("outputs")
+    if not isinstance(rows, list) or not rows:
+        ev["missing"].append("M1a：outputs/INDEX.json 的 outputs[] 缺失或为空")
+        return ev
+    ev["outputs"] = len(rows)
+    absent: List[str] = []
+    for row in rows:
+        rel = str((row or {}).get("path") or "") if isinstance(row, dict) else ""
+        if not rel or not (pkg_dir / rel).is_file():
+            absent.append(rel or "<空 path>")
+            continue
+        ev["checked"] += 1
+        issues = _output_check_issues(root, "%s/%s" % (_pkg_rel(name), rel))
+        if issues:
+            ev["issues"].append({"path": rel, "issues": issues[:3]})
+            ev["missing"].append("M1a：产出面未过 nf output check：%s（%s）"
+                                 % (rel, "；".join(issues[:2])))
+    if absent:
+        ev["missing"].append("M1a：产出面 %d 件不在盘：%s"
+                             % (len(absent), "、".join(absent[:3])))
+    ev["ok"] = not ev["missing"]
+    return ev
+
+
+def _candidate_samples(root: Path) -> List[str]:
+    """M1 分支 b 的候选样本面（glob 发现，按路径排序；不写包名单）。"""
+    out: List[str] = []
+    for pattern in (SAMPLE_LIBRARY_GLOB, SAMPLE_DOCS_GLOB):
+        for p in sorted(root.glob(pattern)):
+            if p.is_file():
+                out.append(p.relative_to(root).as_posix())
+    return out
+
+
+def _requirement_for(pkg: Dict[str, Any], name: str) -> Tuple[str, Dict[str, Any]]:
+    """从**包自身声明**推装配需求 → (requirement, plan)。
+
+    只用类别/包名（不读外部白名单）；要求 plan 命中本包且管线与 `protocol.yaml` 一致，
+    否则视为「定不出允许集」（分支 b 不可用，fail-closed）。
+    """
+    from core import assemble_plan as ap
+    pipe = str(pkg.get("pipeline") or "")
+    cats = [str(c) for c in (pkg.get("categories") or []) if str(c).strip()]
+    stem = re.sub(r"(领域包|域包|组合包)$", "", name)
+    for req in cats + [name, stem]:
+        if not req:
+            continue
+        try:
+            plan = ap.plan(req)
+        except Exception:                                      # noqa: BLE001 - 单候选失败不致死
+            continue
+        if (plan.get("matched") and plan.get("package") == name
+                and str(plan.get("pipeline") or "") == pipe):
+            return req, plan
+    return "", {}
+
+
+def _library_row(root: Path, sample_rel: str) -> str:
+    """library 样本 → `library/INDEX.md` 台账里对应该条目 id 的表格行（空 = 未在册）。"""
+    entry = Path(sample_rel).stem
+    text = _read_text(root / LIBRARY_INDEX_REL)
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|") and entry in s:
+            return s
+    return ""
+
+
+def _provenance_hits(root: Path, sample_rel: str) -> List[Dict[str, str]]:
+    """`protocol/*.json`（协议台账/溯源字段）里逐值指认该样本路径的登记点。
+
+    **排除本模块的落盘件** `protocol/domain_maturity.json`：它是本判据的产出，不是溯源
+    ｜台账——不排除会形成自指（自己的输出把自己算成"被指认"）。
+    """
+    hits: List[Dict[str, str]] = []
+    for p in sorted(root.glob(PROTOCOL_GLOB)):
+        if p.relative_to(root).as_posix() == OUTPUT_REL:
+            continue
+        try:
+            doc = json.loads(_read_text(p))
+        except ValueError:
+            continue
+
+        def walk(node: Any, path: str) -> None:
+            if isinstance(node, dict):
+                for k, v in node.items():
+                    walk(v, path + "/" + str(k))
+            elif isinstance(node, list):
+                for i, v in enumerate(node):
+                    walk(v, path + "/" + str(i))
+            elif isinstance(node, str) and node.strip() == sample_rel:
+                hits.append({"ledger": p.name, "field": path.lstrip("/")})
+
+        walk(doc, "")
+    return hits
+
+
+def _sample_evidence(root: Path, name: str, pkg: Dict[str, Any],
+                     planner: Optional[Callable[..., Tuple[str, Dict[str, Any]]]] = None,
+                     checker: Optional[Callable[..., Tuple[List[str], Dict[str, Any]]]] = None,
+                     ) -> Dict[str, Any]:
+    """M1 分支 b：关联官方样本产物通过 `nf assemble --check`（同源 plan/check）。
+
+    `planner`/`checker` 是单测注入点（合成 plan / 合成 check 结果）；缺省走
+    `core.assemble_plan.plan/check`（与 CLI `nf assemble --check` 同一份判据）。
+    """
+    ev: Dict[str, Any] = {"ok": False, "missing": [], "sample": None, "sample_kind": None,
+                          "association": None, "check": None}
+    plan_fn = planner or _requirement_for
+    req, plan = plan_fn(pkg, name)
+    pipe = str((plan or {}).get("pipeline") or pkg.get("pipeline") or "")
+    if not plan:
+        ev["missing"].append("M1b：分支 b 不可用——无法从包声明推出装配计划/允许集")
+        return ev
+    from core import assemble_plan as ap
+    check_fn = checker or ap.check
+    near: List[str] = []
+    for rel in _candidate_samples(root):
+        text = _read_text(root / rel)
+        if not text:
+            continue
+        if rel.startswith("library/"):
+            kind = "library"
+            row = _library_row(root, rel)
+            cats = [str(c) for c in (pkg.get("categories") or [])]
+            if not row:
+                near.append("%s：未在 %s 在册" % (rel, LIBRARY_INDEX_REL))
+                continue
+            if pipe and pipe not in row:
+                near.append("%s：台账行未声明本包管线 %s" % (rel, pipe))
+                continue
+            if name not in row and not any(c and c in row for c in cats):
+                near.append("%s：台账行未指认本包（包名/类别）" % rel)
+                continue
+            assoc = {"ok": True, "ledger": LIBRARY_INDEX_REL, "field": "条目 %s 的表格行"
+                     % Path(rel).stem}
+        else:
+            kind = "docs"
+            tokens = set(_PIPELINE_TOKEN.findall(text))
+            if not pipe or pipe not in tokens:
+                near.append("%s：样本未明确声明本包管线 %s" % (rel, pipe or "（未声明）"))
+                continue
+            hits = _provenance_hits(root, rel)
+            if not hits:
+                near.append("%s：provenance/协议台账未指认该样本路径" % rel)
+                continue
+            assoc = {"ok": True, "ledger": hits[0]["ledger"], "field": hits[0]["field"],
+                     "hits": hits}
+        try:
+            issues, stats = check_fn(text, plan, expected_pipeline=pipe)
+        except Exception as exc:                               # noqa: BLE001 - 同源执行异常如实报
+            near.append("%s：assemble --check 执行异常：%s" % (rel, exc))
+            continue
+        if issues:
+            near.append("%s：未过 assemble --check（%s）" % (rel, "；".join(issues[:2])))
+            continue
+        ev.update({"ok": True, "sample": rel, "sample_kind": kind, "association": assoc,
+                   "check": {"issues": [], "segments": (stats or {}).get("segments")}})
+        return ev
+    if not ev["missing"]:
+        ev["missing"].append(
+            "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 "
+            "nf assemble --check 的官方样本%s）"
+            % ("；候选：" + "；".join(near[:2]) if near else ""))
+    return ev
+
+
+def m1_evidence(root: Any, name: str, gate: Optional[Dict[str, Any]],
+                pkg: Optional[Dict[str, Any]] = None,
+                sample_probe: Optional[Callable[..., Dict[str, Any]]] = None,
+                ) -> Dict[str, Any]:
+    """M1：机检无 FAIL + 可验收产物证据（a: INDEX 在册并逐件过 output check；b: 样本过
+    assemble --check）。两分支任一成立即算有证据，机检门槛不降。"""
     r = _root(root)
-    pkg_dir = r / COMMUNITY_REL / name
     missing: List[str] = []
-    stats: Dict[str, Any] = {"index": False, "outputs": 0}
     if not _gate_ok(gate):
         failed = []
         for n in MACHINE_CHECKS:
@@ -307,37 +526,34 @@ def m1_evidence(root: Any, name: str, gate: Optional[Dict[str, Any]]) -> Dict[st
                 failed.append(str(n))
         missing.append("M1：机检未全绿（check %s 非绿；同源判据见 nf verify）"
                        % (",".join(failed) or "机器面不可用"))
-    idx_path = pkg_dir / INDEX_REL
-    if not idx_path.is_file():
-        missing.append("M1：outputs/INDEX.json 缺失（%s/%s）" % (_pkg_rel(name), INDEX_REL))
-        return {"ok": False, "missing": missing, **stats}
-    try:
-        doc = json.loads(_read_text(idx_path))
-    except ValueError as exc:
-        missing.append("M1：outputs/INDEX.json 不可解析：%s" % exc)
-        return {"ok": False, "missing": missing, **stats}
-    stats["index"] = True
-    if not isinstance(doc, dict):
-        missing.append("M1：outputs/INDEX.json 顶层非对象")
-        return {"ok": False, "missing": missing, **stats}
-    want_pkg = str(doc.get("package") or "")
-    if want_pkg and want_pkg != name:
-        missing.append("M1：outputs/INDEX.json package=%r 与目录名 %r 不一致" % (want_pkg, name))
-    rows = doc.get("outputs")
-    if not isinstance(rows, list) or not rows:
-        missing.append("M1：outputs/INDEX.json 的 outputs[] 缺失或为空")
-        return {"ok": False, "missing": missing, **stats}
-    stats["outputs"] = len(rows)
-    absent = []
-    for row in rows:
-        rel = str((row or {}).get("path") or "") if isinstance(row, dict) else ""
-        if not rel:
-            absent.append("<空 path>")
-        elif not (pkg_dir / rel).is_file():
-            absent.append(rel)
-    if absent:
-        missing.append("M1：产出面 %d 件不在盘：%s" % (len(absent), "、".join(absent[:3])))
-    return {"ok": not missing, "missing": missing, **stats}
+    index_ev = _index_evidence(r, name)
+    sample_ev: Optional[Dict[str, Any]] = None
+    branch: Optional[str] = None
+    if index_ev["ok"]:
+        branch = "index"
+    else:
+        sample_ev = (sample_probe(r, name, pkg or {}) if sample_probe is not None
+                     else _sample_evidence(r, name, pkg or {}))
+        if sample_ev.get("ok"):
+            branch = "sample"
+    ok = bool(_gate_ok(gate) and branch)
+    if not ok:
+        missing += list(index_ev.get("missing") or [])
+        if sample_ev is not None:
+            missing += list(sample_ev.get("missing") or [])
+    ev: Dict[str, Any] = {"ok": ok, "branch": branch, "missing": missing,
+                          "index": bool(index_ev.get("present")),
+                          "outputs": int(index_ev.get("outputs") or 0),
+                          "outputs_checked": int(index_ev.get("checked") or 0),
+                          "index_evidence": index_ev,
+                          "sample_evidence": sample_ev}
+    if branch == "sample" and sample_ev:
+        ev["sample"] = sample_ev.get("sample")
+        ev["sample_kind"] = sample_ev.get("sample_kind")
+        ev["association"] = sample_ev.get("association")
+        ev["sample_check"] = sample_ev.get("check")
+    return ev
+
 
 
 # ---------------------------------------------------------------- M2 真实执行
@@ -521,7 +737,8 @@ def _declared(pkg: Optional[Dict[str, Any]]) -> Tuple[Any, bool]:
 
 
 def evaluate(root: Any, name: str, gate: Optional[Dict[str, Any]],
-             pkg: Optional[Dict[str, Any]] = None, parse_error: str = "") -> Dict[str, Any]:
+             pkg: Optional[Dict[str, Any]] = None, parse_error: str = "",
+             sample_probe: Optional[Callable[..., Dict[str, Any]]] = None) -> Dict[str, Any]:
     """单包证据 → 一行成熟度（纯函数；测试直接调它）。"""
     if parse_error:
         m0 = {"ok": False, "missing": ["M0：%s" % parse_error],
@@ -533,7 +750,7 @@ def evaluate(root: Any, name: str, gate: Optional[Dict[str, Any]],
     next_level: Optional[str] = None
     missing: List[str] = []
     if m0["ok"]:
-        m1 = m1_evidence(root, name, gate)
+        m1 = m1_evidence(root, name, gate, pkg=pkg, sample_probe=sample_probe)
         evidence["M1"] = m1
         if m1["ok"]:
             m2 = m2_evidence(root, name, pkg)
@@ -570,15 +787,21 @@ def evaluate(root: Any, name: str, gate: Optional[Dict[str, Any]],
 
 def compute(root: Any = ".", packages: Optional[Iterable[str]] = None,
             gate: Optional[Dict[str, Any]] = None,
-            runner: Optional[Callable[[Path], Dict[str, Any]]] = None) -> Dict[str, Any]:
-    """全仓 → 成熟度文档（`nf-domain-maturity/1`）。`gate` 可注入（单测不跑整仓）。"""
+            runner: Optional[Callable[[Path], Dict[str, Any]]] = None,
+            sample_probe: Optional[Callable[..., Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """全仓 → 成熟度文档（`nf-domain-maturity/1`）。
+
+    `gate` / `runner` / `sample_probe` 都是注入点（单测不跑整仓、不依赖真实样本）；
+    缺省走同源判据。
+    """
     r = _root(root)
     names = list(packages) if packages is not None else discover_packages(r)
     gate_doc = gate if gate is not None else machine_gate(r, runner=runner)
     rows: List[Dict[str, Any]] = []
     for name in names:
         pkg, parse_error = _package_doc(r, name)
-        rows.append(evaluate(r, name, gate_doc, pkg=pkg, parse_error=parse_error))
+        rows.append(evaluate(r, name, gate_doc, pkg=pkg, parse_error=parse_error,
+                             sample_probe=sample_probe))
     summary = {lv: sum(1 for row in rows if row["maturity"] == lv) for lv in LEVELS}
     summary["unrated"] = sum(1 for row in rows if row["maturity"] is None)
     summary["total"] = len(rows)

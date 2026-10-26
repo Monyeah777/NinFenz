@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1063,
-    "projection": 131,
-    "support": 267,
-    "verify": 1141
+    "projection": 134,
+    "support": 269,
+    "verify": 1146
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6149,6 +6149,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "T6.2 · 真实模型执行记录（M2 证据）校验与落盘（nf-exec-record/1）。",
+      "path": "desktop/src/core/exec_record.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "42 M1：协议可执行性内部自测 —— 执行失范捕获器（动态质量维基建）。",
       "path": "desktop/src/core/execution_drill.py",
       "role": "prod",
@@ -7541,6 +7547,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "公开 benchmark 榜回归（T6.3）——「可提交、可复算、可排序、空榜诚实」四件套。",
+      "path": "desktop/tests/test_bench_leaderboard.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "双语入口（README.md / README.en.md）机读事实一致性测试。",
       "path": "desktop/tests/test_bilingual_entry.py",
       "role": "verify",
@@ -7951,6 +7963,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_eval_harness.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T6.2 · 执行记录 schema 与 `nf domain record` 校验（M2 证据）。",
+      "path": "desktop/tests/test_exec_record.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13073,8 +13091,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF 公开 benchmark 结果行（nf-bench-result/1）",
+      "path": "protocol/schema/bench_result.schema.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "模块头 machine_contract 机读契约块（01 §1.1 九键 + conformance + 已登记扩展键）",
       "path": "protocol/schema/contract.schema.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NF 真实模型执行记录（nf-exec-record/1 · M2 证据）",
+      "path": "protocol/schema/exec_record.schema.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13266,17 +13296,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f46a049f84e98ad4199383c7aaa1665462b7c467a1c3d382eb98027c761b8637",
+  "root_digest": "30755c61c502c04b14745b0df87b088e63e7ded3a8078378b5d40b85846a7dbe",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 122,
+    "R-catch": 124,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 962,
-    "R-projection": 116,
+    "R-projection": 119,
     "R-support": 119,
-    "R-verify": 1021,
-    "auto:R-core": 262
+    "R-verify": 1025,
+    "auto:R-core": 263
   },
   "schema": "nf-role-coordinates/1"
 }

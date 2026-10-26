@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
+  - protocol/code_metrics_baseline.json:7274bdd745b1eacc72612da4d5a3aaf74603d62850a6cb248c22503771c2c394
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose

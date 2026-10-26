@@ -31,10 +31,12 @@ subjects:
   - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
   - protocol/asset_keys.json:80a845d9afa3cfd67b6f44ac744c2f9d139d574fef7063c155065c599811f35c
-  - desktop/src/core/registry.json:1f7e0c3e3f632f6b0bfbeb76bd2516e9ec36b5f9bbb19ddc8bead44081206d23
+  - desktop/src/core/registry.json:e9e540e487bcd345bb49354f4aeccf911bc01ab66b011db1bcfc2cbf25187474
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-10-26）：Merge t-m1/t-record/t-bench: M1 evidence rule, exec record, bench leaderboard
+
 > 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
 
 > 重审（2026-10-26）：Merge t-compliance: regulatory profile 34 clauses + 9 assets + evidence pack

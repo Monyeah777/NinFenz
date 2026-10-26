@@ -2,7 +2,7 @@
   "kind": "domain-maturity",
   "levels": {
     "M0": "模板：包目录 + protocol.yaml + README + modules 在盘（模块件数 ≥ 声明）",
-    "M1": "机检：check14/15/16/23/29/32 同源判据无 FAIL + outputs/INDEX.json 在册",
+    "M1": "机检：check14/15/16/23/29/32 同源判据无 FAIL + 可验收产物证据（a：outputs/INDEX.json 在册且逐件过 nf output check；b：关联官方样本产物过 nf assemble --check）",
     "M2": "真实执行：真实模型执行记录（executor 模型标识/版本 + date + artifact + check_rc=0 + digest 可复算）",
     "M3": "用户签收：results/audit 审计记录 accepted_by+accepted_at 绑定被审对象 digest"
   },
@@ -63,10 +63,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -108,10 +119,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -153,10 +175,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -198,10 +231,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -243,10 +287,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -288,10 +343,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -333,10 +399,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -378,10 +455,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -423,10 +511,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -468,10 +567,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 6,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 6,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 6
+          "outputs": 6,
+          "outputs_checked": 6,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -513,10 +623,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -558,10 +679,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -603,10 +735,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -648,10 +791,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -693,10 +847,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -738,10 +903,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -783,10 +959,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -828,10 +1015,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -873,10 +1071,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -918,10 +1127,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -963,10 +1183,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1008,10 +1239,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1053,10 +1295,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1098,10 +1351,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1143,10 +1407,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1188,10 +1463,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1233,10 +1519,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1278,10 +1575,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1323,10 +1631,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1368,10 +1687,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1413,10 +1743,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1458,10 +1799,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1503,10 +1855,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1548,10 +1911,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1593,10 +1967,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": "community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）",
@@ -1634,10 +2019,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1679,10 +2075,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1724,10 +2131,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1769,10 +2187,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1814,10 +2243,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1859,10 +2299,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1904,10 +2355,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1949,10 +2411,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -1994,10 +2467,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2039,10 +2523,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2084,10 +2579,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2129,10 +2635,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2174,10 +2691,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2219,10 +2747,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2264,10 +2803,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2309,10 +2859,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2354,10 +2915,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2389,7 +2961,7 @@
       "path": "community/强化学习与决策域包"
     },
     {
-      "declared": "M0",
+      "declared": "M1",
       "declared_valid": true,
       "evidence": {
         "M0": {
@@ -2399,20 +2971,71 @@
           "ok": true
         },
         "M1": {
+          "association": {
+            "field": "条目 NF-TECHDOC-Monyeah777-1 的表格行",
+            "ledger": "library/INDEX.md",
+            "ok": true
+          },
+          "branch": "sample",
           "index": false,
+          "index_evidence": {
+            "checked": 0,
+            "issues": [],
+            "missing": [
+              "M1a：outputs/INDEX.json 缺失（community/技术文档域包/outputs/INDEX.json）"
+            ],
+            "ok": false,
+            "outputs": 0,
+            "present": false
+          },
+          "missing": [],
+          "ok": true,
+          "outputs": 0,
+          "outputs_checked": 0,
+          "sample": "library/NF-TECHDOC-Monyeah777-1.md",
+          "sample_check": {
+            "issues": [],
+            "segments": 8
+          },
+          "sample_evidence": {
+            "association": {
+              "field": "条目 NF-TECHDOC-Monyeah777-1 的表格行",
+              "ledger": "library/INDEX.md",
+              "ok": true
+            },
+            "check": {
+              "issues": [],
+              "segments": 8
+            },
+            "missing": [],
+            "ok": true,
+            "sample": "library/NF-TECHDOC-Monyeah777-1.md",
+            "sample_kind": "library"
+          },
+          "sample_kind": "library"
+        },
+        "M2": {
+          "artifact": "out/*.md（nf assemble --build --dest out 产物，可重建）",
+          "artifact_sha256": null,
+          "check_rc": 0,
+          "date": "2026-10-26",
+          "digest_ok": false,
+          "executor": "python scripts/nf.py assemble --build（官方 assembler，引用式八段）",
+          "executor_kind": "tool",
           "missing": [
-            "M1：outputs/INDEX.json 缺失（community/技术文档域包/outputs/INDEX.json）"
+            "M2：缺真实模型执行：executor='python scripts/nf.py assemble --build（官方 assembler，引用式八段）' 命中工具/装配器信号 'python'（不计 M2）",
+            "M2：artifact 不是单个文件路径（含通配/说明文字）：'out/*.md（nf assemble --build --dest out 产物，可重建）'"
           ],
-          "ok": false,
-          "outputs": 0
+          "ok": false
         }
       },
-      "maturity": "M0",
+      "maturity": "M1",
       "misdeclared": false,
       "missing": [
-        "M1：outputs/INDEX.json 缺失（community/技术文档域包/outputs/INDEX.json）"
+        "M2：缺真实模型执行：executor='python scripts/nf.py assemble --build（官方 assembler，引用式八段）' 命中工具/装配器信号 'python'（不计 M2）",
+        "M2：artifact 不是单个文件路径（含通配/说明文字）：'out/*.md（nf assemble --build --dest out 产物，可重建）'"
       ],
-      "next_level": "M1",
+      "next_level": "M2",
       "package": "技术文档域包",
       "path": "community/技术文档域包"
     },
@@ -2427,10 +3050,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2472,10 +3106,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2517,10 +3162,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2562,10 +3218,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2607,10 +3274,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2652,10 +3330,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2697,10 +3386,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2742,10 +3442,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2787,10 +3498,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2832,10 +3554,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2877,10 +3610,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2922,10 +3666,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -2967,10 +3722,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3012,10 +3778,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3057,10 +3834,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3102,10 +3890,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3147,10 +3946,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3192,10 +4002,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3237,10 +4058,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3272,7 +4104,7 @@
       "path": "community/机器翻译与本地化域包"
     },
     {
-      "declared": "M0",
+      "declared": "M1",
       "declared_valid": true,
       "evidence": {
         "M0": {
@@ -3282,20 +4114,69 @@
           "ok": true
         },
         "M1": {
+          "association": {
+            "field": "条目 NF-1 的表格行",
+            "ledger": "library/INDEX.md",
+            "ok": true
+          },
+          "branch": "sample",
           "index": false,
+          "index_evidence": {
+            "checked": 0,
+            "issues": [],
+            "missing": [
+              "M1a：outputs/INDEX.json 缺失（community/校园情感领域包/outputs/INDEX.json）"
+            ],
+            "ok": false,
+            "outputs": 0,
+            "present": false
+          },
+          "missing": [],
+          "ok": true,
+          "outputs": 0,
+          "outputs_checked": 0,
+          "sample": "library/NF-1.md",
+          "sample_check": {
+            "issues": [],
+            "segments": 8
+          },
+          "sample_evidence": {
+            "association": {
+              "field": "条目 NF-1 的表格行",
+              "ledger": "library/INDEX.md",
+              "ok": true
+            },
+            "check": {
+              "issues": [],
+              "segments": 8
+            },
+            "missing": [],
+            "ok": true,
+            "sample": "library/NF-1.md",
+            "sample_kind": "library"
+          },
+          "sample_kind": "library"
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
           "missing": [
-            "M1：outputs/INDEX.json 缺失（community/校园情感领域包/outputs/INDEX.json）"
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
           ],
-          "ok": false,
-          "outputs": 0
+          "ok": false
         }
       },
-      "maturity": "M0",
+      "maturity": "M1",
       "misdeclared": false,
       "missing": [
-        "M1：outputs/INDEX.json 缺失（community/校园情感领域包/outputs/INDEX.json）"
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
       ],
-      "next_level": "M1",
+      "next_level": "M2",
       "package": "校园情感领域包",
       "path": "community/校园情感领域包"
     },
@@ -3310,18 +4191,42 @@
           "ok": true
         },
         "M1": {
+          "branch": null,
           "index": false,
+          "index_evidence": {
+            "checked": 0,
+            "issues": [],
+            "missing": [
+              "M1a：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）"
+            ],
+            "ok": false,
+            "outputs": 0,
+            "present": false
+          },
           "missing": [
-            "M1：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）"
+            "M1a：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）",
+            "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P04；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P04）"
           ],
           "ok": false,
-          "outputs": 0
+          "outputs": 0,
+          "outputs_checked": 0,
+          "sample_evidence": {
+            "association": null,
+            "check": null,
+            "missing": [
+              "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P04；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P04）"
+            ],
+            "ok": false,
+            "sample": null,
+            "sample_kind": null
+          }
         }
       },
       "maturity": "M0",
       "misdeclared": false,
       "missing": [
-        "M1：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）"
+        "M1a：outputs/INDEX.json 缺失（community/校园西幻轻混组合包/outputs/INDEX.json）",
+        "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P04；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P04）"
       ],
       "next_level": "M1",
       "package": "校园西幻轻混组合包",
@@ -3338,10 +4243,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3383,10 +4299,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3428,10 +4355,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3473,10 +4411,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3518,10 +4467,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3563,10 +4523,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3608,10 +4579,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3653,10 +4635,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3698,10 +4691,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3743,10 +4747,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3788,10 +4803,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3833,10 +4859,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 9,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 9,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 9
+          "outputs": 9,
+          "outputs_checked": 9,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3872,10 +4909,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 9,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 9,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 9
+          "outputs": 9,
+          "outputs_checked": 9,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3911,10 +4959,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 9,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 9,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 9
+          "outputs": 9,
+          "outputs_checked": 9,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3950,10 +5009,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 9,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 9,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 9
+          "outputs": 9,
+          "outputs_checked": 9,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -3989,10 +5059,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4034,20 +5115,97 @@
           "ok": true
         },
         "M1": {
+          "association": {
+            "field": "positive_controls/source",
+            "hits": [
+              {
+                "field": "positive_controls/source",
+                "ledger": "drill_fidelity.json"
+              },
+              {
+                "field": "real_corpus/source",
+                "ledger": "drill_fidelity.json"
+              },
+              {
+                "field": "family_rules/0/sources/0",
+                "ledger": "state_front.json"
+              }
+            ],
+            "ledger": "drill_fidelity.json",
+            "ok": true
+          },
+          "branch": "sample",
           "index": false,
+          "index_evidence": {
+            "checked": 0,
+            "issues": [],
+            "missing": [
+              "M1a：outputs/INDEX.json 缺失（community/西幻生存领域包/outputs/INDEX.json）"
+            ],
+            "ok": false,
+            "outputs": 0,
+            "present": false
+          },
+          "missing": [],
+          "ok": true,
+          "outputs": 0,
+          "outputs_checked": 0,
+          "sample": "docs/完整版样本_西幻生存流P03.md",
+          "sample_check": {
+            "issues": [],
+            "segments": 8
+          },
+          "sample_evidence": {
+            "association": {
+              "field": "positive_controls/source",
+              "hits": [
+                {
+                  "field": "positive_controls/source",
+                  "ledger": "drill_fidelity.json"
+                },
+                {
+                  "field": "real_corpus/source",
+                  "ledger": "drill_fidelity.json"
+                },
+                {
+                  "field": "family_rules/0/sources/0",
+                  "ledger": "state_front.json"
+                }
+              ],
+              "ledger": "drill_fidelity.json",
+              "ok": true
+            },
+            "check": {
+              "issues": [],
+              "segments": 8
+            },
+            "missing": [],
+            "ok": true,
+            "sample": "docs/完整版样本_西幻生存流P03.md",
+            "sample_kind": "docs"
+          },
+          "sample_kind": "docs"
+        },
+        "M2": {
+          "artifact": null,
+          "artifact_sha256": null,
+          "check_rc": null,
+          "date": null,
+          "digest_ok": false,
+          "executor": null,
+          "executor_kind": null,
           "missing": [
-            "M1：outputs/INDEX.json 缺失（community/西幻生存领域包/outputs/INDEX.json）"
+            "M2：缺真实模型执行：package.outputs 执行记录缺失"
           ],
-          "ok": false,
-          "outputs": 0
+          "ok": false
         }
       },
-      "maturity": "M0",
+      "maturity": "M1",
       "misdeclared": false,
       "missing": [
-        "M1：outputs/INDEX.json 缺失（community/西幻生存领域包/outputs/INDEX.json）"
+        "M2：缺真实模型执行：package.outputs 执行记录缺失"
       ],
-      "next_level": "M1",
+      "next_level": "M2",
       "package": "西幻生存领域包",
       "path": "community/西幻生存领域包"
     },
@@ -4062,10 +5220,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4107,10 +5276,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4152,10 +5332,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4197,10 +5388,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4242,10 +5444,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4287,10 +5500,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4332,10 +5556,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4377,10 +5612,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4422,10 +5668,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4467,10 +5724,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4512,10 +5780,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4557,18 +5836,42 @@
           "ok": true
         },
         "M1": {
+          "branch": null,
           "index": false,
+          "index_evidence": {
+            "checked": 0,
+            "issues": [],
+            "missing": [
+              "M1a：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）"
+            ],
+            "ok": false,
+            "outputs": 0,
+            "present": false
+          },
           "missing": [
-            "M1：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）"
+            "M1a：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）",
+            "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P05；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P05）"
           ],
           "ok": false,
-          "outputs": 0
+          "outputs": 0,
+          "outputs_checked": 0,
+          "sample_evidence": {
+            "association": null,
+            "check": null,
+            "missing": [
+              "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P05；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P05）"
+            ],
+            "ok": false,
+            "sample": null,
+            "sample_kind": null
+          }
         }
       },
       "maturity": "M0",
       "misdeclared": false,
       "missing": [
-        "M1：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）"
+        "M1a：outputs/INDEX.json 缺失（community/通用核心基础包/outputs/INDEX.json）",
+        "M1b：无可验收产物证据（a) outputs/INDEX.json 缺失/未过机检；b) 无与包关联且通过 nf assemble --check 的官方样本；候选：library/NF-1.md：台账行未声明本包管线 P05；library/NF-TECHDOC-Monyeah777-1.md：台账行未声明本包管线 P05）"
       ],
       "next_level": "M1",
       "package": "通用核心基础包",
@@ -4585,10 +5888,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 8,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 8,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 8
+          "outputs": 8,
+          "outputs_checked": 8,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4630,10 +5944,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4675,10 +6000,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4720,10 +6056,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4765,10 +6112,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4810,10 +6168,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4855,10 +6224,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4900,10 +6280,21 @@
           "ok": true
         },
         "M1": {
+          "branch": "index",
           "index": true,
+          "index_evidence": {
+            "checked": 10,
+            "issues": [],
+            "missing": [],
+            "ok": true,
+            "outputs": 10,
+            "present": true
+          },
           "missing": [],
           "ok": true,
-          "outputs": 10
+          "outputs": 10,
+          "outputs_checked": 10,
+          "sample_evidence": null
         },
         "M2": {
           "artifact": null,
@@ -4937,8 +6328,8 @@
   ],
   "schema": "nf-domain-maturity/1",
   "summary": {
-    "M0": 5,
-    "M1": 106,
+    "M0": 2,
+    "M1": 109,
     "M2": 0,
     "M3": 0,
     "misdeclared": 0,
