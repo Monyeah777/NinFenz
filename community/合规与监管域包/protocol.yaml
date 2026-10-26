@@ -24,13 +24,17 @@ package:
     - id: "合规与监管:M02"
       desc: 合规与监管收口与形态派生（度量复算 T4 + 概念图派生 + 与口径表同源收口）
   assets:
-    count: 3
+    count: 12
     readme: README.md
   outputs:
     index: outputs/INDEX.json
     count: 9
     machine_verifiable: 9
     functional: 1
+    executor: "python scripts/nf.py assemble \"自定义：AI 内容合规证据包（合规与监管域包 P98 装配）\" --check community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md"
+    date: "2026-10-26"
+    artifact: "community/合规与监管域包/outputs/samples/AI_CONTENT_COMPLIANCE_EVIDENCE_PACK.md（P98 八段引用式证据包；同输入同输出，可重建）"
+    check_rc: 0
   mount_layers:
     P40 行为决策: {default: [合规与监管:M01], available: []}
     P60 长期演变: {default: [合规与监管:M02], available: []}

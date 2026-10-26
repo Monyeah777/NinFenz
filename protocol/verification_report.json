@@ -214,7 +214,7 @@
       "sample": [],
       "source": "asset_ledger_projection.verify",
       "stats": {
-        "entries": 943
+        "entries": 965
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "60a4e25eb4892643244fbe72680144b476d4995bf0eb24787b52069a255d6db5",
+        "root": "0a681debd03e55f91617b510e6c4a3287099f0da59b672fc791bded9ee6dd2f0",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -337,7 +337,7 @@
         ],
         "domain_packs": 100,
         "library_items": 3,
-        "pack_assets": 372,
+        "pack_assets": 381,
         "pack_dirs": 111,
         "registered_packs": 111,
         "schema": "nf-repo-stats/1",
@@ -399,10 +399,10 @@
       "sample": [],
       "source": "key_naming.scan",
       "stats": {
-        "keys_seen": 18,
+        "keys_seen": 27,
         "max_key_len": 29,
-        "occurrences": 625,
-        "registered": 18
+        "occurrences": 643,
+        "registered": 27
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4058,
-        "kernel": 2190,
+        "files": 4072,
+        "kernel": 2202,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "b3520aad44a112af7c405ab68bf94e14bd0726b5f2bb7bef2bddd98136659cff",
+  "root_digest": "3dfb5e70970f77866217d698fe8b5eef5915e5d2b9b86942fbbbc5f02725c60b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

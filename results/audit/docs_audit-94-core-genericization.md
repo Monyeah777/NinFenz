@@ -30,11 +30,13 @@ subjects:
   - 05_资产库/provenance.json:293d3d3dfd1bf25e0fdeaa32e4b14cc817ed974b4209fda45619c65a1473ab93
   - 05_资产库/用户自定义/README.md:03068b5931dba4a0ae92020f9eddcb058bba27a852b0cf9ea015413607374dbf
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
-  - protocol/asset_keys.json:144a06d6c44a403baad68373c3ed1ae7f70c32fb07a4dce0a8199eb46b215b45
-  - desktop/src/core/registry.json:33635f4cf78acae7233b620d93bf313a148372b21f7d78f2b9d96a3f1fe2beea
+  - protocol/asset_keys.json:80a845d9afa3cfd67b6f44ac744c2f9d139d574fef7063c155065c599811f35c
+  - desktop/src/core/registry.json:9209841a494af4e11180f582c0608ef106c21ff30b4ffcba92fed725fced5f2e
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
 
 ---
+> 重审（2026-10-26）：Merge t-compliance: regulatory profile 34 clauses + 9 assets + evidence pack
+
 > 重审（2026-10-26）：EOL normalize: asset_keys/judgement_coverage to LF
 
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering

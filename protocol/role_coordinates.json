@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1445,
+    "app": 1447,
     "entry": 26,
     "floor": 5,
-    "prod": 1054,
+    "prod": 1063,
     "projection": 130,
     "support": 266,
-    "verify": 1131
+    "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -1769,14 +1769,68 @@
       "rule": "R-prod"
     },
     {
+      "function": "AI 透明度告知模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/AI_TRANSPARENCY_NOTICE.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "审计日志 schema · 合规与监管",
+      "path": "community/合规与监管域包/assets/AUDIT_LOG_SCHEMA.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "合规声明模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/COMPLIANCE_STATEMENT.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
       "function": "概念图 · 合规与监管（概念前置偏序）",
       "path": "community/合规与监管域包/assets/CONCEPT_GRAPH.md",
       "role": "prod",
       "rule": "R-prod"
     },
     {
+      "function": "数据来源与授权记录模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/DATA_PROVENANCE_LEDGER.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
       "function": "域口径表 · 合规与监管",
       "path": "community/合规与监管域包/assets/DOMAIN_SPEC.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "证据包索引模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/EVIDENCE_PACK_INDEX.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "人类监督说明模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/HUMAN_OVERSIGHT.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "影响评估清单（DPIA 等价形）· 合规与监管",
+      "path": "community/合规与监管域包/assets/IMPACT_ASSESSMENT.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "保留期与联系人模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/RETENTION_CONTACT.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "风险登记表模板 · 合规与监管",
+      "path": "community/合规与监管域包/assets/RISK_REGISTER.md",
       "role": "prod",
       "rule": "R-prod"
     },
@@ -7121,6 +7175,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "合规材料",
+      "path": "desktop/tests/fixtures/compliance/compliance_bad.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "AI 内容合规证据包（样例：内容合规声明）",
+      "path": "desktop/tests/fixtures/compliance/compliance_ok.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "nf-execution-drill/1",
       "path": "desktop/tests/fixtures/execution/p01_drill_cases.json",
       "role": "verify",
@@ -7999,6 +8065,12 @@
     {
       "function": "M80 质量门 profile 引擎单测（T4.1 技术文档域包纵深）。",
       "path": "desktop/tests/test_gate_profile.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M80 质量门 profile 单测（T4.2 合规与监管域包纵深：regulatory-strict）。",
+      "path": "desktop/tests/test_gate_profile_regulatory.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13152,16 +13224,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2b037f93560538685d4170b3d34695306003c27717c3dd7d730406cad9ea43c8",
+  "root_digest": "4000963a1de805f7efb2f19ba37532c99cf14b659e81954ee104782e7af25a0c",
   "rule_counts": {
-    "R-app": 1445,
+    "R-app": 1447,
     "R-catch": 121,
     "R-entry": 26,
     "R-floor": 5,
-    "R-prod": 953,
+    "R-prod": 962,
     "R-projection": 115,
     "R-support": 119,
-    "R-verify": 1012,
+    "R-verify": 1015,
     "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"

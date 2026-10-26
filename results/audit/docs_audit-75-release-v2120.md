@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:5712a348842b745605951bb8d99cc91ea7118afe400e6a3184ac801916649874
   - docs/meta/VERSION-MATRIX.md:886566785937df83820409ced3ad16f64b728a827cdb1a1a7ea6785c77d7b145
-  - README.md:6588f8b054ee8557d60f1fe97ae40dd82ea27930ddf89746bb528536ca134c0b
+  - README.md:ec0f59b92c59da87b72689770693c877a03515717210222f1fd02d7f469c3eb2
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
 
 ---
+> 重审（2026-10-26）：Merge t-compliance: regulatory profile 34 clauses + 9 assets + evidence pack
+
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
 
 > 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
