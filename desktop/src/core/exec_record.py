@@ -219,6 +219,14 @@ def _resolve_input(root: Path, given: str) -> Path:
     return root / p
 
 
+def _portable_path(root: Path, path: Path) -> str:
+    """机器面路径可移植：仓内 → 仓库相对 POSIX；仓外 → 只给文件名（不回吐本机绝对路径）。"""
+    try:
+        return path.resolve().relative_to(root.resolve()).as_posix()
+    except (OSError, ValueError):
+        return path.name
+
+
 def check_file(root: Any, path: str) -> Dict[str, Any]:
     """读记录文件并校验（不可读 = fail，带修复指引）。"""
     root_p = Path(root)
@@ -226,8 +234,9 @@ def check_file(root: Any, path: str) -> Dict[str, Any]:
     try:
         record = json_doc.load(target, dict, what=str(target))
     except ValueError as exc:
-        return _result("fail", ["record_unreadable：%s" % exc], source_path=str(path))
-    return validate_record(root_p, record, source_path=str(path))
+        return _result("fail", ["record_unreadable：%s" % exc],
+                       source_path=_portable_path(root_p, target))
+    return validate_record(root_p, record, source_path=_portable_path(root_p, target))
 
 
 def scan(root: Any = ".") -> Dict[str, Any]:
