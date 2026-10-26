@@ -237,7 +237,11 @@ def scan(root: Any = ".") -> Dict[str, Any]:
     rows: List[Dict[str, Any]] = []
     if d.is_dir():
         for p in sorted(d.glob("*.json")):
-            rows.append(check_file(root_p, str(p)))
+            try:
+                rel = p.relative_to(root_p).as_posix()
+            except ValueError:                  # root 为 "." 等非包含形态时退回原路径
+                rel = str(p)
+            rows.append(check_file(root_p, rel))
     counts = {"pass": 0, "fail": 0, "not-executed": 0}
     for r in rows:
         counts[r["status"]] = counts.get(r["status"], 0) + 1

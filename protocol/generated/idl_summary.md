@@ -6,12 +6,14 @@
 ## 覆盖
 | schema | 模块文档 | 机读契约 | 管线 | 协议包 | 台账条目 |
 | - | - | - | - | - | - |
-| 9 | 248 | 248 | 114 | 111 | 3 |
+| 11 | 248 | 248 | 114 | 111 | 3 |
 
 ## schema 定义
 - https://ninfenz.dev/schema/asset.schema.json
 - https://ninfenz.dev/schema/asset_contracts.schema.json
+- https://ninfenz.dev/schema/bench_result.schema.json
 - https://ninfenz.dev/schema/contract.schema.json
+- https://ninfenz.dev/schema/exec_record.schema.json
 - https://ninfenz.dev/schema/integration.schema.json
 - https://ninfenz.dev/schema/integration_strings.schema.json
 - https://ninfenz.dev/schema/module.schema.json
