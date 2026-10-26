@@ -37,7 +37,7 @@ regex = "1"
 # `protocol/assertions.json` 的 `regex_absent`）。fancy-regex 基于 regex 但走回溯，
 # 支持后顾/反向引用。**实测（2026-10-03）：本机 windows-gnu host 可构建，依赖树无 windows**。
 # 只用它跑真源给的模式；本线自己的固定正则仍走 regex（更快）。
-fancy-regex = "0.14"
+fancy-regex = "0.19"
 # Python 解析器（内置 AST）：`purity_scan` / `code_metrics` / `asset_contract` 三条判据建立在
 # Python 语法树与调用图之上，手写子集解析器复刻不了（要复刻 CPython 的 AST 语义）。
 # 实测（2026-10-04）：本机 `x86_64-pc-windows-gnu` 可构建可运行；依赖树**无** `windows-sys` /
