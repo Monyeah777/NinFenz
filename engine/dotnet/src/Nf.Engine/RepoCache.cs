@@ -17,6 +17,17 @@ public static class RepoCache
     private static readonly object Gate = new();
     private static readonly Dictionary<string, Entry> Cache = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// Git worktrees store <c>.git</c> as a pointer file rather than a directory.
+    /// Both forms are a working tree; treating the file form as an exported
+    /// snapshot incorrectly enables immutable-golden digest assertions.
+    /// </summary>
+    public static bool IsWorkingTree(string root)
+    {
+        var git = Path.Combine(root, ".git");
+        return Directory.Exists(git) || File.Exists(git);
+    }
+
     public static Entry For(string root)
     {
         var key = Path.GetFullPath(root);
