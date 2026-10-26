@@ -1,0 +1,2188 @@
+{
+  "commands": [
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "agent",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "plan": [
+          "--domain",
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "多 agent 协作契约（T10.3）：writer/critic/fact_checker/editor 四角色契约与域链（techdoc/regulatory）。角色引用既有模块/管线/gate profile，不新造能力；`plan…",
+      "related_docs": [],
+      "usage": "usage: nf agent [-h] {plan,check} ..."
+    },
+    {
+      "flags": [
+        "--by",
+        "--help",
+        "--json",
+        "--list",
+        "--note",
+        "--verify",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "approve",
+      "nested": {},
+      "one_line": "内容绑定批准记录（机制借鉴 MCOP approved-changeset gate）",
+      "related_docs": [
+        "docs/en/release.md",
+        "docs/ja/release.md",
+        "docs/release.md"
+      ],
+      "usage": "usage: nf approve [-h] [--by BY] [--note NOTE] [--verify] [--list] [--json] [subject]"
+    },
+    {
+      "flags": [
+        "--allow-protected-dest",
+        "--answer",
+        "--build",
+        "--check",
+        "--check-trace",
+        "--dest",
+        "--help",
+        "--loose",
+        "--rounds",
+        "--save",
+        "--session",
+        "--trace",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "assemble",
+      "nested": {},
+      "one_line": "需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收）",
+      "related_docs": [
+        "docs/45_M2_回合级drill.md",
+        "docs/45_执行遥测规范.md",
+        "docs/45_质量纵深收口总档.md",
+        "docs/bench.md"
+      ],
+      "usage": "usage: nf assemble [-h] [--check OUT.md] [--save FILE.md] [--trace TRACE.json] [--check-trace TRACE.json] [--rounds] [--loose] [--answer 问答] [--session SESSION.json] [--build] [--dest DIR] [--allow-protected-dest] requirement"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "assertions",
+      "nested": {},
+      "one_line": "数据化断言表（机制借鉴 Schematron；kind 为封闭集）",
+      "related_docs": [],
+      "usage": "usage: nf assertions [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "asset",
+      "nested": {
+        "add": [
+          "--help",
+          "--key",
+          "--module",
+          "--package",
+          "--root",
+          "--source",
+          "--status",
+          "--tier",
+          "--version",
+          "-h"
+        ],
+        "baseline": [
+          "--help",
+          "--root",
+          "--write",
+          "-h"
+        ],
+        "contract": [
+          "--export",
+          "--face",
+          "--freeze",
+          "--help",
+          "--json",
+          "--root",
+          "--run-tests",
+          "-h"
+        ],
+        "density": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ],
+        "deprecate": [
+          "--help",
+          "--key",
+          "--ledger",
+          "-h"
+        ],
+        "inventory": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ],
+        "ledger": [
+          "--help",
+          "--json",
+          "--refresh",
+          "--root",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "--pkg",
+          "--root",
+          "--status",
+          "--tier",
+          "-h"
+        ],
+        "restore": [
+          "--help",
+          "--key",
+          "--ledger",
+          "-h"
+        ],
+        "rm": [
+          "--help",
+          "--key",
+          "--ledger",
+          "-h"
+        ],
+        "thickness": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ],
+        "usage": [
+          "--help",
+          "--json",
+          "--root",
+          "--strict",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--root",
+          "-h"
+        ]
+      },
+      "one_line": "资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏览 / rm 摘除 / deprecate·restore 流转）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/interop.md",
+        "docs/ja/terminal.md",
+        "docs/meta/VERSION-MATRIX.md"
+      ],
+      "usage": "usage: nf asset [-h] {add,verify,baseline,inventory,ls,density,usage,thickness,ledger,contract,rm,deprecate,restore} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--issuer",
+        "--json",
+        "--key-file",
+        "--out",
+        "--selfcheck",
+        "--verify",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "attest",
+      "nested": {},
+      "one_line": "内容 attestation（内部差距：知识签名只自证可复现，无对外可验证的篡改证据）。签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可复现构建惯例）钉成固定值——机器面据此逐字节可复现。",
+      "related_docs": [
+        "docs/attest.md",
+        "docs/EXPORT.md"
+      ],
+      "usage": "usage: nf attest [-h] [--out OUT] [--issuer ISSUER] [--key-file KEY_FILE] [--verify VERIFY] [--selfcheck] [--json] [target]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": false,
+      "name": "audit",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "rebind": [
+          "--dry-run",
+          "--help",
+          "--json",
+          "--note",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "审计/验收（机制借鉴 Audit Report + Acceptance/Sign-off）",
+      "related_docs": [],
+      "usage": "usage: nf audit [-h] {check,ls,verify,rebind} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": false,
+      "name": "bench",
+      "nested": {
+        "compare": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "report": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "run": [
+          "--artifact",
+          "--case",
+          "--help",
+          "--json",
+          "--model",
+          "--out",
+          "-h"
+        ]
+      },
+      "one_line": "执行结果跑分台（机制借鉴 ACP benchmark suite：外部实测的容器）",
+      "related_docs": [],
+      "usage": "usage: nf bench [-h] {run,compare,report} ..."
+    },
+    {
+      "flags": [
+        "--date",
+        "--help",
+        "--json",
+        "--no-commits",
+        "--version",
+        "--write",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "changelog",
+      "nested": {},
+      "one_line": "变更日志生成：渲染确定（无墙钟，版本/日期由参数给）+ 逐条可溯源（只分组、不改写）；--write 把版本节插入 CHANGELOG 顶部并把 changes/unreleased/* 归档到 changes/<version>/",
+      "related_docs": [
+        "docs/en/release.md",
+        "docs/ja/release.md",
+        "docs/meta/VERSION-MATRIX.md",
+        "docs/release.md"
+      ],
+      "usage": "usage: nf changelog [-h] [--version X.Y.Z] [--date YYYY-MM-DD] [--json] [--write] [--no-commits]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": false,
+      "name": "cli",
+      "nested": {
+        "map": [
+          "--check",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ]
+      },
+      "one_line": "CLI IA 机读层（T11.3）：从 argparse 命令面 + terminal.FAMILIES 构建 nf-cli-map/1（命令→族→用途→flags/has_json/相关文档），生成件 protocol/cli_map.…",
+      "related_docs": [],
+      "usage": "usage: nf cli [-h] {map} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": true,
+      "name": "cognition",
+      "nested": {},
+      "one_line": "认知族（机制借鉴 Glossary + SOP/Runbook/Playbook 分档）",
+      "related_docs": [],
+      "usage": "usage: nf cognition [-h] [--json] [{,glossary,modes}]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "combine",
+      "nested": {
+        "breadth": [
+          "--help",
+          "--json",
+          "--quads",
+          "--quints",
+          "--sexts",
+          "--triples",
+          "-h"
+        ],
+        "materialize": [
+          "--category",
+          "--help",
+          "--id",
+          "--json",
+          "--packs",
+          "--write",
+          "-h"
+        ],
+        "plan": [
+          "--assets",
+          "--certify",
+          "--help",
+          "--json",
+          "--label",
+          "--modules",
+          "--note",
+          "--packs",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭包 / 事件闭包 / 资产借阅 / 合法性判定 → 可复算证书（T4）；`breadth` 对全部两两 + 抽样三元/四元/五元/六元跑同一套不变量证明广度；`mater…",
+      "related_docs": [
+        "docs/combos.md",
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf combine [-h] {plan,breadth,verify,materialize} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": false,
+      "name": "completion",
+      "nested": {},
+      "one_line": "生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc）",
+      "related_docs": [],
+      "usage": "usage: nf completion [-h] {bash,zsh,fish}"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--write",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "conformance",
+      "nested": {},
+      "one_line": "一致性报告工件（机制借鉴 MCOP runConformanceSuite：make it checkable instead of trusted）",
+      "related_docs": [
+        "docs/decision-layer.md",
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf conformance [-h] [--write] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": false,
+      "name": "daemon",
+      "nested": {
+        "bench": [
+          "--help",
+          "--json",
+          "--runs",
+          "-h"
+        ],
+        "exec": [
+          "--help",
+          "--no-start",
+          "-h"
+        ],
+        "shell-init": [
+          "--help",
+          "--shell",
+          "-h"
+        ],
+        "start": [
+          "--help",
+          "--idle",
+          "--watch",
+          "-h"
+        ],
+        "status": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "stop": [
+          "--help",
+          "-h"
+        ]
+      },
+      "one_line": "NF 执行层常驻守护：把「每条命令一次解释器启动」（实测 ~400 ms 固定成本）换成「一次启动、长期热跑」，客户端只做一次套接字往返。只绑 127.0.0.1 + 一次性令牌；单线程串行；每次请求比对 core/scripts 源码指…",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf daemon [-h] {start,stop,status,exec,bench,shell-init} ..."
+    },
+    {
+      "flags": [
+        "--adapter",
+        "--dry-run",
+        "--endpoint",
+        "--help",
+        "--json",
+        "--model",
+        "--questions",
+        "--state",
+        "--state-text",
+        "--timeout",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "decide",
+      "nested": {},
+      "one_line": "决策层端口：把选择写成类型化问题交给决策模型；模型在门禁之外，缺适配器/超时/输出不合 schema 一律 abstained",
+      "related_docs": [],
+      "usage": "usage: nf decide [-h] [--state STATE] [--state-text STATE_TEXT] --questions QUESTIONS [--adapter ADAPTER] [--endpoint ENDPOINT] [--model MODEL] [--timeout TIMEOUT] [--dry-run] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": false,
+      "name": "decisions",
+      "nested": {
+        "reindex": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "show": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "决策记录（机制借鉴 ADR：supersede-only + 不可改）",
+      "related_docs": [],
+      "usage": "usage: nf decisions [-h] {show,verify,reindex} ..."
+    },
+    {
+      "flags": [
+        "--dest",
+        "--help",
+        "-h"
+      ],
+      "group": "start",
+      "has_json": false,
+      "name": "demo",
+      "nested": {},
+      "one_line": "一键交付物演示（T3.1：默认 P06 技术文档全链 → 可交付 Markdown；叙事域用 `nf demo narrative` = P04 轻混 → CCV3）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/quickstart.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf demo [-h] [--dest DEST] [{techdoc,narrative}]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": false,
+      "name": "design",
+      "nested": {
+        "audit": [
+          "--check",
+          "--context",
+          "--help",
+          "--mode",
+          "--out",
+          "--root",
+          "--target",
+          "-h"
+        ],
+        "steelman": [
+          "--check",
+          "--context",
+          "--decider",
+          "--help",
+          "--out",
+          "--root",
+          "-h"
+        ]
+      },
+      "one_line": "决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
+      "related_docs": [
+        "docs/41_波C_W3_实测记录.md",
+        "docs/需求收敛模板.md"
+      ],
+      "usage": "usage: nf design [-h] {steelman,audit} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "diff",
+      "nested": {},
+      "one_line": "版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）",
+      "related_docs": [
+        "docs/41_波C_C1_C2_实测记录.md",
+        "docs/迁移指南-基于nf-sig-diff.md"
+      ],
+      "usage": "usage: nf diff [-h] [--json] a b"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "start",
+      "has_json": true,
+      "name": "doctor",
+      "nested": {},
+      "one_line": "环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify 慢跑）",
+      "related_docs": [
+        "docs/45_质量纵深收口总档.md",
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf doctor [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "domain",
+      "nested": {
+        "build": [
+          "--help",
+          "--json",
+          "--no-render",
+          "--spec",
+          "--write",
+          "-h"
+        ],
+        "maturity": [
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "record": [
+          "--check",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "shells": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "specs": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "--spec",
+          "-h"
+        ]
+      },
+      "one_line": "域包工厂：读内部域规格（.rivet/private_archive/ai_packs/specs/<code>.json）生成 protocol.yaml / README / 模块×2 / 管线 / 资产×3（含 provenance…",
+      "related_docs": [],
+      "usage": "usage: nf domain [-h] {build,verify,specs,maturity,shells,record} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "driver",
+      "nested": {},
+      "one_line": "指令档机器面路由（机制借鉴 ACP driver override）",
+      "related_docs": [],
+      "usage": "usage: nf driver [-h] [--json] [workflow]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "endpoint",
+      "nested": {},
+      "one_line": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol）",
+      "related_docs": [
+        "docs/interop.md"
+      ],
+      "usage": "usage: nf endpoint [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "events",
+      "nested": {},
+      "one_line": "全仓事件背书核对（补 check16/26 之外：社区域包订阅是否真有发布方）",
+      "related_docs": [
+        "docs/interop.md"
+      ],
+      "usage": "usage: nf events [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "explain",
+      "nested": {},
+      "one_line": "check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）",
+      "related_docs": [
+        "docs/41_波C_C1_C2_实测记录.md",
+        "docs/迁移指南-基于nf-sig-diff.md"
+      ],
+      "usage": "usage: nf explain [-h] check"
+    },
+    {
+      "flags": [
+        "--check",
+        "--help",
+        "--json",
+        "--write",
+        "-h"
+      ],
+      "group": "start",
+      "has_json": true,
+      "name": "facts",
+      "nested": {},
+      "one_line": "SSOT：唯一机读事实产物 protocol/facts.json；--check 做逐字节比对 + 跨源不变量 + 字面量禁区断言（历史 MIT 句单独放行）",
+      "related_docs": [],
+      "usage": "usage: nf facts [-h] [--write] [--check] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": false,
+      "name": "handover",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "接力协议（机制借鉴 SBAR；空未决即不合格交接）",
+      "related_docs": [],
+      "usage": "usage: nf handover [-h] {ls,check,verify} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": false,
+      "name": "help",
+      "nested": {},
+      "one_line": "显示 nf 或指定子命令的帮助",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf help [-h] [COMMAND]"
+    },
+    {
+      "flags": [
+        "--check",
+        "--help",
+        "--registry",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": false,
+      "name": "impact",
+      "nested": {},
+      "one_line": "变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）",
+      "related_docs": [],
+      "usage": "usage: nf impact [-h] [--check] [--registry REGISTRY] target"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--out",
+        "--register",
+        "--store",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": true,
+      "name": "import",
+      "nested": {},
+      "one_line": "读入外部产物：`nf import <SKILL.md|chara.json>`（旧面）；`nf import docx <file> [--json/--out]`、`nf import dita <file> [--json/--ou…",
+      "related_docs": [],
+      "usage": "usage: nf import [-h] [--register] [--store STORE] [--json] [--out OUT] file [file ...]"
+    },
+    {
+      "flags": [
+        "--all",
+        "--check",
+        "--help",
+        "--json",
+        "--kind",
+        "--list",
+        "--out",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "interop",
+      "nested": {},
+      "one_line": "互操作导出面：把既有声明件实时派生为外部标准工具可读的文档（不新增真源；同一输入两次导出逐字节一致）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/endpoint.md",
+        "docs/interop.md",
+        "docs/ja/terminal.md"
+      ],
+      "usage": "usage: nf interop [-h] [--kind {a2a,asyncapi,c2pa,cid,cyclonedx,decisions,intoto,openapi,prov,sbom,slsa,vc}] [--all] [--list] [--check] [--out OUT] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "ir",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "内容 IR（T7.2）：document/section/paragraph/claim/citation/entity/slot_ref 节点图；每节点稳定 id（路径+内容哈希）；render 规范形逐字节确定性；check 输出 s…",
+      "related_docs": [],
+      "usage": "usage: nf ir [-h] {check} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": false,
+      "name": "knowledge",
+      "nested": {
+        "frequency": [
+          "--help",
+          "--json",
+          "--trace",
+          "--write",
+          "-h"
+        ],
+        "graph": [
+          "--check",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "lint": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "order": [
+          "--as",
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "transform": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "visible": [
+          "--as",
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "双源知识层（机制借鉴一句式：编译时机按数据域选择）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/meta/VERSION-MATRIX.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf knowledge [-h] {order,lint,transform,frequency,visible,graph} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--verify",
+        "--write",
+        "-h"
+      ],
+      "group": "start",
+      "has_json": true,
+      "name": "layers",
+      "nested": {},
+      "one_line": "NF 抽象阶梯（真源 = protocol/LAYERS.json，机制借鉴多视图描述 / 稳定依赖 / 适应度函数 / 单一真源+生成投影）：抽象轴四阶（契约→资产→引擎→出口）、入口面（只登记角色，永不作为真源）、验证纵切（贯穿四阶的…",
+      "related_docs": [
+        "docs/en/layers.md",
+        "docs/en/terminal.md",
+        "docs/ja/layers.md",
+        "docs/ja/terminal.md"
+      ],
+      "usage": "usage: nf layers [-h] [--json] [--verify] [--write]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": false,
+      "name": "library",
+      "nested": {
+        "attest": [
+          "--help",
+          "--json",
+          "--key-file",
+          "--ssh-identity",
+          "--ssh-key",
+          "-h"
+        ],
+        "deprecate": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "receipts": [
+          "--entry",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "reindex": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "restore": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "search": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "show": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "supersede": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "--key-file",
+          "--ssh-allowed-signers",
+          "--ssh-identity",
+          "-h"
+        ]
+      },
+      "one_line": "云端图书馆机器面（内部差距：library 无 CLI 面、MCP 检索不覆盖馆藏、元数据非一等公民）",
+      "related_docs": [
+        "docs/agent/ROUTES.md",
+        "docs/en/release.md",
+        "docs/examples/state-front/techdoc_front.md",
+        "docs/ja/release.md"
+      ],
+      "usage": "usage: nf library [-h] {ls,show,reindex,verify,search,deprecate,restore,supersede,attest,receipts} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "license",
+      "nested": {},
+      "one_line": "图书馆许可证门（内部差距：登记表无许可列，入库产物不承载共享条款）",
+      "related_docs": [
+        "docs/library.md"
+      ],
+      "usage": "usage: nf license [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--dry-run",
+        "--fix",
+        "--help",
+        "--json",
+        "--kinds",
+        "--prose",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "lint",
+      "nested": {},
+      "one_line": "机械检查/修复（内部差距：既有扫描器只报告不修，仓库无 auto-fix）",
+      "related_docs": [
+        "docs/en/lsp.md",
+        "docs/en/terminal.md",
+        "docs/ja/lsp.md",
+        "docs/ja/terminal.md"
+      ],
+      "usage": "usage: nf lint [-h] [--fix] [--dry-run] [--prose] [--kinds] [--json] [target ...]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--write",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "locales",
+      "nested": {},
+      "one_line": "语言面：注册表 ⇄ 文件在场双向对账（入口锚点/切换行/结构；文档译件路径镜像 + source_sha256 防过期）",
+      "related_docs": [],
+      "usage": "usage: nf locales [-h] [--json] [--write]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--print-config",
+        "--root",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": false,
+      "name": "lsp",
+      "nested": {},
+      "one_line": "LSP 服务器（stdio Content-Length 分帧；诊断与 nf lint 同源，领域符号表来自 core/nf_language；--print-config 出编辑器配置）",
+      "related_docs": [
+        "docs/en/lsp.md",
+        "docs/ja/lsp.md",
+        "docs/lsp.md",
+        "docs/nfal.md"
+      ],
+      "usage": "usage: nf lsp [-h] [--root ROOT] [--print-config {,neovim,emacs,helix}]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--list",
+        "--registry",
+        "--tier",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": true,
+      "name": "market",
+      "nested": {},
+      "one_line": "市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf market [-h] [--list] [--json] [--tier {official,community,experimental}] [--registry REGISTRY] [pkg_dir]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "model",
+      "nested": {},
+      "one_line": "内容建模三件（机制借鉴 SKOS 概念方案 / 规范-说明件二分 / 数据契约要素）",
+      "related_docs": [
+        "docs/modeling.md"
+      ],
+      "usage": "usage: nf model [-h] [--json] [{,vocab,normative,contracts}]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "module",
+      "nested": {
+        "contract": [
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "deprecate": [
+          "--help",
+          "--reason",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "--root",
+          "--status",
+          "-h"
+        ],
+        "restore": [
+          "--help",
+          "-h"
+        ],
+        "signature": [
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "status": [
+          "--help",
+          "-h"
+        ],
+        "types": [
+          "--backlog",
+          "--harvest",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--root",
+          "-h"
+        ]
+      },
+      "one_line": "模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/machine_contract.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf module [-h] {ls,status,deprecate,restore,verify,signature,types,contract} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "nfal",
+      "nested": {},
+      "one_line": "NFA-L：声明层借既有 YAML + JSON-Schema IDL，命令层是封闭 guard 表达式（无用户函数/循环/赋值/IO）；用法见 docs/nfal.md",
+      "related_docs": [
+        "docs/nfal.md"
+      ],
+      "usage": "usage: nf nfal [-h] ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "output",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "list": [
+          "--category",
+          "--help",
+          "--json",
+          "--status",
+          "--tier",
+          "-h"
+        ],
+        "meter": [
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ],
+        "render": [
+          "--help",
+          "--json",
+          "--package",
+          "--write",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "产出形态面：把「产出一律是散文」的缺口机制化——形态清单（protocol/output_forms.json）、包级产出面（community/<包>/outputs/INDEX.json）、T0–T4 档位判定、T4 可复算面重算比对…",
+      "related_docs": [],
+      "usage": "usage: nf output [-h] {list,check,verify,render,meter} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": false,
+      "name": "patterns",
+      "nested": {
+        "for": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "reindex": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "show": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "实践包品类（机制借鉴 ACP patterns：与内容域包并列的实践规范包）",
+      "related_docs": [
+        "docs/patterns.md"
+      ],
+      "usage": "usage: nf patterns [-h] {ls,show,for,verify,reindex} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "pipeline",
+      "nested": {
+        "dryrun": [
+          "--all",
+          "--help",
+          "--json",
+          "--pipeline",
+          "--write-advisory",
+          "-h"
+        ],
+        "new": [
+          "--dest",
+          "--domain",
+          "--from",
+          "--help",
+          "--id",
+          "--name",
+          "-h"
+        ]
+      },
+      "one_line": "管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf pipeline [-h] {new,dryrun} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": false,
+      "name": "postmortem",
+      "nested": {
+        "check": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "-h"
+        ],
+        "verify": [
+          "--help",
+          "--json",
+          "-h"
+        ]
+      },
+      "one_line": "复盘（机制借鉴 SRE postmortem）",
+      "related_docs": [],
+      "usage": "usage: nf postmortem [-h] {check,ls,verify} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "preset",
+      "nested": {
+        "apply": [
+          "--help",
+          "--json",
+          "--store",
+          "-h"
+        ],
+        "export": [
+          "--help",
+          "--json",
+          "--out",
+          "--store",
+          "-h"
+        ],
+        "import": [
+          "--help",
+          "--json",
+          "--name",
+          "--store",
+          "-h"
+        ],
+        "ls": [
+          "--help",
+          "--json",
+          "--store",
+          "-h"
+        ],
+        "rm": [
+          "--help",
+          "--json",
+          "--store",
+          "-h"
+        ],
+        "save": [
+          "--assets",
+          "--force",
+          "--help",
+          "--json",
+          "--modules",
+          "--pipeline",
+          "--store",
+          "-h"
+        ],
+        "show": [
+          "--help",
+          "--json",
+          "--store",
+          "-h"
+        ]
+      },
+      "one_line": "预设配置（指令集 F：端壳退役后按「端壳能力一律落 CLI」把预设接成命令；落点 = NF_HOME，非仓库）",
+      "related_docs": [],
+      "usage": "usage: nf preset [-h] {ls,show,apply,save,rm,export,import} ..."
+    },
+    {
+      "flags": [
+        "--entry",
+        "--help",
+        "--json",
+        "--scope",
+        "--write",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "receipts",
+      "nested": {},
+      "one_line": "协议层回执单根（把回执覆盖面从馆藏扩到协议层机读产物）",
+      "related_docs": [
+        "docs/interop.md"
+      ],
+      "usage": "usage: nf receipts [-h] [--scope {protocol}] [--write] [--entry ENTRY] [--json]"
+    },
+    {
+      "flags": [
+        "--apply",
+        "--check",
+        "--help",
+        "--registry",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "register",
+      "nested": {},
+      "one_line": "协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）",
+      "related_docs": [],
+      "usage": "usage: nf register [-h] [--check] [--apply] [--registry REGISTRY] pkg_dir"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "registry",
+      "nested": {
+        "index": [
+          "--check",
+          "--help",
+          "--json",
+          "--write",
+          "-h"
+        ]
+      },
+      "one_line": "契约注册表内容寻址（T8.2）：每包 canonical manifest 的 SHA-256（CID）+ 顶层 root；只读扫描、不改各包；本版不含签名（sig 留空，只做内容寻址与篡改检测）",
+      "related_docs": [
+        "docs/verification-cards.md"
+      ],
+      "usage": "usage: nf registry [-h] {index} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--registry",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": true,
+      "name": "related",
+      "nested": {},
+      "one_line": "See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）",
+      "related_docs": [
+        "docs/41_波C_W2_C3_C4_实测记录.md"
+      ],
+      "usage": "usage: nf related [-h] [--registry REGISTRY] [--json] target"
+    },
+    {
+      "flags": [
+        "--apply",
+        "--by",
+        "--fast",
+        "--freeze",
+        "--help",
+        "--json",
+        "--note",
+        "--plan",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "release",
+      "nested": {},
+      "one_line": "发布前体检与编排：默认=体检（verify + 基线自描述 + e2e + 覆盖率 + 报告新鲜度）；--plan=发布计划（只读）；--freeze [--apply]=冻结链（conformance → approve → recei…",
+      "related_docs": [
+        "docs/45_质量纵深收口总档.md",
+        "docs/en/release.md",
+        "docs/ja/release.md",
+        "docs/meta/VERSION-MATRIX.md"
+      ],
+      "usage": "usage: nf release [-h] [--fast] [--plan] [--json] [--freeze] [--apply] [--by NAME] [--note TEXT]"
+    },
+    {
+      "flags": [
+        "--apply",
+        "--check",
+        "--help",
+        "--registry",
+        "-h"
+      ],
+      "group": "shelf",
+      "has_json": false,
+      "name": "rename",
+      "nested": {},
+      "one_line": "模块改名引用重链（A5：references 中引用该模块的条目批量更新）",
+      "related_docs": [],
+      "usage": "usage: nf rename [-h] [--check] [--apply] [--registry REGISTRY] old_id new_id"
+    },
+    {
+      "flags": [
+        "--dest",
+        "--fmt",
+        "--help",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "render",
+      "nested": {},
+      "one_line": "协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）",
+      "related_docs": [],
+      "usage": "usage: nf render [-h] [--fmt {agents,claude,skill}] [--dest DEST] pkg_dir"
+    },
+    {
+      "flags": [
+        "--adapter",
+        "--batch",
+        "--endpoint",
+        "--help",
+        "--json",
+        "--limit",
+        "--scope",
+        "--timeout",
+        "--write",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "review",
+      "nested": {},
+      "one_line": "逐行审查：机械预筛候选行 → 决策模型逐行判（是否缺口/严重度）→ 确定性证据复核 → 只把**有证据**的放进修复清单",
+      "related_docs": [],
+      "usage": "usage: nf review [-h] [--adapter ADAPTER] [--endpoint ENDPOINT] [--scope SCOPE] [--limit LIMIT] [--batch BATCH] [--timeout TIMEOUT] [--write WRITE] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": true,
+      "name": "rfc",
+      "nested": {},
+      "one_line": "协议件 RFC 索引（机制借鉴 HMP：把协议版本史做成可机读头）",
+      "related_docs": [],
+      "usage": "usage: nf rfc [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--dest",
+        "--doc-semantics",
+        "--fmt",
+        "--force-export",
+        "--help",
+        "--modules",
+        "--no-include-refs",
+        "--pipeline",
+        "--seed",
+        "--store",
+        "--variant-add",
+        "--variant-remove",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "run",
+      "nested": {},
+      "one_line": "跑全链管道：模块选择→装配→质检→导出",
+      "related_docs": [
+        "docs/en/mcp.md",
+        "docs/en/terminal.md",
+        "docs/ja/mcp.md",
+        "docs/ja/terminal.md"
+      ],
+      "usage": "usage: nf run [-h] --pipeline PIPELINE --modules MODULES [--store STORE] [--seed] [--fmt {md,ccv3,skill,agents,claude,mcp,mvu}] [--doc-semantics {project_rules,skill}] [--dest DEST] [--variant-add VARIANT_ADD] [--variant-remove VARIANT_REMOVE] [--no-include-refs] [--force-export]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": false,
+      "name": "runtime",
+      "nested": {
+        "run": [
+          "--help",
+          "--json",
+          "--plan",
+          "--record",
+          "--replay",
+          "--state",
+          "--trace",
+          "-h"
+        ]
+      },
+      "one_line": "参考运行时（T7.3）：载入装配计划与状态，按管线层序执行并产 trace；MockModel 按 contract_digest+step 确定性派生响应（无随机/无网络）；record/replay 复现同一 trace 与产物 di…",
+      "related_docs": [],
+      "usage": "usage: nf runtime [-h] {run} ..."
+    },
+    {
+      "flags": [
+        "--baseline",
+        "--exceptions",
+        "--help",
+        "--json",
+        "--tolerance",
+        "--write-baseline",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "score",
+      "nested": {},
+      "one_line": "基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归判据）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf score [-h] [--baseline BASELINE] [--write-baseline] [--tolerance TOLERANCE] [--exceptions EXCEPTIONS] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "security",
+      "nested": {
+        "scan": [
+          "--help",
+          "--json",
+          "--root",
+          "-h"
+        ]
+      },
+      "one_line": "内容供应链安全扫描：把 community/ 与 library/ 的正文当**外来内容**做只读形态扫描（不联网、不执行、不改写）——指令注入标记（单源 core.trust_boundary）、可执行/主动内容、明文凭据（只回掩码）、…",
+      "related_docs": [
+        "docs/security/threat-model.md",
+        "docs/verification-cards.md"
+      ],
+      "usage": "usage: nf security [-h] {scan} ..."
+    },
+    {
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": false,
+      "name": "serve",
+      "nested": {},
+      "one_line": "MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起）",
+      "related_docs": [
+        "docs/41_波C_C8_transport评估.md",
+        "docs/44_M2_AI通道内容规范.md",
+        "docs/agent/AGENT_START.md",
+        "docs/agent/agent_组装指令包_v0.2.md"
+      ],
+      "usage": "usage: nf serve [-h] [snapshot]"
+    },
+    {
+      "flags": [
+        "--answer",
+        "--baseline",
+        "--color",
+        "--commands",
+        "--complete",
+        "--deep",
+        "--exec",
+        "--file",
+        "--form",
+        "--help",
+        "--history",
+        "--json",
+        "--limit",
+        "--map",
+        "--no-banner",
+        "--no-history",
+        "--pager",
+        "--search",
+        "--session",
+        "--surface",
+        "--surface-write",
+        "--verify",
+        "--width",
+        "--yes",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": true,
+      "name": "shell",
+      "nested": {},
+      "one_line": "NF 终端（端壳退役后的人机交互入口）：把既有 CLI 命令面按能力菜单组织成可交互会话（数字 0-7 看菜单 / 任意 nf 命令直通 / /help /quit）。纯 stdlib、确定性；写入类命令须显式确认（--yes 或交互输入…",
+      "related_docs": [
+        "docs/en/layers.md",
+        "docs/en/terminal.md",
+        "docs/ja/layers.md",
+        "docs/ja/terminal.md"
+      ],
+      "usage": "usage: nf shell [-h] [--exec \"命令1; 命令2\"] [--no-banner] [--yes] [--json] [--file SCRIPT] [--commands [过滤词]] [--search 词] [--map [族或片段]] [--verify] [--deep] [--baseline] [--complete 前缀] [--history 文件] [--no-history] [--color {auto,always,never}] [--width 列宽] [--limit 条数] [--session 文件] [--form [表单id]] [--answer k=v] [--pager {auto,never}] [--surface] [--surface-write [路径]]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--verify",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "sig",
+      "nested": {},
+      "one_line": "协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）",
+      "related_docs": [
+        "docs/41_波C_C1_C2_实测记录.md",
+        "docs/41_波C_W3_实测记录.md",
+        "docs/42_M5_Release-checklist.md",
+        "docs/attest.md"
+      ],
+      "usage": "usage: nf sig [-h] [--json] [--verify] [target ...]"
+    },
+    {
+      "flags": [
+        "--core",
+        "--help",
+        "--json",
+        "--max-states",
+        "--registry",
+        "-h"
+      ],
+      "group": "forge",
+      "has_json": true,
+      "name": "spec",
+      "nested": {},
+      "one_line": "Spec Registry 查询（v2.5.0 Wave3：版本化 spec 查询）；T7.1 契约语义核心：`nf spec check --core [--json]`（五概念模型 + W1/W2/W3）与 `nf spec cano…",
+      "related_docs": [
+        "docs/verification-cards.md"
+      ],
+      "usage": "usage: nf spec [-h] [--core] [--json] [--max-states N] [--registry REGISTRY] [{ls,check,canonical,modelcheck}]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--out",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "st-validate",
+      "nested": {},
+      "one_line": "ST 制卡校验器原型 v0（任务书 A-S3：R1 结构 / R3 世界书 / R4 变量）",
+      "related_docs": [
+        "docs/examples/st-validate/README.md",
+        "docs/reference/trace-as-state-ab-proposal.md"
+      ],
+      "usage": "usage: nf st-validate [-h] [--out OUT] [--json] path"
+    },
+    {
+      "flags": [
+        "--ab",
+        "--check",
+        "--help",
+        "--json",
+        "--mode",
+        "--out",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "state-front",
+      "nested": {},
+      "one_line": "条件先行排布（灵感来源 arXiv:2609.02702 的 condition-first；NF 只做排布纪律）",
+      "related_docs": [
+        "docs/reference/trace-as-state-ab-proposal.md"
+      ],
+      "usage": "usage: nf state-front [-h] [--mode {front,back,none}] [--out OUT] [--check] [--ab] [--json] path"
+    },
+    {
+      "flags": [
+        "--check",
+        "--help",
+        "--json",
+        "--write",
+        "-h"
+      ],
+      "group": "start",
+      "has_json": true,
+      "name": "stats",
+      "nested": {},
+      "one_line": "出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁止手改",
+      "related_docs": [
+        "docs/42_M1_协议可执行性自测规范.md",
+        "docs/42_M5_Release-checklist.md",
+        "docs/en/terminal.md",
+        "docs/fde-sample/evidence/deliverable.md"
+      ],
+      "usage": "usage: nf stats [-h] [--write] [--check] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--otlp",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": false,
+      "name": "telemetry",
+      "nested": {},
+      "one_line": "遥测 semconv 映射（内部差距：trace 为自定 JSON，对外界不可消费）",
+      "related_docs": [
+        "docs/45_执行遥测规范.md"
+      ],
+      "usage": "usage: nf telemetry [-h] [--otlp] trace"
+    },
+    {
+      "flags": [
+        "--answer",
+        "--baseline",
+        "--color",
+        "--commands",
+        "--complete",
+        "--deep",
+        "--exec",
+        "--file",
+        "--form",
+        "--help",
+        "--history",
+        "--json",
+        "--limit",
+        "--map",
+        "--no-banner",
+        "--no-history",
+        "--pager",
+        "--search",
+        "--session",
+        "--surface",
+        "--surface-write",
+        "--verify",
+        "--width",
+        "--yes",
+        "-h"
+      ],
+      "group": "meta",
+      "has_json": true,
+      "name": "terminal",
+      "nested": {},
+      "one_line": "NF 终端（端壳退役后的人机交互入口）：把既有 CLI 命令面按能力菜单组织成可交互会话（数字 0-7 看菜单 / 任意 nf 命令直通 / /help /quit）。纯 stdlib、确定性；写入类命令须显式确认（--yes 或交互输入…",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf shell [-h] [--exec \"命令1; 命令2\"] [--no-banner] [--yes] [--json] [--file SCRIPT] [--commands [过滤词]] [--search 词] [--map [族或片段]] [--verify] [--deep] [--baseline] [--complete 前缀] [--history 文件] [--no-history] [--color {auto,always,never}] [--width 列宽] [--limit 条数] [--session 文件] [--form [表单id]] [--answer k=v] [--pager {auto,never}] [--surface] [--surface-write [路径]]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "toolface",
+      "nested": {},
+      "one_line": "模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf toolface [-h] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--write",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "transparency",
+      "nested": {},
+      "one_line": "透明日志：由 protocol/RECEIPTS.json 确定性派生哈希链（RFC 6962 风格域分隔），并校验在盘生成物",
+      "related_docs": [
+        "docs/receipts.md"
+      ],
+      "usage": "usage: nf transparency [-h] [--write] [--json]"
+    },
+    {
+      "flags": [
+        "--cached",
+        "--help",
+        "--jobs",
+        "--json",
+        "--memo",
+        "--only",
+        "--trust-repo",
+        "-h"
+      ],
+      "group": "verify",
+      "has_json": true,
+      "name": "verify",
+      "nested": {},
+      "one_line": "门禁单进程引擎：把 verify.sh 的 check 收进**一个进程**跑，省掉每条一次的解释器启动（实测全量门禁起 42 次 $PY3）。判据**一字不改**——已迁入的 check 与 verify.sh 的输出逐字一致（由 te…",
+      "related_docs": [
+        "docs/security/threat-model.md"
+      ],
+      "usage": "usage: nf verify [-h] [--only ONLY] [--json] [--memo] [--cached] [--jobs JOBS] [--trust-repo]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--registry",
+        "-h"
+      ],
+      "group": "library",
+      "has_json": false,
+      "name": "who-refers",
+      "nested": {},
+      "one_line": "引用反查（A2：谁引用了某模块，遍历 registry references）",
+      "related_docs": [],
+      "usage": "usage: nf who-refers [-h] [--registry REGISTRY] module_id"
+    },
+    {
+      "flags": [
+        "--adapter",
+        "--close",
+        "--endpoint",
+        "--gate",
+        "--help",
+        "--json",
+        "--list",
+        "--note",
+        "--outcome",
+        "--source",
+        "--timeout",
+        "--top",
+        "--write",
+        "-h"
+      ],
+      "group": "govern",
+      "has_json": true,
+      "name": "workloop",
+      "nested": {},
+      "one_line": "构建回路：从公开待办真源（type_backlog / pipeline_advisory）组类型化问题问决策层，产出**工单**（含完成判据与验收命令）；决策模型只选择不落笔，工单只落内部档案",
+      "related_docs": [],
+      "usage": "usage: nf workloop [-h] [--adapter ADAPTER] [--top TOP] [--source SOURCE] [--endpoint ENDPOINT] [--timeout TIMEOUT] [--list] [--write] [--close CLOSE] [--outcome OUTCOME] [--gate GATE] [--note NOTE] [--json]"
+    },
+    {
+      "flags": [
+        "--help",
+        "--json",
+        "--run",
+        "--state",
+        "--walk",
+        "-h"
+      ],
+      "group": "integrate",
+      "has_json": true,
+      "name": "worldmodel",
+      "nested": {},
+      "one_line": "world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）",
+      "related_docs": [
+        "docs/en/terminal.md",
+        "docs/ja/terminal.md",
+        "docs/meta/DEEP_DIVE.md",
+        "docs/terminal.md"
+      ],
+      "usage": "usage: nf worldmodel [-h] [--json] [--walk] [--run] [--state STATE.json]"
+    }
+  ],
+  "coverage": {
+    "commands": 77,
+    "covered": 77,
+    "duplicates": {},
+    "empty_families": [],
+    "families": 8,
+    "stray": [],
+    "uncurated": []
+  },
+  "digest": "sha256:165656c91943e7eb4aa75b76862c41ea05aaaf0adea6472311d74a84aa824f12",
+  "families": [
+    {
+      "commands": [
+        "agent",
+        "assemble",
+        "import",
+        "preset",
+        "register",
+        "render",
+        "run",
+        "runtime",
+        "spec"
+      ],
+      "id": "forge",
+      "name": "装配与生产",
+      "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读写、入库登记、参考运行时（确定性 harness + record/replay）、多 agent 角色链契约"
+    },
+    {
+      "commands": [
+        "approve",
+        "attest",
+        "audit",
+        "decide",
+        "decisions",
+        "design",
+        "handover",
+        "locales",
+        "model",
+        "postmortem",
+        "receipts",
+        "review",
+        "transparency",
+        "workloop"
+      ],
+      "id": "govern",
+      "name": "治理与决策",
+      "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明日志、设计审计、语言面（本地化与责任方）"
+    },
+    {
+      "commands": [
+        "bench",
+        "driver",
+        "endpoint",
+        "events",
+        "interop",
+        "lsp",
+        "serve",
+        "state-front",
+        "toolface",
+        "worldmodel"
+      ],
+      "id": "integrate",
+      "name": "服务与集成",
+      "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置、世界模型、模块工具面"
+    },
+    {
+      "commands": [
+        "cognition",
+        "impact",
+        "knowledge",
+        "library",
+        "patterns",
+        "related",
+        "rfc",
+        "who-refers"
+      ],
+      "id": "library",
+      "name": "图书馆与知识",
+      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面"
+    },
+    {
+      "commands": [
+        "cli",
+        "completion",
+        "daemon",
+        "help",
+        "shell",
+        "terminal"
+      ],
+      "id": "meta",
+      "name": "命令面与终端",
+      "summary": "帮助、补全脚本、命令地图（IA：命令→族→用途→机器面）、终端自身（本命令即在此族）"
+    },
+    {
+      "commands": [
+        "asset",
+        "combine",
+        "domain",
+        "market",
+        "module",
+        "output",
+        "pipeline",
+        "rename"
+      ],
+      "id": "shelf",
+      "name": "资产与货架",
+      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态"
+    },
+    {
+      "commands": [
+        "demo",
+        "doctor",
+        "facts",
+        "layers",
+        "stats"
+      ],
+      "id": "start",
+      "name": "上手与自检",
+      "summary": "第一次进 NF：体检、一键交付物演示、自述数字、事实真源、抽象阶梯"
+    },
+    {
+      "commands": [
+        "assertions",
+        "changelog",
+        "conformance",
+        "diff",
+        "explain",
+        "ir",
+        "license",
+        "lint",
+        "nfal",
+        "registry",
+        "release",
+        "score",
+        "security",
+        "sig",
+        "st-validate",
+        "telemetry",
+        "verify"
+      ],
+      "id": "verify",
+      "name": "质检与验证",
+      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译、契约注册表内容寻址（CID）"
+    }
+  ],
+  "kind": "cli-map",
+  "root_flags": [
+    "--engine",
+    "--help",
+    "--version",
+    "-h"
+  ],
+  "schema": "nf-cli-map/1",
+  "source": {
+    "commands": "argparse:scripts/nf.py::_build_parser",
+    "docs": "docs/**/*.md",
+    "families": "desktop/src/core/terminal.py::FAMILIES"
+  }
+}

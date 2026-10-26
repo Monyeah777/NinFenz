@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:bec14d3a00d7297c7db53bed6eac60cee3893b5a038db8df85deddee9e5e911b'
+DIGEST = 'sha256:46893692a581043991a920d318072c76af294e22f05291f2e67c708684fa2de1'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -28,6 +28,7 @@ COMMANDS = ['agent',
  'audit',
  'bench',
  'changelog',
+ 'cli',
  'cognition',
  'combine',
  'completion',
@@ -555,8 +556,8 @@ FAMILIES = [{'id': 'start',
                'toolface']},
  {'id': 'meta',
   'name': '命令面与终端',
-  'summary': '帮助、补全脚本、终端自身（本命令即在此族）',
-  'commands': ['help', 'completion', 'shell', 'terminal', 'daemon']}]
+  'summary': '帮助、补全脚本、命令地图（IA：命令→族→用途→机器面）、终端自身（本命令即在此族）',
+  'commands': ['help', 'completion', 'shell', 'terminal', 'daemon', 'cli']}]
 
 FORMS = [{'id': 'deprecate-module',
   'title': '弃用模块',
