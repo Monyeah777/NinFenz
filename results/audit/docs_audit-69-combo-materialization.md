@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
+  - scripts/nf.py:b83b3042597b81fcc9da47f589ffeee4d24b3bae05acdbc7156ba7d51047737b
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

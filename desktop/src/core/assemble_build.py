@@ -89,15 +89,17 @@ def _assets_of(root: Path, package: str) -> List[str]:
 def _section0(req: str, plan: Dict[str, Any], n_mod: int) -> List[str]:
     kind = ("命中预设 %s（管线 %s）" % (plan.get("package"), plan.get("pipeline"))
             if plan.get("matched") else
-            "未命中官方预设 → 自定义题材（允许集 = 官方核心 + 全部已登记社区模块）")
+            "未命中官方预设 → 自定义题材（scoped：允许集 = 官方核心 13；--loose 恢复全库）")
+    scope = ("--loose 全库" if plan.get("loose") else
+             "官方核心 13 + 命中管线 default/allowed + 组合包 references")
     lines = ["## 0. 装配记录", ""]
     lines.append("- **需求原话**：「%s」" % req.strip())
     lines.append("- **选件决策**：%s" % kind)
     if not plan.get("matched"):
         lines.append("- **自定义取件口径**：未指定预设包 → 本档按**官方核心**装配；"
-                     "从允许集中另选题材件后重跑 `nf assemble \"…\" --build`。")
-    lines.append("- **取件模块**：%d 件；**装配允许集**：%d 件"
-                 % (n_mod, len(plan.get("allowed_module_ids") or [])))
+                     "题材件须先登记，再用 `--loose` 验收（scoped 默认不放行域外编号）。")
+    lines.append("- **取件模块**：%d 件；**装配允许集**：%d 件（%s）"
+                 % (n_mod, len(plan.get("allowed_module_ids") or []), scope))
     lines.append("- **来源清单（本次组装实际读取）**：")
     lines.append("  - 骨架真源：`docs/agent/agent_组装指令包_v0.2.md`（##0–##7 八段）")
     lines.append("  - 注册表：`desktop/src/core/registry.json`（模块 %d 件）"

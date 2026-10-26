@@ -7,11 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:fe4a74f1b9b6c26caa0ca9ecbddba7a07b8cf68ee20135969492aebe8a9a8d37
-  - desktop/src/core/assemble_plan.py:87ead8599f78f321d0c29b04e78554e58be6b24319d21042342ff6dc42544e16
+  - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:1acd89a938b64bab4fd18242362874fc1c590474af0aa0c24ddd471b7811c939
+  - protocol/code_metrics_baseline.json:dd5ef9d2f3f71975e169ec6e7ba763c7753a089a7e188fc1e248b84318071e27
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-26）：Merge t-measure: gate defect bench (new scripts/results/tests)
 
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering

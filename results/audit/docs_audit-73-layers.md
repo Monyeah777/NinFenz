@@ -11,7 +11,7 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
-  - scripts/nf.py:4f73b68429c4665cf67881b75e2cf7338423d7d21310dd93b73629d9f4d4670c
+  - scripts/nf.py:b83b3042597b81fcc9da47f589ffeee4d24b3bae05acdbc7156ba7d51047737b
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
 
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest

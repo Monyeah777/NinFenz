@@ -371,8 +371,8 @@
         "baseline": 318,
         "files": 318,
         "max_fn_cc": 117,
-        "max_fn_lines": 1276,
-        "max_lines": 7746
+        "max_fn_lines": 1279,
+        "max_lines": 7759
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4077,
-        "kernel": 2205,
+        "files": 4078,
+        "kernel": 2206,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "dd926cb6017e38b80cbaab17ac3be5274f42112ffd05bd651522826f681aafb5",
+  "root_digest": "4f938c6c0a42ec87ca2972a00920bb92b439a5d3a30f1bf243c5ea90402a6f03",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

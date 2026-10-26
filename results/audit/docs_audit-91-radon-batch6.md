@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:1acd89a938b64bab4fd18242362874fc1c590474af0aa0c24ddd471b7811c939
+  - protocol/code_metrics_baseline.json:dd5ef9d2f3f71975e169ec6e7ba763c7753a089a7e188fc1e248b84318071e27
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-26）：Merge t-measure: gate defect bench (new scripts/results/tests)
 
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering

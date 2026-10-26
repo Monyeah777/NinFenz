@@ -88,6 +88,7 @@ NF 是**交付物契约层**（Deliverable Contract Layer）——把「AI 稳�
 2. `python scripts/nf.py demo`（技术文档全链 → 可交付 Markdown）
 3. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out`
 4. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check out/完整版_技术文档域包.md`
+   （允许集默认 **scoped** = 官方核心 13 + 命中管线 default/allowed + 组合包 references；跨域/自定义题材件用 `--loose` 恢复全库口径）
 5. `python scripts/nf.py shell`（交互终端；或 `bash verify.sh` 跑全量门禁，约 10 分钟）
 6. `python scripts/nf.py --help`（全命令面）
 

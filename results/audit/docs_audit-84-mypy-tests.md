@@ -32,8 +32,10 @@ subjects:
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
+  - desktop/tests/test_nf_cli.py:3008b3771c49209f9497190841e1088d5782d1bcd72f50705f0d892775a8431e
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-25）：发布边界收口：真实决策/交接/复盘迁私有 Plan 仓，公开仓仅留模板与投影
 
 > 重审（2026-10-25）：安全收口：仓库信任根收紧、IPC/MCP/插件/投稿读取资源上限与路径包含性加固重审

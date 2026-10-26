@@ -41,14 +41,14 @@
       "max_fn_lines": 22
     },
     "desktop/src/core/assemble_build.py": {
-      "lines": 338,
+      "lines": 340,
       "max_fn_cc": 22,
       "max_fn_lines": 42
     },
     "desktop/src/core/assemble_plan.py": {
-      "lines": 348,
-      "max_fn_cc": 18,
-      "max_fn_lines": 51
+      "lines": 424,
+      "max_fn_cc": 21,
+      "max_fn_lines": 65
     },
     "desktop/src/core/assertions.py": {
       "lines": 299,
@@ -1236,9 +1236,9 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/trace_drill.py": {
-      "lines": 122,
+      "lines": 124,
       "max_fn_cc": 19,
-      "max_fn_lines": 59
+      "max_fn_lines": 61
     },
     "desktop/src/core/transparency_log.py": {
       "lines": 128,
@@ -1456,9 +1456,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7746,
+      "lines": 7759,
       "max_fn_cc": 117,
-      "max_fn_lines": 1276
+      "max_fn_lines": 1279
     },
     "scripts/nf_client.py": {
       "lines": 187,

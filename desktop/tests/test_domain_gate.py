@@ -159,8 +159,10 @@ class DomainGateTest(unittest.TestCase):
         self.assertIn("产物未声明域", stats["domain"]["reason"])
 
     def test_explicit_expected_pipeline_overrides_plan(self):
-        issues, _ = ap.check(self.sample, self.campus, expected_pipeline="P03")
-        self.assertEqual([], issues, "显式 --domain P03 时同域，不应判跨域")
+        # T5.2 起允许集由 plan 决定（scoped）；expected_pipeline 只覆盖「需求域 vs 声明域」比较，
+        # 不重算允许集——故同域判定用同域 plan，跨域判定用异域 plan（或 --loose）。
+        issues, _ = ap.check(self.sample, self.fantasy, expected_pipeline="P03")
+        self.assertEqual([], issues, "显式声明 P03 且 plan 域一致时不应判跨域")
         issues, stats = ap.check(self.sample, self.fantasy, expected_pipeline="P02")
         self.assertTrue(any("跨域装配" in i for i in issues))
         self.assertEqual("P02", stats["domain"]["expected"]["pipeline"])

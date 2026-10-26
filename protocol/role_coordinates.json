@@ -6,7 +6,7 @@
     "prod": 1063,
     "projection": 131,
     "support": 267,
-    "verify": 1137
+    "verify": 1138
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7421,6 +7421,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "T5.2 · assemble 允许集域作用域（scoped 默认 + `--loose` 逃生阀）单测。",
+      "path": "desktop/tests/test_assemble_scope.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "断言表（数据化断言）正式与否定用例。",
       "path": "desktop/tests/test_assertions.py",
       "role": "verify",
@@ -13242,7 +13248,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "149f57f5f58db535e8470a82f895fcb044e2c685d455ad5a0a6867a5abf91920",
+  "root_digest": "05853b14860aa0f0239e0df334844dfaefeb16b0098fbfb3f98ff4671f13d781",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 122,
@@ -13251,7 +13257,7 @@
     "R-prod": 962,
     "R-projection": 116,
     "R-support": 119,
-    "R-verify": 1018,
+    "R-verify": 1019,
     "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"

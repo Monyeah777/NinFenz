@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:1acd89a938b64bab4fd18242362874fc1c590474af0aa0c24ddd471b7811c939
+  - protocol/code_metrics_baseline.json:dd5ef9d2f3f71975e169ec6e7ba763c7753a089a7e188fc1e248b84318071e27
 ---
+> 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
+
 > 重审（2026-10-26）：Merge t-measure: gate defect bench (new scripts/results/tests)
 
 > 重审（2026-10-26）：Merge t-identity: deliverable-contract first screen + demo/presets/library ordering
