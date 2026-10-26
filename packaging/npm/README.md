@@ -1,7 +1,7 @@
 # ninfenz · npm 一键包
 
 **NinFenz（NF）是内容契约层（content contract layer）**：把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关；叙事只是官方第一个域包。
-**不是**模型、**不是**提示词模板集、**不是**某厂商 SDK。MIT。
+**不是**模型、**不是**提示词模板集、**不是**某厂商 SDK。代码 AGPL-3.0-only 或商业许可；协议文本 CC BY 4.0；社区投稿 LicenseRef-Community-Submission（≤ v1.0.5 为 MIT）。
 
 本包是 NF 的**一键入口**：零安装脚本、零网络请求、零遥测；首次运行把随包 payload 解到缓存目录（带 sha256 清单校验），然后原样把参数转发给 NF CLI。
 
@@ -89,7 +89,7 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 - 国内镜像：https://gitee.com/monyeah777/ninfenz
 - 机器入口 `llms.txt`：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt
 - MCP 接入：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/mcp.md
-- 许可：MIT（见包内 `LICENSE`）
+- 许可：代码 AGPL-3.0-only 或商业许可；协议文本 CC BY 4.0；社区投稿 LicenseRef-Community-Submission（包内 `LICENSE` = AGPL-3.0-only 全文）
 
 ## 维护者：发布流程
 

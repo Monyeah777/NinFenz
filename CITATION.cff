@@ -1,5 +1,5 @@
 # GitHub「Cite this repository」与生成式引擎的机读引用元数据。
-# 纪律：本件不钉版本号（版本真源在 README 版本块 / VERSION-MATRIX），也不进协议回执面（固定清单）。
+# 纪律：本件不钉版本号（版本/许可真源 = protocol/facts.json，由 scripts/nf_facts.py --write 生成），也不进协议回执面（固定清单）。
 cff-version: 1.2.0
 message: "If you use NinFenz (NF) in your work, please cite it as below."
 title: "NinFenz (NF) — 内容契约层 / content contract layer"
@@ -8,7 +8,7 @@ abstract: >-
   使长内容生产可装载、可质检、可复现。协议本体域中立、模型无关；叙事只是官方第一个域包。
   仓库内含核心协议件（01–07）、核心库与 CLI、管线 / 模块 / 资产库、社区域包与云图书馆。
 type: software
-license: MIT
+license: AGPL-3.0-only OR LicenseRef-Commercial
 authors:
   - name: "Monyeah777"
     alias: "NinFenz"

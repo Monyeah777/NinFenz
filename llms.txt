@@ -85,10 +85,10 @@
 
 ## 引用与署名（How to cite）
 
-- [LICENSE](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/LICENSE)：MIT License · 原创开源 · 衍生/引用请注明来源
+- [LICENSE](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/LICENSE)：代码 AGPL-3.0-only 或商业许可；协议文本 CC BY 4.0；社区投稿 LicenseRef-Community-Submission · 原创开源 · 衍生/引用请注明来源
 - [CITATION.cff](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/CITATION.cff)：GitHub「Cite this repository」的机读元数据（标题 / 作者 / 关键词 / 许可 / 仓库地址）
 - [README.md](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/README.md)：人读入口（含「NF 是什么 / 不是什么」与 FAQ）
-- 建议引用形态：`NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz`
+- 建议引用形态：`NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz`
 
 ## Optional
 

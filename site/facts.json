@@ -24,8 +24,9 @@
       "client downloads",
       "group joins"
     ],
-    "license_allows": "MIT: redistribution and commercial use are allowed",
-    "license_requires": "keep LICENSE and attribution"
+    "license_allows": "code: AGPL-3.0-only or commercial license; protocol text: CC-BY-4.0 (attribution); community: LicenseRef-Community-Submission",
+    "license_requires": "keep LICENSE and attribution",
+    "historical_mit_through": "1.0.5"
   },
   "subject": {
     "canonical_name": "NinFenz",
@@ -47,7 +48,7 @@
       "content contract layer",
       "内容契约层"
     ],
-    "license": "MIT",
+    "license": "AGPL-3.0-only OR LicenseRef-Commercial",
     "homepage": "https://ninfenz.dev/",
     "repository": "https://github.com/Monyeah777/NinFenz",
     "mirror": "https://gitee.com/monyeah777/ninfenz",
@@ -129,9 +130,9 @@
     "mcp_registry": "https://registry.modelcontextprotocol.io/v0/servers?search=NinFenz"
   },
   "citation": {
-    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz",
-    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-42 · PASS=76}}",
+    "plain": "NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz",
+    "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. code AGPL-3.0-only or commercial; protocol text CC BY 4.0. https://ninfenz.dev/",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}, note = {verify v2.30 · check1-42 · PASS=76}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {

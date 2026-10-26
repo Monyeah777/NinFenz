@@ -131,6 +131,14 @@ def _make_parser() -> argparse.ArgumentParser:
     st.add_argument("--check", action="store_true", help="只校验（生成区 == 实算）")
     st.add_argument("--json", action="store_true", help="打印机读结果")
 
+    fx = sub.add_parser("facts",
+                        help="事实真源：生成/校验 protocol/facts.json（版本/许可/质量/规模/npm）",
+                        description="SSOT：唯一机读事实产物 protocol/facts.json；--check 做逐字节比对"
+                                    " + 跨源不变量 + 字面量禁区断言（历史 MIT 句单独放行）")
+    fx.add_argument("--write", action="store_true", help="重写 facts.json 与受管事实面")
+    fx.add_argument("--check", action="store_true", help="只校验（默认）")
+    fx.add_argument("--json", action="store_true", help="打印机读结果")
+
     run = sub.add_parser("run",
  help="跑全链管道：模块选择→装配→质检→导出",
  description="跑全链管道：模块选择→装配→质检→导出")
@@ -7266,6 +7274,19 @@ def _cmd_stats(args) -> int:
     return 1 if issues else 0
 
 
+def _cmd_facts(args) -> int:
+    """事实真源（SSOT）：protocol/facts.json 的生成/校验（实现在 scripts/nf_facts.py）。"""
+    import importlib.util
+    path = os.path.join(ROOT, "scripts", "nf_facts.py")
+    spec = importlib.util.spec_from_file_location("nf_facts", path)
+    if spec is None or spec.loader is None:
+        print("  ✗ 读不到 scripts/nf_facts.py（事实真源模块缺失）", file=sys.stderr)
+        return 2
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.run(write_mode=bool(args.write), json_out=bool(args.json), root=ROOT)
+
+
 def _cmd_nfal(args) -> int:
     """nf nfal：透传到 core.nfal_cli（guard 表达式的解析/检查/编译/求值）。"""
     from core import nfal_cli
@@ -7397,6 +7418,8 @@ def main(argv=None) -> int:
         return _cmd_help(args)
     if args.cmd == "stats":
         return _cmd_stats(args)
+    if args.cmd == "facts":
+        return _cmd_facts(args)
     if args.cmd == "doctor":
         return _cmd_doctor(args)
     if args.cmd == "completion":

@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:5ee2ad1c277f809c6ea07dfa46bf853410f08cd8f25758437a36a7edc1bca139'
+DIGEST = 'sha256:377b633f12bf77f570afdf41ee0718e28d869d6980fc7fd8e8a8d435a0e5f7c8'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -43,6 +43,7 @@ COMMANDS = ['approve',
  'endpoint',
  'events',
  'explain',
+ 'facts',
  'handover',
  'help',
  'impact',
@@ -457,8 +458,8 @@ ZONES = [{'key': '0',
 
 FAMILIES = [{'id': 'start',
   'name': '上手与自检',
-  'summary': '第一次进 NF：体检、一键演示、自述数字、抽象阶梯',
-  'commands': ['doctor', 'demo', 'stats', 'layers']},
+  'summary': '第一次进 NF：体检、一键演示、自述数字、事实真源、抽象阶梯',
+  'commands': ['doctor', 'demo', 'stats', 'facts', 'layers']},
  {'id': 'forge',
   'name': '装配与生产',
   'summary': '从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读写、入库登记',

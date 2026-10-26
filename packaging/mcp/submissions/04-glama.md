@@ -15,7 +15,7 @@
 **安装 / Install**：`npx -y ninfenz serve`
 **类目 / Category**：content-creation（备选 developer-tools / knowledge-management）
 **标签 / Tags**：mcp, content-contract, spec-driven, verification, knowledge-base, python, llm
-**许可 / License**：MIT
+**许可 / License**：AGPL-3.0-only 或商业（协议文本 CC BY 4.0）
 **图标 / Icon**：packaging/mcp/assets/icon-400.png（400×400 PNG）
 
 ## 仓库侧已备（2026-10-18）
