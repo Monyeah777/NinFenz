@@ -221,7 +221,7 @@
         "id": "https://ninfenz.dev/builder/verify-sh"
       },
       "metadata": {
-        "invocationId": "b6147bf35d199e9f",
+        "invocationId": "3daa598f0bb3cb1b",
         "note": "本地门禁执行事实；**不构成 SLSA 等级声明**（无远程 builder）"
       }
     }
@@ -362,7 +362,7 @@
     },
     {
       "digest": {
-        "sha256": "93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100"
+        "sha256": "d8a0f8470f97fd0c3affb3427986e2744fef14803363c72d3b32069a06b9edd6"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -554,7 +554,7 @@
     },
     {
       "digest": {
-        "sha256": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f"
+        "sha256": "f4d5f2a8cdef40a7876b4dbcaad9b08d1b724bd91370c72b5f1a64a9e7c7702c"
       },
       "name": "protocol/schema/asset.schema.json"
     },
@@ -566,7 +566,7 @@
     },
     {
       "digest": {
-        "sha256": "5a68d3969a99adaf15bbf69f4d8319b394ba70515b83c55a95e9f303d2b30872"
+        "sha256": "c02aba28724ecb8375776ecfd2531ef288900ddbb94f5c408f94cf7ce5f57c1f"
       },
       "name": "protocol/schema/contract.schema.json"
     },
@@ -584,19 +584,19 @@
     },
     {
       "digest": {
-        "sha256": "912b9c2b02d84015fac80032d2e101c3425a8e2161e5a29e03d9b91d917bed2a"
+        "sha256": "e26332669454e4943248ed12a0f04335472829c7472401cf4f9a2dd53990b8e5"
       },
       "name": "protocol/schema/module.schema.json"
     },
     {
       "digest": {
-        "sha256": "104775cad9f18c31b55683eeb6adc7dd5b9e4a124baa9a1cca3c493343692834"
+        "sha256": "2a3c366da8dfe2602ae7bbfe2ce8238eb0d67125adda915d20835c545cdab4fa"
       },
       "name": "protocol/schema/pipeline.schema.json"
     },
     {
       "digest": {
-        "sha256": "94f38c06de72f3c633daa22f47f3ee85a39f859aaf83907e7a4331e9cd554035"
+        "sha256": "a96d0cc3219b28eaf85473a451e819344cee9cf8e4176030cb5b4ba074bb209e"
       },
       "name": "protocol/schema/protocol.schema.json"
     },

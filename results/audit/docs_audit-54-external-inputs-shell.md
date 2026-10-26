@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
-  - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
+  - skills/ninfenz/SKILL.md:23f4997399c181fa689cf2d87164be7ca02b1c7d249d03828f261f0e666facc8
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
+
 > 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径
 
 > 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价

@@ -46,9 +46,9 @@
       "max_fn_lines": 42
     },
     "desktop/src/core/assemble_plan.py": {
-      "lines": 241,
+      "lines": 336,
       "max_fn_cc": 18,
-      "max_fn_lines": 50
+      "max_fn_lines": 51
     },
     "desktop/src/core/assertions.py": {
       "lines": 299,
@@ -406,7 +406,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/gate_engine.py": {
-      "lines": 627,
+      "lines": 632,
       "max_fn_cc": 19,
       "max_fn_lines": 75
     },
@@ -609,6 +609,11 @@
       "lines": 215,
       "max_fn_cc": 16,
       "max_fn_lines": 45
+    },
+    "desktop/src/core/layer_closure.py": {
+      "lines": 128,
+      "max_fn_cc": 16,
+      "max_fn_lines": 57
     },
     "desktop/src/core/layer_model.py": {
       "lines": 639,
@@ -1385,6 +1390,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 59
     },
+    "scripts/gate_manifest.py": {
+      "lines": 450,
+      "max_fn_cc": 19,
+      "max_fn_lines": 54
+    },
     "scripts/gen_third_party_notices.py": {
       "lines": 161,
       "max_fn_cc": 11,
@@ -1421,14 +1431,19 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7678,
-      "max_fn_cc": 116,
-      "max_fn_lines": 1263
+      "lines": 7701,
+      "max_fn_cc": 117,
+      "max_fn_lines": 1271
     },
     "scripts/nf_client.py": {
       "lines": 187,
       "max_fn_cc": 11,
       "max_fn_lines": 42
+    },
+    "scripts/nf_facts.py": {
+      "lines": 677,
+      "max_fn_cc": 17,
+      "max_fn_lines": 202
     },
     "scripts/nf_verify.py": {
       "lines": 214,
