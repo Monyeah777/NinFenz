@@ -215,6 +215,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 12
     },
+    "desktop/src/core/content_ir.py": {
+      "lines": 750,
+      "max_fn_cc": 18,
+      "max_fn_lines": 54
+    },
     "desktop/src/core/contract_pin.py": {
       "lines": 33,
       "max_fn_cc": 9,
@@ -1471,9 +1476,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7788,
-      "max_fn_cc": 117,
-      "max_fn_lines": 1299
+      "lines": 7831,
+      "max_fn_cc": 118,
+      "max_fn_lines": 1314
     },
     "scripts/nf_client.py": {
       "lines": 187,

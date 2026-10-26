@@ -256,6 +256,8 @@ CANON = {
     # （`test_handover` / `test_postmortem` 的 RealRepo 用例一直断言 ≥1 件）。直接指真件真跑。
     "handover check": ["handover", "check", "handovers/HO-9000-示例-接力模板.md"],
     "postmortem check": ["postmortem", "check", "postmortems/PO-9000-示例-复盘模板.md"],
+    # T7.2 内容 IR：节点级检查面（只读；报告带 schema 面判别键）。
+    "ir check": ["ir", "check", "docs/terminal.md"],
     "diff": ["diff", "01_核心协议.md", "01_核心协议.md"],
     "domain build": ["domain", "build", "--spec", "A01"],
     "library search": ["library", "search", "验收"],
