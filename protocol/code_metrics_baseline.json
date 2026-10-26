@@ -980,6 +980,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 29
     },
+    "desktop/src/core/privacy_scan.py": {
+      "lines": 676,
+      "max_fn_cc": 20,
+      "max_fn_lines": 56
+    },
     "desktop/src/core/prose_lint.py": {
       "lines": 234,
       "max_fn_cc": 19,
@@ -1531,9 +1536,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8237,
-      "max_fn_cc": 122,
-      "max_fn_lines": 1409
+      "lines": 8297,
+      "max_fn_cc": 123,
+      "max_fn_lines": 1431
     },
     "scripts/nf_client.py": {
       "lines": 187,
