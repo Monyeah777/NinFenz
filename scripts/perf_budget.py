@@ -92,7 +92,7 @@ def main(argv=None) -> int:
         for e in doc["entries"]:
             r = ev.get(e["id"]) or {}
             print("  %-16s 预算 %7.0f ms · %s"
-                  % (e["id"], float(e.get("budget_ms") or 0), _rec_line(r)))
+                  % (e["id"], pb.budget_of(e), _rec_line(r)))
         return 0 if not issues else 1
 
     if args.record:

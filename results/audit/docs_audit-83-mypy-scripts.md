@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:2d765276c47c85beb5f7350c4f53f4b58f84074bc4cb17b35a2a6a7fa84809a7
+  - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:7156093310de1be529e60a5cceb733faa64a95844f85934ba0aa5e8e5f445f20
+  - protocol/code_metrics_baseline.json:4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23
 ---
+> 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
+
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
 
 > 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价

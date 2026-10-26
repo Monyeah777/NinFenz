@@ -18,6 +18,8 @@ import subprocess  # nosec B404 - 只跑 argv 列表（无 shell、无动态拼�
 from collections.abc import Callable, Sequence
 from typing import Any
 
+from . import _wake
+
 
 def run_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None = None,
                 timeout: float = 120.0) -> dict[str, Any]:
@@ -25,6 +27,7 @@ def run_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None = 
 
     timeout 是**执行边界**（防挂死），不是判据：超时与否由调用方按 code=None 自行处置。
     """
+    _wake("proc.run_capture")
     command = [str(part) for part in argv]
     try:
         proc = subprocess.run(  # nosec B603
@@ -44,6 +47,7 @@ def run_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None = 
 
 def kill_tree(pid: int) -> None:
     """回收指定进程及其子进程树（只作用于调用方给出的 PID）。"""
+    _wake("proc.kill_tree")
     try:
         if os.name == "nt":
             subprocess.run(  # nosec B603/B607 - taskkill 由 Windows 固定解析
@@ -59,6 +63,7 @@ def kill_tree(pid: int) -> None:
 def popen_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None = None,
                   timeout: float = 120.0, *, new_session: bool = False) -> dict[str, Any]:
     """启动并捕获一个进程；超时则回收整棵进程树，返回 `timed_out=True`。"""
+    _wake("proc.popen_capture")
     command = [str(part) for part in argv]
     kwargs = {"start_new_session": True} if new_session else {}
     try:
@@ -80,4 +85,5 @@ def popen_capture(argv: Sequence[str], cwd: Any | None = None, env: dict | None 
 
 def run_twice(thunk: Callable[[], Any]) -> tuple[Any, Any]:
     """跑同一 thunk 两遍 → (第一次结果, 第二次结果)；**不比较**。"""
+    _wake("proc.run_twice")
     return thunk(), thunk()

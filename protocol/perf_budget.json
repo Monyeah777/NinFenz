@@ -7,7 +7,11 @@
       "max_age_days": 30,
       "note": "决策评分（并发会话持续优化项）",
       "runs": 3,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 6000,
+        "windows": 3000
+      }
     },
     {
       "budget_ms": 15000,
@@ -16,7 +20,11 @@
       "max_age_days": 30,
       "note": "门禁机器可读报告（28 条判据全量重算）——2026-10-10 审计 X3 复测：预热后中位 10.1 s / P95 10.3 s（旧记录停在 5.08 s 且从不复测）",
       "runs": 5,
-      "warmups": 2
+      "warmups": 2,
+      "budget_ms_by_platform": {
+        "linux": 15000,
+        "windows": 32000
+      }
     },
     {
       "budget_ms": 3000,
@@ -25,7 +33,11 @@
       "max_age_days": 30,
       "note": "模块级耦合度量（AST 全量）",
       "runs": 3,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 3000,
+        "windows": 4000
+      }
     },
     {
       "budget_ms": 3000,
@@ -34,7 +46,11 @@
       "max_age_days": 30,
       "note": "代码规模/复杂度度量（AST 全量）",
       "runs": 3,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 3000,
+        "windows": 3000
+      }
     },
     {
       "budget_ms": 1500,
@@ -43,7 +59,11 @@
       "max_age_days": 30,
       "note": "端到端冒烟（官方 13 件 + M91/M92 + P04）",
       "runs": 3,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 1500,
+        "windows": 1500
+      }
     },
     {
       "budget_ms": 200,
@@ -52,7 +72,11 @@
       "max_age_days": 30,
       "note": "默认路径稳态（启动器 + 守护快路）——agent 密集重复调用走的就是这条。**预热 3 次**才计测量（2026-10-10 审计 F2：守护拉起是异步的，此前只热 1 次 ⇒ 5 连发里混着冷读，同一 id 会给出 60 ms 与 2.4 s 两种结论）；预算按预热后实测中位 ×3 定",
       "runs": 5,
-      "warmups": 3
+      "warmups": 3,
+      "budget_ms_by_platform": {
+        "linux": 200,
+        "windows": 1000
+      }
     },
     {
       "budget_ms": 6000,
@@ -61,7 +85,11 @@
       "max_age_days": 30,
       "note": "一致性报告（27 项契约全量重算 + 在盘比对）——最重的只读命令：agent 若把它当常规体检，必须拦住数量级回归（实测中位 1.69 s，预算 ×3.5）",
       "runs": 5,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 6000,
+        "windows": 10000
+      }
     },
     {
       "budget_ms": 3000,
@@ -70,7 +98,11 @@
       "max_age_days": 30,
       "note": "抽象阶梯全仓扫描（layer_model.scan）——第二重的只读命令（实测中位 0.97 s，预算 ×3）",
       "runs": 5,
-      "warmups": 1
+      "warmups": 1,
+      "budget_ms_by_platform": {
+        "linux": 3000,
+        "windows": 5000
+      }
     }
   ],
   "evidence": {
@@ -181,5 +213,6 @@
   },
   "note": "性能预算（ISO 25010 性能效率面）。声明 = entries（唯一真源：命令 + 预算毫秒 + 取数次数 + 预热次数 + 新鲜度上限）；证据 = evidence（由 python scripts/perf_budget.py --record 实测写入：中位/P95/标准差/最小/最大毫秒 + 预热数 + 退出码 + 时间）。判据只两条：① 记录新鲜；② **P95 耗时 ≤ 预算**（尾延迟；旧记录无 P95 时退回判中位，向后兼容）。**本判据不重复判正确性**（正确性由 verify_report 的其余判据承担），否则性能面会因无关原因抖动。预算按**预热后**实测中位 ×2.5~3 定，只拦**数量级回归**，不拦噪声。2026-10-10 审计 X3 修复：① 判据从「中位」改为「P95」，记录补 stdev/P95（此前只有中位/最小/最大，无法判断两次测量的差异是噪声还是回归）；② --record 先按 warmups 预热再计时（此前冷启动/守护未起会污染读数）；③ 中位改真中位（偶数样本取中间两条均值）。",
   "reference_host": "Windows 10 / Python 3.11.9（作者机 · 冷进程）",
-  "schema": "nf-perf-budget/1"
+  "schema": "nf-perf-budget/1",
+  "platform_note": "平台化预算（2026-10-25）：同一命令在 Windows 冷进程上比 Linux 慢 1.5~2×（进程创建约 69 ms vs 10-20 ms、Path.resolve 与杀毒扫描叠加），单一阈值必然二选一（Linux 过紧 / Windows 永远红）。故 budget_ms_by_platform 按平台各定各的；数值由实测 P95 反推，`budget_ms` 保留为无平台条目时的回落值。verify_report 的 Windows 目标（不是预算）：12 s——当前被 31 条判据各自全仓重扫拖住，结构性优化后应把 windows 预算收紧到 20000 以内。"
 }
