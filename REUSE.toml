@@ -32,7 +32,7 @@ SPDX-FileCopyrightText = "Free Software Foundation, Inc."
 SPDX-License-Identifier = "AGPL-3.0-only"
 
 [[annotations]]
-path = ["LICENSING.md", "LICENSE-NOTICE.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "CLA.md"]
+path = ["LICENSING.md", "DUAL-LICENSING-NOTICE.md", "LICENSE-EXCEPTIONS.md", "TRADEMARK.md", "CLA.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "CC-BY-4.0"
