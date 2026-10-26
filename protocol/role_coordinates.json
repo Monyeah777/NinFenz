@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1444,
+    "app": 1445,
     "entry": 26,
     "floor": 5,
     "prod": 1042,
     "projection": 130,
-    "support": 267,
-    "verify": 1123
+    "support": 275,
+    "verify": 1126
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8681,6 +8681,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Reproducible npm release artifacts and SBOM release-gate tests.",
+      "path": "desktop/tests/test_release_artifacts.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。",
       "path": "desktop/tests/test_release_gate.py",
       "role": "verify",
@@ -9007,6 +9013,12 @@
     {
       "function": "测试套件**接线**门禁：不许有「写好了却没人跑」的套件。",
       "path": "desktop/tests/test_suite_wiring.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "OSPS/S2C2F evidence and attestation workflow regression tests.",
+      "path": "desktop/tests/test_supply_chain_standards.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12983,6 +12995,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate OSPS, S2C2F, package-source, and supplier evidence.",
+      "path": "scripts/supply_chain_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁判定缓存：输入摘要 → 判定摘要（**只加速，不替代判定**）。",
       "path": "scripts/verify_cache.py",
       "role": "verify",
@@ -13032,16 +13050,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bfa3020c6e868899b08a8dc856b157511c1bd213ef4b0ff40bc3b16dd52b5e48",
+  "root_digest": "6c9189f68e1487fa72d750b58f667462031a27e9898952513c655b7d23424241",
   "rule_counts": {
-    "R-app": 1444,
-    "R-catch": 121,
+    "R-app": 1445,
+    "R-catch": 123,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 115,
-    "R-support": 120,
-    "R-verify": 1005,
+    "R-support": 126,
+    "R-verify": 1008,
     "auto:R-core": 257
   },
   "schema": "nf-role-coordinates/1"

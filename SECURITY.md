@@ -36,7 +36,24 @@
 3. **凭据类问题按已泄露处理**：任何出现在对话/日志/文档/提交里的 token，一律视为已泄露，
    立即撤销重建（见 `CONTRIBUTING.md` 的 Token 轮换 SOP）。
 
-## 五、本仓已有的安全机制（供报告前自查）
+## 五、依赖与漏洞修复阈值
+
+- **Critical**：停止发布；有可达路径时优先按供应链事故处理，修复前不产生新 Release。
+- **High**：阻断 PR 合并与 tag 发布；无上游修复时须记录不可达/不可利用证据或供应商例外。
+- **Medium**：进入最近一次维护窗口；发布前复查是否已升级为 High/Critical。
+- **License violation**：阻断发布；替换依赖、取得兼容授权，或由明确例外记录批准。
+
+依赖来源、供应商准入、SBOM 和验签方式见 [docs/supply-chain-security.md](docs/supply-chain-security.md)。
+目前为单人维护，不承诺固定响应 SLA；但 Critical/High 在修复或明确处置前不会进入正式发布。
+
+## 六、公开漏洞通告
+
+已确认并完成协调披露的漏洞通过 GitHub Security Advisories 公开：
+<https://github.com/Monyeah777/NinFenz/security/advisories>。通告须至少包含受影响版本、
+判断是否受影响的方法、缓解措施和修复版本；修复版本的 checksums、SBOM 与 attestation
+可在对应 GitHub Release 验证。
+
+## 七、本仓已有的安全机制（供报告前自查）
 
 | 机制 | 载体 | 判据 |
 |---|---|---|
@@ -53,7 +70,7 @@
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
 
-## 六、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
+## 八、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
 
 - **面**：`nf verify` 的引擎侧会对目标仓库 `verify.sh` 里的 heredoc Python 做 `exec`
   （`desktop/src/core/gate_inproc.py`）——**在谁的仓库里跑，就执行谁的代码**

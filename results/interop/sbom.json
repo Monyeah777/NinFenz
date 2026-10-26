@@ -3,7 +3,7 @@
   "comment": "派生面非真源；created = max(仓内声明日期: score_baseline / provenance / approvals)（保确定性，非墙钟）。",
   "creationInfo": {
     "comment": "由纯度扫描登记面（HARD_ALLOW / SOFT_IMPORTS）实时派生；created = 仓内声明日期最大值（非墙钟，保确定性）",
-    "created": "2026-10-26T00:00:00Z",
+    "created": "2026-10-27T00:00:00Z",
     "creators": [
       "Tool: nf interop --kind sbom"
     ]
@@ -59,6 +59,13 @@
       "versionInfo": "6.11.2"
     },
     {
+      "SPDXID": "SPDXRef-Optional-cyclonedx",
+      "comment": "软依赖（可选，须 try/except 守卫）：SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "cyclonedx"
+    },
+    {
       "SPDXID": "SPDXRef-Optional-jsonschema",
       "comment": "软依赖（可选，须 try/except 守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
       "downloadLocation": "NOASSERTION",
@@ -86,6 +93,13 @@
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "nf_pyengine"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-rdflib",
+      "comment": "软依赖（可选，须 try/except 守卫）：SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "rdflib"
     }
   ],
   "relationships": [
@@ -112,6 +126,11 @@
     {
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-cyclonedx"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-jsonschema"
     },
     {
@@ -123,6 +142,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-nf_pyengine"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-rdflib"
     }
   ],
   "spdxVersion": "SPDX-2.3"

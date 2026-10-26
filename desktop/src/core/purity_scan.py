@@ -103,14 +103,14 @@ HARD_ALLOW = {
 SOFT_IMPORTS = {
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
     "PySide6": "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
+    "cyclonedx": "SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
+    "rdflib": "SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
     "nf_pyengine": "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；"
         "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
     "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指"
         "引",
 }
-#: R5 存量残留（**WARN 挂账**：确有理由保留的存量违规须带裁决/文档指针；不判死但不得隐身）。
-#: 本扫描按**文件系统**取件 ⇒ 未入库的本地副本同样会被扫到。2026-09-20：唯一一项残留经作者裁决
-#: 删除，登记随之清空（空表即"零残留"）。
+#: R5 存量残留（WARN 挂账，须带裁决指针）。2026-09-20：唯一项经作者裁决删除，空表即零残留。
 IMPORT_RESIDUE: dict = {}
 #: 扫描作用域含 `.github/scripts`——那是**唯一处理远程不可信输入**（Issue 标题/正文）
 #: 且持有写权限令牌的代码。此前只在 core + scripts 取件，等于把最高风险的入口

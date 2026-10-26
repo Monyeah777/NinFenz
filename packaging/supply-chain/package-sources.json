@@ -1,0 +1,37 @@
+{
+  "schema": "nf-package-sources/1",
+  "reviewed_at": "2026-10-26",
+  "rules": {
+    "https_only": true,
+    "embedded_credentials": false,
+    "mutable_versions": false,
+    "npm_lifecycle_scripts": false,
+    "lock_or_exact_pins_required": true
+  },
+  "sources": [
+    {
+      "ecosystem": "npm",
+      "url": "https://registry.npmjs.org/",
+      "integrity": "package metadata and release SHA256SUMS",
+      "update": "Dependabot weekly"
+    },
+    {
+      "ecosystem": "pypi",
+      "url": "https://pypi.org/simple/",
+      "integrity": "requirements-ci.txt hashes",
+      "update": "Dependabot weekly"
+    },
+    {
+      "ecosystem": "cargo",
+      "url": "https://index.crates.io/",
+      "integrity": "Cargo.lock checksums",
+      "update": "Dependabot weekly"
+    },
+    {
+      "ecosystem": "github-actions",
+      "url": "https://github.com/",
+      "integrity": "40-character commit SHA pins",
+      "update": "Dependabot weekly"
+    }
+  ]
+}

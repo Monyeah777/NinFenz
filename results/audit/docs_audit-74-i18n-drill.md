@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429
+  - protocol/locales.json:6e6687965cd887cb5253fe811898746001d8f93719688803229205ad8fbb8cde
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
@@ -28,6 +28,8 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
   - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
+> 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
+
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
 > 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）

@@ -2,6 +2,22 @@
 > ⛔ 操作指令：本文是发布策略的**声明件**——`core/release_gate.py` 逐锚点机检（`nf release --plan` / check38 子扫描）；读到即执行，勿当资料。
 > 最后更新：2026-10-11
 
+## 可复现工件与来源证明
+
+npm 正式发布不再以 `npm pack` 即时产出的未归档 tarball 为终点。tag 或显式 attest 运行会调用
+`packaging/npm/tools/build_release.py`，对同一源树构建两次并逐字节比较，产出：
+
+- 确定性 `ninfenz-<version>.tgz`；
+- CycloneDX 1.6 与 SPDX 3.0 JSON-LD SBOM；
+- payload 清单、`SHA256SUMS`、`release-metadata.json`；
+- GitHub OIDC build provenance attestation。
+
+发布 job 只消费该构建 job 的 tarball；GitHub Release 同一组 tarball、SBOM、checksums 与元数据。
+消费者命令、供应商策略和威胁模型见 [supply-chain-security.md](supply-chain-security.md)。
+
+> 边界：workflow 具备 SLSA Build L2 所需的托管构建、OIDC 认证和外部可验来源证明；
+> 只有真实 tag/attest 运行成功并产生 attestation 后，才对那一组工件声称 Build L2 证据存在。
+
 ## 这份文件解决什么
 
 发布动作散在 `nf release`（体检）、golden master 快照（**2026-10-11 作者裁决退役**）、`scripts/bump_verify.sh`（换标）
