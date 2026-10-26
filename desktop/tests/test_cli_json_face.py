@@ -258,6 +258,9 @@ CANON = {
     "postmortem check": ["postmortem", "check", "postmortems/PO-9000-示例-复盘模板.md"],
     # T7.2 内容 IR：节点级检查面（只读；报告带 schema 面判别键）。
     "ir check": ["ir", "check", "docs/terminal.md"],
+    # T9.2 导入面：旧面 SKILL 导入的 --json 机器面（docx/dita 导入器见
+    # test_import_docx_dita.py；此面真跑，报告带 schema 判别键）。
+    "import": ["import", "desktop/tests/fixtures/external/anthropic-official/docx.SKILL.md"],
     "diff": ["diff", "01_核心协议.md", "01_核心协议.md"],
     "domain build": ["domain", "build", "--spec", "A01"],
     "library search": ["library", "search", "验收"],

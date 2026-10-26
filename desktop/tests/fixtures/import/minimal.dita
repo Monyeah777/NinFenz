@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="install-guide">
+  <title>示例产品安装指南</title>
+  <shortdesc>本指南说明示例产品的安装、操作与规格核对，供安装人员使用。</shortdesc>
+  <taskbody>
+    <section>
+      <title>安装</title>
+      <p>将设备放置在水平台面，四周预留散热空间。</p>
+      <ul>
+        <li>电源线一根</li>
+        <li>说明书一份</li>
+      </ul>
+      <steps>
+        <step><cmd>连接保护接地。</cmd><stepresult>接地电阻不大于 4 Ω。</stepresult></step>
+        <step><cmd>连接电源线。</cmd></step>
+        <step><cmd>上电并检查指示灯。</cmd></step>
+      </steps>
+      <table>
+        <tgroup cols="2">
+          <tbody>
+            <row><entry>检查项</entry><entry>判据</entry></row>
+            <row><entry>接地电阻</entry><entry>不大于 4 Ω</entry></row>
+          </tbody>
+        </tgroup>
+      </table>
+      <note>高压危险：断电后再打开机箱。</note>
+      <fig>
+        <title>接线示意</title>
+        <image href="wiring.png"><alt>接线示意图</alt></image>
+      </fig>
+      <pre>未覆盖块元素示例文本</pre>
+    </section>
+  </taskbody>
+</task>

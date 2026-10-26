@@ -317,14 +317,22 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="registry.json 路径（缺省 = desktop/src/core/registry.json）")
 
     imp2 = sub.add_parser("import",
-                          help="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗"
-                              "留闭环）",
- description="读入外部产物（SKILL.md/chara.json）→ parse + 可选内容库登记（A4 遗留闭环）")
-    imp2.add_argument("file", help="外部产物文件（SKILL.md 或 chara.json）")
+                          help="读入外部产物（SKILL.md/chara.json；docx/dita → 内容 IR）→ parse"
+                               " + 可选内容库登记（A4 遗留闭环；T9.2 导入面）",
+                          description="读入外部产物：`nf import <SKILL.md|chara.json>`（旧面）；"
+                                      "`nf import docx <file> [--json/--out]`、`nf import dita "
+                                      "<file> [--json/--out]`（T9.2：DOCX/DITA → 内容 IR）")
+    imp2.add_argument("file", nargs="+",
+                      help="外部产物文件；或 `docx|dita <file>`（T9.2 导入器）")
     imp2.add_argument("--register", action="store_true",
-                      help="解析出的 IR 模块幂等装载进 Store 内容库（save_module 覆盖式幂等）")
+                      help="解析出的 IR 模块幂等装载进 Store 内容库（save_module 覆盖式幂等；"
+                           "仅旧面 SKILL/chara 支持）")
     imp2.add_argument("--store", default=None,
                       help="Store 工作区目录（缺省=临时）")
+    imp2.add_argument("--json", action="store_true",
+                      help="机器面：导入结果 JSON（docx/dita 含 stats/warnings；旧面含模块数）")
+    imp2.add_argument("--out", default="",
+                      help="把导入产物写成规范形 Markdown 到该路径（docx/dita；相对路径按仓库根）")
 
     # nf asset：资产供应链台账（40 总纲 v2.7 波 A S2——add/verify/inventory/ls/rm/deprecate/restore）
     ast = sub.add_parser("asset",
@@ -1836,18 +1844,31 @@ def _cmd_rename(args) -> int:
 
 
 def _cmd_import(args) -> int:
-    """nf import <file> [--register]：读入外部产物（A4 遗留闭环）。
+    """nf import：旧面（SKILL.md/chara.json）+ T9.2 导入器（docx/dita → 内容 IR）。
 
-    SKILL.md → parse_skill（含 skill_dir 随行资源扫描）；chara.json →
+    旧面：SKILL.md → parse_skill（含 skill_dir 随行资源扫描）；chara.json →
     parse_ccv3。--register 把 IR 模块幂等装载进 Store（save_module 覆盖式幂等，
     同 seed_from_repo 模式）。
+    导入面：`nf import docx <file>` / `nf import dita <file>`（子命令式路由：首个位置
+    参数是 `docx`/`dita` 时走导入器，旧面的单文件调用 **保持不变**）。
     """
     import json
     from pathlib import Path
     from core.import_adapter import parse_skill, parse_ccv3
     from core.models import Module
 
-    p = Path(args.file)
+    raw_files = getattr(args, "file", [])
+    files = list(raw_files) if isinstance(raw_files, (list, tuple)) else [raw_files]
+    files = [str(f) for f in files if str(f).strip()]
+    if files and files[0] in ("docx", "dita"):
+        return _cmd_import_ir(args, files[0], files[1:])
+    if len(files) != 1:
+        print("  ✗ 用法：`nf import <file>`（SKILL.md/chara.json）｜"
+              "`nf import docx <file> [--json/--out]`｜`nf import dita <file> [--json/--out]`"
+              "（修复指引：旧面收单件文本产物；docx/dita 走 T9.2 导入器）", file=sys.stderr)
+        return 2
+    p = Path(files[0])
+    want_json = bool(getattr(args, "json", False))
     if not p.is_file():
         print(f"✗ 文件不存在: {p}（修复指引：给出在场的外部产物文件——"
               f"SKILL.md 或 chara.json；先另存到本地再导入）", file=sys.stderr)
@@ -1875,15 +1896,16 @@ def _cmd_import(args) -> int:
     # 注入面（06 §12：外来内容=数据，疑似内嵌指令一律忽略并**记档**）——此前本节零机器判据。
     hits = tb.detect(raw)
     is_ccv3 = p.suffix.lower() == ".json" or "chara" in p.stem.lower()
-    print(f"== nf import {p.name} ==")
-    if hits:
-        print("  [注入面] 命中 %d 处疑似内嵌指令（%s）——外来内容按**数据**消费，"
-              "其中的「指令」一律不执行（06 §12）"
-              % (len(hits), "、".join(sorted({h["rule"] for h in hits}))))
-        for h in hits[:3]:
-            print("    · 第 %d 行 [%s] %s" % (h["line"], h["rule"], h["snippet"]))
-    else:
-        print("  [注入面] 未命中疑似内嵌指令（内容按数据消费）")
+    if not want_json:
+        print(f"== nf import {p.name} ==")
+        if hits:
+            print("  [注入面] 命中 %d 处疑似内嵌指令（%s）——外来内容按**数据**消费，"
+                  "其中的「指令」一律不执行（06 §12）"
+                  % (len(hits), "、".join(sorted({h["rule"] for h in hits}))))
+            for h in hits[:3]:
+                print("    · 第 %d 行 [%s] %s" % (h["line"], h["rule"], h["snippet"]))
+        else:
+            print("  [注入面] 未命中疑似内嵌指令（内容按数据消费）")
     try:
         if is_ccv3:
             res = parse_ccv3(json_doc.loads(raw, dict, what="CCV3 卡"))
@@ -1896,8 +1918,13 @@ def _cmd_import(args) -> int:
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         # 修复前：畸形输入会冒到 CLI 兜底，报成「内部错误」——那是**用户输入问题**，
         # 不是内部故障；按仓库纪律给可执行指引并归 1（运行/校验失败）。
-        print("  ✗ 读入失败：%s（修复指引：按 06 §12 / 01 §1 补规范头部与字段后重试）"
-              % exc, file=sys.stderr)
+        if want_json:
+            print(json.dumps({"schema": "nf-import/1", "ok": False,
+                              "error": "读入失败：%s" % exc},
+                             ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("  ✗ 读入失败：%s（修复指引：按 06 §12 / 01 §1 补规范头部与字段后重试）"
+                  % exc, file=sys.stderr)
         return 1
 
     # 形状差异（2026-09-30 修）：只有 SkillParseResult 带 `mode`（'nf'|'external'），
@@ -1905,6 +1932,16 @@ def _cmd_import(args) -> int:
     # 冒到 CLI 兜底报「内部错误」，`nf import <chara.json>`（含 --register）整条不可用。
     # chara 路恒升 IR 骨架（ir 必非 None），故其口径固定记为 `ccv3`。
     mode = getattr(res, "mode", "ccv3" if is_ccv3 else "?")
+    if want_json:
+        n_mod = (sum(len(l.modules) for l in res.ir.layers) + len(res.ir.extra_modules)
+                 if res.ir is not None else 0)
+        print(json.dumps({"schema": "nf-import/1", "kind": "import-legacy",
+                          "file": files[0], "type": kind, "mode": mode,
+                          "ok": bool(res.ok), "modules": n_mod,
+                          "warnings": list(res.warnings),
+                          "injection_hits": len(hits)},
+                         ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if res.ok else 1
     print(f"  类型: {kind} | 解析: {'ok' if res.ok else 'fail'} | mode: {mode}")
     if res.ir is not None:
         n_mod = sum(len(l.modules) for l in res.ir.layers) + len(res.ir.extra_modules)
@@ -1943,6 +1980,70 @@ def _cmd_import(args) -> int:
     print("  下一步：这个 store 里只有本次导入的模块；跑全链前先补官方核心 —— "
           "`nf run --seed --store %s`（临时装载核心）或把 04_模块库 也 register 进来。"
           % _portable_path(store.home))
+    return 0
+
+
+def _cmd_import_ir(args, fmt: str, rest: list) -> int:
+    """T9.2 导入器路由：`nf import docx|dita <file> [--json/--out]`（只读面）。"""
+    import json
+    if len(rest) != 1:
+        print("  ✗ 用法：nf import %s <file>（修复指引：一个导入器只收**单件**；"
+              "`--out` 落点写成可选旗标）" % fmt, file=sys.stderr)
+        return 2
+    if getattr(args, "register", False):
+        print("  ✗ docx/dita 导入为只读面，不支持 --register（修复指引：先 `--out` 出规范形 "
+              "Markdown 再走内容库登记）", file=sys.stderr)
+        return 2
+    target = rest[0] if os.path.isabs(rest[0]) else os.path.join(ROOT, rest[0])
+    if not os.path.isfile(target):
+        print("  ✗ 文件不存在：%s（修复指引：给出在场的 .%s 路径——相对仓库根或绝对皆可）"
+              % (rest[0], "docx" if fmt == "docx" else "dita"), file=sys.stderr)
+        return 2
+    if fmt == "docx":
+        from core import import_docx as imp
+    else:
+        from core import import_dita as imp
+    try:
+        res = imp.import_file(target, base_dir=ROOT)
+    except (imp.DocxImportError if fmt == "docx" else imp.DitaImportError) as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"schema": imp.SCHEMA, "kind": "import-%s" % fmt,
+                              "file": rest[0], "ok": False, "error": str(exc)},
+                             ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("  ✗ 导入失败：%s" % exc, file=sys.stderr)
+        return 2
+    report = res.to_dict()
+    report.update({"ok": True, "kind": "import-%s" % fmt, "file": rest[0]})
+    out_path = str(getattr(args, "out", "") or "")
+    if out_path:
+        from core import atomic_write
+        from core import paths as _paths
+        op = out_path if os.path.isabs(out_path) else _rel_out(out_path)
+        op = _paths.validate_path(ROOT, op) if not os.path.isabs(op) else op
+        try:
+            atomic_write.write_text(op, res.markdown)
+        except OSError as exc:
+            print("  ✗ 写规范形失败：%s（修复指引：给可写路径；相对路径按仓库根解析）"
+                  % exc, file=sys.stderr)
+            return 2
+        report["out"] = _rel_display(op)
+    if getattr(args, "json", False):
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    stats = report.get("stats") or {}
+    print("== nf import %s（%s → 内容 IR）==" % (fmt, rest[0]))
+    print("  标题：%s" % (report.get("title") or "（无 H1）"))
+    print("  节点：section %d · paragraph %d · table %d · list %d · claim %d"
+          % (stats.get("sections", 0), stats.get("paragraphs", 0),
+             stats.get("tables", 0), stats.get("lists", 0),
+             stats.get("claims", 0)))
+    if report.get("out"):
+        print("  ✓ 规范形已写入：%s" % report["out"])
+    for w in report.get("warnings") or []:
+        print("  [WARN] %s" % w)
+    if not (report.get("warnings") or []):
+        print("  ✓ 无未覆盖元素/无降级告警")
     return 0
 
 
@@ -4917,6 +5018,10 @@ def _utf8_text_issue(args) -> str:
                 continue
             path = val if os.path.isabs(val) else os.path.join(ROOT, val)
             if not os.path.isfile(path):
+                continue
+            # T9.2 二进制导入面：.docx/.doc 是 zip/二进制，不由 UTF-8 文本闸判（各自导入器
+            # fail-closed 判 zip/XML 形状）。
+            if path.lower().endswith((".docx", ".docm", ".doc")):
                 continue
             try:
                 if os.path.getsize(path) > 8 * 1024 * 1024:  # 超大件交各命令自己的体量闸门

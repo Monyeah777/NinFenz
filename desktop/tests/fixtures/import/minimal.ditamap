@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map title="示例产品文档集">
+  <title>示例产品文档集</title>
+  <topicref href="minimal.dita" navtitle="示例产品安装指南"/>
+  <topicref href="spec.dita">
+    <topicmeta><navtitle>示例产品规格</navtitle></topicmeta>
+  </topicref>
+</map>
