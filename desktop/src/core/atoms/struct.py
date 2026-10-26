@@ -10,6 +10,8 @@ from typing import Any
 
 from core import json_doc, json_schema, lazy_yaml
 
+from . import _wake
+
 
 def json_load_validated(path: Path, expect: Any = dict, what: str = "") -> Any | None:
     """读 JSON 并校**顶层形状**；不在场 / 坏 JSON / 形状不对 → None。
@@ -18,6 +20,7 @@ def json_load_validated(path: Path, expect: Any = dict, what: str = "") -> Any |
     要不要区分、要不要判红，是能力层的事（本仓 json_doc.load 已经给出带修复指引的报错，
     能力层需要文案时直接调它，不必经过这里）。
     """
+    _wake("struct.json_load_validated")
     try:
         return json_doc.load(path, expect, what=what)
     except ValueError:
@@ -30,6 +33,7 @@ def json_schema_validate(instance: Any, schema: Any) -> list[str]:
     为什么原子不返回布尔：空/非空清单本身携带「逐字段」粒度，布尔会把它丢掉，
     调用方也就无法把「缺哪个字段」写进失败文案。
     """
+    _wake("struct.json_schema_validate")
     if not isinstance(schema, dict):
         raise ValueError(
             f"JSON Schema 顶层须是对象，实为 {type(schema).__name__}"
@@ -43,6 +47,7 @@ def yaml_load_safe(path: Path) -> Any | None:
     走 lazy_yaml（本仓口径：import yaml 冷启动约 40 ms），且只用 safe_load
     （purity_scan R6 把 yaml.load 列为危险 sink）。
     """
+    _wake("struct.yaml_load_safe")
     module = lazy_yaml.module()
     if module is None:
         return None

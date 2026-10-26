@@ -4,6 +4,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import Any
 
+from . import _wake
+
 
 def reconcile(groups: Mapping[str, Iterable[str]]) -> dict[str, Any]:
     """N 方集合对账 → {"only_in": {组名: [仅本组有的项]}, "counts": {组名: 项数}}。
@@ -14,6 +16,7 @@ def reconcile(groups: Mapping[str, Iterable[str]]) -> dict[str, Any]:
 
     顺序稳定：组名按传入顺序，组内项按字典序——差异明细因此可逐字节比对（CAP_DETERMINISTIC）。
     """
+    _wake("sets.reconcile")
     normalized: dict[str, set] = {str(name): set(items) for name, items in groups.items()}
     only_in: dict[str, list[str]] = {}
     for name, items in normalized.items():
@@ -27,5 +30,6 @@ def reconcile(groups: Mapping[str, Iterable[str]]) -> dict[str, Any]:
 
 def subset(required: Iterable[str], available: Iterable[str]) -> list[str]:
     """required 中**没有**出现在 available 里的项（排序）；空列表 = 子集关系成立。"""
+    _wake("sets.subset")
     have = set(available)
     return sorted({item for item in required if item not in have})

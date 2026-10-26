@@ -6,9 +6,12 @@ from pathlib import Path
 
 from core import repo_face
 
+from . import _wake
+
 
 def file_exists(path: Path) -> bool:
     """该路径是否**是普通文件**；不在场 / 不可探测 → False。"""
+    _wake("fs.file_exists")
     try:
         return Path(path).is_file()
     except OSError:
@@ -17,6 +20,7 @@ def file_exists(path: Path) -> bool:
 
 def dir_exists(path: Path) -> bool:
     """该路径是否**是目录**；不在场 / 不可探测 → False。"""
+    _wake("fs.dir_exists")
     try:
         return Path(path).is_dir()
     except OSError:
@@ -25,6 +29,7 @@ def dir_exists(path: Path) -> bool:
 
 def read_text(path: Path, encoding: str = "utf-8") -> str | None:
     """正文（保留原样换行）；不在场 / 不可读 / 解码失败 → None。"""
+    _wake("fs.read_text")
     try:
         return Path(path).read_text(encoding=encoding)
     except (OSError, UnicodeDecodeError):
@@ -36,6 +41,7 @@ def iter_entries(directory: Path) -> list[tuple[str, bool, int]]:
 
     目录不在场 → []。
     """
+    _wake("fs.iter_entries")
     try:
         entries = sorted(Path(directory).iterdir(), key=lambda p: p.name)
     except OSError:
@@ -60,6 +66,7 @@ def walk_files(root: Path, skip: Iterable[str] = ()) -> list[str]:
     会让生成物以「第二份正文」身份进面）。本原子再做一件事——把 Path 归一成
     **posix 相对路径**，这样不同平台上的判据输入是同一串字节。
     """
+    _wake("fs.walk_files")
     root_abs = Path(root).resolve()
     skip_names = {str(name) for name in skip}
     out: list[str] = []

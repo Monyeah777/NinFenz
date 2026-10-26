@@ -38,8 +38,40 @@ if hasattr(sys.stderr, "reconfigure"):
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
-from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
 interp_diet.restore()
+
+
+class _LazyModule:
+    """按需导入的模块代理（`json_doc.load(...)` 首次调用才真 import）。
+
+    为什么：`core.json_doc` 连带 `atomic_write` → pathlib/tempfile/hashlib/shutil，实测导入
+    累计 ≈19 ms。而 `--version`、`--help`、**参数错误面**（argparse 早退）根本用不到它——
+    错误扫描类用例每次都在白付这 19 ms。代理后顶层零成本，首次真用才付（且只付一次）。
+    代理只转发属性访问；不做 `is module` 之类断言（本仓无此用法，测试守着）。
+    """
+
+    __slots__ = ("_name", "_mod")
+
+    def __init__(self, name: str) -> None:
+        object.__setattr__(self, "_name", name)
+        object.__setattr__(self, "_mod", None)
+
+    def _load(self):
+        mod = object.__getattribute__(self, "_mod")
+        if mod is None:
+            import importlib
+            mod = importlib.import_module(object.__getattribute__(self, "_name"))
+            object.__setattr__(self, "_mod", mod)
+        return mod
+
+    def __getattr__(self, item: str):
+        return getattr(self._load(), item)
+
+    def __repr__(self) -> str:                                   # pragma: no cover - 诊断
+        return f"<lazy module {object.__getattribute__(self, '_name')}>"
+
+
+json_doc = _LazyModule("core.json_doc")   # 承重件在 desktop/src，脚本须能独立运行
 
 NF_CLI_VERSION = "1.1.0"
 NF_CLI_EPILOG = (

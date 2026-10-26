@@ -226,7 +226,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 944,
+      "lines": 947,
       "max_fn_cc": 16,
       "max_fn_lines": 70
     },
@@ -846,9 +846,9 @@
       "max_fn_lines": 16
     },
     "desktop/src/core/perf_budget.py": {
-      "lines": 183,
-      "max_fn_cc": 21,
-      "max_fn_lines": 40
+      "lines": 220,
+      "max_fn_cc": 23,
+      "max_fn_lines": 47
     },
     "desktop/src/core/pipeline.py": {
       "lines": 91,
@@ -1416,7 +1416,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7646,
+      "lines": 7678,
       "max_fn_cc": 116,
       "max_fn_lines": 1263
     },
@@ -1442,7 +1442,7 @@
     },
     "scripts/perf_budget.py": {
       "lines": 128,
-      "max_fn_cc": 23,
+      "max_fn_cc": 22,
       "max_fn_lines": 45
     },
     "scripts/pkg.py": {

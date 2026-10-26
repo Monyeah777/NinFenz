@@ -4,6 +4,8 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 
+from . import _wake
+
 
 def keyword_both_ways(text_a: str, text_b: str, keywords: Iterable[str]) -> list[tuple[str, str]]:
     """→ [(缺词的一侧, 关键词)]；两侧都有或两侧都无 → 不报。
@@ -12,6 +14,7 @@ def keyword_both_ways(text_a: str, text_b: str, keywords: Iterable[str]) -> list
     「该存在」由声明清单（能力层的输入面）判，原子不做第二遍。
     顺序 = 关键词的传入顺序；同一关键词只可能缺在一侧，所以顺序天然稳定。
     """
+    _wake("text.keyword_both_ways")
     out: list[tuple[str, str]] = []
     for keyword in keywords:
         in_a = keyword in text_a
@@ -29,6 +32,7 @@ def regex_absent(text: str, pattern: str) -> list[tuple[int, str]]:
     命名沿用设计文档（regex_absent）：判据是「不许命中」，但返回值必须是**命中了什么**，
     否则失败文案只能写「有命中」，修复指引无处落脚（ADR-0002 不许注水）。
     """
+    _wake("text.regex_absent")
     try:
         compiled = re.compile(pattern)
     except re.error as exc:

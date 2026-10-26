@@ -25,11 +25,40 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 DECL_REL = "protocol/perf_budget.json"
 SCHEMA = "nf-perf-budget/1"
+
+
+#: 平台键归一：`sys.platform` 在 Windows 是 `win32`，而声明面用人能读的名字。
+PLATFORM_ALIASES = {"win32": "windows", "cygwin": "windows", "darwin": "macos",
+                    "linux": "linux", "linux2": "linux"}
+
+
+def platform_of(value: str | None = None) -> str:
+    """当前平台键（win32→windows）；允许显式注入，便于单测覆盖三平台。"""
+    if value:
+        return PLATFORM_ALIASES.get(value, value)
+    return PLATFORM_ALIASES.get(sys.platform, sys.platform)
+
+
+def budget_of(entry: dict[str, Any], platform: str | None = None) -> float:
+    """该平台的**生效预算**：`budget_ms_by_platform[平台]` 优先，回落 `budget_ms`。
+
+    为什么平台化（2026-10-25 实测）：同一命令在 Windows 冷进程上比 Linux 慢 1.5~2×——进程
+    创建 ≈69 ms vs ≈10-20 ms、`Path.resolve` 与杀毒扫描叠加。单一声明阈值的后果是二选一：
+    要么在 Linux 上过紧、要么在 Windows 上永远红（"预算太离谱"）。故**按平台各定各的**，
+    而平台值一律由实测 P95 反推，不放宽无依据的余量。
+    """
+    by = (entry or {}).get("budget_ms_by_platform") or {}
+    if isinstance(by, dict):
+        hit = by.get(platform_of(platform))
+        if hit is not None:
+            return float(hit)
+    return float((entry or {}).get("budget_ms") or 0)
 
 
 def load(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
@@ -99,7 +128,7 @@ def _judged(rec: Dict[str, Any]) -> Tuple[float, str]:
     return float(rec.get("median_ms") or 0), "median_ms"
 
 
-def scan(root: str = ".", today: _dt.date | None = None
+def scan(root: str = ".", today: _dt.date | None = None, platform: str | None = None
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     """→ (issues, warns, stats)：缺记录 / 过期 / 超预算 / 凭空记录 = FAIL。"""
     doc, issues = load(root)
@@ -120,9 +149,16 @@ def scan(root: str = ".", today: _dt.date | None = None
             issues.append("性能目标 %s（%s）无实测记录（修复指引：python scripts/"
                           "perf_budget.py --record）" % (eid, e.get("cmd")))
             continue
-        budget = float(e.get("budget_ms") or 0)
+        cur_plat = platform_of(platform)
+        budget = budget_of(e, cur_plat)
         val, field = _judged(rec)
-        if budget and val > budget:
+        rec_plat = str(rec.get("platform") or "")
+        if rec_plat and rec_plat != cur_plat:
+            # 跨平台证据：耗时不可比（同一命令两平台可差 2×），只校验新鲜度、不判超预算。
+            warns.append(f"性能记录 {eid} 采集于平台 {rec_plat}，与当前平台 {cur_plat} 不同"
+                         "——本次不判超预算"
+                         "（修复指引：在本平台跑 python scripts/perf_budget.py --record）")
+        elif budget and val > budget:
             over += 1
             label = "P95" if field == "p95_ms" else "中位（旧记录无 P95）"
             issues.append("性能超预算 %s：%s %.0f ms > 预算 %.0f ms（超出 %.0f%%）"
@@ -171,10 +207,11 @@ def record(root: str = ".", only: str = "", runner=None, today: _dt.date | None 
                "median_ms": round(_median(times), 1), "p95_ms": round(_percentile(times, 0.95), 1),
                "stdev_ms": round(_stdev(times), 1), "min_ms": round(times[0], 1),
                "max_ms": round(times[-1], 1), "runs": len(times), "warmups": warm,
-               "budget_ms": e.get("budget_ms")}
+               "budget_ms": budget_of(e), "platform": platform_of()}
         ev[eid] = rec
         val, _field = _judged(rec)
-        if float(e.get("budget_ms") or 0) and val > float(e.get("budget_ms") or 0):
+        _b = budget_of(e)
+        if _b and val > _b:
             bad.append(eid)
     p = Path(root) / DECL_REL
     from core import atomic_write              # 在仓协议件：原子落盘（2026-10-01）

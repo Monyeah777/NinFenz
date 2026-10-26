@@ -11,9 +11,12 @@ from pathlib import Path
 
 from core.atoms import fs
 
+from . import _wake
+
 
 def parse_py(path: Path) -> ast.AST | None:
     """解析为 AST；不在场 / 语法错误 → None（语法错误本身由调用方决定算不算失败）。"""
+    _wake("code.parse_py")
     text = fs.read_text(path)
     if text is None:
         return None
@@ -28,6 +31,7 @@ def find_calls(tree: ast.AST | None, names: Iterable[str] | None = None) -> list
 
     ast.walk 是广度优先，**顺序不稳定**于判据无益；排序后同一份源码永远给出同一份清单。
     """
+    _wake("code.find_calls")
     if tree is None:
         return []
     wanted = None if names is None else {str(name) for name in names}

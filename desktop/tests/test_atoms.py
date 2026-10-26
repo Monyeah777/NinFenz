@@ -7,6 +7,7 @@
 3. 公开函数都有 docstring（本仓口径：没有文档的公开面等于没有约束）。
 """
 import ast
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -280,3 +281,35 @@ class AtomsPurityTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LazyWakeTest(unittest.TestCase):
+    """懒唤醒与激活登记（2026-10-25）：原子按需加载、真用才登记。"""
+
+    _PROBE = (
+        "import sys; sys.path.insert(0, %r);"
+        "import core.atoms as a;"
+        "loaded = [m for m in ('fs','hash','struct','proc','text','code','sets')"
+        " if ('core.atoms.' + m) in sys.modules];"
+        "print('LOADED=' + ','.join(loaded))"
+    )
+
+    def test_package_import_does_not_load_submodules(self):
+        src = self._PROBE % str(ATOMS_DIR.parents[1])   # atoms → core → src
+        out = subprocess.run([sys.executable, "-c", src], capture_output=True,
+                             text=True, encoding="utf-8")
+        self.assertEqual(0, out.returncode, out.stderr[-400:])
+        self.assertIn("LOADED=", out.stdout)
+        # 导入包本身不该拉任何子模块：否则「按需唤醒」就是空话
+        self.assertEqual("LOADED=", out.stdout.strip(), out.stdout)
+
+    def test_attribute_access_wakes_submodule_and_is_recorded(self):
+        from core import atoms
+        atoms.woken(clear=True)
+        atoms.fs  # noqa: B018 - 属性访问即唤醒
+        self.assertTrue(any(w.startswith("fs.") for w in atoms.woken()) or atoms.woken() == [])
+        atoms.fs.read_text(ATOMS_DIR / "fs.py")
+        self.assertIn("fs.read_text", atoms.woken())
+        snap = atoms.woken(clear=True)          # 先返回快照，再清空
+        self.assertIn("fs.read_text", snap)
+        self.assertEqual([], atoms.woken(), "clear=True 后登记应归零")

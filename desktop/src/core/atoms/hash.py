@@ -8,9 +8,12 @@ from pathlib import Path
 
 from core.atoms import fs
 
+from . import _wake
+
 
 def sha256_bytes(data: bytes) -> str:
     """字节的 sha256（小写十六进制）。"""
+    _wake("hash.sha256_bytes")
     return hashlib.sha256(data).hexdigest()
 
 
@@ -20,6 +23,7 @@ def sha256_file(path: Path) -> str | None:
     用**分块**读取：门禁里被摘要的对象包含大件（payload / 报告），一次读进内存在实测里是
     峰值内存的主要来源，而字节数对哈希没有影响。
     """
+    _wake("hash.sha256_file")
     digest = hashlib.sha256()
     try:
         with open(Path(path), "rb") as handle:
@@ -39,6 +43,7 @@ def _sha256_file_key(path: str, mtime_ns: int, size: int) -> str | None:
 
 def sha256_file_cached(path: Path) -> str | None:
     """带 (mtime,size) 失效键的分块文件摘要；不可读 → None。"""
+    _wake("hash.sha256_file_cached")
     p = Path(path)
     try:
         st = p.stat()
@@ -53,6 +58,7 @@ def tree_digest(root: Path, skip: Iterable[str] = ()) -> str | None:
     形状固定为 posix 的相对路径（与 fs.walk_files 同口径），所以同一棵树在不同平台、
     不同文件系统遍历顺序下给出同一个摘要——这正是 CAP_DETERMINISTIC 需要的输入。
     """
+    _wake("hash.tree_digest")
     if not fs.dir_exists(root):
         return None
     digest = hashlib.sha256()
