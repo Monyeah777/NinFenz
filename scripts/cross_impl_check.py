@@ -130,6 +130,8 @@ def run_node(group: Dict[str, Any], node_cmd: List[str], timeout: int = 120) -> 
         doc = json.loads((proc.stdout or b"").decode("utf-8"))
     except ValueError as exc:
         raise RuntimeError("node 输出不是 JSON：%s" % exc) from exc
+    if not isinstance(doc, dict):
+        raise RuntimeError("node 输出顶层不是对象：%s" % type(doc).__name__)
     for key in ("digest", "bytes_sha256", "bytes"):
         if key not in doc:
             raise RuntimeError("node 输出缺字段 %s：%r" % (key, doc))
