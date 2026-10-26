@@ -67,8 +67,12 @@ class WorkflowActionPinningTest(unittest.TestCase):
     def test_sast_runs_on_pull_requests_and_codeql(self):
         text = (WORKFLOWS / "sast.yml").read_text(encoding="utf-8")
         self.assertRegex(text, r"(?m)^  pull_request:\s*$")
+        self.assertIn("schedule:", text)
         self.assertIn("github/codeql-action/init@", text)
         self.assertIn("github/codeql-action/analyze@", text)
+        for language in ("python", "actions", "javascript-typescript"):
+            self.assertIn(language, text,
+                          f"CodeQL 扫描语言矩阵缺 {language}（动作与发布脚本也是供应链代码面）")
 
     def test_rust_fuzz_target_is_present(self):
         target = ROOT / "engine" / "rust" / "fuzz" / "fuzz_targets" / "python_parser.rs"
