@@ -30,8 +30,16 @@ subjects:
   - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:26a196ccb09d035a7aac7bf8706cc96c1bf4d9add4250eb5765b7754ef4c98e2
+  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
 ---
+> 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
+
+> 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
+
+> 重审（2026-10-26）：结构计数器 + scoped 作用域 + signals 表化
+
+> 重审（2026-10-26）：结构计数器 + 作用域装饰器 + 预筛/共享读面
+
 > 重审（2026-10-26）：json_doc 深度预检摘要缓存（file_facts 实验回退）
 
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）

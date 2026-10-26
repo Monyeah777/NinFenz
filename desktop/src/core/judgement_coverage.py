@@ -17,6 +17,7 @@
 """
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -37,10 +38,10 @@ SCAN_DEF = re.compile(r"^def scan\(", re.M)
 def candidates(root: str = ".") -> List[str]:
     d = Path(root) / CORE_DIR
     return sorted(p.stem for p in d.glob("*.py")
-                  if SCAN_DEF.search(p.read_text(encoding="utf-8", errors="replace")))
+                  if SCAN_DEF.search(scan_memo.read_text(p) or ""))
 
 
-def consumers_of(name: str, root: str = ".") -> List[str]:
+def consumers_of(name: str, root: str = ".", sigs: dict = None) -> List[str]:
     """该判据模块被谁消费。
 
     **精度纪律**（本模块自己踩过的坑）：只认「真消费」信号——`NAME.scan(...)` 之类的属性调用、
@@ -50,6 +51,7 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
     上一版按裸名字匹配，结果把例外表自己的说明文字当成了消费方，产生 5 条假「例外失效」。
     """
     r = Path(root)
+    sigs = _signals_map(root) if sigs is None else sigs
     out: List[str] = []
     registry_files = ("desktop/src/core/verify_report.py",
                       "desktop/src/core/quality_depth_scan.py")
@@ -57,7 +59,7 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
         p = r / rel
         if not p.is_file():
             continue
-        sig = scan_memo.signals(p)
+        sig = sigs.get(os.path.abspath(str(p))) or scan_memo.signals(p)
         hit = name in sig["calls"] or name in sig["imports"]
         if not hit and rel in registry_files:
             hit = name in sig["quoted"]
@@ -66,7 +68,7 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
     for p in sorted((r / CORE_DIR).glob("*.py")):
         if p.stem == name:
             continue
-        sig = scan_memo.signals(p)
+        sig = sigs.get(os.path.abspath(str(p))) or scan_memo.signals(p)
         if name in sig["calls"] or name in sig["imports"]:
             out.append("%s/%s" % (CORE_DIR, p.name))
     return sorted(set(out))
@@ -111,3 +113,25 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     stats = {"scanners": len(cands), "consumed": len(cands) - len(orphans),
              "exceptions": len(exc), "orphans": len(orphans)}
     return issues, warns, stats
+
+
+#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
+scan = scan_memo.scoped(scan)
+
+
+def _signals_map(root: str = ".") -> dict:
+    """一次扫描内**全部核心文件的 signals 表**（键=绝对路径 → 信号 dict）。
+
+    为什么：`consumers_of` 对 68 个判据名各查一遍 signals，而每次查都走 `facts`（各带一次
+    stat）——实测单次扫描 18,490 次 stat，其中 17,600+ 是同一个文件的重复问。表化后每文件
+    只 stat 一次。
+    """
+    from pathlib import Path as _P
+
+    def _compute() -> dict:
+        out = {}
+        for p in sorted((_P(root) / CORE_DIR).glob("*.py")):
+            out[os.path.abspath(str(p))] = scan_memo.token_signals(p)
+        return out
+
+    return scan_memo.facts("jc.signals_map", _P(root) / CORE_DIR, _compute)
