@@ -1,0 +1,21 @@
+{
+  "schema": "nf-exec-record/1",
+  "template": true,
+  "run_id": "template",
+  "package": "<域包名，须在 registry.json protocols[].id 在册>",
+  "executor": {
+    "model": "<真实模型标识，如 gpt-4o>",
+    "provider": "<提供方，如 openai>",
+    "version": "<模型版本/快照，如 2024-11-20>"
+  },
+  "date": "1970-01-01",
+  "profile": "<本次执行使用的 gate profile 标识>",
+  "brief": "<喂给模型的 brief / 需求原话>",
+  "artifact": {
+    "path": "<仓内相对路径，单个文件，如 community/xx/outputs/samples/yy.md>",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "contract_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "check_rc": 0,
+  "notes": "模板示例：显式标记 template=true，表示「未执行」，不构成 M2 证据。复制本件为 protocol/exec_records/<run_id>.json，填真实值并删除 template 字段后，用 `nf domain record --check <file>` 校验；真实运行需要外部模型 API key（本仓库不含任何 key）。"
+}

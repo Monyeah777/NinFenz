@@ -887,6 +887,18 @@ def _make_parser() -> argparse.ArgumentParser:
                                         "已填包数 / 双源（md↔json）一致性 / 与冻结基线比对（只减不"
                                             "增）")
     dm_s.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    dm_r = dmsub.add_parser("record", help="真实模型执行记录校验/落盘（M2 证据 · nf-exec-record/1）",
+                            description="M2 真实模型执行记录（protocol/schema/exec_record.schema.json）："
+                                        "校验 artifact 在仓内且 sha256 可复算 / check_rc==0 / "
+                                        "executor 是模型标识（非工具/装配器）/ date 合法 / package "
+                                        "在册；--write 落盘 protocol/exec_records/<run_id>.json。"
+                                        "无参 = 扫描 protocol/exec_records/。模板 _TEMPLATE.json 显式"
+                                        "标记「未执行」，不构成 M2 证据。")
+    dm_r.add_argument("--check", metavar="FILE", default=None,
+                      help="校验一条执行记录（JSON）；PASS=0 / FAIL=1 / 模板=0（未执行状态）")
+    dm_r.add_argument("--write", metavar="FILE", default=None,
+                      help="校验通过后落盘 protocol/exec_records/<run_id>.json（原子写；同内容幂等）")
+    dm_r.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cb = sub.add_parser("combine",
                         help="域包自由组合（任意 n 元 / 组件级；五不变量 + 可复算证书）",
                         description="组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭"
@@ -3953,6 +3965,11 @@ def _cmd_domain(args):
     from core import domain_pack as dp
 
     sub = getattr(args, "domain_cmd", "") or "specs"
+    if sub == "record":
+        from core import exec_record as er
+        return er.run(ROOT, check=getattr(args, "check", None),
+                      write=getattr(args, "write", None),
+                      as_json=bool(getattr(args, "json", False)))
     if sub == "maturity":
         from core import domain_maturity as dmx
         return dmx.run(ROOT, as_json=bool(getattr(args, "json", False)),
