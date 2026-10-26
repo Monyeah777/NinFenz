@@ -1,0 +1,643 @@
+{
+  "bench": "gate profile defect injection",
+  "defect_classes": [
+    {
+      "id": "cross_domain",
+      "label": "跨域"
+    },
+    {
+      "id": "missing_section",
+      "label": "缺章节"
+    },
+    {
+      "id": "term_inconsistency",
+      "label": "术语不一致"
+    },
+    {
+      "id": "heading_punct",
+      "label": "标题标点"
+    },
+    {
+      "id": "single_space",
+      "label": "单空格"
+    },
+    {
+      "id": "weak_expression",
+      "label": "弱表达"
+    },
+    {
+      "id": "disclosure_missing",
+      "label": "披露缺失"
+    },
+    {
+      "id": "audit_fields_missing",
+      "label": "审计字段缺失"
+    },
+    {
+      "id": "risk_tier",
+      "label": "风险档位"
+    },
+    {
+      "id": "version_no_rollback",
+      "label": "版本不回退"
+    }
+  ],
+  "invalid_cases": [],
+  "overall": {
+    "classes_in_scope": 19,
+    "classes_total": 20,
+    "clean_cases": 40,
+    "detected": 152,
+    "detection_rate": 1.0,
+    "fail_flagged_clean": 0,
+    "fp_rate": 0.0,
+    "negatives": 152
+  },
+  "profiles": {
+    "regulatory-strict": {
+      "classes": [
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "STRUCT-DOCTYPE": 8
+          },
+          "id": "cross_domain",
+          "in_scope": true,
+          "label": "跨域",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "把合规证据包声明成技术文档类型——doc_type 白名单应拒收。",
+          "target_clauses": [
+            "STRUCT-DOCTYPE"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "AUDIT-SECTION": 1,
+            "DATA-SOURCE-SECTION": 1,
+            "EU-AIA-50-TRANSPARENCY-SECTION": 1,
+            "ISO-42001-STATEMENT": 1,
+            "NIST-AIRMF-RISK-SECTION": 1,
+            "OVERSIGHT-SECTION": 1,
+            "PRIVACY-SECTION": 1,
+            "RETENTION-SECTION": 1
+          },
+          "id": "missing_section",
+          "in_scope": true,
+          "label": "缺章节",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "逐条去掉 8 个必备章节标题里的关键词（正文保留）。",
+          "target_clauses": [
+            "EU-AIA-50-TRANSPARENCY-SECTION",
+            "ISO-42001-STATEMENT",
+            "DATA-SOURCE-SECTION",
+            "NIST-AIRMF-RISK-SECTION",
+            "OVERSIGHT-SECTION",
+            "AUDIT-SECTION",
+            "RETENTION-SECTION",
+            "PRIVACY-SECTION"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "EU-AIA-50-GEN-STATEMENT": 8
+          },
+          "id": "term_inconsistency",
+          "in_scope": true,
+          "label": "术语不一致",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "把必填术语「人工智能生成/AI 生成」整体换成模糊同义词。",
+          "target_clauses": [
+            "EU-AIA-50-GEN-STATEMENT"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 0,
+          "detection_rate": null,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": null,
+          "hit_clauses": {},
+          "id": "heading_punct",
+          "in_scope": false,
+          "label": "标题标点",
+          "missed": 8,
+          "missed_cases": [
+            "heading_punct-01",
+            "heading_punct-02",
+            "heading_punct-03",
+            "heading_punct-04",
+            "heading_punct-05",
+            "heading_punct-06",
+            "heading_punct-07",
+            "heading_punct-08"
+          ],
+          "mode": "out_of_scope",
+          "negatives": 8,
+          "note": "regulatory-strict 全 profile 无标题风格条款（无 text_rule）——该类在本 profile 上无判据面，检出率不计入分母（如实报覆盖缺口）。",
+          "target_clauses": []
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "AUDIT-TRACE-ID": 1,
+            "EU-AIA-50-DEEPFAKE": 1,
+            "EU-AIA-50-GEN-STATEMENT": 1,
+            "GB-45438-EXPLICIT": 2,
+            "GB-45438-IMPLICIT": 1,
+            "NIST-AIRMF-RISK-LEVELS": 1,
+            "RETENTION-DURATION": 1
+          },
+          "id": "single_space",
+          "in_scope": true,
+          "label": "单空格",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "compensated",
+          "negatives": 8,
+          "note": "本 profile 无空格条款（compensated）：把双空格注入必填 token 内部，由 token 正则缺席代偿检出——这是**代偿路径**，不是原生空格判据。",
+          "target_clauses": [
+            "GB-45438-EXPLICIT",
+            "GB-45438-IMPLICIT",
+            "EU-AIA-50-GEN-STATEMENT",
+            "EU-AIA-50-DEEPFAKE",
+            "AUDIT-TRACE-ID",
+            "RETENTION-DURATION",
+            "NIST-AIRMF-RISK-LEVELS"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "EU-AIA-50-GEN-STATEMENT": 2,
+            "OVERSIGHT-ACTION": 4,
+            "PRIVACY-MINIMIZATION": 1,
+            "RETENTION-CONTACT": 1
+          },
+          "id": "weak_expression",
+          "in_scope": true,
+          "label": "弱表达",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "compensated",
+          "negatives": 8,
+          "note": "本 profile 无弱表达条款（compensated）：弱化词替换必填动作 token，由必填 token 缺席代偿检出（同样明示为代偿路径）。",
+          "target_clauses": [
+            "OVERSIGHT-ACTION",
+            "PRIVACY-MINIMIZATION",
+            "RETENTION-CONTACT",
+            "EU-AIA-50-GEN-STATEMENT"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "EU-AIA-50-DEEPFAKE": 1,
+            "EU-AIA-50-DISCLOSURE-TABLE": 2,
+            "EU-AIA-50-GEN-STATEMENT": 1,
+            "EU-AIA-50-TRANSPARENCY-SECTION": 1,
+            "GB-45438-IMPLICIT": 2,
+            "GB-45438-LABEL-TABLE": 2
+          },
+          "id": "disclosure_missing",
+          "in_scope": true,
+          "label": "披露缺失",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "AI 披露/标识面缺失：章节、披露表、深度合成口径、显式/隐式标识逐类摘除。",
+          "target_clauses": [
+            "EU-AIA-50-TRANSPARENCY-SECTION",
+            "EU-AIA-50-GEN-STATEMENT",
+            "EU-AIA-50-DISCLOSURE-TABLE",
+            "EU-AIA-50-DEEPFAKE",
+            "GB-45438-EXPLICIT",
+            "GB-45438-IMPLICIT",
+            "GB-45438-LABEL-TABLE"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "AUDIT-FIELD-TABLE": 4,
+            "AUDIT-SECTION": 2,
+            "AUDIT-TRACE-ID": 2
+          },
+          "id": "audit_fields_missing",
+          "in_scope": true,
+          "label": "审计字段缺失",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "审计日志面缺失：章节/字段表/必填列/trace_id 逐类摘除。",
+          "target_clauses": [
+            "AUDIT-SECTION",
+            "AUDIT-FIELD-TABLE",
+            "AUDIT-TRACE-ID"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "NIST-AIRMF-RISK-LEVELS": 2,
+            "NIST-AIRMF-RISK-SECTION": 2,
+            "NIST-AIRMF-RISK-TABLE": 5
+          },
+          "id": "risk_tier",
+          "in_scope": true,
+          "label": "风险档位",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "风险分级面：章节/四档词表/风险等级表逐类破坏。",
+          "target_clauses": [
+            "NIST-AIRMF-RISK-SECTION",
+            "NIST-AIRMF-RISK-TABLE",
+            "NIST-AIRMF-RISK-LEVELS"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "VERSION-CHANGE-TABLE": 3,
+            "VERSION-TRACE": 7
+          },
+          "id": "version_no_rollback",
+          "in_scope": true,
+          "label": "版本不回退",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "版本变更表版本列回退/相等/格式坏/缺列。",
+          "target_clauses": [
+            "VERSION-TRACE",
+            "VERSION-CHANGE-TABLE"
+          ]
+        }
+      ],
+      "fixture_path": "desktop/tests/fixtures/gate_defects/regulatory_base.md",
+      "fixture_sha256": "e1b3aa08ddf6eb5a239e98bb2bdd26b4176396f3d748b57226e65e107edb6608",
+      "profile_id": "regulatory-strict",
+      "profile_path": "community/合规与监管域包/gate_profiles/regulatory-strict.json",
+      "profile_sha256": "51881250ea8b41cf550b826de4db0147b7b8be5d3f764b24691bae0ba2622cef",
+      "totals": {
+        "cases": 100,
+        "classes_in_scope": 9,
+        "classes_total": 10,
+        "clean_cases": 20,
+        "detected": 72,
+        "detection_rate": 1.0,
+        "fail_flagged_clean": 0,
+        "false_positives": 0,
+        "fp_rate": 0.0,
+        "missed": 0,
+        "negatives": 72
+      }
+    },
+    "techdoc-strict": {
+      "classes": [
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "DITA-1.3-DOCTYPE-01": 8
+          },
+          "id": "cross_domain",
+          "in_scope": true,
+          "label": "跨域",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "把技术文档声明成其他域的类型（合规/财报告等）——doc_type 白名单应拒收。",
+          "target_clauses": [
+            "DITA-1.3-DOCTYPE-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "DITA-1.3-TASK-STEPS-01": 2,
+            "GB-19678-GLOSSARY-01": 1,
+            "GB-19678-STRUCT-01": 6
+          },
+          "id": "missing_section",
+          "in_scope": true,
+          "label": "缺章节",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "必备章节改名（保留正文）或把操作步骤改成非编号段落。",
+          "target_clauses": [
+            "GB-19678-STRUCT-01",
+            "GB-19678-GLOSSARY-01",
+            "DITA-1.3-TASK-STEPS-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "GB-19678-TERM-01": 4,
+            "GB-19678-TERM-02": 4
+          },
+          "id": "term_inconsistency",
+          "in_scope": true,
+          "label": "术语不一致",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "正文首次使用术语表外的术语（未就地定义），或规范术语与别名并存。",
+          "target_clauses": [
+            "GB-19678-TERM-01",
+            "GB-19678-TERM-02"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "MS-STYLE-HEADING-PUNCT": 8
+          },
+          "id": "heading_punct",
+          "in_scope": true,
+          "label": "标题标点",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "8 个二级标题逐条加句末句号（MS Style：标题不带句末标点）。",
+          "target_clauses": [
+            "MS-STYLE-HEADING-PUNCT"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "MS-STYLE-SPACE-01": 8
+          },
+          "id": "single_space",
+          "in_scope": true,
+          "label": "单空格",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "正文词间双空格 / 标点前空格（8 处不同位置）。",
+          "target_clauses": [
+            "MS-STYLE-SPACE-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "MS-STYLE-WEAK-01": 8
+          },
+          "id": "weak_expression",
+          "in_scope": true,
+          "label": "弱表达",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "8 个不同弱化词注入 8 处正文（warn 级判据，同样计入「门看见了」）。",
+          "target_clauses": [
+            "MS-STYLE-WEAK-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "DITA-1.3-DOCTYPE-01": 6,
+            "DITA-1.3-SHORTDESC-01": 4
+          },
+          "id": "disclosure_missing",
+          "in_scope": true,
+          "label": "披露缺失",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "读者告知面缺失：短述（blockquote 简摘）/文档类型声明被删或降级为非引用段。",
+          "target_clauses": [
+            "DITA-1.3-SHORTDESC-01",
+            "DITA-1.3-DOCTYPE-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "GB-19678-REVISION-01": 6,
+            "GB-19678-REVISION-02": 4
+          },
+          "id": "audit_fields_missing",
+          "in_scope": true,
+          "label": "审计字段缺失",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "修订记录（审计追溯）表缺列/缺行/版本或日期格式坏。",
+          "target_clauses": [
+            "GB-19678-REVISION-01",
+            "GB-19678-REVISION-02"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "GB-19678-SAFETY-01": 8
+          },
+          "id": "risk_tier",
+          "in_scope": true,
+          "label": "风险档位",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "techdoc profile 无风险档位规则 ⇒ 映射到安全提示档位（warn）：逐例整体摘除 警告/注意/危险 三档提示词。",
+          "target_clauses": [
+            "GB-19678-SAFETY-01"
+          ]
+        },
+        {
+          "cases": 10,
+          "cleans": 2,
+          "detected": 8,
+          "detection_rate": 1.0,
+          "false_positive_cases": [],
+          "false_positives": 0,
+          "fp_rate": 0.0,
+          "hit_clauses": {
+            "GB-19678-REVISION-01": 8
+          },
+          "id": "version_no_rollback",
+          "in_scope": true,
+          "label": "版本不回退",
+          "missed": 0,
+          "missed_cases": [],
+          "mode": "native",
+          "negatives": 8,
+          "note": "修订记录版本列回退/相等/格式坏/缺列。",
+          "target_clauses": [
+            "GB-19678-REVISION-01"
+          ]
+        }
+      ],
+      "fixture_path": "desktop/tests/fixtures/gate_defects/techdoc_base.md",
+      "fixture_sha256": "a138e6b055a018be45acb4735d81b4f5942a242b6b314c49eb24ff79b2d8b073",
+      "profile_id": "techdoc-strict",
+      "profile_path": "community/技术文档域包/gate_profiles/techdoc-strict.json",
+      "profile_sha256": "8d6ed4d4e905dbaa74409de9c840156d1c5e68b0188d32537fc8f5626eaa200c",
+      "totals": {
+        "cases": 100,
+        "classes_in_scope": 10,
+        "classes_total": 10,
+        "clean_cases": 20,
+        "detected": 80,
+        "detection_rate": 1.0,
+        "fail_flagged_clean": 0,
+        "false_positives": 0,
+        "fp_rate": 0.0,
+        "missed": 0,
+        "negatives": 80
+      }
+    }
+  },
+  "schema": "nf-gate-defect-bench/1",
+  "thresholds": {
+    "max_fp_rate": 0.1,
+    "min_detection_rate": 0.9
+  },
+  "verdict": {
+    "ok": true,
+    "profiles": {
+      "regulatory-strict": true,
+      "techdoc-strict": true
+    },
+    "reasons": []
+  }
+}
