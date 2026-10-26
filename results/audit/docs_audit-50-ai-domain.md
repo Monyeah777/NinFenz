@@ -6,7 +6,7 @@ scope: 命题 P（依赖闭包型知识域能否在 NF 现有机制下自然表�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - community/AI系统域包/protocol.yaml:d3803152400d86977f1c3f395c8051c6c06230bc6d565ae823a17b1ec37b27ac
+  - community/AI系统域包/protocol.yaml:a2205ee193631093bf6186c1cec22389d38ca1c2154ae00aa579499cef6b7808
   - community/AI系统域包/assets/CONCEPT_GRAPH.md:bd666baaf1bc9eccc0fbd319c37e922f2dc5abba09020003e74a1ec41c321894
   - community/AI系统域包/modules/M25_前置闭包求值.md:407a0cd4758d8390d04cfb8a3fd3b1bc4153b4e414cf023dc52f028e18ec353f
   - community/AI系统域包/modules/M26_装载序就绪门.md:997415ffd94150b0a6599359eaf04252001cf1b834495f0dfcfb95f5c50bddc3
@@ -14,6 +14,8 @@ subjects:
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
 
 ---
+> 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
+
 
 > 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 

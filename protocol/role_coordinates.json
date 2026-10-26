@@ -6,7 +6,7 @@
     "prod": 1063,
     "projection": 131,
     "support": 267,
-    "verify": 1138
+    "verify": 1141
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6071,6 +6071,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "域包成熟度 M0–M3：从**证据**计算，不接受自报。",
+      "path": "desktop/src/core/domain_maturity.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "域功能引擎：把「AI 品类域」的口径变成**可复算的数**（产出形态 T4 面）。",
       "path": "desktop/src/core/domain_metrics.py",
       "role": "prod",
@@ -7873,6 +7879,12 @@
     {
       "function": "T2.1 · 域隔离与契约 schema 落地（Wave2）单测。",
       "path": "desktop/tests/test_domain_gate.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "T5.1 · 域包成熟度 M0–M3（`nf domain maturity`）判据。",
+      "path": "desktop/tests/test_domain_maturity.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12833,6 +12845,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "域包成熟度 M0–M3：按证据逐级计算（声明位 package.maturity 不参与计算；声明 > 计算 = 虚标）。口径见 core/domain_maturity.py。",
+      "path": "protocol/domain_maturity.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 品类域包名录（公开结果面）。每包：域码 / 独占类别 / 管线 / 模块 / 资产数 / 产出面与机验率 / 规格摘要。机检：check32 domain_packs 子扫描（名录 ↔ 盘上实况一致 + 可机验占比 ≥95%）。规格源在内部档案，故名录只登记摘要（spec_digest）不携带内容。",
       "path": "protocol/domain_packs.json",
       "role": "verify",
@@ -13248,7 +13266,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "05853b14860aa0f0239e0df334844dfaefeb16b0098fbfb3f98ff4671f13d781",
+  "root_digest": "f46a049f84e98ad4199383c7aaa1665462b7c467a1c3d382eb98027c761b8637",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 122,
@@ -13257,8 +13275,8 @@
     "R-prod": 962,
     "R-projection": 116,
     "R-support": 119,
-    "R-verify": 1019,
-    "auto:R-core": 261
+    "R-verify": 1021,
+    "auto:R-core": 262
   },
   "schema": "nf-role-coordinates/1"
 }

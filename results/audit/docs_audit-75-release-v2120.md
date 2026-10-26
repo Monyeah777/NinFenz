@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:b83b3042597b81fcc9da47f589ffeee4d24b3bae05acdbc7156ba7d51047737b
+  - scripts/nf.py:44a44c8bf9de5dd867b80c9596365e98c9a6e6843977a85530f07f5400a970a3
 
 ---
+> 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
+
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
 
 > 重审（2026-10-26）：Merge t-compliance: regulatory profile 34 clauses + 9 assets + evidence pack

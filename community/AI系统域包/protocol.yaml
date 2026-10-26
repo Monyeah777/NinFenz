@@ -5,6 +5,7 @@ protocol:
   schema_version: "2"          # 引用 Schema 版本，v2 起支持 references；bump 走 01 §7 V1/V2/V3
 package:
   conformance: "L2"            # 装配可执行：自带模块在装配在册（registry protocols[].module_ids）
+  maturity: "M1"               # 证据计算等级（nf domain maturity）：M2 未达——缺真实模型执行；声明位不参与计算
   id: AI系统域包                # 包目录名（机读唯一标识，与 02 §8 在册一致）
   name: AI系统域包              # 显示名（与 README 标题一致）
   # 包内容版本迁移记录（additive 档，1.0.0 → 1.1.0）：四步记录单一真源 = 02 §9.4（本件不复制一份）
@@ -33,6 +34,7 @@ package:
     count: 6                    # 声明产出面件数（schema 2 / 数据 1 / 可复算 1 / 图示 2）
     machine_verifiable: 6       # 其中可机验（档位 ≥ T2）件数——本包机验率见 nf output meter
     functional: 1               # 其中可复算（T4：闭包产物由概念图重算比对）
+    note: "缺真实模型执行：本包无执行记录（M2 须真实模型标识/版本 + date + artifact digest 可复算）"
   mount_layers:                 # 挂载层声明（R3，对齐 02 §5 挂载点键名；同层 default 与既有包交集为空——两模块为类内段新编号，唯一 id）
     P40 行为决策: {default: [AI系统:M25], available: []}    # 闭包求值层（读图 + 算闭包；官方 M50 调度本体驻官方核心位，不搬移）
     P60 长期演变: {default: [AI系统:M26], available: []}    # 装载序与就绪门层（派生量收口，不含闭包算法）

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:dd5ef9d2f3f71975e169ec6e7ba763c7753a089a7e188fc1e248b84318071e27
+  - protocol/code_metrics_baseline.json:4a5e9d585db2bbd7652520d9c72fa84714b56deb5a3f9161a44534efabaeadfb
 ---
+> 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
+
 > 重审（2026-10-26）：Merge t-scope: scoped allowed_module_ids + --loose
 
 > 重审（2026-10-26）：Merge t-measure: gate defect bench (new scripts/results/tests)

@@ -77861,6 +77861,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -78090,6 +78100,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -78323,6 +78343,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -78552,6 +78582,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -78785,6 +78825,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -79014,6 +79064,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -79247,6 +79307,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -79476,6 +79546,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -79709,6 +79789,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -79938,6 +80028,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -80171,6 +80271,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -80400,6 +80510,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -80633,6 +80753,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -80862,6 +80992,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -81095,6 +81235,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -81324,6 +81474,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -81557,6 +81717,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -81786,6 +81956,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -82019,6 +82199,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -82248,6 +82438,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -82481,6 +82681,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -82710,6 +82920,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -82943,6 +83163,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -83172,6 +83402,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -83405,6 +83645,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -83634,6 +83884,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -83867,6 +84127,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -84096,6 +84366,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -84329,6 +84609,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -84558,6 +84848,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -84791,6 +85091,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -85020,6 +85330,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -85253,6 +85573,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -85482,6 +85812,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -85715,6 +86055,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -85944,6 +86294,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -86177,6 +86537,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -86406,6 +86776,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -86639,6 +87019,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -86868,6 +87258,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -87101,6 +87501,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -87330,6 +87740,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -87563,6 +87983,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -87792,6 +88222,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -88025,6 +88465,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -88254,6 +88704,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -88487,6 +88947,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -88716,6 +89186,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -88949,6 +89429,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -89178,6 +89668,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -89411,6 +89911,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -89640,6 +90150,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -89873,6 +90393,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -90102,6 +90632,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -90335,6 +90875,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -90564,6 +91114,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -90797,6 +91357,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -91026,6 +91596,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -91259,6 +91839,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -91488,6 +92078,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -91721,6 +92321,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -91950,6 +92560,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -92183,6 +92803,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -92412,6 +93042,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -92645,6 +93285,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -92874,6 +93524,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -93107,6 +93767,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -93336,6 +94006,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -93569,6 +94249,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -93798,6 +94488,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -94031,6 +94731,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -94260,6 +94970,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -94493,6 +95213,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -94722,6 +95452,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -94955,6 +95695,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -95184,6 +95934,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -95417,6 +96177,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -95646,6 +96416,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -95879,6 +96659,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -96108,6 +96898,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -96341,6 +97141,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -96570,6 +97380,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -96803,6 +97623,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -97032,6 +97862,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -97265,6 +98105,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -97494,6 +98344,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -97727,6 +98587,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -97956,6 +98826,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -98189,6 +99069,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -98418,6 +99308,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -98651,6 +99551,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -98880,6 +99790,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -99113,6 +100033,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -99342,6 +100272,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -99575,6 +100515,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -99804,6 +100754,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -100037,6 +100997,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -100266,6 +101236,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -100499,6 +101479,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -100728,6 +101718,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -100961,6 +101961,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -101190,6 +102200,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -101423,6 +102443,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -101652,6 +102682,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -101885,6 +102925,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -102114,6 +103164,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -102347,6 +103407,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -102576,6 +103646,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {
@@ -102809,6 +103889,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -103040,6 +104130,16 @@
                 "minLength": 1,
                 "type": "string"
               },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
               "module_id_range": {
                 "items": {
                   "pattern": "^([^:]*:)?M[0-9]{2}$",
@@ -103269,6 +104369,16 @@
               },
               "id": {
                 "minLength": 1,
+                "type": "string"
+              },
+              "maturity": {
+                "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）",
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
                 "type": "string"
               },
               "module_id_range": {

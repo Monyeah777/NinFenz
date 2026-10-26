@@ -6,13 +6,15 @@ scope: 作者指示新建域包（community 第 7 包）：口径协议（因子
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - community/量化金融域包/protocol.yaml:df556b4f08e825ed9113831f7061252e6187e656a39e1fc0a3dc5fb792afe26d
+  - community/量化金融域包/protocol.yaml:550fff0de0ceb1160253e1e81645225fa2e01bc73baedb586f2b090ebef1d5fe
   - community/量化金融域包/assets/QUANT_GRAPH.md:331d63943effe51462440c41832202df3b8e6bb2553734472947ac77927e094c
   - community/量化金融域包/assets/QUANT_METRICS.md:fd85b5a871729e04b9c4026cc177e66875e35ca44cd098808cadbeb46f19ef06
   - community/量化金融域包/modules/M31_因子与信号口径.md:6404dd6093d63828e39b5ff69b9e289a54c50fed32e61e5c8e15832ef371fd00
   - community/量化金融域包/modules/M32_回测与绩效口径.md:30a5a15d78272ea2cc95418423fc356f053c58da313f2ab2cf33cb777b851d8e
   - community/量化金融域包/pipelines/P08_量化金融域装配流管线.md:925190c471938da22846bf2298fb8e7d10219a5ecbd37d2e945260e70344769c
 ---
+> 重审（2026-10-26）：Merge t-maturity: M0-M3 evidence-based maturity + registry projection
+
 
 > 重审（2026-10-11 · §15 审计修复波）：被审对象随修复波改动，subjects 依「重审并更新 digest」处置。本次为**机械重绑**（作者裁定 A）：修复波本身带判据与全量测试证据（doctor 17/17、四棘轮与基线相等、分块全量测试除本项外全绿），非新的语义审计。
 

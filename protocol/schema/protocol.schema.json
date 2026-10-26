@@ -34,6 +34,11 @@
           "enum": ["L1", "L2", "L3"],
           "description": "协议包一致性分级声明（01 §1.2）；在册包 = L2"
         },
+        "maturity": {
+          "type": "string",
+          "enum": ["M0", "M1", "M2", "M3"],
+          "description": "域包成熟度**声明位**（T5.1；M0 模板 / M1 机检 / M2 真实模型执行 / M3 用户签收）。只作声明，不参与等级计算——实际等级由 `nf domain maturity` 从证据算出（声明 > 计算 = 虚标）"
+        },
         "pipeline": { "type": "string", "pattern": "^P[0-9]{2,3}$" },
         "module_id_range": {
           "type": "array",

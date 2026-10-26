@@ -347,7 +347,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M0"
     },
     {
       "id": "西幻生存领域包",
@@ -430,7 +431,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M0"
     },
     {
       "assets": {
@@ -496,7 +498,8 @@
         }
       ],
       "schema_version": "2",
-      "version": "1.1.0"
+      "version": "1.1.0",
+      "maturity": "M0"
     },
     {
       "assets": {
@@ -547,7 +550,8 @@
       "pipeline": "P05",
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M0"
     },
     {
       "id": "技术文档域包",
@@ -582,7 +586,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.1.0"
+      "version": "1.1.0",
+      "maturity": "M0"
     },
     {
       "id": "AI系统域包",
@@ -617,7 +622,8 @@
       },
       "references": [],
       "version": "1.2.0",
-      "schema_version": "2"
+      "schema_version": "2",
+      "maturity": "M1"
     },
     {
       "id": "量化金融域包",
@@ -652,7 +658,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.1.0"
+      "version": "1.1.0",
+      "maturity": "M1"
     },
     {
       "id": "大语言模型域包",
@@ -687,7 +694,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "多模态大模型域包",
@@ -722,7 +730,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "视觉模型域包",
@@ -757,7 +766,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "语音识别与合成域包",
@@ -792,7 +802,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "音频与音乐生成域包",
@@ -827,7 +838,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "视频生成与理解域包",
@@ -862,7 +874,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "图像生成与编辑域包",
@@ -897,7 +910,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "文本生成与创作域包",
@@ -932,7 +946,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "摘要与信息压缩域包",
@@ -967,7 +982,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "机器翻译与本地化域包",
@@ -1002,7 +1018,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "分类与情感分析域包",
@@ -1037,7 +1054,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "代码大模型域包",
@@ -1072,7 +1090,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "嵌入与检索表示域包",
@@ -1107,7 +1126,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "具身智能与机器人域包",
@@ -1142,7 +1162,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "三维与世界模型域包",
@@ -1177,7 +1198,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数学与形式化推理域包",
@@ -1212,7 +1234,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "强化学习与决策域包",
@@ -1247,7 +1270,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "端侧与边缘小模型域包",
@@ -1282,7 +1306,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "信息抽取与结构化域包",
@@ -1317,7 +1342,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "知识问答与检索增强域包",
@@ -1352,7 +1378,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "多轮对话与角色扮演域包",
@@ -1387,7 +1414,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "代码生成与补全域包",
@@ -1422,7 +1450,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "代码审查与缺陷检测域包",
@@ -1457,7 +1486,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "测试与用例生成域包",
@@ -1492,7 +1522,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数据分析与表格理解域包",
@@ -1527,7 +1558,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "文档解析与版面理解域包",
@@ -1562,7 +1594,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "语音转写与会议记录域包",
@@ -1597,7 +1630,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "语音合成与配音域包",
@@ -1632,7 +1666,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "图像生成与视觉设计域包",
@@ -1667,7 +1702,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "视频生成与自动剪辑域包",
@@ -1702,7 +1738,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数据采集与清洗域包",
@@ -1737,7 +1774,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数据标注与标注质量域包",
@@ -1772,7 +1810,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "合成数据生成域包",
@@ -1807,7 +1846,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "预训练与继续预训练域包",
@@ -1842,7 +1882,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "参数高效微调域包",
@@ -1877,7 +1918,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "对齐与偏好优化域包",
@@ -1912,7 +1954,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "推理优化与加速域包",
@@ -1947,7 +1990,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "推理服务与部署域包",
@@ -1982,7 +2026,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "上下文工程与长上下文域包",
@@ -2017,7 +2062,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "提示工程与提示模板域包",
@@ -2052,7 +2098,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "记忆体与个性化域包",
@@ -2087,7 +2134,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "向量库与检索管线域包",
@@ -2122,7 +2170,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "智能体框架与工具调用域包",
@@ -2157,7 +2206,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "多智能体协同域包",
@@ -2192,7 +2242,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "物流与供应链域包",
@@ -2227,7 +2278,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "交通与出行域包",
@@ -2262,7 +2314,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "建筑与房地产域包",
@@ -2297,7 +2350,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "传媒与新闻域包",
@@ -2332,7 +2386,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "文旅与酒店域包",
@@ -2367,7 +2422,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "科研与实验域包",
@@ -2402,7 +2458,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "提示工程与指令设计域包",
@@ -2437,7 +2494,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "世界书与设定库域包",
@@ -2472,7 +2530,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "长文本与小说创作域包",
@@ -2507,7 +2566,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "内容改写与风格迁移域包",
@@ -2542,7 +2602,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "多语翻译与本地化域包",
@@ -2577,7 +2638,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "图像生成与视觉创作域包",
@@ -2612,7 +2674,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "视频生成与剪辑域包",
@@ -2647,7 +2710,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "音频音乐与语音域包",
@@ -2682,7 +2746,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "编辑校对与出版域包",
@@ -2717,7 +2782,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "智能体与工作流编排域包",
@@ -2752,7 +2818,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "代码与软件工程域包",
@@ -2787,7 +2854,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数据分析与决策支持域包",
@@ -2822,7 +2890,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "个人助理与日常生活域包",
@@ -2857,7 +2926,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "搜索与信息聚合域包",
@@ -2892,7 +2962,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "内容分发与社区运营域包",
@@ -2927,7 +2998,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "数字人与虚拟形象域包",
@@ -2962,7 +3034,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "安全与对齐域包",
@@ -2997,7 +3070,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "合规与监管域包",
@@ -3032,7 +3106,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "隐私与数据治理域包",
@@ -3067,7 +3142,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "版权与知识产权域包",
@@ -3102,7 +3178,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "可解释性与审计域包",
@@ -3137,7 +3214,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "模型运营与成本域包",
@@ -3172,7 +3250,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "平台与基础设施域包",
@@ -3207,7 +3286,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "产业与商业落地域包",
@@ -3242,7 +3322,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "监督微调域包",
@@ -3277,7 +3358,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "零售与电商域包",
@@ -3312,7 +3394,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "游戏与互动娱乐域包",
@@ -3347,7 +3430,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "角色扮演与角色卡域包",
@@ -3382,7 +3466,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "知识管理与检索增强域包",
@@ -3417,7 +3502,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "企业培训与组织学习域包",
@@ -3452,7 +3538,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "对话与客服域包",
@@ -3487,7 +3574,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "评测与基准域包",
@@ -3522,7 +3610,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "开源与开发者生态域包",
@@ -3557,7 +3646,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "推荐排序与广告域包",
@@ -3592,7 +3682,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "预测异常与风险域包",
@@ -3627,7 +3718,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "评测基准与排行榜域包",
@@ -3662,7 +3754,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "红队越狱与安全测试域包",
@@ -3697,7 +3790,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "可观测性成本与可靠性域包",
@@ -3732,7 +3826,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI医疗健康域包",
@@ -3767,7 +3862,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI制药与生物域包",
@@ -3802,7 +3898,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI法律与合规域包",
@@ -3837,7 +3934,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI金融投研与风控域包",
@@ -3872,7 +3970,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI保险域包",
@@ -3907,7 +4006,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI教育域包",
@@ -3942,7 +4042,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI政务与公共事务域包",
@@ -3977,7 +4078,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI制造业域包",
@@ -4012,7 +4114,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI能源与电力域包",
@@ -4047,7 +4150,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI农业域包",
@@ -4082,7 +4186,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI人力资源与招聘域包",
@@ -4117,7 +4222,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "AI食品与餐饮域包",
@@ -4152,7 +4258,8 @@
       },
       "references": [],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "组合包-检索栈",
@@ -4225,7 +4332,8 @@
         }
       ],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "组合包-数据管线",
@@ -4312,7 +4420,8 @@
         }
       ],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "组合包-受监管行业",
@@ -4399,7 +4508,8 @@
         }
       ],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     },
     {
       "id": "组合包-轻混与保险",
@@ -4502,7 +4612,8 @@
         }
       ],
       "schema_version": "2",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "maturity": "M1"
     }
   ]
 }
