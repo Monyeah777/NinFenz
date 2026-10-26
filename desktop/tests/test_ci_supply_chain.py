@@ -151,7 +151,10 @@ class CiRequirementsPinTest(unittest.TestCase):
         self.assertTrue(wf.is_file(), "缺 dependency-review 工作流：PR 依赖回归没有合并前闸门")
         text = wf.read_text(encoding="utf-8")
         self.assertRegex(text, r"(?m)^  pull_request:\s*$")
-        self.assertIn("actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294", text)
+        self.assertIn(
+            "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+            text,
+        )
         self.assertIn("fail-on-severity: high", text)
         self.assertIn("pull-requests: write", text,
                       "依赖审查失败摘要无法回写 PR（诊断面缺失）")
