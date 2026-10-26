@@ -12,8 +12,18 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23
+  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
 ---
+> 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
+
+> 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新
+
+> 重审（2026-10-26）：风格基线收紧 + 共享扫描面（scan_memo）
+
+> 重审（2026-10-26）：asset_contract 用 partial 绑定（消 B023）
+
+> 重审（2026-10-26）：verify_report 共享扫描面（scan_memo）+ role_model/asset_contract/conformance/redos 复用
+
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
 
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑

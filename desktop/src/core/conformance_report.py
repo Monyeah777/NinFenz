@@ -37,8 +37,9 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from core import atomic_write, json_doc
-from core import receipts
+from core import atomic_write, json_doc, receipts
+
+from . import scan_memo
 
 SCHEMA = "nf-conformance/1"
 REPORT_REL = "protocol/conformance_report.json"
@@ -324,6 +325,13 @@ CONTRACTS: List[Tuple[str, Callable[[str], Tuple[bool, str]], str]] = [
 
 
 def run(root: str = ".") -> Dict[str, Any]:
+    """跑全部契约（**作用域内复用**：verify_report 的多条判据都要这份实时报告）。"""
+    import os as _os
+    return scan_memo.pure("conformance.run", _os.path.abspath(root),
+                          lambda: _run_uncached(root))
+
+
+def _run_uncached(root: str = ".") -> Dict[str, Any]:
     """跑全部契约 → 封缄报告（外层）：一次只读调用内共享语料读。
 
     27 项契约里多路扫描器会读同一批协议件 / 模块文档；作用域严格等于这一次 `run()`

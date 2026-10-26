@@ -53,8 +53,8 @@
     },
     "asset_contract": {
       "ca": 1,
-      "ce": 6,
-      "i": 0.8571
+      "ce": 7,
+      "i": 0.875
     },
     "asset_density": {
       "ca": 2,
@@ -193,7 +193,7 @@
     },
     "conformance_report": {
       "ca": 0,
-      "ce": 29,
+      "ce": 30,
       "i": 1.0
     },
     "conformance_run": {
@@ -588,7 +588,7 @@
     },
     "judgement_coverage": {
       "ca": 0,
-      "ce": 1,
+      "ce": 2,
       "i": 1.0
     },
     "key_naming": {
@@ -968,8 +968,8 @@
     },
     "redos_scan": {
       "ca": 1,
-      "ce": 0,
-      "i": 0.0
+      "ce": 1,
+      "i": 0.5
     },
     "registry_cross": {
       "ca": 1,
@@ -1053,8 +1053,8 @@
     },
     "role_model": {
       "ca": 1,
-      "ce": 3,
-      "i": 0.75
+      "ce": 4,
+      "i": 0.8
     },
     "round_drill": {
       "ca": 2,
@@ -1083,6 +1083,11 @@
     },
     "rust_pyext": {
       "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "scan_memo": {
+      "ca": 6,
       "ce": 0,
       "i": 0.0
     },
@@ -1248,7 +1253,7 @@
     },
     "verify_report": {
       "ca": 0,
-      "ce": 4,
+      "ce": 5,
       "i": 1.0
     },
     "watch": {

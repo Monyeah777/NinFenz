@@ -23,6 +23,8 @@ from typing import Any, Dict, List, Tuple
 
 from core import json_doc
 
+from . import scan_memo
+
 DECL_REL = "protocol/judgement_coverage.json"
 SCHEMA = "nf-judgement-coverage/1"
 CORE_DIR = "desktop/src/core"
@@ -49,30 +51,25 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
     """
     r = Path(root)
     out: List[str] = []
-    call_re = re.compile(r"\b%s\s*\.\s*\w+\s*\(" % re.escape(name))
-    import_re = re.compile(r"from\s+core(?:\.%s)?\s+import\b[^\n]*\b%s\b"
-                           % (re.escape(name), re.escape(name)))
-    quoted_re = re.compile(r"[\"']%s[\"']" % re.escape(name))
     registry_files = ("desktop/src/core/verify_report.py",
                       "desktop/src/core/quality_depth_scan.py")
     for rel in CONSUMERS:
         p = r / rel
         if not p.is_file():
             continue
-        text = p.read_text(encoding="utf-8", errors="replace")
-        hit = bool(call_re.search(text) or import_re.search(text))
+        sig = scan_memo.signals(p)
+        hit = name in sig["calls"] or name in sig["imports"]
         if not hit and rel in registry_files:
-            hit = bool(quoted_re.search(text))
+            hit = name in sig["quoted"]
         if hit:
             out.append(rel)
     for p in sorted((r / CORE_DIR).glob("*.py")):
         if p.stem == name:
             continue
-        text = p.read_text(encoding="utf-8", errors="replace")
-        if call_re.search(text) or import_re.search(text):
+        sig = scan_memo.signals(p)
+        if name in sig["calls"] or name in sig["imports"]:
             out.append("%s/%s" % (CORE_DIR, p.name))
     return sorted(set(out))
-
 
 def declaration(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     p = Path(root) / DECL_REL

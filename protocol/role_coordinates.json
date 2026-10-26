@@ -3,7 +3,7 @@
     "app": 1444,
     "entry": 26,
     "floor": 5,
-    "prod": 1041,
+    "prod": 1042,
     "projection": 130,
     "support": 263,
     "verify": 963
@@ -6809,6 +6809,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "一次扫描内的**共享读面 + 派生事实面**（`verify_report` 结构性去重的底座）。",
+      "path": "desktop/src/core/scan_memo.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "43 A1 —— 协议层 IDL 校验器（自实现 JSON-schema 子集 + 全量件扫描）。",
       "path": "desktop/src/core/schema_lint.py",
       "role": "verify",
@@ -12066,7 +12072,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9642bb9489a9c286fd5fc977c5ef4aa4afe2f20b87cb69d219a88ac7b64b004d",
+  "root_digest": "c14190eac88e2b751303bfa16b406c5c3f2f9c520a9eb817b76866673c25f45c",
   "rule_counts": {
     "R-app": 1444,
     "R-catch": 118,
@@ -12076,7 +12082,7 @@
     "R-projection": 115,
     "R-support": 119,
     "R-verify": 846,
-    "auto:R-core": 255
+    "auto:R-core": 256
   },
   "schema": "nf-role-coordinates/1"
 }

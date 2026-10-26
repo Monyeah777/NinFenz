@@ -107,8 +107,8 @@
     },
     {
       "id": "npm",
-      "claim_zh": "分发：npm 包 ninfenz v1.1.0（2905 文件 / 解包 23.06 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
-      "claim_en": "Distribution: npm package ninfenz v1.1.0 (2905 files / 23.06 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
+      "claim_zh": "分发：npm 包 ninfenz v1.1.0（2906 文件 / 解包 23.07 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.1.0 (2906 files / 23.07 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
       "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"

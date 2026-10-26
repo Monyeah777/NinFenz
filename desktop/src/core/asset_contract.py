@@ -43,6 +43,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from core import atomic_write, json_doc, repo_face
 from core.atoms import hash as hash_atom
 
+from . import scan_memo
+
 DECL_REL = "protocol/asset_contracts.json"
 EXPORT_REL = "protocol/generated/asset_contract.frictionless.json"
 SCHEMA_REL = "protocol/schema/asset_contracts.schema.json"
@@ -116,7 +118,7 @@ def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
     """读文本件 → (text, issue)。缺件/不可读不抛裸异常，如实报问题（扫描要能出报告）。"""
     p = Path(root) / rel
     try:
-        return p.read_text(encoding="utf-8"), None
+        return scan_memo.read_text_strict(p), None
     except OSError as exc:
         return None, "读不到 %s：%s（修复指引：核对声明里的路径在场）" % (rel, exc)
     except UnicodeDecodeError as exc:
@@ -984,8 +986,11 @@ def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, A
             issues.append("代码件 %s 语法坏：%s（修复指引：先修语法，AST 判据需要可解析的树）"
                           % (one, exc))
             continue
-        issues += _denied_calls(tree, one, deny)
-        issues += _none_deref(tree, one)
+        pa = Path(root) / one
+        dk = f"denied_calls:{tuple(sorted(deny))}"
+        issues += scan_memo.facts(dk, pa, functools.partial(_denied_calls, tree, one, deny))
+        issues += scan_memo.facts("none_deref", pa,
+                                  functools.partial(_none_deref, tree, one))
     if rel:
         issues += _check_tests(root, rel, spec)
     return issues, stats

@@ -26,8 +26,18 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23
+  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
 ---
+> 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
+
+> 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新
+
+> 重审（2026-10-26）：风格基线收紧 + 共享扫描面（scan_memo）
+
+> 重审（2026-10-26）：asset_contract 用 partial 绑定（消 B023）
+
+> 重审（2026-10-26）：verify_report 共享扫描面（scan_memo）+ role_model/asset_contract/conformance/redos 复用
+
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
 
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
