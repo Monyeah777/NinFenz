@@ -1,7 +1,5 @@
-# NF 的**根依赖入口**（2026-10-10 全仓审计 Z4 / OSPS-QA-02.01）。
-#
-# 此前根目录没有 pyproject.toml / requirements.txt / setup.py / pytest.ini —— 新人拿到的仓库
-# **不带环境定义**，CI 的依赖只散落在 .github/requirements-*.txt 里。
+# NF 的**根依赖入口**（2026-10-10 全仓审计 Z4 / OSPS-QA-02.01），同时是 **Python 发行包**
+# 的构建入口（T9.1：`python -m pip wheel . --no-deps --no-build-isolation -w dist/`）。
 #
 # 口径：
 # - NF 本体是 **stdlib-only + 软第三方导入**（见 purity_scan R5），故 [project].dependencies
@@ -9,23 +7,34 @@
 # - 这份给人类与依赖扫描器一个单点入口；CI 仍按 job 用那份精简清单（不为此改 CI）。
 # - ASCII-only 纪律只约束 requirements-*.txt（pip 按 locale 读）；本文件是 UTF-8 TOML，
 #   注释可用中文。
+# - **版本单一真源 = protocol/facts.json 的 release.cli_version**（scripts/nf_facts.py 生成，
+#   scripts/nf.py 的 NF_CLI_VERSION / npm 包 / 站点同读）。此处 version 是**声明位**，
+#   由三层判据钉死与真源一致：`nf facts --check` 跨源不变量 / wheel 元数据校验 /
+#   `desktop/tests/test_pypi_package.py`（pyproject == facts == nf.py == ninfenz.__version__）。
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "ninfenz"
 version = "1.1.0"
 description = "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. Offline, AGPL-3.0-only (or commercial), stdlib-only core."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "AGPL-3.0-only OR LicenseRef-Commercial" }
+license = "AGPL-3.0-only OR LicenseRef-Commercial"
+license-files = ["LICENSE", "LICENSES/AGPL-3.0-only.txt", "LICENSES/CC-BY-4.0.txt"]
 authors = [{ name = "Monyeah777" }]
 keywords = ["content-contract", "markdown", "verification", "merkle", "llm", "long-form"]
 classifiers = [
-  "License :: OSI Approved :: GNU Affero General Public License v3",
   "Programming Language :: Python :: 3.11",
-  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.12",
   "Operating System :: OS Independent",
 ]
 # 本体零硬依赖（软导入由 purity_scan R5 登记）。
 dependencies = []
+
+[project.scripts]
+nf = "ninfenz._launcher:main"
 
 [project.urls]
 Homepage = "https://github.com/Monyeah777/NinFenz"
@@ -42,3 +51,11 @@ dev = [
   "pyyaml==6.0.3", "PySide6==6.11.2", "jsonschema==4.26.0", "coverage==7.16.1",
   "ruff==0.16.8", "bandit==1.9.4", "pip-audit==2.10.1",
 ]
+
+# ---- Python 发行包（T9.1） ---------------------------------------------------
+# 包源码只有 3 个小模块（__init__ / _launcher / __main__）；真正的仓库树由根 setup.py 的
+# build_py 钩子在**构建时**注入（见该文件顶部说明），仓库里不存第二份副本。
+[tool.setuptools]
+packages = ["ninfenz"]
+package-dir = { ninfenz = "packaging/pypi/ninfenz" }
+include-package-data = false
