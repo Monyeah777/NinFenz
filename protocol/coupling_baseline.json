@@ -6,6 +6,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "agent_contracts": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "agent_rules_adapter": {
       "ca": 1,
       "ce": 3,
@@ -627,9 +632,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 80,
+      "ca": 81,
       "ce": 1,
-      "i": 0.0123
+      "i": 0.0122
     },
     "json_schema": {
       "ca": 5,

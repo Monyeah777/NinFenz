@@ -127,7 +127,8 @@ def run_node(group: Dict[str, Any], node_cmd: List[str], timeout: int = 120) -> 
                            % (proc.returncode,
                               (proc.stderr or b"").decode("utf-8", "replace")[-300:]))
     try:
-        doc = json.loads((proc.stdout or b"").decode("utf-8"))
+        doc = json_doc.loads((proc.stdout or b"").decode("utf-8"),
+                             what="node 第二实现输出")
     except ValueError as exc:
         raise RuntimeError("node 输出不是 JSON：%s" % exc) from exc
     if not isinstance(doc, dict):

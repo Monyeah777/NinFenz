@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:69d5a81f697677f3c4061189746f39d7ad36506e1e7256f73b41aaf672da23ae'
+DIGEST = 'sha256:bec14d3a00d7297c7db53bed6eac60cee3893b5a038db8df85deddee9e5e911b'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -19,7 +19,8 @@ SOURCE = {'module': 'desktop/src/core/terminal.py',
             'CONFIRM_FLAG_PAIRS',
             'BLOCKED_IN_SHELL'],
  'commands': 'scripts/nf.py 的 argparse 面'}
-COMMANDS = ['approve',
+COMMANDS = ['agent',
+ 'approve',
  'assemble',
  'assertions',
  'asset',
@@ -469,8 +470,16 @@ FAMILIES = [{'id': 'start',
  {'id': 'forge',
   'name': '装配与生产',
   'summary': '从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读写、入库登记、参考运行时（确定性 harness + '
-             'record/replay）',
-  'commands': ['assemble', 'preset', 'run', 'render', 'spec', 'register', 'import', 'runtime']},
+             'record/replay）、多 agent 角色链契约',
+  'commands': ['assemble',
+               'preset',
+               'run',
+               'render',
+               'spec',
+               'register',
+               'import',
+               'runtime',
+               'agent']},
  {'id': 'shelf',
   'name': '资产与货架',
   'summary': '市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态',

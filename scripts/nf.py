@@ -1490,6 +1490,26 @@ def _make_parser() -> argparse.ArgumentParser:
         description="节点级检查：parse 产物 → 统计 + 悬空引用/实体 + 3 条文本规则（IR 节点执行）")
     ir_ck.add_argument("file", help="待检 markdown 路径（仓库相对或绝对）")
     ir_ck.add_argument("--json", action="store_true", help="输出结构化 JSON 报告")
+    ag = sub.add_parser(
+        "agent",
+        help="多 agent 协作契约（角色=模块 / 交接=事件 / 验收=门）",
+        description="多 agent 协作契约（T10.3）：writer/critic/fact_checker/editor 四角色契约与域链"
+                    "（techdoc/regulatory）。角色引用既有模块/管线/gate profile，不新造能力；"
+                    "`plan` 输出角色链（谁→谁、交接事件、每步门、runtime 衔接点）；"
+                    "`check` 校验闭合（缺门/孤儿交接/无失败策略/引用不存在模块即 FAIL）。只读、不跑真实模型")
+    agsub = ag.add_subparsers(dest="agent_cmd", required=True)
+    ag_p = agsub.add_parser("plan", help="输出域角色链（角色→模块→门 + 交接边）",
+                            description="角色链计划：按域取链，逐角色给模块/registry 模块/门/"
+                                        "失败策略/交接事件，并给 runtime 衔接点（可注入 ModelClient 直接跑）")
+    ag_p.add_argument("--domain", default="techdoc",
+                      choices=("techdoc", "regulatory"),
+                      help="域：techdoc（技术文档）或 regulatory（合规与监管）")
+    ag_p.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ag_c = agsub.add_parser("check", help="校验角色链闭合（缺门/孤儿交接/无失败策略/坏引用）",
+                            description="闭合校验：角色字段齐全、相邻交接事件有发布/订阅方、"
+                                        "每步门真实可达、引用模块/管线/gate profile 真实存在、"
+                                        "无孤立角色；任一不过 rc=1")
+    ag_c.add_argument("--json", action="store_true", help="输出结构化 JSON")
     return p
 
 
@@ -7846,6 +7866,8 @@ def main(argv=None) -> int:
     _rust_rc = _try_rust_face(args)
     if _rust_rc is not None:
         return _rust_rc
+    if args.cmd == "agent":
+        return _cmd_agent(args)
     if args.cmd in ("shell", "terminal"):
         return _cmd_shell(args)
     if args.cmd == "layers":
@@ -8085,6 +8107,66 @@ def main(argv=None) -> int:
         return 1
     print("\n★ 全链管道 PASSED ✓")
     return 0
+
+
+def _policy_text(policy) -> str:
+    """失败策略 → 一行可读文案（供 `nf agent plan` 人读面）。"""
+    mode = str((policy or {}).get("mode") or "?")
+    if mode == "rewrite_with_limit":
+        return "rewrite ≤%s" % (policy or {}).get("max_retries", 0)
+    return mode
+
+
+def _cmd_agent(args) -> int:
+    """nf agent：多 agent 协作契约（T10.3；只读、不跑真实模型）。"""
+    import json as _json
+    from core import agent_contracts as ac
+
+    sub = str(getattr(args, "agent_cmd", "") or "")
+    if sub == "plan":
+        domain = str(getattr(args, "domain", "") or "techdoc")
+        try:
+            doc = ac.plan(ROOT, domain)
+        except ValueError as exc:
+            print("  ✗ %s" % exc, file=sys.stderr)
+            return 2
+        if getattr(args, "json", False):
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf agent plan（域 %s · 管线 %s · 域包 %s）=="
+              % (doc["domain"], doc["pipeline"], doc["pack"]))
+        for step in doc["chain"]:
+            print("  %d. %-12s 门=%-24s 模块=%s"
+                  % (step["step"], step["layer"], step["gate"],
+                     ",".join(step["module"])))
+            print("       in=%s → out=%s · 失败策略=%s"
+                  % (",".join(step["inputs"]), ",".join(step["outputs"]),
+                     _policy_text(step["failure_policy"])))
+        for edge in doc["edges"]:
+            print("  交接：%s → %s（%s）" % (edge["from"], edge["to"], edge["event"]))
+        hook = doc["runtime_hook"]
+        print("  runtime 衔接：%s.%s（client=%s；trace=%s）"
+              % (hook["module"], hook["entry"], hook["client_interface"],
+                 hook["trace_schema"]))
+        return 0
+    if sub == "check":
+        issues, stats = ac.validate(root=ROOT)
+        if getattr(args, "json", False):
+            print(_json.dumps({"kind": "agent-check", "schema": ac.CHECK_SCHEMA,
+                               "ok": not issues, "issues": issues, "stats": stats},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf agent check（角色=模块 / 交接=事件 / 验收=门）==")
+            for issue in issues:
+                print("  [FAIL] %s" % issue)
+            print("  角色 %d · 域 %d · 模块 %d · 事件 %d · 门 %d → %s"
+                  % (stats["roles"], stats["domains"], stats["modules"],
+                     stats["events"], stats["profiles"],
+                     "PASS" if not issues else "FAIL"))
+        return 0 if not issues else 1
+    print("  ✗ 需要子命令：`nf agent plan --domain techdoc|regulatory [--json]`"
+          " / `nf agent check [--json]`（修复指引：见 nf agent --help）", file=sys.stderr)
+    return 2
 
 
 def guarded_main(argv=None) -> int:
