@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 67,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "3daa598f0bb3cb1bd51080d584fc7a5df96afe4a73385d332eedbea91f76b94c",
+    "root": "de30f89a5facb93ef8557db26fa0a37c7d774755ded86720ef89648818540876",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -23,7 +23,7 @@
     },
     {
       "digest": {
-        "sha256": "686e91e8bbb6055f7dfeea8cd9beae064dc941d7b31263909cc159e58447e3ba"
+        "sha256": "ecd38824fd7e007616def4fa86de7f65718c53002eb7ebf93f97cb8352c8b7b6"
       },
       "name": "02_联动注册表.md"
     },
@@ -41,13 +41,13 @@
     },
     {
       "digest": {
-        "sha256": "69cf93a90e72f700850154d03e7450255f76fe36ea115e2cdbec539d036431f8"
+        "sha256": "b55ddc17efb6add08da144690d78359dc2710d404e9b7d445861cd50e092d0de"
       },
       "name": "llms.txt"
     },
     {
       "digest": {
-        "sha256": "ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b"
+        "sha256": "25cd8e199d7b26e9a0718cfa124afebd1a66e14d549fb2a9795c59053130c7bb"
       },
       "name": "library/INDEX.md"
     },
@@ -77,7 +77,7 @@
     },
     {
       "digest": {
-        "sha256": "661e6444773e369907af4fdd48b178696c97b9283930da6292b2b64d9e1e1cfc"
+        "sha256": "0a0c992a73a0f1da50de7430fad2d9325ecbf52b33a84111a1201bf70742cc06"
       },
       "name": "protocol/community_asset_ledger.json"
     },
@@ -113,13 +113,13 @@
     },
     {
       "digest": {
-        "sha256": "5e803f1e41ed37c1dfd12647e4cfb51385e1d4e7278c76f96db2bf3bdcb49ff4"
+        "sha256": "0533d5816375a92d95cb82b939168208c619fd6336b52841e9137b9c946c18f7"
       },
       "name": "protocol/conformance_report.json"
     },
     {
       "digest": {
-        "sha256": "15e29d124e0ab6bcf09f00b709ceae7153bfafba19777c5fbc6dfe52b48242e7"
+        "sha256": "249c402fce243f00cf929d7c6c0ab48b2e8428bdbd40fe9e4b9e910b6372a877"
       },
       "name": "protocol/asset_line_baseline.json"
     },
@@ -137,19 +137,19 @@
     },
     {
       "digest": {
-        "sha256": "164a696a96a84efc14bcef48586ef28d6a686bb906def23c12575edbbd13e588"
+        "sha256": "d70d1fdfc5bcda09448a3a09c50c4d4e2ee7492d6b122892612a370aee60fa9a"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "d8a0f8470f97fd0c3affb3427986e2744fef14803363c72d3b32069a06b9edd6"
+        "sha256": "633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "4b0554a5ab73f2ad796b1ea1b1a079ea0567a2e6fb9b166666ac7a96a2fac500"
+        "sha256": "215c4a57fc53274cd73018ba4200c29d1f47bf976c8a7841231a49818eb6b844"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -173,7 +173,7 @@
     },
     {
       "digest": {
-        "sha256": "a21468bb3df2d1565b6fbbb36ad7093d7020dde37cfe5fe1de5218378119029e"
+        "sha256": "242a3a58485289ece8d62e6d1bc56e05fab8e24ce16de24fb4b33b53339241f2"
       },
       "name": "protocol/repo_stats.json"
     },
@@ -329,7 +329,7 @@
     },
     {
       "digest": {
-        "sha256": "cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca"
+        "sha256": "33635f4cf78acae7233b620d93bf313a148372b21f7d78f2b9d96a3f1fe2beea"
       },
       "name": "desktop/src/core/registry.json"
     },

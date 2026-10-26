@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:d8a0f8470f97fd0c3affb3427986e2744fef14803363c72d3b32069a06b9edd6
+  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
 ---
+> 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）

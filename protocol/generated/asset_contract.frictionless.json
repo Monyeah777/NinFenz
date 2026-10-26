@@ -77852,6 +77852,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -78077,6 +78082,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -78304,6 +78314,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -78529,6 +78544,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -78756,6 +78776,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -78981,6 +79006,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -79208,6 +79238,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -79433,6 +79468,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -79660,6 +79700,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -79885,6 +79930,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -80112,6 +80162,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -80337,6 +80392,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -80564,6 +80624,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -80789,6 +80854,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -81016,6 +81086,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -81241,6 +81316,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -81468,6 +81548,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -81693,6 +81778,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -81920,6 +82010,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -82145,6 +82240,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -82372,6 +82472,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -82597,6 +82702,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -82824,6 +82934,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -83049,6 +83164,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -83276,6 +83396,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -83501,6 +83626,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -83728,6 +83858,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -83953,6 +84088,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -84180,6 +84320,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -84405,6 +84550,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -84632,6 +84782,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -84857,6 +85012,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -85084,6 +85244,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -85309,6 +85474,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -85536,6 +85706,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -85761,6 +85936,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -85988,6 +86168,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -86213,6 +86398,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -86440,6 +86630,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -86665,6 +86860,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -86892,6 +87092,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -87117,6 +87322,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -87344,6 +87554,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -87569,6 +87784,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -87796,6 +88016,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -88021,6 +88246,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -88248,6 +88478,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -88473,6 +88708,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -88700,6 +88940,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -88925,6 +89170,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -89152,6 +89402,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -89377,6 +89632,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -89604,6 +89864,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -89829,6 +90094,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -90056,6 +90326,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -90281,6 +90556,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -90508,6 +90788,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -90733,6 +91018,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -90960,6 +91250,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -91185,6 +91480,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -91412,6 +91712,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -91637,6 +91942,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -91864,6 +92174,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -92089,6 +92404,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -92316,6 +92636,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -92541,6 +92866,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -92768,6 +93098,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -92993,6 +93328,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -93220,6 +93560,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -93445,6 +93790,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -93672,6 +94022,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -93897,6 +94252,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -94124,6 +94484,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -94349,6 +94714,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -94576,6 +94946,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -94801,6 +95176,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -95028,6 +95408,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -95253,6 +95638,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -95480,6 +95870,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -95705,6 +96100,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -95932,6 +96332,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -96157,6 +96562,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -96384,6 +96794,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -96609,6 +97024,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -96836,6 +97256,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -97061,6 +97486,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -97288,6 +97718,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -97513,6 +97948,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -97740,6 +98180,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -97965,6 +98410,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -98192,6 +98642,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -98417,6 +98872,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -98644,6 +99104,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -98869,6 +99334,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -99096,6 +99566,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -99321,6 +99796,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -99548,6 +100028,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -99773,6 +100258,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -100000,6 +100490,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -100225,6 +100720,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -100452,6 +100952,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -100677,6 +101182,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -100904,6 +101414,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -101129,6 +101644,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -101356,6 +101876,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -101581,6 +102106,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -101808,6 +102338,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -102033,6 +102568,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,
@@ -102260,6 +102800,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -102486,6 +103031,11 @@
                 ],
                 "type": "object"
               },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
+              },
               "id": {
                 "minLength": 1,
                 "type": "string"
@@ -102711,6 +103261,11 @@
                   "cross_package"
                 ],
                 "type": "object"
+              },
+              "domain": {
+                "description": "包所属域（与 categories 单一来源对齐；T1.2 W2 域隔离 join key，缺省 = 取 categories[0]）",
+                "minLength": 1,
+                "type": "string"
               },
               "id": {
                 "minLength": 1,

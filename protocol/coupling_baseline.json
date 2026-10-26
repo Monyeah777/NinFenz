@@ -202,9 +202,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 38,
+      "ca": 39,
       "ce": 6,
-      "i": 0.1364
+      "i": 0.1333
     },
     "content_face": {
       "ca": 3,
@@ -436,6 +436,16 @@
       "ce": 4,
       "i": 1.0
     },
+    "gate_profile": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
+    },
+    "gate_profile_rules": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
     "gate_router": {
       "ca": 0,
       "ce": 3,
@@ -445,6 +455,11 @@
       "ca": 2,
       "ce": 2,
       "i": 0.5
+    },
+    "gate_types": {
+      "ca": 2,
+      "ce": 0,
+      "i": 0.0
     },
     "gate_verdict": {
       "ca": 1,
@@ -567,7 +582,7 @@
       "i": 0.3333
     },
     "ir": {
-      "ca": 11,
+      "ca": 12,
       "ce": 0,
       "i": 0.0
     },
@@ -577,9 +592,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 76,
+      "ca": 77,
       "ce": 1,
-      "i": 0.013
+      "i": 0.0128
     },
     "json_schema": {
       "ca": 5,
@@ -605,6 +620,11 @@
       "ca": 0,
       "ce": 0,
       "i": 0.0
+    },
+    "layer_closure": {
+      "ca": 0,
+      "ce": 3,
+      "i": 1.0
     },
     "layer_model": {
       "ca": 1,
@@ -852,9 +872,9 @@
       "i": 1.0
     },
     "pipeline_loader": {
-      "ca": 4,
+      "ca": 5,
       "ce": 2,
-      "i": 0.3333
+      "i": 0.2857
     },
     "pipeline_scaffold": {
       "ca": 0,
@@ -947,9 +967,9 @@
       "i": 1.0
     },
     "quality_gate": {
-      "ca": 1,
-      "ce": 1,
-      "i": 0.5
+      "ca": 2,
+      "ce": 3,
+      "i": 0.6
     },
     "quant_metrics": {
       "ca": 1,
@@ -1186,6 +1206,11 @@
       "ce": 2,
       "i": 0.6667
     },
+    "techdoc_gate": {
+      "ca": 1,
+      "ce": 2,
+      "i": 0.6667
+    },
     "telemetry_semconv": {
       "ca": 0,
       "ce": 0,
@@ -1334,6 +1359,10 @@
     [
       "purity_scan",
       "layer_model"
+    ],
+    [
+      "quality_gate",
+      "techdoc_gate"
     ]
   ]
 }

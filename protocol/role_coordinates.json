@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1444,
+    "app": 1445,
     "entry": 26,
     "floor": 5,
-    "prod": 1042,
+    "prod": 1054,
     "projection": 130,
-    "support": 264,
-    "verify": 1120
+    "support": 266,
+    "verify": 1131
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -2633,6 +2633,60 @@
       "rule": "R-prod"
     },
     {
+      "function": "资产键 STANDARDS_ANCHORS · 技术文档标准锚点",
+      "path": "community/技术文档域包/assets/STANDARDS_ANCHORS.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_GLOSSARY · 技术文档术语表",
+      "path": "community/技术文档域包/assets/TECH_GLOSSARY.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_STYLE_RULES · 技术文档风格规则",
+      "path": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_INSTALLATION · 安装章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_INSTALLATION.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_OPERATION · 操作章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_OPERATION.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_SAFETY · 安全章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_SAFETY.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_SPECIFICATION · 规格章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_SPECIFICATION.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_TROUBLESHOOTING · 故障章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_TROUBLESHOOTING.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
+      "function": "资产键 TECH_TEMPLATE_UNBOXING · 开箱章节模板",
+      "path": "community/技术文档域包/assets/TECH_TEMPLATE_UNBOXING.md",
+      "role": "prod",
+      "rule": "R-prod"
+    },
+    {
       "function": "模块 M97 · 术语管理",
       "path": "community/技术文档域包/modules/M97_术语管理.md",
       "role": "prod",
@@ -2651,7 +2705,7 @@
       "rule": "R-prod"
     },
     {
-      "function": "protocol.yaml — 第三方协议声明（技术文档域包，v2.1.0-C-b 战例落盘）",
+      "function": "protocol.yaml — 第三方协议声明（技术文档域包，v2.1.0-C-b 战例落盘；T4.1 升 L2 参考域）",
       "path": "community/技术文档域包/protocol.yaml",
       "role": "prod",
       "rule": "R-prod"
@@ -6131,6 +6185,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "M80 质量门 profile 引擎（软门 · 可插拔 · 协议层不内嵌条目）。",
+      "path": "desktop/src/core/gate_profile.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "M80 质量门 profile 判据集（文档视图 + 5 条文本规则 + 结构/术语判据）。",
+      "path": "desktop/src/core/gate_profile_rules.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "复合路由（W-05 首片）：变化闭包选专家，UNSAFE 永不被裁，休眠必带理由。",
       "path": "desktop/src/core/gate_router.py",
       "role": "prod",
@@ -6140,6 +6206,12 @@
       "function": "门禁选择器：由「改动件」选出该跑的测试模块（秒级 check 的第一半）。",
       "path": "desktop/src/core/gate_select.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "质量门公共类型（Issue / GateResult）——从 `quality_gate` 拆出的稳定接口层。",
+      "path": "desktop/src/core/gate_types.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6307,6 +6379,12 @@
     {
       "function": "v2.8.0 波C C1/C2：协议知识签名 + 版本差异检测（41 规划「确定性知识编译」）。",
       "path": "desktop/src/core/knowledge_sig.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "T1.2 W1 · 层序闭包扫描（先 WARN + 例外登记，不直接升 FAIL）。",
+      "path": "desktop/src/core/layer_closure.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -6893,6 +6971,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "M80 结构门 S4/S5（术语一致 / 无越层直写）——从 `quality_gate` 拆出的规则实现。",
+      "path": "desktop/src/core/techdoc_gate.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "遥测对齐 OTel GenAI 语义约定（内部差距实证：docs/45_执行遥测规范.md 定义的",
       "path": "desktop/src/core/telemetry_semconv.py",
       "role": "verify",
@@ -7189,6 +7273,18 @@
     {
       "function": "",
       "path": "desktop/tests/fixtures/release/plan.golden.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "示例设备使用说明书",
+      "path": "desktop/tests/fixtures/techdoc/techdoc_bad.md",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "示例产品使用说明书",
+      "path": "desktop/tests/fixtures/techdoc/techdoc_ok.md",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7691,6 +7787,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "T2.1 · 域隔离与契约 schema 落地（Wave2）单测。",
+      "path": "desktop/tests/test_domain_gate.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包工厂 + 域功能引擎单测：口径公式 / 夹具确定性 / 生成器幂等 / 唯一性守卫 /",
       "path": "desktop/tests/test_domain_pack.py",
       "role": "verify",
@@ -7883,8 +7985,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "门禁清单（`protocol/gates.json`）回归 —— T2.3 第一步：**登记面可判定**。",
+      "path": "desktop/tests/test_gate_manifest.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "gate_observe 判据：读面观测的端到端行为（含子进程读面与失败分类）。",
       "path": "desktop/tests/test_gate_observe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M80 质量门 profile 引擎单测（T4.1 技术文档域包纵深）。",
+      "path": "desktop/tests/test_gate_profile.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8611,6 +8725,12 @@
     {
       "function": "质量治理门单测（v1.4.0 quality_gate：三态质检门，2.0 E0-③）。",
       "path": "desktop/tests/test_quality_gate.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "M80 结构门 S4/S5 单测（T4.1：术语一致 / 无越层直写）。",
+      "path": "desktop/tests/test_quality_gate_techdoc.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12677,8 +12797,20 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-facts/2",
+      "path": "protocol/facts.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "门禁专家声明面：reads 由 audit-hook 观测派生（INV：声明面不得手写猜）；face_verified=true 表示读面已由观测覆盖",
       "path": "protocol/gate_experts.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-gates/1",
+      "path": "protocol/gates.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12721,6 +12853,12 @@
     {
       "function": "知识源使用频次台账（复算入口：nf knowledge frequency --trace <file> --write）。晋升条目若声明 reuse_count，必须与本台账一致——频次不可手写。",
       "path": "protocol/knowledge_usage.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "层序闭包（T1.2 W1）既存例外登记：consumer←producer 层序倒挂先 WARN 不判死。判据 = rank(producer) ≤ rank(consumer)；未登记倒挂仍 FAIL。例外清空后本表可删并升 FAIL。",
+      "path": "protocol/layer_exceptions.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13014,17 +13152,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6995faf6e426f5616098ba1bd20508d1d2bf7a89569e977312b56eae0f9677c0",
+  "root_digest": "2b037f93560538685d4170b3d34695306003c27717c3dd7d730406cad9ea43c8",
   "rule_counts": {
-    "R-app": 1444,
-    "R-catch": 119,
+    "R-app": 1445,
+    "R-catch": 121,
     "R-entry": 26,
     "R-floor": 5,
-    "R-prod": 944,
+    "R-prod": 953,
     "R-projection": 115,
     "R-support": 119,
-    "R-verify": 1003,
-    "auto:R-core": 256
+    "R-verify": 1012,
+    "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"
 }

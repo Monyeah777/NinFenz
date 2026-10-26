@@ -214,7 +214,7 @@
       "sample": [],
       "source": "asset_ledger_projection.verify",
       "stats": {
-        "entries": 924
+        "entries": 943
       },
       "status": "pass",
       "warns": 0
@@ -284,7 +284,7 @@
       "source": "receipts.verify_wrapped",
       "stats": {
         "entries": 3,
-        "root": "42e1522438c6a5e485c7f188c7d22435c69f8b8a15a95b2ccf80700c7622caa1"
+        "root": "ceac330d6aef0193d2d6b5c76c3b4cae437164a42c55347ebbb1acf7adf6a6a5"
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "5ef695100d746e6c652943d97a974f29b19741c8ad2aad96a30a9e4a7a92b837",
+        "root": "60a4e25eb4892643244fbe72680144b476d4995bf0eb24787b52069a255d6db5",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -337,7 +337,7 @@
         ],
         "domain_packs": 100,
         "library_items": 3,
-        "pack_assets": 363,
+        "pack_assets": 372,
         "pack_dirs": 111,
         "registered_packs": 111,
         "schema": "nf-repo-stats/1",
@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 310,
-        "files": 310,
-        "max_fn_cc": 116,
-        "max_fn_lines": 1263,
-        "max_lines": 7678
+        "baseline": 317,
+        "files": 317,
+        "max_fn_cc": 117,
+        "max_fn_lines": 1271,
+        "max_lines": 7701
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 230,
-        "probed": 230
+        "patterns": 259,
+        "probed": 259
       },
       "status": "pass",
       "warns": 0
@@ -399,10 +399,10 @@
       "sample": [],
       "source": "key_naming.scan",
       "stats": {
-        "keys_seen": 10,
-        "max_key_len": 17,
-        "occurrences": 616,
-        "registered": 10
+        "keys_seen": 18,
+        "max_key_len": 29,
+        "occurrences": 625,
+        "registered": 18
       },
       "status": "pass",
       "warns": 0
@@ -431,11 +431,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 258,
-        "modules": 258,
+        "metrics_recorded": 263,
+        "modules": 263,
         "registered_cycles": 0,
-        "registered_sdp": 10,
-        "sdp": 10
+        "registered_sdp": 11,
+        "sdp": 11
       },
       "status": "pass",
       "warns": 0
@@ -478,9 +478,9 @@
       "source": "judgement_coverage.scan",
       "stats": {
         "consumed": 66,
-        "exceptions": 2,
-        "orphans": 2,
-        "scanners": 68
+        "exceptions": 3,
+        "orphans": 3,
+        "scanners": 69
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4032,
-        "kernel": 2167,
+        "files": 4058,
+        "kernel": 2190,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "2ebbdb0e539147c0b8b756e3bc094714add25017c4c92bc3bd933ac38210a8ce",
+  "root_digest": "5336706734e839b1354e01abb479af27cd77d267af873ca3128bea68ec99d250",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

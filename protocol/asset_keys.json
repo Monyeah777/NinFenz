@@ -43,6 +43,38 @@
     "TECH_TEMPLATES": {
       "note": "技术文档模板（技术文档域包 · 用户自定义资产）",
       "scope": "user_asset"
+    },
+    "TECH_GLOSSARY": {
+      "note": "技术文档域包术语表（术语/定义/首用章节）",
+      "scope": "domain_pack"
+    },
+    "TECH_STYLE_RULES": {
+      "note": "技术文档写作风格规则集（可机检条款）",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_SAFETY": {
+      "note": "技术文档安全须知章节模板",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_UNBOXING": {
+      "note": "技术文档开箱清单章节模板",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_INSTALLATION": {
+      "note": "技术文档安装章节模板",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_OPERATION": {
+      "note": "技术文档操作章节模板",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_TROUBLESHOOTING": {
+      "note": "技术文档故障排查章节模板",
+      "scope": "domain_pack"
+    },
+    "TECH_TEMPLATE_SPECIFICATION": {
+      "note": "技术文档规格章节模板",
+      "scope": "domain_pack"
     }
   },
   "updated": "2026-10-13"

@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:022192dd985bc622446c799bb8223b3d659eaaf1d87240d8a6cebde09dca6888
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:d8a0f8470f97fd0c3affb3427986e2744fef14803363c72d3b32069a06b9edd6
+  - protocol/code_metrics_baseline.json:633a2323616dbff9839c67ac749f1b85291d0203fa747c47cc25409a42563f78
 ---
+> 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）

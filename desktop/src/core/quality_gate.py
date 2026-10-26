@@ -1,11 +1,10 @@
 """质量治理门（v1.4.0 quality_gate：自定义质检门引擎，2.0 E0-③）。
-
 - 质检在 **IR 层**跑（消费 v1.2 IRDocument，不解析 MD——质检与 v2.0 导出
   共享同一真源）。
 - run_gate(ir, rules) -> GateResult：规则集逐条执行 → PASS/WARN/FAIL 三态。
-- default_rules 预设四规则（语义对齐现有 validator/order_modules 缺漏提示）：
+- default_rules 预设六规则（语义对齐现有 validator/order_modules 缺漏提示）：
     fail：R1 空装配（无任何层模块且无层外）→ 无可产出内容
-          R2 核心锚点缺失（P00 数据基座 / P80 输出呈现层无模块，registry 锚点）
+          R2 核心锚点缺失（P00/P80 无模块）；R3/R4 = techdoc_gate（条件规则）
     warn：W1 资产引用悬空（IR.asset_missing 非空，列缺失键）
           W2 层外模块（IR.extra_modules 非空，模块层不在管线层序）
 - 可信任度不变量：存在任何 fail 级 Issue → GateResult.ok() 必须 False
@@ -18,51 +17,10 @@ from dataclasses import dataclass, field
 from typing import Callable, List, Optional
 
 from .ir import IRDocument
+from .techdoc_gate import _r_no_layer_bypass, _r_term_consistency
 
 
-@dataclass
-class Issue:
-    level: str       # "pass" / "warn" / "fail"
-    message: str
-    #: B1 可解释化（v2.1.0）：actionable 修复指引——缺省空串向后兼容
-    #: （现有构造 Issue(level, message) 两参仍成立）。
-    suggestion: str = ""
-
-
-@dataclass
-class GateResult:
-    n_pass: int = 0
-    n_warn: int = 0
-    n_fail: int = 0
-    issues: List[Issue] = field(default_factory=list)
-
-    def ok(self) -> bool:
-        """可信任度不变量：fail 阻断通过。"""
-        return self.n_fail == 0
-
-    def report_text(self) -> str:
-        """可解释报告（B1）：三态汇总 + 逐条 [LEVEL] 原因 → 修复建议。
-
-        fail 优先列出（阻断项，须修复）；warn 次之（可行动项）；pass 不列
-        （无问题无需展示）。无 issues 且 ok → 通过说明。
-        """
-        if not self.issues and self.ok():
-            return "质量门通过：无质量问题。"
-        lines = [
-            f"质量门：PASS {self.n_pass} · WARN {self.n_warn}"
-            f" · FAIL {self.n_fail}（{'可产出' if self.ok() else '存在 FAIL，须修复'}）",
-            "",
-        ]
-        # fail 优先，再 warn
-        for level, tag in (("fail", "FAIL"), ("warn", "WARN")):
-            hits = [i for i in self.issues if i.level == level]
-            if not hits:
-                continue
-            for i in hits:
-                lines.append(f"[{tag}] {i.message}")
-                if i.suggestion:
-                    lines.append(f"    建议：{i.suggestion}")
-        return "\n".join(lines)
+from .gate_types import GateResult, Issue  # noqa: F401 - re-export
 
 
 Rule = Callable[[IRDocument], List[Issue]]
@@ -114,8 +72,8 @@ def _w_extra_modules(ir: IRDocument) -> List[Issue]:
 
 
 def default_rules() -> List[Rule]:
-    return [_r_empty_assembly, _r_core_anchor,
-            _w_asset_missing, _w_extra_modules]
+    return [_r_empty_assembly, _r_core_anchor, _r_term_consistency,
+            _r_no_layer_bypass, _w_asset_missing, _w_extra_modules]
 
 
 # ------------------------------------------------------------------ 执行

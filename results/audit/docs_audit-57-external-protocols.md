@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:69cf93a90e72f700850154d03e7450255f76fe36ea115e2cdbec539d036431f8
+  - llms.txt:b55ddc17efb6add08da144690d78359dc2710d404e9b7d445861cd50e092d0de
 
 ---
+> 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）

@@ -2156,6 +2156,120 @@
       "line": 1
     },
     {
+      "key": "STANDARDS_ANCHORS",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/STANDARDS_ANCHORS.md",
+      "line": 1
+    },
+    {
+      "key": "STANDARDS_ANCHORS",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_GLOSSARY.md",
+      "line": 41
+    },
+    {
+      "key": "TECH_GLOSSARY",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/STANDARDS_ANCHORS.md",
+      "line": 24
+    },
+    {
+      "key": "TECH_GLOSSARY",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_GLOSSARY.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_GLOSSARY",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 43
+    },
+    {
+      "key": "TECH_STYLE_RULES",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_GLOSSARY.md",
+      "line": 41
+    },
+    {
+      "key": "TECH_STYLE_RULES",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_INSTALLATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_INSTALLATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_INSTALLATION.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_OPERATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_OPERATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_OPERATION.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_SAFETY",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_SAFETY",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_SAFETY.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_SPECIFICATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_SPECIFICATION",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_SPECIFICATION.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_TROUBLESHOOTING",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_TROUBLESHOOTING",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_TROUBLESHOOTING.md",
+      "line": 1
+    },
+    {
+      "key": "TECH_TEMPLATE_UNBOXING",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_STYLE_RULES.md",
+      "line": 49
+    },
+    {
+      "key": "TECH_TEMPLATE_UNBOXING",
+      "package": "技术文档域包",
+      "file": "community/技术文档域包/assets/TECH_TEMPLATE_UNBOXING.md",
+      "line": 1
+    },
+    {
       "key": "CONCEPT_GRAPH",
       "package": "推理优化与加速域包",
       "file": "community/推理优化与加速域包/assets/CONCEPT_GRAPH.md",

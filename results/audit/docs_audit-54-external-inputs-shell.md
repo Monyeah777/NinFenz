@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
   - skills/ninfenz/SKILL.md:23f4997399c181fa689cf2d87164be7ca02b1c7d249d03828f261f0e666facc8
-  - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
+  - library/INDEX.md:25cd8e199d7b26e9a0718cfa124afebd1a66e14d549fb2a9795c59053130c7bb
 
 ---
+> 重审（2026-10-26）：Merge t-techdoc: techdoc pack depth + new gate modules
+
 > 重审（2026-10-26）：Wave2: SSOT facts.json + domain gate + gate manifest
 
 > 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径

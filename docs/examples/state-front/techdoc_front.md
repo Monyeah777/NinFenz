@@ -4,11 +4,11 @@
 
 | 项 | 值 |
 |---|---|
-| 模块/挂载编号 | M00、M01、M02、M03、M04、M06、M07、M08、M09、M10、M11、M12、M13、M14、M15、M16、M17、M18、M19、M20、M22、M23、M24、M40、M41、M43、M50、M55、M65、M80、M90、M91、M93、M97、M98、P00、P01、P02、P03、P06、P10、P20、P30、P40、P50、P60、P70、P80、P90 |
+| 模块/挂载编号 | M00、M04、M06、M08、M10、M11、M12、M13、M20、M22、M23、M24、M40、M50、M65、M80、M90、M91、M97、M98、P00、P01、P03、P06、P10、P20、P30、P40、P50、P60、P70、P80、P90 |
 | NF 编号 | NF-1、NF-TECHDOC-Monyeah777-1 |
-| 二级标题数 | 89 |
-| 要点行数 | 158 |
-| 原文 sha256 | `25ca28cdcccea1a3` |
+| 二级标题数 | 90 |
+| 要点行数 | 161 |
+| 原文 sha256 | `31f646a8ffa659ef` |
 
 **关键设置点（原文摘录，非改写）**：
 
@@ -27,7 +27,7 @@
 id: NF-TECHDOC-Monyeah777-1
 type: 技术文档装配（自包含完整版）
 title: 技术文档装配流 P06 · 自包含完整版
-description: 技术文档域包 P06 装配的自包含完整版——15 件模块正文与管线声明全文内嵌、零资产、无需仓库路径即可装载开跑
+description: 技术文档域包 P06 装配的自包含完整版——15 件模块正文与管线声明全文内嵌、9 资产、无需仓库路径即可装载开跑
 author: Monyeah777
 license: MIT
 generated: 2026-09-15
@@ -59,8 +59,9 @@ tags:
   - 匹配预设：技术文档域包 → 管线 **P06**（`community/技术文档域包/pipelines/P06_技术文档题材装配流管线.md`）
   - 取件模块：**M97 术语管理**（P40 行为决策）、**M98 修订记录**（P60 长期演变）
   - 装配允许集：官方核心 + 包模块 = **44**；本件实际内嵌 **15** 件（核心 13 + 自带 2）
-  - 资产：**0 文件**（技术文档域包为机制增强包，无题材资产，同通用核心基础包先例）
+  - 资产：**9 文件**（术语表 1 + 章节模板 6 + 风格规则 1 + 标准锚点 1；键表见包 README §3，经资产五接口消费）
   - references：**0**（零跨包引用，`core_only: true`）
+  - **L2 执行记录**：executor `nf assemble --build` · date 2026-10-26 · artifact `out/*.md` · check_rc 0（`nf assemble --check` PASS：八段骨架 + 编号允许集 + 决策引用）
 - **档位声明**：全文内嵌式。本件与引用式样本的差异不在内容，在**可离线自足性**——
   引用式需要接收方另取仓库文件，本件不需要。
 - **缺口声明（如实）**：
@@ -97,6 +98,7 @@ tags:
 > 实例声明：本管线是通用骨架 **P00**（03_管线库/P00_通用文档生成管线.md）在**技术文档·题材装配**的实例——九层位名沿用骨架；本包 P40/P60 两驻留自带模块（M97/M98），M90 官方模块经依赖引用随流协作（M90 本体不复制进包，I5 单一真相源）。
 > **允许编号段固化（R2，v2.1.0-C-b）**：本包 `allowed_modules` 仅限官方核心（M00 / M80 / M90 等 core_modules 13 件含 M90）与本包社区段（M97 / M98，modules/ 在册 2 件）。references=[] 零跨包零借阅。
 > **挂载层规避（check15 ③）**：官方 P00 骨架九层 default 均空；既有社区包同层 default（校园 P40=[情感:M22,M40...]、P60=[M40,M65]；西幻 P40=[M04,M11]、P60=[生存:M10...]）与本包 P40=[M97]、P60=[M98] 无交集——M97/M98 新编号唯一，独立装载不冲突（32 方案反证实证）。
+> **L2 纵深（T4.1）**：本包资产 9 件（术语表 + 六类章节模板 + 风格规则 + 标准锚点）经 M90/M97/M98 五接口消费；`gate_profiles/techdoc-strict.json` 为本管线产物的严格质量门 profile（25 clause），M80 结构门 6 条（含术语一致 / 无越层直写）。
 ```yaml
 Pipeline:
   id: P06
@@ -143,7 +145,7 @@ Pipeline:
       default_modules: [M98]
       allowed_modules: [M98]
     - id: P80
-      name: 输出呈现
+      name: 输出呈现    # M80 输出门（唯一出口；见 §2 层表与 §3 注册表投影）
       description: 官方核心 M80 输出生成器（gate 唯一出口；读 term_synced/revision_recorded 后质检渲染）
       optional: false
       default_modules: []
@@ -1097,11 +1099,23 @@ machine_contract:
 - 术语一致：与协议术语表一致，不混用
 - 无越层直写：素材无越层输出（M23 可见性纪律前置，隐藏域直述 = fail）
 
+**实现映射（`desktop/src/core/quality_gate.py::default_rules()` 6 条，fail 阻断）**
+
+| 结构门项 | 规则实现 | 数据面 |
+|---|---|---|
+| 编号合法 / 引用可寻址 / 结构完整 | R1 空装配、R2 核心锚点、W1 资产悬空、W2 层外模块 | IR 层结构 / `IR.asset_missing` |
+| 术语一致（S4） | R3 `_r_term_consistency` | M97 `term_synced` 事件回执 + DocState.terms（无术语域数据时不启用，通用装配零影响） |
+| 无越层直写（S5） | R4 `_r_no_layer_bypass` | M23 可见性裁剪结果（`visibility.hidden` / `hidden_terms` 等；无可见性数据时不启用） |
+
+- R3/R4 是**条件规则**：只有 IR 带术语/可见性数据（techdoc 等域装配）才评估；未带数据的通用装配照常通过。
+- 术语一致判据：term_synced 未通过（conflict/pending_definition）、术语已使用但无定义、规范术语与别名混用 → 逐条 fail。
+
 ### 2.2 质量门（软 · 可插拔 profile · 可配置）
 
 - 渲染前加载当前 profile 配置（资产键 STYLE_DNA 或 protocol.yaml 的 profile 字段；标识符 Phase 1 冻结，Phase 2 迁移为通用「输出 profile」）；
 - profile 由用户/域包自定义——**协议层不内嵌任何固定条目**；
-- profile 未配置时，仅过结构门即放行（风格由运行方自担）。
+- profile 未配置时，仅过结构门即放行（风格由运行方自担）；
+- 引擎 = `desktop/src/core/gate_profile.py`（加载 / 校验 / 逐条报告 / 转 `run_gate` 规则）；首个 L2 参考 profile = `community/技术文档域包/gate_profiles/techdoc-strict.json`（25 clause，逐条报告可对产物输出）；5 条确定性文本规则（标题句式 / 标题末尾标点 / 单空格 / 缩写首用 / 弱表达）仅经 profile 启用，不进 `default_rules`。
 
 ## 3. 质检门（声明式 gate_action 流水线）
 
@@ -1263,6 +1277,8 @@ machine_contract:
 ## 1. 职责
 维护技术文档的术语表一致性：从 DocState.terms 读取术语条目（M90 结构生产时登记），做首次使用章节标注与定义补全；检测同一术语多定义/首用未定义等冲突（term_conflict_detected）；发布 term_synced 供 M80 质检参考。是本包（技术文档题材增强）相对官方 M90 的增值位——M90 负责骨架，M97 负责术语域。
 
+术语定义的数据源 = 包内资产 `TECH_GLOSSARY`（术语/定义/别名/首用章节）；`term_synced` 回执被 **M80 结构门 R3（术语一致）** 消费（`quality_gate._r_term_consistency`）：未同步/已用未定义/规范术语与别名混用 → 门 fail（无术语域数据的叙事装配不启用该规则）。
+
 ## 2. 协议声明（01 §2 模块协议）
 ```yaml
 Module:
@@ -1275,11 +1291,11 @@ Module:
     publish: [term_synced, term_conflict_detected]
     subscribe: [doc_structure_ready, term_conflict_detected]
   core:
-    assets: []                     # 零题材资产（机制增强；同通用包 M93-96 先例）
+    assets: [TECH_GLOSSARY]        # T4.1：术语表资产（术语/定义/别名/首用章节；经五接口访问，I4）
     logic:
       登记: doc_structure_ready → 扫描章节正文 → 首次使用术语登记 first_use_chapter
-      补定义: 术语无定义 → 查已有术语表 / 留待人工（term_status=pending_definition）
-      校验: 多定义同一术语 / 首用未定义 → term_conflict_detected
+      补定义: 术语无定义 → 查已有术语表（TECH_GLOSSARY） / 留待人工（term_status=pending_definition）
+      校验: 多定义同一术语 / 首用未定义 / 规范术语与别名混用 → term_conflict_detected
       同步: 校验通过 → term_synced（DocState.terms 收敛）
   replaceable: true
 ```
@@ -1315,7 +1331,7 @@ term_status:
 - I1 三正交分离：只声明术语能力，不持管线顺序（顺序在 P06 管线）与内容（M90 产 DocState）。
 - I2 核心固定：依赖 M90/M00 数据槽，未替换核心模块（M90 官方位不动）。
 - I3 通信契约：仅经 term_delta / term_status 与 term_synced 事件通信。
-- I4 数据隔离：无自有资产（零资产机制增强）。
+- I4 数据隔离：自有资产仅 `TECH_GLOSSARY`（经 asset_get/asset_query 五接口访问，禁止直读）。
 - I5 真相唯一：挂载与登记以 02 §8.5 + registry protocols[] 为准（本包第 5 条投影）。
 
 ## 7. 与官方链的关系
@@ -1368,7 +1384,7 @@ Module:
     publish: [revision_recorded]
     subscribe: [doc_structure_ready, doc_delta_committed]
   core:
-    assets: []                     # 零题材资产（机制增强）
+    assets: [STANDARDS_ANCHORS]    # T4.1：修订可追溯条款锚（GB/T 19678.1 修订记录；经五接口访问，I4）
     logic:
       变更: doc_delta_committed → 比较前版 DocState → 提取变更点
       登记: 版本号 v{n+1} + 变更摘要 + date + author → revision_log 追加
@@ -1405,17 +1421,17 @@ revision_log:
 - I1 三正交分离：只声明修订能力，不持管线顺序（顺序在 P06）与内容（M90 产 DocState）。
 - I2 核心固定：依赖 M90/M00，未替换核心模块。
 - I3 通信契约：仅经 revision_entry / revision_log 与 revision_recorded 事件通信。
-- I4 数据隔离：无自有资产。
+- I4 数据隔离：自有资产仅 `STANDARDS_ANCHORS`（修订条款出处；经五接口访问）。
 - I5 真相唯一：挂载与登记以 02 §8.5 + registry protocols[] 为准。
 
 ## 7. 与官方链的关系
 同 M97——M90 官方挂 P90 位产 DocState，M98 挂 P60 位做修订域深化；不复制 M90 正文（core_modules 依赖引用，I5）。
 ```
 
-## 5. 资产（0 文件）
+## 5. 资产（9 文件）
 
-- 本装配**零题材资产**：技术文档域包为机制增强包（同通用核心基础包先例，无 `assets/` 目录）。
-- 因此本件不存在资产键表，也不存在资产正文引用的缺口——**这是它天然可自包含的结构原因**。
+- 本装配消费包内 **9 项资产**（键表见 `community/技术文档域包/README.md` §3）：`TECH_GLOSSARY`（术语表）、六类章节模板 `TECH_TEMPLATE_SAFETY` / `TECH_TEMPLATE_UNBOXING` / `TECH_TEMPLATE_INSTALLATION` / `TECH_TEMPLATE_OPERATION` / `TECH_TEMPLATE_TROUBLESHOOTING` / `TECH_TEMPLATE_SPECIFICATION`、`TECH_STYLE_RULES`（风格规则）、`STANDARDS_ANCHORS`（标准锚点）。
+- 资产经 asset_get / asset_query 五接口访问（I4 禁止直读）；本件按**自包含档**内嵌模块正文与管线声明，资产正文以包内 assets/ 目录为准。
 - 对照：校园情感包 29 资产文件 / 西幻生存包 23 资产文件，其引用式档位正源于资产正文体量。
 
 ## 6. 装载指引
