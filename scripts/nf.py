@@ -956,7 +956,6 @@ def _make_parser() -> argparse.ArgumentParser:
                                            "合法站点须在白名单登记理由；无命中即红（名单不得变黑洞）")
     prv_ck.add_argument("--root", default=ROOT, help="扫描根（缺省=仓库根）")
     prv_ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
->>>>>>> t-priv
     dm = sub.add_parser("domain",
                         help="域包工厂（AI 品类清单工程：从一个域规格生成整套过门禁的域包）",
                         description="域包工厂：读内部域规格（.rivet/private_archive/ai_packs/specs/"
