@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1042,
     "projection": 130,
-    "support": 273,
-    "verify": 1123
+    "support": 274,
+    "verify": 1126
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6551,6 +6551,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "结构性计数器：把「重复 I/O / 重复解析 / 重复 spawn」变成**可判据的数字**（而非毫秒）。",
+      "path": "desktop/src/core/perf_counters.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "v2.8.0 波B S4：管线脚手架（`nf pipeline new` 库实现）。",
       "path": "desktop/src/core/pipeline_scaffold.py",
       "role": "prod",
@@ -8461,6 +8467,12 @@
     {
       "function": "性能预算（`core/perf_budget.py`）回归测试 —— ISO 25010 性能效率面。",
       "path": "desktop/tests/test_perf_budget.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "结构计数器（`core/perf_counters.py` + `scripts/perf_counters.py`）回归测试。",
+      "path": "desktop/tests/test_perf_counters.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12785,6 +12797,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "结构计数器基线：只许减少（重复劳动棘轮）。跨平台稳定，替代毫秒判据。",
+      "path": "protocol/perf_counters.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "管线抽象执行的 advisory（同层顺序 / 跨包依赖 / 跨包事件）——不判死，但需分类可见；类别计数下降即缺口收敛。",
       "path": "protocol/pipeline_advisory.json",
       "role": "verify",
@@ -13032,17 +13050,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a513f565ea3f0ed5b6c6be2644e3d888deb224c0a96d5a2020bd303c9c260714",
+  "root_digest": "c2ee2f1b7ffba2c8be2aff6b0c5fa8be54d5449bd05c4d08c529ed315ad4ccf9",
   "rule_counts": {
     "R-app": 1445,
-    "R-catch": 121,
+    "R-catch": 122,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 115,
     "R-support": 126,
-    "R-verify": 1006,
-    "auto:R-core": 256
+    "R-verify": 1008,
+    "auto:R-core": 257
   },
   "schema": "nf-role-coordinates/1"
 }

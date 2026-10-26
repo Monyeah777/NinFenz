@@ -26,9 +26,17 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:26a196ccb09d035a7aac7bf8706cc96c1bf4d9add4250eb5765b7754ef4c98e2
+  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
 ---
-> 重审（2026-10-26）：发布文档新增可复现工件、SBOM、OIDC provenance 与消费者验签说明，复核后重绑摘要
+> 重审（2026-10-26）：合并结构化性能计数器与扫描作用域更新，并复核供应链发布门的核心纯度登记与语言面签名
+
+> 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
+
+> 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
+
+> 重审（2026-10-26）：结构计数器 + scoped 作用域 + signals 表化
+
+> 重审（2026-10-26）：结构计数器 + 作用域装饰器 + 预筛/共享读面
 
 > 重审（2026-10-26）：json_doc 深度预检摘要缓存（file_facts 实验回退）
 

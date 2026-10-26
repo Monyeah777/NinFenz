@@ -8,10 +8,18 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:e5a0a39a18268104ca4c983df2f6708c44d52d4cadcf9af85a38f2aa004bdaf6
-  - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:26a196ccb09d035a7aac7bf8706cc96c1bf4d9add4250eb5765b7754ef4c98e2
+  - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
+  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
 ---
-> 重审（2026-10-26）：发布文档新增可复现工件、SBOM、OIDC provenance 与消费者验签说明，复核后重绑摘要
+> 重审（2026-10-26）：合并结构化性能计数器与扫描作用域更新，并复核供应链发布门的核心纯度登记与语言面签名
+
+> 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
+
+> 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
+
+> 重审（2026-10-26）：结构计数器 + scoped 作用域 + signals 表化
+
+> 重审（2026-10-26）：结构计数器 + 作用域装饰器 + 预筛/共享读面
 
 > 重审（2026-10-26）：json_doc 深度预检摘要缓存（file_facts 实验回退）
 

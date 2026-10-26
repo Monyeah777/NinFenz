@@ -182,7 +182,6 @@ class CiRequirementsPinTest(unittest.TestCase):
         )
         self.assertIn("github.event_name == 'push'", text,
                       "可选 GitHub Packages 镜像不得拖累主发布工作流的成功结论")
-
     def test_audit_requirements_file_is_pinned(self):
         audit_req = ROOT / ".github" / "requirements-audit.txt"
         self.assertTrue(audit_req.is_file())
