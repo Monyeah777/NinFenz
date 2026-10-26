@@ -348,7 +348,7 @@
       "references": [],
       "schema_version": "2",
       "version": "1.0.0",
-      "maturity": "M0"
+      "maturity": "M1"
     },
     {
       "id": "西幻生存领域包",
@@ -432,7 +432,7 @@
       "references": [],
       "schema_version": "2",
       "version": "1.0.0",
-      "maturity": "M0"
+      "maturity": "M1"
     },
     {
       "assets": {
@@ -587,7 +587,7 @@
       "references": [],
       "schema_version": "2",
       "version": "1.1.0",
-      "maturity": "M0"
+      "maturity": "M1"
     },
     {
       "id": "AI系统域包",

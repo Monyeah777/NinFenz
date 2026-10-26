@@ -153,8 +153,34 @@ class Fixture:
                                                 ensure_ascii=False, indent=2) + "\n")
         return self
 
-    def compute(self, gate=None):
-        return dm.compute(self.root, gate=_gate() if gate is None else gate)
+    def sample_library(self, entry="NF-TEST-1", *, pipeline="P99", assoc_pipeline=None):
+        """合成 library 官方样本 + library/INDEX.md 台账行（分支 b）。"""
+        body = ["# 测试装配样本", "", "> 管线：%s · 八段骨架" % pipeline, ""]
+        body += ["## %d. 段%d" % (i, i) for i in range(8)]
+        body += ["", "M00 数据槽（见 §1）。"]
+        self._write("library/%s.md" % entry, "\n".join(body) + "\n")
+        shown = pipeline if assoc_pipeline is None else assoc_pipeline
+        row = ("| %s | 测试流 %s · 样本 | 测试 | 作者 | 2026-10-26 | MIT | general | active | "
+               "装配样本 |" % (entry, shown))
+        self._write("library/INDEX.md",
+                    "| 编号 | 标题 | 类型 | 作者 | 入库 | 许可 | 分级 | 状态 | 说明 |\n"
+                    "|---|---|---|---|---|---|---|---|---|\n" + row + "\n")
+        return self
+
+    def sample_docs(self, fname="完整版样本_测试流P99.md", *, pipeline="P99", ledger=True):
+        """合成 docs 官方样本（+ 可选 protocol 台账指认）。"""
+        body = ["# 叙事世界完整版：测试流（%s）" % pipeline, "",
+                "> active_pipeline = %s" % pipeline, ""]
+        body += ["## %d. 段%d" % (i, i) for i in range(8)]
+        self._write("docs/%s" % fname, "\n".join(body) + "\n")
+        if ledger:
+            self._write("protocol/ledger.json",
+                        json.dumps({"source": "docs/%s" % fname}, ensure_ascii=False) + "\n")
+        return self
+
+    def compute(self, gate=None, sample_probe=None):
+        return dm.compute(self.root, gate=_gate() if gate is None else gate,
+                          sample_probe=sample_probe)
 
 
 @unittest.skipUnless(HAVE_YAML, "PyYAML 不在（protocol.yaml 解析链必需）")
@@ -285,6 +311,138 @@ class MaturityNegativeTest(unittest.TestCase):
         row = self.fx.compute()["packages"][0]
         self.assertEqual("M0", row["maturity"])
         self.assertIn("不在盘", " ".join(row["missing"]))
+
+    def test_index_output_check_failure_blocks_m1(self):
+        """分支 a 负例：INDEX 在册但某件产出面未过 nf output check → 不算 M1。"""
+        self.fx.package().index()
+        self.fx._write("community/%s/outputs/REPORT.json" % self.fx.name, "not json\n")
+        row = self.fx.compute()["packages"][0]
+        self.assertEqual("M0", row["maturity"])
+        self.assertIn("nf output check", " ".join(row["missing"]))
+
+
+@unittest.skipUnless(HAVE_YAML, "PyYAML 不在（protocol.yaml 解析链必需）")
+class M1BranchSampleTest(unittest.TestCase):
+    """M1 分支 b（官方样本产物）判据：合格 / 证据缺失 / 样本 check 失败 / 非法关联。"""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="nf_maturity_sample_")
+        self.fx = Fixture(self._tmp.name).package(declared="M1")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _planner(self, pipe="P99"):
+        def plan(_pkg, name):
+            return "测试", {"matched": True, "package": name, "pipeline": pipe,
+                           "allowed_module_ids": ["M00"]}
+        return plan
+
+    def _checker(self, issues=()):
+        def check(_text, _plan, expected_pipeline=None):
+            return list(issues), {"segments": 8}
+        return check
+
+    def _sample_ev(self, planner=None, checker=None):
+        pkg = self.fx._read_pkg()
+        return dm._sample_evidence(self.fx.root, self.fx.name, pkg,
+                                   planner=planner or self._planner(),
+                                   checker=checker or self._checker())
+
+    def test_library_sample_traceable_and_passes_check(self):
+        """分支 b（library）：样本在场 + library/INDEX.md 台账行指认包管线 + check 通过。"""
+        self.fx.sample_library()
+        ev = self._sample_ev()
+        self.assertTrue(ev["ok"], ev)
+        self.assertEqual("library/NF-TEST-1.md", ev["sample"])
+        self.assertEqual("library", ev["sample_kind"])
+        self.assertEqual("library/INDEX.md", ev["association"]["ledger"])
+        self.assertEqual(8, ev["check"]["segments"])
+
+    def test_docs_sample_traceable_via_protocol_ledger(self):
+        """分支 b（docs）：样本声明本包管线 + protocol 台账指认该路径 + check 通过。"""
+        self.fx.sample_docs()
+        ev = self._sample_ev()
+        self.assertTrue(ev["ok"], ev)
+        self.assertEqual("docs", ev["sample_kind"])
+        self.assertEqual("ledger.json", ev["association"]["ledger"])
+
+    def test_evidence_missing_stays_m0(self):
+        """证据缺失：无 INDEX 且无任何关联样本 → 保持 M0（不许虚报 M1）。"""
+        def probe(root, name, pkg):
+            return dm._sample_evidence(root, name, pkg,
+                                       planner=self._planner(), checker=self._checker())
+        row = self.fx.compute(sample_probe=probe)["packages"][0]
+        self.assertEqual("M0", row["maturity"])
+        self.assertIn("无可验收产物证据", " ".join(row["missing"]))
+
+    def test_sample_check_failure_blocks_m1(self):
+        """样本 check 失败：样本在场但未过 nf assemble --check → 不算 M1。"""
+        self.fx.sample_library()
+        ev = self._sample_ev(checker=self._checker(["八段骨架缺段：##3"]))
+        self.assertFalse(ev["ok"])
+        self.assertIn("未过 assemble --check", " ".join(ev["missing"]))
+
+    def test_illegal_association_declares_other_pipeline(self):
+        """非法关联：台账行声明的管线与本包不一致 → 不指认（不得靠路径猜）。"""
+        self.fx.sample_library(pipeline="P99", assoc_pipeline="P07")
+        ev = self._sample_ev()
+        self.assertFalse(ev["ok"])
+        self.assertIn("台账行未声明本包管线", " ".join(ev["missing"]))
+
+    def test_docs_sample_without_ledger_not_identified(self):
+        """docs 样本没有 provenance/协议台账指认 → 不进分支 b。"""
+        self.fx.sample_docs(ledger=False)
+        ev = self._sample_ev()
+        self.assertFalse(ev["ok"])
+        self.assertIn("台账未指认", " ".join(ev["missing"]))
+
+    def test_sample_branch_lifts_to_m1(self):
+        """集成：分支 b 成立 → 计算等级 M1（下一级 M2）。"""
+        self.fx.sample_library()
+        probe = lambda r, n, pkg: dm._sample_evidence(  # noqa: E731 - 测试内联注入
+            r, n, pkg, planner=self._planner(), checker=self._checker())
+        doc = self.fx.compute(sample_probe=probe)
+        row = doc["packages"][0]
+        self.assertEqual("M1", row["maturity"])
+        self.assertEqual("sample", row["evidence"]["M1"]["branch"])
+        self.assertEqual("library/NF-TEST-1.md", row["evidence"]["M1"]["sample"])
+        self.assertEqual("M2", row["next_level"])
+
+
+class RealRepoM1EvidenceTest(unittest.TestCase):
+    """真仓代表包：分支 b 端到端（真实 library/docs 样本 + 同源 assemble check）。"""
+
+    PKGS = ("技术文档域包", "校园情感领域包", "西幻生存领域包",
+            "通用核心基础包", "校园西幻轻混组合包")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.rows = {row["package"]: row
+                    for row in dm.compute(ROOT, packages=cls.PKGS, gate=_gate())["packages"]}
+
+    def test_official_samples_upgrade_to_m1(self):
+        expect = {
+            "技术文档域包": ("library/NF-TECHDOC-Monyeah777-1.md", "library/INDEX.md"),
+            "校园情感领域包": ("library/NF-1.md", "library/INDEX.md"),
+            "西幻生存领域包": ("docs/完整版样本_西幻生存流P03.md", "drill_fidelity.json"),
+        }
+        for pkg, (sample, ledger) in expect.items():
+            row = self.rows[pkg]
+            self.assertEqual("M1", row["maturity"], row["missing"])
+            m1 = row["evidence"]["M1"]
+            self.assertEqual("sample", m1["branch"])
+            self.assertEqual(sample, m1["sample"])
+            # 台账必须来自协议溯源件，**不得**是本判据自己的产出（自指）
+            self.assertEqual(ledger, m1["association"]["ledger"])
+            self.assertNotIn("domain_maturity", m1["association"]["ledger"])
+            self.assertEqual(8, m1["sample_check"]["segments"])
+
+    def test_packages_without_evidence_stay_m0(self):
+        for pkg in ("通用核心基础包", "校园西幻轻混组合包"):
+            row = self.rows[pkg]
+            self.assertEqual("M0", row["maturity"])
+            self.assertIsNone(row["evidence"]["M1"]["branch"])
 
 
 class ExecutorClassifyTest(unittest.TestCase):
