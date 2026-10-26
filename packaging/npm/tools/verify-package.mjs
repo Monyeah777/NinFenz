@@ -6,7 +6,7 @@ import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
 import { ALLOW_DIRS, INTERNAL_DIRS, INTERNAL_ROOT_FILES } from './payload-policy.mjs';
 
 const REPO_ROOT = path.resolve(PACKAGE_ROOT, '..', '..');
-import { verifyTree, treeSha256, listFiles } from '../lib/payload.mjs';
+import { verifyTree, treeSha256, listFiles, sha256File } from '../lib/payload.mjs';
 
 const pkg = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 const issues = [];
@@ -43,15 +43,29 @@ if (!fs.existsSync(manifestPath)) {
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   need(manifest.package_version === pkg.version, 'payload.package_version 与 package.json 不一致');
   need(manifest.cli_version === pkg.version, 'payload.cli_version 与 CLI 版本不一致');
-  // A2（2026-10-10 审计 P1）：verify 不是新鲜度闸门——staged payload 落后 HEAD 10 个提交、
-  // 41 个 payload 面文件仍 0 issue 通过。这里把清单的 source_commit 与 HEAD 对上，并把
-  // 「脏工作树暂存」判死（那意味着内容不来自纯提交）。
+  // A2（2026-10-10 审计 P1）：verify 必须是新鲜度闸门。payload 本身会作为
+  // 后续提交入库，因此 source_commit 永远只能指向 HEAD 的祖先，不能等于
+  // 包含 payload 清单的自身提交。这里同时要求：
+  //   ① source_commit 是 HEAD 祖先（来源提交真实存在）；
+  //   ② 清单内每个源文件与当前工作树逐字节一致（提交后内容未漂移）。
+  // 这样既不会让陈旧 payload 假绿，也不会制造自指哈希死锁。
   const rHead = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
   const head = rHead.status === 0 ? String(rHead.stdout).trim() : '';
   if (head) {
-    need(manifest.source_commit === head,
-         'payload source_commit 与 HEAD 不一致：清单=' + String(manifest.source_commit).slice(0, 12)
+    const rAncestor = spawnSync('git', ['merge-base', '--is-ancestor', manifest.source_commit, 'HEAD'],
+      { cwd: REPO_ROOT, encoding: 'utf8' });
+    need(rAncestor.status === 0,
+         'payload source_commit 不是 HEAD 祖先：清单=' + String(manifest.source_commit).slice(0, 12)
          + ' HEAD=' + head.slice(0, 12) + '（修复指引：npm run stage 重新暂存后提交）');
+    const sourceDrift = manifest.files.filter(function (entry) {
+      const src = path.resolve(REPO_ROOT, entry.path);
+      const inside = src === REPO_ROOT || src.startsWith(REPO_ROOT + path.sep);
+      return !inside || !fs.existsSync(src) || !fs.statSync(src).isFile()
+        || sha256File(src) !== entry.sha256;
+    }).map(function (entry) { return entry.path; });
+    need(sourceDrift.length === 0,
+         'payload 与当前源树不一致：' + sourceDrift.slice(0, 3).join(', ')
+         + '（修复指引：npm run stage 重新暂存后提交）');
   }
   const status = spawnSync('git', ['status', '--porcelain', '--untracked-files=no'],
     { cwd: REPO_ROOT, encoding: 'utf8' });

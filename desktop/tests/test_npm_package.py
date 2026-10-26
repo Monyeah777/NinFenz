@@ -244,6 +244,9 @@ class PublishingProvenanceGateTest(unittest.TestCase):
         src = (PKG / "tools" / "verify-package.mjs").read_text(encoding="utf-8")
         self.assertIn("rev-parse", src, "verify 未取 HEAD（A2）")
         self.assertIn("source_commit", src, "verify 未比对 source_commit（A2）")
+        self.assertIn("merge-base", src,
+                      "verify 须用祖先关系而不是自指等值检查 source_commit（A2）")
+        self.assertIn("sha256File", src, "verify 未逐文件核对 payload 与当前源树（A2）")
         self.assertIn("worktree_dirty", src, "verify 未判脏树暂存（A1/A2）")
         self.assertIn("--allow-dirty", src, "verify 缺开发态显式放行开关")
         self.assertIn("status", src, "verify 未核对**当前**工作树状态")

@@ -44,3 +44,10 @@ path = ["MIT-NOTICE.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Monyeah777"
 SPDX-License-Identifier = "MIT"
+
+#: RustPython parser snapshots retain their upstream MIT license and notices.
+[[annotations]]
+path = ["engine/rust/vendor/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "RustPython Team and contributors; local modifications 2026 Monyeah777"
+SPDX-License-Identifier = "MIT"
