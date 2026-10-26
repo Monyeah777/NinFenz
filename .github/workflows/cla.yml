@@ -14,16 +14,18 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  actions: write          # 允许重跑
-  contents: write         # 写 signatures/version1/cla.json
-  pull-requests: write    # 在 PR 上留言
-  statuses: write         # 回写 CLA 状态检查
+  contents: read
 
 jobs:
   cla-assistant:
     name: cla-assistant
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      actions: write          # 允许重跑
+      contents: write         # 写 signatures/version1/cla.json
+      pull-requests: write    # 在 PR 上留言
+      statuses: write         # 回写 CLA 状态检查
     # 只在相关事件上跑（评论只处理签署/重签指令），避免无谓消耗
     if: |
       (github.event_name == 'pull_request_target') ||
