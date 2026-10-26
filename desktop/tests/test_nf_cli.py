@@ -317,11 +317,12 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertIn("M91-M99", out)
 
     def test_assemble_clarify_when_underspecified(self):
-        """需求收敛漏斗：信息不足（无题材线索）→ 抛澄清问句，不硬猜。"""
+        """需求收敛漏斗：信息不足（无交付物线索）→ 抛澄清问句，不硬猜。"""
         code, out = self._run(["assemble", "给我做一个世界"])
         self.assertEqual(code, 0)
         self.assertIn("需求澄清", out)
-        self.assertIn("题材方向", out)
+        self.assertIn("交付物类型", out)
+        self.assertIn("验收判据", out)
 
     def test_assemble_save_dossier(self):
         """需求档案：--save 把澄清/计划落成八字段回填稿。"""
