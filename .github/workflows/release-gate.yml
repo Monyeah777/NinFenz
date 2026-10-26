@@ -46,11 +46,12 @@ jobs:
       - name: 覆盖率门槛（core ≥80）
         # `unittest discover -s desktop/tests` 以顶层模块导入 test_*，**不会执行** desktop/tests/__init__.py
         # 的隔离兜底（它负责设 NARRATIVE_FORGE_HOME）⇒ test_suite_isolation 会红。故此处显式给隔离 home。
-        env:
-          # 判据要求隔离 home 必须落在**系统临时目录**（test_suite_isolation），
-          # 而 runner.temp（/home/runner/work/_temp）不在其中；本 workflow 只在 ubuntu 跑，故用 /tmp。
-          NARRATIVE_FORGE_HOME: /tmp/nf-cov-home
         run: |
+          # 运行时创建系统临时目录下的隔离 home：既满足 test_suite_isolation，
+          # 又避免把机器绝对路径写进公开 workflow（test_leak_surface）。
+          COV_HOME="$(mktemp -d)"
+          trap 'rm -rf "$COV_HOME"' EXIT
+          export NARRATIVE_FORGE_HOME="$COV_HOME"
           coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
           coverage report --fail-under=80 --include="desktop/src/core/*"
 
