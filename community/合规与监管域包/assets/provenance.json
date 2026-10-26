@@ -27,7 +27,88 @@
       "status": "active",
       "module": "合规与监管:M02",
       "added": "2026-09-22",
-      "source": "合规与监管域包自带权威锚表（2026-09-22 本机实测可达性）；锚只作口径参照，不作品质背书"
+      "source": "合规与监管域包自带权威锚表（2026-09-22 本机实测可达性）；T4.2 追加 §2 合规标准锚（6 标准 × 可机检项 × 可信度，2026-10-26 自撰，标准编号/版本取公开发布信息，未入 catalog 者登记为文档锚不宣称可达）"
+    },
+    {
+      "file": "COMPLIANCE_STATEMENT.md",
+      "key": "COMPLIANCE_STATEMENT",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：合规声明模板（五要素 + 可复制模板 + profile 机检映射），供 gate_profiles/regulatory-strict.json 消费"
+    },
+    {
+      "file": "AI_TRANSPARENCY_NOTICE.md",
+      "key": "AI_TRANSPARENCY_NOTICE",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：AI 透明度告知模板（披露对象/方式/文本 + GB 45438 显式隐式标识表），标准要项取 EU AI Act Art.50 与 GB 45438-2025 公开信息"
+    },
+    {
+      "file": "RISK_REGISTER.md",
+      "key": "RISK_REGISTER",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：风险登记表模板（四档词表对齐 EU AI Act 风险分级 + NIST AI RMF 登记形）"
+    },
+    {
+      "file": "DATA_PROVENANCE_LEDGER.md",
+      "key": "DATA_PROVENANCE_LEDGER",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：数据来源与授权记录模板（来源/授权方式/用途 + 授权形态词表），对齐 GB/T 35273 告知同意与 ISO/IEC 42001 数据获取要项"
+    },
+    {
+      "file": "AUDIT_LOG_SCHEMA.md",
+      "key": "AUDIT_LOG_SCHEMA",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M02",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：审计日志最小字段契约（7 必填字段 + JSON Schema 2020-12 片段），字段名与类型为本包自定口径"
+    },
+    {
+      "file": "IMPACT_ASSESSMENT.md",
+      "key": "IMPACT_ASSESSMENT",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：影响评估清单（DPIA 等价机检形，8 条目键 IA-01..IA-08）"
+    },
+    {
+      "file": "HUMAN_OVERSIGHT.md",
+      "key": "HUMAN_OVERSIGHT",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：人类监督说明模板（角色/动作/触发条件表 + 四项有效性检查），对齐 EU AI Act Art.14 与 ISO/IEC 42001 角色职责要项"
+    },
+    {
+      "file": "RETENTION_CONTACT.md",
+      "key": "RETENTION_CONTACT",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M01",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：保留期与联系人模板（量化时长 + 到期处置 + 角色联系方式），对齐 GB/T 35273 保存期限与负责人告知要项"
+    },
+    {
+      "file": "EVIDENCE_PACK_INDEX.md",
+      "key": "EVIDENCE_PACK_INDEX",
+      "version": "1.0",
+      "status": "active",
+      "module": "合规与监管:M02",
+      "added": "2026-10-26",
+      "source": "T4.2 合规纵深自撰（2026-10-26）：证据包索引模板（证据项 → 章节 → profile clause → 角色 → 复核日期的导航面）"
     }
   ]
 }

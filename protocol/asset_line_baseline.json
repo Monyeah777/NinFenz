@@ -240,10 +240,10 @@
       "package": "合成数据生成域包"
     },
     {
-      "digest": "a4575c0beb8a80c6ec70a9b103fb0b290ec4ac485e049c87a6a454c332f65474",
+      "digest": "a3a728eb92fe865bd50aabda47dddf11a502be2f7807a977ffeae2182ffb6d73",
       "dir": "community/合规与监管域包/assets",
-      "files": 3,
-      "lines": 394,
+      "files": 12,
+      "lines": 847,
       "package": "合规与监管域包"
     },
     {

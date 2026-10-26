@@ -8,6 +8,42 @@
       "note": "概念图：节点/边/溯源键（域包资产的标准三件之一）",
       "scope": "domain_pack"
     },
+    "COMPLIANCE_STATEMENT": {
+      "note": "合规声明模板：五要素 + 可复制声明 + profile 机检映射（合规与监管域包 T4.2）",
+      "scope": "domain_pack"
+    },
+    "AI_TRANSPARENCY_NOTICE": {
+      "note": "AI 透明度告知模板：披露对象/方式/文本 + 显式隐式标识表（EU AI Act Art.50 / GB 45438-2025）",
+      "scope": "domain_pack"
+    },
+    "RISK_REGISTER": {
+      "note": "风险登记表模板：四档风险词表 + 登记表（NIST AI RMF / EU AI Act 分级口径）",
+      "scope": "domain_pack"
+    },
+    "DATA_PROVENANCE_LEDGER": {
+      "note": "数据来源与授权记录模板：来源/授权方式/用途 + 授权形态词表",
+      "scope": "domain_pack"
+    },
+    "AUDIT_LOG_SCHEMA": {
+      "note": "审计日志最小字段契约：7 必填字段 + JSON Schema 2020-12 片段",
+      "scope": "domain_pack"
+    },
+    "IMPACT_ASSESSMENT": {
+      "note": "影响评估清单（DPIA 等价机检形）：8 条目键 IA-01..IA-08",
+      "scope": "domain_pack"
+    },
+    "HUMAN_OVERSIGHT": {
+      "note": "人类监督说明模板：监督角色/动作/触发条件 + 有效性检查",
+      "scope": "domain_pack"
+    },
+    "RETENTION_CONTACT": {
+      "note": "保留期与联系人模板：量化时长/到期处置/角色联系方式",
+      "scope": "domain_pack"
+    },
+    "EVIDENCE_PACK_INDEX": {
+      "note": "证据包索引模板：证据项→章节→profile clause→角色→复核日期的导航面",
+      "scope": "domain_pack"
+    },
     "DATA_CONTRACT": {
       "note": "数据契约：字段/口径/校验面（量化金融域包）",
       "scope": "domain_pack"

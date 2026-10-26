@@ -1490,10 +1490,58 @@
       "line": 1
     },
     {
+      "key": "AI_TRANSPARENCY_NOTICE",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AI_TRANSPARENCY_NOTICE.md",
+      "line": 1
+    },
+    {
+      "key": "AUDIT_LOG_SCHEMA",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AUDIT_LOG_SCHEMA.md",
+      "line": 1
+    },
+    {
+      "key": "AUDIT_LOG_SCHEMA",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/DATA_PROVENANCE_LEDGER.md",
+      "line": 45
+    },
+    {
+      "key": "AUDIT_LOG_SCHEMA",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/HUMAN_OVERSIGHT.md",
+      "line": 45
+    },
+    {
+      "key": "COMPLIANCE_STATEMENT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/COMPLIANCE_STATEMENT.md",
+      "line": 1
+    },
+    {
       "key": "CONCEPT_GRAPH",
       "package": "合规与监管域包",
       "file": "community/合规与监管域包/assets/CONCEPT_GRAPH.md",
       "line": 1
+    },
+    {
+      "key": "DATA_PROVENANCE_LEDGER",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AUDIT_LOG_SCHEMA.md",
+      "line": 61
+    },
+    {
+      "key": "DATA_PROVENANCE_LEDGER",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/DATA_PROVENANCE_LEDGER.md",
+      "line": 1
+    },
+    {
+      "key": "DATA_PROVENANCE_LEDGER",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/RETENTION_CONTACT.md",
+      "line": 46
     },
     {
       "key": "DOMAIN_SPEC",
@@ -1506,6 +1554,90 @@
       "package": "合规与监管域包",
       "file": "community/合规与监管域包/assets/DOMAIN_SPEC.md",
       "line": 1
+    },
+    {
+      "key": "EVIDENCE_PACK_INDEX",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/EVIDENCE_PACK_INDEX.md",
+      "line": 1
+    },
+    {
+      "key": "HUMAN_OVERSIGHT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AI_TRANSPARENCY_NOTICE.md",
+      "line": 46
+    },
+    {
+      "key": "HUMAN_OVERSIGHT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AUDIT_LOG_SCHEMA.md",
+      "line": 18
+    },
+    {
+      "key": "HUMAN_OVERSIGHT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/EVIDENCE_PACK_INDEX.md",
+      "line": 27
+    },
+    {
+      "key": "HUMAN_OVERSIGHT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/HUMAN_OVERSIGHT.md",
+      "line": 1
+    },
+    {
+      "key": "HUMAN_OVERSIGHT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/RISK_REGISTER.md",
+      "line": 31
+    },
+    {
+      "key": "IMPACT_ASSESSMENT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/IMPACT_ASSESSMENT.md",
+      "line": 1
+    },
+    {
+      "key": "MIT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/DATA_PROVENANCE_LEDGER.md",
+      "line": 22
+    },
+    {
+      "key": "RETENTION_CONTACT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/AUDIT_LOG_SCHEMA.md",
+      "line": 47
+    },
+    {
+      "key": "RETENTION_CONTACT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/DATA_PROVENANCE_LEDGER.md",
+      "line": 45
+    },
+    {
+      "key": "RETENTION_CONTACT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/HUMAN_OVERSIGHT.md",
+      "line": 30
+    },
+    {
+      "key": "RETENTION_CONTACT",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/RETENTION_CONTACT.md",
+      "line": 1
+    },
+    {
+      "key": "RISK_REGISTER",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/RISK_REGISTER.md",
+      "line": 1
+    },
+    {
+      "key": "STANDARDS_ANCHORS",
+      "package": "合规与监管域包",
+      "file": "community/合规与监管域包/assets/COMPLIANCE_STATEMENT.md",
+      "line": 36
     },
     {
       "key": "STANDARDS_ANCHORS",

@@ -1,0 +1,367 @@
+{
+  "schema": "nf-gate-profile/1",
+  "profile_id": "regulatory-strict",
+  "description": "合规与监管严格质量门（M80 §2.2 可插拔 profile 的第二个纵深域参考件，T4.2）。条款映射自 EU AI Act 第 50 条透明度义务（Regulation (EU) 2024/1689，2026-08-02 起适用）与 2026-06 透明度行为准则、GB 45438-2025（人工智能生成合成内容标识方法：显式/隐式标识）、ISO/IEC 42001:2023（文档化信息）、GB/T 35273-2020（个人信息告知与最小化）、NIST AI RMF 1.0（风险分级与处置）；只做确定性命中，不替作者做合规裁决，也不宣称外部标准的完整覆盖。",
+  "assets": {
+    "compliance_statement": "../assets/COMPLIANCE_STATEMENT.md",
+    "transparency_notice": "../assets/AI_TRANSPARENCY_NOTICE.md",
+    "risk_register": "../assets/RISK_REGISTER.md",
+    "data_provenance_ledger": "../assets/DATA_PROVENANCE_LEDGER.md",
+    "audit_log_schema": "../assets/AUDIT_LOG_SCHEMA.md",
+    "impact_assessment": "../assets/IMPACT_ASSESSMENT.md",
+    "human_oversight": "../assets/HUMAN_OVERSIGHT.md",
+    "retention_contact": "../assets/RETENTION_CONTACT.md",
+    "evidence_pack_index": "../assets/EVIDENCE_PACK_INDEX.md"
+  },
+  "clauses": [
+    {
+      "clause_id": "EU-AIA-50-TRANSPARENCY-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["AI 披露"]},
+      "evidence": "EU AI Act 第 50 条透明度义务须有独立章节承载（谁对谁披露、披露什么、怎么披露）；缺章节即无法逐条对账。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 50 transparency obligations（2026-08-02 适用）"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "EU-AIA-50-GEN-STATEMENT",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "人工智能生成|AI 生成|AI生成",
+        "message": "缺「内容由 AI 生成」的明确告知（正文须出现「人工智能生成」或「AI 生成」字样）。"
+      },
+      "evidence": "第 50(1) 条：面向自然人的交互与生成内容须明确告知其由 AI 生成，不能只写「智能生成」等含糊说法。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 50(1) AI-generated content disclosure"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "EU-AIA-50-DISCLOSURE-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["披露对象", "披露方式", "披露文本"]], "min_rows": 1
+      },
+      "evidence": "披露须可核对：对象 / 方式 / 文本三列齐全，逐条给出实际披露文本，而不是只声明「已披露」。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 50(1)(2) transparency content"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "EU-AIA-50-DEEPFAKE",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "深度合成|深度伪造",
+        "message": "缺深度合成/深度伪造内容的披露口径（第 50(4) 条）。"
+      },
+      "evidence": "第 50(4) 条：深度伪造内容须披露其被人为生成或操纵；不含此口径即漏一类高风险内容。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 50(4) deep fake disclosure"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "EU-AIA-50-EFFECTIVE-DATE",
+      "level": "warn",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "2026-08-02",
+        "message": "缺适用日期锚（应以 2026-08-02 标注第 50 条透明度义务的适用起点）。"
+      },
+      "evidence": "透明度义务 2026-08-02 起适用；证据包写明适用日期，读者才能判断该证据是提前准备还是已生效。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 113 application dates"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "EU-AIA-COP-2026-06",
+      "level": "warn",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "行为准则",
+        "message": "缺行为准则引用（2026-06 透明度行为准则是第 50 条的落地参照）。"
+      },
+      "evidence": "2026-06 透明度行为准则把第 50 条的披露格式细化到可执行程度；合规声明引用它，披露口径才有落地依据。",
+      "source": {"standard": "Code of Practice on transparent AI-generated content (2026-06)", "ref": "transparency code of practice"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "GB-45438-EXPLICIT",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "显式标识",
+        "message": "缺显式标识（GB 45438-2025：生成合成内容须在明显位置加可感知标识）。"
+      },
+      "evidence": "GB 45438-2025 要求生成合成内容带用户可感知的显式标识；只有后台水印不满足显式标识。",
+      "source": {"standard": "GB 45438-2025", "ref": "人工智能生成合成内容标识方法 / 显式标识"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "GB-45438-IMPLICIT",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "隐式标识",
+        "message": "缺隐式标识（GB 45438-2025：文件元数据中的生成合成属性）。"
+      },
+      "evidence": "GB 45438-2025 的隐式标识落在文件元数据（生成合成属性、服务提供者等），供机器核验；缺隐式标识则无法自动化溯源。",
+      "source": {"standard": "GB 45438-2025", "ref": "人工智能生成合成内容标识方法 / 隐式标识"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "GB-45438-LABEL-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["标识类型", "标识位置", "标识内容"]], "min_rows": 2
+      },
+      "evidence": "标识须可机检：显式/隐式两类标识各自的位置与内容成表登记（≥2 行覆盖两类）。",
+      "source": {"standard": "GB 45438-2025", "ref": "标识方式与位置"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "ISO-42001-STATEMENT",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["合规声明"]},
+      "evidence": "ISO/IEC 42001 的文档化信息要求先有治理方针/声明，再有证据；合规声明是证据包的入口章节。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / AI policy"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "ISO-42001-DOC-REGISTER",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["文件名称", "版本", "责任人", "保留期"]], "min_rows": 2
+      },
+      "evidence": "文档化信息台账：每份受控文件有名称/版本/责任人/保留期四要素，ISO/IEC 42001 的有效性证据即出自该台账。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Control of documented information"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "DATA-SOURCE-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["数据来源"]},
+      "evidence": "内容来源与数据出处须独立成章：没有来源章节就无法回答「这段内容依据什么数据」。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Data provenance / documented information"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "DATA-SOURCE-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["数据来源", "授权方式", "用途"]], "min_rows": 1
+      },
+      "evidence": "数据来源表须给出授权方式与用途：只有来源名而无授权依据的条目不可审计。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "个人信息来源与授权（告知同意）"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "DATA-LICENSE",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "授权|许可",
+        "message": "缺授权/许可说明（数据与内容的可用性须有明确依据）。"
+      },
+      "evidence": "外部数据与素材的可用性以授权/许可表述为准；只写「公开可得」不构成授权依据。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Data acquisition / third-party relations"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "NIST-AIRMF-RISK-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["风险分级"]},
+      "evidence": "NIST AI RMF 的 Govern/Map 环节要求显式登记风险；风险分级章节是证据包的风险对话入口。",
+      "source": {"standard": "NIST AI RMF 1.0", "ref": "GOVERN / MAP functions"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "NIST-AIRMF-RISK-LEVELS",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "不可接受风险|高风险|有限风险|最小风险",
+        "message": "缺风险档位用语（不可接受/高/有限/最小四档，EU AI Act 风险分级口径）。"
+      },
+      "evidence": "风险分级须落在公认档位词表上，不能自定义「中高」之类无法对齐的档位。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 5–6 risk tiers"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "NIST-AIRMF-RISK-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["风险等级", "风险描述", "处置措施"]], "min_rows": 2
+      },
+      "evidence": "风险登记表须有实质条目（≥2 行）并给出等级/描述/处置三列，单行占位不算登记。",
+      "source": {"standard": "NIST AI RMF 1.0", "ref": "risk register / treatment"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "OVERSIGHT-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["人类监督"]},
+      "evidence": "EU AI Act 第 14 条要求高风险 AI 系统可被人类有效监督；证据包须有独立的人类监督章节。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 14 human oversight"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "OVERSIGHT-ACTION",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "人工复核|人工确认|审批",
+        "message": "缺人类监督动作（须写明人工复核/人工确认/审批之一）。"
+      },
+      "evidence": "「有人负责」不构成监督；须写明具体监督动作（复核、确认、审批）及其发生时点。",
+      "source": {"standard": "EU AI Act (Regulation (EU) 2024/1689)", "ref": "Art. 14(4) oversight measures"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "OVERSIGHT-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["监督角色", "监督动作", "触发条件"]], "min_rows": 1
+      },
+      "evidence": "监督责任可落到角色：角色/动作/触发条件三列齐全，监督才可执行、可追责。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Roles, responsibilities and authorities"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "AUDIT-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["审计日志"]},
+      "evidence": "留痕与审计须有独立章节承载日志字段与保留要求（本域 F02-09 留痕与审计）。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Monitoring, measurement, logging"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "AUDIT-FIELD-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["字段", "类型", "必填", "说明"]], "min_rows": 5
+      },
+      "evidence": "审计日志 schema 须字段化：字段/类型/必填/说明四列、≥5 个字段，否则日志不可解析、不可对账。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / logging"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "AUDIT-TRACE-ID",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "trace_id|request_id",
+        "message": "缺链路标识字段（trace_id/request_id），日志无法与内容产出关联。"
+      },
+      "evidence": "日志与内容之间须有可关联的链路标识（trace_id/request_id），否则证据链断在「哪次生成」。",
+      "source": {"standard": "NIST AI RMF 1.0", "ref": "MEASURE / MANAGE traceability"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "RETENTION-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["保留期"]},
+      "evidence": "保留期与留痕要求须独立成章：证据包要说明「留多久、到点怎么处置」。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "个人信息保存期限"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "RETENTION-DURATION",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "保留期[^\\n]{0,24}(年|月|天)|保存期限",
+        "message": "缺量化保留时长（保留期须写明年/月/天，不能只写「按规定保留」）。"
+      },
+      "evidence": "保留期须给出量化时长，才能核对是否满足最短保存要求。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "保存期限与到期删除"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "RETENTION-CONTACT",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "联系人|联系方式|数据保护官|DPO",
+        "message": "缺责任人联系方式（须给出联系人/联系方式/数据保护官之一）。"
+      },
+      "evidence": "证据包须留可触达的合规联系人（或数据保护官），否则披露与申诉无落点。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "个人信息保护负责人与联系方式"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "PRIVACY-SECTION",
+      "level": "fail",
+      "predicate": {"kind": "required_sections", "headings": ["敏感信息"]},
+      "evidence": "敏感信息处理须独立成章：给出去标识/最小化与访问控制口径。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "个人敏感信息处理"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "PRIVACY-MINIMIZATION",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "present",
+        "pattern": "去标识化|匿名化",
+        "message": "缺最小化手段（须写明去标识化/匿名化之一）。"
+      },
+      "evidence": "最小必要与去标识化是敏感信息处理的机检落点；只写「注意保护」不可核验。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "去标识化处理"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "PRIVACY-NO-PLAINTEXT",
+      "level": "fail",
+      "predicate": {
+        "kind": "regex", "scope": "prose", "expect": "absent",
+        "pattern": "(?i)(sk-[A-Za-z0-9]{8,}|password\\s*[:=]\\s*\\S+|身份证号\\s*[:：]\\s*\\d{6,})",
+        "message": "证据包内出现凭据/证件号明文（禁用：sk- 密钥、password 赋值、身份证号明文）。"
+      },
+      "evidence": "交付物不得携带凭据或证件号明文；出现即判敏感信息泄露（输出保护纪律）。",
+      "source": {"standard": "GB/T 35273-2020", "ref": "个人敏感信息 / 访问控制"},
+      "data_source": "document.text"
+    },
+    {
+      "clause_id": "VERSION-TRACE",
+      "level": "fail",
+      "predicate": {"kind": "revision_trace"},
+      "evidence": "版本与变更可追溯：修订表版本号严格递增、日期为 ISO 8601——证据包本身也要可版本对账。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / version control"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "VERSION-CHANGE-TABLE",
+      "level": "fail",
+      "predicate": {
+        "kind": "table", "columns_any": [["版本", "日期", "变更"]], "min_rows": 2
+      },
+      "evidence": "变更记录表须有「变更」列且 ≥2 行：只登记版本号不写改了什么，等于没有变更记录。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Change control"},
+      "data_source": "document.tables"
+    },
+    {
+      "clause_id": "STRUCT-DOCTYPE",
+      "level": "fail",
+      "predicate": {
+        "kind": "doc_type",
+        "allowed": ["compliance_evidence_pack", "compliance_statement", "ai_transparency_notice",
+                    "risk_register", "data_provenance_ledger", "audit_log_schema",
+                    "impact_assessment", "human_oversight_charter"]
+      },
+      "evidence": "产物须显式声明文档类型（`> 文档类型：<type>`）且落在合规证据族白名单内——类型决定该用哪套判据。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / identification"},
+      "data_source": "document.text（`> 文档类型：<type>` 声明）"
+    },
+    {
+      "clause_id": "STRUCT-H1",
+      "level": "fail",
+      "predicate": {"kind": "heading_count", "level": 1, "expect": 1},
+      "evidence": "一份证据包只有唯一主标题（H1），其余降为节——多 H1 会让章节对账失去唯一锚。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / structure"},
+      "data_source": "document.headings"
+    },
+    {
+      "clause_id": "STRUCT-TABLE-COLS",
+      "level": "fail",
+      "predicate": {"kind": "table_columns"},
+      "evidence": "表头与数据行列数一致——证据包的表格是机读入口，列错位即丢字段。",
+      "source": {"standard": "ISO/IEC 42001:2023", "ref": "Documented information / records"},
+      "data_source": "document.tables"
+    }
+  ]
+}
