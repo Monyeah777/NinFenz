@@ -427,6 +427,8 @@ def main(argv=None) -> int:
                     help="只打印 n 分片的分配计划并校验并集==全集（不跑测试）")
     ap.add_argument("--run-shard", default="", help=argparse.SUPPRESS)
     ap.add_argument("--json", action="store_true", help="输出结构化摘要")
+    ap.add_argument("--incremental", action="store_true",
+                    help="TISA：内容寻址增量（未变的测试模块跳过；默认关闭，NF_TISA=1 同义）")
     args = ap.parse_args(argv)
 
     if args.run_shard:
@@ -532,6 +534,19 @@ def main(argv=None) -> int:
                  time.perf_counter() - t0))
         return 0
 
+    # ---- TISA 增量（内容寻址）：未变的测试模块直接跳过 ----
+    all_ids = list(ids)
+    skip_ids = []
+    inc = bool(args.incremental or os.environ.get("NF_TISA") == "1")
+    if inc:
+        from scripts import tisa as _tisa          # noqa: WPS433 - 延迟导入：不用增量时零成本
+        skip_ids, ids, _keys = _tisa.plan(all_ids)
+        print("  TISA：跳过 %d 条（模块输入面未变）/ 需跑 %d 条"
+              % (len(skip_ids), len(ids)))
+        if not ids:
+            print("  TISA：全部命中缓存，无需执行（0 s）")
+            return 0
+
     jobs = args.jobs or int(os.environ.get("NF_TEST_JOBS") or 4)
     jobs = max(1, min(jobs, len(ids)))
     weights_doc = load_weights()
@@ -613,6 +628,15 @@ def main(argv=None) -> int:
     for r in failed:
         print("---- 分片%d 失败（rc=%d）末 40 行 ----" % (r["index"], r["rc"]), file=sys.stderr)
         print("\n".join((r["out"] or "").splitlines()[-40:]), file=sys.stderr)
+    # ---- TISA：成功才写缓存（失败即失效，绝不留假绿）----
+    if inc and not failed:
+        try:
+            from scripts import tisa as _tisa
+            _tisa.commit(ids, [], _keys)
+            print("  TISA：已写入缓存 %s（%d 个模块）" % (_tisa.CACHE_REL, len(_keys)))
+        except Exception as exc:                   # noqa: BLE001 - 缓存写失败不得影响判定
+            print("  TISA：缓存写入跳过（%r）" % (exc,), file=sys.stderr)
+
     return 1 if failed else 0
 
 

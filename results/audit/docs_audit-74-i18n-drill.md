@@ -26,8 +26,14 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
+  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
+> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+
+> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
+
 > 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
 
 > 重审（2026-10-26）：新面收尾：coupling/style 基线重冻

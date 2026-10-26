@@ -30,8 +30,14 @@ subjects:
   - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
+  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
+> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+
+> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
+
 > 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
 
 > 重审（2026-10-26）：新面收尾：coupling/style 基线重冻

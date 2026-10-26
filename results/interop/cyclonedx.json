@@ -2,6 +2,13 @@
   "bomFormat": "CycloneDX",
   "components": [
     {
+      "bom-ref": "dep:scripts",
+      "description": "硬依赖（登记）：同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
+      "name": "scripts",
+      "scope": "required",
+      "type": "library"
+    },
+    {
       "bom-ref": "dep:yaml",
       "description": "硬依赖（登记）：PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
       "name": "yaml",
