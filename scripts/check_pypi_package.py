@@ -33,6 +33,9 @@ from email.parser import BytesParser
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+
+from core import json_doc  # noqa: E402  - 读 JSON 走统一守卫（形状/大小/深度）
 
 FACTS_REL = "protocol/facts.json"
 PYPROJECT_REL = "pyproject.toml"
@@ -51,8 +54,7 @@ def _h(data: bytes) -> str:
 
 
 def _load_facts(root: str) -> Dict[str, Any]:
-    with open(os.path.join(root, FACTS_REL), encoding="utf-8") as fh:
-        return json.load(fh)
+    return json_doc.load(os.path.join(root, FACTS_REL), dict, what=FACTS_REL)
 
 
 def _load_pyproject(root: str) -> Dict[str, Any]:

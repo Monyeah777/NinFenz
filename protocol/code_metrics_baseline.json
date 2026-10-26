@@ -10,6 +10,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 19
     },
+    "desktop/src/core/agent_contracts.py": {
+      "lines": 587,
+      "max_fn_cc": 41,
+      "max_fn_lines": 72
+    },
     "desktop/src/core/agent_rules_adapter.py": {
       "lines": 86,
       "max_fn_cc": 11,
@@ -1411,7 +1416,7 @@
       "max_fn_lines": 69
     },
     "scripts/check_pypi_package.py": {
-      "lines": 276,
+      "lines": 278,
       "max_fn_cc": 20,
       "max_fn_lines": 41
     },
@@ -1431,7 +1436,7 @@
       "max_fn_lines": 28
     },
     "scripts/cross_impl_check.py": {
-      "lines": 233,
+      "lines": 234,
       "max_fn_cc": 15,
       "max_fn_lines": 52
     },
@@ -1516,9 +1521,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8088,
-      "max_fn_cc": 121,
-      "max_fn_lines": 1372
+      "lines": 8170,
+      "max_fn_cc": 122,
+      "max_fn_lines": 1392
     },
     "scripts/nf_client.py": {
       "lines": 187,
