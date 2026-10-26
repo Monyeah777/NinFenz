@@ -289,6 +289,9 @@ SKIP = {
     "preset save": "写盘面（同名须 --force）——全链见 test_preset_cli.py",
     "shell": "交互面（接 TTY；非 TTY 阻塞）——覆盖见 test_terminal.py",
     "terminal": "交互面（shell 别名）——见 test_terminal.test_terminal_alias_works",
+    # T7.3：参考运行时 run 需 --plan/--trace（无参跑 rc=2），且 trace/fixture 是用户命名落点；
+    # 确定性 / record→replay / fixture 篡改与缺失 fail-closed 全链见 test_runtime.py。
+    "runtime run": "写盘面（需要 --plan/--trace；trace/fixture 为用户落点）——全链见 test_runtime.py",
 }
 
 
