@@ -18,7 +18,7 @@ crate-type = ["cdylib", "rlib"]
 # rust-mingw 自带的 dlltool 是残废 shim（CreateProcess 失败）⇒ 引入它即无法在
 # windows-gnu host 上构建。本线只用 std + sha2，实测干净通过。
 [dependencies]
-sha2 = "0.10"
+sha2 = "0.11"
 # Worker 状态文件里的能力令牌必须来自 OS CSPRNG，不能用 pid/port/时间拼哈希。
 # getrandom 在 Windows 走系统熵接口，且不引入 Windows raw-dylib 依赖。
 getrandom = "0.2"
