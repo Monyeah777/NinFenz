@@ -57,12 +57,12 @@
   "facts": [
     {
       "id": "quality",
-      "claim_zh": "质量凭证：verify v2.30 · check1-45 · PASS=79",
-      "claim_en": "Quality evidence: verify v2.30 · check1-45 · PASS=79",
+      "claim_zh": "质量凭证：verify v2.30 · check1-47 · PASS=81",
+      "claim_en": "Quality evidence: verify v2.30 · check1-47 · PASS=81",
       "entry_point": "bash verify.sh",
       "anchor": "https://ninfenz.dev/#fact-quality",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
-      "note": "单入口；check1-45 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
+      "note": "单入口；check1-47 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
     },
     {
       "id": "scale",
@@ -132,7 +132,7 @@
   "citation": {
     "plain": "NinFenz（NF）— 交付物契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz",
     "apa": "Monyeah777. (2026). NinFenz (宁封子): a deliverable contract layer [Computer software]. code AGPL-3.0-only or commercial; protocol text CC BY 4.0. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - deliverable contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}, note = {verify v2.30 · check1-45 · PASS=79}}",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - deliverable contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}, note = {verify v2.30 · check1-47 · PASS=81}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是交付物契约层（deliverable contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出可交付内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {

@@ -1,6 +1,6 @@
 {
-  "baseline_checks": 45,
-  "baseline_pass": 79,
+  "baseline_checks": 47,
+  "baseline_pass": 81,
   "concept_graphs": 101,
   "core_modules": 13,
   "core_pipelines": [
@@ -28,6 +28,6 @@
   "standards_total": 370,
   "standards_unreachable": 38,
   "subdivisions_total": 1200,
-  "verify_checks": 45,
+  "verify_checks": 47,
   "verify_version": "2.30"
 }

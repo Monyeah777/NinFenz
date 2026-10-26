@@ -531,13 +531,6 @@ class OrphanArtifactTest(unittest.TestCase):
 # : （或已不在场）就必须删掉，否则会变成掩盖新孤儿的黑洞（见 `test_archive_registry_has_no_stale_ent
 # ries`）。
 ARCHIVE_DOCS = {
-    "docs/41_波C_C1_C2_实测记录.md":
-        "41 波C C1/C2 一次性验收实测记录——结论已入 CHANGELOG 与 `nf sig`/`nf diff` 判据，本件供追溯"
-            "",
-    "docs/41_波C_W2_C3_C4_实测记录.md":
-        "41 波C W2 C3/C4 一次性验收实测记录——同上，供追溯",
-    "docs/41_波C_W3_实测记录.md":
-        "41 波C W3 一次性实测记录（C6/C8/C9 + D2/D5/D6），供追溯",
     "docs/41_波C_W5_实测记录.md":
         "41 波C W5 一次性实测记录（D3 ruff / D4 日志级别），供追溯",
     "docs/42_M1_P06_演练集.md":

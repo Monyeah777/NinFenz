@@ -57,13 +57,15 @@ NULL_FIELDS = ("inputs", "depends")
 
 #: 新面单跑墙钟预算（ms，冷跑实测×安全系数；verify.sh 每 check 起一个解释器，
 #: 预算含解释器启动税。超出预算时由 runner/审计侧告警，不在此处判死）。
-BUDGET_MS = {43: 2000, 44: 3000, 45: 6000}
+BUDGET_MS = {43: 2000, 44: 3000, 45: 6000, 46: 15000, 47: 6000}
 
 #: W9 新能力面（引擎与 bash 同跑一条 CLI；impl 在这里如实登记调用面）。
 IMPL_OVERRIDES = {
     43: "scripts/nf.py::spec check --core",
     44: "scripts/nf.py::registry index --check",
     45: "scripts/nf.py::security scan",
+    46: "scripts/nf.py::privacy scan + privacy check",
+    47: "scripts/nf.py::cli map --check",
 }
 
 #: id 登记表 —— **只增不减**。新增 check 只在末尾追加；既有编号不得改绑、不得删除。
@@ -114,6 +116,8 @@ IDS: dict[int, str] = {
     43: "contract-semantics",
     44: "registry-cid",
     45: "content-security",
+    46: "privacy-airgap",
+    47: "cli-map",
 }
 
 #: kind 形状（八类执行体；第一列是 manifest 值，第二列是 assert 机制）。

@@ -58,7 +58,7 @@ AGGREGATE_GATES = (32, 33, 35, 36)
 #: 探针目录（内部档案：计划期产物不进公开仓库）。缺失即跳过，不假装通过。
 PROBE = ROOT / ".rivet" / "private_archive" / "2026-10-15_gate-speedup-probe"
 TARGETS = [1, 3, 8, 13, 14, 15, 16, 20, 23, 24, 25, 26, 27, 28, 29, 30,
-           31, 32, 33, 34, 35, 36, 37, 39, 40, 43, 44, 45]
+           31, 32, 33, 34, 35, 36, 37, 39, 40, 43, 44, 45, 46, 47]
 #: bash 真值落点：**仓库之外**（放树内会被 check33 的编码卫生扫到自己的临时日志，
 #: 形成自指噪声；放 /tmp 又在「每步独立 shell」的工作流里步间不留存）。
 PARITY_DIR = ROOT.parent / "_nf_parity"
@@ -216,12 +216,13 @@ class GateEngineParityTest(unittest.TestCase):
 
         这是「check 只增不减」在工程上的牙齿：漏一条会被这里抓住。
         2026-10-26（T2.3）：check41/42 此前两边都不在（覆盖 40/42），已补进 PENDING；
-        W9（T9.3）：check43-45 以 delegated adapter 迁入，覆盖面随之收紧到 1-45。
+        W9（T9.3）：check43-45 以 delegated adapter 迁入，覆盖 1-45；
+        W12（T12.1）：check46-47 同口径迁入，覆盖面收紧到 1-47。
         """
         gate_engine.build_registry()
         covered = set(gate_engine.REGISTRY) | set(gate_engine.PENDING)
-        self.assertEqual(set(range(1, 46)), covered,
-                         "check 覆盖面缺口：%s" % sorted(set(range(1, 46)) - covered))
+        self.assertEqual(set(range(1, 48)), covered,
+                         "check 覆盖面缺口：%s" % sorted(set(range(1, 48)) - covered))
         overlap = set(gate_engine.REGISTRY) & set(gate_engine.PENDING)
         self.assertEqual(set(), overlap, "同一条 check 既已迁入又标未迁入：%s" % sorted(overlap))
 
@@ -325,7 +326,7 @@ def _tail_census(text: str) -> tuple[list[int], list[int]]:
 
 def _upgraded_gates(text: str) -> list[int]:
     """→ bash 体里已有「遍历日志、逐条透出 [FAIL]」口径的 check（顺序按编号）。"""
-    return [n for n in range(1, 46)
+    return [n for n in range(1, 48)
             if 'case "$_line" in' in gate_engine.gate_labels.check_body(text, n)]
 
 
@@ -411,12 +412,12 @@ class AggregateGateCensusTest(unittest.TestCase):
     """模式普查：verify.sh 里 tail 压缩的全量清单（防止“这是个案例”被误读）。"""
 
     def test_tail_compression_sites(self):
-        """26 处 tail：23 处压 verdict（check23-45）+ 3 处贴日志尾部（check12×2/check18）。"""
+        """29 处 tail：26 处压 verdict（check23-47）+ 3 处贴日志尾部（check12×2/check18）。"""
         total = sum(1 for line in VERIFY_TEXT.splitlines() if "tail -" in line)
         dump, verdict = _tail_census(VERIFY_TEXT)
-        self.assertEqual(26, total)
+        self.assertEqual(29, total)
         self.assertEqual([12, 18], dump)
-        self.assertEqual(list(range(23, 46)), verdict)
+        self.assertEqual(list(range(23, 48)), verdict)
 
     def test_upgraded_gates_are_exactly_the_seven(self):
         """逐条透出口径当前覆盖 32/33/35/36/41/42/44；其余 16 处仍是模式存量。"""

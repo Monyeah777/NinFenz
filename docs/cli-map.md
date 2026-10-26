@@ -27,7 +27,7 @@
 | `nf audit` | 治理与决策（govern） | 审计/验收（机制借鉴 Audit Report + Acceptance/Sign-off） | 文本 | — |
 | `nf bench` | 服务与集成（integrate） | 执行结果跑分台（机制借鉴 ACP benchmark suite：外部实测的容器） | 文本 | — |
 | `nf changelog` | 质检与验证（verify） | 变更日志生成：渲染确定（无墙钟，版本/日期由参数给）+ 逐条可溯源（只分组、不改写）；--write 把版本节插入 CHANGELOG 顶部并把 changes/unreleased/* 归档到 changes/<version>/ | JSON | docs/en/release.md、docs/ja/release.md、docs/meta/VERSION-MATRIX.md、docs/release.md |
-| `nf cli` | 命令面与终端（meta） | CLI IA 机读层（T11.3）：从 argparse 命令面 + terminal.FAMILIES 构建 nf-cli-map/1（命令→族→用途→flags/has_json/相关文档），生成件 protocol/cli_map.… | 文本 | — |
+| `nf cli` | 命令面与终端（meta） | CLI IA 机读层（T11.3）：从 argparse 命令面 + terminal.FAMILIES 构建 nf-cli-map/1（命令→族→用途→flags/has_json/相关文档），生成件 protocol/cli_map.… | 文本 | docs/verification-cards.md |
 | `nf cognition` | 图书馆与知识（library） | 认知族（机制借鉴 Glossary + SOP/Runbook/Playbook 分档） | JSON | — |
 | `nf combine` | 资产与货架（shelf） | 组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭包 / 事件闭包 / 资产借阅 / 合法性判定 → 可复算证书（T4）；`breadth` 对全部两两 + 抽样三元/四元/五元/六元跑同一套不变量证明广度；`mater… | 文本 | docs/combos.md、docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf completion` | 命令面与终端（meta） | 生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc） | 文本 | — |
@@ -69,7 +69,7 @@
 | `nf pipeline` | 资产与货架（shelf） | 管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线） | 文本 | docs/en/terminal.md、docs/ja/terminal.md、docs/terminal.md |
 | `nf postmortem` | 治理与决策（govern） | 复盘（机制借鉴 SRE postmortem） | 文本 | — |
 | `nf preset` | 装配与生产（forge） | 预设配置（指令集 F：端壳退役后按「端壳能力一律落 CLI」把预设接成命令；落点 = NF_HOME，非仓库） | 文本 | — |
-| `nf privacy` | 质检与验证（verify） | 隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / 凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 scripts 的网络站点（requests/urllib.… | 文本 | docs/security/airgap-and-privacy.md |
+| `nf privacy` | 质检与验证（verify） | 隐私与 air-gap 静态审计：`scan` 扫内容面（PII / 本机路径 / 凭据，掩码输出）；`check` 用 AST 静态审计 desktop/src/core 与 scripts 的网络站点（requests/urllib.… | 文本 | docs/security/airgap-and-privacy.md、docs/verification-cards.md |
 | `nf receipts` | 治理与决策（govern） | 协议层回执单根（把回执覆盖面从馆藏扩到协议层机读产物） | JSON | docs/interop.md |
 | `nf register` | 装配与生产（forge） | 协议登记本地助手（B3-B：protocol.yaml → registry protocols[]） | 文本 | — |
 | `nf registry` | 质检与验证（verify） | 契约注册表内容寻址（T8.2）：每包 canonical manifest 的 SHA-256（CID）+ 顶层 root；只读扫描、不改各包；本版不含签名（sig 留空，只做内容寻址与篡改检测） | 文本 | docs/verification-cards.md |

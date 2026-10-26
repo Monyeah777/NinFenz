@@ -518,10 +518,50 @@ def _cap45(root: Path) -> list:
     return rows
 
 
+def _cap46(root: Path) -> list:
+    """check46 隐私与 air-gap：`nf privacy scan` + `nf privacy check`（critical 判死；warn 只报告）。"""
+    rc_s, scan = _nf_json(root, ["privacy", "scan"])
+    rc_c, chk = _nf_json(root, ["privacy", "check"])
+    sum_s = scan.get("summary") or {}
+    sum_c = chk.get("summary") or {}
+    crit = int(sum_s.get("critical") or 0) + int(sum_c.get("critical") or 0)
+    undec = int(sum_s.get("undecidable") or 0) + int(sum_c.get("undecidable") or 0)
+    warned = int(sum_s.get("warn") or 0)
+    rows: list = []
+    if rc_s != 0 or rc_c != 0:
+        rows.append((FAIL, "隐私/air-gap 门禁异常（scan rc=%d / check rc=%d；不可判定按红 "
+                           "fail-closed）" % (rc_s, rc_c)))
+    elif crit > 0 or undec > 0:
+        rows.append((FAIL, "隐私/air-gap FAIL：critical=%d · undecidable=%d（修复指引："
+                           "python scripts/nf.py privacy scan/check 看 file:line）" % (crit, undec)))
+    if rows:
+        return rows
+    if warned:
+        rows.append((WARN, "隐私扫描有 %d 条 warn（仅报告，不判死；明细："
+                           "python scripts/nf.py privacy scan）" % warned))
+    rows.append((PASS, "隐私与 air-gap 门禁全绿（check46：PII/本机路径/凭据 critical 判死；"
+                       "warn 只报告 + 网络站点静态审计）"))
+    return rows
+
+
+def _cap47(root: Path) -> list:
+    """check47 CLI IA：`nf cli map --check`（生成件 == 实时重算 + 覆盖率闭合）。"""
+    rc, doc = _nf_json(root, ["cli", "map", "--check"])
+    issues = doc.get("issues") or []
+    if rc != 0 or not doc.get("ok", False) or issues:
+        if not issues:
+            return [(FAIL, "CLI IA 门禁异常（rc=%d；不可判定按红 fail-closed）" % rc)]
+        return [(FAIL, "CLI IA：%s" % i) for i in issues[:10]]
+    cov = doc.get("coverage") or {}
+    return [(PASS, "CLI IA 门禁全绿（check47：命令目录 == 实时重算；%d/%d 命令 · %d 族）"
+             % (cov.get("covered", 0), cov.get("commands", 0), cov.get("families", 0)))]
+
+
 def _register_capabilities() -> None:
-    """W9：把 check43-45 接进引擎（与 verify.sh 同名 check 调同一条 CLI；只接线）。"""
+    """W9/W12：把 check43-47 接进引擎（与 verify.sh 同名 check 调同一条 CLI；只接线）。"""
     text = _verify_sh() or ""
-    for num, impl in ((43, _cap43), (44, _cap44), (45, _cap45)):
+    for num, impl in ((43, _cap43), (44, _cap44), (45, _cap45),
+                     (46, _cap46), (47, _cap47)):
         title = gate_labels.banner(text, num)
         REGISTRY[num] = CheckSpec(
             num=num, title=title, reads=(), kind="delegated",

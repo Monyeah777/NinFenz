@@ -82,9 +82,11 @@ BASELINE = (
     (43, "contract-semantics"),
     (44, "registry-cid"),
     (45, "content-security"),
+    (46, "privacy-airgap"),
+    (47, "cli-map"),
 )
 
-_ALL_CHECKS = set(range(1, 46))
+_ALL_CHECKS = set(range(1, 48))
 _ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
@@ -98,7 +100,7 @@ class SchemaTest(unittest.TestCase):
     def test_schema_and_top_level_documented(self) -> None:
         doc = _manifest()
         self.assertEqual(gm.SCHEMA, doc.get("schema"))
-        self.assertEqual(45, doc["source"]["check_count"])
+        self.assertEqual(47, doc["source"]["check_count"])
         self.assertEqual(list(gm.NULL_FIELDS), doc.get("null_fields"))
         self.assertTrue(doc.get("notes"), "null 字段必须有说明（不写假声明）")
 
@@ -156,14 +158,14 @@ class SchemaTest(unittest.TestCase):
 
 
 class CoverageTest(unittest.TestCase):
-    """第 2 层：45/45 全覆盖（manifest 与引擎登记面各自成立）。"""
+    """第 2 层：47/47 全覆盖（manifest 与引擎登记面各自成立）。"""
 
-    def test_manifest_covers_all_45_checks(self) -> None:
+    def test_manifest_covers_all_47_checks(self) -> None:
         checks = sorted(g["legacy_check"] for g in _manifest()["gates"])
         self.assertEqual(sorted(_ALL_CHECKS), checks,
                          "manifest 缺 check：%s" % sorted(_ALL_CHECKS - set(checks)))
 
-    def test_engine_registry_plus_pending_covers_all_45(self) -> None:
+    def test_engine_registry_plus_pending_covers_all_47(self) -> None:
         from core import gate_engine
 
         gate_engine.build_registry()
@@ -178,7 +180,7 @@ class CoverageTest(unittest.TestCase):
         cov = gm.build(ROOT)["coverage"]
         self.assertEqual([], cov["gaps"], "manifest 覆盖缺口：%s" % cov["gaps"])
         self.assertEqual([], cov["orphans"], "引擎登记了不存在的 check：%s" % cov["orphans"])
-        self.assertEqual(45, cov["gates"])
+        self.assertEqual(47, cov["gates"])
         self.assertEqual(_ALL_CHECKS, set(cov["migrated"]) | set(cov["pending"]))
 
     def test_projection_matches_verify_sh(self) -> None:

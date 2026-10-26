@@ -1,12 +1,12 @@
-# NF 验证卡册（既有 45 条门禁的人读复跑说明）
+# NF 验证卡册（既有 47 条门禁的人读复跑说明）
 
 > 生成日期：2026-09-30 ｜ 生成方式：`bash verify.sh` 的 check 函数逐条抽取（`scripts/build_verification_cards.py`，**随仓库分发**：`--check` 只校验、`--write` 重写生成区）
 > 适用者：**不需要读代码**的人（含作者本人、未来接手的维护者、外部审查者）。
 
 ## 为什么有这份卡册
 
-NF 的门禁是一份 bash 脚本、45 条 check，当前基线声明为 `check1-45` · `PASS=79`（行数与 check 数为 verify.sh 实测；基线取自仓库真源 `quality_baseline.EXPECTED_*`，并由 `nf stats --check` 断言入口文件同步）。
-但「PASS=79」本身不说话——它不告诉你每一条到底断言了什么，也不告诉你哪一条可以自己复跑。
+NF 的门禁是一份 bash 脚本、47 条 check，当前基线声明为 `check1-47` · `PASS=81`（行数与 check 数为 verify.sh 实测；基线取自仓库真源 `quality_baseline.EXPECTED_*`，并由 `nf stats --check` 断言入口文件同步）。
+但「PASS=81」本身不说话——它不告诉你每一条到底断言了什么，也不告诉你哪一条可以自己复跑。
 这份卡册把每条 check 翻译成同一张五格卡：**结论 / 判据 / 步骤 / 谁验 / 记录**。
 
 它不新增任何机制，也不修改门禁本体；它只是把既有门禁的结论变成可继承的说明。
@@ -22,11 +22,11 @@ NF 的门禁是一份 bash 脚本、45 条 check，当前基线声明为 `check1
 
 | 项 | 值 |
 |---|---|
-| 卡片总数 | 45（= verify.sh 的 check 函数数，实测） |
-| 门禁脚本 | 3297 行（verify.sh 实测） |
-| 声明基线 | check1-45 · PASS=79（源自 quality_baseline.EXPECTED_*） |
-| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 5 |
-| 断言种类 | 真实单测 6 条 · 结构断言 39 条 |
+| 卡片总数 | 47（= verify.sh 的 check 函数数，实测） |
+| 门禁脚本 | 3341 行（verify.sh 实测） |
+| 声明基线 | check1-47 · PASS=81（源自 quality_baseline.EXPECTED_*） |
+| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 29 · 段D 供应链 7 |
+| 断言种类 | 真实单测 6 条 · 结构断言 41 条 |
 | 复跑入口 | `bash verify.sh`（全量）；单条见各卡片的「复跑命令」 |
 ## 卡片索引
 
@@ -77,6 +77,8 @@ NF 的门禁是一份 bash 脚本、45 条 check，当前基线声明为 `check1
 | 43 | 段D | == [43/段D] 契约语义门禁（W1 层序闭包 / W2 域隔离 / W3 门全性；T7.1 能力接入）== | 结构断言 |
 | 44 | 段D | == [44/段D] 注册表 CID 索引门禁（T8.2：内容寻址 + 篡改检测）== | 结构断言 |
 | 45 | 段D | == [45/段D] 内容安全门禁（T8.3：疑似内嵌指令 / 明文凭据 / 可执行外链；warn 只报）== | 结构断言 |
+| 46 | 段D | == [46/段D] 隐私与 air-gap 门禁（T12.1：PII / 本机路径 / 凭据 critical 判死 + 网络站点静态审计；warn 只报）== | 结构断言 |
+| 47 | 段D | == [47/段D] CLI IA 门禁（T11.3：命令目录/族覆盖/机器面；生成件与实时重算逐字节一致）== | 结构断言 |
 ---
 
 ## 逐条卡片
@@ -531,6 +533,26 @@ NF 的门禁是一份 bash 脚本、45 条 check，当前基线声明为 `check1
 | 谁验 | 任何有 Python 3 的人；不需要读代码 |
 | 记录 | 运行日志 nf_check45.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
 
+### V46 · [46/段D] 隐私与 air-gap 门禁（T12.1：PII / 本机路径 / 凭据 critical 判死 + 网络站点静态审计；warn 只报）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [46/段D] 隐私与 air-gap 门禁（critical 判死；warn 只报告） |
+| 判据 | 双静态审计（`nf privacy scan --json` + `nf privacy check --json`）：scan 的 critical=0 且 undecidable=0 且 rc=0、check 的 rc=0；warn 只报告不判死；rc=2/不可判定按红 fail-closed；不执行被扫内容 |
+| 复跑命令 | `python scripts/nf.py privacy scan` · `python scripts/nf.py privacy check` |
+| 谁验 | 任何有 Python 3 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check46_scan.log / nf_check46_check.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
+### V47 · [47/段D] CLI IA 门禁（T11.3：命令目录/族覆盖/机器面；生成件与实时重算逐字节一致）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [47/段D] CLI IA 门禁（命令目录 == 实时重算；每命令恰好一族、每族非空） |
+| 判据 | 结构断言（`nf cli map --check`）：`protocol/cli_map.json` 与 `docs/cli-map.md` 均与实时重算逐字节一致（源改未重生成即红）+ 覆盖率闭合（未归族/重复归族/空族/虚指任一即红）；rc=2/不可判定按红 fail-closed |
+| 复跑命令 | `python scripts/nf.py cli map --check` |
+| 谁验 | 任何有 Python 3 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check47.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
 ---
 
 > 本册可重建：仓库根执行 `python scripts/build_verification_cards.py --write`（生成器**随仓库分发**，真源 = `verify.sh`），产物逐字节一致；`--check` 为只读校验（生成区 ≠ 实时重算即 exit 1）。
@@ -540,3 +562,4 @@ NF 的门禁是一份 bash 脚本、45 条 check，当前基线声明为 `check1
 > 2026-10-05：语言面注册（check34：硬编码双语对 → 注册面）· 发布编排（check38 release_gate）· 接入面目录（check38 integrations）三项**并入既有 check**（序号不变），基线行同步为 check1-40 · **PASS=72**。
 > 2026-10-17：check41（构建隔离）/ check42（不可伪造 provenance）按同一模板补齐，**新增段D（供应链面）**；基线行同步为 check1-42 · **PASS=76**。
 > 2026-10-26：W9 新能力接入——check43（契约语义 W1-W3）/ check44（注册表 CID）/ check45（内容安全）按同一模板补齐，**段D 扩为供应链+新能力面**；基线行同步为 check1-45 · **PASS=79**。
+> 2026-10-27：W12 新能力接入——check46（隐私与 air-gap）/ check47（CLI IA）按同一模板补齐；基线行同步为 check1-47 · **PASS=81**。

@@ -3273,6 +3273,12 @@ CHECK_GUIDE = {
           "nf registry index --write 重签；确认改动是预期的，否则回滚该包文件。",
     "45": "缺什么：内容供应链扫描出现 critical（可执行内容/明文凭据）。补什么："
           "nf security scan 定位 file:line；删除或转义危险内容；合法安全研究样本走显式白名单。",
+    "46": "缺什么：隐私/air-gap 门禁不过（PII/本机绝对路径/凭据 critical，或网络站点静态审计"
+          "命中未登记出口）。补什么：跑 nf privacy scan / nf privacy check 看 file:line；"
+          "改写绝对路径、删除或掩码凭据、把合法网络出口登记进 allowlist；warn 只报告不判死。",
+    "47": "缺什么：CLI IA 生成件与实时重算不一致，或命令覆盖率不闭合（未归族/重复归族/空族/"
+          "虚指）。补什么：跑 nf cli map --json/--check 看 coverage；重跑 nf cli map --write；"
+          "新命令须在 terminal.FAMILIES 恰好归一族。",
 }
 
 def _cmd_preset(args):

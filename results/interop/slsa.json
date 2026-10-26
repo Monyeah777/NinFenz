@@ -4,7 +4,7 @@
     "buildDefinition": {
       "buildType": "https://ninfenz.dev/buildtypes/local-gate/v1",
       "externalParameters": {
-        "declaredBaseline": "check1-45 PASS=79",
+        "declaredBaseline": "check1-47 PASS=81",
         "gate": "verify.sh",
         "gateVersion": "v2.30",
         "note": "参数取自仓内声明件（不引入新真源）"
