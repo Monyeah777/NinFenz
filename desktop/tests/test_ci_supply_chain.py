@@ -171,6 +171,11 @@ class CiRequirementsPinTest(unittest.TestCase):
         )
         self.assertIn("registry-url: https://registry.npmjs.org", text)
         self.assertIn("npm publish --provenance --access public", text)
+        self.assertNotRegex(
+            text,
+            r"(?m)^\s*npm install -g npm@latest\s*$",
+            "发布工具链不得跟随浮动 @latest；使用 setup-node 固定 Node/npm",
+        )
         self.assertIn("github.event_name == 'push'", text,
                       "可选 GitHub Packages 镜像不得拖累主发布工作流的成功结论")
 
