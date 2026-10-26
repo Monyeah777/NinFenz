@@ -41,6 +41,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from . import atoms
+
 PROTO = 1
 #: 监听地址：**只允许回环**（与 scripts/serve_decision_model.py 同一条纪律；本模块不提供
 #: 「显式放行外网」的开关——守护进程能执行任意 nf 命令，绝不能出回环）。
@@ -174,6 +176,7 @@ def reset_process_caches() -> None:
 
     只在守护进程里逐请求调用——让热进程与「新起进程」看到同一份仓库事实。
     """
+    atoms.woken(clear=True)          # 激活面逐请求重新观测（累计值会跨请求串味）
     try:
         from core import pack_combo
         pack_combo.cache_clear()

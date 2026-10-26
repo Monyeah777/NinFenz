@@ -25,3 +25,38 @@ heredoc 里。分散的代价不是「不好看」，而是**同一动作两侧�
 导入纪律：本包是**叶子层**。只许依赖 stdlib 与同层的叶子件（repo_face / json_doc /
 json_schema / lazy_yaml）；不许反向 import core 的上层模块、scripts、tui、nf（test_atoms 守着）。
 """
+
+
+# ---------------------------------------------------------------- 懒唤醒与激活登记
+#: 已激活的原子名（`"<族>.<函数>"`）。设计意图：原子是**按需唤醒**的——包本身不在导入期拉任何
+#: 子模块（PEP 562 的 `__getattr__` 才导入），且每次**真被调用**时登记一次。于是「哪些原子在
+#: 生产路径上真的被利用了」从"看代码猜"变成可机读事实（`atoms.woken()`），供判据直接盯死代码。
+_WOKEN: "set[str]" = set()
+_SUBMODULES = ("code", "fs", "hash", "proc", "sets", "struct", "text")
+
+
+def _wake(name: str) -> None:
+    """登记一次原子激活（由各原子函数在入口调用；开销 = 一次 set.add）。"""
+    _WOKEN.add(name)
+
+
+def woken(clear: bool = False) -> "list[str]":
+    """本次进程内已激活的原子名（排序，便于逐字节比对）。
+
+    `clear=True` 时顺带清空登记：长驻进程（守护）在**每请求结束**调用一次，让下一轮请求从零
+    开始观测（同一语义见 `daemon.reset_process_caches`——它清的是按路径缓存，这里清的是激活面）。
+    """
+    got = sorted(_WOKEN)
+    if clear:
+        _WOKEN.clear()
+    return got
+
+
+def __getattr__(name: str):
+    """PEP 562：`atoms.fs` 这类属性访问**首次**才导入子模块（导入期零成本）。"""
+    if name in _SUBMODULES:
+        import importlib
+        mod = importlib.import_module("." + name, __name__)
+        globals()[name] = mod
+        return mod
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -162,3 +162,50 @@ class RealRepoTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PlatformBudgetTest(unittest.TestCase):
+    """平台化预算（2026-10-25）：同一命令 Windows 比 Linux 慢 1.5~2×，单一阈值必然二选一。"""
+
+    def test_budget_of_prefers_platform_override(self):
+        e = {"budget_ms": 100, "budget_ms_by_platform": {"windows": 250, "linux": 80}}
+        self.assertEqual(250, pb.budget_of(e, "windows"))
+        self.assertEqual(80, pb.budget_of(e, "linux"))
+        # 未声明的平台：回落到 budget_ms（不是 0——0 会被当成「不判」而静默放行）
+        self.assertEqual(100, pb.budget_of(e, "macos"))
+        # 老声明没有平台表：行为与改造前一致
+        self.assertEqual(100, pb.budget_of({"budget_ms": 100}, "windows"))
+
+    def test_platform_alias_maps_win32(self):
+        self.assertEqual("windows", pb.platform_of("win32"))
+        self.assertEqual("linux", pb.platform_of("linux"))
+
+    def test_scan_judges_by_current_platform_budget(self):
+        # 40 ms 在 linux 预算 30 下超、在 windows 预算 90 下不超
+        entry = {"id": "x", "cmd": "python -c pass", "budget_ms": 30, "runs": 3,
+                 "max_age_days": 7,
+                 "budget_ms_by_platform": {"linux": 30, "windows": 90}}
+        today = dt.date.today().isoformat()
+        ev_w = {"x": {"p95_ms": 40, "median_ms": 35, "platform": "windows", "measured_at": today}}
+        ev_l = {"x": {"p95_ms": 40, "median_ms": 35, "platform": "linux", "measured_at": today}}
+        with tempfile.TemporaryDirectory() as tmp_w, tempfile.TemporaryDirectory() as tmp_l:
+            _decl(tmp_w, [entry], ev_w)
+            _decl(tmp_l, [entry], ev_l)
+            issues_w, _w, stats_w = pb.scan(tmp_w, platform="windows")
+            issues_l, _w, stats_l = pb.scan(tmp_l, platform="linux")
+        self.assertEqual([], issues_w, issues_w)
+        self.assertEqual(0, stats_w["over_budget"])
+        self.assertTrue(any("超预算" in i for i in issues_l), issues_l)
+        self.assertEqual(1, stats_l["over_budget"])
+
+    def test_cross_platform_evidence_warns_not_fails(self):
+        entry = {"id": "x", "cmd": "python -c pass", "budget_ms": 10, "runs": 3,
+                 "max_age_days": 7}
+        ev = {"x": {"p95_ms": 999999, "median_ms": 999999, "platform": "windows",
+                    "measured_at": dt.date.today().isoformat()}}
+        with tempfile.TemporaryDirectory() as tmp:
+            _decl(tmp, [entry], ev)
+            issues, warns, _s = pb.scan(tmp, platform="linux")
+        # 记录采集于别的平台 ⇒ 耗时不可比：不判超预算（也不静默），改发 WARN 要求本平台重录
+        self.assertEqual([], issues, issues)
+        self.assertTrue(any("采集于平台" in w for w in warns), warns)

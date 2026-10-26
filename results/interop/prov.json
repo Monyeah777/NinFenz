@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "7156093310de1be529e60a5cceb733faa64a95844f85934ba0aa5e8e5f445f20"
+      "nf:sha256": "4370e18d92bcfe63f1084a73a46d1126aad2c00853932aedbca24c79ada72d23"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -281,7 +281,7 @@
     {
       "@id": "nf:file/protocol/perf_budget.json",
       "@type": "prov:Entity",
-      "nf:sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
+      "nf:sha256": "bd408ead44d97cb6120a8c0207cd1cb7d5227297f17d50107933c7d03d45c6aa"
     },
     {
       "@id": "nf:file/protocol/pipeline_advisory.json",
