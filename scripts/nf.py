@@ -1099,6 +1099,16 @@ def _make_parser() -> argparse.ArgumentParser:
     k_vis.add_argument("--as", dest="clearance", default="public",
                        choices=["public", "internal", "restricted"],
                        help="消费方清除级（public ⊆ internal ⊆ restricted）")
+    k_graph = ksub.add_parser(
+        "graph",
+        help="资产本体索引：合并全部域包 CONCEPT_GRAPH（nf-concept-index/1）",
+        description="资产本体索引（T10.2）：扫描 community/*/assets/CONCEPT_GRAPH.md（缺件时回退"
+                    " outputs/CONCEPT_DAG.graphml），同名概念跨域合并、边去重，产出唯一机读产物"
+                    " protocol/concept_graph_index.json；只读扫描、不改各包资产")
+    k_graph.add_argument("--write", action="store_true",
+                         help="重写 protocol/concept_graph_index.json")
+    k_graph.add_argument("--check", action="store_true", help="只校验（默认）")
+    k_graph.add_argument("--json", action="store_true", help="打印机读结果")
     for _k in (k_order, k_lint, k_freq, k_vis):
         _k.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ap = sub.add_parser("approve",
@@ -5076,12 +5086,51 @@ def _rel_out(path):
     return os.path.join(ROOT, text)
 
 
+def _knowledge_graph(args) -> int:
+    """资产本体索引（T10.2）：CONCEPT_GRAPH 合并 → protocol/concept_graph_index.json。"""
+    import json as _json
+    from core import concept_index as ci
+
+    want_json = bool(getattr(args, "json", False))
+    write_mode = bool(getattr(args, "write", False))
+    if write_mode:
+        issues, doc = ci.write(ROOT)
+    else:
+        issues, doc = ci.check(ROOT)
+    stats = doc.get("stats") or {}
+    sources = doc.get("sources") or {}
+    if want_json:
+        print(_json.dumps({"kind": "concept-index", "schema": ci.SCHEMA,
+                           "issues": issues, "index": doc},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print("== nf knowledge graph（资产本体索引 · 真源 %s）==" % ci.INDEX_REL)
+        print("  覆盖：md %d/%d · graphml 回退 %d · 跳过 %d"
+              % (sources.get("md_parsed", 0), sources.get("md_total", 0),
+                 sources.get("graphml_used", 0), len(sources.get("skipped") or [])))
+        print("  规模：域 %d · 概念 %d（出现 %d，同名合并 %d）· 边 %d（出现 %d，重复合并 %d）"
+              % (stats.get("domains", 0), stats.get("nodes", 0),
+                 stats.get("node_occurrences", 0), stats.get("merged_same_name", 0),
+                 stats.get("edges", 0), stats.get("edge_occurrences", 0),
+                 stats.get("duplicate_edges_merged", 0)))
+        print("  质量：孤儿 %d · 悬空边 %d · 类别冲突 %d · warnings %d"
+              % (stats.get("orphan_nodes", 0), stats.get("dangling_edges", 0),
+                 stats.get("category_conflicts", 0), stats.get("warnings", 0)))
+        print("  root：%s…" % str(doc.get("root", ""))[:24])
+        print("  模式：%s" % ("write（已重写索引）" if write_mode else "check（只校验）"))
+        for i in issues:
+            print("  [FAIL] %s" % i, file=sys.stderr)
+    return 1 if issues else 0
+
+
 def _cmd_knowledge(args):
-    """nf knowledge：双源知识层（状态 / 顺序 / 巡检 / 消化记录）。"""
+    """nf knowledge：双源知识层（状态 / 顺序 / 巡检 / 消化记录 / 资产本体索引）。"""
     from core import knowledge as kn
     import json as _json
     sub = getattr(args, "knowledge_cmd", None) or "status"
     want_json = bool(getattr(args, "json", False))
+    if sub == "graph":
+        return _knowledge_graph(args)
     if sub == "order":
         clearance = str(getattr(args, "clearance", "") or "")
         rows = kn.resolve_order(ROOT, clearance=clearance)
