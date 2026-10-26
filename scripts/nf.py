@@ -774,6 +774,22 @@ def _make_parser() -> argparse.ArgumentParser:
     b_rep.add_argument("runs", help="run 记录 JSON（单个对象或数组）")
     for _b2 in (b_run, b_cmp, b_rep):
         _b2.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rtp = sub.add_parser("runtime",
+                         help="参考运行时（确定性 harness：装配计划 → trace；MockModel + record/replay）",
+                         description="参考运行时（T7.3）：载入装配计划与状态，按管线层序执行并产 trace；"
+                                     "MockModel 按 contract_digest+step 确定性派生响应（无随机/无网络）；"
+                                     "record/replay 复现同一 trace 与产物 digest，fixture 缺失/篡改即 FAIL。")
+    rtp2 = rtp.add_subparsers(dest="rt_cmd", required=True)
+    rtr = rtp2.add_parser("run", help="跑一次：--plan/--trace（可 --record/--replay）",
+                          description="跑一次参考运行时：计划 → trace；可录制/回放 fixture。")
+    rtr.add_argument("--plan", required=True,
+                     help="装配计划 JSON 路径（assemble_plan.plan 产出）")
+    rtr.add_argument("--trace", required=True, help="trace 输出 JSON 路径")
+    rtr.add_argument("--state", default="",
+                     help="状态 JSON 路径（缺省=protocol/world_slots.json）")
+    rtr.add_argument("--record", default="", help="录制 fixture JSON 路径（模型调用序列）")
+    rtr.add_argument("--replay", default="", help="回放 fixture JSON 路径（复现同一 digest）")
+    rtr.add_argument("--json", action="store_true", help="输出结构化 JSON 摘要")
     ep = sub.add_parser("endpoint",
                         help="服务端点契约（proposed：把已实现能力声明成 HTTP 面 + 指向真实性门禁）",
                         description="服务端点契约（机制借鉴 microsoft/ai-chat-protocol）")
@@ -4711,7 +4727,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "state", "state_path", "key_file", "ssh_key", "ssh_allowed_signers",
                     "registry", "root", "case", "exceptions", "check_file", "check_md",
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
-                    "baseline", "pipeline", "questions")
+                    "baseline", "pipeline", "questions", "plan", "record", "replay")
 
 
 def _path_writing_issue(args) -> str:
@@ -4752,7 +4768,7 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
                     "questions", "registry", "root", "runs", "script_file", "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
-                    "target", "template", "tier", "trace", "verify")
+                    "target", "template", "tier", "trace", "verify", "plan", "record", "replay")
 
 
 def _utf8_text_issue(args) -> str:
@@ -6931,6 +6947,22 @@ def _cmd_toolface(args):
     return 1 if issues else 0
 
 
+def _cmd_runtime(args):
+    """nf runtime：参考运行时（确定性 harness + record/replay）。
+
+    判据与文件读写都在 `core.runtime` 内——本层只做命令面转发（不在此写盘：写面纪律由
+    `_PATH_FLAG_DESTS` / 编码闸 + core.runtime 的 fail-closed 校验共同守住）。
+    """
+    from core import runtime as rt
+
+    if getattr(args, "rt_cmd", "") != "run":
+        print("  ✗ 缺子命令（修复指引：nf runtime run --plan <plan.json> "
+              "--trace <trace.json>）", file=sys.stderr)
+        return 2
+    return rt.cli_run(plan=args.plan, trace=args.trace, state=args.state,
+                      record=args.record, replay=args.replay, as_json=args.json)
+
+
 def _cmd_worldmodel(args):
     """nf worldmodel：浏览确定性抽象状态契约（machine_contract.world_model）。"""
     import json as _json
@@ -7565,6 +7597,8 @@ def main(argv=None) -> int:
         return _cmd_patterns(args)
     if args.cmd == "bench":
         return _cmd_bench(args)
+    if args.cmd == "runtime":
+        return _cmd_runtime(args)
     if args.cmd == "endpoint":
         return _cmd_endpoint(args)
     if args.cmd == "interop":
