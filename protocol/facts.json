@@ -1,0 +1,62 @@
+{
+  "faces": {
+    "license_line_en": "code AGPL-3.0-only or commercial; protocol text CC BY 4.0",
+    "license_line_zh": "AGPL-3.0-only 或商业（协议文本 CC BY 4.0）",
+    "quality_line": "verify v2.30 · check1-42 · PASS=76",
+    "quality_line_zh": "质量凭证：verify v2.30 · check1-42 · PASS=76"
+  },
+  "npm": {
+    "files": 2907,
+    "measured_at": "2026-10-08",
+    "provenance": true,
+    "source": "registry.npmjs.org",
+    "unpacked_bytes": 24253563,
+    "unpacked_mb": "23.13",
+    "version": "1.1.0"
+  },
+  "quality": {
+    "checks": 42,
+    "expected_pass": 76,
+    "verify_version": "v2.30"
+  },
+  "release": {
+    "cli_version": "1.1.0",
+    "content_version": "v0.93",
+    "license": {
+      "code": "AGPL-3.0-only",
+      "code_alternative": "LicenseRef-Commercial",
+      "community": "LicenseRef-Community-Submission",
+      "historical_mit_through": "1.0.5",
+      "protocol": "CC-BY-4.0"
+    }
+  },
+  "scale": {
+    "concept_graphs": 101,
+    "core_modules": 13,
+    "core_pipelines": [
+      "P00",
+      "P01",
+      "P90"
+    ],
+    "domain_packs": 100,
+    "library_items": 3,
+    "pack_assets": 363,
+    "pack_dirs": 111,
+    "registered_packs": 111,
+    "standard_bindings": 1200,
+    "standards_bodies": 194,
+    "standards_by_layer": {
+      "data": 148,
+      "eng": 38,
+      "form": 29,
+      "gov": 71,
+      "iface": 84
+    },
+    "standards_edges": 206,
+    "standards_reachable": 332,
+    "standards_total": 370,
+    "standards_unreachable": 38,
+    "subdivisions_total": 1200
+  },
+  "schema": "nf-facts/2"
+}

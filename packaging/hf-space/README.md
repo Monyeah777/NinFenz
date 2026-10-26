@@ -6,7 +6,7 @@ colorTo: green
 sdk: docker
 app_port: 7860
 pinned: false
-license: mit
+license: agpl-3.0
 short_description: Run real NinFenz read-only gates in the browser
 ---
 
@@ -43,4 +43,4 @@ git clone https://github.com/Monyeah777/NinFenz && cd NinFenz && bash verify.sh
 
 - 仓库（canonical）：https://github.com/Monyeah777/NinFenz
 - 机器入口 `llms.txt`：https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt
-- 许可：MIT
+- 许可：AGPL-3.0-only 或商业（协议文本 CC BY 4.0）

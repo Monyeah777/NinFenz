@@ -23,7 +23,7 @@
 | 安装（有检出） | `python scripts/nf.py serve` |
 | 仓库 | https://github.com/Monyeah777/NinFenz |
 | 站点 | https://ninfenz.dev/ |
-| 许可 | MIT |
+| 许可 | AGPL-3.0-only 或商业（协议文本 CC BY 4.0） |
 
 **先判断你要做哪一种：**
 

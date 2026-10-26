@@ -32,7 +32,7 @@
 1. **Sync Repository**：Admin → Repository 页点 **Sync repository / Refresh**，等 commit 数据出现。
 2. **Dockerfile 页**：选仓库 Dockerfile；Build steps 留空；CMD 填 `["python","scripts/nf.py","serve"]`；
    env schema 填空对象；点 **Deploy**（有的页面叫 **Build**）。
-3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.5`，发布。
+3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.1.0`，发布。
 4. 打开 Schema / Score 页验收：应有 12 个工具、1 个 prompt；Quality 开始评分。
 
 如果你只想记一条：**先去 Repository 页点 Sync，再去 Dockerfile 页点 Deploy，成功后再点 Make Release。**
@@ -152,7 +152,7 @@
 
 1. 在测试列表里点 **Make Release**；
    如果进了测试详情页，点 **Create Release**。
-2. 版本填 **`1.0.5`**（与 `pyproject.toml` 一致）。
+2. 版本填 **`1.1.0`**（与 `protocol/facts.json` 一致）。
 3. Changelog 可填：
 
    ```text
@@ -165,7 +165,7 @@
 如果页面只有 **Build & Release**：
 
 - 点它，Glama 会构建并自动选版本发布；
-- 发布后在 Releases 里确认版本是 `1.0.5`，不是别的版本。
+- 发布后在 Releases 里确认版本是 `1.1.0`，不是别的版本。
 
 发布后：
 
@@ -260,7 +260,7 @@ Glama Listing 三个等级：
 
 | 等级 | 来源 | 本仓现状 |
 |---|---|---|
-| License | 仓库许可证 | A（MIT） |
+| License | 仓库许可证 | A（AGPL-3.0-only 或商业） |
 | Quality | TDQS 总体分 | 构建后实评；预评估 A |
 | Maintenance | 活跃度 / Release / 响应 | Release 后实评 |
 
@@ -329,7 +329,7 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | Install | `npx -y ninfenz serve`（或容器：`docker build -t ninfenz-glama . && docker run --rm -i ninfenz-glama`） |
 | Category | content-creation（备选 developer-tools / knowledge-management） |
 | Tags | mcp, content-contract, spec-driven, verification, knowledge-base, python, llm |
-| License | MIT |
+| License | AGPL-3.0-only 或商业（协议文本 CC BY 4.0） |
 | Icon | `packaging/mcp/assets/icon-400.png`（400×400 PNG） |
 
 ## 12. 我已经做完的 vs 你只需要点的

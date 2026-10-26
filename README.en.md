@@ -147,7 +147,7 @@ AI assembly:
 
 ## Versions
 
-Install **`ninfenz` 1.0.5** today — published to both npm and GitHub Packages:
+Install **`ninfenz` 1.1.0** today — published to both npm and GitHub Packages:
 
 ```bash
 npm i -g ninfenz@latest   # install or upgrade
@@ -160,7 +160,7 @@ Three independent version lines ship from the same repository:
 | Line | Current | What it governs |
 |---|---|---|
 | **Content & protocol** | **v0.93** | Templates, domain packs, specs — *what* can be generated |
-| **Command-line tool** | **1.0.5** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Command-line tool** | **1.1.0** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
 Last three content releases, described by **what they add**:

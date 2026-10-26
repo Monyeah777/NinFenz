@@ -10,7 +10,7 @@
 **安装命令**：`npx -y ninfenz serve`
 **类目**：内容创作 / 开发者工具
 **标签**：MCP、内容契约、规范驱动、可验证、知识库、Python、大模型
-**许可**：MIT
+**许可**：AGPL-3.0-only 或商业（协议文本 CC BY 4.0）
 **图标**：packaging/mcp/assets/icon-400.png
 
 ## 传输配置（stdio）—— 只填 Stdio，另两种留空

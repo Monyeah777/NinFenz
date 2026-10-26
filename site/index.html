@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>宁封子 NinFenz · 内容契约层（content contract layer）</title>
-<meta name="description" content="宁封子（NinFenz，简称 NF）是内容契约层：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关；check1-42 确定性门禁 · PASS=76 · Merkle 证明与签名锚；MIT、可离线。">
+<meta name="description" content="宁封子（NinFenz，简称 NF）是内容契约层：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关；check1-42 确定性门禁 · PASS=76 · Merkle 证明与签名锚；AGPL-3.0-only 或商业（协议文本 CC BY 4.0）、可离线。">
 <link rel="canonical" href="https://ninfenz.dev/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/">
 <link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/">
 <link rel="describedby" href="llms.txt" type="text/plain" title="llms.txt">
 <link rel="alternate" href="llms-full.txt" type="text/plain" title="llms-full.txt（完整单文件）">
-<link rel="license" href="https://opensource.org/license/mit">
+<link rel="license" href="https://opensource.org/license/agpl-3.0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="宁封子 NinFenz · 内容契约层">
-<meta property="og:description" content="协议 + 确定性门禁 + 可验证产物。不是模型，不是提示词模板集，不是厂商 SDK。MIT、离线可跑。">
+<meta property="og:description" content="协议 + 确定性门禁 + 可验证产物。不是模型，不是提示词模板集，不是厂商 SDK。AGPL-3.0-only 或商业（协议文本 CC BY 4.0）、离线可跑。">
 <meta property="og:url" content="https://ninfenz.dev/">
 <meta property="og:image" content="https://ninfenz.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -34,7 +34,7 @@
       ],
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Windows, macOS, Linux",
-      "license": "https://opensource.org/license/mit",
+      "license": "https://opensource.org/license/agpl-3.0",
       "codeRepository": "https://github.com/Monyeah777/NinFenz",
       "sameAs": [
         "https://github.com/Monyeah777/NinFenz",
@@ -148,7 +148,7 @@
           "name": "许可与费用？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MIT，无付费版、无托管服务。"
+            "text": "AGPL-3.0-only 或商业（协议文本 CC BY 4.0），无付费版、无托管服务。"
           }
         }
       ]
@@ -166,7 +166,7 @@
 
 <h1>内容契约层：让 AI 长内容可装载、可质检、可复现</h1>
 <p class="lede sub">宁封子（NinFenz，简称 NF）是<strong>内容契约层（content contract layer）</strong>：把「AI 稳定产出长内容」变成工程。协议本体<strong>域中立、模型无关</strong>；叙事只是官方第一个域包。</p>
-<p class="not">不是模型 · 不是提示词模板集 · 不是某厂商 SDK · MIT · 可离线</p>
+<p class="not">不是模型 · 不是提示词模板集 · 不是某厂商 SDK · AGPL-3.0-only 或商业（协议文本 CC BY 4.0） · 可离线</p>
 <p class="warn">⚠️ 官方唯一指定入口：<strong>https://ninfenz.dev</strong> —— NinFenz 没有付费版，也不需要下载任何「客户端」；第三方站点上的本项目内容与官方无关（<a href="#official">怎么辨识</a>）。</p>
 
 <h2>三种接法（按你的身份选）</h2>
@@ -241,7 +241,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><td>资源站 / 网盘 / 加速器页面上的本项目内容</td><td>❌ 未获官方维护的转载，与官方无关</td></tr>
 <tr><td>任何要求付款、充值、加群、填表、扫码的行为</td><td>❌ 不是本项目（NF 从不收费，也没有客服渠道）</td></tr>
 </table>
-<p class="src">本项目以 MIT 许可发布：欢迎转载与商用，但<strong>必须保留 LICENSE 与来源署名</strong>；抹掉署名的转载不符合许可条件。怀疑某处内容真伪时，回到本页与 canonical 仓库逐项对照即可。</p>
+<p class="src">本项目按分层许可发布：代码 AGPL-3.0-only 或商业许可；协议文本 CC BY 4.0；社区投稿 LicenseRef-Community-Submission（≤ v1.0.5 为 MIT）。转载与商用须保留 LICENSE 与来源署名；抹掉署名的转载不符合许可条件。怀疑某处内容真伪时，回到本页与 canonical 仓库逐项对照即可。</p>
 
 <h2 id="faq">常见问题</h2>
 <h3>宁封子 NinFenz 是什么？</h3>
@@ -259,26 +259,26 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h3>国内网络怎么取件？</h3>
 <p>用 Gitee 镜像 <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>，或直接用本站机器面——本站托管在 Cloudflare，国内可直连（<code>*.workers.dev</code> 不行，自定义域可以）。</p>
 <h3>许可与费用？</h3>
-<p>MIT，无付费版、无托管服务。</p>
+<p>AGPL-3.0-only 或商业（协议文本 CC BY 4.0），无付费版、无托管服务。</p>
 
 <h2>引用这一段</h2>
 <pre><code>宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。
 
-纯文本：NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz
-APA：Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/
+纯文本：NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only 或商业（协议文本 CC BY 4.0），https://github.com/Monyeah777/NinFenz
+APA：Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. code AGPL-3.0-only or commercial; protocol text CC BY 4.0. https://ninfenz.dev/
 BibTeX：
 @software{ninfenz,
   title = {NinFenz (宁封子) - content contract layer},
   author = {Monyeah777},
   year = {2026},
   url = {https://ninfenz.dev/},
-  license = {MIT}
+  license = {AGPL-3.0-only OR LicenseRef-Commercial; protocol text CC-BY-4.0}
 }</code></pre>
 <p class="src">机读引用元数据：仓库根 CITATION.cff · 三种形态同见 <a href="llms-full.txt">/llms-full.txt</a> 第八节。引用请指向 canonical 站点或仓库，并保持定义句逐字一致；量化事实请引 <a href="facts.json">/facts.json</a>，别手抄数字（会过期）。</p>
 
 <footer>
 <p class="warn">⚠️ 官方唯一指定入口：https://ninfenz.dev —— 没有付费版、没有客户端下载；第三方站点上的本项目内容与官方无关。</p>
-<p><span class="badge">MIT</span><span class="badge">离线可跑</span><span class="badge">零第三方依赖</span><span class="badge">模型无关</span></p>
+<p><span class="badge">AGPL-3.0-only 或商业</span><span class="badge">离线可跑</span><span class="badge">零第三方依赖</span><span class="badge">模型无关</span></p>
 <p>仓库：<a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> · 镜像：<a href="https://gitee.com/monyeah777/ninfenz">Gitee</a> · 机器面：<a href="llms.txt">/llms.txt</a> · <a href="llms-full.txt">/llms-full.txt</a> · <a href="facts.json">/facts.json</a> · <a href="nf.txt">/nf.txt</a> · <a href="agent.txt">/agent.txt</a> · <a href="sitemap.xml">sitemap</a></p>
 </footer>
 </div>

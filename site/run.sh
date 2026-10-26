@@ -47,7 +47,7 @@ run() { say "+ $*"; "$@"; }
 say "== NinFenz 免安装引导（https://ninfenz.dev/run.sh）=="
 say "仓库：$REPO"
 say "目标目录：$DEST"
-say "许可：MIT · 全部内容可公开引用"
+say "许可：AGPL-3.0-only 或商业（协议文本 CC BY 4.0） · 全部内容可公开引用"
 
 if ! command -v git >/dev/null 2>&1; then
   say "缺 git：请先安装 git。本脚本不做包管理，也不申请 sudo。"

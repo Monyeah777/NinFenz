@@ -295,8 +295,8 @@ Intent = namedtuple("Intent", "kind payload raw")
 #: check39 与 `nf shell --verify` 共用同一判据：族分区必须恰好覆盖命令集（不缺不重不虚）。
 FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "start", "name": "上手与自检",
-     "summary": "第一次进 NF：体检、一键演示、自述数字、抽象阶梯",
-     "commands": ("doctor", "demo", "stats", "layers")},
+     "summary": "第一次进 NF：体检、一键演示、自述数字、事实真源、抽象阶梯",
+     "commands": ("doctor", "demo", "stats", "facts", "layers")},
     {"id": "forge", "name": "装配与生产",
      "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"
          "写、入库登记",
