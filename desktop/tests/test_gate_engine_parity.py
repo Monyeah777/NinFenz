@@ -212,14 +212,16 @@ class GateEngineParityTest(unittest.TestCase):
                          "引擎与 bash 判据不一致（%d 条）：\n%s" % (len(diffs), "\n".join(diffs)))
 
     def test_no_engine_check_is_silently_missing_from_registry(self) -> None:
-        """登记表与 PENDING **必须恰好覆盖 check1-40**——不许有 check 从两边都消失。
+        """登记表与 PENDING **必须恰好覆盖 check1-42**——不许有 check 从两边都消失。
 
         这是「check 只增不减」在工程上的牙齿：漏一条会被这里抓住。
+        2026-10-26（T2.3）：check41/42 此前两边都不在（覆盖 40/42），已补进 PENDING；
+        覆盖面断言随之从 1-40 收紧到 1-42。
         """
         gate_engine.build_registry()
         covered = set(gate_engine.REGISTRY) | set(gate_engine.PENDING)
-        self.assertEqual(set(range(1, 41)), covered,
-                         "check 覆盖面缺口：%s" % sorted(set(range(1, 41)) - covered))
+        self.assertEqual(set(range(1, 43)), covered,
+                         "check 覆盖面缺口：%s" % sorted(set(range(1, 43)) - covered))
         overlap = set(gate_engine.REGISTRY) & set(gate_engine.PENDING)
         self.assertEqual(set(), overlap, "同一条 check 既已迁入又标未迁入：%s" % sorted(overlap))
 

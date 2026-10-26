@@ -425,6 +425,11 @@ PENDING: dict[int, str] = {
     22: "导出物规范体检（unittest 3 模块）",
     35: "深化面门禁（失败面为 tail-3 拼接 + 子扫描统计，多段结构）",
     38: "出口自动化门禁（6 次解释器循环）",
+    # T2.3（Wave 2）：段D 供应链两条此前**两边都不在**——覆盖缺口不是"未迁入"，
+    # 而是漏登记；先如实进 PENDING（判据仍在 verify.sh，不假装迁入），manifest 登记面
+    # 见 scripts/gate_manifest.py + protocol/gates.json。
+    41: "构建隔离门禁（SLSA L3：构建入口不联网 + 基座按 digest 钉 + 工具链定版）",
+    42: "不可伪造 provenance（SLSA L3：验签在生成进程之外 + 篡改必红）",
 }
 
 

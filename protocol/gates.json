@@ -1,0 +1,1042 @@
+{
+  "schema": "nf-gates/1",
+  "source": {
+    "file": "verify.sh",
+    "sha256": "5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f",
+    "verify_version": "v2.30",
+    "check_count": 42,
+    "baseline_checks": 42,
+    "baseline_pass": 76
+  },
+  "null_fields": [
+    "inputs",
+    "depends",
+    "budget_ms"
+  ],
+  "notes": [
+    "第一步（T2.3）：只登记静态投影，不改任何判据；--check 不执行 check。",
+    "id 登记表只增不减：新增 gate 追加 IDS；既有编号不得改绑/删除。",
+    "inputs 留 null：读面应由 gate_faces 观测派生（声明面曾全空=假声明，见 subcheck_cache），第二步补。",
+    "depends/budget_ms 留 null：依赖图与历史耗时 p95 属实测面，第二步补。",
+    "impl=null 表示该 gate 在 gate_engine 里尚未迁入（PENDING），不假装有实现。"
+  ],
+  "coverage": {
+    "gates": 42,
+    "migrated": [
+      1,
+      3,
+      13,
+      14,
+      15,
+      20,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      36,
+      37,
+      39,
+      40
+    ],
+    "pending": [
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      16,
+      17,
+      18,
+      19,
+      21,
+      22,
+      35,
+      38,
+      41,
+      42
+    ],
+    "gaps": [],
+    "orphans": []
+  },
+  "gates": [
+    {
+      "id": "core-dirs",
+      "legacy_check": 1,
+      "title": "== [1/6·A] 官方核心目录结构（07 §7 项1）==",
+      "segment": "A",
+      "kind": "declarative",
+      "impl": "verify.sh::_decl_check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "decl-rows",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "dup-ids-official",
+      "legacy_check": 2,
+      "title": "== [2/6·A] 重号 ID 全限定·官方层（07 §7 项5）==",
+      "segment": "A",
+      "kind": "bash",
+      "impl": "verify.sh::check2",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "bash-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "invariant-anchors",
+      "legacy_check": 3,
+      "title": "== [3/6·A] 五条不变式落点（01 §5 ↔ 07 §7 项6）==",
+      "segment": "A",
+      "kind": "declarative",
+      "impl": "verify.sh::_decl_check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "decl-rows",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "visibility-boundary",
+      "legacy_check": 4,
+      "title": "== [4/6·A] 可见性边界（06 §4 管线 ↔ M23 可见性域）==",
+      "segment": "A",
+      "kind": "declarative",
+      "impl": "verify.sh::_decl_check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "decl-rows",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "quality-gate-action",
+      "legacy_check": 5,
+      "title": "== [5/6·A] 质检门（M80 gate_action 流水线 ↔ 06 §5）==",
+      "segment": "A",
+      "kind": "declarative",
+      "impl": "verify.sh::_decl_check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "decl-rows",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "entry-navigation",
+      "legacy_check": 6,
+      "title": "== [6/6·A] 入口导航（README → 07 → 协议链/官方目录）==",
+      "segment": "A",
+      "kind": "declarative",
+      "impl": "verify.sh::_decl_check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "decl-rows",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "community-pack-structure",
+      "legacy_check": 7,
+      "title": "== [7/4·B] 社区两包结构完整（07 §7 项2，T6 在册数一致性）==",
+      "segment": "B",
+      "kind": "bash",
+      "impl": "verify.sh::check7",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "bash-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "community-asset-baseline",
+      "legacy_check": 8,
+      "title": "== [8/4·B] 社区资产行数溯源（07 §7 项3）==",
+      "segment": "B",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check8.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "module-asset-addressable",
+      "legacy_check": 9,
+      "title": "== [9/4·B] 模块-资产引用可寻址 + 社区 README 重号限定（07 §7 项4/5）==",
+      "segment": "B",
+      "kind": "bash",
+      "impl": "verify.sh::check9",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "bash-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "ext-closure-redlines",
+      "legacy_check": 10,
+      "title": "== [10/4·B] EXT 闭合 + 社区红线落地（07 §7 项2/8）==",
+      "segment": "B",
+      "kind": "bash",
+      "impl": "verify.sh::check10",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "bash-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "asset-three-way-reconcile",
+      "legacy_check": 11,
+      "title": "== [11/5·B] 资产-模块三方对账（08 方案 T5 A5；02 §8.1 ↔ modules/ ↔ assets/README）==",
+      "segment": "B",
+      "kind": "bash",
+      "impl": "verify.sh::check11",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "bash-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": null,
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "desktop-unittest-compileall",
+      "legacy_check": 12,
+      "title": "== [12/代码层] 桌面核心单元测试 + 全量 py_compile 语法抽查（v0.6.0 治理补漏）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check12_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "tests"
+    },
+    {
+      "id": "protocol-version-migration",
+      "legacy_check": 13,
+      "title": "== [13/段C] 协议版本一致性 + 迁移完整性（09 方案 T2.3）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check13_cmp.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "community-protocol-registration",
+      "legacy_check": 14,
+      "title": "== [14/段C] 社区协议登记门禁（v0.7.0 check14：01 §6.1 Schema + 02 §8.3 登记三要件 + registry protocols[] 投影）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check14.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "composition-references",
+      "legacy_check": 15,
+      "title": "== [15/段C] 组合引用门禁（v0.8.0 check15：02 §8.4 references 五断言）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check15.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "contract-arbitration",
+      "legacy_check": 16,
+      "title": "== [16/段C] 契约仲裁门禁（v1.0.0 check16：01 §1.1 machine_contract 机读结构 + 02 §8.4 规则④ references 装配自动仲裁 + 运行时寻址授权一致）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check16a.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "quality-governance",
+      "legacy_check": 17,
+      "title": "== [17/段C] 质量治理门禁（v1.4.0 check17：16_v1.4.0_质量治理闭环方案.md）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check17_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "export-contract",
+      "legacy_check": 18,
+      "title": "== [18/段C] 导出契约门禁（v2.0.0 check18：17_v2.0.0_导出层CCV3方案.md）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check18_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "export-schema-shape",
+      "legacy_check": 19,
+      "title": "== [19/段C] 导出产物 schema 合规（v2.2.0 A1：export_schema 5 格式 shape 自检）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check19_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "doc-completeness",
+      "legacy_check": 20,
+      "title": "== [20/段C] 文档完整性门禁（v2.2.0 A3：模块文档必填项——对齐 check16 过渡策略分层）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check20.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "registry-reference-graph",
+      "legacy_check": 21,
+      "title": "== [21/段C] registry 引用图闭合门禁（v2.2.0 A4：impact_check 变更影响面——registry 自洽无悬空引用/无裸号重复）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check21_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "export-spec-hygiene",
+      "legacy_check": 22,
+      "title": "== [22/段C] 导出物规范体检门禁（v2.4.0 A4：export_schema 硬约束——spec_version 数值/name 规范/description 上限）==",
+      "segment": "C",
+      "kind": "unittest",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "unittest-green",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check22_unittest.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "asset-supply-chain",
+      "legacy_check": 23,
+      "title": "== [23/段C] 资产供应链闭合门禁（40 总纲 v2.7 波A S2：每资产可溯源/可发现/键无孤儿；台账=provenance.json + 文件头双源一致）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.asset_ledger::verify_root",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check23.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "module-lifecycle",
+      "legacy_check": 24,
+      "title": "== [24/段C] 模块生命周期门禁（40 总纲 v2.8 波B S5：模块 status 位 + deprecate/restore + 引用门禁——deprecated/retired 不得被引用）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.module_lifecycle::verify_modules",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check24.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "knowledge-signature",
+      "legacy_check": 25,
+      "title": "== [25/段C] 协议知识签名门禁（41 波C C2：01-36 全量文档签名两遍可复现——知识指纹稳定 = 编译期冲突可发现）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.knowledge_sig::verify_reproducible",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check25.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "semantic-conflict",
+      "legacy_check": 26,
+      "title": "== [26/段C] 语义矛盾扫描门禁（41 波C C3：techdoc 链事件契约断链 + 挂载点/类别漂移——补 check15/21 结构自洽之上的语义空白）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.semantic_conflict::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check26.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "architecture-purity",
+      "legacy_check": 27,
+      "title": "== [27/段C] 架构纯度体检门禁（42 M3：端壳残留/私货可变物/重复标题 grep 断言族 + core raise 消息修复指引审计 + 抽象阶梯归属与越界 R7 + 核心文面去叙述 R8）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.purity_scan::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check27.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "idl-schema",
+      "legacy_check": 28,
+      "title": "== [28/段C] 协议层 IDL schema 门禁（43 A1：protocol/schema 全定义在场 + 全量件过 schema——machine_contract/registry 投影/管线声明/协议包/资产台账/发布策略/接入面，任一字段漂移即 FAIL）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.schema_lint::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check28.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "conformance-grading",
+      "legacy_check": 29,
+      "title": "== [29/段C] Conformance 一致性分级门禁（43 A2：01 §1.2 分级——模块机读块/协议包/导出 manifest 声明 ≤ 可证级别，防虚标）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.conformance_scan::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check29.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "extension-bump-migration",
+      "legacy_check": 30,
+      "title": "== [30/段C] 扩展策略 + bump 迁移门禁（43 A3：EXTENSION 判据在场 + 版本字段结构性变更须带 01 §7/02 §9.3 迁移记录）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check30.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "golden-generation",
+      "legacy_check": 31,
+      "title": "== [31/段C] 生成物同仓 golden 门禁（43 A4：schema 定义 → 生成物可复现，仓库内产物 == 实时重算——双源不一致即过期 FAIL）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.protocol_golden::verify_golden",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check31.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "quality-depth",
+      "legacy_check": 32,
+      "title": "== [32/段C] 质量纵深汇总门禁（45 W28：载荷注册表/资产 ledger/指令审计/概念图健康/资产密度·厚度·零引用 + world_model/world_slots）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.quality_depth_scan::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check32.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "new-faces-summary",
+      "legacy_check": 33,
+      "title": "== [33/段C] 新面汇总门禁（MCP dual-era / stdio 帧纪律 / attestation / 基线回归评分 / 机械修复 / 正文 lint / 许可证门 / 遥测 semconv / 编码卫生 / 互操作导出（含入仓一致性）/ 文档命令面 / 决策层面 / 构建回路）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check33.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "library-face",
+      "legacy_check": 34,
+      "title": "== [34/段C] 云端图书馆面门禁（frontmatter 真源 / INDEX·ALIAS 投影一致 / 生命周期 / 四型覆盖 / llms.txt 入口 / 内容分级声明 / 投稿面一致）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check34.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "deepening-face",
+      "legacy_check": 35,
+      "title": "== [35/段C] 深化面门禁（管线抽象执行 / 馆藏回执单根 / 模块边界冻结 / 内容绑定批准 / 一致性报告工件 / 无效语料）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check35.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "governance-face",
+      "legacy_check": 36,
+      "title": "== [36/段C] 治理面门禁（一致性声明 / RFC 版本史 / 指令档机器面路由 / 实践包 / 跑分台 / 端点契约）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check36.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "knowledge-layer",
+      "legacy_check": 37,
+      "title": "== [37/段C] 知识层门禁（双源知识：权威分层 / 查询有序 / 时效 / 消化可追溯 / 认知裁剪）==",
+      "segment": "C",
+      "kind": "script",
+      "impl": "scripts/check37_knowledge.py",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "script-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check37.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "output-automation",
+      "legacy_check": 38,
+      "title": "== [38/段C] 出口自动化门禁（自述数字 / 他证通道 / GEO 出口 / FDE 样例 / 发布编排 / 接入面）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check38_$mod.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "terminal-surface",
+      "legacy_check": 39,
+      "title": "== [39/段C] 终端与端壳残留门禁（端壳退役已成事实 + 终端入口在场 + 命令面全策展可达 + 顶尖 CLI 基线逐条可核）==",
+      "segment": "C",
+      "kind": "inproc",
+      "impl": "core.gate_engine::inproc",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check39.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "asset-contracts",
+      "legacy_check": 40,
+      "title": "== [40/段C] 数字资产契约门禁（数据/代码/脚本三面：格式 + 字段完整性 + 防篡改 + AST 规范 + 可证空指针 + 脚本 I/O 对齐）==",
+      "segment": "C",
+      "kind": "delegated",
+      "impl": "core.asset_contract::scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check40.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "build-isolation",
+      "legacy_check": 41,
+      "title": "== [41/段D] 构建隔离门禁（SLSA L3 Build isolation：构建入口不联网 + 基座按 digest 钉 + 工具链定版）==",
+      "segment": "D",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check41.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "provenance-nonfalsifiable",
+      "legacy_check": 42,
+      "title": "== [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）==",
+      "segment": "D",
+      "kind": "inproc",
+      "impl": null,
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-exit0",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check42.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": null,
+      "tier": "static"
+    }
+  ]
+}
