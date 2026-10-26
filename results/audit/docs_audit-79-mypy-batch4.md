@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
+  - protocol/code_metrics_baseline.json:f5cdc577771836691c98c6df5fcfe2f733aa5ee147bf80950de86b85fde307a8
 ---
+> 重审（2026-10-26）：T4.1：gate_profile 增加脚本直跑回退导入（+8 行）后重冻 code/coupling 基线；按审计协议重绑 digest
+
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 gate_profile/gate_profile_rules/techdoc_gate/gate_types 四个核心模块并重冻 code/coupling 基线（评审后按冻结上限显式重签）；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
 
 > 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新

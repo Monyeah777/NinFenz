@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
+  - protocol/code_metrics_baseline.json:f5cdc577771836691c98c6df5fcfe2f733aa5ee147bf80950de86b85fde307a8
 ---
+> 重审（2026-10-26）：T4.1：gate_profile 增加脚本直跑回退导入（+8 行）后重冻 code/coupling 基线；按审计协议重绑 digest
+
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 gate_profile/gate_profile_rules/techdoc_gate/gate_types 四个核心模块并重冻 code/coupling 基线（评审后按冻结上限显式重签）；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
 
 > 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新

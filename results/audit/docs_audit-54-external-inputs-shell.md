@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
-  - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
+  - library/INDEX.md:25cd8e199d7b26e9a0718cfa124afebd1a66e14d549fb2a9795c59053130c7bb
 
 ---
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 9 资产与 gate_profiles 严格 profile，触发 library/INDEX.md 与 README.en.md 生成区刷新；按审计协议机械重绑对象 digest（对象一改旧审计即失效）
+
 > 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径
 
 > 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价

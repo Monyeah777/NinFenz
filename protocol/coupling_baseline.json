@@ -436,6 +436,16 @@
       "ce": 4,
       "i": 1.0
     },
+    "gate_profile": {
+      "ca": 0,
+      "ce": 2,
+      "i": 1.0
+    },
+    "gate_profile_rules": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
     "gate_router": {
       "ca": 0,
       "ce": 3,
@@ -445,6 +455,11 @@
       "ca": 2,
       "ce": 2,
       "i": 0.5
+    },
+    "gate_types": {
+      "ca": 2,
+      "ce": 0,
+      "i": 0.0
     },
     "gate_verdict": {
       "ca": 1,
@@ -567,7 +582,7 @@
       "i": 0.3333
     },
     "ir": {
-      "ca": 11,
+      "ca": 12,
       "ce": 0,
       "i": 0.0
     },
@@ -947,9 +962,9 @@
       "i": 1.0
     },
     "quality_gate": {
-      "ca": 1,
-      "ce": 1,
-      "i": 0.5
+      "ca": 2,
+      "ce": 3,
+      "i": 0.6
     },
     "quant_metrics": {
       "ca": 1,
@@ -1186,6 +1201,11 @@
       "ce": 2,
       "i": 0.6667
     },
+    "techdoc_gate": {
+      "ca": 1,
+      "ce": 2,
+      "i": 0.6667
+    },
     "telemetry_semconv": {
       "ca": 0,
       "ce": 0,
@@ -1334,6 +1354,10 @@
     [
       "purity_scan",
       "layer_model"
+    ],
+    [
+      "quality_gate",
+      "techdoc_gate"
     ]
   ]
 }

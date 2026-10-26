@@ -440,6 +440,16 @@
       "max_fn_cc": 11,
       "max_fn_lines": 35
     },
+    "desktop/src/core/gate_profile.py": {
+      "lines": 304,
+      "max_fn_cc": 23,
+      "max_fn_lines": 41
+    },
+    "desktop/src/core/gate_profile_rules.py": {
+      "lines": 595,
+      "max_fn_cc": 14,
+      "max_fn_lines": 31
+    },
     "desktop/src/core/gate_router.py": {
       "lines": 96,
       "max_fn_cc": 16,
@@ -449,6 +459,11 @@
       "lines": 182,
       "max_fn_cc": 12,
       "max_fn_lines": 34
+    },
+    "desktop/src/core/gate_types.py": {
+      "lines": 56,
+      "max_fn_cc": 8,
+      "max_fn_lines": 23
     },
     "desktop/src/core/gate_verdict.py": {
       "lines": 94,
@@ -951,8 +966,8 @@
       "max_fn_lines": 53
     },
     "desktop/src/core/quality_gate.py": {
-      "lines": 145,
-      "max_fn_cc": 8,
+      "lines": 103,
+      "max_fn_cc": 7,
       "max_fn_lines": 24
     },
     "desktop/src/core/quant_metrics.py": {
@@ -1189,6 +1204,11 @@
       "lines": 347,
       "max_fn_cc": 15,
       "max_fn_lines": 63
+    },
+    "desktop/src/core/techdoc_gate.py": {
+      "lines": 143,
+      "max_fn_cc": 24,
+      "max_fn_lines": 51
     },
     "desktop/src/core/telemetry_semconv.py": {
       "lines": 185,

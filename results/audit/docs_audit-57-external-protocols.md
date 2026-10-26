@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
+  - llms.txt:a3ff7da7c4cc0ce1934f40f72a524dd6a594daec50ecb57b07ea32439aa831bb
 
 ---
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 9 资产与 gate_profiles 严格 profile，触发 library/INDEX.md 与 README.en.md 生成区刷新；按审计协议机械重绑对象 digest（对象一改旧审计即失效）
+
 > 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
 
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑

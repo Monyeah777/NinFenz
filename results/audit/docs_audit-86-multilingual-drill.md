@@ -12,8 +12,12 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
+  - protocol/code_metrics_baseline.json:f5cdc577771836691c98c6df5fcfe2f733aa5ee147bf80950de86b85fde307a8
 ---
+> 重审（2026-10-26）：T4.1：gate_profile 增加脚本直跑回退导入（+8 行）后重冻 code/coupling 基线；按审计协议重绑 digest
+
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 gate_profile/gate_profile_rules/techdoc_gate/gate_types 四个核心模块并重冻 code/coupling 基线（评审后按冻结上限显式重签）；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
 
 > 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新

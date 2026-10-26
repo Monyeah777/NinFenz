@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
-  - README.en.md:0cd92c44a9d35a059fc4626d0f771ddca58318da68a5580daddf0361cef592a7
+  - README.en.md:2c27070a8b5cc050c786fea244e38a7dcc9b7f0e1416f8083c4128e3e29c4f2f
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 9 资产与 gate_profiles 严格 profile，触发 library/INDEX.md 与 README.en.md 生成区刷新；按审计协议机械重绑对象 digest（对象一改旧审计即失效）
+
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
 
 > 重审（2026-10-25）：REUSE 3.3 合规（MIT-NOTICE + 徽章 + CI 作业）

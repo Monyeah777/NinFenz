@@ -14,8 +14,12 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:93d391428f848f78dfeb9deee3eeca7b7ea1f225c0a004324b6e5c30b1ca2100
+  - protocol/code_metrics_baseline.json:f5cdc577771836691c98c6df5fcfe2f733aa5ee147bf80950de86b85fde307a8
 ---
+> 重审（2026-10-26）：T4.1：gate_profile 增加脚本直跑回退导入（+8 行）后重冻 code/coupling 基线；按审计协议重绑 digest
+
+> 重审（2026-10-26）：T4.1 技术文档域包纵深：新增 gate_profile/gate_profile_rules/techdoc_gate/gate_types 四个核心模块并重冻 code/coupling 基线（评审后按冻结上限显式重签）；按审计协议重绑对象 digest
+
 > 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
 
 > 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新
