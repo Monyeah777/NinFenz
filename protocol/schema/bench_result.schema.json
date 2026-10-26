@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/bench_result.schema.json",
+  "title": "NF 公开 benchmark 结果行（nf-bench-result/1）",
+  "description": "results/bench/results/*.json 的单一真相：一条「提交 × profile」的 gate profile 缺陷注入台结果行。判据与台架见 scripts/gate_defect_bench.py，榜单聚合与校验见 scripts/bench_leaderboard.py；evidence_path 指向可复算证据件，contract_digest 是它的 sha256（防手改数字）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "submission_id",
+    "model",
+    "provider",
+    "version",
+    "date",
+    "profile",
+    "cases",
+    "clean_cases",
+    "detected",
+    "false_positives",
+    "detection_rate",
+    "fp_rate",
+    "verdict",
+    "evidence_path",
+    "contract_digest"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": [
+        "nf-bench-result/1"
+      ]
+    },
+    "submission_id": {
+      "description": "提交标识（同一提交可有多 profile 结果行；建议 provider/model@version 形态）。",
+      "type": "string",
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._@/-]{2,119}$"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "date": {
+      "description": "实测日期（YYYY-MM-DD；不写运行耗时等不确定面）。",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "techdoc-strict",
+        "regulatory-strict"
+      ]
+    },
+    "cases": {
+      "description": "负例数（detection_rate 的分母）。",
+      "type": "integer",
+      "minimum": 1
+    },
+    "clean_cases": {
+      "description": "清洁正例数（fp_rate 的分母）。",
+      "type": "integer",
+      "minimum": 1
+    },
+    "detected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "false_positives": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "detection_rate": {
+      "description": "detected / cases，保留 4 位小数（校验器会复算，不许手圆）。",
+      "type": "number",
+      "minimum": 0
+    },
+    "fp_rate": {
+      "description": "false_positives / clean_cases，保留 4 位小数（校验器会复算）。",
+      "type": "number",
+      "minimum": 0
+    },
+    "verdict": {
+      "description": "按台架阈值（检出率 ≥90%、误报率 ≤10%）复算的判定，不采信手填值。",
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail"
+      ]
+    },
+    "evidence_path": {
+      "description": "证据件（REPO 根相对）；必须落在 results/bench/evidence/ 且存在。",
+      "type": "string",
+      "pattern": "^results/bench/evidence/[A-Za-z0-9._-]+\\.json$"
+    },
+    "contract_digest": {
+      "description": "证据件的 sha256（`sha256:<64 hex>`）；与在盘内容不符即拒收。",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}
