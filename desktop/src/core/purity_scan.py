@@ -97,6 +97,7 @@ def _doc_facts(text: str):
 #: R5 硬依赖白名单（**登记**的第三方硬 import：允许直接 import）
 HARD_ALLOW = {
     "yaml": "PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
+    "scripts": "同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
 }
 #: R5 软导入登记（第三方可选依赖：必须 try/except ImportError 守卫 + 写明理由）
 SOFT_IMPORTS = {

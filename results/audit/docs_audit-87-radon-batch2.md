@@ -8,8 +8,14 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:cded7b23d0b9b7da94467714af2925d0bbb7f8eb03cecf794fa596bc9e619f69
+  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
 ---
+> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+
+> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+
+> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
+
 > 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
 
 > 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
