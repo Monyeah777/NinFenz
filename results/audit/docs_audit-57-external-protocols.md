@@ -6,7 +6,7 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:27f93c0ec2ee9f7388dd7bd6a73d79a2168ca5d013b6828c78e0293978e1deba
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
@@ -24,9 +24,13 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:75a1e63d3b95e688bf102acd5469872f0ef491d2bd3d59610e8ea2ecfab1b9ed
+  - llms.txt:72336b8ee68ca7e3fbc031753be2cf8c29db0d48d1af325c8b2eb171c067d74f
 
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45 + EOL 归一后重审（verify.sh/README/度量基线）
+
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：Merge W7: contract semantics + content IR + reference runtime

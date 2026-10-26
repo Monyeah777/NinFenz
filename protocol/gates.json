@@ -2,16 +2,15 @@
   "schema": "nf-gates/1",
   "source": {
     "file": "verify.sh",
-    "sha256": "5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f",
+    "sha256": "4d55b38050b36ffc530e0e8ca8d6fb4161339ca7022f85ed30f718fab0a30342",
     "verify_version": "v2.30",
-    "check_count": 42,
-    "baseline_checks": 42,
-    "baseline_pass": 76
+    "check_count": 45,
+    "baseline_checks": 45,
+    "baseline_pass": 79
   },
   "null_fields": [
     "inputs",
-    "depends",
-    "budget_ms"
+    "depends"
   ],
   "notes": [
     "第一步（T2.3）：只登记静态投影，不改任何判据；--check 不执行 check。",
@@ -21,7 +20,7 @@
     "impl=null 表示该 gate 在 gate_engine 里尚未迁入（PENDING），不假装有实现。"
   ],
   "coverage": {
-    "gates": 42,
+    "gates": 45,
     "migrated": [
       1,
       3,
@@ -44,7 +43,10 @@
       36,
       37,
       39,
-      40
+      40,
+      43,
+      44,
+      45
     ],
     "pending": [
       2,
@@ -1036,6 +1038,75 @@
       },
       "depends": null,
       "budget_ms": null,
+      "tier": "static"
+    },
+    {
+      "id": "contract-semantics",
+      "legacy_check": 43,
+      "title": "== [43/段D] 契约语义门禁（W1 层序闭包 / W2 域隔离 / W3 门全性；T7.1 能力接入）==",
+      "segment": "D",
+      "kind": "delegated",
+      "impl": "scripts/nf.py::spec check --core",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check43.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": 2000,
+      "tier": "static"
+    },
+    {
+      "id": "registry-cid",
+      "legacy_check": 44,
+      "title": "== [44/段D] 注册表 CID 索引门禁（T8.2：内容寻址 + 篡改检测）==",
+      "segment": "D",
+      "kind": "delegated",
+      "impl": "scripts/nf.py::registry index --check",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check44.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": 3000,
+      "tier": "static"
+    },
+    {
+      "id": "content-security",
+      "legacy_check": 45,
+      "title": "== [45/段D] 内容安全门禁（T8.3：疑似内嵌指令 / 明文凭据 / 可执行外链；warn 只报）==",
+      "segment": "D",
+      "kind": "delegated",
+      "impl": "scripts/nf.py::security scan",
+      "inputs": null,
+      "assert": [
+        {
+          "type": "python-issues-empty",
+          "spec": null
+        }
+      ],
+      "output": {
+        "log": "nf_check45.log",
+        "verdict_lines": "[PASS]/[FAIL]/[WARN]",
+        "machine": null
+      },
+      "depends": null,
+      "budget_ms": 6000,
       "tier": "static"
     }
   ]

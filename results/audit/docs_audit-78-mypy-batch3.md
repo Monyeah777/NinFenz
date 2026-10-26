@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
+  - protocol/code_metrics_baseline.json:b688e6469a5e0911b51300a45a1c7ccc36add360dc403fe73728f7547e99fbf8
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)

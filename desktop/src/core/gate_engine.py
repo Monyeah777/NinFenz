@@ -406,6 +406,129 @@ def _register_delegated() -> None:
 
 
 
+# ---------------------------------------------------------------- W9 新能力接线（check43-45）
+
+def _capability_runner(num: int, title: str, labels: Any,
+                       impl: Callable[[Path], list]) -> Callable[[Path], Verdict]:
+    """新能力 check 的通用包装：`impl(root) -> [(status, message)]`。
+
+    纪律：本层只做**接线**——`impl` 跑的就是 verify.sh 同名 check 那条 `nf <子命令>` 命令
+    （同一退出码、同一机器面），本模块不重写任何判据。FAIL 判死；WARN 只报告。
+    """
+
+    def run(root: Path) -> Verdict:
+        v = Verdict(name="check%d" % num, title=title, status=PASS)
+        try:
+            rows = list(impl(root))
+        except Exception as exc:  # noqa: BLE001 - 能力不可用 = 不可判定 → FAIL（fail-closed）
+            v.verdicts.append((FAIL, "%s不可判定——%s（修复指引：核对 scripts/nf.py 与能力真源"
+                                     "可读；本 check 不把「读不到」当通过）" % (labels.success, exc)))
+            v.status = FAIL
+            return v
+        v.verdicts = rows
+        if any(s == FAIL for s, _ in rows):
+            v.status = FAIL
+        elif any(s == WARN for s, _ in rows):
+            v.status = WARN
+        return v
+
+    return run
+
+
+def _nf_json(root: Path, args: Sequence[str]) -> "tuple[int, dict]":
+    """跑 `python scripts/nf.py <args> --json` → (rc, doc)。
+
+    与 verify.sh 的 check 是**同一条命令**（同退出码、同机器面）——引擎与 bash 判据同源，
+    差异只可能来自编排。子进程隔离也保证能力模块的 import 失败不会带崩引擎。
+    """
+    import json as _json
+    import subprocess
+
+    script = root / "scripts" / "nf.py"
+    if not script.is_file():
+        raise RuntimeError("scripts/nf.py 不在场（%s）" % script)
+    proc = subprocess.run(  # nosec B603 - argv 列表、无 shell；只跑仓库内 CLI
+        [sys.executable, str(script), *args, "--json"],
+        cwd=str(root), capture_output=True, timeout=180)
+    text = (proc.stdout or b"").decode("utf-8", "replace")
+    try:
+        doc = _json.loads(text) if text.strip() else {}
+    except ValueError:
+        doc = {}
+    return proc.returncode, doc if isinstance(doc, dict) else {}
+
+
+def _cap43(root: Path) -> list:
+    """check43 契约语义：`nf spec check --core`（W1/W2/W3；FAIL 判死，WARN 只报告）。"""
+    rc, doc = _nf_json(root, ["spec", "check", "--core"])
+    issues = doc.get("issues") or []
+    fails = [i for i in issues if i.get("severity") == "FAIL"] or list(doc.get("fails") or [])
+    warned = sum(1 for i in issues if i.get("severity") == "WARN")
+    rows: list = []
+    if warned:
+        rows.append((WARN, "契约语义有 %d 条 WARN（仅报告，不判死；明细："
+                           "python scripts/nf.py spec check --core）" % warned))
+    for f in fails:
+        rows.append((FAIL, "契约语义 FAIL：%s/%s %s：%s"
+                     % (f.get("rule"), f.get("code"), f.get("subject"),
+                        f.get("message"))))
+    if rc != 0 and not fails:
+        rows.append((FAIL, "契约语义异常（rc=%d；不可判定按红 fail-closed）" % rc))
+    if not fails and rc == 0:
+        rows.append((PASS, "契约语义门禁全绿（check43：W1 层序 / W2 域隔离 / W3 门全性；"
+                           "WARN 仅报告）"))
+    return rows
+
+
+def _cap44(root: Path) -> list:
+    """check44 注册表 CID：`nf registry index --check`（在盘索引 == 实时重算）。"""
+    rc, doc = _nf_json(root, ["registry", "index", "--check"])
+    issues = doc.get("issues") or []
+    if issues or rc != 0:
+        if not issues:
+            return [(FAIL, "注册表 CID 索引异常（rc=%d；不可判定按红 fail-closed）" % rc)]
+        return [(FAIL, "注册表 CID：%s" % i) for i in issues]
+    entries = len(((doc.get("index") or {}).get("entries")) or [])
+    return [(PASS, "注册表 CID 门禁全绿（check44：在盘索引 == 实时重算；手改即红；包 %d）"
+             % entries)]
+
+
+def _cap45(root: Path) -> list:
+    """check45 内容安全：`nf security scan`（critical 判死；咨询面 warn 只报告）。"""
+    rc, doc = _nf_json(root, ["security", "scan"])
+    findings = doc.get("findings") or []
+    errors = doc.get("errors") or []
+    hard = [f for f in findings if f.get("severity") == "critical"]
+    warned = sum(1 for f in findings if f.get("severity") == "warn")
+    rows: list = []
+    for f in hard[:10]:
+        rows.append((FAIL, "内容安全 critical：%s（%s:%s）"
+                     % (f.get("kind"), f.get("file"), f.get("line"))))
+    for e in errors[:3]:
+        rows.append((FAIL, "内容安全不可判定：%s"
+                     % (e.get("reason") or e.get("file") or e)))
+    if rc != 0 and not rows:
+        rows.append((FAIL, "内容安全扫描异常（rc=%d；不可判定按红 fail-closed）" % rc))
+    if rows:
+        return rows
+    if warned:
+        rows.append((WARN, "内容安全有 %d 条咨询面 finding（仅报告，不判死；明细："
+                           "python scripts/nf.py security scan）" % warned))
+    rows.append((PASS, "内容安全门禁全绿（check45：critical 判死；咨询面 warn 只报告）"))
+    return rows
+
+
+def _register_capabilities() -> None:
+    """W9：把 check43-45 接进引擎（与 verify.sh 同名 check 调同一条 CLI；只接线）。"""
+    text = _verify_sh() or ""
+    for num, impl in ((43, _cap43), (44, _cap44), (45, _cap45)):
+        title = gate_labels.banner(text, num)
+        REGISTRY[num] = CheckSpec(
+            num=num, title=title, reads=(), kind="delegated",
+            impl=_capability_runner(num, title, gate_labels.parse_labels(text, num), impl),
+        )
+
+
 PENDING: dict[int, str] = {
     2: "重号 ID 全限定（含 awk 逐行类别判定）",
     4: "可见性边界（grep 多模式）",
@@ -462,6 +585,7 @@ def build_registry() -> None:
                             _native_runner(3, t), (), "native")
     _register_delegated()
     _register_inproc()
+    _register_capabilities()
 
 
 # ---------------------------------------------------------------- 内容寻址 memo

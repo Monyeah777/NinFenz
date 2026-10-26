@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
+  - protocol/code_metrics_baseline.json:b688e6469a5e0911b51300a45a1c7ccc36add360dc403fe73728f7547e99fbf8
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)

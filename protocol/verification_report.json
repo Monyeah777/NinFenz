@@ -1,8 +1,8 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
-    "expected_checks": 42,
-    "expected_pass": 76,
+    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 45（两者不可互替）",
+    "expected_checks": 45,
+    "expected_pass": 79,
     "report_items": 31,
     "verify_version": "v2.30"
   },
@@ -239,7 +239,7 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 42,
+        "checks": 45,
         "verify_version": "v2.30"
       },
       "status": "pass",
@@ -326,8 +326,8 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 42,
-        "baseline_pass": 76,
+        "baseline_checks": 45,
+        "baseline_pass": 79,
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -355,7 +355,7 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 42,
+        "verify_checks": 45,
         "verify_version": "2.30"
       },
       "status": "pass",
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "7e13bf90c314dc792adfe73fbfbbb0e689c0238dbf04cd52732ae4d4358c94b1",
+  "root_digest": "3be86d966c0d3ae2a8b1ab48847e89aaa6b976dd3acfcad7da313aeefdc99c74",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

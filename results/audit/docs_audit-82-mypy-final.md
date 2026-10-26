@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
+  - protocol/code_metrics_baseline.json:b688e6469a5e0911b51300a45a1c7ccc36add360dc403fe73728f7547e99fbf8
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)

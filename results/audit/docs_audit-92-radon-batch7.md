@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
+  - protocol/code_metrics_baseline.json:b688e6469a5e0911b51300a45a1c7ccc36add360dc403fe73728f7547e99fbf8
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)

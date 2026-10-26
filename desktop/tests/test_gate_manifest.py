@@ -4,8 +4,8 @@
 判据分三层（对应 task 的三条验收）
 --------------------------------
 1. **合法性**：schema `nf-gates/1`、12 字段不多不少、id kebab、kind/assert 机制同源；
-2. **全覆盖**：manifest 的 legacy_check 恰好 1-42，且 `core.gate_engine` 的
-   REGISTRY ∪ PENDING **也**恰好覆盖 1-42（check41/42 的缺口就是这里抓出来的）；
+2. **全覆盖**：manifest 的 legacy_check 恰好 1-45，且 `core.gate_engine` 的
+   REGISTRY ∪ PENDING **也**恰好覆盖 1-45（check41/42 曾两边都不在、43-45 为 W9 新接入）；
 3. **只增不减棘轮**：`BASELINE` 冻结点对 (legacy_check, id)；不得删除、不得改绑。
    新增 gate 只能在末尾追加（同时更新 `scripts/gate_manifest.py` 的 IDS 与本表）。
 
@@ -79,9 +79,12 @@ BASELINE = (
     (40, "asset-contracts"),
     (41, "build-isolation"),
     (42, "provenance-nonfalsifiable"),
+    (43, "contract-semantics"),
+    (44, "registry-cid"),
+    (45, "content-security"),
 )
 
-_ALL_CHECKS = set(range(1, 43))
+_ALL_CHECKS = set(range(1, 46))
 _ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
@@ -95,7 +98,7 @@ class SchemaTest(unittest.TestCase):
     def test_schema_and_top_level_documented(self) -> None:
         doc = _manifest()
         self.assertEqual(gm.SCHEMA, doc.get("schema"))
-        self.assertEqual(42, doc["source"]["check_count"])
+        self.assertEqual(45, doc["source"]["check_count"])
         self.assertEqual(list(gm.NULL_FIELDS), doc.get("null_fields"))
         self.assertTrue(doc.get("notes"), "null 字段必须有说明（不写假声明）")
 
@@ -153,14 +156,14 @@ class SchemaTest(unittest.TestCase):
 
 
 class CoverageTest(unittest.TestCase):
-    """第 2 层：42/42 全覆盖（manifest 与引擎登记面各自成立）。"""
+    """第 2 层：45/45 全覆盖（manifest 与引擎登记面各自成立）。"""
 
-    def test_manifest_covers_all_42_checks(self) -> None:
+    def test_manifest_covers_all_45_checks(self) -> None:
         checks = sorted(g["legacy_check"] for g in _manifest()["gates"])
         self.assertEqual(sorted(_ALL_CHECKS), checks,
                          "manifest 缺 check：%s" % sorted(_ALL_CHECKS - set(checks)))
 
-    def test_engine_registry_plus_pending_covers_all_42(self) -> None:
+    def test_engine_registry_plus_pending_covers_all_45(self) -> None:
         from core import gate_engine
 
         gate_engine.build_registry()
@@ -175,7 +178,7 @@ class CoverageTest(unittest.TestCase):
         cov = gm.build(ROOT)["coverage"]
         self.assertEqual([], cov["gaps"], "manifest 覆盖缺口：%s" % cov["gaps"])
         self.assertEqual([], cov["orphans"], "引擎登记了不存在的 check：%s" % cov["orphans"])
-        self.assertEqual(42, cov["gates"])
+        self.assertEqual(45, cov["gates"])
         self.assertEqual(_ALL_CHECKS, set(cov["migrated"]) | set(cov["pending"]))
 
     def test_projection_matches_verify_sh(self) -> None:

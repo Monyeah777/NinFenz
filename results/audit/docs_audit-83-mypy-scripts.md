@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:b258b71ca8ab52637bda2f1029ae4925591c53df988ea33aef8667bcf0ffc7b1
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:227e6b52a03c68feb9878b75e8220b8d3b64b3a054fe444426356ce736cc0346
+  - protocol/code_metrics_baseline.json:b688e6469a5e0911b51300a45a1c7ccc36add360dc403fe73728f7547e99fbf8
 ---
+> 重审（2026-10-26）：W9 T9.3 基线扩展 check43-45：verify.sh/README/度量基线同步后重审
+
 > 重审（2026-10-26）：Merge W8: JS second impl + registry CID + security scan
 
 > 重审（2026-10-26）：W7 cleanup: remove remaining dead imports (gate_profile/quality_gate)

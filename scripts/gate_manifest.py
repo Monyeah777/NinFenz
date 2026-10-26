@@ -50,9 +50,21 @@ FIELDS = (
     "inputs", "assert", "output", "depends", "budget_ms", "tier",
 )
 
-#: 本步刻意不声明的字段（第二步：inputs=gate_faces 观测面；depends=产物图；
-#: budget_ms=历史耗时 p95）。填 null 是**如实**，不是没做完的占位。
-NULL_FIELDS = ("inputs", "depends", "budget_ms")
+#: 本步刻意不声明的字段（第二步：inputs=gate_faces 观测面；depends=产物图）。
+#: budget_ms 自 W9 起对**新接入面**按冷跑实测登记（check43-45），其余既有 gate 仍为 null；
+#: tier 见 gate 条目的 static/tests 两档。
+NULL_FIELDS = ("inputs", "depends")
+
+#: 新面单跑墙钟预算（ms，冷跑实测×安全系数；verify.sh 每 check 起一个解释器，
+#: 预算含解释器启动税。超出预算时由 runner/审计侧告警，不在此处判死）。
+BUDGET_MS = {43: 2000, 44: 3000, 45: 6000}
+
+#: W9 新能力面（引擎与 bash 同跑一条 CLI；impl 在这里如实登记调用面）。
+IMPL_OVERRIDES = {
+    43: "scripts/nf.py::spec check --core",
+    44: "scripts/nf.py::registry index --check",
+    45: "scripts/nf.py::security scan",
+}
 
 #: id 登记表 —— **只增不减**。新增 check 只在末尾追加；既有编号不得改绑、不得删除。
 #: 命名规则：[a-z0-9] 起头、kebab-case、语义化（不绑段位/序号——序号会随历史分段漂移）。
@@ -99,6 +111,9 @@ IDS: dict[int, str] = {
     40: "asset-contracts",
     41: "build-isolation",
     42: "provenance-nonfalsifiable",
+    43: "contract-semantics",
+    44: "registry-cid",
+    45: "content-security",
 }
 
 #: kind 形状（八类执行体；第一列是 manifest 值，第二列是 assert 机制）。
@@ -238,7 +253,8 @@ def _gate_impl(num: int, kind: str, facts: dict, has_heredoc: bool) -> str | Non
     if kind == "bash":
         return "verify.sh::check%d" % num
     if kind == "delegated":
-        return str((facts["impls"] or {}).get(num) or "") or None
+        return (IMPL_OVERRIDES.get(num)
+                or str((facts["impls"] or {}).get(num) or "") or None)
     if kind == "inproc":
         # 已迁入 = 引擎进程内执行 heredoc 原文；未迁入 = 仍留在 bash（impl 如实为 null）
         return "core.gate_engine::inproc" if num in (facts["migrated"] or set()) else None
@@ -298,7 +314,7 @@ def build(root: Path | None = None) -> dict:
                 "machine": None,
             },
             "depends": None,
-            "budget_ms": None,
+            "budget_ms": BUDGET_MS.get(num),
             "tier": "tests" if num in TESTS_TIER else "static",
         })
     return {
