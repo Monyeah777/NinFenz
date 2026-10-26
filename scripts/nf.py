@@ -1551,6 +1551,22 @@ def _make_parser() -> argparse.ArgumentParser:
                                         "每步门真实可达、引用模块/管线/gate profile 真实存在、"
                                         "无孤立角色；任一不过 rc=1")
     ag_c.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cm = sub.add_parser(
+        "cli",
+        help="CLI 信息架构：命令目录 / 族覆盖 / 机器面（生成 protocol/cli_map.json + docs/cli-map.md）",
+        description="CLI IA 机读层（T11.3）：从 argparse 命令面 + terminal.FAMILIES 构建 "
+                    "nf-cli-map/1（命令→族→用途→flags/has_json/相关文档），生成件 "
+                    "protocol/cli_map.json 与人读件 docs/cli-map.md 同源渲染；"
+                    "覆盖率判据：每命令恰好一族、每族非空、无重复归族/虚指。只读消费，不改命令行为")
+    cms = cm.add_subparsers(dest="cli_cmd", required=True)
+    cm_m = cms.add_parser(
+        "map", help="构建/校验命令地图（--write 生成；--check 与实时重算对账）",
+        description="命令地图：默认打印覆盖率摘要；--write 落 protocol/cli_map.json + "
+                    "docs/cli-map.md；--check 与实时重算逐字节对账（源改了没重生成即红）；"
+                    "--json 输出 nf-cli-map/1（配 --check 输出 nf-cli-map-check/1）")
+    cm_m.add_argument("--write", action="store_true", help="生成并落盘机读件与人读件")
+    cm_m.add_argument("--check", action="store_true", help="与实时重算对账（漂移 rc=1）")
+    cm_m.add_argument("--json", action="store_true", help="输出结构化 JSON")
     return p
 
 
@@ -7999,6 +8015,8 @@ def main(argv=None) -> int:
         return _rust_rc
     if args.cmd == "agent":
         return _cmd_agent(args)
+    if args.cmd == "cli":
+        return _cmd_cli(args)
     if args.cmd in ("shell", "terminal"):
         return _cmd_shell(args)
     if args.cmd == "layers":
@@ -8302,6 +8320,70 @@ def _cmd_agent(args) -> int:
     print("  ✗ 需要子命令：`nf agent plan --domain techdoc|regulatory [--json]`"
           " / `nf agent check [--json]`（修复指引：见 nf agent --help）", file=sys.stderr)
     return 2
+
+
+def _cmd_cli(args) -> int:
+    """nf cli：CLI 信息架构机读层（T11.3；只读消费 argparse + terminal.FAMILIES）。"""
+    import json as _json
+    from core import cli_catalog as cc
+
+    sub = str(getattr(args, "cli_cmd", "") or "")
+    if sub != "map":
+        print("  ✗ 需要子命令：`nf cli map [--write|--check] [--json]`"
+              "（修复指引：见 nf cli --help）", file=sys.stderr)
+        return 2
+    try:
+        parser = _build_parser()
+    except Exception as exc:  # noqa: BLE001 - 命令面坏件 → 可修正的用户问题
+        print("  ✗ 构建命令面失败：%s（修复指引：修复 argparse 面后重跑）" % exc,
+              file=sys.stderr)
+        return 2
+    want_json = bool(getattr(args, "json", False))
+    if getattr(args, "write", False):
+        paths, doc = cc.write(ROOT, parser)
+        issues = cc.coverage_issues(doc)
+        if want_json:
+            print(_json.dumps({"kind": "cli-map-check", "schema": "nf-cli-map-check/1",
+                               "ok": not issues, "issues": issues, "written": paths,
+                               "coverage": doc["coverage"]},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            for rel in paths:
+                print("  ✓ 已生成 %s" % rel)
+            print("  命令 %d · 族 %d · 已归族 %d"
+                  % (doc["coverage"]["commands"], doc["coverage"]["families"],
+                     doc["coverage"]["covered"]))
+        return 0 if not issues else 1
+    if getattr(args, "check", False):
+        issues, diffs, doc = cc.check(ROOT, parser)
+        if want_json:
+            print(_json.dumps({"kind": "cli-map-check", "schema": "nf-cli-map-check/1",
+                               "ok": not issues, "issues": issues, "diffs": diffs,
+                               "coverage": doc["coverage"]},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cli map --check（生成件 vs 实时重算）==")
+            for issue in issues:
+                print("  [FAIL] %s" % issue)
+            print("  → %s" % ("PASS" if not issues else "FAIL"))
+        return 0 if not issues else 1
+    doc = cc.build(parser, root=ROOT)
+    issues = cc.coverage_issues(doc)
+    if want_json:
+        print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if not issues else 1
+    cov = doc["coverage"]
+    print("== nf cli map（命令面 IA · 只读）==")
+    print("  顶层命令 %d · 能力族 %d · 已归族 %d · JSON 面 %d"
+          % (cov["commands"], cov["families"], cov["covered"],
+             sum(1 for c in doc["commands"] if c["has_json"])))
+    for fam in doc["families"]:
+        print("  %-10s %s（%d 条）"
+              % (fam["id"], fam["name"], len(fam["commands"])))
+    for issue in issues:
+        print("  [FAIL] %s" % issue)
+    print("  → %s" % ("PASS" if not issues else "FAIL"))
+    return 0 if not issues else 1
 
 
 def guarded_main(argv=None) -> int:
