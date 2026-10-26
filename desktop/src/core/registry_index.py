@@ -119,7 +119,8 @@ def root_of(entries: List[Dict[str, Any]]) -> str:
 def _read_json(path: str) -> Any:
     try:
         with open(path, encoding="utf-8") as fh:
-            return json.load(fh)
+            doc = json.load(fh)
+        return doc if isinstance(doc, (dict, list)) else None
     except Exception:                                        # noqa: BLE001 - 缺件按 issue 报
         return None
 

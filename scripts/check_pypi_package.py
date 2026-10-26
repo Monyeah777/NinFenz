@@ -52,7 +52,10 @@ def _h(data: bytes) -> str:
 
 def _load_facts(root: str) -> Dict[str, Any]:
     with open(os.path.join(root, FACTS_REL), encoding="utf-8") as fh:
-        return json.load(fh)
+        doc = json.load(fh)
+    if not isinstance(doc, dict):
+        raise ValueError("facts.json 顶层不是对象：%s" % type(doc).__name__)
+    return doc
 
 
 def _load_pyproject(root: str) -> Dict[str, Any]:
