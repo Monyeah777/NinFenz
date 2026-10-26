@@ -114,7 +114,8 @@ class CiRequirementsPinTest(unittest.TestCase):
         """
         paths = sorted(self.CI_REQ.parent.glob("requirements-*.txt"))
         self.assertEqual({"requirements-audit.txt", "requirements-ci.txt",
-                          "requirements-lint.txt", "requirements-sast.txt"},
+                          "requirements-lint.txt", "requirements-sast.txt",
+                          "requirements-sbom.txt"},
                          {p.name for p in paths},
                          "requirements 清单集合变化——本判据须覆盖全部清单："
                          f"{sorted(p.name for p in paths)}")
@@ -170,7 +171,10 @@ class CiRequirementsPinTest(unittest.TestCase):
             text,
         )
         self.assertIn("registry-url: https://registry.npmjs.org", text)
-        self.assertIn("npm publish --provenance --access public", text)
+        self.assertIn(
+            'npm publish "$TARBALL" --provenance --access public --ignore-scripts',
+            text,
+        )
         self.assertNotRegex(
             text,
             r"(?m)^\s*npm install -g npm@latest\s*$",

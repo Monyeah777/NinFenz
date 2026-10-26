@@ -1,0 +1,87 @@
+{
+  "schema": "nf-supplier-register/1",
+  "reviewed_at": "2026-10-26",
+  "review_by": "2027-01-31",
+  "licenses_allowed": [
+    "0BSD",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "MIT",
+    "PSF-2.0",
+    "Unicode-3.0"
+  ],
+  "suppliers": [
+    {
+      "id": "nodejs",
+      "name": "Node.js",
+      "role": "runtime-framework",
+      "version": ">=18.17",
+      "license": "MIT",
+      "source": "https://github.com/nodejs/node",
+      "decision": "approved",
+      "reason": "Launcher runtime; no third-party npm dependencies are installed by the package."
+    },
+    {
+      "id": "cpython",
+      "name": "CPython",
+      "role": "runtime-framework",
+      "version": ">=3.11",
+      "license": "PSF-2.0",
+      "source": "https://github.com/python/cpython",
+      "decision": "approved",
+      "reason": "Core CLI runtime with a stdlib-only execution path."
+    },
+    {
+      "id": "pyyaml",
+      "name": "PyYAML",
+      "role": "optional-runtime-library",
+      "version": "6.0.3",
+      "license": "MIT",
+      "source": "https://github.com/yaml/pyyaml",
+      "decision": "approved",
+      "reason": "Optional full YAML parser; runtime has a documented subset fallback."
+    },
+    {
+      "id": "npm-registry",
+      "name": "npm public registry",
+      "role": "distribution",
+      "version": "HTTPS service",
+      "license": "service",
+      "source": "https://registry.npmjs.org/",
+      "decision": "approved",
+      "exception": "A service, not a redistributed component; source policy validates HTTPS and integrity."
+    },
+    {
+      "id": "pypi",
+      "name": "Python Package Index",
+      "role": "build-service",
+      "version": "HTTPS service",
+      "license": "service",
+      "source": "https://pypi.org/simple/",
+      "decision": "approved",
+      "exception": "A service, not a redistributed component; CI requirements are exact-pinned and hashed."
+    },
+    {
+      "id": "crates-io",
+      "name": "crates.io",
+      "role": "build-service",
+      "version": "HTTPS service",
+      "license": "service",
+      "source": "https://index.crates.io/",
+      "decision": "approved",
+      "exception": "A service, not a redistributed component; Cargo.lock records package checksums."
+    },
+    {
+      "id": "github-actions",
+      "name": "GitHub Actions components",
+      "role": "build-service",
+      "version": "commit SHA pins",
+      "license": "service",
+      "source": "https://github.com/",
+      "decision": "approved",
+      "exception": "Build services are pinned to immutable commits and followed by Dependabot."
+    }
+  ]
+}

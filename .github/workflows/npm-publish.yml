@@ -1,27 +1,124 @@
-name: npm-publish
-# 发 npm 包（v* tag 或手动触发）。来源证明（provenance）由 OIDC 签发，与 package.json 的
-# publishConfig.provenance=true 同源；优先走 npm trusted publishing（无 token），有 NPM_TOKEN 时回退 token。
+name: npm-release
+# 可复现构建 → GitHub OIDC attestation → npm 发布 / GitHub Release。
+# PR 只做 dry-run；tag v1.* 与显式 publish=true 的手动运行才进入不可逆发布作业。
 on:
   push:
     tags: ['v*']
+  pull_request:
+    paths:
+      - 'packaging/npm/**'
+      - 'packaging/supply-chain/**'
+      - 'scripts/supply_chain_policy.py'
+      - 'scripts/validate_sboms.py'
+      - '.github/workflows/npm-publish.yml'
+      - '.github/requirements-sbom.txt'
   workflow_dispatch:
+    inputs:
+      publish:
+        description: '发布当前 package.json 版本到 npm 与 GitHub Packages'
+        required: true
+        default: false
+        type: boolean
+
 concurrency:
-  group: npm-publish-${{ github.ref }}
+  group: library-write
   cancel-in-progress: false
 
 permissions:
   contents: read
-jobs:
-  publish:
-    name: npm-publish-provenance
-    # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
-    # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref_name, 'v1.')
 
+jobs:
+  build:
+    name: reproducible-release-artifacts
+    if: github.event_name != 'push' || startsWith(github.ref_name, 'v1.')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://registry.npmjs.org
+      - name: 安装 SBOM 验证器（固定版本）
+        run: python -m pip install -r .github/requirements-sbom.txt
+      - name: tag 与包版本一致
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          if [ "$TAG" != "v$V" ]; then
+            echo "::error::tag=$TAG 与 package.json v$V 不一致"
+            exit 1
+          fi
+      - name: 双构建、SBOM、checksums 与 manifest
+        env:
+          PYTHONHASHSEED: '0'
+        run: |
+          python packaging/npm/tools/build_release.py --out .artifacts/release
+          python scripts/validate_sboms.py .artifacts/release
+          python packaging/npm/tools/build_release.py --verify .artifacts/release
+      - name: tarball 与 payload 清单逐字节核对
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          node packaging/npm/tools/verify-tarball.mjs --tarball ".artifacts/release/ninfenz-$V.tgz"
+      - name: npm 包冒烟
+        working-directory: packaging/npm
+        run: |
+          npm run verify
+          node --test test/smoke.test.mjs
+      - name: 供应链证据矩阵
+        run: python scripts/supply_chain_policy.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release/
+          if-no-files-found: error
+          retention-days: 30
+
+  attest:
+    name: github-build-provenance
+    needs: build
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - name: 为 tarball、双 SBOM 与 checksums 生成签名来源证明
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .artifacts/release/*.tgz
+            .artifacts/release/*.cdx.json
+            .artifacts/release/*.spdx3.json
+            .artifacts/release/SHA256SUMS
+
+  publish-npm:
+    name: publish-attested-npm-artifact
+    needs: [build, attest]
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # 作业级再声明一次：workflow 级 permissions 在部分 fork/复用场景会被覆盖，
-    # 而 OIDC（trusted publishing）缺 id-token 时的表现就是「静默回退成 token 认证 → ENEEDAUTH」。
     permissions:
       contents: read
       id-token: write
@@ -29,135 +126,124 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           persist-credentials: false
-      - name: tag 与包版本一致性（D3：v* tag 与 npm 版本不同源 ⇒ 不许静默空转）
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          V=$(node -p "require('./packaging/npm/package.json').version")
-          TAG="${{ github.ref_name }}"
-          if [ "$TAG" != "v$V" ]; then
-            echo "::error::tag=$TAG 与 npm 包版本 v$V 不一致（本仓 tag 走 v2.x 协议线、包走 1.0.x）——请用 v$V 打 tag，或先 bump 包版本"
-            exit 1
-          fi
-          echo "tag=$TAG 与包版本 v$V 一致"
-      - name: 固定 Node 工具链与 npm registry
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
         with:
           node-version: '24.10'
           registry-url: https://registry.npmjs.org
-      - name: 工具链自述 + 把 npm 升到支持 trusted publishing 的版本
-        run: |
-          node --version
-          npm --version
-          # setup-node 24.10 自带 npm 11.6.1，已满足 trusted publishing（OIDC）
-          # 的 npm >= 11.5.1 要求；不再执行浮动的 `npm install -g npm@latest`。
-          # 实测（2026-10-26）：npm 12.2.1 要求 Node >=24.15，而工具链固定 24.10，
-          # 浮动升级会在发布前被 EBADENGINE 拒绝。
-      - name: payload 暂存 + 发布前自检 + 冒烟
-        working-directory: packaging/npm
-        run: |
-          npm run stage
-          npm run verify
-          node --test test/smoke.test.mjs
-      - name: 打包并核对体积（tarball 体积是发布质量的一部分）
-        working-directory: packaging/npm
-        run: npm pack --dry-run
-      - name: 打包产物逐字节核对（A3：tarball 与 payload 清单，补上最后一跳判据）
-        working-directory: packaging/npm
-        run: node tools/verify-tarball.mjs
-      - name: 配置 registry 认证（有 token 写 .npmrc，否则走 OIDC）
-        working-directory: packaging/npm
+      - name: 下载工件完整性
+        working-directory: .artifacts/release
+        run: sha256sum -c SHA256SUMS
+      - name: 发布已 attest 的 tarball（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
         run: |
-          # 2026-10-07 首次运行实证：本文件此前多写了反斜杠转义 —— YAML 那一层让密钥表达式不被求值，
-          # bash 那一层让变量不被展开，于是 .npmrc 里落的是字面量而不是 token，publish 必然 401/404。
-          # 现在改成不转义的写法，并加一步 whoami 自检（token 坏了就当场红，不再拖到最后一步）。
-          # 2026-10-20 实证：secret 为空但 OIDC 未被采用时，publish 会以 ENEEDAUTH 结束；
-          # 故这里先打印 OIDC 环境是否就绪（缺 ACTIONS_ID_TOKEN_REQUEST_URL ⇒ 权限没给到）。
-          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
-            echo "oidc=ready"
-          else
-            echo "::warning::ACTIONS_ID_TOKEN_REQUEST_URL 缺失：本作业拿不到 OIDC 身份，trusted publishing 不可用"
+          V=$(python3 -c "import json; print(json.load(open('.artifacts/release/release-metadata.json'))['version'])")
+          TARBALL=".artifacts/release/ninfenz-$V.tgz"
+          EXISTING=$(npm view "ninfenz@$V" dist.integrity 2>/dev/null || true)
+          LOCAL="sha512-$(openssl dgst -sha512 -binary "$TARBALL" | base64 -w0)"
+          if [ -n "$EXISTING" ]; then
+            if [ "$EXISTING" != "$LOCAL" ]; then
+              echo "::error::registry 已存在的 ninfenz@$V 与本次可复现工件摘要不同"
+              exit 1
+            fi
+            echo "::notice::ninfenz@$V 已存在且完整性摘要一致，跳过发布"
+            exit 0
           fi
-          if [ -n "$NODE_AUTH_TOKEN" ]; then
-            printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > .npmrc
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/.npmrc"
+            export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc"
             echo "auth=token"
-            npm whoami || { echo "::error::NPM_TOKEN 无效或权限不足（whoami 失败）：建议改用 trusted publishing（删掉 secret 即可走 OIDC），或换成 Automation token"; exit 1; }
           else
             echo "auth=oidc(trusted publishing)"
           fi
-      - name: 发布（带 provenance；同版本已存在即跳过 = 幂等重跑）
-        working-directory: packaging/npm
-        env:
-          # 显式打开 provenance：trusted publishing 的 OIDC 交换与来源证明同源，
-          # package.json 里 publishConfig.provenance 已为 true，这里再加一层防被 --no-provenance 覆盖。
-          NPM_CONFIG_PROVENANCE: "true"
-        run: |
-          # 幂等：重跑 workflow 时该版本已在 registry 上，再发必 409/403。跳过而不是失败——
-          # "这个版本已发布" 正是重跑想要的结果（要真重发请先 bump package.json 版本）。
-          V=$(node -p "require('./package.json').version")
-          if npm view "ninfenz@$V" version >/dev/null 2>&1; then
-            echo "::notice::ninfenz@$V 已存在于 npmjs —— 跳过发布（幂等重跑）"
-          else
-            npm publish --provenance --access public
-          fi
-          rm -f .npmrc
+          npm publish "$TARBALL" --provenance --access public --ignore-scripts
 
   publish-github-packages:
-    name: npm-publish-github-packages
-    # GitHub Packages 是**可选镜像**通道（npmjs.org 才是发布主面）。
-    # 403 write_package 属 packages 侧命名空间/仓库关联配置，不影响 npm 正式发布；
-    # 故本作业失败不判整条 workflow 红（真实失败仍会显示在作业列表里）。
-    continue-on-error: true
-
-    # 内容线 tag（v0.xx）不该触发 npm 发布：包版本走 CLI 线 v1.0.x，
-    # 与内容线解耦（CONTRIBUTING §2.2）。tags: v* 会把 21 个内容 tag 全触发成红灯。
-    if: github.event_name == 'push' && startsWith(github.ref_name, 'v1.')
-
-    # GitHub Packages 只接受 scoped 包（@owner/name），故两通道**包名不同**：
-    #   npmjs.com        → ninfenz（unscoped，面向公众）
-    #   GitHub Packages  → @monyeah777/ninfenz（同仓发布用 GITHUB_TOKEN，无需 PAT；scoped 名须全小写）
+    name: publish-attested-github-packages-mirror
+    needs: [build, attest]
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
-      packages: write          # 发布包到 GitHub Packages 必需
+      packages: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
         with:
-          persist-credentials: false
-      - name: payload 暂存 + 发布前自检（先按 npmjs 口径自证，再改名）
-        working-directory: packaging/npm
-        run: |
-          npm run stage
-          npm run verify
-      - name: 以 scoped 名发布到 GitHub Packages
-        working-directory: packaging/npm
+          name: release-bundle
+          path: .artifacts/release
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://npm.pkg.github.com
+      - name: 下载工件完整性
+        working-directory: .artifacts/release
+        run: sha256sum -c SHA256SUMS
+      - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 顺序要紧：自检必须在改名**之前**跑完 —— verify-package.mjs 要求 publishConfig.provenance=true，
-          # 而发到 GitHub Packages 的成品必须去掉它（该 registry 不收来源证明）。2026-10-07 首次运行
-          # 正是栽在顺序上：先改名再 publish，prepack 回头重跑自检，自己把自己判红。
-          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.name='@monyeah777/ninfenz';if(p.publishConfig)delete p.publishConfig.provenance;p.publishConfig=Object.assign({},p.publishConfig,{registry:'https://npm.pkg.github.com'});fs.writeFileSync('package.json',JSON.stringify(p,null,2));"
-          printf '@monyeah777:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > .npmrc
-          # 幂等同上：GitHub Packages 同一版本二次发布会 409 Conflict - Cannot publish over existing version
-          V=$(node -p "require('./package.json').version")
-          if npm view "@monyeah777/ninfenz@$V" version --registry https://npm.pkg.github.com >/dev/null 2>&1; then
-            echo "::notice::@monyeah777/ninfenz@$V 已存在于 GitHub Packages —— 跳过（幂等重跑）"
-          else
-            npm publish --access public --ignore-scripts
+          V=$(python3 -c "import json; print(json.load(open('.artifacts/release/release-metadata.json'))['version'])")
+          TARBALL=".artifacts/release/monyeah777-ninfenz-$V.tgz"
+          REGISTRY=https://npm.pkg.github.com
+          EXISTING=$(npm view "@monyeah777/ninfenz@$V" dist.integrity --registry "$REGISTRY" 2>/dev/null || true)
+          LOCAL="sha512-$(openssl dgst -sha512 -binary "$TARBALL" | base64 -w0)"
+          if [ -n "$EXISTING" ]; then
+            if [ "$EXISTING" != "$LOCAL" ]; then
+              echo "::error::GitHub Packages 已存在的 @monyeah777/ninfenz@$V 与本次工件摘要不同"
+              exit 1
+            fi
+            echo "::notice::GitHub Packages 镜像已存在且摘要一致，跳过"
+            exit 0
           fi
-          rm -f .npmrc
+          printf '@monyeah777:registry=%s\n//npm.pkg.github.com/:_authToken=%s\n' \
+            "$REGISTRY" "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/.npmrc"
+          NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc" \
+            npm publish "$TARBALL" --registry "$REGISTRY" --access public --ignore-scripts
 
-      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
-        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+  github-release:
+    name: publish-attested-github-release
+    needs: [build, attest, publish-npm, publish-github-packages]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
         with:
-          name: npm-publish-diagnostics
-          path: |
-            .nf-logs/
-            .artifacts/
-            *.log
-          if-no-files-found: ignore
+          name: release-bundle
+          path: .artifacts/release
+      - name: 创建或补齐 GitHub Release（不覆盖既有资产）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            EXISTING=$(gh release view "$TAG" --json assets --jq '.assets[].name')
+          else
+            gh release create "$TAG" --verify-tag --generate-notes --title "$TAG"
+            EXISTING=""
+          fi
+          CHECK=$(mktemp -d "$RUNNER_TEMP/release-check.XXXXXX")
+          for FILE in .artifacts/release/*; do
+            NAME=$(basename "$FILE")
+            if grep -Fxq "$NAME" <<<"$EXISTING"; then
+              gh release download "$TAG" --pattern "$NAME" --dir "$CHECK"
+              cmp "$FILE" "$CHECK/$NAME" || {
+                echo "::error::Release 资产 $NAME 与本次构建不同；拒绝覆盖"
+                exit 1
+              }
+              echo "existing-ok $NAME"
+            else
+              gh release upload "$TAG" "$FILE"
+            fi
+          done

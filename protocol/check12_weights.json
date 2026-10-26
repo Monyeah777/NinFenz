@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-25",
+  "measured_at": "2026-10-26",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -247,6 +247,7 @@
     "test_registry_sync": 0.2,
     "test_regression_score": 11.5,
     "test_related_of": 0.1,
+    "test_release_artifacts": 36.4,
     "test_release_gate": 0.4,
     "test_repeat_safety": 0.2,
     "test_repo_face": 1.7,
@@ -302,6 +303,7 @@
     "test_subcheck_cache": 0.3,
     "test_suite_isolation": 0.2,
     "test_suite_wiring": 2.0,
+    "test_supply_chain_standards": 0.4,
     "test_telemetry_semconv": 0.2,
     "test_terminal": 11.5,
     "test_text_hygiene": 9.7,
@@ -2936,6 +2938,11 @@
     "test_related_of.RelatedOfTest.test_module_owners": 0.0,
     "test_related_of.RelatedOfTest.test_package_see_also_refs": 0.0,
     "test_related_of.RelatedOfTest.test_unknown_target": 0.0,
+    "test_release_artifacts.ReleaseArtifactTest.test_checksum_gate_catches_one_byte_tamper": 0.88,
+    "test_release_artifacts.ReleaseArtifactTest.test_expected_release_bundle_is_present_and_verifies": 0.84,
+    "test_release_artifacts.ReleaseArtifactTest.test_metadata_marks_two_builds_and_no_wall_clock": 0.01,
+    "test_release_artifacts.ReleaseArtifactTest.test_official_sbom_validators_when_available": 0.01,
+    "test_release_artifacts.ReleaseArtifactTest.test_second_build_is_byte_identical": 11.74,
     "test_release_gate.CheckTest.test_change_entry_without_note_is_caught": 0.03,
     "test_release_gate.CheckTest.test_empty_root_reports_issue_not_crash": 0.0,
     "test_release_gate.CheckTest.test_manifest_is_deterministic": 0.09,
@@ -3343,6 +3350,14 @@
     "test_suite_wiring.SuiteWiringRuleTest.test_predicate_flags_unwired_and_spares_wired": 0.0,
     "test_suite_wiring.SuiteWiringTest.test_external_registry_is_not_stale": 0.93,
     "test_suite_wiring.SuiteWiringTest.test_no_suite_is_left_unwired": 0.93,
+    "test_supply_chain_standards.ReleaseProvenanceWorkflowTest.test_attestation_is_hosted_oidc_and_publish_depends_on_it": 0.0,
+    "test_supply_chain_standards.ReleaseProvenanceWorkflowTest.test_build_is_reproducible_and_sboms_are_validated_before_attestation": 0.0,
+    "test_supply_chain_standards.ReleaseProvenanceWorkflowTest.test_pr_is_dry_run_and_manual_publish_defaults_off": 0.0,
+    "test_supply_chain_standards.ReleaseProvenanceWorkflowTest.test_workflow_never_interpolates_untrusted_metadata_into_shell": 0.07,
+    "test_supply_chain_standards.SupplyChainEvidenceTest.test_controls_cover_every_active_l1_l2_requirement": 0.12,
+    "test_supply_chain_standards.SupplyChainEvidenceTest.test_package_sources_are_https_without_credentials": 0.0,
+    "test_supply_chain_standards.SupplyChainEvidenceTest.test_partial_or_na_controls_keep_an_explicit_gap": 0.0,
+    "test_supply_chain_standards.SupplyChainEvidenceTest.test_supplier_register_has_no_unapproved_or_unknown_license": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_ids_are_fixed_length_hex": 0.0,
     "test_telemetry_semconv.StrictOtlpIdsTest.test_status_is_tristate": 0.0,
     "test_telemetry_semconv.TestTelemetrySemconv.test_attributes_carry_semconv_names": 0.0,
@@ -3699,5 +3714,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.04,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1323.0
+  "total_s": 1359.8
 }

@@ -52,6 +52,13 @@
       "versionInfo": "6.11.2"
     },
     {
+      "SPDXID": "SPDXRef-Optional-cyclonedx",
+      "comment": "软依赖（可选，须 try/except 守卫）：SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "cyclonedx"
+    },
+    {
       "SPDXID": "SPDXRef-Optional-jsonschema",
       "comment": "软依赖（可选，须 try/except 守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
       "downloadLocation": "NOASSERTION",
@@ -79,6 +86,13 @@
       "downloadLocation": "NOASSERTION",
       "licenseConcluded": "NOASSERTION",
       "name": "nf_pyengine"
+    },
+    {
+      "SPDXID": "SPDXRef-Optional-rdflib",
+      "comment": "软依赖（可选，须 try/except 守卫）：SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "rdflib"
     }
   ],
   "relationships": [
@@ -100,6 +114,11 @@
     {
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-cyclonedx"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-jsonschema"
     },
     {
@@ -111,6 +130,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "OPTIONAL_DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Optional-nf_pyengine"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-rdflib"
     }
   ],
   "spdxVersion": "SPDX-2.3"

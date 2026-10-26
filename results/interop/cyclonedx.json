@@ -20,6 +20,13 @@
       "version": "6.11.2"
     },
     {
+      "bom-ref": "opt:cyclonedx",
+      "description": "软依赖（可选，须守卫）：SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
+      "name": "cyclonedx",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
       "bom-ref": "opt:jsonschema",
       "description": "软依赖（可选，须守卫）：IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
       "name": "jsonschema",
@@ -39,6 +46,13 @@
       "bom-ref": "opt:nf_pyengine",
       "description": "软依赖（可选，须守卫）：PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
       "name": "nf_pyengine",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
+      "bom-ref": "opt:rdflib",
+      "description": "软依赖（可选，须守卫）：SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
+      "name": "rdflib",
       "scope": "optional",
       "type": "library"
     }
