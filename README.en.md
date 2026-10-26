@@ -1,4 +1,4 @@
-# NinFenz · Documentation Workshop (spec-driven)<sub>文档生成工坊（规范驱动）</sub>
+# NinFenz · Deliverable Contract Layer<sub>交付物契约层（规范驱动）</sub>
 
 [![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
 
@@ -18,6 +18,8 @@
 
 **Live site**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
+**30-second deliverable first screen** (human path, local-only): `python scripts/nf.py doctor` → `python scripts/nf.py demo` (techdoc P06 → deliverable Markdown) → `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out` → `--check out/完整版_技术文档域包.md`; the six copy-paste steps are in [`docs/quickstart.md`](docs/quickstart.md).
+
 **NF terminal (TUI) demo** — a full-screen human entry built on the standard library only; its menu and actions are controlled callers of the real `nf` CLI.
 Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `↑↓` moves inside the focused pane, `/` filters, `?` opens the keymap.
 
@@ -27,12 +29,12 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 <summary>Demo frame text - byte-for-byte the `--demo` renderer output, kept for search/copy</summary>
 
 ```
-┌ NF TUI v1.0.0 · NinFenz 内容契约层 ──────────────────────────────────────────────────────────┐
+┌ NF TUI v1.0.0 · NinFenz 交付物契约层 ────────────────────────────────────────────────────────┐
 │仓库 NinFenz · 能力区 9                                           焦点 动作 · 就绪（0 项待办）│
 ├────────────────────────┬─────────────────────────────────────────────────────────────────────┤
 │  能力区 1/9            │▍ 动作 · 环境自检（2）                                               │
 │▸ 0 环境自检（2）       │❯ 只读体检   nf doctor                                               │
-│  1 一键演示世界（1）   │  体检（机器面）                                                     │
+│  1 一键交付物演示（2） │  体检（机器面）                                                     │
 │  2 需求 → 装配计划（2）│                                                                     │
 │  3 全链生产（2）       ├─────────────────────────────────────────────────────────────────────┤
 │  4 校验与体检（4）     │  输出 · 1-3/3 · 已跟随                                              │
@@ -64,9 +66,9 @@ Details: `tui/README.md`.
 
 > Layered dual licensing (code AGPL-3.0-only or commercial; spec text CC BY 4.0) · see `LICENSING.md` · please cite the source when deriving/referencing
 
-**In one sentence**: NF is a **content contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces long-form content"; narrative is only the first official domain package, while the protocol itself is domain-neutral and model-agnostic.
+**In one sentence**: NF is a **deliverable contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces deliverable content"; deliverables include technical documents, compliance checklists, research reports and specifications, with long-form narrative as one domain pack among many.
 
-**Aliases & keywords**: NF · NinFenz · 宁封子 · content contract layer · spec-driven content factory · long-form content generation · assembly-based content production · module/pipeline/asset · quality gate · domain pack · MCP.
+**Aliases & keywords**: NF · NinFenz · 宁封子 · deliverable contract layer · content contract layer (historical name) · spec-driven deliverable factory · deliverable content generation · assembly-based content production · module/pipeline/asset · quality gate · domain pack · MCP.
 
 **What it is not**: not a model, not a prompt-template collection, not a vendor SDK — the protocol itself is domain-neutral and model-agnostic, and MCP is just one supported connection protocol.
 
@@ -77,23 +79,23 @@ Details: `tui/README.md`.
 
 ## ⚡ If you are an AI / Agent
 
-- What this is: a spec-driven document factory — load modules/pipelines/assets → validate → emit.
+- What this is: a spec-driven **deliverable factory** (technical documents / compliance checklists / research reports / specifications; narrative is one domain pack among them) — load modules/pipelines/assets → validate → emit.
 - Entry chain: `docs/agent/AGENT_START.md` (start) → `docs/agent/AI_ROUTING.md` (pick a route) → `docs/meta/DEEP_DIVE.md` (go deep).
 - Machine credential: `bash verify.sh` (run it locally — the static check count and script version live in the generated stats block below; runtime counters are deliberately not pinned in prose); the machine entry list is `llms.txt`; locales are `README.en.md` · `README.ja.md` (all three entries' machine facts and language switcher lines are asserted consistent by check34's locale scan; registry = `protocol/locales.json`).
 - To understand why NF is designed this way: read [docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md).
 
 ## Quick start
 
-First hop: follow the 6 copy-paste steps in [`docs/quickstart.md`](docs/quickstart.md); one-command self-check: `bash scripts/quickstart_check.sh` (exit 0 · wall clock ≤ 300 s · doc steps == script steps, enforced by check39).
+**30-second first screen** (deliverable path, default domain = techdoc P06; narrative = `demo narrative`):
 
-Human (author/developer, 5 minutes):
+1. `python scripts/nf.py doctor` (read-only health check: 17/17)
+2. `python scripts/nf.py demo` (techdoc chain → deliverable Markdown)
+3. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out`
+4. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check out/完整版_技术文档域包.md`
+5. `python scripts/nf.py shell` (interactive terminal; or `bash verify.sh` for the full gate, ~10 min)
+6. `python scripts/nf.py --help` (full command surface)
 
-1. `bash verify.sh`
-2. `python scripts/nf.py shell` (interactive terminal — the human entry after the shell line retired; see `docs/terminal.md`)
-3. `python scripts/nf.py demo`
-4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
-6. `python scripts/nf.py completion bash`
+One-command self-check: `bash scripts/quickstart_check.sh` (exit 0 · wall clock ≤ 300 s · doc steps == script steps, enforced by check39). The full 6 copy-paste steps are in [`docs/quickstart.md`](docs/quickstart.md).
 
 > **Security boundary (`nf verify` executes the target repository's own gate scripts)**: the engine
 > runs the embedded Python from the target repo's `verify.sh` **in-process** (CWE-94). It therefore
@@ -114,7 +116,7 @@ AI assembly:
 
 ### FAQ
 
-- **What is NF?** A content contract layer: protocols + quality gates + asset standards that make "AI reliably produces long-form content" loadable, checkable and reproducible.
+- **What is NF?** A deliverable contract layer: protocols + quality gates + asset standards that make "AI reliably produces deliverable content" loadable, checkable and reproducible.
 - **Is NF an MCP server?** Not necessarily — protocols and assets are plain text, so a clone or a raw link is enough; `nf serve` adds an MCP surface.
 - **Which models are supported?** Model-agnostic: any text-capable AI can assemble and load the protocols; nothing is bound to a vendor or a connection protocol.
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.

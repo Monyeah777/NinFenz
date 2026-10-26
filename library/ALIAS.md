@@ -6,6 +6,6 @@
 
 | 小写键 | 真实编号 | 状态 | GitHub raw 链接 | Gitee raw 链接 |
 |---|---|---|---|---|
-| nf-1 | NF-1 | active | https://raw.githubusercontent.com/Monyeah777/NinFenz/main/library/NF-1.md | https://gitee.com/monyeah777/ninfenz/raw/main/library/NF-1.md |
 | nf-techdoc-monyeah777-1 | NF-TECHDOC-Monyeah777-1 | active | https://raw.githubusercontent.com/Monyeah777/NinFenz/main/library/NF-TECHDOC-Monyeah777-1.md | https://gitee.com/monyeah777/ninfenz/raw/main/library/NF-TECHDOC-Monyeah777-1.md |
+| nf-1 | NF-1 | active | https://raw.githubusercontent.com/Monyeah777/NinFenz/main/library/NF-1.md | https://gitee.com/monyeah777/ninfenz/raw/main/library/NF-1.md |
 | nf-worldcampus-monyeah777-1 | NF-WORLDCAMPUS-Monyeah777-1 | active | https://raw.githubusercontent.com/Monyeah777/NinFenz/main/library/NF-WORLDCAMPUS-Monyeah777-1.md | https://gitee.com/monyeah777/ninfenz/raw/main/library/NF-WORLDCAMPUS-Monyeah777-1.md |

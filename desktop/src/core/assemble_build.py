@@ -115,11 +115,12 @@ def _section0(req: str, plan: Dict[str, Any], n_mod: int) -> List[str]:
 
 def _section1(plan: Dict[str, Any], pkg: str) -> List[str]:
     pid = plan.get("pipeline") or "（未命中预设，见 §0）"
-    lines = ["## 1. 世界速览", ""]
+    lines = ["## 1. 交付物速览", ""]
     lines.append("- **定位**：%s" % ("预设包 %s" % pkg if pkg else "用户自定义题材"))
-    lines.append("- **玩法主轴**：按 §2 的层序逐层推进（active_pipeline = `%s`）" % pid)
-    lines.append("- **输出风格**：由 `M80` 渲染并把关（结构门 + 档位风格门）")
-    lines.append("- **待回填**：世界名与一句话定位须装配师按需求补全（本档只落可核事实）")
+    lines.append("- **推进方式**：按 §2 的层序逐层推进（active_pipeline = `%s`）" % pid)
+    lines.append("- **输出与验收**：由 `M80` 渲染并把关（结构门 + 档位风格门）；"
+                 "机器验收见 §7 自检清单")
+    lines.append("- **待回填**：交付物名称与一句话定位须装配师按需求补全（本档只落可核事实）")
     lines.append("")
     return lines
 

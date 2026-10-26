@@ -1,4 +1,4 @@
-# NinFenz · ドキュメント生成工房（仕様駆動）<sub>Spec-driven documentation workshop</sub>
+# NinFenz · 交付物契約層（Deliverable Contract Layer）<sub>仕様駆動の交付物工房</sub>
 
 <!-- nf:locales -->
 <p align="center">
@@ -16,15 +16,17 @@
 
 **サイト（公開）**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
 
+**30 秒交付物ファースト画面**（人向け・ローカルのみ）：`python scripts/nf.py doctor` → `python scripts/nf.py demo`（技術文書 P06 → 交付可能な Markdown）→ `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out` → `--check out/完整版_技术文档域包.md`。6 ステップの詳細は [`docs/quickstart.md`](docs/quickstart.md)。
+
 **NF ターミナル（TUI）** —— 全画面の人間向け入口（標準ライブラリのみ）。メニューと各アクションは `nf` CLI の実コマンドの制御された呼び出し元です。キー操作は一流ターミナルの慣例に従います（`Tab` でパネル切替、`↑↓` で移動、`/` で絞り込み、`?` でキー一覧）。詳細は [tui/README.md](tui/README.md) を参照。
 
 ![NF ターミナル TUI デモ（枠線は閲覧者のフォントに依存しません）](site/assets/demo.gif)
 
 > 階層型デュアルライセンス（コード AGPL-3.0-only または商用／仕様テキスト CC BY 4.0）· 詳細は `LICENSING.md` · 派生・引用の際は出典を明記してください
 
-NF は**コンテンツ契約層（content contract layer）**です——「AI が長文コンテンツを安定して産出する」ためのプロトコル・品質ゲート・資産基準を定義します。プロトコル自体はドメイン中立・モデル非依存です。
+NF は**交付物契約層（Deliverable Contract Layer）**です——「AI が交付可能なコンテンツを安定して産出する」ためのプロトコル・品質ゲート・資産基準を定義します。交付物 = 技術文書・コンプライアンスチェックリスト・調査レポート・仕様書など。プロトコル自体はドメイン中立・モデル非依存です。
 
-**別名と検索語**：NF · NinFenz · 宁封子 · コンテンツ契約層（content contract layer）· 仕様駆動のコンテンツ工場 · 長文生成プロトコル · 組立型コンテンツ生産 · モジュール／パイプライン／資産 · 品質ゲート · ドメインパック · MCP 接続。
+**別名と検索語**：NF · NinFenz · 宁封子 · 交付物契約層（deliverable contract layer）· コンテンツ契約層（content contract layer、旧名）· 仕様駆動の交付物工場 · 交付可能コンテンツ生成プロトコル · 組立型コンテンツ生産 · モジュール／パイプライン／資産 · 品質ゲート · ドメインパック · MCP 接続。
 
 **そうではないもの**：モデルではなく、プロンプトテンプレート集でもなく、特定ベンダーの SDK でもありません——プロトコル本体はドメイン中立・モデル非依存で、MCP は接続可能なプロトコルの一つにすぎません。
 
@@ -32,23 +34,23 @@ NF は**コンテンツ契約層（content contract layer）**です——「AI 
 
 ## ⚡ AI / エージェントの方へ
 
-- これは何か：仕様駆動のドキュメント工場。モジュール／パイプライン／資産を搭載 → 検証 → 出力。
+- これは何か：仕様駆動の**交付物工場**（技術文書・コンプライアンスチェックリスト・調査レポート・仕様書。叙事はその中の一ドメインパック）。モジュール／パイプライン／資産を搭載 → 検証 → 出力。
 - 入口チェーン：`docs/agent/AGENT_START.md`（着手）→ `docs/agent/AI_ROUTING.md`（経路選択）→ `docs/meta/DEEP_DIVE.md`（深く理解する）。
 - 機械証憑：`bash verify.sh`（現在の基準値は下部の生成領域「品質証憑」行。`nf stats --write` が書き込みます）。機械向け入口一覧は `llms.txt`。言語面は `README.en.md` · `README.ja.md`（三面の機読事実と言語切替行は check34 の言語面スキャンが常時検証。登録表 = `protocol/locales.json`）。
 - 設計意図を知る：[docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md) を参照。
 
 ## クイックスタート
 
-最初の一歩：[`docs/quickstart.md`](docs/quickstart.md) の 6 ステップを順にコピー＆ペースト。ワンコマンドで自己検査する場合は `bash scripts/quickstart_check.sh`（判定：終了コード 0 · 実時間 ≤ 300 秒 · 文書ステップ数 == スクリプトステップ数）。
+**30 秒ファースト画面**（交付物パス、既定ドメイン = 技術文書 P06。叙事は `demo narrative`）：
 
-作者・開発者向け（5 分）：
+1. `python scripts/nf.py doctor`（読み取り専用の健康診断：17/17）
+2. `python scripts/nf.py demo`（技術文書チェーン → 交付可能な Markdown）
+3. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest out`
+4. `python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check out/完整版_技术文档域包.md`
+5. `python scripts/nf.py shell`（対話ターミナル。または `bash verify.sh` で全ゲート、約 10 分）
+6. `python scripts/nf.py --help`（全コマンド面）
 
-1. `bash verify.sh`
-2. `python scripts/nf.py shell`（対話ターミナル。シェル退役後の人間向け入口。詳細は `docs/terminal.md`）
-3. `python scripts/nf.py demo`
-4. `python scripts/nf.py --help`
-5. `python scripts/nf.py doctor`
-6. `python scripts/nf.py completion bash`
+ワンコマンド自己検査：`bash scripts/quickstart_check.sh`（判定：終了コード 0 · 実時間 ≤ 300 秒 · 文書ステップ数 == スクリプトステップ数）。6 ステップの詳細は [`docs/quickstart.md`](docs/quickstart.md)。
 
 > **セキュリティ境界（`nf verify` は対象リポジトリ自身のゲートスクリプトを実行します）**：エンジンは
 > 対象リポジトリの `verify.sh` に埋め込まれた Python を**同一プロセス内**で実行します（CWE-94）。
@@ -69,7 +71,7 @@ AI による組立：
 
 ### よくある質問（FAQ）
 
-- **NF とは？** コンテンツ契約層です。「AI が長文を安定して産出する」ことをプロトコル＋品質ゲート＋資産基準として定義し、産出物を搭載可能・検証可能・再現可能にします。
+- **NF とは？** 交付物契約層です。「AI が交付可能なコンテンツを安定して産出する」ことをプロトコル＋品質ゲート＋資産基準として定義し、産出物を搭載可能・検証可能・再現可能にします。
 - **NF は MCP サーバーですか？** 必須ではありません。プロトコルと資産はすべてプレーンテキストで、clone または直リンクで搭載できます。`nf serve` が追加で MCP 接続面を提供します。
 - **対応モデルは？** モデル非依存です。テキストを読める AI ならどれでもプロトコルに従って組立・搭載できます。特定モデルや特定接続プロトコルに縛られません。
 - **ネット接続は必須？** 不要です。リポジトリ自体が markdown 原稿です。`bash verify.sh` はローカルのみで完結し、オフラインで実行できます。

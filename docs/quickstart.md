@@ -1,6 +1,6 @@
 # 五分钟可复现入口（quickstart）
 
-这条路径面向**刚 clone 完的干净检出**：从仓库根出发，6 步，只用本仓文件与 Python 标准库（`pip install` 不是前置）。下面每条命令都在仓库根目录复制粘贴即可，按 1→6 顺序执行，不需要先读别的文档。
+这条路径面向**刚 clone 完的干净检出**：从仓库根出发，6 步，只用本仓文件与 Python 标准库（`pip install` 不是前置）。首屏默认路径是**交付物**（技术文档域 P06）——一条命令出可交付 Markdown，再一条命令做机器验收。下面每条命令都在仓库根目录复制粘贴即可，按 1→6 顺序执行，不需要先读别的文档。
 
 环境：Linux / macOS / Windows Git Bash；Python ≥ 3.10。若系统里解释器命令是 `python3`，把命令里的 `python` 换成 `python3`。
 
@@ -40,7 +40,7 @@ python scripts/nf.py doctor
 
 打印 `体检：N/N 通过`，退出码 0。出现 `[FAIL]` 行就停在这里，不要继续下一步。
 
-### 步骤 3 · 一键演示世界
+### 步骤 3 · 一键交付物演示（技术文档）
 
 <!-- nf-step: 3 demo -->
 
@@ -48,25 +48,25 @@ python scripts/nf.py doctor
 python scripts/nf.py demo
 ```
 
-打印 `质量门：` 且其中 `FAIL 0`，退出码 0；产物落在系统临时目录。
+打印 `质量门：` 且其中 `FAIL 0`，退出码 0；产物（可交付 Markdown）落在系统临时目录。叙事域演示在 `demo` 后加 `narrative` 参数（见 `nf demo --help`）。
 
 ### 步骤 4 · 需求 → 完整版（第一份）
 
 <!-- nf-step: 4 assemble -->
 
 ```bash
-python scripts/nf.py assemble "写一份关于雨天的校园短篇" --build --dest .nf-quickstart/out1
+python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest .nf-quickstart/out1
 ```
 
-退出码 0；产出 `.nf-quickstart/out1/完整版_校园情感领域包.md`。
+退出码 0；产出 `.nf-quickstart/out1/完整版_技术文档域包.md`。
 
 ### 步骤 5 · 同一需求再产一份并逐字节比对
 
 <!-- nf-step: 5 reproducible -->
 
 ```bash
-python scripts/nf.py assemble "写一份关于雨天的校园短篇" --build --dest .nf-quickstart/out2
-cmp .nf-quickstart/out1/完整版_校园情感领域包.md .nf-quickstart/out2/完整版_校园情感领域包.md
+python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --build --dest .nf-quickstart/out2
+cmp .nf-quickstart/out1/完整版_技术文档域包.md .nf-quickstart/out2/完整版_技术文档域包.md
 ```
 
 第一条命令退出码 0；第二条 `cmp` 也退出码 0（两份产物逐字节相同）——同一需求可复现。
@@ -76,7 +76,7 @@ cmp .nf-quickstart/out1/完整版_校园情感领域包.md .nf-quickstart/out2/�
 <!-- nf-step: 6 check -->
 
 ```bash
-python scripts/nf.py assemble "写一份关于雨天的校园短篇" --check .nf-quickstart/out1/完整版_校园情感领域包.md
+python scripts/nf.py assemble "写一份技术文档，要术语表和修订记录" --check .nf-quickstart/out1/完整版_技术文档域包.md
 ```
 
 打印 `✓ 成品通过自组装机器验收`，退出码 0。

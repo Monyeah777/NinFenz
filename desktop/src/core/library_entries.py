@@ -78,14 +78,32 @@ def read_entry(path: str) -> Dict[str, Any]:
             "fm": fm, "body": body, "text": text, "decode_issue": decode_issue}
 
 
+#: 交付物类型优先级（T3.1 身份整改）：INDEX 第一屏按**交付物类型**排，不再默认让叙事样本
+#: 占首读位——技术文档（非叙事官方首读）=0，其他非叙事交付物=1，叙事/CCV3/世界=2；同级按 id。
+DELIVERY_TYPE_PRIORITY = (
+    (0, ("技术文档",)),
+    (1, ("合规", "量化", "AI系统", "报告", "规格", "技术")),
+    (2, ("世界", "叙事", "CCV3", "校园", "情感", "角色")),
+)
+
+
+def type_priority(fm: Dict[str, Any]) -> int:
+    """frontmatter.type → 交付物优先级（词表外一律 1：非叙事默认，不猜叙事）。"""
+    t = str((fm or {}).get("type") or "")
+    for prio, keys in DELIVERY_TYPE_PRIORITY:
+        if any(k in t for k in keys):
+            return prio
+    return 1
+
+
 def entries(root: str = ".") -> List[Dict[str, Any]]:
-    """全量条目（按编号排序；path 一律归一为仓库相对路径）。"""
+    """全量条目（**交付物类型优先级 → 编号**排序；path 一律归一为仓库相对路径）。"""
     r = Path(root)
     out = [read_entry(str(p)) for p in sorted(r.glob(ENTRY_GLOB))
            if p.is_file() and not p.is_symlink()]
     for e in out:
         e["path"] = os.path.relpath(e["path"], str(r)).replace("\\", "/")
-    out.sort(key=lambda e: e["id"])
+    out.sort(key=lambda e: (type_priority(e["fm"]), e["id"]))
     return out
 
 

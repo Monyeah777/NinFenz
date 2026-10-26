@@ -151,9 +151,10 @@ def _make_parser() -> argparse.ArgumentParser:
                      help="Store 工作区目录（缺省=临时，配合 --seed）")
     run.add_argument("--seed", action="store_true",
                      help="把 04_模块库官方核心 + community 组合包装载进 store（演示/自测）")
-    run.add_argument("--fmt", default="ccv3",
-                     choices=["ccv3", "skill", "agents", "claude", "mcp", "mvu"],
-                     help="导出格式（exporter 注册表：ccv3/skill/agents/claude/mcp）")
+    run.add_argument("--fmt", default="md",
+                     choices=["md", "ccv3", "skill", "agents", "claude", "mcp", "mvu"],
+                     help="导出格式（缺省 md = 原生 Markdown 交付物；"
+                          "ccv3/skill/agents/claude/mcp/mvu 按需显式选择）")
     run.add_argument("--doc-semantics", default=None,
                      choices=["project_rules", "skill"],
                      help="显式声明装配产物语义（v2.3.0 A3：project_rules → AGENTS/CLAUDE 出口；ski"
@@ -500,10 +501,14 @@ def _make_parser() -> argparse.ArgumentParser:
     m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
     m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
 
-    # ---- v2.8.0 波B S7：一键演示世界 ----
+    # ---- v2.8.0 波B S7；T3.1 身份整改：默认产出交付物（techdoc） ----
     dm = sub.add_parser("demo",
-                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
- description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
+                        help="一键交付物演示（默认 P06 技术文档全链 → Markdown；"
+                             "`demo narrative` = P04 轻混 → CCV3 导出）",
+ description="一键交付物演示（T3.1：默认 P06 技术文档全链 → 可交付 Markdown；"
+             "叙事域用 `nf demo narrative` = P04 轻混 → CCV3）")
+    dm.add_argument("mode", nargs="?", choices=("techdoc", "narrative"), default="techdoc",
+                    help="演示域（缺省 techdoc = 技术文档 P06→Markdown；narrative = 叙事 P04→CCV3）")
     dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
     # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
     sg = sub.add_parser("sig",
@@ -1375,12 +1380,12 @@ def _make_parser() -> argparse.ArgumentParser:
     return p
 
 
-def _seed_store(store):
-    """装载官方核心 + 轻混组合包（等同 e2e 前置）。返回统计 dict。"""
+def _seed_store(store, techdoc=False):
+    """装载官方核心 + 轻混组合包（+ 技术文档域包，techdoc=True）。返回统计 dict。"""
     import glob
     from pathlib import Path
     from core.parser import parse_module
-    stats = {"core": 0, "combo": 0}
+    stats = {"core": 0, "combo": 0, "techdoc": 0}
     for f in sorted(glob.glob(os.path.join(ROOT, "04_模块库", "*", "*.md"))):
         try:
             store.save_module(parse_module(Path(f).read_text(encoding="utf-8")))
@@ -1394,6 +1399,16 @@ def _seed_store(store):
             stats["combo"] += 1
         except Exception:  # 尽力而为：跳过不可读/不可解析项（该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出）  # nosec B112 —— 尽力而为：跳过不可读/不可解析项（对应门禁另报；见 AUD-0016）
             continue
+    if techdoc:
+        # T3.1：交付物演示默认走技术文档域包（M97 术语管理 / M98 修订记录），
+        # 与 `nf run --seed` 的历史口径（核心 + 轻混组合包）解耦——不改变既有 seed 行为。
+        for f in sorted(glob.glob(os.path.join(ROOT, "community",
+                                               "技术文档域包", "modules", "*.md"))):
+            try:
+                store.save_module(parse_module(Path(f).read_text(encoding="utf-8")))
+                stats["techdoc"] += 1
+            except Exception:  # nosec B112 —— 尽力而为：跳过不可读/不可解析项
+                continue
     return stats
 
 
@@ -2509,14 +2524,28 @@ def _cmd_module(args) -> int:
         return 1
 
 
+def _demo_pipeline_path(mode: str) -> str:
+    """演示域 → 管线件路径（T3.1：缺省 techdoc，叙事域用 narrative）。"""
+    if mode == "narrative":
+        return os.path.join(ROOT, "community", "校园西幻轻混组合包",
+                            "pipelines", "P04_轻混装配流管线.md")
+    return os.path.join(ROOT, "community", "技术文档域包",
+                        "pipelines", "P06_技术文档题材装配流管线.md")
+
+
 def _cmd_demo(args) -> int:
-    """nf demo：一键演示世界（v2.8.0 波B S7）——P04 轻混全链 → CCV3。"""
+    """nf demo：一键交付物演示——默认 P06 技术文档全链 → Markdown。
+
+    T3.1 身份整改：缺省域 = techdoc（交付物路径），叙事域保留为 `nf demo narrative`
+    （P04 轻混 → CCV3 卡）。两域共用同一 pipe（retrieve→compose→gate→export），
+    差异仅在管线、取件模块与导出格式。
+    """
     import tempfile
     import time
     from core.pipeline import pipe
     from core.pipeline_loader import load_pipeline_file
-    pipeline_path = os.path.join(ROOT, "community", "校园西幻轻混组合包",
-                                 "pipelines", "P04_轻混装配流管线.md")
+    mode = str(getattr(args, "mode", "") or "techdoc")
+    pipeline_path = _demo_pipeline_path(mode)
     pipeline = load_pipeline_file(pipeline_path)
     if pipeline is None:
         print("  ✗ 演示管线解析失败：%s" % pipeline_path, file=sys.stderr)
@@ -2524,7 +2553,7 @@ def _cmd_demo(args) -> int:
     store, err = _open_store(args)          # NF_HOME 不可用 ⇒ 干净拒绝（2026-10-01）
     if err is not None:
         return err
-    stats = _seed_store(store)
+    stats = _seed_store(store, techdoc=(mode != "narrative"))
     dest = args.dest or tempfile.mkdtemp(prefix="nf_demo_")
     # 形状闸门（2026-10-01）：`--dest <文件>` 此前落到 makedirs 抛 `[WinError 183]`
     # 冒成「内部错误 + 机器路径」（与 `nf render --dest` 同类）。
@@ -2533,20 +2562,35 @@ def _cmd_demo(args) -> int:
             args, "--dest 落点是文件：%s（修复指引：`--dest` 给**目录**（缺省 = 系统临时目录）；"
                   "产物文件名由本命令决定）" % dest, 2)
     t0 = time.time()
-    selected = ["通用类:M00", "轻混类:M91", "轻混类:M92", "通用类:M80"]
-    r = pipe(store, pipeline, selected, include_references=True,
-             fmt="ccv3", dest_dir=dest)
+    if mode == "narrative":
+        selected = ["通用类:M00", "轻混类:M91", "轻混类:M92", "通用类:M80"]
+        fmt = "ccv3"
+    else:
+        # 技术文档域：M00 数据基座 / M97 术语管理 / M98 修订记录 / M80 唯一输出门
+        # （M90 结构装配经 P06 core 依赖引用，不占取件槽——见 P06 管线件 R2 段）
+        selected = ["通用类:M00", "技术文档类:M97", "技术文档类:M98", "通用类:M80"]
+        fmt = "md"
+    r = pipe(store, pipeline, selected, include_references=(mode == "narrative"),
+             fmt=fmt, dest_dir=dest)
     elapsed = time.time() - t0
-    print("== nf demo（一键演示世界 · P04 轻混）==")
-    print("  seed 装载：官方核心 %d 件 + 轻混组合包 %d 件"
-          % (stats["core"], stats["combo"]))
+    if mode == "narrative":
+        print("== nf demo narrative（叙事域演示 · P04 轻混 → CCV3）==")
+        print("  seed 装载：官方核心 %d 件 + 轻混组合包 %d 件"
+              % (stats["core"], stats["combo"]))
+    else:
+        print("== nf demo（一键交付物演示 · P06 技术文档 → Markdown）==")
+        print("  seed 装载：官方核心 %d 件 + 技术文档域包 %d 件"
+              % (stats["core"], stats["techdoc"]))
     print("  全链计时：%.1f s（retrieve→compose→gate→export）" % elapsed)
     print("  质量门：PASS %d · WARN %d · FAIL %d"
           % (r.gate.n_pass, r.gate.n_warn, r.gate.n_fail))
     if r.export is not None and r.export.files:
         for f in r.export.files:
             print("  产物：%s" % f)
-        print("  装载：把上述 chara.json 导入任意 AI 前端 / SillyTavern 即可开跑")
+        if mode == "narrative":
+            print("  装载：把上述 chara.json 导入任意 AI 前端 / SillyTavern 即可开跑")
+        else:
+            print("  装载：Markdown 可直接交付/审阅；再跑 `nf assemble \"…\" --check` 可机器验收")
     return 0 if r.ok else 1
 
 
@@ -4669,7 +4713,8 @@ def _path_writing_issue(args) -> str:
 #: 为什么不再手写名单：二批普查抓到 5 处漏网，根因就是「同一概念换了个参数名（`path` / `paths`）
 #: 就漏出闸门」——所以改成**枚举为准**，并由 `test_cli_error_framing.PathFlagCoverageTest`
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
-_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节"}
+_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
+                       "fmt": "导出格式枚举（md/ccv3/skill/…，ASCII，非文本件）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
@@ -6434,7 +6479,7 @@ def _cmd_assemble(args):
         print("  你的需求信息还不够直接编排，先补三点（缺一不可）：")
         for q in funnel["questions"]:
             print("  · %s" % q)
-        print("  补充后再跑：nf assemble \"题材+主轴+尺度的一句话\" --check <out.md>")
+        print("  补充后再跑：nf assemble \"交付物类型+受众+验收判据的一句话\" --check <out.md>")
         if args.check_md:
             # 2026-09-30 修：`--check` 是**验收动作**，此前会被含糊需求整段吞掉并返回 0——
             # 脚本里 `nf assemble "$REQ" --check out.md && 发布` 会把「没验收」读成「验收通过」。
