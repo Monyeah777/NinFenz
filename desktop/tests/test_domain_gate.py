@@ -1,7 +1,7 @@
 """T2.1 · 域隔离与契约 schema 落地（Wave2）单测。
 
 覆盖四件交付的判据面：
-1. schema meta：9 个 protocol/schema/*.json 是合法 draft 2020-12，且四个 schema 接受可选
+1. schema meta：10 个 protocol/schema/*.json 是合法 draft 2020-12，且四个 schema 接受可选
    `domain`、contract 的事件名 pattern 拒非法名；
 2. 跨域门：校园需求 check 西幻 P03 样本 → FAIL；同域样本 → PASS；未声明域不判死；
 3. 层序闭包：例外表被读取，登记项只产生 WARN（0 FAIL）；不传例外表则同 4 条倒挂 FAIL；
@@ -37,12 +37,13 @@ def _sample_p03():
 
 
 class SchemaMetaTest(unittest.TestCase):
-    """9 件 schema 的元校验 + domain/事件名词法的增量语义。"""
+    """10 件 schema 的元校验 + domain/事件名词法的增量语义。"""
 
     @unittest.skipIf(jsonschema is None, "jsonschema 未安装（可选对照依赖）")
-    def test_nine_schemas_are_valid_draft2020(self):
+    def test_all_schemas_are_valid_draft2020(self):
         files = sorted((ROOT / "protocol" / "schema").glob("*.json"))
-        self.assertEqual(9, len(files), "protocol/schema 面件数应为 9：%s" % files)
+        # T6.3（2026-10-26）：新增 bench_result.schema.json（公开 benchmark 结果行），9 → 10。
+        self.assertEqual(10, len(files), "protocol/schema 面件数应为 10：%s" % files)
         for f in files:
             data = json.loads(f.read_text(encoding="utf-8"))
             Validator.check_schema(data)          # 不是合法 draft 2020-12 即抛
