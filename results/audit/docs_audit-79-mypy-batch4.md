@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
+  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
 
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py

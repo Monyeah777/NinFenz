@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:7ae960511d18f09d0ae62131f942eddfcfd4fe9ece809dad97a57c619ca9245e
+  - scripts/nf.py:886623dbec32c8452e0d37a82910d923367dcb5121160994d339113181a468ee
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
+  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
 
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py

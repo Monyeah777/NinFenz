@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:7ae960511d18f09d0ae62131f942eddfcfd4fe9ece809dad97a57c619ca9245e
+  - scripts/nf.py:886623dbec32c8452e0d37a82910d923367dcb5121160994d339113181a468ee
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
 
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py

@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:7ae960511d18f09d0ae62131f942eddfcfd4fe9ece809dad97a57c619ca9245e
+  - scripts/nf.py:886623dbec32c8452e0d37a82910d923367dcb5121160994d339113181a468ee
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
 
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py

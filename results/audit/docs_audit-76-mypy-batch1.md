@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
+  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
 
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py

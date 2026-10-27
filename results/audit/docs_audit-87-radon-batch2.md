@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
-  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
+  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
 
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py

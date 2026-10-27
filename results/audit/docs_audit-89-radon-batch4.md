@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
-  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
+  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
 ---
+> 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
+
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
 
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
