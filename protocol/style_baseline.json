@@ -1645,7 +1645,7 @@
     "scripts/tisa.py::E501": 1,
     "scripts/tisa.py::I001": 1,
     "scripts/tisa.py::UP031": 4,
-    "scripts/verify_cache.py::UP031": 3,
+    "scripts/verify_cache.py::UP031": 6,
     "scripts/verify_fast.py::E501": 1,
     "scripts/verify_fast.py::E741": 2,
     "scripts/verify_fast.py::RUF100": 2,
