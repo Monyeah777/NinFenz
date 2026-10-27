@@ -303,7 +303,10 @@ class PurityScanTest(unittest.TestCase):
         self.assertEqual([i for i in issues if "危险 sink" in i], [],
                          "真仓库出现未登记 sink 即 FAIL")
         # 2026-10-19：16 → 20（scratch：写权限探针自清 + 上下文清理 + TTL 回收，各站点已登记理由）
-        self.assertLessEqual(stats.get("sinks", 0), 20)
+        # 2026-10-27：20 → 21（`scripts/verify_tests.py` 清理**本进程刚写**的 dump 分片：
+        # `.nf-cache/dump/chunk-<int>.json`，路径由固定前缀+自增片号拼成、不接收外部路径；
+        # 理由已登记 SINK_ALLOW["verify_tests.py:unlink"]，删失败也不影响判定）
+        self.assertLessEqual(stats.get("sinks", 0), 21)
 
 
 class SinkRegistryTest(unittest.TestCase):

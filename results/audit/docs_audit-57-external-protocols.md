@@ -15,7 +15,7 @@ subjects:
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - desktop/src/core/purity_scan.py:7669e6b93b6baada4819559bff38e172fddabfb396b2082d5cf67418515b9f41
+  - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+
 > 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
 
 > 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）

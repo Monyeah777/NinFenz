@@ -30,7 +30,7 @@
           "tiers": 4
         },
         "raises": 96,
-        "sinks": 20
+        "sinks": 21
       },
       "status": "pass",
       "warns": 0
@@ -368,7 +368,7 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 313,
+        "baseline": 318,
         "files": 318,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "469a2beeaead78851ff81b84c2e3ae3b27a5fe316bfc6ea9b719dcabfca5176c",
+  "root_digest": "7d212923f6250cc326a894a842f9226b40ca0d103fb91ac2a305d124fc444af5",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -12,8 +12,20 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
+  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
 ---
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
+
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
 > 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）

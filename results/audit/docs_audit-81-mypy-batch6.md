@@ -10,8 +10,20 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
+  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
 ---
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
+
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
 > 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）

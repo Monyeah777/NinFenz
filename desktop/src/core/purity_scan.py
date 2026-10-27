@@ -144,6 +144,10 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
+    "verify_tests.py:unlink":
+        "只删**本进程刚写**的 `.nf-cache/dump/chunk-<int>.json`（路径由固定前缀 + 自增片号拼接，"
+        "不接收外部路径参数；删的是刚落盘并已读入内存的调度统计），用于避免陈旧 dump 影响下一轮"
+        "EWMA 合并；删失败也不影响判定（异常被吞在调度优化面）",
     "rust_engine.py:unlink":
         "常驻 worker 状态文件（<NF_HOME>/rust_worker.json）的**自清**：落点由 "
         "core.storage.default_home 单源决定（用户态，不接收外部路径参数），删的是本模块上一轮"

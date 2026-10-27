@@ -27,8 +27,12 @@ from typing import Any
 _TEXT: dict[tuple, str] = {}
 _AST: dict[tuple, Any] = {}
 _FACTS: dict[tuple, Any] = {}
-#: 作用域深度（可重入）：公开入口（`scan`/`_run_uncached`/`build`）各自 begin/end，
-#: 嵌套调用共享同一份缓存，最外层退出才清。
+#: 作用域深度（可重入）：公开入口（`scan`/`_run_uncached`/`build`）各自 begin/end。
+#: **语义（2026-10-27 起）**：作用域只重置**计数器**，不丢弃读面/AST/事实缓存——缓存键含
+#: (abspath, mtime_ns, size)，文件一改键就变，因此跨调用保活**不会读到旧内容**；而
+#: 「进程内连续跑 N 条 CLI 面」（`cli_harness.run_cli_proc` 的扫描类用例，实测每条面 ≈1 s、
+#: 单文件 stat 16 万次）由此从 N×扫描 变成 1×扫描 + N×命中。
+#: 需要"每入口彻底冷启"的口径（对齐新起进程）可设 `NF_SCAN_MEMO=cold`。
 #: **不缓存 stat 结果**：实测缓存 stat 会让"改文件后重扫"读到旧键（`test_regex_limit_ratchet`
 #: 直接踩到）。重复 stat 的正确解法是**减少调用次数**（见 judgement_coverage 的 signals 表），
 #: 不是把 stat 结果记住。
@@ -227,30 +231,48 @@ def signals(path: Any) -> dict:
 
 
 def begin() -> None:
-    """开一次扫描作用域（**可重入**：嵌套入口共享同一份缓存，最外层退出才清）。"""
+    """开一次扫描作用域（可重入）：只重置计数器，数据缓存按 mtime 键跨调用保活。"""
     global _DEPTH
     if _DEPTH == 0:
-        reset()
+        _reset_stats()
+        if os.environ.get("NF_SCAN_MEMO") == "cold":
+            _clear_data()
     _DEPTH += 1
 
 
 def end() -> dict[str, int]:
-    """结束作用域（最外层退出时清空并返回统计；嵌套内层只减深度）。"""
+    """结束作用域：返回统计并重置计数器（**不清数据缓存**，见模块顶部语义说明）。"""
     global _DEPTH
     _DEPTH = max(0, _DEPTH - 1)
     if _DEPTH > 0:
         return stats()
     got = stats()
-    reset()
+    _reset_stats()
+    _clear_if_huge()
     return got
 
 
-def reset() -> None:
+def _reset_stats() -> None:
+    for k in _STATS:
+        _STATS[k] = 0
+
+
+def _clear_data() -> None:
     _TEXT.clear()
     _AST.clear()
     _FACTS.clear()
-    for k in _STATS:
-        _STATS[k] = 0
+
+
+def _clear_if_huge(limit: int = 20000) -> None:
+    """兜底内存上限：条目过多就整体丢弃（缓存只是加速面，丢了下一次重建即可）。"""
+    if len(_TEXT) + len(_AST) + len(_FACTS) > limit:
+        _clear_data()
+
+
+def reset() -> None:
+    """显式清空（测试/长驻进程需要"彻底冷启"时用）。"""
+    _clear_data()
+    _reset_stats()
 
 
 def stats() -> dict[str, int]:

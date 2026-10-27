@@ -37,25 +37,20 @@ ROOT = Path(__file__).resolve().parent.parent
 DESKTOP = ROOT / "desktop"
 TESTS = DESKTOP / "tests"
 WEIGHTS_REL = "protocol/check12_weights.json"
+#: 本地自测权重（gitignored，不入库）：每轮把实测耗时按 EWMA 合并，用于下一次切片均衡。
+LOCAL_WEIGHTS_REL = ".nf-cache/test_weights.json"
 SHARD_TIMEOUT_S = float(os.environ.get("NF_SHARD_TIMEOUT", "1800"))
 #: 负载敏感模块：并行段之后独占串行跑（全部用例照跑，只改调度）。见 main 内注释。
 SERIAL_MODULES = frozenset({
-    "test_atomic_write", "test_daemon", "test_npm_package", "test_release_artifacts",
-    # 2026-10-19 复核：串行段一度扩到 9 个模块，结果串行段本身成了 367 s 的新瓶颈（j24 实测
-    # 最大片 = 367 s）。逐条回看取证后发现：schema_lint / governance / quality_depth 那一族的
-    # 红，全部发生在**工作树不干净**的跑次上（报告/回执/一致性面被判过期），不是读写竞争。
-    # 因此收回，只留**真正进程内打桩 + 时间窗**的两族。
-    # test_lsp 的 warm 复用判据是时间窗口径（TTL 内只该扫一次签名）：并发把单次扫描拖到窗外
-    # 就会"合法地"多扫一次而被判红——属负载敏感，保留串行。
-    "test_lsp",
-    # 2026-10-22 补（gov/rust 复验实测，两次全量门禁各红一次）：
-    # - test_daemon_parity：分片 1 报 `_daemon()` 读帧 `TimeoutError: timed out`
-    #   （chunk5；并行段起守护 + 嵌套 `nf verify --json` 被拖到 300 s 外）；
-    # - test_watch：`nf verify --json` 同代际第二跑 cache hits=0，且两次输出里含
-    #   ms 级耗时字段（"…87 16" vs "…87 18"）——同一族「嵌套 nf 进程 × 并发」抖动。
-    # 两族都是时间/进程创建敏感，判据本身没问题；照既有机制进串行段（用例照跑不减）。
-    "test_daemon_parity", "test_watch",
+    "test_atomic_write",       # 进程内给 atomic_write 打桩做失败注入（并发会串补丁）
+    "test_daemon",             # 进程内起守护 + 短超时窗口
+    "test_lsp",                # warm 复用是 TTL 时间窗口径（并发会把单次扫描拖到窗外）
+    "test_npm_package",        # 打包/口径：串行段内跑，避免与 payload 暂存竞争
+    "test_release_artifacts",  # 发布物面：同上
 })
+# 退出串行段的取证（2026-10-27 本机）：test_daemon_parity（224 s）与 test_watch（62 s）
+# 都用真进程/真时钟对账、不依赖进程内打桩；留在串行段等于给门禁加一条 395 s 单线程地板。
+# 迁回并行池后用例逐条照跑、一条不减（收窄后串行段 188 → 113 条）。
 # test_governance_faces 也进串行段（2026-10-18 实测）：它扫全仓"模式命中"，16 片并发时
 # 别的分片正在写临时产物（如 results/ 中间态），扫到就会红——不是它写错，是"读全仓快照"的
 # 判据不能与"会短暂写全仓"的判据同时跑。并发段跑完再独占跑它，判据不变、确定性恢复。
@@ -196,6 +191,49 @@ def affected_selection(ids: list) -> tuple:
         if mod in ALWAYS_MODULES or (_core_imports(sources.get(mod, "")) & closure):
             keep.append(tid)
     return keep, f"core 变更 {len(changed_core)} 个 → 反向依赖闭包 {len(closure)} 个模块"
+
+
+def _local_weights() -> dict:
+    """本地自测权重（若有）→ {"tests": {...}}。"""
+    from core import json_doc
+    p = ROOT / LOCAL_WEIGHTS_REL
+    if not p.is_file():
+        return {}
+    try:
+        doc = json_doc.load(p, dict, what=LOCAL_WEIGHTS_REL)
+    except ValueError:
+        # 可吞：自测权重坏件 = 无自测权重（回落冻结权重；只影响调度，不影响判定）。
+        return {}
+    return doc if isinstance(doc, dict) else {}
+
+
+def _merge_local_weights(alpha: float = 0.5) -> None:
+    """把本轮 `.nf-cache/dump/*.json` 实测耗时按 EWMA 合并进本地权重（调度优化，不参与判定）。"""
+    d = ROOT / ".nf-cache" / "dump"
+    if not d.is_dir():
+        return
+    merged = dict(_local_weights().get("tests") or {})
+    try:
+        for f in sorted(d.glob("chunk-*.json")):
+            try:
+                from core import json_doc as _jd
+                got = _jd.load(f, dict, what="dump 分片")
+            except ValueError:
+                # 可吞：单个 dump 坏件只少一个样本（EWMA 少更新一条），不影响判定。
+                continue
+            for tid, sec in (got or {}).items():
+                old = float(merged.get(tid, 0) or 0)
+                merged[tid] = round(alpha * float(sec) + (1 - alpha) * old, 3) if old                     else round(float(sec), 3)
+            f.unlink(missing_ok=True)
+        if merged:
+            from core import atomic_write
+            atomic_write.write_text(ROOT / LOCAL_WEIGHTS_REL,
+                                    json.dumps({"schema": "nf-local-weights/1",
+                                                "note": "自测权重（EWMA；仅本机调度用，不入库）",
+                                                "tests": merged}, ensure_ascii=False,
+                                               indent=2, sort_keys=True) + "\n")
+    except Exception:                     # noqa: BLE001 - 调度优化失败不影响判定
+        pass
 
 
 def load_weights() -> dict:
@@ -550,6 +588,12 @@ def main(argv=None) -> int:
     jobs = args.jobs or int(os.environ.get("NF_TEST_JOBS") or 4)
     jobs = max(1, min(jobs, len(ids)))
     weights_doc = load_weights()
+    _local = _local_weights().get("tests") or {}
+    if _local:                              # 同机实测优先于冻结基线
+        weights_doc = dict(weights_doc)
+        _mt = dict(weights_doc.get("tests") or {})
+        _mt.update(_local)
+        weights_doc["tests"] = _mt
     ws = test_weights(ids, weights_doc.get("modules", {}), weights_doc.get("tests", {}))
 
     # 负载敏感模块走**独占串行段**（2026-10-18 实测）：test_atomic_write / test_daemon 的
@@ -570,7 +614,8 @@ def main(argv=None) -> int:
         # 均值 259 s / 最大 346 s）。这里把测试按权重切成约 4×jobs 个小片，由一个队列喂给
         # jobs 个 worker——谁先跑完谁领下一片，尾巴被摊平。切片**只改调度**：并集仍逐项等于
         # discover 全集（下面照旧校验），每片仍是独立进程 + 独立 NF_HOME。
-        chunks = chunk_items(parallel_ids, ws, pjobs, factor=4)
+        chunks = chunk_items(parallel_ids, ws, pjobs,
+                                  factor=max(4, min(32, int(os.environ.get("NF_TEST_SLICES") or 12))))
         flat = [t for c in chunks for t in c]
         if sorted(flat) != sorted(parallel_ids):
             print("工作队列切片与 discover 不一致（漏/重）：%d vs %d"
@@ -593,7 +638,9 @@ def main(argv=None) -> int:
                     # 也没有任何失败信息被丢弃——失败只会来自 run_shard 的 rc）。
                     break
                 try:
-                    r = run_shard(c, idx)
+                    dd = ROOT / ".nf-cache" / "dump"
+                    dd.mkdir(parents=True, exist_ok=True)
+                    r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
                     r = {"index": idx, "rc": 1, "out": "worker 异常：%r" % (exc,),
                          "wall": 0.0, "tests": len(c)}
@@ -609,6 +656,7 @@ def main(argv=None) -> int:
         if serial_ids:
             results.append(run_shard(serial_ids, len(chunks)))
     wall = time.perf_counter() - t0
+    _merge_local_weights()
     failed = [r for r in results if r["rc"] != 0]
 
     if args.json:

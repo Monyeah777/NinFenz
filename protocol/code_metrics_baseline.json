@@ -941,7 +941,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 573,
+      "lines": 577,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1096,7 +1096,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/scan_memo.py": {
-      "lines": 277,
+      "lines": 299,
       "max_fn_cc": 25,
       "max_fn_lines": 46
     },
@@ -1320,6 +1320,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 26
     },
+    "scripts/build_vsa.py": {
+      "lines": 174,
+      "max_fn_cc": 21,
+      "max_fn_lines": 58
+    },
     "scripts/capabilities.py": {
       "lines": 43,
       "max_fn_cc": 7,
@@ -1394,6 +1399,11 @@
       "lines": 161,
       "max_fn_cc": 11,
       "max_fn_lines": 63
+    },
+    "scripts/generate_vex.py": {
+      "lines": 160,
+      "max_fn_cc": 19,
+      "max_fn_lines": 51
     },
     "scripts/geo_export.py": {
       "lines": 227,
@@ -1510,6 +1520,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 29
     },
+    "scripts/slsa_l3_readiness.py": {
+      "lines": 82,
+      "max_fn_cc": 15,
+      "max_fn_lines": 35
+    },
     "scripts/standards_map.py": {
       "lines": 197,
       "max_fn_cc": 13,
@@ -1520,6 +1535,11 @@
       "max_fn_cc": 19,
       "max_fn_lines": 36
     },
+    "scripts/supply_chain_policy.py": {
+      "lines": 394,
+      "max_fn_cc": 21,
+      "max_fn_lines": 54
+    },
     "scripts/sync_llms.py": {
       "lines": 59,
       "max_fn_cc": 5,
@@ -1529,6 +1549,11 @@
       "lines": 224,
       "max_fn_cc": 13,
       "max_fn_lines": 20
+    },
+    "scripts/validate_sboms.py": {
+      "lines": 185,
+      "max_fn_cc": 16,
+      "max_fn_lines": 35
     },
     "scripts/verify_cache.py": {
       "lines": 156,
@@ -1556,9 +1581,9 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 648,
-      "max_fn_cc": 54,
-      "max_fn_lines": 227
+      "lines": 696,
+      "max_fn_cc": 58,
+      "max_fn_lines": 237
     },
     "scripts/workflow_policy.py": {
       "lines": 42,
