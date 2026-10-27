@@ -34,6 +34,16 @@ def _load_nf():
     return mod
 
 
+def _live_core(name: str):
+    """取 `sys.modules` 当前生效的 core 模块。
+
+    `daemon._sync_code` 会在长分片里摘除并重载 `core.*`；测试模块导入时保留的
+    旧句柄可能已不是 CLI 随后的导入对象。对旧句柄打补丁会让安全门测试假绿，
+    必须始终对运行期实时模块对象打补丁。
+    """
+    return importlib.import_module(f"core.{name}")
+
+
 def _repo(origin: str = "") -> Path:
     """临时 git 仓库（可带 origin）；调用方负责清理（TemporaryDirectory）。"""
     d = tempfile.mkdtemp(prefix="nf_trust_")
@@ -148,8 +158,8 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
-        with (mock.patch.object(gate_engine, "ROOT", evil),
-              mock.patch.object(repo_trust, "trust_status",
+        with (mock.patch.object(_live_core("gate_engine"), "ROOT", evil),
+              mock.patch.object(_live_core("repo_trust"), "trust_status",
                                 return_value=(False, "untrusted fixture"))):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
@@ -161,9 +171,10 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=True, memo=False, cached=False, jobs=0,
                          trust_repo=True)
-        with (mock.patch.object(gate_engine, "ROOT", evil),
-              mock.patch.object(gate_engine, "build_registry"),
-              mock.patch.object(gate_engine, "run_checks", return_value=[])):
+        live_ge = _live_core("gate_engine")
+        with (mock.patch.object(live_ge, "ROOT", evil),
+              mock.patch.object(live_ge, "build_registry"),
+              mock.patch.object(live_ge, "run_checks", return_value=[])):
             rc = nf._cmd_verify(args)
         self.assertEqual(0, rc, "显式信任后应放行（本轮 run_checks 已 mock）")
 
