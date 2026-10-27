@@ -525,7 +525,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4165,
+        "files": 4166,
         "kernel": 2256,
         "kernel_no_self": 441,
         "rules": 9,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "7419295e2d76901c20b57e4ad3a06d0923c17da45594ae426985221ee7665ae2",
+  "root_digest": "5668d3b6d4f4252534dd3f2cc3282a5fc8744b7086c96b1934560e8cfcc173a5",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
