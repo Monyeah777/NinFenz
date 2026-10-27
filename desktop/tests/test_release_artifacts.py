@@ -184,6 +184,10 @@ class ReleaseArtifactTest(unittest.TestCase):
                     self.assertTrue(any("OpenVEX" in item for item in issues))
                     continue
                 if case == "dirty":
+                    path = bundle / "release-metadata.json"
+                    doc = json.loads(path.read_text(encoding="utf-8"))
+                    doc["release_ready"] = False
+                    path.write_text(json.dumps(doc), encoding="utf-8")
                     issues = module.verify_release(bundle, policy, metadata["source_commit"])
                     self.assertTrue(any("release_ready" in item for item in issues))
                     continue
