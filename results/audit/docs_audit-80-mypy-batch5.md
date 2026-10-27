@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:78e8b9b6d51aa0c1ac22af15f21ef1dd7207ca5c42784df5ca3566496ce32351
+  - protocol/code_metrics_baseline.json:73dc481371be81f004494c1ec58c6a9e97130dd11727267d5620cb54c913dffb
 ---
+> 重审（2026-10-28）：S2v: release/completion/worldmodel/cli/serve/score/explain/help/nfal -> nf_cmds/meta_ops.py
+
 > 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
 
 > 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds

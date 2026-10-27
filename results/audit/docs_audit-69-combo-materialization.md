@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:592891fe32bdbe70ede9ab82ec86a0851e6c00d49e16b72ca3b65bd0686031ed
+  - scripts/nf.py:f7a82823d11ca240c7338bbd4114cb1c3a5e25848453b5a3d2e9fca25b55f174
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-28）：S2v: release/completion/worldmodel/cli/serve/score/explain/help/nfal -> nf_cmds/meta_ops.py
+
 > 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
 
 > 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations

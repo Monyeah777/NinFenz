@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:78e8b9b6d51aa0c1ac22af15f21ef1dd7207ca5c42784df5ca3566496ce32351
+  - protocol/code_metrics_baseline.json:73dc481371be81f004494c1ec58c6a9e97130dd11727267d5620cb54c913dffb
 ---
+> 重审（2026-10-28）：S2v: release/completion/worldmodel/cli/serve/score/explain/help/nfal -> nf_cmds/meta_ops.py
+
 > 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
 
 > 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds

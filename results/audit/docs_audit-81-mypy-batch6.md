@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:78e8b9b6d51aa0c1ac22af15f21ef1dd7207ca5c42784df5ca3566496ce32351
+  - protocol/code_metrics_baseline.json:73dc481371be81f004494c1ec58c6a9e97130dd11727267d5620cb54c913dffb
 ---
+> 重审（2026-10-28）：S2v: release/completion/worldmodel/cli/serve/score/explain/help/nfal -> nf_cmds/meta_ops.py
+
 > 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
 
 > 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds

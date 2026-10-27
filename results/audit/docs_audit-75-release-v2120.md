@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:592891fe32bdbe70ede9ab82ec86a0851e6c00d49e16b72ca3b65bd0686031ed
+  - scripts/nf.py:f7a82823d11ca240c7338bbd4114cb1c3a5e25848453b5a3d2e9fca25b55f174
 
 ---
+> 重审（2026-10-28）：S2v: release/completion/worldmodel/cli/serve/score/explain/help/nfal -> nf_cmds/meta_ops.py
+
 > 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
 
 > 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations
