@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:5429e827dc5a7a6bcc7987de9beb89f67f7a1bdee9d0afac0a87bf6e5a11b42c
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:a58ff813395f01c5f0d7ef76b2259312126c485a63c7373c9ab667fa8dbdc272
+  - protocol/code_metrics_baseline.json:c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+
 > 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate
 
 > 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence

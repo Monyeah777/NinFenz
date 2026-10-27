@@ -310,15 +310,32 @@ def assign(ids: list, ws: dict, jobs: int) -> list:
     return bins
 
 
+def _retry_permission(fn, tries: int = 4, delay: float = 0.3):
+    """Windows 上临时文件可能被 AV/索引器短暂占用（PermissionError）→ 退避重试。
+
+    实测（2026-10-28）：16 片并发时偶发 `PermissionError(13, '另一个程序正在使用此文件')`，
+    整轮门禁被一条**假红**判死。重试只针对 PermissionError，其它异常照旧上抛。
+    """
+    import time as _t
+    last = None
+    for i in range(tries):
+        try:
+            return fn()
+        except PermissionError as exc:      # noqa: PERF203 - 退避重试是本函数的目的
+            last = exc
+            _t.sleep(delay * (i + 1))
+    raise last
+
+
 def run_shard(ids: list, index: int, dump: str = "") -> dict:
     """跑一个分片（可选：把逐测试耗时写到 `dump` 路径，供权重实测用）。"""
     t0 = time.perf_counter()
-    with tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index) as spec_dir:
+    with _retry_permission(lambda: tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index)) as spec_dir:
         spec = Path(spec_dir) / "tests.json"
         payload = {"tests": ids}
         if dump:
             payload["dump"] = dump
-        atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False))
+        _retry_permission(lambda: atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False)))
         with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
