@@ -15,8 +15,8 @@ subjects:
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
-  - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
-  - scripts/nf.py:0ee815de6e755b8a59b05eccf96829fd541772421f3b41c2eac2d3b0b8ba85c9
+  - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
+  - scripts/nf.py:9d2fc5932da73f4d8b164bfda720805751a68777f3fcfe8a10c1b9c63984b887
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,10 @@ subjects:
   - llms.txt:7e011303eae22d163cdbb085934f7264dd5922e1d5e8a5eefa1a139d7be74323
 
 ---
+> 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
+
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization
 
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser

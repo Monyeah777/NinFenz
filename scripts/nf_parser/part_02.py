@@ -151,7 +151,6 @@ def add_77(sub, ctx):
 
 
 def add_78(sub, ctx):
-    argparse = __import__("argparse")
     cm = sub.add_parser(
         "cli",
         help="CLI 信息架构：命令目录 / 族覆盖 / 机器面（生成 protocol/cli_map.json + docs/cli-map.md）",

@@ -372,7 +372,7 @@
         "files": 337,
         "max_fn_cc": 126,
         "max_fn_lines": 318,
-        "max_lines": 7027
+        "max_lines": 6722
       },
       "status": "pass",
       "warns": 0
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "eb96fc77cd7036043fd5f96c76bc19c30ec3c824d7f5ce84bd7dc6355460754e",
+  "root_digest": "299b53ad2db4b9c12c850775e35ae2fd907a2807cb2d6c1d1ff64eb8d859b2ed",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

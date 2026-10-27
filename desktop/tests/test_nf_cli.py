@@ -746,6 +746,9 @@ class DeclaredFlagsAreReadTest(unittest.TestCase):
 
     def test_no_declared_flag_is_unread(self):
         source = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        for mod_dir in ("nf_parser", "nf_cmds"):
+            for part in sorted((ROOT / "scripts" / mod_dir).glob("*.py")):
+                source += "\n" + part.read_text(encoding="utf-8")
         got = unread_flag_dests(nf._build_parser(), source)
         self.assertEqual([], got, "声明了却没人读的旗标（修复指引：在处理器里读它，"
                          "或删掉这个假接口）：%s" % got)

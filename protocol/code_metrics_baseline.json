@@ -1026,7 +1026,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 572,
+      "lines": 575,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1551,7 +1551,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7027,
+      "lines": 6722,
       "max_fn_cc": 126,
       "max_fn_lines": 318
     },

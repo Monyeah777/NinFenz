@@ -13,8 +13,12 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
+  - protocol/code_metrics_baseline.json:ed627d43252ef810f16936a4468f08fe9969389a249acaaf17b0ff4dab9f0f9e
 ---
+> 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
+
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser
 
 > 重审（2026-10-27）：S1: metrics re-freeze after scanner update

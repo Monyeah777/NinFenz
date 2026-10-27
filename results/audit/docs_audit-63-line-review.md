@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:0ee815de6e755b8a59b05eccf96829fd541772421f3b41c2eac2d3b0b8ba85c9
+  - scripts/nf.py:9d2fc5932da73f4d8b164bfda720805751a68777f3fcfe8a10c1b9c63984b887
 ---
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization
 
 > 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)

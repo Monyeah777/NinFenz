@@ -613,7 +613,6 @@ def add_65(sub, ctx):
 
 
 def add_66(sub, ctx):
-    argparse = __import__("argparse")
     rel = sub.add_parser("release",
                          help="发布前体检与编排（体检照旧；--plan 出有序发布计划；--freeze [--apply"
                              "] 按序走冻结链）",
@@ -691,7 +690,6 @@ def add_70(sub, ctx):
 
 
 def add_71(sub, ctx):
-    argparse = __import__("argparse")
     sh = sub.add_parser(
         "shell", aliases=["terminal"],
         help="NF 终端：交互式入口（能力菜单 + nf 命令直通；--exec 非交互回归面）",

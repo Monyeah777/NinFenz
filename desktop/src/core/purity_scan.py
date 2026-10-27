@@ -423,6 +423,9 @@ def _is_local(mod: str, root: str) -> bool:
                  os.path.join(root, ".github", "scripts")):
         if os.path.exists(os.path.join(base, mod + ".py")):
             return True
+        # 本地**包**（目录 + __init__.py）同样是仓内代码，不是第三方依赖
+        if os.path.exists(os.path.join(base, mod, "__init__.py")):
+            return True
     return False
 
 

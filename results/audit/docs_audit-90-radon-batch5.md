@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
+  - protocol/code_metrics_baseline.json:ed627d43252ef810f16936a4468f08fe9969389a249acaaf17b0ff4dab9f0f9e
 ---
+> 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
+
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser
 
 > 重审（2026-10-27）：S1: metrics re-freeze after scanner update

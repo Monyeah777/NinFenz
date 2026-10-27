@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:0ee815de6e755b8a59b05eccf96829fd541772421f3b41c2eac2d3b0b8ba85c9
+  - scripts/nf.py:9d2fc5932da73f4d8b164bfda720805751a68777f3fcfe8a10c1b9c63984b887
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization
 
 > 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)

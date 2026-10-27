@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
+  - protocol/code_metrics_baseline.json:ed627d43252ef810f16936a4468f08fe9969389a249acaaf17b0ff4dab9f0f9e
 ---
+> 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
+
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser
 
 > 重审（2026-10-27）：S1: metrics re-freeze after scanner update

@@ -7,10 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
+  - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
+  - protocol/code_metrics_baseline.json:ed627d43252ef810f16936a4468f08fe9969389a249acaaf17b0ff4dab9f0f9e
 ---
+> 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
+
+> 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
+
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser
 
 > 重审（2026-10-27）：S1: metrics re-freeze after scanner update
