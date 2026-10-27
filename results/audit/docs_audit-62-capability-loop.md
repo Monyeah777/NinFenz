@@ -8,13 +8,15 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
   - desktop/tests/test_interop_export.py:2308d682b075fef25982c6577c67d41714980c94db1f4f538fee26ec7239a847
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

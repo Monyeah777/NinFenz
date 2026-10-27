@@ -36,6 +36,7 @@ PAYLOAD_FILES = (
 PAYLOAD_TREES = (
     "desktop/src/core",
     "protocol/schema",
+    "scripts/nf_parser",
 )
 _SKIP_PARTS = {"__pycache__", ".pytest_cache", ".nf-cache", ".git"}
 _SKIP_SUFFIX = {".pyc", ".pyo"}

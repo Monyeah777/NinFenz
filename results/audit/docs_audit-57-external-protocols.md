@@ -11,12 +11,12 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
+  - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
+  - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,10 @@ subjects:
   - llms.txt:7e011303eae22d163cdbb085934f7264dd5922e1d5e8a5eefa1a139d7be74323
 
 ---
+> 重审（2026-10-27）：S1: CLI scanners cover nf_parser
+
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

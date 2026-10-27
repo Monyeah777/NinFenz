@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:945da2a83eaba05ebc0e7e435a6ab49fcf1b916e00f5a830272a9c91fa3681c8
 
 ---
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

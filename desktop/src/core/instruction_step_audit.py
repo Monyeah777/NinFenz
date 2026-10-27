@@ -34,8 +34,10 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if not (r / "scripts/nf.py").is_file():
         return (["读不到 CLI 真源 scripts/nf.py（修复指引：在 NF 仓库根运行本扫描，"
                  "或先补齐该件——本扫描要拿它当子命令面的单一真值）"], {})
-    nf_subs = set(re.findall(r'add_parser\(\s*"([^"]+)"',
-                             csc.read_text_cached(r / "scripts/nf.py")))
+    nf_src = csc.read_text_cached(r / "scripts/nf.py")
+    for part in sorted((r / "scripts" / "nf_parser").glob("*.py")):
+        nf_src += "\n" + csc.read_text_cached(part)
+    nf_subs = set(re.findall(r'add_parser\(\s*"([^"]+)"', nf_src))
     steps = 0
     for rel in AUDIT_DOCS:
         path = r / rel

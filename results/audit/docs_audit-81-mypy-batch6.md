@@ -10,8 +10,14 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:1a94b94164bb361a3f7807b31d9ceb576d3b13a45d0cdd5ee246be2fa0f73385
+  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
 ---
+> 重审（2026-10-27）：S1: CLI scanners cover nf_parser
+
+> 重审（2026-10-27）：S1: metrics re-freeze after scanner update
+
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

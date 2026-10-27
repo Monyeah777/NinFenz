@@ -185,6 +185,12 @@ def cli_commands(root: str = ".") -> set:
         return set()
     with open(nf_path, encoding="utf-8") as fh:
         nf_src = fh.read()
+    parser_dir = os.path.join(root, "scripts", "nf_parser")
+    if os.path.isdir(parser_dir):
+        for name in sorted(os.listdir(parser_dir)):
+            if name.endswith(".py"):
+                with open(os.path.join(parser_dir, name), encoding="utf-8") as fh:
+                    nf_src += "\n" + fh.read()
     cmds = set(re.findall(r'sub\.add_parser\(\s*"([a-z0-9-]+)"', nf_src))
     for group in re.findall(r"aliases\s*=\s*\[([^\]]*)\]", nf_src):
         cmds.update(re.findall(r'"([a-z0-9-]+)"', group))

@@ -144,13 +144,15 @@ class NoDeadFlagTest(unittest.TestCase):
 
     def test_no_declared_flag_is_unread(self):
         src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        for part in sorted((ROOT / "scripts" / "nf_parser").glob("*.py")):
+            src += "\n" + part.read_text(encoding="utf-8")
         declared = declared_flags(src)
         self.assertGreaterEqual(len(declared), 60,
                                 "旗标面塌缩（判据可能已失效）：%d" % len(declared))
         got = unread_flags(src)
         self.assertEqual([], got,
                          "声明了却从没读过的旗标（修复指引：接线到代码，或删掉声明与文档）：%s"
-                         % ["%s:%d %s" % (ROOT.joinpath("scripts/nf.py").as_posix(), ln, opt)
+                         % ["scripts/nf.py 或 nf_parser:%d %s" % (ln, opt)
                             for ln, _dest, opt in got])
 
     def test_predicate_has_catch_power(self):

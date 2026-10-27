@@ -41,7 +41,7 @@ FACTS_REL = "protocol/facts.json"
 PYPROJECT_REL = "pyproject.toml"
 STATIC_PKG_FILES = {"ninfenz/__init__.py", "ninfenz/_launcher.py", "ninfenz/__main__.py"}
 PAYLOAD_FILES = ("scripts/nf.py", FACTS_REL)
-PAYLOAD_TREES = ("desktop/src/core", "protocol/schema")
+PAYLOAD_TREES = ("desktop/src/core", "protocol/schema", "scripts/nf_parser")  # 兼容回退；真源见 setup.py
 FORBIDDEN = ("/.git/", "/.worktrees/", "/__pycache__/", "/.pytest_cache/", "/.nf-cache/",
              "/node_modules/", "/desktop/tests/", "/.rivet/")
 FORBIDDEN_SUFFIX = (".pyc", ".pyo")
@@ -62,12 +62,34 @@ def _load_pyproject(root: str) -> Dict[str, Any]:
         return tomllib.load(fh)
 
 
+def _setup_payload_lists(root: str):
+    """从 setup.py 读取 PAYLOAD_FILES / PAYLOAD_TREES（单一真源，避免与本脚本双写漂移）。"""
+    import ast
+    path = os.path.join(root, "setup.py")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
+    except (OSError, SyntaxError) as exc:
+        raise ValueError("setup.py 不可读/坏：%s（修复指引：恢复构建入口）" % exc) from exc
+    got = {}
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)
+                and node.targets[0].id in ("PAYLOAD_FILES", "PAYLOAD_TREES")):
+            got[node.targets[0].id] = tuple(ast.literal_eval(node.value))
+    for key in ("PAYLOAD_FILES", "PAYLOAD_TREES"):
+        if key not in got:
+            raise ValueError("setup.py 缺 %s（修复指引：恢复注入清单，勿只在检查器里加）" % key)
+    return got["PAYLOAD_FILES"], got["PAYLOAD_TREES"]
+
+
 def expected_payload(root: str) -> Dict[str, str]:
-    """→ `{wheel 内路径: 仓库根绝对路径}`（注入面真源；与 setup.py 的 PAYLOAD_* 清单同构）。"""
+    """→ `{wheel 内路径: 仓库根绝对路径}`（注入面真源 = setup.py 的 PAYLOAD_*）。"""
+    payload_files, payload_trees = _setup_payload_lists(root)
     out: Dict[str, str] = {}
-    for rel in PAYLOAD_FILES:
+    for rel in payload_files:
         out["ninfenz/" + rel.replace(os.sep, "/")] = os.path.join(root, rel)
-    for rel_dir in PAYLOAD_TREES:
+    for rel_dir in payload_trees:
         base = os.path.join(root, rel_dir)
         for dp, dn, fn in os.walk(base):
             dn[:] = sorted(d for d in dn if d not in ("__pycache__", ".pytest_cache", ".git"))

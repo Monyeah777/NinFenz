@@ -12,10 +12,16 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:1a94b94164bb361a3f7807b31d9ceb576d3b13a45d0cdd5ee246be2fa0f73385
+  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
 ---
+> 重审（2026-10-27）：S1: CLI scanners cover nf_parser
+
+> 重审（2026-10-27）：S1: metrics re-freeze after scanner update
+
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

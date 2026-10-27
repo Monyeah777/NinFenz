@@ -7,8 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:1a94b94164bb361a3f7807b31d9ceb576d3b13a45d0cdd5ee246be2fa0f73385
+  - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
 ---
+> 重审（2026-10-27）：S1: CLI scanners cover nf_parser
+
+> 重审（2026-10-27）：S1: metrics re-freeze after scanner update
+
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

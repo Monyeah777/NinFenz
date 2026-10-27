@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

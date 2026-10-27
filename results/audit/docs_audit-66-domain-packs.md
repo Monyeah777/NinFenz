@@ -11,13 +11,15 @@ subjects:
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:b5a7cb10a7722461db7a511bcc771e466eebabd2f2c73d5c958609935bcd605d
+  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
   - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
 
 ---
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

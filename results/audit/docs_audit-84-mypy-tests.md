@@ -32,8 +32,10 @@ subjects:
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:3008b3771c49209f9497190841e1088d5782d1bcd72f50705f0d892775a8431e
+  - desktop/tests/test_nf_cli.py:a986a641a20d4e829e576136b0500417d19400825a754d554ea4ee5144156600
 ---
+> 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
+
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
 
 > 重审（2026-10-27）：T12.2 英文术语层：新增 protocol/glossary.json entries（33 条双语术语）+ core/glossary.py + nf glossary check/render + docs/protocol/glossary.en.md；新增顶层命令 glossary 与 terminal FAMILIES/命令地图重生成；按冻结上限重冻 code/coupling 基线并重绑对象 digest

@@ -37,6 +37,10 @@ def _cli_commands(root: str = ".") -> set:
     if not nf.is_file():
         return set()
     text = nf.read_text(encoding="utf-8")
+    parser_dir = Path(root) / "scripts" / "nf_parser"
+    if parser_dir.is_dir():
+        for part in sorted(parser_dir.glob("*.py")):
+            text += "\n" + part.read_text(encoding="utf-8")
     return set(re.findall(r'sub\.add_parser\(\s*"([a-z-]+)"', text))
 
 
