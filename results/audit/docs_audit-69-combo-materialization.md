@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:ec44f2324f534b960f965db0dffca4ad55fafdb7a222ff676c1ac6fa7c704191
+  - scripts/nf.py:890e772bb23180ee7eea43a53b5511679d0594ef9a53e132ea3d0dfa7824b46f
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
+
 > 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
 
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py

@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:ec44f2324f534b960f965db0dffca4ad55fafdb7a222ff676c1ac6fa7c704191
+  - scripts/nf.py:890e772bb23180ee7eea43a53b5511679d0594ef9a53e132ea3d0dfa7824b46f
 ---
+> 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
+
 > 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
 
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py

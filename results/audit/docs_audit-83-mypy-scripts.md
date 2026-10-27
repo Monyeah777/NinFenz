@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:ec44f2324f534b960f965db0dffca4ad55fafdb7a222ff676c1ac6fa7c704191
+  - scripts/nf.py:890e772bb23180ee7eea43a53b5511679d0594ef9a53e132ea3d0dfa7824b46f
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:ae0b6857ced5e5286bee8daea0ac659f119b20e5e89ca404cd7582fc57e9a037
+  - protocol/code_metrics_baseline.json:b36c95e10a24bbd9254ba9a66dfd48c027ad4a939c68fa5fe76d3b83b77d36ee
 ---
+> 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
+
 > 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
 
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py

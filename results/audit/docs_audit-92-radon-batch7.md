@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:ae0b6857ced5e5286bee8daea0ac659f119b20e5e89ca404cd7582fc57e9a037
+  - protocol/code_metrics_baseline.json:b36c95e10a24bbd9254ba9a66dfd48c027ad4a939c68fa5fe76d3b83b77d36ee
 ---
+> 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
+
 > 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
 
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
