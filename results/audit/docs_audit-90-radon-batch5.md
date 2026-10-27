@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:566a58106f88fc2c596fedf45effccb2007caa6d549f4bba48a681bd3a87b002
+  - protocol/code_metrics_baseline.json:b66a81fe85c9feaae781f8e267bd8db72df77609498aebb5094d3b353a63773d
 ---
+> 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py
+
 > 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
 
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py

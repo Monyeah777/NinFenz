@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:566a58106f88fc2c596fedf45effccb2007caa6d549f4bba48a681bd3a87b002
+  - protocol/code_metrics_baseline.json:b66a81fe85c9feaae781f8e267bd8db72df77609498aebb5094d3b353a63773d
 ---
+> 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py
+
 > 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
 
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
