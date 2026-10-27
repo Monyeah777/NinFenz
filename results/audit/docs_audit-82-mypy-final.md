@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:2a7d2a89ff205ae7e3d49bb244f71717cd165c87b00ca2d0dce86fd5b9771975
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:8fb75e8068c7bac0f53a13294bc6cfaa03c16155ae161152109d002f4d5de21f
+  - protocol/code_metrics_baseline.json:84281b45dae1c9c3e2f31d8a05f121e33b317bbd4807fe433cf4ad8a34420b16
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,10 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-10-27）：L5 串行段并行（灰度 NF_OVERLAP_SERIAL）
+
+> 重审（2026-10-27）：持久 worker 批处理（NF_TEST_BATCH）
+
 > 重审（2026-10-27）：rebase 重冻（gate-cache）
 
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
