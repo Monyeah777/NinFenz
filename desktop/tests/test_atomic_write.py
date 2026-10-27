@@ -219,7 +219,7 @@ class AtomicWriteTest(unittest.TestCase):
         from unittest import mock
         with mock.patch.object(aw.durability.os, "name", "nt"), \
                 mock.patch.object(aw.durability.os, "open") as opened:
-            aw.durability.fsync_directory(Path("unused"))
+            aw.durability.fsync_directory(mock.sentinel.path)
         opened.assert_not_called()
 
     @unittest.skipIf(os.name == "nt", "Windows chmod 不保留 POSIX 权限位")
@@ -227,9 +227,9 @@ class AtomicWriteTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "shared.json")
             p.write_text("old\n", encoding="utf-8")
-            os.chmod(p, 0o640)
+            os.chmod(p, 0o400)
             aw.write_text(p, "new\n")
-            self.assertEqual(stat.S_IMODE(p.stat().st_mode), 0o640)
+            self.assertEqual(stat.S_IMODE(p.stat().st_mode), 0o400)
 
     def test_write_lines_streams_lazily_and_normalizes_newlines(self):
         with tempfile.TemporaryDirectory() as tmp:
