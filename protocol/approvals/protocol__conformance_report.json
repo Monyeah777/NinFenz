@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-27",
   "approved_by": "Monyeah777",
-  "note": "L4 memo",
+  "note": "ARCH-004 recursive atoms metrics",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "23b9829300a446ccd00eb82d669f5c7430d05761387bfa05947f1e0482a6be59"

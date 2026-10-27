@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
-  - protocol/code_metrics_baseline.json:8fb75e8068c7bac0f53a13294bc6cfaa03c16155ae161152109d002f4d5de21f
+  - protocol/code_metrics_baseline.json:d4605fb80ac9f543a2865fc8aa90069dbc2d2be9fb2f711da83e2005f07ca60f
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -261,6 +261,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-27）：ARCH-004: recursive code_metrics scan for core atoms
+
 > 重审（2026-10-27）：rebase 重冻（gate-cache）
 
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要

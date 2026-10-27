@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:8fb75e8068c7bac0f53a13294bc6cfaa03c16155ae161152109d002f4d5de21f
+  - protocol/code_metrics_baseline.json:d4605fb80ac9f543a2865fc8aa90069dbc2d2be9fb2f711da83e2005f07ca60f
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-10-27）：ARCH-004: recursive code_metrics scan for core atoms
+
 > 重审（2026-10-27）：rebase 重冻（gate-cache）
 
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
