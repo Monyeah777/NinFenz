@@ -11,13 +11,15 @@ subjects:
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:9d2fc5932da73f4d8b164bfda720805751a68777f3fcfe8a10c1b9c63984b887
+  - scripts/nf.py:7ae960511d18f09d0ae62131f942eddfcfd4fe9ece809dad97a57c619ca9245e
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
   - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
 
 ---
+> 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
+
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
 
 > 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization

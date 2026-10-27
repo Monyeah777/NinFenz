@@ -372,7 +372,7 @@
         "files": 337,
         "max_fn_cc": 126,
         "max_fn_lines": 318,
-        "max_lines": 6722
+        "max_lines": 6339
       },
       "status": "pass",
       "warns": 0
@@ -478,12 +478,12 @@
       "source": "judgement_coverage.scan",
       "stats": {
         "consumed": 72,
-        "exceptions": 3,
+        "exceptions": 2,
         "orphans": 2,
         "scanners": 74
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "workflow_policy",
@@ -537,12 +537,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "013f6bbc963e69e329d46196502d09528b2518bc9d871bf1c67a832c81899b1b",
+  "root_digest": "2fe1e0652245c5fc71dc27e1d22d503a523a382c145fc9db4c2aee683ff8e0b2",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 28,
-    "warn": 3
+    "pass": 29,
+    "warn": 2
   }
 }

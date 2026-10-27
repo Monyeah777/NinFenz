@@ -31,6 +31,8 @@ CORE_DIR = "desktop/src/core"
 CONSUMERS = ("verify.sh", "scripts/nf.py",
              "desktop/src/core/verify_report.py",
              "desktop/src/core/quality_depth_scan.py")
+#: 端壳拆包后，消费者也可能住在 scripts 的子包里（S2a/S2b）：按目录逐件取「真消费」信号。
+CONSUMER_DIRS = ("scripts/nf_cmds", "scripts/nf_parser")
 SCAN_DEF = re.compile(r"^def scan\(", re.M)
 
 
@@ -63,6 +65,11 @@ def consumers_of(name: str, root: str = ".") -> List[str]:
             hit = name in sig["quoted"]
         if hit:
             out.append(rel)
+    for rel_dir in CONSUMER_DIRS:
+        for p in sorted((r / rel_dir).glob("*.py")):
+            sig = scan_memo.signals(p)
+            if name in sig["calls"] or name in sig["imports"]:
+                out.append(p.relative_to(r).as_posix())
     for p in sorted((r / CORE_DIR).glob("*.py")):
         if p.stem == name:
             continue

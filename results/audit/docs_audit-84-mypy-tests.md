@@ -32,8 +32,10 @@ subjects:
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:9bc5b17db31cecdc49f117d49c5871989d38dcf84b7fca86d2a125f949173f47
+  - desktop/tests/test_nf_cli.py:cfbdf999ed0a37cb082585c24e1efa58512c532cde672f9a1a9c39c16f5ec171
 ---
+> 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
+
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py
 
 > 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)

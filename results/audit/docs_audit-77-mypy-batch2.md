@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:ed627d43252ef810f16936a4468f08fe9969389a249acaaf17b0ff4dab9f0f9e
+  - protocol/code_metrics_baseline.json:0674f8d003b225ba61940366491b7e8683c28898e8386317b1d791c3d5725bb3
 ---
+> 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
+
+> 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
+
 > 重审（2026-10-27）：S2a: purity local-package detection + helper extraction
 
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py

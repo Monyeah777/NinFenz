@@ -3,9 +3,8 @@
   "note": "判据接线覆盖的**例外登记**（唯一真源）。规矩：core 里暴露 scan() 的模块必须被 verify.sh / nf.py / verify_report 判据表 / quality_depth_scan / 其它 core 模块之一消费；未接线且未登记的判据判 FAIL。登记项须写明**为什么它可以不接线**——本表只许缩小，不许用来给新死判据开后门。",
   "exceptions": {
     "payload_evidence": "**待处置的死判据**：全仓零引用，疑为 payload_registry 取代后的残留。保留登记 = 让它可见；正确处置是删除或接进载荷面（下一波做，不在本次改动的范围内）。",
-    "payload_typing": "**待处置的死判据**：全仓零引用，自述 status=proposal-only（提案态未落 typed）。同上，须删除或接线。",
-    "layer_closure": "新模块（Wave2 层序闭包 W1 扫描）：当前由 desktop/tests/test_domain_gate.py 覆盖，尚未接入 verify_report 判据表；下一波接线或删除。"
+    "payload_typing": "**待处置的死判据**：全仓零引用，自述 status=proposal-only（提案态未落 typed）。同上，须删除或接线。"
   },
-  "updated": "2026-10-26",
-  "updated_note": "Wave2 新增 layer_closure 例外（待接线），其余不变。"
+  "updated": "2026-10-27",
+  "updated_note": "W7 起 layer_closure 已被 core/contract_semantics.py 消费，按「只许缩小」移除该例外。"
 }
