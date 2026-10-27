@@ -8,7 +8,6 @@
 2. 调用期间**写了仓库内文件** → 该结果不缓存，且既有 memo 整体清空；
 3. 写临时目录（NF_HOME）不算污染——被扫描面没变，缓存应保留。
 """
-import os
 import sys
 import tempfile
 import unittest

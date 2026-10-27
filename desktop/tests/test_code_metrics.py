@@ -99,9 +99,18 @@ class BaselineFileTest(unittest.TestCase):
     def test_write_records_all_scanned_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             _mk(tmp, "desktop/src/core/a.py", _fn(10))
+            _mk(tmp, "desktop/src/core/atoms/nested.py", _fn(33))
+            _mk(tmp, "desktop/src/core/__pycache__/ignored.py", _fn(99))
             _mk(tmp, "scripts/b.py", _fn(12))
             _i, doc = cm.write(tmp)
-            self.assertEqual({"desktop/src/core/a.py", "scripts/b.py"}, set(doc["files"]))
+            self.assertEqual(
+                {
+                    "desktop/src/core/a.py",
+                    "desktop/src/core/atoms/nested.py",
+                    "scripts/b.py",
+                },
+                set(doc["files"]),
+            )
             self.assertEqual(cm.SCHEMA, doc["schema"])
             saved = json.loads((Path(tmp) / cm.BASELINE_REL).read_text(encoding="utf-8"))
             self.assertEqual(cm.LIMITS, saved["limits"])
@@ -112,6 +121,7 @@ class BaselineFileTest(unittest.TestCase):
         doc = json.loads(p.read_text(encoding="utf-8"))
         self.assertEqual(cm.SCHEMA, doc["schema"])
         self.assertIn("desktop/src/core/purity_scan.py", doc["files"])
+        self.assertIn("desktop/src/core/atoms/code.py", doc["files"])
 
 
 class RealRepoTest(unittest.TestCase):
