@@ -111,7 +111,10 @@ gh attestation verify ninfenz-1.1.0.tgz --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.0.cdx.json --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.0.spdx3.json --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.0.openvex.json --repo Monyeah777/NinFenz
+gh attestation download ninfenz-1.1.0.tgz --repo Monyeah777/NinFenz --limit 30
+DIGEST=$(sha256sum ninfenz-1.1.0.tgz | cut -d ' ' -f1)
 gh attestation verify ninfenz-1.1.0.tgz --repo Monyeah777/NinFenz \
+  --bundle "sha256:$DIGEST.jsonl" \
   --predicate-type https://slsa.dev/verification_summary/v1
 ```
 

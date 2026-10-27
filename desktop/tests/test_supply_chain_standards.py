@@ -108,6 +108,8 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             "scripts/build_vsa.py",
             "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6",
             "https://slsa.dev/verification_summary/v1",
+            "steps.vsa.outputs.bundle-path",
+            "--bundle",
             "--deny-self-hosted-runners",
         ):
             self.assertIn(needle, text)

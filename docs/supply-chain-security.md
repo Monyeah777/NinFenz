@@ -62,15 +62,21 @@ gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
   --signer-workflow Monyeah777/NinFenz/.github/workflows/npm-publish.yml \
   --deny-self-hosted-runners \
   --predicate-type https://slsa.dev/provenance/v1
+
+# Custom VSA predicate type: download all bundles, then verify locally.
+gh attestation download "$ARTIFACT" --repo Monyeah777/NinFenz --limit 30
+DIGEST=$(sha256sum "$ARTIFACT" | cut -d ' ' -f1)
 gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
+  --bundle "sha256:$DIGEST.jsonl" \
   --signer-workflow Monyeah777/NinFenz/.github/workflows/npm-publish.yml \
   --deny-self-hosted-runners \
   --predicate-type https://slsa.dev/verification_summary/v1
 ```
 
 成功输出必须把 subject digest 绑定到同一次 GitHub Actions 构建，签发身份来自本仓库的
-OIDC workflow。对双 tarball、双 SBOM、OpenVEX、checksums 和 metadata 应逐一运行上述两条
-验证；摘要相同但没有有效 attestation，不等于来源已经认证。
+OIDC workflow。GitHub API 只接受 Build provenance 作为服务端 predicate 过滤参数；VSA 的
+自定义 predicate 先下载 bundle 再做本地密码学校验。对双 tarball、双 SBOM、OpenVEX、
+checksums 和 metadata 应逐一验证；摘要相同但没有有效 attestation，不等于来源已经认证。
 
 npm registry 自身也会保存 npm provenance。可在包页面查看，或通过公开 registry 的
 provenance API 核验；GitHub attestation 与 npm provenance 是两条独立验证面。

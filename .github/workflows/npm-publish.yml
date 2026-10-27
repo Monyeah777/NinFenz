@@ -178,6 +178,7 @@ jobs:
             --run-id "$GITHUB_RUN_ID" \
             --out .artifacts/vsa/verification-summary.json
       - name: 用 GitHub OIDC 签署 VSA
+        id: vsa
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4
         with:
           subject-path: |
@@ -192,12 +193,14 @@ jobs:
       - name: 回验 VSA
         env:
           GH_TOKEN: ${{ github.token }}
+          VSA_BUNDLE: ${{ steps.vsa.outputs.bundle-path }}
         run: |
           shopt -s nullglob
           for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
             .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
             .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
             gh attestation verify "$FILE" \
+              --bundle "$VSA_BUNDLE" \
               --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
               --source-ref "$GITHUB_REF" \
@@ -207,8 +210,10 @@ jobs:
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
-          name: vsa-predicate
-          path: .artifacts/vsa/verification-summary.json
+          name: vsa-evidence
+          path: |
+            .artifacts/vsa/verification-summary.json
+            ${{ steps.vsa.outputs.bundle-path }}
           if-no-files-found: error
           retention-days: 30
 
@@ -232,6 +237,10 @@ jobs:
         with:
           name: release-bundle
           path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
         with:
           node-version: '24.10'
@@ -244,17 +253,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
-          for PREDICATE in \
-            "https://slsa.dev/provenance/v1" \
-            "https://slsa.dev/verification_summary/v1"; do
-            gh attestation verify "$TARBALL" \
-              --repo "$GITHUB_REPOSITORY" \
-              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-              --source-ref "$GITHUB_REF" \
-              --source-digest "$GITHUB_SHA" \
-              --deny-self-hosted-runners \
-              --predicate-type "$PREDICATE"
-          done
+          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
+            ! -name 'verification-summary.json' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 发布已 attest 的 tarball（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -298,6 +313,10 @@ jobs:
         with:
           name: release-bundle
           path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
         with:
           node-version: '24.10'
@@ -310,17 +329,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'monyeah777-ninfenz-*.tgz' -print -quit)
-          for PREDICATE in \
-            "https://slsa.dev/provenance/v1" \
-            "https://slsa.dev/verification_summary/v1"; do
-            gh attestation verify "$TARBALL" \
-              --repo "$GITHUB_REPOSITORY" \
-              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-              --source-ref "$GITHUB_REF" \
-              --source-digest "$GITHUB_SHA" \
-              --deny-self-hosted-runners \
-              --predicate-type "$PREDICATE"
-          done
+          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
+            ! -name 'verification-summary.json' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -357,22 +382,32 @@ jobs:
         with:
           name: release-bundle
           path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
       - name: 上传 Release 前复核 provenance 与 VSA
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
-          for PREDICATE in \
-            "https://slsa.dev/provenance/v1" \
-            "https://slsa.dev/verification_summary/v1"; do
-            gh attestation verify "$TARBALL" \
-              --repo "$GITHUB_REPOSITORY" \
-              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-              --source-ref "$GITHUB_REF" \
-              --source-digest "$GITHUB_SHA" \
-              --deny-self-hosted-runners \
-              --predicate-type "$PREDICATE"
-          done
+          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
+            ! -name 'verification-summary.json' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 创建或补齐 GitHub Release（不覆盖既有资产）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
