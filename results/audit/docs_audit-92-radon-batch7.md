@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:e88420e70458ef55970f65fb49532beb01acbbde0f6e24eb101dcb761c5a523e
+  - protocol/code_metrics_baseline.json:07f922df86073822b9bf12a9430566d7ef25510968493531d9869d2dde467755
 ---
+> 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
+
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
 
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py

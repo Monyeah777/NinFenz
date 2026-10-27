@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:a36e377c25d2cd750ffc39e61a5ccb3f567a54683ed853d823bd07ec52860bd9
+  - scripts/nf.py:1174ad828e80be50c73e351142cd28d8610413f8134766ece3f14b8f0b9e860f
 ---
+> 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
+
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
 
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py

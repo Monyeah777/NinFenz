@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:a36e377c25d2cd750ffc39e61a5ccb3f567a54683ed853d823bd07ec52860bd9
+  - scripts/nf.py:1174ad828e80be50c73e351142cd28d8610413f8134766ece3f14b8f0b9e860f
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
+
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
 
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py

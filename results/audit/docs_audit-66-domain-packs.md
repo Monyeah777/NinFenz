@@ -11,13 +11,15 @@ subjects:
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:a36e377c25d2cd750ffc39e61a5ccb3f567a54683ed853d823bd07ec52860bd9
+  - scripts/nf.py:1174ad828e80be50c73e351142cd28d8610413f8134766ece3f14b8f0b9e860f
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
   - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
 
 ---
+> 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
+
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
 
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py

@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:a36e377c25d2cd750ffc39e61a5ccb3f567a54683ed853d823bd07ec52860bd9
+  - scripts/nf.py:1174ad828e80be50c73e351142cd28d8610413f8134766ece3f14b8f0b9e860f
 
 ---
+> 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
+
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
 
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
