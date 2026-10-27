@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
+  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
 ---
+> 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
+
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
 
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed

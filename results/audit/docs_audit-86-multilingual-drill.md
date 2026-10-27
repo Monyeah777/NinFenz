@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
+  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
 ---
+> 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
+
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
 
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed

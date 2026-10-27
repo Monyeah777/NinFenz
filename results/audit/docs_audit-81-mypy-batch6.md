@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
+  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
 ---
+> 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
+
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
 
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed

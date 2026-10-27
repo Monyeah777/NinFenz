@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:2c7b033a5a5e19048f0bedba1ea42755521f325166ea0e80f30aa8bea896fc39
+  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
 ---
+> 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
+
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
 
 > 重审（2026-10-27）：S2b: handler group -> nf_cmds/surfaces + judgement consumers + stale exception removed
