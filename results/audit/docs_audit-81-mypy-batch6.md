@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b66a81fe85c9feaae781f8e267bd8db72df77609498aebb5094d3b353a63773d
+  - protocol/code_metrics_baseline.json:3a7d4614d6df2cc43afdf0cb96546bf726e3d45b52e69ce1821b1e247739bf96
 ---
+> 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
+
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py
 
 > 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py

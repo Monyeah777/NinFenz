@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:b66a81fe85c9feaae781f8e267bd8db72df77609498aebb5094d3b353a63773d
+  - protocol/code_metrics_baseline.json:3a7d4614d6df2cc43afdf0cb96546bf726e3d45b52e69ce1821b1e247739bf96
 ---
+> 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
+
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py
 
 > 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
