@@ -1,0 +1,100 @@
+{
+  "schema": "nf-threat-model/1",
+  "reviewed_at": "2026-10-27",
+  "method": "STRIDE + attack surface analysis",
+  "assets": [
+    "main branch and workflow definitions",
+    "maintainer GitHub identity and release credentials",
+    "npm tarballs and GitHub Packages mirror",
+    "CycloneDX and SPDX SBOMs",
+    "checksums, build provenance, and VSA",
+    "dependency locks and CI tooling"
+  ],
+  "actors": [
+    "maintainer",
+    "contributor",
+    "GitHub Actions hosted builder",
+    "package registries and upstream suppliers",
+    "external attacker"
+  ],
+  "boundaries": [
+    "fork or pull request to repository",
+    "repository to hosted CI runner",
+    "dependency registry to build",
+    "build job to attestation and signing",
+    "release workflow to npm and GitHub Release",
+    "consumer download to local verification"
+  ],
+  "threats": [
+    {
+      "id": "TM-01",
+      "stride": "Spoofing",
+      "threat": "An attacker impersonates a maintainer and changes protected workflow or release settings.",
+      "impact": "critical",
+      "controls": ["MFA requirement", "Code Owners", "protected main ruleset", "OIDC release identities"],
+      "residual": "GitHub account recovery remains an external identity risk.",
+      "status": "mitigated"
+    },
+    {
+      "id": "TM-02",
+      "stride": "Tampering",
+      "threat": "A dependency or build step injects unreviewed code into the release artifact.",
+      "impact": "critical",
+      "controls": ["locked dependencies", "ignore-scripts", "two deterministic builds", "dependency review", "SBOM"],
+      "residual": "Shared hosted runners and network-enabled build steps prevent a full SLSA L3 isolation claim.",
+      "status": "partial"
+    },
+    {
+      "id": "TM-03",
+      "stride": "Repudiation",
+      "threat": "A producer denies building or publishing a specific artifact.",
+      "impact": "high",
+      "controls": ["signed build provenance", "signed VSA", "immutable source commit", "SHA256SUMS"],
+      "residual": "The current VSA verifier identity belongs to the same project.",
+      "status": "mitigated"
+    },
+    {
+      "id": "TM-04",
+      "stride": "Information disclosure",
+      "threat": "Secrets, internal records, or unlicensed content are packaged into a release.",
+      "impact": "high",
+      "controls": ["payload allowlist", "internal-directory exclusions", "secret scan", "license policy", "REUSE checks"],
+      "residual": "Human review is still required for semantic confidentiality mistakes.",
+      "status": "mitigated"
+    },
+    {
+      "id": "TM-05",
+      "stride": "Denial of service",
+      "threat": "A compromised or unavailable upstream prevents reproducible release and recovery.",
+      "impact": "medium",
+      "controls": ["exact pins", "lock hashes", "cached toolchain constraints", "vendor-neutral build scripts"],
+      "residual": "There is no organization-controlled binary artifact proxy.",
+      "status": "partial"
+    },
+    {
+      "id": "TM-06",
+      "stride": "Elevation of privilege",
+      "threat": "An untrusted pull request obtains a write token or publishing capability.",
+      "impact": "critical",
+      "controls": ["read-only pull-request jobs", "persist-credentials false", "no secrets in PR jobs", "job-scoped permissions"],
+      "residual": "Platform workflow semantics must remain under update review.",
+      "status": "mitigated"
+    },
+    {
+      "id": "TM-07",
+      "stride": "Tampering",
+      "threat": "A release artifact or SBOM is replaced after build.",
+      "impact": "critical",
+      "controls": ["signature subjects include tarballs and SBOMs", "VSA", "checksum verification", "non-overwriting release upload"],
+      "residual": "Consumers must actually run the verification commands.",
+      "status": "mitigated"
+    }
+  ],
+  "review_triggers": [
+    "release workflow changes",
+    "new registry or trusted builder",
+    "new direct dependency ecosystem",
+    "security advisory affecting build or distribution",
+    "change in maintainer access model"
+  ]
+}

@@ -13,7 +13,7 @@ WORKFLOW = ROOT / ".github" / "workflows" / "npm-publish.yml"
 
 
 class SupplyChainEvidenceTest(unittest.TestCase):
-    def test_controls_cover_every_active_l1_l2_requirement(self):
+    def test_controls_cover_every_active_l1_l3_requirement(self):
         proc = subprocess.run(
             [sys.executable, "scripts/supply_chain_policy.py", "--json"],
             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", timeout=60,
@@ -21,13 +21,16 @@ class SupplyChainEvidenceTest(unittest.TestCase):
         self.assertEqual(0, proc.returncode, proc.stderr or proc.stdout)
         doc = json.loads(proc.stdout)
         self.assertEqual([], doc["issues"])
-        self.assertEqual(43, doc["stats"]["osps"]["controls"])
+        self.assertEqual(65, doc["stats"]["osps"]["controls"])
+        self.assertEqual(43, doc["stats"]["osps"]["l1_l2"]["controls"])
+        self.assertEqual(22, doc["stats"]["osps"]["l3"]["controls"])
         self.assertEqual(13, doc["stats"]["s2c2f"]["controls"])
         self.assertEqual(4, doc["stats"]["package_sources"]["sources"])
         self.assertGreaterEqual(doc["stats"]["suppliers"]["suppliers"], 7)
 
     def test_partial_or_na_controls_keep_an_explicit_gap(self):
         for rel in ("packaging/supply-chain/osps-l1-l2.json",
+                    "packaging/supply-chain/osps-l3.json",
                     "packaging/supply-chain/s2c2f-l1-l2.json"):
             doc = json.loads((ROOT / rel).read_text(encoding="utf-8"))
             entries = doc.get("controls") or doc.get("requirements") or []
@@ -83,13 +86,39 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             attest_steps[0]["uses"],
         )
         subject = attest_steps[0]["with"]["subject-path"]
-        for suffix in (".tgz", ".cdx.json", ".spdx3.json", "SHA256SUMS"):
+        for suffix in (".tgz", ".cdx.json", ".spdx3.json", ".openvex.json",
+                       "SHA256SUMS", "release-metadata.json"):
             self.assertIn(suffix, subject)
-        self.assertEqual(["build", "attest"], self.jobs["publish-npm"]["needs"])
+        self.assertEqual(["build", "attest", "verify"], self.jobs["publish-npm"]["needs"])
         self.assertEqual(
-            ["build", "attest", "publish-npm", "publish-github-packages"],
+            ["build", "attest", "verify", "publish-npm", "publish-github-packages"],
             self.jobs["github-release"]["needs"],
         )
+
+    def test_independent_verification_signs_non_l3_vsa_and_gates_publish(self):
+        verify = self.jobs["verify"]
+        self.assertEqual(["build", "attest"], verify["needs"])
+        self.assertEqual("write", verify["permissions"]["id-token"])
+        self.assertEqual("write", verify["permissions"]["attestations"])
+        text = json.dumps(verify, ensure_ascii=False)
+        for needle in (
+            "sha256sum -c SHA256SUMS",
+            "gh attestation verify",
+            "https://slsa.dev/provenance/v1",
+            "scripts/build_vsa.py",
+            "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6",
+            "https://slsa.dev/verification_summary/v1",
+            "steps.vsa.outputs.bundle-path",
+            "--bundle",
+            "--deny-self-hosted-runners",
+        ):
+            self.assertIn(needle, text)
+        for job in ("publish-npm", "publish-github-packages", "github-release"):
+            body = self.jobs[job]
+            self.assertIn("verify", body["needs"])
+            self.assertIn("verification_summary/v1",
+                          json.dumps(body, ensure_ascii=False),
+                          f"{job} 发布前未复核 VSA")
 
     def test_workflow_never_interpolates_untrusted_metadata_into_shell(self):
         dangerous = ("github.ref_name", "github.head_ref", "github.event.pull_request",
