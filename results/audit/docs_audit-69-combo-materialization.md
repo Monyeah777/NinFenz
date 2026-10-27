@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:61b767925d5f9c34ec5bbfb34bb48b91aee559ba26e0359575ad29f9b911cadd
+  - scripts/nf.py:592891fe32bdbe70ede9ab82ec86a0851e6c00d49e16b72ca3b65bd0686031ed
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
+
 > 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations
 
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers

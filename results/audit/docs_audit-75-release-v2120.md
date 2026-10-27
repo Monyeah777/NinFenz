@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:61b767925d5f9c34ec5bbfb34bb48b91aee559ba26e0359575ad29f9b911cadd
+  - scripts/nf.py:592891fe32bdbe70ede9ab82ec86a0851e6c00d49e16b72ca3b65bd0686031ed
 
 ---
+> 重审（2026-10-28）：S2u: forge handlers -> nf_cmds/forge_ops.py; json_doc reader test face updated
+
 > 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations
 
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers

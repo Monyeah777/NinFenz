@@ -90,7 +90,7 @@ CONTRACT_READERS = (
     "desktop/src/core/execution_drill.py",
     "desktop/src/core/terminal.py",
     "scripts/check_interop_schemas.py",
-    "scripts/nf.py",
+    "scripts/nf_cmds/forge_ops.py",   # 端壳拆分后 register 的 json_doc 读取点在此
     "scripts/geo_export.py",
     "scripts/pull_decision_model.py",
     "scripts/serve_decision_model.py",
