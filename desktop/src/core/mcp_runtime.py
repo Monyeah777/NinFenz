@@ -50,6 +50,7 @@ from typing import Any, Dict, List, Optional, TextIO, Tuple
 from core import json_doc
 from core import repo_index
 from core import trust_boundary
+from core.mcp_cache import MAX_CACHE_TTL_MS, cacheable as _cacheable_payload
 
 #: 双时代协议版本常量（2026-07-28 规范 §Versioning 实证）
 MODERN_PROTOCOL_VERSION = "2026-07-28"
@@ -1635,7 +1636,7 @@ class McpRuntime:
                 item["_meta"] = note
         return {"contents": [item]}
 
-    def _cacheable(self, payload: dict, ttl_ms: int = 3600000,
+    def _cacheable(self, payload: dict, ttl_ms: int = MAX_CACHE_TTL_MS,
                    cache_scope: str = "public") -> dict:
         """给可缓存结果补现代规范必填三键（resultType / ttlMs / cacheScope）。
 
@@ -1644,11 +1645,7 @@ class McpRuntime:
         `CacheableResult`，其 `required = [cacheScope, resultType, ttlMs]`——
         本仓此前只在 server/discover 上给了这三个键，list 三面缺它们（官方 schema 判 FAIL）。
         """
-        out: Dict[str, Any] = {"resultType": "complete"}
-        out.update(payload)
-        out.setdefault("ttlMs", ttl_ms)
-        out.setdefault("cacheScope", cache_scope)
-        return out
+        return _cacheable_payload(payload, ttl_ms, cache_scope)
 
     def _list_resources(self, params: dict) -> dict:
         """resources/list 分页 + 过滤（type=module|pipeline|asset|library|pattern / package）。

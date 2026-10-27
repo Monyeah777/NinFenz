@@ -144,7 +144,9 @@ class DaemonArgvLimitTest(unittest.TestCase):
         inside = root / "sub"
         inside.mkdir()
         self.assertEqual(str(inside.resolve()), dm._validated_cwd(root, str(inside)))
-        self.assertEqual(str(root.parent.resolve()), dm._validated_cwd(root, str(root.parent)))
+        self.assertEqual(str(root.resolve()), dm._validated_cwd(root, str(root)))
+        with self.assertRaisesRegex(ValueError, "越出仓库根"):
+            dm._validated_cwd(root, str(root.parent))
         with self.assertRaises(ValueError):
             dm._validated_cwd(root, str(root / "missing"))
         with self.assertRaises(ValueError):

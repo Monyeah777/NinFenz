@@ -90,8 +90,13 @@
       "max_fn_cc": 45,
       "max_fn_lines": 99
     },
+    "desktop/src/core/atomic_durability.py": {
+      "lines": 47,
+      "max_fn_cc": 4,
+      "max_fn_lines": 11
+    },
     "desktop/src/core/atomic_write.py": {
-      "lines": 283,
+      "lines": 281,
       "max_fn_cc": 8,
       "max_fn_lines": 43
     },
@@ -271,9 +276,14 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 997,
+      "lines": 980,
       "max_fn_cc": 17,
       "max_fn_lines": 77
+    },
+    "desktop/src/core/daemon_cwd.py": {
+      "lines": 35,
+      "max_fn_cc": 12,
+      "max_fn_lines": 27
     },
     "desktop/src/core/daemon_shell.py": {
       "lines": 58,
@@ -730,13 +740,18 @@
       "max_fn_cc": 7,
       "max_fn_lines": 28
     },
+    "desktop/src/core/mcp_cache.py": {
+      "lines": 20,
+      "max_fn_cc": 4,
+      "max_fn_lines": 12
+    },
     "desktop/src/core/mcp_package.py": {
       "lines": 101,
       "max_fn_cc": 35,
       "max_fn_lines": 68
     },
     "desktop/src/core/mcp_runtime.py": {
-      "lines": 1866,
+      "lines": 1863,
       "max_fn_cc": 30,
       "max_fn_lines": 69
     },

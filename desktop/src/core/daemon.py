@@ -119,6 +119,7 @@ _STATE_WRITE_LOCK = threading.Lock()
 #: 一次函数调用 + 一次套接字往返——没有子进程、没有解释器启动，这才是真正的毫秒级客户端。
 #: 长驻/自指命令（见 `REFUSED_COMMANDS`）与「无参」一律直落 python 入口（与守护拒绝面一致）。
 # 兼容转发面：CLI 与测试读 dm.SHELL_INIT_BASH（模板真源已迁 core.daemon_shell，见其 docstring）。
+from core.daemon_cwd import validated_cwd as _validated_cwd_impl  # noqa: E402
 from core.daemon_shell import SHELL_INIT_BASH  # noqa: E402,F401
 
 
@@ -266,26 +267,8 @@ def _decode_frame(raw: bytes, what: str) -> str:
 
 
 def _validated_cwd(root: Path, cwd: str | None) -> str | None:
-    """规范化客户端 cwd；空值表示使用守护自身 cwd。"""
-    if cwd is None:
-        return None
-    if not isinstance(cwd, str) or not cwd:
-        raise ValueError("cwd 必须是非空字符串（修复指引：客户端传绝对目录，或省略 cwd）")
-    if len(cwd) > MAX_CWD_CHARS:
-        raise ValueError(f"cwd 超过上限 {MAX_CWD_CHARS} 字符（修复指引：缩短路径或省略 cwd）")
-    if any(ord(ch) < 32 or ord(ch) == 127 for ch in cwd):
-        raise ValueError("cwd 含控制字符（修复指引：路径里不得含 \x00-\x1f）")
-    if os.name == "nt":
-        # Git Bash/MSYS 的原生客户端会送 `/d/repo`；显式映射，避免 isdir 失败后静默回退。
-        import re
-        match = re.match(r"^/([A-Za-z])/(.*)$", cwd)
-        if match:
-            tail = match.group(2).replace("/", "\\")
-            cwd = f"{match.group(1).upper()}:\\{tail}"
-    safe = os.path.realpath(cwd)
-    if not os.path.isdir(safe):
-        raise ValueError(f"cwd 不是现存目录：{safe}（修复指引：传仓库根的绝对路径，或省略 cwd）")
-    return safe
+    """兼容公开测试面；实现见 `daemon_cwd.validated_cwd`。"""
+    return _validated_cwd_impl(root, cwd, MAX_CWD_CHARS)
 
 
 def _check_json_nesting(text: str, limit: int = 32) -> None:

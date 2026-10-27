@@ -3,9 +3,9 @@
     "app": 1447,
     "entry": 26,
     "floor": 5,
-    "prod": 1042,
+    "prod": 1044,
     "projection": 133,
-    "support": 287,
+    "support": 290,
     "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -5765,6 +5765,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "原子替换后的平台耐久性与权限边界。",
+      "path": "desktop/src/core/atomic_durability.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "原子写（同目录临时文件 + `os.replace`）：读者永远看不到半截内容。",
       "path": "desktop/src/core/atomic_write.py",
       "role": "prod",
@@ -5917,6 +5923,12 @@
     {
       "function": "NF 执行层常驻守护 —— 把「每条命令一次解释器启动」换成「一次启动、长期热跑」。",
       "path": "desktop/src/core/daemon.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "守护请求 cwd 的规范化与包含性边界。",
+      "path": "desktop/src/core/daemon_cwd.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -13098,17 +13110,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c9a46ec1b6d9d8382bb8e6909199dce3b778293482a8cb79c1cce852be656808",
+  "root_digest": "d521852d744ede7dd9fbc2cfdad17888e8a5167bc5a951e3ea6b5f9cfa639dd4",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 130,
+    "R-catch": 131,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
-    "R-support": 131,
+    "R-support": 132,
     "R-verify": 1014,
-    "auto:R-core": 259
+    "auto:R-core": 262
   },
   "schema": "nf-role-coordinates/1"
 }

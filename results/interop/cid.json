@@ -107,19 +107,19 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreibe575qbrq3l2n3hkocijmktwrdcc7avqfq4y6nltc5iazgpvv23a",
+      "cid": "bafyreig4f4mn5ayafvardukxeq662jzxbqmkg54jgnnsdgtksz5cxsyixe",
       "path": "protocol/role_coordinates.json",
-      "sha256": "24effb00c61b5e9bb3a9c24258a9da2310be0ac0b0e63cd5cc5d403267d6bad8"
+      "sha256": "dc2f18de83002d4111d157243ded27370c18a37789335b219a6a967a2bcb08b9"
     },
     {
-      "cid": "bafyreigexzvhyzyncmnlndcicdakkn34dsb53hi3owkpppnh2mc2u6dk2i",
+      "cid": "bafyreidkcorsvolxhn42wg2h7ij6oyeaeadttdpcdg4epbwc3pjv6vnlde",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2"
+      "sha256": "6a13a32ab9773b79ab1b47fa13e760802007398de219b84786c2dbd35f55ab19"
     },
     {
-      "cid": "bafyreif55gs3csuiysjh3a4ultdgvk3dk6s362qwntlc3gb5a5acwjyioa",
+      "cid": "bafyreieqgm5drzlhvoev4fvxoflvj3fnats2iwxhxgi5zslilh5mviniqe",
       "path": "protocol/coupling_baseline.json",
-      "sha256": "bde9a5b14a88c4927d83945cc66aab6357a5bf6a166cd62d983d07402b270870"
+      "sha256": "90333a38e567ab895e16b7715754ecad04e5a45ae7b991dcc96859facaa1a881"
     },
     {
       "cid": "bafyreicilosiaopuzd6wa7564pkc4gy7xqsuibcfmjkivd2s3sh37masny",

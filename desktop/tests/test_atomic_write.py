@@ -5,6 +5,7 @@
 """
 import os
 import json
+import stat
 import subprocess
 import sys
 import tempfile
@@ -197,6 +198,39 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
 
 
 class AtomicWriteTest(unittest.TestCase):
+    @unittest.skipIf(os.name == "nt", "Windows 无 POSIX 目录 fsync 语义")
+    def test_posix_replace_fsyncs_parent_directory(self):
+        """`os.replace` 成功后必须 fsync 父目录，否则掉电可能丢失目录项更新。"""
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp, "durable.json")
+            seen_dir = []
+            real_fsync = os.fsync
+
+            def record(fd):
+                seen_dir.append(stat.S_ISDIR(os.fstat(fd).st_mode))
+                return real_fsync(fd)
+
+            with mock.patch.object(aw.durability.os, "fsync", side_effect=record):
+                aw.write_text(p, "{}\n")
+            self.assertIn(True, seen_dir, "替换文件后未 fsync 父目录")
+
+    def test_windows_directory_fsync_is_explicitly_skipped(self):
+        from unittest import mock
+        with mock.patch.object(aw.durability.os, "name", "nt"), \
+                mock.patch.object(aw.durability.os, "open") as opened:
+            aw.durability.fsync_directory(mock.sentinel.path)
+        opened.assert_not_called()
+
+    @unittest.skipIf(os.name == "nt", "Windows chmod 不保留 POSIX 权限位")
+    def test_existing_mode_is_preserved_across_replace(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp, "shared.json")
+            p.write_text("old\n", encoding="utf-8")
+            os.chmod(p, 0o400)
+            aw.write_text(p, "new\n")
+            self.assertEqual(stat.S_IMODE(p.stat().st_mode), 0o400)
+
     def test_write_lines_streams_lazily_and_normalizes_newlines(self):
         with tempfile.TemporaryDirectory() as tmp:
             seen = []
