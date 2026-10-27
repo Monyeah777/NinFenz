@@ -13,18 +13,15 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+> 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
 > 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
-
 > 重审（2026-10-27）：rebase 重冻（fast-gate）
-
 > 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
-
 > 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
-
 > 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
-
 > 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
@@ -310,7 +307,9 @@ subjects:
 ## 二、交付（本批七模块）
 
 | 模块 | 修前 | 修法 |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | `desktop/src/core/semantic_conflict.py` | 3 | `fences`/`buf`/`out`/`publishers` 显式类型（PEP 585 小写） |
 | `desktop/src/core/storage.py` | 3 | 三处 `out` 显式 `List[Path]/[AssetPack]/[Preset]` |
 | `desktop/src/core/receipts.py` | 4 | `merkle_root` 可空返回在非空切片处补 `or b""`（契约上不可达 None） |

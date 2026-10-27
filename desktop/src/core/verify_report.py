@@ -68,6 +68,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "judgement_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
+    ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),
     ("asset_contract",
  "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
      "asset_contract", "scan", "scan"),

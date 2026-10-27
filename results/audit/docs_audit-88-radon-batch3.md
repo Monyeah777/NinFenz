@@ -7,18 +7,15 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:dbb5b2b45ebba8d67770a41056e944506f017dd243522edab79878886284d92e
-  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+> 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
 > 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
-
 > 重审（2026-10-27）：rebase 重冻（fast-gate）
-
 > 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
-
 > 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
-
 > 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
-
 > 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
@@ -269,7 +266,9 @@ subjects:
 ## 二、交付（本批刻意选「消解式」而非「切分式」）
 
 | 面 | 落点 |
-|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|
 | 查表替代分支链 | `_handlers()` 返回「意图 → 处理器」表；`dispatch` 本体只剩 **2** 个判定（表单抢占 + 查表分派） |
 | 处理器归一 | `_h_empty`/`_h_quit`/`_h_help` + `_view`（菜单/分区/检索/命令表/地图/补全/重放清单七种只读视图）· `_set_cmd` · `_form_cmd`（含 form/cancel）· `_replay` · `_history_cmd` · `_unknown` · `_run` |
 | 横切面抽出 | `_form_preempt`（表单进行中把输入当回答）· `_record`（落历史 + 可重放类别登记）——两者原先都压在 dispatch 尾部 |

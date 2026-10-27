@@ -27,21 +27,18 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
+  - desktop/src/core/daemon.py:2a7d2a89ff205ae7e3d49bb244f71717cd165c87b00ca2d0dce86fd5b9771975
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+> 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
+> 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
 > 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
-
 > 重审（2026-10-27）：rebase 重冻（fast-gate）
-
 > 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
-
 > 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
-
 > 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
-
 > 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
@@ -299,7 +296,9 @@ subjects:
 ## 二、交付（按修法归类）
 
 | 类 | 模块 | 修法 |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | 真标注错配 | `import_graph` | `parse` 标注写成 3 元组而实现返回 2 元组 `(deps, dyn)`、调用方也按 2 元组解包——三处只有两处一致；标注改为 `Optional[Tuple[frozenset, bool]]`，两处差错同消 |
 | 变量复用解耦 | `round_drill`（allowed→allowed_set）· `orchestration`（tools→wf_tools）· `export_schema`（e→entry） | |
 | 声明/集合显式类型 | `module_lifecycle` · `market_analyzer` · `pipeline_loader` · `community_inventory` · `retriever` · `knowledge_sig` · `silent_skip` · `decisions` · `machine_contract` · `exporter` · `decision_layer` | 补 `dict`/`list`/`Dict[str, Any]` 标注 |

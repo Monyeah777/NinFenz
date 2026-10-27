@@ -133,6 +133,11 @@ class DaemonArgvLimitTest(unittest.TestCase):
             # BSD/macOS can return a platform flag mask (observed: 4) for SO_REUSEADDR.
             self.assertTrue(sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
 
+    def test_absolute_lifetime_is_independent_from_activity(self):
+        self.assertFalse(dm._lifetime_expired(10.0, 69.9, 60.0))
+        self.assertTrue(dm._lifetime_expired(10.0, 70.0, 60.0))
+        self.assertFalse(dm._lifetime_expired(10.0, 10_000.0, 0.0))
+
     def test_cwd_must_be_an_existing_directory(self):
         root = Path(tempfile.mkdtemp(prefix="nf_daemon_cwd_"))
         self.addCleanup(lambda: __import__("shutil").rmtree(root, ignore_errors=True))
