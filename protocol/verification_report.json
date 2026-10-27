@@ -1,9 +1,9 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
+    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
     "expected_pass": 76,
-    "report_items": 31,
+    "report_items": 32,
     "verify_version": "v2.30"
   },
   "items": [
@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 96,
+        "raises": 97,
         "sinks": 21
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "1ff0a72ea36a6c447a66ee11a9404b6a975f0563e6acf9b444d7f5a3e6613b9f",
+        "root": "9c0b52455dc7878da8a962e01f04c14c6d8d147ab110094729bc6d5ab8607e0d",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -312,9 +312,9 @@
       "source": "audit.scan",
       "stats": {
         "audits": 57,
-        "legacy": 11,
-        "subjects_ok": 388,
-        "with_header": 46
+        "legacy": 27,
+        "subjects_ok": 285,
+        "with_header": 30
       },
       "status": "warn",
       "warns": 1
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 318,
-        "files": 318,
+        "baseline": 321,
+        "files": 321,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7678
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 231,
-        "probed": 231
+        "patterns": 234,
+        "probed": 234
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 259,
-        "modules": 259,
+        "metrics_recorded": 260,
+        "modules": 260,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 66,
+        "consumed": 67,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 68
+        "scanners": 69
       },
       "status": "pass",
       "warns": 0
@@ -496,6 +496,97 @@
         "requirements_files": 5,
         "with_explicit_permissions": 21,
         "workflows": 21
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "asvs",
+      "issues": 0,
+      "name": "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）",
+      "sample": [],
+      "source": "asvs_policy.scan",
+      "stats": {
+        "chapters": [
+          "V1",
+          "V2",
+          "V4",
+          "V5",
+          "V6",
+          "V7",
+          "V8",
+          "V11",
+          "V12",
+          "V13",
+          "V14",
+          "V15",
+          "V16"
+        ],
+        "coverage": {
+          "V1": {
+            "enforced": 5,
+            "not-applicable": 12,
+            "partial": 10
+          },
+          "V11": {
+            "enforced": 5,
+            "not-applicable": 5,
+            "partial": 4
+          },
+          "V12": {
+            "not-applicable": 9
+          },
+          "V13": {
+            "enforced": 3,
+            "not-applicable": 4,
+            "partial": 6
+          },
+          "V14": {
+            "enforced": 1,
+            "not-applicable": 5,
+            "partial": 3
+          },
+          "V15": {
+            "enforced": 4,
+            "not-applicable": 4,
+            "partial": 5
+          },
+          "V16": {
+            "enforced": 14,
+            "partial": 2
+          },
+          "V2": {
+            "enforced": 4,
+            "not-applicable": 2,
+            "partial": 5
+          },
+          "V4": {
+            "not-applicable": 10
+          },
+          "V5": {
+            "enforced": 2,
+            "not-applicable": 4,
+            "partial": 3
+          },
+          "V6": {
+            "not-applicable": 35
+          },
+          "V7": {
+            "enforced": 9,
+            "not-applicable": 9
+          },
+          "V8": {
+            "enforced": 2,
+            "not-applicable": 4,
+            "partial": 1
+          }
+        },
+        "requirements": 191,
+        "statuses": {
+          "enforced": 49,
+          "not-applicable": 103,
+          "partial": 39
+        }
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +616,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4060,
-        "kernel": 2174,
+        "files": 4067,
+        "kernel": 2178,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -537,12 +628,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "7d212923f6250cc326a894a842f9226b40ca0d103fb91ac2a305d124fc444af5",
+  "root_digest": "b744be1f19904684c27b9309888c46c6235dea1887454e8e5d4046b74e3bcec0",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 29,
+    "pass": 30,
     "warn": 2
   }
 }

@@ -81,6 +81,10 @@
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
 
+应用安全作用域评估见 [docs/asvs.md](docs/asvs.md)：覆盖本地 CLI、daemon、MCP、插件、
+文件处理、配置、密钥、日志与错误面。该矩阵是内部 ASVS 5.0.0 L2 证据，不是第三方认证；
+`partial` 与 `not-applicable` 项均保留明确 gap。
+
 ## 八、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
 
 - **面**：`nf verify` 的引擎侧会对目标仓库 `verify.sh` 里的 heredoc Python 做 `exec`

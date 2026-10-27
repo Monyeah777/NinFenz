@@ -1,0 +1,2570 @@
+{
+  "claim": {
+    "certified": false,
+    "kind": "internal-tailored-evidence",
+    "statement": "This is not third-party ASVS certification or a claim that every ASVS chapter applies to this product."
+  },
+  "requirement_count": 191,
+  "requirement_id_digest": "3a9188535468fd49708af56c499362a15ef47d9e1624756b8d122f2280490362",
+  "requirements": [
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.1.1",
+      "minimum_level": 2,
+      "section": "V1.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.1.2",
+      "minimum_level": 2,
+      "section": "V1.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No HTML, HTTP, or XML response generator is in scope.",
+      "id": "V1.2.1",
+      "minimum_level": 1,
+      "section": "V1.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.2.2",
+      "minimum_level": 1,
+      "section": "V1.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
+      ],
+      "id": "V1.2.3",
+      "minimum_level": 1,
+      "section": "V1.2",
+      "status": "enforced",
+      "verification": "Strict JSON parsing, argv-only subprocess calls, no runtime network capability, memory-safe Python/Rust components, and non-evaluating data formats are enforced."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No SQL, NoSQL, or database query engine is used.",
+      "id": "V1.2.4",
+      "minimum_level": 1,
+      "section": "V1.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
+      ],
+      "id": "V1.2.5",
+      "minimum_level": 1,
+      "section": "V1.2",
+      "status": "enforced",
+      "verification": "Strict JSON parsing, argv-only subprocess calls, no runtime network capability, memory-safe Python/Rust components, and non-evaluating data formats are enforced."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No LDAP integration exists.",
+      "id": "V1.2.6",
+      "minimum_level": 2,
+      "section": "V1.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No XPath query engine exists.",
+      "id": "V1.2.7",
+      "minimum_level": 2,
+      "section": "V1.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No LaTeX shell-enabled processor is in scope.",
+      "id": "V1.2.8",
+      "minimum_level": 2,
+      "section": "V1.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.2.9",
+      "minimum_level": 2,
+      "section": "V1.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No WYSIWYG HTML ingestion exists.",
+      "id": "V1.3.1",
+      "minimum_level": 1,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.3.2",
+      "minimum_level": 1,
+      "section": "V1.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.3.3",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No user-supplied SVG renderer exists.",
+      "id": "V1.3.4",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.3.5",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
+      ],
+      "id": "V1.3.6",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "enforced",
+      "verification": "Strict JSON parsing, argv-only subprocess calls, no runtime network capability, memory-safe Python/Rust components, and non-evaluating data formats are enforced."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No server-side template engine is in scope.",
+      "id": "V1.3.7",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No JNDI integration exists.",
+      "id": "V1.3.8",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No memcache integration exists.",
+      "id": "V1.3.9",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.3.10",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No mail-system integration exists.",
+      "id": "V1.3.11",
+      "minimum_level": 2,
+      "section": "V1.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
+      ],
+      "id": "V1.4.1",
+      "minimum_level": 2,
+      "section": "V1.4",
+      "status": "enforced",
+      "verification": "Strict JSON parsing, argv-only subprocess calls, no runtime network capability, memory-safe Python/Rust components, and non-evaluating data formats are enforced."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.4.2",
+      "minimum_level": 2,
+      "section": "V1.4",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "Managed Python and Rust code contain no manual pointer lifetime.",
+      "id": "V1.4.3",
+      "minimum_level": 2,
+      "section": "V1.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V1.5.1",
+      "minimum_level": 1,
+      "section": "V1.5",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V1",
+      "evidence": [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
+      ],
+      "id": "V1.5.2",
+      "minimum_level": 2,
+      "section": "V1.5",
+      "status": "enforced",
+      "verification": "Strict JSON parsing, argv-only subprocess calls, no runtime network capability, memory-safe Python/Rust components, and non-evaluating data formats are enforced."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V2.1.1",
+      "minimum_level": 1,
+      "section": "V2.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V2.1.2",
+      "minimum_level": 2,
+      "section": "V2.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V2.1.3",
+      "minimum_level": 2,
+      "section": "V2.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/trust_boundary.py",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
+      ],
+      "id": "V2.2.1",
+      "minimum_level": 1,
+      "section": "V2.2",
+      "status": "enforced",
+      "verification": "Schema admission, protocol bounds, trusted in-process validation, and atomic read-modify-write locking enforce validation at the service layer."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/trust_boundary.py",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
+      ],
+      "id": "V2.2.2",
+      "minimum_level": 1,
+      "section": "V2.2",
+      "status": "enforced",
+      "verification": "Schema admission, protocol bounds, trusted in-process validation, and atomic read-modify-write locking enforce validation at the service layer."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V2.2.3",
+      "minimum_level": 2,
+      "section": "V2.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no multi-step user authentication or account business flow.",
+      "id": "V2.3.1",
+      "minimum_level": 1,
+      "section": "V2.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/trust_boundary.py",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
+      ],
+      "id": "V2.3.2",
+      "minimum_level": 2,
+      "section": "V2.3",
+      "status": "enforced",
+      "verification": "Schema admission, protocol bounds, trusted in-process validation, and atomic read-modify-write locking enforce validation at the service layer."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V2.3.3",
+      "minimum_level": 2,
+      "section": "V2.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "desktop/src/core/trust_boundary.py",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
+      ],
+      "id": "V2.3.4",
+      "minimum_level": 2,
+      "section": "V2.3",
+      "status": "enforced",
+      "verification": "Schema admission, protocol bounds, trusted in-process validation, and atomic read-modify-write locking enforce validation at the service layer."
+    },
+    {
+      "chapter": "V2",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The CLI and MCP transport are local single-user surfaces, not a remote multi-user service; request-size and compute caps remain enforced.",
+      "id": "V2.4.1",
+      "minimum_level": 2,
+      "section": "V2.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.1.1",
+      "minimum_level": 1,
+      "section": "V4.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.1.2",
+      "minimum_level": 2,
+      "section": "V4.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.1.3",
+      "minimum_level": 2,
+      "section": "V4.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.2.1",
+      "minimum_level": 2,
+      "section": "V4.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.3.1",
+      "minimum_level": 2,
+      "section": "V4.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.3.2",
+      "minimum_level": 2,
+      "section": "V4.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.4.1",
+      "minimum_level": 1,
+      "section": "V4.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.4.2",
+      "minimum_level": 2,
+      "section": "V4.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.4.3",
+      "minimum_level": 2,
+      "section": "V4.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V4",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
+      "id": "V4.4.4",
+      "minimum_level": 2,
+      "section": "V4.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V5.1.1",
+      "minimum_level": 2,
+      "section": "V5.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "desktop/src/core/paths.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_paths.py",
+        "desktop/tests/test_daemon_limits.py"
+      ],
+      "id": "V5.2.1",
+      "minimum_level": 1,
+      "section": "V5.2",
+      "status": "enforced",
+      "verification": "All protocol, plugin, and snapshot input paths have byte limits; repository file paths are lexical- and realpath-contained."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V5.2.2",
+      "minimum_level": 1,
+      "section": "V5.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V5.2.3",
+      "minimum_level": 2,
+      "section": "V5.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No public web-serving directory executes stored files.",
+      "id": "V5.3.1",
+      "minimum_level": 1,
+      "section": "V5.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "desktop/src/core/paths.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_paths.py",
+        "desktop/tests/test_daemon_limits.py"
+      ],
+      "id": "V5.3.2",
+      "minimum_level": 1,
+      "section": "V5.3",
+      "status": "enforced",
+      "verification": "All protocol, plugin, and snapshot input paths have byte limits; repository file paths are lexical- and realpath-contained."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No HTTP Content-Disposition file response exists.",
+      "id": "V5.4.1",
+      "minimum_level": 2,
+      "section": "V5.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No HTTP or email attachment filename response exists.",
+      "id": "V5.4.2",
+      "minimum_level": 2,
+      "section": "V5.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V5",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The runtime does not serve files obtained from remote uploads.",
+      "id": "V5.4.3",
+      "minimum_level": 2,
+      "section": "V5.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.1.1",
+      "minimum_level": 1,
+      "section": "V6.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.1.2",
+      "minimum_level": 2,
+      "section": "V6.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.1.3",
+      "minimum_level": 2,
+      "section": "V6.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.1",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.2",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.3",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.4",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.5",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.6",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.7",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.8",
+      "minimum_level": 1,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.9",
+      "minimum_level": 2,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.10",
+      "minimum_level": 2,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.11",
+      "minimum_level": 2,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.2.12",
+      "minimum_level": 2,
+      "section": "V6.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.3.1",
+      "minimum_level": 1,
+      "section": "V6.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.3.2",
+      "minimum_level": 1,
+      "section": "V6.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.3.3",
+      "minimum_level": 2,
+      "section": "V6.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.3.4",
+      "minimum_level": 2,
+      "section": "V6.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.4.1",
+      "minimum_level": 1,
+      "section": "V6.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.4.2",
+      "minimum_level": 1,
+      "section": "V6.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.4.3",
+      "minimum_level": 2,
+      "section": "V6.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.4.4",
+      "minimum_level": 2,
+      "section": "V6.4",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.5.1",
+      "minimum_level": 2,
+      "section": "V6.5",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.5.2",
+      "minimum_level": 2,
+      "section": "V6.5",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.5.3",
+      "minimum_level": 2,
+      "section": "V6.5",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.5.4",
+      "minimum_level": 2,
+      "section": "V6.5",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.5.5",
+      "minimum_level": 2,
+      "section": "V6.5",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.6.1",
+      "minimum_level": 2,
+      "section": "V6.6",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.6.2",
+      "minimum_level": 2,
+      "section": "V6.6",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.6.3",
+      "minimum_level": 2,
+      "section": "V6.6",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.8.1",
+      "minimum_level": 2,
+      "section": "V6.8",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.8.2",
+      "minimum_level": 2,
+      "section": "V6.8",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.8.3",
+      "minimum_level": 2,
+      "section": "V6.8",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V6",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The project has no human account, password, MFA, or federated login flow; the local daemon token is assessed under V7 and V8.",
+      "id": "V6.8.4",
+      "minimum_level": 2,
+      "section": "V6.8",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.1.1",
+      "minimum_level": 2,
+      "section": "V7.1",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.1.2",
+      "minimum_level": 2,
+      "section": "V7.1",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No federated identity system exists.",
+      "id": "V7.1.3",
+      "minimum_level": 2,
+      "section": "V7.1",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.2.1",
+      "minimum_level": 1,
+      "section": "V7.2",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.2.2",
+      "minimum_level": 1,
+      "section": "V7.2",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.2.3",
+      "minimum_level": 1,
+      "section": "V7.2",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no interactive user authentication/reahentication step.",
+      "id": "V7.2.4",
+      "minimum_level": 1,
+      "section": "V7.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.3.1",
+      "minimum_level": 2,
+      "section": "V7.3",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.3.2",
+      "minimum_level": 2,
+      "section": "V7.3",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.4.1",
+      "minimum_level": 1,
+      "section": "V7.4",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There are no user accounts to disable or delete.",
+      "id": "V7.4.2",
+      "minimum_level": 1,
+      "section": "V7.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There are no user authentication factors to change.",
+      "id": "V7.4.3",
+      "minimum_level": 2,
+      "section": "V7.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no authenticated web page or logout UI.",
+      "id": "V7.4.4",
+      "minimum_level": 2,
+      "section": "V7.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no user-session administration console.",
+      "id": "V7.4.5",
+      "minimum_level": 2,
+      "section": "V7.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There are no account attributes or authentication factors.",
+      "id": "V7.5.1",
+      "minimum_level": 2,
+      "section": "V7.5",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no user-facing session inventory UI.",
+      "id": "V7.5.2",
+      "minimum_level": 2,
+      "section": "V7.5",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No relying-party or identity-provider federation exists.",
+      "id": "V7.6.1",
+      "minimum_level": 2,
+      "section": "V7.6",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V7",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_daemon_limits.py",
+        "docs/asvs.md"
+      ],
+      "id": "V7.6.2",
+      "minimum_level": 2,
+      "section": "V7.6",
+      "status": "enforced",
+      "verification": "One daemon is allowed per NF home; each process uses a fresh 256-bit CSPRNG token, verifies it locally in constant time, has idle and absolute lifetimes, and invalidates the session on shutdown."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V8.1.1",
+      "minimum_level": 1,
+      "section": "V8.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No field-level multi-user data authorization surface exists.",
+      "id": "V8.1.2",
+      "minimum_level": 2,
+      "section": "V8.1",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V8.2.1",
+      "minimum_level": 1,
+      "section": "V8.2",
+      "status": "enforced",
+      "verification": "Daemon command execution requires the process-scoped token; MCP exposes only an explicit read-only tool and resource allowlist."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No multi-user object store or IDOR/BOLA surface exists.",
+      "id": "V8.2.2",
+      "minimum_level": 1,
+      "section": "V8.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No multi-user property-level authorization surface exists.",
+      "id": "V8.2.3",
+      "minimum_level": 2,
+      "section": "V8.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V8.3.1",
+      "minimum_level": 1,
+      "section": "V8.3",
+      "status": "enforced",
+      "verification": "Daemon command execution requires the process-scoped token; MCP exposes only an explicit read-only tool and resource allowlist."
+    },
+    {
+      "chapter": "V8",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application is not multi-tenant.",
+      "id": "V8.4.1",
+      "minimum_level": 2,
+      "section": "V8.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V11.1.1",
+      "minimum_level": 2,
+      "section": "V11.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V11.1.2",
+      "minimum_level": 2,
+      "section": "V11.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/atoms/hash.py",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V11.2.1",
+      "minimum_level": 2,
+      "section": "V11.2",
+      "status": "enforced",
+      "verification": "Authentication tokens use secrets.token_hex(32), integrity checks use SHA-256, and token comparison uses hmac.compare_digest."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V11.2.2",
+      "minimum_level": 2,
+      "section": "V11.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/atoms/hash.py",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V11.2.3",
+      "minimum_level": 2,
+      "section": "V11.2",
+      "status": "enforced",
+      "verification": "Authentication tokens use secrets.token_hex(32), integrity checks use SHA-256, and token comparison uses hmac.compare_digest."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No block cipher or padding scheme is used.",
+      "id": "V11.3.1",
+      "minimum_level": 1,
+      "section": "V11.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No encryption cipher is used in the runtime; SHA-256 is used for integrity and HMAC comparison for token equality.",
+      "id": "V11.3.2",
+      "minimum_level": 1,
+      "section": "V11.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application does not encrypt local user content.",
+      "id": "V11.3.3",
+      "minimum_level": 2,
+      "section": "V11.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/atoms/hash.py",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V11.4.1",
+      "minimum_level": 1,
+      "section": "V11.4",
+      "status": "enforced",
+      "verification": "Authentication tokens use secrets.token_hex(32), integrity checks use SHA-256, and token comparison uses hmac.compare_digest."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No passwords are stored or verified.",
+      "id": "V11.4.2",
+      "minimum_level": 2,
+      "section": "V11.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/atoms/hash.py",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V11.4.3",
+      "minimum_level": 2,
+      "section": "V11.4",
+      "status": "enforced",
+      "verification": "Authentication tokens use secrets.token_hex(32), integrity checks use SHA-256, and token comparison uses hmac.compare_digest."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No password-derived key material exists.",
+      "id": "V11.4.4",
+      "minimum_level": 2,
+      "section": "V11.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/atoms/hash.py",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V11.5.1",
+      "minimum_level": 2,
+      "section": "V11.5",
+      "status": "enforced",
+      "verification": "Authentication tokens use secrets.token_hex(32), integrity checks use SHA-256, and token comparison uses hmac.compare_digest."
+    },
+    {
+      "chapter": "V11",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V11.6.1",
+      "minimum_level": 2,
+      "section": "V11.6",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.1.1",
+      "minimum_level": 1,
+      "section": "V12.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.1.2",
+      "minimum_level": 2,
+      "section": "V12.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.1.3",
+      "minimum_level": 2,
+      "section": "V12.1",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.2.1",
+      "minimum_level": 1,
+      "section": "V12.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.2.2",
+      "minimum_level": 1,
+      "section": "V12.2",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.3.1",
+      "minimum_level": 2,
+      "section": "V12.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.3.2",
+      "minimum_level": 2,
+      "section": "V12.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.3.3",
+      "minimum_level": 2,
+      "section": "V12.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V12",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The scoped runtime has no remote network listener; loopback daemon traffic is protected by process-scoped authorization rather than TLS.",
+      "id": "V12.3.4",
+      "minimum_level": 2,
+      "section": "V12.3",
+      "status": "not-applicable",
+      "verification": "The scoped threat surface does not implement this chapter."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.1.1",
+      "minimum_level": 2,
+      "section": "V13.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "packaging/npm/tools/build_release.py",
+        "packaging/npm/tools/verify-package.mjs",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V13.2.1",
+      "minimum_level": 2,
+      "section": "V13.2",
+      "status": "enforced",
+      "verification": "IPC is loopback-only with a per-process token; no default credential exists; release payload allowlists exclude VCS metadata and development outputs."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.2.2",
+      "minimum_level": 2,
+      "section": "V13.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "packaging/npm/tools/build_release.py",
+        "packaging/npm/tools/verify-package.mjs",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V13.2.3",
+      "minimum_level": 2,
+      "section": "V13.2",
+      "status": "enforced",
+      "verification": "IPC is loopback-only with a per-process token; no default credential exists; release payload allowlists exclude VCS metadata and development outputs."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.2.4",
+      "minimum_level": 2,
+      "section": "V13.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application is not a web/application server.",
+      "id": "V13.2.5",
+      "minimum_level": 2,
+      "section": "V13.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.3.1",
+      "minimum_level": 2,
+      "section": "V13.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.3.2",
+      "minimum_level": 2,
+      "section": "V13.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "packaging/npm/tools/build_release.py",
+        "packaging/npm/tools/verify-package.mjs",
+        "desktop/tests/test_daemon.py"
+      ],
+      "id": "V13.4.1",
+      "minimum_level": 1,
+      "section": "V13.4",
+      "status": "enforced",
+      "verification": "IPC is loopback-only with a per-process token; no default credential exists; release payload allowlists exclude VCS metadata and development outputs."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V13.4.2",
+      "minimum_level": 2,
+      "section": "V13.4",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application does not serve directory listings.",
+      "id": "V13.4.3",
+      "minimum_level": 2,
+      "section": "V13.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application has no HTTP method surface.",
+      "id": "V13.4.4",
+      "minimum_level": 2,
+      "section": "V13.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V13",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "The application exposes no HTTP API documentation or monitoring endpoint.",
+      "id": "V13.4.5",
+      "minimum_level": 2,
+      "section": "V13.4",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V14.1.1",
+      "minimum_level": 2,
+      "section": "V14.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V14.1.2",
+      "minimum_level": 2,
+      "section": "V14.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No HTTP URLs or query strings carry sensitive data.",
+      "id": "V14.2.1",
+      "minimum_level": 1,
+      "section": "V14.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no server-side HTTP cache.",
+      "id": "V14.2.2",
+      "minimum_level": 2,
+      "section": "V14.2",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "desktop/src/core/mcp_runtime.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "packaging/supply-chain/package-sources.json"
+      ],
+      "id": "V14.2.3",
+      "minimum_level": 2,
+      "section": "V14.2",
+      "status": "enforced",
+      "verification": "Runtime code contains no analytics or tracker dependency, and MCP advertises openWorldHint=false for every tool."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V14.2.4",
+      "minimum_level": 2,
+      "section": "V14.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no browser DOM or browser session.",
+      "id": "V14.3.1",
+      "minimum_level": 1,
+      "section": "V14.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no browser HTTP cache.",
+      "id": "V14.3.2",
+      "minimum_level": 2,
+      "section": "V14.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V14",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no browser storage.",
+      "id": "V14.3.3",
+      "minimum_level": 2,
+      "section": "V14.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "SECURITY.md",
+        "packaging/supply-chain/suppliers.json",
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_supply_chain_standards.py"
+      ],
+      "id": "V15.1.1",
+      "minimum_level": 1,
+      "section": "V15.1",
+      "status": "enforced",
+      "verification": "Remediation thresholds, SBOM/supplier inventories, bounded memory/CPU controls, and closed input schemas are machine-verified."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "SECURITY.md",
+        "packaging/supply-chain/suppliers.json",
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_supply_chain_standards.py"
+      ],
+      "id": "V15.1.2",
+      "minimum_level": 2,
+      "section": "V15.1",
+      "status": "enforced",
+      "verification": "Remediation thresholds, SBOM/supplier inventories, bounded memory/CPU controls, and closed input schemas are machine-verified."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V15.1.3",
+      "minimum_level": 2,
+      "section": "V15.1",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V15.2.1",
+      "minimum_level": 1,
+      "section": "V15.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "SECURITY.md",
+        "packaging/supply-chain/suppliers.json",
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_supply_chain_standards.py"
+      ],
+      "id": "V15.2.2",
+      "minimum_level": 2,
+      "section": "V15.2",
+      "status": "enforced",
+      "verification": "Remediation thresholds, SBOM/supplier inventories, bounded memory/CPU controls, and closed input schemas are machine-verified."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V15.2.3",
+      "minimum_level": 2,
+      "section": "V15.2",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V15.3.1",
+      "minimum_level": 1,
+      "section": "V15.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No backend HTTP redirect client exists in the runtime.",
+      "id": "V15.3.2",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "SECURITY.md",
+        "packaging/supply-chain/suppliers.json",
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "desktop/tests/test_supply_chain_standards.py"
+      ],
+      "id": "V15.3.3",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "enforced",
+      "verification": "Remediation thresholds, SBOM/supplier inventories, bounded memory/CPU controls, and closed input schemas are machine-verified."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "No HTTP proxy or middleware IP forwarding exists.",
+      "id": "V15.3.4",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V15.3.5",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no JavaScript runtime in the scoped application.",
+      "id": "V15.3.6",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V15",
+      "evidence": [
+        "docs/asvs.md"
+      ],
+      "gap": "There is no HTTP parameter parser in the scoped application.",
+      "id": "V15.3.7",
+      "minimum_level": 2,
+      "section": "V15.3",
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.1.1",
+      "minimum_level": 2,
+      "section": "V16.1",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.2.1",
+      "minimum_level": 2,
+      "section": "V16.2",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.2.2",
+      "minimum_level": 2,
+      "section": "V16.2",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.2.3",
+      "minimum_level": 2,
+      "section": "V16.2",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.2.4",
+      "minimum_level": 2,
+      "section": "V16.2",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.2.5",
+      "minimum_level": 2,
+      "section": "V16.2",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.3.1",
+      "minimum_level": 2,
+      "section": "V16.3",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.3.2",
+      "minimum_level": 2,
+      "section": "V16.3",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.3.3",
+      "minimum_level": 2,
+      "section": "V16.3",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.3.4",
+      "minimum_level": 2,
+      "section": "V16.3",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.4.1",
+      "minimum_level": 2,
+      "section": "V16.4",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V16.4.2",
+      "minimum_level": 2,
+      "section": "V16.4",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/mcp_runtime.py",
+        "scripts/plugin_host.py",
+        "docs/asvs.md"
+      ],
+      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "id": "V16.4.3",
+      "minimum_level": 2,
+      "section": "V16.4",
+      "status": "partial",
+      "verification": "The control has partial repository evidence."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.5.1",
+      "minimum_level": 2,
+      "section": "V16.5",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.5.2",
+      "minimum_level": 2,
+      "section": "V16.5",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    },
+    {
+      "chapter": "V16",
+      "evidence": [
+        "desktop/src/core/plog.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_security_logging.py",
+        "desktop/tests/test_daemon.py",
+        "desktop/tests/test_mcp_runtime.py"
+      ],
+      "id": "V16.5.3",
+      "minimum_level": 2,
+      "section": "V16.5",
+      "status": "enforced",
+      "verification": "Security events use UTC timestamps and structured metadata; auth, authorization, bypass, and unexpected-error paths are logged with single-line escaping and credential redaction while clients receive generic errors."
+    }
+  ],
+  "schema": "nf-asvs-evidence/1",
+  "standard": {
+    "commit": "5cf9b032440be53ce345ab3c130fda46ba1ce7a2",
+    "excluded_chapters": {
+      "V10": "The project does not implement an OAuth or OIDC provider/client runtime.",
+      "V17": "The project has no WebRTC surface.",
+      "V3": "No browser frontend is shipped by the scoped runtime.",
+      "V9": "The project does not issue self-contained user tokens."
+    },
+    "name": "OWASP Application Security Verification Standard",
+    "repository": "https://github.com/OWASP/ASVS",
+    "scope": [
+      "V1",
+      "V2",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V11",
+      "V12",
+      "V13",
+      "V14",
+      "V15",
+      "V16"
+    ],
+    "scope_note": "Internal risk-tailored assessment of the local CLI, daemon, MCP, plugin, file, logging, and configuration surfaces.",
+    "version": "5.0.0"
+  }
+}

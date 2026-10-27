@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1445,
+    "app": 1446,
     "entry": 26,
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 281,
-    "verify": 1127
+    "support": 283,
+    "verify": 1131
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5759,6 +5759,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Fail-closed validator for the scoped OWASP ASVS 5.0.0 L2 evidence matrix.",
+      "path": "desktop/src/core/asvs_policy.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "原子写（同目录临时文件 + `os.replace`）：读者永远看不到半截内容。",
       "path": "desktop/src/core/atomic_write.py",
       "role": "prod",
@@ -7319,6 +7325,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "OWASP ASVS 5.0.0 scoped evidence matrix regression tests.",
+      "path": "desktop/tests/test_asvs_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "原子写（`core/atomic_write.py`）回归测试：读者不见半截、失败不留残、LF 落盘。",
       "path": "desktop/tests/test_atomic_write.py",
       "role": "verify",
@@ -8863,6 +8875,12 @@
     {
       "function": "P-C5 判据：密封跑法（Dockerfile.crosscheck）与 CI 接线必须是**真钉住**的，不是摆样子。",
       "path": "desktop/tests/test_sealed_crosscheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ASVS V16 security-event logging and redaction regression tests.",
+      "path": "desktop/tests/test_security_logging.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12965,6 +12983,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate the scoped OWASP ASVS 5.0.0 Level 2 evidence matrix.",
+      "path": "scripts/asvs_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "check37 · 知识层门禁（双源知识：权威分层 / 查询有序 / 时效 / 消化可追溯 / 认知裁剪）。",
       "path": "scripts/check37_knowledge.py",
       "role": "verify",
@@ -13056,17 +13080,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9e01f25ba800b352bc6284e2012198c41760c28e699b7ccd7a8884231ba2e4ce",
+  "root_digest": "a946ba1a20d0f808c35df11d12688ec0c44a1a08c10ca5156834852c254f818d",
   "rule_counts": {
-    "R-app": 1445,
-    "R-catch": 126,
+    "R-app": 1446,
+    "R-catch": 127,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
-    "R-support": 129,
-    "R-verify": 1009,
-    "auto:R-core": 257
+    "R-support": 130,
+    "R-verify": 1012,
+    "auto:R-core": 258
   },
   "schema": "nf-role-coordinates/1"
 }

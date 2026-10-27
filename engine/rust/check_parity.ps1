@@ -418,7 +418,7 @@ if ($last.Count -eq 2 -and $last[1] -eq '0') {
     Write-Host ("  [FAIL] 差分不一致"); $script:Failed++
 }
 
-# ---- 面 12 · verify_report（28 条判据聚合 + 声明面 + root_digest + 渲染）
+# ---- 面 12 · verify_report（32 条判据聚合 + 声明面 + root_digest + 渲染）
 Write-Host '== 面 12 · verify_report 内核（聚合/归一/摘要/渲染） =='
 $vrResults = Join-Path $Parity 'vr_results.json'
 $vrPy = Join-Path $Parity 'vr_py.json'
@@ -428,7 +428,7 @@ import sys, json
 sys.path.insert(0, 'desktop/src')
 from core import verify_report as vr
 root = r'$Root'
-# 本线已自主算出 25 条；其余喂入子结果（未移植的扫描器；asset_contract 自 2026-10-14 退出原生面）
+# 本线已自主算出 26 条；其余喂入子结果（未移植扫描器；ASVS 由 Python 证据门喂入）
 NATIVE = {'schema', 'doc_markers', 'baseline', 'self_stats', 'payload', 'assets_ledger', 'instruction', 'key_naming', 'intake', 'library', 'library_projection', 'rating', 'audit', 'workflow_policy', 'judgement_coverage', 'license', 'coupling', 'contract', 'knowledge', 'conformance', 'receipts', 'drill_fidelity', 'purity', 'conformance_report', 'code_metrics', 'rating_decided'}
 res = {}
 for spec in vr.SPECS:
