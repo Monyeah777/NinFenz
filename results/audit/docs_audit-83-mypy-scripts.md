@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:f7e42286a7edd88948cbe13d2cb7cce45ad462d94584b4722918f7b0c847d6d5
+  - scripts/nf.py:61b767925d5f9c34ec5bbfb34bb48b91aee559ba26e0359575ad29f9b911cadd
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
+  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
 ---
+> 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations
+
+> 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
+
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
 
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common

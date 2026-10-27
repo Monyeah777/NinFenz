@@ -28,12 +28,14 @@ subjects:
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:3bb1f0b33b4fb0f4b789e7354008a63498032cbcc23319598c28d2a036d83dba
+  - desktop/tests/test_cli_json_face.py:a07e71a5fd0fe7c3bda113d31b9cd53e5f732ca962476613b3658e69fa370c9e
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:cfbdf999ed0a37cb082585c24e1efa58512c532cde672f9a1a9c39c16f5ec171
 ---
+> 重审（2026-10-27）：S2s: dispatch table + scanner face extension
+
 > 重审（2026-10-27）：S2b: verify/meta handler group -> nf_cmds/surfaces.py
 
 > 重审（2026-10-27）：S2a: shared CLI helpers -> scripts/nf_cmds/common.py

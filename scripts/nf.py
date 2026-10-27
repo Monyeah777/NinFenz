@@ -42,18 +42,18 @@ if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
 from nf_cmds.common import (json_doc, _file_shape_issue, _existing_nonfile_issue, _portable_path, _rel_display, _rel_out, _machine_fail, _release_freeze, _open_store)
-from nf_cmds.surfaces import (_cmd_lsp, _cmd_facts, _cmd_license, _cmd_endpoint, _cmd_assertions, _cmd_conformance, _cmd_stats, _cmd_registry, _cmd_model, _cmd_spec, _cmd_ir, _cmd_ops, _cmd_glossary, _cmd_security, _cmd_privacy)
-from nf_cmds.misc import (_cmd_sig, _cmd_diff, _cmd_telemetry, _cmd_changelog, _cmd_receipts, _cmd_layers, _cmd_attest, _cmd_runtime, _cmd_agent)
-from nf_cmds.shelf import (_cmd_combine, _cmd_output, _cmd_market)
-from nf_cmds.domain import _cmd_domain
-from nf_cmds.knowledge import _cmd_knowledge
-from nf_cmds.asset import _cmd_asset
-from nf_cmds.library import _cmd_library
-from nf_cmds.module import _cmd_module
-from nf_cmds.assemble import _cmd_assemble
-from nf_cmds.govern import (_cmd_design_audit, _cmd_approve, _cmd_handover, _cmd_postmortem, _cmd_audit, _cmd_decide, _cmd_decisions, _cmd_review, _cmd_workloop)
-from nf_cmds.integrate import (_cmd_toolface, _cmd_transparency, _cmd_locales, _cmd_events, _cmd_driver, _cmd_state_front, _cmd_interop, _cmd_render, _cmd_bench)
-from nf_cmds.library_ops import (_cmd_patterns, _cmd_related, _cmd_impact, _cmd_rename, _cmd_who_refers, _cmd_cognition, _cmd_rfc)
+from nf_cmds.surfaces import (_cmd_lsp, _cmd_facts, _cmd_license, _cmd_endpoint, _cmd_assertions, _cmd_conformance, _cmd_stats, _cmd_registry, _cmd_model, _cmd_spec, _cmd_ir, _cmd_ops, _cmd_glossary, _cmd_security, _cmd_privacy)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.misc import (_cmd_sig, _cmd_diff, _cmd_telemetry, _cmd_changelog, _cmd_receipts, _cmd_layers, _cmd_attest, _cmd_runtime, _cmd_agent)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.shelf import (_cmd_combine, _cmd_output, _cmd_market)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.domain import _cmd_domain  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.knowledge import _cmd_knowledge  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.asset import _cmd_asset  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.library import _cmd_library  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.module import _cmd_module  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.assemble import _cmd_assemble  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.govern import (_cmd_design_audit, _cmd_approve, _cmd_handover, _cmd_postmortem, _cmd_audit, _cmd_decide, _cmd_decisions, _cmd_review, _cmd_workloop)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.integrate import (_cmd_toolface, _cmd_transparency, _cmd_locales, _cmd_events, _cmd_driver, _cmd_state_front, _cmd_interop, _cmd_render, _cmd_bench)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
+from nf_cmds.library_ops import (_cmd_patterns, _cmd_related, _cmd_impact, _cmd_rename, _cmd_who_refers, _cmd_cognition, _cmd_rfc)  # noqa: F401 - 由 _dispatch_table 经 globals() 解析
 interp_diet.restore()
 
 
@@ -1625,16 +1625,8 @@ def _try_rust_face(args) -> Optional[int]:
 
 
 
-def main(argv=None) -> int:
-    # 效率：`--version` 是最常被调用的探测命令，而构建 argparse 面 ≈100 ms——
-    # 它不需要命令面，直接短路（输出与 argparse 的 version 动作逐字一致）。
-    if argv is not None and list(argv) == ["--version"]:
-        print("nf %s" % NF_CLI_VERSION)
-        return 0
-    args = _build_parser().parse_args(argv)
-    if args.cmd is None:
-        _build_parser().print_help()
-        return 0
+def _preflight(args):
+    """入口闸门：--root / --key-file / --registry / 路径逃逸 / 编码 / Rust 面。"""
     # `--root` 落点闸门（2026-09-30）：读类命令的 `--root` 语义是「对**另一棵树**做同一套
     # 体检」。落点不在场 / 是文件时，此前照样吐**肯定结论**（实测：`nf asset verify --root
     # README.md` → 「✓ 台账闭合」、`nf module verify --root <不存在>` → 「✓ 引用门禁全绿」）——
@@ -1689,171 +1681,23 @@ def main(argv=None) -> int:
     _rust_rc = _try_rust_face(args)
     if _rust_rc is not None:
         return _rust_rc
-    if args.cmd == "agent":
-        return _cmd_agent(args)
-    if args.cmd == "cli":
-        return _cmd_cli(args)
-    if args.cmd in ("shell", "terminal"):
-        return _cmd_shell(args)
-    if args.cmd == "layers":
-        return _cmd_layers(args)
-    if args.cmd == "verify":
-        return _cmd_verify(args)
-    if args.cmd == "daemon":
-        return _cmd_daemon(args)
-    if args.cmd == "help":
-        return _cmd_help(args)
-    if args.cmd == "stats":
-        return _cmd_stats(args)
-    if args.cmd == "facts":
-        return _cmd_facts(args)
-    if args.cmd == "doctor":
-        return _cmd_doctor(args)
-    if args.cmd == "completion":
-        return _cmd_completion(args)
-    if args.cmd == "assemble":
-        return _cmd_assemble(args)
-    if args.cmd == "preset":
-        return _cmd_preset(args)
-    if args.cmd == "release":
-        return _cmd_release(args)
-    if args.cmd == "changelog":
-        return _cmd_changelog(args)
-    if args.cmd == "locales":
-        return _cmd_locales(args)
-    if args.cmd == "toolface":
-        return _cmd_toolface(args)
-    if args.cmd == "worldmodel":
-        return _cmd_worldmodel(args)
-    if args.cmd == "register":
-        return _cmd_register(args)
-    if args.cmd == "registry":
-        return _cmd_registry(args)
-    if args.cmd == "asset":
-        return _cmd_asset(args)
-    if args.cmd == "pipeline":
-        return _cmd_pipeline(args)
-    if args.cmd == "module":
-        return _cmd_module(args)
-    if args.cmd == "sig":
-        return _cmd_sig(args)
-    if args.cmd == "attest":
-        return _cmd_attest(args)
-    if args.cmd == "score":
-        return _cmd_score(args)
-    if args.cmd == "lint":
-        return _cmd_lint(args)
-    if args.cmd == "lsp":
-        return _cmd_lsp(args)
-    if args.cmd == "license":
-        return _cmd_license(args)
-    if args.cmd == "telemetry":
-        return _cmd_telemetry(args)
-    if args.cmd == "library":
-        return _cmd_library(args)
-    if args.cmd == "conformance":
-        return _cmd_conformance(args)
-    if args.cmd == "glossary":
-        return _cmd_glossary(args)
-    if args.cmd == "approve":
-        return _cmd_approve(args)
-    if args.cmd == "events":
-        return _cmd_events(args)
-    if args.cmd == "receipts":
-        return _cmd_receipts(args)
-    if args.cmd == "driver":
-        return _cmd_driver(args)
-    if args.cmd == "rfc":
-        return _cmd_rfc(args)
-    if args.cmd == "patterns":
-        return _cmd_patterns(args)
-    if args.cmd == "bench":
-        return _cmd_bench(args)
-    if args.cmd == "runtime":
-        return _cmd_runtime(args)
-    if args.cmd == "endpoint":
-        return _cmd_endpoint(args)
-    if args.cmd == "interop":
-        return _cmd_interop(args)
-    if args.cmd == "transparency":
-        return _cmd_transparency(args)
-    if args.cmd == "output":
-        return _cmd_output(args)
-    if args.cmd == "security":
-        return _cmd_security(args)
-    if args.cmd == "ops":
-        return _cmd_ops(args)
-    if args.cmd == "privacy":
-        return _cmd_privacy(args)
-    if args.cmd == "domain":
-        return _cmd_domain(args)
-    if args.cmd == "combine":
-        return _cmd_combine(args)
-    if args.cmd == "decide":
-        return _cmd_decide(args)
-    if args.cmd == "workloop":
-        return _cmd_workloop(args)
-    if args.cmd == "review":
-        return _cmd_review(args)
-    if args.cmd == "knowledge":
-        return _cmd_knowledge(args)
-    if args.cmd == "assertions":
-        return _cmd_assertions(args)
-    if args.cmd == "model":
-        return _cmd_model(args)
-    if args.cmd == "decisions":
-        return _cmd_decisions(args)
-    if args.cmd == "handover":
-        return _cmd_handover(args)
-    if args.cmd == "postmortem":
-        return _cmd_postmortem(args)
-    if args.cmd == "audit":
-        return _cmd_audit(args)
-    if args.cmd == "cognition":
-        return _cmd_cognition(args)
-    if args.cmd == "st-validate":
-        return _cmd_st_validate(args)
-    if args.cmd == "state-front":
-        return _cmd_state_front(args)
-    if args.cmd == "ir":
-        return _cmd_ir(args)
-    if args.cmd == "diff":
-        return _cmd_diff(args)
-    if args.cmd == "related":
-        return _cmd_related(args)
-    if args.cmd == "explain":
-        return _cmd_explain(args)
-    if args.cmd == "demo":
-        return _cmd_demo(args)
-    if args.cmd == "market":
-        return _cmd_market(args)
-    if args.cmd == "who-refers":
-        return _cmd_who_refers(args)
-    if args.cmd == "impact":
-        return _cmd_impact(args)
-    if args.cmd == "rename":
-        return _cmd_rename(args)
-    if args.cmd == "import":
-        return _cmd_import(args)
-    if args.cmd == "spec":
-        return _cmd_spec(args)
-    if args.cmd == "render":
-        return _cmd_render(args)
-    if args.cmd == "serve":
-        return _cmd_serve(args)
-    if args.cmd == "design":
-        if args.design_cmd == "audit":
-            # 注意：这里必须指向 **design audit** 实现（1226 段）——此前与 `nf audit`
-            # 的同名函数冲突（flake8 F811），`nf design audit ls` 实际打到 nf audit 那套
-            # （实测输出「== nf audit（26 件）==」），已重命名为 _cmd_design_audit 修正。
-            return _cmd_design_audit(args)
-        return _cmd_design(args)
-    if args.cmd == "nfal":
-        return _cmd_nfal(args)
-    if args.cmd != "run":
-        _build_parser().print_help()
-        return 2
+    return None
 
+
+_DISPATCH_CACHE = None
+
+
+def _dispatch_table():
+    """cmd → handler 的可调用表（首次调用时解析，避免前向定义问题）。"""
+    global _DISPATCH_CACHE
+    if _DISPATCH_CACHE is None:
+        from nf_cmds.dispatch import COMMANDS
+        _DISPATCH_CACHE = {name: globals()[fn] for name, fn in COMMANDS.items()}
+    return _DISPATCH_CACHE
+
+
+def _run_pipeline(args) -> int:
+    """nf run：管线装配 + 质量门 + 导出（main 的兜底分支）。"""
     from core.pipeline import pipe
     from core.pipeline_loader import load_pipeline_file
 
@@ -1938,6 +1782,34 @@ def main(argv=None) -> int:
         return 1
     print("\n★ 全链管道 PASSED ✓")
     return 0
+
+def main(argv=None) -> int:
+    # 效率：`--version` 是最常被调用的探测命令，而构建 argparse 面 ≈100 ms——
+    # 它不需要命令面，直接短路（输出与 argparse 的 version 动作逐字一致）。
+    if argv is not None and list(argv) == ["--version"]:
+        print("nf %s" % NF_CLI_VERSION)
+        return 0
+    args = _build_parser().parse_args(argv)
+    if args.cmd is None:
+        _build_parser().print_help()
+        return 0
+    rc = _preflight(args)
+    if rc is not None:
+        return rc
+    if args.cmd == "design":
+        if args.design_cmd == "audit":
+            # 注意：这里必须指向 **design audit** 实现——此前与 `nf audit`
+            # 的同名函数冲突（flake8 F811），`nf design audit ls` 实际打到 nf audit 那套
+            # （实测输出「== nf audit（26 件）==」），已重命名为 _cmd_design_audit 修正。
+            return _cmd_design_audit(args)
+        return _cmd_design(args)
+    _handler = _dispatch_table().get(args.cmd)
+    if _handler is not None:
+        return _handler(args)
+    if args.cmd == "run":
+        return _run_pipeline(args)
+    _build_parser().print_help()
+    return 2
 
 
 

@@ -81,7 +81,10 @@ def dict_literal_faces(src: str):
 
 class JsonFaceStaticTest(unittest.TestCase):
     def setUp(self):
+        # 端壳已拆包：机器面字面量分布在 nf.py + nf_cmds/*（拆分不改判据，只改扫描面）。
         self.src = Path(NF).read_text(encoding="utf-8")
+        for part in sorted((ROOT / "scripts" / "nf_cmds").glob("*.py")):
+            self.src += "\n" + part.read_text(encoding="utf-8")
 
     def test_scanner_is_not_vacuous(self):
         """判据不空转：必须真的扫到面（否则结构变了，本件形同虚设）。"""

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
+  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
 ---
+> 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
+
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
 
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common

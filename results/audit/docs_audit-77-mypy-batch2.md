@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
+  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
 ---
+> 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
+
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
 
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
