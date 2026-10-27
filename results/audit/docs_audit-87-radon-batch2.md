@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,10 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|---|
 | `decisions.py` | 抽出 `_check_entry_id` / `_check_required_fields` / `_check_sections` / `_check_entry_fields` / `_check_entry_evidence` / `_check_entry_lifecycle` / `_check_supersede_chains` / `_check_supersedes` | `scan` 48(F) → **无 ≥C 函数**（最大 10） |

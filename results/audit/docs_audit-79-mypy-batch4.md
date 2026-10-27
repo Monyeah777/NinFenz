@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -260,6 +260,10 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|---|
 | `desktop/src/core/lsp.py` | 8 | `read_message` 返回哨兵 `_BAD_FRAME`（`object()`），返回标注由 `Optional[Dict]` 改为 `Any`（哨兵语义不变）；规则集键取 `str(d.get("code"))` |

@@ -19,9 +19,15 @@ class AsvsPolicyTest(unittest.TestCase):
         issues, stats = asvs_policy.scan(ROOT)
         self.assertEqual([], issues)
         self.assertEqual(191, stats["requirements"])
-        self.assertEqual({"enforced": 49, "partial": 39, "not-applicable": 103},
+        self.assertEqual({"enforced": 78, "partial": 4, "not-applicable": 109},
                          stats["statuses"])
         self.assertEqual(13, len(stats["chapters"]))
+        self.assertGreaterEqual(stats["controls"]["data_classes"], 5)
+
+        doc = json.loads((ROOT / asvs_policy.MATRIX_REL).read_text(encoding="utf-8"))
+        partial = {row["id"] for row in doc["requirements"]
+                   if row["status"] == "partial"}
+        self.assertEqual({"V5.2.2", "V11.2.2", "V16.4.2", "V16.4.3"}, partial)
 
     def _copy_root(self):
         tmp = tempfile.TemporaryDirectory()

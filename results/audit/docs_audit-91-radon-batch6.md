@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -261,6 +261,10 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|
 | 按 L1-L10 拆 | `_rule_l1`（+`_rule_l1_assets`/`_rule_l1_files`）· `_rule_l2` · `_rule_l3` · `_rule_l4`（+`_walk_cycle`）· `_rule_l5` · `_rule_l6` · `_rule_l7` · `_rule_l8`（+`_collect_judged_refs`）· `_rule_l9` · `_rule_l10`；`_rule_issues` 只做缓存/派生面准备与依次分派 |

@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -298,6 +298,10 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|
 | 文档面译件 | 新增 `docs/en/{mcp,terminal,layers}.md` + `docs/ja/{mcp,terminal,layers}.md`（逐节镜像；代码块/命令/路径/内联锚点逐字保留） |

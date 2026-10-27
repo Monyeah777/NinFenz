@@ -83,7 +83,10 @@
 
 应用安全作用域评估见 [docs/asvs.md](docs/asvs.md)：覆盖本地 CLI、daemon、MCP、插件、
 文件处理、配置、密钥、日志与错误面。该矩阵是内部 ASVS 5.0.0 L2 证据，不是第三方认证；
-`partial` 与 `not-applicable` 项均保留明确 gap。
+`partial` 与 `not-applicable` 项均保留明确 gap。输入规则、数据分类、密码算法、通信、
+授权、资源上限和生产默认值的机读控制清单见
+[packaging/security/application-security-controls.json](packaging/security/application-security-controls.json)，
+人读说明见 [docs/security-controls.md](docs/security-controls.md)。
 
 ## 八、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
 

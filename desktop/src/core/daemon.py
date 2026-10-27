@@ -57,6 +57,8 @@ MAX_ARGV_CHARS = 8192
 MAX_ARGV_TOTAL = 65536
 #: 工作目录上限（字符）；cwd 只是定位参数，不应成为超长内存/路径解析载荷。
 MAX_CWD_CHARS = 32768
+#: 默认空闲寿命（秒）；0 表示不启用空闲回收（绝对寿命仍独立生效）。
+DEFAULT_IDLE_TIMEOUT = 3600
 #: 绝对寿命（秒）：空闲计时会被请求续命，不能替代进程最大存活时间。
 DEFAULT_MAX_LIFETIME = 24 * 60 * 60
 
@@ -885,7 +887,8 @@ def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
         return False
 
 
-def start(root: Path, idle_timeout: float = float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
+def start(root: Path, idle_timeout: float = float(os.environ.get(
+            "NF_DAEMON_IDLE", DEFAULT_IDLE_TIMEOUT)),
           wait: float = 30.0,
           watch: bool = False) -> Tuple[bool, str]:
     """拉起守护（后台子进程）→ (是否成功, 说明)。已在跑则直接返回 True。"""

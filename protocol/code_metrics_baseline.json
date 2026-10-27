@@ -86,9 +86,9 @@
       "max_fn_lines": 15
     },
     "desktop/src/core/asvs_policy.py": {
-      "lines": 130,
+      "lines": 135,
       "max_fn_cc": 45,
-      "max_fn_lines": 94
+      "max_fn_lines": 99
     },
     "desktop/src/core/atomic_write.py": {
       "lines": 283,
@@ -231,7 +231,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 994,
+      "lines": 997,
       "max_fn_cc": 17,
       "max_fn_lines": 77
     },
@@ -1120,6 +1120,11 @@
       "max_fn_cc": 9,
       "max_fn_lines": 37
     },
+    "desktop/src/core/security_controls.py": {
+      "lines": 247,
+      "max_fn_cc": 71,
+      "max_fn_lines": 155
+    },
     "desktop/src/core/semantic_conflict.py": {
       "lines": 118,
       "max_fn_cc": 16,
@@ -1316,9 +1321,9 @@
       "max_fn_lines": 71
     },
     "scripts/asvs_policy.py": {
-      "lines": 46,
-      "max_fn_cc": 6,
-      "max_fn_lines": 23
+      "lines": 51,
+      "max_fn_cc": 7,
+      "max_fn_lines": 28
     },
     "scripts/build_lsp_transcript.py": {
       "lines": 223,
@@ -1411,7 +1416,7 @@
       "max_fn_lines": 63
     },
     "scripts/generate_asvs_matrix.py": {
-      "lines": 393,
+      "lines": 520,
       "max_fn_cc": 12,
       "max_fn_lines": 75
     },
@@ -1491,7 +1496,7 @@
       "max_fn_lines": 18
     },
     "scripts/plugin_host.py": {
-      "lines": 394,
+      "lines": 395,
       "max_fn_cc": 20,
       "max_fn_lines": 73
     },

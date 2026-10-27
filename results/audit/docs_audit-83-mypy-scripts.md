@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -283,6 +283,10 @@ subjects:
 
 | 脚本 | 修法 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|
 | `scripts/nf.py` | ① `argparse._`/`ngettext` 两处**有意猴补**补 `# type: ignore[attr-defined(,assignment)]`（原 ignore 只盖 assignment）；② daemon bench 的 `rows` 显式 `List[Dict[str, Any]]`；③ `signal.SIGPIPE` 改 `getattr(..., None)` 判空（Windows 无该信号，原靠 except 兜住，行为等价） |

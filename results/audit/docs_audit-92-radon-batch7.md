@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
+  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -260,6 +260,10 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
+
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|
 | 按关键字类拆 | `_collect_unsupported` · `_check_ref` · `_check_type` · `_check_const_enum` · `_check_string` · `_check_number` · `_check_array`（+`_check_unique_items`/`_check_prefix_items`/`_check_items`）· `_check_object`（+`_check_required_fields`/`_check_property`/`_check_property_names`）· `_check_combinators`（+`_report_combinator`）· `_check_not`；`_check` 本体（**5·A**）只做深度守卫 + 分派 + 汇总 |
