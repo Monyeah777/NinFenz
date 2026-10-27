@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1042,
-    "projection": 130,
-    "support": 275,
-    "verify": 1126
+    "projection": 133,
+    "support": 281,
+    "verify": 1127
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9017,6 +9017,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "OSPS L3 evidence and fail-closed VEX/readiness negative tests.",
+      "path": "desktop/tests/test_supply_chain_l3.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "OSPS/S2C2F evidence and attestation workflow regression tests.",
       "path": "desktop/tests/test_supply_chain_standards.py",
       "role": "verify",
@@ -13050,16 +13056,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6c9189f68e1487fa72d750b58f667462031a27e9898952513c655b7d23424241",
+  "root_digest": "9e01f25ba800b352bc6284e2012198c41760c28e699b7ccd7a8884231ba2e4ce",
   "rule_counts": {
     "R-app": 1445,
-    "R-catch": 123,
+    "R-catch": 126,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 115,
-    "R-support": 126,
-    "R-verify": 1008,
+    "R-projection": 118,
+    "R-support": 129,
+    "R-verify": 1009,
     "auto:R-core": 257
   },
   "schema": "nf-role-coordinates/1"
