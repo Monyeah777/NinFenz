@@ -32,7 +32,7 @@ SCHEMA = "nf-code-metrics/1"
 
 #: 新增文件的绝对上限（存量按基线冻结，不受此限）
 LIMITS = {"lines": 800, "max_fn_lines": 120, "max_fn_cc": 25}
-#: 扫描面：core 与 scripts 的 .py（与 purity R5/R6 同口径）
+#: 扫描面：core 与 scripts 的 .py（递归；与 purity R5/R6 同口径）
 SCAN_DIRS = ("desktop/src/core", "scripts")
 
 
@@ -76,7 +76,9 @@ def measure(root: str = ".") -> Dict[str, Dict[str, Any]]:
     r = Path(root)
     out: Dict[str, Dict[str, Any]] = {}
     for d in SCAN_DIRS:
-        for p in sorted((r / d).glob("*.py")):
+        for p in sorted((r / d).rglob("*.py")):
+            if "__pycache__" in p.parts:
+                continue
             rel = p.relative_to(r).as_posix()
             out[rel] = metrics_of(str(p))
     return out

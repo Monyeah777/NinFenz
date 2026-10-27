@@ -10,6 +10,8 @@ import urllib.error
 from pathlib import Path
 from unittest import mock
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 sys.path.insert(0, str(ROOT / ".github" / "scripts"))
@@ -95,6 +97,14 @@ class GiteeDiagnosticsTest(unittest.TestCase):
 
     def test_intake_path_symbol_is_imported(self) -> None:
         self.assertEqual("library/intake.json", self.bot.INTAKE_REL)
+
+    def test_workflow_is_disabled_until_token_and_switch_are_ready(self) -> None:
+        path = ROOT / ".github" / "workflows" / "gitee-poll.yml"
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        self.assertEqual("vars.GITEE_POLL_ENABLED == 'true'", doc["jobs"]["poll"]["if"])
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("GITEE_TOKEN", text)
+        self.assertIn("恢复条件", text)
 
 
 if __name__ == "__main__":
