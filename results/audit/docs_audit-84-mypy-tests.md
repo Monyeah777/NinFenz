@@ -13,7 +13,7 @@ subjects:
   - desktop/tests/test_rust_fastlane.py:3415546ec6ef97dacdb7d8a17596c9815a5ee3912b5db6f948b73075b69216f2
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
-  - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
+  - desktop/tests/test_mcp_runtime.py:df6f3ef4de33b7dbed144b5fe22030cc56ee6df1f783304dbd83b0d6d395eeb5
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-28）：security residual: atomic durability, MCP TTL, daemon cwd
+
 > 重审（2026-10-25）：发布边界收口：真实决策/交接/复盘迁私有 Plan 仓，公开仓仅留模板与投影
 
 > 重审（2026-10-25）：安全收口：仓库信任根收紧、IPC/MCP/插件/投稿读取资源上限与路径包含性加固重审

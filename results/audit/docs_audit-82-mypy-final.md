@@ -27,10 +27,10 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:5429e827dc5a7a6bcc7987de9beb89f67f7a1bdee9d0afac0a87bf6e5a11b42c
+  - desktop/src/core/daemon.py:bf05e89b238b4ae72ebf732fefbe3376f9d8ee3ef318c9bfb59c08c83d6d26da
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2
+  - protocol/code_metrics_baseline.json:6a13a32ab9773b79ab1b47fa13e760802007398de219b84786c2dbd35f55ab19
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,10 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-10-28）：security residual: document missing-target mode branch
+
+> 重审（2026-10-28）：security residual: atomic durability, MCP TTL, daemon cwd
+
 > 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
 
 > 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate

@@ -12,8 +12,8 @@ subjects:
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2
+  - desktop/src/core/mcp_runtime.py:cf01be1b10f1fd3ccbfd7a30f033001d887fa7aeea6f44ce0012a6b1faafb461
+  - protocol/code_metrics_baseline.json:6a13a32ab9773b79ab1b47fa13e760802007398de219b84786c2dbd35f55ab19
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -308,6 +308,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-10-28）：security residual: atomic durability, MCP TTL, daemon cwd
+
 > 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
 
 > 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate

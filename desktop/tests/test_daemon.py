@@ -196,7 +196,7 @@ class DaemonFreshnessTest(DaemonHarness):
             # 用**独有 cwd** 强制走满整条执行路径：响应缓存按 (argv, gen, cwd) 命中，
             # 若同一进程里别的用例刚跑过 --version，这里会**提前 return**、根本到不了
             # 清缓存那一步（分片/乱序跑时实测必红；串行时只是碰巧没被预热）。
-            with tempfile.TemporaryDirectory() as tmp:
+            with tempfile.TemporaryDirectory(prefix=".daemon-freshness-", dir=ROOT) as tmp:
                 dm.execute(["--version"], ROOT, cwd=tmp)
         finally:
             dm.reset_process_caches = real_reset

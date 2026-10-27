@@ -678,6 +678,20 @@ class TestMcpRuntime(unittest.TestCase):
             self.assertIsInstance(result["ttlMs"], int)
             self.assertIn(result["cacheScope"], ("public", "private"))
 
+    def test_cacheable_ttl_is_bounded_and_server_owned(self):
+        """TTL 上限不能被 payload 或调用参数绕过，负值退化为不缓存。"""
+        result = self.srv._cacheable(
+            {"ttlMs": 9_999_999_999, "resultType": "partial"},
+            ttl_ms=9_999_999_999,
+        )
+        self.assertEqual(result["ttlMs"], mrt.MAX_CACHE_TTL_MS)
+        self.assertEqual(result["resultType"], "complete")
+        self.assertEqual(self.srv._cacheable({}, ttl_ms=-1)["ttlMs"], 0)
+        with self.assertRaises(TypeError):
+            self.srv._cacheable({}, ttl_ms=True)  # type: ignore[arg-type]
+        with self.assertRaises(ValueError):
+            self.srv._cacheable({}, cache_scope="shared")
+
 
 class VersionDeclarationKeyTest(unittest.TestCase):
     """版本声明**只认规范键名**：`_meta["io.modelcontextprotocol/protocolVersion"]`。

@@ -23,6 +23,8 @@ import tempfile
 import time
 from pathlib import Path
 
+import core.atomic_durability as durability  # 显式子模块导入：兼容 core.* 整体重载
+
 
 #: 瞬时写错重试参数（Windows 实测：杀软/句柄扫描会让临时件写入偶发 EINVAL(22)、
 #: 也让 `os.replace` 偶发 WinError 5——两者都是「等一个瞬间就好」，不是数据问题）
@@ -51,14 +53,7 @@ def _replace(tmp: str, p: Path, attempts: int = 10, backoff: float = 0.05) -> No
     """`os.replace` + **短重试**：Windows 上目标被读者短暂占用时 replace 会报 WinError 5
     （`PermissionError`）——这不是数据问题，等一个瞬间即可；重试耗尽仍失败则如实抛出
     （绝不退化成裸写：那会丢掉原子性）。"""
-    for i in range(attempts):
-        try:
-            os.replace(tmp, p)
-            return
-        except PermissionError:
-            if i == attempts - 1:
-                raise
-            time.sleep(backoff)
+    return durability.replace(tmp, p, attempts, backoff)
 
 
 def _ensure_target(path: str | os.PathLike) -> Path:
@@ -101,6 +96,7 @@ def write_text(path: str | os.PathLike, text: str) -> None:
             with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
                 fh.write(data)
                 fh.flush()
+                durability.preserve_mode(fh.fileno(), p)
                 os.fsync(fh.fileno())
             _replace(tmp, p)        # 原子替换：读者只会看到旧全量或新全量
         except BaseException:
@@ -129,6 +125,7 @@ def write_lines(path: str | os.PathLike, lines, separator: str = "\n") -> None:
                     fh.write(text)
                     first = False
                 fh.flush()
+                durability.preserve_mode(fh.fileno(), p)
                 os.fsync(fh.fileno())
             _replace(tmp, p)
         except BaseException:
@@ -155,6 +152,7 @@ def write_bytes(path: str | os.PathLike, data: bytes) -> None:
             with os.fdopen(fd, "wb") as fh:
                 fh.write(data)
                 fh.flush()
+                durability.preserve_mode(fh.fileno(), p)
                 os.fsync(fh.fileno())
             _replace(tmp, p)        # 原子替换：读者只会看到旧全量或新全量
         except BaseException:
