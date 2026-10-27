@@ -338,3 +338,39 @@ def _policy_text(policy) -> str:
     if mode == "rewrite_with_limit":
         return "rewrite ≤%s" % (policy or {}).get("max_retries", 0)
     return mode
+
+
+def _load_runs(path):
+    """读一份或一批跑分 JSON；**通配由本函数展开**（跨平台一致）。
+
+    实测（2026-09-30 文档示例真跑）：文档写的是 `nf bench compare runs/*.json`，而 Windows
+    cmd 不做通配展开 ⇒ 原实现直接拿字面 `runs/*.json` 去 `open` ⇒ 裸 `OSError` 冒成
+    「内部错误」。现在：先 glob（POSIX 已展开时就是原样一条路径），落空给**可执行指引**。
+    """
+    import glob as _glob
+    import json as _json
+    files = []
+    for one in ([path] if isinstance(path, str) else list(path)):
+        # 形状闸门（2026-09-30）：glob 到**目录**（如 `nf bench compare docs`）此前会落到
+        # `open(dir)` 抛 `[Errno 13] Permission denied: '<机器绝对路径>'`，冒成 CLI 兜底——
+        # 既无指引又回吐机器路径。只收**文件**，并把目录拦在指引里。
+        files += [f for f in sorted(_glob.glob(_rel_out(one))) if os.path.isfile(f)]
+    if not files:
+        raise ValueError("未匹配到跑分 JSON **文件**：%s（修复指引：先产出跑分——"
+                         "`nf bench run --case <夹具目录> --out runs/<名>.json`；"
+                         "通配由本命令自行展开，无需依赖 shell；目录不会被展开为文件）"
+                         % path)
+    runs = []
+    for f in files:
+        try:
+            with open(f, encoding="utf-8") as fh:
+                data = _json.load(fh)
+        except ValueError as exc:   # 在场但不是合法 JSON ⇒ 干净错误 + 指引（非内部故障）
+            raise ValueError("跑分件不是合法 JSON：%s（%s）（修复指引：收 `nf bench run "
+                             "--case <夹具目录> --out runs/<名>.json` 产出的 JSON；"
+                             "路径按仓库相对写法）"
+                             % (os.path.relpath(f, ROOT).replace("\\", "/"), exc)) from exc
+        if isinstance(data, dict) and "runs" in data:
+            data = data["runs"]
+        runs += data if isinstance(data, list) else [data]
+    return runs

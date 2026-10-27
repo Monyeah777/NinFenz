@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:54c94730f04b3282f37a543f9e1a3f7a502e396963cc07f36d5b3af5da1f61bb
+  - scripts/nf.py:95a186620412fec39a9c6caea6dc828c8da3626474469d855328f49cddcdfcf1
 ---
+> 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
+
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
 
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py

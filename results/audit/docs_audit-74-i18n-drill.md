@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
+  - protocol/code_metrics_baseline.json:af60f833ba943af9c7e42dc14d74cf9ca37ddd5c793c74fe77fdd299160b8862
 ---
+> 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
+
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
 
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py

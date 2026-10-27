@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:9580591b1abd83f56c2f460ed5af69b8c1e262d0cd7f01085e9a5fcd813db568
+  - protocol/code_metrics_baseline.json:af60f833ba943af9c7e42dc14d74cf9ca37ddd5c793c74fe77fdd299160b8862
 ---
+> 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
+
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
 
 > 重审（2026-10-27）：S2c: library-family handlers -> nf_cmds/library_ops.py
