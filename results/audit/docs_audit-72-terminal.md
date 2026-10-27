@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
-  - scripts/nf.py:95a186620412fec39a9c6caea6dc828c8da3626474469d855328f49cddcdfcf1
+  - scripts/nf.py:ec44f2324f534b960f965db0dffca4ad55fafdb7a222ff676c1ac6fa7c704191
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:945da2a83eaba05ebc0e7e435a6ab49fcf1b916e00f5a830272a9c91fa3681c8
 
 ---
+> 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
+
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
 
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py

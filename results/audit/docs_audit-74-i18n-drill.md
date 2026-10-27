@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:af60f833ba943af9c7e42dc14d74cf9ca37ddd5c793c74fe77fdd299160b8862
+  - protocol/code_metrics_baseline.json:ae0b6857ced5e5286bee8daea0ac659f119b20e5e89ca404cd7582fc57e9a037
 ---
+> 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
+
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
 
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py

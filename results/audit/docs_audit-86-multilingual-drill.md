@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:af60f833ba943af9c7e42dc14d74cf9ca37ddd5c793c74fe77fdd299160b8862
+  - protocol/code_metrics_baseline.json:ae0b6857ced5e5286bee8daea0ac659f119b20e5e89ca404cd7582fc57e9a037
 ---
+> 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
+
 > 重审（2026-10-27）：S2e: integrate-family handlers -> nf_cmds/integrate.py
 
 > 重审（2026-10-27）：S2d: govern-family handlers -> nf_cmds/govern.py
