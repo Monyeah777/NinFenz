@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:07f922df86073822b9bf12a9430566d7ef25510968493531d9869d2dde467755
+  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
 ---
+> 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
+
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
 
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)

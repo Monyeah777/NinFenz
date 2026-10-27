@@ -407,3 +407,31 @@ class _LazyModule:
 
 
 json_doc = _LazyModule("core.json_doc")   # 承重件在 desktop/src，脚本须能独立运行
+
+
+def _open_store(args, home: str = ""):
+    """构造 Store → (store, err_code)；NF_HOME / --store 不可用时**干净拒绝**。
+
+    为什么（2026-10-01 取证）：`NARRATIVE_FORGE_HOME=Z:\\nope`（盘符不存在）或指向一个**文件**
+    时，`nf preset ls` / `nf demo` / `nf run --seed` 都冒到 CLI 兜底报「✗ **内部错误**：
+    [WinError 3] …（重跑 NF_DEBUG=1 看堆栈）」——**用户配置问题被框成内部故障**，零指引还让人去
+    看堆栈。既有两处守卫只捕 `ValueError`（形状不符），漏了 `OSError`（盘/权限），另两处
+    （`demo` / `preset`）根本没有守卫；四处共用一个构造点，故在此收口。
+    """
+    from core.storage import Store
+    try:
+        # 口径统一（2026-10-01）：**相对路径按仓库根**解析（与 `--out` / `--dest` / `--root` 同）。
+        # 实测此前 `--store relstore` 落在**进程 cwd**（从临时目录跑就落到临时目录），而同一个
+        # CLI 的 `--out` / `--root` 都是仓根语义——同名概念两套解析，读者没法预测落点。
+        if home and not os.path.isabs(home):
+            home = os.path.join(ROOT, home)
+        return (Store(home=home) if home else Store()), None
+    except (OSError, ValueError) as exc:
+        # 内层 `storage.Store` 的守卫自带修复指引（落点是文件/越界）；重复追加只会让读者看到
+        # 两条「修复指引」——故只在内层没给时补我们这条（2026-10-01 实测去重）。
+        msg = str(exc)
+        if "修复指引" not in msg:
+            msg += ("（修复指引：`--store` / `NARRATIVE_FORGE_HOME` 须给**目录**路径——不存在会"
+                    "自动创建；指向文件、不存在的盘符或无权限位置都会在此失败）")
+        return None, _machine_fail(
+            args, msg, 1)

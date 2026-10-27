@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:07f922df86073822b9bf12a9430566d7ef25510968493531d9869d2dde467755
+  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
 ---
+> 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
+
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
 
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)

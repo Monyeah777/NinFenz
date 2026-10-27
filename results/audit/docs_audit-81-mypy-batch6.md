@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:07f922df86073822b9bf12a9430566d7ef25510968493531d9869d2dde467755
+  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
 ---
+> 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
+
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
 
 > 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)

@@ -41,7 +41,7 @@ _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
-from nf_cmds.common import (json_doc, _file_shape_issue, _existing_nonfile_issue, _portable_path, _rel_display, _rel_out, _machine_fail, _release_freeze)
+from nf_cmds.common import (json_doc, _file_shape_issue, _existing_nonfile_issue, _portable_path, _rel_display, _rel_out, _machine_fail, _release_freeze, _open_store)
 from nf_cmds.surfaces import (_cmd_lsp, _cmd_facts, _cmd_license, _cmd_endpoint, _cmd_assertions, _cmd_conformance, _cmd_stats, _cmd_registry, _cmd_model, _cmd_spec, _cmd_ir, _cmd_ops, _cmd_glossary, _cmd_security, _cmd_privacy)
 from nf_cmds.misc import (_cmd_sig, _cmd_diff, _cmd_telemetry, _cmd_changelog, _cmd_receipts, _cmd_layers, _cmd_attest, _cmd_runtime, _cmd_agent)
 from nf_cmds.shelf import (_cmd_combine, _cmd_output, _cmd_market)
@@ -215,143 +215,9 @@ def _cmd_register(args) -> int:
 
 
 def _cmd_import(args) -> int:
-    """nf import：旧面（SKILL.md/chara.json）+ T9.2 导入器（docx/dita → 内容 IR）。
-
-    旧面：SKILL.md → parse_skill（含 skill_dir 随行资源扫描）；chara.json →
-    parse_ccv3。--register 把 IR 模块幂等装载进 Store（save_module 覆盖式幂等，
-    同 seed_from_repo 模式）。
-    导入面：`nf import docx <file>` / `nf import dita <file>`（子命令式路由：首个位置
-    参数是 `docx`/`dita` 时走导入器，旧面的单文件调用 **保持不变**）。
-    """
-    import json
-    from pathlib import Path
-    from core.import_adapter import parse_skill, parse_ccv3
-    from core.models import Module
-
-    raw_files = getattr(args, "file", [])
-    files = list(raw_files) if isinstance(raw_files, (list, tuple)) else [raw_files]
-    files = [str(f) for f in files if str(f).strip()]
-    if files and files[0] in ("docx", "dita"):
-        return _cmd_import_ir(args, files[0], files[1:])
-    if len(files) != 1:
-        print("  ✗ 用法：`nf import <file>`（SKILL.md/chara.json）｜"
-              "`nf import docx <file> [--json/--out]`｜`nf import dita <file> [--json/--out]`"
-              "（修复指引：旧面收单件文本产物；docx/dita 走 T9.2 导入器）", file=sys.stderr)
-        return 2
-    p = Path(files[0])
-    want_json = bool(getattr(args, "json", False))
-    if not p.is_file():
-        print(f"✗ 文件不存在: {p}（修复指引：给出在场的外部产物文件——"
-              f"SKILL.md 或 chara.json；先另存到本地再导入）", file=sys.stderr)
-        return 2
-
-    # 入站上限（2026-10-01）：外来产物是**外部输入**，先看大小再读——此前无上限，
-    # 指向巨型文件时会把整份内容读进内存（还要再跑一遍注入扫描）。上限口径与 MCP 入站同源。
-    from core import trust_boundary as tb
-    cap = tb.MAX_IMPORT_BYTES
-    if p.stat().st_size > cap:
-        print("  ✗ 外部产物过大：%s（%.1f MiB > 上限 %d MiB）（修复指引：本命令收**单件** "
-              "SKILL.md / chara.json；大件请先裁剪到单件体量再导入）"
-              % (p.name, p.stat().st_size / 1048576, cap // 1048576), file=sys.stderr)
-        return 2
-    try:
-        raw = p.read_text(encoding="utf-8")
-    except UnicodeDecodeError as exc:
-        # 非 UTF-8 外部产物（2026-10-01 探针）：此前这句在 try 之外，UnicodeDecodeError 一路冒到
-        # CLI 兜底报「✗ 内部错误：'utf-8' codec can't decode …」——**用户输入问题被框成内部故障**，
-        # 还让用户去看堆栈。形状问题按 2 归，带可执行指引。
-        print("  ✗ 外部产物不是 UTF-8 文本：%s（%s）（修复指引：本命令只收 **UTF-8** 文本件"
-              "（SKILL.md / chara.json）；二进制或其它编码请先转成 UTF-8 再导入）"
-              % (p.name, exc), file=sys.stderr)
-        return 2
-    # 注入面（06 §12：外来内容=数据，疑似内嵌指令一律忽略并**记档**）——此前本节零机器判据。
-    hits = tb.detect(raw)
-    is_ccv3 = p.suffix.lower() == ".json" or "chara" in p.stem.lower()
-    if not want_json:
-        print(f"== nf import {p.name} ==")
-        if hits:
-            print("  [注入面] 命中 %d 处疑似内嵌指令（%s）——外来内容按**数据**消费，"
-                  "其中的「指令」一律不执行（06 §12）"
-                  % (len(hits), "、".join(sorted({h["rule"] for h in hits}))))
-            for h in hits[:3]:
-                print("    · 第 %d 行 [%s] %s" % (h["line"], h["rule"], h["snippet"]))
-        else:
-            print("  [注入面] 未命中疑似内嵌指令（内容按数据消费）")
-    try:
-        if is_ccv3:
-            res = parse_ccv3(json_doc.loads(raw, dict, what="CCV3 卡"))
-            kind = "CCV3 chara"
-            bundled = []
-        else:
-            res = parse_skill(raw, skill_dir=p.parent)
-            kind = "SKILL"
-            bundled = res.bundled_resources
-    except (ValueError, OSError, json.JSONDecodeError) as exc:
-        # 修复前：畸形输入会冒到 CLI 兜底，报成「内部错误」——那是**用户输入问题**，
-        # 不是内部故障；按仓库纪律给可执行指引并归 1（运行/校验失败）。
-        if want_json:
-            print(json.dumps({"schema": "nf-import/1", "ok": False,
-                              "error": "读入失败：%s" % exc},
-                             ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("  ✗ 读入失败：%s（修复指引：按 06 §12 / 01 §1 补规范头部与字段后重试）"
-                  % exc, file=sys.stderr)
-        return 1
-
-    # 形状差异（2026-09-30 修）：只有 SkillParseResult 带 `mode`（'nf'|'external'），
-    # Ccv3ParseResult 无此字段——此前 chara.json 路走到这里直接 AttributeError，
-    # 冒到 CLI 兜底报「内部错误」，`nf import <chara.json>`（含 --register）整条不可用。
-    # chara 路恒升 IR 骨架（ir 必非 None），故其口径固定记为 `ccv3`。
-    mode = getattr(res, "mode", "ccv3" if is_ccv3 else "?")
-    if want_json:
-        n_mod = (sum(len(l.modules) for l in res.ir.layers) + len(res.ir.extra_modules)
-                 if res.ir is not None else 0)
-        print(json.dumps({"schema": "nf-import/1", "kind": "import-legacy",
-                          "file": files[0], "type": kind, "mode": mode,
-                          "ok": bool(res.ok), "modules": n_mod,
-                          "warnings": list(res.warnings),
-                          "injection_hits": len(hits)},
-                         ensure_ascii=False, indent=2, sort_keys=True))
-        return 0 if res.ok else 1
-    print(f"  类型: {kind} | 解析: {'ok' if res.ok else 'fail'} | mode: {mode}")
-    if res.ir is not None:
-        n_mod = sum(len(l.modules) for l in res.ir.layers) + len(res.ir.extra_modules)
-        print(f"  IR: {res.ir.type} · {res.ir.title} · 管线 {res.ir.pipeline_id} · {n_mod} 模块")
-    if bundled:
-        print(f"  随行资源: {', '.join(bundled)}")
-    for w in res.warnings:
-        print(f"  [警告] {w}")
-
-    if not args.register:
-        return 0
-    if res.ir is None:
-        print("✗ 无 IR 可登记（external 模式未升 IR）", file=sys.stderr)
-        return 1
-
-    store, err = _open_store(args, args.store)   # 落点不可用 ⇒ 干净拒绝（含 OSError：盘/权限）
-    if err is not None:
-        return err
-    n = 0
-    for layer in res.ir.layers:
-        for im in layer.modules:
-            fid = im.full_id
-            cat, num = fid.rsplit(":", 1) if ":" in fid else ("通用类", fid)
-            store.save_module(Module(id=num, name=im.name, category=cat,
-                                    layer=im.layer, source_md=im.content))
-            n += 1
-    for im in res.ir.extra_modules:
-        fid = im.full_id
-        cat, num = fid.rsplit(":", 1) if ":" in fid else ("通用类", fid)
-        store.save_module(Module(id=num, name=im.name, category=cat,
-                                layer=im.layer, source_md=im.content))
-        n += 1
-    print(f"  ✓ 已幂等装载 {n} 模块 → {_portable_path(store.home)}")
-    # 闭环指引（实测缺口 2026-09-30）：该 store 里**只有导入件**，直接拿去 `nf run` 会因缺
-    # 官方核心锚点（P00/P80）报「本地不存在 / 未装配」——这里如实告诉下一步。
-    print("  下一步：这个 store 里只有本次导入的模块；跑全链前先补官方核心 —— "
-          "`nf run --seed --store %s`（临时装载核心）或把 04_模块库 也 register 进来。"
-          % _portable_path(store.home))
-    return 0
+    """nf import：旧面 + T9.2 导入器（实现见 nf_cmds/import_cmd.py）。"""
+    from nf_cmds.import_cmd import run as _import_run
+    return _import_run(args, import_ir=_cmd_import_ir)
 
 
 def _cmd_import_ir(args, fmt: str, rest: list) -> int:
@@ -715,32 +581,6 @@ def _root_pair(args) -> tuple:
 
 
 
-def _open_store(args, home: str = ""):
-    """构造 Store → (store, err_code)；NF_HOME / --store 不可用时**干净拒绝**。
-
-    为什么（2026-10-01 取证）：`NARRATIVE_FORGE_HOME=Z:\\nope`（盘符不存在）或指向一个**文件**
-    时，`nf preset ls` / `nf demo` / `nf run --seed` 都冒到 CLI 兜底报「✗ **内部错误**：
-    [WinError 3] …（重跑 NF_DEBUG=1 看堆栈）」——**用户配置问题被框成内部故障**，零指引还让人去
-    看堆栈。既有两处守卫只捕 `ValueError`（形状不符），漏了 `OSError`（盘/权限），另两处
-    （`demo` / `preset`）根本没有守卫；四处共用一个构造点，故在此收口。
-    """
-    from core.storage import Store
-    try:
-        # 口径统一（2026-10-01）：**相对路径按仓库根**解析（与 `--out` / `--dest` / `--root` 同）。
-        # 实测此前 `--store relstore` 落在**进程 cwd**（从临时目录跑就落到临时目录），而同一个
-        # CLI 的 `--out` / `--root` 都是仓根语义——同名概念两套解析，读者没法预测落点。
-        if home and not os.path.isabs(home):
-            home = os.path.join(ROOT, home)
-        return (Store(home=home) if home else Store()), None
-    except (OSError, ValueError) as exc:
-        # 内层 `storage.Store` 的守卫自带修复指引（落点是文件/越界）；重复追加只会让读者看到
-        # 两条「修复指引」——故只在内层没给时补我们这条（2026-10-01 实测去重）。
-        msg = str(exc)
-        if "修复指引" not in msg:
-            msg += ("（修复指引：`--store` / `NARRATIVE_FORGE_HOME` 须给**目录**路径——不存在会"
-                    "自动创建；指向文件、不存在的盘符或无权限位置都会在此失败）")
-        return None, _machine_fail(
-            args, msg, 1)
 
 
 CHECK_GUIDE = {
@@ -851,146 +691,9 @@ CHECK_GUIDE = {
 }
 
 def _cmd_preset(args):
-    """nf preset：预设配置（一份存档 = 管线 + 模块 + 资产包 的**一次组装**）。
-
-    为什么补（2026-10-01）：`core/preset_manager.py` 是退役端壳（L3_FROZEN：桌面 GUI 永久
-    退役）留下的 UI 面预设语义（snapshot / apply / export / import），而 `nf` 命令面**零引用**
-    ⇒ 预设能力不可达，已在 `test_dead_code.TEST_ONLY_ALLOWED` 如实登记为缺口。本命令按那条
-    登记里写明的补齐方向（「端壳能力一律落 CLI」）把预设接成命令。
-
-    落点 = **NF_HOME**（用户态预设库），不写仓库；`apply` 只做**解析**（管线 + 模块 + 资产包
-    + 本地缺失提示），真生产仍走 `nf run`。
-    """
-    import json as _json
-    from core import preset_manager as pm
-    from core.models import Preset
-
-    sub = getattr(args, "preset_cmd", None) or "ls"
-    store, err = _open_store(args, getattr(args, "store", ""))   # 同上：干净拒绝
-    if err is not None:
-        return err
-    want_json = bool(getattr(args, "json", False))
-    home_txt = _portable_path(store.presets_root)
-
-    def _find(name: str):
-        want = str(name or "").strip()
-        return next((p for p in store.list_presets() if p.name == want), None)
-
-    if sub == "ls":
-        rows = [p.to_json() for p in store.list_presets()]
-        if want_json:
-            print(_json.dumps({"kind": "preset-ls", "home": home_txt,
-                               "count": len(rows), "rows": rows},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("== nf preset ls（%d 条 · 预设库 %s）==" % (len(rows), home_txt))
-            for r in rows:
-                print("  %-22s %-6s 模块 %-3d 资产包 %s"
-                      % (r.get("name"), r.get("pipeline"),
-                         len(r.get("modules") or []), r.get("asset_pack") or "-"))
-            if not rows:
-                print("  （空；`nf preset save <名> --pipeline P04 --modules 通用类:M00` 建一条）")
-        return 0
-    if sub == "show":
-        p = _find(args.name)
-        if p is None:
-            return _machine_fail(args, "预设未找到：%s（修复指引：`nf preset ls` 可枚举本机预设）"
-                                 % args.name, 1)
-        if want_json:
-            print(_json.dumps({"kind": "preset-show", "home": home_txt,
-                               "preset": p.to_json()},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("== nf preset show %s ==" % p.name)
-            print("  管线：%s" % p.pipeline)
-            print("  模块：%s" % ("、".join(p.modules) or "（空）"))
-            print("  资产包：%s" % (p.asset_pack or "（空）"))
-            print("  建档：%s" % (p.created_at or "-"))
-        return 0
-    if sub == "apply":
-        p = _find(args.name)
-        if p is None:
-            return _machine_fail(args, "预设未找到：%s（修复指引：`nf preset ls` 可枚举本机预设）"
-                                 % args.name, 1)
-        res = pm.apply_preset(store, p)
-        modules = [m.full_id for m in res["modules"]]
-        if want_json:
-            print(_json.dumps({"kind": "preset-apply", "name": p.name,
-                               "pipeline": res["pipeline"], "modules": modules,
-                               "asset_pack": res["asset_pack"],
-                               "warnings": res["warnings"]},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("== nf preset apply %s ==" % p.name)
-            print("  管线：%s · 模块 %d 件：%s"
-                  % (res["pipeline"], len(modules), "、".join(modules) or "（空）"))
-            print("  资产包：%s" % (res["asset_pack"] or "（空）"))
-            for w in res["warnings"]:
-                print("  [WARN] %s" % w)
-            if not res["warnings"]:
-                print("  ✓ 装配清单已解析（本机模块齐备）；真生产：nf run --pipeline %s "
-                      "--modules %s --store <store>" % (res["pipeline"], ",".join(modules)))
-        return 0
-    if sub == "save":
-        if _find(args.name) is not None and not args.force:
-            return _machine_fail(
-                args, "同名预设已存在：%s（修复指引：换名，或加 --force 覆盖；"
-                      "`nf preset show %s` 先看现状）" % (args.name, args.name), 1)
-        p = Preset(name=args.name.strip(), pipeline=(args.pipeline or "P01").strip(),
-                   modules=[m.strip() for m in (args.modules or "").split(",") if m.strip()],
-                   asset_pack=(args.assets or "").strip())
-        path = store.save_preset(p)
-        if want_json:
-            print(_json.dumps({"kind": "preset-save", "ok": True, "name": p.name,
-                               "path": _portable_path(path), "preset": p.to_json()},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("  ✓ 预设已保存：%s（%s）" % (p.name, _portable_path(path)))
-        return 0
-    if sub == "rm":
-        if not store.remove_preset(args.name):
-            return _machine_fail(args, "预设未找到：%s（修复指引：`nf preset ls` 可枚举）"
-                                 % args.name, 1)
-        if want_json:
-            print(_json.dumps({"kind": "preset-rm", "ok": True, "name": args.name},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("  ✓ 已删除预设：%s" % args.name)
-        return 0
-    if sub == "export":
-        p = _find(args.name)
-        if p is None:
-            return _machine_fail(args, "预设未找到：%s（修复指引：`nf preset ls` 可枚举）"
-                                 % args.name, 1)
-        if os.path.isdir(_rel_out(args.out)):
-            return _machine_fail(args, "--out 落点是目录：%s（修复指引：给**文件**路径，"
-                                 "如 my.preset.json）" % args.out, 1)
-        if not pm.export_preset_file(p, args.out):
-            return _machine_fail(args, "写导出件失败：%s（修复指引：给可写文件路径）" % args.out, 1)
-        if want_json:
-            print(_json.dumps({"kind": "preset-export", "ok": True, "name": p.name,
-                               "out": args.out}, ensure_ascii=False, indent=2,
-                              sort_keys=True))
-        else:
-            print("  ✓ 预设已导出：%s → %s" % (p.name, args.out))
-        return 0
-    # import
-    p = pm.import_preset_file(store, args.file)
-    if p is None:
-        return _machine_fail(
-            args, "预设不可用：%s（修复指引：收 `nf preset export` 产的 JSON（含 name 与 "
-                  "pipeline 两个必需字段）；文件须在场且可读）" % args.file, 1)
-    if (args.name or "").strip():
-        p = Preset(name=args.name.strip(), pipeline=p.pipeline, modules=list(p.modules),
-                   asset_pack=p.asset_pack, created_at=p.created_at)
-        store.save_preset(p)
-    if want_json:
-        print(_json.dumps({"kind": "preset-import", "ok": True, "name": p.name,
-                           "home": home_txt, "preset": p.to_json()},
-                          ensure_ascii=False, indent=2, sort_keys=True))
-    else:
-        print("  ✓ 预设已导入本机：%s（%s）" % (p.name, home_txt))
-    return 0
+    """nf preset：预设配置（实现见 nf_cmds/preset.py）。"""
+    from nf_cmds.preset import run as _preset_run
+    return _preset_run(args)
 
 
 
