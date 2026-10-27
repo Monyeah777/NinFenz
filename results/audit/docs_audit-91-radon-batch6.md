@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:3a7d4614d6df2cc43afdf0cb96546bf726e3d45b52e69ce1821b1e247739bf96
+  - protocol/code_metrics_baseline.json:bfbc4ede63d0df6d15247f81e1f11012dcecdc191f807b60917d6ae52ab5c833
 ---
+> 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
+
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
 
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py

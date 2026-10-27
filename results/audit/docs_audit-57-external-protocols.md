@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
   - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
-  - scripts/nf.py:dee29b9abb71461eaeed06ab0788e6abb295831b910220971fa2d1675d460384
+  - scripts/nf.py:451649c9346dd748fcf963a72b32e72f511e37d6992a7247eca2d6489d446006
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:7e011303eae22d163cdbb085934f7264dd5922e1d5e8a5eefa1a139d7be74323
 
 ---
+> 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
+
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
 
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py

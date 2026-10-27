@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:dee29b9abb71461eaeed06ab0788e6abb295831b910220971fa2d1675d460384
+  - scripts/nf.py:451649c9346dd748fcf963a72b32e72f511e37d6992a7247eca2d6489d446006
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
+
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
 
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py

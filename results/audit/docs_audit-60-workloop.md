@@ -10,11 +10,13 @@ subjects:
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - scripts/nf.py:dee29b9abb71461eaeed06ab0788e6abb295831b910220971fa2d1675d460384
+  - scripts/nf.py:451649c9346dd748fcf963a72b32e72f511e37d6992a7247eca2d6489d446006
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
+
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
 
 > 重审（2026-10-27）：S2k: asset split by subcommand -> nf_cmds/asset.py
