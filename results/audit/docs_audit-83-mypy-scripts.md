@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:e235aa633f63a35802ab9a05d0a503e1eb2d17625ec5317565e632e6cdee20c3
+  - protocol/code_metrics_baseline.json:cde0ffc10769edea5b750b4213c6ea9f759e28af37c74c484c0d3c04e5bea54f
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -283,6 +283,8 @@ subjects:
 
 | 脚本 | 修法 |
 |---
+> 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence
+
 > 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
 
 > 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests

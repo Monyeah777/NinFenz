@@ -1576,9 +1576,9 @@
       "max_fn_lines": 35
     },
     "scripts/verify_cache.py": {
-      "lines": 156,
+      "lines": 164,
       "max_fn_cc": 7,
-      "max_fn_lines": 26
+      "max_fn_lines": 34
     },
     "scripts/verify_fast.py": {
       "lines": 288,
