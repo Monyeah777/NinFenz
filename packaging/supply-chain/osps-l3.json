@@ -1,0 +1,168 @@
+{
+  "schema": "nf-osps-evidence/1",
+  "standard": {
+    "name": "OpenSSF OSPS Baseline",
+    "repository": "https://github.com/ossf/security-baseline",
+    "commit": "7bfc7bc7e4b0d48a28deee5913483259e623d7c3",
+    "reviewed_at": "2026-10-27",
+    "scope": ["maturity-3"]
+  },
+  "controls": [
+    {
+      "id": "OSPS-AC-04.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Every workflow job declares least-privilege permissions; write scopes exist only on publishing, release, or attestation jobs.",
+      "evidence": [".github/workflows", "desktop/src/core/workflow_policy.py", "desktop/tests/test_workflow_policy.py"]
+    },
+    {
+      "id": "OSPS-BR-01.04",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Trusted collaborator inputs are passed through environment variables or strict version checks; unsafe shell interpolation is a test failure.",
+      "evidence": [".github/workflows", "desktop/tests/test_supply_chain_standards.py"]
+    },
+    {
+      "id": "OSPS-BR-02.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "All release assets share the package version and source commit in release-metadata.json and are listed in SHA256SUMS.",
+      "evidence": ["packaging/npm/tools/build_release.py", ".github/workflows/npm-publish.yml", "docs/supply-chain-security.md"]
+    },
+    {
+      "id": "OSPS-BR-07.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SECURITY and supply-chain documentation define secret storage, token use, OIDC preference, exposure handling, and rotation.",
+      "evidence": ["SECURITY.md", "docs/supply-chain-security.md", ".gitignore", "CONTRIBUTING.md"]
+    },
+    {
+      "id": "OSPS-DO-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Consumer verification commands cover checksums, Build provenance, VSA, and SBOM subjects.",
+      "evidence": ["docs/supply-chain-security.md", "packaging/npm/README.md", "scripts/build_vsa.py"]
+    },
+    {
+      "id": "OSPS-DO-03.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Docs identify the expected GitHub OIDC workflow identity and the VSA verifier identity used by releases.",
+      "evidence": ["docs/supply-chain-security.md", "packaging/supply-chain/verification-policy.json"]
+    },
+    {
+      "id": "OSPS-DO-04.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SUPPORT states the supported release line, support scope, and absence of a fixed SLA.",
+      "evidence": ["SUPPORT.md"]
+    },
+    {
+      "id": "OSPS-DO-05.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SUPPORT and SECURITY define when superseded releases stop receiving security updates.",
+      "evidence": ["SUPPORT.md", "SECURITY.md"]
+    },
+    {
+      "id": "OSPS-GV-04.01",
+      "status": "external-manual",
+      "owner": "@Monyeah777",
+      "verification": "MAINTAINERS defines that elevated access requires identity and need review; GitHub settings remain the external enforcement point.",
+      "evidence": ["MAINTAINERS.md", "docs/supply-chain-security.md", "external:github-collaborator-access-review"]
+    },
+    {
+      "id": "OSPS-QA-02.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Each npm and GitHub Packages release artifact ships with CycloneDX and SPDX SBOMs.",
+      "evidence": [".github/workflows/npm-publish.yml", "packaging/npm/tools/build_release.py", "scripts/validate_sboms.py"]
+    },
+    {
+      "id": "OSPS-QA-04.02",
+      "status": "not-applicable",
+      "owner": "@Monyeah777",
+      "verification": "Releases are produced from one canonical repository; Gitee is a mirror and does not participate in release assembly.",
+      "gap": "The control applies only when a release composes multiple source repositories.",
+      "evidence": ["README.md", ".gitee"]
+    },
+    {
+      "id": "OSPS-QA-06.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CONTRIBUTING lists supported platforms, toolchains, local commands, CI triggers, sharding, and release-only checks.",
+      "evidence": ["CONTRIBUTING.md", ".github/workflows/ci-verify.yml", "docs/supply-chain-security.md"]
+    },
+    {
+      "id": "OSPS-QA-06.03",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CONTRIBUTING requires a failing regression test for fixes and test updates for every behavior change.",
+      "evidence": ["CONTRIBUTING.md", "desktop/tests"]
+    },
+    {
+      "id": "OSPS-QA-07.01",
+      "status": "external-manual",
+      "owner": "@Monyeah777",
+      "verification": "The main ruleset requests non-author approval, but the repository currently has only one human maintainer.",
+      "gap": "A genuine second human reviewer is unavailable; the owner must not fake an approval with a bot or second identity.",
+      "evidence": ["external:github-ruleset-main", "MAINTAINERS.md", ".github/workflows/ci-verify.yml"]
+    },
+    {
+      "id": "OSPS-SA-03.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The machine-readable threat model covers assets, actors, trust boundaries, STRIDE classes, attack paths, controls, and residual risk.",
+      "evidence": ["results/supply-chain/threat-model.json", "docs/supply-chain-security.md", "desktop/tests/test_supply_chain_standards.py"]
+    },
+    {
+      "id": "OSPS-VM-04.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "OpenVEX is generated from vulnerability dispositions and validated before release.",
+      "evidence": ["results/supply-chain/ninfenz.openvex.json", "results/supply-chain/vuln-disposition.json", "scripts/generate_vex.py"]
+    },
+    {
+      "id": "OSPS-VM-05.04",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SECURITY defines Critical, High, Medium, and license remediation thresholds and release blocking.",
+      "evidence": ["SECURITY.md", "packaging/supply-chain/verification-policy.json"]
+    },
+    {
+      "id": "OSPS-VM-05.05",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "License violations block release unless an explicit compatible exception is recorded.",
+      "evidence": ["SECURITY.md", "packaging/supply-chain/suppliers.json"]
+    },
+    {
+      "id": "OSPS-VM-05.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Release candidates require dependency audit, dependency review, SBOM, and disposition checks.",
+      "evidence": [".github/workflows/dependency-audit.yml", ".github/workflows/dependency-review.yml", ".github/workflows/npm-publish.yml"]
+    },
+    {
+      "id": "OSPS-VM-05.03",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "PR dependency review blocks high severity dependency regressions and weekly audits cover pinned tooling and Rust locks.",
+      "evidence": [".github/workflows/dependency-review.yml", ".github/workflows/dependency-audit.yml", "scripts/supply_chain_policy.py"]
+    },
+    {
+      "id": "OSPS-VM-06.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SECURITY defines SAST severity thresholds and release blocking for actionable High or Critical findings.",
+      "evidence": ["SECURITY.md", ".github/workflows/sast.yml", "scripts/sast_check.py"]
+    },
+    {
+      "id": "OSPS-VM-06.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CodeQL and the SAST ratchet run on pull requests and scheduled or push scans.",
+      "evidence": [".github/workflows/sast.yml", "desktop/tests/test_ci_supply_chain.py"]
+    }
+  ]
+}

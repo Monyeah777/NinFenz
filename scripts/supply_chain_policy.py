@@ -9,6 +9,7 @@ package sources, and prohibited licenses fail closed.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 from datetime import date
@@ -36,6 +37,15 @@ EXPECTED_OSPS = {
 EXPECTED_S2C2F = {
     "ING-1", "ING-2", "SCA-1", "SCA-2", "SCA-3", "INV-1", "INV-2",
     "UPD-1", "UPD-2", "UPD-3", "AUD-2", "AUD-3", "ENF-1",
+}
+
+EXPECTED_OSPS_L3 = {
+    "OSPS-AC-04.02", "OSPS-BR-01.04", "OSPS-BR-02.02", "OSPS-BR-07.02",
+    "OSPS-DO-03.01", "OSPS-DO-03.02", "OSPS-DO-04.01", "OSPS-DO-05.01",
+    "OSPS-GV-04.01", "OSPS-QA-02.02", "OSPS-QA-04.02", "OSPS-QA-06.02",
+    "OSPS-QA-06.03", "OSPS-QA-07.01", "OSPS-SA-03.02", "OSPS-VM-04.02",
+    "OSPS-VM-05.04", "OSPS-VM-05.05", "OSPS-VM-05.02", "OSPS-VM-05.03",
+    "OSPS-VM-06.01", "OSPS-VM-06.02",
 }
 
 OSPS_STATUSES = {"enforced", "platform-managed", "external-manual", "partial", "not-applicable"}
@@ -235,6 +245,58 @@ def _supplier_issues() -> tuple[list[str], dict[str, Any]]:
     }
 
 
+def _load_script(name: str):
+    path = ROOT / "scripts" / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(f"nf_{name}", path)
+    if spec is None or spec.loader is None:
+        raise ValueError(f"无法加载 {path}（修复指引：恢复脚本）")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _threat_issues() -> tuple[list[str], dict[str, Any]]:
+    issues: list[str] = []
+    path = ROOT / "results" / "supply-chain" / "threat-model.json"
+    doc = _json(path)
+    if doc.get("schema") != "nf-threat-model/1":
+        issues.append("threat-model.json: schema 不匹配")
+    threats = doc.get("threats")
+    if not isinstance(threats, list) or len(threats) < 7:
+        return issues + ["threat-model.json: 少于 7 条 STRIDE 威胁"], {"threats": 0}
+    seen = set()
+    statuses: dict[str, int] = {}
+    for threat in threats:
+        if not isinstance(threat, dict):
+            issues.append("threat-model.json: threat 必须为对象")
+            continue
+        ident = str(threat.get("id") or "")
+        if not ident or ident in seen:
+            issues.append(f"threat-model.json: id 缺失或重复：{ident!r}")
+        seen.add(ident)
+        for key in ("stride", "threat", "impact", "controls", "residual", "status"):
+            if not threat.get(key):
+                issues.append(f"threat-model.json/{ident}: 缺 {key}")
+        if not isinstance(threat.get("controls"), list):
+            issues.append(f"threat-model.json/{ident}: controls 必须是数组")
+        status = str(threat.get("status"))
+        statuses[status] = statuses.get(status, 0) + 1
+        if status not in {"mitigated", "partial"}:
+            issues.append(f"threat-model.json/{ident}: 非法 status {status!r}")
+    return issues, {"threats": len(threats), "statuses": dict(sorted(statuses.items()))}
+
+
+def _vex_issues() -> tuple[list[str], dict[str, Any]]:
+    vex = _json(ROOT / "results" / "supply-chain" / "ninfenz.openvex.json")
+    module = _load_script("generate_vex")
+    return module.validate_vex(vex), {"statements": len(vex.get("statements") or [])}
+
+
+def _readiness_issues() -> tuple[list[str], dict[str, Any]]:
+    module = _load_script("slsa_l3_readiness")
+    return module.scan(ROOT)
+
+
 def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
     global ROOT
     old_root = ROOT
@@ -247,6 +309,13 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
             OSPS_STATUSES,
             "id",
         )
+        osps_l3_issues, osps_l3_stats = _matrix_issues(
+            ROOT / "packaging" / "supply-chain" / "osps-l3.json",
+            "nf-osps-evidence/1",
+            EXPECTED_OSPS_L3,
+            OSPS_STATUSES,
+            "id",
+        )
         s2_issues, s2_stats = _matrix_issues(
             ROOT / "packaging" / "supply-chain" / "s2c2f-l1-l2.json",
             "nf-s2c2f-evidence/1",
@@ -256,14 +325,31 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
         )
         source_issues, source_stats = _package_source_issues()
         supplier_issues, supplier_stats = _supplier_issues()
+        threat_issues, threat_stats = _threat_issues()
+        vex_issues, vex_stats = _vex_issues()
+        readiness_issues, readiness_stats = _readiness_issues()
     finally:
         ROOT = old_root
-    issues = osps_issues + s2_issues + source_issues + supplier_issues
+    issues = (
+        osps_issues + osps_l3_issues + s2_issues + source_issues + supplier_issues
+        + threat_issues + vex_issues + readiness_issues
+    )
+    combined_counts = dict(osps_stats.get("status_counts") or {})
+    for key, value in (osps_l3_stats.get("status_counts") or {}).items():
+        combined_counts[key] = combined_counts.get(key, 0) + int(value)
     return issues, {
-        "osps": osps_stats,
+        "osps": {
+            "controls": int(osps_stats.get("controls", 0)) + int(osps_l3_stats.get("controls", 0)),
+            "l1_l2": osps_stats,
+            "l3": osps_l3_stats,
+            "status_counts": dict(sorted(combined_counts.items())),
+        },
         "s2c2f": s2_stats,
         "package_sources": source_stats,
         "suppliers": supplier_stats,
+        "threat_model": threat_stats,
+        "vex": vex_stats,
+        "slsa_l3": readiness_stats,
     }
 
 
@@ -287,10 +373,12 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print("== 供应链标准证据 ==")
         print(
-            f"  OSPS L1/L2 {stats['osps']['controls']} 条 · "
+            f"  OSPS L1-L3 {stats['osps']['controls']} 条 · "
             f"S2C2F L1/L2 {stats['s2c2f']['controls']} 条 · "
             f"包源 {stats['package_sources']['sources']} 个 · "
-            f"供应商 {stats['suppliers']['suppliers']} 个"
+            f"供应商 {stats['suppliers']['suppliers']} 个 · "
+            f"威胁 {stats['threat_model']['threats']} 条 · "
+            f"VEX {stats['vex']['statements']} 条"
         )
         for issue in issues:
             print(f"  ✗ {issue}", file=sys.stderr)

@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "3a40a6a01a8ba89f489831ad25583861c800bcfab660c61a6fa7945b317ec7fe",
+        "root": "1ff0a72ea36a6c447a66ee11a9404b6a975f0563e6acf9b444d7f5a3e6613b9f",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,7 +369,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 313,
-        "files": 315,
+        "files": 318,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7678
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 230,
-        "probed": 230
+        "patterns": 231,
+        "probed": 231
       },
       "status": "pass",
       "warns": 0
@@ -492,7 +492,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 87,
+        "pinned_uses": 92,
         "requirements_files": 5,
         "with_explicit_permissions": 21,
         "workflows": 21
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "8d7598a602ca17375966363c62e502fe374a62c2dd53b1c6fd9d58f1dc4d3e58",
+  "root_digest": "4ac0f37cf9da4eac4c22e493b5203ac1d8942406ede78bc8c6bd9d85741fb430",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
