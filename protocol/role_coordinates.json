@@ -5,8 +5,8 @@
     "floor": 6,
     "prod": 1069,
     "projection": 135,
-    "support": 301,
-    "verify": 1181
+    "support": 303,
+    "verify": 1184
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7229,6 +7229,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "兼容垫片：序列化真源已上移到 `scripts/cli_surface_lib.py`（本文件只做 re-export）。",
+      "path": "desktop/tests/_cli_surface.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-I3 进程内 CLI harness：同进程跑 scripts/nf.py 入口，捕获 stdout/stderr/退出码。",
       "path": "desktop/tests/cli_harness.py",
       "role": "verify",
@@ -7261,6 +7267,12 @@
     {
       "function": "外部实测容器：把任意 AI 按 P03 装配出的「完整版」产物丢进来跑分，多跑/多模型可比对（ACP benchmark suite 机制借鉴）。",
       "path": "desktop/tests/fixtures/benchmark/suite/p03-western-cross/case.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf-cli-surface/1",
+      "path": "desktop/tests/fixtures/cli_surface.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7813,6 +7825,12 @@
     {
       "function": "机器面**面判别键**门禁：每个 `--json` 面成功时都必须是自带类型的对象。",
       "path": "desktop/tests/test_cli_json_face.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "CLI 命令面 golden 锁（`desktop/tests/fixtures/cli_surface.json`）。",
+      "path": "desktop/tests/test_cli_surface_lock.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13548,16 +13566,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f3594ad67956dcb774da1db036e924564c10fc3063a0b09c388ae7c0297b9622",
+  "root_digest": "32419b2d77a13e91c864ce0848fc4a27091ad2befa5de1b675f80e45f2929383",
   "rule_counts": {
     "R-app": 1453,
-    "R-catch": 153,
+    "R-catch": 155,
     "R-entry": 26,
     "R-floor": 6,
     "R-prod": 962,
     "R-projection": 119,
     "R-support": 122,
-    "R-verify": 1054,
+    "R-verify": 1057,
     "auto:R-core": 276
   },
   "schema": "nf-role-coordinates/1"
