@@ -32,6 +32,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  需求 {stats.get('requirements', 0)} 条 · "
               f"状态 {stats.get('statuses', {})} · "
               f"章节 {len(stats.get('chapters', []))} 个")
+        controls = stats.get("controls") or {}
+        print(f"  控制清单：数据类 {controls.get('data_classes', 0)} · "
+              f"通信 {controls.get('communication_paths', 0)} · "
+              f"密码算法 {controls.get('crypto_inventory', 0)} · "
+              f"资源上限 {controls.get('resource_limits', 0)}")
         for issue in issues:
             print(f"  ✗ {issue}", file=sys.stderr)
         if not issues:

@@ -41,9 +41,14 @@ GraphQL、WebSocket、密码/MFA 登录或远程网络监听面。daemon 的短�
 当前结果：
 
 - 需求：191 条
-- `enforced`：49 条
-- `partial`：39 条
-- `not-applicable`：103 条
+- `enforced`：78 条
+- `partial`：4 条
+- `not-applicable`：109 条
+
+输入规则、数据分类、密码算法、通信路径、授权、资源上限、生产默认值和发布约束由
+`packaging/security/application-security-controls.json` 统一登记，并由
+`desktop/src/core/security_controls.py` 对照代码常量与负例测试校验。人读说明见
+[security-controls.md](security-controls.md)。
 
 ## 重点控制
 
@@ -86,6 +91,8 @@ python scripts/generate_asvs_matrix.py --write
 ## 边界
 
 - 没有外部评估员的独立访谈、渗透测试和证据抽样，因此不能表述为“ASVS Level 2 认证通过”。
-- `partial` 项仍需后续补齐；它们不会因为本矩阵存在而自动变成合格。
+- 仍有 4 条 `partial`：V5.2.2（全部本地文件格式的扩展名/内容匹配）、V11.2.2（运行时算法
+  协商与迁移）、V16.4.2（不可变 WORM 日志锚）、V16.4.3（独立日志汇聚与告警系统）。
+  它们不会因为本矩阵存在而自动变成合格。
 - V6/V12 的逐项 N/A 取决于当前产品边界。若以后新增远程 HTTP transport、用户账号或 OAuth，
   必须重新纳入适用性评估。

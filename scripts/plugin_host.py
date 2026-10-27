@@ -54,6 +54,7 @@ MAX_PLUGIN_OUTPUT_BYTES = 8 << 20
 #: Component Model 走 WAVE argv，受操作系统单条命令行上限约束；按最坏 4 字符/字节预算。
 MAX_COMPONENT_ARGV_CHARS = 30_000
 MAX_COMPONENT_INPUT_BYTES = (MAX_COMPONENT_ARGV_CHARS - 2) // 4
+DEFAULT_WALL_TIMEOUT_MS = 30_000
 
 
 def resolve_wasmtime():
@@ -254,7 +255,7 @@ def invoke(doc, artifact, method: str, data: bytes, *, wasmtime=_AUTO, root: Pat
                     detail=f"插件输入 {len(data)} 字节 > 上限 {MAX_PLUGIN_INPUT_BYTES}")
         return {"ok": False, "data": None, "meta": meta}
     fuel = fuel_for(entry, len(data))
-    timeout_ms = int(entry.get("wall_timeout_ms") or 30000)
+    timeout_ms = int(entry.get("wall_timeout_ms") or DEFAULT_WALL_TIMEOUT_MS)
     meta["fuel"] = fuel
     if not wasmtime:
         meta.update(reason="host_absent", detail="wasmtime 不在场")

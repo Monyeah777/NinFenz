@@ -37,6 +37,10 @@ def _natural(ident: str) -> tuple[int, ...]:
 def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
     root = Path(root)
     issues: list[str] = []
+    from core import security_controls
+
+    control_issues, control_stats = security_controls.scan(root)
+    issues.extend(control_issues)
     path = root / MATRIX_REL
     try:
         doc = _json(path)
@@ -127,4 +131,5 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         "coverage": {key: dict(sorted(value.items()))
                      for key, value in sorted(coverage.items(),
                                               key=lambda item: int(item[0][1:]))},
+        "controls": control_stats,
     }

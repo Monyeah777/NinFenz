@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 97,
+        "raises": 99,
         "sinks": 21
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "9c0b52455dc7878da8a962e01f04c14c6d8d147ab110094729bc6d5ab8607e0d",
+        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 329,
-        "files": 329,
+        "baseline": 330,
+        "files": 330,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7678
@@ -431,11 +431,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 260,
-        "modules": 260,
+        "metrics_recorded": 261,
+        "modules": 261,
         "registered_cycles": 0,
-        "registered_sdp": 10,
-        "sdp": 10
+        "registered_sdp": 12,
+        "sdp": 12
       },
       "status": "pass",
       "warns": 0
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 67,
+        "consumed": 68,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 69
+        "scanners": 70
       },
       "status": "pass",
       "warns": 0
@@ -522,51 +522,53 @@
           "V15",
           "V16"
         ],
+        "controls": {
+          "communication_paths": 3,
+          "crypto_inventory": 3,
+          "data_classes": 5,
+          "resource_limits": 10,
+          "runtime_external_paths": 0
+        },
         "coverage": {
           "V1": {
-            "enforced": 5,
-            "not-applicable": 12,
-            "partial": 10
+            "enforced": 10,
+            "not-applicable": 17
           },
           "V11": {
-            "enforced": 5,
+            "enforced": 8,
             "not-applicable": 5,
-            "partial": 4
+            "partial": 1
           },
           "V12": {
             "not-applicable": 9
           },
           "V13": {
-            "enforced": 3,
-            "not-applicable": 4,
-            "partial": 6
+            "enforced": 9,
+            "not-applicable": 4
           },
           "V14": {
-            "enforced": 1,
-            "not-applicable": 5,
-            "partial": 3
+            "enforced": 4,
+            "not-applicable": 5
           },
           "V15": {
-            "enforced": 4,
-            "not-applicable": 4,
-            "partial": 5
+            "enforced": 9,
+            "not-applicable": 4
           },
           "V16": {
             "enforced": 14,
             "partial": 2
           },
           "V2": {
-            "enforced": 4,
-            "not-applicable": 2,
-            "partial": 5
+            "enforced": 9,
+            "not-applicable": 2
           },
           "V4": {
             "not-applicable": 10
           },
           "V5": {
-            "enforced": 2,
-            "not-applicable": 4,
-            "partial": 3
+            "enforced": 3,
+            "not-applicable": 5,
+            "partial": 1
           },
           "V6": {
             "not-applicable": 35
@@ -576,16 +578,15 @@
             "not-applicable": 9
           },
           "V8": {
-            "enforced": 2,
-            "not-applicable": 4,
-            "partial": 1
+            "enforced": 3,
+            "not-applicable": 4
           }
         },
         "requirements": 191,
         "statuses": {
-          "enforced": 49,
-          "not-applicable": 103,
-          "partial": 39
+          "enforced": 78,
+          "not-applicable": 109,
+          "partial": 4
         }
       },
       "status": "pass",
@@ -616,8 +617,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4070,
-        "kernel": 2179,
+        "files": 4075,
+        "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -628,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "73d775474f170ee684677b12bb04d2f95c2edef24f8d1631165b8c7e8adad9ea",
+  "root_digest": "5365694a90231ea953a19d4d861bee9c9b60868f487c5de478671f78018875b2",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
