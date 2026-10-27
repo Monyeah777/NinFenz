@@ -26,11 +26,11 @@ class YamlFallbackNoticeTest(unittest.TestCase):
 
     def setUp(self):
         self.ly = self._live()
-        self._saved = (self.ly._TRIED, self.ly._YAML, getattr(self.ly, "_WARNED", False))
 
     def tearDown(self):
-        self.ly._TRIED, self.ly._YAML = self._saved[0], self._saved[1]
-        self.ly._WARNED = self._saved[2]
+        # Never restore a negative snapshot (tried=True, yaml=None): the next test
+        # may run after the simulated import block is gone and must import for real.
+        self._reset()
         os.environ.pop("NF_QUIET_YAML", None)
 
     def _reset(self):
@@ -90,6 +90,15 @@ class YamlFallbackNoticeTest(unittest.TestCase):
             value, err = self._capture(self.ly.module)
         self.assertIsNone(value)
         self.assertEqual("", err, "设了静默开关就不许再出声")
+
+    def test_reset_recovers_from_a_negative_import_cache(self):
+        self._reset()
+        with self._yaml_blocked():
+            self.assertIsNone(self.ly.module())
+        self._reset()
+        if importlib.util.find_spec("yaml") is None:
+            self.skipTest("本机没装 PyYAML")
+        self.assertIsNotNone(self.ly.module(), "reset 后必须重新尝试真实导入")
 
 
 if __name__ == "__main__":
