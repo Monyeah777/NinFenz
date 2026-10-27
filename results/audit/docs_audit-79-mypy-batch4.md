@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
+  - protocol/code_metrics_baseline.json:93e4f4b7a1244e70b8d42f86c78a66835c3aa0e7e01bbf420d52d76c8ae2eef3
 ---
+> 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds
+
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
 
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py

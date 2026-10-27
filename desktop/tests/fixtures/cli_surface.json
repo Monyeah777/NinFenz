@@ -1,0 +1,6325 @@
+{
+ "schema": "nf-cli-surface/1",
+ "root_flags": [
+  {
+   "option": [
+    "-h",
+    "--help"
+   ],
+   "dest": "help",
+   "nargs": 0
+  },
+  {
+   "option": [
+    "--version"
+   ],
+   "dest": "version",
+   "nargs": 0
+  },
+  {
+   "option": [
+    "--engine"
+   ],
+   "dest": "engine",
+   "nargs": null
+  }
+ ],
+ "commands": [
+  {
+   "name": "stats",
+   "aliases": [],
+   "help": "自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "check",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "facts",
+   "aliases": [],
+   "help": "事实真源：生成/校验 protocol/facts.json（版本/许可/质量/规模/npm）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "check",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "run",
+   "aliases": [],
+   "help": "跑全链管道：模块选择→装配→质检→导出",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--pipeline"
+     ],
+     "dest": "pipeline",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--modules"
+     ],
+     "dest": "modules",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--store"
+     ],
+     "dest": "store",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--seed"
+     ],
+     "dest": "seed",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--fmt"
+     ],
+     "dest": "fmt",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--doc-semantics"
+     ],
+     "dest": "doc_semantics",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--dest"
+     ],
+     "dest": "dest",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--variant-add"
+     ],
+     "dest": "variant_add",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--variant-remove"
+     ],
+     "dest": "variant_remove",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--no-include-refs"
+     ],
+     "dest": "no_include_refs",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--force-export"
+     ],
+     "dest": "force_export",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "register",
+   "aliases": [],
+   "help": "协议登记本地助手（B3-B：protocol.yaml → registry protocols[]）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "pkg_dir",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "mode",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--apply"
+     ],
+     "dest": "mode",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "registry",
+   "aliases": [],
+   "help": "契约注册表内容寻址（CID）：registry_index.json 生成/校验（T8.2）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "index",
+     "aliases": [],
+     "help": "生成/校验 protocol/registry_index.json（schema nf-registry-index/1）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "market",
+   "aliases": [],
+   "help": "市场协议查询（B4：依赖闭包 + 挂载冲突预检；list 目录视图）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "pkg_dir",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--list"
+     ],
+     "dest": "list",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--tier"
+     ],
+     "dest": "tier",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "spec",
+   "aliases": [],
+   "help": "Spec Registry 查询（v2.5.0 Wave3）+ 契约语义可判定（T7.1/T10.1）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "action",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--core"
+     ],
+     "dest": "core",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--max-states"
+     ],
+     "dest": "max_states",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "render",
+   "aliases": [],
+   "help": "协议多出口渲染（A3：protocol.yaml → agents/claude/skill rules）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "pkg_dir",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--fmt"
+     ],
+     "dest": "fmt",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--dest"
+     ],
+     "dest": "dest",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "serve",
+   "aliases": [],
+   "help": "MCP 运行时服务（C1：mcp.json 快照或实时仓库面 → stdio JSON-RPC，供 MCP client 拉起）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "snapshot",
+     "nargs": "?"
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "design",
+   "aliases": [],
+   "help": "决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "steelman",
+     "aliases": [],
+     "help": "钢人论证工作单：init/--check/ls（默认缺席，按需自检）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "action",
+       "nargs": "?"
+      },
+      {
+       "option": [],
+       "dest": "question",
+       "nargs": "?"
+      },
+      {
+       "option": [
+        "--context"
+       ],
+       "dest": "context",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--decider"
+       ],
+       "dest": "decider",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--out"
+       ],
+       "dest": "out",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check_file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "audit",
+     "aliases": [],
+     "help": "协议设计审计（M_AUDIT：决策过程质量——钢人/blindspot/full）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "action",
+       "nargs": "?"
+      },
+      {
+       "option": [],
+       "dest": "question",
+       "nargs": "?"
+      },
+      {
+       "option": [
+        "--target"
+       ],
+       "dest": "target",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--mode"
+       ],
+       "dest": "mode",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--context"
+       ],
+       "dest": "context",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--out"
+       ],
+       "dest": "out",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check_file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "who-refers",
+   "aliases": [],
+   "help": "引用反查（A2：谁引用了某模块，遍历 registry references）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "module_id",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "impact",
+   "aliases": [],
+   "help": "变更影响面预检（A4 前置：拟删除 module/protocol 前查破坏性影响）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "target",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "mode",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "rename",
+   "aliases": [],
+   "help": "模块改名引用重链（A5：references 中引用该模块的条目批量更新）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "old_id",
+     "nargs": null
+    },
+    {
+     "option": [],
+     "dest": "new_id",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "mode",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--apply"
+     ],
+     "dest": "mode",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "import",
+   "aliases": [],
+   "help": "读入外部产物（SKILL.md/chara.json；docx/dita → 内容 IR）→ parse + 可选内容库登记（A4 遗留闭环；T9.2 导入面）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "file",
+     "nargs": "+"
+    },
+    {
+     "option": [
+      "--register"
+     ],
+     "dest": "register",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--store"
+     ],
+     "dest": "store",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--out"
+     ],
+     "dest": "out",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "glossary",
+   "aliases": [],
+   "help": "英文术语层（Terminology layer：zh/en 双语定义 + 真实协议锚点）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "术语层校验（失败非零）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "render",
+     "aliases": [],
+     "help": "从同一数据渲染英文术语表（人读件）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--out"
+       ],
+       "dest": "out",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "asset",
+   "aliases": [],
+   "help": "资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏览 / rm 摘除 / deprecate·restore 流转）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "add",
+     "aliases": [],
+     "help": "入库资产：资产文件头写 nf-asset 头 + 台账 append（溯源键表自动生成）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--key"
+       ],
+       "dest": "key",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--source"
+       ],
+       "dest": "source",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--module"
+       ],
+       "dest": "module",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--version"
+       ],
+       "dest": "version",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--status"
+       ],
+       "dest": "status",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--tier"
+       ],
+       "dest": "tier",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--package"
+       ],
+       "dest": "package",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "台账闭合校验（与 verify.sh check23 同语义）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "baseline",
+     "aliases": [],
+     "help": "社区资产行数基线（可重签工件；漂移即 FAIL 直到显式重签）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "inventory",
+     "aliases": [],
+     "help": "库存盘点（台账摘要 + 未托管/孤儿统计）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "货架浏览（--pkg / --tier / --status 过滤）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--pkg"
+       ],
+       "dest": "pkg",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--tier"
+       ],
+       "dest": "tier",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--status"
+       ],
+       "dest": "status",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "density",
+     "aliases": [],
+     "help": "资产键语义密度体检（45：键数/字符/无键与空档统计）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "usage",
+     "aliases": [],
+     "help": "资产引用度体检（45：键在 04/community/docs 全语料引用次数/零引用清单）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--strict"
+       ],
+       "dest": "strict",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "thickness",
+     "aliases": [],
+     "help": "资产语义厚度体检（45：字符/键/小节/表格 + 低信息档候选）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "ledger",
+     "aliases": [],
+     "help": "资产键表机读投影（45：protocol/community_asset_ledger.json；--refresh 重生成）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--refresh"
+       ],
+       "dest": "refresh",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "contract",
+     "aliases": [],
+     "help": "数字资产契约四面校验（数据/代码/脚本/包清单：格式+字段完整性+防篡改+AST 规范+可证空指针+脚本 I/O 对齐+包自述对账）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--face"
+       ],
+       "dest": "face",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--export"
+       ],
+       "dest": "export",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--freeze"
+       ],
+       "dest": "freeze",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--run-tests"
+       ],
+       "dest": "run_tests",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "rm",
+     "aliases": [],
+     "help": "从台账摘除条目（不删资产文件，残留头由 check23 报孤儿）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--ledger"
+       ],
+       "dest": "ledger",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--key"
+       ],
+       "dest": "key",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "deprecate",
+     "aliases": [],
+     "help": "状态流转 → deprecated",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--ledger"
+       ],
+       "dest": "ledger",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--key"
+       ],
+       "dest": "key",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "restore",
+     "aliases": [],
+     "help": "状态流转 → active（deprecated 回退）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--ledger"
+       ],
+       "dest": "ledger",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--key"
+       ],
+       "dest": "key",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "pipeline",
+   "aliases": [],
+   "help": "管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "new",
+     "aliases": [],
+     "help": "派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--id"
+       ],
+       "dest": "id",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--name"
+       ],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--from"
+       ],
+       "dest": "template",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--domain"
+       ],
+       "dest": "domain",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--dest"
+       ],
+       "dest": "dest",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "dryrun",
+     "aliases": [],
+     "help": "管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory 分列）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--pipeline"
+       ],
+       "dest": "pipeline",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--all"
+       ],
+       "dest": "all",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write-advisory"
+       ],
+       "dest": "write_advisory",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "module",
+   "aliases": [],
+   "help": "模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "浏览模块状态（--status 过滤；缺省全量）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--status"
+       ],
+       "dest": "status",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "status",
+     "aliases": [],
+     "help": "查看单个模块文件状态位",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "deprecate",
+     "aliases": [],
+     "help": "状态流转 → deprecated（写文件元信息行状态位）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--reason"
+       ],
+       "dest": "reason",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "restore",
+     "aliases": [],
+     "help": "状态流转 → active（deprecated/retired 回退）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "引用门禁扫描（与 verify.sh check24 同语义）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "signature",
+     "aliases": [],
+     "help": "模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "types",
+     "aliases": [],
+     "help": "I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--harvest"
+       ],
+       "dest": "harvest",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--backlog"
+       ],
+       "dest": "backlog",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "contract",
+     "aliases": [],
+     "help": "L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "demo",
+   "aliases": [],
+   "help": "一键交付物演示（默认 P06 技术文档全链 → Markdown；`demo narrative` = P04 轻混 → CCV3 导出）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "mode",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--dest"
+     ],
+     "dest": "dest",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "sig",
+   "aliases": [],
+   "help": "协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "target",
+     "nargs": "*"
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--verify"
+     ],
+     "dest": "verify",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "attest",
+   "aliases": [],
+   "help": "内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂锚）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "target",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--out"
+     ],
+     "dest": "out",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--issuer"
+     ],
+     "dest": "issuer",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--key-file"
+     ],
+     "dest": "key_file",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--verify"
+     ],
+     "dest": "verify",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--selfcheck"
+     ],
+     "dest": "selfcheck",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "score",
+   "aliases": [],
+   "help": "基线相对回归评分（Codecov 式：当前 vs 基线，no silent worsening）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--baseline"
+     ],
+     "dest": "baseline",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--write-baseline"
+     ],
+     "dest": "write_baseline",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--tolerance"
+     ],
+     "dest": "tolerance",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--exceptions"
+     ],
+     "dest": "exceptions",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "lint",
+   "aliases": [],
+   "help": "机械检查/修复（doc_hygiene 同源判据 + 可选正文 lint；--fix 只改机械面）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "target",
+     "nargs": "*"
+    },
+    {
+     "option": [
+      "--fix"
+     ],
+     "dest": "fix",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--dry-run"
+     ],
+     "dest": "dry_run",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--prose"
+     ],
+     "dest": "prose",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--kinds"
+     ],
+     "dest": "kinds",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "assertions",
+   "aliases": [],
+   "help": "数据化断言表（Schematron 式：patterns→rules→assertions）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "model",
+   "aliases": [],
+   "help": "内容建模三件（词表登记册 / 规范与说明件 / 数据契约登记）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "part",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "decisions",
+   "aliases": [],
+   "help": "决策记录（ADR：一条一编号；采纳后不改不删，只可被取代）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "show",
+     "aliases": [],
+     "help": "看单条决策（frontmatter + 正文）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "id",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "机检决策记录",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "reindex",
+     "aliases": [],
+     "help": "重建 INDEX 投影",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "handover",
+   "aliases": [],
+   "help": "接力协议（SBAR：情境/背景/评估/建议 + 未决项带判据）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列全部交接件",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "机检单件交接",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "path",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "机检声明 + 全部交接件",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "postmortem",
+   "aliases": [],
+   "help": "复盘（无指责 + 根因指向机制 + 行动项闭环）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "机检单件复盘",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "path",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列全部复盘",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "机检声明 + 全部复盘件",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "audit",
+   "aliases": [],
+   "help": "审计/验收（列表 / 单件机检 / 全量机检 / 重审重绑）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "机检单件审计",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "path",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列全部审计件",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "机检声明 + 全部审计件",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "rebind",
+     "aliases": [],
+     "help": "重审并更新 digest（对象改动后机械重绑 + 落重审理由）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--note"
+       ],
+       "dest": "note",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--dry-run"
+       ],
+       "dest": "dry_run",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "cognition",
+   "aliases": [],
+   "help": "认知族（行话术语表 + 执行分档 Runbook/Playbook）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "part",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "st-validate",
+   "aliases": [],
+   "help": "ST 制卡校验器原型（卡 / 世界书 / MVU 变量 → 报告；A-S3）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--out"
+     ],
+     "dest": "out",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "state-front",
+   "aliases": [],
+   "help": "条件先行排布（状态块前置/后置/省略；T3 刺激件生成器）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--mode"
+     ],
+     "dest": "mode",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--out"
+     ],
+     "dest": "out",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "check",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--ab"
+     ],
+     "dest": "ab",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "lsp",
+   "aliases": [],
+   "help": "LSP 服务器（stdio：诊断/补全/悬停/跳定义/大纲/quickfix；不写盘）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--root"
+     ],
+     "dest": "root",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--print-config"
+     ],
+     "dest": "print_config",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "license",
+   "aliases": [],
+   "help": "图书馆许可证门（登记表「许可」列 + 条目内联声明双源校验）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "telemetry",
+   "aliases": [],
+   "help": "遥测 semconv 映射（trace 记录 → OTel GenAI 属性 / OTLP 形状）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "trace",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--otlp"
+     ],
+     "dest": "otlp",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "conformance",
+   "aliases": [],
+   "help": "一致性报告工件（全部契约 → Merkle 根 + verdict；可归档可比对）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "events",
+   "aliases": [],
+   "help": "全仓事件背书核对（订阅必有发布方；跨包事件可见；外部通道须挂账）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "receipts",
+   "aliases": [],
+   "help": "协议层回执单根（01–07/schema/baseline 等机读产物各带 inclusion proof）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--scope"
+     ],
+     "dest": "scope",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--entry"
+     ],
+     "dest": "entry",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "driver",
+   "aliases": [],
+   "help": "指令档机器面路由（有 MCP 走 MCP；派发失败即停、不回退文本步骤）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "workflow",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "rfc",
+   "aliases": [],
+   "help": "协议件 RFC 索引（编号/Category/Date/Status + supersede 链）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "patterns",
+   "aliases": [],
+   "help": "实践包：可发布/可消费/可移植的最佳实践（ls/show/for/verify/reindex）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列出全部 pattern",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "show",
+     "aliases": [],
+     "help": "看单条 pattern（frontmatter + 正文）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "id",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "for",
+     "aliases": [],
+     "help": "反向查：某文件适用哪些 pattern",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "target",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "机检 pattern（格式 + 可证性）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "reindex",
+     "aliases": [],
+     "help": "重建 patterns/INDEX 投影",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "preset",
+   "aliases": [],
+   "help": "预设配置：一份存档 = 管线+模块+资产包的**一次组装**（ls/show/apply/save/rm/export/import）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列出本机预设",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "show",
+     "aliases": [],
+     "help": "看一条预设",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "apply",
+     "aliases": [],
+     "help": "应用预设：解析成装配清单（管线+模块+资产包）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "save",
+     "aliases": [],
+     "help": "保存预设（同名已存在须加 --force 覆盖）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--pipeline"
+       ],
+       "dest": "pipeline",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--modules"
+       ],
+       "dest": "modules",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--assets"
+       ],
+       "dest": "assets",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--force"
+       ],
+       "dest": "force",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "rm",
+     "aliases": [],
+     "help": "删除本机预设",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "export",
+     "aliases": [],
+     "help": "导出预设到文件（跨机迁移）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--out"
+       ],
+       "dest": "out",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "import",
+     "aliases": [],
+     "help": "从文件导入预设到本机",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--name"
+       ],
+       "dest": "name",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--store"
+       ],
+       "dest": "store",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "bench",
+   "aliases": [],
+   "help": "执行结果跑分台（对 agent 产物五维确定性评分；多跑可比对）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "run",
+     "aliases": [],
+     "help": "跑一个用例 → run 记录（可 --out 存档）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--case"
+       ],
+       "dest": "case",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--artifact"
+       ],
+       "dest": "artifact",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--model"
+       ],
+       "dest": "model",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--out"
+       ],
+       "dest": "out",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "compare",
+     "aliases": [],
+     "help": "多跑比对（逐维均值/极差/相对最佳回落）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "runs",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "report",
+     "aliases": [],
+     "help": "人读跑分报告（markdown）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "runs",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "runtime",
+   "aliases": [],
+   "help": "参考运行时（确定性 harness：装配计划 → trace；MockModel + record/replay）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "run",
+     "aliases": [],
+     "help": "跑一次：--plan/--trace（可 --record/--replay）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--plan"
+       ],
+       "dest": "plan",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--trace"
+       ],
+       "dest": "trace",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--state"
+       ],
+       "dest": "state",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--record"
+       ],
+       "dest": "record",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--replay"
+       ],
+       "dest": "replay",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "endpoint",
+   "aliases": [],
+   "help": "服务端点契约（proposed：把已实现能力声明成 HTTP 面 + 指向真实性门禁）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "interop",
+   "aliases": [],
+   "help": "互操作导出（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto Statement / SPDX SBOM——纯派生）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--kind"
+     ],
+     "dest": "kind",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--all"
+     ],
+     "dest": "all",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--list"
+     ],
+     "dest": "list",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "check",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--out"
+     ],
+     "dest": "out",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "transparency",
+   "aliases": [],
+   "help": "透明日志（哈希链）：append-only 顺序 + 防删改（不可抵赖另说）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "output",
+   "aliases": [],
+   "help": "产出形态面（数据/图表/图结构/契约：形态清单 + 机验档位 + 可复算）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "list",
+     "aliases": [],
+     "help": "列形态清单（可按状态/类别/档位过滤）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--status"
+       ],
+       "dest": "status",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--category"
+       ],
+       "dest": "category",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--tier"
+       ],
+       "dest": "tier",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "判单件（多件）产出面的形态与档位并校验",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "paths",
+       "nargs": "+"
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "全量机检（与 verify check32 output_forms 同语义）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "render",
+     "aliases": [],
+     "help": "按包清单渲染产出面（数据/图表/图结构）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--package"
+       ],
+       "dest": "package",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "meter",
+     "aliases": [],
+     "help": "机验率 / 功能面计量（--write 重签基线）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "security",
+   "aliases": [],
+   "help": "内容供应链安全（域包/投稿正文的外来内容形态扫描：注入/可执行/凭据/结构）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "scan",
+     "aliases": [],
+     "help": "扫描路径（缺省 community/ 与 library/）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "paths",
+       "nargs": "*"
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "ops",
+   "aliases": [],
+   "help": "内容 SRE：只用真实产物算 SLI/SLO（缺数据即 UNKNOWN）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "report",
+     "aliases": [],
+     "help": "采集并打印 SLI/SLO 报告",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--no-live"
+       ],
+       "dest": "no_live",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "校验各源在场可解析（缺源 fail-closed）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--no-live"
+       ],
+       "dest": "no_live",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "privacy",
+   "aliases": [],
+   "help": "隐私与 air-gap 静态审计（PII/本机路径/凭据 + core·scripts 网络站点）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "scan",
+     "aliases": [],
+     "help": "内容面扫描（缺省 docs/ site/ protocol/ community/ library/）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "paths",
+       "nargs": "*"
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "air-gap 静态审计（core/ 与 scripts/ 的网络站点）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--root"
+       ],
+       "dest": "root",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "domain",
+   "aliases": [],
+   "help": "域包工厂（AI 品类清单工程：从一个域规格生成整套过门禁的域包）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "build",
+     "aliases": [],
+     "help": "按规格生成/更新一个域包（--write 才落盘）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--spec"
+       ],
+       "dest": "spec",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--no-render"
+       ],
+       "dest": "no_render",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "校验已生成域包与生成器逐字节一致 + 登记到位",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--spec"
+       ],
+       "dest": "spec",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "specs",
+     "aliases": [],
+     "help": "列出内部域规格与其状态",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "maturity",
+     "aliases": [],
+     "help": "域包成熟度 M0–M3（按证据计算；--write 落盘）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "shells",
+     "aliases": [],
+     "help": "派生空壳台账（域口径表：可数 + 只减不增棘轮）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "record",
+     "aliases": [],
+     "help": "真实模型执行记录校验/落盘（M2 证据 · nf-exec-record/1）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "combine",
+   "aliases": [],
+   "help": "域包自由组合（任意 n 元 / 组件级；五不变量 + 可复算证书）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "plan",
+     "aliases": [],
+     "help": "组合一个（打印/落证书）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--packs"
+       ],
+       "dest": "packs",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--modules"
+       ],
+       "dest": "modules",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--assets"
+       ],
+       "dest": "assets",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--label"
+       ],
+       "dest": "label",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--note"
+       ],
+       "dest": "note",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--certify"
+       ],
+       "dest": "certify",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "breadth",
+     "aliases": [],
+     "help": "广度证明（全部两两 + 抽样三元/四元/五元/六元）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--triples"
+       ],
+       "dest": "triples",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--quads"
+       ],
+       "dest": "quads",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--quints"
+       ],
+       "dest": "quints",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--sexts"
+       ],
+       "dest": "sexts",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "证书复算（T4：与在盘证书逐字段比对）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "materialize",
+     "aliases": [],
+     "help": "把组合落成可装载的组合包（派生协议/管线/借阅索引/机验产出面）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--packs"
+       ],
+       "dest": "packs",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--id"
+       ],
+       "dest": "id",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--category"
+       ],
+       "dest": "category",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "decide",
+   "aliases": [],
+   "help": "决策层（typed-decision 三原语 choice/noul/score：候选集上报概率 + argmax）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--state"
+     ],
+     "dest": "state",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--state-text"
+     ],
+     "dest": "state_text",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--questions"
+     ],
+     "dest": "questions",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--adapter"
+     ],
+     "dest": "adapter",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--endpoint"
+     ],
+     "dest": "endpoint",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--model"
+     ],
+     "dest": "model",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--timeout"
+     ],
+     "dest": "timeout",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--dry-run"
+     ],
+     "dest": "dry_run",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "workloop",
+   "aliases": [],
+   "help": "构建回路：决策模型挑活 → 生成式 worker 落笔 → NF 门禁验收",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--adapter"
+     ],
+     "dest": "adapter",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--top"
+     ],
+     "dest": "top",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--source"
+     ],
+     "dest": "source",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--endpoint"
+     ],
+     "dest": "endpoint",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--timeout"
+     ],
+     "dest": "timeout",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--list"
+     ],
+     "dest": "list",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--close"
+     ],
+     "dest": "close",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--outcome"
+     ],
+     "dest": "outcome",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--gate"
+     ],
+     "dest": "gate",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--note"
+     ],
+     "dest": "note",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "review",
+   "aliases": [],
+   "help": "缺口逐行审查（决策模型逐行判 + 确定性证据复核，双轨）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--adapter"
+     ],
+     "dest": "adapter",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--endpoint"
+     ],
+     "dest": "endpoint",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--scope"
+     ],
+     "dest": "scope",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--limit"
+     ],
+     "dest": "limit",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--batch"
+     ],
+     "dest": "batch",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--timeout"
+     ],
+     "dest": "timeout",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "knowledge",
+   "aliases": [],
+   "help": "双源知识层（权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "order",
+     "aliases": [],
+     "help": "解析查询顺序（合同级在前、参考级在后）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--as"
+       ],
+       "dest": "clearance",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "lint",
+     "aliases": [],
+     "help": "知识层巡检（悬空 / 孤儿 / 时效 / 溯源 / 声明）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "transform",
+     "aliases": [],
+     "help": "列消化记录（外部 → 本地，digest 绑定）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": [
+      {
+       "name": "add",
+       "aliases": [],
+       "help": "登记一条消化记录（复核双签，未转正）",
+       "flags": [
+        {
+         "option": [
+          "-h",
+          "--help"
+         ],
+         "dest": "help",
+         "nargs": 0
+        },
+        {
+         "option": [
+          "--from"
+         ],
+         "dest": "src",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--to"
+         ],
+         "dest": "dst",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--by"
+         ],
+         "dest": "by",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--at"
+         ],
+         "dest": "at",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--json"
+         ],
+         "dest": "json",
+         "nargs": 0
+        }
+       ],
+       "nested": null
+      },
+      {
+       "name": "promote",
+       "aliases": [],
+       "help": "转正（须齐三档证据 + 复核双签）",
+       "flags": [
+        {
+         "option": [
+          "-h",
+          "--help"
+         ],
+         "dest": "help",
+         "nargs": 0
+        },
+        {
+         "option": [
+          "--from"
+         ],
+         "dest": "src",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--to"
+         ],
+         "dest": "dst",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--by"
+         ],
+         "dest": "by",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--at"
+         ],
+         "dest": "at",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--evidence"
+         ],
+         "dest": "evidence",
+         "nargs": null
+        },
+        {
+         "option": [
+          "--json"
+         ],
+         "dest": "json",
+         "nargs": 0
+        }
+       ],
+       "nested": null
+      }
+     ]
+    },
+    {
+     "name": "frequency",
+     "aliases": [],
+     "help": "从 trace 复算知识源使用频次（--write 落台账）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--trace"
+       ],
+       "dest": "trace",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "visible",
+     "aliases": [],
+     "help": "按可见性列出源（认知裁剪执行面）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--as"
+       ],
+       "dest": "clearance",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "graph",
+     "aliases": [],
+     "help": "资产本体索引：合并全部域包 CONCEPT_GRAPH（nf-concept-index/1）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "approve",
+   "aliases": [],
+   "help": "内容绑定批准记录（被批准对象改动即失效）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "subject",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--by"
+     ],
+     "dest": "by",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--note"
+     ],
+     "dest": "note",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--verify"
+     ],
+     "dest": "verify",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--list"
+     ],
+     "dest": "list",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "library",
+   "aliases": [],
+   "help": "云端图书馆机器面（frontmatter 真源 / INDEX·ALIAS 投影 / 检索）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "ls",
+     "aliases": [],
+     "help": "列出馆藏条目（编号/状态/许可/标题）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "show",
+     "aliases": [],
+     "help": "查看单条条目（frontmatter + 正文头）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "reindex",
+     "aliases": [],
+     "help": "重生成 INDEX 生成区 + ALIAS（真源 = 条目 frontmatter）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "verify",
+     "aliases": [],
+     "help": "校验 frontmatter + 投影一致性（图书馆门同语义）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--key-file"
+       ],
+       "dest": "key_file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--ssh-allowed-signers"
+       ],
+       "dest": "ssh_allowed_signers",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--ssh-identity"
+       ],
+       "dest": "ssh_identity",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "search",
+     "aliases": [],
+     "help": "关键词检索（标题/描述/标签/正文，中文子串可用）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "query",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "deprecate",
+     "aliases": [],
+     "help": "生命周期流转 → deprecated（不再推荐、仍可读）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "restore",
+     "aliases": [],
+     "help": "生命周期回退 → active",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "supersede",
+     "aliases": [],
+     "help": "取代链：旧条目 → superseded（指向新条目）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [],
+       "dest": "by",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "attest",
+     "aliases": [],
+     "help": "给条目挂 attestation（复用 nf attest 信封摘要）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--key-file"
+       ],
+       "dest": "key_file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--ssh-key"
+       ],
+       "dest": "ssh_key",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--ssh-identity"
+       ],
+       "dest": "ssh_identity",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "receipts",
+     "aliases": [],
+     "help": "馆藏回执 + 单根（逐条 inclusion proof，读者可本地折叠验证）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--entry"
+       ],
+       "dest": "entry",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "diff",
+   "aliases": [],
+   "help": "版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "a",
+     "nargs": null
+    },
+    {
+     "option": [],
+     "dest": "b",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "explain",
+   "aliases": [],
+   "help": "check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "check",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "related",
+   "aliases": [],
+   "help": "See-Also 关联查询（41 波C C4：market/图书馆条目人读引用链）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "target",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--registry"
+     ],
+     "dest": "registry",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "help",
+   "aliases": [],
+   "help": "显示 nf 或指定子命令的帮助",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "command",
+     "nargs": "?"
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "doctor",
+   "aliases": [],
+   "help": "环境自检（快速只读体检：关键文件/registry/schema/核心库——不开 verify 慢跑）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "completion",
+   "aliases": [],
+   "help": "生成 shell 补全脚本（bash/zsh/fish；用法：nf completion bash >> ~/.bashrc）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "shell",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "assemble",
+   "aliases": [],
+   "help": "需求 → 自组装编排（44：一句话需求 → 装配计划；--check 对成品机器验收）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "requirement",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check"
+     ],
+     "dest": "check_md",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--save"
+     ],
+     "dest": "save_path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--trace"
+     ],
+     "dest": "trace_path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--check-trace"
+     ],
+     "dest": "check_trace",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--rounds"
+     ],
+     "dest": "rounds",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--loose"
+     ],
+     "dest": "loose",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--answer"
+     ],
+     "dest": "answer",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--session"
+     ],
+     "dest": "session_path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--build"
+     ],
+     "dest": "build",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--dest"
+     ],
+     "dest": "build_dest",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--allow-protected-dest"
+     ],
+     "dest": "allow_protected_dest",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "release",
+   "aliases": [],
+   "help": "发布前体检与编排（体检照旧；--plan 出有序发布计划；--freeze [--apply] 按序走冻结链）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--fast"
+     ],
+     "dest": "fast",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--plan"
+     ],
+     "dest": "plan",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--freeze"
+     ],
+     "dest": "freeze",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--apply"
+     ],
+     "dest": "apply",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--by"
+     ],
+     "dest": "by",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--note"
+     ],
+     "dest": "note",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "changelog",
+   "aliases": [],
+   "help": "变更日志生成（从变更条目 + 约定式提交生成版本节；默认预览，--write 落盘并归档条目）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--version"
+     ],
+     "dest": "version",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--date"
+     ],
+     "dest": "date",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--no-commits"
+     ],
+     "dest": "no_commits",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "locales",
+   "aliases": [],
+   "help": "语言面自检（--write 重签文档译件的源件摘要）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "toolface",
+   "aliases": [],
+   "help": "模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不入门禁）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "worldmodel",
+   "aliases": [],
+   "help": "world_model 浏览（JEPA-inspired 确定性抽象状态契约，check32 硬门）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--walk"
+     ],
+     "dest": "walk",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--run"
+     ],
+     "dest": "run",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--state"
+     ],
+     "dest": "state_path",
+     "nargs": null
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "shell",
+   "aliases": [
+    "terminal"
+   ],
+   "help": "NF 终端：交互式入口（能力菜单 + nf 命令直通；--exec 非交互回归面）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--exec"
+     ],
+     "dest": "exec_script",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--no-banner"
+     ],
+     "dest": "no_banner",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--yes"
+     ],
+     "dest": "yes",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--file"
+     ],
+     "dest": "script_file",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--commands"
+     ],
+     "dest": "commands",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--search"
+     ],
+     "dest": "search",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--map"
+     ],
+     "dest": "family_map",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--verify"
+     ],
+     "dest": "verify",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--deep"
+     ],
+     "dest": "deep",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--baseline"
+     ],
+     "dest": "baseline",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--complete"
+     ],
+     "dest": "complete_prefix",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--history"
+     ],
+     "dest": "history",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--no-history"
+     ],
+     "dest": "no_history",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--color"
+     ],
+     "dest": "color",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--width"
+     ],
+     "dest": "width",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--limit"
+     ],
+     "dest": "limit",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--session"
+     ],
+     "dest": "session_path",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--form"
+     ],
+     "dest": "form_id",
+     "nargs": "?"
+    },
+    {
+     "option": [
+      "--answer"
+     ],
+     "dest": "answer",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--pager"
+     ],
+     "dest": "pager",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--surface"
+     ],
+     "dest": "surface",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--surface-write"
+     ],
+     "dest": "surface_write",
+     "nargs": "?"
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "layers",
+   "aliases": [],
+   "help": "抽象阶梯（两轴 + 纵切）：四阶真源/接口面 + 资产五子级 + 入口面 + 验证纵切",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--verify"
+     ],
+     "dest": "verify",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--write"
+     ],
+     "dest": "write",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "daemon",
+   "aliases": [],
+   "help": "执行层常驻守护（毫秒级响应）：start / stop / status / exec / bench",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "start",
+     "aliases": [],
+     "help": "拉起守护（后台、脱离控制台）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--idle"
+       ],
+       "dest": "idle",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--watch"
+       ],
+       "dest": "watch",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "stop",
+     "aliases": [],
+     "help": "请守护自行退出（协议级 shutdown，不发信号）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "status",
+     "aliases": [],
+     "help": "守护状态（在线？端口 / pid / 往返时延）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "exec",
+     "aliases": [],
+     "help": "把一条 nf 命令交给守护执行（输出/退出码与直跑一致）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--no-start"
+       ],
+       "dest": "no_start",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "argv",
+       "nargs": "..."
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "bench",
+     "aliases": [],
+     "help": "测量：直跑（含解释器启动）vs 守护往返",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--runs"
+       ],
+       "dest": "runs",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "shell-init",
+     "aliases": [],
+     "help": "输出 shell 快路（零子进程客户端），供 eval 安装",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "shell",
+       "nargs": "?"
+      },
+      {
+       "option": [
+        "--shell"
+       ],
+       "dest": "shell_opt",
+       "nargs": null
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "verify",
+   "aliases": [],
+   "help": "门禁单进程引擎（已迁入的 check 与 verify.sh 判据逐字等价）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--only"
+     ],
+     "dest": "only",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--json"
+     ],
+     "dest": "json",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--memo"
+     ],
+     "dest": "memo",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--cached"
+     ],
+     "dest": "cached",
+     "nargs": 0
+    },
+    {
+     "option": [
+      "--jobs"
+     ],
+     "dest": "jobs",
+     "nargs": null
+    },
+    {
+     "option": [
+      "--trust-repo"
+     ],
+     "dest": "trust_repo",
+     "nargs": 0
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "nfal",
+   "aliases": [],
+   "help": "NFA-L 装配语言：guard 表达式 解析/检查/编译/求值（声明层借 YAML/IDL）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    },
+    {
+     "option": [],
+     "dest": "nfal_args",
+     "nargs": "..."
+    }
+   ],
+   "nested": null
+  },
+  {
+   "name": "ir",
+   "aliases": [],
+   "help": "内容 IR：产物 → 带类型节点图（parse/render；节点级检查）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "节点级检查（section/claim/无归属引用/悬空实体/IR 文本规则）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [],
+       "dest": "file",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "agent",
+   "aliases": [],
+   "help": "多 agent 协作契约（角色=模块 / 交接=事件 / 验收=门）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "plan",
+     "aliases": [],
+     "help": "输出域角色链（角色→模块→门 + 交接边）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--domain"
+       ],
+       "dest": "domain",
+       "nargs": null
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    },
+    {
+     "name": "check",
+     "aliases": [],
+     "help": "校验角色链闭合（缺门/孤儿交接/无失败策略/坏引用）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  },
+  {
+   "name": "cli",
+   "aliases": [],
+   "help": "CLI 信息架构：命令目录 / 族覆盖 / 机器面（生成 protocol/cli_map.json + docs/cli-map.md）",
+   "flags": [
+    {
+     "option": [
+      "-h",
+      "--help"
+     ],
+     "dest": "help",
+     "nargs": 0
+    }
+   ],
+   "nested": [
+    {
+     "name": "map",
+     "aliases": [],
+     "help": "构建/校验命令地图（--write 生成；--check 与实时重算对账）",
+     "flags": [
+      {
+       "option": [
+        "-h",
+        "--help"
+       ],
+       "dest": "help",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--write"
+       ],
+       "dest": "write",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--check"
+       ],
+       "dest": "check",
+       "nargs": 0
+      },
+      {
+       "option": [
+        "--json"
+       ],
+       "dest": "json",
+       "nargs": 0
+      }
+     ],
+     "nested": null
+    }
+   ]
+  }
+ ]
+}

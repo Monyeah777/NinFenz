@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
+  - protocol/code_metrics_baseline.json:93e4f4b7a1244e70b8d42f86c78a66835c3aa0e7e01bbf420d52d76c8ae2eef3
 ---
+> 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds
+
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
 
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py

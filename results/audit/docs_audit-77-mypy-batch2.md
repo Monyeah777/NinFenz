@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
+  - protocol/code_metrics_baseline.json:93e4f4b7a1244e70b8d42f86c78a66835c3aa0e7e01bbf420d52d76c8ae2eef3
 ---
+> 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds
+
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
 
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py

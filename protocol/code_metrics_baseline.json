@@ -1450,6 +1450,11 @@
       "max_fn_cc": 20,
       "max_fn_lines": 41
     },
+    "scripts/cli_surface_lib.py": {
+      "lines": 41,
+      "max_fn_cc": 6,
+      "max_fn_lines": 14
+    },
     "scripts/code_metrics.py": {
       "lines": 81,
       "max_fn_cc": 10,
@@ -1549,6 +1554,11 @@
       "lines": 209,
       "max_fn_cc": 15,
       "max_fn_lines": 42
+    },
+    "scripts/make_cli_surface.py": {
+      "lines": 23,
+      "max_fn_cc": 0,
+      "max_fn_lines": 0
     },
     "scripts/nf.py": {
       "lines": 1942,

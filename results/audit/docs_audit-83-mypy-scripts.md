@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:61b767925d5f9c34ec5bbfb34bb48b91aee559ba26e0359575ad29f9b911cadd
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
+  - protocol/code_metrics_baseline.json:93e4f4b7a1244e70b8d42f86c78a66835c3aa0e7e01bbf420d52d76c8ae2eef3
 ---
+> 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds
+
 > 重审（2026-10-27）：S2s: dispatch table + noqa re-export annotations
 
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers

@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:578fc0747865aa6f03f37d2d04de767b81f39e75de93ba12141f8c5178016308
+  - protocol/code_metrics_baseline.json:93e4f4b7a1244e70b8d42f86c78a66835c3aa0e7e01bbf420d52d76c8ae2eef3
 ---
+> 重审（2026-10-27）：S2t: cli_surface golden + wheel payload includes scripts/nf_cmds
+
 > 重审（2026-10-27）：S2s: main() dispatch -> nf_cmds/dispatch.py command table + preflight/run helpers
 
 > 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
