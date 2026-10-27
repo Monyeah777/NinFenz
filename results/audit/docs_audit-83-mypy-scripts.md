@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:a480880fe406c13f126483b8520327ab9e3394d1e236a63b0175843909a9d519
+  - scripts/nf.py:0cd4f603b26162b65606ad9f9561403ecd749519280ef90e79b4747aaba58131
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:91767ad28fb88a9feb1df125a314209d4aae5fa41d96fdd0ce7e401c2e3be29e
+  - protocol/code_metrics_baseline.json:7dfb684e01c6351bd71c149445f3afa1876640d4bf67a0be3caf04398ffbd98d
 ---
+> 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
+
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py
 
 > 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py

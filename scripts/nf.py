@@ -41,7 +41,7 @@ _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
-from nf_cmds.common import (json_doc, _file_shape_issue, _existing_nonfile_issue, _no_machine_paths, _portable_path, _rel_display, _rel_out, _machine_fail, _page_text, _trust_line, _trust_note, _write_trace_file, _session_load, _session_write, _surface_module_on_disk, _shell_baseline, _release_freeze)
+from nf_cmds.common import (json_doc, _file_shape_issue, _existing_nonfile_issue, _portable_path, _rel_display, _rel_out, _machine_fail, _page_text, _trust_line, _trust_note, _write_trace_file, _session_load, _session_write, _surface_module_on_disk, _shell_baseline, _release_freeze)
 from nf_cmds.surfaces import (_cmd_lsp, _cmd_facts, _cmd_license, _cmd_endpoint, _cmd_assertions, _cmd_conformance, _cmd_stats, _cmd_registry, _cmd_model, _cmd_spec, _cmd_ir, _cmd_ops, _cmd_glossary, _cmd_security, _cmd_privacy)
 from nf_cmds.misc import (_cmd_sig, _cmd_diff, _cmd_telemetry, _cmd_changelog, _cmd_receipts, _cmd_layers, _cmd_attest, _cmd_runtime, _cmd_agent)
 from nf_cmds.shelf import (_cmd_combine, _cmd_output, _cmd_market)
@@ -2229,141 +2229,9 @@ def _cmd_help(args):
 
 
 def _cmd_doctor(args):
-    """nf doctor：环境自检（快速只读体检；不开 verify 慢跑）。
-
-    检查项：关键文件在场 / registry 可解析且模块在册 / IDL schema 定义在场 /
-    核心库可导入。exit 0 = 全部通过；任一 FAIL = 1。
-    """
-    import json as _json
-
-    checks = []
-
-    def chk(name, ok, detail):
-        # 体检明细只回**可移植**写法（2026-10-01 收口）：`detail` 此前会把 `sdir` 这类
-        # 本机绝对路径原样写进 `--json`（隐私 + 换机不可解释）。兜一层 `_no_machine_paths`
-        # 与失败消息同款纪律；各检查项自身也必须给仓库相对口径。
-        checks.append({"name": name, "ok": bool(ok),
-                       "detail": _no_machine_paths(str(detail))})
-
-    for rel in ("README.md", "01_核心协议.md", "02_联动注册表.md",
-                "06_Agent执行协议.md", "07_官方核心出厂与社区预设导航.md",
-                "AGENTS.md", "STRATEGY.md", "verify.sh"):
-        chk("文件在场 %s" % rel, os.path.isfile(os.path.join(ROOT, rel)), rel)
-
-    reg_path = os.path.join(ROOT, "desktop", "src", "core", "registry.json")
-    try:
-        with open(reg_path, encoding="utf-8") as fh:
-            reg = _json.load(fh)
-        n_modules = len(reg.get("modules") or [])
-        n_prots = len(reg.get("protocols") or [])
-        chk("registry 可解析（modules=%d protocols=%d）" % (n_modules, n_prots),
-            n_modules >= 13 and n_prots >= 5,
-            "desktop/src/core/registry.json")
-    except Exception as exc:
-        chk("registry 可解析", False, "desktop/src/core/registry.json: %s" % exc)
-
-    sdir = os.path.join(ROOT, "protocol", "schema")
-    try:
-        n_schema = len([f for f in os.listdir(sdir) if f.endswith(".json")])
-    except OSError as exc:
-        n_schema = 0
-        chk("IDL schema 定义在场", False, str(exc))
-    if os.path.isdir(sdir):
-        # 判据是「五份核心 IDL 定义在场」而非「恰好五份」——扩展协议面（发布策略 / 接入面 schema）
-        # 会合法增份；写成 ==5 会把扩容判成缺陷（2026-10-05 实测：7 份被判 FAIL）。
-        _core_idl = ("contract.schema.json", "module.schema.json", "pipeline.schema.json",
-                     "protocol.schema.json", "asset.schema.json")
-        _names = set(os.listdir(sdir))
-        chk("IDL schema 定义在场（%d 份）" % n_schema,
-            all(x in _names for x in _core_idl), "protocol/schema")
-
-    try:
-        sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
-        from core import schema_lint  # noqa: F401
-        chk("核心库可导入（schema_lint）", True, "desktop/src/core")
-    except Exception as exc:
-        chk("核心库可导入（schema_lint）", False, str(exc))
-
-    try:
-        from core import quality_baseline as qb
-        q_issues, q_stats = qb.scan(ROOT)
-        chk("基线自描述一致（verify %s · check1-%d PASS=%d）"
-            % (q_stats["verify_version"], q_stats["checks"], qb.EXPECTED_PASS),
-            not q_issues,
-            "verify/README/CHANGELOG/VERSION-MATRIX")
-    except Exception as exc:
-        chk("基线自描述一致", False, str(exc))
-
-    try:
-        import json as _j
-        from jsonschema import Draft202012Validator
-        for f in sorted(os.listdir(os.path.join(ROOT, "protocol", "schema"))):
-            if f.endswith(".json"):
-                with open(os.path.join(ROOT, "protocol", "schema", f),
-                          encoding="utf-8") as fh:
-                    Draft202012Validator.check_schema(_j.load(fh))
-        chk("schema 标准对照（jsonschema）", True, "CI 与本地同跑")
-    except Exception as exc:
-        chk("schema 标准对照（jsonschema）", True,
-            "可选依赖未装（CI 已装真跑）：%s" % exc)
-
-    try:
-        from core import tool_face as tf
-        tf_issues, tf_stats = tf.scan(ROOT)
-        chk("模块工具面（tool_face）",
-            not tf_issues,
-            "模块 %d · 条目 %d · 候选 %d"
-            % (tf_stats["modules"], tf_stats["entries"],
-               tf_stats["candidates"]))
-    except Exception as exc:
-        chk("模块工具面（tool_face）", False, str(exc))
-
-    try:
-        from core import world_model as wm
-        from core import world_slots as ws
-        wm_issues, wm_stats = wm.scan(ROOT)
-        ws_issues, ws_stats = ws.scan(ROOT)
-        chk("world_model 契约",
-            not wm_issues,
-            "模块 %d · 变量 %d · checks %d · slots %d/%d"
-            % (wm_stats["modules"], wm_stats["variables"],
-               wm_stats.get("checks", 0), wm_stats.get("slots", 0),
-               wm_stats.get("slot_registry", 0)))
-        chk("world_slots 注册表",
-            not ws_issues,
-            "slots %d · arrays %d" % (ws_stats["slots"], ws_stats["arrays"]))
-    except Exception as exc:
-        chk("world_model/world_slots", False, str(exc))
-
-    # 可选依赖降级面（2026-10-10 审计 Y7，P2）：缺 PyYAML 时上面几条扫描会**静默降级**
-    # （tool_face 1/1/1→0/0/0、world_model 计数塌成 0），而此前只有 stderr 一行 WARN ⇒
-    # 「计数塌成 0」照样显示 N/N 通过、--json 面无从判别 = 降级报绿。现在它是一条**会 FAIL 的
-    # 检查**（CI 装了 PyYAML，故 CI 不受影响），并在 --json 面加 degraded 标记（fail-closed）。
-    from core import lazy_yaml as _ly_doc
-    yaml_ok = _ly_doc.module() is not None
-    chk("可选依赖 PyYAML 在场（YAML 字段不降级）", yaml_ok,
-        "PyYAML" if yaml_ok else
-        "缺 PyYAML：YAML 面计数会塌成 0——本行即 FAIL（修复指引：pip install pyyaml；"
-        "若只想静默 stderr 告警可设 NF_QUIET_YAML=1）")
-
-    n_pass = sum(1 for c in checks if c["ok"])
-    if args.json:
-        print(_json.dumps({
-            "kind": "doctor",
-            "version": NF_CLI_VERSION,
-            "ok": n_pass == len(checks),
-            "passed": n_pass,
-            "total": len(checks),
-            "degraded": not yaml_ok,
-            "checks": checks,
-        }, ensure_ascii=False, indent=2, sort_keys=True))
-    else:
-        print("== nf doctor（nf %s）==" % NF_CLI_VERSION)
-        for c in checks:
-            print("  [%s] %s（%s）" % ("PASS" if c["ok"] else "FAIL",
-                                       c["name"], c["detail"]))
-        print("  体检：%d/%d 通过" % (n_pass, len(checks)))
-    return 0 if n_pass == len(checks) else 1
+    """nf doctor：环境自检（实现见 nf_cmds/doctor.py）。"""
+    from nf_cmds.doctor import run as _doctor_run
+    return _doctor_run(args, NF_CLI_VERSION)
 
 
 #: 终端检索索引里单行摘要的截断长度（列出命令面时保持一行一条）

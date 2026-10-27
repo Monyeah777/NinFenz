@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
-  - protocol/code_metrics_baseline.json:91767ad28fb88a9feb1df125a314209d4aae5fa41d96fdd0ce7e401c2e3be29e
+  - protocol/code_metrics_baseline.json:7dfb684e01c6351bd71c149445f3afa1876640d4bf67a0be3caf04398ffbd98d
 ---
+> 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
+
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py
 
 > 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
