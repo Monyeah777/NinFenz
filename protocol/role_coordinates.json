@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1042,
-    "projection": 183,
-    "support": 297,
-    "verify": 1133
+    "projection": 133,
+    "support": 283,
+    "verify": 1131
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -12629,18 +12629,6 @@
       "rule": "R-verify"
     },
     {
-      "function": "存量冻结的规模/复杂度上限（棘轮：只可下降；上调须评审后重冻）",
-      "path": "protocol/code_metrics_baseline.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
-      "function": "存量冻结的规模/复杂度上限（棘轮：只可下降；上调须评审后重冻）",
-      "path": "protocol/code_metrics_baseline.json",
-      "role": "verify",
-      "rule": "R-verify"
-    },
-    {
       "function": "声明组合证书（公开结果面）。每条 = 一次 n 元组合的可机验凭证：包清单 / 模块集 / 层位堆叠 / 依赖闭包 / 事件闭包 / 资产借阅 / 合法性 / 规范摘要。判据（check32 combos）：① 证书过 CERT_SCHEMA；② 按 packs+extra_modules **复算**逐字段一致（T4）；③ 广度证明（全部两两 + 定种子三元/四元）不变量全成立。",
       "path": "protocol/combo_certificates.json",
       "role": "verify",
@@ -13092,16 +13080,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b3d080569bd2b16cae4b127b405a32b95015334d2ab65ddc4da7663e089fa69a",
+  "root_digest": "a946ba1a20d0f808c35df11d12688ec0c44a1a08c10ca5156834852c254f818d",
   "rule_counts": {
     "R-app": 1446,
     "R-catch": 127,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 168,
-    "R-support": 144,
-    "R-verify": 1014,
+    "R-projection": 118,
+    "R-support": 130,
+    "R-verify": 1012,
     "auto:R-core": 258
   },
   "schema": "nf-role-coordinates/1"
