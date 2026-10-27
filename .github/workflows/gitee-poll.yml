@@ -6,6 +6,9 @@ name: gitee-poll
 #   → git 提交推双端（gitee 子令牌 + origin）→ Gitee Issue 回评双端链接 → 关闭
 # 依赖 Secrets：GITEE_TOKEN（Gitee 子令牌：issues 读写 + 仓库推送权限，作者在
 #   Gitee 设置生成——主令牌绝不共享，子令牌泄露可控）
+# 暂停规则（2026-10-28）：仓库变量 GITEE_POLL_ENABLED 必须显式为 true 才轮询。
+#   未配置变量或缺少 GITEE_TOKEN 时保持停用，避免每 10 分钟制造无意义红。
+#   恢复条件：配置 GITEE_TOKEN 后，再把仓库变量 GITEE_POLL_ENABLED 设为 true。
 on:
   schedule:
     - cron: '*/10 * * * *'
@@ -20,6 +23,7 @@ permissions:
 
 jobs:
   poll:
+    if: vars.GITEE_POLL_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）：轮询入库卡住不许拖到下个周期
     permissions:
