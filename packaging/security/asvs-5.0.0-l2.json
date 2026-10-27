@@ -10,32 +10,38 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V1.1.1",
       "minimum_level": 2,
       "section": "V1.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; dynamic target-repository execution is reachable only through the fail-closed trust gate; paths and argv are bounded and contained; all byte counters are capped."
     },
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V1.1.2",
       "minimum_level": 2,
       "section": "V1.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; dynamic target-repository execution is reachable only through the fail-closed trust gate; paths and argv are bounded and contained; all byte counters are capped."
     },
     {
       "chapter": "V1",
@@ -52,17 +58,14 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "No dynamic outbound URL builder or user-provided external location exists.",
       "id": "V1.2.2",
       "minimum_level": 1,
       "section": "V1.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V1",
@@ -145,17 +148,14 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "No user-controlled regular-expression input is compiled or evaluated.",
       "id": "V1.2.9",
       "minimum_level": 2,
       "section": "V1.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V1",
@@ -172,32 +172,38 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V1.3.2",
       "minimum_level": 1,
       "section": "V1.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; dynamic target-repository execution is reachable only through the fail-closed trust gate; paths and argv are bounded and contained; all byte counters are capped."
     },
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V1.3.3",
       "minimum_level": 2,
       "section": "V1.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; dynamic target-repository execution is reachable only through the fail-closed trust gate; paths and argv are bounded and contained; all byte counters are capped."
     },
     {
       "chapter": "V1",
@@ -214,17 +220,14 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "Markdown and template-like repository content is consumed as data and never evaluated.",
       "id": "V1.3.5",
       "minimum_level": 2,
       "section": "V1.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V1",
@@ -280,17 +283,14 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "No user-controlled interpreter format string is evaluated.",
       "id": "V1.3.10",
       "minimum_level": 2,
       "section": "V1.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V1",
@@ -322,17 +322,20 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V1.4.2",
       "minimum_level": 2,
       "section": "V1.4",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; dynamic target-repository execution is reachable only through the fail-closed trust gate; paths and argv are bounded and contained; all byte counters are capped."
     },
     {
       "chapter": "V1",
@@ -349,17 +352,14 @@
     {
       "chapter": "V1",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "The runtime contains no XML parser or XML ingestion surface.",
       "id": "V1.5.1",
       "minimum_level": 1,
       "section": "V1.5",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V1",
@@ -379,47 +379,53 @@
     {
       "chapter": "V2",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V2.1.1",
       "minimum_level": 1,
       "section": "V2.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The machine-readable control inventory defines input, coupled-data and business-limit rules; closed schemas enforce admitted types and combinations; atomic write plus locking provides all-or-nothing state replacement."
     },
     {
       "chapter": "V2",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V2.1.2",
       "minimum_level": 2,
       "section": "V2.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The machine-readable control inventory defines input, coupled-data and business-limit rules; closed schemas enforce admitted types and combinations; atomic write plus locking provides all-or-nothing state replacement."
     },
     {
       "chapter": "V2",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V2.1.3",
       "minimum_level": 2,
       "section": "V2.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The machine-readable control inventory defines input, coupled-data and business-limit rules; closed schemas enforce admitted types and combinations; atomic write plus locking provides all-or-nothing state replacement."
     },
     {
       "chapter": "V2",
@@ -452,17 +458,19 @@
     {
       "chapter": "V2",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V2.2.3",
       "minimum_level": 2,
       "section": "V2.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The machine-readable control inventory defines input, coupled-data and business-limit rules; closed schemas enforce admitted types and combinations; atomic write plus locking provides all-or-nothing state replacement."
     },
     {
       "chapter": "V2",
@@ -493,17 +501,19 @@
     {
       "chapter": "V2",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V2.3.3",
       "minimum_level": 2,
       "section": "V2.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The machine-readable control inventory defines input, coupled-data and business-limit rules; closed schemas enforce admitted types and combinations; atomic write plus locking provides all-or-nothing state replacement."
     },
     {
       "chapter": "V2",
@@ -654,17 +664,17 @@
     {
       "chapter": "V5",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/paths.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V5.1.1",
       "minimum_level": 2,
       "section": "V5.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The documented file-processing surface has no upload or archive intake, lists every accepted local format, records per-surface size limits, and mandates bounded rejection."
     },
     {
       "chapter": "V5",
@@ -684,32 +694,29 @@
     {
       "chapter": "V5",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "No upload or archive service exists, but the local text-format surface does not yet apply magic-byte validation to every supported extension.",
       "id": "V5.2.2",
       "minimum_level": 1,
       "section": "V5.2",
       "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "verification": "Structured JSON/WASM and path-bound content are validated; full extension-to-content validation remains partial."
     },
     {
       "chapter": "V5",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
         "docs/asvs.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "The runtime accepts no user-supplied compressed files or archives.",
       "id": "V5.2.3",
       "minimum_level": 2,
       "section": "V5.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "not-applicable",
+      "verification": "Applicability review found no corresponding runtime surface."
     },
     {
       "chapter": "V5",
@@ -1431,17 +1438,20 @@
     {
       "chapter": "V8",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V8.1.1",
       "minimum_level": 1,
       "section": "V8.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Authorization rules are documented and machine-validated for daemon token use, read-only MCP resources, WASM capability grants, and target-repository execution."
     },
     {
       "chapter": "V8",
@@ -1522,32 +1532,34 @@
     {
       "chapter": "V11",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/atoms/hash.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V11.1.1",
       "minimum_level": 2,
       "section": "V11.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The key policy and cryptographic inventory bind every runtime primitive to its purpose, CSPRNG source, storage and rotation; only the approved token, SHA-256 and constant-time comparison mechanisms are admitted."
     },
     {
       "chapter": "V11",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/atoms/hash.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V11.1.2",
       "minimum_level": 2,
       "section": "V11.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The key policy and cryptographic inventory bind every runtime primitive to its purpose, CSPRNG source, storage and rotation; only the approved token, SHA-256 and constant-time comparison mechanisms are admitted."
     },
     {
       "chapter": "V11",
@@ -1565,17 +1577,17 @@
     {
       "chapter": "V11",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "Cryptographic choices are inventoried and release-reviewable, but are not negotiated or swapped at runtime.",
       "id": "V11.2.2",
       "minimum_level": 2,
       "section": "V11.2",
       "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "verification": "A central algorithm inventory and controlled-release upgrade path exist; online configuration and migration tooling remain absent."
     },
     {
       "chapter": "V11",
@@ -1692,17 +1704,18 @@
     {
       "chapter": "V11",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/atoms/hash.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V11.6.1",
       "minimum_level": 2,
       "section": "V11.6",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The key policy and cryptographic inventory bind every runtime primitive to its purpose, CSPRNG source, storage and rotation; only the approved token, SHA-256 and constant-time comparison mechanisms are admitted."
     },
     {
       "chapter": "V12",
@@ -1815,17 +1828,19 @@
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.1.1",
       "minimum_level": 2,
       "section": "V13.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
@@ -1844,17 +1859,19 @@
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.2.2",
       "minimum_level": 2,
       "section": "V13.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
@@ -1873,17 +1890,19 @@
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.2.4",
       "minimum_level": 2,
       "section": "V13.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
@@ -1900,32 +1919,36 @@
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.3.1",
       "minimum_level": 2,
       "section": "V13.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.3.2",
       "minimum_level": 2,
       "section": "V13.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
@@ -1944,17 +1967,19 @@
     {
       "chapter": "V13",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V13.4.2",
       "minimum_level": 2,
       "section": "V13.4",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "The communication inventory identifies every runtime path and external flag; daemon, MCP and plugin paths use least privilege; the session secret is CSPRNG-generated with owner-only storage and redacted logging; debug output defaults off."
     },
     {
       "chapter": "V13",
@@ -1995,32 +2020,36 @@
     {
       "chapter": "V14",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/atomic_write.py",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V14.1.1",
       "minimum_level": 2,
       "section": "V14.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Every data class records confidentiality, integrity, retention, logging and access requirements; the security-control validator rejects missing fields and checks the implemented limits and secret/log protections against code."
     },
     {
       "chapter": "V14",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/atomic_write.py",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V14.1.2",
       "minimum_level": 2,
       "section": "V14.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Every data class records confidentiality, integrity, retention, logging and access requirements; the security-control validator rejects missing fields and checks the implemented limits and secret/log protections against code."
     },
     {
       "chapter": "V14",
@@ -2062,17 +2091,19 @@
     {
       "chapter": "V14",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "desktop/src/core/atomic_write.py",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V14.2.4",
       "minimum_level": 2,
       "section": "V14.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Every data class records confidentiality, integrity, retention, logging and access requirements; the security-control validator rejects missing fields and checks the implemented limits and secret/log protections against code."
     },
     {
       "chapter": "V14",
@@ -2145,32 +2176,40 @@
     {
       "chapter": "V15",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V15.1.3",
       "minimum_level": 2,
       "section": "V15.1",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation windows are documented; production payload allowlists exclude development files; closed schemas constrain returned fields and types with strict comparator checks."
     },
     {
       "chapter": "V15",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V15.2.1",
       "minimum_level": 1,
       "section": "V15.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation windows are documented; production payload allowlists exclude development files; closed schemas constrain returned fields and types with strict comparator checks."
     },
     {
       "chapter": "V15",
@@ -2191,32 +2230,40 @@
     {
       "chapter": "V15",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V15.2.3",
       "minimum_level": 2,
       "section": "V15.2",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation windows are documented; production payload allowlists exclude development files; closed schemas constrain returned fields and types with strict comparator checks."
     },
     {
       "chapter": "V15",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V15.3.1",
       "minimum_level": 1,
       "section": "V15.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation windows are documented; production payload allowlists exclude development files; closed schemas constrain returned fields and types with strict comparator checks."
     },
     {
       "chapter": "V15",
@@ -2261,17 +2308,21 @@
     {
       "chapter": "V15",
       "evidence": [
-        "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
       "id": "V15.3.5",
       "minimum_level": 2,
       "section": "V15.3",
-      "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "status": "enforced",
+      "verification": "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation windows are documented; production payload allowlists exclude development files; closed schemas constrain returned fields and types with strict comparator checks."
     },
     {
       "chapter": "V15",
@@ -2465,32 +2516,36 @@
     {
       "chapter": "V16",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "Local logs are owner-only and single-line append records, but lack an immutable WORM anchor that prevents the owner or a compromised process from modifying them.",
       "id": "V16.4.2",
       "minimum_level": 2,
       "section": "V16.4",
       "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "verification": "POSIX mode 0600, owner ACL inheritance and redaction are implemented; tamper-evident external retention is not."
     },
     {
       "chapter": "V16",
       "evidence": [
+        "packaging/security/application-security-controls.json",
+        "desktop/src/core/security_controls.py",
+        "desktop/tests/test_security_controls.py",
+        "docs/security-controls.md",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/mcp_runtime.py",
-        "scripts/plugin_host.py",
-        "docs/asvs.md"
+        "desktop/src/core/plog.py"
       ],
-      "gap": "Applicable, but a dedicated end-to-end ASVS verification is not yet complete.",
+      "gap": "No independent log-collection, detection, alerting or escalation system is configured.",
       "id": "V16.4.3",
       "minimum_level": 2,
       "section": "V16.4",
       "status": "partial",
-      "verification": "The control has partial repository evidence."
+      "verification": "Security events are structured and locally retained; logical separation is absent."
     },
     {
       "chapter": "V16",

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1446,
+    "app": 1447,
     "entry": 26,
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 285,
-    "verify": 1132
+    "support": 287,
+    "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6845,6 +6845,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Machine checks for the scoped application-security control inventory.",
+      "path": "desktop/src/core/security_controls.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "v2.8.0 波C C3：跨模块语义矛盾扫描（41 规划——编译期矛盾拦截）。",
       "path": "desktop/src/core/semantic_conflict.py",
       "role": "verify",
@@ -8881,6 +8887,12 @@
     {
       "function": "P-C5 判据：密封跑法（Dockerfile.crosscheck）与 CI 接线必须是**真钉住**的，不是摆样子。",
       "path": "desktop/tests/test_sealed_crosscheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Regression tests for the machine-verifiable application-security inventory.",
+      "path": "desktop/tests/test_security_controls.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13086,17 +13098,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e5b6ebca1d22aaa33af5daf1612c992b496237dc6e070e31d882b28341b1fd3b",
+  "root_digest": "c9a46ec1b6d9d8382bb8e6909199dce3b778293482a8cb79c1cce852be656808",
   "rule_counts": {
-    "R-app": 1446,
-    "R-catch": 129,
+    "R-app": 1447,
+    "R-catch": 130,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
-    "R-support": 130,
-    "R-verify": 1013,
-    "auto:R-core": 258
+    "R-support": 131,
+    "R-verify": 1014,
+    "auto:R-core": 259
   },
   "schema": "nf-role-coordinates/1"
 }

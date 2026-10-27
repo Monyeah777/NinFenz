@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:54b8df3480891ce322ff942aa2bcab90a3eeef6523e7695aa6498ecfff3a3bbf
+  - protocol/code_metrics_baseline.json:a58ff813395f01c5f0d7ef76b2259312126c485a63c7373c9ab667fa8dbdc272
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,11 +266,13 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
-> 重审（2026-10-28）：ARCH-004 merged with L5 CI parallelization
+> 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate
 
-> 重审（2026-10-27）：ARCH-004: recursive code_metrics scan for core atoms
+> 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence
 
-> 重审（2026-10-27）：rebase 重冻（gate-cache）
+> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
+
+> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
 
 > 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
 |---|---|

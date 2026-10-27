@@ -42,6 +42,12 @@ PARTIAL_EVIDENCE = [
     "docs/asvs.md",
 ]
 PARTIAL_GAP = "Applicable, but a dedicated end-to-end ASVS verification is not yet complete."
+CONTROL_EVIDENCE = [
+    "packaging/security/application-security-controls.json",
+    "desktop/src/core/security_controls.py",
+    "desktop/tests/test_security_controls.py",
+    "docs/security-controls.md",
+]
 
 ENFORCED: dict[str, tuple[str, list[str]]] = {}
 
@@ -169,6 +175,117 @@ _enforce(
         "desktop/tests/test_mcp_runtime.py",
     ],
 )
+_enforce(
+    ["V1.1.1", "V1.1.2", "V1.3.2", "V1.3.3", "V1.4.2"],
+    "UTF-8 and strict JSON are decoded once; JSON/log output is escaped by the serializer; "
+    "dynamic target-repository execution is reachable only through the fail-closed trust "
+    "gate; paths and argv are bounded and contained; all byte counters are capped.",
+    CONTROL_EVIDENCE + [
+        "desktop/src/core/json_doc.py",
+        "desktop/src/core/paths.py",
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py",
+    ],
+)
+_enforce(
+    ["V2.1.1", "V2.1.2", "V2.1.3", "V2.2.3", "V2.3.3"],
+    "The machine-readable control inventory defines input, coupled-data and business-limit "
+    "rules; closed schemas enforce admitted types and combinations; atomic write plus locking "
+    "provides all-or-nothing state replacement.",
+    CONTROL_EVIDENCE + [
+        "desktop/src/core/json_schema.py",
+        "desktop/src/core/atomic_write.py",
+        "desktop/tests/test_atomic_write.py",
+    ],
+)
+_enforce(
+    ["V5.1.1"],
+    "The documented file-processing surface has no upload or archive intake, lists every "
+    "accepted local format, records per-surface size limits, and mandates bounded rejection.",
+    CONTROL_EVIDENCE + ["desktop/src/core/paths.py"],
+)
+_enforce(
+    ["V8.1.1"],
+    "Authorization rules are documented and machine-validated for daemon token use, read-only "
+    "MCP resources, WASM capability grants, and target-repository execution.",
+    CONTROL_EVIDENCE + [
+        "desktop/src/core/repo_trust.py",
+        "desktop/tests/test_repo_trust.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_plugin_wasm_host.py",
+    ],
+)
+_enforce(
+    ["V11.1.1", "V11.1.2", "V11.6.1"],
+    "The key policy and cryptographic inventory bind every runtime primitive to its purpose, "
+    "CSPRNG source, storage and rotation; only the approved token, SHA-256 and constant-time "
+    "comparison mechanisms are admitted.",
+    CONTROL_EVIDENCE + ["desktop/src/core/daemon.py", "desktop/src/core/atoms/hash.py"],
+)
+_enforce(
+    ["V13.1.1", "V13.2.2", "V13.2.4", "V13.3.1", "V13.3.2", "V13.4.2"],
+    "The communication inventory identifies every runtime path and external flag; daemon, MCP "
+    "and plugin paths use least privilege; the session secret is CSPRNG-generated with "
+    "owner-only storage and redacted logging; debug output defaults off.",
+    CONTROL_EVIDENCE + [
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/plog.py",
+        "packaging/supply-chain/package-sources.json",
+    ],
+)
+_enforce(
+    ["V14.1.1", "V14.1.2", "V14.2.4"],
+    "Every data class records confidentiality, integrity, retention, logging and access "
+    "requirements; the security-control validator rejects missing fields and checks the "
+    "implemented limits and secret/log protections against code.",
+    CONTROL_EVIDENCE + [
+        "desktop/src/core/atomic_write.py",
+        "desktop/src/core/daemon.py",
+        "desktop/src/core/plog.py",
+    ],
+)
+_enforce(
+    ["V15.1.3", "V15.2.1", "V15.2.3", "V15.3.1", "V15.3.5"],
+    "Resource-heavy surfaces expose tested byte, time and fuel limits; supplier remediation "
+    "windows are documented; production payload allowlists exclude development files; closed "
+    "schemas constrain returned fields and types with strict comparator checks.",
+    CONTROL_EVIDENCE + [
+        "SECURITY.md",
+        "packaging/npm/tools/payload-policy.mjs",
+        "desktop/tests/test_daemon_limits.py",
+        "desktop/tests/test_mcp_runtime.py",
+        "desktop/tests/test_supply_chain_standards.py",
+    ],
+)
+
+PARTIAL_OVERRIDES: dict[str, tuple[str, str, list[str]]] = {
+    "V5.2.2": (
+        "No upload or archive service exists, but the local text-format surface does not yet "
+        "apply magic-byte validation to every supported extension.",
+        "Structured JSON/WASM and path-bound content are validated; full extension-to-content "
+        "validation remains partial.",
+        CONTROL_EVIDENCE,
+    ),
+    "V11.2.2": (
+        "Cryptographic choices are inventoried and release-reviewable, but are not negotiated "
+        "or swapped at runtime.",
+        "A central algorithm inventory and controlled-release upgrade path exist; online "
+        "configuration and migration tooling remain absent.",
+        CONTROL_EVIDENCE,
+    ),
+    "V16.4.2": (
+        "Local logs are owner-only and single-line append records, but lack an immutable WORM "
+        "anchor that prevents the owner or a compromised process from modifying them.",
+        "POSIX mode 0600, owner ACL inheritance and redaction are implemented; tamper-evident "
+        "external retention is not.",
+        CONTROL_EVIDENCE + ["desktop/src/core/daemon.py", "desktop/src/core/plog.py"],
+    ),
+    "V16.4.3": (
+        "No independent log-collection, detection, alerting or escalation system is configured.",
+        "Security events are structured and locally retained; logical separation is absent.",
+        CONTROL_EVIDENCE + ["desktop/src/core/daemon.py", "desktop/src/core/plog.py"],
+    ),
+}
 
 NA_BY_CHAPTER = {
     "V4": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",
@@ -179,6 +296,8 @@ NA_BY_CHAPTER = {
 }
 NA_IDS = {
     "V1.2.1": "No HTML, HTTP, or XML response generator is in scope.",
+    "V1.2.2": "No dynamic outbound URL builder or user-provided external location exists.",
+    "V1.2.9": "No user-controlled regular-expression input is compiled or evaluated.",
     "V1.2.4": "No SQL, NoSQL, or database query engine is used.",
     "V1.2.6": "No LDAP integration exists.",
     "V1.2.7": "No XPath query engine exists.",
@@ -188,12 +307,17 @@ NA_IDS = {
     "V1.3.7": "No server-side template engine is in scope.",
     "V1.3.8": "No JNDI integration exists.",
     "V1.3.9": "No memcache integration exists.",
+    "V1.3.10": "No user-controlled interpreter format string is evaluated.",
     "V1.3.11": "No mail-system integration exists.",
+    "V1.3.5": "Markdown and template-like repository content is consumed as data and "
+              "never evaluated.",
     "V1.4.3": "Managed Python and Rust code contain no manual pointer lifetime.",
+    "V1.5.1": "The runtime contains no XML parser or XML ingestion surface.",
     "V2.3.1": "There is no multi-step user authentication or account business flow.",
     "V2.4.1": "The CLI and MCP transport are local single-user surfaces, not a remote "
               "multi-user service; request-size and compute caps remain enforced.",
     "V5.3.1": "No public web-serving directory executes stored files.",
+    "V5.2.3": "The runtime accepts no user-supplied compressed files or archives.",
     "V5.4.1": "No HTTP Content-Disposition file response exists.",
     "V5.4.2": "No HTTP or email attachment filename response exists.",
     "V5.4.3": "The runtime does not serve files obtained from remote uploads.",
@@ -254,6 +378,9 @@ def _assessment(ident: str, chapter: str) -> tuple[str, str, str, list[str]]:
     if ident in ENFORCED:
         verification, evidence = ENFORCED[ident]
         return "enforced", "", verification, evidence
+    if ident in PARTIAL_OVERRIDES:
+        gap, verification, evidence = PARTIAL_OVERRIDES[ident]
+        return "partial", gap, verification, evidence
     return (
         "partial",
         PARTIAL_GAP,
