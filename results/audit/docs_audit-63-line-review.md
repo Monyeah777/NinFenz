@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:890e772bb23180ee7eea43a53b5511679d0594ef9a53e132ea3d0dfa7824b46f
+  - scripts/nf.py:a480880fe406c13f126483b8520327ab9e3394d1e236a63b0175843909a9d519
 ---
+> 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py
+
 > 重审（2026-10-27）：S2g: lazy json_doc -> common; combine/output/market -> nf_cmds/shelf.py
 
 > 重审（2026-10-27）：S2f: sig/diff/telemetry/changelog/receipts/layers/attest/runtime/agent -> nf_cmds/misc.py
