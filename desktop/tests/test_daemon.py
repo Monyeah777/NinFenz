@@ -395,9 +395,9 @@ class DaemonInProcessServerTest(unittest.TestCase):
                                   "cwd": str(ROOT), "argv": ["--version"]}).encode() + b"\n"
             try:
                 self._raw(payload)      # 服务端未回帧、直接关连接
-            except OSError:
-                # Windows 上半关闭会以 RST 收尾（WinError 10053），客户端侧本就是异常；
-                # 本判据只关心**服务端存活**，故连接层异常在此不算失败。
+            except (OSError, ValueError):
+                # Windows 半关闭可能以 RST 收尾；服务端无响应帧直接关闭时 read_framed
+                # 会报帧缺失。本判据只关心**服务端存活**，两种断开表现都不算失败。
                 pass
         finally:
             dm._handle_conn = orig
