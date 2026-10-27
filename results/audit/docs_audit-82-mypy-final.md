@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:2a7d2a89ff205ae7e3d49bb244f71717cd165c87b00ca2d0dce86fd5b9771975
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:d4605fb80ac9f543a2865fc8aa90069dbc2d2be9fb2f711da83e2005f07ca60f
+  - protocol/code_metrics_baseline.json:54b8df3480891ce322ff942aa2bcab90a3eeef6523e7695aa6498ecfff3a3bbf
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-10-28）：ARCH-004 merged with L5 CI parallelization
+
 > 重审（2026-10-27）：ARCH-004: recursive code_metrics scan for core atoms
 
 > 重审（2026-10-27）：rebase 重冻（gate-cache）
