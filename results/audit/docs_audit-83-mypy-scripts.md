@@ -14,13 +14,16 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:9cc836e7a79df73b85a464464158f36aeca065254583e1ae3a16fa296a50d4ba
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
@@ -279,7 +282,9 @@ subjects:
 ## 二、交付
 
 | 脚本 | 修法 |
-|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|
 | `scripts/nf.py` | ① `argparse._`/`ngettext` 两处**有意猴补**补 `# type: ignore[attr-defined(,assignment)]`（原 ignore 只盖 assignment）；② daemon bench 的 `rows` 显式 `List[Dict[str, Any]]`；③ `signal.SIGPIPE` 改 `getattr(..., None)` 判空（Windows 无该信号，原靠 except 兜住，行为等价） |
 | `scripts/check_external_links.py` | `breaker` 参数如实标 `Optional[DomainBreaker]`（函数内已 `breaker=None 即不熔断`）；报告接收端显式 `Dict[str, Any]`——7 条一并消 |
 | `scripts/rebuild_selfcontained_sample.py` | 标记行改为显式循环取 `group`（消 `Match\\|None`）；管线段收尾围栏变量 `cl`→`close_idx`（与上文同名变量解耦） |

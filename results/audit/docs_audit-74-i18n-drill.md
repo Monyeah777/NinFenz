@@ -26,13 +26,12 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
 
 > 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
 
@@ -298,7 +297,9 @@ subjects:
 ## 二、交付
 
 | 面 | 落点 |
-|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|
 | 文档面译件 | 新增 `docs/en/{mcp,terminal,layers}.md` + `docs/ja/{mcp,terminal,layers}.md`（逐节镜像；代码块/命令/路径/内联锚点逐字保留） |
 | 语言面注册 | `protocol/locales.json` 文档译件 2 → 5 份（10 件译件）；`docs/locales.md` 及两语译件覆盖面声明同步；`nf locales --write` 重签 source_sha256 |
 | 句子级失范扩容 | `core/execution_drill.py` 增 `cross_pipeline_id`（跨管线串号：编号真实但属其它管线）与 `fabricated_asset_key`（资产键编造）两条硬断言；`RULE_LAW` 4 → 6 条（L1×1 / L2×3 / L3×1 / L4×1，无越级） |

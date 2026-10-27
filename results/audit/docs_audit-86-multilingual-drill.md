@@ -12,13 +12,16 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
@@ -261,7 +264,9 @@ subjects:
 ## 二、交付
 
 | 面 | 落点 |
-|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|
 | 词表参数化 | `run_case(..., lexicon=)`；`lexicon.decision`/`progress` 为字面子串、`lexicon.citation` 为 regex 源串列表，`_compile_citation` 合成为 `(?:p1)|(?:p2)…`；**缺省沿用中文内置词表**（行为零变化） |
 | 贯通调用 | `run_file`/`main`/`drill_fidelity._exec_sets` 均透传 fixture 的 `lexicon` |
 | 英文同构集 | `p07_en_drill_cases.json`（9 例：6 失范覆盖 R1–R4 全六规则 + 3 guard），词表与样本**同文件声明**，样本来源仍诚实标注 `inferred` |

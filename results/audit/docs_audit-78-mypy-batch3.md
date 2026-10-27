@@ -9,13 +9,16 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
@@ -262,7 +265,9 @@ subjects:
 ## 二、交付
 
 | 模块 | 修前 | 修法 |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | `desktop/src/core/mcp_package.py` | 8 | `pkg` 的「isinstance 守卫 + 字典」拆原始值再判型（消 `Any \\| dict \\| None`） |
 | `desktop/src/core/conformance_scan.py` | 2 | `_DIR_MEMO` 键为元组，标注放宽为 `Dict[Any, Any]`；调用点先捕获局部引用再判空（mypy 对模块全局不放宽） |
 | `desktop/src/core/pack_combo.py` | 8 | 两处 `rec` 显式 `Dict[str, Any]`；`for m in ms` 改名 `mid`（与上文正则 `m` 解耦）；`borrow` 显式类型 |

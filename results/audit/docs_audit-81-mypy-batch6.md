@@ -10,13 +10,16 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
@@ -266,7 +269,9 @@ subjects:
 ## 二、交付
 
 | 模块 | 修前 | 修法 |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | `desktop/src/core/terminal.py` | 25 | **根因是四张模块级声明表**（`ZONES`/`FAMILIES`/`FORMS`/`TERMINAL_BASELINE` + `SLASH_WORDS`）无标注，值被推成 `object` 并沿调用面扩散；补 `tuple[dict[str, Any], ...]` 后一次性消掉 17 条。余：`seen`/`history`/`commands` 标注、`self.active_form` 显式可空、两处表单取值改写 |
 | `desktop/src/core/assemble_plan.py` | 3 | `questions`/`answers` 参数由 `List[str]` 改 `Sequence[str]`（默认 `()` 合法）；`pkg`/`pipeline` 显式可空；`if pkg is None or not matched` 收窄 |
 | `desktop/src/core/asset_ledger.py` | 3 | `_load_for_update` 的 `ledger_path` 如实标 `str \\| None`（函数内本就 `or default_...`）；`issues` 标注 |

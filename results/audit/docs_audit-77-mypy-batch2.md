@@ -8,13 +8,16 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
 
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
@@ -257,7 +260,9 @@ subjects:
 ## 二、交付
 
 | 模块 | 修前 | 修法（行为不变） |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | `desktop/src/core/domain_pack.py` | 17 | `pipe`→`pipe_id`（与上面的正则 `Match` 解耦）；`prereq` 显式 `Dict[str, List[str]]`；`std`→`std_entry`（与 `for sid, std in bound.items()` 解耦）；`sub_ev` 分支统一为 tuple；`doc` 显式 `Dict[str, Any]` |
 | `desktop/src/core/prose_lint.py` | 2 | `summarize` 里 `rule = str(f["rule"])` 后再计数（键由 object 归 str） |
 

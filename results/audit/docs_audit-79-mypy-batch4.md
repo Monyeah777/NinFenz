@@ -7,15 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:7669e6b93b6baada4819559bff38e172fddabfb396b2082d5cf67418515b9f41
+  - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:b5e9433f572834bfaddf8a5534c019da0bd4adcd84bfaa8eb6601269334adb8a
----
+  - protocol/code_metrics_baseline.json:2de0be2d5c97ffaa47bfe0bd55d7f57765b7d490899782e6c1a2c25be645cbda
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
 
 > 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
 
@@ -260,7 +259,9 @@ subjects:
 ## 二、交付
 
 | 模块 | 修前 | 修法 |
-|---|---|---|
+|---
+> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
+|---|---|
 | `desktop/src/core/lsp.py` | 8 | `read_message` 返回哨兵 `_BAD_FRAME`（`object()`），返回标注由 `Optional[Dict]` 改为 `Any`（哨兵语义不变）；规则集键取 `str(d.get("code"))` |
 | `desktop/src/core/purity_scan.py` | 7 | `shell/private/seen` 拆三行显式标注；`delta`/`stats` 显式 `Dict[str, Any]`；补 `Any/Dict/List` typing 导入 |
 | `desktop/src/core/asset_contract.py` | 11 | `_read` 后的 `text`/`sch_text` 统一补空串默认（`or ""`，原路径契约上非空）；`seeds`/`pairs` 显式标注 |

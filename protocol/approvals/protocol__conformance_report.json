@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-27",
   "approved_by": "Monyeah777",
-  "note": "ASVS 5.0.0 L2 最终收口",
+  "note": "ASVS 与 main CI 优化合并后重新批准",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "706b3edfe237a6d948de97880e17a6920c7b2167d8167460fcca9ab496474cea"
+  "subject_digest": "23b9829300a446ccd00eb82d669f5c7430d05761387bfa05947f1e0482a6be59"
 }
