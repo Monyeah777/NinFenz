@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:84281b45dae1c9c3e2f31d8a05f121e33b317bbd4807fe433cf4ad8a34420b16
+  - protocol/code_metrics_baseline.json:54b8df3480891ce322ff942aa2bcab90a3eeef6523e7695aa6498ecfff3a3bbf
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -262,9 +262,9 @@ subjects:
 
 | 模块 | 修前 | 修法（行为不变） |
 |---
-> 重审（2026-10-27）：L5 串行段并行（灰度 NF_OVERLAP_SERIAL）
+> 重审（2026-10-28）：ARCH-004 merged with L5 CI parallelization
 
-> 重审（2026-10-27）：持久 worker 批处理（NF_TEST_BATCH）
+> 重审（2026-10-27）：ARCH-004: recursive code_metrics scan for core atoms
 
 > 重审（2026-10-27）：rebase 重冻（gate-cache）
 

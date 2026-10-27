@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-27",
+  "measured_at": "2026-10-28",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -49,6 +49,7 @@
     "test_cli_error_framing": 90.3,
     "test_cli_harness_equivalence": 1.0,
     "test_cli_json_face": 87.4,
+    "test_cli_memo": 0.2,
     "test_cli_trust_meta": 0.7,
     "test_closure_scan": 0.3,
     "test_code_metrics": 1.2,
@@ -823,6 +824,10 @@
     "test_cli_json_face.JsonFaceNoMachinePathTest.test_success_faces_are_portable": 1.75,
     "test_cli_json_face.JsonFaceStaticTest.test_dict_faces_carry_a_discriminant": 0.14,
     "test_cli_json_face.JsonFaceStaticTest.test_scanner_is_not_vacuous": 0.14,
+    "test_cli_memo.MemoTest.test_repo_write_invalidates_everything": 0.0,
+    "test_cli_memo.MemoTest.test_same_invocation_hits_and_is_byte_identical": 0.0,
+    "test_cli_memo.MemoTest.test_temp_writes_do_not_pollute": 0.0,
+    "test_cli_memo.ProbeTest.test_restores_open_after_exit": 0.0,
     "test_cli_trust_meta.CliTrustMetaTest.test_in_repo_practice_pack_is_not_marked": 0.3,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_json_carries_meta": 0.15,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_marks_external_content": 0.15,
@@ -3760,5 +3765,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1108.3
+  "total_s": 1108.5
 }

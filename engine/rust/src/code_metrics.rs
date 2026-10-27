@@ -25,7 +25,7 @@ pub const BASELINE_REL: &str = "protocol/code_metrics_baseline.json";
 
 /// 新增文件的绝对上限（存量按基线冻结，不受此限）。
 const LIMITS: [(&str, i64); 3] = [("lines", 800), ("max_fn_lines", 120), ("max_fn_cc", 25)];
-/// 扫描面：core 与 scripts 的 `.py`（与 purity R5/R6 同口径）。
+/// 扫描面：core 与 scripts 的 `.py`（递归，排除 `__pycache__`）。
 pub const SCAN_DIRS: [&str; 2] = ["desktop/src/core", "scripts"];
 /// 三项度量的（键, 中文标签），顺序即真源的遍历顺序。
 const KEYS: [(&str, &str); 3] = [
@@ -70,24 +70,41 @@ pub fn metrics_of(path: &Path) -> Metrics {
     out
 }
 
+fn collect_py_files(dir: &Path, out: &mut Vec<std::path::PathBuf>) -> std::io::Result<()> {
+    let mut entries: Vec<_> = std::fs::read_dir(dir)?.flatten().collect();
+    entries.sort_by_key(|e| e.file_name());
+    for entry in entries {
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name == "__pycache__" {
+            continue;
+        }
+        let kind = entry.file_type()?;
+        if kind.is_dir() {
+            collect_py_files(&path, out)?;
+        } else if kind.is_file() && name.ends_with(".py") {
+            out.push(path);
+        }
+    }
+    Ok(())
+}
+
 /// 全量度量 → 按仓库相对路径排序的 `(rel, 度量)`。
 pub fn measure(root: &Path) -> Vec<(String, Metrics)> {
-    // 先按真源同序收集文件清单（SCAN_DIRS 顺序 + 目录内文件名排序）。
+    // 先按真源同序收集文件清单（SCAN_DIRS 顺序 + 递归相对路径排序）。
     let mut rels: Vec<String> = Vec::new();
     for d in SCAN_DIRS {
-        let dir = root.join(d);
-        let Ok(rd) = std::fs::read_dir(&dir) else {
+        let mut files = Vec::new();
+        if collect_py_files(&root.join(d), &mut files).is_err() {
             continue;
-        };
-        let mut names: Vec<String> = rd
-            .flatten()
-            .map(|e| e.file_name().to_string_lossy().to_string())
-            .filter(|n| n.ends_with(".py"))
-            .collect();
-        names.sort();
-        for n in names {
-            rels.push(format!("{}/{}", d, n));
         }
+        files.sort();
+        rels.extend(files.iter().map(|p| {
+            p.strip_prefix(root)
+                .unwrap_or(p)
+                .to_string_lossy()
+                .replace('\\', "/")
+        }));
     }
     // Rayon 数据并行：按文件解析 AST；`par_iter().map().collect()` 是 IndexedParallelIterator，
     // **保序**——与真源「清单顺序即输出顺序」逐项同序（并列函数的最先到达语义不受影响）。
@@ -350,6 +367,20 @@ mod tests {
                 r#"无基线 protocol/code_metrics_baseline.json（当前按新文件限值判；修复指引：python scripts/code_metrics.py --write 冻结存量）"#
             ] as &[&str]
         );
+    }
+
+    #[test]
+    fn nested_atoms_are_scanned_and_pycache_is_skipped() {
+        let root = crate::testutil::fixture("code-metrics-nested");
+        let atom = root.join("desktop/src/core/atoms/nested.py");
+        let cache = root.join("desktop/src/core/__pycache__/ignored.py");
+        std::fs::create_dir_all(atom.parent().unwrap()).unwrap();
+        std::fs::create_dir_all(cache.parent().unwrap()).unwrap();
+        std::fs::write(&atom, "x = 1\n").unwrap();
+        std::fs::write(&cache, "y = 2\n").unwrap();
+        let got = measure(&root);
+        assert!(got.iter().any(|(rel, _)| rel == "desktop/src/core/atoms/nested.py"));
+        assert!(!got.iter().any(|(rel, _)| rel.contains("__pycache__")));
     }
     // <<< GENERATED
 }
