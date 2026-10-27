@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-10-28",
   "approved_by": "Monyeah777",
-  "note": "yaml test isolation",
+  "note": "yaml test isolation projection refresh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
