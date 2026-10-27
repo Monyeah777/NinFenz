@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:d1864076e19a762bd850ec814864292d40a63b0f74bd5f3c98581459cebfa43f
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:344e6edb67cddcda12cc67315c74509db6acf7fe21d0fb34afe6abf0c15a24b1
+  - protocol/code_metrics_baseline.json:e88420e70458ef55970f65fb49532beb01acbbde0f6e24eb101dcb761c5a523e
 ---
+> 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
+
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
 
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py

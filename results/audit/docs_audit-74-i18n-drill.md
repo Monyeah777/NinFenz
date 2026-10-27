@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:344e6edb67cddcda12cc67315c74509db6acf7fe21d0fb34afe6abf0c15a24b1
+  - protocol/code_metrics_baseline.json:e88420e70458ef55970f65fb49532beb01acbbde0f6e24eb101dcb761c5a523e
 ---
+> 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
+
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
 
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py

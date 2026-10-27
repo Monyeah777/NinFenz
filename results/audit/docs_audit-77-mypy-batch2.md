@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:6519b1dc812a4f7ec98b1f8847446f23373408a7ea47c366bb881185e4255a68
-  - protocol/code_metrics_baseline.json:344e6edb67cddcda12cc67315c74509db6acf7fe21d0fb34afe6abf0c15a24b1
+  - protocol/code_metrics_baseline.json:e88420e70458ef55970f65fb49532beb01acbbde0f6e24eb101dcb761c5a523e
 ---
+> 重审（2026-10-27）：S2o: shell split by submode -> nf_cmds/shell.py (callables injected)
+
 > 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
 
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
