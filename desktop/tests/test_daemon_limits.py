@@ -130,7 +130,8 @@ class DaemonArgvLimitTest(unittest.TestCase):
         elif os.name == "nt":
             self.assertEqual(0, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
         else:
-            self.assertEqual(1, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
+            # BSD/macOS can return a platform flag mask (observed: 4) for SO_REUSEADDR.
+            self.assertTrue(sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
 
     def test_cwd_must_be_an_existing_directory(self):
         root = Path(tempfile.mkdtemp(prefix="nf_daemon_cwd_"))
