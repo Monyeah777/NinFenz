@@ -1,0 +1,29 @@
+{
+  "schema": "nf-verification-policy/1",
+  "reviewed_at": "2026-10-27",
+  "repository": "https://github.com/Monyeah777/NinFenz",
+  "build_workflow": ".github/workflows/npm-publish.yml",
+  "build_workflow_ref": "refs/heads/main",
+  "required_provenance_predicate": "https://slsa.dev/provenance/v1",
+  "verified_levels": ["SLSA_BUILD_LEVEL_2"],
+  "not_claimed_levels": ["SLSA_BUILD_LEVEL_3"],
+  "required_artifacts": [
+    "*.tgz",
+    "*.cdx.json",
+    "*.spdx3.json",
+    "SHA256SUMS",
+    "release-metadata.json"
+  ],
+  "required_checks": {
+    "checksums": true,
+    "build_provenance": true,
+    "cyclonedx": "1.6",
+    "spdx": "3.0.1",
+    "reproducible_builds": 2,
+    "vex": "OpenVEX 0.2.0"
+  },
+  "verifier": {
+    "id": "https://github.com/Monyeah777/NinFenz/.github/workflows/npm-publish.yml",
+    "kind": "self-hosted-project-verifier"
+  }
+}

@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -749,6 +750,16 @@ def _json_bytes(value: Any) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
+def _vex_tools():
+    path = REPO_ROOT / "scripts" / "generate_vex.py"
+    spec = importlib.util.spec_from_file_location("nf_generate_vex", path)
+    if spec is None or spec.loader is None:
+        raise ReleaseError("无法加载 scripts/generate_vex.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def write_artifacts(
     out: Path,
     pkg: dict[str, Any],
@@ -756,6 +767,7 @@ def write_artifacts(
     github_pkg: dict[str, Any],
     github_artifacts: tuple[bytes, dict[str, Any], dict[str, Any]],
     manifest: dict[str, Any],
+    vex: dict[str, Any],
 ) -> dict[str, str]:
     if out.exists() and (not out.is_dir() or any(out.iterdir())):
         raise ReleaseError(f"输出目录非空：{out}（修复指引：删除旧构建或换空目录）")
@@ -767,6 +779,7 @@ def write_artifacts(
         "tarball": f"ninfenz-{version}.tgz",
         "cyclonedx": f"ninfenz-{version}.cdx.json",
         "spdx": f"ninfenz-{version}.spdx3.json",
+        "vex": f"ninfenz-{version}.openvex.json",
         "payload_manifest": f"ninfenz-{version}.payload-manifest.json",
     }
     github_names = {
@@ -778,6 +791,7 @@ def write_artifacts(
         names["tarball"]: npm_tar,
         names["cyclonedx"]: _json_bytes(npm_cdx),
         names["spdx"]: _json_bytes(npm_spdx),
+        names["vex"]: _json_bytes(vex),
         github_names["tarball"]: github_tar,
         github_names["cyclonedx"]: _json_bytes(github_cdx),
         github_names["spdx"]: _json_bytes(github_spdx),
@@ -812,6 +826,7 @@ def write_artifacts(
             },
             "ntia_minimum_elements": True,
         },
+        "vex": {"path": names["vex"], "spec_version": "OpenVEX 0.2.0"},
         "release_ready": manifest.get("worktree_dirty") is False,
         "artifact_names": names,
         "github_packages_names": github_names,
@@ -866,6 +881,12 @@ def verify_release(out: Path) -> list[str]:
     else:
         for cdx_path, spdx_path in zip(cdx_paths, spdx_paths, strict=True):
             issues.extend(validate_sboms(read_json(cdx_path), read_json(spdx_path)))
+    vex_paths = sorted(out.glob("*.openvex.json"))
+    if len(vex_paths) != 1:
+        issues.append(f"VEX 数量必须为 1，实得 {len(vex_paths)}")
+    else:
+        vex_tools = _vex_tools()
+        issues.extend(vex_tools.validate_vex(read_json(vex_paths[0])))
     return issues
 
 
@@ -880,8 +901,16 @@ def build(out: Path, allow_dirty: bool, skip_stage: bool) -> dict[str, str]:
     npm_artifacts, github_artifacts, manifest = deterministic_inputs(
         pkg, files, github_pkg, github_files, allow_dirty
     )
+    vex_tools = _vex_tools()
+    vex = vex_tools.vex_doc(
+        REPO_ROOT,
+        f"pkg:npm/{quote(str(pkg['name']), safe='/')}@{pkg['version']}",
+    )
+    issues = vex_tools.validate_vex(vex)
+    if issues:
+        raise ReleaseError("VEX 校验失败：" + "; ".join(issues[:6]))
     names = write_artifacts(
-        out, pkg, npm_artifacts, github_pkg, github_artifacts, manifest
+        out, pkg, npm_artifacts, github_pkg, github_artifacts, manifest, vex
     )
     issues = verify_release(out)
     if issues:
@@ -916,7 +945,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✗ {exc}", file=sys.stderr)
         return 1
     print("✓ 可复现发布工件已生成")
-    for key in ("tarball", "cyclonedx", "spdx", "payload_manifest"):
+    for key in ("tarball", "cyclonedx", "spdx", "vex", "payload_manifest"):
         print(f"  {key}: {names[key]}")
     print("  npm reproducible_builds: 2")
     print("  github-packages reproducible_builds: 2")

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-27",
   "approved_by": "Monyeah777",
-  "note": "合并 TISA 与供应链发布链后重新批准一致性报告",
+  "note": "OSPS L3 与 SLSA VSA 供应链收口后重新批准一致性报告",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "8eac02a6e26033a715668327b033471101ad1ddb0704e0b23e67f21c8e3d5e12"
+  "subject_digest": "342295ee6c842c4ad2df6def8f7f1f6ee32d946e096fc14b459988c78589a6fa"
 }

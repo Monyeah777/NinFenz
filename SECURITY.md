@@ -46,6 +46,17 @@
 依赖来源、供应商准入、SBOM 和验签方式见 [docs/supply-chain-security.md](docs/supply-chain-security.md)。
 目前为单人维护，不承诺固定响应 SLA；但 Critical/High 在修复或明确处置前不会进入正式发布。
 
+### SCA、SAST 与发布处置
+
+- SCA：PR 的 dependency review 在出现 **High/Critical** 已知漏洞时阻断；定时 `pip-audit`、
+  `cargo audit` 与依赖审计覆盖固定工具链。无上游修复时必须提交不可达/不可利用证据或明确例外，
+  不得用忽略文件静默清零。
+- SAST：CodeQL、Bandit 与仓库 SAST 棘轮共同运行。可操作的 **High/Critical** 发现阻断发布；
+  Medium 进入维护窗口并带修复或风险接受记录；任何新增规则命中都必须显式处置。
+- License：不在供应商 allowlist 或被判定不兼容的许可证阻断发布，除非存在有期限、可审查的例外。
+- 漏洞处置通过 `results/supply-chain/vuln-disposition.json` 进入 OpenVEX；`not_affected` 必须给出
+  justification 与 impact statement，`affected` / `under_investigation` 必须给出 action statement。
+
 ## 六、公开漏洞通告
 
 已确认并完成协调披露的漏洞通过 GitHub Security Advisories 公开：
