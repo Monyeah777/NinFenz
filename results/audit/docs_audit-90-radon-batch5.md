@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:bfbc4ede63d0df6d15247f81e1f11012dcecdc191f807b60917d6ae52ab5c833
+  - protocol/code_metrics_baseline.json:344e6edb67cddcda12cc67315c74509db6acf7fe21d0fb34afe6abf0c15a24b1
 ---
+> 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
+
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
 
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py

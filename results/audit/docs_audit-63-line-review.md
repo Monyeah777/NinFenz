@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:451649c9346dd748fcf963a72b32e72f511e37d6992a7247eca2d6489d446006
+  - scripts/nf.py:d7ff9f67c32e3195661fc88e2ac5744f4236ed7f5f3baabb349cb2a2e0fbc1bf
 ---
+> 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
+
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
 
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py

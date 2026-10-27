@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
-  - scripts/nf.py:451649c9346dd748fcf963a72b32e72f511e37d6992a7247eca2d6489d446006
+  - scripts/nf.py:d7ff9f67c32e3195661fc88e2ac5744f4236ed7f5f3baabb349cb2a2e0fbc1bf
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:945da2a83eaba05ebc0e7e435a6ab49fcf1b916e00f5a830272a9c91fa3681c8
 
 ---
+> 重审（2026-10-27）：S2n: assemble split by phase -> nf_cmds/assemble.py
+
 > 重审（2026-10-27）：S2m: module split by subcommand -> nf_cmds/module.py
 
 > 重审（2026-10-27）：S2l: library split by subcommand -> nf_cmds/library.py
