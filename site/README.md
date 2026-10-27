@@ -59,7 +59,7 @@
 
 ## 已知状态（诚实面）
 
-- **npm 包已发布**：ninfenz v1.1.0（npmjs.com；2917 文件 / 23.21 MB 解包，带 SLSA provenance
+- **npm 包已发布**：ninfenz v1.1.0（npmjs.com；2921 文件 / 23.25 MB 解包，带 SLSA provenance
   来源证明）。发布通道 = .github/workflows/npm-publish.yml（tag 或手动 dispatch）；GitHub Packages 通道为
   @monyeah777/ninfenz。国内镜像（npmmirror）同步有延迟，站内已注明可用 --registry 绕开。
 - **workers.dev 域名**：已关闭（wrangler.jsonc 的 workers_dev: false）。大陆对该域 DNS 污染，别把它当入口。

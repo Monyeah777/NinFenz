@@ -21,6 +21,7 @@
     "test_asset_line_baseline": 0.2,
     "test_asset_provenance": 0.1,
     "test_ast_missing": 0.1,
+    "test_asvs_policy": 2.1,
     "test_atomic_write": 10.0,
     "test_atomic_write_boundaries": 0.7,
     "test_atoms": 0.7,
@@ -279,6 +280,7 @@
     "test_schema_reference": 0.3,
     "test_scratch": 0.2,
     "test_sealed_crosscheck": 0.1,
+    "test_security_logging": 0.2,
     "test_seed_from_repo": 0.1,
     "test_selfcontained_rebuild": 0.1,
     "test_semantic_conflict": 0.1,
@@ -547,6 +549,11 @@
     "test_asset_provenance.AssetProvenanceTest.test_readme_rows_carry_a_license_column": 0.0,
     "test_ast_missing.Test.test_missing_list": 0.0,
     "test_ast_missing.Test.test_syntax_error_reported": 0.0,
+    "test_asvs_policy.AsvsPolicyTest.test_critical_control_cannot_drop_to_partial": 0.4,
+    "test_asvs_policy.AsvsPolicyTest.test_current_matrix_is_complete_and_internally_consistent": 0.07,
+    "test_asvs_policy.AsvsPolicyTest.test_false_certification_claim_is_rejected": 0.34,
+    "test_asvs_policy.AsvsPolicyTest.test_missing_or_duplicate_requirement_fails_closed": 0.75,
+    "test_asvs_policy.AsvsPolicyTest.test_partial_and_na_require_gap_and_evidence": 0.31,
     "test_atomic_write.AtomicWriteTest.test_concurrent_writers_never_expose_partial_content": 1.53,
     "test_atomic_write.AtomicWriteTest.test_creates_parent_directory": 0.0,
     "test_atomic_write.AtomicWriteTest.test_failure_path_keeps_target_and_cleans_temp": 0.0,
@@ -3219,6 +3226,8 @@
     "test_sealed_crosscheck.PipelineWiringTest.test_local_fallback_face_exists": 0.0,
     "test_sealed_crosscheck.PipelineWiringTest.test_workflow_does_not_rerun_the_repository_gate": 0.0,
     "test_sealed_crosscheck.PipelineWiringTest.test_workflow_triggers_on_push_to_main": 0.0,
+    "test_security_logging.SecurityLoggingTest.test_sanitize_handles_unicode_line_boundaries": 0.0,
+    "test_security_logging.SecurityLoggingTest.test_security_event_redacts_credentials_and_escapes_controls": 0.0,
     "test_seed_from_repo.SeedFromRepoReachabilityTest.test_script_lives_under_desktop_scripts": 0.0,
     "test_seed_from_repo.SeedFromRepoReachabilityTest.test_self_locates_to_this_repo_root": 0.0,
     "test_selfcontained_rebuild.SelfContainedRebuildTest.test_drift_detected_then_repaired_and_idempotent": 0.01,
@@ -3751,5 +3760,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1106.0
+  "total_s": 1108.3
 }
