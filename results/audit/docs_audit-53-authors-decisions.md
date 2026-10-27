@@ -11,9 +11,11 @@ subjects:
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
-  - verify.sh:dba66b723253b488f45e05296bafebc77123d566c9633c53ad0159f9df7365c6
+  - verify.sh:75bc3ae0f56ca7997d426626a4ebdf3d58ea8879c62ab2de2d40c5233e19cb30
 
 ---
+> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+
 > 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
 
 > 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）

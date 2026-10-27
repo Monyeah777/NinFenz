@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:a58ff813395f01c5f0d7ef76b2259312126c485a63c7373c9ab667fa8dbdc272
+  - protocol/code_metrics_baseline.json:c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -298,6 +298,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+
 > 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate
 
 > 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence

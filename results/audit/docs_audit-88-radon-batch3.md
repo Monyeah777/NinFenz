@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:dbb5b2b45ebba8d67770a41056e944506f017dd243522edab79878886284d92e
-  - protocol/code_metrics_baseline.json:a58ff813395f01c5f0d7ef76b2259312126c485a63c7373c9ab667fa8dbdc272
+  - protocol/code_metrics_baseline.json:c4be6a7c670d131ab68c4810c0a5377c1c83dd9d1b7594f7bda7d305aa786ad2
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -267,6 +267,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+
 > 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate
 
 > 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence
