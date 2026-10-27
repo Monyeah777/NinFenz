@@ -647,6 +647,17 @@ def main(argv=None) -> int:
                 with lock:
                     results_box.append(r)
 
+        # ---- 串行段与主队列**并行**（L5，灰度 `NF_OVERLAP_SERIAL=1`）----
+        # 历史记录：2026-10-19/22 两次 red 都是"串行段与 16 片并发"时被拖到时间窗外/守护超时；
+        # 2026-10-27 收窄串行段（parity/watch 迁出）+ 并行度回到 8 后复测未再复现。
+        # 仍保留开关：默认关闭，打开即"串行段独立进程与主队列同时跑"，用例一条不减。
+        _serial_holder = {}
+        _serial_thread = None
+        if serial_ids and os.environ.get("NF_OVERLAP_SERIAL") == "1":
+            def _run_serial():
+                _serial_holder["r"] = run_shard(serial_ids, len(chunks))
+            _serial_thread = threading.Thread(target=_run_serial, daemon=True)
+            _serial_thread.start()
         threads = [threading.Thread(target=_worker, daemon=True) for _ in range(pjobs)]
         for th in threads:
             th.start()
@@ -654,7 +665,11 @@ def main(argv=None) -> int:
             th.join()
         results = sorted(results_box, key=lambda r: r["index"])
         if serial_ids:
-            results.append(run_shard(serial_ids, len(chunks)))
+            if _serial_thread is not None:
+                _serial_thread.join()
+                results.append(_serial_holder["r"])
+            else:
+                results.append(run_shard(serial_ids, len(chunks)))
     wall = time.perf_counter() - t0
     _merge_local_weights()
     failed = [r for r in results if r["rc"] != 0]
