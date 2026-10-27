@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
+  - scripts/nf.py:0ee815de6e755b8a59b05eccf96829fd541772421f3b41c2eac2d3b0b8ba85c9
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - protocol/code_metrics_baseline.json:1bbeb4459b82c4d98b651c1e9b18fde2066bc537f7900e5ccc172db4ab72d29a
 ---
+> 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization
+
 > 重审（2026-10-27）：S1: CLI scanners cover nf_parser
 
 > 重审（2026-10-27）：S1: metrics re-freeze after scanner update

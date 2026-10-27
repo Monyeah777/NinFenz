@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:84dbbc983dd5c1e8025717fb79fb801f8bb6f9796772cffccc9998c9ef9ccfb5
-  - scripts/nf.py:0af67b59294d62c36d3d36d8973b4fc37432e3c20af619bc6b24c0df6782dd7b
+  - scripts/nf.py:0ee815de6e755b8a59b05eccf96829fd541772421f3b41c2eac2d3b0b8ba85c9
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:945da2a83eaba05ebc0e7e435a6ab49fcf1b916e00f5a830272a9c91fa3681c8
 
 ---
+> 重审（2026-10-27）：S1: rebuild governance after CRLF->LF normalization
+
 > 重审（2026-10-27）：S1: extract nf.py::_make_parser into scripts/nf_parser (surface byte-identical)
 
 > 重审（2026-10-27）：Merge W12: check46-47 + bilingual glossary
