@@ -6,7 +6,7 @@
     "prod": 1042,
     "projection": 133,
     "support": 285,
-    "verify": 1133
+    "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7499,6 +7499,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "`cli_harness` 进程内 memo（L4）回归：**命中要真、写仓库必须失效**。",
+      "path": "desktop/tests/test_cli_memo.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CLI 消费面的**信任标注**（外来内容=数据）——与 MCP `_meta.nf.trust` 同口径。",
       "path": "desktop/tests/test_cli_trust_meta.py",
       "role": "verify",
@@ -13092,7 +13098,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d34116f446a7b135867049d954ba020e82c0b8096c132bacc838d21d401e31b6",
+  "root_digest": "ef57240b8161f71f1c7e01d0cf46f0e005e060858b23d59e20a660ce3efcacd3",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 128,
@@ -13101,7 +13107,7 @@
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 131,
-    "R-verify": 1013,
+    "R-verify": 1014,
     "auto:R-core": 259
   },
   "schema": "nf-role-coordinates/1"
