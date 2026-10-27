@@ -71,7 +71,15 @@ def compute_key(mode: str) -> str:
     head = _run(["git", "rev-parse", "HEAD"])
     if not head:
         return ""
-    dirty = _run(["git", "stash", "create"])
+    # `git stash create` 的 **commit** 哈希含作者/提交时间戳 ⇒ 同一棵树每次调用都不同，
+    # 拿它当缓存 key 会导致**永不命中**（2026-10-27 实测：连续两次 key 不同）。
+    # 正确口径是取它指向的 **tree**（再取 index 侧 tree），tree 是纯内容寻址、稳定可复现。
+    stash = _run(["git", "stash", "create"])
+    dirty = ""
+    if stash:
+        wt = _run(["git", "rev-parse", "%s^{tree}" % stash])
+        ix = _run(["git", "rev-parse", "%s^2^{tree}" % stash])
+        dirty = "wt:%s|ix:%s" % (wt, ix)
     untracked = _run(["git", "ls-files", "-o", "--exclude-standard"]).splitlines()
     untracked_hashes = sorted(
         "%s=%s" % (rel, _sha_file(ROOT / rel)) for rel in untracked if rel)
@@ -128,7 +136,7 @@ def cmd_put(key: str, mode: str, n_pass: int, n_warn: int) -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="门禁判定缓存（输入内容寻址）")
-    ap.add_argument("--mode", choices=("full", "quick"), default="full")
+    ap.add_argument("--mode", choices=("full", "quick", "checks"), default="full")
     ap.add_argument("--key", nargs="?", const="", default=None,
                     help="给定 key（缺省=现算）；--put 时必给")
     ap.add_argument("--get", action="store_true")

@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:dba66b723253b488f45e05296bafebc77123d566c9633c53ad0159f9df7365c6
   - README.en.md:0cd92c44a9d35a059fc4626d0f771ddca58318da68a5580daddf0361cef592a7
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,6 +16,10 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
+
+> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
+
 > 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
 
 > 重审（2026-10-25）：REUSE 3.3 合规（MIT-NOTICE + 徽章 + CI 作业）

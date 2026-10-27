@@ -32,9 +32,13 @@ subjects:
   - 05_资产库/用户自定义/STYLE_DNA.md:b7ebed51132f13d4f42d6b3e8b6c425a653e947531e5952d65aa49df8e0a4381
   - protocol/asset_keys.json:59d9fcfb03e4da3c21c1b23bc83c2c0518c6e0c94147b3a6aa3915700e2bd33f
   - desktop/src/core/registry.json:cdcb852579785d8817451398021e55441e635a857e0acd3557af9a86b030e7ca
-  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - verify.sh:dba66b723253b488f45e05296bafebc77123d566c9633c53ad0159f9df7365c6
 
 ---
+> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
+
+> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
+
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno
