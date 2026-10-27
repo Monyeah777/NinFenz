@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:fca0cb83b756f6ac1879d0f720dfe691ede17953421f947a4316040262a94e52
   - desktop/src/core/asset_contract.py:bd7f3166c0c49171807b2b7964aa5a7efb52999a0519f1c1ea184cf2426b130f
-  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
+  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
 ---
+> 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
+
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
 
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py

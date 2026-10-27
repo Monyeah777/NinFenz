@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
+  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
 ---
+> 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
+
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
 
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py

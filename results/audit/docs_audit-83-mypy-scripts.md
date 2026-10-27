@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:6907c68c3a8900f40e2dff763c16a620ecb14efd5d53f46a75ed071259c6e2ec
+  - scripts/nf.py:f7e42286a7edd88948cbe13d2cb7cce45ad462d94584b4722918f7b0c847d6d5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:980321b6a074f26a8e1107d5e2a597233acadf7ed20d86a8692c016c321ac302
+  - protocol/code_metrics_baseline.json:f9042b093197645f21a54dac0bba4f73c16f9d903935766676d5f054c357346c
 ---
+> 重审（2026-10-27）：S2r: daemon split -> nf_cmds/daemon.py
+
 > 重审（2026-10-27）：S2q: preset/import split; _open_store -> common
 
 > 重审（2026-10-27）：S2p: verify split by responsibility -> nf_cmds/verify.py
