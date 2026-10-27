@@ -11,13 +11,15 @@ subjects:
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:0cd4f603b26162b65606ad9f9561403ecd749519280ef90e79b4747aaba58131
+  - scripts/nf.py:ecb7d61c796db0b5384c763bd29a8dbe32d0aa85682dae8d3cce51cd09a03239
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
   - verify.sh:eacd4c758fde0471336c07cb789ebbad39868899cb1cc5cb4eb4d38bf3f5a615
 
 ---
+> 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
+
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
 
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py

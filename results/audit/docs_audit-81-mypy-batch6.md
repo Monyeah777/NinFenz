@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:1fe5d1215b7dfae4a92cf156d1a7cf1768237933c7847a5affdaae9d3886599c
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:7dfb684e01c6351bd71c149445f3afa1876640d4bf67a0be3caf04398ffbd98d
+  - protocol/code_metrics_baseline.json:566a58106f88fc2c596fedf45effccb2007caa6d549f4bba48a681bd3a87b002
 ---
+> 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
+
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
 
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py

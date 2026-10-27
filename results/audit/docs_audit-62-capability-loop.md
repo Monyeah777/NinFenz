@@ -8,13 +8,15 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
-  - scripts/nf.py:0cd4f603b26162b65606ad9f9561403ecd749519280ef90e79b4747aaba58131
+  - scripts/nf.py:ecb7d61c796db0b5384c763bd29a8dbe32d0aa85682dae8d3cce51cd09a03239
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
   - desktop/tests/test_interop_export.py:2308d682b075fef25982c6577c67d41714980c94db1f4f538fee26ec7239a847
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
+
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
 
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:cebaf7f18f50d63c9d06c79e6172aae8dfea0efd84764ef884e28bda0387b8f4
-  - protocol/code_metrics_baseline.json:7dfb684e01c6351bd71c149445f3afa1876640d4bf67a0be3caf04398ffbd98d
+  - protocol/code_metrics_baseline.json:566a58106f88fc2c596fedf45effccb2007caa6d549f4bba48a681bd3a87b002
 ---
+> 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
+
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
 
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py

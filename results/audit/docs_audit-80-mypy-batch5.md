@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:7dfb684e01c6351bd71c149445f3afa1876640d4bf67a0be3caf04398ffbd98d
+  - protocol/code_metrics_baseline.json:566a58106f88fc2c596fedf45effccb2007caa6d549f4bba48a681bd3a87b002
 ---
+> 重审（2026-10-27）：S2j: knowledge split by subcommand -> nf_cmds/knowledge.py
+
 > 重审（2026-10-27）：S2i: doctor split into check helpers -> nf_cmds/doctor.py
 
 > 重审（2026-10-27）：S2h: domain handler split into subcommands -> nf_cmds/domain.py
