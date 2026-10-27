@@ -13,7 +13,7 @@ key 一致 ⇒ 该模块的输入面与上次通过的运行完全相同 ⇒ 可
 - **不做假绿**：只有"上次同一 key 全部通过"才跳过；一旦该模块任一条测试失败/报错，
   本次不写缓存（下次照跑），且不因跳过而降低任何判据。
 - **可回退**：`NF_TISA=0` 或 `--jobs` 外不加 `--incremental` 时行为与历史完全一致。
-- 缓存位置：`.nf-cache/tisa.json`（gitignored；可整体删除，无副作用）。
+- 缓存位置：仓内 .nf-cache/tisa.json（gitignored；可整体删除，无副作用）。
 """
 from __future__ import annotations
 

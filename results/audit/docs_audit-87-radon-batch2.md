@@ -8,8 +8,20 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:dd041c8f925caa2fc85330f4ae6b492c13331dd16122c478367ab3e8cacdbd6e
+  - protocol/code_metrics_baseline.json:534f061eac0431b1306da0e3999ac06b201238fb3f5b5d5dcb5a18a52a1fd88f
 ---
+> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
+
+> 重审（2026-10-27）：rebase 重冻（fast-gate）
+
+> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
+
+> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
+
+> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
+
+> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
+
 > 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
 
 > 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
