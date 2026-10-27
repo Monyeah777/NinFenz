@@ -1058,6 +1058,7 @@
     "desktop/tests/test_cli_json_face.py::E501": 1,
     "desktop/tests/test_cli_json_face.py::RUF100": 1,
     "desktop/tests/test_cli_json_face.py::UP031": 23,
+    "desktop/tests/test_cli_memo.py::F401": 1,
     "desktop/tests/test_code_metrics.py::UP031": 5,
     "desktop/tests/test_commit_msg.py::UP031": 3,
     "desktop/tests/test_commit_title_guard.py::E401": 1,
