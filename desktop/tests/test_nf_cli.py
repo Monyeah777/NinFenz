@@ -683,6 +683,7 @@ class NfCliSmokeTest(unittest.TestCase):
                 code = nf._cmd_doctor(argparse.Namespace(json=True))
         finally:
             lazy_yaml.module = orig
+            lazy_yaml._TRIED, lazy_yaml._YAML, lazy_yaml._WARNED = False, None, False
         self.assertEqual(1, code, "缺 PyYAML 必须让 doctor 退出码非 0（降级不得报绿）")
         doc = json.loads(out.getvalue())
         self.assertTrue(doc["degraded"])

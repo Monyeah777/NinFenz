@@ -29,6 +29,7 @@ class YamlOptionalDependencyTest(unittest.TestCase):
             self.assertIsInstance(plan, dict)
         finally:
             lazy_yaml.module = orig
+            lazy_yaml._TRIED, lazy_yaml._YAML, lazy_yaml._WARNED = False, None, False
 
 
 class AssembleBuildTest(unittest.TestCase):
