@@ -28,12 +28,14 @@ subjects:
   - desktop/tests/test_daemon_parity.py:31800825e5ba642b2518ec8e7ec5c3d93b16243b618c2e6c75e4abc62bc403a9
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:4e91123ee8aa3666d008307d2cbbd71d44d509f3e7b7afae6b919b509ff1c9d3
+  - desktop/tests/test_cli_json_face.py:ff2c6753d8297fecd27794445339f67db519421f4c34cd1f3b97befd6c6478ee
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-28）：json-face 去重复（结构断言）+ 成功面切片 + 权重重测
+
 > 重审（2026-10-28）：parity 机器面 8→24 片（只改粒度）+ 权重重测
 
 > 重审（2026-10-25）：发布边界收口：真实决策/交接/复盘迁私有 Plan 仓，公开仓仅留模板与投影

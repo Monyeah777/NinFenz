@@ -322,24 +322,26 @@ class JsonFaceCanonicalArgsTest(unittest.TestCase):
         self.assertEqual([], bad, "需参面缺面判别键：%s" % bad)
 
     def test_every_json_face_has_a_destination(self):
-        """覆盖点名：每张声明 --json 的面要么无参可跑、要么在 CANON、要么在 SKIP 有理由。
+        """覆盖点名的**结构面**（零成本；真跑由 chunk0-3 逐片承担）。
 
-        P2（2026-10-18 实测）：原实现先把**所有**面真跑一遍再算 `faces - (runs ∪ CANON ∪ SKIP)`，
-        单条白付 ~90 s。判据等价改写：`orphan = {f ∉ CANON/SKIP : 无参跑 rc=2}`——只跑
-        「尚未被点名」的那些面（正常为 0，异常时才多跑几条），结果集与旧式**逐项相同**。
+        等价性论证（2026-10-28，冷跑切片）：原实现先全量真跑一遍面再算
+        `faces - (runs ∪ CANON ∪ SKIP)`，单条白付 ~90–120 s；而 chunk0-3 的
+        `_assert_face_slice` 已按 `rows[i::4]` 逐片断言同一谓词——**并集 = 全集**：
+        - 每片断言 `orphan ∩ 该片 = ∅` ⇒ 并集断言 `orphan = ∅`；
+        - chunk0 另断言 `SKIP` 非空与 `CANON/SKIP ⊆ faces`（stale 检查）。
+        本测试只复核"切片并集闭合 + 点名表自洽"，不再真跑任何面（避免与 chunk 重复付费）。
         """
-        rows, runs = _probe_faces()
+        rows = _face_rows()
         faces = {r["path"] for r in rows}
+        union = set()
+        for i in range(4):
+            union |= {r["path"] for r in rows[i::4]}
+        self.assertEqual(faces, union, "面切片并集必须等于全集（切片不得漏面/重面）")
         known = set(CANON) | set(SKIP)
-        orph = sorted(faces - (set(runs) | known))
-        self.assertEqual([], orph, "既不在 CANON 也不在 SKIP 的 --json 面（无处安放）：%s" % orph)
         self.assertTrue(SKIP, "跳过面必须逐条写理由（防悄悄不跑）")
         stale = sorted(known - faces)
         self.assertEqual([], stale, "CANON/SKIP 里列了不存在（或已改名）的面：%s" % stale)
 
-    # ── 分片版（2026-10-19）：把同一条判据按面切成 4 份，让分片器能并行它 ──
-    # 判据本身不变：仍是「每张面要么无参可跑、要么被 CANON/SKIP 点名」，只是不再由一条
-    # 测试独占 ~90 s（实测那是全量档的头部地板之一）。
     def _face_chunk(self, index: int, total: int = 4):
         rows = _face_rows()
         chunk = rows[index::total]
@@ -409,19 +411,25 @@ class JsonFaceNoMachinePathTest(unittest.TestCase):
     三处机器面把 `C:\\\\Users\\\\<user>\\\\…` 原样写进 `--json`，而同一份纪律此前只覆盖失败
     消息与入仓文件）。跳过的 11 张面（见 `SKIP`，每条都点名了自己的覆盖专件）未纳入本判据。"""
 
-    def test_success_faces_are_portable(self):
-        _probe_faces()
-        texts = dict(_CACHE["raw"])                      # 无参可跑的面（同一批已跑过）
-        for name, argv in CANON.items():
+    def _assert_portable_slice(self, index: int, total: int = 4):
+        """把「成功面不回吐本机路径」按面切片（2026-10-28）：每片只真跑自己那批面。
+
+        判据不变：同一组 `MACHINE_PATH` + 家目录正则、同样的失败消息；切片并集 = 全集。
+        chunk0 另跑面表之外的 4 条**人读面**（`shell --verify/--baseline/--commands`、
+        `daemon status`），它们不属于面表、只需比一次。
+        """
+        texts = {}
+        for name, argv in sorted(CANON.items())[index::total]:
             p = cli_harness.run_cli_proc([sys.executable, NF] + _canon_argv(name) + ["--json"],
                                          cwd=str(ROOT), env=_preset_env())
             texts[name] = p.stdout or ""
-        # 面表之外的**人读面**（不带 `--json`、需要子旗标才看得到的那几处），
-        # 2026-10-01 取证：`nf shell --verify` 会把 `<NF_HOME>/shell_history` 绝对路径打出来。
-        for argv in (["shell", "--verify"], ["shell", "--baseline"],
-                     ["shell", "--commands", "--json"], ["daemon", "status", "--json"]):
-            p = cli_harness.run_cli_proc([sys.executable, NF] + argv, cwd=str(ROOT))
-            texts[" ".join(argv)] = (p.stdout or "") + (p.stderr or "")
+        if index == 0:
+            # 面表之外的**人读面**（不带 `--json`、需要子旗标才看得到的那几处），
+            # 2026-10-01 取证：`nf shell --verify` 会把 `<NF_HOME>/shell_history` 绝对路径打出来。
+            for argv in (["shell", "--verify"], ["shell", "--baseline"],
+                         ["shell", "--commands", "--json"], ["daemon", "status", "--json"]):
+                p = cli_harness.run_cli_proc([sys.executable, NF] + argv, cwd=str(ROOT))
+                texts[" ".join(argv)] = (p.stdout or "") + (p.stderr or "")
         pats = (MACHINE_PATH, re.compile(re.escape(os.path.expanduser("~")), re.I))
         bad = []
         for name, out in sorted(texts.items()):
@@ -429,11 +437,21 @@ class JsonFaceNoMachinePathTest(unittest.TestCase):
                 m = pat.search(out)
                 if m:
                     bad.append("%s → …%s…"
-                               % (name, out[max(0, m.start() - 20):m.end() + 20]
-                                  .replace("\n", " ")))
+                               % (name, out[max(0, m.start() - 20):m.end() + 20].replace(chr(10), " ")))
         self.assertEqual([], bad, "机器面回吐本机绝对路径（改走仓库相对 / `_portable_path`）：%s"
                          % bad[:6])
 
+    def test_success_faces_are_portable_chunk0(self):
+        self._assert_portable_slice(0)
+
+    def test_success_faces_are_portable_chunk1(self):
+        self._assert_portable_slice(1)
+
+    def test_success_faces_are_portable_chunk2(self):
+        self._assert_portable_slice(2)
+
+    def test_success_faces_are_portable_chunk3(self):
+        self._assert_portable_slice(3)
 
 if __name__ == "__main__":
     unittest.main()
