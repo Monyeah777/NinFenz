@@ -6,6 +6,8 @@
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
+        "desktop/src/core/gate_engine.py::B404": 1,
+        "desktop/src/core/gate_engine.py::B603": 1,
         "desktop/src/core/gate_inproc.py::B102": 2,
         "desktop/src/core/ingest_common.py::B404": 1,
         "desktop/src/core/ingest_common.py::B603": 1,
@@ -43,17 +45,17 @@
           "severities": [
             [
               "LOW",
-              47
+              49
             ],
             [
               "MEDIUM",
               3
             ]
           ],
-          "total": 50
+          "total": 52
         },
         "ruff": {
-          "total": 85
+          "total": 86
         }
       },
       "ruff": {
@@ -67,6 +69,7 @@
         "desktop/src/core/community_inventory.py::S112": 1,
         "desktop/src/core/daemon.py::S110": 8,
         "desktop/src/core/decision_layer.py::S310": 4,
+        "desktop/src/core/gate_engine.py::S603": 1,
         "desktop/src/core/gate_inproc.py::S102": 2,
         "desktop/src/core/ingest_common.py::S603": 1,
         "desktop/src/core/ingest_common.py::S607": 1,

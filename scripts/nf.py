@@ -7029,7 +7029,11 @@ def _cmd_verify(args) -> int:
         _os.environ[_rt.ENV_TRUST] = "1"
     try:
         verdicts = ge.run_checks(
-            ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)))
+            ge.ROOT, only, memo, use_cache=bool(getattr(args, "cached", False)),
+            # 并行判据（2026-10-28）：heredoc 类 check 在**子进程**里跑（互不串 stdout，
+            # 也天然零共享状态），exact 类仍串行进程内。实测 32.4 → 9.5 s（3.4×）。
+            # 默认关：`NF_GATE_PARALLEL=1` 打开（C2 阶段会随门禁默认值一起放开）。
+            parallel=_os.environ.get("NF_GATE_PARALLEL") == "1")
     finally:
         if _saved_trust is None:
             _os.environ.pop(_rt.ENV_TRUST, None)
