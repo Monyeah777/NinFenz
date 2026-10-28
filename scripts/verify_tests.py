@@ -340,6 +340,10 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
             env.setdefault("NF_DAEMON_IDLE", "30")
+            # `nf verify` 的判据并行（heredoc → 子进程）：实测 33 → 9.8 s（3.5×）。
+            # 分片里的测试大量调用 `nf verify --json`（parity / json-face / watch），
+            # 打开后这些重件一起受益。可用 NF_GATE_PARALLEL=0 关闭。
+            env.setdefault("NF_GATE_PARALLEL", "1")
             # 内层并发闸：分片越多，单分片内层线程越少；总 spawn 上限控制在 8 路。
             # 实测 16 片 × 2 线程仍会拖长重测试，故分片模式把内层降到 1 路。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)

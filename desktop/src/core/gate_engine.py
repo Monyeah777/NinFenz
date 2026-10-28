@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import threading
 import importlib
 import json
 import os
@@ -55,6 +56,11 @@ if _SRC not in sys.path:
 
 # 必须在补好 sys.path **之后**才能 import core.*（引擎可被当脚本直接跑）。
 from core import gate_inproc, gate_labels, gate_native, repo_trust  # noqa: E402
+
+#: 并行模式（`NF_GATE_PARALLEL=1`）下，heredoc 判据必须在**子进程**里跑：
+#: `gate_inproc.run_inproc` 用 `contextlib.redirect_stdout`（进程全局），线程并行会互相串输出。
+#: 子进程同时带来「判据体之间零共享状态」——比线程更接近 bash 语义。
+_PARALLEL = threading.local()
 from core.gate_labels import Labels  # noqa: E402
 
 #: 代码面：改了这些文件必须换键（沿用 disk_cache 的「算法面进键」纪律）。
@@ -333,7 +339,10 @@ def _inproc(num: int, title: str, labels: Labels) -> Callable[[Path], Verdict]:
             v.status = FAIL
             return v
         src, logname = got
-        code, out = gate_inproc.run_inproc(src, root, "check%d" % num)
+        if getattr(_PARALLEL, "on", False):
+            code, out = _run_heredoc_isolated(src, root, num)
+        else:
+            code, out = gate_inproc.run_inproc(src, root, "check%d" % num)
         v.note = logname
         if code == 0:
             for msg in labels.pass_lines:
@@ -507,8 +516,84 @@ class Memo:
 
 # ---------------------------------------------------------------- 执行
 
+def _run_heredoc_isolated(src: str, root: Path, num: int) -> tuple[int, str]:
+    """在**子进程**里跑一段 heredoc 源码 → (退出码, stdout+stderr)。
+
+    与 `gate_inproc.run_inproc` 的差别只有"执行场所"：同样的源码、同样的 cwd、同样的
+    `sys.path`（root + desktop/src 前置）。这样并行时互不串 stdout，也和 bash 的
+    `$PY3 - <<'PYEOF'` 更接近。超时按 600 s（check39 的 quickstart 段自带 330 s 上限）。
+    """
+    import subprocess
+    env = dict(os.environ)
+    paths = [str(root / "desktop" / "src"), str(root)]
+    old = env.get("PYTHONPATH")
+    if old:
+        paths.append(old)
+    env["PYTHONPATH"] = os.pathsep.join(paths)
+    env.setdefault("PYTHONUTF8", "1")
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    try:
+        r = subprocess.run([sys.executable, "-c", src], cwd=str(root), env=env,
+                           capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=600)
+    except subprocess.TimeoutExpired:
+        return 1, "check%d 子进程超时（600 s）" % num
+    return int(r.returncode), (r.stdout or "") + (r.stderr or "")
+
+
+def _is_exact_body(num: int) -> bool:
+    """该 check 能否整段当 Python 跑（`_inproc` 的 exact 分支）——决定要不要串行。"""
+    body = gate_labels.check_body(_verify_sh() or "", num)
+    try:
+        compile(body, "<probe>", "exec")
+        return True
+    except SyntaxError:
+        return False
+
+
+def run_checks_parallel(root: Path, nums: Sequence[int]) -> list[Verdict]:
+    """并行跑 check（`NF_GATE_PARALLEL=1`）：heredoc 类走子进程池，exact 类仍串行在进程内。
+
+    为什么这么分：exact 类会跑 `run_check_inproc`（内部 `redirect_stdout` 全局），线程并行不安全；
+    heredoc 类在子进程里跑，天然无共享状态。**判据体一字不改**，只改"在哪个进程里跑"。
+    输出 V verdict 与串行完全同构（PASS 文案来自 labels，FAIL 来自 tail(out)）。
+    """
+    from concurrent.futures import ThreadPoolExecutor
+    out: list[Verdict] = []
+    exact = [n for n in nums if _is_exact_body(n)]
+    parallel = [n for n in nums if n not in set(exact)]
+
+    def _one(n: int) -> Verdict:
+        spec = REGISTRY.get(n)
+        t0 = time.perf_counter()
+        _PARALLEL.on = True
+        try:
+            v = spec.impl(root)
+        finally:
+            _PARALLEL.on = False
+        v.seconds = round(time.perf_counter() - t0, 2)
+        return v
+
+    workers = max(1, min(8, (os.cpu_count() or 4)))
+    got: dict = {}
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for n, v in zip(parallel, pool.map(_one, parallel)):
+            got[n] = v
+    for n in exact:
+        spec = REGISTRY.get(n)
+        t0 = time.perf_counter()
+        v = spec.impl(root)
+        v.seconds = round(time.perf_counter() - t0, 2)
+        got[n] = v
+    for n in sorted(nums):
+        if n in got:
+            out.append(got[n])
+    return out
+
+
 def run_checks(root: Path, only: Sequence[int] | None = None,
-               memo: Memo | None = None, use_cache: bool = False) -> list[Verdict]:
+               memo: Memo | None = None, use_cache: bool = False,
+               parallel: bool = False) -> list[Verdict]:
     """跑 check → Verdict 列表。
 
     `use_cache=True`（2026-10-16 新增）：每条 check 走**子 check 内容寻址缓存**——
@@ -518,6 +603,8 @@ def run_checks(root: Path, only: Sequence[int] | None = None,
     """
     build_registry()
     nums = sorted(only) if only else sorted(REGISTRY)
+    if parallel:
+        return run_checks_parallel(root, nums)
     out: list[Verdict] = []
     for n in nums:
         spec = REGISTRY.get(n)
