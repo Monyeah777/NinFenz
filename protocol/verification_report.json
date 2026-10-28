@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "5e49ef8f1cbda7b022197f5ce1773560cb9fec2dcf6a31b817a031a080d60b61",
+        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -313,7 +313,7 @@
       "stats": {
         "audits": 57,
         "legacy": 27,
-        "subjects_ok": 287,
+        "subjects_ok": 285,
         "with_header": 30
       },
       "status": "warn",
@@ -617,7 +617,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4094,
+        "files": 4078,
         "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "5950970f7261d876a3b478bdc0c5dc27c55bd47afd2f8eca0360382544d2e2da",
+  "root_digest": "37f6b5271fff13f84fe945c708fd41b5b6b05b12b81fd614589e4582ccd08cf6",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
