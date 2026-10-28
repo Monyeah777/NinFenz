@@ -185,8 +185,10 @@ if [ "$NF_TESTS_ONLY" = "1" ]; then
   fi
   _UT_JOBS="${NF_TEST_JOBS:-}"
   if [ -z "$_UT_JOBS" ]; then
-    # 实测（2026-10-28，本机 20 核）：jobs=8 → 362–386 s；jobs=16 → 417 s（并发把重测试拖长）。
-    _UT_JOBS="$("$PY3" -c 'import os; print(min(8, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+    # 实测（2026-10-28，本机 20 核，冷跑全量）：
+    #   jobs=8 → 299–307 s；jobs=10 → **285 s**；jobs=12 → 293 s；jobs=16 → 417 s。
+    # 10 是当前拐点（再多会被进程/文件争用吃掉）。
+    _UT_JOBS="$("$PY3" -c 'import os; print(min(10, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
   fi
   exec "$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS"
 fi
@@ -598,8 +600,10 @@ check12(){
       # 20 核开发机也不该被 4 片浪费；显式 NF_TEST_JOBS 一律优先。
       _UT_JOBS="${NF_TEST_JOBS:-}"
       if [ -z "$_UT_JOBS" ]; then
-        # 实测（2026-10-28，本机 20 核）：jobs=8 → 362–386 s；jobs=16 → 417 s（并发把重测试拖长）。
-    _UT_JOBS="$("$PY3" -c 'import os; print(min(8, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
+        # 实测（2026-10-28，本机 20 核，冷跑全量）：
+    #   jobs=8 → 299–307 s；jobs=10 → **285 s**；jobs=12 → 293 s；jobs=16 → 417 s。
+    # 10 是当前拐点（再多会被进程/文件争用吃掉）。
+    _UT_JOBS="$("$PY3" -c 'import os; print(min(10, max(2, (os.cpu_count() or 2) - 1)))' 2>/dev/null || echo 4)"
       fi
       if [ "$NF_TIER" = "full" ]; then
         _ut_cmd=("$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS")
