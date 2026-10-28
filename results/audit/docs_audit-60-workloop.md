@@ -6,7 +6,7 @@ scope: 作者澄清「让这些模型替我干活，来构建 NF」——把决�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:75bc3ae0f56ca7997d426626a4ebdf3d58ea8879c62ab2de2d40c5233e19cb30
+  - verify.sh:9d41165123cd0dd33f31ec62fd8b4554237913d23a3f3e8a04b95d8c97eedcb9
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
@@ -15,6 +15,8 @@ subjects:
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
+
 > 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
 
 > 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
