@@ -270,14 +270,17 @@ class AutostartTest(unittest.TestCase):
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
         return env, log
 
-    def _stop(self, home):
-        _stop_daemon(home)                     # 等状态文件出现再停（非阻塞拉起 ⇒ 收尾有竞态）
+    def _stop(self, home, wait=10.0):
+        # `wait` 可下调：**明确不启守护**的用例（NF_AUTOSTART=0/false/no/off）永远等不到
+        # daemon.json，默认 10 s 的等待纯属浪费（实测该用例 4 次收尾共 40 s）。
+        _stop_daemon(home, wait=wait)          # 等状态文件出现再停（非阻塞拉起 ⇒ 收尾有竞态）
 
     def test_falsey_values_disable_autostart(self):
         """显式关：`0|false|no|off` 一律不许拉起守护（诊断/对照/测试要可复现）。"""
         for value in ("0", "false", "no", "off"):
             home = self._home()
-            self.addCleanup(self._stop, home)
+            # 本用例断言"不得拉起守护"⇒ 不存在 daemon.json 可等，收尾只给 0.3 s 宽限
+            self.addCleanup(self._stop, home, 0.3)
             p = self._run(home, "--version", autostart=value)
             self.assertEqual(0, p.returncode, p.stderr or p.stdout)
             self.assertIn("nf ", p.stdout)
