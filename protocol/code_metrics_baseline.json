@@ -451,9 +451,9 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/gate_engine.py": {
-      "lines": 627,
+      "lines": 714,
       "max_fn_cc": 19,
-      "max_fn_lines": 75
+      "max_fn_lines": 78
     },
     "desktop/src/core/gate_faces.py": {
       "lines": 326,
@@ -1496,7 +1496,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7678,
+      "lines": 7682,
       "max_fn_cc": 116,
       "max_fn_lines": 1263
     },
@@ -1641,7 +1641,7 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 728,
+      "lines": 732,
       "max_fn_cc": 61,
       "max_fn_lines": 252
     },
