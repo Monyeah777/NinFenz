@@ -548,6 +548,8 @@ def _is_exact_body(num: int) -> bool:
         compile(body, "<probe>", "exec")
         return True
     except SyntaxError:
+        # 可吞：编译失败 = 该 check 含 bash 独有语法，走「只跑 heredoc」路径（引擎既有语义，
+        # 由 test_gate_engine_parity 逐字守等价）；不是错误，无需上报。
         return False
 
 
@@ -574,7 +576,13 @@ def run_checks_parallel(root: Path, nums: Sequence[int]) -> list[Verdict]:
         v.seconds = round(time.perf_counter() - t0, 2)
         return v
 
-    workers = max(1, min(8, (os.cpu_count() or 4)))
+    # 并发闸：分片内层已是多进程（10 片 × 8 子进程 = 80 个 python 会互相拖死），
+    # 故允许外层用 `NF_GATE_PARALLEL_WORKERS` 下调；默认 min(8, cpu)。
+    try:
+        _w = int(os.environ.get("NF_GATE_PARALLEL_WORKERS") or 0)
+    except ValueError:
+        _w = 0
+    workers = max(1, min(_w or 8, os.cpu_count() or 4))
     got: dict = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for n, v in zip(parallel, pool.map(_one, parallel)):
