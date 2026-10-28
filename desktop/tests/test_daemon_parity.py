@@ -243,6 +243,10 @@ class _DaemonFixture(unittest.TestCase):
         return r.returncode, r.stdout, r.stderr
 
 
+#: 机器面切片数（只改执行粒度；每片仍逐条比「直跑 + 守护冷 + 守护热」）
+_MACHINE_CHUNKS = 24
+
+
 class DaemonParityTest(_DaemonFixture):
     """**行为等价**：经真守护（socket）与真子进程直跑逐字节一致。"""
 
@@ -313,30 +317,84 @@ class DaemonParityTest(_DaemonFixture):
         self.assertEqual(_check_expected(chunk, directs), checked,
                          "有机器面没被比到（切片内覆盖不完整）")
 
+    # 切片数 = 24（**只改执行粒度，不减少任何一条比较**）：
+    # 历史：单条 142 s → 8 片（~35 s/片）曾是并行地板；2026-10-28 实测 `nf verify --json`
+    # 一条面就要 33–45 s，8 片里最重的那片仍是 176–181 s = 整个冷跑的下界。
+    # 24 片把每片压到 4 个面左右（实测最重片 ~40 s），并集仍逐条等于 _machine_targets()。
+    def _m(self, i):
+        self._machine_chunk(i, _MACHINE_CHUNKS)
+
     def test_machine_faces_byte_identical_chunk0(self):
-        self._machine_chunk(0, 8)
+        self._m(0)
 
     def test_machine_faces_byte_identical_chunk1(self):
-        self._machine_chunk(1, 8)
+        self._m(1)
 
     def test_machine_faces_byte_identical_chunk2(self):
-        self._machine_chunk(2, 8)
+        self._m(2)
 
     def test_machine_faces_byte_identical_chunk3(self):
-        self._machine_chunk(3, 8)
+        self._m(3)
 
     def test_machine_faces_byte_identical_chunk4(self):
-        self._machine_chunk(4, 8)
+        self._m(4)
 
     def test_machine_faces_byte_identical_chunk5(self):
-        self._machine_chunk(5, 8)
+        self._m(5)
 
     def test_machine_faces_byte_identical_chunk6(self):
-        self._machine_chunk(6, 8)
+        self._m(6)
 
     def test_machine_faces_byte_identical_chunk7(self):
-        self._machine_chunk(7, 8)
+        self._m(7)
 
+    def test_machine_faces_byte_identical_chunk8(self):
+        self._m(8)
+
+    def test_machine_faces_byte_identical_chunk9(self):
+        self._m(9)
+
+    def test_machine_faces_byte_identical_chunk10(self):
+        self._m(10)
+
+    def test_machine_faces_byte_identical_chunk11(self):
+        self._m(11)
+
+    def test_machine_faces_byte_identical_chunk12(self):
+        self._m(12)
+
+    def test_machine_faces_byte_identical_chunk13(self):
+        self._m(13)
+
+    def test_machine_faces_byte_identical_chunk14(self):
+        self._m(14)
+
+    def test_machine_faces_byte_identical_chunk15(self):
+        self._m(15)
+
+    def test_machine_faces_byte_identical_chunk16(self):
+        self._m(16)
+
+    def test_machine_faces_byte_identical_chunk17(self):
+        self._m(17)
+
+    def test_machine_faces_byte_identical_chunk18(self):
+        self._m(18)
+
+    def test_machine_faces_byte_identical_chunk19(self):
+        self._m(19)
+
+    def test_machine_faces_byte_identical_chunk20(self):
+        self._m(20)
+
+    def test_machine_faces_byte_identical_chunk21(self):
+        self._m(21)
+
+    def test_machine_faces_byte_identical_chunk22(self):
+        self._m(22)
+
+    def test_machine_faces_byte_identical_chunk23(self):
+        self._m(23)
 
 CLIENT = str(ROOT / "scripts" / "nf_client.py")
 
