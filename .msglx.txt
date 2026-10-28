@@ -1,0 +1,14 @@
+fix(protocol): 采用 Linux 侧冻结产物（消除"本机冻 / 云端重算"differ）
+
+一、现象
+CI 的 `test_scan_clean`（职能坐标投影）与 `test_verify_report`（报告新鲜度）在 16 分片下红：
+提交件是本机 Windows 冻结的，而 Linux 重算得到**多 1 件 support**（293 vs 294）。
+
+二、做法
+用新增的 `refreeze-linux` 工作流（ubuntu + requirements-ci + 同款前置目录）重跑冻结，
+下载 artifact 覆盖 `protocol/role_coordinates.json` 与 `protocol/verification_report.json`，
+再按新树走一遍本地冻结链。
+
+三、验证
+- 本机：`test_role_model.RealRepoTest.test_scan_clean` + `test_verify_report.RealRepoTest` 4 条全绿；
+- `bash verify.sh --checks-only` PASS=75 WARN=2 FAIL=0。
