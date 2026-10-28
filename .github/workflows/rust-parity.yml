@@ -16,6 +16,11 @@ name: rust-parity
 on:
   push:
     branches: [main]
+    paths:
+      - "engine/**"
+      - "protocol/**"
+      - "scripts/**"
+      - ".github/workflows/rust-parity.yml"
   pull_request:
     paths:
       - "engine/rust/**"
