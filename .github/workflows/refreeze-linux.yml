@@ -1,0 +1,71 @@
+name: refreeze-linux
+# Linux 侧冻结（workflow_dispatch）：本仓若干"生成件"（`protocol/role_coordinates.json`、
+# `protocol/verification_report.json` 等）由扫描 + 摘要算出；它们在 Linux CI 与 Windows 本机
+# 上重算结果可能不同 ⇒ 本机冻的产物会让 CI 的"与实时重算一致"类判据变红。
+#
+# 本工作流在**与主门禁同版本的环境**（ubuntu + requirements-ci + 同款前置目录）里重跑冻结，
+# 把产物作为 artifact 上传（**不**直接提交，避免绕过 PR 闸门）。
+#
+# 用法：Actions → refreeze-linux → Run workflow；下载 `refreeze-out` 产物覆盖到工作树后提 PR。
+on:
+  workflow_dispatch:
+    inputs:
+      faces:
+        description: "要重冻的面（空格分隔；默认 role-coordinates verify-report）"
+        required: false
+        default: "role-coordinates verify-report"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  refreeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: .github/requirements-*.txt
+      - name: 安装依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt
+      - name: 前置目录（与主门禁同口径）
+        run: mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+      - name: 重冻
+        run: |
+          set -euxo pipefail
+          python scripts/nf.py layers --write
+          python scripts/verify_report.py --write
+          python scripts/build_verification_cards.py --write
+          python scripts/code_metrics.py --write
+          python scripts/style_check.py --write
+          python scripts/sast_check.py --write
+          python scripts/coupling_metrics.py --write
+          python scripts/nf.py conformance --write
+      - name: 收集产物
+        if: always()
+        run: |
+          mkdir -p out
+          git status --porcelain > out/status.txt || true
+          cp -f protocol/role_coordinates.json out/ 2>/dev/null || true
+          cp -f protocol/verification_report.json out/ 2>/dev/null || true
+          cp -f docs/verification-cards.md out/ 2>/dev/null || true
+          cp -f protocol/code_metrics_baseline.json out/ 2>/dev/null || true
+          cp -f protocol/style_baseline.json out/ 2>/dev/null || true
+          cp -f protocol/sast_baseline.json out/ 2>/dev/null || true
+          cp -f protocol/coupling_baseline.json out/ 2>/dev/null || true
+          cp -f protocol/conformance_report.json out/ 2>/dev/null || true
+          git diff > out/refreeze.diff || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: always()
+        with:
+          name: refreeze-out
+          path: out/
