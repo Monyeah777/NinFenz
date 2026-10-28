@@ -429,7 +429,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 2,
+        "metrics_drift": 0,
         "metrics_missing": 0,
         "metrics_recorded": 261,
         "modules": 261,
@@ -617,7 +617,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4077,
+        "files": 4078,
         "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9883408715e82700e02ccecc8ede63b4666edd36e3f4a68dc5a21d4ba6703e8d",
+  "root_digest": "2d97f620f8c19fff2db629e2399270c5478ca6e87305d98acf38ea7a70050d27",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
