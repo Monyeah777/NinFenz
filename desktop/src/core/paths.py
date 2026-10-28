@@ -73,6 +73,30 @@ def path_syntax_issue(text: str) -> str:
     return ""
 
 
+#: `realpath(root)` 结果缓存：根在一次运行里是固定的，而 `validate_path` 被调用数千次
+#: （check33 实测 3309 次）——每次重算根 realpath 等于白打 3300 次系统调用。
+_REAL_ROOT: dict = {}
+
+
+def _real_root(root: str) -> str:
+    key = str(root)
+    got = _REAL_ROOT.get(key)
+    if got is None:
+        got = os.path.realpath(key)
+        if len(_REAL_ROOT) < 64:          # 有界：进程内根通常 <10 个
+            _REAL_ROOT[key] = got
+    return got
+
+
+def _norm_contained(root_real: str, target_real: str) -> bool:
+    """**两端都已是 realpath** 时的包含判定（不再打 realpath）。"""
+    r = root_real
+    t = target_real
+    if os.name == "nt":
+        r, t = os.path.normcase(r), os.path.normcase(t)
+    return t == r or t.startswith(r + os.sep)
+
+
 def contained(root: str, target: str) -> bool:
     """`target` 解析后是否落在 `root` 内（含 `root` 自身）。两端先 realpath 归一。"""
     r = os.path.realpath(str(root))
@@ -102,8 +126,9 @@ def validate_path(root: str, rel: str, *, allow_absolute: bool = False) -> str:
         raise PathEscapeError("%s：%s（修复指引：改用根内相对路径——勿用 `..` 段 / 盘符写法如 "
                               "C:foo / `文件:流` 备用数据流写法，并去掉不可见控制字符）"
                               % (issue, text))
-    full = os.path.realpath(os.path.join(os.path.realpath(str(root)), text))
-    if not contained(root, full):
+    root_real = _real_root(str(root))
+    full = os.path.realpath(os.path.join(root_real, text))
+    if not _norm_contained(root_real, full):
         raise PathEscapeError("路径逃逸根目录：%s（修复指引：目标须落在 %s 内）"
                              % (text, root))
     return full
