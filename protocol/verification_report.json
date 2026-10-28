@@ -492,10 +492,10 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 95,
+        "pinned_uses": 98,
         "requirements_files": 5,
-        "with_explicit_permissions": 21,
-        "workflows": 21
+        "with_explicit_permissions": 22,
+        "workflows": 22
       },
       "status": "pass",
       "warns": 0
@@ -617,7 +617,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4079,
+        "files": 4080,
         "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "2d208af34d16c2e656a74f9a42c83e84f8bcf49065a05b9d03af2fff8bc7661d",
+  "root_digest": "97cf4d17c715ea6c1d99f5b36da0ad609a9804bfc7487f11ed1179bb533eae83",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
