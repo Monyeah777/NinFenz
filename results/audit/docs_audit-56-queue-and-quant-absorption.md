@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:75bc3ae0f56ca7997d426626a4ebdf3d58ea8879c62ab2de2d40c5233e19cb30
+  - verify.sh:9d41165123cd0dd33f31ec62fd8b4554237913d23a3f3e8a04b95d8c97eedcb9
   - README.en.md:8671d7c1cf392b8664a12b8df5c2738d34986299dea7c3bc54be88b59cd8e998
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
@@ -16,7 +16,10 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-10-28）：merge main for trust badges
+
 > 重审（2026-10-28）：trust badges: M8ven and OpenSSF Scorecard
+> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
 
 > 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
 

@@ -15,9 +15,11 @@ subjects:
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
   - docs/output-forms.md:98716fc96333cdd1d8e012e307fb3911ead53888672c37a012761f3d41a8db4e
   - desktop/tests/test_domain_pack.py:e7ee496bdc2c0a78ead6baca16b252e776ceeab798c9965fa0b765fbb8c59410
-  - verify.sh:75bc3ae0f56ca7997d426626a4ebdf3d58ea8879c62ab2de2d40c5233e19cb30
+  - verify.sh:9d41165123cd0dd33f31ec62fd8b4554237913d23a3f3e8a04b95d8c97eedcb9
 
 ---
+> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
+
 > 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
 
 > 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
