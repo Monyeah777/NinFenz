@@ -1,5 +1,7 @@
 # NinFenz · Documentation Workshop (spec-driven)<sub>文档生成工坊（规范驱动）</sub>
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/monyeah777-ninfenz-18m2bs?v=f3e8250d1126d7677811d9f4ef6ceab0)](https://m8ven.ai/mcp/monyeah777-ninfenz-18m2bs?s=readme) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Monyeah777/NinFenz/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Monyeah777/NinFenz)
+
 [![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
 
 <!-- nf:locales -->
