@@ -1,0 +1,19 @@
+perf(ci): 测试矩阵 32 → 16 片（L6：压排队时间，墙钟 301 → 预期 ~270 s）
+
+一、动机（实测）
+main 的 ci-verify 墙钟 301 s，结构是「setup ~90 s + 32 片矩阵 + gate」；32 片让
+GitHub 托管 runner 出现**第二波排队**（单 job 98 s，两波 ≈ 301 s）。
+16 片时单片工作量翻倍（权重口径 ~120 s）但**只排一波**，实测同形态下更短。
+
+二、口径不变
+- 每片仍只跑自己的 1/N，**并集 == discover 全集**：本地 `verify_tests.py --plan 16` 已校验
+  （3463 == 3463）；
+- `fail-fast: false`、逐片日志与 artifact、gate 汇总 needs 关系全部保留。
+
+三、连带重冻
+工作流内容变了 ⇒ `protocol/verification_report.json` / `role_coordinates.json` 等生成件
+按新树重算（判据「提交件 == 实时重算」必须继续成立）。
+
+四、本地验证
+`bash verify.sh --checks-only` PASS=75 WARN=2 FAIL=0；
+`test_workflow_policy` + `test_verify_report` + `test_role_model` 44 条全绿。
