@@ -12,7 +12,7 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:6da27aa44c7d1da82bb82c6fbc93f6663ea13d3198e3fdfa64489240c90a9c85
+  - protocol/code_metrics_baseline.json:bb0dfdef3fc2186bb03017ec8b31979559592a07b79002811bf9f0176d7aa6be
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -265,6 +265,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-28）：verify 并行 workers 可调 + 可吞理由
+
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
 
 > 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档

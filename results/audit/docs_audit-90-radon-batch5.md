@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:6da27aa44c7d1da82bb82c6fbc93f6663ea13d3198e3fdfa64489240c90a9c85
+  - protocol/code_metrics_baseline.json:bb0dfdef3fc2186bb03017ec8b31979559592a07b79002811bf9f0176d7aa6be
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -261,6 +261,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-28）：verify 并行 workers 可调 + 可吞理由
+
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
 
 > 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档

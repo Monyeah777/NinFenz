@@ -344,6 +344,8 @@ def run_shard(ids: list, index: int, dump: str = "") -> dict:
             # 分片里的测试大量调用 `nf verify --json`（parity / json-face / watch），
             # 打开后这些重件一起受益。可用 NF_GATE_PARALLEL=0 关闭。
             env.setdefault("NF_GATE_PARALLEL", "1")
+            # 外层 10 片时内层只给 4 路，避免 10×8=80 个 python 子进程互拖（实测会超时）。
+            env.setdefault("NF_GATE_PARALLEL_WORKERS", "4")
             # 内层并发闸：分片越多，单分片内层线程越少；总 spawn 上限控制在 8 路。
             # 实测 16 片 × 2 线程仍会拖长重测试，故分片模式把内层降到 1 路。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
