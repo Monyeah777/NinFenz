@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:bb0dfdef3fc2186bb03017ec8b31979559592a07b79002811bf9f0176d7aa6be
+  - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -260,6 +260,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-10-28）：权重重测（verify 并行后）+ 内层并行默认 2
+
 > 重审（2026-10-28）：verify 并行 workers 可调 + 可吞理由
 
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
