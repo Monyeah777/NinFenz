@@ -1844,7 +1844,7 @@
     "test_json_shape_contracts.JsonDocHelperTest.test_loads_tolerates_bom_and_rejects_bad_json": 0.0,
     "test_json_shape_contracts.JsonDocHelperTest.test_text_and_file_size_caps_are_enforced": 0.0,
     "test_json_shape_contracts.UnguardedRatchetTest.test_scanner_catches_a_mutation": 0.0,
-    "test_json_shape_contracts.UnguardedRatchetTest.test_unguarded_sites_do_not_grow": 0.72,
+    "test_json_shape_contracts.UnguardedRatchetTest.test_unguarded_sites_do_not_grow": 0.74,
     "test_judge_references.JudgeReferenceTest.test_code_side_judge_references_resolve": 0.17,
     "test_judge_references.JudgeReferenceTest.test_doc_side_judge_references_resolve": 0.36,
     "test_judge_references.JudgeReferenceTest.test_exemptions_are_not_stale": 0.04,
