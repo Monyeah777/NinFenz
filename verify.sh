@@ -112,20 +112,21 @@ fi
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
 # `--checks-only` 只跑 42 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
-NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"
+NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"; NF_PR_TIER=0
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast) NF_FAST=1 ;;
     --full) NF_TIER='full' ;;
     --quick) NF_TIER='quick' ;;
+    --pr) NF_TIER='quick'; NF_PR_TIER=1 ;;
     --no-cache) NF_CACHE=0 ;;
     --checks-only) NF_CHECKS_ONLY=1 ;;
     --tests-only) NF_TESTS_ONLY=1 ;;
     --shard) shift; NF_SHARD="${1:-}"; [ -n "$NF_SHARD" ] || { echo '用法：--shard 需要形如 3/16 的取值' >&2; exit 2; } ;;
     --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
     *)
-      echo "未知参数：$1（用法：bash verify.sh [--full|--quick] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
+      echo "未知参数：$1（用法：bash verify.sh [--full|--quick|--pr] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
       exit 2 ;;
   esac
   shift

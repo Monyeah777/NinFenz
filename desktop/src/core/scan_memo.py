@@ -25,6 +25,8 @@ from pathlib import Path
 from typing import Any
 
 _TEXT: dict[tuple, str] = {}
+#: 二进制只读面（text_hygiene 要 raw bytes 判 BOM/CRLF/UTF-8；与文本面同键策略）
+_BYTES: dict[tuple, bytes] = {}
 _AST: dict[tuple, Any] = {}
 _FACTS: dict[tuple, Any] = {}
 #: 作用域深度（可重入）：公开入口（`scan`/`_run_uncached`/`build`）各自 begin/end。
@@ -79,6 +81,24 @@ def read_text(path: Any) -> str | None:
     _TEXT[key] = text
     _STATS["read"] += 1
     return text
+
+
+def read_bytes(path: Any) -> bytes | None:
+    """容错二进制读：缺件/不可读 → None（键与 `read_text` 同源，文件一变键就变）。"""
+    key = _key(path)
+    if key is None:
+        return None
+    got = _BYTES.get(key)
+    if got is not None:
+        _STATS["read_hit"] += 1
+        return got
+    try:
+        raw = Path(path).read_bytes()
+    except OSError:
+        return None
+    _BYTES[key] = raw
+    _STATS["read"] += 1
+    return raw
 
 
 def read_text_strict(path: Any) -> str:
@@ -259,6 +279,7 @@ def _reset_stats() -> None:
 
 def _clear_data() -> None:
     _TEXT.clear()
+    _BYTES.clear()
     _AST.clear()
     _FACTS.clear()
 

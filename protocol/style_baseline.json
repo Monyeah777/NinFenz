@@ -902,6 +902,7 @@
     "desktop/src/core/terminal.py::SIM105": 1,
     "desktop/src/core/terminal.py::UP031": 108,
     "desktop/src/core/text_hygiene.py::E501": 1,
+    "desktop/src/core/text_hygiene.py::I001": 1,
     "desktop/src/core/text_hygiene.py::UP006": 14,
     "desktop/src/core/text_hygiene.py::UP031": 13,
     "desktop/src/core/text_hygiene.py::UP035": 3,

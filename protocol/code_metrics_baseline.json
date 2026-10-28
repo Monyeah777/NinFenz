@@ -856,7 +856,7 @@
       "max_fn_lines": 8
     },
     "desktop/src/core/paths.py": {
-      "lines": 145,
+      "lines": 170,
       "max_fn_cc": 9,
       "max_fn_lines": 34
     },
@@ -1141,7 +1141,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/scan_memo.py": {
-      "lines": 299,
+      "lines": 320,
       "max_fn_cc": 25,
       "max_fn_lines": 46
     },
@@ -1257,8 +1257,8 @@
     },
     "desktop/src/core/text_hygiene.py": {
       "lines": 293,
-      "max_fn_cc": 26,
-      "max_fn_lines": 92
+      "max_fn_cc": 25,
+      "max_fn_lines": 90
     },
     "desktop/src/core/tool_face.py": {
       "lines": 68,

@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import os
 import re
+
+from . import scan_memo as _memo
 import unicodedata
 from typing import Any, Dict, List, Tuple
 
@@ -195,10 +197,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     keys_checked = values_checked = 0
     for path in files:
         rel = os.path.relpath(path, root).replace(os.sep, "/")
-        try:
-            with open(path, "rb") as fh:
-                raw = fh.read()
-        except OSError:            # 尽力而为：读不到的文件跳过（缺件由 check35 回执门/门禁件清单报出）
+        raw = _memo.read_bytes(path)
+        if raw is None:            # 尽力而为：读不到的文件跳过（缺件由 check35 回执门/门禁件清单报出）
             continue
         if b"\x00" in raw[:4096]:  # 二进制哨兵
             continue
