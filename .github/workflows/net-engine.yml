@@ -6,6 +6,11 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - "engine/dotnet/**"
+      - "protocol/**"
+      - "scripts/**"
+      - ".github/workflows/net-engine.yml"
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

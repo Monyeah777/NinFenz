@@ -51,7 +51,9 @@ class TestRegressionScore(unittest.TestCase):
             io.open = orig
             builtins.open = orig
         total = sum(counts.values())
-        worst = max(counts.values())
+        # 0 次打开是**最好**的情况（整轮命中常驻/作用域缓存，无需物理读）——CI 上就是 0。
+        # 判据的本意是"上限"，不是"必须读"：所以用 default=0，并单独断言 evaluate 本身有结果。
+        worst = max(counts.values(), default=0)
         self.assertLessEqual(total, 3400, "一次 evaluate 打开 %d 次（共享语料被拆掉？）" % total)
         self.assertLessEqual(worst, 3, "单份件在一次 evaluate 里被读 %d 次" % worst)
 

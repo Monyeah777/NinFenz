@@ -17,6 +17,11 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - "engine/rust/**"
+      - "protocol/**"
+      - "scripts/**"
+      - ".github/workflows/rust-parity.yml"
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
