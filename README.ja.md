@@ -1,5 +1,7 @@
 # NinFenz · ドキュメント生成工房（仕様駆動）<sub>Spec-driven documentation workshop</sub>
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/monyeah777-ninfenz-18m2bs?v=f3e8250d1126d7677811d9f4ef6ceab0)](https://m8ven.ai/mcp/monyeah777-ninfenz-18m2bs?s=readme) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Monyeah777/NinFenz/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Monyeah777/NinFenz)
+
 <!-- nf:locales -->
 <p align="center">
   <a href="README.md">简体中文</a> · <a href="README.en.md">English</a> · <strong><a href="README.ja.md">日本语</a></strong>
