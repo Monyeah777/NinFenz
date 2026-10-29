@@ -1,0 +1,77 @@
+name: release
+
+# 发布闸门（2026-10-29）：把「门禁结论」作为可核验的 Release 制品发布。
+#
+# 为什么（OpenSSF Scorecard 实测：Signed-Releases = -1「no releases found」、Packaging = -1）：
+# 本仓此前只有 npm 发布（不是 GitHub Release），于是"制品是否可核验"这一项在评分里根本不计分。
+# 本工作流在打 tag 时：
+#   1. 校验仓库自身门禁结论齐备（verification_report / cards / receipts 都在场）；
+#   2. 生成 SHA256SUMS；
+#   3. 由**平台**签发 provenance（attest-build-provenance，钉 40 位 SHA）；
+#   4. 创建 GitHub Release 并挂上这些制品 —— 任何人都能 `gh attestation verify` 独立校验。
+#
+# 纪律：只读仓库既有产物，**不**重新计算/改写任何判据（发布不得成为"改结论"的通道）。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要发布的 tag（如 v2.30.0；必须是已存在的 tag）'
+        required: true
+concurrency:
+  group: release-${{ github.ref }}   # 发布型：固定组、不取消（避免半发布状态）
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write          # 创建 Release
+      id-token: write          # 平台签发 provenance
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false     # policy：不把 GITHUB_TOKEN 写进 .git/config
+      - name: 校验待发布产物齐备（不重新计算判据）
+        run: |
+          set -euo pipefail
+          for f in protocol/verification_report.json protocol/RECEIPTS.json \
+                   docs/verification-cards.md; do
+            if [ ! -f "$f" ]; then echo "::error::缺少发布产物 $f"; exit 1; fi
+          done
+          echo "产物齐备"
+      - name: 生成校验和
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts/release
+          for f in protocol/verification_report.json protocol/RECEIPTS.json \
+                   docs/verification-cards.md; do
+            cp "$f" .artifacts/release/
+          done
+          cd .artifacts/release && sha256sum ./*.json ./*.md > SHA256SUMS && cat SHA256SUMS
+      - name: 平台签发发布物 provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .artifacts/release/*.json
+            .artifacts/release/*.md
+            .artifacts/release/SHA256SUMS
+      - name: 创建 GitHub Release（挂制品）
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          notes=$(printf '门禁结论发布\n\n- 提交：`%s`\n- 判据：`verify.sh --checks-only` 42 条 + 全量测试矩阵\n- 校验：`gh attestation verify <file> --repo %s`\n' \
+                  "$GITHUB_SHA" "$GITHUB_REPOSITORY")
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "NF 门禁结论 $TAG" \
+            --notes "$notes" \
+            .artifacts/release/*.json .artifacts/release/*.md .artifacts/release/SHA256SUMS
