@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
+    "app": 1448,
     "entry": 27,
     "floor": 5,
-    "prod": 1047,
+    "prod": 1048,
     "projection": 133,
-    "support": 297,
-    "verify": 1137
+    "support": 299,
+    "verify": 1140
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6767,6 +6767,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Canonicalize checkout-specific paths before sealing machine reports.",
+      "path": "desktop/src/core/report_portable.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "需求 ↔ 判据双向覆盖台账（机制借鉴 poppyseed spec.ts:114-148 / objectui 覆盖度反向）。",
       "path": "desktop/src/core/requirement_coverage.py",
       "role": "verify",
@@ -6902,6 +6908,12 @@
       "function": "贡献点须带 since 来源版本（机制借鉴 tianshu builtin-since-hygiene.test.ts）。",
       "path": "desktop/src/core/since_tags.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Fail-closed validator for the task-level NIST SSDF v1.1 evidence matrix.",
+      "path": "desktop/src/core/ssdf_policy.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -9037,6 +9049,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_skill_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NIST SSDF v1.1 scoped evidence and vulnerability-response regression tests.",
+      "path": "desktop/tests/test_ssdf_policy.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13091,6 +13109,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate the scoped NIST SSDF v1.1 evidence matrix and RV response ledger.",
+      "path": "scripts/ssdf_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Validate OSPS, S2C2F, package-source, and supplier evidence.",
       "path": "scripts/supply_chain_policy.py",
       "role": "verify",
@@ -13146,17 +13170,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0d060eac0d59423a577cf033017c3e00e115f6d73c47854c277247ce5c7a5da0",
+  "root_digest": "19404346237fda5e33bf8a244e430b7d4573e52b0ebea8b7912fc87c4ce1bbbe",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 130,
+    "R-app": 1448,
+    "R-catch": 131,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
-    "R-support": 141,
-    "R-verify": 1017,
-    "auto:R-core": 264
+    "R-support": 142,
+    "R-verify": 1019,
+    "auto:R-core": 266
   },
   "schema": "nf-role-coordinates/1"
 }
