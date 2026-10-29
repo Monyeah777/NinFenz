@@ -74,6 +74,11 @@ jobs:
             echo "前置目录已建"
           fi
       - name: 全量门禁（三平台同口径：bash verify.sh --full；日志落盘供失败诊断）
+        env:
+          # Windows runner 的文件锁语义更严格：分片并发下调（4）以减少临时件/日志件竞争。
+          # 实测（2026-10-30）：默认并发下 GitHub Windows runner 偶发
+          # `PermissionError(13, 'The process cannot access the file ...')` 让分片整片记失败。
+          NF_TEST_JOBS: ${{ matrix.os == 'windows-latest' && 4 || 10 }}
         shell: bash
         env:
           # Windows runner 的文件锁语义更严格：分片并发下调（4）以减少临时件/日志件竞争。
