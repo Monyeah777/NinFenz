@@ -9,12 +9,9 @@
   "items": [
     {
       "id": "purity",
-      "issues": 2,
+      "issues": 0,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [
-        "scripts/verify_tests.py:330 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）",
-        "SINK_ALLOW 放行键指向未登记 sink：verify_tests.py:rmtree（修复指引：删除放行，或先在 DANGEROUS_CALLS 登记该 sink 类目）"
-      ],
+      "sample": [],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -35,7 +32,7 @@
         "raises": 99,
         "sinks": 22
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -300,9 +297,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 26,
-        "root": "69fa64bb15aa13aab5f61aefc0faadc78642410bc8fb65175706cd14df2eebe7",
-        "verdict": "non-conformant"
+        "passed": 27,
+        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+        "verdict": "conformant"
       },
       "status": "pass",
       "warns": 0
@@ -632,12 +629,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "6e85224e60ed88b62d208250e2347b3733f032a962f225d9dc3ef83b701f6b5d",
+  "root_digest": "b002c6b2348b4c191ca068b033d68b765addf7ee2632db5ec1b80dbb8b8af813",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 29,
+    "fail": 0,
+    "pass": 30,
     "warn": 2
   }
 }

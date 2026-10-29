@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:9c970630b15f54c4351549aaa3b39cb34cec3235cc9532ac7e22c7df088e4273
+  - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
   - protocol/code_metrics_baseline.json:4c1c2ebf93c81dc5f5b0203fa5408e1065f048138b6a900f7765d39863bbe2a2
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
