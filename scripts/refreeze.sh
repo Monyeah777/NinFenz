@@ -8,12 +8,26 @@
 #   CI 的「提交件 == 实时重算」判据必然红，而本机当时也是红的，却容易被误判为"平台差异"。
 #   本脚本把顺序固定为：**分发物 → 站点数字 → 冻结链 → 自检**，任何人只要跑它就得到自洽的树。
 #
-# 用法：bash scripts/refreeze.sh [--by <审批人>]
+# 用法：
+#   bash scripts/refreeze.sh                # 重冻并落盘（提交前用）
+#   bash scripts/refreeze.sh --check        # **只校验**：跑完整链条后要求工作树零 diff
+#                                           #（CI 拿它当判据：提交件必须 == 干净检出上重算的结果）
+#   bash scripts/refreeze.sh --by <审批人>   # 指定审批人
+#
+# 为什么要有 `--check`（2026-10-29）：本轮两次 main 红都是"提交件与实时重算差一个快照"，
+# 根因是冻结顺序与日志污染。人工纪律不可靠 ⇒ 把"幂等"变成 CI 里可执行、可挡合并的判据。
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 BY="Monyeah777"
-if [ "${1:-}" = "--by" ] && [ -n "${2:-}" ]; then BY="$2"; fi
+CHECK_ONLY=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --check) CHECK_ONLY=1; shift ;;
+    --by) BY="${2:-Monyeah777}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
 
 echo "== 1/5 分发物 → 自述数字 → 站点数字（顺序：payload 清单先于 repo_stats，后者先于站点）"
 (cd packaging/npm && npm run stage -- --sync-readme >/dev/null)
@@ -39,6 +53,21 @@ echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最�
 # 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
 python scripts/build_verification_cards.py --write >/dev/null
 python scripts/verify_report.py --write >/dev/null
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+  # 判据本体：干净检出上重跑完整冻结链后，工作树必须**零 diff**。
+  # 有任何改动 ⇒ 提交件不是"树上实时重算的结果" ⇒ 判红（把失败挡在合并之前）。
+  if [ -n "$(git status --porcelain)" ]; then
+    echo "::error::冻结链不幂等：重跑后工作树仍有改动（提交件 != 实时重算）"
+    git status --porcelain | head -40
+    echo "---- diff 统计 ----"
+    git diff --stat | tail -20
+    exit 1
+  fi
+  echo "OK 冻结链幂等：干净检出重跑后工作树零 diff（提交件 == 实时重算）"
+  exit 0
+fi
+
 bash verify.sh --checks-only | tail -2
 # 自检必须包含"提交件 == 实时重算"的**执行侧**判据（只看 checks-only 会漏掉它们：
 # 这两条在 unittest 矩阵里，不在 42 条静态 check 里）。
