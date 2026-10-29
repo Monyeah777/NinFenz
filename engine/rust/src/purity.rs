@@ -134,7 +134,12 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
-const SINK_ALLOW: [(&str, &str); 15] = [
+const SINK_ALLOW: [(&str, &str); 16] = [
+    // 2026-10-30（Windows 分片 0.0s 崩根治）：分片临时目录改「软清理」——
+    // `TemporaryDirectory.__exit__` 在删除失败时会抛 PermissionError 使整片误判失败，
+    // 故 `_SoftTempDir.__exit__` 用 `shutil.rmtree(ignore_errors=True)`；路径只来自
+    // `tempfile.mkdtemp`。Python 真源已登记同键（SINK_ALLOW["verify_tests.py:shutil.rmtree"]）。
+    ("verify_tests.py:shutil.rmtree", ""),
     ("verify_tests.py:unlink", ""),
     ("rust_engine.py:unlink", ""),
     ("regression_score.py:__import__", ""),
