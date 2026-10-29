@@ -59,6 +59,37 @@ echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最�
 # 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
 python scripts/build_verification_cards.py --write >/dev/null
 python scripts/verify_report.py --write >/dev/null
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+  # 判据口径：**平台与工具版本无关**的冻结面必须零 diff（style/sast 基线、interop、receipts 除外，
+  # 它们依赖 ruff/bandit 版本与生成平台，跨环境必然不同；由 refreeze-linux 负责）。
+  PORTABLE="protocol/role_coordinates.json protocol/verification_report.json protocol/code_metrics_baseline.json protocol/conformance_report.json"
+  hard=""
+  soft=""
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    f="${line:3}"
+    hit=0
+    for p in $PORTABLE; do [ "$f" = "$p" ] && hit=1 && break; done
+    if [ "$hit" -eq 1 ]; then hard="$hard$line"$'
+'; else soft="$soft$line"$'
+'; fi
+  done < <(git status --porcelain)
+  if [ -n "$soft" ]; then
+    echo "::warning::以下产物在本环境与提交件不同（工具版本/平台相关，判据不阻断）："
+    printf '%s' "$soft"
+  fi
+  if [ -n "$hard" ]; then
+    echo "::error::平台无关冻结面不幂等（提交件 != 实时重算）："
+    printf '%s' "$hard"
+    echo "---- diff 统计 ----"
+    for f in $PORTABLE; do git diff --stat -- "$f"; done
+    exit 1
+  fi
+  echo "OK 平台无关冻结面幂等（role_coordinates / verification_report / code_metrics / conformance）"
+  exit 0
+fi
+
 bash verify.sh --checks-only | tail -2
 # 自检必须包含"提交件 == 实时重算"的**执行侧**判据（只看 checks-only 会漏掉它们：
 # 这两条在 unittest 矩阵里，不在 42 条静态 check 里）。
