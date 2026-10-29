@@ -144,6 +144,11 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
+    "verify_tests.py:rmtree":
+        "只删**本进程用 `tempfile.mkdtemp(prefix=...)` 刚建**的分片临时目录（spec_dir / nf_shard_home_N）；"
+        "路径不接收外部参数，且删除用 `ignore_errors=True`（清理失败不判失败）。放行理由：Windows 上"
+        "该目录在收尾时可能仍被守护/杀软短暂持有，`TemporaryDirectory.__exit__` 抛错会让整片在 0.0 s"
+        "被判失败（2026-10-30 实测），改用软清理后必须显式登记才能通过纯度判据。",
     "verify_tests.py:unlink":
         "只删**本进程刚写**的 `.nf-cache/dump/chunk-<int>.json`（路径由固定前缀 + 自增片号拼接，"
         "不接收外部路径参数；删的是刚落盘并已读入内存的调度统计），用于避免陈旧 dump 影响下一轮"
