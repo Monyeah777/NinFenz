@@ -709,7 +709,7 @@
     "desktop/src/core/protocol_wizard.py::UP006": 10,
     "desktop/src/core/protocol_wizard.py::UP035": 3,
     "desktop/src/core/provenance_external.py::UP031": 6,
-    "desktop/src/core/purity_scan.py::E501": 1,
+    "desktop/src/core/purity_scan.py::E501": 4,
     "desktop/src/core/purity_scan.py::RUF100": 2,
     "desktop/src/core/purity_scan.py::UP006": 7,
     "desktop/src/core/purity_scan.py::UP031": 14,

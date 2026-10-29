@@ -15,7 +15,7 @@ subjects:
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
+  - desktop/src/core/purity_scan.py:9c970630b15f54c4351549aaa3b39cb34cec3235cc9532ac7e22c7df088e4273
   - scripts/nf.py:3254785c7eb84216f3b9ea8583c2e5db1db65a4475a02b517170a0eee7e1695b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-10-28）：默认并行度 10→14
 
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
