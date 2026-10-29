@@ -28,6 +28,7 @@ import os
 import re
 import subprocess
 import sys
+import shutil
 import tempfile
 import time
 import unittest
@@ -310,6 +311,26 @@ def assign(ids: list, ws: dict, jobs: int) -> list:
     return bins
 
 
+class _SoftTempDir:
+    """临时目录：**清理失败不致命**。
+
+    为什么不用 `tempfile.TemporaryDirectory`（2026-10-30 实测）：它在 Windows 上若删除时
+    仍有句柄占用（杀软扫描 / 守护刚停 / 同级分片并发），`__exit__` 会抛 `PermissionError`
+    ——于是整个分片在 **0.0 s** 被判失败（异常发生在收尾，测试其实没跑）。判据不该被"清理
+    收尾"的竞态左右：这里把 `rmtree` 改成 `ignore_errors=True`。
+    """
+
+    def __init__(self, prefix: str):
+        self.name = _retry_permission(lambda: tempfile.mkdtemp(prefix=prefix))
+
+    def __enter__(self):
+        return self.name
+
+    def __exit__(self, *_exc):
+        shutil.rmtree(self.name, ignore_errors=True)
+        return False
+
+
 def _retry_permission(fn, tries: int = 4, delay: float = 0.3):
     """Windows 上临时文件可能被 AV/索引器短暂占用（PermissionError）→ 退避重试。
 
@@ -330,13 +351,13 @@ def _retry_permission(fn, tries: int = 4, delay: float = 0.3):
 def run_shard(ids: list, index: int, dump: str = "") -> dict:
     """跑一个分片（可选：把逐测试耗时写到 `dump` 路径，供权重实测用）。"""
     t0 = time.perf_counter()
-    with _retry_permission(lambda: tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index)) as spec_dir:
+    with _SoftTempDir(prefix="nf_shard_%d_" % index) as spec_dir:
         spec = Path(spec_dir) / "tests.json"
         payload = {"tests": ids}
         if dump:
             payload["dump"] = dump
         _retry_permission(lambda: atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False)))
-        with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
+        with _SoftTempDir(prefix="nf_shard_home_%d_" % index) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
             env.setdefault("NF_DAEMON_IDLE", "30")
