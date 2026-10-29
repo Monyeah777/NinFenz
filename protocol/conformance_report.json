@@ -16,10 +16,10 @@
     },
     {
       "description": "架构纯度零违规",
-      "detail": "纯度零违规",
-      "digest": "6b57502180b736a88428738996933891584a687b0bfee5041f2e03bf02485e6a",
+      "detail": "scripts/verify_tests.py:330 危险 sink shutil.rmtree（CWE-73 递归删除外部可控路径（须证明落点非主目录/仓库根/盘根））——确需使用须在 purity_scan.SINK_ALLOW 登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）",
+      "digest": "4ed0ddefb7265e8cab48fecd471fdccd498caebacd3d0cd6898e402f3dd5f259",
       "id": "purity-clean",
-      "ok": true
+      "ok": false
     },
     {
       "description": "文档四型覆盖",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 27,
-  "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+  "passed": 26,
+  "root": "fbaead8f17489cc66d13c8ac4651b275e7ab81b6b7a868040bcaed5dbdffaeeb",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "conformant"
+  "verdict": "non-conformant"
 }
