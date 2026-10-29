@@ -42,6 +42,9 @@ id_ed25519*
 .artifacts/
 
 .coverage
+# 并行模式中间件（.coverage.<host>.<pid>.<rand>）—— 门禁在仓库根跑 coverage，
+# 若不被忽略会被「工具不得越权写工作树」判据抓成假红（2026-10-30 实测）。
+.coverage.*
 _cov_tmp.json
 
 # 本地模型权重与运行环境（决策层候选；体积 GB 级，绝不入仓）
