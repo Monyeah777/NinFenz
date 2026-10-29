@@ -50,13 +50,13 @@
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referenceLocator": "pkg:pypi/pyside6@6.11.2",
+          "referenceLocator": "pkg:pypi/pyside6@6.12.0",
           "referenceType": "purl"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "name": "PySide6",
-      "versionInfo": "6.11.2"
+      "versionInfo": "6.12.0"
     },
     {
       "SPDXID": "SPDXRef-Optional-cyclonedx",

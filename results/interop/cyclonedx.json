@@ -21,10 +21,10 @@
       "bom-ref": "opt:PySide6",
       "description": "软依赖（可选，须守卫）：CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
       "name": "PySide6",
-      "purl": "pkg:pypi/pyside6@6.11.2",
+      "purl": "pkg:pypi/pyside6@6.12.0",
       "scope": "optional",
       "type": "library",
-      "version": "6.11.2"
+      "version": "6.12.0"
     },
     {
       "bom-ref": "opt:cyclonedx",

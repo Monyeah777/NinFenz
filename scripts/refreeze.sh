@@ -32,6 +32,9 @@ python scripts/nf.py audit rebind --note "refreeze.sh（统一冻结入口）" >
 python scripts/nf.py conformance --write >/dev/null
 python scripts/nf.py approve protocol/conformance_report.json --by "$BY" --note "refreeze.sh" >/dev/null
 python scripts/nf.py receipts --scope protocol --write >/dev/null
+# 互操作派生面（SBOM/provenance 等）：输入含 `.github/requirements-*.txt` 与工具版本，
+# 依赖升级后必须重生成（2026-10-29 实测：bump 依赖后 check32 报「互操作入仓面与实时派生不一致」）。
+python scripts/nf.py interop --all >/dev/null
 
 echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最后写）"
 # 为什么 cards 要在 report 之前（2026-10-29 实测）：`build_verification_cards.py --write`
