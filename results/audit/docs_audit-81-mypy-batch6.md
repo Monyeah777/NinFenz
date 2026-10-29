@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:45ea7f4c7fa4c006b11a323c64b67ee1cf639d790807e67340d4ed2c5d3c1fff
+  - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -270,10 +270,6 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
-> 重审（2026-10-29）：worker 瞬时占用重试
-
-> 重审（2026-10-29）：watch 用例计数隔离（reset_cache_stats）
-
 > 重审（2026-10-28）：回滚持久读缓存后重冻
 
 > 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）
