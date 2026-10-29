@@ -212,14 +212,18 @@ class GateEngineParityTest(unittest.TestCase):
                          "引擎与 bash 判据不一致（%d 条）：\n%s" % (len(diffs), "\n".join(diffs)))
 
     def test_no_engine_check_is_silently_missing_from_registry(self) -> None:
-        """登记表与 PENDING **必须恰好覆盖 check1-40**——不许有 check 从两边都消失。
+        """登记表与 PENDING **必须恰好覆盖 check1-EXPECTED_CHECKS**——不许有 check 从两边都消失。
 
-        这是「check 只增不减」在工程上的牙齿：漏一条会被这里抓住。
+        为什么改用 `quality_baseline.EXPECTED_CHECKS` 而不是写死 40（2026-10-22）：
+        写死的 40 让 2026-10-17 新增的 check41/42 在引擎侧静默漏了 4 天——判据自己把
+        「宇宙大小」写死，扩 check 时必然漂移；真源是 `EXPECTED_CHECKS`。
         """
+        from core import quality_baseline as qb
         gate_engine.build_registry()
         covered = set(gate_engine.REGISTRY) | set(gate_engine.PENDING)
-        self.assertEqual(set(range(1, 41)), covered,
-                         "check 覆盖面缺口：%s" % sorted(set(range(1, 41)) - covered))
+        want = set(range(1, int(qb.EXPECTED_CHECKS) + 1))
+        self.assertEqual(want, covered,
+                         "check 覆盖面缺口：%s" % sorted(want - covered))
         overlap = set(gate_engine.REGISTRY) & set(gate_engine.PENDING)
         self.assertEqual(set(), overlap, "同一条 check 既已迁入又标未迁入：%s" % sorted(overlap))
 

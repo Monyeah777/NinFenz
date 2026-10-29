@@ -7073,6 +7073,15 @@ def _cmd_verify(args) -> int:
     for v in verdicts:
         for status, msg in v.verdicts:
             print("  [%s] %s" % (status, msg))
+    if memo is not None:
+        # 判据账本 R3 读面合规（方案 01 灰度）：**只在本 --memo 观测模式开**——
+        # 观测面来自 subcheck_cache 的先验读面表；无观测即如实报「未观测」，不假装合规。
+        from core import check_registry as _cr
+        _r3_warns, _r3 = _cr.read_surface(str(ge.ROOT))
+        for _w in _r3_warns:
+            print(f"  [WARN] {_w}")
+        print("  [i] 判据账本 R3 读面合规：观测 "
+              f"{_r3.get('observed', 0)} 条 / 未观测 {_r3.get('skipped', 0)} 条")
     print("  已迁入 %d 条 · FAIL %d" % (len(verdicts), fails))
     if pending:
         print("  ⚠ 未迁入 %d 条（仍在 verify.sh 里，**未在本次结论内**）：%s"

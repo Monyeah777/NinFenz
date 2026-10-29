@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 296,
-    "verify": 1134
+    "support": 298,
+    "verify": 1137
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5831,6 +5831,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "判据登记册（架构方案 01：判据账本）。",
+      "path": "desktop/src/core/check_registry.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "规格主张的认识论标签（机制借鉴 restless-core 规格条目认知标签）。",
       "path": "desktop/src/core/claim_labels.py",
       "role": "prod",
@@ -7453,6 +7459,12 @@
     {
       "function": "步骤5「合并同类项」等价性证明：参数化引擎 vs 旧判据（独立参照实现 + 变异夹具）。",
       "path": "desktop/tests/test_check_merge_equivalence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "判据登记册（架构方案 01）单测：R1/R2/R3/#17 + 导出对拍 + 变异夹具。",
+      "path": "desktop/tests/test_check_registry.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12641,6 +12653,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-check-registry/1",
+      "path": "protocol/check_registry.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "存量冻结的规模/复杂度上限（棘轮：只可下降；上调须评审后重冻）",
       "path": "protocol/code_metrics_baseline.json",
       "role": "verify",
@@ -13098,17 +13116,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "dc2bf0803b23c00afbcaa13ac45f667e9edaaa2ea35cfa0a283a1fafa0752fed",
+  "root_digest": "79d321b198b2f4644a1c52ffd88ba5609be22bdd46e83ff66fc450763eadd419",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 130,
+    "R-catch": 132,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 140,
-    "R-verify": 1014,
-    "auto:R-core": 259
+    "R-verify": 1016,
+    "auto:R-core": 260
   },
   "schema": "nf-role-coordinates/1"
 }
