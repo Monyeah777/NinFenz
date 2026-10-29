@@ -1,0 +1,16 @@
+fix(test): watch 缓存命中判据改为"增量"（reset_cache_stats），消除全量跑假红
+
+一、现象
+全量冷跑里 `test_watch.ResponseCacheTest.test_verify_is_allowlisted_and_second_run_hits_cache`
+稳定红，而单模块跑必绿：该用例用**绝对值**断言 `dm.cache_stats()["hits"] == 1`，
+但观测计数是**进程累计**语义——全量跑里前面的用例已经用过响应缓存，起点不是 0。
+
+二、修法（判据不放松）
+`daemon.reset_cache_stats()` 新增（只清观测计数，不动缓存内容）；用例在测量前清零，
+之后仍按 `hits == 1` 判"同代际第二跑命中"、`hits == 1` 判"代际一变必须重算"。
+
+三、连带重冻
+daemon.py 改动 ⇒ 代码度量/风格/SAST/层次/审计/conformance/receipts/report/cards 全部重算。
+
+四、本地验证
+`bash verify.sh --checks-only` PASS=75 WARN=2 FAIL=0（冷跑仅剩发布件因未提交而红，已由本提交解决）。
