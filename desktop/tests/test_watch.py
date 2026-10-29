@@ -97,9 +97,6 @@ class ResponseCacheTest(unittest.TestCase):
         """
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
-        # 观测计数是**进程累计**：全量跑里前面的用例已经用过响应缓存 ⇒ 先清零再按"增量"判，
-        # 否则绝对值断言在全量跑里假红（2026-10-29 实测）。
-        dm.reset_cache_stats()
         dm.set_watcher(_FakeWatcher(generation=11))
         first = dm.execute(["verify", "--json"], Path(ROOT))     # 首跑（可能触发嵌套会话）
         dm.set_watcher(_FakeWatcher(generation=11))              # 会话收尾后重新挂上同代际
