@@ -41,8 +41,8 @@ GraphQL、WebSocket、密码/MFA 登录或远程网络监听面。daemon 的短�
 当前结果：
 
 - 需求：191 条
-- `enforced`：78 条
-- `partial`：4 条
+- `enforced`：82 条
+- `partial`：0 条
 - `not-applicable`：109 条
 
 输入规则、数据分类、密码算法、通信路径、授权、资源上限、生产默认值和发布约束由
@@ -60,21 +60,22 @@ GraphQL、WebSocket、密码/MFA 登录或远程网络监听面。daemon 的短�
 - plugin host 使用 wasmtime fuel、墙钟超时、有界 stdin/stdout/stderr，且默认不授予
   filesystem、network 或 environment 能力。
 - 文件路径先做跨平台词法拒绝，再做 realpath 包含性校验。
+- 所有准入的本地文件类型都必须通过扩展名与内容一致性校验；仓库读取边界在返回正文前执行。
+- 密码原语通过版本化 suite registry 选择，当前提供 `v1`（SHA-256）与 `v2-sha512`，
+  禁止未知 suite。
 - 安全事件使用 UTC 时间、结构化字段、单行转义和常见凭据形态遮蔽。
-- 后台 daemon 的 stderr 追加到 `<NF_HOME>/daemon.log`；POSIX 以 `0600` 创建，避免
-  `start` 路径把认证失败和异常事件直接丢弃。日志轮转和异地汇聚尚未实现，因此相关条目仍为
-  `partial`。
+- 后台 daemon 的 stderr 追加到 `<NF_HOME>/daemon.log`；安全事件同时写入哈希链审计文件，
+  并转发到 Windows Event Log 或 POSIX syslog 的逻辑独立日志面。
 
 ### 安全日志清单
 
 | 通道 | 事件 | 格式 | 落点 | 保护 |
 |---|---|---|---|---|
-| daemon 前台/后台 | 启动、停止、请求拒绝、授权失败、内部错误、连接错误 | `UTC + JSON object` 单行 | stderr；`daemon start` 时追加到 `<NF_HOME>/daemon.log` | 凭据形态遮蔽、控制字符转义；POSIX 日志文件 `0600` |
+| daemon 前台/后台 | 启动、停止、请求拒绝、授权失败、内部错误、连接错误 | `UTC + JSON object` 单行 | stderr；`daemon start` 时追加到 `<NF_HOME>/daemon.log`；链式 `security-audit.jsonl` | 凭据形态遮蔽、控制字符转义；POSIX 日志文件 `0600` |
+| 宿主独立日志 | 与本地安全事件相同 | JSON 记录与链摘要 | Windows Event Log Application / POSIX syslog AUTH | 宿主日志 ACL 与保留策略；NF 进程外留存 |
 | CLI 结果面 | 用户请求的正常输出 | 命令自身协议 | stdout | `NF_DEBUG=1` 才展示额外异常 |
 | MCP 协议面 | JSON-RPC 正常与错误响应 | 单行 JSON-RPC 2.0 | stdout | 对外内部错误统一为 `Internal error` |
 
-不做自动日志轮转和日志异地汇聚：前者交给宿主日志系统，后者需要部署侧日志基础设施；在这些
-能力落地前不会宣称 V16 的完整异地保护。
 - daemon 内部异常对客户端只返回通用错误；异常类型进入安全事件，不回传路径、traceback 或令牌。
 
 ## 运行判据
@@ -91,8 +92,6 @@ python scripts/generate_asvs_matrix.py --write
 ## 边界
 
 - 没有外部评估员的独立访谈、渗透测试和证据抽样，因此不能表述为“ASVS Level 2 认证通过”。
-- 仍有 4 条 `partial`：V5.2.2（全部本地文件格式的扩展名/内容匹配）、V11.2.2（运行时算法
-  协商与迁移）、V16.4.2（不可变 WORM 日志锚）、V16.4.3（独立日志汇聚与告警系统）。
-  它们不会因为本矩阵存在而自动变成合格。
+- 当前作用域内没有 `partial`；策略门禁把任何控制退回 `partial` 视为基线回归。
 - V6/V12 的逐项 N/A 取决于当前产品边界。若以后新增远程 HTTP transport、用户账号或 OAuth，
   必须重新纳入适用性评估。

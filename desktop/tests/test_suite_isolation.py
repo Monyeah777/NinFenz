@@ -10,15 +10,27 @@
 2. 该 home 与仓库路径不同源，且不带用户主目录前缀；
 3. 显式设置过的 home 不被套件篡改（用例自管隔离时不许被覆盖）。
 """
+import importlib.util
 import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class SuiteHomeIsolationTest(unittest.TestCase):
+    @staticmethod
+    def _verify_tests_module():
+        path = ROOT / "scripts" / "verify_tests.py"
+        spec = importlib.util.spec_from_file_location("nf_verify_tests_retry", path)
+        if spec is None or spec.loader is None:
+            raise AssertionError("cannot load verify_tests.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
     def test_session_home_is_a_temp_dir(self):
         home = os.environ.get("NARRATIVE_FORGE_HOME", "")
         self.assertTrue(home, "套件未设置 NARRATIVE_FORGE_HOME——隔离兜底被移除了？")
@@ -47,6 +59,25 @@ class SuiteHomeIsolationTest(unittest.TestCase):
             encoding="utf-8")
         for needle in ("def kill_tree", "taskkill", "def popen_capture"):
             self.assertIn(needle, atom, f"进程原子缺超时树回收判据：{needle}")
+
+    def test_shard_temp_directory_retries_transient_permission_errors(self):
+        """Windows AV/indexer locks must not turn a shard into a 0-second false red."""
+        module = self._verify_tests_module()
+        real = tempfile.TemporaryDirectory(prefix="nf_shard_retry_")
+        with mock.patch.object(
+            module.tempfile,
+            "TemporaryDirectory",
+            side_effect=[PermissionError(13, "busy"), real],
+        ) as factory, module._temporary_directory(
+                "nf_shard_retry_", ignore_cleanup_errors=True) as home:
+            self.assertTrue(Path(home).is_dir())
+        self.assertTrue(factory.call_args.kwargs["ignore_cleanup_errors"])
+        self.assertFalse(Path(real.name).exists(), "临时 home 必须在上下文退出后回收")
+
+    def test_full_gate_uses_the_measured_ten_shard_cap(self):
+        """20-core host benchmark says 10 is the wall-clock/stability turning point."""
+        text = (ROOT / "verify.sh").read_text(encoding="utf-8")
+        self.assertEqual(2, text.count("print(min(10, max(2, (os.cpu_count() or 2) - 1)))"))
 
     def test_coverage_entries_use_the_isolated_shard_runner(self):
         """覆盖率入口必须经分片执行器（独立 home/进程），不得裸跑单进程 discover。"""

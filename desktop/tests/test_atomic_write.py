@@ -96,6 +96,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
     def test_index_projection_write_is_atomic(self):
         from unittest import mock
         from core import decisions as dc
+        from core import doc_family
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "decisions").mkdir()
@@ -104,7 +105,9 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
                     "\n",
                 encoding="utf-8")
             before = (root / dc.INDEX_REL).read_text(encoding="utf-8")
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with mock.patch.object(
+                    doc_family.atomic_write, "_replace",
+                    side_effect=PermissionError("busy")):
                 with self.assertRaises(PermissionError):
                     dc.write_projection(str(root))
             self.assertEqual(before, (root / dc.INDEX_REL).read_text(encoding="utf-8"),

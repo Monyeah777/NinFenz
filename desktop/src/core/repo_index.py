@@ -21,7 +21,7 @@ import urllib.parse as _up
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
-from core import json_doc
+from core import file_format, json_doc
 from core import paths as _paths
 
 DEFAULT_TTL = 2.0
@@ -61,8 +61,7 @@ def read_text(root: str | Path, rel: str) -> str:
     if len(raw) > MAX_RESOURCE_BYTES:
         raise ValueError(f"仓库文本超过上限 {MAX_RESOURCE_BYTES} 字节：{rel}"
                          "（修复指引：拆分文件，或改用支持分页的产出面）")
-    text = raw.decode("utf-8")
-    return text.replace("\r\n", "\n").replace("\r", "\n")
+    return file_format.decode_validated_text(path.suffix, raw, rel)
 
 
 def _rel(root: Path, path: Path) -> str:

@@ -1,6 +1,6 @@
 {
   "schema": "nf-application-security-controls/1",
-  "reviewed_at": "2026-10-27",
+  "reviewed_at": "2026-10-29",
   "scope": [
     "cli",
     "daemon",
@@ -77,9 +77,14 @@
       ".jsonl",
       ".csv",
       ".md",
+      ".markdown",
+      ".txt",
+      ".mmd",
       ".yaml",
+      ".yml",
       ".toml",
       ".graphml",
+      ".xml",
       ".wasm"
     ],
     "maximum_sizes": [
@@ -100,9 +105,9 @@
       }
     ],
     "content_validation": {
-      "status": "partial",
-      "implemented": "JSON, schema-bound data, path containment, and WASM runtime validation reject malformed or escaping content.",
-      "gap": "The repository is not an upload service and does not claim magic-byte validation for every supported local text format."
+      "status": "enforced",
+      "implemented": "desktop/src/core/file_format.py validates extension-content agreement for every accepted local format: strict JSON/JSONL/TOML/YAML parsing, GraphML/XML root and DTD/entity rejection, bounded UTF-8 text/CSV checks, and WASM magic/version checks. desktop/src/core/repo_index.py applies the validator at the repository read boundary.",
+      "gap": ""
     },
     "malicious_file_behavior": "Reject the file, emit a bounded error, and continue without executing content as host code."
   },
@@ -139,7 +144,7 @@
     "inventory": [
       {
         "id": "daemon-session-token",
-        "algorithm": "secrets.token_hex(32)",
+        "algorithm": "secrets.token_hex (v1: 32 bytes; v2-sha512: 48 bytes)",
         "purpose": "per-process daemon authentication",
         "key_source": "operating-system CSPRNG",
         "storage": "owner-only daemon state file while the process is alive",
@@ -163,14 +168,19 @@
       }
     ],
     "approved_algorithms": [
-      "secrets.token_hex(32)",
+      "secrets.token_hex",
       "SHA-256",
+      "SHA-512",
       "hmac.compare_digest"
     ],
     "agility": {
-      "status": "partial",
-      "strategy": "central inventory, version review, and release-gated code upgrade",
-      "gap": "Algorithms are not negotiated at runtime; a change requires a reviewed release and compatibility analysis."
+      "status": "enforced",
+      "strategy": "versioned suite registry selected by NF_CRYPTO_SUITE; runtime callers use the CryptoPolicy abstraction",
+      "suites": [
+        "v1",
+        "v2-sha512"
+      ],
+      "migration": "Add or rotate a reviewed suite, recompute versioned artifact digests, rotate daemon sessions, and retain old suite identifiers for verification during migration."
     }
   },
   "communications": [
@@ -316,9 +326,10 @@
     "control_characters": "escaped to preserve one event per line",
     "local_file": "daemon.log",
     "posix_mode": "0600",
-    "tamper_evident": false,
-    "separate_system": false,
-    "gap": "Local logs are owner-protected but not immutable WORM storage and are not shipped to an independent analysis system."
+    "tamper_evident": true,
+    "separate_system": true,
+    "sink": "Windows Event Log Application channel or POSIX syslog AUTH facility",
+    "chain_anchor": "security-audit.jsonl: per-record previous-digest chain using the active crypto suite"
   },
   "production": {
     "debug_default": "disabled",

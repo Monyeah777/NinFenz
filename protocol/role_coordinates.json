@@ -3,10 +3,10 @@
     "app": 1447,
     "entry": 27,
     "floor": 5,
-    "prod": 1042,
+    "prod": 1047,
     "projection": 133,
     "support": 297,
-    "verify": 1134
+    "verify": 1137
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5765,6 +5765,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Enforced evidence for the final ASVS controls closed by their own implementations.",
+      "path": "desktop/src/core/asvs_residual.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "原子写（同目录临时文件 + `os.replace`）：读者永远看不到半截内容。",
       "path": "desktop/src/core/atomic_write.py",
       "role": "prod",
@@ -5912,6 +5918,12 @@
       "function": "模块级耦合度量与**只许收敛**的债务闸门（架构纯度/可维护性面 · ISO 25010 可维护性）。",
       "path": "desktop/src/core/coupling_metrics.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Versioned cryptographic suites for ASVS V11.2.2 crypto agility.",
+      "path": "desktop/src/core/crypto_policy.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6079,6 +6091,12 @@
     {
       "function": "出站取件加固：宿主钉住 + 拒跟重定向（机制借鉴 mcp-server-smartsheet-rm check_openapi_drift.py:447-463）。",
       "path": "desktop/src/core/fetch_guard.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Fail-closed validation for local file extensions that NF accepts.",
+      "path": "desktop/src/core/file_format.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6845,9 +6863,21 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Tamper-evident local audit records plus host-independent event retention.",
+      "path": "desktop/src/core/security_audit.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "Machine checks for the scoped application-security control inventory.",
       "path": "desktop/src/core/security_controls.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Focused validators for application-security inventory sections.",
+      "path": "desktop/src/core/security_controls_sections.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -7619,6 +7649,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "ASVS V11.2.2: versioned cryptographic agility regression tests.",
+      "path": "desktop/tests/test_crypto_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "执行层常驻守护（core/daemon.py）单测：协议 / 令牌 / 拒绝面 / 等价性 / 新鲜度 / 相对加速。",
       "path": "desktop/tests/test_daemon.py",
       "role": "verify",
@@ -7855,6 +7891,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_fetch_guard.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ASVS V5.2.2: file extension and content-type agreement regression tests.",
+      "path": "desktop/tests/test_file_format.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8887,6 +8929,12 @@
     {
       "function": "P-C5 判据：密封跑法（Dockerfile.crosscheck）与 CI 接线必须是**真钉住**的，不是摆样子。",
       "path": "desktop/tests/test_sealed_crosscheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ASVS V16.4.2/V16.4.3: tamper-evident, independently retained audit events.",
+      "path": "desktop/tests/test_security_audit.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13098,7 +13146,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "641b7c10e906d17ddbfc20242a8d8e3dc121762e93fc170a21a35af60015b97b",
+  "root_digest": "0d060eac0d59423a577cf033017c3e00e115f6d73c47854c277247ce5c7a5da0",
   "rule_counts": {
     "R-app": 1447,
     "R-catch": 130,
@@ -13107,8 +13155,8 @@
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 141,
-    "R-verify": 1014,
-    "auto:R-core": 259
+    "R-verify": 1017,
+    "auto:R-core": 264
   },
   "schema": "nf-role-coordinates/1"
 }

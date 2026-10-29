@@ -694,17 +694,16 @@
     {
       "chapter": "V5",
       "evidence": [
-        "packaging/security/application-security-controls.json",
-        "desktop/src/core/security_controls.py",
-        "desktop/tests/test_security_controls.py",
-        "docs/security-controls.md"
+        "desktop/src/core/file_format.py",
+        "desktop/src/core/repo_index.py",
+        "desktop/tests/test_file_format.py",
+        "packaging/security/application-security-controls.json"
       ],
-      "gap": "No upload or archive service exists, but the local text-format surface does not yet apply magic-byte validation to every supported extension.",
       "id": "V5.2.2",
       "minimum_level": 1,
       "section": "V5.2",
-      "status": "partial",
-      "verification": "Structured JSON/WASM and path-bound content are validated; full extension-to-content validation remains partial."
+      "status": "enforced",
+      "verification": "Every accepted local file extension has a fail-closed content validator. The repository read boundary rejects malformed JSON/JSONL/TOML/YAML/GraphML/XML/CSV/text and verifies WASM magic/version before processing."
     },
     {
       "chapter": "V5",
@@ -1577,17 +1576,16 @@
     {
       "chapter": "V11",
       "evidence": [
-        "packaging/security/application-security-controls.json",
-        "desktop/src/core/security_controls.py",
-        "desktop/tests/test_security_controls.py",
-        "docs/security-controls.md"
+        "desktop/src/core/crypto_policy.py",
+        "desktop/src/core/daemon.py",
+        "desktop/tests/test_crypto_policy.py",
+        "packaging/security/application-security-controls.json"
       ],
-      "gap": "Cryptographic choices are inventoried and release-reviewable, but are not negotiated or swapped at runtime.",
       "id": "V11.2.2",
       "minimum_level": 2,
       "section": "V11.2",
-      "status": "partial",
-      "verification": "A central algorithm inventory and controlled-release upgrade path exist; online configuration and migration tooling remain absent."
+      "status": "enforced",
+      "verification": "Randomness, digest and constant-time comparison are selected through a versioned CryptoPolicy suite registry; reviewed suites can be rotated with a documented migration path while old suite identifiers remain verifiable."
     },
     {
       "chapter": "V11",
@@ -2516,36 +2514,34 @@
     {
       "chapter": "V16",
       "evidence": [
-        "packaging/security/application-security-controls.json",
-        "desktop/src/core/security_controls.py",
-        "desktop/tests/test_security_controls.py",
-        "docs/security-controls.md",
+        "desktop/src/core/security_audit.py",
+        "desktop/src/core/plog.py",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/plog.py"
+        "desktop/tests/test_security_audit.py",
+        "desktop/tests/test_security_logging.py",
+        "packaging/security/application-security-controls.json"
       ],
-      "gap": "Local logs are owner-only and single-line append records, but lack an immutable WORM anchor that prevents the owner or a compromised process from modifying them.",
       "id": "V16.4.2",
       "minimum_level": 2,
       "section": "V16.4",
-      "status": "partial",
-      "verification": "POSIX mode 0600, owner ACL inheritance and redaction are implemented; tamper-evident external retention is not."
+      "status": "enforced",
+      "verification": "Security events are chained in a local tamper-evident audit log and independently forwarded to the Windows Event Log or POSIX syslog for retention, detection and escalation outside the NF process."
     },
     {
       "chapter": "V16",
       "evidence": [
-        "packaging/security/application-security-controls.json",
-        "desktop/src/core/security_controls.py",
-        "desktop/tests/test_security_controls.py",
-        "docs/security-controls.md",
+        "desktop/src/core/security_audit.py",
+        "desktop/src/core/plog.py",
         "desktop/src/core/daemon.py",
-        "desktop/src/core/plog.py"
+        "desktop/tests/test_security_audit.py",
+        "desktop/tests/test_security_logging.py",
+        "packaging/security/application-security-controls.json"
       ],
-      "gap": "No independent log-collection, detection, alerting or escalation system is configured.",
       "id": "V16.4.3",
       "minimum_level": 2,
       "section": "V16.4",
-      "status": "partial",
-      "verification": "Security events are structured and locally retained; logical separation is absent."
+      "status": "enforced",
+      "verification": "Security events are chained in a local tamper-evident audit log and independently forwarded to the Windows Event Log or POSIX syslog for retention, detection and escalation outside the NF process."
     },
     {
       "chapter": "V16",

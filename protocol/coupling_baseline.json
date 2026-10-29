@@ -83,11 +83,16 @@
     },
     "asvs_policy": {
       "ca": 0,
-      "ce": 1,
+      "ce": 2,
       "i": 1.0
     },
+    "asvs_residual": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
     "atomic_write": {
-      "ca": 50,
+      "ca": 51,
       "ce": 0,
       "i": 0.0
     },
@@ -207,9 +212,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 38,
+      "ca": 39,
       "ce": 6,
-      "i": 0.1364
+      "i": 0.1333
     },
     "content_face": {
       "ca": 3,
@@ -226,10 +231,15 @@
       "ce": 2,
       "i": 1.0
     },
+    "crypto_policy": {
+      "ca": 3,
+      "ce": 0,
+      "i": 0.0
+    },
     "daemon": {
       "ca": 2,
-      "ce": 13,
-      "i": 0.8667
+      "ce": 15,
+      "i": 0.8824
     },
     "daemon_shell": {
       "ca": 1,
@@ -385,6 +395,11 @@
       "ca": 1,
       "ce": 0,
       "i": 0.0
+    },
+    "file_format": {
+      "ca": 2,
+      "ce": 2,
+      "i": 0.5
     },
     "gap_review": {
       "ca": 0,
@@ -582,9 +597,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 76,
+      "ca": 77,
       "ce": 1,
-      "i": 0.013
+      "i": 0.0128
     },
     "json_schema": {
       "ca": 5,
@@ -1013,8 +1028,8 @@
     },
     "repo_index": {
       "ca": 2,
-      "ce": 5,
-      "i": 0.7143
+      "ce": 6,
+      "i": 0.75
     },
     "repo_stats": {
       "ca": 0,
@@ -1116,10 +1131,20 @@
       "ce": 0,
       "i": 0.0
     },
-    "security_controls": {
+    "security_audit": {
       "ca": 1,
       "ce": 3,
       "i": 0.75
+    },
+    "security_controls": {
+      "ca": 1,
+      "ce": 4,
+      "i": 0.8
+    },
+    "security_controls_sections": {
+      "ca": 1,
+      "ce": 2,
+      "i": 0.6667
     },
     "semantic_conflict": {
       "ca": 0,
@@ -1182,9 +1207,9 @@
       "i": 0.5
     },
     "storage": {
-      "ca": 8,
+      "ca": 9,
       "ce": 3,
-      "i": 0.2727
+      "i": 0.25
     },
     "strict_schema": {
       "ca": 1,
@@ -1317,10 +1342,6 @@
     [
       "conformance_scan",
       "import_graph"
-    ],
-    [
-      "daemon",
-      "asset_contract"
     ],
     [
       "gate_faces",

@@ -82,6 +82,24 @@ async function copyTree(src, dst) {
 
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
+async function renameWithRetry(src, dst) {
+  for (let i = 0; i < 12; i += 1) {
+    try {
+      await fsp.rename(src, dst);
+      return;
+    } catch (e) {
+      const retryable = e && ['EPERM', 'EACCES', 'EBUSY'].includes(e.code);
+      if (!retryable || i === 11) {
+        throw new Error(
+          'payload 原子落位失败：' + src + ' -> ' + dst +
+          '（' + ((e && e.code) || e) + '）（修复指引：关闭占用该缓存目录的进程后重试）'
+        );
+      }
+      await sleep(Math.min(2000, 100 * (i + 1)));
+    }
+  }
+}
+
 // 首次运行把 payload 落到缓存目录；已存在且校验通过则直接复用（冷启动只解包一次）。
 export async function ensurePayload(manifest, opts) {
   const options = opts || {};
@@ -117,7 +135,7 @@ export async function ensurePayload(manifest, opts) {
     if (bad.length) throw new Error('payload 校验失败（' + bad.length + ' 处）：' + bad.slice(0, 3).join(', '));
     await fsp.writeFile(path.join(tmp, '.nf-payload-ok'), manifest.tree_sha256 + '\n', 'utf8');
     await fsp.rm(home, { recursive: true, force: true });
-    await fsp.rename(tmp, home);
+    await renameWithRetry(tmp, home);
     return home;
   } finally {
     await fsp.rm(lock, { recursive: true, force: true });

@@ -26,12 +26,17 @@
 
 ## 文件处理
 
-运行时没有文件上传服务，也不解压用户提供的归档。处理的本地内容类型包括 JSON、JSONL、
-CSV、Markdown、YAML、TOML、GraphML 和 WASM。JSON/schema 面、路径包含性和 WASM
-运行时验证在准入时执行；恶意或损坏文件以有界错误拒绝，不转成宿主代码执行。
+运行时没有文件上传服务，也不解压用户提供的归档。准入的本地内容类型包括 JSON、JSONL、
+CSV、Markdown、纯文本、Mermaid、YAML、TOML、GraphML、XML 和 WASM。仓库读取边界使用
+`desktop/src/core/file_format.py` 检查扩展名与内容一致：
 
-当前不声称对所有本地文本格式做 magic-byte 内容识别。这是 ASVS V5.2.2 的保留缺口；
-新增文件上传或归档摄取前必须先补类型嗅探、压缩前后大小和成员数上限。
+- JSON、JSONL、TOML、YAML 使用严格解析器；
+- GraphML/XML 校验根元素并拒绝 DTD/实体声明；
+- CSV 使用 strict reader，文本格式要求有效 UTF-8 且禁止 NUL；
+- WASM 校验 magic 与 core/component version。
+
+未知扩展名、解析失败或内容形态不符都在处理前拒绝。新增文件类型必须同时登记 validator，
+否则安全控制门禁失败。文件上传或归档摄取仍不在当前运行时作用域内。
 
 ## 授权
 
@@ -48,12 +53,14 @@ CSV、Markdown、YAML、TOML、GraphML 和 WASM。JSON/schema 面、路径包含
 
 | 用途 | 算法/机制 | 密钥来源 | 生命周期 |
 |---|---|---|---|
-| daemon 会话认证 | `secrets.token_hex(32)` | 操作系统 CSPRNG | 每次启动重生成，关闭时清除 |
+| daemon 会话认证 | `secrets.token_hex`（v1: 32 bytes；v2-sha512: 48 bytes） | 操作系统 CSPRNG | 每次启动重生成，关闭时清除 |
 | 内容与回执完整性 | SHA-256 | 无密钥摘要 | 随内容版本 |
+| 审计链完整性 | 由活动 suite 选择 SHA-256 或 SHA-512 | 无密钥摘要 | 每条审计记录 |
 | 令牌/MAC 比较 | `hmac.compare_digest` | 无密钥机制 | 每次比较 |
 
-算法清单变更必须经过发布审查，同步更新测试、兼容性分析和本文件。当前算法不由运行时协商，
-因此 ASVS V11.2.2 保持 `partial`：升级需要受审查的版本发布，而不是在线替换。
+算法由版本化 `CryptoPolicy` suite registry 选择。默认 `v1` 保持既有令牌与摘要契约；
+受审查部署可通过 `NF_CRYPTO_SUITE=v2-sha512` 选择升级 suite。未知 suite 直接拒绝。
+迁移时必须重算版本化摘要、轮换 daemon 会话，并保留旧 suite 标识用于过渡期验签。
 
 ## 通信清单
 
@@ -75,7 +82,7 @@ CSV、Markdown、YAML、TOML、GraphML 和 WASM。JSON/schema 面、路径包含
 | 公开协议/回执/发布元数据 | 公开 | SHA-256、提交历史和 checksums | 可记录；随仓库与发布保留 |
 | 本地配置 | 当前 OS 用户 | 原子写和跨进程锁 | 只记元数据；用户删除为止 |
 | daemon 会话密钥 | POSIX `0600`；Windows 继承用户 ACL | 常量时间比较 | 禁止记录；进程结束清除 |
-| 安全事件 | 属主本地日志 | 单行追加记录 | 清洗后记录；按宿主策略保留 |
+| 安全事件 | 属主本地日志 + 宿主日志 | 本地逐记录哈希链 + Windows Event Log/syslog 独立副本 | 清洗后记录；本地 `0600`，宿主按 OS 日志策略保留 |
 | 插件载荷 | 仅调用内存 | WASM 验证和有界缓冲 | 只记元数据；调用结束释放 |
 
 敏感数据的保护要求与实际实现由机读清单逐类绑定；新增数据类别时必须同时定义访问、完整性、
@@ -97,10 +104,13 @@ CSV、Markdown、YAML、TOML、GraphML 和 WASM。JSON/schema 面、路径包含
 安全事件使用 UTC、单行 JSON、控制字符转义和凭据形态遮蔽。daemon 后台日志追加到
 `<NF_HOME>/daemon.log`；POSIX 文件权限为 `0600`，Windows 继承当前用户目录 ACL。
 
-当前日志不是不可变 WORM 存储，也没有自动发送到逻辑隔离的日志分析系统。因此：
+安全事件在 `<NF_HOME>/security-audit.jsonl` 中形成可验证哈希链；每条记录的 `prev` 与
+`digest` 绑定前序记录，活动 crypto suite 变更时仍保留每条记录自己的算法标识。任意修改、
+删除或重排都会被 `SecurityAuditLog.verify()` 判为摘要或前序不一致。
 
-- V16.4.2 保持 `partial`：本地属主可修改日志，缺少外部不可变锚；
-- V16.4.3 保持 `partial`：没有独立日志汇聚、检测、告警和升级基础设施。
+同一记录在进程外转发到宿主独立日志面：Windows 使用 Application Event Log，POSIX 使用
+syslog `AUTH` facility。宿主日志的 ACL、保留、检测、告警和升级策略由操作系统与部署侧
+承载，NF 不以本地可写文件冒充 WORM，也不静默吞掉宿主 sink 可用性事实。
 
 ## 生产环境
 
@@ -123,6 +133,8 @@ Critical 漏洞停止发布；High 阻断合并与 tag，除非有可达性证�
 ```bash
 python scripts/asvs_policy.py
 python -m pytest desktop/tests/test_security_controls.py -q
+python -m pytest desktop/tests/test_file_format.py desktop/tests/test_crypto_policy.py \
+  desktop/tests/test_security_audit.py -q
 python scripts/slsa_l3_readiness.py
 ```
 

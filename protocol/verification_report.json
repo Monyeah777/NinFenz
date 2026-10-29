@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 99,
+        "raises": 103,
         "sinks": 21
       },
       "status": "pass",
@@ -259,12 +259,10 @@
           "NF-TECHDOC-Monyeah777-1",
           "NF-WORLDCAMPUS-Monyeah777-1"
         ],
-        "warns": [
-          "NF-1 attestation 与当前内容不符（内容已改，需重签）"
-        ]
+        "warns": []
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "library_projection",
@@ -369,7 +367,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 330,
-        "files": 330,
+        "files": 335,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -431,11 +429,11 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 261,
-        "modules": 261,
+        "metrics_recorded": 266,
+        "modules": 266,
         "registered_cycles": 0,
-        "registered_sdp": 12,
-        "sdp": 12
+        "registered_sdp": 11,
+        "sdp": 11
       },
       "status": "pass",
       "warns": 0
@@ -525,7 +523,27 @@
         "controls": {
           "communication_paths": 3,
           "crypto_inventory": 3,
+          "crypto_suites": [
+            "v1",
+            "v2-sha512"
+          ],
           "data_classes": 5,
+          "file_types": [
+            ".csv",
+            ".graphml",
+            ".json",
+            ".jsonl",
+            ".markdown",
+            ".md",
+            ".mmd",
+            ".toml",
+            ".txt",
+            ".wasm",
+            ".xml",
+            ".yaml",
+            ".yml"
+          ],
+          "independent_log_sink": true,
           "resource_limits": 10,
           "runtime_external_paths": 0
         },
@@ -535,9 +553,8 @@
             "not-applicable": 17
           },
           "V11": {
-            "enforced": 8,
-            "not-applicable": 5,
-            "partial": 1
+            "enforced": 9,
+            "not-applicable": 5
           },
           "V12": {
             "not-applicable": 9
@@ -555,8 +572,7 @@
             "not-applicable": 4
           },
           "V16": {
-            "enforced": 14,
-            "partial": 2
+            "enforced": 16
           },
           "V2": {
             "enforced": 9,
@@ -566,9 +582,8 @@
             "not-applicable": 10
           },
           "V5": {
-            "enforced": 3,
-            "not-applicable": 5,
-            "partial": 1
+            "enforced": 4,
+            "not-applicable": 5
           },
           "V6": {
             "not-applicable": 35
@@ -584,9 +599,8 @@
         },
         "requirements": 191,
         "statuses": {
-          "enforced": 78,
-          "not-applicable": 109,
-          "partial": 4
+          "enforced": 82,
+          "not-applicable": 109
         }
       },
       "status": "pass",
@@ -617,8 +631,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4086,
-        "kernel": 2181,
+        "files": 4094,
+        "kernel": 2189,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -629,12 +643,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "cc29d6d63696cc9f2bc226883359d3bd1806ef8bfe7eb2e8157e5037365236be",
+  "root_digest": "8262409bd83307ac63de759547ee9e886fe05ade5c22000cdadc6b746e007807",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 30,
-    "warn": 2
+    "pass": 31,
+    "warn": 1
   }
 }
