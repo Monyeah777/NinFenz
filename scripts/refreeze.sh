@@ -15,24 +15,25 @@ cd "$(git rev-parse --show-toplevel)"
 BY="Monyeah777"
 if [ "${1:-}" = "--by" ] && [ -n "${2:-}" ]; then BY="$2"; fi
 
-echo "== 1/4 分发物与站点数字（先做：它们会改写被统计的跟踪文件）"
+echo "== 1/5 分发物 → 自述数字 → 站点数字（顺序：payload 清单先于 repo_stats，后者先于站点）"
 (cd packaging/npm && npm run stage -- --sync-readme >/dev/null)
+python scripts/nf.py stats --write >/dev/null     # protocol/repo_stats.json（站点数字的真源）
 node site/tools/sync-numbers.mjs --write >/dev/null
 
-echo "== 2/4 代码/风格/SAST/耦合基线"
+echo "== 2/5 代码/风格/SAST/耦合基线"
 python scripts/code_metrics.py --write >/dev/null
 python scripts/coupling_metrics.py --write >/dev/null
 python scripts/style_check.py --write >/dev/null
 python scripts/sast_check.py --write >/dev/null
 
-echo "== 3/4 层次投影 → 审计重绑 → conformance → 审批 → 回执"
+echo "== 3/5 层次投影 → 审计重绑 → conformance → 审批 → 回执"
 python scripts/nf.py layers --write >/dev/null
 python scripts/nf.py audit rebind --note "refreeze.sh（统一冻结入口）" >/dev/null
 python scripts/nf.py conformance --write >/dev/null
 python scripts/nf.py approve protocol/conformance_report.json --by "$BY" --note "refreeze.sh" >/dev/null
 python scripts/nf.py receipts --scope protocol --write >/dev/null
 
-echo "== 4/4 卡册 → 验证报告 + 自检（顺序关键：报告必须最后写）"
+echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最后写）"
 # 为什么 cards 要在 report 之前（2026-10-29 实测）：`build_verification_cards.py --write`
 # 会改写被报告统计的 `docs/verification-cards.md`；若它排在 report 之后，报告一落盘就过期，
 # 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
@@ -44,3 +45,6 @@ bash verify.sh --checks-only | tail -2
 PYTHONIOENCODING=utf-8 python -m unittest discover -s desktop/tests -p "test_verify_report.py" >/dev/null
 PYTHONIOENCODING=utf-8 python -m unittest discover -s desktop/tests -p "test_role_model.py" >/dev/null
 echo "自检通过（checks-only + verify_report + role_model）。可提交。"
+
+echo "== 5/5 幂等：再跑一遍不应产生任何 diff"
+git diff --stat > /tmp/_rfz_before.txt || true
