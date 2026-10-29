@@ -27,7 +27,12 @@ updates:
     directory: /.github
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    # 关闭**版本**更新（0 = 不再为版本升级开 PR），**安全告警仍会提 PR**。
+    # 为什么（2026-10-30 实测）：本仓 requirements 采用 hash-pinned（CI `--require-hashes`），
+    # dependabot 只改版本号、不重算哈希 ⇒ PR #34 全部测试分片在 `pip install` 阶段就红
+    # （"Hashes are required in --require-hashes mode"）。正确升级流程是手工
+    # `pip-compile --generate-hashes` 重生成四份清单并本地验证；自动化只能管安全面。
+    open-pull-requests-limit: 0
     commit-message:
       prefix: "ci"
     labels:
