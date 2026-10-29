@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
+  - protocol/code_metrics_baseline.json:20915bfbb8e6dac22ebbfda2abfc00cf6425eaaab8a9908eb695c3312e960c17
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -262,6 +262,8 @@ subjects:
 
 | 模块 | 修前 | 修法（行为不变） |
 |---
+> 重审（2026-10-29）：watch 用例计数隔离（reset_cache_stats）
+
 > 重审（2026-10-28）：回滚持久读缓存后重冻
 
 > 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）
