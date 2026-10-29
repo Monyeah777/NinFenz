@@ -30,6 +30,10 @@ jobs:
     name: static-checks-42
     runs-on: ubuntu-latest
     timeout-minutes: 30          # 挂死上限（2026-10-01 统一：CI 不许把 runner 占满 6h 默认）
+    permissions:
+      contents: read
+      id-token: write          # SLSA：由平台签发 provenance（不是仓库脚本自证）
+      attestations: write
     env:
       # 2026-10-21 实测：Ubuntu runner 无 display，PySide6 默认平台插件会直接 abort，
       # 连带 check17/18/19/21/22 的 unittest 全红。offscreen 是无头环境的标准口径。
@@ -86,6 +90,17 @@ jobs:
             .nf-logs/verify-checks.log
             .nf-logs/
           if-no-files-found: warn
+      # SLSA 提升（2026-10-29）：把**门禁结论**（42 条 check 的日志 + 机器可读报告）交给平台
+      # 签发 provenance —— 与 npm-publish 对发布物做的事同构。区别在于：仓库内
+      # `results/interop/slsa.json` 是**脚本自证**（可伪造、不可验证），平台签发的 attestation
+      # 可用 `gh attestation verify` 独立校验，是 SLSA Build L3 的"不可伪造来源"路径。
+      - name: 平台签发门禁结论（SLSA Build provenance）
+        if: always()
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .nf-logs/verify-checks.log
+            protocol/verification_report.json
   unit-tests:
     name: unit-tests-${{ matrix.shard }}-of-32
     runs-on: ubuntu-latest
