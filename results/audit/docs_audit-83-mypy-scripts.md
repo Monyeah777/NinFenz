@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:3254785c7eb84216f3b9ea8583c2e5db1db65a4475a02b517170a0eee7e1695b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
+  - protocol/code_metrics_baseline.json:20915bfbb8e6dac22ebbfda2abfc00cf6425eaaab8a9908eb695c3312e960c17
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -283,6 +283,8 @@ subjects:
 
 | 脚本 | 修法 |
 |---
+> 重审（2026-10-29）：watch 用例计数隔离（reset_cache_stats）
+
 > 重审（2026-10-28）：回滚持久读缓存后重冻
 
 > 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）

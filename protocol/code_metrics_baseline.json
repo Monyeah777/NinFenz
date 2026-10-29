@@ -271,7 +271,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 997,
+      "lines": 1008,
       "max_fn_cc": 17,
       "max_fn_lines": 77
     },
