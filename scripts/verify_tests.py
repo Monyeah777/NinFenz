@@ -666,6 +666,16 @@ def main(argv=None) -> int:
                     dd = ROOT / ".nf-cache" / "dump"
                     dd.mkdir(parents=True, exist_ok=True)
                     r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
+                except PermissionError:
+                    # Windows 瞬时占用（另一进程正持有临时件/规格件）——重试一次再判失败。
+                    # 实测（2026-10-29 冷跑）：偶发 `PermissionError(13)` 让整片记 rc=1，
+                    # 而同一片单独重跑必绿；这是平台竞态，不是判据结论。
+                    time.sleep(0.5)
+                    try:
+                        r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
+                    except Exception as exc2:     # noqa: BLE001 —— 仍崩则如实记失败
+                        r = {"index": idx, "rc": 1, "out": "worker 异常（重试后）：%r" % (exc2,),
+                             "wall": 0.0, "tests": len(c)}
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
                     r = {"index": idx, "rc": 1, "out": "worker 异常：%r\n%s" % (
                         exc, traceback.format_exc()),
