@@ -45,7 +45,7 @@ fancy-regex = "0.14"
 # 探针：`engine/rust/target/probe-pyparser`（一次性，已 gitignore）。
 # TOML 读取（真源 output_forms._check_toml 用 tomllib）——纯 Rust，实测依赖树无
 # windows-sys / windows-link / iana-time / chrono / winapi ⇒ 不触发 dlltool 陷阱。
-toml = "0.8"
+toml = "1.1"
 rayon = "1"
 # rustpython-parser 0.4 默认拉入已停止维护的 malachite/unic-* 依赖；本地 vendored
 # 版本只替换这些依赖实现，不改变 AST 契约。来源与改动见 vendor/README.md。
