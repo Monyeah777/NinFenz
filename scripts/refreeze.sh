@@ -8,12 +8,26 @@
 #   CI 的「提交件 == 实时重算」判据必然红，而本机当时也是红的，却容易被误判为"平台差异"。
 #   本脚本把顺序固定为：**分发物 → 站点数字 → 冻结链 → 自检**，任何人只要跑它就得到自洽的树。
 #
-# 用法：bash scripts/refreeze.sh [--by <审批人>]
+# 用法：
+#   bash scripts/refreeze.sh                # 重冻并落盘（提交前用）
+#   bash scripts/refreeze.sh --check        # **只校验**：跑完整链条后要求工作树零 diff
+#                                           #（CI 拿它当判据：提交件必须 == 干净检出上重算的结果）
+#   bash scripts/refreeze.sh --by <审批人>   # 指定审批人
+#
+# 为什么要有 `--check`（2026-10-29）：本轮两次 main 红都是"提交件与实时重算差一个快照"，
+# 根因是冻结顺序与日志污染。人工纪律不可靠 ⇒ 把"幂等"变成 CI 里可执行、可挡合并的判据。
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 BY="Monyeah777"
-if [ "${1:-}" = "--by" ] && [ -n "${2:-}" ]; then BY="$2"; fi
+CHECK_ONLY=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --check) CHECK_ONLY=1; shift ;;
+    --by) BY="${2:-Monyeah777}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
 
 echo "== 1/5 分发物 → 自述数字 → 站点数字（顺序：payload 清单先于 repo_stats，后者先于站点）"
 (cd packaging/npm && npm run stage -- --sync-readme >/dev/null)
@@ -39,6 +53,44 @@ echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最�
 # 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
 python scripts/build_verification_cards.py --write >/dev/null
 python scripts/verify_report.py --write >/dev/null
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+  # 判据本体：干净检出上重跑完整冻结链后，工作树必须**零 diff**。
+  # 有任何改动 ⇒ 提交件不是"树上实时重算的结果" ⇒ 判红（把失败挡在合并之前）。
+  # 判据口径：**平台无关冻结面**必须零 diff。
+  # 为什么不是全量（2026-10-29 实测）：`protocol/sast_baseline.json`、`protocol/RECEIPTS.json`、
+  # `protocol/generated/receipt_chain.json`、`results/interop/*.json` 的内容依赖**工具版本**与
+  # **生成平台**（本机 Windows 的 bandit/ruff 版本、时间戳、路径写法），在 CI 的 Linux 上重算必然
+  # 与提交件不同。对这类产物做跨环境零 diff 断言只会制造假红；它们的正确冻结入口是
+  # `refreeze-linux` 工作流（同一 Linux 环境生成）。
+  PORTABLE="protocol/role_coordinates.json protocol/verification_report.json protocol/code_metrics_baseline.json protocol/style_baseline.json protocol/conformance_report.json"
+  hard=""
+  soft=""
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    f="${line:3}"
+    case " $PORTABLE " in
+      *" $f "*) hard="$hard$line"$'
+' ;;
+      *) soft="$soft$line"$'
+' ;;
+    esac
+  done < <(git status --porcelain)
+  if [ -n "$soft" ]; then
+    echo "::warning::以下产物在本环境与提交件不同（工具版本/平台相关，判据不阻断）："
+    printf '%s' "$soft"
+  fi
+  if [ -n "$hard" ]; then
+    echo "::error::平台无关冻结面不幂等（提交件 != 实时重算）："
+    printf '%s' "$hard"
+    echo "---- diff 统计 ----"
+    for f in $PORTABLE; do git diff --stat -- "$f"; done
+    exit 1
+  fi
+  echo "OK 平台无关冻结面幂等（role_coordinates / verification_report / code_metrics / style / conformance）"
+  exit 0
+fi
+
 bash verify.sh --checks-only | tail -2
 # 自检必须包含"提交件 == 实时重算"的**执行侧**判据（只看 checks-only 会漏掉它们：
 # 这两条在 unittest 矩阵里，不在 42 条静态 check 里）。
