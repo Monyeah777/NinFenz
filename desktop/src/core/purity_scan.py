@@ -144,7 +144,7 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
-    "verify_tests.py:rmtree":
+    "verify_tests.py:shutil.rmtree":
         "只删**本进程用 `tempfile.mkdtemp(prefix=...)` 刚建**的分片临时目录（spec_dir / nf_shard_home_N）；"
         "路径不接收外部参数，且删除用 `ignore_errors=True`（清理失败不判失败）。放行理由：Windows 上"
         "该目录在收尾时可能仍被守护/杀软短暂持有，`TemporaryDirectory.__exit__` 抛错会让整片在 0.0 s"
