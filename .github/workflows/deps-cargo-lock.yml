@@ -1,0 +1,65 @@
+name: deps-cargo-lock
+
+# 依赖锁重解析（workflow_dispatch）：在**有 cargo 的托管 runner**上重解析某个 crate 的
+# `Cargo.lock`，把结果作为 artifact 交付。
+#
+# 为什么需要（2026-10-30）：本仓 `engine/rust/pyo3/Cargo.lock` 仍锁着 `sha2 0.10.9` →
+# 传递依赖 `block-buffer 0.10.4`（GHSA-qwgh-2vcv-g2f7：panic 破坏内联缓冲）。主 crate 已升
+# `sha2 0.11`，但 pyo3 侧 lock 必须在**有 cargo 的环境**里重解析（手工改 lock 的依赖树不可靠）。
+# 开发者本机没有 Rust 工具链，故把这一步搬到 CI：产物走 artifact，人工复核后提交。
+on:
+  workflow_dispatch:
+    inputs:
+      crate_dir:
+        description: '相对仓库根的 crate 目录（含 Cargo.toml）'
+        required: true
+        default: engine/rust/pyo3
+      package:
+        description: '要升级的包名'
+        required: true
+        default: sha2
+      version:
+        description: '目标版本（--precise）'
+        required: true
+        default: 0.11.1
+concurrency:
+  group: deps-cargo-lock               # 写型：固定组，不取消（避免半成品 artifact）
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: 工具链版本
+        run: cargo --version && rustc --version
+      - name: 重解析 lock（只改 lock 文件）
+        shell: bash
+        env:
+          CRATE_DIR: ${{ inputs.crate_dir }}
+          PKG: ${{ inputs.package }}
+          VER: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          cd "$CRATE_DIR"
+          # `--precise` 需要先 update 该包（cargo 会连带解析其传递依赖）
+          cargo update -p "$PKG" --precise "$VER" || cargo update -p "$PKG"
+          echo "---- 变更摘要 ----"
+          git --no-pager diff --stat -- . || true
+      - name: 产物（Cargo.lock + diff）
+        if: always()
+        run: |
+          mkdir -p out
+          cp "${{ inputs.crate_dir }}/Cargo.lock" out/Cargo.lock 2>/dev/null || true
+          git --no-pager diff -- "${{ inputs.crate_dir }}/Cargo.lock" > out/Cargo.lock.diff || true
+          tail -5 out/Cargo.lock.diff || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: always()
+        with:
+          name: cargo-lock-out
+          path: out/
