@@ -23,7 +23,7 @@ subjects:
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
-  - desktop/tests/test_doc_reachability.py:41309204c54e76af11a4a2017cfa8be26ff7c90c88697ddc0aa43d23f4f0b752
+  - desktop/tests/test_doc_reachability.py:d5dfb761af6abda1a07033ef2c0464919a8d1ec97942c7bb43ef05c99c9eb5ad
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
   - desktop/tests/test_daemon_parity.py:31800825e5ba642b2518ec8e7ec5c3d93b16243b618c2e6c75e4abc62bc403a9
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
@@ -34,6 +34,8 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
 ---
+> 重审（2026-10-29）：four-state check registry on latest main
+
 > 重审（2026-10-28）：json-face 去重复（结构断言）+ 成功面切片 + 权重重测
 
 > 重审（2026-10-28）：parity 机器面 8→24 片（只改粒度）+ 权重重测

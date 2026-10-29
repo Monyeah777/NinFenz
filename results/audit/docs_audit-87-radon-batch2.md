@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
+  - protocol/code_metrics_baseline.json:18babd65c9820093502412864be613c370b0f178629e468c2e733f871bc73af3
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,8 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
+> 重审（2026-10-29）：four-state check registry on latest main
+
 > 重审（2026-10-28）：回滚持久读缓存后重冻
 
 > 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）

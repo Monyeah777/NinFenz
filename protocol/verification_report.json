@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 330,
-        "files": 330,
+        "baseline": 332,
+        "files": 332,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
-        "max_lines": 7682
+        "max_lines": 7691
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 234,
-        "probed": 234
+        "patterns": 238,
+        "probed": 238
       },
       "status": "pass",
       "warns": 0
@@ -429,10 +429,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 4,
+        "metrics_missing": 1,
         "metrics_recorded": 261,
-        "modules": 261,
+        "modules": 262,
         "registered_cycles": 0,
         "registered_sdp": 12,
         "sdp": 12
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 68,
+        "consumed": 69,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 70
+        "scanners": 71
       },
       "status": "pass",
       "warns": 0
@@ -617,8 +617,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4084,
-        "kernel": 2181,
+        "files": 4089,
+        "kernel": 2184,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "2f85fcfc69ce73cbad9ab150a14968b32daed0bd084830c87338c58f08c54ef6",
+  "root_digest": "c3ee97d2c3bee1583c75a1ae779a63cd8a4b6ea35cb5978d586d01a77f642da2",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

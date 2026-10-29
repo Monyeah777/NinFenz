@@ -195,6 +195,11 @@
       "max_fn_cc": 10,
       "max_fn_lines": 33
     },
+    "desktop/src/core/check_registry.py": {
+      "lines": 709,
+      "max_fn_cc": 17,
+      "max_fn_lines": 51
+    },
     "desktop/src/core/claim_labels.py": {
       "lines": 25,
       "max_fn_cc": 6,
@@ -451,7 +456,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/gate_engine.py": {
-      "lines": 722,
+      "lines": 724,
       "max_fn_cc": 19,
       "max_fn_lines": 78
     },
@@ -1450,6 +1455,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 59
     },
+    "scripts/gen_check_registry.py": {
+      "lines": 149,
+      "max_fn_cc": 19,
+      "max_fn_lines": 72
+    },
     "scripts/gen_third_party_notices.py": {
       "lines": 161,
       "max_fn_cc": 11,
@@ -1496,7 +1506,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7682,
+      "lines": 7691,
       "max_fn_cc": 116,
       "max_fn_lines": 1263
     },
