@@ -166,3 +166,9 @@ OSPS Baseline L1/L2、L3 与 S2C2F L1/L2 的逐项证据见
 `packaging/supply-chain/s2c2f-l1-l2.json`；共覆盖 65 条活动 OSPS 控制项（2 条已退役 ID 不计）。
 其中 `platform-managed` 项依赖 GitHub 仓库设置，`external-manual` 项依赖账号安全设置，
 `partial`/`not-applicable` 项保留明确 gap；这些状态不是“认证通过”的同义词。
+
+NIST SSDF v1.1 的 19 条实践、42 条任务证据见
+`packaging/security/ssdf-800-218-v1.1.json`，使用说明见 [ssdf.md](ssdf.md)。当前实践层
+11 条为 `enforced`、8 条为 `external-manual`；任务层 30 条为 `enforced`、12 条为
+`external-manual`，没有 `partial`。官方表 URL、SHA-256 与任务标题均被门禁校验；
+组织职责不会被自动化证据冒充为人工事实。

@@ -27,11 +27,11 @@ sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import atomic_write, verify_report as vr  # noqa: E402
 
 
-#: Rust `verify-report` **不自算**的 5 条（其余 26 条由 engine/rust 自算并逐字节对账）。
+#: Rust `verify-report` **不自算**的 7 条（其余 26 条由 engine/rust 自算并逐字节对账）。
 #: 必须与 `engine/rust/src/verify_report.rs` 的 native 分派同步；`test_rust_fastlane` 的
 #: native 集合 + `check_native_sync.py` 是这条清单的反向守护。喂入面越小，加速越大。
-NON_NATIVE = ("redos", "instruction_evidence", "perf_budget", "asset_contract",
-              "role_coordinates")
+NON_NATIVE = ("redos", "instruction_evidence", "perf_budget", "asvs", "ssdf",
+              "asset_contract", "role_coordinates")
 
 
 def _fed_results() -> dict:
@@ -51,7 +51,7 @@ def _fed_results() -> dict:
 
 
 def _rust_report():
-    """可选的 Rust 快线：Python 只算 5 条喂入，其余 26 条由 Rust 自算（→ bytes, code / None）。"""
+    """可选的 Rust 快线：Python 只算 7 条喂入，其余 26 条由 Rust 自算（→ bytes, code / None）。"""
     from core import rust_engine as re
     if re.disabled() or not re.requested():
         return None

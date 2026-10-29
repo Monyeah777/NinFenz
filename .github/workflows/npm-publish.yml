@@ -8,8 +8,13 @@ on:
     paths:
       - 'packaging/npm/**'
       - 'packaging/supply-chain/**'
+      - 'packaging/security/**'
+      - 'results/supply-chain/**'
       - 'scripts/supply_chain_policy.py'
+      - 'scripts/ssdf_policy.py'
       - 'scripts/validate_sboms.py'
+      - 'desktop/src/core/ssdf_policy.py'
+      - 'SECURITY.md'
       - '.github/workflows/npm-publish.yml'
       - '.github/requirements-sbom.txt'
   workflow_dispatch:
@@ -79,7 +84,9 @@ jobs:
           npm run verify
           node --test test/smoke.test.mjs
       - name: 供应链证据矩阵
-        run: python scripts/supply_chain_policy.py
+        run: |
+          python scripts/supply_chain_policy.py
+          python scripts/ssdf_policy.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: release-bundle

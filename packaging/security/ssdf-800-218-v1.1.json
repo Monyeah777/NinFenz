@@ -1,0 +1,687 @@
+{
+  "schema": "nf-ssdf-evidence/1",
+  "standard": {
+    "name": "NIST Secure Software Development Framework",
+    "version": "1.1",
+    "document": "NIST SP 800-218",
+    "source": "https://csrc.nist.gov/pubs/sp/800/218/final",
+    "table_source": "https://csrc.nist.gov/files/pubs/sp/800/218/final/docs/nist.sp.800-218.ssdf-table.xlsx",
+    "table_sha256": "f5729c4c6c792cbf6cfbea74eee7cc84c579b2109006fe3cbfa8934eb460bd55",
+    "reviewed_at": "2026-10-29",
+    "scope": [
+      "PO",
+      "PS",
+      "PW",
+      "RV"
+    ]
+  },
+  "claim": {
+    "certified": false,
+    "statement": "This is a task-level internal evidence assessment of NIST SP 800-218 v1.1, not NIST certification or an assertion that every organizational practice is independently staffed."
+  },
+  "practices": [
+    {
+      "id": "PO.1",
+      "title": "Define Security Requirements for Software Development",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PO.1.1",
+          "title": "Identify and document all security requirements for the organization's software development infrastructures and processes, and maintain the requirements over time.",
+          "status": "enforced",
+          "verification": "Development infrastructure requirements, least-privilege workflow rules, and secure coding expectations are versioned and tested.",
+          "evidence": [
+            "SECURITY.md",
+            "docs/security-controls.md",
+            ".github/workflows/ci-verify.yml",
+            "desktop/src/core/security_controls.py",
+            "desktop/tests/test_security_controls.py"
+          ]
+        },
+        {
+          "id": "PO.1.2",
+          "title": "Identify and document all security requirements for organization-developed software to meet, and maintain the requirements over time.",
+          "status": "enforced",
+          "verification": "Scoped ASVS controls, application-security constants, threat assumptions, and release gates are maintained as machine-readable evidence.",
+          "evidence": [
+            "packaging/security/asvs-5.0.0-l2.json",
+            "packaging/security/application-security-controls.json",
+            "results/supply-chain/threat-model.json",
+            "docs/asvs.md",
+            "desktop/tests/test_asvs_policy.py"
+          ]
+        },
+        {
+          "id": "PO.1.3",
+          "title": "Communicate requirements to all third parties who will provide commercial software components to the organization for reuse by the organization's own software.",
+          "status": "enforced",
+          "verification": "Third-party sources, supplier approval, licence, integrity, and vulnerability requirements are declared and fail closed when absent.",
+          "evidence": [
+            "packaging/supply-chain/package-sources.json",
+            "packaging/supply-chain/suppliers.json",
+            "scripts/supply_chain_policy.py",
+            "docs/supply-chain-security.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO.2",
+      "title": "Implement Roles and Responsibilities",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PO.2.1",
+          "title": "Create new roles and alter responsibilities for existing roles as needed to encompass all parts of the SDLC. Periodically review and maintain the defined roles and responsibilities, updating them as needed.",
+          "status": "external-manual",
+          "verification": "Repository ownership, maintainer duties, security-reporting responsibilities, and review ownership are documented, but the required periodic review is not a repository artifact.",
+          "gap": "The owner must retain the periodic role and responsibility review record outside the repository.",
+          "evidence": [
+            "MAINTAINERS.md",
+            ".github/CODEOWNERS",
+            "SECURITY.md",
+            "CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "PO.2.2",
+          "title": "Provide role-based training for all personnel with responsibilities that contribute to secure development. Periodically review personnel proficiency and role-based training, and update the training as needed.",
+          "status": "external-manual",
+          "verification": "Secure-development guidance is public, but role-based training completion and proficiency review are personnel records outside the repository.",
+          "gap": "A real maintainer must retain training curriculum, completion, and proficiency-review evidence outside the repository.",
+          "evidence": [
+            "CONTRIBUTING.md",
+            "docs/security-controls.md",
+            "external:personnel-training-records"
+          ]
+        },
+        {
+          "id": "PO.2.3",
+          "title": "Obtain upper management or authorizing official commitment to secure development, and convey that commitment to all with development-related roles and responsibilities.",
+          "status": "external-manual",
+          "verification": "The project has a security policy and ownership statement, but no repository file can prove an independent management authorization.",
+          "gap": "An authorizing official or owner must retain the commitment and communication record outside the repository.",
+          "evidence": [
+            "SECURITY.md",
+            "external:management-commitment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO.3",
+      "title": "Implement Supporting Toolchains",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PO.3.1",
+          "title": "Specify which tools or tool types must or should be included in each toolchain to mitigate identified risks, as well as how the toolchain components are to be integrated with each other.",
+          "status": "enforced",
+          "verification": "CI defines pinned analysis, test, SBOM, release, and verification tools and their order; workflow policy rejects uncontrolled permissions.",
+          "evidence": [
+            ".github/workflows/ci-verify.yml",
+            ".github/workflows/npm-publish.yml",
+            ".github/requirements-ci.txt",
+            "desktop/src/core/workflow_policy.py",
+            "desktop/tests/test_workflow_policy.py"
+          ]
+        },
+        {
+          "id": "PO.3.2",
+          "title": "Follow recommended security practices to deploy, operate, and maintain tools and toolchains.",
+          "status": "enforced",
+          "verification": "Actions are SHA-pinned, dependencies are checked by Dependabot and audits, release builders are stdlib-only, and mutable tool references fail policy checks.",
+          "evidence": [
+            ".github/dependabot.yml",
+            ".github/workflows/dependency-audit.yml",
+            "packaging/npm/tools/build_release.py",
+            "scripts/supply_chain_policy.py",
+            "desktop/tests/test_supply_chain_standards.py"
+          ]
+        },
+        {
+          "id": "PO.3.3",
+          "title": "Configure tools to generate artifacts of their support of secure software development practices as defined by the organization.",
+          "status": "enforced",
+          "verification": "The toolchain emits gate reports, receipts, SBOMs, checksums, provenance, VEX, and release metadata with stable machine-readable schemas.",
+          "evidence": [
+            "desktop/src/core/verify_report.py",
+            "protocol/verification_report.json",
+            "protocol/RECEIPTS.json",
+            "packaging/npm/tools/build_release.py",
+            "scripts/validate_sboms.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO.4",
+      "title": "Define and Use Criteria for Software Security Checks",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PO.4.1",
+          "title": "Define criteria for software security checks and track throughout the SDLC.",
+          "status": "enforced",
+          "verification": "Security checks are expressed as executable verify-report judgements, regression tests, and fail-closed policy scripts.",
+          "evidence": [
+            "desktop/src/core/verify_report.py",
+            "desktop/tests/test_verify_report.py",
+            "scripts/ssdf_policy.py",
+            "scripts/supply_chain_policy.py",
+            "scripts/asvs_policy.py"
+          ]
+        },
+        {
+          "id": "PO.4.2",
+          "title": "Implement processes, mechanisms, etc. to gather and safeguard the necessary information in support of the criteria.",
+          "status": "enforced",
+          "verification": "Gate results, receipts, and release evidence are generated from the current tree, digest-sealed, and rechecked before release.",
+          "evidence": [
+            "protocol/verification_report.json",
+            "protocol/generated/receipt_chain.json",
+            "results/supply-chain/vuln-disposition.json",
+            "results/supply-chain/ninfenz.openvex.json",
+            "desktop/src/core/ssdf_policy.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PO.5",
+      "title": "Implement and Maintain Secure Environments for Software Development",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PO.5.1",
+          "title": "Separate and protect each environment involved in software development.",
+          "status": "external-manual",
+          "verification": "Hosted CI and release jobs use least privilege and isolated runners, but developer, build, test, and distribution environment separation cannot be proved from a repository clone.",
+          "gap": "Repository owners must retain environment inventory, network isolation, privileged-access review, and distribution-environment evidence outside the repository.",
+          "evidence": [
+            ".github/workflows/ci-verify.yml",
+            ".github/workflows/npm-publish.yml",
+            "docs/supply-chain-security.md",
+            "external:environment-isolation-review"
+          ]
+        },
+        {
+          "id": "PO.5.2",
+          "title": "Secure and harden development endpoints (i.e., endpoints for software designers, developers, testers, builders, etc.) to perform development-related tasks using a risk-based approach.",
+          "status": "external-manual",
+          "verification": "The repository cannot prove workstation patching, endpoint protection, administrator separation, or device security posture.",
+          "gap": "The maintainer must retain endpoint hardening and privileged-workstation evidence outside the repository.",
+          "evidence": [
+            "SECURITY.md",
+            "external:endpoint-hardening-records"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PS.1",
+      "title": "Protect All Forms of Code from Unauthorized Access and Tampering",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PS.1.1",
+          "title": "Store all forms of code - including source code, executable code, and configuration-as-code - based on the principle of least privilege so that only authorized personnel, tools, services, etc. have access.",
+          "status": "external-manual",
+          "verification": "Code ownership, secret scanning, and review requirements are declared, while platform access controls and recovery settings remain external.",
+          "gap": "GitHub branch-protection, collaborator-access, session, and account-recovery evidence must be retained by the repository owner.",
+          "evidence": [
+            ".github/CODEOWNERS",
+            "MAINTAINERS.md",
+            ".github/workflows/scorecard.yml",
+            "external:github-access-control-review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PS.2",
+      "title": "Provide a Mechanism for Verifying Software Release Integrity",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PS.2.1",
+          "title": "Make software integrity verification information available to software acquirers.",
+          "status": "enforced",
+          "verification": "Release bundles include checksums, SBOMs, VEX, provenance, and a signed VSA; consumer verification commands are documented and exercised.",
+          "evidence": [
+            "docs/supply-chain-security.md",
+            "docs/release.md",
+            "packaging/npm/tools/build_release.py",
+            "scripts/build_vsa.py",
+            ".github/workflows/npm-publish.yml"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PS.3",
+      "title": "Archive and Protect Each Software Release",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PS.3.1",
+          "title": "Securely archive the necessary files and supporting data (e.g., integrity verification information, provenance data) to be retained for each software release.",
+          "status": "external-manual",
+          "verification": "The release bundle defines the files and integrity metadata to preserve, but secure long-term archive and retention are platform operations.",
+          "gap": "Release owners must retain the archival location, retention schedule, access control, and restore test evidence outside the repository.",
+          "evidence": [
+            "packaging/npm/tools/build_release.py",
+            ".github/workflows/npm-publish.yml",
+            "docs/supply-chain-security.md",
+            "packaging/supply-chain/verification-policy.json"
+          ]
+        },
+        {
+          "id": "PS.3.2",
+          "title": "Collect, safeguard, maintain, and share provenance data for all components of each software release (e.g., in a software bill of materials [SBOM]).",
+          "status": "enforced",
+          "verification": "CycloneDX 1.6 and SPDX 3.0.1 SBOMs are derived from the same payload inventory and validated before release.",
+          "evidence": [
+            "packaging/npm/tools/build_release.py",
+            "scripts/validate_sboms.py",
+            "packaging/supply-chain/package-sources.json",
+            "packaging/supply-chain/suppliers.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.1",
+      "title": "Design Software to Meet Security Requirements and Mitigate Security Risks",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PW.1.1",
+          "title": "Use forms of risk modeling - such as threat modeling, attack modeling, or attack surface mapping - to help assess the security risk for the software.",
+          "status": "enforced",
+          "verification": "The repository includes a machine-readable threat model covering actor, asset, trust-boundary, control, and residual-risk relationships.",
+          "evidence": [
+            "results/supply-chain/threat-model.json",
+            "docs/supply-chain-security.md",
+            "desktop/tests/test_supply_chain_standards.py"
+          ]
+        },
+        {
+          "id": "PW.1.2",
+          "title": "Track and maintain the software's security requirements, risks, and design decisions.",
+          "status": "enforced",
+          "verification": "Security requirements, application controls, threat risks, and design decisions have versioned machine-readable homes and verification tests.",
+          "evidence": [
+            "packaging/security/application-security-controls.json",
+            "packaging/security/asvs-5.0.0-l2.json",
+            "protocol/decision_layer.json",
+            "docs/decision-layer.md",
+            "desktop/tests/test_decision_layer.py"
+          ]
+        },
+        {
+          "id": "PW.1.3",
+          "title": "Where appropriate, build in support for using standardized security features and services (e.g., enabling software to integrate with existing log management, identity management, access control, and vulnerability management systems) instead of creating proprietary implementations of security features and services.",
+          "status": "enforced",
+          "verification": "Security logging integrates with Windows Event Log or syslog, cryptography uses a versioned policy registry, and access decisions reuse standard token and path controls.",
+          "evidence": [
+            "desktop/src/core/security_audit.py",
+            "desktop/src/core/plog.py",
+            "desktop/src/core/crypto_policy.py",
+            "desktop/src/core/paths.py",
+            "docs/security-controls.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.2",
+      "title": "Review the Software Design to Verify Compliance with Security Requirements and Risk Information",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PW.2.1",
+          "title": "Have 1) a qualified person (or people) who were not involved with the design and/or 2) automated processes instantiated in the toolchain review the software design to confirm and enforce that it meets all of the security requirements and satisfactorily addresses the identified risk information.",
+          "status": "external-manual",
+          "verification": "Automated architecture and security checks exist, but no independent qualified design reviewer or independent review record is present.",
+          "gap": "A second qualified human reviewer must review the design and retain the review evidence outside the repository.",
+          "evidence": [
+            "results/supply-chain/threat-model.json",
+            "desktop/src/core/coupling_metrics.py",
+            "desktop/tests/test_coupling_metrics.py",
+            "external:independent-design-review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.4",
+      "title": "Reuse Existing, Well-Secured Software When Feasible Instead of Duplicating Functionality",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PW.4.1",
+          "title": "Acquire and maintain well-secured software components (e.g., software libraries, modules, middleware, frameworks) from commercial, open-source, and other third-party developers for use by the organization's software.",
+          "status": "enforced",
+          "verification": "Third-party components enter only from approved HTTPS package sources and must have a supplier, version, integrity, licence, and approval record.",
+          "evidence": [
+            "packaging/supply-chain/package-sources.json",
+            "packaging/supply-chain/suppliers.json",
+            "scripts/supply_chain_policy.py",
+            ".github/workflows/dependency-review.yml"
+          ]
+        },
+        {
+          "id": "PW.4.2",
+          "title": "Create and maintain well-secured software components in-house following SDLC processes to meet common internal software development needs that cannot be better met by third-party software components.",
+          "status": "enforced",
+          "verification": "In-house components have ownership, tests, bounded APIs, architecture checks, and release gates instead of untracked shared code.",
+          "evidence": [
+            "desktop/src/core/paths.py",
+            "desktop/src/core/atomic_write.py",
+            "desktop/tests/test_atomic_write.py",
+            "desktop/tests/test_paths.py",
+            "protocol/coupling_baseline.json"
+          ]
+        },
+        {
+          "id": "PW.4.4",
+          "title": "Verify that acquired commercial, open-source, and all other third-party software components comply with the requirements, as defined by the organization, throughout their life cycles.",
+          "status": "enforced",
+          "verification": "Dependency review, scheduled audits, supplier re-review, SBOM validation, and vulnerability disposition cover the third-party lifecycle.",
+          "evidence": [
+            ".github/workflows/dependency-review.yml",
+            ".github/workflows/dependency-audit.yml",
+            "packaging/supply-chain/suppliers.json",
+            "scripts/validate_sboms.py",
+            "results/supply-chain/vuln-disposition.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.5",
+      "title": "Create Source Code by Adhering to Secure Coding Practices",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PW.5.1",
+          "title": "Follow all secure coding practices that are appropriate to the development languages and environment to meet the organization's requirements.",
+          "status": "enforced",
+          "verification": "Closed input schemas, path containment, bounded resources, redacted logs, constant-time token comparison, and negative tests enforce secure coding boundaries.",
+          "evidence": [
+            "docs/security-controls.md",
+            "desktop/src/core/paths.py",
+            "desktop/src/core/mcp_runtime.py",
+            "desktop/src/core/daemon.py",
+            "desktop/tests/test_paths.py",
+            "desktop/tests/test_mcp_runtime.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.6",
+      "title": "Configure the Compilation, Interpreter, and Build Processes to Improve Executable Security",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PW.6.1",
+          "title": "Use compiler, interpreter, and build tools that offer features to improve executable security.",
+          "status": "enforced",
+          "verification": "Python, Rust, .NET, Node, and CI tool versions are pinned and exercised by cross-language and parity workflows.",
+          "evidence": [
+            "engine/rust/Cargo.lock",
+            ".github/requirements-ci.txt",
+            "packaging/npm/package.json",
+            ".github/workflows/cross-lang.yml",
+            ".github/workflows/rust-parity.yml"
+          ]
+        },
+        {
+          "id": "PW.6.2",
+          "title": "Determine which compiler, interpreter, and build tool features should be used and how each should be configured, then implement and use the approved configurations.",
+          "status": "enforced",
+          "verification": "Build configuration is code-reviewed, deterministic, warning/static-analysis gated, and release output is rebuilt and compared byte-for-byte.",
+          "evidence": [
+            "engine/rust/Cargo.toml",
+            "pyproject.toml",
+            "packaging/npm/tools/build_release.py",
+            ".github/workflows/npm-publish.yml",
+            "desktop/tests/test_sast_baseline.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.7",
+      "title": "Review and/or Analyze Human-Readable Code to Identify Vulnerabilities and Verify Compliance with Security Requirements",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PW.7.1",
+          "title": "Determine whether code review (a person looks directly at the code to find issues) and/or code analysis (tools are used to find issues in code, either in a fully automated way or in conjunction with a person) should be used, as defined by the organization.",
+          "status": "enforced",
+          "verification": "The project mandates automated static analysis plus code review, with static-analysis baselines and pull-request workflow checks.",
+          "evidence": [
+            ".github/workflows/sast.yml",
+            ".github/workflows/ci-verify.yml",
+            "desktop/tests/test_sast_baseline.py",
+            "CONTRIBUTING.md"
+          ]
+        },
+        {
+          "id": "PW.7.2",
+          "title": "Perform the code review and/or code analysis based on the organization's secure coding standards, and record and triage all discovered issues and recommended remediations in the development team's workflow or issue tracking system.",
+          "status": "external-manual",
+          "verification": "Automated analysis is enforced, but independent human review and issue-triage records depend on a second reviewer and the external workflow system.",
+          "gap": "A second qualified human must review each changeset and retain GitHub review and issue-triage evidence.",
+          "evidence": [
+            ".github/workflows/sast.yml",
+            "desktop/tests/test_sast_baseline.py",
+            "SECURITY.md",
+            "external:independent-code-review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.8",
+      "title": "Test Executable Code to Identify Vulnerabilities and Verify Compliance with Security Requirements",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "PW.8.1",
+          "title": "Determine whether executable code testing should be performed to find vulnerabilities not identified by previous reviews, analysis, or testing and, if so, which types of testing should be used.",
+          "status": "enforced",
+          "verification": "The test policy combines unit, negative, integration, parity, fuzz, and end-to-end workflows according to executable surface.",
+          "evidence": [
+            ".github/workflows/ci-verify.yml",
+            ".github/workflows/fuzz.yml",
+            ".github/workflows/cross-lang.yml",
+            ".github/workflows/e2e-desktop.yml",
+            "scripts/verify_tests.py"
+          ]
+        },
+        {
+          "id": "PW.8.2",
+          "title": "Scope the testing, design the tests, perform the testing, and document the results, including recording and triaging all discovered issues and recommended remediations in the development team's workflow or issue tracking system.",
+          "status": "external-manual",
+          "verification": "Tests are sharded, emit machine-readable gate evidence, include regression/negative cases, and block release on failures; issue triage remains in the external workflow system.",
+          "gap": "The owner must retain the GitHub issue/security-advisory triage and remediation records outside the repository.",
+          "evidence": [
+            "scripts/verify_tests.py",
+            ".github/workflows/ci-verify.yml",
+            "protocol/verification_report.json",
+            "desktop/tests/test_verify_report.py",
+            "desktop/tests/test_ssdf_policy.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PW.9",
+      "title": "Configure Software to Have Secure Settings by Default",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "PW.9.1",
+          "title": "Define a secure baseline by determining how to configure each setting that has an effect on security or a security-related setting so that the default settings are secure and do not weaken the security functions provided by the platform, network infrastructure, or services.",
+          "status": "enforced",
+          "verification": "Default deny, loopback-only daemon binding, disabled debug output, bounded resources, and capability-free plugins are explicit secure defaults.",
+          "evidence": [
+            "packaging/security/application-security-controls.json",
+            "desktop/src/core/daemon.py",
+            "desktop/src/core/plugin_gate.py",
+            "desktop/tests/test_daemon_limits.py",
+            "desktop/tests/test_plugin_gate.py"
+          ]
+        },
+        {
+          "id": "PW.9.2",
+          "title": "Implement the default settings (or groups of default settings, if applicable), and document each setting for software administrators.",
+          "status": "enforced",
+          "verification": "Security settings, limits, defaults, operational impact, and administrator-facing behavior are documented and cross-checked against implementation constants.",
+          "evidence": [
+            "docs/security-controls.md",
+            "packaging/security/application-security-controls.json",
+            "desktop/src/core/security_controls.py",
+            "desktop/tests/test_security_controls.py",
+            "SECURITY.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RV.1",
+      "title": "Identify and Confirm Vulnerabilities on an Ongoing Basis",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "RV.1.1",
+          "title": "Gather information from software acquirers, users, and public sources on potential vulnerabilities in the software and third-party components that the software uses, and investigate all credible reports.",
+          "status": "enforced",
+          "verification": "Security advisories, Dependabot, SAST, and upstream-advisory review are declared intake channels and the ledger must not claim that no vulnerabilities exist.",
+          "evidence": [
+            "SECURITY.md",
+            "results/supply-chain/vuln-disposition.json",
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            ".github/workflows/dependency-audit.yml"
+          ]
+        },
+        {
+          "id": "RV.1.2",
+          "title": "Review, analyze, and/or test the software's code to identify or confirm the presence of previously undetected vulnerabilities.",
+          "status": "enforced",
+          "verification": "SAST, fuzzing, negative tests, cross-language parity, and dependency analysis continuously probe for previously undetected defects.",
+          "evidence": [
+            ".github/workflows/sast.yml",
+            ".github/workflows/fuzz.yml",
+            "desktop/tests/test_sast_baseline.py",
+            "scripts/verify_tests.py"
+          ]
+        },
+        {
+          "id": "RV.1.3",
+          "title": "Have a policy that addresses vulnerability disclosure and remediation, and implement the roles, responsibilities, and processes needed to support that policy.",
+          "status": "enforced",
+          "verification": "SECURITY.md defines private disclosure and severity SLAs; the ledger enforces disposition, VEX, root cause, and release blocking.",
+          "evidence": [
+            "SECURITY.md",
+            "results/supply-chain/vuln-disposition.json",
+            "results/supply-chain/ninfenz.openvex.json",
+            "scripts/generate_vex.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RV.2",
+      "title": "Assess, Prioritize, and Remediate Vulnerabilities",
+      "status": "enforced",
+      "tasks": [
+        {
+          "id": "RV.2.1",
+          "title": "Analyze each vulnerability to gather sufficient information about risk to plan its remediation or other risk response.",
+          "status": "enforced",
+          "verification": "Every finding must carry severity, source, affected versions, discovery date, exploitability, impact, disclosure URL, and evidence.",
+          "evidence": [
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "results/supply-chain/vuln-disposition.json",
+            "docs/ssdf.md"
+          ]
+        },
+        {
+          "id": "RV.2.2",
+          "title": "Plan and implement risk responses for vulnerabilities.",
+          "status": "enforced",
+          "verification": "Affected or under-investigation findings require an action and block release; fixed and not-affected findings require complete disposition plus matching VEX.",
+          "evidence": [
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "results/supply-chain/vuln-disposition.json",
+            "results/supply-chain/ninfenz.openvex.json",
+            "scripts/generate_vex.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RV.3",
+      "title": "Analyze Vulnerabilities to Identify Their Root Causes",
+      "status": "external-manual",
+      "tasks": [
+        {
+          "id": "RV.3.1",
+          "title": "Analyze identified vulnerabilities to determine their root causes.",
+          "status": "enforced",
+          "verification": "A fixed finding cannot pass without a non-empty root cause and related review.",
+          "evidence": [
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "results/supply-chain/vuln-disposition.json"
+          ]
+        },
+        {
+          "id": "RV.3.2",
+          "title": "Analyze the root causes over time to identify patterns, such as a particular secure coding practice not being followed consistently.",
+          "status": "external-manual",
+          "verification": "The vulnerability ledger requires a dated root-cause review with cadence, patterns, SDLC actions, and regression tests, but one empty review cannot prove trend analysis over time.",
+          "gap": "The owner must retain successive root-cause review records and demonstrate that the required cadence was actually followed.",
+          "evidence": [
+            "results/supply-chain/vuln-disposition.json",
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "docs/ssdf.md"
+          ]
+        },
+        {
+          "id": "RV.3.3",
+          "title": "Review the software for similar vulnerabilities to eradicate a class of vulnerabilities, and proactively fix them rather than waiting for external reports.",
+          "status": "enforced",
+          "verification": "A fixed finding requires a related-variant review and at least one existing regression test that prevents recurrence.",
+          "evidence": [
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "results/supply-chain/vuln-disposition.json"
+          ]
+        },
+        {
+          "id": "RV.3.4",
+          "title": "Review the SDLC process, and update it if appropriate to prevent (or reduce the likelihood of) the root cause recurring in updates to the software or in new software that is created.",
+          "status": "external-manual",
+          "verification": "The root-cause review records SDLC actions and fixed findings carry a related review, but actual SDLC ownership decisions remain external.",
+          "gap": "The owner must retain the SDLC change decision or explicit no-change rationale for each root-cause review.",
+          "evidence": [
+            "results/supply-chain/vuln-disposition.json",
+            "desktop/src/core/ssdf_policy.py",
+            "desktop/tests/test_ssdf_policy.py",
+            "docs/ssdf.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

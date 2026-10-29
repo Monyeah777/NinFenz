@@ -3,7 +3,6 @@
 为什么需要（顶层化目标 · 静态可核验）：门禁此前只有人读文本（`bash verify.sh` 的 PASS/WARN/FAIL
 计数），机器消费方（CI、外部审计、下游工具）拿不到结构化结论——无法自动回答
 「哪些判据在场 / 各报几条 / 声明基线与实测是否一致 / 这份报告是否对应当前树」。
-
 设计口径：
 - **判据来源 = 门禁自身用的那些 scanner**（不另造一套）：逐条调 core 扫描器，任何一条
   抛异常都**记账为 error**（不吞、不崩——报告本身必须能出得来，坏的那个反而最显眼）。
@@ -19,12 +18,11 @@ import hashlib
 import importlib
 import json
 from . import scan_memo
-import os
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from core import json_doc
+from core.report_portable import portable as _portable
 
 REPORT_REL = "protocol/verification_report.json"
 SCHEMA = "nf-verify-report/1"
@@ -68,6 +66,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "judgement_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
+    ("ssdf", "NIST SSDF v1.1 作用域证据与漏洞响应闭环", "ssdf_policy", "scan", "scan"),
     ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),
     ("asset_contract",
  "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
@@ -126,31 +125,6 @@ def _declared(root: str) -> Dict[str, Any]:
     except Exception as exc:                                # noqa: BLE001
         out["error"] = "%s: %s" % (type(exc).__name__, exc)
     return out
-
-
-def _portable(value: Any, root: str) -> Any:
-    """Remove checkout-specific absolute roots from report values before sealing."""
-    absolute = str(Path(root).resolve())
-    variants = {absolute, os.path.abspath(root), os.path.realpath(root)}
-    variants = tuple(v for item in variants for v in (item, item.replace("\\", "/"),
-                                                       item.replace("/", "\\")) if v)
-    variants = tuple(sorted(variants, key=len, reverse=True))
-    if isinstance(value, str):
-        # Volatile canonicalized temp roots are diagnostics, never stable evidence.
-        value = re.sub(r"(?<![A-Za-z0-9])(?:/(?:private/)?tmp/|"
-                       r"/(?:private/)?var/folders/[^/]+/[^/]+/T/)[^/]+", "<root>", value)
-        value = re.sub(
-            r"(?i)(?<![A-Za-z0-9])[A-Z]:[\\/](?:[^\\/\s\"']+[\\/])*Temp[\\/][^\\/\s\"']+",
-            "<root>", value,
-        )
-        for token in variants:
-            value = value.replace(token, "<root>")
-        return value
-    if isinstance(value, list):
-        return [_portable(v, root) for v in value]
-    if isinstance(value, dict):
-        return {k: _portable(v, root) for k, v in value.items()}
-    return value
 
 
 def build(root: str = ".") -> Dict[str, Any]:

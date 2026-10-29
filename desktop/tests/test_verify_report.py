@@ -101,11 +101,13 @@ class BuildTest(unittest.TestCase):
         self.assertEqual("<root>/docs/x.md", first["sample"][0])
 
     def test_short_temp_root_alias_cannot_leave_a_private_prefix(self):
+        from core import report_portable
+
         root = "/var/folders/aa/bb/T/tmp.one"
-        with (mock.patch.object(vr.Path, "resolve", return_value=Path(root)),
-              mock.patch.object(vr.os.path, "abspath", return_value=root),
-              mock.patch.object(vr.os.path, "realpath", return_value=root)):
-            got = vr._portable(
+        with (mock.patch.object(report_portable.Path, "resolve", return_value=Path(root)),
+              mock.patch.object(report_portable.os.path, "abspath", return_value=root),
+              mock.patch.object(report_portable.os.path, "realpath", return_value=root)):
+            got = report_portable.portable(
                 {"sample": ["/private/var/folders/aa/bb/T/tmp.one/docs/x.md"]}, root)
         self.assertEqual("<root>/docs/x.md", got["sample"][0])
 

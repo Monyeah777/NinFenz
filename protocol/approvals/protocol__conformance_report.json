@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-10-29",
   "approved_by": "Monyeah777",
-  "note": "refreeze.sh",
+  "note": "NIST SSDF v1.1 task-level evidence and vulnerability-response gate",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
+  "subject_digest": "53c260a4fa1f7879f34d4fdb522d80b2d92bac6984c44b49ca836b29d7a35307"
 }

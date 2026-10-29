@@ -597,9 +597,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 77,
+      "ca": 78,
       "ce": 1,
-      "i": 0.0128
+      "i": 0.0127
     },
     "json_schema": {
       "ca": 5,
@@ -1046,6 +1046,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "report_portable": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
+    },
     "requirement_coverage": {
       "ca": 1,
       "ce": 0,
@@ -1186,6 +1191,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "ssdf_policy": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "st_quality": {
       "ca": 1,
       "ce": 1,
@@ -1293,7 +1303,7 @@
     },
     "verify_report": {
       "ca": 0,
-      "ce": 5,
+      "ce": 6,
       "i": 1.0
     },
     "watch": {
