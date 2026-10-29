@@ -306,7 +306,11 @@ class PurityScanTest(unittest.TestCase):
         # 2026-10-27：20 → 21（`scripts/verify_tests.py` 清理**本进程刚写**的 dump 分片：
         # `.nf-cache/dump/chunk-<int>.json`，路径由固定前缀+自增片号拼成、不接收外部路径；
         # 理由已登记 SINK_ALLOW["verify_tests.py:unlink"]，删失败也不影响判定）
-        self.assertLessEqual(stats.get("sinks", 0), 21)
+        # 2026-10-30：21 → 22（分片临时目录改「软清理」：`_SoftTempDir.__exit__` 用
+        # `shutil.rmtree(ignore_errors=True)`——`TemporaryDirectory.__exit__` 在 Windows 上
+        # 清理失败会抛 PermissionError，让整个分片在 0.0 s 被判失败（实测）。理由已登记
+        # SINK_ALLOW["verify_tests.py:shutil.rmtree"]：路径只来自 `tempfile.mkdtemp`。
+        self.assertLessEqual(stats.get("sinks", 0), 22)
 
 
 class SinkRegistryTest(unittest.TestCase):
