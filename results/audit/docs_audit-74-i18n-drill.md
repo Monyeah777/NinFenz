@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:45ea7f4c7fa4c006b11a323c64b67ee1cf639d790807e67340d4ed2c5d3c1fff
+  - protocol/code_metrics_baseline.json:63cc147817e0e8fa6e3f6fef98e35cc4ad62f3f07a54b33bb23102ba09362459
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -298,6 +298,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
 
 > 重审（2026-10-28）：回滚持久读缓存后重冻
