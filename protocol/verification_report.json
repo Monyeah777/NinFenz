@@ -259,12 +259,10 @@
           "NF-TECHDOC-Monyeah777-1",
           "NF-WORLDCAMPUS-Monyeah777-1"
         ],
-        "warns": [
-          "NF-1 attestation 与当前内容不符（内容已改，需重签）"
-        ]
+        "warns": []
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "library_projection",
@@ -645,12 +643,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "aad5ce04ae6382f20f44beca861720fe85b58847765d39f9b799a5a4248eb77b",
+  "root_digest": "8262409bd83307ac63de759547ee9e886fe05ade5c22000cdadc6b746e007807",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 30,
-    "warn": 2
+    "pass": 31,
+    "warn": 1
   }
 }

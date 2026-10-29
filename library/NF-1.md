@@ -17,8 +17,8 @@ tags:
   - 校园情感
   - 装配样本
   - 引用式
-attestation: a3872e040ba2dc307bc665896908cc0b2a53802517bf867d39ba34d1dea83866
-attested_at: 2026-09-30
+attestation: c57f9795861e46b3ed46878c387c491d93581362d838a5348934323821ebb2ef
+attested_at: 2026-10-29
 ---
 
 # 叙事世界完整版：校园情感流（高二 · 毕业遗憾线）
