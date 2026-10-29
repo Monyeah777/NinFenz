@@ -23,8 +23,15 @@ node site/tools/sync-numbers.mjs --write >/dev/null
 echo "== 2/5 代码/风格/SAST/耦合基线"
 python scripts/code_metrics.py --write >/dev/null
 python scripts/coupling_metrics.py --write >/dev/null
-python scripts/style_check.py --write >/dev/null
-python scripts/sast_check.py --write >/dev/null
+if [ "$CHECK_ONLY" -eq 1 ]; then
+  # `--check` 只校验**平台与工具版本无关**的冻结面：style/sast 基线依赖 ruff/bandit 版本，
+  # 在 CI 与本机之间必然不同（本仓历史上多次"本机绿、云端红"都源于此）。它们由
+  # refreeze-linux（同一 Linux 环境）负责，不作为跨环境零 diff 断言的对象。
+  echo "   （--check：跳过 style/sast 基线——工具版本相关）"
+else
+  python scripts/style_check.py --write >/dev/null
+  python scripts/sast_check.py --write >/dev/null
+fi
 
 echo "== 3/5 层次投影 → 审计重绑 → conformance → 审批 → 回执"
 python scripts/nf.py layers --write >/dev/null
@@ -34,7 +41,7 @@ python scripts/nf.py approve protocol/conformance_report.json --by "$BY" --note 
 python scripts/nf.py receipts --scope protocol --write >/dev/null
 # 互操作派生面（SBOM/provenance 等）：输入含 `.github/requirements-*.txt` 与工具版本，
 # 依赖升级后必须重生成（2026-10-29 实测：bump 依赖后 check32 报「互操作入仓面与实时派生不一致」）。
-python scripts/nf.py interop --all >/dev/null
+if [ "$CHECK_ONLY" -eq 0 ]; then python scripts/nf.py interop --all >/dev/null; fi
 
 echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最后写）"
 # 为什么 cards 要在 report 之前（2026-10-29 实测）：`build_verification_cards.py --write`
