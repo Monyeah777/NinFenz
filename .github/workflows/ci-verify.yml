@@ -176,7 +176,7 @@ jobs:
           if-no-files-found: warn
   gate:
     name: gate
-    needs: [static-checks, unit-tests]
+    needs: [static-checks, unit-tests, freeze-consistency]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -231,6 +231,41 @@ jobs:
           else
             echo "无待关闭的跟踪 issue"
           fi
+
+  # ---------------------------------------------------------------- 冻结一致性判据
+  # 为什么（2026-10-29 两次 main 红）：提交进仓的"生成件"必须等于**在干净检出上重算一次**的结果。
+  # 此前只靠人工纪律（冻结顺序、别把日志写进仓库根），结果连红两次、且本机/云端难对齐。
+  # 本作业把这件事变成**可挡合并的判据**：干净检出 → 重跑完整冻结链 → 工作树必须零 diff。
+  freeze-consistency:
+    name: freeze-consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0          # 与测试矩阵同口径（生成件可能依赖历史/tag 面）
+          fetch-tags: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装依赖（冻结链会 import core 与 yaml）
+        run: |
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt
+      - name: 冷启动前置目录（与矩阵同口径）
+        shell: bash
+        run: mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
+      - name: 冻结链必须幂等（提交件 == 干净检出上重算的结果）
+        shell: bash
+        run: bash scripts/refreeze.sh --check
+
 
   # ---------------------------------------------------------------- MTTR 机制
   # 为什么（2026-10-29 DORA 实测：MTTR 中位 1675 min）：main 红着没人接手是最大浪费。
