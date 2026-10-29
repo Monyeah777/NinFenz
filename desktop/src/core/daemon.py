@@ -29,11 +29,9 @@
 from __future__ import annotations
 
 import contextlib
-import hmac
 import io
 import json
 import os
-import secrets
 import socket
 import sys
 import threading
@@ -41,7 +39,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from . import atoms, plog
+from . import atoms, crypto_policy, plog, security_audit
 
 PROTO = 1
 #: 监听地址：**只允许回环**（与 scripts/serve_decision_model.py 同一条纪律；本模块不提供
@@ -66,7 +64,8 @@ _LOG = plog.get_logger(__name__)
 
 
 def _security_event(event: str, **fields: Any) -> None:
-    plog.security_event(_LOG, event, actor="local-client", **fields)
+    payload = plog.security_event(_LOG, event, actor="local-client", **fields)
+    security_audit.record(payload)
 
 
 def _lifetime_expired(started: float, now: float, max_lifetime: float) -> bool:
@@ -699,7 +698,7 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     # 同时拒绝非字符串形态（旧实现里 `!=` 对 dict/list 只是"不相等"，语义上等于合法比较，
     # 但会把"类型错"混进"令牌错"，诊断面就分不清）。
     got_token = req.get("token")
-    if not isinstance(got_token, str) or not hmac.compare_digest(got_token, token):
+    if not isinstance(got_token, str) or not crypto_policy.compare(got_token, token):
         _security_event("daemon.authorization_denied",
                         reason="token_missing_or_mismatch",
                         token_present=isinstance(got_token, str) and bool(got_token))
@@ -807,7 +806,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
             watcher = None
             print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
                   "行为与常规守护一致", file=sys.stderr)
-    token = secrets.token_hex(32)
+    token = crypto_policy.new_token()
     lifetime_started = time.monotonic()
     _security_event("daemon.started", proto=PROTO, watch=bool(watch))
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

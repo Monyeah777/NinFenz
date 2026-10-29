@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write, json_doc  # noqa: E402
+from core import asvs_residual, atomic_write, json_doc  # noqa: E402
 
 COMMIT = "5cf9b032440be53ce345ab3c130fda46ba1ce7a2"
 SOURCE = (
@@ -258,34 +258,9 @@ _enforce(
     ],
 )
 
-PARTIAL_OVERRIDES: dict[str, tuple[str, str, list[str]]] = {
-    "V5.2.2": (
-        "No upload or archive service exists, but the local text-format surface does not yet "
-        "apply magic-byte validation to every supported extension.",
-        "Structured JSON/WASM and path-bound content are validated; full extension-to-content "
-        "validation remains partial.",
-        CONTROL_EVIDENCE,
-    ),
-    "V11.2.2": (
-        "Cryptographic choices are inventoried and release-reviewable, but are not negotiated "
-        "or swapped at runtime.",
-        "A central algorithm inventory and controlled-release upgrade path exist; online "
-        "configuration and migration tooling remain absent.",
-        CONTROL_EVIDENCE,
-    ),
-    "V16.4.2": (
-        "Local logs are owner-only and single-line append records, but lack an immutable WORM "
-        "anchor that prevents the owner or a compromised process from modifying them.",
-        "POSIX mode 0600, owner ACL inheritance and redaction are implemented; tamper-evident "
-        "external retention is not.",
-        CONTROL_EVIDENCE + ["desktop/src/core/daemon.py", "desktop/src/core/plog.py"],
-    ),
-    "V16.4.3": (
-        "No independent log-collection, detection, alerting or escalation system is configured.",
-        "Security events are structured and locally retained; logical separation is absent.",
-        CONTROL_EVIDENCE + ["desktop/src/core/daemon.py", "desktop/src/core/plog.py"],
-    ),
-}
+ENFORCED.update(asvs_residual.enforcement_map())
+
+PARTIAL_OVERRIDES: dict[str, tuple[str, str, list[str]]] = {}
 
 NA_BY_CHAPTER = {
     "V4": "The scoped runtime exposes no HTTP, GraphQL, or WebSocket service.",

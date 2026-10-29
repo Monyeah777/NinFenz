@@ -7,6 +7,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from core import asvs_residual
+
 MATRIX_REL = Path("packaging/security/asvs-5.0.0-l2.json")
 SCHEMA = "nf-asvs-evidence/1"
 VERSION = "5.0.0"
@@ -110,20 +112,9 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         issues.append(f"{MATRIX_REL}: 需求 ID 集合漂移（{digest}）")
     if doc.get("requirement_id_digest") != digest:
         issues.append(f"{MATRIX_REL}: 矩阵记录的需求摘要已过期")
-    missing_critical = sorted(CRITICAL_ENFORCED - {
-        str(entry.get("id")) for entry in entries
-        if isinstance(entry, dict) and entry.get("status") == "enforced"
-    })
-    if missing_critical:
-        issues.append(f"{MATRIX_REL}: 关键控制未 enforced：{missing_critical}")
-    for entry in entries:
-        if not isinstance(entry, dict) or entry.get("id") not in CRITICAL_ENFORCED:
-            continue
-        evidence = entry.get("evidence") or []
-        if not any(str(item).startswith("desktop/tests/") for item in evidence):
-            issues.append(
-                f"{MATRIX_REL}/{entry.get('id')}: enforced 的关键控制必须有测试证据"
-            )
+    issues.extend(asvs_residual.baseline_issues(
+        entries, statuses, str(MATRIX_REL), CRITICAL_ENFORCED
+    ))
     return issues, {
         "requirements": len(entries),
         "statuses": dict(sorted(statuses.items())),

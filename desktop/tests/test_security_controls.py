@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import security_controls  # noqa: E402
+from core import file_format, security_controls  # noqa: E402
 
 
 class SecurityControlsTest(unittest.TestCase):
@@ -22,6 +22,9 @@ class SecurityControlsTest(unittest.TestCase):
         self.assertGreaterEqual(stats["communication_paths"], 3)
         self.assertGreaterEqual(stats["crypto_inventory"], 3)
         self.assertGreaterEqual(stats["resource_limits"], 9)
+        self.assertEqual(file_format.SUPPORTED_SUFFIXES, set(stats["file_types"]))
+        self.assertEqual({"v1", "v2-sha512"}, set(stats["crypto_suites"]))
+        self.assertTrue(stats["independent_log_sink"])
 
     def _copy_root(self):
         tmp = tempfile.TemporaryDirectory()
@@ -31,6 +34,7 @@ class SecurityControlsTest(unittest.TestCase):
             security_controls.CONTROLS_REL,
             security_controls.DOC_REL,
             Path("scripts/plugin_host.py"),
+            Path("scripts/plugin_reference.py"),
         ]
         for rel in files:
             target = root / rel
@@ -93,7 +97,7 @@ class SecurityControlsTest(unittest.TestCase):
         doc["logging"]["gap"] = ""
         self._write(root, doc)
         issues, _ = security_controls.scan(root)
-        self.assertTrue(any("must record the residual gap" in issue for issue in issues), issues)
+        self.assertTrue(any("logs must be tamper-evident" in issue for issue in issues), issues)
 
     def test_human_document_anchor_drift_is_red(self):
         root, _doc = self._copy_root()
@@ -104,6 +108,21 @@ class SecurityControlsTest(unittest.TestCase):
         )
         issues, _ = security_controls.scan(root)
         self.assertTrue(any("missing section anchor" in issue for issue in issues), issues)
+
+    def test_processing_type_without_a_content_validator_is_red(self):
+        root, doc = self._copy_root()
+        doc["file_handling"]["processing_types"].append(".exe")
+        self._write(root, doc)
+        issues, _ = security_controls.scan(root)
+        self.assertTrue(any("no content validator" in issue for issue in issues), issues)
+
+    def test_logs_must_name_an_independent_host_sink(self):
+        root, doc = self._copy_root()
+        doc["logging"]["separate_system"] = False
+        doc["logging"]["sink"] = ""
+        self._write(root, doc)
+        issues, _ = security_controls.scan(root)
+        self.assertTrue(any("independent host log sink" in issue for issue in issues), issues)
 
 
 if __name__ == "__main__":

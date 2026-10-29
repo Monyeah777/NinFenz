@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from core import security_controls_sections as sections
+
 CONTROLS_REL = Path("packaging/security/application-security-controls.json")
 DOC_REL = Path("docs/security-controls.md")
 SCHEMA = "nf-application-security-controls/1"
@@ -121,10 +123,7 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         issues.append(f"{CONTROLS_REL}: upload_surface must remain false")
     if not files.get("processing_types"):
         issues.append(f"{CONTROLS_REL}: file_handling.processing_types is required")
-    if not _rows(files, "maximum_sizes"):
-        issues.append(f"{CONTROLS_REL}: file_handling.maximum_sizes is required")
-    if not str(files.get("malicious_file_behavior") or "").strip():
-        issues.append(f"{CONTROLS_REL}: file_handling.malicious_file_behavior is required")
+    issues.extend(sections.file_handling_issues(files, str(CONTROLS_REL)))
 
     auth = doc.get("authorization")
     if not isinstance(auth, dict) or auth.get("default") != "deny":
@@ -151,12 +150,8 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         if not _CRYPTO_FIELDS.issubset(row) or not all(
                 str(row.get(key) or "").strip() for key in _CRYPTO_FIELDS):
             issues.append(f"{CONTROLS_REL}/cryptography: incomplete row {row.get('id')!r}")
-    approved = set(crypto.get("approved_algorithms") or [])
-    if approved != {"secrets.token_hex(32)", "SHA-256", "hmac.compare_digest"}:
-        issues.append(f"{CONTROLS_REL}: approved algorithm set drifted")
-    agility = crypto.get("agility") or {}
-    if agility.get("status") == "partial" and not str(agility.get("gap") or "").strip():
-        issues.append(f"{CONTROLS_REL}: partial crypto agility must record gap")
+    crypto_issues, declared_suites = sections.crypto_issues(crypto, str(CONTROLS_REL))
+    issues.extend(crypto_issues)
 
     comms = _rows(doc, "communications")
     if not comms:
@@ -203,10 +198,7 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
             )
 
     logging = doc.get("logging") if isinstance(doc.get("logging"), dict) else {}
-    if logging.get("posix_mode") != "0600":
-        issues.append(f"{CONTROLS_REL}: local log POSIX mode must be 0600")
-    if logging.get("tamper_evident") is False and not str(logging.get("gap") or "").strip():
-        issues.append(f"{CONTROLS_REL}: non-immutable logs must record the residual gap")
+    issues.extend(sections.logging_issues(logging, str(CONTROLS_REL)))
 
     production = doc.get("production") if isinstance(doc.get("production"), dict) else {}
     if production.get("debug_default") != "disabled":
@@ -237,6 +229,14 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         "data_classes": len(classes),
         "communication_paths": len(comms),
         "crypto_inventory": len(crypto_rows),
+        "crypto_suites": sorted(declared_suites),
+        "file_types": sorted({
+            str(item).lower() for item in files.get("processing_types") or []
+        }),
+        "independent_log_sink": (
+            logging.get("separate_system") is True
+            and bool(str(logging.get("sink") or "").strip())
+        ),
         "resource_limits": len(declared_limits) + len(declared_timeouts),
         "runtime_external_paths": sum(
             1 for row in comms if row.get("external") is True

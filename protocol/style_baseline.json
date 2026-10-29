@@ -1657,7 +1657,7 @@
     "scripts/verify_report.py::I001": 1,
     "scripts/verify_report.py::UP031": 9,
     "scripts/verify_run.py::UP031": 1,
-    "scripts/verify_tests.py::E501": 5,
+    "scripts/verify_tests.py::E501": 4,
     "scripts/verify_tests.py::I001": 1,
     "scripts/verify_tests.py::RUF100": 4,
     "scripts/verify_tests.py::SIM105": 1,

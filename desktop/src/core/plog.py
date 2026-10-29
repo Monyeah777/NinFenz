@@ -4,7 +4,6 @@
 - 库/服务诊断走 logging（默认 INFO，级别可调），handler 绑定 **stderr**——
   绝不污染 stdout（MCP stdio 协议面只写 JSON-RPC；CLI 用户面输出保持）。
 - 库层不自造 print 诊断；既有 CLI 用户面 print（结果/产物路径）为输出协议，保留。
-
 用法：from core import plog; log = plog.get_logger(__name__)
 """
 from __future__ import annotations
@@ -32,12 +31,13 @@ def sanitize(value: Any, limit: int = 2048) -> str:
     return text[:max(0, int(limit))]
 
 
-def security_event(logger: logging.Logger, event: str, **fields: Any) -> None:
+def security_event(logger: logging.Logger, event: str, **fields: Any) -> dict[str, Any]:
     """记录一条单行安全事件；字段值一律转义并遮蔽凭据形态。"""
     payload = {"event": sanitize(event, 128)}
     payload.update({sanitize(key, 64): sanitize(value) for key, value in fields.items()})
     logger.warning(json.dumps(payload, ensure_ascii=True, sort_keys=True,
                               separators=(",", ":")))
+    return payload
 
 
 def get_logger(name: str, level: int = logging.INFO) -> "logging.Logger":

@@ -4,7 +4,6 @@
 为什么（2026-10-17 实测）：check12 = 3100+ tests / ~1080 s，占全量门禁 95%；单进程串行是纯
 执行成本。隔离修好后（`desktop/tests/__init__.py`：NF_HOME 兜底临时目录；守护端口由内核分配），
 测试之间不再共享状态，于是可把同一批测试放进 N 个进程——判据一条不动。
-
 纪律（写进判据，不是口头承诺）：
 1. **全集等价**：分片里的测试 id 由**一次 discover**产出，逐项分完（不按文件名猜），
    分片并集必须逐项等于 discover 集，否则 exit 1；
@@ -30,6 +29,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 import unittest
 from pathlib import Path
 
@@ -310,7 +310,7 @@ def assign(ids: list, ws: dict, jobs: int) -> list:
     return bins
 
 
-def _retry_permission(fn, tries: int = 4, delay: float = 0.3):
+def _retry_permission(fn, tries: int = 8, delay: float = 0.5):
     """Windows 上临时文件可能被 AV/索引器短暂占用（PermissionError）→ 退避重试。
 
     实测（2026-10-28）：16 片并发时偶发 `PermissionError(13, '另一个程序正在使用此文件')`，
@@ -327,30 +327,30 @@ def _retry_permission(fn, tries: int = 4, delay: float = 0.3):
     raise last
 
 
+def _temporary_directory(prefix: str, ignore_cleanup_errors: bool = False):
+    return _retry_permission(lambda: tempfile.TemporaryDirectory(
+        prefix=prefix, ignore_cleanup_errors=ignore_cleanup_errors))
+
+
 def run_shard(ids: list, index: int, dump: str = "") -> dict:
     """跑一个分片（可选：把逐测试耗时写到 `dump` 路径，供权重实测用）。"""
     t0 = time.perf_counter()
-    with _retry_permission(lambda: tempfile.TemporaryDirectory(prefix="nf_shard_%d_" % index)) as spec_dir:
+    with _temporary_directory("nf_shard_%d_" % index) as spec_dir:
         spec = Path(spec_dir) / "tests.json"
         payload = {"tests": ids}
         if dump:
             payload["dump"] = dump
         _retry_permission(lambda: atomic_write.write_text(spec, json.dumps(payload, ensure_ascii=False)))
-        with tempfile.TemporaryDirectory(prefix="nf_shard_home_%d_" % index) as home:
+        with _temporary_directory("nf_shard_home_%d_" % index, ignore_cleanup_errors=True) as home:
             env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
                        NARRATIVE_FORGE_HOME=home)
             env.setdefault("NF_DAEMON_IDLE", "30")
-            # `nf verify` 的判据并行（heredoc → 子进程）：实测 33 → 9.8 s（3.5×）。
-            # 分片里的测试大量调用 `nf verify --json`（parity / json-face / watch），
-            # 打开后这些重件一起受益。可用 NF_GATE_PARALLEL=0 关闭。
+            # 分片内判据并行：实测 33 → 9.8 s；parity/json-face/watch 共用。
+            # 可用 NF_GATE_PARALLEL=0 关闭。
             env.setdefault("NF_GATE_PARALLEL", "1")
-            # 内层并行的实测最优（2026-10-28，冷跑全量）：
-            #   jobs=10/w=2 → 245 s；jobs=10/w=1 → 264 s；jobs=10/w=4 → 265 s；
-            #   jobs=8/w=4 → 271 s；jobs=12/w=2 → 243 s；jobs=6/w=2 → 311 s。
-            # 结论：外层 10 片 + 内层 2 路 = 总进程 ~20，正好压满核数而不超额竞争。
+            # 冷跑实测：外层 10 + 内层 2 约 243–271 s；外层 16 时内层降为 1。
             env.setdefault("NF_GATE_PARALLEL_WORKERS", "2")
-            # 内层并发闸：分片越多，单分片内层线程越少；总 spawn 上限控制在 8 路。
-            # 实测 16 片 × 2 线程仍会拖长重测试，故分片模式把内层降到 1 路。
+            # 内层并发闸：总 spawn 上限 8；多分片时降低单分片线程数。
             _jobs_hint = int(os.environ.get("NF_TEST_JOBS") or 8)
             if _jobs_hint > 1:
                 _inner = max(1, min(6, 8 // max(1, _jobs_hint)))
@@ -660,15 +660,15 @@ def main(argv=None) -> int:
                 try:
                     idx, c = q.get_nowait()
                 except _queue.Empty:
-                    # 队列已空 = 所有片都被领走，worker 正常退出（不是吞错：没有错误发生，
-                    # 也没有任何失败信息被丢弃——失败只会来自 run_shard 的 rc）。
+                    # 队列已空 = 所有片都被领走，worker 正常退出，不吞任何失败信息。
                     break
                 try:
                     dd = ROOT / ".nf-cache" / "dump"
                     dd.mkdir(parents=True, exist_ok=True)
                     r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
-                    r = {"index": idx, "rc": 1, "out": "worker 异常：%r" % (exc,),
+                    r = {"index": idx, "rc": 1, "out": "worker 异常：%r\n%s" % (
+                        exc, traceback.format_exc()),
                          "wall": 0.0, "tests": len(c)}
                 with lock:
                     results_box.append(r)

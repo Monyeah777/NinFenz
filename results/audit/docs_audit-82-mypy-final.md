@@ -27,7 +27,7 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:5429e827dc5a7a6bcc7987de9beb89f67f7a1bdee9d0afac0a87bf6e5a11b42c
+  - desktop/src/core/daemon.py:fa4a1d65d762efaefa0c1c06e2d336f63cc6ce6041959aeb17a30ec7486beb19
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
   - protocol/code_metrics_baseline.json:7202d39817ff31cfba2103dbbd9e2ffb1c163d4e6c3f9ecb45666a5ad0b6348c
@@ -297,6 +297,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-10-29）：ASVS residual closure changed verify.sh shard cap and npm payload rename retry
+
 > 重审（2026-10-28）：回滚持久读缓存后重冻
 
 > 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）

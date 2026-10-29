@@ -19,7 +19,7 @@ class AsvsPolicyTest(unittest.TestCase):
         issues, stats = asvs_policy.scan(ROOT)
         self.assertEqual([], issues)
         self.assertEqual(191, stats["requirements"])
-        self.assertEqual({"enforced": 78, "partial": 4, "not-applicable": 109},
+        self.assertEqual({"enforced": 82, "not-applicable": 109},
                          stats["statuses"])
         self.assertEqual(13, len(stats["chapters"]))
         self.assertGreaterEqual(stats["controls"]["data_classes"], 5)
@@ -27,7 +27,7 @@ class AsvsPolicyTest(unittest.TestCase):
         doc = json.loads((ROOT / asvs_policy.MATRIX_REL).read_text(encoding="utf-8"))
         partial = {row["id"] for row in doc["requirements"]
                    if row["status"] == "partial"}
-        self.assertEqual({"V5.2.2", "V11.2.2", "V16.4.2", "V16.4.3"}, partial)
+        self.assertEqual(set(), partial)
 
     def _copy_root(self):
         tmp = tempfile.TemporaryDirectory()
@@ -89,6 +89,15 @@ class AsvsPolicyTest(unittest.TestCase):
         self._write(target, doc)
         issues, _ = asvs_policy.scan(root)
         self.assertTrue(any("关键控制未 enforced" in issue for issue in issues))
+
+    def test_any_partial_control_is_a_baseline_regression(self):
+        root, target, doc = self._copy_root()
+        row = next(entry for entry in doc["requirements"] if entry["id"] == "V5.2.2")
+        row["status"] = "partial"
+        row["gap"] = "regressed"
+        self._write(target, doc)
+        issues, _ = asvs_policy.scan(root)
+        self.assertTrue(any("ASVS partial baseline" in issue for issue in issues), issues)
 
 
 if __name__ == "__main__":
