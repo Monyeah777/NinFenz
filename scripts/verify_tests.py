@@ -668,15 +668,25 @@ def main(argv=None) -> int:
                     dd.mkdir(parents=True, exist_ok=True)
                     r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
                 except PermissionError:
-                    # Windows 瞬时占用（另一进程正持有临时件/规格件）——重试一次再判失败。
-                    # 实测（2026-10-29 冷跑）：偶发 `PermissionError(13)` 让整片记 rc=1，
-                    # 而同一片单独重跑必绿；这是平台竞态，不是判据结论。
-                    time.sleep(0.5)
-                    try:
-                        r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
-                    except Exception as exc2:     # noqa: BLE001 —— 仍崩则如实记失败
-                        r = {"index": idx, "rc": 1, "out": "worker 异常（重试后）：%r" % (exc2,),
-                             "wall": 0.0, "tests": len(c)}
+                    # Windows 瞬时占用（另一进程正持有临时件/规格件/日志件）——多次退避重试。
+                    # 实测（2026-10-29/30）：本机偶发、GitHub Windows runner 更频繁
+                    # （`PermissionError(13, 'The process cannot access the file ...')`），
+                    # 而同一片单独重跑必绿 ⇒ 平台竞态，不是判据结论。
+                    r = None
+                    for _try, _delay in enumerate((1.0, 2.0, 3.0), 1):
+                        time.sleep(_delay)
+                        try:
+                            r = run_shard(c, idx, dump=str(dd / ("chunk-%d.json" % idx)))
+                            break
+                        except PermissionError as exc2:
+                            if _try == 3:
+                                r = {"index": idx, "rc": 1,
+                                     "out": "worker 异常（%d 次重试后仍占用）：%r" % (_try, exc2),
+                                     "wall": 0.0, "tests": len(c)}
+                        except Exception as exc2:  # noqa: BLE001 —— 非占用类错误：如实记失败
+                            r = {"index": idx, "rc": 1, "out": "worker 异常：%r" % (exc2,),
+                                 "wall": 0.0, "tests": len(c)}
+                            break
                 except Exception as exc:          # noqa: BLE001 —— worker 崩了要当分片失败，不是静默
                     r = {"index": idx, "rc": 1, "out": "worker 异常：%r" % (exc,),
                          "wall": 0.0, "tests": len(c)}
