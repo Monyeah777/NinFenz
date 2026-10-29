@@ -3,6 +3,7 @@
 
 覆盖子命令参数面与装配链 smoke（替代手工冒烟；不依赖 GUI/端壳）。
 """
+
 import argparse
 import ast
 import builtins
@@ -19,10 +20,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+
 def _cli_version() -> str:
     """从单一真源读 CLI 版本，避免每次发版都要改测试。"""
     import re as _re
     from pathlib import Path as _Path
+
     txt = (_Path(__file__).resolve().parents[2] / "scripts" / "nf.py").read_text(encoding="utf-8")
     m = _re.search(r'^NF_CLI_VERSION = "([^"]+)"', txt, _re.M)
     return m.group(1) if m else "?"
@@ -43,20 +46,26 @@ def declared_flags(src: str) -> list:
     """→ `[(行号, dest, 长选项串表)]`：全部 `add_argument` 声明（纯函数）。"""
     tree = ast.parse(src)
     out = []
-    for call in [n for n in ast.walk(tree)
-                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
-                 and n.func.attr == "add_argument"]:
-        opts = [a.value for a in call.args
-                if isinstance(a, ast.Constant) and isinstance(a.value, str)
-                and a.value.startswith("-")]
+    for call in [
+        n
+        for n in ast.walk(tree)
+        if isinstance(n, ast.Call)
+        and isinstance(n.func, ast.Attribute)
+        and n.func.attr == "add_argument"
+    ]:
+        opts = [
+            a.value
+            for a in call.args
+            if isinstance(a, ast.Constant) and isinstance(a.value, str) and a.value.startswith("-")
+        ]
         longs = [o for o in opts if o.startswith("--")]
         if not longs:
-            continue                    # 只有短选项（`-h`）或位置参数，跳过
+            continue  # 只有短选项（`-h`）或位置参数，跳过
         dest, decl_hits = "", 0
         for kw in call.keywords:
             if kw.arg == "dest" and isinstance(kw.value, ast.Constant):
                 dest = str(kw.value.value)
-                decl_hits = 1           # 显式 `dest="x"` 字面量本身占 1 次词元
+                decl_hits = 1  # 显式 `dest="x"` 字面量本身占 1 次词元
         if not dest:
             dest = longs[-1][2:].replace("-", "_")
         out.append((call.lineno, dest, longs, decl_hits))
@@ -91,11 +100,20 @@ class LightCommandReadBudgetTest(unittest.TestCase):
     从个位数跳到四位数，当场红。口径是**计数**（不是计时），与机器快慢、噪声都无关。
     """
 
-    BUDGET = 60        # 实测 0–36 次；全仓扫描会到 2000+（两个数量级余量）
-    CMDS = (("domain", "ls"), ("assertions", "--check"), ("approve", "--verify"),
-            ("output", "ls"), ("library", "ls"), ("market", "--list"),
-            ("state-front",), ("knowledge", "--check"), ("sig", "--check"),
-            ("patterns", "ls"), ("audit",))
+    BUDGET = 60  # 实测 0–36 次；全仓扫描会到 2000+（两个数量级余量）
+    CMDS = (
+        ("domain", "ls"),
+        ("assertions", "--check"),
+        ("approve", "--verify"),
+        ("output", "ls"),
+        ("library", "ls"),
+        ("market", "--list"),
+        ("state-front",),
+        ("knowledge", "--check"),
+        ("sig", "--check"),
+        ("patterns", "ls"),
+        ("audit",),
+    )
 
     def _opens(self, argv):
         counts: collections.Counter = collections.Counter()
@@ -106,7 +124,7 @@ class LightCommandReadBudgetTest(unittest.TestCase):
                 path = os.path.normcase(os.path.abspath(str(file)))
                 if ".git" not in path and ".rivet" not in path:
                     counts[path] += 1
-            except Exception:                    # noqa: BLE001 - 计数失败不影响被测逻辑
+            except Exception:  # noqa: BLE001 - 计数失败不影响被测逻辑
                 pass
             return orig(file, *a, **k)
 
@@ -128,9 +146,11 @@ class LightCommandReadBudgetTest(unittest.TestCase):
         for argv in self.CMDS:
             got = self._opens(argv)
             self.assertLessEqual(
-                got, self.BUDGET,
+                got,
+                self.BUDGET,
                 "`nf %s` 打开了 %d 个文件（>%d）——轻命令里混进了全仓扫描？"
-                % (" ".join(argv), got, self.BUDGET))
+                % (" ".join(argv), got, self.BUDGET),
+            )
 
 
 class NoDeadFlagTest(unittest.TestCase):
@@ -145,26 +165,38 @@ class NoDeadFlagTest(unittest.TestCase):
     def test_no_declared_flag_is_unread(self):
         src = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
         declared = declared_flags(src)
-        self.assertGreaterEqual(len(declared), 60,
-                                "旗标面塌缩（判据可能已失效）：%d" % len(declared))
+        self.assertGreaterEqual(
+            len(declared), 60, "旗标面塌缩（判据可能已失效）：%d" % len(declared)
+        )
         got = unread_flags(src)
-        self.assertEqual([], got,
-                         "声明了却从没读过的旗标（修复指引：接线到代码，或删掉声明与文档）：%s"
-                         % ["%s:%d %s" % (ROOT.joinpath("scripts/nf.py").as_posix(), ln, opt)
-                            for ln, _dest, opt in got])
+        self.assertEqual(
+            [],
+            got,
+            "声明了却从没读过的旗标（修复指引：接线到代码，或删掉声明与文档）：%s"
+            % [
+                "%s:%d %s" % (ROOT.joinpath("scripts/nf.py").as_posix(), ln, opt)
+                for ln, _dest, opt in got
+            ],
+        )
 
     def test_predicate_has_catch_power(self):
         """变异自证：**没读**的旗标必判红；`args.x` 读过的、显式 dest= 的不许误报。"""
-        dead = ("p = subparsers.add_parser('x')\n"
-                "p.add_argument('--never-read', action='store_true', help='说明')\n")
+        dead = (
+            "p = subparsers.add_parser('x')\n"
+            "p.add_argument('--never-read', action='store_true', help='说明')\n"
+        )
         self.assertEqual([(2, "never_read", "--never-read")], unread_flags(dead))
-        used = ("p = subparsers.add_parser('x')\n"
-                "p.add_argument('--no-render', action='store_true')\n"
-                "def f(args):\n    return not args.no_render\n")
+        used = (
+            "p = subparsers.add_parser('x')\n"
+            "p.add_argument('--no-render', action='store_true')\n"
+            "def f(args):\n    return not args.no_render\n"
+        )
         self.assertEqual([], unread_flags(used))
-        explicit = ("p = subparsers.add_parser('x')\n"
-                    "p.add_argument('--x-y', dest='foo', action='store_true')\n"
-                    "def f(args):\n    return args.foo\n")
+        explicit = (
+            "p = subparsers.add_parser('x')\n"
+            "p.add_argument('--x-y', dest='foo', action='store_true')\n"
+            "def f(args):\n    return args.foo\n"
+        )
         self.assertEqual([], unread_flags(explicit))
 
 
@@ -222,6 +254,7 @@ class NfCliSmokeTest(unittest.TestCase):
         data = json.loads(out)
         # 期望值取自基线真源，不写字面量（此前钉死 40/70，基线一动本判据就假红）。
         from core import quality_baseline as _qb
+
         self.assertEqual(_qb.EXPECTED_CHECKS, data["baseline_checks"])
         self.assertEqual(_qb.EXPECTED_PASS, data["baseline_pass"])
 
@@ -232,8 +265,9 @@ class NfCliSmokeTest(unittest.TestCase):
 
     def test_diff_01_vs_36(self):
         """nf diff 冒烟：01 核心协议 vs 36 方案 → 判定行在场（C2 差异检测）。"""
-        code, out = self._run(["diff", str(ROOT / "01_核心协议.md"),
-                               str(ROOT / "02_联动注册表.md")])
+        code, out = self._run(
+            ["diff", str(ROOT / "01_核心协议.md"), str(ROOT / "02_联动注册表.md")]
+        )
         self.assertEqual(code, 0)
         self.assertIn("判定", out)
 
@@ -260,8 +294,12 @@ class NfCliSmokeTest(unittest.TestCase):
         # 2026-10-10：原第 4 例【domain build --spec ' A01 '】依赖
         # .rivet/private_archive/ai_packs/specs/（gitignored 内部档案）——fresh clone 上该
         # spec 不在场，命令**应当**返回 1，故不能当 CI 判据；换成 tracked 数据面的标识符命令。
-        for argv in (["related", " M90 "], ["who-refers", "M90 "],
-                     ["impact", " M90"], ["patterns", "show", " predicate-single-source "]):
+        for argv in (
+            ["related", " M90 "],
+            ["who-refers", "M90 "],
+            ["impact", " M90"],
+            ["patterns", "show", " predicate-single-source "],
+        ):
             code, out = self._run(argv)
             self.assertEqual(0, code, "%s 应当接受带空白的标识符：%s" % (argv, out[:120]))
 
@@ -328,8 +366,7 @@ class NfCliSmokeTest(unittest.TestCase):
         fd, path = tempfile.mkstemp(suffix=".md")
         os.close(fd)
         try:
-            code, out = self._run(["assemble", "西幻生存",
-                                   "--save", path])
+            code, out = self._run(["assemble", "西幻生存", "--save", path])
             self.assertEqual(code, 0, out)
             with open(path, encoding="utf-8") as fh:
                 text = fh.read()
@@ -344,9 +381,9 @@ class NfCliSmokeTest(unittest.TestCase):
         fd, path = tempfile.mkstemp(suffix=".md")
         os.close(fd)
         try:
-            code, out = self._run(["assemble", "给我做一个世界",
-                                   "--answer", "题材：西幻生存",
-                                   "--save", path])
+            code, out = self._run(
+                ["assemble", "给我做一个世界", "--answer", "题材：西幻生存", "--save", path]
+            )
             self.assertEqual(code, 0, out)
             with open(path, encoding="utf-8") as fh:
                 text = fh.read()
@@ -360,9 +397,7 @@ class NfCliSmokeTest(unittest.TestCase):
         """真实战例回归：仓库 P03 完整样本须通过 nf assemble --check。"""
         sample = os.path.join(ROOT, "docs", "完整版样本_西幻生存流P03.md")
         self.assertTrue(os.path.exists(sample), sample)
-        code, out = self._run(["assemble",
-                               "帮我组装一个西幻生存世界的完整版",
-                               "--check", sample])
+        code, out = self._run(["assemble", "帮我组装一个西幻生存世界的完整版", "--check", sample])
         self.assertEqual(code, 0, out)
 
     def test_assemble_check_is_not_silently_skipped_by_a_vague_requirement(self):
@@ -387,8 +422,7 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertIn('"total_refs"', out)
 
     def test_asset_usage_strict_passes_repo(self):
-        code, out = self._run(["asset", "usage", "--strict",
-                               "--root", str(ROOT)])
+        code, out = self._run(["asset", "usage", "--strict", "--root", str(ROOT)])
         self.assertEqual(code, 0, out)
 
     def test_release_check_fast(self):
@@ -425,13 +459,19 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertIn('"kind": "worldmodel-run"', out)
         self.assertIn('"digest"', out)
         fd, state_path = tempfile.mkstemp(suffix=".json")
-        os.write(fd, json.dumps({
-            "data_bus": {
-                "active_pipeline": "P01",
-                "round": {"phase": "begin", "phase_trace": []},
-            },
-            "WorldState": {"time": {"tick": 0}},
-        }, ensure_ascii=False).encode("utf-8"))
+        os.write(
+            fd,
+            json.dumps(
+                {
+                    "data_bus": {
+                        "active_pipeline": "P01",
+                        "round": {"phase": "begin", "phase_trace": []},
+                    },
+                    "WorldState": {"time": {"tick": 0}},
+                },
+                ensure_ascii=False,
+            ).encode("utf-8"),
+        )
         os.close(fd)
         try:
             code, out = self._run(["worldmodel", "--run", "--state", state_path, "--json"])
@@ -447,14 +487,15 @@ class NfCliSmokeTest(unittest.TestCase):
         self.assertIn("check32", out)
 
     def test_assemble_rounds_flag(self):
-        good = ("回合 1：引用 06 §3 推进，M00 写回 状态快照。\n"
-                "回合 2：引用 06 §3，M80 输出并进入下一回合。\n")
+        good = (
+            "回合 1：引用 06 §3 推进，M00 写回 状态快照。\n"
+            "回合 2：引用 06 §3，M80 输出并进入下一回合。\n"
+        )
         fd, path = tempfile.mkstemp(suffix=".md")
         os.write(fd, good.encode("utf-8"))
         os.close(fd)
         try:
-            code, out = self._run(["assemble", "西幻生存",
-                                   "--check", path, "--rounds"])
+            code, out = self._run(["assemble", "西幻生存", "--check", path, "--rounds"])
             self.assertEqual(code, 0, out)
         finally:
             if os.path.exists(path):
@@ -462,9 +503,9 @@ class NfCliSmokeTest(unittest.TestCase):
 
     def test_assemble_answers_fill_clarify(self):
         """A3.2：--answer 多次回填 → 澄清转 ready（西幻命中预设）。"""
-        code, out = self._run(["assemble", "给我做一个世界",
-                               "--answer", "题材：西幻生存",
-                               "--answer", "主轴：生存"])
+        code, out = self._run(
+            ["assemble", "给我做一个世界", "--answer", "题材：西幻生存", "--answer", "主轴：生存"]
+        )
         self.assertEqual(code, 0, out)
         self.assertIn("西幻生存领域包", out)
         self.assertNotIn("需求澄清", out)
@@ -474,12 +515,11 @@ class NfCliSmokeTest(unittest.TestCase):
         fd, sess = tempfile.mkstemp(suffix=".json")
         os.close(fd)
         try:
-            code, _ = self._run(["assemble", "给我做一个世界",
-                                 "--answer", "题材：西幻生存",
-                                 "--session", sess])
+            code, _ = self._run(
+                ["assemble", "给我做一个世界", "--answer", "题材：西幻生存", "--session", sess]
+            )
             self.assertEqual(code, 0)
-            code, out = self._run(["assemble", "给我做一个世界",
-                                   "--session", sess])
+            code, out = self._run(["assemble", "给我做一个世界", "--session", sess])
             self.assertEqual(code, 0, out)
             self.assertIn("西幻生存领域包", out)
         finally:
@@ -502,6 +542,7 @@ class NfCliSmokeTest(unittest.TestCase):
 
     def test_assemble_check_ok_and_reject(self):
         """nf assemble --check：合格成品过、编造编号成品拒。"""
+
         def _write(text):
             fd, path = tempfile.mkstemp(suffix=".md")
             os.write(fd, text.encode("utf-8"))
@@ -511,8 +552,7 @@ class NfCliSmokeTest(unittest.TestCase):
         try:
             ok_md = "\n".join("## %d. 段" % i for i in range(8)) + "\n由 M00 数据槽 记录。\n"
             path = _write(ok_md)
-            code, out = self._run(["assemble", "西幻生存",
-                                   "--check", path])
+            code, out = self._run(["assemble", "西幻生存", "--check", path])
             self.assertEqual(code, 0, out)
             self.assertIn("通过", out)
 
@@ -536,7 +576,10 @@ class NfCliSmokeTest(unittest.TestCase):
         for argv, expected in cases:
             proc = subprocess.run(
                 [sys.executable, str(ROOT / "scripts" / "nf.py")] + argv,
-                capture_output=True, text=True, encoding="utf-8", timeout=120,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=120,
             )
             self.assertEqual(proc.returncode, expected, "argv=%s" % argv)
 
@@ -597,7 +640,10 @@ class NfCliSmokeTest(unittest.TestCase):
 
         nf.main = interrupt
         try:
-            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+            with (
+                contextlib.redirect_stderr(io.StringIO()),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
                 self.assertEqual(130, nf.guarded_main([]))
         finally:
             nf.main = orig
@@ -675,6 +721,7 @@ class NfCliSmokeTest(unittest.TestCase):
         修复前：计数静默塌成 0，而 doctor 照样报 N/N 通过（只有 stderr 一行 WARN）——降级报绿。
         """
         from core import lazy_yaml
+
         orig = lazy_yaml.module
         lazy_yaml.module = lambda: None
         try:
@@ -687,13 +734,18 @@ class NfCliSmokeTest(unittest.TestCase):
         doc = json.loads(out.getvalue())
         self.assertTrue(doc["degraded"])
         self.assertFalse(doc["ok"])
-        self.assertTrue(any("PyYAML" in c["name"] and not c["ok"] for c in doc["checks"]),
-                        "缺少「可选依赖在场」这条会 FAIL 的检查")
+        self.assertTrue(
+            any("PyYAML" in c["name"] and not c["ok"] for c in doc["checks"]),
+            "缺少「可选依赖在场」这条会 FAIL 的检查",
+        )
 
     def test_cli_version_flag(self):
         proc = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "nf.py"), "--version"],
-            capture_output=True, text=True, encoding="utf-8", timeout=60,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=60,
         )
         self.assertEqual(proc.returncode, 0)
         self.assertIn(f"nf {CLI_VERSION}", proc.stdout)
@@ -715,6 +767,7 @@ def unread_flag_dests(parser, source: str, allow=()) -> list:
     用户按 `--help` 传参却得到默认行为，比报错更难发现。
     """
     import re as _re
+
     found: dict = {}
 
     def _walk(p):
@@ -742,10 +795,19 @@ class DeclaredFlagsAreReadTest(unittest.TestCase):
     """「声明面 = 执行面」：`nf` 的每个旗标都必须真被读到（防静默空转）。"""
 
     def test_no_declared_flag_is_unread(self):
-        source = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        source = "\n".join(
+            (ROOT / rel).read_text(encoding="utf-8")
+            for rel in (
+                "scripts/nf.py",
+                "desktop/src/core/cli_bridge.py",
+                "desktop/src/core/meta_cockpit/nf_cockpit_cli.py",
+                "desktop/src/core/meta_cockpit/nf_ab_cli.py",
+            )
+        )
         got = unread_flag_dests(nf._build_parser(), source)
-        self.assertEqual([], got, "声明了却没人读的旗标（修复指引：在处理器里读它，"
-                         "或删掉这个假接口）：%s" % got)
+        self.assertEqual(
+            [], got, "声明了却没人读的旗标（修复指引：在处理器里读它，或删掉这个假接口）：%s" % got
+        )
 
     def test_predicate_flags_unread_but_spares_read(self):
         """变异自证：只声明不读的旗标必判红；被 `args.x` / `getattr(args, "x")` 读的不许误报。"""
@@ -775,16 +837,17 @@ class RootFlagHonoredTest(unittest.TestCase):
     def test_declared_root_is_honored(self):
         with tempfile.TemporaryDirectory(prefix="nf_root_") as tmp:
             for argv, marker in (
-                    (["asset", "ls", "--root", tmp], "货架为空"),
-                    (["module", "ls", "--root", tmp], "合计 0"),
-                    (["module", "verify", "--root", tmp], "模块 0"),
-                    (["asset", "density", "--root", tmp], "资产文件 0"),
-                    (["asset", "usage", "--root", tmp], "资产键 0"),
-                    (["asset", "thickness", "--root", tmp], "资产档 0"),
-                    (["asset", "inventory", "--root", tmp], "无 provenance"),
-                    (["asset", "verify", "--root", tmp], "台账 0"),
-                    (["design", "audit", "--root", tmp], "无 audit.md"),
-                    (["design", "steelman", "--root", tmp], "无 steelman")):
+                (["asset", "ls", "--root", tmp], "货架为空"),
+                (["module", "ls", "--root", tmp], "合计 0"),
+                (["module", "verify", "--root", tmp], "模块 0"),
+                (["asset", "density", "--root", tmp], "资产文件 0"),
+                (["asset", "usage", "--root", tmp], "资产键 0"),
+                (["asset", "thickness", "--root", tmp], "资产档 0"),
+                (["asset", "inventory", "--root", tmp], "无 provenance"),
+                (["asset", "verify", "--root", tmp], "台账 0"),
+                (["design", "audit", "--root", tmp], "无 audit.md"),
+                (["design", "steelman", "--root", tmp], "无 steelman"),
+            ):
                 code, out = self._run(argv)
                 self.assertEqual(0, code, (argv, out))
                 self.assertIn(marker, out, "--root 未被兑现：%s" % (argv,))
@@ -798,10 +861,12 @@ class RootFlagHonoredTest(unittest.TestCase):
         正是「看起来正常的错答」（同 `drill_fidelity`「标准不得无载体」）。空树体检
         （在场但空的目录）仍按 `test_declared_root_is_honored` 报空结论。
         """
-        for argv in (["asset", "verify", "--root", "README.md"],
-                     ["asset", "ls", "--root", "README.md"],
-                     ["module", "verify", "--root", "README.md"],
-                     ["asset", "verify", "--root", "__NF_NO_SUCH_ROOT__"]):
+        for argv in (
+            ["asset", "verify", "--root", "README.md"],
+            ["asset", "ls", "--root", "README.md"],
+            ["module", "verify", "--root", "README.md"],
+            ["asset", "verify", "--root", "__NF_NO_SUCH_ROOT__"],
+        ):
             out, err = io.StringIO(), io.StringIO()
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
                 code = nf.main(argv)
@@ -823,18 +888,20 @@ class ParserBuildBudgetTest(unittest.TestCase):
 
     def test_parser_build_does_not_probe_gettext(self):
         import gettext
+
         seen = []
         real = gettext.translation
         gettext.translation = lambda *a, **k: (seen.append(a), gettext.NullTranslations())[1]
         saved = nf._PARSER_CACHE
         try:
             nf._PARSER_CACHE = None
-            nf._build_parser()                 # 建面：翻译钩子必须已是恒等函数
+            nf._build_parser()  # 建面：翻译钩子必须已是恒等函数
         finally:
             gettext.translation = real
             nf._PARSER_CACHE = saved
-        self.assertEqual([], seen,
-                         "建命令面时仍在探测 gettext（每次 translation 都要 stat locale 目录）")
+        self.assertEqual(
+            [], seen, "建命令面时仍在探测 gettext（每次 translation 都要 stat locale 目录）"
+        )
 
 
 class VersionShortCircuitTest(unittest.TestCase):
@@ -861,8 +928,7 @@ class VersionShortCircuitTest(unittest.TestCase):
         finally:
             nf._build_parser = real
         self.assertEqual(0, code)
-        self.assertEqual([], calls,
-                         "`nf --version` 建了命令面 ⇒ 短路判据失效（argv 没递进 main）")
+        self.assertEqual([], calls, "`nf --version` 建了命令面 ⇒ 短路判据失效（argv 没递进 main）")
 
     def test_cli_version_profile_has_no_command_face_build(self):
         """端到端那一条：profile 统计里不许出现命令面构建（抓「**入口**传 None」这个原缺陷）。
@@ -871,9 +937,21 @@ class VersionShortCircuitTest(unittest.TestCase):
         profile 立刻出现 `_make_parser` / `add_subparsers`（实测 2 条）——故本判据必须端到端。
         """
         proc = subprocess.run(
-            [sys.executable, "-m", "cProfile", "-s", "tottime",
-             str(ROOT / "scripts" / "nf.py"), "--version"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
+            [
+                sys.executable,
+                "-m",
+                "cProfile",
+                "-s",
+                "tottime",
+                str(ROOT / "scripts" / "nf.py"),
+                "--version",
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=180,
+        )
         self.assertEqual(0, proc.returncode, proc.stderr[-400:])
         self.assertIn(f"nf {CLI_VERSION}", proc.stdout)
         self.assertNotIn("_make_parser", proc.stdout, "命令面被建了（入口没把 argv 递进去？）")

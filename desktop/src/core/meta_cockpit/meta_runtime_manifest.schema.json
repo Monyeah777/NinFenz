@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/meta-runtime-manifest/1",
+  "title": "NF Meta Runtime Manifest",
+  "type": "object",
+  "required": ["schema", "version", "machine_digest", "runtime_digest",
+               "task_profile_digest", "atom_contracts_digest", "file_digests",
+               "limits", "capabilities", "human_review", "no_scoring",
+               "digest"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-meta-runtime-manifest/1"},
+    "version": {"type": "string", "minLength": 1},
+    "machine_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runtime_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "task_profile_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "atom_contracts_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file_digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "limits": {
+      "type": "object",
+      "required": ["context_units", "references_partition", "method_history",
+                   "search_expansions", "search_generated",
+                   "calibration_store_bytes", "journal_bytes"],
+      "additionalProperties": false,
+      "properties": {
+        "context_units": {"type": "integer", "minimum": 1},
+        "references_partition": {"type": "integer", "minimum": 1},
+        "method_history": {"type": "integer", "minimum": 1},
+        "search_expansions": {"type": "integer", "minimum": 1},
+        "search_generated": {"type": "integer", "minimum": 1},
+        "calibration_store_bytes": {"type": "integer", "minimum": 1},
+        "journal_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["offline", "deterministic_replay", "fail_closed",
+                   "task_native_handoff", "role_aware_retrieval",
+                   "offline_blind_ab", "secret_guard"],
+      "additionalProperties": false,
+      "properties": {
+        "offline": {"const": true},
+        "deterministic_replay": {"const": true},
+        "fail_closed": {"const": true},
+        "task_native_handoff": {"const": true},
+        "role_aware_retrieval": {"const": true},
+        "offline_blind_ab": {"const": true},
+        "secret_guard": {"const": true}
+      }
+    },
+    "human_review": {"enum": ["PENDING", "APPROVED", "REJECTED",
+                              "NOT-CONFIGURED"]},
+    "no_scoring": {"const": true},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

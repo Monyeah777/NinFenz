@@ -1,0 +1,33 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M23",
+  "name": "知识体系",
+  "category": "认知",
+  "layer": "P23",
+  "meta_level": "M1",
+  "meta_function": "integration",
+  "operates_on": ["abstraction_set"],
+  "atoms": ["i.hierarchy", "i.compose", "e.verify"],
+  "applies_when": "需要把抽象组织成有根无环的体系",
+  "inputs": [{"token": "abstraction_set", "kind": "object"}],
+  "outputs": [{"token": "knowledge_system", "kind": "object"}],
+  "cost_class": "single_llm",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "知识体系链",
+  "context_budget": {"input": "2x", "output": "2x"},
+  "crop_policy": {"visibility": "visible", "drop": ["无父无子的孤立节点"], "summarize": []},
+  "criteria": [
+    {"dimension": "node_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.25, "max_missing": 0},
+    {"dimension": "edge_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.333, "max_missing": 0},
+    {"dimension": "acyclic", "primitive": "invariant", "unit": "ratio",
+     "threshold": 1.0, "granularity": 1, "max_missing": 0},
+    {"dimension": "root_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.25, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "desktop/src/core/meta_cockpit/chain_knowledge.py"}],
+  "conformance": "L2"
+}

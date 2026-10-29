@@ -13,6 +13,16 @@ from core import approval  # noqa: E402
 
 
 class ApprovalNamingTest(unittest.TestCase):
+    def test_subject_cannot_escape_repository_root(self):
+        with tempfile.TemporaryDirectory() as parent:
+            root = Path(parent) / "repo"
+            root.mkdir()
+            secret = Path(parent) / "secret.md"
+            secret.write_text("do not touch", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                approval.approve(str(root), "../secret.md", "tester")
+            self.assertFalse((root / "protocol" / "approvals").exists())
+
     def test_json_subject_gets_single_extension(self):
         """主体以 .json 结尾时，记录名只带一个 .json（此前拼成 xxx.json.json）。"""
         with tempfile.TemporaryDirectory() as tmp:

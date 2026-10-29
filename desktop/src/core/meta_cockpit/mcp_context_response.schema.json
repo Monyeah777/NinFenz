@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/mcp-context-response/1",
+  "title": "NF MCP Context Provider Response",
+  "type": "object",
+  "required": ["items"],
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "uri", "text", "line", "resource_digest"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9_.:/-]+$"},
+          "uri": {"type": "string", "pattern": "^mcp://"},
+          "text": {"type": "string", "minLength": 1, "maxLength": 10000},
+          "line": {"type": "integer", "minimum": 1},
+          "resource_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

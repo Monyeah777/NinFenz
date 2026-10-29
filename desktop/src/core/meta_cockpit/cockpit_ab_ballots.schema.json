@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-ab-ballots/1",
+  "title": "NF Cockpit A/B Judge Ballots",
+  "type": "array",
+  "maxItems": 100000,
+  "items": {
+    "type": "object",
+    "required": ["pair_id", "judge_id", "winner"],
+    "additionalProperties": false,
+    "properties": {
+      "pair_id": {"type": "string", "pattern": "^[0-9a-f]{24}$"},
+      "judge_id": {
+        "type": "string", "minLength": 1, "maxLength": 128,
+        "pattern": "^[A-Za-z0-9_.:-]+$"
+      },
+      "winner": {"enum": ["A", "B", "tie"]},
+      "rationale": {"type": "string", "minLength": 1, "maxLength": 2000}
+    }
+  }
+}

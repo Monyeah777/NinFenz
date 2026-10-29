@@ -24,7 +24,7 @@ public static class Approval
     /// <summary>被批准对象的整文件摘要（不含批准记录本身——记录是独立文件，无自指问题）。</summary>
     public static string SubjectDigest(string root, string subject)
     {
-        var path = Path.Combine(root, subject.Replace('/', Path.DirectorySeparatorChar));
+        var path = SubjectPath(root, subject);
         return Convert.ToHexString(
             System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant();
     }
@@ -73,7 +73,16 @@ public static class Approval
             }
             if (PyOr(rec.GetValueOrDefault("approved_by")).Trim().Length == 0)
                 issues.Add($"批准记录缺批准人：{subject}");
-            var path = Path.Combine(root, subject.Replace('/', Path.DirectorySeparatorChar));
+            string path;
+            try
+            {
+                path = SubjectPath(root, subject);
+            }
+            catch (ArgumentException exc)
+            {
+                issues.Add($"批准对象非法：{subject}（{exc.Message}）");
+                continue;
+            }
             if (!File.Exists(path))
             {
                 issues.Add($"批准对象不存在：{subject}");
@@ -122,4 +131,31 @@ public static class Approval
         Dictionary<string, object?> map => map.Count > 0,
         _ => true,
     };
+
+    private static string SubjectPath(string root, string subject)
+    {
+        if (string.IsNullOrWhiteSpace(subject) || subject.Contains(':') ||
+            Path.IsPathRooted(subject) || subject.StartsWith("~", StringComparison.Ordinal) ||
+            subject.Replace('\\', '/').Split('/').Any(part => part == ".."))
+            throw new ArgumentException(
+                "subject 须为仓库根内相对路径（修复指引：去掉绝对路径、盘符、.. 段与 ADS）");
+        var rootFull = Path.GetFullPath(root);
+        var full = Path.GetFullPath(Path.Combine(rootFull,
+            subject.Replace('/', Path.DirectorySeparatorChar)));
+        var prefix = rootFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                     + Path.DirectorySeparatorChar;
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        if (!full.StartsWith(prefix, comparison))
+            throw new ArgumentException("subject 越出仓库根（修复指引：改用根内相对路径）");
+        if (File.Exists(full))
+        {
+            var target = File.ResolveLinkTarget(full, returnFinalTarget: true)?.FullName;
+            if (target is not null && !target.StartsWith(prefix, comparison))
+                throw new ArgumentException(
+                    "subject 经符号链接越出仓库根（修复指引：去掉越界链接）");
+        }
+        return full;
+    }
 }

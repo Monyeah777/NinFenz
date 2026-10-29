@@ -11,6 +11,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -155,6 +156,16 @@ class JsonDocHelperTest(unittest.TestCase):
             json_doc.loads(too_deep, list, what="deep")
         ok = "[" * json_doc.MAX_JSON_DEPTH + "]" * json_doc.MAX_JSON_DEPTH
         self.assertIsInstance(json_doc.loads(ok, list, what="ok"), list)
+
+    def test_text_and_file_size_caps_are_enforced(self):
+        with mock.patch.object(json_doc, "MAX_JSON_BYTES", 4):
+            with self.assertRaisesRegex(ValueError, "修复指引"):
+                json_doc.loads("12345", int, what="oversize")
+            with tempfile.TemporaryDirectory() as tmp:
+                path = Path(tmp) / "oversize.json"
+                path.write_text("12345", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "修复指引"):
+                    json_doc.load(path, int, what="oversize")
 
     def test_load_reports_missing_file_and_shape(self):
         with tempfile.TemporaryDirectory() as tmp:

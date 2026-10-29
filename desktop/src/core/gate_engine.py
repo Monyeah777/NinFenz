@@ -244,8 +244,8 @@ def _trust_gate(num: int, title: str, root: Path) -> Verdict | None:
     """H1（2026-10-22 安全审计）：执行目标仓库自带代码前的信任门。
 
     `nf verify` 的 inproc/script 面会把目标仓库 verify.sh 的 heredoc Python 当本机进程
-    代码执行（CWE-94）。目标仓库 origin owner 不在允许列表时**默认拒绝执行**，需显式
-    `--trust-repo`（NF_TRUST_REPO=1）。返回 None = 放行；返回 Verdict = 拒绝并如实报 FAIL
+    代码执行（CWE-94）。只有当前安装根自动可信；外部仓库即使伪造 origin 也**默认拒绝**，
+    需显式 `--trust-repo`（NF_TRUST_REPO=1）。返回 None=放行；Verdict=拒绝并如实报 FAIL。
     （**不假装 PASS**：拒绝本身是协议面结论，与 bash 的判据不同形，但明确写出原因）。
     """
     ok, why = repo_trust.trust_status(str(root))

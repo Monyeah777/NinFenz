@@ -179,11 +179,13 @@
     "test_mcp_trust_meta": 0.8,
     "test_mcp_write_freedom": 3.3,
     "test_md_tables": 0.2,
+    "test_meta_cockpit": 2.2,
     "test_missing_sentinel": 0.2,
     "test_modeling": 0.6,
     "test_module_lifecycle": 0.2,
     "test_module_namespace": 2.2,
     "test_mvu_adapter": 0.7,
+    "test_publish_boundary": 0.2,
     "test_net_coverage": 0.1,
     "test_new_faces": 1.1,
     "test_nf_cli": 9.1,
@@ -3667,5 +3669,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1251.3
+  "total_s": 1253.7
 }

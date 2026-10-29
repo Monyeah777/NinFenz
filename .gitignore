@@ -32,6 +32,9 @@ id_ed25519*
 .rivet/
 .rivet.md
 
+# 整改期隔离快照（origin/main 的只读基线副本；不入库）
+.worktrees/
+
 # 判据缓存（C1，2026-10-22）：默认落**用户级**缓存（~/.cache/ninfenz/<repo-hash>/ 或
 # %LOCALAPPDATA%）；仅当用户缓存目录不可写时回退仓内 `.nf-cache/` 并 WARN——回退面也必须
 # 被忽略，否则 `git add -A` 会把缓存件（可能被预置伪造）提交进产品仓。

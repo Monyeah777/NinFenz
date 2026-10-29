@@ -9,9 +9,12 @@
   "items": [
     {
       "id": "purity",
-      "issues": 0,
+      "issues": 2,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [],
+      "sample": [
+        "daemon.py:310 raise 消息缺修复指引：JSON 嵌套过深",
+        "daemon.py:286 raise 消息缺修复指引：JSON 嵌套超过上限 "
+      ],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -29,10 +32,10 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 67,
+        "raises": 90,
         "sinks": 20
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -297,9 +300,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 27,
-        "root": "ce1f869039442319109ea3237cfb3799bfe0e0d830b0e6693ba4cc8e9369188c",
-        "verdict": "conformant"
+        "passed": 25,
+        "root": "c35dce30830ac203db886fb79706ff727831595c37e7e360574b8f83a3fc371d",
+        "verdict": "non-conformant"
       },
       "status": "pass",
       "warns": 0
@@ -313,7 +316,7 @@
       "stats": {
         "audits": 57,
         "legacy": 11,
-        "subjects_ok": 389,
+        "subjects_ok": 388,
         "with_header": 46
       },
       "status": "warn",
@@ -386,8 +389,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 231,
-        "probed": 231
+        "patterns": 230,
+        "probed": 230
       },
       "status": "pass",
       "warns": 0
@@ -429,7 +432,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
+        "metrics_drift": 2,
         "metrics_missing": 0,
         "metrics_recorded": 257,
         "modules": 257,
@@ -525,7 +528,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3863,
+        "files": 3846,
         "kernel": 2004,
         "kernel_no_self": 309,
         "rules": 9,
@@ -537,12 +540,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "3365b3965d30d5cda97bb4d245bd89c052bb91762d96a8106928560d7f91ae94",
+  "root_digest": "533df601ed430478452ebf3f5cc49a48429575b70a2b20c0c9b1374036cf7422",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

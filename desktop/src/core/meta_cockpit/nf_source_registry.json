@@ -1,0 +1,14 @@
+{
+  "schema": "nf/source-registry/1",
+  "sources": [
+    {"id": "P03", "kind": "content-fixture", "path": "docs/完整版样本_西幻生存流P03.md"},
+    {"id": "NF-1", "kind": "library-module", "path": "library/NF-1.md"},
+    {"id": "techdoc", "kind": "technical-fixture", "path": "docs/examples/state-front/techdoc_front.md"},
+    {"id": "M00", "kind": "engine-module", "path": "04_模块库/通用类/M00_数据槽总线.md"},
+    {"id": "M04", "kind": "fixture-mapping", "path": "docs/完整版样本_西幻生存流P03.md"},
+    {"id": "M10", "kind": "method-module", "path": "04_模块库/通用类/M10_节拍推进.md"},
+    {"id": "M11", "kind": "fixture-mapping", "path": "docs/完整版样本_西幻生存流P03.md"},
+    {"id": "M12", "kind": "method-module", "path": "04_模块库/事件类/M12_模板检索库.md"},
+    {"id": "M80", "kind": "method-module", "path": "04_模块库/通用类/M80_输出质检门.md"}
+  ]
+}

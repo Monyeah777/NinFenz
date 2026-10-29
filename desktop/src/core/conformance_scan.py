@@ -435,7 +435,7 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
 
     - `**` 消费**零或多层目录**，且不进入符号链接目录（与 pathlib 的 `_RecursiveWildcardSelector` 同）；
     - `*` / `?` 不跨 `/`；**含点文件**（pathlib 的 glob 不隐藏点文件，这里也不）；
-    - 末段只收**文件**（pathlib 的 glob 末段用 `is_file()`，跟随符号链接——这里同样跟随）。
+    - 末段只收**真实文件**；符号链接一律不收——遍历器不得把本机任意文件带进仓库语料。
 
     为什么不用 `Path.glob`：它的 `**` 逐层重入，实测本仓 `community/*/outputs/**/*`（1156 件）
     要 236 ms，而 `os.scandir` 单遍约 90 ms——指纹每次只读调用都要按输入面枚举一遍。
@@ -463,7 +463,7 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
                 continue
             try:
                 if last:
-                    if entry.is_file():
+                    if entry.is_file() and not entry.is_symlink():
                         out.append(rel + entry.name)
                 elif entry.is_dir():
                     match(entry.path, rel + entry.name + "/", i + 1)
@@ -497,7 +497,8 @@ def iter_files(root, pattern: str) -> List[str]:
     else:
         base = Path(root)
         got = tuple(sorted(p.relative_to(base).as_posix()
-                           for p in base.glob(str(pattern)) if p.is_file()))
+                           for p in base.glob(str(pattern))
+                           if p.is_file() and not p.is_symlink()))
     if _PAT_MEMO is not None:
         _PAT_MEMO[key] = got
     return list(got)
@@ -561,7 +562,7 @@ def tree_files(root, rel_dir: str = "") -> List[str]:
                 if entry.is_dir():
                     if not entry.is_symlink():
                         walk(entry.path, rel + entry.name + "/")
-                elif entry.is_file():
+                elif entry.is_file() and not entry.is_symlink():
                     out.append(rel + entry.name)
             except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
                 continue

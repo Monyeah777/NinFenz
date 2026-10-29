@@ -8,6 +8,8 @@
 
 ## 审计与收口
 
+- [docs_audit-95-meta-cockpit.md](audit/docs_audit-95-meta-cockpit.md)（元认知生产驾驶舱主仓融合）
+- [meta-cockpit-manifest.json](meta-cockpit-manifest.json)（运行时代码/契约/协议统一摘要清单）
 - [docs_audit-58-pending-items.md](audit/docs_audit-58-pending-items.md)（六条挂账收口 + 出口/会话面外部核验）
 - [docs_audit-57-external-protocols.md](audit/docs_audit-57-external-protocols.md) · [interop-schema-validation.md](interop-schema-validation.md)（外部权威校验取证）
 
@@ -28,6 +30,7 @@
 ## 正式协议与实现
 
 - [01_核心协议.md](../01_核心协议.md) · [02_联动注册表.md](../02_联动注册表.md) · [06_Agent执行协议.md](../06_Agent执行协议.md) · [07_官方核心出厂与社区预设导航.md](../07_官方核心出厂与社区预设导航.md)
+- [docs/meta-cockpit/README.md](../docs/meta-cockpit/README.md)（元认知生产驾驶舱入口）
 - [protocol/schema](../protocol/schema) · [protocol/generated](../protocol/generated)
 - [desktop/src/core](../desktop/src/core) · [scripts](../scripts)
 

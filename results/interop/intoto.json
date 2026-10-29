@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 72,
+    "count": 67,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "93ea375d58ce16561d269c44fef3557a94b89e19c07c727bdb25d5894e8f6180",
+    "root": "f257fb2d42244401df67724fe883e8b96d932322d79da42298e9b97b609bd657",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "21583746f95a2be7804c26d530f04e90a956a4d3dcb857a2197d3e20c1548222"
+        "sha256": "d40e49b1321d4dcfde29887c59d9acbb0b0d661ed5ceaa4df2b399f94f039d7a"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,13 +137,13 @@
     },
     {
       "digest": {
-        "sha256": "4a8f31a9b28ba2ba7861c5494dbd721a717067fd36af0b4db81b1816807f29f6"
+        "sha256": "f8c00c7ef018c35869be25c061e288089778e74919722d51c865840b53108abd"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "786bb8ac604ed2878a89f9f38b249cc3a46619d608ba05567057bd5dd5f81e4a"
+        "sha256": "748fd843d1529ed5186dc5f372bcf49d52e00a383778d262291fc7aff3b6d8ad"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -269,7 +269,7 @@
     },
     {
       "digest": {
-        "sha256": "c3a2729f1bd877423ffbe0660fbaff419390a6ddbee1c6fb8ba36db999102956"
+        "sha256": "55c242222fa3e82ded6cbff46ab3430cb54c4a26108f187af4e67dfe75bbcc8e"
       },
       "name": "decisions/INDEX.md"
     },
@@ -293,7 +293,7 @@
     },
     {
       "digest": {
-        "sha256": "4561ddb5a221f8fc5beca4cfcca07580b3ea4dd403eb23434549a8eaa8409a60"
+        "sha256": "4ae1908e5add66459f9fa90f882aed2498c8c47d1ceb0fa5b9cb6e7f0a0090f2"
       },
       "name": "protocol/glossary.json"
     },
@@ -389,57 +389,27 @@
     },
     {
       "digest": {
-        "sha256": "4a14f0d1bcbb90f18d9472643cdde27bdb3ca286a80fbc33a9b9f13d328af12b"
+        "sha256": "353480fa44af3cd855767cf46f7c0c0da13460afc145a3ae4856909acf78afc2"
       },
-      "name": "decisions/ADR-0001-双源知识层落位.md"
+      "name": "decisions/ADR-0000-决策记录外置到私有仓.md"
     },
     {
       "digest": {
-        "sha256": "88f7627421970fb55cbb83a2ba31dff2cb6d0e7ed24139637976263427100cfe"
+        "sha256": "f71574dd81858e9713fdb4f5f6911adc84eb1f868a148446fce5f0d708f7a5d3"
       },
-      "name": "decisions/ADR-0002-门禁不注水.md"
+      "name": "decisions/ADR-9000-示例-决策格式模板.md"
     },
     {
       "digest": {
-        "sha256": "43ff7428a28389ce1cca04e98bf2aba3109da23ec7511ce49a937e36399f9f4f"
+        "sha256": "715d04a1ac00abee6b5714d7d4de8c29438ef320d83a77e765b39cee43f92834"
       },
-      "name": "decisions/ADR-0003-断言表封闭集.md"
+      "name": "decisions/ADR-9001-示例-证据必须可解析.md"
     },
     {
       "digest": {
-        "sha256": "3b6c3e41b67b3b7684125160e8cdd16ad84b1a1808f2ef584246af2075d06196"
+        "sha256": "83a0a22c05139c2d5da6ad5464dcd0909beff4c872c16853aeee6963379790bd"
       },
-      "name": "decisions/ADR-0004-抽象阶梯两轴与纵切.md"
-    },
-    {
-      "digest": {
-        "sha256": "e9c7a1627e7e07b80b3523ae4d5c90e4834d8be761ef3e47029787e9398fb762"
-      },
-      "name": "decisions/ADR-0005-新增NET引擎线.md"
-    },
-    {
-      "digest": {
-        "sha256": "cd584d998092826f5bf58148b47854a56f029f51632c3075ad048dc178f62e85"
-      },
-      "name": "decisions/ADR-0006-职能坐标与核内逐件定位.md"
-    },
-    {
-      "digest": {
-        "sha256": "33521d14565dc9b755f32ea11153842e961eb415fe3652d4f518aafe6c38770e"
-      },
-      "name": "decisions/ADR-0007-计划内容不进产品仓.md"
-    },
-    {
-      "digest": {
-        "sha256": "c2324bb89dc48b99d6bc187162f4f0f3ba537799ff61a9249564095b8944a10f"
-      },
-      "name": "decisions/ADR-0008-外部一致性运行器边界.md"
-    },
-    {
-      "digest": {
-        "sha256": "d0e71160c3b515d6d43ab73058e273006c9c0ff7c5128c2100da39067b36cfc1"
-      },
-      "name": "postmortems/PO-0001-冻结顺序事故.md"
+      "name": "postmortems/PO-9000-示例-复盘模板.md"
     }
   ]
 }

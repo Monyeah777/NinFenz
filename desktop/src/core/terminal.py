@@ -298,9 +298,9 @@ FAMILIES: tuple[dict[str, Any], ...] = (
      "summary": "第一次进 NF：体检、一键演示、自述数字、抽象阶梯",
      "commands": ("doctor", "demo", "stats", "layers")},
     {"id": "forge", "name": "装配与生产",
-     "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"
-         "写、入库登记",
-     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import")},
+     "summary": "从需求到产物：装配、全链管道、渲染、登记、元认知驾驶与离线盲评",
+     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import",
+                  "cockpit", "cockpit-ab")},
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",

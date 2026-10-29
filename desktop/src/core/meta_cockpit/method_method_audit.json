@@ -1,0 +1,29 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M32",
+  "name": "方法审计",
+  "category": "认知",
+  "layer": "P32",
+  "meta_level": "M2",
+  "meta_function": "evaluation",
+  "operates_on": ["方法计划", "节点判据结果"],
+  "atoms": ["e.audit", "m.check", "e.adjudicate"],
+  "inputs": [{"token": "节点判据结果", "kind": "array"},
+             {"token": "方法计划", "kind": "object"}],
+  "outputs": [{"token": "方法审计", "kind": "object"}],
+  "cost_class": "heuristic",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "元控制",
+  "context_budget": {"input": "2x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": ["未执行节点"], "summarize": []},
+  "criteria": [
+    {"dimension": "audit_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0},
+    {"dimension": "verdict_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "criterion_policy.json"}],
+  "conformance": "L2"
+}

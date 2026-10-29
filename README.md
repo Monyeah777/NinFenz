@@ -88,10 +88,10 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 6. `python scripts/nf.py completion bash`
 
 > **安全边界（`nf verify` 会执行目标仓库自带的门禁脚本）**：`nf verify` 的引擎会在**本进程内**
-> 执行当前仓库 `verify.sh` 里的内嵌 Python（CWE-94 执行面）。故它默认只信任 `origin` owner 在
-> 白名单里的仓库（本仓 `Monyeah777`）；在**外来/不可信仓库**里默认**拒绝执行**（退出码 2 并给
-> 修复指引），确需执行须显式 `nf verify --trust-repo`（风险自担）；自建镜像/fork CI 用
-> `NF_TRUST_OWNERS` 追加允许 owner。只读体检请用 `bash verify.sh`，或先人工审阅该仓库的
+> 执行当前仓库 `verify.sh` 里的内嵌 Python（CWE-94 执行面）。故只有**当前运行代码所在的
+> 安装根**自动可信；外部仓库即使伪造官方 `origin` 也默认**拒绝执行**（退出码 2 并给修复
+> 指引）。确需执行须显式 `nf verify --trust-repo`（风险自担）；fork/镜像可用
+> `NF_TRUST_OWNERS` 显式 opt-in。只读体检请用 `bash verify.sh`，或先人工审阅该仓库的
 > `verify.sh`。详见 [SECURITY.md](SECURITY.md)。
 
 AI 装配：

@@ -83,6 +83,14 @@ _DECODE_ERROR = object()
 MAX_MESSAGE_BYTES = 8 * 1024 * 1024
 #: 超长消息的哨兵值（与解码失败分开：两者语义不同，错误码也不同）。
 _TOO_LONG = object()
+#: 静态快照文件上限（32 MiB）：快照在启动时整体解析，不能让本地坏件无界占内存。
+MAX_SNAPSHOT_BYTES = 32 << 20
+#: 资源 URI 上限（字符）：别名归一需对每个登记项 unquote，不允许超长串放大 CPU。
+MAX_URI_CHARS = 4096
+#: 单条出站消息上限（16 MiB）：超限时回稳定错误帧，不把巨型结果继续写到管道。
+MAX_RESPONSE_MESSAGE_BYTES = 16 << 20
+#: 快照单资源正文上限（8 MiB）：快照整体虽已限 32 MiB，也不能让单个 body 撑爆一条响应。
+MAX_SNAPSHOT_RESOURCE_TEXT_BYTES = 8 << 20
 
 
 def _iter_lines(stream: TextIO):
@@ -170,6 +178,22 @@ def encode_message(msg: Optional[dict]) -> Optional[str]:
     for ch, esc in LINE_BOUNDARY_TRAPS.items():
         text = text.replace(ch, esc)
     return text + "\n"
+
+
+def _write_response(stdout: TextIO, resp: dict | None) -> None:
+    if resp is None:
+        return
+    line = encode_message(resp) or ""
+    if len(line.encode()) > MAX_RESPONSE_MESSAGE_BYTES:
+        rid = resp.get("id")
+        line = encode_message(_err_at(
+            INTERNAL_ERROR,
+            f"响应超过上限 {MAX_RESPONSE_MESSAGE_BYTES} 字节"
+            "（修复指引：收窄查询范围或改用分页接口）",
+            rid if _valid_request_id(rid) else None,
+        )) or ""
+    stdout.write(line)
+    stdout.flush()
 
 
 def is_single_line_message(line: str) -> bool:
@@ -1033,7 +1057,7 @@ def _tool_library_read(entry_id: str) -> dict:
     if e is not None:
         text = e.get("text")
         if not isinstance(text, str):
-            text = (root / e["path"]).read_text(encoding="utf-8")
+            text = repo_index.read_text(root, e["path"])
         return {"found": True, "id": e["id"], "path": e["path"],
                 "status": str(e["fm"].get("status") or "active"),
                 "frontmatter": e["fm"],
@@ -1118,7 +1142,7 @@ def _tool_pipeline_read(pipeline: str) -> dict:
             if not allowed:
                 raise ValueError("管线路径越界：只读 03_管线库 与 community/*/pipelines"
                                  "（修复指引：路径须指向仓库内管线件，如 03_管线库/P90….md）")
-            text = path.read_text(encoding="utf-8")
+            text = repo_index.read_text(root, req)
             return {"found": True, "path": req, "bytes": len(text.encode("utf-8")),
                     "text": text}
     hit = repo_index.get(root).pipeline(req)
@@ -1145,7 +1169,12 @@ def _tool_asset_get(key: str, package: str = "") -> dict:
                          "（修复指引：用包内资产键表登记的键名重试）" % key)
     out = []
     for h in hits:
-        text = (root / h["rel"]).read_text(encoding="utf-8")
+        try:
+            text = repo_index.read_text(root, h["rel"])
+        except ValueError as exc:
+            raise ValueError(
+                f"资产路径越出仓库根：{h['rel']}（修复指引：重新生成资产索引）"
+            ) from exc
         out.append({"package": h["package"], "file": h["file"],
                     "bytes": len(text.encode("utf-8")), "text": text})
     return {"key": req, "matches": out}
@@ -1229,7 +1258,11 @@ def _repo_uri_source(uri: str) -> str:
 
 def _repo_read_uri(uri: str) -> str:
     """nf://repo/<kind>/… → 仓库正文（只读）。未知结构抛 KeyError → 调用方转白名单拒绝。"""
-    return (_repo_root() / _repo_uri_source(uri)).read_text(encoding="utf-8")
+    rel = _repo_uri_source(uri)
+    try:
+        return repo_index.read_text(_repo_root(), rel)
+    except ValueError as exc:
+        raise UnknownUriError(uri) from exc
 
 
 def _repo_resource_templates() -> list:
@@ -1548,6 +1581,8 @@ class McpRuntime:
         if issue:
             raise ValueError(issue)
         uri = params.get("uri") if isinstance(params, dict) else None
+        if not isinstance(uri, str) or len(uri) > MAX_URI_CHARS:
+            raise UnknownUriError(uri)
         # 快照资源读取不应为了命中一个普通 uri 而先构建全仓索引。只有仓库 URI
         # 才进入实时白名单与别名归一；其余直接走构造期已装载的快照表。
         repo_meta: Dict[str, Dict[str, Any]] = {}
@@ -1574,13 +1609,16 @@ class McpRuntime:
                     rel = _repo_uri_source(uri)
                 except (KeyError, OSError):
                     raise UnknownUriError(uri) from None
-            text = (_repo_root() / rel).read_text(encoding="utf-8")
+            try:
+                text = repo_index.read_text(_repo_root(), rel)
+            except (ValueError, OSError) as exc:
+                raise UnknownUriError(uri) from exc
             item: Dict[str, Any] = {"uri": uri, "mimeType": "text/markdown", "text": text}
             note = _trust_note([rel], [text])                # 外来面 → 带信任标注
             if note:
                 item["_meta"] = note
             return {"contents": [item]}
-        if not isinstance(uri, str) or uri not in self._text:
+        if uri not in self._text:
             # C2 白名单：未知 uri 拒绝（schema 无 not-found 码，参数级拒绝）
             raise UnknownUriError(uri)
         item = {
@@ -1710,8 +1748,7 @@ class McpRuntime:
                     # 不这么做的话，客户端只要不发换行就能把整条流灌进内存（实测 20 MB 照收）。
                     out = _err(INVALID_REQUEST, "消息超上限（> %d 字节；修复指引：一条消息一行、"
                                                 "UTF-8，把大载荷拆成多次调用）" % MAX_MESSAGE_BYTES)
-                    stdout.write(encode_message(out) or "")
-                    stdout.flush()
+                    _write_response(stdout, out)
                     continue
                 if line is _DECODE_ERROR:
                     # 传输层解码失败：按 JSON-RPC 语义回 **-32700 Parse error** 并继续服务。
@@ -1719,8 +1756,7 @@ class McpRuntime:
                     # 退出（实测 rc=1）——任一条畸形帧即可打死整个会话（agent 密集调用面）。
                     out = _err(PARSE_ERROR, "Parse error（非法 UTF-8 字节；"
                                             "修复指引：stdio 消息须为 UTF-8 编码）")
-                    stdout.write(encode_message(out) or "")
-                    stdout.flush()
+                    _write_response(stdout, out)
                     continue
                 line = line.strip()
                 if not line:
@@ -1731,8 +1767,7 @@ class McpRuntime:
                 except ValueError as exc:
                     # 解析失败与 NaN/±Infinity 都归 -32700（RFC 8259 §6 只许有限数）
                     out = _err(PARSE_ERROR, "Parse error（%s；修复指引：JSON 只许有限数值）" % exc)
-                    stdout.write(encode_message(out) or "")
-                    stdout.flush()
+                    _write_response(stdout, out)
                     continue
                 try:
                     resp = self.handle(msg)
@@ -1745,9 +1780,7 @@ class McpRuntime:
                     print(f"mcp_runtime: handle() 内部异常：{type(exc).__name__}: {exc}",
                           file=sys.stderr)
                     resp = _err_at(INTERNAL_ERROR, "Internal error", _echoable_id(msg))
-                if resp is not None:
-                    stdout.write(encode_message(resp) or "")
-                    stdout.flush()
+                _write_response(stdout, resp)
         except KeyboardInterrupt:
             # Ctrl+C：会话正常终止——静默退出，不打印 traceback
             return 130
@@ -1770,8 +1803,13 @@ def load_snapshot(path: str) -> Dict[str, Any]:
     """
     p = Path(path)
     try:
+        with p.open("rb") as fh:
+            raw = fh.read(MAX_SNAPSHOT_BYTES + 1)
+        if len(raw) > MAX_SNAPSHOT_BYTES:
+            raise ValueError(f"快照超过上限 {MAX_SNAPSHOT_BYTES} 字节"
+                             "（修复指引：删除未使用资源后重新导出）")
         # 用单一实现（N11）：顶层形状在下方就地判；这里只要「合法 JSON 才回」。
-        data = json_doc.loads(p.read_text(encoding="utf-8"), None, what=path)
+        data = json_doc.loads(raw.decode("utf-8"), None, what=path)
     except OSError:
         raise
     except ValueError as exc:
@@ -1789,7 +1827,16 @@ def load_snapshot(path: str) -> Dict[str, Any]:
         raise ValueError("快照的 mcp.resources 须为列表（修复指引：同上）")
     for idx, item in enumerate(resources, 1):
         if not isinstance(item, dict) or not str(item.get("uri") or "").strip():
-            raise ValueError("快照第 %d 条 resource 缺 uri 或不是对象（修复指引：同上）" % idx)
+            raise ValueError(f"快照第 {idx} 条 resource 缺 uri 或不是对象（修复指引：同上）")
+        text = item.get("text")
+        if text is not None:
+            if not isinstance(text, str):
+                raise ValueError(f"快照第 {idx} 条 resource.text 须为字符串（修复指引：同上）")
+            if len(text.encode()) > MAX_SNAPSHOT_RESOURCE_TEXT_BYTES:
+                raise ValueError(
+                    f"快照第 {idx} 条 resource.text 超过上限 "
+                    f"{MAX_SNAPSHOT_RESOURCE_TEXT_BYTES} 字节（修复指引：拆分资源）"
+                )
     return data
 
 

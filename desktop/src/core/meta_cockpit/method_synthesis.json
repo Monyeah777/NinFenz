@@ -1,0 +1,33 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M13",
+  "name": "归纳",
+  "category": "认知",
+  "layer": "P14",
+  "meta_level": "M1",
+  "meta_function": "integration",
+  "operates_on": ["comparison_matrix"],
+  "atoms": ["k.abstract", "i.merge", "i.reconcile", "e.adjudicate"],
+  "applies_when": "已有对比矩阵，需要收束成断言",
+  "inputs": [{"token": "comparison_matrix", "kind": "object"}],
+  "outputs": [{"token": "claims", "kind": "array"}],
+  "cost_class": "single_llm",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "横向链",
+  "context_budget": {"input": "3x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": ["未被引用的格子"], "summarize": []},
+  "criteria": [
+    {"dimension": "claim_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.333, "max_missing": 0},
+    {"dimension": "synthesis_evidence", "primitive": "evidence_anchor",
+     "unit": "ratio", "threshold": 1.0, "granularity": 0.333, "max_missing": 0},
+    {"dimension": "tradeoff_declared", "primitive": "disposition",
+     "unit": "ratio", "threshold": 1.0, "granularity": 0.333, "max_missing": 0},
+    {"dimension": "claim_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.333, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "desktop/src/core/meta_cockpit/chain_horizontal.py"}],
+  "conformance": "L2"
+}

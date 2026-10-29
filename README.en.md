@@ -95,11 +95,11 @@ Human (author/developer, 5 minutes):
 
 > **Security boundary (`nf verify` executes the target repository's own gate scripts)**: the engine
 > runs the embedded Python from the target repo's `verify.sh` **in-process** (CWE-94). It therefore
-> only trusts repositories whose `origin` owner is allowlisted (default: `Monyeah777`); on foreign or
-> untrusted repositories it **refuses by default** (exit 2 + remediation guidance) — pass
-> `nf verify --trust-repo` explicitly to override (at your own risk), and extend the allowlist with
-> `NF_TRUST_OWNERS` for forks/mirrors. For read-only checks use `bash verify.sh`. See
-> [SECURITY.md](SECURITY.md).
+> only trusts the installation root that contains the currently running code. A foreign repository
+> is **refused by default** (exit 2 + remediation guidance), even if it forges the official `origin`
+> — local remotes are not code-identity proof. Pass `nf verify --trust-repo` explicitly to override
+> (at your own risk), or opt in an owner with `NF_TRUST_OWNERS` for forks/mirrors. For read-only
+> checks use `bash verify.sh`. See [SECURITY.md](SECURITY.md).
 
 AI assembly:
 

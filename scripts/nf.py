@@ -37,8 +37,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
-from core import interp_diet  # noqa: E402 - 紧接路径设定；`-S` 下补回 site-packages（见其 docstring）
-from core import json_doc  # noqa: E402 - 承重件在 desktop/src，脚本须能独立运行
+from core import cli_bridge, interp_diet, json_doc  # noqa: E402 - 承重件在 desktop/src
 interp_diet.restore()
 
 NF_CLI_VERSION = "1.0.5"
@@ -89,8 +88,7 @@ def _make_parser() -> argparse.ArgumentParser:
                    help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
                         "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
                         "python）。NF_ENGINE 环境变量可作缺省。")
-    sub = p.add_subparsers(dest="cmd", required=False)
-
+    sub = cli_bridge.subparsers(p)
     st = sub.add_parser("stats",
  help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
                         description="出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁"
@@ -1319,7 +1317,7 @@ def _make_parser() -> argparse.ArgumentParser:
                           "合并按 check 号排序，输出与串行逐字节一致（实测 8 路 ≈3.2×）")
     vfy.add_argument("--trust-repo", dest="trust_repo", action="store_true",
                      help="显式信任目标仓库：允许引擎在**本进程内执行**其 verify.sh 内嵌代码"
-                          "（H1/CWE-94 面）。默认只信任 origin owner 在白名单的仓库；"
+                          "（H1/CWE-94 面）。默认只信任当前运行代码所在的安装根；"
                           "外来/不可信仓库不加本旗标一律拒绝执行（自担风险）")
 
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
@@ -6915,7 +6913,7 @@ def _cmd_verify(args) -> int:
 
     # H1（2026-10-22 安全审计）：nf verify 的 inproc/script 面会把目标仓库 verify.sh 的
     # heredoc Python 当本机进程代码执行（CWE-94）。信任门在**执行之前**判：不可信仓库
-    # （origin owner 不在白名单）默认拒绝，需显式 --trust-repo 自担风险。
+    # （外部仓库默认不可信，伪造 origin 也不放行），需显式 --trust-repo 自担风险。
     if getattr(args, "trust_repo", False):
         print("WARN: --trust-repo 已启用：将执行目标仓库自带的门禁脚本（含内嵌 Python，"
               "CWE-94 面），风险自担", file=sys.stderr)
@@ -7235,9 +7233,8 @@ def _cmd_stats(args) -> int:
 
 
 def _cmd_nfal(args) -> int:
-    """nf nfal：透传到 core.nfal_cli（guard 表达式的解析/检查/编译/求值）。"""
-    from core import nfal_cli
-    return nfal_cli.main(list(getattr(args, "nfal_args", []) or []))
+    """Dispatch optional command families kept outside the main CLI body."""
+    return cli_bridge.run(args)
 
 
 def _rust_engine_argv(args) -> Optional[list]:
@@ -7492,7 +7489,7 @@ def main(argv=None) -> int:
             # （实测输出「== nf audit（26 件）==」），已重命名为 _cmd_design_audit 修正。
             return _cmd_design_audit(args)
         return _cmd_design(args)
-    if args.cmd == "nfal":
+    if args.cmd in ("nfal", "cockpit", "cockpit-ab"):
         return _cmd_nfal(args)
     if args.cmd != "run":
         _build_parser().print_help()
