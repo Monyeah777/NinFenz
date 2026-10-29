@@ -14,6 +14,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = str(Path(__file__).resolve().parents[2])
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -101,14 +102,29 @@ class ResponseCacheTest(unittest.TestCase):
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
         dm.set_watcher(_FakeWatcher(generation=11))
-        first = dm.execute(["verify", "--json"], Path(ROOT))     # 首跑（可能触发嵌套会话）
-        dm.set_watcher(_FakeWatcher(generation=11))              # 会话收尾后重新挂上同代际
-        second = dm.execute(["verify", "--json"], Path(ROOT))
+
+        class _Cli:
+            calls = 0
+
+            def guarded_main(self, argv):
+                self.calls += 1
+                print('{"ok": true}')
+                return 0
+
+        cli = _Cli()
+        with (mock.patch.object(dm, "_sync_code", lambda root: None),
+              mock.patch.object(dm, "_load_cli", lambda root: cli)):
+            first = dm.execute(["verify", "--json"], Path(ROOT))
+            second = dm.execute(["verify", "--json"], Path(ROOT))
         self.assertEqual(first, second, "同树两次响应必须逐字段相同（纯函数前提）")
         self.assertEqual(1, dm.cache_stats()["hits"], "同代际第二跑必须命中缓存")
+        self.assertEqual(1, cli.calls, "第二次必须由缓存回放，不得重新执行 CLI")
         dm.set_watcher(_FakeWatcher(generation=12))              # 树变了
-        third = dm.execute(["verify", "--json"], Path(ROOT))
+        with (mock.patch.object(dm, "_sync_code", lambda root: None),
+              mock.patch.object(dm, "_load_cli", lambda root: cli)):
+            third = dm.execute(["verify", "--json"], Path(ROOT))
         self.assertEqual(first, third)
+        self.assertEqual(2, cli.calls, "代际变化后必须重新执行 CLI")
         self.assertEqual(1, dm.cache_stats()["hits"], "树变了必须重算（不得回放旧判定）")
 
     def test_nested_session_release_keeps_the_outer_watcher(self):
@@ -254,6 +270,8 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
         self._old_home = os.environ.get("NARRATIVE_FORGE_HOME")
         os.environ["NARRATIVE_FORGE_HOME"] = self.home
         self.port = None
+        self.watch_root = None
+        self.isolated_watcher = None
 
         def ready(port):
             self.port = port
@@ -267,16 +285,31 @@ class WatchDaemonIntegrationTest(unittest.TestCase):
                 break
             time.sleep(0.01)
         self.assertIsNotNone(self.port, "进程内服务未能就绪")
+        # 外部分片会同时修改同一真实仓库；换成独立空目录的 watcher，既保留 healthy
+        # 与 response-cache 的完整语义，又避免无关写入推进代际造成偶发 miss。
+        repo_watcher = dm._WATCHER
+        self.assertIsNotNone(repo_watcher, "带 --watch 的守护必须安装目录监听")
+        repo_watcher.stop()
+        self.watch_root = tempfile.mkdtemp(prefix="nf_watch_tree_")
+        self.isolated_watcher = watch.DirWatcher(self.watch_root)
+        self.assertTrue(self.isolated_watcher.start(), "隔离目录监听未能启动")
+        dm.set_watcher(self.isolated_watcher)
+        dm.reset_response_cache()
+        dm.reset_cache_stats()
 
     def tearDown(self):
         dm.stop()
         self.thread.join(timeout=5)
+        if self.isolated_watcher is not None:
+            self.isolated_watcher.stop()
         if self._old_home is None:
             os.environ.pop("NARRATIVE_FORGE_HOME", None)
         else:
             os.environ["NARRATIVE_FORGE_HOME"] = self._old_home
         import shutil
         shutil.rmtree(self.home, ignore_errors=True)
+        if self.watch_root:
+            shutil.rmtree(self.watch_root, ignore_errors=True)
 
     def _call(self, argv):
         doc = dm.read_state()

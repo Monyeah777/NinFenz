@@ -39,6 +39,7 @@ jobs:
         env:
           NF_VERIFY_TMP: .nf-logs
         run: |
+          python3 scripts/ssdf_policy.py
           set -o pipefail
           python3 scripts/nf.py release 2>&1 | tee release-gate.log
       - name: 端到端显式步（与 nf release 内嵌同源；失败即红，便于定位）

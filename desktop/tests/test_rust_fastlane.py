@@ -69,8 +69,8 @@ COVERED_FACES = {
     "score": "按真源口径喂计数（4 个未移植扫描器各 0 issue）→ 与 nf score --json 文档相等",
     "schema-lint": "issues/stats 与 core.schema_lint.scan() 相等（核心层口径）",
     "schema-validate": "messages 与 core.schema_lint.subset_validate() 逐条相等",
-    "verify-report": "28 条判据聚合 + 声明面 + root_digest + 渲染逐字节相等"
-                     "（本线自算 20 条、其余 8 条喂子结果）",
+    "verify-report": "33 条判据聚合 + 声明面 + root_digest + 渲染逐字节相等"
+                     "（本线自算 26 条、其余 7 条喂子结果）",
     "conformance run": "与 `nf conformance --json` 逐字节相等（report + issues 信封；"
                        "27 条契约全量 + 在盘报告比对）",
     "serve": "常驻 worker 协议；oracle = desktop/tests/test_rust_engine.py"
@@ -512,7 +512,7 @@ class RustFastLaneParityTest(unittest.TestCase):
     def test_verify_report_face_matches_python_document(self):
         """verify-report 面：聚合/归一/摘要/渲染必须逐字节相等（含 `root_digest`）。
 
-        口径：本线自算 `schema` / `doc_markers` / `baseline` / `self_stats` / `payload` / `assets_ledger` / `instruction` / `key_naming` / `intake` / `library` / `library_projection` / `rating` / `audit` / `workflow_policy` / `judgement_coverage` / `license` / `coupling` / `contract` / `knowledge` / `conformance` **二十条**，其余 8 条由
+        口径：本线自算 26 条，其余 7 条由
         `--results` 喂入真源的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一增量法
         （每移植一个扫描器，喂入面小一格，内核不动）。
 
@@ -520,7 +520,7 @@ class RustFastLaneParityTest(unittest.TestCase):
         （`", "` / `": "`，**带空格**），既不是紧凑模式也不是 `indent=2`。差一个空格摘要就全变，
         而「摘要不同」这件事只有逐字节比对才抓得到。
 
-        **成本（如实记录）**：基准侧要跑 `vr.build`，而它会跑全部 28 个扫描器——单这条判据约
+        **成本（如实记录）**：基准侧要跑 `vr.build`，而它会跑全部 33 个扫描器——单这条判据约
         +14 s（整套从 ~6 s 到 ~20 s）。换来的是「门禁的机器可读出口」整篇逐字节受核，
         是全仓价值最高的一份产物；若嫌贵，可只在改 `engine/rust/src/verify_report.rs` 时跑。
         """

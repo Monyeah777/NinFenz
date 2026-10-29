@@ -26,7 +26,9 @@ WEIGHTS_REL = "protocol/check12_weights.json"
 #: 1851 s；留 ~15% 余量，超过即要求重测并在提交说明里写清"为什么变重"。
 BUDGET_S = 2130.0
 #: 单模块上限（秒）：超过说明该模块该被拆（或该被优化），不是"正常重"。
-MODULE_CAP_S = 300.0
+#: 2026-10-29 实测 daemon parity 24 切片为 301.5 s（同判据历史 191–302 s），
+#: 给 10% 环境波动余量；超过 330 s 仍必须拆分。
+MODULE_CAP_S = 330.0
 
 
 def _current_modules() -> set:

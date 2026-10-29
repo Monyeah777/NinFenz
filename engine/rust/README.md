@@ -152,15 +152,17 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 | `conformance` 封缄内核 + 差分核对 | **逐字节一致**；27 条契约 digest 独立复核 27/27 |
 | `conformance` 契约 | **27/27 全部**逐字节一致（含 `purity-clean`——随内置解析器一并移植） |
 | `score` 内核 | **逐字节一致**（含 compare 与退出码）；**5/6** 信号源自算 |
-| `verify_report` 内核 | **逐字节一致**（含 `root_digest`）；**22/28** 判据自算 |
+| `verify_report` 内核 | **逐字节一致**（含 `root_digest`）；**26/33** 判据自算 |
 
 ### 没做的那部分，每条都有实证
 
-- **需 Python AST**（不可做）：`purity-clean` · `purity` · `code_metrics` · `asset_contract`
-  （最后一条是整套控制流分析，不是"顺带用一下"）。
+- **需 Python AST 控制流分析**：`asset_contract`（不是"顺带用一下 AST"，而是整套数据流检查）。
 - **需本地日历日期**（不可做）：`perf_budget` · `instruction_evidence`。真源注释明写本地日期是
   **有意语义**；而本机 `windows-gnu` 取本地时区要经 raw-dylib crate，其 `dlltool` 垫片是坏的（实测）。
-- **需全量 27 契约实时重算**：`conformance_report`（本线 27/27）。
+- **以 Python 证据策略为真源**：`asvs` · `ssdf`；两者由严格 JSON 台账、代码常量对账和
+  fail-closed 策略共同决定，不在 Rust 快线复制第二套判据。
+- **其余非原生面**：`redos` · `role_coordinates`；边界与理由见真源扫描器及
+  `verify_report.rs` 的分派注释。
 - **可做但体量大（不是边界）**：`depth_clean` —— `quality_depth_scan` 聚合 13 个子扫描器，
   本线已移植 5 个，余 8 个共 **5,513 行**，且**全都无 AST/日期/子进程依赖**。
   这一类必须与"不可做"分开记，否则后人会把"没做"误读成"不可做"。
@@ -310,17 +312,14 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 
 ### 剩余面的边界理由（**逐条实证**，非断言）
 
-`nf verify-report` 有 28 条判据。下面这 6 条不做，**每条都有实测证据**——
-写在这里是为了让「为什么不移植」也可被复核，而不是一句"边界外"了事。
+`nf verify-report` 有 33 条判据。本线自算 26 条，以下 7 条由 Python 真源喂入：
 
-| 判据 | 挡住它的东西 | 实证 |
-|---|---|---|
-| `purity` | **Python AST** | `purity_scan.py` `import ast`，R1-R7 与 L1-L4 阶梯都建立在语法树与调用图之上 |
-| `code_metrics` | **Python AST** | `code_metrics.py` `import ast`，规模/复杂度按 `ast.walk` 统计 |
-| `asset_contract` | **Python AST**（且是**控制流分析**） | `asset_contract.py` 有 `_scan_block` / `_none_deref` / `_always_exits` / `_guard` / `_derefs` 等十余处 `ast.*`——不是"顺带用一下 AST"，而是整条判据就是一套数据流检查 |
-| `perf_budget` | **本地日历日期** | `_dt.date.today()`，且源码注释明写「本地日历日期是**有意语义**（UTC 会在跨零点给出错误「今天」）」——所以**不能**用 UTC 顶替 |
-| `instruction_evidence` | **本地日历日期** | 同上，`_age_days(stamp, _dt.date.today())` |
-| `conformance_report` | 需要**全量 27 契约的实时重算** | `verify_committed` 的判据是「在盘报告 == 实时重算」，而实时重算会跑**全套契约**（含 `purity` 等）——本线 27/27，缺的正是 `purity-clean` |
+`redos` / `instruction_evidence` / `perf_budget` / `asvs` / `ssdf` /
+`asset_contract` / `role_coordinates`。
+
+这些边界不是“以后再说”的占位：日期类判据保留本地日历语义；`asset_contract`
+需要 Python AST 控制流分析；`asvs` 与 `ssdf` 的证据门本身以 Python 策略和 JSON
+台账为真源。喂入面由 `tools/check_native_sync.py` 反推并与两处清单对账。
 
 **为什么"本地日历日期"是硬边界**：本机工具链是 `x86_64-pc-windows-gnu`，取本地时区要经
 `windows-sys` / `iana-time-zone` 一类 raw-dylib crate，而它们的 `dlltool` 垫片在本机是坏的
@@ -406,15 +405,16 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 两侧都已改正；改完后门禁从「32 PASS + 1 FAIL」变成「33 PASS + 0 FAIL」，且 false 侧现在真的受核。
 ### `verify_report` 内核（门禁的机器可读出口）
 
-真源把 **28 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
+真源把 **33 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
 逐条归一到 `(issues, warns, stats)` → 定 status → 汇总 counts + 声明面 → 主体规范化 sha256 作
 `root_digest` → 按 `indent=2, sort_keys=True` 渲染。本线已实现该内核，**逐字节一致含 `root_digest`**。
 
-**已自主算出 22/28 条**：`schema` / `doc_markers` / `baseline` / `self_stats` / `payload` /
+**已自主算出 26/33 条**：`schema` / `doc_markers` / `baseline` / `self_stats` / `payload` /
 `assets_ledger` / `instruction` / `key_naming` / `intake` / `library` / `library_projection` / `rating` /
-`audit` / `workflow_policy` / `judgement_coverage` / `license` / `coupling` / `contract` / `knowledge` /
-`conformance` / `receipts` / `drill_fidelity`。
-其余 6 条由 `--results` 喂入各自的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一增量法：
+`rating_decided` / `audit` / `workflow_policy` / `judgement_coverage` / `license` / `coupling` /
+`contract` / `knowledge` / `conformance` / `conformance_report` / `receipts` / `drill_fidelity` /
+`purity` / `code_metrics`。
+其余 7 条由 `--results` 喂入各自的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一增量法：
 **每移植一个扫描器，喂入面就小一格，内核不动。**
 
 `conformance_scan` 一次解锁**两处**：`verify_report` 的 `conformance` 判据 **与** `score` 的
@@ -666,9 +666,10 @@ double 上（如精确值 `153838026194641.125`）。CPython 取**正确舍入�
 - **写面不实现**：`receipts --write`、`stats --write`（重写 README/README.en/llms.txt 生成区与在仓机读件）一律不实现——真源仍是 Python 侧；
 - **执行层/交互层不提供**：`daemon` / `shell` / `terminal` / `lsp` / `serve` 一概不做；
 - **覆盖到什么程度**（2026-10-04 现值）：`receipts` / `stats` / `layers --verify` 三面完整；
-  `conformance` = 封缄内核 + **27/27 契约**（唯缺 `purity-clean`，需 Python AST）；
+  `conformance` = 封缄内核 + **27/27 契约**；
   `score` 内核完整、**5/6 信号源自算**（余 `purity_clean`·AST 与 `depth_clean`·13 子扫描器）；
-  `verify_report` 内核完整、**22/28 判据自算**（余 6 条：AST 3 条 · 本地日历日期 2 条 · 全量契约重算 1 条）；
+  `verify_report` 内核完整、**26/33 判据自算**（余 7 条：本地日历日期 2 条、Python 证据策略 2 条、
+  控制流分析 1 条、正则/职能边界 2 条）；
   `receipts` 的 library scope **已做**（`verify_report` 的 `receipts` 判据）。
 - **写面一律不实现**：`receipts --write`、`stats --write`、`layers --write`（刷新生成区）、以及 `conformance --write`。
 

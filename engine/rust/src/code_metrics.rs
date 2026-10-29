@@ -379,7 +379,9 @@ mod tests {
         std::fs::write(&atom, "x = 1\n").unwrap();
         std::fs::write(&cache, "y = 2\n").unwrap();
         let got = measure(&root);
-        assert!(got.iter().any(|(rel, _)| rel == "desktop/src/core/atoms/nested.py"));
+        assert!(got
+            .iter()
+            .any(|(rel, _)| rel == "desktop/src/core/atoms/nested.py"));
         assert!(!got.iter().any(|(rel, _)| rel.contains("__pycache__")));
     }
     // <<< GENERATED

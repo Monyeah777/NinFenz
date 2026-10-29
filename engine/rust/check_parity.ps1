@@ -418,7 +418,7 @@ if ($last.Count -eq 2 -and $last[1] -eq '0') {
     Write-Host ("  [FAIL] 差分不一致"); $script:Failed++
 }
 
-# ---- 面 12 · verify_report（32 条判据聚合 + 声明面 + root_digest + 渲染）
+# ---- 面 12 · verify_report（33 条判据聚合 + 声明面 + root_digest + 渲染）
 Write-Host '== 面 12 · verify_report 内核（聚合/归一/摘要/渲染） =='
 $vrResults = Join-Path $Parity 'vr_results.json'
 $vrPy = Join-Path $Parity 'vr_py.json'
