@@ -32,8 +32,15 @@ python scripts/nf.py conformance --write >/dev/null
 python scripts/nf.py approve protocol/conformance_report.json --by "$BY" --note "refreeze.sh" >/dev/null
 python scripts/nf.py receipts --scope protocol --write >/dev/null
 
-echo "== 4/4 验证报告与卡册 + 自检（必须全绿才算冻结完成）"
-python scripts/verify_report.py --write >/dev/null
+echo "== 4/4 卡册 → 验证报告 + 自检（顺序关键：报告必须最后写）"
+# 为什么 cards 要在 report 之前（2026-10-29 实测）：`build_verification_cards.py --write`
+# 会改写被报告统计的 `docs/verification-cards.md`；若它排在 report 之后，报告一落盘就过期，
+# 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
 python scripts/build_verification_cards.py --write >/dev/null
+python scripts/verify_report.py --write >/dev/null
 bash verify.sh --checks-only | tail -2
-echo "冻结完成。可提交；提交后再跑一次本脚本可验证幂等（不应产生任何 diff）。"
+# 自检必须包含"提交件 == 实时重算"的**执行侧**判据（只看 checks-only 会漏掉它们：
+# 这两条在 unittest 矩阵里，不在 42 条静态 check 里）。
+PYTHONIOENCODING=utf-8 python -m unittest discover -s desktop/tests -p "test_verify_report.py" >/dev/null
+PYTHONIOENCODING=utf-8 python -m unittest discover -s desktop/tests -p "test_role_model.py" >/dev/null
+echo "自检通过（checks-only + verify_report + role_model）。可提交。"
