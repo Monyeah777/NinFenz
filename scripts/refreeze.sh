@@ -8,12 +8,22 @@
 #   CI 的「提交件 == 实时重算」判据必然红，而本机当时也是红的，却容易被误判为"平台差异"。
 #   本脚本把顺序固定为：**分发物 → 站点数字 → 冻结链 → 自检**，任何人只要跑它就得到自洽的树。
 #
-# 用法：bash scripts/refreeze.sh [--by <审批人>]
+# 用法：
+#   bash scripts/refreeze.sh                # 重冻并落盘（提交前用）
+#   bash scripts/refreeze.sh --check        # **只校验**平台无关冻结面（干净检出重跑后必须零 diff）
+#   bash scripts/refreeze.sh --by <审批人>   # 指定审批人
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 BY="Monyeah777"
-if [ "${1:-}" = "--by" ] && [ -n "${2:-}" ]; then BY="$2"; fi
+CHECK_ONLY=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --check) CHECK_ONLY=1; shift ;;
+    --by) BY="${2:-Monyeah777}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
 
 echo "== 1/5 分发物 → 自述数字 → 站点数字（顺序：payload 清单先于 repo_stats，后者先于站点）"
 (cd packaging/npm && npm run stage -- --sync-readme >/dev/null)
