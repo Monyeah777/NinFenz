@@ -179,6 +179,9 @@ jobs:
     needs: [static-checks, unit-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write          # 绿跑自动关闭 red-alert 开的跟踪 issue
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -214,3 +217,58 @@ jobs:
           name: verification-report
           path: .artifacts/verification-report.json
           if-no-files-found: warn
+
+      - name: 绿跑 → 关闭自动跟踪 issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          num=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open                   --search "CI 红：main 门禁失败（自动跟踪） in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue close "$num" --repo "$GITHUB_REPOSITORY"               --comment "本次绿跑通过（${{ github.sha }}），自动关闭。"
+            echo "已关闭 issue #$num"
+          else
+            echo "无待关闭的跟踪 issue"
+          fi
+
+  # ---------------------------------------------------------------- MTTR 机制
+  # 为什么（2026-10-29 DORA 实测：MTTR 中位 1675 min）：main 红着没人接手是最大浪费。
+  # 门禁一红就**自动开/更新 issue**（同一标题只保留一个，新红直接补评论），
+  # 让"红 → 有人处理"的延迟从小时级降到分钟级；不消耗 runner（只在红时触发，无依赖安装）。
+  red-alert:
+    name: red-alert
+    needs: [static-checks, unit-tests]
+    if: failure()          # 只在 needs 有失败时跑（绿跑零成本）
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    concurrency:
+      group: nf-red-alert
+      cancel-in-progress: false
+    steps:
+      - name: 门禁红 → 开/更新 issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="CI 红：main 门禁失败（自动跟踪）"
+          body="main 门禁失败，需要人接手修复。
+
+          - 提交：\`$SHA\`
+          - 运行：$RUN_URL
+          - 判据：\`static-checks-42\` / \`gate\`（两者都是 required check）
+
+          修复后本 issue 由下一次绿跑自动关闭。"
+          num=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open                   --search "$title in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --repo "$GITHUB_REPOSITORY" --body "$body"
+            echo "已更新 issue #$num"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"
+            echo "已新建跟踪 issue"
+          fi
