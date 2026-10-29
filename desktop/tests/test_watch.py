@@ -95,6 +95,9 @@ class ResponseCacheTest(unittest.TestCase):
         是用户会反复跑的命令；响应缓存是它唯一的毫秒级路径（树未变时实测 **~0.1 s**）。
         这里同时守住：① 准入表内有 `verify`；② 同代际第二跑命中并逐字段等价；③ 代际一变必须重算。
         """
+        # 观测计数是**进程累计**：全量跑里前面的用例已用过响应缓存 ⇒ 先清零再按增量判，
+        # 否则绝对值断言在全量跑里假红（2026-10-29 实测）。
+        dm.reset_cache_stats()
         self.assertTrue(dm.cacheable(["verify"]), "nf verify 必须在准入表内")
         self.assertTrue(dm.cacheable(["verify", "--json"]), "机器面同样可缓存")
         dm.set_watcher(_FakeWatcher(generation=11))

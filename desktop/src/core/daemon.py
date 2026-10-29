@@ -529,6 +529,17 @@ def cache_stats() -> Dict[str, Any]:
             "resident": _csc.resident_stats()}
 
 
+def reset_cache_stats() -> None:
+    """清零响应缓存**观测计数**（不改缓存内容）。
+
+    为什么需要（2026-10-29 实测）：`test_watch` 的「同代际第二跑必须命中」用绝对值断言
+    `hits == 1`，而计数是**进程累计**语义——全量跑里前面的用例已用过响应缓存，起点不是 0，
+    于是全量跑假红、单模块跑必绿。用例要测"这次多了几次"就必须先清零。
+    """
+    for _k in list(_CACHE_STATS):
+        _CACHE_STATS[_k] = 0
+
+
 def reset_response_cache() -> None:
     """清空响应缓存（监听件报溢出/不可用时调用——宁可全废，不可错答）。"""
     _rc.clear()

@@ -271,7 +271,7 @@
       "max_fn_lines": 37
     },
     "desktop/src/core/daemon.py": {
-      "lines": 997,
+      "lines": 1008,
       "max_fn_cc": 17,
       "max_fn_lines": 77
     },
@@ -1641,9 +1641,9 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 737,
-      "max_fn_cc": 61,
-      "max_fn_lines": 252
+      "lines": 747,
+      "max_fn_cc": 63,
+      "max_fn_lines": 262
     },
     "scripts/workflow_policy.py": {
       "lines": 42,
