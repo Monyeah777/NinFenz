@@ -38,7 +38,7 @@ jobs:
     steps:
       # ubuntu-latest 自带 Python 3 与 Rust（rustup 预装）；.NET 8 SDK 亦在镜像内，
       # 故除 checkout 外**不引任何 action**——少一处需钉 SHA 的第三方依赖。
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4（与仓库既有 workflow 同钉法）
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v4（与仓库既有 workflow 同钉法）
         with:
           persist-credentials: false
       - name: 工具链就绪（python3 / rust / dotnet）
