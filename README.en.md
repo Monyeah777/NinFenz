@@ -147,7 +147,7 @@ AI assembly:
 
 ## Versions
 
-Install **`ninfenz` 1.1.1** from the official npm registry:
+Install **`ninfenz` 1.1.2** from the official npm registry:
 
 ```bash
 npm i -g ninfenz@latest --registry https://registry.npmjs.org   # avoid a stale mirror
@@ -160,7 +160,7 @@ Three independent version lines ship from the same repository:
 | Line | Current | What it governs |
 |---|---|---|
 | **Content & protocol** | **v2.30.0** | Templates, domain packs, specs — *what* can be generated |
-| **Command-line tool** | **1.1.1** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Command-line tool** | **1.1.2** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
 The current gate release is **v2.30.0**; per-release changes, evidence and notes live in

@@ -2,7 +2,7 @@
  "schema": "nf-deepening-gate-golden/1",
  "generated": "2026-09-27",
  "source": "verify.sh check35 内联 Python 原文（机械抽取后执行）",
- "snapshot": "NinFenz",
+ "snapshot": "Monyeah777-NinFenz-b924fbf",
  "digest_rule": "sha256(\"\\n\".join(stdout.splitlines()))[:32]  ← 与引擎 Result.LogDigest 同式",
  "cases": {
   "real": {
@@ -32,7 +32,7 @@
   },
   "synthetic_stale": {
    "python_exit": 1,
-   "digest32": "a9b539dadae79d2525a8c316c797c5a1",
+   "digest32": "ee9e2d557a1e2581dc147d0dbd2f98a9",
    "fails": 76,
    "last": "深化面统计：管线 0 条（advisory 0）· 回执 27 条 · 报告 non-conformant",
    "log": [
@@ -42,10 +42,10 @@
     "[FAIL] 馆藏回执：回执指向不存在的条目：NF-WORLDCAMPUS-Monyeah777-1",
     "[FAIL] 馆藏回执：回执条数 3 ≠ 馆藏条数 0",
     "[FAIL] 模块边界：缺模块边界基线 protocol/module_signatures.json（修复指引：nf module signature --write）",
-    "[FAIL] 一致性报告：报告过期或被改：root 记录=3a40a6a01a8ba89f 实测=6a8b3c170529077a（修复指引：nf conformance --write）",
+    "[FAIL] 一致性报告：报告过期或被改：root 记录=d26fd263c029a990 实测=6a8b3c170529077a（修复指引：nf conformance --write）",
     "[FAIL] 一致性报告：verdict 不一致：记录=partial 实测=non-conformant",
     "[FAIL] 一致性报告 verdict 非 conformant：non-conformant",
-    "[FAIL] 协议回执：协议回执根不一致：记录=9c94a4049a95dc4d 实测=d6dc9abb2dc32ca3（修复指引：nf receipts --scope protocol --write）",
+    "[FAIL] 协议回执：协议回执根不一致：记录=d943f4393200fd8a 实测=4ff6978be8e7b6ed（修复指引：nf receipts --scope protocol --write）",
     "[FAIL] 协议回执：文件内容已变：STRATEGY.md",
     "[FAIL] 协议回执：文件内容已变：01_核心协议.md",
     "[FAIL] 协议回执：文件内容已变：02_联动注册表.md",

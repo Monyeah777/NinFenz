@@ -13,12 +13,12 @@ subjects:
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:cc5a6d48dff1f8ba70e90c64ee46009ae22221bd5b30ea16eea2debae85bfcf4
   - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
-  - scripts/nf.py:77c76d314eaf18e6b22f8aa0fe9b6272e80239c06487c87e964dbddf5f040826
+  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
   - protocol/driver.json:d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093
-  - integrations/site/integration.json:dc865935698500b537929c3ff5564bf06451acaff7d39b077d92606314cafd4a
+  - integrations/site/integration.json:cbc540aa46fe44b061668c4ee1f07314ddb2568c8f04749b7f050479cc22ec75
   - integrations/site/strings.json:4d19bc7e32eb8bb9f7d368261c8bf464c02837ff828cbce364da4da229c4e59c
   - integrations/lsp/integration.json:2a0a752a3138db7bfd0d7c1c912c375f98e1eaf3fe783744ecb61a4d28e2a41e
   - integrations/lsp/strings.json:880d4cfd99a9c5ffe7c342af52f312f108d8c2e3455119dc538b77743fcb194b
@@ -26,6 +26,8 @@ subjects:
   - skills/ninfenz/references/commands.md:b62d73dfef22553dfc05c371e6725670b29201ae973e30fc7edca2bc3261b0bd
 
 ---
+> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-28）：默认并行度 10→14

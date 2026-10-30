@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.2 · 2026-10-30 · 发布事实同步与可选镜像降级
+
+- npm、MCP manifest、CLI、CodeMeta、HF Space 和 .NET doctor 统一到 `1.1.2`。
+- 官方公开分发渠道只承诺 npmjs.com；GitHub Packages 在未取得 `write_package` 时作为 best-effort 镜像，不得阻塞 npm 或 GitHub Release。
+- 删除机器事实中的易漂移文件数与解包体积，改由 npm Registry 作为权威来源。
+- 修复 Lighthouse 13 对 `robots.txt` 扩展指令的解析，保留 `Content-Signal` 注释供人和 AI 阅读。
+- 1.1.1 保留为历史版本；其 tarball 与当时源码快照一致，后续文档修复通过 1.1.2 正式发布。
+
 ## [未发布] · **License change（1.1.0 生效）** — 分层双许可
 
 > 生效于**下一个 minor 版本（1.1.0）**；v1.0.5 及更早版本仍为 MIT，且已分发副本的 MIT 权利永久有效。

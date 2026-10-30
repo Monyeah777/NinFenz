@@ -6,16 +6,18 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:268de0c2922c0f6c4cb85f30e2609b8936554edb295c915760451c23b4055e65
+  - CHANGELOG.md:bfb33daab8f564c1999af62e21c383e426b1c3903a462bf928243d1dd8c03700
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:08af2b63af7d13abd466dbfa8c884a104b457428a4f3ffc356113d2c9829260a
+  - README.md:6749c3cc8e2a9241534fc40b9be5ff160ea81525b30599b0c69d9385e391f9b3
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:e6840c08d2da65bc68809be8f3a0d89de451558f933cdc6b80f51b8659654ceb
-  - scripts/nf.py:77c76d314eaf18e6b22f8aa0fe9b6272e80239c06487c87e964dbddf5f040826
+  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
 
 ---
+> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+
 > 重审（2026-10-30）：2026-10-30: README 官方 npm 渠道说明与 GitHub Packages 非同步状态更新；重审对象变更，正文语义未改变。
 
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
