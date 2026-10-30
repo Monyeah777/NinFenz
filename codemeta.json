@@ -5,7 +5,7 @@
   "name": "NinFenz",
   "alternateName": "NF",
   "description": "NinFenz is a model-agnostic content contract layer for loadable, verifiable, and reproducible long-form content production.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "AGPL-3.0-only OR LicenseRef-Commercial",
   "codeRepository": "https://github.com/Monyeah777/NinFenz",
   "url": "https://ninfenz.dev/",

@@ -3,7 +3,7 @@
   "name": "io.github.Monyeah777/ninfenz",
   "title": "NinFenz Content Gate",
   "description": "AI output assurance with versioned contracts, deterministic release gates and reproducible evidence.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "websiteUrl": "https://ninfenz.dev/",
   "repository": {
     "url": "https://github.com/Monyeah777/NinFenz",
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "ninfenz",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "runtimeHint": "npx",
       "runtimeArguments": [
         {

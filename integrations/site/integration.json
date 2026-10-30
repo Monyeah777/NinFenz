@@ -4,7 +4,7 @@
   "title": "文档站点（人 + 机器入口）",
   "kind": "export",
   "status": "proposed",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "codeowner": "@Monyeah777",
   "tier": "core",
   "entry": {
