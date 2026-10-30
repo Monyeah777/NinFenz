@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Four-week AI Output Assurance Diagnostic · NinFenz</title>
+<meta name="description" content="Establish ten executable controls, PASS/FAIL fixtures and reproducible evidence for AI-generated documentation in four weeks.">
+<link rel="canonical" href="https://ninfenz.dev/en/pilot/">
+<link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/pilot/">
+<link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/pilot/">
+<link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/en/pilot/">
+<link rel="stylesheet" href="../../assets/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Service","name":"AI Output Assurance Diagnostic","serviceType":"AI documentation output assurance","provider":{"@type":"Person","name":"Monyeah777","url":"https://ninfenz.dev/"},"areaServed":"Worldwide","url":"https://ninfenz.dev/en/pilot/","offers":{"@type":"Offer","price":"6500","priceCurrency":"USD","url":"https://ninfenz.dev/en/pilot/"}}
+</script>
+</head>
+<body><div class="wrap">
+<header class="top"><div class="brand">NinFenz <small>Evidence Gate</small></div><nav><a href="../">Home</a><a href="../../controls/">Controls</a><a href="../../pricing/">Pricing</a><a class="active" href="./">Pilot</a><a href="../../trust/">Trust</a><a href="../../pilot/">中文</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a></nav></header>
+<main>
+<section class="page-hero"><div class="eyebrow">Four-week diagnostic</div><h1>Establish evidence for one real AI output workflow.</h1><p class="lede">This is a scoped delivery, not a template download: ten executable controls, targeted failures, CI/MCP integration and an internal audit demonstration.</p><div class="hero-actions"><a class="btn primary" href="#apply">Apply for the pilot</a><a class="btn secondary" href="../../pricing/">View pricing</a></div></section>
+<section><div class="grid three"><div class="card"><h3>Strong fit</h3><ul class="list-plain"><li>AI agents or Copilots generating enterprise reports or customer documents</li><li>API docs, runbooks, release notes or security policies</li><li>Internal audit or customer assurance pressure</li><li>A named technical owner and acceptance reviewer</li></ul></div><div class="card"><h3>Deliverables</h3><ul class="list-plain"><li>Ten versioned contracts</li><li>PASS and targeted FAIL fixtures</li><li>CLI / MCP / CI integration</li><li>Evidence package, hashes and reproduction command</li><li>Audit demonstration and 90-day roadmap</li></ul></div><div class="card"><h3>Not included</h3><ul class="list-plain"><li>Legal advice or certification</li><li>Model fairness, drift or red-team evaluation</li><li>Real-time prompt firewall</li><li>Unlimited controls or revisions</li></ul></div></div></section>
+<section><h2>Four-week plan</h2><div class="flow"><div class="flow-step card"><div class="num">WEEK 1</div><h3>Scope</h3><p>Select one production workflow and collect representative documents.</p></div><div class="flow-step card"><div class="num">WEEK 2</div><h3>Contracts</h3><p>Build ten contracts and matching PASS / FAIL fixtures.</p></div><div class="flow-step card"><div class="num">WEEK 3</div><h3>Integration</h3><p>Connect CLI, MCP or CI and produce the evidence package.</p></div><div class="flow-step card"><div class="num">WEEK 4</div><h3>Acceptance</h3><p>Remediate, demonstrate, accept and define the next 90 days.</p></div></div></section>
+<section id="apply"><h2>Pilot application</h2><p class="section-lede">The form builds a structured email in your mail client. This page does not store your data.</p>
+<form class="form" id="pilotForm">
+<div class="form-row"><div class="field"><label for="name">Name</label><input id="name" required autocomplete="name"></div><div class="field"><label for="email">Work email</label><input id="email" type="email" required autocomplete="email"></div></div>
+<div class="form-row"><div class="field"><label for="company">Company</label><input id="company" required autocomplete="organization"></div><div class="field"><label for="role">Role</label><input id="role" placeholder="AI Platform / Governance / Docs / Security"></div></div>
+<div class="field"><label for="workflow">AI output workflow</label><textarea id="workflow" required placeholder="Example: an agent creates enterprise customer reports; publication requires approval, source, limitations and version fields."></textarea></div>
+<div class="field"><label for="tools">Existing tools or process (optional)</label><textarea id="tools" placeholder="Governance, observability, CI, docs-as-code tools"></textarea></div>
+<div class="form-row"><div class="field"><label for="timeline">Desired start</label><select id="timeline"><option>Within 2 weeks</option><option>Within 1 month</option><option>This quarter</option><option>Researching</option></select></div><div class="field"><label for="budget">Budget status</label><select id="budget"><option>Approved</option><option>Under evaluation</option><option>Needs internal proposal</option><option>Not determined</option></select></div></div>
+<button class="btn primary" type="submit">Create pilot email</button><p class="form-note" id="formStatus">Official contact: support@ninfenz.dev</p>
+</form></section>
+</main>
+<footer><p class="src">© 2026 Monyeah777 · Pilot delivery follows the signed written scope.</p></footer>
+</div>
+<script>
+const form = document.getElementById('pilotForm');
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const value = (id) => document.getElementById(id).value.trim();
+  const subject = 'NinFenz Assurance Diagnostic request - ' + value('company');
+  const body = [
+    'Name: ' + value('name'), 'Work email: ' + value('email'), 'Company: ' + value('company'),
+    'Role: ' + value('role'), 'AI output workflow: ' + value('workflow'),
+    'Existing tools/process: ' + value('tools'), 'Start timeline: ' + value('timeline'),
+    'Budget status: ' + value('budget'), '', 'Sent from https://ninfenz.dev/en/pilot/'
+  ].join('\n');
+  document.getElementById('formStatus').textContent = 'Opening your mail client. If it does not open, email support@ninfenz.dev.';
+  window.location.href = 'mailto:support@ninfenz.dev?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+});
+</script>
+</body></html>

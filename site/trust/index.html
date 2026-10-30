@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trust Center · NinFenz Evidence Gate</title>
+<meta name="description" content="NinFenz 的版本矩阵、许可证、安全报告、发布供应链、MCP 分发和产品边界。">
+<link rel="canonical" href="https://ninfenz.dev/trust/">
+<link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/trust/">
+<link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/trust/">
+<link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/trust/">
+<link rel="stylesheet" href="../assets/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"NinFenz Trust Center","url":"https://ninfenz.dev/trust/","description":"Release matrix, licenses, security reporting, supply-chain evidence and product boundaries."}
+</script>
+</head>
+<body><div class="wrap">
+<header class="top"><div class="brand">NinFenz <small>Evidence Gate</small></div><nav><a href="../">首页</a><a href="../controls/">控制库</a><a href="../pricing/">定价</a><a href="../pilot/">试点</a><a class="active" href="./">Trust</a><a href="../en/trust/">English</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a></nav></header>
+<main>
+<section class="page-hero"><div class="eyebrow">Trust Center</div><h1>先看证据，再谈信任。</h1><p class="lede">这里集中列出当前版本、许可证、安全入口、发布证明和产品能力边界。NinFenz 不以营销页代替技术事实。</p></section>
+<section><h2>版本矩阵</h2><table>
+<tr><th>组件</th><th>当前值</th><th>真源</th></tr>
+<tr><td>npm launcher</td><td><code>ninfenz@1.1.0</code></td><td><a href="https://www.npmjs.com/package/ninfenz">npm</a></td></tr>
+<tr><td>GitHub Release</td><td><code>v2.30.0</code></td><td><a href="https://github.com/Monyeah777/NinFenz/releases/latest">GitHub Releases</a></td></tr>
+<tr><td>质量门禁</td><td><code>verify v2.30 · check1-42 · PASS=76</code></td><td><a href="https://github.com/Monyeah777/NinFenz/blob/main/llms.txt">llms.txt</a></td></tr>
+<tr><td>Official MCP Registry</td><td><code>io.github.Monyeah777/ninfenz</code></td><td><a href="https://registry.modelcontextprotocol.io/v0/servers?search=ninfenz">Registry</a></td></tr>
+</table><p class="src">包版本与协议/Release 版本是不同发布维度。购买或集成前应核对上表，不要只看某个目录页的旧缓存。</p></section>
+<section><h2>许可证</h2><div class="grid three">
+<div class="card"><h3>Community</h3><p><strong>AGPL-3.0-only</strong>。适用于内部使用、内部 CI、自建平台和评估。对外分发或提供服务时按 AGPL 义务执行。</p><a href="https://github.com/Monyeah777/NinFenz/blob/main/LICENSE">查看许可证</a></div>
+<div class="card"><h3>Commercial</h3><p>用于闭源嵌入、对外 SaaS、正式 SLA、安全问卷、私有化支持和企业采购。</p><a href="https://github.com/Monyeah777/NinFenz/blob/main/COMMERCIAL.md">商业授权说明</a></div>
+<div class="card"><h3>产物例外</h3><p>使用软件生成的文档、报告和中间数据归使用者所有；具体边界以附加许可和签署合同为准。</p><a href="https://github.com/Monyeah777/NinFenz/blob/main/LICENSE-EXCEPTIONS.md">附加许可</a></div>
+</div><p class="src">此页是摘要，不构成法律意见。</p></section>
+<section><h2>安全与供应链</h2><div class="grid two">
+<div class="card"><h3>私密漏洞报告</h3><p>不要在公开 Issue 中披露漏洞。使用 GitHub Security Advisories 私密通道。</p><a href="https://github.com/Monyeah777/NinFenz/security/advisories/new">报告安全问题</a></div>
+<div class="card"><h3>发布证明</h3><p>正式 Release 提供 provenance、receipts、checksums、verification cards 和 verification report。企业客户可据此独立验证下载。</p><a href="https://github.com/Monyeah777/NinFenz/releases/latest">查看最新 Release</a></div>
+<div class="card"><h3>自动化门禁</h3><p>仓库包含 SAST、dependency audit、fuzz、cross-platform、SBOM、OpenVEX 和 OpenSSF Scorecard 工作流。</p><a href="https://github.com/Monyeah777/NinFenz/tree/main/.github/workflows">查看 workflows</a></div>
+<div class="card"><h3>数据边界</h3><p>核心校验与报告为本地优先。证明器不会因为缺少上游验证器而静默通过。</p><a href="https://github.com/Monyeah777/NinFenz/blob/main/SECURITY.md">安全策略</a></div>
+</div></section>
+<section><h2>能力边界</h2><div class="grid two">
+<div class="card"><h3>NinFenz 提供</h3><ul class="list-plain"><li>确定性契约执行</li><li>Rule ID 和修复提示</li><li>可复现报告和哈希</li><li>CLI / MCP / Agent / CI 集成</li><li>发布供应链证明</li></ul></div>
+<div class="card"><h3>NinFenz 不提供</h3><ul class="list-plain"><li>事实真实性和法律意见</li><li>通用模型观测或漂移检测</li><li>实时 Prompt 攻击拦截</li><li>SOC 2 / ISO 27001 认证</li><li>完整 AI inventory 或 DLP</li></ul></div>
+</div></section>
+<section><h2>企业材料</h2><p>安全问卷、私有化部署、SLA、合同、发票和 OEM 集成请联系 <a href="mailto:support@ninfenz.dev?subject=NinFenz%20enterprise%20security%20review">support@ninfenz.dev</a>。正式承诺以签署文件为准。</p></section>
+</main>
+<footer><p class="src">© 2026 Monyeah777 · Community AGPL-3.0 · Commercial licensing available</p></footer>
+</div></body></html>
