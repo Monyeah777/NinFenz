@@ -106,8 +106,8 @@
     },
     {
       "id": "npm",
-      "claim_zh": "分发：npm 包 ninfenz v1.1.0（2924 文件 / 解包 23.30 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
-      "claim_en": "Distribution: npm package ninfenz v1.1.0 (2924 files / 23.30 MB unpacked, with SLSA provenance, published via OIDC trusted publishing - no long-lived tokens)",
+      "claim_zh": "分发：npm 包 ninfenz v1.1.0（2933 文件 / 解包 23.35 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
+      "claim_en": "Distribution: npm package ninfenz v1.1.0 (2933 files / 23.35 MB unpacked, with SLSA provenance, published via OIDC trusted publishing - no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
       "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"
@@ -138,7 +138,7 @@
     "hosted_service": false,
     "paid_tier": true,
     "third_party_deps": "核心纯标准库",
-    "commercial_license": "Closed-source integration, SLA, private deployment and enterprise procurement"
+    "commercial_license": "Commercial license for closed-source integration, SLA, private deployment and enterprise procurement"
   },
   "commerce": {
     "pricing": "https://ninfenz.dev/pricing/",

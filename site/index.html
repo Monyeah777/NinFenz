@@ -147,7 +147,7 @@
 </section>
 
 <section id="product">
-  <h2>从治理要求到发布证据，只差一个可执行层</h2>
+  <h2 id="fact-core">从治理要求到发布证据，只差一个可执行层</h2>
   <p class="section-lede">AI governance 平台定义政策，observability 平台观察运行，安全平台拦截攻击。NinFenz 负责另一件具体的事：在内容对外发布之前，证明它满足明确契约。</p>
   <div class="grid four">
     <div class="card card-feature"><div class="num">01 / CONTRACT</div><h3>版本化契约</h3><p>把章节、字段、参数、审批和禁止模式写成可复现的规则，而不是散落在手册里的要求。</p></div>
@@ -218,14 +218,15 @@
   </div>
 </section>
 
-<section>
+<section id="fact-verifiable">
   <h2>建立在可核验的技术底座上</h2>
   <div class="trust-row">
-    <div class="trust-item"><strong>质量证据</strong><span>verify v2.30 · check1-42 · PASS=76</span></div>
-    <div class="trust-item"><strong>发布供应链</strong><span>npm provenance · checksums · release attestations</span></div>
-    <div class="trust-item"><strong>公开入口</strong><span>Official MCP Registry · GitHub · Gitee</span></div>
+    <div class="trust-item" id="fact-quality"><strong>质量证据</strong><span>verify v2.30 · check1-42 · PASS=76</span></div>
+    <div class="trust-item" id="fact-npm"><strong>发布供应链</strong><span>npm provenance · checksums · release attestations</span></div>
+    <div class="trust-item" id="fact-mcp"><strong>公开入口</strong><span>Official MCP Registry · GitHub · Gitee</span></div>
+    <div class="trust-item" id="fact-terminal"><strong>本地工具面</strong><span>CLI · MCP · terminal · local-first</span></div>
   </div>
-  <p class="src">规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 370 条（可达 332 / 不可达 38）· 标准绑定 1200 条 · 馆藏 3 件。</p>
+  <p class="src" id="fact-scale">规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 370 条（可达 332 / 不可达 38）· 标准绑定 1200 条 · 馆藏 3 件。</p>
   <div class="callout">
     <div class="eyebrow">Technical definition</div>
     <p>宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。</p>

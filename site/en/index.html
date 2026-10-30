@@ -50,6 +50,14 @@
       "url": "https://github.com/Monyeah777"
     },
     {
+      "@type": "DefinedTerm",
+      "@id": "https://ninfenz.dev/#term",
+      "name": "content contract layer",
+      "alternateName": "内容契约层",
+      "description": "An engineering layer that defines reliable AI output through versioned contracts plus deterministic gates plus reproducible evidence.",
+      "inDefinedTermSet": {"@id": "https://ninfenz.dev/#software"}
+    },
+    {
       "@type": "FAQPage",
       "@id": "https://ninfenz.dev/en/#faq",
       "mainEntity": [
@@ -97,7 +105,7 @@
 </section>
 
 <section id="product">
-  <h2>The execution layer between governance and release</h2>
+  <h2 id="fact-core">The execution layer between governance and release</h2>
   <p class="section-lede">Governance platforms define policy. Observability tools inspect runtime. Security tools block attacks. NinFenz supplies deterministic evidence that a controlled output met its contract before release.</p>
   <div class="grid four">
     <div class="card card-feature"><div class="num">01 / CONTRACT</div><h3>Versioned rules</h3><p>Required sections, typed fields, approvals and forbidden patterns become explicit, inspectable rules.</p></div>
@@ -125,7 +133,7 @@
   </div>
 </section>
 
-<section>
+<section id="pricing-preview">
   <h2>Transparent pricing for enterprise procurement</h2>
   <div class="price-grid">
     <div class="card price-card"><div class="num">COMMUNITY</div><h3>Open source</h3><div class="price">AGPL-3.0</div><div class="price-note">Internal use and self-hosted CI</div><ul><li>Complete core code</li><li>CLI / MCP / LSP</li><li>Local execution</li></ul><a class="btn secondary" href="../use/">Get started</a></div>
@@ -135,15 +143,16 @@
   </div>
 </section>
 
-<section>
+<section id="fact-verifiable">
   <h2>Verifiable technical foundation</h2>
   <div class="trust-row">
-    <div class="trust-item"><strong>Quality evidence</strong><span>verify v2.30 · check1-42 · PASS=76</span></div>
-    <div class="trust-item"><strong>Supply chain</strong><span>npm provenance · checksums · release attestations</span></div>
-    <div class="trust-item"><strong>Distribution</strong><span>Official MCP Registry · GitHub · Gitee</span></div>
+    <div class="trust-item" id="fact-quality"><strong>Quality evidence</strong><span>verify v2.30 · check1-42 · PASS=76</span></div>
+    <div class="trust-item" id="fact-npm"><strong>Supply chain</strong><span>npm provenance · checksums · release attestations</span></div>
+    <div class="trust-item" id="fact-mcp"><strong>Distribution</strong><span>Official MCP Registry · GitHub · Gitee</span></div>
+    <div class="trust-item" id="fact-terminal"><strong>Local tooling</strong><span>CLI · MCP · terminal · local-first</span></div>
   </div>
-  <p class="src">Scale: 111 registered packs · 363 pack assets · 101 concept graphs; standards 370 (332 reachable / 38 unreachable) · 1200 bindings · 3 library items.</p>
-  <div class="callout"><div class="eyebrow">Technical definition</div><p>NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced.</p><p class="src"><a href="../llms.txt">llms.txt</a> · <a href="../llms-full.txt">llms-full.txt</a> · <a href="../facts.json">facts.json</a> · <a href="../nf.txt">nf.txt</a></p></div>
+  <p class="src" id="fact-scale">Scale: 111 registered packs · 363 pack assets · 101 concept graphs; standards 370 (332 reachable / 38 unreachable) · 1200 bindings · 3 library items.</p>
+  <div class="callout"><div class="eyebrow">Technical definition</div><p>NinFenz (NF) is a content contract layer: a protocol plus deterministic gates plus verifiable artifacts, so AI long-form output can be loaded, checked and reproduced.</p><p class="src"><a href="../llms.txt">llms.txt</a> · <a href="../llms-full.txt">llms-full.txt</a> · <a href="../facts.json">facts.json</a> · <a href="../nf.txt">nf.txt</a> · <a href="../agent.txt">agent.txt</a></p></div>
 </section>
 
 <section id="faq">
