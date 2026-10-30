@@ -15,8 +15,8 @@
 | 项目 | 当前值 |
 |---|---|
 | 官方 Registry 名称 | `io.github.Monyeah777/ninfenz` |
-| 当前仓库发布版本 | **1.1.1（`packaging/mcp/server.json`）** |
-| npm 包 | `ninfenz@1.1.1`，包内已有 `mcpName` |
+| 当前仓库发布版本 | **1.1.2（`packaging/mcp/server.json`）** |
+| npm 包 | `ninfenz@1.1.2`，包内已有 `mcpName` |
 | 展示名 | **NinFenz Content Gate** |
 | 工具面 | **12 个只读工具 + 1 个 prompt**，无写路径 |
 | 安装（零安装） | `npx -y ninfenz serve` |
@@ -27,7 +27,7 @@
 
 **先判断你要做哪一种：**
 
-- **只是让目录里有这个 server**：先查询 Registry 当前版本；若已是 `1.1.1`，直接做第 2、3 节，否则先按 1.8 发布当前版本。
+- **只是让目录里有这个 server**：先查询 Registry 当前版本；若已是 `1.1.2`，直接做第 2、3 节，否则先按 1.8 发布当前版本。
 - **要让 Registry / npm 用户拿到最新代码**：需要先发新的 npm 版本（示例使用下一个语义版本号），再更新 `server.json` 并重新 `mcp-publisher publish`；见 1.8。
 - **三站都没有提交过**：按第 1 → 2 → 3 节顺序做。
 
@@ -57,7 +57,7 @@ Registry **只存元数据，不存包**。它要求：
 // packaging/npm/package.json（节选）
 {
   "name": "ninfenz",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "mcpName": "io.github.Monyeah777/ninfenz"
 }
 ```
@@ -67,12 +67,12 @@ Registry **只存元数据，不存包**。它要求：
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Monyeah777/ninfenz",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "ninfenz",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "transport": { "type": "stdio" }
     }
   ]
@@ -145,7 +145,7 @@ Successfully authenticated!
 ```text
 Publishing to https://registry.modelcontextprotocol.io...
 ✓ Successfully published
-✓ Server io.github.Monyeah777/ninfenz version 1.1.1
+✓ Server io.github.Monyeah777/ninfenz version 1.1.2
 ```
 
 ### 1.6 验证
@@ -155,7 +155,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 ```
 
 应能看到 `io.github.Monyeah777/ninfenz`、`version`、`packages` 等元数据。
-当前仓库发布版本是 `1.1.1`；这条查询应返回当前 Registry 记录的版本，提交前以其实际结果为准。
+当前仓库发布版本是 `1.1.2`；这条查询应返回当前 Registry 记录的版本，提交前以其实际结果为准。
 
 > 搜索对大小写敏感；用 `NinFenz` 或 `Monyeah777`，不要只搜小写 `ninfenz`（历史上会漏）。
 
@@ -173,7 +173,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 
 只有当你希望 Registry 指向**新的 npm 包**时才做这一节。
 
-1. 同步改三处版本（示例 `1.1.1`）：
+1. 同步改三处版本（示例 `1.1.2`）：
    - `packaging/npm/package.json` → `version`
    - `packaging/mcp/server.json` → `version`
    - `packaging/mcp/server.json` → `packages[0].version`
@@ -403,7 +403,7 @@ conformance: 27/27
 - [ ] npm 包 `ninfenz` 可安装：`npx -y ninfenz serve`
 - [ ] `packaging/mcp/server.json` 的版本与 npm 已发布版本一致
 - [ ] `package.json` 里有 `mcpName: io.github.Monyeah777/ninfenz`
-- [ ] 官方 Registry 查询能搜到 `1.1.1`（若只是更新目录，以查询到的实际版本为准）
+- [ ] 官方 Registry 查询能搜到 `1.1.2`（若只是更新目录，以查询到的实际版本为准）
 - [ ] README / `llms-install.md` 没有过期工具名（当前 12 工具）
 - [ ] 不把 API key、token、邮箱密码写进任何提交内容
 
@@ -412,7 +412,7 @@ conformance: 27/27
 ## 6. 推荐执行顺序
 
 ```text
-1. 官方 Registry（先确认是否已有 1.1.1；不一致时按 1.8 发布当前版本）
+1. 官方 Registry（先确认是否已有 1.1.2；不一致时按 1.8 发布当前版本）
 2. Awesome MCP Servers（一个 PR，收益最大）
 3. AgentSkillsHub（表单，人工审核）
 ```

@@ -11,7 +11,7 @@
 #   注释可用中文。
 [project]
 name = "ninfenz"
-version = "1.1.1"
+version = "1.1.2"
 description = "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. Offline, AGPL-3.0-only (or commercial), stdlib-only core."
 readme = "README.md"
 requires-python = ">=3.11"

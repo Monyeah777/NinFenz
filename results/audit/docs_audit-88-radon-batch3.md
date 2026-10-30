@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:4476f75e281ce0a7d3623dd2c037fdc89e8d3d156ef553142c17cd619e7806da
+  - desktop/src/core/terminal.py:66cb4b678913e7f5fc965915a422da403f3ff1859b76e56008bcc2df7e69f5d8
   - protocol/code_metrics_baseline.json:7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
@@ -267,6 +267,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复

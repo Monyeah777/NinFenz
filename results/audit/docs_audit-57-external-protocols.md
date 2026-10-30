@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
-  - scripts/nf.py:77c76d314eaf18e6b22f8aa0fe9b6272e80239c06487c87e964dbddf5f040826
+  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:b65f8cb1b6492c6c0a2bc400cd210cff6604e4a02fcf2dae05dadf666775f23c
 
 ---
+> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-28）：默认并行度 10→14

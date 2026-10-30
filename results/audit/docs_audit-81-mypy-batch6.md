@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:4476f75e281ce0a7d3623dd2c037fdc89e8d3d156ef553142c17cd619e7806da
+  - desktop/src/core/terminal.py:66cb4b678913e7f5fc965915a422da403f3ff1859b76e56008bcc2df7e69f5d8
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
@@ -270,6 +270,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
