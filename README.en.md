@@ -147,10 +147,10 @@ AI assembly:
 
 ## Versions
 
-Install **`ninfenz` 1.0.5** today — published to both npm and GitHub Packages:
+Install **`ninfenz` 1.1.0** from the official npm registry:
 
 ```bash
-npm i -g ninfenz@latest   # install or upgrade
+npm i -g ninfenz@latest --registry https://registry.npmjs.org   # avoid a stale mirror
 nf --version             # show current version
 nf stats                 # show gate and repo status
 ```
@@ -159,19 +159,14 @@ Three independent version lines ship from the same repository:
 
 | Line | Current | What it governs |
 |---|---|---|
-| **Content & protocol** | **v0.93** | Templates, domain packs, specs — *what* can be generated |
-| **Command-line tool** | **1.0.5** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Content & protocol** | **v2.30.0** | Templates, domain packs, specs — *what* can be generated |
+| **Command-line tool** | **1.1.0** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
-Last three content releases, described by **what they add**:
+The current gate release is **v2.30.0**; per-release changes, evidence and notes live in
+`CHANGELOG.md` and GitHub Releases rather than a duplicated README release stream.
 
-| Version | Date | What this release adds |
-|---|---|---|
-| v0.93 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
-| v0.92 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
-| v0.82 | 2026-09-09 | 45-point quality depth plus foundation layer A |
-
-Release rules (since 2026-10-20): the content line uses `v0.xx` — small updates fold into the current release, a modest breakthrough adds **0.01**, an innovation adds **0.1**; the CLI line
-is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed
+Release rules: the content line uses `v2.x` tags; the CLI line is versioned independently
+with semantic versions; every release updates `CHANGELOG.md`, and tags are placed
 on the commit that **carries the feature**.
 

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 周 AI Output Assurance Diagnostic · NinFenz</title>
+<meta name="description" content="用 4 周为 AI 生成文档建立 10 个可执行控制、PASS/FAIL 样例和可复现证据。填写试点申请，生成结构化邮件。">
+<link rel="canonical" href="https://ninfenz.dev/pilot/">
+<link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/pilot/">
+<link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/pilot/">
+<link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/pilot/">
+<link rel="stylesheet" href="../assets/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Service","name":"AI Output Assurance Diagnostic","serviceType":"AI documentation output assurance","provider":{"@type":"Person","name":"Monyeah777","url":"https://ninfenz.dev/"},"areaServed":"Worldwide","url":"https://ninfenz.dev/pilot/","offers":{"@type":"Offer","price":"39800","priceCurrency":"CNY","url":"https://ninfenz.dev/pilot/"}}
+</script>
+</head>
+<body><div class="wrap">
+<header class="top"><div class="brand">NinFenz <small>Evidence Gate</small></div><nav><a href="../">首页</a><a href="../controls/">控制库</a><a href="../pricing/">定价</a><a class="active" href="./">试点</a><a href="../trust/">Trust</a><a href="../en/pilot/">English</a><a href="https://github.com/Monyeah777/NinFenz">GitHub</a></nav></header>
+<main>
+<section class="page-hero"><div class="eyebrow">4-week diagnostic</div><h1>从一个真实 AI 输出流程开始建立证据。</h1><p class="lede">不是买一套模板，而是在 4 周内交付 10 个可执行控制、失败证据、CI/MCP 接入和内部审计演示。</p><div class="hero-actions"><a class="btn primary" href="#apply">填写试点申请</a><a class="btn secondary" href="../pricing/">查看价格</a></div></section>
+<section><div class="grid three">
+<div class="card"><h3>适合</h3><ul class="list-plain"><li>AI Agent / Copilot 生成企业报告或客户文档</li><li>API 文档、runbook、release notes、security policy</li><li>有内部审计或客户安全问卷压力</li><li>能指定技术负责人和验收人</li></ul></div>
+<div class="card"><h3>交付</h3><ul class="list-plain"><li>10 个版本化控制契约</li><li>每控制至少一个 PASS 与定向 FAIL</li><li>CLI / MCP / CI 接入</li><li>证据包、哈希和复现命令</li><li>内部审计演示与 90 天路线</li></ul></div>
+<div class="card"><h3>不包含</h3><ul class="list-plain"><li>法律意见或合规认证</li><li>模型公平性、漂移或红队</li><li>实时 Prompt 攻击拦截</li><li>无限定制度和无限修改</li></ul></div>
+</div></section>
+<section><h2>4 周安排</h2><div class="flow">
+<div class="flow-step card"><div class="num">WEEK 1</div><h3>范围</h3><p>选定一个生产流程，收集真实样例与审批角色。</p></div>
+<div class="flow-step card"><div class="num">WEEK 2</div><h3>控制</h3><p>建立 10 个契约和对应 PASS / FAIL 夹具。</p></div>
+<div class="flow-step card"><div class="num">WEEK 3</div><h3>接入</h3><p>接入 CLI、MCP 或 CI，生成证据包。</p></div>
+<div class="flow-step card"><div class="num">WEEK 4</div><h3>验收</h3><p>修复、演示、验收与下一阶段建议。</p></div>
+</div></section>
+<section id="apply"><h2>试点申请</h2><p class="section-lede">填写后会生成一封结构化邮件；点击按钮会打开你的邮件客户端。不会在网页中保存数据。</p>
+<form class="form" id="pilotForm">
+<div class="form-row"><div class="field"><label for="name">姓名</label><input id="name" required autocomplete="name"></div><div class="field"><label for="email">工作邮箱</label><input id="email" type="email" required autocomplete="email"></div></div>
+<div class="form-row"><div class="field"><label for="company">公司</label><input id="company" required autocomplete="organization"></div><div class="field"><label for="role">角色</label><input id="role" placeholder="AI Platform / Governance / Docs / Security"></div></div>
+<div class="field"><label for="workflow">要控制的 AI 输出流程</label><textarea id="workflow" required placeholder="例如：Agent 生成企业客户报告；发布前需要校验审批、数据来源、限制项和版本字段。"></textarea></div>
+<div class="field"><label for="tools">现有工具或流程（可选）</label><textarea id="tools" placeholder="Governance / observability / CI / docs-as-code 工具"></textarea></div>
+<div class="form-row"><div class="field"><label for="timeline">期望开始时间</label><select id="timeline"><option>2 周内</option><option>1 个月内</option><option>本季度</option><option>先了解</option></select></div><div class="field"><label for="budget">预算状态</label><select id="budget"><option>已立项</option><option>正在评估</option><option>需要内部提案</option><option>尚未确定</option></select></div></div>
+<button class="btn primary" type="submit">生成试点申请邮件</button>
+<p class="form-note" id="formStatus">官方联系地址：support@ninfenz.dev</p>
+</form></section>
+</main>
+<footer><p class="src">© 2026 Monyeah777 · 正式试点以双方确认的书面范围和合同为准。</p></footer>
+</div>
+<script>
+const form = document.getElementById('pilotForm');
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const value = (id) => document.getElementById(id).value.trim();
+  const subject = 'NinFenz Assurance Diagnostic request - ' + value('company');
+  const body = [
+    'Name: ' + value('name'),
+    'Work email: ' + value('email'),
+    'Company: ' + value('company'),
+    'Role: ' + value('role'),
+    'AI output workflow: ' + value('workflow'),
+    'Existing tools/process: ' + value('tools'),
+    'Start timeline: ' + value('timeline'),
+    'Budget status: ' + value('budget'),
+    '',
+    'Sent from https://ninfenz.dev/pilot/'
+  ].join('\n');
+  const href = 'mailto:support@ninfenz.dev?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  document.getElementById('formStatus').textContent = '正在打开邮件客户端；若未打开，请直接发送到 support@ninfenz.dev。';
+  window.location.href = href;
+});
+</script>
+</body></html>

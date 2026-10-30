@@ -16,7 +16,8 @@ const idx = fs.readFileSync(path.join(SITE, 'index.html'), 'utf8');
 const origin = (process.argv.slice(2).find((a) => !a.startsWith('--')) ||
   (idx.match(/rel="canonical" href="(https:\/\/[^\/"]+)/) || [])[1] || '').replace(/\/+$/, '');
 const KNOWN_BASES = ['https://ninfenz.dev', 'https://ninfenz.1764861918.workers.dev', 'https://monyeah777.github.io/NinFenz', 'https://monyeah777.github.io'];
-const MACHINE = ['/llms.txt', '/llms-full.txt', '/nf.txt', '/agent.txt', '/facts.json', '/run.sh', '/robots.txt', '/sitemap.xml', '/.well-known/security.txt', '/use/', '/en/use/', '/404.html', '/assets/site.css'];
+const COMMERCIAL_PAGES = ['/pricing/', '/en/pricing/', '/pilot/', '/en/pilot/', '/controls/', '/en/controls/', '/trust/', '/en/trust/'];
+const MACHINE = ['/llms.txt', '/llms-full.txt', '/nf.txt', '/agent.txt', '/facts.json', '/run.sh', '/robots.txt', '/sitemap.xml', '/.well-known/security.txt', '/use/', '/en/use/', '/404.html', '/assets/site.css', ...COMMERCIAL_PAGES];
 const rows = [];
 const check = (name, ok, detail) => rows.push({ 判据: name, 结果: ok ? 'PASS' : 'FAIL', 详情: String(detail) });
 
@@ -33,7 +34,7 @@ function ldTypesOf(html) {
 if (OFFLINE) {
   const read = (p) => fs.readFileSync(path.join(SITE, p), 'utf8');
   const has = (p) => fs.existsSync(path.join(SITE, p));
-  for (const p of ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html']) {
+  for (const p of ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html']) {
     if (!has(p)) { check('在场 ' + p, false, '缺文件'); continue; }
     const html = read(p);
     const { ok, types } = ldTypesOf(html);
@@ -62,9 +63,13 @@ if (OFFLINE) {
   catch (e) { check('CodeMeta 可解析', false, e.message); }
   if (meta) {
     const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'packaging/npm/package.json'), 'utf8'));
+    const mcp = JSON.parse(fs.readFileSync(path.join(ROOT, 'packaging/mcp/server.json'), 'utf8'));
     check('CodeMeta 标识', meta.identifier === 'ninfenz', meta.identifier || '(缺失)');
     check('CodeMeta 代码仓库', meta.codeRepository === 'https://github.com/Monyeah777/NinFenz', meta.codeRepository || '(缺失)');
     check('CodeMeta 版本与 npm 一致', meta.version === pkg.version, `${meta.version} / ${pkg.version}`);
+    check('MCP 版本与 npm 一致', mcp.version === pkg.version && mcp.packages?.[0]?.version === pkg.version, `${mcp.version} / ${mcp.packages?.[0]?.version} / ${pkg.version}`);
+    check('npm 描述已商业化', /output assurance/i.test(pkg.description || '') && !/\bMIT\b/i.test(pkg.description || ''), pkg.description || '(缺失)');
+    check('MCP 描述已商业化', /output assurance/i.test(mcp.description || '') && !/read-only retrieval over/i.test(mcp.description || ''), mcp.description || '(缺失)');
   }
   let fj = null;
   try { fj = JSON.parse(read('facts.json')); } catch (e) { check('facts.json 可解析', false, e.message); }
@@ -75,7 +80,11 @@ if (OFFLINE) {
     check('facts 定义句在场', (fj.subject || {}).definition_zh && read('llms-full.txt').includes(fj.subject.definition_zh), 'definition_zh');
     check('facts 官方入口', (fj.official || {}).entry === 'https://ninfenz.dev/', (fj.official || {}).entry || '(缺失)');
     check('官方声明在机器面', read('llms-full.txt').includes('官方唯一指定入口') && read('llms.txt').includes('官方唯一指定入口') && read('nf.txt').includes('官方唯一入口'), 'llms.txt + llms-full.txt + nf.txt');
+    check('facts 商业许可', /AGPL-3\.0-only/.test((fj.subject || {}).license || '') && (fj.limits || {}).paid_tier === true, `${(fj.subject || {}).license} / paid=${(fj.limits || {}).paid_tier}`);
+    check('facts 商业入口齐备', ['pricing', 'diagnostic', 'trust', 'controls'].every((k) => /^https:\/\/ninfenz\.dev\//.test((fj.commerce || {})[k] || '')), Object.keys(fj.commerce || {}).join(','));
   }
+  const commercialCopy = ['index.html', 'en/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'trust/index.html', 'en/trust/index.html', 'llms.txt', 'llms-full.txt', 'nf.txt', 'run.sh', 'facts.json'].map(read).join('\n');
+  check('商业面无历史许可口径', !/没有付费版|no paid version|license:\\s*MIT|\\bMIT License\\b/i.test(commercialCopy), '无 MIT / no-paid 残留');
   const hd = read('_headers');
   const missing = MACHINE.filter((p) => p !== '/use/' && p !== '/en/use/' && p !== '/404.html' && p !== '/assets/site.css').filter((p) => !hd.includes('\n' + p + '\n'));
   check('_headers 覆盖机器面', missing.length === 0, missing.length ? missing.join(' ') : '全覆盖');
@@ -86,7 +95,8 @@ if (OFFLINE) {
   check('robots 内容信号', rb.includes('Content-Signal:'), 'Content-Signal');
   check('robots 指向 sitemap', rb.includes('Sitemap: ' + origin + '/sitemap.xml'), 'sitemap');
   const sm = read('sitemap.xml');
-  check('sitemap 覆盖四页', ['/', '/en/', '/use/', '/en/use/'].every((p) => sm.includes('<loc>' + origin + p + '</loc>')), '4 个 loc');
+  const sitemapPages = ['/', '/en/', '/use/', '/en/use/', ...COMMERCIAL_PAGES];
+  check('sitemap 覆盖商业与技术页', sitemapPages.every((p) => sm.includes('<loc>' + origin + p + '</loc>')), sitemapPages.length + ' 个 loc');
   check('run.sh 是脚本', read('run.sh').startsWith('#!'), read('run.sh').split('\n')[0]);
   // worker.js 的**行为**判据移到 site/tools/worker-check.mjs（真跑模块 + 桩 ASSETS，16 条）。
   // 此处原先的两条字符串包含判据（`includes('text/markdown')` / `includes('301')`）已删除：
