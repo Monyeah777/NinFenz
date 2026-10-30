@@ -104,7 +104,7 @@ AI による組立：
 
 ## バージョン
 
-**`ninfenz` 1.1.1** をそのまま導入できます（公式配布は npmjs.com）:
+**`ninfenz` 1.1.2** をそのまま導入できます（公式配布は npmjs.com）:
 
 ```bash
 npm i -g ninfenz@latest   # 導入・更新

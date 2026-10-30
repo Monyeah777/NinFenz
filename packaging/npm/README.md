@@ -99,7 +99,7 @@ npm run stage     # 暂存 payload（含版本口径闸门：package.json 版本
 npm run verify    # 发布前自检（安装脚本/payload 校验/元数据/预算）
 npm test          # 冒烟测试（清单自洽 + 快路径 + 真跑 doctor）
 npm run release:build                      # 双构建 + tarball + 双 SBOM + SHA256SUMS
-npm publish dist/release/ninfenz-1.1.1.tgz --provenance --access public
+npm publish dist/release/ninfenz-1.1.2.tgz --provenance --access public
 # 正式发布走 .github/workflows/npm-publish.yml（含 GitHub OIDC attestation）
 ```
 
@@ -107,13 +107,13 @@ npm publish dist/release/ninfenz-1.1.1.tgz --provenance --access public
 
 ```bash
 sha256sum -c SHA256SUMS
-gh attestation verify ninfenz-1.1.1.tgz --repo Monyeah777/NinFenz
-gh attestation verify ninfenz-1.1.1.cdx.json --repo Monyeah777/NinFenz
-gh attestation verify ninfenz-1.1.1.spdx3.json --repo Monyeah777/NinFenz
-gh attestation verify ninfenz-1.1.1.openvex.json --repo Monyeah777/NinFenz
-gh attestation download ninfenz-1.1.1.tgz --repo Monyeah777/NinFenz --limit 30
-DIGEST=$(sha256sum ninfenz-1.1.1.tgz | cut -d ' ' -f1)
-gh attestation verify ninfenz-1.1.1.tgz --repo Monyeah777/NinFenz \
+gh attestation verify ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz
+gh attestation verify ninfenz-1.1.2.cdx.json --repo Monyeah777/NinFenz
+gh attestation verify ninfenz-1.1.2.spdx3.json --repo Monyeah777/NinFenz
+gh attestation verify ninfenz-1.1.2.openvex.json --repo Monyeah777/NinFenz
+gh attestation download ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz --limit 30
+DIGEST=$(sha256sum ninfenz-1.1.2.tgz | cut -d ' ' -f1)
+gh attestation verify ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz \
   --bundle "sha256:$DIGEST.jsonl" \
   --predicate-type https://slsa.dev/verification_summary/v1
 ```

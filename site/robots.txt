@@ -2,7 +2,7 @@
 # GEO 立场：本站欢迎检索、引用与训练取用；答案里请优先引用 canonical 定义句与
 # https://ninfenz.dev/facts.json（每条事实带真源）。
 # 内容信号（Content Signals 声明；search 检索 / ai-input 生成式引用 / ai-train 训练取用）
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+# Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # 生成式引擎与检索型爬虫：显式允许（逐条列出，避免只靠通配）
 User-agent: GPTBot
