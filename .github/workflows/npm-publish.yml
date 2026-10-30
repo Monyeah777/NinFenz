@@ -203,14 +203,19 @@ jobs:
           for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
             .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
             .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
-            gh attestation verify "$FILE" \
+            VSA_JSON=$(gh attestation verify "$FILE" \
               --bundle "$VSA_BUNDLE" \
               --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-              --source-ref "$GITHUB_REF" \
-              --source-digest "$GITHUB_SHA" \
               --deny-self-hosted-runners \
-              --predicate-type "https://slsa.dev/verification_summary/v1"
+              --predicate-type "https://slsa.dev/verification_summary/v1" \
+              --format=json)
+            jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+              any(.[];
+                .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+                .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+                .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+              )' <<<"$VSA_JSON" >/dev/null
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
@@ -269,14 +274,19 @@ jobs:
             --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
             --predicate-type "https://slsa.dev/provenance/v1"
-          gh attestation verify "$TARBALL" \
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
             --bundle "$VSA_BUNDLE" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-            --source-ref "$GITHUB_REF" \
-            --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
       - name: 发布已 attest 的 tarball（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -348,14 +358,19 @@ jobs:
             --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
             --predicate-type "https://slsa.dev/provenance/v1"
-          gh attestation verify "$TARBALL" \
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
             --bundle "$VSA_BUNDLE" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-            --source-ref "$GITHUB_REF" \
-            --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
       - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -413,14 +428,19 @@ jobs:
             --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
             --predicate-type "https://slsa.dev/provenance/v1"
-          gh attestation verify "$TARBALL" \
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
             --bundle "$VSA_BUNDLE" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
-            --source-ref "$GITHUB_REF" \
-            --source-digest "$GITHUB_SHA" \
             --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
       - name: 创建或补齐 GitHub Release（不覆盖既有资产）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
