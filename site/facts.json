@@ -14,8 +14,7 @@
       "https://gitee.com/monyeah777/ninfenz"
     ],
     "official_packages": [
-      "ninfenz (npmjs.com)",
-      "@monyeah777/ninfenz (GitHub Packages)"
+      "ninfenz (npmjs.com)"
     ],
     "never_asks_for": [
       "random third-party payment links",
@@ -110,7 +109,7 @@
       "claim_en": "Distribution: npm package ninfenz v1.1.1 (2935 files / 23.38 MB unpacked, with SLSA provenance, published via OIDC trusted publishing - no long-lived tokens)",
       "anchor": "https://ninfenz.dev/#fact-npm",
       "source": "https://registry.npmjs.org/ninfenz",
-      "note": "另有 GitHub Packages 通道 @monyeah777/ninfenz"
+      "note": "npmjs.com is the supported public package registry; GitHub Packages is not a guaranteed sync channel"
     }
   ],
   "machine_endpoints": {

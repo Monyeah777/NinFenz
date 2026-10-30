@@ -13,7 +13,7 @@
   <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="已收录于 Awesome MCP Servers" height="20"></a>
 </p>
 
-> **唯一官方仓库**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
+> **唯一官方仓库**：https://github.com/Monyeah777/NinFenz ｜ 官方 npm 包：`ninfenz`
 > 其他账号下的同名仓库均为**未经授权的镜像快照**，不代表本项目，也不接受 Issue/PR。
 
 **站点（线上）**：https://ninfenz.dev · 机器入口 [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)

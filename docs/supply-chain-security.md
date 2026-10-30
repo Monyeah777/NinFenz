@@ -41,7 +41,7 @@ gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源�
    source ref、source commit 与 predicate type；
 6. `scripts/build_vsa.py` 复核可复现次数、源提交、摘要和必需工件，签发
    `https://slsa.dev/verification_summary/v1` predicate，再由 GitHub OIDC 签署为 VSA；
-7. npm、GitHub Packages 与 GitHub Release 作业在发布前再次验证 Build provenance 和 VSA；
+7. npm 与 GitHub Release 作业在发布前再次验证 Build provenance 和 VSA；GitHub Packages 只是 best-effort 镜像，不得拖累主发布结论；
    任一验证失败都不能发布。
 
 结论边界：**流水线具备 Build L2 所需的托管构建和认证来源证明；在真实 tag 或手动 attest
@@ -118,7 +118,8 @@ python scripts/generate_vex.py --json
 ## 凭据、OIDC 与轮换
 
 - 正式发布优先使用 GitHub OIDC 短期身份：build provenance 与 VSA 通过 `id-token: write` 签署，
-  npm trusted publishing 在可用时使用 OIDC，GitHub Packages 使用 job 级 `GITHUB_TOKEN`。
+  npm trusted publishing 在可用时使用 OIDC。GitHub Packages 使用 job 级 `GITHUB_TOKEN`，
+  在仓库或账号尚未授予 `write_package` 时允许该镜像失败，但不得宣称其已同步。
 - PAT、npm token 与 registry 凭据不得硬编码、写入仓库或出现在命令行日志；需要 secret 时只放在
   GitHub protected environment / repository secret，并由 workflow 权限最小化。
 - 任何 token 一旦进入对话、日志、提交或文档，按已泄露处理：立即撤销、重建、检查审计日志，
