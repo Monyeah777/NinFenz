@@ -193,9 +193,13 @@ jobs:
       - name: 回验 VSA
         env:
           GH_TOKEN: ${{ github.token }}
-          VSA_BUNDLE: ${{ steps.vsa.outputs.bundle-path }}
         run: |
           shopt -s nullglob
+          TARBALL_ABS=$(realpath "$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
           for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
             .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
             .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
@@ -205,7 +209,8 @@ jobs:
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
               --source-ref "$GITHUB_REF" \
               --source-digest "$GITHUB_SHA" \
-              --deny-self-hosted-runners
+              --deny-self-hosted-runners \
+              --predicate-type "https://slsa.dev/verification_summary/v1"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
@@ -252,10 +257,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
-          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
-            ! -name 'verification-summary.json' -print -quit)
-          # VSA predicate: https://slsa.dev/verification_summary/v1
-          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -269,7 +275,8 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 发布已 attest 的 tarball（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -329,10 +336,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'monyeah777-ninfenz-*.tgz' -print -quit)
-          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
-            ! -name 'verification-summary.json' -print -quit)
-          # VSA predicate: https://slsa.dev/verification_summary/v1
-          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -346,7 +354,8 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -392,10 +401,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
-          VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
-            ! -name 'verification-summary.json' -print -quit)
-          # VSA predicate: https://slsa.dev/verification_summary/v1
-          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -409,7 +419,8 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1"
       - name: 创建或补齐 GitHub Release（不覆盖既有资产）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
