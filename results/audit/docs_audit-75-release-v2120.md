@@ -8,12 +8,12 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:268de0c2922c0f6c4cb85f30e2609b8936554edb295c915760451c23b4055e65
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:8620308be80542d14fdcb76e70e37fa8cfedfe0b65840a62a9c691c9b92a52da
+  - README.md:9820d210acfcffb27ef099e8f81eaade373c6df78f5c248ed5984254cce86846
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:e6840c08d2da65bc68809be8f3a0d89de451558f933cdc6b80f51b8659654ceb
-  - scripts/nf.py:3254785c7eb84216f3b9ea8583c2e5db1db65a4475a02b517170a0eee7e1695b
+  - scripts/nf.py:77c76d314eaf18e6b22f8aa0fe9b6272e80239c06487c87e964dbddf5f040826
 
 ---
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
