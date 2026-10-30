@@ -214,7 +214,7 @@ jobs:
           ATT_DIR=$(mktemp -d)
           (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
             --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
-          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
           for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
             .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
             .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
@@ -296,7 +296,7 @@ jobs:
           ATT_DIR=$(mktemp -d)
           (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
             --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
-          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -398,7 +398,7 @@ jobs:
           ATT_DIR=$(mktemp -d)
           (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
             --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
-          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -486,7 +486,7 @@ jobs:
           ATT_DIR=$(mktemp -d)
           (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
             --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
-          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name 'sha256-*.jsonl' -print -quit)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
