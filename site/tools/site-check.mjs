@@ -41,6 +41,9 @@ if (OFFLINE) {
     check(p + ' JSON-LD 可解析', ok && types.length > 0, types.join('+') || '(无)');
     check(p + ' 无外部资源', !/(?:<link[^>]+rel="stylesheet"[^>]+href|<script[^>]+src|<img[^>]+src)="https?:/i.test(html), '同源');
   }
+  check('favicon 资产在场', has('assets/icon-512.png'), 'assets/icon-512.png');
+  const htmlPages = ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html', '404.html'];
+  check('favicon 链接覆盖全部页面', htmlPages.every((p) => read(p).includes('href="/assets/icon-512.png"')), htmlPages.join(', '));
   const canon = (idx.match(/rel="canonical" href="([^"]+)"/) || [])[1] || '';
   check('首页 canonical 自指', canon === origin + '/', canon || '(缺失)');
   check('首页 hreflang 三向', ['zh-CN', 'en', 'x-default'].every((l) => idx.includes('hreflang="' + l + '"')), 'zh-CN/en/x-default');
