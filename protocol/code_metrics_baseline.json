@@ -1495,6 +1495,11 @@
       "max_fn_cc": 15,
       "max_fn_lines": 42
     },
+    "scripts/mutation_sample.py": {
+      "lines": 195,
+      "max_fn_cc": 22,
+      "max_fn_lines": 103
+    },
     "scripts/nf.py": {
       "lines": 7682,
       "max_fn_cc": 116,
