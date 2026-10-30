@@ -23,7 +23,7 @@ NinFenz（宁封子，简称 NF）是**内容契约层**：用「协议 + 确定
 ### A 零安装：用已发布的 npm 包（推荐给 agent，最快）
 
 ```bash
-npx -y ninfenz --version       # 期望输出 nf 1.1.0
+npx -y ninfenz --version       # 期望输出 nf 1.1.1
 npx -y ninfenz doctor          # 体检：期望 17/17 通过
 npx -y ninfenz serve           # 启动只读 MCP（stdio JSON-RPC，Ctrl+C 退出）
 ```

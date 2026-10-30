@@ -73,7 +73,7 @@ class _LazyModule:
 
 json_doc = _LazyModule("core.json_doc")   # 承重件在 desktop/src，脚本须能独立运行
 
-NF_CLI_VERSION = "1.1.0"
+NF_CLI_VERSION = "1.1.1"
 NF_CLI_EPILOG = (
     "入门：\n"
     "  nf shell              # 交互终端（能力菜单 + 命令直通；端壳退役后的人机入口）\n"

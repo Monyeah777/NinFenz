@@ -266,7 +266,7 @@
     {
       "@id": "nf:file/protocol/mcp_package.json",
       "@type": "prov:Entity",
-      "nf:sha256": "0c310bbf890681b77b2155f99235c9d592163104c7d6193a7b0578ed6dae2e42"
+      "nf:sha256": "ea6d4188141dde0c7dc78b4f3fe6ab061f9736ccaa4cf55674cc2716005eaa45"
     },
     {
       "@id": "nf:file/protocol/module_signatures.json",

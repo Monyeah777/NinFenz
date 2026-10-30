@@ -1,6 +1,6 @@
 {
   "name": "ninfenz",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "mcpName": "io.github.Monyeah777/ninfenz",
   "description": "AI output assurance: versioned content contracts, deterministic release gates, rule-level evidence and audit-ready reports. Offline CLI and MCP; AGPL-3.0-only or commercial.",
   "keywords": [
