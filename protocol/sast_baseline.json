@@ -26,6 +26,8 @@
         "scripts/check_external_links.py::B104": 1,
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
+        "scripts/mutation_sample.py::B404": 1,
+        "scripts/mutation_sample.py::B603": 1,
         "scripts/nf.py::B404": 1,
         "scripts/nf.py::B603": 5,
         "scripts/perf_budget.py::B404": 1,
@@ -47,17 +49,17 @@
           "severities": [
             [
               "LOW",
-              49
+              51
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 54
+          "total": 56
         },
         "ruff": {
-          "total": 86
+          "total": 87
         }
       },
       "ruff": {
@@ -96,6 +98,7 @@
         "scripts/check_external_links.py::S310": 2,
         "scripts/check_interop_schemas.py::S310": 4,
         "scripts/instruction_evidence.py::S603": 1,
+        "scripts/mutation_sample.py::S603": 1,
         "scripts/nf.py::S110": 2,
         "scripts/nf.py::S112": 3,
         "scripts/nf.py::S603": 6,
