@@ -11,7 +11,7 @@
   <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="Awesome MCP Servers に掲載" height="20"></a>
 </p>
 
-> **唯一の公式リポジトリ**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
+> **唯一の公式リポジトリ**：https://github.com/Monyeah777/NinFenz ｜ 公式 npm パッケージ：`ninfenz`
 > 他アカウントの同名リポジトリは**無断のミラー**であり、本プロジェクトを代表しません（Issue/PR も受け付けません）。
 
 **サイト（公開）**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
@@ -104,7 +104,7 @@ AI による組立：
 
 ## バージョン
 
-**`ninfenz` 1.0.5** をそのまま導入できます（npm と GitHub Packages の同時公開）:
+**`ninfenz` 1.1.1** をそのまま導入できます（公式配布は npmjs.com）:
 
 ```bash
 npm i -g ninfenz@latest   # 導入・更新

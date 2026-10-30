@@ -13,7 +13,7 @@
   <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="Listed in Awesome MCP Servers" height="20"></a>
 </p>
 
-> **Canonical repository**: https://github.com/Monyeah777/NinFenz | npm `ninfenz` | GitHub Packages `@monyeah777/ninfenz`
+> **Canonical repository**: https://github.com/Monyeah777/NinFenz | official npm package: `ninfenz`
 > Same-named repositories under other accounts are **unauthorised mirror snapshots**; they do not represent this project and accept no issues or PRs.
 
 **Live site**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
