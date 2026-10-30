@@ -10,9 +10,9 @@
 FROM python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534c5767af9ea65f6ce
 
 LABEL org.opencontainers.image.title="NinFenz Content Gate" \
-      org.opencontainers.image.description="Read-only MCP server for the NinFenz content contract layer" \
+      org.opencontainers.image.description="MCP server for deterministic contracts, release gates and evidence in the NinFenz content contract layer" \
       org.opencontainers.image.source="https://github.com/Monyeah777/NinFenz" \
-      org.opencontainers.image.licenses="MIT"
+      org.opencontainers.image.licenses="AGPL-3.0-only OR LicenseRef-Commercial"
 
 # UTF-8 everywhere: repository paths and document titles contain Chinese characters.
 # Unbuffered + no .pyc keeps stdio responsive and the image filesystem read-only-safe.

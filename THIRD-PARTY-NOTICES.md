@@ -6,7 +6,8 @@
 
 - **运行时**：NinFenz 核心与 npm 包**不依赖任何第三方运行库**（Python stdlib + Node 标准库）。
 - **本文所列**：仓库**门禁与开发工具链**依赖（用于跑 `verify.sh` 与 CI 检查，不随产品分发）。
-- 各组件按其自身许可证分发；本仓代码/文档为 MIT（见 `LICENSE`）。
+- 各组件按其自身许可证分发；本仓代码为 AGPL-3.0-only 或商业许可，协议文本为 CC BY 4.0
+  （分层边界见 `LICENSING.md`，历史 MIT 版本不受影响）。
 - 投稿/社区内容的版权与再分发条款见 `LICENSES/LicenseRef-Community-Submission.txt` 与 `REUSE.toml`。
 
 ## 清单
@@ -62,7 +63,8 @@
 
 - **PySide6**（若安装 `[dev]` 全量 extras）：LGPL-3.0。仅用于桌面/终端相关测试，
   不随 npm 包或 CLI 分发；再分发其二进制需遵守 LGPL（提供源码获取方式与替换自由）。
-- 其余均为宽松许可（MIT / Apache-2.0 / BSD / PSF），与 MIT 主许可兼容。
+- 其余组件为 MIT / Apache-2.0 / BSD / PSF 等许可证；它们作为独立开发工具使用，
+  不改变 NinFenz 自身代码与协议文本的许可边界。
 
 ## 更新方式
 

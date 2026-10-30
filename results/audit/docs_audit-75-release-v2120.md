@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:268de0c2922c0f6c4cb85f30e2609b8936554edb295c915760451c23b4055e65
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:2933089d199c87fb8236d569c393ba6fe268c53c2488a19af0c10ff4a4d8b79c
+  - README.md:8620308be80542d14fdcb76e70e37fa8cfedfe0b65840a62a9c691c9b92a52da
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:3254785c7eb84216f3b9ea8583c2e5db1db65a4475a02b517170a0eee7e1695b
 
 ---
+> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
 
 > 重审（2026-10-26）：发布文档新增可复现工件、SBOM、OIDC provenance 与消费者验签说明，复核后重绑摘要

@@ -101,12 +101,13 @@ class TestSiteFactsBindToRepoTruth(unittest.TestCase):
         self.assertIn("fail-closed", claim)
 
     def test_limits_fact_is_truthful(self):
-        """边界事实：必须仍是「无托管服务 / 无付费层 / 核心纯标准库」。"""
+        """边界事实：无强制托管服务；商业层明确；核心仍为纯标准库。"""
         limits = self.facts.get("limits") or {}
         self.assertIs(False, limits.get("hosted_service"))
-        self.assertIs(False, limits.get("paid_tier"))
+        self.assertIs(True, limits.get("paid_tier"))
         self.assertIn("纯标准库", str(limits.get("third_party_deps")))
         self.assertTrue(str(limits.get("gates_scope") or "").strip())
+        self.assertIn("commercial", str(limits.get("commercial_license") or "").lower())
 
 
 #: 站点机器面与一键引导；其中的仓库路径与命令是这个站的**对外承诺**

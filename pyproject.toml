@@ -21,7 +21,6 @@ keywords = ["content-contract", "markdown", "verification", "merkle", "llm", "lo
 classifiers = [
   "License :: OSI Approved :: GNU Affero General Public License v3",
   "Programming Language :: Python :: 3.11",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
 # 本体零硬依赖（软导入由 purity_scan R5 登记）。

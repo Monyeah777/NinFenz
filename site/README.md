@@ -17,7 +17,8 @@
 
 | 文件 | 给谁 | 说明 |
 |---|---|---|
-| index.html / en/index.html | 人 | 主页：定义 / 事实 / 三种接法 / 上手 / 对比 / FAQ / 引用段 |
+| index.html / en/index.html | 人 | B2B 主页：Output Assurance、能力边界、诊断、定价、信任事实与 FAQ |
+| pricing/ · pilot/ · controls/ · trust/ | 人 / 采购 | 定价、4 周诊断申请、40 个控制目录、版本与安全材料 |
 | use/index.html / en/use/index.html | 人 | 「让 AI 用起来」：三种接法 + 一键复制块 + 每步期望输出 |
 | llms.txt | AI（索引） | 有哪些面可读（llms.txt 惯例的清单面） |
 | llms-full.txt | AI（完整） | 一文件读全：定义 / 事实 / 术语 / 上手 / FAQ / 引用 / 机器面清单 |
@@ -59,7 +60,7 @@
 
 ## 已知状态（诚实面）
 
-- **npm 包已发布**：ninfenz v1.1.0（npmjs.com；2925 文件 / 23.31 MB 解包，带 SLSA provenance
+- **npm 包已发布**：ninfenz v1.1.0（npmjs.com；2934 文件 / 23.36 MB 解包，带 SLSA provenance
   来源证明）。发布通道 = .github/workflows/npm-publish.yml（tag 或手动 dispatch）；GitHub Packages 通道为
   @monyeah777/ninfenz。国内镜像（npmmirror）同步有延迟，站内已注明可用 --registry 绕开。
 - **workers.dev 域名**：已关闭（wrangler.jsonc 的 workers_dev: false）。大陆对该域 DNS 污染，别把它当入口。

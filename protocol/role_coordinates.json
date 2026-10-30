@@ -5,7 +5,7 @@
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 299,
+    "support": 308,
     "verify": 1134
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -13098,15 +13098,15 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5b43cebaa437355bf540b6c96589be7ac41950d6f8abe27bbd7a1bf0e60909c6",
+  "root_digest": "54efa71f8112961ec3640f9dc6fdba91fa36002d1a07f4066da5f092b4e507ca",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 131,
+    "R-catch": 132,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
-    "R-support": 142,
+    "R-support": 150,
     "R-verify": 1014,
     "auto:R-core": 259
   },

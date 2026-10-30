@@ -3,6 +3,8 @@
   "platforms": {
     "nt": {
       "bandit": {
+        ".github/scripts/gitee_ingest.py::B310": 1,
+        ".github/scripts/library_ingest.py::B310": 1,
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
@@ -51,10 +53,10 @@
             ],
             [
               "MEDIUM",
-              3
+              5
             ]
           ],
-          "total": 54
+          "total": 56
         },
         "ruff": {
           "total": 87

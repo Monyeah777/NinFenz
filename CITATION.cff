@@ -8,7 +8,8 @@ abstract: >-
   使长内容生产可装载、可质检、可复现。协议本体域中立、模型无关；叙事只是官方第一个域包。
   仓库内含核心协议件（01–07）、核心库与 CLI、管线 / 模块 / 资产库、社区域包与云图书馆。
 type: software
-license: MIT
+license: AGPL-3.0-only OR LicenseRef-Commercial
+license-url: "https://github.com/Monyeah777/NinFenz/blob/main/LICENSING.md"
 authors:
   - name: "Monyeah777"
     alias: "NinFenz"

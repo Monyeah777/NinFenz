@@ -3,13 +3,13 @@
 ```text
 名称：NinFenz Content Gate（宁封子内容闸门）
 一句话：给任何 AI agent 一个可校验的内容规范与资产底座——先查契约，再落笔。
-描述：只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。12 个只读工具 + 1 个 prompt（assemble_guide）；modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；无写路径。
+描述：面向 AI 输出的证据门禁 MCP 服务器：将版本化契约、确定性发布门禁、规则级证据和可复现报告接入 agent 工作流。12 个只读检索工具 + 1 个 prompt（assemble_guide）；modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；MCP 服务面本身无写路径。
 安装：npx -y ninfenz serve
 仓库：https://github.com/Monyeah777/NinFenz
 站点：https://ninfenz.dev/
 类目：内容创作
 标签：MCP、内容契约、规范驱动、可验证、知识库、Python、大模型
-许可：MIT
+许可：AGPL-3.0-only 或商业许可
 ```
 
 ## 传输配置（stdio）—— 只填 Stdio，另两种留空

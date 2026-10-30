@@ -32,7 +32,7 @@
 1. **Sync Repository**：Admin → Repository 页点 **Sync repository / Refresh**，等 commit 数据出现。
 2. **Dockerfile 页**：选仓库 Dockerfile；Build steps 留空；CMD 填 `["python","scripts/nf.py","serve"]`；
    env schema 填空对象；点 **Deploy**（有的页面叫 **Build**）。
-3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.0.5`，发布。
+3. 构建测试成功后：点 **Make Release**（或 **Create Release**），版本填 `1.1.0`，发布。
 4. 打开 Schema / Score 页验收：应有 12 个工具、1 个 prompt；Quality 开始评分。
 
 如果你只想记一条：**先去 Repository 页点 Sync，再去 Dockerfile 页点 Deploy，成功后再点 Make Release。**
@@ -131,7 +131,7 @@
 | Tools | 12 个：`pipeline_list` `spec_list` `registry_search` `library_search` `library_read` `pattern_list` `pattern_read` `knowledge_order_read` `module_read` `pipeline_read` `asset_list` `asset_read` |
 | Prompts | 1 个：`assemble_guide` |
 | Resources | `nf://repo/...`，首屏 20 条 + `nextCursor` |
-| Instructions | 只读内容服务的自述 |
+| Instructions | 输出保证服务的能力、边界与工具使用说明 |
 | Capabilities | resources / tools / prompts |
 
 ### Build 失败的常见原因
@@ -152,12 +152,13 @@
 
 1. 在测试列表里点 **Make Release**；
    如果进了测试详情页，点 **Create Release**。
-2. 版本填 **`1.0.5`**（与 `pyproject.toml` 一致）。
+2. 版本填 **`1.1.0`**（与 `pyproject.toml` 一致）。
 3. Changelog 可填：
 
    ```text
-   Read-only MCP server for the NinFenz content contract layer: 10 read-only tools + 1 prompt,
-   dual protocol (modern 2026-07-28 + legacy 2025-11-25), stdlib-only, no write path.
+   AI output assurance MCP server: versioned content contracts, deterministic release gates,
+   rule-level evidence and reproducible reports. 12 read-only retrieval tools + 1 prompt,
+   dual protocol (modern 2026-07-28 + legacy 2025-11-25), stdlib-only retrieval surface.
    ```
 
 4. 点 **Create & Publish Release**。
@@ -165,7 +166,7 @@
 如果页面只有 **Build & Release**：
 
 - 点它，Glama 会构建并自动选版本发布；
-- 发布后在 Releases 里确认版本是 `1.0.5`，不是别的版本。
+- 发布后在 Releases 里确认版本是 `1.1.0`，不是别的版本。
 
 发布后：
 
@@ -260,7 +261,7 @@ Glama Listing 三个等级：
 
 | 等级 | 来源 | 本仓现状 |
 |---|---|---|
-| License | 仓库许可证 | A（MIT） |
+| License | 仓库许可证 | A（AGPL-3.0-only / Commercial） |
 | Quality | TDQS 总体分 | 构建后实评；预评估 A |
 | Maintenance | 活跃度 / Release / 响应 | Release 后实评 |
 
@@ -321,15 +322,15 @@ A ≥ 3.5，B ≥ 3.0，C ≥ 2.0，D ≥ 1.0
 | 字段 | 值 |
 |---|---|
 | Name | NinFenz Content Gate |
-| One-liner (EN) | Read-only MCP server for a content contract layer: protocol, modules, pipelines, assets, library. |
-| One-liner (ZH) | 给任何 AI agent 一个可校验的内容规范与资产底座——先查契约，再落笔。 |
-| Description | 只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成 agent 可调用的检索与取件工具面。12 个只读工具 + 1 个 prompt（assemble_guide）；支持 modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；无写路径。 |
+| One-liner (EN) | AI output assurance MCP server: versioned contracts, deterministic release gates and reproducible evidence. |
+| One-liner (ZH) | 面向 AI 输出的证据门禁：版本化契约、确定性发布门禁与可复现证据。 |
+| Description | 本地优先的 MCP 服务器：把 AI 文档的验收要求变成 agent 可检索的协议、模块、管线、资产与馆藏，并通过 CLI/CI 执行确定性门禁、规则级证据和可复现报告。12 个只读检索工具 + 1 个 prompt（assemble_guide）；支持 modern 2026-07-28 与 legacy 2025-11-25 双协议；零第三方依赖（Python 标准库）；MCP 服务面本身无写路径。 |
 | Repo | https://github.com/Monyeah777/NinFenz |
 | Site | https://ninfenz.dev/ |
 | Install | `npx -y ninfenz serve`（或容器：`docker build -t ninfenz-glama . && docker run --rm -i ninfenz-glama`） |
 | Category | content-creation（备选 developer-tools / knowledge-management） |
 | Tags | mcp, content-contract, spec-driven, verification, knowledge-base, python, llm |
-| License | MIT |
+| License | AGPL-3.0-only / Commercial |
 | Icon | `packaging/mcp/assets/icon-400.png`（400×400 PNG） |
 
 ## 12. 我已经做完的 vs 你只需要点的

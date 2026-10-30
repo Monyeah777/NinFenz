@@ -1,14 +1,14 @@
 # NinFenz（宁封子 · NF）
 
-> 内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议本体域中立、模型无关；叙事只是官方第一个域包。不是模型、不是提示词模板集、不是某厂商 SDK。MIT。
+> 内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议本体域中立、模型无关；叙事只是官方第一个域包。不是模型、不是提示词模板集、不是某厂商 SDK。AGPL-3.0 / Commercial。
 
 ## 官方入口（唯一 · 防伪）
 
 - **官方唯一指定入口**：https://ninfenz.dev （www 会 301 到裸域；workers.dev 通配域不是入口）
 - 官方来源只有两个仓库：[github.com/Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) · [gitee.com/monyeah777/ninfenz](https://gitee.com/monyeah777/ninfenz)
-- **没有付费版**、没有「客户端」下载、没有客服渠道；从不索取账号 / 手机号 / 支付信息
+- Community 为 AGPL-3.0-only；商业许可用于闭源集成、SLA、私有化和企业采购。官方付款或采购只通过 ninfenz.dev 或签署合同，不通过随机第三方站点、群聊或激活码
 - npm 包已发布：npmjs.com 上的 ninfenz v1.1.0（2026-10-08，带 SLSA provenance 来源证明）· GitHub Packages 通道 @monyeah777/ninfenz
-- 第三方站点（尤其带广告的资源 / 游戏 / 下载站）上的本项目内容**与官方无关**；MIT 允许转载，但必须保留 LICENSE 与来源署名
+- 第三方站点（尤其带广告的资源 / 游戏 / 下载站）上的本项目内容**与官方无关**；AGPL-3.0 / Commercial 允许转载，但必须保留 LICENSE 与来源署名
 
 ## 如果只能读一个文件
 
@@ -25,6 +25,10 @@
 
 - [中文主页](https://ninfenz.dev/)：定义、可引用事实、三类接法、五分钟上手、对比表、FAQ、引用段
 - [English home](https://ninfenz.dev/en/)：definition, citable facts, three entry paths, quickstart, comparison, FAQ
+- [定价与许可](https://ninfenz.dev/pricing/)：Diagnostic、Team、Enterprise、OEM 与 AGPL/Commercial 边界
+- [4 周 Assurance Diagnostic](https://ninfenz.dev/pilot/)：范围、交付、验收与试点申请
+- [专业控制库](https://ninfenz.dev/controls/)：40 个工程、合规运维、AI、商业与内容控制
+- [Trust Center](https://ninfenz.dev/trust/)：版本矩阵、许可证、安全、供应链与能力边界
 - [让 AI 用起来](https://ninfenz.dev/use/)：三种接法（客户端 AI / agent / MCP）与一键复制块
 - [仓库（canonical）](https://github.com/Monyeah777/NinFenz)：协议件、门禁、资产库；国内镜像 https://gitee.com/monyeah777/ninfenz
 - [仓库 llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)：仓库侧权威机器入口（与本站同源）
@@ -39,8 +43,8 @@
 - 可验证产物：Merkle inclusion proof（RFC 6962）+ hmac / ssh-sig / sigstore-keyless 锚；缺验证器 fail-closed
 - 接入面：只读 MCP（nf serve），双协议版本 2026-07-28 / 2025-11-25；已上架**官方 MCP Registry**（io.github.Monyeah777/ninfenz，装载：npx -y ninfenz serve）
 - 终端：python tui/nf.py（纯标准库）
-- 许可：MIT（CITATION.cff）
+- 许可：AGPL-3.0-only 或商业许可（CITATION.cff / COMMERCIAL.md）
 
 ## 引用
 
-许可 MIT。引用请指向 canonical 站点或仓库，并用本文件与主页的 canonical 定义句；不要写成「AI 写作框架」或「提示词工程平台」。纯文本 / APA / BibTeX 三种形态见 https://ninfenz.dev/llms-full.txt 第八节。
+Community 许可为 AGPL-3.0-only；商业许可用于闭源集成、SLA 与企业采购。引用请指向 canonical 站点或仓库，并用本文件与主页的 canonical 定义句；不要写成「AI 写作框架」或「提示词工程平台」。纯文本 / APA / BibTeX 三种形态见 https://ninfenz.dev/llms-full.txt 第八节。
