@@ -52,6 +52,25 @@ class ValidatePathTest(unittest.TestCase):
             self.assertEqual(os.path.realpath(inside),
                              paths.validate_path(root, inside, allow_absolute=True))
 
+    def test_root_itself_is_contained(self):
+        """`contained(root, root)` 必须为 True（含根自身）。
+
+        变异测试实测（2026-10-30 `scripts/mutation_sample.py`）：把 `t == r` 改成 `t != r`
+        时测试仍全绿 ⇒ 此前**没有"目标恰为根自身"的用例**，该分支的断言形同虚设。
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertTrue(paths.contained(tmp, tmp))
+            self.assertTrue(paths._norm_contained(paths._real_root(tmp),
+                                                 paths._real_root(tmp)))
+
+    @unittest.skipUnless(os.name == "nt", "大小写折叠只在 Windows 生效")
+    def test_case_insensitive_root_is_contained(self):
+        """Windows 上 `_norm_contained` 必须折叠大小写（变异实测：去掉 normcase 后测试全绿）。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            upper = tmp.upper()
+            self.assertTrue(paths.contained(tmp, upper),
+                            "同一路径的大小写变体必须判为包含（Windows）")
+
     def test_empty_path_is_rejected(self):
         with tempfile.TemporaryDirectory() as root:
             for bad in ("", "   "):
