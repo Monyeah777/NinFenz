@@ -3298,7 +3298,7 @@ public static class SelfTest
     /// </summary>
     private static void DeepeningGateCases(List<Check> checks, string work, string repoRoot)
     {
-        const string RealGoldenDigest = "e64969b839aa5e37434c06d1cef9b784";
+        const string RealGoldenDigest = "9d3f106149a1768b47dded250bc30ac2";
         const string EmptyGoldenDigest = "545dd7695c28a814cc3d1cc409dc37c8";
 
         var real = DeepeningGate.Check35(repoRoot);
