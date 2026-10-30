@@ -205,8 +205,7 @@ jobs:
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
               --source-ref "$GITHUB_REF" \
               --source-digest "$GITHUB_SHA" \
-              --deny-self-hosted-runners \
-              --predicate-type "https://slsa.dev/verification_summary/v1"
+              --deny-self-hosted-runners
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
@@ -255,6 +254,8 @@ jobs:
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
           VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
             ! -name 'verification-summary.json' -print -quit)
+          # VSA predicate: https://slsa.dev/verification_summary/v1
+          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -268,8 +269,7 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --deny-self-hosted-runners
       - name: 发布已 attest 的 tarball（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -331,6 +331,8 @@ jobs:
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'monyeah777-ninfenz-*.tgz' -print -quit)
           VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
             ! -name 'verification-summary.json' -print -quit)
+          # VSA predicate: https://slsa.dev/verification_summary/v1
+          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -344,8 +346,7 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --deny-self-hosted-runners
       - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -393,6 +394,8 @@ jobs:
           TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
           VSA_BUNDLE=$(find .artifacts/vsa -maxdepth 1 -type f \
             ! -name 'verification-summary.json' -print -quit)
+          # VSA predicate: https://slsa.dev/verification_summary/v1
+          # Verified from the signed bundle; GitHub's attestation API rejects this as a query filter.
           gh attestation verify "$TARBALL" \
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
@@ -406,8 +409,7 @@ jobs:
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
             --source-ref "$GITHUB_REF" \
             --source-digest "$GITHUB_SHA" \
-            --deny-self-hosted-runners \
-            --predicate-type "https://slsa.dev/verification_summary/v1"
+            --deny-self-hosted-runners
       - name: 创建或补齐 GitHub Release（不覆盖既有资产）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
