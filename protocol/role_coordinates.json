@@ -4,9 +4,9 @@
     "entry": 27,
     "floor": 5,
     "prod": 1048,
-    "projection": 133,
-    "support": 299,
-    "verify": 1140
+    "projection": 134,
+    "support": 302,
+    "verify": 1141
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6911,6 +6911,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Fail-closed validation for SLSA v1.2 Build L3 release evidence.",
+      "path": "desktop/src/core/slsa_policy.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "Fail-closed validator for the task-level NIST SSDF v1.1 evidence matrix.",
       "path": "desktop/src/core/ssdf_policy.py",
       "role": "verify",
@@ -13170,17 +13176,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "19404346237fda5e33bf8a244e430b7d4573e52b0ebea8b7912fc87c4ce1bbbe",
+  "root_digest": "bccd5fe19d3ed2aabad22349ba5b0d9986956e43040b1f3e3da724d6ad9e22ee",
   "rule_counts": {
     "R-app": 1448,
-    "R-catch": 131,
+    "R-catch": 132,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 118,
-    "R-support": 142,
+    "R-projection": 119,
+    "R-support": 144,
     "R-verify": 1019,
-    "auto:R-core": 266
+    "auto:R-core": 267
   },
   "schema": "nf-role-coordinates/1"
 }

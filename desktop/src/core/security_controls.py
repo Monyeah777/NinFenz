@@ -207,8 +207,8 @@ def scan(root: str | Path = ".") -> tuple[list[str], dict[str, Any]]:
         issues.append(f"{CONTROLS_REL}: development artifacts must be excluded from payload")
 
     release = doc.get("release") if isinstance(doc.get("release"), dict) else {}
-    if release.get("slsa_claimed_level") != "SLSA_BUILD_LEVEL_2":
-        issues.append(f"{CONTROLS_REL}: SLSA claim must remain at evidenced Build L2")
+    if release.get("slsa_claimed_level") != "SLSA_BUILD_LEVEL_3":
+        issues.append(f"{CONTROLS_REL}: SLSA claim must match evidenced Build L3")
     if int(release.get("reproducible_build_count") or 0) < 2:
         issues.append(f"{CONTROLS_REL}: at least two reproducible builds are required")
 

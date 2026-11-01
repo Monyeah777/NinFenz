@@ -28,28 +28,33 @@ python scripts/validate_sboms.py packaging/npm/dist/release
 gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源提交时间或显式
 `SOURCE_DATE_EPOCH`，不读取墙钟。
 
-## Build L2、VSA 与 L3 边界
+## SLSA v1.2 Build L3、provenance 与 VSA
 
 `.github/workflows/npm-publish.yml` 的 tag/手动发布路径执行：
 
-1. GitHub 托管 runner 从不可变提交构建；
-2. 两次构建逐字节比较；
-3. 生成 CycloneDX、SPDX、OpenVEX、payload 清单与 checksums；
-4. 使用 GitHub OIDC 的 `actions/attest-build-provenance` 对两套 tarball、双 SBOM、OpenVEX、
+1. 调用方把全部构建步骤交给同仓 reusable workflow `slsa-build-l3.yml`，调用方不直接构建；
+2. reusable workflow 在 GitHub 托管、每次新建的 runner 上从不可变提交构建，禁用 setup/pip
+   持久缓存，并以 `--no-cache-dir` 安装固定版本验证器；
+3. 两次构建逐字节比较，生成 CycloneDX、SPDX、OpenVEX、payload 清单与 checksums；
+4. reusable workflow 内的 `actions/attest-build-provenance` 对两套 tarball、双 SBOM、OpenVEX、
    checksums 与 release metadata 生成 `https://slsa.dev/provenance/v1` 来源证明；
-5. 独立 `verify` 作业下载发布束、校验 `SHA256SUMS`，再对每个 subject 验证签名 workflow、
-   source ref、source commit 与 predicate type；
+5. 独立 `verify` 作业下载发布束、校验 `SHA256SUMS`，把签名 workflow 固定为
+   `slsa-build-l3.yml`，并核对 source ref、source commit 与 predicate type；
 6. `scripts/build_vsa.py` 复核可复现次数、源提交、摘要和必需工件，签发
    `https://slsa.dev/verification_summary/v1` predicate，再由 GitHub OIDC 签署为 VSA；
 7. npm、GitHub Packages 与 GitHub Release 作业在发布前再次验证 Build provenance 和 VSA；
    任一验证失败都不能发布。
 
-结论边界：**流水线具备 Build L2 所需的托管构建和认证来源证明；在真实 tag 或手动 attest
-运行成功之前，仓库不声称已经取得某次发布的 SLSA 等级证明。**
+结论边界：代码与验证策略按 SLSA v1.2 Build L3 组织。SLSA 等级只对真实成功生成并回验
+attestation 的某次工件成立；PR dry-run 不产生发布 provenance。Build L3 不要求 hermetic
+断网构建，要求的是可信构建控制面、隔离/临时环境、不可伪造 provenance 与无缓存投毒影响。
+VSA verifier 是本项目自己的 workflow，不是独立第三方 verifier。
 
-VSA 当前只声明 `SLSA_BUILD_LEVEL_2`。共享 GitHub runner 可被工作流自定义步骤影响且构建阶段允许
-联网，不满足 Build L3 对 trusted builder / build isolation 的要求；`slsa-l3-readiness.json`
-把该缺口保持为 blocker。VSA verifier 是本项目自己的 workflow，不是独立第三方 verifier。
+最近一次不发布的 L3 验收运行由
+[`slsa-l3-attestation-run.json`](https://github.com/Monyeah777/NinFenz/blob/main/results/supply-chain/slsa-l3-attestation-run.json)
+逐项记录：reusable builder 成功生成 provenance，验证作业按 `slsa-build-l3.yml` signer
+完成回验，并签发/回验 `verifiedLevels=["SLSA_BUILD_LEVEL_3"]` 的 VSA。该记录同时绑定
+npm 主链与 Release evidence 两条独立运行、工作流摘要和发布 subject。
 
 ## 消费者验证
 
@@ -59,7 +64,7 @@ VSA 当前只声明 `SLSA_BUILD_LEVEL_2`。共享 GitHub runner 可被工作流�
 sha256sum -c SHA256SUMS
 ARTIFACT=ninfenz-<version>.tgz
 gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
-  --signer-workflow Monyeah777/NinFenz/.github/workflows/npm-publish.yml \
+  --signer-workflow Monyeah777/NinFenz/.github/workflows/slsa-build-l3.yml \
   --deny-self-hosted-runners \
   --predicate-type https://slsa.dev/provenance/v1
 
@@ -73,8 +78,9 @@ gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
   --predicate-type https://slsa.dev/verification_summary/v1
 ```
 
-成功输出必须把 subject digest 绑定到同一次 GitHub Actions 构建，签发身份来自本仓库的
-OIDC workflow。GitHub API 只接受 Build provenance 作为服务端 predicate 过滤参数；VSA 的
+成功输出必须把 subject digest 绑定到同一次 GitHub Actions 构建，Build provenance 的签发
+身份来自 reusable builder，VSA 的签发身份来自调用方验证 workflow。GitHub API 只接受 Build
+provenance 作为服务端 predicate 过滤参数；VSA 的
 自定义 predicate 先下载 bundle 再做本地密码学校验。对双 tarball、双 SBOM、OpenVEX、
 checksums 和 metadata 应逐一验证；摘要相同但没有有效 attestation，不等于来源已经认证。
 

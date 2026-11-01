@@ -121,6 +121,7 @@
           "evidence": [
             ".github/workflows/ci-verify.yml",
             ".github/workflows/npm-publish.yml",
+            ".github/workflows/slsa-build-l3.yml",
             ".github/requirements-ci.txt",
             "desktop/src/core/workflow_policy.py",
             "desktop/tests/test_workflow_policy.py"
@@ -252,7 +253,9 @@
             "docs/supply-chain-security.md",
             "docs/release.md",
             "packaging/npm/tools/build_release.py",
+            ".github/workflows/slsa-build-l3.yml",
             "scripts/build_vsa.py",
+            "results/supply-chain/slsa-l3-attestation-run.json",
             ".github/workflows/npm-publish.yml"
           ]
         }
@@ -448,6 +451,7 @@
             "pyproject.toml",
             "packaging/npm/tools/build_release.py",
             ".github/workflows/npm-publish.yml",
+            ".github/workflows/slsa-build-l3.yml",
             "desktop/tests/test_sast_baseline.py"
           ]
         }

@@ -10,6 +10,9 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "npm-publish.yml"
+BUILDER_WORKFLOW = ROOT / ".github" / "workflows" / "slsa-build-l3.yml"
+RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release.yml"
+EVIDENCE_BUILDER_WORKFLOW = ROOT / ".github" / "workflows" / "release-evidence-l3.yml"
 
 
 class SupplyChainEvidenceTest(unittest.TestCase):
@@ -65,6 +68,12 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
     def setUpClass(cls):
         cls.doc = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
         cls.jobs = cls.doc["jobs"]
+        cls.builder_doc = yaml.safe_load(BUILDER_WORKFLOW.read_text(encoding="utf-8"))
+        cls.builder_job = cls.builder_doc["jobs"]["build"]
+        cls.release_doc = yaml.safe_load(RELEASE_WORKFLOW.read_text(encoding="utf-8"))
+        cls.evidence_builder_doc = yaml.safe_load(
+            EVIDENCE_BUILDER_WORKFLOW.read_text(encoding="utf-8")
+        )
 
     def test_pr_is_dry_run_and_manual_publish_defaults_off(self):
         self.assertIn("pull_request", self.doc[True])
@@ -74,10 +83,14 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
         self.assertNotIn("NPM_TOKEN", json.dumps(self.jobs["build"], ensure_ascii=False))
 
     def test_attestation_is_hosted_oidc_and_publish_depends_on_it(self):
-        attest = self.jobs["attest"]
-        self.assertEqual("write", attest["permissions"]["id-token"])
-        self.assertEqual("write", attest["permissions"]["attestations"])
-        steps = attest["steps"]
+        build = self.jobs["build"]
+        self.assertEqual("./.github/workflows/slsa-build-l3.yml", build["uses"])
+        self.assertEqual("write", build["permissions"]["id-token"])
+        self.assertEqual("write", build["permissions"]["attestations"])
+        self.assertNotIn("attest", self.jobs)
+        self.assertEqual("write", self.builder_job["permissions"]["id-token"])
+        self.assertEqual("write", self.builder_job["permissions"]["attestations"])
+        steps = self.builder_job["steps"]
         attest_steps = [step for step in steps if str(step.get("uses", "")).startswith(
             "actions/attest-build-provenance@")]
         self.assertEqual(1, len(attest_steps), "缺 build provenance attestation")
@@ -89,15 +102,15 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
         for suffix in (".tgz", ".cdx.json", ".spdx3.json", ".openvex.json",
                        "SHA256SUMS", "release-metadata.json"):
             self.assertIn(suffix, subject)
-        self.assertEqual(["build", "attest", "verify"], self.jobs["publish-npm"]["needs"])
+        self.assertEqual(["build", "verify"], self.jobs["publish-npm"]["needs"])
         self.assertEqual(
-            ["build", "attest", "verify", "publish-npm", "publish-github-packages"],
+            ["build", "verify", "publish-npm", "publish-github-packages"],
             self.jobs["github-release"]["needs"],
         )
 
-    def test_independent_verification_signs_non_l3_vsa_and_gates_publish(self):
+    def test_independent_verification_signs_l3_vsa_and_gates_publish(self):
         verify = self.jobs["verify"]
-        self.assertEqual(["build", "attest"], verify["needs"])
+        self.assertEqual(["build"], verify["needs"])
         self.assertEqual("write", verify["permissions"]["id-token"])
         self.assertEqual("write", verify["permissions"]["attestations"])
         text = json.dumps(verify, ensure_ascii=False)
@@ -106,6 +119,7 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             "gh attestation verify",
             "https://slsa.dev/provenance/v1",
             "scripts/build_vsa.py",
+            ".github/workflows/slsa-build-l3.yml",
             "actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6",
             "https://slsa.dev/verification_summary/v1",
             "steps.vsa.outputs.bundle-path",
@@ -144,7 +158,7 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             walk(yaml.safe_load(path.read_text(encoding="utf-8")), path.name)
 
     def test_build_is_reproducible_and_sboms_are_validated_before_attestation(self):
-        build = json.dumps(self.jobs["build"], ensure_ascii=False)
+        build = json.dumps(self.builder_job, ensure_ascii=False)
         for needle in (
             "packaging/npm/tools/build_release.py",
             "--verify .artifacts/release",
@@ -155,9 +169,38 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             self.assertIn(needle, build)
         self.assertIn("sha256sum -c SHA256SUMS",
                       json.dumps(self.jobs["publish-npm"], ensure_ascii=False))
-        checkout = next(step for step in self.jobs["build"]["steps"]
+        checkout = next(step for step in self.builder_job["steps"]
                         if str(step.get("uses", "")).startswith("actions/checkout@"))
         self.assertFalse(checkout["with"]["persist-credentials"])
+
+    def test_release_evidence_uses_reusable_l3_builder(self):
+        jobs = self.release_doc["jobs"]
+        self.assertEqual("./.github/workflows/release-evidence-l3.yml", jobs["build"]["uses"])
+        self.assertEqual(["build"], jobs["publish"]["needs"])
+        self.assertEqual("write", jobs["build"]["permissions"]["id-token"])
+        self.assertEqual("write", jobs["build"]["permissions"]["attestations"])
+        evidence = self.evidence_builder_doc["jobs"]["build"]
+        attest = next(
+            step for step in evidence["steps"]
+            if str(step.get("uses", "")).startswith(
+                "actions/attest-build-provenance@"
+            )
+        )
+        self.assertEqual("attest", attest["id"])
+        bundle_steps = [
+            step for step in evidence["steps"]
+            if "steps.attest.outputs.bundle-path" in json.dumps(
+                step, ensure_ascii=False
+            )
+        ]
+        self.assertEqual(1, len(bundle_steps))
+        self.assertIn("provenance.intoto.jsonl",
+                      json.dumps(bundle_steps[0], ensure_ascii=False))
+        self.assertNotIn("gh attestation download",
+                         json.dumps(evidence, ensure_ascii=False))
+        publish = json.dumps(jobs["publish"], ensure_ascii=False)
+        self.assertIn("release-evidence-l3.yml", publish)
+        self.assertIn("--deny-self-hosted-runners", publish)
 
 
 if __name__ == "__main__":

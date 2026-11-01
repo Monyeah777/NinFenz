@@ -350,6 +350,6 @@
     ],
     "reproducible_build_count": 2,
     "provenance": "GitHub OIDC build provenance and verification summary",
-    "slsa_claimed_level": "SLSA_BUILD_LEVEL_2"
+    "slsa_claimed_level": "SLSA_BUILD_LEVEL_3"
   }
 }

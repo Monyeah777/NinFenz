@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write  # noqa: E402
+from core import atomic_write, slsa_policy  # noqa: E402
 
 SUM_RE = re.compile(r"^([0-9a-f]{64})  ([^\r\n]+)$")
 
@@ -104,15 +104,14 @@ def predicate(
     commit: str,
     run_id: str,
     verified_at: str,
+    root: Path = ROOT,
 ) -> dict[str, Any]:
     repo = str(policy["repository"])
     verifier_id = str((policy.get("verifier") or {}).get("id") or "")
     levels = policy.get("verified_levels") or []
-    if "SLSA_BUILD_LEVEL_3" in levels:
-        raise ValueError(
-            "readiness 未满足，禁止签发 Build L3 VSA"
-            "（修复指引：先满足 trusted builder 与 build isolation，再改 verification policy）"
-        )
+    level_issues = slsa_policy.claimed_level_issues(policy, root)
+    if level_issues:
+        raise ValueError("；".join(level_issues))
     if not verifier_id or not levels:
         raise ValueError("verification policy 缺 verifier 或 verified_levels")
     policy_uri = f"{repo}/blob/{commit}/packaging/supply-chain/verification-policy.json"
@@ -154,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     verified_at = args.time or datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
-        doc = predicate(policy, policy_digest, args.commit, args.run_id, verified_at)
+        doc = predicate(policy, policy_digest, args.commit, args.run_id, verified_at, ROOT)
     except ValueError as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 1

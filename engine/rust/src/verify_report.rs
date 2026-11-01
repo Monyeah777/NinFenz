@@ -1,13 +1,13 @@
 //! 门禁的**机器可读出口**（`verify_report`）—— 与真源 `desktop/src/core/verify_report.py` 对账。
 //!
-//! 真源把 **33 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
+//! 真源把 **34 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
 //! 逐条归一到 `(issues, warns, stats)` → 定 status → 汇总 counts + 声明面 → 主体规范化 sha256 作
 //! `root_digest`（报告被手改即对不上）→ 按 `indent=2, sort_keys=True` 渲染。
 //!
-//! **本线已自主算出 26/33 条**，其余 7 条由 `--results` 喂入各自的 `(issues, warns, stats)`
+//! **本线已自主算出 26/34 条**，其余 8 条由 `--results` 喂入各自的 `(issues, warns, stats)`
 //! ——与 `score` 的 `--signals` 同一增量法：每移植一个扫描器，喂入面就小一格，内核不动。
 //!
-//! 喂入的 7 条：`redos` / `instruction_evidence` / `perf_budget` / `asvs` / `ssdf` /
+//! 喂入的 8 条：`redos` / `instruction_evidence` / `perf_budget` / `asvs` / `ssdf` / `slsa` /
 //! `asset_contract` / `role_coordinates`（`asset_contract` 为**已裁定**退出原生面，见
 //! `docs/asset_contract.md`；`asvs` 与 `ssdf` 由 Python 证据门校验后喂入）。
 //! ⚠️ 数字**不得凭记忆手写**：以 `engine/rust/tools/check_native_sync.py` 实测输出为准。
@@ -40,7 +40,7 @@ impl Spec {
 }
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
-pub const SPECS: [Spec; 33] = [
+pub const SPECS: [Spec; 34] = [
     Spec {
         id: "purity",
         name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
@@ -213,6 +213,12 @@ pub const SPECS: [Spec; 33] = [
         id: "workflow_policy",
         name: "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）",
         module: "workflow_policy",
+        entry: "scan",
+    },
+    Spec {
+        id: "slsa",
+        name: "SLSA v1.2 Build L3 构建器、provenance 与消费者验签",
+        module: "slsa_policy",
         entry: "scan",
     },
     Spec {
@@ -741,17 +747,18 @@ mod tests {
 
     #[test]
     fn spec_table_matches_the_truth_source_shape() {
-        assert_eq!(SPECS.len(), 33);
+        assert_eq!(SPECS.len(), 34);
         assert_eq!(SPECS[0].id, "purity");
         assert_eq!(SPECS[1].source(), "schema_lint.scan");
         assert_eq!(SPECS[5].id, "rating");
         assert_eq!(SPECS[6].id, "rating_decided");
         assert_eq!(SPECS[6].source(), "rating_gate.decided");
-        assert_eq!(SPECS[29].id, "ssdf");
-        assert_eq!(SPECS[30].id, "asvs");
-        assert_eq!(SPECS[31].id, "asset_contract");
-        assert_eq!(SPECS[32].id, "role_coordinates");
-        assert_eq!(SPECS[32].source(), "role_model.scan");
+        assert_eq!(SPECS[29].id, "slsa");
+        assert_eq!(SPECS[30].id, "ssdf");
+        assert_eq!(SPECS[31].id, "asvs");
+        assert_eq!(SPECS[32].id, "asset_contract");
+        assert_eq!(SPECS[33].id, "role_coordinates");
+        assert_eq!(SPECS[33].source(), "role_model.scan");
     }
 
     #[test]

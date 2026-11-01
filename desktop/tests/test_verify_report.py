@@ -66,6 +66,20 @@ class BuildTest(unittest.TestCase):
         self.assertGreater(d["expected_checks"], 0)
         self.assertTrue(str(d.get("verify_version") or ""), "声明面须含 verify 版本")
 
+    def test_slsa_run_id_is_not_embedded_in_packaged_report(self):
+        stats = vr._stable_stats(
+            "slsa",
+            {
+                "claimed_level": "SLSA_BUILD_LEVEL_3",
+                "last_run_id": 41312133811,
+            },
+        )
+        self.assertNotIn("last_run_id", stats)
+        self.assertEqual(
+            "results/supply-chain/slsa-l3-attestation-run.json",
+            stats["run_evidence"],
+        )
+
     def test_broken_judgement_is_recorded_not_crashing(self):
         """坏判据须记账为 error（报告本身必须出得来）。"""
         with tempfile.TemporaryDirectory() as tmp:      # 空根 → 多条判据会报 fail/error

@@ -6,7 +6,7 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:6e6687965cd887cb5253fe811898746001d8f93719688803229205ad8fbb8cde
+  - protocol/locales.json:5d232d9f4e30bb93a0c1692052b358a26099d97b1efa82f275987ddf2b8c525d
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
@@ -298,6 +298,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-01）：SLSA v1.2 Build L3 successful rebaselined run and workflow hashes
+
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
 
 > 重审（2026-10-28）：回滚持久读缓存后重冻

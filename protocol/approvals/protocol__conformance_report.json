@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-29",
+  "approved_at": "2026-11-01",
   "approved_by": "Monyeah777",
-  "note": "NIST SSDF v1.1 task-level evidence and vulnerability-response gate",
+  "note": "SLSA v1.2 Build L3 successful attestation run evidence",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "53c260a4fa1f7879f34d4fdb522d80b2d92bac6984c44b49ca836b29d7a35307"
+  "subject_digest": "956ae915747a6e296d9aa7b94be929961398fa0a7596f19833d2cb6d901d9f17"
 }

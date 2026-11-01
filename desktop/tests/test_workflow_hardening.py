@@ -100,6 +100,23 @@ class WorkflowHardeningTest(unittest.TestCase):
             issues, _st = wh.scan(tmp)
         self.assertTrue(any("依赖缓存" in i for i in issues), issues)
 
+    def test_slsa_l3_builder_may_disable_cache_explicitly(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            body = GOOD.replace(
+                "    steps:\n",
+                "    steps:\n"
+                "      - run: python -m pip install --no-cache-dir -r req.txt\n",
+            ).replace(
+                "    steps:\n",
+                "    steps:\n"
+                "      - uses: actions/attest-build-provenance@" + SHA + "  # v4\n",
+                1,
+            )
+            _wf(tmp, "slsa.yml", body)
+            _gov(tmp)
+            issues, _st = wh.scan(tmp)
+        self.assertFalse(any("依赖缓存" in i for i in issues), issues)
+
     def test_codeowners_is_required(self):
         with tempfile.TemporaryDirectory() as tmp:
             _wf(tmp, "ok.yml", GOOD)

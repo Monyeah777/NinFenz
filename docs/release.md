@@ -4,8 +4,9 @@
 
 ## 可复现工件与来源证明
 
-npm 正式发布不再以 `npm pack` 即时产出的未归档 tarball 为终点。tag 或显式 attest 运行会调用
-`packaging/npm/tools/build_release.py`，对同一源树构建两次并逐字节比较，产出：
+npm 正式发布不再以 `npm pack` 即时产出的未归档 tarball 为终点。tag 或显式 attest 运行会调用同仓
+reusable workflow `slsa-build-l3.yml`；它用 `packaging/npm/tools/build_release.py` 对同一源树
+构建两次并逐字节比较，产出：
 
 - 确定性 `ninfenz-<version>.tgz`；
 - CycloneDX 1.6 与 SPDX 3.0 JSON-LD SBOM；
@@ -15,8 +16,9 @@ npm 正式发布不再以 `npm pack` 即时产出的未归档 tarball 为终点�
 发布 job 只消费该构建 job 的 tarball；GitHub Release 同一组 tarball、SBOM、checksums 与元数据。
 消费者命令、供应商策略和威胁模型见 [supply-chain-security.md](supply-chain-security.md)。
 
-> 边界：workflow 具备 SLSA Build L2 所需的托管构建、OIDC 认证和外部可验来源证明；
-> 只有真实 tag/attest 运行成功并产生 attestation 后，才对那一组工件声称 Build L2 证据存在。
+> 边界：workflow 按 SLSA v1.2 Build L3 组织：构建在 reusable workflow 的隔离 hosted runner
+> 内完成、禁用持久缓存、由 GitHub 控制面签发不可伪造 provenance。只有真实 tag/attest 运行
+> 成功并产生及回验 attestation 后，才对那一组工件声称 Build L3 证据存在。
 
 ## 这份文件解决什么
 

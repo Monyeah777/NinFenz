@@ -66,6 +66,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "judgement_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
+    ("slsa", "SLSA v1.2 Build L3 构建器、provenance 与消费者验签", "slsa_policy", "scan", "scan"),
     ("ssdf", "NIST SSDF v1.1 作用域证据与漏洞响应闭环", "ssdf_policy", "scan", "scan"),
     ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),
     ("asset_contract",
@@ -86,6 +87,20 @@ def _norm(result: Any, form: str) -> Tuple[List[str], List[str], Dict[str, Any]]
         stats = result[-1] if isinstance(result[-1], dict) else {}
         return issues, warns, stats
     return list(result or []), [], {}
+
+
+def _stable_stats(sid: str, stats: dict[str, Any]) -> dict[str, Any]:
+    """Keep post-build evidence coordinates out of the packaged report digest.
+
+    SLSA evidence records the run that consumed this report. Including that run id here
+    makes every successful build invalidate the source it just built. The run remains
+    machine-readable in ``results/supply-chain/slsa-l3-attestation-run.json``.
+    """
+    clean = dict(stats)
+    if sid == "slsa":
+        clean.pop("last_run_id", None)
+        clean["run_evidence"] = "results/supply-chain/slsa-l3-attestation-run.json"
+    return clean
 
 
 def _call(spec: Tuple[str, str, str, str, str], root: str
@@ -110,6 +125,7 @@ def _call(spec: Tuple[str, str, str, str, str], root: str
         return "error", ["%s.%s 抛 %s：%s（修复指引：先修该判据，报告须能出得来）"
                          % (mod, entry, type(exc).__name__, str(exc)[:120])], [], {}
     issues, warns, stats = _norm(result, form)
+    stats = _stable_stats(sid, stats)
     status = "fail" if issues else ("warn" if warns else "pass")
     return status, issues, warns, stats
 
