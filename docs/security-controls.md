@@ -123,6 +123,11 @@ syslog `AUTH` facility。宿主日志的 ACL、保留、检测、告警和升级
 Critical 漏洞停止发布；High 阻断合并与 tag，除非有可达性证据或显式风险处置；Medium 进入下一
 维护窗口。依赖源、供应商、许可证、VEX 和 SBOM 分别由供应链清单校验。
 
+OpenSSF Security Insights v2.2.0 的机器可读安全画像位于根目录
+`security-insights.yml`。`scripts/security_insights.py` 校验标准字段、私有漏洞报告入口、
+维护者、发布分发点、SLSA/VSA/OpenVEX 声明及所有仓内证据链接，并绑定官方 CUE
+`cue vet` 留下的摘要证据。
+
 发布构建连续构建两次并逐字节比较，产出 CycloneDX 1.6、SPDX 3.0.1、OpenVEX、checksums
 和 release metadata。全部构建步骤在 reusable workflow 内执行，GitHub OIDC 从平台控制面生成
 Build L3 provenance，再由独立 verify 作业生成 VSA。Build L3 不要求断网构建；关键控制是

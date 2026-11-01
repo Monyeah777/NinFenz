@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2e3c8b6c41966340bf02e58719cd9be2207c1f005cf5e777f13fe9013bb456c0
+  - protocol/code_metrics_baseline.json:aad98ee9d2584962d820e4058a0728a67c29399b96631b0add1fa1bb8d935bc1
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -298,6 +298,10 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-02）：Security Insights guarded JSON load
+
+> 重审（2026-11-02）：OpenSSF Security Insights v2.2.0
+
 > 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3
 
 > 重审（2026-11-02）：S2C2F SCA-3 runtime EOL policy

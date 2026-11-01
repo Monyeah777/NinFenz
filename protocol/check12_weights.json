@@ -286,6 +286,7 @@
     "test_sealed_crosscheck": 0.2,
     "test_security_audit": 0.3,
     "test_security_controls": 0.5,
+    "test_security_insights": 0.3,
     "test_security_logging": 0.2,
     "test_seed_from_repo": 0.2,
     "test_selfcontained_rebuild": 0.2,
@@ -3292,6 +3293,14 @@
     "test_security_controls.SecurityControlsTest.test_real_inventory_matches_code_and_documentation": 0.0,
     "test_security_controls.SecurityControlsTest.test_resource_limit_must_equal_code_constant": 0.03,
     "test_security_controls.SecurityControlsTest.test_unreviewed_runtime_external_path_is_red": 0.03,
+    "test_security_insights.SecurityInsightsTest.test_current_profile_is_valid_and_fresh": 0.01,
+    "test_security_insights.SecurityInsightsTest.test_evidence_is_bound_to_profile_digest": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_insecure_reference_is_rejected": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_primary_contact_must_be_unambiguous": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_release_attestations_are_complete": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_repository_must_be_active": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_schema_version_is_pinned": 0.0,
+    "test_security_insights.SecurityInsightsTest.test_stale_profile_fails": 0.0,
     "test_security_logging.SecurityLoggingTest.test_sanitize_handles_unicode_line_boundaries": 0.0,
     "test_security_logging.SecurityLoggingTest.test_security_event_redacts_credentials_and_escapes_controls": 0.0,
     "test_seed_from_repo.SeedFromRepoReachabilityTest.test_script_lives_under_desktop_scripts": 0.0,
@@ -3842,5 +3851,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1638.7
+  "total_s": 1639.0
 }

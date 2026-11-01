@@ -4,9 +4,9 @@
     "entry": 27,
     "floor": 5,
     "prod": 1049,
-    "projection": 134,
-    "support": 306,
-    "verify": 1144
+    "projection": 135,
+    "support": 309,
+    "verify": 1145
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8975,6 +8975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "OpenSSF Security Insights v2.2.0 profile regression tests.",
+      "path": "desktop/tests/test_security_insights.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "ASVS V16 security-event logging and redaction regression tests.",
       "path": "desktop/tests/test_security_logging.py",
       "role": "verify",
@@ -13200,16 +13206,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bf94bd508bf8ac848e9dfc62e33025ca5f896c10fbb06b0945644d8b6ba24d28",
+  "root_digest": "3a2028c94ff66996aca795cd6737de8b4760f55b727ffcc59f033c305d3e712e",
   "rule_counts": {
     "R-app": 1448,
-    "R-catch": 134,
+    "R-catch": 136,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 119,
-    "R-support": 146,
-    "R-verify": 1022,
+    "R-projection": 120,
+    "R-support": 147,
+    "R-verify": 1023,
     "auto:R-core": 268
   },
   "schema": "nf-role-coordinates/1"
