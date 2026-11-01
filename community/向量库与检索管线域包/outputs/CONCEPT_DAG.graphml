@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <key id="layer" for="node" attr.name="layer" attr.type="string"/>
+  <key id="branch" for="node" attr.name="branch" attr.type="string"/>
+  <key id="provenance" for="edge" attr.name="provenance" attr.type="string"/>
+  <graph id="concept-graph" edgedefault="directed">
+    <node id="C15-01">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-02">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-03">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-04">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-05">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-06">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-07">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-08">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-09">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-10">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-11">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="C15-12">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="STD-arrow">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-cncf-otel-semconv">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-frictionless-package">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-ietf-json-schema">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-mermaid">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-mlcommons-bench">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-mlcommons-croissant">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-nist-800-188">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-nist-privacy">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-parquet">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-rdf11">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-schema-org">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-vega-lite">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-w3c-vc">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <edge source="C15-01" target="C15-02">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-02" target="C15-03">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-03" target="C15-04">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-01" target="C15-04">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-04" target="C15-05">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-02" target="C15-05">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-05" target="C15-06">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-03" target="C15-06">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-06" target="C15-07">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-04" target="C15-07">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-07" target="C15-08">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-05" target="C15-08">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-08" target="C15-09">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-06" target="C15-09">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-09" target="C15-10">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-07" target="C15-10">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-10" target="C15-11">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-08" target="C15-11">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-11" target="C15-12">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-09" target="C15-12">
+      <data key="provenance">['c15-anchor']</data>
+    </edge>
+    <edge source="C15-01" target="STD-arrow">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-12" target="STD-cncf-otel-semconv">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-05" target="STD-cncf-otel-semconv">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-04" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-06" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-07" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-json-schema" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-04" target="STD-mermaid">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-09" target="STD-mermaid">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-12" target="STD-mermaid">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-09" target="STD-mlcommons-bench">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-03" target="STD-mlcommons-croissant">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-schema-org" target="STD-mlcommons-croissant">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-10" target="STD-nist-800-188">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-nist-privacy" target="STD-nist-800-188">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-02" target="STD-parquet">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-05" target="STD-parquet">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-08" target="STD-parquet">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-11" target="STD-parquet">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-01" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-02" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-03" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-06" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-07" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-08" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-11" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-json-schema" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="C15-10" target="STD-w3c-vc">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-rdf11" target="STD-w3c-vc">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+  </graph>
+</graphml>

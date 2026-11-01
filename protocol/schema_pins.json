@@ -1,0 +1,5 @@
+{
+  "schema": "nf-schema-pins/1",
+  "note": "按 schema 版本钉扎的旧版契约样本（机制借鉴 restless-core company_projection.rs:800-853；消费方 core/schema_pins.py）。把 §7 V2 的兼容从声明变成可执行侧。",
+  "pins": []
+}

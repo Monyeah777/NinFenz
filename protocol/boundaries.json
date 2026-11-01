@@ -1,0 +1,5 @@
+{
+  "schema": "nf-boundaries/1",
+  "note": "边界登记：边界 → 协议代码件 + 协议文档件（机制借鉴 OpenAgentCore AGENTS 边界表；消费方 core/boundaries.py）。两件都必须真实在场。",
+  "boundaries": []
+}

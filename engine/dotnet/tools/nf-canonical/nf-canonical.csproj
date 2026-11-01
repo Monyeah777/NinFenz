@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    nf-canonical —— RFC 8785 (JCS) 规范化 JSON 的独立 C# 实现（BCL-only，零 NuGet）。
+
+    为什么单开一个工具而不用 nf-dotnet 的子命令：跨语言契约对拍要求「各语言按同一规范各自
+    实现，且互不引用」。挂进 nf-dotnet 会让人误以为它与 Nf.Engine 的既有规范化口径同源；
+    独立工程把「实现独立」这一前提结构性地钉住。
+
+    读入/写出与 Rust 侧 engine/rust/canonical、Python 侧 scripts/jcs.py 的 jcs 规则逐字节
+    对齐：进程级、无尾换行、不合法输入一律非零退出并报因（不静默降级）。
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>nf-canonical</AssemblyName>
+    <RootNamespace>Nf.Canonical</RootNamespace>
+    <Version>0.1.0</Version>
+    <Description>RFC 8785 (JCS) canonical JSON —— 独立 C# 实现（跨语言契约对拍的第三实现）</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NinFenz Evidence Gate · AI 文档发布证据控制层</title>
+<meta name="description" content="NinFenz Evidence Gate 把 AI 文档要求变成版本化契约、确定性发布门禁与可审计证据。Community 采用 AGPL-3.0；闭源集成、SLA、私有化与企业采购提供商业许可。">
+<link rel="canonical" href="https://ninfenz.dev/">
+<link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/">
+<link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/">
+<link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/">
+<link rel="describedby" href="llms.txt" type="text/plain" title="llms.txt">
+<link rel="alternate" href="llms-full.txt" type="text/plain" title="llms-full.txt（完整单文件）">
+<link rel="license" href="https://www.gnu.org/licenses/agpl-3.0.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NinFenz Evidence Gate · AI 文档发布证据控制层">
+<meta property="og:description" content="把 AI 文档要求变成可执行契约、发布门禁与审计证据。Community AGPL-3.0；商业许可用于闭源集成、SLA 与企业采购。">
+<meta property="og:url" content="https://ninfenz.dev/">
+<meta property="og:image" content="https://ninfenz.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="msvalidate.01" content="BC986533673F959259865E7DE5291890">
+<link rel="stylesheet" href="assets/site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://ninfenz.dev/#software",
+      "name": "NinFenz Evidence Gate",
+      "alternateName": ["NinFenz", "宁封子", "NF"],
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "codeRepository": "https://github.com/Monyeah777/NinFenz",
+      "sameAs": ["https://github.com/Monyeah777/NinFenz", "https://gitee.com/monyeah777/ninfenz"],
+      "softwareVersion": "1.1.2",
+      "description": "Local-first output assurance for AI-generated documentation: versioned contracts, deterministic release gates, rule-level evidence and audit-ready reports.",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "AI Output Assurance Diagnostic",
+          "price": "39800",
+          "priceCurrency": "CNY",
+          "url": "https://ninfenz.dev/pilot/"
+        },
+        {
+          "@type": "Offer",
+          "name": "Team Control",
+          "price": "19800",
+          "priceCurrency": "CNY",
+          "url": "https://ninfenz.dev/pricing/"
+        },
+        {
+          "@type": "Offer",
+          "name": "Enterprise",
+          "price": "98000",
+          "priceCurrency": "CNY",
+          "url": "https://ninfenz.dev/pricing/"
+        }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://ninfenz.dev/#website",
+      "url": "https://ninfenz.dev/",
+      "name": "NinFenz Evidence Gate",
+      "inLanguage": ["zh-CN", "en"],
+      "publisher": {"@id": "https://ninfenz.dev/#person"}
+    },
+    {
+      "@type": "Person",
+      "@id": "https://ninfenz.dev/#person",
+      "name": "Monyeah777",
+      "url": "https://github.com/Monyeah777"
+    },
+    {
+      "@type": "DefinedTerm",
+      "@id": "https://ninfenz.dev/#term",
+      "name": "内容契约层",
+      "alternateName": "content contract layer",
+      "description": "用协议、确定性门禁和可验证产物定义 AI 长内容，使产出可装载、可质检、可复现。"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://ninfenz.dev/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "NinFenz 是 AI 治理平台吗？",
+          "acceptedAnswer": {"@type": "Answer", "text": "不是全栈 AI 治理平台。NinFenz 聚焦 AI 生成文档的输出契约、发布门禁和可复现证据。"}
+        },
+        {
+          "@type": "Question",
+          "name": "Community 和商业版的许可是什么？",
+          "acceptedAnswer": {"@type": "Answer", "text": "Community 代码采用 AGPL-3.0-only。闭源嵌入、SLA、私有化支持和企业采购使用单独商业许可。"}
+        },
+        {
+          "@type": "Question",
+          "name": "会验证事实或保证法律合规吗？",
+          "acceptedAnswer": {"@type": "Answer", "text": "不会。NinFenz 验证文档是否满足明确契约，不替代事实核查、法律意见、模型评测或安全认证。"}
+        },
+        {
+          "@type": "Question",
+          "name": "可以本地运行吗？",
+          "acceptedAnswer": {"@type": "Answer", "text": "可以。核心校验、报告和证据生成均为本地优先，不要求上传文档。"}
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand">NinFenz <small>Evidence Gate</small></div>
+  <nav>
+    <a href="#product">产品</a>
+    <a href="controls/">控制库</a>
+    <a href="pricing/">定价</a>
+    <a href="pilot/">4 周试点</a>
+    <a href="trust/">Trust Center</a>
+    <a href="use/">开源使用</a>
+    <a href="en/">English</a>
+    <a href="https://github.com/Monyeah777/NinFenz">GitHub</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="eyebrow">AI TRiSM · Output assurance</div>
+  <h1>别再发布没有<span class="grad">证据</span>的 AI 文档。</h1>
+  <p class="lede">NinFenz Evidence Gate 把文档要求变成版本化契约、确定性发布门禁和可审计报告。它不猜“内容好不好”，而是证明每一条控制是否真的执行。</p>
+  <div class="hero-actions">
+    <a class="btn primary" href="pilot/">申请 4 周 Output Assurance Diagnostic</a>
+    <a class="btn secondary" href="pricing/">查看价格与许可</a>
+  </div>
+  <div class="trust-strip">
+    <span class="badge">Community AGPL-3.0</span>
+    <span class="badge">Commercial license available</span>
+    <span class="badge">Local-first · no uploads</span>
+    <span class="badge">Official MCP Registry</span>
+    <span class="badge">SLSA provenance</span>
+  </div>
+  <div class="official-note"><strong>官方唯一指定入口：</strong><a href="https://ninfenz.dev/">https://ninfenz.dev</a>。NinFenz 的付款、采购或定制合作只通过本页列出的官方联系方式或签署的正式合同，不通过随机第三方下载站、群聊或激活码。</div>
+</section>
+
+<section id="product">
+  <h2 id="fact-core">从治理要求到发布证据，只差一个可执行层</h2>
+  <p class="section-lede">AI governance 平台定义政策，observability 平台观察运行，安全平台拦截攻击。NinFenz 负责另一件具体的事：在内容对外发布之前，证明它满足明确契约。</p>
+  <div class="grid four">
+    <div class="card card-feature"><div class="num">01 / CONTRACT</div><h3>版本化契约</h3><p>把章节、字段、参数、审批和禁止模式写成可复现的规则，而不是散落在手册里的要求。</p></div>
+    <div class="card card-feature"><div class="num">02 / GATE</div><h3>确定性门禁</h3><p>CLI、MCP、Agent 或 CI 执行同一套检查。失败返回 rule ID、位置和修复提示。</p></div>
+    <div class="card card-feature"><div class="num">03 / EVIDENCE</div><h3>可审计证据</h3><p>JSON 与 HTML 报告可归档、可复验，并可与 checksum、provenance 和 attestation 结合。</p></div>
+    <div class="card card-feature"><div class="num">04 / RELEASE</div><h3>发布前决策</h3><p>让内部审计、客户交付和采购安全问卷拿到同一份证据，而不是“我们检查过了”。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>面向真实 AI 输出，不是抽象治理看板</h2>
+  <div class="grid two">
+    <div class="card">
+      <h3>适合这些场景</h3>
+      <ul class="list-plain">
+        <li>Agent 生成企业报告、工单总结、发布说明或知识库内容</li>
+        <li>API reference、runbook、migration guide 和 security policy 的发布门禁</li>
+        <li>需要把控制证据交给客户、内部审计或企业采购的 AI 产品团队</li>
+        <li>已有 governance / evaluation 工具，但缺少内容发布执行层的平台</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>明确不做什么</h3>
+      <ul class="list-plain">
+        <li>不做全企业 AI inventory 或 shadow AI 发现</li>
+        <li>不做 DLP、IAM 或实时 Prompt 攻击拦截</li>
+        <li>不做模型漂移、公平性或红队评测</li>
+        <li>不把 PASS 说成事实正确、法律合规或安全认证</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>4 周，从“相信审核人”到“每条控制都有证据”</h2>
+  <div class="flow">
+    <div class="flow-step card"><div class="num">WEEK 1</div><h3>范围与样例</h3><p>选择一个生产流程，整理真实文档和审批链。</p></div>
+    <div class="flow-step card"><div class="num">WEEK 2</div><h3>10 个契约</h3><p>建立 PASS 与定向 FAIL 样例，让每条规则可证明。</p></div>
+    <div class="flow-step card"><div class="num">WEEK 3</div><h3>接入与报告</h3><p>接入 CLI、MCP 或 CI，生成可归档证据包。</p></div>
+    <div class="flow-step card"><div class="num">WEEK 4</div><h3>验收与路线</h3><p>内部演示、缺陷修复和 90 天扩展计划。</p></div>
+  </div>
+</section>
+
+<section id="pricing-preview">
+  <h2>透明价格，按企业采购设计</h2>
+  <p class="section-lede">先用 4 周诊断验证控制与预算，再进入团队或企业许可。Community 保持 AGPL-3.0，不把核心执行能力藏在付费墙后。</p>
+  <div class="price-grid">
+    <div class="card price-card">
+      <div class="num">COMMUNITY</div><h3>开源版</h3><div class="price">AGPL-3.0</div><div class="price-note">内部 CI、自建与评估可用</div>
+      <ul><li>完整核心代码</li><li>CLI / MCP / LSP</li><li>本地运行</li></ul>
+      <a class="btn secondary" href="use/">开始使用</a>
+    </div>
+    <div class="card price-card featured">
+      <div class="num">START HERE</div><h3>Assurance Diagnostic</h3><div class="price">¥39,800</div><div class="price-note">USD 6,500 · 4 周</div>
+      <ul><li>10 个控制契约</li><li>PASS / FAIL 样例</li><li>证据包与内部审计演示</li></ul>
+      <a class="btn primary" href="pilot/">申请试点</a>
+    </div>
+    <div class="card price-card">
+      <div class="num">TEAM</div><h3>Team Control</h3><div class="price">¥19,800 / 年</div><div class="price-note">USD 3,000 / 年</div>
+      <ul><li>40 个专业控制包</li><li>10 个 Agent 安装包</li><li>报告模板与更新</li></ul>
+      <a class="btn secondary" href="pricing/">查看详情</a>
+    </div>
+    <div class="card price-card">
+      <div class="num">ENTERPRISE</div><h3>Enterprise</h3><div class="price">¥98,000 起</div><div class="price-note">USD 15,000 起 / 年</div>
+      <ul><li>商业许可与合同</li><li>安全问卷支持</li><li>私有化与 4h 首响</li></ul>
+      <a class="btn secondary" href="pricing/">采购咨询</a>
+    </div>
+  </div>
+</section>
+
+<section id="fact-verifiable">
+  <h2>建立在可核验的技术底座上</h2>
+  <div class="trust-row">
+    <div class="trust-item" id="fact-quality"><strong>质量证据</strong><span>verify v2.30 · check1-42 · PASS=76</span></div>
+    <div class="trust-item" id="fact-npm"><strong>发布供应链</strong><span>npm provenance · checksums · release attestations</span></div>
+    <div class="trust-item" id="fact-mcp"><strong>公开入口</strong><span>Official MCP Registry · GitHub · Gitee</span></div>
+    <div class="trust-item" id="fact-terminal"><strong>本地工具面</strong><span>CLI · MCP · terminal · local-first</span></div>
+  </div>
+  <p class="src" id="fact-scale">规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 370 条（可达 332 / 不可达 38）· 标准绑定 1200 条 · 馆藏 3 件。</p>
+  <div class="callout">
+    <div class="eyebrow">Technical definition</div>
+    <p>宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。</p>
+    <p class="src">技术机器面：<a href="llms.txt">/llms.txt</a> · <a href="llms-full.txt">/llms-full.txt</a> · <a href="facts.json">/facts.json</a> · <a href="nf.txt">/nf.txt</a> · <a href="agent.txt">/agent.txt</a></p>
+  </div>
+</section>
+
+<section id="faq">
+  <h2>常见问题</h2>
+  <div class="grid two">
+    <div class="card"><h3>Community 真的免费吗？</h3><p>核心代码采用 AGPL-3.0-only，可用于内部部署和内部 CI。需要闭源嵌入、正式 SLA、商业合同或企业采购时使用商业许可。</p></div>
+    <div class="card"><h3>和 AI governance 平台什么关系？</h3><p>NinFenz 是治理政策和真实输出之间的执行与证据层，不替代 AI inventory、风险评分、模型观测或安全平台。</p></div>
+    <div class="card"><h3>会检查事实吗？</h3><p>不会。它检查是否满足明确契约。事实正确性、法律判断、发布适用性仍由人和对应专业流程负责。</p></div>
+    <div class="card"><h3>可以私有化吗？</h3><p>可以。核心校验和报告均为本地优先。企业商业许可包含私有化部署支持和安全问卷配合。</p></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div><div class="brand">NinFenz <small>Evidence Gate</small></div><p class="src">AI 生成内容的发布契约、门禁与证据层。</p></div>
+    <div><strong>产品</strong><ul><li><a href="controls/">控制库</a></li><li><a href="pricing/">定价与许可</a></li><li><a href="pilot/">4 周试点</a></li><li><a href="trust/">Trust Center</a></li></ul></div>
+    <div><strong>资源</strong><ul><li><a href="use/">开源使用</a></li><li><a href="llms.txt">机器入口</a></li><li><a href="https://github.com/Monyeah777/NinFenz">GitHub</a></li><li><a href="mailto:support@ninfenz.dev?subject=NinFenz%20enterprise%20inquiry">企业咨询</a></li></ul></div>
+  </div>
+  <p class="src">© 2026 Monyeah777 · Community AGPL-3.0 · Commercial licensing available · <a href="https://github.com/Monyeah777/NinFenz/blob/main/COMMERCIAL.md">商业授权说明</a></p>
+</footer>
+</div>
+</body>
+</html>

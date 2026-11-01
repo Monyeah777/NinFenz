@@ -1,0 +1,79 @@
+%% 概念前置图（由 community/图像生成与视觉创作域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    E07-01
+    E07-03
+    E07-05
+    E07-07
+    E07-09
+    E07-11
+  end
+  subgraph P60[P60]
+    E07-02
+    E07-04
+    E07-06
+    E07-08
+    E07-10
+    E07-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-creativecommons
+    STD-gdpr
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-spdx-licenses
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  E07-01 --> E07-02
+  E07-02 --> E07-03
+  E07-03 --> E07-04
+  E07-01 --> E07-04
+  E07-04 --> E07-05
+  E07-02 --> E07-05
+  E07-05 --> E07-06
+  E07-03 --> E07-06
+  E07-06 --> E07-07
+  E07-04 --> E07-07
+  E07-07 --> E07-08
+  E07-05 --> E07-08
+  E07-08 --> E07-09
+  E07-06 --> E07-09
+  E07-09 --> E07-10
+  E07-07 --> E07-10
+  E07-10 --> E07-11
+  E07-08 --> E07-11
+  E07-11 --> E07-12
+  E07-09 --> E07-12
+  E07-01 --> STD-commonmark
+  E07-04 --> STD-commonmark
+  E07-07 --> STD-commonmark
+  E07-02 --> STD-commonmark
+  E07-05 --> STD-commonmark
+  E07-10 --> STD-creativecommons
+  E07-09 --> STD-gdpr
+  E07-01 --> STD-ietf-json-schema
+  E07-06 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  E07-10 --> STD-spdx-licenses
+  E07-03 --> STD-vega-lite
+  E07-08 --> STD-vega-lite
+  E07-09 --> STD-vega-lite
+  E07-11 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  E07-03 --> STD-w3c-epub33
+  E07-06 --> STD-w3c-epub33
+  E07-11 --> STD-w3c-epub33
+  E07-12 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  E07-02 --> STD-w3c-tabular-data
+  E07-05 --> STD-w3c-tabular-data
+  E07-08 --> STD-w3c-tabular-data
+  E07-04 --> STD-w3c-tabular-data
+  E07-07 --> STD-w3c-tabular-data
+  E07-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

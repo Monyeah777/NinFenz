@@ -1,0 +1,78 @@
+%% 概念前置图（由 community/提示工程与提示模板域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    C13-01
+    C13-03
+    C13-05
+    C13-07
+    C13-09
+    C13-11
+  end
+  subgraph P60[P60]
+    C13-02
+    C13-04
+    C13-06
+    C13-08
+    C13-10
+    C13-12
+  end
+  subgraph P80[P80]
+    STD-cncf-otel-semconv
+    STD-commonmark
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mlcommons-bench
+    STD-vega-lite
+    STD-w3c-tabular-data
+  end
+  C13-01 --> C13-02
+  C13-02 --> C13-03
+  C13-03 --> C13-04
+  C13-01 --> C13-04
+  C13-04 --> C13-05
+  C13-02 --> C13-05
+  C13-05 --> C13-06
+  C13-03 --> C13-06
+  C13-06 --> C13-07
+  C13-04 --> C13-07
+  C13-07 --> C13-08
+  C13-05 --> C13-08
+  C13-08 --> C13-09
+  C13-06 --> C13-09
+  C13-09 --> C13-10
+  C13-07 --> C13-10
+  C13-10 --> C13-11
+  C13-08 --> C13-11
+  C13-11 --> C13-12
+  C13-09 --> C13-12
+  C13-04 --> STD-cncf-otel-semconv
+  C13-08 --> STD-cncf-otel-semconv
+  C13-09 --> STD-cncf-otel-semconv
+  C13-10 --> STD-cncf-otel-semconv
+  C13-06 --> STD-commonmark
+  C13-07 --> STD-commonmark
+  C13-08 --> STD-commonmark
+  C13-09 --> STD-commonmark
+  C13-10 --> STD-commonmark
+  C13-11 --> STD-commonmark
+  C13-12 --> STD-commonmark
+  C13-03 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  C13-01 --> STD-ietf-json-schema
+  C13-04 --> STD-ietf-json-schema
+  C13-05 --> STD-ietf-json-schema
+  C13-06 --> STD-ietf-json-schema
+  C13-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  C13-02 --> STD-mlcommons-bench
+  C13-05 --> STD-mlcommons-bench
+  C13-01 --> STD-vega-lite
+  C13-03 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  C13-02 --> STD-w3c-tabular-data
+  C13-07 --> STD-w3c-tabular-data
+  C13-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

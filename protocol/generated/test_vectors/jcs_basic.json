@@ -1,0 +1,57 @@
+{
+  "schema": "nf-test-vectors/1",
+  "note": "P-C1 走通件（三实现均已是真实现，非 probe）：单条真契约向量。",
+  "vectors": [
+    {
+      "id": "jcs/basic-ascii",
+      "spec_clause": "RFC8785/3.2.3",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_input.json",
+      "compare_rule": "byte",
+      "expected": "{\"a\":[2,1.5,true,null],\"b\":1,\"c\":\"xy\"}",
+      "note": "键排序 + 无空白",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        }
+      }
+    }
+  ]
+}

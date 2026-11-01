@@ -1,0 +1,20 @@
+fix(ci): 预算判据容忍 0 次打开 + 重型语言工作流加变更面过滤（L6）
+
+一、红因修复
+main 的 `unit-tests-2-of-32` 红：`test_evaluate_reads_stay_within_budget` 用
+`max(counts.values())`，而 CI（ubuntu）上第二次 `evaluate` **零次物理打开**（整轮命中
+常驻/作用域语料缓存）⇒ `ValueError: max() arg is an empty sequence`。
+该判据守的是**上限**（≤3400 次打开、单件 ≤3 次），0 次是最好结果 ⇒ `default=0`，
+对 total/worst 照旧断言。本地 8 条全绿。
+
+二、L6：变更面过滤（不降覆盖率，只不触发无关工作流）
+给 `cross-lang` / `rust-parity` / `net-engine` 的 `pull_request` 加 `paths:`——
+只在它们真正的输入面变动时跑：
+- cross-lang：engine/rust、engine/dotnet、cross_lang_verify.py、desktop/src/core、protocol
+- rust-parity：engine/rust、protocol、scripts
+- net-engine：engine/dotnet、protocol、scripts
+`push: main` 保持全量（主分支仍每次全跑）。
+
+三、预期
+PR 的 checks 总时长下降（不再为文档/纯 Python 改动跑 Rust/Dotnet 构建）；
+ci-verify 维持 ≈4.5 min ≤ 5 min（T3 达标）。

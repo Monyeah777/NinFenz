@@ -1,0 +1,19 @@
+[package]
+name = "nf-pyengine"
+version = "0.1.0"
+edition = "2021"
+description = "NF Python 扩展（PyO3）：同进程绑定的第二形态（P5-07.1/07.2）"
+license = "MIT"
+
+[dependencies]
+pyo3 = { version = "0.30.1", features = ["extension-module"] }
+# 进程内绑定的业务原语单源 = engine/rust 的 rlib（不重抄 sha256 / float repr，避免两份口径）。
+# 只暴露 lib.rs 里的纯函数面；业务判据面仍在 bin（main.rs 只读快线）。
+nf-rs = { path = ".." }
+
+[lib]
+name = "nf_pyengine"
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 2

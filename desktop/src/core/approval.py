@@ -1,0 +1,133 @@
+"""内容绑定批准记录（机制借鉴 MCOP 的 approved-changeset gate）。
+
+NF 现状：所有「作者裁决」只存在于散文（代码注释与文档里）。本模块把「有人批准了」
+变成**内容绑定、可重放**的记录：
+
+- 记录 = {schema, subject, subject_digest, approved_by, approved_at, note}；
+- 被批准对象一改，`subject_digest` 立刻不符 → **失效**（approved 不是永久通行证）；
+- 缺批准人 / 摘要不符 / 指向不存在的对象 → FAIL。
+
+纪律：纯标准库；记录入库（protocol/approvals/*.json）可 diff 可审计。
+"""
+from __future__ import annotations
+
+import json
+import os
+from datetime import date
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+from core import atomic_write, json_doc, paths, repo_trust
+from core.atoms import hash as hash_atom
+
+SCHEMA = "nf-approval/1"
+DIR_REL = "protocol/approvals"
+ENV_APPROVERS = "NF_APPROVERS"
+
+
+def allowed_approvers(root: str) -> frozenset:
+    """当前仓库允许的批准人；显式环境变量优先，仅可信安装根退回 owner 白名单。"""
+    if ENV_APPROVERS in os.environ:
+        return frozenset(x.strip() for x in
+                         (os.environ.get(ENV_APPROVERS) or "").split(",") if x.strip())
+    return (frozenset(repo_trust.ALLOWED_OWNERS)
+            if repo_trust.trust_status(root)[0] else frozenset())
+
+
+def subject_digest(root: str, subject: str) -> str:
+    """被批准对象的整文件摘要（不含批准记录本身——记录是独立文件，无自指问题）。"""
+    p = Path(paths.validate_path(root, subject))
+    # 批准是完整性锚点：不得用 (mtime,size) 缓存。NTFS 快速同尺寸覆写可能保留同一
+    # 时间戳，缓存会给旧内容假签收；这里直接分块重算（仍不整文件读入内存）。
+    got = hash_atom.sha256_file(p)
+    if got is None:
+        raise ValueError("被批准对象不可读：%s（修复指引：确认路径存在且可读）" % subject)
+    return got
+
+
+def approve(root: str, subject: str, approved_by: str, note: str = "",
+            today: str = "") -> str:
+    """写一条批准记录 → 相对路径。"""
+    if not approved_by.strip():
+        raise ValueError("批准人不能为空（修复指引：--by <批准人标识>）")
+    allowed = allowed_approvers(root)
+    if allowed and approved_by.strip() not in allowed:
+        raise ValueError("批准人 %s 不在允许列表 %s（修复指引：由获授权者批准，或显式设置 %s）"
+                         % (approved_by.strip(), sorted(allowed), ENV_APPROVERS))
+    p = Path(paths.validate_path(root, subject))
+    if not p.is_file():
+        raise ValueError("被批准对象不存在：%s（修复指引：给出仓库内真实文件路径）" % subject)
+    rec = {"schema": SCHEMA, "subject": subject.replace("\\", "/"),
+           "subject_digest": subject_digest(root, subject),
+           "approved_by": approved_by.strip(),
+           "approved_at": today or date.today().isoformat(),  # noqa: DTZ011 - 本地日历日期是有意语义（UTC 会在跨零点给出错误「今天」）
+           "note": note}
+    safe = subject.replace("/", "__").replace("\\", "__")
+    # 双扩展名修复（2026-10-10 审计 W7）：主体本身以 .json 结尾时，此前拼成 xxx.json.json
+    # （在仓实例：protocol/approvals/protocol__conformance_report.json.json）。记录名只是**唯一键**
+    # （读取按 glob + 记录内 subject 字段），去掉重复后缀不改语义。
+    if safe.endswith(".json"):
+        safe = safe[:-5]
+    dest = Path(root) / DIR_REL / ("%s.json" % safe)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    # 原子写（2026-09-30 收口）：批准记录是**在仓产物**（protocol/approvals/*.json），
+    # 并发 `verify`/`nf audit` 读者此前可能读到半截 JSON（裸 write_text）。
+    atomic_write.write_text(dest, json.dumps(rec, ensure_ascii=False,
+                                             indent=2, sort_keys=True) + "\n")
+    return dest.relative_to(Path(root)).as_posix()
+
+
+def records(root: str = ".") -> List[Dict[str, Any]]:
+    d = Path(root) / DIR_REL
+    if not d.is_dir():
+        return []
+    out = []
+    for p in sorted(d.glob("*.json")):
+        try:
+            out.append(json_doc.load(p, dict, what=p.name))
+        except ValueError:
+            out.append({"schema": "?", "subject": p.name, "broken": True})
+    return out
+
+
+def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """校验全部批准记录 → (issues, stats)。改动即失效、缺批准人即 FAIL。"""
+    issues: List[str] = []
+    rows = records(root)
+    stale = []
+    allowed = allowed_approvers(root)
+    for rec in rows:
+        subj = str(rec.get("subject") or "")
+        if rec.get("schema") != SCHEMA:
+            issues.append("批准记录 schema 不匹配：%s" % subj)
+            continue
+        if not str(rec.get("approved_by") or "").strip():
+            issues.append("批准记录缺批准人：%s" % subj)
+        elif allowed and str(rec.get("approved_by")).strip() not in allowed:
+            issues.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
+                          % (rec.get("approved_by"), subj))
+        try:
+            changed = subject_digest(root, subj) != str(rec.get("subject_digest") or "")
+        except (paths.PathEscapeError, ValueError) as exc:
+            issues.append(f"批准对象不可用：{subj}（{exc}）")
+            continue
+        if changed:
+            stale.append(subj)
+            issues.append("批准已失效（对象内容已改）：%s（修复指引：重新批准）" % subj)
+    stats = {"records": len(rows), "stale": stale,
+             "subjects": sorted({str(r.get("subject")) for r in rows})}
+    return issues, stats
+
+
+def list_records(root: str = ".") -> List[Dict[str, Any]]:
+    """列批准记录 + 失效标记（供 `nf approve --list`；只读）。"""
+    out = []
+    for rec in records(root):
+        subj = str(rec.get("subject") or "")
+        stale = True
+        if rec.get("schema") == SCHEMA and os.path.isfile(os.path.join(root, subj)):
+            stale = subject_digest(root, subj) != str(rec.get("subject_digest") or "")
+        out.append({"subject": subj, "approved_by": rec.get("approved_by", ""),
+                    "approved_at": rec.get("approved_at", ""),
+                    "note": rec.get("note", ""), "stale": stale})
+    return out

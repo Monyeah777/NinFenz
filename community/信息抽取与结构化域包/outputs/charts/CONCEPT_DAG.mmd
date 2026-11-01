@@ -1,0 +1,74 @@
+%% 概念前置图（由 community/信息抽取与结构化域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    B05-01
+    B05-03
+    B05-05
+    B05-07
+    B05-09
+    B05-11
+  end
+  subgraph P60[P60]
+    B05-02
+    B05-04
+    B05-06
+    B05-08
+    B05-10
+    B05-12
+  end
+  subgraph P80[P80]
+    STD-cncf-cloudevents
+    STD-commonmark
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mlcommons-bench
+    STD-rdf11
+    STD-vega-lite
+    STD-w3c-prov-o
+    STD-w3c-skos
+    STD-w3c-tabular-data
+  end
+  B05-01 --> B05-02
+  B05-02 --> B05-03
+  B05-01 --> B05-04
+  B05-04 --> B05-05
+  B05-04 --> B05-06
+  B05-05 --> B05-07
+  B05-05 --> B05-08
+  B05-02 --> B05-09
+  B05-10 --> B05-11
+  B05-11 --> B05-12
+  B05-03 --> STD-cncf-cloudevents
+  STD-ietf-json-schema --> STD-cncf-cloudevents
+  B05-07 --> STD-commonmark
+  B05-06 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  B05-01 --> STD-ietf-json-schema
+  B05-04 --> STD-ietf-json-schema
+  B05-07 --> STD-ietf-json-schema
+  B05-10 --> STD-ietf-json-schema
+  B05-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  B05-11 --> STD-mlcommons-bench
+  B05-12 --> STD-mlcommons-bench
+  B05-02 --> STD-rdf11
+  B05-01 --> STD-vega-lite
+  B05-02 --> STD-vega-lite
+  B05-03 --> STD-vega-lite
+  B05-05 --> STD-vega-lite
+  B05-06 --> STD-vega-lite
+  B05-09 --> STD-vega-lite
+  B05-10 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  B05-04 --> STD-w3c-prov-o
+  B05-08 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o
+  B05-09 --> STD-w3c-skos
+  STD-rdf11 --> STD-w3c-skos
+  B05-05 --> STD-w3c-tabular-data
+  B05-08 --> STD-w3c-tabular-data
+  B05-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

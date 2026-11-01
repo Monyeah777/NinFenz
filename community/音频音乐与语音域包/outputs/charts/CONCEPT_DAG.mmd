@@ -1,0 +1,78 @@
+%% 概念前置图（由 community/音频音乐与语音域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    E09-01
+    E09-03
+    E09-05
+    E09-07
+    E09-09
+    E09-11
+  end
+  subgraph P60[P60]
+    E09-02
+    E09-04
+    E09-06
+    E09-08
+    E09-10
+    E09-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-tabular-data
+    STD-w3c-webaudio
+    STD-w3c-xml
+  end
+  E09-01 --> E09-02
+  E09-02 --> E09-03
+  E09-03 --> E09-04
+  E09-01 --> E09-04
+  E09-04 --> E09-05
+  E09-02 --> E09-05
+  E09-05 --> E09-06
+  E09-03 --> E09-06
+  E09-06 --> E09-07
+  E09-04 --> E09-07
+  E09-07 --> E09-08
+  E09-05 --> E09-08
+  E09-08 --> E09-09
+  E09-06 --> E09-09
+  E09-09 --> E09-10
+  E09-07 --> E09-10
+  E09-10 --> E09-11
+  E09-08 --> E09-11
+  E09-11 --> E09-12
+  E09-09 --> E09-12
+  E09-01 --> STD-commonmark
+  E09-07 --> STD-commonmark
+  E09-05 --> STD-commonmark
+  E09-01 --> STD-ietf-json-schema
+  E09-06 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  E09-11 --> STD-mermaid
+  E09-08 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  E09-03 --> STD-w3c-epub33
+  E09-06 --> STD-w3c-epub33
+  E09-09 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  E09-05 --> STD-w3c-tabular-data
+  E09-08 --> STD-w3c-tabular-data
+  E09-11 --> STD-w3c-tabular-data
+  E09-02 --> STD-w3c-tabular-data
+  E09-03 --> STD-w3c-tabular-data
+  E09-04 --> STD-w3c-tabular-data
+  E09-07 --> STD-w3c-tabular-data
+  E09-09 --> STD-w3c-tabular-data
+  E09-10 --> STD-w3c-tabular-data
+  E09-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data
+  E09-02 --> STD-w3c-webaudio
+  E09-04 --> STD-w3c-webaudio
+  E09-10 --> STD-w3c-webaudio
+  E09-12 --> STD-w3c-webaudio

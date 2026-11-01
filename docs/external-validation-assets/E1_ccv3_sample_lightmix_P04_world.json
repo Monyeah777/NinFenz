@@ -1,0 +1,47 @@
+{
+  "name": "轻混装配流管线 · 叙事输出 · 世界书",
+  "entries": [
+    {
+      "name": "时间推进",
+      "keys": [
+        "通用类:M10",
+        "时间推进"
+      ],
+      "content": "### 模块 通用:M10 · 时间推进\n\n> 类别：通用｜来源：核心｜挂载点：P10 世界推进（active）｜依赖：M00｜发布：`tick_day`\n\n```yaml\nmachine_contract:\n  conformance: \"L2\"\n  schema: \"1\"\n  id: 通用:M10\n  name: 时间推进\n  category: 通用\n  layer: P10\n  inputs: [M00]\n  outputs: [tick, day, season]\n  events:\n    publish: [tick_day, minute_tick]\n    subscribe: []\n  interfaces: []\n  tool_face:\n    - purpose: 回合/日/分钟三轨时间换算与跨日判定\n      candidates:\n        - repo: https://github.com/arrow-py/arrow\n          ref: 1.3.0\n          license: BSD-2-Clause\n          note: 成熟时间库，仅作实现参考；引用不等于背书，AI 可自造等价能力\n      guidance:\n        要算什么: 从 tick 折算 day、minute、is_new_day 与 season_ctx\n        输出形状: 整数 tick/day/minute；布尔 is_new_day；字符串 season_ctx\n        对接字段: outputs=[tick, day, season]，事件 payload 见第 4 节\n        常见坑: 分钟制只在 P03 启用；跨日只发布一次 tick_day；禁止模块自行推进时间\n  io_types:\n    outputs:\n      tick: number\n      day: number\n      season: string\n    inputs:\n      M00: state\n```\n\n#### 1. 职责\n\n驱动系统时间轴，维护 `tick / day / season` 三轨时钟，并广播回合推进事件。所有\"每日/每回合\"结算的模块（M01、M19、M08、M09、M40）均以本模块的推进信号为节拍。\n\n#### 2. 时间尺度\n\n| 尺度 | 单位 | 用途 | 适用管线 |\n| --- | --- | --- | --- |\n| tick | 1 回合 | 主循环最小步进（M50 回卷单位） | P01/P02/P03 |\n| day | 1 日 = 若干 tick | 日程/刷新/好感结算 | P01/P02 |\n| 分钟制 | 1 日细分 | 生存消耗逐分钟结算 | 社区西幻生存包（P03） |\n\n- 社区校园情感包（P02）以 `day` 为主节拍：上学日/周末区分日程。\n- 社区西幻生存包（P03）启用分钟制子结算：`fatigue/hunger` 每 10 分钟刻扣减，M10 负责把分钟刻度折算为 tick 事件。\n\n#### 3. 推进流程\n\n```yaml\nadvance:\n  1. tick += 1\n  2. 若跨日（day 变更）→ 发布 tick_day（含新 day 号、season 状态）\n  3. 若 P03 分钟制 → 额外发布 minute_tick（每 10 分钟刻度）\n  4. 等待订阅者完成结算（同步），再返回 M50 继续下一层\n```\n\n#### 4. 事件契约\n\n```yaml\npublish: tick_day\n  payload: {tick, day, is_new_day: bool, season_ctx}\n  subscribers: [生存:M01, 生存:M19, M08, M09, M40]\npublish: minute_tick        # 仅 P03 启用\n  payload: {tick, minute}\n  subscribers: [生存:M01, M04]\n```\n\n#### 5. 违例与边界\n\n- 任何模块禁止自行推进系统时间；只允许请求 `M10.advance(n)`。\n- 时间回卷（回溯/读档）由 M50 统一触发，M10 只接受回卷指令并重放事件。",
+      "enabled": true,
+      "insertion_order": 0,
+      "case_sensitive": false,
+      "priority": 10,
+      "id": 0,
+      "comment": "NF 层 P10 · 世界推进"
+    },
+    {
+      "name": "匿名情书",
+      "keys": [
+        "情感类:M55",
+        "匿名情书"
+      ],
+      "content": "### 模块 M55 · 匿名情书\n\n> 类别：情感｜来源：校园｜挂载点：P40 行为决策（active）｜依赖：M40、M43｜发布：无（叙事素材交事件:M22）\n\n```yaml\nmachine_contract:\n  conformance: \"L2\"\n  schema: \"1\"\n  id: M55\n  name: 匿名情书\n  category: 情感\n  layer: P40\n  inputs: []\n  outputs: []\n  events:\n    publish: []\n    subscribe: [relationship_change, confession_event, npc_action]\n  interfaces: []\n  io_types:\n    outputs: {}\n    inputs: {}\n```\n\n#### 1. 职责\n\n承载校园经典的**匿名情书**事件链：写→投→收→（误）→回。情书的匿名性天然制造认知偏差与误会空间，是 M23 认知边界的经典应用场景。\n\n#### 2. 情书事件链\n\n```yaml\nlove_letter_chain:\n  write:    主角选择写信对象与署名方式（实名/匿名/冒名）\n  deliver:  投递通道：鞋柜/书桌/信箱（资产 LOCATIONS 30 条中取样）\n  receive:  收信人判定：默认目标NPC；可被情敌事件/误放篡改（认知偏差）\n  respond:  收信人按 M40 关系深度 + 大五人格决定反应（惊喜/困惑/回避）\n  reveal:   匿名揭晓窗口：由事件:M22 安排（直接揭晓/拖长悬念/永不揭晓→M65 遗憾）\n```\n\n#### 3. 匿名性规则\n\n```yaml\nanonymity:\n  系统真知: 谁写的、写给谁，系统层完整保留（真相唯一 I5）\n  角色认知: 收信人只能推断（依据笔迹/内容/时机等证据），推断错误合法\n  冒名风险: 情敌/第三方可冒名投递 → 引发误会事件（须过 M23 后才可呈现）\n  揭晓限制: 揭晓前，主角与收信人的\"真相对齐\"属隐藏域\n```\n\n#### 4. 事件契约\n\n```yaml\nsubscribe:\n  relationship_change:   # 关系档位变化 → 情书反应基线更新\n  confession_event:      # 告白竞争时情书可成为关键证据/信物\n  npc_action:            # 冲动行为可能触发\"冲动回信\"\n输出: 情书事件素材写入 EventState.pending_narratives，交事件:M22 编排\n```\n\n#### 5. 违例与边界\n\n- 情书文本生成受写作 DNA8（对话极简）约束：信件正文短、口语、带潜台词。\n- 禁止系统在揭晓窗口前向玩家输出\"这是某某写的情书\"式直述。",
+      "enabled": true,
+      "insertion_order": 1,
+      "case_sensitive": false,
+      "priority": 10,
+      "id": 1,
+      "comment": "NF 层 P40 · 行为决策"
+    },
+    {
+      "name": "生产制造",
+      "keys": [
+        "生存类:M17",
+        "生产制造"
+      ],
+      "content": "### 模块 M17 · 生产制造\n\n> 类别：生存｜来源：西幻｜挂载点：P50 交互执行（active）｜依赖：M00、M09｜发布：`production_output`\n\n```yaml\nmachine_contract:\n  conformance: \"L2\"\n  schema: \"1\"\n  id: M17\n  name: 生产制造\n  category: 生存\n  layer: P50\n  inputs: []\n  outputs: [recipe_id, item, qty, quality, cost, tick]\n  events:\n    publish: [production_output]\n    subscribe: [market_event]\n  interfaces: []\n  io_types:\n    outputs:\n      recipe_id: untyped\n      item: untyped\n      qty: number\n      quality: number\n      cost: number\n      tick: number\n    inputs: {}\n```\n\n#### 1. 职责\n\n管理**采集、制造与产出**：以 ProductionRecipe 配方表驱动食物/材料/武器/炼金/锻造等生产链路，产出进入经济系统（M09）（对应骨架 M17）。\n\n#### 2. 配方数据结构（ProductionRecipe）\n\n```yaml\nProductionRecipe:\n  id: 唯一配方号\n  category: [食物, 材料, 武器, 防具, 药水, 炼金, 锻造, 建筑]\n  inputs: {材料A: 数量, 材料B: 数量}\n  output: {物品, 数量}\n  requirements: {技能等级, 工具, 据点设施(M16), 配方书}\n  duration: 生产耗时（分钟制 tick）\n```\n\n#### 3. 配方库（节选，完整见资产库西幻包）\n\n```yaml\nfood_recipes:    5+（面包/炖肉/药膳…）      → 恢复 vitals（M01 消费）\nmaterial_recipes: 8+（皮革/铁锭/魔晶碎…）   → 中间材料\nweapon_recipes:  6+（铁剑/长弓/法杖…）      → M04 战斗装备\nspecial:         炼金/附魔配方（联动 M11 元素/词根）\n```\n\n#### 4. 生产流程\n\n```yaml\nproduce(player, recipe_id):\n  1. 校验材料/工具/技能/设施（M16 据点设施加成）\n  2. 扣除材料 → 进入生产队列（duration 倒计时，M10 分钟制结算）\n  3. 完成 → 产出物品（进背包/仓库）→ 发布 production_output\n  4. 技能熟练度+（M03）；品质波动（成功/大成功/失败）\n```\n\n#### 5. 经济联动\n\n```yaml\nsubscribe: [market_event]      # M09 市场价格波动 → 调整生产成本/售价\npublish: production_output\n  payload: {recipe_id, item, qty, quality, cost, tick}\n  subscribers: [M09, 事件:M22]\n产出去向: 自用 / 商店出售（M09）/ 委托交付（M06 任务）/ 据点建设（M16）\n```\n\n#### 6. 违例与边界\n\n- 无配方条目禁止凭空产出（防刷）；配方的材料/产出比由 M09 经济模型校准。\n- 生产行为属玩家可控操作，NPC 生产走 M13 日程（不占用玩家队列）。",
+      "enabled": true,
+      "insertion_order": 2,
+      "case_sensitive": false,
+      "priority": 10,
+      "id": 2,
+      "comment": "NF 层 P50 · 交互执行"
+    }
+  ]
+}

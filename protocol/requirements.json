@@ -1,0 +1,5 @@
+{
+  "schema": "nf-requirements/1",
+  "note": "需求/规范条款登记（机制借鉴 poppyseed spec.ts:114-148；消费方 core/requirement_coverage.py）。无判据的 MUST/SHOULD 必须登记 plan（显式缺席可审计）。",
+  "requirements": []
+}

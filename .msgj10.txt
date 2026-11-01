@@ -1,0 +1,10 @@
+perf(ci): tests-only 默认并行度 8 → 10（实测拐点，冷跑 299 → 285 s）
+
+实测（本机 20 核，冷跑全量 3463 条，同会话同负载）：
+- jobs=8  → 299–307 s
+- jobs=10 → **285 s**（拐点）
+- jobs=12 → 293 s
+- jobs=16 → 417 s
+
+`verify.sh --tests-only` 的默认 `_UT_JOBS` 从 min(8, cores-1) 改为 min(10, cores-1)。
+CI 的 2 核 runner 不受影响（仍按核数自适应下限）。

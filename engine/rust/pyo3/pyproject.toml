@@ -1,0 +1,16 @@
+# P5-07.2 构建面：maturin 把 PyO3 扩展打成 wheel（pip 可装的分布形态）。
+# cargo build + 改名 .pyd 也能跑（见 desktop/tests/test_engine_ffi_binding.py），
+# 但 wheel 才是可分发件——两条构建路径的维护成本差异正是晋升门要计的那一项。
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "ninfenz-pyengine"
+version = "0.1.0"
+description = "NF Python 扩展（PyO3）：同进程绑定的第二形态"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[tool.maturin]
+module-name = "nf_pyengine"

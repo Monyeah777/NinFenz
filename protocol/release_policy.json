@@ -1,0 +1,21 @@
+{
+  "schema": "nf-release-policy/1",
+  "policy_doc": "docs/release.md",
+  "freeze_chain": [
+    "python scripts/nf.py conformance --write",
+    "python scripts/nf.py approve protocol/conformance_report.json",
+    "python scripts/nf.py receipts --scope protocol --write"
+  ],
+  "required_artifacts": [
+    "protocol/conformance_report.json",
+    "protocol/RECEIPTS.json",
+    "protocol/approvals",
+    "results/audit"
+  ],
+  "version_faces": [
+    "CHANGELOG.md",
+    "docs/meta/VERSION-MATRIX.md",
+    "README.md"
+  ],
+  "changes_dir": "changes/unreleased"
+}

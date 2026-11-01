@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <key id="layer" for="node" attr.name="layer" attr.type="string"/>
+  <key id="branch" for="node" attr.name="branch" attr.type="string"/>
+  <key id="provenance" for="edge" attr.name="provenance" attr.type="string"/>
+  <graph id="concept-graph" edgedefault="directed">
+    <node id="D20-01">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-02">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-03">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-04">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-05">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-06">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-07">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-08">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-09">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-10">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-11">
+      <data key="layer">P40</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="D20-12">
+      <data key="layer">P60</data>
+      <data key="branch">domain</data>
+    </node>
+    <node id="STD-bagit">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-commonmark">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-datacite">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-frictionless-package">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-ietf-bcp47">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-ietf-json">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-ietf-json-schema">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-mermaid">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-nist-ai-rmf">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-rdf11">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-rocrate">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-vega-lite">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-w3c-json-ld">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-w3c-prov-o">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-w3c-tabular-data">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <node id="STD-w3c-xml">
+      <data key="layer">P80</data>
+      <data key="branch">standards</data>
+    </node>
+    <edge source="D20-01" target="D20-02">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-02" target="D20-03">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-03" target="D20-04">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-01" target="D20-04">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-04" target="D20-05">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-02" target="D20-05">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-05" target="D20-06">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-03" target="D20-06">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-06" target="D20-07">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-04" target="D20-07">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-07" target="D20-08">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-05" target="D20-08">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-08" target="D20-09">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-06" target="D20-09">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-09" target="D20-10">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-07" target="D20-10">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-10" target="D20-11">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-08" target="D20-11">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-11" target="D20-12">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-09" target="D20-12">
+      <data key="provenance">['d20-anchor']</data>
+    </edge>
+    <edge source="D20-07" target="STD-commonmark">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-02" target="STD-datacite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-04" target="STD-datacite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-06" target="STD-datacite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-08" target="STD-datacite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-w3c-xml" target="STD-datacite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-01" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-10" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-json-schema" target="STD-frictionless-package">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-06" target="STD-ietf-json-schema">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-11" target="STD-ietf-json-schema">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-json" target="STD-ietf-json-schema">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-04" target="STD-mermaid">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-09" target="STD-mermaid">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-12" target="STD-nist-ai-rmf">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-03" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-05" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-07" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-09" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-11" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-bagit" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-w3c-json-ld" target="STD-rocrate">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-02" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-03" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-08" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-12" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-json-schema" target="STD-vega-lite">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-01" target="STD-w3c-prov-o">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-10" target="STD-w3c-prov-o">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-rdf11" target="STD-w3c-prov-o">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="D20-05" target="STD-w3c-tabular-data">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+    <edge source="STD-ietf-bcp47" target="STD-w3c-tabular-data">
+      <data key="provenance">['std-catalog']</data>
+    </edge>
+  </graph>
+</graphml>

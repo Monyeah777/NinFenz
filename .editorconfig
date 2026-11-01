@@ -1,0 +1,23 @@
+# Cross-platform text defaults. Existing files are not rewritten by this file.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,jsonc,yaml,yml,js,mjs,ts,tsx}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{bat,cmd}]
+end_of_line = crlf
+
+[*.{png,jpg,jpeg,gif,ico,pdf,woff,woff2,ttf,zip,gz}]
+insert_final_newline = false
+

@@ -1,0 +1,91 @@
+{
+  "after_action": "lifecycle",
+  "channels": {
+    "gitee": {
+      "allowlist": [
+        "monyeah777"
+      ],
+      "gate": [
+        "self_contained",
+        "numbering",
+        "license_warn",
+        "rating_warn"
+      ],
+      "index_label": "仅作者本人自投",
+      "mode": "author_only"
+    },
+    "github": {
+      "allowlist": [
+        "monyeah777"
+      ],
+      "gate": [
+        "self_contained",
+        "numbering",
+        "license_warn",
+        "rating_warn"
+      ],
+      "index_label": "仅作者本人自投",
+      "mode": "author_only"
+    }
+  },
+  "note": "投稿闸门的唯一机读真相：两个入库机器人（.github/scripts/library_ingest.py / gitee_ingest.py）运行时读本件；library/INDEX.md 投稿须知须出现各通道的 index_label；三方不一致即 verify check34 FAIL。改闸门 = 改本件 + 同步须知措辞（机器人自动跟随）。mode 取值：open（零门槛直投）/ author_only（白名单）/ paused（暂停接收，作者一键关闸）。",
+  "schema": "nf-intake/1",
+  "rating": {
+    "vocabulary": [
+      "general",
+      "teen",
+      "mature",
+      "unrated"
+    ],
+    "required": true,
+    "note": "内容分级（挂账收口）：每条馆藏须在 frontmatter 声明 rating（真源 = 条目 frontmatter，投影 = INDEX 的「分级」列）。取值 = general / teen / mature / unrated；`unrated` 是**显式声明未分级**（不是缺省），缺字段即 FAIL——分级是消费方选择的前提，不许沉默。**投稿者必须自行声明适龄分级**（未声明 = 不合规，不会默认成 unrated；要写 unrated 也得显式写出来）。分级由投稿人自述 + 入库机器人闸门里的 rating_warn 提示，门禁只判「声明在场且合规」——**不替投稿人做适龄判断**（那是内容责任，不是机器责任）。"
+  },
+  "standards": [
+    "自包含可召回",
+    "编号前缀小写键唯一",
+    "许可未声明则挂账（不阻断）",
+    "内容分级须声明（取值为词表内，未定级写 unrated 而非留空）"
+  ],
+  "submission": {
+    "body_limit_chars": 262144,
+    "body_limit_label": "256 KiB",
+    "fields": ["标题", "形态/领域自述", "一句话", "许可", "分级", "档位词", "自定义段"],
+    "explicit_required": ["分级"],
+    "forbidden_attributions": ["（平台限制）"],
+    "quota": {
+      "per_author_per_day": 2,
+      "global_per_day": 20,
+      "note": "按投稿人/全仓的日配额；机器人读本段并在入库前拒绝超额投稿。配额按 library 条目 frontmatter 的 generated 日期与 author 计数，不依赖进程内易失状态。"
+    },
+    "templates": {
+      "github": [".github/ISSUE_TEMPLATE/library_submission.md"],
+      "gitee": [".github/ISSUE_TEMPLATE/NF投稿.md"]
+    },
+    "gitee_surface": {
+      "dir": ".gitee/ISSUE_TEMPLATE",
+      "state": "empty-by-design",
+      "reason": "Gitee 模板选择器机制未在仓内实测（与 NF投稿.md 注释 Q1 同源）；Gitee 投稿入口 = library/INDEX.md 投稿须知 + docs/agent/ROUTES.md 指向仓库内模板件"
+    },
+    "gate_impl": {
+      "self_contained": "editorial",
+      "numbering": "code:.github/scripts/library_ingest.py",
+      "license_warn": "code:desktop/src/core/license_gate.py",
+      "rating_warn": "code:desktop/src/core/rating_gate.py"
+    },
+    "path_surface": [".github/ISSUE_TEMPLATE/bug_report.yml", ".github/ISSUE_TEMPLATE/feature_request.yml", ".github/ISSUE_TEMPLATE/library_submission.md", ".github/ISSUE_TEMPLATE/NF投稿.md"],
+    "gate_ref_surface": ["library/intake.json", "library/INDEX.md"],
+    "path_allow": ["NF-序号", "NF-档位词-自定义段-序号"],
+    "code_surfaces": ["scripts/", "desktop/", "tui/", "engine/", "integrations/", "site/"],
+    "code_surface_template": ".github/ISSUE_TEMPLATE/feature_request.yml",
+    "code_surface_prefix": "代码层",
+    "anchor_lines": [
+      {
+        "file": ".github/ISSUE_TEMPLATE/bug_report.yml",
+        "text": "- 形态：CLI（scripts/nf.py）｜协议内容（模块/管线/资产/community 包）｜文档/质量门禁（verify.sh）｜其他（桌面 GUI 端壳已于 2026-09-09 退役移出）",
+        "check_paths": ["scripts/nf.py", "verify.sh"]
+      }
+    ],
+    "note": "投稿面（模板/须知）一致性真源：模板可见字段 ⊇ fields；长度口径须出现 body_limit_label 且不得出现 forbidden_attributions；每份模板须指向闸门声明/须知；模板内反引号仓内路径须可解析（path_allow 除外）；channels.*.gate 每项须在 gate_impl 有落点（editorial = 人工评审面，code:<path> = 实现件须在场）；gitee_surface.state=empty-by-design 时该目录须为空且 ROUTES 须指向模板件。改口径 = 改本段，判据自动跟随（core/intake_surface.py + verify check34）。"
+  },
+  "updated": "2026-10-13"
+}

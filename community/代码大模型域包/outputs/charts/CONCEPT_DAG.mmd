@@ -1,0 +1,77 @@
+%% 概念前置图（由 community/代码大模型域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    A09-01
+    A09-03
+    A09-05
+    A09-07
+    A09-09
+    A09-11
+  end
+  subgraph P60[P60]
+    A09-02
+    A09-04
+    A09-06
+    A09-08
+    A09-10
+    A09-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-cwe
+    STD-frictionless-package
+    STD-gfm
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-jsonrpc
+    STD-lsp
+    STD-mermaid
+    STD-mlcommons-bench
+    STD-osv
+    STD-owasp-llm
+    STD-owasp-top10
+    STD-vega-lite
+    STD-w3c-tabular-data
+  end
+  A09-01 --> A09-02
+  A09-02 --> A09-03
+  A09-01 --> A09-04
+  A09-02 --> A09-05
+  A09-05 --> A09-06
+  A09-03 --> A09-09
+  A09-07 --> A09-10
+  A09-05 --> A09-11
+  A09-08 --> A09-12
+  A09-11 --> A09-12
+  A09-02 --> STD-cwe
+  A09-05 --> STD-cwe
+  A09-08 --> STD-cwe
+  A09-03 --> STD-frictionless-package
+  STD-ietf-json-schema --> STD-frictionless-package
+  A09-01 --> STD-gfm
+  STD-commonmark --> STD-gfm
+  A09-01 --> STD-ietf-json-schema
+  A09-05 --> STD-ietf-json-schema
+  A09-06 --> STD-ietf-json-schema
+  A09-10 --> STD-ietf-json-schema
+  A09-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  A09-06 --> STD-lsp
+  A09-09 --> STD-lsp
+  STD-jsonrpc --> STD-lsp
+  A09-04 --> STD-mermaid
+  A09-09 --> STD-mermaid
+  A09-11 --> STD-mlcommons-bench
+  A09-04 --> STD-osv
+  A09-07 --> STD-osv
+  A09-10 --> STD-osv
+  A09-12 --> STD-owasp-llm
+  STD-owasp-top10 --> STD-owasp-llm
+  A09-03 --> STD-vega-lite
+  A09-08 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  A09-02 --> STD-w3c-tabular-data
+  A09-07 --> STD-w3c-tabular-data
+  A09-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

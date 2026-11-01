@@ -1,0 +1,235 @@
+"""Agentic 检索单测（v1.3.0 retriever.search：四类对象统一检索入口）。
+
+运行：cd desktop && python -m unittest tests.test_retriever -v
+隔离：临时 Store；module/asset 源用假数据；protocol 源读真实 registry.json（I5 真相源）。
+"""
+from __future__ import annotations
+
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from core.models import Module, AssetPack, Pipeline, PipelineLayer  # noqa: E402
+from core.storage import Store  # noqa: E402
+from core.retriever import search, Hit, referenced_by  # noqa: E402
+
+
+def _mk_store():
+    store = Store(home=tempfile.mkdtemp(prefix="nf_ret_"))
+    # 模块
+    m1 = Module(id="M00", category="通用类", layer="P00", name="数据结构")
+    m1.source_md = "# 模块 通用:M00\n数据基座"
+    m2 = Module(id="M22", category="事件类", layer="P30", name="事件叙事")
+    store.save_module(m1)
+    store.save_module(m2)
+    # 资产包
+    store.save_asset_pack(AssetPack(name="测试资产", entries={"LOCATION": "x"}))
+    # 管线缓存（桌面侧管线经 cache 键 pipelines）
+    p = Pipeline(id="P01", name="标准管线")
+    p.layers = [PipelineLayer(id="P00", name="基座")]
+    store.save_cache("pipelines", [p.to_json()])
+    return store
+
+
+class TestSearch(unittest.TestCase):
+    def setUp(self):
+        self.store = _mk_store()
+
+    def test_module_by_ref(self):
+        hits = search(self.store, "module", "M00")
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].kind, "module")
+        self.assertEqual(hits[0].ref, "通用类:M00")
+        self.assertEqual(hits[0].layer, "P00")
+
+    def test_module_by_name(self):
+        hits = search(self.store, "module", "事件叙事")
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].name, "事件叙事")
+
+    def test_asset_pack(self):
+        hits = search(self.store, "asset_pack", "测试资产")
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].kind, "asset_pack")
+        self.assertEqual(hits[0].ref, "测试资产")
+
+    def test_pipeline_via_cache(self):
+        hits = search(self.store, "pipeline", "标准管线")
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0].ref, "P01")
+
+    def test_protocol_from_registry(self):
+        # 真实 registry.json protocols[]（I5 真相源）——v1.1.0 应有 ≥3 条
+        hits = search(self.store, "protocol", "")
+        self.assertGreaterEqual(len(hits), 1)
+
+    def test_cross_kind_search(self):
+        hits = search(self.store, None, "标准管线")
+        kinds = {h.kind for h in hits}
+        self.assertIn("pipeline", kinds)
+        # kind=None 跨类返回全部类型命中
+
+    def test_no_match_empty(self):
+        hits = search(self.store, "module", "不存在的关键词XYZ")
+        self.assertEqual(hits, [])
+
+    def test_hit_is_dataclass_with_metadata(self):
+        hits = search(self.store, "module", "M00")
+        h = hits[0]
+        self.assertIsInstance(h, Hit)
+        # Discovery 轻量：有元数据，不强制带正文
+        self.assertTrue(hasattr(h, "name") and hasattr(h, "layer"))
+
+    # ---- E5：community 盘点源（真实仓库） ----
+    def test_community_module_kind(self):
+        hits = search(self.store, "community_module", "M55")
+        self.assertTrue(hits, "community_module 应命中校园 M55")
+        self.assertTrue(any(h.ref == "情感类:M55" for h in hits),
+                        f"refs={[h.ref for h in hits]}")
+        hit = next(h for h in hits if h.ref == "情感类:M55")
+        self.assertEqual(hit.kind, "community_module")
+        self.assertEqual(hit.tags[0], "校园情感领域包", f"tags={hit.tags}")
+
+    def test_community_pipeline_kind(self):
+        hits = search(self.store, "community_pipeline", "P04")
+        self.assertTrue(hits)
+        self.assertTrue(any(h.ref == "P04" for h in hits),
+                        f"refs={[h.ref for h in hits]}")
+
+    def test_community_default_all_excludes_community(self):
+        # kind=None 全量不并入社区项（与 E4 四类语义隔离）
+        hits = search(self.store, None, "M55")
+        kinds = {h.kind for h in hits}
+        self.assertNotIn("community_module", kinds,
+                         "kind=None 不应混入 community_module")
+
+    def test_community_installed_flag(self):
+        # 先装一件 community 模块 → 盘点 ref installed 标记在 Hit tags 中
+        from core.community_inventory import catalog, install_module
+        items = [i for i in catalog(self.store)
+                 if i.kind == "community_module" and i.ref == "情感类:M55"]
+        self.assertTrue(items)
+        self.assertTrue(install_module(self.store, items[0]))
+        hits = search(self.store, "community_module", "M55")
+        hit = next(h for h in hits if h.ref == "情感类:M55")
+        self.assertIn("✓已装", hit.tags, f"tags={hit.tags}")
+
+
+class TestReferencedBy(unittest.TestCase):
+    """v2.2.0 A2 引用反查：registry protocols[].references 反向命中。
+
+    用隔离临时 registry 断言语义（不依赖真实数据漂移）；真实 registry
+    命中作 smoke 回归（M55/M17 被轻混组合包引用）。
+    """
+
+    def _mk_registry(self, path, protocols):
+        import json
+        reg = {"registry_schema_version": "2", "schema_name": "test",
+               "registry_name": "t", "truth_source": "t",
+               "modules": [], "mount_points": {}, "subscriptions": {},
+               "protocols": protocols}
+        path.write_text(json.dumps(reg, ensure_ascii=False), encoding="utf-8")
+
+    def test_bare_module_id_hit(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory(prefix="nf_rb_") as td:
+            p = Path(td) / "registry.json"
+            self._mk_registry(p, [{
+                "id": "测试包A",
+                "references": [{"source_package": "校园情感领域包",
+                                "module_id": "M55", "source_schema_version": "2",
+                                "asset_readonly": True}],
+            }])
+            refs = referenced_by("M55", path=p)
+            self.assertEqual(len(refs), 1)
+            self.assertEqual(refs[0]["referrer"], "测试包A")
+            self.assertEqual(refs[0]["source_package"], "校园情感领域包")
+            self.assertEqual(refs[0]["module_id"], "M55")
+            self.assertTrue(refs[0]["asset_readonly"])
+
+    def test_qualified_id_matches_bare(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory(prefix="nf_rb_") as td:
+            p = Path(td) / "registry.json"
+            self._mk_registry(p, [{
+                "id": "测试包A",
+                "references": [{"source_package": "校园情感领域包",
+                                "module_id": "M55"}],
+            }])
+            # 查询方带类别前缀（情感类:M55）也应命中裸号 reference
+            refs = referenced_by("情感类:M55", path=p)
+            self.assertEqual(len(refs), 1)
+            self.assertEqual(refs[0]["referrer"], "测试包A")
+
+    def test_no_reference_returns_empty(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory(prefix="nf_rb_") as td:
+            p = Path(td) / "registry.json"
+            self._mk_registry(p, [{
+                "id": "测试包A",
+                "references": [{"source_package": "校园情感领域包",
+                                "module_id": "M55"}],
+            }])
+            self.assertEqual(referenced_by("M99", path=p), [])
+            self.assertEqual(referenced_by("M91", path=p), [])
+
+    def test_no_references_key_ok(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory(prefix="nf_rb_") as td:
+            p = Path(td) / "registry.json"
+            self._mk_registry(p, [{"id": "无引用包"}])
+            self.assertEqual(referenced_by("M55", path=p), [])
+
+    def test_missing_registry_returns_empty(self):
+        # registry 缺失：retriever 不阻断——返回 []（与 _protocol_hits 同策略）
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory(prefix="nf_rb_") as td:
+            refs = referenced_by("M55", path=Path(td) / "nope.json")
+            self.assertEqual(refs, [])
+
+    def test_real_registry_smoke(self):
+        # I5 真相源回归：轻混组合包引用校园情感 M55 / 西幻生存 M17
+        refs = referenced_by("M55")
+        self.assertTrue(refs, "真实 registry 中 M55 应被引用")
+        self.assertIn("校园西幻轻混组合包", [r["referrer"] for r in refs])
+        # 交叉引用面自洽（不写死期望）：按类别感知口径复算，要求与声明侧一致；
+        # 新增组合包 references 自然纳入，不再出现「过期硬编码期望」。
+        import json
+        from pathlib import Path
+        # 路径相对**测试文件**解析，而不是相对 CWD：CI 的 coverage job 与
+        # scripts/coverage_summary.sh / per_module_coverage.sh 都是从仓库根跑
+        # （`discover -s desktop/tests`），CWD 相对写法会让本测试在覆盖率通道里
+        # 直接 FileNotFoundError（实测：CI「core-coverage-ge-80」同形）。
+        _reg_path = (Path(__file__).resolve().parent.parent
+                     / "src" / "core" / "registry.json")
+        reg = json.loads(_reg_path.read_text(encoding="utf-8"))
+        rows = []
+        for p in reg.get("protocols") or []:
+            for r in p.get("references") or []:
+                if r.get("module_id"):
+                    rows.append((p["id"], str(r["module_id"])))
+        self.assertTrue(rows, "真实 registry 应存在跨包 references 声明")
+        for mid in sorted({m for _, m in rows}):
+            cat, bare = (mid.split(":", 1) if ":" in mid else ("", mid))
+            expect = {pid for pid, m in rows
+                      if (m == mid) or (bare == m.split(":", 1)[-1]
+                                        and (not cat or not (":" in m) or
+                                             m.split(":", 1)[0] == cat))}
+            got = {r["referrer"] for r in referenced_by(mid)}
+            self.assertEqual(got, expect, "module_id=%s 被引用集合与声明不一致" % mid)
+        # 防跨类别误命中（本波真实缺陷回归）：类别限定查询不得命中其它类别的同号声明。
+        cross = {r["referrer"] for r in referenced_by("AI保险:M01")}
+        self.assertTrue(cross, "AI保险:M01 应存在真实引用方")
+        self.assertNotIn("组合包-数据管线", cross)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,515 @@
+{
+  "schema": "nf-assertions/1",
+  "note": "断言表（数据化断言，机制借鉴 Schematron 的 patterns→rules→assertions）：把「能确定性判定的形状类断言」从 check 代码里搬出来，新增规则 = 加一行数据。边界写死：kind 是**封闭集**（见 kind_vocabulary），只做搬运与去重，不做表达力扩张，不自造 DSL；业务语义断言仍留在 check 代码里。每条断言必须有 fix（修复指引）。",
+  "severity_vocabulary": [
+    "fail",
+    "warn"
+  ],
+  "kind_vocabulary": [
+    "regex_absent",
+    "regex_present",
+    "count_at_least",
+    "json_value"
+  ],
+  "capability_vocabulary": [
+    "CAP_TOPO_PRESENCE",
+    "CAP_REF_CLOSURE",
+    "CAP_IDENTITY_QUALIFIED",
+    "CAP_KEYWORD_ALIGN",
+    "CAP_CONTRACT_STRUCT",
+    "CAP_AUTH_COHERENT",
+    "CAP_SET_RECONCILE",
+    "CAP_PROVENANCE_TRACE",
+    "CAP_DETERMINISTIC",
+    "CAP_TAMPER_EVIDENT",
+    "CAP_LIFECYCLE_LEGAL",
+    "CAP_ASSERTION_PROVEN",
+    "CAP_PURITY_BOUNDARY",
+    "CAP_RUNTIME_EXECUTABLE",
+    "CAP_CORPUS_CONFORM",
+    "CAP_AGGREGATE_SUMMARY"
+  ],
+  "capability_index": {
+    "CAP_TOPO_PRESENCE": [
+      1,
+      6,
+      7,
+      20,
+      34
+    ],
+    "CAP_REF_CLOSURE": [
+      9,
+      15,
+      16,
+      21,
+      24
+    ],
+    "CAP_IDENTITY_QUALIFIED": [
+      2,
+      9,
+      13,
+      30
+    ],
+    "CAP_KEYWORD_ALIGN": [
+      3,
+      4,
+      5,
+      10,
+      26
+    ],
+    "CAP_CONTRACT_STRUCT": [
+      14,
+      16,
+      18,
+      19,
+      22,
+      28
+    ],
+    "CAP_AUTH_COHERENT": [
+      16
+    ],
+    "CAP_SET_RECONCILE": [
+      7,
+      8,
+      11,
+      23
+    ],
+    "CAP_PROVENANCE_TRACE": [
+      23,
+      38
+    ],
+    "CAP_DETERMINISTIC": [
+      25,
+      31,
+      40,
+      41
+    ],
+    "CAP_TAMPER_EVIDENT": [
+      23,
+      25,
+      31,
+      40,
+      42
+    ],
+    "CAP_LIFECYCLE_LEGAL": [
+      17,
+      24,
+      29,
+      34
+    ],
+    "CAP_ASSERTION_PROVEN": [
+      29,
+      35,
+      38
+    ],
+    "CAP_PURITY_BOUNDARY": [
+      27,
+      39,
+      40
+    ],
+    "CAP_RUNTIME_EXECUTABLE": [
+      12,
+      16,
+      33,
+      39
+    ],
+    "CAP_CORPUS_CONFORM": [
+      20,
+      34,
+      37
+    ],
+    "CAP_AGGREGATE_SUMMARY": [
+      32,
+      33,
+      35,
+      36
+    ]
+  },
+  "assertions": [
+    {
+      "id": "public-surface-no-abs-path",
+      "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
+      "kind": "regex_absent",
+      "params": {
+        "globs": [
+          "desktop/tests/fixtures/external/**/*",
+          "docs/external-validation-assets/*"
+        ],
+        "pattern": "(?<![A-Za-z0-9])[A-Za-z]:[\\\\/]|/Users/|/home/[a-z]"
+      },
+      "message": "公开导出面出现绝对路径（泄漏本机路径）",
+      "fix": "改成仓库相对路径或占位符",
+      "evidence": "check35 / conformance::public-surface"
+    },
+    {
+      "id": "idl-schema-five-in-place",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "count_at_least",
+      "params": {
+        "glob": "protocol/schema/*.schema.json",
+        "min": 5
+      },
+      "message": "IDL schema 定义少于 5 份（定义面残缺）",
+      "fix": "补齐缺失的 schema 定义后重跑",
+      "evidence": "check28"
+    },
+    {
+      "id": "llms-txt-machine-anchors",
+      "severity": "fail",
+      "capability": "CAP_TOPO_PRESENCE",
+      "kind": "regex_present",
+      "params": {
+        "path": "llms.txt",
+        "patterns": [
+          "# NinFenz",
+          "library/INDEX.md",
+          "01_核心协议.md",
+          "06_Agent执行协议.md",
+          "docs/agent/agent_组装指令包_v0.2.md"
+        ]
+      },
+      "message": "llms.txt 缺机器入口锚点",
+      "fix": "按 docs/knowledge.md 之外的入口清单补齐锚点行",
+      "evidence": "check34"
+    },
+    {
+      "id": "contract-schema-declares-quality-keys",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/schema/contract.schema.json",
+        "key": "properties",
+        "op": "contains_keys",
+        "value": [
+          "conformance",
+          "io_types"
+        ]
+      },
+      "message": "machine_contract 定义缺质量键（conformance / io_types）",
+      "fix": "在 contract.schema.json 的 properties 补该键（additive）",
+      "evidence": "check28 / check29"
+    },
+    {
+      "id": "contract-schema-extension-face-closed",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/schema/contract.schema.json",
+        "key": "additionalProperties",
+        "op": "equals",
+        "value": false
+      },
+      "message": "machine_contract 扩展面未封闭（未登记键可静默入契约）",
+      "fix": "contract.schema.json 顶层 additionalProperties 置 false；新扩展键须先登记词表（01 §1.1 扩展键纪律）",
+      "evidence": "check28 / 01 §1.1"
+    },
+    {
+      "id": "canonical-digest-declared",
+      "severity": "fail",
+      "capability": "CAP_DETERMINISTIC",
+      "kind": "regex_present",
+      "params": {
+        "path": "protocol/CONFORMANCE.md",
+        "patterns": [
+          "规范化摘要口径",
+          "SHA-256",
+          "RFC 6962",
+          "RFC 8785",
+          "ensure_ascii=False"
+        ]
+      },
+      "message": "CONFORMANCE.md 缺规范化摘要口径声明（仓外读者侧验证器无从逐字复现）",
+      "fix": "在 protocol/CONFORMANCE.md 补「规范化摘要口径」段：摘要口径 + Merkle 域分隔 + 与 RFC 8785 的关系声明",
+      "evidence": "nf assertions / conformance::assertions"
+    },
+    {
+      "id": "skill-face-frontmatter",
+      "severity": "fail",
+      "capability": "CAP_CORPUS_CONFORM",
+      "kind": "regex_present",
+      "params": {
+        "path": "skills/ninfenz/SKILL.md",
+        "patterns": [
+          "name:",
+          "description:",
+          "license:"
+        ]
+      },
+      "message": "对外 skill 面缺必要前件（name / description / license）——装载方选不中或授权不明",
+      "fix": "在 skills/ninfenz/SKILL.md 前件补 name/description/license；description 须写明适用与不适用",
+      "evidence": "nf assertions / conformance::assertions"
+    },
+    {
+      "id": "skill-face-references",
+      "severity": "fail",
+      "capability": "CAP_TOPO_PRESENCE",
+      "kind": "count_at_least",
+      "params": {
+        "glob": "skills/ninfenz/references/*.md",
+        "min": 3
+      },
+      "message": "对外 skill 面参考件少于 3 件（SKILL.md 引用的 references 面残缺）",
+      "fix": "补齐 skills/ninfenz/references/ 下被 SKILL.md 引用的参考件",
+      "evidence": "nf assertions / conformance::assertions"
+    },
+    {
+      "id": "vocabularies-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/vocabularies.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-vocabularies/1"
+      },
+      "message": "词表登记册不在位或 schema 未自证",
+      "fix": "补 protocol/vocabularies.json（schema=nf-vocabularies/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:vocabularies-face）"
+    },
+    {
+      "id": "normative-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/normative.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-normative/1"
+      },
+      "message": "规范/说明件名单不在位或 schema 未自证",
+      "fix": "补 protocol/normative.json（schema=nf-normative/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:normative-face）"
+    },
+    {
+      "id": "data-contracts-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/data_contracts.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-data-contracts/1"
+      },
+      "message": "数据契约登记表不在位或 schema 未自证",
+      "fix": "补 protocol/data_contracts.json（schema=nf-data-contracts/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:data-contracts-face）"
+    },
+    {
+      "id": "layers-declaration-in-place",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/LAYERS.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-layers/1"
+      },
+      "message": "抽象阶梯真源不在位或 schema 未自证（阶梯体检 R7 会随之失效）",
+      "fix": "补 protocol/LAYERS.json（schema=nf-layers/1）后跑 nf layers --verify",
+      "evidence": "check27 R7 / nf layers / docs/layers.md"
+    },
+    {
+      "id": "layers-generated-region",
+      "severity": "fail",
+      "capability": "CAP_DETERMINISTIC",
+      "kind": "regex_present",
+      "params": {
+        "path": "docs/layers.md",
+        "patterns": [
+          "<!-- nf:layers:begin -->",
+          "<!-- nf:layers:end -->"
+        ]
+      },
+      "message": "docs/layers.md 缺生成区标记（阶梯表一旦手写必然与真源漂移）",
+      "fix": "补 begin/end 标记后跑 nf layers --write 刷新生成区",
+      "evidence": "check27 R7（L10：生成区 == 实时渲染）"
+    },
+    {
+      "id": "layers-no-abs-path",
+      "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
+      "kind": "regex_absent",
+      "params": {
+        "globs": [
+          "protocol/LAYERS.json",
+          "docs/layers.md"
+        ],
+        "pattern": "(?<![A-Za-z0-9])[A-Za-z]:[\\\\/]|/Users/|/home/[a-z]"
+      },
+      "message": "阶梯件出现绝对路径（公开面泄漏本机路径）",
+      "fix": "改成仓库相对路径或占位符",
+      "evidence": "check27 R7 / conformance::public-surface"
+    },
+    {
+      "id": "no-credential-leak-in-public-faces",
+      "severity": "fail",
+      "capability": "CAP_PURITY_BOUNDARY",
+      "kind": "regex_absent",
+      "params": {
+        "globs": [
+          ".github/workflows/*.yml",
+          "docs/**/*.md",
+          "protocol/*.json",
+          "integrations/**/*.json",
+          "results/interop/*.json",
+          "library/*.md",
+          "llms.txt",
+          "README.md",
+          "README.en.md",
+          "README.ja.md",
+          "desktop/src/core/*.py",
+          "scripts/*.py",
+          "tui/*.py"
+        ],
+        "pattern": "AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{36,}|xox[baprs]-[A-Za-z0-9-]{10,}|sk-[A-Za-z0-9]{32,}|(?i:(api[_-]?key|secret|password|passwd|access[_-]?token|client[_-]?secret)\\s*[:=]\\s*[\"'][A-Za-z0-9/+_.-]{16,}[\"'])"
+      },
+      "message": "公开面/源码面出现疑似凭据（密钥/令牌/口令）——本断言只报位置，不回显命中值",
+      "fix": "移除明文凭据：改从环境变量读取且在输出中遮蔽；确为示例则用占位符（如 <TOKEN>）替换",
+      "evidence": "check35 / conformance::assertions"
+    },
+    {
+      "id": "error-codes-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/error_codes.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-error-codes/1"
+      },
+      "message": "错误码登记册不在位或 schema 未自证",
+      "fix": "补 protocol/error_codes.json（schema=nf-error-codes/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:error-codes-face）"
+    },
+    {
+      "id": "injection-profiles-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/injection_profiles.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-injection-profiles/1"
+      },
+      "message": "注入预算档位册不在位或 schema 未自证",
+      "fix": "补 protocol/injection_profiles.json（schema=nf-injection-profiles/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:injection-profiles-face）"
+    },
+    {
+      "id": "boundaries-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/boundaries.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-boundaries/1"
+      },
+      "message": "边界登记册不在位或 schema 未自证",
+      "fix": "补 protocol/boundaries.json（schema=nf-boundaries/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:boundaries-face）"
+    },
+    {
+      "id": "path-moved-face",
+      "severity": "fail",
+      "capability": "CAP_IDENTITY_QUALIFIED",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/path_moved.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-path-moved/1"
+      },
+      "message": "路径迁移映射不在位或 schema 未自证",
+      "fix": "补 protocol/path_moved.json（schema=nf-path-moved/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:path-moved-face）"
+    },
+    {
+      "id": "declined-face",
+      "severity": "fail",
+      "capability": "CAP_LIFECYCLE_LEGAL",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/declined.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-declined/1"
+      },
+      "message": "被否决候选留档不在位或 schema 未自证",
+      "fix": "补 protocol/declined.json（schema=nf-declined/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:declined-face）"
+    },
+    {
+      "id": "schema-pins-face",
+      "severity": "fail",
+      "capability": "CAP_CONTRACT_STRUCT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/schema_pins.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-schema-pins/1"
+      },
+      "message": "版本钉扎样本册不在位或 schema 未自证",
+      "fix": "补 protocol/schema_pins.json（schema=nf-schema-pins/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:schema-pins-face）"
+    },
+    {
+      "id": "requirements-face",
+      "severity": "fail",
+      "capability": "CAP_ASSERTION_PROVEN",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/requirements.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-requirements/1"
+      },
+      "message": "需求登记册不在位或 schema 未自证",
+      "fix": "补 protocol/requirements.json（schema=nf-requirements/1）",
+      "evidence": "nf assertions / 数据契约登记（quality_rule=assertion:requirements-face）"
+    },
+    {
+      "id": "build-entrypoints-offline",
+      "severity": "fail",
+      "capability": "CAP_DETERMINISTIC",
+      "kind": "regex_absent",
+      "params": {
+        "globs": [
+          "packaging/npm/tools/*.mjs",
+          "packaging/npm/package.json"
+        ],
+        "pattern": "curl |wget |git clone|npm install|npm ci|pip install|fetch\\(|https\\.request|http\\.request|net\\.connect"
+      },
+      "message": "构建入口出现取网/取包命令（构建期读面被宿主污染，产物不可复现）",
+      "fix": "构建期只读仓内既有件；确需联网的步骤拆到发布编排，别放进构建入口",
+      "evidence": "check41 / conformance::assertions"
+    },
+    {
+      "id": "provenance-receipts-schema",
+      "severity": "fail",
+      "capability": "CAP_TAMPER_EVIDENT",
+      "kind": "json_value",
+      "params": {
+        "path": "protocol/RECEIPTS.json",
+        "key": "schema",
+        "op": "equals",
+        "value": "nf-receipts/1"
+      },
+      "message": "回执单根不在位或 schema 未自证（provenance 机制缺前提）",
+      "fix": "跑 nf receipts --scope protocol --write 重新生成回执单根，别手改",
+      "evidence": "check42 / conformance::assertions"
+    }
+  ]
+}

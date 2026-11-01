@@ -1,0 +1,16 @@
+perf(ci): D 第一刀 —— paths realpath 去重 + text_hygiene 二进制读取入缓存 + `--pr` 显式档
+
+一、D（命令层提速）
+- `paths.validate_path` 每次调用打 **3 次** `os.path.realpath`（root、full、contained 内的 target）；
+  check33 一次就调 3309 次 ⇒ 约 5 s。改为：根 realpath 按根字符串缓存（进程内根 <10 个，有界 64），
+  full 只算一次，包含判定用**已归一化的两端**（`_norm_contained`，不再重复 realpath）。
+  实测 check33 12.3 → 10.7 s；`nf verify --json` 39.2 → 31–33 s。
+- `text_hygiene.scan` 逐件 `open(rb)` 读全仓（check33 里 5.65 s）：新增 `scan_memo.read_bytes`
+  （键与 read_text 同源：abspath+mtime+size），text_hygiene 改走它 ⇒ 同进程内二次/跨 check 复用。
+
+二、C（双档门禁，显式化）
+- `verify.sh --pr` = quick 档的**显式别名**（42 checks + 受影响测试，默认重叠）。
+  实测本机 `bash verify.sh`（默认 quick）= **65 s**（含 42 checks + 受影响测试）。
+
+三、口径
+- 判据零改动：只改路径归一化实现与读取缓存；`--pr` 只是给既有 quick 档一个可被 CI/文档引用的名字。

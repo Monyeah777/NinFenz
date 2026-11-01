@@ -1,0 +1,486 @@
+{
+  "kind": "nf-domain-spec/1",
+  "code": "E15",
+  "domain": "企业培训与组织学习",
+  "section": "E · 人机与内容创作",
+  "anchors_verified_on": "2026-09-22",
+  "standard_anchors_verified_on": "2026-09-24",
+  "metric_family": "generation",
+  "content_tier": "derived",
+  "data_authenticity": {
+    "standard_bindings": 24,
+    "in_catalog_ratio": 1.0,
+    "reachable_ratio": 1.0,
+    "probe_evidence_ratio": 1.0,
+    "anchor_probed_ratio": 1.0,
+    "score": 1.0,
+    "threshold": 0.95,
+    "bound_standards": [
+      "commonmark",
+      "gdpr",
+      "ietf-json-schema",
+      "mermaid",
+      "mlcommons-bench",
+      "unesco-ai",
+      "vega-lite",
+      "w3c-epub33",
+      "w3c-tabular-data"
+    ]
+  },
+  "subdivisions": [
+    {
+      "id": "E15-01",
+      "name": "新员工培训",
+      "definition": "新员工培训：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "unesco-ai",
+      "standard_why": "关键词「教育|培训|组织学习」命中",
+      "standards": [
+        {
+          "ref": "unesco-ai",
+          "role": "primary",
+          "why": "关键词「教育|培训|组织学习」命中",
+          "layer": "gov",
+          "body": "UNESCO",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "E 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-02",
+      "name": "培训合规要求",
+      "definition": "培训合规要求：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "gdpr",
+      "standard_why": "关键词「隐私|个人信息|去标识|合规|监管」命中",
+      "standards": [
+        {
+          "ref": "gdpr",
+          "role": "primary",
+          "why": "关键词「隐私|个人信息|去标识|合规|监管」命中",
+          "layer": "gov",
+          "body": "EU",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "commonmark",
+          "role": "support",
+          "why": "E 段载体锚（轮换 1；与主锚异层）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-03",
+      "name": "销售话术训练",
+      "definition": "销售话术训练：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "mlcommons-bench",
+      "standard_why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+      "standards": [
+        {
+          "ref": "mlcommons-bench",
+          "role": "primary",
+          "why": "关键词「训练|微调|对齐|蒸馏|偏好」命中",
+          "layer": "eng",
+          "body": "MLCommons",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "mermaid",
+          "role": "support",
+          "why": "E 段载体锚（轮换 2；与主锚异层）",
+          "layer": "form",
+          "body": "Mermaid",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-04",
+      "name": "岗位技能图谱",
+      "definition": "岗位技能图谱：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "commonmark",
+      "standard_why": "E 段默认绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "commonmark",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 0）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "载体锚：产出形态「图」的承载标准",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-05",
+      "name": "微课生成",
+      "definition": "微课生成：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-tabular-data",
+      "standard_why": "E 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "w3c-tabular-data",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 1）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        },
+        {
+          "ref": "commonmark",
+          "role": "support",
+          "why": "E 段载体锚（轮换 1；与主锚异层）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-06",
+      "name": "陪练与考核",
+      "definition": "陪练与考核：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-epub33",
+      "standard_why": "E 段默认绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "w3c-epub33",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 2）",
+          "layer": "form",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "w3c-xml"
+          ]
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "E 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-07",
+      "name": "培训效果评估",
+      "definition": "培训效果评估：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "unesco-ai",
+      "standard_why": "关键词「教育|培训|组织学习」命中",
+      "standards": [
+        {
+          "ref": "unesco-ai",
+          "role": "primary",
+          "why": "关键词「教育|培训|组织学习」命中",
+          "layer": "gov",
+          "body": "UNESCO",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "commonmark",
+          "role": "support",
+          "why": "E 段载体锚（轮换 1；与主锚异层）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-08",
+      "name": "知识沉淀",
+      "definition": "知识沉淀：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-tabular-data",
+      "standard_why": "E 段默认绑定（轮换 1）",
+      "standards": [
+        {
+          "ref": "w3c-tabular-data",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 1）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        },
+        {
+          "ref": "vega-lite",
+          "role": "support",
+          "why": "E 段载体锚（轮换 3；与主锚异层）",
+          "layer": "form",
+          "body": "Vega",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json-schema"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-09",
+      "name": "讲师助手",
+      "definition": "讲师助手：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "w3c-epub33",
+      "standard_why": "E 段默认绑定（轮换 2）",
+      "standards": [
+        {
+          "ref": "w3c-epub33",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 2）",
+          "layer": "form",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "w3c-xml"
+          ]
+        },
+        {
+          "ref": "w3c-tabular-data",
+          "role": "support",
+          "why": "E 段载体锚（轮换 4；与主锚异层）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-10",
+      "name": "学习路径设计",
+      "definition": "学习路径设计：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "commonmark",
+      "standard_why": "E 段默认绑定（轮换 0）",
+      "standards": [
+        {
+          "ref": "commonmark",
+          "role": "primary",
+          "why": "E 段默认绑定（轮换 0）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "w3c-tabular-data",
+          "role": "support",
+          "why": "E 段载体锚（轮换 3；与主锚异层）",
+          "layer": "data",
+          "body": "W3C",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-bcp47"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-11",
+      "name": "跨文化培训",
+      "definition": "跨文化培训：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "unesco-ai",
+      "standard_why": "关键词「教育|培训|组织学习」命中",
+      "standards": [
+        {
+          "ref": "unesco-ai",
+          "role": "primary",
+          "why": "关键词「教育|培训|组织学习」命中",
+          "layer": "gov",
+          "body": "UNESCO",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "ietf-json-schema",
+          "role": "support",
+          "why": "E 段载体锚（轮换 0；与主锚异层）",
+          "layer": "data",
+          "body": "IETF/JSON Schema",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": [
+            "ietf-json"
+          ]
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    },
+    {
+      "id": "E15-12",
+      "name": "培训记录管理",
+      "definition": "培训记录管理：口径 = 产出形态 / 目标受众 / 一致性规则 / 机验方式 四件齐备（本条目按 E 段口径框架登记，领域细则待作者补全）。",
+      "anchor": "https://spec.commonmark.org/0.31.2/",
+      "anchor_kind": "spec",
+      "anchor_status": 200,
+      "standard_ref": "unesco-ai",
+      "standard_why": "关键词「教育|培训|组织学习」命中",
+      "standards": [
+        {
+          "ref": "unesco-ai",
+          "role": "primary",
+          "why": "关键词「教育|培训|组织学习」命中",
+          "layer": "gov",
+          "body": "UNESCO",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        },
+        {
+          "ref": "commonmark",
+          "role": "support",
+          "why": "E 段载体锚（轮换 1；与主锚异层）",
+          "layer": "form",
+          "body": "CommonMark",
+          "reachable": true,
+          "http_status": 200,
+          "probe_date": "2026-09-24",
+          "depends_on": []
+        }
+      ],
+      "check": "声明 形态清单 / 受众与可读性口径 / 跨件一致规则 / 可机验项；四项缺一即判「口径未定」（本判据为段级框架，领域专属判据待补）。",
+      "pitfall": "只评「好看好用」无判据；跨件风格漂移无规则（E 段常见失效模式；领域专属失效模式待补）。"
+    }
+  ]
+}

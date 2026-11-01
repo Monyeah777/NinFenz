@@ -1,0 +1,83 @@
+%% 概念前置图（由 community/图像生成与视觉设计域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    B15-01
+    B15-03
+    B15-05
+    B15-07
+    B15-09
+    B15-11
+  end
+  subgraph P60[P60]
+    B15-02
+    B15-04
+    B15-06
+    B15-08
+    B15-10
+    B15-12
+  end
+  subgraph P80[P80]
+    STD-creativecommons
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-rdf11
+    STD-spdx-licenses
+    STD-vega-lite
+    STD-w3c-prov-o
+    STD-w3c-svg2
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  B15-01 --> B15-02
+  B15-02 --> B15-03
+  B15-03 --> B15-04
+  B15-01 --> B15-04
+  B15-04 --> B15-05
+  B15-02 --> B15-05
+  B15-05 --> B15-06
+  B15-03 --> B15-06
+  B15-06 --> B15-07
+  B15-04 --> B15-07
+  B15-07 --> B15-08
+  B15-05 --> B15-08
+  B15-08 --> B15-09
+  B15-06 --> B15-09
+  B15-09 --> B15-10
+  B15-07 --> B15-10
+  B15-10 --> B15-11
+  B15-08 --> B15-11
+  B15-11 --> B15-12
+  B15-09 --> B15-12
+  B15-09 --> STD-creativecommons
+  B15-03 --> STD-frictionless-table
+  B15-06 --> STD-frictionless-table
+  B15-12 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  B15-01 --> STD-ietf-json-schema
+  B15-07 --> STD-ietf-json-schema
+  B15-10 --> STD-ietf-json-schema
+  B15-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  B15-09 --> STD-spdx-licenses
+  B15-01 --> STD-vega-lite
+  B15-02 --> STD-vega-lite
+  B15-03 --> STD-vega-lite
+  B15-05 --> STD-vega-lite
+  B15-06 --> STD-vega-lite
+  B15-07 --> STD-vega-lite
+  B15-10 --> STD-vega-lite
+  B15-12 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  B15-04 --> STD-w3c-prov-o
+  B15-08 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o
+  B15-04 --> STD-w3c-svg2
+  B15-11 --> STD-w3c-svg2
+  STD-w3c-xml --> STD-w3c-svg2
+  B15-02 --> STD-w3c-tabular-data
+  B15-05 --> STD-w3c-tabular-data
+  B15-08 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

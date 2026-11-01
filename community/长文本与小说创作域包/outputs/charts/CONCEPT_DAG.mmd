@@ -1,0 +1,77 @@
+%% 概念前置图（由 community/长文本与小说创作域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    E04-01
+    E04-03
+    E04-05
+    E04-07
+    E04-09
+    E04-11
+  end
+  subgraph P60[P60]
+    E04-02
+    E04-04
+    E04-06
+    E04-08
+    E04-10
+    E04-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  E04-01 --> E04-02
+  E04-02 --> E04-03
+  E04-03 --> E04-04
+  E04-01 --> E04-04
+  E04-04 --> E04-05
+  E04-02 --> E04-05
+  E04-05 --> E04-06
+  E04-03 --> E04-06
+  E04-06 --> E04-07
+  E04-04 --> E04-07
+  E04-07 --> E04-08
+  E04-05 --> E04-08
+  E04-08 --> E04-09
+  E04-06 --> E04-09
+  E04-09 --> E04-10
+  E04-07 --> E04-10
+  E04-10 --> E04-11
+  E04-08 --> E04-11
+  E04-11 --> E04-12
+  E04-09 --> E04-12
+  E04-01 --> STD-commonmark
+  E04-04 --> STD-commonmark
+  E04-07 --> STD-commonmark
+  E04-10 --> STD-commonmark
+  E04-02 --> STD-commonmark
+  E04-05 --> STD-commonmark
+  E04-01 --> STD-ietf-json-schema
+  E04-06 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  E04-11 --> STD-mermaid
+  E04-08 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  E04-03 --> STD-w3c-epub33
+  E04-06 --> STD-w3c-epub33
+  E04-09 --> STD-w3c-epub33
+  E04-12 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  E04-02 --> STD-w3c-tabular-data
+  E04-05 --> STD-w3c-tabular-data
+  E04-08 --> STD-w3c-tabular-data
+  E04-11 --> STD-w3c-tabular-data
+  E04-03 --> STD-w3c-tabular-data
+  E04-04 --> STD-w3c-tabular-data
+  E04-07 --> STD-w3c-tabular-data
+  E04-09 --> STD-w3c-tabular-data
+  E04-10 --> STD-w3c-tabular-data
+  E04-12 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

@@ -1,0 +1,83 @@
+%% 概念前置图（由 community/上下文工程与长上下文域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    C12-01
+    C12-03
+    C12-05
+    C12-07
+    C12-09
+    C12-11
+  end
+  subgraph P60[P60]
+    C12-02
+    C12-04
+    C12-06
+    C12-08
+    C12-10
+    C12-12
+  end
+  subgraph P80[P80]
+    STD-cncf-otel-semconv
+    STD-commonmark
+    STD-frictionless-package
+    STD-gfm
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-mlcommons-bench
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  C12-01 --> C12-02
+  C12-02 --> C12-03
+  C12-03 --> C12-04
+  C12-01 --> C12-04
+  C12-04 --> C12-05
+  C12-02 --> C12-05
+  C12-05 --> C12-06
+  C12-03 --> C12-06
+  C12-06 --> C12-07
+  C12-04 --> C12-07
+  C12-07 --> C12-08
+  C12-05 --> C12-08
+  C12-08 --> C12-09
+  C12-06 --> C12-09
+  C12-09 --> C12-10
+  C12-07 --> C12-10
+  C12-10 --> C12-11
+  C12-08 --> C12-11
+  C12-11 --> C12-12
+  C12-09 --> C12-12
+  C12-07 --> STD-cncf-otel-semconv
+  C12-12 --> STD-cncf-otel-semconv
+  C12-04 --> STD-cncf-otel-semconv
+  C12-05 --> STD-cncf-otel-semconv
+  C12-05 --> STD-commonmark
+  C12-08 --> STD-commonmark
+  C12-09 --> STD-commonmark
+  C12-10 --> STD-commonmark
+  C12-03 --> STD-frictionless-package
+  STD-ietf-json-schema --> STD-frictionless-package
+  C12-01 --> STD-gfm
+  C12-04 --> STD-gfm
+  C12-06 --> STD-gfm
+  STD-commonmark --> STD-gfm
+  C12-01 --> STD-ietf-json-schema
+  C12-06 --> STD-ietf-json-schema
+  C12-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  C12-12 --> STD-mermaid
+  C12-02 --> STD-mlcommons-bench
+  C12-08 --> STD-mlcommons-bench
+  C12-11 --> STD-mlcommons-bench
+  C12-03 --> STD-vega-lite
+  C12-07 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  C12-09 --> STD-w3c-epub33
+  C12-10 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  C12-02 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

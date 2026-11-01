@@ -1,0 +1,80 @@
+%% 概念前置图（由 community/企业培训与组织学习域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    E15-01
+    E15-03
+    E15-05
+    E15-07
+    E15-09
+    E15-11
+  end
+  subgraph P60[P60]
+    E15-02
+    E15-04
+    E15-06
+    E15-08
+    E15-10
+    E15-12
+  end
+  subgraph P80[P80]
+    STD-commonmark
+    STD-gdpr
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-mlcommons-bench
+    STD-unesco-ai
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  E15-01 --> E15-02
+  E15-02 --> E15-03
+  E15-03 --> E15-04
+  E15-01 --> E15-04
+  E15-04 --> E15-05
+  E15-02 --> E15-05
+  E15-05 --> E15-06
+  E15-03 --> E15-06
+  E15-06 --> E15-07
+  E15-04 --> E15-07
+  E15-07 --> E15-08
+  E15-05 --> E15-08
+  E15-08 --> E15-09
+  E15-06 --> E15-09
+  E15-09 --> E15-10
+  E15-07 --> E15-10
+  E15-10 --> E15-11
+  E15-08 --> E15-11
+  E15-11 --> E15-12
+  E15-09 --> E15-12
+  E15-04 --> STD-commonmark
+  E15-10 --> STD-commonmark
+  E15-02 --> STD-commonmark
+  E15-05 --> STD-commonmark
+  E15-07 --> STD-commonmark
+  E15-12 --> STD-commonmark
+  E15-02 --> STD-gdpr
+  E15-01 --> STD-ietf-json-schema
+  E15-06 --> STD-ietf-json-schema
+  E15-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  E15-03 --> STD-mermaid
+  E15-03 --> STD-mlcommons-bench
+  E15-01 --> STD-unesco-ai
+  E15-07 --> STD-unesco-ai
+  E15-11 --> STD-unesco-ai
+  E15-12 --> STD-unesco-ai
+  E15-04 --> STD-vega-lite
+  E15-08 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  E15-06 --> STD-w3c-epub33
+  E15-09 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  E15-05 --> STD-w3c-tabular-data
+  E15-08 --> STD-w3c-tabular-data
+  E15-09 --> STD-w3c-tabular-data
+  E15-10 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

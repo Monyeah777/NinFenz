@@ -1,0 +1,85 @@
+%% 概念前置图（由 community/AI制药与生物域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    D02-01
+    D02-03
+    D02-05
+    D02-07
+    D02-09
+    D02-11
+  end
+  subgraph P60[P60]
+    D02-02
+    D02-04
+    D02-06
+    D02-08
+    D02-10
+    D02-12
+  end
+  subgraph P80[P80]
+    STD-cncf-cloudevents
+    STD-common-criteria
+    STD-commonmark
+    STD-hl7-fhir
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-nist-ai-rmf
+    STD-rdf11
+    STD-vega-lite
+    STD-w3c-epub33
+    STD-w3c-prov-o
+    STD-w3c-tabular-data
+    STD-w3c-xml
+  end
+  D02-01 --> D02-02
+  D02-02 --> D02-03
+  D02-03 --> D02-04
+  D02-01 --> D02-04
+  D02-04 --> D02-05
+  D02-02 --> D02-05
+  D02-05 --> D02-06
+  D02-03 --> D02-06
+  D02-06 --> D02-07
+  D02-04 --> D02-07
+  D02-07 --> D02-08
+  D02-05 --> D02-08
+  D02-08 --> D02-09
+  D02-06 --> D02-09
+  D02-09 --> D02-10
+  D02-07 --> D02-10
+  D02-10 --> D02-11
+  D02-08 --> D02-11
+  D02-11 --> D02-12
+  D02-09 --> D02-12
+  D02-07 --> STD-cncf-cloudevents
+  STD-ietf-json-schema --> STD-cncf-cloudevents
+  D02-03 --> STD-common-criteria
+  D02-09 --> STD-common-criteria
+  D02-12 --> STD-common-criteria
+  D02-06 --> STD-commonmark
+  D02-04 --> STD-hl7-fhir
+  D02-01 --> STD-ietf-json-schema
+  D02-05 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  D02-07 --> STD-mermaid
+  D02-04 --> STD-mermaid
+  D02-09 --> STD-mermaid
+  D02-11 --> STD-mermaid
+  D02-01 --> STD-nist-ai-rmf
+  D02-10 --> STD-nist-ai-rmf
+  D02-02 --> STD-vega-lite
+  D02-03 --> STD-vega-lite
+  D02-10 --> STD-vega-lite
+  D02-12 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  D02-06 --> STD-w3c-epub33
+  STD-w3c-xml --> STD-w3c-epub33
+  D02-02 --> STD-w3c-prov-o
+  D02-05 --> STD-w3c-prov-o
+  D02-08 --> STD-w3c-prov-o
+  D02-11 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o
+  D02-08 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data

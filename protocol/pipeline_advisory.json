@@ -1,0 +1,5723 @@
+{
+  "counts": {
+    "同层依赖序": 2,
+    "跨包/外部事件": 1134,
+    "跨包/外部依赖": 6
+  },
+  "items": [
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P00"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P01"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P90"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P133"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P127"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P132"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P124"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P130"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P123"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P129"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P128"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P125"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P07"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P131"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P126"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P43"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P25"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P55"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P81"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P93"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P72"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P106"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P91"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P22"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P34"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P33"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P115"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P76"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P29"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P24"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P95"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P83"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P21"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P49"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P122"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P102"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P47"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P98"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P58"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P16"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P85"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P41"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P61"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P11"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P84"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P32"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P09"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P97"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P116"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P51"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P23"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P104"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P74"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P105"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P27"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P06"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P53"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P54"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P118"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P79"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P56"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P94"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P18"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P96"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P26"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P92"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P36"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P46"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P45"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P77"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P17"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P37"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P89"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P59"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P19"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M43、M55、M57、M58、M59 ← npc_action（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P02"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M91 ← confession_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M91 ← npc_action（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M92、事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M91、事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P04"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P103"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P35"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P112"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P100"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P71"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P107"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P114"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P31"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P78"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P28"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P121"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P110"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P108"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P109"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P111"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P88"
+    },
+    {
+      "category": "同层依赖序",
+      "detail": "M01 ← M02（以注册表合并顺序为准）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M18 ← M15（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M18 ← M16（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M04 ← M03（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M04 ← M07（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M04 ← M03（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部依赖",
+      "detail": "M04 ← M07（可能由 references 闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "同层依赖序",
+      "detail": "M15 ← M16（以注册表合并顺序为准）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P03"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P12"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P86"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P15"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P42"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P113"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P57"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P101"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P120"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P39"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P13"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P38"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P05"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P08"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P82"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P99"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P117"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P14"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P87"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P119"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06、事件:M22 ← chaos_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← combat_result（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← death_trigger（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← ghost_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M13 ← level_up（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← market_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← production_output（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "事件:M22 ← relationship_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← reputation_change（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    },
+    {
+      "category": "跨包/外部事件",
+      "detail": "M06 ← travel_event（可能由 references 跨包闭包或外部域包提供）",
+      "pipeline": "P48"
+    }
+  ],
+  "note": "管线抽象执行的 advisory（同层顺序 / 跨包依赖 / 跨包事件）——不判死，但需分类可见；类别计数下降即缺口收敛。",
+  "pipelines": 114,
+  "schema": "nf-pipeline-advisory/1",
+  "total": 1142
+}

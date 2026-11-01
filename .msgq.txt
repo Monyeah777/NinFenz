@@ -1,0 +1,15 @@
+perf(ci): tests-only 默认并行度收到 8 + 临时文件 PermissionError 退避重试
+
+一、并行度默认值（实测）
+- 本机 20 核：jobs=8 → 冷跑 350–386 s；jobs=16 → 417 s（高并发把重测试拖长）。
+- `verify.sh --tests-only` 的默认 `_UT_JOBS` 从 min(16, cores-1) 收到 min(8, cores-1)。
+
+二、假红治理
+- 16 片并发时偶发 `PermissionError(13, '另一个程序正在使用此文件')`（AV/索引器短暂占用
+  临时 spec 文件），整轮门禁被一条**假红**判死。
+- 新增 `_retry_permission`（只重试 PermissionError，4 次指数退避），包住临时目录创建与
+  spec 落盘；其它异常照旧上抛。
+
+三、实测（本机）
+- 冷跑（8 片 + `NF_OVERLAP_SERIAL=1`）：**350 s / 360 s**（两次）
+- 热跑（TISA 全命中）：**9 s**；静态 checks 命中缓存：**1 s** → 热门禁 ≈ **10 s**

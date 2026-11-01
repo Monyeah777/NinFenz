@@ -1,0 +1,344 @@
+{
+  "schema": "nf-application-security-controls/1",
+  "reviewed_at": "2026-10-27",
+  "scope": [
+    "cli",
+    "daemon",
+    "mcp",
+    "plugin-host",
+    "file-processing",
+    "logging",
+    "release"
+  ],
+  "input_validation": {
+    "default": "closed-schema-or-bounded-parser-admission",
+    "rules": [
+      {
+        "id": "json-strict",
+        "surface": "CLI and daemon JSON",
+        "validation": "UTF-8 is decoded once and parsed as strict RFC 8259 JSON; NaN and Infinity are rejected.",
+        "limit": "Daemon request framing is bounded before parsing.",
+        "evidence": "desktop/src/core/json_doc.py"
+      },
+      {
+        "id": "mcp-closed-schema",
+        "surface": "MCP JSON-RPC tools",
+        "validation": "Tool arguments are admitted by declared inputSchema with additionalProperties false; unknown tools and methods are refused.",
+        "limit": "Each inbound message is bounded before dispatch.",
+        "evidence": "desktop/src/core/mcp_runtime.py"
+      },
+      {
+        "id": "plugin-bounded-input",
+        "surface": "WASM plugin host",
+        "validation": "The wasmtime artifact is validated by the runtime; the host does not interpret plugin input as host code.",
+        "limit": "Input, output, fuel, wall time, and component argv have hard budgets.",
+        "evidence": "scripts/plugin_host.py"
+      },
+      {
+        "id": "path-containment",
+        "surface": "Repository file access",
+        "validation": "Paths receive lexical rejection followed by realpath containment and symlink escape checks.",
+        "limit": "Resource and URI lengths are bounded at the transport boundary.",
+        "evidence": "desktop/src/core/paths.py"
+      }
+    ],
+    "coupled_rules": [
+      {
+        "id": "type-and-value",
+        "rule": "Type checks precede value-domain checks; booleans are not accepted as integers.",
+        "evidence": "desktop/src/core/trust_boundary.py"
+      },
+      {
+        "id": "atomic-read-modify-write",
+        "rule": "State replacement uses same-directory atomic write plus a cross-process lock; a failed operation leaves the prior file intact.",
+        "evidence": "desktop/src/core/atomic_write.py"
+      }
+    ],
+    "business_limits": [
+      {
+        "id": "daemon-request-lifetime",
+        "rule": "One daemon per NF home, bounded request sizes, idle timeout, and absolute lifetime."
+      },
+      {
+        "id": "mcp-response-limits",
+        "rule": "Resource bodies, snapshots, inbound messages, and outbound messages are bounded."
+      },
+      {
+        "id": "plugin-resource-limits",
+        "rule": "Fuel and wall-clock limits are mandatory; timeout, fuel exhaustion, and output overflow fail closed."
+      }
+    ]
+  },
+  "file_handling": {
+    "upload_surface": false,
+    "archives_accepted": false,
+    "processing_types": [
+      ".json",
+      ".jsonl",
+      ".csv",
+      ".md",
+      ".yaml",
+      ".toml",
+      ".graphml",
+      ".wasm"
+    ],
+    "maximum_sizes": [
+      {
+        "surface": "MCP resource",
+        "bytes": 8388608,
+        "action": "reject before returning content"
+      },
+      {
+        "surface": "MCP snapshot",
+        "bytes": 33554432,
+        "action": "reject before admission"
+      },
+      {
+        "surface": "WASM plugin payload",
+        "bytes": 8388608,
+        "action": "reject before invocation"
+      }
+    ],
+    "content_validation": {
+      "status": "partial",
+      "implemented": "JSON, schema-bound data, path containment, and WASM runtime validation reject malformed or escaping content.",
+      "gap": "The repository is not an upload service and does not claim magic-byte validation for every supported local text format."
+    },
+    "malicious_file_behavior": "Reject the file, emit a bounded error, and continue without executing content as host code."
+  },
+  "authorization": {
+    "default": "deny",
+    "rules": [
+      {
+        "id": "daemon-process-token",
+        "consumer": "local NF CLI",
+        "resource": "daemon command execution",
+        "decision": "requires the per-process CSPRNG token"
+      },
+      {
+        "id": "mcp-read-only",
+        "consumer": "MCP client",
+        "resource": "repository content",
+        "decision": "explicit read-only tool/resource allowlist; write tools are absent"
+      },
+      {
+        "id": "plugin-capabilities",
+        "consumer": "WASM plugin",
+        "resource": "filesystem, network, environment",
+        "decision": "capabilities are denied unless explicitly granted by the package manifest"
+      },
+      {
+        "id": "repo-trust",
+        "consumer": "nf verify engine",
+        "resource": "execution of target repository code",
+        "decision": "external repositories are refused unless the caller explicitly opts in"
+      }
+    ]
+  },
+  "cryptography": {
+    "inventory": [
+      {
+        "id": "daemon-session-token",
+        "algorithm": "secrets.token_hex(32)",
+        "purpose": "per-process daemon authentication",
+        "key_source": "operating-system CSPRNG",
+        "storage": "owner-only daemon state file while the process is alive",
+        "rotation": "new token on every daemon start"
+      },
+      {
+        "id": "content-integrity",
+        "algorithm": "SHA-256",
+        "purpose": "content, receipt, and release integrity",
+        "key_source": "not applicable",
+        "storage": "digest only",
+        "rotation": "not applicable"
+      },
+      {
+        "id": "token-comparison",
+        "algorithm": "hmac.compare_digest",
+        "purpose": "constant-time token and MAC comparison",
+        "key_source": "not applicable",
+        "storage": "not applicable",
+        "rotation": "not applicable"
+      }
+    ],
+    "approved_algorithms": [
+      "secrets.token_hex(32)",
+      "SHA-256",
+      "hmac.compare_digest"
+    ],
+    "agility": {
+      "status": "partial",
+      "strategy": "central inventory, version review, and release-gated code upgrade",
+      "gap": "Algorithms are not negotiated at runtime; a change requires a reviewed release and compatibility analysis."
+    }
+  },
+  "communications": [
+    {
+      "id": "daemon-loopback",
+      "source": "NF CLI",
+      "target": "local daemon",
+      "transport": "TCP over 127.0.0.1",
+      "external": false,
+      "authentication": "per-process token",
+      "least_privilege": "current OS user",
+      "allowlist": "loopback only"
+    },
+    {
+      "id": "mcp-stdio",
+      "source": "MCP client",
+      "target": "NF MCP runtime",
+      "transport": "newline-delimited UTF-8 JSON-RPC over stdio",
+      "external": false,
+      "authentication": "parent-process pipe ownership",
+      "least_privilege": "read-only allowlist",
+      "allowlist": "current process"
+    },
+    {
+      "id": "plugin-host",
+      "source": "NF plugin host",
+      "target": "WASM plugin",
+      "transport": "bounded subprocess and wasmtime",
+      "external": false,
+      "authentication": "local child process",
+      "least_privilege": "manifest capabilities default deny",
+      "allowlist": "explicit filesystem/network/environment grants only"
+    }
+  ],
+  "data_protection": {
+    "classes": [
+      {
+        "id": "public-protocol",
+        "examples": "protocol documents, schemas, receipts, release metadata",
+        "confidentiality": "public by design",
+        "integrity": "SHA-256 and committed diffs",
+        "retention": "repository history and release artifacts",
+        "logging": "allowed",
+        "access": "repository ACL"
+      },
+      {
+        "id": "local-configuration",
+        "examples": "NF_HOME state and user configuration",
+        "confidentiality": "current OS user",
+        "integrity": "atomic writes and cross-process locking",
+        "retention": "until the user removes it",
+        "logging": "metadata only; secrets are redacted",
+        "access": "filesystem ACL"
+      },
+      {
+        "id": "daemon-session-secret",
+        "examples": "daemon token in daemon.json",
+        "confidentiality": "owner-only POSIX mode 0600; inherited user ACL on Windows",
+        "integrity": "constant-time comparison",
+        "retention": "daemon process lifetime; cleared on shutdown",
+        "logging": "forbidden and redacted",
+        "access": "only the current user and daemon client path"
+      },
+      {
+        "id": "security-events",
+        "examples": "authentication failures, rejected requests, internal error events",
+        "confidentiality": "owner-only local log",
+        "integrity": "single-line append-only local record",
+        "retention": "host log retention policy",
+        "logging": "sanitized structured records",
+        "access": "owner-only POSIX mode 0600; inherited user ACL on Windows"
+      },
+      {
+        "id": "plugin-payload",
+        "examples": "bounded input and output bytes",
+        "confidentiality": "invocation memory only",
+        "integrity": "WASM validation and bounded buffers",
+        "retention": "invocation lifetime",
+        "logging": "metadata only",
+        "access": "plugin host process"
+      }
+    ]
+  },
+  "resource_limits": {
+    "limits": [
+      {
+        "id": "daemon.request",
+        "bytes": 1048576,
+        "evidence": "desktop/src/core/daemon.py"
+      },
+      {
+        "id": "daemon.response",
+        "bytes": 16777216,
+        "evidence": "desktop/src/core/daemon.py"
+      },
+      {
+        "id": "mcp.message",
+        "bytes": 8388608,
+        "evidence": "desktop/src/core/mcp_runtime.py"
+      },
+      {
+        "id": "mcp.snapshot",
+        "bytes": 33554432,
+        "evidence": "desktop/src/core/mcp_runtime.py"
+      },
+      {
+        "id": "mcp.resource",
+        "bytes": 8388608,
+        "evidence": "desktop/src/core/repo_index.py"
+      },
+      {
+        "id": "plugin.input",
+        "bytes": 8388608,
+        "evidence": "scripts/plugin_host.py"
+      },
+      {
+        "id": "plugin.output",
+        "bytes": 8388608,
+        "evidence": "scripts/plugin_host.py"
+      }
+    ],
+    "timeouts": [
+      {
+        "id": "daemon.idle",
+        "seconds": 3600,
+        "evidence": "desktop/src/core/daemon.py"
+      },
+      {
+        "id": "daemon.lifetime",
+        "seconds": 86400,
+        "evidence": "desktop/src/core/daemon.py"
+      },
+      {
+        "id": "plugin.wall",
+        "seconds": 30,
+        "evidence": "scripts/plugin_host.py"
+      }
+    ]
+  },
+  "logging": {
+    "format": "UTC timestamp plus single-line JSON object",
+    "redaction": "credential shapes and credential-named fields",
+    "control_characters": "escaped to preserve one event per line",
+    "local_file": "daemon.log",
+    "posix_mode": "0600",
+    "tamper_evident": false,
+    "separate_system": false,
+    "gap": "Local logs are owner-protected but not immutable WORM storage and are not shipped to an independent analysis system."
+  },
+  "production": {
+    "debug_default": "disabled",
+    "debug_enable_environment": "NF_DEBUG",
+    "client_error_policy": "generic internal error without traceback, path, or token",
+    "development_artifacts_excluded_from_payload": true,
+    "package_allowlist": "packaging/npm/tools/payload-policy.mjs"
+  },
+  "release": {
+    "critical_response": "stop release",
+    "high_response": "block merge and tag until fixed or explicitly dispositioned",
+    "medium_response": "next maintenance window",
+    "dependency_sources": "packaging/supply-chain/package-sources.json",
+    "supplier_register": "packaging/supply-chain/suppliers.json",
+    "sbom_formats": [
+      "CycloneDX 1.6",
+      "SPDX 3.0.1"
+    ],
+    "reproducible_build_count": 2,
+    "provenance": "GitHub OIDC build provenance and verification summary",
+    "slsa_claimed_level": "SLSA_BUILD_LEVEL_2"
+  }
+}

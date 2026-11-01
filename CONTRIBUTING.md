@@ -1,0 +1,183 @@
+# 贡献规范（CONTRIBUTING）
+
+> **适用对象**：对 NinFenz **协议层（01–07 + 08/09 方案）**、**代码层（desktop/ scripts/）**、**社区领域包（community/）** 的任何改动。
+> **门禁铁律**：**任一 FAIL = 协议事故，回滚再改**；0 WARN / 0 FAIL 方可提交（verify.sh 语义）。
+
+## 1. 提交信息格式（Conventional Commits）
+
+格式：`<type>(<scope>): <subject>`——subject 用中文一句话，禁句号结尾。
+**机检**：`bash scripts/install_hooks.sh` 装 `commit-msg` 钩子（`scripts/commit_msg_check.py`），
+不合规即拒提交（确需绕过用 `git commit --no-verify`）；判据与下表同源——下表 type 之外的
+`release` / `merge` / `ci` / `lib` 是仓库实证补充（发版 / 并行流合流 / CI 改动 / 入库机器人）。
+
+| type | 用途 | 示例 |
+| --- | --- | --- |
+| feat | 新功能 / 新资产 / 新文档 | `feat(desktop): ROADMAP 落盘 + v0.6.0 治理缺口补漏` |
+| fix | 缺陷修复 | `fix(core): registry 版本比对 NaN 崩溃` |
+| docs | 文档 / 协议改动 | `docs(protocol): 02 §8 登记 P03 西幻包` |
+| refactor | 重构不改行为 | `refactor(core): storage 导入路径收口` |
+| test | 测试增补 | `test(core): verify.sh 增 check12 代码层门禁` |
+| chore | 杂项 / CI | `chore(ci): ci-verify 增覆盖率门槛` |
+| release | 发版收口（CHANGELOG 归档 + 版本块归位） | `release(v2.10.0): 45 质量纵深收口发布` |
+| merge | 并行流合流（多会话/远端合并） | `merge(remote main): 并行流合流` |
+| ci | CI/工作流改动 | `ci(workflow): 壳端与基础层彻底分离` |
+| lib | 云端代收入库（机器人提交） | `lib(Y12): 云端代收 NF-9 自动入库` |
+
+多 type 可并联（`docs+feat(quality): …`）；scope 从宽（`state-front` / `v41,B1` / `docs+test` 均合法）；**不设行长上限**。
+
+scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `ci` / `core`（真相源 = desktop/src/core，APK 线已移除见裁决 #16）。
+
+## 2. 分支策略：单主干 + 版本锚点
+
+- 主干 main 为唯一长期分支，改动直接推 main（大改动可短命分支合并后删除）。
+- **版本锚点**：发布即打 annotated tag（内容线 `v0.xx` / CLI 线 `v1.0.x`），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
+- 开工前工作树须干净（当前版本锚点 = 最新 annotated tag，见 §2）。
+
+### 2.1 编号体系映射表（四套口径 · 唯一真源）
+
+仓库同时存在四套编号，混用即口径崩塌（2026-10-10 审计 P1-6）。机检 = `desktop/tests/test_version_map.py`：
+下表每一行的「唯一真源」都逐项断言，漂移即红。
+
+| 体系 | 语义 | 唯一真源 | 升级规则 |
+|---|---|---|---|
+| 协议 / 内容 v0.xx | 协议件与内容资产版本 | CHANGELOG.md 最新**已发布**节 «## [0.xx]»、docs/meta/VERSION-MATRIX.md 末行 | 发布收口：归档未发布节 + 补 VERSION-MATRIX 行；release_gate 取 CHANGELOG 的 release_line |
+| 门禁 verify vA.B | verify.sh 的判据集版本 | protocol/repo_stats.json（verify_version / verify_checks / baseline_pass）= core.quality_baseline 期望值 = llms.txt 质量凭证串 | scripts/bump_verify.sh 换标；判据集变即升 A.B |
+| CLI / npm / MCP 1.0.x | 启动器与 npm 包版本 | scripts/nf.py 的 NF_CLI_VERSION = packaging/npm/package.json = packaging/mcp/server.json（version 与 packages[0].version） | 发 npm 版时三处同改（stage-payload / test_mcp_packaging / site sync-numbers 均判死） |
+
+站点面（site/**）的 npm 版本 / 件数 / 体积必须与第三行一致，由 site/tools/sync-numbers.mjs 判死；
+CITATION.cff 刻意不钉版本号（见其文件头），不在断言面内。
+
+### 2.2 打 tag 的判定规则（2026-10-20 起执行，替代"凭感觉推"）
+
+**tag 只标记"用户能感知的功能变化"**，不标记内部整理。判定顺序固定：
+
+| 问题 | 是 → | 否 → |
+|---|---|---|
+| 有没有改到**用户能感知的能力**（新命令 / 新协议件 / 新领域包 / 行为变化）？ | 打 tag | 不打 tag |
+| 这次变化有多大？ | **稍有突破** → **+0.01**（0.01 → 0.02） | **小更新** → **合并进当前版本**，不单独发版 |
+| 有没有**创新突破**（新能力线/新引擎/新协议层）？ | **+0.1**（0.02 → 0.12），破坏兼容时另写迁移说明 | 按上一行 |
+
+三条硬约束：
+
+1. **tag 必须打在"带该功能的那次提交"上**——不能打在后续的 `chore:`/`ci:` 收尾提交上。
+2. **tag 注释必须写清"这一版加了什么功能"**（一两句人话，不写内部字段名）；空注释或只写版本号视为不合规。
+3. **CLI 线 tag（`v1.0.x`）与 npm 包版本严格同号**：`v1.0.4` ⟺ `package.json` 1.0.4。内容线（`v0.xx`）与 CLI 线各自独立，互不牵连。
+
+发布流程（缺一步就不算发版）：
+
+```bash
+# ① 功能已合并、CHANGELOG 已写、门禁绿
+# ② 在功能提交上打附注 tag（注释写功能摘要）
+git tag -a v0.13 -m "v0.13 …（这一版新增/修正了什么）"
+# ③ 推 tag（CI 的 release-gate / npm-publish 由此触发）
+git push origin refs/tags/v0.13
+```
+
+> 2026-10-20 重排：内容线由 v0.x / v1.x / v2.x 混杂改为 **0.xx 两位小数单序列**；
+> 纯修复/打点的 5 个历史 tag（0.3.0 / 0.3.1 / 0.3.2 / 0.3.3 / 0.5.0）按「小更新合并」并入 v0.11；
+> 备档 bundle 见 `D:\_NF-Archive\NinFenz-BEFORE-renumber-*.bundle`。
+
+## 3. 验证门槛（提交前三步，全部通过）
+
+```bash
+# ① 协议门禁（check1–32 三段式：段 A 官方 / 段 B 社区 / 段 C 代码层）
+bash verify.sh
+# ② 代码层门禁（check12 同款：desktop core 用例）
+cd desktop && python3 -m unittest discover -s tests -q && cd ..
+# ③ 语法抽查（全量 py 编译）
+python3 -m compileall -q desktop/src scripts
+```
+
+任一失败即回滚本次修改，修正后重跑；全绿方可提交推送。
+
+## 4. 改动域细则
+
+### 4.1 协议层（01–07 + 08/09 方案）
+- 结构性改动走 **06 §10 修改规程四步闭环**：按协议声明 → 登记真相源 → verify.sh 自检 → 提交同步导航面。
+- 动 01/02/06 契约触发 **01 §7 V2 bump**（结构性变更 + 迁移说明）；registry_schema_version / save_schema_version 双字段联动升级。
+- 新增方案文档（08→09→…）须同步 README L32 协议链与 ROADMAP §1 总览表，不在多处重复维护任务清单。
+
+### 4.2 代码层（desktop/ scripts/）
+- **core 零第三方依赖**（纯标准库）；确需引入第三方依赖先开 Issue 讨论。
+- 新增可测逻辑放 desktop/tests/，纳入 unittest 体系（check12）；暂不做端到端 / GUI 测试入 CI。
+- **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
+
+### 4.3 社区领域包（community/）
+- 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。
+- 资产须登记溯源索引（assets/README.md）并满足 EXT 闭合（起始/终止行溯源注释 + 外部完整实体源标注），`bash scripts/reconcile_assets.sh --quiet` 应全清。
+
+### 4.4 社区包协作流程（v1.0.0 起：第三方协议贡献全流程）
+
+> **收口锚点**：兑现 10_v0.7.0_自定义协议方案 §6 开放问题 4——第三方包从提交到登记的协作流程（PR/评审/发布）原「不属 v0.7.0 协议层范畴……流程治理留待 v1.0.0 生态收口」，本版以文档化收口：**人读流程 = 本节五步**（提交 → PR 评审 → 登记 → 发布，含前置协议合规自检），**机读门禁 = verify.sh check 断言配套**（check14/check15/check16，见 02 §9.2）。流程治理本版 = 文档化，不做平台化/工具化（PR 机器人 / 自动登记流水线留后续，同防范围蔓延纪律）。适用对象：向 community/ 贡献新社区领域包（02 §8.1/8.2 同型）或组合管线包（02 §8.4 同型）的第三方。
+
+**① 协议合规自检（提交前，贡献者必过）**
+- **protocol.yaml 三要件齐备**（02 §8.3）：包根机读协议声明在场（01 §6.1 Schema 必填 12 字段，check14 ①-⑥ 断言）；登记要素（包目录/管线/模块/资产/类别）齐备；组合包另须 references 合规（02 §8.4 四规则：在册可寻址 / 依赖闭包闭合 / 同层 default 唯一 / 契约断裂 FAIL 阻断 + 自动仲裁）。
+- **本地自检单**：`bash verify.sh` 全绿（0 WARN / 0 FAIL；其中 check14 注册门禁 / check15 组合门禁为社区包专项）——**不钉运行时计数**（check 数与 PASS 基线见 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区，钉死必漂）；代码/语法按 §3 三步验证门槛全过；资产经 asset_get 寻址、登记溯源索引并满足 EXT 闭合，`bash scripts/reconcile_assets.sh --quiet` 全清（§4.3）。
+
+**② 提交（分支 / commit / 引用规范）**
+- 分支策略按 §2（单主干 main 直推或短命分支合并）；commit 信息遵循 §1 Conventional Commits——type 取 `feat`（新包落盘）/ `docs`（协议改动），scope 取 `community`。
+- 方案文档引用：结构性协议改动须可溯方案文档（README L32 协议链）与登记真相源 02，不在多处重复维护任务清单（§4.1）。
+
+**③ PR 评审（reviewer 判据）**
+- 使用 .github/PULL_REQUEST_TEMPLATE.md，勾选「社区包」改动域 + 门禁自检清单（§5）。
+- **协议层 reviewer 判据 = 02 §8.1–8.4 登记规则 + check 全绿**：整包登记对照 §8.3 登记三要件、组合登记对照 §8.4 登记判定四规则；**`bash verify.sh` 全绿（WARN 0 / FAIL 0）为合并前提**——当前 check 数与 PASS 基线以 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区为准，**本文件不钉运行时计数**（钉死会漂，2026-09-30 实测此处曾落后到 check1-36/PASS=59）。
+- 评审范围含题材/资产合规：模块遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；资产 EXT 闭合 + 溯源索引在册（§4.3）。
+
+**④ 登记（协作流程终点的机读落地）**
+- 02 §8 登记表登记（新领域包走 §8.1/8.2 同型、组合管线包走 §8.4）：**模块编号**落 `M91–M99 机制段` 或本包 **R2 独占类别**的 `<类别>:Mxx` **类内段**（每类 00-99 独立空间，类别须在本包 categories 在册、类内号唯一），两通道均不占官方核心 13 件与既有社区包编号（§8.3）；**管线编号**须全库唯一且避让层位 id（P00–P80）与官方管线 id（P00/P01/P90）（check14 ⑤/⑧）；同步 registry.json `protocols[]` 投影（02 §9.1 字段映射；check14 ⑦ 断言）。
+- 三要件缺一即不被平台门禁识别（02 §8.3）；**登记 = 协作流程终点的机读落地**（02 §9.2 协作流程纪律）。
+
+**⑤ 发布（README 双源声明 + 版本行同步 + 发布纪律）**
+- 包 README 装载手册声明登记指针——「登记三要件见 02 §8.3，组合登记见 02 §8.4」（对齐既有两包形态）；根 README 开箱即玩社区预设段与 07 §3 索引同步增补（双源声明一致，I5）。
+- 版本行同步：schema_version / registry_schema_version 等字段级改动走 01 §7 V1（只增不删）/ V2（结构性变更 bump + 迁移记录）规则。
+- 发布纪律：tag（内容线 v0.xx / CLI v1.0.x）为版本真相源（I5）、禁止在已发布 tag 上回写（§2）；发布条目同步 CHANGELOG 与 ROADMAP。
+
+### 4.5 方案文档纪律（NN_ 方案模板必填两段，v2.2.0 B1/B2 起）
+新增/修订方案文档（`NN_<版本>_<主题>方案.md`）**必含**以下两段，位置在「核心」段之后：
+
+**B1 五问自检（Clarify 自检，每方案回答五问）**
+1. **谁消费本功能**——具体消费方（模块/CLI/verify check/文档/外部产物格式），不接受「将来可能有用」。
+2. **何时/如何验证被消费**——验证动作 + 时机（如「nf CLI 冒烟输出」「verify checkNN 绿」「单测断言」），可独立跑、有可观察结果。
+3. **与非目标边界**——明确不做（对照 01 §5 I5 / L3_FROZEN 冻结面 / ROADMAP 条件池），一句话边界声明。
+4. **与现存协议关系**——涉及 01-07 哪一层、是否需 02 登记 / registry 投影 / schema bump（V1/V2）。
+5. **失败定义**——什么算验收不通过（RED 判据），与 §3 验证门槛对齐。
+
+**B2 消费方声明（防 C-a 无消费方能力重演，并入 B1 五问 ①/②）**
+- 以表格或清单声明：**功能** → **谁消费** → **怎么验证被消费**。消费方为空的条目不得进入方案（须先裁掉或绑定后续立项）。
+- 追溯锚点：落地后 README L32 协议链 / CHANGELOG 条目须能指回该方案（治理指针 2），verify 新增 check 须在头部配套说明引方案号。
+
+> 反例（C-a 教训）：模块质量分级曾因无消费方搁置——五问 ① 答不出「谁消费」即方案未成熟。正面示例见方案 33（A2 消费方 = nf who-refers CLI + retriever 库；A4 = verify check21）。
+
+**推荐段（可选，非门禁——v2.6-A 钢人论证 / M_AUDIT 协议设计审计）**：重大方向性决策（域包立项 / 协议设计前置 / 线体取舍 / 发布节奏）可选用协议设计审计工作单理清支持/反对/盲区——`nf design audit init "<问题>" --target T --mode {steelman,blindspot,full}` 生成，`--check` 结构自检（verdict 三态/论据与清单边界/meta 在场），`ls` 列审计索引。full 模式含盲区双问（Q1 低置信度 / Q2 遗漏）——反幻觉与反思维惯性；`nf design steelman` 为其钢人子集兼容入口。**措辞为推荐非必做**：默认缺席、按需装载，不强制任何决策走审计（「也许有人需要而有人不需要」）；审计产物（audit.md）是过程档案，与方案文档（产物）互补，可回溯决策依据。
+
+## 5. Issue / PR 规范
+- **缺陷上报**：使用 .github/ISSUE_TEMPLATE/bug_report.yml（结构化表单；环境信息按字段填写）。
+- **功能请求**：使用 .github/ISSUE_TEMPLATE/feature_request.yml（结构化表单）。
+- **PR**：使用 .github/PULL_REQUEST_TEMPLATE.md，勾选改动域（协议层 / 代码层 / 社区包）+ 门禁自检清单（verify.sh 全绿 / unittest 用例 / py_compile 通过）。
+
+## 6. 安全章程（40 总纲 S8，2026-09-06）
+- **密钥零落盘**：不提交/不 cat/不 read `.env`、`credentials.*`、`*token*`、`*secret*` 等文件；发现即警告并中止（项目硬性闸门）。
+- **Token 轮换 SOP**：任何出现在对话/日志/文档/commit 中的 token 视为已泄露——立即到 GitHub → Settings → Developer settings → Personal access tokens 撤销重建；新 token 仅经环境变量注入，不写入文件/提交。CI 一律用 `GITHUB_TOKEN`（workflow 内最小权限），不使用个人 PAT。
+- **workflow 最小权限**：顶层默认 `contents: read`；需要写 Release/推送的 job 单独声明 `contents: write`——新增 workflow 或步骤前对照现有 permissions 模式（ci-verify/e2e 只读、build job 单提权）。
+- **Release 校验和**：发布资产随行 `sha256sum` 校验和文件（用户下载后可验完整性）。
+- **secret 扫描**：提交前自查常见 token 前缀（`ghp_` / `gho_` / `sk-` 等）；完整自动扫描入 ci-verify 为波 A 项（40 总纲 S8 全量，v2.7）。
+
+## 7. 贡献授权（CLA · 双授权必需）
+
+> 依据：`STRATEGY.md §四`、`LICENSING.md §6`；双授权需要贡献者**明示授权**作者以商业/专有许可再许可。
+
+- **inbound = outbound（Z6 口径）**：你提交的贡献以**项目当前许可**（代码层 AGPL-3.0-only）发布；**商业再许可**不靠该口径，而由 CLA §2.3 单独明示授权。
+- **必须签署 CLA**：贡献者需签署 `CLA.md`（改编自 **Harmony Combined Contributor Agreement v1.0 · Option Five**）。
+  其 §2.3 原文：*"We may license the Contribution under any license, including copyleft, permissive,
+  **commercial, or proprietary** licenses."* —— 这是商业闭源再许可的**唯一**合法授权来源。
+  签署方式见 `CLA.md` 的 SUBMISSION_INSTRUCTIONS（CLA Assistant 机器人回复一句话即可）。
+- **DCO 不是授权工具**：DCO 只声明"我有权提交该作品"，其效果是把贡献按**项目当前许可**（AGPL）发布，
+  **不包含**商业再许可授权。本仓**不**用 DCO 承载商业授权（旧文案曾误写，2026-10-25 已纠正）。
+  仍建议 `git commit -s`（便于追溯作者与来源），但它是**补充**，不是替代 CLA 的授权。
+- **你保留版权**；CLA 是**许可**（非版权转让，本仓采用 License 版而非 Assignment 版）。
+- **实体贡献**：受雇期间产出需雇主签 Entity 版本（`CLA.md` 已含 Entity 条款）。
+- **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
+  或已获授权；这类内容的许可声明见 `LICENSES/LicenseRef-Community-Submission.txt`。
+- **不得提交专有/未授权内容**：引用第三方内容须注明来源与许可（2026-10-10 审计 X1 即此类事故，
+  已按「排除发布面 + 换自写夹具」修复）。
+- **沙箱意识**：工具执行限项目目录内。路径逃逸的拦截由**宿主 harness 的工具层**负责——仓库不对该层作实现承诺（旧文案写「被 validatePath 拦截」，而仓库内并无该实现，属虚假保证；2026-09-24 起文档只写真实载体）。仓库内组件之间的包含性判据 = `desktop/src/core/paths.py::validate_path`（**资产台账**与**产出面清单**已收敛到它，有单测 `desktop/tests/test_paths.py` + `desktop/tests/test_output_path_escape.py`），不得绕过。

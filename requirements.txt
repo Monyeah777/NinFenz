@@ -1,0 +1,20 @@
+# NF root requirements (2026-10-11).
+#
+# NF itself is stdlib-only: the core has NO runtime dependencies. Installing the
+# gates toolchain (below) is for running the repo's checks, not for using NF.
+#
+# Pins keep their single source of truth in .github/requirements-*.txt (mirrored by
+# pyproject.toml [project.optional-dependencies]). This file only *includes* those
+# lists -- it never repeats a version, so no pin can disagree between two places.
+#
+#   pip install -r requirements.txt          # gates toolchain (pyyaml/PySide6/jsonschema/coverage + ruff)
+#   pip install -e .[dev]                    # same set, via package metadata
+#
+# Heavy-toolchain extras (used by their own workflows, not needed for the gates):
+#   -r .github/requirements-audit.txt        # pip-audit
+#   -r .github/requirements-sast.txt         # bandit
+#
+# IMPORTANT: keep this file ASCII-only. pip parses requirements files with the
+# process locale (no coding cookie), so non-ASCII comments break pip install -r
+# under non-UTF-8 locales (reproduced on Windows/GBK). See .github/requirements-ci.txt.
+-r .github/requirements-ci.txt

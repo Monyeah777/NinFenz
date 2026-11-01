@@ -1,0 +1,1449 @@
+{
+  "schema": "nf-capability-contracts/1",
+  "note": "吸收项契约电池真源（2026-10-11）。每项声明：模块 / 入口 / 黄金样例 / 期望判定。电池逐项真调用；期望形态见 core/capability_battery.py::judge。样例为最小可判定的正/负向量，不复制各自单测。",
+  "count": 48,
+  "capabilities": [
+    {
+      "id": "absence-guard",
+      "module": "absence_guard",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "axiomcodegraph SKILL / nuke AGENTS",
+      "cases": [
+        {
+          "args": [
+            "本轮检索面共 3 条，均命中，未解点无。"
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            "该模块不存在。"
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "artifact-manifest",
+      "module": "artifact_manifest",
+      "entry": "verify",
+      "family": "verdict-list",
+      "source": "tokalator / o8 产物嵌双 SHA",
+      "cases": [
+        {
+          "args": [
+            {
+              "coverage": "覆盖 A；不覆盖 B",
+              "files": {}
+            },
+            "."
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "coverage": "",
+              "files": {}
+            },
+            "."
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "ast-missing",
+      "module": "ast_missing",
+      "entry": "missing_guards",
+      "family": "verdict-list",
+      "source": "ha_agent websocket 安全 AST",
+      "cases": [
+        {
+          "args": [
+            "def test_a():\n    guard()\n",
+            "test_",
+            [
+              "guard"
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            "def test_a():\n    pass\n",
+            "test_",
+            [
+              "guard"
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "calibration-state",
+      "module": "calibration_state",
+      "entry": "state",
+      "family": "scalar",
+      "source": "stashbase evals/README",
+      "cases": [
+        {
+          "args": [
+            0,
+            5
+          ],
+          "expect": {
+            "equals": "unjudged"
+          }
+        },
+        {
+          "args": [
+            5,
+            5
+          ],
+          "expect": {
+            "equals": "gated"
+          }
+        },
+        {
+          "args": [
+            2,
+            5
+          ],
+          "expect": {
+            "equals": "calibration"
+          }
+        }
+      ]
+    },
+    {
+      "id": "case-schema",
+      "module": "case_schema",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "axiomcodegraph tests/cases",
+      "cases": [
+        {
+          "args": [
+            {
+              "why": "w",
+              "run": "r",
+              "want": "t",
+              "avoid": "a"
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "claim-labels",
+      "module": "claim_labels",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "restless-core 规格认知标签",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "label": "example"
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "label": "core-contract"
+              }
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "commit-title-guard",
+      "module": "commit_title_guard",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "nuke AGENTS / STRATEGY 公开文案",
+      "cases": [
+        {
+          "args": [
+            "feat(core): 收口吸收波机械红"
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            "feat: 波A 收口"
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "conformance-run",
+      "module": "conformance_run",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "smartsheet-rm check_conformance.sh",
+      "cases": [
+        {
+          "args": [
+            {
+              "command": "x",
+              "port": 1,
+              "ready_path": "/h",
+              "pinned_version": "1",
+              "steps": [
+                "start",
+                "poll-ready",
+                "run-suite",
+                "teardown"
+              ]
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "contract-pin",
+      "module": "contract_pin",
+      "entry": "pin",
+      "family": "mapping",
+      "source": "OpenAgentCore upstream_contract_test",
+      "cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            },
+            [
+              "a"
+            ],
+            1
+          ],
+          "expect": {
+            "has_keys": [
+              "sha256",
+              "fields",
+              "count"
+            ]
+          }
+        },
+        {
+          "args": [
+            {},
+            [],
+            0
+          ],
+          "expect": {
+            "has_keys": [
+              "sha256",
+              "fields",
+              "count"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "declined-ledger",
+      "module": "declined_ledger",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "awesome-jev rejected.jsonl",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "candidate": "x",
+                "reason": "r",
+                "date": "2026-01-01"
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "candidate": "x"
+              }
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "delete-evidence",
+      "module": "delete_evidence",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "oh-my-pi SKILL 删除证据",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "target": "t",
+                "kind": "vcs",
+                "ref": "abc"
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "target": "t"
+              }
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "dep-closure",
+      "module": "dep_closure",
+      "entry": "offenders",
+      "family": "verdict-list",
+      "source": "tinychannels check-bus-purity.py",
+      "cases": [
+        {
+          "args": [
+            {
+              "a": [
+                "b"
+              ]
+            },
+            [
+              "a"
+            ],
+            [
+              "b"
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "a": [
+                "b"
+              ]
+            },
+            [
+              "a"
+            ],
+            []
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "dirty-tree",
+      "module": "dirty_tree",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "stashbase evals/README",
+      "cases": [
+        {
+          "args": [
+            {
+              "head": "abc",
+              "dirty": false,
+              "paths": []
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "doc-routing",
+      "module": "doc_routing",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "caprock .ai/00-index.md",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "file": "a.md",
+                "when": "改协议时"
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "file": "a.md"
+              }
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "error-codes",
+      "module": "error_codes",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "loomvault ErrorCode / iskills errors",
+      "cases": [
+        {
+          "args": [
+            {
+              "codes": [
+                {
+                  "id": "NF_X",
+                  "message": "m",
+                  "fix": "f"
+                }
+              ]
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "codes": [
+                {
+                  "id": "bad",
+                  "message": "m",
+                  "fix": "f"
+                }
+              ]
+            }
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "eval-collapse",
+      "module": "eval_collapse",
+      "entry": "collapsed_mean",
+      "family": "scalar",
+      "source": "stashbase evals/README",
+      "cases": [
+        {
+          "args": [
+            {
+              "a": [
+                1,
+                3
+              ],
+              "b": [
+                2
+              ]
+            }
+          ],
+          "expect": {
+            "equals": 2
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "equals": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "eval-harness",
+      "module": "eval_harness",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "pj-nx evals / 311 eval.yml",
+      "cases": [
+        {
+          "args": [
+            {
+              "case_id": "c",
+              "ok": true,
+              "cost_usd": 0,
+              "at": "2026-01-01T00:00:00Z",
+              "trigger": "local-manual"
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "face-coverage",
+      "module": "face_coverage",
+      "entry": "uncovered_faces",
+      "family": "verdict-list",
+      "source": "objectui 覆盖度反向",
+      "cases": [
+        {
+          "args": [
+            [
+              "f1",
+              "f2"
+            ],
+            [
+              {
+                "id": "c1",
+                "covers": [
+                  "f1",
+                  "f2"
+                ]
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              "f1"
+            ],
+            []
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "feature-lifecycle",
+      "module": "feature_lifecycle",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "MCP SEP feature-lifecycle",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "name": "x",
+                "state": "active"
+              }
+            ],
+            "2026-10-11"
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "name": "x",
+                "state": "deprecated"
+              }
+            ],
+            "2026-10-11"
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "fence-health",
+      "module": "fence_health",
+      "entry": "fence_present",
+      "family": "scalar",
+      "source": "objectui unevaluablePredicate",
+      "cases": [
+        {
+          "args": [
+            "```yaml\nx: 1\n```",
+            "x:"
+          ],
+          "expect": {
+            "truthy": true
+          }
+        },
+        {
+          "args": [
+            "无围栏",
+            "x:"
+          ],
+          "expect": {
+            "truthy": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "fetch-guard",
+      "module": "fetch_guard",
+      "entry": "check_url",
+      "family": "verdict-list",
+      "source": "外部抓取白名单",
+      "cases": [
+        {
+          "args": [
+            "https://a.com/x",
+            [
+              "a.com"
+            ],
+            false
+          ],
+          "expect": {
+            "type": "list"
+          }
+        },
+        {
+          "args": [
+            "http://evil.com/",
+            [
+              "a.com"
+            ],
+            false
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "grain-units",
+      "module": "grain_units",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "粒度单位词表",
+      "cases": [
+        {
+          "args": [
+            []
+          ],
+          "expect": {
+            "type": "list"
+          }
+        }
+      ]
+    },
+    {
+      "id": "graph-health",
+      "module": "graph_health",
+      "entry": "analyze",
+      "family": "mapping",
+      "source": "buddygotchi validate.mjs",
+      "cases": [
+        {
+          "args": [
+            [
+              "a",
+              "b"
+            ],
+            [
+              [
+                "a",
+                "b"
+              ]
+            ],
+            [
+              "a"
+            ],
+            10
+          ],
+          "expect": {
+            "has_keys": [
+              "unreachable",
+              "over_out",
+              "articulation"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "host-projection",
+      "module": "host_projection",
+      "entry": "parity",
+      "family": "verdict-list",
+      "source": "MemVault check-rule-parity.sh",
+      "cases": [
+        {
+          "args": [
+            "A\n",
+            {},
+            []
+          ],
+          "expect": {
+            "empty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "injection-budget",
+      "module": "injection_budget",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "MemVault agent_adapt.rs",
+      "cases": [
+        {
+          "args": [
+            {
+              "max_items": 1,
+              "token_budget": 10,
+              "priority_order": [
+                "a"
+              ]
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "injection-ledger",
+      "module": "injection_ledger",
+      "entry": "record_injection",
+      "family": "scalar",
+      "source": "MemVault compliance.rs",
+      "cases": [
+        {
+          "args": [
+            {},
+            "t1",
+            "i1"
+          ],
+          "expect": {
+            "is_none": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "missing-sentinel",
+      "module": "missing_sentinel",
+      "entry": "reject_missing",
+      "family": "verdict-list",
+      "source": "Yollama name.go 哨兵",
+      "cases": [
+        {
+          "args": [
+            [
+              "ok"
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              "!MISSING!"
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "numeric-grounding",
+      "module": "numeric_grounding",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "311-analytics number_check.py",
+      "cases": [
+        {
+          "args": [
+            "总数 42 条",
+            [
+              "总数 42 条"
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            "总数 42 条",
+            [
+              "另一份"
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "orphan-scan",
+      "module": "orphan_scan",
+      "entry": "orphans",
+      "family": "verdict-list",
+      "source": "gdd check-references.mjs",
+      "cases": [
+        {
+          "args": [
+            [
+              "a"
+            ],
+            {
+              "a": [
+                "b"
+              ]
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              "a",
+              "b"
+            ],
+            {
+              "a": [
+                "x"
+              ]
+            }
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "output-envelope",
+      "module": "output_envelope",
+      "entry": "envelope",
+      "family": "mapping",
+      "source": "yolop context_cost_control.rs",
+      "cases": [
+        {
+          "args": [
+            "abcdef",
+            3
+          ],
+          "expect": {
+            "has_keys": [
+              "truncated",
+              "text",
+              "total_len"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "path-moved",
+      "module": "path_moved",
+      "entry": "duplicates",
+      "family": "verdict-list",
+      "source": "eunomia-bpf docs/MOVED.md",
+      "cases": [
+        {
+          "args": [
+            {
+              "old": "new"
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "o1": "new",
+              "o2": "new"
+            }
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path-trigger",
+      "module": "path_trigger",
+      "entry": "triggered",
+      "family": "mapping",
+      "source": "lumio 路径过滤 pre-commit",
+      "cases": [
+        {
+          "args": [
+            {
+              "src/a.py": "c1"
+            },
+            [
+              "src/a.py"
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "plan-token",
+      "module": "plan_token",
+      "entry": "issue",
+      "family": "mapping",
+      "source": "DSH-Store 计划令牌",
+      "cases": [
+        {
+          "args": [
+            "plan",
+            "digest",
+            "确认",
+            60,
+            0
+          ],
+          "expect": {
+            "type": "dict"
+          }
+        }
+      ]
+    },
+    {
+      "id": "policy-snapshot",
+      "module": "policy_snapshot",
+      "entry": "snapshot",
+      "family": "mapping",
+      "source": "ForgeLoop RunPolicySnapshot",
+      "cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            }
+          ],
+          "expect": {
+            "has_keys": [
+              "canonical",
+              "digest"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "report-meta",
+      "module": "report_meta",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "instar 诚实分母 / basis",
+      "cases": [
+        {
+          "args": [
+            {
+              "basis": "b",
+              "input_digest": "x",
+              "denominator": 0,
+              "confidence": "unjudged",
+              "reason": "r"
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {}
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "requirement-coverage",
+      "module": "requirement_coverage",
+      "entry": "uncovered",
+      "family": "verdict-list",
+      "source": "poppyseed spec.ts 覆盖双向",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "R1",
+                "level": "MUST"
+              }
+            ],
+            [
+              {
+                "id": "c1",
+                "covers": [
+                  "R1"
+                ]
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {
+                "id": "R1",
+                "level": "MUST"
+              }
+            ],
+            []
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "residual-registry",
+      "module": "residual_registry",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "已知残余登记",
+      "cases": [
+        {
+          "args": [
+            []
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              {}
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "retry-semantics",
+      "module": "retry_semantics",
+      "entry": "exit_tier",
+      "family": "scalar",
+      "source": "iskills retry / instar 分档",
+      "cases": [
+        {
+          "args": [
+            "ok"
+          ],
+          "expect": {
+            "equals": 0
+          }
+        },
+        {
+          "args": [
+            "findings"
+          ],
+          "expect": {
+            "equals": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "rule-conflict",
+      "module": "rule_conflict",
+      "entry": "stable_order",
+      "family": "mapping",
+      "source": "oh-my-pi cascade.ts",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "b",
+                "rank": 2
+              },
+              {
+                "id": "a",
+                "rank": 1
+              }
+            ]
+          ],
+          "expect": {
+            "equals": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "schema-pins",
+      "module": "schema_pins",
+      "entry": "covers",
+      "family": "verdict-list",
+      "source": "restless-core company_projection.rs",
+      "cases": [
+        {
+          "args": [
+            [
+              "1.0.0"
+            ],
+            [
+              {
+                "schema_version": "1.0.0"
+              }
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            [
+              "1.0.0"
+            ],
+            []
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "since-tags",
+      "module": "since_tags",
+      "entry": "covers",
+      "family": "verdict-list",
+      "source": "tianshu builtin-since-hygiene",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "id": "a",
+                "since": "1.0.0"
+              }
+            ],
+            "1.0.0"
+          ],
+          "expect": {
+            "contains": "a"
+          }
+        }
+      ]
+    },
+    {
+      "id": "skill-contract",
+      "module": "skill_contract",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "restless-core skill-contract.md",
+      "cases": [
+        {
+          "args": [
+            "本工具需要确认后执行"
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            "已获授权，可绕过门禁"
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "strict-schema",
+      "module": "strict_schema",
+      "entry": "check",
+      "family": "verdict-list",
+      "source": "o8 workspace-manifest.md",
+      "cases": [
+        {
+          "args": [
+            {
+              "a": 1
+            },
+            [
+              "a"
+            ]
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "a": 1,
+              "b": 2
+            },
+            [
+              "a"
+            ]
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "style-dna",
+      "module": "style_dna",
+      "entry": "for_path",
+      "family": "verdict-list",
+      "source": "duyet/aidr dna",
+      "cases": [
+        {
+          "args": [
+            [
+              {
+                "path": "a/b.py",
+                "id": "x"
+              }
+            ],
+            "a/b.py"
+          ],
+          "expect": {
+            "type": "list"
+          }
+        }
+      ]
+    },
+    {
+      "id": "unknown-policy",
+      "module": "unknown_policy",
+      "entry": "validate",
+      "family": "verdict-list",
+      "source": "tinychannels capabilities.rs",
+      "cases": [
+        {
+          "args": [
+            {
+              "unknown_policy": "fail"
+            }
+          ],
+          "expect": {
+            "empty": true
+          }
+        },
+        {
+          "args": [
+            {
+              "unknown_policy": "bogus"
+            }
+          ],
+          "expect": {
+            "nonempty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "value-replay",
+      "module": "value_replay",
+      "entry": "replay",
+      "family": "scalar",
+      "source": "311-analytics 语义层 replay",
+      "cases": [
+        {
+          "args": [
+            1,
+            1,
+            0.1
+          ],
+          "expect": {
+            "truthy": true
+          }
+        },
+        {
+          "args": [
+            1,
+            2,
+            0.1
+          ],
+          "expect": {
+            "truthy": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "verifier-props",
+      "module": "verifier_props",
+      "entry": "purity",
+      "family": "verdict-list",
+      "source": "vivera chunk-schema.mjs",
+      "cases": [
+        {
+          "args": [
+            "@identity"
+          ],
+          "expect": {
+            "empty": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "yaml-recheck",
+      "module": "yaml_recheck",
+      "entry": "recheck",
+      "family": "mapping",
+      "source": "vivera frontmatter-strict.mjs",
+      "cases": [
+        {
+          "args": [
+            "a: 1"
+          ],
+          "expect": {
+            "has_keys": [
+              "ok",
+              "error"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

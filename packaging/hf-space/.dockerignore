@@ -1,0 +1,5 @@
+# 构建上下文瘦身（E1：nf/ 现在由多阶段从 npm payload 取，不再需要本地产物）。
+__pycache__/
+tools/
+nf/
+.gitignore

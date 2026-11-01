@@ -1,0 +1,69 @@
+{
+  "note": "结构计数器基线：只许减少（重复劳动棘轮）。跨平台稳定，替代毫秒判据。",
+  "schema": "nf-perf-counters/1",
+  "workloads": {
+    "asset_contract.scan": {
+      "ast_parse": 11,
+      "open": 1795,
+      "read_text": 1793,
+      "regex": 3671,
+      "scandir": 1860,
+      "spawn": 1,
+      "stat": 14819
+    },
+    "code_metrics.measure": {
+      "ast_parse": 312,
+      "open": 312,
+      "read_text": 312,
+      "regex": 0,
+      "scandir": 2,
+      "spawn": 0,
+      "stat": 2
+    },
+    "conformance_report.run": {
+      "ast_parse": 0,
+      "open": 4120,
+      "read_text": 2421,
+      "regex": 256,
+      "scandir": 3130,
+      "spawn": 0,
+      "stat": 6406
+    },
+    "judgement_coverage.scan": {
+      "ast_parse": 0,
+      "open": 262,
+      "read_text": 262,
+      "regex": 0,
+      "scandir": 70,
+      "spawn": 0,
+      "stat": 1071
+    },
+    "redos_scan.scan": {
+      "ast_parse": 325,
+      "open": 325,
+      "read_text": 325,
+      "regex": 0,
+      "scandir": 24,
+      "spawn": 0,
+      "stat": 333
+    },
+    "role_model.scan": {
+      "ast_parse": 72,
+      "open": 4756,
+      "read_text": 4752,
+      "regex": 0,
+      "scandir": 0,
+      "spawn": 2,
+      "stat": 8967
+    },
+    "verify_report.build": {
+      "ast_parse": 982,
+      "open": 16510,
+      "read_text": 10781,
+      "regex": 11007,
+      "scandir": 10962,
+      "spawn": 3,
+      "stat": 35325
+    }
+  }
+}

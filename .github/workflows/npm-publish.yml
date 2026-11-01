@@ -1,0 +1,536 @@
+name: npm-release
+# 可复现构建 → GitHub OIDC provenance → 独立验证与 VSA → npm 发布 / GitHub Release。
+# PR 只做 dry-run；tag v1.* 与显式 publish=true 的手动运行才进入不可逆发布作业。
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'packaging/npm/**'
+      - 'packaging/supply-chain/**'
+      - 'scripts/supply_chain_policy.py'
+      - 'scripts/validate_sboms.py'
+      - '.github/workflows/npm-publish.yml'
+      - '.github/requirements-sbom.txt'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: '发布当前 package.json 版本到 npm 与 GitHub Packages'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: library-write
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: reproducible-release-artifacts
+    if: github.event_name != 'push' || startsWith(github.ref_name, 'v1.')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://registry.npmjs.org
+      - name: 安装 SBOM 验证器（固定版本）
+        run: python -m pip install -r .github/requirements-sbom.txt
+      - name: tag 与包版本一致
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          if [ "$TAG" != "v$V" ]; then
+            echo "::error::tag=$TAG 与 package.json v$V 不一致"
+            exit 1
+          fi
+      - name: 双构建、SBOM、checksums 与 manifest
+        env:
+          PYTHONHASHSEED: '0'
+        run: |
+          python packaging/npm/tools/build_release.py --out .artifacts/release
+          python scripts/validate_sboms.py .artifacts/release
+          python packaging/npm/tools/build_release.py --verify .artifacts/release
+      - name: tarball 与 payload 清单逐字节核对
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          node packaging/npm/tools/verify-tarball.mjs --tarball ".artifacts/release/ninfenz-$V.tgz"
+      - name: npm 包冒烟
+        working-directory: packaging/npm
+        run: |
+          npm run verify
+          node --test test/smoke.test.mjs
+      - name: 供应链证据矩阵
+        run: python scripts/supply_chain_policy.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release/
+          if-no-files-found: error
+          retention-days: 30
+
+  attest:
+    name: github-build-provenance
+    needs: build
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - name: 为 tarball、双 SBOM 与 checksums 生成签名来源证明
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .artifacts/release/*.tgz
+            .artifacts/release/*.cdx.json
+            .artifacts/release/*.spdx3.json
+            .artifacts/release/*.openvex.json
+            .artifacts/release/SHA256SUMS
+            .artifacts/release/release-metadata.json
+
+  verify:
+    name: verify-provenance-and-sign-vsa
+    needs: [build, attest]
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Pin GitHub CLI for attestation verification
+        run: |
+          set -euo pipefail
+          gh_version=2.103.3
+          gh_sha256=4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d
+          archive="$RUNNER_TEMP/gh_${gh_version}_linux_amd64.tar.gz"
+          curl -fsSL \
+            "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_linux_amd64.tar.gz" \
+            -o "$archive"
+          echo "${gh_sha256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/gh-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gh-bin" --strip-components=1
+          sudo install -m 0755 "$RUNNER_TEMP/gh-bin/bin/gh" /usr/local/bin/gh
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          /usr/local/bin/gh version
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - name: 下载工件完整性
+        working-directory: .artifacts/release
+        run: sha256sum -c SHA256SUMS
+      - name: 独立验证全部 provenance subject
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          FILES=(
+            .artifacts/release/*.tgz
+            .artifacts/release/*.cdx.json
+            .artifacts/release/*.spdx3.json
+            .artifacts/release/*.openvex.json
+            .artifacts/release/SHA256SUMS
+            .artifacts/release/release-metadata.json
+          )
+          if [ "${#FILES[@]}" -lt 9 ]; then
+            echo "::error::provenance subject 少于 9 个，发布束不完整"
+            exit 1
+          fi
+          for FILE in "${FILES[@]}"; do
+            gh attestation verify "$FILE" \
+              --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+              --source-ref "$GITHUB_REF" \
+              --source-digest "$GITHUB_SHA" \
+              --deny-self-hosted-runners \
+              --predicate-type "https://slsa.dev/provenance/v1"
+          done
+      - name: 生成 Build L2 VSA predicate
+        env:
+          REPOSITORY_URL: https://github.com/${{ github.repository }}
+        run: |
+          python scripts/supply_chain_policy.py
+          python scripts/slsa_l3_readiness.py
+          python scripts/build_vsa.py \
+            --release-dir .artifacts/release \
+            --policy packaging/supply-chain/verification-policy.json \
+            --repository "$REPOSITORY_URL" \
+            --commit "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" \
+            --out .artifacts/vsa/verification-summary.json
+      - name: 用 GitHub OIDC 签署 VSA
+        id: vsa
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4
+        with:
+          subject-path: |
+            .artifacts/release/*.tgz
+            .artifacts/release/*.cdx.json
+            .artifacts/release/*.spdx3.json
+            .artifacts/release/*.openvex.json
+            .artifacts/release/SHA256SUMS
+            .artifacts/release/release-metadata.json
+          predicate-type: https://slsa.dev/verification_summary/v1
+          predicate-path: .artifacts/vsa/verification-summary.json
+      - name: 回验 VSA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          TARBALL_ABS=$(realpath "$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
+          for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
+            .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
+            .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
+            VSA_JSON=$(gh attestation verify "$FILE" \
+              --bundle "$VSA_BUNDLE" \
+              --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+              --deny-self-hosted-runners \
+              --predicate-type "https://slsa.dev/verification_summary/v1" \
+              --format=json)
+            jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+              any(.[];
+                .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+                .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+                .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+              )' <<<"$VSA_JSON" >/dev/null
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: vsa-evidence
+          path: |
+            .artifacts/vsa/verification-summary.json
+            ${{ steps.vsa.outputs.bundle-path }}
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-npm:
+    name: publish-attested-npm-artifact
+    needs: [build, attest, verify]
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+      attestations: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: Pin GitHub CLI for attestation verification
+        run: |
+          set -euo pipefail
+          gh_version=2.103.3
+          gh_sha256=4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d
+          archive="$RUNNER_TEMP/gh_${gh_version}_linux_amd64.tar.gz"
+          curl -fsSL \
+            "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_linux_amd64.tar.gz" \
+            -o "$archive"
+          echo "${gh_sha256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/gh-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gh-bin" --strip-components=1
+          sudo install -m 0755 "$RUNNER_TEMP/gh-bin/bin/gh" /usr/local/bin/gh
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          /usr/local/bin/gh version
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://registry.npmjs.org
+      - name: 下载工件完整性
+        working-directory: .artifacts/release
+        run: sha256sum -c SHA256SUMS
+      - name: 发布前复核 provenance 与 VSA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
+      - name: 发布已 attest 的 tarball（同版本幂等）
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+        run: |
+          V=$(python3 -c "import json; print(json.load(open('.artifacts/release/release-metadata.json'))['version'])")
+          TARBALL=".artifacts/release/ninfenz-$V.tgz"
+          EXISTING=$(npm view "ninfenz@$V" dist.integrity 2>/dev/null || true)
+          LOCAL="sha512-$(openssl dgst -sha512 -binary "$TARBALL" | base64 -w0)"
+          if [ -n "$EXISTING" ]; then
+            if [ "$EXISTING" != "$LOCAL" ]; then
+              echo "::error::registry 已存在的 ninfenz@$V 与本次可复现工件摘要不同"
+              exit 1
+            fi
+            echo "::notice::ninfenz@$V 已存在且完整性摘要一致，跳过发布"
+            exit 0
+          fi
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/.npmrc"
+            export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc"
+            echo "auth=token"
+          else
+            echo "auth=oidc(trusted publishing)"
+          fi
+          npm publish "$TARBALL" --provenance --access public --ignore-scripts
+
+  publish-github-packages:
+    name: publish-attested-github-packages-mirror
+    needs: [build, attest, verify]
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+      attestations: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: Pin GitHub CLI for attestation verification
+        run: |
+          set -euo pipefail
+          gh_version=2.103.3
+          gh_sha256=4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d
+          archive="$RUNNER_TEMP/gh_${gh_version}_linux_amd64.tar.gz"
+          curl -fsSL \
+            "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_linux_amd64.tar.gz" \
+            -o "$archive"
+          echo "${gh_sha256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/gh-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gh-bin" --strip-components=1
+          sudo install -m 0755 "$RUNNER_TEMP/gh-bin/bin/gh" /usr/local/bin/gh
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          /usr/local/bin/gh version
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://npm.pkg.github.com
+      - name: 下载工件完整性
+        working-directory: .artifacts/release
+        run: sha256sum -c SHA256SUMS
+      - name: 发布前复核 provenance 与 VSA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TARBALL=$(find .artifacts/release -maxdepth 1 -name 'monyeah777-ninfenz-*.tgz' -print -quit)
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
+      - name: 发布已 attest 的 GitHub Packages 镜像（同版本幂等）
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          V=$(python3 -c "import json; print(json.load(open('.artifacts/release/release-metadata.json'))['version'])")
+          TARBALL=".artifacts/release/monyeah777-ninfenz-$V.tgz"
+          REGISTRY=https://npm.pkg.github.com
+          EXISTING=$(npm view "@monyeah777/ninfenz@$V" dist.integrity --registry "$REGISTRY" 2>/dev/null || true)
+          LOCAL="sha512-$(openssl dgst -sha512 -binary "$TARBALL" | base64 -w0)"
+          if [ -n "$EXISTING" ]; then
+            if [ "$EXISTING" != "$LOCAL" ]; then
+              echo "::error::GitHub Packages 已存在的 @monyeah777/ninfenz@$V 与本次工件摘要不同"
+              exit 1
+            fi
+            echo "::notice::GitHub Packages 镜像已存在且摘要一致，跳过"
+            exit 0
+          fi
+          printf '@monyeah777:registry=%s\n//npm.pkg.github.com/:_authToken=%s\n' \
+            "$REGISTRY" "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/.npmrc"
+          NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc" \
+            npm publish "$TARBALL" --registry "$REGISTRY" --access public --ignore-scripts
+
+  github-release:
+    name: publish-attested-github-release
+    needs: [build, attest, verify, publish-npm, publish-github-packages]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v1.')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      attestations: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: Pin GitHub CLI for attestation verification
+        run: |
+          set -euo pipefail
+          gh_version=2.103.3
+          gh_sha256=4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d
+          archive="$RUNNER_TEMP/gh_${gh_version}_linux_amd64.tar.gz"
+          curl -fsSL \
+            "https://github.com/cli/cli/releases/download/v${gh_version}/gh_${gh_version}_linux_amd64.tar.gz" \
+            -o "$archive"
+          echo "${gh_sha256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/gh-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gh-bin" --strip-components=1
+          sudo install -m 0755 "$RUNNER_TEMP/gh-bin/bin/gh" /usr/local/bin/gh
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          /usr/local/bin/gh version
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: vsa-evidence
+          path: .artifacts/vsa
+      - name: 上传 Release 前复核 provenance 与 VSA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TARBALL=$(find .artifacts/release -maxdepth 1 -name 'ninfenz-*.tgz' -print -quit)
+          TARBALL_ABS=$(realpath "$TARBALL")
+          ATT_DIR=$(mktemp -d)
+          (cd "$ATT_DIR" && gh attestation download "$TARBALL_ABS" \
+            --repo "$GITHUB_REPOSITORY" --limit 30 >/dev/null)
+          VSA_BUNDLE=$(find "$ATT_DIR" -type f -name '*.jsonl' -print -quit)
+          gh attestation verify "$TARBALL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --source-ref "$GITHUB_REF" \
+            --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/provenance/v1"
+          VSA_JSON=$(gh attestation verify "$TARBALL" \
+            --bundle "$VSA_BUNDLE" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/npm-publish.yml" \
+            --deny-self-hosted-runners \
+            --predicate-type "https://slsa.dev/verification_summary/v1" \
+            --format=json)
+          jq -e --arg ref "$GITHUB_REF" --arg digest "$GITHUB_SHA" '
+            any(.[];
+              .verificationResult.signature.certificate.sourceRepositoryRef == $ref and
+              .verificationResult.signature.certificate.sourceRepositoryDigest == $digest and
+              .verificationResult.statement.predicateType == "https://slsa.dev/verification_summary/v1"
+            )' <<<"$VSA_JSON" >/dev/null
+      - name: 创建或补齐 GitHub Release（不覆盖既有资产）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            EXISTING=$(gh release view "$TAG" --json assets --jq '.assets[].name')
+          else
+            gh release create "$TAG" --verify-tag --generate-notes --title "$TAG"
+            EXISTING=""
+          fi
+          CHECK=$(mktemp -d "$RUNNER_TEMP/release-check.XXXXXX")
+          for FILE in .artifacts/release/*; do
+            NAME=$(basename "$FILE")
+            if grep -Fxq "$NAME" <<<"$EXISTING"; then
+              gh release download "$TAG" --pattern "$NAME" --dir "$CHECK"
+              cmp "$FILE" "$CHECK/$NAME" || {
+                echo "::error::Release 资产 $NAME 与本次构建不同；拒绝覆盖"
+                exit 1
+              }
+              echo "existing-ok $NAME"
+            else
+              gh release upload "$TAG" "$FILE"
+            fi
+          done

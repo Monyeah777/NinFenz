@@ -1,0 +1,18 @@
+perf(ci): 回滚 16 片（写-读干扰）+ 引擎工作流 push 也走变更面（L6 收尾）
+
+一、回滚 16 → 32 片（**负结果**）
+16 片实测墙钟 164 s（单波），但 6 个分片红：分片内用例变多后，**写协议件的用例污染同片后续判据**
+（`role_coordinates` / `verification_report` 新鲜度、gitee 接入面）。
+⇒ "分片越大越省"不成立：**判据之间的写-读依赖要求分片足够细**。回到 32 片（已知全绿）。
+
+二、引擎工作流的 push 也按变更面
+`cross-lang` / `rust-parity` / `net-engine` 的 `push: main` 原为全量触发，会与 34 个门禁作业
+抢 20 个并发 runner（排队 → 墙钟抬高）。改为与 `pull_request` 同口径的 `paths:`：
+只在 engine/protocol/scripts 等真实输入面变动时跑；`workflow_dispatch` 仍可手动全跑。
+
+三、setup 瘦身
+主门禁的 apt 安装改 `--no-install-recommends`（省镜像推荐包）。
+
+四、目标（L6：CI 冷 ≤5 min）
+32 片 + 静态 + gate = 34 作业 → 2 波（90 s setup + 2×~95 s）≈ 280–300 s；
+把引擎工作流移出主分支的常驻队列后，主分支不再和它们抢 runner。

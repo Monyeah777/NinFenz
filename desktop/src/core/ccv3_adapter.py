@@ -1,0 +1,174 @@
+"""CCV3 映射层（v2.0.0 T1：IR → chara_card_v3 + world entries）。
+
+映射规则（17_v2.0.0 方案 §B1，立项 A 段成果）：
+- NF 装配产物 = **世界规则集**（真实社区包语义实证）→ 主承载 = character_book
+  （SillyTavern lorebook 条目），不是伪单角色 persona。
+- **引擎锚点排除**：P00（数据结构）/P80（输出生成器）是协议核心层（01 §5 I2），
+  非叙事内容 → 不导 world（显式排除，非静默丢弃）。
+- 叙事层模块（P10-P70 等）→ 每条 world 条目：keys=[full_id]，content=归一正文。
+- 资产（IR.asset_refs）→ 独立条目（I4 数据隔离：素材与规则分条目，可被引用）。
+- persona = 主角占位引导（不伪称角色定义）；scenario = 叙事入口/引导语。
+- spec 锚点：chara_card_v3 / v3（SillyTavern 兼容稳定核心字段；权威 spec 在线
+  抓取受网络限制未复核——字段集保守，真实 SillyTavern 导入时校准）。
+
+CCV3 字段集（SillyTavern 稳定核心，spec v3）：name / description / personality /
+scenario / first_mes / mes_example / system_prompt / post_history_instructions /
+alternate_greetings / character_book.entries[] / tags / creator /
+character_version / spec / spec_version。
+"""
+from __future__ import annotations
+
+import re
+from typing import List
+
+from .ir import IRDocument
+
+# 引擎锚点层（01 §5 I2 核心固定：数据结构/输出呈现，非叙事内容不导出）
+_ENGINE_LAYERS = {"P00", "P80"}
+
+# 机器契约围栏（```machine_contract … ``` 等）：玩家可见文本不得携带（P03 §6 红线⑤）
+_FENCE_RE = re.compile(r"```.*?```", re.S)
+
+
+def _readable_head(content: str, limit: int = 400) -> str:
+    """scenario 可读头部：先剔机器契约围栏，再按自然边界截断（不切词）。
+
+    外部实测修正（2026-10-02）：原实现直接 `content[:400]`，会在词中间硬切
+    （实证切口落在 `…arrow-py/arrow` 的 `repo` 一词中段），并把 machine_contract
+    YAML 围栏带进玩家可见文本——撞 P03 §6 红线⑤「玩家可见文本禁止 JSON/YAML」。
+    改法：剔围栏 → 超限时回退到最近的段落/行/句读边界并加省略号；找不到合格
+    边界（窗口不足一半）才退回硬切，保证输出永远不超 limit 量级。
+    """
+    body = _FENCE_RE.sub("", content).strip()
+    if len(body) <= limit:
+        return body
+    window = body[:limit]
+    for sep in ("\n\n", "\n", "。", "；", "！", "？"):
+        cut = window.rfind(sep)
+        if cut >= limit // 2:
+            return body[:cut + len(sep)].strip() + "……"
+    return window.rstrip() + "……"
+
+
+def _module_entries(ir: IRDocument) -> List[dict]:
+    """叙事层模块 → world 条目（排除 P00/P80 引擎锚点）。"""
+    entries: List[dict] = []
+    order = 0
+    for layer in ir.layers:
+        if layer.id in _ENGINE_LAYERS:
+            continue
+        for m in layer.modules:
+            entries.append({
+                "name": m.name,
+                "keys": [m.full_id, m.name],
+                "content": m.content,
+                "enabled": True,
+                "insertion_order": order,
+                "case_sensitive": False,
+                "priority": 10,
+                "id": order,
+                "comment": f"NF 层 {layer.id} · {layer.name}",
+            })
+            order += 1
+    for m in ir.extra_modules:
+        if m.layer in _ENGINE_LAYERS:
+            continue
+        entries.append({
+            "name": m.name, "keys": [m.full_id], "content": m.content,
+            "enabled": True, "insertion_order": order,
+            "case_sensitive": False, "priority": 5, "id": order,
+            "comment": "NF 层外模块", })
+        order += 1
+    return entries
+
+
+def _asset_entries(ir: IRDocument, start: int = 0) -> List[dict]:
+    """资产 refs → 独立条目（素材；缺失键不导，已在 IR.asset_missing 明示）。
+
+    v2.5.0 B3 修复：资产条目补 id 字段（与模块条目连续编号——start 为模块
+    条目数，资产条目 id/insertion_order 从 start 续号，非固定 1000 魔法数），
+    满足 export_schema.WORLD_ENTRY_KEYS 的 id 必填。
+    """
+    entries: List[dict] = []
+    order = start
+    for key, val in (ir.asset_refs or {}).items():
+        if val is None:
+            continue
+        content = val if isinstance(val, str) else str(val)
+        entries.append({
+            "name": key, "keys": [key], "content": content,
+            "enabled": True, "insertion_order": order,
+            "case_sensitive": False, "priority": 10,
+            "id": order,
+            "comment": "NF 资产素材", })
+        order += 1
+    return entries
+
+
+def world_entries(ir: IRDocument) -> List[dict]:
+    """装配 → lorebook 条目列表（规则模块 + 资产）。"""
+    mods = _module_entries(ir)
+    return mods + _asset_entries(ir, start=len(mods))
+
+
+def _scenario_text(ir: IRDocument) -> str:
+    """scenario：叙事入口层模块内容或引导语（可读性由 `_readable_head` 保证）。"""
+    for layer in ir.layers:
+        if layer.id in _ENGINE_LAYERS:
+            continue
+        if layer.modules:
+            first = layer.modules[0]
+            head = _readable_head(first.content)
+            if head:
+                return (f"{first.name}：{head}\n\n"
+                        f"（叙事世界「{ir.title}」已就绪，故事由此展开）")
+    return f"叙事世界「{ir.title}」已就绪。你将以主角身份进入，故事由此展开。"
+
+
+def map_ir_to_ccv3(ir: IRDocument) -> dict:
+    """IR → chara_card_v3 dict（**v3 真形状**：spec/spec_version + `data` 块 + v2 兼容镜像）。
+
+    结构依据（外部实证，2026-09-21 修正）：SillyTavern 自身写卡逻辑（`src/character-card-parser.js`
+    的 `write()`）在 CCv3 分支里做的是 `v3Data.spec = 'chara_card_v3'` / `v3Data.spec_version = '3.0'`，
+    而 v3 的**内容字段**位于 `data` 对象内（v2 字段保留在顶层只为向后兼容）。
+    本适配器此前只输出顶层 v2 字段 + v3 头 —— 属**结构性缺陷**（内部门禁只校自述 schema，
+    所以从未红过；外部标准一照就现）。现改为：`data` 承载 v3 全字段（权威），
+    顶层同步镜像 v2 兼容字段（name/description/personality/scenario/first_mes/mes_example）。
+    """
+    n_rule = sum(len(l.modules) for l in ir.layers
+                 if l.id not in _ENGINE_LAYERS)
+    n_asset = len([v for v in (ir.asset_refs or {}).values() if v is not None])
+    description = (
+        f"{ir.pipeline_name}（{ir.pipeline_id}）装配产物 · {n_rule} 个规则模块"
+        f" + {n_asset} 项资产素材。由宁封子 2.0 导出层生成。")
+    entries = world_entries(ir)
+    data = {
+        "name": ir.title,
+        "description": description,
+        "personality": "（主角占位）此装配是世界观设定，非单一角色定义——"
+                       "主角由你在叙事前端创建/选择，此卡提供世界规则上下文。",
+        "scenario": _scenario_text(ir),
+        "first_mes": f"你来到了「{ir.title}」。世界规则已加载，故事开始了……",
+        "mes_example": "",
+        "creator_notes": f"由 NinFenz 2.0 导出层生成（{ir.pipeline_id}）",
+        "system_prompt": "",
+        "post_history_instructions": "",
+        "alternate_greetings": [],
+        "character_book": {
+            "name": f"{ir.title} · 世界书",
+            "entries": entries,
+        },
+        "tags": [ir.pipeline_id],
+        "creator": "NinFenz",
+        "character_version": "2.0.0",
+        "extensions": {},
+    }
+    # v3 真形状：spec/spec_version 在场 + 内容入 data；顶层保留 v2 兼容镜像（同源，不另造内容）
+    card: dict = {
+        "spec": "chara_card_v3",
+        "spec_version": "3.0",
+        "data": data,
+    }
+    for k in ("name", "description", "personality", "scenario", "first_mes", "mes_example"):
+        card[k] = data[k]
+    return card

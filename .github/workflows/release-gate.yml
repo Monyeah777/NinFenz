@@ -1,0 +1,68 @@
+name: release-gate
+# 45 · 打 tag 强制闸：v* 标签推送即跑发布前体检（verify + 基线自描述 + 覆盖率），
+# 任一 FAIL → CI 红 → Releases/发布动作受阻（把 nf release check 从“命令”升为“强制”）。
+on:
+  push:
+    tags: ['v*']
+  # 注（2026-10-25）：曾加 workflow_dispatch 以便手动跑发布前体检，但既有判据对 release-gate
+  # 的触发面有约束（只在 tag 上跑），加手动触发会让 verify 判红；此处回退，保持 tag-only。
+  # 需提前验证时：本地跑 `bash verify.sh --full --no-cache` + `scripts/e2e_desktop_headless.py`。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+jobs:
+  gate:
+    name: release-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 60          # 挂死上限（2026-10-01 统一）
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+          # 2026-10-22：发布前体检含全量 discover（p6_evaluations 依赖 git tag/全历史）；浅克隆必红。
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          cache-dependency-path: .github/requirements-*.txt
+          cache: pip
+          python-version: '3.11'
+      - name: 安装测试依赖（verify + 标准对照 + 覆盖率）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
+          pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
+      - name: 发布前体检（verify + 基线自描述一致；日志落盘供失败诊断）
+        env:
+          NF_VERIFY_TMP: .nf-logs
+        run: |
+          set -o pipefail
+          python3 scripts/nf.py release 2>&1 | tee release-gate.log
+      - name: 端到端显式步（与 nf release 内嵌同源；失败即红，便于定位）
+        run: python3 scripts/e2e_desktop_headless.py
+      - name: 覆盖率门槛（core ≥80）
+        # `unittest discover -s desktop/tests` 以顶层模块导入 test_*，**不会执行** desktop/tests/__init__.py
+        # 的隔离兜底（它负责设 NARRATIVE_FORGE_HOME）⇒ test_suite_isolation 会红。故此处显式给隔离 home。
+        run: |
+          # 运行时创建系统临时目录下的隔离 home：既满足 test_suite_isolation，
+          # 又避免把机器绝对路径写进公开 workflow（test_leak_surface）。
+          COV_HOME="$(mktemp -d)"
+          trap 'rm -rf "$COV_HOME"' EXIT
+          export NARRATIVE_FORGE_HOME="$COV_HOME"
+          coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
+          coverage report --fail-under=80 --include="desktop/src/core/*"
+
+      - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
+        # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-gate-diagnostics
+          path: |
+            .nf-logs/
+            .artifacts/
+            *.log
+          if-no-files-found: ignore

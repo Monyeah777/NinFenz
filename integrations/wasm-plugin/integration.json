@@ -1,0 +1,29 @@
+{
+  "schema": "nf-integration/1",
+  "id": "wasm-plugin",
+  "title": "微内核 wasm 插件面（P5）",
+  "kind": "library",
+  "status": "active",
+  "version": "0.1.0",
+  "codeowner": "@Monyeah777",
+  "tier": "core",
+  "entry": {
+    "command": "python scripts/plugin_promote.py --json",
+    "path": "engine/wasm/sha256/Cargo.toml"
+  },
+  "requires": [
+    "cargo>=1.75",
+    "wasmtime>=20"
+  ],
+  "docs": [
+    "engine/wasm/README.md"
+  ],
+  "evidence": [
+    "engine/wasm/ninfenz-plugin.wit",
+    "engine/wasm/manifests/sha256.json",
+    "scripts/plugin_host.py",
+    "desktop/src/core/plugin_manifest.py",
+    "desktop/src/core/plugin_gate.py"
+  ],
+  "notes": "WASI preview1 插件 + wasmtime 宿主（默认无 fs/net、fuel 计量、超时中断、崩溃回退 Python 参考）。宿主只在适配器侧（scripts/），core/ 保持 stdlib 零依赖；插件不产出时门禁回退 Python 参考并记录降级，不静默。"
+}

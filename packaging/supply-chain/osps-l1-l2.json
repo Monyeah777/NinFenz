@@ -1,0 +1,314 @@
+{
+  "schema": "nf-osps-evidence/1",
+  "standard": {
+    "name": "OpenSSF OSPS Baseline",
+    "repository": "https://github.com/ossf/security-baseline",
+    "commit": "7bfc7bc7e4b0d48a28deee5913483259e623d7c3",
+    "reviewed_at": "2026-10-26",
+    "scope": ["maturity-1", "maturity-2"]
+  },
+  "controls": [
+    {
+      "id": "OSPS-AC-01.01",
+      "status": "external-manual",
+      "owner": "@Monyeah777",
+      "verification": "GitHub account MFA must remain enabled for maintainers and token automation must not read personal credentials.",
+      "evidence": ["external:github-account-security"]
+    },
+    {
+      "id": "OSPS-AC-02.01",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "New collaborators receive repository read permission by default; elevated roles require owner action.",
+      "evidence": ["external:github-repository-access"]
+    },
+    {
+      "id": "OSPS-AC-03.01",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "The main ruleset blocks direct updates and requires the static-checks-42 status check.",
+      "evidence": ["external:github-ruleset-main"]
+    },
+    {
+      "id": "OSPS-AC-03.02",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "The main ruleset blocks branch deletion.",
+      "evidence": ["external:github-ruleset-main"]
+    },
+    {
+      "id": "OSPS-AC-04.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Every workflow declares explicit read-first permissions and workflow_policy rejects missing or write-all permissions.",
+      "evidence": [".github/workflows", "desktop/src/core/workflow_policy.py", "desktop/tests/test_workflow_policy.py"]
+    },
+    {
+      "id": "OSPS-BR-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Workflow metadata is passed through environment variables or strict tag/version checks; shell input interpolation is tested.",
+      "evidence": [".github/workflows/npm-publish.yml", "desktop/tests/test_supply_chain_standards.py"]
+    },
+    {
+      "id": "OSPS-BR-01.03",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Pull-request jobs have read-only permissions, disable checkout credential persistence, and do not receive publishing secrets.",
+      "evidence": [".github/workflows", "desktop/tests/test_ci_supply_chain.py"]
+    },
+    {
+      "id": "OSPS-BR-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Release versions come from package.json and tag jobs fail unless the tag equals v<version>.",
+      "evidence": [".github/workflows/npm-publish.yml", "packaging/npm/tools/build_release.py"]
+    },
+    {
+      "id": "OSPS-BR-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Official channels are documented with HTTPS; the source policy rejects plaintext transport and URL credentials.",
+      "evidence": ["README.md", "packaging/supply-chain/package-sources.json", "scripts/supply_chain_policy.py"]
+    },
+    {
+      "id": "OSPS-BR-03.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Release artifacts are published through npm/GitHub with checksums and GitHub OIDC build attestations.",
+      "evidence": [".github/workflows/npm-publish.yml", "docs/supply-chain-security.md"]
+    },
+    {
+      "id": "OSPS-BR-04.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CHANGELOG.md is required by the release process and release notes are generated from the tagged commit.",
+      "evidence": ["CHANGELOG.md", ".github/workflows/npm-publish.yml"]
+    },
+    {
+      "id": "OSPS-BR-05.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Package manifests, lock files, hashed pip requirements, and Dependabot are present.",
+      "evidence": ["packaging/npm/package.json", "engine/rust/Cargo.lock", ".github/requirements-ci.txt", ".github/dependabot.yml"]
+    },
+    {
+      "id": "OSPS-BR-06.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Tag workflow attests the tarball and SBOM subjects through GitHub OIDC and uploads a SHA256SUMS manifest.",
+      "evidence": [".github/workflows/npm-publish.yml", "packaging/npm/tools/build_release.py", "docs/supply-chain-security.md"]
+    },
+    {
+      "id": "OSPS-BR-07.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Sensitive file patterns are ignored and every CI run scans common credential token forms.",
+      "evidence": [".gitignore", ".github/workflows/ci-verify.yml", "SECURITY.md"]
+    },
+    {
+      "id": "OSPS-DO-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "README, quickstart, CLI help, and user documentation cover installation and primary functionality.",
+      "evidence": ["README.md", "docs", "packaging/npm/README.md"]
+    },
+    {
+      "id": "OSPS-DO-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SUPPORT.md and issue templates provide public defect-reporting instructions.",
+      "evidence": ["SUPPORT.md", ".github/ISSUE_TEMPLATE"]
+    },
+    {
+      "id": "OSPS-DO-06.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The dependency and supplier policy documents selection, source, lock, review, update, and removal rules.",
+      "evidence": ["docs/supply-chain-security.md", "packaging/supply-chain/suppliers.json", "packaging/supply-chain/package-sources.json"]
+    },
+    {
+      "id": "OSPS-DO-07.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CONTRIBUTING documents the build and test commands; release builder has a single documented entry point.",
+      "evidence": ["CONTRIBUTING.md", "packaging/npm/tools/build_release.py", "packaging/npm/package.json"]
+    },
+    {
+      "id": "OSPS-GV-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "MAINTAINERS.md and CODEOWNERS identify the owner with access to sensitive repository resources.",
+      "evidence": ["MAINTAINERS.md", ".github/CODEOWNERS"]
+    },
+    {
+      "id": "OSPS-GV-01.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "MAINTAINERS.md describes owner responsibilities and final decision authority.",
+      "evidence": ["MAINTAINERS.md"]
+    },
+    {
+      "id": "OSPS-GV-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Public GitHub issues and discussions through pull requests are documented support channels.",
+      "evidence": ["SUPPORT.md", ".github/ISSUE_TEMPLATE"]
+    },
+    {
+      "id": "OSPS-GV-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CONTRIBUTING and the pull-request template define the contribution process.",
+      "evidence": ["CONTRIBUTING.md", ".github/PULL_REQUEST_TEMPLATE.md"]
+    },
+    {
+      "id": "OSPS-GV-03.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CONTRIBUTING defines code style, tests, verification gates, and submission requirements.",
+      "evidence": ["CONTRIBUTING.md"]
+    },
+    {
+      "id": "OSPS-LE-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The CLA workflow requires a recorded contributor agreement before merge.",
+      "evidence": [".github/workflows/cla.yml", "CLA.md", "signatures/version1/cla.json"]
+    },
+    {
+      "id": "OSPS-LE-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Source code is offered under OSI-approved AGPL-3.0-only with documented additional permissions.",
+      "evidence": ["LICENSE", "LICENSING.md", "LICENSE-EXCEPTIONS.md"]
+    },
+    {
+      "id": "OSPS-LE-02.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The npm tarball includes the same AGPL license and declares it in package metadata and SBOMs.",
+      "evidence": ["LICENSE", "packaging/npm/package.json", "packaging/npm/tools/build_release.py"]
+    },
+    {
+      "id": "OSPS-LE-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The source license is present at the repository root.",
+      "evidence": ["LICENSE", "LICENSES"]
+    },
+    {
+      "id": "OSPS-LE-03.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The release builder includes LICENSE in the npm tarball and validates its presence.",
+      "evidence": ["packaging/npm/tools/build_release.py", "packaging/npm/tools/verify-package.mjs"]
+    },
+    {
+      "id": "OSPS-QA-01.01",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "The canonical GitHub repository is public at a stable URL.",
+      "evidence": ["external:github-public-repository", "README.md"]
+    },
+    {
+      "id": "OSPS-QA-01.02",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "GitHub preserves public commit history, authors, and timestamps without automatic history rewriting.",
+      "evidence": ["external:github-commit-history"]
+    },
+    {
+      "id": "OSPS-QA-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Python, npm, and Rust dependency manifests/locks are tracked, and CI requirements are pinned.",
+      "evidence": ["pyproject.toml", "packaging/npm/package.json", "engine/rust/Cargo.lock", ".github/requirements-ci.txt"]
+    },
+    {
+      "id": "OSPS-QA-03.01",
+      "status": "platform-managed",
+      "owner": "@Monyeah777",
+      "verification": "The main ruleset requires static-checks-42 and disallows bypass actors.",
+      "evidence": ["external:github-ruleset-main", ".github/workflows/ci-verify.yml"]
+    },
+    {
+      "id": "OSPS-QA-04.01",
+      "status": "not-applicable",
+      "owner": "@Monyeah777",
+      "verification": "NinFenz releases are built from this single canonical repository; the Gitee surface is a mirror, not a second build source.",
+      "gap": "The requirement applies only when multiple source repositories are compiled into one release.",
+      "evidence": ["README.md", ".gitee"]
+    },
+    {
+      "id": "OSPS-QA-05.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Scorecard Binary-Artifacts is enabled and generated npm/engine outputs are ignored rather than tracked.",
+      "evidence": [".github/workflows/scorecard.yml", ".gitignore", "packaging/npm/.gitignore"]
+    },
+    {
+      "id": "OSPS-QA-05.02",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Executable build outputs are generated at build time; tracked image assets are reviewable content assets.",
+      "evidence": [".github/workflows/scorecard.yml", ".gitignore", "results/scorecard/README.md"]
+    },
+    {
+      "id": "OSPS-QA-06.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Every pull request runs verify, 32 test shards, and dedicated packaging/release tests.",
+      "evidence": [".github/workflows/ci-verify.yml", "desktop/tests/test_release_artifacts.py"]
+    },
+    {
+      "id": "OSPS-SA-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Supply-chain actors, trust boundaries, release flow, and external interfaces are documented.",
+      "evidence": ["docs/supply-chain-security.md", "README.md", "docs/mcp.md"]
+    },
+    {
+      "id": "OSPS-SA-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "CLI, MCP, package, release, and verification interfaces are documented with their trust boundaries.",
+      "evidence": ["docs/supply-chain-security.md", "README.md", "docs/mcp.md"]
+    },
+    {
+      "id": "OSPS-SA-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "A release threat model covers dependency confusion, build compromise, artifact substitution, and maintainer-account compromise.",
+      "evidence": ["docs/supply-chain-security.md", "SECURITY.md"]
+    },
+    {
+      "id": "OSPS-VM-01.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SECURITY.md defines coordinated private disclosure and remediation-before-publication.",
+      "evidence": ["SECURITY.md"]
+    },
+    {
+      "id": "OSPS-VM-02.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "SECURITY.md provides the GitHub Security Advisory contact channel.",
+      "evidence": ["SECURITY.md", "SUPPORT.md"]
+    },
+    {
+      "id": "OSPS-VM-03.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "The GitHub private advisory URL is the only vulnerability-reporting intake.",
+      "evidence": ["SECURITY.md", "SUPPORT.md"]
+    },
+    {
+      "id": "OSPS-VM-04.01",
+      "status": "enforced",
+      "owner": "@Monyeah777",
+      "verification": "Published GitHub Security Advisories are the public vulnerability channel and include affected versions and fixes.",
+      "evidence": ["SECURITY.md"]
+    }
+  ]
+}

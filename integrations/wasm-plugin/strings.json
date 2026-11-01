@@ -1,0 +1,18 @@
+{
+  "schema": "nf-integration-strings/1",
+  "id": "wasm-plugin",
+  "locales": {
+    "zh": {
+      "title": "微内核 wasm 插件面（P5）",
+      "summary": "WASI 插件 + wasmtime 宿主：默认无 fs/net、燃料计量、崩溃回退 Python 参考；晋升门按实测判定。"
+    },
+    "en": {
+      "title": "Microkernel wasm plugins (P5)",
+      "summary": "WASI plugins on a wasmtime host: no fs/net by default, fuel metering, fallback to the Python reference, and a promotion gate that decides on measured cost."
+    },
+    "ja": {
+      "title": "マイクロカーネル wasm プラグイン面（P5）",
+      "summary": "WASI プラグイン + wasmtime ホスト：既定で fs/net なし、燃料計量、障害時は Python 参照実装へフォールバック。昇格は実測で判定。"
+    }
+  }
+}

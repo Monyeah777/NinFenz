@@ -1,0 +1,16 @@
+{
+  "config": ".markdownlint.json",
+  "ignores": [
+    "**/node_modules/**",
+    "community/**",
+    "packaging/npm/payload/**",
+    "results/**",
+    "library/NF-*.md",
+    "library/anchors/**"
+  ],
+  "_why_ignores": {
+    "community/ + library/NF-*": "第三方投稿正文（投稿人版权，正文形态不属于本仓结构规则管辖；由 library/ 的 frontmatter 真源与许可证门单独守）",
+    "results/**": "审计流水账与取证档案（机器产出的过程记录，读者面不是文档入口；结构规则不适用于存档）",
+    "packaging/npm/payload/**": "npm 发布物镜像树（生成物，由 payload 清单门禁守）"
+  }
+}

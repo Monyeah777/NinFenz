@@ -1,0 +1,16 @@
+perf(ci): parity 机器面 8 → 24 片（只改执行粒度，比较一条不减）
+
+事实（2026-10-28 实测）：
+- 机器面 88 条里 `nf verify --json` 一条就要 33–45 s，parity 每条面跑三遍
+  （直跑 + 守护冷 + 守护热）⇒ 单这一条 ≈ 100–110 s；
+- 8 片时它落在 chunk5，使该片 176–181 s，**整个冷跑的下界就是它**（调度再优化也压不下去）。
+
+做法：
+- `_machine_chunk(i, 8)` → `_machine_chunk(i, 24)`：切片只改**执行粒度**，
+  `_machine_targets()[i::24]` 的并集仍逐条等于全部机器面；每片仍逐条比三路。
+- 逐测试权重重测（`--write-weights test_daemon_parity`）：parity 合计 253.7 s，
+  最重片 120 s（verify 面），次重 30.5 s。
+
+效果与边界：
+- 冷跑尾部从 181 s 降到 ~120 s（verify 面本身的 3×33 s 无法切掉）；
+- 要再降必须把 `nf verify --json` 从 33 s 压到 ~10 s（D 继续），或按 B 方案收窄 parity。

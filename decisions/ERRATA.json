@@ -1,0 +1,8 @@
+{
+  "schema": "nf-decisions-errata/1",
+  "note": "非语义勘误登记：只改「引用指针」类字段，不改决策内容。ADR 正文保持逐字节不变（回执锚定不失效），故更正登记在此。判据 = desktop/tests/test_decisions.py::ErrataTest（不腐 + 不作假），随 check12 常驻。 2026-10-25：被勘误 ADR 迁私有仓归档，勘误清单随档迁移；公开面仅保留 schema。",
+  "fields_vocabulary": [
+    "evidence"
+  ],
+  "entries": []
+}

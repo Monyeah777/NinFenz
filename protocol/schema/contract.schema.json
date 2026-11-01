@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/contract.schema.json",
+  "title": "模块头 machine_contract 机读契约块（01 §1.1 九键 + conformance + 已登记扩展键）",
+  "description": "模块文档内 machine_contract yaml 围栏的 IDL 定义；check16/26 消费的机读真相，check28 逐件校验。顶层键为封闭词表（01 §1.1 扩展键纪律）：词表 = 本文件 properties，扩展键须合命名模式，未登记键即 FAIL。",
+  "type": "object",
+  "required": ["schema", "id", "name", "category", "layer", "inputs", "outputs", "events", "interfaces", "conformance"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["1"],
+      "description": "机读契约 schema 版本（独立演进，01 §7 V3）"
+    },
+    "conformance": {
+      "type": "string",
+      "enum": ["L1", "L2", "L3"],
+      "description": "一致性分级声明（01 §1.2）；声明 ≤ 可证级别，check29 防虚标"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^([^:]*:)?M[0-9]{2}$",
+      "description": "与标题 # 模块 一致；官方限定写法如 通用:M10"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "layer": {
+      "type": "string",
+      "pattern": "^(P[0-9]{2}|调度器)$",
+      "description": "挂载层 Pxx 或全局调度器"
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "依赖前置模块（跨包限定 id）"
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "events": {
+      "type": "object",
+      "required": ["publish", "subscribe"],
+      "properties": {
+        "publish": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "subscribe": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "host_consumed": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "宿主消费的终端事件（01 §7 V1 字段级新增，2026-09-23）：本模块发布、但设计上由外部宿主/客户端消费（不经包内邻居、也不经官方核心）；显式声明后方可通过 check16 ③ 的 publish⊆subscribe 断言——「未闭合」必须可审计，不得静默"
+        }
+      },
+      "additionalProperties": false
+    },
+    "interfaces": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "对外查询接口面；零事件模块不得以空契约隐式脱离联动面"
+    },
+    "io_types": {
+      "type": "object",
+      "description": "I/O 类型面（01 §7 V1 字段级新增，可选）：outputs = token→kind、inputs = 依赖模块→期望 kind；untyped 为合法值（显式未收窄），不得编造具体类型",
+      "properties": {
+        "outputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["string", "integer", "number", "boolean", "array", "object", "event", "state", "untyped"]
+          }
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["string", "integer", "number", "boolean", "array", "object", "event", "state", "untyped"]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tool_face": {
+      "type": "array",
+      "description": "模块工具面（45 内部计划 v1）：AI 选/造工具的开放建议层；缺省 = 无工具纯文本模块",
+      "items": {
+        "type": "object",
+        "required": ["purpose", "guidance"],
+        "properties": {
+          "purpose": { "type": "string", "minLength": 1 },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["repo", "license"],
+              "properties": {
+                "repo": { "type": "string", "minLength": 1 },
+                "ref": { "type": "string" },
+                "license": { "type": "string", "minLength": 1 },
+                "note": { "type": "string" }
+              }
+            }
+          },
+          "guidance": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "world_model": {
+      "type": "object",
+      "description": "JEPA-inspired 确定性抽象状态世界模型（可选）：只声明可机检的有限状态变量、显式相位迁移与不变式；不是神经运行时，也不断言模型优劣",
+      "required": ["abstract_state", "transition", "invariants"],
+      "properties": {
+        "abstract_state": {
+          "type": "object",
+          "required": ["variables", "initial"],
+          "properties": {
+            "variables": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["name", "kind", "source"],
+                "properties": {
+                  "name": { "type": "string", "minLength": 1 },
+                  "kind": {
+                    "type": "string",
+                    "enum": ["string", "integer", "number", "boolean", "array"]
+                  },
+                  "source": { "type": "string", "minLength": 1 },
+                  "slot": { "type": "string", "minLength": 1 },
+                  "item_kind": {
+                    "type": "string",
+                    "enum": ["string", "integer", "number", "boolean"]
+                  },
+                  "note": { "type": "string" }
+                }
+              }
+            },
+            "initial": { "type": "object" }
+          },
+          "additionalProperties": false
+        },
+        "transition": {
+          "type": "object",
+          "required": ["initial_phase", "phases"],
+          "properties": {
+            "initial_phase": { "type": "string", "minLength": 1 },
+            "phases": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["phase", "next", "guard", "writes"],
+                "properties": {
+                  "phase": { "type": "string", "minLength": 1 },
+                  "next": { "type": "string", "minLength": 1 },
+                  "guard": { "type": "string", "minLength": 1 },
+                  "writes": {
+                    "type": "array",
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["kind", "field"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": ["finite_phase", "monotonic", "finite_sequence"]
+              },
+              "field": { "type": "string", "minLength": 1 },
+              "values": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "propertyNames": {
+    "type": "string",
+    "pattern": "^[a-z][a-z0-9_]{0,19}$",
+    "description": "顶层键命名纪律（01 §1.1）：snake_case、小写字母开头、≤20 字符——防大小写与连字符变体撞名"
+  },
+  "additionalProperties": false
+}

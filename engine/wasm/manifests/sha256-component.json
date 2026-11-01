@@ -1,0 +1,34 @@
+{
+  "schema": "nf-plugin-manifest/1",
+  "id": "nf-plugin-sha256-component",
+  "version": "0.1.0",
+  "abi": "wasi-preview2-component",
+  "summary": "SHA-256 摘要（Component Model 形态：WIT 类型接口 + Canonical ABI）",
+  "artifact": {
+    "path": "engine/wasm/sha256-component/dist/nf-plugin-sha256.component.wasm",
+    "sha256": null
+  },
+  "methods": [
+    {
+      "name": "sha256",
+      "io": {
+        "invoke": "ninfenz:plugin/methods.sha256@0.1.0",
+        "input": "list<u8>（WAVE 字面量，经 argv 传入）",
+        "output": "result<list<u8>, string>（WAVE 文本 ok([...]) / err(\"...\")）",
+        "exit_ok": [0],
+        "exit_usage": 2
+      },
+      "determinism": "deterministic",
+      "cost": {"kind": "linear", "unit": "byte"},
+      "fuel": {"base": 2000000, "per_kib": 200000, "hard_cap": 400000000000},
+      "wall_timeout_ms": 30000,
+      "capabilities": {
+        "fs": [],
+        "net": [],
+        "env": [],
+        "clocks": "deny",
+        "random": "deny"
+      }
+    }
+  ]
+}

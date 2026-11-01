@@ -1,0 +1,13 @@
+[package]
+name = "nf-canonical"
+version = "0.1.0"
+edition = "2021"
+description = "RFC 8785 (JCS) 规范化 JSON 的独立 Rust 实现（std-only，无外部 crate）"
+license = "MIT"
+
+# 独立包：**不是** engine/rust 的成员（父包无 workspace，嵌套包各自解析）。
+# 刻意 std-only：跨语言对拍要求「独立实现」，复用别家解析器会削弱对拍价值。
+[dependencies]
+
+[profile.release]
+opt-level = 2

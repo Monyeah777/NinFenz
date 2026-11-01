@@ -1,0 +1,109 @@
+name: 🐛 缺陷上报
+description: 提交缺陷帮助改进 NinFenz（含最小复现与环境，便于直接复跑）
+title: '[BUG] '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > ⚠️ **安全问题（漏洞 / 越权 / 凭据泄露）不要开公开 Issue**：请走 [SECURITY.md](../../SECURITY.md) 的私密通道（仓库页 → Security → Report a vulnerability）。公开 Issue 会触发云端代收站自动入库。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 缺陷描述
+      description: 发生了什么？期望什么？实际什么？
+      placeholder: 一句话说清现象；细节留给下面的字段。
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 影响与等级
+      description: 阻塞 = 无法继续使用 / 产物损坏；严重 = 主流程可走但结果错误；一般 = 有绕行办法（IEEE 1044-2009 异常分类口径）
+      options:
+        - 阻塞（无法继续使用 / 产物损坏）
+        - 严重（主流程可走，但结果错误）
+        - 一般（有绕行办法）
+    validations:
+      required: true
+  - type: dropdown
+    id: reproduce-stability
+    attributes:
+      label: 复现稳定性
+      options:
+        - 每次必现
+        - 偶发（请在下文写近似比例）
+        - 只出现过一次
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 一条命令 + 期望 + 实得（最小可复现片段，不要贴整仓；SSCCE 口径）
+      placeholder: |
+        1. python scripts/nf.py ...
+        2. 期望：…  实得：…
+    validations:
+      required: true
+  - type: input
+    id: form
+    attributes:
+      label: 形态
+      description: |-
+        - 形态：CLI（scripts/nf.py）｜协议内容（模块/管线/资产/community 包）｜文档/质量门禁（verify.sh）｜其他（桌面 GUI 端壳已于 2026-09-09 退役移出）
+      placeholder: CLI（scripts/nf.py）
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: 系统版本
+      placeholder: Windows 11 23H2 / Ubuntu 24.04 / macOS 15
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本（verify 基线 / tag）
+      description: 跑 nf --version 与 nf doctor 后贴回
+      placeholder: nf 1.1.0 · verify v2.30 · tag v1.1.0
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python 版本（要求 ≥3.11）
+      placeholder: Python 3.11.9
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: nf doctor 输出
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: CLI 侧附终端报错输出；协议/内容问题附相关文件路径与 check 输出。**粘贴前先脱敏**：token / 密钥 / 私密路径一律替换为 ***——出现在公开 Issue 的凭据按已泄露处理（SECURITY.md §四）
+      render: text
+    validations:
+      required: false
+  - type: upload
+    id: screenshots
+    attributes:
+      label: 截图 / 相关文件
+      description: 拖入截图或日志文件（可选）
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充
+      description: 其他上下文（可选）
+    validations:
+      required: false

@@ -1,0 +1,414 @@
+{
+  "schema": "nf-test-vectors/1",
+  "note": "P-C1/P-C3 JCS 契约向量（正例）：期望值由 RFC 8785 规则导出；三实现各自独立实现该规范。compare_rule=byte（规范化已完成，无需再归一）。",
+  "vectors": [
+    {
+      "id": "jcs/basic-ascii",
+      "spec_clause": "RFC8785/3.2.3",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_input.json",
+      "compare_rule": "byte",
+      "expected": "{\"a\":[2,1.5,true,null],\"b\":1,\"c\":\"xy\"}",
+      "note": "键排序 + 无空白",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_input.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/utf16-key-order",
+      "spec_clause": "RFC8785/3.2.3",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_key_order.json",
+      "compare_rule": "byte",
+      "expected": "{\"0\":4,\"Z\":1,\"_\":5,\"a\":2,\"中\":3}",
+      "note": "码元序：数字 < 大写 < 下划线 < 小写 < CJK",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_key_order.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_key_order.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_key_order.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/number-forms",
+      "spec_clause": "RFC8785/3.2.2.3",
+      "level": "L2",
+      "input": "protocol/generated/test_vectors/jcs_numbers.json",
+      "compare_rule": "byte",
+      "expected": "[1,1.5,0,1e-7,1e+21,0.000001,100000000000000000000]",
+      "note": "ES 定点/指数切换点 + -0 归一",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/number-fixed-vs-exp",
+      "spec_clause": "RFC8785/3.2.2.3",
+      "level": "L2",
+      "input": "protocol/generated/test_vectors/jcs_numbers2.json",
+      "compare_rule": "byte",
+      "expected": "[0.5,0.000001,1e-7,2.5e+22]",
+      "note": "n 在 (-6, 0] 与 (-6, 21] 两侧的形态",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers2.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers2.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_numbers2.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/escape-minimal",
+      "spec_clause": "RFC8785/3.2.2.2",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_escapes.json",
+      "compare_rule": "byte",
+      "expected": "\"a\\\"b\\\\c\\n\\t\\u0001\"",
+      "note": "引号/反斜杠/C0 控制字符最小转义",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_escapes.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_escapes.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_escapes.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/escape-slash",
+      "spec_clause": "RFC8785/3.2.2.2",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_slash.json",
+      "compare_rule": "byte",
+      "expected": "\"a/b\"",
+      "note": "斜杠**不**转义（非最小转义被规范掉）",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_slash.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_slash.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_slash.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/unicode-escape-decoded",
+      "spec_clause": "RFC8785/3.2.2.2",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_unicode_escape.json",
+      "compare_rule": "byte",
+      "expected": "\"中\"",
+      "note": "反斜杠 u 转义解码为裸字符，非 ASCII 不再转义",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_unicode_escape.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_unicode_escape.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_unicode_escape.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "jcs/nested-sort",
+      "spec_clause": "RFC8785/3.2.3",
+      "level": "L1",
+      "input": "protocol/generated/test_vectors/jcs_nested.json",
+      "compare_rule": "byte",
+      "expected": "{\"a\":[],\"b\":{\"c\":2,\"d\":1}}",
+      "note": "嵌套对象逐层排序",
+      "langs": {
+        "python": {
+          "cmd": [
+            "python",
+            "scripts/jcs.py",
+            "--rule",
+            "jcs",
+            "--file",
+            "protocol/generated/test_vectors/jcs_nested.json"
+          ]
+        },
+        "rust": {
+          "cmd": [
+            "cargo",
+            "run",
+            "--quiet",
+            "--release",
+            "--manifest-path",
+            "engine/rust/canonical/Cargo.toml",
+            "--",
+            "--file",
+            "protocol/generated/test_vectors/jcs_nested.json"
+          ]
+        },
+        "csharp": {
+          "build": [
+            "dotnet",
+            "build",
+            "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+            "-c",
+            "Release",
+            "-v",
+            "quiet"
+          ],
+          "cmd": [
+            "dotnet",
+            "engine/dotnet/tools/nf-canonical/bin/Release/net8.0/nf-canonical.dll",
+            "--file",
+            "protocol/generated/test_vectors/jcs_nested.json"
+          ]
+        }
+      }
+    }
+  ]
+}

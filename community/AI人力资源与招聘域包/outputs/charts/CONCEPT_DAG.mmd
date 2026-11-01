@@ -1,0 +1,83 @@
+%% 概念前置图（由 community/AI人力资源与招聘域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    D14-01
+    D14-03
+    D14-05
+    D14-07
+    D14-09
+    D14-11
+  end
+  subgraph P60[P60]
+    D14-02
+    D14-04
+    D14-06
+    D14-08
+    D14-10
+    D14-12
+  end
+  subgraph P80[P80]
+    STD-cncf-cloudevents
+    STD-common-criteria
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-gdpr
+    STD-gips
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-nist-ai-rmf
+    STD-rdf11
+    STD-unesco-ai
+    STD-vega-lite
+    STD-w3c-prov-o
+  end
+  D14-01 --> D14-02
+  D14-02 --> D14-03
+  D14-03 --> D14-04
+  D14-01 --> D14-04
+  D14-04 --> D14-05
+  D14-02 --> D14-05
+  D14-05 --> D14-06
+  D14-03 --> D14-06
+  D14-06 --> D14-07
+  D14-04 --> D14-07
+  D14-07 --> D14-08
+  D14-05 --> D14-08
+  D14-08 --> D14-09
+  D14-06 --> D14-09
+  D14-09 --> D14-10
+  D14-07 --> D14-10
+  D14-10 --> D14-11
+  D14-08 --> D14-11
+  D14-11 --> D14-12
+  D14-09 --> D14-12
+  D14-06 --> STD-cncf-cloudevents
+  STD-ietf-json-schema --> STD-cncf-cloudevents
+  D14-03 --> STD-common-criteria
+  D14-06 --> STD-common-criteria
+  D14-09 --> STD-common-criteria
+  D14-10 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  D14-12 --> STD-gdpr
+  D14-07 --> STD-gips
+  D14-01 --> STD-ietf-json-schema
+  D14-05 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  D14-04 --> STD-mermaid
+  D14-09 --> STD-mermaid
+  D14-11 --> STD-mermaid
+  D14-01 --> STD-nist-ai-rmf
+  D14-04 --> STD-nist-ai-rmf
+  D14-08 --> STD-unesco-ai
+  D14-02 --> STD-vega-lite
+  D14-03 --> STD-vega-lite
+  D14-07 --> STD-vega-lite
+  D14-08 --> STD-vega-lite
+  D14-12 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  D14-02 --> STD-w3c-prov-o
+  D14-05 --> STD-w3c-prov-o
+  D14-11 --> STD-w3c-prov-o
+  D14-10 --> STD-w3c-prov-o
+  STD-rdf11 --> STD-w3c-prov-o

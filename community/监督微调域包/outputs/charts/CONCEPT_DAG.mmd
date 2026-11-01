@@ -1,0 +1,84 @@
+%% 概念前置图（由 community/监督微调域包/assets/CONCEPT_GRAPH.md 确定性派生；唯一机读真相在资产 §4 围栏块）
+flowchart TD
+  subgraph P40[P40]
+    C05-01
+    C05-03
+    C05-05
+    C05-07
+    C05-09
+    C05-11
+  end
+  subgraph P60[P60]
+    C05-02
+    C05-04
+    C05-06
+    C05-08
+    C05-10
+    C05-12
+  end
+  subgraph P80[P80]
+    STD-cncf-otel-semconv
+    STD-commonmark
+    STD-creativecommons
+    STD-frictionless-package
+    STD-frictionless-table
+    STD-ietf-bcp47
+    STD-ietf-json
+    STD-ietf-json-schema
+    STD-mermaid
+    STD-mlcommons-bench
+    STD-mlcommons-croissant
+    STD-schema-org
+    STD-spdx-licenses
+    STD-vega-lite
+    STD-w3c-tabular-data
+  end
+  C05-01 --> C05-02
+  C05-02 --> C05-03
+  C05-03 --> C05-04
+  C05-01 --> C05-04
+  C05-04 --> C05-05
+  C05-02 --> C05-05
+  C05-05 --> C05-06
+  C05-03 --> C05-06
+  C05-06 --> C05-07
+  C05-04 --> C05-07
+  C05-07 --> C05-08
+  C05-05 --> C05-08
+  C05-08 --> C05-09
+  C05-06 --> C05-09
+  C05-09 --> C05-10
+  C05-07 --> C05-10
+  C05-10 --> C05-11
+  C05-08 --> C05-11
+  C05-11 --> C05-12
+  C05-09 --> C05-12
+  C05-04 --> STD-cncf-otel-semconv
+  C05-07 --> STD-cncf-otel-semconv
+  C05-10 --> STD-cncf-otel-semconv
+  C05-03 --> STD-cncf-otel-semconv
+  C05-03 --> STD-commonmark
+  C05-12 --> STD-creativecommons
+  C05-06 --> STD-frictionless-table
+  STD-frictionless-package --> STD-frictionless-table
+  C05-05 --> STD-ietf-json-schema
+  C05-11 --> STD-ietf-json-schema
+  STD-ietf-json --> STD-ietf-json-schema
+  C05-04 --> STD-mermaid
+  C05-09 --> STD-mermaid
+  C05-02 --> STD-mlcommons-bench
+  C05-05 --> STD-mlcommons-bench
+  C05-08 --> STD-mlcommons-bench
+  C05-09 --> STD-mlcommons-bench
+  C05-11 --> STD-mlcommons-bench
+  C05-01 --> STD-mlcommons-croissant
+  STD-schema-org --> STD-mlcommons-croissant
+  C05-12 --> STD-spdx-licenses
+  C05-01 --> STD-vega-lite
+  C05-06 --> STD-vega-lite
+  C05-07 --> STD-vega-lite
+  C05-08 --> STD-vega-lite
+  STD-ietf-json-schema --> STD-vega-lite
+  C05-02 --> STD-w3c-tabular-data
+  C05-10 --> STD-w3c-tabular-data
+  STD-ietf-bcp47 --> STD-w3c-tabular-data
