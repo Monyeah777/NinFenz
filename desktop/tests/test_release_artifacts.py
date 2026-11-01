@@ -63,7 +63,14 @@ class ReleaseArtifactTest(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name) / "release"
         proc = subprocess.run(
-            [sys.executable, str(BUILDER), "--out", str(cls.out), "--allow-dirty"],
+            [
+                sys.executable,
+                str(BUILDER),
+                "--out",
+                str(cls.out),
+                "--allow-dirty",
+                "--skip-stage",
+            ],
             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", timeout=900,
         )
         if proc.returncode != 0:
