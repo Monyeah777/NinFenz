@@ -49,24 +49,19 @@ jobs:
           cd .artifacts/release
           sha256sum ./*.json ./*.md > SHA256SUMS
       - name: 平台签发 Build L3 provenance
+        id: attest
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
         with:
           subject-path: |
             .artifacts/release/*.json
             .artifacts/release/*.md
             .artifacts/release/SHA256SUMS
-      - name: 下载并合并 attestation bundle
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: 落盘 attestation bundle
         run: |
           set -euo pipefail
-          mkdir -p .artifacts/att
-          for f in .artifacts/release/*.json .artifacts/release/*.md \
-                   .artifacts/release/SHA256SUMS; do
-            gh attestation download "$f" \
-              --repo "$GITHUB_REPOSITORY" --dir .artifacts/att
-          done
-          cat .artifacts/att/*.intoto.jsonl > .artifacts/release/provenance.intoto.jsonl
+          test -s "${{ steps.attest.outputs.bundle-path }}"
+          cp "${{ steps.attest.outputs.bundle-path }}" \
+            .artifacts/release/provenance.intoto.jsonl
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: gate-release-bundle

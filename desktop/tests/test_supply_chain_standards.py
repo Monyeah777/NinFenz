@@ -180,10 +180,24 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
         self.assertEqual("write", jobs["build"]["permissions"]["id-token"])
         self.assertEqual("write", jobs["build"]["permissions"]["attestations"])
         evidence = self.evidence_builder_doc["jobs"]["build"]
-        self.assertTrue(any(
-            str(step.get("uses", "")).startswith("actions/attest-build-provenance@")
-            for step in evidence["steps"]
-        ))
+        attest = next(
+            step for step in evidence["steps"]
+            if str(step.get("uses", "")).startswith(
+                "actions/attest-build-provenance@"
+            )
+        )
+        self.assertEqual("attest", attest["id"])
+        bundle_steps = [
+            step for step in evidence["steps"]
+            if "steps.attest.outputs.bundle-path" in json.dumps(
+                step, ensure_ascii=False
+            )
+        ]
+        self.assertEqual(1, len(bundle_steps))
+        self.assertIn("provenance.intoto.jsonl",
+                      json.dumps(bundle_steps[0], ensure_ascii=False))
+        self.assertNotIn("gh attestation download",
+                         json.dumps(evidence, ensure_ascii=False))
         publish = json.dumps(jobs["publish"], ensure_ascii=False)
         self.assertIn("release-evidence-l3.yml", publish)
         self.assertIn("--deny-self-hosted-runners", publish)
