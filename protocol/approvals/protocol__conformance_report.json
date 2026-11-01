@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-02",
   "approved_by": "Monyeah777",
-  "note": "Security Insights sync EOL UTC fix",
+  "note": "refreeze.sh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "be6f680f95de9d459aeb76594bb68d696dc78b3de2fcd4d0ee7b809c68e89cbd"
