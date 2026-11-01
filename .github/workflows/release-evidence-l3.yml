@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-evidence-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: isolated-release-evidence

@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: slsa-build-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: isolated-reproducible-build

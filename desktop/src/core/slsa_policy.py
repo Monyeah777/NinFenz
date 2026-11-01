@@ -1,8 +1,8 @@
 """Fail-closed validation for SLSA v1.2 Build L3 release evidence."""
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import re
 from datetime import datetime
 from pathlib import Path
@@ -231,8 +231,11 @@ def claimed_level_issues(policy: dict[str, Any], root: Path) -> list[str]:
 
 def scan(root: str | Path) -> tuple[list[str], dict[str, Any]]:
     root = Path(root)
-    readiness = _json(root / READINESS_REL)
-    policy = _json(root / POLICY_REL)
+    try:
+        readiness = _json(root / READINESS_REL)
+        policy = _json(root / POLICY_REL)
+    except (OSError, ValueError) as exc:
+        return [f"SLSA L3 evidence unreadable: {exc}"], {}
     claimed = readiness.get("claimed_level")
     readiness_issues, statuses = _readiness_issues(root, readiness)
     issues = readiness_issues + _policy_issues(policy, claimed) + _workflow_issues(root)

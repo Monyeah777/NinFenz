@@ -1,5 +1,4 @@
 """工作流工业级加固判据（Python-only 面 · 2026-10-13 补）。
-
 **为什么单独成件**：`core/workflow_policy.py` 是 `python scripts/verify_report.py` 的 **native 面**
 （Rust 引擎 `engine/rust/src/workflow_policy.rs` 与其逐字节对账）；改它的问题/统计面就必须
 同步移植到 Rust，否则跨语言对账当场红。本件守的是 **CI 运行面**（并发 / 凭据 / 缓存 / 评审路由 /
@@ -18,7 +17,6 @@ About code owners；Scorecard §Dependency-Update-Tool）：
 4. `CODEOWNERS` 在场且含 `*` 兜底规则。
 5. dependabot 覆盖仓库**真实**生态（按结构推断）：工作流 → github-actions；
    requirements-*.txt → pip；packaging/npm/package.json → npm。
-
 纪律：纯标准库、只读、错误消息带修复指引。
 """
 from __future__ import annotations
@@ -90,6 +88,8 @@ def _cache_issues(rel: str, text: str) -> list:
         return []
     if CACHE_MARK in text and "cache-dependency-path" in text:
         return []
+    if "--no-cache-dir" in text and "actions/attest-build-provenance@" in text:
+        return []                    # SLSA L3：无持久缓存是隔离要求，不是遗漏
     return [f"{rel} 有 pip 安装但未声明依赖缓存（修复指引：actions/setup-python 的 with 下加 "
             f"cache: pip 与 cache-dependency-path: .github/requirements-*.txt）"]
 
