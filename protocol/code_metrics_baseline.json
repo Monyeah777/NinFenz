@@ -1606,9 +1606,9 @@
       "max_fn_lines": 39
     },
     "scripts/reproducibility_policy.py": {
-      "lines": 150,
+      "lines": 189,
       "max_fn_cc": 16,
-      "max_fn_lines": 38
+      "max_fn_lines": 36
     },
     "scripts/rewrite_text.py": {
       "lines": 136,
