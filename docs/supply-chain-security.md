@@ -111,6 +111,18 @@ python scripts/generate_vex.py --json
 或过期 VEX 都会 fail-closed。发布构建会把 VEX 写入 tarball 同级的发布束、`SHA256SUMS` 和
 `release-metadata.json`，并纳入 provenance / VSA subject。
 
+## 可复现构建证据
+
+`packaging/supply-chain/reproducibility.json` 将 npm tarball、GitHub Packages mirror 和 PyO3 wheel
+绑定到同一个 SLSA L3 验证运行。`python scripts/reproducibility_policy.py` 要求：
+
+- 每个声明工件至少执行两次构建且结果逐字节一致；
+- 工件摘要必须等于同一次运行的 SLSA provenance subject；
+- 构建必须禁用持久缓存，wheel 容器必须固定 digest；
+- 标准声明范围严格限定为“同一受控构建环境”。
+
+当前证据不支持跨机器、跨发行版或跨工具链版本的无条件可复现声明。
+
 ## 依赖与供应商准入
 
 依赖只能从 `packaging/supply-chain/package-sources.json` 声明的 HTTPS 源进入。运行工件当前
