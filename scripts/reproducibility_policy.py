@@ -18,6 +18,8 @@ RELEASE_REL = "packaging/npm/tools/build_release.py"
 SCHEMA = "nf-reproducibility-evidence/1"
 STANDARD = "https://reproducible-builds.org/docs/definition/"
 SCOPE = "same-controlled-build-environment"
+SLSA_SCHEMA = "nf-slsa-l3-attestation-run/1"
+SLSA_LEVEL = "SLSA_BUILD_LEVEL_3"
 KINDS = {"npm", "github-packages", "python-wheel"}
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -47,9 +49,18 @@ def _workflow_issues(root: Path) -> list[str]:
     return issues
 
 
+def _slsa_subjects(slsa: dict[str, Any], issues: list[str]) -> dict[str, Any]:
+    value = slsa.get("subjects")
+    if not isinstance(value, dict):
+        issues.append("SLSA subjects 必须是对象")
+        return {}
+    return value
+
+
 def _artifact_kinds(slsa: dict[str, Any], artifacts: list[Any], issues: list[str]) -> set[str]:
     seen: set[str] = set()
-    subjects = slsa.get("subjects") or {}
+    seen_filenames: set[str] = set()
+    subjects = _slsa_subjects(slsa, issues)
     for index, artifact in enumerate(artifacts):
         if not isinstance(artifact, dict):
             issues.append(f"artifacts[{index}] 必须是对象")
@@ -57,12 +68,16 @@ def _artifact_kinds(slsa: dict[str, Any], artifacts: list[Any], issues: list[str
         kind = str(artifact.get("kind") or "")
         filename = str(artifact.get("filename") or "")
         digest = str(artifact.get("sha256") or "")
+        builds = artifact.get("builds")
         if kind in seen:
             issues.append(f"artifact kind 重复：{kind}")
         seen.add(kind)
         if kind not in KINDS:
             issues.append(f"artifacts[{index}] 未知 kind：{kind!r}")
-        if int(artifact.get("builds", 0)) < 2:
+        if not filename or filename in seen_filenames:
+            issues.append(f"artifacts[{index}] filename 为空或重复：{filename!r}")
+        seen_filenames.add(filename)
+        if isinstance(builds, bool) or not isinstance(builds, int) or builds < 2:
             issues.append(f"artifacts[{index}] 至少需要 2 次构建")
         if artifact.get("comparison") != "byte-identical":
             issues.append(f"artifacts[{index}] comparison 必须是 byte-identical")
@@ -71,6 +86,32 @@ def _artifact_kinds(slsa: dict[str, Any], artifacts: list[Any], issues: list[str
         if subjects.get(filename) != digest:
             issues.append(f"artifacts[{index}] 摘要未绑定到 SLSA subject {filename}")
     return seen
+
+
+def _slsa_verification_issues(slsa: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if slsa.get("schema") != SLSA_SCHEMA:
+        issues.append(f"SLSA evidence schema 必须是 {SLSA_SCHEMA}")
+    levels = slsa.get("verified_levels")
+    if not isinstance(levels, list) or SLSA_LEVEL not in levels:
+        issues.append(f"SLSA evidence 必须包含已验证的 {SLSA_LEVEL}")
+    for field in (
+        "provenance_verified",
+        "vsa_verified",
+        "release_evidence_verified",
+    ):
+        if slsa.get(field) is not True:
+            issues.append(f"SLSA evidence {field} 必须为 true")
+    return issues
+
+
+def _binding_issues(doc: dict[str, Any], slsa: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if doc.get("run_id") != slsa.get("run_id"):
+        issues.append("run_id 必须与 SLSA L3 验证运行一致")
+    if doc.get("source_commit") != slsa.get("tested_commit"):
+        issues.append("source_commit 必须与 SLSA L3 tested_commit 一致")
+    return issues
 
 
 def validate_doc(
@@ -86,10 +127,8 @@ def validate_doc(
             "scope 必须严格声明为同一受控构建环境；"
             "当前证据不足以宣称跨机器或跨发行版可复现"
         )
-    if doc.get("run_id") != slsa.get("run_id"):
-        issues.append("run_id 必须与 SLSA L3 验证运行一致")
-    if doc.get("source_commit") != slsa.get("tested_commit"):
-        issues.append("source_commit 必须与 SLSA L3 tested_commit 一致")
+    issues.extend(_binding_issues(doc, slsa))
+    issues.extend(_slsa_verification_issues(slsa))
     env = doc.get("environment")
     if not isinstance(env, dict):
         issues.append("environment 必须是对象")

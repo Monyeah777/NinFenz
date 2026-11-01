@@ -36,6 +36,33 @@ class ReproducibilityPolicyTest(unittest.TestCase):
         self.assertTrue(any("run_id" in issue for issue in issues), issues)
         self.assertTrue(any("source_commit" in issue for issue in issues), issues)
 
+    def test_slsa_must_verify_build_level_and_signatures(self):
+        slsa = copy.deepcopy(self.slsa)
+        slsa["verified_levels"] = ["SLSA_BUILD_LEVEL_2"]
+        slsa["provenance_verified"] = False
+        slsa["vsa_verified"] = False
+        slsa["release_evidence_verified"] = False
+        issues, _ = policy.validate_doc(ROOT, self.doc, slsa)
+        self.assertTrue(any("SLSA_BUILD_LEVEL_3" in issue for issue in issues), issues)
+        for field in (
+            "provenance_verified",
+            "vsa_verified",
+            "release_evidence_verified",
+        ):
+            self.assertTrue(any(field in issue for issue in issues), issues)
+
+    def test_malformed_slsa_subjects_fail_closed(self):
+        slsa = copy.deepcopy(self.slsa)
+        slsa["subjects"] = []
+        issues, _ = policy.validate_doc(ROOT, self.doc, slsa)
+        self.assertTrue(any("subjects 必须是对象" in issue for issue in issues), issues)
+
+    def test_non_integer_build_count_fails_closed(self):
+        doc = copy.deepcopy(self.doc)
+        doc["artifacts"][0]["builds"] = "2"
+        issues, _ = policy.validate_doc(ROOT, doc, self.slsa)
+        self.assertTrue(any("2 次构建" in issue for issue in issues), issues)
+
     def test_single_build_is_not_reproducibility(self):
         doc = copy.deepcopy(self.doc)
         doc["artifacts"][0]["builds"] = 1
