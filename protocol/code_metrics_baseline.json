@@ -1626,7 +1626,7 @@
       "max_fn_lines": 30
     },
     "scripts/security_insights.py": {
-      "lines": 284,
+      "lines": 289,
       "max_fn_cc": 13,
       "max_fn_lines": 33
     },

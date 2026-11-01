@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:457fd997430af74d76795d4a9697aba5cb08c18ecfd2d2f1b14ea2766fba0024
+  - protocol/code_metrics_baseline.json:aad98ee9d2584962d820e4058a0728a67c29399b96631b0add1fa1bb8d935bc1
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,8 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
+> 重审（2026-11-02）：Security Insights guarded JSON load
+
 > 重审（2026-11-02）：OpenSSF Security Insights v2.2.0
 
 > 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3

@@ -13,6 +13,11 @@ from typing import Any
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT / "desktop" / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core import json_doc  # noqa: E402
+
 PROFILE_REL = "security-insights.yml"
 EVIDENCE_REL = "results/standards/security-insights-validation.json"
 SCHEMA_VERSION = "2.2.0"
@@ -247,7 +252,7 @@ def scan(
         )
     else:
         try:
-            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            evidence = json_doc.load(evidence_path, dict, what=EVIDENCE_REL)
         except (OSError, ValueError) as exc:
             issues.append(f"{EVIDENCE_REL} 不可读：{exc}")
         else:
