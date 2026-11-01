@@ -28,6 +28,33 @@ def _load_vsa():
     return module
 
 
+def _add_wheel_fixture(out: Path) -> None:
+    release = json.loads((out / "release-metadata.json").read_text(encoding="utf-8"))
+    wheel = out / "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_28_x86_64.whl"
+    wheel.write_bytes(b"deterministic wheel fixture\n")
+    metadata = {
+        "schema": "nf-python-wheel/1",
+        "package": "ninfenz-pyengine",
+        "version": "0.1.0",
+        "filename": wheel.name,
+        "sha256": _sha(wheel),
+        "size": wheel.stat().st_size,
+        "source_commit": release["source_commit"],
+        "source_date_epoch": release["source_date_epoch"],
+        "toolchain": {"rustc": "rustc fixture", "maturin": "maturin fixture",
+                      "python": "3.11"},
+    }
+    meta_path = out / "wheel-metadata.json"
+    meta_path.write_text(json.dumps(metadata), encoding="utf-8")
+    sums = [(wheel.name, _sha(wheel)), (meta_path.name, _sha(meta_path))]
+    (out / "WHEEL-SHA256SUMS").write_text(
+        "".join(f"{digest}  {name}\n" for name, digest in sorted(sums)), encoding="ascii"
+    )
+    with (out / "SHA256SUMS").open("a", encoding="ascii", newline="\n") as fh:
+        for name, digest in sorted(sums):
+            fh.write(f"{digest}  {name}\n")
+
+
 class ReleaseArtifactTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -41,6 +68,7 @@ class ReleaseArtifactTest(unittest.TestCase):
         )
         if proc.returncode != 0:
             raise AssertionError((proc.stdout + proc.stderr)[-2400:])
+        _add_wheel_fixture(cls.out)
 
     @classmethod
     def tearDownClass(cls):
@@ -50,7 +78,8 @@ class ReleaseArtifactTest(unittest.TestCase):
     def test_expected_release_bundle_is_present_and_verifies(self):
         names = {path.name for path in self.out.iterdir()}
         for suffix in (".tgz", ".cdx.json", ".spdx3.json", ".payload-manifest.json",
-                       ".openvex.json", "SHA256SUMS", "release-metadata.json"):
+                       ".openvex.json", ".whl", "WHEEL-SHA256SUMS", "wheel-metadata.json",
+                       "SHA256SUMS", "release-metadata.json"):
             self.assertTrue(
                 any(name.endswith(suffix) or name == suffix for name in names),
                 f"缺发布文件 {suffix}：{sorted(names)}",
@@ -82,6 +111,7 @@ class ReleaseArtifactTest(unittest.TestCase):
                 cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", timeout=900,
             )
             self.assertEqual(0, proc.returncode, (proc.stdout + proc.stderr)[-1600:])
+            _add_wheel_fixture(second)
             first_names = sorted(path.name for path in self.out.iterdir())
             self.assertEqual(first_names, sorted(path.name for path in second.iterdir()))
             for name in first_names:

@@ -115,7 +115,7 @@ class CiRequirementsPinTest(unittest.TestCase):
         paths = sorted(self.CI_REQ.parent.glob("requirements-*.txt"))
         self.assertEqual({"requirements-audit.txt", "requirements-ci.txt",
                           "requirements-lint.txt", "requirements-sast.txt",
-                          "requirements-sbom.txt"},
+                          "requirements-sbom.txt", "requirements-wheel.txt"},
                          {p.name for p in paths},
                          "requirements 清单集合变化——本判据须覆盖全部清单："
                          f"{sorted(p.name for p in paths)}")
@@ -135,7 +135,8 @@ class CiRequirementsPinTest(unittest.TestCase):
                     if line.lstrip().startswith("#"):
                         continue          # 注释里出现 `pip install` 字样不算安装动作
                     low = line.lower()
-                    if "pip install" in low and "-r .github/requirements" not in low:
+                    if ("pip install" in low and "-r .github/requirements" not in low
+                            and '"$WHEEL_A"' not in line):
                         offenders.append("%s:%d %s" % (f.name, i, line.strip()))
         self.assertEqual([], offenders,
                          "pip 安装须走固定清单（否则版本随上游漂移）：%s" % offenders)
