@@ -1,12 +1,13 @@
 # 供应链安全与发布验证
 
-> 最后更新：2026-10-27
+> 最后更新：2026-11-01
 
 本文件是 NinFenz 发布工件、依赖摄取、SBOM、来源证明和漏洞响应的人读入口。机读证据位于
 `packaging/supply-chain/`，判据入口为：
 
 ```bash
 python scripts/supply_chain_policy.py
+python scripts/slsa_source_readiness.py
 python scripts/validate_sboms.py packaging/npm/dist/release
 ```
 
@@ -50,6 +51,21 @@ gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源�
 VSA 当前只声明 `SLSA_BUILD_LEVEL_2`。共享 GitHub runner 可被工作流自定义步骤影响且构建阶段允许
 联网，不满足 Build L3 对 trusted builder / build isolation 的要求；`slsa-l3-readiness.json`
 把该缺口保持为 blocker。VSA verifier 是本项目自己的 workflow，不是独立第三方 verifier。
+
+## SLSA Source Track 边界
+
+仓库对 `main` 使用 active Ruleset：禁止强推和删除、要求 linear history、要求状态检查通过、
+要求会话解决，并对管理员生效。`refs/tags/v*` 另一个 active Ruleset 禁止删除、强推和更新，
+且两个 Ruleset 都没有 bypass actor。机器快照由
+`python scripts/slsa_source_readiness.py --collect` 从 GitHub API 生成，CI 校验提交快照与
+readiness 声明。维护者在变更 Ruleset 后运行 `--live` 显式回读平台事实；公网 API 不作为
+每次 PR 的硬依赖，避免托管 runner 的匿名限流制造假红。
+
+GitHub 当前不提供 SLSA Source VSA 与 Source Provenance，因此本仓库明确声明
+**SLSA Source Level 0**，不把 Build provenance 改名为 Source provenance。机读矩阵在
+`packaging/supply-chain/slsa-source-readiness.json` 中把 Source VSA / Source Provenance
+保持为 `blocked`，把目前规则集与未来平台 attestation 的绑定保持为 `partial`。技术控制
+readiness 可以验证，但不等于已经取得 Source L2/L3。
 
 ## 消费者验证
 
@@ -167,3 +183,7 @@ OSPS Baseline L1/L2、L3 与 S2C2F L1/L2 的逐项证据见
 `packaging/supply-chain/s2c2f-l1-l2.json`；共覆盖 65 条活动 OSPS 控制项（2 条已退役 ID 不计）。
 其中 `platform-managed` 项依赖 GitHub 仓库设置，`external-manual` 项依赖账号安全设置，
 `partial`/`not-applicable` 项保留明确 gap；这些状态不是“认证通过”的同义词。
+
+SLSA Source Track 的当前等级、技术控制快照、平台缺口与安全 expunging 规则分别见
+`packaging/supply-chain/slsa-source-readiness.json`、
+`results/supply-chain/github-source-controls.json` 和 `docs/source-control-policy.md`。

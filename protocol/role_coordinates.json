@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
+    "app": 1448,
     "entry": 27,
     "floor": 5,
     "prod": 1042,
-    "projection": 133,
-    "support": 309,
-    "verify": 1134
+    "projection": 134,
+    "support": 312,
+    "verify": 1136
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6875,6 +6875,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Fail-closed readiness checks for the SLSA v1.2 Source Track.",
+      "path": "desktop/src/core/slsa_source_policy.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "ST 制卡质量规范门禁（验收层规范的**数据化**：M/S/R → fail/warn/info）。",
       "path": "desktop/src/core/st_quality.py",
       "role": "verify",
@@ -8989,6 +8995,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_skill_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "SLSA v1.2 Source Track control-readiness regression tests.",
+      "path": "desktop/tests/test_slsa_source_policy.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13098,17 +13110,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b2b30d2d435d475c7934ec32d3d06dbc2562985e4c32b6f2fb28a5b1db523c33",
+  "root_digest": "733736ca28150e117a6a63976bc11de502afa7381b23dcc2c32bf5bc9b188b34",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 132,
+    "R-app": 1448,
+    "R-catch": 134,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 118,
-    "R-support": 151,
-    "R-verify": 1014,
-    "auto:R-core": 259
+    "R-projection": 119,
+    "R-support": 152,
+    "R-verify": 1015,
+    "auto:R-core": 260
   },
   "schema": "nf-role-coordinates/1"
 }

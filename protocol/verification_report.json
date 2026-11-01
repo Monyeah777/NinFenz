@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+        "root": "f335a48ec122dc4b8f42605498af327944ef7894cd1245be247bc179fe2164f0",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 331,
-        "files": 331,
+        "baseline": 333,
+        "files": 333,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 261,
-        "modules": 261,
+        "metrics_recorded": 262,
+        "modules": 262,
         "registered_cycles": 0,
         "registered_sdp": 12,
         "sdp": 12
@@ -477,10 +477,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 68,
+        "consumed": 69,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 70
+        "scanners": 71
       },
       "status": "pass",
       "warns": 0
@@ -492,7 +492,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 107,
+        "pinned_uses": 108,
         "requirements_files": 5,
         "with_explicit_permissions": 24,
         "workflows": 24
@@ -617,8 +617,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4098,
-        "kernel": 2181,
+        "files": 4105,
+        "kernel": 2183,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "29ee12f5b9ddaef664d297b35c88b696e4c4961deea3382c1c97add84c0184e8",
+  "root_digest": "2d77437684c42b3dc6a79300d7ea7d758599ccea871d82c9bf7f0ab1d04f980d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

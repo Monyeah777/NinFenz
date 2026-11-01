@@ -7,6 +7,7 @@
 本判据把该盲区变成机检：
 - 候选集 = `desktop/src/core/*.py` 中定义 `def scan(` 的模块；
 - 「被消费」= 该模块名出现在任一消费者里：`verify.sh`、`scripts/nf.py`、
+  `scripts/slsa_source_readiness.py`、
   `core/verify_report.py`（机器可读报告的判据表）、`core/quality_depth_scan.py`、
   或**其它 core 模块**（间接消费）；
 - **未被消费且未登记 = FAIL**（修复指引：接进上述任一消费者，或删除该死判据）；
@@ -29,9 +30,8 @@ from . import scan_memo
 DECL_REL = "protocol/judgement_coverage.json"
 SCHEMA = "nf-judgement-coverage/1"
 CORE_DIR = "desktop/src/core"
-CONSUMERS = ("verify.sh", "scripts/nf.py",
-             "desktop/src/core/verify_report.py",
-             "desktop/src/core/quality_depth_scan.py")
+CONSUMERS = ("verify.sh", "scripts/nf.py", "scripts/slsa_source_readiness.py",
+             "desktop/src/core/verify_report.py", "desktop/src/core/quality_depth_scan.py")
 SCAN_DEF = re.compile(r"^def scan\(", re.M)
 
 

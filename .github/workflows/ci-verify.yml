@@ -176,7 +176,7 @@ jobs:
           if-no-files-found: warn
   gate:
     name: gate
-    needs: [static-checks, unit-tests, freeze-consistency]
+    needs: [static-checks, unit-tests, freeze-consistency, source-controls]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -231,6 +231,19 @@ jobs:
           else
             echo "无待关闭的跟踪 issue"
           fi
+
+  source-controls:
+    name: slsa-source-controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 验证 SLSA Source 技术控制快照与诚实等级声明
+        run: python3 scripts/slsa_source_readiness.py
 
   # ---------------------------------------------------------------- 冻结一致性判据
   # 为什么（2026-10-29 两次 main 红）：提交进仓的"生成件"必须等于**在干净检出上重算一次**的结果。
