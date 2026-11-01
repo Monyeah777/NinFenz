@@ -1,6 +1,6 @@
 # 供应链安全与发布验证
 
-> 最后更新：2026-10-27
+> 最后更新：2026-11-02
 
 本文件是 NinFenz 发布工件、依赖摄取、SBOM、来源证明和漏洞响应的人读入口。机读证据位于
 `packaging/supply-chain/`，判据入口为：
@@ -23,10 +23,14 @@ python scripts/validate_sboms.py packaging/npm/dist/release
 | `ninfenz-<version>.payload-manifest.json` | 逐文件 SHA-256 与聚合树摘要 |
 | `SHA256SUMS` | 所有发布文件的完整性清单 |
 | `release-metadata.json` | 源提交、可复现结论、SBOM、VEX 和工件映射 |
+| `ninfenz_pyengine-<version>-cp311-*.whl` | 由 Maturin 构建的 PyO3 原生扩展 wheel |
+| `wheel-metadata.json` | wheel 源提交、固定 Rust/Maturin/Python 工具链与摘要 |
+| `WHEEL-SHA256SUMS` | wheel 与 wheel metadata 的独立完整性清单 |
 
-构建器对同一源树连续构建两次，tarball 字节不同即失败。tar 成员顺序、权限、uid/gid、mtime、
+构建器对同一源树连续构建两次，tarball 或 wheel 字节不同即失败。tar 成员顺序、权限、uid/gid、mtime、
 gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源提交时间或显式
-`SOURCE_DATE_EPOCH`，不读取墙钟。
+`SOURCE_DATE_EPOCH`，不读取墙钟。wheel 另以 Rust 1.99.1、Maturin 1.16.0 和 CPython 3.11
+固定构建，安装到新 venv 后验证 `ABI_VERSION`、SHA-256、反序字节和浮点 repr。
 
 ## SLSA v1.2 Build L3、provenance 与 VSA
 
@@ -35,10 +39,11 @@ gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源�
 1. 调用方把全部构建步骤交给同仓 reusable workflow `slsa-build-l3.yml`，调用方不直接构建；
 2. reusable workflow 在 GitHub 托管、每次新建的 runner 上从不可变提交构建，禁用 setup/pip
    持久缓存，并以 `--no-cache-dir` 安装固定版本验证器；
-3. 两次构建逐字节比较，生成 CycloneDX、SPDX、OpenVEX、payload 清单与 checksums；
-4. reusable workflow 内的 `actions/attest-build-provenance` 对两套 tarball、双 SBOM、OpenVEX、
-   checksums 与 release metadata 生成 `https://slsa.dev/provenance/v1` 来源证明；
-5. 独立 `verify` 作业下载发布束、校验 `SHA256SUMS`，把签名 workflow 固定为
+3. 两次 npm 构建与两次 Maturin wheel 构建逐字节比较，生成 CycloneDX、SPDX、OpenVEX、
+   payload 清单、wheel metadata 与两套 checksums；
+4. reusable workflow 内的 `actions/attest-build-provenance` 对两套 tarball、PyO3 wheel、
+   双 SBOM、OpenVEX、checksums 与 metadata 生成 `https://slsa.dev/provenance/v1` 来源证明；
+5. 独立 `verify` 作业下载发布束、校验 `SHA256SUMS` / `WHEEL-SHA256SUMS`，把签名 workflow 固定为
    `slsa-build-l3.yml`，并核对 source ref、source commit 与 predicate type；
 6. `scripts/build_vsa.py` 复核可复现次数、源提交、摘要和必需工件，签发
    `https://slsa.dev/verification_summary/v1` predicate，再由 GitHub OIDC 签署为 VSA；
@@ -62,6 +67,8 @@ npm 主链与 Release evidence 两条独立运行、工作流摘要和发布 sub
 
 ```bash
 sha256sum -c SHA256SUMS
+sha256sum -c WHEEL-SHA256SUMS
+python scripts/wheel_release_metadata.py verify --release-dir . --source-commit <commit>
 ARTIFACT=ninfenz-<version>.tgz
 gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
   --signer-workflow Monyeah777/NinFenz/.github/workflows/slsa-build-l3.yml \

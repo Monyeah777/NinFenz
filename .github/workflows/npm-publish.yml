@@ -69,7 +69,11 @@ jobs:
           path: .artifacts/release
       - name: 下载工件完整性
         working-directory: .artifacts/release
-        run: sha256sum -c SHA256SUMS
+        run: |
+          sha256sum -c SHA256SUMS
+          sha256sum -c WHEEL-SHA256SUMS
+          python ../../scripts/wheel_release_metadata.py verify \
+            --release-dir . --source-commit "$GITHUB_SHA"
       - name: 独立验证全部 provenance subject
         env:
           GH_TOKEN: ${{ github.token }}
@@ -80,11 +84,14 @@ jobs:
             .artifacts/release/*.cdx.json
             .artifacts/release/*.spdx3.json
             .artifacts/release/*.openvex.json
+            .artifacts/release/*.whl
+            .artifacts/release/WHEEL-SHA256SUMS
+            .artifacts/release/wheel-metadata.json
             .artifacts/release/SHA256SUMS
             .artifacts/release/release-metadata.json
           )
-          if [ "${#FILES[@]}" -lt 9 ]; then
-            echo "::error::provenance subject 少于 9 个，发布束不完整"
+          if [ "${#FILES[@]}" -lt 12 ]; then
+            echo "::error::provenance subject 少于 12 个，发布束不完整"
             exit 1
           fi
           for FILE in "${FILES[@]}"; do
@@ -118,6 +125,9 @@ jobs:
             .artifacts/release/*.cdx.json
             .artifacts/release/*.spdx3.json
             .artifacts/release/*.openvex.json
+            .artifacts/release/*.whl
+            .artifacts/release/WHEEL-SHA256SUMS
+            .artifacts/release/wheel-metadata.json
             .artifacts/release/SHA256SUMS
             .artifacts/release/release-metadata.json
           predicate-type: https://slsa.dev/verification_summary/v1
@@ -130,6 +140,8 @@ jobs:
           shopt -s nullglob
           for FILE in .artifacts/release/*.tgz .artifacts/release/*.cdx.json \
             .artifacts/release/*.spdx3.json .artifacts/release/*.openvex.json \
+            .artifacts/release/*.whl .artifacts/release/WHEEL-SHA256SUMS \
+            .artifacts/release/wheel-metadata.json \
             .artifacts/release/SHA256SUMS .artifacts/release/release-metadata.json; do
             gh attestation verify "$FILE" \
               --bundle "$VSA_BUNDLE" \

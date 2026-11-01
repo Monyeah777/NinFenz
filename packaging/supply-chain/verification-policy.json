@@ -14,6 +14,9 @@
     "*.tgz",
     "*.cdx.json",
     "*.spdx3.json",
+    "*.whl",
+    "WHEEL-SHA256SUMS",
+    "wheel-metadata.json",
     "SHA256SUMS",
     "release-metadata.json"
   ],
