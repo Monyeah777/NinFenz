@@ -164,6 +164,17 @@ class DaemonHardeningTest(DaemonHarness):
         self.assertNotIn("--allow-non-loopback", src,
                          "守护能执行任意 nf 命令，不得提供放行外网的开关")
 
+    def test_cwd_outside_daemon_root_is_rejected(self):
+        with tempfile.TemporaryDirectory(dir=ROOT.parent) as outside:
+            code, out, err = dm.run_request(
+                self._state(), ["--version"], cwd=outside
+            )
+
+        self.assertEqual(2, code)
+        self.assertEqual(b"", out)
+        self.assertIn("越出守护根", err.decode("utf-8"))
+        self.assertTrue(dm.ping(), "拒绝越界 cwd 后守护必须仍然活着")
+
 
 class DaemonFreshnessTest(DaemonHarness):
     def test_path_keyed_caches_are_cleared_per_request(self):
@@ -196,7 +207,7 @@ class DaemonFreshnessTest(DaemonHarness):
             # 用**独有 cwd** 强制走满整条执行路径：响应缓存按 (argv, gen, cwd) 命中，
             # 若同一进程里别的用例刚跑过 --version，这里会**提前 return**、根本到不了
             # 清缓存那一步（分片/乱序跑时实测必红；串行时只是碰巧没被预热）。
-            with tempfile.TemporaryDirectory() as tmp:
+            with tempfile.TemporaryDirectory(dir=ROOT) as tmp:
                 dm.execute(["--version"], ROOT, cwd=tmp)
         finally:
             dm.reset_process_caches = real_reset
