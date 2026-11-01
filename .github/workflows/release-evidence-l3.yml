@@ -5,6 +5,7 @@ name: release-evidence-l3
 # attestations:write. No persistent cache or signing secret enters this job.
 on:
   workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
