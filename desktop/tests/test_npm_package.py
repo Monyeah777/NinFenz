@@ -20,11 +20,17 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT / "desktop" / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core.atomic_write import lock_file  # noqa: E402
+
 PKG = ROOT / "packaging" / "npm"
 MANIFEST = PKG / "payload" / "payload-manifest.json"
 #: 冒烟用例数下限（防「面塌缩」：删用例比删断言更容易被忽略）
@@ -64,6 +70,17 @@ def _node_or_skip(case):
 
 class NpmPackageGateTest(unittest.TestCase):
     """工作流跑哪两条自检，常驻面就跑哪两条（判据必须接线）。"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._payload_lock = lock_file(
+            PKG / "payload", timeout=900, what="npm package read-only gates"
+        )
+        cls._payload_lock.__enter__()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._payload_lock.__exit__(None, None, None)
 
     def test_smoke_suite_passes(self):
         """冒烟套件：sha256 对账 + 启动器快路 + 在已有检出上真跑一条只读命令。"""
@@ -228,6 +245,17 @@ class PublishingProvenanceGateTest(unittest.TestCase):
     - stage 默认对脏工作树 fail-closed，且不再**静默改写**受跟踪的 README；
     - verify 把 source_commit 与 HEAD 对上，并把「脏树暂存」判死。
     """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._payload_lock = lock_file(
+            PKG / "payload", timeout=900, what="publishing provenance gates"
+        )
+        cls._payload_lock.__enter__()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._payload_lock.__exit__(None, None, None)
 
     def test_stager_guards_dirty_tree_and_readme(self):
         src = (PKG / "tools" / "stage-payload.mjs").read_text(encoding="utf-8")

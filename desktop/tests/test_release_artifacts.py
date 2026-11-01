@@ -11,6 +11,11 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT / "desktop" / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "desktop" / "src"))
+
+from core.atomic_write import lock_file  # noqa: E402
+
 BUILDER = ROOT / "packaging" / "npm" / "tools" / "build_release.py"
 VSA = ROOT / "scripts" / "build_vsa.py"
 
@@ -60,6 +65,12 @@ class ReleaseArtifactTest(unittest.TestCase):
     def setUpClass(cls):
         if not shutil.which("node"):
             raise unittest.SkipTest("无 node，无法运行 npm payload 暂存器")
+        cls._payload_lock = lock_file(
+            ROOT / "packaging" / "npm" / "payload",
+            timeout=900,
+            what="release artifact tests vs npm package tests",
+        )
+        cls._payload_lock.__enter__()
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name) / "release"
         proc = subprocess.run(
@@ -69,7 +80,6 @@ class ReleaseArtifactTest(unittest.TestCase):
                 "--out",
                 str(cls.out),
                 "--allow-dirty",
-                "--skip-stage",
             ],
             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", timeout=900,
         )
@@ -81,6 +91,8 @@ class ReleaseArtifactTest(unittest.TestCase):
     def tearDownClass(cls):
         if hasattr(cls, "tmp"):
             cls.tmp.cleanup()
+        if hasattr(cls, "_payload_lock"):
+            cls._payload_lock.__exit__(None, None, None)
 
     def test_expected_release_bundle_is_present_and_verifies(self):
         names = {path.name for path in self.out.iterdir()}
