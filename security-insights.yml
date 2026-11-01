@@ -1,7 +1,7 @@
 header:
   schema-version: 2.2.0
-  last-updated: '2026-11-02'
-  last-reviewed: '2026-11-02'
+  last-updated: '2026-11-01'
+  last-reviewed: '2026-11-01'
   url: https://raw.githubusercontent.com/Monyeah777/NinFenz/main/security-insights.yml
   comment: |
     Canonical machine-readable security profile for NinFenz.
@@ -86,7 +86,7 @@ repository:
       self:
         comment: Scoped internal ASVS 5.0.0 L2 assessment; partial and not-applicable controls retain explicit gaps.
         evidence: https://github.com/Monyeah777/NinFenz/blob/main/docs/asvs.md
-        date: '2026-11-02'
+        date: '2026-11-01'
     champions:
       - name: Monyeah777
         affiliation: NinFenz
