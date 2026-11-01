@@ -57,6 +57,14 @@ class WheelMetadataTest(unittest.TestCase):
         metadata_path.write_text(json.dumps(doc), encoding="utf-8")
         sums = root / "WHEEL-SHA256SUMS"
         wr.write_checksums(sums, [wheel, metadata_path])
+        sums.write_text(
+            "\n".join(
+                line.replace(f"  {wheel.name}", f"  ./{wheel.name}")
+                if wheel.name in line else line
+                for line in sums.read_text(encoding="ascii").splitlines()
+            ) + "\n",
+            encoding="ascii",
+        )
         self.assertEqual([], wr.verify(wheel, metadata_path, sums, "a" * 40))
         wheel.write_bytes(b"tampered")
         self.assertTrue(

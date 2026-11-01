@@ -75,7 +75,11 @@ def _sums(path: Path) -> tuple[dict[str, str], list[str]]:
         if not match:
             issues.append(f"非法 WHEEL-SHA256SUMS 行：{line!r}")
             continue
-        digest, name = match.groups()
+        digest, raw_name = match.groups()
+        name = raw_name[2:] if raw_name.startswith("./") else raw_name
+        if "/" in name or "\\" in name:
+            issues.append(f"WHEEL-SHA256SUMS 路径必须是无目录文件名：{raw_name}")
+            continue
         if name in values:
             issues.append(f"WHEEL-SHA256SUMS 重复路径：{name}")
         values[name] = digest
