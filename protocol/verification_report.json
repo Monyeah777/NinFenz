@@ -368,7 +368,7 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 331,
+        "baseline": 333,
         "files": 333,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c8207a9113d14a11a34020311d14fb37d3010f387f7ddf218b93daa6390baf96",
+  "root_digest": "2d77437684c42b3dc6a79300d7ea7d758599ccea871d82c9bf7f0ab1d04f980d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

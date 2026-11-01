@@ -1205,6 +1205,11 @@
       "max_fn_cc": 4,
       "max_fn_lines": 8
     },
+    "desktop/src/core/slsa_source_policy.py": {
+      "lines": 295,
+      "max_fn_cc": 14,
+      "max_fn_lines": 28
+    },
     "desktop/src/core/st_quality.py": {
       "lines": 111,
       "max_fn_cc": 32,
@@ -1589,6 +1594,11 @@
       "lines": 82,
       "max_fn_cc": 15,
       "max_fn_lines": 35
+    },
+    "scripts/slsa_source_readiness.py": {
+      "lines": 112,
+      "max_fn_cc": 7,
+      "max_fn_lines": 30
     },
     "scripts/standards_map.py": {
       "lines": 197,
