@@ -14,7 +14,7 @@ PACKAGE = "ninfenz-pyengine"
 SUM_RE = re.compile(r"^([0-9a-f]{64})  ([^\r\n]+)$")
 WHEEL_RE = re.compile(
     r"^ninfenz_pyengine-(?P<version>[^-]+)-cp311-cp311-"
-    r"manylinux_2_17_(?P<arch>x86_64|aarch64)\.whl$"
+    r"manylinux_2_28_(?P<arch>x86_64|aarch64)\.whl$"
 )
 
 
@@ -23,7 +23,7 @@ def _version(wheel: Path) -> str:
     if not match:
         raise ValueError(
             f"{wheel.name}: 非法 PyO3 wheel 文件名"
-            "（修复指引：使用 CPython 3.11 manylinux_2_17 wheel）"
+            "（修复指引：使用 CPython 3.11 manylinux_2_28 wheel）"
         )
     return match.group("version")
 

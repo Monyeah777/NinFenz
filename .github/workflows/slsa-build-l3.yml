@@ -79,26 +79,35 @@ jobs:
           set -euo pipefail
           export CARGO_HOME="$RUNNER_TEMP/cargo-home"
           export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
-          A=$(mktemp -d "$RUNNER_TEMP/wheel-a.XXXXXX")
-          B=$(mktemp -d "$RUNNER_TEMP/wheel-b.XXXXXX")
-          for OUT in "$A" "$B"; do
-            maturin build --release --locked \
-              --manifest-path engine/rust/pyo3/Cargo.toml \
-              --out "$OUT" --compatibility manylinux_2_17
-          done
-          WHEEL_A=$(find "$A" -maxdepth 1 -name '*.whl' -print -quit)
-          WHEEL_B=$(find "$B" -maxdepth 1 -name '*.whl' -print -quit)
-          test -n "$WHEEL_A"
-          test -n "$WHEEL_B"
-          cmp "$WHEEL_A" "$WHEEL_B"
-          cp "$WHEEL_A" .artifacts/release/
-      - name: wheel 安装与 ABI 冒烟
-        run: |
-          set -euo pipefail
-          python -m venv .artifacts/wheel-smoke
-          .artifacts/wheel-smoke/bin/python -m pip install --no-cache-dir \
-            --force-reinstall --no-deps .artifacts/release/*.whl
-          .artifacts/wheel-smoke/bin/python - <<'PYEOF'
+          IMAGE='quay.io/pypa/manylinux_2_28_x86_64@sha256:7e41b1c7fd64dfc69703a1124b43c404382973ee06ec5d764b85c34d2221fded'
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -v "$CARGO_HOME:/cargo" \
+            -w /work \
+            -e CARGO_HOME=/cargo \
+            -e SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" \
+            "$IMAGE" /bin/bash -lc '
+              set -euo pipefail
+              export PATH=/opt/python/cp311-cp311/bin:/cargo/bin:$PATH
+              curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs |
+                sh -s -- -y --profile minimal --no-modify-path --default-toolchain 1.99.1
+              python -m pip install --disable-pip-version-check --no-cache-dir maturin==1.16.0
+              A=$(mktemp -d /tmp/wheel-a.XXXXXX)
+              B=$(mktemp -d /tmp/wheel-b.XXXXXX)
+              for OUT in "$A" "$B"; do
+                maturin build --release --locked \
+                  --manifest-path engine/rust/pyo3/Cargo.toml \
+                  --out "$OUT" --compatibility manylinux_2_28
+              done
+              WHEEL_A=$(find "$A" -maxdepth 1 -name "*.whl" -print -quit)
+              WHEEL_B=$(find "$B" -maxdepth 1 -name "*.whl" -print -quit)
+              test -n "$WHEEL_A"
+              test -n "$WHEEL_B"
+              cmp "$WHEEL_A" "$WHEEL_B"
+              python -m venv /tmp/wheel-smoke
+              /tmp/wheel-smoke/bin/python -m pip install --no-cache-dir \
+                --force-reinstall --no-deps "$WHEEL_A"
+              /tmp/wheel-smoke/bin/python - <<"PYEOF"
           import hashlib
           import nf_pyengine
           assert nf_pyengine.ABI_VERSION == 1
@@ -106,6 +115,8 @@ jobs:
           assert nf_pyengine.reverse_bytes(b"abc") == b"cba"
           assert nf_pyengine.float_repr(0.1) == repr(0.1)
           PYEOF
+              cp "$WHEEL_A" .artifacts/release/
+            '
       - name: wheel metadata 与独立摘要
         run: |
           set -euo pipefail

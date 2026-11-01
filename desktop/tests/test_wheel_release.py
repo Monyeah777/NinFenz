@@ -23,7 +23,7 @@ class WheelMetadataTest(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
-        wheel = root / "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_17_x86_64.whl"
+        wheel = root / "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_28_x86_64.whl"
         wheel.write_bytes(b"deterministic-wheel")
         return tmp, root, wheel
 
@@ -98,7 +98,8 @@ class WheelWorkflowTest(unittest.TestCase):
         for needle in (
             "rustup toolchain install 1.99.1",
             "maturin==1.16.0",
-            "--compatibility manylinux_2_17",
+            "quay.io/pypa/manylinux_2_28_x86_64@sha256:",
+            "--compatibility manylinux_2_28",
             'cmp "$WHEEL_A" "$WHEEL_B"',
             "WHEEL-SHA256SUMS",
             "wheel-metadata.json",

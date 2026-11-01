@@ -30,7 +30,8 @@ python scripts/validate_sboms.py packaging/npm/dist/release
 构建器对同一源树连续构建两次，tarball 或 wheel 字节不同即失败。tar 成员顺序、权限、uid/gid、mtime、
 gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源提交时间或显式
 `SOURCE_DATE_EPOCH`，不读取墙钟。wheel 另以 Rust 1.99.1、Maturin 1.16.0 和 CPython 3.11
-固定构建，安装到新 venv 后验证 `ABI_VERSION`、SHA-256、反序字节和浮点 repr。
+固定构建，并在按 digest 固定的 manylinux_2_28 容器内安装到新 venv，再验证
+`ABI_VERSION`、SHA-256、反序字节和浮点 repr。
 
 ## SLSA v1.2 Build L3、provenance 与 VSA
 
