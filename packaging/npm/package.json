@@ -22,7 +22,7 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "engines": {
-    "node": ">=18.17"
+    "node": "22.x || 24.x"
   },
   "bin": {
     "nf": "bin/nf.mjs",

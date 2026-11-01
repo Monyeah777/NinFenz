@@ -305,16 +305,12 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
         osps_issues, osps_stats = _matrix_issues(
             ROOT / "packaging" / "supply-chain" / "osps-l1-l2.json",
             "nf-osps-evidence/1",
-            EXPECTED_OSPS,
-            OSPS_STATUSES,
-            "id",
+            EXPECTED_OSPS, OSPS_STATUSES, "id",
         )
         osps_l3_issues, osps_l3_stats = _matrix_issues(
             ROOT / "packaging" / "supply-chain" / "osps-l3.json",
             "nf-osps-evidence/1",
-            EXPECTED_OSPS_L3,
-            OSPS_STATUSES,
-            "id",
+            EXPECTED_OSPS_L3, OSPS_STATUSES, "id",
         )
         s2_issues, s2_stats = _matrix_issues(
             ROOT / "packaging" / "supply-chain" / "s2c2f-l1-l2.json",
@@ -328,11 +324,12 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
         threat_issues, threat_stats = _threat_issues()
         vex_issues, vex_stats = _vex_issues()
         readiness_issues, readiness_stats = _readiness_issues()
+        eol_issues, eol_warns, eol_stats = _load_script("eol_policy").scan(ROOT)
     finally:
         ROOT = old_root
     issues = (
         osps_issues + osps_l3_issues + s2_issues + source_issues + supplier_issues
-        + threat_issues + vex_issues + readiness_issues
+        + threat_issues + vex_issues + readiness_issues + eol_issues
     )
     combined_counts = dict(osps_stats.get("status_counts") or {})
     for key, value in (osps_l3_stats.get("status_counts") or {}).items():
@@ -350,6 +347,7 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
         "threat_model": threat_stats,
         "vex": vex_stats,
         "slsa_l3": readiness_stats,
+        "eol": {**eol_stats, "warns": eol_warns},
     }
 
 

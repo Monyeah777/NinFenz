@@ -40,10 +40,14 @@
     {
       "id": "SCA-3",
       "level": "L2",
-      "status": "partial",
-      "verification": "Dependabot maintenance signals and release-age review reduce end-of-life exposure; no universal multi-ecosystem EOL database is authoritative.",
-      "gap": "EOL status requires reviewer judgment at dependency-update time.",
-      "evidence": [".github/dependabot.yml", "docs/supply-chain-security.md"]
+      "status": "enforced",
+      "verification": "A versioned support matrix records EOL dates for every declared Python, Node, and container runtime; CI discovers version declarations across manifests, Dockerfiles, and workflows and fails closed on unknown or expired versions.",
+      "evidence": [
+        "packaging/supply-chain/eol-support.json",
+        "scripts/eol_policy.py",
+        "desktop/tests/test_eol_policy.py",
+        "docs/supply-chain-security.md"
+      ]
     },
     {
       "id": "INV-1",

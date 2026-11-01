@@ -1,0 +1,59 @@
+{
+  "schema": "nf-eol-support/1",
+  "reviewed_at": "2026-11-02",
+  "max_review_age_days": 90,
+  "warn_before_eol_days": 90,
+  "policy": {
+    "scope": "Toolchains and runtime images declared by this repository's release and CI manifests.",
+    "unknown_version": "fail",
+    "expired_version": "fail"
+  },
+  "runtimes": [
+    {
+      "id": "python-3.11",
+      "ecosystem": "python",
+      "version": "3.11",
+      "support": "security",
+      "eol": "2027-10-31",
+      "source": "https://devguide.python.org/versions/"
+    },
+    {
+      "id": "python-3.12",
+      "ecosystem": "python",
+      "version": "3.12",
+      "support": "security",
+      "eol": "2028-10-31",
+      "source": "https://devguide.python.org/versions/"
+    },
+    {
+      "id": "node-22",
+      "ecosystem": "node",
+      "version": "22",
+      "support": "lts",
+      "eol": "2027-04-30",
+      "source": "https://github.com/nodejs/release"
+    },
+    {
+      "id": "node-24",
+      "ecosystem": "node",
+      "version": "24",
+      "support": "lts",
+      "eol": "2028-04-30",
+      "source": "https://github.com/nodejs/release"
+    }
+  ],
+  "declarations": {
+    "python_requires": [
+      "pyproject.toml",
+      "engine/rust/pyo3/pyproject.toml"
+    ],
+    "node_engines": "packaging/npm/package.json",
+    "dockerfiles": [
+      "Dockerfile",
+      "Dockerfile.crosscheck",
+      "packaging/hf-space/Dockerfile",
+      "packaging/nfal/Dockerfile"
+    ],
+    "workflows": ".github/workflows/*.yml"
+  }
+}
