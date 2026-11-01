@@ -89,6 +89,20 @@ def _norm(result: Any, form: str) -> Tuple[List[str], List[str], Dict[str, Any]]
     return list(result or []), [], {}
 
 
+def _stable_stats(sid: str, stats: Dict[str, Any]) -> Dict[str, Any]:
+    """Keep post-build evidence coordinates out of the packaged report digest.
+
+    SLSA evidence records the run that consumed this report. Including that run id here
+    makes every successful build invalidate the source it just built. The run remains
+    machine-readable in ``results/supply-chain/slsa-l3-attestation-run.json``.
+    """
+    clean = dict(stats)
+    if sid == "slsa":
+        clean.pop("last_run_id", None)
+        clean["run_evidence"] = "results/supply-chain/slsa-l3-attestation-run.json"
+    return clean
+
+
 def _call(spec: Tuple[str, str, str, str, str], root: str
           ) -> Tuple[str, List[str], List[str], Dict[str, Any]]:
     """调一条判据 → (status, issues, warns, stats)；异常记账为 error（报告不吞错也不崩）。"""
@@ -111,6 +125,7 @@ def _call(spec: Tuple[str, str, str, str, str], root: str
         return "error", ["%s.%s 抛 %s：%s（修复指引：先修该判据，报告须能出得来）"
                          % (mod, entry, type(exc).__name__, str(exc)[:120])], [], {}
     issues, warns, stats = _norm(result, form)
+    stats = _stable_stats(sid, stats)
     status = "fail" if issues else ("warn" if warns else "pass")
     return status, issues, warns, stats
 

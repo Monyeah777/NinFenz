@@ -506,7 +506,7 @@
       "source": "slsa_policy.scan",
       "stats": {
         "claimed_level": "SLSA_BUILD_LEVEL_3",
-        "last_run_id": 41312133811,
+        "run_evidence": "results/supply-chain/slsa-l3-attestation-run.json",
         "statuses": {
           "satisfied": 6
         }
@@ -688,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "ba8d5d5ce119769e531fdbd29372b812102e601c5e903716088fea525a1d4cb9",
+  "root_digest": "629d89182c2f433ff5e12a3e5f277aa0d8db8ec6a7d667a66d0253279547e65a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

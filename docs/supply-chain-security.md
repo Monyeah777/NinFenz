@@ -50,11 +50,11 @@ attestation 的某次工件成立；PR dry-run 不产生发布 provenance。Buil
 断网构建，要求的是可信构建控制面、隔离/临时环境、不可伪造 provenance 与无缓存投毒影响。
 VSA verifier 是本项目自己的 workflow，不是独立第三方 verifier。
 
-最近一次不发布的 L3 验收运行是
-[`41309669898`](https://github.com/Monyeah777/NinFenz/actions/runs/41309669898)：reusable
-builder 成功生成 provenance，验证作业按 `slsa-build-l3.yml` signer 完成回验，并签发/回验
-`verifiedLevels=["SLSA_BUILD_LEVEL_3"]` 的 VSA。机读记录在
-`results/supply-chain/slsa-l3-attestation-run.json`。
+最近一次不发布的 L3 验收运行由
+[`slsa-l3-attestation-run.json`](https://github.com/Monyeah777/NinFenz/blob/main/results/supply-chain/slsa-l3-attestation-run.json)
+逐项记录：reusable builder 成功生成 provenance，验证作业按 `slsa-build-l3.yml` signer
+完成回验，并签发/回验 `verifiedLevels=["SLSA_BUILD_LEVEL_3"]` 的 VSA。该记录同时绑定
+npm 主链与 Release evidence 两条独立运行、工作流摘要和发布 subject。
 
 ## 消费者验证
 
