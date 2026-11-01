@@ -1,7 +1,7 @@
 {
-  "approved_at": "2026-11-01",
+  "approved_at": "2026-11-02",
   "approved_by": "Monyeah777",
-  "note": "SLSA v1.2 Build L3 successful attestation run evidence",
+  "note": "S2C2F SCA-3 runtime EOL policy",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "956ae915747a6e296d9aa7b94be929961398fa0a7596f19833d2cb6d901d9f17"

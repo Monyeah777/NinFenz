@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1049,
     "projection": 134,
-    "support": 304,
-    "verify": 1142
+    "support": 305,
+    "verify": 1144
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7829,6 +7829,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "S2C2F SCA-3 runtime end-of-life policy regression tests.",
+      "path": "desktop/tests/test_eol_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_error_codes.py",
       "role": "verify",
@@ -13121,6 +13127,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Validate support windows for declared Python, Node, and container runtimes.",
+      "path": "scripts/eol_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "SAST 基线闸门（安全/供应链面 · ISO 25010 安全性）：bandit + ruff-S 的**只增不减**计数棘轮。",
       "path": "scripts/sast_check.py",
       "role": "verify",
@@ -13188,7 +13200,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "19fe24b17109926f3d0cb14278d9a4feb3a285b61cc1c227b5ed3496f3511a59",
+  "root_digest": "07bc772bed9164e5449611097a853acd3908b650b4ebab761a28438b16ee50fe",
   "rule_counts": {
     "R-app": 1448,
     "R-catch": 134,
@@ -13196,8 +13208,8 @@
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 119,
-    "R-support": 144,
-    "R-verify": 1020,
+    "R-support": 145,
+    "R-verify": 1022,
     "auto:R-core": 268
   },
   "schema": "nf-role-coordinates/1"

@@ -366,8 +366,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 330,
-        "files": 341,
+        "baseline": 342,
+        "files": 342,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -384,8 +384,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 236,
-        "probed": 236
+        "patterns": 242,
+        "probed": 242
       },
       "status": "pass",
       "warns": 0
@@ -427,9 +427,9 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 1,
-        "metrics_missing": 1,
-        "metrics_recorded": 269,
+        "metrics_drift": 0,
+        "metrics_missing": 0,
+        "metrics_recorded": 270,
         "modules": 270,
         "registered_cycles": 0,
         "registered_sdp": 11,
@@ -676,8 +676,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4110,
-        "kernel": 2196,
+        "files": 4113,
+        "kernel": 2198,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -688,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "2716988b89b46ad3145b4e7e6ba3c9b6029cbe942c6bfedb6fcef34b642290b9",
+  "root_digest": "773e56b8fcd2e7a5d864eac689cd91437f0d32b81d481f97f063080a0fddecad",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
