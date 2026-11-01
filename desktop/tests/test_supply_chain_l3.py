@@ -2,6 +2,7 @@
 """OSPS L3 evidence and fail-closed VEX/readiness negative tests."""
 import importlib.util
 import json
+import os
 import shutil
 import tempfile
 import unittest
@@ -188,6 +189,26 @@ class ReadinessTest(unittest.TestCase):
         path.write_text(path.read_text(encoding="utf-8") + "\n# drift\n", encoding="utf-8")
         issues, _ = READINESS.scan(root)
         self.assertTrue(any("验收运行后变更" in issue for issue in issues), issues)
+
+    def test_pending_run_mode_only_relaxes_workflow_hash_staleness(self):
+        root = self._root_copy()
+        path = root / READINESS.WORKFLOW_REL
+        path.write_text(path.read_text(encoding="utf-8") + "\n# pending\n", encoding="utf-8")
+        evidence = root / READINESS.RUN_EVIDENCE_REL
+        doc = json.loads(evidence.read_text(encoding="utf-8"))
+        doc["provenance_verified"] = False
+        evidence.write_text(json.dumps(doc), encoding="utf-8")
+        old = os.environ.get(READINESS.PENDING_RUN_ENV)
+        os.environ[READINESS.PENDING_RUN_ENV] = "1"
+        try:
+            issues, _ = READINESS.scan(root)
+        finally:
+            if old is None:
+                os.environ.pop(READINESS.PENDING_RUN_ENV, None)
+            else:
+                os.environ[READINESS.PENDING_RUN_ENV] = old
+        self.assertFalse(any("验收运行后变更" in issue for issue in issues), issues)
+        self.assertTrue(any("provenance_verified" in issue for issue in issues), issues)
 
     def test_deprecated_generator_cannot_return(self):
         root = self._root_copy()

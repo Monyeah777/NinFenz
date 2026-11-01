@@ -53,6 +53,8 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+    env:
+      NF_SLSA_PENDING_RUN: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:

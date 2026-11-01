@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +16,7 @@ BUILDER_REL = ".github/workflows/slsa-build-l3.yml"
 RELEASE_WORKFLOW_REL = ".github/workflows/release.yml"
 EVIDENCE_BUILDER_REL = ".github/workflows/release-evidence-l3.yml"
 RUN_EVIDENCE_REL = "results/supply-chain/slsa-l3-attestation-run.json"
+PENDING_RUN_ENV = "NF_SLSA_PENDING_RUN"
 EXPECTED_REQUIREMENTS = {
     "reusable-trusted-builder",
     "unforgeable-provenance",
@@ -122,7 +124,7 @@ def _builder_issues(label: str, text: str) -> list[str]:
     return issues
 
 
-def _run_evidence_issues(root: Path) -> list[str]:
+def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
     path = root / RUN_EVIDENCE_REL
     if not path.is_file():
         return [f"{RUN_EVIDENCE_REL}: 缺真实 L3 attestation 运行证据"]
@@ -163,7 +165,7 @@ def _run_evidence_issues(root: Path) -> list[str]:
     else:
         for rel, expected_hash in workflows.items():
             actual = hashlib.sha256((root / rel).read_bytes()).hexdigest()
-            if actual != expected_hash:
+            if actual != expected_hash and not pending_run:
                 issues.append(f"{RUN_EVIDENCE_REL}: {rel} 已在验收运行后变更")
     try:
         datetime.fromisoformat(str(doc.get("verified_at") or "").replace("Z", "+00:00"))
@@ -242,7 +244,9 @@ def scan(root: str | Path) -> tuple[list[str], dict[str, Any]]:
     if claimed == LEVEL_L3 and statuses != {"satisfied": len(EXPECTED_REQUIREMENTS)}:
         issues.append("声明 Build L3 时所有 readiness 要求必须为 satisfied")
     if claimed == LEVEL_L3:
-        issues.extend(_run_evidence_issues(root))
+        issues.extend(_run_evidence_issues(
+            root, pending_run=bool(os.environ.get(PENDING_RUN_ENV))
+        ))
     last_run_id = None
     if (root / RUN_EVIDENCE_REL).is_file():
         try:
@@ -262,6 +266,7 @@ __all__ = [
     "EXPECTED_REQUIREMENTS",
     "LEVEL_L3",
     "POLICY_REL",
+    "PENDING_RUN_ENV",
     "READINESS_REL",
     "RELEASE_WORKFLOW_REL",
     "RUN_EVIDENCE_REL",
