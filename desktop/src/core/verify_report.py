@@ -89,7 +89,7 @@ def _norm(result: Any, form: str) -> Tuple[List[str], List[str], Dict[str, Any]]
     return list(result or []), [], {}
 
 
-def _stable_stats(sid: str, stats: Dict[str, Any]) -> Dict[str, Any]:
+def _stable_stats(sid: str, stats: dict[str, Any]) -> dict[str, Any]:
     """Keep post-build evidence coordinates out of the packaged report digest.
 
     SLSA evidence records the run that consumed this report. Including that run id here
