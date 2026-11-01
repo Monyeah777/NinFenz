@@ -107,14 +107,14 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreifs4cqrc4gbggzuptqpl4elskjmoxmxdub3qtj2cymelhnlbfd6ea",
+      "cid": "bafyreif7xbare7qo5c2ow24hkr233pawu6yoxmb627oaw7e5xw3zchfv2m",
       "path": "protocol/role_coordinates.json",
-      "sha256": "b2e0a11170c131b347ce0f5f08b9292c75d971d03b84d3a1618459dab0947e20"
+      "sha256": "bfb841127e0ee8b4eb6b875475bdbc16a7b0ebb03ed7dc0b7c9dbdb7911cb5d3"
     },
     {
-      "cid": "bafyreid7ldsmffax72hf2qabzrkkxi7mdv5kdttxiqyjo23itsinebjkfi",
+      "cid": "bafyreibaagdvm6d42azuel5tzrzgbjckw56cgwf3qojv7me4un4cevw7am",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a"
+      "sha256": "20018756787cd033422fb3cc7260a44ab77c2358bb83935fb09ca3782256df03"
     },
     {
       "cid": "bafyreihbxmqas6olhdaiafneemdnbwqoitrrjzmrjewfostholyrpmkrua",
@@ -127,9 +127,9 @@
       "sha256": "485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e"
     },
     {
-      "cid": "bafyreietkvroopr4izpydvc7drs2jjcgsgnfn3smemes6ybxkhtzd7rm2m",
+      "cid": "bafyreibbbtwvdqaaepc3jtk3jkaqtgovzqd63wxxoaezvi6yci7vibdagi",
       "path": "protocol/instruction_evidence.json",
-      "sha256": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3"
+      "sha256": "210ced51c00023c5b4cd5b4a810999d5cc07eddaf770099aa3d8123f54046032"
     },
     {
       "cid": "bafyreif5ichk2rgzps3becumaid42hfx2urhff7rpviba6jty7id2rogvi",
@@ -142,9 +142,9 @@
       "sha256": "a21468bb3df2d1565b6fbbb36ad7093d7020dde37cfe5fe1de5218378119029e"
     },
     {
-      "cid": "bafyreieys47hxzbsfvbyxx4s4enqtvti5xlykmuu2oaektoigahgnlegmq",
+      "cid": "bafyreicgpswqqzorqhf2l5fbtwcl2jajksaxhyxflqfzwkbv5gwdvhpnvu",
       "path": "protocol/sast_baseline.json",
-      "sha256": "98973e7be4322d438bdf92e11b09d668edd7853294d380454dc8300e66ac8664"
+      "sha256": "467cad0865d181cba5f4a19d84bd2409548173e2e55c0b9b2835e9ac3a9dedad"
     },
     {
       "cid": "bafyreiaannlhjc3nvlzedg7ebjssi7mq57lcshuhztlbyzjh5uksnnvu4q",

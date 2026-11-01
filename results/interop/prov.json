@@ -171,7 +171,7 @@
     {
       "@id": "nf:file/protocol/code_metrics_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a"
+      "nf:sha256": "20018756787cd033422fb3cc7260a44ab77c2358bb83935fb09ca3782256df03"
     },
     {
       "@id": "nf:file/protocol/community_asset_ledger.json",
@@ -246,7 +246,7 @@
     {
       "@id": "nf:file/protocol/instruction_evidence.json",
       "@type": "prov:Entity",
-      "nf:sha256": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3"
+      "nf:sha256": "210ced51c00023c5b4cd5b4a810999d5cc07eddaf770099aa3d8123f54046032"
     },
     {
       "@id": "nf:file/protocol/knowledge_sources.json",
@@ -311,12 +311,12 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "b2e0a11170c131b347ce0f5f08b9292c75d971d03b84d3a1618459dab0947e20"
+      "nf:sha256": "bfb841127e0ee8b4eb6b875475bdbc16a7b0ebb03ed7dc0b7c9dbdb7911cb5d3"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "98973e7be4322d438bdf92e11b09d668edd7853294d380454dc8300e66ac8664"
+      "nf:sha256": "467cad0865d181cba5f4a19d84bd2409548173e2e55c0b9b2835e9ac3a9dedad"
     },
     {
       "@id": "nf:file/protocol/schema/asset.schema.json",

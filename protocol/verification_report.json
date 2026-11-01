@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 99,
+        "raises": 100,
         "sinks": 22
       },
       "status": "pass",
@@ -617,7 +617,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4098,
+        "files": 4099,
         "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
@@ -629,7 +629,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "29ee12f5b9ddaef664d297b35c88b696e4c4961deea3382c1c97add84c0184e8",
+  "root_digest": "2785480e7320604876f5ff428877e3d0fca1ad9bfc36a2263a0e0335d04b0512",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

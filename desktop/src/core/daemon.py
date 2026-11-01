@@ -266,7 +266,11 @@ def _decode_frame(raw: bytes, what: str) -> str:
 
 
 def _validated_cwd(root: Path, cwd: str | None) -> str | None:
-    """规范化客户端 cwd；空值表示使用守护自身 cwd。"""
+    """规范化客户端 cwd；空值表示使用守护自身 cwd。
+
+    `cwd` 会进入进程级 `os.chdir`，因此必须先按 realpath 消除 `..` 与 symlink，
+    再要求它位于守护 root 内；否则持有令牌的客户端可把命令执行面扩展到仓外。
+    """
     if cwd is None:
         return None
     if not isinstance(cwd, str) or not cwd:
@@ -285,6 +289,15 @@ def _validated_cwd(root: Path, cwd: str | None) -> str | None:
     safe = os.path.realpath(cwd)
     if not os.path.isdir(safe):
         raise ValueError(f"cwd 不是现存目录：{safe}（修复指引：传仓库根的绝对路径，或省略 cwd）")
+    root_safe = os.path.realpath(os.fspath(root))
+    try:
+        inside_root = os.path.commonpath((root_safe, safe)) == root_safe
+    except ValueError:
+        inside_root = False
+    if not inside_root:
+        raise ValueError(
+            f"cwd 越出守护根：{safe}（修复指引：cwd 必须是 {root_safe} 内目录，或省略 cwd）"
+        )
     return safe
 
 
