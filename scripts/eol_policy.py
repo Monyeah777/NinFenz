@@ -35,7 +35,7 @@ def _json(path: Path) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        raise ValueError(f"{path}: 不可读 JSON：{exc}") from exc
+        raise ValueError(f"{path}: 不可读 JSON：{exc}（修复指引：恢复有效 UTF-8 JSON）") from exc
     if not isinstance(value, dict):
         raise ValueError(f"{path}: 顶层必须是对象")
     return value
