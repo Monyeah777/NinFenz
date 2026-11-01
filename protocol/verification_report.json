@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 99,
+        "raises": 100,
         "sinks": 22
       },
       "status": "pass",
@@ -409,16 +409,20 @@
     },
     {
       "id": "instruction_evidence",
-      "issues": 0,
+      "issues": 5,
       "name": "规范入口指令实测记录（新鲜 + 退出码 0）",
-      "sample": [],
+      "sample": [
+        "指令 report 的实测记录已过期（8 天 > 上限 7 天）（修复指引：python scripts/instruction_evidence.py --record --only report）",
+        "指令 code_metrics 的实测记录已过期（8 天 > 上限 7 天）（修复指引：python scripts/instruction_evidence.py --record --only code_metrics）",
+        "指令 e2e 的实测记录已过期（8 天 > 上限 7 天）（修复指引：python scripts/instruction_evidence.py --record --only e2e）"
+      ],
       "source": "instruction_evidence.scan",
       "stats": {
         "declared": 7,
         "recorded": 7,
         "recorded_policy": 3
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -617,7 +621,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4098,
+        "files": 4099,
         "kernel": 2181,
         "kernel_no_self": 436,
         "rules": 9,
@@ -629,12 +633,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "29ee12f5b9ddaef664d297b35c88b696e4c4961deea3382c1c97add84c0184e8",
+  "root_digest": "1ce833ab335a6d92ec16c91a857f5020f2b4107a2d83b3ddcf80c943de3990e7",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 30,
+    "fail": 1,
+    "pass": 29,
     "warn": 2
   }
 }
