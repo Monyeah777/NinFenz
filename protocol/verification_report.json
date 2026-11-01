@@ -1,9 +1,9 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 33 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
+    "coverage_note": "判据级抽查面 34 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
     "expected_pass": 76,
-    "report_items": 33,
+    "report_items": 34,
     "verify_version": "v2.30"
   },
   "items": [
@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 103,
+        "raises": 104,
         "sinks": 21
       },
       "status": "pass",
@@ -367,7 +367,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 330,
-        "files": 338,
+        "files": 339,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -428,9 +428,9 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_missing": 1,
         "metrics_recorded": 268,
-        "modules": 268,
+        "modules": 269,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -475,10 +475,10 @@
       "sample": [],
       "source": "judgement_coverage.scan",
       "stats": {
-        "consumed": 69,
+        "consumed": 70,
         "exceptions": 2,
         "orphans": 2,
-        "scanners": 71
+        "scanners": 72
       },
       "status": "pass",
       "warns": 0
@@ -490,10 +490,25 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 101,
+        "pinned_uses": 102,
         "requirements_files": 5,
-        "with_explicit_permissions": 23,
-        "workflows": 23
+        "with_explicit_permissions": 25,
+        "workflows": 25
+      },
+      "status": "pass",
+      "warns": 0
+    },
+    {
+      "id": "slsa",
+      "issues": 0,
+      "name": "SLSA v1.2 Build L3 构建器、provenance 与消费者验签",
+      "sample": [],
+      "source": "slsa_policy.scan",
+      "stats": {
+        "claimed_level": "SLSA_BUILD_LEVEL_3",
+        "statuses": {
+          "satisfied": 6
+        }
       },
       "status": "pass",
       "warns": 0
@@ -672,12 +687,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "24118c9a6a3aa07871b0ee214edfd3bc158c3d1f689541ce85dc5b6eb5880aef",
+  "root_digest": "d874d470c06c5303b21a117407627734d7d780f1af36e5cfb3371e23665cc4c5",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 32,
+    "pass": 33,
     "warn": 1
   }
 }

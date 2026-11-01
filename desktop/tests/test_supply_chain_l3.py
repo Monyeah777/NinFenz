@@ -87,35 +87,93 @@ class ReadinessTest(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
-        for rel in (READINESS.READINESS_REL, READINESS.POLICY_REL, READINESS.WORKFLOW_REL):
+        readiness = json.loads(
+            (ROOT / READINESS.READINESS_REL).read_text(encoding="utf-8")
+        )
+        rels = {
+            READINESS.READINESS_REL,
+            READINESS.POLICY_REL,
+            READINESS.WORKFLOW_REL,
+            READINESS.BUILDER_REL,
+            READINESS.RELEASE_WORKFLOW_REL,
+            READINESS.EVIDENCE_BUILDER_REL,
+        }
+        for row in readiness["requirements"]:
+            rels.update(
+                rel for rel in row["evidence"] if not str(rel).startswith("external:")
+            )
+        for rel in rels:
             target = root / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / rel, target)
         return root
 
-    def test_current_tree_never_claims_build_l3(self):
+    def test_current_tree_claims_build_l3_consistently(self):
         issues, stats = READINESS.scan(ROOT)
         self.assertEqual([], issues)
-        self.assertEqual("SLSA_BUILD_LEVEL_2", stats["claimed_level"])
+        self.assertEqual("SLSA_BUILD_LEVEL_3", stats["claimed_level"])
+        self.assertEqual({"satisfied": 6}, stats["statuses"])
 
-    def test_policy_cannot_promote_shared_runner_to_l3(self):
-        root = self._root_copy()
-        path = root / READINESS.POLICY_REL
-        doc = json.loads(path.read_text(encoding="utf-8"))
-        doc["verified_levels"].append("SLSA_BUILD_LEVEL_3")
-        path.write_text(json.dumps(doc), encoding="utf-8")
-        issues, _ = READINESS.scan(root)
-        self.assertTrue(any("不得" in issue and "Build L3" in issue for issue in issues))
-
-    def test_trusted_builder_blocker_cannot_be_removed(self):
+    def test_every_readiness_requirement_must_be_satisfied(self):
         root = self._root_copy()
         path = root / READINESS.READINESS_REL
         doc = json.loads(path.read_text(encoding="utf-8"))
         next(item for item in doc["requirements"]
-             if item["id"] == "trusted-builder")["status"] = "satisfied"
+             if item["id"] == "build-isolation")["status"] = "partial"
+        path.write_text(json.dumps(doc), encoding="utf-8")
+        issues, stats = READINESS.scan(root)
+        self.assertEqual({"partial": 1, "satisfied": 5}, stats["statuses"])
+        self.assertTrue(any("必须为 satisfied" in issue for issue in issues), issues)
+
+    def test_policy_and_readiness_levels_must_agree(self):
+        root = self._root_copy()
+        path = root / READINESS.POLICY_REL
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["verified_levels"] = ["SLSA_BUILD_LEVEL_2"]
         path.write_text(json.dumps(doc), encoding="utf-8")
         issues, _ = READINESS.scan(root)
-        self.assertTrue(any("trusted L3 builder" in issue for issue in issues))
+        self.assertTrue(any("verified_levels" in issue for issue in issues), issues)
+
+    def test_caller_must_use_reusable_builder(self):
+        root = self._root_copy()
+        path = root / READINESS.WORKFLOW_REL
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "uses: ./.github/workflows/slsa-build-l3.yml",
+                "uses: actions/checkout@" + "0" * 40,
+            ),
+            encoding="utf-8",
+        )
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("reusable workflow" in issue for issue in issues), issues)
+
+    def test_release_caller_must_use_reusable_evidence_builder(self):
+        root = self._root_copy()
+        path = root / READINESS.RELEASE_WORKFLOW_REL
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "uses: ./.github/workflows/release-evidence-l3.yml",
+                "uses: actions/checkout@" + "0" * 40,
+            ),
+            encoding="utf-8",
+        )
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("release.yml" in issue and "reusable" in issue for issue in issues),
+                        issues)
+
+    def test_reusable_builder_requires_internal_provenance_and_no_cache(self):
+        root = self._root_copy()
+        path = root / READINESS.BUILDER_REL
+        text = path.read_text(encoding="utf-8")
+        text = text.replace("actions/attest-build-provenance@", "actions/checkout@")
+        text = text.replace(
+            "python-version: '3.11'",
+            "cache: pip\n          python-version: '3.11'",
+        )
+        path.write_text(text, encoding="utf-8")
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("内部生成 artifact provenance" in issue for issue in issues), issues)
+        self.assertTrue(any("持久缓存" in issue for issue in issues), issues)
 
     def test_deprecated_generator_cannot_return(self):
         root = self._root_copy()
@@ -125,7 +183,7 @@ class ReadinessTest(unittest.TestCase):
             encoding="utf-8",
         )
         issues, _ = READINESS.scan(root)
-        self.assertTrue(any("Node.js SLSA builder" in issue for issue in issues))
+        self.assertTrue(any("slsa-github-generator" in issue for issue in issues), issues)
 
 
 class VsaPredicateTest(unittest.TestCase):
@@ -135,19 +193,49 @@ class VsaPredicateTest(unittest.TestCase):
             .read_text(encoding="utf-8")
         )
         doc = VSA.predicate(policy, "a" * 64, "b" * 40, "123", "2026-10-27T00:00:00Z")
-        self.assertEqual(["SLSA_BUILD_LEVEL_2"], doc["verifiedLevels"])
+        self.assertEqual(["SLSA_BUILD_LEVEL_3"], doc["verifiedLevels"])
         self.assertEqual("PASSED", doc["verificationResult"])
         self.assertEqual({"sha256": "a" * 64}, doc["policy"]["digest"])
 
-    def test_l3_policy_is_rejected(self):
+    def test_l3_policy_is_rejected_when_readiness_is_incomplete(self):
+        readiness = {
+            "schema": "nf-slsa-l3-readiness/2",
+            "standard": "SLSA v1.2 Build L3",
+            "claimed_level": "SLSA_BUILD_LEVEL_3",
+            "requirements": [
+                {"id": ident, "status": "satisfied", "reason": "ok", "evidence": ["x"]}
+                for ident in sorted(READINESS.EXPECTED_REQUIREMENTS)
+            ],
+        }
+        readiness["requirements"][0]["status"] = "blocked"
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        for rel, value in (
+            (READINESS.READINESS_REL, readiness),
+            (READINESS.POLICY_REL, json.loads(
+                (ROOT / READINESS.POLICY_REL).read_text(encoding="utf-8"))),
+        ):
+            target = root / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps(value), encoding="utf-8")
+        for rel in (
+            READINESS.WORKFLOW_REL,
+            READINESS.BUILDER_REL,
+            READINESS.RELEASE_WORKFLOW_REL,
+            READINESS.EVIDENCE_BUILDER_REL,
+        ):
+            target = root / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / rel, target)
+        (root / "x").write_text("", encoding="utf-8")
         policy = json.loads(
             (ROOT / "packaging/supply-chain/verification-policy.json")
             .read_text(encoding="utf-8")
         )
-        policy["verified_levels"].append("SLSA_BUILD_LEVEL_3")
-        with self.assertRaisesRegex(ValueError, "禁止签发 Build L3"):
+        with self.assertRaisesRegex(ValueError, "readiness 未通过"):
             VSA.predicate(
-                policy, "a" * 64, "b" * 40, "123", "2026-10-27T00:00:00Z"
+                policy, "a" * 64, "b" * 40, "123", "2026-10-27T00:00:00Z", root
             )
 
 

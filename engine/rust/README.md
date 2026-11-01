@@ -152,7 +152,7 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 | `conformance` 封缄内核 + 差分核对 | **逐字节一致**；27 条契约 digest 独立复核 27/27 |
 | `conformance` 契约 | **27/27 全部**逐字节一致（含 `purity-clean`——随内置解析器一并移植） |
 | `score` 内核 | **逐字节一致**（含 compare 与退出码）；**5/6** 信号源自算 |
-| `verify_report` 内核 | **逐字节一致**（含 `root_digest`）；**26/33** 判据自算 |
+| `verify_report` 内核 | **逐字节一致**（含 `root_digest`）；**26/34** 判据自算 |
 
 ### 没做的那部分，每条都有实证
 
@@ -312,9 +312,9 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 
 ### 剩余面的边界理由（**逐条实证**，非断言）
 
-`nf verify-report` 有 33 条判据。本线自算 26 条，以下 7 条由 Python 真源喂入：
+`nf verify-report` 有 34 条判据。本线自算 26 条，以下 8 条由 Python 真源喂入：
 
-`redos` / `instruction_evidence` / `perf_budget` / `asvs` / `ssdf` /
+`redos` / `instruction_evidence` / `perf_budget` / `asvs` / `ssdf` / `slsa` /
 `asset_contract` / `role_coordinates`。
 
 这些边界不是“以后再说”的占位：日期类判据保留本地日历语义；`asset_contract`
@@ -405,16 +405,16 @@ python desktop/tests/test_rust_fastlane.py                           # 同行独
 两侧都已改正；改完后门禁从「32 PASS + 1 FAIL」变成「33 PASS + 0 FAIL」，且 false 侧现在真的受核。
 ### `verify_report` 内核（门禁的机器可读出口）
 
-真源把 **33 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
+真源把 **34 条判据**（各自调一个 core 扫描器）聚合成 `protocol/verification_report.json`：
 逐条归一到 `(issues, warns, stats)` → 定 status → 汇总 counts + 声明面 → 主体规范化 sha256 作
 `root_digest` → 按 `indent=2, sort_keys=True` 渲染。本线已实现该内核，**逐字节一致含 `root_digest`**。
 
-**已自主算出 26/33 条**：`schema` / `doc_markers` / `baseline` / `self_stats` / `payload` /
+**已自主算出 26/34 条**：`schema` / `doc_markers` / `baseline` / `self_stats` / `payload` /
 `assets_ledger` / `instruction` / `key_naming` / `intake` / `library` / `library_projection` / `rating` /
 `rating_decided` / `audit` / `workflow_policy` / `judgement_coverage` / `license` / `coupling` /
 `contract` / `knowledge` / `conformance` / `conformance_report` / `receipts` / `drill_fidelity` /
 `purity` / `code_metrics`。
-其余 7 条由 `--results` 喂入各自的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一增量法：
+其余 8 条由 `--results` 喂入各自的 `(issues, warns, stats)`——与 `score` 的 `--signals` 同一增量法：
 **每移植一个扫描器，喂入面就小一格，内核不动。**
 
 `conformance_scan` 一次解锁**两处**：`verify_report` 的 `conformance` 判据 **与** `score` 的
@@ -668,7 +668,7 @@ double 上（如精确值 `153838026194641.125`）。CPython 取**正确舍入�
 - **覆盖到什么程度**（2026-10-04 现值）：`receipts` / `stats` / `layers --verify` 三面完整；
   `conformance` = 封缄内核 + **27/27 契约**；
   `score` 内核完整、**5/6 信号源自算**（余 `purity_clean`·AST 与 `depth_clean`·13 子扫描器）；
-  `verify_report` 内核完整、**26/33 判据自算**（余 7 条：本地日历日期 2 条、Python 证据策略 2 条、
+  `verify_report` 内核完整、**26/34 判据自算**（余 8 条：本地日历日期 2 条、Python 证据策略 3 条、
   控制流分析 1 条、正则/职能边界 2 条）；
   `receipts` 的 library scope **已做**（`verify_report` 的 `receipts` 判据）。
 - **写面一律不实现**：`receipts --write`、`stats --write`、`layers --write`（刷新生成区）、以及 `conformance --write`。

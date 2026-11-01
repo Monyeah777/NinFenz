@@ -124,9 +124,9 @@ Critical 漏洞停止发布；High 阻断合并与 tag，除非有可达性证�
 维护窗口。依赖源、供应商、许可证、VEX 和 SBOM 分别由供应链清单校验。
 
 发布构建连续构建两次并逐字节比较，产出 CycloneDX 1.6、SPDX 3.0.1、OpenVEX、checksums
-和 release metadata。GitHub OIDC 生成 build provenance 与 VSA。当前声明仅限
-`SLSA_BUILD_LEVEL_2`；共享 GitHub runner 仍是 L3 readiness 的 trusted-builder blocker，
-不得因签名存在而虚标 Build L3。
+和 release metadata。全部构建步骤在 reusable workflow 内执行，GitHub OIDC 从平台控制面生成
+Build L3 provenance，再由独立 verify 作业生成 VSA。Build L3 不要求断网构建；关键控制是
+reusable-workflow 信任边界、临时 hosted runner、无持久缓存和不可伪造 provenance。
 
 ## 判据
 

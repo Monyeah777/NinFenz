@@ -104,7 +104,7 @@ class ReleaseArtifactTest(unittest.TestCase):
             self.assertNotEqual(0, proc.returncode)
             self.assertIn("摘要不符", proc.stderr)
 
-    def test_vsa_verifies_bundle_and_signs_only_build_l2(self):
+    def test_vsa_verifies_bundle_and_signs_build_l3(self):
         policy_path = ROOT / "packaging/supply-chain/verification-policy.json"
         policy = json.loads(policy_path.read_text(encoding="utf-8"))
         metadata = json.loads(
@@ -138,7 +138,7 @@ class ReleaseArtifactTest(unittest.TestCase):
             )
             self.assertEqual(0, proc.returncode, proc.stderr)
             doc = json.loads(out.read_text(encoding="utf-8"))
-            self.assertEqual(["SLSA_BUILD_LEVEL_2"], doc["verifiedLevels"])
+            self.assertEqual(["SLSA_BUILD_LEVEL_3"], doc["verifiedLevels"])
             self.assertEqual(64, len(doc["policy"]["digest"]["sha256"]))
 
     def test_vsa_rejects_tamper_commit_vex_and_insufficient_builds(self):

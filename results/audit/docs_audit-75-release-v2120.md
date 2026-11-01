@@ -12,10 +12,12 @@ subjects:
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
-  - docs/release.md:e6840c08d2da65bc68809be8f3a0d89de451558f933cdc6b80f51b8659654ceb
+  - docs/release.md:645f3d22ab830e75b165ab97085c23ebc419ab106d3776fcee0c00e6f747a649
   - scripts/nf.py:3254785c7eb84216f3b9ea8583c2e5db1db65a4475a02b517170a0eee7e1695b
 
 ---
+> 重审（2026-11-01）：SLSA v1.2 Build L3 reusable builder and release verification
+
 > 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
 
 > 重审（2026-10-26）：发布文档新增可复现工件、SBOM、OIDC provenance 与消费者验签说明，复核后重绑摘要

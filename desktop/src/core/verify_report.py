@@ -66,6 +66,7 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "judgement_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
+    ("slsa", "SLSA v1.2 Build L3 构建器、provenance 与消费者验签", "slsa_policy", "scan", "scan"),
     ("ssdf", "NIST SSDF v1.1 作用域证据与漏洞响应闭环", "ssdf_policy", "scan", "scan"),
     ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),
     ("asset_contract",

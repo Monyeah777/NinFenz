@@ -1,0 +1,84 @@
+name: slsa-build-l3
+
+# SLSA v1.2 Build L3 reusable builder.
+# The caller must pass contents:read, id-token:write and attestations:write.
+# Build state is ephemeral, caches are disabled, and provenance is signed by the
+# GitHub control plane from inside this reusable workflow rather than by the caller.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: isolated-reproducible-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    env:
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: '24.10'
+          registry-url: https://registry.npmjs.org
+      - name: 安装 SBOM 验证器（固定版本，禁用持久缓存）
+        run: python -m pip install --disable-pip-version-check --no-cache-dir -r .github/requirements-sbom.txt
+      - name: tag 与包版本一致
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          if [ "$TAG" != "v$V" ]; then
+            echo "::error::tag=$TAG 与 package.json v$V 不一致"
+            exit 1
+          fi
+      - name: 双构建、SBOM、checksums 与 manifest
+        run: |
+          python packaging/npm/tools/build_release.py --out .artifacts/release
+          python scripts/validate_sboms.py .artifacts/release
+          python packaging/npm/tools/build_release.py --verify .artifacts/release
+      - name: tarball 与 payload 清单逐字节核对
+        run: |
+          V=$(node -p "require('./packaging/npm/package.json').version")
+          node packaging/npm/tools/verify-tarball.mjs \
+            --tarball ".artifacts/release/ninfenz-$V.tgz"
+      - name: npm 包冒烟
+        working-directory: packaging/npm
+        run: |
+          npm run verify
+          node --test test/smoke.test.mjs
+      - name: 供应链与 SSDF 证据
+        run: |
+          python scripts/supply_chain_policy.py
+          python scripts/ssdf_policy.py
+      - name: 生成 Build L3 provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .artifacts/release/*.tgz
+            .artifacts/release/*.cdx.json
+            .artifacts/release/*.spdx3.json
+            .artifacts/release/*.openvex.json
+            .artifacts/release/SHA256SUMS
+            .artifacts/release/release-metadata.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-bundle
+          path: .artifacts/release/
+          if-no-files-found: error
+          retention-days: 30

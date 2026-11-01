@@ -1,0 +1,70 @@
+name: release-evidence-l3
+
+# SLSA v1.2 Build L3 reusable builder for verification evidence attached to a
+# GitHub Release. The caller must grant contents:read, id-token:write and
+# attestations:write. No persistent cache or signing secret enters this job.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: isolated-release-evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: 校验待发布产物齐备
+        run: |
+          set -euo pipefail
+          for f in protocol/verification_report.json protocol/RECEIPTS.json \
+                   docs/verification-cards.md; do
+            if [ ! -f "$f" ]; then
+              echo "::error::缺少发布产物 $f"
+              exit 1
+            fi
+          done
+      - name: 生成校验和
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts/release
+          for f in protocol/verification_report.json protocol/RECEIPTS.json \
+                   docs/verification-cards.md; do
+            cp "$f" .artifacts/release/
+          done
+          cd .artifacts/release
+          sha256sum ./*.json ./*.md > SHA256SUMS
+      - name: 平台签发 Build L3 provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .artifacts/release/*.json
+            .artifacts/release/*.md
+            .artifacts/release/SHA256SUMS
+      - name: 下载并合并 attestation bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts/att
+          for f in .artifacts/release/*.json .artifacts/release/*.md \
+                   .artifacts/release/SHA256SUMS; do
+            gh attestation download "$f" \
+              --repo "$GITHUB_REPOSITORY" --dir .artifacts/att
+          done
+          cat .artifacts/att/*.intoto.jsonl > .artifacts/release/provenance.intoto.jsonl
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: gate-release-bundle
+          path: .artifacts/release/
+          if-no-files-found: error
+          retention-days: 30
