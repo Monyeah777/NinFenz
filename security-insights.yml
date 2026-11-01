@@ -1,0 +1,135 @@
+header:
+  schema-version: 2.2.0
+  last-updated: '2026-11-02'
+  last-reviewed: '2026-11-02'
+  url: https://raw.githubusercontent.com/Monyeah777/NinFenz/main/security-insights.yml
+  comment: |
+    Canonical machine-readable security profile for NinFenz.
+
+project:
+  name: NinFenz
+  homepage: https://ninfenz.dev/
+  administrators:
+    - name: Monyeah777
+      affiliation: NinFenz
+      social: https://github.com/Monyeah777
+      primary: true
+  repositories:
+    - name: NinFenz
+      url: https://github.com/Monyeah777/NinFenz
+      comment: Canonical source repository.
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    contact:
+      name: GitHub Security Advisories
+      primary: true
+    policy: https://github.com/Monyeah777/NinFenz/blob/main/SECURITY.md
+    in-scope:
+      - protocol and machine-readable contracts
+      - CLI, daemon, MCP, LSP, and plugin runtime
+      - CI, release, and supply-chain automation
+      - untrusted library and community content handling
+    out-of-scope:
+      - editorial and content-quality disputes
+      - vulnerabilities only in upstream dependencies without a NinFenz-specific impact
+      - physical-access or already-compromised-host scenarios
+  documentation:
+    quickstart-guide: https://github.com/Monyeah777/NinFenz/blob/main/docs/quickstart.md
+    detailed-guide: https://github.com/Monyeah777/NinFenz/blob/main/README.md
+    code-of-conduct: https://github.com/Monyeah777/NinFenz/blob/main/CODE_OF_CONDUCT.md
+    release-process: https://github.com/Monyeah777/NinFenz/blob/main/docs/release.md
+    support-policy: https://github.com/Monyeah777/NinFenz/blob/main/SUPPORT.md
+    signature-verification: https://github.com/Monyeah777/NinFenz/blob/main/docs/supply-chain-security.md
+
+repository:
+  url: https://github.com/Monyeah777/NinFenz
+  status: active
+  bug-fixes-only: false
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  no-third-party-packages: false
+  core-team:
+    - name: Monyeah777
+      affiliation: NinFenz
+      social: https://github.com/Monyeah777
+      primary: true
+  documentation:
+    contributing-guide: https://github.com/Monyeah777/NinFenz/blob/main/CONTRIBUTING.md
+    dependency-management-policy: https://github.com/Monyeah777/NinFenz/blob/main/docs/supply-chain-security.md
+    governance: https://github.com/Monyeah777/NinFenz/blob/main/STRATEGY.md
+    review-policy: https://github.com/Monyeah777/NinFenz/blob/main/AGENTS.md
+    security-policy: https://github.com/Monyeah777/NinFenz/blob/main/SECURITY.md
+  license:
+    url: https://github.com/Monyeah777/NinFenz/blob/main/LICENSE
+    expression: AGPL-3.0-only OR LicenseRef-Commercial
+  release:
+    changelog: https://github.com/Monyeah777/NinFenz/blob/main/CHANGELOG.md
+    automated-pipeline: true
+    distribution-points:
+      - uri: https://github.com/Monyeah777/NinFenz/releases
+        comment: GitHub Releases
+      - uri: pkg:npm/ninfenz
+        comment: npm package
+    attestations:
+      - name: SLSA Build provenance
+        predicate-uri: https://slsa.dev/provenance/v1
+        location: https://github.com/Monyeah777/NinFenz/blob/main/docs/supply-chain-security.md
+      - name: SLSA Verification Summary
+        predicate-uri: https://slsa.dev/verification_summary/v1
+        location: https://github.com/Monyeah777/NinFenz/blob/main/docs/supply-chain-security.md
+      - name: OpenVEX
+        predicate-uri: https://openvex.dev/ns/v0.2.0
+        location: https://github.com/Monyeah777/NinFenz/blob/main/results/supply-chain/ninfenz.openvex.json
+  security:
+    assessments:
+      self:
+        comment: Scoped internal ASVS 5.0.0 L2 assessment; partial and not-applicable controls retain explicit gaps.
+        evidence: https://github.com/Monyeah777/NinFenz/blob/main/docs/asvs.md
+        date: '2026-11-02'
+    champions:
+      - name: Monyeah777
+        affiliation: NinFenz
+        social: https://github.com/Monyeah777
+        primary: true
+    tools:
+      - name: CodeQL
+        type: SAST
+        rulesets: [default]
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results: {}
+      - name: Bandit and Ruff Security
+        type: SAST
+        rulesets: [default]
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results: {}
+      - name: Dependency Review and audits
+        type: SCA
+        rulesets: [default]
+        integration:
+          adhoc: true
+          ci: true
+          release: true
+        results: {}
+      - name: cargo-fuzz Python parser
+        type: fuzzing
+        rulesets: [default]
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results: {}
+      - name: OpenSSF Scorecard
+        type: other
+        rulesets: [default]
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+        results: {}

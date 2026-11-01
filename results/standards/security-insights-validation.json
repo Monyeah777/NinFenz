@@ -1,0 +1,14 @@
+{
+  "schema": "nf-security-insights-validation/1",
+  "schema_version": "2.2.0",
+  "standard": "https://github.com/ossf/security-insights/tree/v2.2.0",
+  "schema_url": "https://raw.githubusercontent.com/ossf/security-insights/v2.2.0/spec/schema.cue",
+  "schema_sha256": "4e4b61470b5484fc8969f2a8a77ffbe0712a7c8a870c2079188f246c14cd58b1",
+  "subject": "security-insights.yml",
+  "subject_sha256": "654354f78c621aceddd04a88dd58bcd32377d6380007160e7d081de77eed0119",
+  "validator": "cue",
+  "validator_version": "v0.17.1",
+  "command": "cue vet -d '#SecurityInsights' schema.cue security-insights.yml",
+  "cue_vet": "PASS",
+  "validated_at": "2026-11-02"
+}

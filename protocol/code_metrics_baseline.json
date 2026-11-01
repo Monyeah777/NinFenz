@@ -1625,6 +1625,11 @@
       "max_fn_cc": 12,
       "max_fn_lines": 30
     },
+    "scripts/security_insights.py": {
+      "lines": 284,
+      "max_fn_cc": 13,
+      "max_fn_lines": 33
+    },
     "scripts/serve_decision_model.py": {
       "lines": 288,
       "max_fn_cc": 19,

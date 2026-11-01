@@ -1,0 +1,1 @@
+- Add the OpenSSF Security Insights v2.2.0 machine-readable security profile and an official CUE validation evidence record.
