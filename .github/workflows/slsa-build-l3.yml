@@ -26,7 +26,6 @@ jobs:
     env:
       PYTHONHASHSEED: '0'
       NF_SLSA_PENDING_RUN: '1'
-      CARGO_HOME: ${{ runner.temp }}/cargo-home
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -38,6 +37,7 @@ jobs:
           python-version: '3.11'
       - name: 固定 Rust 与 Maturin 工具链
         run: |
+          export CARGO_HOME="$RUNNER_TEMP/cargo-home"
           rustup toolchain install 1.99.1 --profile minimal --no-self-update
           rustup default 1.99.1
           python -m pip install --disable-pip-version-check --no-cache-dir maturin==1.16.0
@@ -77,6 +77,7 @@ jobs:
       - name: 双构建 PyO3/Maturin wheel
         run: |
           set -euo pipefail
+          export CARGO_HOME="$RUNNER_TEMP/cargo-home"
           export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
           A=$(mktemp -d "$RUNNER_TEMP/wheel-a.XXXXXX")
           B=$(mktemp -d "$RUNNER_TEMP/wheel-b.XXXXXX")
