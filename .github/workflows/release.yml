@@ -20,6 +20,11 @@ on:
       tag:
         description: '要发布的 tag（如 v2.30.0；必须是已存在的 tag）'
         required: true
+      dry_run:
+        description: '只生成并验证门禁证据，不创建 GitHub Release'
+        required: true
+        default: false
+        type: boolean
 concurrency:
   group: release-${{ github.ref }}   # 发布型：固定组、不取消（避免半发布状态）
   cancel-in-progress: false
@@ -37,6 +42,7 @@ jobs:
   publish:
     name: publish-attested-gate-evidence
     needs: [build]
+    if: github.event_name == 'push' || inputs.dry_run != true
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
