@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write, slsa_policy  # noqa: E402
+from core import atomic_write, slsa_policy, wheel_release  # noqa: E402
 
 SUM_RE = re.compile(r"^([0-9a-f]{64})  ([^\r\n]+)$")
 
@@ -45,8 +45,7 @@ def verify_release(
     source_root: Path = ROOT,
 ) -> list[str]:
     issues: list[str] = []
-    metadata_path = release / "release-metadata.json"
-    sums_path = release / "SHA256SUMS"
+    metadata_path, sums_path = release / "release-metadata.json", release / "SHA256SUMS"
     if not metadata_path.is_file() or not sums_path.is_file():
         return ["release bundle 缺 release-metadata.json 或 SHA256SUMS"]
     metadata = _json(metadata_path)
@@ -95,6 +94,7 @@ def verify_release(
         generated_vex = _vex_tools().vex_doc(source_root, product)
         if actual_vex != generated_vex:
             issues.append("发布束 OpenVEX 与处置台账不一致")
+    issues.extend(wheel_release.verify_release_dir(release, commit))
     return issues
 
 

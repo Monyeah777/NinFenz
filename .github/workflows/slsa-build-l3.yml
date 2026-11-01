@@ -35,6 +35,15 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: '3.11'
+      - name: 固定 Rust 与 Maturin 工具链
+        run: |
+          export CARGO_HOME="$RUNNER_TEMP/cargo-home"
+          rustup toolchain install 1.99.1 --profile minimal --no-self-update
+          rustup default 1.99.1
+          python -m pip install -r .github/requirements-wheel.txt \
+            --disable-pip-version-check --no-cache-dir
+          rustc --version
+          maturin --version
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
         with:
           node-version: '24.10'
@@ -66,6 +75,69 @@ jobs:
         run: |
           npm run verify
           node --test test/smoke.test.mjs
+      - name: 双构建 PyO3/Maturin wheel
+        run: |
+          set -euo pipefail
+          export CARGO_HOME="$RUNNER_TEMP/cargo-home"
+          export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
+          IMAGE='quay.io/pypa/manylinux_2_28_x86_64@sha256:7e41b1c7fd64dfc69703a1124b43c404382973ee06ec5d764b85c34d2221fded'
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -v "$CARGO_HOME:/cargo" \
+            -w /work \
+            -e CARGO_HOME=/cargo \
+            -e SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" \
+            "$IMAGE" /bin/bash -lc '
+              set -euo pipefail
+              export PATH=/opt/python/cp311-cp311/bin:/cargo/bin:$PATH
+              curl --proto "=https" --tlsv1.2 -fsSLo /tmp/rustup-init \
+                https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+              echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" \
+                | sha256sum -c -
+              chmod +x /tmp/rustup-init
+              /tmp/rustup-init -y --profile minimal --no-modify-path \
+                --default-toolchain 1.99.1
+              python -m pip install -r .github/requirements-wheel.txt \
+                --disable-pip-version-check --no-cache-dir
+              A=$(mktemp -d /tmp/wheel-a.XXXXXX)
+              B=$(mktemp -d /tmp/wheel-b.XXXXXX)
+              for OUT in "$A" "$B"; do
+                maturin build --release --locked \
+                  --manifest-path engine/rust/pyo3/Cargo.toml \
+                  --out "$OUT" --compatibility manylinux_2_28
+              done
+              WHEEL_A=$(find "$A" -maxdepth 1 -name "*.whl" -print -quit)
+              WHEEL_B=$(find "$B" -maxdepth 1 -name "*.whl" -print -quit)
+              test -n "$WHEEL_A"
+              test -n "$WHEEL_B"
+              cmp "$WHEEL_A" "$WHEEL_B"
+              python -m venv /tmp/wheel-smoke
+              /tmp/wheel-smoke/bin/python -m pip install --no-cache-dir --force-reinstall --no-deps "$WHEEL_A"
+              /tmp/wheel-smoke/bin/python - <<"PYEOF"
+          import hashlib
+          import nf_pyengine
+          assert nf_pyengine.ABI_VERSION == 1
+          assert nf_pyengine.sha256(b"abc") == hashlib.sha256(b"abc").digest()
+          assert nf_pyengine.reverse_bytes(b"abc") == b"cba"
+          assert nf_pyengine.float_repr(0.1) == repr(0.1)
+          PYEOF
+              cp "$WHEEL_A" .artifacts/release/
+            '
+      - name: wheel metadata 与独立摘要
+        run: |
+          set -euo pipefail
+          export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
+          WHEEL=$(find .artifacts/release -maxdepth 1 -name '*.whl' -print -quit)
+          python scripts/wheel_release_metadata.py metadata \
+            --wheel "$WHEEL" \
+            --out .artifacts/release/wheel-metadata.json \
+            --source-commit "$GITHUB_SHA" \
+            --source-date-epoch "$SOURCE_DATE_EPOCH" \
+            --rustc "$(rustc --version)" \
+            --maturin "$(maturin --version)" \
+            --python "$(python -c 'import platform; print(platform.python_version())')"
+          cd .artifacts/release
+          sha256sum ./*.whl wheel-metadata.json > WHEEL-SHA256SUMS
       - name: 供应链与 SSDF 证据
         run: |
           python scripts/supply_chain_policy.py
@@ -79,6 +151,9 @@ jobs:
             .artifacts/release/*.cdx.json
             .artifacts/release/*.spdx3.json
             .artifacts/release/*.openvex.json
+            .artifacts/release/*.whl
+            .artifacts/release/WHEEL-SHA256SUMS
+            .artifacts/release/wheel-metadata.json
             .artifacts/release/SHA256SUMS
             .artifacts/release/release-metadata.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4

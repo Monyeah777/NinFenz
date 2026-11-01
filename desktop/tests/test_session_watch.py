@@ -41,7 +41,10 @@ class SessionCacheTest(unittest.TestCase):
                 importlib.import_module("core.watch"))
 
     def tearDown(self):
-        self._live()[1].release()          # 任何路径都不许把残影留到下一个用例（按当前实例）
+        csc, sw, _watch = self._live()
+        while getattr(sw, "_STACK", None):  # 清空本会话拥有的整栈，而非只弹一层
+            sw.release()
+        csc.clear_resident()
 
     def test_unavailable_platform_degrades_without_side_effects(self):
         """监听不可用时 `attach` 必须返回 False，且**不装常驻层**（行为与今天逐字一致）。"""
@@ -55,6 +58,9 @@ class SessionCacheTest(unittest.TestCase):
     def test_release_leaves_no_resident(self):
         """收尾（正常/异常都走 `release`）之后不得再声称常驻层在位。"""
         csc, sw, _watch = self._live()
+        while getattr(sw, "_STACK", None):
+            sw.release()
+        csc.clear_resident()
         with tempfile.TemporaryDirectory() as tmp:
             attached = sw.attach(tmp)
             if attached:

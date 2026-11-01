@@ -29,7 +29,8 @@
       "reason": "GitHub signs the provenance from its control plane inside the reusable build workflow; signing material is unavailable to user build steps.",
       "evidence": [
         ".github/workflows/slsa-build-l3.yml",
-        ".github/workflows/release-evidence-l3.yml"
+        ".github/workflows/release-evidence-l3.yml",
+        "desktop/src/core/wheel_release.py"
       ]
     },
     {
@@ -48,7 +49,8 @@
       "evidence": [
         ".github/workflows/slsa-build-l3.yml",
         ".github/workflows/release-evidence-l3.yml",
-        "packaging/npm/tools/build_release.py"
+        "packaging/npm/tools/build_release.py",
+        "scripts/wheel_release_metadata.py"
       ]
     },
     {
@@ -58,6 +60,7 @@
       "evidence": [
         ".github/workflows/npm-publish.yml",
         ".github/workflows/release.yml",
+        "packaging/supply-chain/verification-policy.json",
         "results/supply-chain/slsa-l3-attestation-run.json",
         "docs/supply-chain-security.md"
       ]
