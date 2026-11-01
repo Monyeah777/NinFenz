@@ -1,0 +1,120 @@
+{
+  "schema": "nf-slsa-source-readiness/1",
+  "standard": "SLSA v1.2 Source Track",
+  "reviewed_at": "2026-11-01",
+  "repository": "https://github.com/Monyeah777/NinFenz",
+  "target_level": 3,
+  "claimed_level": 0,
+  "claim_reason": "GitHub does not currently issue the Source VSA and Source Provenance attestations required by the SLSA Source Track. The repository therefore makes no nonzero Source Track claim.",
+  "platform_attestations": {
+    "source_vsa": false,
+    "source_vsa_url": "",
+    "source_provenance": false,
+    "source_provenance_url": ""
+  },
+  "requirements": [
+    {
+      "id": "source-control-system",
+      "status": "satisfied",
+      "reason": "GitHub provides stable repository identity, immutable commit ids, hosted history, and role-based access control.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        "docs/source-control-policy.md"
+      ]
+    },
+    {
+      "id": "identity-management",
+      "status": "satisfied",
+      "reason": "Write and administrative actions require authenticated GitHub identities; rulesets apply to administrators.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        "MAINTAINERS.md"
+      ]
+    },
+    {
+      "id": "immutable-revisions",
+      "status": "satisfied",
+      "reason": "Git commit ids are cryptographic content digests, and protected refs prohibit force updates and deletion.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        "docs/source-control-policy.md"
+      ]
+    },
+    {
+      "id": "human-readable-changes",
+      "status": "satisfied",
+      "reason": "Git and GitHub provide human-readable diffs for pull requests and revisions.",
+      "evidence": [
+        "docs/source-control-policy.md",
+        ".github/CODEOWNERS"
+      ]
+    },
+    {
+      "id": "history-continuity",
+      "status": "satisfied",
+      "reason": "Main requires linear history, blocks force push and deletion, and remains subject to administrator enforcement.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        "docs/source-control-policy.md"
+      ]
+    },
+    {
+      "id": "safe-expunging",
+      "status": "satisfied",
+      "reason": "The repository documents a fail-closed legal/privacy-only expunging process and its audit requirements.",
+      "evidence": [
+        "docs/source-control-policy.md",
+        "SECURITY.md"
+      ]
+    },
+    {
+      "id": "protected-named-references",
+      "status": "partial",
+      "reason": "Main and version tags have active rulesets, but GitHub does not bind those controls into contemporaneous Source Provenance attestations.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        "docs/source-control-policy.md"
+      ],
+      "gap": "SCS-issued control evidence is unavailable on the current platform."
+    },
+    {
+      "id": "continuous-controls",
+      "status": "partial",
+      "reason": "Current controls are technically enforced, but control continuity cannot be proven from SCS-issued source attestations.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json",
+        ".github/workflows/ci-verify.yml"
+      ],
+      "gap": "Continuity is observable only from current configuration and workflow history."
+    },
+    {
+      "id": "source-vsa",
+      "status": "blocked",
+      "reason": "GitHub does not currently expose a SLSA Source Verification Summary Attestation for this repository.",
+      "evidence": [
+        "results/supply-chain/github-source-controls.json"
+      ],
+      "gap": "Without a Source VSA, SLSA defines the revision as Source Level 0."
+    },
+    {
+      "id": "source-provenance",
+      "status": "blocked",
+      "reason": "Build provenance is present, but it does not satisfy the Source Track requirement for SCS-issued Source Provenance.",
+      "evidence": [
+        ".github/workflows/npm-publish.yml"
+      ],
+      "gap": "A build attestation must not be relabeled as Source Provenance."
+    },
+    {
+      "id": "two-party-review",
+      "status": "not-applicable",
+      "reason": "This Level 4 control is outside the declared Level 3 target and the repository currently has one human maintainer.",
+      "evidence": [
+        "MAINTAINERS.md",
+        ".github/CODEOWNERS"
+      ],
+      "gap": "Revisit only after a second trusted maintainer is onboarded."
+    }
+  ],
+  "claim_rule": "Never claim a nonzero SLSA Source Level until SCS-issued Source VSA and Source Provenance evidence is available and verified."
+}

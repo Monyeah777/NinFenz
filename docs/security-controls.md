@@ -118,10 +118,15 @@ Critical 漏洞停止发布；High 阻断合并与 tag，除非有可达性证�
 `SLSA_BUILD_LEVEL_2`；共享 GitHub runner 仍是 L3 readiness 的 trusted-builder blocker，
 不得因签名存在而虚标 Build L3。
 
+SLSA Source Track 技术控制包括管理员强制的受保护 main、禁止强推/删除、linear history、
+必需状态检查和不可移动的 `refs/tags/v*`。GitHub 尚未提供 Source VSA/Source Provenance，
+因此仓库保持 Source Level 0，并只把上述规则描述为 Source technical-control readiness。
+
 ## 判据
 
 ```bash
 python scripts/asvs_policy.py
+python scripts/slsa_source_readiness.py --live
 python -m pytest desktop/tests/test_security_controls.py -q
 python scripts/slsa_l3_readiness.py
 ```

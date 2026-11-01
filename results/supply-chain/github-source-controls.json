@@ -1,0 +1,102 @@
+{
+  "branch_protection": {
+    "allow_deletions": false,
+    "allow_force_pushes": false,
+    "dismiss_stale_reviews": true,
+    "enforce_admins": true,
+    "required_approving_review_count": 0,
+    "required_conversation_resolution": true,
+    "required_linear_history": true,
+    "required_status_checks": [
+      "gate",
+      "static-checks-42"
+    ],
+    "strict_status_checks": true
+  },
+  "branch_ruleset": {
+    "bypass_actors": [],
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "~DEFAULT_BRANCH"
+        ]
+      }
+    },
+    "enforcement": "active",
+    "id": 25858585,
+    "name": "NinFenz main - public ruleset",
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "parameters": {
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "static-checks-42"
+            }
+          ],
+          "strict_required_status_checks_policy": true
+        },
+        "type": "required_status_checks"
+      },
+      {
+        "parameters": {
+          "allowed_merge_methods": [
+            "merge",
+            "squash",
+            "rebase"
+          ],
+          "dismiss_stale_reviews_on_push": true,
+          "require_code_owner_review": false,
+          "require_extra_approval_for_unattributed_changes": true,
+          "require_last_push_approval": false,
+          "required_approving_review_count": 0,
+          "required_review_thread_resolution": true,
+          "required_reviewers": []
+        },
+        "type": "pull_request"
+      }
+    ],
+    "target": "branch"
+  },
+  "collected_at": "2026-11-01T15:01:37Z",
+  "repository": {
+    "default_branch": "main",
+    "id": 1426460268,
+    "url": "https://github.com/Monyeah777/NinFenz",
+    "visibility": "public"
+  },
+  "schema": "nf-github-source-controls/1",
+  "tag_ruleset": {
+    "bypass_actors": [],
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/tags/v*"
+        ]
+      }
+    },
+    "enforcement": "active",
+    "id": 26314522,
+    "name": "NinFenz version tags - immutable",
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "update"
+      }
+    ],
+    "target": "tag"
+  }
+}
