@@ -105,6 +105,8 @@ class WheelWorkflowTest(unittest.TestCase):
     def test_builder_builds_twice_with_pinned_toolchain(self):
         for needle in (
             "rustup toolchain install 1.99.1",
+            "/tmp/rustup-init",
+            "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4",
             "-r .github/requirements-wheel.txt",
             "quay.io/pypa/manylinux_2_28_x86_64@sha256:",
             "--compatibility manylinux_2_28",
@@ -118,6 +120,7 @@ class WheelWorkflowTest(unittest.TestCase):
         )
         self.assertIn("maturin==1.16.0", requirements)
         self.assertIn("--hash=sha256:", requirements)
+        self.assertNotIn("sh.rustup.rs |", self.builder_text)
 
     def test_provenance_and_vsa_cover_wheel_subjects(self):
         text = json.dumps(self.publish, ensure_ascii=False)

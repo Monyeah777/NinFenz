@@ -90,8 +90,13 @@ jobs:
             "$IMAGE" /bin/bash -lc '
               set -euo pipefail
               export PATH=/opt/python/cp311-cp311/bin:/cargo/bin:$PATH
-              curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs |
-                sh -s -- -y --profile minimal --no-modify-path --default-toolchain 1.99.1
+              curl --proto "=https" --tlsv1.2 -fsSLo /tmp/rustup-init \
+                https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+              echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" \
+                | sha256sum -c -
+              chmod +x /tmp/rustup-init
+              /tmp/rustup-init -y --profile minimal --no-modify-path \
+                --default-toolchain 1.99.1
               python -m pip install -r .github/requirements-wheel.txt \
                 --disable-pip-version-check --no-cache-dir
               A=$(mktemp -d /tmp/wheel-a.XXXXXX)
