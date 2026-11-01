@@ -296,7 +296,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "3f9f78b5bcb9465b7bc45ea956f55da08d764ad2b4db4d15898046bf3a1d9c03",
+        "root": "f335a48ec122dc4b8f42605498af327944ef7894cd1245be247bc179fe2164f0",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -506,6 +506,7 @@
       "source": "slsa_policy.scan",
       "stats": {
         "claimed_level": "SLSA_BUILD_LEVEL_3",
+        "last_run_id": 41306896670,
         "statuses": {
           "satisfied": 6
         }
@@ -687,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c10d879d21ff6c4329e6aa0a006446497fd003a64f260ef50a2ae860e249f7ab",
+  "root_digest": "641824eb114864e1b63b5f5d719ccdcddd5540f72703ce9abf263ee37a43f2a7",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import re
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +14,7 @@ WORKFLOW_REL = ".github/workflows/npm-publish.yml"
 BUILDER_REL = ".github/workflows/slsa-build-l3.yml"
 RELEASE_WORKFLOW_REL = ".github/workflows/release.yml"
 EVIDENCE_BUILDER_REL = ".github/workflows/release-evidence-l3.yml"
+RUN_EVIDENCE_REL = "results/supply-chain/slsa-l3-attestation-run.json"
 EXPECTED_REQUIREMENTS = {
     "reusable-trusted-builder",
     "unforgeable-provenance",
@@ -118,6 +122,61 @@ def _builder_issues(label: str, text: str) -> list[str]:
     return issues
 
 
+def _run_evidence_issues(root: Path) -> list[str]:
+    path = root / RUN_EVIDENCE_REL
+    if not path.is_file():
+        return [f"{RUN_EVIDENCE_REL}: 缺真实 L3 attestation 运行证据"]
+    try:
+        doc = _json(path)
+    except (OSError, ValueError) as exc:
+        return [f"{RUN_EVIDENCE_REL}: 不可读：{exc}"]
+    issues: list[str] = []
+    expected = {
+        "schema": "nf-slsa-l3-attestation-run/1",
+        "repository": "https://github.com/Monyeah777/NinFenz",
+        "build_signer_workflow": BUILDER_REL,
+        "vsa_signer_workflow": WORKFLOW_REL,
+        "provenance_predicate": "https://slsa.dev/provenance/v1",
+        "vsa_predicate": "https://slsa.dev/verification_summary/v1",
+    }
+    for key, value in expected.items():
+        if doc.get(key) != value:
+            issues.append(f"{RUN_EVIDENCE_REL}: {key} 必须是 {value}")
+    if not isinstance(doc.get("run_id"), int) or doc["run_id"] < 1:
+        issues.append(f"{RUN_EVIDENCE_REL}: run_id 必须是正整数")
+    if not re.fullmatch(r"[0-9a-f]{40}", str(doc.get("tested_commit") or "")):
+        issues.append(f"{RUN_EVIDENCE_REL}: tested_commit 必须是 40 位提交 SHA")
+    if doc.get("verified_levels") != [LEVEL_L3]:
+        issues.append(f"{RUN_EVIDENCE_REL}: verified_levels 必须且只能是 Build L3")
+    for key in ("provenance_verified", "vsa_verified"):
+        if doc.get(key) is not True:
+            issues.append(f"{RUN_EVIDENCE_REL}: {key} 必须为 true")
+    workflows = doc.get("workflow_sha256")
+    expected_workflows = {
+        BUILDER_REL,
+        WORKFLOW_REL,
+        EVIDENCE_BUILDER_REL,
+        RELEASE_WORKFLOW_REL,
+    }
+    if not isinstance(workflows, dict) or set(workflows) != expected_workflows:
+        issues.append(f"{RUN_EVIDENCE_REL}: workflow_sha256 集合不完整")
+    else:
+        for rel, expected_hash in workflows.items():
+            actual = hashlib.sha256((root / rel).read_bytes()).hexdigest()
+            if actual != expected_hash:
+                issues.append(f"{RUN_EVIDENCE_REL}: {rel} 已在验收运行后变更")
+    try:
+        datetime.fromisoformat(str(doc.get("verified_at") or "").replace("Z", "+00:00"))
+    except ValueError:
+        issues.append(f"{RUN_EVIDENCE_REL}: verified_at 必须是 ISO-8601")
+    subjects = doc.get("subjects")
+    if not isinstance(subjects, dict) or not subjects:
+        issues.append(f"{RUN_EVIDENCE_REL}: subjects 必须非空")
+    elif any(not re.fullmatch(r"[0-9a-f]{64}", str(digest)) for digest in subjects.values()):
+        issues.append(f"{RUN_EVIDENCE_REL}: subject digest 必须是 SHA-256")
+    return issues
+
+
 def _workflow_issues(root: Path) -> list[str]:
     caller = (root / WORKFLOW_REL).read_text(encoding="utf-8")
     builder = (root / BUILDER_REL).read_text(encoding="utf-8")
@@ -179,9 +238,18 @@ def scan(root: str | Path) -> tuple[list[str], dict[str, Any]]:
     issues = readiness_issues + _policy_issues(policy, claimed) + _workflow_issues(root)
     if claimed == LEVEL_L3 and statuses != {"satisfied": len(EXPECTED_REQUIREMENTS)}:
         issues.append("声明 Build L3 时所有 readiness 要求必须为 satisfied")
+    if claimed == LEVEL_L3:
+        issues.extend(_run_evidence_issues(root))
+    last_run_id = None
+    if (root / RUN_EVIDENCE_REL).is_file():
+        try:
+            last_run_id = _json(root / RUN_EVIDENCE_REL).get("run_id")
+        except (OSError, ValueError):
+            last_run_id = None
     return issues, {
         "claimed_level": claimed,
         "statuses": dict(sorted(statuses.items())),
+        "last_run_id": last_run_id,
     }
 
 
@@ -193,6 +261,7 @@ __all__ = [
     "POLICY_REL",
     "READINESS_REL",
     "RELEASE_WORKFLOW_REL",
+    "RUN_EVIDENCE_REL",
     "WORKFLOW_REL",
     "claimed_level_issues",
     "scan",

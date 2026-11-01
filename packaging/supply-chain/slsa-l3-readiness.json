@@ -8,6 +8,7 @@
     ".github/workflows/slsa-build-l3.yml",
     ".github/workflows/release.yml",
     ".github/workflows/release-evidence-l3.yml",
+    "results/supply-chain/slsa-l3-attestation-run.json",
     "packaging/supply-chain/verification-policy.json"
   ],
   "requirements": [
@@ -57,6 +58,7 @@
       "evidence": [
         ".github/workflows/npm-publish.yml",
         ".github/workflows/release.yml",
+        "results/supply-chain/slsa-l3-attestation-run.json",
         "docs/supply-chain-security.md"
       ]
     },
@@ -67,6 +69,7 @@
       "evidence": [
         ".github/workflows/npm-publish.yml",
         ".github/workflows/release.yml",
+        "results/supply-chain/slsa-l3-attestation-run.json",
         "docs/supply-chain-security.md"
       ]
     }

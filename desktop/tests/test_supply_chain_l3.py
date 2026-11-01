@@ -113,6 +113,7 @@ class ReadinessTest(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertEqual("SLSA_BUILD_LEVEL_3", stats["claimed_level"])
         self.assertEqual({"satisfied": 6}, stats["statuses"])
+        self.assertEqual(41306896670, stats["last_run_id"])
 
     def test_every_readiness_requirement_must_be_satisfied(self):
         root = self._root_copy()
@@ -174,6 +175,19 @@ class ReadinessTest(unittest.TestCase):
         issues, _ = READINESS.scan(root)
         self.assertTrue(any("内部生成 artifact provenance" in issue for issue in issues), issues)
         self.assertTrue(any("持久缓存" in issue for issue in issues), issues)
+
+    def test_l3_requires_real_verified_run_evidence(self):
+        root = self._root_copy()
+        (root / READINESS.RUN_EVIDENCE_REL).unlink()
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("真实 L3 attestation 运行证据" in issue for issue in issues), issues)
+
+    def test_l3_run_evidence_is_bound_to_workflow_contents(self):
+        root = self._root_copy()
+        path = root / READINESS.WORKFLOW_REL
+        path.write_text(path.read_text(encoding="utf-8") + "\n# drift\n", encoding="utf-8")
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("验收运行后变更" in issue for issue in issues), issues)
 
     def test_deprecated_generator_cannot_return(self):
         root = self._root_copy()

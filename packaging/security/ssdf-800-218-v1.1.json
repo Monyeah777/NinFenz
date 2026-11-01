@@ -255,6 +255,7 @@
             "packaging/npm/tools/build_release.py",
             ".github/workflows/slsa-build-l3.yml",
             "scripts/build_vsa.py",
+            "results/supply-chain/slsa-l3-attestation-run.json",
             ".github/workflows/npm-publish.yml"
           ]
         }
