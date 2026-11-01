@@ -95,6 +95,7 @@
     "test_engine_ffi_binding": 0.2,
     "test_engine_loader": 0.2,
     "test_engine_registry": 2.8,
+    "test_eol_policy": 0.4,
     "test_error_codes": 0.2,
     "test_eval_collapse": 0.2,
     "test_eval_harness": 0.2,
@@ -1343,6 +1344,12 @@
     "test_engine_registry.RealRepoTest.test_status_and_report_shape": 1.0,
     "test_engine_registry.RegistryCompletenessTest.test_real_repo_engine_dirs_are_declared": 0.26,
     "test_engine_registry.RegistryCompletenessTest.test_undeclared_engine_dir_is_flagged": 0.07,
+    "test_eol_policy.EolPolicyTest.test_current_repository_is_inside_supported_windows": 0.01,
+    "test_eol_policy.EolPolicyTest.test_expired_runtime_fails_closed": 0.04,
+    "test_eol_policy.EolPolicyTest.test_node_engine_cannot_advertise_expired_major": 0.04,
+    "test_eol_policy.EolPolicyTest.test_python_requires_floor_cannot_claim_eol_python": 0.04,
+    "test_eol_policy.EolPolicyTest.test_stale_review_is_rejected": 0.04,
+    "test_eol_policy.EolPolicyTest.test_unsupported_workflow_runtime_is_rejected": 0.04,
     "test_error_codes.Test.test_duplicate_and_bad_lexis": 0.0,
     "test_error_codes.Test.test_unknown_code_raises": 0.0,
     "test_error_codes.Test.test_validate_and_lookup": 0.0,
@@ -3835,5 +3842,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1638.3
+  "total_s": 1638.7
 }

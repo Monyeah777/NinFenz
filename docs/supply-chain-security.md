@@ -111,6 +111,19 @@ python scripts/generate_vex.py --json
 或过期 VEX 都会 fail-closed。发布构建会把 VEX 写入 tarball 同级的发布束、`SHA256SUMS` 和
 `release-metadata.json`，并纳入 provenance / VSA subject。
 
+## 运行时 EOL 门禁
+
+`packaging/supply-chain/eol-support.json` 是 Python、Node 与固定容器镜像的支持窗口真源。
+`python scripts/eol_policy.py` 会从根与 PyO3 的 `requires-python`、npm `engines.node`、
+Dockerfile 与 GitHub Actions 工作流中提取实际声明，拒绝：
+
+- 未登记在矩阵中的 Python、Node 或容器运行时版本；
+- 已经超过 EOL 日期的版本；
+- 未固定 digest 的 Docker 基础镜像；
+- 超过复核期限或 `requires-python` 下限包含已 EOL 版本的清单。
+
+矩阵只覆盖仓库控制的工具链与运行镜像，不把未扫描的传递依赖解释成“无 EOL 风险”。
+
 ## 依赖与供应商准入
 
 依赖只能从 `packaging/supply-chain/package-sources.json` 声明的 HTTPS 源进入。运行工件当前

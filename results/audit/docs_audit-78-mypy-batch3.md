@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:15e23311cf08ee90c43874d31a8b07ec5b0dd03f28def7e6a4aef0cc4033a18e
+  - protocol/code_metrics_baseline.json:2e3c8b6c41966340bf02e58719cd9be2207c1f005cf5e777f13fe9013bb456c0
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,9 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3
+
+> 重审（2026-11-02）：S2C2F SCA-3 runtime EOL policy
 > 重审（2026-11-02）：SLSA PyO3/Maturin wheel L3 final verification
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复

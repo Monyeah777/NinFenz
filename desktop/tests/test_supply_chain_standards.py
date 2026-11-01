@@ -28,6 +28,12 @@ class SupplyChainEvidenceTest(unittest.TestCase):
         self.assertEqual(43, doc["stats"]["osps"]["l1_l2"]["controls"])
         self.assertEqual(22, doc["stats"]["osps"]["l3"]["controls"])
         self.assertEqual(13, doc["stats"]["s2c2f"]["controls"])
+        matrix = json.loads(
+            (ROOT / "packaging/supply-chain/s2c2f-l1-l2.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(["ING-2"], [row["id"] for row in matrix["requirements"]
+                                     if row["status"] == "partial"])
+        self.assertEqual(4, doc["stats"]["eol"]["runtimes"])
         self.assertEqual(4, doc["stats"]["package_sources"]["sources"])
         self.assertGreaterEqual(doc["stats"]["suppliers"]["suppliers"], 7)
 
