@@ -1441,7 +1441,7 @@
     "desktop/tests/test_runtime_shape_contracts.py::UP031": 2,
     "desktop/tests/test_rust_engine.py::I001": 1,
     "desktop/tests/test_rust_fastlane.py::C420": 2,
-    "desktop/tests/test_rust_fastlane.py::E501": 4,
+    "desktop/tests/test_rust_fastlane.py::E501": 3,
     "desktop/tests/test_rust_fastlane.py::RUF100": 1,
     "desktop/tests/test_rust_fastlane.py::UP031": 18,
     "desktop/tests/test_rust_module_wiring.py::E702": 2,
