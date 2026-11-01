@@ -82,7 +82,20 @@ jobs:
       - name: NIST SSDF v1.1 证据与漏洞响应台账
         run: python scripts/ssdf_policy.py
       - name: OpenSSF Security Insights v2.2.0 profile
-        run: python scripts/security_insights.py
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSLo "$RUNNER_TEMP/cue.tar.gz" \
+            https://github.com/cue-lang/cue/releases/download/v0.17.1/cue_v0.17.1_linux_amd64.tar.gz
+          echo "a39b0c97695069d95d276d99be0f5dbabb081d801bfdc9ba49b76efaf94e2369  $RUNNER_TEMP/cue.tar.gz" \
+            | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/cue.tar.gz" -C "$RUNNER_TEMP"
+          curl --proto '=https' --tlsv1.2 -fsSLo "$RUNNER_TEMP/security-insights.cue" \
+            https://raw.githubusercontent.com/ossf/security-insights/v2.2.0/spec/schema.cue
+          echo "4e4b61470b5484fc8969f2a8a77ffbe0712a7c8a870c2079188f246c14cd58b1  $RUNNER_TEMP/security-insights.cue" \
+            | sha256sum -c -
+          "$RUNNER_TEMP/cue" vet -d '#SecurityInsights' \
+            "$RUNNER_TEMP/security-insights.cue" security-insights.yml
+          python scripts/security_insights.py
       - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
         run: node site/tools/site-check.mjs --offline
       - name: 上传门禁日志（失败时同样上传）
