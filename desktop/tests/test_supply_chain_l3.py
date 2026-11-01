@@ -114,7 +114,7 @@ class ReadinessTest(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertEqual("SLSA_BUILD_LEVEL_3", stats["claimed_level"])
         self.assertEqual({"satisfied": 6}, stats["statuses"])
-        self.assertEqual(41306896670, stats["last_run_id"])
+        self.assertEqual(41309669898, stats["last_run_id"])
 
     def test_every_readiness_requirement_must_be_satisfied(self):
         root = self._root_copy()

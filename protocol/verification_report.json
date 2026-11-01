@@ -428,8 +428,8 @@
       "stats": {
         "cycles": 0,
         "metrics_drift": 0,
-        "metrics_missing": 1,
-        "metrics_recorded": 268,
+        "metrics_missing": 0,
+        "metrics_recorded": 269,
         "modules": 269,
         "registered_cycles": 0,
         "registered_sdp": 11,
@@ -506,7 +506,7 @@
       "source": "slsa_policy.scan",
       "stats": {
         "claimed_level": "SLSA_BUILD_LEVEL_3",
-        "last_run_id": 41306896670,
+        "last_run_id": 41309669898,
         "statuses": {
           "satisfied": 6
         }
@@ -676,7 +676,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4105,
+        "files": 4106,
         "kernel": 2194,
         "kernel_no_self": 436,
         "rules": 9,
@@ -688,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "641824eb114864e1b63b5f5d719ccdcddd5540f72703ce9abf263ee37a43f2a7",
+  "root_digest": "c1d9d39034cad22d9871448d308948d0f45411e43271e58d89ba62d248581351",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

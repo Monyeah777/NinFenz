@@ -51,7 +51,7 @@ attestation 的某次工件成立；PR dry-run 不产生发布 provenance。Buil
 VSA verifier 是本项目自己的 workflow，不是独立第三方 verifier。
 
 最近一次不发布的 L3 验收运行是
-[`41306896670`](https://github.com/Monyeah777/NinFenz/actions/runs/41306896670)：reusable
+[`41309669898`](https://github.com/Monyeah777/NinFenz/actions/runs/41309669898)：reusable
 builder 成功生成 provenance，验证作业按 `slsa-build-l3.yml` signer 完成回验，并签发/回验
 `verifiedLevels=["SLSA_BUILD_LEVEL_3"]` 的 VSA。机读记录在
 `results/supply-chain/slsa-l3-attestation-run.json`。
