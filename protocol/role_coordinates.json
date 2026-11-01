@@ -3,10 +3,10 @@
     "app": 1448,
     "entry": 27,
     "floor": 5,
-    "prod": 1048,
+    "prod": 1049,
     "projection": 134,
-    "support": 302,
-    "verify": 1141
+    "support": 304,
+    "verify": 1142
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7031,6 +7031,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Deterministic metadata and verification for the PyO3/Maturin wheel.",
+      "path": "desktop/src/core/wheel_release.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "工作流工业级加固判据（Python-only 面 · 2026-10-13 补）。",
       "path": "desktop/src/core/workflow_hardening.py",
       "role": "verify",
@@ -9247,6 +9253,12 @@
     {
       "function": "目录监听 + 守护响应缓存单测（毫秒级执行层的「**不重算**」判据）。",
       "path": "desktop/tests/test_watch.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "SLSA wheel release metadata and workflow regression tests.",
+      "path": "desktop/tests/test_wheel_release.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13176,17 +13188,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bccd5fe19d3ed2aabad22349ba5b0d9986956e43040b1f3e3da724d6ad9e22ee",
+  "root_digest": "19fe24b17109926f3d0cb14278d9a4feb3a285b61cc1c227b5ed3496f3511a59",
   "rule_counts": {
     "R-app": 1448,
-    "R-catch": 132,
+    "R-catch": 134,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 144,
-    "R-verify": 1019,
-    "auto:R-core": 267
+    "R-verify": 1020,
+    "auto:R-core": 268
   },
   "schema": "nf-role-coordinates/1"
 }

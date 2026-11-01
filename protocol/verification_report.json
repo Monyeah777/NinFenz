@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 104,
+        "raises": 107,
         "sinks": 21
       },
       "status": "pass",
@@ -367,7 +367,7 @@
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 330,
-        "files": 339,
+        "files": 341,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -384,8 +384,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 234,
-        "probed": 234
+        "patterns": 236,
+        "probed": 236
       },
       "status": "pass",
       "warns": 0
@@ -427,10 +427,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
+        "metrics_drift": 1,
+        "metrics_missing": 1,
         "metrics_recorded": 269,
-        "modules": 269,
+        "modules": 270,
         "registered_cycles": 0,
         "registered_sdp": 11,
         "sdp": 11
@@ -676,8 +676,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4106,
-        "kernel": 2194,
+        "files": 4110,
+        "kernel": 2196,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -688,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "629d89182c2f433ff5e12a3e5f277aa0d8db8ec6a7d667a66d0253279547e65a",
+  "root_digest": "2716988b89b46ad3145b4e7e6ba3c9b6029cbe942c6bfedb6fcef34b642290b9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-29",
+  "measured_at": "2026-11-02",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -333,6 +333,7 @@
     "test_version_map": 1.4,
     "test_version_matrix": 0.2,
     "test_watch": 90.5,
+    "test_wheel_release": 0.3,
     "test_workflow_hardening": 0.2,
     "test_workflow_policy": 0.3,
     "test_world_model": 0.7,
@@ -3778,6 +3779,11 @@
     "test_watch.WatchDaemonIntegrationTest.test_resident_layer_is_wired_and_unknown_change_clears_it": 0.17,
     "test_watch.WatchDaemonIntegrationTest.test_resident_layer_survives_a_code_reload": 0.16,
     "test_watch.WatchDaemonIntegrationTest.test_zero_subprocess_client_really_talks_to_the_daemon": 0.47,
+    "test_wheel_release.WheelMetadataTest.test_metadata_binds_source_toolchain_and_digest": 0.01,
+    "test_wheel_release.WheelMetadataTest.test_verify_detects_tampered_wheel": 0.01,
+    "test_wheel_release.WheelMetadataTest.test_verify_rejects_source_commit_drift": 0.01,
+    "test_wheel_release.WheelWorkflowTest.test_builder_builds_twice_with_pinned_toolchain": 0.0,
+    "test_wheel_release.WheelWorkflowTest.test_provenance_and_vsa_cover_wheel_subjects": 0.0,
     "test_workflow_hardening.WorkflowHardeningTest.test_codeowners_is_required": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_credential_persistence_is_rejected": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_dependabot_must_cover_real_ecosystems": 0.01,
@@ -3829,5 +3835,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1638.0
+  "total_s": 1638.3
 }
