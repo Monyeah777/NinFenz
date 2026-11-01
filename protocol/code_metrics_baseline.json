@@ -86,9 +86,14 @@
       "max_fn_lines": 15
     },
     "desktop/src/core/asvs_policy.py": {
-      "lines": 135,
-      "max_fn_cc": 45,
-      "max_fn_lines": 99
+      "lines": 126,
+      "max_fn_cc": 38,
+      "max_fn_lines": 88
+    },
+    "desktop/src/core/asvs_residual.py": {
+      "lines": 83,
+      "max_fn_cc": 9,
+      "max_fn_lines": 45
     },
     "desktop/src/core/atomic_write.py": {
       "lines": 283,
@@ -270,8 +275,13 @@
       "max_fn_cc": 15,
       "max_fn_lines": 37
     },
+    "desktop/src/core/crypto_policy.py": {
+      "lines": 125,
+      "max_fn_cc": 4,
+      "max_fn_lines": 15
+    },
     "desktop/src/core/daemon.py": {
-      "lines": 1008,
+      "lines": 1007,
       "max_fn_cc": 17,
       "max_fn_lines": 77
     },
@@ -429,6 +439,11 @@
       "lines": 26,
       "max_fn_cc": 8,
       "max_fn_lines": 15
+    },
+    "desktop/src/core/file_format.py": {
+      "lines": 173,
+      "max_fn_cc": 6,
+      "max_fn_lines": 23
     },
     "desktop/src/core/gap_review.py": {
       "lines": 260,
@@ -1056,7 +1071,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/repo_index.py": {
-      "lines": 538,
+      "lines": 537,
       "max_fn_cc": 17,
       "max_fn_lines": 39
     },
@@ -1074,6 +1089,11 @@
       "lines": 43,
       "max_fn_cc": 11,
       "max_fn_lines": 14
+    },
+    "desktop/src/core/report_portable.py": {
+      "lines": 45,
+      "max_fn_cc": 5,
+      "max_fn_lines": 33
     },
     "desktop/src/core/requirement_coverage.py": {
       "lines": 45,
@@ -1160,10 +1180,20 @@
       "max_fn_cc": 9,
       "max_fn_lines": 37
     },
+    "desktop/src/core/security_audit.py": {
+      "lines": 249,
+      "max_fn_cc": 11,
+      "max_fn_lines": 37
+    },
     "desktop/src/core/security_controls.py": {
       "lines": 247,
-      "max_fn_cc": 71,
-      "max_fn_lines": 155
+      "max_fn_cc": 61,
+      "max_fn_lines": 153
+    },
+    "desktop/src/core/security_controls_sections.py": {
+      "lines": 66,
+      "max_fn_cc": 11,
+      "max_fn_lines": 22
     },
     "desktop/src/core/semantic_conflict.py": {
       "lines": 118,
@@ -1204,6 +1234,16 @@
       "lines": 21,
       "max_fn_cc": 4,
       "max_fn_lines": 8
+    },
+    "desktop/src/core/slsa_policy.py": {
+      "lines": 316,
+      "max_fn_cc": 17,
+      "max_fn_lines": 44
+    },
+    "desktop/src/core/ssdf_policy.py": {
+      "lines": 664,
+      "max_fn_cc": 23,
+      "max_fn_lines": 41
     },
     "desktop/src/core/st_quality.py": {
       "lines": 111,
@@ -1311,7 +1351,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 238,
+      "lines": 228,
       "max_fn_cc": 10,
       "max_fn_lines": 29
     },
@@ -1319,6 +1359,11 @@
       "lines": 348,
       "max_fn_cc": 13,
       "max_fn_lines": 51
+    },
+    "desktop/src/core/wheel_release.py": {
+      "lines": 157,
+      "max_fn_cc": 9,
+      "max_fn_lines": 29
     },
     "desktop/src/core/workflow_hardening.py": {
       "lines": 164,
@@ -1376,7 +1421,7 @@
       "max_fn_lines": 26
     },
     "scripts/build_vsa.py": {
-      "lines": 174,
+      "lines": 173,
       "max_fn_cc": 21,
       "max_fn_lines": 58
     },
@@ -1456,7 +1501,7 @@
       "max_fn_lines": 63
     },
     "scripts/generate_asvs_matrix.py": {
-      "lines": 520,
+      "lines": 495,
       "max_fn_cc": 12,
       "max_fn_lines": 75
     },
@@ -1581,9 +1626,14 @@
       "max_fn_lines": 29
     },
     "scripts/slsa_l3_readiness.py": {
-      "lines": 82,
-      "max_fn_cc": 15,
-      "max_fn_lines": 35
+      "lines": 55,
+      "max_fn_cc": 6,
+      "max_fn_lines": 21
+    },
+    "scripts/ssdf_policy.py": {
+      "lines": 43,
+      "max_fn_cc": 5,
+      "max_fn_lines": 20
     },
     "scripts/standards_map.py": {
       "lines": 197,
@@ -1644,6 +1694,11 @@
       "lines": 747,
       "max_fn_cc": 63,
       "max_fn_lines": 262
+    },
+    "scripts/wheel_release_metadata.py": {
+      "lines": 76,
+      "max_fn_cc": 4,
+      "max_fn_lines": 18
     },
     "scripts/workflow_policy.py": {
       "lines": 42,
