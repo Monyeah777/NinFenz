@@ -114,24 +114,24 @@
     },
     {
       "description": "数据化断言表（形状类断言数据化）",
-      "detail": "断言 24 条（通过 24）· kind 封闭集 4 种",
-      "digest": "57d8fee97b2aa5b13ad7cfa62ce54b543a9bd803f97043e3b45e57a3266faa93",
+      "detail": "provenance-receipts-schema 不通过：JSON 不可解析：C:\\Users\\mon_7\\.codex\\worktrees\\security-insights\\NinFenz\\protocol\\RECEIPTS.json 不是合法 JSON：Expecting property name enclosed in double quotes: line 28 column 1 (char 875)（修复指引：核对该件是否被写坏 / 含注释 / 截断）（修复指引：跑 nf receipts --scope protocol --write 重新生成回执单根，别手改）",
+      "digest": "c5de218b82330bd6508aab35cb79e80aaf122572227b6cb2ff59934ca4100170",
       "id": "assertions",
-      "ok": true
+      "ok": false
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2404 · 数据契约 54",
-      "digest": "cbfb79f019203b6cdb0dde734307049f1e480baef709a374b7a12d1a450614c1",
+      "detail": "契约执行异常：Expecting property name enclosed in double quotes: line 28 column 1 (char 875)",
+      "digest": "423368687d20fa52866278e7c0ef25f438b1ae1ecc995dcdf688141d69f18318",
       "id": "modeling",
-      "ok": true
+      "ok": false
     },
     {
       "description": "决策记录（ADR：不可改 + 取代链）",
-      "detail": "决策 3 条（accepted 1 · 取代链 0）",
-      "digest": "3baf8ac57c7becca5fa1ef0d1c75bdb14e7b3be3ab021018d859937d6b50d0f5",
+      "detail": "ADR-0000 已 accepted 但未被协议回执锚定（修复指引：nf receipts --write）——未锚定的 accepted 等于可被偷改; 回执声明不可解析：protocol/RECEIPTS.json 不是合法 JSON：Expecting property name enclosed in double quotes: line 28 column 1 (char 875)（修复指引：核对该件是否被写坏 / 含注释 / 截断）（修复指引：nf receipts --scope protocol --write）",
+      "digest": "0610a35ec36b9f8b99bf9331f2ff91dd40ef31a5e5a7835067daa3d1999f86eb",
       "id": "decisions",
-      "ok": true
+      "ok": false
     },
     {
       "description": "接力协议（SBAR 五段 + 未决带判据）",
@@ -190,9 +190,9 @@
       "ok": true
     }
   ],
-  "passed": 27,
-  "root": "1a0a8f732a8c58d6cd44ff3bb26df6a976cc088192f758ff0db2d89da6202a74",
+  "passed": 24,
+  "root": "d3fc8fa2df7e20eba68eabd53a457ec24577840c930393f5fc8503a8d014b078",
   "schema": "nf-conformance/1",
   "total": 27,
-  "verdict": "conformant"
+  "verdict": "non-conformant"
 }

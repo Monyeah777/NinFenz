@@ -289,9 +289,12 @@
     },
     {
       "id": "conformance_report",
-      "issues": 0,
+      "issues": 2,
       "name": "一致性报告（已提交 == 实时重算）",
-      "sample": [],
+      "sample": [
+        "报告过期或被改：root 记录=d3fc8fa2df7e20eb 实测=1a0a8f732a8c58d6（修复指引：nf conformance --write）",
+        "verdict 不一致：记录=non-conformant 实测=conformant"
+      ],
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
@@ -299,7 +302,7 @@
         "root": "1a0a8f732a8c58d6cd44ff3bb26df6a976cc088192f758ff0db2d89da6202a74",
         "verdict": "conformant"
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -676,7 +679,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4119,
+        "files": 4141,
         "kernel": 2199,
         "kernel_no_self": 436,
         "rules": 9,
@@ -688,12 +691,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "0d5c2cbecb3ab20b4d7cdcbb4df1b9d3515787c4077c48955ef989f19f4911f3",
+  "root_digest": "624a47a3965c0bd9e6b5a574a9945475951064853181ea0578211c743ab6702c",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 33,
+    "fail": 1,
+    "pass": 32,
     "warn": 1
   }
 }
