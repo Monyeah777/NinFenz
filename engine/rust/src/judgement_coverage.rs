@@ -4,7 +4,8 @@
 //! 这类「判据写好了但没接消费者」是 **"全 check PASS" 的盲区**——门禁全绿并不代表每条判据都在跑。
 //!
 //! 候选集 = `desktop/src/core/*.py` 中定义 `def scan(` 的模块；「被消费」= 模块名出现在任一消费者
-//!（`verify.sh` / `scripts/nf.py` / `core/verify_report.py` / `core/quality_depth_scan.py`，
+//!（`verify.sh` / `scripts/nf.py` / `scripts/slsa_source_readiness.py` /
+//! `core/verify_report.py` / `core/quality_depth_scan.py`，
 //! 或其它 core 模块）。未被消费且未登记 = FAIL；登记却已接线 = WARN（例外表不得虚挂）。
 //!
 //! **精度纪律**（真源自己踩过的坑，务必照抄）：只认「真消费」信号——`NAME.scan(...)` 属性调用、
@@ -25,9 +26,10 @@ use std::path::Path;
 
 pub const DECL_REL: &str = "protocol/judgement_coverage.json";
 pub const SCHEMA: &str = "nf-judgement-coverage/1";
-const CONSUMERS: [&str; 4] = [
+const CONSUMERS: [&str; 5] = [
     "verify.sh",
     "scripts/nf.py",
+    "scripts/slsa_source_readiness.py",
     "desktop/src/core/verify_report.py",
     "desktop/src/core/quality_depth_scan.py",
 ];
