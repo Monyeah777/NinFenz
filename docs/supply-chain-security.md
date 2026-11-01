@@ -7,7 +7,7 @@
 
 ```bash
 python scripts/supply_chain_policy.py
-python scripts/slsa_source_readiness.py --live
+python scripts/slsa_source_readiness.py
 python scripts/validate_sboms.py packaging/npm/dist/release
 ```
 
@@ -57,8 +57,9 @@ VSA 当前只声明 `SLSA_BUILD_LEVEL_2`。共享 GitHub runner 可被工作流�
 仓库对 `main` 使用 active Ruleset：禁止强推和删除、要求 linear history、要求状态检查通过、
 要求会话解决，并对管理员生效。`refs/tags/v*` 另一个 active Ruleset 禁止删除、强推和更新，
 且两个 Ruleset 都没有 bypass actor。机器快照由
-`python scripts/slsa_source_readiness.py --collect` 从 GitHub API 生成，CI 使用 `--live`
-重新读取平台事实并与 readiness 声明对账。
+`python scripts/slsa_source_readiness.py --collect` 从 GitHub API 生成，CI 校验提交快照与
+readiness 声明。维护者在变更 Ruleset 后运行 `--live` 显式回读平台事实；公网 API 不作为
+每次 PR 的硬依赖，避免托管 runner 的匿名限流制造假红。
 
 GitHub 当前不提供 SLSA Source VSA 与 Source Provenance，因此本仓库明确声明
 **SLSA Source Level 0**，不把 Build provenance 改名为 Source provenance。机读矩阵在

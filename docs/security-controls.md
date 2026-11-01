@@ -126,7 +126,7 @@ SLSA Source Track 技术控制包括管理员强制的受保护 main、禁止强
 
 ```bash
 python scripts/asvs_policy.py
-python scripts/slsa_source_readiness.py --live
+python scripts/slsa_source_readiness.py
 python -m pytest desktop/tests/test_security_controls.py -q
 python scripts/slsa_l3_readiness.py
 ```

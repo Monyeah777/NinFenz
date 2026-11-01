@@ -157,13 +157,14 @@ class SourceReadinessTest(unittest.TestCase):
         self.assertEqual([], snapshot["branch_ruleset"]["bypass_actors"])
         self.assertNotIn("token", json.dumps(snapshot).lower())
 
-    def test_ci_gate_uses_live_source_controls(self):
+    def test_ci_gate_uses_reviewed_source_snapshot(self):
         workflow = yaml.safe_load(
             (ROOT / ".github/workflows/ci-verify.yml").read_text(encoding="utf-8")
         )
         job = workflow["jobs"]["source-controls"]
         self.assertNotIn("env", job["steps"][-1])
-        self.assertIn("slsa_source_readiness.py --live", job["steps"][-1]["run"])
+        self.assertIn("slsa_source_readiness.py", job["steps"][-1]["run"])
+        self.assertNotIn("--live", job["steps"][-1]["run"])
         self.assertIn("source-controls", workflow["jobs"]["gate"]["needs"])
 
     def test_source_scanner_has_a_declared_consumer(self):
