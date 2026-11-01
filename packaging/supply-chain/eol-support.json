@@ -1,6 +1,6 @@
 {
   "schema": "nf-eol-support/1",
-  "reviewed_at": "2026-11-02",
+  "reviewed_at": "2026-11-01",
   "max_review_age_days": 90,
   "warn_before_eol_days": 90,
   "policy": {
