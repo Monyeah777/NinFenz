@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:2e3c8b6c41966340bf02e58719cd9be2207c1f005cf5e777f13fe9013bb456c0
+  - protocol/code_metrics_baseline.json:457fd997430af74d76795d4a9697aba5cb08c18ecfd2d2f1b14ea2766fba0024
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -260,6 +260,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-02）：OpenSSF Security Insights v2.2.0
+
 > 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3
 
 > 重审（2026-11-02）：S2C2F SCA-3 runtime EOL policy
