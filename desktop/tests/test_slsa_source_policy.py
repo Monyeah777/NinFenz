@@ -162,7 +162,7 @@ class SourceReadinessTest(unittest.TestCase):
             (ROOT / ".github/workflows/ci-verify.yml").read_text(encoding="utf-8")
         )
         job = workflow["jobs"]["source-controls"]
-        self.assertIn("GH_TOKEN", job["steps"][-1]["env"])
+        self.assertNotIn("env", job["steps"][-1])
         self.assertIn("slsa_source_readiness.py --live", job["steps"][-1]["run"])
         self.assertIn("source-controls", workflow["jobs"]["gate"]["needs"])
 

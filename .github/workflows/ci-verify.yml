@@ -243,8 +243,6 @@ jobs:
         with:
           persist-credentials: false
       - name: 验证 SLSA Source 技术控制与诚实等级声明
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: python3 scripts/slsa_source_readiness.py --live
 
   # ---------------------------------------------------------------- 冻结一致性判据
