@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
+import os
+import ssl
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from http.client import HTTPException, HTTPSConnection
 from pathlib import Path
 from typing import Any
 
@@ -15,35 +17,42 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write, slsa_source_policy as policy  # noqa: E402
+from core import atomic_write, json_doc  # noqa: E402
+from core import slsa_source_policy as policy  # noqa: E402
+
+_SSL_CONTEXT = ssl.create_default_context()
 
 
 def _gh_api(path: str) -> Any:
-    proc = subprocess.run(
-        [
-            "gh",
-            "api",
-            "-H",
-            "Accept: application/vnd.github+json",
-            path,
-        ],
-        cwd=str(ROOT),
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        timeout=30,
-        check=False,
-    )
-    if proc.returncode != 0:
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN") or ""
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "NinFenz-Source-Readiness",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    connection = HTTPSConnection("api.github.com", timeout=30, context=_SSL_CONTEXT)
+    try:
+        connection.request("GET", "/" + path.lstrip("/"), headers=headers)
+        response = connection.getresponse()
+        payload = response.read().decode("utf-8")
+        if not 200 <= response.status < 300:
+            raise RuntimeError(
+                f"GitHub API returned HTTP {response.status} for {path}"
+                "（修复指引：检查仓库只读权限与 API 限流）"
+            )
+    except (OSError, HTTPException) as exc:
         raise RuntimeError(
-            f"GitHub API read failed for {path}: {proc.stderr.strip()[:200]}"
-            "（修复指引：检查 gh 认证、网络与仓库只读权限）"
-        )
-    return json.loads(proc.stdout)
+            f"GitHub API read failed for {path}: {str(exc)[:200]}"
+            "（修复指引：检查 GH_TOKEN、网络与仓库只读权限）"
+        ) from exc
+    finally:
+        connection.close()
+    return json_doc.loads(payload, (dict, list), what=f"GitHub API {path}")
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _write_snapshot(snapshot: dict[str, Any], root: Path) -> None:
@@ -79,10 +88,10 @@ def main(argv: list[str] | None = None) -> int:
                 _write_snapshot(snapshot, root)
             controls = snapshot
         else:
-            controls = json.loads((root / policy.CONTROLS_REL).read_text(encoding="utf-8"))
-        readiness = json.loads((root / policy.READINESS_REL).read_text(encoding="utf-8"))
+            controls = json_doc.load(root / policy.CONTROLS_REL, dict, what=policy.CONTROLS_REL)
+        readiness = json_doc.load(root / policy.READINESS_REL, dict, what=policy.READINESS_REL)
         issues, stats = policy.scan_documents(readiness, controls)
-    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError, RuntimeError) as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 2
     if args.json:

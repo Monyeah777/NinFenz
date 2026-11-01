@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-28",
+  "measured_at": "2026-11-01",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -298,6 +298,7 @@
     "test_site_face": 0.9,
     "test_skill_adapter": 0.2,
     "test_skill_contract": 0.1,
+    "test_slsa_source_policy": 0.7,
     "test_st_validator": 0.1,
     "test_state_front": 0.1,
     "test_stdio_encoding": 0.5,
@@ -3343,6 +3344,15 @@
     "test_skill_adapter.TestSkillAdapter.test_techdoc_export_produces_skill_md": 0.0,
     "test_skill_contract.Test.test_clean_text": 0.0,
     "test_skill_contract.Test.test_grant_detected": 0.0,
+    "test_slsa_source_policy.SourceReadinessTest.test_ci_gate_uses_live_source_controls": 0.01,
+    "test_slsa_source_policy.SourceReadinessTest.test_collector_normalizes_only_required_platform_fields": 0.0,
+    "test_slsa_source_policy.SourceReadinessTest.test_current_tree_is_honest_about_source_level": 0.0,
+    "test_slsa_source_policy.SourceReadinessTest.test_main_must_forbid_force_push_and_deletion": 0.04,
+    "test_slsa_source_policy.SourceReadinessTest.test_nonzero_claim_requires_source_attestations": 0.02,
+    "test_slsa_source_policy.SourceReadinessTest.test_platform_attestation_claim_needs_evidence_url": 0.02,
+    "test_slsa_source_policy.SourceReadinessTest.test_ruleset_bypass_actor_is_rejected": 0.02,
+    "test_slsa_source_policy.SourceReadinessTest.test_source_scanner_has_a_declared_consumer": 0.3,
+    "test_slsa_source_policy.SourceReadinessTest.test_tags_require_immutable_ruleset": 0.01,
     "test_st_validator.TestCard.test_v1_flat_needs_six_fields": 0.0,
     "test_st_validator.TestCard.test_v2_clean_passes": 0.0,
     "test_st_validator.TestCard.test_v2_wrong_spec_version_is_fail": 0.0,
@@ -3793,5 +3803,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 956.9
+  "total_s": 957.6
 }

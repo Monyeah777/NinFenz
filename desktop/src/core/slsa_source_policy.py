@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import json
-import re
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+
+from . import json_doc
 
 READINESS_REL = "packaging/supply-chain/slsa-source-readiness.json"
 CONTROLS_REL = "results/supply-chain/github-source-controls.json"
@@ -32,10 +33,7 @@ VALID_STATUS = {"satisfied", "partial", "blocked", "not-applicable"}
 
 
 def _json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{path}: top-level value must be an object（修复指引：恢复 JSON 对象）")
-    return value
+    return json_doc.load(path, dict, what=str(path))
 
 
 def _repository_issues(snapshot: dict[str, Any]) -> list[str]:
