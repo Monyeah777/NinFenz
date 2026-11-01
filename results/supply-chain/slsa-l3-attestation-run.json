@@ -1,13 +1,13 @@
 {
   "schema": "nf-slsa-l3-attestation-run/1",
   "repository": "https://github.com/Monyeah777/NinFenz",
-  "run_id": 41315142439,
-  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41315142439",
-  "tested_commit": "5c0b1e6f092d8addceb5eb17973f528db289cacc",
+  "run_id": 41315754738,
+  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41315754738",
+  "tested_commit": "eda16787e009dbdb16966307722e8f4b5bad9880",
   "trigger": "workflow_dispatch",
   "release_published": false,
-  "release_evidence_run_id": 41315138944,
-  "release_evidence_run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41315138944",
+  "release_evidence_run_id": 41315751199,
+  "release_evidence_run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41315751199",
   "release_evidence_verified": true,
   "build_signer_workflow": ".github/workflows/slsa-build-l3.yml",
   "vsa_signer_workflow": ".github/workflows/npm-publish.yml",
@@ -24,9 +24,9 @@
   ],
   "provenance_verified": true,
   "vsa_verified": true,
-  "verified_at": "2026-11-01T14:16:07Z",
+  "verified_at": "2026-11-01T14:23:06Z",
   "subjects": {
-    "monyeah777-ninfenz-1.1.0.tgz": "71307f4386e73a00456eb1a8b360c1530c48df619bb178efe1c81e56bf29f925",
-    "ninfenz-1.1.0.tgz": "29bf497fa212a4d20e4daa23bc955089415ab23d8982cbae5f4a469da3435143"
+    "monyeah777-ninfenz-1.1.0.tgz": "568f276bbfbb0c3c7607b83cac5d26a8f606895042acf8405914e8a12f691f73",
+    "ninfenz-1.1.0.tgz": "59cad1068d1097d6c92edc4188adfa6aede89e68ae1037af0a6950dc7ced30ee"
   }
 }
