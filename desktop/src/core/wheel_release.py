@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from . import json_doc
+from . import atomic_write, json_doc
 
 SCHEMA = "nf-python-wheel/1"
 PACKAGE = "ninfenz-pyengine"
@@ -64,7 +64,7 @@ def write_checksums(path: Path, files: list[Path]) -> None:
         f"{hashlib.sha256(item.read_bytes()).hexdigest()}  {item.name}"
         for item in sorted(files, key=lambda item: item.name)
     ]
-    path.write_text("\n".join(rows) + "\n", encoding="ascii")
+    atomic_write.write_text(path, "\n".join(rows) + "\n")
 
 
 def _sums(path: Path) -> tuple[dict[str, str], list[str]]:

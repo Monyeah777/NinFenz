@@ -266,7 +266,10 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
+> 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3
+
 > 重审（2026-11-02）：S2C2F SCA-3 runtime EOL policy
+> 重审（2026-11-02）：SLSA PyO3/Maturin wheel L3 final verification
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
 

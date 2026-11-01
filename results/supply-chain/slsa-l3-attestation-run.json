@@ -1,20 +1,20 @@
 {
   "schema": "nf-slsa-l3-attestation-run/1",
   "repository": "https://github.com/Monyeah777/NinFenz",
-  "run_id": 41326574658,
-  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41326574658",
-  "tested_commit": "7b53ea4a3d546352819ac94945e31dfd38632b87",
+  "run_id": 41328877295,
+  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41328877295",
+  "tested_commit": "a0fbde51fb4ad777b3cb5744adc4e37494be13c4",
   "trigger": "workflow_dispatch",
   "release_published": false,
-  "release_evidence_run_id": 41327046879,
-  "release_evidence_run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41327046879",
+  "release_evidence_run_id": 41329573766,
+  "release_evidence_run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41329573766",
   "release_evidence_verified": true,
   "build_signer_workflow": ".github/workflows/slsa-build-l3.yml",
   "vsa_signer_workflow": ".github/workflows/npm-publish.yml",
   "provenance_predicate": "https://slsa.dev/provenance/v1",
   "vsa_predicate": "https://slsa.dev/verification_summary/v1",
   "workflow_sha256": {
-    ".github/workflows/slsa-build-l3.yml": "ccdf797aaf15a21663d0cd410f8c14d6b77a6b36d9b56f1e152f1732df96a180",
+    ".github/workflows/slsa-build-l3.yml": "0f6f632df5695298d48db5795da39fb3921763ef3123d7a3fa3a1ca6f09cc4b7",
     ".github/workflows/npm-publish.yml": "328df9afb7337896695e6b60d085db15a40d5c56dc34c7c69936d88b392d7dd7",
     ".github/workflows/release-evidence-l3.yml": "bb88ffe905dfb1ce8821bb1ef1eb254e48ba196f73f7ee2773befe65aaf0aede",
     ".github/workflows/release.yml": "8c0fce08e91c0deb714aac7d5abd2879d2f77bb2bbca1082f27551e763de38f7"
@@ -24,10 +24,20 @@
   ],
   "provenance_verified": true,
   "vsa_verified": true,
-  "verified_at": "2026-11-01T16:32:18Z",
+  "verified_at": "2026-11-01T17:01:37Z",
   "subjects": {
-    "monyeah777-ninfenz-1.1.0.tgz": "b0a19ad1b82d99c2dfa983cf9b95728882c12a78bda8a06f720f43298d1e1950",
-    "ninfenz-1.1.0.tgz": "e37837cacd66e7bc1f21786b4a95507baf85f05a23a6b6c819b18842c9410a30",
-    "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_28_x86_64.whl": "fbbd61c1a39330cf16e7d0bc689cba1ffe1ae6f5be41ff223018c0777b0f668a"
+    "SHA256SUMS": "685ebff4524fb752d56935e09104993477949a8c71351eb39d1f98b277cc9c18",
+    "WHEEL-SHA256SUMS": "42e051f28e9e0c01591f6f38dab613cef65f02d2e484e9331cea24e22fb4abbc",
+    "monyeah777-ninfenz-1.1.0.cdx.json": "c6ae5e87cf6093e7a92cf273bb9a08ebdb246f2da649476e80f77e7f854b4521",
+    "monyeah777-ninfenz-1.1.0.spdx3.json": "848777cabba8550d7fbeacbb15362964eb8a0e4e38b7d4fb079ea321e21b0440",
+    "monyeah777-ninfenz-1.1.0.tgz": "90f51041304900ffa9097ee570d09fedee6cdaaa7790432f36e875846c08b92b",
+    "ninfenz-1.1.0.cdx.json": "b66e1e9889dd540fcdbf5d039a3c5755bf821da67bbb2bf5a16d00769339eab6",
+    "ninfenz-1.1.0.openvex.json": "38007dcb7bf1dfb5348260678b788eab2e07cda57ebba8b56afa3ae6687353f9",
+    "ninfenz-1.1.0.payload-manifest.json": "cff09e10e03b24b27a282789d6a2190f63c209974df9ade7498cdd3325244e96",
+    "ninfenz-1.1.0.spdx3.json": "b19ba420e8f984a6fc47e21d493c2bab03ab99015138a560c3c2d06240c42c9a",
+    "ninfenz-1.1.0.tgz": "b6f643e52e92fbd654bdf8815cde7e5362fbeb011e981af6020866060d89c4c2",
+    "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_28_x86_64.whl": "2735c2db90222e0b546f46c46ea48be4039a11bb0d4355b906fad3dab254c5c8",
+    "release-metadata.json": "76c250e0b88d2b9344337e7821b18bc4d0efa280b90b7a367f87e26a07b660bb",
+    "wheel-metadata.json": "8dd26927802c38673738652927c4a9b7ff296ddfed639de5ebee256c0e97a7d8"
   }
 }

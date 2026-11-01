@@ -186,7 +186,7 @@
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "8f167d1d370f44dab9cb44b1019738f446ed9d1bb8b8f10299cfbf18016d14ef"
+      "nf:sha256": "5d1066a67e153fede53af1b5e976f54bc35efddef828a65ff37c1cefd56a3a90"
     },
     {
       "@id": "nf:file/protocol/data_contracts.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "274c96bd4cfc999e093dde11b2cbc0e8ae6b3258be182f913e6677fb5c8e679c"
+      "nf:sha256": "dbb325b3a61349e3e7a263243901312d051b1934752b2bd6eca52ab63153b68b"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

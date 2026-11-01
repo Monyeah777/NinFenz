@@ -298,7 +298,10 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-02）：S2C2F SCA-3 rebased on final wheel L3
+
 > 重审（2026-11-02）：S2C2F SCA-3 runtime EOL policy
+> 重审（2026-11-02）：SLSA PyO3/Maturin wheel L3 final verification
 
 > 重审（2026-11-01）：SLSA v1.2 Build L3 successful rebaselined run and workflow hashes
 

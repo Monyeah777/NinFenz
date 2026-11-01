@@ -40,7 +40,8 @@ jobs:
           export CARGO_HOME="$RUNNER_TEMP/cargo-home"
           rustup toolchain install 1.99.1 --profile minimal --no-self-update
           rustup default 1.99.1
-          python -m pip install --disable-pip-version-check --no-cache-dir maturin==1.16.0
+          python -m pip install -r .github/requirements-wheel.txt \
+            --disable-pip-version-check --no-cache-dir
           rustc --version
           maturin --version
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
@@ -91,7 +92,8 @@ jobs:
               export PATH=/opt/python/cp311-cp311/bin:/cargo/bin:$PATH
               curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs |
                 sh -s -- -y --profile minimal --no-modify-path --default-toolchain 1.99.1
-              python -m pip install --disable-pip-version-check --no-cache-dir maturin==1.16.0
+              python -m pip install -r .github/requirements-wheel.txt \
+                --disable-pip-version-check --no-cache-dir
               A=$(mktemp -d /tmp/wheel-a.XXXXXX)
               B=$(mktemp -d /tmp/wheel-b.XXXXXX)
               for OUT in "$A" "$B"; do
@@ -105,8 +107,7 @@ jobs:
               test -n "$WHEEL_B"
               cmp "$WHEEL_A" "$WHEEL_B"
               python -m venv /tmp/wheel-smoke
-              /tmp/wheel-smoke/bin/python -m pip install --no-cache-dir \
-                --force-reinstall --no-deps "$WHEEL_A"
+              /tmp/wheel-smoke/bin/python -m pip install --no-cache-dir --force-reinstall --no-deps "$WHEEL_A"
               /tmp/wheel-smoke/bin/python - <<"PYEOF"
           import hashlib
           import nf_pyengine
