@@ -259,6 +259,7 @@
     "test_repo_stats": 0.6,
     "test_repo_trust": 3.8,
     "test_report_meta": 0.2,
+    "test_reproducibility_policy": 0.2,
     "test_requirement_coverage": 0.2,
     "test_residual_registry": 0.2,
     "test_response_cache_replay": 0.2,
@@ -3073,6 +3074,12 @@
     "test_report_meta.Test.test_tentative_requires_reason": 0.0,
     "test_report_meta.Test.test_valid_meta": 0.0,
     "test_report_meta.Test.test_zero_denominator_confident_rejected": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_cross_machine_overclaim_is_rejected": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_current_evidence_is_bound_to_slsa_run": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_digest_must_match_attested_subject": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_required_artifact_kind_cannot_disappear": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_run_and_commit_must_match": 0.0,
+    "test_reproducibility_policy.ReproducibilityPolicyTest.test_single_build_is_not_reproducibility": 0.0,
     "test_requirement_coverage.Test.test_orphan_check": 0.0,
     "test_requirement_coverage.Test.test_uncovered_must_is_reported": 0.0,
     "test_requirement_coverage.Test.test_uncovered_without_plan_fails": 0.0,
@@ -3835,5 +3842,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1638.3
+  "total_s": 1638.5
 }

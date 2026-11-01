@@ -81,6 +81,8 @@ jobs:
         run: node site/tools/sync-numbers.mjs
       - name: NIST SSDF v1.1 证据与漏洞响应台账
         run: python scripts/ssdf_policy.py
+      - name: Reproducible Builds evidence
+        run: python scripts/reproducibility_policy.py
       - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
         run: node site/tools/site-check.mjs --offline
       - name: 上传门禁日志（失败时同样上传）

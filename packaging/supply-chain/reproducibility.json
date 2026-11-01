@@ -1,0 +1,40 @@
+{
+  "schema": "nf-reproducibility-evidence/1",
+  "standard": "https://reproducible-builds.org/docs/definition/",
+  "scope": "same-controlled-build-environment",
+  "run_id": 41347575682,
+  "source_commit": "e30d3ec7ab6b33fb1085c2b2d5d59e82ae599c41",
+  "environment": {
+    "runner": "ubuntu-latest",
+    "source_date_epoch": "git-commit-timestamp",
+    "persistent_caches": false,
+    "rust": "1.99.1",
+    "maturin": "1.16.0",
+    "python": "3.11",
+    "node": "24.10",
+    "wheel_container": "quay.io/pypa/manylinux_2_28_x86_64@sha256:7e41b1c7fd64dfc69703a1124b43c404382973ee06ec5d764b85c34d2221fded"
+  },
+  "artifacts": [
+    {
+      "kind": "npm",
+      "filename": "ninfenz-1.1.0.tgz",
+      "sha256": "a6e635c0af24dbef26e4b724c42ad08ced5ef1eb4fb79e7935792d33fbd6c5d9",
+      "builds": 2,
+      "comparison": "byte-identical"
+    },
+    {
+      "kind": "github-packages",
+      "filename": "monyeah777-ninfenz-1.1.0.tgz",
+      "sha256": "b9bcdb0608cfccba94b9a2b619fd2bfd113595bc5173f3711b7aceaa0ed8c48c",
+      "builds": 2,
+      "comparison": "byte-identical"
+    },
+    {
+      "kind": "python-wheel",
+      "filename": "ninfenz_pyengine-0.1.0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "sha256": "20260348eb56c8d211aedeba58d32087b0dc4205449073f4a3f6b09952c72488",
+      "builds": 2,
+      "comparison": "byte-identical"
+    }
+  ]
+}

@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:35a3fc9bd1d6d63a7a94c7cdb4e1842be2e9fba77941186b77937a5bec097718
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:15e23311cf08ee90c43874d31a8b07ec5b0dd03f28def7e6a4aef0cc4033a18e
+  - protocol/code_metrics_baseline.json:b38e679e9c759acf3006ea5541c78e42986c9ed1310533757722c976d08f0bc0
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -260,6 +260,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：SLSA PyO3/Maturin wheel L3 final verification
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
