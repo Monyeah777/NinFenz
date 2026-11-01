@@ -1,11 +1,14 @@
 {
   "schema": "nf-slsa-l3-attestation-run/1",
   "repository": "https://github.com/Monyeah777/NinFenz",
-  "run_id": 41309669898,
-  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41309669898",
-  "tested_commit": "60936006363dcd8a46d3787f5fed41bb04d9ec01",
+  "run_id": 41312133811,
+  "run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41312133811",
+  "tested_commit": "f769a7e3a040ca12438bbcf425b508e8fc142fa3",
   "trigger": "workflow_dispatch",
   "release_published": false,
+  "release_evidence_run_id": 41312047865,
+  "release_evidence_run_url": "https://github.com/Monyeah777/NinFenz/actions/runs/41312047865",
+  "release_evidence_verified": true,
   "build_signer_workflow": ".github/workflows/slsa-build-l3.yml",
   "vsa_signer_workflow": ".github/workflows/npm-publish.yml",
   "provenance_predicate": "https://slsa.dev/provenance/v1",
@@ -13,17 +16,17 @@
   "workflow_sha256": {
     ".github/workflows/slsa-build-l3.yml": "e2fd7481b04e724d21acb4da87c6011c3564e06ab33d32e423108debf242387a",
     ".github/workflows/npm-publish.yml": "fd529008fab7225cd61c949005ade27c9ed4184364e9b8a57d2c7f13e3c9d324",
-    ".github/workflows/release-evidence-l3.yml": "bfcbd2843a929a3850412c62ea88bd574905b452c0a08e07888be1dffbcf297b",
-    ".github/workflows/release.yml": "a4142c2ecfd6cf0faf87b80d9ba921d7949fcbeca31fc8dae25a3492314b5171"
+    ".github/workflows/release-evidence-l3.yml": "bb88ffe905dfb1ce8821bb1ef1eb254e48ba196f73f7ee2773befe65aaf0aede",
+    ".github/workflows/release.yml": "8c0fce08e91c0deb714aac7d5abd2879d2f77bb2bbca1082f27551e763de38f7"
   },
   "verified_levels": [
     "SLSA_BUILD_LEVEL_3"
   ],
   "provenance_verified": true,
   "vsa_verified": true,
-  "verified_at": "2026-11-01T13:09:04Z",
+  "verified_at": "2026-11-01T13:38:44Z",
   "subjects": {
-    "monyeah777-ninfenz-1.1.0.tgz": "2193d651422da1db7c75278dc8396e8e246bf71e33c15c7c4ce43b7cef9680e6",
-    "ninfenz-1.1.0.tgz": "1d34dd45647be8f4fb105c4d701bae479986bd3eda81b60230600ce2283443f5"
+    "monyeah777-ninfenz-1.1.0.tgz": "0fc543555faa2a280e3d8aeb5772b2e471f7bcde558982ae469f5ac0a04e6576",
+    "ninfenz-1.1.0.tgz": "4df8196414a54ef9a1758e1edd1dfe1aacce136222b8f8163df22a8e42e7b4ea"
   }
 }

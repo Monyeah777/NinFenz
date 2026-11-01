@@ -146,6 +146,27 @@ def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
             issues.append(f"{RUN_EVIDENCE_REL}: {key} 必须是 {value}")
     if not isinstance(doc.get("run_id"), int) or doc["run_id"] < 1:
         issues.append(f"{RUN_EVIDENCE_REL}: run_id 必须是正整数")
+    expected_run_url = (
+        f"https://github.com/Monyeah777/NinFenz/actions/runs/{doc.get('run_id')}"
+    )
+    if doc.get("run_url") != expected_run_url:
+        issues.append(f"{RUN_EVIDENCE_REL}: run_url 必须绑定 run_id")
+    release_run_id = doc.get("release_evidence_run_id")
+    if not isinstance(release_run_id, int) or release_run_id < 1:
+        issues.append(f"{RUN_EVIDENCE_REL}: release_evidence_run_id 必须是正整数")
+    elif release_run_id == doc.get("run_id"):
+        issues.append(f"{RUN_EVIDENCE_REL}: npm 与 Release evidence 必须是独立运行")
+    release_run_url = (
+        f"https://github.com/Monyeah777/NinFenz/actions/runs/{release_run_id}"
+    )
+    if doc.get("release_evidence_run_url") != release_run_url:
+        issues.append(
+            f"{RUN_EVIDENCE_REL}: release_evidence_run_url 必须绑定 release_evidence_run_id"
+        )
+    if doc.get("release_evidence_verified") is not True:
+        issues.append(f"{RUN_EVIDENCE_REL}: release_evidence_verified 必须为 true")
+    if doc.get("release_published") is not False:
+        issues.append(f"{RUN_EVIDENCE_REL}: 验证运行不得发布 Release")
     if not re.fullmatch(r"[0-9a-f]{40}", str(doc.get("tested_commit") or "")):
         issues.append(f"{RUN_EVIDENCE_REL}: tested_commit 必须是 40 位提交 SHA")
     if doc.get("verified_levels") != [LEVEL_L3]:

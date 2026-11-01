@@ -114,7 +114,7 @@ class ReadinessTest(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertEqual("SLSA_BUILD_LEVEL_3", stats["claimed_level"])
         self.assertEqual({"satisfied": 6}, stats["statuses"])
-        self.assertEqual(41309669898, stats["last_run_id"])
+        self.assertEqual(41312133811, stats["last_run_id"])
 
     def test_every_readiness_requirement_must_be_satisfied(self):
         root = self._root_copy()
@@ -182,6 +182,19 @@ class ReadinessTest(unittest.TestCase):
         (root / READINESS.RUN_EVIDENCE_REL).unlink()
         issues, _ = READINESS.scan(root)
         self.assertTrue(any("真实 L3 attestation 运行证据" in issue for issue in issues), issues)
+
+    def test_l3_run_evidence_binds_both_independent_runs(self):
+        root = self._root_copy()
+        path = root / READINESS.RUN_EVIDENCE_REL
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["release_evidence_run_url"] = (
+            "https://github.com/Monyeah777/NinFenz/actions/runs/1"
+        )
+        doc["release_evidence_verified"] = False
+        path.write_text(json.dumps(doc), encoding="utf-8")
+        issues, _ = READINESS.scan(root)
+        self.assertTrue(any("release_evidence_run_url" in issue for issue in issues), issues)
+        self.assertTrue(any("release_evidence_verified" in issue for issue in issues), issues)
 
     def test_l3_run_evidence_is_bound_to_workflow_contents(self):
         root = self._root_copy()
