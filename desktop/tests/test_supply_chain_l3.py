@@ -114,7 +114,10 @@ class ReadinessTest(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertEqual("SLSA_BUILD_LEVEL_3", stats["claimed_level"])
         self.assertEqual({"satisfied": 6}, stats["statuses"])
-        self.assertEqual(41312133811, stats["last_run_id"])
+        evidence = json.loads(
+            (ROOT / READINESS.RUN_EVIDENCE_REL).read_text(encoding="utf-8")
+        )
+        self.assertEqual(evidence["run_id"], stats["last_run_id"])
 
     def test_every_readiness_requirement_must_be_satisfied(self):
         root = self._root_copy()
