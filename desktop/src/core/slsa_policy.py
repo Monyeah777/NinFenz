@@ -124,14 +124,7 @@ def _builder_issues(label: str, text: str) -> list[str]:
     return issues
 
 
-def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
-    path = root / RUN_EVIDENCE_REL
-    if not path.is_file():
-        return [f"{RUN_EVIDENCE_REL}: 缺真实 L3 attestation 运行证据"]
-    try:
-        doc = _json(path)
-    except (OSError, ValueError) as exc:
-        return [f"{RUN_EVIDENCE_REL}: 不可读：{exc}"]
+def _run_identity_issues(doc: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     expected = {
         "schema": "nf-slsa-l3-attestation-run/1",
@@ -174,6 +167,13 @@ def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
     for key in ("provenance_verified", "vsa_verified"):
         if doc.get(key) is not True:
             issues.append(f"{RUN_EVIDENCE_REL}: {key} 必须为 true")
+    return issues
+
+
+def _run_hash_issues(
+    root: Path, doc: dict[str, Any], pending_run: bool
+) -> list[str]:
+    issues: list[str] = []
     workflows = doc.get("workflow_sha256")
     expected_workflows = {
         BUILDER_REL,
@@ -188,6 +188,11 @@ def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
             actual = hashlib.sha256((root / rel).read_bytes()).hexdigest()
             if actual != expected_hash and not pending_run:
                 issues.append(f"{RUN_EVIDENCE_REL}: {rel} 已在验收运行后变更")
+    return issues
+
+
+def _run_timestamp_subject_issues(doc: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
     try:
         datetime.fromisoformat(str(doc.get("verified_at") or "").replace("Z", "+00:00"))
     except ValueError:
@@ -197,6 +202,20 @@ def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
         issues.append(f"{RUN_EVIDENCE_REL}: subjects 必须非空")
     elif any(not re.fullmatch(r"[0-9a-f]{64}", str(digest)) for digest in subjects.values()):
         issues.append(f"{RUN_EVIDENCE_REL}: subject digest 必须是 SHA-256")
+    return issues
+
+
+def _run_evidence_issues(root: Path, pending_run: bool = False) -> list[str]:
+    path = root / RUN_EVIDENCE_REL
+    if not path.is_file():
+        return [f"{RUN_EVIDENCE_REL}: 缺真实 L3 attestation 运行证据"]
+    try:
+        doc = _json(path)
+    except (OSError, ValueError) as exc:
+        return [f"{RUN_EVIDENCE_REL}: 不可读：{exc}"]
+    issues = _run_identity_issues(doc)
+    issues.extend(_run_hash_issues(root, doc, pending_run))
+    issues.extend(_run_timestamp_subject_issues(doc))
     return issues
 
 

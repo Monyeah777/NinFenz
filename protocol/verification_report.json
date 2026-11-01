@@ -506,7 +506,7 @@
       "source": "slsa_policy.scan",
       "stats": {
         "claimed_level": "SLSA_BUILD_LEVEL_3",
-        "last_run_id": 41309669898,
+        "last_run_id": 41312133811,
         "statuses": {
           "satisfied": 6
         }
@@ -688,7 +688,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c1d9d39034cad22d9871448d308948d0f45411e43271e58d89ba62d248581351",
+  "root_digest": "ba8d5d5ce119769e531fdbd29372b812102e601c5e903716088fea525a1d4cb9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
