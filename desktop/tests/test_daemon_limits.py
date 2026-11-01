@@ -138,13 +138,14 @@ class DaemonArgvLimitTest(unittest.TestCase):
         self.assertTrue(dm._lifetime_expired(10.0, 70.0, 60.0))
         self.assertFalse(dm._lifetime_expired(10.0, 10_000.0, 0.0))
 
-    def test_cwd_must_be_an_existing_directory(self):
+    def test_cwd_must_be_an_existing_directory_inside_root(self):
         root = Path(tempfile.mkdtemp(prefix="nf_daemon_cwd_"))
         self.addCleanup(lambda: __import__("shutil").rmtree(root, ignore_errors=True))
         inside = root / "sub"
         inside.mkdir()
         self.assertEqual(str(inside.resolve()), dm._validated_cwd(root, str(inside)))
-        self.assertEqual(str(root.parent.resolve()), dm._validated_cwd(root, str(root.parent)))
+        with self.assertRaisesRegex(ValueError, "越出守护根"):
+            dm._validated_cwd(root, str(root.parent))
         with self.assertRaises(ValueError):
             dm._validated_cwd(root, str(root / "missing"))
         with self.assertRaises(ValueError):
