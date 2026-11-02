@@ -6,12 +6,14 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - .github/PULL_REQUEST_TEMPLATE.md:ee28953acf26601c4c36568dc99f705a86319b9c7622f019fee541d907621aff
-  - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
+  - .github/PULL_REQUEST_TEMPLATE.md:cbf949df18aa23f01589618e1322b115644318540627960886b22f0f22bd75c7
+  - CONTRIBUTING.md:6c571602fadaa60b40ec402bb2f363b839362ed37a4bebf1cb376bbc64a69619
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
   - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
 
 ---
+> 重审（2026-11-02）：2026-11-02 repository governance map: align PR/CLA workflow with protected main; existing external-input audit conclusion remains valid
+
 > 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径
 
 > 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价

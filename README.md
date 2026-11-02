@@ -71,10 +71,12 @@ NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质�
 
 `bash verify.sh`（当前基线见下方生成区「质量凭证」行） · `python scripts/nf.py --version`
 
+**仓库治理地图**：统一导航入口见 [docs/README.md](docs/README.md)；它区分规则、导航、状态和历史，涉及运行时行为的断言仍以代码、测试、`verify.sh` 和发布标签为准。
+
 ## ⚡ 如果你是 AI / Agent
 
 - 这是什么：规范驱动的文档工厂，装模块/管线/资产 → 校验 → 输出。
-- 入口链：`docs/agent/AGENT_START.md`（开工）→ `docs/agent/AI_ROUTING.md`（选线）→ `docs/meta/DEEP_DIVE.md`（懂得深）。
+- 入口链：本节的仓库治理地图 → `docs/agent/AGENT_START.md`（开工）→ `docs/agent/AI_ROUTING.md`（选线）→ `docs/meta/DEEP_DIVE.md`（懂得深）。
 - 机器凭证：`bash verify.sh`（当前基线见下方生成区的「质量凭证」行，由 `nf stats --write` 写入）；机器入口清单见 `llms.txt`；语言面见 `README.en.md` · `README.ja.md`（三面的机读事实与语言切换行由 check34 的语言面扫描断言一致；注册表 = `protocol/locales.json`）。
 - 要懂 NF 为什么这样设计：读 [docs/meta/DEEP_DIVE.md](docs/meta/DEEP_DIVE.md)。
 

@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreiaxo5r7ml3ojkttn5qt7bdyx5pphjpzpctvq4v27h3zi64bro5tpm",
+      "cid": "bafyreictyjqkj6q7pb47gtkp3njc3afs3ev2y2meyrfutsudnmu5pi2ta4",
       "path": "protocol/conformance_report.json",
-      "sha256": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
+      "sha256": "53c260a4fa1f7879f34d4fdb522d80b2d92bac6984c44b49ca836b29d7a35307"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,9 +107,9 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreifs4cqrc4gbggzuptqpl4elskjmoxmxdub3qtj2cymelhnlbfd6ea",
+      "cid": "bafyreihoigt7cyg73nqqcpbjygiwrczt3jljuictskc6drngtsvqtnj3mm",
       "path": "protocol/role_coordinates.json",
-      "sha256": "b2e0a11170c131b347ce0f5f08b9292c75d971d03b84d3a1618459dab0947e20"
+      "sha256": "ee41a7f160dfdb61013c29c191688b33da569a20539285e1c5a69cab09b53b63"
     },
     {
       "cid": "bafyreid7ldsmffax72hf2qabzrkkxi7mdv5kdttxiqyjo23itsinebjkfi",
@@ -127,9 +127,9 @@
       "sha256": "485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e"
     },
     {
-      "cid": "bafyreietkvroopr4izpydvc7drs2jjcgsgnfn3smemes6ybxkhtzd7rm2m",
+      "cid": "bafyreigggrcte3bpnagvns4qfmzyldunusr47t7e2k54khnpezqeu7neiq",
       "path": "protocol/instruction_evidence.json",
-      "sha256": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3"
+      "sha256": "c63445326c2f680d56cb902b33858e8da4a3cfcfe4d2bbc51daf26604a7da444"
     },
     {
       "cid": "bafyreif5ichk2rgzps3becumaid42hfx2urhff7rpviba6jty7id2rogvi",
@@ -142,9 +142,9 @@
       "sha256": "a21468bb3df2d1565b6fbbb36ad7093d7020dde37cfe5fe1de5218378119029e"
     },
     {
-      "cid": "bafyreieys47hxzbsfvbyxx4s4enqtvti5xlykmuu2oaektoigahgnlegmq",
+      "cid": "bafyreicgpswqqzorqhf2l5fbtwcl2jajksaxhyxflqfzwkbv5gwdvhpnvu",
       "path": "protocol/sast_baseline.json",
-      "sha256": "98973e7be4322d438bdf92e11b09d668edd7853294d380454dc8300e66ac8664"
+      "sha256": "467cad0865d181cba5f4a19d84bd2409548173e2e55c0b9b2835e9ac3a9dedad"
     },
     {
       "cid": "bafyreiaannlhjc3nvlzedg7ebjssi7mq57lcshuhztlbyzjh5uksnnvu4q",

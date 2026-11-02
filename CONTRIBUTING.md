@@ -27,9 +27,13 @@
 
 scope 约定：`protocol`（01–07）/ `desktop` / `scripts` / `community` / `ci` / `core`（真相源 = desktop/src/core，APK 线已移除见裁决 #16）。
 
-## 2. 分支策略：单主干 + 版本锚点
+## 2. 分支策略：单主干 + PR 门禁 + 版本锚点
 
-- 主干 main 为唯一长期分支，改动直接推 main（大改动可短命分支合并后删除）。
+- 主干 `main` 为唯一长期分支，由 GitHub ruleset 保护；禁止直接推送、强推或删除。所有改动必须经短命分支和 PR 进入 `main`，通过必需检查后合并，并由 GitHub 在合并后删除功能分支。
+- 分支只承载未完成工作，不承担备份职责。实验、快照和未采用方案不得通过新增长期 `archive/*` 分支保存到主仓库。
+- 默认一个分支对应一个 Issue/PR 和一个可验收结果；分支名使用 `feat/`、`fix/`、`docs/`、`ci/`、`refactor/` 或 `release/`。
+- PR 堆栈最多 2 层。3 层以上的依赖改动用临时 integration branch 累积，稳定后只向 `main` 开一个集成 PR；禁止把 6–8 层链式 PR 当作常规流程。
+- 无 PR 的分支应在 48 小时内创建 Draft PR；14 天无实质更新的 PR 应关闭或转回 Issue；30 天仍未合并的分支必须先完成可验证的外部归档，再删除。
 - **版本锚点**：发布即打 annotated tag（内容线 `v0.xx` / CLI 线 `v1.0.x`），tag 为版本真相源（I5），禁止在已发布 tag 上回写。
 - 开工前工作树须干净（当前版本锚点 = 最新 annotated tag，见 §2）。
 
@@ -80,7 +84,7 @@ git push origin refs/tags/v0.13
 ## 3. 验证门槛（提交前三步，全部通过）
 
 ```bash
-# ① 协议门禁（check1–32 三段式：段 A 官方 / 段 B 社区 / 段 C 代码层）
+# ① 协议门禁（全量 check：段 A 官方 / 段 B 社区 / 段 C 代码层）
 bash verify.sh
 # ② 代码层门禁（check12 同款：desktop core 用例）
 cd desktop && python3 -m unittest discover -s tests -q && cd ..
@@ -88,7 +92,7 @@ cd desktop && python3 -m unittest discover -s tests -q && cd ..
 python3 -m compileall -q desktop/src scripts
 ```
 
-任一失败即回滚本次修改，修正后重跑；全绿方可提交推送。
+任一失败即回滚本次修改，修正后重跑；全绿方可提交 PR。具体 check 数与 PASS 基线以 `protocol/repo_stats.json`、`quality_baseline.EXPECTED_*` 和 `nf stats --check` 为准，不在本文硬编码。
 
 ## 4. 改动域细则
 
@@ -115,7 +119,7 @@ python3 -m compileall -q desktop/src scripts
 - **本地自检单**：`bash verify.sh` 全绿（0 WARN / 0 FAIL；其中 check14 注册门禁 / check15 组合门禁为社区包专项）——**不钉运行时计数**（check 数与 PASS 基线见 `quality_baseline.EXPECTED_*` 与 `nf stats --check` 的生成区，钉死必漂）；代码/语法按 §3 三步验证门槛全过；资产经 asset_get 寻址、登记溯源索引并满足 EXT 闭合，`bash scripts/reconcile_assets.sh --quiet` 全清（§4.3）。
 
 **② 提交（分支 / commit / 引用规范）**
-- 分支策略按 §2（单主干 main 直推或短命分支合并）；commit 信息遵循 §1 Conventional Commits——type 取 `feat`（新包落盘）/ `docs`（协议改动），scope 取 `community`。
+- 分支策略按 §2（单主干 `main` + 短命 PR 分支）；commit 信息遵循 §1 Conventional Commits——type 取 `feat`（新包落盘）/ `docs`（协议改动），scope 取 `community`。
 - 方案文档引用：结构性协议改动须可溯方案文档（README L32 协议链）与登记真相源 02，不在多处重复维护任务清单（§4.1）。
 
 **③ PR 评审（reviewer 判据）**
