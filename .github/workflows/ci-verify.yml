@@ -75,8 +75,16 @@ jobs:
           # --no-cache 保证每次真跑、不复用本地判定缓存（半份门禁的绿不进缓存）。
           # `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。
           set -o pipefail
-          mkdir -p .nf-logs   # tee 的目标目录（已被 .gitignore 覆盖，不进全仓件集合）
-          bash verify.sh --checks-only --no-cache 2>&1 | tee .nf-logs/verify-checks.log
+          mkdir -p .nf-logs .artifacts  # 均被 .gitignore 覆盖，不进全仓件集合
+          bash verify.sh --checks-only --no-cache --report-out .artifacts/verify-junit.xml \
+            2>&1 | tee .nf-logs/verify-checks.log
+      - name: 上传 JUnit 门禁报告
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: verify-junit
+          path: .artifacts/verify-junit.xml
+          if-no-files-found: error
       - name: 站点数字与真源同步（site/tools/sync-numbers.mjs：站点发布旧数字即红）
         run: node site/tools/sync-numbers.mjs
       - name: 站点离线体检（site-check.mjs --offline：JSON-LD / 机器面在场 / 抓取规则 / 无旧基址）
@@ -100,6 +108,7 @@ jobs:
         with:
           subject-path: |
             .nf-logs/verify-checks.log
+            .artifacts/verify-junit.xml
             protocol/verification_report.json
   unit-tests:
     name: unit-tests-${{ matrix.shard }}-of-32

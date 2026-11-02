@@ -112,8 +112,9 @@ fi
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
 # `--checks-only` 只跑 42 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
+# `--report-out PATH` 额外输出 42 条静态 check 的标准 JUnit XML；默认输出和退出码不变。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"; NF_PR_TIER=0
-NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
+NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''; NF_REPORT_OUT=''
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast) NF_FAST=1 ;;
@@ -125,8 +126,9 @@ while [ $# -gt 0 ]; do
     --tests-only) NF_TESTS_ONLY=1 ;;
     --shard) shift; NF_SHARD="${1:-}"; [ -n "$NF_SHARD" ] || { echo '用法：--shard 需要形如 3/16 的取值' >&2; exit 2; } ;;
     --base) shift; NF_BASE="${1:-}"; [ -n "$NF_BASE" ] || { echo '用法：--base 需要一个提交引用' >&2; exit 2; } ;;
+    --report-out) shift; NF_REPORT_OUT="${1:-}"; [ -n "$NF_REPORT_OUT" ] || { echo '用法：--report-out 需要一个文件路径' >&2; exit 2; } ;;
     *)
-      echo "未知参数：$1（用法：bash verify.sh [--full|--quick|--pr] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n]）" >&2
+      echo "未知参数：$1（用法：bash verify.sh [--full|--quick|--pr] [--fast] [--no-cache] [--base <ref>] [--checks-only] [--tests-only --shard i/n] [--report-out PATH]）" >&2
       exit 2 ;;
   esac
   shift
@@ -134,6 +136,11 @@ done
 if [ "$NF_CHECKS_ONLY" = "1" ] && [ "$NF_TESTS_ONLY" = "1" ]; then
   echo '--checks-only 与 --tests-only 不能同时给（二者互斥）' >&2; exit 2
 fi
+if [ -n "$NF_REPORT_OUT" ] && [ "$NF_TESTS_ONLY" = "1" ]; then
+  echo '--report-out 只汇总静态 check，不能与 --tests-only 同用' >&2; exit 2
+fi
+# JUnit 必须来自本 run 的真实记录；缓存命中没有逐 check 事件，故显式旁路缓存。
+[ -n "$NF_REPORT_OUT" ] && NF_CACHE=0
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
   for _cand in "${TMPDIR:-/tmp}" "$PWD/.rivet/tmp"; do
     if mkdir -p "$_cand/nf_verify_$$" 2>/dev/null; then NFL_TMP="$_cand/nf_verify_$$"; break; fi
@@ -141,6 +148,13 @@ if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
 fi
 if [ -z "$NFL_TMP" ] || [ ! -d "$NFL_TMP" ]; then
   echo '无法创建诊断日志目录——请设 NF_VERIFY_TMP 指向可写目录' >&2; exit 2
+fi
+NF_REPORT_RECORDS=''
+if [ -n "$NF_REPORT_OUT" ]; then
+  NF_REPORT_RECORDS="$NFL_TMP/nf-gate-records.tsv"
+  if ! : > "$NF_REPORT_RECORDS"; then
+    echo '无法初始化 JUnit 记录文件' >&2; exit 2
+  fi
 fi
 cleanup_nfl(){
   # 全绿才清理；有 FAIL 时保留目录——诊断日志是修复依据，删掉等于把修复线索一起删了。
@@ -228,13 +242,51 @@ if [ "$NF_TIER" = "quick" ] && [ "$NF_FAST" != "1" ] && [ "$NF_CHECKS_ONLY" != "
   _NF_BG_TESTS_PID=$!
 fi
 PASS=0; FAIL=0; WARN=0
-ok(){ PASS=$((PASS+1)); printf '  [PASS] %s\n' "$1"; }
+_gate_check_id(){
+  local fn
+  for fn in ${FUNCNAME[@]+"${FUNCNAME[@]}"}; do
+    case "$fn" in
+      check[0-9]|check[0-9][0-9]) printf '%s' "${fn#check}"; return 0 ;;
+    esac
+  done
+  return 1
+}
+_gate_record(){
+  [ -n "${NF_REPORT_RECORDS:-}" ] || return 0
+  local check_id status="$1" msg="${2:-}"
+  check_id="$(_gate_check_id)" || return 0
+  msg="${msg//$'\t'/ }"; msg="${msg//$'\r'/ }"; msg="${msg//$'\n'/ }"
+  printf '%s\t%s\t%s\n' "$check_id" "$status" "$msg" >> "$NF_REPORT_RECORDS"
+}
+_gate_record_id(){
+  [ -n "${NF_REPORT_RECORDS:-}" ] || return 0
+  local check_id="$1" status="$2" msg="${3:-}"
+  msg="${msg//$'\t'/ }"; msg="${msg//$'\r'/ }"; msg="${msg//$'\n'/ }"
+  printf '%s\t%s\t%s\n' "$check_id" "$status" "$msg" >> "$NF_REPORT_RECORDS"
+}
+_gate_emit_report(){
+  [ -n "$NF_REPORT_OUT" ] || return 0
+  if [ -z "$PY3" ]; then
+    echo '  [FAIL] 无法生成 JUnit XML：可用 Python 不在 PATH' >&2
+    FAIL=$((FAIL+1))
+    return 0
+  fi
+  local rc=0
+  "$PY3" scripts/gate_report.py --records "$NF_REPORT_RECORDS" \
+    --out "$NF_REPORT_OUT" --elapsed "$SECONDS" || rc=$?
+  if [ "$rc" -ge 2 ]; then
+    echo '  [FAIL] JUnit XML 生成或完整性校验失败' >&2
+    FAIL=$((FAIL+1))
+  fi
+  return 0
+}
+ok(){ PASS=$((PASS+1)); printf '  [PASS] %s\n' "$1"; _gate_record PASS "$1"; }
 # 机制借鉴 reviewdog 的「发现 → 结构化注解」：在 GitHub Actions 里把 FAIL/WARN 同时打成
 # Actions 注解（`::error::` / `::warning::`），失败直接显示在 CI 摘要与 PR 界面；
 # 本地跑（无 GITHUB_ACTIONS）行为不变。多行消息按 Actions 规则转义为 %0A。
 _gha_note(){ [ "${GITHUB_ACTIONS:-}" = "true" ] || return 0
   printf '::%s title=verify.sh::%s\n' "$1" "${2//$'\n'/%0A}"; }
-no(){ FAIL=$((FAIL+1)); printf '  [FAIL] %s\n' "$1"; _gha_note error "$1"; }
+no(){ FAIL=$((FAIL+1)); printf '  [FAIL] %s\n' "$1"; _gate_record FAIL "$1"; _gha_note error "$1"; }
 # ---- 参数化在场/关键词判据（步骤5「合并同类项」：check1/3/4/5/6 共用**一份**判定）----
 # 输入（stdin，制表符分隔）：kind<TAB>path<TAB>token<TAB>message
 #   file  → 文件在场        dir   → 目录在场
@@ -270,7 +322,7 @@ _decl_check(){
   done
   return "$missing"
 }
-wn(){ WARN=$((WARN+1)); printf '  [WARN] %s\n' "$1"; _gha_note warning "$1"; }
+wn(){ WARN=$((WARN+1)); printf '  [WARN] %s\n' "$1"; _gate_record WARN "$1"; _gha_note warning "$1"; }
 check1(){
   echo '== [1/6·A] 官方核心目录结构（07 §7 项1）=='
   local err=0
@@ -3151,9 +3203,13 @@ echo '—— 段 B：社区领域包（两包在场执行，缺包 WARN 跳过�
 if [ -d community/校园情感领域包 ] && [ -d community/西幻生存领域包 ]; then
   check7; check8; check9; check10; check11
 elif [ -d community ]; then
-  wn 'community 仅部分领域包在场：社区段（check7-11）跳过——单包/半包部署仅验收官方段'
+  _msg='community 仅部分领域包在场：社区段（check7-11）跳过——单包/半包部署仅验收官方段'
+  wn "$_msg"
+  for _cid in 7 8 9 10 11; do _gate_record_id "$_cid" SKIP "$_msg"; done
 else
-  wn 'community 不在场：社区段（check7-11）跳过——无包部署仅验收官方段'
+  _msg='community 不在场：社区段（check7-11）跳过——无包部署仅验收官方段'
+  wn "$_msg"
+  for _cid in 7 8 9 10 11; do _gate_record_id "$_cid" SKIP "$_msg"; done
 fi
 echo '—— 段 C：代码层门禁（L2 core：check12-check40 无条件执行；android 相关已随 L3 冻结移出）——'
 check12
@@ -3188,6 +3244,7 @@ check40
 echo '—— 段 D：供应链面（check41-42 无条件执行：构建隔离 + 不可伪造 provenance）——'
 check41
 check42
+_gate_emit_report
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
