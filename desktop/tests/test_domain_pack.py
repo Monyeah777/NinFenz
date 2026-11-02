@@ -110,6 +110,33 @@ def _load_csv(text):
     return rows, ""
 
 
+class SourceWriteGuardTest(unittest.TestCase):
+    """D-5（2026-11-02）：工厂改写 02 / verify.sh / registry 必须显式授权。
+
+    `verify.sh` 是门禁本体、02/registry 是门禁读取的真相源；「被测流程顺手改判据输入」
+    会让门禁失去独立裁判地位。未授权时应如实报 skipped 且**一个写函数都不调用**。
+    """
+
+    def test_register_sources_requires_explicit_allow(self):
+        calls = []
+        orig = (dp._append_section02, dp._append_domain_list, dp._register_protocols)
+        dp._append_section02 = lambda *a, **k: calls.append("s02") or True
+        dp._append_domain_list = lambda *a, **k: calls.append("dom") or True
+        dp._register_protocols = lambda *a, **k: calls.append("reg") or "ok"
+        try:
+            out = dp._register_sources(ROOT, {"pack_name": "x"},
+                                       {"module_ids": ["a", "b"]}, False)
+            self.assertEqual([], calls, "未授权时不得调用任何写函数")
+            self.assertIn("skipped", str(out["domain_list"]))
+            out = dp._register_sources(ROOT, {"pack_name": "x"},
+                                       {"module_ids": ["a", "b"]}, True)
+            self.assertEqual(["s02", "dom", "reg"], calls)
+            self.assertIs(True, out["section02"])
+        finally:
+            (dp._append_section02, dp._append_domain_list,
+             dp._register_protocols) = orig
+
+
 class FactoryTest(unittest.TestCase):
     """真仓库：已建域包必须与生成器逐字节一致、登记三处到位、产出面机检通过。"""
 

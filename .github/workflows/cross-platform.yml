@@ -10,7 +10,7 @@ name: cross-platform
 # 依赖走固定清单（.github/requirements-ci.txt），平台专属系统库只在 Linux 装。
 #
 # 档位（2026-10-19 修）：此前这里只是裸跑 `bash verify.sh`——而 verify.sh 自 P3 分层起
-# **默认档已是 quick**（42 条静态 check + 受影响测试），只有 `--full` 才是发布结论
+# **默认档已是 quick**（44 条静态 check + 受影响测试），只有 `--full` 才是发布结论
 # （verify.sh 参数区注释 + ci-verify.yml 的分层纪律）。裸跑 = 把开发档当发布档，属于
 # 「silent quick」：看起来三平台全绿，实际全量测试一条没跑。故显式 `--full`，
 # 并由 desktop/tests/test_ci_visibility.py::test_every_workflow_invocation_declares_tier

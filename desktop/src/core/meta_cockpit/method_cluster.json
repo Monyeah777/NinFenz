@@ -1,0 +1,33 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M21",
+  "name": "主题聚类",
+  "category": "认知",
+  "layer": "P21",
+  "meta_level": "M1",
+  "meta_function": "integration",
+  "operates_on": ["claims"],
+  "atoms": ["i.cluster", "m.compare"],
+  "applies_when": "断言需要按主题归并",
+  "inputs": [{"token": "claims", "kind": "array"}],
+  "outputs": [{"token": "cluster_set", "kind": "object"}],
+  "cost_class": "single_llm",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "知识体系链",
+  "context_budget": {"input": "2x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": ["无主题归属的断言"], "summarize": []},
+  "criteria": [
+    {"dimension": "cluster_count", "primitive": "count", "unit": "count",
+     "threshold": 2, "granularity": 1},
+    {"dimension": "member_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.125, "max_missing": 0},
+    {"dimension": "member_uniqueness", "primitive": "uniqueness", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.125, "max_missing": 0},
+    {"dimension": "cluster_nonempty", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.125, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "desktop/src/core/meta_cockpit/chain_knowledge.py"}],
+  "conformance": "L2"
+}

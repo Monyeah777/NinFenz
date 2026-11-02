@@ -26,7 +26,7 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a
+  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -298,6 +298,62 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
+
+> 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card
+
+> 重审（2026-11-02）：接入认知驾驶舱（meta_cockpit）：CLI/终端/测试/文档
+
+> 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 labeling 媒体写入（2026-11-02）
+
+> 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
+
+> 重审（2026-11-02）：逐规则 coverage + close_action + Evidence Action/CLI
+
+> 重审（2026-11-02）：coverage 阈值可执行 + 契约检查纳入 verify
+
+> 重审（2026-11-02）：域包规则机读化 + 证据卡覆盖统计 + grant 填写稿
+
+> 重审（2026-11-02）：check43 升级：A 桶证据内核门禁
+
+> 重审（2026-11-02）：2026-11-02 波十七：A 桶门禁执行体 + 驾驶舱汇总 + check43 方案
+
+> 重审（2026-11-02）：2026-11-02 波十六：契约包自检 + grant 问答包
+
+> 重审（2026-11-02）：2026-11-02 波十五：产物检查 + 驾驶舱日志（attach_decision/list_decisions）
+
+> 重审（2026-11-02）：2026-11-02 波十四：证据卡绑定契约 digest + A 桶批 2/3 冒烟
+
+> 重审（2026-11-02）：2026-11-02 波十三：NF Evidence MCP + A 桶证据内核自检
+
+> 重审（2026-11-02）：2026-11-02 波十二：域包模板填写进度（domain shells --fill-dir）
+
+> 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
+
+> 重审（2026-11-02）：2026-11-02 波十：模块边界签名 0 模块不得空过（F14）
+
+> 重审（2026-11-02）：2026-11-02 波九：Q2 CHANGELOG 锚点、E9 边界测试、域包模板批量校验
+
+> 重审（2026-11-02）：2026-11-02 修复波八：回执 anchor 块纳入校验（E1）
+
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
+> 重审（2026-11-02）：2026-11-02 修复波六：V3 报告自证 + C-04 引号分号 + 域包补全模板工具
+
+> 重审（2026-11-02）：2026-11-02 修复波五：写盘闸门补三旗标 + TUI =value 归一 + 闸门扫描器扩 sink
+
+> 重审（2026-11-02）：2026-11-02 修复波四：域包完备度报告+缓存 key 输入面+conformance 证据存在性+插件静默回退回执默认覆盖面
+
+> 重审（2026-11-02）：2026-11-02 修复波三：B-1 模块映射、D-5 真源面保护、check35 覆盖面接线、E13/E6/E5/E2/E18/E19/G1/C-05/I1/Q1/D1/check_parity 可移植性
+
+> 重审（2026-11-01）：2026-11-01 修复波二：清理仓库残留（.msg*/档案.md）、NF-1 重签、WASM 产物摘要校验、MCP 来源判定、回执覆盖面判据、skills 示例落点
+
+> 重审（2026-11-01）：2026-11-01 深挖修复波：终端写盘闸门 --flag=value 归一 + argparse 长选项缩写关闭；MCP cursor 收紧为 ASCII；LSP 内部错误脱敏；协议回执 subject 去重；gate_engine 41/42 入账 + 未知/未迁入 check fail-closed；文档陈旧基线数字更正
+
+> 重审（2026-11-01）：2026-11-01 深挖修复：终端写盘闸门归一(--flag=value)、argparse 长选项缩写关闭、MCP cursor ASCII 收紧、LSP 内部错误脱敏、协议回执 subject 去重、gate_engine 41/42 入账 + 未知号 fail-closed
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复

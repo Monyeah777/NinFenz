@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
+    "app": 1449,
     "entry": 27,
     "floor": 5,
-    "prod": 1042,
-    "projection": 133,
-    "support": 309,
-    "verify": 1134
+    "prod": 1046,
+    "projection": 134,
+    "support": 421,
+    "verify": 1155
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5837,6 +5837,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Thin CLI bridge for optional command families kept outside scripts/nf.py.",
+      "path": "desktop/src/core/cli_bridge.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "44 追加 · 契约事件闭包扫描（元工具·只报告不设闸）。",
       "path": "desktop/src/core/closure_scan.py",
       "role": "verify",
@@ -5969,6 +5975,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "域包补全模板（不代写领域内容，只把「要填什么」变成结构化清单）。",
+      "path": "desktop/src/core/domain_fill.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "域功能引擎：把「AI 品类域」的口径变成**可复算的数**（产出形态 T4 面）。",
       "path": "desktop/src/core/domain_metrics.py",
       "role": "prod",
@@ -5984,6 +5996,12 @@
       "function": "域包工厂：从一个「域规格」生成整套**过门禁**的社区域包（AI 品类清单工程的机制面）。",
       "path": "desktop/src/core/domain_pack.py",
       "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "域包「12 条细分规则」的机读化：把 DOMAIN_SPEC 的 check 文本编译成可消费规则表。",
+      "path": "desktop/src/core/domain_rules.py",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -6037,6 +6055,12 @@
     {
       "function": "评测标准模板：用例真源 + 显式触发 + 成本/时点标注 + 结果回写（机制借鉴 pj-nx evals / 311 eval.yml）。",
       "path": "desktop/src/core/eval_harness.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "NF Evidence MCP（本地只读证据面）：为 AI 产物生成/校验可离线复算的证据卡。",
+      "path": "desktop/src/core/evidence_mcp.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -7211,6 +7235,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "A 桶批 2/3 冒烟：域工厂/装配/信任边界的真实入口可跑、坏输入 fail-closed。",
+      "path": "desktop/tests/test_a_bucket_smoke.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "absence_guard 单测。",
       "path": "desktop/tests/test_absence_guard.py",
       "role": "verify",
@@ -7529,6 +7559,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Cognition Event：manifest+journal → 可复算事件；无评分；事件库。",
+      "path": "desktop/tests/test_cognition_event.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交信息机检单测（CONTRIBUTING §1 判据化 · 含\"不打断自动化\"回归）。",
       "path": "desktop/tests/test_commit_msg.py",
       "role": "verify",
@@ -7697,6 +7733,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "DOCX / OFD / Markdown 写入 → 体检 的端到端测试（CLI 路径）。",
+      "path": "desktop/tests/test_doc_formats.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M4 —— 文档可执行性卫生检查单测（标识/last-updated/过期告警 + 变异注入）。",
       "path": "desktop/tests/test_doc_hygiene.py",
       "role": "verify",
@@ -7721,6 +7763,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "域包补全模板（`core.domain_fill`）：不代写内容、只给待填清单 + 自检。",
+      "path": "desktop/tests/test_domain_fill.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包工厂 + 域功能引擎单测：口径公式 / 夹具确定性 / 生成器幂等 / 唯一性守卫 /",
       "path": "desktop/tests/test_domain_pack.py",
       "role": "verify",
@@ -7729,6 +7777,12 @@
     {
       "function": "域包工厂**渲染面**在无内部档案时的回归（合成规格，不依赖 `.rivet` 私档）。",
       "path": "desktop/tests/test_domain_pack_render.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "域包 12 条细分规则机读化：编译稳定、字段抽取、覆盖统计。",
+      "path": "desktop/tests/test_domain_rules.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7783,6 +7837,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_eval_harness.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "NF Evidence MCP（本地只读证据面）回归：卡生成/校验/差异/契约列表/越界拒绝。",
+      "path": "desktop/tests/test_evidence_mcp.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -7879,6 +7939,12 @@
     {
       "function": "gate_check 判据：计划期定键 / 并行执行 / 红的缓存不洗绿 / 不可缓存常跑 / 慢车道让位。",
       "path": "desktop/tests/test_gate_check.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "A 桶证据内核自检（批 1）：gate_engine / gate_inproc / gate_labels。",
+      "path": "desktop/tests/test_gate_core_selftest.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8159,6 +8225,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf labeling 子命令的 subprocess 回归（走 scripts/nf.py 真 CLI）。",
+      "path": "desktop/tests/test_labeling_cli.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "nf labeling（并入 NF 的 nf-labelcheck）快速核心回归。",
+      "path": "desktop/tests/test_labeling_core.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`scripts/nf` 启动器的**回退路径**判据：没有守护时必须静默回退 python 直跑。",
       "path": "desktop/tests/test_launcher.py",
       "role": "verify",
@@ -8291,6 +8369,18 @@
       "rule": "R-verify"
     },
     {
+      "function": "JPEG/PDF/MP4 写入 → 体检 的端到端测试（CLI 路径）。",
+      "path": "desktop/tests/test_media_integration.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Meta-cognitive cockpit integration contracts.",
+      "path": "desktop/tests/test_meta_cockpit.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_missing_sentinel.py",
       "role": "verify",
@@ -8311,6 +8401,12 @@
     {
       "function": "编号命名空间 + 管线 id 避让判据（01 §1.6.11）——直接执行 verify.sh check14 的内嵌程序。",
       "path": "desktop/tests/test_module_namespace.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "模块边界签名（F14：解析面为 0 不得空过）。",
+      "path": "desktop/tests/test_module_signature.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9143,6 +9239,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "verify_cache key 的输入面（D2/D3/D5/D6）：忽略面产物 / 历史 tag / 失败即不缓存。",
+      "path": "desktop/tests/test_verify_cache_key.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "Concurrent local verify runs must not share ignored build state.",
       "path": "desktop/tests/test_verify_guard.py",
       "role": "verify",
@@ -9209,8 +9311,50 @@
       "rule": "R-verify"
     },
     {
+      "function": "DOCX / Markdown 标识写入的回归测试（writers_docx_md）。",
+      "path": "desktop/tests/test_writers_docx_md.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "JPEG / PDF 标识写入的回归测试（writers_image_pdf）。",
+      "path": "desktop/tests/test_writers_image_pdf.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "writers_mp4.inject_mp4_xmp 的单元测试（unittest）。",
+      "path": "desktop/tests/test_writers_mp4.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "writers_mp4.inject_mp4_meta（GB 20257A 标准位置）的单元测试。",
+      "path": "desktop/tests/test_writers_mp4_meta.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "writers_ofd.inject_ofd 的单元测试（unittest）。",
+      "path": "desktop/tests/test_writers_ofd.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "xmind / posm / posf / UOF 标识写入的回归测试（writers_zipformats）。",
+      "path": "desktop/tests/test_writers_zipformats.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_yaml_recheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "xmind / posm / posf / UOF 写入 → 体检 端到端测试（CLI）。",
+      "path": "desktop/tests/test_zip_format_integration.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12683,6 +12827,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "nf-domain-completeness/1",
+      "path": "protocol/domain_completeness.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 品类域包名录（公开结果面）。每包：域码 / 独占类别 / 管线 / 模块 / 资产数 / 产出面与机验率 / 规格摘要。机检：check32 domain_packs 子扫描（名录 ↔ 盘上实况一致 + 可机验占比 ≥95%）。规格源在内部档案，故名录只登记摘要（spec_digest）不携带内容。",
       "path": "protocol/domain_packs.json",
       "role": "verify",
@@ -13098,17 +13248,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b2b30d2d435d475c7934ec32d3d06dbc2562985e4c32b6f2fb28a5b1db523c33",
+  "root_digest": "eb3979b4d31d967c53a8e063363dea63cec95b97884c2c592f9ca4c69c377edc",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 132,
+    "R-app": 1449,
+    "R-catch": 249,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 118,
-    "R-support": 151,
-    "R-verify": 1014,
-    "auto:R-core": 259
+    "R-projection": 119,
+    "R-support": 145,
+    "R-verify": 1035,
+    "auto:R-core": 264
   },
   "schema": "nf-role-coordinates/1"
 }

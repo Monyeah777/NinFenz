@@ -1,0 +1,9 @@
+{
+  "schema": "nf/self-application/1",
+  "depth": 1,
+  "source": "desktop/tests/test_meta_cockpit.py",
+  "result": "PASS",
+  "baseline": {"coverage": 0.4, "evidence_rate": 0.25, "actionability": 0.0},
+  "cockpit": {"coverage": 1.0, "evidence_rate": 1.0, "actionability": 1.0},
+  "note": "只允许对系统做一次自用批评；不得对自用结果再次自用递归。"
+}

@@ -23,6 +23,82 @@ from core import receipts as rc  # noqa: E402
 VERIFIER = ROOT / "scripts" / "nf_verify.py"
 
 
+class TestProtocolSubjects(unittest.TestCase):
+    def test_protocol_subjects_are_unique(self):
+        """协议回执 subject 不得重复（2026-11-01 · F7）。
+
+        依据：`protocol/schema/asset_contracts.schema.json` 既在显式清单、又被
+        `protocol/schema/*.json` glob 收一次 → 回执 67 条只有 66 个不同 subject，
+        同一 id 出现两条叶、两条不同的 inclusion proof。回执是「逐件有主」的锚定面，
+        重复叶会让根与条数口径不一致，也可能让读者按 id 查找时拿到错误 proof。
+        """
+        subs = rc.protocol_subjects(str(ROOT))
+        dup = [s for s, n in collections.Counter(subs).items() if n > 1]
+        self.assertEqual([], dup, "协议回执 subject 重复：%s" % dup)
+
+
+class TestCoverageShrinkMitigation(unittest.TestCase):
+    """E9 边界：透明链对「删条+重建」自洽（链是派生物、无外部见证），
+    但协议回执的**覆盖面默认判据**会把删条挡下来——两道判据互补，别把链当历史证明。"""
+
+    def test_deleted_entry_is_caught_by_default_coverage(self):
+        full = rc.build_scope(str(ROOT), ["STRATEGY.md", "llms.txt"], scope="protocol")
+        shrunk = rc.build_scope(str(ROOT), ["STRATEGY.md"], scope="protocol")
+        issues, _ = rc.verify_scope(shrunk, str(ROOT))
+        self.assertTrue(any("漏登" in i for i in issues), issues)
+        # 链/根对 shrink 后的集合自洽（正是「链不自证历史」的诚实边界）
+        self.assertEqual(shrunk["root"], rc.build_scope(
+            str(ROOT), ["STRATEGY.md"], scope="protocol")["root"])
+        self.assertNotEqual(full["root"], shrunk["root"])
+
+
+class TestReceiptAnchorCoverage(unittest.TestCase):
+    """E1：回执里的 anchor 块必须与 frontmatter 一致且路径安全。"""
+
+    def test_tampered_anchor_is_detected(self):
+        doc = rc.build(str(ROOT))
+        doc["entries"][0]["anchor"] = {"scheme": "hmac-sha256",
+                                       "sig_file": "../../etc/passwd"}
+        issues, _ = rc.verify(doc, str(ROOT))
+        self.assertTrue(any("锚块" in i for i in issues), issues)
+
+    def test_anchor_must_match_frontmatter(self):
+        doc = rc.build(str(ROOT))
+        live_anchor = doc["entries"][0].get("anchor")
+        doc["entries"][0]["anchor"] = None if live_anchor else {"scheme": "ssh-sig"}
+        issues, _ = rc.verify(doc, str(ROOT))
+        self.assertTrue(any("不一致" in i for i in issues), issues)
+
+
+class TestProtocolCoverage(unittest.TestCase):
+    """协议回执覆盖面（2026-11-01 · F1）：删一条再重算根，旧校验仍全绿。"""
+
+    def test_missing_subject_is_reported(self):
+        doc = rc.build_scope(str(ROOT), ["STRATEGY.md"], scope="protocol")
+        issues, _stats = rc.verify_scope(doc, str(ROOT),
+                                         expected_subjects=["STRATEGY.md", "llms.txt"])
+        self.assertTrue(any("漏登" in i for i in issues), issues)
+
+    def test_extra_subject_is_reported(self):
+        doc = rc.build_scope(str(ROOT), ["STRATEGY.md", "llms.txt"], scope="protocol")
+        issues, _stats = rc.verify_scope(doc, str(ROOT), expected_subjects=["STRATEGY.md"])
+        self.assertTrue(any("不在册" in i for i in issues), issues)
+
+    def test_malformed_entries_fail_closed(self):
+        """E2：entries 不是对象数组时给 issue，不得抛 AttributeError/TypeError。"""
+        for bad in ({"schema": "nf-receipts/1", "entries": {"a": 1}},
+                    {"schema": "nf-receipts/1", "entries": [None]},
+                    {"schema": "nf-receipts/1", "entries": ["x"]}):
+            issues, _stats = rc.verify_scope(bad, str(ROOT))
+            self.assertTrue(any("形状非法" in i for i in issues), (bad, issues))
+
+    def test_without_expected_stays_backward_compatible(self):
+        # 协议面现在**默认**校验覆盖面（R2 收尾）；非协议 scope 仍保持旧语义。
+        doc = rc.build_scope(str(ROOT), ["STRATEGY.md"], scope="custom")
+        issues, _stats = rc.verify_scope(doc, str(ROOT))
+        self.assertEqual([], issues)
+
+
 class TestProofScale(unittest.TestCase):
     def test_receipts_write_is_idempotent(self):
         """回执写入口**再跑一次逐字节不变**（2026-10-01 改原子写后补）。

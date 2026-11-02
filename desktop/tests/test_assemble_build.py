@@ -31,6 +31,29 @@ class YamlOptionalDependencyTest(unittest.TestCase):
             lazy_yaml.module = orig
 
 
+class ModuleFileMappingTest(unittest.TestCase):
+    """B-1（2026-11-02）：模块 id → 模块件必须按 machine_contract.id 解析。
+
+    旧实现按文件名里的 `Mxx` 建键；域包模块文件名是 `A01a_…`（类内段号不在文件名），
+    于是「大语言模型域包:M01」按裸号 M01 命中西幻生存包的 M01_职业成长.md。
+    """
+
+    def test_qualified_id_resolves_to_own_package_file(self):
+        files = ab._mod_files(ROOT)
+        meta = ab._meta("大语言模型:M01", {}, files, ROOT)
+        self.assertEqual(
+            "community/大语言模型域包/modules/A01a_模型与能力口径登记.md",
+            meta["path"], meta)
+        self.assertEqual("模型与能力口径登记", meta["name"], meta)
+        self.assertNotEqual("职业成长", meta["name"], "B-1 回归：命中别包模块")
+
+    def test_official_core_still_resolves(self):
+        files = ab._mod_files(ROOT)
+        meta = ab._meta("M00", {}, files, ROOT)
+        self.assertTrue(meta["path"].startswith("04_模块库/"), meta)
+        self.assertIn("数据槽总线", meta["name"])
+
+
 class AssembleBuildTest(unittest.TestCase):
     def _build(self, requirement):
         plan = ap.plan(requirement)

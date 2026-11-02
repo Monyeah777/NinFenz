@@ -102,9 +102,27 @@ def _build_parser() -> argparse.ArgumentParser:
     return _PARSER_CACHE
 
 
+class _NfParser(argparse.ArgumentParser):
+    """命令面用的 argparse（**关闭长选项前缀缩写**）。
+
+    2026-11-01 修（D1）：argparse 默认 `allow_abbrev=True`，`--wri` 会被解析成 `--write`、
+    `--fi` 解析成 `--fix`。而终端写盘闸门（`core.terminal.needs_confirm`）按**完整旗标名**
+    判定，于是 `nf shell --exec "nf stats --wri"` 既不触发确认、又真的写了盘——闸门守的正是
+    「粘贴/注入文本」那条面。关闭缩写后，这类写法统一变成用法错误（exit 2），
+    「闸门表 = 唯一写法」不再有第二套等价写法可以绕。
+
+    子解析器由 argparse 自动继承本类（`add_subparsers` 缺省 `parser_class=type(self)`），
+    故只在根解析器换类即可覆盖全部命令。
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+
 def _make_parser() -> argparse.ArgumentParser:
     """真正构建 argparse 命令面（**只在缓存未命中时调用一次**——见 `_build_parser`）。"""
-    p = argparse.ArgumentParser(
+    p = _NfParser(
         prog="nf", description=(
             "NinFenz 全链管道（B2：retrieve→compose→gate→export）。"
             "分层引导（40 总纲 v2.8 波B S7）：作者五分钟上手 = run / demo / pipeline new；"
@@ -122,6 +140,23 @@ def _make_parser() -> argparse.ArgumentParser:
                         "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
                         "python）。NF_ENGINE 环境变量可作缺省。")
     sub = p.add_subparsers(dest="cmd", required=False)
+
+    # 认知驾驶舱（可选命令族，实现在 core.meta_cockpit；本文件只做入口）
+    from core.meta_cockpit import nf_ab_cli, nf_cockpit_cli
+    _ck = sub.add_parser(
+        "cockpit",
+        help="认知方法驾驶舱：按当前任务即时组合元认知原子（离线、无内部评分）",
+        description="认知方法驾驶舱：按任务即时组合 1-3 个元认知原子，多轮时持续重选并保留可重放轨迹；"
+                    "不生成内部 score/grade。")
+    nf_cockpit_cli.add_arguments(_ck)
+    _ck.set_defaults(_meta_cli="cockpit")
+    _ab = sub.add_parser(
+        "cockpit-ab",
+        help="驾驶舱离线盲评 A/B：预注册、盲包、分析、bundle、实验库",
+        description="驾驶舱离线盲评 A/B：同 prompt/model/seed 严格配对，评审包隐藏 arm/model/seed；"
+                    "结论只来自预注册门与配套盲评。")
+    nf_ab_cli.add_arguments(_ab)
+    _ab.set_defaults(_meta_cli="cockpit-ab")
 
     st = sub.add_parser("stats",
  help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
@@ -850,6 +885,9 @@ def _make_parser() -> argparse.ArgumentParser:
                                         "--render/--no-render 控制是否顺带重渲染产出面")
     dm_b.add_argument("--spec", required=True, help="域码（如 A01）")
     dm_b.add_argument("--write", action="store_true", help="落盘（缺省 dry-run）")
+    dm_b.add_argument("--allow-source-write", dest="allow_source_write", action="store_true",
+                      help="允许工厂改写判据/真相源（02 §8 / verify.sh DOMAIN / registry protocols[]）；"
+                           "缺省拒绝（D-5 真源面保护）")
     dm_b.add_argument("--no-render", action="store_true", help="不自动渲染产出面")
     dm_b.add_argument("--json", action="store_true", help="输出结构化 JSON")
     dm_v = dmsub.add_parser("verify", help="校验已生成域包与生成器逐字节一致 + 登记到位",
@@ -866,6 +904,19 @@ def _make_parser() -> argparse.ArgumentParser:
                                         "已填包数 / 双源（md↔json）一致性 / 与冻结基线比对（只减不"
                                             "增）")
     dm_s.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    dm_s.add_argument("--write", action="store_true",
+                      help="重生成完备度报告（docs/domain-completeness.md + protocol/domain_completeness.json）")
+    dm_s.add_argument("--fill-dir", dest="fill_dir", default="",
+                      help="统计某目录下补全模板的填写进度（配合 domain template 导出目录）")
+    dm_t = dmsub.add_parser("template", help="生成/校验「域包补全模板」（不代写领域内容）",
+                            description="从公开投影生成 12 条细分待填骨架（定义/判据/失效模式留空），"
+                                        "或校验填好的模板：字段非空且不含占位短语。")
+    dm_t.add_argument("package", help="包名（community/ 下的目录名，如 AI教育域包）")
+    dm_t.add_argument("--out", default="", help="写出模板 JSON（缺省打印到 stdout）")
+    dm_t.add_argument("--check", default="", help="校验已填模板文件（给了就只校验）")
+    dm_t.add_argument("--check-dir", dest="check_dir", default="",
+                      help="批量校验目录下全部待填模板（如导出的 73 包目录）")
+    dm_t.add_argument("--json", action="store_true", help="机器面")
     cb = sub.add_parser("combine",
                         help="域包自由组合（任意 n 元 / 组件级；五不变量 + 可复算证书）",
                         description="组合引擎：任选若干域包（或直接点模块/资产）→ 层位堆叠 / 依赖闭"
@@ -1243,6 +1294,8 @@ def _make_parser() -> argparse.ArgumentParser:
                     help="跨会话历史文件（缺省 <NF_HOME>/shell_history；仅交互态写入）")
     sh.add_argument("--no-history", action="store_true",
                     help="不写历史（`--exec`/`--file` 本来就一律不写，以保证确定性）")
+    sh.add_argument("--engine", choices=("python", "rust", "auto"), default=None,
+                    help="会话内判据引擎（透传 NF_ENGINE；rust/auto 为只读快线，失败回退 Python）")
     sh.add_argument("--color", choices=("auto", "always", "never"), default=None,
                     help="着色模式（缺省 auto：真 TTY 且未设 NO_COLOR 才上色；非 TTY 恒无色）")
     sh.add_argument("--width", type=int, default=0, metavar="列宽",
@@ -1364,6 +1417,31 @@ def _make_parser() -> argparse.ArgumentParser:
                                      "（无用户函数/循环/赋值/IO）；用法见 docs/nfal.md")
     nfl.add_argument("nfal_args", nargs=argparse.REMAINDER,
                      help="透传给 NFA-L 的参数；完整用法见 nf nfal help")
+
+    # AI 生成合成内容标识体检（GB 45438—2025 + TC260-PG-202511A）。
+    # 命令面实现收在 core.labeling.cli（此处只做入口，避免与 nf 命令面重复定义
+    # 旗标）；REMAINDER 原样透传，保持 `nf labeling <子命令> ...` 的用法不变。
+    # add_help=False：让 `nf labeling --help` 由 core.labeling.cli 自己回答
+    # （它才能列出 check/sign/… 六个子命令）；否则 REMAINDER 前会被本层 -h 截走。
+    lb = sub.add_parser(
+        "labeling",
+        add_help=False,
+        help="AI 生成合成内容标识体检（check / sign / verify / keygen / "
+             "selfcheck / info）",
+        description="AI 生成合成内容标识合规体检器（GB 45438—2025 + "
+                    "TC260-PG-202511A，本地可复算）：五段判定 A 显式 / B 隐式字段 / "
+                    "C 安全防护 / D 内容绑定 / E 备案材料；容器覆盖 PNG/JPEG/PDF/"
+                    "MP4/MP3/WAV/文本，算法用国密 SM3/SM2，并支持证书链与可信"
+                    "时间戳。")
+    # 显式 -h/--help：add_help=False 后由这里接管，dispatch 再把它转交
+    # core.labeling.cli —— 这样 `nf labeling --help` 看到的是**子命令清单**，
+    # 而不是 REMAINDER 壳的用法行。
+    lb.add_argument("-h", "--help", dest="labeling_help",
+                    action="store_true",
+                    help="显示 nf-labelcheck 的六个子命令与用法")
+    lb.add_argument("labeling_args", nargs=argparse.REMAINDER,
+                    help="透传给 nf-labelcheck 的参数；如 check/sign/verify/"
+                         "keygen/selfcheck/info")
     return p
 
 
@@ -2829,6 +2907,8 @@ CHECK_GUIDE = {
     "42": "缺什么：provenance 校验不过（回执单根形状坏 / 独立子进程验签失败 / 篡改未被检出）。补什么"
           "：nf receipts --scope protocol --write 重建单根；确认 nf attest --key-file 与"
           " core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
+    "43": "缺什么：A 桶证据内核门禁红（gate_engine 键/ inproc 异常 / labels 抽取 / 证据 MCP 测试）。补什么：跑 python scripts/gate_a_bucket.py 看逐组失败；修好后重跑。",
+    "44": "缺什么：AI 生成合成内容标识不合规（GB 45438／TC260 隐式标识缺字段、签名验不过、证书链断、可信时间戳缺）。补什么：48 小时自查——先跑 python3 scripts/nf_labeling.py selfcheck；再对导出文件跑 nf labeling check <file> --trust-store <roots.pem>；五段判定看 A/B/C/D/E，其中 C4 是证书链、C5 是可信时间戳。",
 }
 
 def _cmd_preset(args):
@@ -3924,7 +4004,27 @@ def _cmd_domain(args):
         return 0
     if sub == "shells":
         from core import shell_ledger as sl
+        if getattr(args, "fill_dir", ""):
+            from core import domain_fill as df
+            fstats, per = df.fill_status(args.fill_dir)
+            if getattr(args, "json", False):
+                print(_json.dumps({"kind": "domain-fill-status", "stats": fstats,
+                                   "per_file": per}, ensure_ascii=False, indent=2,
+                                  sort_keys=True))
+            else:
+                print("== 补全模板填写进度（%s）==" % args.fill_dir)
+                print("  %d 包 · %d 条细分 · 已填 %d（%s%%）"
+                      % (fstats["files"], fstats["subdivisions"],
+                         fstats["filled"], fstats["percent"]))
+                for name, v in sorted(per.items()):
+                    if v["filled"] < v["total"]:
+                        print("   · %-40s %d/%d" % (name, v["filled"], v["total"]))
+            return 0
+        if getattr(args, "write", False):
+            written = sl.write_report(ROOT)
+            print("  ✓ 完备度报告已重生成：%s · %s" % (written["report"], written["json"]))
         issues, s = sl.ratchet(ROOT)
+        issues = issues + sl.report_issues(ROOT)
         if args.json:
             print(_json.dumps({"kind": "domain-shells", "issues": issues,
                                "survey": s, "baseline": sl.BASELINE},
@@ -3950,6 +4050,49 @@ def _cmd_domain(args):
         if not issues:
             print("  ✓ 未超基线（缺口只减不增）")
         return 1 if issues else 0
+    if sub == "template":
+        from core import domain_fill as df
+        if args.check_dir:
+            issues, st = df.check_dir(args.check_dir)
+            if args.json:
+                print(_json.dumps({"kind": "domain-template-check-dir", "issues": issues,
+                                   "stats": st}, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                for i in issues:
+                    print("  ✗ %s" % i[:200], file=sys.stderr)
+                print("  模板 %d 件：通过 %d · 待填/有误 %d"
+                      % (st["files"], st["ok"], st["bad"]))
+            return 1 if issues else 0
+        if args.check:
+            try:
+                doc = _json.load(open(args.check, encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                return _machine_fail(args, "模板文件不可读/非 JSON：%s（%s）" % (args.check, exc), 1)
+            issues = df.check(doc)
+            if args.json:
+                print(_json.dumps({"kind": "domain-template-check", "issues": issues},
+                                  ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                for i in issues:
+                    print("  ✗ %s" % i, file=sys.stderr)
+                if not issues:
+                    print("  ✓ 模板自检通过（12 条字段齐且无占位短语）——按 docs/domain-packs.md 流程补全")
+            return 1 if issues else 0
+        try:
+            doc = df.template(ROOT, args.package)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "生成模板失败：%s（%s）" % (args.package, exc), 1)
+        if args.out:
+            path = df.write_template(ROOT, args.package, args.out)
+            print("  ✓ 模板已写出：%s（12 条待填）" % path)
+        elif args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("  （模板 JSON 见 --json 或 --out；此处只列待填条目）")
+            for s in doc["subdivisions"]:
+                print("   · %s %s" % (s["id"], s["name"]))
+            print("  → 逐条填写 definition/check/pitfall；不代写")
+        return 0
     if sub == "build":
         spec_code = str(args.spec or "").strip()   # 域码是标识符：裁空白（同 who-refers 口径）
         try:
@@ -3961,7 +4104,8 @@ def _cmd_domain(args):
             return _machine_fail(args, str(exc), 1)
         from core import output_forms as of           # 渲染器由调用方注入（工厂不再反向依赖产出面）
         out = dp.build(ROOT, spec, write=args.write, render=not args.no_render,
-                       renderer=of.render_outputs)
+                       renderer=of.render_outputs,
+                       allow_source_write=bool(getattr(args, "allow_source_write", False)))
         if args.json:
             print(_json.dumps({"kind": "domain-build", **out},
                               ensure_ascii=False, indent=2, sort_keys=True))
@@ -5009,7 +5153,8 @@ def _cmd_receipts(args):
         print("  折叠 %s · 根 %s → %s"
               % (folded[:16], str(doc.get("root"))[:16], "✓ 一致" if ok else "✗ 不一致"))
         return 0 if ok else 1
-    issues, stats = rc.verify_scope(doc, ROOT)
+    expected = rc.protocol_subjects(ROOT) if args.scope == "protocol" else None
+    issues, stats = rc.verify_scope(doc, ROOT, expected_subjects=expected)
     if args.json:
         print(_json.dumps({"kind": "receipts", "issues": issues, "stats": stats},
                           ensure_ascii=False, indent=2, sort_keys=True))
@@ -5883,6 +6028,13 @@ def _cmd_layers(args) -> int:
 
 
 def _cmd_shell(args) -> int:
+    # 2026-11-02（C-06）：`--engine` 是全局旗标，但 shell 过去没有同名参数——
+    # `nf shell --engine rust` 直接被 argparse 拒（帮助里却写着全局旗标）。这里显式接收并
+    # 透传到会话：后续直通命令走 NF_ENGINE（rust/auto = 只读快线，失败仍回退 Python）。
+    _eng = getattr(args, "engine", None)
+    if _eng:
+        import os as _os
+        _os.environ["NF_ENGINE"] = str(_eng)
     """nf shell（别名 nf terminal）：终端交互入口（端壳退役后的人机面）。"""
     from core import session_watch as _sw, terminal as term   # 会话缓存包装（见 core.session_watch）
 
@@ -6967,7 +7119,13 @@ def _cmd_verify(args) -> int:
         return 2
 
     ge.build_registry()
-    only = [int(x) for x in str(args.only).split(",") if x.strip()] if args.only else None
+    try:
+        only = [int(x) for x in str(args.only).split(",") if x.strip()] if args.only else None
+    except ValueError:
+        return _machine_fail(args, "--only 须为逗号分隔的 check 号（如 1,3,12）：%r"
+                             "（修复指引：只写数字，范围 1-%d）"
+                             % (args.only, ge.EXPECTED_CHECKS if hasattr(ge, "EXPECTED_CHECKS")
+                                else 42), 2)
     if only:
         unknown = sorted(set(only) - set(ge.REGISTRY))
         if unknown:
@@ -7276,6 +7434,29 @@ def _cmd_nfal(args) -> int:
     return nfal_cli.main(list(getattr(args, "nfal_args", []) or []))
 
 
+def _cmd_cockpit(args) -> int:
+    """nf cockpit / cockpit-ab：透传到 core.meta_cockpit（入口薄壳）。"""
+    from core.meta_cockpit import nf_ab_cli, nf_cockpit_cli
+    if args.cmd == "cockpit-ab":
+        return nf_ab_cli.run(args)
+    return nf_cockpit_cli.run(args)
+
+
+def _cmd_labeling(args) -> int:
+    """nf labeling：透传到 core.labeling.cli（标识体检器的全命令面）。
+
+    为什么仍补一次 sys.path：本模块顶部虽然已插入 desktop/src（import core 的前提），
+    但 `nf labeling` 也可能运行在守护/被嵌入的进程里（sys.path 被外部改过）；薄壳
+    自己保证可导入性，代价是一次幂等的路径插入。
+    """
+    sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+    from core.labeling.cli import main as labeling_main
+    argv = list(getattr(args, "labeling_args", []) or [])
+    if getattr(args, "labeling_help", False):
+        argv.append("--help")
+    return labeling_main(argv)
+
+
 def _rust_engine_argv(args) -> Optional[list]:
     """**已实测为净收益**的面才映射成 nf-rs argv；其余返回 None（走 Python 真源）。
 
@@ -7530,6 +7711,10 @@ def main(argv=None) -> int:
         return _cmd_design(args)
     if args.cmd == "nfal":
         return _cmd_nfal(args)
+    if args.cmd in ("cockpit", "cockpit-ab"):
+        return _cmd_cockpit(args)
+    if args.cmd == "labeling":
+        return _cmd_labeling(args)
     if args.cmd != "run":
         _build_parser().print_help()
         return 2
@@ -7586,7 +7771,9 @@ def main(argv=None) -> int:
         selected = v.selected
         print(f"  [变体] selected {args.modules.split(',')} → {selected}"
               + (f"（移除 {args.variant_remove}）" if args.variant_remove else ""))
-    dest = args.dest
+    # 2026-11-02（C-02）：`--dest` 帮助文案写「缺省=store 根」，实现却把 None 直传
+    # exporter → 落在 `Path.cwd()`（TUI 菜单跑全链时等于写仓根）。按文案口径补齐。
+    dest = _run_export_dest(args.dest, store)
     r = pipe(store, pipeline, selected,
              include_references=not args.no_include_refs,
              fmt=args.fmt, dest_dir=dest,
@@ -7618,6 +7805,14 @@ def main(argv=None) -> int:
         return 1
     print("\n★ 全链管道 PASSED ✓")
     return 0
+
+
+def _run_export_dest(arg_dest, store):
+    """`nf run` 的导出落点：显式 --dest 优先，否则回退 store 根（2026-11-02 · C-02）。"""
+    if arg_dest:
+        return arg_dest
+    home = getattr(store, "home", None)
+    return str(home) if home else None
 
 
 def guarded_main(argv=None) -> int:

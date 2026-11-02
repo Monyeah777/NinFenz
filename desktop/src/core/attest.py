@@ -22,9 +22,12 @@ import json
 import os
 import re
 import shutil
+from pathlib import Path
 import subprocess  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
+
+from core import paths as _paths
 
 SCHEMA = "nf-attest/1"
 
@@ -60,10 +63,17 @@ def _sha256(data: bytes) -> str:
 
 def subject_of(path: str, root: str = ".") -> Dict[str, Any]:
     """内容主体摘要：相对路径 + sha256 + 字节数 + 行数（全部可复现）。"""
-    abs_path = os.path.join(root, path)
+    # 2026-11-02（E6）：主体路径必须过仓库包含性判据——此前 `os.path.join(root, path)`
+    # 对绝对路径直接放行，`nf attest --verify` 可对 /etc/hostname 等仓外文件给「证据成立」。
+    abs_path = str(_paths.validate_path(root, path))
     with open(abs_path, "rb") as fh:
         raw = fh.read()
-    text = raw.decode("utf-8")
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        # 2026-11-02（E5）：行数是信息字段，非 UTF-8 主体不应让 verify 裸抛；
+        # 用替换解码计数（字节级 sha256/bytes 仍是严格判据）。
+        text = raw.decode("utf-8", "replace")
     rel = path.replace("\\", "/")
     return {
         "path": rel,
@@ -138,19 +148,45 @@ def _which(tool: str, purpose: str) -> str:
     return exe
 
 
-def verify_external(att: Dict[str, Any], tool: str = "cosign") -> Tuple[bool, List[str]]:
-    """调用外部验证器校验 sigstore 锚；验证器缺失 → **拒绝**（不降级）。"""
+def verify_external(att: Dict[str, Any], tool: str = "cosign",
+                    root: str = ".") -> Tuple[bool, List[str]]:
+    """调用外部验证器校验 sigstore 锚；验证器缺失 → **拒绝**（不降级）。
+
+    2026-11-02（E4）：旧 argv 是 `verify-blob --bundle <bundle> <bundle>`——把 **bundle 当主体**，
+    既不可能验过真实签名（签名覆盖的是 subject），也等于把「验什么」从主体换成了信封。
+    现在显式传 `subject.path` 指向的文件，并要求 bundle 位于仓库内（相对路径）。
+    """
+    sig = (att.get("signature") or {})
+    bundle = str(sig.get("bundle") or "")
+    if not bundle:
+        return False, ["外挂锚缺 bundle 路径（signature.bundle 为空）"
+                       "（修复指引：随 attestation 一并分发签名 bundle）"]
+    bpath = Path(root) / bundle
+    try:
+        bpath.resolve().relative_to(Path(root).resolve())
+    except (ValueError, OSError):
+        return False, ["外挂锚 bundle 逃逸仓库根：%s（修复指引：bundle 须仓内相对路径）" % bundle]
+    if not bpath.is_file():
+        return False, ["外挂锚缺 bundle 实体（signature.bundle 指向不存在）"
+                       "（修复指引：随 attestation 一并分发签名 bundle）"]
     if not have_external_verifier(tool):
         return False, ["外挂锚验证器缺失（%s 未安装）→ fail-closed 拒绝，"
                        "不降级为 digest_only（修复指引：装 cosign 后重验，"
                        "或改用 --key-file 的 hmac 级）" % tool]
-    sig = (att.get("signature") or {})
-    bundle = sig.get("bundle")
-    if not bundle or not os.path.exists(bundle):
-        return False, ["外挂锚缺 bundle 实体（signature.bundle 指向不存在）"
-                       "（修复指引：随 attestation 一并分发签名 bundle）"]
+    subj = (att.get("subject") or {})
     try:
-        proc = subprocess.run([shutil.which(tool) or tool, "verify-blob", "--bundle", bundle, bundle],  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
+        subj_path = subject_of(str(subj.get("path") or ""), root)
+    except (_paths.PathEscapeError, OSError) as exc:
+        return False, ["外挂锚主体不可用：%s（%s）" % (subj.get("path"), exc)]
+    # subject_of 已校验包含性；这里需要**路径**而不是摘要，故按 root 重算一次。
+    target = (Path(root) / str(subj.get("path"))).resolve()
+    try:
+        target.relative_to(Path(root).resolve())
+    except ValueError:
+        return False, ["外挂锚主体逃逸仓库根：%s" % subj.get("path")]
+    try:
+        proc = subprocess.run([shutil.which(tool) or tool, "verify-blob",
+                               "--bundle", str(bpath), str(target)],  # nosec B404/B603/B607
                               capture_output=True, text=True, timeout=TOOL_TIMEOUT_S)
     except subprocess.TimeoutExpired:
         return False, ["外挂锚校验超时（%d s，%s 未返回）→ fail-closed 拒绝"
@@ -177,8 +213,8 @@ def verify(att: Dict[str, Any], root: str = ".",
         return False, ["attestation 缺 subject.path"], "invalid"
     try:
         live = subject_of(path, root)
-    except OSError as exc:
-        return False, ["主体不可读：%s（%s）" % (path, exc)], "invalid"
+    except (_paths.PathEscapeError, OSError) as exc:
+        return False, ["主体不可用：%s（%s）" % (path, exc)], "invalid"
     for field in ("sha256", "bytes", "line_count"):
         if live.get(field) != subj.get(field):
             issues.append("主体漂移：%s 记录=%s 实测=%s"
@@ -200,7 +236,7 @@ def verify(att: Dict[str, Any], root: str = ".",
             return False, ["hmac 签名不匹配（密钥不符或信封被改）"], "hmac-sha256"
         return True, [], "hmac-sha256"
     if scheme == SCHEME_SIGSTORE:
-        ok, ext_issues = verify_external(att)
+        ok, ext_issues = verify_external(att, root=root)
         return ok, ext_issues, "sigstore-keyless"
     return False, ["未知签名方案：%s（支持：%s / %s）"
                    % (scheme, SCHEME_HMAC, SCHEME_SIGSTORE)], "unsupported"

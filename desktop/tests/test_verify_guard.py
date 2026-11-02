@@ -62,7 +62,8 @@ class VerifyGuardTest(unittest.TestCase):
                     errors="replace",
                     timeout=20,
                 )
-                self.assertEqual(1, second.returncode, second.stdout + second.stderr)
+                # 2026-11-02（D1）：锁超时改用 EX_TEMPFAIL(75)，与判据 FAIL(1) 区分
+                self.assertEqual(75, second.returncode, second.stdout + second.stderr)
                 self.assertIn("另一个 verify.sh 正在此仓库运行", second.stderr)
                 self.assertIn("NF_VERIFY_LOCK_WAIT", second.stderr)
                 self.assertNotIn("unexpected", second.stdout)

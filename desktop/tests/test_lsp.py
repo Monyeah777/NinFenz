@@ -393,6 +393,34 @@ class TestTransport(unittest.TestCase):
         self.assertEqual(srv.serve(stdin=io.BytesIO(payload), stdout=out), 0)
         self.assertEqual(parse_frames(out.getvalue())[0]["id"], 1)
 
+    def test_internal_error_hides_server_details(self):
+        """内部异常只回稳定文案（2026-11-01 · D7 · CWE-209）。
+
+        旧实现把 `str(exc)` 直接写进 error.message——异常文本常含服务端绝对路径
+        （如「{path} 不存在」），等于把目录结构回给客户端；MCP 面早已改为只回
+        `Internal error`，LSP 侧补同一条口径。
+        """
+        srv = _ready(lsp.LspServer(root=ROOT))
+        key = lsp.M_HOVER
+        orig = lsp._REQUESTS[key]
+
+        def boom(_srv, _params):
+            raise RuntimeError("/secret/leak/x.md 不存在")
+
+        lsp._REQUESTS[key] = boom
+        try:
+            out = io.BytesIO()
+            srv.serve(stdin=io.BytesIO(frame({
+                "jsonrpc": "2.0", "id": 7, "method": key,
+                "params": {"textDocument": {"uri": "file:///tmp/x.md"},
+                           "position": {"line": 0, "character": 0}}})), stdout=out)
+        finally:
+            lsp._REQUESTS[key] = orig
+        resp = parse_frames(out.getvalue())[0]
+        self.assertEqual(-32603, resp["error"]["code"])
+        self.assertIn("Internal error", resp["error"]["message"])
+        self.assertNotIn("/secret/leak", resp["error"]["message"])
+
     def test_unknown_method_returns_error(self):
         out = _ready(lsp.LspServer(root=ROOT)).handle({"jsonrpc": "2.0", "id": 9, "method": "no/suc"
             "h"})

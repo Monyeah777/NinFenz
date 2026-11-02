@@ -36,6 +36,7 @@ SINKS = re.compile(
     r"|os\.replace\(|os\.remove\(|os\.unlink\(|shutil\.move\(|makedirs\(|os\.mkdir\("
     r"|save_module\(|save_asset|save_cache\(|_write_|write_projection\(|write_region\("
     r"|save_baseline\(|write_log\(|write_usage\(|write_order\(|write_scope\("
+    r"|write_export\(|\.freeze\(|refresh\(|set_status\("
     r"|write_state\(|set_status\(|register\(|apply\(ROOT, write"
 )
 
@@ -50,6 +51,7 @@ REVIEWED_FALSE_POSITIVES = {
     "--note": "同上",
     "--pipeline": "块内写调用由 `--write-advisory` 守卫（已入闸）",
     "--check": "块内写调用由 `--trace` 守卫（assemble；已入闸）",
+    "--root": "只是目标仓库根路径；写者是同块的 --export/--freeze/--refresh（已入闸）",
 }
 
 

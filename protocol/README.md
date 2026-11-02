@@ -5,7 +5,7 @@
 > **元工具定位**：本层验收对象 = IDL/门禁/生成物/一致性机制自身的正确性；存量域包内容缺机读块（L0 过渡态）由 check16 过渡策略承接，不计入元工具质量缺口。
 > **承接**：43 A1（IDL schema，`schema/`）/ A2（Conformance 分级，`export_conformance.json` + 01 §1.2）/ A3（扩展策略 + 影响分层，`EXTENSION.md`）/ A4（生成物同仓 golden，`generated/`）。四个里程碑的产物均已随 check28-31 常驻。
 
-## schema/ · 五份契约定义（本层机器真相）
+## schema/ · 契约定义（本层机器真相）
 
 | schema 文件 | 校验对象 | 真相形态 |
 |---|---|---|
@@ -21,8 +21,9 @@
 
 ## 扫描口径（A1 验收）
 
-- 44 个模块文档全量纳入扫描：**在场 machine_contract 即校验**（现行 23/44）；存量旧格式模块（无机读块）按 check16 过渡策略不阻断，缺块计数见统计行——A2 起逐模块补 `conformance` 位与机读块归位。
-- 8 条管线文档、5 份 community protocol.yaml、`05_资产库/provenance.json` 台账条目全量过 schema。
+- **248 个模块文档**（`04_模块库` 13 + `community/*/modules` 235）全量纳入扫描：**在场 `machine_contract` 即校验**（现行 **248/248**；另有 3 件非模块文档含机读块，全仓合计 251）。存量旧格式模块（无机读块）按 check16 过渡策略不阻断，缺块计数见统计行。*（A1 验收时点为 44 件 / 23 有块；历史值见 CHANGELOG。）*
+- **114 条管线文档**（`03_管线库` 3 + `community/*/pipelines` 111）、**111 份** community `protocol.yaml`、`05_资产库/provenance.json` 台账（3 条机制资产）全量过 schema。*（A1 时点为 8 条管线 / 5 份协议包。）*
+- `protocol/schema/` 现有 **9 份** IDL：上表 5 份契约定义之外，另有 `integration` / `integration_strings` / `release` / `asset_contracts` 四份（分别在 A1 之后随接入面、发布编排、数字资产契约层加入）。
 - 任一漂移（字段类型/必填缺失/枚举越界/编号格式错位）即 check28 FAIL。
 
 ## 新增一个契约件

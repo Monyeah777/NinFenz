@@ -44,6 +44,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import gate_engine  # noqa: E402
 from core import posix_shell as psh  # noqa: E402
+from core import quality_baseline as qb  # noqa: E402
 
 BANNER = re.compile(r"^== \[(\d+)/")
 VERDICT = re.compile(r"^\s*\[(PASS|FAIL|WARN)\] (.*)$")
@@ -212,14 +213,18 @@ class GateEngineParityTest(unittest.TestCase):
                          "引擎与 bash 判据不一致（%d 条）：\n%s" % (len(diffs), "\n".join(diffs)))
 
     def test_no_engine_check_is_silently_missing_from_registry(self) -> None:
-        """登记表与 PENDING **必须恰好覆盖 check1-40**——不许有 check 从两边都消失。
+        """登记表与 PENDING **必须恰好覆盖 check1-EXPECTED_CHECKS**——不许有 check 从两边都消失。
 
         这是「check 只增不减」在工程上的牙齿：漏一条会被这里抓住。
+        2026-11-01 修：此前硬编码 range(1,41)，check41/42 扩段后两条同时从
+        REGISTRY 与 PENDING 消失却仍全绿——覆盖面断言必须跟着**单一真源**
+        （`quality_baseline.EXPECTED_CHECKS`）走，不许写死上界。
         """
         gate_engine.build_registry()
         covered = set(gate_engine.REGISTRY) | set(gate_engine.PENDING)
-        self.assertEqual(set(range(1, 41)), covered,
-                         "check 覆盖面缺口：%s" % sorted(set(range(1, 41)) - covered))
+        expect = set(range(1, qb.EXPECTED_CHECKS + 1))
+        self.assertEqual(expect, covered,
+                         "check 覆盖面缺口：%s" % sorted(expect - covered))
         overlap = set(gate_engine.REGISTRY) & set(gate_engine.PENDING)
         self.assertEqual(set(), overlap, "同一条 check 既已迁入又标未迁入：%s" % sorted(overlap))
 
@@ -227,6 +232,24 @@ class GateEngineParityTest(unittest.TestCase):
         """未迁入的 check 不得出现在引擎结果里充数（不许拿 PENDING 装绿）。"""
         leaked = sorted(set(self.engine) & set(gate_engine.PENDING))
         self.assertEqual([], leaked, "PENDING 的 check 混进了引擎结果：%s" % leaked)
+
+    def test_memo_key_includes_check_number(self) -> None:
+        """G1：22 条 check 不得共用同一 memo 键（否则 --only 1,3 --memo 回放错判定）。"""
+        gate_engine.build_registry()
+        root = Path(ROOT)
+        keys = {gate_engine.content_key(gate_engine.REGISTRY[n], root)
+                for n in (1, 3, 12)}
+        self.assertEqual(3, len(keys), "不同 check 的 memo 键必须不同")
+
+    def test_unknown_check_number_fails_closed(self) -> None:
+        """不存在的 check 号不得以 exit 0 假绿（D3：run_checks 对未知号静默 continue）。"""
+        from io import StringIO
+        from contextlib import redirect_stderr
+        buf = StringIO()
+        with redirect_stderr(buf):
+            rc = gate_engine.main(["--only", "999", "--quiet-time"])
+        self.assertEqual(2, rc, "未知 check 号应 exit 2（用法错误），实际 %r" % rc)
+        self.assertIn("999", buf.getvalue())
 
     def test_registry_specs_are_wellformed(self) -> None:
         """每条已迁入的 check 都要有：banner、非空实现、明确 kind。"""

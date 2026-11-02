@@ -1,8 +1,8 @@
 {
   "declared": {
-    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
-    "expected_checks": 42,
-    "expected_pass": 76,
+    "coverage_note": "判据级抽查面 32 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 44（两者不可互替）",
+    "expected_checks": 44,
+    "expected_pass": 78,
     "report_items": 32,
     "verify_version": "v2.30"
   },
@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 99,
+        "raises": 103,
         "sinks": 22
       },
       "status": "pass",
@@ -239,7 +239,7 @@
       "sample": [],
       "source": "quality_baseline.scan",
       "stats": {
-        "checks": 42,
+        "checks": 44,
         "verify_version": "v2.30"
       },
       "status": "pass",
@@ -259,12 +259,10 @@
           "NF-TECHDOC-Monyeah777-1",
           "NF-WORLDCAMPUS-Monyeah777-1"
         ],
-        "warns": [
-          "NF-1 attestation 与当前内容不符（内容已改，需重签）"
-        ]
+        "warns": []
       },
-      "status": "warn",
-      "warns": 1
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "library_projection",
@@ -298,7 +296,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+        "root": "1a0a8f732a8c58d6cd44ff3bb26df6a976cc088192f758ff0db2d89da6202a74",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -326,8 +324,8 @@
       "sample": [],
       "source": "repo_stats.check_strict",
       "stats": {
-        "baseline_checks": 42,
-        "baseline_pass": 76,
+        "baseline_checks": 44,
+        "baseline_pass": 78,
         "concept_graphs": 101,
         "core_modules": 13,
         "core_pipelines": [
@@ -355,7 +353,7 @@
         "standards_total": 370,
         "standards_unreachable": 38,
         "subdivisions_total": 1200,
-        "verify_checks": 42,
+        "verify_checks": 44,
         "verify_version": "2.30"
       },
       "status": "pass",
@@ -368,11 +366,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 331,
-        "files": 331,
-        "max_fn_cc": 116,
-        "max_fn_lines": 1263,
-        "max_lines": 7682
+        "baseline": 404,
+        "files": 404,
+        "max_fn_cc": 118,
+        "max_fn_lines": 1323,
+        "max_lines": 7877
       },
       "status": "pass",
       "warns": 0
@@ -386,8 +384,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 234,
-        "probed": 234
+        "patterns": 265,
+        "probed": 265
       },
       "status": "pass",
       "warns": 0
@@ -429,10 +427,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 0,
-        "metrics_missing": 0,
-        "metrics_recorded": 261,
-        "modules": 261,
+        "metrics_drift": 1,
+        "metrics_missing": 1,
+        "metrics_recorded": 265,
+        "modules": 266,
         "registered_cycles": 0,
         "registered_sdp": 12,
         "sdp": 12
@@ -617,8 +615,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4098,
-        "kernel": 2181,
+        "files": 4233,
+        "kernel": 2203,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -629,12 +627,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "29ee12f5b9ddaef664d297b35c88b696e4c4961deea3382c1c97add84c0184e8",
+  "root_digest": "1ef18b0b0623796b55fb54b0b259a6c6c49c51c6ffed2de8406dfc1e4b2d3cd3",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 30,
-    "warn": 2
+    "pass": 31,
+    "warn": 1
   }
 }

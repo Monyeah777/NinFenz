@@ -142,6 +142,22 @@ def verify(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[str, A
             issues.append("条目内容已变：%s（修复指引：重签该条并重建回执）" % eid)
         if fold_proof(str(e.get("leaf")), e.get("proof") or []) != str(doc.get("root")):
             issues.append("包含证明不折叠到根：%s" % eid)
+        # 2026-11-02（E1）：anchor 块此前不在任何判据覆盖内——既不在 Merkle 载荷里，
+        # verify 也不与 frontmatter 对照（读者侧 nf_verify 只信这个块）。两条判据：
+        # ① 形状/路径安全（scheme 词表、sig_file 必须仓内相对）；② 与实时 frontmatter 一致。
+        got_anchor = e.get("anchor")
+        if got_anchor is not None and not isinstance(got_anchor, dict):
+            issues.append("锚块形状非法（须为对象或 null）：%s" % eid)
+        elif isinstance(got_anchor, dict):
+            scheme = str(got_anchor.get("scheme") or "")
+            if scheme not in ("hmac-sha256", "ssh-sig", "sigstore-keyless"):
+                issues.append("锚块方案非法：%s（%s）" % (scheme or "<空>", eid))
+            sig = str(got_anchor.get("sig_file") or "")
+            if sig and (Path(sig).is_absolute() or ".." in Path(sig).parts):
+                issues.append("锚块 sig_file 逃逸仓库根：%s（%s）" % (sig, eid))
+        if got_anchor != live_e.get("anchor"):
+            issues.append("锚块与条目 frontmatter 不一致：%s（修复指引：nf library attest "
+                          "重签后重建回执）" % eid)
     if len(doc.get("entries") or []) != live["count"]:
         issues.append("回执条数 %d ≠ 馆藏条数 %d"
                       % (len(doc.get("entries") or []), live["count"]))
@@ -170,6 +186,10 @@ def load(root: str = ".", rel: str = RECEIPTS_REL) -> Dict[str, Any]:
 PROTOCOL_RECEIPTS_REL = "protocol/RECEIPTS.json"
 
 
+#: 去重（2026-11-01 · F7）：`protocol/schema/asset_contracts.schema.json` 曾既在显式清单、
+#: 又被 `protocol/schema/*.json` glob 收一次 → 回执 67 条只有 66 个不同 subject（同 id 两条叶、
+#: 两条不同 inclusion proof）。回执是「逐件有主」的锚定面，重复叶会让根与条数口径不一致。
+#: 故 `protocol_subjects` 出口按**首次出现顺序**去重（`dict.fromkeys`），条数 = 件数。
 def protocol_subjects(root: str = ".") -> List[str]:
     """协议层机读产物清单（回执覆盖面；不存在的项自动跳过）。"""
     fixed = ["STRATEGY.md", "01_核心协议.md", "02_联动注册表.md",
@@ -217,7 +237,7 @@ def protocol_subjects(root: str = ".") -> List[str]:
     # closed 复盘件必须先被回执锚定；把真源复盘件纳入协议回执面，
     # 否则 postmortem 的 closed 判据永远无法从正常重建路径满足。
     fixed += [p.relative_to(r).as_posix() for p in sorted(r.glob("postmortems/PO-*.md"))]
-    return [s for s in fixed if (r / s).is_file()]
+    return list(dict.fromkeys(s for s in fixed if (r / s).is_file()))
 
 
 def build_scope(root: str = ".", subjects: Optional[List[str]] = None,
@@ -246,18 +266,45 @@ def build_scope(root: str = ".", subjects: Optional[List[str]] = None,
             "entries": entries}
 
 
-def verify_scope(doc: Dict[str, Any], root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """协议层回执校验：每条折叠到根 + 文件摘要与记录一致 + 根与实时重算一致。"""
+def verify_scope(doc: Dict[str, Any], root: str = ".",
+                 expected_subjects: Optional[List[str]] = None
+                 ) -> Tuple[List[str], Dict[str, Any]]:
+    """协议层回执校验：每条折叠到根 + 文件摘要与记录一致 + 根与实时重算一致。
+
+    `expected_subjects`（2026-11-01 · F1 补）：可选**覆盖面**判据。此前校验只用回执
+    自带的 id 列表重算根——把某条从回执里删掉再重算根，校验仍然全绿（覆盖面可静默
+    收缩）。馆藏层有计数断言挡着，协议层没有；调用方给出期望件集后，漏登/多登都会
+    如实报 FAIL，不再只证明「记录下来的那几条自洽」。
+    """
     issues: List[str] = []
     if not isinstance(doc, dict) or doc.get("schema") != SCHEMA:
         return ["协议回执 schema 不匹配"], {}
-    live = build_scope(root, [e["id"] for e in doc.get("entries") or []])
+    if expected_subjects is None and str(doc.get("scope") or "") == "protocol":
+        # 2026-11-02（R2 收尾）：协议面回执默认校验覆盖面（不再依赖调用方记得传参；
+        # 也避免改 verify.sh 文本导致 .NET 内嵌真源摘要漂移）。
+        expected_subjects = protocol_subjects(root)
+    entries = doc.get("entries")
+    if not isinstance(entries, list) or any(not isinstance(e, dict) for e in entries):
+        return ["协议回执 entries 形状非法（须为对象数组；修复指引：nf receipts --scope "
+                "protocol --write 重建）"], {}
+    recorded = [str(e.get("id") or "") for e in entries]
+    if expected_subjects is not None:
+        miss = sorted(set(expected_subjects) - set(recorded))
+        extra = sorted(set(recorded) - set(expected_subjects))
+        if miss:
+            issues.append("协议回执漏登 %d 件（覆盖面收缩）：%s（修复指引：nf receipts --scope "
+                          "protocol --write）" % (len(miss), "、".join(miss[:6])))
+        if extra:
+            issues.append("协议回执含 %d 件不在册条目（已删除/改名？）：%s（修复指引：nf "
+                          "receipts --scope protocol --write）"
+                          % (len(extra), "、".join(extra[:6])))
+    live = build_scope(root, [e["id"] for e in entries])
     if doc.get("root") != live["root"]:
         issues.append("协议回执根不一致：记录=%s 实测=%s（修复指引：nf receipts --scope protocol --"
             "write）"
                       % (str(doc.get("root"))[:16], str(live["root"])[:16]))
     live_by = {e["id"]: e["digest"] for e in live["entries"]}
-    for e in doc.get("entries") or []:
+    for e in entries:
         if live_by.get(e["id"]) != e.get("digest"):
             issues.append("文件内容已变：%s" % e["id"])
         if fold_proof(str(e.get("leaf")), e.get("proof") or []) != str(doc.get("root")):

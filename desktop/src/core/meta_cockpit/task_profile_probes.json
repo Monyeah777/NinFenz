@@ -1,0 +1,55 @@
+{
+  "schema": "nf/task-profile-probes/1",
+  "frozen_at": "2026-10-29T03:05:00+08:00",
+  "digest": "14eda5ceffb546200825f1032e0c1c31ca82196fac15c56c29629912e917131f",
+  "probes": [
+    {
+      "prompt": "比较三个候选方案，说明取舍和适用边界。",
+      "modes": ["compare", "explain"]
+    },
+    {
+      "prompt": "为什么系统上线后故障率上升，找出机制和混淆因素。",
+      "modes": ["diagnose"]
+    },
+    {
+      "prompt": "设计一个多人协作的内容审核流程。",
+      "modes": ["design"]
+    },
+    {
+      "prompt": "审查现有发布流程并给出遗漏项。",
+      "modes": ["audit"]
+    },
+    {
+      "prompt": "解释供需变化如何影响市场价格。",
+      "modes": ["explain"]
+    },
+    {
+      "prompt": "是否应该把缓存层拆成独立服务？",
+      "modes": ["decide"]
+    },
+    {
+      "prompt": "创作一个短篇故事，主题是失去记忆的城市。",
+      "modes": ["create"]
+    },
+    {
+      "prompt": "设计两种通知策略并比较它们的优劣。",
+      "modes": ["compare", "design"]
+    },
+    {
+      "prompt": "制定数据库迁移的检查清单和撤回步骤。",
+      "modes": ["design", "audit"]
+    },
+    {
+      "prompt": "帮我处理一下这个事情。",
+      "modes": ["general"]
+    },
+    {
+      "prompt": "Compare two storage designs versus a single service.",
+      "modes": ["compare"]
+    },
+    {
+      "prompt": "解释这个机制，并判断是否值得采用。",
+      "modes": ["explain", "decide"]
+    }
+  ]
+}

@@ -153,6 +153,13 @@ def _portable(value: Any, root: str) -> Any:
     return value
 
 
+def _digest(body: Dict[str, Any]) -> str:
+    """报告主体（除 root_digest 外全部字段）的规范化 sha256。"""
+    clone = {k: v for k, v in body.items() if k != "root_digest"}
+    return hashlib.sha256(
+        json.dumps(clone, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+
+
 def build(root: str = ".") -> Dict[str, Any]:
     """跑全部判据 → 报告 dict（含声明/实测并排 + 稳定 digest）。
 
@@ -178,8 +185,7 @@ def build(root: str = ".") -> Dict[str, Any]:
         {"schema": SCHEMA, "items": items, "summary": summary, "declared": declared},
         root,
     )
-    digest_src = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
-    body["root_digest"] = hashlib.sha256(digest_src).hexdigest()
+    body["root_digest"] = _digest(body)
     scan_memo.end()                     # 作用域收尾：清缓存，避免跨次 build 吃旧值
     return body
 
@@ -225,6 +231,12 @@ def check(root: str = ".", live: Optional[Dict[str, Any]] = None
     if recorded.get("schema") != SCHEMA:
         issues.append("%s schema 不匹配（期望 %s）（修复指引：重跑 --write）"
                       % (REPORT_REL, SCHEMA))
+    # 2026-11-02（V3）：自证——按**已存正文**重算 root_digest。旧实现只比
+    # 「记录里的 root_digest 字段 == 实时重算」，改 items/stats 但保留旧 root_digest
+    # 仍会判「新鲜」（root_digest 字段本身没被核对）。
+    if isinstance(recorded, dict) and recorded.get("root_digest") != _digest(recorded):
+        issues.append("%s 报告主体被改（root_digest 与正文自证不符）（修复指引：重跑 --write）"
+                      % REPORT_REL)
     return issues, live
 
 

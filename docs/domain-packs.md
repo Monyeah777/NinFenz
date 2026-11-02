@@ -135,3 +135,35 @@ python scripts/nf.py domain shells --json    # 机读形态
 
 口径：**领域判据由作者/领域专家落笔**（不代写、不臆造）；补全之后下调
 `core/shell_ledger.BASELINE`。新增域包**不得**以占位条目出厂——超基线即 FAIL。
+
+## 内容完备度（27 authored / 73 derived，2026-11-02 起可机读）
+
+> **事实**：100 个域包里 **27 个已逐条写实（authored）**，**73 个仍是段级框架（derived）**——
+> 12 条细分的定义/判据/失效模式为同一段框架文字（每包 36 处「待作者补全」占位，共 2628 处）。
+> 这不是秘密：仓库用 `content_tier` 与正文占位如实标注，`nf domain shells` 把缺口做成**只减不增**的台账。
+
+```bash
+python scripts/nf.py domain shells            # 现状：27 已填 / 73 带壳 / 2628 处；超基线即 FAIL
+python scripts/nf.py domain shells --write     # 重生成完备度报告（人读 + 机读）
+```
+
+- 人读报告：`docs/domain-completeness.md`（自动生成，禁止手改）
+- 机读报告：`protocol/domain_completeness.json`
+- 新鲜度：`desktop/tests/test_shell_ledger.py::test_completeness_report_is_fresh` 在 check12 里断言报告与实测一致
+- 补全纪律：领域判据须由作者/领域专家落笔（**不代写、不编造**）；写完把该包 `content_tier` 翻为 `authored`，
+  并把 `core/shell_ledger.BASELINE` 下调到新实测值，再走冻结链重生成报告。
+
+### 补全工具（2026-11-02）
+
+```bash
+# 1) 生成 12 条待填骨架（名称/锚已就位，定义/判据/失效模式留空）
+python scripts/nf.py domain template AI教育域包 --out /tmp/AI教育.fill.json
+
+# 2) 作者/领域专家逐条填写 definition / check / pitfall（不代写、不编造）
+
+# 3) 自检：12 条字段齐、无占位短语
+python scripts/nf.py domain template AI教育域包 --check /tmp/AI教育.fill.json
+```
+
+模板只负责「要填什么」，**不生成内容**；补全后按上方流程翻 `content_tier`、下调 `BASELINE`、
+重生成完备度报告并走冻结链。

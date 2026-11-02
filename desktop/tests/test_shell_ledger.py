@@ -25,6 +25,24 @@ class ShellLedgerTest(unittest.TestCase):
                if v != sl.BASELINE["per_shell_pack"]}
         self.assertEqual({}, odd, "空壳包出现异型条目数（要么补全了、要么派生走样）")
 
+    def test_completeness_report_is_fresh(self):
+        """完备度报告必须与实时 survey 一致（否则缺口清单会静默过期）。"""
+        self.assertEqual([], sl.report_issues(str(ROOT)),
+                         "报告过期（修复指引：nf domain shells --write）")
+
+    def test_report_roundtrip_and_staleness(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp, "community", "域包A", "assets")
+            d.mkdir(parents=True)
+            (d / "DOMAIN_SPEC.md").write_text("| 领域细则待作者补全 |\n", encoding="utf-8")
+            sl.write_report(tmp)
+            self.assertEqual([], sl.report_issues(tmp))
+            # 新增一处占位 → 报告必须被判过期
+            (d / "DOMAIN_SPEC.md").write_text(
+                "| 领域细则待作者补全 |\n| 领域专属判据待补 |\n", encoding="utf-8")
+            issues = sl.report_issues(tmp)
+            self.assertTrue(any("过期" in i for i in issues), issues)
+
     def test_ratchet_catches_a_new_shell_pack(self):
         """变异自证：新造一个带占位的域包必须被判红（否则棘轮是空转）。"""
         with tempfile.TemporaryDirectory() as tmp:

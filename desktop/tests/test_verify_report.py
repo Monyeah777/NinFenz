@@ -128,6 +128,17 @@ class CheckTest(unittest.TestCase):
             issues, _ = vr.check(tmp)
         self.assertTrue(any("不一致" in i for i in issues), issues)
 
+    def test_body_tamper_without_digest_change_is_detected(self):
+        """V3：只改正文、保留旧 root_digest 也必须判红（root_digest 自证）。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            vr.write(tmp)
+            p = Path(tmp) / vr.REPORT_REL
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            doc["items"][0]["issues"] = 999
+            p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            issues, _ = vr.check(tmp)
+        self.assertTrue(any("自证不符" in i or "主体被改" in i for i in issues), issues)
+
     def test_written_report_round_trips(self):
         with tempfile.TemporaryDirectory() as tmp:
             vr.write(tmp)

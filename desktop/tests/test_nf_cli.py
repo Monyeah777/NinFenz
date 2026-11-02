@@ -738,6 +738,66 @@ def unread_flag_dests(parser, source: str, allow=()) -> list:
     return out
 
 
+class ShellEngineFlagTest(unittest.TestCase):
+    """C-06：`nf shell --engine rust` 必须被接受并透传到会话（NF_ENGINE）。"""
+
+    def test_shell_accepts_engine_flag_and_exports_env(self):
+        import contextlib
+        import os
+        old = os.environ.get("NF_ENGINE")
+        try:
+            a = nf._build_parser().parse_args(
+                ["shell", "--engine", "rust", "--commands"])
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                nf._cmd_shell(a)
+            self.assertEqual("rust", os.environ.get("NF_ENGINE"))
+        finally:
+            if old is None:
+                os.environ.pop("NF_ENGINE", None)
+            else:
+                os.environ["NF_ENGINE"] = old
+
+
+class RunExportDestTest(unittest.TestCase):
+    """C-02：`nf run` 缺省导出落点 = store 根（帮助文案口径），不是 cwd。"""
+
+    def test_default_dest_falls_back_to_store_home(self):
+        class S:
+            home = "/tmp/nf-store"
+
+        self.assertEqual("/tmp/nf-store", nf._run_export_dest("", S()))
+        self.assertEqual("out/x", nf._run_export_dest("out/x", S()))
+
+    def test_missing_store_home_keeps_none(self):
+        class S:
+            home = None
+
+        self.assertIsNone(nf._run_export_dest("", S()))
+
+
+class AbbrevDisabledTest(unittest.TestCase):
+    """长选项前缀缩写必须被拒（2026-11-01 · D1）。
+
+    argparse 默认 `allow_abbrev=True`：`--wri` 会被当成 `--write`、`--fi` 当成 `--fix`，
+    而终端写盘闸门按完整旗标名判定 ⇒ 缩写是闸门之外的第二套等价写法（粘贴面可绕）。
+    本用例钉住「命令面只有一种写法」：缩写 = 用法错误（exit 2），完整写法照常可用。
+    """
+
+    def test_abbreviated_long_options_are_rejected(self):
+        for argv in (["stats", "--wri"], ["lint", "--fi"], ["interop", "--ou", "/tmp/x"]):
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                with self.assertRaises(SystemExit) as cm:
+                    nf._build_parser().parse_args(argv)
+            self.assertEqual(2, cm.exception.code, argv)
+
+    def test_full_spelling_still_works(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            a = nf._build_parser().parse_args(["stats", "--write"])
+        self.assertTrue(getattr(a, "write", False))
+
+
 class DeclaredFlagsAreReadTest(unittest.TestCase):
     """「声明面 = 执行面」：`nf` 的每个旗标都必须真被读到（防静默空转）。"""
 

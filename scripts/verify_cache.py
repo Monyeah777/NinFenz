@@ -42,16 +42,63 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import atomic_write, json_doc  # noqa: E402 - 先用后置（scripts 面统一写法）
 
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 
 
 def _run(argv: list) -> str:
+    rc, out = _run_status(argv)
+    return out
+
+
+def _run_status(argv: list) -> tuple:
+    """→ (returncode, stdout.strip)；失败返回 (-1, "")（调用方需要区分「成功且为空」）。"""
     try:
         proc = subprocess.run(argv, cwd=str(ROOT), capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=120)
     except (OSError, subprocess.SubprocessError):
-        return ""
-    return (proc.stdout or "").strip() if proc.returncode == 0 else ""
+        return -1, ""
+    return proc.returncode, (proc.stdout or "").strip() if proc.returncode == 0 else ""
+
+
+def _tool_versions() -> dict:
+    """工具链版本（2026-11-02 · D5）：依赖/工具升级会改变判定行为，必须进 key。
+
+    取不到的维度记 `absent`（不因此放弃缓存，但会随安装/升级而变化）。
+    """
+    import shutil
+    out = {}
+    for name, argv in (("node", ["node", "-v"]), ("cargo", ["cargo", "-V"]),
+                       ("dotnet", ["dotnet", "--version"]), ("ruff", ["ruff", "--version"]),
+                       ("cosign", ["cosign", "version"])):
+        exe = shutil.which(name)
+        if not exe:
+            out[name] = "absent"
+            continue
+        rc, got = _run_status([exe] + argv[1:])
+        out[name] = got.splitlines()[0][:80] if rc == 0 and got else "unknown"
+    return out
+
+
+#: 判定依赖的**忽略面**目录（D2）：存在与否会改变 check32/33、asset_contract、wasm 宿主结果。
+IGNORED_INPUTS = (".gitee/ISSUE_TEMPLATE", "engine/dotnet/dist",
+                  "engine/rust/canonical/target", "engine/rust/target")
+
+
+def _ignored_inputs() -> dict:
+    """忽略面输入指纹：存在性 + 直接子项名（只名字，不读内容——target 可能很大）。"""
+    out = {}
+    for rel in IGNORED_INPUTS:
+        p = ROOT / rel
+        if not p.is_dir():
+            out[rel] = "absent"
+            continue
+        try:
+            names = sorted(x.name for x in p.iterdir())
+        except OSError:
+            names = ["<unreadable>"]
+        out[rel] = "dir:" + hashlib.sha256(
+            "\0".join(names).encode("utf-8")).hexdigest()[:16]
+    return out
 
 
 def _sha_file(path: Path) -> str:
@@ -74,7 +121,11 @@ def compute_key(mode: str) -> str:
     # `git stash create` 的 **commit** 哈希含作者/提交时间戳 ⇒ 同一棵树每次调用都不同，
     # 拿它当缓存 key 会导致**永不命中**（2026-10-27 实测：连续两次 key 不同）。
     # 正确口径是取它指向的 **tree**（再取 index 侧 tree），tree 是纯内容寻址、稳定可复现。
-    stash = _run(["git", "stash", "create"])
+    stash_rc, stash = _run_status(["git", "stash", "create"])
+    if stash_rc != 0:
+        # 2026-11-02（D6）：`stash create` 失败（未解冲突/index 不可读）时，旧实现把
+        # dirty 当空串 ⇒ 冲突脏树与干净树同 key。这里直接放弃缓存（fail-closed）。
+        return ""
     dirty = ""
     if stash:
         wt = _run(["git", "rev-parse", "%s^{tree}" % stash])
@@ -92,9 +143,20 @@ def compute_key(mode: str) -> str:
         "v": CACHE_VERSION,
         "mode": mode,
         "head": head,
+        # D3：HEAD 一个点看不见浅/深克隆与 tag 面（p6_evaluations 依赖 tag/全历史）
+        "history": _run(["git", "rev-list", "--count", "HEAD"]),
+        "tags": len(_run(["git", "tag"]).splitlines()),
         "dirty": dirty,
         "untracked": untracked_hashes,
         "gate": gate,
+        # D2：判定相关的忽略面产物（存在性 + 子项名）
+        "ignored_inputs": _ignored_inputs(),
+        # D5：工具链与依赖版本
+        "tools": _tool_versions(),
+        "deps": {
+            "requirements-ci": _sha_file(ROOT / ".github" / "requirements-ci.txt"),
+            "pyproject": _sha_file(ROOT / "pyproject.toml"),
+        },
         "py": platform.python_version(),
         "plat": sys.platform,
     }

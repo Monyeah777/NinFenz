@@ -104,11 +104,24 @@ _RULES: Tuple[Tuple[str, "re.Pattern[str]"], ...] = (
 
 
 def is_untrusted_source(rel: str) -> bool:
-    """相对路径是否属外来内容面（按 `UNTRUSTED_PREFIXES` 前缀判定）。"""
+    """来源是否属外来内容面（`UNTRUSTED_PREFIXES`；相对路径与绝对路径都判）。
+
+    2026-11-01（D3）：旧实现 `lstrip("./")` 后只做**仓库根相对前缀**匹配，于是
+    `/root/workspace/library/x.md`、`C:\\repo\\community\\a.md` 这类绝对路径
+    一个都命中不了（实测），而 MCP 适配器的来源字段在 `nf run --store` 路径下会
+    落到绝对/快照路径——「外来内容 = 数据」的可见性承诺在真实路径上漏标。
+    判据改成：先按相对前缀；再按**路径段**匹配（`/library/`、`/community/`、
+    `/docs/reference/external/`）。这是安全方向——宁可多标，不可漏标。
+    """
     if not isinstance(rel, str) or not rel.strip():
         return False
-    p = rel.replace("\\", "/").lstrip("./").lower()
-    return any(p.startswith(pre) for pre in UNTRUSTED_PREFIXES)
+    p = rel.replace("\\", "/").lower()
+    while p.startswith("./"):
+        p = p[2:]
+    if any(p.startswith(pre) for pre in UNTRUSTED_PREFIXES):
+        return True
+    hose = "/" + p.lstrip("/")
+    return any(("/" + pre) in hose for pre in UNTRUSTED_PREFIXES)
 
 
 def detect(text: str) -> List[Dict[str, Any]]:

@@ -434,7 +434,39 @@ PENDING: dict[int, str] = {
     22: "导出物规范体检（unittest 3 模块）",
     35: "深化面门禁（失败面为 tail-3 拼接 + 子扫描统计，多段结构）",
     38: "出口自动化门禁（6 次解释器循环）",
+    # 2026-11-01（D1）：41/42 是 check41-42 扩段时新增的两条供应链门禁，当时只进了
+    # verify.sh 与 quality_baseline，**没进本账目**——于是 `nf verify` 的
+    # 「已迁入 22 / 未迁入 18」两边都漏掉它们（22+18=40≠42），而
+    # test_gate_engine_parity 的覆盖面断言又硬编码 range(1,41) 把这个缺口也一起放过。
+    # 现在如实登记为未迁入（两条都是 bash 侧多段结构，尚未移植）。
+    41: "构建隔离门禁（SLSA L3 Build isolation：容器基座/工具链/取网面，多段结构）",
+    42: "不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：独立子进程验签 + 篡改必红）",
 }
+
+
+def _only_arg_error(only_text: str) -> int:
+    """校验 `--only` 的点名面 → 0=通过，1=应 exit 2（未知号 / 未迁入）。
+
+    2026-11-01 修（D1/D3）：`run_checks` 对 REGISTRY 外的 check 静默 continue，于是
+    `--only 999` 会「FAIL=0」exit 0（假绿）；而 `--only 41`（PENDING）同样以「未迁入 20」
+    的文案配绿退出码。两种都按用法错误处理（与 `nf verify` 口径一致），并分别给出
+    「不存在」与「未迁入」的可执行指引。
+    """
+    build_registry()
+    wanted = [int(x) for x in only_text.split(",") if x.strip()]
+    unknown = sorted(n for n in wanted if n not in REGISTRY and n not in PENDING)
+    if unknown:
+        print("未知 check 号：%s（已迁入 %d / 未迁入 %d / 编号上界 %d）"
+              % (unknown, len(REGISTRY), len(PENDING),
+                 max(list(REGISTRY) + list(PENDING))), file=sys.stderr)
+        return 1
+    pending_req = sorted(n for n in wanted if n in PENDING)
+    if pending_req:
+        print("check %s 尚未迁入引擎（bash 侧判据仍在 verify.sh）：请用 "
+              "`bash verify.sh` 跑全量门禁" % ",".join(str(n) for n in pending_req),
+              file=sys.stderr)
+        return 1
+    return 0
 
 
 def _native_runner(num: int, verify_text: str) -> Callable[[Path], Verdict]:
@@ -482,6 +514,9 @@ def content_key(spec: CheckSpec, root: Path) -> str:
     h = hashlib.sha256()
     h.update(str(root.resolve()).encode("utf-8"))
     h.update(b"\0gate_engine\0")
+    # 2026-11-02（G1）：键必须含 check 号——此前 22 条 check 共用同一键，
+    # `--only 1,3 --memo` 会把 check1 的判定回放给 check3。
+    h.update(("check%d\0" % spec.num).encode("utf-8"))
     for rel in CODE_FACE + tuple(spec.reads):
         h.update(rel.encode("utf-8"))
         h.update(b"\0")
@@ -644,6 +679,25 @@ def run_checks(root: Path, only: Sequence[int] | None = None,
     return out
 
 
+def _print_json(allv: "list[Verdict]", quiet: bool, wall: float,
+                memo: "Memo | None") -> None:
+    """`--json` 机器面（2026-11-01 从 main 拆出：让 main 的圈复杂度留在冻结值内）。
+
+    键与取值口径与拆分前逐字一致：`quiet` 只决定 `wall_seconds` / `memo` 两个
+    「不确定性面」是否出现；`checks` 两个分支本来就拼同一份列表。
+    """
+    payload: dict[str, Any] = {
+        "checks": [{"name": v.name, "status": v.status, "cached": v.cached,
+                    "fails": v.fails, "warns": v.warns} for v in allv],
+        "pending": len(PENDING),
+    }
+    if not quiet:
+        payload["wall_seconds"] = round(wall, 4)
+        payload["memo"] = None if memo is None else {"hits": memo.hits,
+                                                     "misses": memo.misses}
+    print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="门禁单进程引擎（骨架）")
     ap.add_argument("--only", default="", help="逗号分隔的 check 号（默认全部已迁入）")
@@ -657,6 +711,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     a = ap.parse_args(argv)
     if getattr(a, "trust_repo", False):
         os.environ[repo_trust.ENV_TRUST] = "1"
+
+    if a.only and _only_arg_error(a.only):
+        return 2
 
     # 不确定性面**默认不进输出**（2026-10-15 实测教训）：`nf verify` 曾被
     # test_daemon_parity 抓到「直跑 vs 守护」输出逐字节不同（3480 vs 3478 字节），
@@ -680,19 +737,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     wall = time.perf_counter() - wall0
 
     if a.json:
-        payload: dict[str, Any] = {
-            "checks": [{"name": v.name, "status": v.status, "cached": v.cached,
-                        "fails": v.fails, "warns": v.warns} for v in allv],
-            "pending": len(PENDING),
-        }
-        if not quiet:
-            payload["wall_seconds"] = round(wall, 4)
-            payload["memo"] = None if m is None else {"hits": m.hits, "misses": m.misses}
-        else:
-            payload["checks"] = [
-                {"name": v.name, "status": v.status, "cached": v.cached,
-                 "fails": v.fails, "warns": v.warns} for v in allv]
-        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+        _print_json(allv, quiet, wall, m)
         return 0
 
     build_registry()

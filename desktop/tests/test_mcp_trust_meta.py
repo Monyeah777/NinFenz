@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import mcp_runtime as mrt  # noqa: E402
+from core import trust_boundary as tb  # noqa: E402
 
 
 def _srv():
@@ -96,3 +97,23 @@ class McpTrustMetaTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class UntrustedSourcePathTest(unittest.TestCase):
+    """来源判定对**绝对路径**同样生效（2026-11-01 · D3）。"""
+
+    def test_relative_prefixes(self):
+        for p in ("library/NF-1.md", "./community/x/a.md",
+                  "docs/reference/external/e.md"):
+            self.assertTrue(tb.is_untrusted_source(p), p)
+
+    def test_absolute_paths_are_marked(self):
+        for p in ("/root/workspace/library/NF-1.md",
+                  "C:\\repo\\community\\a.md",
+                  "/srv/nf/docs/reference/external/e.md"):
+            self.assertTrue(tb.is_untrusted_source(p), p)
+
+    def test_self_paths_are_not_marked(self):
+        for p in ("desktop/src/core/mcp_runtime.py", "protocol/README.md",
+                  "results/audit/x.md"):
+            self.assertFalse(tb.is_untrusted_source(p), p)

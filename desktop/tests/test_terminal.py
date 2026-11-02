@@ -360,6 +360,27 @@ class ConfirmGateTest(unittest.TestCase):
         self.assertFalse(term.needs_confirm(["knowledge", "frequency", "--trace", "t.json"]))
         self.assertFalse(term.needs_confirm(["shell", "--session", "C:/tmp/s.json"]))
 
+    def test_asset_write_flags_are_gated(self):
+        """C-01：`asset contract --export/--freeze`、`asset ledger --refresh` 都写仓，须入闸。"""
+        for argv in (["asset", "contract", "--export"],
+                     ["asset", "contract", "--freeze"],
+                     ["asset", "ledger", "--refresh"]):
+            self.assertTrue(term.needs_confirm(argv), argv)
+        self.assertFalse(term.needs_confirm(["asset", "ls"]), "只读 asset 命令不得误拦")
+
+    def test_flag_value_form_is_not_a_bypass(self):
+        """`--out=/tmp/x` 与 `--out /tmp/x` 是同一个写面（2026-11-01 · D2）。
+
+        闸门此前对 token 做精确集合匹配，`--out=<值>` 形式既不是 `--out` 也不是
+        `--out 值`，于是不触发确认却仍被 argparse 解析成写盘——粘贴面可直接落盘。
+        """
+        for argv in (["interop", "--out=/tmp/x"],
+                     ["assemble", "需求", "--save=/tmp/x"],
+                     ["stats", "--write=/tmp/x"],
+                     ["module", "types", "--harvest=/tmp/x"]):
+            self.assertTrue(term.needs_confirm(argv), argv)
+        self.assertFalse(term.needs_confirm(["interop", "--check=x"]))
+
     def test_long_running_faces_are_blocked_in_shell(self):
         """长驻/递归面在会话内**不执行**（给指引而不是占住终端）。
 
@@ -464,6 +485,15 @@ class SessionTest(unittest.TestCase):
         if argv and argv[0] == "run":
             sys.exit(2)                       # 模拟 argparse 用法错误
         return 1
+
+    def test_quoted_semicolon_is_not_a_statement_separator(self):
+        """C-04：引号内的 `;` 不得把一条命令切成两条（注入面）。"""
+        from core import terminal as _t
+        self.assertEqual(['nf assemble "西幻;生存"'],
+                         _t._statements(['nf assemble "西幻;生存"']))
+        self.assertEqual(["nf doctor", "nf stats"],
+                         _t._statements(["nf doctor; nf stats"]))
+        self.assertEqual(["nf assemble 'a;b'"], _t._statements(["nf assemble 'a;b'"]))
 
     def test_runner_must_be_callable(self):
         with self.assertRaises(ValueError) as ctx:
