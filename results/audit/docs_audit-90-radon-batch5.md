@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:5b34a9b55c7ab80d2de017a90d4270a225055d1210b0ba1a1cc7fed6829a67b1
+  - protocol/code_metrics_baseline.json:25fcf2159a8201c3f96797975080fb9d3a52f9e74169831e55cc2e4e8deebcd0
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑

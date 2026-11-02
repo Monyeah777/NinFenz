@@ -1648,7 +1648,6 @@
     "scripts/serve_decision_model.py::UP031": 10,
     "scripts/serve_decision_model.py::UP035": 2,
     "scripts/serve_decision_model.py::UP045": 2,
-    "scripts/standards_coverage.py::F401": 1,
     "scripts/standards_map.py::RUF100": 5,
     "scripts/style_check.py::UP031": 15,
     "scripts/tisa.py::E501": 1,

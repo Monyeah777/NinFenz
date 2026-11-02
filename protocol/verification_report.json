@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 99,
+        "raises": 100,
         "sinks": 22
       },
       "status": "pass",
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "b9a3e40df6e292dce120d816c1fbdc7708fa18b84e14b392bd86eb1bc9c85e7f",
+  "root_digest": "50a29fa45760f3ee51b2a4dc404b6d47babcf407405b6cf23f9300990199e73e",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

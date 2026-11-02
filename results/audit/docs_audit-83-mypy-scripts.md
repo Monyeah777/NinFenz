@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:a02531224a38c0a3bd3a31081f175add25712e41c800b0ae91c853b8fc610c2c
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:5b34a9b55c7ab80d2de017a90d4270a225055d1210b0ba1a1cc7fed6829a67b1
+  - protocol/code_metrics_baseline.json:25fcf2159a8201c3f96797975080fb9d3a52f9e74169831e55cc2e4e8deebcd0
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑

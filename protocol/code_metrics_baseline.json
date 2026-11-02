@@ -1216,7 +1216,7 @@
       "max_fn_lines": 35
     },
     "desktop/src/core/standards_coverage.py": {
-      "lines": 425,
+      "lines": 427,
       "max_fn_cc": 16,
       "max_fn_lines": 88
     },
@@ -1601,7 +1601,7 @@
       "max_fn_lines": 35
     },
     "scripts/standards_coverage.py": {
-      "lines": 58,
+      "lines": 57,
       "max_fn_cc": 8,
       "max_fn_lines": 31
     },
