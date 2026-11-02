@@ -57,6 +57,7 @@ class GateVisibilityTest(unittest.TestCase):
             text = _read(WORKFLOWS / wf)
             self.assertRegex(text,
                              r"(?m)^\s*bash verify\.sh --checks-only( --no-cache)?"
+                             r"( --report-out \S+)?"
                              r"(\s+2>&1\s*\|\s*tee\s+\S+)?\s*$",
                              "%s 缺「静态 42 条 check」作业（--checks-only）" % wf)
             self.assertRegex(text,
@@ -83,6 +84,7 @@ class GateVisibilityTest(unittest.TestCase):
         self.assertEqual(1, len(checks), "静态作业必须只调一次：%s" % invocations)
         self.assertEqual(1, len(tests), "测试矩阵必须只调一次：%s" % invocations)
         self.assertRegex(checks[0], r"^bash verify\.sh --checks-only( --no-cache)?"
+                                    r"( --report-out \S+)?"
                                     r"(\s+2>&1\s*\|\s*tee\s+\S+)?$",
                          "静态作业必须只跑 check（不含测试）：%s" % checks[0])
         self.assertRegex(tests[0],
