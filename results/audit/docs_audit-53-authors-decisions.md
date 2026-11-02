@@ -11,7 +11,7 @@ subjects:
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
   - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
-  - verify.sh:b585045c7d0abec7c8425d449046976dc8f6e6fa4dc244991145fa544edf1396
+  - verify.sh:7b0a9cc7044631823a5e6ad334e42e23fbe80ff90291b76c7d05bc6b70367904
 
 ---
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）
