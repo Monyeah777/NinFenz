@@ -618,11 +618,9 @@
     },
     {
       "id": "asset_contract",
-      "issues": 1,
+      "issues": 0,
       "name": "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
-      "sample": [
-        "数据件 protocol/LAYERS.json 摘要不符（记录 0285b8b1fdf2 / 实测 70d4ac0ae5a6）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"
-      ],
+      "sample": [],
       "source": "asset_contract.scan",
       "stats": {
         "chains": 1,
@@ -633,7 +631,7 @@
         "no_schema": 206,
         "script": 4
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -655,12 +653,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "9741f1c23b063e7517ba7b8092f928a856f9cd2c253b202ce95bcb3621cd86e4",
+  "root_digest": "b9a3e40df6e292dce120d816c1fbdc7708fa18b84e14b392bd86eb1bc9c85e7f",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 30,
+    "fail": 0,
+    "pass": 31,
     "warn": 2
   }
 }
