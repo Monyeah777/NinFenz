@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 309,
-    "verify": 1134
+    "support": 311,
+    "verify": 1135
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7919,6 +7919,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "JUnit gate-report tests: stable mapping, fail-closed parsing, valid XML.",
+      "path": "desktop/tests/test_gate_report.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.gate_router 回归：策略 S 路由 + 三条硬纪律 + 变异自证。",
       "path": "desktop/tests/test_gate_router.py",
       "role": "verify",
@@ -13098,16 +13104,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b2b30d2d435d475c7934ec32d3d06dbc2562985e4c32b6f2fb28a5b1db523c33",
+  "root_digest": "44b219ce0dd246a8f060dfb3b8fcb88ee99fbb029e8ef7660d30feeb6b875505",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 132,
+    "R-catch": 134,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 151,
-    "R-verify": 1014,
+    "R-verify": 1015,
     "auto:R-core": 259
   },
   "schema": "nf-role-coordinates/1"

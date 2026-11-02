@@ -1450,6 +1450,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 59
     },
+    "scripts/gate_report.py": {
+      "lines": 270,
+      "max_fn_cc": 8,
+      "max_fn_lines": 56
+    },
     "scripts/gen_third_party_notices.py": {
       "lines": 161,
       "max_fn_cc": 11,

@@ -3,8 +3,6 @@
   "platforms": {
     "nt": {
       "bandit": {
-        ".github/scripts/gitee_ingest.py::B310": 1,
-        ".github/scripts/library_ingest.py::B310": 1,
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
@@ -24,6 +22,8 @@
         "desktop/src/core/rust_engine.py::B607": 1,
         "desktop/src/core/watch.py::B110": 1,
         "scripts/check_external_links.py::B104": 1,
+        "scripts/gate_report.py::B105": 1,
+        "scripts/gate_report.py::B405": 1,
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
         "scripts/mutation_sample.py::B404": 1,
@@ -49,11 +49,11 @@
           "severities": [
             [
               "LOW",
-              51
+              53
             ],
             [
               "MEDIUM",
-              5
+              3
             ]
           ],
           "total": 56
