@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-02",
   "approved_by": "Monyeah777",
-  "note": "standards assertion ledger",
+  "note": "refreeze.sh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "e3b7b8cf00faf1d553b15843984429e27704a94669bee22113ae67f9c2b1a93a"

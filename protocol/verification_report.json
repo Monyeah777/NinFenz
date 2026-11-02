@@ -409,18 +409,16 @@
     },
     {
       "id": "instruction_evidence",
-      "issues": 1,
+      "issues": 0,
       "name": "规范入口指令实测记录（新鲜 + 退出码 0）",
-      "sample": [
-        "指令 conformance 实测退出码 1（修复指引：先修到 0 再 --record）"
-      ],
+      "sample": [],
       "source": "instruction_evidence.scan",
       "stats": {
         "declared": 7,
         "recorded": 7,
         "recorded_policy": 3
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -655,12 +653,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "312419dfa132f1b7fcb9fddc61c6fd0e86633c309ca16744590136eaffc0a543",
+  "root_digest": "50a29fa45760f3ee51b2a4dc404b6d47babcf407405b6cf23f9300990199e73e",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 30,
+    "fail": 0,
+    "pass": 31,
     "warn": 2
   }
 }
