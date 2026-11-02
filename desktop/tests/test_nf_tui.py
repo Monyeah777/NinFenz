@@ -71,6 +71,13 @@ class NoShellTest(unittest.TestCase):
 
 
 class GateTest(unittest.TestCase):
+    def test_classify_handles_flag_value_form(self):
+        """C-03：TUI 分类此前只认裸 token，`--out=/tmp/x` 会被判 read。"""
+        self.assertEqual("write", TUI.classify(["interop", "--out=/tmp/x"]))
+        self.assertEqual("write", TUI.classify(["assemble", "需求", "--save=/tmp/x"]))
+        self.assertEqual("read", TUI.classify(["doctor"]))
+        self.assertEqual("write", TUI.classify(["asset", "contract", "--export"]))
+
     def test_classify_covers_long_running_write_and_read(self):
         self.assertEqual("long", TUI.classify(["serve"]))
         self.assertEqual("long", TUI.classify(["daemon", "start", "--watch"]))

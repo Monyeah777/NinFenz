@@ -220,7 +220,9 @@ class TestMcpRuntime(unittest.TestCase):
         空表**（客户端以为「没有这类资源」）——只读面里的静默错答，与工具参数面同一类。
         """
         for params in ({"cursor": "abc"}, {"cursor": -5}, {"type": 123},
-                       {"typo": "x"}, {"type": "不存在"}):
+                       {"typo": "x"}, {"type": "不存在"},
+                       # 2026-11-01（D6）：Unicode 数字曾被 isdigit() 放过、又被 int() 静默当 0
+                       {"cursor": "²"}, {"cursor": "١٢٣"}, {"cursor": "1²"}):
             resp = self.srv.handle(_req(60, "resources/list", params))
             self.assertEqual(INVALID_PARAMS, resp["error"]["code"], params)
             self.assertIn("修复指引", resp["error"]["message"], params)

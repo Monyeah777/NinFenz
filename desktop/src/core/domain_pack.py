@@ -1735,8 +1735,27 @@ def _register_protocols(root: str, spec: Dict[str, Any], _alloc: Dict[str, Any])
     return "已写入（protocols[] %d → %d）" % (len(cur), len(merged))
 
 
+def _register_sources(root: str, spec: Dict[str, Any], alloc: Dict[str, Any],
+                      allow: bool) -> Dict[str, Any]:
+    """登记三处（02 §8 / verify.sh DOMAIN / registry protocols[]）。
+
+    2026-11-02 修（D-5）：`verify.sh` 是**门禁本体**、`02`/`registry` 是门禁读取的真相源。
+    「被测流程（工厂）顺手改写判据输入」会让门禁失去独立裁判地位，与 `assemble` 那套
+    check_dest 真源面保护同一类风险。故三处登记默认**拒绝**，须显式
+    `allow_source_write=True`（CLI：`--allow-source-write`）才执行；未授权即如实报 skipped。
+    """
+    if not allow:
+        return {"section02": "skipped（需 --allow-source-write）",
+                "domain_list": "skipped（需 --allow-source-write）",
+                "protocols": "skipped（需 --allow-source-write）"}
+    return {"section02": _append_section02(root, spec, alloc),
+            "domain_list": _append_domain_list(root, spec),
+            "protocols": _register_protocols(root, spec, alloc)}
+
+
 def build(root: str, spec: Dict[str, Any], write: bool = False,
-          render: bool = True, renderer=None) -> Dict[str, Any]:
+          render: bool = True, renderer=None,
+          allow_source_write: bool = False) -> Dict[str, Any]:
     """生成整包：文件 + 登记三处（02 §8 / verify.sh DOMAIN / registry protocols[]）+ 渲染产出面。
 
     登记三处**一次做完**（2026-09-23 实测教训：漏跑 `nf register --apply` 会让
@@ -1763,9 +1782,7 @@ def build(root: str, spec: Dict[str, Any], write: bool = False,
                 written.append(rel)
     reg = {"section02": False, "domain_list": False, "render": []}
     if write:
-        reg["section02"] = _append_section02(root, spec, alloc)
-        reg["domain_list"] = _append_domain_list(root, spec)
-        reg["protocols"] = _register_protocols(root, spec, alloc)
+        reg.update(_register_sources(root, spec, alloc, allow_source_write))
         update_manifest(root, spec, write=True)
         if render and renderer is not None:
             issues, rows = renderer(root, package=spec["pack_name"], write=True)

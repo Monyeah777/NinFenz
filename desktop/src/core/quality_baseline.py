@@ -18,8 +18,8 @@ _ROOT = Path(__file__).resolve().parents[3]
 
 #: 当前基线声明（verify 每次扩 check 时同步：check 数 + PASS 期望值）。
 #: 本模块以 verify.sh 为单一真值做四处自洽断言，期望值集中在此，避免散落字面量。
-EXPECTED_CHECKS = 42
-EXPECTED_PASS = 76
+EXPECTED_CHECKS = 44
+EXPECTED_PASS = 78
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -41,17 +41,33 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         issues.append("verify.sh check 函数数/编号异常：%s" % nums)
 
     checks: List[Tuple[str, str, int]] = []
-    readme = (r / "README.md").read_text(encoding="utf-8")
+
+    def _read(rel: str) -> str:
+        # 2026-11-02（Q1）：文件缺失/不可读时不得裸崩（此前 FileNotFoundError 从
+        # `nf release` 直接冒成栈崩）；读不到按空文处理，由下面的声明判据如实报缺。
+        try:
+            return (r / rel).read_text(encoding="utf-8")
+        except OSError:
+            return ""
+
+    readme = _read("README.md")
     checks.append(("README", "基线句",
                   1 if all(t in readme for t in (
                       ver, "check1-%d" % EXPECTED_CHECKS,
                       "PASS=%d" % EXPECTED_PASS))
                    else 0))
-    changelog = (r / "CHANGELOG.md").read_text(encoding="utf-8")
-    head = changelog.split("\n## [2.8.0]", 1)[0]
+    changelog = _read("CHANGELOG.md")
+    # 2026-11-02（Q2）：原锚点 `## [2.8.0]` 已不存在 ⇒ split 退化为**全文**，
+    # 「最新节含 PASS=76」变成「全文任意处出现即过」。改为在册锚点并在缺失时
+    # 如实报「锚点缺失」，不再静默放宽。
+    _anchor = "\n## [0.93]"
+    if changelog and _anchor not in changelog:
+        issues.append("CHANGELOG 缺锚点 %r（修复指引：补该版本节，或同步锚点；"
+                      "缺锚点会让「最新节」判据退化为全文命中）" % _anchor.strip())
+    head = changelog.split(_anchor, 1)[0]
     checks.append(("CHANGELOG 最新节", "PASS=%d" % EXPECTED_PASS,
                    head.count("PASS=%d" % EXPECTED_PASS)))
-    matrix = (r / "docs/meta/VERSION-MATRIX.md").read_text(encoding="utf-8")
+    matrix = _read("docs/meta/VERSION-MATRIX.md")
     checks.append(("VERSION-MATRIX", "PASS=%d" % EXPECTED_PASS,
                    matrix.count("PASS=%d" % EXPECTED_PASS)))
     for name, what, n in checks:

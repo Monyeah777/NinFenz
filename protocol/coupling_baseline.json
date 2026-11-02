@@ -87,14 +87,14 @@
       "i": 1.0
     },
     "atomic_write": {
-      "ca": 50,
+      "ca": 51,
       "ce": 0,
       "i": 0.0
     },
     "attest": {
       "ca": 5,
-      "ce": 0,
-      "i": 0.0
+      "ce": 1,
+      "i": 0.1667
     },
     "audit": {
       "ca": 1,
@@ -156,10 +156,20 @@
       "ce": 0,
       "i": 0.0
     },
+    "cli_bridge": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "closure_scan": {
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "cockpit_log": {
+      "ca": 1,
+      "ce": 0,
+      "i": 0.0
     },
     "code_metrics": {
       "ca": 0,
@@ -207,9 +217,9 @@
       "i": 0.0
     },
     "conformance_scan": {
-      "ca": 38,
+      "ca": 39,
       "ce": 6,
-      "i": 0.1364
+      "i": 0.1333
     },
     "content_face": {
       "ca": 3,
@@ -286,6 +296,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "domain_fill": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
+    },
     "domain_metrics": {
       "ca": 2,
       "ce": 2,
@@ -300,6 +315,11 @@
       "ca": 2,
       "ce": 7,
       "i": 0.7778
+    },
+    "domain_rules": {
+      "ca": 1,
+      "ce": 1,
+      "i": 0.5
     },
     "drill_fidelity": {
       "ca": 0,
@@ -345,6 +365,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "evidence_mcp": {
+      "ca": 0,
+      "ce": 6,
+      "i": 1.0
     },
     "execution_drill": {
       "ca": 1,
@@ -582,9 +607,9 @@
       "i": 0.0
     },
     "json_doc": {
-      "ca": 76,
+      "ca": 79,
       "ce": 1,
-      "i": 0.013
+      "i": 0.0125
     },
     "json_schema": {
       "ca": 5,
@@ -672,9 +697,9 @@
       "i": 0.0
     },
     "machine_contract": {
-      "ca": 0,
+      "ca": 1,
       "ce": 3,
-      "i": 1.0
+      "i": 0.75
     },
     "market_analyzer": {
       "ca": 0,
@@ -747,9 +772,9 @@
       "i": 0.7143
     },
     "nfal_cli": {
-      "ca": 0,
+      "ca": 1,
       "ce": 4,
-      "i": 1.0
+      "i": 0.8
     },
     "nfal_rules": {
       "ca": 2,
@@ -812,7 +837,7 @@
       "i": 0.0
     },
     "paths": {
-      "ca": 7,
+      "ca": 9,
       "ce": 0,
       "i": 0.0
     },
@@ -1138,7 +1163,7 @@
     },
     "shell_ledger": {
       "ca": 0,
-      "ce": 1,
+      "ce": 2,
       "i": 1.0
     },
     "silent_skip": {

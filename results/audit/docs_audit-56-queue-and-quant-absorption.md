@@ -7,8 +7,8 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
-  - README.en.md:b1858810c2a35398283f0f27354ef421896fffbe0f6ed370d9f94b23307c4163
+  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
+  - README.en.md:c44d23873109b7c149d78679080fab0eafb437ad8bd659f50bb5e1ef5bc85152
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,14 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
+
+> 重审（2026-11-02）：check43 升级：A 桶证据内核门禁
+
+> 重审（2026-11-02）：2026-11-02 修复波四：域包完备度报告+缓存 key 输入面+conformance 证据存在性+插件静默回退回执默认覆盖面
+
+> 重审（2026-11-02）：2026-11-02 修复波三：B-1 模块映射、D-5 真源面保护、check35 覆盖面接线、E13/E6/E5/E2/E18/E19/G1/C-05/I1/Q1/D1/check_parity 可移植性
+
 > 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
 
 > 重审（2026-10-30）：2026-10-30: README 官方 npm 渠道说明与 GitHub Packages 非同步状态更新；重审对象变更，正文语义未改变。

@@ -504,10 +504,21 @@ class LspServer:
                 for resp in self.handle(msg):
                     write_message(stdout, resp)
             except Exception as exc:  # 单条异常不杀会话
-                if "id" in msg:
-                    write_message(stdout, {"jsonrpc": "2.0", "id": msg["id"],
-                                           "error": {"code": -32603,
-                                                     "message": str(exc)}})
+                _serve_internal_error(stdout, msg, exc)
+
+
+def _serve_internal_error(stdout: TextIO, msg: dict, exc: Exception) -> None:
+    """单条异常的回包（2026-11-01 · D7 · CWE-209）：对外只回稳定文案。
+
+    旧实现把 `str(exc)` 直接写进 error.message——异常文本常含服务端绝对路径
+    （如「{path} 不存在」），等于把目录结构回给客户端；MCP 面 R2 后早已改为
+    「对外 Internal error、细节走 stderr」，LSP 侧补同一条口径。
+    """
+    print("[lsp] 内部异常：%s" % exc, file=sys.stderr)
+    if "id" in msg:
+        write_message(stdout, {"jsonrpc": "2.0", "id": msg["id"],
+                               "error": {"code": -32603,
+                                         "message": "Internal error（详情见服务端 stderr）"}})
 
 
 #: 请求方法 → 处理器（表驱动分派：避免 handle 的线性分支把圈复杂度推过高限）

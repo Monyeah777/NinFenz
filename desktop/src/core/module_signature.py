@@ -77,6 +77,14 @@ def verify(root: str = ".", rel: str = BASELINE_REL) -> Tuple[List[str], List[st
         return ["缺模块边界基线 %s（修复指引：nf module signature --write）" % rel], [], {}
     sigs = signatures(root)
     base_mods = base.get("modules") or {}
+    # 2026-11-02（F14）：解析面为 0 时旧实现**没有 FAIL**——基线里的模块全被记成
+    # 「已不在仓库」WARN，check35 只看 issues ⇒ 0 模块也能绿。这里显式判解析失效。
+    if not sigs:
+        issues.append("未解析到任何模块边界签名（0 模块）——解析面失效，不得空过"
+                      "（修复指引：检查 04_模块库/**/machine_contract 围栏与 baseline）")
+    elif base_mods and not (set(sigs) & set(base_mods)):
+        issues.append("模块边界签名与基线零交集（解析面失效：基线 %d 条 / 实测 %d 条）"
+                      % (len(base_mods), len(sigs)))
     for mid, rec in sorted(sigs.items()):
         if mid not in base_mods:
             warns.append("新模块未签边界：%s（修复指引：nf module signature --write）" % mid)

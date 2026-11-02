@@ -51,7 +51,13 @@ def approve(root: str, subject: str, approved_by: str, note: str = "",
     if not approved_by.strip():
         raise ValueError("批准人不能为空（修复指引：--by <批准人标识>）")
     allowed = allowed_approvers(root)
-    if allowed and approved_by.strip() not in allowed:
+    # 2026-11-02（E13）：空集必须 fail-closed。此前 `NF_APPROVERS=""` 会得到空集，
+    # 而 `if allowed and …` 把「无授权批准人」当成「不限制」→ 任意人可批准且 verify 通过。
+    if not allowed:
+        raise ValueError("无授权批准人（%s 为空、或当前仓库不是可信安装根）——"
+                         "拒绝写批准记录（修复指引：设置非空 %s，或由可信安装根运行）"
+                         % (ENV_APPROVERS, ENV_APPROVERS))
+    if approved_by.strip() not in allowed:
         raise ValueError("批准人 %s 不在允许列表 %s（修复指引：由获授权者批准，或显式设置 %s）"
                          % (approved_by.strip(), sorted(allowed), ENV_APPROVERS))
     p = Path(paths.validate_path(root, subject))
@@ -101,9 +107,11 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         if rec.get("schema") != SCHEMA:
             issues.append("批准记录 schema 不匹配：%s" % subj)
             continue
+        if not allowed:
+            issues.append("无授权批准人（%s 为空/仓库不可信）→ 全部批准记录不可信" % ENV_APPROVERS)
         if not str(rec.get("approved_by") or "").strip():
             issues.append("批准记录缺批准人：%s" % subj)
-        elif allowed and str(rec.get("approved_by")).strip() not in allowed:
+        elif str(rec.get("approved_by")).strip() not in allowed:
             issues.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
                           % (rec.get("approved_by"), subj))
         try:

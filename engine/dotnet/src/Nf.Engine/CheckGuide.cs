@@ -50,6 +50,8 @@ public static class CheckGuide
         ["40"] = "缺什么：数字资产契约违约（数据格式/字段完整性/输入输出一致性/防篡改；代码 AST 规范、可证空指针、测试用例在场；脚本 nf-io 头与声明双源不一致、链上 A 输出不匹配 B 输入）。补什么：`nf asset contract` 逐条看；数据件改声明或补字段；脚本补 `# nf-io: inputs=… outputs=…` 头并与 protocol/asset_contracts.json 对齐；sha256 漂移确认后用 `nf asset contract --freeze` 重冻。",
         ["41"] = "缺什么：构建隔离违约（构建入口出现取网/取包命令；Dockerfile 基座未按 @sha256 钉或写了 :latest；engines.node / engine/rust/Cargo.lock 缺位；CI 的 setup-python / setup-node 未给具体版本号）。补什么：先跑 core.build_isolation.scan 看逐条；构建入口改读仓内既有件、基座换成 name:tag@sha256:*、工具链把版本写死（不浮动 major）。",
         ["42"] = "缺什么：provenance 校验不过（回执单根形状坏 / 独立子进程验签失败 / 篡改未被检出）。补什么：nf receipts --scope protocol --write 重建单根；确认 nf attest --key-file 与 core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
+        ["43"] = "缺什么：A 桶证据内核门禁红（gate_engine 键/ inproc 异常 / labels 抽取 / 证据 MCP 测试）。补什么：跑 python scripts/gate_a_bucket.py 看逐组失败；修好后重跑。",
+        ["44"] = "缺什么：AI 生成合成内容标识不合规（GB 45438／TC260 隐式标识缺字段、签名验不过、证书链断、可信时间戳缺）。补什么：48 小时自查——先跑 python3 scripts/nf_labeling.py selfcheck；再对导出文件跑 nf labeling check <file> --trust-store <roots.pem>；五段判定看 A/B/C/D/E，其中 C4 是证书链、C5 是可信时间戳。",
         ["4"] = "缺什么：认知边界断链（06 §4 管线 ↔ M23 认知域不一致）。补什么：对齐执行协议与 M23 的裁剪/过滤口径。",
         ["5"] = "缺什么：质检门流水线违约（M80 gate_action ↔ 06 §5）。补什么：核对输出生成器的 gate_action 三态与执行协议一致。",
         ["6"] = "缺什么：入口导航断链（README → 07 → 协议链/官方目录）。补什么：按 07 §7 项6 修 README 路由。",

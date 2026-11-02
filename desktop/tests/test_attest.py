@@ -10,6 +10,58 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from core import attest  # noqa: E402
 
 
+class TestSigstoreArgv(unittest.TestCase):
+    """E4：cosign 必须验**主体文件**，bundle 只能作为 --bundle 参数。"""
+
+    def _att(self, tmp):
+        import json
+        p = Path(tmp, "subject.md")
+        p.write_text("x", encoding="utf-8")
+        Path(tmp, "bundle.json").write_text("{}", encoding="utf-8")
+        return {"subject": {"path": "subject.md"},
+                "signature": {"scheme": "sigstore-keyless", "bundle": "bundle.json"}}
+
+    def test_verify_blob_gets_subject_not_bundle(self):
+        import types
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            att = self._att(tmp)
+            with mock.patch.object(attest, "have_external_verifier", return_value=True), \
+                 mock.patch.object(attest.subprocess, "run",
+                                   return_value=types.SimpleNamespace(
+                                       returncode=0, stdout="", stderr="")) as run:
+                ok, issues = attest.verify_external(att, root=tmp)
+            argv = run.call_args[0][0]
+        self.assertTrue(ok, issues)
+        self.assertEqual("verify-blob", argv[1])
+        self.assertEqual(str(Path(tmp, "bundle.json")), argv[argv.index("--bundle") + 1])
+        self.assertTrue(argv[-1].endswith("subject.md"), argv)
+        self.assertNotEqual(argv[argv.index("--bundle") + 1], argv[-1])
+
+    def test_bundle_escape_is_rejected(self):
+        att = {"subject": {"path": "x.md"}, "signature": {"bundle": "../bundle.json"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            ok, issues = attest.verify_external(att, root=tmp)
+        self.assertFalse(ok)
+        self.assertTrue(any("逃逸" in i for i in issues), issues)
+
+
+class TestSubjectPathBoundary(unittest.TestCase):
+    """E6：attestation 主体不得指向仓库外（此前 /etc/hostname 也能给「证据成立」）。"""
+
+    def test_absolute_subject_rejected(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp, "doc.md")
+            p.write_text("x", encoding="utf-8")
+            att = attest.build("doc.md", root=tmp)
+            att["subject"]["path"] = "/etc/hostname"
+            ok, issues, level = attest.verify(att, tmp)
+        self.assertFalse(ok, issues)
+        self.assertEqual("invalid", level)
+        self.assertTrue(any("主体不可用" in i for i in issues), issues)
+
+
 class TestAttest(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="nf_attest_")

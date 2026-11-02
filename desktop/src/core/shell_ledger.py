@@ -16,7 +16,10 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-from core import json_doc
+
+import json
+
+from core import atomic_write, json_doc
 
 #: 占位短语（命中任一即计一条空壳）
 SHELL_PHRASES = ("领域细则待作者补全", "领域专属判据待补", "领域专属失效模式待补")
@@ -24,6 +27,10 @@ SHELL_PHRASES = ("领域细则待作者补全", "领域专属判据待补", "领
 PACKAGE_GLOB = "community/*/assets/DOMAIN_SPEC.md"
 #: 机读投影（与真源逐条同源）
 JSON_SUFFIX = "outputs/DOMAIN_SPEC.json"
+
+#: 完备度报告（可提交工件；人读 + 机读双形态）。生成：`nf domain shells --write`。
+REPORT_REL = "docs/domain-completeness.md"
+JSON_REL = "protocol/domain_completeness.json"
 
 #: 冻结基线（2026-09-30 实测）。**只减不增**：空壳数 > 基线即 FAIL（补全后请下调本表）。
 BASELINE: Dict[str, int] = {"packs_total": 100, "packs_with_shell": 73,
@@ -118,3 +125,95 @@ def ratchet(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     for m in s["tier_mismatches"]:
         issues.append("档位声明与实况不符：%s" % m)
     return issues, s
+
+
+# ---------------------------------------------------------------- 完备度报告
+def report(root: str = ".") -> Dict[str, Any]:
+    """完备度报告（确定性，无时间戳）→ 机读 dict + 人读渲染共用一份真源。"""
+    s = survey(root)
+    derived = sorted(s["per_package"])
+    authored = sorted(
+        p.parent.parent.name for p in Path(root).glob(PACKAGE_GLOB)
+        if p.parent.parent.name not in s["per_package"])
+    return {"schema": "nf-domain-completeness/1",
+            "packs_total": s["packs_total"],
+            "packs_authored": s["packs_filled"],
+            "packs_derived": s["packs_with_shell"],
+            "shell_hits": s["hits"],
+            "per_shell_pack": BASELINE["per_shell_pack"],
+            "per_package": s["per_package"],
+            "authored": authored,
+            "derived": derived,
+            "mismatches": s["mismatches"],
+            "tier_mismatches": s["tier_mismatches"],
+            "boundary": ("本报告只统计缺口，不代写领域判据；补全须作者/领域专家落笔，"
+                         "补完把 BASELINE 下调后重跑 `nf domain shells --write`。")}
+
+
+def render_markdown(rep: Dict[str, Any]) -> str:
+    lines = [
+        "# 域包内容完备度（自动生成，禁止手改）",
+        "",
+        "> 生成命令：`python scripts/nf.py domain shells --write` ｜ 机读：`protocol/domain_completeness.json`",
+        "> 口径：域包「内容资产」是否已由作者逐条补全；**统计缺口不等于质量结论**，也不代写领域内容。",
+        "",
+        "## 总览",
+        "",
+        "| 项 | 值 |",
+        "|---|---|",
+        "| 域包总数 | %d |" % rep["packs_total"],
+        "| **已写实（authored）** | **%d** |" % rep["packs_authored"],
+        "| **待补全（derived，段级框架）** | **%d** |" % rep["packs_derived"],
+        "| 空壳命中（12 细分 × 3 处占位） | %d 处 |" % rep["shell_hits"],
+        "",
+        "## 待补全清单（每包 36 处占位：定义 / 可机验判据 / 失效模式）",
+        "",
+        "| 包 | 占位处 |",
+        "|---|---|",
+    ]
+    for pkg in rep["derived"]:
+        lines.append("| %s | %d |" % (pkg, rep["per_package"].get(pkg, 0)))
+    lines += ["", "## 已写实清单", "", "、".join(rep["authored"]) or "（无）", "",
+              "## 补全指引", "",
+              "1. `python scripts/nf.py domain template <包名> --out <fill.json>` 生成 12 条待填骨架；",
+              "   由作者/领域专家逐条填写 definition/check/pitfall（不代写、不编造）。",
+              "   锚表同步 `STANDARDS_ANCHORS.md`；不代写、不编造（宁缺毋滥）。",
+              "2. 写完把该包 `content_tier` 改为 `authored`（人读/机读两处），",
+              "   并把 `core/shell_ledger.BASELINE` 的 `packs_with_shell`/`hits` 下调到新实测值。",
+              "3. `python scripts/nf.py domain shells --write` 重生成本报告与机读件，",
+              "   再走冻结链（code_metrics → audit rebind → conformance → approve → receipts）。",
+              "", "---", "", "边界：%s" % rep["boundary"]]
+    return "\n".join(lines) + "\n"
+
+
+def write_report(root: str = ".") -> Dict[str, str]:
+    rep = report(root)
+    p_md = Path(root) / REPORT_REL
+    p_json = Path(root) / JSON_REL
+    atomic_write.write_text(p_md, render_markdown(rep))
+    atomic_write.write_text(p_json,
+                            json.dumps(rep, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+    return {"report": REPORT_REL, "json": JSON_REL}
+
+
+def report_issues(root: str = ".") -> List[str]:
+    """报告新鲜度：缺件 / 与实时 survey 不一致 → issue（由 check12 的单测与 CLI 共同消费）。"""
+    issues: List[str] = []
+    p_md = Path(root) / REPORT_REL
+    p_json = Path(root) / JSON_REL
+    if not p_md.is_file() or not p_json.is_file():
+        return ["缺域包完备度报告（修复指引：nf domain shells --write）"]
+    live = report(root)
+    try:
+        got = json_doc.load(p_json, dict, what=JSON_REL)
+    except ValueError as exc:
+        return ["域包完备度机读件不可解析：%s（修复指引：nf domain shells --write）" % exc]
+    for key in ("packs_total", "packs_authored", "packs_derived", "shell_hits"):
+        if got.get(key) != live[key]:
+            issues.append("完备度报告过期：%s 记录=%r 实测=%r（修复指引：nf domain shells "
+                          "--write）" % (key, got.get(key), live[key]))
+    if got.get("per_package") != live["per_package"]:
+        issues.append("完备度报告 per_package 与实测不一致（修复指引：nf domain shells --write）")
+    if p_md.read_text(encoding="utf-8", errors="replace") != render_markdown(live):
+        issues.append("完备度人读件与生成器输出不一致（修复指引：nf domain shells --write）")
+    return issues

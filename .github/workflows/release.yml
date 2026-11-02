@@ -80,7 +80,7 @@ jobs:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
-          notes=$(printf '门禁结论发布\n\n- 提交：`%s`\n- 判据：`verify.sh --checks-only` 42 条 + 全量测试矩阵\n- 校验：`gh attestation verify <file> --repo %s`\n' \
+          notes=$(printf '门禁结论发布\n\n- 提交：`%s`\n- 判据：`verify.sh --checks-only` 44 条 + 全量测试矩阵\n- 校验：`gh attestation verify <file> --repo %s`\n' \
                   "$GITHUB_SHA" "$GITHUB_REPOSITORY")
           gh release create "$TAG" \
             --repo "$GITHUB_REPOSITORY" \

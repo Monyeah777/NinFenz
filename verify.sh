@@ -22,6 +22,9 @@
 #        段 A/B = L0/L1（协议一致性 + 内容对账），check12-22 = L2 core（unittest/py_compile/协议投影/
 #        组合/契约/质量/导出/产物schema/文档完整性/registry闭合门/导出物规范体检）；android 相关 check 已随 L3 端壳线退役移出（桌面 GUI 端壳 2026-09-09 同轨退役，见 L3_FROZEN.md）。check12 = desktop unittest 全量 + 全量 py_compile；check13 = 协议版本一致性（两处）+ 迁移完整性；check14 = 社区协议登记门禁：01 §6.1 Schema 必填 12 字段 + 02 §8.3 登记三要件 + registry protocols[] 投影一致；check15 = 组合引用门禁：02 §8.4 references 五断言（在册可寻址/依赖闭包闭合/挂载层冲突/schema 兼容/双源一致）；check16 = 契约仲裁门禁：01 §1.1 machine_contract 机读结构 + 02 §8.4 规则④ references 装配 publish⊆subscribe + 运行时寻址授权一致；check17 = 质量治理门；check18 = 导出契约门；check19 = 导出产物 schema 合规（A1）；check20 = 文档完整性门禁（A3）；check21 = registry 引用图闭合门禁（A4）；check22 = 导出物规范体检门禁（A4，35 方案）；check23 = 资产供应链闭合门禁（40 总纲 S2：溯源键表 provenance.json + 文件头双源一致；check24 = 模块生命周期门禁（40 总纲 v2.8 波B S5：模块头 status 位 + deprecate/restore + 引用门禁——deprecated/retired 不得被引用）；check25 = 协议知识签名门禁（41 波C C2：01-36 全量签名两遍生成逐字节一致 + 结构字段齐备）；check26 = 语义矛盾扫描门禁（41 波C C3：techdoc 链 machine_contract 订阅事件无发布方断链 + 挂载点/类别漂移）；check27 = 架构纯度体检门禁（42 M3：协议层端壳残留/私货可变物/重复标题 grep + core raise 消息修复指引审计））
 # 基准 : 判定逐字对齐 07 §7；04=核心 13 件 / 03=P00+P01+P90 / 05=README+用户自定义；
+#        [段 D] 供应链面（check41-42：SLSA L3 构建隔离 + 不可伪造 provenance）
+#        [段 E] 证据与标识内核（check43 A 桶证据内核 + check44 标识合规门禁
+#        GB 45438—2025 / TC260-PG-202511A：五段判定 + 国密 + 证书链 + 可信时间戳）
 #        抽象阶梯（两轴 + 纵切）判据并入 check27 R7——真源 protocol/LAYERS.json，
 #        语义判据在 desktop/src/core/layer_model.py（见 docs/layers.md）。
 #        校园资产 29 文件 1575 行 / 西幻资产 23 文件 4284 行（西幻 4285→4284：2026-09-20 删
@@ -101,16 +104,16 @@ else
 fi
 # ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
 # 档位（2026-10-18 起）：
-#   bash verify.sh         quick 档 = 42 条静态 check + **受影响测试**（按变更面的 core 反向依赖
+#   bash verify.sh         quick 档 = 44 条静态 check + **受影响测试**（按变更面的 core 反向依赖
 #                          闭包；非 core 变更全量兜底）——给开发回路用的分钟级结论。
-#   bash verify.sh --full  full 档 = 42 条静态 check + **全量 3100+ 测试**（分片并行）；
+#   bash verify.sh --full  full 档 = 44 条静态 check + **全量 3100+ 测试**（分片并行）；
 #                          **只有这一档能作为发布/推送结论**（nf release 走它）。
 #   bash verify.sh --fast  既有开发快车道（按改动选 check），跑在全部 check 之后、只作补充。
 # 缓存（P3b）：两档都按**输入内容寻址**缓存绿判定（HEAD + 工作树差异 + 未跟踪件 + 门禁代码 +
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 42 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 44 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"; NF_PR_TIER=0
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -176,7 +179,7 @@ elif command -v python >/dev/null 2>&1 && python -c 'import sys' >/dev/null 2>&1
 fi
 # ---- 矩阵模式（CI）：`--tests-only` 只跑测试并直接透传退出码（不产生 check 摘要、不写缓存）----
 # 为什么单独成路（2026-10-18）：CI 要"静态 1 台 + 测试 n 台并行"，测试那 n 台只该跑自己那一片；
-# 若仍走完整 verify.sh，每台都会重跑 42 条静态 check，n 倍浪费且摘要会被 n 份覆盖。
+# 若仍走完整 verify.sh，每台都会重跑 44 条静态 check，n 倍浪费且摘要会被 n 份覆盖。
 if [ "$NF_TESTS_ONLY" = "1" ]; then
   if [ -z "$PY3" ]; then echo '--tests-only 需要可用的 python' >&2; exit 2; fi
   if [ ! -f scripts/verify_tests.py ]; then echo '--tests-only 需要 scripts/verify_tests.py' >&2; exit 2; fi
@@ -192,7 +195,7 @@ if [ "$NF_TESTS_ONLY" = "1" ]; then
   fi
   exec "$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS"
 fi
-# checks-only 现在**单独成档**吃内容寻址缓存（mode=checks）：它的结论只覆盖 42 条静态 check，
+# checks-only 现在**单独成档**吃内容寻址缓存（mode=checks）：它的结论只覆盖 44 条静态 check，
 # 与 full/quick 档的结论不可互替，因此用独立 mode 隔离（缓存命中只回放**同一档**的绿）。
 _CACHE_MODE="$NF_TIER"
 if [ "$NF_CHECKS_ONLY" = "1" ]; then
@@ -200,7 +203,7 @@ if [ "$NF_CHECKS_ONLY" = "1" ]; then
 fi
 
 # ---- 测试与静态 check 重叠加速（2026-10-18）----
-# quick 档 = 静态 42 条（约 55 s）+ 受影响测试（约 90 s），顺序跑是两者相加；
+# quick 档 = 静态 44 条（约 55 s）+ 受影响测试（约 90 s），顺序跑是两者相加；
 # 它们**互不依赖**（测试在独立进程/独立 NF_HOME 里跑，不写仓内受跟踪文件），
 # 因此把测试放后台与静态 check 并行，墙钟从 "a+b" 变成 "max(a,b)"。
 # 判据不变：测试命令与判定逻辑一字未改，只是不在 check12 里"现场跑"，而是"先跑、到点收"。
@@ -3124,6 +3127,151 @@ PYEOF
   fi
 }
 
+check43(){
+  echo '== [43/段E] A 桶证据内核门禁（gate_engine/inproc/labels + 证据 MCP）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if "$PY3" scripts/gate_a_bucket.py >"$NFL_TMP"/nf_check43.log 2>&1; then
+      ok 'A 桶证据内核全绿（check43：证据内核 + 证据 MCP + 批2/3 冒烟）'
+    else
+      while IFS= read -r _line; do no "$_line"; done < "$NFL_TMP"/nf_check43.log
+      err=1
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check43）'
+  fi
+  return $err
+}
+
+check44(){
+  echo '== [44/段E] 标识合规门禁（GB 45438 / TC260-PG-202511A：五段判定 + 国密 + 证书链 + 时间戳）=='
+  local err=0
+  if [ -n "$PY3" ]; then
+    if [ ! -f scripts/nf_labeling.py ]; then
+      no '缺标识体检启动器 scripts/nf_labeling.py（修复指引：恢复 scripts/nf_labeling.py 与 desktop/src/core/labeling/）'
+      err=1
+    else
+      if "$PY3" scripts/nf_labeling.py selfcheck >"$NFL_TMP"/nf_check44_selfcheck.log 2>&1; then
+        :
+      else
+        no "标识体检自检失败——$(tail -3 "$NFL_TMP"/nf_check44_selfcheck.log | tr '\n' ' ')"
+        err=1
+      fi
+      if "$PY3" - "$NFL_TMP" <<'PYEOF' >"$NFL_TMP"/nf_check44.log 2>&1
+import base64
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+
+ROOT = os.getcwd()
+sys.path.insert(0, os.path.join("desktop", "src"))
+from core.labeling import metadata, sm, x509  # noqa: E402
+
+TMP = sys.argv[1]
+TD = tempfile.mkdtemp(prefix="nf-check44-", dir=TMP)
+FAIL = []
+
+
+def run(args):
+    return subprocess.run([sys.executable] + args, cwd=ROOT,
+                          capture_output=True, text=True)
+
+
+def pem(der):
+    b64 = base64.b64encode(der).decode("ascii")
+    lines = [b64[i:i + 64] for i in range(0, len(b64), 64)]
+    return ("-----BEGIN CERTIFICATE-----\n" + "\n".join(lines)
+            + "\n-----END CERTIFICATE-----\n")
+
+
+try:
+    # 1) keygen（走标识体检启动器，真实 CLI 面）
+    keys = os.path.join(TD, "keys.json")
+    r = run(["scripts/nf_labeling.py", "keygen", "--out", keys])
+    if r.returncode != 0:
+        FAIL.append("keygen 失败：%s" % (r.stderr or r.stdout).strip()[:160])
+        raise SystemExit(1)
+    key = json.load(open(keys, encoding="utf-8"))
+    priv, pub = key["private"], key["public"]
+
+    # 2) 证书链夹具：CA 自签 + 叶子（叶子公钥 = 签名私钥对应公钥）
+    ca_k = sm.sm2_keygen()
+    ca = x509.make_cert("check44 CA", "check44 CA", ca_k["public"],
+                        ca_k["private"], serial=1, is_ca=True)
+    leaf = x509.make_cert("check44 Signer", "check44 CA", pub,
+                          ca_k["private"], serial=2)
+    roots = os.path.join(TD, "roots.pem")
+    with open(roots, "w", encoding="ascii") as fh:
+        fh.write(pem(ca))
+    leaf_pem = os.path.join(TD, "leaf.pem")
+    with open(leaf_pem, "w", encoding="ascii") as fh:
+        fh.write(pem(leaf))
+
+    # 3) 已标识 PNG：sign --png-text + 附证书/时间戳
+    png = os.path.join(TD, "signed.png")
+    metadata.make_png(png)
+    meta = os.path.join(TD, "meta.json")
+    with open(meta, "w", encoding="utf-8") as fh:
+        json.dump({"Label": 1, "ContentProducer": "1" * 27,
+                   "ProduceID": "CHECK44-1"}, fh)
+    r = run(["scripts/nf_labeling.py", "sign", png, "--meta", meta,
+             "--priv", priv, "--png-text", "--tsa-cert", leaf_pem,
+             "--tsa-key", priv])
+    if r.returncode != 0:
+        FAIL.append("sign 失败：%s" % (r.stderr or r.stdout).strip()[:160])
+    r = run(["scripts/nf_labeling.py", "check", png,
+             "--trust-store", roots, "--json"])
+    try:
+        report = json.loads(r.stdout)
+    except ValueError:
+        report = {}
+    if r.returncode != 0 or report.get("verdict") != "PASS":
+        FAIL.append("已标识 PNG 未判 PASS（rc=%s verdict=%s）"
+                    % (r.returncode, report.get("verdict")))
+    items = {it["id"]: it["status"]
+             for it in report.get("sections", {}).get("C", {}).get("items", [])}
+    for need in ("C4", "C5.0"):
+        if items.get(need) != "PASS":
+            FAIL.append("安全防护面 %s 未 PASS（%s）" % (need, items.get(need)))
+
+    # 4) 无标识 PNG：check 必须判 FAIL（退出码 1）
+    bare = os.path.join(TD, "bare.png")
+    metadata.make_png(bare)
+    r = run(["scripts/nf_labeling.py", "check", bare, "--json"])
+    try:
+        bare_report = json.loads(r.stdout)
+    except ValueError:
+        bare_report = {}
+    if r.returncode != 1 or bare_report.get("verdict") != "FAIL":
+        FAIL.append("无标识 PNG 未判 FAIL（rc=%s verdict=%s）"
+                    % (r.returncode, bare_report.get("verdict")))
+
+    for line in FAIL:
+        print("[FAIL] %s" % line)
+    print("标识合规样例：已标识=%s · 无标识=%s · 失败项=%d"
+          % (report.get("verdict"), bare_report.get("verdict"), len(FAIL)))
+    raise SystemExit(1 if FAIL else 0)
+finally:
+    shutil.rmtree(TD, ignore_errors=True)
+PYEOF
+      then
+        :
+      else
+        no "标识合规样例判定异常——$(tail -3 "$NFL_TMP"/nf_check44.log 2>/dev/null | tr '\n' ' ')"
+        err=1
+      fi
+    fi
+  else
+    wn 'python3 不在 PATH（跳过 check44 标识合规门禁）'
+  fi
+  if [ "$err" -eq 0 ]; then
+    ok '标识合规门禁全绿（check44：GB 45438/TC260 五段判定 + 国密 + 证书链 + 时间戳）'
+  fi
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3141,9 +3289,9 @@ echo '=================================================='
 echo ' NinFenz 三段式验收门禁  v2.30（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
 echo '=================================================='
 if [ "$NF_TIER" = "full" ]; then
-  echo ' 档位：full（42 条静态 check + 全量测试；发布/推送结论用这一档）'
+  echo ' 档位：full（44 条静态 check + 全量测试；发布/推送结论用这一档）'
 else
-  echo ' 档位：quick（42 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
+  echo ' 档位：quick（44 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
 fi
 echo '—— 段 A：官方核心出厂（无 community 亦须通过）——'
 check1; check2; check3; check4; check5; check6
@@ -3185,9 +3333,12 @@ check37
 check38
 check39
 check40
-echo '—— 段 D：供应链面（check41-42 无条件执行：构建隔离 + 不可伪造 provenance）——'
+echo '—— 段 D：供应链与证据内核（check41-43 无条件执行：构建隔离 + 不可伪造 provenance + A 桶证据内核）——'
 check41
 check42
+check43
+echo '—— 段 E：标识合规面（check44：GB 45438 / TC260-PG-202511A 五段判定）——'
+check44
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
@@ -3209,7 +3360,7 @@ if [ "$FAIL" -gt 0 ]; then
   echo '>>> 存在 FAIL = 协议事故：请回滚本次修改，修正后重新运行验收 <<<'
   # 指引面接线（2026-09-30）：每条 check 都有「缺什么 / 补什么」条目（nf explain 1-39），
   # 但此前从不把用户指过去——红的时候只有「请回滚」，没有下一步。这里补一句可执行的指引。
-  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42））"
+  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-44））"
   exit 1
 else
   if [ "$NF_CACHE" -eq 1 ] && [ "$NF_FAST" -eq 0 ] && [ -n "$_CACHE_KEY" ] && [ -n "$PY3" ]; then

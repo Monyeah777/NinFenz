@@ -196,6 +196,25 @@ def _write_response(stdout: TextIO, resp: dict | None) -> None:
     stdout.flush()
 
 
+def _cursor_index(params: dict) -> int:
+    """`resources/list` 的 cursor → 起始下标（准入与解析同一处；非法形态 fail-closed）。
+
+    2026-11-01 修（D6）：`str.isdigit()` 收 Unicode 数字（"²"、"١٢٣"），而下游 `int()`
+    只认 ASCII 十进制——"²" 会在 `except ValueError` 里被静默当 0（正是本段注释声称
+    已消灭的「非法 cursor 静默当 0」）。判据收紧到 ASCII 十进制，非法形态一律 raise
+    （由参数准入转成 -32602），不再有第二条「吞掉异常」的路径。
+    """
+    if not isinstance(params, dict):
+        return 0
+    cur = params.get("cursor")
+    if cur is None or cur == "":
+        return 0
+    if not isinstance(cur, str) or not re.fullmatch(r"[0-9]+", cur):
+        raise ValueError("cursor 须为非负整数字符串（ASCII 十进制）：%r（修复指引：原样传"
+                         "上一页返回的 nextCursor）" % (cur,))
+    return max(0, int(cur))
+
+
 def is_single_line_message(line: str) -> bool:
     """校验一行是否为合规消息（恰好一条、无裸行边界字符、非空）。"""
     body = line[:-1] if line.endswith("\n") else line
@@ -1466,7 +1485,9 @@ class McpRuntime:
         """legacy 握手（2025-11-25 及更早）：会话建在 legacy 版本上。
 
         双时代纪律：走 initialize 的客户端按定义是 legacy 客户端——请求版本受支持
-        则回显，否则回落到最新 legacy 版本（modern 版本对其不可理解）。
+        则回显（含 modern 版本；与 `docs/mcp.md` 及实现一致），否则回落到最新 legacy 版本。
+        （2026-11-01 修 D9：旧注释写「modern 版本对其不可理解」，与实现相反；实现一直
+        是受支持即回显，这里只改口径、不改行为。）
         """
         issue = _extra_params_issue("initialize", params,
                                     ("protocolVersion", "capabilities", "clientInfo"))
@@ -1667,10 +1688,7 @@ class McpRuntime:
             if extra:
                 raise ValueError("resources/list 不认识的参数：%s（修复指引：只支持 cursor / "
                                  "type / package）" % "、".join(extra))
-            cur = params.get("cursor")
-            if cur is not None and not (isinstance(cur, str) and (cur == "" or cur.isdigit())):
-                raise ValueError("cursor 须为非负整数字符串：%r（修复指引：原样传上一页返回的 "
-                                 "nextCursor）" % (cur,))
+            _cursor_index(params)  # 准入：非法形态 raise（解析与准入同一处，见 helper）
             for key in ("type", "package"):
                 v = params.get(key)
                 if v is not None and not isinstance(v, str):
@@ -1708,12 +1726,7 @@ class McpRuntime:
                 kept.append(it)
             items = kept
         page = 20
-        start = 0
-        if isinstance(params, dict) and isinstance(params.get("cursor"), str):
-            try:
-                start = max(0, int(params["cursor"]))
-            except ValueError:
-                start = 0
+        start = _cursor_index(params)
         end = start + page
         out: Dict[str, Any] = {"resources": items[start:end]}
         if end < len(items):

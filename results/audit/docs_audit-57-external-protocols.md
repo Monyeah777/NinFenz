@@ -6,17 +6,17 @@ scope: 作者指示的七项任务（NF 深析 / 外部协议清单 ≥100 条 /
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
+  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:ff5fb24eafb99044ad1452f26d5cf3be6b89a24d77a5be5e4bcf56189a8ea956
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
-  - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
+  - desktop/src/core/mcp_runtime.py:7a30f8b335822e059571d8975d5ad91746f10f6b7f9babdc133af759c92cf5f7
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
-  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
+  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -24,9 +24,35 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:b65f8cb1b6492c6c0a2bc400cd210cff6604e4a02fcf2dae05dadf666775f23c
+  - llms.txt:314565a5fc78f28eabf8951fc07dabcafb3ffa8c779ac954822cd6f6bbbd000a
 
 ---
+> 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
+
+> 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
+
+> 重审（2026-11-02）：check43 升级：A 桶证据内核门禁
+
+> 重审（2026-11-02）：2026-11-02 波十二：域包模板填写进度（domain shells --fill-dir）
+
+> 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
+
+> 重审（2026-11-02）：2026-11-02 波九：Q2 CHANGELOG 锚点、E9 边界测试、域包模板批量校验
+
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
+> 重审（2026-11-02）：2026-11-02 修复波六：V3 报告自证 + C-04 引号分号 + 域包补全模板工具
+
+> 重审（2026-11-02）：2026-11-02 修复波四：域包完备度报告+缓存 key 输入面+conformance 证据存在性+插件静默回退回执默认覆盖面
+
+> 重审（2026-11-02）：2026-11-02 修复波三：B-1 模块映射、D-5 真源面保护、check35 覆盖面接线、E13/E6/E5/E2/E18/E19/G1/C-05/I1/Q1/D1/check_parity 可移植性
+
+> 重审（2026-11-01）：2026-11-01 修复波二：清理仓库残留（.msg*/档案.md）、NF-1 重签、WASM 产物摘要校验、MCP 来源判定、回执覆盖面判据、skills 示例落点
+
+> 重审（2026-11-01）：2026-11-01 深挖修复波：终端写盘闸门 --flag=value 归一 + argparse 长选项缩写关闭；MCP cursor 收紧为 ASCII；LSP 内部错误脱敏；协议回执 subject 去重；gate_engine 41/42 入账 + 未知/未迁入 check fail-closed；文档陈旧基线数字更正
+
+> 重审（2026-11-01）：2026-11-01 深挖修复：终端写盘闸门归一(--flag=value)、argparse 长选项缩写关闭、MCP cursor ASCII 收紧、LSP 内部错误脱敏、协议回执 subject 去重、gate_engine 41/42 入账 + 未知号 fail-closed
+
 > 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
 
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）

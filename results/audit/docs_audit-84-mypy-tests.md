@@ -6,14 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/tests/test_write_flag_gate.py:bc55da5403b7acdcd8552c1f28c44f553f4a4f191ff8b9a81c47bae42a035803
+  - desktop/tests/test_write_flag_gate.py:7c843289aed63afe5cb47d058b72e066b43906a3868da60b2f7ccbdb3f752e45
   - desktop/tests/test_verification_cards.py:f4486f2683676e0b9094eaad6a7a4d20c424c9e07bb101e3692a90b6d5828492
   - desktop/tests/test_serve_default.py:4a4d19c399ba06f70d8c7153a8d23dd29c3330466df1c0e86434b9500d00a65c
   - desktop/tests/test_selfcontained_rebuild.py:c1804902ab453ca60333c35b712b9e9a8a14aed34664aafe3b5ff184ad18ef20
   - desktop/tests/test_rust_fastlane.py:3415546ec6ef97dacdb7d8a17596c9815a5ee3912b5db6f948b73075b69216f2
   - desktop/tests/test_quant_domain_package.py:e11700ea8f52a9d2a3c39838923f9264a099aa0997ce5e6890a9a96e65bc1709
   - desktop/tests/test_mcp_write_freedom.py:a2afa8cf6e1d6c2ccb2cde5f57b796d0b8722908be632e227b2a8dc76fe9cf2e
-  - desktop/tests/test_mcp_runtime.py:cf53f00460f76e3eabb0a45842f584878e12d7d402fe613dcc355c5f62a25457
+  - desktop/tests/test_mcp_runtime.py:e84ffe8e4eb0ba51c7e579c05d311f56a8ee387364bf64fc59b14d04ee56b1cd
   - desktop/tests/test_live_doc_counts.py:8d522b35f224f733bcac561a57376699a75dd3593e945475fc77319673d458d0
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/tests/test_knowledge_sig.py:634a727aab5fa9e119835be2e9a2c60dbe36054b66b8d955e0856db048fc9b34
@@ -31,9 +31,19 @@ subjects:
   - desktop/tests/test_cli_json_face.py:ff2c6753d8297fecd27794445339f67db519421f4c34cd1f3b97befd6c6478ee
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:3f44b1e1a186e38ecdfe065d867f6d9eaccd996e0e7eca26acfc6366f853ccb6
+  - desktop/tests/test_terminal.py:2b69019ebef7779cc6b020007510c2b95a6d1282a50990131662ec1099db3dbd
+  - desktop/tests/test_nf_cli.py:800e53bee54e0f4c3316f7860abf329f3e063fe73ec4596fddffdd514f93bd78
 ---
+> 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
+
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
+> 重审（2026-11-02）：2026-11-02 修复波六：V3 报告自证 + C-04 引号分号 + 域包补全模板工具
+
+> 重审（2026-11-02）：2026-11-02 修复波五：写盘闸门补三旗标 + TUI =value 归一 + 闸门扫描器扩 sink
+
+> 重审（2026-11-01）：2026-11-01 深挖修复：终端写盘闸门归一(--flag=value)、argparse 长选项缩写关闭、MCP cursor ASCII 收紧、LSP 内部错误脱敏、协议回执 subject 去重、gate_engine 41/42 入账 + 未知号 fail-closed
+
 > 重审（2026-10-28）：json-face 去重复（结构断言）+ 成功面切片 + 权重重测
 
 > 重审（2026-10-28）：parity 机器面 8→24 片（只改粒度）+ 权重重测

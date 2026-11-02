@@ -6,7 +6,7 @@ name: ci-verify
 # 而一份写着过期数字的 workflow 头，正是「本机绿、云端红」最难被发现的伪装。
 #
 # P3+矩阵（2026-10-18）：全量门禁拆成 **静态 1 台 + 测试 32 台并行**。
-#   静态：`bash verify.sh --checks-only`（42 条 check，不含 unittest）
+#   静态：`bash verify.sh --checks-only`（44 条 check，不含 unittest）
 #   测试：`bash verify.sh --tests-only --shard i/32`（每台只跑 1/32，权重由 check12_weights.json 定）
 #   汇总：`gate` 作业 needs 两者——**任一片红即整条红**，不因为"别的片绿"而变绿。
 #   为什么拆：单机全量约 600 s，且 16 片以上同机并行收益迅速饱和（实测 8 片 502 s / 16 片 396 s）；
@@ -66,7 +66,7 @@ jobs:
           # check32 / check33 / 图书馆投稿面 直接 FAIL（intake_surface: gitee_surface.dir 不存在）。
           mkdir -p .gitee/ISSUE_TEMPLATE engine/dotnet/dist engine/rust/canonical/target
           echo "前置目录已建"
-      - name: 静态 42 条 check（不含 unittest；测试交给矩阵）
+      - name: 静态 44 条 check（不含 unittest；测试交给矩阵）
         env:
           # Z5（审计 0.2）：固定日志目录 + verify.sh 退出不清理 ⇒ 失败日志可下载。
           NF_VERIFY_TMP: .nf-logs
@@ -90,7 +90,7 @@ jobs:
             .nf-logs/verify-checks.log
             .nf-logs/
           if-no-files-found: warn
-      # SLSA 提升（2026-10-29）：把**门禁结论**（42 条 check 的日志 + 机器可读报告）交给平台
+      # SLSA 提升（2026-10-29）：把**门禁结论**（44 条 check 的日志 + 机器可读报告）交给平台
       # 签发 provenance —— 与 npm-publish 对发布物做的事同构。区别在于：仓库内
       # `results/interop/slsa.json` 是**脚本自证**（可伪造、不可验证），平台签发的 attestation
       # 可用 `gh attestation verify` 独立校验，是 SLSA Build L3 的"不可伪造来源"路径。

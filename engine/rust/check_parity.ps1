@@ -29,9 +29,17 @@ New-Item -ItemType Directory -Force -Path $Parity | Out-Null
 $env:PYTHONIOENCODING = 'utf-8'
 $script:Failed = 0
 
-# ---- 工具链定位（不假设 PATH 已注入）
-$cargo = Join-Path $env:USERPROFILE '.cargo\bin\cargo.exe'
-if (-not (Test-Path $cargo)) { $cargo = 'cargo' }
+# ---- 工具链定位（不假设 PATH 已注入；2026-11-02 修：不再写死 Windows 路径）
+# 旧实现只认 `$env:USERPROFILE\.cargo\bin\cargo.exe`，Linux/macOS 上 USERPROFILE 为空
+# ⇒ Join-Path 绑定失败，公开仓无法复跑 15 面对账。
+$cargo = $null
+$cargoCmd = Get-Command cargo -ErrorAction SilentlyContinue
+if ($cargoCmd) { $cargo = $cargoCmd.Source }
+if (-not $cargo -and $env:USERPROFILE) {
+    $win = Join-Path $env:USERPROFILE '.cargo\bin\cargo.exe'
+    if (Test-Path -LiteralPath $win) { $cargo = $win }
+}
+if (-not $cargo) { $cargo = 'cargo' }
 
 
 Write-Host '== 1/3 构建 Rust 侧'

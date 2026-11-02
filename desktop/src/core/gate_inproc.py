@@ -92,6 +92,16 @@ def extract_heredoc(text: str, num: int) -> tuple[str, str] | None:
     return None
 
 
+def _exit_code(value) -> int:
+    """SystemExit.code → 退出码（2026-11-02 · I1）：`sys.exit("msg")` 的 code 是字符串，
+    旧实现直接 `int(code)` 会 ValueError，让整轮门禁崩在「判据自己抛异常」上。
+    CPython 对非整数 code 的实际退出码是 1，这里按同一口径归一。
+    """
+    if isinstance(value, int):
+        return value
+    return 0 if value is None else 1
+
+
 def run_inproc(src: str, root: Path, name: str) -> tuple[int, str]:
     """在当前进程内跑一段 heredoc 源码 → (退出码, 捕获的输出)。
 
@@ -127,9 +137,9 @@ def run_inproc(src: str, root: Path, name: str) -> tuple[int, str]:
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             exec(compile(src, "<verify.sh:{}>".format(name), "exec"), glb)
     except _Exit as e:
-        code = int(e.code)
+        code = _exit_code(e.code)
     except SystemExit as e:                     # 万一 heredoc 直接用 SystemExit
-        code = int(e.code or 0)
+        code = _exit_code(getattr(e, "code", None))
     except BaseException:
         import traceback
         buf.write(traceback.format_exc())
@@ -164,7 +174,7 @@ def run_script(path: Any, root: Path, name: str) -> tuple[int, str]:
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             runpy.run_path(str(path), run_name="__main__")
     except SystemExit as e:
-        code = int(e.code or 0)
+        code = _exit_code(getattr(e, "code", None))
     except BaseException:
         import traceback
         buf.write(traceback.format_exc())
@@ -259,9 +269,9 @@ def run_check_inproc(body: str, root: Path, name: str) -> tuple[int, list[str], 
     try:
         exec(compile(text, "<verify.sh:{}>".format(name), "exec"), glb)
     except _Exit as e:
-        code = int(e.code)
+        code = _exit_code(e.code)
     except SystemExit as e:
-        code = int(e.code or 0)
+        code = _exit_code(getattr(e, "code", None))
     except BaseException:
         import traceback
         out_lines.append(traceback.format_exc())

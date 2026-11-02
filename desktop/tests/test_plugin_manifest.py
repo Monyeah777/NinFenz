@@ -48,6 +48,52 @@ class ShippedManifestTest(unittest.TestCase):
         self.assertEqual("deny", granted["random"])
 
 
+class VersionShapeTest(unittest.TestCase):
+    def test_version_must_be_full_semver(self):
+        doc = _doc()
+        doc["version"] = "1.2.3evil"
+        self.assertTrue(any("version" in i for i in pm.validate(doc)), pm.validate(doc))
+
+
+class ArtifactDigestTest(unittest.TestCase):
+    """产物摘要（2026-11-01 · D5）：清单 sha256 此前恒 null 且无消费点。
+
+    补两条可证判据：非 null 须 64 位小写十六进制；产物在场时逐字节比对。
+    clean checkout 产物缺席（gitignore 面）时不做比对——null = 显式「未钉」。
+    """
+
+    def test_bad_format_is_refused(self):
+        doc = _doc()
+        doc["artifact"]["sha256"] = "deadbeef"
+        issues = pm.validate(doc)
+        self.assertTrue(any("64 位" in i for i in issues), issues)
+
+    def test_mismatch_is_refused(self):
+        import hashlib
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "x.wasm").write_bytes(b"real-bytes")
+            doc = _doc()
+            doc["artifact"] = {"path": "x.wasm", "sha256": "0" * 64}
+            issues = pm.validate(doc, tmp)
+        self.assertTrue(any("与产物不符" in i for i in issues), issues)
+
+    def test_match_passes(self):
+        import hashlib
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "x.wasm").write_bytes(b"real-bytes")
+            doc = _doc()
+            doc["artifact"] = {"path": "x.wasm",
+                               "sha256": hashlib.sha256(b"real-bytes").hexdigest()}
+            self.assertEqual([], pm.validate(doc, tmp))
+
+    def test_null_sha_is_allowed_but_means_unpinned(self):
+        doc = _doc()
+        doc["artifact"]["sha256"] = None
+        self.assertEqual([], pm.validate(doc))
+
+
 class CapabilityDenyTest(unittest.TestCase):
     """deny by default（§18.3）：fs / net / env 的非空请求一律拒绝装载。"""
 

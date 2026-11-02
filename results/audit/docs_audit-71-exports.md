@@ -6,20 +6,46 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
-  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
+  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
+  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
-  - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
+  - desktop/src/core/quality_baseline.py:dc7c9ef409e9f904896ac560247339a0006b927d6259663d2a8dbd58adee41e2
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
+  - protocol/CONFORMANCE.md:016554d0120cc31d5103560c23a79cf7edb7f67c639ebffefe62f3eaba32ed7e
   - docs/fde-stack.md:79633a484dcf01cd92c03deac96d7b59f85489c1aa0ec4ad5489768d2702da8a
   - docs/fde-sample/README.md:c17984ad90f50d39131fd932c37915b978e28bf606f9c397128de1c8417e4168
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
+
+> 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
+
+> 重审（2026-11-02）：check43 声明/能力面对齐
+
+> 重审（2026-11-02）：check43 升级：A 桶证据内核门禁
+
+> 重审（2026-11-02）：2026-11-02 波十二：域包模板填写进度（domain shells --fill-dir）
+
+> 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
+
+> 重审（2026-11-02）：2026-11-02 波九：Q2 CHANGELOG 锚点、E9 边界测试、域包模板批量校验
+
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
+> 重审（2026-11-02）：2026-11-02 修复波六：V3 报告自证 + C-04 引号分号 + 域包补全模板工具
+
+> 重审（2026-11-02）：2026-11-02 修复波四：域包完备度报告+缓存 key 输入面+conformance 证据存在性+插件静默回退回执默认覆盖面
+
+> 重审（2026-11-02）：2026-11-02 修复波三：B-1 模块映射、D-5 真源面保护、check35 覆盖面接线、E13/E6/E5/E2/E18/E19/G1/C-05/I1/Q1/D1/check_parity 可移植性
+
+> 重审（2026-11-01）：2026-11-01 修复波二：清理仓库残留（.msg*/档案.md）、NF-1 重签、WASM 产物摘要校验、MCP 来源判定、回执覆盖面判据、skills 示例落点
+
+> 重审（2026-11-01）：2026-11-01 深挖修复：终端写盘闸门归一(--flag=value)、argparse 长选项缩写关闭、MCP cursor ASCII 收紧、LSP 内部错误脱敏、协议回执 subject 去重、gate_engine 41/42 入账 + 未知号 fail-closed
+
 > 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
 
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）

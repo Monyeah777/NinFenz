@@ -1721,8 +1721,8 @@ public static class SelfTest
 
         // ① 修复指引表：机械导出件的长度与**码点序**键序（"10" 排在 "2" 前），缺键必须是 null
         var keys = CheckGuide.SortedKeys();
-        checks.Add(new Check("小口·修复指引表（42 条 · 码点序键序 · 缺键 null）",
-            CheckGuide.Count == 42 && keys.Count == 42
+        checks.Add(new Check("小口·修复指引表（44 条 · 码点序键序 · 缺键 null）",
+            CheckGuide.Count == 44 && keys.Count == 44
             && string.Join(",", keys.Take(4)) == "1,10,11,12"
             && keys[^1] == "9"
             && CheckGuide.Get("42") is not null && CheckGuide.Get("32")!.Contains("质量纵深汇总"),
@@ -3745,7 +3745,9 @@ public static class SelfTest
         var pinned = IsPinnedSnapshot(repoRoot);
         checks.Add(new Check("文档面·真仓命令面（零问题 · 导出态断 78 文档/433 处与金标摘要 / 工作区态断语义）",
             real.Ok
-            && Convert.ToInt64(real.Stats["cli_commands"]) == 109
+            // 2026-11-02：`nf domain template` 后 109 → 110；`nf labeling`（标识体检器
+            // 命令面，透传 core.labeling.cli）再 +1 → 111（真源 nf.py 子命令数）
+            && Convert.ToInt64(real.Stats["cli_commands"]) == 113
             && Convert.ToInt64(real.Stats["mcp_tools"]) == 12
             && (!pinned || (DigestOf(CommandFaceLog(real)) == RealGoldenDigest
                             && Convert.ToInt64(real.Stats["docs"]) == 78

@@ -263,11 +263,15 @@ def classify(argv: list) -> str:
     sub = argv[1] if len(argv) > 1 and not argv[1].startswith("-") else ""
     if top in LONG_RUNNING:
         return "long"
-    if any(tok in WRITE_FLAGS for tok in argv):
+    def _bare(tok: str) -> str:
+        return tok.split("=", 1)[0] if tok.startswith("-") and "=" in tok else tok
+
+    bare = [_bare(tok) for tok in argv]
+    if any(tok in WRITE_FLAGS for tok in bare):
         return "write"
     if (top, sub) in WRITE_VERBS or (top, "") in WRITE_VERBS:
         return "write"
-    if {flag for cmd, flag in WRITE_PAIRS if cmd == top} & set(argv):
+    if {flag for cmd, flag in WRITE_PAIRS if cmd == top} & set(bare):
         return "write"
     return "read"
 

@@ -66,7 +66,7 @@ def resolve_wasmtime():
 def load_declared(manifest_rel: str = DEFAULT_MANIFEST, root: Path = ROOT):
     """装载三件事一次做完：清单校验 + WIT 对账 + 产物解析。→ (doc, issues, artifact)。"""
     doc = pm.load(str(root / manifest_rel))
-    issues = pm.validate(doc)
+    issues = pm.validate(doc, str(root))
     wit_path = root / WIT_REL
     if wit_path.is_file():
         issues = issues + pm.validate_against_wit(doc, wit_path.read_text(encoding="utf-8"))
@@ -334,7 +334,12 @@ def invoke_with_fallback(doc, artifact, method: str, data: bytes, **kw):
 def _self_test() -> int:
     checks = 0
     doc, issues, artifact = load_declared()
-    assert issues == [], f"自带清单不该有问题：{issues}"  # nosec B101  # noqa: S101
+    # 2026-11-01（D5）：干净检出里 wasm 产物在 gitignore 面（target/、dist/），
+    # 旧自检把「产物不在场」算成装载问题 → assert 失败 rc=1，读者按 README 跑自检
+    # 只会拿到失败。产物缺席是**预期姿态**：断言「其余装载面全绿 + 回退路径带
+    # artifact_absent 标记」，真跑/燃料/字节互证留给有产物的环境。
+    blocking = [i for i in issues if "产物不在场" not in i]
+    assert blocking == [], f"自带清单不该有问题：{blocking}"  # nosec B101  # noqa: S101
     checks += 1
     # 能力收窄：argv 里不许出现 --dir / inherit-network / inherit-env=y
     argv = isolation_argv("wasmtime", artifact or Path("x.wasm"), 1000, 1000)
@@ -344,6 +349,15 @@ def _self_test() -> int:
     for required in ("fuel=", "timeout=", "inherit-env=n", "epoch-interruption=y"):
         assert required in joined, f"宿主 argv 缺 {required}"  # nosec B101  # noqa: S101
     checks += 1
+    # 产物缺席：显式断言回退原因，不假装跑过（干净检出的常态）
+    if artifact is None or not Path(artifact).is_file():
+        # 传一个**非空**宿主路径：invoke 的检查顺序是「宿主不在场 → 产物不在场」，
+        # 要断言的是后者（产物缺席），故不能让它先命中 host_absent。
+        absent = invoke(doc, artifact, "sha256", b"abc", wasmtime=Path("/nonexistent/wasmtime"))
+        assert not absent["ok"] and absent["meta"]["reason"] == "artifact_absent"  # nosec B101  # noqa: S101
+        checks += 1
+        print(f"self-test OK（{checks} 例；产物缺席 → 回退 artifact_absent，未做真跑）")
+        return 0
     # 降级路径：宿主缺席必须回退且**标记** degraded
     got = invoke_with_fallback(doc, artifact, "sha256", b"abc", wasmtime=None)
     assert got["ok"] and got["meta"]["degraded"] and got["meta"]["reason"] == "host_absent"  # nosec B101  # noqa: S101
@@ -383,6 +397,11 @@ def main(argv=None) -> int:
                          ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(got["data"])
+        # 2026-11-02（E20）：默认面也把「这次其实是 Python 参考实现算的」打到 stderr。
+        # docstring 早就承诺「回退永远不是静默的」，但此前只有 --json 才看得见 degraded。
+        if got["meta"].get("degraded"):
+            print("WARN: 插件未执行，已回退到 Python 参考实现（reason=%s）"
+                  % (got["meta"].get("reason") or "unknown"), file=sys.stderr)
     if args.require_plugin and got["meta"]["degraded"]:
         return 1
     return 0

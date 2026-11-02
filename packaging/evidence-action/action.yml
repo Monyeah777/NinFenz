@@ -1,0 +1,47 @@
+name: NF Evidence Gate
+description: Generate a local, offline-recomputable evidence card for an artifact (and fail if contract coverage is not met).
+branding:
+  icon: shield
+  color: blue
+inputs:
+  path:
+    description: Repository-relative path of the artifact
+    required: true
+  contract:
+    description: Domain pack name/code (optional; enables coverage check)
+    required: false
+    default: ""
+  min_names:
+    description: Minimum subdivision-name hits when contract is set
+    required: false
+    default: "1"
+  min_fields:
+    description: Minimum field hits when contract is set
+    required: false
+    default: "0"
+  min_rules:
+    description: Minimum fully-covered rules when contract is set
+    required: false
+    default: "0"
+  output:
+    description: Card output path
+    required: false
+    default: "nf-evidence.json"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        IN_PATH: ${{ inputs.path }}
+        IN_CONTRACT: ${{ inputs.contract }}
+        IN_MIN_NAMES: ${{ inputs.min_names }}
+        IN_MIN_FIELDS: ${{ inputs.min_fields }}
+        IN_MIN_RULES: ${{ inputs.min_rules }}
+        IN_OUTPUT: ${{ inputs.output }}
+      run: |
+        set -euo pipefail
+        python "${{ github.action_path }}/../../scripts/evidence_cli.py" card \
+          --path "$IN_PATH" --contract "$IN_CONTRACT" \
+          --min-names "$IN_MIN_NAMES" --min-fields "$IN_MIN_FIELDS" --min-rules "$IN_MIN_RULES" \
+          --json > "$IN_OUTPUT"
+        echo "evidence card written: $IN_OUTPUT"

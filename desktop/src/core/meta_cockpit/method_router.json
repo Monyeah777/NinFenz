@@ -1,0 +1,29 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M31",
+  "name": "方法路由",
+  "category": "认知",
+  "layer": "P31",
+  "meta_level": "M2",
+  "meta_function": "control",
+  "operates_on": ["方法目录", "节点判据结果"],
+  "atoms": ["c.select", "c.sequence", "c.allocate", "c.switch"],
+  "inputs": [{"token": "需求画像", "kind": "object"},
+             {"token": "方法目录", "kind": "array"}],
+  "outputs": [{"token": "方法计划", "kind": "object"}],
+  "cost_class": "heuristic",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "元控制",
+  "context_budget": {"input": "1x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": ["不适用方法"], "summarize": []},
+  "criteria": [
+    {"dimension": "route_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0},
+    {"dimension": "route_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "cognition_pipeline.json"}],
+  "conformance": "L2"
+}

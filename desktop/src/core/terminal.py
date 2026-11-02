@@ -109,7 +109,10 @@ CONFIRM_VERBS = (("asset", "add"), ("asset", "rm"), ("asset", "deprecate"),
 #:   `nf shell --session` 上是**读/仓外受控**（shell 那条另有「必须绝对路径且不得落仓库内」的
 #:   硬闸），只有 `nf assemble` 的这两条会**写你自己命名的文件**（可仓库相对 ⇒ 粘贴面能落仓）。
 CONFIRM_FLAG_PAIRS = (("interop", "--all"),
-                       ("assemble", "--trace"), ("assemble", "--session"))
+                       ("assemble", "--trace"), ("assemble", "--session"),
+                       # 2026-11-02（C-01）：三个「不带 --write 语义却写仓库」的旗标
+                       ("asset", "--export"), ("asset", "--freeze"),
+                       ("asset", "--refresh"))
 #: 会话内不直接执行：长驻/递归/需独占终端的动词 → 给指引
 BLOCKED_IN_SHELL = {
     "shell": "终端内不再开终端（避免递归会话）：请另开一个终端窗口运行 nf shell。",
@@ -300,17 +303,18 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "forge", "name": "装配与生产",
      "summary": "从需求到产物：装配计划、预设（管线+模块+资产包一次组装）、全链管道、渲染、协议件读"
          "写、入库登记",
-     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import")},
+     "commands": ("assemble", "preset", "run", "render", "spec", "register", "import",
+                  "cockpit", "cockpit-ab")},
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",
                   "output", "rename")},
     {"id": "verify", "name": "质检与验证",
      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、"
-         "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",
+         "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译、标识合规体检",
      "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
-                  "nfal")},
+                  "nfal", "labeling")},
     {"id": "library", "name": "图书馆与知识",
      "summary": "馆藏存取、双源知识、行话术语、实践包、协议件版本史、引用关系与影响面",
      "commands": ("library", "knowledge", "cognition", "patterns", "rfc",
@@ -890,6 +894,18 @@ def parse(line: str) -> Intent:
     return Intent("run", argv, raw)
 
 
+def _bare_flag(tok: str) -> str:
+    """`--out=/tmp/x` → `--out`：闸门按「旗标名」判，不按「旗标+值」判。
+
+    2026-11-01 修（D2）：`--out <v>` 与 `--out=<v>` 在 argparse 里是同一个 dest、同一种
+    写盘效果，但旧闸门只认裸 token，`--out=/tmp/x` 于是无确认落盘。归一保持 argv 原样
+    执行，只影响判定入参。
+    """
+    if isinstance(tok, str) and tok.startswith("-") and "=" in tok:
+        return tok.split("=", 1)[0]
+    return tok
+
+
 def needs_confirm(argv: list) -> bool:
     """判定一条命令是否属于写入/不可逆面（须显式确认才放行）。
 
@@ -903,7 +919,7 @@ def needs_confirm(argv: list) -> bool:
     **改口径要两边一起改**：谁要动这条边界（例如也给 `daemon exec` 加确认），必须同时更新本
     段说明与 CHANGELOG——不要只改一边，那会让「闸门到底守哪条面」重新变成无人可查的问题。
     """
-    if any(tok in CONFIRM_FLAGS for tok in argv):
+    if any(_bare_flag(tok) in CONFIRM_FLAGS for tok in argv):
         return True
     if not argv:
         return False
@@ -911,7 +927,7 @@ def needs_confirm(argv: list) -> bool:
     sub = argv[1] if len(argv) > 1 and not argv[1].startswith("-") else ""
     if (head, sub) in CONFIRM_VERBS or (head, "") in CONFIRM_VERBS:
         return True
-    return any((head, tok) in CONFIRM_FLAG_PAIRS for tok in argv)
+    return any((head, _bare_flag(tok)) in CONFIRM_FLAG_PAIRS for tok in argv)
 
 
 def example_resolves(example: str, commands, root_flags) -> bool:
@@ -1161,7 +1177,11 @@ BASELINE_DEFAULT_MAX_MS = 300
 #: 活体深检行的预算。**2026-09-29 实测重标 2000 → 6000**：该行主成本是**全仓抽象阶梯扫描**
 #: （`nf layers --verify` 空闲 ~0.5–1.7 s / 本机满载 2.4–3.7 s），旧注「~320 ms × 6」的前提
 #: 已不成立（2000 ms 实余 1.15×、同一棵树一次绿一次红）；6000 ≈ 3.5× 空闲余量，仍拦 ~11 s 级回归。
-BASELINE_DEEP_MAX_MS = 6000
+#: **2026-11-02 重标 6000 → 12000**：命令面 70 → 71（新增 `nf labeling`）+ 本次并入的
+#: labeling 包（10 模块 / ~5.5k 行）让 `nf layers --verify` 扫描面变大；本机 proot 实测
+#: 活体行 4.9–10.3 s（含 in-process check39 路径），6000 出现稳定红。12000 仍能拦住
+#: 「分钟级/命令面崩溃」类回归，语义判据（活体可跑 + 全命令 --help 可调用）不变。
+BASELINE_DEEP_MAX_MS = 12000
 
 
 def baseline_tmp_dir() -> str:
@@ -2190,11 +2210,37 @@ def readline_available() -> bool:
         return False
 
 
+def _split_semicolons(line: str) -> list:
+    """按 `;` 切分但**尊重引号**（2026-11-02 · C-04）。
+
+    旧实现 `str.split(";")` 会把 `nf assemble "西幻;生存"` 切成两条语句——argv 被截断，
+    后半段「生存"」还被当成新命令派发（粘贴面注入）。这里只在引号外切分；
+    未闭合引号按「保持原样」处理（由后续 parse/argparse 报错，不制造新命令）。
+    """
+    out, buf = [], []
+    quote = ""
+    for ch in str(line):
+        if quote:
+            buf.append(ch)
+            if ch == quote:
+                quote = ""
+        elif ch in ("'", '"'):
+            quote = ch
+            buf.append(ch)
+        elif ch == ";":
+            out.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    out.append("".join(buf))
+    return out
+
+
 def _statements(lines) -> list:
-    """把脚本/`--exec` 文本切成语句：`;` 与换行都是分隔；`#` 开头为注释。"""
+    """把脚本/`--exec` 文本切成语句：`;` 与换行都是分隔；`#` 开头为注释（引号内不切）。"""
     out = []
     for raw in lines:
-        for piece in str(raw).split(";"):
+        for piece in _split_semicolons(str(raw)):
             stmt = piece.strip()
             if stmt and not stmt.startswith("#"):
                 out.append(stmt)

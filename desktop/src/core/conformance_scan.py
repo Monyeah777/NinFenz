@@ -974,6 +974,23 @@ def export_manifest_issues(root: str,
     return issues, len(items)
 
 
+def _evidence_presence(root: str) -> str:
+    """导出 manifest 的 evidence **存在性**指纹（2026-11-02 · C1）。
+
+    evidence 件是契约面判据的输入（删件必须让缓存失效），但它们含 `desktop/tests/**` 夹具；
+    按「内容面不收测试件」纪律不能进 `SCAN_INPUTS`。这里只取**存在性**（不读内容），
+    与内容指纹组合成 scan 的键——删/加 evidence 会让键变，从而重算。
+    """
+    manifest = _read_json(os.path.join(root, "protocol", "export_conformance.json"))[0]
+    if not isinstance(manifest, dict):
+        return "no-manifest"
+    ev = []
+    for item in manifest.get("items") or []:
+        for rel in (item or {}).get("evidence") or []:
+            ev.append("%s=%d" % (rel, 1 if os.path.isfile(os.path.join(root, rel)) else 0))
+    return hashlib.sha256("\n".join(sorted(ev)).encode("utf-8")).hexdigest()
+
+
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
     """检查（外层）：派生结果按**输入内容指纹**跨调用缓存（输入面见 `SCAN_INPUTS`，已穷举）。
 
@@ -986,7 +1003,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
     「读到的文件必须全部落在输入面内」有判据守着（test_conformance_scan.DerivedResultCacheTest）：
     将来给本函数加新读取，判据会先红、逼着把新输入补进来——不会悄悄读到陈旧结果。
     """
-    fp = face_fingerprint(root, SCAN_INPUTS)
+    fp = hashlib.sha256((face_fingerprint(root, SCAN_INPUTS) + "|" +
+                          _evidence_presence(root)).encode("utf-8")).hexdigest()
     hit = _SCAN_CACHE.get(fp)
     if hit is None:
         from core import disk_cache

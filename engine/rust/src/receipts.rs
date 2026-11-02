@@ -99,6 +99,12 @@ pub fn protocol_subjects(root: &Path) -> Vec<String> {
     subs.extend(glob_sorted(root, "decisions", "ADR-", ".md"));
     subs.extend(glob_sorted(root, "postmortems", "PO-", ".md"));
     subs.retain(|rel| root.join(rel).is_file());
+    // 去重（2026-11-01，与 Python 真源同步）：`protocol/schema/asset_contracts.schema.json`
+    // 既在 FIXED 里、又被 `protocol/schema/*.json` glob 收一次 → 旧实现 67 条叶、真源
+    // 66 条（Python 侧已改为 `dict.fromkeys` 首次出现序去重）。此处按同一口径去重，
+    // 否则 `check_parity` 的 receipts 面会与真源根不一致。
+    let mut seen = std::collections::HashSet::new();
+    subs.retain(|rel| seen.insert(rel.clone()));
     subs
 }
 

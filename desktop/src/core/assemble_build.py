@@ -25,13 +25,34 @@ _M_NUM = re.compile(r"(M\d{2,3})")
 
 
 def _mod_files(root: Path) -> Dict[str, Path]:
-    """模块号 → 模块件路径（官方核心 + 全部社区包；同号取先出现的官方件）。"""
+    """模块 id → 模块件路径（官方核心 + 全部社区包）。
+
+    2026-11-02 修（B-1）：旧实现只从**文件名**里抽 `Mxx` 建键，而域包模块文件名是
+    `A01a_…`（类内段编号不在文件名里）——于是 `_meta("大语言模型域包:M01")` 会按裸号
+    `M01` 命中西幻生存包的 `M01_职业成长.md`，装配产物嵌入别包契约。
+    现在优先读每件 `machine_contract.id`（真源），文件名正则只作无契约件的兜底；
+    同时登记「全 id」与「裸号」两把键，前者保证限定 id 精确命中。
+    """
     out: Dict[str, Path] = {}
     for pat in ("04_模块库/*/*.md", "community/*/modules/*.md"):
         for p in sorted(root.glob(pat)):
-            m = _M_NUM.search(p.stem)
-            if m:
-                out.setdefault(m.group(1), p)
+            try:
+                text = p.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            mid = ""
+            block = _contract(text)
+            if block:
+                m = re.search(r"(?m)^\s*id:\s*([^\s#]+)\s*$", block)
+                if m:
+                    mid = m.group(1).strip().strip('"\'')
+            if not mid:
+                m2 = _M_NUM.search(p.stem)
+                if m2:
+                    mid = m2.group(1)
+            if mid:
+                out.setdefault(mid, p)
+                out.setdefault(mid.split(":")[-1], p)
     return out
 
 
@@ -54,7 +75,7 @@ def _meta(mid: str, reg_by_id: Dict[str, Dict[str, Any]],
     if mounts:
         layer = str(mounts[0].get("layer") or "")
     src = str(got.get("source") or "")
-    path = files.get(mid.split(":")[-1])
+    path = files.get(mid) or files.get(mid.split(":")[-1])
     rel = path.relative_to(root).as_posix() if path else ""
     if path and (not name or not category):
         text = path.read_text(encoding="utf-8")

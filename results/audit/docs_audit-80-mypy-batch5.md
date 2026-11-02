@@ -7,13 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/semantic_conflict.py:eb11b7e32ac07c52400c4c4a457ed877f434decc05a77fd69ef6d0bf2ddcf131
-  - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
-  - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
+  - desktop/src/core/storage.py:88307cf9f86502161320b8c51e1df4b21b135bbb8b0728b42265c9b70317e7b8
+  - desktop/src/core/receipts.py:48448984213809322341e4a74c2eae63b84e8ff6926661ff8c3a78fc72a8c4cf
   - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a
+  - desktop/src/core/mcp_runtime.py:7a30f8b335822e059571d8975d5ad91746f10f6b7f9babdc133af759c92cf5f7
+  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -308,6 +308,62 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
+
+> 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card
+
+> 重审（2026-11-02）：接入认知驾驶舱（meta_cockpit）：CLI/终端/测试/文档
+
+> 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 labeling 媒体写入（2026-11-02）
+
+> 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
+
+> 重审（2026-11-02）：逐规则 coverage + close_action + Evidence Action/CLI
+
+> 重审（2026-11-02）：coverage 阈值可执行 + 契约检查纳入 verify
+
+> 重审（2026-11-02）：域包规则机读化 + 证据卡覆盖统计 + grant 填写稿
+
+> 重审（2026-11-02）：check43 升级：A 桶证据内核门禁
+
+> 重审（2026-11-02）：2026-11-02 波十七：A 桶门禁执行体 + 驾驶舱汇总 + check43 方案
+
+> 重审（2026-11-02）：2026-11-02 波十六：契约包自检 + grant 问答包
+
+> 重审（2026-11-02）：2026-11-02 波十五：产物检查 + 驾驶舱日志（attach_decision/list_decisions）
+
+> 重审（2026-11-02）：2026-11-02 波十四：证据卡绑定契约 digest + A 桶批 2/3 冒烟
+
+> 重审（2026-11-02）：2026-11-02 波十三：NF Evidence MCP + A 桶证据内核自检
+
+> 重审（2026-11-02）：2026-11-02 波十二：域包模板填写进度（domain shells --fill-dir）
+
+> 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
+
+> 重审（2026-11-02）：2026-11-02 波十：模块边界签名 0 模块不得空过（F14）
+
+> 重审（2026-11-02）：2026-11-02 波九：Q2 CHANGELOG 锚点、E9 边界测试、域包模板批量校验
+
+> 重审（2026-11-02）：2026-11-02 修复波八：回执 anchor 块纳入校验（E1）
+
+> 重审（2026-11-02）：refreeze.sh（统一冻结入口）
+
+> 重审（2026-11-02）：2026-11-02 修复波六：V3 报告自证 + C-04 引号分号 + 域包补全模板工具
+
+> 重审（2026-11-02）：2026-11-02 修复波五：写盘闸门补三旗标 + TUI =value 归一 + 闸门扫描器扩 sink
+
+> 重审（2026-11-02）：2026-11-02 修复波四：域包完备度报告+缓存 key 输入面+conformance 证据存在性+插件静默回退回执默认覆盖面
+
+> 重审（2026-11-02）：2026-11-02 修复波三：B-1 模块映射、D-5 真源面保护、check35 覆盖面接线、E13/E6/E5/E2/E18/E19/G1/C-05/I1/Q1/D1/check_parity 可移植性
+
+> 重审（2026-11-01）：2026-11-01 修复波二：清理仓库残留（.msg*/档案.md）、NF-1 重签、WASM 产物摘要校验、MCP 来源判定、回执覆盖面判据、skills 示例落点
+
+> 重审（2026-11-01）：2026-11-01 深挖修复波：终端写盘闸门 --flag=value 归一 + argparse 长选项缩写关闭；MCP cursor 收紧为 ASCII；LSP 内部错误脱敏；协议回执 subject 去重；gate_engine 41/42 入账 + 未知/未迁入 check fail-closed；文档陈旧基线数字更正
+
+> 重审（2026-11-01）：2026-11-01 深挖修复：终端写盘闸门归一(--flag=value)、argparse 长选项缩写关闭、MCP cursor ASCII 收紧、LSP 内部错误脱敏、协议回执 subject 去重、gate_engine 41/42 入账 + 未知号 fail-closed
+
 > 重审（2026-10-30）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复

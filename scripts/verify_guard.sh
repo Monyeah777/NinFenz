@@ -78,7 +78,9 @@ verify_guard_acquire() {
     if [ "$elapsed" -ge "$wait_s" ]; then
       echo "另一个 verify.sh 正在此仓库运行（pid=${owner:-unknown}，等待 ${wait_s}s 超时）。" >&2
       echo "修复指引：等待该门禁结束，或设 NF_VERIFY_LOCK_WAIT=<秒数> 调整等待；不要在并发门禁中删除 payload。" >&2
-      return 1
+      # 2026-11-02（D1）：超时不是判据 FAIL——用 EX_TEMPFAIL(75) 区分，
+      # CI/发布侧才不会把「并发等待」记成「协议事故」。
+      return 75
     fi
     sleep 1
     elapsed=$((elapsed + 1))

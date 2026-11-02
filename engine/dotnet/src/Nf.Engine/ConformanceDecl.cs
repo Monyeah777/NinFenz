@@ -13,15 +13,15 @@ namespace Nf.Engine;
 /// **镜像说明**：基线两项（<c>EXPECTED_CHECKS</c> / <c>EXPECTED_PASS</c>）取自
 /// <c>core/quality_baseline.py</c>。仓库改基线时本镜像会滞后 → 该契约会**立刻报不一致**
 /// （fail-closed 且可由双跑对账定位），不静默通过。
-/// 2026-10-20 重同步：quality_baseline 已是 check1-42 / PASS=76（verify v2.30 扩门禁），
-/// 本镜像此前停在 39/68，导致「声明与真源不一致」常红。
+/// 2026-11-02 重同步：quality_baseline 已是 check1-44 / PASS=78（check44 标识合规门禁：
+/// GB 45438 / TC260-PG-202511A 五段判定 + 国密 + 证书链 + 时间戳），本镜像随真源同步。
 /// </summary>
 public static class ConformanceDecl
 {
     public const string DeclRel = "protocol/CONFORMANCE.md";
     public const string ContractDescription = "一致性声明";
-    public const int ExpectedChecks = 42;
-    public const int ExpectedPass = 76;
+    public const int ExpectedChecks = 44;
+    public const int ExpectedPass = 78;
 
     private static readonly Regex Row = new(@"^\|\s*`?([^`|]+?)`?\s*\|\s*`?([^`|]+?)`?\s*\|\s*([^|]+?)\s*\|\s*$");
     private static readonly Regex Row2 = new(@"^\|\s*`?([^`|]+?)`?\s*\|\s*([^|]+?)\s*\|\s*$");

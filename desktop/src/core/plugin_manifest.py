@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 from typing import Any
@@ -52,8 +53,12 @@ def wit_exports(text: str) -> list[str]:
     return sorted(set(_WIT_EXPORT.findall(body)))
 
 
-def validate(doc: Any) -> list[str]:
-    """→ 装载问题清单（空表 = 可装）。纯函数，便于变异自证。"""
+def validate(doc: Any, root: str = ".") -> list[str]:
+    """→ 装载问题清单（空表 = 可装）。纯函数，便于变异自证。
+
+    `root`（2026-11-01 补）：产物摘要校验需要按**仓库根**解析 `artifact.path`；
+    默认 `"."`（测试/宿主在仓库根运行）。纯净性不变——不 import 宿主设施。
+    """
     issues: list[str] = []
     if not isinstance(doc, dict):
         return ["清单不是对象"]
@@ -65,7 +70,7 @@ def validate(doc: Any) -> list[str]:
     if doc.get("abi") and doc["abi"] not in ABIS:
         issues.append(f"未知 ABI：{doc['abi']!r}（在册：{' | '.join(ABIS)}）")
     ver = str(doc.get("version") or "")
-    if ver and not re.match(r"^\d+\.\d+\.\d+", ver):
+    if ver and not re.fullmatch(r"\d+\.\d+\.\d+", ver):
         issues.append(f"version 不是 x.y.z 形态：{ver!r}")
 
     methods = doc.get("methods")
@@ -82,9 +87,27 @@ def validate(doc: Any) -> list[str]:
             issues.append("artifact 存在但无 path")
         else:
             try:
-                _paths.validate_path(".", str(art["path"]))
+                _paths.validate_path(root, str(art["path"]))
             except _paths.PathEscapeError as exc:
                 issues.append(f"artifact.path 逃逸仓库根：{exc}")
+            # 产物身份（2026-11-01 · D5）：清单的 `sha256` 此前恒 null 且**全仓无消费点**
+            # ⇒ 本地替换/旁路替换 wasm 不被任何判据发现。这里补两条可证判据：
+            #   ① 非 null 时须 64 位小写十六进制；
+            #   ② 产物在场时逐字节比对（clean checkout 产物缺席 → 跳过比对，
+            #      null 显式表达「尚未钉摘要」，由调用方在装载报告里标 unverified）。
+            sha = art.get("sha256")
+            if sha is not None:
+                sha_s = str(sha)
+                if not re.fullmatch(r"[0-9a-f]{64}", sha_s):
+                    issues.append(f"artifact.sha256 须为 64 位小写十六进制：{sha_s!r}")
+                else:
+                    p = Path(root) / str(art["path"])
+                    if p.is_file():
+                        got = hashlib.sha256(p.read_bytes()).hexdigest()
+                        if got != sha_s:
+                            issues.append("artifact.sha256 与产物不符（期望 %s… 实测 %s…；"
+                                          "修复指引：重算产物摘要并更新清单）"
+                                          % (sha_s[:12], got[:12]))
     return issues
 
 
