@@ -2,8 +2,8 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **370** 条 · 本机可达 **332** · 不可达 **38** · 机构 **194** · 依赖边 **206**
-- 分层：data 148 · eng 38 · form 29 · gov 71 · iface 84
+- 覆盖：标准 **372** 条 · 本机可达 **332** · 不可达 **40** · 机构 **194** · 依赖边 **206**
+- 分层：data 148 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 

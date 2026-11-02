@@ -1971,25 +1971,37 @@ import os, sys
 sys.path.insert(0, os.path.join('desktop', 'src'))
 try:
     from core import protocol_golden as pg
+    from core import standards_coverage as sc
 except Exception as exc:
     print('import 失败：%s' % exc)
     sys.exit(1)
 issues, stats = pg.verify_golden('.')
+standard_issues, standard_report = sc.check('.')
+issues.extend(standard_issues)
 for i in issues:
     print('[FAIL] %s' % i)
+summary = standard_report.get('summary', {})
 print('golden 统计：报告字节 %(report_bytes)d / schema 定义 %(schema_ids)d'
       % stats)
+print('标准四态统计：编目 %(catalogued)s / 绑定 %(bound)s / 断言 %(asserted)s / '
+      '可消费 %(consumable)s / 非域包绑定 %(not_domain_bound)s' % {
+          'catalogued': summary.get('catalogued', '?'),
+          'bound': summary.get('bound', '?'),
+          'asserted': summary.get('asserted', '?'),
+          'consumable': summary.get('consumable', '?'),
+          'not_domain_bound': summary.get('not_domain_bound', '?'),
+      })
 sys.exit(1 if issues else 0)
 PYEOF
     then
-      ok '生成物同仓 golden 一致（A4：schema↔生成物双源可复现，无过期）'
+      ok '生成物同仓 golden + 标准四态账本一致（catalog / binding / assertions / consumers 四方闭环）'
     else
       no "golden 双源校验异常——$(tail -2 "$NFL_TMP"/nf_check31.log | tr '\n' ' ')"; err=1
     fi
   else
     wn 'python3 不在 PATH（跳过 check31）'
   fi
-  if [ "$err" -eq 0 ]; then ok '生成物同仓 golden 门禁全绿（check31：43 A4——生成物双源一致，PASS 47→49）'
+  if [ "$err" -eq 0 ]; then ok '生成物同仓 golden 门禁全绿（check31：43 A4——生成物双源一致 + 标准四态可复算，PASS 47→49）'
   fi
 }
 

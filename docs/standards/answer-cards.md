@@ -2,14 +2,14 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **370** 条 · 本机可达 **332** · 不可达 **38** · 机构 **194** · 依赖边 **206**
-- 分层：data 148 · eng 38 · form 29 · gov 71 · iface 84
+- 覆盖：标准 **372** 条 · 本机可达 **332** · 不可达 **40** · 机构 **194** · 依赖边 **206**
+- 分层：data 148 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。
 
 ## 卡 1 · 哪些标准提供扩展点？
 
-全 **370** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
+全 **372** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
 
 - `http-semantics` · HTTP 语义（RFC 9110） · 扩展点 3：method-registry, field-name-registry, status-code-registry
 - `acme` · ACME 证书签发自动化 · 扩展点 2：challenge-type, identifier-type
@@ -37,7 +37,7 @@
 - **data** 148 条 → `docs/standards/layer-data.md`
 - **eng** 38 条 → `docs/standards/layer-eng.md`
 - **form** 29 条 → `docs/standards/layer-form.md`
-- **gov** 71 条 → `docs/standards/layer-gov.md`
+- **gov** 73 条 → `docs/standards/layer-gov.md`
 - **iface** 84 条 → `docs/standards/layer-iface.md`
 
 ## 卡 3 · 哪些标准被域包绑定、绑了多少次？
@@ -67,7 +67,7 @@
 
 ## 卡 4 · 哪些标准本机不可达？（诚实披露）
 
-共 **38** 条本机探测未达（不假装可达），逐条如下：
+共 **40** 条本机探测未达（不假装可达），逐条如下：
 
 - `arib-ttml` · ARIB 字幕/编成元数据 · HTTP 403 · HTTPError: Forbidden
 - `autosar-ap` · Adaptive Platform · HTTP 0 · URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify fai
@@ -102,6 +102,8 @@
 - `premis` · PREMIS 保存元数据 · HTTP 403 · HTTPError: Forbidden
 - `riff` · RIFF 容器 · HTTP 0 · URLError: <urlopen error [WinError 10054] 远程主机强迫关闭了一个现有的连接。>
 - `opentype` · OpenType 字体 · HTTP 0 · URLError: <urlopen error [WinError 10054] 远程主机强迫关闭了一个现有的连接。>
+- `openssf-osps-baseline` · Open Source Project Security Baseline · HTTP 0 · 本机未对该新增编目项做网络探测
+- `openssf-s2c2f` · Secure Supply Chain Consumption Framework · HTTP 0 · 本机未对该新增编目项做网络探测
 - `iso4217-six` · ISO 4217 货币代码（维护机构版） · HTTP 0 · URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify fai
 - `sunspec` · SunSpec 逆变器模型 · HTTP 403 · HTTPError: Forbidden
 - `archimate` · ArchiMate 3.2 企业架构建模 · HTTP 401 · HTTPError: Unauthorized

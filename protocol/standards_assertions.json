@@ -1,0 +1,250 @@
+{
+  "schema": "nf-standards-assertions/1",
+  "note": "标准实现声明账本。catalogued / domain-bound 由 standards_catalog + standards_binding 派生；asserted 要求正例、负例和仓库证据；consumable 还要求真实调用点。四态只表示仓内证据，不表示第三方认证。",
+  "claims": [
+    {
+      "id": "junit-gate-report",
+      "standard": "junit-xml",
+      "assertion": "42 条静态门禁可稳定生成标准 JUnit XML，并由 CI 留档与 provenance 消费。",
+      "tests": [
+        "desktop/tests/test_gate_report.py::GateReportTest.test_complete_mapping_is_valid_junit",
+        "desktop/tests/test_gate_report.py::GateReportTest.test_rendering_is_deterministic"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_gate_report.py::GateReportTest.test_missing_check_becomes_error_not_silent_pass",
+        "desktop/tests/test_gate_report.py::GateReportTest.test_unknown_check_and_status_fail_closed"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "scripts/gate_report.py",
+        "desktop/tests/test_gate_report.py",
+        "verify.sh"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/gate_report.py",
+          "symbol": "render_junit"
+        },
+        {
+          "path": ".github/workflows/ci-verify.yml",
+          "contains": "verify-junit"
+        }
+      ]
+    },
+    {
+      "id": "slsa-policy-ceiling",
+      "standard": "slsa",
+      "assertion": "SLSA provenance/VSA 形状与等级上限由策略约束，当前树不得虚报 Build L3。",
+      "tests": [
+        "desktop/tests/test_supply_chain_l3.py::VsaPredicateTest.test_predicate_can_only_sign_policy_levels"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_supply_chain_l3.py::VsaPredicateTest.test_l3_policy_is_rejected",
+        "desktop/tests/test_supply_chain_l3.py::ReadinessTest.test_current_tree_never_claims_build_l3"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/supply-chain/verification-policy.json",
+        "packaging/supply-chain/slsa-l3-readiness.json",
+        "scripts/build_vsa.py",
+        "scripts/slsa_l3_readiness.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/build_vsa.py",
+          "symbol": "predicate"
+        },
+        {
+          "path": "scripts/slsa_l3_readiness.py",
+          "symbol": "scan"
+        }
+      ]
+    },
+    {
+      "id": "openssf-osps-evidence",
+      "standard": "openssf-osps-baseline",
+      "assertion": "OSPS L1-L3 活动控制项完整登记，partial/not-applicable 必须保留显式 gap。",
+      "tests": [
+        "desktop/tests/test_supply_chain_standards.py::SupplyChainEvidenceTest.test_controls_cover_every_active_l1_l3_requirement"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_supply_chain_standards.py::SupplyChainEvidenceTest.test_partial_or_na_controls_keep_an_explicit_gap"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/supply-chain/osps-l1-l2.json",
+        "packaging/supply-chain/osps-l3.json",
+        "scripts/supply_chain_policy.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/supply_chain_policy.py",
+          "symbol": "scan"
+        },
+        {
+          "path": ".github/workflows/npm-publish.yml",
+          "contains": "scripts/supply_chain_policy.py"
+        }
+      ]
+    },
+    {
+      "id": "openssf-s2c2f-evidence",
+      "standard": "openssf-s2c2f",
+      "assertion": "S2C2F L1/L2 消费链控制项逐项登记，不可用的部分保留明确 gap。",
+      "tests": [
+        "desktop/tests/test_supply_chain_standards.py::SupplyChainEvidenceTest.test_controls_cover_every_active_l1_l3_requirement"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_supply_chain_standards.py::SupplyChainEvidenceTest.test_partial_or_na_controls_keep_an_explicit_gap"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/supply-chain/s2c2f-l1-l2.json",
+        "scripts/supply_chain_policy.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/supply_chain_policy.py",
+          "symbol": "scan"
+        }
+      ]
+    },
+    {
+      "id": "owasp-asvs-scoped-evidence",
+      "standard": "owasp-asvs",
+      "assertion": "ASVS 5.0 L2 作用域矩阵完整，partial/NA 保留 gap，且禁止伪造认证声明。",
+      "tests": [
+        "desktop/tests/test_asvs_policy.py::AsvsPolicyTest.test_current_matrix_is_complete_and_internally_consistent"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_asvs_policy.py::AsvsPolicyTest.test_false_certification_claim_is_rejected",
+        "desktop/tests/test_asvs_policy.py::AsvsPolicyTest.test_partial_and_na_require_gap_and_evidence"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/security/asvs-5.0.0-l2.json",
+        "desktop/src/core/asvs_policy.py",
+        "docs/asvs.md"
+      ],
+      "consumers": [
+        {
+          "path": "desktop/src/core/asvs_policy.py",
+          "symbol": "scan"
+        },
+        {
+          "path": "scripts/asvs_policy.py",
+          "symbol": "main"
+        }
+      ]
+    },
+    {
+      "id": "openvex-disposition",
+      "standard": "openvex",
+      "assertion": "漏洞处置记录可生成内容寻址的 OpenVEX 0.2.0 文档，非法状态与缺字段 fail-closed。",
+      "tests": [
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_empty_disposition_is_valid_openvex"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_unknown_status_is_rejected",
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_affected_requires_action_statement"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "results/supply-chain/ninfenz.openvex.json",
+        "results/supply-chain/vuln-disposition.json",
+        "scripts/generate_vex.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/generate_vex.py",
+          "symbol": "vex_doc"
+        },
+        {
+          "path": "scripts/generate_vex.py",
+          "symbol": "validate_vex"
+        }
+      ]
+    },
+    {
+      "id": "spdx-3-release-sbom",
+      "standard": "spdx-3",
+      "assertion": "发布构建生成 SPDX 3.0.1 JSON-LD，并校验根包、关系、许可和摘要完整性。",
+      "tests": [
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_expected_release_bundle_is_present_and_verifies"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_checksum_gate_catches_one_byte_tamper"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/npm/tools/build_release.py",
+        "scripts/validate_sboms.py"
+      ],
+      "consumers": [
+        {
+          "path": "packaging/npm/tools/build_release.py",
+          "symbol": "spdx_doc"
+        },
+        {
+          "path": "scripts/validate_sboms.py",
+          "symbol": "validate_spdx3"
+        }
+      ]
+    },
+    {
+      "id": "spdx-license-gate",
+      "standard": "spdx-licenses",
+      "assertion": "供应商与资产许可必须命中 SPDX 词表或显式服务许可，未知许可 fail-closed。",
+      "tests": [
+        "desktop/tests/test_license_gate.py::TestLicenseGate.test_real_repo_declared_rows_pass"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_license_gate.py::TestLicenseGate.test_unknown_license_is_fail",
+        "desktop/tests/test_license_gate.py::TestLicenseGate.test_missing_license_column_value_is_fail"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/license_gate.py",
+        "packaging/supply-chain/suppliers.json"
+      ],
+      "consumers": [
+        {
+          "path": "desktop/src/core/license_gate.py",
+          "symbol": "scan"
+        }
+      ]
+    },
+    {
+      "id": "reproducible-release-artifacts",
+      "standard": "reproducible-builds",
+      "assertion": "npm 与 GitHub Packages 发布包各做两次确定性构建并逐字节比较。",
+      "tests": [
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_second_build_is_byte_identical",
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_metadata_marks_two_builds_and_no_wall_clock"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_checksum_gate_catches_one_byte_tamper"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "packaging/npm/tools/build_release.py",
+        "desktop/tests/test_release_artifacts.py"
+      ],
+      "consumers": [
+        {
+          "path": "packaging/npm/tools/build_release.py",
+          "symbol": "build_variant"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
-# 标准目录 · 层 gov（71 条）
+# 标准目录 · 层 gov（73 条）
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **370** 条 · 本机可达 **332** · 不可达 **38** · 机构 **194** · 依赖边 **206**
-- 分层：data 148 · eng 38 · form 29 · gov 71 · iface 84
+- 覆盖：标准 **372** 条 · 本机可达 **332** · 不可达 **40** · 机构 **194** · 依赖边 **206**
+- 分层：data 148 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
@@ -153,6 +153,12 @@
 
 ### `oecd-privacy`
 - OECD 隐私保护准则 · OECD · 层 gov · 可达 是（200 · 2026-09-24） · 扩展点 principle-set, implementation-guidance · 绑定 主锚 0 / 辅锚 0 · https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0188
+
+### `openssf-osps-baseline`
+- Open Source Project Security Baseline · OpenSSF · 层 gov · 可达 否（0 · ） · 扩展点 maturity-level, control · 绑定 主锚 0 / 辅锚 0 · https://github.com/ossf/security-baseline
+
+### `openssf-s2c2f`
+- Secure Supply Chain Consumption Framework · OpenSSF · 层 gov · 可达 否（0 · ） · 扩展点 level, requirement · 绑定 主锚 0 / 辅锚 0 · https://github.com/ossf/S2C2F
 
 ### `oscal`
 - OSCAL 控制与评估交换 · NIST · 层 gov · 可达 是（200 · 2026-09-24） · 扩展点 model-extension, profile-resolution · 绑定 主锚 0 / 辅锚 0 · https://pages.nist.gov/OSCAL/

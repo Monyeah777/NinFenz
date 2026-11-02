@@ -2,7 +2,7 @@
 # nf-io: inputs=protocol/standards_catalog.json,protocol/standards_binding.json outputs=docs/standards/index.md,docs/standards/answer-cards.md,protocol/geo_export.json,docs/standards/layer-data.md,docs/standards/layer-eng.md,docs/standards/layer-form.md,docs/standards/layer-gov.md,docs/standards/layer-iface.md
 """标准目录 · GEO 出口生成器（check38 子扫描 3）。
 
-定位：把 `protocol/standards_catalog.json`（370 条）+ `protocol/standards_binding.json`（1200 绑定）
+定位：把 `protocol/standards_catalog.json`（372 条）+ `protocol/standards_binding.json`（1200 绑定）
 导出成**生成式引擎可引用**的稳定面。全部是生成物，禁止手写；`--check` 逐字节比对，防漂移。
 
 产物：
