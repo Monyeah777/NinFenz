@@ -618,9 +618,11 @@
     },
     {
       "id": "asset_contract",
-      "issues": 0,
+      "issues": 1,
       "name": "数字资产契约（数据/代码/脚本三面：格式+字段完整性+防篡改+AST 规范+脚本 I/O 对齐）",
-      "sample": [],
+      "sample": [
+        "数据件 protocol/LAYERS.json 摘要不符（记录 0285b8b1fdf2 / 实测 70d4ac0ae5a6）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）"
+      ],
       "source": "asset_contract.scan",
       "stats": {
         "chains": 1,
@@ -631,17 +633,14 @@
         "no_schema": 206,
         "script": 4
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
       "id": "role_coordinates",
-      "issues": 2,
+      "issues": 0,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [
-        "③ verify 件自带写盘入口未登记：desktop/src/core/standards_coverage.py（修复指引：在 roles.write_exceptions 写明理由，或把写入口移出判据面）",
-        "③ 写入口 desktop/src/core/standards_coverage.py 未声明落点件（修复指引：roles.write_exceptions 的值写成 {why, artifact}——写通道必须有契约）"
-      ],
+      "sample": [],
       "source": "role_model.scan",
       "stats": {
         "files": 4107,
@@ -650,13 +649,13 @@
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 11,
-        "write_exceptions": 10
+        "write_exceptions": 11
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     }
   ],
-  "root_digest": "85fff87f8052f40aeda6d646191200a5747e56db8bae5de59b16119bfc409688",
+  "root_digest": "9741f1c23b063e7517ba7b8092f928a856f9cd2c253b202ce95bcb3621cd86e4",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
