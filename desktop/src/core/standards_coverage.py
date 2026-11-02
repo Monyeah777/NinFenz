@@ -33,11 +33,11 @@ def _load(root: Path, rel: str) -> tuple[dict[str, Any] | None, str | None]:
         return None, str(exc)
 
 
-def _symbols(path: Path) -> set[str] | None:
+def _symbols(path: Path) -> set[str]:
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, SyntaxError):
-        return None
+    except (OSError, UnicodeError, SyntaxError) as exc:
+        raise ValueError(f"{path}: 无法解析 Python 符号（修复指引：修复语法或编码）") from exc
     out: set[str] = set()
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -68,9 +68,10 @@ def _check_test_ref(root: Path, rel: str, label: str) -> list[str]:
     path, problem = _safe_file(root, path_raw, label)
     if problem:
         return [problem]
-    symbols = _symbols(path)
-    if symbols is None:
-        return [f"{label}: 测试文件无法解析 AST：{path_raw}"]
+    try:
+        symbols = _symbols(path)
+    except ValueError as exc:
+        return [f"{label}: {exc}"]
     if symbol not in symbols:
         return [f"{label}: 测试方法不存在：{rel}"]
     if not symbol.rsplit(".", 1)[-1].startswith("test_"):
@@ -88,9 +89,10 @@ def _check_consumer(root: Path, rel: str, label: str) -> list[str]:
     symbol = str(rel.get("symbol") or "")
     contains = str(rel.get("contains") or "")
     if symbol:
-        symbols = _symbols(path)
-        if symbols is None:
-            return [f"{label}: consumer 文件无法解析 AST：{path_raw}"]
+        try:
+            symbols = _symbols(path)
+        except ValueError as exc:
+            return [f"{label}: {exc}"]
         if symbol not in symbols:
             return [f"{label}: consumer symbol 不存在：{path_raw}::{symbol}"]
         return []
