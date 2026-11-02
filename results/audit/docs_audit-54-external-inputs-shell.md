@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:5aa66cab0df22d0ae287355756cedad518cc4ecad003e51b4a6c99996a7293ae
+  - CONTRIBUTING.md:6c571602fadaa60b40ec402bb2f363b839362ed37a4bebf1cb376bbc64a69619
   - skills/ninfenz/SKILL.md:5ef5858a08e6fd76a7cdee201938e0140e05257a7759a3ab27c05f9339109197
   - library/INDEX.md:ac0bcadbfd9019931e8e8a2f2739dd6603c73fe5b32950b8c80a2eb007c5761b
 
 ---
+> 重审（2026-11-02）：2026-11-02 repository governance map: align PR/CLA workflow with protected main; existing external-input audit conclusion remains valid
+
 > 重审（2026-10-25）：CONTRIBUTING 补 inbound=outbound 口径
 
 > 重审（2026-10-25）：CLA 替代 DCO + FAQ 引用 + 免责与参考价

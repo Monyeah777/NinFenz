@@ -11,10 +11,11 @@
 - [ ] `changes/unreleased/<日期或主题>.md` 已写（`type:` / `note:` 两行——发布收口由 `nf release` 归档进 CHANGELOG，不再手改 CHANGELOG）
 
 ## 贡献者条款
-- [ ] 提交已 `git commit -s` 签署 DCO（`Signed-off-by:`；见 CONTRIBUTING 贡献者条款）
+- [ ] 我已按 `CLA.md` 的 SUBMISSION_INSTRUCTIONS 完成 CLA 签署
+- [ ] 提交已使用 `git commit -s`（`Signed-off-by:` 为来源追踪补充，不替代 CLA；见 `CONTRIBUTING.md` §7）
 
 ## 变更摘要
 （一句话 + 关键文件列表）
 
 ## 关联 Issue
-Fixes # / Closes #
+Fixes # / Closes # / Refs #

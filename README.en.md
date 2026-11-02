@@ -70,6 +70,8 @@ Details: `tui/README.md`.
 
 **What it is not**: not a model, not a prompt-template collection, not a vendor SDK — the protocol itself is domain-neutral and model-agnostic, and MCP is just one supported connection protocol.
 
+**Repository governance map**: start at [docs/README.md](docs/README.md) for the canonical rules, navigation, status and history entry points.
+
 `bash verify.sh`（check 数与脚本版本以生成的统计区为准；本文档不钉运行时计数） · `python scripts/nf.py stats --check`
 
 > **Bilingual rule**: this file mirrors `README.md` section by section; the Chinese `README.md` is authoritative. The machine-checkable facts (version, check count, PASS baseline, protocol files, machine entries) are asserted identical by `verify.sh` check34 — a drift fails the gate.
