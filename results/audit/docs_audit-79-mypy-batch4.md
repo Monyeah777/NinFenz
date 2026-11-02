@@ -9,7 +9,7 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
   - desktop/src/core/asset_contract.py:dc7f81200d97c4fbcc71427c992d853d0cf3fade619aec309342c09f376e6920
-  - protocol/code_metrics_baseline.json:0c6163a236621ac9c3da4af5f8f71064bb7108c5ffb5819013232c7fb593d75d
+  - protocol/code_metrics_baseline.json:5b34a9b55c7ab80d2de017a90d4270a225055d1210b0ba1a1cc7fed6829a67b1
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑

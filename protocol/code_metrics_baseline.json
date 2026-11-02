@@ -1215,6 +1215,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 35
     },
+    "desktop/src/core/standards_coverage.py": {
+      "lines": 425,
+      "max_fn_cc": 16,
+      "max_fn_lines": 88
+    },
     "desktop/src/core/state_front.py": {
       "lines": 150,
       "max_fn_cc": 21,
@@ -1311,7 +1316,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 238,
+      "lines": 240,
       "max_fn_cc": 10,
       "max_fn_lines": 29
     },
@@ -1594,6 +1599,11 @@
       "lines": 82,
       "max_fn_cc": 15,
       "max_fn_lines": 35
+    },
+    "scripts/standards_coverage.py": {
+      "lines": 58,
+      "max_fn_cc": 8,
+      "max_fn_lines": 31
     },
     "scripts/standards_map.py": {
       "lines": 197,
