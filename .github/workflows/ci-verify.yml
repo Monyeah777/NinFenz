@@ -76,8 +76,7 @@ jobs:
           # `set -o pipefail` 保证 verify.sh 的退出码不被 tee 吞掉。
           set -o pipefail
           mkdir -p .nf-logs .artifacts  # 均被 .gitignore 覆盖，不进全仓件集合
-          bash verify.sh --checks-only --no-cache --report-out .artifacts/verify-junit.xml \
-            2>&1 | tee .nf-logs/verify-checks.log
+          bash verify.sh --checks-only --no-cache --report-out .artifacts/verify-junit.xml 2>&1 | tee .nf-logs/verify-checks.log
       - name: 上传 JUnit 门禁报告
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4

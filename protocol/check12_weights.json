@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-10-28",
+  "measured_at": "2026-11-02",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -119,6 +119,7 @@
     "test_gate_faces": 0.2,
     "test_gate_graph": 0.2,
     "test_gate_observe": 1.8,
+    "test_gate_report": 0.5,
     "test_gate_router": 0.2,
     "test_gate_select": 0.2,
     "test_gate_verdict": 0.2,
@@ -1504,6 +1505,12 @@
     "test_gate_observe.ObserveOneTest.test_missing_module_is_marked": 0.09,
     "test_gate_observe.ObserveOneTest.test_red_module_is_marked": 0.1,
     "test_gate_observe.ObserveOneTest.test_timeout_is_enforced_and_says_so": 1.02,
+    "test_gate_report.GateReportTest.test_cli_writes_report_and_returns_failure_for_failed_check": 0.03,
+    "test_gate_report.GateReportTest.test_complete_mapping_is_valid_junit": 0.0,
+    "test_gate_report.GateReportTest.test_malformed_record_fails_closed": 0.0,
+    "test_gate_report.GateReportTest.test_missing_check_becomes_error_not_silent_pass": 0.0,
+    "test_gate_report.GateReportTest.test_rendering_is_deterministic": 0.0,
+    "test_gate_report.GateReportTest.test_unknown_check_and_status_fail_closed": 0.0,
     "test_gate_router.MutationTest.test_culling_unsafe_is_caught": 0.01,
     "test_gate_router.MutationTest.test_dormant_without_reason_is_caught": 0.01,
     "test_gate_router.MutationTest.test_missing_expert_is_caught": 0.01,
@@ -3793,5 +3800,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 956.9
+  "total_s": 957.4
 }
