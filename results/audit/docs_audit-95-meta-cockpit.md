@@ -1,33 +1,49 @@
 ---
 id: AUD-0047
 title: 元认知生产驾驶舱主仓融合
-date: 2026-10-29
-scope: 将元原子运行时、动态驾驶、事件溯源、上下文预算、A/B 与正式协议融合进主仓；不调用外部模型，不伪造 HR-001。
+date: 2026-10-30
+scope: 将元原子运行时、动态驾驶、事件溯源、上下文预算、A/B 与正式协议融合进主仓；并收口桥接 Path 参数根相对/类型闸门、包入口惰性加载、生成物原子写与 manifest 可复算；不调用外部模型，不伪造 HR-001。
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/cli_bridge.py:846d3097297b24cf10d83925adeaac98085083bd4ce4524699b23fcdc9e79e49
+  - desktop/src/core/cli_bridge.py:4247ed0e73dfc1ca319f6b9881f3b73a875b01ee6b24eda3d4fe861736cadad8
+  - desktop/src/core/meta_cockpit/__init__.py:f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7
+  - desktop/src/core/meta_cockpit/build_atom_menu.py:1bedd2efd340114f91442a41b6319f7a9e7f962996d49f656a132e45988dbf95
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
-  - desktop/src/core/meta_cockpit/cockpit_ab.py:ae7a62ad3d3040c750a4b8a07794ae350bc5660e7f19679cb9330646cf32d04f
+  - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
   - desktop/src/core/terminal.py:200c9ba8661ad8cf7b182c45d86aa94f4fcc0a6a5b9d2867b719f5c447305a25
-  - desktop/tests/test_meta_cockpit.py:624f21f1e3bbb7bd40cb48bd028114b034e829d720020f2dd159c49d47ccc3af
-  - desktop/tests/test_nf_cli.py:3544e66fa9081d201c47f59b15376d16abaa2eeba50491a9e69e1fd3d3aa239f
-  - scripts/nf.py:a8d4e2f6170d01cfe63387bc1a58c368ead723bc874d15a8db445813e89b8ec6
+  - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
+  - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
+  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
+  - scripts/nf.py:c9fa145a18d58d87a802dd67c4af398a73aa61167c73c2f82613d05afa1ae515
   - tui/_surface.py:6b688fcd5c75248dbc5a496bb9c66a8e1c612d339392afaafa488a0cfe843ec9
   - protocol/check12_weights.json:744258fe3a1da9ed6e071618f4d9916d6107b1404b6489f55630cf3431f65397
-  - protocol/coupling_baseline.json:c77bf864d3191b2364ff184168fc4978162e33c46853bfcb65987a62e54c9cc5
-  - docs/meta-cockpit/README.md:fa04c0f21d01dbbfa96149190a76bd43aa44be22ca1e806662c3789296ff4518
-  - results/meta-cockpit-manifest.json:dfb177bd9cfc8afda01544305c73852224ca2bd790c1fd213d715a33ff6ba87d
+  - protocol/coupling_baseline.json:65ef6388ebda5fd11e3f75407e761cf525da03b0107e9c7f80cea1a46296cbbf
+  - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
+  - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
+  - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
+
+> 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
+
+> 重审（2026-10-30）：桥接 Path 参数统一根相对与类型闸门；公共子模块惰性加载；生成菜单原子写；入仓 manifest 增加实时复算判据
+
+> 重审（2026-10-29）：CLI 命令树无损分组、meta-cockpit 接线与恢复分支全量验证后重绑；既有结论不变
+
+> 重审（2026-10-29）：恢复分支全量验证：纯度修复、零引用清理、public API 接线、ReDoS/CLI 闸门/文档路径与模板示例修复
+
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
+
 
 # 元认知生产驾驶舱主仓融合审计
 
-> 日期：2026-10-29
+> 日期：2026-10-30
 > 范围：`desktop/src/core/meta_cockpit/`、CLI 桥、终端命令族与自动化测试
-> Machine digest：`e2efe89661c386cd7b282992cdf833776d0840925f27152b44dbac5a1b0219c9`
-> Manifest digest：`234905086b2c7dfb76ccf254b304a4ea7f3d06a1983f18bd23731b585aeeebda`
+> Machine digest：`59357b7056a68bfbd64cdd85333aadfb95c34fdf06f1216563cee56f5e01ce5c`
+> Manifest digest：`c9469a7f54041e7c041e353a768bad98054b72bcb4775639f7463754b985abfc`
 
 ## 结果
 

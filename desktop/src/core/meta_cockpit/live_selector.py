@@ -270,17 +270,6 @@ def candidate_families(
     return result
 
 
-def candidate_cache_stats() -> dict:
-    return {**_CACHE_STATS, "size": len(_CANDIDATE_CACHE), "limit": CACHE_LIMIT}
-
-
-def candidate_cache_clear() -> None:
-    _CANDIDATE_CACHE.clear()
-    for key in _CACHE_STATS:
-        _CACHE_STATS[key] = 0
-    _LAST_SEARCH_STATS.clear()
-
-
 def search_stats() -> dict:
     return copy.deepcopy(_LAST_SEARCH_STATS)
 
@@ -296,24 +285,6 @@ def candidates(
         max_cost=max_cost,
         beam_width=beam_width,
     )["direct"]
-
-
-def progress_candidates(
-    s: dict, max_len: int = 3, limit: int = 12, max_cost: int = 3, beam_width: int = 192
-) -> list[dict]:
-    """返回会扩展能力状态面的候选，包括不直接兑现 need 的准备态。
-
-    `resolves` 仍是结构缺口，不是质量分；准备态必须至少新增或移除一个
-    当前契约键，否则不会进入候选，保证有限状态上不会空转。
-    """
-    return candidate_families(
-        s,
-        max_len=max_len,
-        direct_limit=0,
-        progress_limit=limit,
-        max_cost=max_cost,
-        beam_width=beam_width,
-    )["progress"]
 
 
 def select(s: dict, max_cost: int = 3) -> dict:

@@ -56,7 +56,3 @@ def build_contract(candidate: dict, profile: dict | None = None) -> dict:
         "closure_rules": sorted(set(closure)),
         "patch_required": False,
     }
-
-
-def build_contracts(candidates: list[dict], profile: dict | None = None) -> list[dict]:
-    return [build_contract(candidate, profile=profile) for candidate in candidates]

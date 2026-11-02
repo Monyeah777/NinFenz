@@ -19,6 +19,7 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # argparse 的每个**内建** help 串都要过一次 `gettext.translation`（本机实测：建一次命令面 **432 次
@@ -69,26 +70,7 @@ def _build_parser() -> argparse.ArgumentParser:
     return _PARSER_CACHE
 
 
-def _make_parser() -> argparse.ArgumentParser:
-    """真正构建 argparse 命令面（**只在缓存未命中时调用一次**——见 `_build_parser`）。"""
-    p = argparse.ArgumentParser(
-        prog="nf", description=(
-            "NinFenz 全链管道（B2：retrieve→compose→gate→export）。"
-            "分层引导（40 总纲 v2.8 波B S7）：作者五分钟上手 = run / demo / pipeline new；"
-            "开发者与仓库治理工具族 = asset / module / register / market / spec / render / serve / "
-            "design / audit / who-refers / impact / rename / import——README「五分钟快速开始」"
-            "含逐条示例。"),
-        epilog=NF_CLI_EPILOG,
-    )
-    p.add_argument("--version", action="version",
-                   version="nf %s" % NF_CLI_VERSION,
-                   help="显示版本号后退出")
-    p.add_argument("--engine", dest="engine", default=None,
-                   choices=("python", "rust", "auto"),
-                   help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
-                        "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
-                        "python）。NF_ENGINE 环境变量可作缺省。")
-    sub = cli_bridge.subparsers(p)
+def _add_parser_base(sub):
     st = sub.add_parser("stats",
  help="自述数字实算与生成（README/README.en/llms.txt 的 marker 区）",
                         description="出口自动化：README/README.en/llms.txt 的数字由产物实算生成，禁"
@@ -266,6 +248,9 @@ def _make_parser() -> argparse.ArgumentParser:
                       help="Store 工作区目录（缺省=临时）")
 
     # nf asset：资产供应链台账（40 总纲 v2.7 波 A S2——add/verify/inventory/ls/rm/deprecate/restore）
+
+
+def _add_parser_catalog(sub):
     ast = sub.add_parser("asset",
                          help="资产供应链台账（S2：add 入库 / verify 闭合 / inventory 盘点 / ls 浏"
                              "览 / rm 摘除 / deprecate·restore 流转）",
@@ -377,6 +362,9 @@ def _make_parser() -> argparse.ArgumentParser:
                          help="provenance.json 路径（如 05_资产库/provenance.json）")
         _sp.add_argument("--key", required=True, help="溯源键")
     # ---- v2.8.0 波B S4：管线脚手架 ----
+
+
+def _add_parser_production(sub):
     pln = sub.add_parser("pipeline",
                          help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
  description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
@@ -492,6 +480,9 @@ def _make_parser() -> argparse.ArgumentParser:
     at.add_argument("--selfcheck", action="store_true",
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _add_parser_validation(sub):
     sc = sub.add_parser("score",
                         help="基线相对回归评分（Codecov 式：当前 vs 基线，no silent worsening）",
                         description="基线相对回归评分（内部差距：现有门禁全为绝对门，无 delta/回归"
@@ -709,6 +700,9 @@ def _make_parser() -> argparse.ArgumentParser:
         _p3.add_argument("--store", default="", metavar="NF_HOME",
                          help="预设库根（缺省 = NF_HOME，即 ~/.NinFenz 或 NARRATIVE_FORGE_HOME）")
         _p3.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _add_parser_integration(sub):
     bn = sub.add_parser("bench",
                         help="执行结果跑分台（对 agent 产物五维确定性评分；多跑可比对）",
                         description="执行结果跑分台（机制借鉴 ACP benchmark suite：外部实测的容器）")
@@ -932,6 +926,9 @@ def _make_parser() -> argparse.ArgumentParser:
     rv.add_argument("--timeout", type=float, default=120.0, help="适配器超时秒")
     rv.add_argument("--write", default="", help="把审查报告写入路径（不得写 protocol/）")
     rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _add_parser_governance(sub):
     kn = sub.add_parser("knowledge",
                         help="双源知识层（权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性）",
                         description="双源知识层（机制借鉴一句式：编译时机按数据域选择）")
@@ -1041,10 +1038,12 @@ def _make_parser() -> argparse.ArgumentParser:
     for _p in (l_ls, l_sh, l_ri, l_vf, l_se, l_dp, l_rs, l_sp, l_at, l_rc):
         _p.add_argument("--json", action="store_true", help="输出结构化 JSON")
     df = sub.add_parser("diff",
-                        help="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）",
- description="版本差异检测（41 波C C2：两份签名/文档 → 字段级差异 + 兼容判定）")
-    df.add_argument("a", help="签名 A 的文档 md 路径")
-    df.add_argument("b", help="签名 B 的文档 md 路径")
+                        help="差异与契约历史（双文件字段级差异 / Git 历史演进时间线）",
+ description="差异与契约历史（双文件字段级差异 + 兼容判定；--history 从 Git 重建契约演进）")
+    df.add_argument("a", nargs="?", help="签名 A 的文档路径；--history 时收契约路径")
+    df.add_argument("b", nargs="?", help="签名 B 的文档路径")
+    df.add_argument("--history", type=int, metavar="N",
+                    help="从 Git 历史重建契约演进时间线（最多 N 次提交）")
     df.add_argument("--json", action="store_true", help="输出结构化差异 JSON")
     ex = sub.add_parser("explain",
                         help="check 修复指引（41 波C C5：缺什么/补什么/示例 三段式）",
@@ -1154,6 +1153,9 @@ def _make_parser() -> argparse.ArgumentParser:
     loc.add_argument("--json", action="store_true", help="机读输出（issues + stats）")
     loc.add_argument("--write", action="store_true",
                      help="重签文档译件的 source_sha256（写 protocol/locales.json）")
+
+
+def _add_parser_terminal(sub):
     tf = sub.add_parser("toolface",
                         help="模块工具面浏览（45：machine_contract.tool_face 可选建议层，AI 裁量不"
                             "入门禁）",
@@ -1322,6 +1324,35 @@ def _make_parser() -> argparse.ArgumentParser:
 
     # NFA-L（声明式 + 命令式混合）：guard 表达式 解析/检查/编译/求值。
     # 命令面实现收在 core.nfal_cli（此处只做入口，避免与 nf 命令面重复定义旗标）。
+
+
+def _make_parser() -> argparse.ArgumentParser:
+    """真正构建 argparse 命令面（**只在缓存未命中时调用一次**——见 `_build_parser`）。"""
+    p = argparse.ArgumentParser(
+        prog="nf", description=(
+            "NinFenz 全链管道（B2：retrieve→compose→gate→export）。"
+            "分层引导（40 总纲 v2.8 波B S7）：作者五分钟上手 = run / demo / pipeline new；"
+            "开发者与仓库治理工具族 = asset / module / register / market / spec / render / serve / "
+            "design / audit / who-refers / impact / rename / import——README「五分钟快速开始」"
+            "含逐条示例。"),
+        epilog=NF_CLI_EPILOG,
+    )
+    p.add_argument("--version", action="version",
+                   version="nf %s" % NF_CLI_VERSION,
+                   help="显示版本号后退出")
+    p.add_argument("--engine", dest="engine", default=None,
+                   choices=("python", "rust", "auto"),
+                   help="判据引擎：python（真源，缺省）/ rust（engine/rust 只读快线，需 nf-rs 二进制"
+                        "在场，否则回退 python）/ auto（二进制在场且已逐字节对账的面走 rust，其余 "
+                        "python）。NF_ENGINE 环境变量可作缺省。")
+    sub = cli_bridge.subparsers(p)
+    _add_parser_base(sub)
+    _add_parser_catalog(sub)
+    _add_parser_production(sub)
+    _add_parser_validation(sub)
+    _add_parser_integration(sub)
+    _add_parser_governance(sub)
+    _add_parser_terminal(sub)
     nfl = sub.add_parser("nfal",
                          help="NFA-L 装配语言：guard 表达式 解析/检查/编译/求值（声明层借 YAML/IDL"
                              "）",
@@ -4593,7 +4624,9 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "state", "state_path", "key_file", "ssh_key", "ssh_allowed_signers",
                     "registry", "root", "case", "exceptions", "check_file", "check_md",
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
-                    "baseline", "pipeline", "questions")
+                    "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
+                    "handoff_out", "manifest_out", "context_dir", "responses",
+                    "experiment", "ballots", "bundle")
 
 
 def _path_writing_issue(args) -> str:
@@ -4607,7 +4640,10 @@ def _path_writing_issue(args) -> str:
     from core import paths as _p
     for dest in _PATH_FLAG_DESTS:
         val = getattr(args, dest, "")
-        if not isinstance(val, str) or not val.strip() or os.path.isabs(val):
+        if not isinstance(val, (str, os.PathLike)):
+            continue
+        val = os.fspath(val)
+        if not val.strip() or os.path.isabs(val):
             continue
         try:
             _p.validate_path(ROOT, val)
@@ -4631,9 +4667,11 @@ _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私�
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
-                    "questions", "registry", "root", "runs", "script_file", "snapshot",
+                    "prompt_file", "questions", "registry", "root", "runs", "script_file",
+                    "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
-                    "target", "template", "tier", "trace", "verify")
+                    "target", "template", "tier", "trace", "verify",
+                    "injections", "journal", "responses", "experiment", "ballots", "bundle")
 
 
 def _utf8_text_issue(args) -> str:
@@ -4650,7 +4688,10 @@ def _utf8_text_issue(args) -> str:
         # 位置参数可以是**列表**（`nf lint a.md b.md` 的 `target` 是 `nargs="*"`）——两条形态都判。
         values = raw if isinstance(raw, (list, tuple)) else [raw]
         for val in values:
-            if not isinstance(val, str) or not val.strip():
+            if not isinstance(val, (str, os.PathLike)):
+                continue
+            val = os.fspath(val)
+            if not val.strip():
                 continue
             path = val if os.path.isabs(val) else os.path.join(ROOT, val)
             if not os.path.isfile(path):
@@ -5402,42 +5443,9 @@ def _cmd_score(args):
 
 
 def _cmd_diff(args):
-    """nf diff：41 波C C2 —— 结构化差异 + 兼容判定。"""
-    from core import knowledge_sig as ks
-    import json as _json
-    try:
-        # 形状闸门（2026-09-30）：`nf diff <目录> <目录>` 此前落到读盘抛
-        # `[Errno 13] Permission denied: '<作者机绝对路径>'`，无指引（`_rel_to_root` 只判在场）。
-        for side, val in (("a", args.a), ("b", args.b)):
-            sp = val if os.path.isabs(val) else os.path.join(ROOT, val)
-            if not os.path.isfile(sp):
-                return _machine_fail(
-                    args, "签名目标不是文件：%s=%s（修复指引：`nf diff a b` 各收**一份文件**"
-                          "（01-36 文档 / 管线 / 模块 md，已挂签名的件）；缺省签名面用 "
-                          "`nf sig`）" % (side, val))
-        ra = _rel_to_root(args.a)
-        rb = _rel_to_root(args.b)
-        diff = ks.diff_signatures(ks.build_signature(ra, ROOT),
-                                 ks.build_signature(rb, ROOT))
-        if args.json:
-            print(_json.dumps({"kind": "diff", **diff},
-                              ensure_ascii=False, indent=2, sort_keys=True))
-        else:
-            print("== nf diff ==")
-            print("  %s  →  %s" % (diff["from"], diff["to"]))
-            if not diff["changes"]:
-                print("  无字段差异（两份签名一致）")
-            for c in diff["changes"]:
-                print("  [%s] %s  %r → %r" % (c["kind"], c["field"], c["from"], c["to"]))
-            print("  判定：%s" % diff["verdict"])
-            impact = diff.get("impact", "editorial")
-            label = {"bump": "结构性（须 bump + 迁移记录）",
-                     "additive": "字段级新增（V1 只增不删）",
-                     "editorial": "措辞/编辑（无契约影响）"}.get(impact, impact)
-            print("  影响度：%s（%s）" % (impact, label))
-        return 0
-    except (OSError, ValueError) as exc:
-        return _machine_fail(args, str(exc))
+    """nf diff：结构化差异、兼容判定与契约演进时间线。"""
+    from core import contract_history
+    return contract_history.run(args, ROOT)
 
 def _cmd_explain(args):
     """nf explain：41 波C C5 —— check 修复指引（缺什么/补什么/示例）。"""
@@ -7232,8 +7240,18 @@ def _cmd_stats(args) -> int:
     return 1 if issues else 0
 
 
+def _resolve_bridge_paths(args):
+    """Resolve bridged `Path` arguments against the repository root."""
+    for dest in _PATH_FLAG_DESTS:
+        value = getattr(args, dest, None)
+        if isinstance(value, os.PathLike) and not os.path.isabs(os.fspath(value)):
+            setattr(args, dest, Path(ROOT) / value)
+    return args
+
+
 def _cmd_nfal(args) -> int:
     """Dispatch optional command families kept outside the main CLI body."""
+    _resolve_bridge_paths(args)
     return cli_bridge.run(args)
 
 
@@ -7284,6 +7302,76 @@ def _try_rust_face(args) -> Optional[int]:
     sys.stdout.buffer.write(out)
     sys.stdout.buffer.flush()
     return 0
+
+
+_COMMAND_HANDLERS = {
+    "shell": _cmd_shell, "terminal": _cmd_shell,
+    "layers": _cmd_layers,
+    "verify": _cmd_verify,
+    "daemon": _cmd_daemon,
+    "help": _cmd_help,
+    "stats": _cmd_stats,
+    "doctor": _cmd_doctor,
+    "completion": _cmd_completion,
+    "assemble": _cmd_assemble,
+    "preset": _cmd_preset,
+    "release": _cmd_release,
+    "changelog": _cmd_changelog,
+    "locales": _cmd_locales,
+    "toolface": _cmd_toolface,
+    "worldmodel": _cmd_worldmodel,
+    "register": _cmd_register,
+    "asset": _cmd_asset,
+    "pipeline": _cmd_pipeline,
+    "module": _cmd_module,
+    "sig": _cmd_sig,
+    "attest": _cmd_attest,
+    "score": _cmd_score,
+    "lint": _cmd_lint,
+    "lsp": _cmd_lsp,
+    "license": _cmd_license,
+    "telemetry": _cmd_telemetry,
+    "library": _cmd_library,
+    "conformance": _cmd_conformance,
+    "approve": _cmd_approve,
+    "events": _cmd_events,
+    "receipts": _cmd_receipts,
+    "driver": _cmd_driver,
+    "rfc": _cmd_rfc,
+    "patterns": _cmd_patterns,
+    "bench": _cmd_bench,
+    "endpoint": _cmd_endpoint,
+    "interop": _cmd_interop,
+    "transparency": _cmd_transparency,
+    "output": _cmd_output,
+    "domain": _cmd_domain,
+    "combine": _cmd_combine,
+    "decide": _cmd_decide,
+    "workloop": _cmd_workloop,
+    "review": _cmd_review,
+    "knowledge": _cmd_knowledge,
+    "assertions": _cmd_assertions,
+    "model": _cmd_model,
+    "decisions": _cmd_decisions,
+    "handover": _cmd_handover,
+    "postmortem": _cmd_postmortem,
+    "audit": _cmd_audit,
+    "cognition": _cmd_cognition,
+    "st-validate": _cmd_st_validate,
+    "state-front": _cmd_state_front,
+    "diff": _cmd_diff,
+    "related": _cmd_related,
+    "explain": _cmd_explain,
+    "demo": _cmd_demo,
+    "market": _cmd_market,
+    "who-refers": _cmd_who_refers,
+    "impact": _cmd_impact,
+    "rename": _cmd_rename,
+    "import": _cmd_import,
+    "spec": _cmd_spec,
+    "render": _cmd_render,
+    "serve": _cmd_serve,
+}
 
 
 def main(argv=None) -> int:
@@ -7350,138 +7438,9 @@ def main(argv=None) -> int:
     _rust_rc = _try_rust_face(args)
     if _rust_rc is not None:
         return _rust_rc
-    if args.cmd in ("shell", "terminal"):
-        return _cmd_shell(args)
-    if args.cmd == "layers":
-        return _cmd_layers(args)
-    if args.cmd == "verify":
-        return _cmd_verify(args)
-    if args.cmd == "daemon":
-        return _cmd_daemon(args)
-    if args.cmd == "help":
-        return _cmd_help(args)
-    if args.cmd == "stats":
-        return _cmd_stats(args)
-    if args.cmd == "doctor":
-        return _cmd_doctor(args)
-    if args.cmd == "completion":
-        return _cmd_completion(args)
-    if args.cmd == "assemble":
-        return _cmd_assemble(args)
-    if args.cmd == "preset":
-        return _cmd_preset(args)
-    if args.cmd == "release":
-        return _cmd_release(args)
-    if args.cmd == "changelog":
-        return _cmd_changelog(args)
-    if args.cmd == "locales":
-        return _cmd_locales(args)
-    if args.cmd == "toolface":
-        return _cmd_toolface(args)
-    if args.cmd == "worldmodel":
-        return _cmd_worldmodel(args)
-    if args.cmd == "register":
-        return _cmd_register(args)
-    if args.cmd == "asset":
-        return _cmd_asset(args)
-    if args.cmd == "pipeline":
-        return _cmd_pipeline(args)
-    if args.cmd == "module":
-        return _cmd_module(args)
-    if args.cmd == "sig":
-        return _cmd_sig(args)
-    if args.cmd == "attest":
-        return _cmd_attest(args)
-    if args.cmd == "score":
-        return _cmd_score(args)
-    if args.cmd == "lint":
-        return _cmd_lint(args)
-    if args.cmd == "lsp":
-        return _cmd_lsp(args)
-    if args.cmd == "license":
-        return _cmd_license(args)
-    if args.cmd == "telemetry":
-        return _cmd_telemetry(args)
-    if args.cmd == "library":
-        return _cmd_library(args)
-    if args.cmd == "conformance":
-        return _cmd_conformance(args)
-    if args.cmd == "approve":
-        return _cmd_approve(args)
-    if args.cmd == "events":
-        return _cmd_events(args)
-    if args.cmd == "receipts":
-        return _cmd_receipts(args)
-    if args.cmd == "driver":
-        return _cmd_driver(args)
-    if args.cmd == "rfc":
-        return _cmd_rfc(args)
-    if args.cmd == "patterns":
-        return _cmd_patterns(args)
-    if args.cmd == "bench":
-        return _cmd_bench(args)
-    if args.cmd == "endpoint":
-        return _cmd_endpoint(args)
-    if args.cmd == "interop":
-        return _cmd_interop(args)
-    if args.cmd == "transparency":
-        return _cmd_transparency(args)
-    if args.cmd == "output":
-        return _cmd_output(args)
-    if args.cmd == "domain":
-        return _cmd_domain(args)
-    if args.cmd == "combine":
-        return _cmd_combine(args)
-    if args.cmd == "decide":
-        return _cmd_decide(args)
-    if args.cmd == "workloop":
-        return _cmd_workloop(args)
-    if args.cmd == "review":
-        return _cmd_review(args)
-    if args.cmd == "knowledge":
-        return _cmd_knowledge(args)
-    if args.cmd == "assertions":
-        return _cmd_assertions(args)
-    if args.cmd == "model":
-        return _cmd_model(args)
-    if args.cmd == "decisions":
-        return _cmd_decisions(args)
-    if args.cmd == "handover":
-        return _cmd_handover(args)
-    if args.cmd == "postmortem":
-        return _cmd_postmortem(args)
-    if args.cmd == "audit":
-        return _cmd_audit(args)
-    if args.cmd == "cognition":
-        return _cmd_cognition(args)
-    if args.cmd == "st-validate":
-        return _cmd_st_validate(args)
-    if args.cmd == "state-front":
-        return _cmd_state_front(args)
-    if args.cmd == "diff":
-        return _cmd_diff(args)
-    if args.cmd == "related":
-        return _cmd_related(args)
-    if args.cmd == "explain":
-        return _cmd_explain(args)
-    if args.cmd == "demo":
-        return _cmd_demo(args)
-    if args.cmd == "market":
-        return _cmd_market(args)
-    if args.cmd == "who-refers":
-        return _cmd_who_refers(args)
-    if args.cmd == "impact":
-        return _cmd_impact(args)
-    if args.cmd == "rename":
-        return _cmd_rename(args)
-    if args.cmd == "import":
-        return _cmd_import(args)
-    if args.cmd == "spec":
-        return _cmd_spec(args)
-    if args.cmd == "render":
-        return _cmd_render(args)
-    if args.cmd == "serve":
-        return _cmd_serve(args)
+    handler = _COMMAND_HANDLERS.get(args.cmd)
+    if handler is not None:
+        return handler(args)
     if args.cmd == "design":
         if args.design_cmd == "audit":
             # 注意：这里必须指向 **design audit** 实现（1226 段）——此前与 `nf audit`

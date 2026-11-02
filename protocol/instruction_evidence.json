@@ -3,23 +3,23 @@
     "code_metrics": {
       "cmd": "python scripts/code_metrics.py",
       "exit_code": 0,
-      "output_sha256": "8d732d3b7d846193b3843d763003c066a5ba020469ce52014aaabd9392baa33f",
-      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 309（基线 309）· 最大行数 7646 · 最长函数 1263 行 · 最大圈复杂度 116",
-      "ran_at": "2026-10-25"
+      "output_sha256": "0c9147559d11a849c3e55b6bba0e620bad4baceb40a109fbcc993d3ea4d3288c",
+      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 314（基线 314）· 最大行数 7602 · 最长函数 318 行 · 最大圈复杂度 106",
+      "ran_at": "2026-11-02"
     },
     "conformance": {
       "cmd": "python scripts/nf.py conformance",
       "exit_code": 0,
-      "output_sha256": "2ac7cb05743b693c5da8ec3a27836fe9496e3381d161abcb2cd745629c77130f",
+      "output_sha256": "7509ae691dc8752bf7f17951fa98487f71fa9800f4abf241fc21ce8b91905f00",
       "output_tail": "  ✓ mcp-package                    工具 12 · 提示 1 · 类目 content-creation · 目标平台 4\n  ✓ state-front                    单件 0 · 族规则 1 · 族成员 3\n  ✓ public-surface                 公开导出面零泄漏",
-      "ran_at": "2026-10-25"
+      "ran_at": "2026-11-02"
     },
     "e2e": {
       "cmd": "python scripts/e2e_desktop_headless.py",
       "exit_code": 0,
       "output_sha256": "20633b1d36f6bbaef8eb1a63ec69e5457e62dc01eb8400f9398ae5393f252c48",
       "output_tail": "[产物] <path> 字节）\n\n★ E2E DESKTOP HEADLESS PASSED ✓（官方13件 + M91/M92 + P04 → 装配 → 生成 → 断言全绿）",
-      "ran_at": "2026-10-25"
+      "ran_at": "2026-11-02"
     },
     "release": {
       "cmd": "python scripts/nf.py release",
@@ -31,16 +31,16 @@
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
       "exit_code": 0,
-      "output_sha256": "3b4d00ad68cbf724fdfd5eaae166b1ed5a6a9fa03523945e06a0f6837994b4dd",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 28 · FAIL 1 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
-      "ran_at": "2026-10-25"
+      "output_sha256": "9d31434a7ca350fcac5889237c95c5f2923fcf4e8ef414e0530af88a1327af26",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
+      "ran_at": "2026-11-02"
     },
     "stats_check": {
       "cmd": "python scripts/nf.py stats --check",
       "exit_code": 0,
       "output_sha256": "0d1bbdd93a7df3355a49469b68242dca40decc2bc3b010234aebd15f47374f3b",
       "output_tail": "  标准目录：370 条（可达 332 / 不可达 38 · 机构 194 · 206 边） · 绑定 1200 条\n  质量凭证：verify check1-42 常驻（脚本 v2.30） · 馆藏 3 件\n  模式：check（只校验）",
-      "ran_at": "2026-10-25"
+      "ran_at": "2026-11-02"
     },
     "verify": {
       "cmd": "python scripts/verify_run.py",

@@ -674,6 +674,39 @@ class NfCliSmokeTest(unittest.TestCase):
                 bad.append("%s: 缺 help 选项" % path)
         self.assertEqual(bad, [])
 
+    def test_parser_registration_is_split_into_bounded_groups(self):
+        """命令树保持单一构建入口，但不再由一个超大函数承载。"""
+        tree = ast.parse((ROOT / "scripts" / "nf.py").read_text(encoding="utf-8"))
+        funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+        self.assertIn("_make_parser", funcs)
+        main = funcs["_make_parser"]
+        self.assertLessEqual(main.end_lineno - main.lineno + 1, 300)
+        groups = sorted(name for name in funcs if name.startswith("_add_parser_"))
+        self.assertGreaterEqual(len(groups), 5, f"命令树拆分组过少：{groups}")
+        for name in groups:
+            node = funcs[name]
+            self.assertLessEqual(node.end_lineno - node.lineno + 1, 300,
+                                 f"命令树分组仍过大：{name}")
+
+    def test_command_dispatch_table_covers_parser_surface(self):
+        """普通命令的参数面与分派表必须一一覆盖；特殊分支单独列白名单。"""
+        tree = nf._collect_cli_tree()["tree"]
+        special = {"design", "nfal", "cockpit", "cockpit-ab", "run"}
+        expected = set(tree) - special
+        actual = set(nf._COMMAND_HANDLERS)
+        self.assertEqual(set(), expected - actual,
+                         f"参数面有命令没有分派器：{sorted(expected - actual)}")
+        self.assertEqual(set(), actual - expected,
+                         f"分派表有陈旧命令：{sorted(actual - expected)}")
+
+    def test_contract_history_reuses_diff_surface(self):
+        args = nf._make_parser().parse_args(
+            ["diff", "--history", "20", "01_核心协议.md", "--json"])
+        self.assertEqual(20, args.history)
+        self.assertEqual("01_核心协议.md", args.a)
+        self.assertIsNone(args.b)
+        self.assertTrue(args.json)
+
     def test_json_flag_surface(self):
         """JSON 面自洽矩阵：声明的数据命令逐点带 --json（与 README 速查一致）。"""
         tree = nf._collect_cli_tree()["tree"]

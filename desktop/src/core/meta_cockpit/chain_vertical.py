@@ -25,8 +25,29 @@ from .repo_context import repository_root
 TEXT = (repository_root() / "docs" / "完整版样本_西幻生存流P03.md").read_text(encoding="utf-8")
 SEG = re.compile(r"^##\s*([0-7])\.\s*(.+)$", re.M)
 REQ = ["生存", "经济", "战斗", "制造", "势力", "死亡重生", "校园情感", "遗憾"]
-ID = re.compile(r"(?:[A-Za-z\u4e00-\u9fff]+:)?M\d+")
-REAL_IDS = set(ID.findall(TEXT))
+ID = re.compile(r"M\d+")
+
+
+def _id_prefix_char(char: str) -> bool:
+    return ("A" <= char <= "Z") or ("a" <= char <= "z") or ("\u4e00" <= char <= "\u9fff")
+
+
+def module_ids(text: str) -> list[str]:
+    """提取 `M数字` 与 `类别:M数字`，不依赖会重复回溯的宽前缀正则。"""
+    out = []
+    for match in ID.finditer(text):
+        start = match.start()
+        if start > 0 and text[start - 1] == ":":
+            left = start - 1
+            while left > 0 and _id_prefix_char(text[left - 1]):
+                left -= 1
+            if left < start - 1:
+                start = left
+        out.append(text[start : match.end()])
+    return out
+
+
+REAL_IDS = set(module_ids(TEXT))
 
 
 def extract() -> list[dict]:
@@ -35,7 +56,7 @@ def extract() -> list[dict]:
     for i, m in enumerate(ms):
         end = ms[i + 1].start() if i + 1 < len(ms) else len(TEXT)
         body = TEXT[m.end() : end]
-        mods = ID.findall(body)
+        mods = module_ids(body)
         line = next(
             (
                 x.strip()
@@ -108,7 +129,7 @@ def metrics(subs, claims, causal, attacks, role_aware: bool, req_terms=None) -> 
     deliverable = [s for s in subs if (not role_aware or s["role"] == "deliverable")]
     covers = [set(s["covers"]) for s in subs]
     recs, atk = causal["records"], attacks["attacks"]
-    real = [a for a in atk if ID.search(a["check"]) and ID.search(a["check"]).group(0) in REAL_IDS]
+    real = [a for a in atk if module_ids(a["check"]) and module_ids(a["check"])[0] in REAL_IDS]
     return {
         "subgoal_count": len(subs),
         "deliverable_anchor_rate": frac(deliverable, lambda s: bool(s["deliverable"].strip())),

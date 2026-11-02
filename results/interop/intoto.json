@@ -4,7 +4,7 @@
     "algorithm": "RFC6962-style sha256 domain-separated",
     "count": 67,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "f257fb2d42244401df67724fe883e8b96d932322d79da42298e9b97b609bd657",
+    "root": "055b8e9e9b3a61b25bdc98d4b1d23a424da05fe10732d8dbe0adec4c40a30b0e",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "d40e49b1321d4dcfde29887c59d9acbb0b0d661ed5ceaa4df2b399f94f039d7a"
+        "sha256": "6acd8d24d84278b1dbbdc361bd746a1b60fb526a47f3c11e56b3fc18d61be79c"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,19 +137,19 @@
     },
     {
       "digest": {
-        "sha256": "f8c00c7ef018c35869be25c061e288089778e74919722d51c865840b53108abd"
+        "sha256": "2c31691dd047ff5bf83a1798eaa9cb532166fb8eb7c365167db34dad0525d131"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "748fd843d1529ed5186dc5f372bcf49d52e00a383778d262291fc7aff3b6d8ad"
+        "sha256": "11db72f087346b056e8f92814b1f5b92882c65df1e151108f66557d895368c70"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "a7aa7441fd1df8c042f47460e243105838486bab3cf3e7a3aba1416fef956dfd"
+        "sha256": "65ef6388ebda5fd11e3f75407e761cf525da03b0107e9c7f80cea1a46296cbbf"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -239,7 +239,7 @@
     },
     {
       "digest": {
-        "sha256": "6bc367c494fdeda5c21a43b16023ecd2d04e8fff0b52b813ac5e739900b42cb6"
+        "sha256": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429"
       },
       "name": "protocol/locales.json"
     },
@@ -287,13 +287,13 @@
     },
     {
       "digest": {
-        "sha256": "914c5dfe05763ecab52cea35cb72fd34026cd2522ca37fbebc0a86596a1d01eb"
+        "sha256": "cce69546ca42d2d5fb3785a22d51e8cd6c49229d8d2f35c4abb1d2b9ee0a91b3"
       },
       "name": "protocol/audit.json"
     },
     {
       "digest": {
-        "sha256": "4ae1908e5add66459f9fa90f882aed2498c8c47d1ceb0fa5b9cb6e7f0a0090f2"
+        "sha256": "0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7"
       },
       "name": "protocol/glossary.json"
     },

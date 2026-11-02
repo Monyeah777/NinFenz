@@ -10,8 +10,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-LEXICON_VERSION = "3"  # v2 -> v3：additive 增加 invariant 原语（V1 只增不删）
-
 #: 判据原语词表（节点 criteria.primitive 只能取这里的值）
 PRIMITIVES = {
     "coverage",
@@ -63,12 +61,6 @@ _LEXICON_NAMES = (
 def frac(items, pred) -> float:
     """满足 pred 的比例；空集记 0。"""
     return round(sum(1 for x in items if pred(x)) / len(items), 3) if items else 0.0
-
-
-def coverage_rate(hit_ids, universe) -> float:
-    """hit_ids 覆盖 universe 的比例。"""
-    universe = set(universe)
-    return round(len(set(hit_ids) & universe) / len(universe), 3) if universe else 0.0
 
 
 def drift_scan(paths) -> list[str]:

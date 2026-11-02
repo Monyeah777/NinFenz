@@ -95,6 +95,27 @@ class RebindTest(unittest.TestCase):
             self.assertEqual(0, st["rechained"])
             self.assertEqual(1, st["skipped"])
 
+    def test_external_subject_is_not_read_or_rebound(self):
+        """重绑不得跟随 `..` 去哈希仓外对象。"""
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            outside = root.parent / (root.name + "-outside.txt")
+            outside.write_text("outside\n", encoding="utf-8")
+            self.addCleanup(lambda: outside.unlink(missing_ok=True))
+            audit_dir = root / "results" / "audit"
+            audit_dir.mkdir(parents=True)
+            audit = audit_dir / "a1.md"
+            marker = "0" * 64
+            audit.write_text(
+                "---\nid: AUD-9002\ndate: 2026-01-01\nscope: 测试\nverdict: pass\n"
+                f"auditor: t\nsubjects:\n  - ../{outside.name}:{marker}\n---\n正文\n",
+                encoding="utf-8",
+            )
+            issues, stats = au.rebind(str(root), note="不读取仓外对象")
+            self.assertEqual([], issues)
+            self.assertEqual(0, stats["rechained"])
+            self.assertIn(marker, audit.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

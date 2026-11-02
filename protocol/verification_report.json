@@ -9,12 +9,9 @@
   "items": [
     {
       "id": "purity",
-      "issues": 2,
+      "issues": 0,
       "name": "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
-      "sample": [
-        "daemon.py:310 raise 消息缺修复指引：JSON 嵌套过深",
-        "daemon.py:286 raise 消息缺修复指引：JSON 嵌套超过上限 "
-      ],
+      "sample": [],
       "source": "purity_scan.scan",
       "stats": {
         "docs": 4,
@@ -32,10 +29,10 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 90,
+        "raises": 104,
         "sinks": 20
       },
-      "status": "fail",
+      "status": "pass",
       "warns": 0
     },
     {
@@ -300,9 +297,9 @@
       "source": "conformance_report.verify_committed",
       "stats": {
         "contracts": 27,
-        "passed": 25,
-        "root": "c35dce30830ac203db886fb79706ff727831595c37e7e360574b8f83a3fc371d",
-        "verdict": "non-conformant"
+        "passed": 27,
+        "root": "3cf469035ec4bdbe502dd41ff11a4324dbfdc95f0267fc28f469f7dcf73ea9b8",
+        "verdict": "conformant"
       },
       "status": "pass",
       "warns": 0
@@ -314,10 +311,10 @@
       "sample": [],
       "source": "audit.scan",
       "stats": {
-        "audits": 57,
+        "audits": 59,
         "legacy": 11,
-        "subjects_ok": 388,
-        "with_header": 46
+        "subjects_ok": 417,
+        "with_header": 48
       },
       "status": "warn",
       "warns": 1
@@ -371,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 309,
-        "files": 309,
-        "max_fn_cc": 116,
-        "max_fn_lines": 1263,
-        "max_lines": 7646
+        "baseline": 314,
+        "files": 314,
+        "max_fn_cc": 106,
+        "max_fn_lines": 318,
+        "max_lines": 7602
       },
       "status": "pass",
       "warns": 0
@@ -389,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 230,
-        "probed": 230
+        "patterns": 253,
+        "probed": 253
       },
       "status": "pass",
       "warns": 0
@@ -432,10 +429,10 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 2,
+        "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 257,
-        "modules": 257,
+        "metrics_recorded": 262,
+        "modules": 262,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -528,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3846,
-        "kernel": 2004,
+        "files": 3960,
+        "kernel": 2007,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -540,12 +537,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "533df601ed430478452ebf3f5cc49a48429575b70a2b20c0c9b1374036cf7422",
+  "root_digest": "794136a78b0089122f4251aaf28379b55ad2a2eb876b39af79d4e9ad800ef24a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 1,
-    "pass": 28,
+    "fail": 0,
+    "pass": 29,
     "warn": 2
   }
 }

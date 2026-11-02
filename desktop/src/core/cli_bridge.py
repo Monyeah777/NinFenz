@@ -44,4 +44,7 @@ def run(args: Any) -> int:
         from core.meta_cockpit import nf_ab_cli
 
         return nf_ab_cli.run(args)
-    raise ValueError(f"unknown bridged command: {args.cmd}")
+    raise ValueError(
+        f"unknown bridged command: {args.cmd}"
+        "（修复指引：在 cli_bridge.subparsers 注册该命令，或核对 args.cmd）"
+    )

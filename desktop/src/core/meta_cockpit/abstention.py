@@ -8,16 +8,6 @@ from typing import Any
 
 from . import coherence, task_profile
 
-STATUS_ORDER = (
-    "budget-exhausted",
-    "deadline-exceeded",
-    "blocked",
-    "evidence-required",
-    "repair-required",
-    "review-required",
-    "none",
-)
-
 
 def _digest(value: Any) -> str:
     payload = json.dumps(

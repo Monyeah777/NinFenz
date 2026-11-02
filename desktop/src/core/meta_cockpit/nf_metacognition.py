@@ -17,8 +17,6 @@ from .repo_context import repository_root
 
 NF = repository_root()
 P03 = NF / "docs" / "完整版样本_西幻生存流P03.md"
-NF1 = NF / "library" / "NF-1.md"
-TECH = NF / "docs" / "examples" / "state-front" / "techdoc_front.md"
 
 TEMPLATES = {
     "content": [

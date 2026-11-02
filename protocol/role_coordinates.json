@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1434,
+    "app": 1445,
     "entry": 26,
     "floor": 5,
-    "prod": 1041,
-    "projection": 130,
-    "support": 251,
-    "verify": 958
+    "prod": 1042,
+    "projection": 132,
+    "support": 349,
+    "verify": 960
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5831,6 +5831,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Thin CLI bridge for optional command families kept outside scripts/nf.py.",
+      "path": "desktop/src/core/cli_bridge.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "44 追加 · 契约事件闭包扫描（元工具·只报告不设闸）。",
       "path": "desktop/src/core/closure_scan.py",
       "role": "verify",
@@ -8255,6 +8261,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "Meta-cognitive cockpit integration contracts.",
+      "path": "desktop/tests/test_meta_cockpit.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "desktop/tests/test_missing_sentinel.py",
       "role": "verify",
@@ -8569,6 +8581,12 @@
     {
       "function": "协议定义向导单测（v2.0.x-E2：ProtocolForm → protocol.yaml v2 生成 + self_check）。",
       "path": "desktop/tests/test_protocol_wizard.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "公开仓发布边界：决策 / 交接 / 复盘三类内部材料**只能留模板**。",
+      "path": "desktop/tests/test_publish_boundary.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12036,17 +12054,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "a2db21e13b02f8b56455d63be3f2feffdd47742f034ffd6cf327bcbee77e9e57",
+  "root_digest": "e06cf926fa8174571b3bd3b3165ab445a9c8136c0c49af3f13d59a10f7ffd9f9",
   "rule_counts": {
-    "R-app": 1434,
-    "R-catch": 108,
+    "R-app": 1445,
+    "R-catch": 204,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 115,
-    "R-support": 117,
-    "R-verify": 841,
-    "auto:R-core": 255
+    "R-projection": 117,
+    "R-support": 119,
+    "R-verify": 843,
+    "auto:R-core": 256
   },
   "schema": "nf-role-coordinates/1"
 }

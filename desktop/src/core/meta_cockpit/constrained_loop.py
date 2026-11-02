@@ -58,26 +58,6 @@ def first_policy(state: dict, candidates: list[dict]) -> dict:
     )
 
 
-def last_policy(state: dict, candidates: list[dict]) -> dict:
-    return (
-        stop("no candidates")
-        if not candidates
-        else {"choice": len(candidates) - 1, "reason": "last candidate", "stop": False}
-    )
-
-
-def stop_policy(state: dict, candidates: list[dict]) -> dict:
-    return stop("policy stop")
-
-
-def bad_range_policy(state: dict, candidates: list[dict]) -> dict:
-    return {"choice": len(candidates) + 1, "reason": "bad", "stop": False}
-
-
-def bad_score_policy(state: dict, candidates: list[dict]) -> dict:
-    return {"choice": 0, "reason": "bad", "stop": False, "score": 1}
-
-
 def contextual_policy(adapter, providers: list | None = None):
     """把模型 adapter 接到候选上下文包，同时保持短响应协议。"""
 

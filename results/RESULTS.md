@@ -30,7 +30,7 @@
 ## 正式协议与实现
 
 - [01_核心协议.md](../01_核心协议.md) · [02_联动注册表.md](../02_联动注册表.md) · [06_Agent执行协议.md](../06_Agent执行协议.md) · [07_官方核心出厂与社区预设导航.md](../07_官方核心出厂与社区预设导航.md)
-- [docs/meta-cockpit/README.md](../docs/meta-cockpit/README.md)（元认知生产驾驶舱入口）
+- [docs/meta-cockpit/README.md](../docs/meta-cockpit/README.md) · [功能解析.md](../docs/meta-cockpit/功能解析.md)（元认知生产驾驶舱入口与功能解析）
 - [protocol/schema](../protocol/schema) · [protocol/generated](../protocol/generated)
 - [desktop/src/core](../desktop/src/core) · [scripts](../scripts)
 

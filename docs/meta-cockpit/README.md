@@ -32,3 +32,5 @@ nf help cockpit-ab
 - 语义真伪保留人工复核兜底。
 
 正式协议见 [COCKPIT_PROTOCOL.md](../../desktop/src/core/meta_cockpit/COCKPIT_PROTOCOL.md)，差异化边界见 [DIFFERENTIATION.md](../../desktop/src/core/meta_cockpit/DIFFERENTIATION.md)。
+
+完整功能拆解见 [功能解析.md](功能解析.md)。

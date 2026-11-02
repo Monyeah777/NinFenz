@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-25",
+  "approved_at": "2026-10-30",
   "approved_by": "Monyeah777",
-  "note": "内部材料外置最终重冻",
+  "note": "契约级 Git 演进时间线与结构化差异收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "d40e49b1321d4dcfde29887c59d9acbb0b0d661ed5ceaa4df2b399f94f039d7a"
+  "subject_digest": "6acd8d24d84278b1dbbdc361bd746a1b60fb526a47f3c11e56b3fc18d61be79c"
 }

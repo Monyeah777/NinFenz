@@ -287,6 +287,8 @@ SKIP = {
     "preset save": "写盘面（同名须 --force）——全链见 test_preset_cli.py",
     "shell": "交互面（接 TTY；非 TTY 阻塞）——覆盖见 test_terminal.py",
     "terminal": "交互面（shell 别名）——见 test_terminal.test_terminal_alias_works",
+    "cockpit": "有参生产面（--prompt/--prompt-file 必填，未完成运行 rc=2）"
+               "——见 test_meta_cockpit.py",
 }
 
 

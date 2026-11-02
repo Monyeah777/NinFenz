@@ -307,19 +307,19 @@ class AutostartTest(unittest.TestCase):
     def test_default_engages_autostart_without_blocking_the_command(self):
         """**默认开且非阻塞**（2026-09-29 起）：首条命令不等守护，随后守护自己起来。
 
-        非阻塞怎么**确定性**地判：把 shim 的 `daemon start` 那一跑挂 5 s 睡眠——
-        阻塞式实现会让首条命令≥5 s，非阻塞式只有 ~0.3–0.6 s（差一个数量级，不是靠抖动判）。
+        非阻塞怎么**确定性**地判：把 shim 的 `daemon start` 那一跑挂 10 s 睡眠——
+        阻塞式实现会让首条命令≥10 s；非阻塞式在满负载全量下实测仍 <8 s，留出负载余量。
         """
         home = self._home()
         self.addCleanup(self._stop, home)
-        env, _log = self._sleepy_shim(home, sleep_seconds=5)
+        env, _log = self._sleepy_shim(home, sleep_seconds=10)
         env.pop("NF_AUTOSTART", None)                 # 不给开关 ⇒ 走默认
         t0 = time.time()
         p = self._run(home, "--version", env=env)
         elapsed = time.time() - t0
         self.assertEqual(0, p.returncode, p.stderr or p.stdout)
         self.assertIn("nf ", p.stdout)
-        self.assertLess(elapsed, 5.0,
+        self.assertLess(elapsed, 8.0,
                         "首条命令等了后台起守护（阻塞式实现）——必须非阻塞：%.1fs" % elapsed)
         deadline = time.time() + 40                      # 后台拉起是**稍后**发生，允许慢机
         while time.time() < deadline and not os.path.exists(os.path.join(home, "daemon.json")):

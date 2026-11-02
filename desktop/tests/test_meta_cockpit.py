@@ -6,6 +6,8 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -15,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core.meta_cockpit import (  # noqa: E402
+    build_atom_menu,
     calibration_ledger,
     cockpit_ab,
     cockpit_ab_bundle,
@@ -308,6 +311,11 @@ class CockpitABTest(unittest.TestCase):
 
 
 class ReleaseAndSafetyTest(unittest.TestCase):
+    def test_generated_atom_menu_matches_its_renderer(self):
+        saved = (PACKAGE / "ATOM_MENU.md").read_text(encoding="utf-8")
+        self.assertEqual(build_atom_menu.render(), saved,
+                         "ATOM_MENU.md 已与应用菜单生成器漂移（修复指引：运行模块 main 重生成）")
+
     def test_manifest_binds_runtime_and_limits(self):
         manifest = meta_runtime_manifest.build()
         self.assertEqual([], meta_runtime_manifest.verify(manifest))
@@ -318,6 +326,9 @@ class ReleaseAndSafetyTest(unittest.TestCase):
         schema = json_asset.load(PACKAGE / "meta_runtime_manifest.schema.json")
         validator = schema_compat.Draft202012Validator(schema)
         self.assertEqual([], [item.message for item in validator.iter_errors(manifest)])
+        saved = json_asset.load(ROOT / "results" / "meta-cockpit-manifest.json")
+        self.assertEqual([], meta_runtime_manifest.verify(saved),
+                         "已入仓 manifest 与当前实现不一致（修复指引：用官方 build 重生成）")
 
     def test_secret_guard_redacts_without_echoing_value(self):
         value = "sk-" + "a" * 24
@@ -328,6 +339,26 @@ class ReleaseAndSafetyTest(unittest.TestCase):
         failed = constrained_loop.run("handle " + value, constrained_loop.first_policy)
         self.assertEqual("invalid-input", failed["termination"])
         self.assertNotIn(value, str(failed))
+
+    def test_public_submodules_are_lazy_and_load_on_demand(self):
+        """包入口保留公共子模块，但不得在 import 包时加载其 schema / 全局计算。"""
+        code = (
+            "import sys; "
+            f"sys.path.insert(0, {str(ROOT / 'desktop' / 'src')!r}); "
+            "import core.meta_cockpit as m; "
+            "assert 'core.meta_cockpit.live_protocol' not in sys.modules; "
+            "assert 'core.meta_cockpit.build_atom_menu' not in sys.modules; "
+            "_ = m.live_protocol; "
+            "_ = m.build_atom_menu; "
+            "assert 'core.meta_cockpit.live_protocol' in sys.modules; "
+            "assert 'core.meta_cockpit.build_atom_menu' in sys.modules; "
+            "print('lazy-ok')"
+        )
+        env = dict(os.environ, PYTHONUTF8="1")
+        proc = subprocess.run([sys.executable, "-c", code], cwd=str(ROOT),
+                              capture_output=True, text=True, encoding="utf-8", env=env)
+        self.assertEqual(0, proc.returncode, proc.stderr)
+        self.assertIn("lazy-ok", proc.stdout)
 
 
 class MainCliTest(unittest.TestCase):

@@ -58,7 +58,7 @@ def build() -> dict:
             "task_native_handoff": True,
             "role_aware_retrieval": True,
             "offline_blind_ab": True,
-            "secret_guard": True,
+            "secret_guard": True,  # nosec B105 - capability flag, not a password
         },
         "human_review": runtime_executor.review_status()[0],
         "no_scoring": True,

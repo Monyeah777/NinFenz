@@ -19,9 +19,6 @@ RESULT_SCHEMA = json_asset.load(BASE / "cockpit_ab_result.schema.json")
 RESULT_VALIDATOR = jsonschema.Draft202012Validator(RESULT_SCHEMA)
 BALLOT_SCHEMA = json_asset.load(BASE / "cockpit_ab_ballots.schema.json")
 BALLOT_VALIDATOR = jsonschema.Draft202012Validator(BALLOT_SCHEMA)
-ARMS = {"baseline", "guided"}
-
-
 def _canonical(value: Any) -> bytes:
     return json.dumps(
         value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str
