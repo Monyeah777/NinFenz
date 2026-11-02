@@ -5,7 +5,7 @@ namespace Nf.Engine;
 
 /// <summary>
 /// 复刻 <c>scripts/geo_export.py</c>（**check38 子扫描 3 · GEO 出口**）：把标准目录
-/// （<c>protocol/standards_catalog.json</c> 370 条）+ 绑定面（<c>protocol/standards_binding.json</c>）
+/// （<c>protocol/standards_catalog.json</c> 372 条）+ 绑定面（<c>protocol/standards_binding.json</c>）
 /// 导出成**生成式引擎可引用**的稳定面，`check` 逐字节比对**在盘生成物 ↔ 实时派生**。
 ///
 /// 八个生成物：<c>docs/standards/index.md</c> · <c>layer-{data,eng,form,gov,iface}.md</c> ·

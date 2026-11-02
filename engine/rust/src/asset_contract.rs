@@ -2317,7 +2317,7 @@ l2
                 r#"{"files": 1, "format": "markdown", "tables": 2}"#,
             ),
             (
-                r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023"}"#,
+                r#"{"format": "json", "id": "ladder-truth", "path": "protocol/LAYERS.json", "required_fields": ["schema", "rules", "tiers"], "sha256": "70d4ac0ae5a69f380f43fed2709e94af01576997c10a3736ae6eb548d5344502"}"#,
                 &[],
                 r#"{"fields": 3, "files": 1, "format": "json"}"#,
             ),

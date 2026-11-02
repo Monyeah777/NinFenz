@@ -9,7 +9,7 @@
 - docs/standards/index.md          全量可引用索引（每条 `### <id>` 稳定锚）
 - docs/standards/layer-<L>.md      按层切分（data / eng / form / gov / iface）
 - docs/standards/answer-cards.md   按问题形态聚合的可引用卡（扩展点 / 分层 / 绑定 / 不可达）
-- protocol/geo_export.json         机读紧凑面（避免引擎解析 370 条大 JSON）
+- protocol/geo_export.json         机读紧凑面（避免引擎解析 372 条大 JSON）
 
 用法：python scripts/geo_export.py --write | --check
 """
