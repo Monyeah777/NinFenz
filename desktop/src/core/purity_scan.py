@@ -144,6 +144,15 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
+    "cognition_event.py:shutil.rmtree":
+        "只删 <store>/canary 影子副本；调用前校验 resolve() 后父目录为 store、"
+        "名字恰为 canary（不是根/家目录/仓库根），且 canary 由本函数自建、不接收外部输入。"
+        "放行理由：审计灰度需要在影子库 apply 后清理，避免残留；路径已守。",
+    "m1_e2e.py:shutil.rmtree":
+        "只删脚本自建的 <work>/gc-probe 临时副本（work 为 CLI 临时目录；"
+        "调用前校验 resolve 后位于 work 内、名字恰为 gc-probe、不等于 work 根/家目录；"
+        "probe 内容仅 events/*.json 与 index.json）。放行理由：M1 演练需 apply "
+        "GC 于副本且不留残留；路径由脚本拼出而非外部任意输入。",
     "verify_tests.py:shutil.rmtree":
         "只删**本进程用 `tempfile.mkdtemp(prefix=...)` 刚建**的分片临时目录（spec_dir / nf_shard_home_N）；"
         "路径不接收外部参数，且删除用 `ignore_errors=True`（清理失败不判失败）。放行理由：Windows 上"

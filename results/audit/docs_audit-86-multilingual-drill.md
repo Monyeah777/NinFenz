@@ -12,7 +12,7 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
+  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -265,6 +265,26 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
+> 重审（2026-11-02）：check45 驾驶舱 M1 门禁（基线/文档同步）
+
+> 重审（2026-11-02）：真实工具兼容修复：TIFF XMP/GIF 子块/PDF trailer（2026-11-02）
+
+> 重审（2026-11-02）：并入 OGG/HEIF 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 TIFF/GIF/WebP/WAV/MP3/FLAC 载体（2026-11-02）
+
 > 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
 
 > 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card

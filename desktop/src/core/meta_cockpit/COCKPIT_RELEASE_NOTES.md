@@ -2,7 +2,7 @@
 
 > 状态：机器层验收通过，HR-001 待人工签字；外部模型实测冻结。
 > 当前 machine digest 由 `core.meta_cockpit.runtime_executor.machine_digest()` 输出。
-> 主仓审计：`results/audit/docs_audit-95-meta-cockpit.md`。
+> 协议与判据：`desktop/src/core/meta_cockpit/COCKPIT_PROTOCOL.md`；审计归档见 `results/audit/`。
 
 ## 可用入口
 

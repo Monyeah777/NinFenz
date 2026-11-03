@@ -55,7 +55,15 @@ def append(record: Dict[str, Any]) -> Dict[str, Any]:
     p = log_path()
     if p.is_file():
         for line in p.read_text(encoding="utf-8", errors="replace").splitlines():
-            if line.strip() and json.loads(line).get("id") == rec["id"]:
+            if not line.strip():
+                continue
+            try:
+                prev = json.loads(line)
+            except ValueError:      # 坏行跳过：半截行不该让「查重」失败
+                continue
+            if not isinstance(prev, dict):   # 数组/标量行不是记录
+                continue
+            if prev.get("id") == rec["id"]:
                 return {"ok": True, "duplicate": True, "record": rec}
     with p.open("a", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")
@@ -75,7 +83,9 @@ def records(kind: str = "", limit: int = 50) -> List[Dict[str, Any]]:
             continue
         try:
             rec = json.loads(line)
-        except ValueError:
+        except ValueError:  # 坏行跳过：半截/损坏行不该让查询失败（AUD-0016）
+            continue
+        if not isinstance(rec, dict):   # 数组/标量行不是记录
             continue
         if kind and rec.get("kind") != kind:
             continue

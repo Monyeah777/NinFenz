@@ -107,7 +107,8 @@ class _NfParser(argparse.ArgumentParser):
 
     2026-11-01 修（D1）：argparse 默认 `allow_abbrev=True`，`--wri` 会被解析成 `--write`、
     `--fi` 解析成 `--fix`。而终端写盘闸门（`core.terminal.needs_confirm`）按**完整旗标名**
-    判定，于是 `nf shell --exec "nf stats --wri"` 既不触发确认、又真的写了盘——闸门守的正是
+    判定，于是 `nf shell` 里粘贴 `--wri` 这类前缀缩写写法（等价 `--write`）
+    既不触发确认、又真的写了盘——闸门守的正是
     「粘贴/注入文本」那条面。关闭缩写后，这类写法统一变成用法错误（exit 2），
     「闸门表 = 唯一写法」不再有第二套等价写法可以绕。
 
@@ -2909,6 +2910,7 @@ CHECK_GUIDE = {
           " core.attest.verify 的口径一致；篡改必须被判否——否则这份证据是摆设。",
     "43": "缺什么：A 桶证据内核门禁红（gate_engine 键/ inproc 异常 / labels 抽取 / 证据 MCP 测试）。补什么：跑 python scripts/gate_a_bucket.py 看逐组失败；修好后重跑。",
     "44": "缺什么：AI 生成合成内容标识不合规（GB 45438／TC260 隐式标识缺字段、签名验不过、证书链断、可信时间戳缺）。补什么：48 小时自查——先跑 python3 scripts/nf_labeling.py selfcheck；再对导出文件跑 nf labeling check <file> --trust-store <roots.pem>；五段判定看 A/B/C/D/E，其中 C4 是证书链、C5 是可信时间戳。",
+    "45": "缺什么：驾驶舱 M1 双会话链门禁红（prev 链断、action 关闭未带 card digest、证据角色传播（event→card→receipt）不一致或升级、--event-store 跨目录事件库不可读/搬迁后不可重放、事件库 query 查不到 A/B、GC dry-run 误删或 apply 后索引不一致/保留链断、保留策略配置（--config/NF_COCKPIT_RETENTION）非法或未生效、--audit 审计非确定性/未落盘、--canary 影子库索引不一致或动了真实库、审计查询/汇总异常、审计异常阈值告警（max_removed/ratio/churn，clean→0、告警→1）异常、告警历史/趋势（--record 幂等、history/trend 确定性）异常、或同一工作目录两次 check 的 report.json 不一致；cockpit→event→card→gate→ledger→receipt→replay 任一环断）。补什么：先跑 python3 scripts/m1_e2e.py run --work /tmp/m1 --event-store /tmp/m1store，再跑 python3 scripts/m1_e2e.py check --work /tmp/m1 --event-store /tmp/m1store（连跑两次，两次报告须逐字节一致）；做 --event-store 跨目录复核与坏事件 fail-closed 负测；cognition-gc 先 --audit 再 --canary；cognition-audits / cognition-audit-alerts（--record 落盘幂等）与 cognition-alert-history / cognition-alert-trend 查历史趋势（trend 两次须逐字节一致）；确认 action evidence 含 card:<sha256> 且 evidence_roles 原样传递；按失败环节修。；回执外部锚定（--anchor-key 的 HMAC 必须用工作目录外的密钥校验，篡改/缺 key 须 anchor FAIL）",
 }
 
 def _cmd_preset(args):

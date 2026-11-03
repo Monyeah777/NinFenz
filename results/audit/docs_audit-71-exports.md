@@ -6,20 +6,28 @@ scope: 作者指令「自述数字自动化，互操作性从他证，标准目�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - verify.sh:9274877ccae8dadee27b4f13dd90df7def9df2d123743277c0c0b9e66a1794f7
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
   - desktop/src/core/repo_stats.py:3bc955c22bef31d7b93313b4fe2694934c048e8ee84b9ef81c0e9805c7982a87
-  - desktop/src/core/quality_baseline.py:dc7c9ef409e9f904896ac560247339a0006b927d6259663d2a8dbd58adee41e2
+  - desktop/src/core/quality_baseline.py:38e10a279f68614d6a5c9f190cd5f51f0641fb94326237dd6c5ac95aa15128d6
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
-  - protocol/CONFORMANCE.md:016554d0120cc31d5103560c23a79cf7edb7f67c639ebffefe62f3eaba32ed7e
+  - protocol/CONFORMANCE.md:e56b60186a6c445816ec3de6300ca72b3c4eb8ded63888496efbd97c191229ec
   - docs/fde-stack.md:79633a484dcf01cd92c03deac96d7b59f85489c1aa0ec4ad5489768d2702da8a
   - docs/fde-sample/README.md:c17984ad90f50d39131fd932c37915b978e28bf606f9c397128de1c8417e4168
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）

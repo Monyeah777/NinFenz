@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-labelledby="qrTitle qrDesc">
+  <title id="qrTitle">微信二维码占位图</title>
+  <desc id="qrDesc">部署前替换为实际微信二维码，当前为同源占位图。</desc>
+  <defs>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#122436"/>
+      <stop offset="1" stop-color="#0b1621"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="18" fill="url(#card)"/>
+  <rect x="1" y="1" width="238" height="238" rx="17" fill="none" stroke="#2c4760" stroke-width="1"/>
+  <g fill="none" stroke="#55e6c1" stroke-width="3" stroke-linecap="round">
+    <path d="M56 44h-9a6 6 0 0 0-6 6v9"/>
+    <path d="M184 44h9a6 6 0 0 1 6 6v9"/>
+    <path d="M56 229h-9a6 6 0 0 1-6-6v-9"/>
+    <path d="M184 229h9a6 6 0 0 0 6-6v-9"/>
+  </g>
+  <g fill="#55e6c1">
+    <rect x="90" y="58" width="12" height="12" rx="2"/>
+    <rect x="108" y="58" width="12" height="12" rx="2"/>
+    <rect x="138" y="58" width="12" height="12" rx="2"/>
+    <rect x="90" y="76" width="12" height="12" rx="2"/>
+    <rect x="126" y="76" width="12" height="12" rx="2"/>
+    <rect x="90" y="94" width="12" height="12" rx="2"/>
+    <rect x="108" y="94" width="12" height="12" rx="2"/>
+    <rect x="138" y="94" width="12" height="12" rx="2"/>
+    <rect x="90" y="112" width="12" height="12" rx="2"/>
+    <rect x="120" y="112" width="12" height="12" rx="2"/>
+    <rect x="138" y="112" width="12" height="12" rx="2"/>
+  </g>
+  <g fill="#0b1621" stroke="#55e6c1" stroke-width="3">
+    <rect x="98" y="72" width="44" height="34" rx="12"/>
+    <path d="M150 96l10 8-3-11z" fill="#55e6c1" stroke="none"/>
+  </g>
+  <g fill="#55e6c1">
+    <circle cx="110" cy="86" r="2.6"/>
+    <circle cx="120" cy="86" r="2.6"/>
+    <circle cx="130" cy="86" r="2.6"/>
+  </g>
+  <text x="120" y="170" fill="#edf3f7" font-family="system-ui, -apple-system, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="15" font-weight="600" text-anchor="middle">微信二维码</text>
+  <text x="120" y="192" fill="#718699" font-family="system-ui, -apple-system, 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="12" text-anchor="middle">部署前替换</text>
+</svg>

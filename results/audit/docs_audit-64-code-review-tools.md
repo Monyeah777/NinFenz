@@ -11,12 +11,20 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/storage.py:88307cf9f86502161320b8c51e1df4b21b135bbb8b0728b42265c9b70317e7b8
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
 
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）

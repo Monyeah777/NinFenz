@@ -220,6 +220,15 @@ def resident_active() -> bool:
     return _RESIDENT is not None
 
 
+def in_read_scope() -> bool:
+    """当前是否处在一次只读调用的**共享语料作用域**内（`read_memo()` 内外之判）。
+
+    给「缓存键即内容」的派生用：作用域内取指纹的读面与派生共享同一批物理读（近乎白拿），
+    作用域外（一次性进程）指纹自身可能就是最大成本——两条路径的取舍不同，需可查询。
+    """
+    return _READ_MEMO is not None
+
+
 def resident_stats() -> Dict[str, int]:
     """常驻层规模（观测 + 判据用）：目录条数 / 正文条数 / 二进制条数。"""
     if _RESIDENT is None:
@@ -451,7 +460,7 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
             match(dir_abs, rel, i + 1)                       # 零层：当前目录直接续匹配
             for entry in _scandir_list(dir_abs):
                 try:
-                    if entry.is_dir() and not entry.is_symlink() \
+                    if entry.is_dir() and not _is_real_symlink(entry) \
                             and entry.name not in NON_REPO_DIRS:
                         match(entry.path, rel + entry.name + "/", i)
                 except OSError:
@@ -463,7 +472,7 @@ def _enumerate_rel(root_abs: str, pattern: str) -> List[str]:
                 continue
             try:
                 if last:
-                    if entry.is_file() and not entry.is_symlink():
+                    if entry.is_file() and not _is_real_symlink(entry):
                         out.append(rel + entry.name)
                 elif entry.is_dir():
                     match(entry.path, rel + entry.name + "/", i + 1)
@@ -542,6 +551,22 @@ def _match_parts(segments, parts) -> bool:
     return step(0, 0)
 
 
+def _is_real_symlink(entry) -> bool:
+    """条目是否**真是**符号链接：不轻信 getdents 的 d_type，d_type 说是链接时用 lstat 复核。
+
+    为什么（2026-11-03 实测，本机 proot/overlayfs）：有一批真实文件在目录枚举里 d_type
+    报 DT_LNK，而 `os.readlink` 回 EINVAL、`os.lstat` 是普通文件——旧实现直接信
+    `entry.is_symlink()`，于是这些**真实文件被宽面枚举静默排除**（`layer_model` 真源面
+    与参考实现差 14 件；同类扫描器的漏件同理）。d_type 只是提示，lstat 才是判据。
+    """
+    if not entry.is_symlink():
+        return False
+    try:
+        return os.path.islink(entry.path)
+    except OSError:                     # 复核不了 → 保守当链接（遍历器不收不确定件）
+        return True
+
+
 def tree_files(root, rel_dir: str = "") -> List[str]:
     """`rel_dir` 子树内**全部文件**（仓库相对 posix 路径，已排序）。作用域内按目录记忆。
 
@@ -560,9 +585,9 @@ def tree_files(root, rel_dir: str = "") -> List[str]:
         for entry in _scandir_list(dir_abs):
             try:
                 if entry.is_dir():
-                    if not entry.is_symlink():
+                    if not _is_real_symlink(entry):
                         walk(entry.path, rel + entry.name + "/")
-                elif entry.is_file() and not entry.is_symlink():
+                elif entry.is_file() and not _is_real_symlink(entry):
                     out.append(rel + entry.name)
             except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
                 continue

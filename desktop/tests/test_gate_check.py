@@ -123,15 +123,26 @@ class RealInvokerTest(unittest.TestCase):
         return invoke
 
     def test_real_subprocess_green_and_red(self):
+        """真 subprocess：绿件必须**真的有测试**且过，红件真失败。
+
+        为什么绿件要写一个 `test_green`（而不是 `_make` 默认的 `x = 1`）：真判据是
+        `python -m unittest tests.<mod>` 的**退出码**，而 Python 3.12 起「一个测试都没跑」
+        是 **rc=5（NO TESTS RAN）**——空模块不是「绿」，是「没跑」。旧夹具把空模块当绿件，
+        于是在 3.12 上被如实判红（2026-11-03 实测：failed 同时含 green/red），这是**夹具缺陷**
+        而非 gate_check 的判定缺陷：等价性判据只该比较「真跑过的测试」。
+        """
         with tempfile.TemporaryDirectory() as tmp:
             tdir, faces = _make(tmp, ["green", "red"])
             red = [m for m in faces if "red" in m][0]
-            for mod in list(faces):
-                if mod == red:
-                    (tdir / f"{mod}.py").write_text(
-                        "import unittest\n\n\nclass T(unittest.TestCase):\n"
-                        "    def test_red(self):\n        self.assertTrue(False)\n",
-                        encoding="utf-8", newline="\n")
+            green = [m for m in faces if "red" not in m][0]
+            (tdir / f"{green}.py").write_text(
+                "import unittest\n\n\nclass T(unittest.TestCase):\n"
+                "    def test_green(self):\n        self.assertTrue(True)\n",
+                encoding="utf-8", newline="\n")
+            (tdir / f"{red}.py").write_text(
+                "import unittest\n\n\nclass T(unittest.TestCase):\n"
+                "    def test_red(self):\n        self.assertTrue(False)\n",
+                encoding="utf-8", newline="\n")
             res = gck.check(["src/x.py"], self._invoke(Path(tmp)), root=tmp, faces=faces,
                             tests_dir=tdir, timeout=120)
             self.assertEqual(res["failed"], [red])

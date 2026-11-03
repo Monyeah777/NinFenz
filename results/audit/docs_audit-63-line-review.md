@@ -9,13 +9,21 @@ subjects:
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
-  - protocol/assertions.json:7a278f17a38938e2948232209c9f52316ab1e3f2c768adc649fb58eeef6aee93
+  - protocol/assertions.json:b2840b54f268fa9e6a4bfdc1edd3110e1d50ee99ef479f35eff2daf4b73f7a41
   - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
   - desktop/src/core/text_hygiene.py:ff5fb24eafb99044ad1452f26d5cf3be6b89a24d77a5be5e4bcf56189a8ea956
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）

@@ -242,21 +242,33 @@ def _install_ast_line_cache() -> None:
     cache_split: dict = {}
 
     if orig_no_ff is not None:
-        def cached_no_ff(source):
-            got = cache_no_ff.get(source)
+        # 3.12 的签名是 `_splitlines_no_ff(source, maxlines=None)`，而
+        # `ast.get_source_segment` 会带 `maxlines=end_lineno+1` 调用；包装函数必须
+        # 原样转发该关键字（否则每次取片段都 TypeError）。
+        def cached_no_ff(source, maxlines=None):
+            key = (source, maxlines)
+            got = cache_no_ff.get(key)
             if got is None:
-                got = orig_no_ff(source)
-                cache_no_ff[source] = got
+                try:
+                    got = orig_no_ff(source, maxlines=maxlines)
+                except TypeError:       # 旧版 CPython 无 maxlines 参数
+                    got = orig_no_ff(source)
+                cache_no_ff[key] = got
             return got
 
         ast._splitlines_no_ff = cached_no_ff
 
     if orig_split is not None:
-        def cached_split(source):
-            got = cache_split.get(source)
+        # `_splitlines(source, keepends=False)` 同型：转发 keepends。
+        def cached_split(source, keepends=False):
+            key = (source, keepends)
+            got = cache_split.get(key)
             if got is None:
-                got = orig_split(source)
-                cache_split[source] = got
+                try:
+                    got = orig_split(source, keepends=keepends)
+                except TypeError:
+                    got = orig_split(source)
+                cache_split[key] = got
             return got
 
         ast._splitlines = cached_split

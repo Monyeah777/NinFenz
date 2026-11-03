@@ -7,15 +7,15 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
-  - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
+  - desktop/src/core/layer_model.py:f1b00529b99a93282c9d614ee5683a71502507947d5b0b1c4444328d63a0d6d6
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
+  - desktop/src/core/purity_scan.py:34edc3a93e1e298519e74646fe4a531c22bf627d7b81316898f7e33f56373601
   - desktop/tests/test_purity_scan.py:f0a23dcc6b5c7c481cf8bdb0356ed0fbf81a8d65f7d3e2d9e15d3b4796f52a62
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
-  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
+  - verify.sh:9274877ccae8dadee27b4f13dd90df7def9df2d123743277c0c0b9e66a1794f7
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/assertions.json:7a278f17a38938e2948232209c9f52316ab1e3f2c768adc649fb58eeef6aee93
+  - protocol/assertions.json:b2840b54f268fa9e6a4bfdc1edd3110e1d50ee99ef479f35eff2daf4b73f7a41
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
@@ -23,6 +23,20 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-03）：P3 收口重审：layer_model 一次性进程免付指纹取键（实测 fingerprint 10.2s→_scan_impl 1.5s）、conformance_scan DT_LNK 复核、terminal 深检预算重冻 10000（实测 1.7-7.8s）、risk_baseline 部署/事故口径修正；同批含并行面 nf.py/CLI 测试改动
+
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）

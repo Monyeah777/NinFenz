@@ -24,16 +24,20 @@ subjects:
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:41309204c54e76af11a4a2017cfa8be26ff7c90c88697ddc0aa43d23f4f0b752
-  - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
+  - desktop/tests/test_dead_code.py:aba936cc6a67238318d251ff3d6dd289c68007970737e11958ff36b738fb8828
   - desktop/tests/test_daemon_parity.py:31800825e5ba642b2518ec8e7ec5c3d93b16243b618c2e6c75e4abc62bc403a9
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:ff2c6753d8297fecd27794445339f67db519421f4c34cd1f3b97befd6c6478ee
+  - desktop/tests/test_cli_json_face.py:decd36b09e74d9bdd43a9d3f7d2cb76926c86c219a6a10faba8118152ad9e3d7
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:2b69019ebef7779cc6b020007510c2b95a6d1282a50990131662ec1099db3dbd
-  - desktop/tests/test_nf_cli.py:800e53bee54e0f4c3316f7860abf329f3e063fe73ec4596fddffdd514f93bd78
+  - desktop/tests/test_nf_cli.py:d0783a6204f3b1d48558350223509c8ec637ced8b7cb645250aebc30f53b9f47
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-03）：P3 专项重审：desktop/src/core/terminal.py（BASELINE_DEEP_MAX_MS 重冻 12000→10000，实测 6.20/7.75s）、desktop/src/core/conformance_scan.py（枚举不信 d_type，DT_LNK 复核）、desktop/tests/test_dead_code.py（并行 dead_code 面改动，同批对象）
+
 > 重审（2026-11-02）：2026-11-02 波十一：shell --engine 透传（C-06）、sigstore 验主体（E4）
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

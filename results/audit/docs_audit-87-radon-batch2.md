@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
+  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,26 @@ subjects:
 
 | 模块 | 拆法 | 结果 |
 |---
+> 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
+> 重审（2026-11-02）：check45 驾驶舱 M1 门禁（基线/文档同步）
+
+> 重审（2026-11-02）：真实工具兼容修复：TIFF XMP/GIF 子块/PDF trailer（2026-11-02）
+
+> 重审（2026-11-02）：并入 OGG/HEIF 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 TIFF/GIF/WebP/WAV/MP3/FLAC 载体（2026-11-02）
+
 > 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
 
 > 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card

@@ -7,8 +7,8 @@
   ],
   "official": {
     "entry": "https://ninfenz.dev/",
-    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev。Community 代码采用 AGPL-3.0-only；闭源集成、SLA、私有化和企业采购使用商业许可。官方付款或采购只通过 ninfenz.dev 或签署合同，不通过随机第三方站点、群聊或激活码。",
-    "statement_en": "The only official entry point is https://ninfenz.dev. Community code is AGPL-3.0-only; closed-source integration, SLAs, private deployment and enterprise procurement use a commercial license. Official payment or procurement is handled only through ninfenz.dev or a signed agreement, never through random third-party sites, chat groups or activation codes.",
+    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev。Community 代码采用 AGPL-3.0-only；闭源集成、SLA、私有化和企业采购使用商业许可。官方付款或采购只通过 ninfenz.dev 或签署合同，不通过随机第三方站点、群聊或激活码。小额体检服务可通过官网下单页与对公/微信支付完成；正式企业采购仍以签署合同为准。",
+    "statement_en": "The only official entry point is https://ninfenz.dev. Community code is AGPL-3.0-only; closed-source integration, SLAs, private deployment and enterprise procurement use a commercial license. Official payment or procurement is handled only through ninfenz.dev or a signed agreement, never through random third-party sites, chat groups or activation codes. Small-ticket labeling checks can be ordered and paid on the official order page by corporate transfer or WeChat Pay; formal enterprise procurement still follows a signed agreement.",
     "official_repositories": [
       "https://github.com/Monyeah777/NinFenz",
       "https://gitee.com/monyeah777/ninfenz"
@@ -54,12 +54,12 @@
   "facts": [
     {
       "id": "quality",
-      "claim_zh": "质量凭证：verify v2.30 · check1-44 · PASS=78",
-      "claim_en": "Quality evidence: verify v2.30 · check1-44 · PASS=78",
+      "claim_zh": "质量凭证：verify v2.30 · check1-45 · PASS=79",
+      "claim_en": "Quality evidence: verify v2.30 · check1-45 · PASS=79",
       "entry_point": "bash verify.sh",
       "anchor": "https://ninfenz.dev/#fact-quality",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
-      "note": "单入口；check1-44 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
+      "note": "单入口；check1-45 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
     },
     {
       "id": "scale",
@@ -129,7 +129,7 @@
   "citation": {
     "plain": "NinFenz（NF）— 内容契约层，Monyeah777，AGPL-3.0-only / Commercial，https://github.com/Monyeah777/NinFenz",
     "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. AGPL-3.0-only / Commercial. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only or Commercial}, note = {verify v2.30 · check1-44 · PASS=78}}",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {AGPL-3.0-only or Commercial}, note = {verify v2.30 · check1-45 · PASS=79}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {
@@ -145,6 +145,8 @@
     "trust": "https://ninfenz.dev/trust/",
     "controls": "https://ninfenz.dev/controls/",
     "diagnostic_cny": 39800,
-    "diagnostic_usd": 6500
+    "diagnostic_usd": 6500,
+    "label": "https://ninfenz.dev/label/",
+    "label_cny": 2999
   }
 }

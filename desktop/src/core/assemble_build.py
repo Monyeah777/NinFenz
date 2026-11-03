@@ -38,7 +38,7 @@ def _mod_files(root: Path) -> Dict[str, Path]:
         for p in sorted(root.glob(pat)):
             try:
                 text = p.read_text(encoding="utf-8")
-            except OSError:
+            except OSError:  # 跳过不可读件；缺口由 check20/21 另报（AUD-0016）
                 continue
             mid = ""
             block = _contract(text)

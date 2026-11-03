@@ -128,12 +128,22 @@
         "desktop/src/core/ingest_common.py::B603": 1,
         "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/labeling/checker.py::B105": 2,
+        "desktop/src/core/labeling/extra_dft.py::B105": 1,
         "desktop/src/core/labeling/metadata.py::B314": 3,
         "desktop/src/core/labeling/metadata.py::B405": 3,
+        "desktop/src/core/labeling/metadata_extra.py::B314": 2,
+        "desktop/src/core/labeling/metadata_extra.py::B405": 1,
+        "desktop/src/core/labeling/pipeline.py::B105": 1,
+        "desktop/src/core/labeling/recheck.py::B105": 1,
+        "desktop/src/core/labeling/render_extra.py::B105": 3,
+        "desktop/src/core/labeling/render_extra.py::B108": 1,
+        "desktop/src/core/labeling/report.py::B101": 1,
+        "desktop/src/core/labeling/report.py::B105": 2,
         "desktop/src/core/labeling/writers_docx_md.py::B314": 1,
         "desktop/src/core/labeling/writers_docx_md.py::B405": 1,
         "desktop/src/core/labeling/writers_zipformats.py::B314": 1,
         "desktop/src/core/labeling/writers_zipformats.py::B405": 1,
+        "desktop/src/core/labeling/xcheck.py::B105": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
         "desktop/src/core/perf_counters.py::B110": 1,
         "desktop/src/core/perf_counters.py::B404": 1,
@@ -148,10 +158,13 @@
         "scripts/gate_a_bucket.py::B603": 1,
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
+        "scripts/m1_e2e.py::B404": 1,
+        "scripts/m1_e2e.py::B603": 1,
         "scripts/mutation_sample.py::B404": 1,
         "scripts/mutation_sample.py::B603": 1,
         "scripts/nf.py::B404": 1,
         "scripts/nf.py::B603": 5,
+        "scripts/nf_label.py::B105": 1,
         "scripts/perf_budget.py::B404": 1,
         "scripts/perf_budget.py::B603": 1,
         "scripts/sast_check.py::B404": 1,
@@ -171,17 +184,17 @@
           "severities": [
             [
               "LOW",
-              60
+              74
             ],
             [
               "MEDIUM",
-              10
+              13
             ]
           ],
-          "total": 70
+          "total": 87
         },
         "ruff": {
-          "total": 93
+          "total": 98
         }
       },
       "ruff": {
@@ -201,6 +214,9 @@
         "desktop/src/core/ingest_common.py::S607": 1,
         "desktop/src/core/interop_export.py::S110": 1,
         "desktop/src/core/labeling/metadata.py::S314": 3,
+        "desktop/src/core/labeling/metadata_extra.py::S314": 2,
+        "desktop/src/core/labeling/render_extra.py::S108": 1,
+        "desktop/src/core/labeling/report.py::S101": 1,
         "desktop/src/core/labeling/writers_docx_md.py::S314": 1,
         "desktop/src/core/labeling/writers_zipformats.py::S314": 1,
         "desktop/src/core/library.py::S110": 1,
@@ -224,6 +240,7 @@
         "scripts/check_interop_schemas.py::S310": 4,
         "scripts/gate_a_bucket.py::S603": 1,
         "scripts/instruction_evidence.py::S603": 1,
+        "scripts/m1_e2e.py::S603": 1,
         "scripts/mutation_sample.py::S603": 1,
         "scripts/nf.py::S110": 2,
         "scripts/nf.py::S112": 3,

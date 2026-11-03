@@ -128,15 +128,6 @@ def _canonical(obj) -> bytes:
     return json.dumps(obj, ensure_ascii=True, separators=(",", ":")).encode("ascii")
 
 
-def slice_fields(meta: dict, side: str = "producer") -> dict:
-    span = SPANS[side]
-    out = {}
-    for key in FIELDS[:span]:
-        if key in meta and meta[key] is not None:
-            out[key] = meta[key]
-    return out
-
-
 def build_message(sd: dict, raw_text: str, bindings: list,
                   content: bytes | None = None) -> bytes:
     """按 TBSData 数组拼接签名消息。
@@ -468,10 +459,6 @@ def verify_time(ds: dict, roots=None, when=None, tolerance_h=24) -> tuple:
         ds.get("TBSData") or [], ds.get("Signature") or ""), roots, when)
     return ok, issues, {"kind": "token", "gen_time": str(tok.tst.gen_time),
                         "serial": tok.tst.serial}
-
-
-def content_hash_hex(content: bytes) -> str:
-    return sm.sm3_hex(content)
 
 
 def describe_field(key: str) -> str:

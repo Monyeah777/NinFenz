@@ -609,14 +609,26 @@ def face_fingerprint(root: str = ".") -> str:
     return _fk.fingerprint(root, _READ_FACE, patterns(root))
 
 
-def scan(root: str = ".", _fp: Optional[str] = None) -> Tuple[List[str], Dict[str, Any]]:
+def scan(root: str = ".", _fp: Optional[str] = None,
+         cache: bool | None = None) -> Tuple[List[str], Dict[str, Any]]:
     """阶梯体检 → (issues, stats)；issues 空 = 阶梯自洽（并入 check27 纯度面）。
 
     派生结果按**输入内容指纹**缓存（输入面见 `patterns()`：声明列了整棵语料，面很宽）。
-    **冷进程也走这层**（2026-09-29 改）：过去写「只在常驻语料层在位时才缓存」，理由是「冷进程里取
-    指纹比直接算更贵」——实测不成立（冷进程本来就要为别的站点读整棵语料，摘要共享 ⇒ 指纹近乎白拿）；
-    实测数字见 `quality_depth_scan.scan`。
+    作用域内走缓存是划算的（2026-09-29 实测：同一只读作用域里指纹的读面与别的站点共享，
+    近乎白拿；实测数字见 `quality_depth_scan.scan`）。
+
+    `cache` 开关（2026-11-03 实测补）：**一次性进程**（`nf layers --verify`、单测直调）里这条
+    前提不成立——宽面指纹要独立读完整棵语料，成本比派生本身贵一个数量级（本机实测：
+    `face_fingerprint` ≈ **10.2 s** vs `_scan_impl` ≈ **1.5 s**），而进程跑完即退、缓存命中
+    一辈子也摊销不回来。故 `cache=None`（缺省）时自动判：无预给指纹 + 无共享语料作用域 +
+    无常驻层 ⇒ 直接算（结论逐位相同，只是不做无收益的取键）。`purity_scan` 传 `_fp` 时
+    仍走缓存；需要强制某一路时可显式传 True/False。
     """
+    if cache is False:
+        return _scan_impl(root)
+    if cache is None and _fp is None and not csc.resident_active() \
+            and not csc.in_read_scope():
+        return _scan_impl(root)
     return csc.memo_pair("layer-model", patterns(root), _scan_impl, root,
                          code_modules=("core.layer_model",), fp=_fp)
 

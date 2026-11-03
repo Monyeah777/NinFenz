@@ -102,7 +102,7 @@ curl -s  https://ninfenz.dev/nope | findstr /I "404"             # 应回站内 
 
 | 组成 | 说明 |
 |---|---|
-| `wrangler.jsonc` · `main: site/worker.js` | 从 assets-only 升级为**静态资产 + 轻量 Worker**：Worker 只做 `www.*` → 裸域 **301**，其余原样交回 `env.ASSETS.fetch()` |
+| `wrangler.jsonc` · `main: site/worker.js` | 从 assets-only 升级为**静态资产 + 轻量 Worker**：Worker 做 `www.*` → 裸域 **301**、首页 markdown 协商，以及 `POST /api/lead` 线索落库（可选 `LEAD_KV`）；其余原样交回 `env.ASSETS.fetch()` |
 | `assets.binding: "ASSETS"` | **必需**。`run_worker_first: true` 时若不声明绑定，`env.ASSETS` 是 `undefined`（本波 dry-run 实测拦下，否则全站崩） |
 | `assets.run_worker_first: true` | 每个请求先过 Worker（www 跳转必须），非 www 再交回资产层——`_headers` 规则实测照旧生效 |
 | `workers_dev: false` | 关掉 `*.workers.dev` 路由，全网只留 `ninfenz.dev` / `www` 一个可达源 |
@@ -175,3 +175,74 @@ node site/tools/site-check.mjs              # 联网判据（部署后）：状�
 CI 里已接 `sync-numbers.mjs` 与 `site-check.mjs --offline` 两步（.github/workflows/ci-verify.yml），
 所以站点数字或机器面漂移会与仓库门禁一起红。
 
+
+---
+
+## 十、标识体检产品上线清单（2026-11-02 增补）
+
+本波新增 `/label/`（中文）与 `/en/label/`（英文）两个落地页、`POST /api/lead` 线索接口，以及可选的 `LEAD_KV` 绑定。上线按下面顺序执行。
+
+### 1. 替换微信二维码
+
+页面当前引用同源占位图 `/assets/wechat-qr-placeholder.svg`（联系区和提交成功提示各一处，中英两页共 4 处 `<img>`）。
+
+- 把实际微信二维码导出为 240×240 的 SVG 或 PNG，**覆盖同名文件**，或改两页的 `img src` 指向新文件；不要引用外部图床。
+- 改完跑一次 `grep -rn "wechat-qr-placeholder" site/label site/en/label`，确认路径与文件名一致。
+- 占位图内写有“微信二维码 / 部署前替换”，替换后自然消失；若改用新文件名，记得删除旧占位图或保留但不再引用。
+
+### 2. 填对公账户与收款说明
+
+页面目前写的是“对公账户与开票信息在预检确认后随付款通知提供”，避免在公开页写未确认的账户。若希望直接展示：
+
+- 修改 `site/label/index.html` 与 `site/en/label/index.html` 的「支付方式 / Payment」卡片，填入户名、开户行、账号与发票类型；
+- 改价时同步 `site/pricing/index.html`、`site/en/pricing/index.html`、`site/facts.json` 的 `commerce.label_cny` 与两页文案，避免价格漂移；
+- 退款口径（交付前可全退；交付后 24h 内对判定错误可复检/退款）已写在两页与 Trust 页，改动时三处一起改。
+
+### 3. 创建 KV 并解注释绑定
+
+```bash
+npx wrangler kv namespace create LEAD_KV
+# 记下输出里的 id
+```
+
+打开根目录 `wrangler.jsonc`，把注释行改成真实绑定后重新部署：
+
+```jsonc
+"kv_namespaces": [{"binding": "LEAD_KV", "id": "<上一步输出的 id>"}]
+```
+
+没有绑定也能上线：`POST /api/lead` 返回 `501` 与 `{ok:false, fallback:"mailto"}`，页面会自动打开邮件客户端，内容与表单一致。绑定后线索写入 `lead:<时间戳>:<随机串>`。KV 里是姓名、微信/联系方式与需求简述，按最小必要保存，并定期清理。
+
+### 4. 测试下单表单
+
+```bash
+# worker 行为判据（GET 协商 / www 301 / 回落不受影响）
+node site/tools/worker-check.mjs
+
+# 已绑定 KV：期望 200 {"ok":true}
+curl -i -X POST https://ninfenz.dev/api/lead \
+  -H 'content-type: application/json' \
+  --data '{"name":"test","contact":"wx-test","fileType":"PDF"}'
+
+# 未绑定 KV：期望 501 {"ok":false,"fallback":"mailto",...}
+```
+
+浏览器里两页各测一次：提交后应显示“已收到，48h 内回复”（英文页为 “Received. We will reply within 48 hours.”）并展示二维码；断网或接口 4xx/5xx 时应打开 `mailto:1764861918@qq.com`。另测一次隐藏字段 `company_url` 被填写时不落库（返回 200、`stored:false`）。
+
+### 5. 更新 facts / sitemap 后部署
+
+本波已改 `facts.json`（`commerce.label` / `commerce.label_cny` + official 段小额支付说明）、`sitemap.xml`（两个 `/label/` loc）、`_headers`（两页 no-cache 规则）、`llms.txt` / `llms-full.txt` / `nf.txt`。部署前后按序跑：
+
+```bash
+node site/tools/site-check.mjs --offline
+npx wrangler deploy
+node site/tools/site-check.mjs https://ninfenz.dev
+```
+
+### 6. 发布前检查
+
+- `node site/tools/site-check.mjs --offline` 全过（当前 70 项，含 `/label/`、`/en/label/` 的 JSON-LD / 无外链 / favicon / `_headers` / sitemap）；
+- `node site/tools/worker-check.mjs` 全过（当前 16 项）；
+- 样例报告 `/assets/label-sample-report.html` 由 Lead 产出，发布前确认线上返回 200；若尚未就绪，先去掉两页 hero 的“下载样例报告”按钮，避免 404；
+- 线上确认 `/label/` 与 `/en/label/` 的 canonical、三向 hreflang、`Cache-Control: public, max-age=0, must-revalidate`；
+- 价格文案四处一致：两页 label、两页 pricing、`facts.json` 的 `label_cny`。

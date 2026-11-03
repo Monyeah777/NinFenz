@@ -23,14 +23,14 @@ subjects:
   - desktop/src/core/orchestration.py:c1af716bbb08fc06b8d75edc96a662b50f57bb91b5d06b3f8ecd3f19289e8084
   - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
-  - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
+  - desktop/src/core/layer_model.py:f1b00529b99a93282c9d614ee5683a71502507947d5b0b1c4444328d63a0d6d6
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
   - desktop/src/core/daemon.py:eddcc0f9c14cf0cde6024e35cc1de1e23d63ebccf036a8ac0d5cd2e7bc300931
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
+  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,28 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
+
+> 重审（2026-11-03）：P3 收口重审：layer_model 一次性进程免付指纹取键（实测 fingerprint 10.2s→_scan_impl 1.5s）、conformance_scan DT_LNK 复核、terminal 深检预算重冻 10000（实测 1.7-7.8s）、risk_baseline 部署/事故口径修正；同批含并行面 nf.py/CLI 测试改动
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
+> 重审（2026-11-02）：check45 驾驶舱 M1 门禁（基线/文档同步）
+
+> 重审（2026-11-02）：真实工具兼容修复：TIFF XMP/GIF 子块/PDF trailer（2026-11-02）
+
+> 重审（2026-11-02）：并入 OGG/HEIF 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 TIFF/GIF/WebP/WAV/MP3/FLAC 载体（2026-11-02）
+
 > 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
 
 > 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card

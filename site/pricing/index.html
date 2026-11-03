@@ -4,15 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>定价与许可 · NinFenz Evidence Gate</title>
-<meta name="description" content="NinFenz Evidence Gate 企业定价：4 周输出保障诊断、Team、Enterprise 与 OEM。Community 采用 AGPL-3.0，商业许可用于闭源集成、SLA 与企业采购。">
+<meta name="description" content="NinFenz Evidence Gate 定价：GB 45438 标识体检、4 周输出保障诊断、Team、Enterprise 与 OEM。Community 采用 AGPL-3.0，商业许可用于闭源集成、SLA 与企业采购。">
 <link rel="canonical" href="https://ninfenz.dev/pricing/">
 <link rel="alternate" hreflang="zh-CN" href="https://ninfenz.dev/pricing/">
 <link rel="alternate" hreflang="en" href="https://ninfenz.dev/en/pricing/">
 <link rel="alternate" hreflang="x-default" href="https://ninfenz.dev/pricing/">
 <link rel="stylesheet" href="../assets/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"OfferCatalog","name":"NinFenz Evidence Gate pricing","url":"https://ninfenz.dev/pricing/","itemListElement":[{"@type":"Offer","name":"AI Output Assurance Diagnostic","price":"39800","priceCurrency":"CNY"},{"@type":"Offer","name":"Team Control","price":"19800","priceCurrency":"CNY"},{"@type":"Offer","name":"Enterprise","price":"98000","priceCurrency":"CNY"}]}
+{"@context":"https://schema.org","@type":"OfferCatalog","name":"NinFenz Evidence Gate pricing","url":"https://ninfenz.dev/pricing/","itemListElement":[{"@type":"Offer","name":"GB 45438 Label Check","price":"2999","priceCurrency":"CNY"},{"@type":"Offer","name":"Label Check three-file pack","price":"7999","priceCurrency":"CNY"},{"@type":"Offer","name":"AI Output Assurance Diagnostic","price":"39800","priceCurrency":"CNY"},{"@type":"Offer","name":"Team Control","price":"19800","priceCurrency":"CNY"},{"@type":"Offer","name":"Enterprise","price":"98000","priceCurrency":"CNY"}]}
 </script>
+<style>
+  .price-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 900px) { .price-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 650px) { .price-grid { grid-template-columns: 1fr; } }
+</style>
 <link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
 </head>
 <body>
@@ -35,20 +40,30 @@
       <ul><li>完整核心代码</li><li>CLI、MCP、LSP</li><li>本地优先</li><li>无强制云服务</li><li>社区 Issue 支持</li></ul>
       <a class="btn secondary" href="../use/">开始使用</a>
     </div>
+    <div class="card price-card">
+      <div class="num">LABEL CHECK</div><h3>标识体检</h3><div class="price">¥2,999</div><div class="price-note">单文件 · 48h（工作日）</div>
+      <ul><li>GB 45438 五段判定</li><li>PDF 报告 + evidence.json</li><li>整改清单与复算命令</li><li>1 次免费复检</li></ul>
+      <a class="btn secondary" href="../label/">申请体检</a>
+    </div>
+    <div class="card price-card">
+      <div class="num">THREE-FILE PACK</div><h3>三文件包</h3><div class="price">¥7,999</div><div class="price-note">3 个文件 · 48h（工作日）</div>
+      <ul><li>同批次 3 个文件</li><li>每份独立报告与 evidence.json</li><li>合并整改清单</li><li>同批共 1 次免费复检</li></ul>
+      <a class="btn secondary" href="../label/#apply">按三文件包申请</a>
+    </div>
     <div class="card price-card featured">
       <div class="num">RECOMMENDED FIRST</div><h3>Assurance Diagnostic</h3><div class="price">¥39,800</div><div class="price-note">USD 6,500 · 4 周</div>
-      <ul><li>1 个生产工作流</li><li>10 个控制契约</li><li>PASS / FAIL 样例</li><li>1 个 CLI / MCP / CI 集成</li><li>证据包与内部审计演示</li><li>90 天路线图</li></ul>
+      <ul><li>1 个生产工作流</li><li>10 个控制契约</li><li>PASS / FAIL 样例</li><li>1 个 CLI / MCP / CI 集成</li><li>证据包与内部审计演示</li><li>90 天路线图</li><li>已购买 Label Check 可抵扣 ¥2,999</li></ul>
       <a class="btn primary" href="../pilot/">申请诊断</a>
     </div>
     <div class="card price-card">
       <div class="num">TEAM</div><h3>Team Control</h3><div class="price">¥19,800 / 年</div><div class="price-note">USD 3,000 / 年</div>
       <ul><li>40 个专业控制包</li><li>10 个 Agent 安装包</li><li>3 个报告布局</li><li>12 个月兼容更新</li><li>上线支持</li></ul>
-      <a class="btn secondary" href="mailto:support@ninfenz.dev?subject=NinFenz%20Team%20Control">获取采购信息</a>
+      <a class="btn secondary" href="mailto:1764861918@qq.com?subject=NinFenz%20Team%20Control">获取采购信息</a>
     </div>
     <div class="card price-card">
       <div class="num">ENTERPRISE</div><h3>Enterprise</h3><div class="price">¥98,000 起 / 年</div><div class="price-note">USD 15,000 起 / 年</div>
       <ul><li>商业许可</li><li>私有化部署支持</li><li>安全问卷配合</li><li>合同与发票</li><li>工作日 4h 首响</li><li>季度治理评审</li></ul>
-      <a class="btn secondary" href="mailto:support@ninfenz.dev?subject=NinFenz%20Enterprise">企业咨询</a>
+      <a class="btn secondary" href="mailto:1764861918@qq.com?subject=NinFenz%20Enterprise">企业咨询</a>
     </div>
   </div>
 </section>
@@ -57,7 +72,7 @@
   <h2>OEM / Embedded</h2>
   <div class="grid two">
     <div class="card"><h3>嵌入你的 AI 产品或治理平台</h3><p>适用于 AI Agent、Copilot、AI governance、observability 和 docs-as-code 平台。NinFenz 可以作为输出控制与证据层，而不是替代现有平台。</p></div>
-    <div class="card"><h3>起价</h3><div class="price">¥200,000 / 年</div><div class="price-note">USD 30,000 / 年</div><p>包含白标授权、技术集成、联合案例和版本路线协调。</p><a class="btn primary" href="mailto:support@ninfenz.dev?subject=NinFenz%20OEM%20integration">讨论集成</a></div>
+    <div class="card"><h3>起价</h3><div class="price">¥200,000 / 年</div><div class="price-note">USD 30,000 / 年</div><p>包含白标授权、技术集成、联合案例和版本路线协调。</p><a class="btn primary" href="mailto:1764861918@qq.com?subject=NinFenz%20OEM%20integration">讨论集成</a></div>
   </div>
 </section>
 

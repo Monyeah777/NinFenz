@@ -24,7 +24,10 @@ VERSION = "0.1.0"
 
 def _read_json(path):
     with open(path, encoding="utf-8") as f:
-        return json.load(f)
+        obj = json.load(f)
+    if not isinstance(obj, dict):
+        raise ValueError("%s 顶层不是对象（修复指引：标识 JSON 须是对象）" % path)
+    return obj
 
 
 def cmd_check(args):
@@ -136,6 +139,30 @@ def _write_into_container(path, container, text, args):
             from . import writers_image_pdf as w
             w.inject_pdf_info(path, text)
             print(f"已写入 PDF Info /AIGC（增量更新）：{path}")
+            return True
+        if container == "ogg":
+            from . import writers_ogg as w
+            w.inject_ogg(path, text)
+            print(f"已写入 OGG Vorbis/Opus 注释头：{path}")
+            return True
+        if container == "heif":
+            from . import writers_heif as w
+            w.inject_heif(path, text)
+            print(f"已写入 HEIF meta 元数据 item：{path}")
+            return True
+        if container in ("tiff", "gif", "webp"):
+            from . import writers_media_extra as w
+            fn = {"tiff": w.inject_tiff, "gif": w.inject_gif,
+                  "webp": w.inject_webp}[container]
+            fn(path, text)
+            print(f"已写入 {container} 标识载体：{path}")
+            return True
+        if container in ("wav", "mp3", "flac"):
+            from . import writers_audio_extra as w
+            fn = {"wav": w.inject_wav, "mp3": w.inject_mp3,
+                  "flac": w.inject_flac}[container]
+            fn(path, text)
+            print(f"已写入 {container} 标识载体：{path}")
             return True
         if container in ("xmind", "posm", "posf", "uof"):
             from . import writers_zipformats as w

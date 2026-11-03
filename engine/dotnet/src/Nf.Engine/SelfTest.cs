@@ -1721,8 +1721,8 @@ public static class SelfTest
 
         // ① 修复指引表：机械导出件的长度与**码点序**键序（"10" 排在 "2" 前），缺键必须是 null
         var keys = CheckGuide.SortedKeys();
-        checks.Add(new Check("小口·修复指引表（44 条 · 码点序键序 · 缺键 null）",
-            CheckGuide.Count == 44 && keys.Count == 44
+        checks.Add(new Check("小口·修复指引表（45 条 · 码点序键序 · 缺键 null）",
+            CheckGuide.Count == 45 && keys.Count == 45
             && string.Join(",", keys.Take(4)) == "1,10,11,12"
             && keys[^1] == "9"
             && CheckGuide.Get("42") is not null && CheckGuide.Get("32")!.Contains("质量纵深汇总"),

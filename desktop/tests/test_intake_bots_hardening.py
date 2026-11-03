@@ -13,6 +13,7 @@
 import io
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -44,16 +45,44 @@ def bot_module():
 MAX_EXEC_STRLEN = 131072
 
 
+def copy_tree(src, dst):
+    """递归复制夹具树，**类型判据只用 lstat，不用 readdir 的 d_type**。
+
+    为什么不用 `shutil.copytree`（2026-11-03 实测，本机 Android/proot）：个别文件
+    （`desktop/src/core/labeling/extra_dft.py`、`recheck.py`）的目录项被内核报成
+    `DT_LNK`，而 `lstat` 明确是普通文件；`shutil` 信任 `DirEntry.is_symlink()` 于是走
+    `os.readlink()` → `EINVAL`，夹具准备阶段就炸（与本测试要判的入库加固无关，是宿主
+    文件系统元数据不一致）。判据以 lstat 为准；**真的**符号链接照旧跟随复制。
+    """
+    os.makedirs(dst, exist_ok=True)
+    with os.scandir(src) as itr:
+        entries = list(itr)
+    for entry in entries:
+        if entry.name == "__pycache__":
+            continue
+        s, d = entry.path, os.path.join(dst, entry.name)
+        st = os.lstat(s)
+        if stat.S_ISLNK(st.st_mode):
+            real = os.path.realpath(s)
+            if os.path.isdir(real):
+                copy_tree(real, d)
+            else:
+                shutil.copy2(real, d)
+        elif stat.S_ISDIR(st.st_mode):
+            copy_tree(s, d)
+        else:
+            shutil.copy2(s, d)
+
+
 def run_bot(tmp, body=None, number="991", body_file=None, title=None):
     """在临时副本里真跑一次 GitHub 前端入库（DRY_RUN，不提交/不调 API）。
 
     正文传输：小载荷走 `ISSUE_BODY`（历史通道）；大载荷走 `ISSUE_BODY_FILE`（见下）。
     `title` 用于投稿标题面判据（审计 Y2：标题也是不可信输入）。
     """
-    shutil.copytree(os.path.join(ROOT, "library"), os.path.join(tmp, "library"))
-    shutil.copytree(os.path.join(ROOT, "desktop", "src"),
-                    os.path.join(tmp, "desktop", "src"),
-                    ignore=shutil.ignore_patterns("__pycache__"))
+    copy_tree(os.path.join(ROOT, "library"), os.path.join(tmp, "library"))
+    copy_tree(os.path.join(ROOT, "desktop", "src"),
+              os.path.join(tmp, "desktop", "src"))
     env = dict(os.environ)
     env.pop("ISSUE_BODY", None)
     env.pop("ISSUE_BODY_FILE", None)

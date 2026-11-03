@@ -324,29 +324,42 @@ def _aggregate_summary(num: int) -> str:
     return m.group(1) if m else ""
 
 
-def _tail_census(text: str) -> tuple[list[int], list[int]]:
-    """扫 verify.sh → (贴整段日志尾部的 check, 把 verdict 压成一行的 check)。
+def _tail_census(text: str) -> dict:
+    """扫 verify.sh → tail 站点的**三分**普查（每条 `tail -` 行必须落进且只落进一类）。
 
     - `| sed`：失败时把日志尾部贴出来，是**诊断上下文**，不是一行 verdict；
-    - `| tr` ：`no "前缀$(tail -N log | tr '\\n' ' ')"` —— 子面明细被压成一行 verdict。
+    - `| tr` ：`no "前缀$(tail -N log | tr '\\n' ' ')"` —— 子面明细被压成一行 verdict；
+    - 第三类：同样是 `| tr` 压行，但日志路径先存进 `$_aud1` / `$_a_list` / `$_al1` 等
+      **shell 变量**、行内没有 `nf_checkNN` 字样（check45 审计/告警族）。旧版对这些行
+      直接 `continue`，于是它们既不入 dump 也不入 verdict——「N 处 tail」的口径会**漏账**。
+      现按行数如实计入 `unattributed_tr`。
     """
     dump, verdict = set(), set()
+    counts = {"dump": 0, "verdict": 0, "unattributed_tr": 0}
     for line in text.splitlines():
         if "tail -" not in line:
             continue
         m = re.search(r"nf_check(\d+)", line)
         if not m:
+            if "| tr" in line:
+                counts["unattributed_tr"] += 1
             continue
         if "| sed" in line:
             dump.add(int(m.group(1)))
+            counts["dump"] += 1
         elif "| tr" in line:
             verdict.add(int(m.group(1)))
-    return sorted(dump), sorted(verdict)
+            counts["verdict"] += 1
+    return {"dump": sorted(dump), "verdict": sorted(verdict), "counts": counts}
 
 
 def _upgraded_gates(text: str) -> list[int]:
-    """→ bash 体里已有「遍历日志、逐条透出 [FAIL]」口径的 check（顺序按编号）。"""
-    return [n for n in range(1, 43)
+    """→ bash 体里已有「遍历日志、逐条透出 [FAIL]」口径的 check（顺序按编号）。
+
+    扫描上界跟着 check 总数走（现 45 条）：写死 `range(1, 43)` 会让 check43/44/45
+    即使将来也升级成逐条透出，这条判据也**看不见**（普查范围外的假绿）。
+    """
+    return [n for n in range(1, 46)
             if 'case "$_line" in' in gate_engine.gate_labels.check_body(text, n)]
 
 
@@ -432,15 +445,27 @@ class AggregateGateCensusTest(unittest.TestCase):
     """模式普查：verify.sh 里 tail 压缩的全量清单（防止“这是个案例”被误读）。"""
 
     def test_tail_compression_sites(self):
-        """23 处 tail：20 处压 verdict（check23-42）+ 3 处贴日志尾部（check12×2/check18）。"""
+        """44 处 tail 的全量三分普查（2026-11-03 实算，check43/44/45 落地后重冻）。
+
+        - 3 处贴整段日志尾部（check12×2 / check18，`| sed`）——诊断上下文；
+        - 34 处把 verdict 压成一行（`| tr`，行内可归到 check 号）：
+          check23–42 二十处 + check44 两处（selfcheck / 样例判定）+ check45 十二处；
+        - 7 处同样是 `| tr` 压行，但日志路径走 `$_aud1` / `$_a_list` / `$_al1` 等变量
+          （check45 审计/告警族），行内没有 `nf_checkNN` 字样。
+        三分之和 == total 是闭合判据：任何新增 tail 站点没被归类都会当场红。
+        """
         total = sum(1 for line in VERIFY_TEXT.splitlines() if "tail -" in line)
-        dump, verdict = _tail_census(VERIFY_TEXT)
-        self.assertEqual(23, total)
-        self.assertEqual([12, 18], dump)
-        self.assertEqual(list(range(23, 43)), verdict)
+        census = _tail_census(VERIFY_TEXT)
+        self.assertEqual(44, total)
+        self.assertEqual([12, 18], census["dump"])
+        self.assertEqual(list(range(23, 43)) + [44, 45], census["verdict"])
+        self.assertEqual({"dump": 3, "verdict": 34, "unattributed_tr": 7},
+                         census["counts"])
+        self.assertEqual(total, sum(census["counts"].values()),
+                         "tail 站点三分不闭合：有站点没被 dump/verdict/变量名 tr 归到")
 
     def test_upgraded_gates_are_exactly_the_six(self):
-        """逐条透出口径当前覆盖 32/33/35/36/41/42；其余 14 处仍是模式存量。"""
+        """逐条透出口径当前覆盖 32/33/35/36/41/42；其余 16 处 verdict 压缩仍是模式存量。"""
         self.assertEqual(list(UPGRADED_GATES), _upgraded_gates(VERIFY_TEXT))
 
     def test_summary_has_single_source(self):

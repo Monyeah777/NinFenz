@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GB 45438 标识体检报告 · 示例-未带标识.mp4</title>
+<style>
+:root{--ink:#1f2328;--muted:#667085;--line:#d0d7de;--ok:#1a7f37;
+--warn:#9a6700;--bad:#cf222e;--na:#6e7781;--bg:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:14px/1.65 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:900px;margin:0 auto;padding:32px 24px 56px}
+.brand{color:var(--muted);font-size:12px;letter-spacing:.08em}
+h1{font-size:24px;margin:6px 0 4px}
+h2{font-size:17px;margin:28px 0 10px;padding-top:8px;
+border-top:1px solid var(--line)}
+h3{font-size:15px;margin:18px 0 8px}
+.muted{color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+font-size:12px;word-break:break-all}
+table{width:100%;border-collapse:collapse;margin:8px 0 4px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;
+vertical-align:top}
+th{background:#f6f8fa;font-size:12px;color:var(--muted)}
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;
+font-size:12px;border:1px solid currentColor}
+.badge.ok{color:var(--ok)}.badge.warn{color:var(--warn)}
+.badge.bad{color:var(--bad)}.badge.na{color:var(--na)}
+.verdict{font-size:22px;font-weight:600;margin:6px 0 2px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:4px 12px;
+margin:10px 0;font-size:13px}
+.kv div:nth-child(odd){color:var(--muted)}
+pre{background:#f6f8fa;border:1px solid var(--line);padding:8px;
+overflow:auto;font-size:12px;white-space:pre-wrap}
+details{margin:4px 0}
+footer{margin-top:32px;font-size:12px;color:var(--muted);
+border-top:1px solid var(--line);padding-top:10px}
+@media print{
+body{font-size:11pt}main{max-width:none;padding:0}
+h2{page-break-after:avoid}table{page-break-inside:auto}
+tr{page-break-inside:avoid}.noprint{display:none}
+}
+</style></head><body><main>
+<div class="brand">NF · NINFENZ · 标识体检报告</div>
+<h1>GB 45438 标识体检报告</h1>
+<div class="muted">示例-未带标识.mp4 · MP4 视频</div>
+<p class="verdict">结论：<span class="badge bad">FAIL</span></p>
+<div class="kv">
+<div>报告编号</div><div class="mono">416081995ce12c36</div>
+<div>生成时间</div><div class="mono">2026-11-02T10:00:00+0800</div>
+<div>文件大小</div><div class="mono">123 字节</div>
+<div>文件 SHA-256</div><div class="mono">416081995ce12c36f46a0c54d961a0486f19a2958beff22bb5f333b789ce3cc9</div>
+<div>标识位置</div><div class="mono">—</div>
+<div>判定项</div><div>15 项（FAIL 1 / WARN 8）</div>
+</div>
+<h2>五段判定</h2>
+<table><thead><tr><th>段</th><th>判据</th><th>状态</th></tr></thead>
+<tbody><tr><td class="mono">A</td><td>显式标识</td><td><span class="badge na">NA</span></td></tr><tr><td class="mono">B</td><td>隐式标识字段</td><td><span class="badge bad">FAIL</span></td></tr><tr><td class="mono">C</td><td>安全防护信息</td><td><span class="badge na">NA</span></td></tr><tr><td class="mono">D</td><td>内容绑定</td><td><span class="badge ok">PASS</span></td></tr><tr><td class="mono">E</td><td>备案材料</td><td><span class="badge warn">WARN</span></td></tr></tbody></table>
+<h2>整改清单</h2>
+<table><thead><tr><th>段</th><th>项</th><th>状态</th><th>整改说明</th></tr></thead><tbody><tr><td>B</td><td>B0</td><td><span class="badge bad">FAIL</span></td><td>未找到隐式标识元数据（七字段 JSON）</td></tr><tr><td>E</td><td>E1</td><td><span class="badge warn">WARN</span></td><td>待补：隐式标识元数据样本</td></tr><tr><td>E</td><td>E2</td><td><span class="badge warn">WARN</span></td><td>待补：证书链与时间戳（可选）</td></tr><tr><td>E</td><td>E3</td><td><span class="badge warn">WARN</span></td><td>待补：内容摘要与绑定记录</td></tr><tr><td>E</td><td>E4</td><td><span class="badge warn">WARN</span></td><td>待补：SM3withSM2 签名与公钥</td></tr><tr><td>E</td><td>E6</td><td><span class="badge warn">WARN</span></td><td>待补：服务提供者编码（27 位）</td></tr><tr><td>E</td><td>E7</td><td><span class="badge warn">WARN</span></td><td>待补：标识方法说明（协议/界面）</td></tr><tr><td>E</td><td>E8</td><td><span class="badge warn">WARN</span></td><td>待补：日志留存说明（≥6 个月）</td></tr><tr><td>E</td><td>E9</td><td><span class="badge warn">WARN</span></td><td>备案/评估可用材料 1/8</td></tr></tbody></table>
+
+<h2>逐项明细</h2>
+<section class="seg"><h3>A · 显式标识 <span class="badge na">NA</span></h3><table><thead><tr><th>项</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td class="mono">A1</td><td><span class="badge na">NA</span></td><td>显式标识位于像素/画面/音轨，本工具不做视觉判定；请人工或 OCR/抽帧复核</td></tr></tbody></table></section><section class="seg"><h3>B · 隐式标识字段 <span class="badge bad">FAIL</span></h3><table><thead><tr><th>项</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td class="mono">B0</td><td><span class="badge bad">FAIL</span></td><td>未找到隐式标识元数据（七字段 JSON）</td></tr></tbody></table></section><section class="seg"><h3>C · 安全防护信息 <span class="badge na">NA</span></h3><table><thead><tr><th>项</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td class="mono">C0</td><td><span class="badge na">NA</span></td><td>无隐式标识元数据，跳过</td></tr></tbody></table></section><section class="seg"><h3>D · 内容绑定 <span class="badge ok">PASS</span></h3><table><thead><tr><th>项</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td class="mono">D1</td><td><span class="badge ok">PASS</span></td><td>内容字节选取 CntSel=DFT，共 15 字节<details><summary>证据</summary><pre>{
+  &quot;cntsel&quot;: &quot;DFT&quot;,
+  &quot;bytes&quot;: 15
+}</pre></details></td></tr><tr><td class="mono">D2</td><td><span class="badge ok">PASS</span></td><td>SM3 摘要可复算<details><summary>证据</summary><pre>{
+  &quot;sm3&quot;: &quot;f1a6293ba5b861b873c00928747e3c4890c244a77d033d96cf87e55cc6007007&quot;
+}</pre></details></td></tr><tr><td class="mono">D3</td><td><span class="badge na">NA</span></td><td>绑定关系由 C2/C3 综合判定</td></tr></tbody></table></section><section class="seg"><h3>E · 备案材料 <span class="badge warn">WARN</span></h3><table><thead><tr><th>项</th><th>状态</th><th>说明</th></tr></thead><tbody><tr><td class="mono">E1</td><td><span class="badge warn">WARN</span></td><td>待补：隐式标识元数据样本</td></tr><tr><td class="mono">E2</td><td><span class="badge warn">WARN</span></td><td>待补：证书链与时间戳（可选）</td></tr><tr><td class="mono">E3</td><td><span class="badge warn">WARN</span></td><td>待补：内容摘要与绑定记录</td></tr><tr><td class="mono">E4</td><td><span class="badge warn">WARN</span></td><td>待补：SM3withSM2 签名与公钥</td></tr><tr><td class="mono">E5</td><td><span class="badge ok">PASS</span></td><td>已有：显式标识样例</td></tr><tr><td class="mono">E6</td><td><span class="badge warn">WARN</span></td><td>待补：服务提供者编码（27 位）</td></tr><tr><td class="mono">E7</td><td><span class="badge warn">WARN</span></td><td>待补：标识方法说明（协议/界面）</td></tr><tr><td class="mono">E8</td><td><span class="badge warn">WARN</span></td><td>待补：日志留存说明（≥6 个月）</td></tr><tr><td class="mono">E9</td><td><span class="badge warn">WARN</span></td><td>备案/评估可用材料 1/8</td></tr></tbody></table></section>
+<h2>内容绑定与复算</h2>
+<p class="muted">报告可被第三方独立复核：按下列命令重跑，结论与摘要应一致。</p>
+<pre>python3 scripts/nf_labeling.py check /tmp/sc/示例-未带标识.mp4 --json
+python3 scripts/nf_label_report.py report /tmp/sc/示例-未带标识.mp4
+python3 scripts/nf_labeling.py selfcheck</pre>
+
+<h2>支持矩阵与已知限制</h2>
+<table><thead><tr><th>容器</th><th>标识载体</th><th>读取方式</th><th>限制</th></tr></thead><tbody><tr><td class="mono">png</td><td>tEXt / iTXt / zTXt</td><td>标准库 zlib 解压</td><td>—</td></tr><tr><td class="mono">jpeg</td><td>APP1 XMP / EXIF UserComment</td><td>标准库分段解析</td><td>仅读 APP1，不做像素判定</td></tr><tr><td class="mono">tiff</td><td>IFD0 0x2BC / XMP</td><td>标准库 IFD 遍历</td><td>多页 TIFF 只读首页</td></tr><tr><td class="mono">gif</td><td>XMP DataXMP 扩展块</td><td>标准库块遍历</td><td>—</td></tr><tr><td class="mono">webp</td><td>XMP chunk</td><td>标准库 RIFF 解析</td><td>—</td></tr><tr><td class="mono">pdf</td><td>Info 字典 / /Metadata XMP</td><td>标准库扫描 obj + FlateDecode</td><td>不支持加密 PDF、对象流(ObjStm)、增量更新；Info 非 ASCII 文本可能乱码</td></tr><tr><td class="mono">mp4</td><td>moov.udta.meta keys/ilst / XMP uuid</td><td>标准库 box 解析</td><td>只读元数据，不解码画面</td></tr><tr><td class="mono">mp3</td><td>ID3v2 TXXX</td><td>标准库帧解析</td><td>—</td></tr><tr><td class="mono">wav</td><td>LIST/INFO 子块</td><td>标准库 chunk 解析</td><td>—</td></tr><tr><td class="mono">flac</td><td>VORBIS_COMMENT</td><td>标准库块解析</td><td>—</td></tr><tr><td class="mono">docx</td><td>docProps/custom.xml</td><td>标准库 zipfile</td><td>—</td></tr><tr><td class="mono">ofd</td><td>CustomDatas/AIGC.xml</td><td>标准库 zipfile</td><td>—</td></tr><tr><td class="mono">markdown</td><td>头注释块（AIGC JSON）</td><td>标准库文本解析</td><td>—</td></tr><tr><td class="mono">xmind/posm/posf</td><td>metadata.json / meta.json</td><td>标准库 zipfile</td><td>—</td></tr><tr><td class="mono">uof</td><td>_meta/meta.xml `&lt;meta:AIGC&gt;`</td><td>标准库 zipfile</td><td>—</td></tr></tbody></table>
+<h2>免责声明</h2>
+<p class="muted">本报告由本地工具对单个文件做**结构与字段级自查**，结论仅代表该文件在检查时刻的状态；不构成官方认定、法律意见或备案结论，不保证备案/评估通过。显式标识若位于像素、画面或音轨，本工具不做视觉判定，需人工或OCR/抽帧复核。报告中的数据可被第三方按「复算命令」独立复核。</p>
+<footer>nf-labelcheck/0.1.0 · schema nf-label-report/1 · 报告可打印为 PDF
+（浏览器 Ctrl+P → 另存为 PDF）</footer>
+</main></body></html>

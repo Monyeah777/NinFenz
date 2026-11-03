@@ -6,19 +6,31 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:9ff12b9a591a0a27d724b9ec9371a231aeed121dde3f90f0edb38570263aef3e
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - desktop/src/core/terminal.py:9dc6130c27683576fe2618d52a447a66cc6134a772239abfbd5528ee9bf04cf5
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
   - desktop/tests/test_terminal.py:2b69019ebef7779cc6b020007510c2b95a6d1282a50990131662ec1099db3dbd
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
-  - desktop/src/core/quality_baseline.py:dc7c9ef409e9f904896ac560247339a0006b927d6259663d2a8dbd58adee41e2
+  - verify.sh:9274877ccae8dadee27b4f13dd90df7def9df2d123743277c0c0b9e66a1794f7
+  - desktop/src/core/quality_baseline.py:38e10a279f68614d6a5c9f190cd5f51f0641fb94326237dd6c5ac95aa15128d6
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
-  - protocol/CONFORMANCE.md:016554d0120cc31d5103560c23a79cf7edb7f67c639ebffefe62f3eaba32ed7e
+  - protocol/CONFORMANCE.md:e56b60186a6c445816ec3de6300ca72b3c4eb8ded63888496efbd97c191229ec
 
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-03）：P3 专项重审：desktop/src/core/terminal.py（BASELINE_DEEP_MAX_MS 重冻 12000→10000，实测 6.20/7.75s）、desktop/src/core/conformance_scan.py（枚举不信 d_type，DT_LNK 复核）、desktop/tests/test_dead_code.py（并行 dead_code 面改动，同批对象）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：并入 labeling 媒体写入（2026-11-02）

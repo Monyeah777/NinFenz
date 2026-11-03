@@ -7,9 +7,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
-from core import json_doc
+from core import atomic_write, json_doc
 
 SCHEMA = "nf-domain-fill/1"
 SHELL_PHRASES = ("领域细则待作者补全", "领域专属判据待补", "领域专属失效模式待补")
@@ -66,11 +66,12 @@ def check(doc: Any) -> List[str]:
 
 
 def write_template(root: str, package: str, out: str) -> str:
+    """把待填模板写到 `out`（**原子写**：模板是交付给作者/领域专家的在仓产物，
+    半截 JSON 会被 `check_dir` 读成「解析失败」，把一次断点变成一次误判）。"""
     import json
     doc = template(root, package)
     p = Path(out)
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
     return str(p)
 
 
@@ -86,6 +87,10 @@ def check_dir(directory: str):
             doc = json.loads(f.read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
             issues.append("%s 不可读/非 JSON：%s" % (f.name, exc))
+            continue
+        if not isinstance(doc, dict):
+            issues.append("%s 顶层不是对象（修复指引：模板须是 JSON 对象——"
+                          "重跑 `nf domain template` 生成后再填）" % f.name)
             continue
         bad = check(doc)
         if bad:

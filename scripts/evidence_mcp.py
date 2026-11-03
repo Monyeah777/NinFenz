@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """NF Evidence MCP server（stdio，换行分隔 JSON-RPC；本地只读证据面）。"""
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -28,6 +27,10 @@ def main() -> int:
         except ValueError:
             _write({"jsonrpc": "2.0", "id": None,
                     "error": {"code": -32700, "message": "JSON 解析失败"}})
+            continue
+        if not isinstance(req, dict):
+            _write({"jsonrpc": "2.0", "id": None,
+                    "error": {"code": -32600, "message": "请求须是 JSON 对象"}})
             continue
         _write(em.handle(req, ROOT))
     return 0

@@ -257,6 +257,7 @@ CANON = {
     "handover check": ["handover", "check", "handovers/HO-9000-示例-接力模板.md"],
     "postmortem check": ["postmortem", "check", "postmortems/PO-9000-示例-复盘模板.md"],
     "diff": ["diff", "01_核心协议.md", "01_核心协议.md"],
+    "domain template": ["domain", "template", "AI教育域包"],
     "domain build": ["domain", "build", "--spec", "A01"],
     "library search": ["library", "search", "验收"],
     "library show": ["library", "show", "NF-1"],
@@ -287,6 +288,8 @@ SKIP = {
     "preset save": "写盘面（同名须 --force）——全链见 test_preset_cli.py",
     "shell": "交互面（接 TTY；非 TTY 阻塞）——覆盖见 test_terminal.py",
     "terminal": "交互面（shell 别名）——见 test_terminal.test_terminal_alias_works",
+    "cockpit": "长跑面（需 --prompt，且写事件库/日志）——真跑覆盖见 "
+        "test_m1_e2e.py（M1 演练会跑两次 cockpit）",
 }
 
 

@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-02",
+  "approved_at": "2026-11-03",
   "approved_by": "Monyeah777",
-  "note": "cognition 事件重签",
+  "note": "final refreeze before full",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "be6f680f95de9d459aeb76594bb68d696dc78b3de2fcd4d0ee7b809c68e89cbd"
+  "subject_digest": "31e93a64682468011baca06f5285b522300e0efb43a70da06e22ad12b5c412f9"
 }

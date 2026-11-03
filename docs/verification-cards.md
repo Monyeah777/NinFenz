@@ -22,11 +22,11 @@ NF 的门禁是一份 bash 脚本、42 条 check，当前基线声明为 `check1
 
 | 项 | 值 |
 |---|---|
-| 卡片总数 | 44（= verify.sh 的 check 函数数，实测） |
-| 门禁脚本 | 3373 行（verify.sh 实测） |
-| 声明基线 | check1-44 · PASS=78（源自 quality_baseline.EXPECTED_*） |
-| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 31 · 段D 供应链 2 |
-| 断言种类 | 真实单测 6 条 · 结构断言 38 条 |
+| 卡片总数 | 45（= verify.sh 的 check 函数数，实测） |
+| 门禁脚本 | 3738 行（verify.sh 实测） |
+| 声明基线 | check1-45 · PASS=79（源自 quality_baseline.EXPECTED_*） |
+| 段位分布 | 段A 官方核心 6 · 段B 社区包 5 · 段C 代码层 32 · 段D 供应链 2 |
+| 断言种类 | 真实单测 6 条 · 结构断言 39 条 |
 | 复跑入口 | `bash verify.sh`（全量）；单条见各卡片的「复跑命令」 |
 ## 卡片索引
 
@@ -76,6 +76,7 @@ NF 的门禁是一份 bash 脚本、42 条 check，当前基线声明为 `check1
 | 42 | 段D | == [42/段D] 不可伪造 provenance 门禁（SLSA L3 Non-falsifiable：验签在生成进程之外 + 篡改必红）== | 结构断言 |
 | 43 | 段C | == [43/段E] A 桶证据内核门禁（gate_engine/inproc/labels + 证据 MCP）== | 结构断言 |
 | 44 | 段C | == [44/段E] 标识合规门禁（GB 45438 / TC260-PG-202511A：五段判定 + 国密 + 证书链 + 时间戳）== | 结构断言 |
+| 45 | 段C | == [45/段E] 驾驶舱 M1 全链门禁（cockpit→event→card→gate→ledger→receipt→replay）== | 结构断言 |
 ---
 
 ## 逐条卡片
@@ -499,6 +500,42 @@ NF 的门禁是一份 bash 脚本、42 条 check，当前基线声明为 `check1
 | 复跑命令 | `python -c "import sys;sys.path.insert(0,'desktop/src');from core import provenance_external;print(provenance_external.scan('.'))"` |
 | 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
 | 记录 | 运行日志 nf_check42.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
+---
+
+### V43 · [43/段E] A 桶证据内核门禁（gate_engine/inproc/labels + 证据 MCP）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [43/段E] A 桶证据内核全绿（证据内核 + 证据 MCP + 批2/3 冒烟） |
+| 判据 | 语义校验（`desktop/src/core/` 证据内核三件 active/在册 + Evidence MCP 工具面 + 批 2/3 冒烟；任一漂移即 FAIL） |
+| 复跑命令 | `bash verify.sh --checks-only --no-cache`（段 E） |
+| 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check43.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
+---
+
+### V44 · [44/段E] 标识合规门禁（GB 45438 / TC260-PG-202511A：五段判定 + 国密 + 证书链 + 时间戳）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [44/段E] 标识合规门禁全绿（五段判定 + 国密 + 证书链 + 时间戳） |
+| 判据 | 语义校验（`scripts/nf_labeling.py` 与 `desktop/src/core/labeling/`：A–E 五段、SM3withSM2、证书链、可信时间戳、载体读写；任一漂移即 FAIL） |
+| 复跑命令 | `bash verify.sh --checks-only --no-cache`（段 E；单项：`nf labeling selfcheck`） |
+| 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check44.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
+
+---
+
+### V45 · [45/段E] 驾驶舱 M1 全链门禁（cockpit→event→card→gate→ledger→receipt→replay）
+
+| 字段 | 内容 |
+|---|---|
+| 结论 | [45/段E] 驾驶舱 M1 全链可重放（双会话 prev 链 + 角色传播 + action 带 card digest + 跨目录事件库） |
+| 判据 | 真实执行（`scripts/m1_e2e.py run/check`：cockpit 双会话 → 事件/索引 → 证据卡 → labeling 门禁 → ledger → 回执/外锚 → 同一工作目录两次 check 报告逐字节一致；另含跨目录/负测/审计策略段） |
+| 复跑命令 | `python3 scripts/m1_e2e.py run --work /tmp/m1 && python3 scripts/m1_e2e.py check --work /tmp/m1`（连跑两次报告须逐字节一致） |
+| 谁验 | 任何有 Python 3 与 bash 的人；不需要读代码 |
+| 记录 | 运行日志 nf_check45_*.log（本次运行的临时目录内；有 FAIL 时脚本会打印保留路径） |
 
 ---
 

@@ -24,6 +24,7 @@
 # 基准 : 判定逐字对齐 07 §7；04=核心 13 件 / 03=P00+P01+P90 / 05=README+用户自定义；
 #        [段 D] 供应链面（check41-42：SLSA L3 构建隔离 + 不可伪造 provenance）
 #        [段 E] 证据与标识内核（check43 A 桶证据内核 + check44 标识合规门禁
+#        + check45 驾驶舱 M1 全链可重放门禁
 #        GB 45438—2025 / TC260-PG-202511A：五段判定 + 国密 + 证书链 + 可信时间戳）
 #        抽象阶梯（两轴 + 纵切）判据并入 check27 R7——真源 protocol/LAYERS.json，
 #        语义判据在 desktop/src/core/layer_model.py（见 docs/layers.md）。
@@ -104,16 +105,16 @@ else
 fi
 # ---- 命令行参数（P3 分层：默认 quick 档，--full 才是发布结论）----
 # 档位（2026-10-18 起）：
-#   bash verify.sh         quick 档 = 44 条静态 check + **受影响测试**（按变更面的 core 反向依赖
+#   bash verify.sh         quick 档 = 45 条静态 check + **受影响测试**（按变更面的 core 反向依赖
 #                          闭包；非 core 变更全量兜底）——给开发回路用的分钟级结论。
-#   bash verify.sh --full  full 档 = 44 条静态 check + **全量 3100+ 测试**（分片并行）；
+#   bash verify.sh --full  full 档 = 45 条静态 check + **全量 3100+ 测试**（分片并行）；
 #                          **只有这一档能作为发布/推送结论**（nf release 走它）。
 #   bash verify.sh --fast  既有开发快车道（按改动选 check），跑在全部 check 之后、只作补充。
 # 缓存（P3b）：两档都按**输入内容寻址**缓存绿判定（HEAD + 工作树差异 + 未跟踪件 + 门禁代码 +
 #   运行时 + 档位）；输入没变直接回放摘要（秒级）。--no-cache 或 NF_VERIFY_CACHE=0 关掉。
 # 任何其它参数 = 用法错误（exit 2），以免"看上去像传了子集其实仍在全量"这类静默误读。
 # 矩阵分片（CI，2026-10-18）：`--tests-only --shard i/n` 只跑测试的第 i/n 片；
-# `--checks-only` 只跑 44 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
+# `--checks-only` 只跑 45 条静态 check（测试交给矩阵）。两者由 CI 组合成一次完整门禁：
 # 静态 1 台 + 测试 n 台并行 ⇒ 全量墙钟从"一台机器的 ~600 s"降到"n 台各自 ~100 s"。
 NF_FAST=0; NF_BASE=''; NF_TIER='quick'; NF_CACHE="${NF_VERIFY_CACHE:-1}"; NF_PR_TIER=0
 NF_CHECKS_ONLY=0; NF_TESTS_ONLY=0; NF_SHARD=''
@@ -179,7 +180,7 @@ elif command -v python >/dev/null 2>&1 && python -c 'import sys' >/dev/null 2>&1
 fi
 # ---- 矩阵模式（CI）：`--tests-only` 只跑测试并直接透传退出码（不产生 check 摘要、不写缓存）----
 # 为什么单独成路（2026-10-18）：CI 要"静态 1 台 + 测试 n 台并行"，测试那 n 台只该跑自己那一片；
-# 若仍走完整 verify.sh，每台都会重跑 44 条静态 check，n 倍浪费且摘要会被 n 份覆盖。
+# 若仍走完整 verify.sh，每台都会重跑 45 条静态 check，n 倍浪费且摘要会被 n 份覆盖。
 if [ "$NF_TESTS_ONLY" = "1" ]; then
   if [ -z "$PY3" ]; then echo '--tests-only 需要可用的 python' >&2; exit 2; fi
   if [ ! -f scripts/verify_tests.py ]; then echo '--tests-only 需要 scripts/verify_tests.py' >&2; exit 2; fi
@@ -195,7 +196,7 @@ if [ "$NF_TESTS_ONLY" = "1" ]; then
   fi
   exec "$PY3" scripts/verify_tests.py --jobs "$_UT_JOBS"
 fi
-# checks-only 现在**单独成档**吃内容寻址缓存（mode=checks）：它的结论只覆盖 44 条静态 check，
+# checks-only 现在**单独成档**吃内容寻址缓存（mode=checks）：它的结论只覆盖 45 条静态 check，
 # 与 full/quick 档的结论不可互替，因此用独立 mode 隔离（缓存命中只回放**同一档**的绿）。
 _CACHE_MODE="$NF_TIER"
 if [ "$NF_CHECKS_ONLY" = "1" ]; then
@@ -203,7 +204,7 @@ if [ "$NF_CHECKS_ONLY" = "1" ]; then
 fi
 
 # ---- 测试与静态 check 重叠加速（2026-10-18）----
-# quick 档 = 静态 44 条（约 55 s）+ 受影响测试（约 90 s），顺序跑是两者相加；
+# quick 档 = 静态 45 条（约 55 s）+ 受影响测试（约 90 s），顺序跑是两者相加；
 # 它们**互不依赖**（测试在独立进程/独立 NF_HOME 里跑，不写仓内受跟踪文件），
 # 因此把测试放后台与静态 check 并行，墙钟从 "a+b" 变成 "max(a,b)"。
 # 判据不变：测试命令与判定逻辑一字未改，只是不在 check12 里"现场跑"，而是"先跑、到点收"。
@@ -3272,6 +3273,369 @@ PYEOF
   fi
 }
 
+check45(){
+  echo '== [45/段E] 驾驶舱 M1 全链门禁（cockpit→event→card→gate→ledger→receipt→replay）=='
+  local err=0
+  if [ -z "$PY3" ]; then
+    wn 'python3 不在 PATH（跳过 check45 驾驶舱 M1 门禁）'
+  elif [ ! -f scripts/m1_e2e.py ] || [ ! -f scripts/evidence_cli.py ]; then
+    no '缺 scripts/m1_e2e.py 或 scripts/evidence_cli.py（修复指引：恢复两件或按 README 重新生成）'
+    err=1
+  else
+    local _m1="$NFL_TMP/m1" _ms="$NFL_TMP/m1store" _m1w2="$NFL_TMP/m1w2" _msq="$NFL_TMP/m1storeq"
+    rm -rf "$_m1" "$_ms" "$_m1w2" "$_msq"
+    if ! "$PY3" scripts/m1_e2e.py run --work "$_m1" --event-store "$_ms" >"$NFL_TMP/nf_check45_run.log" 2>&1; then
+      no "驾驶舱 M1 run（--event-store 跨目录事件库）失败——$(tail -2 "$NFL_TMP"/nf_check45_run.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! "$PY3" scripts/m1_e2e.py check --work "$_m1" --event-store "$_ms" >"$NFL_TMP/nf_check45_check1.log" 2>&1; then
+      no "驾驶舱 M1 check 第 1 次失败——$(tail -2 "$NFL_TMP"/nf_check45_check1.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    local _report="$NFL_TMP/m1_report_1.json"
+    if [ "$err" -eq 0 ] && [ ! -f "$_m1/report.json" ]; then
+      no '驾驶舱 M1 check 第 1 次未产出 report.json（修复指引：确认 m1_e2e.py check 的报告落点）'
+      err=1
+    fi
+    if [ "$err" -eq 0 ]; then
+      cp "$_m1/report.json" "$_report"
+    fi
+    if [ "$err" -eq 0 ] && ! "$PY3" scripts/m1_e2e.py check --work "$_m1" --event-store "$_ms" >"$NFL_TMP/nf_check45_check2.log" 2>&1; then
+      no "驾驶舱 M1 check 第 2 次失败——$(tail -2 "$NFL_TMP"/nf_check45_check2.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! cmp -s "$_report" "$_m1/report.json"; then
+      no '驾驶舱 M1 同一工作目录两次 check 的 report.json 不一致（重放不确定）'
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! cp -r "$_m1" "$_m1w2"; then
+      no "驾驶舱 M1 工作目录复制失败：cp -r $_m1 $_m1w2"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! "$PY3" scripts/m1_e2e.py check --work "$_m1w2" --event-store "$_ms" >"$NFL_TMP/nf_check45_copy.log" 2>&1; then
+      no "驾驶舱 M1 跨目录重放失败（--work 搬走后配原 --event-store 应仍 PASS）——$(tail -2 "$NFL_TMP"/nf_check45_copy.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    if [ "$err" -eq 0 ]; then
+      local _victim
+      _victim="$(find "$_ms/events" -maxdepth 1 -name '*.json' -type f ! -name index.json 2>/dev/null | head -1)"
+      if [ -z "$_victim" ]; then
+        no "驾驶舱 M1 事件库无事件文件（$_ms/events），无法做 fail-closed 负测"
+        err=1
+      else
+        cp -p "$_victim" "$NFL_TMP/nf_check45_victim.bak"
+        printf '{bad' >"$_victim"
+        if "$PY3" scripts/m1_e2e.py check --work "$_m1" --event-store "$_ms" >"$NFL_TMP/nf_check45_neg.log" 2>&1; then
+          no '驾驶舱 M1 fail-closed 负测失败：事件库 JSON 损坏后 check 仍 rc=0（应 rc!=0）'
+          err=1
+        fi
+        # 负测后立刻恢复：诊断目录常落在仓库内（NF_VERIFY_TMP），
+        # 留一个坏 JSON 会被 check33 编码卫生面当成仓库文件判红。
+        # -p 保留 mtime：GC 按会话内事件文件 mtime 排序，恢复不能把旧事件
+        # 的 mtime 刷新成最新（否则 keep-last 会误判会话新旧）。
+        cp -p "$NFL_TMP/nf_check45_victim.bak" "$_victim"
+      fi
+    fi
+    # ---- 第 6 段：事件库查询 + GC（dry-run 不删 / apply 后索引一致）----
+    if [ "$err" -eq 0 ] && ! cp -a "$_ms" "$_msq"; then
+      no "驾驶舱 M1 事件库复制失败：cp -a $_ms $_msq（-a 保 mtime 供 GC 判新旧）"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-query --json >"$NFL_TMP/nf_check45_query.json" 2>&1; then
+      no "驾驶舱 M1 事件库查询失败——$(tail -2 "$NFL_TMP"/nf_check45_query.json 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! "$PY3" - "$_m1/receipt.json" "$NFL_TMP/nf_check45_query.json" <<'PY45A' >"$NFL_TMP/nf_check45_query_assert.log" 2>&1
+import json
+import sys
+
+receipt = json.load(open(sys.argv[1], encoding="utf-8"))
+rows = json.load(open(sys.argv[2], encoding="utf-8"))
+want = {receipt["event_a_digest"], receipt["event_b_digest"]}
+got = {str(row.get("digest")) for row in rows}
+missing = want - got
+if missing:
+    print("查询缺 A/B digest：%s" % ",".join(sorted(missing)))
+    raise SystemExit(1)
+PY45A
+    then
+      no "驾驶舱 M1 事件库查询未覆盖 A/B——$(tail -2 "$NFL_TMP"/nf_check45_query_assert.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    local _qc_before=''
+    if [ "$err" -eq 0 ]; then
+      _qc_before="$(find "$_msq/events" -maxdepth 1 -name '*.json' ! -name index.json 2>/dev/null | wc -l)"
+      if ! NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --keep-last 1 --json >"$NFL_TMP/nf_check45_gc_dry.log" 2>&1; then
+        no "驾驶舱 M1 事件库 GC dry-run 失败——$(tail -2 "$NFL_TMP"/nf_check45_gc_dry.log 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif [ "$(find "$_msq/events" -maxdepth 1 -name '*.json' ! -name index.json 2>/dev/null | wc -l)" != "$_qc_before" ]; then
+        no '驾驶舱 M1 GC dry-run 改动了事件文件（dry-run 必须不删）'
+        err=1
+      fi
+    fi
+    if [ "$err" -eq 0 ] && ! NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --keep-last 1 --apply --json >"$NFL_TMP/nf_check45_gc_apply.log" 2>&1; then
+      no "驾驶舱 M1 事件库 GC apply 失败——$(tail -2 "$NFL_TMP"/nf_check45_gc_apply.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+    if [ "$err" -eq 0 ] && ! "$PY3" - "$_msq" "$_m1/receipt.json" <<'PY45B' >"$NFL_TMP/nf_check45_gc_assert.log" 2>&1
+import json
+import os
+import sys
+
+sys.path.insert(0, "desktop/src")
+os.environ["NF_COCKPIT_HOME"] = sys.argv[1]
+from core.meta_cockpit import cognition_event as ce  # noqa: E402
+
+receipt = json.load(open(sys.argv[2], encoding="utf-8"))
+issues = ce.verify_index()
+if issues:
+    print("GC apply 后索引不一致：%s" % ";".join(issues))
+    raise SystemExit(1)
+kept = set(ce.build_index().get("digests") or [])
+if receipt["event_b_digest"] not in kept:
+    print("GC apply 误删保留会话 B 的事件")
+    raise SystemExit(1)
+if receipt["event_a_digest"] not in kept:
+    print("GC apply 未保留 B.prev 引用的祖先 A（保留链断）")
+    raise SystemExit(1)
+PY45B
+    then
+      no "驾驶舱 M1 GC apply 后校验失败——$(tail -2 "$NFL_TMP"/nf_check45_gc_assert.log 2>/dev/null | tr '\n' ' ')"
+      err=1
+    fi
+  fi
+    # ---- 第 7 段：保留策略配置（--config 生效 + 非法配置 fail-closed）----
+    if [ "$err" -eq 0 ]; then
+      local _pol="$NFL_TMP/m1retention.json" _polbad="$NFL_TMP/m1retention_bad.cfg"
+      printf '%s\n' '{"schema":"nf-cognition-retention/1","keep_last":1,"keep_status":["pass"]}' >"$_pol"
+      if ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --config "$_pol" --json >"$NFL_TMP/nf_check45_policy.log" 2>&1; then
+        no "驾驶舱 M1 保留策略 dry-run 失败——$(tail -2 "$NFL_TMP"/nf_check45_policy.log 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! grep -q '"policy"' "$NFL_TMP/nf_check45_policy.log"; then
+        no '驾驶舱 M1 保留策略输出缺 policy 字段（--json 须带生效策略）'
+        err=1
+      fi
+      if [ "$err" -eq 0 ]; then
+        # 非法配置用 .cfg 后缀：避免坏 JSON 落在仓库内诊断目录被 check33 编码卫生判红
+        printf '{"keep_last": 0}\n' >"$_polbad"
+        if NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --config "$_polbad" >"$NFL_TMP/nf_check45_policy_bad.log" 2>&1; then
+          no '驾驶舱 M1 非法保留策略（keep_last=0）未 fail-closed（应 rc!=0）'
+          err=1
+        fi
+      fi
+    fi
+    # ---- 第 8 段：审计试运行（--audit）+ 灰度（--canary）----
+    if [ "$err" -eq 0 ]; then
+      local _aud1="$NFL_TMP/nf_check45_audit1.json" _aud2="$NFL_TMP/nf_check45_audit2.json"
+      local _n_before _n_after
+      _n_before="$(find "$_msq/events" -maxdepth 1 -name '*.json' -type f 2>/dev/null | wc -l)"
+      if ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --audit --json >"$_aud1" 2>&1; then
+        no "驾驶舱 M1 审计试运行失败——$(tail -2 "$_aud1" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! "$PY3" - "$_aud1" "$_msq" <<'PY45C'
+import glob, json, os, sys
+audit = json.load(open(sys.argv[1]))
+store = sys.argv[2]
+ok = (audit.get("schema") == "nf-cognition-gc-audit/1"
+      and isinstance(audit.get("policy_digest"), str)
+      and isinstance(audit.get("removed"), list)
+      and audit.get("dry_run") is True
+      and bool(glob.glob(os.path.join(store, "audit", "*.json"))))
+raise SystemExit(0 if ok else 1)
+PY45C
+      then
+        no '驾驶舱 M1 审计记录缺 schema/policy_digest/removed/dry_run 或未落盘'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --audit --json >"$_aud2" 2>&1; then
+        no '驾驶舱 M1 审计试运行第二次失败'
+        err=1
+      elif ! "$PY3" - "$_aud1" "$_aud2" <<'PY45D'
+import json, sys
+a = json.load(open(sys.argv[1]))
+b = json.load(open(sys.argv[2]))
+raise SystemExit(0 if a.get("digest") == b.get("digest") else 1)
+PY45D
+      then
+        no '驾驶舱 M1 两次审计 digest 不一致（审计非确定性）'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --audit --canary --json >"$NFL_TMP/nf_check45_canary.json" 2>&1; then
+        no "驾驶舱 M1 灰度（canary）失败——$(tail -2 "$NFL_TMP"/nf_check45_canary.json 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! "$PY3" - "$NFL_TMP/nf_check45_canary.json" <<'PY45E'
+import json, sys
+audit = json.load(open(sys.argv[1]))
+canary = audit.get("canary") or {}
+raise SystemExit(0 if canary.get("applied") is True
+                 and canary.get("index_ok") is True else 1)
+PY45E
+      then
+        no '驾驶舱 M1 灰度影子库 index_ok 非 True（canary 应用后索引不一致）'
+        err=1
+      else
+        _n_after="$(find "$_msq/events" -maxdepth 1 -name '*.json' -type f 2>/dev/null | wc -l)"
+        if [ "$_n_before" != "$_n_after" ]; then
+          no "驾驶舱 M1 审计/灰度动了真实事件库（$_n_before → $_n_after）"
+          err=1
+        fi
+      fi
+    fi
+    # ---- 第 9 段：审计查询/汇总（list ≥2、summary 两次逐字节一致）----
+    if [ "$err" -eq 0 ]; then
+      local _pol2="$NFL_TMP/m1retention2.json"
+      local _a_list="$NFL_TMP/nf_check45_audits.json" _a_sum1="$NFL_TMP/nf_check45_sum1.json" _a_sum2="$NFL_TMP/nf_check45_sum2.json"
+      printf '%s\n' '{"schema":"nf-cognition-retention/1","keep_last":1,"keep_status":["fail"]}' >"$_pol2"
+      # 第 8 段两条默认策略审计 digest 相同（只落 1 件）；再落一条不同策略的审计，凑≥2 供查询/汇总断言
+      if ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-gc --audit --config "$_pol2" --json >"$NFL_TMP/nf_check45_audit3.json" 2>&1; then
+        no "驾驶舱 M1 第二条策略审计失败——$(tail -2 "$NFL_TMP"/nf_check45_audit3.json 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audits --json >"$_a_list" 2>&1; then
+        no "驾驶舱 M1 审计查询失败——$(tail -2 "$_a_list" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! "$PY3" - "$_a_list" <<'PY45F'
+import json
+import sys
+
+rows = json.load(open(sys.argv[1], encoding="utf-8"))
+raise SystemExit(0 if isinstance(rows, list) and len(rows) >= 2 else 1)
+PY45F
+      then
+        no '驾驶舱 M1 审计查询结果少于 2 条（第 8/9 段应已产生 2 条不同策略审计）'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-summary --json >"$_a_sum1" 2>&1; then
+        no "驾驶舱 M1 审计汇总失败——$(tail -2 "$_a_sum1" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-summary --json >"$_a_sum2" 2>&1; then
+        no '驾驶舱 M1 审计汇总第二次失败'
+        err=1
+      elif ! cmp -s "$_a_sum1" "$_a_sum2"; then
+        no '驾驶舱 M1 审计汇总两次输出不一致（summary 非确定性）'
+        err=1
+      elif ! "$PY3" - "$_a_sum1" <<'PY45G'
+import json
+import sys
+
+summary = json.load(open(sys.argv[1], encoding="utf-8"))
+raise SystemExit(0 if int(summary.get("total") or 0) >= 2 else 1)
+PY45G
+      then
+        no '驾驶舱 M1 审计汇总 total < 2'
+        err=1
+      fi
+    fi
+    # ---- 第 10 段：审计异常阈值告警（默认 clean、改规则必告警、输出确定）----
+    if [ "$err" -eq 0 ]; then
+      local _al1="$NFL_TMP/nf_check45_alert1.json" _al2="$NFL_TMP/nf_check45_alert2.json"
+      local _alcfg="$NFL_TMP/m1alert_rules.json" _alb
+      _alb="$NFL_TMP/nf_check45_alert_bad.json"
+      if ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-alerts --json >"$_al1" 2>&1; then
+        no "驾驶舱 M1 审计告警默认规则应为 clean（rc0）——$(tail -2 "$_al1" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! "$PY3" - "$_al1" <<'PY45H'
+import json
+import sys
+
+alert = json.load(open(sys.argv[1], encoding="utf-8"))
+ok = (alert.get("schema") == "nf-cognition-audit-alert/1"
+      and alert.get("clean") is True
+      and isinstance(alert.get("findings"), list)
+      and alert.get("findings") == [])
+raise SystemExit(0 if ok else 1)
+PY45H
+      then
+        no '驾驶舱 M1 审计告警默认规则下 clean 非 true / findings 非空'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-alerts --json >"$_al2" 2>&1; then
+        no '驾驶舱 M1 审计告警第二次运行失败'
+        err=1
+      elif ! cmp -s "$_al1" "$_al2"; then
+        no '驾驶舱 M1 审计告警两次输出不一致（告警非确定性）'
+        err=1
+      else
+        printf '%s\n' '{"schema":"nf-cognition-audit-alerts/1","max_policy_churn":0}' >"$_alcfg"
+        if NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-alerts --config "$_alcfg" --json >"$_alb" 2>&1; then
+          no '驾驶舱 M1 审计告警 max_policy_churn=0 未触发告警（应 rc1）'
+          err=1
+        elif ! "$PY3" - "$_alb" <<'PY45I'
+import json
+import sys
+
+alert = json.load(open(sys.argv[1], encoding="utf-8"))
+findings = alert.get("findings") or []
+ok = (alert.get("clean") is False and bool(findings)
+      and any(f.get("kind") == "policy_churn" for f in findings))
+raise SystemExit(0 if ok else 1)
+PY45I
+        then
+          no '驾驶舱 M1 审计告警 findings 为空或缺 policy_churn（clean 应为 false）'
+          err=1
+        fi
+      fi
+    fi
+    # ---- 第 11 段：告警历史/趋势（--record 幂等、history ≥1、trend 确定）----
+    if [ "$err" -eq 0 ]; then
+      local _ah1="$NFL_TMP/nf_check45_alert_rec1.json"
+      local _ah2="$NFL_TMP/nf_check45_alert_rec2.json"
+      local _ahl="$NFL_TMP/nf_check45_alert_history.json"
+      local _aht1="$NFL_TMP/nf_check45_alert_trend1.json"
+      local _aht2="$NFL_TMP/nf_check45_alert_trend2.json"
+      rm -rf "$_msq/alerts"
+      if ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-alerts --record --json >"$_ah1" 2>&1; then
+        no "驾驶舱 M1 告警记录首次失败——$(tail -2 "$_ah1" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif [ "$(find "$_msq/alerts" -maxdepth 1 -name '*.json' -type f 2>/dev/null | wc -l)" -ne 1 ]; then
+        no '驾驶舱 M1 告警记录首次未落 1 个文件（<store>/alerts/<digest>.json）'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-audit-alerts --record --json >"$_ah2" 2>&1; then
+        no '驾驶舱 M1 告警记录第二次失败'
+        err=1
+      elif [ "$(find "$_msq/alerts" -maxdepth 1 -name '*.json' -type f 2>/dev/null | wc -l)" -ne 1 ]; then
+        no '驾驶舱 M1 告警记录两次落盘不幂等（同 digest 应只 1 个文件）'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-alert-history --json >"$_ahl" 2>&1; then
+        no "驾驶舱 M1 告警历史读取失败——$(tail -2 "$_ahl" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! "$PY3" - "$_ahl" <<'PY45J'
+import json
+import sys
+
+history = json.load(open(sys.argv[1], encoding="utf-8"))
+ok = (isinstance(history, list) and len(history) >= 1
+      and all(isinstance(r, dict)
+              and r.get("schema") == "nf-cognition-audit-alert/1"
+              for r in history))
+raise SystemExit(0 if ok else 1)
+PY45J
+      then
+        no '驾驶舱 M1 告警历史少于 1 条或 schema 不符'
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-alert-trend --json >"$_aht1" 2>&1; then
+        no "驾驶舱 M1 告警趋势读取失败——$(tail -2 "$_aht1" 2>/dev/null | tr '\n' ' ')"
+        err=1
+      elif ! NF_COCKPIT_RETENTION= NF_COCKPIT_HOME="$_msq" "$PY3" scripts/evidence_cli.py cognition-alert-trend --json >"$_aht2" 2>&1; then
+        no '驾驶舱 M1 告警趋势第二次失败'
+        err=1
+      elif ! cmp -s "$_aht1" "$_aht2"; then
+        no '驾驶舱 M1 告警趋势两次输出不一致（趋势非确定性）'
+        err=1
+      elif ! "$PY3" - "$_aht1" <<'PY45K'
+import json
+import sys
+
+trend = json.load(open(sys.argv[1], encoding="utf-8"))
+ok = (trend.get("schema") == "nf-cognition-alert-trend/1"
+      and int(trend.get("reports") or 0) >= 1)
+raise SystemExit(0 if ok else 1)
+PY45K
+      then
+        no '驾驶舱 M1 告警趋势 reports <1 或 schema 不符'
+        err=1
+      fi
+    fi
+  if [ "$err" -eq 0 ]; then
+    ok '驾驶舱 M1 全链可重放（双会话 prev 链 + 角色传播 + action 带 card digest + 跨目录事件库；cockpit→event→card→gate→ledger→receipt→replay 逐字节一致）'
+  fi
+}
+
 # ---- P3b：判定缓存（输入内容寻址；只回放**绿**判定）----
 # key 由 scripts/verify_cache.py 按 HEAD + 工作树差异 + 未跟踪件 + 门禁代码 + 运行时 + 档位算出；
 # 输入没变就回放上次摘要（秒级）。红判定**不缓存**（红是瞬态），--fast/--no-cache 一律重算。
@@ -3289,9 +3653,9 @@ echo '=================================================='
 echo ' NinFenz 三段式验收门禁  v2.30（对齐 07 §7 + 08 T5 A5 资产对账 + 09 v0.6.0 check12 代码层 + check13 迁移完整性 + 10 v0.7.0 check14 社区协议登记门禁 + 11 v0.8.0 check15 组合引用门禁 + 12 v1.0.0 check16 契约仲裁门禁 + 16 v1.4.0 check17 质量治理门 + 17 v2.0.0 check18 导出契约门 + 33 v2.2.0 check19-21 外部吸收首波 + 35 v2.4.0 check22 规范体检 + 终端线 check39 端壳零回潮/终端入口；分层治理 23 方案：L3 端壳退役移出，门禁默认锁 L0-L2）'
 echo '=================================================='
 if [ "$NF_TIER" = "full" ]; then
-  echo ' 档位：full（44 条静态 check + 全量测试；发布/推送结论用这一档）'
+  echo ' 档位：full（45 条静态 check + 全量测试；发布/推送结论用这一档）'
 else
-  echo ' 档位：quick（44 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
+  echo ' 档位：quick（45 条静态 check + 受影响测试；不是发布结论——发布用 bash verify.sh --full）'
 fi
 echo '—— 段 A：官方核心出厂（无 community 亦须通过）——'
 check1; check2; check3; check4; check5; check6
@@ -3337,8 +3701,9 @@ echo '—— 段 D：供应链与证据内核（check41-43 无条件执行：构
 check41
 check42
 check43
-echo '—— 段 E：标识合规面（check44：GB 45438 / TC260-PG-202511A 五段判定）——'
+echo '—— 段 E：标识合规与驾驶舱面（check44 标识合规 + check45 驾驶舱 M1 全链）——'
 check44
+check45
 echo '=================================================='
 echo "结果统计: PASS=$PASS  WARN=$WARN  FAIL=$FAIL"
 # ---- 开发快车道（--fast · 显式 opt-in · 不改变上面的任何一条判定）----
@@ -3360,7 +3725,7 @@ if [ "$FAIL" -gt 0 ]; then
   echo '>>> 存在 FAIL = 协议事故：请回滚本次修改，修正后重新运行验收 <<<'
   # 指引面接线（2026-09-30）：每条 check 都有「缺什么 / 补什么」条目（nf explain 1-39），
   # 但此前从不把用户指过去——红的时候只有「请回滚」，没有下一步。这里补一句可执行的指引。
-  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-44））"
+  echo "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-45））"
   exit 1
 else
   if [ "$NF_CACHE" -eq 1 ] && [ "$NF_FAST" -eq 0 ] && [ -n "$_CACHE_KEY" ] && [ -n "$PY3" ]; then

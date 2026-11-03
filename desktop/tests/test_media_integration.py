@@ -62,6 +62,40 @@ class TestMediaContainers(unittest.TestCase):
         rep = json.loads(r.stdout)
         self.assertEqual(rep["sections"]["C"]["status"], "FAIL")
 
+    def test_extra_carrier_fixture_factories(self):
+        """额外载体夹具工厂（PNG zTXt/iTXt、MP3/WAV/TIFF/GIF/WebP/FLAC/OGG/HEIF）。
+
+        这些夹具由 `test_media_extra_integration` 的端到端用例使用；这里在
+        **入仓单测**里显式调用它们，保证「工厂 → 建件 → extract 可解析」这条
+        夹具面有常驻判据（dead-code 门禁要求顶层函数必须有真实调用点）。
+        """
+        makers = (
+            ("png-ztxt", lambda p: metadata.make_png_with_ztxt(p, "K", "v")),
+            ("png-itxt", lambda p: metadata.make_png_with_itxt(p, "K", "v")),
+            ("mp3", lambda p: metadata.make_mp3_with_txxx(p, "AIGC", "{}")),
+            ("wav", lambda p: metadata.make_wav_with_info(p, {"ISFT": "nf"})),
+            ("tiff", metadata.make_tiff),
+            ("gif", metadata.make_gif),
+            ("webp", metadata.make_webp),
+            ("flac", metadata.make_flac),
+            ("ogg", metadata.make_ogg),
+            ("heif", metadata.make_heif),
+        )
+        for suffix, maker in makers:
+            path = os.path.join(self.td, "extra-" + suffix)
+            maker(path)
+            with open(path, "rb") as fh:
+                self.assertGreater(len(fh.read()), 0, suffix)
+            self.assertIsInstance(metadata.extract(path), list, suffix)
+        # sidecar 读写 API 往返（read_sidecar 与 write_sidecar 是成对公开面）
+        base = os.path.join(self.td, "extra-sidecar.bin")
+        with open(base, "wb") as fh:
+            fh.write(b"x")
+        wrote = metadata.write_sidecar(base, {"AIGC": {"Label": 1}})
+        self.assertTrue(wrote.endswith(".aigc.json"))
+        self.assertEqual({"AIGC": {"Label": 1}},
+                         metadata.read_sidecar(base))
+
     def test_sidecar_still_used_for_unknown_container(self):
         p = os.path.join(self.td, "x.bin")
         with open(p, "wb") as f:

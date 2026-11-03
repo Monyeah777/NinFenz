@@ -16,7 +16,7 @@ const idx = fs.readFileSync(path.join(SITE, 'index.html'), 'utf8');
 const origin = (process.argv.slice(2).find((a) => !a.startsWith('--')) ||
   (idx.match(/rel="canonical" href="(https:\/\/[^\/"]+)/) || [])[1] || '').replace(/\/+$/, '');
 const KNOWN_BASES = ['https://ninfenz.dev', 'https://ninfenz.1764861918.workers.dev', 'https://monyeah777.github.io/NinFenz', 'https://monyeah777.github.io'];
-const COMMERCIAL_PAGES = ['/pricing/', '/en/pricing/', '/pilot/', '/en/pilot/', '/controls/', '/en/controls/', '/trust/', '/en/trust/'];
+const COMMERCIAL_PAGES = ['/pricing/', '/en/pricing/', '/pilot/', '/en/pilot/', '/controls/', '/en/controls/', '/trust/', '/en/trust/', '/label/', '/en/label/'];
 const MACHINE = ['/llms.txt', '/llms-full.txt', '/nf.txt', '/agent.txt', '/facts.json', '/run.sh', '/robots.txt', '/sitemap.xml', '/.well-known/security.txt', '/use/', '/en/use/', '/404.html', '/assets/site.css', ...COMMERCIAL_PAGES];
 const rows = [];
 const check = (name, ok, detail) => rows.push({ 判据: name, 结果: ok ? 'PASS' : 'FAIL', 详情: String(detail) });
@@ -34,7 +34,7 @@ function ldTypesOf(html) {
 if (OFFLINE) {
   const read = (p) => fs.readFileSync(path.join(SITE, p), 'utf8');
   const has = (p) => fs.existsSync(path.join(SITE, p));
-  for (const p of ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html']) {
+  for (const p of ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html', 'label/index.html', 'en/label/index.html']) {
     if (!has(p)) { check('在场 ' + p, false, '缺文件'); continue; }
     const html = read(p);
     const { ok, types } = ldTypesOf(html);
@@ -42,7 +42,7 @@ if (OFFLINE) {
     check(p + ' 无外部资源', !/(?:<link[^>]+rel="stylesheet"[^>]+href|<script[^>]+src|<img[^>]+src)="https?:/i.test(html), '同源');
   }
   check('favicon 资产在场', has('assets/icon-512.png'), 'assets/icon-512.png');
-  const htmlPages = ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html', '404.html'];
+  const htmlPages = ['index.html', 'en/index.html', 'use/index.html', 'en/use/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'controls/index.html', 'en/controls/index.html', 'trust/index.html', 'en/trust/index.html', 'label/index.html', 'en/label/index.html', '404.html'];
   check('favicon 链接覆盖全部页面', htmlPages.every((p) => read(p).includes('href="/assets/icon-512.png"')), htmlPages.join(', '));
   const canon = (idx.match(/rel="canonical" href="([^"]+)"/) || [])[1] || '';
   check('首页 canonical 自指', canon === origin + '/', canon || '(缺失)');
@@ -86,7 +86,7 @@ if (OFFLINE) {
     check('facts 商业许可', /AGPL-3\.0-only/.test((fj.subject || {}).license || '') && (fj.limits || {}).paid_tier === true, `${(fj.subject || {}).license} / paid=${(fj.limits || {}).paid_tier}`);
     check('facts 商业入口齐备', ['pricing', 'diagnostic', 'trust', 'controls'].every((k) => /^https:\/\/ninfenz\.dev\//.test((fj.commerce || {})[k] || '')), Object.keys(fj.commerce || {}).join(','));
   }
-  const commercialCopy = ['index.html', 'en/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'trust/index.html', 'en/trust/index.html', 'llms.txt', 'llms-full.txt', 'nf.txt', 'run.sh', 'facts.json'].map(read).join('\n');
+  const commercialCopy = ['index.html', 'en/index.html', 'pricing/index.html', 'en/pricing/index.html', 'pilot/index.html', 'en/pilot/index.html', 'trust/index.html', 'en/trust/index.html', 'label/index.html', 'en/label/index.html', 'llms.txt', 'llms-full.txt', 'nf.txt', 'run.sh', 'facts.json'].map(read).join('\n');
   check('商业面无历史许可口径', !/没有付费版|no paid version|license:\\s*MIT|\\bMIT License\\b/i.test(commercialCopy), '无 MIT / no-paid 残留');
   const hd = read('_headers');
   const missing = MACHINE.filter((p) => p !== '/use/' && p !== '/en/use/' && p !== '/404.html' && p !== '/assets/site.css').filter((p) => !hd.includes('\n' + p + '\n'));

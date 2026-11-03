@@ -10,8 +10,9 @@
 
   - **P6-04**：缓解项必须点名一个**在场**的判据件；六类少一类即 FAIL。威胁模型写成散文就无法
     被推翻，也无法被回归——故这里要求每条都能指到一条会变红的判据。
-  - **P6-06**：DORA 的四键里，「部署频率」与「变更前置时间」在本仓**有真数据**（25 个 tag +
-    提交历史），故按定义算出来、写明口径；「变更失败率」与「恢复时长」需要**事故记录**，
+  - **P6-06**：DORA 的四键里，「部署频率」与「变更前置时间」在本仓**有真数据**（27 个 tag，
+    以 tag 指向的**发布提交时间**为准；tag 对象自身的时间被批量重建过、不可当部署时间），
+    故按定义算出来、写明口径；「变更失败率」与「恢复时长」需要**事故记录**，
     本仓没有 ⇒ 记 UNKNOWN 并写明缺什么，**不用代理指标冒充**。提供 records 输入面后即可算。
     SPACE 同理：活动度/流动效率/沟通可测，满意与绩效需要问卷与结果指标 ⇒ UNKNOWN。
   - **P6-11**：把 P6-04..P6-10 的报告规范化后取摘要（走 core.attest 的仓库 canonical），
@@ -81,6 +82,9 @@ NEEDS_RECORDS = "需要部署/事故记录（--records），本仓无采集面 �
 #: 事故记录真源：复盘件（postmortems/PO-*.md）——**不是**代理指标，是本仓对「出了什么事」的
 #: 正式登记；关联规则显式写在 _incidents_by_release 里，可逐条复核。
 POSTMORTEM_DIR = "postmortems"
+#: 复盘件目录里**只有模板**（`PO-9xxx`）可进公开仓：ADR-0000（2026-10-25 作者裁决）
+#: 把真实复盘件外置到私有仓。模板是**写法示例**，不是事故 ⇒ 不得计入事故登记面。
+POSTMORTEM_TEMPLATE_PREFIX = "PO-9"
 NEEDS_SURVEY = "需要团队问卷/结果指标，本仓无采集面 ⇒ 不造代理指标"
 #: 提速曲线样本与交付记录的形状（写成常量，供测试与使用者对账）
 TIMINGS_SCHEMA = "nf-timings/1"
@@ -121,14 +125,25 @@ def _git(root: Path, *args: str) -> str:
 
 
 def _tags_with_time(root: Path) -> list[tuple[str, int]]:
-    """打了时间戳的 tag（按创建时间升序）——本仓的**部署记录**真源。"""
-    out: list[tuple[str, int]] = []
-    for line in _git(root, "for-each-ref", "--sort=creatordate",
-                     "--format=%(refname:short)\t%(creatordate:unix)",
+    """tag → **发布提交的 committer 时间**（升序）——本仓的**部署记录**真源。
+
+    为什么不用 tag 对象自身的 tagger 时间（2026-11-03 实测）：本仓 2026-10-20 批量重建过
+    tag，27 个 tag 里 22 个的 tagger 时间挤在 `23:02:54`–`23:02:58` **五秒**内（原样存在于
+    origin）。拿它当部署时间会算出「18.9 次/周」这种**假数字**（把三个月的发布压成一周）。
+    而 tag 指向的**发布提交**的 committer 时间是开发事实（2026-09-03 → 10-30，跨度 58 天）。
+    口径因此定为：**部署时间 = 该次发布提交的时间**，tag 名只作发布标识；tag 对象时间不入判据。
+    """
+    rows: list[tuple[str, str]] = []
+    for line in _git(root, "for-each-ref",
+                     "--format=%(refname:short)\t%(objectname)\t%(*objectname)",
                      "refs/tags").splitlines():
-        name, _, ts = line.partition("\t")
-        if name and ts.strip().isdigit():
-            out.append((name.strip(), int(ts)))
+        parts = (line.split("\t") + ["", ""])[:3]
+        name, obj, peeled = (part.strip() for part in parts)
+        if name:
+            rows.append((name, peeled or obj))
+    times = _commit_times(root)
+    out = [(name, times[sha]) for name, sha in rows if sha in times]
+    out.sort(key=lambda item: (item[1], item[0]))
     return out
 
 
@@ -201,6 +216,9 @@ def postmortems(root: Path = ROOT) -> list[dict]:
         return out
     for path in sorted(base.glob("*.md")):
         if path.name == "README.md":
+            continue
+        if path.stem.startswith(POSTMORTEM_TEMPLATE_PREFIX):
+            # 模板不是事故：ADR-0000 后公开仓只留 PO-9xxx；计入会把「示例」算成一次失败。
             continue
         text = path.read_text(encoding="utf-8")
         if not text.startswith("---"):
@@ -291,11 +309,17 @@ def _incident_from_records(records: list[dict]) -> tuple[dict, dict]:
 
 def _incident_from_postmortems(root: Path, tags: list[tuple[str, int]]) -> tuple[dict, dict]:
     """本仓**正式的事故登记面**（复盘件）→ (变更失败率, 恢复时长)；规则显式、可逐条复核。"""
-    missing = {"value": None, "unit": "", "basis": "",
-               "why": f"{POSTMORTEM_DIR}/ 无复盘件或 tag 不足 ⇒ 无事故记录可算"}
+    cfr_missing = {
+        "value": None, "unit": "", "basis": "",
+        "why": (f"{POSTMORTEM_DIR}/ 按 ADR-0000 只留 PO-9xxx 模板（真实复盘件在私有仓）"
+                f" ⇒ 本仓无事故登记可算；补 --records 或从私有仓导出后即可算")}
+    mttr_missing = {
+        "value": None, "unit": "", "basis": "",
+        "why": (f"{POSTMORTEM_DIR}/ 无真实复盘件（ADR-0000 外置）⇒ 既无事故计数，"
+                f"也无 restored（恢复时刻）字段可算；补 --records 或私有仓导出后即可算")}
     posts = postmortems(root)
     if not (tags and posts):
-        return dict(missing), dict(missing)
+        return dict(cfr_missing), dict(mttr_missing)
     mapping = _incidents_by_release(tags, posts)
     hit = [name for name, ids in mapping.items() if ids]
     cfr = {
@@ -336,12 +360,12 @@ def dora_values(root: Path = ROOT, records_path: str = "") -> tuple[dict, dict, 
     values = {
         "deployment_frequency": {
             "value": deploys_per_week, "unit": "次/周",
-            "basis": "git tag 时间戳（本仓的部署记录真源）",
+            "basis": "tag 指向的发布提交时间（committer time；本仓部署记录真源）",
             "why": "" if deploys_per_week is not None else "tag 少于 2 个，跨度不可算"},
         "lead_time_for_changes": {
             "value": None if median_lag is None else round(median_lag / 86400.0, 3),
             "unit": "天（中位）",
-            "basis": "每个 tag 区间内**最早提交**到该 tag 的滞后中位数",
+            "basis": "每个 tag 区间内**最早提交**到该次发布提交的滞后中位数（committer time）",
             "why": "" if median_lag is not None else "无可用 tag 区间"},
         "change_failure_rate": {"value": None, "unit": "", "basis": "", "why": NEEDS_RECORDS},
         "time_to_restore": {"value": None, "unit": "", "basis": "", "why": NEEDS_RECORDS},
@@ -374,7 +398,9 @@ def space_values(root: Path = ROOT, records_path: str = "") -> dict[str, Any]:
                           "basis": "git 提交作者",
                           "why": "" if counts.get("authors") else "作者面不可用"},
         "efficiency_and_flow": {"value": lead_days, "unit": "天（中位前置时间）",
-                                "basis": "与 DORA 前置时间同源", "why": ""},
+                                "basis": "与 DORA 前置时间同源",
+                                "why": "" if lead_days is not None
+                                       else "与 DORA 前置时间同源；无可用 tag 发布区间 ⇒ 无法算"},
     }
 
 

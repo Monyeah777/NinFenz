@@ -92,6 +92,86 @@ class EvidenceCardTest(unittest.TestCase):
                 if old is None: os.environ.pop("NF_COCKPIT_HOME", None)
                 else: os.environ["NF_COCKPIT_HOME"] = old
 
+    def test_cognition_evidence_roles_propagate_and_mismatch_detected(self):
+        import os, tempfile
+        from core.meta_cockpit import cognition_event as ce
+        old = os.environ.get("NF_COCKPIT_HOME")
+        with tempfile.TemporaryDirectory() as tmp:
+            os.environ["NF_COCKPIT_HOME"] = tmp
+            try:
+                roles = {"local-trusted": 1, "derived": 1,
+                         "external-advisory": 1}
+                ev = ce.build({
+                    "schema": "nf-cockpit-manifest/1", "prompt_digest": "a" * 64,
+                    "machine_digest": "b" * 64, "runtime_digest": "c" * 64,
+                    "journal_digest": "d" * 64, "handoff_digest": "e" * 64,
+                    "context_digest": "f" * 64, "status": "pass",
+                    "termination": "max-turns", "complete": False, "turns": 1,
+                    "context_units_spent": 1, "abstention_status": "none",
+                    "human_action_required": False,
+                }, evidence_roles=roles)
+                ce.write(ev)
+                card = em.evidence_card("docs/mcp.md", ROOT, cognition=ev)
+                # 卡透传同值 + 校验通过
+                self.assertEqual(roles, card["cognition"]["evidence_roles"])
+                self.assertTrue(em.verify_card(card, ROOT)["ok"])
+                # 篡改角色（尝试把外部建议升级为派生）→ 一致性校验必须报错
+                card["cognition"]["evidence_roles"] = {
+                    "local-trusted": 1, "derived": 2,
+                    "external-advisory": 0}
+                res = em.verify_card(card, ROOT)
+                self.assertFalse(res["ok"])
+                self.assertTrue(any("cognition evidence_roles 不一致" in i
+                                    for i in res["issues"]), res["issues"])
+            finally:
+                if old is None: os.environ.pop("NF_COCKPIT_HOME", None)
+                else: os.environ["NF_COCKPIT_HOME"] = old
+
+    def test_cognition_evidence_roles_whitelist_in_card(self):
+        import os, tempfile
+        from core.meta_cockpit import cognition_event as ce
+        old = os.environ.get("NF_COCKPIT_HOME")
+        with tempfile.TemporaryDirectory() as tmp:
+            os.environ["NF_COCKPIT_HOME"] = tmp
+            try:
+                roles = {"local-trusted": 1, "derived": 1}
+                ev = ce.build({
+                    "schema": "nf-cockpit-manifest/1", "prompt_digest": "a" * 64,
+                    "machine_digest": "b" * 64, "runtime_digest": "c" * 64,
+                    "journal_digest": "d" * 64, "handoff_digest": "e" * 64,
+                    "context_digest": "f" * 64, "status": "pass",
+                    "termination": "max-turns", "complete": False, "turns": 1,
+                    "context_units_spent": 1, "abstention_status": "none",
+                    "human_action_required": False,
+                }, evidence_roles=roles)
+                ce.write(ev)
+                card = em.evidence_card("docs/mcp.md", ROOT, cognition=ev)
+                self.assertEqual(roles, card["cognition"]["evidence_roles"])
+                self.assertTrue(em.verify_card(card, ROOT)["ok"])
+                # 卡片 roles 非法（未知键 / 负数 / bool）→ verify 报 issue
+                for bad_roles in ({"bogus": 1},
+                                  {"local-trusted": -1},
+                                  {"derived": True}):
+                    bad = json.loads(json.dumps(card))
+                    bad["cognition"]["evidence_roles"] = bad_roles
+                    res = em.verify_card(bad, ROOT)
+                    self.assertFalse(res["ok"], bad_roles)
+                    self.assertTrue(any("cognition card evidence_roles 非法"
+                                        in i for i in res["issues"]),
+                                    res["issues"])
+                # 事件侧 roles 非法（先重算 digest 让事件自洽）→ 也报 issue
+                bad_ev = json.loads(json.dumps(ev))
+                bad_ev["evidence_roles"] = {"unknown": 1}
+                bad_ev["digest"] = ce.digest(
+                    {k: v for k, v in bad_ev.items() if k != "digest"})
+                ce.write(bad_ev) if False else None
+                # evidence_card 直接拒绝非法事件 roles（fail-closed）
+                with self.assertRaises(ValueError):
+                    em.evidence_card("docs/mcp.md", ROOT, cognition=bad_ev)
+            finally:
+                if old is None: os.environ.pop("NF_COCKPIT_HOME", None)
+                else: os.environ["NF_COCKPIT_HOME"] = old
+
     def test_unknown_contract_rejected(self):
         with self.assertRaises(Exception):
             em.evidence_card("docs/mcp.md", ROOT, contract="不存在的域")

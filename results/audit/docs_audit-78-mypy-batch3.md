@@ -7,9 +7,9 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
-  - desktop/src/core/conformance_scan.py:945e4cbabfb5669e0f1cd7264dc9ea3fd2a1b3bd9e98a152b2a2f65df7489497
+  - desktop/src/core/conformance_scan.py:627f35b4e9160f035966d58af1f3e20dd9d4454aaf964d18a00bfbb6369e8839
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
+  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -266,6 +266,30 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
+
+> 重审（2026-11-03）：P3 收口重审：layer_model 一次性进程免付指纹取键（实测 fingerprint 10.2s→_scan_impl 1.5s）、conformance_scan DT_LNK 复核、terminal 深检预算重冻 10000（实测 1.7-7.8s）、risk_baseline 部署/事故口径修正；同批含并行面 nf.py/CLI 测试改动
+
+> 重审（2026-11-03）：P3 专项重审：desktop/src/core/terminal.py（BASELINE_DEEP_MAX_MS 重冻 12000→10000，实测 6.20/7.75s）、desktop/src/core/conformance_scan.py（枚举不信 d_type，DT_LNK 复核）、desktop/tests/test_dead_code.py（并行 dead_code 面改动，同批对象）
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
+> 重审（2026-11-02）：check45 驾驶舱 M1 门禁（基线/文档同步）
+
+> 重审（2026-11-02）：真实工具兼容修复：TIFF XMP/GIF 子块/PDF trailer（2026-11-02）
+
+> 重审（2026-11-02）：并入 OGG/HEIF 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 TIFF/GIF/WebP/WAV/MP3/FLAC 载体（2026-11-02）
+
 > 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
 
 > 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card

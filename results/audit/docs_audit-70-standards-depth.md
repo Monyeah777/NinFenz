@@ -9,10 +9,14 @@ subjects:
   - desktop/src/core/domain_pack.py:f8fcf7bc041f1cd42a0f01d2631d1ab32762e1a033fd18e6888ba9d365f9ee1f
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:fe985154c0901786295dbe04d2d9992ff2263c49581d154074ba6923cec5d802
+  - verify.sh:9274877ccae8dadee27b4f13dd90df7def9df2d123743277c0c0b9e66a1794f7
   - docs/domain-packs.md:1c86fb56f08747b4f050cef48fb09ee24e631c96441d25731817169ee456bb38
 
 ---
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）
 
 > 重审（2026-11-02）：check43 升级：A 桶证据内核门禁

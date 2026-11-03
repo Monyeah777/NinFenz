@@ -6,16 +6,24 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CHANGELOG.md:3d86047bf13870fa37ecb94c75effac6db9987b244432a4f6e0e519ccaf3330f
-  - docs/meta/VERSION-MATRIX.md:2c1343293ee6af30b6cbab6b476edc15d41623f50d8b8dac3a5361bd8ee5dabd
-  - README.md:91566fe57b863bdf417ce0152edb1cc0a2e9d0a2bdec7d7a0e28444330ee6bf6
+  - CHANGELOG.md:5b7a71d9a4f8b529b89864dc2165507d52457cf17a181431ad34b3e4f9a8d61c
+  - docs/meta/VERSION-MATRIX.md:edbbb13115c3f84d772a1890ea5357a92ff64cd223f2743211e0be871a8c4b5f
+  - README.md:b5733c042195e55d68dc35785918b6c4cfccae6527bd75ed753d3c4c88dbfa43
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:e6840c08d2da65bc68809be8f3a0d89de451558f933cdc6b80f51b8659654ceb
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
 
 ---
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-02）：并入 docx/ofd/markdown 载体（2026-11-02）
 
 > 重审（2026-11-02）：check44 标识合规门禁（基线/文档同步）

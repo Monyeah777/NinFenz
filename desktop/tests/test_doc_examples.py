@@ -108,6 +108,8 @@ class NonNfDocumentedCommandTest(unittest.TestCase):
         "docs/42_M5_Release-checklist.md": "带版本占位符（`vX.Y.Z`）的发布流程示例，非可直接照抄形"
             "态",
         "docs/45_执行遥测规范.md": "JSON 遥测样例（数据，不是命令行）",
+        "docs/m1-cockpit-replay.md": "链路示意图（prompt ──nf cockpit──► …），"
+            "是产物流转图而非命令行；命令本身由 M1 演练 test_m1_e2e.py 真跑",
         "docs/lsp.md": "客户端配置（JSON / Lua 各一处），路径由编辑器填",
         "docs/mcp.md": "MCP 客户端配置（JSON 两处），路径由用户填",
         "skills/ninfenz/references/quickstart.md"

@@ -196,9 +196,13 @@ class TestReceiptScope(unittest.TestCase):
                           "closed 复盘必须进入协议回执锚定面")
             doc = rc.build_scope(tmp, ["protocol/a.json", "protocol/b.json", "protocol/c.json"])
             self.assertEqual(doc["count"], 3)
-            self.assertEqual(rc.verify_scope(doc, tmp)[0], [], "三叶也必须折叠到根")
+            leaves = [e["id"] for e in doc["entries"]]
+            # 协议面回执默认校验「全量覆盖面」（verify_scope 的 R2 默认）；本夹具是
+            # 任意 3 叶的子集回执，必须显式给期望件集，才只判折叠/摘要/篡改。
+            self.assertEqual(rc.verify_scope(doc, tmp, expected_subjects=leaves)[0],
+                             [], "三叶也必须折叠到根")
             (Path(tmp) / "protocol" / "b.json").write_text('{"k": 2}', encoding="utf-8")
-            self.assertTrue(rc.verify_scope(doc, tmp)[0])
+            self.assertTrue(rc.verify_scope(doc, tmp, expected_subjects=leaves)[0])
 
     def test_write_scope_creates_file(self):
         with tempfile.TemporaryDirectory() as tmp:

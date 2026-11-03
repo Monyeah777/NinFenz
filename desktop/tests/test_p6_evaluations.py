@@ -137,12 +137,38 @@ class RiskAndBaselineTest(unittest.TestCase):
         self.assertGreater(m["dora_derived"]["lead_samples"], 0)
 
     def test_change_failure_rate_comes_from_the_incident_registry(self):
+        """反造假：变更失败率**只能**来自事故登记面；登记面按 ADR-0000 外置时如实 UNKNOWN。
+
+        三重判据（缺一即红）：
+        ① **模板不计入**：`postmortems/PO-9xxx` 是写法示例而非事故（ADR-0000 后公开仓只留
+           模板），读登记面时不得把它算成一次失败——旧实现会因此报「1/27 次发布有事故」，
+           这既是假数字也是对未发生事件的断言；
+        ② **规则可复算**：注入合成的「发布 + 复盘」后，`_incidents_by_release` 的归属规则
+           必须逐条命中（本仓有没有真登记件都能测这条）；
+        ③ **有数字就要有登记件**：若算了数字，basis 必须指向 postmortems/ 且有真实复盘件；
+           若没有登记面，则必须 UNKNOWN 且 why 指名 ADR-0000 —— 不许沉默、不许代理指标。
+        """
         m = rb.dora_metrics(ROOT)
         cfr = m["dora"]["change_failure_rate"]
-        self.assertIsNotNone(cfr["value"])
-        self.assertIn(rb.POSTMORTEM_DIR, cfr["basis"])
         posts = rb.postmortems(ROOT)
-        self.assertTrue(posts, "复盘件应被读到（本仓的正式事故登记面）")
+        self.assertFalse(
+            [p for p in posts
+             if str(p.get("id") or "").startswith(rb.POSTMORTEM_TEMPLATE_PREFIX)],
+            "PO-9xxx 模板不得计入事故登记面")
+        if cfr["value"] is not None:
+            self.assertIn(rb.POSTMORTEM_DIR, cfr["basis"])
+            self.assertTrue(posts, "有数字就必须有复盘件支撑（不得无米之炊）")
+        else:
+            self.assertIn("ADR-0000", cfr["why"], cfr["why"])
+            self.assertIn(rb.POSTMORTEM_DIR, cfr["why"], cfr["why"])
+        # ② 归属规则单测（不依赖本仓是否真有登记件）
+        tags = [("v1", rb._date_to_epoch("2026-01-01")),
+                ("v2", rb._date_to_epoch("2026-02-01"))]
+        samples = [{"id": "PO-1", "date": "2026-01-05"},
+                   {"id": "PO-2", "date": "2026-02-05"}]
+        mapping = rb._incidents_by_release(tags, samples)
+        self.assertEqual(["PO-1"], mapping["v1"], mapping)
+        self.assertEqual(["PO-2"], mapping["v2"], mapping)
 
     def test_time_to_restore_is_unknown_only_for_a_named_reason(self):
         m = rb.dora_metrics(ROOT)

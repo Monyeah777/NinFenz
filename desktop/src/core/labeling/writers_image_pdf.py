@@ -277,6 +277,8 @@ def inject_pdf_info(path, json_text) -> None:
     _classic_xref_guard(data, old_xref)
     region = _trailer_region(data, old_xref)
     root_ref = _ref(region, "Root")
+    if root_ref.startswith(b"/Root"):
+        root_ref = root_ref[len(b"/Root"):].strip()
     if root_ref is None:
         raise ValueError("PDF trailer 缺 /Root（修复指引：用带 /Root 的完整 PDF）")
     old_info = _object_num(region, "Info")

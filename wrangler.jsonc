@@ -8,6 +8,9 @@
   // 正式域已生效；关掉 workers.dev 路由，避免出现第二个可达源（non-China 亦统一到 ninfenz.dev）
   "workers_dev": false,
   "compatibility_date": "2026-10-06",
+  // 线索落库（可选）：POST /api/lead 使用 env.LEAD_KV。
+  // 创建命名空间后把下面一行解注释并填入真实 id；保持注释时接口返回 501，前端自动回退 mailto。
+  "kv_namespaces": [{"binding":"LEAD_KV","id":"7119b98514bb45baa64f0de7cf721638"}],
   "assets": {
     "directory": "./site",
     // run_worker_first=true 时必须声明资产绑定，否则 env.ASSETS 为 undefined（本波 dry-run 实测拦下）

@@ -802,7 +802,15 @@ class DeclaredFlagsAreReadTest(unittest.TestCase):
     """「声明面 = 执行面」：`nf` 的每个旗标都必须真被读到（防静默空转）。"""
 
     def test_no_declared_flag_is_unread(self):
-        source = (ROOT / "scripts" / "nf.py").read_text(encoding="utf-8")
+        # 入口薄壳：ng cockpit / cockpit-ab 的 parser 与读侧都在 core.meta_cockpit
+        # 的 nf_*_cli.py（scripts/nf.py 只 add_arguments + 透传 args），所以扫描源必须
+        # 覆盖这些模块，否则真读的旗标会被误判成「声明了没人读」。
+        sources = [ROOT / "scripts" / "nf.py",
+                   ROOT / "desktop" / "src" / "core" / "meta_cockpit"
+                   / "nf_cockpit_cli.py",
+                   ROOT / "desktop" / "src" / "core" / "meta_cockpit"
+                   / "nf_ab_cli.py"]
+        source = "\n".join(p.read_text(encoding="utf-8") for p in sources)
         got = unread_flag_dests(nf._build_parser(), source)
         self.assertEqual([], got, "声明了却没人读的旗标（修复指引：在处理器里读它，"
                          "或删掉这个假接口）：%s" % got)

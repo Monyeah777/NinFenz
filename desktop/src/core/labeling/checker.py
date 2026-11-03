@@ -237,22 +237,6 @@ def select_content(path, container):
     return metadata.content_bytes_for(path, container)
 
 
-def _dft_bytes(path, entries):
-    """DFT = 除隐式标识字节外的全部文件字节（尽力扣除，找不到就保留）。"""
-    with open(path, "rb") as f:
-        data = f.read()
-    for e in entries:
-        # sidecar 在另一个文件；text 条目就是正文本身，都不是「要扣除的标识块」
-        if e.get("container") in ("sidecar", "text") or not e.get("text"):
-            continue
-        blob = e["text"].encode("utf-8", "ignore")
-        idx = data.find(blob)
-        if idx < 0:
-            continue
-        data = data[:idx] + data[idx + len(blob):]
-    return data
-
-
 def _content_selector(path, container, entries):
     def _for_cntsel(sd):
         try:

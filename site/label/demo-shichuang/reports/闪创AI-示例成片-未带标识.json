@@ -1,0 +1,346 @@
+{
+  "schema": "nf-label-report/1",
+  "tool": "nf-labelcheck",
+  "version": "0.1.0",
+  "title": "GB 45438 标识体检报告",
+  "generated_at": "2026-11-02T10:00:00+0800",
+  "report_id": "416081995ce12c36",
+  "file": {
+    "name": "示例-未带标识.mp4",
+    "path": "/tmp/sc/示例-未带标识.mp4",
+    "size": 123,
+    "sha256": "416081995ce12c36f46a0c54d961a0486f19a2958beff22bb5f333b789ce3cc9"
+  },
+  "container": "mp4",
+  "container_label": "MP4 视频",
+  "meta_found_at": null,
+  "meta_raw": "",
+  "verdict": "FAIL",
+  "exit_code": 1,
+  "summary": {
+    "A": "NA",
+    "B": "FAIL",
+    "C": "NA",
+    "D": "PASS",
+    "E": "WARN"
+  },
+  "counts": {
+    "items": 15,
+    "PASS": 3,
+    "WARN": 8,
+    "FAIL": 1,
+    "NA": 3
+  },
+  "actions": [
+    {
+      "section": "B",
+      "id": "B0",
+      "status": "FAIL",
+      "detail": "未找到隐式标识元数据（七字段 JSON）",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E1",
+      "status": "WARN",
+      "detail": "待补：隐式标识元数据样本",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E2",
+      "status": "WARN",
+      "detail": "待补：证书链与时间戳（可选）",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E3",
+      "status": "WARN",
+      "detail": "待补：内容摘要与绑定记录",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E4",
+      "status": "WARN",
+      "detail": "待补：SM3withSM2 签名与公钥",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E6",
+      "status": "WARN",
+      "detail": "待补：服务提供者编码（27 位）",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E7",
+      "status": "WARN",
+      "detail": "待补：标识方法说明（协议/界面）",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E8",
+      "status": "WARN",
+      "detail": "待补：日志留存说明（≥6 个月）",
+      "evidence": {}
+    },
+    {
+      "section": "E",
+      "id": "E9",
+      "status": "WARN",
+      "detail": "备案/评估可用材料 1/8",
+      "evidence": {}
+    }
+  ],
+  "sections": {
+    "A": {
+      "id": "A",
+      "title": "显式标识",
+      "items": [
+        {
+          "id": "A1",
+          "status": "NA",
+          "detail": "显式标识位于像素/画面/音轨，本工具不做视觉判定；请人工或 OCR/抽帧复核",
+          "evidence": {}
+        }
+      ],
+      "status": "NA"
+    },
+    "B": {
+      "id": "B",
+      "title": "隐式标识字段",
+      "status": "FAIL",
+      "items": [
+        {
+          "id": "B0",
+          "status": "FAIL",
+          "detail": "未找到隐式标识元数据（七字段 JSON）",
+          "evidence": {}
+        }
+      ]
+    },
+    "D": {
+      "id": "D",
+      "title": "内容绑定",
+      "status": "PASS",
+      "items": [
+        {
+          "id": "D1",
+          "status": "PASS",
+          "detail": "内容字节选取 CntSel=DFT，共 15 字节",
+          "evidence": {
+            "cntsel": "DFT",
+            "bytes": 15
+          }
+        },
+        {
+          "id": "D2",
+          "status": "PASS",
+          "detail": "SM3 摘要可复算",
+          "evidence": {
+            "sm3": "f1a6293ba5b861b873c00928747e3c4890c244a77d033d96cf87e55cc6007007"
+          }
+        },
+        {
+          "id": "D3",
+          "status": "NA",
+          "detail": "绑定关系由 C2/C3 综合判定",
+          "evidence": {}
+        }
+      ]
+    },
+    "C": {
+      "id": "C",
+      "title": "安全防护信息",
+      "status": "NA",
+      "items": [
+        {
+          "id": "C0",
+          "status": "NA",
+          "detail": "无隐式标识元数据，跳过",
+          "evidence": {}
+        }
+      ]
+    },
+    "E": {
+      "id": "E",
+      "title": "备案材料",
+      "status": "WARN",
+      "items": [
+        {
+          "id": "E1",
+          "status": "WARN",
+          "detail": "待补：隐式标识元数据样本",
+          "evidence": {}
+        },
+        {
+          "id": "E2",
+          "status": "WARN",
+          "detail": "待补：证书链与时间戳（可选）",
+          "evidence": {}
+        },
+        {
+          "id": "E3",
+          "status": "WARN",
+          "detail": "待补：内容摘要与绑定记录",
+          "evidence": {}
+        },
+        {
+          "id": "E4",
+          "status": "WARN",
+          "detail": "待补：SM3withSM2 签名与公钥",
+          "evidence": {}
+        },
+        {
+          "id": "E5",
+          "status": "PASS",
+          "detail": "已有：显式标识样例",
+          "evidence": {}
+        },
+        {
+          "id": "E6",
+          "status": "WARN",
+          "detail": "待补：服务提供者编码（27 位）",
+          "evidence": {}
+        },
+        {
+          "id": "E7",
+          "status": "WARN",
+          "detail": "待补：标识方法说明（协议/界面）",
+          "evidence": {}
+        },
+        {
+          "id": "E8",
+          "status": "WARN",
+          "detail": "待补：日志留存说明（≥6 个月）",
+          "evidence": {}
+        },
+        {
+          "id": "E9",
+          "status": "WARN",
+          "detail": "备案/评估可用材料 1/8",
+          "evidence": {}
+        }
+      ],
+      "materials": {
+        "隐式标识元数据样本": false,
+        "证书链与时间戳_可选": false,
+        "内容摘要与绑定记录": false,
+        "SM3withSM2_签名与公钥": false,
+        "显式标识样例": true,
+        "服务提供者编码_27_位": false,
+        "标识方法说明_协议/界面": false,
+        "日志留存说明_6_个月": false
+      }
+    }
+  },
+  "preflight": {
+    "container": "mp4",
+    "size": 123,
+    "sha256": "416081995ce12c36f46a0c54d961a0486f19a2958beff22bb5f333b789ce3cc9",
+    "warnings": [],
+    "readable": true
+  },
+  "support": [
+    {
+      "container": "png",
+      "carrier": "tEXt / iTXt / zTXt",
+      "read": "标准库 zlib 解压",
+      "limit": "—"
+    },
+    {
+      "container": "jpeg",
+      "carrier": "APP1 XMP / EXIF UserComment",
+      "read": "标准库分段解析",
+      "limit": "仅读 APP1，不做像素判定"
+    },
+    {
+      "container": "tiff",
+      "carrier": "IFD0 0x2BC / XMP",
+      "read": "标准库 IFD 遍历",
+      "limit": "多页 TIFF 只读首页"
+    },
+    {
+      "container": "gif",
+      "carrier": "XMP DataXMP 扩展块",
+      "read": "标准库块遍历",
+      "limit": "—"
+    },
+    {
+      "container": "webp",
+      "carrier": "XMP chunk",
+      "read": "标准库 RIFF 解析",
+      "limit": "—"
+    },
+    {
+      "container": "pdf",
+      "carrier": "Info 字典 / /Metadata XMP",
+      "read": "标准库扫描 obj + FlateDecode",
+      "limit": "不支持加密 PDF、对象流(ObjStm)、增量更新；Info 非 ASCII 文本可能乱码"
+    },
+    {
+      "container": "mp4",
+      "carrier": "moov.udta.meta keys/ilst / XMP uuid",
+      "read": "标准库 box 解析",
+      "limit": "只读元数据，不解码画面"
+    },
+    {
+      "container": "mp3",
+      "carrier": "ID3v2 TXXX",
+      "read": "标准库帧解析",
+      "limit": "—"
+    },
+    {
+      "container": "wav",
+      "carrier": "LIST/INFO 子块",
+      "read": "标准库 chunk 解析",
+      "limit": "—"
+    },
+    {
+      "container": "flac",
+      "carrier": "VORBIS_COMMENT",
+      "read": "标准库块解析",
+      "limit": "—"
+    },
+    {
+      "container": "docx",
+      "carrier": "docProps/custom.xml",
+      "read": "标准库 zipfile",
+      "limit": "—"
+    },
+    {
+      "container": "ofd",
+      "carrier": "CustomDatas/AIGC.xml",
+      "read": "标准库 zipfile",
+      "limit": "—"
+    },
+    {
+      "container": "markdown",
+      "carrier": "头注释块（AIGC JSON）",
+      "read": "标准库文本解析",
+      "limit": "—"
+    },
+    {
+      "container": "xmind/posm/posf",
+      "carrier": "metadata.json / meta.json",
+      "read": "标准库 zipfile",
+      "limit": "—"
+    },
+    {
+      "container": "uof",
+      "carrier": "_meta/meta.xml `<meta:AIGC>`",
+      "read": "标准库 zipfile",
+      "limit": "—"
+    }
+  ],
+  "reproduce": [
+    "python3 scripts/nf_labeling.py check /tmp/sc/示例-未带标识.mp4 --json",
+    "python3 scripts/nf_label_report.py report /tmp/sc/示例-未带标识.mp4",
+    "python3 scripts/nf_labeling.py selfcheck"
+  ],
+  "disclaimer": "本报告由本地工具对单个文件做**结构与字段级自查**，结论仅代表该文件在检查时刻的状态；不构成官方认定、法律意见或备案结论，不保证备案/评估通过。显式标识若位于像素、画面或音轨，本工具不做视觉判定，需人工或OCR/抽帧复核。报告中的数据可被第三方按「复算命令」独立复核。"
+}

@@ -3,7 +3,7 @@
     "app": 1449,
     "entry": 27,
     "floor": 5,
-    "prod": 1046,
+    "prod": 1045,
     "projection": 134,
     "support": 421,
     "verify": 1155
@@ -5833,12 +5833,6 @@
     {
       "function": "规格主张的认识论标签（机制借鉴 restless-core 规格条目认知标签）。",
       "path": "desktop/src/core/claim_labels.py",
-      "role": "prod",
-      "rule": "auto:R-core"
-    },
-    {
-      "function": "Thin CLI bridge for optional command families kept outside scripts/nf.py.",
-      "path": "desktop/src/core/cli_bridge.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -13248,7 +13242,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "eb3979b4d31d967c53a8e063363dea63cec95b97884c2c592f9ca4c69c377edc",
+  "root_digest": "3442ce4e46ecae62ec610e962c8da0a3566853b40e34dbb61a9efb02b0243bd3",
   "rule_counts": {
     "R-app": 1449,
     "R-catch": 249,
@@ -13258,7 +13252,7 @@
     "R-projection": 119,
     "R-support": 145,
     "R-verify": 1035,
-    "auto:R-core": 264
+    "auto:R-core": 263
   },
   "schema": "nf-role-coordinates/1"
 }

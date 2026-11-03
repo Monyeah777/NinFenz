@@ -15,11 +15,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from core import cockpit_log, domain_rules, json_doc, machine_contract, paths
 from core.meta_cockpit import cognition_event as ce
+
+#: 关闭动作的证据引用可带「证据卡 digest」：card:<sha256 小写 hex>。
+_CARD_DIGEST_RE = re.compile(r"^card:[0-9a-f]{64}$")
 
 SCHEMA = "nf-evidence-card/1"
 SERVER_NAME = "nf-evidence"
@@ -57,7 +61,10 @@ def artifact_checks(path_rel: str, root: str | Path = ".") -> List[Dict[str, Any
     rel = target.relative_to(_root(root)).as_posix()
     if rel.endswith(".json"):
         try:
-            json.loads(raw.decode("utf-8"))
+            parsed = json.loads(raw.decode("utf-8"))
+            if not isinstance(parsed, (dict, list)):
+                raise ValueError("顶层不是对象/数组（标量 JSON 不是契约件形状；"
+                                 "修复指引：该文件须是对象或数组）")
             checks.append({"rule": "json_parse", "ok": True, "detail": "ok"})
         except (ValueError, UnicodeDecodeError) as exc:
             checks.append({"rule": "json_parse", "ok": False, "detail": str(exc)[:120]})
@@ -187,6 +194,10 @@ def evidence_card(path_rel: str, root: str | Path = ".", contract: str = "",
                      "handoff_digest": ev.get("handoff_digest"),
                      "status": ev.get("status"), "turns": ev.get("turns"),
                      "atoms": ev.get("atoms") or []}
+        # 证据角色传播（event → card）：事件含 evidence_roles 才透传同值；
+        # 键/值按白名单校验，非法直接 ValueError（fail-closed）。
+        if isinstance(ev.get("evidence_roles"), dict):
+            cog_block["evidence_roles"] = ce.validate_roles(ev["evidence_roles"])
     return {"schema": SCHEMA,
             "cognition": cog_block,
             "subject": {"path": target.relative_to(_root(root)).as_posix(),
@@ -251,7 +262,7 @@ def verify_card(card: Any, root: str | Path = ".") -> Dict[str, Any]:
                            (live_cov0["fields"] == 0 or
                             live_cov0["fields_hit"] >= int(cov0.get("min_fields", 0))) and
                            live_cov0["rules_ok"] >= int(cov0.get("min_rules", 0)))}
-            except (ValueError, OSError):
+            except (ValueError, OSError):  # 重算失败沿用记录值，异常由规则门禁报（AUD-0016）
                 pass
         for c in contract.get("checks") or []:
             if not isinstance(c, dict):
@@ -284,6 +295,19 @@ def verify_card(card: Any, root: str | Path = ".") -> Dict[str, Any]:
                 issues.append("cognition digest 不一致")
             if ev.get("handoff_digest") != cog.get("handoff_digest"):
                 issues.append("cognition handoff digest 不一致")
+            # 证据角色只许原样传播：先各自做白名单/值域校验（非法即 issue），
+            # 再逐值比较（缺省 None==None 不误报，旧卡行为不变）。
+            for label, roles in (("card", cog.get("evidence_roles")),
+                                 ("event", ev.get("evidence_roles"))):
+                if roles is None:
+                    continue
+                try:
+                    ce.validate_roles(roles)
+                except ValueError as exc:
+                    issues.append("cognition %s evidence_roles 非法：%s"
+                                  % (label, exc))
+            if ev.get("evidence_roles") != cog.get("evidence_roles"):
+                issues.append("cognition evidence_roles 不一致")
     elif cog is not None:
         issues.append("cognition 块形状非法")
     return {"ok": not issues, "issues": issues, "live": live}
@@ -429,6 +453,12 @@ def call_tool(name: str, arguments: Dict[str, Any], root: str | Path = ".") -> D
         ev = [str(x) for x in (args.get("evidence") or [])]
         bad = []
         for rel in ev:
+            if rel.startswith("card:"):
+                # 证据卡 digest 引用：只做形态校验（语义「关闭必须带 card」
+                # 由 M1 脚本与 verify.sh check45 保证）；非法即 fail-closed。
+                if not _CARD_DIGEST_RE.match(rel):
+                    bad.append(rel)
+                continue
             if rel.startswith("cog-") or rel.startswith("cog-event:"):
                 if rel.startswith("cog-event:") and ce.load(rel.split(":", 1)[1]) is None:
                     bad.append(rel)

@@ -69,14 +69,25 @@ class TestInvalidCorpus(unittest.TestCase):
             self.assertTrue(receipts.verify(doc, tmp)[0])
 
     def test_invalid_approval_stale(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            subject = Path(tmp, "doc.md")
-            subject.write_text("# v1\n", encoding="utf-8")
-            approval.approve(tmp, "doc.md", "作者", today="2026-09-14")
-            self.assertEqual(approval.verify(tmp)[0], [])
-            subject.write_text("# v2\n", encoding="utf-8")
-            issues = approval.verify(tmp)[0]
-            self.assertTrue(any("批准已失效" in i for i in issues), issues)
+        # 2026-11-02 E13 起批准人白名单 fail-closed：临时目录不是可信安装根，不显式声明
+        # 批准人时 `approve` 直接 ValueError（防「空集=不限制」）。本用例要判的是**内容失效**，
+        # 故显式给出批准人（白名单外仍拒绝，见下一条用例）——不放宽任何门禁。
+        old = os.environ.get(approval.ENV_APPROVERS)
+        os.environ[approval.ENV_APPROVERS] = "作者"
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                subject = Path(tmp, "doc.md")
+                subject.write_text("# v1\n", encoding="utf-8")
+                approval.approve(tmp, "doc.md", "作者", today="2026-09-14")
+                self.assertEqual(approval.verify(tmp)[0], [])
+                subject.write_text("# v2\n", encoding="utf-8")
+                issues = approval.verify(tmp)[0]
+                self.assertTrue(any("批准已失效" in i for i in issues), issues)
+        finally:
+            if old is None:
+                os.environ.pop(approval.ENV_APPROVERS, None)
+            else:
+                os.environ[approval.ENV_APPROVERS] = old
 
     def test_approval_actor_must_be_in_explicit_allowlist(self):
         with tempfile.TemporaryDirectory() as tmp:

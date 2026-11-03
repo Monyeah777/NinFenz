@@ -10,7 +10,7 @@
 
 ## [未发布] · **License change（1.1.0 生效）** — 分层双许可
 
-- 质量门禁：verify v2.30 · check1-44 · PASS=78（新增 check44 标识合规门禁：GB 45438—2025 / TC260-PG-202511A 五段判定 + 国密 + 证书链 + 可信时间戳）。
+- 质量门禁：verify v2.30 · check1-45 · PASS=79（新增 check45 驾驶舱 M1 全链门禁：cockpit→event→card→gate→ledger→receipt→replay 可重放，两次 check 报告逐字节一致）。
 
 > 生效于**下一个 minor 版本（1.1.0）**；v1.0.5 及更早版本仍为 MIT，且已分发副本的 MIT 权利永久有效。
 

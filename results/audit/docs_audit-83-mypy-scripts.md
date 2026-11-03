@@ -12,9 +12,9 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:a5a9ff54c702ffb104f13040058f0d6f621e905e7d44b43b2c44af7176ac841b
+  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:355910b16c00c4a42bf9ab3dc1a2daa3785e478984881b941fdec3c80286bf56
+  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -283,6 +283,30 @@ subjects:
 
 | 脚本 | 修法 |
 |---
+> 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
+
+> 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
+
+> 重审（2026-11-03）：细节+外锚+门禁修复（cards/stdio/purity）
+
+> 重审（2026-11-02）：回执外部锚定 + 告警历史（M1 16 项）
+
+> 重审（2026-11-02）：审计试运行/灰度 canary（check45 第 8 段）
+
+> 重审（2026-11-02）：M1 接入 query/gc 检查项（15 项）
+
+> 重审（2026-11-02）：check45 roles 白名单 + 事件库索引（2026-11-02）
+
+> 重审（2026-11-02）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
+> 重审（2026-11-02）：check45 驾驶舱 M1 门禁（基线/文档同步）
+
+> 重审（2026-11-02）：真实工具兼容修复：TIFF XMP/GIF 子块/PDF trailer（2026-11-02）
+
+> 重审（2026-11-02）：并入 OGG/HEIF 载体（2026-11-02）
+
+> 重审（2026-11-02）：并入 TIFF/GIF/WebP/WAV/MP3/FLAC 载体（2026-11-02）
+
 > 重审（2026-11-02）：并入 xmind/posm/posf/UOF 载体（2026-11-02）
 
 > 重审（2026-11-02）：P1-P3：cognition event → ledger → evidence card

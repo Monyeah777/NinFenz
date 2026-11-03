@@ -100,10 +100,11 @@ def _kind_of(key: str, text: str) -> str:
         return "xmp"
     if t[:1] in ("{", "["):
         try:
-            json.loads(text)
+            parsed = json.loads(text)
         except (ValueError, TypeError):
             return "text"
-        return "json"
+        # 首字符已限定 {/[；显式判一次形状，把「标签载体」钉在读取点（下游按对象取字段）。
+        return "json" if isinstance(parsed, (dict, list)) else "text"
     return "text"
 
 
@@ -157,10 +158,28 @@ def sniff(path: str) -> str:
         return "jpeg"
     if head.startswith(b"%PDF-") or b"%PDF-" in head[:1024]:
         return "pdf"
+    if len(head) >= 12 and head[4:8] == b"ftyp":
+        brand = head[8:12]
+        if brand in (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1"):
+            return "heif"
     if len(head) >= 12 and head[4:8] in _MP4_BOX_TYPES:
         return "mp4"
     if head[:4] == b"RIFF" and head[8:12] == b"WAVE":
         return "wav"
+    if head[:2] in (b"II", b"MM") and head[2:4] in (b"*\x00", b"\x00*"):
+        return "tiff"
+    if head[:6] in (b"GIF87a", b"GIF89a"):
+        return "gif"
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return "webp"
+    if head[:4] == b"fLaC":
+        return "flac"
+    if head[:4] == b"OggS":
+        return "ogg"
+    if len(head) >= 12 and head[4:8] == b"ftyp":
+        brand = head[8:12]
+        if brand in (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1"):
+            return "heif"
     if head.startswith(b"ID3"):
         return "mp3"
     if len(head) >= 2 and head[0] == 0xFF and (head[1] & 0xE0) == 0xE0:
@@ -858,9 +877,13 @@ def read_sidecar(path: str) -> dict | None:
     except OSError as exc:
         raise ValueError("无法读 sidecar：%s（%s）" % (target, exc))
     try:
-        return json.loads(text)
+        obj = json.loads(text)
     except ValueError as exc:
         raise ValueError("sidecar 不是合法 JSON：%s（%s）" % (target, exc))
+    if not isinstance(obj, dict):
+        raise ValueError("sidecar 顶层不是对象：%s（修复指引：sidecar 须是标注对象）"
+                         % target)
+    return obj
 
 
 # ---------------------------------------------------------------- extract
@@ -892,6 +915,19 @@ def extract(path: str) -> list[dict]:
         out = _mp3_entries(data)
     elif kind == "wav":
         out = _wav_entries(data)
+        out.extend(_wav_aigc_entries(data))
+    elif kind == "tiff":
+        out = _tiff_aigc_entries(path)
+    elif kind == "gif":
+        out = _gif_entries(data)
+    elif kind == "webp":
+        out = _webp_entries(data)
+    elif kind == "flac":
+        out = _flac_entries(path)
+    elif kind == "ogg":
+        out = _ogg_entries(path)
+    elif kind == "heif":
+        out = _heif_entries(path)
     elif kind in ("xmind", "posm", "posf"):
         out = _json_meta_entries(path, kind)
     elif kind == "uof":
@@ -1033,6 +1069,497 @@ def _uof_entries(path: str) -> list:
     return out
 
 
+# ---------------------------------------------------------------- media content rules
+def _tiff_content(data: bytes) -> bytes:
+    """TIFF 内容 = 图像 strip 数据（StripOffsets/StripByteCounts），无则整文件。"""
+    if len(data) < 8 or data[:2] not in (b"II", b"MM"):
+        return data
+    bo = "little" if data[:2] == b"II" else "big"
+    if int.from_bytes(data[2:4], bo) != 42:
+        return data
+    ifd0 = int.from_bytes(data[4:8], bo)
+    offsets, counts = [], []
+    for tag, typ, cnt, raw4, pos in _tiff_entries(data, ifd0, bo):
+        if tag not in (0x111, 0x117):
+            continue
+        raw, _off = _tiff_value(data, bo, (typ, cnt, raw4, pos))
+        width = 4 if typ == 4 else 2
+        vals = [int.from_bytes(raw[i:i + width], bo)
+                for i in range(0, len(raw), width)]
+        (offsets if tag == 0x111 else counts).extend(vals)
+    if not offsets or len(offsets) != len(counts):
+        return data
+    parts = []
+    for off, ln in zip(offsets, counts):
+        if 0 <= off < len(data):
+            parts.append(data[off:off + ln])
+    return b"".join(parts) if parts else data
+
+
+def _gif_content(data: bytes) -> bytes:
+    """GIF 内容 = 首个图像块起点到 trailer 前的字节（标识扩展插在其前）。"""
+    blocks = list(_gif_blocks(data, _gif_start(data), len(data)))
+    first = next((st for kind, st, _e in blocks if kind == "image"), None)
+    trailer = next((st for kind, st, _e in blocks if kind == "trailer"), None)
+    if first is None:
+        return data
+    return data[first:]
+
+
+def _webp_content(data: bytes) -> bytes:
+    if len(data) < 12 or data[8:12] != b"WEBP":
+        return data
+    parts = []
+    for fourcc, body, end in _webp_chunks(data):
+        if fourcc in (b"VP8 ", b"VP8L", b"ALPH"):
+            parts.append(data[body:end])
+    return b"".join(parts) if parts else data
+
+
+def _wav_content(data: bytes) -> bytes:
+    """WAV 内容 = 除 AIGC 子块外全部 chunk 的原始字节（头+payload+pad）。"""
+    if data[:4] != b"RIFF" or data[8:12] != b"WAVE":
+        return data
+    parts = []
+    for fourcc, body, end in _wav_chunks(data):
+        if fourcc == b"AIGC":
+            continue
+        parts.append(data[body - 8:end])
+    return b"".join(parts) if parts else data
+
+
+# ---------------------------------------------------------------- media extra readers
+def _tiff_aigc_entries(path: str) -> list:
+    """TIFF：IFD0 tag 0x2BC（UNDEFINED）里的 JSON 标识。"""
+    data = _read(path)
+    if len(data) < 8 or data[:2] not in (b"II", b"MM"):
+        return []
+    bo = "little" if data[:2] == b"II" else "big"
+    if int.from_bytes(data[2:4], bo) != 42:
+        return []
+    ifd0 = int.from_bytes(data[4:8], bo)
+    for tag, typ, cnt, raw4, pos in _tiff_entries(data, ifd0, bo):
+        if tag != 0x2BC:
+            continue
+        raw, _off = _tiff_value(data, bo, (typ, cnt, raw4, pos))
+        text = _decode(raw, "utf-8")
+        if not text:
+            continue
+        if "xmpmeta" in text or "xpacket" in text:
+            frags = _json_fragments(_unescape_xml(text))
+            if frags:
+                return [_entry("tiff.IFD0", "AIGC", frags[0][0], 0)]
+            continue
+        return [_entry("tiff.IFD0", "AIGC", text, 0)]
+    return []
+
+
+def _gif_start(data: bytes) -> int:
+    """GIF 头部 6 + LSD 7 + 全局色表（若有）之后的偏移。"""
+    if len(data) < 13:
+        return 13
+    flags = data[10]
+    start = 13
+    if flags & 0x80:
+        start += 3 * (2 ** ((flags & 7) + 1))
+    return min(start, len(data))
+
+
+def _gif_blocks(data: bytes, pos: int, end: int):
+    """迭代 GIF 顶层块：(kind, start, end)。kind ∈ image/extension/trailer。"""
+    while pos < end:
+        b = data[pos]
+        if b == 0x3B:
+            yield "trailer", pos, pos + 1
+            return
+        if b == 0x2C:
+            if pos + 10 > end:
+                return
+            flags = data[pos + 9]
+            p = pos + 10
+            if flags & 0x80:
+                p += 3 * (2 ** ((flags & 7) + 1))
+            p += 1  # LZW min code size
+            while p < end:
+                n = data[p]
+                p += 1
+                if n == 0:
+                    break
+                p += n
+            yield "image", pos, min(p, end)
+            pos = p
+            continue
+        if b == 0x21:
+            if data[pos:pos + 3] == b"\x21\xff\x0b":
+                p = pos + 3 + 11          # 跳过 app identifier/auth code
+                while p < end:
+                    n = data[p]
+                    p += 1
+                    if n == 0:
+                        break
+                    p += n
+                yield "extension", pos, min(p, end)
+                pos = p
+                continue
+            p = pos + 2
+            while p < end:
+                n = data[p]
+                p += 1
+                if n == 0:
+                    break
+                p += n
+            yield "extension", pos, min(p, end)
+            pos = p
+            continue
+        return
+
+
+def _gif_entries(data: bytes) -> list:
+    out = []
+    for kind, start, end in _gif_blocks(data, _gif_start(data), len(data)):
+        block = data[start:end]
+        if kind != "extension" or not block.startswith(b"\x21\xff\x0b"):
+            continue
+        if b"XMP DataXMP" not in block[:32]:
+            continue
+        body = block[3 + 11:]
+        packet = bytearray()
+        pos = 0
+        while pos < len(body):
+            n = body[pos]
+            pos += 1
+            if n == 0:
+                break
+            packet += body[pos:pos + n]
+            pos += n
+        text = _decode(bytes(packet), "utf-8")
+        if text and ("xmpmeta" in text or "xpacket" in text):
+            out.append(_entry("gif.XMP", "AIGC", text, start))
+    return out
+
+
+def _webp_chunks(data: bytes):
+    pos, end = 12, len(data)
+    while pos + 8 <= end:
+        fourcc = data[pos:pos + 4]
+        size = int.from_bytes(data[pos + 4:pos + 8], "little")
+        body = pos + 8
+        yield fourcc, body, min(body + size, end)
+        pos = body + size + (size & 1)
+
+
+def _webp_entries(data: bytes) -> list:
+    out = []
+    if data[8:12] != b"WEBP":
+        return out
+    for fourcc, body, end in _webp_chunks(data):
+        if fourcc != b"XMP ":
+            continue
+        text = _decode(data[body:end].rstrip(b"\x00"), "utf-8")
+        if text:
+            out.append(_entry("webp.XMP", "XMP", text, body))
+    return out
+
+
+def _wav_chunks(data: bytes):
+    pos, end = 12, len(data)
+    while pos + 8 <= end:
+        fourcc = data[pos:pos + 4]
+        size = int.from_bytes(data[pos + 4:pos + 8], "little")
+        body = pos + 8
+        yield fourcc, body, min(body + size, end)
+        pos = body + size + (size & 1)
+
+
+def _wav_aigc_entries(data: bytes) -> list:
+    out = []
+    if data[:4] != b"RIFF" or data[8:12] != b"WAVE":
+        return out
+    for fourcc, body, end in _wav_chunks(data):
+        if fourcc != b"AIGC":
+            continue
+        text = _decode(data[body:end].rstrip(b"\x00"), "utf-8")
+        if text:
+            out.append(_entry("wav.AIGC", "AIGC", text, body))
+    return out
+
+
+def _id3v2_size(data: bytes) -> int:
+    if data[:3] != b"ID3" or len(data) < 10:
+        return 0
+    raw = data[6:10]
+    return 10 + ((raw[0] << 21) | (raw[1] << 14) | (raw[2] << 7) | raw[3])
+
+
+def _flac_blocks(data: bytes):
+    """迭代 FLAC metadata blocks：(type, body_start, body_end, header_start)。"""
+    pos, end = 4, len(data)
+    while pos + 4 <= end:
+        header = data[pos]
+        last, btype = header >> 7, header & 0x7F
+        size = int.from_bytes(data[pos + 1:pos + 4], "big")
+        body = pos + 4
+        yield btype, body, min(body + size, end), pos
+        pos = body + size
+        if last:
+            return
+
+
+def _flac_entries(path: str) -> list:
+    data = _read(path)
+    if data[:4] != b"fLaC":
+        return []
+    out = []
+    for btype, body, end, _hdr in _flac_blocks(data):
+        if btype != 4:      # VORBIS_COMMENT
+            continue
+        block = data[body:end]
+        if len(block) < 4:
+            continue
+        try:
+            pos = 4 + int.from_bytes(block[0:4], "little")   # skip vendor
+            count = int.from_bytes(block[pos:pos + 4], "little")
+            pos += 4
+            for _ in range(count):
+                ln = int.from_bytes(block[pos:pos + 4], "little")
+                pos += 4
+                cmt = block[pos:pos + ln]
+                pos += ln
+                if cmt.upper().startswith(b"AIGC="):
+                    text = _decode(cmt[5:], "utf-8")
+                    if text:
+                        out.append(_entry("flac.VORBIS", "AIGC", text,
+                                          body + pos - ln))
+        except (IndexError, ValueError):
+            continue
+    return out
+
+
+# ---------------------------------------------------------------- heif content rule
+def _heif_primary_id(data: bytes) -> int | None:
+    """从 meta/pitm 取主图 item_ID。"""
+    for btype, body, bend, _size in _heif_boxes(data, 0, len(data)):
+        if btype != b"meta":
+            continue
+        for t2, b2, e2, _s2 in _heif_boxes(data, body + 4, bend):
+            if t2 != b"pitm":
+                continue
+            ver = data[b2]
+            p = b2 + 4
+            if ver == 0:
+                return int.from_bytes(data[p:p + 2], "big")
+            return int.from_bytes(data[p:p + 4], "big")
+    return None
+
+
+def _heif_content(data: bytes) -> bytes:
+    """HEIF 内容 = 主图 item（pitm）的 extent 字节；失败回退整文件。"""
+    pid = _heif_primary_id(data)
+    if pid is None:
+        return data
+    _ms, _me, items = _heif_meta_items(data)
+    meta = items.get(pid) or {}
+    parts = []
+    for off, ln in meta.get("offsets") or []:
+        if 0 <= off < len(data):
+            parts.append(data[off:off + ln])
+    return b"".join(parts) if parts else data
+
+
+# ---------------------------------------------------------------- ogg / heif readers
+def _ogg_pages(data: bytes):
+    """迭代 Ogg 页：(payload, start, end)；畸形即停止。"""
+    pos, n = 0, len(data)
+    while pos + 27 <= n:
+        if data[pos:pos + 4] != b"OggS":
+            return
+        nseg = data[pos + 26]
+        if pos + 27 + nseg > n:
+            return
+        segs = data[pos + 27:pos + 27 + nseg]
+        body = pos + 27 + nseg
+        plen = sum(segs)
+        end = body + plen
+        if end > n:
+            return
+        yield data[body:end], pos, end
+        pos = end
+
+
+def _ogg_packets(data: bytes) -> list:
+    """把页载荷拼成包；用 lacing<255 判包结束（跨页续表由 header_type 位 0x01 表示）。"""
+    packets, cur = [], bytearray()
+    for payload, _start, _end in _ogg_pages(data):
+        p = 0
+        # 段表在页头：重解析一次段长
+        # 这里按 255 边界直接扫描 payload（等价：段长序列由页头决定）
+    # 简化实现：重新走页并读段表
+    packets, cur = [], bytearray()
+    for payload, start, _end in _ogg_pages(data):
+        nseg = data[start + 26]
+        segs = data[start + 27:start + 27 + nseg]
+        p = 0
+        for seg in segs:
+            cur += payload[p:p + seg]
+            p += seg
+            if seg < 255:
+                packets.append(bytes(cur))
+                cur = bytearray()
+    if cur:
+        packets.append(bytes(cur))
+    return packets
+
+
+def _vorbis_comments(packet: bytes) -> list:
+    """解析 Vorbis/Opus 注释包，返回注释字符串列表。"""
+    if packet.startswith(b"\x03vorbis"):
+        pos = 7
+    elif packet.startswith(b"OpusTags"):
+        pos = 8
+    else:
+        return []
+    try:
+        vlen = int.from_bytes(packet[pos:pos + 4], "little")
+        pos += 4 + vlen
+        cnt = int.from_bytes(packet[pos:pos + 4], "little")
+        pos += 4
+        out = []
+        for _ in range(cnt):
+            ln = int.from_bytes(packet[pos:pos + 4], "little")
+            pos += 4
+            out.append(packet[pos:pos + ln].decode("utf-8", "replace"))
+            pos += ln
+        return out
+    except (IndexError, ValueError):
+        return []
+
+
+def _ogg_entries(path: str) -> list:
+    data = _read(path)
+    packets = _ogg_packets(data)
+    if len(packets) < 2:
+        return []
+    for cmt in _vorbis_comments(packets[1]):
+        if cmt.upper().startswith("AIGC="):
+            text = cmt[5:]
+            if text:
+                return [_entry("ogg.comment", "AIGC", text, 0)]
+    return []
+
+
+def _heif_boxes(data: bytes, start: int, end: int, bo: str = "little"):
+    """ISO BMFF 盒：yield (type, body_start, box_end, size)。"""
+    pos = start
+    while pos + 8 <= end:
+        size = int.from_bytes(data[pos:pos + 4], "big")
+        btype = data[pos + 4:pos + 8]
+        hdr = 8
+        if size == 1:
+            if pos + 16 > end:
+                return
+            size = int.from_bytes(data[pos + 8:pos + 16], "big")
+            hdr = 16
+        elif size == 0:
+            size = end - pos
+        if size < hdr or pos + size > end:
+            return
+        yield btype, pos + hdr, pos + size, size
+        pos += size
+
+
+def _heif_meta_items(data: bytes):
+    """解析 meta：返回 (meta_start, meta_end, items)。
+
+    items = {item_id: {"name": str|None, "offsets": [(off, len)],
+                       "type": bytes|None}}
+    infe 采用 fullbox 布局：version(1)+flags(3)+item_ID(2)+protection(2)
+    [+ item_type(4) + item_name(NUL) if version>=2]。
+    """
+    items = {}
+    for btype, body, bend, _size in _heif_boxes(data, 0, len(data)):
+        if btype != b"meta":
+            continue
+        for t2, b2, e2, _s2 in _heif_boxes(data, body + 4, bend):
+            if t2 == b"iinf":
+                ver = data[b2]
+                p = b2 + 4
+                cnt_bytes = 2 if ver == 0 else 4
+                cnt = int.from_bytes(data[p:p + cnt_bytes], "big")
+                p += cnt_bytes
+                for _ in range(cnt):
+                    kids = list(_heif_boxes(data, p, e2))
+                    if not kids:
+                        break
+                    t3, b3, e3, sz3 = kids[0]
+                    p = e3
+                    if t3 != b"infe":
+                        continue
+                    v = data[b3]
+                    item_id = int.from_bytes(data[b3 + 4:b3 + 6], "big")
+                    item_type = data[b3 + 8:b3 + 12] if v >= 2 else None
+                    name = None
+                    if v >= 2:
+                        nstart = b3 + 12
+                        nend = data.find(b"\x00", nstart, e3)
+                        if nend < 0:
+                            nend = e3
+                        name = data[nstart:nend].decode("utf-8", "replace")
+                    items.setdefault(item_id, {})
+                    items[item_id].update({"name": name, "type": item_type})
+            elif t2 == b"iloc":
+                ver = data[b2]
+                p = b2 + 4
+                off_size = data[p] >> 4
+                len_size = data[p] & 0x0F
+                p += 1
+                base_size = data[p] >> 4
+                idx_size = data[p] & 0x0F if ver in (1, 2) else 0
+                p += 1
+                id_size = 2 if ver < 2 else 4
+                cnt = int.from_bytes(data[p:p + (2 if ver < 2 else 4)], "big")
+                p += (2 if ver < 2 else 4)
+                for _ in range(cnt):
+                    item_id = int.from_bytes(data[p:p + id_size], "big")
+                    p += id_size
+                    if ver in (1, 2):
+                        p += 2  # construction_method
+                    p += 2      # data_reference_index
+                    base = int.from_bytes(data[p:p + base_size], "big") \
+                        if base_size else 0
+                    p += base_size
+                    ext_cnt = int.from_bytes(data[p:p + 2], "big")
+                    p += 2
+                    exts = []
+                    for _ in range(ext_cnt):
+                        if idx_size:
+                            p += idx_size
+                        eoff = int.from_bytes(data[p:p + off_size], "big") \
+                            if off_size else 0
+                        p += off_size
+                        elen = int.from_bytes(data[p:p + len_size], "big") \
+                            if len_size else 0
+                        p += len_size
+                        exts.append((base + eoff, elen))
+                    items.setdefault(item_id, {})
+                    items[item_id]["offsets"] = exts
+        return body, bend, items
+    return None, None, {}
+
+
+def _heif_entries(path: str) -> list:
+    data = _read(path)
+    _ms, _me, items = _heif_meta_items(data)
+    for item_id, meta in items.items():
+        if (meta.get("name") or "").upper() != "AIGC":
+            continue
+        for off, ln in meta.get("offsets") or []:
+            if 0 <= off < len(data):
+                text = _decode(data[off:off + ln], "utf-8")
+                if text:
+                    return [_entry("heif.item", "AIGC", text, off)]
+    return []
+
+
 # ---------------------------------------------------------------- JSON 候选
 def _json_fragments(text: str) -> list:
     """从任意文本里挑出可解析的 JSON 片段（含 XMP 里嵌的 JSON）。"""
@@ -1088,6 +1615,11 @@ def extract_json_candidates(path: str) -> list[dict]:
                             "raw": text, "obj": None,
                             "error": "JSON 解析失败：%s" % exc})
                 continue
+            if not isinstance(obj, (dict, list)):
+                out.append({"container": container, "key": key,
+                            "raw": text, "obj": None,
+                            "error": "顶层不是对象/数组"})
+                continue
             out.append({"container": container, "key": key,
                         "raw": text, "obj": obj})
         elif kind == "xmp":
@@ -1101,6 +1633,8 @@ def extract_json_candidates(path: str) -> list[dict]:
             try:
                 obj = json.loads(text)
             except (ValueError, TypeError):
+                continue
+            if not isinstance(obj, (dict, list)):
                 continue
             out.append({"container": container, "key": key,
                         "raw": text, "obj": obj})
@@ -1179,6 +1713,35 @@ def content_bytes_for(path: str, container: str) -> tuple:
                     continue
                 parts.append(name.encode("utf-8") + b"\x00" + zf.read(name))
         return "DFT", b"\x00".join(parts)
+    if container == "ogg":
+        data = _read(path)
+        packets = _ogg_packets(data)
+        return "DFT", b"".join(packets[2:]) if len(packets) > 2 else data
+    if container == "heif":
+        data = _read(path)
+        return "DFT", _heif_content(data)
+    if container == "tiff":
+        data = _read(path)
+        return "DFT", _tiff_content(data)
+    if container == "gif":
+        data = _read(path)
+        return "DFT", _gif_content(data)
+    if container == "webp":
+        data = _read(path)
+        return "DFT", _webp_content(data)
+    if container == "wav":
+        data = _read(path)
+        return "DFT", _wav_content(data)
+    if container == "mp3":
+        data = _read(path)
+        size = _id3v2_size(data)
+        return "DFT", data[size:] if size else data
+    if container == "flac":
+        data = _read(path)
+        audio = 4
+        for _btype, _body, end, _hdr in _flac_blocks(data):
+            audio = end
+        return "DFT", data[audio:]
     data = _read(path)
     if container == "markdown":
         return "DFT", _strip_md_block(_decode(data, "utf-8")).encode("utf-8")
@@ -1535,3 +2098,135 @@ def make_uof(path: str, aigc: str | None = None) -> None:
     xml += "</meta:Meta>"
     _zip_write(path, [("_meta/meta.xml", xml),
                       ("document.xml", "<document><body>demo</body></document>")])
+
+
+# ---------------------------------------------------------------- media extra 夹具
+def make_tiff(path: str, payload: bytes = b"TIFF-IMAGE-DATA") -> None:
+    """生成最小小端 TIFF（IFD0: StripOffsets/StripByteCounts + strip 数据）。"""
+    entries = 2
+    ifd_size = 2 + entries * 12 + 4
+    data_off = 8 + ifd_size
+
+    def entry(tag, typ, count, value):
+        return struct.pack("<HHI", tag, typ, count) + value
+
+    out = bytearray()
+    out += b"II" + struct.pack("<H", 42) + struct.pack("<I", 8)
+    out += struct.pack("<H", entries)
+    out += entry(0x0111, 4, 1, struct.pack("<I", data_off))
+    out += entry(0x0117, 4, 1, struct.pack("<I", len(payload)))
+    out += struct.pack("<I", 0)
+    out += payload
+    _write(path, bytes(out))
+
+
+def make_gif(path: str, payload: bytes = b"GIF-IMAGE") -> None:
+    """生成结构合法的 GIF89a（LSD + 2 色全局表 + 1 个图像块 + trailer）。"""
+    out = bytearray(b"GIF89a")
+    # LSD: 宽=1 高=1，全局色表标志 + 色表大小 2 色，背景 0，像素比 0
+    out += struct.pack("<HH", 1, 1) + bytes([0x80, 0, 0])
+    out += b"\x00\x00\x00" + b"\xff\xff\xff"   # 2 色全局表
+    out += b"\x2c" + struct.pack("<HHHH", 0, 0, 1, 1) + b"\x00"
+    out += b"\x02" + bytes([2]) + b"\x44\x01" + b"\x00" + b"\x3b"
+    _write(path, bytes(out))
+
+
+def make_webp(path: str, payload: bytes = b"WEBP-IMAGE") -> None:
+    """生成最小 WebP（RIFF + WEBP + VP8L 块）。"""
+    chunk = b"VP8L" + struct.pack("<I", len(payload)) + payload
+    if len(payload) % 2:
+        chunk += b"\x00"
+    body = b"WEBP" + chunk
+    _write(path, b"RIFF" + struct.pack("<I", len(body)) + body)
+
+
+def make_flac(path: str, payload: bytes = b"FLAC-AUDIO") -> None:
+    """生成最小 FLAC（fLaC + STREAMINFO(last) + 音频字节）。"""
+    streaminfo = b"\x00" * 34
+    header = bytes([0x80]) + len(streaminfo).to_bytes(3, "big")
+    _write(path, b"fLaC" + header + streaminfo + payload)
+
+
+# ---------------------------------------------------------------- ogg / heif 夹具
+_OGG_CRC_TABLE = []
+
+
+def _ogg_crc_table():
+    if _OGG_CRC_TABLE:
+        return _OGG_CRC_TABLE
+    for i in range(256):
+        r = i << 24
+        for _ in range(8):
+            r = ((r << 1) ^ 0x04C11DB7) & 0xFFFFFFFF if (r & 0x80000000) \
+                else (r << 1) & 0xFFFFFFFF
+        _OGG_CRC_TABLE.append(r)
+    return _OGG_CRC_TABLE
+
+
+def _ogg_crc(data: bytes) -> int:
+    crc = 0
+    table = _ogg_crc_table()
+    for b in data:
+        crc = ((crc << 8) & 0xFFFFFFFF) ^ table[((crc >> 24) ^ b) & 0xFF]
+    return crc
+
+
+def _ogg_page(payload: bytes, seq: int, granule: int = 0,
+              header_type: int = 0) -> bytes:
+    segs = []
+    n = len(payload)
+    while n >= 255:
+        segs.append(255)
+        n -= 255
+    segs.append(n)
+    header = (
+        b"OggS" + b"\x00" + bytes([header_type]) + struct.pack("<Q", granule)
+        + struct.pack("<I", 1234) + struct.pack("<I", seq)
+        + b"\x00\x00\x00\x00" + bytes([len(segs)]) + bytes(segs)
+    )
+    page = bytearray(header + payload)
+    crc = _ogg_crc(bytes(page))
+    page[22:26] = struct.pack("<I", crc)
+    return bytes(page)
+
+
+def make_ogg(path: str, audio: bytes = b"OGG-AUDIO-FRAMES") -> None:
+    """生成最小 Ogg/Vorbis（ident + comment + 1 个音频包，3 页）。"""
+    ident = (b"\x01vorbis" + struct.pack("<I", 0) + b"\x02"
+             + struct.pack("<I", 44100) + b"\x00" * 12 + b"\x00\x00" + b"\x01")
+    vendor = b"nf-labelcheck"
+    cmt = (b"\x03vorbis" + struct.pack("<I", len(vendor)) + vendor
+           + struct.pack("<I", 0) + b"\x01")
+    out = (_ogg_page(ident, 0, header_type=0x02) + _ogg_page(cmt, 1)
+           + _ogg_page(audio, 2, header_type=0x04))
+    _write(path, out)
+
+
+def _heif_box(btype: bytes, payload: bytes) -> bytes:
+    return struct.pack(">I", 8 + len(payload)) + btype + payload
+
+
+def make_heif(path: str, payload: bytes = b"HEIF-PRIMARY-IMAGE") -> None:
+    """生成最小 HEIF（ftyp + meta(hdlr/pitm/iinf v0/iloc v0) + mdat 主图）。"""
+    ftyp = _heif_box(b"ftyp", b"heic" + struct.pack(">I", 0) + b"heicmif1")
+
+    def build(iloc_offset: int) -> bytes:
+        hdlr = _heif_box(b"hdlr", b"\x00\x00\x00\x00" + b"\x00" * 4
+                         + b"pict" + b"\x00" * 12 + b"image\x00")
+        pitm = _heif_box(b"pitm", b"\x00\x00\x00\x00" + struct.pack(">H", 1))
+        infe = _heif_box(b"infe", b"\x02\x00\x00\x00" + struct.pack(">HH", 1, 0)
+                         + b"hvc1" + b"image\x00")
+        iinf = _heif_box(b"iinf", b"\x00\x00\x00\x00" + struct.pack(">H", 1)
+                         + infe)
+        iloc = _heif_box(
+            b"iloc",
+            b"\x00\x00\x00\x00" + bytes([0x44, 0x00]) + struct.pack(">H", 1)
+            + struct.pack(">H", 1) + struct.pack(">H", 0)
+            + struct.pack(">H", 1) + struct.pack(">I", iloc_offset)
+            + struct.pack(">I", len(payload)))
+        return _heif_box(b"meta", b"\x00\x00\x00\x00" + hdlr + pitm + iinf + iloc)
+
+    meta = build(0)
+    offset = len(ftyp) + len(meta) + 8
+    meta = build(offset)
+    _write(path, ftyp + meta + _heif_box(b"mdat", payload))

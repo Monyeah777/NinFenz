@@ -25,6 +25,10 @@
   Cache-Control: public, max-age=0, must-revalidate
 /en/use/
   Cache-Control: public, max-age=0, must-revalidate
+/label/
+  Cache-Control: public, max-age=0, must-revalidate
+/en/label/
+  Cache-Control: public, max-age=0, must-revalidate
 /pricing/
   Cache-Control: public, max-age=0, must-revalidate
 /en/pricing/
