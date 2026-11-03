@@ -20,13 +20,13 @@
     "data": 148,
     "eng": 38,
     "form": 29,
-    "gov": 71,
+    "gov": 73,
     "iface": 84
   },
   "standards_edges": 206,
   "standards_reachable": 332,
-  "standards_total": 370,
-  "standards_unreachable": 38,
+  "standards_total": 372,
+  "standards_unreachable": 40,
   "subdivisions_total": 1200,
   "verify_checks": 42,
   "verify_version": "2.30"

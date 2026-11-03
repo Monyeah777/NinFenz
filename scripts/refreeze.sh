@@ -55,6 +55,7 @@ echo "== 4/5 卡册 → 验证报告 + 自检（顺序关键：报告必须最�
 # 会改写被报告统计的 `docs/verification-cards.md`；若它排在 report 之后，报告一落盘就过期，
 # 于是「提交件 == 实时重算」判据在 CI 与本机同时红（且本机自检也会红）。
 python scripts/build_verification_cards.py --write >/dev/null
+python scripts/standards_coverage.py --write >/dev/null
 python scripts/verify_report.py --write >/dev/null
 
 if [ "$CHECK_ONLY" -eq 1 ]; then
@@ -66,7 +67,7 @@ if [ "$CHECK_ONLY" -eq 1 ]; then
   # **生成平台**（本机 Windows 的 bandit/ruff 版本、时间戳、路径写法），在 CI 的 Linux 上重算必然
   # 与提交件不同。对这类产物做跨环境零 diff 断言只会制造假红；它们的正确冻结入口是
   # `refreeze-linux` 工作流（同一 Linux 环境生成）。
-  PORTABLE="protocol/role_coordinates.json protocol/verification_report.json protocol/code_metrics_baseline.json protocol/style_baseline.json protocol/conformance_report.json"
+  PORTABLE="protocol/role_coordinates.json protocol/verification_report.json protocol/standards_coverage.json protocol/code_metrics_baseline.json protocol/style_baseline.json protocol/conformance_report.json"
   hard=""
   soft=""
   while IFS= read -r line; do
@@ -90,7 +91,7 @@ if [ "$CHECK_ONLY" -eq 1 ]; then
     for f in $PORTABLE; do git diff --stat -- "$f"; done
     exit 1
   fi
-  echo "OK 平台无关冻结面幂等（role_coordinates / verification_report / code_metrics / style / conformance）"
+  echo "OK 平台无关冻结面幂等（role_coordinates / verification_report / standards_coverage / code_metrics / style / conformance）"
   exit 0
 fi
 

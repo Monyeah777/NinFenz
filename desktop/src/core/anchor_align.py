@@ -1,7 +1,7 @@
 """双向锚定对齐面：反向量化「项目对已收集标准的内化度」，正向按词汇找标准交叉候选。
 
-内部差距（2026-10-09 实测）：protocol/standards_catalog.json 收集 370 条可扩展标准，但
-protocol/standards_binding.json 的 100 包 × 1200 条绑定只实际引用 68 条 —— 302 条（81.6%）
+内部差距（2026-11-02 实测）：protocol/standards_catalog.json 收集 372 条可扩展标准，但
+protocol/standards_binding.json 的 100 包 × 1200 条绑定只实际引用 70 条 —— 302 条
 从未被任何域包绑定。现有判据（check32 domain_packs）只判「每条细分都有 standard_ref」这一侧，
 不判「收集来的标准被用得怎么样」。本模块把两侧打通：
 

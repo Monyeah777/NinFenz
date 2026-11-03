@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-02",
+  "approved_at": "2026-11-03",
   "approved_by": "Monyeah777",
   "note": "refreeze.sh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
+  "subject_digest": "e3b7b8cf00faf1d553b15843984429e27704a94669bee22113ae67f9c2b1a93a"
 }

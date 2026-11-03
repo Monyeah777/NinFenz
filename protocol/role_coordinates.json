@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1042,
     "projection": 133,
-    "support": 311,
-    "verify": 1135
+    "support": 313,
+    "verify": 1139
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6887,6 +6887,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Standards four-state ledger: catalogued, bound, asserted, consumable.",
+      "path": "desktop/src/core/standards_coverage.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "条件先行排布（state-first）：把「状态块」放到资料**之前**的确定性排布纪律。",
       "path": "desktop/src/core/state_front.py",
       "role": "verify",
@@ -9001,6 +9007,12 @@
     {
       "function": "ST 制卡校验器原型（A-S3）单测：**自造 fixture**（非真实卡，仅验证判据）。",
       "path": "desktop/tests/test_st_validator.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Standards four-state ledger: derivation and fail-closed mutations.",
+      "path": "desktop/tests/test_standards_coverage.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12959,6 +12971,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "标准实现声明账本。catalogued / domain-bound 由 standards_catalog + standards_binding 派生；asserted 要求正例、负例和仓库证据；consumable 还要求真实调用点。四态只表示仓内证据，不表示第三方认证。",
+      "path": "protocol/standards_assertions.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "域包 × 细分 → 可扩展标准目录条目的绑定表（公开结果面）。判据（check32 domain_packs）：① 每条细分都有 standard_ref；② 引用 id 必须在 protocol/standards_catalog.json 在册；③ 每包绑定覆盖率 100%；④ 概念密度（边/节点，含标准节点与绑定边）≥ 门槛。",
       "path": "protocol/standards_binding.json",
       "role": "verify",
@@ -12967,6 +12985,12 @@
     {
       "function": "可扩展标准目录（真源）。每条 = 一个**带扩展机制**的开放标准/规范：body（发布机构）/ title / url / ext_points（扩展点或扩展注册表）/ layer（该标准在 NF 里落哪一层：data 数据 · iface 接口 · form 形态 · gov 治理 · eng 工程）/ depends_on（该标准在规范层面真实依赖/承载于的另一目录内标准，只写有据可查的依赖）/ evidence（本机可达性实测：状态 + 取样标题 + sha256）。外部标准只作**口径与机制参照**，不作品质背书（STRATEGY §3.2/§3.3）。",
       "path": "protocol/standards_catalog.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "四态仅表示仓库内部编目、绑定、断言与消费证据；不等于第三方认证。",
+      "path": "protocol/standards_coverage.json",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13104,17 +13128,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "44b219ce0dd246a8f060dfb3b8fcb88ee99fbb029e8ef7660d30feeb6b875505",
+  "root_digest": "68887c85f86a3e5f9807102182798d902b9d56fdbb42e232a98fcab45610e883",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 134,
+    "R-catch": 136,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 151,
-    "R-verify": 1015,
-    "auto:R-core": 259
+    "R-verify": 1018,
+    "auto:R-core": 260
   },
   "schema": "nf-role-coordinates/1"
 }

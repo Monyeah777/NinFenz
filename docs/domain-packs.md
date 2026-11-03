@@ -35,7 +35,7 @@ NF 的「域包」= 一个内容域的**口径协议 + 可机验产出 + 装载�
 
 ## 可扩展标准对齐（概念密度 · 数据真实性）
 
-**标准目录**：`protocol/standards_catalog.json`（**370 条** · **194 家机构** · **330 条本机可达 200**；
+**标准目录**：`protocol/standards_catalog.json`（**372 条** · **194 家机构** · **332 条本机可达 200**；
 层分布 data 148 / iface 84 / gov 71 / eng 38 / form 29）——每条 = 一个**带扩展机制**的开放标准/规范，
 登记 `ext_points`（扩展点 / 扩展注册表 / profile / 命名空间）· `layer`（data / iface / form / gov / eng）·
 `depends_on`（**规范层面真实依赖**的另一目录内标准，共 206 条依赖边）与**可达性实证**

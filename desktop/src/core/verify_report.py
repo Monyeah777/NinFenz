@@ -66,6 +66,8 @@ SPECS: Tuple[Tuple[str, str, str, str, str], ...] = (
      "drill_fidelity", "scan", "scan"),
     ("judgement_coverage", "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
      "judgement_coverage", "scan", "scan"),
+    ("standards_coverage", "标准四态覆盖账本（catalogued / bound / asserted / consumable）",
+     "standards_coverage", "scan", "scan"),
     ("workflow_policy", "工作流供应链策略（actions 钉 40 位 SHA + 显式最小 permissions）", "workflo"
         "w_policy", "scan", "scan"),
     ("asvs", "应用安全作用域证据（ASVS 5.0.0 L2，内部评估）", "asvs_policy", "scan", "scan"),

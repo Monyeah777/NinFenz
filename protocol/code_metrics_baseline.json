@@ -1215,6 +1215,11 @@
       "max_fn_cc": 17,
       "max_fn_lines": 35
     },
+    "desktop/src/core/standards_coverage.py": {
+      "lines": 427,
+      "max_fn_cc": 16,
+      "max_fn_lines": 88
+    },
     "desktop/src/core/state_front.py": {
       "lines": 150,
       "max_fn_cc": 21,
@@ -1311,7 +1316,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 238,
+      "lines": 240,
       "max_fn_cc": 10,
       "max_fn_lines": 29
     },
@@ -1595,6 +1600,11 @@
       "max_fn_cc": 15,
       "max_fn_lines": 35
     },
+    "scripts/standards_coverage.py": {
+      "lines": 57,
+      "max_fn_cc": 8,
+      "max_fn_lines": 31
+    },
     "scripts/standards_map.py": {
       "lines": 197,
       "max_fn_cc": 13,
@@ -1651,7 +1661,7 @@
       "max_fn_lines": 4
     },
     "scripts/verify_tests.py": {
-      "lines": 778,
+      "lines": 779,
       "max_fn_cc": 66,
       "max_fn_lines": 272
     },

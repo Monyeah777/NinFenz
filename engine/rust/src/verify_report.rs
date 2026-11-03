@@ -40,7 +40,7 @@ impl Spec {
 }
 
 /// 真源 `SPECS` 逐字（次序即报告 items 的次序）。
-pub const SPECS: [Spec; 32] = [
+pub const SPECS: [Spec; 33] = [
     Spec {
         id: "purity",
         name: "架构纯度体检（R1-R7 + 分层阶梯 L1-L4）",
@@ -207,6 +207,12 @@ pub const SPECS: [Spec; 32] = [
         id: "judgement_coverage",
         name: "判据接线覆盖（暴露 scan() 的判据必须有消费者或例外登记）",
         module: "judgement_coverage",
+        entry: "scan",
+    },
+    Spec {
+        id: "standards_coverage",
+        name: "标准四态覆盖账本（catalogued / bound / asserted / consumable）",
+        module: "standards_coverage",
         entry: "scan",
     },
     Spec {
@@ -735,16 +741,16 @@ mod tests {
 
     #[test]
     fn spec_table_matches_the_truth_source_shape() {
-        assert_eq!(SPECS.len(), 32);
+        assert_eq!(SPECS.len(), 33);
         assert_eq!(SPECS[0].id, "purity");
         assert_eq!(SPECS[1].source(), "schema_lint.scan");
         assert_eq!(SPECS[5].id, "rating");
         assert_eq!(SPECS[6].id, "rating_decided");
         assert_eq!(SPECS[6].source(), "rating_gate.decided");
-        assert_eq!(SPECS[29].id, "asvs");
-        assert_eq!(SPECS[30].id, "asset_contract");
-        assert_eq!(SPECS[31].id, "role_coordinates");
-        assert_eq!(SPECS[31].source(), "role_model.scan");
+        assert_eq!(SPECS[30].id, "asvs");
+        assert_eq!(SPECS[31].id, "asset_contract");
+        assert_eq!(SPECS[32].id, "role_coordinates");
+        assert_eq!(SPECS[32].source(), "role_model.scan");
     }
 
     #[test]

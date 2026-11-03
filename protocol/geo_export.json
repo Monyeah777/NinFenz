@@ -5,13 +5,13 @@
       "data": 148,
       "eng": 38,
       "form": 29,
-      "gov": 71,
+      "gov": 73,
       "iface": 84
     },
     "depends_edges": 206,
     "reachable": 332,
-    "standards": 370,
-    "unreachable": 38
+    "standards": 372,
+    "unreachable": 40
   },
   "note": "生成物；真源 protocol/standards_catalog.json + protocol/standards_binding.json。",
   "schema": "nf-geo-export/1",
@@ -4446,6 +4446,40 @@
       "sha256_sample": "2d7447c98e31677dab7c7e4d619f5222ec47160cf1ea91b6b20245efb9b4d3e3",
       "title": "OECD 隐私保护准则",
       "url": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0188"
+    },
+    {
+      "body": "OpenSSF",
+      "bound_main": 0,
+      "bound_support": 0,
+      "ext_points": [
+        "maturity-level",
+        "control"
+      ],
+      "http_status": 0,
+      "id": "openssf-osps-baseline",
+      "layer": "gov",
+      "probe_date": "",
+      "reachable": false,
+      "sha256_sample": "",
+      "title": "Open Source Project Security Baseline",
+      "url": "https://github.com/ossf/security-baseline"
+    },
+    {
+      "body": "OpenSSF",
+      "bound_main": 0,
+      "bound_support": 0,
+      "ext_points": [
+        "level",
+        "requirement"
+      ],
+      "http_status": 0,
+      "id": "openssf-s2c2f",
+      "layer": "gov",
+      "probe_date": "",
+      "reachable": false,
+      "sha256_sample": "",
+      "title": "Secure Supply Chain Consumption Framework",
+      "url": "https://github.com/ossf/S2C2F"
     },
     {
       "body": "NIST",

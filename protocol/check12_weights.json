@@ -300,6 +300,7 @@
     "test_skill_adapter": 0.2,
     "test_skill_contract": 0.1,
     "test_st_validator": 0.1,
+    "test_standards_coverage": 0.7,
     "test_state_front": 0.1,
     "test_stdio_encoding": 0.5,
     "test_steelman": 0.1,
@@ -3359,6 +3360,13 @@
     "test_st_validator.TestMvu.test_initial_mismatch_is_fail": 0.0,
     "test_st_validator.TestWorldbook.test_comma_key_and_duplicate_are_warn": 0.0,
     "test_st_validator.TestWorldbook.test_missing_entries_is_fail": 0.0,
+    "test_standards_coverage.CurrentLedgerTest.test_committed_report_is_fresh": 0.13,
+    "test_standards_coverage.CurrentLedgerTest.test_current_ledger_is_valid_and_has_consumable_examples": 0.0,
+    "test_standards_coverage.CurrentLedgerTest.test_unbound_catalog_is_explicit": 0.0,
+    "test_standards_coverage.LedgerMutationTest.test_missing_test_symbol_and_consumer_fail_closed": 0.05,
+    "test_standards_coverage.LedgerMutationTest.test_positive_and_negative_evidence_are_both_required": 0.02,
+    "test_standards_coverage.LedgerMutationTest.test_unknown_standard_and_duplicate_claim_are_rejected": 0.03,
+    "test_standards_coverage.LedgerMutationTest.test_valid_synthetic_claim_reaches_consumable": 0.02,
     "test_state_front.TestStateFront.test_ab_differs_only_by_position": 0.0,
     "test_state_front.TestStateFront.test_block_is_deterministic_and_cites_digest": 0.0,
     "test_state_front.TestStateFront.test_check_order_front_pass_back_fail": 0.0,
@@ -3800,5 +3808,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.02,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 957.4
+  "total_s": 958.1
 }

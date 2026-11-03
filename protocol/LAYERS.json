@@ -630,6 +630,10 @@
         "why": "职能坐标投影落盘（nf layers --write；派生面）",
         "artifact": "protocol/role_coordinates.json"
       },
+      "desktop/src/core/standards_coverage.py": {
+        "why": "标准四态覆盖报告重算（scripts/standards_coverage.py --write）",
+        "artifact": "protocol/standards_coverage.json"
+      },
       "scripts/sast_check.py": {
         "why": "SAST 计数基线冻结（--write；棘轮显式动作）",
         "artifact": "protocol/sast_baseline.json"

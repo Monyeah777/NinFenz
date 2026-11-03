@@ -50,6 +50,32 @@
       ]
     },
     {
+      "id": "standards-assertions",
+      "artifact": "protocol/standards_assertions.json",
+      "quality_rule": "check31",
+      "owner": "标准四态账本（core/standards_coverage.py）+ verify check31",
+      "status": "active",
+      "freshness": "只读声明件；新增实现声明须同时给正例、负例、证据与真实消费者",
+      "consumers": [
+        "python scripts/standards_coverage.py",
+        "verify check31",
+        "desktop/tests/test_standards_coverage.py"
+      ]
+    },
+    {
+      "id": "standards-coverage",
+      "artifact": "protocol/standards_coverage.json",
+      "quality_rule": "check31",
+      "owner": "标准四态账本（core/standards_coverage.py）+ verify check31",
+      "status": "active",
+      "freshness": "重生成：python scripts/standards_coverage.py --write",
+      "consumers": [
+        "verify check31",
+        "verify_report",
+        "python scripts/standards_coverage.py --check"
+      ]
+    },
+    {
       "id": "registry",
       "artifact": "desktop/src/core/registry.json",
       "quality_rule": "check21",

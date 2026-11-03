@@ -2,15 +2,15 @@
   "schema": "nf-standards-catalog/1",
   "note": "可扩展标准目录（真源）。每条 = 一个**带扩展机制**的开放标准/规范：body（发布机构）/ title / url / ext_points（扩展点或扩展注册表）/ layer（该标准在 NF 里落哪一层：data 数据 · iface 接口 · form 形态 · gov 治理 · eng 工程）/ depends_on（该标准在规范层面真实依赖/承载于的另一目录内标准，只写有据可查的依赖）/ evidence（本机可达性实测：状态 + 取样标题 + sha256）。外部标准只作**口径与机制参照**，不作品质背书（STRATEGY §3.2/§3.3）。",
   "coverage": {
-    "standards": 370,
+    "standards": 372,
     "reachable": 332,
-    "unreachable": 38,
+    "unreachable": 40,
     "depends_edges": 206,
     "by_layer": {
       "data": 148,
       "eng": 38,
       "form": 29,
-      "gov": 71,
+      "gov": 73,
       "iface": 84
     },
     "bodies": 194
@@ -5721,6 +5721,46 @@
         "probe_date": "2026-09-24",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
+      }
+    },
+    {
+      "id": "openssf-osps-baseline",
+      "body": "OpenSSF",
+      "title": "Open Source Project Security Baseline",
+      "url": "https://github.com/ossf/security-baseline",
+      "ext_points": [
+        "maturity-level",
+        "control"
+      ],
+      "layer": "gov",
+      "evidence": {
+        "reachable": false,
+        "http_status": 0,
+        "title": "",
+        "sha256_sample": "",
+        "probe_date": "",
+        "probe_method": "",
+        "error": "本机未对该新增编目项做网络探测"
+      }
+    },
+    {
+      "id": "openssf-s2c2f",
+      "body": "OpenSSF",
+      "title": "Secure Supply Chain Consumption Framework",
+      "url": "https://github.com/ossf/S2C2F",
+      "ext_points": [
+        "level",
+        "requirement"
+      ],
+      "layer": "gov",
+      "evidence": {
+        "reachable": false,
+        "http_status": 0,
+        "title": "",
+        "sha256_sample": "",
+        "probe_date": "",
+        "probe_method": "",
+        "error": "本机未对该新增编目项做网络探测"
       }
     },
     {
