@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9dc6130c27683576fe2618d52a447a66cc6134a772239abfbd5528ee9bf04cf5
-  - scripts/nf.py:9a224bca5b2dddc8a0077c9fdb747f349c86291208a05b4770f1407e4a01a51a
+  - scripts/nf.py:9152b8f2fead2931b976eb1c4d2ae1ee08589391321117f87bd44091ee2b5f51
   - desktop/tests/test_terminal.py:2b69019ebef7779cc6b020007510c2b95a6d1282a50990131662ec1099db3dbd
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:e56b60186a6c445816ec3de6300ca72b3c4eb8ded63888496efbd97c191229ec
 
 ---
+> 重审（2026-11-03）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-03）：P3 收口重审：terminal 预算重冻(10000)/conformance_scan DT_LNK 修复/risk 口径修正；含并行面 nf.py 与 CLI 测试改动（同批 drifted 对象）
 
 > 重审（2026-11-03）：P3 专项重审：desktop/src/core/terminal.py（BASELINE_DEEP_MAX_MS 重冻 12000→10000，实测 6.20/7.75s）、desktop/src/core/conformance_scan.py（枚举不信 d_type，DT_LNK 复核）、desktop/tests/test_dead_code.py（并行 dead_code 面改动，同批对象）

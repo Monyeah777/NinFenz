@@ -685,6 +685,11 @@
       "max_fn_cc": 0,
       "max_fn_lines": 0
     },
+    "desktop/src/core/labeling/_atomic.py": {
+      "lines": 42,
+      "max_fn_cc": 7,
+      "max_fn_lines": 28
+    },
     "desktop/src/core/labeling/checker.py": {
       "lines": 395,
       "max_fn_cc": 26,
@@ -771,7 +776,7 @@
       "max_fn_lines": 26
     },
     "desktop/src/core/labeling/writers_heif.py": {
-      "lines": 370,
+      "lines": 340,
       "max_fn_cc": 19,
       "max_fn_lines": 82
     },
@@ -781,7 +786,7 @@
       "max_fn_lines": 56
     },
     "desktop/src/core/labeling/writers_media_extra.py": {
-      "lines": 345,
+      "lines": 315,
       "max_fn_cc": 14,
       "max_fn_lines": 52
     },
@@ -796,12 +801,12 @@
       "max_fn_lines": 40
     },
     "desktop/src/core/labeling/writers_ogg.py": {
-      "lines": 391,
+      "lines": 390,
       "max_fn_cc": 18,
       "max_fn_lines": 49
     },
     "desktop/src/core/labeling/writers_zipformats.py": {
-      "lines": 233,
+      "lines": 202,
       "max_fn_cc": 8,
       "max_fn_lines": 29
     },
@@ -981,9 +986,9 @@
       "max_fn_lines": 97
     },
     "desktop/src/core/meta_cockpit/cockpit_service.py": {
-      "lines": 82,
-      "max_fn_cc": 12,
-      "max_fn_lines": 66
+      "lines": 85,
+      "max_fn_cc": 13,
+      "max_fn_lines": 69
     },
     "desktop/src/core/meta_cockpit/cognition_event.py": {
       "lines": 869,
@@ -1011,9 +1016,9 @@
       "max_fn_lines": 80
     },
     "desktop/src/core/meta_cockpit/constrained_loop.py": {
-      "lines": 651,
-      "max_fn_cc": 91,
-      "max_fn_lines": 535
+      "lines": 690,
+      "max_fn_cc": 99,
+      "max_fn_lines": 574
     },
     "desktop/src/core/meta_cockpit/context_pack.py": {
       "lines": 221,
@@ -1096,9 +1101,9 @@
       "max_fn_lines": 66
     },
     "desktop/src/core/meta_cockpit/nf_cockpit_cli.py": {
-      "lines": 139,
-      "max_fn_cc": 29,
-      "max_fn_lines": 90
+      "lines": 170,
+      "max_fn_cc": 35,
+      "max_fn_lines": 116
     },
     "desktop/src/core/meta_cockpit/nf_metacognition.py": {
       "lines": 245,
@@ -1109,6 +1114,76 @@
       "lines": 56,
       "max_fn_cc": 15,
       "max_fn_lines": 42
+    },
+    "desktop/src/core/meta_cockpit/reasoning/__init__.py": {
+      "lines": 18,
+      "max_fn_cc": 0,
+      "max_fn_lines": 0
+    },
+    "desktop/src/core/meta_cockpit/reasoning/anytime.py": {
+      "lines": 219,
+      "max_fn_cc": 14,
+      "max_fn_lines": 68
+    },
+    "desktop/src/core/meta_cockpit/reasoning/bridge.py": {
+      "lines": 223,
+      "max_fn_cc": 7,
+      "max_fn_lines": 42
+    },
+    "desktop/src/core/meta_cockpit/reasoning/budget.py": {
+      "lines": 245,
+      "max_fn_cc": 23,
+      "max_fn_lines": 63
+    },
+    "desktop/src/core/meta_cockpit/reasoning/certificate.py": {
+      "lines": 490,
+      "max_fn_cc": 35,
+      "max_fn_lines": 88
+    },
+    "desktop/src/core/meta_cockpit/reasoning/counterfactual.py": {
+      "lines": 304,
+      "max_fn_cc": 12,
+      "max_fn_lines": 75
+    },
+    "desktop/src/core/meta_cockpit/reasoning/memory.py": {
+      "lines": 502,
+      "max_fn_cc": 23,
+      "max_fn_lines": 58
+    },
+    "desktop/src/core/meta_cockpit/reasoning/parallel.py": {
+      "lines": 470,
+      "max_fn_cc": 25,
+      "max_fn_lines": 187
+    },
+    "desktop/src/core/meta_cockpit/reasoning/portfolio.py": {
+      "lines": 271,
+      "max_fn_cc": 9,
+      "max_fn_lines": 91
+    },
+    "desktop/src/core/meta_cockpit/reasoning/search.py": {
+      "lines": 1119,
+      "max_fn_cc": 30,
+      "max_fn_lines": 152
+    },
+    "desktop/src/core/meta_cockpit/reasoning/session.py": {
+      "lines": 323,
+      "max_fn_cc": 22,
+      "max_fn_lines": 75
+    },
+    "desktop/src/core/meta_cockpit/reasoning/steering.py": {
+      "lines": 313,
+      "max_fn_cc": 16,
+      "max_fn_lines": 116
+    },
+    "desktop/src/core/meta_cockpit/reasoning/trace.py": {
+      "lines": 24,
+      "max_fn_cc": 1,
+      "max_fn_lines": 6
+    },
+    "desktop/src/core/meta_cockpit/reasoning/value.py": {
+      "lines": 404,
+      "max_fn_cc": 16,
+      "max_fn_lines": 76
     },
     "desktop/src/core/meta_cockpit/repo_context.py": {
       "lines": 36,
@@ -1931,7 +2006,7 @@
       "max_fn_lines": 103
     },
     "scripts/nf.py": {
-      "lines": 7879,
+      "lines": 7882,
       "max_fn_cc": 118,
       "max_fn_lines": 1323
     },
@@ -1941,7 +2016,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_label.py": {
-      "lines": 167,
+      "lines": 163,
       "max_fn_cc": 6,
       "max_fn_lines": 27
     },

@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:eddcc0f9c14cf0cde6024e35cc1de1e23d63ebccf036a8ac0d5cd2e7bc300931
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
+  - protocol/code_metrics_baseline.json:41eae3090277bf82a75c0a64fff179e7b3b0e663ae5cf2c851cbc0a014892472
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-11-03）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
 
 > 重审（2026-11-03）：P3 收口重审：layer_model 一次性进程免付指纹取键（实测 fingerprint 10.2s→_scan_impl 1.5s）、conformance_scan DT_LNK 复核、terminal 深检预算重冻 10000（实测 1.7-7.8s）、risk_baseline 部署/事故口径修正；同批含并行面 nf.py/CLI 测试改动

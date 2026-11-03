@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from . import anytime
 from . import budget
 from . import search
 from . import session
@@ -13,4 +14,5 @@ from . import steering
 from . import value
 from .session import ReasoningSession
 
-__all__ = ["ReasoningSession", "budget", "value", "steering", "search", "session"]
+__all__ = ["ReasoningSession", "anytime", "budget", "value", "steering",
+           "search", "session"]

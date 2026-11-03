@@ -144,6 +144,7 @@
         "desktop/src/core/labeling/writers_zipformats.py::B314": 1,
         "desktop/src/core/labeling/writers_zipformats.py::B405": 1,
         "desktop/src/core/labeling/xcheck.py::B105": 1,
+        "desktop/src/core/meta_cockpit/reasoning/value.py::B110": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
         "desktop/src/core/perf_counters.py::B110": 1,
         "desktop/src/core/perf_counters.py::B404": 1,
@@ -184,17 +185,17 @@
           "severities": [
             [
               "LOW",
-              74
+              75
             ],
             [
               "MEDIUM",
               13
             ]
           ],
-          "total": 87
+          "total": 88
         },
         "ruff": {
-          "total": 98
+          "total": 99
         }
       },
       "ruff": {
@@ -220,6 +221,7 @@
         "desktop/src/core/labeling/writers_docx_md.py::S314": 1,
         "desktop/src/core/labeling/writers_zipformats.py::S314": 1,
         "desktop/src/core/library.py::S110": 1,
+        "desktop/src/core/meta_cockpit/reasoning/value.py::S110": 1,
         "desktop/src/core/mvu_adapter.py::S110": 1,
         "desktop/src/core/output_forms.py::S314": 2,
         "desktop/src/core/pack_combo.py::S311": 1,

@@ -23,10 +23,8 @@ idat（construction_method=1）的相对偏移不受影响。
 from __future__ import annotations
 
 import json
-import os
-import stat
-import tempfile
 from pathlib import Path
+from ._atomic import write_bytes as _atomic_write
 
 #: AIGC 元数据 item 的命名（读取面按 item_name 找）。
 ITEM_NAME = "AIGC"
@@ -53,34 +51,6 @@ def _check_json_text(json_text) -> bytes:
         raise ValueError("json_text 不是合法 JSON：%s" % exc)
     return json_text.encode("utf-8")
 
-
-def _atomic_write(path, data: bytes) -> None:
-    p = Path(path)
-    try:
-        mode = stat.S_IMODE(p.stat().st_mode)
-    except OSError as exc:
-        raise ValueError("无法读取目标文件状态：%s（%s）" % (path, exc))
-    fd, tmp = tempfile.mkstemp(prefix="." + p.name + ".", suffix=".tmp",
-                               dir=str(p.parent))
-    try:
-        with os.fdopen(fd, "wb") as fh:
-            fh.write(data)
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.chmod(tmp, mode)
-        os.replace(tmp, p)
-    except OSError as exc:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise ValueError("写入失败：%s（%s）" % (path, exc))
-    except BaseException:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
 
 
 # ---------------------------------------------------------------- BMFF 盒

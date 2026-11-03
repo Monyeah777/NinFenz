@@ -4773,7 +4773,9 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "state", "state_path", "key_file", "ssh_key", "ssh_allowed_signers",
                     "registry", "root", "case", "exceptions", "check_file", "check_md",
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
-                    "baseline", "pipeline", "questions")
+                    "baseline", "pipeline", "questions", "check_dir", "fill_dir", "journal",
+                    "manifest_out", "event_out", "injections", "responses",
+                    "reasoning_policy")
 
 
 def _path_writing_issue(args) -> str:
@@ -4813,7 +4815,8 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
                     "questions", "registry", "root", "runs", "script_file", "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
-                    "target", "template", "tier", "trace", "verify")
+                    "target", "template", "tier", "trace", "verify", "journal", "injections",
+                    "responses", "reasoning_policy")
 
 
 def _utf8_text_issue(args) -> str:

@@ -37,7 +37,6 @@ BACKENDS = ("greedy", "best_first", "puct")
 MIN_ROUND_SLICE = 8
 MAX_TOTAL_NODES = 4096
 MAX_ROUNDS = 6
-MAX_BACKENDS = len(BACKENDS)
 
 
 def _is_int(value) -> bool:

@@ -500,8 +500,3 @@ class PlanMemory:
             raise ValueError("threshold must be a finite number in [0, 1]")
         return float(threshold)
 
-
-def canonical_result(report: dict) -> bytes:
-    """canonical 字节表示（两次运行逐字节一致断言用）。"""
-
-    return canonical(report)

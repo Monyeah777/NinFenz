@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:f5aa3edb16168c14998292ab39185da0c27daff6af1227862c49cd4e217b58de
+  - protocol/code_metrics_baseline.json:41eae3090277bf82a75c0a64fff179e7b3b0e663ae5cf2c851cbc0a014892472
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -270,6 +270,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-03）：check45 双会话 prev 链 + card digest 证据（校验器/文案/文档）
+
 > 重审（2026-11-03）：专项清理存量红灯（dead_code/docs/评测/打包/守护/intake）
 
 > 重审（2026-11-03）：P3 专项重审：desktop/src/core/terminal.py（BASELINE_DEEP_MAX_MS 重冻 12000→10000，实测 6.20/7.75s）、desktop/src/core/conformance_scan.py（枚举不信 d_type，DT_LNK 复核）、desktop/tests/test_dead_code.py（并行 dead_code 面改动，同批对象）

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1449,
+    "app": 1450,
     "entry": 27,
     "floor": 5,
     "prod": 1045,
     "projection": 134,
-    "support": 421,
-    "verify": 1155
+    "support": 468,
+    "verify": 1175
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8231,6 +8231,60 @@
       "rule": "R-verify"
     },
     {
+      "function": "扩展容器接进主判定的回归（extra_integration）。",
+      "path": "desktop/tests/test_labeling_extra_integration.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "多格式容器读取模块（metadata_extra）的回归测试。",
+      "path": "desktop/tests/test_labeling_metadata_extra.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "统一入口 scripts/nf_label.py 的回归（新子命令 + 旧命令透传）。",
+      "path": "desktop/tests/test_labeling_nf_label.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标识体检价值链（pipeline.py）的单元回归。",
+      "path": "desktop/tests/test_labeling_pipeline.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "platform_rules 规则包与 fail-closed 评估的单元测试（纯标准库）。",
+      "path": "desktop/tests/test_labeling_platform_rules.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "labeling.recheck 回归：指纹 / 复测记录 / 历史 / 摘要。",
+      "path": "desktop/tests/test_labeling_recheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "一份数据多渲染（render_extra.py）的单元回归。",
+      "path": "desktop/tests/test_labeling_render_extra.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "标识体检报告（report.py）的单元回归。",
+      "path": "desktop/tests/test_labeling_report.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "独立交叉认证（xcheck.py）的单元回归。",
+      "path": "desktop/tests/test_labeling_xcheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`scripts/nf` 启动器的**回退路径**判据：没有守护时必须静默回退 python 直跑。",
       "path": "desktop/tests/test_launcher.py",
       "role": "verify",
@@ -8309,6 +8363,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "M1 端到端演练脚本（scripts/m1_e2e.py）的回归测试。",
+      "path": "desktop/tests/test_m1_e2e.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "市场协议分析库测试（v2.1.0-B4：依赖闭包 + 挂载冲突，verify check15 ②③ 同构）。",
       "path": "desktop/tests/test_market_analyzer.py",
       "role": "verify",
@@ -8359,6 +8419,12 @@
     {
       "function": "Markdown 表格列数一致性（审计 W4：断链 2 / 表格列数不齐 11）。",
       "path": "desktop/tests/test_md_tables.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "TIFF/GIF/WebP/WAV/MP3/FLAC 写入 → 体检 端到端测试（CLI）。",
+      "path": "desktop/tests/test_media_extra_integration.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8473,6 +8539,12 @@
     {
       "function": "官方核心件清单的一致性（审计 Z1 F6：4 处硬编码、1 处写成 12）。",
       "path": "desktop/tests/test_official_core.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "OGG / HEIF 写入 → 体检 端到端测试（CLI）。",
+      "path": "desktop/tests/test_ogg_heif_integration.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -8761,6 +8833,30 @@
     {
       "function": "读者侧独立验证器（scripts/nf_verify.py）端到端测试。",
       "path": "desktop/tests/test_reader_verify.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "CLI 接线冒烟：nf cockpit 的 --reasoning 只加 reasoning 块，不改变既有输出面。",
+      "path": "desktop/tests/test_reasoning_cli.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "推理面包内核心契约测试：导入 / policy / 无标量判定 / 先验 / 预算 / 搜索。",
+      "path": "desktop/tests/test_reasoning_core.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Phase 2 模块测试：portfolio / anytime / memory / counterfactual / certificate / parallel。",
+      "path": "desktop/tests/test_reasoning_phase2.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "ReasoningSession 门面测试：只读、确定性、mode 行为、fail-closed、记录。",
+      "path": "desktop/tests/test_reasoning_session.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9305,14 +9401,32 @@
       "rule": "R-verify"
     },
     {
+      "function": "writers_audio_extra 的单元测试（WAV / MP3 / FLAC）。",
+      "path": "desktop/tests/test_writers_audio_extra.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "DOCX / Markdown 标识写入的回归测试（writers_docx_md）。",
       "path": "desktop/tests/test_writers_docx_md.py",
       "role": "verify",
       "rule": "R-verify"
     },
     {
+      "function": "HEIF 标识写入的回归测试（writers_heif）。",
+      "path": "desktop/tests/test_writers_heif.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "JPEG / PDF 标识写入的回归测试（writers_image_pdf）。",
       "path": "desktop/tests/test_writers_image_pdf.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "TIFF / GIF / WebP 标识写入的回归测试（writers_media_extra）。",
+      "path": "desktop/tests/test_writers_media_extra.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9331,6 +9445,12 @@
     {
       "function": "writers_ofd.inject_ofd 的单元测试（unittest）。",
       "path": "desktop/tests/test_writers_ofd.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "writers_ogg.inject_ogg 的单元测试（OGG Vorbis / Opus）。",
+      "path": "desktop/tests/test_writers_ogg.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13242,16 +13362,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3442ce4e46ecae62ec610e962c8da0a3566853b40e34dbb61a9efb02b0243bd3",
+  "root_digest": "efeddb9e5dbd8e97e46951420b9c184e5305cc37f90c6ea9c091a15bc5d1b8cd",
   "rule_counts": {
-    "R-app": 1449,
-    "R-catch": 249,
+    "R-app": 1450,
+    "R-catch": 284,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 119,
-    "R-support": 145,
-    "R-verify": 1035,
+    "R-support": 157,
+    "R-verify": 1055,
     "auto:R-core": 263
   },
   "schema": "nf-role-coordinates/1"

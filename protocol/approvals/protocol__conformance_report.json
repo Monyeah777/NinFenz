@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-03",
   "approved_by": "Monyeah777",
-  "note": "final refreeze before full",
+  "note": "final freeze before commit+full",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "31e93a64682468011baca06f5285b522300e0efb43a70da06e22ad12b5c412f9"

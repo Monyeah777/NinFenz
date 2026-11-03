@@ -497,7 +497,9 @@ class PathFlagCoverageTest(unittest.TestCase):
         self.assertGreater(len(dests), 30, "没枚举到文本类参数（判据可能已失效）")
         #: 写侧落点（目标而非被读内容）——与「二进制」两类之外**不得**再有豁免
         write_targets = {"out", "dest", "dst", "session_path", "write", "save_path", "build_dest",
-                         "store"}
+                         "store",
+                         # cockpit 的产物落点（派生物，不是被读入的文本输入）
+                         "manifest_out", "event_out"}
         gated = set(nf._UTF8_TEXT_DESTS) | set(nf._UTF8_BINARY_EXEMPT) | write_targets
         orphan = sorted(d for d in dests if d not in gated)
         self.assertEqual([], orphan,

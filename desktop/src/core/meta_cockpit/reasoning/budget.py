@@ -76,8 +76,6 @@ class Budget:
         }
 
 
-DEFAULT_BUDGET = Budget()
-
 
 def difficulty_proxy(gaps: int) -> float:
     """把初始结构缺口数映射为难度代理（≥1）。"""

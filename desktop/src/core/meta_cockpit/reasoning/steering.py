@@ -311,9 +311,3 @@ def steer(
     )
     return audit
 
-
-def prior_vector(state: dict, candidates: list[dict]) -> list[float]:
-    """不做偏置时的结构先验（β=0 的等价物），用于对照实验。"""
-
-    del state
-    return base_prior(_validate_candidates(candidates))

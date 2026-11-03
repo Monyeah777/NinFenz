@@ -40,7 +40,6 @@ import tempfile
 #: 首包 / 注释包签名。
 VORBIS_ID = b"\x01vorbis"
 VORBIS_COMMENT = b"\x03vorbis"
-VORBIS_SETUP = b"\x05vorbis"
 OPUS_HEAD = b"OpusHead"
 OPUS_TAGS = b"OpusTags"
 #: Vorbis / Opus 的头部包个数（ident + comment [+ setup]）。

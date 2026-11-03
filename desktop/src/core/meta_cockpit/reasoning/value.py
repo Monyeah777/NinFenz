@@ -36,7 +36,6 @@ from typing import Callable
 from . import bridge as nf
 
 SCHEMA = "nf-step-verdict/1"
-ROLE_LOCAL = "local-verifiable"
 ROLE_EXTERNAL = "external-advisory"
 CACHE_LIMIT = 512
 MAX_ATOMS = nf.MAX_ATOMS

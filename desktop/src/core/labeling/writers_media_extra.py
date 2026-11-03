@@ -23,9 +23,8 @@ from __future__ import annotations
 import html
 import json
 import os
-import stat
-import tempfile
 from pathlib import Path
+from ._atomic import write_bytes as _atomic_write
 
 #: GIF 里 XMP Application Extension 的标识（11 字节）。
 GIF_XMP_ID = b"XMP DataXMP"
@@ -74,35 +73,6 @@ def _xmp_packet(json_text: str) -> bytes:
     ) + _XPACKET_TAIL
     return body.encode("utf-8")
 
-
-def _atomic_write(path, data: bytes) -> None:
-    """原子写：同目录临时件 + os.replace；保留原权限位；失败清理临时件。"""
-    p = Path(path)
-    try:
-        mode = stat.S_IMODE(p.stat().st_mode)
-    except OSError as exc:
-        raise ValueError("无法读取目标文件状态：%s（%s）" % (path, exc))
-    fd, tmp = tempfile.mkstemp(prefix="." + p.name + ".", suffix=".tmp",
-                               dir=str(p.parent))
-    try:
-        with os.fdopen(fd, "wb") as fh:
-            fh.write(data)
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.chmod(tmp, mode)
-        os.replace(tmp, p)
-    except OSError as exc:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise ValueError("写入失败：%s（%s）" % (path, exc))
-    except BaseException:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
 
 
 # ---------------------------------------------------------------- TIFF

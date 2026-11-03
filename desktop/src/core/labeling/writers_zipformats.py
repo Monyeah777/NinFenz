@@ -21,11 +21,10 @@ import io
 import json
 import os
 import re
-import stat
-import tempfile
 import zipfile
-from pathlib import Path
 from xml.etree import ElementTree as ET
+
+from ._atomic import write_bytes as _atomic_write
 
 #: zip 重打包的固定时间戳（确定性产物；跨机/跨次写逐字节可比）。
 DEFAULT_DATE_TIME = (2026, 1, 1, 0, 0, 0)
@@ -79,36 +78,6 @@ def _read_zip(path, kind: str):
         if need not in data:
             raise ValueError("不是完整 %s（缺 %s）" % (kind, need))
     return infos, data
-
-
-def _atomic_write(path, data: bytes) -> None:
-    """原子写：同目录临时件 + os.replace；保留原文件权限位；失败清理临时件。"""
-    p = Path(path)
-    try:
-        mode = stat.S_IMODE(p.stat().st_mode)
-    except OSError as exc:
-        raise ValueError("无法读取目标文件状态：%s（%s）" % (path, exc))
-    fd, tmp = tempfile.mkstemp(prefix="." + p.name + ".", suffix=".tmp",
-                               dir=str(p.parent))
-    try:
-        with os.fdopen(fd, "wb") as fh:
-            fh.write(data)
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.chmod(tmp, mode)
-        os.replace(tmp, p)
-    except OSError as exc:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise ValueError("写入失败：%s（%s）" % (path, exc))
-    except BaseException:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
 
 
 def _rewrite_zip(infos, data, replacements) -> bytes:
