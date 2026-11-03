@@ -31,7 +31,7 @@ from core import atomic_write, verify_report as vr  # noqa: E402
 #: 必须与 `engine/rust/src/verify_report.rs` 的 native 分派同步；`test_rust_fastlane` 的
 #: native 集合 + `check_native_sync.py` 是这条清单的反向守护。喂入面越小，加速越大。
 NON_NATIVE = ("redos", "instruction_evidence", "perf_budget", "asset_contract",
-              "role_coordinates")
+              "role_coordinates", "standards_coverage")
 
 
 def _fed_results() -> dict:
