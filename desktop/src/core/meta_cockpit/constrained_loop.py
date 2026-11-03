@@ -124,6 +124,7 @@ def run(
     max_seconds: float | None = None,
     max_context_units: int | None = None,
     injections: dict[int, list[str]] | None = None,
+    reasoning=None,
 ) -> dict:
     prompt_secrets = secret_guard.find(prompt, "$.prompt")
     if prompt_secrets:
@@ -370,11 +371,29 @@ def run(
                 observations.append(text)
         candidates = cons.build_candidates(turn_state, ledger)
         candidate_search_stats = ls.search_stats()
+        reasoning_trace = None
         if not candidates:
             trace.append({"turn": turn, "action": "stop", "reason": "no candidates"})
             termination = "blocked"
             exhausted = False
             break
+        if reasoning is not None:
+            try:
+                step = reasoning.begin_turn(turn_state, candidates, ledger)
+                if not isinstance(step, dict) or not isinstance(step.get("candidates"), list):
+                    raise ValueError(
+                        "reasoning.begin_turn returned invalid step（修复指引：检查 ReasoningSession.begin_turn 返回值）"
+                    )
+                candidates = step["candidates"]
+                reasoning_trace = step.get("trace")
+            except Exception as exc:  # noqa: BLE001 - reasoning failure is fail-closed
+                trace.append(
+                    {"turn": turn, "action": "error", "issues": ["reasoning: " + safe_error(exc)]}
+                )
+                termination = "reasoning-error"
+                exhausted = False
+                break
+            candidate_search_stats = ls.search_stats()
         context_units = None
         if max_context_units is not None:
             spent_before_context = int(s.get("context_units_spent", 0))
@@ -593,6 +612,24 @@ def run(
                 "reliability_band": cl.band(cl.avg_reliability(ledger, c["cluster"])),
             }
         )
+        if reasoning is not None:
+            try:
+                reasoning.record_turn(
+                    turn=turn,
+                    before_state=turn_state,
+                    cluster=c["cluster"],
+                    after_state=committed_state,
+                    result=result,
+                )
+            except Exception as exc:  # noqa: BLE001
+                trace.append(
+                    {"turn": turn, "action": "error", "issues": ["reasoning: " + safe_error(exc)]}
+                )
+                termination = "reasoning-error"
+                exhausted = False
+                break
+            if trace:
+                trace[-1]["reasoning"] = reasoning_trace
         if complete(s):
             trace.append({"turn": turn, "action": "stop", "reason": "done"})
             termination = "done"
@@ -634,6 +671,7 @@ def run(
         "deadline-exceeded",
         "context-budget-exceeded",
         "state-cycle",
+        "reasoning-error",
     }
     return {
         "status": "fail" if failed else "pass",
@@ -648,4 +686,5 @@ def run(
         "elapsed_ms": round(elapsed_seconds() * 1000, 3),
         "context_units_spent": int(s.get("context_units_spent", 0)),
         "context_units_limit": max_context_units,
+        **({"reasoning": reasoning.summary()} if reasoning is not None else {}),
     }

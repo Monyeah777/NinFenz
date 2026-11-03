@@ -25,6 +25,7 @@ def produce(
     max_seconds: float | None = None,
     max_context_units: int | None = 36_000,
     injections: dict[int, list[str]] | None = None,
+    reasoning=None,
 ) -> dict:
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("prompt must be non-empty")
@@ -46,6 +47,7 @@ def produce(
         max_seconds=max_seconds,
         max_context_units=max_context_units,
         injections=injections,
+        reasoning=reasoning,
     )
     handoff = cockpit_handoff.build_handoff(run["state"], termination=run["termination"])
     journal_digest = None
@@ -79,4 +81,5 @@ def produce(
         "handoff": handoff,
         "markdown": cockpit_handoff.render_markdown(handoff),
         "manifest": manifest,
+        **({"reasoning": run["reasoning"]} if "reasoning" in run else {}),
     }

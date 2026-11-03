@@ -29,6 +29,11 @@ def add_arguments(p: argparse.ArgumentParser) -> None:
     p.add_argument("--json", action="store_true", help="emit JSON instead of markdown")
     p.add_argument("--responses", type=Path, help="JSONL model responses")
     p.add_argument("--context-dir", type=Path, help="write per-turn candidate payloads")
+    p.add_argument("--reasoning", action="store_true", help="enable the deterministic reasoning plane")
+    p.add_argument("--reasoning-mode", choices=("auto", "steer", "search", "off"), default="auto")
+    p.add_argument("--search-nodes", type=int, default=200, help="per-session search node budget")
+    p.add_argument("--reasoning-beta", type=float, default=0.0, help="candidate prior strength (<=0.5)")
+    p.add_argument("--reasoning-policy", type=Path, help="nf-reasoning-policy/1 JSON")
 
 
 def parser() -> argparse.ArgumentParser:
@@ -71,6 +76,31 @@ def run(args: argparse.Namespace) -> int:
     if not prompt:
         print("empty prompt", file=sys.stderr)
         return 2
+    reasoning = None
+    if args.reasoning or args.reasoning_policy is not None:
+        try:
+            from . import reasoning as reasoning_mod
+
+            policy_doc = (
+                json_asset.load(args.reasoning_policy)
+                if args.reasoning_policy is not None
+                else None
+            )
+            mode = args.reasoning_mode
+            beta = args.reasoning_beta
+            if mode == "steer":
+                # “steer” 是“不搜索、只做候选先验”的便捷别名；默认 β=0.5（<= beta_cap）。
+                mode = "off"
+                beta = beta or 0.5
+            reasoning = reasoning_mod.ReasoningSession(
+                mode=mode,
+                search_nodes=args.search_nodes,
+                beta=beta,
+                policy=policy_doc,
+            )
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
     adapter = None
     try:
         if args.responses is not None:
@@ -93,6 +123,7 @@ def run(args: argparse.Namespace) -> int:
             max_seconds=args.max_seconds,
             max_context_units=args.max_context_units,
             injections=injections,
+            reasoning=reasoning,
         )
     except ValueError as exc:
         print(str(exc), file=sys.stderr)

@@ -1,14 +1,14 @@
 {
   "schema": "nf-meta-runtime-manifest/1",
   "version": "1.0",
-  "machine_digest": "a4c63a5515eece5df8c8f0943a5aca8a9c410c0641e60965941129bc2823a13d",
-  "runtime_digest": "a4c63a5515eece5df8c8f0943a5aca8a9c410c0641e60965941129bc2823a13d",
+  "machine_digest": "e893bcffb939ffcd4865f37838a0f6def78d2ae104eb40629965e5319e5a8d9f",
+  "runtime_digest": "e893bcffb939ffcd4865f37838a0f6def78d2ae104eb40629965e5319e5a8d9f",
   "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
   "atom_contracts_digest": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
   "file_digests": {
     "ATOM_MENU.md": "d02816fa60b25da4b5f92d0b34d4ffaf1a13b35144903ab82d7b00dd3d2bff24",
     "COCKPIT_PROTOCOL.md": "7f60c1b72fb511840e20466abf863a5cb2d4ee8c1e509a5cf8fcb75b61edf1f8",
-    "COCKPIT_RELEASE_NOTES.md": "f8499f8dd5cc02671db6ea0b583d159e389eb11eb8f82ff5623f9f6bf93e86f3",
+    "COCKPIT_RELEASE_NOTES.md": "00e61c03de6b5aa6633483feaf48a7d1da64a34d64f4a21a5aed85fae4aef13a",
     "DIFFERENTIATION.md": "5d9b90cd34f340d36aaa0b0438ded87717bfe135af53d77180369520fca3a882",
     "__init__.py": "f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7",
     "abstention.py": "87ad854a1a05e854b9e10b8c76b5f1343b797b97fc1146ab5a21ae98d9b0efcb",
@@ -33,8 +33,8 @@
     "cockpit_handoff.schema.json": "b296ed11d0db164180d112325144057119aec045c943b1e3f602abe11c121b43",
     "cockpit_journal.schema.json": "9373b8f5642eaa6ef880d9d0dcec0760086b685cc922fccdc0886cc7e9b79f0d",
     "cockpit_manifest.schema.json": "f495fb97a71023997b7b09c561404befd4d39a6439b0d13d5bf99a2460ed8966",
-    "cockpit_service.py": "18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf",
-    "cognition_event.py": "fbc7a8502a1c323636d3b46ff83075ed1499fa1594a435ae1548b154da7fd161",
+    "cockpit_service.py": "bb2cadc4d1da6843e544d1538c417ad234dd421cf980fe2b7262806fda28a839",
+    "cognition_event.py": "c1942e68bf7aa88ca85faae9a2b7912a307bf7de69e96af4a9a9cd7a54d89fff",
     "cognition_meta_pipeline.json": "fb364f183cfae672e09431d79741165bf7e7fe4aac200f0ae1864bf9216fc1e8",
     "cognition_method.schema.json": "cf9c129a1f26bb38a8cd44953e96e71af741b0450035a96e8facbb3b20dd164d",
     "cognition_pipeline.json": "0cc1482807e9da79b6ff45decf97edfa03aa44bc1f7752b1cf17b98758eb6093",
@@ -45,7 +45,7 @@
     "constrained_candidates.schema.json": "d3ad153d8ce60e221b214317824b7bf58d0c4c73db6f9e085be39e34529576ef",
     "constrained_choice.py": "9c7f2d9d883bfeeacb596576ef497e07ede0080b898ca05e9bed3e155ce7dbc2",
     "constrained_choice.schema.json": "839c14654ece10639f833ad3246eea670893c535c432986262da995e0f82be34",
-    "constrained_loop.py": "bc28ae9c86ba9b1a3e6052b1dfb0dded1ef91117598c9ba9d60d55f79e596b68",
+    "constrained_loop.py": "2bd27e2373a70f801fb3ab259bb9a864ed8a68b2cdf01d5a2be2f932ce1d41c3",
     "context_pack.py": "435e5f4dd0e78277edd68fd1a259d399cabfa8e786c78b61300384649084b34f",
     "criteria_lexicon.py": "f3e9a8a7652ea3cf9ddcb09dd8b1ccd9b722e2db312dbc91c16de3852c46100e",
     "criterion_policy.json": "b81274c3b3b5f8b16f9e1602c2ce7ff5770a4ce9219cccf6815ef7e99e8d275b",
@@ -85,7 +85,7 @@
     "method_synthesis.json": "2ed08257840322883185215ee6986ae0386aa25b90a918437e2119d343b6cbcf",
     "method_system.json": "9ff05563c8f93c2b9684629eed661bd07e4a782ab2dc2e074679ab41255047cf",
     "nf_ab_cli.py": "21bd6933554c0858241e51d8ddb4f985062d52929cdfa8085b176c329ddfcd66",
-    "nf_cockpit_cli.py": "dd601494f571ab69d192fe9eef8514ad1a81793649ec5022646130e94697c29a",
+    "nf_cockpit_cli.py": "4923af770dd629968a69292c23a576ce6ea1cef81a9de0808e078eb85787ad57",
     "nf_metacognition.py": "62dff3d3355dce566212aa93a7aeb3b172550f0c1b437b9f9f9de68b6aeb7355",
     "nf_source_registry.json": "597f9dcf6eb5e4a224671c7af75f15ab5a740f98df30905b6c16416bb6407c3f",
     "plan_compiler.py": "a43cec2b89718523eec95d90594d7c83004d594b203db2d129f50aa2f684d7a6",
@@ -124,5 +124,5 @@
   },
   "human_review": "PENDING",
   "no_scoring": true,
-  "digest": "23f367d78137702d82895a714fd841d12182c9023b04b6c72c3fbc7a2e8193cb"
+  "digest": "5789b19adc55e3a4518bd6725f707b27590cd44baab1c9e546f943f111749cbc"
 }

@@ -1,0 +1,19 @@
+{
+  "schema": "nf-reasoning-policy/1",
+  "version": "1.0.0",
+  "mode": "auto",
+  "beta": 0.0,
+  "beta_cap": 0.5,
+  "search": {
+    "max_nodes": 200,
+    "backend": "best_first",
+    "min_gaps": 6
+  },
+  "portfolio": {
+    "enabled": false
+  },
+  "memory": {
+    "enabled": false,
+    "threshold": 0.75
+  }
+}
