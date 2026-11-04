@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:81f4ed8387240a6951bc4fcb003ead4355951910925b83225c528c7e28ac4027
+  - protocol/code_metrics_baseline.json:1403aef220c9f6bd431d7728cc61b91dc1215e62daf544a871532b86e025af39
 ---
+> 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）
+
 > 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
 
 > 重审（2026-11-04）：发布结论器：SAST nosec 标注 + 缺省改串行（并发只给独立 runner）

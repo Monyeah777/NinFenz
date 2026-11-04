@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:81f4ed8387240a6951bc4fcb003ead4355951910925b83225c528c7e28ac4027
+  - protocol/code_metrics_baseline.json:1403aef220c9f6bd431d7728cc61b91dc1215e62daf544a871532b86e025af39
 ---
+> 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）
+
 > 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
 
 > 重审（2026-11-04）：发布结论器：SAST nosec 标注 + 缺省改串行（并发只给独立 runner）

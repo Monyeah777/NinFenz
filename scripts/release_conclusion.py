@@ -100,8 +100,14 @@ def _shard_one(index: int, total: int) -> dict:
             f"{index}/{total}", "--json"]
     proc = _run(argv, 3600)
     rc = proc.get("code")
-    return {"shard": f"{index}/{total}", "rc": 1 if rc is None else int(rc),
-            "wall": round(time.perf_counter() - t0, 1)}
+    row = {"shard": f"{index}/{total}", "rc": 1 if rc is None else int(rc),
+           "wall": round(time.perf_counter() - t0, 1)}
+    if row["rc"] != 0:
+        # 失败必须自带证据：只报「某片红了」等于把诊断成本丢给下一个人（实测教训：
+        # 全量串行红了一次却因为没留分片输出，只能整轮重跑取证）。
+        out = (proc.get("out") or "") + (proc.get("err") or "")
+        row["tail"] = [ln for ln in out.splitlines() if ln.strip()][-40:]
+    return row
 
 
 def main(argv=None) -> int:
@@ -170,6 +176,13 @@ def main(argv=None) -> int:
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:
+        failed_rows = [r for r in results if r["rc"] != 0]
+        if failed_rows:
+            print("== 失败分片输出（末 40 行）==")
+            for row in sorted(failed_rows, key=lambda r: r["shard"]):
+                print(f"-- 分片 {row['shard']}（rc={row['rc']}）--")
+                for line in row.get("tail") or []:
+                    print(f"  {line}")
         print("== 发布结论 ==")
         print(f"  checks-only：rc={checks_rc}")
         print(f"  分片：{len(results)} 片 · 失败 {len(summary['failed'])} 片 · "
