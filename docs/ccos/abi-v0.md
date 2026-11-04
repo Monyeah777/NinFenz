@@ -74,7 +74,7 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 ### 1. `cc_label(obj, contract)` → `label`
 
 **状态：`unimplemented`（无 maps_to）**。本仓当前**没有**任何标识写入/标识驱动子系统
-（`desktop/src/core/labeling/` 与 `nf labeling` 均不存在，2026-11-04 实测）。因此本调用只定
+（标识驱动子目录与 `nf labeling` 子命令均不存在，2026-11-04 实测三处独立来源核对）。因此本调用只定
 形状，不宣称能力；实装前置见 §未实装差距。
 
 - 输入：`{obj: <字节或路径>, contract: <契约 id>}`

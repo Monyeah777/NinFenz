@@ -32,3 +32,6 @@ operation 带 `x-nf-idempotency`。
 ## 边界
 
 契约存在 ≠ 服务存在。真正实现服务时把 `status` 改成 `implemented` 并补实测记录；此前不得对外宣称有服务。
+
+本地 HTTP 面（本机回环、已实装）是**另一件**：`nf serve --http` 的三个 `local.*` 端点，
+见 [docs/ccos/local-api-v0.md](ccos/local-api-v0.md)。本契约其余端点仍是远端面的形状声明。
