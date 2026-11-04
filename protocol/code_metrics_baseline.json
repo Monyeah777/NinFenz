@@ -651,7 +651,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_ir.py": {
-      "lines": 185,
+      "lines": 183,
       "max_fn_cc": 13,
       "max_fn_lines": 35
     },
@@ -1471,7 +1471,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8041,
+      "lines": 8042,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },

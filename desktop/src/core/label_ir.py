@@ -180,6 +180,4 @@ def validate(doc: dict[str, Any]) -> dict[str, Any]:
     return res
 
 
-def applied_rules(doc: dict[str, Any]) -> list[str]:
-    """便捷取已满足的规则 id（报告用）。"""
-    return [str(a["rule"]) for a in validate(doc).get("applied") or []]
+# （删掉过 applied_rules：没人用——死代码判据当场抓出来。取已满足规则请读 validate()["applied"]）
