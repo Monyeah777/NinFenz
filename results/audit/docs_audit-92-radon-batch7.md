@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:59ef333ef06a420c2e929a30a44dd3dada53b1b36ac396f126a3251c0ae2b4a7
+  - protocol/code_metrics_baseline.json:f7b84cda599940ba08e4b78aff494ab17dc8c01177a1186a76e8d3d5b40dad10
 ---
+> 重审（2026-11-05）：发布结论器新增新鲜度步（行数上限随之重冻 328→365）
+
 > 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
 
 > 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序

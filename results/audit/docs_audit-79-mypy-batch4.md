@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:59ef333ef06a420c2e929a30a44dd3dada53b1b36ac396f126a3251c0ae2b4a7
+  - protocol/code_metrics_baseline.json:f7b84cda599940ba08e4b78aff494ab17dc8c01177a1186a76e8d3d5b40dad10
 ---
+> 重审（2026-11-05）：发布结论器新增新鲜度步（行数上限随之重冻 328→365）
+
 > 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
 
 > 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序

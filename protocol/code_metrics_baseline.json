@@ -1435,6 +1435,11 @@
       "max_fn_cc": 27,
       "max_fn_lines": 103
     },
+    "scripts/freshness_check.py": {
+      "lines": 115,
+      "max_fn_cc": 8,
+      "max_fn_lines": 24
+    },
     "scripts/gate.py": {
       "lines": 272,
       "max_fn_cc": 16,
@@ -1536,9 +1541,9 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 328,
-      "max_fn_cc": 29,
-      "max_fn_lines": 122
+      "lines": 365,
+      "max_fn_cc": 35,
+      "max_fn_lines": 139
     },
     "scripts/rewrite_text.py": {
       "lines": 136,

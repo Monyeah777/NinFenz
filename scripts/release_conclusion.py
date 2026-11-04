@@ -118,10 +118,30 @@ def _git_status() -> list[str]:
     return porcelain_lines(proc.get("out") or "")
 
 
+#: 生成物新鲜度前置（秒级）：提交件 == 实时重算。脚本自带逐项修复命令。
+FRESHNESS_SCRIPT = "scripts/freshness_check.py"
+
+
+def _step_freshness(verbose: bool) -> dict:
+    """跑生成物新鲜度前置检查 → 行结果（失败带末段输出）。"""
+    t0 = time.perf_counter()
+    proc = _run([sys.executable, FRESHNESS_SCRIPT], 900)
+    rc = proc.get("code")
+    out = (proc.get("out") or "") + (proc.get("err") or "")
+    row = {"id": "freshness", "rc": 1 if rc is None else int(rc),
+           "wall": round(time.perf_counter() - t0, 1)}
+    if row["rc"] != 0:
+        row["tail"] = [ln for ln in out.splitlines() if ln.strip()][-12:]
+    if verbose:
+        mark = "✓" if row["rc"] == 0 else "✗"
+        print(f"  {mark} 生成物新鲜度 · {row['wall']} s", flush=True)
+    return row
+
+
 def _step_checks_only(verbose: bool) -> tuple[int, float]:
     t0 = time.perf_counter()
     if verbose:
-        print("[2/3] bash verify.sh --checks-only …", flush=True)
+        print("[3/4] bash verify.sh --checks-only …", flush=True)
     proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
     out = (proc.get("out") or "") + (proc.get("err") or "")
     tail = [ln for ln in out.splitlines() if ln.strip()][-1:]
@@ -222,6 +242,7 @@ def main(argv=None) -> int:
                       "packaging/npm/payload/payload-manifest.json 的 source_commit == HEAD",
                       "供应链核对（node site/tools/sync-numbers.mjs + "
                       "python scripts/sync_llms.py --check）",
+                      "生成物新鲜度（python scripts/freshness_check.py）",
                       "bash verify.sh --checks-only"]
                      + [f"python scripts/verify_tests.py --shard {i}/{shards}"
                         for i in range(shards)]}
@@ -249,9 +270,24 @@ def main(argv=None) -> int:
 
     t0 = time.perf_counter()
     if not args.json:
-        print("[1/3] 供应链核对（站点数字 + 根投影）…", flush=True)
+        print("[1/4] 供应链核对（站点数字 + 根投影）…", flush=True)
     supply = _step_supply_chain(not args.json)
     supply_issues = supply_chain_issues(supply)
+    if not args.json:
+        print("[2/4] 生成物新鲜度（提交件 == 实时重算）…", flush=True)
+    fresh = _step_freshness(not args.json)
+    if fresh["rc"] != 0:
+        payload = {"schema": "nf-release-conclusion/1", "ok": False,
+                   "supply_chain": supply, "freshness": fresh,
+                   "note": "生成物已过期：先按上面的修复命令重算，再跑本件（"
+                           "这类过期若留到分片里发现要多花 25 分钟）",
+                   "wall": round(time.perf_counter() - t0, 1)}
+        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              if args.json else "  ✗ 生成物过期 → 停止")
+        if not args.json:
+            for line in fresh.get("tail") or []:
+                print(f"    {line}")
+        return 1
     if supply_issues:
         payload = {"schema": "nf-release-conclusion/1", "ok": False,
                    "supply_chain": supply, "issues": supply_issues,
@@ -265,7 +301,7 @@ def main(argv=None) -> int:
 
     if args.only_preflight:
         payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
-                   "supply_chain": supply, "issues": [],
+                   "supply_chain": supply, "freshness": fresh, "issues": [],
                    "wall": round(time.perf_counter() - t0, 1)}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
@@ -284,7 +320,7 @@ def main(argv=None) -> int:
             return 1
 
     if not args.json:
-        print(f"[3/3] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
+        print(f"[4/4] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
     results: list[dict] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = [pool.submit(_shard_one, i, shards) for i in range(shards)]
@@ -297,7 +333,7 @@ def main(argv=None) -> int:
                       flush=True)
     summary = aggregate(results)
     payload = {"schema": "nf-release-conclusion/1", "ok": summary["ok"] and checks_rc == 0,
-               "supply_chain": supply, "checks_only_rc": checks_rc,
+               "supply_chain": supply, "freshness": fresh, "checks_only_rc": checks_rc,
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
                "wall_s": round(time.perf_counter() - t0, 1)}
@@ -313,6 +349,7 @@ def main(argv=None) -> int:
                     print(f"  {line}")
         print("== 发布结论 ==")
         print(f"  供应链核对：{len(supply)} 步 · 未过 {len(supply_issues)}")
+        print(f"  生成物新鲜度：{fresh['wall']} s · rc={fresh['rc']}")
         print(f"  checks-only：rc={checks_rc}")
         print(f"  分片：{len(results)} 片 · 失败 {len(summary['failed'])} 片 · "
               f"分片墙钟合计 {summary['wall']} s · 总墙钟 {payload['wall_s']} s")

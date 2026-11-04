@@ -167,11 +167,17 @@ class TestOnlyPreflight(unittest.TestCase):
         proc = subprocess.run([sys.executable, str(SCRIPT), "--only-preflight", "--allow-dirty",
                                "--json"], cwd=str(ROOT), capture_output=True, text=True,
                               encoding="utf-8", errors="replace")
-        self.assertEqual(0, proc.returncode, proc.stderr[-400:])
+        # 前置面含「生成物新鲜度」——它依赖树的状态（改到一半的树可以合理地不新鲜），
+        # 故这里只钉**结构**与 rc 一致性；「干净树上必须全过」由 test_freshness_check 钉。
         doc = json.loads(proc.stdout)
-        self.assertTrue(doc["only_preflight"])
         self.assertEqual(2, len(doc["supply_chain"]))
-        self.assertEqual([], doc["issues"])
+        self.assertIn("freshness", doc)
+        if proc.returncode == 0:
+            self.assertTrue(doc["ok"])
+            self.assertEqual([], doc["issues"])
+        else:
+            self.assertEqual(1, proc.returncode)
+            self.assertIn("生成物", json.dumps(doc, ensure_ascii=False))
 
 
 class TestDirtyRefusal(unittest.TestCase):
