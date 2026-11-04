@@ -31,6 +31,9 @@ from core import attest, receipts
 from core.transparency_log import NODE_PREFIX
 
 SCHEMA = "nf-evidence/1"
+RECEIPTS_SCHEMA = "nf-receipts/1"
+ATTEST_SCHEMA = "nf-attest/1"
+ATTEST_SET_SCHEMA = "nf-attest-set/1"
 REVOCATION_SCHEMA = "nf-revocation/1"
 BUNDLE_ENTRY = "bundle.json"
 PAYLOAD_DIR = "payload/"
@@ -39,7 +42,9 @@ REVOCATIONS_ENTRY = "revocations.json"
 
 #: 证据强度排序（弱 → 强）：判 level 时取「包内**通过校验**的最强一档」——
 #: 不通过的不算，避免「有强信封就算强证据」这种虚假保证。
-LEVELS = ("digest_only", "hmac-sha256", "ssh-sig", "sigstore-keyless")
+LEVELS = ("digest_only", "receipts_only", "hmac-sha256", "ssh-sig", "sigstore-keyless")
+#: 证据形态（cc_verify 的输入面）：自包含包 / 协议回执 / 信封
+KINDS = ("bundle", "receipts", "attest")
 VERDICTS = ("ok", "revoked", "expired", "invalid")
 #: 判定 → CLI 退出码（稳定面；4 留给「输入不是证据包」这一用法错，不是判定）
 EXIT_CODES = {"ok": 0, "invalid": 1, "revoked": 2, "expired": 3}
@@ -362,24 +367,24 @@ def _extract(rd: _Reader, entries: Sequence[dict[str, Any]], tmp: str) -> None:
 
 
 def _one_envelope(rd: _Reader, name: str, by_path: dict[str, str], tmp: str,
-                  key: bytes | None) -> tuple[str, list[str]]:
-    """校验单份信封 → (level 或空串, 失败原因)。"""
+                  key: bytes | None) -> tuple[str, list[str], str]:
+    """校验单份信封 → (level 或空串, 失败原因, 主体相对路径)。"""
     raw = rd.read(_norm(name))
     if raw is None:
-        return "", [f"{name}：包内缺该信封（{GUIDE}清单与实体不一致，请重打包）"]
+        return "", [f"{name}：包内缺该信封（{GUIDE}清单与实体不一致，请重打包）"], ""
     try:
         env = json.loads(raw.decode())
     except (ValueError, UnicodeDecodeError) as exc:
-        return "", [f"{name}：不是合法 JSON（{exc}）（{GUIDE}重打包）"]
+        return "", [f"{name}：不是合法 JSON（{exc}）（{GUIDE}重打包）"], ""
     subj = _norm(str((env.get("subject") or {}).get("path") or ""))
     subj_sha = str((env.get("subject") or {}).get("sha256") or "")
     if subj and by_path.get(subj) != subj_sha:
         return "", [f"{name}：信封 subject 与包内成员不同源（{GUIDE}信封须指向包内成员——"
-                    "请重打包）"]
+                    "请重打包）"], subj
     ok, att_issues, level = attest.verify(env, tmp, key=key)
     if ok:
-        return level, []
-    return "", [f"{name}：{'；'.join(att_issues)}（信封未通过校验）"]
+        return level, [], subj
+    return "", [f"{name}：{'；'.join(att_issues)}（信封未通过校验）"], subj
 
 
 def _check_attestations(rd: _Reader, meta: dict[str, Any],
@@ -394,16 +399,29 @@ def _check_attestations(rd: _Reader, meta: dict[str, Any],
     by_path = {_norm(str(e.get("path") or "")): str(e.get("digest") or "") for e in entries}
     passed: list[str] = []
     failed: list[str] = []
+    covered: set[str] = set()
     with tempfile.TemporaryDirectory(prefix="nf_evidence_") as tmp:
         _extract(rd, entries, tmp)
         for name in att_names:
-            level, why = _one_envelope(rd, name, by_path, tmp, key)
-            passed.extend([level] if level else [])
-            failed.extend(why)
-    if not passed:
+            level, why, subj = _one_envelope(rd, name, by_path, tmp, key)
+            if level:
+                passed.append(level)
+                covered.add(subj)
+            else:
+                failed.extend(why)
+    if failed:
+        # 严格口径：清单里的**每一份**信封都必须通过。容忍「有一份过了就算过」等于给了
+        # 「悄悄塞一份坏信封」的容错面——证据强度只能由最弱那环决定，不能挑最好看的报。
         joined = "；".join(failed[:3]) or "无可用信封"
-        res["issues"].append(f"所有 attestation 均未通过校验：{joined}（{GUIDE}hmac 级须提供"
-                             "同一密钥 --key-file；缺密钥一律拒绝，不降级为 digest_only）")
+        res["issues"].append(f"信封未全部通过校验：{joined}（{GUIDE}hmac 级须提供同一密钥 "
+                             "--key-file；缺密钥一律拒绝，不降级为 digest_only；坏信封请"
+                             "重新 nf evidence pack）")
+        return
+    uncovered = sorted({_norm(str(e.get("path") or e.get("id") or "")) for e in entries}
+                       - covered)
+    if uncovered:
+        res["issues"].append(f"成员缺信封：{', '.join(uncovered[:3])}（{GUIDE}每个成员都要有一份"
+                             "信封——没有签发背书的成员不算证据，请重新 nf evidence pack）")
         return
     res["level"] = max(passed, key=lambda lv: LEVELS.index(lv) if lv in LEVELS else -1)
     res["attestations_ok"] = len(passed)
@@ -470,6 +488,7 @@ def verify(bundle: str, key: bytes | None = None,
             return res
         _check_proofs(entries, res)
         _check_chain(entries, res)
+        _check_extras(rd, entries, res["issues"])
         if res["issues"]:
             return res
         _check_attestations(rd, meta, entries, key, res)
@@ -514,6 +533,240 @@ def _revocation_hit(rev: dict[str, Any] | None,
         if (dig and dig in digests) or (pat and pat in paths):
             return item
     return None
+
+
+# ------------------------------------------------------------------ 多形态复验
+#
+# cc_verify 的输入不是「只有一种包」：仓里同时存在三种可独立验证的证据形态——
+#   1) bundle   : nf evidence pack 产出的自包含 zip（bundle.json + payload/ + attest/）
+#   2) receipts : nf receipts --scope protocol --write 产出的 nf-receipts/1（单根 + 每条包含证明）
+#   3) attest   : nf attest 产出的 nf-attest/1 / nf-attest-set/1（信封，可带 hmac/ssh/sigstore 锚）
+# 三种都必须能**脱离仓库**判：只给「文档 + 成员实体」，不查生产环境、不联网。
+# 形态由**内容**（schema 字段）决定，不由扩展名或文件名决定——判据不依赖命名约定。
+
+def _check_extras(rd: _Reader, entries: Sequence[dict[str, Any]],
+                  issues: list[str]) -> None:
+    """包内多出未登记的成员 → invalid（多出来的字节没有回执背书，包就不干净）。"""
+    listed = {PAYLOAD_DIR + _norm(str(e.get('path') or e.get('id') or '')) for e in entries}
+    for name in rd.names():
+        if name.startswith(PAYLOAD_DIR) and name not in listed:
+            issues.append(f"包内多出未登记成员：{name}（{GUIDE}成员集必须与根一致——多出来的"
+                          "字节没有回执背书，请去掉或重新 nf evidence pack）")
+
+
+def _payload_find(read: Any, rel: str) -> bytes | None:
+    """成员实体查找：先按原相对路径，再退化到 payload/ 前缀（bundle 形态用前缀）。"""
+    for name in (rel, PAYLOAD_DIR + rel):
+        data = read(name)
+        if data is not None:
+            return data
+    return None
+
+
+def _schema_of(raw: bytes | None) -> str:
+    if raw is None:
+        return ""
+    try:
+        doc = json.loads(raw.decode())
+    except (ValueError, UnicodeDecodeError):
+        return ""
+    return str(doc.get("schema") or "") if isinstance(doc, dict) else ""
+
+
+def _detect_container(rd: _Reader, kind: str = "") -> tuple[str, dict[str, Any]]:
+    """容器（zip / 目录）→ (形态, 文档)。显式 --kind 时只做形状确认，不猜。"""
+    if rd.read(BUNDLE_ENTRY) is not None:
+        return "bundle", _load_meta(rd)
+    found: dict[str, dict[str, Any]] = {}
+    for name in [n for n in rd.names() if n.endswith(".json")]:
+        raw = rd.read(name)
+        schema = _schema_of(raw)
+        if schema in (RECEIPTS_SCHEMA, ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and schema not in found:
+            try:
+                found[schema] = json.loads(raw.decode())  # type: ignore[arg-type]
+            except (ValueError, UnicodeDecodeError):
+                continue
+    for schema, form in ((RECEIPTS_SCHEMA, "receipts"), (ATTEST_SCHEMA, "attest"),
+                         (ATTEST_SET_SCHEMA, "attest")):
+        if schema in found and (not kind or kind == form):
+            return form, found[schema]
+    raise ValueError(f"认不出证据形态：{rd.path}（{GUIDE}请给 nf evidence pack 的 .zip、或含 "
+                     "nf-receipts/1 · nf-attest/1 · nf-attest-set/1 的目录/JSON；形态以文档 "
+                     "schema 字段判定，不看扩展名）")
+
+
+def _dir_read(root: str) -> Any:
+    """目录成员读取器（单 JSON + 根目录形态用）。"""
+    def read(rel: str) -> bytes | None:
+        full = os.path.join(root, *_norm(rel).split("/"))
+        if not os.path.isfile(full):
+            return None
+        with open(full, "rb") as fh:
+            return fh.read()
+    return read
+
+
+def _verify_receipts(doc: dict[str, Any], read: Any,
+                     revocations: dict[str, Any] | None = None) -> dict[str, Any]:
+    """回执形态：成员摘要 → 叶 → 根 → 每条包含证明（不回查仓库）。"""
+    res = _empty_result()
+    res["kind"] = "receipts"
+    issues = res["issues"]
+    if str(doc.get("schema") or "") != RECEIPTS_SCHEMA:
+        issues.append(f"回执 schema 不匹配（期望 {RECEIPTS_SCHEMA}）（{GUIDE}用 nf receipts "
+                      "--scope protocol --write 重新生成）")
+        return res
+    entries = doc.get("entries") or []
+    res["count"] = len(entries)
+    res["root"] = str(doc.get("root") or "")
+    if not entries:
+        issues.append("回执为空（" + GUIDE + "空根不能证明任何事——请生成含成员的回执）")
+        return res
+    leaves: list[bytes] = []
+    for e in entries:
+        rel = _norm(str(e.get("id") or e.get("path") or ""))
+        data = _payload_find(read, rel) if rel else None
+        if data is None:
+            issues.append(f"缺成员实体：{rel or '?'}（{GUIDE}回执只证明「根里有这条」，验它需要"
+                          "成员字节——请把成员与回执放在同一根下，或用 nf evidence pack 打包）")
+            continue
+        digest = _sha256(data)
+        want = str(e.get("digest") or "")
+        if digest != want:
+            issues.append(f"成员摘要不符：{rel}（记录={want[:16]} 实测={digest[:16]}）"
+                          f"（{GUIDE}成员被改过——回执证明的就是字节，字节变了判定必红）")
+        want_leaf = _leaf(rel, digest)
+        if want_leaf != str(e.get("leaf") or ""):
+            issues.append(f"叶复算不符：{rel}（{GUIDE}叶定义须与 receipts 同源；改动后请重签回执）")
+        leaves.append(bytes.fromhex(want_leaf))
+    if issues:
+        return res
+    _check_root(leaves, res)
+    if issues:
+        return res
+    _check_proofs(entries, res)
+    if issues:
+        return res
+    res["level"] = "receipts_only"
+    if _apply_revocation_doc(revocations, entries, res):
+        return res
+    res["verdict"] = "ok"
+    return res
+
+
+def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
+                   revocations: dict[str, Any] | None = None,
+                   at: str = "") -> dict[str, Any]:
+    """信封形态：每份信封必须自洽且指向真实成员；level 取通过的最强一档。"""
+    res = _empty_result()
+    res["kind"] = "attest"
+    issues = res["issues"]
+    envs = doc.get("attestations") if str(doc.get("schema") or "") == ATTEST_SET_SCHEMA else [doc]
+    if not isinstance(envs, list) or not envs:
+        issues.append("信封集为空（" + GUIDE + "nf-attest-set/1 必须至少含一份信封）")
+        return res
+    res["count"] = len(envs)
+    entries: list[dict[str, Any]] = []
+    with tempfile.TemporaryDirectory(prefix="nf_attestset_") as tmp:
+        for env in envs:
+            if not isinstance(env, dict):
+                issues.append("信封不是对象（" + GUIDE + "重跑 nf attest --out 生成）")
+                continue
+            subj = _norm(str((env.get("subject") or {}).get("path") or ""))
+            data = _payload_find(read, subj) if subj else None
+            if data is None:
+                issues.append(f"缺成员实体：{subj or '?'}（{GUIDE}信封只证明「这份内容被签过」，"
+                              "验它需要内容本身——请把成员与信封放在同一根下）")
+                continue
+            digest = _sha256(data)
+            entries.append({"path": subj, "digest": digest})
+            full = os.path.join(tmp, *subj.split("/"))
+            parent = os.path.dirname(full)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+            with open(full, "wb") as fh:
+                fh.write(data)
+        if issues:
+            return res
+        passed: list[str] = []
+        failed: list[str] = []
+        for env in envs:
+            ok, att_issues, level = attest.verify(env, tmp, key=key)
+            passed.extend([level] if ok else [])
+            failed.extend([] if ok else att_issues)
+        if not passed:
+            res["issues"].append(f"所有信封均未通过校验：{'；'.join(failed[:3]) or '无可用信封'}"
+                                 f"（{GUIDE}hmac 级须提供同一密钥 --key-file；缺密钥一律拒绝）")
+            return res
+        res["level"] = max(passed, key=lambda lv: LEVELS.index(lv) if lv in LEVELS else -1)
+        res["attestations_ok"] = len(passed)
+    if _apply_revocation_doc(revocations, entries, res):
+        return res
+    if _apply_expiry(res, at):
+        return res
+    res["verdict"] = "ok"
+    return res
+
+
+def _apply_revocation_doc(revocations: dict[str, Any] | None,
+                          entries: Sequence[dict[str, Any]],
+                          res: dict[str, Any]) -> bool:
+    """无容器形态的吊销判定（吊销表由调用方给，不内嵌）。"""
+    hit = _revocation_hit(revocations, entries)
+    if hit is None:
+        return False
+    why = hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
+    res["verdict"] = "revoked"
+    res["revoked_by"] = hit
+    res["issues"].append(f"证据已被吊销：{why}（{GUIDE}吊销是不可逆判定——请向签发方确认"
+                          "是否曾发生错签或内容下架，不要当临时失败重试）")
+    return True
+
+
+def verify_any(path: str, key: bytes | None = None,
+               revocations: dict[str, Any] | None = None, at: str = "",
+               root: str = "", kind: str = "") -> dict[str, Any]:
+    """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
+
+    - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
+      （缺省 = 该 JSON 所在目录）。
+    - 判定词表与退出码对所有形态一致：ok / revoked / expired / invalid。
+    """
+    if os.path.isfile(path) and not zipfile.is_zipfile(path):
+        return _verify_single_json(path, key, revocations, at, root, kind)
+    rd = _Reader(path)
+    try:
+        form, doc = _detect_container(rd, kind)
+        if form == "bundle":
+            return verify(path, key=key, revocations=revocations, at=at)
+        if form == "receipts":
+            return _verify_receipts(doc, rd.read, revocations)
+        return _verify_attest(doc, rd.read, key, revocations, at)
+    finally:
+        rd.close()
+
+
+def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any] | None,
+                        at: str, root: str, kind: str) -> dict[str, Any]:
+    with open(path, "rb") as fh:
+        raw = fh.read()
+    try:
+        doc = json.loads(raw.decode())
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise ValueError(f"不是合法 UTF-8 JSON：{path}（{exc}）（{GUIDE}请给 nf receipts / "
+                         "nf attest 产出的 JSON，或 nf evidence pack 的 .zip）") from exc
+    if not isinstance(doc, dict):
+        raise ValueError(f"证据文档不是对象：{path}（{GUIDE}请给带 schema 字段的证据 JSON）")
+    schema = str(doc.get("schema") or "")
+    base = root or os.path.dirname(os.path.abspath(path)) or "."
+    read = _dir_read(base)
+    if schema == RECEIPTS_SCHEMA and (not kind or kind == "receipts"):
+        return _verify_receipts(doc, read, revocations)
+    if schema in (ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and (not kind or kind == "attest"):
+        return _verify_attest(doc, read, key, revocations, at)
+    raise ValueError(f"认不出证据形态：{path}（schema={schema or '缺失'}）"
+                     "（修复指引：请对照支持的四种——nf-evidence/1 容器、nf-receipts/1、"
+                     "nf-attest/1、nf-attest-set/1；形态以文档 schema 字段判定）")
 
 
 # ------------------------------------------------------------------ 机制自检
@@ -591,3 +844,221 @@ def selfcheck() -> tuple[bool, list[str], dict[str, Any]]:
                           "执行，请先修判定顺序）")
         stats["expired"] = ex
     return not issues, issues, stats
+
+
+# ------------------------------------------------------------------ 攻击矩阵基准 v0
+#
+# 目的：把「抓不到篡改的校验器就是摆设」变成**可复跑的数字**。对同一份金丝雀证据包施加
+# 25 种已知攻击/退化（改字节、换成员、删证明、改根、改链、改信封、错密钥、良性重排…），
+# 逐条比对「期望判定 vs 实际判定」。任何一条不达期望 = 复验器有洞，基准当场红。
+#
+# 这是**自测基准**，不是安全证明：它证明「这些已知攻击都判得出来」，不证明「所有攻击都
+# 判得出来」——不可抵赖与可信时间戳仍需第三方见证，见包内 boundary 声明。
+
+BENCH_SCHEMA = "nf-evidence-bench/1"
+BENCH_KEY = b"nf-evidence-bench-key-0123456789"
+BENCH_PIN = "2026-01-01T00:00:00Z"
+
+
+def _members(data: bytes) -> dict[str, bytes]:
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        return {n: zf.read(n) for n in zf.namelist()}
+
+
+def _rebuild(members: dict[str, bytes]) -> bytes:
+    return _zip_bytes(list(members.items()))
+
+
+def _mut_meta(data: bytes, fn: Any) -> bytes:
+    """改清单后重打包（fn(meta) 原地改）。"""
+    members = _members(data)
+    meta = json.loads(members[BUNDLE_ENTRY].decode())
+    fn(meta)
+    members[BUNDLE_ENTRY] = _json_bytes(meta)
+    return _rebuild(members)
+
+
+def _zip_unsorted(members: dict[str, bytes]) -> bytes:
+    """良性重排：成员顺序打乱 + 时间戳变化（判定不该因此变化）。"""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        for name in sorted(members, reverse=True):
+            zi = zipfile.ZipInfo(name, date_time=(2026, 1, 2, 3, 4, 6))
+            zi.compress_type = zipfile.ZIP_STORED
+            zf.writestr(zi, members[name])
+    return buf.getvalue()
+
+
+def _bench_write(tmp: str, name: str, data: bytes) -> str:
+    path = os.path.join(tmp, name)
+    with open(path, "wb") as fh:
+        fh.write(data)
+    return path
+
+
+def _bench_run(rows: list[dict[str, Any]], cid: str, desc: str, expected: str,
+               path: str, key: bytes | None = BENCH_KEY,
+               revocations: dict[str, Any] | None = None, at: str = "") -> None:
+    """跑一条用例并记账（认不出形态也记 invalid——判定面外不算通过）。"""
+    try:
+        actual = verify(path, key=key, revocations=revocations, at=at)["verdict"]
+    except ValueError:
+        actual = "invalid"
+    rows.append({"id": cid, "desc": desc, "expected": expected,
+                 "actual": actual, "ok": actual == expected})
+
+
+def _drop_entry(meta: dict[str, Any]) -> None:
+    meta["entries"] = meta["entries"][:-1]
+
+
+def _flip_proof(meta: dict[str, Any]) -> None:
+    proof = meta["entries"][0].get("proof") or []
+    if proof:
+        proof[0]["side"] = "left" if proof[0].get("side") == "right" else "right"
+
+
+def _truncate_proof(meta: dict[str, Any]) -> None:
+    meta["entries"][0]["proof"] = []
+
+
+def _swap_entries(meta: dict[str, Any]) -> None:
+    entries = meta["entries"]
+    entries[0], entries[-1] = entries[-1], entries[0]
+
+
+def _bump_subject(env: dict[str, Any]) -> None:
+    (env.get("subject") or {})["sha256"] = "0" * 64
+
+
+def _bump_mac(env: dict[str, Any]) -> None:
+    (env.get("signature") or {})["mac"] = "0" * 64
+
+
+def _mut_attest(data: bytes, fn: Any) -> bytes:
+    """改第一份信封后重打包（fn(env) 原地改）。"""
+    members = _members(data)
+    env = json.loads(members[ATTEST_DIR + "0001.json"].decode())
+    fn(env)
+    members[ATTEST_DIR + "0001.json"] = _json_bytes(env)
+    return _rebuild(members)
+
+
+def bench() -> dict[str, Any]:
+    """跑攻击矩阵 → {schema, cases, passed, failed, total, ok}。"""
+    rows: list[dict[str, Any]] = []
+    with tempfile.TemporaryDirectory(prefix="nf_bench_") as tmp:
+        os.makedirs(os.path.join(tmp, "d"), exist_ok=True)
+        for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n")):
+            with open(os.path.join(tmp, "d", name), "wb") as fh:
+                fh.write(body.encode())
+        base, _info = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
+                            created_at=BENCH_PIN, key=BENCH_KEY)
+        members = _members(base)
+        digest_a = _sha256(members[PAYLOAD_DIR + "d/a.md"])
+        base_path = _bench_write(tmp, "base.zip", base)
+        # 正例与良性变化
+        _bench_run(rows, "pass", "完好证据包必过", "ok", base_path)
+        ddir = os.path.join(tmp, "unpacked")
+        os.makedirs(ddir, exist_ok=True)
+        with zipfile.ZipFile(base_path) as zf:
+            zf.extractall(ddir)
+        _bench_run(rows, "pass_dir", "解包目录形态等价", "ok", ddir)
+        _bench_run(rows, "benign_reorder", "成员重排/时间戳变化不影响判定", "ok",
+                   _bench_write(tmp, "reorder.zip", _zip_unsorted(members)))
+        # 成员面
+        m = dict(members)
+        payload = members[PAYLOAD_DIR + "d/a.md"]
+        m[PAYLOAD_DIR + "d/a.md"] = "# A\n\n甲改\n".encode()
+        _bench_run(rows, "payload_flip", "成员字节被改", "invalid",
+                   _bench_write(tmp, "flip.zip", _rebuild(m)))
+        m = dict(members)
+        m[PAYLOAD_DIR + "d/a.md"] = payload[:4]
+        _bench_run(rows, "payload_truncate", "成员被截断", "invalid",
+                   _bench_write(tmp, "trunc.zip", _rebuild(m)))
+        m = dict(members)
+        m[PAYLOAD_DIR + "d/a.md"] = b"X" * len(payload)
+        _bench_run(rows, "payload_same_size", "等长替换（摘要必须变）", "invalid",
+                   _bench_write(tmp, "samesize.zip", _rebuild(m)))
+        m = dict(members)
+        m.pop(PAYLOAD_DIR + "d/b.md")
+        _bench_run(rows, "payload_removed", "成员实体缺失", "invalid",
+                   _bench_write(tmp, "pop.zip", _rebuild(m)))
+        m = dict(members)
+        m[PAYLOAD_DIR + "d/sneak.md"] = b"# sneak\n"
+        _bench_run(rows, "payload_extra", "夹带未登记成员", "invalid",
+                   _bench_write(tmp, "extra.zip", _rebuild(m)))
+        # 清单面
+        _bench_run(rows, "manifest_digest", "清单里的摘要被改", "invalid",
+                   _bench_write(tmp, "mdig.zip", _mut_meta(
+                       base, lambda meta: meta["entries"][0].__setitem__("digest", "0" * 64))))
+        _bench_run(rows, "manifest_root", "清单里的根被改", "invalid",
+                   _bench_write(tmp, "mroot.zip", _mut_meta(
+                       base, lambda meta: meta.__setitem__("root", "0" * 64))))
+        _bench_run(rows, "manifest_leaf", "清单里的叶被改", "invalid",
+                   _bench_write(tmp, "mleaf.zip", _mut_meta(
+                       base, lambda meta: meta["entries"][0].__setitem__("leaf", "0" * 64))))
+        _bench_run(rows, "manifest_drop_entry", "清单删条但实体仍在", "invalid",
+                   _bench_write(tmp, "mdrop.zip", _mut_meta(base, _drop_entry)))
+        # 证明 / 链
+        _bench_run(rows, "proof_flip", "包含证明被翻面", "invalid",
+                   _bench_write(tmp, "pflip.zip", _mut_meta(base, _flip_proof)))
+        _bench_run(rows, "proof_truncate", "包含证明被截断", "invalid",
+                   _bench_write(tmp, "ptrunc.zip", _mut_meta(base, _truncate_proof)))
+        _bench_run(rows, "chain_head", "链头被改", "invalid",
+                   _bench_write(tmp, "chead.zip", _mut_meta(
+                       base, lambda meta: meta["chain"].__setitem__("head", "0" * 64))))
+        _bench_run(rows, "chain_order", "条目顺序被换（链可证顺序）", "invalid",
+                   _bench_write(tmp, "corder.zip", _mut_meta(base, _swap_entries)))
+        # 信封 / 密钥 / 结构
+        m = dict(members)
+        m.pop(ATTEST_DIR + "0001.json")
+        _bench_run(rows, "attest_removed", "信封实体缺失", "invalid",
+                   _bench_write(tmp, "natt.zip", _rebuild(m)))
+        _bench_run(rows, "attest_subject_sha", "信封主体摘要被改", "invalid",
+                   _bench_write(tmp, "asub.zip", _mut_attest(base, _bump_subject)))
+        _bench_run(rows, "attest_mac", "hmac 签名被改", "invalid",
+                   _bench_write(tmp, "amac.zip", _mut_attest(base, _bump_mac)))
+        _bench_run(rows, "no_key", "hmac 级缺密钥（不降级）", "invalid", base_path,
+                   key=None)
+        _bench_run(rows, "wrong_key", "hmac 级错密钥", "invalid", base_path,
+                   key=b"wrong-key-wrong-key-wrong-key")
+        _bench_run(rows, "schema_bumped", "包版本被改", "invalid",
+                   _bench_write(tmp, "schema.zip", _mut_meta(
+                       base, lambda meta: meta.__setitem__("schema", "nf-evidence/99"))))
+        notzip = os.path.join(tmp, "notzip.bin")
+        with open(notzip, "wb") as fh:
+            fh.write(b"just a file")
+        _bench_run(rows, "not_a_bundle", "不是证据包", "invalid", notzip)
+        # 判定面（吊销 / 时效）
+        rev = {"schema": REVOCATION_SCHEMA,
+               "revoked": [{"digest": digest_a, "revoked_at": BENCH_PIN,
+                             "reason": "bench"}]}
+        _bench_run(rows, "revoked", "吊销表命中必须压过 ok", "revoked", base_path,
+                   revocations=rev)
+        expired, _x = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
+                            created_at=BENCH_PIN, key=BENCH_KEY,
+                            expires_at="2020-01-01T00:00:00Z")
+        _bench_run(rows, "expired", "有效期已过", "expired",
+                   _bench_write(tmp, "expired.zip", expired))
+    passed = sum(1 for r in rows if r["ok"])
+    return {"schema": BENCH_SCHEMA, "cases": rows, "passed": passed,
+            "failed": len(rows) - passed, "total": len(rows),
+            "ok": passed == len(rows)}
+
+
+def bench_markdown(res: dict[str, Any]) -> str:
+    """把基准结果渲染成可直接贴进报告的表（确定性输出）。"""
+    lines = ["# 证据复验器攻击矩阵基准 v0", "",
+             f"用例 {res['total']} 条 · 通过 {res['passed']} · 失败 {res['failed']} · "
+             f"结论 {'PASS' if res['ok'] else 'FAIL'}", "",
+             "| # | 用例 | 攻击 / 变化 | 期望 | 实际 | 结果 |",
+             "|---|---|---|---|---|---|"]
+    for i, r in enumerate(res["cases"], 1):
+        mark = "✓" if r["ok"] else "✗"
+        lines.append(f"| {i} | {r['id']} | {r['desc']} | {r['expected']} | "
+                     f"{r['actual']} | {mark} |")
+    lines.append("")
+    lines.append("边界：本基准证明「这些已知攻击都判得出来」，**不**证明「所有攻击都判得"
+                 "出来」；不可抵赖与可信时间戳仍需第三方见证，见证据包 boundary 声明。")
+    return "\n".join(lines) + "\n"

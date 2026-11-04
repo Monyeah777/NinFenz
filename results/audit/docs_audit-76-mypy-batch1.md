@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:65caa9caf109781ae7c167d75841949275f92eca0606805ccfd1e0f3758a2778
+  - protocol/code_metrics_baseline.json:a237c9afbb64d8813686683f53cd753423b4bfc030880856c77be89b1580edda
 ---
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑审计摘要（证据复验器扩形态与基准）
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
 > 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
 
 > 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）

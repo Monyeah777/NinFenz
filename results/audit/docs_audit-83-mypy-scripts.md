@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:4229c2bfaaf084eefe7b82ed73b1306ec49265275d7092e31c9c096f627a9ff6
+  - scripts/nf.py:a8e78ba5b69d5c3cc34e1ff0e691a2a6acb90b68e00b4c731e1a0bec9e7c7600
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:65caa9caf109781ae7c167d75841949275f92eca0606805ccfd1e0f3758a2778
+  - protocol/code_metrics_baseline.json:a237c9afbb64d8813686683f53cd753423b4bfc030880856c77be89b1580edda
 ---
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑审计摘要（证据复验器扩形态与基准）
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
 > 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
 
 > 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）

@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from core import evidence, receipts
+from core import attest, evidence, receipts
 
 
 class _Base(unittest.TestCase):
@@ -173,7 +173,7 @@ class TestStrength(_Base):
         self.assertEqual(info["level"], "hmac-sha256")
         res = evidence.verify(path)
         self.assertEqual(res["verdict"], "invalid")
-        self.assertTrue(any("所有 attestation 均未通过" in i for i in res["issues"]),
+        self.assertTrue(any("信封未全部通过校验" in i for i in res["issues"]),
                         res["issues"])
 
     def test_hmac_with_key_ok(self):
@@ -229,6 +229,114 @@ class TestSelfcheck(_Base):
         self.assertEqual(stats["tamper"], "invalid")
         self.assertEqual(stats["revoked"], "revoked")
         self.assertEqual(stats["expired"], "expired")
+
+
+class TestForms(_Base):
+    """cc_verify 的三种输入形态：自包含包 / 协议回执 / 信封集。"""
+
+    def _receipts_doc(self, rels=("docs/a.md", "docs/b.md")):
+        return receipts.build_scope(str(self.tmp), list(rels), scope="evidence")
+
+    def test_receipts_form_ok(self):
+        doc = self._receipts_doc()
+        path = Path(self._tmp.name, "RECEIPTS.json")
+        path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+        res = evidence.verify_any(str(path), root=str(self.tmp))
+        self.assertEqual(res["verdict"], "ok", res["issues"])
+        self.assertEqual(res["level"], "receipts_only")
+        self.assertEqual(res["count"], 2)
+        self.assertEqual(res["root"], doc["root"])
+
+    def test_receipts_form_tamper(self):
+        doc = self._receipts_doc()
+        path = Path(self._tmp.name, "RECEIPTS.json")
+        path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+        self.a.write_text("# A\n\n被改\n", encoding="utf-8")
+        res = evidence.verify_any(str(path), root=str(self.tmp))
+        self.assertEqual(res["verdict"], "invalid")
+        self.assertTrue(any("成员摘要不符" in i for i in res["issues"]), res["issues"])
+
+    def test_receipts_form_missing_member(self):
+        doc = self._receipts_doc()
+        path = Path(self._tmp.name, "RECEIPTS.json")
+        path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+        self.b.unlink()
+        res = evidence.verify_any(str(path), root=str(self.tmp))
+        self.assertEqual(res["verdict"], "invalid")
+        self.assertTrue(any("缺成员实体" in i for i in res["issues"]), res["issues"])
+
+    def test_attest_set_ok_with_key(self):
+        envs = []
+        for rel in ("docs/a.md", "docs/b.md"):
+            envs.append(attest.sign_hmac(attest.build(rel, str(self.tmp)), self.key))
+        path = Path(self._tmp.name, "ATTEST.json")
+        path.write_text(json.dumps({"schema": "nf-attest-set/1", "attestations": envs},
+                                   ensure_ascii=False), encoding="utf-8")
+        res = evidence.verify_any(str(path), root=str(self.tmp), key=self.key)
+        self.assertEqual(res["verdict"], "ok", res["issues"])
+        self.assertEqual(res["level"], "hmac-sha256")
+
+    def test_attest_set_without_key_invalid(self):
+        envs = [attest.sign_hmac(attest.build("docs/a.md", str(self.tmp)), self.key)]
+        path = Path(self._tmp.name, "ATTEST.json")
+        path.write_text(json.dumps({"schema": "nf-attest-set/1", "attestations": envs},
+                                   ensure_ascii=False), encoding="utf-8")
+        self.assertEqual(evidence.verify_any(str(path), root=str(self.tmp))["verdict"],
+                         "invalid")
+
+    def test_attest_subject_edit_invalid(self):
+        env = attest.build("docs/a.md", str(self.tmp))
+        env["subject"]["sha256"] = "0" * 64
+        path = Path(self._tmp.name, "A.json")
+        path.write_text(json.dumps(env, ensure_ascii=False), encoding="utf-8")
+        res = evidence.verify_any(str(path), root=str(self.tmp))
+        self.assertEqual(res["verdict"], "invalid")
+
+    def test_container_auto_detect_receipts(self):
+        doc = self._receipts_doc()
+        Path(self._tmp.name, "RECEIPTS.json").write_text(
+            json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        res = evidence.verify_any(str(self.tmp))
+        self.assertEqual(res.get("kind"), "receipts")
+        self.assertEqual(res["verdict"], "ok", res["issues"])
+
+    def test_unknown_form(self):
+        path = Path(self._tmp.name, "x.json")
+        path.write_text(json.dumps({"schema": "nothing/1"}), encoding="utf-8")
+        with self.assertRaises(ValueError) as ctx:
+            evidence.verify_any(str(path))
+        self.assertIn("修复指引", str(ctx.exception))
+
+
+class TestExtras(_Base):
+    def test_extra_member_invalid(self):
+        """夹带未登记成员 = 包不干净（多出来的字节没有回执背书）。"""
+        path, _info, _data = self._pack()
+        import zipfile as _zip
+        with _zip.ZipFile(path) as zf:
+            members = {n: zf.read(n) for n in zf.namelist()}
+        members["payload/docs/sneak.md"] = b"# sneak\n"
+        bad = Path(self._tmp.name, "sneak.zip")
+        bad.write_bytes(evidence._zip_bytes(list(members.items())))
+        res = evidence.verify(str(bad))
+        self.assertEqual(res["verdict"], "invalid")
+        self.assertTrue(any("多出未登记成员" in i for i in res["issues"]), res["issues"])
+
+
+class TestBench(_Base):
+    def test_bench_all_cases(self):
+        """攻击矩阵必须全过——任何一条不达期望说明复验器有洞。"""
+        res = evidence.bench()
+        bad = [c for c in res["cases"] if not c["ok"]]
+        self.assertEqual(bad, [])
+        self.assertEqual(res["total"], 25)
+        self.assertTrue(res["ok"])
+
+    def test_bench_markdown(self):
+        md = evidence.bench_markdown(evidence.bench())
+        self.assertIn("攻击矩阵", md)
+        self.assertIn("| # | 用例 |", md)
+        self.assertIn("不**证明", md)
 
 
 if __name__ == "__main__":

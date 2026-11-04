@@ -507,8 +507,13 @@ def _add_parser_production(sub):
                           description="复验：结构→成员摘要→根→包含证明→链→信封→吊销→时效，"
                                       "fail-closed。退出码：ok=0 / invalid=1 / revoked=2 / "
                                       "expired=3 / 用法错=4。")
-    evv.add_argument("evidence_bundle", nargs="?", default="", metavar="BUNDLE",
-                     help="证据包路径（.zip 或解包目录）")
+    evv.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / nf-receipts/1 · nf-attest/1 的 JSON"
+                          "（形态按文档 schema 自动判，不看扩展名）")
+    evv.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判；判错即报错，不猜）")
+    evv.add_argument("--root", default="",
+                     help="单 JSON 形态的成员根目录（缺省 = 该 JSON 所在目录）")
     evv.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
     evv.add_argument("--revocations", default="",
                      help="外部吊销表 JSON（优先于包内嵌的那份）")
@@ -516,6 +521,19 @@ def _add_parser_production(sub):
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（25 条已知攻击，逐条比对判定）",
+                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
+                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
+                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
+    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
+    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
+
+
+def evidence_kinds() -> tuple[str, ...]:
+    """证据形态词表（与 core.evidence.KINDS 同源——不在 CLI 再手抄一份）。"""
+    from core import evidence
+    return tuple(evidence.KINDS)
 
 
 def _add_parser_validation(sub):
@@ -3058,7 +3076,11 @@ def _cmd_evidence(args):
         print("用法：nf evidence pack <文件…> --out <包.zip>｜nf evidence verify <包.zip>"
               "（各自 --help 看逐条）", file=sys.stderr)
         return 2
-    return _evidence_verify(args) if sub == "verify" else _evidence_pack(args)
+    if sub == "verify":
+        return _evidence_verify(args)
+    if sub == "bench":
+        return _evidence_bench(args)
+    return _evidence_pack(args)
 
 
 def _evidence_verify(args):
@@ -3093,7 +3115,9 @@ def _evidence_verify(args):
         rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
                if args.revocations else None)
         path = _rel_out(target) if not os.path.isabs(target) else target
-        res = evidence.verify(path, key=key, revocations=rev, at=args.at)
+        root = _rel_out(args.root) if args.root else ""
+        res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
+                                  root=root, kind=args.kind)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -3137,6 +3161,34 @@ def _evidence_pack(args):
               f"链头：{info['head'][:16]}")
         print(f"  复验：nf evidence verify {shown}")
     return 0
+
+
+def _evidence_bench(args):
+    """nf evidence bench：攻击矩阵基准（25 条已知攻击，逐条比对期望判定）。"""
+    import json as _json
+
+    from core import evidence
+    res = evidence.bench()
+    if getattr(args, "out", ""):
+        dest = _rel_out(args.out)
+        parent = os.path.dirname(dest)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with open(dest, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(evidence.bench_markdown(res))
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    elif not getattr(args, "quiet", False):
+        print("== nf evidence bench（攻击矩阵 v0）==")
+        for i, r in enumerate(res["cases"], 1):
+            mark = "✓" if r["ok"] else "✗"
+            print(f"  {mark} {i:>2}. {r['id']:<22} 期望={r['expected']:<8} "
+                  f"实际={r['actual']:<8} {r['desc']}")
+        if getattr(args, "out", ""):
+            print(f"  报告：{args.out}")
+    print(f"用例 {res['total']} · 通过 {res['passed']} · 失败 {res['failed']} · "
+          f"结论 {'PASS' if res['ok'] else 'FAIL'}")
+    return 0 if res["ok"] else 1
 
 
 def _cmd_attest(args):

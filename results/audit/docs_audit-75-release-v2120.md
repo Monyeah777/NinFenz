@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:4229c2bfaaf084eefe7b82ed73b1306ec49265275d7092e31c9c096f627a9ff6
+  - scripts/nf.py:a8e78ba5b69d5c3cc34e1ff0e691a2a6acb90b68e00b4c731e1a0bec9e7c7600
 
 ---
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
 > 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
 
 > 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）

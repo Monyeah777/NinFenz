@@ -109,28 +109,35 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 
 ### 4. `cc_verify(evidence)` → `ok | revoked | expired | invalid`
 
-**状态：`implemented`（本文配套 MVP）**。maps_to = `nf evidence verify <bundle>`。
-本调用是**中立裁判位的地基**：验证方只需要证据包本身，**不需要仓库、不需要联网、
+**状态：`implemented`**（三种输入形态 + 25 条攻击矩阵基准）。
+maps_to = `nf evidence verify <target>` / `nf evidence bench`。
+本调用是**中立裁判位的地基**：验证方只需要证据本身，**不需要仓库、不需要联网、
 不需要复现生产环境**。
 
-- 输入：一个证据包（`.zip` 或目录，布局见 `docs/ccos/evidence-bundle-v0.md`）
-- 输出：`{verdict, level, root, head?, findings: [], revoked_by?: {...}, expiring: {...}}`
+- 输入：**三种形态，同一套判定**（形态由文档 `schema` 判，不看扩展名）：
+  `bundle`（`nf-evidence/1` 自包含包）/ `receipts`（`nf-receipts/1` 单根 + 包含证明）/
+  `attest`（`nf-attest/1`、`nf-attest-set/1` 信封）。容器形态见
+  `docs/ccos/evidence-bundle-v0.md`。
+- 输出：`{verdict, kind, level, root, head?, count, issues: [], revoked_by?: {...}}`
 - 判定顺序（**fail-closed**，先失败先返回；不允许「证据弱就放行」）：
 
   | 序 | 检查 | 不过 → |
   |---|---|---|
-  | 1 | 包结构/版本（`bundle.json.schema == nf-evidence/1`） | `invalid` |
-  | 2 | 每个 payload 的 sha256 == manifest 记录 | `invalid` |
-  | 3 | manifest 叶 → RFC 6962 根 == 记录 root | `invalid` |
-  | 4 | receipts 每条 inclusion proof 折叠到同一 root | `invalid` |
+  | 1 | 形态/结构/版本（schema 与形态一致） | `invalid` |
+  | 2 | 每个成员实体的 sha256 == 记录 | `invalid` |
+  | 3 | 叶 → RFC 6962 根 == 记录 root | `invalid` |
+  | 4 | 每条 inclusion proof 折叠到同一 root | `invalid` |
   | 5 | 透明日志链（若在包内）自洽且 head 一致 | `invalid` |
-  | 6 | 至少一条 attestation 通过（含信封摘要自洽） | `invalid` |
-  | 7 | hmac 级：密钥在场且 mac 匹配 | `invalid` |
-  | 8 | 吊销表命中 | **`revoked`** |
-  | 9 | 时效（`expires_at` / `--at`）已过 | **`expired`** |
+  | 6 | 成员集外**不得**多出未登记成员 | `invalid` |
+  | 7 | 清单内**每一份**信封都必须通过 + 每个成员都被覆盖 | `invalid` |
+  | 8 | hmac 级：密钥在场且 mac 匹配（缺密钥不降级） | `invalid` |
+  | 9 | 吊销表命中 | **`revoked`** |
+  | 10 | 时效（`expires_at` / `--at`）已过 | **`expired`** |
 
-- `level` 如实回填证据强度（`digest_only`/`hmac-sha256`/`ssh-sig`/`sigstore-keyless`），
-  **不**把 `digest_only` 说成可信签发。
+- `level` 如实回填证据强度（`digest_only`/`receipts_only`/`hmac-sha256`/`ssh-sig`/
+  `sigstore-keyless`），**不**把 `digest_only` 说成可信签发、不把「一份信封过了」说成整体可信。
+- 机制判据：`nf evidence verify --selfcheck`（四词判定各自可达）+ `nf evidence bench`
+  （25 条已知攻击逐条比对，任一条不达期望即 exit 1）。
 - 错误码：`cc.verify.not_a_bundle` / `cc.verify.digest_mismatch` / `cc.verify.root_mismatch` /
   `cc.verify.proof_mismatch` / `cc.verify.no_attestation` / `cc.verify.key_required` /
   `cc.verify.revoked` / `cc.verify.expired`
@@ -165,14 +172,20 @@ spec 查询）。缺「给一个对象，返回答它该用哪套契约」的单
 ## 判据（可证）
 
 ```bash
-# 1) cc_verify 的形状自检（本仓基线）
+# 1) cc_verify 的机制自检（四词判定各自可达）
 python scripts/nf.py evidence verify --selfcheck
-# 2) cc_attest 的可复现性（两次运行逐字节一致）
+# 2) cc_verify 的敏感度基准（25 条已知攻击逐条比对；任一条不达期望即 exit 1）
+python scripts/nf.py evidence bench
+# 3) 三种形态都能脱离仓库判：自包含包 / 协议回执 / 信封集
+python scripts/nf.py evidence verify <包.zip>
+python scripts/nf.py evidence verify protocol/RECEIPTS.json --root .
+python scripts/nf.py evidence verify <信封集.json> --root <成员根> --key-file <密钥>
+# 4) cc_attest 的可复现性（两次运行逐字节一致）
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py attest 01_核心协议.md --json > /tmp/a1.json
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py attest 01_核心协议.md --json > /tmp/a2.json
 cmp /tmp/a1.json /tmp/a2.json
-# 3) 证据强度不冒充：digest_only 级必须报 digest_only
-python scripts/nf.py evidence verify <bundle> --json | grep -q '"level": "digest_only"'
+# 5) 证据强度不冒充：digest_only 级必须报 digest_only
+python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "digest_only"'
 ```
 
 判据约定：任一调用的「实装状态」字段与实际能力不符即视为**本文失真**——
@@ -183,7 +196,7 @@ python scripts/nf.py evidence verify <bundle> --json | grep -q '"level": "digest
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
 | `cc_label` | 全无：无载体写入/无 sidecar 回退/无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
-| `cc_check` | 仓库级 verdict 有，单对象 × 单策略入口无 | 需要 policy 编译器（P2–P3 方向） |
+| `cc_check` | 仓库级 verdict 有（`nf conformance`），单对象 × 单策略入口无 | 需要 policy 编译器（P2–P3 方向） |
 | `cc_replay` | 单条回执可折叠，整链 trace 未串 | 需要 trace 形态定稿 |
 | `cc_resolve` | 依赖闭包可查，对象→契约集映射无 | 需要对象类型判定 |
 

@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 109,
+        "raises": 113,
         "sinks": 20
       },
       "status": "pass",
@@ -372,7 +372,7 @@
         "files": 315,
         "max_fn_cc": 106,
         "max_fn_lines": 318,
-        "max_lines": 7727
+        "max_lines": 7779
       },
       "status": "pass",
       "warns": 0
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9e4406410eb19ecb667785062abd97e01e31d7434cf51a8d6e0fe61b334658ba",
+  "root_digest": "0423aeb46f7af6c743b542d9f66e610453ea40e80416fb5baf9f0411cbc6942d",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

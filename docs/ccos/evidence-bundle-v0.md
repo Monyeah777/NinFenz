@@ -1,7 +1,7 @@
 # 证据包 v0（evidence bundle）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-04
-> **Status**: v0 已实装（nf evidence pack / verify）· **上位**: docs/ccos/abi-v0.md §4 cc_verify
+> **Status**: v0 已实装（pack / verify / bench · 三种可验形态）· **上位**: docs/ccos/abi-v0.md §4 cc_verify
 
 ## 是什么
 
@@ -40,46 +40,83 @@ core.attest，链节域分隔前缀取 core.transparency_log。
 | 3 | 叶复算 → RFC 6962 根 == 清单 root | invalid |
 | 4 | 每条 inclusion proof 折叠到同一 root | invalid |
 | 5 | 透明日志链头 == 由条目顺序重算的链头 | invalid |
-| 6 | 至少一份信封通过（信封摘要自洽 + 主体与成员同源） | invalid |
-| 7 | hmac 级：同一密钥在场且 mac 匹配 | invalid（缺密钥**不**降级） |
-| 8 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
-| 9 | 时效（expires_at 早于判定时点） | **expired** |
+| 6 | payload 里**不得**多出未登记成员（多出来的字节没有回执背书） | invalid |
+| 7 | 清单内**每一份**信封都必须通过，且每个成员至少被一份信封覆盖 | invalid |
+| 8 | hmac 级：同一密钥在场且 mac 匹配 | invalid（缺密钥**不**降级） |
+| 9 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
+| 10 | 时效（expires_at 早于判定时点） | **expired** |
+
+第 7 条是**严格**口径：不容忍「有一份信封过了就算过」——证据强度只由最弱那一环决定，
+挑最好看的报等于给「悄悄塞一份坏信封」留容错面。
 
 判定词表只有四个词：ok / revoked / expired / invalid。退出码：ok=0 / invalid=1 / revoked=2 /
-expired=3 / 用法错=4。
+expired=3 / 用法错=4。证据强度（level）如实回填，词表 = digest_only / receipts_only /
+hmac-sha256 / ssh-sig / sigstore-keyless。
+
+## 三种可验形态（cc_verify 的输入面）
+
+形态由**文档 schema** 判定，不由扩展名或文件名判定——判据不依赖命名约定。
+
+| 形态 | 输入 | 判什么 | level |
+|---|---|---|---|
+| bundle | nf evidence pack 的 .zip / 解包目录 | 上面 10 条全判 | 取通过的最强信封档 |
+| receipts | nf-receipts/1（nf receipts --scope protocol 产出） | 成员摘要 → 叶 → 根 → 每条包含证明 | receipts_only |
+| attest | nf-attest/1 或 nf-attest-set/1（nf attest 产出） | 每份信封自洽 + 指向真实成员 | 取通过的最强档 |
+
+后两种是**单 JSON + 成员根目录**形态（--root 指成员根，缺省 = 该 JSON 所在目录）；
+容器（.zip / 目录）里也可以直接放这两种文档，自动识别。
 
 ## 怎么用
 
 ```bash
 # 打包（缺省目标 = 01/02/06/07 四件；缺省落点 = 系统临时目录 nf-evidence.zip——
-# **不往仓库里落盘**，要入仓请显式 --out；--key-file 即升级到 hmac-sha256 级）
+# 不往仓库里落盘，要入仓请显式 --out；--key-file 即升级到 hmac-sha256 级）
 python scripts/nf.py evidence pack 01_核心协议.md STRATEGY.md --out evidence.zip
-python scripts/nf.py evidence pack 01_核心协议.md --key-file <密钥> --issuer 作者        --expires-at 2027-01-01T00:00:00Z --revocations <吊销表.json> --out evidence.zip
+python scripts/nf.py evidence pack 01_核心协议.md --key-file <密钥> --issuer 作者 \
+       --expires-at 2027-01-01T00:00:00Z --revocations <吊销表.json> --out evidence.zip
 
-# 复验（纯读；不需要仓库）
+# 复验（纯读；不需要仓库）——三种形态同一个入口
 python scripts/nf.py evidence verify evidence.zip
+python scripts/nf.py evidence verify protocol/RECEIPTS.json --root .        # 回执形态
+python scripts/nf.py evidence verify <信封集.json> --root <成员根> --key-file <同一密钥>
 python scripts/nf.py evidence verify evidence.zip --json
-python scripts/nf.py evidence verify evidence.zip --key-file <同一密钥>   # hmac 级
 python scripts/nf.py evidence verify evidence.zip --revocations <吊销表.json>
+python scripts/nf.py evidence verify evidence.zip --kind bundle             # 显式指定形态
 
 # 机制体检（PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired）
 python scripts/nf.py evidence verify --selfcheck
-```
 
+# 攻击矩阵基准（25 条已知攻击，逐条比对期望判定；写 Markdown 报告）
+python scripts/nf.py evidence bench
+python scripts/nf.py evidence bench --out /tmp/evidence-bench.md
+```
 ## 判据（可证）
 
 ```bash
-# 1) 机制体检必须绿（抓不到篡改的校验器就是摆设）
+# 1) 复验机制体检必须绿（抓不到篡改的校验器就是摆设）
 python scripts/nf.py evidence verify --selfcheck          # 退出码 0
 
-# 2) 逐字节可复现
+# 2) 攻击矩阵基准必须 25/25（任何一条不达期望即 exit 1）
+python scripts/nf.py evidence bench
+
+# 3) 逐字节可复现
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.md --out /tmp/e1.zip
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.md --out /tmp/e2.zip
 cmp /tmp/e1.zip /tmp/e2.zip
 
-# 3) 四词判定各自可达（单测）
-python -m unittest desktop.tests.test_evidence -v          # 23 项全绿
+# 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
+python -m unittest desktop.tests.test_evidence             # 34 项全绿
 ```
+
+## 攻击矩阵基准 v0（防「看起来能验」）
+
+对同一份金丝雀证据包施加 25 种已知攻击/退化，逐条断言「期望判定 vs 实际判定」：
+改字节、截断、等长替换、删成员、夹带成员、改清单摘要/根/叶、删清单条目、翻/截包含证明、
+改链头、换条目顺序、删信封、改信封主体摘要、改 hmac、缺密钥、错密钥、改包版本、非包输入、
+吊销命中、过期，以及**良性重排**（必须仍然 ok）。
+
+它是自测基准，不是安全证明：证明「这些已知攻击都判得出来」，**不**证明「所有攻击都判得出来」。
+不可抵赖与可信时间戳仍需第三方见证——这条边界写进包内 boundary 字段，也写进报告页脚。
 
 ## 与既有验证器的关系
 

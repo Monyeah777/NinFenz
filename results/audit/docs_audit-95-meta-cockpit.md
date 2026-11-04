@@ -16,7 +16,7 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:4229c2bfaaf084eefe7b82ed73b1306ec49265275d7092e31c9c096f627a9ff6
+  - scripts/nf.py:a8e78ba5b69d5c3cc34e1ff0e691a2a6acb90b68e00b4c731e1a0bec9e7c7600
   - tui/_surface.py:32f26fcabb626b6130a210555767530955010fab4e363a5b9374fae3d66b2e98
   - protocol/check12_weights.json:744258fe3a1da9ed6e071618f4d9916d6107b1404b6489f55630cf3431f65397
   - protocol/coupling_baseline.json:65ef6388ebda5fd11e3f75407e761cf525da03b0107e9c7f80cea1a46296cbbf
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
 > 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
 
 > 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
