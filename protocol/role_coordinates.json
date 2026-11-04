@@ -6,7 +6,7 @@
     "prod": 1048,
     "projection": 134,
     "support": 354,
-    "verify": 969
+    "verify": 970
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9191,6 +9191,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "受影响测试选片（verify_tests.select_affected）判据：**纯函数**，不打桩也不跑全量。",
+      "path": "desktop/tests/test_verify_tests_selection.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "编号体系映射表判据（审计 C1：四套版本口径必须各自自洽）。",
       "path": "desktop/tests/test_version_map.py",
       "role": "verify",
@@ -12144,7 +12150,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "32bfa443813d4b41d4b268dadc841f8696c74b92eee85f7c1a8bbb3730efb17a",
+  "root_digest": "5770dc4d031953662fbfc6f2a6b5122e6edf8770000adbe1dee7bbc54086b21a",
   "rule_counts": {
     "R-app": 1454,
     "R-catch": 208,
@@ -12153,7 +12159,7 @@
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 850,
+    "R-verify": 851,
     "auto:R-core": 266
   },
   "schema": "nf-role-coordinates/1"
