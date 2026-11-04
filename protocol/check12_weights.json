@@ -265,6 +265,7 @@
     "test_response_cache_replay": 0.1,
     "test_retriever": 1.0,
     "test_retry_semantics": 0.1,
+    "test_revocations": 1.8,
     "test_rewrite_tool": 0.8,
     "test_role_model": 6.9,
     "test_round_drill": 0.2,
@@ -3111,6 +3112,23 @@
     "test_retriever.TestSearch.test_protocol_from_registry": 0.01,
     "test_retry_semantics.Test.test_exit_tiers": 0.0,
     "test_retry_semantics.Test.test_known_and_unknown": 0.0,
+    "test_revocations.TestChain.test_chain_ok": 0.0,
+    "test_revocations.TestChain.test_fork_detected": 0.0,
+    "test_revocations.TestChain.test_rollback_detected": 0.0,
+    "test_revocations.TestCli.test_sign_verify_merge_roundtrip": 1.01,
+    "test_revocations.TestCli.test_verify_without_key_exits_1": 0.7,
+    "test_revocations.TestMerge.test_merge_forged_fails_whole": 0.0,
+    "test_revocations.TestMerge.test_merge_union_sorted": 0.0,
+    "test_revocations.TestMerge.test_merge_without_key_fails": 0.0,
+    "test_revocations.TestSignVerify.test_bad_seq_fails": 0.0,
+    "test_revocations.TestSignVerify.test_digest_is_deterministic": 0.0,
+    "test_revocations.TestSignVerify.test_missing_key_does_not_downgrade": 0.0,
+    "test_revocations.TestSignVerify.test_roundtrip_ok": 0.0,
+    "test_revocations.TestSignVerify.test_table_missing_fails": 0.0,
+    "test_revocations.TestSignVerify.test_tampered_table_fails": 0.0,
+    "test_revocations.TestSignVerify.test_unknown_schema_fails": 0.0,
+    "test_revocations.TestSignVerify.test_unsigned_table_warns": 0.0,
+    "test_revocations.TestSignVerify.test_wrong_key_fails": 0.0,
     "test_rewrite_tool.RewriteTextTest.test_blast_radius_guard_refuses_without_touching_anything": 0.1,
     "test_rewrite_tool.RewriteTextTest.test_check_reports_remaining_hits": 0.1,
     "test_rewrite_tool.RewriteTextTest.test_dry_run_prints_table_and_changes_nothing": 0.1,
@@ -3786,5 +3804,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1267.2
+  "total_s": 1269.0
 }

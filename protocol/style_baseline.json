@@ -1593,7 +1593,6 @@
     "scripts/nf.py::E501": 19,
     "scripts/nf.py::E702": 7,
     "scripts/nf.py::E741": 2,
-    "scripts/nf.py::I001": 74,
     "scripts/nf.py::RUF100": 4,
     "scripts/nf.py::UP006": 2,
     "scripts/nf.py::UP017": 1,

@@ -143,6 +143,9 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 
 - `level` 如实回填证据强度（`digest_only`/`receipts_only`/`hmac-sha256`/`ssh-sig`/
   `sigstore-keyless`），**不**把 `digest_only` 说成可信签发、不把「一份信封过了」说成整体可信。
+- **吊销表分发（G2）**：`--revocations` 吃普通 `nf-revocation/1` 表；表可由**签名 feed** 合并产出
+  （`nf evidence revocations sign|verify|merge`）——合并时验签名、验序号连续性、验前序摘要，
+  任何一份不过则整次失败。缺密钥即不可信（不降级），见 [revocation-feed-v0.md](revocation-feed-v0.md)。
 - **外部锚点（G1 的反截断面）**：打包可用 `--anchor {count, head}` 声明继承的上一条链；复验可用
   `--anchor` 给同一份材料核对「不是被截断的更早版本」。不给材料时**不判死也不抬高**：只在
   `warnings` 里写「无法证明未被截断」，且 `anchor_verified` 为 false。锚点本身的可信来源

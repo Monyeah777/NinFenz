@@ -1095,6 +1095,11 @@
       "max_fn_cc": 1,
       "max_fn_lines": 4
     },
+    "desktop/src/core/revocations.py": {
+      "lines": 206,
+      "max_fn_cc": 25,
+      "max_fn_lines": 86
+    },
     "desktop/src/core/rfc.py": {
       "lines": 107,
       "max_fn_cc": 26,
@@ -1471,9 +1476,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8042,
+      "lines": 8250,
       "max_fn_cc": 106,
-      "max_fn_lines": 318
+      "max_fn_lines": 319
     },
     "scripts/nf_client.py": {
       "lines": 187,
