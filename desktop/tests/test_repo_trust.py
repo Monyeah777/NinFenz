@@ -25,6 +25,18 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from core import gate_engine, gate_inproc, gate_labels, repo_trust  # noqa: E402
 
 
+def _live_gate_engine():
+    """取**当前**的 core.gate_engine（必须运行时取，不能在模块导入时抓一个）。
+
+    为什么：常驻语料层在代码变化时会把 core.* 从 sys.modules 里摘掉重载（见
+    test_watch 的 docstring）。于是「本模块导入时抓到的 gate_engine」与「nf 命令运行时
+    from core import gate_engine 拿到的」可能不是同一个对象——patch 打在旧对象上，
+    判据就变成假绿/假红（2026-11-04 分片实测踩过：单跑绿、整片跑红）。
+    """
+    import core.gate_engine as ge
+    return sys.modules.get("core.gate_engine", ge)
+
+
 def _load_nf():
     """按路径加载 CLI；裸 `import nf` 在分片进程里会撞同名包/缓存。"""
     spec = importlib.util.spec_from_file_location("nfcli_repo_trust", ROOT / "scripts" / "nf.py")
@@ -174,7 +186,7 @@ class GateRefusalTest(_Base):
         # （2026-11-04 分片实测：脏环境/前面用例的残留会让这条判据假红）。
         clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
         with mock.patch.dict(os.environ, clean, clear=True), \
-                mock.patch.object(gate_engine, "ROOT", evil):
+                mock.patch.object(_live_gate_engine(), "ROOT", evil):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
 
@@ -186,10 +198,11 @@ class GateRefusalTest(_Base):
         args = Namespace(only="", json=True, memo=False, cached=False, jobs=0,
                          trust_repo=True)
         clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
+        ge = _live_gate_engine()
         with (mock.patch.dict(os.environ, clean, clear=True),
-              mock.patch.object(gate_engine, "ROOT", evil),
-              mock.patch.object(gate_engine, "build_registry"),
-              mock.patch.object(gate_engine, "run_checks", return_value=[])):
+              mock.patch.object(ge, "ROOT", evil),
+              mock.patch.object(ge, "build_registry"),
+              mock.patch.object(ge, "run_checks", return_value=[])):
             rc = nf._cmd_verify(args)
         self.assertEqual(0, rc, "显式信任后应放行（本轮 run_checks 已 mock）")
 
