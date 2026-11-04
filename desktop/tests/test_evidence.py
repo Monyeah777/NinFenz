@@ -339,5 +339,85 @@ class TestBench(_Base):
         self.assertIn("不**证明", md)
 
 
+class TestStandaloneParity(_Base):
+    """两套独立实现判据必须一致：core 版（复验器）vs scripts/nf_verify.py（零依赖单文件）。
+
+    不一致就说明至少一边有 bug——那时「第三方复验」的结论不可信，所以这条判据是硬门。
+    """
+
+    SCRIPT = Path(__file__).resolve().parent.parent.parent / "scripts" / "nf_verify.py"
+
+    def _run(self, *args):
+        import subprocess
+        proc = subprocess.run([sys.executable, str(self.SCRIPT), *args],
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace")
+        return proc.returncode, proc.stdout, proc.stderr
+
+    def _verdict(self, path, key_file="", root="", revocations=""):
+        args = ["--evidence", str(path), "--json"]
+        if key_file:
+            args += ["--key-file", str(key_file)]
+        if root:
+            args += ["--root", str(root)]
+        if revocations:
+            args += ["--revocations", str(revocations)]
+        _rc, out, err = self._run(*args)
+        try:
+            return json.loads(out)["verdict"]
+        except (ValueError, KeyError):
+            self.fail(f"零依赖验证器没给出可解析结论：{err[:300]}")
+
+    def _key_file(self):
+        path = Path(self._tmp.name, "key.bin")
+        path.write_bytes(self.key)
+        return path
+
+    def test_bundle_ok_and_tamper_agree(self):
+        path, _info, data = self._pack(key=self.key)
+        kf = self._key_file()
+        self.assertEqual(self._verdict(path, key_file=kf),
+                         evidence.verify_any(path, key=self.key)["verdict"])
+        self.assertEqual(self._verdict(path),
+                         evidence.verify_any(path)["verdict"])
+        with zipfile.ZipFile(path) as zf:
+            members = {n: zf.read(n) for n in zf.namelist()}
+        members["payload/docs/a.md"] = "改".encode()
+        bad = Path(self._tmp.name, "bad.zip")
+        bad.write_bytes(evidence._zip_bytes(list(members.items())))
+        self.assertEqual(self._verdict(str(bad), key_file=kf),
+                         evidence.verify_any(str(bad), key=self.key)["verdict"])
+
+    def test_revoked_and_expired_agree(self):
+        path, _info, _data = self._pack(key=self.key, expires_at="2020-01-01T00:00:00Z")
+        kf = self._key_file()
+        self.assertEqual(self._verdict(path, key_file=kf),
+                         evidence.verify_any(path, key=self.key)["verdict"])
+        ok_path, _i2, _d2 = self._pack(key=self.key)
+        rev = {"schema": evidence.REVOCATION_SCHEMA,
+               "revoked": [{"path": "docs/a.md", "reason": "x"}]}
+        rev_file = Path(self._tmp.name, "rev.json")
+        rev_file.write_text(json.dumps(rev), encoding="utf-8")
+        self.assertEqual(self._verdict(str(ok_path), key_file=kf, revocations=rev_file),
+                         evidence.verify_any(str(ok_path), key=self.key, revocations=rev)
+                         ["verdict"])
+
+    def test_receipts_and_attest_forms_agree(self):
+        doc = receipts.build_scope(str(self.tmp), ["docs/a.md", "docs/b.md"], scope="ev")
+        rec = Path(self._tmp.name, "RECEIPTS.json")
+        rec.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        self.assertEqual(self._verdict(str(rec), root=str(self.tmp)),
+                         evidence.verify_any(str(rec), root=str(self.tmp))["verdict"])
+        envs = [attest.sign_hmac(attest.build(rel, str(self.tmp)), self.key)
+                for rel in ("docs/a.md", "docs/b.md")]
+        aset = Path(self._tmp.name, "ATTEST.json")
+        aset.write_text(json.dumps({"schema": "nf-attest-set/1", "attestations": envs},
+                                   ensure_ascii=False), encoding="utf-8")
+        kf = self._key_file()
+        self.assertEqual(self._verdict(str(aset), key_file=kf, root=str(self.tmp)),
+                         evidence.verify_any(str(aset), key=self.key, root=str(self.tmp))
+                         ["verdict"])
+
+
 if __name__ == "__main__":
     unittest.main()

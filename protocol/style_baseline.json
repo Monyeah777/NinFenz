@@ -1604,7 +1604,7 @@
     "scripts/nf_client.py::I001": 1,
     "scripts/nf_client.py::RUF100": 3,
     "scripts/nf_client.py::UP031": 3,
-    "scripts/nf_verify.py::UP031": 13,
+    "scripts/nf_verify.py::UP031": 3,
     "scripts/nfal_rules.py::UP031": 2,
     "scripts/orchestrate.py::UP031": 3,
     "scripts/perf_budget.py::UP031": 12,

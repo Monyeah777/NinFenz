@@ -1456,9 +1456,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf_verify.py": {
-      "lines": 214,
+      "lines": 674,
       "max_fn_cc": 28,
-      "max_fn_lines": 101
+      "max_fn_lines": 86
     },
     "scripts/nfal_rules.py": {
       "lines": 47,

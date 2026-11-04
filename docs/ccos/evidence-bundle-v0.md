@@ -105,7 +105,7 @@ SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.
 cmp /tmp/e1.zip /tmp/e2.zip
 
 # 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
-python -m unittest desktop.tests.test_evidence             # 34 项全绿
+python -m unittest desktop.tests.test_evidence             # 37 项全绿（含零依赖复验器一致性）
 ```
 
 ## 攻击矩阵基准 v0（防「看起来能验」）
@@ -118,9 +118,28 @@ python -m unittest desktop.tests.test_evidence             # 34 项全绿
 它是自测基准，不是安全证明：证明「这些已知攻击都判得出来」，**不**证明「所有攻击都判得出来」。
 不可抵赖与可信时间戳仍需第三方见证——这条边界写进包内 boundary 字段，也写进报告页脚。
 
-## 与既有验证器的关系
+## 与既有验证器的关系（两套独立实现，判据必须一致）
 
-scripts/nf_verify.py 是**读者侧零依赖**验证器（纯 stdlib、不 import NF），走的是另一条口径
-（直接读回执/信封文件、自成进程）。两者职责不同、**判据必须一致**：
-证据包这一层管「容器与判定顺序」，nf_verify.py 那一层管「同一算法的独立复刻」。
-两边对同一输入的结论不一致，就是其中一边有 bug——发现即红，不许放过。
+scripts/nf_verify.py 是**读者侧零依赖**验证器：纯标准库、**不 import 任何 NF 模块**，
+单文件拷走即可运行——这是「免费验证器 / 可嵌入」的形态要求（发布物不该带整条工具链）。
+两种用法：
+
+```bash
+# 馆藏单条（原有口径）
+python scripts/nf_verify.py --entry NF-1 --json
+
+# 证据文档整体（与 nf evidence verify 同一套四词判定）
+python scripts/nf_verify.py --evidence evidence.zip --json
+python scripts/nf_verify.py --evidence protocol/RECEIPTS.json --root . --json
+python scripts/nf_verify.py --evidence <信封集.json> --root <成员根> --key-file <密钥>
+```
+
+退出码与 ABI 对齐：ok=0 / invalid=1 / revoked=2 / expired=3 / 用法错=4。
+
+职责分工：core/evidence.py 管「容器与判定顺序」，nf_verify.py 管「同一算法的独立复刻」。
+**判据必须一致**——`desktop/tests/test_evidence.py::TestStandaloneParity` 用同一批夹具
+跑两边（含真实仓内 67 件回执），结论不同即红：两套实现不一致说明至少一边有 bug，
+那时「第三方复验」的结论就不可信。
+
+边界：零依赖复验器不调外部工具，故 ssh-sig / sigstore 信封一律 fail-closed（缺锚不降级）；
+要验这两档请用带外挂验证器的那一层。

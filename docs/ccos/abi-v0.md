@@ -110,7 +110,7 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 ### 4. `cc_verify(evidence)` → `ok | revoked | expired | invalid`
 
 **状态：`implemented`**（三种输入形态 + 25 条攻击矩阵基准）。
-maps_to = `nf evidence verify <target>` / `nf evidence bench`。
+maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参考实现** = `scripts/nf_verify.py --evidence <target>`（纯标准库、不 import 任何 NF 模块，单文件可分发）。
 本调用是**中立裁判位的地基**：验证方只需要证据本身，**不需要仓库、不需要联网、
 不需要复现生产环境**。
 
@@ -176,6 +176,8 @@ spec 查询）。缺「给一个对象，返回答它该用哪套契约」的单
 python scripts/nf.py evidence verify --selfcheck
 # 2) cc_verify 的敏感度基准（25 条已知攻击逐条比对；任一条不达期望即 exit 1）
 python scripts/nf.py evidence bench
+# 2b) 两套独立实现判据一致（core 版 vs 零依赖单文件版，含真实回执）
+python -m unittest desktop.tests.test_evidence.TestStandaloneParity
 # 3) 三种形态都能脱离仓库判：自包含包 / 协议回执 / 信封集
 python scripts/nf.py evidence verify <包.zip>
 python scripts/nf.py evidence verify protocol/RECEIPTS.json --root .
