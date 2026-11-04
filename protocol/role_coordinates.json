@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1453,
+    "app": 1454,
     "entry": 26,
     "floor": 5,
     "prod": 1048,
     "projection": 134,
     "support": 354,
-    "verify": 967
+    "verify": 969
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6803,6 +6803,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "吊销分发件 v0（G2 的可落地部分）：签名 + 单调序号 + 前序链 + 合并。",
+      "path": "desktop/src/core/revocations.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "协议件 RFC 头 + supersede 链（机制借鉴 HMP 的 RFC 系列）。",
       "path": "desktop/src/core/rfc.py",
       "role": "verify",
@@ -8815,6 +8821,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_retry_semantics.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "吊销分发件 v0（core/revocations.py + nf evidence revocations CLI）判据。",
+      "path": "desktop/tests/test_revocations.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12132,17 +12144,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b7080d84952656550d9fa1bef89b891479d50ad888bcf8c4a07392b37d2105f7",
+  "root_digest": "32bfa443813d4b41d4b268dadc841f8696c74b92eee85f7c1a8bbb3730efb17a",
   "rule_counts": {
-    "R-app": 1453,
+    "R-app": 1454,
     "R-catch": 208,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 849,
-    "auto:R-core": 265
+    "R-verify": 850,
+    "auto:R-core": 266
   },
   "schema": "nf-role-coordinates/1"
 }
