@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:1403aef220c9f6bd431d7728cc61b91dc1215e62daf544a871532b86e025af39
+  - protocol/code_metrics_baseline.json:9b42d455ccac28fe95607ab0554d80e47ab24d860ead5cd0696197235b1914cd
 ---
+> 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
+
 > 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）
 
 > 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行

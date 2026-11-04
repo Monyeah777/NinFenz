@@ -69,16 +69,30 @@ class TestDryRun(unittest.TestCase):
                               encoding="utf-8", errors="replace")
 
     def test_dry_run_prints_plan(self):
-        proc = self._run("--jobs", "2")
+        proc = self._run("--shards", "2")
         self.assertIn(proc.returncode, (0, 2))
         doc = json.loads(proc.stdout)
         self.assertTrue(doc["dry_run"])
         self.assertEqual(doc["plan"]["shards"], 2)
+        self.assertEqual(doc["plan"]["concurrency"], 1, "缺省并发必须是 1（单机并发有争用）")
         steps = doc["plan"]["steps"]
         self.assertEqual(steps[0], "git status --porcelain")
         joined = " ".join(steps)
         self.assertIn("--shard 0/2", joined)
         self.assertIn("--shard 1/2", joined)
+
+    def test_jobs_sets_concurrency_not_partitions(self):
+        """分区与并发是两件事：--jobs 只改同时跑几片，不改切片数（判据面不变）。"""
+        proc = self._run("--shards", "4", "--jobs", "2")
+        doc = json.loads(proc.stdout)
+        self.assertEqual(doc["plan"]["shards"], 4)
+        self.assertEqual(doc["plan"]["concurrency"], 2)
+
+    def test_default_is_eight_partitions_serial(self):
+        proc = self._run()
+        doc = json.loads(proc.stdout)
+        self.assertEqual(doc["plan"]["shards"], 8, "单片跑全量会暴露套件级顺序敏感性")
+        self.assertEqual(doc["plan"]["concurrency"], 1)
 
     def test_dry_run_allow_dirty_reports_no_block(self):
         proc = self._run("--jobs", "1", "--allow-dirty")

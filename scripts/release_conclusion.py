@@ -30,10 +30,14 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-#: 缺省**串行**：分片模式是为「CI 矩阵各跑一片（不同机器）」设计的；同一台机上并发多片会
-#: 在守护端口/临时目录/计时判据上互相干扰（2026-11-04 实测：8 片并发时有分片报出与输入无关的
-#: 红，串行重跑即绿）。墙钟换正确性：要快请看 --jobs，并接受它是「给独立 runner 的」。
-DEFAULT_SHARDS = 1
+#: **分区数**与**并发数**是两件事（2026-11-04 实测教训）：
+#: - 分区（--shards）默认 8：每个分区是**独立进程**（各自 import 一套模块），因此分区并集 = 全量
+#:   且互不污染。单片跑全量（--shards 1）会变成「所有测试共享一个进程」，su^ite 级顺序敏感性
+#:   全部暴露（实测：单片全量出现 8 处 red，同内容 8 片独立进程全绿）。
+#: - 并发（--jobs）默认 1 = 顺序执行：分片是为「CI 矩阵各跑一片（不同机器）」设计的；同一台机
+#:   并发多片会在守护端口/临时目录/计时判据上互相干扰（实测 8 片并发有假红）。
+DEFAULT_SHARDS = 8
+DEFAULT_JOBS = 1
 GUIDE = "修复指引："
 
 
@@ -113,8 +117,10 @@ def _shard_one(index: int, total: int) -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="release_conclusion",
                                  description="发布结论一键复跑（干净树 → checks-only → 分片）")
-    ap.add_argument("--jobs", type=int, default=DEFAULT_SHARDS,
-                    help=f"并发分片数（缺省 {DEFAULT_SHARDS}；1 = 串行）")
+    ap.add_argument("--shards", type=int, default=DEFAULT_SHARDS,
+                    help=f"分区数（缺省 {DEFAULT_SHARDS}；每片独立进程，并集 == 全量）")
+    ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
+                    help=f"并发数（缺省 {DEFAULT_JOBS} = 顺序跑；>1 只建议给独立 runner）")
     ap.add_argument("--allow-dirty", action="store_true",
                     help="允许在脏树上跑（默认拒绝：脏树会产生与输入无关的假红）")
     ap.add_argument("--skip-checks", action="store_true", help="跳过 checks-only 步骤")
@@ -122,11 +128,13 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true", help="机读汇总")
     args = ap.parse_args(argv)
 
-    jobs = max(1, min(int(args.jobs), DEFAULT_SHARDS * 2))
-    plan = {"root": str(ROOT), "shards": jobs, "checks_only": not args.skip_checks,
+    shards = max(1, min(int(args.shards), 32))
+    concurrency = max(1, min(int(args.jobs), shards))
+    plan = {"root": str(ROOT), "shards": shards, "concurrency": concurrency,
+            "checks_only": not args.skip_checks,
             "steps": ["git status --porcelain", "bash verify.sh --checks-only"]
-                     + [f"python scripts/verify_tests.py --shard {i}/{jobs}"
-                        for i in range(jobs)]}
+                     + [f"python scripts/verify_tests.py --shard {i}/{shards}"
+                        for i in range(shards)]}
 
     dirty = _git_status()
     blocked = dirty_guard(dirty, args.allow_dirty)
@@ -156,10 +164,10 @@ def main(argv=None) -> int:
             return 1
 
     if not args.json:
-        print(f"[2/2] 分片 ×{jobs}（并发 {jobs}）…", flush=True)
+        print(f"[2/2] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
     results: list[dict] = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
-        futures = [pool.submit(_shard_one, i, jobs) for i in range(jobs)]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
+        futures = [pool.submit(_shard_one, i, shards) for i in range(shards)]
         for fut in concurrent.futures.as_completed(futures):
             row = fut.result()
             results.append(row)

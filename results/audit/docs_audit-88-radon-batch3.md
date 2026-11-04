@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f7a5ab33222f057150d56a5fe66f31d3dbbd1263a714e8a9f1f34a2c7c257cfc
-  - protocol/code_metrics_baseline.json:1403aef220c9f6bd431d7728cc61b91dc1215e62daf544a871532b86e025af39
+  - protocol/code_metrics_baseline.json:9b42d455ccac28fe95607ab0554d80e47ab24d860ead5cd0696197235b1914cd
 ---
+> 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
+
 > 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）
 
 > 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
