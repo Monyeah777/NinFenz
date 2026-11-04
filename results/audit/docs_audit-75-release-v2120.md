@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:839e14c35c14897ae6541a0c8bb280637729022475b0acb7a382f09f873eee39
+  - scripts/nf.py:bedb9917ffdf6efeb06aa90b151415a25d9ec5b1b86c3a1db74584996463d1f1
 
 ---
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
 
 > 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）

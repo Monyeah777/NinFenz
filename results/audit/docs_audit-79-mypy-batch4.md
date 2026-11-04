@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
-  - desktop/src/core/asset_contract.py:75af8aa9f347b36aaae3d5485299ff1b4ad76daa913b41d53f4115efa2774a40
-  - protocol/code_metrics_baseline.json:9b0c408a7d0f515653ee9b35bf9a0ce01a7d00345f498964f6d3ff4a6b15510f
+  - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
+  - protocol/code_metrics_baseline.json:f4b8c80ed81fde89af36fb87de482edfec90807f29038715e55ab40e05aeeebb
 ---
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
 
 > 重审（2026-11-04）：零依赖单文件复验器（--evidence 三形态）落地 + 风格基线重冻

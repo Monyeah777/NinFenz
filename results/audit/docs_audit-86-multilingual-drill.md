@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:9b0c408a7d0f515653ee9b35bf9a0ce01a7d00345f498964f6d3ff4a6b15510f
+  - protocol/code_metrics_baseline.json:f4b8c80ed81fde89af36fb87de482edfec90807f29038715e55ab40e05aeeebb
 ---
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
 
 > 重审（2026-11-04）：零依赖单文件复验器（--evidence 三形态）落地 + 风格基线重冻

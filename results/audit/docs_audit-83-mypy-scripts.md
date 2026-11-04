@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:839e14c35c14897ae6541a0c8bb280637729022475b0acb7a382f09f873eee39
+  - scripts/nf.py:bedb9917ffdf6efeb06aa90b151415a25d9ec5b1b86c3a1db74584996463d1f1
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:9b0c408a7d0f515653ee9b35bf9a0ce01a7d00345f498964f6d3ff4a6b15510f
+  - protocol/code_metrics_baseline.json:f4b8c80ed81fde89af36fb87de482edfec90807f29038715e55ab40e05aeeebb
 ---
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
 
 > 重审（2026-11-04）：零依赖单文件复验器（--evidence 三形态）落地 + 风格基线重冻

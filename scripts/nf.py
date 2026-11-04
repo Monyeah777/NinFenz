@@ -547,6 +547,12 @@ def _add_parser_production(sub):
     ck.add_argument("object", help="体检对象（单个文件；目录请逐件跑）")
     ck.add_argument("--policy", required=True, help="策略 JSON 路径（仓库相对或绝对）")
     ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rv = sub.add_parser("resolve", help="对象 → 契约集（cc_resolve：这个文件该守哪些契约）",
+                        description="契约解析（内部差距：既有 resolve 是「声明 → 文件」，缺反方向。"
+                                    "契约声明是 opt-in，未被认领时显式给 closure_closed=false，"
+                                    "不用空数组冒充「查过没问题」）。")
+    rv.add_argument("object", help="对象路径（仓库相对或绝对）")
+    rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 
 def evidence_kinds() -> tuple[str, ...]:
@@ -3154,6 +3160,33 @@ def _evidence_verify(args):
                   "不等于内容质量或内容真实）")
     return evidence.EXIT_CODES.get(str(res["verdict"]), 1)
 
+
+def _cmd_resolve(args):
+    """nf resolve：对象 → 契约集（cc_resolve：这个文件该守哪些契约）。"""
+    import json as _json
+
+    from core import asset_contract
+    target = _rel_out(args.object)
+    try:
+        rel = os.path.relpath(target, ROOT)
+    except ValueError:            # 跨盘时 relpath 无解：按原样交给契约面（必然未认领）
+        rel = target
+    try:
+        res = asset_contract.contracts_for_path(ROOT, rel)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf resolve（{res['object']}）==")
+        if not res["contracts"]:
+            print("  未被任何契约认领（closure_closed=false）——注意：这不是「查过没问题」，")
+            print("  而是「契约声明里没有覆盖它」（声明面是 opt-in）")
+        for c in res["contracts"]:
+            name = c['id'] or '(未命名)'
+            print(f"  · [{c['face']}] {name} · 管 {c['files']} 件 · 摘要 {c['digest'][:16]}")
+        print(f"  契约集闭合：{'是' if res['closure_closed'] else '否'}")
+    return 0 if res["closure_closed"] else 1
 
 def _evidence_replay(args):
     """nf evidence replay：把证据推导过程摊成确定性 trace（纯读、可 diff）。"""
@@ -7581,6 +7614,7 @@ _COMMAND_HANDLERS = {
     "attest": _cmd_attest,
     "evidence": _cmd_evidence,
     "check": _cmd_check,
+    "resolve": _cmd_resolve,
     "score": _cmd_score,
     "lint": _cmd_lint,
     "lsp": _cmd_lsp,

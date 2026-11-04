@@ -304,7 +304,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "shelf", "name": "资产与货架",
      "summary": "市场、资产台账、模块生命周期、管线派生、组合引擎、域包工厂、产出形态",
      "commands": ("market", "asset", "module", "pipeline", "combine", "domain",
-                  "output", "rename")},
+                  "output", "rename", "resolve")},
     {"id": "verify", "name": "质检与验证",
      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、"
          "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",

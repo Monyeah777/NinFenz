@@ -56,7 +56,7 @@
       "max_fn_lines": 73
     },
     "desktop/src/core/asset_contract.py": {
-      "lines": 1430,
+      "lines": 1463,
       "max_fn_cc": 28,
       "max_fn_lines": 62
     },
@@ -1350,6 +1350,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 18
     },
+    "scripts/ccos_chain.py": {
+      "lines": 128,
+      "max_fn_cc": 23,
+      "max_fn_lines": 49
+    },
     "scripts/check37_knowledge.py": {
       "lines": 70,
       "max_fn_cc": 14,
@@ -1451,7 +1456,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7857,
+      "lines": 7891,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },

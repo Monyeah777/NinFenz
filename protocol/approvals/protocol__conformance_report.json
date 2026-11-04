@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-04",
   "approved_by": "Monyeah777",
-  "note": "CCOS ABI：cc_replay 轨迹 + cc_check 单对象策略体检收口",
+  "note": "CCOS ABI：cc_resolve + 一条链复现收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "0d053be07923b16de7bdf7b209761e474fc0c2a28a5888e009b59de2d5319df1"

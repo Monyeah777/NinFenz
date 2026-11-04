@@ -1309,6 +1309,39 @@ def _export_drift(root: str) -> List[str]:
     return []
 
 
+def contracts_for_path(root: str, rel: str) -> dict[str, Any]:
+    """给定对象 → 命中它的契约集（cc_resolve v0）。
+
+    方向与 resolve（声明 → 文件清单）**相反**：那个回答「这份契约管哪些文件」，
+    这个回答「这个文件该守哪些契约」——合规体检与责任归属要的是后一个方向。
+
+    closure_closed 显式出现：没有契约认领该对象时也必须给出 false，不许用空数组糊过去
+    （空数组读起来像「查过了，没问题」，那是假结论）。
+    """
+    target = str(rel).replace("\\", "/").lstrip("/")
+    doc, issues = load(root)
+    if issues:
+        raise ValueError("契约声明不可用：" + "；".join(issues[:3]))
+    _begin_repo_scope()
+    try:
+        hits: list[dict[str, Any]] = []
+        for face in FACES:
+            for spec in doc.get(face) or []:
+                if not isinstance(spec, dict):
+                    continue
+                files = resolve(root, spec)
+                if target not in files:
+                    continue
+                spec_bytes = json.dumps(spec, sort_keys=True, ensure_ascii=False,
+                                        separators=(",", ":")).encode("utf-8")
+                hits.append({"face": face, "id": str(spec.get("id") or ""),
+                             "files": len(files),
+                             "digest": hashlib.sha256(spec_bytes).hexdigest()})
+    finally:
+        _end_repo_scope()
+    return {"schema": "nf-contract-resolve/1", "object": target, "contracts": hits,
+            "closure_closed": bool(hits), "unclaimed": not hits}
+
 def scan(root: str = ".", faces: Iterable[str] = ()
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；门禁入口（check40 同源）。"""

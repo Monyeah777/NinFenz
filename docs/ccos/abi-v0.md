@@ -168,11 +168,15 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 
 ### 7. `cc_resolve(obj)` → `contract set`
 
-**状态：`partial`**。maps_to = `nf market`（依赖闭包 + 挂载冲突预检）与 `nf spec`（版本化
-spec 查询）。缺「给一个对象，返回答它该用哪套契约」的单入口。
-- 输入：`{obj: <路径或类型>}`
-- 输出：`{contracts: [{id, version, digest}], closure_closed: bool}`（`closure_closed=false`
-  必须显式出现，不得用空数组代替）
+**状态：`implemented`（v0：契约声明面反查）**。maps_to = `nf resolve <对象>`——
+方向与既有 `asset_contract.resolve`（声明 → 文件清单）**相反**：那个回答「这份契约管哪些
+文件」，这个回答「这个文件该守哪些契约」。
+- 输入：`{obj: <仓库相对路径>}`
+- 输出：`{schema: nf-contract-resolve/1, object, contracts: [{face, id, files, digest}],
+  closure_closed: bool, unclaimed: bool}`
+- `closure_closed=false` **必须显式出现**：契约声明是 opt-in，未被认领时给 false 而不是
+  空数组——空数组读起来像「查过了没问题」，那是假结论。
+- 退出码：0 = 有契约认领；1 = 未被认领（显式判定，不是错误）。
 - 幂等：idempotent + 纯读。
 
 ## 判据（可证）
@@ -205,13 +209,29 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 判据约定：任一调用的「实装状态」字段与实际能力不符即视为**本文失真**——
 文档是结果面，不许把规划和实装混写。
 
+## 一条链复现（ABI 的验收动作）
+
+四环可跑的链条现场验证：`scripts/ccos_chain.py`（`--target <对象>`）。它的判据不是
+「四个命令都返回 0」，而是**同一个对象字节的摘要逐个流下去**——体检的 sha256、信封的
+subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；四个命令各自成功
+而链条换了字节，仍不算同一条链。
+
+缺环如实标注：本仓无 labeling 子系统（2026-11-04 实测），链条输出 `missing: ["cc_label"]`，
+不假装七环齐全。
+
+```bash
+python scripts/ccos_chain.py --target STRATEGY.md          # 人读表
+python scripts/ccos_chain.py --target STRATEGY.md --json   # 机读（含四份摘要）
+python -m unittest desktop.tests.test_ccos_chain            # 6 项：摘要一致 / 缺环标注 / 空对象判否
+```
+
 ## 未实装差距（如实挂账，不构成立项理由）
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
 | `cc_label` | 全无：无载体写入/无 sidecar 回退/无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
 | `cc_check` | v0 只有封闭词表（5 类规则）；法规文本 → 规则的编译器没有 | 需要政策编译（P2–P3 方向） |
-| `cc_resolve` | 依赖闭包可查，对象→契约集映射无 | 需要对象类型判定 |
+| `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 需要更完整的契约声明面（人工编纂） |
 
 本表只记录**内部差距实证**；外部项目的能力不作为开项依据（`STRATEGY.md` §3.3）。
 

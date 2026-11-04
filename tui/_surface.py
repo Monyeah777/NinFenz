@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:be5e2f6c8951d74f5583308e38683778e099920e4ed424228f5d9194aef5ff13'
+DIGEST = 'sha256:a7a923cb9dda30848a8d6fd120edc035ff30b3a06b8d35a24f770b909824dac3'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -74,6 +74,7 @@ COMMANDS = ['approve',
  'release',
  'rename',
  'render',
+ 'resolve',
  'review',
  'rfc',
  'run',
@@ -485,7 +486,8 @@ FAMILIES = [{'id': 'start',
                'combine',
                'domain',
                'output',
-               'rename']},
+               'rename',
+               'resolve']},
  {'id': 'verify',
   'name': '质检与验证',
   'summary': '门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译',
