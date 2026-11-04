@@ -87,6 +87,33 @@
         "ninfenz",
         "content-contract"
       ]
+    },
+    {
+      "description": "maps_to nf serve（GET /api/health）",
+      "id": "local.health",
+      "name": "local.health",
+      "tags": [
+        "ninfenz",
+        "content-contract"
+      ]
+    },
+    {
+      "description": "maps_to nf evidence verify（POST /api/verify）",
+      "id": "local.verify",
+      "name": "local.verify",
+      "tags": [
+        "ninfenz",
+        "content-contract"
+      ]
+    },
+    {
+      "description": "maps_to nf check（POST /api/check）",
+      "id": "local.check",
+      "name": "local.check",
+      "tags": [
+        "ninfenz",
+        "content-contract"
+      ]
     }
   ],
   "url": "urn:nf:repo",

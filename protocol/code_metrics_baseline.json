@@ -520,6 +520,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 12
     },
+    "desktop/src/core/http_api.py": {
+      "lines": 226,
+      "max_fn_cc": 8,
+      "max_fn_lines": 28
+    },
     "desktop/src/core/impact_check.py": {
       "lines": 222,
       "max_fn_cc": 12,
@@ -1456,7 +1461,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7891,
+      "lines": 7900,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },

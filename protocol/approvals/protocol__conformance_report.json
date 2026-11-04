@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-04",
   "approved_by": "Monyeah777",
-  "note": "CCOS ABI：cc_resolve + 一条链复现收口",
+  "note": "本地 HTTP 面 v0 收口（度量重冻后重批）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "0d053be07923b16de7bdf7b209761e474fc0c2a28a5888e009b59de2d5319df1"
+  "subject_digest": "c34d60a68e91e90bc0ef10d6240ed4666a4946833eeb1867ed8a0a1ed16b01fd"
 }

@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:f4b8c80ed81fde89af36fb87de482edfec90807f29038715e55ab40e05aeeebb
+  - protocol/code_metrics_baseline.json:0b2d79b56e4d99db082d5b681159023d6fbf3b55cf3f993bd3f547e0d121a019
 ---
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
 > 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
 
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重

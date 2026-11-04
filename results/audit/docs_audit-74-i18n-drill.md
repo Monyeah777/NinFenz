@@ -26,8 +26,12 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:f4b8c80ed81fde89af36fb87de482edfec90807f29038715e55ab40e05aeeebb
+  - protocol/code_metrics_baseline.json:0b2d79b56e4d99db082d5b681159023d6fbf3b55cf3f993bd3f547e0d121a019
 ---
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
 > 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
 
 > 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重

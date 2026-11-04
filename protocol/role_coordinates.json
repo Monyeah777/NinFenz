@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1046,
     "projection": 133,
-    "support": 351,
-    "verify": 964
+    "support": 352,
+    "verify": 965
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7439,6 +7439,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CCOS 一条链复现单测（cc_check → cc_attest → cc_verify → cc_replay）。",
+      "path": "desktop/tests/test_ccos_chain.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCV3 映射层单测（v2.0.0 T1：IR→chara_card_v3 + world entries）。",
       "path": "desktop/tests/test_ccv3_adapter.py",
       "role": "verify",
@@ -11723,7 +11729,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。",
+      "function": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。。其中 local.* 三端点已实装（nf serve --http，只绑回环），其余仍 status=proposed。",
       "path": "protocol/endpoint_contract.json",
       "role": "verify",
       "rule": "R-verify"
@@ -12102,16 +12108,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "95b85c6130ae0850810dff1d228b589a6d998b4b0640f0c35c759f656e73c743",
+  "root_digest": "fb0802d9d4450971d2583e43ad4fa146db986a20d8a8d00fe2f7c1b9c5c81ff0",
   "rule_counts": {
     "R-app": 1449,
-    "R-catch": 206,
+    "R-catch": 207,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 845,
+    "R-verify": 846,
     "auto:R-core": 262
   },
   "schema": "nf-role-coordinates/1"

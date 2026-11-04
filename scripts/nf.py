@@ -160,6 +160,11 @@ def _add_parser_base(sub):
     srv.add_argument("snapshot", nargs="?", default=None,
                      help="mcp.json 快照路径（如 nf run --fmt mcp 产物）；"
                           "缺省 = 实时仓库面（无需先产快照，默认路径直起）")
+    srv.add_argument("--http", action="store_true",
+                     help="改起**本地 HTTP 面**（127.0.0.1，GET /api/health + POST /api/verify "
+                          "+ POST /api/check；纯读、无客户端可控路径）")
+    srv.add_argument("--port", type=int, default=8765,
+                     help="--http 的端口（缺省 8765；0 = 由内核分配）")
 
     dsn = sub.add_parser("design",
                          help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
@@ -1940,6 +1945,10 @@ def _cmd_serve(args) -> int:
     transport 纪律：stdout 只写 MCP 消息（换行分隔 JSON-RPC）——初始化说明走 stderr。
     """
     from core.mcp_runtime import load_snapshot, McpRuntime
+
+    if getattr(args, "http", False):
+        from core import http_api
+        return http_api.serve("127.0.0.1", int(getattr(args, "port", 8765) or 0), ROOT)
 
     if args.snapshot:
         label = os.path.basename(args.snapshot)
