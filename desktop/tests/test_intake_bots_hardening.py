@@ -349,10 +349,11 @@ class GiteeInjectionWiringTest(unittest.TestCase):
         """
         import importlib
         li = bot_module()
-        li = sys.modules.get(getattr(li, "__name__", ""), li)
+        # 两边都按「当前模块对象」重载：别的用例可能改写/重载过 library_ingest 的函数绑定，
+        # 只重载一侧仍然对不上（2026-11-05 分片实测：只重载 Gitee 侧仍红）。
+        li = importlib.reload(li)
         sys.modules.pop("gitee_ingest", None)
-        gi = __import__("gitee_ingest")
-        importlib.reload(gi)
+        gi = importlib.reload(__import__("gitee_ingest"))
         return li, gi
 
     def test_gitee_reuses_the_single_source_probe(self):

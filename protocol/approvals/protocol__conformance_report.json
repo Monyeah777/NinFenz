@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-05",
   "approved_by": "Monyeah777",
-  "note": "隔离根因修复收口",
+  "note": "单源判据隔离收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "a11f501726dfc81f853ee56ce91aac284e20d8dec4a831f453ec613f23e81af7"
