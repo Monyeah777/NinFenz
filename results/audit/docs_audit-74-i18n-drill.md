@@ -26,8 +26,12 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:40218c1c860a73e62904d129a7139713a0a545bbae59d3bc8a53264ca36d4a07
+  - protocol/code_metrics_baseline.json:81f4ed8387240a6951bc4fcb003ead4355951910925b83225c528c7e28ac4027
 ---
+> 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
+
+> 重审（2026-11-04）：发布结论器：SAST nosec 标注 + 缺省改串行（并发只给独立 runner）
+
 > 重审（2026-11-04）：H1 修复：--trust-repo 环境变量不再泄漏（信任门不再被绕过）+ 新增回归判据
 
 > 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地

@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:40218c1c860a73e62904d129a7139713a0a545bbae59d3bc8a53264ca36d4a07
+  - protocol/code_metrics_baseline.json:81f4ed8387240a6951bc4fcb003ead4355951910925b83225c528c7e28ac4027
 ---
+> 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
+
+> 重审（2026-11-04）：发布结论器：SAST nosec 标注 + 缺省改串行（并发只给独立 runner）
+
 > 重审（2026-11-04）：H1 修复：--trust-repo 环境变量不再泄漏（信任门不再被绕过）+ 新增回归判据
 
 > 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地

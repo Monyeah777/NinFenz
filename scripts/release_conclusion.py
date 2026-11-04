@@ -12,8 +12,8 @@
   判据等价；并行只改墙钟。
 
 用法：
-  python scripts/release_conclusion.py                # 缺省 8 分片并行
-  python scripts/release_conclusion.py --jobs 4       # 并发数（缺省取 8）
+  python scripts/release_conclusion.py                # 缺省串行（8 片依次跑，墙钟换正确性）
+  python scripts/release_conclusion.py --jobs 8       # 并发：只建议给独立 runner（单机有争用）
   python scripts/release_conclusion.py --dry-run      # 只打印计划，不执行
   python scripts/release_conclusion.py --json         # 机读汇总
 与 nf release（发布编排/冻结链）分工：那个管「按什么次序冻结」，本件管「冻结后能不能发布」。
@@ -25,13 +25,15 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SHARDS = 8
+#: 缺省**串行**：分片模式是为「CI 矩阵各跑一片（不同机器）」设计的；同一台机上并发多片会
+#: 在守护端口/临时目录/计时判据上互相干扰（2026-11-04 实测：8 片并发时有分片报出与输入无关的
+#: 红，串行重跑即绿）。墙钟换正确性：要快请看 --jobs，并接受它是「给独立 runner 的」。
+DEFAULT_SHARDS = 1
 GUIDE = "修复指引："
 
 
@@ -58,46 +60,47 @@ def aggregate(results: list[dict]) -> dict:
             "wall": round(sum(float(r.get("wall") or 0.0) for r in results), 1)}
 
 
-def _run(argv: list[str], timeout: float) -> subprocess.CompletedProcess:
-    return subprocess.run(argv, cwd=str(ROOT), capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", timeout=timeout)
+def _run(argv: list[str], timeout: float) -> dict:
+    """跑**本仓固定命令** → {code, out, err}。
+
+    统一走 core 的受控进程原子：本件不再自己起 subprocess（那是 SAST 面要逐处标注的东西，
+    而受控原子已经把「argv 列表 / 无 shell / 超时即回收」写死在一处）。
+    """
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from core.atoms import proc as proc_atom  # 局部导入：模块级只留纯逻辑
+    return proc_atom.run_capture(argv, cwd=str(ROOT), timeout=timeout)
 
 
 def _git_status() -> list[str]:
-    try:
-        proc = _run(["git", "status", "--porcelain"], 120)
-    except (OSError, subprocess.SubprocessError):
+    proc = _run(["git", "status", "--porcelain"], 120)
+    if proc.get("code") is None:
         # git 不可用（非 git 检出/权限）：按「无脏树信息」处理，不阻断——判据只做门禁不放行
         return []
-    return porcelain_lines(proc.stdout)
+    return porcelain_lines(proc.get("out") or "")
 
 
 def _step_checks_only(verbose: bool) -> tuple[int, float]:
     t0 = time.perf_counter()
     if verbose:
         print("[1/2] bash verify.sh --checks-only …", flush=True)
-    try:
-        proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
-    except (OSError, subprocess.SubprocessError) as exc:
-        print(f"  ✗ checks-only 起不来：{exc}", file=sys.stderr)
-        return 1, time.perf_counter() - t0
-    out = (proc.stdout or "") + (proc.stderr or "")
+    proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
+    out = (proc.get("out") or "") + (proc.get("err") or "")
     tail = [ln for ln in out.splitlines() if ln.strip()][-1:]
+    rc = proc.get("code")
     if verbose:
-        print(f"  => rc={proc.returncode} · {tail[0] if tail else '（无输出）'}", flush=True)
-    return int(proc.returncode), time.perf_counter() - t0
+        print(f"  => rc={rc} · {tail[0] if tail else '（无输出）'}", flush=True)
+    return (1 if rc is None else int(rc)), time.perf_counter() - t0
 
 
 def _shard_one(index: int, total: int) -> dict:
     t0 = time.perf_counter()
     argv = [sys.executable, "scripts/verify_tests.py", "--shard",
             f"{index}/{total}", "--json"]
-    try:
-        proc = _run(argv, 3600)
-    except (OSError, subprocess.SubprocessError) as exc:
-        return {"shard": f"{index}/{total}", "rc": 1,
-                "wall": round(time.perf_counter() - t0, 1), "detail": str(exc)}
-    return {"shard": f"{index}/{total}", "rc": int(proc.returncode),
+    proc = _run(argv, 3600)
+    rc = proc.get("code")
+    return {"shard": f"{index}/{total}", "rc": 1 if rc is None else int(rc),
             "wall": round(time.perf_counter() - t0, 1)}
 
 
