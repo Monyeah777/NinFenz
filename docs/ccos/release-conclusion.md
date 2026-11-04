@@ -8,7 +8,7 @@
 一条命令给出「这台机器现在能不能发布」：**干净树闸门 → checks-only → N 分片并行 → 汇总**。
 
 与 `nf release` 的分工：`nf release` 管**次序**（一致性报告 → 批准 → 回执的冻结链）；
-本件管**结论**（冻结之后 check1-42 到底过没过）。两者不替代。
+本件管**结论**（冻结之后全部门禁到底过没过）。两者不替代。
 
 ## 为什么有它
 
@@ -37,14 +37,13 @@ python scripts/release_conclusion.py --json          # 机读汇总（含每片 
 # 纯函数判据（脏树闸门 / 分片汇总 / 计划生成）+ dry-run 集成
 python -m unittest desktop.tests.test_release_conclusion    # 10 项全绿
 
-# 真跑（干净树上）：8 片并行 + checks-only，总墙钟约 15 分钟量级
+# 真跑（干净树上）：8 片并行 + checks-only（墙钟随机器与并发数变，不在此钉数字）
 python scripts/release_conclusion.py --jobs 8
 ```
 
 ## 边界
 
-- **不等于 `bash verify.sh` 全量档的逐条对照**：它跑的是同一批 check（checks-only 覆盖
-  check1-42 的结构面，分片覆盖 check12 的测试面）。真要在 CI 上做「单进程全量」仍用
-  `bash verify.sh`。
+- **不等于 `bash verify.sh` 全量档的逐条对照**：它跑的是同一批门禁（checks-only 覆盖
+  结构面，分片覆盖测试面）。真要在 CI 上做「单进程全量」仍用 `bash verify.sh`。
 - **不冻结任何东西**：本件只判读，不写仓库（冻结请用 `nf release --freeze --apply`）。
 - 分片并发上限按 `--jobs`，越界自动夹到 `[1, 16]`。

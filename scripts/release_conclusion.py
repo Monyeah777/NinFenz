@@ -67,6 +67,7 @@ def _git_status() -> list[str]:
     try:
         proc = _run(["git", "status", "--porcelain"], 120)
     except (OSError, subprocess.SubprocessError):
+        # git 不可用（非 git 检出/权限）：按「无脏树信息」处理，不阻断——判据只做门禁不放行
         return []
     return porcelain_lines(proc.stdout)
 

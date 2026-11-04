@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:5802553074a90470c8b360fc69b577ddb0945c5aeed988c62f414869a8110a78
   - tui/_surface.py:7a4db227d2a85a0b2cefab97ee40faa997964ca43bfba5d540854366179185f8
-  - protocol/check12_weights.json:d02dd92ed5c7bb22c8c3c40302a803c5d8776c552e443c804cb0aa1882314b80
+  - protocol/check12_weights.json:07c50d217b996f0d7bc140cc22bd4df05d5cc846890cf27706671f65c20cde6e
   - protocol/coupling_baseline.json:306e6d65760b82734bc03a1e0e295e893cae486c66c382d605cff9ce82d9c258
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-04）：H1 修复：--trust-repo 环境变量不再泄漏（信任门不再被绕过）+ 新增回归判据
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）

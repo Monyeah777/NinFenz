@@ -560,8 +560,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--quiet-time", action="store_true",
                     help="输出里不带墙钟耗时（**确定性输出**用；见下）")
     a = ap.parse_args(argv)
-    if getattr(a, "trust_repo", False):
-        os.environ[repo_trust.ENV_TRUST] = "1"
 
     # 不确定性面**默认不进输出**（2026-10-15 实测教训）：`nf verify` 曾被
     # test_daemon_parity 抓到「直跑 vs 守护」输出逐字节不同（3480 vs 3478 字节），
@@ -578,10 +576,23 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     allv: list[Verdict] = []
     wall0 = time.perf_counter()
-    for _ in range(max(1, a.repeat)):
-        allv = run_checks(root, only, m)
-        if not a.json and a.repeat > 1 and _ < a.repeat - 1:
-            continue
+    # H1 修复（2026-11-04 实测）：--trust-repo 此前直接写进程级 NF_TRUST_REPO=1 且**从不还原**
+    # ——同进程里后续任何一次信任门判定都会被这条残留放行（信任门被环境泄漏绕过；分片实测
+    # 当场抓到：一个先跑过 --trust-repo 的用例让后面的「拒绝不可信仓库」判据失效）。
+    # 改成「只在真正跑 check 的区间内生效，出区间按原值还原」。
+    _saved_trust = os.environ.get(repo_trust.ENV_TRUST)
+    if getattr(a, "trust_repo", False):
+        os.environ[repo_trust.ENV_TRUST] = "1"
+    try:
+        for _ in range(max(1, a.repeat)):
+            allv = run_checks(root, only, m)
+            if not a.json and a.repeat > 1 and _ < a.repeat - 1:
+                continue
+    finally:
+        if _saved_trust is None:
+            os.environ.pop(repo_trust.ENV_TRUST, None)
+        else:
+            os.environ[repo_trust.ENV_TRUST] = _saved_trust
     wall = time.perf_counter() - wall0
 
     if a.json:

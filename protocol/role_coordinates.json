@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1450,
+    "app": 1451,
     "entry": 26,
     "floor": 5,
     "prod": 1047,
     "projection": 134,
-    "support": 353,
-    "verify": 965
+    "support": 354,
+    "verify": 966
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8735,6 +8735,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "发布结论复跑器（scripts/release_conclusion.py）单测——纯函数判据 + dry-run 集成。",
+      "path": "desktop/tests/test_release_conclusion.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "发布编排（core/release_gate.py）回归：机读策略过 schema + 计划有序 + 计划快照 + 变异自证。",
       "path": "desktop/tests/test_release_gate.py",
       "role": "verify",
@@ -12114,16 +12120,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8ee2c9e4ed1579cf4c9fa846c1c41745c260292d381b19e5717fc903c035d9ed",
+  "root_digest": "16bf83ae50956f8e236fc4fea8c69909e223f6efa5aa2ceacc26764079b3edb5",
   "rule_counts": {
-    "R-app": 1450,
-    "R-catch": 207,
+    "R-app": 1451,
+    "R-catch": 208,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 847,
+    "R-verify": 848,
     "auto:R-core": 264
   },
   "schema": "nf-role-coordinates/1"

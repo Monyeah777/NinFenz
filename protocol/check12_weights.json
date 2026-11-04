@@ -252,6 +252,7 @@
     "test_registry_sync": 0.2,
     "test_regression_score": 12.8,
     "test_related_of": 0.2,
+    "test_release_conclusion": 0.5,
     "test_release_gate": 0.5,
     "test_repeat_safety": 0.2,
     "test_repo_face": 1.1,
@@ -3002,6 +3003,16 @@
     "test_related_of.RelatedOfTest.test_module_owners": 0.0,
     "test_related_of.RelatedOfTest.test_package_see_also_refs": 0.0,
     "test_related_of.RelatedOfTest.test_unknown_target": 0.0,
+    "test_release_conclusion.TestDirtyRefusal.test_refuses_when_repo_dirty": 0.09,
+    "test_release_conclusion.TestDryRun.test_dry_run_allow_dirty_reports_no_block": 0.16,
+    "test_release_conclusion.TestDryRun.test_dry_run_prints_plan": 0.16,
+    "test_release_conclusion.TestPureLogic.test_aggregate_all_pass": 0.0,
+    "test_release_conclusion.TestPureLogic.test_aggregate_empty_is_not_ok": 0.0,
+    "test_release_conclusion.TestPureLogic.test_aggregate_one_fail": 0.0,
+    "test_release_conclusion.TestPureLogic.test_dirty_guard_allow_flag": 0.0,
+    "test_release_conclusion.TestPureLogic.test_dirty_guard_allows_clean": 0.0,
+    "test_release_conclusion.TestPureLogic.test_dirty_guard_refuses_dirty": 0.0,
+    "test_release_conclusion.TestPureLogic.test_porcelain_lines_ignores_blanks": 0.0,
     "test_release_gate.CheckTest.test_change_entry_without_note_is_caught": 0.14,
     "test_release_gate.CheckTest.test_empty_root_reports_issue_not_crash": 0.0,
     "test_release_gate.CheckTest.test_manifest_is_deterministic": 0.08,
@@ -3758,5 +3769,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1265.2
+  "total_s": 1265.7
 }

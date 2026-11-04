@@ -141,6 +141,28 @@ class GateRefusalTest(_Base):
         self.assertIn("拒绝", text)
         self.assertIn("--trust-repo", text, "拒绝文案必须给修复指引")
 
+    def test_engine_trust_env_is_scoped_and_restored(self):
+        """H1 回归：--trust-repo 只在执行区间生效，出区间必须还原。
+
+        为什么（2026-11-04 分片实测）：引擎此前直接写进程级 NF_TRUST_REPO=1 且从不还原，
+        同进程里后续任何一次信任门判定都会被这条残留放行——一个先跑过 --trust-repo 的用例
+        就能让后面的「拒绝不可信仓库」判据失效。信任门被环境泄漏绕过 = 安全缺陷。
+        """
+        from core import gate_engine as ge
+
+        prev = os.environ.pop("NF_TRUST_REPO", None)
+        try:
+            ge.main(["--json", "--only", "999", "--trust-repo"])
+            self.assertIsNone(os.environ.get("NF_TRUST_REPO"),
+                              "trust 环境变量泄漏出执行区间（后续信任门会被放行）")
+            os.environ["NF_TRUST_REPO"] = "0"
+            ge.main(["--json", "--only", "999"])
+            self.assertEqual("0", os.environ.get("NF_TRUST_REPO"), "原有值必须按原样还原")
+        finally:
+            os.environ.pop("NF_TRUST_REPO", None)
+            if prev is not None:
+                os.environ["NF_TRUST_REPO"] = prev
+
     def test_cli_verify_preflight_refuses_untrusted_repo(self):
         """`nf verify` 在**执行前**拒绝（rc=2 + 风险文案），而不是跑完再报失败。"""
         evil = self._tmp_repo("https://github.com/evil/repo.git")
