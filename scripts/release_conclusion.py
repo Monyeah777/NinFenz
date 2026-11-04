@@ -55,6 +55,39 @@ def dirty_guard(lines: list[str], allow_dirty: bool) -> str:
             "在改到一半的树上跑分片会产生与输入无关的假红；确需跑加 --allow-dirty）")
 
 
+def payload_drift_guard(manifest: dict | None, head: str) -> str:
+    """npm payload 与 HEAD 的耦合闸门 → 拒绝原因（空串 = 放行）。
+
+    为什么必须前置（2026-11-04 实测踩了三次）：npm 门槛要求 payload 清单里的 source_commit
+    == HEAD，而 payload 是**忽略文件**——所以「工作树干净」并不代表「payload 是最新的」。
+    不前置的话，要跑满 8 片（约 30 分钟）才在最后一处看见「payload 与 HEAD 不一致」，
+    而且报出来的只是某个分片的一条红。
+    """
+    if not isinstance(manifest, dict):
+        return ""                        # payload 不在场：忽略面（发布前才 stage）
+    commit = str(manifest.get("source_commit") or "")
+    if not commit or not head:
+        return ""
+    if head.startswith(commit) or commit.startswith(head):
+        return ""
+    return (f"npm payload 与 HEAD 不一致（清单 {commit[:12]} ≠ HEAD {head[:12]}）"
+            f"（{GUIDE}在 packaging/npm 里跑 node tools/stage-payload.mjs 重新暂存——"
+            "它只写忽略文件，不产生提交；暂存后再跑本件）")
+
+
+def read_payload_manifest(path) -> dict | None:
+    """读 payload 清单 → dict 或 None（坏件也当不在场：这条只是前置提示，不是判据本体）。"""
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    try:
+        doc = json.loads(raw)
+    except ValueError:
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
 def aggregate(results: list[dict]) -> dict:
     """分片结果汇总 → {ok, total, failed, wall}（纯函数，便于单测）。"""
     failed = [r for r in results if int(r.get("rc") or 0) != 0]
@@ -132,19 +165,28 @@ def main(argv=None) -> int:
     concurrency = max(1, min(int(args.jobs), shards))
     plan = {"root": str(ROOT), "shards": shards, "concurrency": concurrency,
             "checks_only": not args.skip_checks,
-            "steps": ["git status --porcelain", "bash verify.sh --checks-only"]
+            "steps": ["git status --porcelain",
+                      "packaging/npm/payload/payload-manifest.json 的 source_commit == HEAD",
+                      "bash verify.sh --checks-only"]
                      + [f"python scripts/verify_tests.py --shard {i}/{shards}"
                         for i in range(shards)]}
 
     dirty = _git_status()
     blocked = dirty_guard(dirty, args.allow_dirty)
+    head = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
+    manifest = read_payload_manifest(ROOT / "packaging" / "npm" / "payload"
+                                     / "payload-manifest.json")
+    payload_blocked = payload_drift_guard(manifest, head)
     if args.dry_run:
         payload = {"schema": "nf-release-conclusion/1", "dry_run": True, "plan": plan,
-                   "dirty": dirty, "blocked": blocked}
+                   "dirty": dirty, "blocked": blocked, "payload_blocked": payload_blocked}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
-        return 0 if not blocked else 2
+        return 0 if not (blocked or payload_blocked) else 2
     if blocked:
         print(f"  ✗ {blocked}", file=sys.stderr)
+        return 2
+    if payload_blocked:
+        print(f"  ✗ {payload_blocked}", file=sys.stderr)
         return 2
     if dirty:
         print(f"  [WARN] 脏树放行（{len(dirty)} 处变更）——结果可能含中间态假红",

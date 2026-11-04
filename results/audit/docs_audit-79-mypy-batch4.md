@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:9b42d455ccac28fe95607ab0554d80e47ab24d860ead5cd0696197235b1914cd
+  - protocol/code_metrics_baseline.json:2578c3ef5480d68b27739c1ff01b3236a7893cf6dbf9febbf083b83dc6e510bb
 ---
+> 重审（2026-11-05）：威胁模型 v0（能证明/不承诺/缺口）+ 发布结论前置 payload 闸门 + 站点 npm 数字自动改写
+
 > 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
 
 > 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）

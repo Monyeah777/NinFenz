@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:5802553074a90470c8b360fc69b577ddb0945c5aeed988c62f414869a8110a78
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:9b42d455ccac28fe95607ab0554d80e47ab24d860ead5cd0696197235b1914cd
+  - protocol/code_metrics_baseline.json:2578c3ef5480d68b27739c1ff01b3236a7893cf6dbf9febbf083b83dc6e510bb
 ---
+> 重审（2026-11-05）：威胁模型 v0（能证明/不承诺/缺口）+ 发布结论前置 payload 闸门 + 站点 npm 数字自动改写
+
 > 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
 
 > 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）

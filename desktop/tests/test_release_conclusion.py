@@ -62,6 +62,40 @@ class TestPureLogic(unittest.TestCase):
         self.assertFalse(self.gate.aggregate([])["ok"])
 
 
+class TestPayloadGuard(unittest.TestCase):
+    """npm payload 与 HEAD 的耦合闸门（前置判据：不通过就不该跑 30 分钟）。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_no_manifest_is_not_blocking(self):
+        self.assertEqual("", self.gate.payload_drift_guard(None, "abc123"))
+
+    def test_matching_commit_passes(self):
+        self.assertEqual("", self.gate.payload_drift_guard(
+            {"source_commit": "abc123def456"}, "abc123def4567890"))
+
+    def test_mismatch_blocks_with_fix_command(self):
+        msg = self.gate.payload_drift_guard({"source_commit": "deadbeefdead"},
+                                            "cafebabecafe0000")
+        self.assertIn("npm payload 与 HEAD 不一致", msg)
+        self.assertIn("stage-payload.mjs", msg)
+
+    def test_missing_commit_field_passes(self):
+        self.assertEqual("", self.gate.payload_drift_guard({}, "abc123"))
+
+    def test_bad_manifest_is_treated_as_absent(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "payload-manifest.json"
+            p.write_text("{not json", encoding="utf-8")
+            self.assertIsNone(self.gate.read_payload_manifest(p))
+            p.write_text("[1,2]", encoding="utf-8")
+            self.assertIsNone(self.gate.read_payload_manifest(p))
+            p.write_text('{"source_commit": "abc"}', encoding="utf-8")
+            self.assertEqual("abc", self.gate.read_payload_manifest(p)["source_commit"])
+
+
 class TestDryRun(unittest.TestCase):
     def _run(self, *args):
         return subprocess.run([sys.executable, str(SCRIPT), "--dry-run", *args],

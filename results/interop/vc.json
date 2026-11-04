@@ -7,7 +7,7 @@
     "contracts": 27,
     "id": "nf:conformance_report",
     "receiptCount": 66,
-    "receiptRoot": "dc7b5249c3b3b3e0b57381d61e2e33181d545757a288e7c0b32f02d47a49ec9e",
+    "receiptRoot": "14b7b64c9d72ac58550498f414c1bbb88b971f5635f20c7fbee7b8108fa92a0e",
     "verdict": "conformant"
   },
   "issuer": "Monyeah777",
@@ -15,7 +15,7 @@
     "VerifiableCredential",
     "NfConformanceCredential"
   ],
-  "validFrom": "2026-11-04",
+  "validFrom": "2026-11-05",
   "x-nf-note": "派生自 protocol/conformance_report.json + protocol/RECEIPTS.json + protocol/approvals/*（纯派生，不新增真源）",
   "x-nf-proof-status": "unsigned（本仓签名走 ssh 外挂锚 nf attest；未接 JWS/Data Integrity 签名套件——形状可读，不可验证，勿当凭证使用）"
 }

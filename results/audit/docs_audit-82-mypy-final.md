@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:9b42d455ccac28fe95607ab0554d80e47ab24d860ead5cd0696197235b1914cd
+  - protocol/code_metrics_baseline.json:2578c3ef5480d68b27739c1ff01b3236a7893cf6dbf9febbf083b83dc6e510bb
 ---
+> 重审（2026-11-05）：威胁模型 v0（能证明/不承诺/缺口）+ 发布结论前置 payload 闸门 + 站点 npm 数字自动改写
+
 > 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
 
 > 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）

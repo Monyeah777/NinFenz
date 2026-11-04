@@ -47,3 +47,8 @@ python scripts/release_conclusion.py
 - **不等于 `bash verify.sh` 全量档的逐条对照**：它跑的是同一批门禁（checks-only 覆盖结构面，
   分片覆盖测试面）。要在 CI 上做「单进程全量」仍用 `bash verify.sh`。
 - **不冻结任何东西**：本件只判读，不写仓库（冻结请用 `nf release --freeze --apply`）。
+- **payload 与 HEAD 耦合（前置闸门）**：npm 门槛要求 `packaging/npm/payload/payload-manifest.json`
+  的 `source_commit == HEAD`，而 payload 是忽略文件——**「工作树干净」不代表 payload 是最新的**。
+  故本件跑之前会先比一次：不一致直接 rc=2 并给出重新暂存的命令，不浪费 30 分钟跑完才发现。
+  反过来说：**任何新提交都会让上一次结论失效**，重新取证前先 `node tools/stage-payload.mjs`
+  （只写忽略文件，不产生提交）。

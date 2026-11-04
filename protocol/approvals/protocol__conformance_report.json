@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-04",
+  "approved_at": "2026-11-05",
   "approved_by": "Monyeah777",
-  "note": "分片 0/8 用例隔离根因修复",
+  "note": "威胁模型与发布前置闸门收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "9c1de7f7b7c6d9e51a8d4996c9cbac26362b153a93a36934576e5dd4493b8990"
+  "subject_digest": "5a57ada876eb62875a6da1a2173008e283e6c3f391f1bc4d14b82c2478a755aa"
 }

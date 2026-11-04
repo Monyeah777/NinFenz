@@ -12,6 +12,8 @@ CCOS（Content Contract Operating System）= 内容契约运行时。本文件�
 ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定义内容域、**不**新增真源：
 所有调用都必须能落到仓库内**已存在**的产物或命令上（`maps_to`），落不到就标 `unimplemented`。
 
+**威胁模型**（能证明什么、不能证明什么、有哪些已知缺口）：见 [threat-model.md](threat-model.md)。
+
 **非目标**（与 `docs/layers.md` 的 L0–L5 边界一致）：不是计算内核（不跑模型）、不是云、
 不是 DRM、不是检测模型；本 ABI 不承诺任何不可计算的性质。
 
