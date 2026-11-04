@@ -507,6 +507,9 @@ def _add_parser_production(sub):
     evp.add_argument("--expires-at", default="",
                      help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；缺省 = 不过期）")
     evp.add_argument("--revocations", default="", help="吊销表 JSON 路径（随包分发）")
+    evp.add_argument("--anchor", default="",
+                     help="声明继承的外部锚点 JSON（{count, head}）——写进清单，复验方用同一份"
+                          "材料核对可证「不是被截断的更早版本」")
     evp.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evv = esub.add_parser("verify", help="第三方复验证据包（纯读；不需要仓库）",
                           description="复验：结构→成员摘要→根→包含证明→链→信封→吊销→时效，"
@@ -523,10 +526,13 @@ def _add_parser_production(sub):
     evv.add_argument("--revocations", default="",
                      help="外部吊销表 JSON（优先于包内嵌的那份）")
     evv.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evv.add_argument("--anchor", default="",
+                     help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」；"
+                          "不给则只在 warnings 里说明无法证明未截断（不提升强度）")
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（29 条已知攻击，逐条比对判定）",
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（33 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
                                       "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
@@ -3173,8 +3179,10 @@ def _evidence_verify(args):
                if args.revocations else None)
         path = _rel_out(target) if not os.path.isabs(target) else target
         root = _rel_out(args.root) if args.root else ""
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if getattr(args, "anchor", "") else None)
         res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
-                                  root=root, kind=args.kind)
+                                  root=root, kind=args.kind, anchor=anc)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -3185,6 +3193,10 @@ def _evidence_verify(args):
               f"成员 {res['count']} 件 · 根 {res['root'][:16]}")
         for i in res["issues"]:
             print(f"  [FAIL] {i}", file=sys.stderr)
+        for w in res.get("warnings") or []:
+            print(f"  [WARN] {w}", file=sys.stderr)
+        if res.get("anchor_verified"):
+            print("  锚点：已核对（不是被截断的更早版本）")
         if res["verdict"] == "ok":
             print("  ✓ 证据成立（注意：成立 = 成员未改、证明到根、信封自洽；"
                   "不等于内容质量或内容真实）")
@@ -3285,9 +3297,12 @@ def _evidence_pack(args):
         key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
         rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
                if args.revocations else None)
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if getattr(args, "anchor", "") else None)
         out = _rel_out(args.out) if args.out else evidence.default_out()
         dest, info = evidence.write(ROOT, out, rels, issuer=args.issuer,
-                                    key=key, expires_at=args.expires_at, revocations=rev)
+                                    key=key, expires_at=args.expires_at, revocations=rev,
+                                    anchor=anc)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
     if args.json:
@@ -3304,7 +3319,7 @@ def _evidence_pack(args):
 
 
 def _evidence_bench(args):
-    """nf evidence bench：攻击矩阵基准（29 条已知攻击，逐条比对期望判定）。"""
+    """nf evidence bench：攻击矩阵基准（33 条已知攻击，逐条比对期望判定）。"""
     import json as _json
 
     from core import evidence
@@ -4944,7 +4959,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
                     "handoff_out", "manifest_out", "context_dir", "responses",
                     "experiment", "ballots", "bundle",
-                    "policy", "revocations")
+                    "policy", "revocations", "anchor")
 
 
 def _path_writing_issue(args) -> str:
@@ -4981,9 +4996,10 @@ def _path_writing_issue(args) -> str:
 #: 为什么不再手写名单：二批普查抓到 5 处漏网，根因就是「同一概念换了个参数名（`path` / `paths`）
 #: 就漏出闸门」——所以改成**枚举为准**，并由 `test_cli_error_framing.PathFlagCoverageTest`
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
-_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节"}
+_UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
+                       "evidence_bundle": "证据包是 zip（二进制容器）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
-                    "evidence_bundle", "issuer", "object", "policy", "revocations", "targets",
+                    "anchor", "issuer", "object", "policy", "revocations", "targets",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
                     "prompt_file", "questions", "registry", "root", "runs", "script_file",

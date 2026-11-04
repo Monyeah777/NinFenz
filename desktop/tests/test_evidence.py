@@ -329,7 +329,7 @@ class TestBench(_Base):
         res = evidence.bench()
         bad = [c for c in res["cases"] if not c["ok"]]
         self.assertEqual(bad, [])
-        self.assertEqual(res["total"], 29)
+        self.assertEqual(res["total"], 33)
         self.assertTrue(res["ok"])
 
     def test_bench_markdown(self):
@@ -402,6 +402,40 @@ class TestStandaloneParity(_Base):
                          evidence.verify_any(str(ok_path), key=self.key, revocations=rev)
                          ["verdict"])
 
+    def test_anchor_verdicts_agree(self):
+        """双实现必须同判锚点相关判定（anchored ok / 截断 / 分叉）。"""
+        import subprocess
+        kf = self._key_file()
+        tmp = Path(self._tmp.name)
+        for n in ("a.md", "b.md", "c.md"):
+            (tmp / "docs" / n).write_text(f"# {n}\n\nx\n", encoding="utf-8")
+        b2, _i2 = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md"],
+                                 created_at="2026-01-01T00:00:00Z", key=self.key)
+        v2 = tmp / "v2.zip"
+        v2.write_bytes(b2)
+        head2 = {"count": 2, "head": evidence.verify(str(v2), key=self.key)["head"]}
+        b3, _i3 = evidence.build(str(self.tmp), ["docs/a.md", "docs/b.md", "docs/c.md"],
+                                 created_at="2026-01-02T00:00:00Z", key=self.key,
+                                 anchor=head2)
+        v3 = tmp / "v3.zip"
+        v3.write_bytes(b3)
+        head3 = {"count": 3, "head": evidence.verify(str(v3), key=self.key)["head"]}
+
+        def standalone(path, anchor):
+            af = Path(self._tmp.name, "anchor.json")
+            af.write_text(json.dumps(anchor), encoding="utf-8")
+            proc = subprocess.run([sys.executable, str(self.SCRIPT), "--evidence", str(path),
+                                   "--json", "--key-file", str(kf), "--anchor", str(af)],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace")
+            return json.loads(proc.stdout)["verdict"]
+
+        cases = [(v3, head2, "ok"), (v2, head3, "invalid"),
+                 (v3, {"count": 2, "head": "0" * 64}, "invalid")]
+        for path, anchor, want in cases:
+            core = evidence.verify(str(path), key=self.key, anchor=anchor)["verdict"]
+            self.assertEqual(want, core, str(path))
+            self.assertEqual(core, standalone(path, anchor), str(path))
     def test_receipts_and_attest_forms_agree(self):
         doc = receipts.build_scope(str(self.tmp), ["docs/a.md", "docs/b.md"], scope="ev")
         rec = Path(self._tmp.name, "RECEIPTS.json")
@@ -512,6 +546,39 @@ class TestReplay(_Base):
                                   capture_output=True, text=True, encoding="utf-8",
                                   errors="replace")
             self.assertEqual(json.loads(proc.stdout)["verdict"], core, name)
+
+
+    def test_anchor_truncation_is_caught(self):
+        """G1：外部锚点防「整链截断成更早版本」——包只有 2 条、锚点记 3 条即 invalid。"""
+        tmp = Path(self._tmp.name)
+        (tmp / "d").mkdir(exist_ok=True)
+        for n in ("a.md", "b.md", "c.md"):
+            (tmp / "d" / n).write_text(f"# {n}\n\nx\n", encoding="utf-8")
+        b2, _i2 = evidence.build(str(tmp), ["d/a.md", "d/b.md"],
+                                 created_at="2026-01-01T00:00:00Z", key=self.key)
+        v2 = tmp / "v2.zip"
+        v2.write_bytes(b2)
+        head2 = evidence.verify(str(v2), key=self.key)["head"]
+        b3, _i3 = evidence.build(str(tmp), ["d/a.md", "d/b.md", "d/c.md"],
+                                 created_at="2026-01-02T00:00:00Z", key=self.key,
+                                 anchor={"count": 2, "head": head2})
+        v3 = tmp / "v3.zip"
+        v3.write_bytes(b3)
+        good = evidence.verify(str(v3), key=self.key,
+                               anchor={"count": 2, "head": head2})
+        self.assertEqual("ok", good["verdict"])
+        self.assertTrue(good["anchor_verified"])
+        head3 = evidence.verify(str(v3), key=self.key)["head"]
+        cut = evidence.verify(str(v2), key=self.key, anchor={"count": 3, "head": head3})
+        self.assertEqual("invalid", cut["verdict"])
+        self.assertIn("截断", " ".join(cut["issues"]))
+        fork = evidence.verify(str(v3), key=self.key,
+                               anchor={"count": 2, "head": "0" * 64})
+        self.assertEqual("invalid", fork["verdict"])
+        noisy = evidence.verify(str(v3), key=self.key)
+        self.assertEqual("ok", noisy["verdict"], "缺锚点材料不判死")
+        self.assertFalse(noisy["anchor_verified"], "缺锚点材料不得声称已核对")
+        self.assertTrue(noisy["warnings"], "缺锚点材料必须留下 warning")
 
 
 if __name__ == "__main__":

@@ -83,6 +83,61 @@ def _leaf(path: str, digest: str) -> str:
     return receipts.leaf_hash(payload).hex()
 
 
+def _chain_prefix_head(entries: Sequence[dict[str, Any]], upto: int) -> str:
+    """前 upto 条折叠出的链头（锚点核对用：外部锚点记的是「当时那条链的链头」）。"""
+    prev = "0" * 64
+    for e in entries[:max(0, upto)]:
+        h = hashlib.sha256()
+        h.update(NODE_PREFIX)
+        for part in (prev.encode("ascii"), str(e.get("leaf") or "").encode("ascii")):
+            h.update(b"|")
+            h.update(part)
+        prev = h.hexdigest()
+    return prev
+
+
+def check_anchor(entries: Sequence[dict[str, Any]], meta: dict[str, Any],
+                 anchor: dict[str, Any] | None, res: dict[str, Any]) -> None:
+    """外部锚点核对（G1：防「整链被截断成更早版本」）。
+
+    语义：锚点 = 某个**外部可核**的（条目数 count, 链头 head）二元组，例如上一次发布的链头、
+    外部日志的序号+摘要。核对三件事：
+      1) 本包的链必须包含锚点声称的那一段前缀（count 条）——少于它即**被截断**；
+      2) 该前缀折叠出的链头必须等于锚点记录（否则历史被改写/分叉）；
+      3) 包内声明的 anchor 与外部锚点材料必须一致（声称与证据不得互相矛盾）。
+    没提供锚点材料时：不判死、不判 ok —— 只在 warnings 里写明「无法证明未被截断」，
+    并且**不**提升 level（缺证据不等于证据成立）。
+    """
+    declared = meta.get("anchor")
+    if isinstance(declared, dict) and declared:
+        res["anchor_ref"] = {"count": declared.get("count"), "head": declared.get("head")}
+    if anchor is None:
+        if res["anchor_ref"]:
+            res["warnings"].append("包声明了外部锚点但未提供锚点材料（" + GUIDE +
+                                   "无法证明未被截断：请向发布方索要锚点文件并加 --anchor）")
+        return
+    cnt = anchor.get("count")
+    head = str(anchor.get("head") or "")
+    if not isinstance(cnt, int) or cnt < 0 or not head:
+        res["issues"].append("锚点材料形状不对（" + GUIDE +
+                             "需要 {count: 非负整数, head: 非空字符串}）")
+        return
+    if res["anchor_ref"] and (res["anchor_ref"].get("count") != cnt
+                               or res["anchor_ref"].get("head") != head):
+        res["issues"].append("包内 anchor 与外部锚点不一致（" + GUIDE +
+                             "声称的锚点与证据互相矛盾——请以外部锚点为准重新打包）")
+        return
+    if len(entries) < cnt:
+        res["issues"].append(f"证据包被截断：包只有 {len(entries)} 条，锚点记录 {cnt} 条"
+                             f"（{GUIDE}截断的历史不能当现在——请索要完整包）")
+        return
+    if _chain_prefix_head(entries, cnt) != head:
+        res["issues"].append("与外部锚点不符：该位置的链头不一致（" + GUIDE +
+                             "历史被改写或来自另一条链，二者只能有一个是真的）")
+        return
+    res["anchor_verified"] = True
+
+
 def _chain_head(entries: Sequence[dict[str, Any]]) -> str:
     """透明日志链头：H(NODE_PREFIX | prev | leaf) 逐节折叠（公式同 transparency_log）。"""
     prev = "0" * 64
@@ -100,7 +155,8 @@ def _chain_head(entries: Sequence[dict[str, Any]]) -> str:
 
 def build(root: str, targets: Sequence[str], issuer: str = "",
           key: bytes | None = None, expires_at: str = "", created_at: str = "",
-          revocations: dict[str, Any] | None = None) -> tuple[bytes, dict[str, Any]]:
+          revocations: dict[str, Any] | None = None,
+          anchor: dict[str, Any] | None = None) -> tuple[bytes, dict[str, Any]]:
     """把目标文件打成自包含证据包 → (zip 字节, 摘要信息)。
 
     - 回执与根：receipts.build_scope（本模块只排序去重，公式不复制）
@@ -120,11 +176,12 @@ def build(root: str, targets: Sequence[str], issuer: str = "",
     if revocations is not None:
         members.append((REVOCATIONS_ENTRY, _json_bytes(revocations)))
     meta = _manifest(doc["root"], entries, atts, created_at, issuer, key,
-                     str(expires_at or ""), revocations is not None)
+                     str(expires_at or ""), revocations is not None, anchor)
     members.append((BUNDLE_ENTRY, _json_bytes(meta)))
     info = {"root": meta["root"], "count": meta["count"], "head": meta["chain"]["head"],
             "level": meta["level"], "attestations": len(atts),
-            "revocations": revocations is not None, "created_at": meta["created_at"]}
+            "revocations": revocations is not None, "created_at": meta["created_at"],
+            "anchor": meta.get("anchor") or None}
     return _zip_bytes(members), info
 
 
@@ -168,8 +225,8 @@ def _json_bytes(obj: Any) -> bytes:
 
 def _manifest(root_digest: str, entries: Sequence[dict[str, Any]], atts: list[str],
               created_at: str, issuer: str, key: bytes | None, expires_at: str,
-              has_rev: bool) -> dict[str, Any]:
-    return {
+              has_rev: bool, anchor: dict[str, Any] | None = None) -> dict[str, Any]:
+    doc: dict[str, Any] = {
         "schema": SCHEMA,
         "created_at": created_at or attest.issue_stamp(),
         "producer": {"tool": "nf", "issuer": issuer or ""},
@@ -183,9 +240,13 @@ def _manifest(root_digest: str, entries: Sequence[dict[str, Any]], atts: list[st
         "revocations": REVOCATIONS_ENTRY if has_rev else "",
         "expires_at": expires_at,
         "boundary": ("本包可证：成员字节未被改动、成员集与根一致、单条可折叠到根、"
-                     "条目顺序未被插删、信封与主体一致。"
+                     "条目顺序未被插删、信封与主体一致；给出外部锚点时还可证"
+                     "「不是被截断的更早版本」。"
                      "本包**不**提供：不可抵赖（需第三方见证）、内容质量、内容真实性"),
     }
+    if isinstance(anchor, dict) and anchor:
+        doc["anchor"] = {"count": anchor.get("count"), "head": anchor.get("head")}
+    return doc
 
 
 def _zip_bytes(members: Sequence[tuple[str, bytes]]) -> bytes:
@@ -212,10 +273,11 @@ def default_out() -> str:
 
 def write(root: str, out: str, targets: Sequence[str], issuer: str = "",
           key: bytes | None = None, expires_at: str = "", created_at: str = "",
-          revocations: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
+          revocations: dict[str, Any] | None = None,
+          anchor: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
     """打包并落盘（单一写出处；调用方负责输出路径口径）。"""
     data, info = build(root, targets, issuer=issuer, key=key, created_at=created_at,
-                       expires_at=expires_at, revocations=revocations)
+                       expires_at=expires_at, revocations=revocations, anchor=anchor)
     dest = out if os.path.isabs(out) else os.path.join(root, out)
     parent = os.path.dirname(dest)
     if parent:
@@ -296,7 +358,8 @@ def _load_meta(rd: _Reader) -> dict[str, Any]:
 
 def _empty_result() -> dict[str, Any]:
     return {"verdict": "invalid", "level": "none", "root": "", "head": "", "count": 0,
-            "issues": [], "created_at": "", "expires_at": "", "revoked_by": None}
+            "issues": [], "warnings": [], "created_at": "", "expires_at": "",
+            "revoked_by": None, "anchor_ref": None, "anchor_verified": False}
 
 
 def _fill_header(res: dict[str, Any], meta: dict[str, Any]) -> None:
@@ -489,7 +552,7 @@ def _apply_expiry(res: dict[str, Any], at: str) -> bool:
 
 def verify(bundle: str, key: bytes | None = None,
            revocations: dict[str, Any] | None = None,
-           at: str = "") -> dict[str, Any]:
+           at: str = "", anchor: dict[str, Any] | None = None) -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
@@ -518,6 +581,7 @@ def verify(bundle: str, key: bytes | None = None,
             return res
         _check_proofs(entries, res)
         _check_chain(entries, meta, res)
+        check_anchor(entries, meta, anchor, res)
         _check_extras(rd, entries, res["issues"])
         if res["issues"]:
             return res
@@ -765,7 +829,8 @@ def _apply_revocation_doc(revocations: dict[str, Any] | None,
 
 def verify_any(path: str, key: bytes | None = None,
                revocations: dict[str, Any] | None = None, at: str = "",
-               root: str = "", kind: str = "") -> dict[str, Any]:
+               root: str = "", kind: str = "",
+               anchor: dict[str, Any] | None = None) -> dict[str, Any]:
     """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
 
     - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
@@ -778,7 +843,7 @@ def verify_any(path: str, key: bytes | None = None,
     try:
         form, doc = _detect_container(rd, kind)
         if form == "bundle":
-            return verify(path, key=key, revocations=revocations, at=at)
+            return verify(path, key=key, revocations=revocations, at=at, anchor=anchor)
         if form == "receipts":
             return _verify_receipts(doc, rd.read, revocations)
         return _verify_attest(doc, rd.read, key, revocations, at)
@@ -1145,10 +1210,12 @@ def _bench_write(tmp: str, name: str, data: bytes) -> str:
 
 def _bench_run(rows: list[dict[str, Any]], cid: str, desc: str, expected: str,
                path: str, key: bytes | None = BENCH_KEY,
-               revocations: dict[str, Any] | None = None, at: str = "") -> None:
+               revocations: dict[str, Any] | None = None, at: str = "",
+               anchor: dict[str, Any] | None = None) -> None:
     """跑一条用例并记账（认不出形态也记 invalid——判定面外不算通过）。"""
     try:
-        actual = verify(path, key=key, revocations=revocations, at=at)["verdict"]
+        actual = verify(path, key=key, revocations=revocations, at=at,
+                        anchor=anchor)["verdict"]
     except ValueError:
         actual = "invalid"
     rows.append({"id": cid, "desc": desc, "expected": expected,
@@ -1200,7 +1267,8 @@ def bench() -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     with tempfile.TemporaryDirectory(prefix="nf_bench_") as tmp:
         os.makedirs(os.path.join(tmp, "d"), exist_ok=True)
-        for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n")):
+        for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n"),
+                           ("c.md", "# C\n\n丙\n")):
             with open(os.path.join(tmp, "d", name), "wb") as fh:
                 fh.write(body.encode())
         base, _info = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
@@ -1306,6 +1374,20 @@ def bench() -> dict[str, Any]:
                             expires_at="2020-01-01T00:00:00Z")
         _bench_run(rows, "expired", "有效期已过", "expired",
                    _bench_write(tmp, "expired.zip", expired))
+        # 外部锚点（G1：防整链截断）
+        head2 = {"count": 2, "head": verify(base_path, key=BENCH_KEY)["head"]}
+        v3, _i3 = build(tmp, ["d/a.md", "d/b.md", "d/c.md"], issuer="bench",
+                        created_at=BENCH_PIN, key=BENCH_KEY, anchor=head2)
+        v3_path = _bench_write(tmp, "v3.zip", v3)
+        _bench_run(rows, "anchor_ok", "锚点对得上（正常追加，不得误杀）", "ok", v3_path,
+                   anchor=head2)
+        head3 = {"count": 3, "head": verify(v3_path, key=BENCH_KEY)["head"]}
+        _bench_run(rows, "anchor_truncated", "用更早的包冒充现在（整链截断）", "invalid",
+                   base_path, anchor=head3)
+        _bench_run(rows, "anchor_forked", "锚点来自另一条链（历史被改写）", "invalid",
+                   v3_path, anchor={"count": 2, "head": "0" * 64})
+        _bench_run(rows, "anchor_bad_shape", "锚点材料形状不对", "invalid", v3_path,
+                   anchor={"count": "two", "head": ""})
     passed = sum(1 for r in rows if r["ok"])
     return {"schema": BENCH_SCHEMA, "cases": rows, "passed": passed,
             "failed": len(rows) - passed, "total": len(rows),

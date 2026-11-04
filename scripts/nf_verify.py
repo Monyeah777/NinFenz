@@ -145,7 +145,7 @@ def _v_members(src, entries, res):
     return None if res["issues"] else (payloads, leaves)
 
 
-def _v_bundle_manifest(src, doc, res):
+def _v_bundle_manifest(src, doc, res, anchor=None):
     """包清单面：成员 → 根 → 包含证明 → 链 → 夹带成员。返回 (entries, payloads)。"""
     entries = doc.get("entries") or []
     res["count"] = len(entries)
@@ -183,6 +183,8 @@ def _v_bundle_manifest(src, doc, res):
         return None
     if _chain_head(entries) != res["head"]:
         res["issues"].append("透明日志链头不一致（条目顺序被插删/改序）")
+        return None
+    if not _check_anchor(entries, doc, anchor, res):
         return None
     listed = {PAYLOAD_DIR + _norm(e.get("path") or e.get("id") or "") for e in entries}
     for name in src.names():
@@ -365,7 +367,18 @@ def run_evidence(args) -> int:
             form, doc = _form(src, args.kind)
             if form == "bundle":
                 res = _res("bundle")
-                got = _v_bundle_manifest(src, doc, res)
+                anc = None
+                if getattr(args, "anchor", ""):
+                    try:
+                        with open(args.anchor, encoding="utf-8") as fh:
+                            anc = json.load(fh)      # 就地形状校验（零依赖：不走 core）
+                    except (OSError, ValueError) as exc:
+                        print(f"✗ 锚点不可读：{exc}", file=sys.stderr)
+                        return EVIDENCE_USAGE
+                    if not isinstance(anc, dict):
+                        print("✗ 锚点顶层应为对象（修复指引：给 {count, head}）", file=sys.stderr)
+                        return EVIDENCE_USAGE
+                got = _v_bundle_manifest(src, doc, res, anc)
                 if got is not None:
                     _v_bundle_envelopes(src, doc, got[1], key, res)
                     if not res["issues"]:
@@ -416,6 +429,8 @@ def _build_parser():
                     help="证据文档形态（缺省 = 按文档 schema 自动判）")
     ap.add_argument("--revocations", default="", help="吊销表 JSON（nf-revocation/1）")
     ap.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    ap.add_argument("--anchor", default="",
+                    help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」")
     ap.add_argument("--key-file", default="", help="hmac 锚 / hmac 信封校验用密钥文件")
     ap.add_argument("--ssh-allowed-signers", default="",
                     help="ssh-sig 锚校验用 allowed_signers 文件")
@@ -438,6 +453,44 @@ def _merkle_root(leaves):
     while mid * 2 < len(leaves):
         mid *= 2
     return node(_merkle_root(leaves[:mid]), _merkle_root(leaves[mid:]))
+
+
+
+
+def _anchor_prefix_head(entries, upto) -> str:
+    """前 upto 条的链头（外部锚点核对用，与真源同一公式）。"""
+    return _chain_head(entries[:max(0, upto)])
+
+
+def _check_anchor(entries, doc, anchor, res):
+    """外部锚点核对（G1）：防「整链被截断成更早版本」。
+
+    与真源同口径：包内 anchor 声明必须与外部材料一致；锚点声称的前缀必须存在且链头相符。
+    """
+    declared = doc.get("anchor")
+    if isinstance(declared, dict) and declared:
+        res["anchor_ref"] = {"count": declared.get("count"), "head": declared.get("head")}
+    if not isinstance(anchor, dict) or not anchor:
+        if res.get("anchor_ref"):
+            res["warnings"].append("包声明了外部锚点但未提供锚点材料（无法证明未被截断）")
+        return True
+    cnt = anchor.get("count")
+    head = str(anchor.get("head") or "")
+    if not isinstance(cnt, int) or cnt < 0 or not head:
+        res["issues"].append("锚点材料形状不对（需要 {count: 非负整数, head: 非空字符串}）")
+        return False
+    ref = res.get("anchor_ref")
+    if ref and (ref.get("count") != cnt or ref.get("head") != head):
+        res["issues"].append("包内 anchor 与外部锚点不一致（声称与证据互相矛盾）")
+        return False
+    if len(entries) < cnt:
+        res["issues"].append(f"证据包被截断：包只有 {len(entries)} 条，锚点记录 {cnt} 条")
+        return False
+    if _anchor_prefix_head(entries, cnt) != head:
+        res["issues"].append("与外部锚点不符：该位置的链头不一致（历史被改写或来自另一条链）")
+        return False
+    res["anchor_verified"] = True
+    return True
 
 
 def _chain_head(entries) -> str:
@@ -569,7 +622,8 @@ def _form(src, kind: str = ""):
 
 def _res(kind: str):
     return {"kind": kind, "verdict": "invalid", "level": "none", "root": "",
-            "head": "", "count": 0, "issues": [], "expires_at": "", "revoked_by": None}
+            "head": "", "count": 0, "issues": [], "warnings": [], "expires_at": "",
+            "revoked_by": None, "anchor_ref": None, "anchor_verified": False}
 
 
 def _envelope_ok(env, payloads, key):
