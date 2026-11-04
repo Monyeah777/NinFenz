@@ -289,6 +289,10 @@ SKIP = {
     "terminal": "交互面（shell 别名）——见 test_terminal.test_terminal_alias_works",
     "cockpit": "有参生产面（--prompt/--prompt-file 必填，未完成运行 rc=2）"
                "——见 test_meta_cockpit.py",
+    "check": "需参面（对象 + --policy 必填）——见 test_check_policy.py",
+    "resolve": "需参面（对象必填；未认领时 rc=1 属判定）——见 test_asset_contract_faces.py",
+    "evidence verify": "需参面（证据源必填）——见 test_evidence.py / test_http_api.py",
+    "evidence replay": "需参面（证据源必填）——见 test_evidence.py::TestReplay",
 }
 
 

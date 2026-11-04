@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:a2c366857f30c17259014f0d78424ec033c596201d0c5da121804fe30c5eb043
+  - scripts/nf.py:35a19362ea5cef26466c262b4dc4522b3eb684bf8c483c5e39e0ffb5d0bb657b
   - tui/_surface.py:7a4db227d2a85a0b2cefab97ee40faa997964ca43bfba5d540854366179185f8
-  - protocol/check12_weights.json:744258fe3a1da9ed6e071618f4d9916d6107b1404b6489f55630cf3431f65397
+  - protocol/check12_weights.json:d02dd92ed5c7bb22c8c3c40302a803c5d8776c552e443c804cb0aa1882314b80
   - protocol/coupling_baseline.json:65ef6388ebda5fd11e3f75407e761cf525da03b0107e9c7f80cea1a46296cbbf
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
 > 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
 
 > 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地

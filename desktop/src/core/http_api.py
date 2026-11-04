@@ -23,7 +23,7 @@ import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
-from core import check_policy, evidence, web_pages
+from core import check_policy, evidence, json_doc, web_pages
 
 API_VERSION = "nf-http/1"
 MAX_BODY = 8 * 1024 * 1024
@@ -68,9 +68,9 @@ def _verify_body(body: bytes, root: str) -> dict[str, Any]:
 def _check_body(body: bytes, root: str) -> dict[str, Any]:
     """请求体 = {object, policy} → 单对象体检（对象与策略只写临时目录）。"""
     try:
-        doc = json.loads(body.decode("utf-8"))
+        doc = json_doc.loads(body.decode("utf-8"), dict, what="请求体")
     except (ValueError, UnicodeDecodeError) as exc:
-        return {"ok": False, "error": f"请求体不是合法 UTF-8 JSON：{exc}",
+        return {"ok": False, "error": f"请求体不是合法 JSON 对象：{exc}",
                 "fix": _GUIDE + "请 POST JSON：{\"object\": \"<文本>\", \"policy\": {...}}"}
     if not isinstance(doc, dict):
         return {"ok": False, "error": "请求体顶层应为对象",
@@ -243,7 +243,7 @@ def serve(host: str = "127.0.0.1", port: int = 8765, root: str = ".") -> int:
     print("  停止：Ctrl-C", file=sys.stderr)
     try:
         srv.serve_forever()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:      # Ctrl-C 是正常停止路径，不是失败（不留异常帧）
         pass
     finally:
         srv.server_close()

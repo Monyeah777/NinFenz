@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:a2c366857f30c17259014f0d78424ec033c596201d0c5da121804fe30c5eb043
+  - scripts/nf.py:35a19362ea5cef26466c262b4dc4522b3eb684bf8c483c5e39e0ffb5d0bb657b
 
 ---
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
 > 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
 
 > 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地

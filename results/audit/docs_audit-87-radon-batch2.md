@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:34f3177c5ec5d3f69a5cc21482d9418bd8ba43aa8ccda357cfe77d6cde7e3a4d
+  - protocol/code_metrics_baseline.json:11308d1177ce0ba1f334f654ca397667332d448c90b4148eb289304319a8e777
 ---
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
 > 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地
 
 > 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）

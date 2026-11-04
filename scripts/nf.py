@@ -560,6 +560,27 @@ def _add_parser_production(sub):
     rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 
+def _portable_out(path: str) -> str:
+    """机器面（--json）的落点展示：**不得出现机器绝对路径**。
+
+    仓内 → 仓库相对；仓外把家目录/临时目录换成占位符（读者拿这条路径也用不上作者机路径，
+    而直接抹掉又会让「产物在哪」变成无解——占位符两头都顾到）。
+    """
+    import tempfile
+    rel = _rel_display(path)
+    if not os.path.isabs(rel):
+        return rel
+    for base, token in ((tempfile.gettempdir(), "<tmp>"),
+                        (os.path.expanduser("~"), "<home>")):
+        try:
+            same = os.path.commonpath([os.path.abspath(base), os.path.abspath(path)])
+        except ValueError:      # 跨盘的 base 无共同前缀：跳过该占位符，继续试下一个
+            continue
+        if same == os.path.abspath(base):
+            return token + "/" + os.path.relpath(path, base).replace("\\", "/")
+    return "<外部>/" + os.path.basename(path)
+
+
 def evidence_kinds() -> tuple[str, ...]:
     """证据形态词表（与 core.evidence.KINDS 同源——不在 CLI 再手抄一份）。"""
     from core import evidence
@@ -3270,8 +3291,8 @@ def _evidence_pack(args):
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
     if args.json:
-        print(_json.dumps({"kind": "evidence-pack", "out": _rel_display(dest),
-                           "info": dict(info, out=str(dest))},
+        print(_json.dumps({"kind": "evidence-pack", "out": _portable_out(dest),
+                           "info": dict(info, out=_portable_out(dest))},
                           ensure_ascii=False, indent=2, sort_keys=True))
     else:
         shown = _rel_display(dest)
@@ -3297,7 +3318,8 @@ def _evidence_bench(args):
             fh.write(evidence.bench_markdown(res))
     if args.json:
         print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
-    elif not getattr(args, "quiet", False):
+        return 0 if res["ok"] else 1
+    if not getattr(args, "quiet", False):
         print("== nf evidence bench（攻击矩阵 v0）==")
         for i, r in enumerate(res["cases"], 1):
             mark = "✓" if r["ok"] else "✗"

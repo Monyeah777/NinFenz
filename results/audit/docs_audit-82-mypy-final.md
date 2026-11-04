@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:34f3177c5ec5d3f69a5cc21482d9418bd8ba43aa8ccda357cfe77d6cde7e3a4d
+  - protocol/code_metrics_baseline.json:11308d1177ce0ba1f334f654ca397667332d448c90b4148eb289304319a8e777
 ---
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
 > 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地
 
 > 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）

@@ -19,6 +19,8 @@ import os
 import re
 from typing import Any
 
+from core import json_doc
+
 SCHEMA = "nf-check-policy/1"
 #: 规则类别（封闭集）。新增类别 = 破坏性变更：它会让「同一策略」在不同版本判出不同结论。
 KINDS = ("utf8", "regex_present", "regex_absent", "count_at_least", "digest_pin")
@@ -109,7 +111,7 @@ def load(path: str) -> dict[str, Any]:
     with open(path, "rb") as fh:
         raw = fh.read()
     try:
-        policy = json.loads(raw.decode())
+        policy = json_doc.loads(raw.decode(), dict, what="策略")
     except (ValueError, UnicodeDecodeError) as exc:
         raise ValueError(f"策略不是合法 UTF-8 JSON：{exc}（{GUIDE}请修正后重跑；"
                          "坏策略不许静默放过）") from exc
@@ -120,9 +122,10 @@ def load(path: str) -> dict[str, Any]:
 
 
 def _text(raw: bytes) -> str | None:
+    """解码失败返回 None（**不在此抛**：utf8 规则要能给出「不是合法 UTF-8」这条判定）。"""
     try:
         return raw.decode()
-    except UnicodeDecodeError:
+    except UnicodeDecodeError:  # 非文本对象：由 utf8 规则判否，不是解析故障
         return None
 
 

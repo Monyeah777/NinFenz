@@ -3,7 +3,7 @@
     "app": 1450,
     "entry": 26,
     "floor": 5,
-    "prod": 1046,
+    "prod": 1047,
     "projection": 133,
     "support": 353,
     "verify": 966
@@ -7001,6 +7001,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "本地工作台页面（/verify）：零构建、零 CDN、离线可用。",
+      "path": "desktop/src/core/web_pages.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "工作流工业级加固判据（Python-only 面 · 2026-10-13 补）。",
       "path": "desktop/src/core/workflow_hardening.py",
       "role": "verify",
@@ -12114,7 +12120,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8f5f1ec4ba484d392bc3a8d44cd13321d41f092e03712b253590a12604437997",
+  "root_digest": "0b6a542e19edc28e797f91078eb93ed3533316703e0b6a68ff128d4874cfdb21",
   "rule_counts": {
     "R-app": 1450,
     "R-catch": 207,
@@ -12124,7 +12130,7 @@
     "R-projection": 118,
     "R-support": 119,
     "R-verify": 847,
-    "auto:R-core": 263
+    "auto:R-core": 264
   },
   "schema": "nf-role-coordinates/1"
 }

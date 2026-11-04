@@ -28,7 +28,7 @@ import zipfile
 from collections.abc import Sequence
 from typing import Any
 
-from core import attest, receipts
+from core import attest, json_doc, receipts
 from core.transparency_log import NODE_PREFIX
 
 SCHEMA = "nf-evidence/1"
@@ -260,7 +260,7 @@ class _Reader:
         if self._zf is not None:
             try:
                 return self._zf.read(name)
-            except KeyError:
+            except KeyError:        # 成员不在包里：按「缺件」返回 None，由调用方判 invalid
                 return None
         full = os.path.join(self._dir, *name.split("/"))
         if not os.path.isfile(full):
@@ -280,7 +280,7 @@ def _load_meta(rd: _Reader) -> dict[str, Any]:
         raise ValueError("缺 bundle.json：不是证据包（" + GUIDE + "请用 nf evidence pack 产出，"
                          "不要手工拼 zip）")
     try:
-        meta = json.loads(raw.decode())
+        meta = json_doc.loads(raw.decode(), dict, what="证据文档")
     except (ValueError, UnicodeDecodeError) as exc:
         raise ValueError(f"bundle.json 不是合法 UTF-8 JSON：{exc}（{GUIDE}请重新 nf evidence "
                          "pack 生成，坏件不要手工修补——补出来的包验不过才是对的）") from exc
@@ -374,7 +374,7 @@ def _one_envelope(rd: _Reader, name: str, by_path: dict[str, str], tmp: str,
     if raw is None:
         return "", [f"{name}：包内缺该信封（{GUIDE}清单与实体不一致，请重打包）"], ""
     try:
-        env = json.loads(raw.decode())
+        env = json_doc.loads(raw.decode(), dict, what="证据文档")
     except (ValueError, UnicodeDecodeError) as exc:
         return "", [f"{name}：不是合法 JSON（{exc}）（{GUIDE}重打包）"], ""
     subj = _norm(str((env.get("subject") or {}).get("path") or ""))
@@ -510,8 +510,8 @@ def _embedded_revocations(rd: _Reader) -> dict[str, Any] | None:
     if raw is None:
         return None
     try:
-        doc = json.loads(raw.decode())
-    except (ValueError, UnicodeDecodeError):
+        doc = json_doc.loads(raw.decode(), dict, what="吊销表")
+    except (ValueError, UnicodeDecodeError):   # 包内吊销表坏件：按「无吊销表」处理
         return None
     return doc if isinstance(doc, dict) else None
 
@@ -568,7 +568,7 @@ def _schema_of(raw: bytes | None) -> str:
     if raw is None:
         return ""
     try:
-        doc = json.loads(raw.decode())
+        doc = json_doc.loads(raw.decode(), dict, what="证据文档")
     except (ValueError, UnicodeDecodeError):
         return ""
     return str(doc.get("schema") or "") if isinstance(doc, dict) else ""
@@ -584,7 +584,7 @@ def _detect_container(rd: _Reader, kind: str = "") -> tuple[str, dict[str, Any]]
         schema = _schema_of(raw)
         if schema in (RECEIPTS_SCHEMA, ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and schema not in found:
             try:
-                found[schema] = json.loads(raw.decode())  # type: ignore[arg-type]
+                found[schema] = json_doc.loads(raw.decode(), dict, what="证据文档")  # type: ignore[arg-type]
             except (ValueError, UnicodeDecodeError):
                 continue
     for schema, form in ((RECEIPTS_SCHEMA, "receipts"), (ATTEST_SCHEMA, "attest"),
@@ -752,7 +752,7 @@ def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any
     with open(path, "rb") as fh:
         raw = fh.read()
     try:
-        doc = json.loads(raw.decode())
+        doc = json_doc.loads(raw.decode(), dict, what="证据文档")
     except (ValueError, UnicodeDecodeError) as exc:
         raise ValueError(f"不是合法 UTF-8 JSON：{path}（{exc}）（{GUIDE}请给 nf receipts / "
                          "nf attest 产出的 JSON，或 nf evidence pack 的 .zip）") from exc
@@ -863,7 +863,7 @@ def _open_source(path: str, root: str = "",
         with open(path, "rb") as fh:
             raw = fh.read()
         try:
-            doc = json.loads(raw.decode())
+            doc = json_doc.loads(raw.decode(), dict, what="证据文档")
         except (ValueError, UnicodeDecodeError) as exc:
             raise ValueError(f"不是合法 UTF-8 JSON：{path}（{exc}）"
                              f"（{GUIDE}请给证据 JSON 或证据包 .zip）") from exc
@@ -1077,7 +1077,7 @@ def _rebuild(members: dict[str, bytes]) -> bytes:
 def _mut_meta(data: bytes, fn: Any) -> bytes:
     """改清单后重打包（fn(meta) 原地改）。"""
     members = _members(data)
-    meta = json.loads(members[BUNDLE_ENTRY].decode())
+    meta = json_doc.loads(members[BUNDLE_ENTRY].decode(), dict, what="bundle.json")
     fn(meta)
     members[BUNDLE_ENTRY] = _json_bytes(meta)
     return _rebuild(members)
@@ -1143,7 +1143,7 @@ def _bump_mac(env: dict[str, Any]) -> None:
 def _mut_attest(data: bytes, fn: Any) -> bytes:
     """改第一份信封后重打包（fn(env) 原地改）。"""
     members = _members(data)
-    env = json.loads(members[ATTEST_DIR + "0001.json"].decode())
+    env = json_doc.loads(members[ATTEST_DIR + "0001.json"].decode(), dict, what="信封")
     fn(env)
     members[ATTEST_DIR + "0001.json"] = _json_bytes(env)
     return _rebuild(members)

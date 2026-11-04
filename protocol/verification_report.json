@@ -372,7 +372,7 @@
         "files": 319,
         "max_fn_cc": 106,
         "max_fn_lines": 318,
-        "max_lines": 7900
+        "max_lines": 7922
       },
       "status": "pass",
       "warns": 0
@@ -429,7 +429,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 3,
+        "metrics_drift": 4,
         "metrics_missing": 4,
         "metrics_recorded": 262,
         "modules": 266,
@@ -525,8 +525,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 3980,
-        "kernel": 2017,
+        "files": 3981,
+        "kernel": 2018,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "45c7278275058a8bae8b246430de8df58f956f64fe130ab8611dde7d7e945488",
+  "root_digest": "891c35c45af17f68f672319d88ff2766a4759039cc223d68b44114bad0694351",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

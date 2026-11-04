@@ -21,7 +21,7 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
-from core import attest, check_policy, evidence  # noqa: E402
+from core import attest, check_policy, evidence, json_doc  # noqa: E402
 
 CHAIN_SCHEMA = "nf-ccos-chain/1"
 #: 链上缺的环（本仓无 labeling 子系统；不得凭空补）
@@ -67,7 +67,7 @@ def run(root: str, target: str, key: bytes | None = None) -> dict:
         with open(bundle, "wb") as fh:
             fh.write(data)
         with zipfile.ZipFile(bundle) as zf:
-            meta = json.loads(zf.read("bundle.json").decode())
+            meta = json_doc.loads(zf.read("bundle.json").decode(), dict, what="bundle.json")
         member = str(((meta.get("entries") or [{}])[0]).get("digest") or "")
         vres = evidence.verify(bundle, key=key)
         links.append({"link": "cc_verify", "verdict": vres["verdict"], "digest": member,

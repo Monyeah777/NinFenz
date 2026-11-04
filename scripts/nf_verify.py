@@ -339,6 +339,10 @@ def run_evidence(args) -> int:
         if args.revocations:
             with open(args.revocations, encoding="utf-8") as fh:
                 rev = json.load(fh)
+            if not isinstance(rev, dict):     # 形状就地校验（零依赖：不走 core.json_doc）
+                print("✗ 吊销表顶层应为对象（修复指引：请给 nf-revocation/1 的 JSON 对象）",
+                      file=sys.stderr)
+                return EVIDENCE_USAGE
         src = _Src(args.evidence, root=args.root)
         try:
             form, doc = _form(src, args.kind)
@@ -472,7 +476,7 @@ class _Src:
         if self._zf is not None:
             try:
                 return self._zf.read(name)
-            except KeyError:
+            except KeyError:        # 成员不在包里：按「缺件」返回 None，由调用方判 invalid
                 return None
         full = os.path.join(self._dir, *name.split("/"))
         if not os.path.isfile(full):
@@ -500,6 +504,11 @@ class _Src:
 
 
 def _parse_doc(raw):
+    """容错解析：坏 JSON / 非对象一律返回 ("", None)。
+
+    本文件刻意**不 import 任何 NF 模块**（零依赖单文件可分发），故不能走 core.json_doc；
+    形状判据就在解析点旁边显式写出来，不散落到调用方。
+    """
     try:
         doc = json.loads(raw.decode())
     except (ValueError, UnicodeDecodeError):
