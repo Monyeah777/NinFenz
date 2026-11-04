@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1445,
+    "app": 1448,
     "entry": 26,
     "floor": 5,
-    "prod": 1042,
-    "projection": 132,
-    "support": 349,
-    "verify": 960
+    "prod": 1046,
+    "projection": 133,
+    "support": 351,
+    "verify": 962
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5777,6 +5777,18 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Explicit registry for audit records created before the audit protocol.",
+      "path": "desktop/src/core/audit_legacy.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Validation for audit subject bindings.",
+      "path": "desktop/src/core/audit_subject.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "执行结果跑分台（机制借鉴 ACP `agent/benchmarks/suite`）。",
       "path": "desktop/src/core/bench.py",
       "role": "prod",
@@ -5903,8 +5915,20 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Reconstruct a contract-level timeline from Git history.",
+      "path": "desktop/src/core/contract_history.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "上游契约 pin + 逐字段对账 + 数量钉死（机制借鉴 OpenAgentCore upstream_contract_test）。",
       "path": "desktop/src/core/contract_pin.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "Structural field extraction for YAML-like contract blocks.",
+      "path": "desktop/src/core/contract_text.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -6038,6 +6062,12 @@
       "function": "评测标准模板：用例真源 + 显式触发 + 成本/时点标注 + 结果回写（机制借鉴 pj-nx evals / 311 eval.yml）。",
       "path": "desktop/src/core/eval_harness.py",
       "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "证据包（evidence bundle）——cc_verify 的自包含证据容器。",
+      "path": "desktop/src/core/evidence.py",
+      "role": "verify",
       "rule": "auto:R-core"
     },
     {
@@ -7753,6 +7783,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_eval_harness.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据包（evidence bundle）单测——cc_verify 的四词判定与 fail-closed 面。",
+      "path": "desktop/tests/test_evidence.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12054,17 +12090,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "e06cf926fa8174571b3bd3b3165ab445a9c8136c0c49af3f13d59a10f7ffd9f9",
+  "root_digest": "33e49fffb440f9a388edd45819b021848a8ba0455604ceaeea0584471a7bfb66",
   "rule_counts": {
-    "R-app": 1445,
-    "R-catch": 204,
+    "R-app": 1448,
+    "R-catch": 206,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 117,
+    "R-projection": 118,
     "R-support": 119,
-    "R-verify": 843,
-    "auto:R-core": 256
+    "R-verify": 844,
+    "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"
 }

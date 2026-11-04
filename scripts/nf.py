@@ -480,6 +480,42 @@ def _add_parser_production(sub):
     at.add_argument("--selfcheck", action="store_true",
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ev = sub.add_parser("evidence",
+                        help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
+                        description="证据包（内部差距：attest/receipts/transparency 三件都在，但缺"
+                                    "「给外部人一个文件就能验」的自包含形态）。判定词表固定为 "
+                                    "ok/revoked/expired/invalid（见 docs/ccos/abi-v0.md §4）。")
+    esub = ev.add_subparsers(dest="evidence_cmd")
+    evp = esub.add_parser("pack", help="把目标文件打成自包含证据包（.zip）",
+                          description="打包：成员实体 + 回执/根/包含证明 + 信封（+ 可选链头、"
+                                      "吊销表、有效期）。打包本身确定性（固定时间戳 + 不压缩 + "
+                                      "成员名排序）；要**逐字节可复现**须钉 SOURCE_DATE_EPOCH"
+                                      "（同 nf attest 口径，否则 created_at 取墙钟）。")
+    evp.add_argument("targets", nargs="*", default=None,
+                     help="目标文件（仓相对路径；缺省 = 01/02/06/07 四件）")
+    evp.add_argument("--out", default="",
+                     help="输出 .zip 路径（缺省 = 系统临时目录的 nf-evidence.zip——不往仓库里"
+                          "落盘；相对路径相对仓库根，绝对路径按原样）")
+    evp.add_argument("--issuer", default="", help="签发方标识（写入信封 producer.issuer）")
+    evp.add_argument("--key-file", default="",
+                     help="HMAC 密钥文件 → hmac-sha256 级信封（不给 = digest_only）")
+    evp.add_argument("--expires-at", default="",
+                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；缺省 = 不过期）")
+    evp.add_argument("--revocations", default="", help="吊销表 JSON 路径（随包分发）")
+    evp.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evv = esub.add_parser("verify", help="第三方复验证据包（纯读；不需要仓库）",
+                          description="复验：结构→成员摘要→根→包含证明→链→信封→吊销→时效，"
+                                      "fail-closed。退出码：ok=0 / invalid=1 / revoked=2 / "
+                                      "expired=3 / 用法错=4。")
+    evv.add_argument("evidence_bundle", nargs="?", default="", metavar="BUNDLE",
+                     help="证据包路径（.zip 或解包目录）")
+    evv.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evv.add_argument("--revocations", default="",
+                     help="外部吊销表 JSON（优先于包内嵌的那份）")
+    evv.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evv.add_argument("--selfcheck", action="store_true",
+                     help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
+    evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 
 def _add_parser_validation(sub):
@@ -3014,6 +3050,94 @@ def _cmd_sig(args):
         return 0
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
+
+def _cmd_evidence(args):
+    """nf evidence：证据包打包 / 第三方复验（cc_verify 的 CLI 面）的派发。"""
+    sub = getattr(args, "evidence_cmd", "") or ""
+    if not sub:
+        print("用法：nf evidence pack <文件…> --out <包.zip>｜nf evidence verify <包.zip>"
+              "（各自 --help 看逐条）", file=sys.stderr)
+        return 2
+    return _evidence_verify(args) if sub == "verify" else _evidence_pack(args)
+
+
+def _evidence_verify(args):
+    """nf evidence verify：第三方复验（纯读；--selfcheck 是机制体检）。
+
+    判定词表（ok/revoked/expired/invalid）与退出码是稳定面，见 docs/ccos/abi-v0.md。
+    不写盘、不改仓库：payload 只解到进程私有临时目录，出作用域即销毁。
+    """
+    import json as _json
+
+    from core import attest, evidence, json_doc
+    if getattr(args, "selfcheck", False):
+        ok, issues, stats = evidence.selfcheck()
+        if args.json:
+            print(_json.dumps({"kind": "evidence-selfcheck", "ok": ok,
+                               "issues": issues, "stats": stats},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence verify --selfcheck（复验机制体检）==")
+            for i in issues:
+                print(f"  [FAIL] {i}", file=sys.stderr)
+            if ok:
+                print("  ✓ PASS 必过 · 篡改必红 · 吊销必判 revoked · 过期必判 expired"
+                      "（确定性打包：两次逐字节一致）")
+        return 0 if ok else 1
+    target = getattr(args, "evidence_bundle", "") or ""
+    if not target:
+        return _machine_fail(args, "缺证据包路径（修复指引：请给 <包.zip> 或解包目录；"
+                                   "只想体检复验机制用 --selfcheck）", 2)
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        path = _rel_out(target) if not os.path.isabs(target) else target
+        res = evidence.verify(path, key=key, revocations=rev, at=args.at)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence verify（{target}）==")
+        print(f"  判定：{res['verdict']} · 证据强度：{res['level']} · "
+              f"成员 {res['count']} 件 · 根 {res['root'][:16]}")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            print("  ✓ 证据成立（注意：成立 = 成员未改、证明到根、信封自洽；"
+                  "不等于内容质量或内容真实）")
+    return evidence.EXIT_CODES.get(str(res["verdict"]), 1)
+
+
+def _evidence_pack(args):
+    """nf evidence pack：把目标文件打成自包含证据包（缺省 = 01/02/06/07 四件）。"""
+    import json as _json
+
+    from core import attest, evidence, json_doc
+    targets = list(getattr(args, "targets", None) or attest.DEFAULT_SUBJECTS)
+    try:
+        rels = [_rel_to_root(t) for t in targets]
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        out = _rel_out(args.out) if args.out else evidence.default_out()
+        dest, info = evidence.write(ROOT, out, rels, issuer=args.issuer,
+                                    key=key, expires_at=args.expires_at, revocations=rev)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc))
+    if args.json:
+        print(_json.dumps({"kind": "evidence-pack", "out": _rel_display(dest),
+                           "info": dict(info, out=str(dest))},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        shown = _rel_display(dest)
+        print(f"== nf evidence pack（{info['count']} 件）==")
+        print(f"  包：{shown} · 强度：{info['level']} · 根：{info['root'][:16]} · "
+              f"链头：{info['head'][:16]}")
+        print(f"  复验：nf evidence verify {shown}")
+    return 0
+
 
 def _cmd_attest(args):
     """nf attest：内容 attestation 生成/校验（三级信任；缺锚一律拒绝）。"""
@@ -7326,6 +7450,7 @@ _COMMAND_HANDLERS = {
     "module": _cmd_module,
     "sig": _cmd_sig,
     "attest": _cmd_attest,
+    "evidence": _cmd_evidence,
     "score": _cmd_score,
     "lint": _cmd_lint,
     "lsp": _cmd_lsp,

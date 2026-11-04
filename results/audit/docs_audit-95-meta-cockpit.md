@@ -12,12 +12,12 @@ subjects:
   - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
   - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:200c9ba8661ad8cf7b182c45d86aa94f4fcc0a6a5b9d2867b719f5c447305a25
+  - desktop/src/core/terminal.py:0575bb32229a21a7325dfb64d54f83d1c286a3a3f513076870dcc98cdc7224d9
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:c9fa145a18d58d87a802dd67c4af398a73aa61167c73c2f82613d05afa1ae515
-  - tui/_surface.py:6b688fcd5c75248dbc5a496bb9c66a8e1c612d339392afaafa488a0cfe843ec9
+  - scripts/nf.py:4229c2bfaaf084eefe7b82ed73b1306ec49265275d7092e31c9c096f627a9ff6
+  - tui/_surface.py:32f26fcabb626b6130a210555767530955010fab4e363a5b9374fae3d66b2e98
   - protocol/check12_weights.json:744258fe3a1da9ed6e071618f4d9916d6107b1404b6489f55630cf3431f65397
   - protocol/coupling_baseline.json:65ef6388ebda5fd11e3f75407e761cf525da03b0107e9c7f80cea1a46296cbbf
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
@@ -25,6 +25,10 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
 > 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
 
 > 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算

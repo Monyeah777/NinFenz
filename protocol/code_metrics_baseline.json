@@ -231,7 +231,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/contract_history.py": {
-      "lines": 296,
+      "lines": 292,
       "max_fn_cc": 13,
       "max_fn_lines": 62
     },
@@ -369,6 +369,11 @@
       "lines": 60,
       "max_fn_cc": 12,
       "max_fn_lines": 23
+    },
+    "desktop/src/core/evidence.py": {
+      "lines": 593,
+      "max_fn_cc": 16,
+      "max_fn_lines": 47
     },
     "desktop/src/core/execution_drill.py": {
       "lines": 323,
@@ -1441,7 +1446,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7602,
+      "lines": 7727,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },

@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-10-30",
+  "approved_at": "2026-11-04",
   "approved_by": "Monyeah777",
-  "note": "契约级 Git 演进时间线与结构化差异收口",
+  "note": "CCOS ABI v0 + 证据包第三方复验器收口（缺省落点不入仓；文件面同步后重批）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "6acd8d24d84278b1dbbdc361bd746a1b60fb526a47f3c11e56b3fc18d61be79c"
+  "subject_digest": "337b47882ad951a0386717502ebd386f75c2e1d9a08a08d1968c02d18d7b5781"
 }

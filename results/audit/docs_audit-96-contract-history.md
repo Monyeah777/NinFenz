@@ -9,12 +9,16 @@ subjects:
   - desktop/src/core/contract_history.py:e452d6d8a0d9849dece08210e7af2acbf554440e8871f8d656f745f533d06646
   - desktop/src/core/contract_text.py:01b784e63dd19425b3609ae3792b6c8d9f40366acb5806f71d10759c96de8fd6
   - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - scripts/nf.py:c9fa145a18d58d87a802dd67c4af398a73aa61167c73c2f82613d05afa1ae515
+  - scripts/nf.py:4229c2bfaaf084eefe7b82ed73b1306ec49265275d7092e31c9c096f627a9ff6
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - docs/迁移指南-基于nf-sig-diff.md:64b4299bfdec7b663feef412ea16b8b5768c54036754fae066d1c81c3fdbfc5d
   - changes/unreleased/20261030-contract-history.md:4aa6c0df999193ab102115105c450ddae136dfa32c47d07fdebfe271f1059398
 ---
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
 > 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
 
 
