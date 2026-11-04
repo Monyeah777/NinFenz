@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:0b2d79b56e4d99db082d5b681159023d6fbf3b55cf3f993bd3f547e0d121a019
+  - protocol/code_metrics_baseline.json:34f3177c5ec5d3f69a5cc21482d9418bd8ba43aa8ccda357cfe77d6cde7e3a4d
 ---
+> 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地
+
 > 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）
 
 > 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*

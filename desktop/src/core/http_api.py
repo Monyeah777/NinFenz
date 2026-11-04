@@ -23,7 +23,7 @@ import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
-from core import check_policy, evidence
+from core import check_policy, evidence, web_pages
 
 API_VERSION = "nf-http/1"
 MAX_BODY = 8 * 1024 * 1024
@@ -41,7 +41,8 @@ def _health() -> dict[str, Any]:
     return {"ok": True, "api": API_VERSION, "tool": "nf",
             "evidence_schema": evidence.SCHEMA,
             "check_policy_schema": check_policy.SCHEMA,
-            "endpoints": ["GET /api/health", "POST /api/verify", "POST /api/check"]}
+            "endpoints": ["GET /api/health", "POST /api/verify", "POST /api/check"],
+            "page": "/verify"}
 
 
 def _verify_body(body: bytes, root: str) -> dict[str, Any]:
@@ -114,6 +115,18 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _send_bytes(self, body: bytes, ctype: str,
+                    extra: dict[str, str] | None = None) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        for key, val in (extra or {}).items():
+            self.send_header(key, val)
+        self.end_headers()
+        self.wfile.write(body)
+
     def _origin_ok(self) -> bool:
         """CSRF 护栏：带了 Origin 就必须是本机同端口（浏览器跨站请求会被挡）。"""
         origin = self.headers.get("Origin")
@@ -151,8 +164,19 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(403, {"ok": False, "error": "来源不允许（Origin 校验失败）",
                              "fix": _GUIDE + "浏览器请从 http://127.0.0.1 同端口访问"})
             return
-        if self.path.split("?")[0] == "/api/health":
+        route = self.path.split("?")[0]
+        if route == "/api/health":
             self._send(200, _health())
+            return
+        if route in ("/", "/verify", "/index.html"):
+            self._send_bytes(web_pages.html(), "text/html; charset=utf-8",
+                             {"Content-Security-Policy": web_pages.CSP})
+            return
+        if route == "/assets/verify.js":
+            self._send_bytes(web_pages.js(), "text/javascript; charset=utf-8")
+            return
+        if route == "/assets/verify.css":
+            self._send_bytes(web_pages.css(), "text/css; charset=utf-8")
             return
         self._send(404, {"ok": False, "error": "未知端点",
                          "fix": _GUIDE + "可用端点见 GET /api/health"})

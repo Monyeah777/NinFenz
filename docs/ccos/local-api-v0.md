@@ -27,8 +27,19 @@ python scripts/nf.py serve --http --port 0   # 端口交给内核挑（测试用
 | GET | /api/health | — | 服务与契约版本、可用端点列表 |
 | POST | /api/verify | 自包含证据包 zip 字节 | 四词判定 verdict / level / root / issues |
 | POST | /api/check | {object: UTF-8 文本, policy: nf-check-policy/1} | verdict / policy_digest / findings |
+| GET | / 或 /verify | — | 工作台页面（拖拽证据包 → 调 /api/verify → 显示判定） |
+| GET | /assets/verify.js · /assets/verify.css | — | 页面资源（同源，无 CDN） |
 
 机器可读契约：`protocol/endpoint_contract.json` 的 `local.*` 三端点（maps_to 指向真实 CLI）。
+
+## 工作台页（/verify）
+
+浏览器打开 http://127.0.0.1:8765/ 即可用：拖拽证据包 → 页面 POST 到 /api/verify → 显示
+判定、强度、根与问题清单。页面**零构建、零 CDN、零外链**（离线与内网都能跑），资源随服务
+一起分发（嵌在 core/web_pages.py 里，不会出现「页面在、资源 404」）。
+
+CSP 锁死：`default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'`——
+不允许内联脚本、不允许外部资源，第三方脚本没有任何执行位。
 
 ## 安全边界（写死，不靠调用方自觉）
 

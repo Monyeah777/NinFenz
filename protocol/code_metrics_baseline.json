@@ -521,7 +521,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/http_api.py": {
-      "lines": 226,
+      "lines": 250,
       "max_fn_cc": 8,
       "max_fn_lines": 28
     },
@@ -1299,6 +1299,11 @@
       "lines": 348,
       "max_fn_cc": 13,
       "max_fn_lines": 51
+    },
+    "desktop/src/core/web_pages.py": {
+      "lines": 167,
+      "max_fn_cc": 1,
+      "max_fn_lines": 2
     },
     "desktop/src/core/workflow_hardening.py": {
       "lines": 164,

@@ -144,5 +144,55 @@ class TestSafety(_Server):
         self.assertEqual(leftovers, [])
 
 
+class TestPage(_Server):
+    """本地工作台页：零构建、零外链、CSP 锁死（离线与内网都能跑，也不给第三方脚本执行位）。"""
+
+    def _raw(self, path):
+        req = urllib.request.Request(f"http://127.0.0.1:{self.port}{path}", method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status, dict(resp.headers), resp.read()
+        except urllib.error.HTTPError as exc:
+            return exc.code, dict(exc.headers or {}), exc.read()
+
+    def test_index_and_verify_alias(self):
+        for path in ("/", "/verify"):
+            code, headers, body = self._raw(path)
+            self.assertEqual(code, 200)
+            self.assertIn("text/html", headers.get("Content-Type", ""))
+            self.assertIn("证据复验", body.decode("utf-8"))
+            self.assertIn("/assets/verify.js", body.decode("utf-8"))
+
+    def test_csp_locked(self):
+        _code, headers, _body = self._raw("/")
+        csp = headers.get("Content-Security-Policy", "")
+        self.assertIn("default-src 'none'", csp)
+        self.assertIn("script-src 'self'", csp)
+        self.assertNotIn("unsafe-inline", csp)
+        self.assertNotIn("https:", csp)
+
+    def test_assets_served(self):
+        code, headers, js = self._raw("/assets/verify.js")
+        self.assertEqual(code, 200)
+        self.assertIn("javascript", headers.get("Content-Type", ""))
+        self.assertIn("/api/verify", js.decode("utf-8"))
+        code2, headers2, css = self._raw("/assets/verify.css")
+        self.assertEqual(code2, 200)
+        self.assertIn("text/css", headers2.get("Content-Type", ""))
+        self.assertTrue(css)
+
+    def test_no_external_resources(self):
+        """离线优先：页面与其资源不得引用任何外部地址（含 CDN / 字体 / 图片）。"""
+        for path in ("/", "/assets/verify.js", "/assets/verify.css"):
+            _code, _headers, body = self._raw(path)
+            text = body.decode("utf-8")
+            self.assertNotIn("https://", text)
+            self.assertNotIn("http://", text)
+
+    def test_unknown_asset_404(self):
+        code, _headers, _body = self._raw("/assets/nope.js")
+        self.assertEqual(code, 404)
+
+
 if __name__ == "__main__":
     unittest.main()

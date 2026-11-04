@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1449,
+    "app": 1450,
     "entry": 26,
     "floor": 5,
     "prod": 1046,
     "projection": 133,
-    "support": 352,
-    "verify": 965
+    "support": 353,
+    "verify": 966
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8015,6 +8015,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "本地 HTTP 面单测——起真服务（端口 0）打真请求，判安全边界与判定语义。",
+      "path": "desktop/tests/test_http_api.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "registry 变更影响面检查单测（v2.2.0 A4：impact_check 引用图闭合）。",
       "path": "desktop/tests/test_impact_check.py",
       "role": "verify",
@@ -12108,17 +12114,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "fb0802d9d4450971d2583e43ad4fa146db986a20d8a8d00fe2f7c1b9c5c81ff0",
+  "root_digest": "8f5f1ec4ba484d392bc3a8d44cd13321d41f092e03712b253590a12604437997",
   "rule_counts": {
-    "R-app": 1449,
+    "R-app": 1450,
     "R-catch": 207,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 846,
-    "auto:R-core": 262
+    "R-verify": 847,
+    "auto:R-core": 263
   },
   "schema": "nf-role-coordinates/1"
 }
