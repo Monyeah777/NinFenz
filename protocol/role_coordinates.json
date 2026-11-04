@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1047,
-    "projection": 133,
+    "projection": 134,
     "support": 353,
-    "verify": 966
+    "verify": 965
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6071,12 +6071,6 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "证据包（evidence bundle）——cc_verify 的自包含证据容器。",
-      "path": "desktop/src/core/evidence.py",
-      "role": "verify",
-      "rule": "auto:R-core"
-    },
-    {
       "function": "42 M1：协议可执行性内部自测 —— 执行失范捕获器（动态质量维基建）。",
       "path": "desktop/src/core/execution_drill.py",
       "role": "prod",
@@ -12120,7 +12114,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "0b6a542e19edc28e797f91078eb93ed3533316703e0b6a68ff128d4874cfdb21",
+  "root_digest": "8ee2c9e4ed1579cf4c9fa846c1c41745c260292d381b19e5717fc903c035d9ed",
   "rule_counts": {
     "R-app": 1450,
     "R-catch": 207,

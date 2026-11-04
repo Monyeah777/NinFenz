@@ -3310,12 +3310,12 @@ def _evidence_bench(args):
     from core import evidence
     res = evidence.bench()
     if getattr(args, "out", ""):
+        from core import atomic_write
         dest = _rel_out(args.out)
         parent = os.path.dirname(dest)
         if parent:
             os.makedirs(parent, exist_ok=True)
-        with open(dest, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(evidence.bench_markdown(res))
+        atomic_write.write_text(dest, evidence.bench_markdown(res))
     if args.json:
         print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if res["ok"] else 1

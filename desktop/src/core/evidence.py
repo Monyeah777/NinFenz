@@ -28,7 +28,7 @@ import zipfile
 from collections.abc import Sequence
 from typing import Any
 
-from core import attest, json_doc, receipts
+from core import atomic_write, attest, json_doc, receipts
 from core.transparency_log import NODE_PREFIX
 
 SCHEMA = "nf-evidence/1"
@@ -219,8 +219,8 @@ def write(root: str, out: str, targets: Sequence[str], issuer: str = "",
     parent = os.path.dirname(dest)
     if parent:
         os.makedirs(parent, exist_ok=True)
-    with open(dest, "wb") as fh:
-        fh.write(data)
+    # 在仓落点走原子写出：半截证据包比没有更危险（读者会把它当完整件验）
+    atomic_write.write_bytes(dest, data)
     return dest, info
 
 
