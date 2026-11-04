@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-05",
   "approved_by": "Monyeah777",
-  "note": "威胁模型与发布前置闸门收口",
+  "note": "npm 口径自动同步落地",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5a57ada876eb62875a6da1a2173008e283e6c3f391f1bc4d14b82c2478a755aa"

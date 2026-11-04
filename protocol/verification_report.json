@@ -520,12 +520,14 @@
     },
     {
       "id": "role_coordinates",
-      "issues": 0,
+      "issues": 1,
       "name": "职能坐标（ADR-0006：核内逐件 / 规则不漂 / verify 只读）",
-      "sample": [],
+      "sample": [
+        "② protocol/role_coordinates.json 与实时重算不一致（记录 16bf83ae5095 / 实测 bd0f4c8c69f9）（修复指引：nf layers --write）"
+      ],
       "source": "role_model.scan",
       "stats": {
-        "files": 3984,
+        "files": 3985,
         "kernel": 2018,
         "kernel_no_self": 309,
         "rules": 9,
@@ -533,16 +535,16 @@
         "verify_writers": 10,
         "write_exceptions": 10
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     }
   ],
-  "root_digest": "481e036893eca8cd26823e7bc5a26bf2c3781091438e5839f0f2141b41447edd",
+  "root_digest": "257cacdc868285fcf1f172268b9c020ed1a57b0024cdb3326c3abf7ea59998b7",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }
