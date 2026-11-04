@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1048,
     "projection": 134,
-    "support": 354,
-    "verify": 970
+    "support": 355,
+    "verify": 971
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7895,6 +7895,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "生成物新鲜度前置检查（scripts/freshness_check.py）判据。",
+      "path": "desktop/tests/test_freshness_check.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "缺口逐行审查（gap_review）单测：候选筛法可复现 + 确定性证据复核 + stub 双轨纪律。",
       "path": "desktop/tests/test_gap_review.py",
       "role": "verify",
@@ -12150,16 +12156,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "5770dc4d031953662fbfc6f2a6b5122e6edf8770000adbe1dee7bbc54086b21a",
+  "root_digest": "707916057c9a583289c349d61b96d147eff6958e971c3fdc7169c1b47215d71c",
   "rule_counts": {
     "R-app": 1454,
-    "R-catch": 208,
+    "R-catch": 209,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 851,
+    "R-verify": 852,
     "auto:R-core": 266
   },
   "schema": "nf-role-coordinates/1"
