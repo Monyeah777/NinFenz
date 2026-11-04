@@ -5,7 +5,8 @@
 
 ## 是什么
 
-一条命令给出「这台机器现在能不能发布」：**干净树闸门 → checks-only → N 个独立分片 → 汇总**。
+一条命令给出「这台机器现在能不能发布」：**干净树闸门 → payload 对账 → 供应链核对 → checks-only
+→ N 个独立分片 → 汇总**。
 
 与 `nf release` 的分工：`nf release` 管**次序**（一致性报告 → 批准 → 回执的冻结链）；
 本件管**结论**（冻结之后全部门禁到底过没过）。两者不替代。
@@ -26,10 +27,22 @@ python scripts/release_conclusion.py                 # 缺省：8 片、顺序�
 python scripts/release_conclusion.py --shards 4      # 分区数（并集必须 == 全量，执行器自带断言）
 python scripts/release_conclusion.py --jobs 8        # 并发：只建议给独立 runner（单机有争用）
 python scripts/release_conclusion.py --dry-run       # 只打印计划（含脏树判定），不跑
+python scripts/release_conclusion.py --only-preflight   # 只跑前置面（脏树/payload/供应链，秒级）
 python scripts/release_conclusion.py --json          # 机读汇总（含每片 rc/墙钟；失败片带输出尾部）
 ```
 
 退出码：0 = 可发布 · 1 = 有失败 · 2 = 前置不满足（脏树 / 参数错）。
+
+## 三步各判什么
+
+| 步 | 判据 | 不过的含义 |
+|---|---|---|
+| 1 供应链核对 | `node site/tools/sync-numbers.mjs` 与 `python scripts/sync_llms.py --check` | 发布文案里的数字与真源不一致（站点件数/体积、根投影）→ 先修再跑 |
+| 2 checks-only | `bash verify.sh --checks-only` | 结构性红（契约/回执/纯度/文档面） |
+| 3 分片 | 8 个独立进程跑完全部测试，并集 == 全量 | 测试面红 |
+
+供应链步进 gate 的原因（G5）：这两条此前是「记得手动跑」的命令，而它们正是发布文案数字的来源——
+忘了跑就把旧数字发出去（实测犯过两次）。步骤本身秒级，代价远小于一次错发。
 
 ## 判据（可证）
 

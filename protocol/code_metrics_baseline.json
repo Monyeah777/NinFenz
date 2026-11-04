@@ -650,6 +650,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 41
     },
+    "desktop/src/core/label_ir.py": {
+      "lines": 185,
+      "max_fn_cc": 13,
+      "max_fn_lines": 35
+    },
     "desktop/src/core/layer_model.py": {
       "lines": 639,
       "max_fn_cc": 22,
@@ -1231,7 +1236,7 @@
       "max_fn_lines": 39
     },
     "desktop/src/core/terminal.py": {
-      "lines": 2417,
+      "lines": 2418,
       "max_fn_cc": 37,
       "max_fn_lines": 89
     },
@@ -1466,7 +1471,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7940,
+      "lines": 8041,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },
@@ -1526,9 +1531,9 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 249,
-      "max_fn_cc": 24,
-      "max_fn_lines": 93
+      "lines": 328,
+      "max_fn_cc": 29,
+      "max_fn_lines": 122
     },
     "scripts/rewrite_text.py": {
       "lines": 136,

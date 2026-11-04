@@ -96,6 +96,33 @@ class TestPayloadGuard(unittest.TestCase):
             self.assertEqual("abc", self.gate.read_payload_manifest(p)["source_commit"])
 
 
+class TestSupplyChain(unittest.TestCase):
+    """供应链核对进 gate（G5）：数字来源不一致就不该产出「可发布」。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_all_clean_no_issues(self):
+        rows = [{"id": "site_numbers", "rc": 0}, {"id": "llms_projection", "rc": 0}]
+        self.assertEqual([], self.gate.supply_chain_issues(rows))
+
+    def test_failure_becomes_issue_with_tail(self):
+        rows = [{"id": "site_numbers", "rc": 1,
+                 "tail": ["✗ 站点 npm 件数与 payload 清单不一致：3011（清单 3012）"]}]
+        issues = self.gate.supply_chain_issues(rows)
+        self.assertEqual(1, len(issues))
+        self.assertIn("site_numbers", issues[0])
+        self.assertIn("不一致", issues[0])
+
+    def test_skipped_steps_are_not_issues(self):
+        rows = [{"id": "site_numbers", "rc": 0, "skipped": True}]
+        self.assertEqual([], self.gate.supply_chain_issues(rows))
+
+    def test_declared_steps_cover_both_faces(self):
+        ids = [s[0] for s in self.gate.SUPPLY_STEPS]
+        self.assertEqual(["site_numbers", "llms_projection"], ids)
+
+
 class TestDryRun(unittest.TestCase):
     def _run(self, *args):
         return subprocess.run([sys.executable, str(SCRIPT), "--dry-run", *args],
@@ -132,6 +159,19 @@ class TestDryRun(unittest.TestCase):
         proc = self._run("--jobs", "1", "--allow-dirty")
         self.assertEqual(0, proc.returncode)
         self.assertEqual("", json.loads(proc.stdout)["blocked"])
+
+
+class TestOnlyPreflight(unittest.TestCase):
+    def test_preflight_runs_supply_chain_without_shards(self):
+        """前置面可在几秒内单跑（脏树也允许）：这是「我到底该不该花 29 分钟」的判断入口。"""
+        proc = subprocess.run([sys.executable, str(SCRIPT), "--only-preflight", "--allow-dirty",
+                               "--json"], cwd=str(ROOT), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+        self.assertEqual(0, proc.returncode, proc.stderr[-400:])
+        doc = json.loads(proc.stdout)
+        self.assertTrue(doc["only_preflight"])
+        self.assertEqual(2, len(doc["supply_chain"]))
+        self.assertEqual([], doc["issues"])
 
 
 class TestDirtyRefusal(unittest.TestCase):

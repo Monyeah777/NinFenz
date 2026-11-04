@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-04",
+  "measured_at": "2026-11-05",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -161,6 +161,7 @@
     "test_key_naming": 0.3,
     "test_knowledge": 0.7,
     "test_knowledge_sig": 0.2,
+    "test_label_ir": 1.5,
     "test_launcher": 119.4,
     "test_layer_model": 11.2,
     "test_lazy_yaml": 0.2,
@@ -1942,6 +1943,22 @@
     "test_knowledge_sig.SignTest.test_diff_reports_changes_and_verdict": 0.0,
     "test_knowledge_sig.SignTest.test_signature_reproducible": 0.0,
     "test_knowledge_sig.SignTest.test_verify_reproducible_passes": 0.0,
+    "test_label_ir.TestBuild.test_build_has_no_timestamp": 0.0,
+    "test_label_ir.TestBuild.test_build_is_deterministic": 0.0,
+    "test_label_ir.TestBuild.test_carrier_defaults_to_not_embedded": 0.0,
+    "test_label_ir.TestCli.test_ir_then_validate_round_trip": 0.68,
+    "test_label_ir.TestCli.test_missing_object_is_usage_error": 0.33,
+    "test_label_ir.TestCli.test_validate_invalid_exits_1": 0.33,
+    "test_label_ir.TestRules.test_full_rules_include_minimal": 0.0,
+    "test_label_ir.TestRules.test_minimal_rules": 0.0,
+    "test_label_ir.TestRules.test_unknown_level_raises_with_guidance": 0.0,
+    "test_label_ir.TestValidate.test_bad_digest_fails": 0.0,
+    "test_label_ir.TestValidate.test_carrier_self_claim_is_warning_not_success": 0.0,
+    "test_label_ir.TestValidate.test_full_reports_missing_rules": 0.0,
+    "test_label_ir.TestValidate.test_minimal_passes": 0.0,
+    "test_label_ir.TestValidate.test_schema_mismatch_fails": 0.0,
+    "test_label_ir.TestValidate.test_top_level_must_be_object": 0.0,
+    "test_label_ir.TestValidate.test_unknown_kind_fails": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_cmd_launcher_is_never_advertised_as_the_fastest": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_documented_default_matches_the_launcher": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_one_current_number_per_launcher": 0.0,
@@ -3769,5 +3786,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1265.7
+  "total_s": 1267.2
 }

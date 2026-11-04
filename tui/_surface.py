@@ -9,7 +9,7 @@
 
 KIND = 'nf-terminal-surface'
 SCHEMA = 'nf-terminal-surface/1'
-DIGEST = 'sha256:a7a923cb9dda30848a8d6fd120edc035ff30b3a06b8d35a24f770b909824dac3'
+DIGEST = 'sha256:fa5ef7d84d12e31bf8c0c9e776e4f415b509a955fb137cb6c49142a59828f2cb'
 SOURCE = {'module': 'desktop/src/core/terminal.py',
  'tables': ['ZONES',
             'FAMILIES',
@@ -53,6 +53,7 @@ COMMANDS = ['approve',
  'import',
  'interop',
  'knowledge',
+ 'label',
  'layers',
  'library',
  'license',
@@ -519,7 +520,8 @@ FAMILIES = [{'id': 'start',
                'impact']},
  {'id': 'govern',
   'name': '治理与决策',
-  'summary': '决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明日志、证据包（打包/第三方复验）、设计审计、语言面（本地化与责任方）',
+  'summary': '决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明日志、证据包（打包/第三方复验）、标注 '
+             'IR（声明与校验，不写载体）、设计审计、语言面（本地化与责任方）',
   'commands': ['decisions',
                'audit',
                'attest',
@@ -533,6 +535,7 @@ FAMILIES = [{'id': 'start',
                'approve',
                'transparency',
                'evidence',
+               'label',
                'design',
                'locales']},
  {'id': 'integrate',

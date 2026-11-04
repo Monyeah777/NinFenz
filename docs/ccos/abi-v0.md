@@ -75,9 +75,10 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 
 ### 1. `cc_label(obj, contract)` → `label`
 
-**状态：`unimplemented`（无 maps_to）**。本仓当前**没有**任何标识写入/标识驱动子系统
-（标识驱动子目录与 `nf labeling` 子命令均不存在，2026-11-04 实测三处独立来源核对）。因此本调用只定
-形状，不宣称能力；实装前置见 §未实装差距。
+**状态：`partial`（声明层已实装 · 载体层未实装）**。`maps_to`：`nf label ir` /
+`nf label validate`（`core/label_ir.py`，形状 = `nf-label/1`，见
+[label-ir-v0.md](label-ir-v0.md)）。**没有**标识写入子系统：`embedded` 只能是声明值，本调用
+**不**宣称已写入载体；把它读成「已实装」是误读。
 
 - 输入：`{obj: <字节或路径>, contract: <契约 id>}`
 - 输出：`{label: {contract, standard, fields, carrier, embedded: bool}}`
@@ -226,8 +227,8 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；四个命令各自成功
 而链条换了字节，仍不算同一条链。
 
-缺环如实标注：本仓无 labeling 子系统（2026-11-04 实测），链条输出 `missing: ["cc_label"]`，
-不假装七环齐全。
+缺环如实标注：本仓无**载体写入**子系统（2026-11-04 实测），链条输出 `missing: ["cc_label"]`，
+不假装七环齐全——`nf label ir` 只补了声明层（形状），不补链条里那一环。
 
 ```bash
 python scripts/ccos_chain.py --target STRATEGY.md          # 人读表
@@ -239,7 +240,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 6 项：摘要一�
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
-| `cc_label` | 全无：无载体写入/无 sidecar 回退/无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
+| `cc_label` | 声明层已有（`nf-label/1` IR + 校验）；**载体写入/读取全无**：无水印嵌入、无元数据注入、无 sidecar 回退、无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
 | `cc_check` | v0 只有封闭词表（5 类规则）；法规文本 → 规则的编译器没有 | 需要政策编译（P2–P3 方向） |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 需要更完整的契约声明面（人工编纂） |
 

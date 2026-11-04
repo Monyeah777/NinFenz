@@ -485,6 +485,28 @@ def _add_parser_production(sub):
     at.add_argument("--selfcheck", action="store_true",
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lab = sub.add_parser("label",
+                        help="标注 IR：形状声明与校验（cc_label 的声明层，不写载体）",
+                        description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
+                                    "**不写载体**（本仓没有标识写入子系统，别把声明当已实装）。"
+                                    "规则表按 GB 45438 分类，v0 映射待按标准原文复核。")
+    lsub = lab.add_subparsers(dest="label_cmd")
+    lir = lsub.add_parser("ir", help="由对象 + 声明项组装 nf-label/1 IR",
+                          description="组装 IR：对象摘要 + 显式/隐式声明项 → nf-label/1。"
+                                      "纯数据、无时间戳（同输入逐字节一致）。")
+    lir.add_argument("object", help="对象文件路径（仓相对或绝对）")
+    lir.add_argument("--level", default="minimal", choices=("minimal", "full"),
+                     help="档位：minimal=显式文字+隐式元数据；full=再要语音/显式元数据/水印")
+    lir.add_argument("--contract", default="", help="关联契约 id（写进 IR，便于溯源）")
+    lir.add_argument("--items", default="", help="声明项 JSON（数组；缺省=空，靠校验面暴露缺项）")
+    lir.add_argument("--producer", default="", help="声明主体（写进 carrier.producer）")
+    lir.add_argument("--out", default="", help="输出文件（缺省=只打印，不落盘）")
+    lir.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lva = lsub.add_parser("validate", help="校验 nf-label/1 IR（形状 + 档位 + 未证明提示）",
+                          description="校验 IR：schema/standard/object/声明项形状 + 档位必需项。"
+                                      "退出码：ok=0 / invalid=1 / 用法错=4。")
+    lva.add_argument("label_ir", metavar="IR.json", help="要校验的 nf-label/1 文件")
+    lva.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("evidence",
                         help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
                         description="证据包（内部差距：attest/receipts/transparency 三件都在，但缺"
@@ -3129,6 +3151,84 @@ def _cmd_sig(args):
         return 0
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
+
+def _cmd_label(args):
+    """nf label：标注 IR 的派发（形状声明与校验；**不写载体**）。"""
+    sub = getattr(args, "label_cmd", "") or ""
+    if sub == "ir":
+        return _label_ir(args)
+    if sub == "validate":
+        return _label_validate(args)
+    print("用法：nf label ir <对象> [--level minimal|full] [--items <json>] [--out <文件>]"
+          " ｜ nf label validate <IR.json>（各自 --help 看逐条）", file=sys.stderr)
+    return 2
+
+
+def _label_ir(args):
+    """nf label ir：组装 nf-label/1 IR（纯数据；给了 --out 才落盘，走 atomic_write）。"""
+    import hashlib
+    import json as _json
+
+    from core import atomic_write, label_ir
+    src = _rel_out(str(args.object)) if not os.path.isabs(str(args.object)) else str(args.object)
+    if not os.path.isfile(src):
+        return _machine_fail(args, f"对象不是文件：{src}（修复指引：先 ls 定位；目录请逐个列出）",
+                             2)
+    try:
+        with open(src, "rb") as fh:
+            digest = hashlib.sha256(fh.read()).hexdigest()
+        items = (json_doc.load(_rel_out(args.items), list, what=args.items)
+                 if getattr(args, "items", "") else [])
+        doc = label_ir.build(_rel_display(src), digest, contract=args.contract,
+                             level=args.level, items=items, producer=args.producer)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    text = _json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    out = ""
+    if getattr(args, "out", ""):
+        out = _rel_out(args.out)
+        parent = os.path.dirname(out)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        atomic_write.write_text(out, text)
+    if args.json:
+        print(text, end="")
+    else:
+        print(f"== nf label ir（{doc['object']['path']} · {doc['level']}）==")
+        print(f"  显式 {len(doc['explicit'])} 项 · 隐式 {len(doc['implicit'])} 项 · "
+              f"digest {digest[:16]}")
+        if out:
+            print(f"  已写入：{_rel_display(out)}")
+        print("  注意：本件只声明「该有哪些标识」，不证明载体里写入了任何东西")
+    return 0
+
+
+def _label_validate(args):
+    """nf label validate：校验 IR（形状 + 档位必需项 + 未证明提示）。"""
+    import json as _json
+
+    from core import json_doc, label_ir
+    raw_path = str(args.label_ir)
+    path = raw_path if os.path.isabs(raw_path) else _rel_out(raw_path)
+    try:
+        doc = json_doc.load(path, dict, what=str(args.label_ir))
+        res = label_ir.validate(doc)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label validate（{_rel_display(path)}）==")
+        print(f"  判定：{res['verdict']} · 档位：{res['level']} · "
+              f"已满足 {len(res['applied'])} 条 · 缺 {len(res['missing'])} 条")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        for w in res["warnings"]:
+            print(f"  [WARN] {w}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            print("  ✓ 声明形状与档位齐备（**不等于**载体里真的带标识）")
+    return 0 if res["verdict"] == "ok" else 1
+
 
 def _cmd_evidence(args):
     """nf evidence：证据包打包 / 第三方复验（cc_verify 的 CLI 面）的派发。"""
@@ -7662,6 +7762,7 @@ _COMMAND_HANDLERS = {
     "sig": _cmd_sig,
     "attest": _cmd_attest,
     "evidence": _cmd_evidence,
+    "label": _cmd_label,
     "check": _cmd_check,
     "resolve": _cmd_resolve,
     "score": _cmd_score,

@@ -121,7 +121,7 @@ def _git_status() -> list[str]:
 def _step_checks_only(verbose: bool) -> tuple[int, float]:
     t0 = time.perf_counter()
     if verbose:
-        print("[1/2] bash verify.sh --checks-only …", flush=True)
+        print("[2/3] bash verify.sh --checks-only …", flush=True)
     proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
     out = (proc.get("out") or "") + (proc.get("err") or "")
     tail = [ln for ln in out.splitlines() if ln.strip()][-1:]
@@ -129,6 +129,56 @@ def _step_checks_only(verbose: bool) -> tuple[int, float]:
     if verbose:
         print(f"  => rc={rc} · {tail[0] if tail else '（无输出）'}", flush=True)
     return (1 if rc is None else int(rc)), time.perf_counter() - t0
+
+
+
+
+#: 供应链核对步骤（G5）：站点数字与根投影必须与「本轮真源」一致。
+#: 为什么进 gate 而不是留在文档里：这两条此前是「记得手动跑」的命令，而它们正是发布文案的
+#: 数字来源——忘了跑就把旧数字发出去（我为此犯过两次）。步骤本身很便宜（秒级）。
+SUPPLY_STEPS = (
+    ("site_numbers", ["node", "site/tools/sync-numbers.mjs"],
+     "站点数字（质量凭证 / 规模 / npm 口径）"),
+    ("llms_projection", ["python", "scripts/sync_llms.py", "--check"],
+     "根 llms-full 投影与 site 逐字节一致"),
+)
+
+
+def supply_chain_issues(rows: list[dict]) -> list[str]:
+    """供应链步骤结果 → 问题列表（纯函数：便于单测门槛逻辑本身）。"""
+    out = []
+    for row in rows:
+        if row.get("skipped"):
+            continue
+        if int(row.get("rc") or 0) != 0:
+            tail = (row.get("tail") or [""])[-1]
+            out.append(f"{row.get('id')} 未过：{tail}")
+    return out
+
+
+def _step_supply_chain(verbose: bool) -> list[dict]:
+    """跑供应链核对步骤（缺工具则记 skipped，不假装通过）。"""
+    rows: list[dict] = []
+    for cid, argv, desc in SUPPLY_STEPS:
+        if argv[0] == "python":
+            argv = [sys.executable, *argv[1:]]
+        t0 = time.perf_counter()
+        proc = _run(argv, 300)
+        rc = proc.get("code")
+        row = {"id": cid, "desc": desc, "rc": 1 if rc is None else int(rc),
+               "wall": round(time.perf_counter() - t0, 1)}
+        if rc is None:
+            row["skipped"] = True
+            row["rc"] = 0
+        if row["rc"] != 0:
+            out = (proc.get("out") or "") + (proc.get("err") or "")
+            row["tail"] = [ln for ln in out.splitlines() if ln.strip()][-6:]
+        if verbose:
+            mark = "✓" if row["rc"] == 0 else "✗"
+            more = "（工具缺失，跳过）" if row.get("skipped") else ""
+            print(f"  {mark} {cid} · {desc}{more}", flush=True)
+        rows.append(row)
+    return rows
 
 
 def _shard_one(index: int, total: int) -> dict:
@@ -149,7 +199,8 @@ def _shard_one(index: int, total: int) -> dict:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="release_conclusion",
-                                 description="发布结论一键复跑（干净树 → checks-only → 分片）")
+                                 description="发布结论一键复跑（干净树 → 供应链核对 → "
+                                             "checks-only → 分片）")
     ap.add_argument("--shards", type=int, default=DEFAULT_SHARDS,
                     help=f"分区数（缺省 {DEFAULT_SHARDS}；每片独立进程，并集 == 全量）")
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
@@ -158,6 +209,8 @@ def main(argv=None) -> int:
                     help="允许在脏树上跑（默认拒绝：脏树会产生与输入无关的假红）")
     ap.add_argument("--skip-checks", action="store_true", help="跳过 checks-only 步骤")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
+    ap.add_argument("--only-preflight", action="store_true",
+                    help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
     ap.add_argument("--json", action="store_true", help="机读汇总")
     args = ap.parse_args(argv)
 
@@ -167,6 +220,8 @@ def main(argv=None) -> int:
             "checks_only": not args.skip_checks,
             "steps": ["git status --porcelain",
                       "packaging/npm/payload/payload-manifest.json 的 source_commit == HEAD",
+                      "供应链核对（node site/tools/sync-numbers.mjs + "
+                      "python scripts/sync_llms.py --check）",
                       "bash verify.sh --checks-only"]
                      + [f"python scripts/verify_tests.py --shard {i}/{shards}"
                         for i in range(shards)]}
@@ -193,6 +248,29 @@ def main(argv=None) -> int:
               file=sys.stderr)
 
     t0 = time.perf_counter()
+    if not args.json:
+        print("[1/3] 供应链核对（站点数字 + 根投影）…", flush=True)
+    supply = _step_supply_chain(not args.json)
+    supply_issues = supply_chain_issues(supply)
+    if supply_issues:
+        payload = {"schema": "nf-release-conclusion/1", "ok": False,
+                   "supply_chain": supply, "issues": supply_issues,
+                   "note": "供应链核对未过：发布文案的数字来源不一致，先修再跑（"
+                           "site: node site/tools/sync-numbers.mjs --write；"
+                           "投影: python scripts/sync_llms.py --write）",
+                   "wall": round(time.perf_counter() - t0, 1)}
+        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              if args.json else "  ✗ 供应链核对未过 → 停止")
+        return 1
+
+    if args.only_preflight:
+        payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
+                   "supply_chain": supply, "issues": [],
+                   "wall": round(time.perf_counter() - t0, 1)}
+        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
+        return 0
+
     checks_rc = 0
     if not args.skip_checks:
         checks_rc, _checks_wall = _step_checks_only(not args.json)
@@ -206,7 +284,7 @@ def main(argv=None) -> int:
             return 1
 
     if not args.json:
-        print(f"[2/2] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
+        print(f"[3/3] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
     results: list[dict] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = [pool.submit(_shard_one, i, shards) for i in range(shards)]
@@ -219,7 +297,7 @@ def main(argv=None) -> int:
                       flush=True)
     summary = aggregate(results)
     payload = {"schema": "nf-release-conclusion/1", "ok": summary["ok"] and checks_rc == 0,
-               "checks_only_rc": checks_rc,
+               "supply_chain": supply, "checks_only_rc": checks_rc,
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
                "wall_s": round(time.perf_counter() - t0, 1)}
@@ -234,6 +312,7 @@ def main(argv=None) -> int:
                 for line in row.get("tail") or []:
                     print(f"  {line}")
         print("== 发布结论 ==")
+        print(f"  供应链核对：{len(supply)} 步 · 未过 {len(supply_issues)}")
         print(f"  checks-only：rc={checks_rc}")
         print(f"  分片：{len(results)} 片 · 失败 {len(summary['failed'])} 片 · "
               f"分片墙钟合计 {summary['wall']} s · 总墙钟 {payload['wall_s']} s")

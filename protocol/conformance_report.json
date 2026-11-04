@@ -121,8 +121,8 @@
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2406 · 数据契约 54",
-      "digest": "d17969c7b77690d268ec299b8e0d56d11b5f2421a132e932f69fba17251cea2d",
+      "detail": "词表 12 · 规范件 37 / 说明件 2407 · 数据契约 54",
+      "digest": "44a9ead1f396ef2e483d717007dc38a7b3a8f67dfa1079d4f43e7af9f417dd1f",
       "id": "modeling",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "b442943e0dfc8637546af37603b089600c260385ef91a2960aa2d7039bedee53",
+  "root": "012e4c782186145cb69e9e435b98063f9f9f4fcf225ce0fa9e2efc13f78b9b20",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

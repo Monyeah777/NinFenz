@@ -317,10 +317,11 @@ FAMILIES: tuple[dict[str, Any], ...] = (
                   "related", "who-refers", "impact")},
     {"id": "govern", "name": "治理与决策",
      "summary": "决策记录（ADR）、审计、背书、回执、交接、复盘、决策层、评审、构建回路、批准、透明"
-         "日志、证据包（打包/第三方复验）、设计审计、语言面（本地化与责任方）",
+         "日志、证据包（打包/第三方复验）、标注 IR（声明与校验，不写载体）、设计审计、"
+         "语言面（本地化与责任方）",
      "commands": ("decisions", "audit", "attest", "receipts", "handover",
                   "postmortem", "decide", "model", "review", "workloop",
-                  "approve", "transparency", "evidence", "design", "locales")},
+                  "approve", "transparency", "evidence", "label", "design", "locales")},
     {"id": "integrate", "name": "服务与集成",
      "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置"
          "、世界模型、模块工具面",

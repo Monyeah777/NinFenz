@@ -293,6 +293,8 @@ SKIP = {
     "resolve": "需参面（对象必填；未认领时 rc=1 属判定）——见 test_asset_contract_faces.py",
     "evidence verify": "需参面（证据源必填）——见 test_evidence.py / test_http_api.py",
     "evidence replay": "需参面（证据源必填）——见 test_evidence.py::TestReplay",
+    "label ir": "需参面（对象必填）——见 test_label_ir.py::TestCli",
+    "label validate": "需参面（IR 文件必填）——见 test_label_ir.py::TestCli",
 }
 
 
