@@ -39,15 +39,21 @@ core.attest，链节域分隔前缀取 core.transparency_log。
 | 2 | 每个 payload 的 sha256 == 清单记录 | invalid |
 | 3 | 叶复算 → RFC 6962 根 == 清单 root | invalid |
 | 4 | 每条 inclusion proof 折叠到同一 root | invalid |
-| 5 | 透明日志链头 == 由条目顺序重算的链头 | invalid |
+| 5 | chain 段**必填**：head 非空、count == 成员数，且链头 == 由条目顺序重算 | invalid |
 | 6 | payload 里**不得**多出未登记成员（多出来的字节没有回执背书） | invalid |
 | 7 | 清单内**每一份**信封都必须通过，且每个成员至少被一份信封覆盖 | invalid |
 | 8 | hmac 级：同一密钥在场且 mac 匹配 | invalid（缺密钥**不**降级） |
-| 9 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
-| 10 | 时效（expires_at 早于判定时点） | **expired** |
+| 9 | 包内吊销表（若在）可解析且 schema 正确 | invalid（坏件**不能**当「无吊销」） |
+| 10 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
+| 11 | 时效（expires_at 早于判定时点） | **expired** |
 
-第 7 条是**严格**口径：不容忍「有一份信封过了就算过」——证据强度只由最弱那一环决定，
-挑最好看的报等于给「悄悄塞一份坏信封」留容错面。
+三条**严格**口径（都是 2026-11-04 攻击矩阵实测出来的「坏件冒充合格」）：
+
+- 第 5 条：旧实现「有链头才比」——删掉 chain 段或把 head 置空就能绕过，等于把「顺序不可证」
+  伪装成「顺序没问题」。**缺证据 ≠ 证据成立**。
+- 第 7 条：不容忍「有一份信封过了就算过」——证据强度只由最弱那一环决定，挑最好看的报
+  等于给「悄悄塞一份坏信封」留容错面。
+- 第 9 条：吊销表坏件曾被折成「无吊销」，于是把吊销表写坏就能让已吊销证据判 ok。
 
 判定词表只有四个词：ok / revoked / expired / invalid。退出码：ok=0 / invalid=1 / revoked=2 /
 expired=3 / 用法错=4。证据强度（level）如实回填，词表 = digest_only / receipts_only /
@@ -86,7 +92,7 @@ python scripts/nf.py evidence verify evidence.zip --kind bundle             # �
 # 机制体检（PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired）
 python scripts/nf.py evidence verify --selfcheck
 
-# 攻击矩阵基准（25 条已知攻击，逐条比对期望判定；写 Markdown 报告）
+# 攻击矩阵基准（29 条已知攻击，逐条比对期望判定；写 Markdown 报告）
 python scripts/nf.py evidence bench
 python scripts/nf.py evidence bench --out /tmp/evidence-bench.md
 ```

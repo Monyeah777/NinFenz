@@ -150,8 +150,20 @@ def _v_bundle_manifest(src, doc, res):
     entries = doc.get("entries") or []
     res["count"] = len(entries)
     res["root"] = str(doc.get("root") or "")
-    res["head"] = str((doc.get("chain") or {}).get("head") or "")
+    chain = doc.get("chain")
+    res["head"] = str((chain or {}).get("head") or "") if isinstance(chain, dict) else ""
     res["expires_at"] = str(doc.get("expires_at") or "")
+    # 链段必填且自洽（与真源同口径）：缺段/空头/计数不符一律 invalid——缺证据 ≠ 证据成立
+    if not isinstance(chain, dict):
+        res["issues"].append("缺 chain 段（证据包必须带链头，否则无法证明条目顺序）")
+        return None
+    if not res["head"]:
+        res["issues"].append("chain.head 为空（空链头证明不了任何顺序）")
+        return None
+    if chain.get("count") != len(entries):
+        res["issues"].append("chain.count 不符：记录={} 实测={}".format(
+            chain.get("count"), len(entries)))
+        return None
     if not entries:
         res["issues"].append("证据包为空")
         return None
@@ -169,7 +181,7 @@ def _v_bundle_manifest(src, doc, res):
             res["issues"].append("包含证明不折叠到根：{}".format(_norm(e.get("path") or "")))
     if res["issues"]:
         return None
-    if res["head"] and _chain_head(entries) != res["head"]:
+    if _chain_head(entries) != res["head"]:
         res["issues"].append("透明日志链头不一致（条目顺序被插删/改序）")
         return None
     listed = {PAYLOAD_DIR + _norm(e.get("path") or e.get("id") or "") for e in entries}
@@ -321,11 +333,16 @@ def _v_attest(src, doc, key, revocations, at):
 
 
 def _embedded_rev(src):
+    """包内吊销表 → (表 或 None, 错误)。坏件/形状不符**不能**当「无吊销」（与真源同口径）。"""
     raw = src.read("revocations.json")
     if raw is None:
-        return None
-    _schema, doc = _parse_doc(raw)
-    return doc
+        return None, ""
+    schema, doc = _parse_doc(raw)
+    if doc is None:
+        return None, "包内吊销表不可解析（坏件不能当「无吊销」）"
+    if schema != REVOCATION_SCHEMA:
+        return None, f"包内吊销表 schema 不匹配（期望 {REVOCATION_SCHEMA}）"
+    return doc, ""
 
 
 def run_evidence(args) -> int:
@@ -352,8 +369,12 @@ def run_evidence(args) -> int:
                 if got is not None:
                     _v_bundle_envelopes(src, doc, got[1], key, res)
                     if not res["issues"]:
-                        _judge(res, got[0], rev if rev is not None else _embedded_rev(src),
-                               args.at)
+                        embedded, rev_err = _embedded_rev(src) if rev is None else (None, "")
+                        if rev_err:      # 坏吊销表 = 定案 invalid（不是「无吊销」）
+                            res["issues"].append(rev_err)
+                        else:
+                            _judge(res, got[0], rev if rev is not None else embedded,
+                                   args.at)
             elif form == "receipts":
                 res = _v_receipts(src, doc, rev)
             else:

@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:11308d1177ce0ba1f334f654ca397667332d448c90b4148eb289304319a8e777
+  - protocol/code_metrics_baseline.json:e9db262f013b726646fda9b4263837789cfaf54ae4172417bdf826ae6e538c6b
 ---
+> 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
 > 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
 
 > 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地

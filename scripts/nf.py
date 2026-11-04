@@ -526,7 +526,7 @@ def _add_parser_production(sub):
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（25 条已知攻击，逐条比对判定）",
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（29 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
                                       "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
@@ -3304,7 +3304,7 @@ def _evidence_pack(args):
 
 
 def _evidence_bench(args):
-    """nf evidence bench：攻击矩阵基准（25 条已知攻击，逐条比对期望判定）。"""
+    """nf evidence bench：攻击矩阵基准（29 条已知攻击，逐条比对期望判定）。"""
     import json as _json
 
     from core import evidence

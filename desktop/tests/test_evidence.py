@@ -329,7 +329,7 @@ class TestBench(_Base):
         res = evidence.bench()
         bad = [c for c in res["cases"] if not c["ok"]]
         self.assertEqual(bad, [])
-        self.assertEqual(res["total"], 25)
+        self.assertEqual(res["total"], 29)
         self.assertTrue(res["ok"])
 
     def test_bench_markdown(self):
@@ -478,6 +478,40 @@ class TestReplay(_Base):
         self.assertTrue(res["ok"], res["issues"])
         self.assertEqual(res["kind"], "attest")
         self.assertEqual(res["entries"][0]["steps"][1]["rule"], "nf-attest-envelope")
+
+
+    def test_strict_chain_and_revocation_agree(self):
+        """两套实现必须同时把「坏件」判 invalid：缺 chain / 空链头 / 吊销表坏 JSON。"""
+        path, _info, data = self._pack(key=self.key)
+        kf = Path(self._tmp.name, "key.bin")
+        kf.write_bytes(self.key)
+
+        def mutate(name, fn):
+            with zipfile.ZipFile(path) as zf:
+                members = {n: zf.read(n) for n in zf.namelist()}
+            meta = json.loads(members["bundle.json"].decode())
+            fn(members, meta)
+            members["bundle.json"] = json.dumps(meta, ensure_ascii=False, indent=2,
+                                                sort_keys=True).encode()
+            out = Path(self._tmp.name, name)
+            out.write_bytes(evidence._zip_bytes(list(members.items())))
+            return str(out)
+
+        cases = [
+            ("nochain.zip", lambda m, meta: meta.pop("chain", None)),
+            ("emptyhead.zip", lambda m, meta: meta["chain"].__setitem__("head", "")),
+            ("badrev.zip", lambda m, meta: m.__setitem__("revocations.json", b"{not json")),
+        ]
+        import subprocess
+        for name, fn in cases:
+            bad = mutate(name, fn)
+            core = evidence.verify(bad, key=self.key)["verdict"]
+            self.assertEqual(core, "invalid", name)
+            proc = subprocess.run([sys.executable, str(TestStandaloneParity.SCRIPT),
+                                   "--evidence", bad, "--json", "--key-file", str(kf)],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace")
+            self.assertEqual(json.loads(proc.stdout)["verdict"], core, name)
 
 
 if __name__ == "__main__":

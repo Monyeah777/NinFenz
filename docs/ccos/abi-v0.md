@@ -112,7 +112,7 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
 
 ### 4. `cc_verify(evidence)` → `ok | revoked | expired | invalid`
 
-**状态：`implemented`**（三种输入形态 + 25 条攻击矩阵基准）。
+**状态：`implemented`**（三种输入形态 + 29 条攻击矩阵基准）。
 maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参考实现** = `scripts/nf_verify.py --evidence <target>`（纯标准库、不 import 任何 NF 模块，单文件可分发）。
 本调用是**中立裁判位的地基**：验证方只需要证据本身，**不需要仓库、不需要联网、
 不需要复现生产环境**。
@@ -140,7 +140,7 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 - `level` 如实回填证据强度（`digest_only`/`receipts_only`/`hmac-sha256`/`ssh-sig`/
   `sigstore-keyless`），**不**把 `digest_only` 说成可信签发、不把「一份信封过了」说成整体可信。
 - 机制判据：`nf evidence verify --selfcheck`（四词判定各自可达）+ `nf evidence bench`
-  （25 条已知攻击逐条比对，任一条不达期望即 exit 1）。
+  （29 条已知攻击逐条比对，任一条不达期望即 exit 1）。
 - 错误码：`cc.verify.not_a_bundle` / `cc.verify.digest_mismatch` / `cc.verify.root_mismatch` /
   `cc.verify.proof_mismatch` / `cc.verify.no_attestation` / `cc.verify.key_required` /
   `cc.verify.revoked` / `cc.verify.expired`
@@ -184,7 +184,7 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 ```bash
 # 1) cc_verify 的机制自检（四词判定各自可达）
 python scripts/nf.py evidence verify --selfcheck
-# 2) cc_verify 的敏感度基准（25 条已知攻击逐条比对；任一条不达期望即 exit 1）
+# 2) cc_verify 的敏感度基准（29 条已知攻击逐条比对；任一条不达期望即 exit 1）
 python scripts/nf.py evidence bench
 # 2b) 两套独立实现判据一致（core 版 vs 零依赖单文件版，含真实回执）
 python -m unittest desktop.tests.test_evidence.TestStandaloneParity

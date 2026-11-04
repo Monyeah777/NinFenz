@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:11308d1177ce0ba1f334f654ca397667332d448c90b4148eb289304319a8e777
+  - protocol/code_metrics_baseline.json:e9db262f013b726646fda9b4263837789cfaf54ae4172417bdf826ae6e538c6b
 ---
+> 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
 > 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
 
 > 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地

@@ -346,8 +346,30 @@ def _check_proofs(entries: Sequence[dict[str, Any]], res: dict[str, Any]) -> Non
                                  f"（{GUIDE}单条证明与根不同源——请重打包）")
 
 
-def _check_chain(entries: Sequence[dict[str, Any]], res: dict[str, Any]) -> None:
-    if res["head"] and _chain_head(entries) != res["head"]:
+def _check_chain(entries: Sequence[dict[str, Any]], meta: dict[str, Any],
+                 res: dict[str, Any]) -> None:
+    """链段**必填且自洽**（缺段/空头/计数不符一律 invalid）。
+
+    为什么必须严（2026-11-04 实测）：旧实现「有 head 才比」——攻击者删掉 chain 段或把 head
+    置空，校验直接跳过并判 ok，等于把「顺序不可证」伪装成「顺序没问题」。缺证据 ≠ 证据成立。
+    """
+    chain = meta.get("chain")
+    if not isinstance(chain, dict):
+        res["issues"].append("缺 chain 段（" + GUIDE + "证据包必须带链头——没有它无法证明"
+                             "条目顺序，请用 nf evidence pack 重新打包）")
+        return
+    head = str(chain.get("head") or "")
+    if not head:
+        res["issues"].append("chain.head 为空（" + GUIDE + "空链头证明不了任何顺序，"
+                             "请重新 nf evidence pack）")
+        return
+    count = chain.get("count")
+    if count != len(entries):
+        res["issues"].append(f"chain.count 不符：记录={count} 实测={len(entries)}"
+                             f"（{GUIDE}条目被增删后未重打包）")
+        return
+    res["head"] = head
+    if _chain_head(entries) != head:
         res["issues"].append("透明日志链头不一致（" + GUIDE +
                              "条目顺序被插删/改序——链可证顺序，对不上即 invalid）")
 
@@ -432,7 +454,13 @@ def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
                       revocations: dict[str, Any] | None,
                       res: dict[str, Any]) -> bool:
     """吊销判定：命中即 revoked（压过 expired，也压过 ok）。返回是否已定案。"""
-    rev = revocations if revocations is not None else _embedded_revocations(rd)
+    if revocations is not None:
+        rev: dict[str, Any] | None = revocations
+    else:
+        rev, err = _embedded_revocations(rd)
+        if err:
+            res["issues"].append(err)
+            return True                       # 坏吊销表 = 定案 invalid（不是「无吊销」）
     hit = _revocation_hit(rev, entries)
     if hit is None:
         return False
@@ -488,7 +516,7 @@ def verify(bundle: str, key: bytes | None = None,
         if res["issues"]:
             return res
         _check_proofs(entries, res)
-        _check_chain(entries, res)
+        _check_chain(entries, meta, res)
         _check_extras(rd, entries, res["issues"])
         if res["issues"]:
             return res
@@ -505,15 +533,25 @@ def verify(bundle: str, key: bytes | None = None,
         rd.close()
 
 
-def _embedded_revocations(rd: _Reader) -> dict[str, Any] | None:
+def _embedded_revocations(rd: _Reader) -> tuple[dict[str, Any] | None, str]:
+    """包内吊销表 → (表 或 None, 错误文本)。
+
+    **坏件不能当「无吊销」**（2026-11-04 实测）：旧实现把解析失败折成 None，于是「把吊销表
+    写坏」就能让已吊销的证据判 ok——坏件冒充合格。现在坏件/形状不符一律返回错误，判定 invalid。
+    """
     raw = rd.read(REVOCATIONS_ENTRY)
     if raw is None:
-        return None
+        return None, ""
     try:
         doc = json_doc.loads(raw.decode(), dict, what="吊销表")
-    except (ValueError, UnicodeDecodeError):   # 包内吊销表坏件：按「无吊销表」处理
-        return None
-    return doc if isinstance(doc, dict) else None
+    except (ValueError, UnicodeDecodeError) as exc:
+        return None, (f"包内吊销表不可解析：{exc}（{GUIDE}吊销表坏件不能当「无吊销」——"
+                      "请重新打包，或提供合法的 nf-revocation/1）")
+    if str(doc.get("schema") or "") != REVOCATION_SCHEMA:
+        got = doc.get("schema")
+        return None, (f"包内吊销表 schema 不匹配（期望 {REVOCATION_SCHEMA}，实得 {got!r}）"
+                      f"（{GUIDE}形状不对的吊销表不能当「无吊销」）")
+    return doc, ""
 
 
 def _revocation_hit(rev: dict[str, Any] | None,
@@ -952,7 +990,10 @@ def _replay_bundle(doc: dict[str, Any], read: Any, entry: str,
     if res["recomputed_root"] != res["root"]:
         issues.append(f"根不一致：记录={res['root'][:16]} 实测="
                       f"{res['recomputed_root'][:16]}（{GUIDE}成员集被增删或改序）")
-    if res["head"] and res["recomputed_head"] != res["head"]:
+    if not res["head"]:
+        issues.append("缺 chain 段（" + GUIDE + "轨迹无法证明条目顺序——"
+                      "请用 nf evidence pack 重新打包，缺证据不等于没问题）")
+    elif res["recomputed_head"] != res["head"]:
         issues.append("链头不一致（" + GUIDE + "条目顺序被插删/改序）")
     if want and not res["entries"]:
         issues.append(f"证据里没有该成员：{entry}（{GUIDE}请核对相对路径写法）")
@@ -1127,6 +1168,10 @@ def _truncate_proof(meta: dict[str, Any]) -> None:
     meta["entries"][0]["proof"] = []
 
 
+def _empty_head(meta: dict[str, Any]) -> None:
+    meta["chain"]["head"] = ""
+
+
 def _swap_entries(meta: dict[str, Any]) -> None:
     entries = meta["entries"]
     entries[0], entries[-1] = entries[-1], entries[0]
@@ -1215,6 +1260,20 @@ def bench() -> dict[str, Any]:
                        base, lambda meta: meta["chain"].__setitem__("head", "0" * 64))))
         _bench_run(rows, "chain_order", "条目顺序被换（链可证顺序）", "invalid",
                    _bench_write(tmp, "corder.zip", _mut_meta(base, _swap_entries)))
+        _bench_run(rows, "chain_missing", "chain 段被整体删除（缺证据≠证据成立）", "invalid",
+                   _bench_write(tmp, "chnone.zip",
+                                _mut_meta(base, lambda meta: meta.pop("chain", None))))
+        _bench_run(rows, "chain_head_empty", "链头被置空", "invalid",
+                   _bench_write(tmp, "chzero.zip",
+                                _mut_meta(base, _empty_head)))
+        _bench_run(rows, "chain_count_wrong", "链条数与成员数不符", "invalid",
+                   _bench_write(tmp, "chcnt.zip",
+                                _mut_meta(base, lambda meta: meta["chain"]
+                                          .__setitem__("count", 99))))
+        m = dict(members)
+        m[REVOCATIONS_ENTRY] = b"{not json"
+        _bench_run(rows, "revocations_bad", "包内吊销表写坏（坏件不能当「无吊销」）", "invalid",
+                   _bench_write(tmp, "revbad.zip", _rebuild(m)))
         # 信封 / 密钥 / 结构
         m = dict(members)
         m.pop(ATTEST_DIR + "0001.json")

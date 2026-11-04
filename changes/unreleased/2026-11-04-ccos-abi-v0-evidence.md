@@ -1,3 +1,3 @@
 type: fix
 surface: ccos
-note: 全量档 check12 修复波——分片实测暴露的 8 项失败清零：新 --json 面登记去向（check/resolve/evidence verify/replay）、bench 的 --json 输出改纯 JSON 且不吐机器绝对路径、证据模块读取统一走 core.json_doc（未校验读点回到基线 1）、静默跳过逐站点补理由、Rust 快线回执去重与 Python 真源同步（重编 nf-rs 后逐字节对账恢复）、新增 4 个测试模块的 check12 权重增量实测（--write-weights 合并，预算棘轮复位）；另确认此前「check12 挂死」为误判：实测分片 0/8 全程 224 s 正常完成，全量档在本机约 40 分钟（参考机基线 1265 s）
+note: 证据线 fail-closed 加固（攻击矩阵 25→29）：chain 段改必填且自洽（缺段/空链头/计数不符一律 invalid——缺证据不等于证据成立）、包内吊销表坏件与 schema 不符不再折成「无吊销」（坏件冒充合格），零依赖单文件复验器同步同一口径并补双实现一致性判据；另修全量档分片暴露的原子写纪律、JSON 面登记、json_doc 收敛、Rust 快线回执同步与 check12 权重；分片 0/8 与 4/8 实测 rc=0
