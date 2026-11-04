@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:23ded27cdf0e3302f6c6b417e037332294dd28fc078c8ec23efb44e43e2ceb7b
+  - protocol/code_metrics_baseline.json:62110f0e5205db7920f787761bfce1a191703a725b7462252f0dc1c45197e63b
 ---
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例

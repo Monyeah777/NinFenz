@@ -211,6 +211,9 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 
 ## 一条链复现（ABI 的验收动作）
 
+发布结论的**固定入口**见 [release-conclusion.md](release-conclusion.md)：脏树闸门 → checks-only
+→ 分片并行 → 汇总，一条命令给出「这台机器现在能不能发布」。
+
 四环可跑的链条现场验证：`scripts/ccos_chain.py`（`--target <对象>`）。它的判据不是
 「四个命令都返回 0」，而是**同一个对象字节的摘要逐个流下去**——体检的 sha256、信封的
 subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；四个命令各自成功

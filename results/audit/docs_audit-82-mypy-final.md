@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:23ded27cdf0e3302f6c6b417e037332294dd28fc078c8ec23efb44e43e2ceb7b
+  - protocol/code_metrics_baseline.json:62110f0e5205db7920f787761bfce1a191703a725b7462252f0dc1c45197e63b
 ---
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:23ded27cdf0e3302f6c6b417e037332294dd28fc078c8ec23efb44e43e2ceb7b
+  - protocol/code_metrics_baseline.json:62110f0e5205db7920f787761bfce1a191703a725b7462252f0dc1c45197e63b
 ---
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例

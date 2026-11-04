@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:23ded27cdf0e3302f6c6b417e037332294dd28fc078c8ec23efb44e43e2ceb7b
+  - protocol/code_metrics_baseline.json:62110f0e5205db7920f787761bfce1a191703a725b7462252f0dc1c45197e63b
 ---
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例

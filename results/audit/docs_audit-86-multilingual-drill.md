@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:23ded27cdf0e3302f6c6b417e037332294dd28fc078c8ec23efb44e43e2ceb7b
+  - protocol/code_metrics_baseline.json:62110f0e5205db7920f787761bfce1a191703a725b7462252f0dc1c45197e63b
 ---
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
 > 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
 
 > 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例
