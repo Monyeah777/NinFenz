@@ -20,6 +20,17 @@ from core import atomic_write as aw  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _live(name):
+    """取**当前**的 core 模块（判据必须打桩在运行时对象上）。
+
+    为什么：常驻层/其它用例会 reload core 模块，本文件 import 时抓到的对象可能已经过时——
+    对旧对象打桩，被测代码用的是新对象，桩不生效，判据就变成假绿/假红（2026-11-05 分片实测）。
+    """
+    import importlib
+    mod = sys.modules.get(name)
+    return mod if mod is not None else importlib.import_module(name)
+
+
 def _load_nf():
     import importlib.util
     spec = importlib.util.spec_from_file_location("nfcli_atomic", ROOT / "scripts" / "nf.py")
@@ -76,14 +87,16 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
 
     def test_code_metrics_baseline_write_is_atomic(self):
         from unittest import mock
-        from core import code_metrics as cm
+        aw_live = _live("core.atomic_write")
+        cm = _live("core.code_metrics")
         with tempfile.TemporaryDirectory() as tmp:
             root = self._fixture(tmp)
             cm.write(str(root))                        # 先落一版
             target = root / cm.BASELINE_REL
             before = target.read_text(encoding="utf-8")
             (root / "a.py").write_text("x = 2\ny = 3\n", encoding="utf-8")
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with mock.patch.object(aw_live, "_replace",
+                                   side_effect=PermissionError("busy")):
                 with self.assertRaises(PermissionError):
                     cm.write(str(root))
             self.assertEqual(before, target.read_text(encoding="utf-8"),
@@ -95,7 +108,8 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
 
     def test_index_projection_write_is_atomic(self):
         from unittest import mock
-        from core import decisions as dc
+        aw_live = _live("core.atomic_write")
+        dc = _live("core.decisions")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "decisions").mkdir()
@@ -104,7 +118,8 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
                     "\n",
                 encoding="utf-8")
             before = (root / dc.INDEX_REL).read_text(encoding="utf-8")
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with mock.patch.object(aw_live, "_replace",
+                                   side_effect=PermissionError("busy")):
                 with self.assertRaises(PermissionError):
                     dc.write_projection(str(root))
             self.assertEqual(before, (root / dc.INDEX_REL).read_text(encoding="utf-8"),

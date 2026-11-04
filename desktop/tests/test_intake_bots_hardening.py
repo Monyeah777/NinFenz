@@ -341,7 +341,19 @@ class GiteeInjectionWiringTest(unittest.TestCase):
     """
 
     def _modules(self):
-        return bot_module(), __import__("gitee_ingest")
+        """取**当前**两个前端模块。
+
+        为什么要是「当前」：常驻层/其它用例会 reload core 模块，本文件 import 时抓到的对象可能
+        已过时——于是「两个前端共用同一函数对象」这条判据会假红（2026-11-05 分片实测）。
+        取当前对象后再 reload 一次 Gitee 前端，让它从当前单源重新取函数。
+        """
+        import importlib
+        li = bot_module()
+        li = sys.modules.get(getattr(li, "__name__", ""), li)
+        sys.modules.pop("gitee_ingest", None)
+        gi = __import__("gitee_ingest")
+        importlib.reload(gi)
+        return li, gi
 
     def test_gitee_reuses_the_single_source_probe(self):
         li, gi = self._modules()

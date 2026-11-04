@@ -1001,7 +1001,7 @@
     "desktop/tests/test_ast_missing.py::E401": 1,
     "desktop/tests/test_ast_missing.py::I001": 1,
     "desktop/tests/test_ast_missing.py::RUF100": 1,
-    "desktop/tests/test_atomic_write.py::I001": 5,
+    "desktop/tests/test_atomic_write.py::I001": 3,
     "desktop/tests/test_atomic_write.py::RUF100": 1,
     "desktop/tests/test_atomic_write.py::SIM117": 11,
     "desktop/tests/test_atomic_write.py::UP031": 4,
