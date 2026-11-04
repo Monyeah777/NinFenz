@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-05",
   "approved_by": "Monyeah777",
-  "note": "标注 IR v0 + G5 收口",
+  "note": "口径同步收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "91d0deb1a0d7a190870a971b4a372c60a074d84e7cc764761d2f8a2aa586c447"
