@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:a4da6dbf76142b82842fd51d13d6bef1eaa610e62c4c0227be33fa65a0e53b7c
+  - protocol/code_metrics_baseline.json:59ef333ef06a420c2e929a30a44dd3dada53b1b36ac396f126a3251c0ae2b4a7
 ---
+> 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
+
 > 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
 
 > 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数

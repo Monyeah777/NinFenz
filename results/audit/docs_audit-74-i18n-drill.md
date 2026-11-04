@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:a4da6dbf76142b82842fd51d13d6bef1eaa610e62c4c0227be33fa65a0e53b7c
+  - protocol/code_metrics_baseline.json:59ef333ef06a420c2e929a30a44dd3dada53b1b36ac396f126a3251c0ae2b4a7
 ---
+> 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
+
 > 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
 
 > 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数

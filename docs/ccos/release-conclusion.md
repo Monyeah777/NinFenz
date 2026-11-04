@@ -44,6 +44,29 @@ python scripts/release_conclusion.py --json          # 机读汇总（含每片 
 供应链步进 gate 的原因（G5）：这两条此前是「记得手动跑」的命令，而它们正是发布文案数字的来源——
 忘了跑就把旧数字发出去（实测犯过两次）。步骤本身秒级，代价远小于一次错发。
 
+## 修复回路：`--affected`（本地快回路，**不是**发布结论）
+
+发布结论要全量（上面三步），但「改一处、验一处」不必每次都花 29 分钟。分片执行器提供选片：
+
+```bash
+python scripts/verify_tests.py --affected --list    # 先看会跑哪些（含选择理由）
+python scripts/verify_tests.py --affected           # 跑受影响模块
+```
+
+选片分四类，**宁慢勿漏**：
+
+| 变更面 | 选中 | 实测（2026-11-05） |
+|---|---|---|
+| 干净树 | 只跑常驻集（纯度/风格/死代码/套件隔离/预算） | 72 条 |
+| `desktop/tests/test_*.py` | 该模块的测试 | 89 条 |
+| `desktop/src/core/*.py` | 反向 import 闭包（谁依赖它） | 135 条 |
+| 其它路径（CLI/文档…） | 测试源码里**引用了该路径**的模块（文档按 `docs/` 目录前缀） | 594 / 1007 条 |
+| `verify.sh` / `protocol/` / `.github/` / 门禁本体 | **全量兜底**（改的是判据本身，选片不可信） | 全量 |
+
+判据：`python -m unittest desktop.tests.test_verify_tests_selection`（11 项，纯函数）。
+
+**纪律**：`--affected` 只用于本地修复回路；「可发布」的结论必须来自上面的全量三步。
+
 ## 判据（可证）
 
 ```bash

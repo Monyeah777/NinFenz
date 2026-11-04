@@ -326,6 +326,7 @@
     "test_verify_guard": 6.0,
     "test_verify_parallel_checks": 2.1,
     "test_verify_report": 35.0,
+    "test_verify_tests_selection": 0.2,
     "test_version_map": 2.3,
     "test_version_matrix": 0.1,
     "test_watch": 62.7,
@@ -3711,6 +3712,17 @@
     "test_verify_report.RealRepoTest.test_committed_report_is_fresh": 0.0,
     "test_verify_report.RealRepoTest.test_real_repo_has_no_failing_judgement": 0.0,
     "test_verify_report.RealRepoTest.test_summary_line_mentions_declared_baseline": 0.0,
+    "test_verify_tests_selection.TestSelection.test_always_modules_survive_any_rule": 0.04,
+    "test_verify_tests_selection.TestSelection.test_changed_test_file_selects_that_module": 0.0,
+    "test_verify_tests_selection.TestSelection.test_clean_tree_runs_only_always_modules": 0.0,
+    "test_verify_tests_selection.TestSelection.test_cli_change_selects_referencing_tests": 0.0,
+    "test_verify_tests_selection.TestSelection.test_core_change_uses_reverse_closure": 0.04,
+    "test_verify_tests_selection.TestSelection.test_docs_change_selects_doc_referencing_tests": 0.0,
+    "test_verify_tests_selection.TestSelection.test_hard_fallback_protocol_goes_full": 0.0,
+    "test_verify_tests_selection.TestSelection.test_hard_fallback_self_edit_goes_full": 0.0,
+    "test_verify_tests_selection.TestSelection.test_hard_fallback_verify_sh_goes_full": 0.0,
+    "test_verify_tests_selection.TestSelection.test_selection_is_deterministic": 0.0,
+    "test_verify_tests_selection.TestSelection.test_windows_separators_are_normalized": 0.0,
     "test_version_map.CliNpmMcpVersionTest.test_three_faces_agree": 0.0,
     "test_version_map.ContentVersionTest.test_changelog_and_matrix_agree": 0.0,
     "test_version_map.GateVersionTest.test_repo_stats_matches_quality_baseline_and_llms": 0.0,
@@ -3804,5 +3816,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1269.0
+  "total_s": 1269.2
 }

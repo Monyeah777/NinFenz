@@ -178,24 +178,100 @@ def _test_sources() -> dict:
     return out
 
 
-def affected_selection(ids: list) -> tuple:
-    """变更 → 受影响测试 id；非 core 变更**全量兜底**（宁慢勿漏）。"""
-    changed = changed_paths()
-    if not changed:
-        keep = [t for t in ids if module_of(t) in ALWAYS_MODULES]
-        return keep, f"干净树（只跑常驻集 {len(keep and {module_of(t) for t in keep})} 个模块）"
-    non_core = [p for p in changed if not p.startswith("desktop/src/core/")]
-    if non_core:
-        return list(ids), f"非 core 变更 {len(non_core)} 个 → 全量兜底"
-    changed_core = {Path(p).stem for p in changed if p.endswith(".py")}
-    closure = _core_reverse_closure(changed_core)
-    sources = _test_sources()
-    keep = []
+#: 「改了就全量兜底」的面：这些件一动，选片规则不再可信（宁慢勿漏）。
+#: 协议件、门禁本体、CI 配置、测试装配入口都在这——它们影响的是**判据本身**，不是某个模块。
+HARD_FALLBACK = (
+    "verify.sh",
+    "protocol/",
+    ".github/",
+    "desktop/tests/__init__.py",
+    "scripts/verify_tests.py",
+    "scripts/verify_report.py",
+    "scripts/release_conclusion.py",
+    "scripts/style_check.py",
+    "scripts/code_metrics.py",
+    "scripts/coupling_metrics.py",
+    "scripts/sast_check.py",
+    "desktop/src/core/atomic_write.py",
+)
+
+
+def _hard_fallback_hit(paths: list) -> str:
+    """命中硬兜底面 → 命中项（空串 = 没命中）。目录项按前缀比，文件项按全等比。"""
+    for p in paths:
+        for rule in HARD_FALLBACK:
+            if rule.endswith("/"):
+                if p.startswith(rule):
+                    return p
+            elif p == rule:
+                return p
+    return ""
+
+
+def select_affected(ids: list, changed: list, sources: dict) -> tuple:
+    """变更 → (受影响的测试 id, 人读理由)。**纯函数**（sources 由调用方给），便于单测。
+
+    为什么分四类（2026-11-05 实测教训）：旧规则「非 core 变更一律全量兜底」让 `--affected` 在
+    最常用的两种改动（改测试、改 CLI）上永远退化成全量——等于没有选片，改一条断言仍要跑 29 分钟。
+
+    规则与安全性：
+    - **HARD_FALLBACK** 面（协议/门禁本体/CI 装配）→ 全量兜底：这些件改的是判据本身，选片不可信；
+    - core 模块变更 → 反向 import 闭包（谁依赖它）；
+    - 测试文件自身变更 → 该模块的测试；
+    - 其余路径 → **文本引用闭包**：测试源码里出现该仓内相对路径才选中（只认完整路径，不认文件名）。
+    常驻集（ALWAYS_MODULES）永远在。**选片只用于本地修复回路，发布结论仍跑全量分片**。
+    """
+    paths = [str(p).replace("\\", "/") for p in (changed or [])]
+    always = frozenset(ALWAYS_MODULES)
+    if not paths:
+        keep = [t for t in ids if module_of(t) in always]
+        mods = len({module_of(t) for t in keep})
+        return keep, f"干净树（只跑常驻集 {mods} 个模块）"
+    hard = _hard_fallback_hit(paths)
+    if hard:
+        return list(ids), f"命中硬兜底面（{hard}）→ 全量"
+    keep: set = set()
+    classes = []
+    core_changed = {Path(p).stem for p in paths
+                    if p.startswith("desktop/src/core/") and p.endswith(".py")}
+    if core_changed:
+        closure = _core_reverse_closure(core_changed)
+        for tid in ids:
+            if _core_imports(sources.get(module_of(tid), "")) & closure:
+                keep.add(tid)
+        classes.append(f"core {len(core_changed)} 个 → 闭包 {len(closure)} 模块")
+    test_mods = {Path(p).stem for p in paths
+                 if p.startswith("desktop/tests/") and p.endswith(".py")
+                 and Path(p).name.startswith("test")}
+    if test_mods:
+        for tid in ids:
+            if module_of(tid) in test_mods:
+                keep.add(tid)
+        classes.append(f"测试件 {len(test_mods)} 个 → 对应模块")
+    others = [p for p in paths
+              if not p.startswith(("desktop/src/core/", "desktop/tests/"))]
+    if others:
+        # 文档面按**目录前缀**匹配：判据源码里引的是「docs/」这种目录，不会写全件路径；
+        # 只按全路径匹配会让「只改文档」这类最常见的改动**漏选**文档面判据（实测 0 命中）。
+        needles = [] if not others else [
+            p if not p.startswith("docs/") else "docs/" for p in others]
+        hit_mods = {mod for mod, src in sources.items()
+                    if any(nd in src for nd in needles)}
+        for tid in ids:
+            if module_of(tid) in hit_mods:
+                keep.add(tid)
+        classes.append(f"文本引用 {len(others)} 个 → {len(hit_mods)} 模块")
     for tid in ids:
-        mod = module_of(tid)
-        if mod in ALWAYS_MODULES or (_core_imports(sources.get(mod, "")) & closure):
-            keep.append(tid)
-    return keep, f"core 变更 {len(changed_core)} 个 → 反向依赖闭包 {len(closure)} 个模块"
+        if module_of(tid) in always:
+            keep.add(tid)
+    ordered = [t for t in ids if t in keep]
+    why = "；".join(classes) if classes else "无匹配类"
+    return ordered, f"{why}（+常驻集）→ {len(ordered)} 条"
+
+
+def affected_selection(ids: list) -> tuple:
+    """变更 → 受影响测试 id（IO 壳：读 git 变更与测试源码，交给纯函数 select_affected）。"""
+    return select_affected(ids, changed_paths(), _test_sources())
 
 
 def load_weights() -> dict:
@@ -492,17 +568,20 @@ def main(argv=None) -> int:
             print("指定模块里没有测试：%s（修复指引：模块名形如 tests.test_xxx）"
                   % ", ".join(sorted(want)), file=sys.stderr)
             return 2
-    if args.list:
-        print(json.dumps({"tests": len(ids), "modules": len({module_of(t) for t in ids})},
-                         ensure_ascii=False))
-        return 0
-
+    selection = ""
     if args.affected and not args.write_weights:
-        ids, why = affected_selection(ids)
-        print("  受影响选择：%s → %d 条测试" % (why, len(ids)))
+        ids, selection = affected_selection(ids)
+        if not args.list:
+            print("  受影响选择：%s" % selection)
         if not ids:
             print("  受影响集为空（修复指引：用 --jobs 0 或 --full 档跑全量）", file=sys.stderr)
             return 2
+    if args.list:
+        payload = {"tests": len(ids), "modules": len({module_of(t) for t in ids})}
+        if selection:
+            payload["selection"] = selection
+        print(json.dumps(payload, ensure_ascii=False))
+        return 0
 
     if args.write_weights:
         t0 = time.perf_counter()
