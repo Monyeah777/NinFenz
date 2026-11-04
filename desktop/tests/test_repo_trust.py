@@ -170,7 +170,11 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
-        with mock.patch.object(gate_engine, "ROOT", evil):
+        # 判据只该依赖「本用例给了什么」，不依赖进程里别的用例留下的信任开关
+        # （2026-11-04 分片实测：脏环境/前面用例的残留会让这条判据假红）。
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
+        with mock.patch.dict(os.environ, clean, clear=True), \
+                mock.patch.object(gate_engine, "ROOT", evil):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
 
@@ -181,7 +185,9 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=True, memo=False, cached=False, jobs=0,
                          trust_repo=True)
-        with (mock.patch.object(gate_engine, "ROOT", evil),
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
+        with (mock.patch.dict(os.environ, clean, clear=True),
+              mock.patch.object(gate_engine, "ROOT", evil),
               mock.patch.object(gate_engine, "build_registry"),
               mock.patch.object(gate_engine, "run_checks", return_value=[])):
             rc = nf._cmd_verify(args)

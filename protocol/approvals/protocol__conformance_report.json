@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-04",
   "approved_by": "Monyeah777",
-  "note": "发布结论器分区/并分离收口",
+  "note": "分片 0/8 两处失败收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "9c1de7f7b7c6d9e51a8d4996c9cbac26362b153a93a36934576e5dd4493b8990"
