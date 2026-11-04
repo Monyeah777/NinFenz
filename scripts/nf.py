@@ -528,6 +528,25 @@ def _add_parser_production(sub):
     evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
     evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evb.add_argument("--quiet", action="store_true", help="只输出结论行")
+    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
+                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
+                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
+                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
+    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
+    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
+    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判）")
+    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
+    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ck = sub.add_parser("check", help="单对象策略体检（cc_check：对象 × 策略 → verdict）",
+                        description="单对象策略体检（内部差距：仓内判定全是仓库级，缺「单对象 × "
+                                    "单策略」入口）。策略是 nf-check-policy/1 的封闭词表 JSON；"
+                                    "判定 ok/invalid，warn 级只提示、不改判定。")
+    ck.add_argument("object", help="体检对象（单个文件；目录请逐件跑）")
+    ck.add_argument("--policy", required=True, help="策略 JSON 路径（仓库相对或绝对）")
+    ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 
 def evidence_kinds() -> tuple[str, ...]:
@@ -3080,6 +3099,8 @@ def _cmd_evidence(args):
         return _evidence_verify(args)
     if sub == "bench":
         return _evidence_bench(args)
+    if sub == "replay":
+        return _evidence_replay(args)
     return _evidence_pack(args)
 
 
@@ -3133,6 +3154,62 @@ def _evidence_verify(args):
                   "不等于内容质量或内容真实）")
     return evidence.EXIT_CODES.get(str(res["verdict"]), 1)
 
+
+def _evidence_replay(args):
+    """nf evidence replay：把证据推导过程摊成确定性 trace（纯读、可 diff）。"""
+    import json as _json
+
+    from core import attest, evidence
+    target = getattr(args, "evidence_bundle", "") or ""
+    if not target:
+        return _machine_fail(args, "缺证据源（修复指引：请给证据包 .zip / 解包目录 / "
+                                   "回执或信封 JSON）", 2)
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        res = evidence.replay(_rel_out(target), entry=args.entry, key=key,
+                              root=_rel_out(args.root) if args.root else "",
+                              kind=args.kind)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence replay（{res['kind']} · {len(res['entries'])} 段轨迹）==")
+        for e in res["entries"]:
+            print(f"  {e['path']}  →  叶 {e['leaf'][:16]}…")
+            for s in e["steps"]:
+                print(f"    {s['step']:>2}. {s['rule']:<18} {s['output'][:32]}")
+        if res.get("root"):
+            print(f"  根：记录 {res['root'][:16]}… / 实测 "
+                  f"{res.get('recomputed_root', '')[:16]}…")
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        print(f"  轨迹自洽：{'是' if res['ok'] else '否'}")
+    return 0 if res["ok"] else 1
+
+
+def _cmd_check(args):
+    """nf check：单对象策略体检（cc_check：对象 × 策略 → verdict）。"""
+    import json as _json
+
+    from core import check_policy
+    try:
+        policy = check_policy.load(_rel_out(args.policy))
+        res = check_policy.check(_rel_out(args.object), policy)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        title = res["policy_id"] or "未命名策略"
+        print(f"== nf check（{title} · 策略 {res['policy_digest'][:16]}）==")
+        for f in res["findings"]:
+            mark = "✓" if f["ok"] else ("✗" if f["severity"] == "fail" else "!")
+            print(f"  {mark} {f['rule']:<24} {f['detail']}")
+            if not f["ok"]:
+                print(f"    → {f['fix']}")
+        print(f"  判定：{res['verdict']}（fail {res['failed']} · warn {res['warned']}）")
+    return 0 if res["verdict"] == "ok" else 1
 
 def _evidence_pack(args):
     """nf evidence pack：把目标文件打成自包含证据包（缺省 = 01/02/06/07 四件）。"""
@@ -7503,6 +7580,7 @@ _COMMAND_HANDLERS = {
     "sig": _cmd_sig,
     "attest": _cmd_attest,
     "evidence": _cmd_evidence,
+    "check": _cmd_check,
     "score": _cmd_score,
     "lint": _cmd_lint,
     "lsp": _cmd_lsp,

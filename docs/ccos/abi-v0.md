@@ -85,13 +85,16 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 
 ### 2. `cc_check(obj, policy)` → `verdict`
 
-**状态：`partial`**。maps_to = `nf conformance`（契约 → Merkle 根 + verdict，
-`protocol/conformance_report.json`）与 `nf run` 的三态质量门（PASS/WARN/FAIL）。
-缺的是「单对象 × 单策略」的入口——现状是仓库级。
+**状态：`implemented`（v0：封闭词表的单对象策略体检）**。maps_to = `nf check <对象> --policy <策略>`；
+仓库级判定仍走 `nf conformance`。策略形状与词表见 `docs/ccos/check-policy-v0.md`：
+`nf-check-policy/1`，kind 是**封闭集**（utf8 / regex_present / regex_absent /
+count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数据。
 
-- 输入：`{obj: <路径>, policy: <策略 id 或策略文件>}`
-- 输出：`{verdict: "ok"|"invalid", findings: [{rule, severity, path, message}], policy_digest}`
-- 判定：`policy_digest` 必填——**判据版本必须随结论一起走**，否则结论不可复算。
+- 输入：`{obj: <单个文件>, policy: <nf-check-policy/1 JSON>}`
+- 输出：`{verdict: "ok"|"invalid", policy_id, policy_digest, object{path,sha256,bytes},
+  findings: [{rule, kind, severity, ok, detail, fix}], failed, warned}`
+- 判定：verdict 只有两个词；`warn` 级违规只进 findings、**不改判定**；坏策略一律带指引拒绝。
+- `policy_digest` 必填——**判据版本必须随结论一起走**，否则结论不可复算。
 - 幂等：idempotent + 纯读。
 
 ### 3. `cc_attest(subject)` → `evidence`
@@ -145,11 +148,14 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 
 ### 5. `cc_replay(evidence)` → `trace`
 
-**状态：`partial`**。maps_to = `nf receipts --entry <path> --json`（单条 → inclusion proof 折叠
-路径）+ `nf transparency --json`（链节重放）。产出「这条证据是怎么被算出来的」的可重放轨迹，
-不是重新执行生产。
-- 输入：证据包 / 单条回执
-- 输出：`{trace: [{step, input_digest, output_digest, rule}]}`（确定性、可 diff）
+**状态：`implemented`**。maps_to = `nf evidence replay <target>`——把每一成员的
+「字节 → sha256 → RFC 6962 叶 → 每条证明折叠」逐算成步骤，另给链节与信封摘要。
+产出「这条证据是怎么算出来的」的可重放轨迹，**不是**重新执行生产。
+- 输入：三种形态（同 cc_verify），`entry` 可只看单个成员
+- 输出：`{schema: nf-replay/1, kind, entries: [{path, digest, leaf, steps: [{step, rule,
+  subject, input, output}]}], recomputed_root, recomputed_head, ok, issues}`
+- 稳定性：trace **不含时间戳**，同输入两次 replay 逐字节一致（可 diff、可归档比对）；
+  `ok` = 每一步都复算得出且与记录一致（篡改必然在叶/折叠那一步断掉）
 - 幂等：idempotent + 纯读。
 
 ### 6. `cc_diff(a, b)` → `delta`
@@ -182,6 +188,12 @@ python -m unittest desktop.tests.test_evidence.TestStandaloneParity
 python scripts/nf.py evidence verify <包.zip>
 python scripts/nf.py evidence verify protocol/RECEIPTS.json --root .
 python scripts/nf.py evidence verify <信封集.json> --root <成员根> --key-file <密钥>
+# 3b) cc_replay 的轨迹可 diff（同输入两次逐字节一致）+ 篡改必现
+python scripts/nf.py evidence replay <包.zip> --json > /tmp/t1.json
+python scripts/nf.py evidence replay <包.zip> --json > /tmp/t2.json
+cmp /tmp/t1.json /tmp/t2.json
+# 3c) cc_check 的单对象判定（ok/invalid 两态）
+python scripts/nf.py check 01_核心协议.md --policy <策略.json> --json
 # 4) cc_attest 的可复现性（两次运行逐字节一致）
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py attest 01_核心协议.md --json > /tmp/a1.json
 SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py attest 01_核心协议.md --json > /tmp/a2.json
@@ -198,8 +210,7 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
 | `cc_label` | 全无：无载体写入/无 sidecar 回退/无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
-| `cc_check` | 仓库级 verdict 有（`nf conformance`），单对象 × 单策略入口无 | 需要 policy 编译器（P2–P3 方向） |
-| `cc_replay` | 单条回执可折叠，整链 trace 未串 | 需要 trace 形态定稿 |
+| `cc_check` | v0 只有封闭词表（5 类规则）；法规文本 → 规则的编译器没有 | 需要政策编译（P2–P3 方向） |
 | `cc_resolve` | 依赖闭包可查，对象→契约集映射无 | 需要对象类型判定 |
 
 本表只记录**内部差距实证**；外部项目的能力不作为开项依据（`STRATEGY.md` §3.3）。

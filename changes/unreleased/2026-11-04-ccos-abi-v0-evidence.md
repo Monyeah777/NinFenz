@@ -1,3 +1,3 @@
 type: feat
 surface: ccos
-note: CCOS ABI v0（7 调用 · cc_verify 先行，其余如实标注实装状态）+ 证据复验器（三种可验形态——自包含包、协议回执、信封集；判定 ok|revoked|expired|invalid，退出码 0/1/2/3/4；25 条攻击矩阵基准逐条比对判定）+ 零依赖单文件复验器（scripts/nf_verify.py --evidence，纯标准库、不 import NF，与 core 版判据一致性由单测硬钉；37 项单测 + --selfcheck 机制体检）
+note: CCOS ABI v0 七个系统调用落地五项——cc_attest / cc_verify（三种证据形态 + 25 条攻击矩阵基准 + 零依赖单文件复验器）/ cc_replay（确定性推导轨迹，无时间戳可 diff）/ cc_check（封闭词表单对象策略体检，判据版本随结论走）/ cc_diff；cc_label 与 cc_resolve 如实挂 partial/unimplemented；另修协议回执重复条目（同一 schema 被算两次）；单测 62 项

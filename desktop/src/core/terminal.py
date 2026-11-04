@@ -308,7 +308,7 @@ FAMILIES: tuple[dict[str, Any], ...] = (
     {"id": "verify", "name": "质检与验证",
      "summary": "门禁单进程引擎、正文 lint、一致性报告、断言表、知识签名、评分、差异、解释、状态前置、"
          "发布体检与变更日志生成、许可证、遥测、装配语言 guard 检查/编译",
-     "commands": ("verify", "lint", "conformance", "assertions", "sig", "score", "diff",
+     "commands": ("verify", "check", "lint", "conformance", "assertions", "sig", "score", "diff",
                   "explain", "st-validate", "release", "changelog", "license", "telemetry",
                   "nfal")},
     {"id": "library", "name": "图书馆与知识",

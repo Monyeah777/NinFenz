@@ -419,5 +419,66 @@ class TestStandaloneParity(_Base):
                          ["verdict"])
 
 
+class TestReplay(_Base):
+    """cc_replay：推导过程摊成 trace——每步可复算、可 diff、篡改必现。"""
+
+    def test_bundle_replay_ok_and_deterministic(self):
+        path, info, _data = self._pack(key=self.key)
+        res = evidence.replay(path, key=self.key)
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual(res["schema"], evidence.REPLAY_SCHEMA)
+        self.assertEqual(res["kind"], "bundle")
+        self.assertEqual(res["recomputed_root"], info["root"])
+        self.assertEqual(res["recomputed_head"], info["head"])
+        # trace 不含时间戳：同一输入两次逐字节一致
+        again = evidence.replay(path, key=self.key)
+        self.assertEqual(json.dumps(res, sort_keys=True, ensure_ascii=False),
+                         json.dumps(again, sort_keys=True, ensure_ascii=False))
+
+    def test_replay_steps_are_ordered(self):
+        path, _info, _data = self._pack()
+        res = evidence.replay(path)
+        for ent in res["entries"]:
+            steps = [s["step"] for s in ent["steps"]]
+            self.assertEqual(steps, sorted(steps))
+            self.assertEqual(ent["steps"][0]["rule"], "sha256-bytes")
+            self.assertEqual(ent["steps"][1]["rule"], "rfc6962-leaf")
+
+    def test_replay_entry_filter(self):
+        path, _info, _data = self._pack()
+        res = evidence.replay(path, entry="docs/a.md")
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual([e["path"] for e in res["entries"]], ["docs/a.md"])
+
+    def test_replay_detects_tamper(self):
+        path, _info, _data = self._pack()
+        with zipfile.ZipFile(path) as zf:
+            members = {n: zf.read(n) for n in zf.namelist()}
+        members["payload/docs/a.md"] = "改".encode()
+        bad = Path(self._tmp.name, "rbad.zip")
+        bad.write_bytes(evidence._zip_bytes(list(members.items())))
+        res = evidence.replay(str(bad))
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("叶复算不符" in i for i in res["issues"]), res["issues"])
+
+    def test_receipts_replay_ok(self):
+        doc = receipts.build_scope(str(self.tmp), ["docs/a.md", "docs/b.md"], scope="ev")
+        rec = Path(self._tmp.name, "R.json")
+        rec.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        res = evidence.replay(str(rec), root=str(self.tmp))
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual(res["kind"], "receipts")
+        self.assertEqual(res["recomputed_root"], doc["root"])
+
+    def test_attest_replay_ok(self):
+        env = attest.sign_hmac(attest.build("docs/a.md", str(self.tmp)), self.key)
+        path = Path(self._tmp.name, "A.json")
+        path.write_text(json.dumps(env, ensure_ascii=False), encoding="utf-8")
+        res = evidence.replay(str(path), root=str(self.tmp), key=self.key)
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual(res["kind"], "attest")
+        self.assertEqual(res["entries"][0]["steps"][1]["rule"], "nf-attest-envelope")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 67,
+    "count": 66,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "ea70d33ff8cdde89d901e5f6bedc55c0dcad7bb5d3351a470c2b38ff05df97b4",
+    "root": "fee0abc226433dd96f9baf431f1d0f5823d812ba092ea5e45e15ce915c244d8b",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "337b47882ad951a0386717502ebd386f75c2e1d9a08a08d1968c02d18d7b5781"
+        "sha256": "0d053be07923b16de7bdf7b209761e474fc0c2a28a5888e009b59de2d5319df1"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -143,7 +143,7 @@
     },
     {
       "digest": {
-        "sha256": "b2f2af6ff12982a2bd25bb355d68a90e7dbc5c96dfc2442952e5a258287d65a0"
+        "sha256": "9b0c408a7d0f515653ee9b35bf9a0ce01a7d00345f498964f6d3ff4a6b15510f"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
@@ -338,12 +338,6 @@
         "sha256": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f"
       },
       "name": "protocol/schema/asset.schema.json"
-    },
-    {
-      "digest": {
-        "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
-      },
-      "name": "protocol/schema/asset_contracts.schema.json"
     },
     {
       "digest": {
