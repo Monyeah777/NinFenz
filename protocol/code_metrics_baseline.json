@@ -161,7 +161,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/check_policy.py": {
-      "lines": 189,
+      "lines": 184,
       "max_fn_cc": 33,
       "max_fn_lines": 56
     },
@@ -376,7 +376,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1328,
+      "lines": 1329,
       "max_fn_cc": 24,
       "max_fn_lines": 115
     },
@@ -1466,7 +1466,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 7922,
+      "lines": 7924,
       "max_fn_cc": 106,
       "max_fn_lines": 318
     },

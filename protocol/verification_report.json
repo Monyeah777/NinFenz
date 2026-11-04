@@ -372,7 +372,7 @@
         "files": 319,
         "max_fn_cc": 106,
         "max_fn_lines": 318,
-        "max_lines": 7922
+        "max_lines": 7924
       },
       "status": "pass",
       "warns": 0
@@ -429,9 +429,9 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 5,
-        "metrics_missing": 4,
-        "metrics_recorded": 262,
+        "metrics_drift": 0,
+        "metrics_missing": 0,
+        "metrics_recorded": 266,
         "modules": 266,
         "registered_cycles": 0,
         "registered_sdp": 10,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "f3fdab8a00038289e0d7d6817b2db98bcb013779013c44ad9c18a282a42348b1",
+  "root_digest": "4b2e27c6ee8b89eb31fc7462912783f737af29523829f551fb9a87ee546b9e74",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

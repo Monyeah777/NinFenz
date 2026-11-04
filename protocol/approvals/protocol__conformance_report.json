@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-04",
   "approved_by": "Monyeah777",
-  "note": "双实现 fail-closed 口径对齐收口（重批）",
+  "note": "分片 1/8 修复波收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "c34d60a68e91e90bc0ef10d6240ed4666a4946833eeb1867ed8a0a1ed16b01fd"

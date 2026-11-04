@@ -41,11 +41,6 @@ def policy_digest(policy: dict[str, Any]) -> str:
     return hashlib.sha256(canonical(policy)).hexdigest()
 
 
-def _rule_ids(policy: dict[str, Any]) -> list[str]:
-    return [str(r.get("id") or "") for r in (policy.get("rules") or [])
-            if isinstance(r, dict)]
-
-
 def validate(policy: Any) -> list[str]:
     """策略形状校验 → 问题列表（空 = 合法）。每条都给可执行指引。"""
     issues: list[str] = []

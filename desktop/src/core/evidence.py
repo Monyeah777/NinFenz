@@ -46,8 +46,9 @@ REVOCATIONS_ENTRY = "revocations.json"
 LEVELS = ("digest_only", "receipts_only", "hmac-sha256", "ssh-sig", "sigstore-keyless")
 #: 证据形态（cc_verify 的输入面）：自包含包 / 协议回执 / 信封
 KINDS = ("bundle", "receipts", "attest")
-VERDICTS = ("ok", "revoked", "expired", "invalid")
-#: 判定 → CLI 退出码（稳定面；4 留给「输入不是证据包」这一用法错，不是判定）
+#: 判定词表 = EXIT_CODES 的键（单一真源：词表与退出码一一对应，不再各执一份）
+#: 判定 → CLI 退出码（稳定面；4 留给「输入不是证据包」这一用法错，不是判定）。
+#: 这四个键就是判定词表本身——不再单独维护一份 VERDICTS（两份真源必然漂移）。
 EXIT_CODES = {"ok": 0, "invalid": 1, "revoked": 2, "expired": 3}
 
 #: zip 成员固定时间戳：同一输入两次打包**逐字节一致**（可复现构建惯例）。

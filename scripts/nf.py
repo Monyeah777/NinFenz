@@ -4943,7 +4943,8 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
                     "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
                     "handoff_out", "manifest_out", "context_dir", "responses",
-                    "experiment", "ballots", "bundle")
+                    "experiment", "ballots", "bundle",
+                    "policy", "revocations")
 
 
 def _path_writing_issue(args) -> str:
@@ -4982,6 +4983,7 @@ def _path_writing_issue(args) -> str:
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
+                    "evidence_bundle", "issuer", "object", "policy", "revocations", "targets",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
                     "prompt_file", "questions", "registry", "root", "runs", "script_file",
