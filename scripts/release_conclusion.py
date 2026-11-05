@@ -277,7 +277,15 @@ def main(argv=None) -> int:
         print(f"  ✗ {blocked}", file=sys.stderr)
         return 2
     if payload_blocked:
-        print(f"  ✗ {payload_blocked}", file=sys.stderr)
+        payload = {"schema": "nf-release-conclusion/1", "ok": False,
+                   "payload_blocked": payload_blocked, "head": head,
+                   "supply_chain": [], "freshness": {"id": "freshness", "rc": 2},
+                   "note": "npm payload 与 HEAD 不一致：先重新暂存再跑本件",
+                   "wall": 0.0}
+        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+              if args.json else f"  ✗ {payload_blocked}")
+        if not args.json:
+            print(f"  ✗ {payload_blocked}", file=sys.stderr)
         return 2
     if dirty:
         print(f"  [WARN] 脏树放行（{len(dirty)} 处变更）——结果可能含中间态假红",
@@ -296,7 +304,7 @@ def main(argv=None) -> int:
                    "supply_chain": supply, "freshness": fresh,
                    "note": "生成物已过期：先按上面的修复命令重算，再跑本件（"
                            "这类过期若留到分片里发现要多花 25 分钟）",
-                   "wall": round(time.perf_counter() - t0, 1)}
+                   "wall": 0.0}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  ✗ 生成物过期 → 停止")
         if not args.json:
@@ -309,7 +317,7 @@ def main(argv=None) -> int:
                    "note": "供应链核对未过：发布文案的数字来源不一致，先修再跑（"
                            "site: node site/tools/sync-numbers.mjs --write；"
                            "投影: python scripts/sync_llms.py --write）",
-                   "wall": round(time.perf_counter() - t0, 1)}
+                   "wall": 0.0}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  ✗ 供应链核对未过 → 停止")
         return 1
@@ -317,7 +325,7 @@ def main(argv=None) -> int:
     if args.only_preflight:
         payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
                    "supply_chain": supply, "freshness": fresh, "issues": [],
-                   "wall": round(time.perf_counter() - t0, 1)}
+                   "wall": 0.0}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
         return 0
@@ -329,7 +337,7 @@ def main(argv=None) -> int:
             payload = {"schema": "nf-release-conclusion/1", "ok": False,
                        "checks_only_rc": checks_rc,
                        "note": "checks-only 未过：结构性红不必再花时间跑测试",
-                       "wall": round(time.perf_counter() - t0, 1)}
+                       "wall": 0.0}
             print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
                   if args.json else "  ✗ checks-only 未过 → 停止")
             return 1

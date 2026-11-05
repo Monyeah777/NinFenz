@@ -156,9 +156,17 @@ class TestDryRun(unittest.TestCase):
         self.assertEqual(doc["plan"]["concurrency"], 1)
 
     def test_dry_run_allow_dirty_reports_no_block(self):
+        """--allow-dirty 放行脏树；但 payload 与 HEAD 脱节时仍按前置不满足退出（rc=2）。
+
+        判据只钉「脏树不阻断」这件事——payload 是否新鲜取决于提交历史，不是测试能假设的。
+        """
         proc = self._run("--jobs", "1", "--allow-dirty")
-        self.assertEqual(0, proc.returncode)
-        self.assertEqual("", json.loads(proc.stdout)["blocked"])
+        doc = json.loads(proc.stdout)
+        self.assertEqual("", doc["blocked"])
+        if doc.get("payload_blocked"):
+            self.assertEqual(2, proc.returncode)
+        else:
+            self.assertEqual(0, proc.returncode)
 
 
 class TestOnlyPreflight(unittest.TestCase):
@@ -167,8 +175,13 @@ class TestOnlyPreflight(unittest.TestCase):
         proc = subprocess.run([sys.executable, str(SCRIPT), "--only-preflight", "--allow-dirty",
                                "--json"], cwd=str(ROOT), capture_output=True, text=True,
                               encoding="utf-8", errors="replace")
-        # 前置面含「生成物新鲜度」——它依赖树的状态（改到一半的树可以合理地不新鲜），
+        # 前置面含「生成物新鲜度」与「payload 对 HEAD」——都依赖树/提交状态（可能合理地不满足），
         # 故这里只钉**结构**与 rc 一致性；「干净树上必须全过」由 test_freshness_check 钉。
+        if proc.returncode == 2:
+            doc = json.loads(proc.stdout)
+            self.assertFalse(doc["ok"])
+            self.assertIn("payload_blocked", doc)
+            return
         doc = json.loads(proc.stdout)
         self.assertEqual(2, len(doc["supply_chain"]))
         self.assertIn("freshness", doc)
