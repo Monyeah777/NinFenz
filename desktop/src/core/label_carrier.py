@@ -18,7 +18,7 @@ import struct
 import zlib
 from typing import Any
 
-from core import atomic_write, label_ir
+from core import atomic_write, json_doc, label_ir
 
 PNG_SIG = b"\x89PNG\r\n\x1a\n"
 KEYWORD = "AIGC"                      # iTXt 关键字：载体里能看见的锚点
@@ -143,10 +143,9 @@ def read(png: bytes) -> dict[str, Any]:
             if text is None:
                 continue
             try:
-                doc = json.loads(text)
-            except json.JSONDecodeError as exc:
-                res["issues"].append(f"AIGC iTXt 不是合法 JSON：{exc}"
-                                     f"（{GUIDE}载体被改坏，按 invalid 处理）")
+                doc = json_doc.loads(text, dict, what="载体里的 AIGC 声明")
+            except ValueError as exc:
+                res["issues"].append(str(exc))
                 return res
             issues = label_ir.validate(doc)["issues"]
             if issues:

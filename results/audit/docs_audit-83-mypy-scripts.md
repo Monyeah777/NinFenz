@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:99b46146e0ebc1034b1a13702b158085beec70557bf791f5821d90ec9b7f6f2e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:08e171d8f5895ec1f4af7a820a84aac4142ce5810825e27c70227314162cfb9d
+  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
 ---
+> 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
+
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
 
 > 重审（2026-11-06）：常驻集加 test_cli_error_framing（参数登记面 100 s 换 36 分钟）

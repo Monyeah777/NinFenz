@@ -656,7 +656,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_carrier.py": {
-      "lines": 173,
+      "lines": 172,
       "max_fn_cc": 14,
       "max_fn_lines": 38
     },
