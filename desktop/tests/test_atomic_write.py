@@ -12,12 +12,24 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from core import atomic_write as aw  # noqa: E402
+from core import atomic_write as aw  # noqa: E402 —— 静态面（非打桩）用；打桩走 _no_replace
 
 ROOT = Path(__file__).resolve().parents[2]
+
+def _no_replace():
+    """打桩「替换失败」：必须打在**运行时**模块上（理由见 _live）。
+
+    两处坑合成一条：既要不被 reload 后的旧对象坑（打桩不生效 ⇒ 判据假红），
+    也要避免每处重复写长行（行宽棘轮）。故收成一个 helper。
+    """
+    from unittest import mock
+    return mock.patch.object(_live("core.atomic_write"), "_replace",
+                             side_effect=PermissionError("busy"))
+
 
 
 def _live(name):
@@ -56,7 +68,6 @@ class RepoTruthWritersUseAtomicWriteTest(unittest.TestCase):
                       "registry.json 的 --apply 写入口必须走 atomic_write")
 
     def test_trace_writer_keeps_old_content_on_failed_replace(self):
-        from unittest import mock
 
         from core import atomic_write as live_aw
         nf = _load_nf()
@@ -86,8 +97,6 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
         return root
 
     def test_code_metrics_baseline_write_is_atomic(self):
-        from unittest import mock
-        aw_live = _live("core.atomic_write")
         cm = _live("core.code_metrics")
         with tempfile.TemporaryDirectory() as tmp:
             root = self._fixture(tmp)
@@ -95,8 +104,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             target = root / cm.BASELINE_REL
             before = target.read_text(encoding="utf-8")
             (root / "a.py").write_text("x = 2\ny = 3\n", encoding="utf-8")
-            with mock.patch.object(aw_live, "_replace",
-                                   side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     cm.write(str(root))
             self.assertEqual(before, target.read_text(encoding="utf-8"),
@@ -107,8 +115,6 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             json.loads(target.read_text(encoding="utf-8"))
 
     def test_index_projection_write_is_atomic(self):
-        from unittest import mock
-        aw_live = _live("core.atomic_write")
         dc = _live("core.decisions")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -118,8 +124,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
                     "\n",
                 encoding="utf-8")
             before = (root / dc.INDEX_REL).read_text(encoding="utf-8")
-            with mock.patch.object(aw_live, "_replace",
-                                   side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     dc.write_projection(str(root))
             self.assertEqual(before, (root / dc.INDEX_REL).read_text(encoding="utf-8"),
@@ -131,14 +136,13 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
         依据（2026-09-30）：这两处此前是裸 `open(w)`——崩在中途会把一份源件/台账截断成半截，
         那是**数据损坏**（比派生件半截更重）。
         """
-        from unittest import mock
         from core import asset_ledger as al
         from core import autofix
         with tempfile.TemporaryDirectory() as tmp:
             f = Path(tmp, "doc.md")
             f.write_text("标题\n\n正文带尾随空格   \n", encoding="utf-8")
             before = f.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     autofix.fix_file(str(f), root=tmp)      # 机械修复：会改写该件
             self.assertEqual(before, f.read_bytes(), "修复失败时必须保留旧内容")
@@ -146,7 +150,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             lp = Path(tmp, "ledger.json")
             al.save_ledger({"assets": []}, str(lp))
             lbefore = lp.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     al.save_ledger({"assets": [{"a": 1}]}, str(lp))
             self.assertEqual(lbefore, lp.read_bytes(), "台账写失败时必须保留旧全量")
@@ -159,11 +163,10 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
         并发读者（批准记录 check35、知识层 check37、模块边界签名 check35、`docs/layers.md`
         被 `layer_model` 自己当常驻语料读）⇒ 半截内容会被判成「内容被改/签名无效」。
         """
-        from unittest import mock
-        from core import approval
-        from core import knowledge as kn
-        from core import module_signature as ms
-        from core import layer_model as lm
+        approval = _live("core.approval")
+        kn = _live("core.knowledge")
+        ms = _live("core.module_signature")
+        lm = _live("core.layer_model")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             # ① 批准记录（protocol/approvals/*.json）
@@ -172,7 +175,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             approval.approve(str(root), "doc.md", "tester", "自测")
             rec = Path(root, approval.DIR_REL, "doc.md.json")
             before = rec.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     approval.approve(str(root), "doc.md", "tester", "第二次")
             self.assertEqual(before, rec.read_bytes(), "批准记录失败时必须保留旧全量")
@@ -180,7 +183,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             kn.write_usage(str(root), {"A": 1})
             up = root / kn.USAGE_REL
             ubefore = up.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     kn.write_usage(str(root), {"A": 2})
             self.assertEqual(ubefore, up.read_bytes(), "知识台账失败时必须保留旧全量")
@@ -191,7 +194,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
             ms.write(str(root))
             sp = root / ms.BASELINE_REL
             sbefore = sp.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     ms.write(str(root))
             self.assertEqual(sbefore, sp.read_bytes(), "签名基线失败时必须保留旧全量")
@@ -205,7 +208,7 @@ class DerivedWritersAreAtomicTest(unittest.TestCase):
                            encoding="utf-8")
             lm.write_region(str(root))
             dbefore = doc.read_bytes()
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     lm.write_region(str(root))
             self.assertEqual(dbefore, doc.read_bytes(), "阶梯文档失败时必须保留旧全量")
@@ -308,7 +311,6 @@ class AtomicWriteTest(unittest.TestCase):
 
     def test_transient_permission_error_is_retried(self):
         """并发原子写下读者会瞬时撞 `PermissionError`（实测 ≈0.09%）——读侧必须短重试。"""
-        from unittest import mock
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
             aw.write_text(p, "{}")
@@ -327,7 +329,6 @@ class AtomicWriteTest(unittest.TestCase):
 
     def test_persistent_permission_error_reraises(self):
         """重试耗尽仍失败 ⇒ 如实抛出（不退化成「读空」——那会把瞬时故障变成错数据）。"""
-        from unittest import mock
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
             aw.write_text(p, "{}")
@@ -337,7 +338,6 @@ class AtomicWriteTest(unittest.TestCase):
 
     def test_transient_einval_on_write_is_retried(self):
         """写侧瞬时 `EINVAL(22)`（Windows 杀软/句柄扫描实测）必须重试；持续错如实抛。"""
-        from unittest import mock
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
             real_fsync = os.fsync
@@ -361,12 +361,11 @@ class AtomicWriteTest(unittest.TestCase):
 
     def test_write_bytes_round_trip_and_failure_path(self):
         """二进制入口同规（签名锚 `.sig` 走它）：写成功逐字节一致；`replace` 失败保留旧全量。"""
-        from unittest import mock
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "anchor.sig")
             aw.write_bytes(p, b"\x00\x01\x02")
             self.assertEqual(b"\x00\x01\x02", p.read_bytes())
-            with mock.patch.object(aw, "_replace", side_effect=PermissionError("busy")):
+            with _no_replace():
                 with self.assertRaises(PermissionError):
                     aw.write_bytes(p, b"\xff" * 32)
             self.assertEqual(b"\x00\x01\x02", p.read_bytes(),
