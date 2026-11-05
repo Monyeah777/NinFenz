@@ -77,11 +77,12 @@ CA/TSA 等外部权威、不承诺 K1–K8 内核语义、不承诺联邦/多节
 
 ### 1. `cc_label(obj, contract)` → `label`
 
-**状态：`partial`（声明层 + sidecar 回退已实装 · 载体写入未实装）**。`maps_to`：
-`nf label ir` / `nf label validate`（形状 = `nf-label/1`）、`nf label write|read|list`
-（sidecar 回退 = `nf-label-sidecar/1`，与对象摘要绑定），见 [label-ir-v0.md](label-ir-v0.md)。
-**没有**标识写入子系统：`embedded` **恒为 false**（常量），本调用**不**宣称已写入载体；
-把 sidecar 回退读成「已嵌入」是误读。
+**状态：`partial`（声明层 + sidecar 回退 + PNG 载体已实装）**。`maps_to`：
+`nf label ir|validate`（形状 = `nf-label/1`）、`nf label write|read|list`
+（sidecar 回退 = `nf-label-sidecar/1`，与对象摘要绑定）、`nf label embed|extract`
+（**PNG iTXt 载体**），见 [label-ir-v0.md](label-ir-v0.md)。PNG 面只承诺「能读回 / 不改像素 /
+块结构合法」：**没有**水印、没有其它格式；非 PNG 仍走 sidecar 且 `embedded=false`。把可见文本
+载体读成「抗转码的标识」是误读。
 
 - 输入：`{obj: <字节或路径>, contract: <契约 id>}`
 - 输出：`{label: {contract, standard, fields, carrier, embedded: bool}}`
@@ -258,7 +259,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 7 项：摘要一�
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
-| `cc_label` | 声明层 + sidecar 回退已有（`nf-label/1` IR、`nf-label-sidecar/1` 摘要绑定）；**载体写入全无**：无水印嵌入、无元数据注入、无 20+ 格式覆盖 | 标识写入子系统（本仓不存在）；本季不做，触发条件见下节 |
+| `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt 载体**已有（可读回 / 不改像素 / 块结构合法）；**仍缺**：水印嵌入、其它格式（JPEG/MP4/PDF）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的那一种（PNG 文本块） |
 | `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层：不承诺自动把法规原文变成意图，缺的意图必须逐条挂账 |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 契约声明面为人工编纂；未认领给 `unclaimed` 而非放行，不得读成「查过了没问题」 |
 

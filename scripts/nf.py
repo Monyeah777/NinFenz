@@ -530,6 +530,18 @@ def _add_parser_production(sub):
                           description="清点 sidecar：给出 (旁车, 对象, embedded) 三元组。")
     lls.add_argument("--root", default=".", help="扫描根（缺省=仓库根）")
     lls.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lemb = lsub.add_parser("embed", help="把 IR 写进 PNG 载体（iTXt 块；可读回、可证像素未变）",
+                           description="载体写入（只 PNG）：写 AIGC iTXt 块，不改像素、不毁 CRC；"
+                                       "已存在则替换（幂等）。其它格式请用 sidecar 回退。")
+    lemb.add_argument("--object", dest="label_object", default="",
+                      help="源图（PNG；可以是二进制）")
+    lemb.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
+    lemb.add_argument("--out", default="", help="写入落点（缺省=<对象>.labeled.png；不改输入）")
+    lemb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lext = lsub.add_parser("extract", help="从 PNG 载体读回 IR（与 sidecar.read 同形状）",
+                           description="载体读取：读 AIGC iTXt 块，校验 IR 形状；没有则 invalid。")
+    lext.add_argument("label_object", metavar="OBJECT", help="PNG 路径（可以是二进制）")
+    lext.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("evidence",
                         help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
                         description="证据包（内部差距：attest/receipts/transparency 三件都在，但缺"
@@ -3229,6 +3241,68 @@ def _cmd_sig(args):
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
 
+def _label_embed(args):
+    """nf label embed：IR → PNG iTXt 载体（不改输入；像素面摘要前后一致）。"""
+    import json as _json
+
+    from core import json_doc, label_carrier
+    obj = str(getattr(args, "label_object", "") or "")
+    if not obj or not getattr(args, "ir", ""):
+        return _machine_fail(args, "缺 --object / --ir（修复指引：nf label embed --object <图.png> "
+                                   "--ir <IR.json>；IR 用 nf label ir 生成）", 2)
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    out = _rel_out(args.out) if args.out else src + ".labeled.png"
+    try:
+        ir = json_doc.load(_rel_out(args.ir), dict, what=args.ir)
+        info = label_carrier.embed_file(src, ir, out)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps({"kind": "label-embed", "ok": True, **_rel_display_keys(info)},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label embed（{_rel_display(src)} → {_rel_display(out)}）==")
+        print(f"  载体：PNG iTXt · keyword={info['keyword']} · 已替换={info['replaced']}")
+        print(f"  像素面：{info['pixel_digest'][:16]}（写入前后一致）")
+        print("  只承诺：能读回、不改像素、块 CRC 合法；抗转码/水印不在本件")
+    return 0
+
+
+def _label_extract(args):
+    """nf label extract：PNG iTXt → IR（判定词表与 sidecar 对齐）。"""
+    import json as _json
+
+    from core import label_carrier
+    obj = str(getattr(args, "label_object", "") or "")
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    try:
+        with open(src, "rb") as fh:
+            raw = fh.read()
+    except OSError as exc:
+        return _machine_fail(args, f"读不到对象：{exc}", 2)
+    res = label_carrier.read(raw)
+    res["object"] = _rel_display(src)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label extract（{_rel_display(src)}）==")
+        print(f"  判定：{res['verdict']}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            label = res["label"] or {}
+            print(f"  标注：{label.get('standard')} · 档位 {label.get('level')}")
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _rel_display_keys(info):
+    """把路径类字段换成仓内显示形态（JSON 面用）。"""
+    out = {}
+    for key, value in info.items():
+        out[key] = _rel_display(value) if key in ("src", "out") else value
+    return out
+
+
 def _cmd_label(args):
     """nf label：标注 IR 的派发（声明层 + sidecar 回退；**不写载体**）。"""
     sub = getattr(args, "label_cmd", "") or ""
@@ -3242,6 +3316,10 @@ def _cmd_label(args):
         return _label_read(args)
     if sub == "list":
         return _label_list(args)
+    if sub == "embed":
+        return _label_embed(args)
+    if sub == "extract":
+        return _label_extract(args)
     print("用法：nf label ir ｜ validate ｜ write --object/--ir ｜ read ｜ list"
           "（各自 --help 看逐条）", file=sys.stderr)
     return 2

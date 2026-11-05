@@ -58,9 +58,11 @@
   见 [revocation-feed-v0.md](revocation-feed-v0.md)）。残留：**仍是拉取式**——没有发布/订阅通道，
   「签发方已撤销但你没收到」无解；且 hmac 是对称的，跨组织来源证明还得走公钥面。
 - **G3 无可信时间戳**：时效判据吃本机时钟，回拨即可绕过「已过期」。
-- **G4 `cc_label` 声明层 + sidecar 回退已实装、载体写入未实装**：`nf-label/1` IR 能校验
-  「该有哪些标识、缺哪几条」；sidecar 回退（`nf-label-sidecar/1`）把声明与对象摘要绑定，对象一变即判
-  过期。`embedded` **恒为 false**（载体写入不存在），物理绑定（防截屏/防转贴）仍不承诺。
+- **G4 `cc_label`：声明层 + sidecar 回退 + PNG 载体已实装；水印与多格式仍缺**：`nf-label/1` IR
+  能校验「该有哪些标识、缺哪几条」；sidecar（`nf-label-sidecar/1`）把声明与对象摘要绑定，对象一变即判
+  过期；`nf label embed` 把 IR 写进 **PNG iTXt 块**（可读回 / 不改像素 / 块结构合法）。但那是**可见文本
+  载体**——任何人可剥掉，抗裁剪/抗转码/抗截屏（真水印）**不承诺**；JPEG/MP4/PDF 无载体，只能走 sidecar
+  且 `embedded=false`。
 - **G5 供应链核对（已部分接入 gate）**：发布结论器现在**先跑**供应链核对（站点件数/体积 vs payload
   清单、根 llms-full 投影逐字节一致），不一致即不产出「可发布」。残留：payload 清单自身的来源证明
   （SLSA/OIDC 签名）仍靠发布线外置命令核对，不在本 gate 内。

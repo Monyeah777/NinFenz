@@ -655,6 +655,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 41
     },
+    "desktop/src/core/label_carrier.py": {
+      "lines": 173,
+      "max_fn_cc": 14,
+      "max_fn_lines": 38
+    },
     "desktop/src/core/label_ir.py": {
       "lines": 183,
       "max_fn_cc": 13,
@@ -1496,7 +1501,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8438,
+      "lines": 8516,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

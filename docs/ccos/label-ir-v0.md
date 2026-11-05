@@ -66,6 +66,26 @@ nf label list                                                    # 清点仓内�
 
 写盘走 `atomic_write`：半截旁车会让读者读到假声明。读判据只读旁车 + 对象摘要，不联网、不猜。
 
+
+## PNG 载体（v0 已实装，唯一支持的格式）
+
+`nf label embed` 把 IR 写进 PNG 的 `iTXt` 块（keyword = `AIGC`，UTF-8），`nf label extract` 读回。
+纯标准库实现，**只承诺三件能自证的事**：
+
+| 承诺 | 判据 |
+|---|---|
+| 写进去能读回（同 IR、JSON 语义等价） | `nf label extract` 返回同档位/同声明项 |
+| **不改像素** | 所有 IDAT 块拼接后的 sha256 前后一致 |
+| 写后仍是结构合法 PNG | 每个块 CRC 校验通过、签名正确、IHDR 首 / IEND 尾 |
+
+```bash
+nf label embed --object 产出/海报.png --ir 产出/海报.label.json   # 缺省落 海报.png.labeled.png，不改输入
+nf label extract 产出/海报.png.labeled.png
+```
+
+**边界**：这是**可见文本载体**（任何人都能剥掉 iTXt 块），不是水印——抗裁剪/抗转码/抗截屏
+都不承诺；JPEG/MP4/PDF 等格式没有实测，一律走 `nf label write` 的 sidecar 回退，不宣称已嵌入。
+
 ## 与 `cc_label` 的关系
 
 `cc_label(obj, contract)` 要返回 `{label: {contract, standard, fields, carrier, embedded}}`。v0 做实两块：
