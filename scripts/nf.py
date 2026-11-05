@@ -5433,7 +5433,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "handoff_out", "manifest_out", "context_dir", "responses",
                     "experiment", "ballots", "bundle",
                     "policy", "revocations", "anchor", "items", "table", "prev",
-                    "label_object", "ir", "sidecar",
+                    "label_object", "ir", "sidecar", "decision",
                     "compile")
 
 
@@ -5475,7 +5475,7 @@ _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私�
                        "label_object": "被标注对象可以是任意字节（图片/音视频）",
                        "evidence_bundle": "证据包是 zip（二进制容器）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
-                    "items", "label_ir", "ir", "sidecar", "table", "prev",
+                    "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",
                     "revocation_feed", "feeds",
                     "compile",
                     "anchor", "issuer", "object", "policy", "revocations", "targets",
