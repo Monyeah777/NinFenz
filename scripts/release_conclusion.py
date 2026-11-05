@@ -153,10 +153,51 @@ def _step_freshness(verbose: bool) -> dict:
     return row
 
 
+#: 静态棘轮（秒级）：风格 / 代码规模与复杂度 / 模块级耦合 / SAST。
+#: 这四条都是「超基线即红」的静态判据，合计约 12 s——比花 6 分钟跑 checks-only、
+#: 再花 30 分钟跑测试去撞它划算得多（2026-11-05 实测：跨会话留下的风格债就是这么撞到的）。
+RATCHET_STEPS = (
+    ("style", ["python", "scripts/style_check.py"], "风格棘轮（命中只许下降）"),
+    ("code_metrics", ["python", "scripts/code_metrics.py"], "代码规模/复杂度上限"),
+    ("coupling", ["python", "scripts/coupling_metrics.py"], "模块级耦合度量（环/SDP）"),
+    ("sast", ["python", "scripts/sast_check.py"], "SAST 基线闸门（bandit/ruff-S）"),
+)
+
+
+def ratchet_issues(rows: list[dict]) -> list[str]:
+    """静态棘轮结果 → 问题列表（纯函数：便于单测门槛本身）。"""
+    out = []
+    for row in rows:
+        if row.get("skipped") or int(row.get("rc") or 0) == 0:
+            continue
+        tail = (row.get("tail") or [""])[-1]
+        out.append(f"{row.get('id')} 未过：{tail}")
+    return out
+
+
+def _step_ratchets(verbose: bool) -> list[dict]:
+    """跑四条静态棘轮（各脚本自带修复指引；失败带末几行输出）。"""
+    rows: list[dict] = []
+    for cid, argv, desc in RATCHET_STEPS:
+        t0 = time.perf_counter()
+        proc = _run([sys.executable, *argv[1:]], 900)
+        rc = proc.get("code")
+        row = {"id": cid, "desc": desc, "rc": 1 if rc is None else int(rc),
+               "wall": round(time.perf_counter() - t0, 1)}
+        if row["rc"] != 0:
+            out = (proc.get("out") or "") + (proc.get("err") or "")
+            row["tail"] = [ln for ln in out.splitlines() if ln.strip()][-8:]
+        if verbose:
+            mark = "✓" if row["rc"] == 0 else "✗"
+            print(f"  {mark} {cid} · {desc} · {row['wall']} s", flush=True)
+        rows.append(row)
+    return rows
+
+
 def _step_checks_only(verbose: bool) -> tuple[int, float]:
     t0 = time.perf_counter()
     if verbose:
-        print("[3/4] bash verify.sh --checks-only …", flush=True)
+        print("[4/5] bash verify.sh --checks-only …", flush=True)
     proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
     out = (proc.get("out") or "") + (proc.get("err") or "")
     tail = [ln for ln in out.splitlines() if ln.strip()][-1:]
@@ -258,6 +299,7 @@ def main(argv=None) -> int:
                       "供应链核对（node site/tools/sync-numbers.mjs + "
                       "python scripts/sync_llms.py --check）",
                       "生成物新鲜度（python scripts/freshness_check.py）",
+                      "静态棘轮（style / code_metrics / coupling / sast）",
                       "bash verify.sh --checks-only"]
                      + [f"python scripts/verify_tests.py --shard {i}/{shards}"
                         for i in range(shards)]}
@@ -293,11 +335,11 @@ def main(argv=None) -> int:
 
     t0 = time.perf_counter()
     if not args.json:
-        print("[1/4] 供应链核对（站点数字 + 根投影）…", flush=True)
+        print("[1/5] 供应链核对（站点数字 + 根投影）…", flush=True)
     supply = _step_supply_chain(not args.json)
     supply_issues = supply_chain_issues(supply)
     if not args.json:
-        print("[2/4] 生成物新鲜度（提交件 == 实时重算）…", flush=True)
+        print("[2/5] 生成物新鲜度（提交件 == 实时重算）…", flush=True)
     fresh = _step_freshness(not args.json)
     if fresh["rc"] != 0:
         payload = {"schema": "nf-release-conclusion/1", "ok": False,
@@ -322,9 +364,29 @@ def main(argv=None) -> int:
               if args.json else "  ✗ 供应链核对未过 → 停止")
         return 1
 
+    if not args.json:
+        print("[3/5] 静态棘轮（风格 / 度量 / 耦合 / SAST）…", flush=True)
+    ratchets = _step_ratchets(not args.json)
+    ratchet_bad = ratchet_issues(ratchets)
+    if ratchet_bad:
+        payload = {"schema": "nf-release-conclusion/1", "ok": False,
+                   "supply_chain": supply, "freshness": fresh, "ratchets": ratchets,
+                   "issues": ratchet_bad,
+                   "note": "静态棘轮未过：先按各脚本的修复指引收口，再跑本件"
+                           "（这类红跑测试也变不绿）",
+                   "wall": 0.0}
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("  ✗ 静态棘轮未过 → 停止")
+            for line in ratchet_bad:
+                print(f"    {line}")
+        return 1
+
     if args.only_preflight:
         payload = {"schema": "nf-release-conclusion/1", "ok": True, "only_preflight": True,
-                   "supply_chain": supply, "freshness": fresh, "issues": [],
+                   "supply_chain": supply, "freshness": fresh,
+                   "ratchets": ratchets, "issues": [],
                    "wall": 0.0}
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
               if args.json else "  => 前置面全过（脏树 / payload / 供应链）")
@@ -343,7 +405,7 @@ def main(argv=None) -> int:
             return 1
 
     if not args.json:
-        print(f"[4/4] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
+        print(f"[5/5] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
     results: list[dict] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = [pool.submit(_shard_one, i, shards) for i in range(shards)]
@@ -360,7 +422,8 @@ def main(argv=None) -> int:
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
                "head_start": head, "head_end": head_end, "head_moved": bool(moved),
-               "supply_chain": supply, "freshness": fresh, "checks_only_rc": checks_rc,
+               "supply_chain": supply, "freshness": fresh, "ratchets": ratchets,
+               "checks_only_rc": checks_rc,
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
                "wall_s": round(time.perf_counter() - t0, 1)}
@@ -377,6 +440,7 @@ def main(argv=None) -> int:
         print("== 发布结论 ==")
         print(f"  供应链核对：{len(supply)} 步 · 未过 {len(supply_issues)}")
         print(f"  生成物新鲜度：{fresh['wall']} s · rc={fresh['rc']}")
+        print(f"  静态棘轮：{len(ratchets)} 条 · 未过 {len(ratchet_bad)}")
         print(f"  checks-only：rc={checks_rc}")
         print(f"  分片：{len(results)} 片 · 失败 {len(summary['failed'])} 片 · "
               f"分片墙钟合计 {summary['wall']} s · 总墙钟 {payload['wall_s']} s")

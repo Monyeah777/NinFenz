@@ -226,5 +226,32 @@ class TestHeadMoveGuard(unittest.TestCase):
         self.assertEqual("", self.gate.head_move_guard("abc", ""))
 
 
+class TestRatchets(unittest.TestCase):
+    """静态棘轮（风格/度量/耦合/SAST）进前置面：这类红跑测试也变不绿，必须秒级拦。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_all_pass_no_issues(self):
+        rows = [{"id": "style", "rc": 0}, {"id": "sast", "rc": 0}]
+        self.assertEqual([], self.gate.ratchet_issues(rows))
+
+    def test_failure_becomes_issue_with_tail(self):
+        rows = [{"id": "style", "rc": 1,
+                 "tail": ["新增风格命中 a.py · E501（修复指引：修掉）"]}]
+        issues = self.gate.ratchet_issues(rows)
+        self.assertEqual(1, len(issues))
+        self.assertIn("style", issues[0])
+        self.assertIn("E501", issues[0])
+
+    def test_skipped_rows_are_not_issues(self):
+        self.assertEqual([], self.gate.ratchet_issues(
+            [{"id": "sast", "rc": 0, "skipped": True}]))
+
+    def test_declared_steps_cover_four_ratchets(self):
+        ids = [row[0] for row in self.gate.RATCHET_STEPS]
+        self.assertEqual(["style", "code_metrics", "coupling", "sast"], ids)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -6,7 +6,7 @@
 ## 是什么
 
 一条命令给出「这台机器现在能不能发布」：**干净树闸门 → payload 对账 → 供应链核对 →
-生成物新鲜度 → checks-only → N 个独立分片 → 汇总**。
+生成物新鲜度 → 静态棘轮 → checks-only → N 个独立分片 → 汇总**。
 
 与 `nf release` 的分工：`nf release` 管**次序**（一致性报告 → 批准 → 回执的冻结链）；
 本件管**结论**（冻结之后全部门禁到底过没过）。两者不替代。
@@ -27,20 +27,21 @@ python scripts/release_conclusion.py                 # 缺省：8 片、顺序�
 python scripts/release_conclusion.py --shards 4      # 分区数（并集必须 == 全量，执行器自带断言）
 python scripts/release_conclusion.py --jobs 8        # 并发：只建议给独立 runner（单机有争用）
 python scripts/release_conclusion.py --dry-run       # 只打印计划（含脏树判定），不跑
-python scripts/release_conclusion.py --only-preflight   # 只跑前置面（脏树/payload/供应链/新鲜度，约 25 秒）
+python scripts/release_conclusion.py --only-preflight   # 只跑前置面（脏树/payload/供应链/新鲜度/棘轮，约 45 秒）
 python scripts/release_conclusion.py --json          # 机读汇总（含每片 rc/墙钟；失败片带输出尾部）
 ```
 
 退出码：0 = 可发布 · 1 = 有失败 · 2 = 前置不满足（脏树 / 参数错）。
 
-## 四步各判什么
+## 五步各判什么
 
 | 步 | 判据 | 不过的含义 |
 |---|---|---|
 | 1 供应链核对 | `node site/tools/sync-numbers.mjs` 与 `python scripts/sync_llms.py --check` | 发布文案里的数字与真源不一致（站点件数/体积、根投影）→ 先修再跑 |
 | 2 生成物新鲜度 | `python scripts/freshness_check.py`（职能坐标 / 门检报告 / 一致性报告 / 审计摘要 == 实时重算） | 我改了东西忘了重跑生成器；**这一条以前要 25 分钟才在分片里出现，现在约 20 秒** |
-| 3 checks-only | `bash verify.sh --checks-only` | 结构性红（契约/回执/纯度/文档面） |
-| 4 分片 | 8 个独立进程跑完全部测试，并集 == 全量 | 测试面红 |
+| 3 静态棘轮 | `style_check` / `code_metrics` / `coupling_metrics` / `sast_check`（合计约 12 s） | 命中超基线：跑测试也变不绿，必须当场修 |
+| 4 checks-only | `bash verify.sh --checks-only` | 结构性红（契约/回执/纯度/文档面） |
+| 5 分片 | 8 个独立进程跑完全部测试，并集 == 全量 | 测试面红 |
 
 #### 第 1、2 步为什么必须在跑测试之前
 
@@ -48,6 +49,8 @@ python scripts/release_conclusion.py --json          # 机读汇总（含每片 
 
 - **供应链数字（G5）**：站点件数/体积与根投影此前是「记得手动跑」的命令，而它们正是发布文案数字的
   来源——忘了跑就把旧数字发出去（实测犯过两次）。
+- **静态棘轮**：风格 / 代码度量 / 耦合 / SAST 四条都是「超基线即红」，合计约 12 秒——
+  2026-11-05 实测：跨会话留下的风格债正是靠这条在 checks-only 之前被拦住的。
 - **生成物新鲜度**：角色坐标 / 门检报告 / 一致性报告 / 审计摘要必须是「提交件 == 实时重算」。
   实测在三轮里各让我白跑一次全量，根因永远是「改了东西忘了重跑生成器」。现在任一不过，gate 停在
   20–30 秒处并打印逐项修复命令。
