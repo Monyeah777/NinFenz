@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:b74feb0cbb9435aa22210dcd42b109942ec3b3af40c4cd38d090e9a1a5f4574b
+  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
 ---
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
 
 > 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档

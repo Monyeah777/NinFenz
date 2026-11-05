@@ -503,11 +503,33 @@ def _add_parser_production(sub):
     lir.add_argument("--producer", default="", help="声明主体（写进 carrier.producer）")
     lir.add_argument("--out", default="", help="输出文件（缺省=只打印，不落盘）")
     lir.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    lva = lsub.add_parser("validate", help="校验 nf-label/1 IR（形状 + 档位 + 未证明提示）",
+    lva = lsub.add_parser("validate",
+                          help="校验 nf-label/1 IR（形状 + 档位 + 未证明提示）",
                           description="校验 IR：schema/standard/object/声明项形状 + 档位必需项。"
                                       "退出码：ok=0 / invalid=1 / 用法错=4。")
     lva.add_argument("label_ir", metavar="IR.json", help="要校验的 nf-label/1 文件")
     lva.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lwr = lsub.add_parser("write",
+                          help="把 IR 写成对象旁的 sidecar（回退载体，embedded 恒 false）",
+                          description="sidecar 回退：写 <对象>.label.json，绑定对象摘要。"
+                                      "载体写入未实装，故 embedded 恒 false。"
+                                      "只声明、不冒充已嵌入。")
+    lwr.add_argument("--object", dest="label_object", default="",
+                     help="被标注对象（仓相对或绝对；可以是二进制，如图片/音视频）")
+    lwr.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
+    lwr.add_argument("--out", default="", help="旁车落点（缺省=<对象>.label.json）")
+    lwr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lrd = lsub.add_parser("read", help="读旁车并与对象摘要对账",
+                          description="读 sidecar：对象变了就判 invalid"
+                                      "（标签声明过期），不静默放过。")
+    lrd.add_argument("label_object", metavar="OBJECT",
+                     help="对象路径（仓相对或绝对；可以是二进制）")
+    lrd.add_argument("--sidecar", default="", help="旁车路径（缺省=<对象>.label.json）")
+    lrd.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    lls = lsub.add_parser("list", help="清点仓内全部旁车（只读）",
+                          description="清点 sidecar：给出 (旁车, 对象, embedded) 三元组。")
+    lls.add_argument("--root", default=".", help="扫描根（缺省=仓库根）")
+    lls.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("evidence",
                         help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
                         description="证据包（内部差距：attest/receipts/transparency 三件都在，但缺"
@@ -3205,16 +3227,93 @@ def _cmd_sig(args):
         return _machine_fail(args, str(exc))
 
 def _cmd_label(args):
-    """nf label：标注 IR 的派发（形状声明与校验；**不写载体**）。"""
+    """nf label：标注 IR 的派发（声明层 + sidecar 回退；**不写载体**）。"""
     sub = getattr(args, "label_cmd", "") or ""
     if sub == "ir":
         return _label_ir(args)
     if sub == "validate":
         return _label_validate(args)
-    print("用法：nf label ir <对象> [--level minimal|full] [--items <json>] [--out <文件>]"
-          " ｜ nf label validate <IR.json>（各自 --help 看逐条）", file=sys.stderr)
+    if sub == "write":
+        return _label_write(args)
+    if sub == "read":
+        return _label_read(args)
+    if sub == "list":
+        return _label_list(args)
+    print("用法：nf label ir ｜ validate ｜ write --object/--ir ｜ read ｜ list"
+          "（各自 --help 看逐条）", file=sys.stderr)
     return 2
 
+
+def _label_write(args):
+    """nf label write：IR → 对象旁 sidecar（绑定对象摘要；embedded 恒 false）。"""
+    import json as _json
+
+    from core import json_doc, label_sidecar
+    obj = str(getattr(args, "label_object", "") or "")
+    if not obj or not getattr(args, "ir", ""):
+        return _machine_fail(args, "缺 --object / --ir（修复指引：nf label write --object <对象> "
+                                   "--ir <IR.json>；IR 用 nf label ir 生成）", 2)
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    try:
+        ir = json_doc.load(_rel_out(args.ir), dict, what=args.ir)
+        dest, info = label_sidecar.write(src, ir, out=_rel_out(args.out) if args.out else "")
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps({"kind": "label-write", "ok": True, "sidecar": _rel_display(dest),
+                           "object": _rel_display(src), "digest": info["digest"],
+                           "embedded": info["embedded"]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label write（{_rel_display(src)}）==")
+        print(f"  旁车：{_rel_display(dest)} · 绑定摘要 {info['digest'][:16]}")
+        print("  embedded=false：载体写入未实装——这只声明「该带哪些标识」，不冒充已嵌入")
+    return 0
+
+
+def _label_read(args):
+    """nf label read：读 sidecar 并与对象摘要对账。"""
+    import json as _json
+
+    from core import label_sidecar
+    obj = str(getattr(args, "label_object", "") or "")
+    src = obj if os.path.isabs(obj) else _rel_out(obj)
+    path = _rel_out(args.sidecar) if getattr(args, "sidecar", "") else ""
+    res = label_sidecar.read(src, path=path)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label read（{_rel_display(src)}）==")
+        print(f"  判定：{res['verdict']} · embedded={res['embedded']}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            label = res["label"] or {}
+            print(f"  标注：{label.get('standard')} · 档位 {label.get('level')} · "
+                  f"显式 {len(label.get('explicit') or [])} / "
+                  f"隐式 {len(label.get('implicit') or [])}")
+    return 0 if res["verdict"] == "ok" else 1
+
+
+def _label_list(args):
+    """nf label list：清点仓内旁车（只读）。"""
+    import json as _json
+
+    from core import label_sidecar
+    root = _rel_out(args.root) if getattr(args, "root", "") else str(ROOT)
+    rows = label_sidecar.discover(root)
+    if args.json:
+        print(_json.dumps({"kind": "label-list", "count": len(rows),
+                           "rows": [{"sidecar": s, "object": o, "embedded": e}
+                                    for s, o, e in rows]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf label list（{len(rows)} 份旁车）==")
+        for sidecar, obj, embedded in rows:
+            print(f"  {obj}  ←  {sidecar}  embedded={embedded}")
+        if not rows:
+            print("  （仓内暂无旁车：标注声明还没落到旁车文件）")
+    return 0
 
 def _label_ir(args):
     """nf label ir：组装 nf-label/1 IR（纯数据；给了 --out 才落盘，走 atomic_write）。"""
@@ -5329,6 +5428,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "handoff_out", "manifest_out", "context_dir", "responses",
                     "experiment", "ballots", "bundle",
                     "policy", "revocations", "anchor", "items", "table", "prev",
+                    "label_object", "ir", "sidecar",
                     "compile")
 
 
@@ -5367,9 +5467,11 @@ def _path_writing_issue(args) -> str:
 #: 就漏出闸门」——所以改成**枚举为准**，并由 `test_cli_error_framing.PathFlagCoverageTest`
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
+                       "label_object": "被标注对象可以是任意字节（图片/音视频）",
                        "evidence_bundle": "证据包是 zip（二进制容器）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
-                    "items", "label_ir", "table", "prev", "revocation_feed", "feeds",
+                    "items", "label_ir", "ir", "sidecar", "table", "prev",
+                    "revocation_feed", "feeds",
                     "compile",
                     "anchor", "issuer", "object", "policy", "revocations", "targets",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",

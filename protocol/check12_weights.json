@@ -166,6 +166,7 @@
     "test_knowledge": 0.7,
     "test_knowledge_sig": 0.2,
     "test_label_ir": 1.5,
+    "test_label_sidecar": 3.2,
     "test_launcher": 119.4,
     "test_layer_model": 11.2,
     "test_lazy_yaml": 0.2,
@@ -2006,6 +2007,19 @@
     "test_label_ir.TestValidate.test_schema_mismatch_fails": 0.0,
     "test_label_ir.TestValidate.test_top_level_must_be_object": 0.0,
     "test_label_ir.TestValidate.test_unknown_kind_fails": 0.0,
+    "test_label_sidecar.TestCli.test_list_is_read_only_and_parseable": 1.6,
+    "test_label_sidecar.TestCli.test_read_stale_exits_1": 0.67,
+    "test_label_sidecar.TestCli.test_write_then_read_round_trip": 0.66,
+    "test_label_sidecar.TestDiscover.test_discover_finds_sidecars_only": 0.01,
+    "test_label_sidecar.TestWriteRead.test_bad_sidecar_schema_is_invalid": 0.01,
+    "test_label_sidecar.TestWriteRead.test_changed_object_is_stale": 0.01,
+    "test_label_sidecar.TestWriteRead.test_custom_out_path": 0.01,
+    "test_label_sidecar.TestWriteRead.test_invalid_ir_is_rejected": 0.0,
+    "test_label_sidecar.TestWriteRead.test_ir_digest_mismatch_is_rejected": 0.01,
+    "test_label_sidecar.TestWriteRead.test_missing_object_is_invalid": 0.0,
+    "test_label_sidecar.TestWriteRead.test_missing_sidecar_is_invalid_with_guidance": 0.0,
+    "test_label_sidecar.TestWriteRead.test_round_trip_ok_and_never_embedded": 0.01,
+    "test_label_sidecar.TestWriteRead.test_sidecar_binds_object_digest": 0.01,
     "test_launcher.AutostartDefaultDocumentationTest.test_cmd_launcher_is_never_advertised_as_the_fastest": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_documented_default_matches_the_launcher": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_one_current_number_per_launcher": 0.0,
@@ -3873,5 +3887,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1329.0
+  "total_s": 1332.2
 }

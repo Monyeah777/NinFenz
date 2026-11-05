@@ -44,11 +44,33 @@ nf label validate 产出/海报.label.json
 | 档位必需的每条规则都有匹配声明项（kind 相符 + 必填字段非空） | invalid（列出缺哪几条） |
 | `carrier.embedded=true` 但本仓无写入子系统 | **ok + warning**（不当成功，只如实提示自称） |
 
+
+## sidecar 回退载体（v0 已实装）
+
+嵌入载体做不到时，ABI 允许回退 sidecar：把标注 IR 写到对象旁的 `<对象>.label.json`，**与对象摘要绑定**。
+`nf-label-sidecar/1` 的 `embedded` **恒为 false**（常量，不是参数）——它证明「这份声明与这份对象对得上」，
+不证明「对象里真的带标识」。
+
+```bash
+nf label write --object 产出/海报.png --ir 产出/海报.label.json   # 写旁车（绑定摘要）
+nf label read 产出/海报.png                                      # 读旁车 + 对账
+nf label list                                                    # 清点仓内全部旁车
+```
+
+| 检查 | 不过 |
+|---|---|
+| 旁车在场且 schema == `nf-label-sidecar/1` | invalid |
+| 旁车内 IR 通过 `nf-label/1` 校验 | invalid |
+| **对象摘要 == 旁车绑定摘要** | invalid（「对象已被改动，标签声明已过期」） |
+| 对象可读（被删/权限不足） | invalid |
+
+写盘走 `atomic_write`：半截旁车会让读者读到假声明。读判据只读旁车 + 对象摘要，不联网、不猜。
+
 ## 与 `cc_label` 的关系
 
-`cc_label(obj, contract)` 要返回 `{label: {contract, standard, fields, carrier, embedded}}`。v0 只把
-「fields/carrier 的形状与齐备度」做实（本文 + `nf label`），`embedded` **恒为声明值**，无法证；
-因此 ABI 里 `cc_label` 记为 `partial`，不升级为 `implemented`。
+`cc_label(obj, contract)` 要返回 `{label: {contract, standard, fields, carrier, embedded}}`。v0 做实两块：
+**声明层**（IR 形状与齐备度）+ **sidecar 回退**（把声明落到对象旁并与摘要绑定）；`embedded` **恒为
+false**，无法证「对象里真的带标识」。因此 ABI 里 `cc_label` 记为 `partial`，不升级为 `implemented`。
 
 ## 复核
 

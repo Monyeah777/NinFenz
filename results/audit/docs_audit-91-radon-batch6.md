@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:b74feb0cbb9435aa22210dcd42b109942ec3b3af40c4cd38d090e9a1a5f4574b
+  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
 ---
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
 
 > 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档

@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 121,
+        "raises": 123,
         "sinks": 20
       },
       "status": "pass",
@@ -368,11 +368,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 325,
-        "files": 325,
+        "baseline": 326,
+        "files": 326,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
-        "max_lines": 8331
+        "max_lines": 8433
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 269,
-        "modules": 269,
+        "metrics_recorded": 270,
+        "modules": 270,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "a1934e5f12eddeb333cc14d13c00318c4084e2e618fbf3ec04c47174dd87c17d",
+  "root_digest": "5e816d66e47a5531c0051d3143f810f6b481d24a764c30d9b8aac0608feabe8a",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

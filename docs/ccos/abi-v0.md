@@ -75,10 +75,11 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 
 ### 1. `cc_label(obj, contract)` → `label`
 
-**状态：`partial`（声明层已实装 · 载体层未实装）**。`maps_to`：`nf label ir` /
-`nf label validate`（`core/label_ir.py`，形状 = `nf-label/1`，见
-[label-ir-v0.md](label-ir-v0.md)）。**没有**标识写入子系统：`embedded` 只能是声明值，本调用
-**不**宣称已写入载体；把它读成「已实装」是误读。
+**状态：`partial`（声明层 + sidecar 回退已实装 · 载体写入未实装）**。`maps_to`：
+`nf label ir` / `nf label validate`（形状 = `nf-label/1`）、`nf label write|read|list`
+（sidecar 回退 = `nf-label-sidecar/1`，与对象摘要绑定），见 [label-ir-v0.md](label-ir-v0.md)。
+**没有**标识写入子系统：`embedded` **恒为 false**（常量），本调用**不**宣称已写入载体；
+把 sidecar 回退读成「已嵌入」是误读。
 
 - 输入：`{obj: <字节或路径>, contract: <契约 id>}`
 - 输出：`{label: {contract, standard, fields, carrier, embedded: bool}}`
@@ -248,7 +249,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 6 项：摘要一�
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
-| `cc_label` | 声明层已有（`nf-label/1` IR + 校验）；**载体写入/读取全无**：无水印嵌入、无元数据注入、无 sidecar 回退、无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
+| `cc_label` | 声明层 + sidecar 回退已有（`nf-label/1` IR、`nf-label-sidecar/1` 摘要绑定）；**载体写入全无**：无水印嵌入、无元数据注入、无 20+ 格式覆盖 | 需要标识写入子系统（本仓不存在） |
 | `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层（P2–P3 方向） |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 需要更完整的契约声明面（人工编纂） |
 

@@ -660,6 +660,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 35
     },
+    "desktop/src/core/label_sidecar.py": {
+      "lines": 134,
+      "max_fn_cc": 10,
+      "max_fn_lines": 41
+    },
     "desktop/src/core/layer_model.py": {
       "lines": 639,
       "max_fn_cc": 22,
@@ -1491,7 +1496,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8331,
+      "lines": 8433,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },
