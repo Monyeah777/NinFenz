@@ -31,13 +31,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import evidence  # noqa: E402
+from core import atomic_write, evidence, json_doc  # noqa: E402
 
 SCHEMA = "nf-evidence-vectors/1"
 OUT_REL = "results/ccos/evidence_verdict_vectors.json"
 PIN = "2026-01-01T00:00:00Z"
 KEY = b"vector-key-0123456789abcdef012345"          # 固定密钥：可复现，非生产用途
-KEY_B64 = base64.b64encode(KEY).decode("ascii")
 GUIDE = "修复指引："
 
 
@@ -49,7 +48,7 @@ def _write_members(path: str, members: dict) -> bytes:
     """把成员字典写成确定性 zip（固定时间戳 + 不压缩 + 名排序）。"""
     items = [(name, members[name]) for name in sorted(members)]
     data = evidence._zip_bytes(items)
-    Path(path).write_bytes(data)
+    atomic_write.write_bytes(path, data)
     return data
 
 
@@ -69,7 +68,7 @@ def _base_fixture(tmp: str) -> None:
     d.mkdir(parents=True, exist_ok=True)
     for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n"),
                        ("c.md", "# C\n\n丙\n")):
-        (d / name).write_text(body, encoding="utf-8")
+        atomic_write.write_text(str(d / name), body)
 
 
 def _case(cid: str, desc: str, verdict: str, *, bundle: bytes | None = None,
@@ -145,13 +144,13 @@ def _build_vectors() -> dict:
         rows.append(_case("payload_flip", "成员字节被改", "invalid",
                           bundle=_write_members(os.path.join(tmp, "flip.zip"), m)))
         m = _members(base)
-        meta = json.loads(m["bundle.json"].decode())
+        meta = json_doc.loads(m["bundle.json"].decode(), dict, what="bundle.json")
         meta["root"] = "0" * 64
         m["bundle.json"] = json.dumps(meta, ensure_ascii=False, sort_keys=True).encode()
         rows.append(_case("root_flip", "根被改", "invalid",
                           bundle=_write_members(os.path.join(tmp, "root.zip"), m)))
         m = _members(base)
-        meta = json.loads(m["bundle.json"].decode())
+        meta = json_doc.loads(m["bundle.json"].decode(), dict, what="bundle.json")
         meta.pop("chain", None)
         m["bundle.json"] = json.dumps(meta, ensure_ascii=False, sort_keys=True).encode()
         rows.append(_case("chain_missing", "chain 段被删（顺序不可证）", "invalid",
@@ -178,7 +177,7 @@ def _build_vectors() -> dict:
         rows.append(_case("bad_revocations", "包内吊销表坏件（不是「无吊销」）", "invalid",
                           bundle=_write_members(os.path.join(tmp, "revin.zip"), m)))
         plain = Path(tmp) / "plain.bin"
-        plain.write_bytes(b"just a file")
+        atomic_write.write_bytes(str(plain), b"just a file")
         # 输入不是证据包 = **用法错**（rc=4），不是判定面；第三方实现也必须拒绝而不是给判定
         rows.append(_case("not_a_bundle", "不是证据包（用法错，不是判定）", "invalid",
                           bundle=plain.read_bytes(), special="not_a_bundle",
@@ -189,7 +188,7 @@ def _build_vectors() -> dict:
 def _dump(tmp: str, data: bytes) -> str:
     """把内存里的包落到临时文件（verify 只吃路径）。"""
     path = os.path.join(tmp, "dump.zip")
-    Path(path).write_bytes(data)
+    atomic_write.write_bytes(path, data)
     return path
 
 
@@ -204,7 +203,8 @@ def check_vectors() -> tuple:
     if not path.is_file():
         return [f"缺向量集 {OUT_REL}（{GUIDE}跑 python scripts/evidence_vectors.py --write）"], live
     try:
-        recorded = json.loads(path.read_text(encoding="utf-8"))
+        recorded = json_doc.loads(path.read_text(encoding="utf-8"), dict,
+                                  what=OUT_REL)
     except (OSError, ValueError) as exc:
         return [f"{OUT_REL} 不可读：{exc}（{GUIDE}重跑 --write）"], live
     if render_vectors(recorded) != render_vectors(live):
@@ -223,7 +223,7 @@ def main(argv=None) -> int:
         doc = build_vectors()
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(render_vectors(doc), encoding="utf-8", newline="\n")
+        atomic_write.write_text(str(dest), render_vectors(doc))
         if args.json:
             print(json.dumps({"written": OUT_REL, "count": doc["count"]},
                              ensure_ascii=False, indent=2, sort_keys=True))
