@@ -123,6 +123,16 @@ class TestSafety(_Server):
         self.assertEqual(code, 403)
         self.assertIn("Origin", doc["error"])
 
+    def test_bad_origin_with_large_body_still_gets_json(self):
+        """回 403 前必须把请求体读掉：否则客户端看到的是连接异常而不是可执行指引。
+
+        分片实测（2026-11-05）：403 分支漏了 drain，偶发 BadStatusLine/RemoteDisconnected。
+        """
+        code, doc = self._post("/api/verify", b"x" * 8192,
+                               headers={"Origin": "http://evil.example"})
+        self.assertEqual(code, 403)
+        self.assertIn("Origin", doc["error"])
+
     def test_same_origin_allowed(self):
         code, _doc = self._post("/api/verify", self._bundle(),
                                 headers={"Origin": f"http://127.0.0.1:{self.port}"})

@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:c75c54242d3d72891a0a74b5436e56f018cf30207d65d1bfa6c981c832e99709
+  - protocol/code_metrics_baseline.json:6a0d1f47d584fa5cbfbfd359ee8feb0846fe84e21437682c5048d0ac1870ff14
 ---
+> 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
+
 > 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
 
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）

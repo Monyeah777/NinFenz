@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:c75c54242d3d72891a0a74b5436e56f018cf30207d65d1bfa6c981c832e99709
+  - protocol/code_metrics_baseline.json:6a0d1f47d584fa5cbfbfd359ee8feb0846fe84e21437682c5048d0ac1870ff14
 ---
+> 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
+
 > 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
 
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:c75c54242d3d72891a0a74b5436e56f018cf30207d65d1bfa6c981c832e99709
+  - protocol/code_metrics_baseline.json:6a0d1f47d584fa5cbfbfd359ee8feb0846fe84e21437682c5048d0ac1870ff14
 ---
+> 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
+
 > 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
 
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）

@@ -526,7 +526,7 @@
       "max_fn_lines": 12
     },
     "desktop/src/core/http_api.py": {
-      "lines": 250,
+      "lines": 266,
       "max_fn_cc": 8,
       "max_fn_lines": 28
     },

@@ -138,6 +138,21 @@ class _Handler(BaseHTTPRequestHandler):
                    f"http://{host}"}
         return origin in allowed
 
+    def _drain(self) -> None:
+        """把请求体读掉（**回 4xx 前必备**）。
+
+        为什么：不读就回错误，客户端往往还在写请求体，于是它看到的是「远端关闭连接」而不是我们
+        给的可执行指引（2026-11-05 分片实测：403 分支漏了这一步，偶发 BadStatusLine）。
+        与 413 分支同一口径：先读掉（最多 limit+1 字节）再回。
+        """
+        try:
+            length = int(self.headers.get("Content-Length") or "0")
+        except ValueError:
+            return
+        limit = int(getattr(self.server, "max_body", MAX_BODY))
+        if length > 0:
+            self.rfile.read(min(length, limit + 1))
+
     def _body(self) -> tuple[bytes | None, str]:
         """读请求体（有上限）→ (字节, 拒绝原因)。超限时先**把体读掉**再回 4xx。
 
@@ -183,6 +198,7 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         if not self._origin_ok():
+            self._drain()          # 先读掉请求体：否则客户端看到的是连接异常而不是 403
             self._send(403, {"ok": False, "error": "来源不允许（Origin 校验失败）",
                              "fix": _GUIDE + "浏览器请从 http://127.0.0.1 同端口访问"})
             return
