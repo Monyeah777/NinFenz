@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:4882ec12eb63411042f11ffada64ed5c0954aaee67944d6795007e0cc24cf49b
+  - protocol/code_metrics_baseline.json:8b305ec332349fd63564b191d882dc2fcbdae95a8d04ebcd5f976e4f2042bf86
 ---
+> 重审（2026-11-05）：攻击矩阵重名用例：构造期抑制 zipfile 重名 UserWarning（机器面逐字节一致）
+
 > 重审（2026-11-05）：并发会话风格债收口（6 处 E501/RUF100/UP031/UP012 修掉，style 基线 9923→9921）
 
 > 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）

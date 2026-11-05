@@ -381,9 +381,9 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1492,
+      "lines": 1497,
       "max_fn_cc": 24,
-      "max_fn_lines": 142
+      "max_fn_lines": 146
     },
     "desktop/src/core/execution_drill.py": {
       "lines": 323,

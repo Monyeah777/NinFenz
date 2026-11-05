@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:4882ec12eb63411042f11ffada64ed5c0954aaee67944d6795007e0cc24cf49b
+  - protocol/code_metrics_baseline.json:8b305ec332349fd63564b191d882dc2fcbdae95a8d04ebcd5f976e4f2042bf86
 ---
+> 重审（2026-11-05）：攻击矩阵重名用例：构造期抑制 zipfile 重名 UserWarning（机器面逐字节一致）
+
 > 重审（2026-11-05）：并发会话风格债收口（6 处 E501/RUF100/UP031/UP012 修掉，style 基线 9923→9921）
 
 > 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）

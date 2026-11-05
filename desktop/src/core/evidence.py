@@ -24,6 +24,7 @@ import io
 import json
 import os
 import tempfile
+import warnings
 import zipfile
 from collections.abc import Sequence
 from typing import Any
@@ -1415,12 +1416,16 @@ def bench() -> dict[str, Any]:
                        base, lambda meta: meta["entries"][0].update(
                            {"path": "../escape.md", "id": "../escape.md"}))))
         dup_zip = os.path.join(tmp, "dupym.zip")
-        with zipfile.ZipFile(dup_zip, "w", zipfile.ZIP_STORED) as zf:
-            for name, raw in sorted(_members(base).items()):
-                zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
-                zf.writestr(zi, raw)
-            zi = zipfile.ZipInfo(PAYLOAD_DIR + "d/a.md", date_time=_ZIP_EPOCH)
-            zf.writestr(zi, b"shadow")
+        # 造重名 zip 时 zipfile 会发 UserWarning（"Duplicate name"）到 stderr；机器面比对要求
+        # 直跑与守护逐字节一致，这条噪声必须在这里消掉（不是屏蔽判据，是屏蔽构造期提示）。
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with zipfile.ZipFile(dup_zip, "w", zipfile.ZIP_STORED) as zf:
+                for name, raw in sorted(_members(base).items()):
+                    zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
+                    zf.writestr(zi, raw)
+                zi = zipfile.ZipInfo(PAYLOAD_DIR + "d/a.md", date_time=_ZIP_EPOCH)
+                zf.writestr(zi, b"shadow")
         _bench_run(rows, "dup_members", "重名成员（zip 歧义：判定不可复算）", "invalid", dup_zip)
         _bench_run(rows, "revocations_bad", "包内吊销表写坏（坏件不能当「无吊销」）", "invalid",
                    _bench_write(tmp, "revbad.zip", _rebuild(m)))
