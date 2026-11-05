@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:ddf0ff856da9b457112bcba359948ebaddf2780e2712b7e1a078ddc4bd4ce745
+  - protocol/code_metrics_baseline.json:a4f9557e58a73a62c539afe104142391b5255664f7e0aaae9bbb6347a21a9f60
 ---
+> 重审（2026-11-06）：并发会话遗留的派生面重冻（中途哨兵入库）
+
 > 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
 
 > 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
