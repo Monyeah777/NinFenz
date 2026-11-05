@@ -208,6 +208,56 @@ class TestCliIrBinary(unittest.TestCase):
                              doc["object"]["digest"])
 
 
+def make_min_jpeg() -> bytes:
+    """最小可解析 JPEG：SOI + APP0 + SOF0 + SOS + 熵数据 + EOI（纯标准库构造）。
+
+    命名避开仓库既有 make_jpeg（那是 Pillow 真图夹具，PIL 解码面判据依赖它）。
+    """
+    def seg(marker, payload):
+        return b"\xff" + bytes([marker]) + struct.pack(">H", len(payload) + 2) + payload
+    app0 = seg(0xE0, b"JFIF\x00")
+    sof = seg(0xC0, b"\x08" + struct.pack(">HH", 2, 2) + b"\x01\x01\x11\x00")
+    sos = seg(0xDA, b"\x01\x01\x00\x00\x3f\x00")
+    return b"\xff\xd8" + app0 + sof + sos + b"\x12\x34\x56\x78\xff\xd9"
+
+
+class TestJpegHardening(unittest.TestCase):
+    """JPEG 分支与 PNG 同等硬化：对象绑定 / SOF 结构闸 / 幂等 / 内容摘要去标签。"""
+
+    def test_rejects_ir_for_other_object(self):
+        jpeg = make_jpeg()
+        other_ir = make_ir(b"# not this jpeg\n")
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(jpeg, other_ir)
+        self.assertIn("不符", str(ctx.exception))
+        self.assertIn("修复指引", str(ctx.exception))
+
+    def test_rejects_missing_sof(self):
+        shell = b"\xff\xd8" + b"\xff\xda" + struct.pack(">H", 8) + b"\x01\x01\x00\x00\x3f\x00"
+        ir = label_ir.build("shell.jpg", hashlib.sha256(shell).hexdigest(), items=[
+            {"face": "explicit", "kind": "text", "where": "start", "value": "AI"},
+            {"face": "implicit", "kind": "metadata", "key": "AIGC", "value": "1"}])
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(shell, ir)
+        self.assertIn("SOF", str(ctx.exception))
+
+    def test_round_trip_idempotent_and_scan_untouched(self):
+        jpeg = make_jpeg()
+        ir = make_ir(jpeg, path="photo.jpg")
+        once, info1 = lc.embed(jpeg, ir)
+        self.assertEqual("jpeg", info1["format"])
+        self.assertEqual(lc.jpeg_scan_digest(jpeg), lc.jpeg_scan_digest(once))
+        self.assertEqual("ok", lc.read(once)["verdict"])
+        twice, info2 = lc.embed(once, ir)
+        self.assertTrue(info2["replaced"])
+        self.assertEqual(once, twice)
+
+    def test_content_digest_strips_label(self):
+        jpeg = make_jpeg()
+        out, _info = lc.embed(jpeg, make_ir(jpeg, path="photo.jpg"))
+        self.assertEqual(hashlib.sha256(jpeg).hexdigest(), lc.jpeg_content_digest(out))
+
+
 class TestCli(unittest.TestCase):
     def _run(self, *args):
         return subprocess.run([sys.executable, str(SCRIPT), "label", *args], cwd=str(ROOT),

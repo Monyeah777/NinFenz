@@ -5,7 +5,7 @@
     "floor": 5,
     "prod": 1049,
     "projection": 137,
-    "support": 360,
+    "support": 361,
     "verify": 979
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -6347,7 +6347,7 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "标注载体 v0：把 nf-label/1 真正**写进** PNG 的 iTXt 块（可读回、可证像素未变）。",
+      "function": "标注载体 v0：把 nf-label/1 真正**写进** PNG iTXt 块 / JPEG APP15 段。",
       "path": "desktop/src/core/label_carrier.py",
       "role": "prod",
       "rule": "auto:R-core"
@@ -12210,10 +12210,10 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f4ecfd976437d18556f2a1e93d11a38a4dc11bf7557093c87a37f5c8e17d7f42",
+  "root_digest": "9fdc8dc16f2072e2f5ad8d9820e10e94ee0f559fd0d89774a01bd5a02514c1c5",
   "rule_counts": {
     "R-app": 1455,
-    "R-catch": 214,
+    "R-catch": 215,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,

@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 130,
+        "raises": 131,
         "sinks": 20
       },
       "status": "pass",
@@ -372,7 +372,7 @@
         "files": 327,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
-        "max_lines": 8525
+        "max_lines": 8527
       },
       "status": "pass",
       "warns": 0
@@ -525,7 +525,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4012,
+        "files": 4013,
         "kernel": 2033,
         "kernel_no_self": 309,
         "rules": 9,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "93ad056ead5a4855b2bc92baa48e217073e9d6529ce0feb75c8a604362de0f7d",
+  "root_digest": "9e859d31e3f764904c31e704e7a33da5dd8030a4c5b581e2c1f2772119f8f750",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

@@ -40,7 +40,7 @@ class TestWriteRead(unittest.TestCase):
 
     def test_round_trip_ok_and_never_embedded(self):
         dest, info = ls.write(self.obj, _ir(self.obj))
-        self.assertFalse(info["embedded"], "载体写入未实装：embedded 必须恒 false")
+        self.assertFalse(info["embedded"], "sidecar 不是嵌入：embedded 必须恒 false")
         self.assertTrue(dest.endswith(ls.SUFFIX))
         res = ls.read(self.obj)
         self.assertEqual("ok", res["verdict"], res["issues"])

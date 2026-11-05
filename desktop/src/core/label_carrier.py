@@ -1,15 +1,19 @@
-"""标注载体 v0：把 nf-label/1 真正**写进** PNG 的 iTXt 块（可读回、可证像素未变）。
+"""标注载体 v0：把 nf-label/1 真正**写进** PNG iTXt 块 / JPEG APP15 段。
 
-为什么只做 PNG 一种（2026-11-06）：本仓没有标识写入子系统，上一轮只做到 sidecar（声明与对象
-绑定，但「对象里到底有没有」证不了）。PNG 的 iTXt 是**公开规范 + 纯字节可逆**的载体，纯标准库
-就能写且能读回自证；其它格式（JPEG/MP4/PDF）各自有一套嵌入规则，没有实测就不宣称。
+覆盖两种常见格式（2026-11-06）：
+- PNG → iTXt（keyword=AIGC，UTF-8）；
+- JPEG → APP15 私有段（"AIGC\0" + JSON）。
+两者都是公开规范 + 纯字节可逆的载体，纯标准库可写且可读回自证；其它格式（MP4/PDF/…）
+各自有一套嵌入规则，没有实测就不宣称，走 sidecar 回退。
 
-只承诺这里能证的三件事：
-1. 写入后**能被自己读回**（同 keyword、同 IR、JSON 语义等价）；
-2. 写入**不改像素**（IDAT 块逐字节一致）；
-3. 写入后文件仍是**结构合法**的 PNG（每个块 CRC 正确、签名正确）。
+承诺（逐格式有判据）：
+1. 写入后**能被自己读回**（同 IR、JSON 语义等价）；IR.object.digest 必须等于「去掉本件
+   标签后的内容摘要」——不符 fail-closed（写入前绑定，防「标签声明的是另一个文件」）；
+2. 写入**不改内容面**：PNG 所有 IDAT 块拼接 sha256 一致；JPEG 从 SOS 到 EOF 的原始字节一致；
+3. 写入后文件**结构合法**：PNG 块 CRC/签名/IHDR 首/IEND 尾；JPEG 段边界与长度合法、SOI 起、
+   含 SOF 与 SOS。
 
-不承诺：抗裁剪/抗转码/抗截屏（那是水印，不在本件）；不承诺别的格式。
+不承诺：抗裁剪/抗转码/抗截屏（那是水印，不在本件）；不承诺未覆盖的格式。
 """
 from __future__ import annotations
 
@@ -31,14 +35,14 @@ MAX_INPUT_BYTES = 64 * 1024 * 1024
 
 
 class CarrierError(ValueError):
-    """载体面失败（不是 PNG / 块结构坏 / 标识读不出 / IR 与对象不符）。"""
+    """载体面失败（格式不支持 / 结构坏 / 标识读不出 / IR 与对象不符）。"""
 
 
 def _iter_chunks(data: bytes) -> list[tuple[str, bytes]]:
     """拆 PNG 块 → [(类型, 数据)]；结构不合法就抛 CarrierError（含具体位置）。"""
     if not data.startswith(PNG_SIG):
-        raise CarrierError("不是 PNG（签名不符）(" + GUIDE + "本件只写 PNG；其它格式请用 "
-                           "nf label write 的 sidecar 回退）")
+        raise CarrierError("不是 PNG（签名不符）(" + GUIDE + "PNG 载体只接受 PNG 字节；"
+                           "JPEG 走 APP15 分支，其它格式请用 nf label write 的 sidecar 回退）")
     out: list[tuple[str, bytes]] = []
     pos = len(PNG_SIG)
     while pos < len(data):
@@ -214,18 +218,20 @@ JPEG_PREFIX = b"AIGC\x00"
 _JPEG_STANDALONE = frozenset({0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7})
 
 
-def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes]], bytes]:
-    """JPEG → (SOS 之前的段列表 [(marker, payload)], 从 SOS 到 EOF 的原始字节)。
+def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes, bytes]], bytes]:
+    """JPEG → (SOS 之前的段列表 [(marker, payload, raw_bytes)], 从 SOS 到 EOF 的原始字节)。
 
+    raw_bytes 是原文件里该段的**原样字节**（含 0xFF 填充），供内容摘要/原样重排用；
     SOS 之后是熵编码数据，**必须原样保留**——载体承诺「不改扫描数据」的判据就是它。
     """
     if not data.startswith(JPEG_SOI):
         raise CarrierError("不是 JPEG（缺 SOI）(" + GUIDE + "JPEG 必须以 FFD8 开头；"
                            "其它格式请用 nf label write 的 sidecar 回退）")
     pos = len(JPEG_SOI)
-    segs: list[tuple[int, bytes]] = []
+    segs: list[tuple[int, bytes, bytes]] = []
     n = len(data)
     while pos < n:
+        seg_start = pos
         if data[pos] != 0xFF:
             raise CarrierError(f"JPEG 段边界不符（偏移 {pos} 应为 0xFF）("
                                + GUIDE + "文件损坏，重新导出原图再写）")
@@ -241,9 +247,9 @@ def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes]], bytes]:
             seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
             if pos + seg_len > n:
                 raise CarrierError("JPEG SOS 段数据截断（" + GUIDE + "文件不完整）")
-            return segs, data[pos - 2:]           # 从 SOS 标记起原样返回（含 FFDA 与长度）
+            return segs, data[seg_start:]         # 从 SOS 标记起原样返回（含 FFDA 与长度）
         if marker in _JPEG_STANDALONE:
-            segs.append((marker, b""))
+            segs.append((marker, b"", data[seg_start:pos]))
             continue
         if pos + 2 > n:
             raise CarrierError("JPEG 段长度截断（" + GUIDE + "文件不完整）")
@@ -251,9 +257,32 @@ def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes]], bytes]:
         if seg_len < 2 or pos + seg_len > n:
             raise CarrierError(f"JPEG 段长度非法（marker=0x{marker:02X}）("
                                + GUIDE + "文件损坏，重新导出原图再写）")
-        segs.append((marker, data[pos + 2:pos + seg_len]))
+        segs.append((marker, data[pos + 2:pos + seg_len], data[seg_start:pos + seg_len]))
         pos += seg_len
     raise CarrierError("JPEG 缺 SOS（" + GUIDE + "文件不完整，重新导出原图再写）")
+
+
+#: SOF 帧头（0xC0–0xCF，排除 DHT/JPG/DAC）：结构闸要求 SOS 前至少有一个
+_SOF_MARKERS = frozenset(set(range(0xC0, 0xD0)) - {0xC4, 0xC8, 0xCC})
+
+
+def _jpeg_structure_issues(segs: list[tuple[int, bytes, bytes]]) -> list[str]:
+    """JPEG 结构闸：段存在 + SOS 前有 SOF（只有 SOI/SOS 的壳不算结构合法）。"""
+    if not any(marker in _SOF_MARKERS for marker, _body, _raw in segs):
+        return ["JPEG 缺 SOF 帧头（" + GUIDE + "文件不完整或只是壳，重新导出原图再写）"]
+    return []
+
+
+def jpeg_content_digest(jpeg: bytes) -> str:
+    """JPEG 内容摘要 = 去掉本件 AIGC APP15 段后的完整字节摘要（IR.object.digest 的比对基准）。
+
+    与 PNG 的 content_digest 同构：已标注文件再写一次（幂等）时，去掉本件标签段后的字节
+    就是 IR 描述的那份内容。未标注文件上它等于 sha256(原文件字节)。
+    """
+    segs, tail = _jpeg_split(jpeg)
+    kept = [raw for marker, body, raw in segs
+            if not (marker == APP15 and body.startswith(JPEG_PREFIX))]
+    return hashlib.sha256(JPEG_SOI + b"".join(kept) + tail).hexdigest()
 
 
 def jpeg_scan_digest(data: bytes) -> str:
@@ -271,6 +300,15 @@ def _jpeg_seg(marker: int, payload: bytes) -> bytes:
 def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     """把 IR 写进 JPEG 的 APP15 段（幂等替换；扫描数据原样保留）。"""
     segs, tail = _jpeg_split(jpeg)
+    struct_issues = _jpeg_structure_issues(segs)
+    if struct_issues:
+        raise CarrierError("；".join(struct_issues))
+    want = str((ir.get("object") or {}).get("digest") or "")
+    got = jpeg_content_digest(jpeg)
+    if want != got:
+        raise CarrierError("IR 的 object.digest 与输入对象不符（" + GUIDE + "IR 必须针对**这份**"
+                           "对象生成（nf label ir <对象>）；JPEG 的摘要基准 = 去掉本件 APP15 "
+                           "后的完整字节）")
     before = jpeg_scan_digest(jpeg)
     payload = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
     if len(payload) > 8000:
@@ -280,13 +318,13 @@ def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]
     kept: list[bytes] = []
     replaced = False
     insert_at = 0                    # 原文件没有我们的段时，插在 APP0/APP1 之后
-    for marker, body in segs:
+    for marker, body, raw in segs:
         if marker == APP15 and body.startswith(JPEG_PREFIX):
             if not replaced:          # 幂等：原位替换，多余的旧段丢弃（防重复堆积）
                 kept.append(app15)
                 replaced = True
             continue
-        kept.append(_jpeg_seg(marker, body))
+        kept.append(raw)              # 其余段**原样字节**保留（含 0xFF 填充）
         if not replaced and marker in (0xE0, 0xE1):
             insert_at = len(kept)
     if not replaced:
@@ -308,7 +346,7 @@ def _read_jpeg(jpeg: bytes) -> dict[str, Any]:
     except CarrierError as exc:
         res["issues"].append(str(exc))
         return res
-    for marker, body in segs:
+    for marker, body, _raw in segs:
         if marker != APP15 or not body.startswith(JPEG_PREFIX):
             continue
         text = body[len(JPEG_PREFIX):].decode("utf-8", "replace")
@@ -332,6 +370,9 @@ def _read_jpeg(jpeg: bytes) -> dict[str, Any]:
 
 def embed(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     """按 magic 选载体：PNG → iTXt；JPEG → APP15。其它格式一律带指引拒绝（不猜）。"""
+    if len(data) > MAX_INPUT_BYTES:
+        raise CarrierError(f"输入对象超过上限（{len(data)} > {MAX_INPUT_BYTES} 字节）"
+                           f"（{GUIDE}先缩小对象；载体只写常规图）")
     issues = label_ir.validate(ir)["issues"]
     if issues:
         raise CarrierError("标注 IR 不合法：" + "；".join(issues[:3])
@@ -363,7 +404,7 @@ def embed_file(src: str, ir: dict[str, Any], out: str) -> dict[str, Any]:
     with open(src, "rb") as fh:
         png = fh.read()
     if not png:
-        raise CarrierError(f"输入为空：{src}（" + GUIDE + "换一份真实 PNG）")
+        raise CarrierError(f"输入为空：{src}（" + GUIDE + "换一份真实图片（PNG/JPEG））")
     new, info = embed(png, ir)
     atomic_write.write_bytes(out, new)
     return {"src": src, "out": out, **info}

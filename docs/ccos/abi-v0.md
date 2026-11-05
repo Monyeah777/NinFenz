@@ -15,7 +15,7 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 **威胁模型**（能证明什么、不能证明什么、有哪些已知缺口）：见 [threat-model.md](threat-model.md)。
 
 **非目标**（与 `docs/layers.md` 的四阶边界一致：契约/资产/引擎/出口）：不是计算内核（不跑模型/不做推理调度）、
-不是云（不做多租户/SaaS）、不是 DRM、不是检测模型；不承诺载体物理绑定（PNG iTXt 只写可见文本块，无水印/无抗转码）、不承诺
+不是云（不做多租户/SaaS）、不是 DRM、不是检测模型；不承诺载体物理绑定（PNG iTXt / JPEG APP15 只写可见文本段，无水印/无抗转码）、不承诺
 CA/TSA 等外部权威、不承诺 K1–K8 内核语义、不承诺联邦/多节点、不用外部盲评作质量判据。
 本 ABI 不承诺任何不可计算的性质；逐条触发条件见文末「本季非目标与触发条件」。
 
@@ -77,11 +77,12 @@ CA/TSA 等外部权威、不承诺 K1–K8 内核语义、不承诺联邦/多节
 
 ### 1. `cc_label(obj, contract)` → `label`
 
-**状态：`partial`（声明层 + sidecar 回退 + PNG 载体已实装）**。`maps_to`：
+**状态：`partial`（声明层 + sidecar 回退 + PNG iTXt / JPEG APP15 载体已实装）**。`maps_to`：
 `nf label ir|validate`（形状 = `nf-label/1`）、`nf label write|read|list`
 （sidecar 回退 = `nf-label-sidecar/1`，与对象摘要绑定）、`nf label embed|extract`
-（**PNG iTXt 载体**），见 [label-ir-v0.md](label-ir-v0.md)。PNG 面只承诺「能读回 / 不改像素 /
-块结构合法」：**没有**水印、没有其它格式；非 PNG 仍走 sidecar 且 `embedded=false`。把可见文本
+（**PNG iTXt / JPEG APP15 载体**），见 [label-ir-v0.md](label-ir-v0.md)。载体面只承诺「能读回 /
+不改内容面 / 结构合法 + 对象绑定」：**没有**水印、没有其它格式；非 PNG/JPEG 仍走 sidecar 且
+`embedded=false`。把可见文本
 载体读成「抗转码的标识」是误读。
 
 - 输入：`{obj: <字节或路径>, contract: <契约 id>}`
@@ -248,9 +249,9 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；四个命令各自成功
 而链条换了字节，仍不算同一条链。
 
-缺环如实标注：本仓载体写入只覆盖 **PNG iTXt**（2026-11-06 实装，`nf label embed|extract`），
-链尚未接 label 环，故链条输出 `missing: ["cc_label"]`——不假装七环齐全；把 PNG 文本块读成
-「抗转码标识」是误读。
+缺环如实标注：本仓载体写入覆盖 **PNG iTXt 与 JPEG APP15**（2026-11-06 实装，
+`nf label embed|extract`），链尚未接 label 环，故链条输出 `missing: ["cc_label"]`——不假装七环
+齐全；把可见文本段读成「抗转码标识」是误读。
 
 ```bash
 python scripts/ccos_chain.py --target STRATEGY.md          # 人读表
@@ -262,7 +263,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 7 项：摘要一�
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
-| `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt 载体**已有（可读回 / 不改像素 / 块结构合法）；**仍缺**：水印嵌入、其它格式（JPEG/MP4/PDF）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的那一种（PNG 文本块） |
+| `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt / JPEG APP15 载体**已有（读回 / 内容面不变 / 结构合法 / 对象绑定）；**仍缺**：水印嵌入、其余格式（MP4/PDF/…）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的两种 |
 | `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层：不承诺自动把法规原文变成意图，缺的意图必须逐条挂账 |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 契约声明面为人工编纂；未认领给 `unclaimed` 而非放行，不得读成「查过了没问题」 |
 
@@ -275,7 +276,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 7 项：摘要一�
 
 | 非目标 | 触发条件 |
 |---|---|
-| 水印 / 其它格式载体 / C2PA 读写 | 出现真实合规写入需求，且「格式覆盖 × 水印算法 × 验证闭环」选型判据成立；PNG 文本块已实装，其余格式不一次铺 20+ |
+| 水印 / 其它格式载体 / C2PA 读写 | 出现真实合规写入需求，且「格式覆盖 × 水印算法 × 验证闭环」选型判据成立；PNG/JPEG 已实装，其余格式不一次铺 20+ |
 | CA / TSA / measured boot 等外部权威 | 本仓威胁模型不引外部权威（见 threat-model.md）；无触发条件 |
 | K1–K8 内核语义（作业/调度/内存/命名空间/资源治理/启动恢复） | 出现第二个调用面/租户，或长任务取消/断点恢复成为真实需求；届时只允许 K1+K4+K5+K7 最小集（K2 折入 K1、K3/K6 不做、K8 仅 boot 自检） |
 | 四类网关 / 联邦 / 多节点 | 出现多节点部署或远程调用面需求；本地 CLI 路径必须无网关亦完整 |

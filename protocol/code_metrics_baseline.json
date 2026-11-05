@@ -656,7 +656,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_carrier.py": {
-      "lines": 369,
+      "lines": 410,
       "max_fn_cc": 17,
       "max_fn_lines": 48
     },
@@ -1501,7 +1501,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8525,
+      "lines": 8527,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

@@ -1,14 +1,14 @@
 # 标注 IR v0（`cc_label` 的声明层）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-05
-> **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **PNG iTXt 载体写入**
-> （`core/label_carrier.py` + `nf label embed|extract`；只 PNG、只可见文本块、无水印）
+> **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **PNG iTXt / JPEG APP15
+> 载体写入**（`core/label_carrier.py` + `nf label embed|extract`；只可见文本段、无水印）
 
 ## 是什么 / 不是什么
 
 `nf-label/1` 是一份**纯数据 IR**：描述「某对象按某个标准**应当**带哪些标识」，并校验声明的形状与
 档位齐备度。它**不**写载体、**不**读载体、**不**证明文件里真的带标识——载体写入在
-`core/label_carrier.py`（PNG iTXt，只证读回/不改像素/结构合法），
+`core/label_carrier.py`（PNG iTXt / JPEG APP15，只证读回/内容面不变/结构合法/对象绑定），
 任何「已写入水印/已嵌入元数据」的宣称都不可证。
 
 ## 规则表（GB 45438 分类 · v0 映射）

@@ -496,7 +496,7 @@ def _add_parser_production(sub):
                           description="组装 IR：对象摘要 + 显式/隐式声明项 → nf-label/1。"
                                       "纯数据、无时间戳（同输入逐字节一致）。")
     lir.add_argument("label_object", metavar="OBJECT",
-                     help="对象文件路径（仓相对或绝对；可以是二进制——载体只写 PNG）")
+                     help="对象文件路径（仓相对或绝对；可以是二进制——载体支持 PNG/JPEG）")
     lir.add_argument("--level", default="minimal", choices=("minimal", "full"),
                      help="档位：minimal=显式文字+隐式元数据；full=再要语音/显式元数据/水印")
     lir.add_argument("--contract", default="", help="关联契约 id（写进 IR，便于溯源）")
@@ -538,13 +538,14 @@ def _add_parser_production(sub):
                                        "不改像素、不毁结构；"
                                        "已存在则替换（幂等）。其它格式请用 sidecar 回退。")
     lemb.add_argument("--object", dest="label_object", default="",
-                      help="源图（PNG；可以是二进制）")
+                      help="源图（PNG/JPEG；可以是二进制）")
     lemb.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
     lemb.add_argument("--out", default="", help="写入落点（缺省=<对象>.labeled.png；不改输入）")
     lemb.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    lext = lsub.add_parser("extract", help="从 PNG 载体读回 IR（与 sidecar.read 同形状）",
+    lext = lsub.add_parser("extract",
+                           help="从载体读回 IR（PNG iTXt / JPEG APP15；与 sidecar 同形状）",
                            description="载体读取：读 AIGC iTXt 块，校验 IR 形状；没有则 invalid。")
-    lext.add_argument("label_object", metavar="OBJECT", help="PNG 路径（可以是二进制）")
+    lext.add_argument("label_object", metavar="OBJECT", help="图片路径（PNG/JPEG；可以是二进制）")
     lext.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("evidence",
                         help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
@@ -3269,7 +3270,8 @@ def _label_embed(args):
                           ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(f"== nf label embed（{_rel_display(src)} → {_rel_display(out)}）==")
-        print(f"  载体：PNG iTXt · keyword={info['keyword']} · 已替换={info['replaced']}")
+        fmt = info.get("format", "?")
+        print(f"  载体：{fmt} · keyword={info['keyword']} · 已替换={info['replaced']}")
         print(f"  像素面：{info['pixel_digest'][:16]}（写入前后一致）")
         print("  只承诺：能读回、不改像素、块 CRC 合法；抗转码/水印不在本件")
     return 0
