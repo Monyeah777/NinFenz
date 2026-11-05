@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:c82cc65abee5b995ddcaeb41f80d6fd23a3de56801ef6c99343bd69f96b97d4c
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:592e1ba3daf8b975cd3c7998a343f941801a440b479f9279adcf0f71cf01b68a
+  - protocol/check12_weights.json:ee78dc5ae297ce5ec0832a198b6427ad7e3bb3fd6a8b41c950bda27443a9797d
   - protocol/coupling_baseline.json:ac6325e75ee65a2ccbfad0f6f9a473ccd28cbcf46c14377efd7c73e22fd82cce
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-05）：M2：证据面双实现 parity（三形态+仓外单文件）与 CLI↔HTTP 同证据判据落地；重绑 check12 权重摘要
+
 > 重审（2026-11-05）：M1：ABI 错误面登记 + docs/ccos 一致性判据落地，重绑被审对象摘要
 
 > 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）

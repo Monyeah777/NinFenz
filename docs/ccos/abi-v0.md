@@ -242,7 +242,7 @@ subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全�
 ```bash
 python scripts/ccos_chain.py --target STRATEGY.md          # 人读表
 python scripts/ccos_chain.py --target STRATEGY.md --json   # 机读（含四份摘要）
-python -m unittest desktop.tests.test_ccos_chain            # 6 项：摘要一致 / 缺环标注 / 空对象判否
+python -m unittest desktop.tests.test_ccos_chain            # 7 项：摘要一致 / 缺环标注 / 缺环闭集 / 空对象判否
 ```
 
 ## 未实装差距（如实挂账，不构成立项理由）

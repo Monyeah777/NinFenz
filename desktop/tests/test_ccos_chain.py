@@ -61,6 +61,16 @@ class _Base(unittest.TestCase):
         attest_link = [link for link in res["links"] if link["link"] == "cc_attest"][0]
         self.assertIn("hmac-sha256", attest_link["detail"])
 
+    def test_missing_rings_closed_to_known_set(self):
+        """缺环是挂账不是默认：链上 missing 只允许 cc_label 一项。
+
+        新增缺环 = 新增未实装承诺，必须走裁决并同时改本用例与 docs/ccos/abi-v0.md；
+        悄悄出现第二个缺环即红（防「链条短一截但没人发现」）。
+        """
+        res = self.chain.run(str(self.root), "doc.md")
+        self.assertEqual(res["missing"], ["cc_label"])
+        self.assertEqual(list(self.chain.MISSING), ["cc_label"])
+
     def test_chain_cli_json(self):
         import subprocess
         proc = subprocess.run([sys.executable, str(_REPO / "scripts" / "ccos_chain.py"),
