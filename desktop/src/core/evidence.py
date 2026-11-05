@@ -67,6 +67,38 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+#: 单成员/整包解压上限（防 zip 炸弹）：我们自己打包用 STORED，但**验证器收的是不可信输入**。
+MAX_MEMBER_BYTES = 16 * 1024 * 1024
+MAX_TOTAL_BYTES = 96 * 1024 * 1024
+
+
+class UnsafeBundleError(ValueError):
+    """证据包含不安全/歧义结构（路径穿越、重名成员、超限膨胀）。"""
+
+
+def _safe_rel(rel: str) -> str:
+    """仓相对路径的安全闸门 → 归一后的 POSIX 路径；不安全就抛 UnsafeBundleError。
+
+    为什么必须在这里拦（2026-11-05 实测）：成员路径来自**不可信包**，而验证过程会把它拼进
+    临时目录落盘（信封主体摘要要对文件算）。不拦两点号段就等于给了「验证即任意写」——这是
+    验证器最不该有的洞：它的全部价值建立在「敢拿去验敌意输入」上。
+    """
+    clean = _norm(str(rel or ""))
+    if not clean:
+        raise UnsafeBundleError("成员路径为空（修复指引：成员必须有仓相对路径）")
+    parts = clean.split("/")
+    for part in parts:
+        if part in ("", ".", ".."):
+            raise UnsafeBundleError(f"成员路径不安全：{clean}（修复指引：路径段不许是空串 / "
+                                    "单点 / 双点，这一条防的是解包越界写）")
+        if ":" in part:
+            raise UnsafeBundleError(f"成员路径含盘符/备用流写法：{clean}（修复指引：只接受仓内 "
+                                    "POSIX 相对路径）")
+        if part != part.strip():
+            raise UnsafeBundleError(f"成员路径含首尾空白：{clean!r}（修复指引：请去掉不可见字符）")
+    return clean
+
+
 def _norm(rel: str) -> str:
     """仓相对路径归一成 POSIX 形态：zip 成员名与回执 id 都用正斜杠。"""
     return rel.replace("\\", "/").lstrip("/")
@@ -296,6 +328,9 @@ class _Reader:
         self.path = path
         self._zf: zipfile.ZipFile | None = None
         self._dir = ""
+        #: 读面发现的结构问题（重名成员 / 超限膨胀）：由 verify 收进判定，不在这里抛
+        self.issues: list[str] = []
+        self._total = 0
         if os.path.isdir(path):
             self._dir = path
         elif os.path.isfile(path):
@@ -304,6 +339,16 @@ class _Reader:
             except zipfile.BadZipFile as exc:
                 raise ValueError(f"不是证据包（坏 zip）：{exc}（{GUIDE}请用 nf evidence pack "
                                  "产出的 .zip 或解包后的目录，不要喂别的东西）") from exc
+            names = self._zf.namelist()
+            dup = sorted({n for n in names if names.count(n) > 1})
+            if dup:
+                self.issues.append(f"包内有重名成员：{'、'.join(dup[:3])}（{GUIDE}重名 zip 的"
+                                   "取字节在实现间不一致——判定不可复算，按 invalid 处理）")
+            declared = sum(int(getattr(info, "file_size", 0) or 0)
+                           for info in self._zf.infolist())
+            if declared > MAX_TOTAL_BYTES:
+                self.issues.append(f"包声明解压后 {declared} 字节，超过上限 {MAX_TOTAL_BYTES}"
+                                   f"（{GUIDE}拒绝按声明膨胀解包——防 zip 炸弹）")
         else:
             raise ValueError(f"证据包不存在：{path}（{GUIDE}请先 nf evidence pack --out "
                              "<包.zip> 生成证据包，再对生成的包执行 verify）")
@@ -322,9 +367,25 @@ class _Reader:
         name = _norm(name)
         if self._zf is not None:
             try:
-                return self._zf.read(name)
+                with self._zf.open(name) as fh:
+                    data = fh.read(MAX_MEMBER_BYTES + 1)
             except KeyError:        # 成员不在包里：按「缺件」返回 None，由调用方判 invalid
                 return None
+            except (zipfile.BadZipFile, RuntimeError, NotImplementedError) as exc:
+                # 重叠成员 / 不支持的压缩法（zipfile 自己判成 zip bomb 的形态）：按不可信处理
+                self.issues.append(f"成员 {name} 不可安全读取：{exc}"
+                                   f"（{GUIDE}容器结构歧义或压缩不受支持——判 invalid，不猜）")
+                return None
+            if len(data) > MAX_MEMBER_BYTES:
+                self.issues.append(f"成员 {name} 超过单件上限 {MAX_MEMBER_BYTES} 字节"
+                                   f"（{GUIDE}拒绝解包超限成员——防 zip 炸弹）")
+                return None
+            self._total += len(data)
+            if self._total > MAX_TOTAL_BYTES:
+                self.issues.append(f"已解压超过整包上限 {MAX_TOTAL_BYTES} 字节"
+                                   f"（{GUIDE}拒绝继续膨胀解包——防 zip 炸弹）")
+                return None
+            return data
         full = os.path.join(self._dir, *name.split("/"))
         if not os.path.isfile(full):
             return None
@@ -374,7 +435,11 @@ def _check_members(rd: _Reader, entries: Sequence[dict[str, Any]],
     """成员实体在场 + 摘要一致 + 叶复算一致（三道一起判，任一不符即不可信）。"""
     leaves: list[bytes] = []
     for e in entries:
-        rel = _norm(str(e.get("path") or e.get("id") or ""))
+        try:
+            rel = _safe_rel(str(e.get("path") or e.get("id") or ""))
+        except UnsafeBundleError as exc:
+            issues.append(str(exc))
+            continue
         data = rd.read(PAYLOAD_DIR + rel) if rel else None
         if data is None:
             issues.append(f"缺 payload：{rel or '?'}（{GUIDE}证据包必须自带成员实体——缺实体"
@@ -391,6 +456,9 @@ def _check_members(rd: _Reader, entries: Sequence[dict[str, Any]],
             issues.append(f"叶复算不符：{rel}（{GUIDE}叶定义须与 receipts 同源；"
                           "包被改过就重打）")
         leaves.append(bytes.fromhex(want_leaf))
+    # 读面在遍历过程中才发现的问题（超限成员/歧义结构）也要收进判定
+    issues.extend(rd.issues)
+    rd.issues.clear()
     return leaves
 
 
@@ -441,7 +509,7 @@ def _check_chain(entries: Sequence[dict[str, Any]], meta: dict[str, Any],
 def _extract(rd: _Reader, entries: Sequence[dict[str, Any]], tmp: str) -> None:
     """把成员解到进程私有临时目录（只为让 attest.verify 能按相对路径算主体摘要）。"""
     for e in entries:
-        rel = _norm(str(e.get("path") or ""))
+        rel = _safe_rel(str(e.get("path") or ""))
         data = rd.read(PAYLOAD_DIR + rel) if rel else None
         if data is None:
             continue
@@ -569,6 +637,7 @@ def verify(bundle: str, key: bytes | None = None,
         entries = meta.get("entries") or []
         res["count"] = len(entries)
         _fill_header(res, meta)
+        res["issues"].extend(rd.issues)
         if not entries:
             res["issues"].append("证据包为空（" + GUIDE + "pack 时请至少给一个目标文件；"
                                  "空包不给 ok）")
@@ -1341,6 +1410,18 @@ def bench() -> dict[str, Any]:
                                           .__setitem__("count", 99))))
         m = dict(members)
         m[REVOCATIONS_ENTRY] = b"{not json"
+        _bench_run(rows, "traversal_path", "成员路径含双点段（验证即任意写的入口）", "invalid",
+                   _bench_write(tmp, "trav.zip", _mut_meta(
+                       base, lambda meta: meta["entries"][0].update(
+                           {"path": "../escape.md", "id": "../escape.md"}))))
+        dup_zip = os.path.join(tmp, "dupym.zip")
+        with zipfile.ZipFile(dup_zip, "w", zipfile.ZIP_STORED) as zf:
+            for name, raw in sorted(_members(base).items()):
+                zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
+                zf.writestr(zi, raw)
+            zi = zipfile.ZipInfo(PAYLOAD_DIR + "d/a.md", date_time=_ZIP_EPOCH)
+            zf.writestr(zi, b"shadow")
+        _bench_run(rows, "dup_members", "重名成员（zip 歧义：判定不可复算）", "invalid", dup_zip)
         _bench_run(rows, "revocations_bad", "包内吊销表写坏（坏件不能当「无吊销」）", "invalid",
                    _bench_write(tmp, "revbad.zip", _rebuild(m)))
         # 信封 / 密钥 / 结构

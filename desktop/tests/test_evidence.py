@@ -4,6 +4,7 @@
 确定性打包；信封强度如实回填（hmac 缺密钥一律拒绝，不降级）；
 叶定义与 receipts 同源（防止第二套摘要悄悄长出来）。
 """
+import io
 import json
 import sys
 import tempfile
@@ -14,6 +15,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core import attest, evidence, receipts
+
+
+def _bundle_members(data):
+    """证据包字节 → {成员名: 字节}（测试内小工具）。"""
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        return {n: zf.read(n) for n in zf.namelist()}
 
 
 class _Base(unittest.TestCase):
@@ -329,7 +336,7 @@ class TestBench(_Base):
         res = evidence.bench()
         bad = [c for c in res["cases"] if not c["ok"]]
         self.assertEqual(bad, [])
-        self.assertEqual(res["total"], 33)
+        self.assertEqual(res["total"], 35)
         self.assertTrue(res["ok"])
 
     def test_bench_markdown(self):
@@ -436,6 +443,35 @@ class TestStandaloneParity(_Base):
             core = evidence.verify(str(path), key=self.key, anchor=anchor)["verdict"]
             self.assertEqual(want, core, str(path))
             self.assertEqual(core, standalone(path, anchor), str(path))
+    def test_container_attacks_agree(self):
+        """双实现必须同判容器面攻击（遍历 / 重名）——第三方复验也吃同一口径。"""
+        import subprocess
+        tmp = str(self._tmp.name)
+        base, _info = evidence.build(str(self.tmp), ["docs/a.md"],
+                                     created_at="2026-01-01T00:00:00Z")
+        members = _bundle_members(base)
+        meta = json.loads(members["bundle.json"].decode())
+        meta["entries"][0].update({"path": "../escape.md", "id": "../escape.md"})
+        members["bundle.json"] = json.dumps(meta, ensure_ascii=False,
+                                            sort_keys=True).encode()
+        trav = Path(tmp, "trav.zip")
+        trav.write_bytes(evidence._zip_bytes(list(members.items())))
+        dup = Path(tmp, "dup.zip")
+        with zipfile.ZipFile(dup, "w", zipfile.ZIP_STORED) as zf:
+            for name, raw in sorted(_bundle_members(base).items()):
+                zi = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+                zf.writestr(zi, raw)
+            zi = zipfile.ZipInfo("payload/docs/a.md", date_time=(1980, 1, 1, 0, 0, 0))
+            zf.writestr(zi, b"shadow")
+        for path in (trav, dup):
+            core = evidence.verify(str(path))["verdict"]
+            self.assertEqual("invalid", core, path.name)
+            proc = subprocess.run([sys.executable, str(self.SCRIPT), "--evidence", str(path),
+                                   "--json"], capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace")
+            self.assertEqual(1, proc.returncode, proc.stderr[-200:])
+            self.assertEqual("invalid", json.loads(proc.stdout)["verdict"], path.name)
+
     def test_receipts_and_attest_forms_agree(self):
         doc = receipts.build_scope(str(self.tmp), ["docs/a.md", "docs/b.md"], scope="ev")
         rec = Path(self._tmp.name, "RECEIPTS.json")
@@ -579,6 +615,94 @@ class TestReplay(_Base):
         self.assertEqual("ok", noisy["verdict"], "缺锚点材料不判死")
         self.assertFalse(noisy["anchor_verified"], "缺锚点材料不得声称已核对")
         self.assertTrue(noisy["warnings"], "缺锚点材料必须留下 warning")
+
+
+class TestContainerHardening(unittest.TestCase):
+    """**容器面**判据：验证器要敢拿敌意包来验——越界写、歧义 zip、zip 炸弹都必须判 invalid。
+
+    这三条是 2026-11-05 审计出来的真实攻击面（不是假想）：
+    1. 成员路径来自不可信包，而验证会把成员拼进临时目录落盘 → 不拦「两点号段」就是验证即任意写；
+    2. 重名成员在 zip 里是合法的，不同实现取到的字节可能不同 → 判定不可复算；
+    3. DEFLATE 能把 1 KB 膨胀成 1 GB → 验证器不能按声明无限解包。
+    """
+
+    def _base(self, tmp):
+        for name, body in (("a.md", "# A\n"),):
+            (Path(tmp) / "d").mkdir(parents=True, exist_ok=True)
+            (Path(tmp) / "d" / name).write_text(body, encoding="utf-8")
+        return evidence.build(str(tmp), ["d/a.md"], created_at="2026-01-01T00:00:00Z")[0]
+
+    def _members(self, data):
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            return {n: zf.read(n) for n in zf.namelist()}
+
+    def test_safe_rel_rejects_traversal(self):
+        for bad in ("../escape.md", "d/../../x", "./a.md", "d//a.md", "C:/x.md", "d/ /a.md"):
+            with self.assertRaises(evidence.UnsafeBundleError, msg=bad):
+                evidence._safe_rel(bad)
+
+    def test_safe_rel_accepts_normal_paths(self):
+        for ok in ("d/a.md", "docs/x/y.md", "a.md"):
+            self.assertEqual(ok, evidence._safe_rel(ok))
+
+    def test_traversal_entry_does_not_escape(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            root.mkdir()
+            data = self._base(root)
+            members = _bundle_members(data)
+            members["payload/../escape.md"] = members.pop("payload/d/a.md")
+            meta = json.loads(members["bundle.json"].decode())
+            meta["entries"][0]["path"] = "../escape.md"
+            meta["entries"][0]["id"] = "../escape.md"
+            members["bundle.json"] = json.dumps(meta, ensure_ascii=False,
+                                                sort_keys=True).encode()
+            bad = Path(tmp) / "bad.zip"
+            bad.write_bytes(evidence._zip_bytes(list(members.items())))
+            res = evidence.verify(str(bad))
+            self.assertEqual("invalid", res["verdict"])
+            escaped = Path(tmp) / "escape.md"
+            self.assertFalse(escaped.exists(), "验证过程不得在临时目录外落任何文件")
+
+    def test_duplicate_members_are_invalid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            root.mkdir()
+            data = self._base(root)
+            members = _bundle_members(data)
+            dup = Path(tmp) / "dup.zip"
+            with zipfile.ZipFile(dup, "w", zipfile.ZIP_STORED) as zf:
+                for name, raw in sorted(members.items()):
+                    zi = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+                    zf.writestr(zi, raw)
+                zi = zipfile.ZipInfo("payload/d/a.md", date_time=(1980, 1, 1, 0, 0, 0))
+                zf.writestr(zi, b"shadow")
+            res = evidence.verify(str(dup))
+            self.assertEqual("invalid", res["verdict"])
+            self.assertIn("重名成员", " ".join(res["issues"]))
+
+    def test_oversized_member_is_invalid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            root.mkdir()
+            data = self._base(root)
+            members = _bundle_members(data)
+            import hashlib
+            huge = b"\x00" * (evidence.MAX_MEMBER_BYTES + 1)
+            digest = hashlib.sha256(huge).hexdigest()
+            members["payload/big.bin"] = huge
+            meta = json.loads(members["bundle.json"].decode())
+            meta["entries"].append({"path": "big.bin", "id": "big.bin", "digest": digest,
+                                    "leaf": evidence._leaf("big.bin", digest), "proof": []})
+            members["bundle.json"] = json.dumps(meta, ensure_ascii=False,
+                                                sort_keys=True).encode()
+            bomb = Path(tmp) / "bomb.zip"
+            with zipfile.ZipFile(bomb, "w", zipfile.ZIP_DEFLATED) as zf:
+                for name, raw in sorted(members.items()):
+                    zf.writestr(name, raw)
+            res = evidence.verify(str(bomb))
+            self.assertEqual("invalid", res["verdict"])
+            self.assertIn("上限", " ".join(res["issues"]))
 
 
 if __name__ == "__main__":

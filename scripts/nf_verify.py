@@ -120,6 +120,7 @@ BUNDLE_ENTRY = "bundle.json"
 PAYLOAD_DIR = "payload/"
 NODE_PREFIX = b"\x01nf-node:"
 EVIDENCE_EXIT = {"ok": 0, "invalid": 1, "revoked": 2, "expired": 3}
+EVIDENCE_INVALID = 1
 EVIDENCE_USAGE = 4
 LEVELS_EV = ("digest_only", "receipts_only", "hmac-sha256", "ssh-sig", "sigstore-keyless")
 
@@ -128,7 +129,11 @@ def _v_members(src, entries, res):
     """成员实体 + 摘要 + 叶复算 → (payloads, leaves)；有问题即 None。"""
     payloads, leaves = {}, []
     for e in entries:
-        rel = _norm(e.get("path") or e.get("id") or "")
+        try:
+            rel = _safe_rel(e.get("path") or e.get("id") or "")
+        except ValueError as exc:
+            res["issues"].append(str(exc))
+            continue
         data = src.find(rel) if rel else None
         if data is None:
             res["issues"].append("缺 payload：%s" % (rel or "?"))
@@ -363,6 +368,18 @@ def run_evidence(args) -> int:
                       file=sys.stderr)
                 return EVIDENCE_USAGE
         src = _Src(args.evidence, root=args.root)
+        if src.issues:      # 容器面已判死：给出 invalid + 退出码 1（与真源同口径）
+            res = _res("bundle")
+            res["issues"].extend(src.issues)
+            res["verdict"] = "invalid"
+            if args.json:
+                print(json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                for issue in res["issues"]:
+                    print(f"  [FAIL] {issue}", file=sys.stderr)
+                print(f"  判定：{res['verdict']}")
+            src.close()
+            return EVIDENCE_INVALID
         try:
             form, doc = _form(src, args.kind)
             if form == "bundle":
@@ -510,6 +527,26 @@ def _norm(rel: str) -> str:
     return str(rel).replace("\\", "/").lstrip("/")
 
 
+#: 单成员/整包上限（与真源同口径：验证器收的是不可信输入）
+MAX_MEMBER_BYTES = 16 * 1024 * 1024
+MAX_TOTAL_BYTES = 96 * 1024 * 1024
+
+
+def _safe_rel(rel):
+    """仓相对路径安全闸门 → 归一路径；不安全抛 ValueError（与真源同口径）。"""
+    clean = _norm(rel)
+    if not clean:
+        raise ValueError("成员路径为空（修复指引：成员必须有仓相对路径）")
+    for part in clean.split("/"):
+        if part in ("", ".", ".."):
+            raise ValueError(f"成员路径不安全：{clean}"
+                             "（修复指引：路径段不许是空串 / 单点 / 双点）")
+        if ":" in part:
+            raise ValueError(f"成员路径含盘符/备用流写法：{clean}"
+                             "（修复指引：只接受仓内 POSIX 相对路径）")
+    return clean
+
+
 def _now() -> str:
     epoch = (os.environ.get("SOURCE_DATE_EPOCH") or "").strip()
     if epoch.isdigit():
@@ -525,10 +562,21 @@ class _Src:
         self._zf = None
         self._dir = ""
         self._doc_path = ""
+        #: 容器面问题（重名成员 / 超限膨胀）：按 invalid 判，不当用法错
+        self.issues = []
         if os.path.isdir(path):
             self._dir = path
         elif os.path.isfile(path) and zipfile.is_zipfile(path):
             self._zf = zipfile.ZipFile(path)
+            names = self._zf.namelist()
+            dup = sorted({n for n in names if names.count(n) > 1})
+            if dup:
+                self.issues.append(f"包内有重名成员：{dup[:3]}"
+                                   "（重名 zip 各实现取字节可能不同，判定不可复算）")
+            declared = sum(int(getattr(i, "file_size", 0) or 0) for i in self._zf.infolist())
+            if declared > MAX_TOTAL_BYTES:
+                self.issues.append(f"包声明解压后 {declared} 字节，超上限 {MAX_TOTAL_BYTES}"
+                                   "（拒绝按声明膨胀解包——防 zip 炸弹）")
         elif os.path.isfile(path):
             self._doc_path = path
             self._dir = root or os.path.dirname(os.path.abspath(path)) or "."

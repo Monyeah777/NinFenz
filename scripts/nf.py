@@ -607,7 +607,7 @@ def _add_parser_production(sub):
     rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
     rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
     rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（33 条已知攻击，逐条比对判定）",
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（35 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
                                       "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
@@ -3767,7 +3767,7 @@ def _evidence_pack(args):
 
 
 def _evidence_bench(args):
-    """nf evidence bench：攻击矩阵基准（33 条已知攻击，逐条比对期望判定）。"""
+    """nf evidence bench：攻击矩阵基准（35 条已知攻击，逐条比对期望判定）。"""
     import json as _json
 
     from core import evidence

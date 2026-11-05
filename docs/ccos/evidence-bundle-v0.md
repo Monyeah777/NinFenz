@@ -47,6 +47,7 @@ core.attest，链节域分隔前缀取 core.transparency_log。
 | 10 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
 | 11 | 时效（expires_at 早于判定时点） | **expired** |
 | 12 | 给了外部锚点时：包不得被截断、该位置链头相符、包内声明与材料一致 | invalid |
+| 13 | **容器结构安全**：成员路径无双点段/盘符、无重名成员、解压不超上限 | invalid |
 
 第 12 条解决的是**整链截断**：攻击者把包回滚成「更早但自洽」的版本，前 11 条全过——只有外部锚点
 （上一条链的 `{count, head}`）能把它戳穿。不给锚点材料时不判死也不抬高：warning + `anchor_verified=false`。
@@ -105,7 +106,7 @@ python scripts/nf.py evidence verify evidence.zip --kind bundle             # �
 # 机制体检（PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired）
 python scripts/nf.py evidence verify --selfcheck
 
-# 攻击矩阵基准（33 条已知攻击，逐条比对期望判定；写 Markdown 报告）
+# 攻击矩阵基准（35 条已知攻击，逐条比对期望判定；写 Markdown 报告）
 python scripts/nf.py evidence bench
 python scripts/nf.py evidence bench --out /tmp/evidence-bench.md
 ```
