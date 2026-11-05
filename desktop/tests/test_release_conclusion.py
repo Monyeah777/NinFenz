@@ -275,6 +275,48 @@ class TestMidrunDriftGuard(unittest.TestCase):
     def test_missing_head_is_not_drift(self):
         self.assertEqual("", self.gate.midrun_drift_guard("", "", []))
 
+    def test_allow_dirty_same_snapshot_is_not_drift(self):
+        """--allow-dirty 起始就脏、途中没变：不能被误判成「途中出现改动」而停（2026-11-06 修）。"""
+        initial = [" M protocol/x.json"]
+        msg = self.gate.midrun_drift_guard("abc", "abc", [" M protocol/x.json"], initial)
+        self.assertEqual("", msg)
+
+    def test_allow_dirty_new_change_still_stops(self):
+        initial = [" M protocol/x.json"]
+        msg = self.gate.midrun_drift_guard("abc", "abc",
+                                           [" M protocol/x.json", "?? new.py"], initial)
+        self.assertIn("工作树", msg)
+
+    def test_clean_start_becoming_dirty_stops(self):
+        msg = self.gate.midrun_drift_guard("abc", "abc", [" M a.py"], [])
+        self.assertIn("工作树", msg)
+
+
+class TestSnapshotMode(unittest.TestCase):
+    """快照门禁：结论钉在一个 SHA 上，与工作区（含并发会话）完全解耦。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_strip_snapshot_flag(self):
+        argv = ["--shards", "4", "--snapshot", "--json"]
+        self.assertEqual(["--shards", "4", "--json"], self.gate.strip_snapshot_flag(argv))
+
+    def test_strip_keeps_other_flags(self):
+        argv = ["--only-preflight", "--allow-dirty"]
+        self.assertEqual(argv, self.gate.strip_snapshot_flag(argv))
+
+    def test_snapshot_dir_name_carries_head(self):
+        name = self.gate.snapshot_dir_name("0123456789abcdef")
+        self.assertIn("0123456789ab", name)
+        self.assertTrue(name.startswith("nf-gate-snap-"))
+
+    def test_flag_is_advertised_in_help(self):
+        proc = subprocess.run([sys.executable, str(SCRIPT), "--help"], cwd=str(ROOT),
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace")
+        self.assertIn("--snapshot", proc.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

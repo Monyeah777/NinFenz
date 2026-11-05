@@ -30,7 +30,7 @@
           "tiers": 4
         },
         "raises": 131,
-        "sinks": 20
+        "sinks": 21
       },
       "status": "pass",
       "warns": 0
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "8c2bf02e358a6a7f0f480f4f85e5112559d5e6e0bbe68af62a12bc449b94b1d6",
+  "root_digest": "6b208423ba6f39d7a1972f26d7126f900a730e00152cda48395e1de03a7d22a0",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

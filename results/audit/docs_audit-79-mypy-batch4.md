@@ -7,10 +7,18 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
+  - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:a4f9557e58a73a62c539afe104142391b5255664f7e0aaae9bbb6347a21a9f60
+  - protocol/code_metrics_baseline.json:1ee6fe5a2ff788eb3beec929c6b132ff7d135b984ef5f1899c872364f7fc0f44
 ---
+> 重审（2026-11-06）：纯度放行表扩容后度量基线重冻
+
+> 重审（2026-11-06）：快照门禁清理进纯度放行表（临时目录自清）
+
+> 重审（2026-11-06）：发布结论器加 --snapshot（HEAD 快照里跑，免疫并发改动）
+
+> 重审（2026-11-06）：release_conclusion P2 修复：allow-dirty 与分片 drift 守卫兼容，度量重冻后重绑
+
 > 重审（2026-11-06）：并发会话遗留的派生面重冻（中途哨兵入库）
 
 > 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象

@@ -15,7 +15,7 @@ subjects:
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
+  - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - scripts/nf.py:48778c99b1d60bfd62aaa19256b80ac37e9d943dddf94a67aae7d1da35db4cb6
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-11-06）：快照门禁清理进纯度放行表（临时目录自清）
+
 > 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
 
 > 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据

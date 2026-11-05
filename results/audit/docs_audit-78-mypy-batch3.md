@@ -9,8 +9,14 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:a4f9557e58a73a62c539afe104142391b5255664f7e0aaae9bbb6347a21a9f60
+  - protocol/code_metrics_baseline.json:1ee6fe5a2ff788eb3beec929c6b132ff7d135b984ef5f1899c872364f7fc0f44
 ---
+> 重审（2026-11-06）：纯度放行表扩容后度量基线重冻
+
+> 重审（2026-11-06）：发布结论器加 --snapshot（HEAD 快照里跑，免疫并发改动）
+
+> 重审（2026-11-06）：release_conclusion P2 修复：allow-dirty 与分片 drift 守卫兼容，度量重冻后重绑
+
 > 重审（2026-11-06）：并发会话遗留的派生面重冻（中途哨兵入库）
 
 > 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象

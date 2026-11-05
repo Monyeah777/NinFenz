@@ -149,6 +149,10 @@ SINK_ALLOW = {
         "自己写的状态文件，用于避免陈旧 port/token 被复用；worker 随后重写该件",
     "regression_score.py:__import__":
         "模块名取自内部常量表 SIGNAL_SPECS（非用户输入），用于按名调用既有扫描器",
+    "release_conclusion.py:shutil.rmtree":
+        "快照门禁的**失败自清**：落点由本模块 tempfile.mkdtemp 现建（前缀 nf-gate-snap-<sha>），"
+        "只在 git worktree add 失败时删掉这个刚建的空壳；不接收外部路径参数。成功路径交给 "
+        "git worktree remove --force 管，不走这条",
     "e2e_desktop_headless.py:shutil.rmtree":
         "自检专用临时 home 的清理；落点已由 _resolve_test_home 拒绝主目录/仓库根/盘根（见 F-10）",
     "storage.py:shutil.rmtree":

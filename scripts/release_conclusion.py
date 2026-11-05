@@ -25,7 +25,10 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
+import os
+import shutil
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -88,20 +91,73 @@ def read_payload_manifest(path) -> dict | None:
     return doc if isinstance(doc, dict) else None
 
 
-def midrun_drift_guard(head_start: str, head_now: str, dirty_now: list[str]) -> str:
+def midrun_drift_guard(head_start: str, head_now: str, dirty_now: list[str],
+                       initial_dirty: list[str] | None = None) -> str:
     """跑分片途中的树变动 → 停止原因（空串 = 稳定，可继续）。
 
     为什么要在**每片之前**再查一次（2026-11-06 实测）：并发会话在分片跑到一半时提交，
     8 片会分别落在不同 HEAD 上，红绿都不可信；等跑完 25 分钟才发现「HEAD 变了」太贵。
     脏变更同样致命：分片读到的是别人改了一半的文件。
+
+    initial_dirty：启动时的脏树快照。给了它，就按「相对启动态是否**新增/变化**」判；
+    不给（None）则沿用「非空即变动」。为什么要这个参数（2026-11-06）：--allow-dirty 显式
+    允许起始脏树，若仍把「非空」当途中变动，第 1 片结束就会误停，选项等于失效。
     """
     if (head_now or "").strip() != (head_start or "").strip():
         return (f"HEAD 在分片途中变化（{str(head_start)[:12]} → {str(head_now)[:12]}）"
                 f"（{GUIDE}已停止剩余分片——本结论无效，等树静止后重跑）")
-    if dirty_now:
-        return (f"工作树在分片途中出现改动（{len(dirty_now)} 处，例：{dirty_now[0][:60]}）"
-                f"（{GUIDE}已停止剩余分片——分片读到的是改到一半的文件，结论无效）")
+    if not dirty_now:
+        return ""
+    if initial_dirty is not None and sorted(dirty_now) == sorted(initial_dirty):
+        return ""
+    return (f"工作树在分片途中出现改动（{len(dirty_now)} 处，例：{dirty_now[0][:60]}）"
+            f"（{GUIDE}已停止剩余分片——分片读到的是改到一半的文件，结论无效）")
+
+
+#: 快照模式下**不传给内层**的旗标（内层在快照目录里跑，自己就是「本仓」）。
+SNAPSHOT_STRIP = ("--snapshot",)
+
+
+def strip_snapshot_flag(argv: list[str]) -> list[str]:
+    """去掉外层消费的旗标 → 内层 argv（纯函数，便于单测）。"""
+    return [a for a in argv if a not in SNAPSHOT_STRIP]
+
+
+def snapshot_dir_name(head: str) -> str:
+    """快照目录名：带 HEAD 短哈希，冲突可辨（纯函数）。"""
+    return f"nf-gate-snap-{str(head)[:12]}"
+
+
+def _snapshot_create(head: str) -> tuple[str, str]:
+    """在临时目录建 HEAD 的 detached worktree → (路径, 错误说明)。
+
+    为什么要快照（2026-11-06 实测）：本仓常有并发 agent 会话，它们会在我跑 36 分钟门禁的
+    时候提交、改文件、甚至改门禁脚本自己——8 片于是落在不同状态上，红绿都不可信。
+    快照把结论**钉在一个 SHA** 上：证明「这个提交的内容是绿的」，与工作区完全解耦。
+    """
+    base = tempfile.mkdtemp(prefix=snapshot_dir_name(head) + "-")
+    path = os.path.join(base, "wt")
+    proc = _run(["git", "worktree", "add", path, "--detach", head], 300)
+    if proc.get("code") != 0:
+        shutil.rmtree(base, ignore_errors=True)
+        return "", (f"建快照失败（{proc.get('err') or proc.get('out') or '未知错误'}）"
+                    f"（{GUIDE}确认 git 可用、HEAD={str(head)[:12]} 存在）")
+    return path, ""
+
+
+def _snapshot_stage_payload(path: str) -> str:
+    """在快照里按该 SHA 重新暂存 npm payload（只写忽略文件；不产生提交）。→ 错误说明"""
+    proc = _run(["node", "tools/stage-payload.mjs"], 900, cwd=os.path.join(path, "packaging",
+                                                                        "npm"))
+    if proc.get("code") != 0:
+        return (f"快照里 payload 暂存失败（{proc.get('err') or proc.get('out')}）"
+                f"（{GUIDE}确认 node 可用，或改用 --allow-dirty 在活树上跑）")
     return ""
+
+
+def _snapshot_remove(path: str) -> None:
+    _run(["git", "worktree", "remove", "--force", path], 300)
+    _run(["git", "worktree", "prune"], 120)
 
 
 def head_move_guard(start: str, end: str) -> str:
@@ -128,8 +184,8 @@ def aggregate(results: list[dict]) -> dict:
             "wall": round(sum(float(r.get("wall") or 0.0) for r in results), 1)}
 
 
-def _run(argv: list[str], timeout: float) -> dict:
-    """跑**本仓固定命令** → {code, out, err}。
+def _run(argv: list[str], timeout: float, cwd: str = "") -> dict:
+    """跑**本仓固定命令** → {code, out, err}；cwd 缺省为仓库根。
 
     统一走 core 的受控进程原子：本件不再自己起 subprocess（那是 SAST 面要逐处标注的东西，
     而受控原子已经把「argv 列表 / 无 shell / 超时即回收」写死在一处）。
@@ -138,7 +194,7 @@ def _run(argv: list[str], timeout: float) -> dict:
     if src not in sys.path:
         sys.path.insert(0, src)
     from core.atoms import proc as proc_atom  # 局部导入：模块级只留纯逻辑
-    return proc_atom.run_capture(argv, cwd=str(ROOT), timeout=timeout)
+    return proc_atom.run_capture(argv, cwd=cwd or str(ROOT), timeout=timeout)
 
 
 def _git_status() -> list[str]:
@@ -289,6 +345,44 @@ def _shard_one(index: int, total: int) -> dict:
     return row
 
 
+def _run_in_snapshot(args, head: str) -> int:
+    """外层：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
+
+    内层是**独立进程**：它的 ROOT 就是快照目录，所以 payload 对账 / 新鲜度 / 分片天然
+    都作用在快照上，无需把 cwd 透传到每个 helper。结论因此绑定**一个 SHA**。
+    """
+    path, err = _snapshot_create(head)
+    if err:
+        print(f"  ✗ {err}", file=sys.stderr)
+        return 2
+    try:
+        stage_err = _snapshot_stage_payload(path)
+        if stage_err:
+            print(f"  ✗ {stage_err}", file=sys.stderr)
+            return 2
+        inner = [sys.executable, os.path.join(path, "scripts", "release_conclusion.py"),
+                 *strip_snapshot_flag(sys.argv[1:])]
+        proc = _run(inner, 7200, cwd=path)
+        out = proc.get("out") or ""
+        err_out = proc.get("err") or ""
+        if getattr(args, "json", False) and out.strip():
+            try:
+                doc = json.loads(out)
+            except ValueError:
+                sys.stdout.write(out)
+            else:
+                doc["snapshot"] = {"path": path, "head": head}
+                print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            sys.stdout.write(out)
+        if err_out:
+            sys.stderr.write(err_out)
+        rc = proc.get("code")
+        return 3 if rc is None else int(rc)
+    finally:
+        _snapshot_remove(path)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="release_conclusion",
                                  description="发布结论一键复跑（干净树 → 供应链核对 → "
@@ -300,6 +394,8 @@ def main(argv=None) -> int:
     ap.add_argument("--allow-dirty", action="store_true",
                     help="允许在脏树上跑（默认拒绝：脏树会产生与输入无关的假红）")
     ap.add_argument("--skip-checks", action="store_true", help="跳过 checks-only 步骤")
+    ap.add_argument("--snapshot", action="store_true",
+                    help="在 HEAD 的临时 worktree 快照里跑（免疫并发会话的实时改动）")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
     ap.add_argument("--only-preflight", action="store_true",
                     help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
@@ -321,11 +417,17 @@ def main(argv=None) -> int:
                         for i in range(shards)]}
 
     dirty = _git_status()
+    initial_dirty = list(dirty)
     blocked = dirty_guard(dirty, args.allow_dirty)
     head = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
     manifest = read_payload_manifest(ROOT / "packaging" / "npm" / "payload"
                                      / "payload-manifest.json")
     payload_blocked = payload_drift_guard(manifest, head)
+    if args.snapshot and args.dry_run:
+        plan["snapshot"] = f"git worktree add <tmp> --detach {head[:12]}（快照里重跑本件）"
+    if args.snapshot and not args.dry_run:
+        return _run_in_snapshot(args, head)
+
     if args.dry_run:
         payload = {"schema": "nf-release-conclusion/1", "dry_run": True, "plan": plan,
                    "dirty": dirty, "blocked": blocked, "payload_blocked": payload_blocked}
@@ -430,7 +532,8 @@ def main(argv=None) -> int:
         head_now = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
         status = _run(["git", "status", "--porcelain"], 120).get("out") or ""
         return midrun_drift_guard(head, head_now,
-                                  [ln for ln in status.splitlines() if ln.strip()])
+                                  [ln for ln in status.splitlines() if ln.strip()],
+                                  initial_dirty)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = {}

@@ -9,7 +9,7 @@ subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
+  - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/tests/test_purity_scan.py:dc54f3037f7f87cf7dcf3e6f147b223a80648ab005f4bc923122b0324813b8fb
   - scripts/nf.py:48778c99b1d60bfd62aaa19256b80ac37e9d943dddf94a67aae7d1da35db4cb6
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-06）：快照门禁清理进纯度放行表（临时目录自清）
+
 > 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
 
 > 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
