@@ -111,6 +111,10 @@ ALWAYS_MODULES = frozenset({
     "test_json_shape_contracts", "test_core_atomic_writes", "test_silent_skip_reasons",
     # 跨用例隔离的静态判据（打桩面必须运行时取模块）：0.5 s，钉的是「假绿/假红」那一类
     "test_isolation_patterns",
+    # CLI 参数登记面（~100 s）：新增/改动 argparse 参数而漏登记 _UTF8_TEXT_DESTS /
+    # _PATH_FLAG_DESTS 时，只有这一组判据会红——2026-11-05/06 两次都是别人的提交漏登记，
+    # 我却在 36 分钟后的分片里才发现。100 s 换掉 36 分钟，值。
+    "test_cli_error_framing",
 })
 
 #: 明确**不进**常驻集：`test_npm_package` 判的是 payload 清单与 HEAD 一致——那只在
