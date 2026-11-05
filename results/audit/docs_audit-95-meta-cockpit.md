@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:723bc8a01e98c2529058a0e16dabe1ad11b0846a6c01fa757829376ea3ab949f
+  - scripts/nf.py:097431168233ee8811fd5dca34883d93b82c55254cfd5f23d5e5333734c9a00f
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:b346f0319543708b766abdd9bfd6fb726e037e486acfb5c87bb2c55ff7fe201f
-  - protocol/coupling_baseline.json:4f1b1ba0c5ecdfc4748ac4f30bc0f6016efaae01af8d4362dfbc96d0b635464a
+  - protocol/check12_weights.json:555015b046fa4eb60481b058e6a81adace8228c9ce6dddce6ae603d65ad245c2
+  - protocol/coupling_baseline.json:2f7302868ad6722907fefab44d357385cd16c417c7a0c15261b47e6bac7b06f2
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
+
 > 重审（2026-11-05）：权重实测后重冻（报告须最后写）
 
 > 重审（2026-11-05）：新鲜度步：修 UP031 + 前置测试改结构断言

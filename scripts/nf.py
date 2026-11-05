@@ -608,8 +608,14 @@ def _add_parser_production(sub):
                         description="单对象策略体检（内部差距：仓内判定全是仓库级，缺「单对象 × "
                                     "单策略」入口）。策略是 nf-check-policy/1 的封闭词表 JSON；"
                                     "判定 ok/invalid，warn 级只提示、不改判定。")
-    ck.add_argument("object", help="体检对象（单个文件；目录请逐件跑）")
-    ck.add_argument("--policy", required=True, help="策略 JSON 路径（仓库相对或绝对）")
+    ck.add_argument("object", nargs="?", default="",
+                    help="体检对象（单个文件；目录请逐件跑）")
+    ck.add_argument("--policy", default="", help="策略 JSON 路径（仓库相对或绝对）")
+    ck.add_argument("--compile", default="", metavar="INTENT",
+                    help="把 nf-check-intent/1 意图编译成策略（法规意图 → 封闭词表规则）")
+    ck.add_argument("--out", default="", help="编译结果的落点（缺省=只打印）")
+    ck.add_argument("--list-rules", action="store_true",
+                    help="列出可编译的意图规则与**明确不可表达**的规则（含缺什么能力）")
     ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rv = sub.add_parser("resolve", help="对象 → 契约集（cc_resolve：这个文件该守哪些契约）",
                         description="契约解析（内部差距：既有 resolve 是「声明 → 文件」，缺反方向。"
@@ -3534,10 +3540,29 @@ def _evidence_replay(args):
 
 
 def _cmd_check(args):
-    """nf check：单对象策略体检（cc_check：对象 × 策略 → verdict）。"""
+    """nf check：单对象策略体检 + 意图编译器（cc_check 的判定面与编译面）。"""
     import json as _json
 
-    from core import check_policy
+    from core import check_compile, check_policy
+    if getattr(args, "list_rules", False):
+        table = check_compile.rules_table()
+        if args.json:
+            print(_json.dumps(table, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== 可编译的意图规则 ==")
+        for row in table["compilable"]:
+            extra = "（可选：" + ", ".join(row["optional"]) + "）" if row["optional"] else ""
+            print(f"  {row['rule']:<20} {row['why']}{extra}")
+        print("== 明确不可表达（会进 unsupported，不会静默丢弃）==")
+        for row in table["unsupported"]:
+            print(f"  {row['rule']:<20} {row['why']} → 需要：{row['needs']}")
+        return 0
+    if getattr(args, "compile", ""):
+        return _check_compile(args)
+    if not args.object or not args.policy:
+        return _machine_fail(args, "用法：nf check <对象> --policy <策略.json> ｜ "
+                                   "nf check --compile <意图.json> [--out 策略.json] ｜ "
+                                   "nf check --list-rules（修复指引：三选一，别空跑）", 2)
     try:
         policy = check_policy.load(_rel_out(args.policy))
         res = check_policy.check(_rel_out(args.object), policy)
@@ -3555,6 +3580,60 @@ def _cmd_check(args):
                 print(f"    → {f['fix']}")
         print(f"  判定：{res['verdict']}（fail {res['failed']} · warn {res['warned']}）")
     return 0 if res["verdict"] == "ok" else 1
+
+def _check_compile(args):
+    """nf check --compile：意图 → 策略（编不出来就说清楚为什么，不静默丢要求）。"""
+    import json as _json
+
+    from core import atomic_write, check_compile, check_policy, json_doc
+    path = _rel_out(args.compile)
+    try:
+        intent = json_doc.load(path, dict, what=args.compile)
+        res = check_compile.compile_intent(intent)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if not res["ok"]:
+        if args.json:
+            print(_json.dumps({"kind": "check-compile", "ok": False,
+                               "issues": res["issues"]},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            for issue in res["issues"]:
+                print(f"  [FAIL] {issue}", file=sys.stderr)
+        return 2
+    policy = res["policy"]
+    issues = check_policy.validate(policy)
+    if issues:
+        # 编译器自己产出的策略过不了判定器的形状校验 = 编译器 bug，必须当场红
+        return _machine_fail(args, "内部错误：编译产物不合法：" + "；".join(issues[:3]), 1)
+    shown = ""
+    if args.out:
+        dest = _rel_out(args.out)
+        parent = os.path.dirname(dest)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        text = _json.dumps(policy, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        atomic_write.write_text(dest, text)
+        shown = _rel_display(dest)
+    if args.json:
+        print(_json.dumps({"kind": "check-compile", "ok": True, "out": shown,
+                           "policy": policy, "coverage": res["coverage"],
+                           "unsupported": res["unsupported"]},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        cov = res["coverage"]
+        print(f"== nf check --compile（{policy.get('policy_id') or '未命名'}）==")
+        print(f"  要求 {cov['requirements']} 条 · 编译 {cov['compiled']} 条 · "
+              f"不可表达 {cov['unsupported']} 条 · 完整 {cov['complete']}")
+        for row in res["unsupported"]:
+            print(f"  [UNSUPPORTED] {row['rule']}：{row['why']}（需要：{row['needs']}）",
+                  file=sys.stderr)
+        print(f"  策略规则 {len(policy['rules'])} 条 · 摘要 "
+              f"{check_policy.policy_digest(policy)[:16]}")
+        if shown:
+            print(f"  已写入：{shown} → 用 nf check <对象> --policy {shown} 判定")
+    return 0 if res["coverage"]["complete"] else 3
+
 
 def _evidence_pack(args):
     """nf evidence pack：把目标文件打成自包含证据包（缺省 = 01/02/06/07 四件）。"""

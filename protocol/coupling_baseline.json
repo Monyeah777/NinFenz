@@ -156,6 +156,11 @@
       "ce": 1,
       "i": 0.5
     },
+    "check_compile": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "check_policy": {
       "ca": 1,
       "ce": 1,

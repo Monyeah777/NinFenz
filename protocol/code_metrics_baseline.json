@@ -160,6 +160,11 @@
       "max_fn_cc": 10,
       "max_fn_lines": 33
     },
+    "desktop/src/core/check_compile.py": {
+      "lines": 240,
+      "max_fn_cc": 39,
+      "max_fn_lines": 76
+    },
     "desktop/src/core/check_policy.py": {
       "lines": 184,
       "max_fn_cc": 33,
@@ -1481,7 +1486,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8250,
+      "lines": 8329,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

@@ -88,7 +88,8 @@ ABI 只固定「调用长什么样、判什么、错了说什么」，**不**定
 
 ### 2. `cc_check(obj, policy)` → `verdict`
 
-**状态：`implemented`（v0：封闭词表的单对象策略体检）**。maps_to = `nf check <对象> --policy <策略>`；
+**状态：`implemented`（v0：封闭词表的单对象策略体检 + 结构化意图编译器）**。maps_to =
+`nf check <对象> --policy <策略>`（判定面）与 `nf check --compile <意图.json>`（编译面）；
 仓库级判定仍走 `nf conformance`。策略形状与词表见 `docs/ccos/check-policy-v0.md`：
 `nf-check-policy/1`，kind 是**封闭集**（utf8 / regex_present / regex_absent /
 count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数据。
@@ -99,6 +100,10 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
 - 判定：verdict 只有两个词；`warn` 级违规只进 findings、**不改判定**；坏策略一律带指引拒绝。
 - `policy_digest` 必填——**判据版本必须随结论一起走**，否则结论不可复算。
 - 幂等：idempotent + 纯读。
+- **编译面（`nf-check-intent/1`）**：结构化意图（`explicit_notice` / `forbidden_tokens` /
+  `min_bytes` / `require_metadata` / `digest_pinned` / `utf8`）→ 上述封闭词表策略；表达不了的
+  意图（模型判内容 / 载体水印 / 视觉要素 / 可信时间 / 身份签发）逐条进 `unsupported` 并写清缺什么。
+  **法规原文 → 意图**仍需人写——这是编译器 v0 的边界，不假装有语义层。
 
 ### 3. `cc_attest(subject)` → `evidence`
 
@@ -244,7 +249,7 @@ python -m unittest desktop.tests.test_ccos_chain            # 6 项：摘要一�
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
 | `cc_label` | 声明层已有（`nf-label/1` IR + 校验）；**载体写入/读取全无**：无水印嵌入、无元数据注入、无 sidecar 回退、无 20+ 格式覆盖 | 需要先有标识驱动子系统（本仓不存在） |
-| `cc_check` | v0 只有封闭词表（5 类规则）；法规文本 → 规则的编译器没有 | 需要政策编译（P2–P3 方向） |
+| `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层（P2–P3 方向） |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 需要更完整的契约声明面（人工编纂） |
 
 本表只记录**内部差距实证**；外部项目的能力不作为开项依据（`STRATEGY.md` §3.3）。
