@@ -88,6 +88,21 @@ def read_payload_manifest(path) -> dict | None:
     return doc if isinstance(doc, dict) else None
 
 
+def head_move_guard(start: str, end: str) -> str:
+    """运行期间 HEAD 是否移动 → 无效原因（空串 = 没移动，结论可用）。
+
+    为什么要这条（2026-11-05 实测）：本仓常有并发 agent 会话。我第一次跑发布结论时，
+    另一个会话在跑动中提交了 3 个 commit——分片们分别在不同 HEAD 上跑完，出来的红全是
+    别人的中间态，那份结论既不能当绿也不能当真红。结论必须绑定**一个** HEAD。
+    """
+    start = (start or "").strip()
+    end = (end or "").strip()
+    if not start or not end or start == end:
+        return ""
+    return (f"工作树在运行期间被改动（HEAD {start[:12]} → {end[:12]}）"
+            f"（{GUIDE}本次结论无效：请在工作区静止后重跑；并发会话下先确认 HEAD 不再移动）")
+
+
 def aggregate(results: list[dict]) -> dict:
     """分片结果汇总 → {ok, total, failed, wall}（纯函数，便于单测）。"""
     failed = [r for r in results if int(r.get("rc") or 0) != 0]
@@ -332,7 +347,11 @@ def main(argv=None) -> int:
                 print(f"  {mark} 分片 {row['shard']} · rc={row['rc']} · {row['wall']} s",
                       flush=True)
     summary = aggregate(results)
-    payload = {"schema": "nf-release-conclusion/1", "ok": summary["ok"] and checks_rc == 0,
+    head_end = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
+    moved = head_move_guard(head, head_end)
+    payload = {"schema": "nf-release-conclusion/1",
+               "ok": summary["ok"] and checks_rc == 0 and not moved,
+               "head_start": head, "head_end": head_end, "head_moved": bool(moved),
                "supply_chain": supply, "freshness": fresh, "checks_only_rc": checks_rc,
                "shards": sorted(results, key=lambda r: r["shard"]),
                "failed": summary["failed"], "shard_wall_s": summary["wall"],
@@ -355,6 +374,10 @@ def main(argv=None) -> int:
               f"分片墙钟合计 {summary['wall']} s · 总墙钟 {payload['wall_s']} s")
         verdict = "可发布（check1-42 测试侧与结构侧全过）" if payload["ok"] else "不可发布"
         print(f"  => {verdict}")
+        if moved:
+            print(f"  ✗ {moved}", file=sys.stderr)
+    if moved:
+        return 3
     return 0 if payload["ok"] else 1
 
 

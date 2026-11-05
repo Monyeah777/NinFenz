@@ -363,9 +363,13 @@
     },
     {
       "id": "code_metrics",
-      "issues": 0,
+      "issues": 6,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [],
+      "sample": [
+        "desktop/src/core/error_codes.py 模块行数 47 > 冻结值 42（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "desktop/src/core/error_codes.py 最长函数行数 16 > 冻结值 15（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "desktop/src/core/error_codes.py 最大圈复杂度 10 > 冻结值 9（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+      ],
       "source": "code_metrics.scan",
       "stats": {
         "baseline": 326,
@@ -374,7 +378,7 @@
         "max_fn_lines": 319,
         "max_lines": 8433
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -386,8 +390,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 254,
-        "probed": 254
+        "patterns": 255,
+        "probed": 255
       },
       "status": "pass",
       "warns": 0
@@ -525,8 +529,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4003,
-        "kernel": 2028,
+        "files": 4008,
+        "kernel": 2031,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -537,12 +541,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "6e70e0336bb303ed80969b30d8afbdcea82bbf1ad002e994ba5d09fb8a091705",
+  "root_digest": "ab766f268b19aacece8ffb93f68113d4d8d3b24a6e75c4bf3490f6e0e69d23d6",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }

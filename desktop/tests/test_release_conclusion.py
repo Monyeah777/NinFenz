@@ -193,5 +193,25 @@ class TestDirtyRefusal(unittest.TestCase):
         self.assertIn("工作树不干净", proc.stderr)
 
 
+class TestHeadMoveGuard(unittest.TestCase):
+    """并发会话下「跑动中的树」必须判无效：green/red 都得绑定同一个 HEAD。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_same_head_passes(self):
+        self.assertEqual("", self.gate.head_move_guard("abc123", "abc123"))
+
+    def test_moved_head_invalidates(self):
+        msg = self.gate.head_move_guard("abc123def456", "999888777666")
+        self.assertIn("HEAD", msg)
+        self.assertIn("无效", msg)
+        self.assertIn("abc123def456"[:12], msg)
+
+    def test_missing_head_is_not_a_failure(self):
+        self.assertEqual("", self.gate.head_move_guard("", "abc"))
+        self.assertEqual("", self.gate.head_move_guard("abc", ""))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1048,
     "projection": 137,
-    "support": 356,
-    "verify": 975
+    "support": 358,
+    "verify": 978
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7451,6 +7451,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CCOS ABI 文档一致性判据（文档 ↔ 实装 ↔ 判据三元对账）。",
+      "path": "desktop/tests/test_ccos_abi_docs.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCOS 一条链复现单测（cc_check → cc_attest → cc_verify → cc_replay）。",
       "path": "desktop/tests/test_ccos_chain.py",
       "role": "verify",
@@ -7825,6 +7831,12 @@
     {
       "function": "证据包（evidence bundle）单测——cc_verify 的四词判定与 fail-closed 面。",
       "path": "desktop/tests/test_evidence.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
+      "path": "desktop/tests/test_evidence_forms_parity.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9031,6 +9043,12 @@
     {
       "function": "派生空壳台账（`core/shell_ledger.py`）回归测试：可数 + 只减不增 + 有捕获力。",
       "path": "desktop/tests/test_shell_ledger.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "跨入口同证据（M2-T9）：同一对象 / 同一证据包经 CLI 与本地 HTTP 面必须得到同一判定。",
+      "path": "desktop/tests/test_shell_parity.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11807,7 +11825,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。空表期间不得以此为由跳过登记——条目按实际错误面在重构波次迁移。",
+      "function": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。词法两类：大写码（NF_*）与 ABI 码 cc.<syscall>.<reason>（docs/ccos/abi-v0.md）。2026-11-05 起登记 CCOS ABI v0 错误面。",
       "path": "protocol/error_codes.json",
       "role": "verify",
       "rule": "R-verify"
@@ -12180,16 +12198,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1d352d8c4640bcecc36eeef9ac7dae37298b645f40746baf380cdd359c06b680",
+  "root_digest": "9f47b2308ddef0ce57d54bd681743d943c1578cc32b5e94b7cb4364848a85257",
   "rule_counts": {
     "R-app": 1455,
-    "R-catch": 210,
+    "R-catch": 212,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 856,
+    "R-verify": 859,
     "auto:R-core": 268
   },
   "schema": "nf-role-coordinates/1"
