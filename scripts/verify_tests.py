@@ -105,6 +105,12 @@ def module_of(test_id: str) -> str:
 ALWAYS_MODULES = frozenset({
     "test_purity_scan", "test_style_ratchet", "test_dead_code",
     "test_suite_isolation", "test_check12_budget",
+    # 机器面三判据（2026-11-05 实测教训）：新脚本落地时，死代码/未校验读点/裸写 sink 这三类
+    # 只由下面三个模块判——它们不在常驻集时，--affected 快回路会「绿着」放过，直到 30 分钟的
+    # gate 才红。三者都很快（合计 ~10 s），必须常驻。
+    "test_json_shape_contracts", "test_core_atomic_writes", "test_silent_skip_reasons",
+    # 跨用例隔离的静态判据（打桩面必须运行时取模块）：0.5 s，钉的是「假绿/假红」那一类
+    "test_isolation_patterns",
 })
 
 #: 明确**不进**常驻集：`test_npm_package` 判的是 payload 清单与 HEAD 一致——那只在

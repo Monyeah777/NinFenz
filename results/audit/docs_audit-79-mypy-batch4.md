@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:2729e6938e042ec6fbae7704f37c2027f68c605633fd17e68d51d3347f1568fe
+  - protocol/code_metrics_baseline.json:b74feb0cbb9435aa22210dcd42b109942ec3b3af40c4cd38d090e9a1a5f4574b
 ---
+> 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
+
 > 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
 
 > 重审（2026-11-05）：http_api 行数上限重冻 266→267
