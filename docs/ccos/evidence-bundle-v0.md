@@ -125,7 +125,7 @@ SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.
 cmp /tmp/e1.zip /tmp/e2.zip
 
 # 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
-python -m unittest desktop.tests.test_evidence             # 37 项全绿（含零依赖复验器一致性）
+python -m unittest desktop.tests.test_evidence             # 52 项全绿（含零依赖复验器一致性）
 ```
 
 ## 攻击矩阵基准 v0（防「看起来能验」）

@@ -1,7 +1,8 @@
 """错误码中央登记 + 抛出/呈现分离（机制借鉴 loomvault ErrorCode.java / iskills domain/errors.ts）。
 
-NF 有稳定退出码与 R4「报错须带修复指引」，但**无错误码中央登记件**（protocol/ 下
-error_codes 命中 0）。本模块提供登记册的构造与校验：码唯一、稳定、每条带 message+fix；
+NF 有稳定退出码与 R4「报错须带修复指引」，错误码中央登记件 = protocol/error_codes.json。
+本模块提供登记册的构造与校验：码唯一、稳定、每条带 message+fix；两种词法并存——
+传统大写码（NF_*）与 ABI 稳定面 cc.<syscall>.<reason>（见 docs/ccos/abi-v0.md）。
 抛出/呈现分离（domain 只给 code+params，文案由呈现层注入）。
 """
 from __future__ import annotations
@@ -9,7 +10,10 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Tuple
 
+#: 传统大写码（NF_*）；错误面主线，保持兼容
 _CODE = re.compile(r"^[A-Z][A-Z0-9_]{2,39}$")
+#: ABI 码（cc.<syscall>.<reason>）：对外稳定面，不得改成大写/缩写
+_CODE_CC = re.compile(r"^cc\.[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
 
 
 def validate(registry: Dict[str, Any]) -> List[str]:
@@ -18,8 +22,9 @@ def validate(registry: Dict[str, Any]) -> List[str]:
     seen = set()
     for e in registry.get("codes") or []:
         cid = str(e.get("id") or "")
-        if not _CODE.match(cid):
-            issues.append("错误码 %r 不合词法（修复指引：^[A-Z][A-Z0-9_]{2,39}$）" % cid)
+        if not (_CODE.match(cid) or _CODE_CC.match(cid)):
+            issues.append("错误码 %r 不合词法（修复指引：大写码 ^[A-Z][A-Z0-9_]{2,39}$，"
+                          "或 ABI 码 cc.<syscall>.<reason>）" % cid)
         if cid in seen:
             issues.append("错误码重复：%s（修复指引：合并或改号）" % cid)
         seen.add(cid)

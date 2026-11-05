@@ -64,7 +64,7 @@ curl -s http://127.0.0.1:8765/api/health
 curl -s -X POST --data-binary @evidence.zip http://127.0.0.1:8765/api/verify
 
 # 单测（起真服务打真请求：端点可用 / invalid 也 200 / Origin 挡跨站 / 体量上限 / 拒绝非回环）
-python -m unittest desktop.tests.test_http_api            # 12 项全绿
+python -m unittest desktop.tests.test_http_api            # 18 项全绿
 ```
 
 ## 边界（如实挂账）

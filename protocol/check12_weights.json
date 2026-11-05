@@ -36,6 +36,7 @@
     "test_capability_battery": 0.2,
     "test_case_schema": 0.2,
     "test_category_registry": 0.8,
+    "test_ccos_abi_docs": 0.6,
     "test_ccos_chain": 0.4,
     "test_ccv3_adapter": 0.2,
     "test_changelog_gen": 1.3,
@@ -693,6 +694,12 @@
     "test_category_registry.RealRepoTest.test_no_exact_duplicate_glob_sets": 0.0,
     "test_category_registry.RealRepoTest.test_registry_selfcheck_clean": 0.0,
     "test_category_registry.RealRepoTest.test_unknown_category_is_empty": 0.0,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_documented_unittest_counts_match_reality": 0.08,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_every_declared_error_code_is_registered": 0.0,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_maps_to_commands_are_reachable": 0.39,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_no_abolished_layering_vocabulary": 0.0,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_registry_passes_central_validation": 0.0,
+    "test_ccos_abi_docs.AbiDocConsistencyTest.test_seven_calls_have_expected_ids_and_status": 0.0,
     "test_ccos_chain._Base.test_chain_breaks_on_empty_object": 0.03,
     "test_ccos_chain._Base.test_chain_cli_json": 0.15,
     "test_ccos_chain._Base.test_chain_marks_missing_link": 0.01,
@@ -3887,5 +3894,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1332.2
+  "total_s": 1332.8
 }
