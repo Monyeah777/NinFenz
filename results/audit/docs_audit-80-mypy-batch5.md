@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:6a0d1f47d584fa5cbfbfd359ee8feb0846fe84e21437682c5048d0ac1870ff14
+  - protocol/code_metrics_baseline.json:df6452cabee00423a7511c0b391281f0ac0e39e8e437a7b0399820830216c3af
 ---
+> 重审（2026-11-05）：http_api 行数上限重冻 266→267
+
 > 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
 
 > 重审（2026-11-05）：--compile 参数登记进编码/路径闸门

@@ -148,6 +148,7 @@ class _Handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length") or "0")
         except ValueError:
+            # Content-Length 非数字：无从知道要读多少，交给 _body() 走它的拒绝路径（那边会报错）
             return
         limit = int(getattr(self.server, "max_body", MAX_BODY))
         if length > 0:
