@@ -6053,7 +6053,7 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "错误码中央登记 + 抛出/呈现分离（机制借鉴 loomvault ErrorCode.java / iskills domain/errors.ts）。",
+      "function": "错误码中央登记 + 抛出/呈现分离（借鉴 loomvault/iskills）：码唯一、稳定、每条带 message+fix；",
       "path": "desktop/src/core/error_codes.py",
       "role": "prod",
       "rule": "auto:R-core"
@@ -12198,7 +12198,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9f47b2308ddef0ce57d54bd681743d943c1578cc32b5e94b7cb4364848a85257",
+  "root_digest": "623b199450e7451e18182a9f8b9c86194a4415076b39ebc34224ad2a93ed07a8",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 212,

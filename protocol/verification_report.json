@@ -363,12 +363,12 @@
     },
     {
       "id": "code_metrics",
-      "issues": 6,
+      "issues": 5,
       "name": "代码规模/复杂度上限（棘轮冻结）",
       "sample": [
-        "desktop/src/core/error_codes.py 模块行数 47 > 冻结值 42（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
-        "desktop/src/core/error_codes.py 最长函数行数 16 > 冻结值 15（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
-        "desktop/src/core/error_codes.py 最大圈复杂度 10 > 冻结值 9（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+        "scripts/evidence_vectors.py 模块行数 287 > 冻结值 249（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "scripts/evidence_vectors.py 最长函数行数 76 > 冻结值 61（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）",
+        "scripts/release_conclusion.py 模块行数 396 > 冻结值 365（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
       ],
       "source": "code_metrics.scan",
       "stats": {
@@ -390,8 +390,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 255,
-        "probed": 255
+        "patterns": 254,
+        "probed": 254
       },
       "status": "pass",
       "warns": 0
@@ -541,7 +541,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "ab766f268b19aacece8ffb93f68113d4d8d3b24a6e75c4bf3490f6e0e69d23d6",
+  "root_digest": "76e02d618c0b65d9bc3d2591bde6c64f59c05233fd8f27e8c5ba6eddb6a45186",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
