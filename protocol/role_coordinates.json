@@ -6,7 +6,7 @@
     "prod": 1048,
     "projection": 136,
     "support": 356,
-    "verify": 973
+    "verify": 974
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8177,6 +8177,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "跨用例隔离的**静态**判据：不许把桩打在「模块导入时抓到的 core 模块」上。",
+      "path": "desktop/tests/test_isolation_patterns.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
       "role": "verify",
@@ -12168,7 +12174,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "afa3c81b6aa5028675adb498d9b74a3e958bc9f8ccfc4b8ec6dbb703096d97a7",
+  "root_digest": "62d10a7734bada7354edc43d0a6cb147ef2497235ab05df413c52827515eec16",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 210,
@@ -12177,7 +12183,7 @@
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 854,
+    "R-verify": 855,
     "auto:R-core": 267
   },
   "schema": "nf-role-coordinates/1"
