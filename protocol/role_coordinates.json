@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1048,
-    "projection": 134,
+    "projection": 135,
     "support": 355,
-    "verify": 971
+    "verify": 972
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7481,6 +7481,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "策略编译器 v0（core/check_compile.py）判据：意图 → 封闭词表策略，并如实报告不可表达项。",
+      "path": "desktop/tests/test_check_compile.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "步骤5「合并同类项」等价性证明：参数化引擎 vs 旧判据（独立参照实现 + 变异夹具）。",
       "path": "desktop/tests/test_check_merge_equivalence.py",
       "role": "verify",
@@ -12156,7 +12162,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "707916057c9a583289c349d61b96d147eff6958e971c3fdc7169c1b47215d71c",
+  "root_digest": "54809cdcb364e29f1cc51ed7231decac99afb4828cc04d9d0b95f982bdad51fc",
   "rule_counts": {
     "R-app": 1454,
     "R-catch": 209,
@@ -12165,8 +12171,8 @@
     "R-prod": 944,
     "R-projection": 118,
     "R-support": 119,
-    "R-verify": 852,
-    "auto:R-core": 266
+    "R-verify": 853,
+    "auto:R-core": 267
   },
   "schema": "nf-role-coordinates/1"
 }
