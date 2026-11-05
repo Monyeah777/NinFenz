@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:df6452cabee00423a7511c0b391281f0ac0e39e8e437a7b0399820830216c3af
+  - protocol/code_metrics_baseline.json:2729e6938e042ec6fbae7704f37c2027f68c605633fd17e68d51d3347f1568fe
 ---
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
 > 重审（2026-11-05）：http_api 行数上限重冻 266→267
 
 > 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）

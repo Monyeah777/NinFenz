@@ -99,6 +99,7 @@
     "test_eval_collapse": 0.1,
     "test_eval_harness": 0.2,
     "test_evidence": 1.8,
+    "test_evidence_vectors": 1.5,
     "test_execution_drill": 0.2,
     "test_explain_coverage": 0.2,
     "test_export_manifest_gates": 0.2,
@@ -1381,6 +1382,14 @@
     "test_evidence.TestVerdicts.test_revoked_by_digest": 0.01,
     "test_evidence.TestVerdicts.test_revoked_by_path": 0.01,
     "test_evidence.TestVerdicts.test_tampered_payload_invalid": 0.01,
+    "test_evidence_vectors.TestExpectedVerdicts.test_core_matches_every_vector": 0.04,
+    "test_evidence_vectors.TestExpectedVerdicts.test_standalone_matches_every_vector": 1.19,
+    "test_evidence_vectors.TestReproducible.test_committed_equals_live": 0.05,
+    "test_evidence_vectors.TestReproducible.test_generation_is_deterministic": 0.05,
+    "test_evidence_vectors.TestVectorIntegrity.test_ids_unique": 0.0,
+    "test_evidence_vectors.TestVectorIntegrity.test_no_machine_specific_paths": 0.0,
+    "test_evidence_vectors.TestVectorIntegrity.test_schema_and_count": 0.0,
+    "test_evidence_vectors.TestVectorIntegrity.test_sha_matches_bytes": 0.0,
     "test_execution_drill.ContextBoundaryTest.test_context_window_does_not_cross_clause": 0.0,
     "test_execution_drill.ContextBoundaryTest.test_decision_word_glue_is_not_decision": 0.0,
     "test_execution_drill.ContextBoundaryTest.test_history_context": 0.0,
@@ -3857,5 +3866,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1326.8
+  "total_s": 1328.3
 }

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:df6452cabee00423a7511c0b391281f0ac0e39e8e437a7b0399820830216c3af
+  - protocol/code_metrics_baseline.json:2729e6938e042ec6fbae7704f37c2027f68c605633fd17e68d51d3347f1568fe
 ---
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
 > 重审（2026-11-05）：http_api 行数上限重冻 266→267
 
 > 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）

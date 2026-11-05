@@ -85,6 +85,15 @@ python scripts/nf.py evidence pack 01_核心协议.md STRATEGY.md --out evidence
 python scripts/nf.py evidence pack 01_核心协议.md --key-file <密钥> --issuer 作者 \
        --expires-at 2027-01-01T00:00:00Z --revocations <吊销表.json> --out evidence.zip
 
+
+## 跨语言一致性：判定向量集
+
+`results/ccos/evidence_verdict_vectors.json` 把「证据包字节 → 期望判定 + 退出码」固化成 13 条与实现
+无关的用例：**任何语言**的 `cc_verify` 都可以只读这份 JSON 自证对不对（无需本仓工具链）。
+生成与复核：`python scripts/evidence_vectors.py --write|--check`，判据
+`python -m unittest desktop.tests.test_evidence_vectors`（8 项，含双实现同判）。详见
+[evidence-vectors-v0.md](evidence-vectors-v0.md)。
+
 # 复验（纯读；不需要仓库）——三种形态同一个入口
 python scripts/nf.py evidence verify evidence.zip
 python scripts/nf.py evidence verify protocol/RECEIPTS.json --root .        # 回执形态

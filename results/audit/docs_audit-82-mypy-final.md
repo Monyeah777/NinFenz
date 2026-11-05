@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:df6452cabee00423a7511c0b391281f0ac0e39e8e437a7b0399820830216c3af
+  - protocol/code_metrics_baseline.json:2729e6938e042ec6fbae7704f37c2027f68c605633fd17e68d51d3347f1568fe
 ---
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
 > 重审（2026-11-05）：http_api 行数上限重冻 266→267
 
 > 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）

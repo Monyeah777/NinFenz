@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-05",
   "approved_by": "Monyeah777",
-  "note": "行数上限重冻收口",
+  "note": "证据向量集收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a11f501726dfc81f853ee56ce91aac284e20d8dec4a831f453ec613f23e81af7"
+  "subject_digest": "bc750882970614bf434c5e3d7d1713366f4e68770939e17e75f4db8b462b70b5"
 }

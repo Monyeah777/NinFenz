@@ -1435,6 +1435,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 44
     },
+    "scripts/evidence_vectors.py": {
+      "lines": 249,
+      "max_fn_cc": 9,
+      "max_fn_lines": 61
+    },
     "scripts/fde_sample_run.py": {
       "lines": 328,
       "max_fn_cc": 27,

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:1357533fd1e3bdcafa07ee0807510bc7959044cdf7dd13145d96e363eb48765e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:555015b046fa4eb60481b058e6a81adace8228c9ce6dddce6ae603d65ad245c2
+  - protocol/check12_weights.json:fd4be10b83825f70e3de70dcd9ea616a42079508cd845cbe55ac2abb958bb1d6
   - protocol/coupling_baseline.json:2f7302868ad6722907fefab44d357385cd16c417c7a0c15261b47e6bac7b06f2
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
 > 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
 
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）

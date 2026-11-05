@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:df6452cabee00423a7511c0b391281f0ac0e39e8e437a7b0399820830216c3af
+  - protocol/code_metrics_baseline.json:2729e6938e042ec6fbae7704f37c2027f68c605633fd17e68d51d3347f1568fe
 ---
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
 > 重审（2026-11-05）：http_api 行数上限重冻 266→267
 
 > 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
