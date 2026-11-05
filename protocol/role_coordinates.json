@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1454,
+    "app": 1455,
     "entry": 26,
     "floor": 5,
     "prod": 1048,
-    "projection": 135,
-    "support": 355,
-    "verify": 972
+    "projection": 136,
+    "support": 356,
+    "verify": 973
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7829,6 +7829,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "证据判定向量集（results/ccos/evidence_verdict_vectors.json）判据。",
+      "path": "desktop/tests/test_evidence_vectors.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "42 M1 + 44 扩展 —— 执行失范捕获器单测（多管线演练集 P01-P06/P90 + 变异自检/捕获率验收）。",
       "path": "desktop/tests/test_execution_drill.py",
       "role": "verify",
@@ -12162,16 +12168,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "54809cdcb364e29f1cc51ed7231decac99afb4828cc04d9d0b95f982bdad51fc",
+  "root_digest": "afa3c81b6aa5028675adb498d9b74a3e958bc9f8ccfc4b8ec6dbb703096d97a7",
   "rule_counts": {
-    "R-app": 1454,
-    "R-catch": 209,
+    "R-app": 1455,
+    "R-catch": 210,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 118,
+    "R-projection": 119,
     "R-support": 119,
-    "R-verify": 853,
+    "R-verify": 854,
     "auto:R-core": 267
   },
   "schema": "nf-role-coordinates/1"
