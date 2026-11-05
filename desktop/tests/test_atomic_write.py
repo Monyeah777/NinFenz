@@ -305,15 +305,15 @@ class AtomicWriteTest(unittest.TestCase):
     def test_read_matches_plain_read(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
-            aw.write_text(p, "{\n  \"a\": 1\n}\n")
-            self.assertEqual("{\n  \"a\": 1\n}\n", aw.read_text(p))
-            self.assertEqual(p.read_bytes(), aw.read_bytes(p))
+            _live("core.atomic_write").write_text(p, "{\n  \"a\": 1\n}\n")
+            self.assertEqual("{\n  \"a\": 1\n}\n", _live("core.atomic_write").read_text(p))
+            self.assertEqual(p.read_bytes(), _live("core.atomic_write").read_bytes(p))
 
     def test_transient_permission_error_is_retried(self):
         """并发原子写下读者会瞬时撞 `PermissionError`（实测 ≈0.09%）——读侧必须短重试。"""
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
-            aw.write_text(p, "{}")
+            _live("core.atomic_write").write_text(p, "{}")
             real_open = open
             state = {"n": 0}
 
@@ -324,17 +324,17 @@ class AtomicWriteTest(unittest.TestCase):
                 return real_open(*a, **kw)
 
             with mock.patch("builtins.open", side_effect=flaky):
-                self.assertEqual("{}", aw.read_text(p))
+                self.assertEqual("{}", _live("core.atomic_write").read_text(p))
             self.assertGreaterEqual(state["n"], 3, "必须真的重试过")
 
     def test_persistent_permission_error_reraises(self):
         """重试耗尽仍失败 ⇒ 如实抛出（不退化成「读空」——那会把瞬时故障变成错数据）。"""
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "x.json")
-            aw.write_text(p, "{}")
+            _live("core.atomic_write").write_text(p, "{}")
             with mock.patch("builtins.open", side_effect=PermissionError(13, "denied")):
                 with self.assertRaises(PermissionError):
-                    aw.read_text(p)
+                    _live("core.atomic_write").read_text(p)
 
     def test_transient_einval_on_write_is_retried(self):
         """写侧瞬时 `EINVAL(22)`（Windows 杀软/句柄扫描实测）必须重试；持续错如实抛。"""
@@ -350,24 +350,24 @@ class AtomicWriteTest(unittest.TestCase):
                 return real_fsync(fd)
 
             with mock.patch("os.fsync", side_effect=flaky_fsync):
-                aw.write_text(p, "{}\n")
+                _live("core.atomic_write").write_text(p, "{}\n")
             self.assertEqual("{}\n", p.read_text(encoding="utf-8"))
             self.assertGreaterEqual(state["n"], 3, "必须真的重试过")
             # 持续 EINVAL ⇒ 如实抛（不掩盖）
             with mock.patch("os.fsync", side_effect=OSError(22, "Invalid argument")):
                 with self.assertRaises(OSError):
-                    aw.write_text(p, "{\"a\": 1}\n")
+                    _live("core.atomic_write").write_text(p, "{\"a\": 1}\n")
             self.assertEqual("{}\n", p.read_text(encoding="utf-8"), "失败须保留旧全量")
 
     def test_write_bytes_round_trip_and_failure_path(self):
         """二进制入口同规（签名锚 `.sig` 走它）：写成功逐字节一致；`replace` 失败保留旧全量。"""
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "anchor.sig")
-            aw.write_bytes(p, b"\x00\x01\x02")
+            _live("core.atomic_write").write_bytes(p, b"\x00\x01\x02")
             self.assertEqual(b"\x00\x01\x02", p.read_bytes())
             with _no_replace():
                 with self.assertRaises(PermissionError):
-                    aw.write_bytes(p, b"\xff" * 32)
+                    _live("core.atomic_write").write_bytes(p, b"\xff" * 32)
             self.assertEqual(b"\x00\x01\x02", p.read_bytes(),
                              "失败时必须保留旧全量（不得留半截签名件）")
             litter = [x.name for x in Path(tmp).iterdir() if x.name.endswith(".tmp")]
@@ -376,19 +376,19 @@ class AtomicWriteTest(unittest.TestCase):
     def test_round_trip_is_lf(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "out.md")
-            aw.write_text(p, "a\r\nb\rc\n")
+            _live("core.atomic_write").write_text(p, "a\r\nb\rc\n")
             self.assertEqual(b"a\nb\nc\n", p.read_bytes())
 
     def test_leaves_no_temp_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "out.json")
-            aw.write_text(p, "{}")
+            _live("core.atomic_write").write_text(p, "{}")
             self.assertEqual(["out.json"], sorted(os.listdir(tmp)))
 
     def test_creates_parent_directory(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "nested", "deep", "out.txt")
-            aw.write_text(p, "x")
+            _live("core.atomic_write").write_text(p, "x")
             self.assertTrue(p.is_file())
 
     def test_concurrent_writers_never_expose_partial_content(self):
@@ -397,14 +397,14 @@ class AtomicWriteTest(unittest.TestCase):
         big_b = "B" * 300000
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "shared.txt")
-            aw.write_text(p, big_a)
+            _live("core.atomic_write").write_text(p, big_a)
             stop = threading.Event()
             torn = []
 
             def writer(payload):
                 while not stop.is_set():
                     try:
-                        aw.write_text(p, payload)
+                        _live("core.atomic_write").write_text(p, payload)
                     except PermissionError:      # 极端并发下重试耗尽（平台语义，非本判据对象）
                         continue
 
@@ -435,7 +435,7 @@ class AtomicWriteTest(unittest.TestCase):
             blocked = Path(tmp, "target")
             blocked.mkdir()
             with self.assertRaises(OSError):
-                aw.write_text(blocked, "x")
+                _live("core.atomic_write").write_text(blocked, "x")
             self.assertTrue(blocked.is_dir(), "失败路径不得破坏既有目标")
             self.assertEqual(["target"], sorted(os.listdir(tmp)), "失败路径应清掉临时件")
 
