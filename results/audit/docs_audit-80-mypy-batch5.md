@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
+  - protocol/code_metrics_baseline.json:763ca71295d2279a57c18855ef07906030e1e7b1f83592a189bbdcd5434e3617
 ---
+> 重审（2026-11-05）：label_sidecar 删零引用 helper（死代码判据）
+
 > 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
 
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集

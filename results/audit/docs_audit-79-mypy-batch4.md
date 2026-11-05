@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
+  - protocol/code_metrics_baseline.json:763ca71295d2279a57c18855ef07906030e1e7b1f83592a189bbdcd5434e3617
 ---
+> 重审（2026-11-05）：label_sidecar 删零引用 helper（死代码判据）
+
 > 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
 
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集

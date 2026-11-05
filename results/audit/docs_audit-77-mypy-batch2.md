@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
+  - protocol/code_metrics_baseline.json:763ca71295d2279a57c18855ef07906030e1e7b1f83592a189bbdcd5434e3617
 ---
+> 重审（2026-11-05）：label_sidecar 删零引用 helper（死代码判据）
+
 > 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
 
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集

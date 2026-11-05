@@ -661,7 +661,7 @@
       "max_fn_lines": 35
     },
     "desktop/src/core/label_sidecar.py": {
-      "lines": 134,
+      "lines": 129,
       "max_fn_cc": 10,
       "max_fn_lines": 41
     },

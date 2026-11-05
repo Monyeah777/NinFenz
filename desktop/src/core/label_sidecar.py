@@ -16,7 +16,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
 from typing import Any
 
 from core import atomic_write, json_doc, label_ir
@@ -128,7 +127,3 @@ def discover(root: str = ".") -> list:
                             EMBEDDED))
     return sorted(out)
 
-
-def check_labeled(root: str, rel_object: str) -> dict[str, Any]:
-    """便捷：仓内相对路径 → 对账结果（报告用）。"""
-    return read(str(Path(root) / rel_object))

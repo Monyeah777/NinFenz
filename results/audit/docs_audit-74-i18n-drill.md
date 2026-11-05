@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:51ed5248c2049b437ceeab28fdf221e475d9cd81b1b0b677fde4ad154e54f9ec
+  - protocol/code_metrics_baseline.json:763ca71295d2279a57c18855ef07906030e1e7b1f83592a189bbdcd5434e3617
 ---
+> 重审（2026-11-05）：label_sidecar 删零引用 helper（死代码判据）
+
 > 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
 
 > 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
