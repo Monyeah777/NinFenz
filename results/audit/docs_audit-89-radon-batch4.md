@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:1ee6fe5a2ff788eb3beec929c6b132ff7d135b984ef5f1899c872364f7fc0f44
+  - protocol/code_metrics_baseline.json:46da2dcbfea1236a6a708825d01f3e021bdaff99d794cf3f1bbf45647e161a87
 ---
+> 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）
+
 > 重审（2026-11-06）：纯度放行表扩容后度量基线重冻
 
 > 重审（2026-11-06）：发布结论器加 --snapshot（HEAD 快照里跑，免疫并发改动）

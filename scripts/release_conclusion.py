@@ -128,18 +128,46 @@ def snapshot_dir_name(head: str) -> str:
     return f"nf-gate-snap-{str(head)[:12]}"
 
 
-def _snapshot_create(head: str) -> tuple[str, str]:
+#: 快照默认落点：仓库同盘的 .worktrees/（已被 .gitignore 忽略）。为什么不放 $TEMP：
+#: 2026-11-06 实测 C 盘 100% 满（剩余 84 MB），tempfile.mkdtemp 直接把整次门禁打成 ENOSPC。
+SNAP_BASE_DEFAULT = ".worktrees/gate-snap"
+
+
+def snapshot_base(root: Path, override: str = "") -> Path:
+    """快照基目录（纯函数）：显式覆盖优先，否则落在仓库同盘。"""
+    raw = (override or "").strip() or SNAP_BASE_DEFAULT
+    path = Path(raw)
+    return path if path.is_absolute() else (root / path)
+
+
+def _snapshot_free_bytes(path: Path) -> int:
+    """落点所在卷的可用字节；量不出来就返回 -1（不阻断，只告警）。"""
+    probe = path
+    while not probe.exists() and probe.parent != probe:
+        probe = probe.parent
+    try:
+        return int(shutil.disk_usage(str(probe)).free)
+    except OSError:
+        return -1
+
+
+def _snapshot_create(head: str, base: Path, need_mb: int = 400) -> tuple[str, str]:
     """在临时目录建 HEAD 的 detached worktree → (路径, 错误说明)。
 
     为什么要快照（2026-11-06 实测）：本仓常有并发 agent 会话，它们会在我跑 36 分钟门禁的
     时候提交、改文件、甚至改门禁脚本自己——8 片于是落在不同状态上，红绿都不可信。
     快照把结论**钉在一个 SHA** 上：证明「这个提交的内容是绿的」，与工作区完全解耦。
     """
-    base = tempfile.mkdtemp(prefix=snapshot_dir_name(head) + "-")
-    path = os.path.join(base, "wt")
+    free = _snapshot_free_bytes(base)
+    if 0 <= free < need_mb * 1024 * 1024:
+        return "", (f"快照落点空间不足（{base} 可用 {free // 1048576} MB，需 ≥{need_mb} MB）"
+                    f"（{GUIDE}用 --snapshot-dir 指到空间充足的卷，或先清理旧快照）")
+    base.mkdir(parents=True, exist_ok=True)
+    run_dir = Path(tempfile.mkdtemp(prefix=snapshot_dir_name(head) + "-", dir=str(base)))
+    path = str(run_dir / "wt")
     proc = _run(["git", "worktree", "add", path, "--detach", head], 300)
     if proc.get("code") != 0:
-        shutil.rmtree(base, ignore_errors=True)
+        shutil.rmtree(run_dir, ignore_errors=True)
         return "", (f"建快照失败（{proc.get('err') or proc.get('out') or '未知错误'}）"
                     f"（{GUIDE}确认 git 可用、HEAD={str(head)[:12]} 存在）")
     return path, ""
@@ -184,7 +212,7 @@ def aggregate(results: list[dict]) -> dict:
             "wall": round(sum(float(r.get("wall") or 0.0) for r in results), 1)}
 
 
-def _run(argv: list[str], timeout: float, cwd: str = "") -> dict:
+def _run(argv: list[str], timeout: float, cwd: str = "", env: dict | None = None) -> dict:
     """跑**本仓固定命令** → {code, out, err}；cwd 缺省为仓库根。
 
     统一走 core 的受控进程原子：本件不再自己起 subprocess（那是 SAST 面要逐处标注的东西，
@@ -194,7 +222,7 @@ def _run(argv: list[str], timeout: float, cwd: str = "") -> dict:
     if src not in sys.path:
         sys.path.insert(0, src)
     from core.atoms import proc as proc_atom  # 局部导入：模块级只留纯逻辑
-    return proc_atom.run_capture(argv, cwd=cwd or str(ROOT), timeout=timeout)
+    return proc_atom.run_capture(argv, cwd=cwd or str(ROOT), env=env, timeout=timeout)
 
 
 def _git_status() -> list[str]:
@@ -351,7 +379,8 @@ def _run_in_snapshot(args, head: str) -> int:
     内层是**独立进程**：它的 ROOT 就是快照目录，所以 payload 对账 / 新鲜度 / 分片天然
     都作用在快照上，无需把 cwd 透传到每个 helper。结论因此绑定**一个 SHA**。
     """
-    path, err = _snapshot_create(head)
+    base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+    path, err = _snapshot_create(head, base)
     if err:
         print(f"  ✗ {err}", file=sys.stderr)
         return 2
@@ -362,7 +391,11 @@ def _run_in_snapshot(args, head: str) -> int:
             return 2
         inner = [sys.executable, os.path.join(path, "scripts", "release_conclusion.py"),
                  *strip_snapshot_flag(sys.argv[1:])]
-        proc = _run(inner, 7200, cwd=path)
+        # 内层的临时件也落在快照卷：C 盘满时测试自己就会 ENOSPC（实测 84 MB 剩余跑不完）
+        tmp_dir = os.path.join(path, "..", "tmp")
+        os.makedirs(tmp_dir, exist_ok=True)
+        env = {**os.environ, "TEMP": tmp_dir, "TMP": tmp_dir}
+        proc = _run(inner, 7200, cwd=path, env=env)
         out = proc.get("out") or ""
         err_out = proc.get("err") or ""
         if getattr(args, "json", False) and out.strip():
@@ -394,6 +427,8 @@ def main(argv=None) -> int:
     ap.add_argument("--allow-dirty", action="store_true",
                     help="允许在脏树上跑（默认拒绝：脏树会产生与输入无关的假红）")
     ap.add_argument("--skip-checks", action="store_true", help="跳过 checks-only 步骤")
+    ap.add_argument("--snapshot-dir", default="",
+                    help="快照落点基目录（缺省 .worktrees/gate-snap，与仓库同盘）")
     ap.add_argument("--snapshot", action="store_true",
                     help="在 HEAD 的临时 worktree 快照里跑（免疫并发会话的实时改动）")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")

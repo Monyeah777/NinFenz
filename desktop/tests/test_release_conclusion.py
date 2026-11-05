@@ -318,5 +318,28 @@ class TestSnapshotMode(unittest.TestCase):
         self.assertIn("--snapshot", proc.stdout)
 
 
+class TestSnapshotLocation(unittest.TestCase):
+    """快照落点必须在**与仓库同盘**的可写目录：$TEMP 落在满盘卷上会把门禁打成 ENOSPC。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_default_is_repo_local(self):
+        base = self.gate.snapshot_base(ROOT)
+        self.assertTrue(str(base).endswith("gate-snap"), base)
+        self.assertIn(".worktrees", str(base).replace("\\", "/"))
+
+    def test_override_relative_is_under_root(self):
+        base = self.gate.snapshot_base(ROOT, ".worktrees/custom")
+        self.assertEqual(ROOT / ".worktrees" / "custom", base)
+
+    def test_override_absolute_wins(self):
+        base = self.gate.snapshot_base(ROOT, "D:/elsewhere/snap")
+        self.assertTrue(str(base).startswith("D:"))
+
+    def test_free_space_probe_does_not_raise(self):
+        self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
