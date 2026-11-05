@@ -253,5 +253,28 @@ class TestRatchets(unittest.TestCase):
         self.assertEqual(["style", "code_metrics", "coupling", "sast"], ids)
 
 
+class TestMidrunDriftGuard(unittest.TestCase):
+    """分片途中树变动必须立刻停：否则 8 片落在不同 HEAD 上，红绿都不可信。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_stable_tree_passes(self):
+        self.assertEqual("", self.gate.midrun_drift_guard("abc123", "abc123", []))
+
+    def test_head_changed_stops(self):
+        msg = self.gate.midrun_drift_guard("abc123def456", "999888777666", [])
+        self.assertIn("HEAD", msg)
+        self.assertIn("无效", msg)
+
+    def test_dirty_tree_stops_with_example(self):
+        msg = self.gate.midrun_drift_guard("abc", "abc", [" M protocol/x.json"])
+        self.assertIn("工作树", msg)
+        self.assertIn("protocol/x.json", msg)
+
+    def test_missing_head_is_not_drift(self):
+        self.assertEqual("", self.gate.midrun_drift_guard("", "", []))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -88,6 +88,22 @@ def read_payload_manifest(path) -> dict | None:
     return doc if isinstance(doc, dict) else None
 
 
+def midrun_drift_guard(head_start: str, head_now: str, dirty_now: list[str]) -> str:
+    """跑分片途中的树变动 → 停止原因（空串 = 稳定，可继续）。
+
+    为什么要在**每片之前**再查一次（2026-11-06 实测）：并发会话在分片跑到一半时提交，
+    8 片会分别落在不同 HEAD 上，红绿都不可信；等跑完 25 分钟才发现「HEAD 变了」太贵。
+    脏变更同样致命：分片读到的是别人改了一半的文件。
+    """
+    if (head_now or "").strip() != (head_start or "").strip():
+        return (f"HEAD 在分片途中变化（{str(head_start)[:12]} → {str(head_now)[:12]}）"
+                f"（{GUIDE}已停止剩余分片——本结论无效，等树静止后重跑）")
+    if dirty_now:
+        return (f"工作树在分片途中出现改动（{len(dirty_now)} 处，例：{dirty_now[0][:60]}）"
+                f"（{GUIDE}已停止剩余分片——分片读到的是改到一半的文件，结论无效）")
+    return ""
+
+
 def head_move_guard(start: str, end: str) -> str:
     """运行期间 HEAD 是否移动 → 无效原因（空串 = 没移动，结论可用）。
 
@@ -407,8 +423,19 @@ def main(argv=None) -> int:
     if not args.json:
         print(f"[5/5] 分片 ×{shards}（并发 {concurrency}）…", flush=True)
     results: list[dict] = []
+    drift = ""
+    # 并发会话下「跑动中的树」会在分片途中把结论弄成垃圾：每片**之前**查一次 HEAD + 脏树，
+    # 变了就停掉剩余分片（而不是等 25 分钟跑完再发现）。串行分片下这条最有效。
+    def _drift_now() -> str:
+        head_now = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
+        status = _run(["git", "status", "--porcelain"], 120).get("out") or ""
+        return midrun_drift_guard(head, head_now,
+                                  [ln for ln in status.splitlines() if ln.strip()])
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
-        futures = [pool.submit(_shard_one, i, shards) for i in range(shards)]
+        futures = {}
+        for i in range(shards):
+            futures[pool.submit(_shard_one, i, shards)] = i
         for fut in concurrent.futures.as_completed(futures):
             row = fut.result()
             results.append(row)
@@ -416,9 +443,20 @@ def main(argv=None) -> int:
                 mark = "✓" if row["rc"] == 0 else "✗"
                 print(f"  {mark} 分片 {row['shard']} · rc={row['rc']} · {row['wall']} s",
                       flush=True)
+            if not drift:
+                drift = _drift_now()
+                if drift:
+                    print(f"  ✗ {drift}", file=sys.stderr, flush=True)
+                    for pending, idx in list(futures.items()):
+                        if not pending.done():
+                            pending.cancel()
+                            results.append({"shard": f"{idx}/{shards}", "rc": 3,
+                                            "wall": 0.0, "tests": 0,
+                                            "skipped": True,
+                                            "note": "树在跑动中变化——未执行"})
     summary = aggregate(results)
     head_end = (_run(["git", "rev-parse", "HEAD"], 60).get("out") or "").strip()
-    moved = head_move_guard(head, head_end)
+    moved = head_move_guard(head, head_end) or drift
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
                "head_start": head, "head_end": head_end, "head_moved": bool(moved),
