@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1048,
-    "projection": 136,
+    "projection": 137,
     "support": 356,
-    "verify": 974
+    "verify": 975
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8231,6 +8231,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "标注 sidecar v0（core/label_sidecar.py + nf label write/read/list）判据。",
+      "path": "desktop/tests/test_label_sidecar.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`scripts/nf` 启动器的**回退路径**判据：没有守护时必须静默回退 python 直跑。",
       "path": "desktop/tests/test_launcher.py",
       "role": "verify",
@@ -12174,7 +12180,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "62d10a7734bada7354edc43d0a6cb147ef2497235ab05df413c52827515eec16",
+  "root_digest": "1d352d8c4640bcecc36eeef9ac7dae37298b645f40746baf380cdd359c06b680",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 210,
@@ -12183,8 +12189,8 @@
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 855,
-    "auto:R-core": 267
+    "R-verify": 856,
+    "auto:R-core": 268
   },
   "schema": "nf-role-coordinates/1"
 }
