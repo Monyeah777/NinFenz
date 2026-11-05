@@ -33,6 +33,9 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import atomic_write, evidence, json_doc  # noqa: E402
 
+BUNDLE_ENTRY = evidence.BUNDLE_ENTRY
+PAYLOAD_DIR = evidence.PAYLOAD_DIR
+
 SCHEMA = "nf-evidence-vectors/1"
 OUT_REL = "results/ccos/evidence_verdict_vectors.json"
 PIN = "2026-01-01T00:00:00Z"
@@ -176,6 +179,21 @@ def _build_vectors() -> dict:
         m["revocations.json"] = b"{not json"
         rows.append(_case("bad_revocations", "包内吊销表坏件（不是「无吊销」）", "invalid",
                           bundle=_write_members(os.path.join(tmp, "revin.zip"), m)))
+        # 容器面（敌意容器）：跨语言实现也必须拒绝——这是「敢验敌意输入」的最小证据
+        trav_members = _members(base)
+        trav_meta = json_doc.loads(trav_members[BUNDLE_ENTRY].decode(), dict,
+                                   what=BUNDLE_ENTRY)
+        trav_members[PAYLOAD_DIR + "../escape.md"] = trav_members.pop(
+            PAYLOAD_DIR + "d/a.md")
+        trav_meta["entries"][0]["path"] = "../escape.md"
+        trav_meta["entries"][0]["id"] = "../escape.md"
+        trav_members[BUNDLE_ENTRY] = json.dumps(trav_meta, ensure_ascii=False,
+                                                sort_keys=True).encode()
+        rows.append(_case("traversal_path", "成员路径含双点段（解包越界写的入口）", "invalid",
+                          bundle=evidence._zip_bytes(list(trav_members.items()))))
+        rows.append(_case("dup_members", "重名成员（zip 歧义：判定不可复算）", "invalid",
+                          bundle=_zip_with_duplicate(_members(base),
+                                                     PAYLOAD_DIR + "d/a.md")))
         plain = Path(tmp) / "plain.bin"
         atomic_write.write_bytes(str(plain), b"just a file")
         # 输入不是证据包 = **用法错**（rc=4），不是判定面；第三方实现也必须拒绝而不是给判定
@@ -183,6 +201,26 @@ def _build_vectors() -> dict:
                           bundle=plain.read_bytes(), special="not_a_bundle",
                           exit_code=4))
     return {"schema": SCHEMA, "pinned_at": PIN, "count": len(rows), "vectors": rows}
+
+
+def _zip_with_duplicate(members: dict, dup_name: str) -> bytes:
+    """造确定性 zip，其中 dup_name 出现两次（一次原文、一次影子字节）。
+
+    为什么不能复用 _zip_bytes：那个入口要求成员名唯一（dict 语义），而攻击面恰恰是「重名」。
+    """
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        for name in sorted(members):
+            zi = zipfile.ZipInfo(name, date_time=evidence._ZIP_EPOCH)
+            zf.writestr(zi, members[name])
+        zi = zipfile.ZipInfo(dup_name, date_time=evidence._ZIP_EPOCH)
+        zf.writestr(zi, b"shadow")
+    return buf.getvalue()
+
+
+def _members(data: bytes) -> dict:
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        return {name: zf.read(name) for name in zf.namelist()}
 
 
 def _dump(tmp: str, data: bytes) -> str:

@@ -5,7 +5,7 @@
 
 ## 是什么
 
-一份**与实现无关**的 JSON：13 条「证据包字节 → 期望判定 + 期望退出码」的固定用例。任何语言的
+一份**与实现无关**的 JSON：15 条「证据包字节 → 期望判定 + 期望退出码」的固定用例。任何语言的
 `cc_verify` 实现都能只读这一份文件自证对不对——不需要读本仓代码、不需要装 NF 工具链。
 
 与攻击矩阵（`nf evidence bench`）的分工：矩阵证明「**本实现**抓得住攻击」；向量集证明
@@ -17,7 +17,7 @@
 {
   "schema": "nf-evidence-vectors/1",
   "pinned_at": "2026-01-01T00:00:00Z",
-  "count": 13,
+  "count": 15,
   "vectors": [
     {"id": "ok_digest_only", "desc": "完好包（digest_only）",
      "expected": {"verdict": "ok", "exit_code": 0},
@@ -34,7 +34,7 @@
 hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence verify` 的对应参数。
 `special="not_a_bundle"` 表示**输入不是证据包**：这是用法错（rc=4），实现必须拒绝，不许给判定。
 
-## 13 条向量覆盖什么
+## 15 条向量覆盖什么
 
 | id | 攻击/变化 | 期望 |
 |---|---|---|
@@ -46,6 +46,8 @@ hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence veri
 | revoked | 吊销表命中 | revoked / 2 |
 | expired | 有效期已过 | expired / 3 |
 | bad_revocations | 包内吊销表坏件（不是「无吊销」） | invalid / 1 |
+| traversal_path | 成员路径含双点段（解包越界写的入口） | invalid / 1 |
+| dup_members | 重名成员（zip 歧义：判定不可复算） | invalid / 1 |
 | not_a_bundle | 输入不是证据包 | 用法错 / 4 |
 
 ## 第三方怎么用（以任何语言为例）
@@ -62,6 +64,7 @@ hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence veri
 python scripts/evidence_vectors.py --write   # 重写向量集（确定性：钉死时间戳 + 固定密钥）
 python scripts/evidence_vectors.py --check   # 提交件 == 重算（CI / gate 用）
 python -m unittest desktop.tests.test_evidence_vectors   # 8 项：期望成立 + 双实现同判 + 可复现
+# 注：向量集里的容器面两条（traversal_path / dup_members）是 2026-11-05 容器加固的锚点
 `
 
 确定性来自两处：`SOURCE_DATE_EPOCH` 钉到 `pinned_at`（信封时间戳固定）、zip 用固定时间戳 +
