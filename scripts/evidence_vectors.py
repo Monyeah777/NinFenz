@@ -60,9 +60,33 @@ def _members(data: bytes) -> dict:
         return {name: zf.read(name) for name in zf.namelist()}
 
 
-def _build(tmp: str, targets: list, key: bytes | None = None, anchor=None) -> bytes:
+def _decision_rows(tmp: str, digest_a: str) -> list:
+    """决策证据（Q0）向量：自洽 + 换策略摘要 + 删声明面（都必须被双实现同判）。"""
+    dec = {"syscall": "cc_check",
+           "policy_digest": hashlib.sha256(b"nf-check-policy/1:vectors").hexdigest(),
+           "verdict": "ok", "object_sha256": digest_a}
+    dec_bundle = _build(tmp, ["d/a.md"], decision=dec)
+    rows = [_case("decision_ok", "决策证据自洽（digest_only → declared）", "ok",
+                  bundle=dec_bundle)]
+    m = _members(dec_bundle)
+    meta = json_doc.loads(m[BUNDLE_ENTRY].decode(), dict, what=BUNDLE_ENTRY)
+    meta["decision"]["policy_digest"] = "1" * 64
+    m[BUNDLE_ENTRY] = json.dumps(meta, ensure_ascii=False, sort_keys=True).encode()
+    rows.append(_case("decision_policy_swap", "换策略摘要（声明面与绑定面不一致）", "invalid",
+                      bundle=_write_members(os.path.join(tmp, "decswap.zip"), m)))
+    m = _members(dec_bundle)
+    meta = json_doc.loads(m[BUNDLE_ENTRY].decode(), dict, what=BUNDLE_ENTRY)
+    meta.pop("decision", None)
+    m[BUNDLE_ENTRY] = json.dumps(meta, ensure_ascii=False, sort_keys=True).encode()
+    rows.append(_case("decision_strip", "删声明面（绑定面仍在）", "invalid",
+                      bundle=_write_members(os.path.join(tmp, "decstrip.zip"), m)))
+    return rows
+
+
+def _build(tmp: str, targets: list, key: bytes | None = None, anchor=None,
+           decision: dict | None = None) -> bytes:
     data, _info = evidence.build(tmp, targets, issuer="vectors", created_at=PIN,
-                                 key=key, anchor=anchor)
+                                 key=key, anchor=anchor, decision=decision)
     return data
 
 
@@ -194,6 +218,7 @@ def _build_vectors() -> dict:
         rows.append(_case("dup_members", "重名成员（zip 歧义：判定不可复算）", "invalid",
                           bundle=_zip_with_duplicate(_members(base),
                                                      PAYLOAD_DIR + "d/a.md")))
+        rows.extend(_decision_rows(tmp, digest_a))
         plain = Path(tmp) / "plain.bin"
         atomic_write.write_bytes(str(plain), b"just a file")
         # 输入不是证据包 = **用法错**（rc=4），不是判定面；第三方实现也必须拒绝而不是给判定

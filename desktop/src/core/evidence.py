@@ -189,14 +189,18 @@ def _chain_head(entries: Sequence[dict[str, Any]]) -> str:
 def build(root: str, targets: Sequence[str], issuer: str = "",
           key: bytes | None = None, expires_at: str = "", created_at: str = "",
           revocations: dict[str, Any] | None = None,
-          anchor: dict[str, Any] | None = None) -> tuple[bytes, dict[str, Any]]:
+          anchor: dict[str, Any] | None = None,
+          decision: dict[str, Any] | None = None) -> tuple[bytes, dict[str, Any]]:
     """把目标文件打成自包含证据包 → (zip 字节, 摘要信息)。
 
     - 回执与根：receipts.build_scope（本模块只排序去重，公式不复制）
     - 信封：每条目标一份 attest；给了密钥即 hmac-sha256 级（不给 = digest_only）
     - 链头：按回执条目顺序折叠（append-only 顺序可证，不可抵赖**不**由本包提供）
+    - decision（可选，Q0）：绑定「过过哪条策略」；声明面放 bundle.json，
+      绑定面放进 object_sha256 相符的那份信封（纳入信封摘要；旧包无此键不受影响）
     """
     rels = _targets(root, targets)
+    target = _decision_target(root, rels, decision)
     doc = receipts.build_scope(root, rels, scope="evidence")
     entries = doc["entries"]
     members: list[tuple[str, bytes]] = [(PAYLOAD_DIR + rel, _read_text(root, rel))
@@ -204,18 +208,33 @@ def build(root: str, targets: Sequence[str], issuer: str = "",
     atts: list[str] = []
     for i, rel in enumerate(rels, 1):
         name = ATTEST_DIR + f"{i:04d}.json"
-        members.append((name, _envelope(root, rel, issuer, key)))
+        env = _envelope(root, rel, issuer, key, decision if rel == target else None)
+        members.append((name, env))
         atts.append(name)
     if revocations is not None:
         members.append((REVOCATIONS_ENTRY, _json_bytes(revocations)))
     meta = _manifest(doc["root"], entries, atts, created_at, issuer, key,
-                     str(expires_at or ""), revocations is not None, anchor)
+                     str(expires_at or ""), revocations is not None, anchor, decision)
     members.append((BUNDLE_ENTRY, _json_bytes(meta)))
     info = {"root": meta["root"], "count": meta["count"], "head": meta["chain"]["head"],
             "level": meta["level"], "attestations": len(atts),
             "revocations": revocations is not None, "created_at": meta["created_at"],
             "anchor": meta.get("anchor") or None}
     return _zip_bytes(members), info
+
+
+def _decision_target(root: str, rels: Sequence[str],
+                     decision: dict[str, Any] | None) -> str:
+    """决策证据块校验 → 绑定主体的相对路径（空串 = 未声明 decision）。"""
+    if decision is None:
+        return ""
+    digests = [_sha256(_read_text(root, rel)) for rel in rels]
+    issues = attest.decision_issues(decision, digests)
+    if issues:
+        raise ValueError(f"决策证据块不合法：{'；'.join(issues)}"
+                         f"（{GUIDE}见 docs/ccos/evidence-bundle-v0.md）")
+    obj = str(decision.get("object_sha256") or "")
+    return next((rel for rel, dig in zip(rels, digests, strict=True) if dig == obj), "")
 
 
 def _targets(root: str, targets: Sequence[str]) -> list[str]:
@@ -244,8 +263,9 @@ def _read_text(root: str, rel: str) -> bytes:
     return raw
 
 
-def _envelope(root: str, rel: str, issuer: str, key: bytes | None) -> bytes:
-    env = attest.build(rel, root, issuer=issuer)
+def _envelope(root: str, rel: str, issuer: str, key: bytes | None,
+              decision: dict[str, Any] | None = None) -> bytes:
+    env = attest.build(rel, root, issuer=issuer, decision=decision)
     if key:
         env = attest.sign_hmac(env, key)
     return _json_bytes(env)
@@ -258,7 +278,8 @@ def _json_bytes(obj: Any) -> bytes:
 
 def _manifest(root_digest: str, entries: Sequence[dict[str, Any]], atts: list[str],
               created_at: str, issuer: str, key: bytes | None, expires_at: str,
-              has_rev: bool, anchor: dict[str, Any] | None = None) -> dict[str, Any]:
+              has_rev: bool, anchor: dict[str, Any] | None = None,
+              decision: dict[str, Any] | None = None) -> dict[str, Any]:
     doc: dict[str, Any] = {
         "schema": SCHEMA,
         "created_at": created_at or attest.issue_stamp(),
@@ -279,6 +300,8 @@ def _manifest(root_digest: str, entries: Sequence[dict[str, Any]], atts: list[st
     }
     if isinstance(anchor, dict) and anchor:
         doc["anchor"] = {"count": anchor.get("count"), "head": anchor.get("head")}
+    if decision is not None:
+        doc["decision"] = dict(decision)
     return doc
 
 
@@ -307,10 +330,12 @@ def default_out() -> str:
 def write(root: str, out: str, targets: Sequence[str], issuer: str = "",
           key: bytes | None = None, expires_at: str = "", created_at: str = "",
           revocations: dict[str, Any] | None = None,
-          anchor: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
+          anchor: dict[str, Any] | None = None,
+          decision: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
     """打包并落盘（单一写出处；调用方负责输出路径口径）。"""
     data, info = build(root, targets, issuer=issuer, key=key, created_at=created_at,
-                       expires_at=expires_at, revocations=revocations, anchor=anchor)
+                       expires_at=expires_at, revocations=revocations, anchor=anchor,
+                       decision=decision)
     dest = out if os.path.isabs(out) else os.path.join(root, out)
     parent = os.path.dirname(dest)
     if parent:
@@ -421,7 +446,8 @@ def _load_meta(rd: _Reader) -> dict[str, Any]:
 def _empty_result() -> dict[str, Any]:
     return {"verdict": "invalid", "level": "none", "root": "", "head": "", "count": 0,
             "issues": [], "warnings": [], "created_at": "", "expires_at": "",
-            "revoked_by": None, "anchor_ref": None, "anchor_verified": False}
+            "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
+            "decision": None, "decision_status": "absent"}
 
 
 def _fill_header(res: dict[str, Any], meta: dict[str, Any]) -> None:
@@ -583,6 +609,57 @@ def _check_attestations(rd: _Reader, meta: dict[str, Any],
     res["attestations_ok"] = len(passed)
 
 
+def _check_decision(rd: _Reader, meta: dict[str, Any],
+                    entries: Sequence[dict[str, Any]], res: dict[str, Any]) -> None:
+    """决策证据块（Q0）：声明面（bundle.json）必须与绑定面（相符信封）一致。
+
+    只证明「这份证据绑定过一次 cc_check 的判定」；**不证明策略内容正确**——策略正确性
+    需要验方用自己信任的 policy 重算 policy_digest 后比对（v0 不提供期望参数）。
+    digest_only 级的信封只算 declared（没签名覆盖，证不了签发方认可该策略）。
+    """
+    envs: list[dict[str, Any]] = []
+    for name in [str(n) for n in (meta.get("attestations") or [])]:
+        raw = rd.read(name)
+        if raw is None:
+            continue
+        try:
+            env = json_doc.loads(raw.decode(), dict, what="信封")
+        except (ValueError, UnicodeDecodeError):
+            continue
+        if isinstance(env, dict):
+            envs.append(env)
+    decision = meta.get("decision")
+    if decision is None:
+        if any(isinstance(env.get("decision"), dict) for env in envs):
+            res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）"
+                                 "（" + GUIDE + "重新 pack 让声明面与绑定面同源）")
+        return
+    issues = attest.decision_issues(decision, [str(e.get("digest") or "") for e in entries])
+    if issues:
+        res["issues"].extend(issues)
+        return
+    obj = str(decision.get("object_sha256") or "")
+    matched, signed = 0, False
+    for env in envs:
+        if str((env.get("subject") or {}).get("sha256") or "") != obj:
+            continue
+        matched += 1
+        bound = env.get("decision")
+        if not isinstance(bound, dict) or bound != decision:
+            res["issues"].append("decision 声明面与信封绑定面不一致（换策略/删块都会在这里断）"
+                                 "（" + GUIDE + "重新 nf evidence pack 并把同一 decision 交给"
+                                 " pack）")
+            return
+        signed = signed or bool(env.get("signature"))
+    if not matched:
+        res["issues"].append("decision 找不到主体摘要相符的信封（决策未绑定到任何签发面）"
+                             "（" + GUIDE + "重新 pack，decision.object_sha256 必须等于某个"
+                             "成员实体的 sha256）")
+        return
+    res["decision"] = dict(decision)
+    res["decision_status"] = "bound" if signed else "declared"
+
+
 def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
                       revocations: dict[str, Any] | None,
                       res: dict[str, Any]) -> bool:
@@ -656,6 +733,9 @@ def verify(bundle: str, key: bytes | None = None,
         if res["issues"]:
             return res
         _check_attestations(rd, meta, entries, key, res)
+        if res["issues"]:
+            return res
+        _check_decision(rd, meta, entries, res)
         if res["issues"]:
             return res
         if _apply_revocation(rd, entries, revocations, res):
@@ -1409,6 +1489,21 @@ def bench() -> dict[str, Any]:
                    _bench_write(tmp, "chcnt.zip",
                                 _mut_meta(base, lambda meta: meta["chain"]
                                           .__setitem__("count", 99))))
+        # 决策证据（Q0）：正例 + 两条攻击（换策略摘要 / 删声明面）
+        dec = {"syscall": "cc_check",
+               "policy_digest": _sha256(b"nf-check-policy/1:bench"),
+               "verdict": "ok", "object_sha256": digest_a}
+        dec_bundle, _dec_info = build(tmp, ["d/a.md", "d/b.md"], issuer="bench",
+                                      created_at=BENCH_PIN, decision=dec)
+        _bench_run(rows, "decision_ok", "决策证据自洽（digest_only → declared）", "ok",
+                   _bench_write(tmp, "decbase.zip", dec_bundle))
+        _bench_run(rows, "decision_policy_swap", "换策略摘要（声明面与绑定面不一致）", "invalid",
+                   _bench_write(tmp, "decswap.zip", _mut_meta(
+                       dec_bundle,
+                       lambda meta: meta["decision"].__setitem__("policy_digest", "1" * 64))))
+        _bench_run(rows, "decision_strip", "删声明面（绑定面仍在）", "invalid",
+                   _bench_write(tmp, "decstrip.zip",
+                                _mut_meta(dec_bundle, lambda meta: meta.pop("decision", None))))
         m = dict(members)
         m[REVOCATIONS_ENTRY] = b"{not json"
         _bench_run(rows, "traversal_path", "成员路径含双点段（验证即任意写的入口）", "invalid",

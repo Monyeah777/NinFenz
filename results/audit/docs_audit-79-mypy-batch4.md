@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:6a1a39690d83938a2afbe9639033ba76e2dfe734f0ccba367b4849a2622f42ef
+  - protocol/code_metrics_baseline.json:d709dfc0b8d5d5eeeefd9743f1f6986319d0da8df2777d1fd472136f937982ef
 ---
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
 > 重审（2026-11-05）：发布结论器新增静态棘轮步（style/度量/耦合/SAST，约 12 s）
 
 > 重审（2026-11-05）：攻击矩阵重名用例：构造期抑制 zipfile 重名 UserWarning（机器面逐字节一致）

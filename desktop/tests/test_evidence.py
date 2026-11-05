@@ -336,7 +336,7 @@ class TestBench(_Base):
         res = evidence.bench()
         bad = [c for c in res["cases"] if not c["ok"]]
         self.assertEqual(bad, [])
-        self.assertEqual(res["total"], 35)
+        self.assertEqual(res["total"], 38)
         self.assertTrue(res["ok"])
 
     def test_bench_markdown(self):
@@ -704,6 +704,72 @@ class TestContainerHardening(unittest.TestCase):
             self.assertEqual("invalid", res["verdict"])
             self.assertIn("上限", " ".join(res["issues"]))
 
+
+
+
+class TestDecisionBinding(_Base):
+    """Q0：decision 进签名信封——自洽可证、换策略/删声明面必红、旧包不受影响。"""
+
+    def _decision(self):
+        import hashlib
+        obj = hashlib.sha256((self.tmp / "docs" / "a.md").read_bytes()).hexdigest()
+        return {"syscall": "cc_check",
+                "policy_digest": hashlib.sha256(b"policy").hexdigest(),
+                "verdict": "ok", "object_sha256": obj}
+
+    def test_declared_digest_only(self):
+        path, _info, _data = self._pack(decision=self._decision())
+        res = evidence.verify(path)
+        self.assertEqual(("ok", "declared"),
+                         (res["verdict"], res["decision_status"]), res["issues"])
+        self.assertEqual(self._decision(), res["decision"])
+
+    def test_bound_with_hmac(self):
+        path, _info, _data = self._pack(decision=self._decision(), key=self.key)
+        res = evidence.verify(path, key=self.key)
+        self.assertEqual(("ok", "bound"),
+                         (res["verdict"], res["decision_status"]), res["issues"])
+
+    def test_old_bundle_stays_absent(self):
+        path, _info, _data = self._pack()
+        res = evidence.verify(path)
+        self.assertEqual(("ok", "absent"),
+                         (res["verdict"], res["decision_status"]), res["issues"])
+        self.assertIsNone(res["decision"])
+
+    def test_policy_swap_is_invalid(self):
+        """只改声明面的 policy_digest：绑定面（信封摘要）覆盖不到 → 必红。"""
+        path, _info, data = self._pack(decision=self._decision())
+        members = _bundle_members(data)
+        meta = json.loads(members["bundle.json"].decode("utf-8"))
+        meta["decision"]["policy_digest"] = "1" * 64
+        members["bundle.json"] = json.dumps(meta, ensure_ascii=False,
+                                            sort_keys=True).encode("utf-8")
+        bad = Path(self._tmp.name) / "swap.zip"
+        bad.write_bytes(evidence._zip_bytes(list(members.items())))
+        res = evidence.verify(str(bad))
+        self.assertEqual("invalid", res["verdict"])
+        self.assertIn("不一致", " ".join(res["issues"]))
+
+    def test_strip_declaration_is_invalid(self):
+        """删顶层声明面而绑定面仍在：两条面不一致 → 必红（不许静默降级）。"""
+        path, _info, data = self._pack(decision=self._decision())
+        members = _bundle_members(data)
+        meta = json.loads(members["bundle.json"].decode("utf-8"))
+        meta.pop("decision", None)
+        members["bundle.json"] = json.dumps(meta, ensure_ascii=False,
+                                            sort_keys=True).encode("utf-8")
+        bad = Path(self._tmp.name) / "strip.zip"
+        bad.write_bytes(evidence._zip_bytes(list(members.items())))
+        res = evidence.verify(str(bad))
+        self.assertEqual("invalid", res["verdict"])
+
+    def test_bad_decision_rejected_at_build(self):
+        dec = self._decision()
+        dec["policy_digest"] = "not-hex"
+        with self.assertRaises(ValueError) as ctx:
+            evidence.build(str(self.tmp), ["docs/a.md"], decision=dec)
+        self.assertIn("修复指引", str(ctx.exception))
 
 if __name__ == "__main__":
     unittest.main()

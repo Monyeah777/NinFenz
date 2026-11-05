@@ -91,7 +91,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/attest.py": {
-      "lines": 364,
+      "lines": 401,
       "max_fn_cc": 16,
       "max_fn_lines": 53
     },
@@ -381,9 +381,9 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1497,
+      "lines": 1592,
       "max_fn_cc": 24,
-      "max_fn_lines": 146
+      "max_fn_lines": 161
     },
     "desktop/src/core/execution_drill.py": {
       "lines": 323,
@@ -1441,9 +1441,9 @@
       "max_fn_lines": 44
     },
     "scripts/evidence_vectors.py": {
-      "lines": 287,
+      "lines": 312,
       "max_fn_cc": 9,
-      "max_fn_lines": 76
+      "max_fn_lines": 77
     },
     "scripts/fde_sample_run.py": {
       "lines": 328,
@@ -1496,7 +1496,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8433,
+      "lines": 8438,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },
@@ -1506,7 +1506,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_verify.py": {
-      "lines": 806,
+      "lines": 868,
       "max_fn_cc": 28,
       "max_fn_lines": 86
     },

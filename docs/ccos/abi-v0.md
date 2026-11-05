@@ -123,7 +123,7 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
 
 ### 4. `cc_verify(evidence)` → `ok | revoked | expired | invalid`
 
-**状态：`implemented`**（三种输入形态 + 35 条攻击矩阵基准）。
+**状态：`implemented`**（三种输入形态 + 38 条攻击矩阵基准；decision 证据绑定 v0 已实装）。
 maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参考实现** = `scripts/nf_verify.py --evidence <target>`（纯标准库、不 import 任何 NF 模块，单文件可分发）。
 本调用是**中立裁判位的地基**：验证方只需要证据本身，**不需要仓库、不需要联网、
 不需要复现生产环境**。
@@ -132,7 +132,8 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
   `bundle`（`nf-evidence/1` 自包含包）/ `receipts`（`nf-receipts/1` 单根 + 包含证明）/
   `attest`（`nf-attest/1`、`nf-attest-set/1` 信封）。容器形态见
   `docs/ccos/evidence-bundle-v0.md`。
-- 输出：`{verdict, kind, level, root, head?, count, issues: [], revoked_by?: {...}}`
+- 输出：`{verdict, kind, level, root, head?, count, issues: [], revoked_by?: {...},
+  decision?: {...}, decision_status?: absent|declared|bound}`
 - 判定顺序（**fail-closed**，先失败先返回；不允许「证据弱就放行」）：
 
   | 序 | 检查 | 不过 → |
@@ -146,9 +147,15 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
   | 6 | 成员集外**不得**多出未登记成员 | `invalid` |
   | 7 | 清单内**每一份**信封都必须通过 + 每个成员都被覆盖 | `invalid` |
   | 8 | hmac 级：密钥在场且 mac 匹配（缺密钥不降级） | `invalid` |
+  | 8b | decision（若声明）：形状合法、object 在成员里、与主体摘要相符的信封内同一块、且清单与信封两侧都有 | `invalid` |
   | 9 | 吊销表命中 | **`revoked`** |
   | 10 | 时效（`expires_at` / `--at`）已过 | **`expired`** |
 
+- **decision 证据绑定（v0）**：包可带可选 `decision{syscall, policy_digest, verdict,
+  object_sha256}`，声明面在 `bundle.json`、绑定面在 `object_sha256` 相符的那份信封里（进信封摘要）。
+  只能证「与一次 cc_check 判定自洽且被签发面覆盖」（`decision_status=bound`）；**不证明策略内容正确**——
+  正确性需要验方用自己信任的 policy 重算 `policy_digest` 后比对。digest_only 级只算 `declared`。
+  包无 decision 时为 `absent`（旧包不因此变红）。
 - `level` 如实回填证据强度（`digest_only`/`receipts_only`/`hmac-sha256`/`ssh-sig`/
   `sigstore-keyless`），**不**把 `digest_only` 说成可信签发、不把「一份信封过了」说成整体可信。
 - **吊销表分发（G2）**：`--revocations` 吃普通 `nf-revocation/1` 表；表可由**签名 feed** 合并产出
@@ -159,7 +166,7 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
   `warnings` 里写「无法证明未被截断」，且 `anchor_verified` 为 false。锚点本身的可信来源
   （谁发布、怎么拿到）不在本 ABI 内。
 - 机制判据：`nf evidence verify --selfcheck`（四词判定各自可达）+ `nf evidence bench`
-  （35 条已知攻击逐条比对，任一条不达期望即 exit 1）。
+  （38 条已知攻击逐条比对，任一条不达期望即 exit 1）。
 - 错误码：`cc.verify.not_a_bundle` / `cc.verify.digest_mismatch` / `cc.verify.root_mismatch` /
   `cc.verify.proof_mismatch` / `cc.verify.no_attestation` / `cc.verify.key_required` /
   `cc.verify.revoked` / `cc.verify.expired`
@@ -203,7 +210,7 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
 ```bash
 # 1) cc_verify 的机制自检（四词判定各自可达）
 python scripts/nf.py evidence verify --selfcheck
-# 2) cc_verify 的敏感度基准（35 条已知攻击逐条比对；任一条不达期望即 exit 1）
+# 2) cc_verify 的敏感度基准（38 条已知攻击逐条比对；任一条不达期望即 exit 1）
 python scripts/nf.py evidence bench
 # 2b) 两套独立实现判据一致（core 版 vs 零依赖单文件版，含真实回执）
 python -m unittest desktop.tests.test_evidence.TestStandaloneParity

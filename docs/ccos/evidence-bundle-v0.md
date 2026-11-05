@@ -22,7 +22,7 @@ core.attest，链节域分隔前缀取 core.transparency_log。
 
 | 成员 | 必有 | 内容 |
 |---|---|---|
-| bundle.json | 是 | 清单：schema、created_at、producer、root、chain、entries[]、attestations[]、expires_at、boundary |
+| bundle.json | 是 | 清单：schema、created_at、producer、root、chain、entries[]、attestations[]、expires_at、boundary（+ 可选 decision） |
 | payload/<仓相对路径> | 是 | 成员实体（UTF-8 文本，原字节） |
 | attest/NNNN.json | 是 | 每个成员一份 nf-attest/1 信封 |
 | revocations.json | 否 | 内嵌吊销表（nf-revocation/1），也可用 --revocations 外部给 |
@@ -43,6 +43,7 @@ core.attest，链节域分隔前缀取 core.transparency_log。
 | 6 | payload 里**不得**多出未登记成员（多出来的字节没有回执背书） | invalid |
 | 7 | 清单内**每一份**信封都必须通过，且每个成员至少被一份信封覆盖 | invalid |
 | 8 | hmac 级：同一密钥在场且 mac 匹配 | invalid（缺密钥**不**降级） |
+| 8b | decision（若声明）：形状合法、object 在成员里、与相符信封内同一块、两侧都存在 | invalid |
 | 9 | 包内吊销表（若在）可解析且 schema 正确 | invalid（坏件**不能**当「无吊销」） |
 | 10 | 吊销表命中（按摘要或仓相对路径） | **revoked** |
 | 11 | 时效（expires_at 早于判定时点） | **expired** |
@@ -79,6 +80,11 @@ hmac-sha256 / ssh-sig / sigstore-keyless。
 
 ## 怎么用
 
+> **decision 证据绑定（v0，可选）**：`--decision <json>` 把 `{syscall, policy_digest,
+> verdict, object_sha256}` 绑定进包（声明面 + 相符信封的绑定面，进信封摘要）。可证「与一次
+> cc_check 判定自洽且被签发面覆盖」；**不证策略内容正确**（验方须用自己信任的 policy 重算
+> `policy_digest` 后比对）。换策略/删一侧 = invalid；旧包无 decision 仍为 ok（status=absent）。
+
 ```bash
 # 打包（缺省目标 = 01/02/06/07 四件；缺省落点 = 系统临时目录 nf-evidence.zip——
 # 不往仓库里落盘，要入仓请显式 --out；--key-file 即升级到 hmac-sha256 级）
@@ -89,7 +95,7 @@ python scripts/nf.py evidence pack 01_核心协议.md --key-file <密钥> --issu
 
 ## 跨语言一致性：判定向量集
 
-`results/ccos/evidence_verdict_vectors.json` 把「证据包字节 → 期望判定 + 退出码」固化成 13 条与实现
+`results/ccos/evidence_verdict_vectors.json` 把「证据包字节 → 期望判定 + 退出码」固化成 18 条与实现
 无关的用例：**任何语言**的 `cc_verify` 都可以只读这份 JSON 自证对不对（无需本仓工具链）。
 生成与复核：`python scripts/evidence_vectors.py --write|--check`，判据
 `python -m unittest desktop.tests.test_evidence_vectors`（8 项，含双实现同判）。详见
@@ -106,7 +112,7 @@ python scripts/nf.py evidence verify evidence.zip --kind bundle             # �
 # 机制体检（PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired）
 python scripts/nf.py evidence verify --selfcheck
 
-# 攻击矩阵基准（35 条已知攻击，逐条比对期望判定；写 Markdown 报告）
+# 攻击矩阵基准（38 条已知攻击，逐条比对期望判定；写 Markdown 报告）
 python scripts/nf.py evidence bench
 python scripts/nf.py evidence bench --out /tmp/evidence-bench.md
 ```
@@ -116,7 +122,7 @@ python scripts/nf.py evidence bench --out /tmp/evidence-bench.md
 # 1) 复验机制体检必须绿（抓不到篡改的校验器就是摆设）
 python scripts/nf.py evidence verify --selfcheck          # 退出码 0
 
-# 2) 攻击矩阵基准必须 25/25（任何一条不达期望即 exit 1）
+# 2) 攻击矩阵基准必须 38/38（任何一条不达期望即 exit 1）
 python scripts/nf.py evidence bench
 
 # 3) 逐字节可复现
@@ -125,7 +131,7 @@ SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.
 cmp /tmp/e1.zip /tmp/e2.zip
 
 # 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
-python -m unittest desktop.tests.test_evidence             # 52 项全绿（含零依赖复验器一致性）
+python -m unittest desktop.tests.test_evidence             # 58 项全绿（含零依赖复验器一致性）
 ```
 
 ## 攻击矩阵基准 v0（防「看起来能验」）

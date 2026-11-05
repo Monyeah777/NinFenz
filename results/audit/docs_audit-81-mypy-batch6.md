@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:6a1a39690d83938a2afbe9639033ba76e2dfe734f0ccba367b4849a2622f42ef
+  - protocol/code_metrics_baseline.json:d709dfc0b8d5d5eeeefd9743f1f6986319d0da8df2777d1fd472136f937982ef
 ---
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
 > 重审（2026-11-05）：发布结论器新增静态棘轮步（style/度量/耦合/SAST，约 12 s）
 
 > 重审（2026-11-05）：攻击矩阵重名用例：构造期抑制 zipfile 重名 UserWarning（机器面逐字节一致）

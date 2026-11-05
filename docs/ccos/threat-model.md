@@ -46,6 +46,7 @@
 | 内容**对不对**（合规/事实/情感） | **不承诺**（不跑模型、不做检测） | ABI 非目标 |
 | 载体**物理绑定**（防截屏/防转贴） | **不承诺**（`cc_label` 未实装） | ABI §1 状态标注 |
 | 第三方**零依赖复验** | 能（单文件验证器，fail-closed） | `scripts/nf_verify.py`；双实现一致性判据 |
+| 过了**哪条策略**（decision） | 能到「与一次 cc_check 判定自洽且被签发面覆盖」；**不**证明策略内容正确 | decision 绑定 + 攻击矩阵 decision_policy_swap / decision_strip |
 
 ## 已知缺口（按优先级）
 

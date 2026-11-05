@@ -555,6 +555,9 @@ def _add_parser_production(sub):
     evp.add_argument("--anchor", default="",
                      help="声明继承的外部锚点 JSON（{count, head}）——写进清单，复验方用同一份"
                           "材料核对可证「不是被截断的更早版本」")
+    evp.add_argument("--decision", default="",
+                     help="决策证据块 JSON（可选）：{syscall,policy_digest,verdict,object_sha256}"
+                          "——绑定「这次判定过了哪条策略」，进签名信封摘要")
     evp.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evv = esub.add_parser("verify", help="第三方复验证据包（纯读；不需要仓库）",
                           description="复验：结构→成员摘要→根→包含证明→链→信封→吊销→时效，"
@@ -607,7 +610,7 @@ def _add_parser_production(sub):
     rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
     rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
     rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（35 条已知攻击，逐条比对判定）",
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
                                       "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
@@ -3747,10 +3750,12 @@ def _evidence_pack(args):
                if args.revocations else None)
         anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
                if getattr(args, "anchor", "") else None)
+        dec = (json_doc.load(_rel_out(args.decision), dict, what=args.decision)
+               if getattr(args, "decision", "") else None)
         out = _rel_out(args.out) if args.out else evidence.default_out()
         dest, info = evidence.write(ROOT, out, rels, issuer=args.issuer,
                                     key=key, expires_at=args.expires_at, revocations=rev,
-                                    anchor=anc)
+                                    anchor=anc, decision=dec)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc))
     if args.json:
@@ -3767,7 +3772,7 @@ def _evidence_pack(args):
 
 
 def _evidence_bench(args):
-    """nf evidence bench：攻击矩阵基准（35 条已知攻击，逐条比对期望判定）。"""
+    """nf evidence bench：攻击矩阵基准（38 条已知攻击，逐条比对期望判定）。"""
     import json as _json
 
     from core import evidence

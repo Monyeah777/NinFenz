@@ -233,6 +233,62 @@ def _v_bundle_envelopes(src, doc, payloads, key, res):
     res["level"] = max(levels, key=lambda lv: LEVELS_EV.index(lv) if lv in LEVELS_EV else -1)
 
 
+def _decision_issues(decision, payloads):
+    """决策块形状校验（零依赖版；与 core 同口径）。"""
+    if not isinstance(decision, dict) or not decision:
+        return ["decision 必须是非空对象"]
+    issues = []
+    if sorted(set(decision) - {"syscall", "policy_digest", "verdict", "object_sha256"}):
+        issues.append("decision 含未知字段")
+    if decision.get("syscall") != "cc_check":
+        issues.append("decision.syscall 只支持 cc_check（v0）")
+    for key in ("policy_digest", "object_sha256"):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(decision.get(key) or "")):
+            issues.append(f"decision.{key} 须为 64 位十六进制")
+    if decision.get("verdict") != "ok":
+        issues.append("decision.verdict 只允许 ok（v0）")
+    if str(decision.get("object_sha256") or "") not in {_sha_hex(d) for d in payloads.values()}:
+        issues.append("decision.object_sha256 不在成员摘要里")
+    return issues
+
+
+def _check_decision(src, doc, payloads, res):
+    """决策证据块：声明面（bundle.json）与绑定面（相符信封）必须一致。"""
+    envs = []
+    for name in [str(n) for n in (doc.get("attestations") or [])]:
+        raw = src.read(name)
+        if raw is None:
+            continue
+        _schema, env = _parse_doc(raw)
+        if isinstance(env, dict):
+            envs.append(env)
+    decision = doc.get("decision")
+    if decision is None:
+        if any(isinstance(env.get("decision"), dict) for env in envs):
+            res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）")
+        return
+    issues = _decision_issues(decision, payloads)
+    if issues:
+        res["issues"].extend(issues)
+        return
+    obj = str(decision.get("object_sha256") or "")
+    matched, signed = 0, False
+    for env in envs:
+        if str((env.get("subject") or {}).get("sha256") or "") != obj:
+            continue
+        matched += 1
+        bound = env.get("decision")
+        if not isinstance(bound, dict) or bound != decision:
+            res["issues"].append("decision 声明面与信封绑定面不一致（换策略/删块）")
+            return
+        signed = signed or bool(env.get("signature"))
+    if not matched:
+        res["issues"].append("decision 找不到主体摘要相符的信封")
+        return
+    res["decision"] = decision
+    res["decision_status"] = "bound" if signed else "declared"
+
+
 def _rev_hit(rev, entries):
     """吊销表命中（按摘要或仓相对路径）；表形状不对一律不认。"""
     if not rev or str(rev.get("schema") or "") != REVOCATION_SCHEMA:
@@ -398,6 +454,8 @@ def run_evidence(args) -> int:
                 got = _v_bundle_manifest(src, doc, res, anc)
                 if got is not None:
                     _v_bundle_envelopes(src, doc, got[1], key, res)
+                    if not res["issues"]:
+                        _check_decision(src, doc, got[1], res)
                     if not res["issues"]:
                         embedded, rev_err = _embedded_rev(src) if rev is None else (None, "")
                         if rev_err:      # 坏吊销表 = 定案 invalid（不是「无吊销」）
@@ -671,7 +729,8 @@ def _form(src, kind: str = ""):
 def _res(kind: str):
     return {"kind": kind, "verdict": "invalid", "level": "none", "root": "",
             "head": "", "count": 0, "issues": [], "warnings": [], "expires_at": "",
-            "revoked_by": None, "anchor_ref": None, "anchor_verified": False}
+            "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
+            "decision": None, "decision_status": "absent"}
 
 
 def _envelope_ok(env, payloads, key):
@@ -679,6 +738,9 @@ def _envelope_ok(env, payloads, key):
     if not isinstance(env, dict) or env.get("schema") != ATTEST_SCHEMA:
         return "", "信封 schema 不匹配"
     base = {k: env.get(k) for k in ("schema", "subject", "producer", "issued_at")}
+    decision = env.get("decision")
+    if isinstance(decision, dict) and decision:
+        base["decision"] = decision
     if env.get("envelope_digest") != _sha_hex(canonical_bytes(base)):
         return "", "信封摘要不一致（信封被改）"
     subj = env.get("subject") or {}
