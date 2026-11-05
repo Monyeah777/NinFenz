@@ -13,9 +13,13 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:c0e43ef50c667f2626901255d2cdfdddb66adfcb4e4f0debd524a4dab4770da8
+  - scripts/nf.py:96638c07bf37af9703acde77d7db4ff80a5c8e98dfc3281598d2bee4d599caee
 
 ---
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
 > 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

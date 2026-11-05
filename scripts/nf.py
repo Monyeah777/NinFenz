@@ -489,7 +489,7 @@ def _add_parser_production(sub):
     lab = sub.add_parser("label",
                         help="标注 IR：形状声明与校验（cc_label 的声明层）",
                         description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
-                                    "载体写入走 nf label embed（PNG iTXt）。"
+                                    "载体写入走 nf label embed（PNG iTXt / JPEG APP15）。"
                                     "规则表按 GB 45438 分类，v0 映射待按标准原文复核。")
     lsub = lab.add_subparsers(dest="label_cmd")
     lir = lsub.add_parser("ir", help="由对象 + 声明项组装 nf-label/1 IR",
@@ -513,7 +513,7 @@ def _add_parser_production(sub):
     lwr = lsub.add_parser("write",
                           help="把 IR 写成对象旁的 sidecar（回退载体，embedded 恒 false）",
                           description="sidecar 回退：写 <对象>.label.json，绑定对象摘要。"
-                                      "载体写入只有 PNG iTXt（nf label embed），"
+                                      "载体写入只有 PNG iTXt 与 JPEG APP15（nf label embed），"
                                       "其它格式 embedded 恒 false。"
                                       "只声明、不冒充已嵌入。")
     lwr.add_argument("--object", dest="label_object", default="",
@@ -532,8 +532,10 @@ def _add_parser_production(sub):
                           description="清点 sidecar：给出 (旁车, 对象, embedded) 三元组。")
     lls.add_argument("--root", default=".", help="扫描根（缺省=仓库根）")
     lls.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    lemb = lsub.add_parser("embed", help="把 IR 写进 PNG 载体（iTXt 块；可读回、可证像素未变）",
-                           description="载体写入（只 PNG）：写 AIGC iTXt 块，不改像素、不毁 CRC；"
+    lemb = lsub.add_parser("embed",
+                           help="把 IR 写进载体（PNG iTXt / JPEG APP15；可证像素未变）",
+                           description="载体写入（PNG iTXt / JPEG APP15）：按 magic 选格式；"
+                                       "不改像素、不毁结构；"
                                        "已存在则替换（幂等）。其它格式请用 sidecar 回退。")
     lemb.add_argument("--object", dest="label_object", default="",
                       help="源图（PNG；可以是二进制）")
@@ -591,6 +593,9 @@ def _add_parser_production(sub):
     evv.add_argument("--anchor", default="",
                      help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」；"
                           "不给则只在 warnings 里说明无法证明未截断（不提升强度）")
+    evv.add_argument("--policy-digest", dest="policy_digest", default="",
+                     help="期望策略摘要（64 hex）：与包内 decision.policy_digest 比对"
+                          "（不符判 invalid；包内无 decision 时只给 warning，不判死）")
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
@@ -3244,7 +3249,7 @@ def _cmd_sig(args):
         return _machine_fail(args, str(exc))
 
 def _label_embed(args):
-    """nf label embed：IR → PNG iTXt 载体（不改输入；像素面摘要前后一致）。"""
+    """nf label embed：IR → 载体（PNG iTXt / JPEG APP15；不改输入，像素面摘要前后一致）。"""
     import json as _json
 
     from core import json_doc, label_carrier
@@ -3641,7 +3646,8 @@ def _evidence_verify(args):
         anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
                if getattr(args, "anchor", "") else None)
         res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
-                                  root=root, kind=args.kind, anchor=anc)
+                                  root=root, kind=args.kind, anchor=anc,
+                                  expected_policy_digest=getattr(args, "policy_digest", ""))
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:

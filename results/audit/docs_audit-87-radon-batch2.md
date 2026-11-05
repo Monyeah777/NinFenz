@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
+  - protocol/code_metrics_baseline.json:bac9033b7cc2dea99291a2d423493c058d685a3a8cf0d58973743d2d37109f8b
 ---
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
 > 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
 
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）

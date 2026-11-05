@@ -447,7 +447,7 @@ def _empty_result() -> dict[str, Any]:
     return {"verdict": "invalid", "level": "none", "root": "", "head": "", "count": 0,
             "issues": [], "warnings": [], "created_at": "", "expires_at": "",
             "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
-            "decision": None, "decision_status": "absent"}
+            "decision": None, "decision_status": "absent", "policy_verified": False}
 
 
 def _fill_header(res: dict[str, Any], meta: dict[str, Any]) -> None:
@@ -610,7 +610,8 @@ def _check_attestations(rd: _Reader, meta: dict[str, Any],
 
 
 def _check_decision(rd: _Reader, meta: dict[str, Any],
-                    entries: Sequence[dict[str, Any]], res: dict[str, Any]) -> None:
+                    entries: Sequence[dict[str, Any]], res: dict[str, Any],
+                    expected_policy_digest: str = "") -> None:
     """决策证据块（Q0）：声明面（bundle.json）必须与绑定面（相符信封）一致。
 
     只证明「这份证据绑定过一次 cc_check 的判定」；**不证明策略内容正确**——策略正确性
@@ -633,6 +634,9 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
         if any(isinstance(env.get("decision"), dict) for env in envs):
             res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）"
                                  "（" + GUIDE + "重新 pack 让声明面与绑定面同源）")
+        elif expected_policy_digest:
+            res["warnings"].append("包内无 decision，无法比对策略（只证字节与信封；"
+                                   "" + GUIDE + "需要策略绑定请 pack 时带 decision）")
         return
     issues = attest.decision_issues(decision, [str(e.get("digest") or "") for e in entries])
     if issues:
@@ -658,6 +662,15 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
         return
     res["decision"] = dict(decision)
     res["decision_status"] = "bound" if signed else "declared"
+    if expected_policy_digest:
+        want = expected_policy_digest.strip().lower()
+        got = str(decision.get("policy_digest") or "")
+        if want != got:
+            res["issues"].append(f"decision.policy_digest 与期望策略不符（期望={want[:16]} "
+                                 f"实际={got[:16]}）（{GUIDE}确认包与策略是同一份；"
+                                 "策略内容正确性只能由验方用自己信任的策略比对）")
+            return
+        res["policy_verified"] = True
 
 
 def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
@@ -698,7 +711,8 @@ def _apply_expiry(res: dict[str, Any], at: str) -> bool:
 
 def verify(bundle: str, key: bytes | None = None,
            revocations: dict[str, Any] | None = None,
-           at: str = "", anchor: dict[str, Any] | None = None) -> dict[str, Any]:
+           at: str = "", anchor: dict[str, Any] | None = None,
+           expected_policy_digest: str = "") -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
@@ -735,7 +749,7 @@ def verify(bundle: str, key: bytes | None = None,
         _check_attestations(rd, meta, entries, key, res)
         if res["issues"]:
             return res
-        _check_decision(rd, meta, entries, res)
+        _check_decision(rd, meta, entries, res, expected_policy_digest)
         if res["issues"]:
             return res
         if _apply_revocation(rd, entries, revocations, res):
@@ -980,7 +994,8 @@ def _apply_revocation_doc(revocations: dict[str, Any] | None,
 def verify_any(path: str, key: bytes | None = None,
                revocations: dict[str, Any] | None = None, at: str = "",
                root: str = "", kind: str = "",
-               anchor: dict[str, Any] | None = None) -> dict[str, Any]:
+               anchor: dict[str, Any] | None = None,
+               expected_policy_digest: str = "") -> dict[str, Any]:
     """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
 
     - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
@@ -988,17 +1003,24 @@ def verify_any(path: str, key: bytes | None = None,
     - 判定词表与退出码对所有形态一致：ok / revoked / expired / invalid。
     """
     if os.path.isfile(path) and not zipfile.is_zipfile(path):
-        return _verify_single_json(path, key, revocations, at, root, kind)
-    rd = _Reader(path)
-    try:
-        form, doc = _detect_container(rd, kind)
-        if form == "bundle":
-            return verify(path, key=key, revocations=revocations, at=at, anchor=anchor)
-        if form == "receipts":
-            return _verify_receipts(doc, rd.read, revocations)
-        return _verify_attest(doc, rd.read, key, revocations, at)
-    finally:
-        rd.close()
+        res = _verify_single_json(path, key, revocations, at, root, kind)
+        form = "bundle" if str(res.get("kind") or "") == "bundle" else "other"
+    else:
+        rd = _Reader(path)
+        try:
+            form, doc = _detect_container(rd, kind)
+            if form == "bundle":
+                return verify(path, key=key, revocations=revocations, at=at, anchor=anchor,
+                              expected_policy_digest=expected_policy_digest)
+            if form == "receipts":
+                res = _verify_receipts(doc, rd.read, revocations)
+            else:
+                res = _verify_attest(doc, rd.read, key, revocations, at)
+        finally:
+            rd.close()
+    if expected_policy_digest and form != "bundle":
+        res["warnings"].append("该证据形态不含 decision，无法比对策略（只证字节与信封）")
+    return res
 
 
 def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any] | None,

@@ -108,6 +108,7 @@ python scripts/nf.py evidence verify <信封集.json> --root <成员根> --key-f
 python scripts/nf.py evidence verify evidence.zip --json
 python scripts/nf.py evidence verify evidence.zip --revocations <吊销表.json>
 python scripts/nf.py evidence verify evidence.zip --kind bundle             # 显式指定形态
+python scripts/nf.py evidence verify evidence.zip --policy-digest <64hex>  # 期望策略比对（不符 invalid）
 
 # 机制体检（PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired）
 python scripts/nf.py evidence verify --selfcheck
@@ -131,7 +132,7 @@ SOURCE_DATE_EPOCH=1700000000 python scripts/nf.py evidence pack 01_核心协议.
 cmp /tmp/e1.zip /tmp/e2.zip
 
 # 4) 单测（四词判定各自可达 + 三形态 + 夹带成员 + 基准）
-python -m unittest desktop.tests.test_evidence             # 58 项全绿（含零依赖复验器一致性）
+python -m unittest desktop.tests.test_evidence             # 62 项全绿（含零依赖复验器一致性）
 ```
 
 ## 攻击矩阵基准 v0（防「看起来能验」）

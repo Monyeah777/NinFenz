@@ -69,24 +69,28 @@ nf label list                                                    # 清点仓内�
 写盘走 `atomic_write`：半截旁车会让读者读到假声明。读判据只读旁车 + 对象摘要，不联网、不猜。
 
 
-## PNG 载体（v0 已实装，唯一支持的格式）
+## 载体（v0 已实装：PNG iTXt 与 JPEG APP15）
 
-`nf label embed` 把 IR 写进 PNG 的 `iTXt` 块（keyword = `AIGC`，UTF-8），`nf label extract` 读回。
-纯标准库实现，**只承诺三件能自证的事**：
+`nf label embed` 按 magic 选载体：**PNG → `iTXt` 块**（keyword = `AIGC`，UTF-8）、
+**JPEG → `APP15` 段**（`AIGC\0` + JSON）。`nf label extract` 读回。纯标准库实现，
+**只承诺三件能自证的事**：
 
 | 承诺 | 判据 |
 |---|---|
 | 写进去能读回（同 IR、JSON 语义等价） | `nf label extract` 返回同档位/同声明项 |
-| **不改像素** | 所有 IDAT 块拼接后的 sha256 前后一致 |
-| 写后仍是结构合法 PNG | 每个块 CRC 校验通过、签名正确、IHDR 首 / IEND 尾 |
+| **不改像素** | PNG：所有 IDAT 块拼接后 sha256 一致；JPEG：SOS 到 EOF 的原始字节 sha256 一致 |
+| 写后仍是结构合法的文件 | PNG：每块 CRC + 签名 + IHDR 首 / IEND 尾；JPEG：段边界/长度合法、SOI 起、含 SOS |
 
 ```bash
-nf label embed --object 产出/海报.png --ir 产出/海报.label.json   # 缺省落 海报.png.labeled.png，不改输入
+nf label embed --object 产出/海报.png  --ir 产出/海报.label.json   # 缺省落 海报.png.labeled.png，不改输入
+nf label embed --object 产出/照片.jpg  --ir 产出/照片.label.json   # JPEG 走 APP15，扫描数据原样保留
 nf label extract 产出/海报.png.labeled.png
 ```
 
-**边界**：这是**可见文本载体**（任何人都能剥掉 iTXt 块），不是水印——抗裁剪/抗转码/抗截屏
-都不承诺；JPEG/MP4/PDF 等格式没有实测，一律走 `nf label write` 的 sidecar 回退，不宣称已嵌入。
+**边界**：这是**可见文本载体**（任何人都能剥掉 iTXt 块或 APP15 段），不是水印——抗裁剪/抗转码/
+抗截屏都不承诺；MP4/PDF/WebP 等格式没有实测，一律走 `nf label write` 的 sidecar 回退，不宣称已嵌入。
+真仓图标（多 IDAT / 辅助块）与真 JPEG 的往返各有判据；JPEG 另有一条「Pillow 在场时解码后像素一致」的
+附加判据（环境无 Pillow 则跳过，不冒充已验）。
 
 ## 与 `cc_label` 的关系
 

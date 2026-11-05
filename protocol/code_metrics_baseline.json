@@ -381,7 +381,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1592,
+      "lines": 1614,
       "max_fn_cc": 24,
       "max_fn_lines": 161
     },
@@ -656,7 +656,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_carrier.py": {
-      "lines": 218,
+      "lines": 369,
       "max_fn_cc": 17,
       "max_fn_lines": 48
     },
@@ -1501,7 +1501,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8519,
+      "lines": 8525,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },
@@ -1511,7 +1511,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_verify.py": {
-      "lines": 868,
+      "lines": 881,
       "max_fn_cc": 28,
       "max_fn_lines": 86
     },

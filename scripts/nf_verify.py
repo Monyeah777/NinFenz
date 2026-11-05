@@ -252,7 +252,7 @@ def _decision_issues(decision, payloads):
     return issues
 
 
-def _check_decision(src, doc, payloads, res):
+def _check_decision(src, doc, payloads, res, expected_policy_digest=""):
     """决策证据块：声明面（bundle.json）与绑定面（相符信封）必须一致。"""
     envs = []
     for name in [str(n) for n in (doc.get("attestations") or [])]:
@@ -266,6 +266,8 @@ def _check_decision(src, doc, payloads, res):
     if decision is None:
         if any(isinstance(env.get("decision"), dict) for env in envs):
             res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）")
+        elif expected_policy_digest:
+            res["warnings"].append("包内无 decision，无法比对策略（只证字节与信封）")
         return
     issues = _decision_issues(decision, payloads)
     if issues:
@@ -287,6 +289,13 @@ def _check_decision(src, doc, payloads, res):
         return
     res["decision"] = decision
     res["decision_status"] = "bound" if signed else "declared"
+    if expected_policy_digest:
+        want = expected_policy_digest.strip().lower()
+        got = str(decision.get("policy_digest") or "")
+        if want != got:
+            res["issues"].append("decision.policy_digest 与期望策略不符")
+            return
+        res["policy_verified"] = True
 
 
 def _rev_hit(rev, entries):
@@ -455,7 +464,8 @@ def run_evidence(args) -> int:
                 if got is not None:
                     _v_bundle_envelopes(src, doc, got[1], key, res)
                     if not res["issues"]:
-                        _check_decision(src, doc, got[1], res)
+                        _check_decision(src, doc, got[1], res,
+                                        getattr(args, "policy_digest", ""))
                     if not res["issues"]:
                         embedded, rev_err = _embedded_rev(src) if rev is None else (None, "")
                         if rev_err:      # 坏吊销表 = 定案 invalid（不是「无吊销」）
@@ -506,6 +516,9 @@ def _build_parser():
     ap.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
     ap.add_argument("--anchor", default="",
                     help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」")
+    ap.add_argument("--policy-digest", dest="policy_digest", default="",
+                    help="期望策略摘要（64 hex）：与包内 decision.policy_digest 比对"
+                         "（不符判 invalid；无 decision 只 warning）")
     ap.add_argument("--key-file", default="", help="hmac 锚 / hmac 信封校验用密钥文件")
     ap.add_argument("--ssh-allowed-signers", default="",
                     help="ssh-sig 锚校验用 allowed_signers 文件")
@@ -730,7 +743,7 @@ def _res(kind: str):
     return {"kind": kind, "verdict": "invalid", "level": "none", "root": "",
             "head": "", "count": 0, "issues": [], "warnings": [], "expires_at": "",
             "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
-            "decision": None, "decision_status": "absent"}
+            "decision": None, "decision_status": "absent", "policy_verified": False}
 
 
 def _envelope_ok(env, payloads, key):

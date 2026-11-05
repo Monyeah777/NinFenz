@@ -771,5 +771,44 @@ class TestDecisionBinding(_Base):
             evidence.build(str(self.tmp), ["docs/a.md"], decision=dec)
         self.assertIn("修复指引", str(ctx.exception))
 
+    def test_expected_policy_matches(self):
+        dec = self._decision()
+        path, _info, _data = self._pack(decision=dec)
+        res = evidence.verify(path, expected_policy_digest=dec["policy_digest"])
+        self.assertEqual("ok", res["verdict"], res["issues"])
+        self.assertTrue(res["policy_verified"])
+
+    def test_expected_policy_mismatch_is_invalid(self):
+        path, _info, _data = self._pack(decision=self._decision())
+        res = evidence.verify(path, expected_policy_digest="1" * 64)
+        self.assertEqual("invalid", res["verdict"])
+        self.assertIn("不符", " ".join(res["issues"]))
+
+    def test_expected_without_decision_warns_not_fails(self):
+        path, _info, _data = self._pack()
+        res = evidence.verify(path, expected_policy_digest="1" * 64)
+        self.assertEqual("ok", res["verdict"], res["issues"])
+        self.assertFalse(res["policy_verified"])
+        self.assertTrue(any("无法比对" in w for w in res["warnings"]), res["warnings"])
+
+    def test_standalone_policy_digest_parity(self):
+        import subprocess
+        dec = self._decision()
+        path, _info, _data = self._pack(decision=dec)
+        script = Path(__file__).resolve().parent.parent.parent / "scripts" / "nf_verify.py"
+
+        def run(digest):
+            proc = subprocess.run(
+                [sys.executable, str(script), "--evidence", path, "--json",
+                 "--policy-digest", digest],
+                capture_output=True, text=True, encoding="utf-8", errors="replace")
+            return proc.returncode, json.loads(proc.stdout)["verdict"]
+
+        self.assertEqual((0, "ok"), run(dec["policy_digest"]))
+        self.assertEqual((1, "invalid"), run("1" * 64))
+        core_ok = evidence.verify(path, expected_policy_digest=dec["policy_digest"])
+        core_bad = evidence.verify(path, expected_policy_digest="1" * 64)
+        self.assertEqual(("ok", "invalid"), (core_ok["verdict"], core_bad["verdict"]))
+
 if __name__ == "__main__":
     unittest.main()

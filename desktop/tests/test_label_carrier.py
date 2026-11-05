@@ -5,7 +5,9 @@
 3. 写入后文件仍是**结构合法**的 PNG（签名 + 每块 CRC）。
 另外：不支持的格式必须带指引拒绝，绝不给「写成了」的假象。
 """
+import base64
 import hashlib
+import io
 import json
 import struct
 import subprocess
@@ -22,6 +24,37 @@ from core import label_carrier as lc  # noqa: E402
 from core import label_ir  # noqa: E402
 
 SCRIPT = ROOT / "scripts" / "nf.py"
+
+
+#: 1x1 真实 JPEG（Pillow 生成后固定下来的字节；用 base64 内联是为了零外部文件依赖）
+JPEG_B64 = (
+    "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsK"
+    "CwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQU"
+    "FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAEAAQDASIA"
+    "AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA"
+    "AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3"
+    "ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm"
+    "p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA"
+    "AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx"
+    "BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK"
+    "U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3"
+    "uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD8+qKK"
+    "K+oPnD//2Q=="
+)
+
+
+def make_jpeg() -> bytes:
+    """真实 JPEG 字节（不是手搓外壳）：载体判据必须能处理真文件。"""
+    return base64.b64decode(JPEG_B64)
+
+
+def pytest_importorskip_image():
+    """Pillow 在场就返回 Image（用于「解码后像素一致」这条附加判据）；不在场返回 None。"""
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+    return Image
 
 
 def make_png(width: int = 2, height: int = 2, rgb: tuple = (10, 20, 30)) -> bytes:
@@ -206,6 +239,76 @@ class TestCli(unittest.TestCase):
             proc = self._run("extract", str(src), "--json")
             self.assertEqual(1, proc.returncode)
             self.assertEqual("invalid", json.loads(proc.stdout)["verdict"])
+
+
+class TestJpegCarrier(unittest.TestCase):
+    """JPEG APP15 载体：承诺与 PNG 同形——读得回、扫描数据不动、段结构合法。"""
+
+    def setUp(self):
+        self.jpeg = make_jpeg()
+
+    def test_magic_dispatch(self):
+        self.assertEqual("jpeg", lc.embed(self.jpeg, make_ir(self.jpeg))[1]["format"])
+
+    def test_round_trip(self):
+        out, info = lc.embed(self.jpeg, make_ir(self.jpeg))
+        self.assertFalse(info["replaced"])
+        res = lc.read(out)
+        self.assertEqual("ok", res["verdict"], res["issues"])
+        self.assertEqual("jpeg-app15", res["carrier"])
+        self.assertEqual("GB 45438-2025", res["label"]["standard"])
+
+    def test_scan_data_untouched(self):
+        out, _info = lc.embed(self.jpeg, make_ir(self.jpeg))
+        self.assertEqual(lc.jpeg_scan_digest(self.jpeg), lc.jpeg_scan_digest(out))
+
+    def test_idempotent_and_no_duplicate_segments(self):
+        ir = make_ir(self.jpeg)
+        once, _i1 = lc.embed(self.jpeg, ir)
+        twice, info2 = lc.embed(once, ir)
+        self.assertTrue(info2["replaced"])
+        self.assertEqual(once, twice, "重复嵌入必须幂等（不得堆积 APP15 段）")
+
+    def test_refuses_truncated_jpeg(self):
+        ir = make_ir(self.jpeg)
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(self.jpeg[:len(self.jpeg) // 2], ir)
+        self.assertIn("修复指引", str(ctx.exception))
+
+    def test_unsupported_format_rejected(self):
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(b"RIFF0000WEBPVP8 ", make_ir(self.jpeg))
+        self.assertIn("PNG", str(ctx.exception))
+        self.assertIn("JPEG", str(ctx.exception))
+
+    def test_pillow_can_still_decode_and_pixels_match(self):
+        pil = pytest_importorskip_image()
+        if pil is None:
+            self.skipTest("环境无 Pillow：跳过解码面判据（结构面已由其它判据覆盖）")
+        out, _info = lc.embed(self.jpeg, make_ir(self.jpeg))
+        a = pil.open(io.BytesIO(self.jpeg))
+        b = pil.open(io.BytesIO(out))
+        self.assertEqual(a.size, b.size)
+        self.assertEqual(list(a.convert("RGB").getdata()), list(b.convert("RGB").getdata()))
+
+
+class TestRealPngFixtures(unittest.TestCase):
+    """真仓里的真 PNG（图标/OG 图）：载体必须能处理多 IDAT、辅助块等真实结构。"""
+
+    FIXTURES = ("packaging/mcp/assets/icon-400.png", "site/assets/og.png")
+
+    def test_embed_round_trip_on_repo_pngs(self):
+        pairs = [(name, (ROOT / name)) for name in self.FIXTURES]
+        present = [(n, p) for n, p in pairs if p.is_file()]
+        self.assertTrue(present, "仓库里找不到真 PNG 夹具（判据面被缩小）")
+        for name, path in present:
+            png = path.read_bytes()
+            ir = make_ir(png, path.name)
+            out, _info = lc.embed(png, ir)
+            self.assertEqual(lc.pixel_digest(png), lc.pixel_digest(out), name)
+            res = lc.read(out)
+            self.assertEqual("ok", res["verdict"], f"{name}: {res['issues']}")
+            self.assertEqual(ir["object"]["digest"], res["label"]["object"]["digest"], name)
 
 
 if __name__ == "__main__":

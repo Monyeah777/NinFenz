@@ -124,7 +124,7 @@ def _structure_issues(chunks: list[tuple[str, bytes]]) -> list[str]:
     return issues
 
 
-def embed(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+def _embed_png(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     """把 IR 写进 PNG 的 AIGC iTXt 块 → (新字节, 摘要信息)。已存在则**替换**（幂等）。"""
     issues = label_ir.validate(ir)["issues"]
     if issues:
@@ -174,7 +174,7 @@ def embed(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
                  "replaced": replaced}
 
 
-def read(png: bytes) -> dict[str, Any]:
+def _read_png(png: bytes) -> dict[str, Any]:
     """读回载体里的 IR → {ok, verdict, label, issues}（形状与 sidecar.read 对齐）。"""
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "label": None,
                            "carrier": "itxt", "issues": []}
@@ -202,6 +202,157 @@ def read(png: bytes) -> dict[str, Any]:
         return res
     res["issues"].append("载体里没有 AIGC iTXt 块（" + GUIDE + "该文件从未写入标识；"
                          "若声明来自 sidecar，请用 nf label read 核对）")
+    return res
+
+
+# ---------------------------------------------------------------- JPEG（APP15 文本段）
+
+JPEG_SOI = b"\xff\xd8"
+APP15 = 0xEF
+#: JPEG 段：APP15 里放 "AIGC\0" + JSON（UTF-8）。为什么是 APP15：应用私有段，解码器按规范跳过。
+JPEG_PREFIX = b"AIGC\x00"
+_JPEG_STANDALONE = frozenset({0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7})
+
+
+def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes]], bytes]:
+    """JPEG → (SOS 之前的段列表 [(marker, payload)], 从 SOS 到 EOF 的原始字节)。
+
+    SOS 之后是熵编码数据，**必须原样保留**——载体承诺「不改扫描数据」的判据就是它。
+    """
+    if not data.startswith(JPEG_SOI):
+        raise CarrierError("不是 JPEG（缺 SOI）(" + GUIDE + "JPEG 必须以 FFD8 开头；"
+                           "其它格式请用 nf label write 的 sidecar 回退）")
+    pos = len(JPEG_SOI)
+    segs: list[tuple[int, bytes]] = []
+    n = len(data)
+    while pos < n:
+        if data[pos] != 0xFF:
+            raise CarrierError(f"JPEG 段边界不符（偏移 {pos} 应为 0xFF）("
+                               + GUIDE + "文件损坏，重新导出原图再写）")
+        while pos < n and data[pos] == 0xFF:      # 填充字节 0xFF 合法，跳过
+            pos += 1
+        if pos >= n:
+            break
+        marker = data[pos]
+        pos += 1
+        if marker == 0xDA:                        # SOS：后面全是熵数据
+            if pos + 2 > n:
+                raise CarrierError("JPEG SOS 段头截断（" + GUIDE + "文件不完整）")
+            seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
+            if pos + seg_len > n:
+                raise CarrierError("JPEG SOS 段数据截断（" + GUIDE + "文件不完整）")
+            return segs, data[pos - 2:]           # 从 SOS 标记起原样返回（含 FFDA 与长度）
+        if marker in _JPEG_STANDALONE:
+            segs.append((marker, b""))
+            continue
+        if pos + 2 > n:
+            raise CarrierError("JPEG 段长度截断（" + GUIDE + "文件不完整）")
+        seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
+        if seg_len < 2 or pos + seg_len > n:
+            raise CarrierError(f"JPEG 段长度非法（marker=0x{marker:02X}）("
+                               + GUIDE + "文件损坏，重新导出原图再写）")
+        segs.append((marker, data[pos + 2:pos + seg_len]))
+        pos += seg_len
+    raise CarrierError("JPEG 缺 SOS（" + GUIDE + "文件不完整，重新导出原图再写）")
+
+
+def jpeg_scan_digest(data: bytes) -> str:
+    """扫描数据摘要：SOS 到 EOF 的原始字节 sha256（判「不改扫描数据」）。"""
+    import hashlib
+    _segs, tail = _jpeg_split(data)
+    return hashlib.sha256(tail).hexdigest()
+
+
+def _jpeg_seg(marker: int, payload: bytes) -> bytes:
+    body = JPEG_PREFIX + payload if marker == APP15 else payload
+    return b"\xff" + bytes([marker]) + struct.pack(">H", len(body) + 2) + body
+
+
+def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """把 IR 写进 JPEG 的 APP15 段（幂等替换；扫描数据原样保留）。"""
+    segs, tail = _jpeg_split(jpeg)
+    before = jpeg_scan_digest(jpeg)
+    payload = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    if len(payload) > 8000:
+        raise CarrierError(f"IR 太大（{len(payload)} 字节，上限 8000）（"
+                           + GUIDE + "减小声明项或改用 sidecar 回退）")
+    app15 = _jpeg_seg(APP15, payload)
+    kept: list[bytes] = []
+    replaced = False
+    insert_at = 0                    # 原文件没有我们的段时，插在 APP0/APP1 之后
+    for marker, body in segs:
+        if marker == APP15 and body.startswith(JPEG_PREFIX):
+            if not replaced:          # 幂等：原位替换，多余的旧段丢弃（防重复堆积）
+                kept.append(app15)
+                replaced = True
+            continue
+        kept.append(_jpeg_seg(marker, body))
+        if not replaced and marker in (0xE0, 0xE1):
+            insert_at = len(kept)
+    if not replaced:
+        kept.insert(insert_at, app15)
+    out = JPEG_SOI + b"".join(kept) + tail
+    after = jpeg_scan_digest(out)
+    if after != before:
+        raise CarrierError("内部错误：写入改动了扫描数据（" + GUIDE
+                           + "这是判据 bug，别发布这份产物）")
+    return out, {"keyword": KEYWORD, "format": "jpeg", "bytes": len(out),
+                 "scan_digest": before, "replaced": replaced}
+
+
+def _read_jpeg(jpeg: bytes) -> dict[str, Any]:
+    res: dict[str, Any] = {"ok": False, "verdict": "invalid", "label": None,
+                           "carrier": "jpeg-app15", "issues": []}
+    try:
+        segs, _tail = _jpeg_split(jpeg)
+    except CarrierError as exc:
+        res["issues"].append(str(exc))
+        return res
+    for marker, body in segs:
+        if marker != APP15 or not body.startswith(JPEG_PREFIX):
+            continue
+        text = body[len(JPEG_PREFIX):].decode("utf-8", "replace")
+        try:
+            doc = json_doc.loads(text, dict, what="JPEG APP15 里的 AIGC 声明")
+        except ValueError as exc:
+            res["issues"].append(str(exc))
+            return res
+        issues = label_ir.validate(doc)["issues"]
+        if issues:
+            res["issues"].append("载体里的 IR 不合法：" + "；".join(issues[:3]))
+            return res
+        res.update({"ok": True, "verdict": "ok", "label": doc, "embedded": True})
+        return res
+    res["issues"].append("载体里没有 AIGC APP15 段（" + GUIDE + "该文件从未写入标识；"
+                         "若声明来自 sidecar，请用 nf label read 核对）")
+    return res
+
+
+# ---------------------------------------------------------------- 分发（格式按 magic）
+
+def embed(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """按 magic 选载体：PNG → iTXt；JPEG → APP15。其它格式一律带指引拒绝（不猜）。"""
+    issues = label_ir.validate(ir)["issues"]
+    if issues:
+        raise CarrierError("标注 IR 不合法：" + "；".join(issues[:3])
+                           + f"（{GUIDE}先 nf label validate 修好，再写载体）")
+    if data.startswith(PNG_SIG):
+        out, info = _embed_png(data, ir)
+        return out, {**info, "format": "png"}
+    if data.startswith(JPEG_SOI):
+        return _embed_jpeg(data, ir)
+    raise CarrierError("不支持的载体格式（" + GUIDE + "本件只写 PNG 与 JPEG；"
+                       "其它格式请用 nf label write 的 sidecar 回退）")
+
+
+def read(data: bytes) -> dict[str, Any]:
+    """按 magic 读载体；不认识就如实 invalid。"""
+    if data.startswith(PNG_SIG):
+        return _read_png(data)
+    if data.startswith(JPEG_SOI):
+        return _read_jpeg(data)
+    res = {"ok": False, "verdict": "invalid", "label": None, "issues": []}
+    res["issues"].append("不认识的载体格式（" + GUIDE + "本件只读 PNG 与 JPEG）")
     return res
 
 

@@ -152,6 +152,8 @@ maps_to = `nf evidence verify <target>` / `nf evidence bench`；**零依赖参�
   | 9 | 吊销表命中 | **`revoked`** |
   | 10 | 时效（`expires_at` / `--at`）已过 | **`expired`** |
 
+- **期望策略比对（r2）**：`--policy-digest <64hex>` 与包内 `decision.policy_digest` 比对——
+  不符即 `invalid`；包内无 decision 时只 warning（`policy_verified=false`），不判死。
 - **decision 证据绑定（v0）**：包可带可选 `decision{syscall, policy_digest, verdict,
   object_sha256}`，声明面在 `bundle.json`、绑定面在 `object_sha256` 相符的那份信封里（进信封摘要）。
   只能证「与一次 cc_check 判定自洽且被签发面覆盖」（`decision_status=bound`）；**不证明策略内容正确**——
