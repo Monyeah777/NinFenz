@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
+  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

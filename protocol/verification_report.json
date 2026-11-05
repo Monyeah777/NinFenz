@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 129,
+        "raises": 130,
         "sinks": 20
       },
       "status": "pass",
@@ -372,7 +372,7 @@
         "files": 327,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
-        "max_lines": 8516
+        "max_lines": 8519
       },
       "status": "pass",
       "warns": 0
@@ -429,7 +429,7 @@
       "source": "coupling_metrics.scan",
       "stats": {
         "cycles": 0,
-        "metrics_drift": 2,
+        "metrics_drift": 0,
         "metrics_missing": 0,
         "metrics_recorded": 271,
         "modules": 271,
@@ -537,7 +537,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9f7c71bef591155a1b71fac08486832c6ad2f55fefe2b63db8e059f032de1bdb",
+  "root_digest": "207484c8038602628146d9634b5ba7c37d6c6ed791142477b5779bb5b6f8b630",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

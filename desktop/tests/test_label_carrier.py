@@ -79,7 +79,7 @@ class TestEmbedRead(unittest.TestCase):
         comment = b"Comment" + b"\x00" * 5 + b"hello"
         extra = (lc.PNG_SIG + lc._chunk("IHDR", ihdr) + lc._chunk("iTXt", comment)
                  + lc._chunk("IDAT", idat) + lc._chunk("IEND", b""))
-        out, _info = lc.embed(extra, make_ir(png))
+        out, _info = lc.embed(extra, make_ir(extra))
         blocks = [b for t, b in lc._iter_chunks(out) if t == "iTXt"]
         self.assertEqual(2, len(blocks), "别人的 iTXt 块必须原样保留")
         self.assertTrue(any(b.startswith(b"Comment") for b in blocks))
@@ -110,6 +110,69 @@ class TestEmbedRead(unittest.TestCase):
         res = lc.read(make_png())
         self.assertEqual("invalid", res["verdict"])
         self.assertIn("从未写入", " ".join(res["issues"]))
+
+
+class TestHardening(unittest.TestCase):
+    """入库复核（2026-11-06）补的负例：对象绑定 / 空壳 / 畸形块 / 落点 / 深度。"""
+
+    def test_refuses_ir_for_other_object(self):
+        png, other = make_png(), make_png(rgb=(1, 2, 3))
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(png, make_ir(other))
+        self.assertIn("不符", str(ctx.exception))
+        self.assertIn("修复指引", str(ctx.exception))
+
+    def test_refuses_signature_only_shell(self):
+        shell = lc.PNG_SIG
+        ir = label_ir.build("shell.png", hashlib.sha256(shell).hexdigest(), items=[
+            {"face": "explicit", "kind": "text", "where": "start", "value": "AI 生成"},
+            {"face": "implicit", "kind": "metadata", "key": "AIGC", "value": "1"}])
+        with self.assertRaises(lc.CarrierError) as ctx:
+            lc.embed(shell, ir)
+        self.assertIn("没有任何块", str(ctx.exception))
+
+    def test_refuses_out_equals_src(self):
+        with tempfile.TemporaryDirectory(prefix="nf_carrier3_") as tmp:
+            src = str(Path(tmp, "a.png"))
+            Path(src).write_bytes(make_png())
+            with self.assertRaises(lc.CarrierError) as ctx:
+                lc.embed_file(src, make_ir(Path(src).read_bytes()), src)
+            self.assertIn("落点不能等于源文件", str(ctx.exception))
+
+    def test_read_malformed_aigc_block_is_invalid(self):
+        bad = (lc.PNG_SIG + lc._chunk("IHDR", b"\x00" * 13)
+               + lc._chunk("iTXt", b"AIGC") + lc._chunk("IEND", b""))
+        res = lc.read(bad)
+        self.assertEqual("invalid", res["verdict"])
+        self.assertIn("结构不完整", " ".join(res["issues"]))
+
+    def test_read_deep_nesting_is_invalid_not_crash(self):
+        deep = "{" * 200 + "0" + "}" * 200
+        png = (lc.PNG_SIG + lc._chunk("IHDR", b"\x00" * 13)
+               + lc._chunk("iTXt", lc._itxt_body(deep)) + lc._chunk("IEND", b""))
+        res = lc.read(png)
+        self.assertEqual("invalid", res["verdict"])
+
+
+class TestCliIrBinary(unittest.TestCase):
+    """用户流程判据：nf label ir 必须能吃二进制对象（否则载体 CLI 无法端到端使用）。"""
+
+    def test_ir_accepts_png_object(self):
+        items = [{"face": "explicit", "kind": "text", "where": "start", "value": "AI 生成"},
+                 {"face": "implicit", "kind": "metadata", "key": "AIGC", "value": "1"}]
+        with tempfile.TemporaryDirectory(prefix="nf_carrier4_") as tmp:
+            src = Path(tmp, "poster.png")
+            src.write_bytes(make_png())
+            items_path = Path(tmp, "items.json")
+            items_path.write_text(json.dumps(items, ensure_ascii=False), encoding="utf-8")
+            proc = subprocess.run([sys.executable, str(SCRIPT), "label", "ir", str(src),
+                                   "--items", str(items_path), "--json"],
+                                  cwd=str(ROOT), capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace")
+            self.assertEqual(0, proc.returncode, proc.stderr[-300:])
+            doc = json.loads(proc.stdout)
+            self.assertEqual(hashlib.sha256(src.read_bytes()).hexdigest(),
+                             doc["object"]["digest"])
 
 
 class TestCli(unittest.TestCase):

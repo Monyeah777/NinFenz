@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
+  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

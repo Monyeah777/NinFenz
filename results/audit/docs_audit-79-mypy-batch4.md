@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:2beea53297ddd9e3e260df12884989319809a0b1c997da050949ea2efab23788
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
+  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

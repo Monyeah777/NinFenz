@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:99b46146e0ebc1034b1a13702b158085beec70557bf791f5821d90ec9b7f6f2e
+  - scripts/nf.py:c0e43ef50c667f2626901255d2cdfdddb66adfcb4e4f0debd524a4dab4770da8
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
 
 > 重审（2026-11-06）：注册 --decision 参数进编码/路径闸门（其提交遗漏）

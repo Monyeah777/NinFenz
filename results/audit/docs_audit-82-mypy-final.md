@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
+  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

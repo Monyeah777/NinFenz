@@ -1,4 +1,4 @@
-"""标注 IR v0（`cc_label` 的**形状层**）：只描述「该有哪些标识」，不写载体。
+"""标注 IR v0（`cc_label` 的**形状层**）：只描述「该有哪些标识」；载体写入在 core/label_carrier。
 
 为什么只到 IR（2026-11-05 实测）：本仓没有标识写入/载体注入子系统，任何「已写入水印 / 已嵌入元数据」
 的宣称都不可证。故本模块只做三件事：
@@ -128,7 +128,7 @@ def _check_items(doc: dict[str, Any], issues: list[str], warnings: list[str]) ->
         issues.append("carrier.embedded 必须是布尔值（" + GUIDE + "true 表示自称已写入载体）")
         return
     if embedded:
-        warnings.append("carrier.embedded=true 只是**自称**：本仓没有载体写入子系统，"
+        warnings.append("carrier.embedded=true 只是**自称**：本仓载体写入只覆盖 PNG iTXt，"
                         "本判定无法证明标识真的写进了文件——不要把它当已实装")
 
 

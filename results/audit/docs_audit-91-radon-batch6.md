@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:083f214824563a12cea8b18e442fb35871bdbea85e552aa2eee39df934184c66
+  - protocol/code_metrics_baseline.json:e8aa3da69b1a403cab8a87527f770049091b5e65f3bfb1882daf34b417a33892
 ---
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
 > 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
 
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）

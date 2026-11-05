@@ -6353,7 +6353,7 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "标注 IR v0（`cc_label` 的**形状层**）：只描述「该有哪些标识」，不写载体。",
+      "function": "标注 IR v0（`cc_label` 的**形状层**）：只描述「该有哪些标识」；载体写入在 core/label_carrier。",
       "path": "desktop/src/core/label_ir.py",
       "role": "prod",
       "rule": "auto:R-core"
@@ -12210,7 +12210,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6028d38e9c07e922f9c9d001fc35e0f049a3b05ca1d475121788384b46cab7f3",
+  "root_digest": "d2f708800b336757849843c1fdc1e0bbf0214541a1272ea24ad0654afeb38187",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 213,

@@ -1,8 +1,9 @@
 """标注 sidecar v0：cc_label 的**回退载体**（嵌入载体做不到时，标识放进旁车文件）。
 
-为什么是 sidecar 而不是水印（2026-11-05）：本仓没有标识写入子系统，任何「已写入水印/已嵌入元数据」
-的宣称都不可证。ABI 的 cc_label 输出里本来就有 embedded 字段与「embedded=false（回退 sidecar）」
-的语义——本模块把那半边做实，并且**永远 embedded=false**：它证明的是「这份声明与这份对象对得上」，
+为什么是 sidecar 而不是水印（2026-11-05）：本仓载体写入只覆盖 PNG iTXt，任何
+「已写入水印/已嵌入元数据」的宣称都不可证。ABI 的 cc_label 输出里本来就有 embedded
+字段与「embedded=false（回退 sidecar）」的语义——本模块把那半边做实，并且**永远
+embedded=false**：它证明的是「这份声明与这份对象对得上」，
 不是「对象里真的带标识」。
 
 纪律：
@@ -61,7 +62,7 @@ def write(object_path: str, ir: dict[str, Any], out: str = "") -> tuple[str, dic
         "label": ir,
         "embedded": EMBEDDED,
         "boundary": ("旁车只声明「该对象该带哪些标识」并与对象摘要绑定；"
-                     "不证明载体里写入了任何标识（载体写入未实装）"),
+                     "不证明载体里写入了任何标识（侧车不是嵌入；PNG 嵌入走 nf label embed）"),
     }
     dest = out or sidecar_path(src)
     atomic_write.write_text(dest, json.dumps(doc, ensure_ascii=False, indent=2,

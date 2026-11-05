@@ -13,7 +13,9 @@
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import struct
 import zlib
 from typing import Any
@@ -24,6 +26,8 @@ PNG_SIG = b"\x89PNG\r\n\x1a\n"
 KEYWORD = "AIGC"                      # iTXt 关键字：载体里能看见的锚点
 GUIDE = "修复指引："
 SCHEMA = "nf-label/1"
+#: 输入对象上限（防 OOM）：常规图远小于此；超大件请先缩，再写载体
+MAX_INPUT_BYTES = 64 * 1024 * 1024
 
 
 class CarrierError(ValueError):
@@ -68,12 +72,18 @@ def _itxt_body(text: str) -> bytes:
 
 
 def _itxt_text(body: bytes) -> str | None:
-    """iTXt 体 → 文本；keyword 不是 AIGC 就返回 None（别人的块不碰）。"""
+    """iTXt 体 → 文本；keyword 不是 AIGC 就返回 None（别人的块不碰）。
+
+    AIGC 关键字但结构不完整 → **fail-closed**：旧实现返回 None 会被当成「不是我们的块」，
+    于是畸形 AIGC 块被静默跳过、再插一块同 keyword，读面从此不确定。
+    """
+    keyword = body.split(b"\x00", 1)[0].decode("latin-1", "replace")
+    if keyword != KEYWORD:
+        return None
     parts = body.split(b"\x00", 5)
     if len(parts) < 6:
-        return None
-    if parts[0].decode("latin-1", "replace") != KEYWORD:
-        return None
+        raise CarrierError("AIGC iTXt 块结构不完整（" + GUIDE + "载体被改坏——按 invalid 处理，"
+                           "不要静默跳过再插同 keyword 块）")
     try:
         return parts[5].decode("utf-8")
     except UnicodeDecodeError:
@@ -91,6 +101,29 @@ def pixel_digest(data: bytes) -> str:
     return h.hexdigest()
 
 
+def content_digest(png: bytes) -> str:
+    """内容摘要 = 去掉本件 AIGC iTXt 块后的 PNG 字节摘要（IR.object.digest 的比对基准）。
+
+    为什么不是 sha256(整文件)：已标注的文件再写一次（幂等）时整文件带着标识；IR 描述的是
+    「写入前内容」，把本件标签块去掉后的字节序列就是那个内容。
+    """
+    kept = [(t, b) for t, b in _iter_chunks(png)
+            if not (t == "iTXt" and _itxt_text(b) is not None)]
+    return hashlib.sha256(PNG_SIG + b"".join(_chunk(t, b) for t, b in kept)).hexdigest()
+
+
+def _structure_issues(chunks: list[tuple[str, bytes]]) -> list[str]:
+    """embed 前的结构闸：IHDR 首 / IEND 尾 / 至少两个块（空壳或半截一律拒）。"""
+    if not chunks:
+        return ["PNG 没有任何块（空壳/仅签名）（" + GUIDE + "换一份真实 PNG）"]
+    issues: list[str] = []
+    if chunks[0][0] != "IHDR":
+        issues.append("首个块不是 IHDR（" + GUIDE + "换一份真实 PNG，不要手工拼签名）")
+    if chunks[-1][0] != "IEND":
+        issues.append("末块不是 IEND（" + GUIDE + "文件被截断或尾部有多余字节，重新导出）")
+    return issues
+
+
 def embed(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     """把 IR 写进 PNG 的 AIGC iTXt 块 → (新字节, 摘要信息)。已存在则**替换**（幂等）。"""
     issues = label_ir.validate(ir)["issues"]
@@ -101,7 +134,17 @@ def embed(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     want = str(obj.get("digest") or "")
     if not want:
         raise CarrierError("IR 缺 object.digest（" + GUIDE + "用 nf label ir 针对该文件重编 IR）")
+    if len(png) > MAX_INPUT_BYTES:
+        raise CarrierError(f"输入对象超过上限（{len(png)} > {MAX_INPUT_BYTES} 字节）"
+                           f"（{GUIDE}先缩小对象；载体只写常规图）")
     chunks = _iter_chunks(png)
+    struct_issues = _structure_issues(chunks)
+    if struct_issues:
+        raise CarrierError("；".join(struct_issues))
+    got = content_digest(png)
+    if want != got:
+        raise CarrierError("IR 的 object.digest 与输入对象不符（" + GUIDE + "IR 必须针对**这份**"
+                           "对象生成（nf label ir <对象>）；声明的是写入前内容，不是任意对象）")
     before = pixel_digest(png)
     payload = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
     if len(payload) > 8000:
@@ -143,9 +186,10 @@ def read(png: bytes) -> dict[str, Any]:
             if text is None:
                 continue
             try:
-                doc = json_doc.loads(text, dict, what="载体里的 AIGC 声明")
+                doc = json_doc.loads(text, dict, what="载体 IR")
             except ValueError as exc:
-                res["issues"].append(str(exc))
+                res["issues"].append(f"AIGC iTXt 不是合法 IR JSON：{exc}"
+                                     f"（{GUIDE}载体被改坏，按 invalid 处理）")
                 return res
             issues = label_ir.validate(doc)["issues"]
             if issues:
@@ -163,6 +207,8 @@ def read(png: bytes) -> dict[str, Any]:
 
 def embed_file(src: str, ir: dict[str, Any], out: str) -> dict[str, Any]:
     """文件级写入：读原图 → 嵌入 → 原子写新文件（**不改输入**）。"""
+    if os.path.abspath(src) == os.path.abspath(out):
+        raise CarrierError("落点不能等于源文件（" + GUIDE + "本件承诺不改输入；请换一个 --out）")
     with open(src, "rb") as fh:
         png = fh.read()
     if not png:

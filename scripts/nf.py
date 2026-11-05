@@ -487,15 +487,16 @@ def _add_parser_production(sub):
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
     lab = sub.add_parser("label",
-                        help="标注 IR：形状声明与校验（cc_label 的声明层，不写载体）",
+                        help="标注 IR：形状声明与校验（cc_label 的声明层）",
                         description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
-                                    "**不写载体**（本仓没有标识写入子系统，别把声明当已实装）。"
+                                    "载体写入走 nf label embed（PNG iTXt）。"
                                     "规则表按 GB 45438 分类，v0 映射待按标准原文复核。")
     lsub = lab.add_subparsers(dest="label_cmd")
     lir = lsub.add_parser("ir", help="由对象 + 声明项组装 nf-label/1 IR",
                           description="组装 IR：对象摘要 + 显式/隐式声明项 → nf-label/1。"
                                       "纯数据、无时间戳（同输入逐字节一致）。")
-    lir.add_argument("object", help="对象文件路径（仓相对或绝对）")
+    lir.add_argument("label_object", metavar="OBJECT",
+                     help="对象文件路径（仓相对或绝对；可以是二进制——载体只写 PNG）")
     lir.add_argument("--level", default="minimal", choices=("minimal", "full"),
                      help="档位：minimal=显式文字+隐式元数据；full=再要语音/显式元数据/水印")
     lir.add_argument("--contract", default="", help="关联契约 id（写进 IR，便于溯源）")
@@ -512,7 +513,8 @@ def _add_parser_production(sub):
     lwr = lsub.add_parser("write",
                           help="把 IR 写成对象旁的 sidecar（回退载体，embedded 恒 false）",
                           description="sidecar 回退：写 <对象>.label.json，绑定对象摘要。"
-                                      "载体写入未实装，故 embedded 恒 false。"
+                                      "载体写入只有 PNG iTXt（nf label embed），"
+                                      "其它格式 embedded 恒 false。"
                                       "只声明、不冒充已嵌入。")
     lwr.add_argument("--object", dest="label_object", default="",
                      help="被标注对象（仓相对或绝对；可以是二进制，如图片/音视频）")
@@ -3304,7 +3306,7 @@ def _rel_display_keys(info):
 
 
 def _cmd_label(args):
-    """nf label：标注 IR 的派发（声明层 + sidecar 回退；**不写载体**）。"""
+    """nf label：标注 IR 的派发（声明层 + sidecar + PNG 载体；载体写入走 embed）。"""
     sub = getattr(args, "label_cmd", "") or ""
     if sub == "ir":
         return _label_ir(args)
@@ -3348,7 +3350,7 @@ def _label_write(args):
     else:
         print(f"== nf label write（{_rel_display(src)}）==")
         print(f"  旁车：{_rel_display(dest)} · 绑定摘要 {info['digest'][:16]}")
-        print("  embedded=false：载体写入未实装——这只声明「该带哪些标识」，不冒充已嵌入")
+        print("  embedded=false：sidecar 不是嵌入——这只声明「该带哪些标识」，不冒充已嵌入")
     return 0
 
 
@@ -3402,7 +3404,8 @@ def _label_ir(args):
     import json as _json
 
     from core import atomic_write, label_ir
-    src = _rel_out(str(args.object)) if not os.path.isabs(str(args.object)) else str(args.object)
+    obj = str(args.label_object)
+    src = _rel_out(obj) if not os.path.isabs(obj) else obj
     if not os.path.isfile(src):
         return _machine_fail(args, f"对象不是文件：{src}（修复指引：先 ls 定位；目录请逐个列出）",
                              2)

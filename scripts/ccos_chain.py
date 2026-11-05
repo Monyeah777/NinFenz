@@ -6,7 +6,7 @@
 证据包里的成员 digest、复现轨迹第一步的 output，必须**完全相同**。任何一环换了字节，
 链条就在那里断——那时四个命令仍可能各自返回 0，但「同一条链」已经不成立。
 
-缺环如实标注：cc_label 环节本仓不存在（labeling 子系统缺位，2026-11-04 实测），
+缺环如实标注：cc_label 环未接入（PNG iTXt 载体已实装，但链尚未调用 label 环；2026-11-06 实测），
 故链从 cc_check 起，输出里显式写 missing 字段——不假装七环齐全。
 """
 from __future__ import annotations
@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 from core import attest, check_policy, evidence, json_doc  # noqa: E402
 
 CHAIN_SCHEMA = "nf-ccos-chain/1"
-#: 链上缺的环（本仓无 labeling 子系统；不得凭空补）
+#: 链上缺的环（PNG 载体已实装但链未接；不得凭空补或凭文档移除）
 MISSING = ("cc_label",)
 
 
