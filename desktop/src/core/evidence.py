@@ -622,7 +622,7 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
         raw = rd.read(name)
         if raw is None:
             continue
-        try:
+        try:            # 坏信封由上游 fail-closed 判死，这里跳过不重复记账
             env = json_doc.loads(raw.decode(), dict, what="信封")
         except (ValueError, UnicodeDecodeError):
             continue
