@@ -120,6 +120,22 @@ class AbiDocConsistencyTest(unittest.TestCase):
                     hits.append(f"{path.name}:{i}")
         self.assertEqual(hits, [], "docs/ccos 不得复用已废止的 L0–L5 词汇（修复指引：改用四阶）")
 
+
+    def test_documented_vector_count_matches_vectors(self):
+        """文档写的「N 条向量/固定用例」必须等于向量集实际 count（补向量忘改文档即红）。"""
+        vectors = json.loads((_REPO / "results/ccos/evidence_verdict_vectors.json")
+                             .read_text(encoding="utf-8"))
+        count = int(vectors["count"])
+        bad = []
+        for path in sorted(_DOCS.glob("*.md")):
+            for i, line in enumerate(_read(path).splitlines(), 1):
+                if not any(k in line for k in ("向量", "固定用例", "与实现")):
+                    continue
+                for m in re.finditer(r"(\d+)\s*条", line):
+                    if int(m.group(1)) != count:
+                        bad.append(f"{path.name}:{i} 写 {m.group(1)} 条，向量集实为 {count}")
+        self.assertEqual(bad, [], "向量条数口径漂移（修复指引：改文档数字或补向量）")
+
     def test_maps_to_commands_are_reachable(self):
         cmds = set(re.findall(r"`nf ([a-z][a-z0-9-]*)", self.abi))
         self.assertTrue(cmds, "未从 abi-v0 解析到任何 nf 命令")
