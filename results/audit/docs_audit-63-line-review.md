@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:097431168233ee8811fd5dca34883d93b82c55254cfd5f23d5e5333734c9a00f
+  - scripts/nf.py:1357533fd1e3bdcafa07ee0807510bc7959044cdf7dd13145d96e363eb48765e
 ---
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
 
 > 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序

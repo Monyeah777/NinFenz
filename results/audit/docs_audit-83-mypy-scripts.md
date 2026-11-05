@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:097431168233ee8811fd5dca34883d93b82c55254cfd5f23d5e5333734c9a00f
+  - scripts/nf.py:1357533fd1e3bdcafa07ee0807510bc7959044cdf7dd13145d96e363eb48765e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:d99bc71885c9e09da236f2df23fd61555d2f8bb7a41bea50c1b81b21af0f86ae
+  - protocol/code_metrics_baseline.json:c75c54242d3d72891a0a74b5436e56f018cf30207d65d1bfa6c981c832e99709
 ---
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
 > 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
 
 > 重审（2026-11-05）：发布结论器新增新鲜度步（行数上限随之重冻 328→365）

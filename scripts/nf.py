@@ -5328,7 +5328,8 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
                     "handoff_out", "manifest_out", "context_dir", "responses",
                     "experiment", "ballots", "bundle",
-                    "policy", "revocations", "anchor", "items", "table", "prev")
+                    "policy", "revocations", "anchor", "items", "table", "prev",
+                    "compile")
 
 
 def _path_writing_issue(args) -> str:
@@ -5369,6 +5370,7 @@ _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私�
                        "evidence_bundle": "证据包是 zip（二进制容器）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
                     "items", "label_ir", "table", "prev", "revocation_feed", "feeds",
+                    "compile",
                     "anchor", "issuer", "object", "policy", "revocations", "targets",
                     "check_md", "entry", "exceptions", "face", "file", "history", "key", "ledger",
                     "mode", "name", "package", "path", "paths", "pipeline", "pkg",
