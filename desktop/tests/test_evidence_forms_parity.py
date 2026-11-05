@@ -160,7 +160,7 @@ class TestOutOfRepoStandalone(_Base):
         self.bad = self.outside / "bad.zip"
         with zipfile.ZipFile(self.good) as zf:
             members = {n: zf.read(n) for n in zf.namelist()}
-        members["payload/docs/a.md"] = "# A\n\n正文被改\n".encode("utf-8")
+        members["payload/docs/a.md"] = "# A\n\n正文被改\n".encode()
         self.bad.write_bytes(evidence._zip_bytes(list(members.items())))
         # 跑的是同一份零依赖实现（拷走的是字节，不是另一个版本）
         self.assertEqual(SCRIPT.read_bytes(), self.copied.read_bytes())

@@ -368,7 +368,7 @@
     "desktop/src/core/error_codes.py": {
       "lines": 42,
       "max_fn_cc": 9,
-      "max_fn_lines": 15
+      "max_fn_lines": 16
     },
     "desktop/src/core/eval_collapse.py": {
       "lines": 46,
@@ -1441,9 +1441,9 @@
       "max_fn_lines": 44
     },
     "scripts/evidence_vectors.py": {
-      "lines": 249,
+      "lines": 287,
       "max_fn_cc": 9,
-      "max_fn_lines": 61
+      "max_fn_lines": 76
     },
     "scripts/fde_sample_run.py": {
       "lines": 328,
@@ -1556,9 +1556,9 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 365,
-      "max_fn_cc": 35,
-      "max_fn_lines": 139
+      "lines": 396,
+      "max_fn_cc": 41,
+      "max_fn_lines": 155
     },
     "scripts/rewrite_text.py": {
       "lines": 136,

@@ -31,7 +31,10 @@ _OBJECT = "# 跨入口同证据\n\n本内容由 AI 生成，含中文与换行�
 
 
 def _policy():
-    """nf-check-policy/1：至少 utf8 + count_at_least 两条（形状同 docs/ccos/check-policy-v0.md）。"""
+    """nf-check-policy/1：至少 utf8 + count_at_least 两条。
+
+    形状同 docs/ccos/check-policy-v0.md。
+    """
     return {
         "schema": "nf-check-policy/1",
         "id": "shell-parity",

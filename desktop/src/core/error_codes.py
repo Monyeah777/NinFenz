@@ -18,7 +18,8 @@ def validate(registry: Dict[str, Any]) -> List[str]:
     for e in registry.get("codes") or []:
         cid = str(e.get("id") or "")
         if not _CODE.match(cid):
-            issues.append("错误码 %r 不合词法（修复指引：大写码 ^[A-Z][A-Z0-9_]{2,39}$，或 ABI 码 cc.<syscall>.<reason>）" % cid)
+            issues.append("错误码 %r 不合词法（修复指引：大写码 "
+                          "^[A-Z][A-Z0-9_]{2,39}$，或 ABI 码 cc.<syscall>.<reason>）" % cid)
         if cid in seen:
             issues.append("错误码重复：%s（修复指引：合并或改号）" % cid)
         seen.add(cid)

@@ -1135,8 +1135,6 @@
     "desktop/tests/test_effect_rows.py::UP031": 1,
     "desktop/tests/test_engine_loader.py::E501": 1,
     "desktop/tests/test_engine_loader.py::E741": 1,
-    "desktop/tests/test_error_codes.py::E401": 1,
-    "desktop/tests/test_error_codes.py::I001": 1,
     "desktop/tests/test_error_codes.py::RUF100": 1,
     "desktop/tests/test_eval_collapse.py::E401": 1,
     "desktop/tests/test_eval_collapse.py::I001": 1,

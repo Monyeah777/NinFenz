@@ -49,7 +49,7 @@ def _count_tests(module):
             continue
         try:
             return unittest.defaultTestLoader.loadTestsFromName(name).countTestCases()
-        except Exception:  # noqa: BLE001 —— 加载失败按「无法核对」处理
+        except Exception:  # 加载失败按「无法核对」处理（不做断言，返回 None）
             return None
     return None
 
@@ -105,11 +105,11 @@ class AbiDocConsistencyTest(unittest.TestCase):
         for name, line_no, module, claimed in claims:
             actual = _count_tests(module)
             if actual is None:
-                bad.append("%s:%d %s 无法找到（修复指引：改文档指向真实模块）"
-                           % (name, line_no, module))
+                bad.append(f"{name}:{line_no} {module} 无法找到"
+                           "（修复指引：改文档指向真实模块）")
             elif actual != claimed:
-                bad.append("%s:%d %s 写 %d 项，实测 %d 项（修复指引：改文档或补测试）"
-                           % (name, line_no, module, claimed, actual))
+                bad.append(f"{name}:{line_no} {module} 写 {claimed} 项，"
+                           f"实测 {actual} 项（修复指引：改文档或补测试）")
         self.assertEqual(bad, [])
 
     def test_no_abolished_layering_vocabulary(self):
@@ -117,7 +117,7 @@ class AbiDocConsistencyTest(unittest.TestCase):
         for path in sorted(_DOCS.glob("*.md")):
             for i, line in enumerate(_read(path).splitlines(), 1):
                 if any(token in line for token in BANNED_LAYERS):
-                    hits.append("%s:%d" % (path.name, i))
+                    hits.append(f"{path.name}:{i}")
         self.assertEqual(hits, [], "docs/ccos 不得复用已废止的 L0–L5 词汇（修复指引：改用四阶）")
 
     def test_maps_to_commands_are_reachable(self):
@@ -129,7 +129,8 @@ class AbiDocConsistencyTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, "nf --help 跑不通（修复指引：检查 scripts/nf.py）")
         lists = re.findall(r"\{([a-z0-9,\-]+)\}", proc.stdout)
         cmd_list = next((x for x in lists if "cockpit" in x.split(",")), None)
-        self.assertIsNotNone(cmd_list, "nf --help 的命令面不可解析（修复指引：保持 usage 花括号列表）")
+        self.assertIsNotNone(cmd_list,
+                             "nf --help 的命令面不可解析（修复指引：保持 usage 花括号列表）")
         top = set(cmd_list.split(","))
         self.assertEqual(sorted(cmds - top), [],
                          "ABI 的 maps_to 指向不存在的顶层命令（修复指引：命令改名或改 maps_to）")
