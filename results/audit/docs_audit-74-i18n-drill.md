@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
+  - protocol/code_metrics_baseline.json:c6a22a333ae3ec7903fe2116bd7681672e8eff77cb52964614c5f57dd33057d9
 ---
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc

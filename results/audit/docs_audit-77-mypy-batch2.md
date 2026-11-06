@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
+  - protocol/code_metrics_baseline.json:c6a22a333ae3ec7903fe2116bd7681672e8eff77cb52964614c5f57dd33057d9
 ---
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc

@@ -758,6 +758,8 @@ def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
     if str(res.get("revocations_source") or "none") == "none":
         return False
     state = str(res.get("revocations_fresh") or "unknown")
+    if state not in revoc.FRESH:
+        state = "unknown"      # 来源给出词表外状态：按未知处理（绝不因错误状态放行）
     if state == "fresh":
         return False
     exp = str(fresh.get("expires_at") or "")

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:1c9ba09e26591be6e2c1e8694d11b8a605d0c8bd2270e46cedcd6ca0300fd493
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
+  - protocol/code_metrics_baseline.json:c6a22a333ae3ec7903fe2116bd7681672e8eff77cb52964614c5f57dd33057d9
 ---
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc

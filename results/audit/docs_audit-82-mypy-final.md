@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
+  - protocol/code_metrics_baseline.json:c6a22a333ae3ec7903fe2116bd7681672e8eff77cb52964614c5f57dd33057d9
 ---
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc

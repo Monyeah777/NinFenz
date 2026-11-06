@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
+  - protocol/code_metrics_baseline.json:c6a22a333ae3ec7903fe2116bd7681672e8eff77cb52964614c5f57dd33057d9
 ---
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
