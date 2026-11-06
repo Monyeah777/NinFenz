@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:abc6ca9f1886a0861ab6106674a4d9076e38da49c0600d35497bef9bb6eb79da
+  - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
 
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
 
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象

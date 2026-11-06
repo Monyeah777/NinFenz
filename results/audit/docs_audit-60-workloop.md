@@ -10,11 +10,13 @@ subjects:
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - scripts/nf.py:abc6ca9f1886a0861ab6106674a4d9076e38da49c0600d35497bef9bb6eb79da
+  - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
 
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象

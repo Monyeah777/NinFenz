@@ -11,7 +11,7 @@ subjects:
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/tests/test_purity_scan.py:01a7a7ff5b55ccc7c23b06b4d130457421db5ddf92f55d05d7dec79e36d06721
-  - scripts/nf.py:abc6ca9f1886a0861ab6106674a4d9076e38da49c0600d35497bef9bb6eb79da
+  - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
 
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象

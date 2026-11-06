@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:c76082418ee647c0c2c6b85e6afe93a3d96520711cbe0884fbdca30db97daa06
+  - protocol/code_metrics_baseline.json:014b714989a623668fac54bd06b4f2cfa8299eff1e3a296d6c6336da1f4fa396
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：bash 身份守卫（WSL 空输出不再冒充判据红）+ Windows 两坑入文档
 
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）

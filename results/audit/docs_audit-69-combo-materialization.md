@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:abc6ca9f1886a0861ab6106674a4d9076e38da49c0600d35497bef9bb6eb79da
+  - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
 
 > 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象

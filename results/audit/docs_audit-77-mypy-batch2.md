@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:c76082418ee647c0c2c6b85e6afe93a3d96520711cbe0884fbdca30db97daa06
+  - protocol/code_metrics_baseline.json:014b714989a623668fac54bd06b4f2cfa8299eff1e3a296d6c6336da1f4fa396
 ---
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
 > 重审（2026-11-06）：bash 身份守卫（WSL 空输出不再冒充判据红）+ Windows 两坑入文档
 
 > 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）

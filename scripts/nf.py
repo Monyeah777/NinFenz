@@ -2906,6 +2906,21 @@ def _portable_path(p: object) -> str:
         prefix = nb.rstrip("\\/") + os.sep
         if ns.startswith(prefix):
             return (repl + "/" + canon[len(base) + 1:]).replace("\\", "/")
+    # NF home（可被 NARRATIVE_FORGE_HOME 指到仓库外）：也必须可移植，否则机器面回吐本机绝对路径。
+    # 为什么（2026-11-06 快照门禁实测）：--snapshot 给内层独立 NF_HOME（<run>/home，在仓库树外），
+    # daemon status / preset 的 state_file/home 原样打印绝对路径，portable 判据在快照里假红。
+    try:
+        from core import storage as _storage
+        home_base = os.path.realpath(str(_storage.default_home()))
+    except Exception:                      # 环境异常时不放宽判据：退回原样
+        home_base = ""
+    if home_base:
+        ns, nb = os.path.normcase(canon), os.path.normcase(home_base)
+        if ns == nb:
+            return "<NF_HOME>"
+        prefix = nb.rstrip("\\/") + os.sep
+        if ns.startswith(prefix):
+            return ("<NF_HOME>/" + canon[len(home_base) + 1:]).replace("\\", "/")
     return s
 
 
