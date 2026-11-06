@@ -3,51 +3,51 @@
     "code_metrics": {
       "cmd": "python scripts/code_metrics.py",
       "exit_code": 0,
-      "output_sha256": "4506375f231452548be4555ad547c2ae579a376b2ecba43c1880a2567003aee5",
-      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 327（基线 327）· 最大行数 8574 · 最长函数 319 行 · 最大圈复杂度 106",
-      "ran_at": "2026-11-07"
+      "output_sha256": "0c9147559d11a849c3e55b6bba0e620bad4baceb40a109fbcc993d3ea4d3288c",
+      "output_tail": "== 代码规模/复杂度上限 ==\n  文件 314（基线 314）· 最大行数 7602 · 最长函数 318 行 · 最大圈复杂度 106",
+      "ran_at": "2026-11-02"
     },
     "conformance": {
       "cmd": "python scripts/nf.py conformance",
       "exit_code": 0,
-      "output_sha256": "7e6cb93b63c07fef8dd1088cccd9ddf69f47420511187474394277aca0a79a0c",
+      "output_sha256": "7509ae691dc8752bf7f17951fa98487f71fa9800f4abf241fc21ce8b91905f00",
       "output_tail": "  ✓ mcp-package                    工具 12 · 提示 1 · 类目 content-creation · 目标平台 4\n  ✓ state-front                    单件 0 · 族规则 1 · 族成员 3\n  ✓ public-surface                 公开导出面零泄漏",
-      "ran_at": "2026-11-07"
+      "ran_at": "2026-11-02"
     },
     "e2e": {
       "cmd": "python scripts/e2e_desktop_headless.py",
       "exit_code": 0,
       "output_sha256": "20633b1d36f6bbaef8eb1a63ec69e5457e62dc01eb8400f9398ae5393f252c48",
       "output_tail": "[产物] <path> 字节）\n\n★ E2E DESKTOP HEADLESS PASSED ✓（官方13件 + M91/M92 + P04 → 装配 → 生成 → 断言全绿）",
-      "ran_at": "2026-11-07"
+      "ran_at": "2026-11-02"
     },
     "release": {
       "cmd": "python scripts/nf.py release",
       "exit_code": 1,
-      "output_sha256": "7e9b90899631e8dc3dba89ceaf17dd61729d4282d64fdd0c4facc4cde6ce0602",
-      "output_tail": "  verify 版本 v2.30 · check 数 42（基线自描述一致：OK）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.Tic51oPQZp\n  ✗ 发布体检未过（基线/verify）——禁止发布",
+      "output_sha256": "79e6bb9fefb0fc7b1676f2f8f4eb95ca4731d32dbd9a37fd18c3ca80a9ed24ab",
+      "output_tail": "  verify 版本 v2.30 · check 数 42（基线自描述一致：OK）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.fFOz0rFd0D\n  ✗ 发布体检未过（基线/verify）——禁止发布",
       "ran_at": "2026-11-07"
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
       "exit_code": 0,
-      "output_sha256": "3d433840b27e6fc9638dd00c4d9266107c12933a7756458151ca6805bdd8c226",
-      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 28 · FAIL 0 · WARN 3 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
-      "ran_at": "2026-11-07"
+      "output_sha256": "9d31434a7ca350fcac5889237c95c5f2923fcf4e8ef414e0530af88a1327af26",
+      "output_tail": "== 门禁机器可读报告 check ==\n  判据 31 条：PASS 29 · FAIL 0 · WARN 2 · ERROR 0；声明 check1-42 / PASS=76 · verify v2.30（判据级抽查面，非 check 全量）\n  ✓ 已落盘报告与实时重算一致",
+      "ran_at": "2026-11-02"
     },
     "stats_check": {
       "cmd": "python scripts/nf.py stats --check",
       "exit_code": 0,
       "output_sha256": "0d1bbdd93a7df3355a49469b68242dca40decc2bc3b010234aebd15f47374f3b",
       "output_tail": "  标准目录：370 条（可达 332 / 不可达 38 · 机构 194 · 206 边） · 绑定 1200 条\n  质量凭证：verify check1-42 常驻（脚本 v2.30） · 馆藏 3 件\n  模式：check（只校验）",
-      "ran_at": "2026-11-07"
+      "ran_at": "2026-11-02"
     },
     "verify": {
       "cmd": "python scripts/verify_run.py",
-      "exit_code": 0,
-      "output_sha256": "621ac839653c100505c0094a645131884c3ce725ed9e3d66de160f13101b3a01",
-      "output_tail": "  上次判定：PASS=76 WARN=1 FAIL=0（未重跑；--no-cache 或 NF_VERIFY_CACHE=0 可强制重算）\n>>> 全部通过（缓存判定：输入未变；--no-cache 可强制重算） <<<\n== 一键复现：<path> verify.sh（cwd=<path>）",
-      "ran_at": "2026-11-07"
+      "exit_code": 1,
+      "output_sha256": "9e2224d5faf7eac4f2ffb2640374baf2e933cdb4f927e465b31fdf0327b4e5cf",
+      "output_tail": "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-40））\n== 一键复现：<path> verify.sh（cwd=<path>）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.wYMV1PZBT1",
+      "ran_at": "2026-10-07"
     }
   },
   "instructions": [

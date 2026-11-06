@@ -409,16 +409,18 @@
     },
     {
       "id": "instruction_evidence",
-      "issues": 0,
+      "issues": 1,
       "name": "规范入口指令实测记录（新鲜 + 退出码 0）",
-      "sample": [],
+      "sample": [
+        "指令 verify 的实测记录已过期（31 天 > 上限 30 天）（修复指引：python scripts/instruction_evidence.py --record --only verify）"
+      ],
       "source": "instruction_evidence.scan",
       "stats": {
         "declared": 7,
         "recorded": 7,
         "recorded_policy": 3
       },
-      "status": "warn",
+      "status": "fail",
       "warns": 5
     },
     {
@@ -537,12 +539,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "7c2cd703563b35f7053110615b6c788dcd59b059a03ad1830df41b23ac021265",
+  "root_digest": "ec5feeb8e970aff18ff9579e693e8251605ca9fa087d8c40b73a90b237bd5704",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
+    "fail": 1,
     "pass": 28,
-    "warn": 3
+    "warn": 2
   }
 }
