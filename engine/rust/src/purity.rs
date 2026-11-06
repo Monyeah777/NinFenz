@@ -126,8 +126,9 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
-const SINK_ALLOW: [(&str, &str); 14] = [
+const SINK_ALLOW: [(&str, &str); 15] = [
     ("rust_engine.py:unlink", ""),
+    ("release_conclusion.py:shutil.rmtree", ""),
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),
