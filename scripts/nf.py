@@ -589,8 +589,12 @@ def _add_parser_production(sub):
                      help="单 JSON 形态的成员根目录（缺省 = 该 JSON 所在目录）")
     evv.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
     evv.add_argument("--revocations", default="",
-                     help="外部吊销表 JSON（优先于包内嵌的那份）")
+                     help="外部吊销件 JSON：nf-revocation/1 表或签名 nf-revocation-feed/1"
+                          "（优先于包内嵌的那份；吃 feed 时会读其有效期）")
     evv.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evv.add_argument("--require-fresh-revocations", action="store_true",
+                     help="要求吊销表新鲜：stale/unknown 判 invalid（缺省只 WARN，"
+                          "不改变四词判定；完全没有吊销来源时不算 unknown）")
     evv.add_argument("--anchor", default="",
                      help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」；"
                           "不给则只在 warnings 里说明无法证明未截断（不提升强度）")
@@ -614,6 +618,12 @@ def _add_parser_production(sub):
     rvs.add_argument("--issuer", default="", help="签发方标识（写进 feed）")
     rvs.add_argument("--seq", type=int, default=1, help="单调递增序号（首份 1，之后 +1）")
     rvs.add_argument("--prev", default="", help="上一份 feed JSON（接链；首份省略）")
+    rvs.add_argument("--expires-at", default="",
+                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；进签名体，只记录不联网）")
+    rvs.add_argument("--ttl", type=int, default=None,
+                     help="有效期秒数（正整数 ≤31536000；有 --expires-at 时以它为准）")
+    rvs.add_argument("--status-uri", default="",
+                     help="分发指针（非空字符串；仅记录，本仓不联网去取）")
     rvs.add_argument("--out", default="", help="输出 feed（缺省=只打印）")
     rvs.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvv = rvsub.add_parser("verify", help="校验 feed（签名 + 序号 + 前序链）",
@@ -622,12 +632,14 @@ def _add_parser_production(sub):
     rvv.add_argument("revocation_feed", metavar="FEED.json", help="feed 或裸 nf-revocation/1 表")
     rvv.add_argument("--key-file", default="", help="校验签名所需密钥（缺密钥即 invalid，不降级）")
     rvv.add_argument("--prev", default="", help="上一份 feed（核对序号与前序摘要）")
+    rvv.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
     rvv.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
                            description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
                                        "输出是普通表，可给 nf evidence verify --revocations 用。")
     rvm.add_argument("feeds", nargs="+", help="feed JSON（按任意顺序给，内部按 seq 排）")
     rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
+    rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
     rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
     rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
@@ -3519,7 +3531,8 @@ def _revocations_sign(args):
         table = _revocations_load(args, args.table)
         prev = _revocations_load(args, args.prev) if args.prev else None
         key = attest.read_key_file(_rel_out(args.key_file))
-        feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev)
+        feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev,
+                       expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     shown = _revocations_write(args, feed, args.out)
@@ -3548,7 +3561,7 @@ def _revocations_verify(args):
         doc = _revocations_load(args, args.revocation_feed)
         prev = _revocations_load(args, args.prev) if args.prev else None
         key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
-        res = rv.verify(doc, key=key, prev=prev)
+        res = rv.verify(doc, key=key, prev=prev, at=args.at)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -3557,6 +3570,10 @@ def _revocations_verify(args):
         print(f"== nf evidence revocations verify（{args.revocation_feed}）==")
         print(f"  判定：{res['verdict']} · 序号 {res['seq']} · 条目 {res['count']} · "
               f"签名 {'有' if res['signed'] else '无'} · 摘要 {res['digest'][:16]}")
+        fresh = res.get("freshness") or {}
+        state = fresh.get("state") or "unknown"
+        exp = fresh.get("expires_at") or "未给"
+        print(f"  新鲜度：{state}（basis={fresh.get('basis') or 'none'}，到期 {exp}）")
         for i in res["issues"]:
             print(f"  [FAIL] {i}", file=sys.stderr)
         for w in res["warnings"]:
@@ -3573,7 +3590,7 @@ def _revocations_merge(args):
     try:
         feeds = [_revocations_load(args, p) for p in args.feeds]
         key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
-        res = rv.merge(feeds, key=key)
+        res = rv.merge(feeds, key=key, at=args.at)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     shown = _revocations_write(args, res["table"], args.out) if res["ok"] else ""
@@ -3582,11 +3599,15 @@ def _revocations_merge(args):
                            "ok": res["ok"], "verdict": res["verdict"],
                            "feeds": res["feeds"], "count": res["count"],
                            "issues": res["issues"], "warnings": res["warnings"],
+                           "freshness": res["freshness"],
                            "table": res["table"] if res["ok"] else None},
                           ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(f"== nf evidence revocations merge（{res['feeds']} 份）==")
         print(f"  判定：{res['verdict']} · 合并后条目 {res['count']}")
+        fresh = res.get("freshness") or {}
+        print(f"  新鲜度：{fresh.get('state') or 'unknown'}"
+              f"（{len(fresh.get('parts') or [])} 份取最严）")
         for i in res["issues"]:
             print(f"  [FAIL] {i}", file=sys.stderr)
         if shown:
@@ -3649,7 +3670,9 @@ def _evidence_verify(args):
                if getattr(args, "anchor", "") else None)
         res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
                                   root=root, kind=args.kind, anchor=anc,
-                                  expected_policy_digest=getattr(args, "policy_digest", ""))
+                                  expected_policy_digest=getattr(args, "policy_digest", ""),
+                                  require_fresh_revocations=getattr(
+                                      args, "require_fresh_revocations", False))
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -3658,6 +3681,9 @@ def _evidence_verify(args):
         print(f"== nf evidence verify（{target}）==")
         print(f"  判定：{res['verdict']} · 证据强度：{res['level']} · "
               f"成员 {res['count']} 件 · 根 {res['root'][:16]}")
+        print(f"  吊销新鲜度：{res.get('revocations_fresh') or 'unknown'}"
+              f"（basis={res.get('revocations_basis') or 'none'}，"
+              f"来源={res.get('revocations_source') or 'none'}）")
         for i in res["issues"]:
             print(f"  [FAIL] {i}", file=sys.stderr)
         for w in res.get("warnings") or []:

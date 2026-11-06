@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:787069b6d41f16b08f3bd168da4df3d73a3c11cac853c4f506198c8a147d5541
+  - protocol/code_metrics_baseline.json:3e92086d8e3402c71d6a9a35b979a822d5b621c2d21e36f7a8b9edee2f067751
 ---
+> 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
+
 > 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
 
 > 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩

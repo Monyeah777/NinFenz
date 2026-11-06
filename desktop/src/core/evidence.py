@@ -30,6 +30,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from core import atomic_write, attest, json_doc, receipts
+from core import revocations as revoc
 from core.transparency_log import NODE_PREFIX
 
 SCHEMA = "nf-evidence/1"
@@ -447,7 +448,9 @@ def _empty_result() -> dict[str, Any]:
     return {"verdict": "invalid", "level": "none", "root": "", "head": "", "count": 0,
             "issues": [], "warnings": [], "created_at": "", "expires_at": "",
             "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
-            "decision": None, "decision_status": "absent", "policy_verified": False}
+            "decision": None, "decision_status": "absent", "policy_verified": False,
+            "revocations_fresh": "unknown", "revocations_source": "none",
+            "revocations_basis": "none"}
 
 
 def _fill_header(res: dict[str, Any], meta: dict[str, Any]) -> None:
@@ -673,18 +676,66 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
         res["policy_verified"] = True
 
 
+#: `--revocations` 形状不对时的统一文案（M11）：坏形状 fail-closed，不许静默不命中
+_BAD_REVOCATIONS = ("--revocations 既不是 nf-revocation/1 表也不是 nf-revocation-feed/1"
+                    "（" + GUIDE + "给表或签名 feed；传 feed 时本仓会取 table 并读其有效期）")
+
+
+def _revocation_source(rev: dict[str, Any] | None,
+                       ) -> tuple[dict[str, Any] | None, dict[str, Any] | None, str]:
+    """吊销来源归一化 → (表, feed 信封, 错误文本)。
+
+    `--revocations` 现在**同时吃**普通 `nf-revocation/1` 表与签名 `nf-revocation-feed/1`
+    （此前只认表：传签名 feed 会静默不命中、已吊销的证据照样判 ok——那是缺陷，不是特性）。
+    吃 feed 时取里面的表并读它的有效期；裸表没有信封可读有效期 → freshness=unknown。
+    **坏形状一律 fail-closed**：坏件不能当「无吊销」，也不能静默放过。
+    """
+    if not isinstance(rev, dict):
+        return None, None, _BAD_REVOCATIONS
+    schema = str(rev.get("schema") or "")
+    if schema == REVOCATION_SCHEMA:
+        table, feed = rev, None
+    elif schema == revoc.FEED_SCHEMA:
+        table = revoc.table_of(rev)
+        feed = rev
+        if table is None:
+            return None, None, ("--revocations 的 feed 缺 nf-revocation/1 表（" + GUIDE +
+                                "只放条目不算；请用签发方 feed 或先 revocations merge）")
+    else:
+        return None, None, _BAD_REVOCATIONS
+    revoked = table.get("revoked")
+    if not isinstance(revoked, list) or not all(isinstance(i, dict) for i in revoked):
+        return None, None, ("--revocations 的 revoked 必须是对象数组（" + GUIDE +
+                            "给合法的 nf-revocation/1 表或签名 feed）")
+    return table, feed, ""
+
+
 def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
                       revocations: dict[str, Any] | None,
-                      res: dict[str, Any]) -> bool:
-    """吊销判定：命中即 revoked（压过 expired，也压过 ok）。返回是否已定案。"""
+                      res: dict[str, Any], fresh: dict[str, Any],
+                      at: str = "") -> bool:
+    """吊销判定：命中即 revoked（压过 expired/新鲜度，也压过 ok）。返回是否已定案。
+
+    来源优先级：外部 `--revocations`（表或签名 feed）> 包内嵌（只认表）。
+    未命中时**只记录新鲜度**（写进 `fresh` 与 res），不在这里判死——严格判定在时效之后。
+    """
     if revocations is not None:
-        rev: dict[str, Any] | None = revocations
+        table, feed, err = _revocation_source(revocations)
+        res["revocations_source"] = "external"
     else:
-        rev, err = _embedded_revocations(rd)
-        if err:
-            res["issues"].append(err)
-            return True                       # 坏吊销表 = 定案 invalid（不是「无吊销」）
-    hit = _revocation_hit(rev, entries)
+        table, err = _embedded_revocations(rd)
+        feed = None
+        res["revocations_source"] = "embedded" if (table is not None or err) else "none"
+    if err:
+        res["issues"].append(err)
+        return True                       # 坏吊销表 = 定案 invalid（不是「无吊销」）
+    if table is None:
+        return False                      # 没做吊销检查：不是「陈旧」，严格开关也不判死
+    fresh.update(revoc.freshness(feed, at) if feed is not None
+                 else {"state": "unknown", "expires_at": "", "basis": "none"})
+    res["revocations_fresh"] = fresh["state"]
+    res["revocations_basis"] = fresh["basis"]
+    hit = _revocation_hit(table, entries)
     if hit is None:
         return False
     res["verdict"] = "revoked"
@@ -692,6 +743,43 @@ def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
     why = hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
     res["issues"].append(f"证据已被吊销：{why}（{GUIDE}吊销是不可逆判定——请向签发方确认是否"
                          "曾发生错签或内容下架，不要把它当临时失败重试）")
+    return True
+
+
+def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
+                     fresh: dict[str, Any]) -> bool:
+    """吊销表新鲜度：默认只 WARN；`--require-fresh-revocations` 才把 stale/unknown 定案。
+
+    插在**时效之后、ok 之前**：`expired` 是更具体的正向判定，不该被「表陈旧」这种数据
+    质量问题遮蔽；而「命中吊销」是事实，已在 `_apply_revocation` 里立即定案。
+    **完全没有吊销来源时不算 unknown**——那是「没做吊销检查」，不是「陈旧」，严格开关下
+    也不得判死（否则不传吊销表的离线复验会全红）。
+    """
+    if str(res.get("revocations_source") or "none") == "none":
+        return False
+    state = str(res.get("revocations_fresh") or "unknown")
+    if state == "fresh":
+        return False
+    exp = str(fresh.get("expires_at") or "")
+    if not require_fresh:
+        if state == "stale":
+            res["warnings"].append(f"吊销表已过期（expires_at={exp}）：未开 "
+                                   "--require-fresh-revocations，本次判定不受影响（" + GUIDE +
+                                   "需要「新鲜」保证时加上该开关）")
+        else:
+            res["warnings"].append("吊销表未给有效期，无法判新鲜（" + GUIDE +
+                                   "签发时加 --expires-at/--ttl；本次判定不受影响）")
+        return False
+    now = at or attest.issue_stamp()
+    if state == "stale":
+        res["issues"].append(f"吊销表已过期（expires_at={exp}，判定时点={now}）：无法证明"
+                             "「当前未吊销」（" + GUIDE + "向签发方取 seq 更大的新 feed 重跑；"
+                             "或去掉 --require-fresh-revocations 接受「新鲜度未知」）")
+    else:
+        res["issues"].append("吊销表未给有效期（无 expires_at/ttl）："
+                             "--require-fresh-revocations 下无法证明新鲜（" + GUIDE +
+                             "签发方补 --expires-at 或 --ttl 重签；或去掉开关）")
+    res["verdict"] = "invalid"
     return True
 
 
@@ -712,11 +800,13 @@ def _apply_expiry(res: dict[str, Any], at: str) -> bool:
 def verify(bundle: str, key: bytes | None = None,
            revocations: dict[str, Any] | None = None,
            at: str = "", anchor: dict[str, Any] | None = None,
-           expected_policy_digest: str = "") -> dict[str, Any]:
+           expected_policy_digest: str = "",
+           require_fresh_revocations: bool = False) -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
-    结构 → 成员摘要 → 根 → 包含证明 → 链 → 信封 → 吊销 → 时效。
+    结构 → 成员摘要 → 根 → 包含证明 → 链 → 信封 → 吊销 → 时效 → 吊销新鲜度。
+    最后两段互相独立：`revoked > expired > 新鲜度不足(invalid) > ok`。
     """
     res = _empty_result()
     rd = _Reader(bundle)
@@ -752,9 +842,12 @@ def verify(bundle: str, key: bytes | None = None,
         _check_decision(rd, meta, entries, res, expected_policy_digest)
         if res["issues"]:
             return res
-        if _apply_revocation(rd, entries, revocations, res):
+        fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
+        if _apply_revocation(rd, entries, revocations, res, fresh, at):
             return res
         if _apply_expiry(res, at):
+            return res
+        if _apply_freshness(res, require_fresh_revocations, at, fresh):
             return res
         res["verdict"] = "ok"
         return res
@@ -875,7 +968,9 @@ def _dir_read(root: str) -> Any:
 
 
 def _verify_receipts(doc: dict[str, Any], read: Any,
-                     revocations: dict[str, Any] | None = None) -> dict[str, Any]:
+                     revocations: dict[str, Any] | None = None,
+                     require_fresh_revocations: bool = False,
+                     at: str = "") -> dict[str, Any]:
     """回执形态：成员摘要 → 叶 → 根 → 每条包含证明（不回查仓库）。"""
     res = _empty_result()
     res["kind"] = "receipts"
@@ -916,7 +1011,10 @@ def _verify_receipts(doc: dict[str, Any], read: Any,
     if issues:
         return res
     res["level"] = "receipts_only"
-    if _apply_revocation_doc(revocations, entries, res):
+    fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
+    if _apply_revocation_doc(revocations, entries, res, fresh, at):
+        return res
+    if _apply_freshness(res, require_fresh_revocations, at, fresh):
         return res
     res["verdict"] = "ok"
     return res
@@ -924,7 +1022,8 @@ def _verify_receipts(doc: dict[str, Any], read: Any,
 
 def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
                    revocations: dict[str, Any] | None = None,
-                   at: str = "") -> dict[str, Any]:
+                   at: str = "",
+                   require_fresh_revocations: bool = False) -> dict[str, Any]:
     """信封形态：每份信封必须自洽且指向真实成员；level 取通过的最强一档。"""
     res = _empty_result()
     res["kind"] = "attest"
@@ -968,9 +1067,12 @@ def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
             return res
         res["level"] = max(passed, key=lambda lv: LEVELS.index(lv) if lv in LEVELS else -1)
         res["attestations_ok"] = len(passed)
-    if _apply_revocation_doc(revocations, entries, res):
+    fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
+    if _apply_revocation_doc(revocations, entries, res, fresh, at):
         return res
     if _apply_expiry(res, at):
+        return res
+    if _apply_freshness(res, require_fresh_revocations, at, fresh):
         return res
     res["verdict"] = "ok"
     return res
@@ -978,9 +1080,21 @@ def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
 
 def _apply_revocation_doc(revocations: dict[str, Any] | None,
                           entries: Sequence[dict[str, Any]],
-                          res: dict[str, Any]) -> bool:
-    """无容器形态的吊销判定（吊销表由调用方给，不内嵌）。"""
-    hit = _revocation_hit(revocations, entries)
+                          res: dict[str, Any], fresh: dict[str, Any],
+                          at: str = "") -> bool:
+    """无容器形态的吊销判定（吊销表由调用方给，不内嵌；同样吃表或签名 feed）。"""
+    if revocations is None:
+        return False
+    table, feed, err = _revocation_source(revocations)
+    res["revocations_source"] = "external"
+    if err:
+        res["issues"].append(err)
+        return True
+    fresh.update(revoc.freshness(feed, at) if feed is not None
+                 else {"state": "unknown", "expires_at": "", "basis": "none"})
+    res["revocations_fresh"] = fresh["state"]
+    res["revocations_basis"] = fresh["basis"]
+    hit = _revocation_hit(table, entries)
     if hit is None:
         return False
     why = hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
@@ -995,7 +1109,8 @@ def verify_any(path: str, key: bytes | None = None,
                revocations: dict[str, Any] | None = None, at: str = "",
                root: str = "", kind: str = "",
                anchor: dict[str, Any] | None = None,
-               expected_policy_digest: str = "") -> dict[str, Any]:
+               expected_policy_digest: str = "",
+               require_fresh_revocations: bool = False) -> dict[str, Any]:
     """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
 
     - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
@@ -1003,7 +1118,8 @@ def verify_any(path: str, key: bytes | None = None,
     - 判定词表与退出码对所有形态一致：ok / revoked / expired / invalid。
     """
     if os.path.isfile(path) and not zipfile.is_zipfile(path):
-        res = _verify_single_json(path, key, revocations, at, root, kind)
+        res = _verify_single_json(path, key, revocations, at, root, kind,
+                                  require_fresh_revocations)
         form = "bundle" if str(res.get("kind") or "") == "bundle" else "other"
     else:
         rd = _Reader(path)
@@ -1011,11 +1127,14 @@ def verify_any(path: str, key: bytes | None = None,
             form, doc = _detect_container(rd, kind)
             if form == "bundle":
                 return verify(path, key=key, revocations=revocations, at=at, anchor=anchor,
-                              expected_policy_digest=expected_policy_digest)
+                              expected_policy_digest=expected_policy_digest,
+                              require_fresh_revocations=require_fresh_revocations)
             if form == "receipts":
-                res = _verify_receipts(doc, rd.read, revocations)
+                res = _verify_receipts(doc, rd.read, revocations,
+                                       require_fresh_revocations, at)
             else:
-                res = _verify_attest(doc, rd.read, key, revocations, at)
+                res = _verify_attest(doc, rd.read, key, revocations, at,
+                                     require_fresh_revocations)
         finally:
             rd.close()
     if expected_policy_digest and form != "bundle":
@@ -1024,7 +1143,8 @@ def verify_any(path: str, key: bytes | None = None,
 
 
 def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any] | None,
-                        at: str, root: str, kind: str) -> dict[str, Any]:
+                        at: str, root: str, kind: str,
+                        require_fresh_revocations: bool = False) -> dict[str, Any]:
     with open(path, "rb") as fh:
         raw = fh.read()
     try:
@@ -1038,9 +1158,9 @@ def _verify_single_json(path: str, key: bytes | None, revocations: dict[str, Any
     base = root or os.path.dirname(os.path.abspath(path)) or "."
     read = _dir_read(base)
     if schema == RECEIPTS_SCHEMA and (not kind or kind == "receipts"):
-        return _verify_receipts(doc, read, revocations)
+        return _verify_receipts(doc, read, revocations, require_fresh_revocations, at)
     if schema in (ATTEST_SCHEMA, ATTEST_SET_SCHEMA) and (not kind or kind == "attest"):
-        return _verify_attest(doc, read, key, revocations, at)
+        return _verify_attest(doc, read, key, revocations, at, require_fresh_revocations)
     raise ValueError(f"认不出证据形态：{path}（schema={schema or '缺失'}）"
                      "（修复指引：请对照支持的四种——nf-evidence/1 容器、nf-receipts/1、"
                      "nf-attest/1、nf-attest-set/1；形态以文档 schema 字段判定）")

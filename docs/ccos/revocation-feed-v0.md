@@ -1,6 +1,6 @@
 # 吊销分发件 v0（`nf-revocation-feed/1`）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-05
+> 最后更新：2026-11-06
 > **Status**: v0 已实装（`core/revocations.py` + `nf evidence revocations`）· 仍是**拉取式**分发
 
 ## 解决什么（威胁模型 G2 的可落地部分）
@@ -21,6 +21,7 @@
   "issuer": "acme",
   "seq": 2,
   "issued_at": "2026-11-05T03:00:00Z",
+  "expires_at": "2026-12-05T03:00:00Z",
   "prev_digest": "<上一份 feed 的 digest>",
   "table": {"schema": "nf-revocation/1", "revoked": [{"digest": "…", "reason": "…"}]},
   "signature": {"alg": "hmac-sha256", "mac": "<hex>"}
@@ -28,7 +29,8 @@
 ```
 
 签名体 = **除 `signature` 外的全部字段**（`sort_keys + ensure_ascii=false + 紧凑分隔符` 规范化后求
-hmac-sha256）；`digest` = 对签名体求 sha256（前序链用）。
+hmac-sha256）；`digest` = 对签名体求 sha256（前序链用）。`expires_at` 在下节说明，是**可选**字段：
+不给就不写（不写 null），旧 feed 原样可用。
 
 ## 怎么用
 
@@ -38,14 +40,23 @@ nf evidence revocations sign --table table.json --key-file k.bin --issuer acme -
 nf evidence revocations sign --table table2.json --key-file k.bin --issuer acme --seq 2 \
     --prev f1.json --out f2.json
 
+# 签发时给有效期与分发指针（都只在给出时写入；status_uri 只记录，本仓不联网取）
+nf evidence revocations sign --table table3.json --key-file k.bin --seq 3 \
+    --expires-at 2026-12-06T00:00:00Z --status-uri https://example.invalid/revocations/3.json \
+    --out f3.json
+# 也可以用 --ttl 86400（正整数秒 ≤ 31536000；与 --expires-at 并存时以 --expires-at 为准）
+
 # 校验（缺密钥即 invalid，不降级；给了 --prev 时同时核对序号与前序链）
 nf evidence revocations verify f2.json --key-file k.bin --prev f1.json
+nf evidence revocations verify f3.json --key-file k.bin --at 2026-11-06T00:00:00Z   # 新鲜度时点
 
 # 合并（多份按任意顺序给，内部按 seq 排；任何一份不过则整次失败）→ 普通表
 nf evidence revocations merge f2.json f1.json --key-file k.bin --out revocations.json
 
-# 合并结果直接喂证据复验
+# 合并结果直接喂证据复验；--revocations 也直接吃签名 feed（会读它的有效期）
 nf evidence verify bundle.zip --revocations revocations.json
+nf evidence verify bundle.zip --revocations f3.json
+nf evidence verify bundle.zip --revocations f3.json --require-fresh-revocations   # 表不新鲜即 invalid
 ```
 
 ## 判定（可证）
@@ -57,7 +68,43 @@ nf evidence verify bundle.zip --revocations revocations.json
 | 有 `signature` 时：算法只认 hmac-sha256、**必须有密钥**、mac 必须匹配 | invalid（缺密钥**不**降级） |
 | 无 `signature` | ok + warning（形状可判、来源与回滚判不了） |
 | 给了 `--prev`：`seq` 必须恰好 +1 且 `prev_digest` 等于上一份的 digest | invalid |
+| `expires_at` / `ttl` / `status_uri` 给了时形状必须合法（见下节） | invalid |
+| `expires_at` 早于 `issued_at` | invalid |
 | 合并：任何一份验不过 | 整次 invalid（半可信的合并结果比没有更危险） |
+
+## 新鲜度（可选字段，TSL 语义子集）
+
+feed 可带三个**可选**字段（只在给出时写入；`nf-revocation/1` 表 schema 不变）：
+
+| 字段 | 口径 | 用途 |
+|---|---|---|
+| `expires_at` | UTC 秒级 `YYYY-MM-DDTHH:MM:SSZ`，且不得早于 `issued_at` | 有效期；在场时以它为准 |
+| `ttl` | 正整数秒，≤ 31536000（1 年） | 有效期 = `issued_at + ttl`（`expires_at` 在场时被它压过） |
+| `status_uri` | 非空字符串 | 分发指针；**只记录，不联网取、不验可达性** |
+
+三个字段都在**签名体**里（签名体 = 除 `signature` 外全部字段）——改一个字节即破签名，`digest` 随之
+变化；旧读者用同一 body 定义重算，seq/prev 链仍接得上（回滚判定口径不变）。
+
+**新鲜度只进输出，不改四词判定**：`nf evidence revocations verify|merge` 输出 `freshness{state,
+expires_at, basis}`（`basis` = `expires_at|ttl|none`）；`nf evidence verify` 输出
+`revocations_fresh`（`fresh|stale|unknown`）、`revocations_source`（`external|embedded|none`）与
+`revocations_basis`。默认只给 WARN，要硬拒须显式开关 `--require-fresh-revocations`：
+
+| 条件 | 默认 | `--require-fresh-revocations` |
+|---|---|---|
+| 表 fresh | ok | ok |
+| 表 stale（已过有效期） | ok + WARN | invalid（`吊销表已过期`） |
+| 表 unknown（没给 `expires_at`/`ttl`，或来源是裸表） | ok + WARN | invalid（`吊销表未给有效期`） |
+| **完全没有吊销来源** | ok | ok（没做吊销检查 ≠ 陈旧，不得判死） |
+| 命中吊销条目 | revoked | revoked（事实优先，压过新鲜度） |
+| 证据本身已过期 | expired | expired（压过新鲜度） |
+
+判定优先级：`revoked > expired > 新鲜度不足(invalid) > ok`。三处调用点（bundle / receipts / attest）
+共用同一段判定。
+
+`--revocations` 现在**同时接受** `nf-revocation/1` 表与签名 `nf-revocation-feed/1`（传 feed 时取
+它的 table 并读其有效期）；形状不对一律 fail-closed（不会静默当成「无吊销」）。包内嵌
+`revocations.json` 仍只认表。
 
 ## 边界（仍缺什么）
 
@@ -65,9 +112,11 @@ nf evidence verify bundle.zip --revocations revocations.json
 - **hmac 是对称的**：拿到密钥的人能伪造任意 feed。要跨组织证明来源，需要公钥签名（ssh-sig/sigstore 面
   已有实现，但吊销件还没走那条线）。
 - **没有撤销时间语义**：feed 只说「哪些被吊销」，不说「从何时起」；时效仍由证据包的 `expires_at` 承担。
+- **新鲜度不是分发**：`expires_at`/`ttl` 只说明这份表**声称**多新，`status_uri` 只是一个指针；
+  本仓仍不轮询、不自动取，也不验证指针可达性。
 
 ## 复核
 
 ```bash
-python -m unittest desktop.tests.test_revocations    # 17 项：签名/篡改/缺密钥/回滚/分叉/合并
+python -m unittest desktop.tests.test_revocations    # 34 项：签名/篡改/缺密钥/回滚/分叉/合并/新鲜度
 ```

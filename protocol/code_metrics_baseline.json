@@ -381,8 +381,8 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1614,
-      "max_fn_cc": 24,
+      "lines": 1734,
+      "max_fn_cc": 25,
       "max_fn_lines": 161
     },
     "desktop/src/core/execution_drill.py": {
@@ -1111,9 +1111,9 @@
       "max_fn_lines": 4
     },
     "desktop/src/core/revocations.py": {
-      "lines": 206,
-      "max_fn_cc": 25,
-      "max_fn_lines": 86
+      "lines": 323,
+      "max_fn_cc": 26,
+      "max_fn_lines": 94
     },
     "desktop/src/core/rfc.py": {
       "lines": 107,
@@ -1501,7 +1501,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8527,
+      "lines": 8553,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

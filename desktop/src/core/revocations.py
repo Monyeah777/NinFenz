@@ -14,10 +14,12 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import re
 from collections.abc import Iterable, Sequence
+from datetime import timedelta
 from typing import Any
 
-from core import attest
+from core import attest, iso8601
 
 FEED_SCHEMA = "nf-revocation-feed/1"
 TABLE_SCHEMA = "nf-revocation/1"
@@ -25,6 +27,13 @@ ZERO = "0" * 64
 GUIDE = "修复指引："
 #: 签名算法（v0 只有一种；不是协商面）
 ALG = "hmac-sha256"
+#: ttl 上限（1 年）：比这更长就不是「缓存窗口」，而是「永不过期」的伪装
+MAX_TTL = 31536000
+#: 新鲜度词表（只进输出，不进四词判定；严格开关才升级成 invalid）
+FRESH = ("fresh", "stale", "unknown")
+#: 有效期时间戳口径（UTC 秒级；与 attest.issue_stamp 同形，可直接字典序比）
+STAMP_FMT = "%Y-%m-%dT%H:%M:%SZ"
+STAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
 def canonical_bytes(obj: Any) -> bytes:
@@ -74,37 +83,127 @@ def make_table(revoked: Iterable[dict[str, Any]]) -> dict[str, Any]:
     return {"schema": TABLE_SCHEMA, "revoked": ordered, "count": len(ordered)}
 
 
+def _valid_ttl(value: Any) -> bool:
+    """ttl 口径：正整数秒且 ≤ 1 年（bool 是 int 子类，显式排除）。"""
+    return (isinstance(value, int) and not isinstance(value, bool)
+            and 0 < value <= MAX_TTL)
+
+
+def _expiry_of(doc: dict[str, Any]) -> tuple[str, str]:
+    """→ (生效到期时刻, basis)；没给有效期 → ("", "none")。
+
+    `expires_at` 在场就以它为准；否则 `issued_at + ttl`（解析后加秒，避免手工算日期）。
+    """
+    exp = doc.get("expires_at")
+    if isinstance(exp, str) and STAMP_RE.match(exp):
+        return exp, "expires_at"
+    ttl = doc.get("ttl")
+    issued = doc.get("issued_at")
+    if _valid_ttl(ttl) and isinstance(issued, str):
+        start = iso8601.parse_instant(issued)
+        if start is not None:
+            return (start + timedelta(seconds=ttl)).strftime(STAMP_FMT), "ttl"
+    return "", "none"
+
+
+def freshness(doc: dict[str, Any], at: str = "") -> dict[str, Any]:
+    """吊销件新鲜度 → {state: fresh|stale|unknown, expires_at, basis}。
+
+    **只输出，不参与判定**（判定只在 evidence 的严格开关下升级）。裸表没有信封可读有效期
+    → unknown；旧 feed 没给 `expires_at`/`ttl` 也 → unknown（不因此判死）。
+    """
+    exp, basis = ("", "none")
+    if isinstance(doc, dict) and str(doc.get("schema") or "") == FEED_SCHEMA:
+        exp, basis = _expiry_of(doc)
+    if not exp:
+        return {"state": "unknown", "expires_at": "", "basis": "none"}
+    now = at or attest.issue_stamp()
+    return {"state": "fresh" if now <= exp else "stale", "expires_at": exp, "basis": basis}
+
+
+def _shape_issues(doc: dict[str, Any]) -> list[str]:
+    """feed 可选字段的形状判定（在**签名校验之前**跑；返回问题文本，空 = 通过）。"""
+    issues: list[str] = []
+    exp = doc.get("expires_at")
+    if "expires_at" in doc and not (isinstance(exp, str) and STAMP_RE.match(exp)):
+        issues.append(f"feed 的 expires_at 形状不对：{exp!r}（" + GUIDE +
+                      "UTC 秒级 YYYY-MM-DDTHH:MM:SSZ）")
+    if "ttl" in doc and not _valid_ttl(doc.get("ttl")):
+        issues.append("feed 的 ttl 必须是正整数秒且 ≤31536000（" + GUIDE +
+                      "重签该 feed；不要手工改已签名件）")
+    uri = doc.get("status_uri")
+    if "status_uri" in doc and not (isinstance(uri, str) and uri.strip()):
+        issues.append("feed 的 status_uri 必须是非空字符串（" + GUIDE +
+                      "填 URI 形式；本仓不会去取它）")
+    issued = doc.get("issued_at")
+    if (isinstance(exp, str) and STAMP_RE.match(exp) and isinstance(issued, str)
+            and STAMP_RE.match(issued) and exp < issued):
+        issues.append("feed 的 expires_at 早于 issued_at（" + GUIDE +
+                      "重签；手工改必破签名）")
+    return issues
+
+
 def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
-         prev: dict[str, Any] | None = None, issued_at: str = "") -> dict[str, Any]:
-    """把表包成签名 feed（seq 单调递增；prev 给出上一份 feed 以接链）。"""
+         prev: dict[str, Any] | None = None, issued_at: str = "",
+         expires_at: str = "", ttl: int | None = None,
+         status_uri: str = "") -> dict[str, Any]:
+    """把表包成签名 feed（seq 单调递增；prev 给出上一份 feed 以接链）。
+
+    `expires_at` / `ttl` / `status_uri` 是**可选**新鲜度与分发指针字段：只在给出时写入
+    （不写 null，免得无谓改变 digest）。签名体仍是「除 signature 外全部字段」，故它们
+    自动进签名、改一个字节即破签名；本模块**不**根据 status_uri 联网取任何东西。
+    """
     if not isinstance(key, bytes) or not key:
         raise ValueError("签名需要密钥（" + GUIDE + "请用 --key-file 指一个非空密钥文件）")
     if int(seq) < 0:
         raise ValueError("seq 必须是非负整数（" + GUIDE + "首份用 0 或 1，之后逐份 +1）")
+    stamp = issued_at or attest.issue_stamp()
+    if expires_at:
+        if not STAMP_RE.match(str(expires_at)):
+            raise ValueError("--expires-at 必须是 UTC 秒级 YYYY-MM-DDTHH:MM:SSZ（" + GUIDE +
+                             "先换算成 UTC；格式与 nf attest 的 issued_at 同源）")
+        if str(expires_at) < stamp:
+            raise ValueError("--expires-at 早于 issued_at（" + GUIDE +
+                             "有效期必须晚于签发时刻；或改用 --ttl）")
+    if ttl is not None and not _valid_ttl(ttl):
+        raise ValueError("--ttl 必须是正整数秒且 ≤31536000（" + GUIDE +
+                         "给整数秒，例如 --ttl 86400）")
+    if status_uri and not (isinstance(status_uri, str) and status_uri.strip()):
+        raise ValueError("feed 的 status_uri 必须是非空字符串（" + GUIDE +
+                         "填 URI 形式；本仓不会去取它）")
     base: dict[str, Any] = {"schema": FEED_SCHEMA, "issuer": issuer or "",
                             "seq": int(seq),
-                            "issued_at": issued_at or attest.issue_stamp(),
+                            "issued_at": stamp,
                             "prev_digest": digest(prev) if isinstance(prev, dict) else ZERO,
                             "table": table}
+    if expires_at:
+        base["expires_at"] = str(expires_at)
+    if ttl is not None:
+        base["ttl"] = int(ttl)
+    if status_uri:
+        base["status_uri"] = str(status_uri)
     mac = hmac.new(key, canonical_bytes(base), hashlib.sha256).hexdigest()
     base["signature"] = {"alg": ALG, "mac": mac}
     return base
 
 
 def verify(doc: dict[str, Any], key: bytes | None = None,
-           prev: dict[str, Any] | None = None) -> dict[str, Any]:
-    """校验 feed（或裸表）→ {ok, verdict, seq, digest, issues, warnings}。
+           prev: dict[str, Any] | None = None, at: str = "") -> dict[str, Any]:
+    """校验 feed（或裸表）→ {ok, verdict, seq, digest, issues, warnings, freshness}。
 
     口径：签名在就必须过、且必须有密钥（**缺密钥不降级**）；没签名只给 warning
     （形状可判、来源不可判）。
     `prev` 给出时核对「序号 +1 且前序摘要接得上」——这是防回滚/分叉的那一步。
+    `at` 只影响 `freshness`（缺省 = 现在），**不参与 verdict**。
     """
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "seq": None, "digest": "",
                            "issuer": "", "count": 0, "issues": [], "warnings": [],
-                           "signed": False}
+                           "signed": False,
+                           "freshness": {"state": "unknown", "expires_at": "", "basis": "none"}}
     if not isinstance(doc, dict):
         res["issues"].append("顶层应为对象（" + GUIDE + "给 feed 或 nf-revocation/1 表）")
         return res
+    res["freshness"] = freshness(doc, at)
     schema = str(doc.get("schema") or "")
     if schema == TABLE_SCHEMA:
         table = table_of(doc)
@@ -140,6 +239,11 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
     if not isinstance(rev, list) or not all(isinstance(i, dict) for i in rev):
         res["issues"].append("table.revoked 必须是对象数组（" + GUIDE +
                              "每条至少给 digest 或 path）")
+        return res
+    # 可选字段形状（expires_at / ttl / status_uri）：**签名之前**判，坏形状即 invalid
+    shape = _shape_issues(doc)
+    if shape:
+        res["issues"].extend(shape)
         return res
     res["seq"] = seq
     res["issuer"] = str(doc.get("issuer") or "")
@@ -179,20 +283,26 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
     return res
 
 
-def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None) -> dict[str, Any]:
+def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None,
+          at: str = "") -> dict[str, Any]:
     """多份 feed → 合并后的 `nf-revocation/1` 表（按 seq 排序、逐份验链、取并集）。
 
     只要有任何一份验不过（签名/序号/前序），整次合并失败——半可信的合并结果比没有更危险。
+    新鲜度取各份**最严**（任一 stale → stale；否则任一 unknown → unknown；全 fresh → fresh），
+    逐份状态放在 `freshness.parts`；表本身 schema 不变（新鲜度只进输出）。
     """
     rows = sorted(feeds, key=lambda d: int(d.get("seq") or 0))
     issues: list[str] = []
     warnings: list[str] = []
     prev: dict[str, Any] | None = None
     items: list[dict[str, Any]] = []
+    parts: list[dict[str, Any]] = []
     for doc in rows:
-        res = verify(doc, key=key, prev=prev)
+        res = verify(doc, key=key, prev=prev, at=at)
         issues.extend(res["issues"])
         warnings.extend(res["warnings"])
+        parts.append({"seq": int(doc.get("seq") or 0),
+                      "state": (res.get("freshness") or {}).get("state", "unknown")})
         if not res["ok"]:
             prev = None
             continue
@@ -200,7 +310,14 @@ def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None) -> dict[str
         items.extend(table.get("revoked") or [])
         prev = doc
     merged = make_table(items)
+    states = [str(p["state"]) for p in parts]
+    if "stale" in states:
+        state = "stale"
+    elif "unknown" in states or not states:
+        state = "unknown"
+    else:
+        state = "fresh"
     ok = not issues
     return {"ok": ok, "verdict": "ok" if ok else "invalid", "table": merged,
             "feeds": len(rows), "count": merged["count"], "issues": issues,
-            "warnings": warnings}
+            "warnings": warnings, "freshness": {"state": state, "parts": parts}}
