@@ -45,9 +45,9 @@
     "verify": {
       "cmd": "python scripts/verify_run.py",
       "exit_code": 1,
-      "output_sha256": "9e2224d5faf7eac4f2ffb2640374baf2e933cdb4f927e465b31fdf0327b4e5cf",
-      "output_tail": "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-40））\n== 一键复现：<path> verify.sh（cwd=<path>）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.wYMV1PZBT1",
-      "ran_at": "2026-10-07"
+      "output_sha256": "5dbe6e7668b7cc8854664229af62943a8cc83b2ff60dfdefec86acb24f78ca7e",
+      "output_tail": "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-42））\n== 一键复现：<path> verify.sh（cwd=<path>）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.tnaDwYN3UF",
+      "ran_at": "2026-11-07"
     }
   },
   "instructions": [
