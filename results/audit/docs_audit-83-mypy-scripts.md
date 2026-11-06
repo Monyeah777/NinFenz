@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:014b714989a623668fac54bd06b4f2cfa8299eff1e3a296d6c6336da1f4fa396
+  - protocol/code_metrics_baseline.json:1e96adfc6882fe0828ef89f2300ea6ba1fb28fef3a1a49069d24c2d87f08f6e2
 ---
+> 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）
+
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
 
 > 重审（2026-11-06）：bash 身份守卫（WSL 空输出不再冒充判据红）+ Windows 两坑入文档

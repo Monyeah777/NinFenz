@@ -188,6 +188,15 @@ def _snapshot_remove(path: str) -> None:
     _run(["git", "worktree", "prune"], 120)
 
 
+def _snapshot_remove_tmp(path: str) -> None:
+    """清掉快照的独立临时目录（盘根 .nf-gate-tmp 下，与路径一起收）。"""
+    drive = os.path.splitdrive(os.path.abspath(path))[0] or ""
+    run_name = os.path.basename(os.path.dirname(path))
+    if drive and run_name:
+        shutil.rmtree(os.path.join(drive + os.sep, ".nf-gate-tmp", run_name),
+                      ignore_errors=True)
+
+
 def head_move_guard(start: str, end: str) -> str:
     """运行期间 HEAD 是否移动 → 无效原因（空串 = 没移动，结论可用）。
 
@@ -422,8 +431,14 @@ def _run_in_snapshot(args, head: str) -> int:
             return 2
         inner = [sys.executable, os.path.join(path, "scripts", "release_conclusion.py"),
                  *strip_snapshot_flag(sys.argv[1:])]
-        # 内层的临时件也落在快照卷：C 盘满时测试自己就会 ENOSPC（实测 84 MB 剩余跑不完）
-        tmp_dir = os.path.join(path, "..", "tmp")
+        # 内层临时件要同时满足两件事（2026-11-06 快照实测都是真红）：
+        # ① 与快照同盘：C 盘满时测试自己会 ENOSPC（实测 84 MB 剩余跑不完）；
+        # ② **在主仓树之外**：若 %TEMP% 落在仓库树内，npm 包的 findRepoRoot 会从 %TEMP% 向上
+        #    命中活树，于是不触发解包，test_payload_is_extracted_to_cache_and_runs 假红。
+        #    所以用「盘根下独立目录」：同盘、且任何仓库根的祖先都不是它。
+        drive = os.path.splitdrive(os.path.abspath(path))[0] or ""
+        tmp_dir = os.path.join(drive + os.sep, ".nf-gate-tmp",
+                               os.path.basename(os.path.dirname(path)), "tmp")
         os.makedirs(tmp_dir, exist_ok=True)
         home_dir = os.path.join(path, "..", "home")
         os.makedirs(home_dir, exist_ok=True)
@@ -450,6 +465,7 @@ def _run_in_snapshot(args, head: str) -> int:
         return 3 if rc is None else int(rc)
     finally:
         _snapshot_remove(path)
+        _snapshot_remove_tmp(path)
 
 
 def main(argv=None) -> int:
