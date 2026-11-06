@@ -1,6 +1,6 @@
 # 发布结论复跑 v0（release conclusion）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-04
+> 最后更新：2026-11-06
 > **Status**: v0 已实装（scripts/release_conclusion.py）· 与 nf release 分工不同
 
 ## 是什么
@@ -42,6 +42,32 @@ python scripts/release_conclusion.py --json          # 机读汇总（含每片 
    不对就 rc=2 并说明怎么改。**跑本件请用 git-bash 的 bash**（或项目自带的 ops_bash）。
 2. **日志别写进仓库**：`python scripts/release_conclusion.py > gate.log` 会把日志落在工作树里，
    脏树闸门直接拒绝（`?? gate.log`）。日志写到仓库外（如 `D:/nf-gate-logs/`）。
+
+## 快照模式：`--snapshot`（并发会话在场时取结论）
+
+```bash
+python scripts/release_conclusion.py --snapshot            # 在 HEAD 的临时 worktree 里跑全量
+python scripts/release_conclusion.py --snapshot --keep-snapshot   # 排障：跑完不删，打印路径
+```
+
+**它解决什么**：本仓常有并发会话。普通模式在**主工作区**跑，任何一方中途提交/改文件都会让结论作废
+（HEAD 移动即无效；分片途中变更会即刻停）。快照模式先把 HEAD 的树**检出到临时 worktree**
+（`.worktrees/gate-snap/<run>/wt`），在快照里跑内层脚本——主树之后再怎么改都不影响这次结论。
+
+**绑定语义**：结论证明的是「**该 SHA 的那棵树**是绿的」，不是「当前工作区现在能发布」。外层仍守脏树闸门
+（启动时主树必须干净；运行中的改动无影响）。
+
+**环境隔离**（都是实测踩出来的）：
+- payload 在快照里按该 SHA 重新暂存（忽略文件不跟 HEAD 走）；
+- 独立 `NARRATIVE_FORGE_HOME`（快照内的守护/缓存自成一户，不会连上活树里的守护）；
+- `TEMP/TMP` 指到**盘根独立目录**（`.nf-gate-tmp/<run>/tmp`）：与快照同盘（C 盘满时测试会 ENOSPC），
+  且不在任何仓库树的祖先链上（否则 `findRepoRoot` 从 %TEMP% 向上命中活树，npm 包的解包机制不会被触发）；
+- 内层日志边跑边落盘（`<run>/inner.log`），外层结束前不再「静默 36 分钟」；
+- 陈旧快照（被强杀的 run）会自动清理；`--keep-snapshot` 可显式留存。
+
+**边界**：快照是**干净检出**——gitignored 的构建产物（如 `engine/dotnet/dist/`）按设计不在场，
+文档路径判据对「引用 gitignored 路径」放行（fresh clone 同样不在场）；判据面与普通模式**同一批**
+（checks-only + 8 片），不存在「快照更松」。
 
 ## 五步各判什么
 
@@ -96,7 +122,7 @@ python scripts/verify_tests.py --affected           # 跑受影响模块
 
 ```bash
 # 纯函数判据（脏树闸门 / 分片汇总 / 计划生成）+ dry-run 集成
-python -m unittest desktop.tests.test_release_conclusion    # 47 项全绿
+python -m unittest desktop.tests.test_release_conclusion    # 51 项全绿
 
 # 真跑（干净树上）：checks-only + 8 片顺序跑（墙钟随机器变，不在此钉数字）
 python scripts/release_conclusion.py
