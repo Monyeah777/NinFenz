@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:2be97f0a38b0bc2ce355e9612f224fd608660e6c7d40896d7f70afa8574a13e9
+  - protocol/code_metrics_baseline.json:a81f4fd12857a4c46cfcfecbbdaebd8ac9fe99663033e6cf8ad4785545d4d718
 ---
+> 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
+
 > 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
 
 > 重审（2026-11-06）：快照日志/清理收口（重绑）

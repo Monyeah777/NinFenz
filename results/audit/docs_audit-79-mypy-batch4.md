@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:2be97f0a38b0bc2ce355e9612f224fd608660e6c7d40896d7f70afa8574a13e9
+  - protocol/code_metrics_baseline.json:a81f4fd12857a4c46cfcfecbbdaebd8ac9fe99663033e6cf8ad4785545d4d718
 ---
+> 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
+
 > 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
 
 > 重审（2026-11-06）：快照日志/清理收口（重绑）

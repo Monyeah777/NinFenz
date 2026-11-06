@@ -24,9 +24,9 @@
     "release": {
       "cmd": "python scripts/nf.py release",
       "exit_code": 1,
-      "output_sha256": "9443e07c7647b67cc31872fa33d5ddf61ab92d1242b593ca5d10fded96485bbd",
-      "output_tail": "  verify 版本 v2.30 · check 数 40（基线自描述一致：OK）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.btljylL0J4\n  ✗ 发布体检未过（基线/verify）——禁止发布",
-      "ran_at": "2026-10-07"
+      "output_sha256": "7e9b90899631e8dc3dba89ceaf17dd61729d4282d64fdd0c4facc4cde6ce0602",
+      "output_tail": "  verify 版本 v2.30 · check 数 42（基线自描述一致：OK）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.Tic51oPQZp\n  ✗ 发布体检未过（基线/verify）——禁止发布",
+      "ran_at": "2026-11-07"
     },
     "report": {
       "cmd": "python scripts/verify_report.py --fresh",
@@ -44,10 +44,10 @@
     },
     "verify": {
       "cmd": "python scripts/verify_run.py",
-      "exit_code": 1,
-      "output_sha256": "9e2224d5faf7eac4f2ffb2640374baf2e933cdb4f927e465b31fdf0327b4e5cf",
-      "output_tail": "    修复指引：python scripts/nf.py explain <check 号>（逐条：缺什么 / 补什么 / 示例；全量见 python scripts/nf.py explain all（覆盖 check1-40））\n== 一键复现：<path> verify.sh（cwd=<path>）\n  [i] 本次有 FAIL —— 诊断日志保留在：/tmp/tmp.wYMV1PZBT1",
-      "ran_at": "2026-10-07"
+      "exit_code": 0,
+      "output_sha256": "621ac839653c100505c0094a645131884c3ce725ed9e3d66de160f13101b3a01",
+      "output_tail": "  上次判定：PASS=76 WARN=1 FAIL=0（未重跑；--no-cache 或 NF_VERIFY_CACHE=0 可强制重算）\n>>> 全部通过（缓存判定：输入未变；--no-cache 可强制重算） <<<\n== 一键复现：<path> verify.sh（cwd=<path>）",
+      "ran_at": "2026-11-07"
     }
   },
   "instructions": [

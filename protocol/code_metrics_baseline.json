@@ -561,9 +561,9 @@
       "max_fn_lines": 20
     },
     "desktop/src/core/instruction_evidence.py": {
-      "lines": 149,
-      "max_fn_cc": 23,
-      "max_fn_lines": 46
+      "lines": 164,
+      "max_fn_cc": 24,
+      "max_fn_lines": 51
     },
     "desktop/src/core/instruction_step_audit.py": {
       "lines": 63,
@@ -1561,7 +1561,7 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 780,
+      "lines": 779,
       "max_fn_cc": 58,
       "max_fn_lines": 217
     },

@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2be97f0a38b0bc2ce355e9612f224fd608660e6c7d40896d7f70afa8574a13e9
+  - protocol/code_metrics_baseline.json:a81f4fd12857a4c46cfcfecbbdaebd8ac9fe99663033e6cf8ad4785545d4d718
 ---
+> 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
+
 > 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
 
 > 重审（2026-11-06）：快照日志/清理收口（重绑）
