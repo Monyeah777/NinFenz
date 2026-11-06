@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:1e96adfc6882fe0828ef89f2300ea6ba1fb28fef3a1a49069d24c2d87f08f6e2
+  - protocol/code_metrics_baseline.json:edf7806ec02149ac3f87eb86423dc3cf7ac45309b6256c4cb83278b293618be9
 ---
+> 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
+
 > 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）

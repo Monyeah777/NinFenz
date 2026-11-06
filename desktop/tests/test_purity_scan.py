@@ -307,7 +307,10 @@ class PurityScanTest(unittest.TestCase):
         #   现建、只在 git worktree add 失败时删这个空壳；理由已登记
         #   SINK_ALLOW["release_conclusion.py:shutil.rmtree"]——快照成功路径交给
         #   git worktree remove --force，不走这条）
-        self.assertLessEqual(stats.get("sinks", 0), 21)
+        # 2026-11-06 再 +1（21 → 22）：并发会话把快照临时目录移到盘根独立目录
+        #   （.nf-gate-tmp），新增一处同键清理（release_conclusion.py:shutil.rmtree，
+        #   理由同上：落点由本模块自己拼、只删自己刚建的 run 目录）
+        self.assertLessEqual(stats.get("sinks", 0), 22)
 
 
 class SinkRegistryTest(unittest.TestCase):

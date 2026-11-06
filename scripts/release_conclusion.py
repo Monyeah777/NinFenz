@@ -115,7 +115,7 @@ def midrun_drift_guard(head_start: str, head_now: str, dirty_now: list[str],
 
 
 #: 快照模式下**不传给内层**的旗标（内层在快照目录里跑，自己就是「本仓」）。
-SNAPSHOT_STRIP = ("--snapshot",)
+SNAPSHOT_STRIP = ("--snapshot", "--keep-snapshot")
 
 
 def strip_snapshot_flag(argv: list[str]) -> list[str]:
@@ -464,7 +464,10 @@ def _run_in_snapshot(args, head: str) -> int:
         rc = proc.get("code")
         return 3 if rc is None else int(rc)
     finally:
-        _snapshot_remove(path)
+        if getattr(args, "keep_snapshot", False):
+            print(f"  [keep-snapshot] {path}", file=sys.stderr)
+        else:
+            _snapshot_remove(path)
         _snapshot_remove_tmp(path)
 
 
@@ -481,6 +484,8 @@ def main(argv=None) -> int:
     ap.add_argument("--skip-checks", action="store_true", help="跳过 checks-only 步骤")
     ap.add_argument("--snapshot-dir", default="",
                     help="快照落点基目录（缺省 .worktrees/gate-snap，与仓库同盘）")
+    ap.add_argument("--keep-snapshot", action="store_true",
+                    help="快照跑完不删（排障用；会打印路径）")
     ap.add_argument("--snapshot", action="store_true",
                     help="在 HEAD 的临时 worktree 快照里跑（免疫并发会话的实时改动）")
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")

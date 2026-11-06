@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:1e96adfc6882fe0828ef89f2300ea6ba1fb28fef3a1a49069d24c2d87f08f6e2
+  - protocol/code_metrics_baseline.json:edf7806ec02149ac3f87eb86423dc3cf7ac45309b6256c4cb83278b293618be9
 ---
+> 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
+
 > 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）

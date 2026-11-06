@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:1e96adfc6882fe0828ef89f2300ea6ba1fb28fef3a1a49069d24c2d87f08f6e2
+  - protocol/code_metrics_baseline.json:edf7806ec02149ac3f87eb86423dc3cf7ac45309b6256c4cb83278b293618be9
 ---
+> 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
+
 > 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
