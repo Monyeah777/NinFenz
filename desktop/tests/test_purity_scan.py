@@ -303,7 +303,11 @@ class PurityScanTest(unittest.TestCase):
         self.assertEqual([i for i in issues if "危险 sink" in i], [],
                          "真仓库出现未登记 sink 即 FAIL")
         # 2026-10-19：16 → 20（scratch：写权限探针自清 + 上下文清理 + TTL 回收，各站点已登记理由）
-        self.assertLessEqual(stats.get("sinks", 0), 20)
+        # 2026-11-06：20 → 21（发布结论器 --snapshot 的**失败自清**：落点由 tempfile.mkdtemp
+        #   现建、只在 git worktree add 失败时删这个空壳；理由已登记
+        #   SINK_ALLOW["release_conclusion.py:shutil.rmtree"]——快照成功路径交给
+        #   git worktree remove --force，不走这条）
+        self.assertLessEqual(stats.get("sinks", 0), 21)
 
 
 class SinkRegistryTest(unittest.TestCase):
