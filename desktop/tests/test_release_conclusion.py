@@ -341,5 +341,24 @@ class TestSnapshotLocation(unittest.TestCase):
         self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
 
 
+class TestBashIdentity(unittest.TestCase):
+    """checks-only 之前先验 bash 身份：WSL 的 bash 会 rc=1 且**零输出**（被误读成判据红）。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_git_bash_flavours_pass(self):
+        for text in ("Msys", "CYGWIN_NT-10.0", "MINGW64_NT-10.0", "msys"):
+            self.assertEqual("", self.gate.bash_identity_ok(text), text)
+
+    def test_wsl_is_rejected_with_guidance(self):
+        msg = self.gate.bash_identity_ok("GNU/Linux")
+        self.assertIn("git-bash", msg)
+        self.assertIn("修复指引", msg)
+
+    def test_empty_probe_is_rejected(self):
+        self.assertIn("修复指引", self.gate.bash_identity_ok(""))
+
+
 if __name__ == "__main__":
     unittest.main()

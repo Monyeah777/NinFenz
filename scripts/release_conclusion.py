@@ -294,10 +294,36 @@ def _step_ratchets(verbose: bool) -> list[dict]:
     return rows
 
 
+#: 我们需要的 bash：git-bash / MSYS / cygwin 一类（能认 Windows 路径、能跑本仓 verify.sh）。
+#: System32 里的 bash.exe 是 WSL：在 Windows 上它会把 /d/NinFenz 当成不存在的路径，
+#: 于是 bash verify.sh --checks-only 返回 rc=1 且**零输出**——看起来像「checks-only 未过」。
+BASH_MARKERS = ("msys", "cygwin", "mingw", "git")
+
+
+def bash_identity_ok(uname_o: str) -> str:
+    """bash 身份判据（纯函数）→ 空串=可用；否则给原因（带指引）。"""
+    text = (uname_o or "").strip().lower()
+    if not text:
+        return ("bash 身份探针无输出（修复指引：确认 bash 可用；Windows 上请用 git-bash，"
+                "别落到 System32 的 bash.exe（那是 WSL））")
+    if any(marker in text for marker in BASH_MARKERS):
+        return ""
+    got = uname_o.strip()
+    return (f"bash 不是 git-bash 系（uname -o 返回 {got}）（修复指引：Windows 上从 PowerShell "
+            "启动时 PATH 里的 bash 可能是 WSL——请显式用 git-bash 的 bash.exe，或直接走 "
+            "ops_bash 的 bash 跑本件）")
+
+
 def _step_checks_only(verbose: bool) -> tuple[int, float]:
     t0 = time.perf_counter()
     if verbose:
         print("[4/5] bash verify.sh --checks-only …", flush=True)
+    probe = _run(["bash", "-c", "uname -o"], 60)
+    ident = bash_identity_ok(probe.get("out") or "")
+    if ident:
+        if verbose:
+            print(f"  ✗ {ident}", flush=True)
+        return 2, time.perf_counter() - t0
     proc = _run(["bash", "verify.sh", "--checks-only"], 3600)
     out = (proc.get("out") or "") + (proc.get("err") or "")
     tail = [ln for ln in out.splitlines() if ln.strip()][-1:]

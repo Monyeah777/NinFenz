@@ -31,7 +31,17 @@ python scripts/release_conclusion.py --only-preflight   # 只跑前置面（脏�
 python scripts/release_conclusion.py --json          # 机读汇总（含每片 rc/墙钟；失败片带输出尾部）
 ```
 
-退出码：0 = 可发布 · 1 = 有失败 · 2 = 前置不满足（脏树 / 参数错）。
+退出码：0 = 可发布 · 1 = 有失败 · 2 = 前置不满足（脏树 / 参数错 / bash 身份不对）。
+
+### Windows 上的两个坑（2026-11-06 各花掉 30+ 分钟）
+
+1. **bash 落到 WSL**：从 PowerShell 启动本件时，PATH 里的 `bash` 可能是
+   `C:\Windows\System32\bash.exe`（WSL）。它把 `/d/NinFenz` 当成不存在的路径，
+   `bash verify.sh --checks-only` 于是 **rc=1 且零输出**——看起来像「checks-only 未过」。
+   现在 checks-only 之前会先跑 `bash -c 'uname -o'` 验身份（git-bash/MSYS/cygwin 才放行），
+   不对就 rc=2 并说明怎么改。**跑本件请用 git-bash 的 bash**（或项目自带的 ops_bash）。
+2. **日志别写进仓库**：`python scripts/release_conclusion.py > gate.log` 会把日志落在工作树里，
+   脏树闸门直接拒绝（`?? gate.log`）。日志写到仓库外（如 `D:/nf-gate-logs/`）。
 
 ## 五步各判什么
 
