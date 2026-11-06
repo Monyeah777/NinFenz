@@ -419,8 +419,8 @@
         "recorded": 7,
         "recorded_policy": 3
       },
-      "status": "warn",
-      "warns": 5
+      "status": "pass",
+      "warns": 0
     },
     {
       "id": "coupling",
@@ -538,12 +538,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "16b94949520cc35228eb305f2510f59fc82885c8d8db08158f7d93498befa53b",
+  "root_digest": "49f10090073d7af30557f32f91b6e7ba0f34d19b345a4e2ac1db2fea5c6a57f9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
     "fail": 0,
-    "pass": 28,
-    "warn": 3
+    "pass": 29,
+    "warn": 2
   }
 }
