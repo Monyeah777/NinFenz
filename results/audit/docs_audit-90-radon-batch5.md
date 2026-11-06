@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:a81f4fd12857a4c46cfcfecbbdaebd8ac9fe99663033e6cf8ad4785545d4d718
+  - protocol/code_metrics_baseline.json:3f099e1325f53e4c77fbfe07c012de802dc8b787efb2a85aaed2ed350b4a422b
 ---
+> 重审（2026-11-07）：verification_report 记 built_for_date（涉时判据按基准日重算）
+
 > 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
 
 > 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51

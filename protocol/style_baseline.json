@@ -940,7 +940,7 @@
     "desktop/src/core/verify_checks.py::UP045": 2,
     "desktop/src/core/verify_report.py::I001": 1,
     "desktop/src/core/verify_report.py::RUF100": 2,
-    "desktop/src/core/verify_report.py::UP006": 26,
+    "desktop/src/core/verify_report.py::UP006": 24,
     "desktop/src/core/verify_report.py::UP031": 11,
     "desktop/src/core/verify_report.py::UP035": 3,
     "desktop/src/core/verify_report.py::UP045": 1,
