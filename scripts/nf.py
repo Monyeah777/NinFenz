@@ -604,44 +604,7 @@ def _add_parser_production(sub):
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evr = esub.add_parser("revocations",
-                          help="吊销分发件：签名 / 校验 / 合并（nf-revocation-feed/1）",
-                          description="吊销表的分发信封：issuer + 单调 seq + 前序摘要 + hmac 签名。"
-                                      "校验不过即不可信（缺密钥不降级）；多份按序号链验完再取并集，"
-                                      "输出仍是 nf-revocation/1 表（可直接喂 --revocations）。")
-    rvsub = evr.add_subparsers(dest="revocations_cmd")
-    rvs = rvsub.add_parser("sign", help="把 nf-revocation/1 表包成签名 feed",
-                           description="签名：对「除 signature 外」的规范化字节求 hmac-sha256。"
-                                       "seq 单调递增；--prev 接上一份 feed（防回滚/分叉）。")
-    rvs.add_argument("--table", required=True, help="要签的 nf-revocation/1 表 JSON")
-    rvs.add_argument("--key-file", required=True, help="签名密钥文件（文本或字节，取非空内容）")
-    rvs.add_argument("--issuer", default="", help="签发方标识（写进 feed）")
-    rvs.add_argument("--seq", type=int, default=1, help="单调递增序号（首份 1，之后 +1）")
-    rvs.add_argument("--prev", default="", help="上一份 feed JSON（接链；首份省略）")
-    rvs.add_argument("--expires-at", default="",
-                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；进签名体，只记录不联网）")
-    rvs.add_argument("--ttl", type=int, default=None,
-                     help="有效期秒数（正整数 ≤31536000；有 --expires-at 时以它为准）")
-    rvs.add_argument("--status-uri", default="",
-                     help="分发指针（非空字符串；仅记录，本仓不联网去取）")
-    rvs.add_argument("--out", default="", help="输出 feed（缺省=只打印）")
-    rvs.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    rvv = rvsub.add_parser("verify", help="校验 feed（签名 + 序号 + 前序链）",
-                           description="校验：schema/seq/prev_digest/table 形状 + 签名（有则必过）+ 前序链。"
-                                       "退出码：ok=0 / invalid=1 / 用法错=4。")
-    rvv.add_argument("revocation_feed", metavar="FEED.json", help="feed 或裸 nf-revocation/1 表")
-    rvv.add_argument("--key-file", default="", help="校验签名所需密钥（缺密钥即 invalid，不降级）")
-    rvv.add_argument("--prev", default="", help="上一份 feed（核对序号与前序摘要）")
-    rvv.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
-    rvv.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
-                           description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
-                                       "输出是普通表，可给 nf evidence verify --revocations 用。")
-    rvm.add_argument("feeds", nargs="+", help="feed JSON（按任意顺序给，内部按 seq 排）")
-    rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
-    rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
-    rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
-    rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_revocations(esub)
     evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
@@ -708,6 +671,50 @@ def evidence_kinds() -> tuple[str, ...]:
     from core import evidence
     return tuple(evidence.KINDS)
 
+
+def _add_parser_revocations(esub):
+    """吊销分发件子命令（sign / verify / merge）注册。
+
+    从 _add_parser_production 拆出：命令树仍单一构建入口，但单函数保持在 300 行判据内。
+    """
+    evr = esub.add_parser("revocations",
+                          help="吊销分发件：签名 / 校验 / 合并（nf-revocation-feed/1）",
+                          description="吊销表的分发信封：issuer + 单调 seq + 前序摘要 + hmac 签名。"
+                                      "校验不过即不可信（缺密钥不降级）；多份按序号链验完再取并集，"
+                                      "输出仍是 nf-revocation/1 表（可直接喂 --revocations）。")
+    rvsub = evr.add_subparsers(dest="revocations_cmd")
+    rvs = rvsub.add_parser("sign", help="把 nf-revocation/1 表包成签名 feed",
+                           description="签名：对「除 signature 外」的规范化字节求 hmac-sha256。"
+                                       "seq 单调递增；--prev 接上一份 feed（防回滚/分叉）。")
+    rvs.add_argument("--table", required=True, help="要签的 nf-revocation/1 表 JSON")
+    rvs.add_argument("--key-file", required=True, help="签名密钥文件（文本或字节，取非空内容）")
+    rvs.add_argument("--issuer", default="", help="签发方标识（写进 feed）")
+    rvs.add_argument("--seq", type=int, default=1, help="单调递增序号（首份 1，之后 +1）")
+    rvs.add_argument("--prev", default="", help="上一份 feed JSON（接链；首份省略）")
+    rvs.add_argument("--expires-at", default="",
+                     help="有效期（UTC 秒级 YYYY-MM-DDTHH:MM:SSZ；进签名体，只记录不联网）")
+    rvs.add_argument("--ttl", type=int, default=None,
+                     help="有效期秒数（正整数 ≤31536000；有 --expires-at 时以它为准）")
+    rvs.add_argument("--status-uri", default="",
+                     help="分发指针（非空字符串；仅记录，本仓不联网去取）")
+    rvs.add_argument("--out", default="", help="输出 feed（缺省=只打印）")
+    rvs.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvv = rvsub.add_parser("verify", help="校验 feed（签名 + 序号 + 前序链）",
+                           description="校验：schema/seq/prev_digest/table 形状 + 签名（有则必过）+ 前序链。"
+                                       "退出码：ok=0 / invalid=1 / 用法错=4。")
+    rvv.add_argument("revocation_feed", metavar="FEED.json", help="feed 或裸 nf-revocation/1 表")
+    rvv.add_argument("--key-file", default="", help="校验签名所需密钥（缺密钥即 invalid，不降级）")
+    rvv.add_argument("--prev", default="", help="上一份 feed（核对序号与前序摘要）")
+    rvv.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
+    rvv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
+                           description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
+                                       "输出是普通表，可给 nf evidence verify --revocations 用。")
+    rvm.add_argument("feeds", nargs="+", help="feed JSON（按任意顺序给，内部按 seq 排）")
+    rvm.add_argument("--key-file", default="", help="校验签名所需密钥")
+    rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
+    rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
+    rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 def _add_parser_validation(sub):
     sc = sub.add_parser("score",
@@ -3671,8 +3678,7 @@ def _evidence_verify(args):
         res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
                                   root=root, kind=args.kind, anchor=anc,
                                   expected_policy_digest=getattr(args, "policy_digest", ""),
-                                  require_fresh_revocations=getattr(
-                                      args, "require_fresh_revocations", False))
+                                  require_fresh_revocations=bool(args.require_fresh_revocations))
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
