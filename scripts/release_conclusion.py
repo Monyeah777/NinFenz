@@ -196,6 +196,7 @@ def _snapshot_prune(base: Path, keep_wt: str = "") -> list[str]:
         try:
             entries.append((str(child), child.stat().st_mtime))
         except OSError:
+            # 刚被别的进程清掉/无权限读 mtime：跳过这个目录即可，清理逻辑本身不需要它
             continue
     stale = stale_snapshot_dirs(entries, live, time.time(), keep=keep_wt)
     for path in stale:

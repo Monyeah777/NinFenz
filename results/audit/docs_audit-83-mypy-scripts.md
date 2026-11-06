@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:d9509dd246288680080a3c333b0cc9ccad13afe74d9f1f74dab9f346590676f0
+  - protocol/code_metrics_baseline.json:2be97f0a38b0bc2ce355e9612f224fd608660e6c7d40896d7f70afa8574a13e9
 ---
+> 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
+
 > 重审（2026-11-06）：快照日志/清理收口（重绑）
 
 > 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理

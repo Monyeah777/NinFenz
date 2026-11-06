@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:d9509dd246288680080a3c333b0cc9ccad13afe74d9f1f74dab9f346590676f0
+  - protocol/code_metrics_baseline.json:2be97f0a38b0bc2ce355e9612f224fd608660e6c7d40896d7f70afa8574a13e9
 ---
+> 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
+
 > 重审（2026-11-06）：快照日志/清理收口（重绑）
 
 > 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理
