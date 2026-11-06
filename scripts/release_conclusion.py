@@ -380,6 +380,11 @@ def _run_in_snapshot(args, head: str) -> int:
     都作用在快照上，无需把 cwd 透传到每个 helper。结论因此绑定**一个 SHA**。
     """
     base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from core import json_doc as json_doc_mod  # 局部导入：模块级只留纯逻辑
+
     path, err = _snapshot_create(head, base)
     if err:
         print(f"  ✗ {err}", file=sys.stderr)
@@ -394,14 +399,18 @@ def _run_in_snapshot(args, head: str) -> int:
         # 内层的临时件也落在快照卷：C 盘满时测试自己就会 ENOSPC（实测 84 MB 剩余跑不完）
         tmp_dir = os.path.join(path, "..", "tmp")
         os.makedirs(tmp_dir, exist_ok=True)
+        home_dir = os.path.join(path, "..", "home")
+        os.makedirs(home_dir, exist_ok=True)
         env = {**os.environ, "TEMP": tmp_dir, "TMP": tmp_dir,
+               # 独立 NF_HOME：快照里的守护/缓存/会话都自成一户，不会连上活树里的守护
+               "NARRATIVE_FORGE_HOME": home_dir,
                "NF_GATE_IN_SNAPSHOT": "1"}
         proc = _run(inner, 7200, cwd=path, env=env)
         out = proc.get("out") or ""
         err_out = proc.get("err") or ""
         if getattr(args, "json", False) and out.strip():
             try:
-                doc = json.loads(out)
+                doc = json_doc_mod.loads(out, dict, what="内层门禁结论")
             except ValueError:
                 sys.stdout.write(out)
             else:

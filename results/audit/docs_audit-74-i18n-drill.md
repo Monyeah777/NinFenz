@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:398c7c34507c0059b3dea5fdf34ec9884b8c092253539f759e62615a7328597c
+  - protocol/code_metrics_baseline.json:787069b6d41f16b08f3bd168da4df3d73a3c11cac853c4f506198c8a147d5541
 ---
+> 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
+
 > 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
 
 > 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）

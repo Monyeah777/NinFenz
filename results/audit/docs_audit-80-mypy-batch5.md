@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:398c7c34507c0059b3dea5fdf34ec9884b8c092253539f759e62615a7328597c
+  - protocol/code_metrics_baseline.json:787069b6d41f16b08f3bd168da4df3d73a3c11cac853c4f506198c8a147d5541
 ---
+> 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
+
 > 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
 
 > 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）

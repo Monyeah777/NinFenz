@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:398c7c34507c0059b3dea5fdf34ec9884b8c092253539f759e62615a7328597c
+  - protocol/code_metrics_baseline.json:787069b6d41f16b08f3bd168da4df3d73a3c11cac853c4f506198c8a147d5541
 ---
+> 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
+
 > 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
 
 > 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）

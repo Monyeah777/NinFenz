@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:398c7c34507c0059b3dea5fdf34ec9884b8c092253539f759e62615a7328597c
+  - protocol/code_metrics_baseline.json:787069b6d41f16b08f3bd168da4df3d73a3c11cac853c4f506198c8a147d5541
 ---
+> 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
+
 > 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
 
 > 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）

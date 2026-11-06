@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-06",
   "approved_by": "Monyeah777",
-  "note": "change note 收录后投影重冻",
+  "note": "快照隔离收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "bc750882970614bf434c5e3d7d1713366f4e68770939e17e75f4db8b462b70b5"
