@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:48778c99b1d60bfd62aaa19256b80ac37e9d943dddf94a67aae7d1da35db4cb6
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:46da2dcbfea1236a6a708825d01f3e021bdaff99d794cf3f1bbf45647e161a87
+  - protocol/code_metrics_baseline.json:398c7c34507c0059b3dea5fdf34ec9884b8c092253539f759e62615a7328597c
 ---
+> 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
+
 > 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）
 
 > 重审（2026-11-06）：纯度放行表扩容后度量基线重冻

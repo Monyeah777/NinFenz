@@ -23,7 +23,7 @@ subjects:
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
   - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
-  - desktop/tests/test_doc_reachability.py:41309204c54e76af11a4a2017cfa8be26ff7c90c88697ddc0aa43d23f4f0b752
+  - desktop/tests/test_doc_reachability.py:b74cc400e354ca12cf632747eefbe41766f42fce445961613d97e02dd7d1b828
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
@@ -34,6 +34,10 @@ subjects:
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
 ---
+> 重审（2026-11-06）：哨兵修复收口（重绑）
+
+> 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
+
 > 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
 
 > 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）

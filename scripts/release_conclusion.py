@@ -394,7 +394,8 @@ def _run_in_snapshot(args, head: str) -> int:
         # 内层的临时件也落在快照卷：C 盘满时测试自己就会 ENOSPC（实测 84 MB 剩余跑不完）
         tmp_dir = os.path.join(path, "..", "tmp")
         os.makedirs(tmp_dir, exist_ok=True)
-        env = {**os.environ, "TEMP": tmp_dir, "TMP": tmp_dir}
+        env = {**os.environ, "TEMP": tmp_dir, "TMP": tmp_dir,
+               "NF_GATE_IN_SNAPSHOT": "1"}
         proc = _run(inner, 7200, cwd=path, env=env)
         out = proc.get("out") or ""
         err_out = proc.get("err") or ""
@@ -575,7 +576,11 @@ def main(argv=None) -> int:
         for i in range(shards):
             futures[pool.submit(_shard_one, i, shards)] = i
         for fut in concurrent.futures.as_completed(futures):
-            row = fut.result()
+            try:
+                row = fut.result()
+            except concurrent.futures.CancelledError:
+                row = {"shard": f"{futures[fut]}/{shards}", "rc": 3, "wall": 0.0,
+                       "tests": 0, "skipped": True, "note": "树在跑动中变化——已取消"}
             results.append(row)
             if not args.json:
                 mark = "✓" if row["rc"] == 0 else "✗"
