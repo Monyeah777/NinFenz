@@ -6,6 +6,7 @@
 """
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -358,6 +359,32 @@ class TestBashIdentity(unittest.TestCase):
 
     def test_empty_probe_is_rejected(self):
         self.assertIn("修复指引", self.gate.bash_identity_ok(""))
+
+
+class TestSnapshotHygiene(unittest.TestCase):
+    """陈旧快照必须清（几个就几百 MB，撞满盘会伪装成门禁红）：在跑的、这次用的都不许清。"""
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_old_unregistered_is_stale(self):
+        entries = [("/base/old", 1000.0)]
+        self.assertEqual(["/base/old"],
+                         self.gate.stale_snapshot_dirs(entries, set(), 1000.0 + 7 * 3600))
+
+    def test_young_is_kept(self):
+        entries = [("/base/new", 1000.0)]
+        self.assertEqual([], self.gate.stale_snapshot_dirs(entries, set(), 1000.0 + 60))
+
+    def test_live_worktree_is_never_pruned(self):
+        entries = [("/base/live", 1000.0)]
+        live = {os.path.abspath("/base/live")}
+        self.assertEqual([], self.gate.stale_snapshot_dirs(entries, live, 1000.0 + 99 * 3600))
+
+    def test_current_run_is_kept(self):
+        entries = [("/base/mine", 1000.0)]
+        self.assertEqual([], self.gate.stale_snapshot_dirs(
+            entries, set(), 1000.0 + 99 * 3600, keep="/base/mine"))
 
 
 if __name__ == "__main__":

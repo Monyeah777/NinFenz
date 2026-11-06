@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:edf7806ec02149ac3f87eb86423dc3cf7ac45309b6256c4cb83278b293618be9
+  - protocol/code_metrics_baseline.json:d9509dd246288680080a3c333b0cc9ccad13afe74d9f1f74dab9f346590676f0
 ---
+> 重审（2026-11-06）：快照日志/清理收口（重绑）
+
+> 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理
+
 > 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
 
 > 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）

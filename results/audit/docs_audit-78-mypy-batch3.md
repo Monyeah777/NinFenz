@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:edf7806ec02149ac3f87eb86423dc3cf7ac45309b6256c4cb83278b293618be9
+  - protocol/code_metrics_baseline.json:d9509dd246288680080a3c333b0cc9ccad13afe74d9f1f74dab9f346590676f0
 ---
+> 重审（2026-11-06）：快照日志/清理收口（重绑）
+
+> 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理
+
 > 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
 
 > 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）

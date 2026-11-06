@@ -151,6 +151,61 @@ def _snapshot_free_bytes(path: Path) -> int:
         return -1
 
 
+def _rm_tree(path: str) -> None:
+    """删一棵**本模块自己建的**临时树（单一 sink 站点；落点从不来自外部输入）。"""
+    shutil.rmtree(path, ignore_errors=True)
+
+
+def stale_snapshot_dirs(entries: list[tuple[str, float]], live: set, now: float,
+                        max_age_s: float = 6 * 3600.0, keep: str = "") -> list[str]:
+    """陈旧快照目录（纯函数，判据可单测）→ 待清理的绝对路径列表。
+
+    规则：**已注册的在跑 worktree 永不清**、当前这次的不清、其余超过 max_age_s 才清。
+    为什么要清（2026-11-06 实测）：失败/中断的快照会留在 .worktrees/gate-snap/，几个就几百 MB，
+    迟早把盘撞满——那会伪装成「门禁红」。
+    """
+    out = []
+    for raw, mtime in entries:
+        path = str(raw)
+        if path == keep:
+            continue
+        if os.path.abspath(path) in live:
+            continue
+        if now - float(mtime or 0.0) < max_age_s:
+            continue
+        out.append(path)
+    return sorted(out)
+
+
+def _live_worktree_paths() -> set:
+    proc = _run(["git", "worktree", "list", "--porcelain"], 120)
+    out = set()
+    for line in (proc.get("out") or "").splitlines():
+        if line.startswith("worktree "):
+            out.add(os.path.abspath(line[len("worktree "):].strip()))
+    return out
+
+
+def _snapshot_prune(base: Path, keep_wt: str = "") -> list[str]:
+    """清掉陈旧快照（先交还 git 注册，再删目录）→ 已清理路径列表。"""
+    if not base.is_dir():
+        return []
+    live = _live_worktree_paths()
+    entries = []
+    for child in sorted(base.iterdir()):
+        try:
+            entries.append((str(child), child.stat().st_mtime))
+        except OSError:
+            continue
+    stale = stale_snapshot_dirs(entries, live, time.time(), keep=keep_wt)
+    for path in stale:
+        _run(["git", "worktree", "remove", "--force", path], 300)
+        _rm_tree(path)
+    if stale:
+        _run(["git", "worktree", "prune"], 120)
+    return stale
+
+
 def _snapshot_create(head: str, base: Path, need_mb: int = 400) -> tuple[str, str]:
     """在临时目录建 HEAD 的 detached worktree → (路径, 错误说明)。
 
@@ -167,7 +222,7 @@ def _snapshot_create(head: str, base: Path, need_mb: int = 400) -> tuple[str, st
     path = str(run_dir / "wt")
     proc = _run(["git", "worktree", "add", path, "--detach", head], 300)
     if proc.get("code") != 0:
-        shutil.rmtree(run_dir, ignore_errors=True)
+        _rm_tree(str(run_dir))
         return "", (f"建快照失败（{proc.get('err') or proc.get('out') or '未知错误'}）"
                     f"（{GUIDE}确认 git 可用、HEAD={str(head)[:12]} 存在）")
     return path, ""
@@ -408,6 +463,15 @@ def _shard_one(index: int, total: int) -> dict:
     return row
 
 
+def _read_text(path: str) -> str:
+    """读内层日志（大件也一次性读；门禁日志量级 < 1 MB）。读不到就当空串。"""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return fh.read()
+    except OSError:
+        return ""
+
+
 def _run_in_snapshot(args, head: str) -> int:
     """外层：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
 
@@ -420,10 +484,18 @@ def _run_in_snapshot(args, head: str) -> int:
         sys.path.insert(0, src)
     from core import json_doc as json_doc_mod  # 局部导入：模块级只留纯逻辑
 
+    pruned = _snapshot_prune(base)
+    if pruned:
+        names = ", ".join(p.split(os.sep)[-1] for p in pruned)
+        print(f"  [snapshot] 清理陈旧快照 {len(pruned)} 个：{names}",
+              file=sys.stderr, flush=True)
     path, err = _snapshot_create(head, base)
     if err:
         print(f"  ✗ {err}", file=sys.stderr)
         return 2
+    log_path = os.path.join(os.path.dirname(path), "gate.log")
+    print(f"  [snapshot] HEAD {head[:12]} · 内层日志 {log_path}（可另开终端 tail -f）",
+          file=sys.stderr, flush=True)
     try:
         stage_err = _snapshot_stage_payload(path)
         if stage_err:
@@ -446,9 +518,20 @@ def _run_in_snapshot(args, head: str) -> int:
                # 独立 NF_HOME：快照里的守护/缓存/会话都自成一户，不会连上活树里的守护
                "NARRATIVE_FORGE_HOME": home_dir,
                "NF_GATE_IN_SNAPSHOT": "1"}
-        proc = _run(inner, 7200, cwd=path, env=env)
-        out = proc.get("out") or ""
-        err_out = proc.get("err") or ""
+        # 内层输出**边跑边落盘**：外层用 bash 重定向（受控进程原子照旧），这样 12 分钟里
+        # 另开终端 tail 就能看到进度，而不是盯一个空文件等半小时。
+        quoted = " ".join(f'"{a}"' for a in inner)
+        launcher = ['bash', '-c',
+                    f'{quoted} > "{log_path}" 2>&1; echo "NFGATE_EXIT=$?"']
+        proc = _run(launcher, 7200, cwd=path, env=env)
+        out = _read_text(log_path)
+        err_meta = proc.get("out") or ""
+        inner_rc = None
+        for line in err_meta.splitlines():
+            if line.startswith("NFGATE_EXIT=") and line.split("=", 1)[1].strip().isdigit():
+                inner_rc = int(line.split("=", 1)[1])
+        # 先把内层输出整段回显（含逐片进度），再按内层退出码返回——顺序错了就等于
+        # 「跑完了但什么都没告诉你」（第一版真踩过）。
         if getattr(args, "json", False) and out.strip():
             try:
                 doc = json_doc_mod.loads(out, dict, what="内层门禁结论")
@@ -459,10 +542,9 @@ def _run_in_snapshot(args, head: str) -> int:
                 print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
         else:
             sys.stdout.write(out)
-        if err_out:
-            sys.stderr.write(err_out)
-        rc = proc.get("code")
-        return 3 if rc is None else int(rc)
+        if inner_rc is None:
+            return 3 if proc.get("code") is None else int(proc.get("code"))
+        return inner_rc
     finally:
         if getattr(args, "keep_snapshot", False):
             print(f"  [keep-snapshot] {path}", file=sys.stderr)
