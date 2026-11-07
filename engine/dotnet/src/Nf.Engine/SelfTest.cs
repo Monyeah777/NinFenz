@@ -2525,7 +2525,7 @@ public static class SelfTest
         // ① 真材料：真仓生成物 == 实时重算（**这一条绿就等价于两个生成物逐字节一致**）+ 统计数
         var (realIssues, realStats) = ProtocolGolden.VerifyGolden(repoRoot);
         checks.Add(new Check("协议生成物 golden·真仓（check31：生成物 == 实时重算 · 摘要 %s 字节 / schema %s 份）",
-            realIssues.Count == 0 && Convert.ToInt64(realStats["schema_ids"]) == 9
+            realIssues.Count == 0 && Convert.ToInt64(realStats["schema_ids"]) == 10
             && Convert.ToInt64(realStats["report_bytes"]) > 50000,
             $"问题 {realIssues.Count} · report {realStats["report_bytes"]} 字节 · schema {realStats["schema_ids"]} 份"));
 
@@ -2823,7 +2823,7 @@ public static class SelfTest
     }
 
     /// <summary>
-    /// GEO 出口（check38 子扫描 3 · `scripts/geo_export.py`）四钉：真仓（375 条标准 / 71 条被绑定 /
+    /// GEO 出口（check38 子扫描 3 · `scripts/geo_export.py`）四钉：真仓（376 条标准 / 72 条被绑定 /
     /// 8 件生成物，**引擎重算须逐字节命中盘上原件**）· 合成语料（真源 `write()` 写出的盘上原件 →
     /// 引擎重算同样命中，证明渲染器不是只对真仓凑巧）· 合成漂移（删一个索引锚点 → 漂移 + 锚点集合
     /// 各报一条）· 缺生成物（8 件逐件报缺 + 锚点集合报差）。金标由 probes/geo_export_probe.py 产出。
@@ -2836,10 +2836,10 @@ public static class SelfTest
         const string Absent = "4aa7946fa0a0edc6ccf8e560949dc5bb";
 
         var real = GeoExport.Check(repoRoot);
-        checks.Add(new Check("GEO 出口·真仓（375 条标准 / 71 条被绑定 / 8 件生成物 · 重算逐字节命中）",
+        checks.Add(new Check("GEO 出口·真仓（376 条标准 / 72 条被绑定 / 8 件生成物 · 重算逐字节命中）",
             real.Ok && real.LogDigest() == Real
-            && Convert.ToInt64(real.Stats["standards"]) == 375
-            && Convert.ToInt64(real.Stats["bound_standards"]) == 71
+            && Convert.ToInt64(real.Stats["standards"]) == 376
+            && Convert.ToInt64(real.Stats["bound_standards"]) == 72
             && Convert.ToInt64(real.Stats["files"]) == 8,
             $"FAIL {real.Issues.Count} · 标准 {real.Stats["standards"]} · 摘要 {real.LogDigest()}"
             + $"（真源金标 {Real}）"));
