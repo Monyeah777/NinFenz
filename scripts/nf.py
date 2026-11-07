@@ -370,122 +370,9 @@ def _add_parser_catalog(sub):
     # ---- v2.8.0 波B S4：管线脚手架 ----
 
 
-def _add_parser_production(sub):
-    pln = sub.add_parser("pipeline",
-                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
- description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
-    psub = pln.add_subparsers(dest="pipeline_cmd", required=True)
-    p_new = psub.add_parser("new",
- help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
- description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
-    p_dry = psub.add_parser("dryrun",
-                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory "
-                                "分列）",
-                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，"
-                                "答不了『跑得通吗』）")
-    p_dry.add_argument("--pipeline", default="", help="管线 md 路径（缺省 + --all 时全仓扫）")
-    p_dry.add_argument("--all", action="store_true", help="全仓管线扫一遍并汇总")
-    p_dry.add_argument("--json", action="store_true", help="输出执行图 JSON")
-    p_dry.add_argument("--write-advisory", action="store_true",
-                       help="配合 --all：把 advisory 分类台账写入 protocol/pipeline_advisory.json")
-    p_new.add_argument("--id", required=True, help="新管线 id（如 P07）")
-    p_new.add_argument("--name", required=True, help="新管线显示名（如 演示领域管线）")
-    p_new.add_argument("--from", dest="template", default=None,
-                       help="模板管线 md（缺省 = 03_管线库/P00_通用文档生成管线.md）")
-    p_new.add_argument("--domain", default="",
-                       help="领域标签（如 悬疑 → tags 追加「悬疑领域」）")
-    p_new.add_argument("--dest", default="",
-                       help="输出 md 路径（缺省 = 03_管线库/<id>_<name>.md 官方管线位）")
 
-    # ---- v2.8.0 波B S5：模块生命周期 ----
-    mds = sub.add_parser("module",
-                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 "
-                             "verify）",
- description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
-    msub = mds.add_subparsers(dest="module_cmd", required=True)
-    m_ls = msub.add_parser("ls",
- help="浏览模块状态（--status 过滤；缺省全量）",
- description="浏览模块状态（--status 过滤；缺省全量）")
-    m_ls.add_argument("--status", default="", choices=("active", "deprecated", "retired"))
-    m_ls.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
-    m_ls.add_argument("--json", action="store_true",
-                      help="输出结构化 JSON（模块状态清单）")
-    m_st = msub.add_parser("status",
- help="查看单个模块文件状态位",
- description="查看单个模块文件状态位")
-    m_st.add_argument("file", help="模块 md 路径（如 community/<包>/modules/Mxx_….md）")
-    m_dp = msub.add_parser("deprecate",
- help="状态流转 → deprecated（写文件元信息行状态位）",
- description="状态流转 → deprecated（写文件元信息行状态位）")
-    m_dp.add_argument("file", help="模块 md 路径")
-    m_dp.add_argument("--reason", default="", help="弃用原因（写入状态位）")
-    m_rs = msub.add_parser("restore",
- help="状态流转 → active（deprecated/retired 回退）",
- description="状态流转 → active（deprecated/retired 回退）")
-    m_rs.add_argument("file", help="模块 md 路径")
-    m_vf = msub.add_parser("verify",
- help="引用门禁扫描（与 verify.sh check24 同语义）",
- description="引用门禁扫描（与 verify.sh check24 同语义）")
-    m_sg = msub.add_parser("signature",
-                           help="模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
-                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结"
-                               "、实现可替）")
-    m_sg.add_argument("--write", action="store_true",
-                      help="重新冻结边界基线（评审后显式重签）")
-    m_sg.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_ty = msub.add_parser("types",
-                           help="I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
-                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段"
-                               "级新增）")
-    m_ty.add_argument("--write", action="store_true",
-                      help="给全部有机读契约的模块补 io_types（确定性推导，未命中写 untyped）")
-    m_ty.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_ty.add_argument("--harvest", action="store_true",
-                      help="从模块正文事件契约收割载荷字段（并入 event_registry）")
-    m_ty.add_argument("--backlog", action="store_true",
-                      help="生成/校验类型积压台账（不可推断的 untyped 显式化）")
-    m_ct = msub.add_parser("contract",
-                           help="L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
-                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契"
-                               "约的结构化投影）")
-    m_ct.add_argument("--write", action="store_true", help="写入机读块（幂等；已有机读块则跳过）")
-    m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
-
-    # ---- v2.8.0 波B S7：一键演示世界 ----
-    dm = sub.add_parser("demo",
-                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
- description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
-    dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
-    # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
-    sg = sub.add_parser("sig",
-                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹"
-                            "）",
- description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
-    sg.add_argument("target", nargs="*", default=None,
-                    help="目标 md 或目录；缺省 = 全量 01-36 编号方案文档")
-    sg.add_argument("--json", action="store_true", help="输出完整 canonical JSON 记录")
-    sg.add_argument("--verify", action="store_true",
-                    help="check25 同语义：两遍生成一致性校验（可复现门禁）")
-    at = sub.add_parser("attest",
-                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂"
-                            "锚）",
-                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证"
-                            "的篡改证据）。"
-                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可"
-                                        "复现构建惯例）"
-                                    "钉成固定值——机器面据此逐字节可复现。")
-    at.add_argument("target", nargs="?", default="",
-                    help="目标 md（缺省 = 01/02/06/07 四件集合）")
-    at.add_argument("--out", default="", help="写出 attestation JSON 的路径（缺省 = 不写盘）")
-    at.add_argument("--issuer", default="", help="签发方标识（写入 producer.issuer）")
-    at.add_argument("--key-file", default="",
-                    help="HMAC 密钥文件 → 签发/校验 hmac-sha256 级 attestation")
-    at.add_argument("--verify", default="",
-                    help="校验既有 attestation JSON（缺省 = 生成模式）")
-    at.add_argument("--selfcheck", action="store_true",
-                    help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
-    at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+def _add_parser_evidence_face(sub):
+    """label / evidence / check / resolve 族的参数面（拆分只为把单函数压回 300 行内）。"""
     lab = sub.add_parser("label",
                         help="标注 IR：形状声明与校验（cc_label 的声明层）",
                         description="标注 IR v0：只声明「该有哪些标识」并校验形状/档位；"
@@ -691,6 +578,124 @@ def _add_parser_production(sub):
                                     "不用空数组冒充「查过没问题」）。")
     rv.add_argument("object", help="对象路径（仓库相对或绝对）")
     rv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+def _add_parser_production(sub):
+    pln = sub.add_parser("pipeline",
+                         help="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）",
+ description="管线脚手架（v2.8 波B S4：pipeline new——自 P00 骨架派生新管线）")
+    psub = pln.add_subparsers(dest="pipeline_cmd", required=True)
+    p_new = psub.add_parser("new",
+ help="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）",
+ description="派生新管线：复制模板 → 改 id/name/领域标签（登记 02 / 填层名挂载按 README 三步）")
+    p_dry = psub.add_parser("dryrun",
+                            help="管线抽象执行（不调模型跑一遍声明 → 执行图；hard 缺陷 + advisory "
+                                "分列）",
+                            description="管线抽象执行（内部差距：静态 check 只能答『声明自洽吗』，"
+                                "答不了『跑得通吗』）")
+    p_dry.add_argument("--pipeline", default="", help="管线 md 路径（缺省 + --all 时全仓扫）")
+    p_dry.add_argument("--all", action="store_true", help="全仓管线扫一遍并汇总")
+    p_dry.add_argument("--json", action="store_true", help="输出执行图 JSON")
+    p_dry.add_argument("--write-advisory", action="store_true",
+                       help="配合 --all：把 advisory 分类台账写入 protocol/pipeline_advisory.json")
+    p_new.add_argument("--id", required=True, help="新管线 id（如 P07）")
+    p_new.add_argument("--name", required=True, help="新管线显示名（如 演示领域管线）")
+    p_new.add_argument("--from", dest="template", default=None,
+                       help="模板管线 md（缺省 = 03_管线库/P00_通用文档生成管线.md）")
+    p_new.add_argument("--domain", default="",
+                       help="领域标签（如 悬疑 → tags 追加「悬疑领域」）")
+    p_new.add_argument("--dest", default="",
+                       help="输出 md 路径（缺省 = 03_管线库/<id>_<name>.md 官方管线位）")
+
+    # ---- v2.8.0 波B S5：模块生命周期 ----
+    mds = sub.add_parser("module",
+                         help="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 "
+                             "verify）",
+ description="模块生命周期（v2.8 波B S5：status 位 + deprecate/restore + 引用门禁 verify）")
+    msub = mds.add_subparsers(dest="module_cmd", required=True)
+    m_ls = msub.add_parser("ls",
+ help="浏览模块状态（--status 过滤；缺省全量）",
+ description="浏览模块状态（--status 过滤；缺省全量）")
+    m_ls.add_argument("--status", default="", choices=("active", "deprecated", "retired"))
+    m_ls.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
+    m_ls.add_argument("--json", action="store_true",
+                      help="输出结构化 JSON（模块状态清单）")
+    m_st = msub.add_parser("status",
+ help="查看单个模块文件状态位",
+ description="查看单个模块文件状态位")
+    m_st.add_argument("file", help="模块 md 路径（如 community/<包>/modules/Mxx_….md）")
+    m_dp = msub.add_parser("deprecate",
+ help="状态流转 → deprecated（写文件元信息行状态位）",
+ description="状态流转 → deprecated（写文件元信息行状态位）")
+    m_dp.add_argument("file", help="模块 md 路径")
+    m_dp.add_argument("--reason", default="", help="弃用原因（写入状态位）")
+    m_rs = msub.add_parser("restore",
+ help="状态流转 → active（deprecated/retired 回退）",
+ description="状态流转 → active（deprecated/retired 回退）")
+    m_rs.add_argument("file", help="模块 md 路径")
+    m_vf = msub.add_parser("verify",
+ help="引用门禁扫描（与 verify.sh check24 同语义）",
+ description="引用门禁扫描（与 verify.sh check24 同语义）")
+    m_sg = msub.add_parser("signature",
+                           help="模块边界签名基线（边界写一次；漂移即 FAIL 直到重签）",
+                           description="模块边界签名基线（机制借鉴 Pipelex signature_for：边界冻结"
+                               "、实现可替）")
+    m_sg.add_argument("--write", action="store_true",
+                      help="重新冻结边界基线（评审后显式重签）")
+    m_sg.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_ty = msub.add_parser("types",
+                           help="I/O 类型面（io_types）：覆盖率 + 可证不匹配；--write 补标",
+                           description="I/O 类型面（机制借鉴 Pipelex typed concepts，01 §7 V1 字段"
+                               "级新增）")
+    m_ty.add_argument("--write", action="store_true",
+                      help="给全部有机读契约的模块补 io_types（确定性推导，未命中写 untyped）")
+    m_ty.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_ty.add_argument("--harvest", action="store_true",
+                      help="从模块正文事件契约收割载荷字段（并入 event_registry）")
+    m_ty.add_argument("--backlog", action="store_true",
+                      help="生成/校验类型积压台账（不可推断的 untyped 显式化）")
+    m_ct = msub.add_parser("contract",
+                           help="L0 → L1 机读块 retro-fit（从人读引用块/正文投影，不编造）",
+                           description="L0 → L1 机读块 retro-fit（机制借鉴 Pipelex：机读块 = 人读契"
+                               "约的结构化投影）")
+    m_ct.add_argument("--write", action="store_true", help="写入机读块（幂等；已有机读块则跳过）")
+    m_ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    m_vf.add_argument("--root", default=ROOT, help="扫描根（缺省 = 仓库根）")
+
+    # ---- v2.8.0 波B S7：一键演示世界 ----
+    dm = sub.add_parser("demo",
+                        help="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）",
+ description="一键演示世界（v2.8 波B S7：P04 轻混全链 → CCV3 导出）")
+    dm.add_argument("--dest", default="", help="导出目录（缺省 = 系统临时目录并打印路径）")
+    # ---- v2.8.0 波C C1/C2/C5：知识签名 / 版本差异 / 修复指引（41 规划）----
+    sg = sub.add_parser("sig",
+                        help="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹"
+                            "）",
+ description="协议知识签名（41 波C C1：01-36 文档/管线/模块 → 结构化签名，知识指纹）")
+    sg.add_argument("target", nargs="*", default=None,
+                    help="目标 md 或目录；缺省 = 全量 01-36 编号方案文档")
+    sg.add_argument("--json", action="store_true", help="输出完整 canonical JSON 记录")
+    sg.add_argument("--verify", action="store_true",
+                    help="check25 同语义：两遍生成一致性校验（可复现门禁）")
+    at = sub.add_parser("attest",
+                        help="内容 attestation（三级信任：digest_only / hmac-sha256 / sigstore 外挂"
+                            "锚）",
+                        description="内容 attestation（内部差距：知识签名只自证可复现，无对外可验证"
+                            "的篡改证据）。"
+                                    "签发时间戳取墙钟（`issued_at`），可用 `SOURCE_DATE_EPOCH`（可"
+                                        "复现构建惯例）"
+                                    "钉成固定值——机器面据此逐字节可复现。")
+    at.add_argument("target", nargs="?", default="",
+                    help="目标 md（缺省 = 01/02/06/07 四件集合）")
+    at.add_argument("--out", default="", help="写出 attestation JSON 的路径（缺省 = 不写盘）")
+    at.add_argument("--issuer", default="", help="签发方标识（写入 producer.issuer）")
+    at.add_argument("--key-file", default="",
+                    help="HMAC 密钥文件 → 签发/校验 hmac-sha256 级 attestation")
+    at.add_argument("--verify", default="",
+                    help="校验既有 attestation JSON（缺省 = 生成模式）")
+    at.add_argument("--selfcheck", action="store_true",
+                    help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
+    at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_evidence_face(sub)
+
 
 
 def _portable_out(path: str) -> str:

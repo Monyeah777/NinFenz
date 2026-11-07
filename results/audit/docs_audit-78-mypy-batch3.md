@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:6503dbf027b525141363cd12bc004f94e5ab5bf89bc0754c23497b3cdf80f92f
+  - protocol/code_metrics_baseline.json:3667fb4ec6461828c3426f12546f735a447f47d3ee96a4366f8fe526e1924de2
 ---
+> 重审（2026-11-07）：命令树拆分（production 321→117 行 + 新组 evidence_face 207 行）
+
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import
 
 > 重审（2026-11-07）：Go 客户端补齐 cc_check/cc_label/cc_attest/cc_replay/cc_diff/cc_resolve（6 份向量集）
