@@ -105,8 +105,8 @@ def _normalize_stamp(raw: str) -> str:
     for fmt in ("%b %d %H:%M:%S %Y GMT", "%b  %d %H:%M:%S %Y GMT"):
         try:
             return _dt.datetime.strptime(text, fmt).strftime("%Y-%m-%dT%H:%M:%SZ")
-        except ValueError:
-            continue
+        except ValueError:  # 为什么可以吞：两种空格宽度是多来源格式差异（单/双空格），
+            continue        # 都不匹配就返回空串由调用方判 invalid——不是丢证据
     return ""
 
 

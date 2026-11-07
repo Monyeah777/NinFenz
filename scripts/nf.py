@@ -6036,7 +6036,7 @@ _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私�
                        "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）",
                        "timestamp_data": "被盖时间戳的对象可以是任意字节（证据包是 zip）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
-                    "batch_target",
+                    "batch_target", "intent_from_text", "trust_manifest",
                     "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",
                     "revocation_feed", "feeds",
                     "compile",
