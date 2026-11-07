@@ -27,7 +27,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
       - name: tag 与包版本一致性（D3：v* tag 与 npm 版本不同源 ⇒ 不许静默空转）
@@ -115,7 +115,7 @@ jobs:
       contents: read
       packages: write          # 发布包到 GitHub Packages 必需
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
       - name: payload 暂存 + 发布前自检（先按 npmjs 口径自证，再改名）
