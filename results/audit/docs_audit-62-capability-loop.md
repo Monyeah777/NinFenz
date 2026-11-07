@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
-  - desktop/src/core/interop_export.py:ee081372149e5bf5acbf42a9162a4e29426eb72354e22910e27a4b2c6e5fd292
+  - desktop/src/core/interop_export.py:b669f37d01611a9276f7dd63cb98c0fb0f31b22b5211beb59b69fd21038763cf
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c

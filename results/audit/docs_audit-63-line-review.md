@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/payload_harvest.py:514c493d341863b245b7dddb0bde8ee87ca969fe4407c9f2834a726bb92d1a76
   - protocol/data_contracts.json:69241e31bb9f5429346ab93c583c337757ca84ae4f1b29269e76fa3e7e672e77
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
-  - desktop/src/core/interop_export.py:ee081372149e5bf5acbf42a9162a4e29426eb72354e22910e27a4b2c6e5fd292
+  - desktop/src/core/interop_export.py:b669f37d01611a9276f7dd63cb98c0fb0f31b22b5211beb59b69fd21038763cf
   - desktop/src/core/text_hygiene.py:ff5fb24eafb99044ad1452f26d5cf3be6b89a24d77a5be5e4bcf56189a8ea956
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee

@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:66cb4b678913e7f5fc965915a422da403f3ff1859b76e56008bcc2df7e69f5d8
-  - protocol/code_metrics_baseline.json:366187dce19d04bb893fcbeb62639c6ace160b0d0abd6712f0fb0c15d4d6a0af
+  - protocol/code_metrics_baseline.json:0e4a83a2e91643f791a970136b78498dfe39cb3719fa1ba36c94dc8c35dbba6e
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -267,6 +267,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-07）：refreeze CID
+
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

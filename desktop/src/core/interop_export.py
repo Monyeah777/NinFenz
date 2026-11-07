@@ -655,7 +655,8 @@ def c2pa_manifest(root: str = ".") -> Dict[str, Any]:
 def cidv1_raw_sha256(digest_hex: str) -> str:
     """sha256 十六进制摘要 → CIDv1（raw codec + multibase base32lower）。"""
     if not re.fullmatch(r"[0-9a-f]{64}", str(digest_hex or "")):
-        raise ValueError("CID 摘要必须是 64 位小写十六进制（修复指引：传 sha256 hexdigest，而不是文件路径）")
+        raise ValueError("CID 摘要必须是 64 位小写十六进制"
+                         "（修复指引：传 sha256 hexdigest，而不是文件路径）")
     mh = b"\x12\x20" + bytes.fromhex(digest_hex)   # 0x12 = sha2-256, 0x20 = 32 字节
     return "b" + base64.b32encode(b"\x01\x71" + mh).decode("ascii").lower().rstrip("=")
 
@@ -664,7 +665,8 @@ def parse_cidv1_raw_sha256(cid: str) -> bytes:
     """解析本仓声明支持的 CIDv1(raw 0x71, sha2-256, base32lower)并返回摘要字节。"""
     value = str(cid or "")
     if not value.startswith("b") or not re.fullmatch(r"[a-z2-7]+", value[1:]):
-        raise ValueError("CID 必须是 multibase base32lower（修复指引：使用前缀 b + RFC 4648 base32 小写字符 [a-z2-7]）")
+        raise ValueError("CID 必须是 multibase base32lower"
+                         "（修复指引：使用前缀 b + RFC 4648 base32 小写字符 [a-z2-7]）")
     body = value[1:]
     padding = "=" * ((8 - len(body) % 8) % 8)
     try:
@@ -672,7 +674,8 @@ def parse_cidv1_raw_sha256(cid: str) -> bytes:
     except (ValueError, TypeError) as exc:
         raise ValueError("CID base32 不可解码（修复指引：检查字符集与非零尾位）") from exc
     if base64.b32encode(raw).decode("ascii").lower().rstrip("=") != body:
-        raise ValueError("CID base32 不是 canonical 形式（修复指引：重编码后再比较，去掉填充与大写）")
+        raise ValueError("CID base32 不是 canonical 形式"
+                         "（修复指引：重编码后再比较，去掉填充与大写）")
     if len(raw) != 36 or raw[:4] != b"\x01\x71\x12\x20":
         raise ValueError("CID 仅支持 v1 + raw(0x71) + sha2-256(0x12) + 32 字节摘要"
                          "（修复指引：不要用 dag-pb、其它 multihash 或截断向量冒充本 profile）")
