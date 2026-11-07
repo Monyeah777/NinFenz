@@ -1341,7 +1341,7 @@
       "max_fn_lines": 43
     },
     "desktop/src/core/verify_report.py": {
-      "lines": 289,
+      "lines": 293,
       "max_fn_cc": 10,
       "max_fn_lines": 41
     },

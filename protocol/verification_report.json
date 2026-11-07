@@ -1,5 +1,5 @@
 {
-  "built_for_date": "2026-11-08",
+  "built_for_date": "2026-11-07",
   "declared": {
     "coverage_note": "判据级抽查面 31 条，各对应 verify.sh 的一道或多道门禁；≠ 声明 check 总数 42（两者不可互替）",
     "expected_checks": 42,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "9dee86e36d000be3f8864ffd7ca5beabee2eff6d78a29692cefbaf7ce03d20b5",
+  "root_digest": "ff78b3afd4854d581a735d85b4501b3eab35a798811457d299f2ef808a968067",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
