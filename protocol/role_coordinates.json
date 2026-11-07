@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 145,
-    "support": 395,
-    "verify": 992
+    "projection": 146,
+    "support": 396,
+    "verify": 993
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9377,6 +9377,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "DCT 水印探针判据：**把探针结论也锁住**（否则下次调参就会悄悄漂）。",
+      "path": "desktop/tests/test_watermark_dct_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "工作流工业级加固判据（`core/workflow_hardening.py`）回归测试。",
       "path": "desktop/tests/test_workflow_hardening.py",
       "role": "verify",
@@ -12324,16 +12330,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "7ae1e04b167c1163673be728e2a5a4653aa7559f766424c9cfd5fecbec7e8ab9",
+  "root_digest": "033852000b83f4876379b495112272ff1e6b41d444d3fb076624ee3e500f7715",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 249,
+    "R-catch": 250,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 126,
+    "R-projection": 127,
     "R-support": 119,
-    "R-verify": 872,
+    "R-verify": 873,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"
