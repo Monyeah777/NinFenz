@@ -138,9 +138,8 @@ class TraceRejectTest(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmp:
             for name, text in cases.items():
-                with self.subTest(name=name):
-                    with self.assertRaises(ValueError):
-                        ts.load_trace(self._write(tmp, name, text))
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    ts.load_trace(self._write(tmp, name, text))
 
     def test_rejects_nonfinite_and_malformed_json(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -148,16 +147,15 @@ class TraceRejectTest(unittest.TestCase):
                 "nan.json": '{"records":[{"stats":{"score":NaN}}]}',
                 "bad.json": '{"records": [',
             }.items():
-                with self.subTest(name=name):
-                    with self.assertRaises(ValueError):
-                        ts.load_trace(self._write(tmp, name, text))
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    ts.load_trace(self._write(tmp, name, text))
 
     def test_rejects_oversized_trace_before_parse(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = self._write(tmp, "large.json", json.dumps(RECORD))
-            with mock.patch.object(ts, "MAX_TRACE_BYTES", 8):
-                with self.assertRaisesRegex(ValueError, "trace 过大"):
-                    ts.load_trace(path)
+            with mock.patch.object(ts, "MAX_TRACE_BYTES", 8), \
+                    self.assertRaisesRegex(ValueError, "trace 过大"):
+                ts.load_trace(path)
 
 
 if __name__ == "__main__":

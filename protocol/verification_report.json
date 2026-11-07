@@ -227,7 +227,7 @@
       "source": "instruction_step_audit.scan",
       "stats": {
         "docs": 5,
-        "steps": 9
+        "steps": 10
       },
       "status": "pass",
       "warns": 0
@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 14,
+        "asserted": 16,
         "bound": 82,
         "catalogued": 376,
-        "claims": 14,
-        "consumable": 14,
+        "claims": 16,
+        "consumable": 16,
         "domain_bound": 72,
         "not_domain_bound": 304,
         "states": {
           "asserted": 0,
-          "bound": 68,
+          "bound": 66,
           "catalogued": 294,
-          "consumable": 14
+          "consumable": 16
         }
       },
       "status": "pass",
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "949c9a68229a9953facbf4862e55b1b2e99262175199bb4fe11de93adc976548",
+  "root_digest": "f2d4715b814b9f4fc8368b4ea6bdefba26fa4ddebf5c77fd9ebb94682503bb07",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
