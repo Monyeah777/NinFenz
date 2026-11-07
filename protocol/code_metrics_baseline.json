@@ -775,6 +775,11 @@
       "max_fn_cc": 7,
       "max_fn_lines": 28
     },
+    "desktop/src/core/mcp_manifest.py": {
+      "lines": 206,
+      "max_fn_cc": 28,
+      "max_fn_lines": 45
+    },
     "desktop/src/core/mcp_package.py": {
       "lines": 101,
       "max_fn_cc": 35,
@@ -1564,6 +1569,11 @@
       "lines": 209,
       "max_fn_cc": 15,
       "max_fn_lines": 42
+    },
+    "scripts/mcp_manifest.py": {
+      "lines": 117,
+      "max_fn_cc": 7,
+      "max_fn_lines": 26
     },
     "scripts/nf.py": {
       "lines": 9630,

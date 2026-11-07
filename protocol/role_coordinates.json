@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 150,
-    "support": 415,
-    "verify": 1003
+    "projection": 151,
+    "support": 416,
+    "verify": 1005
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6473,6 +6473,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "CCOS Tool Manifest（nf-tool-manifest/1）：给 MCP 的 tools/list 加契约与证据，不破坏兼容。",
+      "path": "desktop/src/core/mcp_manifest.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "B 线包装声明门禁（内容质检 MCP 包）：工具面 / 类目 / 红线可机检。",
       "path": "desktop/src/core/mcp_package.py",
       "role": "verify",
@@ -8473,6 +8479,12 @@
     {
       "function": "MCP 上架面·**真进程**端到端（默认实时仓库面 `nf serve` ↔ 越权/注入拒出面）。",
       "path": "desktop/tests/test_mcp_live_e2e.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "MCP 兼容头判据（P6）：对外说 MCP，对内走 CCOS——增强字段不许破坏兼容，且必须有牙。",
+      "path": "desktop/tests/test_mcp_manifest.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12390,17 +12402,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c6884019926d2e05df18432b5dd37de662cad1c2916e57a2da2fd8a6b7c094bf",
+  "root_digest": "33c8a7d3065a82e235420fe3d4dc34bc068ad00906e3cc6b5a3425d587f633be",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 269,
+    "R-catch": 270,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 131,
+    "R-projection": 132,
     "R-support": 119,
-    "R-verify": 882,
-    "auto:R-core": 278
+    "R-verify": 883,
+    "auto:R-core": 279
   },
   "schema": "nf-role-coordinates/1"
 }

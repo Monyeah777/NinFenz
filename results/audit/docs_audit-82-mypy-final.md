@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:2685414f6ad8b46cdc6146f3d8b29572f9fe28b551bdadede5de2346f6110881
+  - protocol/code_metrics_baseline.json:54710ecbe8b99cd5cb8fd9123469941aa1b4e527f53be157a50f10caa52b8db1
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）

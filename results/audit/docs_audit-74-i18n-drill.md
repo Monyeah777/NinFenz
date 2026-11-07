@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:2685414f6ad8b46cdc6146f3d8b29572f9fe28b551bdadede5de2346f6110881
+  - protocol/code_metrics_baseline.json:54710ecbe8b99cd5cb8fd9123469941aa1b4e527f53be157a50f10caa52b8db1
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）

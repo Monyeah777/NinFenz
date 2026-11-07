@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:f90a8c822ca23b03d9b24564db427751fff8db75339643169bf9f9e45c119af9
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:2685414f6ad8b46cdc6146f3d8b29572f9fe28b551bdadede5de2346f6110881
+  - protocol/code_metrics_baseline.json:54710ecbe8b99cd5cb8fd9123469941aa1b4e527f53be157a50f10caa52b8db1
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）

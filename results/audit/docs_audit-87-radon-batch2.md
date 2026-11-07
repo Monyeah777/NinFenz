@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:2685414f6ad8b46cdc6146f3d8b29572f9fe28b551bdadede5de2346f6110881
+  - protocol/code_metrics_baseline.json:54710ecbe8b99cd5cb8fd9123469941aa1b4e527f53be157a50f10caa52b8db1
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）

@@ -1,0 +1,214 @@
+{
+  "checks": {
+    "manifest_issues": [],
+    "receipt_replay_ok": true,
+    "revoked_blocked": true,
+    "same_call_evidence": true,
+    "signature_ok": true
+  },
+  "counts": {
+    "side_effects": {
+      "local": 2,
+      "network": 0,
+      "none": 3
+    },
+    "tools": 5
+  },
+  "envelope": {
+    "manifest_digest": "e382766d04e62cfbfa0a5d26e990bb6a017a8968efd31629607175bcacbd7ae7",
+    "pubkey": "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8",
+    "signature": "6a43750819575058f105ec0211ea01ca9a0cd4ac4367f3cc2f80587afe199f111cbbb893d8d0ae2fc63183f0fee7fe3d806211b20152cde98d7e5ef57af70b0a"
+  },
+  "manifest": {
+    "schema": "nf-tool-manifest/1",
+    "tools": [
+      {
+        "_meta": {
+          "ccos": {
+            "deprecated_at": null,
+            "evidence": {
+              "emit": true,
+              "schema": "nf-call-receipt/1"
+            },
+            "idempotent": true,
+            "manifest_version": "1.0.0",
+            "outputSchema": {
+              "required": [
+                "verdict"
+              ],
+              "type": "object"
+            },
+            "replacement": null,
+            "requires_consent": false,
+            "resource": {
+              "max_bytes": 67108864,
+              "timeout_ms": 60000
+            },
+            "side_effect": "none"
+          }
+        },
+        "description": "跑门禁/断言，返回四词判定",
+        "inputSchema": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": "check_file"
+      },
+      {
+        "_meta": {
+          "ccos": {
+            "deprecated_at": null,
+            "evidence": {
+              "emit": true,
+              "schema": "nf-call-receipt/1"
+            },
+            "idempotent": false,
+            "manifest_version": "1.0.0",
+            "outputSchema": {
+              "required": [
+                "label"
+              ],
+              "type": "object"
+            },
+            "replacement": null,
+            "requires_consent": true,
+            "resource": {
+              "max_bytes": 67108864,
+              "timeout_ms": 60000
+            },
+            "side_effect": "local"
+          }
+        },
+        "description": "按契约写标识（本地写盘）",
+        "inputSchema": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": "label_file"
+      },
+      {
+        "_meta": {
+          "ccos": {
+            "deprecated_at": null,
+            "evidence": {
+              "emit": true,
+              "schema": "nf-call-receipt/1"
+            },
+            "idempotent": true,
+            "manifest_version": "1.0.0",
+            "outputSchema": {
+              "required": [
+                "verdict"
+              ],
+              "type": "object"
+            },
+            "replacement": null,
+            "requires_consent": false,
+            "resource": {
+              "max_bytes": 67108864,
+              "timeout_ms": 60000
+            },
+            "side_effect": "none"
+          }
+        },
+        "description": "复验证据包",
+        "inputSchema": {
+          "properties": {
+            "bundle": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": "evidence_verify"
+      },
+      {
+        "_meta": {
+          "ccos": {
+            "deprecated_at": null,
+            "evidence": {
+              "emit": true,
+              "schema": "nf-call-receipt/1"
+            },
+            "idempotent": true,
+            "manifest_version": "1.0.0",
+            "outputSchema": {
+              "required": [
+                "contracts"
+              ],
+              "type": "object"
+            },
+            "replacement": null,
+            "requires_consent": false,
+            "resource": {
+              "max_bytes": 67108864,
+              "timeout_ms": 60000
+            },
+            "side_effect": "none"
+          }
+        },
+        "description": "解析适用契约/策略包",
+        "inputSchema": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": "resolve_contract"
+      },
+      {
+        "_meta": {
+          "ccos": {
+            "deprecated_at": null,
+            "evidence": {
+              "emit": true,
+              "schema": "nf-call-receipt/1"
+            },
+            "idempotent": true,
+            "manifest_version": "1.0.0",
+            "outputSchema": {
+              "required": [
+                "obligations"
+              ],
+              "type": "object"
+            },
+            "replacement": null,
+            "requires_consent": true,
+            "resource": {
+              "max_bytes": 67108864,
+              "timeout_ms": 60000
+            },
+            "side_effect": "local"
+          }
+        },
+        "description": "把主张编译成证据义务清单",
+        "inputSchema": {
+          "properties": {
+            "claim": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": "cog_claim"
+      }
+    ],
+    "top_level_allowed": [
+      "name",
+      "description",
+      "inputSchema"
+    ]
+  },
+  "ok": true,
+  "schema": "nf-tool-manifest-report/1"
+}

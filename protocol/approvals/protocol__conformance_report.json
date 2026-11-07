@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "P0 补账收口",
+  "note": "P6 MCP 头收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "577034412e9ba7bfa04801ef459f2da71ded3169e14b77c0d661b191109d45eb"
+  "subject_digest": "6b46204823bec5a7e71646451f39c783362c819c8af64d55d0143a2268927db5"
 }

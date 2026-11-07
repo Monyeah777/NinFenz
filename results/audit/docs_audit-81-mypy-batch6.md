@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:2685414f6ad8b46cdc6146f3d8b29572f9fe28b551bdadede5de2346f6110881
+  - protocol/code_metrics_baseline.json:54710ecbe8b99cd5cb8fd9123469941aa1b4e527f53be157a50f10caa52b8db1
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）

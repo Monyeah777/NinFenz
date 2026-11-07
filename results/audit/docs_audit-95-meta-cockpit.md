@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:f90a8c822ca23b03d9b24564db427751fff8db75339643169bf9f9e45c119af9
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:404ffcbf1b4f1e7417c7e78dd5ca1470d0acb3034475921356d5b6b787285f39
-  - protocol/coupling_baseline.json:d8cbba897f46addd46e9744d8e63c68479b4755196ec8b74f6cd89c8f9c8e166
+  - protocol/check12_weights.json:99e9367030bbe24821635dca7ddff79951d06f5e80ac42972c3ec1b350469f48
+  - protocol/coupling_baseline.json:33c0f4defa343c119945b23df29f1f7b9fd54292696bc1b64af9b8b38b6ef389
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：MCP 兼容头（工具清单 _meta 增强 + 签名钉根 + 吊销 + 调用回执）
+
 > 重审（2026-11-08）：ADR 注册表 + 16 份文档台账 + 分层依赖判据（P0 补账）
 
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
