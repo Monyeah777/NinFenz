@@ -1685,6 +1685,11 @@
       "max_fn_cc": 6,
       "max_fn_lines": 29
     },
+    "scripts/watermark_dct_probe.py": {
+      "lines": 318,
+      "max_fn_cc": 8,
+      "max_fn_lines": 47
+    },
     "scripts/workflow_policy.py": {
       "lines": 42,
       "max_fn_cc": 6,

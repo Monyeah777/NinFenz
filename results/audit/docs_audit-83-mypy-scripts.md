@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:e17f49c22411a4eeaf1f85427562ead328be805a29e7b960e497271508dc54c3
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
+  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
 ---
+> 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
+
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
 
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）

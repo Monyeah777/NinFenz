@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
+  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
 ---
+> 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
+
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
 
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）

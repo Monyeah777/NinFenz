@@ -349,6 +349,7 @@
     "test_version_matrix": 0.1,
     "test_watch": 62.7,
     "test_watermark_bench": 2.1,
+    "test_watermark_dct_probe": 1.0,
     "test_workflow_hardening": 0.2,
     "test_workflow_policy": 0.2,
     "test_world_model": 0.5,
@@ -4056,6 +4057,13 @@
     "test_watermark_bench.PromiseAndBoundaryTest.test_boundary_scale_and_screenshot_are_not_survived": 0.0,
     "test_watermark_bench.PromiseAndBoundaryTest.test_boundary_tiny_noise_and_brightness_have_no_margin": 0.0,
     "test_watermark_bench.PromiseAndBoundaryTest.test_promise_lossless_and_crop": 0.0,
+    "test_watermark_dct_probe.MechanismBoundaryTest.test_absolute_qim_boundary": 0.0,
+    "test_watermark_dct_probe.MechanismBoundaryTest.test_both_methods_round_trip_clean": 0.0,
+    "test_watermark_dct_probe.MechanismBoundaryTest.test_geometry_is_not_solved_by_embedding": 0.0,
+    "test_watermark_dct_probe.MechanismBoundaryTest.test_relationship_costs_visibility": 0.0,
+    "test_watermark_dct_probe.MechanismBoundaryTest.test_relationship_embedding_holds_to_q70": 0.0,
+    "test_watermark_dct_probe.ProbeDeterminismTest.test_build_is_deterministic": 0.36,
+    "test_watermark_dct_probe.ProbeDeterminismTest.test_committed_results_match_rebuild": 0.18,
     "test_workflow_hardening.WorkflowHardeningTest.test_codeowners_is_required": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_credential_persistence_is_rejected": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_dependabot_must_cover_real_ecosystems": 0.01,
@@ -4107,5 +4115,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1376.5
+  "total_s": 1377.5
 }
