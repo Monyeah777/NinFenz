@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:5baddeb344f90ebdaacb59dee337057c57575c653198b9061315ce5e546bc7ee
+  - protocol/code_metrics_baseline.json:71cc7cd9eea682c79e5bde9e4a3536122c15050af238d97cc286ee66b5027899
 ---
+> 重审（2026-11-08）：verify_report 基准日 UTC 化修复
+
 > 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测
 
 > 重审（2026-11-07）：盲区修复：证据包 zip 跨平台确定性（create_system 固定）+ 平台无关断言/文档/可选依赖收口
