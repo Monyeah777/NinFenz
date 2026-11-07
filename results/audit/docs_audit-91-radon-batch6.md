@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
+  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
 ---
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）
 
 > 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表

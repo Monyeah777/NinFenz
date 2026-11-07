@@ -799,6 +799,27 @@ def _add_parser_revocations(esub):
     rvts_show.add_argument("--check-pub", default="", help="现场核对一把公钥（64 hex）")
     rvts_show.add_argument("--at", default="", help="核对时点（UTC 秒级；缺省=现在）")
     rvts_show.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktb = rvts.add_parser("kt-build", help="造一版密钥透明目录（可接在旧版后）",
+                          description="密钥透明目录：版本化根 + 只追加日志 + 包含证明 + 分叉检测。")
+    ktb.add_argument("kt_keys", metavar="KEYS.json", help="key_id → 公钥 hex 的 JSON 对象")
+    ktb.add_argument("--prev", default="", help="上一版目录（接链；首版省略）")
+    ktb.add_argument("--out", default="", help="输出目录（缺省=只打印）")
+    ktb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktv = rvts.add_parser("kt-verify", help="校验目录自洽（链/根/版本）",
+                          description="校验：schema、keys 形状、log 链、重算根与最新 log 根一致。")
+    ktv.add_argument("kt_doc", metavar="DIR.json", help="密钥透明目录")
+    ktv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ktl = rvts.add_parser("kt-lookup", help="单键查找 + 包含证明",
+                          description="查找 key_id 并给出可离线验证的包含证明。")
+    ktl.add_argument("kt_doc", metavar="DIR.json", help="密钥透明目录")
+    ktl.add_argument("--id", dest="kt_key_id", required=True, help="要查的 key_id")
+    ktl.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    kts = rvts.add_parser("kt-split", help="两份目录的分叉检测（谁都不是谁的合法延伸）",
+                          description="分叉检测：同版本不同根 / 新版本链上缺旧根"
+                                      " → 报 split 并给 witness。")
+    kts.add_argument("--a", required=True, help="目录 A")
+    kts.add_argument("--b", required=True, help="目录 B")
+    kts.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
                            description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
                                        "输出是普通表，可给 nf evidence verify --revocations 用。")
@@ -3769,7 +3790,89 @@ def _revocations_trust(args):
                 for issue in got["issues"]:
                     print(f"  [FAIL] {issue}", file=sys.stderr)
         return 0
-    print("用法：nf evidence revocations trust grant|show ...", file=sys.stderr)
+    if sub.startswith("kt-"):
+        return _revocations_kt(args, sub)
+    print("用法：nf evidence revocations trust grant|show|kt-build|kt-verify|kt-lookup|kt-split",
+          file=sys.stderr)
+    return 2
+
+
+def _revocations_kt(args, sub):
+    """密钥透明目录：build / verify / lookup / split。"""
+    import json as _json
+
+    from core import atomic_write, json_doc
+    from core import key_transparency as kt
+    if sub == "kt-build":
+        try:
+            keys = json_doc.load(_rel_out(args.kt_keys), dict, what=args.kt_keys)
+            prev = (json_doc.load(_rel_out(args.prev), dict, what=args.prev)
+                    if args.prev else None)
+            doc = kt.build(keys, prev=prev)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-build（v" + str(doc["version"]) + "）==")
+            print("  根：" + doc["root"][:32] + " · 键 " + str(len(doc["keys"])) + " 个")
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "kt-verify":
+        try:
+            doc = json_doc.load(_rel_out(args.kt_doc), dict, what=args.kt_doc)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.verify(doc)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-verify ==")
+            print("  判定：" + res["verdict"] + " · 版本 " + str(res["version"])
+                  + " · 根 " + (res["root"][:32] or "—"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+            for warn in res["warnings"]:
+                print("  [WARN] " + warn, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "kt-lookup":
+        try:
+            doc = json_doc.load(_rel_out(args.kt_doc), dict, what=args.kt_doc)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.lookup(doc, args.kt_key_id)
+        if res["ok"]:
+            res["inclusion_ok"] = kt.verify_inclusion(res)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-lookup（" + args.kt_key_id + "）==")
+            if res["ok"]:
+                print("  公钥：" + res["pub"])
+                print("  包含证明：" + ("可离线验证" if res.get("inclusion_ok") else "验证失败"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "kt-split":
+        try:
+            a = json_doc.load(_rel_out(args.a), dict, what=args.a)
+            b = json_doc.load(_rel_out(args.b), dict, what=args.b)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, "目录不可读：" + str(exc), 4)
+        res = kt.split_witness(a, b)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf evidence revocations trust kt-split ==")
+            print("  分叉：" + ("是" if res["split"] else "否"))
+            if res["split"]:
+                print("  提示：" + res.get("note", ""))
+        return 1 if res["split"] else 0
     return 2
 
 

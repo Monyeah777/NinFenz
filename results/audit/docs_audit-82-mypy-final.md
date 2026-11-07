@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
+  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
 ---
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）
 
 > 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表

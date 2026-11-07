@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-07",
+  "measured_at": "2026-11-08",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -169,6 +169,7 @@
     "test_judge_references": 0.7,
     "test_judgement_coverage": 7.4,
     "test_key_naming": 0.3,
+    "test_key_transparency": 1.6,
     "test_knowledge": 0.7,
     "test_knowledge_sig": 0.2,
     "test_label_carrier": 1.6,
@@ -2031,6 +2032,21 @@
     "test_key_naming.JudgementTest.test_unused_registered_key_warns": 0.01,
     "test_key_naming.RealRepoTest.test_declaration_is_committed": 0.0,
     "test_key_naming.RealRepoTest.test_real_repo_keys_all_registered_and_wellformed": 0.08,
+    "test_key_transparency.BuildVerifyTest.test_bad_pubkey_length_is_rejected": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_build_is_deterministic": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_empty_keys_is_rejected_with_guide": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_tampered_keys_break_root": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_tampered_log_breaks_chain": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_verify_ok": 0.0,
+    "test_key_transparency.BuildVerifyTest.test_version_must_match_log_length": 0.0,
+    "test_key_transparency.CliTest.test_build_verify_lookup_split": 1.48,
+    "test_key_transparency.ConsistencyAndSplitTest.test_append_is_consistent": 0.0,
+    "test_key_transparency.ConsistencyAndSplitTest.test_fork_detected_when_history_rewritten": 0.0,
+    "test_key_transparency.ConsistencyAndSplitTest.test_same_doc_is_not_split": 0.0,
+    "test_key_transparency.ConsistencyAndSplitTest.test_same_version_different_root_is_split": 0.0,
+    "test_key_transparency.InclusionTest.test_lookup_returns_verifiable_proof": 0.0,
+    "test_key_transparency.InclusionTest.test_proof_fails_on_wrong_pubkey": 0.0,
+    "test_key_transparency.InclusionTest.test_unknown_key_is_rejected_with_guide": 0.0,
     "test_knowledge.TestClearance.test_public_cannot_see_internal": 0.0,
     "test_knowledge.TestClearance.test_resolve_order_filters_by_clearance": 0.01,
     "test_knowledge.TestClearance.test_restricted_sees_all": 0.0,
@@ -4091,5 +4107,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1374.9
+  "total_s": 1376.5
 }

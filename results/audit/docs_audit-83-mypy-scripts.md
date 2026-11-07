@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
+  - scripts/nf.py:e17f49c22411a4eeaf1f85427562ead328be805a29e7b960e497271508dc54c3
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
+  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
 ---
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）
 
 > 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表

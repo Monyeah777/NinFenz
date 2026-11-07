@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
+  - protocol/code_metrics_baseline.json:9ca7d34960830c50721ccd69707394fa3c1bcdb2f854c8cb19f70a72bbfcbd2f
 ---
+> 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
+
 > 重审（2026-11-08）：水印基准收口（纯度为软导入）
 
 > 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表

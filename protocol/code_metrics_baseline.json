@@ -660,6 +660,11 @@
       "max_fn_cc": 13,
       "max_fn_lines": 29
     },
+    "desktop/src/core/key_transparency.py": {
+      "lines": 217,
+      "max_fn_cc": 19,
+      "max_fn_lines": 49
+    },
     "desktop/src/core/knowledge.py": {
       "lines": 502,
       "max_fn_cc": 62,
@@ -1546,7 +1551,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 9089,
+      "lines": 9192,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

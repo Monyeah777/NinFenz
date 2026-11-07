@@ -117,6 +117,8 @@ nf evidence revocations trust show --trust trust.json --check-pub <ORG_PUB_HEX>
 
 残留（诚实写）：根公钥怎么分发到验证方仍靠带外渠道（邮件/公告/配对指纹）；本仓不建 PKI，也不假装有。
 
+**分叉面**：钉根方案判不了「两个验证方看到不同密钥集」——已另做密钥透明目录（版本化根 + 只追加日志 + 包含证明 + 分叉见证），见 [key-transparency-v0.md](key-transparency-v0.md)。
+
 ## 判定（可证）
 
 | 检查 | 不过 |
