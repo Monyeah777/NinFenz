@@ -3,9 +3,9 @@
     "app": 1447,
     "entry": 27,
     "floor": 5,
-    "prod": 1042,
-    "projection": 136,
-    "support": 313,
+    "prod": 1043,
+    "projection": 138,
+    "support": 314,
     "verify": 1139
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -6983,6 +6983,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "OpenVEX 0.2.0 and CycloneDX 1.6 VEX projections from one disposition ledger.",
+      "path": "desktop/src/core/vex.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "目录变更监听（仅标准库）：给守护进程一个**「树没变」的可证信号**。",
       "path": "desktop/src/core/watch.py",
       "role": "prod",
@@ -13128,17 +13134,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8e592324b985220ee99f1ff1aa7be994f3feb955c210ec5484ad20a07a4f3716",
+  "root_digest": "82b210c0a754db185db6df50dccc19afa0e7a08d4c3c8bb88c5ce0fdaa4e3df3",
   "rule_counts": {
     "R-app": 1447,
-    "R-catch": 136,
+    "R-catch": 137,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 121,
+    "R-projection": 123,
     "R-support": 151,
     "R-verify": 1018,
-    "auto:R-core": 260
+    "auto:R-core": 261
   },
   "schema": "nf-role-coordinates/1"
 }

@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:eddcc0f9c14cf0cde6024e35cc1de1e23d63ebccf036a8ac0d5cd2e7bc300931
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:0e4a83a2e91643f791a970136b78498dfe39cb3719fa1ba36c94dc8c35dbba6e
+  - protocol/code_metrics_baseline.json:5e3adb5046a4342f4d758f238294b5bffab31a3d9a7601d12e4c21c411ec82c1
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑

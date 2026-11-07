@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-07",
   "approved_by": "Monyeah777",
-  "note": "CycloneDX VEX dual-format evidence and modular verification",
+  "note": "refreeze.sh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "06a7e64aa2fa790888f753deef57839c72eb0fecdb16e1fac1a362b30b91140f"
