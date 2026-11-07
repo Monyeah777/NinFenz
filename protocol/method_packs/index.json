@@ -16,6 +16,11 @@
       "id": "metacognition",
       "version": "1.0.0",
       "path": "protocol/method_packs/metacognition.json"
+    },
+    {
+      "id": "evaluation-design",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/evaluation-design.json"
     }
   ]
 }

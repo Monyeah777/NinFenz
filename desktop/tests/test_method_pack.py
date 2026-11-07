@@ -20,11 +20,11 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 from core import cognition_plan, method_pack  # noqa: E402
 
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
-PACK_IDS = ("watermarking", "evidence-audit", "metacognition")
+PACK_IDS = ("watermarking", "evidence-audit", "metacognition", "evaluation-design")
 
 
 class PackShapeTest(unittest.TestCase):
-    def test_index_lists_three_packs(self):
+    def test_index_lists_registered_packs(self):
         packs = method_pack.list_packs(str(ROOT))
         self.assertEqual(set(PACK_IDS), {p["id"] for p in packs})
 
@@ -73,6 +73,16 @@ class PackContentTest(unittest.TestCase):
         self.assertIn("立卡", names)
         std = method_pack.obligations(pack, "closure")
         self.assertTrue(any("Claim Card" in r for r in std["standards"][0]["required"]))
+
+    def test_evaluation_design_pack_has_pre_registration_and_controls(self):
+        pack = method_pack.load_pack(str(ROOT), "evaluation-design")
+        ids = {m["id"] for m in pack["expert_moves"]}
+        for need in ("ev.pre_register", "ev.blind_partition", "ev.negative_control",
+                     "ev.synthetic_guard", "ev.cost_accounting"):
+            self.assertIn(need, ids, "评测设计包缺关键动作：" + need)
+        kinds = {st["claim_kind"] for st in pack["evidence_standards"]}
+        self.assertEqual({"efficacy", "cost", "reliability"}, kinds)
+        self.assertTrue(any("合成" in f for f in pack["common_failures"]))
 
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
