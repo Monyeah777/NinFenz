@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:4b034d4fe22ff4b43ea7131489fb68b0976bb0be0e5565eae63c0d6644f56a2b
+  - protocol/check12_weights.json:5958ecf0926d2fb2a94125bad8ab200344b76e2b31acdeecd8c58b8deb1ff53f
   - protocol/coupling_baseline.json:f1000f95c9d530926c8a80e3a135578e8430c35689b8b7bb3bd1b239fb46e084
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：口径同步 3022 件 / 23.92 MB
+
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
 > 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
