@@ -1745,6 +1745,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 47
     },
+    "scripts/watermark_ecc_probe.py": {
+      "lines": 286,
+      "max_fn_cc": 6,
+      "max_fn_lines": 38
+    },
     "scripts/watermark_geometry_probe.py": {
       "lines": 368,
       "max_fn_cc": 10,

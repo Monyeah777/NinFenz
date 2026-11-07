@@ -462,6 +462,26 @@
       "evidence": [
         "python -m unittest desktop.tests.test_mcp_ingress"
       ]
+    },
+    {
+      "id": "C-18",
+      "module": "label-watermark",
+      "claim": "拍屏水印边界：10 组配置（delta 24–48 / 块 8–16 / 中低频）在 0.9×+blur+q80 链下全部读不回",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_watermark_ecc_probe.py",
+          "test_no_config_survives_screenshot"
+        ],
+        [
+          "test_watermark_ecc_probe.py",
+          "test_clean_always_round_trips"
+        ]
+      ],
+      "reverse_fixture": "若任一配置通过拍屏链 → 判据红并要求重写结论（test_no_config_survives_screenshot）；干净图必须全通（否则探针坏）",
+      "evidence": [
+        "python scripts/watermark_ecc_probe.py --check"
+      ]
     }
   ]
 }

@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 153,
-    "support": 421,
-    "verify": 1015
+    "projection": 154,
+    "support": 422,
+    "verify": 1016
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9491,6 +9491,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "拍屏水印第五轮探针判据：把「加大强度也救不回」写成可复算边界。",
+      "path": "desktop/tests/test_watermark_ecc_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "几何提示同步判据：用「标签里记录的尺寸」替代频谱模板做几何同步。",
       "path": "desktop/tests/test_watermark_geometry_probe.py",
       "role": "verify",
@@ -12462,16 +12468,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "8d6fd664a1cbc000a1542c8d97dc086ac5576362a9d34b48249df2f4ea14de0a",
+  "root_digest": "6bced378817cb26881fc1b647d3842447ae7e114df391267f8925704d826fb91",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 274,
+    "R-catch": 275,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 134,
+    "R-projection": 135,
     "R-support": 119,
-    "R-verify": 890,
+    "R-verify": 891,
     "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"

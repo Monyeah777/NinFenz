@@ -363,6 +363,7 @@
     "test_watch": 62.7,
     "test_watermark_bench": 2.1,
     "test_watermark_dct_probe": 1.0,
+    "test_watermark_ecc_probe": 1.2,
     "test_watermark_geometry_probe": 64.6,
     "test_watermark_sync_probe": 54.7,
     "test_workflow_hardening": 0.2,
@@ -4334,6 +4335,10 @@
     "test_watermark_dct_probe.MechanismBoundaryTest.test_relationship_embedding_holds_to_q70": 0.0,
     "test_watermark_dct_probe.ProbeDeterminismTest.test_build_is_deterministic": 0.36,
     "test_watermark_dct_probe.ProbeDeterminismTest.test_committed_results_match_rebuild": 0.18,
+    "test_watermark_ecc_probe.EccProbeTest.test_clean_always_round_trips": 0.0,
+    "test_watermark_ecc_probe.EccProbeTest.test_no_config_survives_screenshot": 0.0,
+    "test_watermark_ecc_probe.EccProbeTest.test_reproducible": 0.45,
+    "test_watermark_ecc_probe.EccProbeTest.test_visibility_cost_is_bounded": 0.0,
     "test_watermark_geometry_probe.GeometryDeterminismTest.test_build_is_deterministic": 30.75,
     "test_watermark_geometry_probe.GeometryDeterminismTest.test_committed_results_match_rebuild": 16.47,
     "test_watermark_geometry_probe.GeometryRecoveryTest.test_clean_round_trip": 0.0,
@@ -4400,5 +4405,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1535.4
+  "total_s": 1536.6
 }

@@ -21,7 +21,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 21,
+        "imports": 24,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "0c1e81d746fd36159443824cfdffdbbf43ab3c64317f0da6164d62fd609ff241",
+        "root": "395fce51de09abfebbbe1061cabab7c0d51d3dd0397859cfbda02cc5c40cbf81",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -364,18 +364,20 @@
     },
     {
       "id": "code_metrics",
-      "issues": 0,
+      "issues": 1,
       "name": "代码规模/复杂度上限（棘轮冻结）",
-      "sample": [],
+      "sample": [
+        "scripts/watermark_ecc_probe.py 模块行数 289 > 冻结值 286（修复指引：拆分该模块/函数；确需上调须评审后重冻基线 python scripts/code_metrics.py --write）"
+      ],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 352,
-        "files": 352,
+        "baseline": 353,
+        "files": 353,
         "max_fn_cc": 122,
         "max_fn_lines": 405,
         "max_lines": 9787
       },
-      "status": "pass",
+      "status": "fail",
       "warns": 0
     },
     {
@@ -526,8 +528,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4134,
-        "kernel": 2075,
+        "files": 4137,
+        "kernel": 2076,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,12 +540,12 @@
       "warns": 0
     }
   ],
-  "root_digest": "1295f7198b11d3c90bf997debc9cef473b8061681ca291f1e972311d34b396ce",
+  "root_digest": "6f070cc5db879263ae546b513fa492980c9aed72095a5990973fb1acc4b64d91",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
-    "fail": 0,
-    "pass": 29,
+    "fail": 1,
+    "pass": 28,
     "warn": 2
   }
 }
