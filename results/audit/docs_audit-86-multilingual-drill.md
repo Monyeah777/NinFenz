@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:9828dbc5e27299a87276f2fe9757d37ef0ac97e9c5acd66ca340637e10fd6617
+  - protocol/code_metrics_baseline.json:5baddeb344f90ebdaacb59dee337057c57575c653198b9061315ce5e546bc7ee
 ---
+> 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测
+
 > 重审（2026-11-07）：盲区修复：证据包 zip 跨平台确定性（create_system 固定）+ 平台无关断言/文档/可选依赖收口
 
 > 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
