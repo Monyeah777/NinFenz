@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { PACKAGE_ROOT, PAYLOAD_DIR } from '../lib/paths.mjs';
 import { verifyTree, treeSha256 } from '../lib/payload.mjs';
+import * as payloadLib from '../lib/payload.mjs';
 
 const pkg = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 const manifest = JSON.parse(fs.readFileSync(path.join(PAYLOAD_DIR, 'payload-manifest.json'), 'utf8'));
@@ -34,4 +35,22 @@ test('在已有检出上真跑一条只读命令', function () {
   if (r.status === 4) return; // 本机无 Python：环境问题，不算失败
   assert.equal(r.status, 0, r.stderr || r.stdout);
   assert.match(r.stdout + r.stderr, /doctor|体检|PASS/i);
+});
+
+test('payload 原子 rename 对 Windows 瞬时拒绝退避重试', async function () {
+  let attempts = 0;
+  const waits = [];
+  await payloadLib.renameWithRetry('source', 'target', {
+    rename: async function () {
+      attempts += 1;
+      if (attempts < 3) {
+        const err = new Error('temporarily locked');
+        err.code = 'EPERM';
+        throw err;
+      }
+    },
+    sleep: async function (ms) { waits.push(ms); }
+  });
+  assert.equal(attempts, 3);
+  assert.deepEqual(waits, [25, 50]);
 });
