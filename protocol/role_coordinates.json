@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 149,
-    "support": 413,
-    "verify": 1000
+    "projection": 150,
+    "support": 415,
+    "verify": 1003
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5687,6 +5687,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "架构裁决记录（nf-adr/1）+ 文档台账（nf-doc-ledger/1）：把「裁决」做成可校验数据。",
+      "path": "desktop/src/core/adr.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "登记条目带有效期（机制借鉴 openmake audit-gate.cjs:31-47）。",
       "path": "desktop/src/core/allowlist_expiry.py",
       "role": "prod",
@@ -7321,6 +7327,12 @@
     {
       "function": "批准记录命名（审计 W7：protocol/approvals/*.json.json 双扩展名）。",
       "path": "desktop/tests/test_approval_naming.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "架构分层判据（P0）：依赖方向 + ADR/台账单一真源。",
+      "path": "desktop/tests/test_architecture_layers.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -11963,6 +11975,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "16 份架构文档台账：状态 + 归属裁决 + 仓内落点。仓内实现只按 current 执行；冲突未裁前以 ADR 为准（见 protocol/adr/registry.json）。文档原件在仓外（作者提供），此处只登记裁决与锚点。",
+      "path": "protocol/docs_ledger.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "AI 品类域包名录（公开结果面）。每包：域码 / 独占类别 / 管线 / 模块 / 资产数 / 产出面与机验率 / 规格摘要。机检：check32 domain_packs 子扫描（名录 ↔ 盘上实况一致 + 可机验占比 ≥95%）。规格源在内部档案，故名录只登记摘要（spec_digest）不携带内容。",
       "path": "protocol/domain_packs.json",
       "role": "verify",
@@ -12372,17 +12390,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "25cf53c281aa45f8e6767bc09d5efc9313bba5627bbb83ab5bd343c2d89d9521",
+  "root_digest": "c6884019926d2e05df18432b5dd37de662cad1c2916e57a2da2fd8a6b7c094bf",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 267,
+    "R-catch": 269,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 130,
+    "R-projection": 131,
     "R-support": 119,
-    "R-verify": 880,
-    "auto:R-core": 277
+    "R-verify": 882,
+    "auto:R-core": 278
   },
   "schema": "nf-role-coordinates/1"
 }

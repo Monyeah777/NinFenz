@@ -6,6 +6,11 @@
       "ce": 0,
       "i": 0.0
     },
+    "adr": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "agent_rules_adapter": {
       "ca": 1,
       "ce": 3,

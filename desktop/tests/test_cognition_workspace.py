@@ -205,9 +205,10 @@ class IsolationTest(unittest.TestCase):
                     names = [alias.name for alias in node.names]
                 elif isinstance(node, ast.ImportFrom) and node.module:
                     names = [node.module]
+                    names.extend(node.module + "." + alias.name for alias in node.names)
                 for name in names:
-                    if any(name == bad or name.startswith(bad + ".")
-                           for bad in self.FORBIDDEN):
+                    padded = "." + name + "."
+                    if any(("." + bad + ".") in padded for bad in self.FORBIDDEN):
                         offenders.append(path.name + " → " + name)
         self.assertEqual([], offenders, "认知核 import 了契约核：" + str(offenders))
 

@@ -10,6 +10,11 @@
       "max_fn_cc": 8,
       "max_fn_lines": 19
     },
+    "desktop/src/core/adr.py": {
+      "lines": 191,
+      "max_fn_cc": 27,
+      "max_fn_lines": 50
+    },
     "desktop/src/core/agent_rules_adapter.py": {
       "lines": 86,
       "max_fn_cc": 11,
@@ -1404,6 +1409,11 @@
       "lines": 258,
       "max_fn_cc": 5,
       "max_fn_lines": 40
+    },
+    "scripts/adr_check.py": {
+      "lines": 92,
+      "max_fn_cc": 8,
+      "max_fn_lines": 31
     },
     "scripts/ai_domain_closure.py": {
       "lines": 395,

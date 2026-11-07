@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "P5 桥收口",
+  "note": "P0 补账收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "5ef1a8adf15fd1030e8846437ba93af1fb210d2b8a57540b4d2ee35a022a4e4a"
+  "subject_digest": "577034412e9ba7bfa04801ef459f2da71ded3169e14b77c0d661b191109d45eb"
 }
