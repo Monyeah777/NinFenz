@@ -171,7 +171,7 @@ def build(root: str = ".", today: Any = None) -> dict[str, Any]:
     「提交件 == 重算」在跨时区必红。UTC 是唯一跨机器一致的“今天”。
     """
     if today is None:
-        today = _dt.datetime.now(_dt.timezone.utc).date()
+        today = _dt.datetime.now(_dt.UTC).date()
     items: List[Dict[str, Any]] = []
     for spec in SPECS:
         sid, name, mod, entry, _form = spec
