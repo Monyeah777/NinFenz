@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:74509379350e92447c6d37ac49940a1d7489de030c3f43fd2c24dc6f7cd40131
+  - protocol/code_metrics_baseline.json:22e428e83df7c62c7ea6cbf62825ab837ff37097170c455a26477c316d47e9de
 ---
+> 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning
+
 > 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
 > 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）

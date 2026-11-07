@@ -318,7 +318,11 @@ def _rev_hit(rev, entries):
 
 
 def _judge(res, entries, revocations, at):
-    """判定面：证据本身成立后，再判吊销（压过 ok）与时效。"""
+    """判定面：证据本身成立后，再判吊销（压过 ok）与时效；同时标注时间可证性（G3）。"""
+    res["time_proof"] = "pinned" if at else "none"
+    res["time_basis"] = at or ("本机时钟 " + _now())
+    if (res.get("expires_at") or "") and not at:
+        res["warnings"].append("时间不可证（G3）：本机时钟判有效期，回拨时钟即可改变 expired 结论")
     hit = _rev_hit(revocations, entries)
     if hit is not None:
         res["verdict"] = "revoked"
@@ -743,7 +747,9 @@ def _res(kind: str):
     return {"kind": kind, "verdict": "invalid", "level": "none", "root": "",
             "head": "", "count": 0, "issues": [], "warnings": [], "expires_at": "",
             "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
-            "decision": None, "decision_status": "absent", "policy_verified": False}
+            "decision": None, "decision_status": "absent", "policy_verified": False,
+            # 时间可证性（G3）：与真源同口径——只标「时点谁给的」，不假装时间可信
+            "time_proof": "none", "time_basis": ""}
 
 
 def _envelope_ok(env, payloads, key):

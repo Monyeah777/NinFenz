@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:74509379350e92447c6d37ac49940a1d7489de030c3f43fd2c24dc6f7cd40131
+  - protocol/code_metrics_baseline.json:22e428e83df7c62c7ea6cbf62825ab837ff37097170c455a26477c316d47e9de
 ---
+> 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning
+
 > 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
 > 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）

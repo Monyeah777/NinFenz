@@ -138,7 +138,11 @@ maps_to = `nf evidence verify <target>` / `nf evidence batch <dir>` / `nf eviden
   `attest`（`nf-attest/1`、`nf-attest-set/1` 信封）。容器形态见
   `docs/ccos/evidence-bundle-v0.md`。
 - 输出：`{verdict, kind, level, root, head?, count, issues: [], revoked_by?: {...},
-  decision?: {...}, decision_status?: absent|declared|bound}`
+  decision?: {...}, decision_status?: absent|declared|bound,
+  time_proof: none|pinned, time_basis}
+
+  `time_proof` 是 **G3 诚实面**：本仓没有可信时间源，只能标「这个判定用的时点是本机时钟还是
+  调用方给定」，不能标「该时点为真」；包带 `expires_at` 且未给 `--at` 时必给 warning。`
 - 判定顺序（**fail-closed**，先失败先返回；不允许「证据弱就放行」）：
 
   | 序 | 检查 | 不过 → |

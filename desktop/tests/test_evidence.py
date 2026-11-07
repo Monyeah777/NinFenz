@@ -810,5 +810,66 @@ class TestDecisionBinding(_Base):
         core_bad = evidence.verify(path, expected_policy_digest="1" * 64)
         self.assertEqual(("ok", "invalid"), (core_ok["verdict"], core_bad["verdict"]))
 
+class TimeProofTest(unittest.TestCase):
+    """G3 诚实面：本仓没有可信时间源——只标「时点谁给的」，绝不假装时间可信。"""
+
+    def test_pinned_time_is_flagged_reproducible(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs").mkdir()
+            (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
+            data, _info = evidence.build(str(root), ["docs/a.md"],
+                                     created_at="2026-01-01T00:00:00Z")
+            bundle = Path(tmp) / "b.zip"
+            bundle.write_bytes(data)
+            res = evidence.verify(str(bundle), at="2030-01-01T00:00:00Z")
+            self.assertEqual("pinned", res["time_proof"])
+            self.assertIn("2030-01-01", res["time_basis"])
+
+    def test_clock_based_judgement_is_marked_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs").mkdir()
+            (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
+            data, _info = evidence.build(str(root), ["docs/a.md"],
+                                     created_at="2026-01-01T00:00:00Z")
+            bundle = Path(tmp) / "b.zip"
+            bundle.write_bytes(data)
+            # 无有效期 = 时间没参与判定：标 none 但不必警告
+            res = evidence.verify(str(bundle))
+            self.assertEqual("none", res["time_proof"])
+            self.assertFalse(any("G3" in w for w in res["warnings"]))
+            # 带有效期 = 时间参与了判定：必须给 G3 warning（不假装时间可信）
+            data2, _ = evidence.build(str(root), ["docs/a.md"],
+                                      created_at="2026-01-01T00:00:00Z",
+                                      expires_at="2099-01-01T00:00:00Z")
+            bundle2 = Path(tmp) / "b2.zip"
+            bundle2.write_bytes(data2)
+            res2 = evidence.verify(str(bundle2))
+            self.assertEqual("none", res2["time_proof"])
+            self.assertTrue(any("G3" in w for w in res2["warnings"]), res2["warnings"])
+
+    def test_zero_dep_parity_on_time_proof(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs").mkdir()
+            (root / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
+            data, _info = evidence.build(str(root), ["docs/a.md"],
+                                         created_at="2026-01-01T00:00:00Z",
+                                         expires_at="2099-01-01T00:00:00Z")
+            bundle = Path(tmp) / "b.zip"
+            bundle.write_bytes(data)
+            script = Path(__file__).resolve().parent.parent.parent / "scripts" / "nf_verify.py"
+            proc = subprocess.run([sys.executable, str(script),
+                                   "--evidence", str(bundle), "--json"],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace")
+            self.assertEqual(0, proc.returncode, proc.stderr[-300:])
+            doc = json.loads(proc.stdout)
+            self.assertEqual("none", doc["time_proof"])
+            self.assertTrue(any("G3" in w for w in doc["warnings"]))
+
+
 if __name__ == "__main__":
     unittest.main()

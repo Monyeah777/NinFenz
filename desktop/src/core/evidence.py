@@ -450,7 +450,9 @@ def _empty_result() -> dict[str, Any]:
             "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
             "decision": None, "decision_status": "absent", "policy_verified": False,
             "revocations_fresh": "unknown", "revocations_source": "none",
-            "revocations_basis": "none"}
+            "revocations_basis": "none",
+            # 时间可证性（威胁模型 G3）：本仓没有可信时间源，只能如实标注「谁给的时点」
+            "time_proof": "none", "time_basis": ""}
 
 
 def _fill_header(res: dict[str, Any], meta: dict[str, Any]) -> None:
@@ -786,10 +788,21 @@ def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
 
 
 def _apply_expiry(res: dict[str, Any], at: str) -> bool:
-    """时效判定：有效期早于判定时点即 expired。返回是否已定案。"""
+    """时效判定：有效期早于判定时点即 expired。返回是否已定案。
+
+    同时标注**时间可证性**（G3）：本仓没有可信时间源，所以只能说「这个判定用的是哪个时点」，
+    不能说「那个时点是真的」。调用方给 --at 时记 pinned（可复现/可对账），否则记 none 并
+    在包带有效期时给 warning——**不假装已经证明了时间**。
+    """
     exp = res["expires_at"]
+    res["time_proof"] = "pinned" if at else "none"
+    res["time_basis"] = at or ("本机时钟 " + attest.issue_stamp())
     if not exp:
         return False
+    if not at:
+        res["warnings"].append("时间不可证（G3）：本判定用本机时钟判有效期，回拨时钟即可改变 "
+                               "expired 结论（修复指引：需要可对账时给 --at 固定时点，"
+                               "或接可信时间戳后再判）")
     now = at or attest.issue_stamp()
     if now <= exp:
         return False

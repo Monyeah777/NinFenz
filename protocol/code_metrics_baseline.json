@@ -386,7 +386,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1798,
+      "lines": 1811,
       "max_fn_cc": 25,
       "max_fn_lines": 161
     },
@@ -1516,7 +1516,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_verify.py": {
-      "lines": 881,
+      "lines": 887,
       "max_fn_cc": 28,
       "max_fn_lines": 86
     },

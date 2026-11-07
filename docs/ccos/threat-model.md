@@ -58,7 +58,10 @@
   前序摘要 + hmac」信封，能验来源、能防回滚/分叉（`nf evidence revocations sign|verify|merge`，
   见 [revocation-feed-v0.md](revocation-feed-v0.md)）。残留：**仍是拉取式**——没有发布/订阅通道，
   「签发方已撤销但你没收到」无解；且 hmac 是对称的，跨组织来源证明还得走公钥面。
-- **G3 无可信时间戳**：时效判据吃本机时钟，回拨即可绕过「已过期」。
+- **G3 无可信时间戳（已做诚实闭环，仍缺外部权威）**：时效判据吃本机时钟，回拨即可绕过「已过期」。
+  2026-11-07 起判定面如实标注 `time_proof`（`none` = 本机时钟；`pinned` = 调用方给定、可对账）
+  + `time_basis`，并在包带有效期且未给 `--at` 时给显式 warning——不假装时间可信。仍未做：
+  RFC 3161 时间戳 token 的签发与校验（需外部 TSA）。
 - **G4 `cc_label`：声明层 + sidecar 回退 + PNG/JPEG 载体已实装；水印与多格式仍缺**：`nf-label/1` IR
   能校验「该有哪些标识、缺哪几条」；sidecar（`nf-label-sidecar/1`）把声明与对象摘要绑定，对象一变即判
   过期；`nf label embed` 把 IR 写进 **PNG iTXt 块**（可读回 / 不改像素 / 块结构合法）。但那是**可见文本

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:dd00f9f9799ce425fdd47143840db28b47d8ee9c681dd30804e097563415c525
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:74509379350e92447c6d37ac49940a1d7489de030c3f43fd2c24dc6f7cd40131
+  - protocol/code_metrics_baseline.json:22e428e83df7c62c7ea6cbf62825ab837ff37097170c455a26477c316d47e9de
 ---
+> 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning
+
 > 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
 > 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
