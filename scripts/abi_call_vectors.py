@@ -183,8 +183,9 @@ def build_replay_vectors() -> dict:
     with tempfile.TemporaryDirectory(prefix="nf_replay_vec_") as tmp:
         root = Path(tmp) / "repo"
         (root / "d").mkdir(parents=True)
-        atomic_write.write_text(root / "d" / "a.md", "# A\n")
-        atomic_write.write_text(root / "d" / "b.md", "# B\n")
+        # 字节落盘（不用文本模式）：避免 Windows 的 \n→\r\n 让包字节跨平台漂移
+        atomic_write.write_bytes(root / "d" / "a.md", b"# A\n")
+        atomic_write.write_bytes(root / "d" / "b.md", b"# B\n")
         data, _info = evidence.build(str(root), ["d/a.md", "d/b.md"],
                                      created_at="2026-01-01T00:00:00Z")
         bundle = Path(tmp) / "b.zip"

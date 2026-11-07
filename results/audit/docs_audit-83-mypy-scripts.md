@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:47d5e712d0ebe4c9a0dd06151e054bb31686f1170ccd6e52c302f33ddaa481bc
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:ed9183426668295405a84bb60fa4c49cbd6cf6c4b44c674dc491258fe16fc2ef
+  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
 ---
+> 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
+
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
 > 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核

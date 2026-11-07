@@ -1386,7 +1386,7 @@
       "max_fn_lines": 14
     },
     "scripts/abi_call_vectors.py": {
-      "lines": 255,
+      "lines": 256,
       "max_fn_cc": 5,
       "max_fn_lines": 37
     },
@@ -1481,7 +1481,7 @@
       "max_fn_lines": 44
     },
     "scripts/evidence_vectors.py": {
-      "lines": 432,
+      "lines": 434,
       "max_fn_cc": 9,
       "max_fn_lines": 79
     },

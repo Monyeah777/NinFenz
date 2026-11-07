@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:ed9183426668295405a84bb60fa4c49cbd6cf6c4b44c674dc491258fe16fc2ef
+  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
 ---
+> 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
+
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import

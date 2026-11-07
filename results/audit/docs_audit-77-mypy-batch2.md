@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:ed9183426668295405a84bb60fa4c49cbd6cf6c4b44c674dc491258fe16fc2ef
+  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
 ---
+> 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
+
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import

@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:ed9183426668295405a84bb60fa4c49cbd6cf6c4b44c674dc491258fe16fc2ef
+  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
 ---
+> 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
+
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import

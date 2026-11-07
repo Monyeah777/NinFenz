@@ -94,9 +94,11 @@ def _build(tmp: str, targets: list, key: bytes | None = None, anchor=None,
 def _base_fixture(tmp: str) -> None:
     d = Path(tmp) / "d"
     d.mkdir(parents=True, exist_ok=True)
+    # 写成**字节**（不用 write_text）：Windows 的文本模式会把 \n 翻成 \r\n，
+    # 于是同一仓库在不同平台生成的证据包字节不同，向量「提交件==重算」跨平台必红。
     for name, body in (("a.md", "# A\n\n甲\n"), ("b.md", "# B\n\n乙\n"),
                        ("c.md", "# C\n\n丙\n")):
-        atomic_write.write_text(str(d / name), body)
+        atomic_write.write_bytes(str(d / name), body.encode("utf-8"))
 
 
 def _case(cid: str, desc: str, verdict: str, *, bundle: bytes | None = None,
