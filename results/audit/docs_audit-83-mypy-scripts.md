@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:9b3e8112a59cb062d8a6f9c3822cdeebc662bd29220f66325d8738fc7cc50d13
+  - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:5bc895c4e3a0d9cf6c5093e486007317a521ec6a6f4a98f85ed127ce36b6c040
+  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
 ---
+> 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
+
+> 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
+
 > 重审（2026-11-07）：认知核研究层：方法库 + 切片计划器 + CLI（切片检索词/方法论路径/证据台账）
 
 > 重审（2026-11-07）：向量面收口：三形态跨实现同判 + 信封 subject 三摘要面

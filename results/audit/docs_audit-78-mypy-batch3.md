@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:5bc895c4e3a0d9cf6c5093e486007317a521ec6a6f4a98f85ed127ce36b6c040
+  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
 ---
+> 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
+
+> 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
+
 > 重审（2026-11-07）：认知核研究层：方法库 + 切片计划器 + CLI（切片检索词/方法论路径/证据台账）
 
 > 重审（2026-11-07）：向量面收口：三形态跨实现同判 + 信封 subject 三摘要面

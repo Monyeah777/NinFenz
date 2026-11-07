@@ -1,0 +1,104 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "evidence-audit",
+  "version": "1.0.0",
+  "domain": "assurance/evidence-audit",
+  "note": "机制来源：本仓 NF-盲区审计协议 v1（Claim Card / 五问 / A–F 六型盲区 / 闭合动作 / 反例复验）。这是本仓自有方法，不引外部论文。",
+  "expert_moves": [
+    {
+      "id": "EA-1",
+      "name": "立卡再判",
+      "maps_to": [
+        "k.represent",
+        "k.partition"
+      ],
+      "why": "没有 Claim Card（断言/范围/机制/证据/owner）就没有可审对象；判据先于结论",
+      "frame_delta_hint": {
+        "kind": "question_restated"
+      }
+    },
+    {
+      "id": "EA-2",
+      "name": "反向问三次",
+      "maps_to": [
+        "e.falsify",
+        "k.abstract"
+      ],
+      "why": "先列 ≥3 种失效模式，再问「谁在哪层抓住」——没有抓手的就是盲区",
+      "frame_delta_hint": {
+        "kind": "assumptions_challenged"
+      }
+    },
+    {
+      "id": "EA-3",
+      "name": "分型（A–F）",
+      "maps_to": [
+        "k.classify",
+        "m.check"
+      ],
+      "why": "准入≠不变量、覆盖≠判据、机制≠边界、声明≠接线、身份≠覆盖、默认≠安全；分型决定闭合动作",
+      "frame_delta_hint": {
+        "kind": "hypothesis_proposed"
+      }
+    },
+    {
+      "id": "EA-4",
+      "name": "闭合落到代码或测试",
+      "maps_to": [
+        "e.verify",
+        "m.trace"
+      ],
+      "why": "「加文档」不算闭合；必须是判据/反例 fixture/痕迹/不变量套件/终态矩阵之一",
+      "frame_delta_hint": {
+        "kind": "commitment_formed"
+      }
+    },
+    {
+      "id": "EA-5",
+      "name": "红队复验：故意触发",
+      "maps_to": [
+        "e.falsify",
+        "e.audit"
+      ],
+      "why": "反例不响 = 判据未闭合；每条新判据至少一个「应该报警」的 fixture",
+      "frame_delta_hint": {
+        "kind": "evidence_standard"
+      }
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "closure",
+      "required": [
+        "Claim Card 六字段",
+        "≥1 个故意触发的反例 fixture",
+        "trigger→期望信号→实际信号→是否留痕"
+      ]
+    },
+    {
+      "claim_kind": "verification",
+      "required": [
+        "可复算命令",
+        "期望输出（哈希/计数/退出码）",
+        "失败时的分层定位"
+      ]
+    }
+  ],
+  "common_failures": [
+    "用「有测试」代替「有判据」",
+    "用「已落仓」代替「已接线」",
+    "把声明写成结论（README 说支持 ≠ 默认路径可达）",
+    "逃生舱打开后无痕，却宣称是「边界」",
+    "为过门禁删测试/弱化断言"
+  ],
+  "examples": [
+    {
+      "case": "本仓 2026-11-03 首轮审计 12 条断言",
+      "why": "12 条里只约 2 条真正闭合；其余缺判据/痕迹/接线之一——示范「能力存在 ≠ 被证明」"
+    }
+  ],
+  "criteria_refs": [
+    "craft:evidence_sufficiency",
+    "craft:falsifiability"
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "watermarking",
+  "version": "1.0.0",
+  "domain": "content-provenance/watermarking",
+  "note": "机制来源：①DCT 域 + SIFT 几何同步 + CRC+BCH 纠错的屏幕拍摄鲁棒水印（Telkom Univ., 2025，仅读摘要/标题，全文未取）；②DWT-SVD-DCT 抗 JPEG/JPEG2000（ScienceDirect S0045790614002146，仅读标题/摘要）。本包只抽象**方法与判据**，不复制实验数字。",
+  "expert_moves": [
+    {
+      "id": "WM-1",
+      "name": "先分层攻击面再谈鲁棒",
+      "maps_to": [
+        "k.partition",
+        "e.falsify"
+      ],
+      "why": "鲁棒性是「对哪类攻击」的函数；不列攻击面就谈鲁棒 = 不可证",
+      "frame_delta_hint": {
+        "kind": "question_restated",
+        "note": "把「抗转码」重述为「抗哪些参数化转码」"
+      }
+    },
+    {
+      "id": "WM-2",
+      "name": "同步先于嵌入",
+      "maps_to": [
+        "k.relate",
+        "m.check"
+      ],
+      "why": "几何攻击（裁剪/缩放/旋转/拍屏）先破坏位对齐；没有同步原语，任何嵌入都读不回",
+      "frame_delta_hint": {
+        "kind": "assumption_suspended",
+        "note": "悬置「像素位置稳定」这个默认假设"
+      }
+    },
+    {
+      "id": "WM-3",
+      "name": "频域嵌入 + 量化步长不变量",
+      "maps_to": [
+        "k.quantify",
+        "e.verify"
+      ],
+      "why": "JPEG/缩放改变低频系数幅度，但相对关系（区块间比较）可比幅度更稳",
+      "frame_delta_hint": {
+        "kind": "hypothesis_proposed"
+      }
+    },
+    {
+      "id": "WM-4",
+      "name": "纠错码换容量",
+      "maps_to": [
+        "k.quantify",
+        "m.estimate"
+      ],
+      "why": "BCH/CRC 把「误码率」换成「可恢复」，代价是容量与可见性；不写纠错就只能在低误码率下成立",
+      "frame_delta_hint": {
+        "kind": "tension_added",
+        "note": "容量 vs 鲁棒 vs 可见性三角"
+      }
+    },
+    {
+      "id": "WM-5",
+      "name": "误码率曲线代替单点结论",
+      "maps_to": [
+        "m.detect",
+        "e.benchmark"
+      ],
+      "why": "单次重编码通过 = 噪声；要给「质量因子 × 缩放比 × 截图链路」上的 BER 曲线与阈值",
+      "frame_delta_hint": {
+        "kind": "evidence_standard"
+      }
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "robustness",
+      "required": [
+        "攻击矩阵范围（转码参数/缩放/截图链路）",
+        "BER 或位正确率曲线",
+        "至少 3 个质量档位的均值与方差",
+        "与无嵌入对照的可见性指标（PSNR/SSIM 或人工盲评协议）"
+      ]
+    },
+    {
+      "claim_kind": "capacity",
+      "required": [
+        "载荷字节",
+        "纠错码参数（如 BCH(n,k,t)）",
+        "嵌入位置（频带/系数对数）"
+      ]
+    },
+    {
+      "claim_kind": "detectability",
+      "required": [
+        "盲检 vs 非盲检",
+        "误检率（非目标图被判有 watermark）"
+      ]
+    }
+  ],
+  "common_failures": [
+    "只测一次 JPEG q=95 就宣称抗转码",
+    "用原图自证（拿同一张图重存再读，未经过真实链路）",
+    "把可见文本块（iTXt/EXIF）当作水印鲁棒性证据",
+    "忽略几何攻击（裁剪导致位对齐丢失）就报高存活率",
+    "报单次最好值，不给方差与基线"
+  ],
+  "examples": [
+    {
+      "case": "本仓 label_watermark（LSB + 24×24 块冗余）",
+      "why": "能扛裁剪/无损重存，不扛 JPEG/缩放/截屏——判据写成期望行为；这正是「分层攻击面」缺失时的典型边界"
+    },
+    {
+      "case": "DCT + SIFT + CRC/BCH（屏幕拍摄）",
+      "why": "三段式：频域嵌入（抗压缩）+ 几何同步（抗拍屏形变）+ 纠错（抗误码）——可作为本仓 v1 鲁棒水印的方法骨架"
+    }
+  ],
+  "criteria_refs": [
+    "craft:coherence",
+    "craft:evidence_sufficiency",
+    "standard:GB45438-2025"
+  ]
+}

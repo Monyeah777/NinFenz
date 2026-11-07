@@ -198,8 +198,8 @@
     },
     "cognition_plan": {
       "ca": 0,
-      "ce": 0,
-      "i": 0.0
+      "ce": 1,
+      "i": 1.0
     },
     "commit_title_guard": {
       "ca": 1,
@@ -773,6 +773,11 @@
     },
     "md_blocks": {
       "ca": 2,
+      "ce": 0,
+      "i": 0.0
+    },
+    "method_pack": {
+      "ca": 1,
       "ce": 0,
       "i": 0.0
     },

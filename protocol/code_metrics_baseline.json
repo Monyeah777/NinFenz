@@ -201,9 +201,9 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/cognition_plan.py": {
-      "lines": 201,
+      "lines": 210,
       "max_fn_cc": 18,
-      "max_fn_lines": 59
+      "max_fn_lines": 68
     },
     "desktop/src/core/commit_title_guard.py": {
       "lines": 22,
@@ -779,6 +779,11 @@
       "lines": 36,
       "max_fn_cc": 8,
       "max_fn_lines": 17
+    },
+    "desktop/src/core/method_pack.py": {
+      "lines": 204,
+      "max_fn_cc": 35,
+      "max_fn_lines": 59
     },
     "desktop/src/core/missing_sentinel.py": {
       "lines": 27,
@@ -1541,7 +1546,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 9057,
+      "lines": 9089,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

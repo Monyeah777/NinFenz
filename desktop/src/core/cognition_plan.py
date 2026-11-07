@@ -141,7 +141,7 @@ def _expand(template: str, topic: str, topic_en: str, key: str) -> str:
 
 
 def plan(topic: str, depth: int = 2, methods: list[str] | None = None,
-         root: str = ".") -> dict[str, Any]:
+         root: str = ".", pack_ids: list[str] | None = None) -> dict[str, Any]:
     """主题 → 研究计划（切片 + 检索词 + 方法论路径 + 证据台账）。纯函数、确定性。"""
     text = str(topic or "").strip()
     if not text:
@@ -186,8 +186,17 @@ def plan(topic: str, depth: int = 2, methods: list[str] | None = None,
                       "when": str(m["when"]),
                       "steps": list(m["steps"]), "output": str(m["output"]),
                       "falsifier": str(m["falsifier"])})
+    domain = None
+    if pack_ids:
+        from core import method_pack as mp
+        composed = mp.compose([mp.load_pack(root, pid) for pid in pack_ids])
+        domain = {"packs": composed["packs"],
+                  "expert_moves": composed["expert_moves"],
+                  "evidence_standards": composed["evidence_standards"],
+                  "common_failures": composed["common_failures"]}
     return {"schema": SCHEMA, "topic": text, "depth": depth,
             "topic_en": topic_en, "topic_key": key,
+            "domain": domain,
             "slices": slices, "paths": paths,
             "ledger": {"columns": ["claim", "source", "strength", "falsifier", "status"],
                        "strength_scale": ["实测", "一手条款", "一手代码", "推测", "未证"],

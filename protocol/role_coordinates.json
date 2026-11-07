@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1456,
+    "app": 1457,
     "entry": 26,
     "floor": 5,
-    "prod": 1053,
+    "prod": 1054,
     "projection": 144,
-    "support": 390,
-    "verify": 986
+    "support": 394,
+    "verify": 990
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5879,6 +5879,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "认知核 · 研究层 v0：把「深入钻研」拆成**切片 → 检索词 → 方法论路径 → 证据台账**。",
+      "path": "desktop/src/core/cognition_plan.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "提交标题禁内部流水账/内部编号/金额（机制借鉴 nuke AGENTS.md:113-128；对齐 STRATEGY §四公开文案纪律）。",
       "path": "desktop/src/core/commit_title_guard.py",
       "role": "verify",
@@ -6463,6 +6469,12 @@
     {
       "function": "MCP Server 运行时（v2.5.0 Wave5 C1：快照烧成服务——静态 mcp.json → stdio JSON-RPC）。",
       "path": "desktop/src/core/mcp_runtime.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "方法包（Method Pack）v0：把「专业领域的专家动作 + 证据标准」做成可校验、可组合的数据。",
+      "path": "desktop/src/core/method_pack.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -7607,6 +7619,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "认知核 · 研究层判据：切片/检索词/方法论路径必须**成体系且可证伪**，不是随便列几个词。",
+      "path": "desktop/tests/test_cognition_plan.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交信息机检单测（CONTRIBUTING §1 判据化 · 含\"不打断自动化\"回归）。",
       "path": "desktop/tests/test_commit_msg.py",
       "role": "verify",
@@ -8443,6 +8461,12 @@
     {
       "function": "Meta-cognitive cockpit integration contracts.",
       "path": "desktop/tests/test_meta_cockpit.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "方法包判据：领域专业性必须是**可校验的数据**，不是文档里的形容词。",
+      "path": "desktop/tests/test_method_pack.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12053,6 +12077,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "认知核的研究层真源：方法论库（怎么钻）+ 切片模板（钻哪些面）。切片检索词由 core/cognition_plan.py 按主题生成，方法论只提供路径与判据，不写结论。",
+      "path": "protocol/research_methods.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "协议件 RFC 索引（机制借鉴 HMP 的 RFC 系列：编号 / Category / Date / Status / supersede 链）。文档头部为真源，本索引为机读投影并逐条比对。",
       "path": "protocol/rfc_index.json",
       "role": "verify",
@@ -12276,17 +12306,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "18fcf32baeea19d7c0cf89cd29b2cb40c655c11ecc9d0d9f60e2716d716ffdcd",
+  "root_digest": "90110c81d48d1a57fab80b9627098734f3a857f59d14202bf8e39157433f39dc",
   "rule_counts": {
-    "R-app": 1456,
-    "R-catch": 244,
+    "R-app": 1457,
+    "R-catch": 248,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 125,
     "R-support": 119,
-    "R-verify": 867,
-    "auto:R-core": 274
+    "R-verify": 870,
+    "auto:R-core": 276
   },
   "schema": "nf-role-coordinates/1"
 }

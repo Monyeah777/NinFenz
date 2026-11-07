@@ -16,15 +16,19 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:9b3e8112a59cb062d8a6f9c3822cdeebc662bd29220f66325d8738fc7cc50d13
+  - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:886edd2bae5436000694e8ccf51e65eeef9fa30a30fbc11a2c068ec0445420d8
-  - protocol/coupling_baseline.json:18d5392a8ad9346b577d2cd670790155b5bbc957d99f54c93727363b5f29ee6e
+  - protocol/check12_weights.json:4039489e210dd5ae97011e4efed6d0fb965e1ec419c21d34e4643831c78f86bf
+  - protocol/coupling_baseline.json:431d4eda758bf75851f088809133795e6299690b24dbbe1e4ad31125f93b6b46
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
+
+> 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
+
 > 重审（2026-11-07）：认知核研究层：方法库 + 切片计划器 + CLI（切片检索词/方法论路径/证据台账）
 
 > 重审（2026-11-07）：向量面收口：三形态跨实现同判 + 信封 subject 三摘要面

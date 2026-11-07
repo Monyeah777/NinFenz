@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 335,
-        "files": 335,
+        "baseline": 336,
+        "files": 336,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
-        "max_lines": 9057
+        "max_lines": 9089
       },
       "status": "pass",
       "warns": 0
@@ -432,8 +432,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 277,
-        "modules": 277,
+        "metrics_recorded": 278,
+        "modules": 278,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4061,
-        "kernel": 2044,
+        "files": 4071,
+        "kernel": 2049,
         "kernel_no_self": 309,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "724f0a011e1b486693d280c49399e364520025ec9e1d003cb77c99f4ffc672eb",
+  "root_digest": "41c686e308cd0530076c222f9abb7bef2ca3acb49e6011fc7ca0ecf854792170",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

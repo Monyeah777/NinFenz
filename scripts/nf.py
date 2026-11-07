@@ -909,6 +909,11 @@ def _add_parser_validation(sub):
                      help="只用这些方法（逗号分隔，如 M1,M3,M4）")
     cog.add_argument("--list-methods", dest="list_methods", action="store_true",
                      help="列出方法论库（怎么钻）")
+    cog.add_argument("--pack", dest="packs", action="append", default=[],
+                     metavar="PACK_ID",
+                     help="领域方法包（可重复）：把专家动作+证据标准并入研究计划")
+    cog.add_argument("--packs-list", dest="packs_list", action="store_true",
+                     help="列出领域方法包（怎么写专家动作/证据标准）")
     cog.add_argument("--out", default="", help="计划落点（缺省=只打印）")
     cog.add_argument("--json", action="store_true", help="输出结构化 JSON")
     stv = sub.add_parser("st-validate",
@@ -5637,6 +5642,24 @@ def _cmd_cognition(args):
 
     from core import cognition as cg
     from core import cognition_plan as cp
+    if getattr(args, "packs_list", False):
+        from core import method_pack as mpk
+        packs = mpk.list_packs(ROOT)
+        if args.json:
+            print(_json.dumps({"kind": "method-packs", "packs": packs},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print(f"== nf cognition --packs-list（{len(packs)} 个领域方法包）==")
+        for p in packs:
+            try:
+                full = mpk.load_pack(ROOT, p["id"])
+            except ValueError as exc:
+                print(f"  ✗ {p['id']}：{exc}", file=sys.stderr)
+                continue
+            print(f"  {p['id']} v{p['version']} · {full['domain']}")
+            print(f"      专家动作 {len(full['expert_moves'])} · "
+                  f"证据标准 {len(full['evidence_standards'])}")
+        return 0
     if getattr(args, "list_methods", False):
         lib = cp.load_methods(ROOT)
         print(f"== nf cognition --list-methods（{len(lib['methods'])} 条方法论）==")
@@ -5649,7 +5672,8 @@ def _cmd_cognition(args):
         try:
             methods = ([x.strip() for x in args.methods.split(",") if x.strip()]
                        if args.methods else None)
-            doc = cp.plan(args.research_topic, depth=args.depth, methods=methods, root=ROOT)
+            doc = cp.plan(args.research_topic, depth=args.depth, methods=methods, root=ROOT,
+                          pack_ids=list(getattr(args, "packs", []) or []))
         except (OSError, ValueError) as exc:
             return _machine_fail(args, str(exc), 1)
         if args.out:
@@ -5673,6 +5697,14 @@ def _cmd_cognition(args):
             print("\n  方法论路径：")
             for pa in doc["paths"]:
                 print(f"    {pa['order']}. {pa['method']} {pa['title']}")
+            if doc.get("domain"):
+                print("\n  领域方法包：" + " + ".join(doc["domain"]["packs"]))
+                for mv in doc["domain"]["expert_moves"]:
+                    maps = ",".join(mv["maps_to"])
+                    print(f"    · {mv['id']} {mv['name']}（{mv['from']}）→ {maps}")
+                for st in doc["domain"]["evidence_standards"]:
+                    print(f"    证据标准[{st['claim_kind']}]：{'；'.join(st['required'][:3])}…")
+                print("    常见错法：" + "；".join(doc["domain"]["common_failures"][:2]))
             print("\n  台账规则：" + doc["ledger"]["rule"])
             if args.out:
                 print(f"  已写入：{_rel_display(_rel_out(args.out))}")
