@@ -158,6 +158,45 @@ class Iso29119LedgerTest(unittest.TestCase):
         )
 
 
+class CycloneDxVexLedgerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.issues, cls.report = sc.build(ROOT)
+
+    def test_cyclonedx_vex_is_consumable_with_dual_format_parity(self):
+        self.assertEqual([], self.issues)
+        rows = {row["id"]: row for row in self.report["standards"]}
+        self.assertIn("cyclonedx-vex", rows)
+        row = rows["cyclonedx-vex"]
+        self.assertEqual("eng", row["layer"])
+        self.assertEqual("consumable", row["state"])
+        self.assertTrue(row["asserted"])
+        self.assertTrue(row["domain_bound"])
+
+        ledger = json.loads(
+            (ROOT / "protocol" / "standards_assertions.json").read_text(encoding="utf-8")
+        )
+        claim = next(
+            item for item in ledger["claims"]
+            if item["id"] == "cyclonedx-vex-dual-format"
+        )
+        self.assertEqual("cyclonedx-vex", claim["standard"])
+        self.assertIn(
+            "desktop/tests/test_supply_chain_l3.py::VexTest.test_openvex_cyclonedx_mismatch_is_rejected",
+            claim["negative_tests"],
+        )
+        consumer_paths = {item["path"] for item in claim["consumers"]}
+        self.assertEqual(
+            {
+                "scripts/generate_vex.py",
+                "packaging/npm/tools/build_release.py",
+                "scripts/build_vsa.py",
+                "scripts/validate_cyclonedx_vex.py",
+            },
+            consumer_paths,
+        )
+
+
 class LedgerMutationTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

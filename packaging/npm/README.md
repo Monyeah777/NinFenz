@@ -98,7 +98,7 @@ cd packaging/npm
 npm run stage     # 暂存 payload（含版本口径闸门：package.json 版本 == NF_CLI_VERSION）
 npm run verify    # 发布前自检（安装脚本/payload 校验/元数据/预算）
 npm test          # 冒烟测试（清单自洽 + 快路径 + 真跑 doctor）
-npm run release:build                      # 双构建 + tarball + 双 SBOM + SHA256SUMS
+npm run release:build                      # 双构建 + tarball + 双 SBOM + 双 VEX + SHA256SUMS
 npm publish dist/release/ninfenz-1.1.2.tgz --provenance --access public
 # 正式发布走 .github/workflows/npm-publish.yml（含 GitHub OIDC attestation）
 ```
@@ -111,6 +111,7 @@ gh attestation verify ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.2.cdx.json --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.2.spdx3.json --repo Monyeah777/NinFenz
 gh attestation verify ninfenz-1.1.2.openvex.json --repo Monyeah777/NinFenz
+gh attestation verify ninfenz-1.1.2.cdx-vex.json --repo Monyeah777/NinFenz
 gh attestation download ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz --limit 30
 DIGEST=$(sha256sum ninfenz-1.1.2.tgz | cut -d ' ' -f1)
 gh attestation verify ninfenz-1.1.2.tgz --repo Monyeah777/NinFenz \

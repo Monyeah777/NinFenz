@@ -20,6 +20,7 @@ python scripts/validate_sboms.py packaging/npm/dist/release
 | `ninfenz-<version>.cdx.json` | CycloneDX 1.6 SBOM |
 | `ninfenz-<version>.spdx3.json` | SPDX 3.0 JSON-LD SBOM |
 | `ninfenz-<version>.openvex.json` | 与漏洞处置台账一致的 OpenVEX 0.2.0 文档 |
+| `ninfenz-<version>.cdx-vex.json` | 与 OpenVEX 同源、逐项语义对账的 CycloneDX 1.6 VEX |
 | `ninfenz-<version>.payload-manifest.json` | 逐文件 SHA-256 与聚合树摘要 |
 | `SHA256SUMS` | 所有发布文件的完整性清单 |
 | `release-metadata.json` | 源提交、可复现结论、SBOM、VEX 和工件映射 |
@@ -34,8 +35,8 @@ gzip mtime 和 OS 字节均被归一；payload 清单的 `generated_at` 取源�
 
 1. GitHub 托管 runner 从不可变提交构建；
 2. 两次构建逐字节比较；
-3. 生成 CycloneDX、SPDX、OpenVEX、payload 清单与 checksums；
-4. 使用 GitHub OIDC 的 `actions/attest-build-provenance` 对两套 tarball、双 SBOM、OpenVEX、
+3. 生成 CycloneDX、SPDX、OpenVEX、CycloneDX VEX、payload 清单与 checksums；
+4. 使用 GitHub OIDC 的 `actions/attest-build-provenance` 对两套 tarball、双 SBOM、双 VEX、
    checksums 与 release metadata 生成 `https://slsa.dev/provenance/v1` 来源证明；
 5. 独立 `verify` 作业下载发布束、校验 `SHA256SUMS`，再对每个 subject 验证签名 workflow、
    source ref、source commit 与 predicate type；
@@ -75,7 +76,7 @@ gh attestation verify "$ARTIFACT" --repo Monyeah777/NinFenz \
 
 成功输出必须把 subject digest 绑定到同一次 GitHub Actions 构建，签发身份来自本仓库的
 OIDC workflow。GitHub API 只接受 Build provenance 作为服务端 predicate 过滤参数；VSA 的
-自定义 predicate 先下载 bundle 再做本地密码学校验。对双 tarball、双 SBOM、OpenVEX、
+自定义 predicate 先下载 bundle 再做本地密码学校验。对双 tarball、双 SBOM、双 VEX、
 checksums 和 metadata 应逐一验证；摘要相同但没有有效 attestation，不等于来源已经认证。
 
 npm registry 自身也会保存 npm provenance。可在包页面查看，或通过公开 registry 的
@@ -83,18 +84,21 @@ provenance API 核验；GitHub attestation 与 npm provenance 是两条独立验
 
 ## VEX 与漏洞处置
 
-漏洞处置台账是 `results/supply-chain/vuln-disposition.json`，生成物是
-`results/supply-chain/ninfenz.openvex.json`：
+漏洞处置台账是 `results/supply-chain/vuln-disposition.json`。单次生成会同时产出
+`results/supply-chain/ninfenz.openvex.json` 与 `results/supply-chain/ninfenz.cdx-vex.json`：
 
 ```bash
 python scripts/generate_vex.py --check
 python scripts/generate_vex.py --write
 python scripts/generate_vex.py --json
+python scripts/generate_vex.py --cyclonedx-json
 ```
 
 改动处置台账后必须先 `--write`，再让 `--check` 与 `scripts/supply_chain_policy.py` 全绿。
 `not_affected` 缺 justification / impact、`affected` / `under_investigation` 缺 action、非法状态
-或过期 VEX 都会 fail-closed。发布构建会把 VEX 写入 tarball 同级的发布束、`SHA256SUMS` 和
+或过期 VEX 都会 fail-closed。CycloneDX projection 只接受可映射的 justification 枚举，并校验
+`affects.ref` 必须指向已知产品组件；两种格式还要在漏洞、产品、状态、justification 与处置说明
+上逐项一致。发布构建会把双 VEX 写入 tarball 同级的发布束、`SHA256SUMS` 和
 `release-metadata.json`，并纳入 provenance / VSA subject。
 
 ## 依赖与供应商准入

@@ -119,8 +119,8 @@
       "id": "OSPS-VM-04.02",
       "status": "enforced",
       "owner": "@Monyeah777",
-      "verification": "OpenVEX is generated from vulnerability dispositions and validated before release.",
-      "evidence": ["results/supply-chain/ninfenz.openvex.json", "results/supply-chain/vuln-disposition.json", "scripts/generate_vex.py"]
+      "verification": "OpenVEX and CycloneDX VEX are generated from the same vulnerability dispositions, checked for semantic parity, and validated before release.",
+      "evidence": ["results/supply-chain/ninfenz.openvex.json", "results/supply-chain/ninfenz.cdx-vex.json", "results/supply-chain/vuln-disposition.json", "scripts/generate_vex.py", "scripts/validate_cyclonedx_vex.py"]
     },
     {
       "id": "OSPS-VM-05.04",

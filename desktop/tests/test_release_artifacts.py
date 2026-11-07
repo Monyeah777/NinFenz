@@ -50,7 +50,8 @@ class ReleaseArtifactTest(unittest.TestCase):
     def test_expected_release_bundle_is_present_and_verifies(self):
         names = {path.name for path in self.out.iterdir()}
         for suffix in (".tgz", ".cdx.json", ".spdx3.json", ".payload-manifest.json",
-                       ".openvex.json", "SHA256SUMS", "release-metadata.json"):
+                       ".openvex.json", ".cdx-vex.json", "SHA256SUMS",
+                       "release-metadata.json"):
             self.assertTrue(
                 any(name.endswith(suffix) or name == suffix for name in names),
                 f"缺发布文件 {suffix}：{sorted(names)}",
@@ -65,6 +66,11 @@ class ReleaseArtifactTest(unittest.TestCase):
         metadata = json.loads((self.out / "release-metadata.json").read_text(encoding="utf-8"))
         self.assertTrue(metadata["reproducible_build"]["verified"])
         self.assertEqual(2, metadata["reproducible_build"]["independent_builds"])
+        self.assertEqual("OpenVEX 0.2.0", metadata["vex"]["formats"]["openvex"]["spec_version"])
+        self.assertEqual(
+            "CycloneDX 1.6",
+            metadata["vex"]["formats"]["cyclonedx"]["spec_version"],
+        )
         manifest = json.loads(next(self.out.glob("*.payload-manifest.json"))
                               .read_text(encoding="utf-8"))
         self.assertIsInstance(manifest["source_date_epoch"], int)
@@ -150,7 +156,7 @@ class ReleaseArtifactTest(unittest.TestCase):
             (self.out / "release-metadata.json").read_text(encoding="utf-8")
         )
         module = _load_vsa()
-        cases = ("commit", "checksum", "sums", "vex", "builds", "dirty")
+        cases = ("commit", "checksum", "sums", "vex", "cdx-vex", "builds", "dirty")
         for case in cases:
             with self.subTest(case=case), tempfile.TemporaryDirectory() as tmp:
                 bundle = Path(tmp) / "release"
@@ -183,6 +189,11 @@ class ReleaseArtifactTest(unittest.TestCase):
                     issues = module.verify_release(bundle, policy, metadata["source_commit"])
                     self.assertTrue(any("OpenVEX" in item for item in issues))
                     continue
+                if case == "cdx-vex":
+                    next(bundle.glob("*.cdx-vex.json")).unlink()
+                    issues = module.verify_release(bundle, policy, metadata["source_commit"])
+                    self.assertTrue(any("CycloneDX VEX" in item for item in issues))
+                    continue
                 if case == "dirty":
                     path = bundle / "release-metadata.json"
                     doc = json.loads(path.read_text(encoding="utf-8"))
@@ -207,6 +218,18 @@ class ReleaseArtifactTest(unittest.TestCase):
             cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", timeout=300,
         )
         self.assertEqual(0, proc.returncode, (proc.stdout + proc.stderr)[-2000:])
+
+    def test_official_cyclonedx_vex_schema_when_available(self):
+        if importlib.util.find_spec("cyclonedx") is None:
+            self.skipTest("CycloneDX validator not installed")
+        path = ROOT / "scripts" / "validate_cyclonedx_vex.py"
+        spec = importlib.util.spec_from_file_location("test_validate_cyclonedx_vex", path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError(f"cannot load {path}")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        vex = next(self.out.glob("*.cdx-vex.json"))
+        self.assertEqual([], module.validate(vex))
 
 
 if __name__ == "__main__":

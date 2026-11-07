@@ -20,7 +20,7 @@
           "hits": 0
         },
         "import_residue": [],
-        "imports": 16,
+        "imports": 18,
         "layers": {
           "asset_levels": 5,
           "crosscut": 6,
@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 105,
+        "raises": 120,
         "sinks": 22
       },
       "status": "pass",
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "03a9e9359e6b37f00ee738839c5da68ef12e71bee0128a622711a57eef39b596",
+        "root": "c9335f4cb83da24fd9b3890772af8d7a08af91ac2e6ea22aa217908f8a4d5905",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 334,
-        "files": 334,
+        "baseline": 336,
+        "files": 336,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 262,
-        "modules": 262,
+        "metrics_recorded": 263,
+        "modules": 263,
         "registered_cycles": 0,
         "registered_sdp": 12,
         "sdp": 12
@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 12,
-        "bound": 80,
+        "asserted": 13,
+        "bound": 81,
         "catalogued": 375,
-        "claims": 12,
-        "consumable": 12,
-        "domain_bound": 70,
-        "not_domain_bound": 305,
+        "claims": 13,
+        "consumable": 13,
+        "domain_bound": 71,
+        "not_domain_bound": 304,
         "states": {
           "asserted": 0,
           "bound": 68,
-          "catalogued": 295,
-          "consumable": 12
+          "catalogued": 294,
+          "consumable": 13
         }
       },
       "status": "pass",
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "6337c79b0be2f784bbbc364d4aca8fd7cdd47dc831665ae11e8ee1e33d54de36",
+  "root_digest": "c9c0072c2257a681115a2e12677695751040e58d5f79cab63eec1741cf6f8086",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

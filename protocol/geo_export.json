@@ -967,7 +967,7 @@
     {
       "body": "IETF/JSON Schema",
       "bound_main": 63,
-      "bound_support": 228,
+      "bound_support": 227,
       "ext_points": [
         "vocabulary",
         "format-annotation"
@@ -2646,7 +2646,7 @@
     {
       "body": "CycloneDX",
       "bound_main": 0,
-      "bound_support": 0,
+      "bound_support": 1,
       "ext_points": [
         "vulnerability-state",
         "analysis-justification"

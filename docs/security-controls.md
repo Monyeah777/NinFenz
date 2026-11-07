@@ -111,9 +111,9 @@ CSV、Markdown、YAML、TOML、GraphML 和 WASM。JSON/schema 面、路径包含
 ## 发布与依赖
 
 Critical 漏洞停止发布；High 阻断合并与 tag，除非有可达性证据或显式风险处置；Medium 进入下一
-维护窗口。依赖源、供应商、许可证、VEX 和 SBOM 分别由供应链清单校验。
+维护窗口。依赖源、供应商、许可证、双 VEX 格式和 SBOM 分别由供应链清单校验。
 
-发布构建连续构建两次并逐字节比较，产出 CycloneDX 1.6、SPDX 3.0.1、OpenVEX、checksums
+发布构建连续构建两次并逐字节比较，产出 CycloneDX 1.6、SPDX 3.0.1、OpenVEX、CycloneDX VEX、checksums
 和 release metadata。GitHub OIDC 生成 build provenance 与 VSA。当前声明仅限
 `SLSA_BUILD_LEVEL_2`；共享 GitHub runner 仍是 L3 readiness 的 trusted-builder blocker，
 不得因签名存在而虚标 Build L3。

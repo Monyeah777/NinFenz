@@ -87,6 +87,7 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
         )
         subject = attest_steps[0]["with"]["subject-path"]
         for suffix in (".tgz", ".cdx.json", ".spdx3.json", ".openvex.json",
+                       ".cdx-vex.json",
                        "SHA256SUMS", "release-metadata.json"):
             self.assertIn(suffix, subject)
         self.assertEqual(["build", "attest", "verify"], self.jobs["publish-npm"]["needs"])
@@ -149,6 +150,7 @@ class ReleaseProvenanceWorkflowTest(unittest.TestCase):
             "packaging/npm/tools/build_release.py",
             "--verify .artifacts/release",
             "scripts/validate_sboms.py",
+            "scripts/validate_cyclonedx_vex.py",
             "scripts/supply_chain_policy.py",
             "tools/verify-tarball.mjs",
         ):

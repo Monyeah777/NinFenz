@@ -11,6 +11,8 @@
     "*.tgz",
     "*.cdx.json",
     "*.spdx3.json",
+    "*.openvex.json",
+    "*.cdx-vex.json",
     "SHA256SUMS",
     "release-metadata.json"
   ],
@@ -20,7 +22,10 @@
     "cyclonedx": "1.6",
     "spdx": "3.0.1",
     "reproducible_builds": 2,
-    "vex": "OpenVEX 0.2.0"
+    "vex": {
+      "openvex": "0.2.0",
+      "cyclonedx": "1.6"
+    }
   },
   "verifier": {
     "id": "https://github.com/Monyeah777/NinFenz/.github/workflows/npm-publish.yml",

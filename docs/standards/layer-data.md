@@ -176,7 +176,7 @@
 - JSON (RFC 8259) · IETF · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 member-extension · 绑定 主锚 0 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc8259.txt
 
 ### `ietf-json-schema`
-- JSON Schema 2020-12 · IETF/JSON Schema · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 vocabulary, format-annotation · 绑定 主锚 63 / 辅锚 228 · https://json-schema.org/draft/2020-12/json-schema-core
+- JSON Schema 2020-12 · IETF/JSON Schema · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 vocabulary, format-annotation · 绑定 主锚 63 / 辅锚 227 · https://json-schema.org/draft/2020-12/json-schema-core
 
 ### `ietf-nip-19`
 - NIP-19 编码（可扩展前缀） · IETF · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 prefix-registry · 绑定 主锚 0 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc9457.txt
