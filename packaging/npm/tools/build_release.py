@@ -6,7 +6,8 @@ This is the release-side gate, not the npm package's first-run installer.  It:
 1. stages the tracked payload through the existing Node policy;
 2. builds the npm tarball twice and fails unless the bytes match;
 3. emits CycloneDX 1.6 and SPDX 3.0 JSON-LD SBOMs;
-4. writes SHA256SUMS and a machine-readable release manifest.
+4. projects the same vulnerability dispositions to OpenVEX and CycloneDX VEX;
+5. writes SHA256SUMS and a machine-readable release manifest.
 
 The builder is deliberately stdlib-only.  External validators may consume its
 output, but a clean checkout can reproduce and verify it without network access.
@@ -768,6 +769,7 @@ def write_artifacts(
     github_artifacts: tuple[bytes, dict[str, Any], dict[str, Any]],
     manifest: dict[str, Any],
     vex: dict[str, Any],
+    cdx_vex: dict[str, Any],
 ) -> dict[str, str]:
     if out.exists() and (not out.is_dir() or any(out.iterdir())):
         raise ReleaseError(f"输出目录非空：{out}（修复指引：删除旧构建或换空目录）")
@@ -780,6 +782,7 @@ def write_artifacts(
         "cyclonedx": f"ninfenz-{version}.cdx.json",
         "spdx": f"ninfenz-{version}.spdx3.json",
         "vex": f"ninfenz-{version}.openvex.json",
+        "cdx_vex": f"ninfenz-{version}.cdx-vex.json",
         "payload_manifest": f"ninfenz-{version}.payload-manifest.json",
     }
     github_names = {
@@ -792,6 +795,7 @@ def write_artifacts(
         names["cyclonedx"]: _json_bytes(npm_cdx),
         names["spdx"]: _json_bytes(npm_spdx),
         names["vex"]: _json_bytes(vex),
+        names["cdx_vex"]: _json_bytes(cdx_vex),
         github_names["tarball"]: github_tar,
         github_names["cyclonedx"]: _json_bytes(github_cdx),
         github_names["spdx"]: _json_bytes(github_spdx),
@@ -826,7 +830,19 @@ def write_artifacts(
             },
             "ntia_minimum_elements": True,
         },
-        "vex": {"path": names["vex"], "spec_version": "OpenVEX 0.2.0"},
+        "vex": {
+            "source": "results/supply-chain/vuln-disposition.json",
+            "formats": {
+                "openvex": {
+                    "path": names["vex"],
+                    "spec_version": "OpenVEX 0.2.0",
+                },
+                "cyclonedx": {
+                    "path": names["cdx_vex"],
+                    "spec_version": "CycloneDX 1.6",
+                },
+            },
+        },
         "release_ready": manifest.get("worktree_dirty") is False,
         "artifact_names": names,
         "github_packages_names": github_names,
@@ -883,10 +899,21 @@ def verify_release(out: Path) -> list[str]:
             issues.extend(validate_sboms(read_json(cdx_path), read_json(spdx_path)))
     vex_paths = sorted(out.glob("*.openvex.json"))
     if len(vex_paths) != 1:
-        issues.append(f"VEX 数量必须为 1，实得 {len(vex_paths)}")
+        issues.append(f"OpenVEX 数量必须为 1，实得 {len(vex_paths)}")
     else:
         vex_tools = _vex_tools()
         issues.extend(vex_tools.validate_vex(read_json(vex_paths[0])))
+    cdx_vex_paths = sorted(out.glob("*.cdx-vex.json"))
+    if len(cdx_vex_paths) != 1:
+        issues.append(f"CycloneDX VEX 数量必须为 1，实得 {len(cdx_vex_paths)}")
+    elif vex_paths:
+        vex_tools = _vex_tools()
+        issues.extend(
+            vex_tools.validate_vex_pair(
+                read_json(vex_paths[0]),
+                read_json(cdx_vex_paths[0]),
+            )
+        )
     return issues
 
 
@@ -906,11 +933,15 @@ def build(out: Path, allow_dirty: bool, skip_stage: bool) -> dict[str, str]:
         REPO_ROOT,
         f"pkg:npm/{quote(str(pkg['name']), safe='/')}@{pkg['version']}",
     )
-    issues = vex_tools.validate_vex(vex)
+    cdx_vex = vex_tools.cyclonedx_vex_doc(
+        REPO_ROOT,
+        f"pkg:npm/{quote(str(pkg['name']), safe='/')}@{pkg['version']}",
+    )
+    issues = vex_tools.validate_vex_pair(vex, cdx_vex)
     if issues:
         raise ReleaseError("VEX 校验失败：" + "; ".join(issues[:6]))
     names = write_artifacts(
-        out, pkg, npm_artifacts, github_pkg, github_artifacts, manifest, vex
+        out, pkg, npm_artifacts, github_pkg, github_artifacts, manifest, vex, cdx_vex
     )
     issues = verify_release(out)
     if issues:
@@ -945,7 +976,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✗ {exc}", file=sys.stderr)
         return 1
     print("✓ 可复现发布工件已生成")
-    for key in ("tarball", "cyclonedx", "spdx", "vex", "payload_manifest"):
+    for key in ("tarball", "cyclonedx", "spdx", "vex", "cdx_vex", "payload_manifest"):
         print(f"  {key}: {names[key]}")
     print("  npm reproducible_builds: 2")
     print("  github-packages reproducible_builds: 2")

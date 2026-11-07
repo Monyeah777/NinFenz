@@ -286,12 +286,6 @@ def _threat_issues() -> tuple[list[str], dict[str, Any]]:
     return issues, {"threats": len(threats), "statuses": dict(sorted(statuses.items()))}
 
 
-def _vex_issues() -> tuple[list[str], dict[str, Any]]:
-    vex = _json(ROOT / "results" / "supply-chain" / "ninfenz.openvex.json")
-    module = _load_script("generate_vex")
-    return module.validate_vex(vex), {"statements": len(vex.get("statements") or [])}
-
-
 def _readiness_issues() -> tuple[list[str], dict[str, Any]]:
     module = _load_script("slsa_l3_readiness")
     return module.scan(ROOT)
@@ -326,7 +320,7 @@ def scan(root: Path = ROOT) -> tuple[list[str], dict[str, Any]]:
         source_issues, source_stats = _package_source_issues()
         supplier_issues, supplier_stats = _supplier_issues()
         threat_issues, threat_stats = _threat_issues()
-        vex_issues, vex_stats = _vex_issues()
+        vex_issues, vex_stats = _load_script("generate_vex").scan_files(ROOT)
         readiness_issues, readiness_stats = _readiness_issues()
     finally:
         ROOT = old_root
@@ -378,7 +372,8 @@ def main(argv: list[str] | None = None) -> int:
             f"包源 {stats['package_sources']['sources']} 个 · "
             f"供应商 {stats['suppliers']['suppliers']} 个 · "
             f"威胁 {stats['threat_model']['threats']} 条 · "
-            f"VEX {stats['vex']['statements']} 条"
+            f"VEX {stats['vex']['statements']} 条 × "
+            f"{len(stats['vex']['formats'])} 格式"
         )
         for issue in issues:
             print(f"  ✗ {issue}", file=sys.stderr)

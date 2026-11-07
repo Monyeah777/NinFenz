@@ -4,6 +4,6 @@
   "author": "NinFenz maintainers",
   "statements": [],
   "timestamp": "2026-10-27T00:00:00Z",
-  "tooling": "NinFenz generate_vex.py",
+  "tooling": "NinFenz core.vex",
   "version": 1
 }

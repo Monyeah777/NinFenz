@@ -1320,6 +1320,11 @@
       "max_fn_cc": 10,
       "max_fn_lines": 29
     },
+    "desktop/src/core/vex.py": {
+      "lines": 453,
+      "max_fn_cc": 24,
+      "max_fn_lines": 43
+    },
     "desktop/src/core/watch.py": {
       "lines": 348,
       "max_fn_cc": 13,
@@ -1381,9 +1386,9 @@
       "max_fn_lines": 26
     },
     "scripts/build_vsa.py": {
-      "lines": 174,
-      "max_fn_cc": 21,
-      "max_fn_lines": 58
+      "lines": 156,
+      "max_fn_cc": 19,
+      "max_fn_lines": 51
     },
     "scripts/capabilities.py": {
       "lines": 43,
@@ -1471,8 +1476,8 @@
       "max_fn_lines": 75
     },
     "scripts/generate_vex.py": {
-      "lines": 160,
-      "max_fn_cc": 19,
+      "lines": 113,
+      "max_fn_cc": 11,
       "max_fn_lines": 51
     },
     "scripts/geo_export.py": {
@@ -1616,7 +1621,7 @@
       "max_fn_lines": 36
     },
     "scripts/supply_chain_policy.py": {
-      "lines": 394,
+      "lines": 389,
       "max_fn_cc": 21,
       "max_fn_lines": 54
     },
@@ -1629,6 +1634,11 @@
       "lines": 224,
       "max_fn_cc": 13,
       "max_fn_lines": 20
+    },
+    "scripts/validate_cyclonedx_vex.py": {
+      "lines": 54,
+      "max_fn_cc": 5,
+      "max_fn_lines": 17
     },
     "scripts/validate_sboms.py": {
       "lines": 185,

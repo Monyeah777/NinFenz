@@ -72,6 +72,91 @@ class VexTest(unittest.TestCase):
         self.assertEqual([], doc["statements"])
         self.assertEqual(doc, VEX.vex_doc(ROOT), "VEX ID 必须由内容寻址且可重复")
 
+    def test_cyclonedx_default_product_tracks_npm_package_version(self):
+        package = json.loads(
+            (ROOT / "packaging" / "npm" / "package.json").read_text(encoding="utf-8")
+        )
+        doc = VEX.cyclonedx_vex_doc(ROOT)
+        expected = f"pkg:npm/{package['name']}@{package['version']}"
+        self.assertEqual(expected, doc["metadata"]["component"]["purl"])
+        self.assertEqual(expected, doc["metadata"]["component"]["bom-ref"])
+
+    def test_openvex_and_cyclonedx_are_semantically_equivalent(self):
+        root = self._root_with_findings([
+            {
+                "vulnerability": "CVE-2099-0101",
+                "status": "not_affected",
+                "justification": "vulnerable_code_not_in_execute_path",
+                "impact_statement": "The vulnerable parser is never invoked.",
+            },
+            {
+                "vulnerability": "CVE-2099-0102",
+                "status": "affected",
+                "action_statement": "Upgrade after the fixed parser is published.",
+                "responses": ["update"],
+            },
+            {
+                "vulnerability": "CVE-2099-0103",
+                "status": "fixed",
+                "action_statement": "Fixed in the reviewed product release.",
+            },
+            {
+                "vulnerability": "CVE-2099-0104",
+                "status": "under_investigation",
+                "action_statement": "Reachability analysis is in progress.",
+            },
+        ])
+        openvex = VEX.vex_doc(root)
+        cyclonedx = VEX.cyclonedx_vex_doc(root)
+        self.assertEqual([], VEX.validate_vex(openvex))
+        self.assertEqual([], VEX.validate_cyclonedx_vex(cyclonedx))
+        self.assertEqual([], VEX.validate_vex_pair(openvex, cyclonedx))
+
+        states = [item["analysis"]["state"] for item in cyclonedx["vulnerabilities"]]
+        self.assertEqual(["not_affected", "affected", "fixed", "in_triage"], states)
+        self.assertEqual(
+            "code_not_reachable",
+            cyclonedx["vulnerabilities"][0]["analysis"]["justification"],
+        )
+        self.assertEqual(
+            ["update"],
+            cyclonedx["vulnerabilities"][1]["analysis"]["response"],
+        )
+
+    def test_unknown_openvex_justification_is_rejected_for_cyclonedx(self):
+        root = self._root_with_findings([{
+            "vulnerability": "CVE-2099-0105",
+            "status": "not_affected",
+            "justification": "trust-us",
+            "impact_statement": "No reachable path was found.",
+        }])
+        with self.assertRaisesRegex(ValueError, "justification"):
+            VEX.cyclonedx_vex_doc(root)
+
+    def test_cyclonedx_rejects_tampered_product_reference(self):
+        doc = VEX.cyclonedx_vex_doc(ROOT)
+        self.assertEqual([], VEX.validate_cyclonedx_vex(doc))
+        doc["vulnerabilities"] = [{
+            "id": "CVE-2099-0106",
+            "source": {"name": "NinFenz vulnerability disposition"},
+            "analysis": {"state": "fixed"},
+            "affects": [{"ref": "pkg:npm/not-ninfenz@9.9.9"}],
+        }]
+        issues = VEX.validate_cyclonedx_vex(doc)
+        self.assertTrue(any("affects.ref" in issue for issue in issues), issues)
+
+    def test_openvex_cyclonedx_mismatch_is_rejected(self):
+        root = self._root_with_findings([{
+            "vulnerability": "CVE-2099-0107",
+            "status": "under_investigation",
+            "action_statement": "Reachability analysis is in progress.",
+        }])
+        openvex = VEX.vex_doc(root)
+        cyclonedx = VEX.cyclonedx_vex_doc(root)
+        cyclonedx["vulnerabilities"][0]["analysis"]["state"] = "fixed"
+        issues = VEX.validate_vex_pair(openvex, cyclonedx)
+        self.assertTrue(any("语义" in issue or "state" in issue for issue in issues), issues)
+
     def test_disposition_change_changes_vex_identity(self):
         first = VEX.vex_doc(self._root_with_findings([]))
         second = VEX.vex_doc(self._root_with_findings([{

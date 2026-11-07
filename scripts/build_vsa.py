@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import re
 import sys
@@ -16,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "desktop" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write  # noqa: E402
+from core import atomic_write, vex  # noqa: E402
 
 SUM_RE = re.compile(r"^([0-9a-f]{64})  ([^\r\n]+)$")
 
@@ -26,16 +25,6 @@ def _json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{path}: 顶层必须是对象")
     return value
-
-
-def _vex_tools():
-    path = ROOT / "scripts" / "generate_vex.py"
-    spec = importlib.util.spec_from_file_location("nf_vsa_generate_vex", path)
-    if spec is None or spec.loader is None:
-        raise ValueError("无法加载 scripts/generate_vex.py（修复指引：恢复 VEX 生成器）")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def verify_release(
@@ -86,15 +75,8 @@ def verify_release(
     for pattern in policy.get("required_artifacts") or []:
         if not any(release.glob(pattern)):
             issues.append(f"发布目录缺必需工件：{pattern}")
-    vex_paths = sorted(release.glob("*.openvex.json"))
-    if len(vex_paths) != 1:
-        issues.append("发布目录缺 OpenVEX")
-    else:
-        actual_vex = _json(vex_paths[0])
-        product = f"pkg:npm/{metadata.get('package')}@{metadata.get('version')}"
-        generated_vex = _vex_tools().vex_doc(source_root, product)
-        if actual_vex != generated_vex:
-            issues.append("发布束 OpenVEX 与处置台账不一致")
+    product = f"pkg:npm/{metadata.get('package')}@{metadata.get('version')}"
+    issues.extend(vex.verify_release_artifacts(release, product, source_root))
     return issues
 
 

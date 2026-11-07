@@ -172,6 +172,47 @@
       ]
     },
     {
+      "id": "cyclonedx-vex-dual-format",
+      "standard": "cyclonedx-vex",
+      "assertion": "同一漏洞处置台账可生成 CycloneDX 1.6 VEX，并与 OpenVEX 在漏洞、产品、状态、justification 与处置说明上逐项语义一致；未知枚举、未知产品引用或格式漂移均 fail-closed。",
+      "tests": [
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_openvex_and_cyclonedx_are_semantically_equivalent",
+        "desktop/tests/test_release_artifacts.py::ReleaseArtifactTest.test_expected_release_bundle_is_present_and_verifies"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_unknown_openvex_justification_is_rejected_for_cyclonedx",
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_cyclonedx_rejects_tampered_product_reference",
+        "desktop/tests/test_supply_chain_l3.py::VexTest.test_openvex_cyclonedx_mismatch_is_rejected"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "results/supply-chain/vuln-disposition.json",
+        "results/supply-chain/ninfenz.openvex.json",
+        "results/supply-chain/ninfenz.cdx-vex.json",
+        "scripts/generate_vex.py",
+        "scripts/validate_cyclonedx_vex.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/generate_vex.py",
+          "symbol": "cyclonedx_vex_doc"
+        },
+        {
+          "path": "packaging/npm/tools/build_release.py",
+          "symbol": "write_artifacts"
+        },
+        {
+          "path": "scripts/build_vsa.py",
+          "symbol": "verify_release"
+        },
+        {
+          "path": "scripts/validate_cyclonedx_vex.py",
+          "symbol": "validate"
+        }
+      ]
+    },
+    {
       "id": "spdx-3-release-sbom",
       "standard": "spdx-3",
       "assertion": "发布构建生成 SPDX 3.0.1 JSON-LD，并校验根包、关系、许可和摘要完整性。",

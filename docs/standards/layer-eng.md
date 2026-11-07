@@ -26,7 +26,7 @@
 - CUE 配置语言 · CUE · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 definition-constraint, attribute · 绑定 主锚 0 / 辅锚 0 · https://cuelang.org/docs/reference/spec/
 
 ### `cyclonedx-vex`
-- CycloneDX VEX · CycloneDX · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 vulnerability-state, analysis-justification · 绑定 主锚 0 / 辅锚 0 · https://cyclonedx.org/capabilities/vex/
+- CycloneDX VEX · CycloneDX · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 vulnerability-state, analysis-justification · 绑定 主锚 0 / 辅锚 1 · https://cyclonedx.org/capabilities/vex/
 
 ### `devcontainer-spec`
 - Dev Container 规范 · Dev Container 社区 · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 feature-contribution, lifecycle-hook · 绑定 主锚 0 / 辅锚 0 · https://containers.dev/implementors/spec/
