@@ -321,7 +321,8 @@ FAMILIES: tuple[dict[str, Any], ...] = (
          "语言面（本地化与责任方）",
      "commands": ("decisions", "audit", "attest", "receipts", "handover",
                   "postmortem", "decide", "model", "review", "workloop",
-                  "approve", "transparency", "evidence", "label", "design", "locales")},
+                  "approve", "transparency", "evidence", "label", "design", "locales",
+                  "cog")},
     {"id": "integrate", "name": "服务与集成",
      "summary": "MCP 服务面、编辑器面、跑分台、端点契约、互操作导出、指令档路由、事件背书、状态前置"
          "、世界模型、模块工具面",

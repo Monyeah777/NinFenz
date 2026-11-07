@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "SAST 修净",
+  "note": "快照前置收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5b9ba7aa79098320929f23dfa1390841921866faa67132572013161089724987"

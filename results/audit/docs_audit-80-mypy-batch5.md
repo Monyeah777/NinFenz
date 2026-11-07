@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:12d671c6e6e693b644e4742f6ea8204b1fc5068a8d32c378296ca67e91582cb2
+  - protocol/code_metrics_baseline.json:fa5b451c33c2d10f74490dc5113b2e5d9444096040dd658a6c652f66ee9355d0
 ---
+> 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一
+
 > 重审（2026-11-08）：SAST 修净（token 常量改名 / 去 except-pass）
 
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）

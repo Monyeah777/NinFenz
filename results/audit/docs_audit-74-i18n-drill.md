@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:12d671c6e6e693b644e4742f6ea8204b1fc5068a8d32c378296ca67e91582cb2
+  - protocol/code_metrics_baseline.json:fa5b451c33c2d10f74490dc5113b2e5d9444096040dd658a6c652f66ee9355d0
 ---
+> 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一
+
 > 重审（2026-11-08）：SAST 修净（token 常量改名 / 去 except-pass）
 
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）

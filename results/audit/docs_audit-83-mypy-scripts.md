@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:12d671c6e6e693b644e4742f6ea8204b1fc5068a8d32c378296ca67e91582cb2
+  - protocol/code_metrics_baseline.json:fa5b451c33c2d10f74490dc5113b2e5d9444096040dd658a6c652f66ee9355d0
 ---
+> 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一
+
 > 重审（2026-11-08）：SAST 修净（token 常量改名 / 去 except-pass）
 
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）

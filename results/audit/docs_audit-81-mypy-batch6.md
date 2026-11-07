@@ -6,12 +6,14 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
+  - desktop/src/core/terminal.py:dc0655bfff0f78ad57dc8c01318bc535829285f0d570a902abe4d2241d33fc8d
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:12d671c6e6e693b644e4742f6ea8204b1fc5068a8d32c378296ca67e91582cb2
+  - protocol/code_metrics_baseline.json:fa5b451c33c2d10f74490dc5113b2e5d9444096040dd658a6c652f66ee9355d0
 ---
+> 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一
+
 > 重审（2026-11-08）：SAST 修净（token 常量改名 / 去 except-pass）
 
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
