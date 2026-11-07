@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
-  - docs/domain-packs.md:d958813bfdee544578c781b2d2bec562782a781e81278dfd4650470c03c8bd15
+  - docs/domain-packs.md:6c031a9bef1d54f45cbd3983a5b86690cab2b148fb6a9a92ed38bc9f03f9a028
   - protocol/data_contracts.json:69241e31bb9f5429346ab93c583c337757ca84ae4f1b29269e76fa3e7e672e77
 ---
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）

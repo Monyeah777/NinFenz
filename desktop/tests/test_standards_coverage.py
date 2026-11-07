@@ -89,6 +89,42 @@ class Rfc8785LedgerTest(unittest.TestCase):
         )
 
 
+class MultiformatsCidLedgerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.issues, cls.report = sc.build(ROOT)
+
+    def test_multiformats_cid_is_consumable_with_fail_closed_profile(self):
+        self.assertEqual([], self.issues)
+        rows = {row["id"]: row for row in self.report["standards"]}
+        self.assertIn("multiformats-cid", rows)
+        row = rows["multiformats-cid"]
+        self.assertEqual("data", row["layer"])
+        self.assertEqual("consumable", row["state"])
+        self.assertTrue(row["asserted"])
+
+        ledger = json.loads(
+            (ROOT / "protocol" / "standards_assertions.json").read_text(encoding="utf-8")
+        )
+        claim = next(
+            item for item in ledger["claims"] if item["id"] == "cidv1-raw-sha256-profile"
+        )
+        self.assertEqual("multiformats-cid", claim["standard"])
+        self.assertIn(
+            "desktop/tests/test_interop_export.py::InteropExportTest.test_cidv1_profile_rejects_non_profile_cids",
+            claim["negative_tests"],
+        )
+        consumer_paths = {item["path"] for item in claim["consumers"]}
+        self.assertEqual(
+            {
+                "desktop/src/core/interop_export.py",
+                "scripts/interop_thirdparty_kit.py",
+                "engine/dotnet/src/Nf.Engine/Interop.cs",
+            },
+            consumer_paths,
+        )
+
+
 class LedgerMutationTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

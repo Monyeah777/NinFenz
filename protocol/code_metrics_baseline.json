@@ -596,7 +596,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/interop_export.py": {
-      "lines": 1106,
+      "lines": 1131,
       "max_fn_cc": 23,
       "max_fn_lines": 96
     },

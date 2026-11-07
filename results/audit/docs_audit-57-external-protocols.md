@@ -9,7 +9,7 @@ subjects:
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
   - desktop/src/core/text_hygiene.py:ff5fb24eafb99044ad1452f26d5cf3be6b89a24d77a5be5e4bcf56189a8ea956
-  - desktop/src/core/interop_export.py:ff00f77a4236929cb64dfd120f9a60952ba8013843681cc0586a96f0c155564c
+  - desktop/src/core/interop_export.py:b669f37d01611a9276f7dd63cb98c0fb0f31b22b5211beb59b69fd21038763cf
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
   - desktop/src/core/license_gate.py:602d29e257651283e5d51cd173568878ab7cb4daa385a79fd79e53cd37ff3889
@@ -24,9 +24,11 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:e853a09ca221b22d92566cb1e8d613e40abc5d9df7a81a41b0c64b522f1d5e4e
+  - llms.txt:13fb70f2f6a27d0a312c04d6add194f019d6fd20a655e1f99daaf58d44423285
 
 ---
+> 重审（2026-11-07）：refreeze CID
+
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

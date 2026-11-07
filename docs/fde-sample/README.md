@@ -30,7 +30,7 @@ python scripts/fde_sample_run.py --check   # 逐字节比对证据与当前仓�
 | G4 | 装配链四件（protocol.yaml + 管线 + 两模块）在场可指认 | 交付过程可被第三方照做 |
 | G5 | `nf stats --check` 与 `geo_export.py --check` 同时绿 | 交付所引用的数字与标准锚都是实算生成物 |
 
-**当前实跑结果**（`evidence/gates.txt`）：五门全 PASS——G3 的图规模 48 节点 / 拓扑序 47 / 证据强度 `external`；G5 覆盖 373 条标准锚。
+**当前实跑结果**（`evidence/gates.txt`）：五门全 PASS——G3 的图规模 48 节点 / 拓扑序 47 / 证据强度 `external`；G5 覆盖 374 条标准锚。
 
 ## 四、复算与失败处置
 

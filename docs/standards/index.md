@@ -2,8 +2,8 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **373** 条 · 本机可达 **333** · 不可达 **40** · 机构 **194** · 依赖边 **207**
-- 分层：data 149 · eng 38 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **374** 条 · 本机可达 **334** · 不可达 **40** · 机构 **195** · 依赖边 **207**
+- 分层：data 150 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每条标准一个稳定锚：`#<id>`（如 `docs/standards/index.md#onnx`）。
 
@@ -261,6 +261,9 @@
 
 ### `msgpack`
 - MessagePack 二进制序列化 · MessagePack · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 extension-type · 绑定 主锚 0 / 辅锚 0 · https://github.com/msgpack/msgpack/blob/master/spec.md
+
+### `multiformats-cid`
+- CID (Content IDentifier) · Multiformats/IPFS · 层 data · 可达 是（200 · 2026-11-07） · 扩展点 cid-version, multibase, multicodec, multihash · 绑定 主锚 0 / 辅锚 0 · https://specs.ipfs.tech/cid/
 
 ### `netcdf`
 - NetCDF 科学数据 · Unidata · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 convention-attribute, group-hierarchy · 绑定 主锚 0 / 辅锚 0 · https://docs.unidata.ucar.edu/nug/current/

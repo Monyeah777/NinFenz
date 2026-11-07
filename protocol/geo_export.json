@@ -1,16 +1,16 @@
 {
   "coverage": {
-    "bodies": 194,
+    "bodies": 195,
     "by_layer": {
-      "data": 149,
+      "data": 150,
       "eng": 38,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
     "depends_edges": 207,
-    "reachable": 333,
-    "standards": 373,
+    "reachable": 334,
+    "standards": 374,
     "unreachable": 40
   },
   "note": "生成物；真源 protocol/standards_catalog.json + protocol/standards_binding.json。",
@@ -1445,6 +1445,25 @@
       "sha256_sample": "9f54074acaf1ba876151e3846e8b11fdb33599e5ea8ffec4074ae2f7f7c273c1",
       "title": "MessagePack 二进制序列化",
       "url": "https://github.com/msgpack/msgpack/blob/master/spec.md"
+    },
+    {
+      "body": "Multiformats/IPFS",
+      "bound_main": 0,
+      "bound_support": 0,
+      "ext_points": [
+        "cid-version",
+        "multibase",
+        "multicodec",
+        "multihash"
+      ],
+      "http_status": 200,
+      "id": "multiformats-cid",
+      "layer": "data",
+      "probe_date": "2026-11-07",
+      "reachable": true,
+      "sha256_sample": "a8850da8d78875ccfb98ef28fb49aaa70a3080d7f6568026988322cb4df9588b",
+      "title": "CID (Content IDentifier)",
+      "url": "https://specs.ipfs.tech/cid/"
     },
     {
       "body": "Unidata",

@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
-  - docs/domain-packs.md:d958813bfdee544578c781b2d2bec562782a781e81278dfd4650470c03c8bd15
+  - docs/domain-packs.md:6c031a9bef1d54f45cbd3983a5b86690cab2b148fb6a9a92ed38bc9f03f9a028
 
 ---
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）

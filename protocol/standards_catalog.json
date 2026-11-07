@@ -2,18 +2,18 @@
   "schema": "nf-standards-catalog/1",
   "note": "可扩展标准目录（真源）。每条 = 一个**带扩展机制**的开放标准/规范：body（发布机构）/ title / url / ext_points（扩展点或扩展注册表）/ layer（该标准在 NF 里落哪一层：data 数据 · iface 接口 · form 形态 · gov 治理 · eng 工程）/ depends_on（该标准在规范层面真实依赖/承载于的另一目录内标准，只写有据可查的依赖）/ evidence（本机可达性实测：状态 + 取样标题 + sha256）。外部标准只作**口径与机制参照**，不作品质背书（STRATEGY §3.2/§3.3）。",
   "coverage": {
-    "standards": 373,
-    "reachable": 333,
+    "standards": 374,
+    "reachable": 334,
     "unreachable": 40,
     "depends_edges": 207,
     "by_layer": {
-      "data": 149,
+      "data": 150,
       "eng": 38,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
-    "bodies": 194
+    "bodies": 195
   },
   "standards": [
     {
@@ -2487,6 +2487,28 @@
         "title": "RFC 8610: Concise Data Definition Language (CDDL): A Notational Convention to Express Concise Binary Object Representation (CBOR) and JSON D",
         "sha256_sample": "017b4388e0f7a9861c85e6b00761ee6bb4226eedc6dd376058e48e57070f11eb",
         "probe_date": "2026-09-24",
+        "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
+        "error": ""
+      }
+    },
+    {
+      "id": "multiformats-cid",
+      "body": "Multiformats/IPFS",
+      "title": "CID (Content IDentifier)",
+      "url": "https://specs.ipfs.tech/cid/",
+      "ext_points": [
+        "cid-version",
+        "multibase",
+        "multicodec",
+        "multihash"
+      ],
+      "layer": "data",
+      "evidence": {
+        "reachable": true,
+        "http_status": 200,
+        "title": "CID (Content IDentifier)",
+        "sha256_sample": "a8850da8d78875ccfb98ef28fb49aaa70a3080d7f6568026988322cb4df9588b",
+        "probe_date": "2026-11-07",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
       }
