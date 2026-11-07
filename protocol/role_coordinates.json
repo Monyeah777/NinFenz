@@ -6,7 +6,7 @@
     "prod": 1049,
     "projection": 137,
     "support": 370,
-    "verify": 979
+    "verify": 980
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7841,6 +7841,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "批量复验（core.evidence.verify_batch / nf evidence batch）判据。",
+      "path": "desktop/tests/test_evidence_batch.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "证据面双实现 parity 收口：receipts / attest 两形态 + 仓外单文件复验。",
       "path": "desktop/tests/test_evidence_forms_parity.py",
       "role": "verify",
@@ -12210,7 +12216,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "02bf6e240b1a77d50d6bededdfd93f0e125f26caaa11f6897b67ab261d761d72",
+  "root_digest": "89447b11b5a7eb92735c9bdc8e8aaa4e78081cb0ad236fdbb1c37706be98dece",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 224,
@@ -12219,7 +12225,7 @@
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 860,
+    "R-verify": 861,
     "auto:R-core": 269
   },
   "schema": "nf-role-coordinates/1"
