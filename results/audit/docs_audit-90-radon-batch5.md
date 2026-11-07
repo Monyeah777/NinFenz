@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:fe3a2e6799b11723a0f11cc3aa93e0499b48044ace534d9edc8a840f09626255
+  - protocol/code_metrics_baseline.json:5bd9a3fef57b91ee4bdf3bf022c44b32a9ee052e02d5bdb47d864a0ff3e7eacb
 ---
+> 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
+
 > 重审（2026-11-08）：原子目录 v2 + 不变量 A1–A5 + 候选健康 B1–B5
 
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）

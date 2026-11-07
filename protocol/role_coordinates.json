@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1055,
     "projection": 149,
-    "support": 412,
-    "verify": 999
+    "support": 413,
+    "verify": 1000
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7631,6 +7631,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "双核桥判据（P5）：唯一共享对象 + 双向闭环 + fail-closed。",
+      "path": "desktop/tests/test_cognition_bridge.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "判据注册表 + 主张编译判据（P3 剩余）。",
       "path": "desktop/tests/test_cognition_claims.py",
       "role": "verify",
@@ -12366,16 +12372,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "894650f4594553b54bf54e695d035168e2aeabc1b203e61d5f2aede4495093be",
+  "root_digest": "25cf53c281aa45f8e6767bc09d5efc9313bba5627bbb83ab5bd343c2d89d9521",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 266,
+    "R-catch": 267,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 130,
     "R-support": 119,
-    "R-verify": 879,
+    "R-verify": 880,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"

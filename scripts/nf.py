@@ -411,6 +411,39 @@ def _add_parser_cog(sub):
                          description="摘要：动作数/假设数/张力数/未答问题数/digest。")
     ct.add_argument("--bundle", required=True, help="会话文件")
     ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bcommit = csub.add_parser("bridge-commit", help="生成 commitment（双核唯一共享对象）",
+                              description="commitment{cog_digest, cc_digest, claim_digest}："
+                                          "两侧各自用 digest 认可同一版；不解则 fail-closed。")
+    bcommit.add_argument("--bundle", required=True, help="会话文件")
+    bcommit.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    bcommit.add_argument("--cc-result", dest="cc_result", required=True,
+                         help="契约核结果 JSON（nf evidence verify --json）")
+    bcommit.add_argument("--out", default="", help="写 commitment（缺省=只打印）")
+    bcommit.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bob = csub.add_parser("bridge-obligation", help="把 cc 失败项编成回灌消息（x_obligation）",
+                          description="回灌：failed/unknown 列表 + next_actions"
+                                      "（detect/request_context）。")
+    bob.add_argument("--commitment", required=True, help="commitment 文件")
+    bob.add_argument("--cc-result", dest="cc_result", required=True, help="契约核结果 JSON")
+    bob.add_argument("--failed", default="", help="逗号分隔的失败项")
+    bob.add_argument("--unknown", default="", help="逗号分隔的未知项")
+    bob.add_argument("--out", default="", help="写回灌消息")
+    bob.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bap = csub.add_parser("bridge-apply", help="把回灌消息落到认知侧（控制面 detect）",
+                          description="落灌：只改控制面（真副作用），discourse 不动（三层分离）。")
+    bap.add_argument("--bundle", required=True, help="会话文件")
+    bap.add_argument("--obligation", required=True, help="回灌消息文件")
+    bap.add_argument("--commitment", default="", help="同时追加 commitment 到链上")
+    bap.add_argument("--out", default="", help="写回会话文件")
+    bap.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    bver = csub.add_parser("bridge-verify", help="核对 commitment 与两侧当前状态",
+                           description="校验：commitment 自身 + cog/claim/cc "
+                                       "三个 digest 是否仍一致。")
+    bver.add_argument("--bundle", required=True, help="会话文件")
+    bver.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    bver.add_argument("--cc-result", dest="cc_result", required=True, help="契约核结果 JSON")
+    bver.add_argument("--commitment", required=True, help="commitment 文件")
+    bver.add_argument("--json", action="store_true", help="输出结构化 JSON")
     co = csub.add_parser("ops", help="列出 11 个元算子及其 witness 要求",
                          description="元算子：只改过程（策略/预算/中止/焦点），不改内容。")
     co.add_argument("--id", dest="op_id", default="", help="只看一个算子")
@@ -493,6 +526,78 @@ def _cmd_cog(args) -> int:
             print("    frame_delta：" + "、".join(item["delta_kinds"]))
             print("    失败模式：" + item["failure_mode"])
         return 0
+    if sub.startswith("bridge-"):
+        try:
+            from core.cognition_workspace import bridge as cg_bridge
+            bundle = _read(args.bundle) if getattr(args, "bundle", "") else None
+            if sub == "bridge-commit":
+                claim = _read(args.claim_file)
+                cc = _read(args.cc_result)
+                commitment = cg_bridge.commit(bundle, claim, cc)
+                if args.out:
+                    atomic_write.write_text(_rel_out(args.out),
+                                            _json.dumps(commitment, ensure_ascii=False,
+                                                        indent=2, sort_keys=True) + chr(10))
+                if args.json:
+                    print(_json.dumps(commitment, ensure_ascii=False, indent=2,
+                                      sort_keys=True))
+                else:
+                    print("== nf cog bridge-commit ==")
+                    print("  判定：" + commitment["cc_verdict"]
+                          + " · commitment " + commitment["digest"][:16])
+                    if args.out:
+                        print("  已写入：" + _rel_display(_rel_out(args.out)))
+                return 0
+            if sub == "bridge-obligation":
+                commitment = _read(args.commitment)
+                cc = _read(args.cc_result)
+                ob = cg_bridge.obligation(
+                    commitment, cc,
+                    failed=[x for x in str(args.failed).split(",") if x],
+                    unknown=[x for x in str(args.unknown).split(",") if x])
+                if args.out:
+                    atomic_write.write_text(_rel_out(args.out),
+                                            _json.dumps(ob, ensure_ascii=False,
+                                                        indent=2, sort_keys=True) + chr(10))
+                if args.json:
+                    print(_json.dumps(ob, ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-obligation ==")
+                    print("  判定：" + ob["cc_verdict"] + " · 失败项 " + str(ob["failed"]))
+                    print("  下一步：" + "、".join(a["op"] for a in ob["next_actions"]))
+                return 0
+            if sub == "bridge-apply":
+                ob = _read(args.obligation)
+                new_bundle = cg_bridge.apply_obligation(bundle, ob)
+                if args.commitment:
+                    new_bundle = cg_bridge.append_commitment(
+                        new_bundle, _read(args.commitment))
+                if args.out:
+                    _write(args.out, new_bundle)
+                if args.json:
+                    print(_json.dumps(new_bundle["control"], ensure_ascii=False,
+                                      indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-apply ==")
+                    print("  控制面记录：" + str(len(new_bundle["control"]["records"])))
+                    print("  discourse 未改：" + str(new_bundle["state"]["digest"]
+                                                  == bundle["state"]["digest"]))
+                return 0
+            if sub == "bridge-verify":
+                commitment = _read(args.commitment)
+                claim = _read(args.claim_file)
+                cc = _read(args.cc_result)
+                res = cg_bridge.verify_commitment(commitment, bundle, claim, cc)
+                if args.json:
+                    print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog bridge-verify ==")
+                    print("  一致：" + ("是" if res["ok"] else "否"))
+                    for issue in res["issues"]:
+                        print("  [FAIL] " + issue, file=sys.stderr)
+                return 0 if res["ok"] else 1
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
     if sub == "criteria":
         try:
             from core.cognition_workspace import criteria as cg_criteria
