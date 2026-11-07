@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 120,
+        "raises": 126,
         "sinks": 22
       },
       "status": "pass",
@@ -47,7 +47,7 @@
         "module_docs": 248,
         "pipelines": 114,
         "protocols": 111,
-        "schema_files": 9
+        "schema_files": 10
       },
       "status": "pass",
       "warns": 0
@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "c9335f4cb83da24fd9b3890772af8d7a08af91ac2e6ea22aa217908f8a4d5905",
+        "root": "1be1c555bf3ca7c355263a8669199f9ab571aeb7a6f0e66062e1a66956508276",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -345,14 +345,14 @@
         "standards_bodies": 196,
         "standards_by_layer": {
           "data": 150,
-          "eng": 39,
+          "eng": 40,
           "form": 29,
           "gov": 73,
           "iface": 84
         },
         "standards_edges": 207,
-        "standards_reachable": 334,
-        "standards_total": 375,
+        "standards_reachable": 335,
+        "standards_total": 376,
         "standards_unreachable": 41,
         "subdivisions_total": 1200,
         "verify_checks": 42,
@@ -368,8 +368,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 336,
-        "files": 336,
+        "baseline": 338,
+        "files": 338,
         "max_fn_cc": 116,
         "max_fn_lines": 1263,
         "max_lines": 7682
@@ -386,8 +386,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 235,
-        "probed": 235
+        "patterns": 236,
+        "probed": 236
       },
       "status": "pass",
       "warns": 0
@@ -431,8 +431,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 263,
-        "modules": 263,
+        "metrics_recorded": 264,
+        "modules": 264,
         "registered_cycles": 0,
         "registered_sdp": 12,
         "sdp": 12
@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 13,
-        "bound": 81,
-        "catalogued": 375,
-        "claims": 13,
-        "consumable": 13,
-        "domain_bound": 71,
+        "asserted": 14,
+        "bound": 82,
+        "catalogued": 376,
+        "claims": 14,
+        "consumable": 14,
+        "domain_bound": 72,
         "not_domain_bound": 304,
         "states": {
           "asserted": 0,
           "bound": 68,
           "catalogued": 294,
-          "consumable": 13
+          "consumable": 14
         }
       },
       "status": "pass",
@@ -516,7 +516,7 @@
       "sample": [],
       "source": "workflow_policy.scan",
       "stats": {
-        "pinned_uses": 108,
+        "pinned_uses": 109,
         "requirements_files": 5,
         "with_explicit_permissions": 24,
         "workflows": 24
@@ -641,8 +641,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4114,
-        "kernel": 2187,
+        "files": 4120,
+        "kernel": 2190,
         "kernel_no_self": 436,
         "rules": 9,
         "uncovered": 0,
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "c13a4085a5af9c5915c2f25c47dd7c805e19252505afdc38ed74f2d225c04794",
+  "root_digest": "949c9a68229a9953facbf4862e55b1b2e99262175199bb4fe11de93adc976548",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

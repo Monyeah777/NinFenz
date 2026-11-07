@@ -2067,7 +2067,7 @@ int DoctorCommand()
         Chk("IDL schema 定义在场", false, exc.Message);
     }
     if (Directory.Exists(schemaDir))
-        Chk($"IDL schema 定义在场（{schemaCount} 份）", schemaCount == 9, "protocol/schema");
+        Chk($"IDL schema 定义在场（{schemaCount} 份）", schemaCount == 10, "protocol/schema");
 
     // 声明边界①：真源靠 Python import 成功，引擎只验文件在场
     Chk("核心库可导入（schema_lint）",
@@ -2089,7 +2089,7 @@ int DoctorCommand()
     try
     {
         var (schemaIssues, schemas) = SchemaLint.CheckSchemaFiles(root!);
-        Chk("schema 标准对照（jsonschema）", schemaIssues.Count == 0 && schemas.Count == 9,
+        Chk("schema 标准对照（jsonschema）", schemaIssues.Count == 0 && schemas.Count == 10,
             "CI 与本地同跑");
     }
     catch (Exception exc)

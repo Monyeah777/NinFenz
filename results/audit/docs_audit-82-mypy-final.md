@@ -30,7 +30,7 @@ subjects:
   - desktop/src/core/daemon.py:eddcc0f9c14cf0cde6024e35cc1de1e23d63ebccf036a8ac0d5cd2e7bc300931
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:5e3adb5046a4342f4d758f238294b5bffab31a3d9a7601d12e4c21c411ec82c1
+  - protocol/code_metrics_baseline.json:794531110cc3fab81ff721501cbdaeccce1d805dd074a6897d85c19aad1a768e
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -297,6 +297,8 @@ subjects:
 
 | 类 | 模块 | 修法 |
 |---
+> 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
+
 > 重审（2026-11-07）：refreeze CID
 
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）

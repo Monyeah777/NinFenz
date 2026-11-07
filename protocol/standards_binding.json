@@ -20814,13 +20814,13 @@
           "standard_url": "https://www.w3.org/TR/prov-o/",
           "standard_reachable": true,
           "standard_probe_date": "2026-09-24",
-          "support_standard": "vega-lite",
-          "support_standard_rationale": "F 段载体锚（轮换 2；与主锚异层）",
-          "support_standard_layer": "form",
-          "support_standard_body": "Vega",
-          "support_standard_url": "https://vega.github.io/schema/vega-lite/v5.json",
+          "support_standard": "rfc3161-tsp",
+          "support_standard_rationale": "日志证据链用 RFC 3161 将摘要绑定到外部可信时间",
+          "support_standard_layer": "eng",
+          "support_standard_body": "IETF",
+          "support_standard_url": "https://www.rfc-editor.org/rfc/rfc3161",
           "support_standard_reachable": true,
-          "support_standard_probe_date": "2026-09-24"
+          "support_standard_probe_date": "2026-11-07"
         },
         {
           "subdivision": "F01-12",

@@ -306,7 +306,7 @@
     "zarr"
   ],
   "note": "四态仅表示仓库内部编目、绑定、断言与消费证据；不等于第三方认证。",
-  "root_digest": "06bc9e8ad96bc8e1f7478f3a73cf385517d25e115405e5b87045101f2613820b",
+  "root_digest": "a1515209aecc3f5574d0560eba342ff8c93d0d1723eb712f01c9c96878b2c218",
   "schema": "nf-standards-coverage/1",
   "standards": [
     {
@@ -4178,6 +4178,22 @@
       "url": "https://reuse.software/spec-3.3/"
     },
     {
+      "asserted": true,
+      "body": "IETF",
+      "bound": true,
+      "catalogued": true,
+      "claims": [
+        "rfc3161-offline-time-proof"
+      ],
+      "consumable": true,
+      "domain_bound": true,
+      "id": "rfc3161-tsp",
+      "layer": "eng",
+      "state": "consumable",
+      "title": "RFC 3161 Time-Stamp Protocol (TSP)",
+      "url": "https://www.rfc-editor.org/rfc/rfc3161"
+    },
+    {
       "asserted": false,
       "body": "IETF",
       "bound": true,
@@ -5593,18 +5609,18 @@
     "consumable"
   ],
   "summary": {
-    "asserted": 13,
-    "bound": 81,
-    "catalogued": 375,
-    "claims": 13,
-    "consumable": 13,
-    "domain_bound": 71,
+    "asserted": 14,
+    "bound": 82,
+    "catalogued": 376,
+    "claims": 14,
+    "consumable": 14,
+    "domain_bound": 72,
     "not_domain_bound": 304,
     "states": {
       "asserted": 0,
       "bound": 68,
       "catalogued": 294,
-      "consumable": 13
+      "consumable": 14
     }
   }
 }

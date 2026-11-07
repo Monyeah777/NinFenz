@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
-  - README.en.md:81bf0e593e1fb22fb833e9d3e4110b1f29d811405db1bf0d48f0638ef496ed15
+  - README.en.md:39f64d7d68e37233f5ece32da7fe0a0d03210f340eac0731783ac34b9467707b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,6 +16,8 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
+> 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
+
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

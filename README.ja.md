@@ -81,10 +81,10 @@ AI による組立：
 
 <!-- nf:stats:begin -->
 **公式コア**：13 モジュール · 3 パイプライン（P00 / P01 / P90） · コアプロトコル 01–07
-**コミュニティ規模**：111 登録パッケージ · 363 資産ファイル · 101 概念グラフ · 100 ドメインパック／1200 細分類 · 標準カタログ 375 件（到達可能 334 ／ 不可達 41 · 機関 196 · 207 依存辺） · 標準バインディング 1200 件
+**コミュニティ規模**：111 登録パッケージ · 363 資産ファイル · 101 概念グラフ · 100 ドメインパック／1200 細分類 · 標準カタログ 376 件（到達可能 335 ／ 不可達 41 · 機関 196 · 207 依存辺） · 標準バインディング 1200 件
 **品質証憑**：verify v2.30 · check1-42 · PASS=76（bash verify.sh の単一入口。期待基準は quality_baseline.EXPECTED_*） · 所蔵 3 件
 
-分层：data 150 · eng 39 · form 29 · gov 73 · iface 84 （標準カタログ layer 別）
+分层：data 150 · eng 40 · form 29 · gov 73 · iface 84 （標準カタログ layer 別）
 
 > 本区は python scripts/nf.py stats --write が生成します（手改禁止）。口径と実算真源は protocol/repo_stats.json。
 <!-- nf:stats:end -->
@@ -98,7 +98,7 @@ AI による組立：
 | ライブラリ | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | コミュニティ | `community/README.md` · `community/模板制作指令包.md` |
 | AI | `docs/agent/AGENT_START.md` · `docs/agent/AI_ROUTING.md` · `docs/meta/DEEP_DIVE.md` |
-| ツール | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
+| ツール | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `docs/rfc3161.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
 | 接続面 | `integrations/README.md`（MCP / LSP / CLI / TUI / 図書館 / Skill / npm / Rust / .NET / A2A） |
 | 書庫 | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 

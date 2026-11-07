@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:bfb33daab8f564c1999af62e21c383e426b1c3903a462bf928243d1dd8c03700
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:1d4e44c3acdb0cfe3f807594f044b87cfa5cb929222d5a725fd5d8732691c8fb
+  - README.md:97ccf1c7508cb458d40bca168229e307057121c9af9c2f35d496eb4b60607370
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
 
 ---
+> 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
+
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

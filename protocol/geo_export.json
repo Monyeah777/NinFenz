@@ -3,14 +3,14 @@
     "bodies": 196,
     "by_layer": {
       "data": 150,
-      "eng": 39,
+      "eng": 40,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
     "depends_edges": 207,
-    "reachable": 334,
-    "standards": 375,
+    "reachable": 335,
+    "standards": 376,
     "unreachable": 41
   },
   "note": "生成物；真源 protocol/standards_catalog.json + protocol/standards_binding.json。",
@@ -3015,6 +3015,24 @@
     {
       "body": "IETF",
       "bound_main": 0,
+      "bound_support": 1,
+      "ext_points": [
+        "message-imprint",
+        "timestamp-token",
+        "tsa-policy"
+      ],
+      "http_status": 200,
+      "id": "rfc3161-tsp",
+      "layer": "eng",
+      "probe_date": "2026-11-07",
+      "reachable": true,
+      "sha256_sample": "eaa75657d082a6fc2644f6849fe4c8a496019a13ab0538479e48594a259a8918",
+      "title": "RFC 3161 Time-Stamp Protocol (TSP)",
+      "url": "https://www.rfc-editor.org/rfc/rfc3161"
+    },
+    {
+      "body": "IETF",
+      "bound_main": 0,
       "bound_support": 0,
       "ext_points": [
         "log-entry-type",
@@ -3553,7 +3571,7 @@
     {
       "body": "Vega",
       "bound_main": 5,
-      "bound_support": 364,
+      "bound_support": 363,
       "ext_points": [
         "config-extension"
       ],

@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1447,
+    "app": 1448,
     "entry": 27,
     "floor": 5,
-    "prod": 1043,
-    "projection": 138,
-    "support": 314,
-    "verify": 1139
+    "prod": 1044,
+    "projection": 139,
+    "support": 315,
+    "verify": 1141
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6929,6 +6929,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "RFC 3161 timestamp records with offline token verification and fail-closed trust.",
+      "path": "desktop/src/core/timestamp.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "45 · 模块工具面扫描器（machine_contract.tool_face 可选建议层）。",
       "path": "desktop/src/core/tool_face.py",
       "role": "verify",
@@ -9103,6 +9109,12 @@
     {
       "function": "编码卫生门禁单测（check33 新面：RFC 3629 / RFC 8259 §4 / UAX #15 / UTS #39）。",
       "path": "desktop/tests/test_text_hygiene.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "RFC 3161 timestamp query, token verification, and distributable record tests.",
+      "path": "desktop/tests/test_timestamp.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12959,6 +12971,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "NF RFC 3161 time token record",
+      "path": "protocol/schema/time_token.schema.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "按 schema 版本钉扎的旧版契约样本（机制借鉴 restless-core company_projection.rs:800-853；消费方 core/schema_pins.py）。把 §7 V2 的兼容从声明变成可执行侧。",
       "path": "protocol/schema_pins.json",
       "role": "verify",
@@ -13134,17 +13152,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "82b210c0a754db185db6df50dccc19afa0e7a08d4c3c8bb88c5ce0fdaa4e3df3",
+  "root_digest": "ff271baed678b6d2ea914e7cfa98d5da19d0b26ba8571e259ba19988388d47ef",
   "rule_counts": {
-    "R-app": 1447,
-    "R-catch": 137,
+    "R-app": 1448,
+    "R-catch": 138,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 123,
+    "R-projection": 124,
     "R-support": 151,
-    "R-verify": 1018,
-    "auto:R-core": 261
+    "R-verify": 1020,
+    "auto:R-core": 262
   },
   "schema": "nf-role-coordinates/1"
 }

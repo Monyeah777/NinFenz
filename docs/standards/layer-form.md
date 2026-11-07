@@ -2,8 +2,8 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **375** 条 · 本机可达 **334** · 不可达 **41** · 机构 **196** · 依赖边 **207**
-- 分层：data 150 · eng 39 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **376** 条 · 本机可达 **335** · 不可达 **41** · 机构 **196** · 依赖边 **207**
+- 分层：data 150 · eng 40 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
@@ -71,7 +71,7 @@
 - Vega 数据集与规范 · Vega · 层 form · 可达 是（200 · 2026-09-24） · 扩展点 spec-extension · 绑定 主锚 0 / 辅锚 0 · https://vega.github.io/vega-lite/
 
 ### `vega-lite`
-- Vega-Lite v5 · Vega · 层 form · 可达 是（200 · 2026-09-24） · 扩展点 config-extension · 绑定 主锚 5 / 辅锚 364 · https://vega.github.io/schema/vega-lite/v5.json
+- Vega-Lite v5 · Vega · 层 form · 可达 是（200 · 2026-09-24） · 扩展点 config-extension · 绑定 主锚 5 / 辅锚 363 · https://vega.github.io/schema/vega-lite/v5.json
 
 ### `w3c-css`
 - CSS 快照（分级扩展） · W3C · 层 form · 可达 是（200 · 2026-09-24） · 扩展点 module-level · 绑定 主锚 0 / 辅锚 0 · https://www.w3.org/TR/CSS/

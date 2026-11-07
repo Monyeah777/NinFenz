@@ -2837,6 +2837,7 @@
     "https://ninfenz.dev/schema/module.schema.json",
     "https://ninfenz.dev/schema/pipeline.schema.json",
     "https://ninfenz.dev/schema/protocol.schema.json",
-    "https://ninfenz.dev/schema/release.schema.json"
+    "https://ninfenz.dev/schema/release.schema.json",
+    "https://ninfenz.dev/schema/time_token.schema.json"
   ]
 }

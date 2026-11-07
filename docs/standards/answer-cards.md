@@ -2,18 +2,19 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **375** 条 · 本机可达 **334** · 不可达 **41** · 机构 **196** · 依赖边 **207**
-- 分层：data 150 · eng 39 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **376** 条 · 本机可达 **335** · 不可达 **41** · 机构 **196** · 依赖边 **207**
+- 分层：data 150 · eng 40 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。
 
 ## 卡 1 · 哪些标准提供扩展点？
 
-全 **375** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
+全 **376** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
 
 - `iso-iec-ieee-29119` · 软件测试（29119 系列） · 扩展点 4：part-1-concepts, part-2-processes, part-3-documentation, part-4-techniques
 - `multiformats-cid` · CID (Content IDentifier) · 扩展点 4：cid-version, multibase, multicodec, multihash
 - `http-semantics` · HTTP 语义（RFC 9110） · 扩展点 3：method-registry, field-name-registry, status-code-registry
+- `rfc3161-tsp` · RFC 3161 Time-Stamp Protocol (TSP) · 扩展点 3：message-imprint, timestamp-token, tsa-policy
 - `acme` · ACME 证书签发自动化 · 扩展点 2：challenge-type, identifier-type
 - `activitypub` · ActivityPub · 扩展点 2：activity-type-extension, extension-context
 - `adbc` · ADBC 数据库访问接口 · 扩展点 2：driver-manager, statement-option
@@ -30,21 +31,20 @@
 - `autosar-someip` · SOME/IP 车载服务通信 · 扩展点 2：service-interface, eventgroup
 - `avif` · AVIF 图像格式 · 扩展点 2：av1-item, extended-profile
 - `avro` · Avro 规范 · 扩展点 2：schema-resolution, logical-type
-- `bacnet` · BACnet 楼宇自动化 · 扩展点 2：proprietary-property, object-type-extension
 
 ## 卡 2 · 各层有哪些标准？
 
 - **data** 150 条 → `docs/standards/layer-data.md`
-- **eng** 39 条 → `docs/standards/layer-eng.md`
+- **eng** 40 条 → `docs/standards/layer-eng.md`
 - **form** 29 条 → `docs/standards/layer-form.md`
 - **gov** 73 条 → `docs/standards/layer-gov.md`
 - **iface** 84 条 → `docs/standards/layer-iface.md`
 
 ## 卡 3 · 哪些标准被域包绑定、绑了多少次？
 
-绑定总量 **1200**（71 条不同标准被引用；主锚=口径锚，辅锚=产出承载锚）。绑定最多的 20 条：
+绑定总量 **1200**（72 条不同标准被引用；主锚=口径锚，辅锚=产出承载锚）。绑定最多的 20 条：
 
-- `vega-lite` · 主锚 5 / 辅锚 364
+- `vega-lite` · 主锚 5 / 辅锚 363
 - `w3c-tabular-data` · 主锚 95 / 辅锚 198
 - `ietf-json-schema` · 主锚 63 / 辅锚 227
 - `commonmark` · 主锚 70 / 辅锚 111
