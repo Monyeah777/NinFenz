@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:13e31b049094b9d87d9e55dd766e3efd70f89cf6d1651efb5676920ac95268f9
+  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
 ---
+> 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
+
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）
 
 > 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面

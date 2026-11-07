@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:13e31b049094b9d87d9e55dd766e3efd70f89cf6d1651efb5676920ac95268f9
+  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
 ---
+> 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
+
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）
 
 > 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面

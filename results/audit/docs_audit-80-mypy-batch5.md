@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:13e31b049094b9d87d9e55dd766e3efd70f89cf6d1651efb5676920ac95268f9
+  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
 ---
+> 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
+
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）
 
 > 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面

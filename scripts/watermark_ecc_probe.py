@@ -42,7 +42,6 @@ CONFIGS = (
 )
 BLUR_RADII = (0.3, 0.6, 1.0)
 
-
 def _np():
     try:
         import numpy as np
@@ -50,14 +49,12 @@ def _np():
         raise SystemExit("环境缺 numpy（" + GUIDE + "pip install numpy）") from exc
     return np
 
-
 def _pil():
     try:
         from PIL import Image
     except ImportError as exc:  # pragma: no cover
         raise SystemExit("环境缺 Pillow（" + GUIDE + "pip install Pillow）") from exc
     return Image
-
 
 def _dct(n: int):
     np = _np()
@@ -68,7 +65,6 @@ def _dct(n: int):
             m[u, x] = alpha * np.cos((2 * x + 1) * u * np.pi / (2 * n))
     return m
 
-
 def _bits(data: bytes) -> list[int]:
     out: list[int] = []
     for byte in data:
@@ -76,10 +72,8 @@ def _bits(data: bytes) -> list[int]:
             out.append((byte >> shift) & 1)
     return out
 
-
 def _message_bits() -> list[int]:
     return _bits(PAYLOAD + zlib.crc32(PAYLOAD).to_bytes(4, "big"))
-
 
 def _decode_message(bits: list[int]) -> tuple[bool, bytes]:
     data = bytearray()
@@ -92,13 +86,11 @@ def _decode_message(bits: list[int]) -> tuple[bool, bytes]:
     body, crc = raw[:-4], raw[-4:]
     return zlib.crc32(body).to_bytes(4, "big") == crc, body
 
-
 def _pairs(freq: int) -> tuple[tuple[int, int], tuple[int, int]]:
     """块内系数对：freq=0 → 中频 (4,5)/(5,4)；freq=1 → 低频 (2,3)/(3,2)。"""
     if freq == 0:
         return (4, 5), (5, 4)
     return (2, 3), (3, 2)
-
 
 def _base_png() -> bytes:
     np = _np()
@@ -108,11 +100,9 @@ def _base_png() -> bytes:
     Image.fromarray(arr, "RGB").save(buf, "PNG")
     return buf.getvalue()
 
-
 def _repeat_for(block_size: int) -> int:
     """重复次数随块尺寸自适应：16×16 块时块数只有 8×8 的 1/4，重复数同步降。"""
     return REPEAT if block_size <= 8 else max(2, REPEAT // 4)
-
 
 def embed(data: bytes, delta: float, block_size: int, freq: int) -> tuple[bytes, dict[str, Any]]:
     np = _np()
@@ -153,7 +143,6 @@ def embed(data: bytes, delta: float, block_size: int, freq: int) -> tuple[bytes,
     return buf.getvalue(), {"blocks": len(order), "block": block_size,
                             "delta": delta, "freq": freq, "repeat": repeat}
 
-
 def extract(data: bytes, delta: float, block_size: int, freq: int) -> list[int]:
     np = _np()
     Image = _pil()
@@ -178,7 +167,6 @@ def extract(data: bytes, delta: float, block_size: int, freq: int) -> list[int]:
         votes[bit_idx][0 if abs(coeff[a]) > abs(coeff[b]) else 1] += 1
     return [0 if v[0] >= v[1] else 1 for v in votes]
 
-
 def screenshot(data: bytes, radius: float) -> bytes:
     _np()
     Image = _pil()
@@ -195,7 +183,6 @@ def screenshot(data: bytes, radius: float) -> bytes:
     Image.open(buf).convert("RGB").save(out, "PNG")
     return out.getvalue()
 
-
 def psnr(a: bytes, b: bytes) -> float:
     np = _np()
     Image = _pil()
@@ -203,7 +190,6 @@ def psnr(a: bytes, b: bytes) -> float:
     y = np.asarray(Image.open(io.BytesIO(b)).convert("RGB"), dtype="float64")
     mse = float(((x - y) ** 2).mean())
     return 99.0 if mse == 0 else float(10 * np.log10((255.0 ** 2) / mse))
-
 
 def build_probe() -> dict[str, Any]:
     base = _base_png()
@@ -231,10 +217,8 @@ def build_probe() -> dict[str, Any]:
             "conclusion": ("若 any_survives_screenshot=false：加大强度/降频/放大块都救不回拍屏，"
                            "边界成立（破坏性变换）；否则须复核可见性代价")}
 
-
 def render(doc: dict[str, Any]) -> str:
     return json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-
 
 def table_md(doc: dict[str, Any]) -> str:
     lines = ["| delta | 块 | 频段 | PSNR | 干净 | blur0.3 | blur0.6 | blur1.0 |",
@@ -249,7 +233,6 @@ def table_md(doc: dict[str, Any]) -> str:
             f"| {row['delta']} | {row['block']} | {band} | {row['psnr_db']} | {mark} | "
             f"{fmt(b3, 'ber')} | {fmt(b6, 'ber')} | {fmt(b10, 'ber')} |")
     return "\n".join(lines) + "\n"
-
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="watermark_ecc_probe",
@@ -280,7 +263,6 @@ def main(argv=None) -> int:
     else:
         print(render(doc), end="")
     return 0
-
 
 if __name__ == "__main__":
     for _stream in (sys.stdout, sys.stderr):
