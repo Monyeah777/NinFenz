@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:552a190cf82cf9f2827240071460660c4e0d75b86fcb848afe5e201eccd072a7
+  - protocol/code_metrics_baseline.json:caca989ee86a4c66a3db9f66a636481e48c26c69151bd62aff4ae0a29df2c54a
 ---
+> 重审（2026-11-07）：Go 客户端补 receipts/attest 两形态；向量集扩到 28 条（三形态）
+
 > 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
 
 > 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）

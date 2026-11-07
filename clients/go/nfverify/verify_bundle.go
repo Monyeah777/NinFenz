@@ -90,6 +90,11 @@ func VerifyBundle(data []byte, opts Options) (*Result, error) {
 	if doc == nil || asString(doc["schema"]) != EvidenceSchema {
 		return nil, UsageError
 	}
+	return verifyBundleDoc(src, doc, opts), nil
+}
+
+// verifyBundleDoc 对已解析的 bundle 清单做全部判定（三形态出口共用同一套四词判定）。
+func verifyBundleDoc(src *zipSource, doc map[string]any, opts Options) *Result {
 	res := newResult()
 	entriesRaw := asList(doc["entries"])
 	entries := make([]map[string]any, 0, len(entriesRaw))
@@ -109,35 +114,35 @@ func VerifyBundle(data []byte, opts Options) (*Result, error) {
 	// 链段必填且自洽（与真源同口径）：缺证据 ≠ 证据成立
 	if chain == nil {
 		res.Issues = append(res.Issues, "缺 chain 段（证据包必须带链头）")
-		return res, nil
+		return res
 	}
 	if res.Head == "" {
 		res.Issues = append(res.Issues, "chain.head 为空")
-		return res, nil
+		return res
 	}
 	if asString(chain["count"]) != itoa(len(entries)) {
 		res.Issues = append(res.Issues, "chain.count 不符")
-		return res, nil
+		return res
 	}
 	if len(entries) == 0 {
 		res.Issues = append(res.Issues, "证据包为空")
-		return res, nil
+		return res
 	}
 
 	payloads, leaves, ok := verifyMembers(src, entries, res)
 	if !ok {
-		return res, nil
+		return res
 	}
 	root := hex.EncodeToString(merkleRoot(leaves))
 	if root != res.Root {
 		res.Issues = append(res.Issues, "根不一致（" + root[:16] + "）")
-		return res, nil
+		return res
 	}
 	for _, e := range entries {
 		leaf, err := hex.DecodeString(asString(e["leaf"]))
 		if err != nil {
 			res.Issues = append(res.Issues, "叶不可解析")
-			return res, nil
+			return res
 		}
 		folded := hex.EncodeToString(foldLeaf(leaf, asList(e["proof"])))
 		if folded != res.Root {
@@ -145,14 +150,14 @@ func VerifyBundle(data []byte, opts Options) (*Result, error) {
 		}
 	}
 	if len(res.Issues) > 0 {
-		return res, nil
+		return res
 	}
 	if chainHead(entries) != res.Head {
 		res.Issues = append(res.Issues, "透明日志链头不一致（条目顺序被插删/改序）")
-		return res, nil
+		return res
 	}
 	if !checkAnchor(entries, doc, opts.Anchor, res) {
-		return res, nil
+		return res
 	}
 	listed := map[string]bool{}
 	for _, e := range entries {
@@ -168,27 +173,27 @@ func VerifyBundle(data []byte, opts Options) (*Result, error) {
 		}
 	}
 	if len(res.Issues) > 0 {
-		return res, nil
+		return res
 	}
 	verifyEnvelopes(src, doc, payloads, opts.Key, res)
 	if len(res.Issues) > 0 {
-		return res, nil
+		return res
 	}
 	checkDecision(src, doc, payloads, res, opts.PolicyDigest)
 	if len(res.Issues) > 0 {
-		return res, nil
+		return res
 	}
 	rev := opts.Revocations
 	if rev == nil {
 		embedded, errMsg := embeddedRev(src)
 		if errMsg != "" {
 			res.Issues = append(res.Issues, errMsg)
-			return res, nil
+			return res
 		}
 		rev = embedded
 	}
 	judge(res, entries, rev, opts.At)
-	return res, nil
+	return res
 }
 
 func itoa(n int) string { return strconv.Itoa(n) }

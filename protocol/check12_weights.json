@@ -104,7 +104,7 @@
     "test_evidence": 1.8,
     "test_evidence_batch": 1.4,
     "test_evidence_forms_parity": 1.1,
-    "test_evidence_vectors": 1.5,
+    "test_evidence_vectors": 4.6,
     "test_execution_drill": 0.2,
     "test_explain_coverage": 0.2,
     "test_export_manifest_gates": 0.2,
@@ -1441,10 +1441,10 @@
     "test_evidence_forms_parity.TestAttestFormParity.test_attest_form_verdict_level_agree": 0.23,
     "test_evidence_forms_parity.TestOutOfRepoStandalone.test_copied_verifier_outside_repo_agrees": 0.45,
     "test_evidence_forms_parity.TestReceiptsFormParity.test_receipts_form_verdict_level_root_agree": 0.21,
-    "test_evidence_vectors.TestExpectedVerdicts.test_core_matches_every_vector": 0.04,
-    "test_evidence_vectors.TestExpectedVerdicts.test_standalone_matches_every_vector": 1.19,
-    "test_evidence_vectors.TestReproducible.test_committed_equals_live": 0.05,
-    "test_evidence_vectors.TestReproducible.test_generation_is_deterministic": 0.05,
+    "test_evidence_vectors.TestExpectedVerdicts.test_core_matches_every_vector": 0.08,
+    "test_evidence_vectors.TestExpectedVerdicts.test_standalone_matches_every_vector": 3.94,
+    "test_evidence_vectors.TestReproducible.test_committed_equals_live": 0.19,
+    "test_evidence_vectors.TestReproducible.test_generation_is_deterministic": 0.18,
     "test_evidence_vectors.TestVectorIntegrity.test_ids_unique": 0.0,
     "test_evidence_vectors.TestVectorIntegrity.test_no_machine_specific_paths": 0.0,
     "test_evidence_vectors.TestVectorIntegrity.test_schema_and_count": 0.0,
@@ -4041,5 +4041,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1363.7
+  "total_s": 1366.8
 }

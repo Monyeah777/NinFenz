@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:552a190cf82cf9f2827240071460660c4e0d75b86fcb848afe5e201eccd072a7
+  - protocol/code_metrics_baseline.json:caca989ee86a4c66a3db9f66a636481e48c26c69151bd62aff4ae0a29df2c54a
 ---
+> 重审（2026-11-07）：Go 客户端补 receipts/attest 两形态；向量集扩到 28 条（三形态）
+
 > 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
 
 > 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）

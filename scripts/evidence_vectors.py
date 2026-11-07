@@ -20,6 +20,7 @@ import argparse
 import base64
 import contextlib
 import hashlib
+import hmac
 import io
 import json
 import os
@@ -31,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
-from core import atomic_write, evidence, json_doc  # noqa: E402
+from core import atomic_write, evidence, json_doc, receipts  # noqa: E402
 
 BUNDLE_ENTRY = evidence.BUNDLE_ENTRY
 PAYLOAD_DIR = evidence.PAYLOAD_DIR
@@ -225,6 +226,8 @@ def _build_vectors() -> dict:
         rows.append(_case("not_a_bundle", "不是证据包（用法错，不是判定）", "invalid",
                           bundle=plain.read_bytes(), special="not_a_bundle",
                           exit_code=4))
+    rows.extend(_receipts_vectors(tmp))
+    rows.extend(_attest_vectors(tmp))
     return {"schema": SCHEMA, "pinned_at": PIN, "count": len(rows), "vectors": rows}
 
 
@@ -246,6 +249,119 @@ def _zip_with_duplicate(members: dict, dup_name: str) -> bytes:
 def _members(data: bytes) -> dict:
     with zipfile.ZipFile(io.BytesIO(data)) as zf:
         return {name: zf.read(name) for name in zf.namelist()}
+
+
+def _members_zip(tmp: str, name: str, members: dict) -> bytes:
+    """确定性 zip（成员名排序、不压缩、固定时间戳）——回执/信封形态也走同一容器。"""
+    return _write_members(os.path.join(tmp, name), members)
+
+
+def _evidence_leaf(rel: str, digest: str) -> bytes:
+    """证据面的叶：sha256(0x00 || 规范 JSON{"id","digest"})——与真源/零依赖复验器同算法。"""
+    body = json.dumps({"id": rel, "digest": digest}, sort_keys=True,
+                      ensure_ascii=False, separators=(",", ":")).encode()
+    return hashlib.sha256(b"\x00" + body).digest()
+
+
+def _receipts_doc(payloads: dict) -> tuple[dict, list]:
+    """由成员字节造回执文档（叶/根/包含证明，与真源同算法）。"""
+    names = sorted(payloads)
+    leaves = [_evidence_leaf(n, hashlib.sha256(payloads[n]).hexdigest()) for n in names]
+    root = receipts.merkle_root(leaves).hex()
+    entries = []
+    for idx, name in enumerate(names):
+        entries.append({"id": name,
+                        "digest": hashlib.sha256(payloads[name]).hexdigest(),
+                        "leaf": leaves[idx].hex(),
+                        "proof": receipts.inclusion_proof(leaves, idx)})
+    return {"schema": "nf-receipts/1", "root": root, "entries": entries}, names
+
+
+def _receipts_vectors(tmp: str) -> list:
+    """回执形态向量：正常 / 成员被改 / 根被改 / 缺成员。"""
+    payloads = {"payload/d/a.md": "# A\n\n甲\n".encode(), "payload/d/b.md": "# B\n\n乙\n".encode()}
+    doc, _names = _receipts_doc(payloads)
+    base = {**payloads,
+            "receipts.json": json.dumps(doc, sort_keys=True, ensure_ascii=False).encode()}
+    rows = [_case("receipts_ok", "回执形态（单根 + 包含证明）", "ok",
+                  bundle=_members_zip(tmp, "rc-ok.zip", base))]
+    flip = dict(base)
+    flip["payload/d/a.md"] = "# A\n\n甲改\n".encode()
+    rows.append(_case("receipts_payload_flip", "回执：成员字节被改", "invalid",
+                      bundle=_members_zip(tmp, "rc-flip.zip", flip)))
+    bad_root = dict(doc)
+    bad_root["root"] = "0" * 64
+    rows.append(_case("receipts_root_flip", "回执：根被改", "invalid",
+                      bundle=_members_zip(tmp, "rc-root.zip",
+                                          {**payloads,
+                                           "receipts.json": json.dumps(
+                                               bad_root, sort_keys=True).encode()})))
+    rows.append(_case("receipts_missing_member", "回执：缺成员实体", "invalid",
+                      bundle=_members_zip(tmp, "rc-miss.zip",
+                                          {"payload/d/a.md": payloads["payload/d/a.md"],
+                                           "receipts.json": json.dumps(
+                                               doc, sort_keys=True).encode()})))
+    return rows
+
+
+def _envelope(path: str, data: bytes, key: bytes | None = None) -> dict:
+    """造 nf-attest/1 信封（digest_only 或 hmac-sha256 级）。"""
+    base = {"schema": "nf-attest/1",
+            "subject": {"path": path, "sha256": hashlib.sha256(data).hexdigest()},
+            "producer": "vectors", "issued_at": PIN}
+    body = json.dumps(base, sort_keys=True, ensure_ascii=False,
+                      separators=(",", ":")).encode()
+    env = dict(base)
+    env["envelope_digest"] = hashlib.sha256(body).hexdigest()
+    if key is not None:
+        env["signature"] = {"scheme": "hmac-sha256",
+                            "mac": hmac.new(key, env["envelope_digest"].encode(),
+                                            hashlib.sha256).hexdigest()}
+    return env
+
+
+def _attest_vectors(tmp: str) -> list:
+    """信封形态向量：digest_only / hmac 正常 / 错密钥 / 主体被改 / 信封集缺成员。"""
+    payload = "# A\n\n甲\n".encode()
+    env = _envelope("payload/d/a.md", payload)
+    rows = [_case("attest_ok", "信封形态（digest_only）", "ok",
+                  bundle=_members_zip(tmp, "at-ok.zip",
+                                      {"payload/d/a.md": payload,
+                                       "attest.json": json.dumps(
+                                           env, sort_keys=True,
+                                           ensure_ascii=False).encode()}))]
+    env_hmac = _envelope("payload/d/a.md", payload, KEY)
+    hm = _members_zip(tmp, "at-hmac.zip",
+                      {"payload/d/a.md": payload,
+                       "attest.json": json.dumps(env_hmac, sort_keys=True,
+                                                 ensure_ascii=False).encode()})
+    rows.append(_case("attest_hmac_ok", "信封形态（hmac-sha256 级）", "ok",
+                      bundle=hm, key=KEY))
+    rows.append(_case("attest_hmac_wrong_key", "信封：hmac 错密钥", "invalid",
+                      bundle=hm, key=b"wrong-key-wrong-key-wrong-key"))
+    tampered = dict(env)
+    tampered["subject"] = {"path": "payload/d/a.md", "sha256": "0" * 64}
+    rows.append(_case("attest_subject_flip", "信封：主体摘要被改", "invalid",
+                      bundle=_members_zip(tmp, "at-flip.zip",
+                                          {"payload/d/a.md": payload,
+                                           "attest.json": json.dumps(
+                                               tampered, sort_keys=True).encode()})))
+    env_b = _envelope("payload/d/b.md", b"# B\n")
+    a_set = {"schema": "nf-attest-set/1", "attestations": [env, env_b]}
+    rows.append(_case("attest_set_ok", "信封集（两份都自洽）", "ok",
+                      bundle=_members_zip(tmp, "at-set.zip",
+                                          {"payload/d/a.md": payload,
+                                           "payload/d/b.md": b"# B\n",
+                                           "attest-set.json": json.dumps(
+                                               a_set, sort_keys=True,
+                                               ensure_ascii=False).encode()})))
+    rows.append(_case("attest_set_missing_member", "信封集：缺一个成员实体", "invalid",
+                      bundle=_members_zip(tmp, "at-set-miss.zip",
+                                          {"payload/d/a.md": payload,
+                                           "attest-set.json": json.dumps(
+                                               a_set, sort_keys=True,
+                                               ensure_ascii=False).encode()})))
+    return rows
 
 
 def _dump(tmp: str, data: bytes) -> str:

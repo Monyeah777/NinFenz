@@ -5,7 +5,8 @@
 
 ## 是什么
 
-一份**与实现无关**的 JSON：18 条「证据包字节 → 期望判定 + 期望退出码」的固定用例。任何语言的
+一份**与实现无关**的 JSON：**28 例**「证据字节 → 期望判定 + 期望退出码」的固定用例，覆盖
+自包含包 / 回执 / 信封三种形态（分布见下表）。任何语言的
 `cc_verify` 实现都能只读这一份文件自证对不对——不需要读本仓代码、不需要装 NF 工具链。
 
 与攻击矩阵（`nf evidence bench`）的分工：矩阵证明「**本实现**抓得住攻击」；向量集证明
@@ -33,8 +34,9 @@
 字段语义：`bundle_b64` 解码即证据包字节（`bundle_sha256` 是它的摘要）；`key_b64` 给出时按
 hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence verify` 的对应参数。
 `special="not_a_bundle"` 表示**输入不是证据包**：这是用法错（rc=4），实现必须拒绝，不许给判定。
+回执/信封形态同样装在一个 zip 里（成员即 payload 与文档），形态由**文档 schema** 判，不看文件名。
 
-## 18 条向量覆盖什么
+## 28 条向量覆盖什么
 
 | id | 攻击/变化 | 期望 |
 |---|---|---|
@@ -49,6 +51,14 @@ hmac-sha256 级校验；`revocations` / `anchor` / `at` 就是 `nf evidence veri
 | traversal_path | 成员路径含双点段（解包越界写的入口） | invalid / 1 |
 | dup_members | 重名成员（zip 歧义：判定不可复算） | invalid / 1 |
 | not_a_bundle | 输入不是证据包 | 用法错 / 4 |
+| receipts_ok | 回执形态：单根 + 包含证明 | ok / 0 |
+| receipts_payload_flip / receipts_root_flip | 回执：成员被改 / 根被改 | invalid / 1 |
+| receipts_missing_member | 回执：缺成员实体 | invalid / 1 |
+| attest_ok / attest_hmac_ok | 信封形态：digest_only / hmac-sha256 | ok / 0 |
+| attest_hmac_wrong_key | 信封：hmac 错密钥 | invalid / 1 |
+| attest_subject_flip | 信封：主体摘要被改 | invalid / 1 |
+| attest_set_ok | 信封集（两份都自洽） | ok / 0 |
+| attest_set_missing_member | 信封集：缺一个成员实体 | invalid / 1 |
 
 ## 第三方怎么用（以任何语言为例）
 

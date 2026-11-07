@@ -133,9 +133,9 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
 
 **状态：`implemented`**（三种输入形态 + 38 条攻击矩阵基准；decision 证据绑定 v0 已实装）。
 maps_to = `nf evidence verify <target>` / `nf evidence batch <dir>` / `nf evidence bench`；
-**两个独立实现**（同一份 18 条向量集必须同判）：零依赖 Python = `scripts/nf_verify.py --evidence`
+**两个独立实现**（同一份 **28 条向量集**必须同判）：零依赖 Python = `scripts/nf_verify.py --evidence`
 （纯标准库、不 import 任何 NF 模块、单文件可分发）；**Go 客户端** = `clients/go`
-（`nfverify --bundle 包.zip`，`go test ./...` 跑同一份向量集）——用来证明**这个 ABI 不绑定语言**。
+（`nfverify --bundle 包.zip`，三形态同入口；`go test ./...` 跑同一份向量集）——用来证明**这个 ABI 不绑定语言**。
 本调用是**中立裁判位的地基**：验证方只需要证据本身，**不需要仓库、不需要联网、
 不需要复现生产环境**。
 

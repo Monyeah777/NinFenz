@@ -95,8 +95,9 @@ python scripts/nf.py evidence pack 01_核心协议.md --key-file <密钥> --issu
 
 ## 跨语言一致性：判定向量集
 
-`results/ccos/evidence_verdict_vectors.json` 把「证据包字节 → 期望判定 + 退出码」固化成 18 条与实现
-无关的用例：**任何语言**的 `cc_verify` 都可以只读这份 JSON 自证对不对（无需本仓工具链）。
+`results/ccos/evidence_verdict_vectors.json` 把「证据字节 → 期望判定 + 退出码」固化成 28 条与实现
+无关的用例（18 条自包含包 + 4 条回执 + 6 条信封）：**任何语言**的 `cc_verify` 都可以只读这份
+JSON 自证对不对（无需本仓工具链）。
 生成与复核：`python scripts/evidence_vectors.py --write|--check`，判据
 `python -m unittest desktop.tests.test_evidence_vectors`（8 项，含双实现同判）。详见
 [evidence-vectors-v0.md](evidence-vectors-v0.md)。

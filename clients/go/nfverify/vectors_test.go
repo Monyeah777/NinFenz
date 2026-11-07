@@ -47,7 +47,7 @@ type vectorDoc struct {
 	Vectors []vector `json:"vectors"`
 }
 
-// TestVectorsConformance 是这套 Go 实现的**唯一**合格判据：18 条向量的判定与退出码必须逐条相符。
+// TestVectorsConformance 是这套 Go 实现的**唯一**合格判据：向量集逐条的判定与退出码必须相符。
 // 它证明「同一份证据，Go 侧与 Python 侧得出同一结论」——ABI 不绑定语言。
 func TestVectorsConformance(t *testing.T) {
 	raw, err := os.ReadFile(vectorFile(t))
@@ -79,7 +79,7 @@ func TestVectorsConformance(t *testing.T) {
 				}
 				opts.Key = key
 			}
-			res, err := VerifyBundle(bundle, opts)
+			res, err := VerifyAny(bundle, opts)
 			wantVerdict, _ := v.Expected["verdict"].(string)
 			wantCode := int(v.Expected["exit_code"].(float64))
 			gotCode := 0
