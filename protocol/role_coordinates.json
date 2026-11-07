@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 147,
-    "support": 397,
-    "verify": 994
+    "projection": 148,
+    "support": 398,
+    "verify": 995
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9383,6 +9383,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "几何提示同步判据：用「标签里记录的尺寸」替代频谱模板做几何同步。",
+      "path": "desktop/tests/test_watermark_geometry_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "同步层探针判据：把「网格同步能做什么、不能做什么」锁成断言。",
       "path": "desktop/tests/test_watermark_sync_probe.py",
       "role": "verify",
@@ -12336,16 +12342,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "6c8509071e63b53d200f2210305e90888d11fa5d51821e8831b98d5d8250fe1d",
+  "root_digest": "99b7ca4375970e4283c81c0735dda97712ee83aa67465097f3497163cf90348f",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 251,
+    "R-catch": 252,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 128,
+    "R-projection": 129,
     "R-support": 119,
-    "R-verify": 874,
+    "R-verify": 875,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"

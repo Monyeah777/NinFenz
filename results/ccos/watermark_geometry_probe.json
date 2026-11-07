@@ -1,0 +1,266 @@
+{
+  "attacks": [
+    {
+      "desc": "缩放 0.85×",
+      "id": "scale_0.85",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        0.8477,
+        0.8477
+      ],
+      "vote_conf": 915,
+      "vote_max": 915
+    },
+    {
+      "desc": "缩放 0.9×",
+      "id": "scale_0.9",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        0.8984,
+        0.8984
+      ],
+      "vote_conf": 957,
+      "vote_max": 957
+    },
+    {
+      "desc": "缩放 0.95×",
+      "id": "scale_0.95",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        0.9492,
+        0.9492
+      ],
+      "vote_conf": 986,
+      "vote_max": 986
+    },
+    {
+      "desc": "放大 1.1×",
+      "id": "scale_1.1",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        1.0977,
+        1.0977
+      ],
+      "vote_conf": 1022,
+      "vote_max": 1022
+    },
+    {
+      "desc": "放大 1.25×",
+      "id": "scale_1.25",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        1.25,
+        1.25
+      ],
+      "vote_conf": 1024,
+      "vote_max": 1024
+    },
+    {
+      "desc": "裁剪 10%",
+      "id": "crop_10",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        0.8984,
+        0.8984
+      ],
+      "vote_conf": 848,
+      "vote_max": 848
+    },
+    {
+      "desc": "JPEG q=70",
+      "id": "jpeg_70",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": true,
+      "payload_exact": true,
+      "scale_est": [
+        1.0,
+        1.0
+      ],
+      "vote_conf": 1015,
+      "vote_max": 1015
+    },
+    {
+      "desc": "模拟拍屏",
+      "id": "screenshot_sim",
+      "offset": [
+        0,
+        0
+      ],
+      "ok": false,
+      "payload_exact": false,
+      "scale_est": [
+        0.8984,
+        0.8984
+      ],
+      "vote_conf": 675,
+      "vote_max": 675
+    }
+  ],
+  "clean": {
+    "ok": true,
+    "psnr_db": 32.79
+  },
+  "conclusion": "几何提示（记录尺寸）能不能替代频谱模板做缩放同步，看 attacks 里 ok",
+  "delta": 24.0,
+  "geometry": [
+    256,
+    256
+  ],
+  "info": {
+    "delta": 24.0,
+    "geometry": [
+      256,
+      256
+    ],
+    "payload_bits": 80,
+    "repeat": 8
+  },
+  "payload": "NFGEO1",
+  "repeat": 8,
+  "schema": "nf-watermark-geometry-probe/1",
+  "seed": 20261108,
+  "size": 256,
+  "template_invariance": {
+    "note": "若 peaks_moved=False，则周期/频谱模板无法估缩放（数学必然）",
+    "peaks_moved": false,
+    "rows": [
+      {
+        "peaks": [
+          [
+            -16,
+            0
+          ],
+          [
+            16,
+            0
+          ],
+          [
+            0,
+            -20
+          ],
+          [
+            0,
+            20
+          ],
+          [
+            -80,
+            98
+          ]
+        ],
+        "scale": 1.0,
+        "template_present": true
+      },
+      {
+        "peaks": [
+          [
+            -16,
+            0
+          ],
+          [
+            16,
+            0
+          ],
+          [
+            0,
+            -20
+          ],
+          [
+            0,
+            20
+          ],
+          [
+            -22,
+            29
+          ]
+        ],
+        "scale": 0.85,
+        "template_present": true
+      },
+      {
+        "peaks": [
+          [
+            16,
+            0
+          ],
+          [
+            -16,
+            0
+          ],
+          [
+            0,
+            -20
+          ],
+          [
+            0,
+            20
+          ],
+          [
+            -22,
+            29
+          ]
+        ],
+        "scale": 1.1,
+        "template_present": true
+      },
+      {
+        "peaks": [
+          [
+            16,
+            0
+          ],
+          [
+            -16,
+            0
+          ],
+          [
+            0,
+            -20
+          ],
+          [
+            0,
+            20
+          ],
+          [
+            22,
+            -29
+          ]
+        ],
+        "scale": 1.25,
+        "template_present": true
+      }
+    ]
+  }
+}
