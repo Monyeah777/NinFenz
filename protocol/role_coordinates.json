@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1056,
-    "projection": 151,
-    "support": 416,
-    "verify": 1007
+    "projection": 152,
+    "support": 418,
+    "verify": 1009
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5873,6 +5873,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "闭包台账（nf-closure/1）：把「声称完成」变成「可核对的断言 → 判据 → 反例」。",
+      "path": "desktop/src/core/closure.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "44 追加 · 契约事件闭包扫描（元工具·只报告不设闸）。",
       "path": "desktop/src/core/closure_scan.py",
       "role": "verify",
@@ -7639,6 +7645,12 @@
     {
       "function": "CLI 消费面的**信任标注**（外来内容=数据）——与 MCP `_meta.nf.trust` 同口径。",
       "path": "desktop/tests/test_cli_trust_meta.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "闭包台账判据（P7）：断言必须指向**真实在场**的判据，债务必须写明。",
+      "path": "desktop/tests/test_closure.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12420,17 +12432,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "f22b31d8b2ca12a87f71da30b8e7ec4d546d48783bed20ef4969a15209f298b8",
+  "root_digest": "66b1f69dad24e377f312c2a24b4674d235ee8dff45529857519a61728b294be2",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 270,
+    "R-catch": 272,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 132,
+    "R-projection": 133,
     "R-support": 119,
-    "R-verify": 884,
-    "auto:R-core": 281
+    "R-verify": 885,
+    "auto:R-core": 282
   },
   "schema": "nf-role-coordinates/1"
 }

@@ -1,0 +1,411 @@
+{
+  "schema": "nf-closure/1",
+  "note": "闭包台账：每条断言 → 判据（真实存在的测试方法）→ 反例 fixture → 状态。status=closed 必须有判据 + 反例；partial/debt 必须写 debt 原因。脚本会核对引用的测试方法是否真的在场（防「声称有判据」）。",
+  "entries": [
+    {
+      "id": "C-01",
+      "module": "cognition_plan",
+      "claim": "研究计划按七切片/八方法论产出，深度映射与切片覆盖可判",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_plan.py",
+          "test_depth_controls_slice_count"
+        ],
+        [
+          "test_cognition_plan.py",
+          "test_every_slice_is_complete"
+        ]
+      ],
+      "reverse_fixture": "未知方法名/空主题/非法深度 → 抛 ValueError 并带修复指引（test_unknown_method_is_rejected_with_guide）",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_plan"
+      ]
+    },
+    {
+      "id": "C-02",
+      "module": "method_pack",
+      "claim": "领域方法包可校验、可组合、可接进研究计划；maps_to 只能指向真实动作",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_method_pack.py",
+          "test_unknown_maps_to_is_rejected"
+        ],
+        [
+          "test_method_pack.py",
+          "test_compose_unions_and_dedupes"
+        ]
+      ],
+      "reverse_fixture": "maps_to 写不存在原子 → 校验失败并指名（test_unknown_maps_to_is_rejected）",
+      "evidence": [
+        "python -m unittest desktop.tests.test_method_pack"
+      ]
+    },
+    {
+      "id": "C-03",
+      "module": "label-watermark",
+      "claim": "LSB 水印的承诺面与边界面都被实测锁定（重存/裁剪可读回，JPEG/缩放/噪声/拍屏读不回）",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_watermark_bench.py",
+          "test_promise_lossless_and_crop"
+        ],
+        [
+          "test_watermark_bench.py",
+          "test_boundary_jpeg_is_not_survived"
+        ]
+      ],
+      "reverse_fixture": "若 JPEG 竟然读回 → 判据红（test_boundary_jpeg_is_not_survived）",
+      "evidence": [
+        "python scripts/watermark_bench.py --check"
+      ]
+    },
+    {
+      "id": "C-04",
+      "module": "key-transparency",
+      "claim": "密钥目录自洽可验、包含证明可离线验、分叉可检测并给 witness",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_key_transparency.py",
+          "test_same_version_different_root_is_split"
+        ],
+        [
+          "test_key_transparency.py",
+          "test_fork_detected_when_history_rewritten"
+        ]
+      ],
+      "reverse_fixture": "同版本不同根的伪造目录（自身自洽）必被判 split",
+      "evidence": [
+        "python -m unittest desktop.tests.test_key_transparency"
+      ]
+    },
+    {
+      "id": "C-05",
+      "module": "label-watermark",
+      "claim": "绝对量化 QIM 只扛 q≥85；关系嵌入扛 q≥70/50——鲁棒性来自相对关系",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_watermark_dct_probe.py",
+          "test_absolute_qim_boundary"
+        ],
+        [
+          "test_watermark_dct_probe.py",
+          "test_relationship_embedding_holds_to_q70"
+        ]
+      ],
+      "reverse_fixture": "QIM 在 q=70 若读回 → 判据红",
+      "evidence": [
+        "python scripts/watermark_dct_probe.py --check"
+      ]
+    },
+    {
+      "id": "C-06",
+      "module": "label-watermark",
+      "claim": "固定块网格同步对不齐非整数重采样（可复算的负结果）",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_watermark_sync_probe.py",
+          "test_non_integer_resample_is_not_recovered"
+        ],
+        [
+          "test_watermark_sync_probe.py",
+          "test_crop_is_not_recovered"
+        ]
+      ],
+      "reverse_fixture": "若非整数重采样能对齐 → 结论须重写",
+      "evidence": [
+        "python scripts/watermark_sync_probe.py --check"
+      ]
+    },
+    {
+      "id": "C-07",
+      "module": "label-watermark",
+      "claim": "几何提示（记录尺寸）替代频谱模板：缩放/裁剪/JPEG 可读回；谱峰对缩放不变（负结果）",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_watermark_geometry_probe.py",
+          "test_scaling_is_recovered_with_exact_estimate"
+        ],
+        [
+          "test_watermark_geometry_probe.py",
+          "test_template_invariance_negative_result"
+        ]
+      ],
+      "reverse_fixture": "谱峰若随缩放移动 → 数学结论作废（test_template_invariance_negative_result）",
+      "evidence": [
+        "python scripts/watermark_geometry_probe.py --check"
+      ]
+    },
+    {
+      "id": "C-08",
+      "module": "cognition-workspace",
+      "claim": "15 元动作必须有语义有效的 frame_delta；记录只追加且可重放",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_workspace.py",
+          "test_ritual_reframe_is_rejected"
+        ],
+        [
+          "test_cognition_workspace.py",
+          "test_replay_reproduces_state"
+        ]
+      ],
+      "reverse_fixture": "只换词不换问题（before==after digest）→ 拒绝（test_ritual_reframe_is_rejected）",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_workspace"
+      ]
+    },
+    {
+      "id": "C-09",
+      "module": "cognition-control",
+      "claim": "11 元算子只改过程面、必须带 witness 且真改状态；同 witness 连续三次判仪式化",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_control.py",
+          "test_ritual_observe_is_rejected_on_third"
+        ],
+        [
+          "test_cognition_control.py",
+          "test_plane_violation_is_rejected"
+        ]
+      ],
+      "reverse_fixture": "算子写 discourse 字段（越界）/ 无 witness / 假动作 → 全拒",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_control"
+      ]
+    },
+    {
+      "id": "C-10",
+      "module": "cognition-claims",
+      "claim": "判据三层注册表 + 主张编译出证据义务清单；缺 witness 只能 unknown，不出聚合分",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_claims.py",
+          "test_missing_witness_is_unknown_not_pass"
+        ],
+        [
+          "test_cognition_claims.py",
+          "test_aggregate_score_key_is_rejected"
+        ]
+      ],
+      "reverse_fixture": "注册表出现 score 键 / 角色升级 → 拒（test_aggregate_score_key_is_rejected）",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_claims"
+      ]
+    },
+    {
+      "id": "C-11",
+      "module": "atom-catalog",
+      "claim": "原子目录 v2 派生不改 v1；A1–A5 不变量可判；新增死码 fail-closed、存量记债",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_atom_catalog.py",
+          "test_a4_new_dead_atom_fails_closed"
+        ],
+        [
+          "test_atom_catalog.py",
+          "test_build_does_not_mutate_v1"
+        ]
+      ],
+      "reverse_fixture": "新增无人引用原子 → 违规（test_a4_new_dead_atom_fails_closed）",
+      "evidence": [
+        "python scripts/atom_invariants.py --check"
+      ]
+    },
+    {
+      "id": "C-12",
+      "module": "cognition-bridge",
+      "claim": "commitment 是两核唯一共享对象；cc 失败必须真的触发认知侧动作；fail-closed 不留半成品",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_bridge.py",
+          "test_apply_obligation_touches_control_only"
+        ],
+        [
+          "test_cognition_bridge.py",
+          "test_fail_then_revise_then_pass"
+        ]
+      ],
+      "reverse_fixture": "cc 缺 verdict → 抛错且状态不变；回灌篡改 → 拒",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_bridge"
+      ]
+    },
+    {
+      "id": "C-13",
+      "module": "architecture",
+      "claim": "依赖方向双向隔离（认知核↔契约核）；ADR 与 16 份文档台账单一真源",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_architecture_layers.py",
+          "test_reverse_fixture_is_caught"
+        ],
+        [
+          "test_architecture_layers.py",
+          "test_duplicate_current_topic_is_rejected"
+        ]
+      ],
+      "reverse_fixture": "假源码 import 契约核 → 必被 AST 判据抓（test_reverse_fixture_is_caught）",
+      "evidence": [
+        "python scripts/adr_check.py --check"
+      ]
+    },
+    {
+      "id": "C-14",
+      "module": "mcp-manifest",
+      "claim": "MCP 兼容头：扩展字段全在 _meta；签名须钉根；吊销即拒；调用回执可重放且跨适配器同源",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_mcp_manifest.py",
+          "test_wrong_seed_fails_against_pinned_root"
+        ],
+        [
+          "test_mcp_manifest.py",
+          "test_revoked_tool_is_blocked"
+        ]
+      ],
+      "reverse_fixture": "换种子重签 + 钉根 → 必红（test_wrong_seed_fails_against_pinned_root）",
+      "evidence": [
+        "python scripts/mcp_manifest.py --check"
+      ]
+    },
+    {
+      "id": "C-15",
+      "module": "job-ledger",
+      "claim": "6 态作业 + 只追加事件链 + 终态后不可追加 + 启动自检 safe 拒写",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_job_ledger.py",
+          "test_terminal_blocks_receipts"
+        ],
+        [
+          "test_job_ledger.py",
+          "test_safe_mode_blocks_writes"
+        ]
+      ],
+      "reverse_fixture": "终态后挂回执 → 拒；坏 JSON → safe 且写面拦截",
+      "evidence": [
+        "python -m unittest desktop.tests.test_job_ledger"
+      ]
+    },
+    {
+      "id": "C-16",
+      "module": "cognition-core",
+      "claim": "认知核可独立跑（不 import 契约核）",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_cognition_workspace.py",
+          "test_no_contract_core_imports"
+        ],
+        [
+          "test_architecture_layers.py",
+          "test_cognition_core_does_not_import_contract_core"
+        ]
+      ],
+      "reverse_fixture": "给假源码 import meta_cockpit → 必红",
+      "evidence": [
+        "python -m unittest desktop.tests.test_architecture_layers"
+      ]
+    },
+    {
+      "id": "D-01",
+      "module": "atom-catalog",
+      "claim": "33 原子中 12 个当前无人引用（存量死码）",
+      "status": "debt",
+      "debt": "已记 protocol/criteria/atom_debt.json（15 条含 12 死码），逐条给接入计划；A4 对存量降级为 warning",
+      "criteria": [
+        [
+          "test_atom_catalog.py",
+          "test_a4_debt_becomes_warning"
+        ]
+      ],
+      "reverse_fixture": "新增死码（不在债里）→ 违规 fail-closed",
+      "evidence": [
+        "python scripts/atom_invariants.py --json"
+      ]
+    },
+    {
+      "id": "D-02",
+      "module": "atom-catalog",
+      "claim": "composed_of 仍全空（原子组合关系未建立）",
+      "status": "debt",
+      "debt": "A1 因此平凡通过；需在 P4 后续轮次为至少 8 个复合原子补 composed_of，并让 A1 真正有内容可查",
+      "criteria": [
+        [
+          "test_atom_catalog.py",
+          "test_current_state_passes"
+        ]
+      ],
+      "reverse_fixture": "composed_of 引用不存在/成环 → 违规",
+      "evidence": [
+        "python scripts/atom_invariants.py --json"
+      ]
+    },
+    {
+      "id": "D-03",
+      "module": "cognition-bridge",
+      "claim": "桥只做到 commitment + 回灌；cc_attest → receipt 的自动化尚未接线",
+      "status": "debt",
+      "debt": "cc 侧 attest/receipt 由 CLI 手动调用；桥闭环测试用合成 cc 结果，未接真实 nf evidence 输出",
+      "criteria": [
+        [
+          "test_cognition_bridge.py",
+          "test_fail_then_revise_then_pass"
+        ]
+      ],
+      "reverse_fixture": "cc 缺 verdict → fail-closed",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_bridge"
+      ]
+    },
+    {
+      "id": "D-04",
+      "module": "mcp-manifest",
+      "claim": "工具面派生用内置 5 个工具示例，未直连 mcp_runtime.TOOL_DEFS 真实清单",
+      "status": "debt",
+      "debt": "接真实 TOOL_DEFS 需要改 serve 启动路径，留到 P6 Ingress 一起做",
+      "criteria": [
+        [
+          "test_mcp_manifest.py",
+          "test_build_keeps_mcp_top_level_only"
+        ]
+      ],
+      "reverse_fixture": "顶层出现非 MCP 字段 → 拒",
+      "evidence": [
+        "python scripts/mcp_manifest.py --json"
+      ]
+    },
+    {
+      "id": "D-05",
+      "module": "evaluation",
+      "claim": "P7 预注册评测（free/menu/hybrid/workspace）与外部盲评尚未开始",
+      "status": "debt",
+      "debt": "评测协议需先入库再跑（防事后挑指标）；本仓目前只有 craft/standard 两层可自证",
+      "criteria": [
+        [
+          "test_cognition_claims.py",
+          "test_review_layer_never_passes_internally"
+        ]
+      ],
+      "reverse_fixture": "review 层在本仓内产出 pass → 判据红",
+      "evidence": [
+        "python -m unittest desktop.tests.test_cognition_claims"
+      ]
+    }
+  ]
+}

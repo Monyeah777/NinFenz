@@ -56,6 +56,7 @@
     "test_cli_harness_equivalence": 1.1,
     "test_cli_json_face": 132.9,
     "test_cli_trust_meta": 0.8,
+    "test_closure": 12.1,
     "test_closure_scan": 0.4,
     "test_code_metrics": 1.2,
     "test_cognition": 0.2,
@@ -950,6 +951,20 @@
     "test_cli_trust_meta.CliTrustMetaTest.test_in_repo_practice_pack_is_not_marked": 0.34,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_json_carries_meta": 0.17,
     "test_cli_trust_meta.CliTrustMetaTest.test_library_show_marks_external_content": 0.17,
+    "test_closure.LedgerTest.test_every_closed_entry_has_criteria": 0.62,
+    "test_closure.LedgerTest.test_every_debt_entry_has_reason": 0.61,
+    "test_closure.LedgerTest.test_ledger_has_entries": 0.61,
+    "test_closure.LedgerTest.test_ledger_is_valid": 1.25,
+    "test_closure.LedgerTest.test_summary_counts": 0.87,
+    "test_closure.ReferenceTest.test_all_criteria_exist": 1.66,
+    "test_closure.ReferenceTest.test_bad_evidence_is_caught": 0.87,
+    "test_closure.ReferenceTest.test_closed_without_criteria_is_caught": 0.79,
+    "test_closure.ReferenceTest.test_debt_without_reason_is_caught": 0.78,
+    "test_closure.ReferenceTest.test_duplicate_id_is_caught": 0.82,
+    "test_closure.ReferenceTest.test_missing_file_is_caught": 0.89,
+    "test_closure.ReferenceTest.test_missing_method_is_caught": 0.83,
+    "test_closure.ScriptTest.test_human_output_mentions_debt": 0.68,
+    "test_closure.ScriptTest.test_report_is_reproducible": 0.69,
     "test_closure_scan.ClosureScanTest.test_orphan_side_reporting": 0.13,
     "test_closure_scan.ClosureScanTest.test_repo_scan_deterministic": 0.1,
     "test_code_metrics.BaselineFileTest.test_committed_baseline_is_valid_json_with_core_entries": 0.0,
@@ -4312,5 +4327,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1504.6
+  "total_s": 1516.7
 }

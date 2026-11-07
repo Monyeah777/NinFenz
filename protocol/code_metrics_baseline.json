@@ -195,6 +195,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 23
     },
+    "desktop/src/core/closure.py": {
+      "lines": 127,
+      "max_fn_cc": 32,
+      "max_fn_lines": 54
+    },
     "desktop/src/core/closure_scan.py": {
       "lines": 76,
       "max_fn_cc": 8,
@@ -1484,6 +1489,11 @@
       "lines": 139,
       "max_fn_cc": 5,
       "max_fn_lines": 37
+    },
+    "scripts/closure_audit.py": {
+      "lines": 101,
+      "max_fn_cc": 10,
+      "max_fn_lines": 45
     },
     "scripts/code_metrics.py": {
       "lines": 81,

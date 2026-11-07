@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "K1/K4/K8 收口",
+  "note": "P7 闭包审计收口",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "6b46204823bec5a7e71646451f39c783362c819c8af64d55d0143a2268927db5"
+  "subject_digest": "5ec53b9a28d7cc53031b57b5e34c3a082f33ce39d84e86347d460f9e656ff5f5"
 }
