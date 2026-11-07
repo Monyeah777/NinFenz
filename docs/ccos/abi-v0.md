@@ -111,6 +111,11 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
   **法规原文 → 意图**仍需人写——这是编译器 v0 的边界，不假装有语义层。
 - **研究层（2026-11-07 起）**：nf cognition --plan <主题> 把「深入钻研」展开为七切片 + 八方法论路径 + 证据台账，
   与 nf check --intent-from-text 共用同一套封闭词表；规格见 [research-methods-v0.md](research-methods-v0.md)。
+- **认知工作台 L0（2026-11-08 起）**：nf cog begin|step|replay|diff|moves|status——话语状态 + 15 元动作 + 只追加记录 + 重放；
+  每步必须带 frame_delta（框架变化见证），没有实际变化的动作直接拒绝；记录链可复算，篡改必被抓。
+- **元算子面（2026-11-08 起）**：nf cog ops|control|triggers——11 算子只改过程（策略/预算/中止/焦点），
+  每算子必须带 witness 且必须真改状态；同一 witness 连续三次判「仪式化」拒绝；stop/abstain 真终止会话。
+  依赖方向：core/cognition_workspace/ 不 import 契约核（有 AST 判据守）。
 - **文本层（2026-11-07 起）**：`nf check --intent-from-text <法规.txt>` 做**规则抽取**草稿
   （`nf-check-intent-draft/1`）——按条切分 + 封闭关键词 → 可编译规则；能抽的参数
   （引号内文字、数字）就抽，抽不到的进 `pending`，需要能力才判的进 `unsupported`，
