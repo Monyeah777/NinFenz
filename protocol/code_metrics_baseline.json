@@ -345,6 +345,11 @@
       "max_fn_cc": 40,
       "max_fn_lines": 66
     },
+    "desktop/src/core/ed25519.py": {
+      "lines": 169,
+      "max_fn_cc": 7,
+      "max_fn_lines": 16
+    },
     "desktop/src/core/effect_rows.py": {
       "lines": 121,
       "max_fn_cc": 16,
@@ -1111,9 +1116,9 @@
       "max_fn_lines": 4
     },
     "desktop/src/core/revocations.py": {
-      "lines": 323,
-      "max_fn_cc": 26,
-      "max_fn_lines": 94
+      "lines": 366,
+      "max_fn_cc": 36,
+      "max_fn_lines": 122
     },
     "desktop/src/core/rfc.py": {
       "lines": 107,
@@ -1501,7 +1506,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8624,
+      "lines": 8673,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

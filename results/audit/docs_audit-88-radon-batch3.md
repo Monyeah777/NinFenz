@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
+  - protocol/code_metrics_baseline.json:74509379350e92447c6d37ac49940a1d7489de030c3f43fd2c24dc6f7cd40131
 ---
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
+
 > 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
 
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）

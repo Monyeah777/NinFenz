@@ -429,5 +429,91 @@ class TestMergeFreshness(unittest.TestCase):
         self.assertEqual(2, res["table"]["count"], "表 schema 与并集语义不变")
 
 
+class Ed25519FeedTest(unittest.TestCase):
+    """非对称吊销面：验证方只持公钥——拿到验证能力不等于拿到伪造能力。
+
+    这是跨组织吊销成立的前提：hmac 把密钥给出去就等于把伪造权给出去。
+    """
+
+    SEED = bytes(range(32))
+
+    def setUp(self):
+        self.rv = _rv()
+
+    def _feed(self, **kw):
+        table = self.rv.make_table([{"digest": "a" * 64, "reason": "文案违规"}])
+        return self.rv.sign(table, self.SEED, issuer="org-a", seq=1, scheme=self.rv.ALG_ED25519,
+                       issued_at="2026-11-07T00:00:00Z", **kw)
+
+    def test_sign_then_verify_with_public_key(self):
+        from core import ed25519
+        feed = self._feed()
+        self.assertEqual(self.rv.ALG_ED25519, feed["signature"]["alg"])
+        self.assertEqual(ed25519.public_key(self.SEED).hex(), feed["signature"]["pub"])
+        res = self.rv.verify(feed, key=ed25519.public_key(self.SEED))
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual(self.rv.ALG_ED25519, res["scheme"])
+
+    def test_wrong_public_key_is_invalid(self):
+        from core import ed25519
+        feed = self._feed()
+        res = self.rv.verify(feed, key=ed25519.public_key(bytes(32)))
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("公钥" in i for i in res["issues"]))
+
+    def test_tampered_body_is_invalid(self):
+        from core import ed25519
+        feed = self._feed()
+        feed["table"]["revoked"].append({"digest": "b" * 64})
+        res = self.rv.verify(feed, key=ed25519.public_key(self.SEED))
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("ed25519 签名不匹配" in i for i in res["issues"]))
+
+    def test_missing_public_key_is_fail_closed(self):
+        res = self.rv.verify(self._feed())
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("缺公钥不降级" in i for i in res["issues"]))
+
+    def test_seed_as_key_is_rejected(self):
+        """把 32 字节种子当公钥给：长度一样但必然验不过——要给出「别把种子当公钥」的指引。"""
+        res = self.rv.verify(self._feed(), key=self.SEED)
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("公钥" in i for i in res["issues"]))
+
+    def test_scheme_must_be_known(self):
+        table = self.rv.make_table([{"digest": "a" * 64}])
+        with self.assertRaises(ValueError) as ctx:
+            self.rv.sign(table, self.SEED, scheme="rsa-2048")
+        self.assertIn("不支持", str(ctx.exception))
+
+    def test_ed25519_requires_32_byte_seed(self):
+        table = self.rv.make_table([{"digest": "a" * 64}])
+        with self.assertRaises(ValueError) as ctx:
+            self.rv.sign(table, b"short", scheme=self.rv.ALG_ED25519)
+        self.assertIn("32 字节", str(ctx.exception))
+
+    def test_hmac_path_unchanged(self):
+        table = self.rv.make_table([{"digest": "a" * 64}])
+        feed = self.rv.sign(table, b"shared-secret")
+        self.assertEqual(self.rv.ALG, feed["signature"]["alg"])
+        self.assertTrue(self.rv.verify(feed, key=b"shared-secret")["ok"])
+
+    def test_chain_still_checked_for_ed25519(self):
+        from core import ed25519
+        pub = ed25519.public_key(self.SEED)
+        first = self._feed()
+        second = self.rv.sign(self.rv.make_table([{"digest": "c" * 64}]), self.SEED, issuer="org-a",
+                         seq=2, prev=first, scheme=self.rv.ALG_ED25519,
+                         issued_at="2026-11-08T00:00:00Z")
+        self.assertTrue(self.rv.verify(second, key=pub, prev=first)["ok"])
+        # 跳号：第三份必须紧接第二份，接在第一份后面判死（链检查对 ed25519 同样生效）
+        third = self.rv.sign(self.rv.make_table([{"digest": "d" * 64}]), self.SEED,
+                             issuer="org-a", seq=3, prev=first, scheme=self.rv.ALG_ED25519,
+                             issued_at="2026-11-09T00:00:00Z")
+        res = self.rv.verify(third, key=pub, prev=first)
+        self.assertFalse(res["ok"], "跳号仍须判死")
+        self.assertTrue(any("序号不连续" in i for i in res["issues"]), res["issues"])
+
+
 if __name__ == "__main__":
     unittest.main()

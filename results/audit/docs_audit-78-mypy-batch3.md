@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
+  - protocol/code_metrics_baseline.json:74509379350e92447c6d37ac49940a1d7489de030c3f43fd2c24dc6f7cd40131
 ---
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
+
 > 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
 
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）

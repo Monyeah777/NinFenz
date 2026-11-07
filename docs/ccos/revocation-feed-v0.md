@@ -59,6 +59,32 @@ nf evidence verify bundle.zip --revocations f3.json
 nf evidence verify bundle.zip --revocations f3.json --require-fresh-revocations   # 表不新鲜即 invalid
 ```
 
+### 非对称签名（ed25519，2026-11-07 起）
+
+hmac-sha256 是**对称**的：把验证能力交给别人，就等于把伪造能力一起交出去——跨组织时「谁吊销的」
+不成立。现在可以用 ed25519：发布方持 32 字节种子、只把 **32 字节公钥**交给验证方。
+
+```bash
+# 发布方：生成种子（一次），导出公钥交给验证方
+openssl rand -out seed.bin 32
+nf evidence revocations pubkey seed.bin                 # 打印 32 字节公钥（hex）
+
+# 发布方：用种子签（签名确定性：同 key+msg 永远同字节，故可进向量集）
+nf evidence revocations sign --table table.json --key-file seed.bin \
+    --scheme ed25519 --issuer acme --seq 1 --out f1.json
+
+# 验证方：只持公钥即可验（缺公钥 fail-closed，不降级）
+nf evidence revocations verify f1.json --key-file pub.bin
+```
+
+- 签名体仍是「除 `signature` 外全部字段」的规范字节；`signature = {alg: ed25519, pub, sig}`——
+  声明里的 `pub` 与验证方给的公钥不一致即 invalid（换密钥必须重签，不能只改声明）。
+- 实现是**纯标准库**（`core/ed25519.py`，RFC 8032），判据含 RFC 黄金向量（TEST 1）与和
+  `cryptography` 库的交叉验证（该库不在场时跳过，不冒充已验）。
+- hmac 路径完全保留（本机/单组织场景仍最省事）；两种方案在同一个 `verify()` 里按 `alg` 分派。
+
+边界不变：公钥**分发**本身没有信任锚（谁换掉公钥谁就能造「合法」吊销）——那需要证书链/透明日志，
+本季不做，见威胁模型 G2。
 ## 判定（可证）
 
 | 检查 | 不过 |

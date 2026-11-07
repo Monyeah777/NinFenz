@@ -27,6 +27,8 @@ ZERO = "0" * 64
 GUIDE = "修复指引："
 #: 签名算法（v0 只有一种；不是协商面）
 ALG = "hmac-sha256"
+#: 非对称方案：跨组织时验证方只持公钥，不因此获得伪造能力。
+ALG_ED25519 = "ed25519"
 #: ttl 上限（1 年）：比这更长就不是「缓存窗口」，而是「永不过期」的伪装
 MAX_TTL = 31536000
 #: 新鲜度词表（只进输出，不进四词判定；严格开关才升级成 invalid）
@@ -146,7 +148,7 @@ def _shape_issues(doc: dict[str, Any]) -> list[str]:
 def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
          prev: dict[str, Any] | None = None, issued_at: str = "",
          expires_at: str = "", ttl: int | None = None,
-         status_uri: str = "") -> dict[str, Any]:
+         status_uri: str = "", scheme: str = ALG) -> dict[str, Any]:
     """把表包成签名 feed（seq 单调递增；prev 给出上一份 feed 以接链）。
 
     `expires_at` / `ttl` / `status_uri` 是**可选**新鲜度与分发指针字段：只在给出时写入
@@ -155,6 +157,13 @@ def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
     """
     if not isinstance(key, bytes) or not key:
         raise ValueError("签名需要密钥（" + GUIDE + "请用 --key-file 指一个非空密钥文件）")
+    if scheme not in (ALG, ALG_ED25519):
+        raise ValueError(f"签名方案不支持：{scheme!r}（" + GUIDE +
+                         f"只支持 {ALG} 或 {ALG_ED25519}）")
+    if scheme == ALG_ED25519 and len(key) != 32:
+        raise ValueError("Ed25519 签名需要 32 字节种子（" + GUIDE +
+                         "用 openssl rand -out seed.bin 32 生成；公钥用 nf evidence "
+                         "revocations pubkey 导出）")
     if int(seq) < 0:
         raise ValueError("seq 必须是非负整数（" + GUIDE + "首份用 0 或 1，之后逐份 +1）")
     stamp = issued_at or attest.issue_stamp()
@@ -182,8 +191,14 @@ def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
         base["ttl"] = int(ttl)
     if status_uri:
         base["status_uri"] = str(status_uri)
-    mac = hmac.new(key, canonical_bytes(base), hashlib.sha256).hexdigest()
-    base["signature"] = {"alg": ALG, "mac": mac}
+    payload = canonical_bytes(base)
+    if scheme == ALG_ED25519:
+        from core import ed25519 as _ed
+        base["signature"] = {"alg": ALG_ED25519, "pub": _ed.public_key(key).hex(),
+                             "sig": _ed.sign(key, payload).hex()}
+    else:
+        mac = hmac.new(key, payload, hashlib.sha256).hexdigest()
+        base["signature"] = {"alg": ALG, "mac": mac}
     return base
 
 
@@ -252,18 +267,46 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
     sig = doc.get("signature")
     if isinstance(sig, dict) and sig:
         res["signed"] = True
-        if sig.get("alg") != ALG:
-            res["issues"].append(f"签名算法不支持：{sig.get('alg')!r}（" + GUIDE +
-                                 f"v0 只认 {ALG}）")
-            return res
-        if key is None:
-            res["issues"].append("feed 已签名但没给密钥（" + GUIDE +
-                                 "缺密钥不降级：请用签发方密钥 --key-file 校验，"
-                                 "或只把它当形状核对）")
-            return res
-        want = hmac.new(key, canonical_bytes(body(doc)), hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(want, str(sig.get("mac") or "")):
-            res["issues"].append("签名不匹配（" + GUIDE + "内容被改过或密钥不对——两者都不可信）")
+        alg = str(sig.get("alg") or "")
+        if alg == ALG_ED25519:
+            res["scheme"] = ALG_ED25519
+            if key is None:
+                res["issues"].append("feed 用 ed25519 签名但没给公钥（" + GUIDE +
+                                     "缺公钥不降级：--key-file 指 32 字节公钥文件）")
+                return res
+            if len(key) != 32:
+                res["issues"].append(f"ed25519 校验需要 32 字节公钥（{GUIDE}"
+                                     f"现在是 {len(key)} 字节——别把种子当公钥给）")
+                return res
+            from core import ed25519 as _ed
+            announced = str(sig.get("pub") or "")
+            if announced and announced != key.hex():
+                res["issues"].append("feed 声明的公钥与给定公钥不一致（" + GUIDE +
+                                     "换密钥必须重签，不能只改声明）")
+                return res
+            try:
+                raw = bytes.fromhex(str(sig.get("sig") or ""))
+            except ValueError:
+                res["issues"].append("ed25519 签名不是合法十六进制（" + GUIDE + "重签）")
+                return res
+            if not _ed.verify(key, canonical_bytes(body(doc)), raw):
+                res["issues"].append("ed25519 签名不匹配（" + GUIDE +
+                                     "内容被改过或公钥不对——两者都不可信）")
+                return res
+        elif alg == ALG:
+            if key is None:
+                res["issues"].append("feed 已签名但没给密钥（" + GUIDE +
+                                     "缺密钥不降级：请用签发方密钥 --key-file 校验，"
+                                     "或只把它当形状核对）")
+                return res
+            want = hmac.new(key, canonical_bytes(body(doc)), hashlib.sha256).hexdigest()
+            if not hmac.compare_digest(want, str(sig.get("mac") or "")):
+                res["issues"].append("签名不匹配（" + GUIDE +
+                                     "内容被改过或密钥不对——两者都不可信）")
+                return res
+        else:
+            res["issues"].append(f"签名算法不支持：{alg!r}（" + GUIDE +
+                                 f"只认 {ALG} 或 {ALG_ED25519}）")
             return res
     else:
         res["warnings"].append("feed 未签名：形状可判、来源与防回滚都判不了（" + GUIDE +

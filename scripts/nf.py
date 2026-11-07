@@ -700,7 +700,10 @@ def _add_parser_revocations(esub):
                            description="签名：对「除 signature 外」的规范化字节求 hmac-sha256。"
                                        "seq 单调递增；--prev 接上一份 feed（防回滚/分叉）。")
     rvs.add_argument("--table", required=True, help="要签的 nf-revocation/1 表 JSON")
-    rvs.add_argument("--key-file", required=True, help="签名密钥文件（文本或字节，取非空内容）")
+    rvs.add_argument("--key-file", required=True,
+                     help="签名密钥文件：hmac 取非空内容；ed25519 取 32 字节种子")
+    rvs.add_argument("--scheme", default="", choices=("", "hmac-sha256", "ed25519"),
+                     help="签名方案（缺省 hmac-sha256；ed25519 是非对称——验证方只持公钥）")
     rvs.add_argument("--issuer", default="", help="签发方标识（写进 feed）")
     rvs.add_argument("--seq", type=int, default=1, help="单调递增序号（首份 1，之后 +1）")
     rvs.add_argument("--prev", default="", help="上一份 feed JSON（接链；首份省略）")
@@ -712,6 +715,13 @@ def _add_parser_revocations(esub):
                      help="分发指针（非空字符串；仅记录，本仓不联网去取）")
     rvs.add_argument("--out", default="", help="输出 feed（缺省=只打印）")
     rvs.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvp = rvsub.add_parser("pubkey",
+                           help="从 32 字节 ed25519 种子导出公钥（发布方给出、验证方保存）",
+                           description="导出公钥：种子留在发布方，公钥给验证方——"
+                                       "这就是「拿到验证能力不等于拿到伪造能力」。")
+    rvp.add_argument("revocations_seed", metavar="SEED",
+                     help="32 字节种子文件（字节原样读，别用会带换行的文本写入）")
+    rvp.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvv = rvsub.add_parser("verify", help="校验 feed（签名 + 序号 + 前序链）",
                            description="校验：schema/seq/prev_digest/table 形状 + 签名（有则必过）+ 前序链。"
                                        "退出码：ok=0 / invalid=1 / 用法错=4。")
@@ -3524,6 +3534,8 @@ def _cmd_revocations(args):
     sub = getattr(args, "revocations_cmd", "") or ""
     if sub == "sign":
         return _revocations_sign(args)
+    if sub == "pubkey":
+        return _revocations_pubkey(args)
     if sub == "verify":
         return _revocations_verify(args)
     if sub == "merge":
@@ -3556,6 +3568,32 @@ def _revocations_write(args, doc: dict, out: str) -> str:
     return _rel_display(dest)
 
 
+def _revocations_pubkey(args):
+    """从 32 字节 ed25519 种子导出公钥（种子不出发布方）。"""
+    import json as _json
+
+    from core import ed25519
+    path = _rel_out(args.revocations_seed)
+    try:
+        with open(path, "rb") as fh:
+            seed = fh.read()
+    except OSError as exc:
+        return _machine_fail(args, f"读不到种子文件：{exc}", 4)
+    try:
+        pub = ed25519.public_key(seed)
+    except ValueError as exc:
+        return _machine_fail(args, str(exc), 4)
+    if args.json:
+        print(_json.dumps({"kind": "revocations-pubkey", "pubkey": pub.hex(),
+                           "scheme": "ed25519"}, ensure_ascii=False, indent=2,
+                          sort_keys=True))
+    else:
+        print(f"== nf evidence revocations pubkey（{_rel_display(path)}）==")
+        print(f"  公钥（hex，32 字节）：{pub.hex()}")
+        print("  把这段公钥交给验证方；种子留在发布方，别随 feed 分发")
+    return 0
+
+
 def _revocations_sign(args):
     """签名：nf-revocation/1 表 → 签名 feed。"""
     import json as _json
@@ -3566,8 +3604,10 @@ def _revocations_sign(args):
         table = _revocations_load(args, args.table)
         prev = _revocations_load(args, args.prev) if args.prev else None
         key = attest.read_key_file(_rel_out(args.key_file))
+        scheme = args.scheme or rv.ALG
         feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev,
-                       expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri)
+                       expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri,
+                       scheme=scheme)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     shown = _revocations_write(args, feed, args.out)
@@ -3595,7 +3635,16 @@ def _revocations_verify(args):
     try:
         doc = _revocations_load(args, args.revocation_feed)
         prev = _revocations_load(args, args.prev) if args.prev else None
-        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        key = None
+        if args.key_file:
+            sig = doc.get("signature") if isinstance(doc, dict) else None
+            alg = str((sig or {}).get("alg") or "") if isinstance(sig, dict) else ""
+            if alg == rv.ALG_ED25519:
+                # ed25519 公钥是**32 字节原始值**：不能 strip（末尾字节可能是空白）
+                with open(_rel_out(args.key_file), "rb") as fh:
+                    key = fh.read()
+            else:
+                key = attest.read_key_file(_rel_out(args.key_file))
         res = rv.verify(doc, key=key, prev=prev, at=args.at)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
