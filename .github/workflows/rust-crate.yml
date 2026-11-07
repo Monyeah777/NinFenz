@@ -1,0 +1,47 @@
+name: rust-crate
+# Rust 主 crate（`engine/rust`，nf-rs）的编译 + 单测面。
+#
+# 为什么单独一条（2026-11-08 盲区收口）：旧 `rust-parity.yml` 退役后，主 crate 不再被任何
+# workflow 构建/测试（`cross-lang.yml` 只 build `engine/rust/canonical` 的 parity crate）。
+# 主 crate 里 249 条单测含多条「与 Python 真源逐字节对账」的 oracle（depth_scan / asset_contract /
+# pack_combo / output_forms…），没有 CI 面等于这些 oracle 只在作者机器上跑过。
+#
+# 口径：与旧 rust-parity 的 cargo-test 同档（`--release`，与对拍/门禁的优化档一致）；
+# 依赖 Cargo.lock，用 `--locked` 防依赖漂移；失败时上传日志供诊断（不写仓库）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rust-crate-tests:
+    name: rust-crate-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（rust：runner 预装；只记录版本，不联网更新）
+        run: |
+          rustc --version
+          cargo --version
+      - name: 主 crate 单测（release 档：249 条 oracle 与对拍同口径）
+        run: |
+          set -o pipefail
+          cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
+      - name: 失败诊断产物（本 run 日志；无则跳过）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: rust-crate-test-log
+          path: rust-crate-test.log
+          if-no-files-found: warn
