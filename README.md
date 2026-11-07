@@ -1,7 +1,5 @@
 # NinFenz · 文档生成工坊（规范驱动）<sub>Spec-driven documentation workshop</sub>
 
-[![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
-
 <!-- nf:locales -->
 <p align="center">
   <strong><a href="README.md">简体中文</a></strong> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本语</a>
@@ -13,7 +11,7 @@
   <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="已收录于 Awesome MCP Servers" height="20"></a>
 </p>
 
-> **唯一官方仓库**：https://github.com/Monyeah777/NinFenz ｜ 官方 npm 包：`ninfenz`
+> **唯一官方仓库**：https://github.com/Monyeah777/NinFenz ｜ npm `ninfenz` ｜ GitHub Packages `@monyeah777/ninfenz`
 > 其他账号下的同名仓库均为**未经授权的镜像快照**，不代表本项目，也不接受 Issue/PR。
 
 **站点（线上）**：https://ninfenz.dev · 机器入口 [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
@@ -61,7 +59,7 @@
 （无 TTY 亦可：`--list-actions --json` 给 agent 列动作与退出码）。命令在后台线程跑，运行中 `Ctrl-C` 只取消该命令；
 路径参数过仓库包含性判据、写盘需键入 `yes` 确认、密钥只从环境变量读并遮蔽显示。细节见 `tui/README.md`。
 
-> 双许可（分层）· 代码 AGPL-3.0-only 或商业许可 · 协议文本 CC BY 4.0 · 见 `LICENSING.md`
+> MIT License · 原创开源 · 衍生/引用请注明来源
 
 NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质量与资产标准；协议本身域中立、模型无关。
 
@@ -112,7 +110,7 @@ AI 装配：
 - **支持哪些模型？** 模型无关：任何能读文本的 AI 都能按协议装配与装载，不绑定某家模型或某个连接协议。
 - **必须联网吗？** 不必。仓库本身就是 markdown 源件；`bash verify.sh` 只读本地，可离线跑。
 - **产出怎么判合格？** 判据只来自内部链：verify 门禁（静态可核）+ 五维纵深自评 + 真实战例；外部评价不作为质量背书。
-- **怎么引用？** 代码层 AGPL-3.0-only（或商业许可），协议文本 CC BY 4.0；引用请注明来源，边界见 `LICENSING.md`，机读元数据见 `CITATION.cff`。
+- **怎么引用？** MIT 许可；引用请注明来源，机读元数据见仓库根引用文件（`CITATION.cff`）。
 - **出口与合规？** 密码学只走标准库 + 外部 `ssh-keygen`（不自制算法）；出口管制读法见 `docs/EXPORT.md`。
 
 ## 能力与资产
@@ -142,10 +140,10 @@ AI 装配：
 
 ## 版本
 
-现在安装就是 **`ninfenz` 1.1.2**（npm 正式源已发布，`mcpName` 已与官方 MCP Registry 对齐）：
+现在安装就是 **`ninfenz` 1.0.5**（npm 与 GitHub Packages 同步发布），装上即可用：
 
 ```bash
-npm i -g ninfenz@latest --registry https://registry.npmjs.org   # 装或升级（避开滞后镜像）
+npm i -g ninfenz@latest   # 装或升级
 nf --version             # 看当前版本
 nf stats                 # 看门禁与仓库状态
 ```
@@ -154,13 +152,18 @@ nf stats                 # 看门禁与仓库状态
 
 | 线 | 当前 | 这条线管什么 |
 |---|---|---|
-| **内容与协议** | **v2.30.0** | 文档模板、领域包、规范本身 —— 决定「能生成什么」 |
-| **命令行工具** | **1.1.2** | `nf` 命令 / npm 包 / MCP 服务 —— 决定「怎么用」 |
+| **内容与协议** | **v0.93** | 文档模板、领域包、规范本身 —— 决定「能生成什么」 |
+| **命令行工具** | **1.0.5** | `nf` 命令 / npm 包 / MCP 服务 —— 决定「怎么用」 |
 | **质量门禁** | 见 `nf stats` | 仓库自检通过情况 —— 决定「有没有改坏」 |
 
-当前门禁发布为 **v2.30.0**；逐版变更、证据与发布说明以 `CHANGELOG.md`
-和 GitHub Releases 为准，不在 README 复制易漂移的版本流水。
+最近三版内容线，按**加了什么功能**排（不是按编号堆）：
 
-发版规则：内容线使用 `v2.x` 标签；CLI 线独立按语义版本编号；
+| 版本 | 时间 | 这一版加了什么 |
+|---|---|---|
+| v0.93 | 2026-10-05 | 知识层检索、终端形态、数字资产契约（资产可跨项目复用） |
+| v0.92 | 2026-09-10 | 世界状态模型：确定性抽象状态 + 槽位（同一输入必得同一输出） |
+| v0.82 | 2026-09-09 | 质量纵深 45 项 + 基础层 A 组收口 |
+
+发版规则（2026-10-20 起）：内容线用 `v0.xx` —— **小更新直接并进当前版**、稍有突破 **+0.01**、创新突破 **+0.1**；CLI 线 `1.0.x` 独立编号；
 每次发版同步写 `CHANGELOG.md`，tag 只打在**带功能的那次提交**上。
 

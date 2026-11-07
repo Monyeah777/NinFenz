@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cognition-pipeline/1",
+  "title": "NF Cognition Pipeline",
+  "description": "Composition contract for method nodes and adapters: typed edges, DAG, reachability, orphan-output and budget checks. Shape only; graph properties are enforced by the pipeline validator.",
+  "type": "object",
+  "required": ["schema", "id", "name", "entry", "exit", "nodes", "edges",
+               "budget_envelope", "conformance"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "cognition-pipeline/1"},
+    "id": {"type": "string", "pattern": "^认知:P[0-9]{2}$"},
+    "name": {"type": "string", "minLength": 1},
+    "entry": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "exit": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "nodes": {
+      "type": "array", "minItems": 1,
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "edges": {
+      "type": "array", "minItems": 1,
+      "items": {"$ref": "#/$defs/edge"}
+    },
+    "budget_envelope": {"type": "number", "exclusiveMinimum": 0},
+    "conformance": {"enum": ["L1", "L2"]}
+  },
+  "$defs": {
+    "port": {
+      "type": "object",
+      "required": ["token", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "token": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["object", "array", "string", "state", "event", "untyped"]}
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": ["id", "kind", "cost", "inputs", "outputs"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["method", "adapter"]},
+        "cost": {"type": "number", "minimum": 0},
+        "inputs": {"type": "array", "items": {"$ref": "#/$defs/port"}},
+        "outputs": {"type": "array", "items": {"$ref": "#/$defs/port"}}
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["from", "output", "to", "input", "kind", "fail_closed"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "output": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "input": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["object", "array", "string", "state", "event", "untyped"]},
+        "fail_closed": {"const": true}
+      }
+    }
+  }
+}

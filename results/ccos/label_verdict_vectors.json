@@ -1,0 +1,305 @@
+{
+  "count": 7,
+  "schema": "nf-abi-call-vectors/1",
+  "vectors": [
+    {
+      "desc": "minimal 档 E1+I2 齐备",
+      "expected": {
+        "level": "minimal",
+        "missing": [],
+        "ok": true,
+        "warnings": 0
+      },
+      "id": "minimal_ok",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "minimal",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    },
+    {
+      "desc": "minimal 档缺 E1",
+      "expected": {
+        "level": "minimal",
+        "missing": [
+          "E1"
+        ],
+        "ok": false,
+        "warnings": 0
+      },
+      "id": "minimal_missing_e1",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "minimal",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    },
+    {
+      "desc": "full 档缺 E2/I1（只有 E1、I2）",
+      "expected": {
+        "level": "full",
+        "missing": [
+          "E2",
+          "E3",
+          "I1"
+        ],
+        "ok": false,
+        "warnings": 0
+      },
+      "id": "full_missing_items",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "full",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    },
+    {
+      "desc": "standard 不是 GB 45438-2025",
+      "expected": {
+        "level": "minimal",
+        "missing": [],
+        "ok": false,
+        "warnings": 0
+      },
+      "id": "bad_standard",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "minimal",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 00000-1999"
+      }
+    },
+    {
+      "desc": "object.digest 不是 64 hex",
+      "expected": {
+        "level": "minimal",
+        "missing": [],
+        "ok": false,
+        "warnings": 0
+      },
+      "id": "bad_digest",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "minimal",
+        "object": {
+          "digest": "xyz",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    },
+    {
+      "desc": "carrier.embedded=true 只自称（warning）",
+      "expected": {
+        "level": "minimal",
+        "missing": [],
+        "ok": true,
+        "warnings": 1
+      },
+      "id": "carrier_embedded_warns",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": true,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "minimal",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    },
+    {
+      "desc": "level 非法",
+      "expected": {
+        "level": "none",
+        "missing": [],
+        "ok": false,
+        "warnings": 0
+      },
+      "id": "bad_level",
+      "ir": {
+        "boundary": "声明面",
+        "carrier": {
+          "embedded": false,
+          "producer": "vectors"
+        },
+        "contract": "",
+        "explicit": [
+          {
+            "face": "explicit",
+            "id": "E1",
+            "kind": "text",
+            "value": "AI 生成",
+            "where": "start"
+          }
+        ],
+        "implicit": [
+          {
+            "face": "implicit",
+            "id": "I2",
+            "key": "AIGC",
+            "kind": "metadata",
+            "value": "yes"
+          }
+        ],
+        "level": "ultra",
+        "object": {
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "path": "d/a.md"
+        },
+        "schema": "nf-label/1",
+        "standard": "GB 45438-2025"
+      }
+    }
+  ]
+}

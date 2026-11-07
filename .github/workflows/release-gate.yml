@@ -4,9 +4,6 @@ name: release-gate
 on:
   push:
     tags: ['v*']
-  # 注（2026-10-25）：曾加 workflow_dispatch 以便手动跑发布前体检，但既有判据对 release-gate
-  # 的触发面有约束（只在 tag 上跑），加手动触发会让 verify 判红；此处回退，保持 tag-only。
-  # 需提前验证时：本地跑 `bash verify.sh --full --no-cache` + `scripts/e2e_desktop_headless.py`。
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -44,14 +41,7 @@ jobs:
       - name: 端到端显式步（与 nf release 内嵌同源；失败即红，便于定位）
         run: python3 scripts/e2e_desktop_headless.py
       - name: 覆盖率门槛（core ≥80）
-        # `unittest discover -s desktop/tests` 以顶层模块导入 test_*，**不会执行** desktop/tests/__init__.py
-        # 的隔离兜底（它负责设 NARRATIVE_FORGE_HOME）⇒ test_suite_isolation 会红。故此处显式给隔离 home。
         run: |
-          # 运行时创建系统临时目录下的隔离 home：既满足 test_suite_isolation，
-          # 又避免把机器绝对路径写进公开 workflow（test_leak_surface）。
-          COV_HOME="$(mktemp -d)"
-          trap 'rm -rf "$COV_HOME"' EXIT
-          export NARRATIVE_FORGE_HOME="$COV_HOME"
           coverage run --source=desktop/src/core -m unittest discover -s desktop/tests
           coverage report --fail-under=80 --include="desktop/src/core/*"
 

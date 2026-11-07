@@ -100,8 +100,8 @@
     },
     {
       "description": "服务端点契约指向真实性",
-      "detail": "端点 8（status=proposed）",
-      "digest": "93c25c44f2a9afe2d1a66d516f5a351fb8965d344ceaef525738ffeb497f6f87",
+      "detail": "端点 11（status=proposed）",
+      "digest": "13dca0ac94a09cd27dabc5629a6efd7e8fb1edf39694537a561aaf1625403c22",
       "id": "endpoint-contract",
       "ok": true
     },
@@ -121,8 +121,8 @@
     },
     {
       "description": "内容建模三件（词表/规范说明件/数据契约）",
-      "detail": "词表 12 · 规范件 37 / 说明件 2401 · 数据契约 54",
-      "digest": "b095e1b3404f7bd3f5894bf1392940a92b7975780cdde41254414560072b6e2f",
+      "detail": "词表 12 · 规范件 37 / 说明件 2417 · 数据契约 54",
+      "digest": "4c1d8ccac5c122d19b512dc55688734ad2c05d3912166daed4d300b7009fa7ac",
       "id": "modeling",
       "ok": true
     },
@@ -149,8 +149,8 @@
     },
     {
       "description": "审计/验收（结论绑定对象 digest + 签收双要素）",
-      "detail": "审计 57 件（带审计头 30 · legacy 27）· 绑定对象 285",
-      "digest": "24dd79e458fab7e341f5d7a76dfcb90831c005a715788a77706effca73be837f",
+      "detail": "审计 59 件（带审计头 48 · legacy 11）· 绑定对象 417",
+      "digest": "8ecee054dd4ef1fc18ae853792879f19fa9083c044717e6f0564f496aa3dcc24",
       "id": "audit",
       "ok": true
     },
@@ -191,7 +191,7 @@
     }
   ],
   "passed": 27,
-  "root": "d26fd263c029a990e43aa9f4627ec56e10a0a263ad90d8e6293f3f568d34c566",
+  "root": "45cc0d2632fe04c9d0e6663b9c4297313755501e2b00d4297a51ca864cbdf3bb",
   "schema": "nf-conformance/1",
   "total": 27,
   "verdict": "conformant"

@@ -1,0 +1,70 @@
+{
+  "count": 3,
+  "schema": "nf-abi-call-vectors/1",
+  "vectors": [
+    {
+      "desc": "digest_only 级信封",
+      "envelope": {
+        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "issued_at": "2026-01-01T00:00:00Z",
+        "producer": "vectors",
+        "schema": "nf-attest/1",
+        "subject": {
+          "path": "d/a.md",
+          "sha256": "726af096302174eaf76affe47f4db81dfebdeae58fbb9d8a320c75ad75651959"
+        }
+      },
+      "expected": {
+        "level": "digest_only",
+        "ok": true
+      },
+      "id": "digest_only",
+      "key_b64": "",
+      "subject_b64": "ZC9hLm1k"
+    },
+    {
+      "desc": "hmac-sha256 级信封",
+      "envelope": {
+        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "issued_at": "2026-01-01T00:00:00Z",
+        "producer": "vectors",
+        "schema": "nf-attest/1",
+        "signature": {
+          "mac": "6020c710b40845121277d24ce0b2ca0e04d82041393240c63080a6856f31621e",
+          "scheme": "hmac-sha256"
+        },
+        "subject": {
+          "path": "d/a.md",
+          "sha256": "726af096302174eaf76affe47f4db81dfebdeae58fbb9d8a320c75ad75651959"
+        }
+      },
+      "expected": {
+        "level": "hmac-sha256",
+        "ok": true
+      },
+      "id": "hmac_ok",
+      "key_b64": "YWJpLXZlY3Rvci1rZXktMDEyMzQ1Njc4OWFiY2RlZg==",
+      "subject_b64": "ZC9hLm1k"
+    },
+    {
+      "desc": "主体摘要被改",
+      "envelope": {
+        "envelope_digest": "91ccec899e5dda1e5d49195ebdab4decd6389f077c5a6f4aaa326e91136c22c3",
+        "issued_at": "2026-01-01T00:00:00Z",
+        "producer": "vectors",
+        "schema": "nf-attest/1",
+        "subject": {
+          "path": "d/a.md",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "expected": {
+        "level": "none",
+        "ok": false
+      },
+      "id": "subject_flip",
+      "key_b64": "",
+      "subject_b64": "ZC9hLm1k"
+    }
+  ]
+}

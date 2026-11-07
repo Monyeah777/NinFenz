@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/constrained-choice/1",
+  "title": "NF Constrained Cockpit Choice",
+  "description": "Model chooses one compiled-safe candidate or stops. No invented atoms, no scores, no full plans.",
+  "type": "object",
+  "required": ["choice", "reason", "stop"],
+  "additionalProperties": false,
+  "properties": {
+    "choice": {
+      "anyOf": [
+        {"type": "integer", "minimum": 0},
+        {"type": "null"}
+      ]
+    },
+    "reason": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "stop": {"type": "boolean"},
+    "thought_patch": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 16,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "array", "object", "null"]
+      }
+    }
+  }
+}

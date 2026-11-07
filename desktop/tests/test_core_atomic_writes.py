@@ -25,11 +25,13 @@ REVIEWED_NO_ATOMIC = {
     "attest": "只写临时工作目录里的 ssh 签名载荷（非仓产物）",
     "storage": "只写 NF_HOME 用户库（Store 自有语义；本波未纳入）",
     "watch": "只写 NF_HOME 监听状态",
+    "http_api": "只写进程私有临时目录（请求体/对象落盘后即销毁，非仓产物）",
 }
 #: 脚本面已复核例外（N9 取证）：写的是**用户态**非在仓产物，且该件按设计保持纯 stdlib 热路径——
 #: 为它 import core 会把 Windows 快路从 ≈50ms 拖回 ≈390ms（本文件 docstring 的立项依据）。
 REVIEWED_NO_ATOMIC_SCRIPTS = {
     "scripts/nf_client.py": "只写 NF_FASTPATH_MARKER 指定的用户态标记（热路径刻意零 core 依赖）",
+    "scripts/ccos_chain.py": "只写进程私有临时目录里的演示证据包（出作用域即销毁，非仓产物）",
 }
 
 

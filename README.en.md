@@ -1,7 +1,5 @@
 # NinFenz · Documentation Workshop (spec-driven)<sub>文档生成工坊（规范驱动）</sub>
 
-[![REUSE compliant v3.3](https://img.shields.io/badge/REUSE-compliant%20v3.3-brightgreen)](https://reuse.software/spec/) [![License: AGPL-3.0-only or Commercial](https://img.shields.io/badge/license-AGPL--3.0--only%20%7C%20Commercial-blue)](LICENSING.md)
-
 <!-- nf:locales -->
 <p align="center">
   <a href="README.md">简体中文</a> · <strong><a href="README.en.md">English</a></strong> · <a href="README.ja.md">日本语</a>
@@ -13,7 +11,7 @@
   <a href="https://github.com/punkpeye/awesome-mcp-servers"><img src="https://img.shields.io/badge/Awesome_MCP_Servers-listed-2ea44f?logo=github&amp;logoColor=white" alt="Listed in Awesome MCP Servers" height="20"></a>
 </p>
 
-> **Canonical repository**: https://github.com/Monyeah777/NinFenz | official npm package: `ninfenz`
+> **Canonical repository**: https://github.com/Monyeah777/NinFenz | npm `ninfenz` | GitHub Packages `@monyeah777/ninfenz`
 > Same-named repositories under other accounts are **unauthorised mirror snapshots**; they do not represent this project and accept no issues or PRs.
 
 **Live site**: https://ninfenz.dev · machine entry [llms.txt](https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt)
@@ -62,7 +60,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked. A single-file executable is shipped alongside.
 Details: `tui/README.md`.
 
-> Layered dual licensing (code AGPL-3.0-only or commercial; spec text CC BY 4.0) · see `LICENSING.md` · please cite the source when deriving/referencing
+> MIT License · original open source · please cite the source when deriving/referencing
 
 **In one sentence**: NF is a **content contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces long-form content"; narrative is only the first official domain package, while the protocol itself is domain-neutral and model-agnostic.
 
@@ -119,7 +117,7 @@ AI assembly:
 - **Which models are supported?** Model-agnostic: any text-capable AI can assemble and load the protocols; nothing is bound to a vendor or a connection protocol.
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
-- **How do I cite it?** Code layer is AGPL-3.0-only (or commercial), spec text is CC BY 4.0 — see `LICENSING.md` for boundaries; please credit the source. Machine-readable metadata lives in `CITATION.cff` at the repository root.
+- **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
 - **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
 
 ## Capabilities and assets
@@ -147,10 +145,10 @@ AI assembly:
 
 ## Versions
 
-Install **`ninfenz` 1.1.2** from the official npm registry:
+Install **`ninfenz` 1.0.5** today — published to both npm and GitHub Packages:
 
 ```bash
-npm i -g ninfenz@latest --registry https://registry.npmjs.org   # avoid a stale mirror
+npm i -g ninfenz@latest   # install or upgrade
 nf --version             # show current version
 nf stats                 # show gate and repo status
 ```
@@ -159,14 +157,19 @@ Three independent version lines ship from the same repository:
 
 | Line | Current | What it governs |
 |---|---|---|
-| **Content & protocol** | **v2.30.0** | Templates, domain packs, specs — *what* can be generated |
-| **Command-line tool** | **1.1.2** | the `nf` command / npm package / MCP server — *how* you use it |
+| **Content & protocol** | **v0.93** | Templates, domain packs, specs — *what* can be generated |
+| **Command-line tool** | **1.0.5** | the `nf` command / npm package / MCP server — *how* you use it |
 | **Quality gate** | see `nf stats` | self-check status — *whether* something broke |
 
-The current gate release is **v2.30.0**; per-release changes, evidence and notes live in
-`CHANGELOG.md` and GitHub Releases rather than a duplicated README release stream.
+Last three content releases, described by **what they add**:
 
-Release rules: the content line uses `v2.x` tags; the CLI line is versioned independently
-with semantic versions; every release updates `CHANGELOG.md`, and tags are placed
+| Version | Date | What this release adds |
+|---|---|---|
+| v0.93 | 2026-10-05 | knowledge-layer retrieval, terminal surface, digital-asset contracts (reusable across projects) |
+| v0.92 | 2026-09-10 | world-state model: deterministic abstract state + slots (same input, same output) |
+| v0.82 | 2026-09-09 | 45-point quality depth plus foundation layer A |
+
+Release rules (since 2026-10-20): the content line uses `v0.xx` — small updates fold into the current release, a modest breakthrough adds **0.01**, an innovation adds **0.1**; the CLI line
+is versioned independently as `1.0.x`; every release updates `CHANGELOG.md`, and tags are placed
 on the commit that **carries the feature**.
 

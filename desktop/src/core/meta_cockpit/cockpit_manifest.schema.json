@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-manifest/1",
+  "title": "NF Cognitive Cockpit Production Manifest",
+  "type": "object",
+  "required": ["schema", "prompt_digest", "machine_digest", "runtime_digest",
+               "journal_digest", "handoff_digest", "context_digest",
+               "status", "termination", "complete", "turns",
+               "context_units_spent", "abstention_status",
+               "human_action_required"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-manifest/1"},
+    "prompt_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "machine_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runtime_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "journal_digest": {
+      "anyOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"type": "null"}
+      ]
+    },
+    "handoff_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "context_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["pass", "fail"]},
+    "termination": {"type": "string", "minLength": 1},
+    "complete": {"type": "boolean"},
+    "turns": {"type": "integer", "minimum": 0},
+    "context_units_spent": {"type": "integer", "minimum": 0},
+    "abstention_status": {
+      "enum": ["none", "repair-required", "evidence-required",
+               "review-required", "blocked", "deadline-exceeded",
+               "budget-exhausted"]
+    },
+    "human_action_required": {"type": "boolean"}
+  }
+}

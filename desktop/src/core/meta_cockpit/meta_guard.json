@@ -1,0 +1,24 @@
+{
+  "schema": "nf/meta-guard/1",
+  "limits": {
+    "max_meta_level": "M4",
+    "max_atoms": 33,
+    "max_nodes": 20,
+    "max_atoms_per_node": 5,
+    "max_criteria_per_node": 8,
+    "max_self_application_depth": 1,
+    "max_complexity_per_evidence": 30
+  },
+  "frozen": {
+    "holdout_pack_digest": "57ac93b8b09768f11a2983c1c84f57bf0d5de60ecbd03ca7171a1f22048a7de1"
+  },
+  "rules": [
+    "M0-M4 封顶；禁止 M5+。新增层必须先删除/合并一层。",
+    "原子数 ≤33；新增原子必须替换或合并已有原子。",
+    "节点数 ≤20；新增节点不得与已有原子组合重复。",
+    "自用深度 ≤1；禁止对自用结果再做自用递归。",
+    "holdout digest 冻结；改 holdout 即视为过拟合，守卫失败。",
+    "复杂度/证据比 ≤30；只涨机器不涨真实/holdout 证据的改动一律拒绝。"
+  ],
+  "stop_condition": "审计全过 + holdout 全过 + 自用深度的最近一次无新缺陷 + 复杂度/证据比 ≤30；满足后停止扩层，除非出现新的真实夹具或真实缺陷。"
+}

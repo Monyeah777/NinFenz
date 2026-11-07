@@ -6,12 +6,12 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:66cb4b678913e7f5fc965915a422da403f3ff1859b76e56008bcc2df7e69f5d8
-  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
+  - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
+  - scripts/nf.py:47d5e712d0ebe4c9a0dd06151e054bb31686f1170ccd6e52c302f33ddaa481bc
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - desktop/src/core/quality_baseline.py:7c1f06bc581a2400b1248df63e07a98dfffba2b92ca8070a71082abcc317d1e4
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - docs/terminal.md:b08d721ed527baa92d4cdf56f73aa4972c1314159c3213ed38a95911c2b7f71b
@@ -19,29 +19,89 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
-> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+> 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
-> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
+> 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
 
-> 重审（2026-10-28）：默认并行度 10→14
+> 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
 
-> 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
 
-> 重审（2026-10-28）：tests-only 默认并行度 8→10（实测 285 s 拐点）
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
-> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
+> 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）
 
-> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+> 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
-> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
-> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
 
-> 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
-> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
 
-> 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
+> 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
+
+> 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
+
+> 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
+
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
+> 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
+
+> 重审（2026-11-06）：注册 --decision 参数进编码/路径闸门（其提交遗漏）
+
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
+> 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）
+
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
+> 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
+
+> 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
+
+> 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数
+
+> 重审（2026-11-05）：cc_label 声明层（nf-label/1 IR）+ 供应链核对进发布结论
+
+> 重审（2026-11-05）：G1 外部锚点：证据包可声明并可核对（防整链截断），双实现同口径 + 攻击矩阵 33 条
+
+> 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
+> 重审（2026-11-04）：抽检第二个分片：原子写纪律（包/报告走 atomic_write，临时写例外登记）
+
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
+> 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
+> 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
+
+> 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
+
+> 重审（2026-10-29）：CLI 命令树无损分组、meta-cockpit 接线与恢复分支全量验证后重绑；既有结论不变
+
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
 
 > 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
 

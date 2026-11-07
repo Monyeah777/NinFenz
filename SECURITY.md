@@ -5,8 +5,7 @@
 
 ## 一、如何私密报告
 
-请用 **GitHub Security Advisories** 的私密通道报告：
-<https://github.com/Monyeah777/NinFenz/security/advisories/new>。
+请用 **GitHub Security Advisories** 的私密通道报告（仓库页 → Security → Report a vulnerability）。
 不要用公开 Issue 报安全问题——公开 Issue 会触发**云端代收站**的自动入库机器人（见下），
 等于把细节先公开分发一次。
 
@@ -36,35 +35,7 @@
 3. **凭据类问题按已泄露处理**：任何出现在对话/日志/文档/提交里的 token，一律视为已泄露，
    立即撤销重建（见 `CONTRIBUTING.md` 的 Token 轮换 SOP）。
 
-## 五、依赖与漏洞修复阈值
-
-- **Critical**：停止发布；有可达路径时优先按供应链事故处理，修复前不产生新 Release。
-- **High**：阻断 PR 合并与 tag 发布；无上游修复时须记录不可达/不可利用证据或供应商例外。
-- **Medium**：进入最近一次维护窗口；发布前复查是否已升级为 High/Critical。
-- **License violation**：阻断发布；替换依赖、取得兼容授权，或由明确例外记录批准。
-
-依赖来源、供应商准入、SBOM 和验签方式见 [docs/supply-chain-security.md](docs/supply-chain-security.md)。
-目前为单人维护，不承诺固定响应 SLA；但 Critical/High 在修复或明确处置前不会进入正式发布。
-
-### SCA、SAST 与发布处置
-
-- SCA：PR 的 dependency review 在出现 **High/Critical** 已知漏洞时阻断；定时 `pip-audit`、
-  `cargo audit` 与依赖审计覆盖固定工具链。无上游修复时必须提交不可达/不可利用证据或明确例外，
-  不得用忽略文件静默清零。
-- SAST：CodeQL、Bandit 与仓库 SAST 棘轮共同运行。可操作的 **High/Critical** 发现阻断发布；
-  Medium 进入维护窗口并带修复或风险接受记录；任何新增规则命中都必须显式处置。
-- License：不在供应商 allowlist 或被判定不兼容的许可证阻断发布，除非存在有期限、可审查的例外。
-- 漏洞处置通过 `results/supply-chain/vuln-disposition.json` 进入 OpenVEX；`not_affected` 必须给出
-  justification 与 impact statement，`affected` / `under_investigation` 必须给出 action statement。
-
-## 六、公开漏洞通告
-
-已确认并完成协调披露的漏洞通过 GitHub Security Advisories 公开：
-<https://github.com/Monyeah777/NinFenz/security/advisories>。通告须至少包含受影响版本、
-判断是否受影响的方法、缓解措施和修复版本；修复版本的 checksums、SBOM 与 attestation
-可在对应 GitHub Release 验证。
-
-## 七、本仓已有的安全机制（供报告前自查）
+## 五、本仓已有的安全机制（供报告前自查）
 
 | 机制 | 载体 | 判据 |
 |---|---|---|
@@ -81,14 +52,7 @@
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
 
-应用安全作用域评估见 [docs/asvs.md](docs/asvs.md)：覆盖本地 CLI、daemon、MCP、插件、
-文件处理、配置、密钥、日志与错误面。该矩阵是内部 ASVS 5.0.0 L2 证据，不是第三方认证；
-`partial` 与 `not-applicable` 项均保留明确 gap。输入规则、数据分类、密码算法、通信、
-授权、资源上限和生产默认值的机读控制清单见
-[packaging/security/application-security-controls.json](packaging/security/application-security-controls.json)，
-人读说明见 [docs/security-controls.md](docs/security-controls.md)。
-
-## 八、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
+## 六、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
 
 - **面**：`nf verify` 的引擎侧会对目标仓库 `verify.sh` 里的 heredoc Python 做 `exec`
   （`desktop/src/core/gate_inproc.py`）——**在谁的仓库里跑，就执行谁的代码**

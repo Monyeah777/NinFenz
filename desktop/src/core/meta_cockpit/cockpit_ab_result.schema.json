@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-ab-analysis/1",
+  "title": "NF Cockpit Blind A/B Analysis",
+  "type": "object",
+  "required": ["schema", "experiment_id", "pairs", "planned_pairs", "decisive",
+               "guided_wins", "baseline_wins", "ties", "missing",
+               "guided_win_rate", "ci95", "effect_vs_half", "sign_test_p",
+               "judge_count", "judge_agreement", "per_model", "decision",
+               "thresholds", "analysis_plan_digest", "packet_digest",
+               "ballots_digest", "power_plan"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-ab-analysis/1"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "pairs": {"type": "integer", "minimum": 0},
+    "planned_pairs": {"type": "integer", "minimum": 2},
+    "decisive": {"type": "integer", "minimum": 0},
+    "guided_wins": {"type": "integer", "minimum": 0},
+    "baseline_wins": {"type": "integer", "minimum": 0},
+    "ties": {"type": "integer", "minimum": 0},
+    "missing": {"type": "integer", "minimum": 0},
+    "guided_win_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "ci95": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"type": "number", "minimum": 0, "maximum": 1}
+    },
+    "effect_vs_half": {"type": "number", "minimum": -0.5, "maximum": 0.5},
+    "sign_test_p": {"type": "number", "minimum": 0, "maximum": 1},
+    "judge_count": {"type": "integer", "minimum": 0},
+    "judge_agreement": {
+      "type": "object",
+      "required": ["mean_pairwise", "unanimous_pairs", "rated_pairs"],
+      "additionalProperties": false,
+      "properties": {
+        "mean_pairwise": {
+          "anyOf": [
+            {"type": "number", "minimum": 0, "maximum": 1},
+            {"type": "null"}
+          ]
+        },
+        "unanimous_pairs": {"type": "integer", "minimum": 0},
+        "rated_pairs": {"type": "integer", "minimum": 0}
+      }
+    },
+    "per_model": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["pairs", "guided_wins", "baseline_wins", "ties",
+                     "guided_win_rate"],
+        "additionalProperties": false,
+        "properties": {
+          "pairs": {"type": "integer", "minimum": 0},
+          "guided_wins": {"type": "integer", "minimum": 0},
+          "baseline_wins": {"type": "integer", "minimum": 0},
+          "ties": {"type": "integer", "minimum": 0},
+          "guided_win_rate": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "decision": {
+      "enum": ["guided-better", "baseline-better", "inconclusive",
+               "insufficient-evidence", "judge-disagreement"]
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["min_pairs", "min_effect", "alpha", "min_judges",
+                   "min_agreement", "min_pairs_per_model"],
+      "additionalProperties": false,
+      "properties": {
+        "min_pairs": {"type": "integer", "minimum": 1},
+        "min_effect": {"type": "number", "minimum": 0, "maximum": 0.5},
+        "alpha": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.5},
+        "min_judges": {"type": "integer", "minimum": 1},
+        "min_agreement": {"type": "number", "minimum": 0, "maximum": 1},
+        "min_pairs_per_model": {"type": "integer", "minimum": 1}
+      }
+    },
+    "analysis_plan_digest": {
+      "type": "string", "pattern": "^[0-9a-f]{64}$"
+    },
+    "power_plan": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["method", "effect", "alpha", "target_power",
+                       "required_pairs", "estimated_power"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"const": "two-sided-exact-sign"},
+            "effect": {"type": "number", "exclusiveMinimum": 0,
+                       "maximum": 0.5},
+            "alpha": {"type": "number", "exclusiveMinimum": 0,
+                      "maximum": 0.2},
+            "target_power": {"type": "number", "exclusiveMinimum": 0.5,
+                             "exclusiveMaximum": 1},
+            "required_pairs": {"type": "integer", "minimum": 2},
+            "estimated_power": {"type": "number", "minimum": 0,
+                                "maximum": 1}
+          }
+        }
+      ]
+    },
+    "packet_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ballots_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
