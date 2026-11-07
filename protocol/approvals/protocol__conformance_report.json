@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "rust 日期 port",
+  "note": "rust purity 对齐",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "5b9ba7aa79098320929f23dfa1390841921866faa67132572013161089724987"
