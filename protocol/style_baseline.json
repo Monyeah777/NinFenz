@@ -1091,7 +1091,6 @@
     "desktop/tests/test_daemon.py::I001": 1,
     "desktop/tests/test_daemon.py::RUF100": 1,
     "desktop/tests/test_daemon.py::SIM102": 1,
-    "desktop/tests/test_daemon.py::SIM105": 1,
     "desktop/tests/test_daemon.py::UP031": 28,
     "desktop/tests/test_daemon_limits.py::RUF100": 2,
     "desktop/tests/test_daemon_limits.py::UP031": 2,
