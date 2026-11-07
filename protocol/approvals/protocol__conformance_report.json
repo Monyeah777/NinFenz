@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-07",
   "approved_by": "Monyeah777",
-  "note": "refreeze CID evidence",
+  "note": "refreeze.sh",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "3bb8503cf504eb5c00a28ee36d1f52f7ca133beede515bccd37822ecc62f48e8"
