@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:97e307b07644fd7f139a8aa4de7f6fe2ea79ef7b9facb1c9a70f4d761d26c2f5
+  - protocol/code_metrics_baseline.json:257044b745208ece8f91bae1458ef1078766303c9e60e3221448506c8b058b57
 ---
+> 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）
+
 > 重审（2026-11-08）：闭包台账（21 条断言 → 真实判据 → 反例 → 状态）+ 审计脚本
 
 > 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）

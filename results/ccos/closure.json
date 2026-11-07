@@ -242,14 +242,26 @@
       "status": "debt"
     },
     {
-      "claim": "P7 预注册评测（free/menu/hybrid/workspace）与外部盲评尚未开始",
+      "claim": "评测协议已预注册冻结 + harness 可校验 run/compare（synthetic 不得当证据）；真实测量留外部",
       "criteria": [
-        "test_cognition_claims.py::test_review_layer_never_passes_internally"
+        "test_eval_harness.py::test_unfrozen_protocol_is_rejected",
+        "test_eval_harness.py::test_synthetic_run_is_blocked"
       ],
-      "debt": "评测协议需先入库再跑（防事后挑指标）；本仓目前只有 craft/standard 两层可自证",
+      "debt": "",
       "id": "D-05",
       "module": "evaluation",
-      "reverse_fixture": "review 层在本仓内产出 pass → 判据红",
+      "reverse_fixture": "协议未冻结/缺 free 基线/缺反窄化指标/出现打分键 → 拒；synthetic run 进 compare → 直接拒",
+      "status": "closed"
+    },
+    {
+      "claim": "measured 数据（4 条件 × 4 任务 × 3 样本）尚未采集",
+      "criteria": [
+        "test_eval_harness.py::test_measurement_not_claimed"
+      ],
+      "debt": "真实测量需外部盲评；按作者纪律，外部实测仅由作者显式触发，agent 不代跑、不伪造",
+      "id": "D-06",
+      "module": "evaluation",
+      "reverse_fixture": "把 synthetic 数据标成 measured → compare 拒（test_synthetic_run_is_blocked）",
       "status": "debt"
     }
   ],
@@ -281,6 +293,7 @@
         "closed": 1
       },
       "evaluation": {
+        "closed": 1,
         "debt": 1
       },
       "job-ledger": {
@@ -301,14 +314,14 @@
       }
     },
     "by_status": {
-      "closed": 19,
+      "closed": 20,
       "debt": 2
     },
     "open_debt": [
       "D-04",
-      "D-05"
+      "D-06"
     ],
     "schema": "nf-closure-summary/1",
-    "total": 21
+    "total": 22
   }
 }

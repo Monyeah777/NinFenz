@@ -3,9 +3,9 @@
     "app": 1458,
     "entry": 26,
     "floor": 5,
-    "prod": 1056,
-    "projection": 152,
-    "support": 418,
+    "prod": 1055,
+    "projection": 153,
+    "support": 421,
     "verify": 1012
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -6101,12 +6101,6 @@
       "rule": "auto:R-core"
     },
     {
-      "function": "评测标准模板：用例真源 + 显式触发 + 成本/时点标注 + 结果回写（机制借鉴 pj-nx evals / 311 eval.yml）。",
-      "path": "desktop/src/core/eval_harness.py",
-      "role": "prod",
-      "rule": "auto:R-core"
-    },
-    {
       "function": "42 M1：协议可执行性内部自测 —— 执行失范捕获器（动态质量维基建）。",
       "path": "desktop/src/core/execution_drill.py",
       "role": "prod",
@@ -7973,7 +7967,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "预注册评测判据（D-05）：协议先冻结、只计数、演练数据不得当证据。",
       "path": "desktop/tests/test_eval_harness.py",
       "role": "verify",
       "rule": "R-verify"
@@ -12450,14 +12444,14 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "d1394423e0bc627cee92c79c766aa71fff28f6c7a709577397fef8d2bb3c05d8",
+  "root_digest": "61eed4bc7110518ed0e7ca77497e85ecd86c183df1d7a3f61aa00327cd88b637",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 272,
+    "R-catch": 274,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 133,
+    "R-projection": 134,
     "R-support": 119,
     "R-verify": 888,
     "auto:R-core": 282

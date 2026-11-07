@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:97e307b07644fd7f139a8aa4de7f6fe2ea79ef7b9facb1c9a70f4d761d26c2f5
+  - protocol/code_metrics_baseline.json:257044b745208ece8f91bae1458ef1078766303c9e60e3221448506c8b058b57
 ---
+> 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）
+
 > 重审（2026-11-08）：闭包台账（21 条断言 → 真实判据 → 反例 → 状态）+ 审计脚本
 
 > 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
