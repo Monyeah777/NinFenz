@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
+  - protocol/code_metrics_baseline.json:89100fffa6a338901ec5d456a80b8e0f7471022284a5a8198ec67e40ae2b3f42
 ---
+> 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）
+
 > 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

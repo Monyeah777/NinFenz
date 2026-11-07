@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
+  - protocol/code_metrics_baseline.json:89100fffa6a338901ec5d456a80b8e0f7471022284a5a8198ec67e40ae2b3f42
 ---
+> 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）
+
 > 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

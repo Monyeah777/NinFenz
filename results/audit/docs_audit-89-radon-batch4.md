@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
+  - protocol/code_metrics_baseline.json:89100fffa6a338901ec5d456a80b8e0f7471022284a5a8198ec67e40ae2b3f42
 ---
+> 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）
+
 > 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

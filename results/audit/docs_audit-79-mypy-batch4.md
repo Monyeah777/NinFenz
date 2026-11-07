@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
+  - protocol/code_metrics_baseline.json:89100fffa6a338901ec5d456a80b8e0f7471022284a5a8198ec67e40ae2b3f42
 ---
+> 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）
+
 > 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

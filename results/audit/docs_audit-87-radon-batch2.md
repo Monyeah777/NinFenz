@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:d8d69d8a23c9292c975a8d12ffc75787a9ea39fbd0dfac4a68e4d59d8dbdef4d
+  - protocol/code_metrics_baseline.json:89100fffa6a338901ec5d456a80b8e0f7471022284a5a8198ec67e40ae2b3f42
 ---
+> 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）
+
 > 重审（2026-11-08）：DCT 水印探针（QIM vs 关系嵌入，q70/q50 实测）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

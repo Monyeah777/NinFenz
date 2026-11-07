@@ -131,6 +131,16 @@ nf label extract 产出/海报.wm.png                                          #
 
 完整数据：`results/ccos/watermark_dct_probe.json`（复跑 `python scripts/watermark_dct_probe.py --write|--check`，
 判据 `test_watermark_dct_probe.py` 7 项把「哪些扛、哪些必扛不住、代价多少」都锁住）。
+
+**同步层探针结论（2026-11-08，负结果但可复算）**：给关系嵌入加「同步字平铺 + 缩放/偏移网格搜索」，
+给足网格（缩放 5% 步、偏移 16 px）：
+
+- 干净图 ✓（128/128）、JPEG q=70 ✓（127/128，JPEG 不破坏块网格）、整数比放大 1.25× ✓（128/128）；
+- **非整数重采样（0.85/0.9/1.1×）、裁剪 10%、模拟拍屏全部对不齐**（对齐分封顶 81–88/128 ≈ 64–69%）。
+
+这说明**固定 8×8 块网格同步不够**，不是搜索分辨率的问题：重采样后块边界不再落在 8 像素栅格上，
+任何网格对齐都收不回来。v1 同步层必须走**内容同步**（SIFT/特征点）或**频谱模板**（周期峰检测）。
+数据：`results/ccos/watermark_sync_probe.json`，判据 `test_watermark_sync_probe.py` 7 项。
 水印帧只带 IR 的摘要帧（版本/标准/对象摘要前缀/条目名/条数），不是整份 IR。
 
 ## 与 `cc_label` 的关系

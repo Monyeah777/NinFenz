@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1055,
-    "projection": 146,
-    "support": 396,
-    "verify": 993
+    "projection": 147,
+    "support": 397,
+    "verify": 994
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9383,6 +9383,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "同步层探针判据：把「网格同步能做什么、不能做什么」锁成断言。",
+      "path": "desktop/tests/test_watermark_sync_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "工作流工业级加固判据（`core/workflow_hardening.py`）回归测试。",
       "path": "desktop/tests/test_workflow_hardening.py",
       "role": "verify",
@@ -12330,16 +12336,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "033852000b83f4876379b495112272ff1e6b41d444d3fb076624ee3e500f7715",
+  "root_digest": "6c8509071e63b53d200f2210305e90888d11fa5d51821e8831b98d5d8250fe1d",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 250,
+    "R-catch": 251,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 127,
+    "R-projection": 128,
     "R-support": 119,
-    "R-verify": 873,
+    "R-verify": 874,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"
