@@ -2,15 +2,15 @@
   "coverage": {
     "bodies": 194,
     "by_layer": {
-      "data": 148,
+      "data": 149,
       "eng": 38,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
-    "depends_edges": 206,
-    "reachable": 332,
-    "standards": 372,
+    "depends_edges": 207,
+    "reachable": 333,
+    "standards": 373,
     "unreachable": 40
   },
   "note": "生成物；真源 protocol/standards_catalog.json + protocol/standards_binding.json。",
@@ -1863,6 +1863,22 @@
       "sha256_sample": "779c8b5ee4323a58cc83d4a84b2649c5e409246e8d656aabc1480f0919d0155a",
       "title": "时间戳",
       "url": "https://www.rfc-editor.org/rfc/rfc3339.txt"
+    },
+    {
+      "body": "IETF",
+      "bound_main": 0,
+      "bound_support": 0,
+      "ext_points": [
+        "profile"
+      ],
+      "http_status": 200,
+      "id": "rfc8785-jcs",
+      "layer": "data",
+      "probe_date": "2026-11-07",
+      "reachable": true,
+      "sha256_sample": "4ee3da55478a74b2d3e784be466255915247e97bdc19625bba1633e7b92504cf",
+      "title": "JSON Canonicalization Scheme (JCS)",
+      "url": "https://www.rfc-editor.org/rfc/rfc8785.txt"
     },
     {
       "body": "IETF",

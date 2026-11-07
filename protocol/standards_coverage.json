@@ -222,6 +222,7 @@
     "redfish",
     "reproducible-builds",
     "reuse-3",
+    "rfc8785-jcs",
     "rfc9162-ct",
     "rfc9562-uuid",
     "riff",
@@ -304,7 +305,7 @@
     "zarr"
   ],
   "note": "四态仅表示仓库内部编目、绑定、断言与消费证据；不等于第三方认证。",
-  "root_digest": "49eeaa75c624ba795d1410582062bc4ad77787ebaefb2a206e42d60242ec62c9",
+  "root_digest": "7e4b4775dc38509b4fcc5fa493dfac9ccb3c3f5846d62b80c3a086867c53830d",
   "schema": "nf-standards-coverage/1",
   "standards": [
     {
@@ -4156,6 +4157,22 @@
       "url": "https://www.rfc-editor.org/rfc/rfc3339.txt"
     },
     {
+      "asserted": true,
+      "body": "IETF",
+      "bound": true,
+      "catalogued": true,
+      "claims": [
+        "jcs-three-implementation-contract"
+      ],
+      "consumable": true,
+      "domain_bound": false,
+      "id": "rfc8785-jcs",
+      "layer": "data",
+      "state": "consumable",
+      "title": "JSON Canonicalization Scheme (JCS)",
+      "url": "https://www.rfc-editor.org/rfc/rfc8785.txt"
+    },
+    {
       "asserted": false,
       "body": "IETF",
       "bound": false,
@@ -5541,18 +5558,18 @@
     "consumable"
   ],
   "summary": {
-    "asserted": 9,
-    "bound": 77,
-    "catalogued": 372,
-    "claims": 9,
-    "consumable": 9,
+    "asserted": 10,
+    "bound": 78,
+    "catalogued": 373,
+    "claims": 10,
+    "consumable": 10,
     "domain_bound": 70,
-    "not_domain_bound": 302,
+    "not_domain_bound": 303,
     "states": {
       "asserted": 0,
       "bound": 68,
       "catalogued": 295,
-      "consumable": 9
+      "consumable": 10
     }
   }
 }

@@ -2,14 +2,14 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **372** 条 · 本机可达 **332** · 不可达 **40** · 机构 **194** · 依赖边 **206**
-- 分层：data 148 · eng 38 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **373** 条 · 本机可达 **333** · 不可达 **40** · 机构 **194** · 依赖边 **207**
+- 分层：data 149 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。
 
 ## 卡 1 · 哪些标准提供扩展点？
 
-全 **372** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
+全 **373** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
 
 - `http-semantics` · HTTP 语义（RFC 9110） · 扩展点 3：method-registry, field-name-registry, status-code-registry
 - `acme` · ACME 证书签发自动化 · 扩展点 2：challenge-type, identifier-type
@@ -34,7 +34,7 @@
 
 ## 卡 2 · 各层有哪些标准？
 
-- **data** 148 条 → `docs/standards/layer-data.md`
+- **data** 149 条 → `docs/standards/layer-data.md`
 - **eng** 38 条 → `docs/standards/layer-eng.md`
 - **form** 29 条 → `docs/standards/layer-form.md`
 - **gov** 73 条 → `docs/standards/layer-gov.md`
