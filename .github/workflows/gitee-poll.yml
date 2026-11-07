@@ -26,7 +26,20 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           fetch-depth: 0
+      - name: 凭据检查（GITEE_TOKEN 未配置 → 本轮跳过并留 notice，不产红）
+        # 2026-11-08 盲区收口：本 workflow 每 10 分钟跑一次，而仓库 Secrets 里没有配置
+        # GITEE_TOKEN（实测 2026-11-07 run 失败：ERROR Gitee 轮询诊断: category=missing_token）
+        # ⇒ 每天 144 次假红，把「真失败」淹掉。无凭据时显式 skip，配置后自动恢复轮询。
+        id: guard
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          if [ -z "${GITEE_TOKEN}" ]; then
+            echo "::notice::GITEE_TOKEN 未配置：本轮跳过（作者在仓库 Secrets 加 Gitee 子令牌后自动恢复）"
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
       - name: Gitee 投稿轮询入库（拉取 → 入库 → 双端推送 → 回评关闭）
+        if: steps.guard.outputs.skip != '1'
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
           REPO: ${{ github.repository }}
