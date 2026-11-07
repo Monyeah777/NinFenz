@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:66cb4b678913e7f5fc965915a422da403f3ff1859b76e56008bcc2df7e69f5d8
-  - protocol/code_metrics_baseline.json:ae1f165f62b2f16df6ccc19ebac15f291e994ce3fe2d1dd0340726f30d68352f
+  - protocol/code_metrics_baseline.json:794531110cc3fab81ff721501cbdaeccce1d805dd074a6897d85c19aad1a768e
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
