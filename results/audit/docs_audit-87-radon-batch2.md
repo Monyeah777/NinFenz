@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
+  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
+
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）

@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
+  - scripts/nf.py:bbb8305f6c8d3d75329383657ee4766403e057ccf337cb0ee7cde0774fe1ca29
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
+  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
+
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）

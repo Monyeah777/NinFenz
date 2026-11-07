@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
+  - scripts/nf.py:bbb8305f6c8d3d75329383657ee4766403e057ccf337cb0ee7cde0774fe1ca29
 
 ---
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）

@@ -16,7 +16,7 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
+  - scripts/nf.py:bbb8305f6c8d3d75329383657ee4766403e057ccf337cb0ee7cde0774fe1ca29
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:5958ecf0926d2fb2a94125bad8ab200344b76e2b31acdeecd8c58b8deb1ff53f
   - protocol/coupling_baseline.json:f1000f95c9d530926c8a80e3a135578e8430c35689b8b7bb3bd1b239fb46e084
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
 > 重审（2026-11-07）：口径同步 3022 件 / 23.92 MB
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）

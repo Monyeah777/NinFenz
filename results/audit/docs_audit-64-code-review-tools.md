@@ -11,12 +11,14 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
+  - scripts/nf.py:bbb8305f6c8d3d75329383657ee4766403e057ccf337cb0ee7cde0774fe1ca29
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:431d764da2ef56538eb1c473fe4f45d5ffa8191450638036f147ae7d66a3ae73
 
 ---
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）

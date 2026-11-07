@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
+  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
+
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）

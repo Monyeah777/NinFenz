@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
+  - scripts/nf.py:bbb8305f6c8d3d75329383657ee4766403e057ccf337cb0ee7cde0774fe1ca29
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
+
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
 > 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）

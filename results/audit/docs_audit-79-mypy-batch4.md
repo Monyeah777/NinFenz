@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
+  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
+
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）

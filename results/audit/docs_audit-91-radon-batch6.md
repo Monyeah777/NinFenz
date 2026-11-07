@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
+  - protocol/code_metrics_baseline.json:781c27702f77579670cc97d15ddbda53f788bf1e841ea55a461cfc9bf3fc4c3c
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
+
 > 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
 > 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
