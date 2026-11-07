@@ -78,7 +78,7 @@ pwsh -NoProfile -File run-rebaseline.ps1 -Snap <新快照> -SnapName nf-snap-hN 
 `nf approve protocol/conformance_report.json --by <作者>` → `nf receipts --scope protocol --write` → `bash verify.sh`。
 
 CI 配方：**树外构建**（`cp -r engine/dotnet "$RUNNER_TEMP/build"`）+ **门跑工作树**（有 `.git` ⇒ 语义模式）。
-两条**已证伪**的变体（树内构建 / 导出快照当语料）写在 `.github/workflows/net-engine.yml` 的注释里，别再走。
+两条**已证伪**的变体（树内构建 / 导出快照当语料）见本仓 git 历史中的 `net-engine.yml`（该工作流已随 .NET 引擎线退役删除），别再走。
 
 ## 5. 纪律清单（每条都有实测出处）
 

@@ -314,6 +314,9 @@ def _zip_bytes(members: Sequence[tuple[str, bytes]]) -> bytes:
             zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
             zi.compress_type = zipfile.ZIP_STORED
             zi.external_attr = 0o644 << 16
+            # Windows/Linux 的 ZipInfo.create_system 默认值不同（0 vs 3）→ 同一份成员
+            # 在两平台生成的 zip 字节不同（证据包 digest 因此跨平台漂移）。固定 0。
+            zi.create_system = 0
             zf.writestr(zi, data)
     return buf.getvalue()
 

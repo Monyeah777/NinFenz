@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
+  - protocol/code_metrics_baseline.json:9828dbc5e27299a87276f2fe9757d37ef0ac97e9c5acd66ca340637e10fd6617
 ---
+> 重审（2026-11-07）：盲区修复：证据包 zip 跨平台确定性（create_system 固定）+ 平台无关断言/文档/可选依赖收口
+
 > 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
 
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组

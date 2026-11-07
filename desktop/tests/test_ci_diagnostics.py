@@ -20,7 +20,7 @@ TRACKED_FILES = ("llms.txt", "README.md", "README.en.md", "verify.sh", "CHANGELO
 
 #: 关键门禁工作流：至少要有一步 upload-artifact（失败诊断物覆盖）。
 KEY_WORKFLOWS = ("ci-verify.yml", "cross-platform.yml", "release-gate.yml", "coverage.yml",
-                 "e2e-desktop.yml", "net-engine.yml", "sast.yml", "lint.yml",
+                 "e2e-desktop.yml", "sast.yml", "lint.yml",
                  "dependency-audit.yml", "docker-nfal.yml")
 
 
