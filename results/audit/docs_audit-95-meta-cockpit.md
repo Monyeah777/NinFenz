@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:cc407ecee2aceb012f603a56d1042e61b30c3d96ee7281766c15a06676012352
+  - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
   - tui/_surface.py:f708147a385a47d8cb9d34ea340c172bd9ac40a3e545d15ca4956f0ec5496b5d
-  - protocol/check12_weights.json:e53776a31af6ed8013ca1c4f9dfa0b343753443f2e900ef20f9207fd0a34d582
-  - protocol/coupling_baseline.json:20fd3a96155f00178c0ebf5ee3fa00557a6358ced47d432b85b535915f2aa700
+  - protocol/check12_weights.json:3176498f8112fccda70439cde03cdc141b6dbfbcc9e6323a299bf7bcb97b87b0
+  - protocol/coupling_baseline.json:30db6552f03e0d085322db1e651220d827289eebfe537897ad847305dfb5bbb6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
 > 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
 
 > 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一

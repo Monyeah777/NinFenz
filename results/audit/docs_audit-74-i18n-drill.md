@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:26cd872407dbbe46b457431e3eff68d62960816638d102f6c9e70260c117f150
+  - protocol/code_metrics_baseline.json:d8b4d9cb225b73cb978c35dadf57f49ace2e4c48db3be882b09105cf473975f9
 ---
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
 > 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
 
 > 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一

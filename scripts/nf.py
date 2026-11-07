@@ -419,7 +419,9 @@ def _add_parser_cog(sub):
                            description="作业：created→queued→running→succeeded|failed|"
                                        "canceled|timeout；事件只追加、可重放、终态后不可追加。")
     jcmd = jsub.add_subparsers(dest="job_cmd")
-    jc = jcmd.add_parser("create", help="建作业（created）")
+    jc = jcmd.add_parser("create", help="建作业（created）",
+                          description="建作业（created）：写 job{id,kind,"
+                                      "contract_digest,inputs_digest} 并追加事件。")
     jc.add_argument("--ledger", required=True, help="账本文件")
     jc.add_argument("--id", dest="job_id", required=True, help="作业 id")
     jc.add_argument("--kind", required=True, help="作业类型（check/label/evidence-verify…）")
@@ -427,24 +429,31 @@ def _add_parser_cog(sub):
     jc.add_argument("--inputs", default="", help="输入 digest（可选）")
     jc.add_argument("--out", default="", help="写回账本")
     jc.add_argument("--json", action="store_true")
-    jt = jcmd.add_parser("transition", help="状态迁移")
+    jt = jcmd.add_parser("transition", help="状态迁移",
+                          description="状态迁移：created→queued→running→终态；"
+                                      "非法迁移与终态后追加一律拒。")
     jt.add_argument("--ledger", required=True, help="账本文件")
     jt.add_argument("--id", dest="job_id", required=True, help="作业 id")
     jt.add_argument("--to", required=True, help="目标状态")
     jt.add_argument("--witness", default="", help="见证 JSON 文件（可选）")
     jt.add_argument("--out", default="", help="写回账本")
     jt.add_argument("--json", action="store_true")
-    jr = jcmd.add_parser("receipt", help="把调用回执挂到作业")
+    jr = jcmd.add_parser("receipt", help="把调用回执挂到作业",
+                          description="把调用回执挂到作业：终态后拒绝，回执 digest 进事件链。")
     jr.add_argument("--ledger", required=True, help="账本文件")
     jr.add_argument("--id", dest="job_id", required=True, help="作业 id")
     jr.add_argument("--receipt", required=True, help="回执文件")
     jr.add_argument("--out", default="", help="写回账本")
     jr.add_argument("--json", action="store_true")
-    js = jcmd.add_parser("show", help="看作业摘要与 digest")
+    js = jcmd.add_parser("show", help="看作业摘要与 digest",
+                          description="看作业摘要：状态/事件数/回执数/job_digest"
+                                      "（用于与证据、commitment 绑定）。")
     js.add_argument("--ledger", required=True, help="账本文件")
     js.add_argument("--id", dest="job_id", default="", help="只看一个作业")
     js.add_argument("--json", action="store_true")
-    jv = jcmd.add_parser("verify", help="从事件链重放校验")
+    jv = jcmd.add_parser("verify", help="从事件链重放校验",
+                          description="从事件链重放校验：seq/prev/digest/迁移合法性，"
+                                      "任一不符即 invalid。")
     jv.add_argument("--ledger", required=True, help="账本文件")
     jv.add_argument("--json", action="store_true")
     bcommit = csub.add_parser("bridge-commit", help="生成 commitment（双核唯一共享对象）",

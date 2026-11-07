@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:cc407ecee2aceb012f603a56d1042e61b30c3d96ee7281766c15a06676012352
+  - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
 
 ---
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
 > 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
 
 > 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）

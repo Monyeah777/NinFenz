@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:26cd872407dbbe46b457431e3eff68d62960816638d102f6c9e70260c117f150
+  - protocol/code_metrics_baseline.json:d8b4d9cb225b73cb978c35dadf57f49ace2e4c48db3be882b09105cf473975f9
 ---
+> 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
+
 > 重审（2026-11-08）：全量门禁收口：json_doc/atomic_write/面判别键/dead-code/静默跳过/路径旗标/ingress 接线
 
 > 重审（2026-11-08）：terminal 族登记 cog + 终端投影刷新 + CRLF 归一

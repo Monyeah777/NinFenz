@@ -164,7 +164,9 @@ class CliTest(unittest.TestCase):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,
                               text=True, encoding="utf-8", errors="replace", timeout=180)
         self.assertEqual(0, proc.returncode, proc.stderr[-300:])
-        self.assertGreaterEqual(len(json.loads(proc.stdout)), 6)
+        doc = json.loads(proc.stdout)
+        self.assertEqual("cog-criteria", doc["kind"])
+        self.assertGreaterEqual(len(doc["items"]), 6)
 
     def test_claim_compile_and_check(self):
         with tempfile.TemporaryDirectory() as tmp:

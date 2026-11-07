@@ -256,7 +256,9 @@ class CliTest(unittest.TestCase):
         proc = subprocess.run([*NF, "cog", "moves", "--json"], capture_output=True,
                               text=True, encoding="utf-8", errors="replace", timeout=180)
         self.assertEqual(0, proc.returncode, proc.stderr[-300:])
-        items = json.loads(proc.stdout)
+        doc = json.loads(proc.stdout)
+        self.assertEqual("cog-moves", doc["kind"])
+        items = doc["items"]
         self.assertEqual(15, len(items))
         self.assertEqual("reframe", items[0]["id"])
 

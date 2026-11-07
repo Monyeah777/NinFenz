@@ -215,7 +215,9 @@ class CliTest(unittest.TestCase):
         proc = subprocess.run([*NF, "cog", "ops", "--json"], capture_output=True,
                               text=True, encoding="utf-8", errors="replace", timeout=180)
         self.assertEqual(0, proc.returncode, proc.stderr[-300:])
-        self.assertEqual(11, len(json.loads(proc.stdout)))
+        doc = json.loads(proc.stdout)
+        self.assertEqual("cog-ops", doc["kind"])
+        self.assertEqual(11, len(doc["items"]))
 
     def test_control_round_trip(self):
         with tempfile.TemporaryDirectory() as tmp:
