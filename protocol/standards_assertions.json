@@ -330,6 +330,40 @@
       ]
     },
     {
+      "id": "rfc3161-offline-time-proof",
+      "standard": "rfc3161-tsp",
+      "assertion": "RFC 3161 时间戳记录必须同时绑定 subject、query 与 token；只有显式信任锚下的离线签名验证通过才标记 time_proof=tsa，错 CA、错 subject、篡改 token 或记录 schema 漂移均 fail-closed。",
+      "tests": [
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_full_chain_verifies_offline_and_records_trusted_time",
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_cli_verify_emits_structured_result",
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_cli_create_uses_loopback_tsa_and_writes_record"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_wrong_anchor_and_missing_anchor_fail_closed",
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_token_for_other_subject_is_rejected",
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_tampered_token_and_record_are_rejected",
+        "desktop/tests/test_timestamp.py::LocalTsaTest.test_submit_rejects_non_http_and_missing_query"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/timestamp.py",
+        "scripts/time_stamp.py",
+        "protocol/schema/time_token.schema.json",
+        "docs/rfc3161.md"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/time_stamp.py",
+          "symbol": "main"
+        },
+        {
+          "path": "desktop/src/core/timestamp.py",
+          "symbol": "verify_record"
+        }
+      ]
+    },
+    {
       "id": "cidv1-raw-sha256-profile",
       "standard": "multiformats-cid",
       "assertion": "CIDv1 raw 0x71 + sha2-256 + base32lower profile 由 Python/C# 独立生成，全部回执可由第三方按规范复算，非 profile 输入 fail-closed。",

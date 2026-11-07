@@ -1,9 +1,9 @@
-# 标准目录 · 层 eng（39 条）
+# 标准目录 · 层 eng（40 条）
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **375** 条 · 本机可达 **334** · 不可达 **41** · 机构 **196** · 依赖边 **207**
-- 分层：data 150 · eng 39 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **376** 条 · 本机可达 **335** · 不可达 **41** · 机构 **196** · 依赖边 **207**
+- 分层：data 150 · eng 40 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
@@ -90,6 +90,9 @@
 
 ### `reuse-3`
 - REUSE 许可声明规范 · REUSE/FSFE · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 spdx-header, reuse-toml · 绑定 主锚 0 / 辅锚 0 · https://reuse.software/spec-3.3/
+
+### `rfc3161-tsp`
+- RFC 3161 Time-Stamp Protocol (TSP) · IETF · 层 eng · 可达 是（200 · 2026-11-07） · 扩展点 message-imprint, timestamp-token, tsa-policy · 绑定 主锚 0 / 辅锚 1 · https://www.rfc-editor.org/rfc/rfc3161
 
 ### `rfc9162-ct`
 - 证书透明 v2（CT） · IETF · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 log-entry-type, extension-data · 绑定 主锚 0 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc9162

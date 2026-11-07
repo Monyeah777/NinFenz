@@ -197,6 +197,40 @@ class CycloneDxVexLedgerTest(unittest.TestCase):
         )
 
 
+class Rfc3161LedgerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.issues, cls.report = sc.build(ROOT)
+
+    def test_rfc3161_is_consumable_with_fail_closed_time_proof(self):
+        self.assertEqual([], self.issues)
+        rows = {row["id"]: row for row in self.report["standards"]}
+        self.assertIn("rfc3161-tsp", rows)
+        row = rows["rfc3161-tsp"]
+        self.assertEqual("eng", row["layer"])
+        self.assertEqual("consumable", row["state"])
+        self.assertTrue(row["asserted"])
+        self.assertTrue(row["domain_bound"])
+
+        ledger = json.loads(
+            (ROOT / "protocol" / "standards_assertions.json").read_text(encoding="utf-8")
+        )
+        claim = next(
+            item for item in ledger["claims"]
+            if item["id"] == "rfc3161-offline-time-proof"
+        )
+        self.assertEqual("rfc3161-tsp", claim["standard"])
+        self.assertIn(
+            "desktop/tests/test_timestamp.py::LocalTsaTest.test_tampered_token_and_record_are_rejected",
+            claim["negative_tests"],
+        )
+        consumer_paths = {item["path"] for item in claim["consumers"]}
+        self.assertEqual(
+            {"scripts/time_stamp.py", "desktop/src/core/timestamp.py"},
+            consumer_paths,
+        )
+
+
 class LedgerMutationTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

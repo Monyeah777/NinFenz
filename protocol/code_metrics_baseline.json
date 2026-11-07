@@ -1265,6 +1265,11 @@
       "max_fn_cc": 25,
       "max_fn_lines": 90
     },
+    "desktop/src/core/timestamp.py": {
+      "lines": 396,
+      "max_fn_cc": 19,
+      "max_fn_lines": 63
+    },
     "desktop/src/core/tool_face.py": {
       "lines": 68,
       "max_fn_cc": 12,
@@ -1629,6 +1634,11 @@
       "lines": 59,
       "max_fn_cc": 5,
       "max_fn_lines": 29
+    },
+    "scripts/time_stamp.py": {
+      "lines": 148,
+      "max_fn_cc": 6,
+      "max_fn_lines": 31
     },
     "scripts/tisa.py": {
       "lines": 224,

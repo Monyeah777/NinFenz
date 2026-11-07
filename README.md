@@ -119,10 +119,10 @@ AI 装配：
 
 <!-- nf:stats:begin -->
 **官方核心**：13 模块 · 3 管线（P00 / P01 / P90） · 核心协议件 01–07
-**社区规模**：111 登记包 · 363 资产档 · 101 概念图 · 100 域包/1200 细分 · 标准目录 375 条（可达 334 / 不可达 41 · 机构 196 · 207 条依赖边） · 标准绑定 1200 条
+**社区规模**：111 登记包 · 363 资产档 · 101 概念图 · 100 域包/1200 细分 · 标准目录 376 条（可达 335 / 不可达 41 · 机构 196 · 207 条依赖边） · 标准绑定 1200 条
 **质量凭证**：verify v2.30 · check1-42 · PASS=76（`bash verify.sh` 单入口；期望基线取自 `quality_baseline.EXPECTED_*`） · 馆藏 3 件
 
-分层：data 150 · eng 39 · form 29 · gov 73 · iface 84 （按标准目录 layer）
+分层：data 150 · eng 40 · form 29 · gov 73 · iface 84 （按标准目录 layer）
 
 > 本区由 `python scripts/nf.py stats --write` 生成，禁止手改；口径与实算真源见 `protocol/repo_stats.json`。
 <!-- nf:stats:end -->
@@ -136,7 +136,7 @@ AI 装配：
 | 库 | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | 社区 | `community/README.md` · `community/模板制作指令包.md` |
 | AI | `docs/agent/AGENT_START.md` · `docs/agent/AI_ROUTING.md` · `docs/meta/DEEP_DIVE.md` |
-| 工具 | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
+| 工具 | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `docs/rfc3161.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
 | 接入面 | `integrations/README.md`（MCP / LSP / CLI / TUI / 图书馆 / Skill / npm / Rust / .NET / A2A） |
 | 馆 | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 

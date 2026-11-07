@@ -13,13 +13,15 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/geo_export.py:d263d55b7b6a8582a13cf66126d22eeb5f05b6d02d648ee9af4ab270812f51cc
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
-  - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
+  - protocol/CONFORMANCE.md:556553117003b30a7482bac6ddc536c44a59d340f769a1e9f77417583c6c5b14
   - docs/fde-stack.md:383a4bba4b253d5f3ca6d7f2aba6d85599fbbf20144c87ffde2f2c7f193bf0e0
   - docs/fde-sample/README.md:9f91cb94c24d15d22fd207607ac7716a4826c3114f4bb58a09dd68f579f8ec27
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
+
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-11-02）：standards assertion ledger

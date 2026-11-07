@@ -59,7 +59,7 @@
           "total": 56
         },
         "ruff": {
-          "total": 87
+          "total": 89
         }
       },
       "ruff": {
@@ -91,6 +91,7 @@
         "desktop/src/core/rust_engine.py::S607": 1,
         "desktop/src/core/storage.py::S110": 1,
         "desktop/src/core/storage.py::S112": 5,
+        "desktop/src/core/timestamp.py::S310": 2,
         "desktop/src/core/verify_checks.py::S603": 1,
         "desktop/src/core/watch.py::S110": 1,
         "desktop/src/core/workloop.py::S110": 1,

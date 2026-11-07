@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/time_token.schema.json",
+  "title": "NF RFC 3161 time token record",
+  "description": "Self-contained subject/query/token evidence record. The trust anchor is intentionally external.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "subject",
+    "query",
+    "token",
+    "trust_anchor",
+    "tsa_result",
+    "note"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["nf-time-token/1"]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256", "der_base64"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "der_base64": {"type": "string", "minLength": 8}
+      }
+    },
+    "token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256", "der_base64"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "der_base64": {"type": "string", "minLength": 8}
+      }
+    },
+    "trust_anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sha256"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "tsa_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gen_time",
+        "serial",
+        "tsa",
+        "status",
+        "policy_oid",
+        "hash_algorithm",
+        "nonce"
+      ],
+      "properties": {
+        "gen_time": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "serial": {"type": "string"},
+        "tsa": {"type": "string"},
+        "status": {"type": "string", "minLength": 1},
+        "policy_oid": {"type": "string", "minLength": 1},
+        "hash_algorithm": {"type": "string", "enum": ["sha256"]},
+        "nonce": {"type": "string", "minLength": 1}
+      }
+    },
+    "note": {"type": "string", "minLength": 1}
+  }
+}

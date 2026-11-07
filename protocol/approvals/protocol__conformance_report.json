@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-07",
   "approved_by": "Monyeah777",
-  "note": "refreeze.sh",
+  "note": "RFC 3161 final baseline",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "06a7e64aa2fa790888f753deef57839c72eb0fecdb16e1fac1a362b30b91140f"
+  "subject_digest": "e1335ea13160d9b025f3e895cac0832ae98941ecbea17d88cc7df91b436d91d6"
 }
