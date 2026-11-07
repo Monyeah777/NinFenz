@@ -1,6 +1,6 @@
 # CCOS ABI v0：7 个系统调用
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-11-06
+> 最后更新：2026-11-07
 > **Status**: Draft v0 · **性质**: 正式协议（形状固定；实装状态逐调用如实标注，未实装不许当已实装读）
 > **上位**: `STRATEGY.md`（方向与禁令）→ 本文件（ABI 层）。
 
@@ -254,26 +254,33 @@ python scripts/nf.py evidence verify <包.zip> --json | grep -q '"level": "diges
 发布结论的**固定入口**见 [release-conclusion.md](release-conclusion.md)：脏树闸门 → checks-only
 → 分片并行 → 汇总，一条命令给出「这台机器现在能不能发布」。
 
-四环可跑的链条现场验证：`scripts/ccos_chain.py`（`--target <对象>`）。它的判据不是
-「四个命令都返回 0」，而是**同一个对象字节的摘要逐个流下去**——体检的 sha256、信封的
-subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；四个命令各自成功
+链条现场验证：`scripts/ccos_chain.py`（`--target <对象>`），顺序为
+**四环 + 可选 sidecar label 环**：cc_check → [cc_label] → cc_attest → cc_verify → cc_replay。
+判据不是「每个命令都返回 0」，而是**同一个对象字节的摘要逐个流下去**——体检的 sha256、信封的
+subject.sha256、证据包成员 digest、轨迹第一步 output 必须**完全相同**；各命令各自成功
 而链条换了字节，仍不算同一条链。
 
-缺环如实标注：本仓载体写入覆盖 **PNG iTXt 与 JPEG APP15**（2026-11-06 实装，
-`nf label embed|extract`），链尚未接 label 环，故链条输出 `missing: ["cc_label"]`——不假装七环
-齐全；把可见文本段读成「抗转码标识」是误读。
+label 环覆盖**旁车标签**（`<对象>.label.json`，`carrier=sidecar embedded=false`）：旁车 ok、
+IR 合法且 `object.digest` 等于体检摘要时，链在 cc_check 后追加 `cc_label` 环并把同一摘要记入
+digests；旁车存在但不合法 / 摘要不等 → 该环判否且 `missing: ["cc_label"]`；无旁车 → 不追加环，
+`missing: ["cc_label"]`（不假装七环齐全）。
+
+**嵌入载体对象（PNG iTXt / JPEG APP15）不进链**，两条硬原因：①证据四环的成员面只收 UTF-8
+文本（attest 对二进制直接 UnicodeDecodeError，evidence 读成员拒非 UTF-8），二进制对象
+不可能上链；②嵌入 IR.object.digest 绑的是「去掉本件标签块/段后的内容摘要」，与整文件 sha256
+定义不同，套进「同一文件摘要逐环一致」不变式会直接判假。把可见文本段读成「抗转码标识」是误读。
 
 ```bash
-python scripts/ccos_chain.py --target STRATEGY.md          # 人读表
-python scripts/ccos_chain.py --target STRATEGY.md --json   # 机读（含四份摘要）
-python -m unittest desktop.tests.test_ccos_chain            # 7 项：摘要一致 / 缺环标注 / 缺环闭集 / 空对象判否
+python scripts/ccos_chain.py --target STRATEGY.md          # 人读表（无旁车 → 缺 cc_label）
+python scripts/ccos_chain.py --target <对象> --json        # 机读（有旁车时五份摘要一致）
+python -m unittest desktop.tests.test_ccos_chain            # 9 项：摘要一致 / 缺环标注 / 缺环闭集 / 空对象判否 / 旁车环闭合 / 篡改判否
 ```
 
 ## 未实装差距（如实挂账，不构成立项理由）
 
 | 调用 | 差距 | 阻塞项 |
 |---|---|---|
-| `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt / JPEG APP15 载体**已有（读回 / 内容面不变 / 结构合法 / 对象绑定）；**仍缺**：水印嵌入、其余格式（MP4/PDF/…）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的两种 |
+| `cc_label` | 声明层 + sidecar 回退 + **PNG iTXt / JPEG APP15 载体**已有（读回 / 内容面不变 / 结构合法 / 对象绑定）；链上只接 **sidecar 标签环**（嵌入载体对象不进链，见上）；**仍缺**：水印嵌入、其余格式（MP4/PDF/…）载体、20+ 格式覆盖 | 水印与多格式需要专门的写入子系统；本季只做能自证的两种 |
 | `cc_check` | 判定面：封闭词表（5 类规则）；**编译面 v0 已有**（结构化意图 → 规则，不可表达项逐条挂账）；**法规原文 → 意图**仍需人写 | 政策编译的语义层：不承诺自动把法规原文变成意图，缺的意图必须逐条挂账 |
 | `cc_resolve` | v0 只认真实声明的契约面（23 条 spec，opt-in）；未声明的对象一律 unclaimed | 契约声明面为人工编纂；未认领给 `unclaimed` 而非放行，不得读成「查过了没问题」 |
 

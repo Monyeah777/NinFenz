@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""CCOS 一条链复现（cc_check → cc_attest → cc_verify → cc_replay）。
+"""CCOS 一条链复现：cc_check → [cc_label] → cc_attest → cc_verify → cc_replay。
 
 为什么（Go/No-Go 判据）：方案要求「一条链可复现」。可复现的硬判据不是「四个命令都返回 0」，
 而是**同一个对象字节的摘要必须逐个流下去**：体检里算出的 sha256、信封里的 subject.sha256、
 证据包里的成员 digest、复现轨迹第一步的 output，必须**完全相同**。任何一环换了字节，
 链条就在那里断——那时四个命令仍可能各自返回 0，但「同一条链」已经不成立。
 
-缺环如实标注：cc_label 环未接入（PNG iTXt 载体已实装，但链尚未调用 label 环；2026-11-06 实测），
-故链从 cc_check 起，输出里显式写 missing 字段——不假装七环齐全。
+label 环只接**旁车标签**（`<对象>.label.json`，embedded 恒 false）：sidecar.read 已强制
+object.digest == sha256(对象) == 体检摘要，套进上面的不变式不换定义。**嵌入载体对象不进链**，
+两条硬原因：①证据四环的成员面只收 UTF-8 文本（attest.subject_of 对二进制即
+UnicodeDecodeError，evidence 读成员拒非 UTF-8），二进制对象不可能上链；②嵌入 IR.object.digest
+绑的是「去掉本件标签块/段后的内容摘要」，与整文件 sha256 定义不同。无旁车时如实写
+missing: ["cc_label"]——不假装七环齐全。
 """
 from __future__ import annotations
 
@@ -21,10 +25,17 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
 
-from core import attest, check_policy, evidence, json_doc  # noqa: E402
+from core import (  # noqa: E402
+    attest,
+    check_policy,
+    evidence,
+    json_doc,
+    label_ir,
+)
+from core import label_sidecar as ls  # noqa: E402
 
 CHAIN_SCHEMA = "nf-ccos-chain/1"
-#: 链上缺的环（PNG 载体已实装但链未接；不得凭空补或凭文档移除）
+#: 候选缺环：无 sidecar 标签时链上确实缺 label 环（嵌入载体对象不进链，见模块头）
 MISSING = ("cc_label",)
 
 
@@ -39,8 +50,36 @@ def _policy() -> dict:
             ]}
 
 
+def _label_ring(abs_path: str, check_digest: str) -> tuple[dict | None, bool]:
+    """尝试 sidecar 标签环 → (link|None, 是否缺环)。
+
+    无旁车 → (None, True)：链上确实缺 label 环，不凭空补。
+    旁车存在但读不通 / IR 有 issues / 绑定摘要 ≠ 体检摘要 → (判否的 link, True)。
+    旁车 ok 且三面对上 → (ok 的 link, False)，digest 即体检摘要（digests 不变式成立）。
+    """
+    if not os.path.isfile(ls.sidecar_path(abs_path)):
+        return None, True
+    res = ls.read(abs_path)
+    label = res.get("label") or {}
+    bound = str((label.get("object") or {}).get("digest") or "")
+    issues = list(res.get("issues") or [])
+    if res.get("ok"):
+        validity = label_ir.validate(label)
+        if validity["issues"]:
+            issues.extend(validity["issues"])
+        elif bound != check_digest:
+            issues.append(f"sidecar 绑定摘要 {bound[:16]} ≠ 链上体检摘要 {check_digest[:16]}"
+                          "（修复指引：旁车与链上对象不是同一份字节）")
+        else:
+            level = str(validity.get("level") or "none")
+            return ({"link": "cc_label", "verdict": "ok", "digest": bound, "ok": True,
+                     "detail": f"carrier=sidecar embedded=false level={level}"}, False)
+    return ({"link": "cc_label", "verdict": "invalid", "digest": bound, "ok": False,
+             "detail": "；".join(issues[:2]) or "旁车标签不可用"}, True)
+
+
 def run(root: str, target: str, key: bytes | None = None) -> dict:
-    """跑四个环节 → {schema, target, links, digests, missing, ok}。"""
+    """跑四环 + 可选 sidecar label 环 → {schema, target, links, digests, missing, ok}。"""
     rel = str(target).replace("\\", "/").lstrip("/")
     abs_path = os.path.join(root, rel) if not os.path.isabs(rel) else rel
     links: list[dict] = []
@@ -51,6 +90,12 @@ def run(root: str, target: str, key: bytes | None = None) -> dict:
     links.append({"link": "cc_check", "verdict": res["verdict"],
                   "digest": digests["check"], "ok": res["verdict"] == "ok",
                   "detail": f"policy={res['policy_id']} digest={res['policy_digest'][:16]}"})
+
+    label_link, label_missing = _label_ring(abs_path, digests["check"])
+    if label_link is not None:
+        links.append(label_link)
+        if label_link["ok"]:
+            digests["label"] = label_link["digest"]
 
     env = attest.build(rel, root, issuer="ccos-chain")
     if key:
@@ -86,13 +131,15 @@ def run(root: str, target: str, key: bytes | None = None) -> dict:
 
     same = all(digests.values()) and len({d for d in digests.values() if d}) == 1
     return {"schema": CHAIN_SCHEMA, "target": rel, "links": links,
-            "digests": digests, "missing": list(MISSING), "digests_agree": same,
+            "digests": digests, "missing": ["cc_label"] if label_missing else [],
+            "digests_agree": same,
             "ok": same and all(link["ok"] for link in links)}
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
-        prog="ccos_chain", description="CCOS 一条链复现（cc_check→cc_attest→cc_verify→cc_replay）")
+        prog="ccos_chain",
+        description="CCOS 一条链复现（cc_check→[cc_label]→cc_attest→cc_verify→cc_replay）")
     ap.add_argument("--root", default=ROOT, help="仓库根（缺省 = 本脚本所在仓）")
     ap.add_argument("--target", default="STRATEGY.md", help="链上对象（仓库相对路径）")
     ap.add_argument("--key-file", default="", help="可选：给信封加 hmac-sha256 级")
