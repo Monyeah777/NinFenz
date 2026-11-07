@@ -6,7 +6,7 @@ description = "NF Python 扩展（PyO3）：同进程绑定的第二形态（P5-
 license = "MIT"
 
 [dependencies]
-pyo3 = { version = "0.22", features = ["extension-module"] }
+pyo3 = { version = "0.29", features = ["extension-module"] }
 # 进程内绑定的业务原语单源 = engine/rust 的 rlib（不重抄 sha256 / float repr，避免两份口径）。
 # 只暴露 lib.rs 里的纯函数面；业务判据面仍在 bin（main.rs 只读快线）。
 nf-rs = { path = ".." }
