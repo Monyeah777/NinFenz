@@ -100,6 +100,8 @@ HARD_ALLOW = {
 }
 #: R5 软导入登记（第三方可选依赖：必须 try/except ImportError 守卫 + 写明理由）
 SOFT_IMPORTS = {
+    "numpy": "水印鲁棒性基准（watermark_bench）里按像素构造噪声/亮度攻击；"
+        "软导入 + 缺依赖给修复指引，基准以外不依赖",
     "PIL": "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，"
         "文本载体那条路保持纯标准库",
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",

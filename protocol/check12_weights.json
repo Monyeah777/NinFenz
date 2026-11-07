@@ -347,6 +347,7 @@
     "test_version_map": 2.3,
     "test_version_matrix": 0.1,
     "test_watch": 62.7,
+    "test_watermark_bench": 2.1,
     "test_workflow_hardening": 0.2,
     "test_workflow_policy": 0.2,
     "test_world_model": 0.5,
@@ -4029,6 +4030,16 @@
     "test_watch.WatchDaemonIntegrationTest.test_resident_layer_is_wired_and_unknown_change_clears_it": 0.14,
     "test_watch.WatchDaemonIntegrationTest.test_resident_layer_survives_a_code_reload": 0.09,
     "test_watch.WatchDaemonIntegrationTest.test_zero_subprocess_client_really_talks_to_the_daemon": 0.39,
+    "test_watermark_bench.BenchCoverageTest.test_attack_matrix_is_wide_enough": 0.37,
+    "test_watermark_bench.BenchCoverageTest.test_every_attack_has_both_verdict_fields": 0.27,
+    "test_watermark_bench.BenchCoverageTest.test_markdown_table_has_all_rows": 0.26,
+    "test_watermark_bench.BenchDeterminismTest.test_build_is_deterministic": 0.52,
+    "test_watermark_bench.BenchDeterminismTest.test_committed_results_match_rebuild": 0.27,
+    "test_watermark_bench.PromiseAndBoundaryTest.test_baseline_clean_embed_round_trips": 0.0,
+    "test_watermark_bench.PromiseAndBoundaryTest.test_boundary_jpeg_is_not_survived": 0.0,
+    "test_watermark_bench.PromiseAndBoundaryTest.test_boundary_scale_and_screenshot_are_not_survived": 0.0,
+    "test_watermark_bench.PromiseAndBoundaryTest.test_boundary_tiny_noise_and_brightness_have_no_margin": 0.0,
+    "test_watermark_bench.PromiseAndBoundaryTest.test_promise_lossless_and_crop": 0.0,
     "test_workflow_hardening.WorkflowHardeningTest.test_codeowners_is_required": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_credential_persistence_is_rejected": 0.01,
     "test_workflow_hardening.WorkflowHardeningTest.test_dependabot_must_cover_real_ecosystems": 0.01,
@@ -4080,5 +4091,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1372.8
+  "total_s": 1374.9
 }

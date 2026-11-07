@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:4039489e210dd5ae97011e4efed6d0fb965e1ec419c21d34e4643831c78f86bf
+  - protocol/check12_weights.json:e3ed5befcfccefa6f24c67f14907fbdd9a8567832a4b6709a92a07da2b897343
   - protocol/coupling_baseline.json:431d4eda758bf75851f088809133795e6299690b24dbbe1e4ad31125f93b6b46
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）

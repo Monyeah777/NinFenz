@@ -14,8 +14,12 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
+  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
 ---
+> 重审（2026-11-08）：水印基准收口（纯度为软导入）
+
+> 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）

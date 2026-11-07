@@ -9,7 +9,7 @@ subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
+  - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
   - desktop/tests/test_purity_scan.py:8f534c3cb5f4a85df538a551bf610dc4c09aae4cb28dd28aa4fe6a66a5f5c4d7
   - scripts/nf.py:729d9c9f764aa04b0b16f2c0112477a5a52b58114f76e3b4791c2889edbc165e
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
@@ -23,6 +23,8 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
+> 重审（2026-11-08）：纯度：numpy/PIL 软导入登记
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）

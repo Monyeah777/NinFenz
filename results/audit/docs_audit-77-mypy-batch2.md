@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
+  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
 ---
+> 重审（2026-11-08）：水印基准收口（纯度为软导入）
+
+> 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）

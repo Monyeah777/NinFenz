@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
+  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
 ---
+> 重审（2026-11-08）：水印基准收口（纯度为软导入）
+
+> 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）

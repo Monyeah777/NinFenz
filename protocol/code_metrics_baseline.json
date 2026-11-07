@@ -686,9 +686,9 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_watermark.py": {
-      "lines": 257,
+      "lines": 300,
       "max_fn_cc": 16,
-      "max_fn_lines": 38
+      "max_fn_lines": 41
     },
     "desktop/src/core/layer_model.py": {
       "lines": 639,
@@ -1021,7 +1021,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 578,
+      "lines": 580,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1674,6 +1674,11 @@
       "lines": 713,
       "max_fn_cc": 50,
       "max_fn_lines": 206
+    },
+    "scripts/watermark_bench.py": {
+      "lines": 218,
+      "max_fn_cc": 6,
+      "max_fn_lines": 29
     },
     "scripts/workflow_policy.py": {
       "lines": 42,

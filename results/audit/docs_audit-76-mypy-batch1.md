@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:3b892bab41405943090339dc9e08bb971bb66a2bf1b492324320b4f088f9d59e
+  - protocol/code_metrics_baseline.json:a8ffa39281509a6d11761baad94bf3a814d7d9b2ed663a5a71bd51eb79dfa147
 ---
+> 重审（2026-11-08）：水印基准收口（纯度为软导入）
+
+> 重审（2026-11-08）：水印鲁棒性基准（16 攻击 × BER）+ 文档实测表
+
 > 重审（2026-11-07）：方法包 v0 收尾（风格/度量重冻）
 
 > 重审（2026-11-07）：方法包 v0（3 个领域包 + 组合 + 研究计划接线）
