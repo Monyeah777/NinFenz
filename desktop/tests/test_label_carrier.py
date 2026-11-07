@@ -327,9 +327,9 @@ class TestJpegCarrier(unittest.TestCase):
 
     def test_unsupported_format_rejected(self):
         with self.assertRaises(lc.CarrierError) as ctx:
-            lc.embed(b"RIFF0000WEBPVP8 ", make_ir(self.jpeg))
+            lc.embed(b"GIF89a" + b"\x00" * 32, make_ir(self.jpeg))
         self.assertIn("PNG", str(ctx.exception))
-        self.assertIn("JPEG", str(ctx.exception))
+        self.assertIn("PDF", str(ctx.exception), "指引里要列全支持的载体")
 
     def test_pillow_can_still_decode_and_pixels_match(self):
         pil = pytest_importorskip_image()
@@ -359,6 +359,59 @@ class TestRealPngFixtures(unittest.TestCase):
             res = lc.read(out)
             self.assertEqual("ok", res["verdict"], f"{name}: {res['issues']}")
             self.assertEqual(ir["object"]["digest"], res["label"]["object"]["digest"], name)
+
+
+class AdditionalCarriersTest(unittest.TestCase):
+    """WebP / MP4 / PDF 的附加块载体：**前缀字节不变**（WebP 需同步 RIFF 长度字段）。
+
+    这三种的承诺比 PNG/JPEG 更窄：不是「改元数据」，而是「在容器尾部追加可忽略块」——
+    因此旧版解码器照样能打开，删除也只要截掉尾部。判据盯两件事：① 媒体字节没被碰；
+    ② 读回形状合法（IR 校验过）。
+    """
+
+    def _ir(self):
+        from core import label_ir
+        return label_ir.build("x.bin", "a" * 64, level="minimal", items=[
+            {"id": "E1", "face": "explicit", "kind": "text", "where": "start", "value": "AI"},
+            {"id": "I2", "face": "implicit", "kind": "metadata", "key": "AIGC", "value": "y"},
+        ])
+
+    def test_webp_chunk_round_trip(self):
+        import io as _io
+
+        import numpy as np
+        from PIL import Image
+        img = Image.fromarray(np.zeros((64, 64, 3), dtype=np.uint8), "RGB")
+        buf = _io.BytesIO()
+        img.save(buf, "WEBP", lossless=True)
+        src = buf.getvalue()
+        out, info = lc.embed(src, self._ir())
+        self.assertEqual("webp-chunk", info["carrier"])
+        self.assertEqual(src[12:], out[12:len(src)], "媒体块必须逐字节不变")
+        self.assertEqual(src[:4], out[:4])
+        self.assertTrue(lc.read(out)["ok"])
+        self.assertEqual((64, 64), Image.open(_io.BytesIO(out)).size)
+
+    def test_mp4_box_round_trip(self):
+        src = (int.to_bytes(24, 4, "big") + b"ftyp" + b"isom" + b"\x00\x00\x02\x00"
+               + b"isomiso2")
+        out, info = lc.embed(src, self._ir())
+        self.assertEqual("mp4-free-box", info["carrier"])
+        self.assertEqual(src, out[:len(src)], "原始盒必须逐字节保留")
+        self.assertTrue(lc.read(out)["ok"])
+
+    def test_pdf_trailer_round_trip(self):
+        src = b"%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"
+        out, info = lc.embed(src, self._ir())
+        self.assertEqual("pdf-trailer-comment", info["carrier"])
+        self.assertEqual(src, out[:len(src)], "PDF 前缀必须逐字节保留")
+        self.assertTrue(lc.read(out)["ok"])
+
+    def test_unlabeled_containers_are_invalid(self):
+        for src in (b"RIFF\x10\x00\x00\x00WEBPVP8 " + b"\x00" * 8,
+                    int.to_bytes(24, 4, "big") + b"ftypisom" + b"\x00" * 12,
+                    b"%PDF-1.4\n%%EOF\n"):
+            self.assertFalse(lc.read(src)["ok"], src[:16])
 
 
 if __name__ == "__main__":

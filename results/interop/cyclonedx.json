@@ -11,6 +11,13 @@
       "version": "6.0.3"
     },
     {
+      "bom-ref": "opt:PIL",
+      "description": "软依赖（可选，须守卫）：标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体那条路保持纯标准库",
+      "name": "PIL",
+      "scope": "optional",
+      "type": "library"
+    },
+    {
       "bom-ref": "opt:PySide6",
       "description": "软依赖（可选，须守卫）：CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
       "name": "PySide6",

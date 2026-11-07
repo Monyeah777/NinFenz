@@ -541,11 +541,16 @@ def _add_parser_production(sub):
                       help="源图（PNG/JPEG；可以是二进制）")
     lemb.add_argument("--ir", default="", help="已编好的 nf-label/1 IR JSON")
     lemb.add_argument("--out", default="", help="写入落点（缺省=<对象>.labeled.png；不改输入）")
+    lemb.add_argument("--mode", default="text", choices=("text", "watermark"),
+                      help="写入面：text=容器文本块（PNG/JPEG/WebP/MP4/PDF）；"
+                           "watermark=PNG 像素 LSB 水印（删掉文本块也还在）")
     lemb.add_argument("--json", action="store_true", help="输出结构化 JSON")
     lext = lsub.add_parser("extract",
                            help="从载体读回 IR（PNG iTXt / JPEG APP15；与 sidecar 同形状）",
                            description="载体读取：读 AIGC iTXt 块，校验 IR 形状；没有则 invalid。")
     lext.add_argument("label_object", metavar="OBJECT", help="图片路径（PNG/JPEG；可以是二进制）")
+    lext.add_argument("--mode", default="auto", choices=("auto", "text", "watermark"),
+                      help="读取面：auto=先读文本块、没有再读水印；也可指定其一")
     lext.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ev = sub.add_parser("evidence",
                         help="证据包：打包 / 第三方复验（cc_verify 的 CLI 面）",
@@ -3346,7 +3351,23 @@ def _label_embed(args):
     out = _rel_out(args.out) if args.out else src + ".labeled.png"
     try:
         ir = json_doc.load(_rel_out(args.ir), dict, what=args.ir)
-        info = label_carrier.embed_file(src, ir, out)
+        if getattr(args, "mode", "text") == "watermark":
+            from core import atomic_write, label_watermark
+            with open(src, "rb") as fh:
+                raw = fh.read()
+            payload = label_watermark._frame_for_ir(ir)
+            wm_out, winfo = label_watermark.embed(raw, payload)
+            atomic_write.write_bytes(out, wm_out)
+            back = label_watermark.extract(wm_out)
+            info = {"src": src, "out": out, "format": "png", "carrier": "png-lsb-watermark",
+                    "keyword": "NFWM1", "replaced": False, **winfo,
+                    "readback_ok": bool(back["ok"]),
+                    "readback_confidence": back["confidence"],
+                    "pixel_digest": label_carrier.pixel_digest(wm_out)}
+            if not back["ok"]:
+                return _machine_fail(args, "水印写完后读不回来（内部不一致，已中止）", 1)
+        else:
+            info = label_carrier.embed_file(src, ir, out)
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 2)
     if args.json:
@@ -3355,9 +3376,16 @@ def _label_embed(args):
     else:
         print(f"== nf label embed（{_rel_display(src)} → {_rel_display(out)}）==")
         fmt = info.get("format", "?")
-        print(f"  载体：{fmt} · keyword={info['keyword']} · 已替换={info['replaced']}")
-        print(f"  像素面：{info['pixel_digest'][:16]}（写入前后一致）")
-        print("  只承诺：能读回、不改像素、块 CRC 合法；抗转码/水印不在本件")
+        carrier = info.get("carrier") or fmt
+        print(f"  载体：{carrier} · keyword={info['keyword']} · 已替换={info['replaced']}")
+        if carrier == "png-lsb-watermark":
+            print(f"  冗余：{info['redundancy']} 块 × {info['bits_per_tile']} bit")
+            print(f"  回读自检：ok={info['readback_ok']} · 置信度 {info['readback_confidence']}")
+            print("  只承诺：删掉文本块仍可读回摘要帧、扛裁剪与重存；"
+                  "不承诺抗 JPEG/缩放/截屏")
+        else:
+            print(f"  像素面：{info['pixel_digest'][:16]}（写入前后一致）")
+            print("  只承诺：能读回、不改像素、块 CRC 合法；抗转码/水印不在本件")
     return 0
 
 
@@ -3375,14 +3403,32 @@ def _label_extract(args):
         return _machine_fail(args, f"读不到对象：{exc}", 2)
     res = label_carrier.read(raw)
     res["object"] = _rel_display(src)
+    if (not res.get("ok")) and getattr(args, "mode", "auto") != "text":
+        from core import label_watermark
+        wm_res = label_watermark.extract(raw)
+        if wm_res["ok"]:
+            res = {"ok": True, "verdict": "ok", "label": None, "object": _rel_display(src),
+                   "source": "watermark",
+                   "watermark_payload": wm_res["payload"].decode("utf-8", "replace"),
+                   "confidence": wm_res["confidence"], "issues": [],
+                   "warnings": ["水印层只带 IR 的摘要帧（版本/标准/对象摘要前缀/条目名），"
+                                "不是整份 IR；整份 IR 用文本载体或 sidecar"]}
+        else:
+            res["watermark"] = {"ok": False, "issues": wm_res["issues"]}
     if args.json:
         print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(f"== nf label extract（{_rel_display(src)}）==")
-        print(f"  判定：{res['verdict']}")
+        origin = res.get("source") or res.get("carrier") or "text"
+        print(f"  判定：{res['verdict']} · 来源：{origin}")
         for issue in res["issues"]:
             print(f"  [FAIL] {issue}", file=sys.stderr)
-        if res["verdict"] == "ok":
+        if res["verdict"] == "ok" and res.get("source") == "watermark":
+            print(f"  水印帧：{res['watermark_payload']}")
+            print(f"  置信度：{res['confidence']}")
+            for warn in res["warnings"]:
+                print(f"  [WARN] {warn}", file=sys.stderr)
+        elif res["verdict"] == "ok":
             label = res["label"] or {}
             print(f"  标注：{label.get('standard')} · 档位 {label.get('level')}")
     return 0 if res["verdict"] == "ok" else 1

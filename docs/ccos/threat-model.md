@@ -68,9 +68,11 @@
   [time-token-v0.md](time-token-v0.md)。
 - **G4 `cc_label`：声明层 + sidecar 回退 + PNG/JPEG 载体已实装；水印与多格式仍缺**：`nf-label/1` IR
   能校验「该有哪些标识、缺哪几条」；sidecar（`nf-label-sidecar/1`）把声明与对象摘要绑定，对象一变即判
-  过期；`nf label embed` 把 IR 写进 **PNG iTXt 块**（可读回 / 不改像素 / 块结构合法）。但那是**可见文本
-  载体**——任何人可剥掉，抗裁剪/抗转码/抗截屏（真水印）**不承诺**；JPEG/MP4/PDF 无载体，只能走 sidecar
-  且 `embedded=false`。
+  过期；`nf label embed` 的**文本载体**覆盖 PNG iTXt / JPEG APP15 / WebP NFLA / MP4 free 盒 /
+  PDF 尾部注释——可读回、容器结构合法、媒体字节不被碰；但它们都是**可剥离**的（删块/截尾即失效）。
+  2026-11-07 起另有 **PNG 像素水印**（`--mode watermark`，24×24 块冗余 + 逐位多数表决）：删掉文本块仍在、
+  扛裁剪与无损重存；**不扛** JPEG 重编码/缩放/截屏（有损变换改的就是低位，判据里写成期望行为）。
+  其它格式的水印仍缺（MP4/PDF/WebP 只有可剥离载体）。
 - **G5 供应链核对（已部分接入 gate）**：发布结论器现在**先跑**供应链核对（站点件数/体积 vs payload
   清单、根 llms-full 投影逐字节一致），不一致即不产出「可发布」。残留：payload 清单自身的来源证明
   （SLSA/OIDC 签名）仍靠发布线外置命令核对，不在本 gate 内。

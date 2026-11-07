@@ -172,6 +172,7 @@
     "test_label_carrier": 1.6,
     "test_label_ir": 1.5,
     "test_label_sidecar": 3.2,
+    "test_label_watermark": 2.1,
     "test_launcher": 119.4,
     "test_layer_model": 11.2,
     "test_lazy_yaml": 0.2,
@@ -2089,6 +2090,15 @@
     "test_label_sidecar.TestWriteRead.test_missing_sidecar_is_invalid_with_guidance": 0.0,
     "test_label_sidecar.TestWriteRead.test_round_trip_ok_and_never_embedded": 0.01,
     "test_label_sidecar.TestWriteRead.test_sidecar_binds_object_digest": 0.01,
+    "test_label_watermark.WatermarkCliTest.test_cli_embed_and_extract": 1.63,
+    "test_label_watermark.WatermarkFrameTest.test_frame_carries_ir_summary": 0.0,
+    "test_label_watermark.WatermarkRoundTripTest.test_does_not_survive_jpeg_transcode": 0.03,
+    "test_label_watermark.WatermarkRoundTripTest.test_embed_then_extract_round_trip": 0.03,
+    "test_label_watermark.WatermarkRoundTripTest.test_image_without_watermark_reports_invalid": 0.01,
+    "test_label_watermark.WatermarkRoundTripTest.test_oversized_payload_is_rejected_with_guide": 0.0,
+    "test_label_watermark.WatermarkRoundTripTest.test_survives_crop": 0.03,
+    "test_label_watermark.WatermarkRoundTripTest.test_survives_lossless_resave": 0.03,
+    "test_label_watermark.WatermarkRoundTripTest.test_too_small_image_is_rejected_with_guide": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_cmd_launcher_is_never_advertised_as_the_fastest": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_documented_default_matches_the_launcher": 0.0,
     "test_launcher.AutostartDefaultDocumentationTest.test_one_current_number_per_launcher": 0.0,
@@ -3999,5 +4009,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1359.2
+  "total_s": 1361.3
 }

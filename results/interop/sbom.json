@@ -37,6 +37,13 @@
       "versionInfo": "6.0.3"
     },
     {
+      "SPDXID": "SPDXRef-Optional-PIL",
+      "comment": "软依赖（可选，须 try/except 守卫）：标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，文本载体那条路保持纯标准库",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "name": "PIL"
+    },
+    {
       "SPDXID": "SPDXRef-Optional-PySide6",
       "comment": "软依赖（可选，须 try/except 守卫）：CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
       "downloadLocation": "NOASSERTION",
@@ -91,6 +98,11 @@
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",
       "relationshipType": "DEPENDENCY_OF",
       "spdxElementId": "SPDXRef-Dependency-yaml"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-ninfenz",
+      "relationshipType": "OPTIONAL_DEPENDENCY_OF",
+      "spdxElementId": "SPDXRef-Optional-PIL"
     },
     {
       "relatedSpdxElement": "SPDXRef-Package-ninfenz",

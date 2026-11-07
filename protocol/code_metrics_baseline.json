@@ -661,7 +661,7 @@
       "max_fn_lines": 41
     },
     "desktop/src/core/label_carrier.py": {
-      "lines": 410,
+      "lines": 548,
       "max_fn_cc": 17,
       "max_fn_lines": 48
     },
@@ -674,6 +674,11 @@
       "lines": 130,
       "max_fn_cc": 10,
       "max_fn_lines": 41
+    },
+    "desktop/src/core/label_watermark.py": {
+      "lines": 257,
+      "max_fn_cc": 16,
+      "max_fn_lines": 38
     },
     "desktop/src/core/layer_model.py": {
       "lines": 639,
@@ -1001,7 +1006,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 576,
+      "lines": 578,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1511,7 +1516,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8786,
+      "lines": 8832,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

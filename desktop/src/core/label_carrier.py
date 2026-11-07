@@ -17,6 +17,7 @@
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -368,6 +369,131 @@ def _read_jpeg(jpeg: bytes) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- 分发（格式按 magic）
 
+
+# ---------------------------------------------------------------- WebP / MP4 / PDF（附加块载体）
+WEBP_RIFF = b"RIFF"
+WEBP_TAG = b"WEBP"
+WEBP_CHUNK = b"NFLA"
+MP4_BOX = b"free"
+PDF_COMMENT = b"\n%% NF-LABEL "
+
+
+def _webp_media_digest(data: bytes) -> str:
+    """WebP 媒体面摘要（前半 RIFF 不变的那段之外的部分）：用于证明写入不改像素数据。"""
+    return hashlib.sha256(data[12:]).hexdigest()
+
+
+def _embed_webp(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """WebP：在 RIFF 尾部追加私有块 NFLA（解码器按规范跳过未知块；RIFF 长度同步）。"""
+    if len(data) < 12 or data[8:12] != WEBP_TAG:
+        raise CarrierError("WebP 头部不合法（" + GUIDE + "不是 RIFF/WEBP 容器）")
+    body = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    pad = b"\x00" if len(body) % 2 else b""
+    chunk = WEBP_CHUNK + int.to_bytes(len(body), 4, "little") + body + pad
+    riff = bytearray(data)
+    new_size = int.from_bytes(riff[4:8], "little") + len(chunk)
+    riff[4:8] = int.to_bytes(new_size, 4, "little")
+    out = bytes(riff) + chunk
+    return out, {"keyword": WEBP_CHUNK.decode("ascii"), "replaced": False,
+                 "media_digest": _webp_media_digest(data), "carrier": "webp-chunk",
+                 "bytes_before": len(data), "bytes_after": len(out)}
+
+
+def _read_webp(data: bytes) -> dict[str, Any]:
+    res: dict[str, Any] = {"ok": False, "verdict": "invalid", "label": None, "issues": []}
+    pos = 12
+    while pos + 8 <= len(data):
+        name = data[pos:pos + 4]
+        size = int.from_bytes(data[pos + 4:pos + 8], "little")
+        body = data[pos + 8:pos + 8 + size]
+        if name == WEBP_CHUNK:
+            try:
+                ir = json_doc.loads(body[:size].rstrip(b"\x00").decode("utf-8"), dict,
+                                what="标注块")
+            except (ValueError, UnicodeDecodeError) as exc:
+                res["issues"].append(f"WebP 标注块不可解析：{exc}（{GUIDE}重写）")
+                return res
+            issues = label_ir.validate(ir)["issues"]
+            if issues:
+                res["issues"].extend(issues)
+                return res
+            res.update({"ok": True, "verdict": "ok", "label": ir})
+            return res
+        pos += 8 + size + (size % 2)
+    res["issues"].append("WebP 里没有 NFLA 标注块（" + GUIDE + "可能是被重编码/剥离过）")
+    return res
+
+
+def _embed_mp4(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """MP4：尾部追加一个顶层 free 盒（规范允许跳过；不碰 moov/mdat）。"""
+    if len(data) < 12 or data[4:8] != b"ftyp":
+        raise CarrierError("MP4 头部不合法（" + GUIDE + "不是 ftyp 开头的 ISO BMFF）")
+    body = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    box = int.to_bytes(8 + len(body), 4, "big") + MP4_BOX + body
+    out = data + box
+    return out, {"keyword": MP4_BOX.decode("ascii"), "replaced": False,
+                 "media_digest": hashlib.sha256(data).hexdigest(), "carrier": "mp4-free-box",
+                 "bytes_before": len(data), "bytes_after": len(out)}
+
+
+def _read_mp4(data: bytes) -> dict[str, Any]:
+    res: dict[str, Any] = {"ok": False, "verdict": "invalid", "label": None, "issues": []}
+    pos = 0
+    while pos + 8 <= len(data):
+        size = int.from_bytes(data[pos:pos + 4], "big")
+        name = data[pos + 4:pos + 8]
+        if size < 8 or pos + size > len(data):
+            res["issues"].append("MP4 盒结构不合法（" + GUIDE + "文件可能被截断/改写）")
+            return res
+        if name == MP4_BOX:
+            body = data[pos + 8:pos + size]
+            try:
+                ir = json_doc.loads(body.decode("utf-8"), dict, what="标注盒")
+            except (ValueError, UnicodeDecodeError):
+                pos += size
+                continue
+            issues = label_ir.validate(ir)["issues"]
+            if not issues:
+                res.update({"ok": True, "verdict": "ok", "label": ir})
+                return res
+        pos += size
+    res["issues"].append("MP4 里没有 free 标注盒（" + GUIDE + "可能被重封装/剥离过）")
+    return res
+
+
+def _embed_pdf(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """PDF：EOF 之后追加一行注释（PDF 允许尾部多余字节；不碰 xref/对象）。"""
+    if not data.startswith(b"%PDF-"):
+        raise CarrierError("PDF 头部不合法（" + GUIDE + "不是 %PDF 文件）")
+    body = base64.b64encode(json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8"))
+    out = data + PDF_COMMENT + body + b"\n"
+    return out, {"keyword": "NF-LABEL", "replaced": False,
+                 "media_digest": hashlib.sha256(data).hexdigest(), "carrier": "pdf-trailer-comment",
+                 "bytes_before": len(data), "bytes_after": len(out)}
+
+
+def _read_pdf(data: bytes) -> dict[str, Any]:
+    res: dict[str, Any] = {"ok": False, "verdict": "invalid", "label": None, "issues": []}
+    marker = PDF_COMMENT.strip()
+    idx = data.rfind(marker)
+    if idx < 0:
+        res["issues"].append("PDF 尾部没有 NF-LABEL 注释（" + GUIDE + "可能被重新保存/剥离过）")
+        return res
+    tail = data[idx + len(marker):].split(b"\n", 1)[0].strip()
+    try:
+        ir = json_doc.loads(base64.b64decode(tail, validate=True).decode("utf-8"),
+                            dict, what="标注注释")
+    except (ValueError, UnicodeDecodeError):
+        res["issues"].append("PDF 标注注释不可解析（" + GUIDE + "注释行被截断/改动）")
+        return res
+    issues = label_ir.validate(ir)["issues"]
+    if issues:
+        res["issues"].extend(issues)
+        return res
+    res.update({"ok": True, "verdict": "ok", "label": ir})
+    return res
+
+
 def embed(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     """按 magic 选载体：PNG → iTXt；JPEG → APP15。其它格式一律带指引拒绝（不猜）。"""
     if len(data) > MAX_INPUT_BYTES:
@@ -382,7 +508,13 @@ def embed(data: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
         return out, {**info, "format": "png"}
     if data.startswith(JPEG_SOI):
         return _embed_jpeg(data, ir)
-    raise CarrierError("不支持的载体格式（" + GUIDE + "本件只写 PNG 与 JPEG；"
+    if data.startswith(WEBP_RIFF) and data[8:12] == WEBP_TAG:
+        return _embed_webp(data, ir)
+    if data[4:8] == b"ftyp":
+        return _embed_mp4(data, ir)
+    if data.startswith(b"%PDF-"):
+        return _embed_pdf(data, ir)
+    raise CarrierError("不支持的载体格式（" + GUIDE + "本件写 PNG/JPEG/WebP/MP4/PDF；"
                        "其它格式请用 nf label write 的 sidecar 回退）")
 
 
@@ -392,8 +524,14 @@ def read(data: bytes) -> dict[str, Any]:
         return _read_png(data)
     if data.startswith(JPEG_SOI):
         return _read_jpeg(data)
+    if data.startswith(WEBP_RIFF) and data[8:12] == WEBP_TAG:
+        return _read_webp(data)
+    if data[4:8] == b"ftyp":
+        return _read_mp4(data)
+    if data.startswith(b"%PDF-"):
+        return _read_pdf(data)
     res = {"ok": False, "verdict": "invalid", "label": None, "issues": []}
-    res["issues"].append("不认识的载体格式（" + GUIDE + "本件只读 PNG 与 JPEG）")
+    res["issues"].append("不认识的载体格式（" + GUIDE + "本件读 PNG/JPEG/WebP/MP4/PDF）")
     return res
 
 

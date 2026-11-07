@@ -1,8 +1,9 @@
 # 标注 IR v0（`cc_label` 的声明层）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-05
-> **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **PNG iTXt / JPEG APP15
-> 载体写入**（`core/label_carrier.py` + `nf label embed|extract`；只可见文本段、无水印）
+> **Status**: v0 已实装**声明层**（`core/label_ir.py` + `nf label ir|validate`）+ **载体层
+> （`core/label_carrier.py`：PNG iTXt / JPEG APP15 / WebP NFLA / MP4 free 盒 / PDF 尾部注释；
+> `core/label_watermark.py`：PNG 像素水印）**（`nf label embed|extract`）
 
 ## 是什么 / 不是什么
 
@@ -69,7 +70,37 @@ nf label list                                                    # 清点仓内�
 写盘走 `atomic_write`：半截旁车会让读者读到假声明。读判据只读旁车 + 对象摘要，不联网、不猜。
 
 
-## 载体（v0 已实装：PNG iTXt 与 JPEG APP15）
+## 载体（v0 已实装：PNG / JPEG / WebP / MP4 / PDF + PNG 水印）
+
+`nf label embed` 按 magic 选载体，`--mode` 选写入面：
+
+| 格式 | 写入面 | 载体机制 | 承诺 |
+|---|---|---|---|
+| PNG | `--mode text`（缺省） | `iTXt` 块（keyword = `AIGC`，UTF-8） | 读回 + **不改像素** + 结构合法 |
+| PNG | `--mode watermark` | 像素最低位帧（24×24 块冗余 × 多数表决） | 读回 + **删掉文本块仍在** + 扛裁剪/重存；**不**扛 JPEG/缩放 |
+| JPEG | `text` | `APP15` 段（`AIGC\0` + JSON） | 读回 + 扫描数据原样 + 段结构合法 |
+| WebP | `text` | RIFF 尾部私有块 `NFLA`（同步 RIFF 长度） | 读回 + 媒体块逐字节不变 + 解码器可开 |
+| MP4 | `text` | 顶层 `free` 盒（尾部追加） | 读回 + 原始盒逐字节保留 |
+| PDF | `text` | `%%EOF` 后注释行（base64） | 读回 + 原文件前缀逐字节保留 |
+
+**WebP/MP4/PDF 的承诺比图片弱**：不是写元数据，而是**在容器尾部追加可忽略块**——旧解码器照样能开，
+要删也只要截掉尾部。这三条都只证明「可读回 + 媒体字节没被碰」，不证明「别人删不掉」。
+
+```bash
+nf label embed --object 产出/海报.png  --ir 产出/海报.label.json            # 文本块（不改像素）
+nf label embed --object 产出/海报.png  --ir 产出/海报.label.json \
+            --mode watermark --out 产出/海报.wm.png                      # 像素水印（删块仍在）
+nf label embed --object 产出/片段.mp4  --ir 产出/片段.label.json            # MP4 free 盒
+nf label embed --object 产出/报告.pdf  --ir 产出/报告.label.json            # PDF 尾部注释
+nf label extract 产出/海报.wm.png                                          # auto：先文本块，再水印
+```
+
+**水印的边界（判据里写成期望行为）**：低位水印扛得住裁剪、无偏噪声与无损重存；
+**扛不住** JPEG 重编码 / 缩放 / 截屏——有损变换改的就是低位。`test_label_watermark.py` 里
+「JPEG 转码后读不回」是断言通过的**期望行为**，避免下次有人把它当 bug 修。
+水印帧只带 IR 的摘要帧（版本/标准/对象摘要前缀/条目名/条数），不是整份 IR。
+
+## 与 `cc_label` 的关系
 
 `nf label embed` 按 magic 选载体：**PNG → `iTXt` 块**（keyword = `AIGC`，UTF-8）、
 **JPEG → `APP15` 段**（`AIGC\0` + JSON）。`nf label extract` 读回。纯标准库实现，
