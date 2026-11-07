@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
   - tui/_surface.py:f708147a385a47d8cb9d34ea340c172bd9ac40a3e545d15ca4956f0ec5496b5d
-  - protocol/check12_weights.json:43e983929de091122ed9d9e0e7e8738342c24fd15f67337ed3f5dc5c40049774
+  - protocol/check12_weights.json:5818317762929de02a76e77339b6401d07737ca86c3813a334d814ca13867f16
   - protocol/coupling_baseline.json:30db6552f03e0d085322db1e651220d827289eebfe537897ad847305dfb5bbb6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：评测设计包接主张编译（efficacy/cost/reliability 三态）
+
 > 重审（2026-11-08）：新增方法包 evaluation-design（评测设计域）
 
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）

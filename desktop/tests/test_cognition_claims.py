@@ -159,6 +159,19 @@ class CheckClaimTest(unittest.TestCase):
             cl.check_claim({"schema": "wrong"}, {})
 
 
+    def test_evaluation_design_pack_compiles_all_three_kinds(self):
+        """评测设计包接了口语主张：三种 claim_kind 都能编出义务，且缺证据时三态检查会点名。"""
+        from core.cognition_workspace import claims as cl
+        for kind, minimum in (("efficacy", 4), ("cost", 3), ("reliability", 2)):
+            doc = cl.compile_claim(str(ROOT), "主张 " + kind, kind, ["evaluation-design"])
+            self.assertEqual(["evaluation-design"], doc["packs"])
+            stds = [st for b in doc["obligations"] for st in b["standards"]]
+            self.assertTrue(stds, kind)
+            self.assertGreaterEqual(len(stds[0]["required"]), minimum, kind)
+            checked = cl.check_claim(doc, {})
+            self.assertFalse(checked["ready"], kind)
+            self.assertTrue(checked["missing"], kind)
+
 class CliTest(unittest.TestCase):
     def test_criteria_listing(self):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,
