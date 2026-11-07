@@ -200,6 +200,11 @@
       "max_fn_cc": 21,
       "max_fn_lines": 41
     },
+    "desktop/src/core/cognition_plan.py": {
+      "lines": 201,
+      "max_fn_cc": 18,
+      "max_fn_lines": 59
+    },
     "desktop/src/core/commit_title_guard.py": {
       "lines": 22,
       "max_fn_cc": 5,
@@ -1536,7 +1541,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 9005,
+      "lines": 9057,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },

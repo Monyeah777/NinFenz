@@ -901,6 +901,15 @@ def _add_parser_validation(sub):
                          description="认知族（机制借鉴 Glossary + SOP/Runbook/Playbook 分档）")
     cog.add_argument("part", nargs="?", default="", choices=["", "glossary", "modes"],
                      help="只看一件（缺省 = 全跑）")
+    cog.add_argument("--plan", dest="research_topic", default="", metavar="TOPIC",
+                     help="研究计划：主题 → 切片 + 检索词 + 方法论路径 + 证据台账（深度钻研用）")
+    cog.add_argument("--depth", type=int, default=2, choices=(1, 2, 3),
+                     help="计划深度：1=快扫三片 / 2=标准五片 / 3=全七片")
+    cog.add_argument("--methods", default="",
+                     help="只用这些方法（逗号分隔，如 M1,M3,M4）")
+    cog.add_argument("--list-methods", dest="list_methods", action="store_true",
+                     help="列出方法论库（怎么钻）")
+    cog.add_argument("--out", default="", help="计划落点（缺省=只打印）")
     cog.add_argument("--json", action="store_true", help="输出结构化 JSON")
     stv = sub.add_parser("st-validate",
                          help="ST 制卡校验器原型（卡 / 世界书 / MVU 变量 → 报告；A-S3）",
@@ -5623,10 +5632,53 @@ def _cmd_st_validate(args):
 
 
 def _cmd_cognition(args):
-    """nf cognition：行话术语表 / 执行分档（认证 + 逐条逐字核对）。"""
+    """nf cognition：行话术语表 / 执行分档 / **研究计划**（切片 + 检索词 + 方法论路径）。"""
     import json as _json
 
     from core import cognition as cg
+    from core import cognition_plan as cp
+    if getattr(args, "list_methods", False):
+        lib = cp.load_methods(ROOT)
+        print(f"== nf cognition --list-methods（{len(lib['methods'])} 条方法论）==")
+        for m in lib["methods"]:
+            print(f"  {m['id']} · {m['title']}")
+            print(f"      何时用：{m['when']}")
+            print(f"      产出：{m['output']}")
+        return 0
+    if getattr(args, "research_topic", ""):
+        try:
+            methods = ([x.strip() for x in args.methods.split(",") if x.strip()]
+                       if args.methods else None)
+            doc = cp.plan(args.research_topic, depth=args.depth, methods=methods, root=ROOT)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 1)
+        if args.out:
+            from core import atomic_write
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf cognition --plan（{doc['topic']} · depth {doc['depth']}）==")
+            print(f"  切片 {len(doc['slices'])} · 方法论路径 {len(doc['paths'])}")
+            for sl in doc["slices"]:
+                print(f"\n  [{sl['id']}] {sl['title']}（方法 {','.join(sl['methods'])}）")
+                print(f"    问题：{sl['question']}")
+                print(f"    检索词 zh：{' ｜ '.join(sl['terms']['zh'])}")
+                print(f"    检索词 en：{' ｜ '.join(sl['terms']['en'])}")
+                print(f"    操作股：{' ｜ '.join(sl['terms']['ops'])}")
+                print(f"    要交出的证据：{'；'.join(sl['evidence_owed'])}")
+                print(f"    证伪：{sl['falsifier']}")
+            print("\n  方法论路径：")
+            for pa in doc["paths"]:
+                print(f"    {pa['order']}. {pa['method']} {pa['title']}")
+            print("\n  台账规则：" + doc["ledger"]["rule"])
+            if args.out:
+                print(f"  已写入：{_rel_display(_rel_out(args.out))}")
+        return 0
+
+    from core import cognition as cg2  # noqa: F401 —— 下面的门禁分支沿用原名
     part = getattr(args, "part", "") or ""
     fns = {"glossary": cg.verify_glossary, "modes": cg.verify_modes}
     picked = [k for k in fns if not part or k == part]

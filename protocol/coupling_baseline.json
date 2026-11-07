@@ -196,6 +196,11 @@
       "ce": 1,
       "i": 0.5
     },
+    "cognition_plan": {
+      "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
     "commit_title_guard": {
       "ca": 1,
       "ce": 0,

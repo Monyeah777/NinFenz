@@ -57,6 +57,7 @@
     "test_closure_scan": 0.4,
     "test_code_metrics": 1.2,
     "test_cognition": 0.2,
+    "test_cognition_plan": 1.0,
     "test_commit_msg": 0.1,
     "test_commit_title_guard": 0.1,
     "test_community_inventory": 1.7,
@@ -912,6 +913,22 @@
     "test_cognition.TestNegatives.test_term_absent_from_source_is_fail": 0.01,
     "test_cognition.TestNegatives.test_term_absent_from_used_in_is_fail": 0.0,
     "test_cognition.TestRealRepo.test_scan_clean": 0.01,
+    "test_cognition_plan.CliTest.test_list_methods": 0.39,
+    "test_cognition_plan.CliTest.test_plan_json_and_out_file": 0.41,
+    "test_cognition_plan.MethodsLibraryTest.test_duplicate_id_is_rejected": 0.0,
+    "test_cognition_plan.MethodsLibraryTest.test_every_method_has_steps_output_and_falsifier": 0.0,
+    "test_cognition_plan.MethodsLibraryTest.test_library_loads_and_validates": 0.0,
+    "test_cognition_plan.MethodsLibraryTest.test_missing_falsifier_is_rejected": 0.0,
+    "test_cognition_plan.PlanTest.test_ascii_topic_derives_english_terms": 0.0,
+    "test_cognition_plan.PlanTest.test_cjk_topic_marks_english_terms_for_human": 0.0,
+    "test_cognition_plan.PlanTest.test_depth_controls_slice_count": 0.0,
+    "test_cognition_plan.PlanTest.test_empty_topic_is_rejected_with_guide": 0.0,
+    "test_cognition_plan.PlanTest.test_every_slice_is_complete": 0.0,
+    "test_cognition_plan.PlanTest.test_ledger_rule_forbids_unproven_claims": 0.0,
+    "test_cognition_plan.PlanTest.test_methods_filter_narrows_surface": 0.0,
+    "test_cognition_plan.PlanTest.test_paths_cover_used_methods": 0.0,
+    "test_cognition_plan.PlanTest.test_plan_is_deterministic": 0.0,
+    "test_cognition_plan.PlanTest.test_unknown_method_is_rejected_with_guide": 0.0,
     "test_commit_msg.CommitMsgCheckTest.test_automation_commits_pass": 0.0,
     "test_commit_msg.CommitMsgCheckTest.test_bypass_forms_pass": 0.0,
     "test_commit_msg.CommitMsgCheckTest.test_invalid_forms_caught": 0.0,
@@ -4044,5 +4061,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1370.8
+  "total_s": 1371.8
 }
