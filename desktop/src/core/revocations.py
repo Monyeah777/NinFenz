@@ -203,7 +203,9 @@ def sign(table: dict[str, Any], key: bytes, issuer: str = "", seq: int = 1,
 
 
 def verify(doc: dict[str, Any], key: bytes | None = None,
-           prev: dict[str, Any] | None = None, at: str = "") -> dict[str, Any]:
+           prev: dict[str, Any] | None = None, at: str = "",
+           trust: dict[str, Any] | None = None,
+           require_trust: bool = False) -> dict[str, Any]:
     """校验 feed（或裸表）→ {ok, verdict, seq, digest, issues, warnings, freshness}。
 
     口径：签名在就必须过、且必须有密钥（**缺密钥不降级**）；没签名只给 warning
@@ -213,7 +215,7 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
     """
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "seq": None, "digest": "",
                            "issuer": "", "count": 0, "issues": [], "warnings": [],
-                           "signed": False,
+                           "signed": False, "trust_root": "", "trust_path": [],
                            "freshness": {"state": "unknown", "expires_at": "", "basis": "none"}}
     if not isinstance(doc, dict):
         res["issues"].append("顶层应为对象（" + GUIDE + "给 feed 或 nf-revocation/1 表）")
@@ -293,6 +295,22 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
                 res["issues"].append("ed25519 签名不匹配（" + GUIDE +
                                      "内容被改过或公钥不对——两者都不可信）")
                 return res
+            if trust is None:
+                if require_trust:
+                    res["issues"].append("要求信任锚但没有给 --trust（" + GUIDE +
+                                         "钉一份 trust 清单；不给就等于相信任意一把公钥）")
+                    return res
+                res["warnings"].append("未给信任锚：签名自洽只证明「同一把公钥签的」，"
+                                       "不证明这把公钥属于谁（" + GUIDE +
+                                       "用 --trust 钉根公钥 + 委派链）")
+            else:
+                from core import trust_anchor
+                got = trust_anchor.anchor(trust, key, at)
+                if not got["ok"]:
+                    res["issues"].extend(got["issues"])
+                    return res
+                res["trust_root"] = got["root"]
+                res["trust_path"] = got["path"]
         elif alg == ALG:
             if key is None:
                 res["issues"].append("feed 已签名但没给密钥（" + GUIDE +

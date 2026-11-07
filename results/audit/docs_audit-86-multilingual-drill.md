@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:f84d4b0a7a76f97004405bdd0cd39182ce36ed1ad687b5e7e561affbb62350d9
+  - protocol/code_metrics_baseline.json:030da060e659cdbad788961adab03ee74f8e75e49f4efa0bb4e4defb00e57923
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印；Pillow 软依赖登记
 
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）

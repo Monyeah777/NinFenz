@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:f84d4b0a7a76f97004405bdd0cd39182ce36ed1ad687b5e7e561affbb62350d9
+  - protocol/code_metrics_baseline.json:030da060e659cdbad788961adab03ee74f8e75e49f4efa0bb4e4defb00e57923
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印；Pillow 软依赖登记
 
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）

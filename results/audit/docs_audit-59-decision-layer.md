@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:58ceb86a5eb111b5dd9ebe3e963ae1715b34f993d88c5b87757e886f89c6ce36
+  - scripts/nf.py:d4bf31ed5e4bc99435ccd9f58fd90e7d089b5923639c746d0e6f05d45adeb5e9
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
 > 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）

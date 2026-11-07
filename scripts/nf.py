@@ -761,7 +761,36 @@ def _add_parser_revocations(esub):
     rvv.add_argument("--key-file", default="", help="校验签名所需密钥（缺密钥即 invalid，不降级）")
     rvv.add_argument("--prev", default="", help="上一份 feed（核对序号与前序摘要）")
     rvv.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
+    rvv.add_argument("--trust", dest="trust_manifest", default="",
+                     help="nf-revocation-trust/1 信任清单：ed25519 feed 的公钥必须被根覆盖")
+    rvv.add_argument("--require-trust", dest="require_trust", action="store_true",
+                     help="强制要求信任锚：没给 --trust 就判 invalid（缺锚不降级）")
     rvv.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvt = rvsub.add_parser("trust",
+                           help="信任锚：给委派签名（grant）/ 看清单（show）",
+                           description="信任锚：根公钥钉在清单里，组织公钥必须由根签发委派才被承认。"
+                                       "委派有 scope（只 revocations）与失效期，链深上限 3。")
+    rvts = rvt.add_subparsers(dest="trust_cmd")
+    rvtg = rvts.add_parser("grant", help="签发一条委派并写进清单",
+                           description="用签发方种子对 (issuer, subject, scope, expires_at) 签名，"
+                                       "把委派条目追加进清单。")
+    rvtg.add_argument("revocations_seed", metavar="ISSUER_SEED",
+                      help="签发方 32 字节种子文件（根或已委派的中间方）")
+    rvtg.add_argument("--subject-pub", required=True,
+                      help="被委派方公钥（64 hex；用 revocations pubkey 导出）")
+    rvtg.add_argument("--expires-at", required=True, help="委派失效期（UTC 秒级）")
+    rvtg.add_argument("--trust", dest="trust_manifest", default="",
+                      help="清单文件（不存在则新建；存在则追加委派）")
+    rvtg.add_argument("--root", action="store_true",
+                      help="把签发方公钥同时登记为根（首次初始化清单用）")
+    rvtg.add_argument("--out", default="", help="输出清单（缺省=覆盖 --trust）")
+    rvtg.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    rvts_show = rvts.add_parser("show", help="看清单摘要（根数 / 委派数 / 可选锚定核对）",
+                                description="摘要：列出根与委派；给了 --check-pub 就现场锚定一次。")
+    rvts_show.add_argument("--trust", dest="trust_manifest", required=True, help="清单文件")
+    rvts_show.add_argument("--check-pub", default="", help="现场核对一把公钥（64 hex）")
+    rvts_show.add_argument("--at", default="", help="核对时点（UTC 秒级；缺省=现在）")
+    rvts_show.add_argument("--json", action="store_true", help="输出结构化 JSON")
     rvm = rvsub.add_parser("merge", help="多份 feed → 合并成 nf-revocation/1 表",
                            description="合并：按 seq 排序、逐份验签验链、取并集；任何一份不过则整次失败。"
                                        "输出是普通表，可给 nf evidence verify --revocations 用。")
@@ -3607,6 +3636,8 @@ def _cmd_revocations(args):
     sub = getattr(args, "revocations_cmd", "") or ""
     if sub == "sign":
         return _revocations_sign(args)
+    if sub == "trust":
+        return _revocations_trust(args)
     if sub == "pubkey":
         return _revocations_pubkey(args)
     if sub == "verify":
@@ -3639,6 +3670,85 @@ def _revocations_write(args, doc: dict, out: str) -> str:
         os.makedirs(parent, exist_ok=True)
     atomic_write.write_text(dest, text)
     return _rel_display(dest)
+
+
+def _revocations_trust(args):
+    """nf evidence revocations trust：签发委派 / 看清单。"""
+    import json as _json
+
+    from core import json_doc, trust_anchor
+    sub = str(getattr(args, "trust_cmd", "") or "")
+    if sub == "grant":
+        manifest_path = _rel_out(args.trust_manifest) if args.trust_manifest else ""
+        manifest = {"schema": trust_anchor.SCHEMA, "roots": [], "delegations": []}
+        if manifest_path and os.path.isfile(manifest_path):
+            try:
+                manifest = json_doc.load(manifest_path, dict, what=manifest_path)
+            except (OSError, ValueError) as exc:
+                return _machine_fail(args, f"信任清单不可读：{exc}", 4)
+        try:
+            with open(_rel_out(args.revocations_seed), "rb") as fh:
+                seed = fh.read()
+            item, err = trust_anchor.make_delegation(
+                seed, bytes.fromhex(args.subject_pub), args.expires_at)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if err:
+            return _machine_fail(args, err, 4)
+        manifest.setdefault("delegations", []).append(item)
+        if args.root:
+            from core import ed25519
+            pub = ed25519.public_key(seed).hex()
+            roots = manifest.setdefault("roots", [])
+            if not any(str(r.get("pub")) == pub for r in roots):
+                roots.append({"id": f"root-{len(roots) + 1}", "pub": pub})
+        out = _rel_out(args.out) if args.out else (manifest_path or "revocation-trust.json")
+        from core import atomic_write
+        atomic_write.write_text(out, _json.dumps(manifest, ensure_ascii=False, indent=2,
+                                                 sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps({"kind": "revocations-trust-grant", "ok": True, "out": out,
+                               "delegation": item, "roots": len(manifest.get("roots") or []),
+                               "delegations": len(manifest.get("delegations") or [])},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf evidence revocations trust grant（{out}）==")
+            print(f"  委派：{item['issuer'][:16]}… → {item['subject'][:16]}…"
+                  f" · scope={item['scope']} · 至 {item['expires_at']}")
+            print(f"  清单现有：根 {len(manifest.get('roots') or [])} · "
+                  f"委派 {len(manifest.get('delegations') or [])}")
+        return 0
+    if sub == "show":
+        path = _rel_out(args.trust_manifest)
+        try:
+            manifest = json_doc.load(path, dict, what=path)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, f"信任清单不可读：{exc}", 4)
+        res = {"schema": str(manifest.get("schema") or ""),
+               "roots": manifest.get("roots") or [],
+               "delegations": len(manifest.get("delegations") or [])}
+        if args.check_pub:
+            try:
+                got = trust_anchor.anchor(manifest, bytes.fromhex(args.check_pub), args.at)
+            except ValueError as exc:
+                return _machine_fail(args, f"公钥格式不对：{exc}", 4)
+            res["anchor"] = got
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print(f"== nf evidence revocations trust show（{path}）==")
+            print(f"  schema：{res['schema'] or '缺失'} · 根 {len(res['roots'])} · "
+                  f"委派 {res['delegations']}")
+            for root in res["roots"]:
+                print(f"  root：{root.get('id')} · {str(root.get('pub'))[:24]}…")
+            if "anchor" in res:
+                got = res["anchor"]
+                print(f"  核对：{'锚定到 ' + got['root'] if got['ok'] else '未通过'}")
+                for issue in got["issues"]:
+                    print(f"  [FAIL] {issue}", file=sys.stderr)
+        return 0
+    print("用法：nf evidence revocations trust grant|show ...", file=sys.stderr)
+    return 2
 
 
 def _revocations_pubkey(args):
@@ -3676,7 +3786,13 @@ def _revocations_sign(args):
     try:
         table = _revocations_load(args, args.table)
         prev = _revocations_load(args, args.prev) if args.prev else None
-        key = attest.read_key_file(_rel_out(args.key_file))
+        scheme_arg = args.scheme or rv.ALG
+        if scheme_arg == rv.ALG_ED25519:
+            # 32 字节种子是**原始值**：不能 strip（任意字节都可能出现在种子末尾）
+            with open(_rel_out(args.key_file), "rb") as fh:
+                key = fh.read()
+        else:
+            key = attest.read_key_file(_rel_out(args.key_file))
         scheme = args.scheme or rv.ALG
         feed = rv.sign(table, key, issuer=args.issuer, seq=args.seq, prev=prev,
                        expires_at=args.expires_at, ttl=args.ttl, status_uri=args.status_uri,
@@ -3718,7 +3834,11 @@ def _revocations_verify(args):
                     key = fh.read()
             else:
                 key = attest.read_key_file(_rel_out(args.key_file))
-        res = rv.verify(doc, key=key, prev=prev, at=args.at)
+        trust = (json_doc.load(_rel_out(args.trust_manifest), dict,
+                               what=args.trust_manifest)
+                 if getattr(args, "trust_manifest", "") else None)
+        res = rv.verify(doc, key=key, prev=prev, at=args.at, trust=trust,
+                        require_trust=bool(getattr(args, "require_trust", False)))
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:

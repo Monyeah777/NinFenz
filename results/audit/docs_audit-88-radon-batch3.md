@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:f84d4b0a7a76f97004405bdd0cd39182ce36ed1ad687b5e7e561affbb62350d9
+  - protocol/code_metrics_baseline.json:030da060e659cdbad788961adab03ee74f8e75e49f4efa0bb4e4defb00e57923
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印；Pillow 软依赖登记
 
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）

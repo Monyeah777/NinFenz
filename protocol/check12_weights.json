@@ -329,6 +329,7 @@
     "test_tool_face": 0.3,
     "test_trace_drill": 3.3,
     "test_transparency_log": 0.2,
+    "test_trust_anchor": 1.5,
     "test_trust_boundary": 0.7,
     "test_two_faces_jsonrpc": 0.2,
     "test_unknown_policy": 0.1,
@@ -3826,6 +3827,22 @@
     "test_transparency_log.TransparencyLogTest.test_receipts_change_without_refresh_is_detected": 0.02,
     "test_transparency_log.TransparencyLogTest.test_repo_chain_is_consistent_and_on_disk": 0.01,
     "test_transparency_log.TransparencyLogTest.test_tampered_generated_chain_detected": 0.01,
+    "test_trust_anchor.AnchorChainTest.test_chain_beyond_depth_is_rejected": 0.02,
+    "test_trust_anchor.AnchorChainTest.test_delegation_requires_expiry": 0.0,
+    "test_trust_anchor.AnchorChainTest.test_expired_delegation_is_rejected": 0.01,
+    "test_trust_anchor.AnchorChainTest.test_one_hop_delegation": 0.01,
+    "test_trust_anchor.AnchorChainTest.test_root_anchors_itself": 0.0,
+    "test_trust_anchor.AnchorChainTest.test_tampered_delegation_signature_is_rejected": 0.01,
+    "test_trust_anchor.AnchorChainTest.test_two_hop_delegation_is_allowed": 0.02,
+    "test_trust_anchor.AnchorChainTest.test_unanchored_key_is_rejected_with_guide": 0.0,
+    "test_trust_anchor.AnchorChainTest.test_wrong_scope_is_rejected": 0.01,
+    "test_trust_anchor.FeedTrustTest.test_feed_verifies_and_reports_root_when_trusted": 0.02,
+    "test_trust_anchor.FeedTrustTest.test_honest_warning_without_trust": 0.01,
+    "test_trust_anchor.FeedTrustTest.test_requires_trust_when_asked": 0.01,
+    "test_trust_anchor.FeedTrustTest.test_untrusted_key_is_invalid": 0.01,
+    "test_trust_anchor.ManifestShapeTest.test_bad_schema_is_rejected": 0.0,
+    "test_trust_anchor.ManifestShapeTest.test_manifest_without_roots_cannot_anchor": 0.0,
+    "test_trust_anchor.TrustCliTest.test_grant_then_verify_with_trust": 1.22,
     "test_trust_boundary.ArgumentAdmissionTest.test_control_chars_and_overlength_rejected": 0.0,
     "test_trust_boundary.ArgumentAdmissionTest.test_qualified_ids_and_uris_survive_the_new_rules": 0.0,
     "test_trust_boundary.ArgumentAdmissionTest.test_shape_limits_rejected": 0.0,
@@ -4009,5 +4026,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1361.3
+  "total_s": 1362.8
 }

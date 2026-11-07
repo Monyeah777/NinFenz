@@ -83,8 +83,40 @@ nf evidence revocations verify f1.json --key-file pub.bin
   `cryptography` 库的交叉验证（该库不在场时跳过，不冒充已验）。
 - hmac 路径完全保留（本机/单组织场景仍最省事）；两种方案在同一个 `verify()` 里按 `alg` 分派。
 
-边界不变：公钥**分发**本身没有信任锚（谁换掉公钥谁就能造「合法」吊销）——那需要证书链/透明日志，
-本季不做，见威胁模型 G2。
+### 信任锚（钉根 + 有界委派，2026-11-07 起）
+
+公钥签名只解决「给验证能力 ≠ 给伪造能力」，没解决「这把公钥是谁的」——攻击者换一把公钥重签 feed，
+验证方照样验得过。信任锚补这一层：验证方钉一份清单（根公钥），组织公钥必须由根**签发委派**才被承认。
+
+```bash
+# 1) 初始化清单：把根公钥登记为根，并签一条到组织公钥的委派
+nf evidence revocations trust grant root.seed --subject-pub <ORG_PUB_HEX> \
+    --expires-at 2027-01-01T00:00:00Z --root --trust trust.json --out trust.json
+
+# 2) 验证 feed：ed25519 公钥必须被信任根覆盖（不给 --trust 只给 warning；--require-trust 则判死）
+nf evidence revocations verify feed.json --key-file org.pub --trust trust.json --require-trust
+
+# 3) 看清单 / 现场核对一把公钥
+nf evidence revocations trust show --trust trust.json --check-pub <ORG_PUB_HEX>
+```
+
+形状（`nf-revocation-trust/1`）：
+
+| 字段 | 含义 |
+|---|---|
+| `roots[]` | `{id, pub}`：钉住的根公钥 |
+| `delegations[]` | `{issuer, subject, scope, expires_at, sig}`：委派条目（签名体 = 四个字段的规范 JSON） |
+
+**判据约束**（都在 `test_trust_anchor.py`）：
+
+- 只允许 `scope=revocations`（这把钥匙不能拿去签别的东西）；
+- `expires_at` 必填且必须是 UTC 秒级（不允许永久授权），过期即不认；
+- 链深上限 **2 级委派**（root → org → team），超过不认；
+- 委派签名被改 / issuer 对不上 → 不认；
+- 未被根覆盖的公钥 → 判 invalid 并给修复指引。
+
+残留（诚实写）：根公钥怎么分发到验证方仍靠带外渠道（邮件/公告/配对指纹）；本仓不建 PKI，也不假装有。
+
 ## 判定（可证）
 
 | 检查 | 不过 |

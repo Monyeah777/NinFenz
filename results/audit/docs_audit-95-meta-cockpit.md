@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:58ceb86a5eb111b5dd9ebe3e963ae1715b34f993d88c5b87757e886f89c6ce36
+  - scripts/nf.py:d4bf31ed5e4bc99435ccd9f58fd90e7d089b5923639c746d0e6f05d45adeb5e9
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:ca276180103297bd93c3e7151bbf4ae16cca3fe50c82965c3a8947f0fb1770e8
-  - protocol/coupling_baseline.json:a01df2bf476661e7bcf27d4c7344b5b61de20cd280bb83f4cec967479caabc3a
+  - protocol/check12_weights.json:f8318492e9568531c4c47d058abba96c0a4a36dc87b86b8d0dd93e2e2773d2c4
+  - protocol/coupling_baseline.json:2d5e5d6b041c157d2e81777386439cd9c4d017b6e835d49db3f33666a7e7ddee
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
 > 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）

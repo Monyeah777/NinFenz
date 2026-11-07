@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - scripts/nf.py:58ceb86a5eb111b5dd9ebe3e963ae1715b34f993d88c5b87757e886f89c6ce36
+  - scripts/nf.py:d4bf31ed5e4bc99435ccd9f58fd90e7d089b5923639c746d0e6f05d45adeb5e9
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
+
 > 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
 > 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）

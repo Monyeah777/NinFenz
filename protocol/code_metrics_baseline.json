@@ -1121,9 +1121,9 @@
       "max_fn_lines": 4
     },
     "desktop/src/core/revocations.py": {
-      "lines": 366,
-      "max_fn_cc": 36,
-      "max_fn_lines": 122
+      "lines": 384,
+      "max_fn_cc": 39,
+      "max_fn_lines": 140
     },
     "desktop/src/core/rfc.py": {
       "lines": 107,
@@ -1294,6 +1294,11 @@
       "lines": 128,
       "max_fn_cc": 17,
       "max_fn_lines": 43
+    },
+    "desktop/src/core/trust_anchor.py": {
+      "lines": 161,
+      "max_fn_cc": 17,
+      "max_fn_lines": 45
     },
     "desktop/src/core/trust_boundary.py": {
       "lines": 185,
@@ -1516,7 +1521,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8832,
+      "lines": 8952,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },
