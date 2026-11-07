@@ -30,7 +30,7 @@ jobs:
           cache: pip
           python-version: '3.11'
       - name: 安装 ruff
-        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+        run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: ruff 语法级静态检查（ruff.toml：E9/F63/F7/F82）
         run: ruff check desktop/src scripts
 
@@ -48,7 +48,7 @@ jobs:
           cache: pip
           python-version: '3.11'
       - name: 安装 ruff
-        run: pip install -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
+        run: pip install --require-hashes -r .github/requirements-lint.txt  # 版本固定见该文件（F-05）
       - name: 风格棘轮（Z2：规则集 E,W,F,B,UP,I,C4,SIM,RET，只拦新增；存量按基线冻结）
         run: python scripts/style_check.py
 
