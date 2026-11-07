@@ -1,4 +1,4 @@
-<testsuites name="NinFenz verify" tests="42" failures="0" errors="0" skipped="0" time="525.000">
+<testsuites name="NinFenz verify" tests="42" failures="0" errors="0" skipped="0" time="589.000">
   <testsuite name="segment-a: 官方核心出厂" tests="6" failures="0" errors="0" skipped="0">
     <testcase classname="verify.segment-a" name="check01: 官方核心目录结构">
       <properties>
