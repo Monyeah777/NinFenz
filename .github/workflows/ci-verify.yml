@@ -101,8 +101,21 @@ jobs:
       # 签发 provenance —— 与 npm-publish 对发布物做的事同构。区别在于：仓库内
       # `results/interop/slsa.json` 是**脚本自证**（可伪造、不可验证），平台签发的 attestation
       # 可用 `gh attestation verify` 独立校验，是 SLSA Build L3 的"不可伪造来源"路径。
-      - name: 平台签发门禁结论（SLSA Build provenance）
+      - name: 平台签发门禁结论（SLSA Build provenance · 尝试 1/2）
+        id: attest
         if: always()
+        continue-on-error: true
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: |
+            .nf-logs/verify-checks.log
+            .artifacts/verify-junit.xml
+            protocol/verification_report.json
+      - name: 等待透明日志退避（仅首次签发失败）
+        if: always() && steps.attest.outcome == 'failure'
+        run: sleep 15
+      - name: 平台签发门禁结论（SLSA Build provenance · 尝试 2/2）
+        if: always() && steps.attest.outcome == 'failure'
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
         with:
           subject-path: |
