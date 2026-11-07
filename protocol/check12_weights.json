@@ -32,6 +32,7 @@
     "test_autofix": 0.2,
     "test_bilingual_entry": 0.2,
     "test_boundaries": 0.2,
+    "test_bridge_real": 2.6,
     "test_cache_bounds": 0.2,
     "test_calibration_state": 0.2,
     "test_canonical_parity": 0.2,
@@ -733,6 +734,11 @@
     "test_bilingual_entry.ExternalLinkToolTest.test_write_into_protocol_layer_is_rejected": 0.0,
     "test_boundaries.Test.test_both_present_ok": 0.0,
     "test_boundaries.Test.test_missing_files_reported": 0.0,
+    "test_bridge_real.RealVerifyTest.test_commit_from_real_verify": 0.71,
+    "test_bridge_real.RealVerifyTest.test_missing_head_uses_root_as_subject": 0.0,
+    "test_bridge_real.RealVerifyTest.test_pack_verify_ok": 0.7,
+    "test_bridge_real.RealVerifyTest.test_tampered_bundle_produces_obligation": 1.04,
+    "test_bridge_real.RealVerifyTest.test_unknown_verdict_word_is_rejected": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_every_long_lived_cache_declares_a_positive_cap": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_response_cache_evicts_at_its_cap": 0.0,
     "test_calibration_state.Test.test_calibration_downgrades_fail": 0.0,
@@ -4327,5 +4333,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1516.7
+  "total_s": 1519.3
 }

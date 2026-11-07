@@ -163,3 +163,48 @@ def replay_commitments(commitments: Any) -> dict[str, Any]:
         prev = str(item.get("digest") or "")
     res["ok"] = not res["issues"]
     return res
+
+#: nf evidence verify 的四词判定（docs/ccos/abi-v0.md §4）→ 桥的 pass/fail 归类
+VERIFY_PASS = ("ok",)
+VERIFY_FAIL = ("revoked", "expired", "invalid")
+VERIFY_WORDS = VERIFY_PASS + VERIFY_FAIL
+
+
+def cc_result_from_verify(verify_doc: dict[str, Any]) -> dict[str, Any]:
+    """把 nf evidence verify --json 的真实输出转成桥认的 cc 结果。
+
+    映射规则（不猜）：四词判定保留原词；subject 取证据链头（head），detail 带 root/level/count。
+    """
+    if not isinstance(verify_doc, dict):
+        raise ValueError("verify 输出必须是对象（" + GUIDE + "nf evidence verify --json）")
+    verdict = str(verify_doc.get("verdict") or "").lower()
+    if not verdict and str(verify_doc.get("error") or ""):
+        # 真 CLI 在「包读不开/结构坏」时给的是 error 对象，不是四词判定：
+        # 桥必须把它当 invalid（fail-closed），而不是抛错或当没看见。
+        verdict = "invalid"
+        verify_doc = dict(verify_doc, issues=[str(verify_doc["error"])],
+                          root=verify_doc.get("root"), head=verify_doc.get("head"))
+    if verdict not in VERIFY_WORDS:
+        raise ValueError("未知证据判定：" + verdict
+                         + "（" + GUIDE + "四词判定：ok/revoked/expired/invalid）")
+    return {"verdict": verdict,
+            "subject": str(verify_doc.get("head") or verify_doc.get("root") or ""),
+            "detail": {"root": verify_doc.get("root"), "level": verify_doc.get("level"),
+                       "count": verify_doc.get("count"),
+                       "issues": list(verify_doc.get("issues") or [])}}
+
+
+def commit_from_verify(bundle: dict[str, Any], claim_doc: dict[str, Any],
+                       verify_doc: dict[str, Any],
+                       roles: list[str] | None = None) -> dict[str, Any]:
+    """用真实证据包复验结果建 commitment（闭环里 cc 侧的真输入）。"""
+    return commit(bundle, claim_doc, cc_result_from_verify(verify_doc), roles=roles)
+
+
+def obligation_from_verify(commitment: dict[str, Any],
+                           verify_doc: dict[str, Any]) -> dict[str, Any]:
+    """证据复验不过 → 直接把 issues 编成回灌消息（unknown 保留供后续补证）。"""
+    cc = cc_result_from_verify(verify_doc)
+    issues = [str(x) for x in (verify_doc.get("issues") or [])]
+    failed = issues if cc["verdict"] in VERIFY_FAIL else []
+    return obligation(commitment, cc, failed=failed)

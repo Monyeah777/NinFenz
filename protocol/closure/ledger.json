@@ -359,18 +359,21 @@
     {
       "id": "D-03",
       "module": "cognition-bridge",
-      "claim": "桥只做到 commitment + 回灌；cc_attest → receipt 的自动化尚未接线",
-      "status": "debt",
-      "debt": "cc 侧 attest/receipt 由 CLI 手动调用；桥闭环测试用合成 cc 结果，未接真实 nf evidence 输出",
+      "claim": "桥接真实证据包：pack→verify→commitment→回灌→控制面 detect（不再用合成 cc 结果）",
+      "status": "closed",
       "criteria": [
         [
-          "test_cognition_bridge.py",
-          "test_fail_then_revise_then_pass"
+          "test_bridge_real.py",
+          "test_commit_from_real_verify"
+        ],
+        [
+          "test_bridge_real.py",
+          "test_tampered_bundle_produces_obligation"
         ]
       ],
-      "reverse_fixture": "cc 缺 verdict → fail-closed",
+      "reverse_fixture": "改坏证据包尾 → verify 非 ok → 回灌 failed 非空 → 控制面 detect；error 形态输入按 invalid 处理（test_tampered_bundle_produces_obligation）",
       "evidence": [
-        "python -m unittest desktop.tests.test_cognition_bridge"
+        "python -m unittest desktop.tests.test_bridge_real"
       ]
     },
     {
