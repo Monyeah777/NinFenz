@@ -16,7 +16,7 @@ subjects:
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
   - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
-  - scripts/nf.py:f90a8c822ca23b03d9b24564db427751fff8db75339643169bf9f9e45c119af9
+  - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350
 
 ---
+> 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
+
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
 
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）

@@ -411,6 +411,38 @@ def _add_parser_cog(sub):
                          description="摘要：动作数/假设数/张力数/未答问题数/digest。")
     ct.add_argument("--bundle", required=True, help="会话文件")
     ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    jsub = csub.add_parser("job", help="作业账本（K1 六态作业 + K4 事件流）",
+                           description="作业：created→queued→running→succeeded|failed|"
+                                       "canceled|timeout；事件只追加、可重放、终态后不可追加。")
+    jcmd = jsub.add_subparsers(dest="job_cmd")
+    jc = jcmd.add_parser("create", help="建作业（created）")
+    jc.add_argument("--ledger", required=True, help="账本文件")
+    jc.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jc.add_argument("--kind", required=True, help="作业类型（check/label/evidence-verify…）")
+    jc.add_argument("--contract", default="", help="契约 digest（可选）")
+    jc.add_argument("--inputs", default="", help="输入 digest（可选）")
+    jc.add_argument("--out", default="", help="写回账本")
+    jc.add_argument("--json", action="store_true")
+    jt = jcmd.add_parser("transition", help="状态迁移")
+    jt.add_argument("--ledger", required=True, help="账本文件")
+    jt.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jt.add_argument("--to", required=True, help="目标状态")
+    jt.add_argument("--witness", default="", help="见证 JSON 文件（可选）")
+    jt.add_argument("--out", default="", help="写回账本")
+    jt.add_argument("--json", action="store_true")
+    jr = jcmd.add_parser("receipt", help="把调用回执挂到作业")
+    jr.add_argument("--ledger", required=True, help="账本文件")
+    jr.add_argument("--id", dest="job_id", required=True, help="作业 id")
+    jr.add_argument("--receipt", required=True, help="回执文件")
+    jr.add_argument("--out", default="", help="写回账本")
+    jr.add_argument("--json", action="store_true")
+    js = jcmd.add_parser("show", help="看作业摘要与 digest")
+    js.add_argument("--ledger", required=True, help="账本文件")
+    js.add_argument("--id", dest="job_id", default="", help="只看一个作业")
+    js.add_argument("--json", action="store_true")
+    jv = jcmd.add_parser("verify", help="从事件链重放校验")
+    jv.add_argument("--ledger", required=True, help="账本文件")
+    jv.add_argument("--json", action="store_true")
     bcommit = csub.add_parser("bridge-commit", help="生成 commitment（双核唯一共享对象）",
                               description="commitment{cog_digest, cc_digest, claim_digest}："
                                           "两侧各自用 digest 认可同一版；不解则 fail-closed。")
@@ -526,6 +558,85 @@ def _cmd_cog(args) -> int:
             print("    frame_delta：" + "、".join(item["delta_kinds"]))
             print("    失败模式：" + item["failure_mode"])
         return 0
+    if sub == "job":
+        try:
+            from core import boot_check as cg_boot
+            from core import job_ledger as cg_job
+            boot = cg_boot.check(ROOT)
+            blocked = cg_boot.safe_mode_write_gate(boot)
+            if blocked and getattr(args, "job_cmd", "") in ("create", "transition", "receipt"):
+                raise ValueError(blocked[0] + "（修复指引：修好关键件后重跑）")
+            if not getattr(args, "job_cmd", ""):
+                print("用法：nf cog job create|transition|receipt|show|verify …",
+                      file=sys.stderr)
+                return 2
+            ledger_path = _rel_out(args.ledger)
+            ledger = (json_doc.load(ledger_path, dict, what=args.ledger)
+                      if os.path.isfile(ledger_path) else cg_job.new_ledger())
+            if args.job_cmd == "create":
+                ledger = cg_job.create(ledger, args.job_id, args.kind,
+                                       contract_digest=args.contract,
+                                       inputs_digest=args.inputs)
+            elif args.job_cmd == "transition":
+                witness = {}
+                if args.witness:
+                    with open(_rel_out(args.witness), encoding="utf-8") as handle:
+                        witness = _json.load(handle)
+                ledger = cg_job.transition(ledger, args.job_id, args.to, witness=witness)
+            elif args.job_cmd == "receipt":
+                with open(_rel_out(args.receipt), encoding="utf-8") as handle:
+                    receipt = _json.load(handle)
+                ledger = cg_job.attach_receipt(ledger, args.job_id, receipt)
+            elif args.job_cmd == "verify":
+                res = cg_job.replay(ledger)
+                if args.json:
+                    print(_json.dumps({"ok": res["ok"], "issues": res["issues"]},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog job verify ==")
+                    print("  判定：" + ("ok" if res["ok"] else "invalid"))
+                    for issue in res["issues"]:
+                        print("  [FAIL] " + issue, file=sys.stderr)
+                return 0 if res["ok"] else 1
+            elif args.job_cmd == "show":
+                ids = [args.job_id] if args.job_id else sorted(ledger.get("jobs") or {})
+                items = []
+                for job_id in ids:
+                    job = (ledger.get("jobs") or {})[job_id]
+                    items.append({"id": job_id, "kind": job["kind"],
+                                  "state": job["state"],
+                                  "events": len(job["events"]),
+                                  "receipts": len(job["receipts"]),
+                                  "digest": cg_job.job_digest(ledger, job_id)})
+                if args.json:
+                    print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+                else:
+                    print("== nf cog job show（" + str(len(items)) + " 个）==")
+                    for item in items:
+                        print("  " + item["id"] + " [" + item["state"] + "] "
+                              + item["kind"] + " · events " + str(item["events"])
+                              + " / receipts " + str(item["receipts"]))
+                        print("    digest：" + item["digest"][:16])
+                return 0
+            else:
+                print("未知子命令：" + str(args.job_cmd), file=sys.stderr)
+                return 2
+            if args.out:
+                atomic_write.write_text(_rel_out(args.out),
+                                        _json.dumps(ledger, ensure_ascii=False, indent=2,
+                                                    sort_keys=True) + chr(10))
+            if args.json:
+                print(_json.dumps(ledger, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                print("== nf cog job " + args.job_cmd + " ==")
+                job = (ledger.get("jobs") or {}).get(args.job_id) or {}
+                print("  作业：" + str(args.job_id) + " · 状态：" + str(job.get("state")))
+                print("  启动自检：" + boot["mode"])
+                if args.out:
+                    print("  已写入：" + _rel_display(_rel_out(args.out)))
+            return 0
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
     if sub.startswith("bridge-"):
         try:
             from core.cognition_workspace import bridge as cg_bridge

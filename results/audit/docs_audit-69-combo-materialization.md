@@ -7,10 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - scripts/nf.py:f90a8c822ca23b03d9b24564db427751fff8db75339643169bf9f9e45c119af9
+  - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
   - docs/combos.md:4d25fe6d366687213df7090badd52b815bdf07f774df856e598d7cf8a1d130de
 
 ---
+> 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
+
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
 
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）

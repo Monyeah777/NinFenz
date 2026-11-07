@@ -125,6 +125,11 @@
       "max_fn_cc": 11,
       "max_fn_lines": 30
     },
+    "desktop/src/core/boot_check.py": {
+      "lines": 69,
+      "max_fn_cc": 7,
+      "max_fn_lines": 24
+    },
     "desktop/src/core/boundaries.py": {
       "lines": 22,
       "max_fn_cc": 7,
@@ -644,6 +649,11 @@
       "lines": 62,
       "max_fn_cc": 7,
       "max_fn_lines": 20
+    },
+    "desktop/src/core/job_ledger.py": {
+      "lines": 169,
+      "max_fn_cc": 17,
+      "max_fn_lines": 35
     },
     "desktop/src/core/json_doc.py": {
       "lines": 130,
@@ -1576,9 +1586,9 @@
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9630,
-      "max_fn_cc": 106,
-      "max_fn_lines": 319
+      "lines": 9741,
+      "max_fn_cc": 122,
+      "max_fn_lines": 397
     },
     "scripts/nf_client.py": {
       "lines": 187,

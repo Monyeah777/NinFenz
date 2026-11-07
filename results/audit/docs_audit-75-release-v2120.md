@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:f90a8c822ca23b03d9b24564db427751fff8db75339643169bf9f9e45c119af9
+  - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
 
 ---
+> 重审（2026-11-08）：K1 作业账本 + K4 事件流 + K8 启动自检（P6 第二件）
+
 > 重审（2026-11-08）：双核桥（commitment + 回灌 + 闭环）
 
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）

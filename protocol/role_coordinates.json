@@ -3,10 +3,10 @@
     "app": 1458,
     "entry": 26,
     "floor": 5,
-    "prod": 1055,
+    "prod": 1056,
     "projection": 151,
     "support": 416,
-    "verify": 1005
+    "verify": 1007
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5801,6 +5801,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "启动自检与安全模式（K8 最小实现）：坏配置**拒绝启动**，不带病运行。",
+      "path": "desktop/src/core/boot_check.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "边界登记：边界 → 协议代码文件 + 协议文档（机制借鉴 OpenAgentCore AGENTS 的「边界→协议代码+文档」表）。",
       "path": "desktop/src/core/boundaries.py",
       "role": "prod",
@@ -6331,6 +6337,12 @@
     {
       "function": "IR 内容归一化层（v1.2.0 协议中转站 v2，2.0 E0-①）。",
       "path": "desktop/src/core/ir.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "作业账本（nf-job/1 + nf-job-ledger/1）：K1 作业模型 + K4 事件总线最小实现。",
+      "path": "desktop/src/core/job_ledger.py",
       "role": "prod",
       "rule": "auto:R-core"
     },
@@ -8317,6 +8329,12 @@
     {
       "function": "P-C1：canonical JSON 面的**规范-实现分歧**判据（RFC 8785 vs 仓库口径）。",
       "path": "desktop/tests/test_jcs_spec_gap.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "作业账本判据（K1+K4）与启动自检判据（K8）。",
+      "path": "desktop/tests/test_job_ledger.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12402,7 +12420,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "33c8a7d3065a82e235420fe3d4dc34bc068ad00906e3cc6b5a3425d587f633be",
+  "root_digest": "f22b31d8b2ca12a87f71da30b8e7ec4d546d48783bed20ef4969a15209f298b8",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 270,
@@ -12411,8 +12429,8 @@
     "R-prod": 944,
     "R-projection": 132,
     "R-support": 119,
-    "R-verify": 883,
-    "auto:R-core": 279
+    "R-verify": 884,
+    "auto:R-core": 281
   },
   "schema": "nf-role-coordinates/1"
 }
