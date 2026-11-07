@@ -44,7 +44,7 @@ jobs:
       - name: Upload report（本 run 的新鲜副本；**不**上传受跟踪的 results/ 原件）
         # N1 同类（审计 Z5）：受跟踪文件在失败时可能是**上一次提交的旧结论**。
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: external-links-report
           path: |

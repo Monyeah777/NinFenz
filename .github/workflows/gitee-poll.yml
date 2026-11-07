@@ -35,7 +35,7 @@ jobs:
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: gitee-poll-diagnostics
           path: |
