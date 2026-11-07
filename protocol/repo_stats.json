@@ -15,18 +15,18 @@
   "registered_packs": 111,
   "schema": "nf-repo-stats/1",
   "standard_bindings": 1200,
-  "standards_bodies": 195,
+  "standards_bodies": 196,
   "standards_by_layer": {
     "data": 150,
-    "eng": 38,
+    "eng": 39,
     "form": 29,
     "gov": 73,
     "iface": 84
   },
   "standards_edges": 207,
   "standards_reachable": 334,
-  "standards_total": 374,
-  "standards_unreachable": 40,
+  "standards_total": 375,
+  "standards_unreachable": 41,
   "subdivisions_total": 1200,
   "verify_checks": 42,
   "verify_version": "2.30"

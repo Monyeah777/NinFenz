@@ -125,6 +125,39 @@ class MultiformatsCidLedgerTest(unittest.TestCase):
         )
 
 
+class Iso29119LedgerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.issues, cls.report = sc.build(ROOT)
+
+    def test_iso29119_four_layer_mapping_is_consumable(self):
+        self.assertEqual([], self.issues)
+        rows = {row["id"]: row for row in self.report["standards"]}
+        self.assertIn("iso-iec-ieee-29119", rows)
+        row = rows["iso-iec-ieee-29119"]
+        self.assertEqual("eng", row["layer"])
+        self.assertEqual("consumable", row["state"])
+        self.assertTrue(row["asserted"])
+
+        ledger = json.loads(
+            (ROOT / "protocol" / "standards_assertions.json").read_text(encoding="utf-8")
+        )
+        claim = next(
+            item for item in ledger["claims"]
+            if item["id"] == "iso29119-four-layer-evidence"
+        )
+        self.assertEqual("iso-iec-ieee-29119", claim["standard"])
+        self.assertIn(
+            "desktop/tests/test_p6_evaluations.py::StandardsMapTest.test_missing_artifact_turns_red",
+            claim["negative_tests"],
+        )
+        consumer_paths = {item["path"] for item in claim["consumers"]}
+        self.assertEqual(
+            {"scripts/standards_map.py", "scripts/risk_baseline.py"},
+            consumer_paths,
+        )
+
+
 class LedgerMutationTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

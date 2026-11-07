@@ -2,15 +2,16 @@
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **374** 条 · 本机可达 **334** · 不可达 **40** · 机构 **195** · 依赖边 **207**
-- 分层：data 150 · eng 38 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **375** 条 · 本机可达 **334** · 不可达 **41** · 机构 **196** · 依赖边 **207**
+- 分层：data 150 · eng 39 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 每张卡回答一类问题，可直接被生成式引擎引用；数据源同主索引。
 
 ## 卡 1 · 哪些标准提供扩展点？
 
-全 **374** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
+全 **375** 条标准均声明扩展点（`ext_points`），扩展点最多的 20 条：
 
+- `iso-iec-ieee-29119` · 软件测试（29119 系列） · 扩展点 4：part-1-concepts, part-2-processes, part-3-documentation, part-4-techniques
 - `multiformats-cid` · CID (Content IDentifier) · 扩展点 4：cid-version, multibase, multicodec, multihash
 - `http-semantics` · HTTP 语义（RFC 9110） · 扩展点 3：method-registry, field-name-registry, status-code-registry
 - `acme` · ACME 证书签发自动化 · 扩展点 2：challenge-type, identifier-type
@@ -30,12 +31,11 @@
 - `avif` · AVIF 图像格式 · 扩展点 2：av1-item, extended-profile
 - `avro` · Avro 规范 · 扩展点 2：schema-resolution, logical-type
 - `bacnet` · BACnet 楼宇自动化 · 扩展点 2：proprietary-property, object-type-extension
-- `bibframe` · BIBFRAME 书目框架 · 扩展点 2：profile, vocabulary-extension
 
 ## 卡 2 · 各层有哪些标准？
 
 - **data** 150 条 → `docs/standards/layer-data.md`
-- **eng** 38 条 → `docs/standards/layer-eng.md`
+- **eng** 39 条 → `docs/standards/layer-eng.md`
 - **form** 29 条 → `docs/standards/layer-form.md`
 - **gov** 73 条 → `docs/standards/layer-gov.md`
 - **iface** 84 条 → `docs/standards/layer-iface.md`
@@ -67,7 +67,7 @@
 
 ## 卡 4 · 哪些标准本机不可达？（诚实披露）
 
-共 **40** 条本机探测未达（不假装可达），逐条如下：
+共 **41** 条本机探测未达（不假装可达），逐条如下：
 
 - `arib-ttml` · ARIB 字幕/编成元数据 · HTTP 403 · HTTPError: Forbidden
 - `autosar-ap` · Adaptive Platform · HTTP 0 · URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify fai
@@ -91,6 +91,7 @@
 - `iec-42001` · AI 管理体系 · HTTP 403 · HTTPError: Forbidden
 - `iso-iec-25010` · SQuaRE 质量模型 · HTTP 403 · HTTPError: Forbidden
 - `iso-iec-26511` · 术语工作（Terminology） · HTTP 403 · HTTPError: Forbidden
+- `iso-iec-ieee-29119` · 软件测试（29119 系列） · HTTP 403 · HTTPError: Forbidden
 - `iso-iec-42010` · 架构描述 · HTTP 403 · HTTPError: Forbidden
 - `iso15118` · ISO 15118 车充通信 · HTTP 403 · HTTPError: Forbidden
 - `pdfa` · PDF/A 长期保存 · HTTP 403 · HTTPError: Forbidden

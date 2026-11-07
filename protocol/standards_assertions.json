@@ -325,6 +325,36 @@
           "contains": "public static string Cidv1RawSha256(string digestHex)"
         }
       ]
+    },
+    {
+      "id": "iso29119-four-layer-evidence",
+      "standard": "iso-iec-ieee-29119",
+      "assertion": "ISO/IEC/IEEE 29119 的过程、文档、技术、覆盖四层各绑定一个真实在场件；缺件或错误覆盖 fail-closed。该声明只表示内部证据映射，不表示 ISO 认证。",
+      "tests": [
+        "desktop/tests/test_p6_evaluations.py::StandardsMapTest.test_real_repo_satisfies_all_three",
+        "desktop/tests/test_p6_evaluations.py::StandardsMapTest.test_iso29119_has_exactly_the_four_layers"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_p6_evaluations.py::StandardsMapTest.test_missing_artifact_turns_red",
+        "desktop/tests/test_p6_evaluations.py::StandardsMapTest.test_wrong_coverage_turns_red"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "scripts/standards_map.py",
+        "desktop/tests/test_p6_evaluations.py",
+        "scripts/risk_baseline.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/standards_map.py",
+          "symbol": "report"
+        },
+        {
+          "path": "scripts/risk_baseline.py",
+          "contains": "\"P6-05/09/10\": sm.report(root)"
+        }
+      ]
     }
   ]
 }
