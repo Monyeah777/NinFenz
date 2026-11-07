@@ -399,6 +399,12 @@ class DaemonInProcessServerTest(unittest.TestCase):
                 # Windows 上半关闭会以 RST 收尾（WinError 10053），客户端侧本就是异常；
                 # 本判据只关心**服务端存活**，故连接层异常在此不算失败。
                 pass
+            except ValueError:
+                # POSIX 的“服务端未回帧就关连接”走的是**干净 EOF**：read_framed 的
+                # _length_line 读到空行会抛 ValueError（响应帧 exit 缺失或超长）。
+                # 这也是“没回帧”的合法表现（与 RST 同义），不属于服务端死亡。
+                # 实测 2026-11-07 分片 8：同一用例偶发 ERROR（复跑即过）。
+                pass
         finally:
             dm._handle_conn = orig
         self.assertTrue(dm.ping(), "连接级失败之后服务必须仍可用")
