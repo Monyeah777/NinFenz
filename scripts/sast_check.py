@@ -200,7 +200,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SAST 基线闸门（bandit + ruff-S 计数棘轮）")
     ap.add_argument("--write", action="store_true", help="冻结当前计数为基线")
     ap.add_argument("--json", action="store_true", help="打印当前计数")
+    ap.add_argument("--platform", default="", choices=("", "nt", "posix"),
+                    help="覆盖「本平台段」选择（缺省=当前平台）；跨平台基线维护用")
     args = ap.parse_args(argv)
+    global PLATFORM
+    if args.platform:
+        PLATFORM = args.platform
 
     if args.write:
         issues, section = write()
