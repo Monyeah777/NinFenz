@@ -1,51 +1,50 @@
 # CCOS Go 客户端（`nfverify`）
 
-证据复验的 **Go 侧零依赖实现**：证明 ABI 的 `cc_verify` 不绑定语言。
-它不 import 本仓任何 Python 代码，也不联网。
+CCOS 七个 ABI 调用的 **Go 侧第二实现**（判定面）。不 import 本仓任何 Python 代码，也不联网。
 
-## 覆盖面（诚实写清）
+## 覆盖面
 
-| ABI 调用 | Go 侧状态 |
-|---|---|
-| `cc_verify` | **已移植**：三种形态（bundle / receipts / attest）同一套四词判定 |
-| `cc_check` | 未移植（Python 侧封闭词表判定；Go 版待做） |
-| `cc_attest` | 未移植（信封验证已在 cc_verify 的 attest 形态里复用） |
-| `cc_label` | 未移植（IR 校验 + 载体读写） |
-| `cc_diff` | 未移植 |
-| `cc_replay` | 未移植 |
-| `cc_resolve` | 未移植 |
+| ABI 调用 | Go 侧状态 | 判据（跨语言向量） |
+|---|---|---|
+| `cc_verify` | **完整**：bundle / receipts / attest 三形态同判 | 28 例 |
+| `cc_check` | **完整**：封闭词表五类（utf8/regex_present/regex_absent/count_at_least/digest_pin） | 6 例 |
+| `cc_label` | **声明层**：IR 校验（档位/缺项/形状） | 7 例 |
+| `cc_attest` | **完整**：信封生成（digest_only / hmac-sha256）+ 验证 | 3 例 |
+| `cc_replay` | **完整**：逐成员摘要 → 叶 → 折叠 → 链头轨迹 | 1 例 |
+| `cc_diff` | **JSON 契约**：字段级差异 + 兼容判定（bump/additive/editorial） | 6 例 |
+| `cc_resolve` | **完整**：对象 → 认领契约集（含 closure_closed/unclaimed 显式面） | 4 例 |
 
-判据锚点是仓内固定向量集（`results/ccos/evidence_verdict_vectors.json`，**28 条**：18 条自包含包
-+ 4 条回执 + 6 条信封）：真源（Python 库）、零依赖 Python 复验器（`scripts/nf_verify.py`）、
-本 Go 客户端三者对每条的**判定与退出码**必须一致。
+**边界（不假装）**：
 
-## 用法
-
-```bash
-# 编译（Go 1.24+；本仓实测 go1.24.5）
-cd clients/go && go build ./...
-
-# 复验（形态由文档 schema 判，不看扩展名）
-./nfverify --bundle 包.zip
-./nfverify --bundle 回执.zip --json
-./nfverify --bundle 包.zip --key-file key.bin --revocations revocations.json \
-           --anchor anchor.json --at 2030-01-01T00:00:00Z
-```
-
-退出码与仓内一致：`0 ok` · `1 invalid` · `2 revoked` · `3 expired` · `4 用法错`
-（4 表示输入不是证据容器，**不属于**判定面）。
+- `cc_label` 只移植**声明层**（IR 校验）；载体读写（PNG iTXt / JPEG APP15 / WebP / MP4 / PDF、
+  像素水印）是另一件工程，Go 侧**未移植**——要验载体请用 Python 侧 `nf label extract`。
+- `cc_diff` 只移植 **JSON 契约**那一路；Markdown 契约签名（knowledge_sig）未移植。
+- `cc_resolve` 用 `git ls-files` 取受跟踪件（与真源同口径）；无 git 时回退文件系统 glob。
 
 ## 判据（自证）
 
 ```bash
-cd clients/go && go test ./...
+cd clients/go && go build ./... && go test ./...
 ```
 
-`TestVectorsConformance` 逐条跑向量集，任何一条判定或退出码不符即失败；
-`NF_VECTORS=<路径>` 可指向异机的向量集副本。
+共 **55 例跨语言向量**：证据 28 + 策略 6 + 标注 7 + 信封 3 + 轨迹 1 + 差异 6 + 契约 4。
+向量文件在 `results/ccos/`*_vectors.json`，Python 侧生成器见 `scripts/{evidence_vectors,check_vectors,abi_call_vectors}.py`。
+
+## 用法
+
+```bash
+nfverify verify  --bundle 证据.zip [--key-file K] [--revocations R] [--anchor A] [--at T]
+nfverify check   --object 文件 --policy 策略.json
+nfverify label   --ir IR.json
+nfverify attest  --subject 文件 [--key-file K] [--producer P]
+nfverify replay  --bundle 证据.zip
+nfverify diff    --a a.json --b b.json
+nfverify resolve --root <仓库> --object <相对路径> [--decl 声明件]
+```
+
+退出码与仓内一致：`0 ok` · `1 invalid` · `2 revoked` · `3 expired` · `4 用法错`
 
 ## 只承诺什么
 
-- **承诺**：成员未改（摘要 + 叶复算）、包含证明折叠到根、链头自洽、信封自洽（含 hmac）、
-  吊销命中、时效判定；容器面 fail-closed（重名成员/不安全路径/超限成员一律拒收）。
-- **不承诺**：内容质量、内容真实性、抗抵赖、以及**其余 6 个 ABI 调用的 Go 实现**（见上表）。
+- **承诺**：以上七调的**判定面**与真源同口径（向量逐例对账）；容器/策略/IR/契约面 fail-closed。
+- **不承诺**：载体写入读出、Markdown 契约签名、内容质量与真实性。

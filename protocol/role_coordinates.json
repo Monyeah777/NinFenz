@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1053,
-    "projection": 138,
-    "support": 377,
-    "verify": 985
+    "projection": 144,
+    "support": 390,
+    "verify": 986
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -12203,6 +12203,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "cc_check 判定向量集：策略 + 对象字节 → 期望 verdict（跨语言可复核）。",
+      "path": "scripts/check_vectors.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "代码规模/复杂度上限（CLI）：棘轮式冻结 + 只增不减校验。",
       "path": "scripts/code_metrics.py",
       "role": "verify",
@@ -12270,16 +12276,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "29aad051908aecefa7403b50fb86bbae7e069d8bd078031466237945f2d388a7",
+  "root_digest": "18fcf32baeea19d7c0cf89cd29b2cb40c655c11ecc9d0d9f60e2716d716ffdcd",
   "rule_counts": {
     "R-app": 1456,
-    "R-catch": 231,
+    "R-catch": 244,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 119,
+    "R-projection": 125,
     "R-support": 119,
-    "R-verify": 866,
+    "R-verify": 867,
     "auto:R-core": 274
   },
   "schema": "nf-role-coordinates/1"
