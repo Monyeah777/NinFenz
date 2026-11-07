@@ -264,7 +264,9 @@ class AutostartTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
@@ -397,7 +399,9 @@ class InterpreterLaunchBudgetTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(stub if (stub_python3 and name == "python3") else body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = self.home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
@@ -649,7 +653,9 @@ class InterpreterDietTest(unittest.TestCase):
             path = os.path.join(bin_dir, name)
             with open(path, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(body)
-            os.chmod(path, 0o755)
+            # 测试夹具（临时 bin 里的 stub）：仅属主可执行即可；0o755 是 code scanning
+            # py/overly-permissive-file 的告警面，收紧到 0o700（语义不变：同一用户可跑）。
+            os.chmod(path, 0o700)
         env = dict(os.environ)
         env["NARRATIVE_FORGE_HOME"] = home
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")

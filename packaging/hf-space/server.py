@@ -61,11 +61,16 @@ def run_mode(mode: str, text: str = '') -> dict:
             fh.write(body)
         args += ['lint', os.path.basename(tmp_path)]
     else:
-        args += mode.split() if mode != 'stats' else ['stats', '--check']
-        if mode == 'conformance':
-            args = [PY, str(NF_ROOT / 'scripts' / 'nf.py'), 'conformance']
-        elif mode == 'doctor':
-            args = [PY, str(NF_ROOT / 'scripts' / 'nf.py'), 'doctor']
+        # 显式分支到白名单子命令（**不再**用 mode.split() 拼 argv）：即使未来白名单
+        # 表被误改，这里也不会把外部字符串拼进参数列表（code scanning
+        # py/command-line-injection 的加固写法；语义与原来逐条相等）。
+        nf_py = [PY, str(NF_ROOT / 'scripts' / 'nf.py')]
+        if mode == 'stats':
+            args = nf_py + ['stats', '--check']
+        elif mode == 'conformance':
+            args = nf_py + ['conformance']
+        else:                                  # MODES 白名单里 needs_input=False 的只剩 doctor
+            args = nf_py + ['doctor']
     _caps(args)
     env = dict(os.environ)
     env['PYTHONUTF8'] = '1'
