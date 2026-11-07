@@ -54,7 +54,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
-          pip install -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
+          pip install --require-hashes -r .github/requirements-ci.txt  # 版本固定见该文件（F-05）
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
         shell: bash
         run: |
@@ -114,10 +114,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
-          pip install -r .github/requirements-ci.txt
+          pip install --require-hashes -r .github/requirements-ci.txt
           # 分片会跑 release-conclusion 的 preflight（含静态棘轮）——缺 ruff/bandit 会被
           # fail-closed 判红（单元测试本身没问题，是工具不在场）；与静态作业同一份固定版本。
-          pip install -r .github/requirements-lint.txt -r .github/requirements-sast.txt
+          pip install --require-hashes -r .github/requirements-lint.txt -r .github/requirements-sast.txt
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项分片必红）
         shell: bash
         run: |
@@ -178,7 +178,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdbus-1-3
-          pip install -r .github/requirements-ci.txt
+          pip install --require-hashes -r .github/requirements-ci.txt
       - name: 冷启动前置（干净 clone 缺的 4 项；缺任一项门禁必红）
         shell: bash
         run: |
