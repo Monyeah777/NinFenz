@@ -130,7 +130,10 @@ class DaemonArgvLimitTest(unittest.TestCase):
         elif os.name == "nt":
             self.assertEqual(0, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
         else:
-            self.assertEqual(1, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
+            # BSD/macOS 的 getsockopt(SO_REUSEADDR) 返回**选项位掩码**（REUSEADDR 位 = 4），
+            # 不是 Linux 的布尔 1；只看「非零 = 已开启」才是跨平台正确的判据。
+            # （实测 2026-11-07 macos-latest：1 != 4，gate-macos 因此红。）
+            self.assertNotEqual(0, sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR))
 
     def test_cwd_must_be_an_existing_directory(self):
         root = Path(tempfile.mkdtemp(prefix="nf_daemon_cwd_"))
