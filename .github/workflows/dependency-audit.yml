@@ -36,7 +36,7 @@ jobs:
           cache: pip
           python-version: '3.11'
       - name: 安装审计器（版本固定，见 .github/requirements-audit.txt）
-        run: pip install -r .github/requirements-audit.txt
+        run: pip install --require-hashes -r .github/requirements-audit.txt
       - name: 对固定依赖集做 CVE 审计（命中即红）
         run: python -m pip_audit -r .github/requirements-ci.txt --progress-spinner off
 

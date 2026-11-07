@@ -33,8 +33,8 @@ jobs:
           python-version: '3.11'
       - name: 安装 SAST 工具（版本固定）
         run: |
-          pip install -r .github/requirements-sast.txt
-          pip install -r .github/requirements-lint.txt
+          pip install --require-hashes -r .github/requirements-sast.txt
+          pip install --require-hashes -r .github/requirements-lint.txt
       - name: SAST 计数棘轮（新增/上升即红）
         run: |
           python scripts/sast_check.py --json > .sast-counts.json || true

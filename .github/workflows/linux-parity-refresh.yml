@@ -28,8 +28,8 @@ jobs:
           cache-dependency-path: .github/requirements-*.txt
       - name: 安装固定版本工具（lint/sast）
         run: |
-          pip install -r .github/requirements-ci.txt
-          pip install -r .github/requirements-lint.txt -r .github/requirements-sast.txt
+          pip install --require-hashes -r .github/requirements-ci.txt
+          pip install --require-hashes -r .github/requirements-lint.txt -r .github/requirements-sast.txt
       - name: posix SAST 计数（基线维护输入）
         run: |
           python scripts/sast_check.py --json --platform posix > sast-posix.json || true
