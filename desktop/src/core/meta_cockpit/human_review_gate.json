@@ -1,0 +1,26 @@
+{
+  "schema": "human-review/1",
+  "gate_id": "HR-001",
+  "pipeline": "认知:P01",
+  "trigger": "after-machine-pass",
+  "scope": ["认知:M02", "认知:M13"],
+  "checklist": [
+    {
+      "id": "HR-C1",
+      "question": "每条因果断言的 evidence_quote 是否真的支持机制？",
+      "evidence": "claim_id → quote → 是否支持 → 理由"
+    },
+    {
+      "id": "HR-C2",
+      "question": "跨链同一需求词的数值与结论是否一致？",
+      "evidence": "key → 各链取值 → 是否冲突 → 处置"
+    },
+    {
+      "id": "HR-C3",
+      "question": "领域常识是否成立，有无荒谬机制？",
+      "evidence": "抽样条目 → 判断 → 理由"
+    }
+  ],
+  "sampling": {"mode": "full", "size": 8},
+  "conformance": "L2"
+}

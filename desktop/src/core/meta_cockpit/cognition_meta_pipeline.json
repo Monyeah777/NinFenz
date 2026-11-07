@@ -1,0 +1,37 @@
+{
+  "schema": "cognition-pipeline/1",
+  "id": "认知:P02",
+  "name": "元认知控制管线",
+  "entry": ["认知:M31", "认知:M51", "认知:M52"],
+  "exit": ["认知:M32", "认知:M41", "认知:M51", "认知:M52"],
+  "nodes": [
+    {"id": "认知:M31", "kind": "method", "cost": 1,
+     "inputs": [{"token": "需求画像", "kind": "object"},
+                {"token": "方法目录", "kind": "array"}],
+     "outputs": [{"token": "方法计划", "kind": "object"}]},
+    {"id": "认知:M32", "kind": "method", "cost": 1,
+     "inputs": [{"token": "节点判据结果", "kind": "array"},
+                {"token": "方法计划", "kind": "object"}],
+     "outputs": [{"token": "方法审计", "kind": "object"}]},
+    {"id": "认知:M41", "kind": "method", "cost": 1,
+     "inputs": [{"token": "方法计划", "kind": "object"},
+                {"token": "预算状态", "kind": "object"}],
+     "outputs": [{"token": "过程读数", "kind": "object"}]},
+    {"id": "认知:M51", "kind": "method", "cost": 2,
+     "inputs": [{"token": "节点判据结果", "kind": "array"},
+                {"token": "判据框架", "kind": "object"}],
+     "outputs": [{"token": "框架审计", "kind": "object"}]},
+    {"id": "认知:M52", "kind": "method", "cost": 1,
+     "inputs": [{"token": "任务类型", "kind": "string"},
+                {"token": "证据标准库", "kind": "array"}],
+     "outputs": [{"token": "证据标准", "kind": "object"}]}
+  ],
+  "edges": [
+    {"from": "认知:M31", "output": "方法计划", "to": "认知:M32",
+     "input": "方法计划", "kind": "object", "fail_closed": true},
+    {"from": "认知:M31", "output": "方法计划", "to": "认知:M41",
+     "input": "方法计划", "kind": "object", "fail_closed": true}
+  ],
+  "budget_envelope": 6,
+  "conformance": "L2"
+}

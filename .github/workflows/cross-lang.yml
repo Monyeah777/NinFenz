@@ -9,20 +9,7 @@ name: cross-lang
 on:
   push:
     branches: [main]
-    paths:
-      - "engine/**"
-      - "scripts/cross_lang_verify.py"
-      - "desktop/src/core/**"
-      - "protocol/**"
-      - ".github/workflows/cross-lang.yml"
   pull_request:
-    paths:
-      - "engine/rust/**"
-      - "engine/dotnet/**"
-      - "scripts/cross_lang_verify.py"
-      - "desktop/src/core/**"
-      - "protocol/**"
-      - ".github/workflows/cross-lang.yml"
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

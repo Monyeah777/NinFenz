@@ -43,8 +43,6 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from core import atomic_write, json_doc, repo_face
 from core.atoms import hash as hash_atom
 
-from . import scan_memo
-
 DECL_REL = "protocol/asset_contracts.json"
 EXPORT_REL = "protocol/generated/asset_contract.frictionless.json"
 SCHEMA_REL = "protocol/schema/asset_contracts.schema.json"
@@ -118,7 +116,7 @@ def _read(root: str, rel: str) -> Tuple[Optional[str], Optional[str]]:
     """读文本件 → (text, issue)。缺件/不可读不抛裸异常，如实报问题（扫描要能出报告）。"""
     p = Path(root) / rel
     try:
-        return scan_memo.read_text_strict(p), None
+        return p.read_text(encoding="utf-8"), None
     except OSError as exc:
         return None, "读不到 %s：%s（修复指引：核对声明里的路径在场）" % (rel, exc)
     except UnicodeDecodeError as exc:
@@ -778,10 +776,11 @@ def _check_tests(root: str, rel: str, spec: Dict[str, Any]) -> List[str]:
             issues.append("代码件 %s 声明的测试件不在场：%s（修复指引：先写测试再登记）" % (rel,
  trel))
             continue
-        text = scan_memo.read_text(p) or ""
-        if scan_memo.parse(p) is None:
-            # 同一测试件常被多条契约登记：读与解析都走共享面（一次扫描只做一遍）
-            issues.append("测试件 %s 语法坏：%s（修复指引：先修语法）" % (trel, "SyntaxError"))
+        text = p.read_text(encoding="utf-8", errors="replace")
+        try:
+            ast.parse(text)
+        except SyntaxError as exc:
+            issues.append("测试件 %s 语法坏：%s（修复指引：先修语法）" % (trel, exc))
             continue
         if stem not in text:
             issues.append("测试件 %s 未点名被测模块 %s（修复指引：在测试里 import 或引用该模块）"
@@ -985,11 +984,8 @@ def _check_code(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, A
             issues.append("代码件 %s 语法坏：%s（修复指引：先修语法，AST 判据需要可解析的树）"
                           % (one, exc))
             continue
-        pa = Path(root) / one
-        dk = f"denied_calls:{tuple(sorted(deny))}"
-        issues += scan_memo.facts(dk, pa, functools.partial(_denied_calls, tree, one, deny))
-        issues += scan_memo.facts("none_deref", pa,
-                                  functools.partial(_none_deref, tree, one))
+        issues += _denied_calls(tree, one, deny)
+        issues += _none_deref(tree, one)
     if rel:
         issues += _check_tests(root, rel, spec)
     return issues, stats
@@ -1313,6 +1309,39 @@ def _export_drift(root: str) -> List[str]:
     return []
 
 
+def contracts_for_path(root: str, rel: str) -> dict[str, Any]:
+    """给定对象 → 命中它的契约集（cc_resolve v0）。
+
+    方向与 resolve（声明 → 文件清单）**相反**：那个回答「这份契约管哪些文件」，
+    这个回答「这个文件该守哪些契约」——合规体检与责任归属要的是后一个方向。
+
+    closure_closed 显式出现：没有契约认领该对象时也必须给出 false，不许用空数组糊过去
+    （空数组读起来像「查过了，没问题」，那是假结论）。
+    """
+    target = str(rel).replace("\\", "/").lstrip("/")
+    doc, issues = load(root)
+    if issues:
+        raise ValueError("契约声明不可用：" + "；".join(issues[:3]))
+    _begin_repo_scope()
+    try:
+        hits: list[dict[str, Any]] = []
+        for face in FACES:
+            for spec in doc.get(face) or []:
+                if not isinstance(spec, dict):
+                    continue
+                files = resolve(root, spec)
+                if target not in files:
+                    continue
+                spec_bytes = json.dumps(spec, sort_keys=True, ensure_ascii=False,
+                                        separators=(",", ":")).encode("utf-8")
+                hits.append({"face": face, "id": str(spec.get("id") or ""),
+                             "files": len(files),
+                             "digest": hashlib.sha256(spec_bytes).hexdigest()})
+    finally:
+        _end_repo_scope()
+    return {"schema": "nf-contract-resolve/1", "object": target, "contracts": hits,
+            "closure_closed": bool(hits), "unclaimed": not hits}
+
 def scan(root: str = ".", faces: Iterable[str] = ()
          ) -> Tuple[List[str], List[str], Dict[str, Any]]:
     """四面契约扫描（数据/代码/脚本/包清单）→ (issues, warns, stats)；门禁入口（check40 同源）。"""
@@ -1432,7 +1461,3 @@ def run_tests(root: str = ".", ids: Iterable[str] = ()) -> Tuple[List[str], Dict
             issues += sub
             out["tests"] += ran
     return issues, out
-
-
-#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
-scan = scan_memo.scoped(scan)

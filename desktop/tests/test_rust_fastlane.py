@@ -102,11 +102,40 @@ CANDIDATES = (
 )
 
 
+#: 快线源码目录（判「二进制是不是拿旧源码编的」）
+RUST_SRC = ROOT / "engine" / "rust" / "src"
+
+
+def _newest_rust_mtime() -> float:
+    """engine/rust/src 下最新 .rs 的 mtime（没有源码返回 0）。"""
+    latest = 0.0
+    if RUST_SRC.is_dir():
+        for path in RUST_SRC.rglob("*.rs"):
+            try:
+                latest = max(latest, path.stat().st_mtime)
+            except OSError:
+                continue
+    return latest
+
+
 def binary():
-    """快线可执行件（release 优先，其次 debug）；未构建返回 None。"""
+    """快线可执行件（release 优先，其次 debug）；未构建或**已过期**都返回 None。
+
+    过期判据（2026-11-06 实测）：bin 停在 11-04，仓库契约/放行表已推进到 11-06，于是四条
+    parity 判据红在「过期二进制」上——那不是代码回归。宁可 skip 并说明，也不拿旧编译产物
+    冒充判据；重新 cargo build --release 后自动恢复。
+    """
+    newest = _newest_rust_mtime()
     for rel in CANDIDATES:
         p = ROOT / rel
         if p.is_file():
+            try:
+                if newest and p.stat().st_mtime < newest:
+                    sys.stderr.write("  [SKIP] 快线二进制早于 engine/rust/src 最新源码："
+                                     "先 cargo build --release（避免拿旧产物冒充 parity）\n")
+                    return None
+            except OSError:
+                return None
             return p
     return None
 
@@ -583,6 +612,29 @@ class RustFastLaneParityTest(unittest.TestCase):
             self.assertEqual(0, proc.returncode, proc.stderr.decode("utf-8", "replace"))
         self.assertEqual(want.replace(b"\r\n", b"\n"), got.replace(b"\r\n", b"\n"),
                          "verify-report 面与真源报告不等（聚合/摘要/渲染，含 root_digest）")
+
+    def test_rust_sink_allowlist_is_not_drifted(self):
+        """Rust 移植的 SINK_ALLOW 必须与真源 purity_scan.SINK_ALLOW **同键集**。
+
+        为什么单开一条（2026-11-06 实测）：我给真源加了
+        release_conclusion.py:shutil.rmtree（快照失败自清），Rust 侧那份移植清单没跟上，
+        于是 purity-clean 在快线上 rc=1、而真源 ok——四条 parity 判据一起红，排查一小时。
+        这条判据只读源码、不需要二进制，秒级把「加放行忘同步移植」钉死。
+        """
+        from core import purity_scan as ps
+
+        rust = (ROOT / "engine" / "rust" / "src" / "purity.rs").read_text(encoding="utf-8")
+        block = rust.split("const SINK_ALLOW:", 1)
+        self.assertEqual(2, len(block), "Rust 侧找不到 SINK_ALLOW 常量（判据面被缩小）")
+        body = block[1].split("];", 1)[0]
+        keys = set(re.findall(r'\("([^"]+)"', body))
+        want = set(ps.SINK_ALLOW)
+        self.assertEqual(sorted(want - keys), [],
+                         "真源有、Rust 移植缺（修复指引：把该键补进 engine/rust/src/purity.rs "
+                         "的 SINK_ALLOW，并 cargo build --release）")
+        self.assertEqual(sorted(keys - want), [],
+                         "Rust 移植多出真源没有的键（修复指引：删掉，或先在 "
+                         "purity_scan.SINK_ALLOW 登记理由）")
 
     def test_density_face_matches_python_document(self):
         """density 面：`stats` 与 `issues` 必须与 `nf asset density --json` **文档相等**。

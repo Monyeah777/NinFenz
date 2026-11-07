@@ -68,7 +68,7 @@ class BenchDocExampleTest(unittest.TestCase):
 
 
 class PostmortemAndAttestDocExampleTest(unittest.TestCase):
-    """同轮从文档示例里抓到的另两处：复盘模板通配、`--ssh-key ~/…`。"""
+    """公开面模板通配与 `--ssh-key ~/…` 的文档示例必须真可执行。"""
 
     def test_postmortem_glob_form_runs(self):
         p = _run("postmortem", "check", "postmortems/PO-9000-*.md")

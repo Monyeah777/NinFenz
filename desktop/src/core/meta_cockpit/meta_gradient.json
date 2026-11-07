@@ -1,0 +1,47 @@
+{
+  "schema": "nf/meta-gradient/1",
+  "levels": [
+    {"id": "M0", "name": "对象级", "definition": "直接作用于需求/内容对象，产出第一阶知识产物。"},
+    {"id": "M1", "name": "产物级", "definition": "作用于 M0 产物，做检验、归纳、抽象、体系化。"},
+    {"id": "M2", "name": "方法级", "definition": "作用于方法应用：路由、审计、重规划、方法补丁。"},
+    {"id": "M3", "name": "过程级", "definition": "作用于认知过程状态：置信、预算、注意力、停止/继续。"},
+    {"id": "M4", "name": "认识论级", "definition": "作用于有效性框架：证据标准、判据框架、范式审计。"}
+  ],
+  "functions": [
+    {"id": "knowledge", "name": "知识"},
+    {"id": "monitoring", "name": "监控"},
+    {"id": "control", "name": "控制"},
+    {"id": "evaluation", "name": "评价"},
+    {"id": "integration", "name": "整合"}
+  ],
+  "artifact_levels": {
+    "需求画像": "M0",
+    "任务类型": "M0",
+    "拆解树": "M0",
+    "claims": "M0",
+    "causal_map": "M0",
+    "comparison_frame": "M0",
+    "comparison_matrix": "M0",
+    "counterexample_ledger": "M1",
+    "cluster_set": "M1",
+    "abstraction_set": "M1",
+    "knowledge_system": "M1",
+    "方法目录": "M1",
+    "节点判据结果": "M1",
+    "方法计划": "M2",
+    "方法审计": "M2",
+    "预算状态": "M2",
+    "过程读数": "M3",
+    "控制动作": "M3",
+    "判据框架": "M3",
+    "证据标准库": "M3",
+    "框架审计": "M4",
+    "证据标准": "M4"
+  },
+  "invariants": [
+    "M0 节点必须作用于原始需求/任务类型。",
+    "M1+ 节点必须在 operates_on 中引用至少一个低于自身元级的产物。",
+    "M2+ 节点不得只引用 M0 产物；否则判 level inflation。",
+    "meta_function 必须与输出形态匹配：control 出计划/动作，monitoring 出读数，evaluation 出裁决/审计，knowledge 出标准/知识，integration 出结构。"
+  ]
+}

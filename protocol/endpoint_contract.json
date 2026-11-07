@@ -1,13 +1,13 @@
 {
   "schema": "nf-endpoint/1",
   "status": "proposed",
-  "note": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。",
+  "note": "服务端点契约（机制借鉴 microsoft/ai-chat-protocol 的 API 规格）：把**已实现**的 NF 能力声明成 HTTP 面，供未来的装配服务实现。status=proposed —— 服务本体尚未实现，本文件只固定契约形状；每个端点的 maps_to 必须指向**当下真实存在**的 CLI 子命令或 MCP 工具（否则门禁判 FAIL，防止契约指向空气）。。其中 local.* 三端点已实装（nf serve --http，只绑回环），其余仍 status=proposed。",
   "conventions": {
     "encoding": "UTF-8 JSON（请求/响应）",
     "errors": "非 2xx + {error: {code, message}}；message 必须带修复指引（见 patterns/error-message-guidance）",
     "streaming": "stream=true 时响应为 text/event-stream（SSE），事件 data 为同一 schema 的分片",
     "versioning": "契约版本随 RFC 头（protocol/rfc_index.json）；破坏性变更 bump 并留迁移记录",
-"deprecation": "弃用/日落语义（机制借鉴 OpenAPI 的 deprecated 标志 + RFC 8594 Sunset 头）：端点弃用须**同时**给出 `sunset`（YYYY-MM-DD 日落日）与 `replacement`（替代端点 id，无替代写 null，不许省略）——只有标志没有出口的弃用视为违约；弃用只对**已实装**端点成立（status=proposed 期间不得声明弃用，未实装的能力没有可弃用的东西）；未弃用端点不得出现 sunset/replacement（悬空弃用字段）",
+    "deprecation": "弃用/日落语义（机制借鉴 OpenAPI 的 deprecated 标志 + RFC 8594 Sunset 头）：端点弃用须**同时**给出 `sunset`（YYYY-MM-DD 日落日）与 `replacement`（替代端点 id，无替代写 null，不许省略）——只有标志没有出口的弃用视为违约；弃用只对**已实装**端点成立（status=proposed 期间不得声明弃用，未实装的能力没有可弃用的东西）；未弃用端点不得出现 sunset/replacement（悬空弃用字段）",
     "idempotency": "幂等语义（RFC 9110 §9.2.2 的幂等方法定义）：本契约**默认 idempotent**——同请求重放须得同结果且无副作用；例外只在顶层 `idempotency_exceptions` 登记，登记为 non-idempotent 的端点 `key=required` 时客户端 MUST 幂等键、服务端 MUST 据此去重（重放不得二次落盘）。判据理由：幂等性是**重试安全**的前提，而重试是网络面的常态，不是异常路径"
   },
   "idempotency_exceptions": [
@@ -24,8 +24,14 @@
       "method": "POST",
       "path": "/assemble/plan",
       "streaming": true,
-      "request": {"requirement": "string"},
-      "response": {"plan": "object", "preset": "string|null", "pipeline": "string|null"},
+      "request": {
+        "requirement": "string"
+      },
+      "response": {
+        "plan": "object",
+        "preset": "string|null",
+        "pipeline": "string|null"
+      },
       "maps_to": "nf assemble"
     },
     {
@@ -33,8 +39,14 @@
       "method": "POST",
       "path": "/assemble/check",
       "streaming": false,
-      "request": {"requirement": "string", "artifact_text": "string"},
-      "response": {"issues": "array", "stats": "object"},
+      "request": {
+        "requirement": "string",
+        "artifact_text": "string"
+      },
+      "response": {
+        "issues": "array",
+        "stats": "object"
+      },
       "maps_to": "nf assemble --check"
     },
     {
@@ -42,8 +54,13 @@
       "method": "GET",
       "path": "/library/{id}",
       "streaming": false,
-      "request": {"id": "string（NF 编号，大小写不敏感）"},
-      "response": {"frontmatter": "object", "text": "string"},
+      "request": {
+        "id": "string（NF 编号，大小写不敏感）"
+      },
+      "response": {
+        "frontmatter": "object",
+        "text": "string"
+      },
       "maps_to": "library_read（MCP 工具）"
     },
     {
@@ -51,8 +68,13 @@
       "method": "GET",
       "path": "/library/search",
       "streaming": false,
-      "request": {"q": "string", "limit": "integer"},
-      "response": {"hits": "array"},
+      "request": {
+        "q": "string",
+        "limit": "integer"
+      },
+      "response": {
+        "hits": "array"
+      },
       "maps_to": "library_search（MCP 工具）"
     },
     {
@@ -60,8 +82,13 @@
       "method": "GET",
       "path": "/registry",
       "streaming": false,
-      "request": {"query": "string|null"},
-      "response": {"modules": "array", "protocols": "array"},
+      "request": {
+        "query": "string|null"
+      },
+      "response": {
+        "modules": "array",
+        "protocols": "array"
+      },
       "maps_to": "registry_search（MCP 工具）"
     },
     {
@@ -69,8 +96,12 @@
       "method": "POST",
       "path": "/pipeline/dryrun",
       "streaming": false,
-      "request": {"pipeline": "string"},
-      "response": {"graph": "object"},
+      "request": {
+        "pipeline": "string"
+      },
+      "response": {
+        "graph": "object"
+      },
       "maps_to": "nf pipeline dryrun"
     },
     {
@@ -78,8 +109,14 @@
       "method": "POST",
       "path": "/bench/evaluate",
       "streaming": false,
-      "request": {"case": "string", "artifact_text": "string", "model": "string"},
-      "response": {"run": "object"},
+      "request": {
+        "case": "string",
+        "artifact_text": "string",
+        "model": "string"
+      },
+      "response": {
+        "run": "object"
+      },
       "maps_to": "nf bench run"
     },
     {
@@ -88,8 +125,59 @@
       "path": "/conformance",
       "streaming": false,
       "request": {},
-      "response": {"contracts": "array", "root": "string", "verdict": "string"},
+      "response": {
+        "contracts": "array",
+        "root": "string",
+        "verdict": "string"
+      },
       "maps_to": "nf conformance"
+    },
+    {
+      "id": "local.health",
+      "method": "GET",
+      "path": "/api/health",
+      "streaming": false,
+      "request": {},
+      "response": {
+        "ok": "boolean",
+        "api": "string",
+        "endpoints": "array"
+      },
+      "maps_to": "nf serve"
+    },
+    {
+      "id": "local.verify",
+      "method": "POST",
+      "path": "/api/verify",
+      "streaming": false,
+      "request": {
+        "body": "自包含证据包 zip 字节（上限 8 MiB）"
+      },
+      "response": {
+        "ok": "boolean",
+        "verdict": "string",
+        "level": "string",
+        "root": "string",
+        "issues": "array"
+      },
+      "maps_to": "nf evidence verify"
+    },
+    {
+      "id": "local.check",
+      "method": "POST",
+      "path": "/api/check",
+      "streaming": false,
+      "request": {
+        "object": "string（UTF-8 文本）",
+        "policy": "object（nf-check-policy/1）"
+      },
+      "response": {
+        "ok": "boolean",
+        "verdict": "string",
+        "policy_digest": "string",
+        "findings": "array"
+      },
+      "maps_to": "nf check"
     }
   ]
 }

@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-journal/1",
+  "title": "NF Cockpit Session Journal",
+  "description": "Event-sourced cockpit session snapshots. Every event commits exactly one calibrated turn; scores are forbidden.",
+  "type": "object",
+  "required": ["schema", "session_id", "goal", "atom_contracts_digest",
+               "runtime_digest",
+               "initial_calibration_digest", "created_at", "initial_state",
+               "events", "digest"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-journal/1"},
+    "session_id": {"type": "string", "minLength": 1},
+    "goal": {"type": "string", "minLength": 1},
+    "atom_contracts_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runtime_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "initial_calibration_digest": {"type": "string",
+                                   "pattern": "^[0-9a-f]{64}$"},
+    "created_at": {"type": "string", "minLength": 1},
+    "initial_state": {"type": "object"},
+    "events": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": ["seq", "type", "prev_digest", "state_before_digest",
+                     "state_after_digest", "cluster", "kind", "predicted",
+                     "resolved", "changed_keys", "state", "created_at",
+                     "atom_trace", "decision", "calibration_before_digest",
+                     "calibration_after_digest", "observations",
+                     "event_digest"],
+        "additionalProperties": false,
+        "properties": {
+          "seq": {"type": "integer", "minimum": 1},
+          "type": {"const": "turn-commit"},
+          "prev_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "state_before_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "state_after_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "cluster": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"}
+          },
+          "kind": {"enum": ["direct", "prepare", "compiled"]},
+          "predicted": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": ["structure", "relations", "risks", "synthesis",
+                       "grounding", "resolve"]
+            }
+          },
+          "resolved": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": ["structure", "relations", "risks", "synthesis",
+                       "grounding", "resolve"]
+            }
+          },
+          "changed_keys": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string"}
+          },
+          "state": {"type": "object"},
+          "atom_trace": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "required": ["atom_id", "status", "input_digest", "output_digest"],
+              "additionalProperties": false,
+              "properties": {
+                "atom_id": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"},
+                "status": {"const": "pass"},
+                "input_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "output_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          },
+          "decision": {
+            "type": "object",
+            "required": ["choice", "candidate_count", "candidate_set_digest",
+                         "chosen_candidate_digest", "context_digest",
+                         "context_units", "source_snapshot",
+                         "source_snapshot_digest", "external_context",
+                         "candidates"],
+            "additionalProperties": false,
+            "properties": {
+              "choice": {"type": "integer", "minimum": 0},
+              "candidate_count": {"type": "integer", "minimum": 1,
+                                  "maximum": 5},
+              "candidate_set_digest": {"type": "string",
+                                       "pattern": "^[0-9a-f]{64}$"},
+              "chosen_candidate_digest": {"type": "string",
+                                          "pattern": "^[0-9a-f]{64}$"},
+              "context_digest": {"type": "string",
+                                 "pattern": "^[0-9a-f]{64}$"},
+              "context_units": {"type": "integer", "minimum": 0},
+              "source_snapshot": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["source", "path", "role", "trust",
+                               "content_digest", "file_digest"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "source": {"type": "string"},
+                    "path": {"type": "string"},
+                    "role": {"type": "string"},
+                    "trust": {"type": "string"},
+                    "content_digest": {"type": "string",
+                                       "pattern": "^[0-9a-f]{64}$"},
+                    "file_digest": {"type": "string",
+                                    "pattern": "^[0-9a-f]{64}$"}
+                  }
+                }
+              },
+              "source_snapshot_digest": {"type": "string",
+                                         "pattern": "^[0-9a-f]{64}$"},
+              "external_context": {"type": "boolean"},
+              "thought_patch": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 16,
+                "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+                "additionalProperties": {
+                  "type": ["string", "number", "boolean", "array", "object",
+                           "null"]
+                }
+              },
+              "thought_patch_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "candidates": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "required": ["cluster", "resolves", "cost", "kind"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "cluster": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 3,
+                      "uniqueItems": true,
+                      "items": {"type": "string"}
+                    },
+                    "resolves": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {"type": "string"}
+                    },
+                    "cost": {"type": "integer", "minimum": 1, "maximum": 3},
+                    "kind": {"enum": ["direct", "prepare", "compiled"]},
+                    "basis": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {"type": "string"}
+                    },
+                    "effect": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "adds": {"type": "array", "items": {"type": "string"}},
+                        "removes": {"type": "array", "items": {"type": "string"}}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "calibration_before_digest": {
+            "type": "string", "pattern": "^[0-9a-f]{64}$"
+          },
+          "calibration_after_digest": {
+            "type": "string", "pattern": "^[0-9a-f]{64}$"
+          },
+          "observations": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          },
+          "created_at": {"type": "string", "minLength": 1},
+          "event_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

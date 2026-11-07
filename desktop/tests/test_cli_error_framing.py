@@ -444,7 +444,8 @@ class PathFlagCoverageTest(unittest.TestCase):
                     out.setdefault(a.dest, {
                         "bool": isinstance(a, (argparse._StoreTrueAction,
                                                argparse._StoreFalseAction)),
-                        "help": str(a.help or "")})
+                        "help": str(a.help or ""),
+                        "path": a.type is Path})
         walk(nf._build_parser())
         return nf, out
 
@@ -452,7 +453,7 @@ class PathFlagCoverageTest(unittest.TestCase):
         nf, dests = self._dests()
         listed = set(nf._PATH_FLAG_DESTS)
         pathish = {d for d, v in dests.items()
-                   if self.PATHISH.search(v["help"]) and not v["bool"]}
+                   if (v["path"] or self.PATHISH.search(v["help"])) and not v["bool"]}
         self.assertGreater(len(pathish), 15, "没扫到路径类旗标（判据可能已失效）")
         orphan = sorted(pathish - listed - set(self.FREE_TEXT_EXEMPT))
         self.assertEqual([], orphan,
@@ -497,7 +498,7 @@ class PathFlagCoverageTest(unittest.TestCase):
         self.assertGreater(len(dests), 30, "没枚举到文本类参数（判据可能已失效）")
         #: 写侧落点（目标而非被读内容）——与「二进制」两类之外**不得**再有豁免
         write_targets = {"out", "dest", "dst", "session_path", "write", "save_path", "build_dest",
-                         "store"}
+                         "store", "handoff_out", "manifest_out", "context_dir"}
         gated = set(nf._UTF8_TEXT_DESTS) | set(nf._UTF8_BINARY_EXEMPT) | write_targets
         orphan = sorted(d for d in dests if d not in gated)
         self.assertEqual([], orphan,
@@ -516,6 +517,52 @@ class PathFlagCoverageTest(unittest.TestCase):
         collect(nf._build_parser())
         stale = sorted(d for d in nf._UTF8_TEXT_DESTS if d not in all_dests)
         self.assertEqual([], stale, "编码闸门名单里有不存在的参数（改名后没同步）：%s" % stale)
+
+    def test_cockpit_pathlike_arguments_use_the_same_gates(self):
+        """桥接命令用 `Path` 参数时不得绕过通用路径 / 编码闸。
+
+        `cli_bridge` 里的 cockpit 参数声明为 `pathlib.Path`；通用闸若只认 `str`，
+        名单看起来完整、实际却全部跳过。这里直接调用 helper 钉住类型归一化，
+        并确认纯写侧 `manifest_out` 不被误当成输入文本读取。
+        """
+        import argparse
+
+        nf = _load_nf()
+        escaped = nf._path_writing_issue(
+            argparse.Namespace(manifest_out=Path("../nf-escape.json")))
+        self.assertIn("--manifest-out", escaped)
+        self.assertIn("修复指引", escaped)
+
+        fd, bad_name = tempfile.mkstemp(suffix=".txt", prefix="nf_non_utf8_")
+        try:
+            with os.fdopen(fd, "wb") as fh:
+                fh.write(b"\xff\xfe\x00")
+            bad = Path(bad_name)
+            issue = nf._utf8_text_issue(argparse.Namespace(prompt_file=bad))
+            self.assertIn("--prompt-file", issue)
+            self.assertIn("UTF-8", issue)
+            self.assertEqual("", nf._utf8_text_issue(
+                argparse.Namespace(manifest_out=bad)),
+                "写侧参数不应被当成输入文本读取")
+        finally:
+            os.unlink(bad_name)
+
+    def test_bridge_paths_are_resolved_against_repository_root(self):
+        """`Path` 参数进入桥接实现前统一按仓库根解析，不能悄悄退回当前目录口径。"""
+        import argparse
+
+        nf = _load_nf()
+        args = argparse.Namespace(
+            prompt_file=Path("docs/task.md"),
+            experiment=Path("results/experiment.json"),
+            out=Path("results/out.json"),
+            manifest_out=Path("results/manifest.json"),
+        )
+        nf._resolve_bridge_paths(args)
+        self.assertEqual(Path(nf.ROOT) / "docs" / "task.md", args.prompt_file)
+        self.assertEqual(Path(nf.ROOT) / "results" / "experiment.json", args.experiment)
+        self.assertEqual(Path(nf.ROOT) / "results" / "out.json", args.out)
+        self.assertEqual(Path(nf.ROOT) / "results" / "manifest.json", args.manifest_out)
 
 
 def _load_nf():

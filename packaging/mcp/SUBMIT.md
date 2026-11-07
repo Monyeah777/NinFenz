@@ -15,20 +15,20 @@
 | 项目 | 当前值 |
 |---|---|
 | 官方 Registry 名称 | `io.github.Monyeah777/ninfenz` |
-| 当前仓库发布版本 | **1.1.2（`packaging/mcp/server.json`）** |
-| npm 包 | `ninfenz@1.1.2`，包内已有 `mcpName` |
+| 当前仓库发布版本 | **1.0.5（`packaging/mcp/server.json`）** |
+| npm 包 | `ninfenz@1.0.5`，包内已有 `mcpName` |
 | 展示名 | **NinFenz Content Gate** |
 | 工具面 | **12 个只读工具 + 1 个 prompt**，无写路径 |
 | 安装（零安装） | `npx -y ninfenz serve` |
 | 安装（有检出） | `python scripts/nf.py serve` |
 | 仓库 | https://github.com/Monyeah777/NinFenz |
 | 站点 | https://ninfenz.dev/ |
-| 许可 | AGPL-3.0-only / Commercial |
+| 许可 | MIT |
 
 **先判断你要做哪一种：**
 
-- **只是让目录里有这个 server**：先查询 Registry 当前版本；若已是 `1.1.2`，直接做第 2、3 节，否则先按 1.8 发布当前版本。
-- **要让 Registry / npm 用户拿到最新代码**：需要先发新的 npm 版本（示例使用下一个语义版本号），再更新 `server.json` 并重新 `mcp-publisher publish`；见 1.8。
+- **只是让目录里有这个 server**：先查询 Registry 当前版本；若已是 `1.0.5`，直接做第 2、3 节，否则先按 1.8 发布当前版本。
+- **要让 Registry / npm 用户拿到最新代码**：需要先发新的 npm 版本（例如 `1.0.2`），再更新 `server.json` 并重新 `mcp-publisher publish`；见 1.8。
 - **三站都没有提交过**：按第 1 → 2 → 3 节顺序做。
 
 ---
@@ -57,7 +57,7 @@ Registry **只存元数据，不存包**。它要求：
 // packaging/npm/package.json（节选）
 {
   "name": "ninfenz",
-  "version": "1.1.2",
+  "version": "1.0.5",
   "mcpName": "io.github.Monyeah777/ninfenz"
 }
 ```
@@ -67,12 +67,12 @@ Registry **只存元数据，不存包**。它要求：
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Monyeah777/ninfenz",
-  "version": "1.1.2",
+  "version": "1.0.5",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "ninfenz",
-      "version": "1.1.2",
+      "version": "1.0.5",
       "transport": { "type": "stdio" }
     }
   ]
@@ -145,7 +145,7 @@ Successfully authenticated!
 ```text
 Publishing to https://registry.modelcontextprotocol.io...
 ✓ Successfully published
-✓ Server io.github.Monyeah777/ninfenz version 1.1.2
+✓ Server io.github.Monyeah777/ninfenz version 1.0.5
 ```
 
 ### 1.6 验证
@@ -155,7 +155,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 ```
 
 应能看到 `io.github.Monyeah777/ninfenz`、`version`、`packages` 等元数据。
-当前仓库发布版本是 `1.1.2`；这条查询应返回当前 Registry 记录的版本，提交前以其实际结果为准。
+当前仓库发布版本是 `1.0.5`；这条查询应返回当前 Registry 记录的版本，提交前以其实际结果为准。
 
 > 搜索对大小写敏感；用 `NinFenz` 或 `Monyeah777`，不要只搜小写 `ninfenz`（历史上会漏）。
 
@@ -173,7 +173,7 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 
 只有当你希望 Registry 指向**新的 npm 包**时才做这一节。
 
-1. 同步改三处版本（示例 `1.1.2`）：
+1. 同步改三处版本（示例 `1.0.2`）：
    - `packaging/npm/package.json` → `version`
    - `packaging/mcp/server.json` → `version`
    - `packaging/mcp/server.json` → `packages[0].version`
@@ -215,13 +215,13 @@ curl.exe -sS "https://registry.modelcontextprotocol.io/v0.1/servers?search=NinFe
 复制这一行：
 
 ```markdown
-- [Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) [![Monyeah777/NinFenz MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) 🐍 🏠 🍎 🪟 🐧 - AI output assurance MCP server with versioned content contracts, deterministic release gates and reproducible evidence; 12 read-only retrieval tools plus an assembly prompt, Python stdlib only.
+- [Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) [![Monyeah777/NinFenz MCP server](https://glama.ai/mcp/servers/Monyeah777/NinFenz/badges/score.svg)](https://glama.ai/mcp/servers/Monyeah777/NinFenz) 🐍 🏠 🍎 🪟 🐧 - Content contract layer as a read-only MCP server: protocol specs, modules, pipelines, assets, and the knowledge library for long-form content; 12 read-only tools plus an assembly prompt, Python stdlib only, no write paths.
 ```
 
 不想带 Glama 徽章也可以删掉中间那段 `[![...]]`，只保留：
 
 ```markdown
-- [Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) 🐍 🏠 🍎 🪟 🐧 - AI output assurance MCP server with versioned content contracts, deterministic release gates and reproducible evidence; 12 read-only retrieval tools plus an assembly prompt, Python stdlib only.
+- [Monyeah777/NinFenz](https://github.com/Monyeah777/NinFenz) 🐍 🏠 🍎 🪟 🐧 - Content contract layer as a read-only MCP server: protocol specs, modules, pipelines, assets, and the knowledge library for long-form content; 12 read-only tools plus an assembly prompt, Python stdlib only, no write paths.
 ```
 
 ### 2.3 网页操作（最省事）
@@ -249,14 +249,14 @@ Add NinFenz Content Gate MCP server 🤖🤖🤖
 ```markdown
 ## What
 
-Adds **NinFenz Content Gate**, a local-first MCP server for AI output assurance:
-versioned content contracts, deterministic release gates and reproducible evidence.
+Adds **NinFenz Content Gate**, a read-only MCP server for a content contract layer:
+protocol specs, modules, pipelines, assets, and the knowledge library.
 
 ## Why it fits Knowledge & Memory
 
-Agents can discover the contract, module, pipeline, asset, and library records that
-define the required output evidence. The MCP surface exposes 12 read-only retrieval
-tools plus one assembly prompt; deterministic gates run through the CLI or CI.
+Agents can discover and retrieve the contract, module, pipeline, asset, and library
+records they need before writing long-form content. The server exposes 12 read-only
+tools plus one assembly prompt; there are no write paths.
 
 ## Verification
 
@@ -305,12 +305,12 @@ tools plus one assembly prompt; deterministic gates run through the CLI or CI.
 如果表单有额外说明框，粘贴：
 
 ```text
-NinFenz Content Gate is a local-first MCP server for AI output assurance:
-versioned content contracts, deterministic release gates and reproducible evidence.
+NinFenz Content Gate is a read-only MCP server that exposes a content contract layer
+to agents: protocol specs, modules, pipelines, assets, and the knowledge library.
 
 - 12 read-only tools + 1 prompt (assemble_guide)
 - stdio; modern 2026-07-28 and legacy 2025-11-25 protocol eras
-- Python standard library only; the MCP retrieval surface has no write paths
+- Python standard library only; no write paths
 - Install: npx -y ninfenz serve
 - Repo: https://github.com/Monyeah777/NinFenz
 - Site: https://ninfenz.dev/
@@ -330,27 +330,25 @@ versioned content contracts, deterministic release gates and reproducible eviden
 ### 4.1 英文一句话
 
 ```text
-AI output assurance MCP server with versioned contracts, deterministic release
-gates and reproducible evidence.
+Read-only MCP server for a content contract layer: protocol specs, modules,
+pipelines, assets, and the knowledge library.
 ```
 
 ### 4.2 中文一句话
 
 ```text
-面向 AI 输出的证据门禁 MCP 服务器：把版本化契约、确定性发布门禁、
-规则级证据和可复现报告接入 agent 工作流。
+只读 MCP 服务器：把长内容的验收标准（协议 / 模块 / 管线 / 资产 / 馆藏）变成
+agent 可调用的检索与取件工具面。
 ```
 
 ### 4.3 英文完整描述
 
 ```text
-NinFenz Content Gate — a local-first MCP server that makes versioned content contracts,
-deterministic release gates, rule-level evidence and reproducible reports available
-to agent workflows.
+NinFenz Content Gate — a read-only MCP server that exposes a content contract layer
+to agents: protocol specs, modules, pipelines, assets, and the knowledge library.
 
 12 read-only tools + 1 prompt (assemble_guide); dual protocol era (modern 2026-07-28 /
-legacy 2025-11-25); zero third-party runtime dependencies (Python stdlib); the MCP
-retrieval surface itself has no write paths.
+legacy 2025-11-25); zero third-party runtime dependencies (Python stdlib); no write paths.
 
 Install: npx -y ninfenz serve
 Repo: https://github.com/Monyeah777/NinFenz
@@ -403,7 +401,7 @@ conformance: 27/27
 - [ ] npm 包 `ninfenz` 可安装：`npx -y ninfenz serve`
 - [ ] `packaging/mcp/server.json` 的版本与 npm 已发布版本一致
 - [ ] `package.json` 里有 `mcpName: io.github.Monyeah777/ninfenz`
-- [ ] 官方 Registry 查询能搜到 `1.1.2`（若只是更新目录，以查询到的实际版本为准）
+- [ ] 官方 Registry 查询能搜到 `1.0.5`（若只是更新目录，以查询到的实际版本为准）
 - [ ] README / `llms-install.md` 没有过期工具名（当前 12 工具）
 - [ ] 不把 API key、token、邮箱密码写进任何提交内容
 
@@ -412,7 +410,7 @@ conformance: 27/27
 ## 6. 推荐执行顺序
 
 ```text
-1. 官方 Registry（先确认是否已有 1.1.2；不一致时按 1.8 发布当前版本）
+1. 官方 Registry（先确认是否已有 1.0.5；不一致时按 1.8 发布当前版本）
 2. Awesome MCP Servers（一个 PR，收益最大）
 3. AgentSkillsHub（表单，人工审核）
 ```

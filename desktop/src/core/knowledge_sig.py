@@ -13,67 +13,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import re
 
-#: 根目录编号方案文档范围：01..36（含 33/34/35 各子报告）
-DOC_RANGE = re.compile(r"^((?:0[1-9]|[12][0-9]|3[0-6]))_")
-_VERSION = re.compile(r"v\d+(?:\.\d+){1,2}")
-_REF_P = re.compile(r"(?<![A-Za-z0-9])P\d{2,4}")
-_REF_M = re.compile(r"(?<![A-Za-z0-9])M\d{2,4}")
-_HEADING = re.compile(r"^#{1,6}\s+(.*?)\s*$")
-_YAML_FENCE = re.compile(r"^```[ \t]*[Yy][Aa][Mm][Ll]?[ \t]*$", re.M)
-_BLOCK_KEY = re.compile(r"^([A-Za-z_][\w]*):\s*$", re.M)
-
-
-def _norm(text: str) -> str:
-    return text.replace("\r\n", "\n").replace("\r", "\n")
+from core.contract_text import DOC_RANGE, build_signature_text
 
 
 def _sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-
-def parse_doc_id(path: str) -> str:
-    """从相对路径取根目录编号方案文档的两位编号（01-36），否则空串。"""
-    base = os.path.basename(path)
-    m = DOC_RANGE.match(base)
-    return m.group(1) if m else ""
-
-
-def kind_of(path: str) -> str:
-    p = path.replace("\\", "/")
-    if "/03_管线库/" in p or "/pipelines/" in p:
-        return "pipeline"
-    if "/04_模块库/" in p or "/modules/" in p:
-        return "module"
-    return "doc"
-
-
-def _extract_fences(text: str) -> list:
-    """提取 ```yaml 代码块内文本（纯文本切段，不做 yaml 解析）。"""
-    out = []
-    in_fence = False
-    buf: list = []
-    for ln in text.splitlines():
-        if not in_fence:
-            if _YAML_FENCE.match(ln):
-                in_fence = True
-                buf = []
-        else:
-            if ln.strip().startswith("```"):
-                in_fence = False
-                out.append("\n".join(buf))
-            else:
-                buf.append(ln)
-    return out
-
-
-def _field_from_fence(text: str, field: str) -> str:
-    for fence in _extract_fences(text):
-        m = re.search(r"(?m)^\s*%s:\s*(.+?)\s*$" % re.escape(field), fence)
-        if m:
-            return m.group(1).strip().strip("'\"")
-    return ""
 
 
 def build_signature(path: str, root: str = ".") -> dict:
@@ -81,46 +26,7 @@ def build_signature(path: str, root: str = ".") -> dict:
     abs_path = os.path.join(root, path)
     with open(abs_path, encoding="utf-8") as fh:
         raw = fh.read()
-    text = _norm(raw)
-    lines = text.splitlines()
-    headings = []
-    for ln in lines:
-        m = _HEADING.match(ln)
-        if m and not m.group(1).startswith("#"):
-            headings.append(m.group(1).strip())
-    doc_id = parse_doc_id(path)
-    title = headings[0] if headings else os.path.basename(path)
-    ver_m = _VERSION.search(title + "\n" + "\n".join(lines[:8]))
-    schema_names = []
-    for fence in _extract_fences(text):
-        for m in _BLOCK_KEY.finditer(fence):
-            name = m.group(1)
-            if name not in ("yaml", "yml", "text"):
-                schema_names.append(name)
-    refs = sorted(set(_REF_M.findall(text) + _REF_P.findall(text)))
-    kind = kind_of(path)
-    self_id = _field_from_fence(text, "id")
-    layer = _field_from_fence(text, "layer")
-    category = _field_from_fence(text, "category")
-    meta_lines = [ln for ln in lines if ln.strip().startswith(">")]
-    sig = {
-        "kind": kind,
-        "path": path.replace("\\", "/"),
-        "doc_id": doc_id,
-        "title": title,
-        "version": ver_m.group(0) if ver_m else "",
-        "self_id": self_id,
-        "layer": layer,
-        "category": category,
-        "heading_count": len(headings),
-        "headings": headings,
-        "schema_names": sorted(set(schema_names)),
-        "refs": refs,
-        "meta_line_count": len(meta_lines),
-        "line_count": len(lines),
-        "body_hash": _sha(text),
-    }
-    return sig
+    return build_signature_text(path, raw)
 
 
 def _canonical(sig: dict) -> bytes:
@@ -185,14 +91,17 @@ def diff_signatures(a: dict, b: dict) -> dict:
         va, vb = a.get(f), b.get(f)
         if va != vb:
             changes.append({"field": f, "from": va, "to": vb, "kind": "字段变更"})
-    list_fields = ("headings", "schema_names", "refs")
+    list_fields = ("headings", "schema_names", "field_paths", "refs")
     for f in list_fields:
         sa, sb = set(a.get(f, [])), set(b.get(f, []))
         for x in sorted(sa - sb):
             changes.append({"field": f, "from": x, "to": None, "kind": "移除"})
         for x in sorted(sb - sa):
             changes.append({"field": f, "from": None, "to": x, "kind": "新增"})
-    removed = [c for c in changes if c["kind"] == "移除" and c["field"] in ("refs", "headings")]
+    removed = [
+        c for c in changes
+        if c["kind"] == "移除" and c["field"] in ("refs", "headings", "field_paths")
+    ]
     removed_any = [c for c in changes if c["kind"] == "移除"]
     added_any = [c for c in changes if c["kind"] == "新增"]
     if a.get("doc_id") and b.get("doc_id") and a["doc_id"] != b["doc_id"]:

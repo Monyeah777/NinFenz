@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/live-cockpit-turn/1",
+  "title": "NF Live Cockpit Turn",
+  "description": "One turn only: current need, 1-3 atoms, state patch, stop flag. No scores, no full plan, no receipts.",
+  "type": "object",
+  "required": ["need", "cluster", "state_patch", "stop"],
+  "additionalProperties": false,
+  "properties": {
+    "need": {
+      "enum": ["understand", "relate", "challenge", "resolve",
+               "synthesize", "ground", "done"]
+    },
+    "cluster": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"}
+    },
+    "state_patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parts": {"type": "array", "items": {"type": "string"}},
+        "relations": {"type": "array", "items": {"type": "string"}},
+        "risks": {"type": "array", "items": {"type": "string"}},
+        "resolutions": {"type": "array", "items": {"type": "object"}},
+        "draft": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "verified": {"type": "boolean"},
+        "open_questions": {"type": "array", "items": {"type": "string"}},
+        "note": {"type": "string"}
+      }
+    },
+    "stop": {"type": "boolean"}
+  }
+}

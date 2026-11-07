@@ -1,0 +1,29 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M41",
+  "name": "过程监控",
+  "category": "认知",
+  "layer": "P41",
+  "meta_level": "M3",
+  "meta_function": "monitoring",
+  "operates_on": ["方法计划", "预算状态"],
+  "atoms": ["m.observe", "m.estimate", "m.detect", "c.stop"],
+  "inputs": [{"token": "方法计划", "kind": "object"},
+             {"token": "预算状态", "kind": "object"}],
+  "outputs": [{"token": "过程读数", "kind": "object"}],
+  "cost_class": "heuristic",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "元过程",
+  "context_budget": {"input": "1x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": [], "summarize": ["历史读数"]},
+  "criteria": [
+    {"dimension": "state_readout_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0},
+    {"dimension": "budget_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "runtime_executor.py"}],
+  "conformance": "L2"
+}

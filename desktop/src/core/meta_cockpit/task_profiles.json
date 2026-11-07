@@ -1,0 +1,116 @@
+{
+  "schema": "nf/task-profiles/1",
+  "version": "1.0",
+  "facet_witnesses": {
+    "objects": [{"keys": ["parts"], "min_items": 2}],
+    "dimensions": [{"keys": ["relations"], "min_items": 1}, {"keys": ["diff"]}],
+    "tradeoff": [{"keys": ["risks"], "min_items": 1, "min_chars": 12}, {"keys": ["diff"]}],
+    "decision_rule": [{"keys": ["plan"], "min_items": 1}, {"keys": ["criteria"], "min_items": 1}],
+    "symptom": [{"keys": ["parts"]}],
+    "mechanism": [{"keys": ["relations"], "min_items": 1, "min_chars": 3}],
+    "confounder": [{"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "intervention": [{"keys": ["plan"], "min_items": 1}],
+    "evidence": [{"keys": ["evidence"], "min_items": 1}],
+    "components": [{"keys": ["parts"]}],
+    "interactions": [{"keys": ["relations"], "min_items": 1, "min_chars": 3}],
+    "failure_path": [{"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "verification": [{"keys": ["evidence", "verified"], "min_items": 1}],
+    "scope": [{"keys": ["representation"]}],
+    "criteria": [{"keys": ["criteria"], "min_items": 1, "item_keys": ["dimension", "threshold"]}],
+    "checks": [{"keys": ["audit", "check", "verdict"], "allow_empty": ["audit"]}],
+    "findings": [{"keys": ["risks"], "min_items": 1, "min_chars": 12}, {"keys": ["verdict"]}],
+    "residual_risks": [{"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "phenomenon": [{"keys": ["representation"]}, {"keys": ["parts"]}],
+    "example": [{"keys": ["definitions"], "min_items": 1, "min_chars": 3}, {"keys": ["instance"]}],
+    "boundary": [{"keys": ["definitions"], "min_items": 1, "min_chars": 3}, {"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "options": [{"keys": ["options"], "min_items": 2}, {"keys": ["parts"], "min_items": 2}, {"keys": ["selected"]}],
+    "recommendation": [{"keys": ["plan"], "min_items": 1}, {"keys": ["selected"]}],
+    "reversal": [{"keys": ["fallback"]}, {"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "intent": [{"keys": ["representation"]}, {"keys": ["parts"]}],
+    "constraints": [{"keys": ["definitions"], "min_items": 1, "min_chars": 3}, {"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "variation": [{"keys": ["clusters"]}, {"keys": ["instance"]}, {"keys": ["diff"]}],
+    "coherence": [{"keys": ["relations"], "min_items": 1, "min_chars": 3}],
+    "revision": [{"keys": ["plan"], "min_items": 1}, {"keys": ["risks"], "min_items": 1, "min_chars": 12}],
+    "structure": [{"keys": ["parts"]}],
+    "synthesis": [{"keys": ["plan"], "min_items": 1}]
+  },
+  "profiles": [
+    {
+      "id": "compare",
+      "strong_triggers": ["比较", "对比", "取舍", "优劣", "versus", "vs"],
+      "weak_triggers": ["差异"],
+      "facets": ["objects", "dimensions", "tradeoff", "decision_rule"],
+      "required_facets": ["objects", "tradeoff", "decision_rule"],
+      "functions": ["knowledge", "integration", "evaluation"],
+      "context_roles": ["examples", "relations", "evidence", "tradeoffs"],
+      "preferred_atoms": ["m.compare", "e.benchmark", "k.classify"]
+    },
+    {
+      "id": "diagnose",
+      "strong_triggers": ["为什么", "根因", "失败原因", "反馈回路"],
+      "weak_triggers": ["原因", "故障", "异常", "盲点"],
+      "facets": ["symptom", "mechanism", "confounder", "intervention", "evidence"],
+      "required_facets": ["symptom", "mechanism", "confounder"],
+      "functions": ["monitoring", "evaluation", "integration"],
+      "context_roles": ["current-state", "events", "counterexamples", "relations", "evidence"],
+      "preferred_atoms": ["m.observe", "m.detect", "e.audit", "e.falsify", "i.reconcile"]
+    },
+    {
+      "id": "design",
+      "strong_triggers": ["设计", "制定", "搭建", "构建"],
+      "weak_triggers": ["方案", "流程", "系统", "架构", "计划"],
+      "facets": ["boundary", "components", "interactions", "failure_path", "verification"],
+      "required_facets": ["components", "interactions", "failure_path", "verification"],
+      "functions": ["knowledge", "integration", "evaluation"],
+      "context_roles": ["definition", "relations", "counterexamples", "acceptance-obligations"],
+      "preferred_atoms": ["i.compose", "i.hierarchy", "i.cluster", "e.falsify"]
+    },
+    {
+      "id": "audit",
+      "strong_triggers": ["审查", "检查", "审计", "合规", "门禁", "检查清单"],
+      "weak_triggers": ["清单", "风险", "盲点"],
+      "facets": ["scope", "criteria", "checks", "findings", "residual_risks"],
+      "required_facets": ["criteria", "checks", "findings"],
+      "functions": ["evaluation", "monitoring", "integration"],
+      "context_roles": ["acceptance-obligations", "evidence", "counterexamples", "observable-signals"],
+      "preferred_atoms": ["k.criterion", "e.audit", "m.check", "e.adjudicate", "m.detect"]
+    },
+    {
+      "id": "explain",
+      "strong_triggers": ["解释", "说明", "原理", "如何工作", "运作方式"],
+      "weak_triggers": ["机制"],
+      "facets": ["phenomenon", "mechanism", "example", "boundary"],
+      "required_facets": ["mechanism", "example", "boundary"],
+      "functions": ["knowledge", "integration", "evaluation"],
+      "context_roles": ["definition", "examples", "relations", "evidence"],
+      "preferred_atoms": ["k.relate", "k.abstract", "k.instantiate", "m.trace"]
+    },
+    {
+      "id": "decide",
+      "strong_triggers": ["选择", "决策", "是否", "该不该", "建议", "推荐", "判断"],
+      "weak_triggers": [],
+      "facets": ["options", "criteria", "tradeoff", "recommendation", "reversal"],
+      "required_facets": ["options", "criteria", "recommendation"],
+      "functions": ["knowledge", "evaluation", "control", "integration"],
+      "context_roles": ["constraints", "tradeoffs", "evidence", "fallback"],
+      "preferred_atoms": ["k.criterion", "c.select", "e.benchmark", "e.adjudicate", "i.reconcile"]
+    },
+    {
+      "id": "create",
+      "strong_triggers": ["创作", "写作", "故事", "文案", "课程", "角色", "玩法"],
+      "weak_triggers": ["创意"],
+      "facets": ["intent", "constraints", "variation", "coherence", "revision"],
+      "required_facets": ["constraints", "coherence", "revision"],
+      "functions": ["knowledge", "evaluation", "integration"],
+      "context_roles": ["definition", "examples", "unresolved-conflicts", "evidence"],
+      "preferred_atoms": ["k.instantiate", "k.abstract", "i.compose", "m.compare"]
+    }
+  ],
+  "general": {
+    "facets": ["boundary", "structure", "evidence", "synthesis"],
+    "required_facets": ["boundary", "evidence", "synthesis"],
+    "functions": ["knowledge", "evaluation", "integration"],
+    "context_roles": ["definition", "relations", "evidence", "acceptance-obligations"],
+    "preferred_atoms": []
+  }
+}

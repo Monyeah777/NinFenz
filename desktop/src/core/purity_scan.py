@@ -97,20 +97,21 @@ def _doc_facts(text: str):
 #: R5 硬依赖白名单（**登记**的第三方硬 import：允许直接 import）
 HARD_ALLOW = {
     "yaml": "PyYAML（仓库既有依赖；check16/28 同源解析，见 CONTRIBUTING §4.2 例外）",
-    "scripts": "同仓脚本目录（verify_tests 复用 scripts/tisa.py 的增量器；非第三方依赖）",
 }
 #: R5 软导入登记（第三方可选依赖：必须 try/except ImportError 守卫 + 写明理由）
 SOFT_IMPORTS = {
+    "PIL": "标注水印层（label_watermark）读写 PNG 位图；软导入 + 缺依赖给修复指引，"
+        "文本载体那条路保持纯标准库",
     "jsonschema": "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
     "PySide6": "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
-    "cyclonedx": "SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
-    "rdflib": "SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
     "nf_pyengine": "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；"
         "缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
     "laya": "决策层本地服务（scripts/serve_decision_model.py）的模型运行时；软导入 + 缺依赖给修复指"
         "引",
 }
-#: R5 存量残留（WARN 挂账，须带裁决指针）。2026-09-20：唯一项经作者裁决删除，空表即零残留。
+#: R5 存量残留（**WARN 挂账**：确有理由保留的存量违规须带裁决/文档指针；不判死但不得隐身）。
+#: 本扫描按**文件系统**取件 ⇒ 未入库的本地副本同样会被扫到。2026-09-20：唯一一项残留经作者裁决
+#: 删除，登记随之清空（空表即"零残留"）。
 IMPORT_RESIDUE: dict = {}
 #: 扫描作用域含 `.github/scripts`——那是**唯一处理远程不可信输入**（Issue 标题/正文）
 #: 且持有写权限令牌的代码。此前只在 core + scripts 取件，等于把最高风险的入口
@@ -144,21 +145,16 @@ METHOD_SINKS = {
 }
 #: R6 已登记放行（键 = "<文件基名>:<调用名>"；放行须可审计）
 SINK_ALLOW = {
-    "verify_tests.py:shutil.rmtree":
-        "只删**本进程用 `tempfile.mkdtemp(prefix=...)` 刚建**的分片临时目录（spec_dir / nf_shard_home_N）；"
-        "路径不接收外部参数，且删除用 `ignore_errors=True`（清理失败不判失败）。放行理由：Windows 上"
-        "该目录在收尾时可能仍被守护/杀软短暂持有，`TemporaryDirectory.__exit__` 抛错会让整片在 0.0 s"
-        "被判失败（2026-10-30 实测），改用软清理后必须显式登记才能通过纯度判据。",
-    "verify_tests.py:unlink":
-        "只删**本进程刚写**的 `.nf-cache/dump/chunk-<int>.json`（路径由固定前缀 + 自增片号拼接，"
-        "不接收外部路径参数；删的是刚落盘并已读入内存的调度统计），用于避免陈旧 dump 影响下一轮"
-        "EWMA 合并；删失败也不影响判定（异常被吞在调度优化面）",
     "rust_engine.py:unlink":
         "常驻 worker 状态文件（<NF_HOME>/rust_worker.json）的**自清**：落点由 "
         "core.storage.default_home 单源决定（用户态，不接收外部路径参数），删的是本模块上一轮"
         "自己写的状态文件，用于避免陈旧 port/token 被复用；worker 随后重写该件",
     "regression_score.py:__import__":
         "模块名取自内部常量表 SIGNAL_SPECS（非用户输入），用于按名调用既有扫描器",
+    "release_conclusion.py:shutil.rmtree":
+        "快照门禁的**失败自清**：落点由本模块 tempfile.mkdtemp 现建（前缀 nf-gate-snap-<sha>），"
+        "只在 git worktree add 失败时删掉这个刚建的空壳；不接收外部路径参数。成功路径交给 "
+        "git worktree remove --force 管，不走这条",
     "e2e_desktop_headless.py:shutil.rmtree":
         "自检专用临时 home 的清理；落点已由 _resolve_test_home 拒绝主目录/仓库根/盘根（见 F-10）",
     "storage.py:shutil.rmtree":

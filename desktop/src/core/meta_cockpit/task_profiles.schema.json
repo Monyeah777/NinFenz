@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/task-profiles/1",
+  "title": "NF Task Profiles",
+  "type": "object",
+  "required": ["schema", "version", "facet_witnesses", "profiles", "general"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf/task-profiles/1"},
+    "version": {"type": "string", "minLength": 1},
+    "facet_witnesses": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["keys"],
+          "additionalProperties": false,
+          "properties": {
+            "keys": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+            },
+            "min_items": {"type": "integer", "minimum": 1},
+            "min_chars": {"type": "integer", "minimum": 1},
+            "item_keys": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            },
+            "allow_empty": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "strong_triggers", "weak_triggers", "facets",
+                     "required_facets", "functions", "context_roles",
+                     "preferred_atoms"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"enum": ["compare", "diagnose", "design", "audit",
+                          "explain", "decide", "create"]},
+          "strong_triggers": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "weak_triggers": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "facets": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string"}
+          },
+          "required_facets": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string"}
+          },
+          "functions": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"enum": ["knowledge", "monitoring", "control",
+                               "evaluation", "integration"]}
+          },
+          "context_roles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "preferred_atoms": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"}
+          }
+        }
+      }
+    },
+    "general": {
+      "type": "object",
+      "required": ["facets", "required_facets", "functions",
+                   "context_roles", "preferred_atoms"],
+      "additionalProperties": false,
+      "properties": {
+        "facets": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "required_facets": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "functions": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["knowledge", "monitoring", "control",
+                             "evaluation", "integration"]}
+        },
+        "context_roles": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "preferred_atoms": {
+          "type": "array", "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"}
+        }
+      }
+    }
+  }
+}

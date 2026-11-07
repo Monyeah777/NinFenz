@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cognition-method/1",
+  "title": "NF Cognition Method Node",
+  "description": "Production-side cognition method node contract (shape only). Semantic rule min_effect >= granularity is enforced by the conformance validator, not by JSON Schema.",
+  "type": "object",
+  "required": ["schema", "id", "name", "category", "layer", "inputs", "outputs",
+               "cost_class", "essential", "context_budget", "criteria",
+               "meta_level", "meta_function", "atoms", "conformance"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "cognition-method/1"},
+    "id": {"type": "string", "pattern": "^(认知:)?M[0-9]{2}$"},
+    "name": {"type": "string", "minLength": 1},
+    "category": {"const": "认知"},
+    "layer": {"type": "string", "pattern": "^P[0-9]{2}$"},
+    "applies_when": {"type": "string", "minLength": 1},
+    "inputs": {"$ref": "#/$defs/ports"},
+    "outputs": {"$ref": "#/$defs/ports"},
+    "cost_class": {"enum": ["heuristic", "single_llm", "multi_llm"]},
+    "meta_level": {"enum": ["M0", "M1", "M2", "M3", "M4"]},
+    "meta_function": {"enum": ["knowledge", "monitoring", "control",
+                                "evaluation", "integration"]},
+    "operates_on": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "atoms": {"type": "array", "minItems": 2,
+              "items": {"type": "string", "pattern": "^[a-z]\\.[a-z_]+$"}},
+    "essential": {"type": "boolean"},
+    "fallback": {"enum": ["heuristic", "partial+mark", "none"]},
+    "parallelizable": {"type": "boolean"},
+    "fuse_group": {"type": "string", "minLength": 1},
+    "context_budget": {"$ref": "#/$defs/budget"},
+    "crop_policy": {"$ref": "#/$defs/crop"},
+    "min_effect": {"$ref": "#/$defs/min_effect_map"},
+    "criteria": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/criterion"}},
+    "examples": {"type": "array", "items": {"type": "object"}},
+    "conformance": {"enum": ["L1", "L2"]}
+  },
+  "$defs": {
+    "ports": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/port"}},
+    "port": {
+      "type": "object",
+      "required": ["token", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "token": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["object", "array", "string", "state", "event", "untyped"]}
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": ["input", "output"],
+      "additionalProperties": false,
+      "properties": {
+        "input": {"type": "string", "minLength": 1},
+        "output": {"type": "string", "minLength": 1},
+        "notes": {"type": "string"}
+      }
+    },
+    "crop": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "visibility": {"enum": ["visible", "inferred", "hidden"]},
+        "drop": {"type": "array", "items": {"type": "string"}},
+        "summarize": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "required": ["dimension", "primitive", "threshold", "granularity"],
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {"type": "string", "minLength": 1},
+        "primitive": {"enum": ["coverage", "concreteness", "check_ref",
+                                 "evidence_anchor", "linkage", "disposition",
+                                 "uniqueness", "count", "invariant"]},
+        "unit": {"enum": ["ratio", "count"]},
+        "threshold": {"type": "number", "minimum": 0},
+        "granularity": {"type": "number", "exclusiveMinimum": 0},
+        "min_effect": {"type": "number", "minimum": 0},
+        "role_scope": {"enum": ["all", "deliverable"]},
+        "max_missing": {"type": "integer", "minimum": 0},
+        "requires_real_id": {"type": "boolean"},
+        "ref_kind": {"enum": ["identifier", "form", "span"]},
+        "direction": {"enum": ["higher_better", "lower_better"]}
+      }
+    },
+    "min_effect_map": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+    },
+    "decompose_tree": {
+      "type": "object",
+      "required": ["schema", "subgoals"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/decompose-tree/1"},
+        "subgoals": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/subgoal"}
+        }
+      }
+    },
+    "subgoal": {
+      "type": "object",
+      "required": ["id", "title", "deliverable", "covers"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^SG[0-9]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "deliverable": {"type": "string", "minLength": 1},
+        "covers": {"type": "array", "items": {"type": "string"}},
+        "role": {"enum": ["deliverable", "overview"]}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "required": ["schema", "claims"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/claims/1"},
+        "claims": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/claim"}
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["id", "text", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^C[0-9]+$"},
+        "text": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1},
+        "source_kind": {"enum": ["subgoal", "cell", "dimension"]},
+        "tradeoff": {"enum": ["tradeoff", "dominant", "incomparable"]}
+      }
+    },
+    "causal_map": {
+      "type": "object",
+      "required": ["schema", "records"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/causal-map/1"},
+        "records": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/causal_record"}
+        }
+      }
+    },
+    "causal_record": {
+      "type": "object",
+      "required": ["claim", "mechanism", "evidence", "confounder",
+                   "counterfactual", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "claim": {"type": "string", "pattern": "^C[0-9]+$"},
+        "mechanism": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 1},
+        "confounder": {"type": "string", "minLength": 1},
+        "counterfactual": {"type": "string", "minLength": 1},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "evidence_quote": {"type": "string", "minLength": 1}
+      }
+    },
+    "counterexample_ledger": {
+      "type": "object",
+      "required": ["schema", "attacks"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/counterexample-ledger/1"},
+        "attacks": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/attack"}
+        }
+      }
+    },
+    "attack": {
+      "type": "object",
+      "required": ["claim", "trigger", "check", "disposition", "reason", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "claim": {"type": "string", "pattern": "^C[0-9]+$"},
+        "trigger": {"type": "string", "minLength": 1},
+        "check": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["refuted", "survived", "needs_evidence"]},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 1},
+        "causal_ref": {"type": "string", "pattern": "^$|^C[0-9]+$"}
+      }
+    },
+    "comparison_frame": {
+      "type": "object",
+      "required": ["schema", "objects", "dimensions"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/comparison-frame/1"},
+        "objects": {
+          "type": "array", "minItems": 2,
+          "items": {"$ref": "#/$defs/comparison_object"}
+        },
+        "dimensions": {
+          "type": "array", "minItems": 2,
+          "items": {"$ref": "#/$defs/comparison_dimension"}
+        }
+      }
+    },
+    "comparison_object": {
+      "type": "object",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^O[0-9]+$"},
+        "name": {"type": "string", "minLength": 1}
+      }
+    },
+    "comparison_dimension": {
+      "type": "object",
+      "required": ["id", "name", "check"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^D[0-9]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "check": {"type": "string", "minLength": 1}
+      }
+    },
+    "comparison_matrix": {
+      "type": "object",
+      "required": ["schema", "cells"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/comparison-matrix/1"},
+        "cells": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/comparison_cell"}
+        }
+      }
+    },
+    "comparison_cell": {
+      "type": "object",
+      "required": ["object", "dimension"],
+      "additionalProperties": false,
+      "properties": {
+        "object": {"type": "string", "pattern": "^O[0-9]+$"},
+        "dimension": {"type": "string", "pattern": "^D[0-9]+$"},
+        "applicability": {"enum": ["applicable", "not_applicable"]},
+        "value_kind": {"enum": ["numeric", "condition", "enum", "qualitative"]},
+        "value": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 1},
+        "check": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"not": {"required": ["applicability"]}},
+          "then": {"required": ["value", "evidence", "check", "value_kind"]}
+        },
+        {
+          "if": {"properties": {"applicability": {"const": "applicable"}},
+                 "required": ["applicability"]},
+          "then": {"required": ["value", "evidence", "check", "value_kind"]}
+        },
+        {
+          "if": {"properties": {"applicability": {"const": "not_applicable"}},
+                 "required": ["applicability"]},
+          "then": {
+            "required": ["reason"],
+            "not": {"anyOf": [{"required": ["value"]},
+                               {"required": ["evidence"]},
+                               {"required": ["check"]},
+                               {"required": ["value_kind"]}]}
+          }
+        }
+      ]
+    },
+    "cluster_set": {
+      "type": "object",
+      "required": ["schema", "clusters"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/cluster-set/1"},
+        "clusters": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/cluster"}
+        }
+      }
+    },
+    "cluster": {
+      "type": "object",
+      "required": ["id", "theme", "members"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^T[0-9]+$"},
+        "theme": {"type": "string", "minLength": 1},
+        "members": {"type": "array", "minItems": 1,
+                     "items": {"type": "string", "pattern": "^C[0-9]+$"}}
+      }
+    },
+    "abstraction_set": {
+      "type": "object",
+      "required": ["schema", "abstractions"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/abstraction-set/1"},
+        "abstractions": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/abstraction"}
+        }
+      }
+    },
+    "abstraction": {
+      "type": "object",
+      "required": ["id", "theme", "scope", "evidence", "descent_check"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^A[0-9]+$"},
+        "theme": {"type": "string", "minLength": 1},
+        "scope": {"type": "array", "minItems": 1,
+                  "items": {"type": "string", "pattern": "^T[0-9]+$"}},
+        "evidence": {"type": "string", "minLength": 1},
+        "descent_check": {"type": "string", "minLength": 1},
+        "evidence_refs": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["source", "ref"],
+            "additionalProperties": false,
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "ref": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "knowledge_system": {
+      "type": "object",
+      "required": ["schema", "nodes", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf/knowledge-system/1"},
+        "nodes": {"type": "array", "minItems": 1,
+                  "items": {"type": "string", "pattern": "^A[0-9]+$"}},
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "from": {"type": "string", "pattern": "^A[0-9]+$"},
+              "to": {"type": "string", "pattern": "^A[0-9]+$"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

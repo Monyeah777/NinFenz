@@ -1,0 +1,40 @@
+{
+  "title": "NinFenz (NF) — 内容契约层 / content contract layer",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": {
+    "id": "AGPL-3.0-only"
+  },
+  "creators": [
+    {
+      "name": "Monyeah777"
+    }
+  ],
+  "description": "<p>NinFenz（NF）是面向长内容生产的<strong>内容契约层</strong>：以协议定义模块、管线、资产与质量门的契约，使 AI 产出可装载、可质检、可复现。协议本体域中立、模型无关；长篇叙事是官方第一个域包，techdoc 等非叙事域包为域中立先例。</p><p>仓库包含协议件 01–07、官方核心 13 模块 / 3 管线（P00 / P01 / P90）、社区域包与资产库、CLI / MCP / TUI 多入口、verify 质量门禁，以及 OpenAPI / AsyncAPI / in-toto / SBOM / SLSA / A2A / prov / CycloneDX / VC / C2PA / CID 等互操作导出面。</p><p><strong>许可分层（v1.1.0 起）</strong>：引擎 / CLI / 门禁 / 工具代码为 AGPL-3.0-only 或商业许可；协议规范文本（01–07、protocol/）为 CC BY 4.0；社区投稿（library/、community/）为 LicenseRef-Community-Submission；v1.0.5 及更早版本为 MIT。本记录单一许可字段标注代码主许可，分层边界以仓库 LICENSING.md 为准。</p>",
+  "keywords": [
+    "content contract layer",
+    "spec-driven generation",
+    "long-form content",
+    "quality gate",
+    "AI agent",
+    "MCP",
+    "domain pack",
+    "reproducibility",
+    "内容契约层",
+    "长内容生成协议"
+  ],
+  "language": "zho",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Monyeah777/NinFenz",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://ninfenz.dev/",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    }
+  ],
+  "notes": "许可分层：代码 AGPL-3.0-only 或商业许可；协议文本 CC BY 4.0；社区投稿 LicenseRef-Community-Submission；v1.0.5 及更早版本为 MIT。商业授权与商标条款见仓库 COMMERCIAL.md / TRADEMARK.md。"
+}

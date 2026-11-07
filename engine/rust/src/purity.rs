@@ -67,10 +67,10 @@ const DOMAIN_TERMS: [&str; 28] = [
 ];
 
 /// 真源 `HARD_ALLOW`：登记的第三方硬依赖（允许直接 import）。
-const HARD_ALLOW: [&str; 2] = ["yaml", "scripts"];
+const HARD_ALLOW: [&str; 1] = ["yaml"];
 
 /// 真源 `SOFT_IMPORTS`：第三方可选依赖（须 try/except ImportError 守卫）。值只用于消息。
-const SOFT_IMPORTS: [(&str, &str); 6] = [
+const SOFT_IMPORTS: [(&str, &str); 4] = [
     (
         "jsonschema",
         "IDL 标准实现交叉验证（可选对照；缺依赖则跳过该面）",
@@ -80,16 +80,8 @@ const SOFT_IMPORTS: [(&str, &str); 6] = [
         "CCV3 卡面占位图写入（缺依赖须给明确修复指引，不得裸 ImportError）",
     ),
     (
-        "cyclonedx",
-        "SBOM 官方 schema 验证（固定 requirements-sbom.txt）",
-    ),
-    (
-        "rdflib",
-        "SPDX JSON-LD 展开验证（固定 requirements-sbom.txt）",
-    ),
-    (
         "nf_pyengine",
-        "PyO3 扩展（engine/rust/pyo3 构建）为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr，不把 Rust 工具链变成运行前提",
+        "PyO3 扩展为可选进程内原语加速；缺扩展时 rust_pyext 回退 hashlib/repr",
     ),
     (
         "laya",
@@ -134,14 +126,9 @@ const METHOD_SINKS: [(&str, &str); 1] = [(
 /// 真源 `SINK_ALLOW`（键 = `<文件基名>:<调用名>`；放行须可审计）。值不参与判据，只作留档。
 /// 顺序与真源 `purity_scan.SINK_ALLOW` 逐条同序（2026-10-19：补 `scratch.py` 的两条豁免，
 /// 该模块是 2026-10-19 新增的临时区单一裁决点，Python 侧已登记「探针自清 / 整目录回收」）。
-const SINK_ALLOW: [(&str, &str); 16] = [
-    // 2026-10-30（Windows 分片 0.0s 崩根治）：分片临时目录改「软清理」——
-    // `TemporaryDirectory.__exit__` 在删除失败时会抛 PermissionError 使整片误判失败，
-    // 故 `_SoftTempDir.__exit__` 用 `shutil.rmtree(ignore_errors=True)`；路径只来自
-    // `tempfile.mkdtemp`。Python 真源已登记同键（SINK_ALLOW["verify_tests.py:shutil.rmtree"]）。
-    ("verify_tests.py:shutil.rmtree", ""),
-    ("verify_tests.py:unlink", ""),
+const SINK_ALLOW: [(&str, &str); 15] = [
     ("rust_engine.py:unlink", ""),
+    ("release_conclusion.py:shutil.rmtree", ""),
     ("regression_score.py:__import__", ""),
     ("e2e_desktop_headless.py:shutil.rmtree", ""),
     ("storage.py:shutil.rmtree", ""),

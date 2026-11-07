@@ -1,0 +1,3 @@
+type: feat
+surface: ccos
+note: Q0 决策证据绑定（ABI minor）——evidence bundle/attest 增可选 decision{syscall,policy_digest,verdict,object_sha256}：声明面在 bundle.json、绑定面在 object_sha256 相符的信封内并纳入 envelope_digest（旧信封无该键时摘要逐字节不变）；cc_verify 在 fail-closed 序 8b 校验两侧一致，输出 decision/decision_status∈absent|declared|bound，换策略/删一侧必红；零依赖单文件 nf_verify.py 同步同一公式；nf evidence pack 增 --decision 入口。攻击矩阵 35→38（decision_ok/policy_swap/strip），判定向量 15→18，双实现同判。文档同步 abi-v0/evidence-bundle/evidence-vectors/threat-model；冻结链与 code_metrics 小幅重冻（Lead 已批准）。判据：bench 38/38、相关单测 110 项、CLI 62 项、checks-only PASS=75 WARN=2 FAIL=0、freshness 4/4、conformance 27/27。

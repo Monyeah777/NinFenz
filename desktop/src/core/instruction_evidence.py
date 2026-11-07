@@ -27,6 +27,11 @@ from core import json_doc
 
 DECL_REL = "protocol/instruction_evidence.json"
 SCHEMA = "nf-instruction-evidence/1"
+#: 临近过期提前量（天）：剩余天数 <= 它就发 WARN（不是 FAIL）。
+#: 为什么要有（2026-11-07 实测）：release 记录 2026-10-07、窗口 30 天，恰好在 11-06 仍有效、
+#: 11-07 一过就 FAIL——**没有任何内容变更，门禁在午夜自己变红**，且与「提交坏了」长得一样。
+#: 提前 7 天喊，比午夜突袭好。
+WARN_DAYS_BEFORE_EXPIRY = 7
 
 #: 机器绝对路径（Windows 盘符 / macOS / Linux 家目录）——证据件进公开仓，**不得**带作者机器路径。
 _MACHINE_PATH = re.compile(r"(?:[A-Za-z]:[\\/][^\s\"'）)】]*)|(?:/(?:Users|home)/[^\s\"'）)】]*)")
@@ -62,6 +67,11 @@ def _age_days(stamp: str, today: _dt.date) -> int:
     except ValueError:
         return 10 ** 6                       # 时间戳不可解析 → 视作无限旧（判 FAIL）
     return (today - d).days
+
+
+def _warn_window(max_age: int) -> int:
+    """提前量：取 7 天与窗口一半的较小者（短窗口不被常量吞掉；刚录完的不吵）。"""
+    return min(WARN_DAYS_BEFORE_EXPIRY, max(1, max_age // 2))
 
 
 def scan(root: str = ".", today: _dt.date | None = None
@@ -102,6 +112,11 @@ def scan(root: str = ".", today: _dt.date | None = None
             issues.append("指令 %s 的实测记录已过期（%d 天 > 上限 %d 天）（修复指引："
                           "python scripts/instruction_evidence.py --record --only %s）"
                           % (iid, age, max_age, iid))
+        elif max_age - age <= _warn_window(max_age):
+            left = max_age - age
+            warns.append(f"指令 {iid} 的实测记录 {left} 天后过期（{age}/{max_age} 天，"
+                         f"上限 {max_age}）（修复指引：趁早 --record --only {iid}，"
+                         "别等它半夜变红）")
     known = {str((i or {}).get("id") or "") for i in decl}
     for iid in sorted(set(ev) - known):
         issues.append("记录 %s 无对应声明（修复指引：要么在 %s 声明该指令，要么删掉记录）"

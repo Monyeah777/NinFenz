@@ -1,0 +1,193 @@
+{
+  "count": 6,
+  "schema": "nf-abi-call-vectors/1",
+  "vectors": [
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": 2,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "desc": "只改值（同类型）",
+      "expected": {
+        "changes": [
+          {
+            "kind": "变更",
+            "pointer": "$.items.a"
+          }
+        ],
+        "impact": "editorial",
+        "verdict": "兼容（编辑性变更）"
+      },
+      "id": "editorial"
+    },
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": 1,
+          "b": "x",
+          "c": "y"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "desc": "新增可选字段",
+      "expected": {
+        "changes": [
+          {
+            "kind": "新增",
+            "pointer": "$.items.c"
+          }
+        ],
+        "impact": "additive",
+        "verdict": "兼容（字段级新增）"
+      },
+      "id": "additive"
+    },
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": 1
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "desc": "字段被移除",
+      "expected": {
+        "changes": [
+          {
+            "kind": "移除",
+            "pointer": "$.items.b"
+          }
+        ],
+        "impact": "bump",
+        "verdict": "破坏（结构移除、类型/版本变化或必填项增加）"
+      },
+      "id": "bump_removed"
+    },
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": "1",
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "desc": "类型变化（int → str）",
+      "expected": {
+        "changes": [
+          {
+            "kind": "变更",
+            "pointer": "$.items.a"
+          }
+        ],
+        "impact": "bump",
+        "verdict": "破坏（结构移除、类型/版本变化或必填项增加）"
+      },
+      "id": "bump_type"
+    },
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": 1,
+          "b": "x",
+          "required": [
+            "a"
+          ]
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "desc": "必填项增加",
+      "expected": {
+        "changes": [
+          {
+            "kind": "新增",
+            "pointer": "$.items.required"
+          },
+          {
+            "kind": "新增",
+            "pointer": "$.items.required[0]"
+          }
+        ],
+        "impact": "bump",
+        "verdict": "破坏（结构移除、类型/版本变化或必填项增加）"
+      },
+      "id": "bump_required_added"
+    },
+    {
+      "a": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "1"
+      },
+      "b": {
+        "items": {
+          "a": 1,
+          "b": "x"
+        },
+        "schema": "demo/1",
+        "version": "2"
+      },
+      "desc": "版本字段变化",
+      "expected": {
+        "changes": [
+          {
+            "kind": "变更",
+            "pointer": "$.version"
+          }
+        ],
+        "impact": "bump",
+        "verdict": "破坏（结构移除、类型/版本变化或必填项增加）"
+      },
+      "id": "bump_version"
+    }
+  ]
+}

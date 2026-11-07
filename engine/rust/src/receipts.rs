@@ -98,6 +98,11 @@ pub fn protocol_subjects(root: &Path) -> Vec<String> {
     subs.extend(glob_sorted(root, "protocol/schema", "", ".json"));
     subs.extend(glob_sorted(root, "decisions", "ADR-", ".md"));
     subs.extend(glob_sorted(root, "postmortems", "PO-", ".md"));
+    // 去重（2026-11-04）：固定清单已含 protocol/schema/asset_contracts.schema.json，
+    // 上面的 schema glob 会再收一次——同一成员在根里出现两次会破坏成员集自洽。
+    // 与真源 receipts.protocol_subjects 同口径：按**首次出现**去重，顺序不变。
+    let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
+    subs.retain(|rel| !seen.contains(rel) && seen.insert(rel.clone()));
     subs.retain(|rel| root.join(rel).is_file());
     subs
 }

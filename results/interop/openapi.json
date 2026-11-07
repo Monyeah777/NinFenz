@@ -41,6 +41,188 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/check": {
+      "post": {
+        "operationId": "local.check",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "object": {
+                    "description": "string（UTF-8 文本）",
+                    "type": "string"
+                  },
+                  "policy": {
+                    "additionalProperties": true,
+                    "description": "object（nf-check-policy/1）",
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "findings": {
+                      "description": "array",
+                      "items": {},
+                      "type": "array"
+                    },
+                    "ok": {
+                      "description": "boolean",
+                      "type": "boolean"
+                    },
+                    "policy_digest": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "verdict": {
+                      "description": "string",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfError"
+                }
+              }
+            },
+            "description": "错误（RFC 9457 Problem Details 映射见 x-nf-error-mapping）"
+          }
+        },
+        "summary": "maps_to nf check",
+        "x-nf-idempotency": "idempotent"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "local.health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "api": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "endpoints": {
+                      "description": "array",
+                      "items": {},
+                      "type": "array"
+                    },
+                    "ok": {
+                      "description": "boolean",
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfError"
+                }
+              }
+            },
+            "description": "错误（RFC 9457 Problem Details 映射见 x-nf-error-mapping）"
+          }
+        },
+        "summary": "maps_to nf serve",
+        "x-nf-idempotency": "idempotent"
+      }
+    },
+    "/api/verify": {
+      "post": {
+        "operationId": "local.verify",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "additionalProperties": true,
+                    "description": "自包含证据包 zip 字节（上限 8 MiB）",
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "issues": {
+                      "description": "array",
+                      "items": {},
+                      "type": "array"
+                    },
+                    "level": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "ok": {
+                      "description": "boolean",
+                      "type": "boolean"
+                    },
+                    "root": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "verdict": {
+                      "description": "string",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "成功"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfError"
+                }
+              }
+            },
+            "description": "错误（RFC 9457 Problem Details 映射见 x-nf-error-mapping）"
+          }
+        },
+        "summary": "maps_to nf evidence verify",
+        "x-nf-idempotency": "idempotent"
+      }
+    },
     "/assemble/check": {
       "post": {
         "operationId": "assemble.check",
@@ -515,7 +697,7 @@
     }
   },
   "servers": [],
-  "x-nf-endpoints": 8,
+  "x-nf-endpoints": 11,
   "x-nf-error-mapping": {
     "detail": "error.message + 修复指引（patterns/error-message-guidance）",
     "instance": "请求路径",

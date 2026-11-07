@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-ab/1",
+  "title": "NF Cockpit Offline Blind A/B Experiment",
+  "type": "object",
+  "required": ["schema", "experiment_id", "blind_salt", "trials",
+               "analysis_plan"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-ab/1"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "blind_salt": {"type": "string", "minLength": 8},
+    "analysis_plan": {
+      "type": "object",
+      "required": ["schema", "thresholds", "prompt_set_digest",
+                   "power_plan", "planned_pairs", "plan_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf-cockpit-ab-plan/1"},
+        "thresholds": {
+          "type": "object",
+          "required": ["min_pairs", "min_effect", "alpha", "min_judges",
+                       "min_agreement", "min_pairs_per_model"],
+          "additionalProperties": false,
+          "properties": {
+            "min_pairs": {"type": "integer", "minimum": 1},
+            "min_effect": {"type": "number", "minimum": 0, "maximum": 0.5},
+            "alpha": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.5},
+            "min_judges": {"type": "integer", "minimum": 1},
+            "min_agreement": {"type": "number", "minimum": 0, "maximum": 1},
+            "min_pairs_per_model": {"type": "integer", "minimum": 1}
+          }
+        },
+        "prompt_set_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "power_plan": {
+          "anyOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "required": ["method", "effect", "alpha", "target_power",
+                           "required_pairs", "estimated_power"],
+              "additionalProperties": false,
+              "properties": {
+                "method": {"const": "two-sided-exact-sign"},
+                "effect": {"type": "number", "exclusiveMinimum": 0,
+                           "maximum": 0.5},
+                "alpha": {"type": "number", "exclusiveMinimum": 0,
+                          "maximum": 0.2},
+                "target_power": {"type": "number", "exclusiveMinimum": 0.5,
+                                 "exclusiveMaximum": 1},
+                "required_pairs": {"type": "integer", "minimum": 2},
+                "estimated_power": {"type": "number", "minimum": 0,
+                                    "maximum": 1}
+              }
+            }
+          ]
+        },
+        "planned_pairs": {"type": "integer", "minimum": 2},
+        "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "trials": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["trial_id", "prompt_id", "prompt", "model_id", "seed",
+                     "arm", "generation", "resource_budget", "status",
+                     "truncated", "output", "output_digest"],
+        "additionalProperties": false,
+        "properties": {
+          "trial_id": {"type": "string", "minLength": 1},
+          "prompt_id": {"type": "string", "minLength": 1},
+          "prompt": {"type": "string", "minLength": 1, "maxLength": 100000},
+          "model_id": {"type": "string", "minLength": 1},
+          "seed": {"type": "integer"},
+          "arm": {"enum": ["baseline", "guided"]},
+          "generation": {
+            "type": "object",
+            "required": ["temperature", "top_p", "max_output_tokens"],
+            "additionalProperties": false,
+            "properties": {
+              "temperature": {"type": "number", "minimum": 0, "maximum": 2},
+              "top_p": {"type": "number", "minimum": 0, "maximum": 1},
+              "max_output_tokens": {"type": "integer", "minimum": 1}
+            }
+          },
+          "resource_budget": {
+            "type": "object",
+            "required": ["max_total_tokens", "max_seconds"],
+            "additionalProperties": false,
+            "properties": {
+              "max_total_tokens": {"type": "integer", "minimum": 1},
+              "max_seconds": {"type": "number", "exclusiveMinimum": 0}
+            }
+          },
+          "status": {"enum": ["completed", "truncated", "error"]},
+          "truncated": {"type": "boolean"},
+          "output": {"type": "string", "minLength": 1, "maxLength": 200000},
+          "output_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

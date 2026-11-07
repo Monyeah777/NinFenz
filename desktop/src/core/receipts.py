@@ -217,7 +217,11 @@ def protocol_subjects(root: str = ".") -> List[str]:
     # closed 复盘件必须先被回执锚定；把真源复盘件纳入协议回执面，
     # 否则 postmortem 的 closed 判据永远无法从正常重建路径满足。
     fixed += [p.relative_to(r).as_posix() for p in sorted(r.glob("postmortems/PO-*.md"))]
-    return [s for s in fixed if (r / s).is_file()]
+    # 去重（2026-11-04 实测）：固定清单里已列 protocol/schema/asset_contracts.schema.json，
+    # 下面的 protocol/schema/*.json glob 会把它再收一次——同一成员在根里出现两次会让
+    # 「根能否复算」与「成员集是否自洽」两个口径打架（replay 的重复成员判据当场红）。
+    # 按首次出现去重，顺序不变（回执根因此改变 → 须重签回执）。
+    return [s for s in dict.fromkeys(fixed) if (r / s).is_file()]
 
 
 def build_scope(root: str = ".", subjects: Optional[List[str]] = None,

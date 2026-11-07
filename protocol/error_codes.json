@@ -1,5 +1,76 @@
 {
   "schema": "nf-error-codes/1",
-  "note": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。空表期间不得以此为由跳过登记——条目按实际错误面在重构波次迁移。",
-  "codes": []
+  "note": "错误码中央登记（机制借鉴 loomvault error/ErrorCode.java + iskills domain/errors.ts）。抛出侧只给 code+params，文案由呈现层查表注入；消费方 core/error_codes.py。词法两类：大写码（NF_*）与 ABI 码 cc.<syscall>.<reason>（docs/ccos/abi-v0.md）。2026-11-05 起登记 CCOS ABI v0 错误面。",
+  "codes": [
+    {
+      "id": "cc.label.no_contract",
+      "message": "对象未匹配到任何契约",
+      "fix": "修复指引：先跑 nf resolve <对象> 看未认领原因，或补契约声明后再标注"
+    },
+    {
+      "id": "cc.label.unsupported_carrier",
+      "message": "载体格式不支持嵌入标识",
+      "fix": "修复指引：改用 sidecar 回退并在结果里如实标注 embedded=false"
+    },
+    {
+      "id": "cc.label.embed_failed",
+      "message": "标识嵌入失败",
+      "fix": "修复指引：检查对象是否可原子写/被占用；失败不得降级成未标注"
+    },
+    {
+      "id": "cc.attest.no_subject",
+      "message": "签发缺少主体",
+      "fix": "修复指引：传入要签发的对象路径或字节"
+    },
+    {
+      "id": "cc.attest.empty_key",
+      "message": "签发密钥为空",
+      "fix": "修复指引：提供非空密钥，或改用 digest_only 级"
+    },
+    {
+      "id": "cc.attest.verifier_missing",
+      "message": "签发要求的复验器不在场",
+      "fix": "修复指引：安装 sigstore 验签器，或降级为 hmac/digest 级并如实标注强度"
+    },
+    {
+      "id": "cc.verify.not_a_bundle",
+      "message": "输入不是可识别的证据形态",
+      "fix": "修复指引：按 bundle/receipts/attest 三种形态之一提供证据"
+    },
+    {
+      "id": "cc.verify.digest_mismatch",
+      "message": "成员实体摘要与记录不符",
+      "fix": "修复指引：重跑 nf evidence pack 重新打包，不要手改成员"
+    },
+    {
+      "id": "cc.verify.root_mismatch",
+      "message": "叶到根的复算不一致",
+      "fix": "修复指引：重跑 nf evidence pack 生成新根，不同批次证据不可拼接"
+    },
+    {
+      "id": "cc.verify.proof_mismatch",
+      "message": "包含证明折叠不到同一根",
+      "fix": "修复指引：核对证明与根是否同一批次；跨批次混用必红"
+    },
+    {
+      "id": "cc.verify.no_attestation",
+      "message": "证据内没有可验信封",
+      "fix": "修复指引：先用 nf attest 产出信封，再打包证据"
+    },
+    {
+      "id": "cc.verify.key_required",
+      "message": "hmac 级证据缺密钥（不降级）",
+      "fix": "修复指引：提供 --key-file，或改用 digest_only 级并接受更低强度"
+    },
+    {
+      "id": "cc.verify.revoked",
+      "message": "证据命中吊销表",
+      "fix": "修复指引：重新签发并更新吊销 feed；被吊销证据不得放行"
+    },
+    {
+      "id": "cc.verify.expired",
+      "message": "证据已过时效",
+      "fix": "修复指引：核对 --at 时间，或重签带新 expires_at 的证据"
+    }
+  ]
 }

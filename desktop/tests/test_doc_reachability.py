@@ -10,6 +10,7 @@
 """
 import argparse
 import ast
+import functools
 import importlib.util
 import io
 import re
@@ -150,6 +151,26 @@ def _is_exempt(cand: str) -> bool:
     return any(cand == k or cand.startswith(k + "/") for k in LIVING_PATH_EXEMPT)
 
 
+@functools.lru_cache(maxsize=256)
+def _is_gitignored(cand: str) -> bool:
+    """仓库相对路径是否被 .gitignore 覆盖（构建产物 / 本地暂存）→ 不在场是合法状态。
+
+    为什么（2026-11-06，发布结论快照模式暴露）：--snapshot 在 HEAD 的**干净 worktree** 里跑，
+    engine/dotnet/dist 这类 gitignored 构建产物按设计不在场（fresh clone 也没有），文档引用它们
+    会被本判据误判成「写了不存在的路径」。gitignored 路径按定义不是仓库件，只在「写了且漏提交」
+    的错误语境里才该红；这里按 git 的权威答案放行，非 ignored 的缺失仍然照判。
+    """
+    for probe in (cand, cand.rstrip("/") + "/"):
+        try:
+            proc = subprocess.run(["git", "check-ignore", "-q", "--", probe], cwd=str(ROOT),
+                                  capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            return False                 # git 不可用：不放宽（宁可误红，不静默放行）
+        if proc.returncode == 0:
+            return True
+    return False
+
+
 def _git_managed_path(cand: str) -> Path:
     """`.git/**` → 真实落点（linked worktree 兼容；解析不到时退回字面路径）。
 
@@ -191,6 +212,8 @@ def _unresolved_paths(tokens: list, tops: set) -> list:
         if _is_exempt(cand):
             continue
         if not _repo_path_exists(cand):
+            if _is_gitignored(cand):
+                continue                 # 构建产物/本地暂存：按设计不入库，不在场不判红
             out.append(cand)
     return out
 
@@ -239,6 +262,14 @@ class LivingDocConsistencyTest(unittest.TestCase):
         self.assertFalse(_is_exempt("engine/rust/targets"))
         self.assertEqual(["docs/不存在的手册.md"],
                          _unresolved_paths(["docs/不存在的手册.md"], self.tops))
+
+    def test_gitignored_build_outputs_are_not_required_in_tree(self):
+        """gitignored 构建产物按设计不在场：文档引用它们不算路径错误（2026-11-06 快照模式）。"""
+        self.assertTrue(_is_gitignored("engine/dotnet/dist/"))
+        self.assertTrue(_is_gitignored("engine/dotnet/dist"))
+        self.assertEqual([], _unresolved_paths(["engine/dotnet/dist/"], self.tops))
+        self.assertEqual([], _unresolved_paths(["engine/dotnet/dist/nf_engine_native.dll"],
+                                               self.tops))
 
     def test_living_docs_second_level_resolve(self):
         valid = _subcommands()

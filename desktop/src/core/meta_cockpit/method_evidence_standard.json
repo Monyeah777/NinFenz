@@ -1,0 +1,29 @@
+{
+  "schema": "cognition-method/1",
+  "id": "认知:M52",
+  "name": "证据标准选择",
+  "category": "认知",
+  "layer": "P52",
+  "meta_level": "M4",
+  "meta_function": "knowledge",
+  "operates_on": ["证据标准库", "任务类型"],
+  "atoms": ["c.select", "k.standard", "i.transfer"],
+  "inputs": [{"token": "任务类型", "kind": "string"},
+             {"token": "证据标准库", "kind": "array"}],
+  "outputs": [{"token": "证据标准", "kind": "object"}],
+  "cost_class": "heuristic",
+  "essential": true,
+  "fallback": "partial+mark",
+  "parallelizable": false,
+  "fuse_group": "元认识论",
+  "context_budget": {"input": "1x", "output": "1x"},
+  "crop_policy": {"visibility": "visible", "drop": ["不适用标准"], "summarize": []},
+  "criteria": [
+    {"dimension": "standard_coverage", "primitive": "coverage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0},
+    {"dimension": "task_linkage", "primitive": "linkage", "unit": "ratio",
+     "threshold": 1.0, "granularity": 0.111, "max_missing": 0}
+  ],
+  "examples": [{"anchor": "human_review_gate.json"}],
+  "conformance": "L2"
+}

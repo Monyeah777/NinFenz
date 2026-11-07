@@ -1,41 +1,9 @@
 # Changelog
 
-## 1.1.2 · 2026-10-30 · 发布事实同步与可选镜像降级
-
-- npm、MCP manifest、CLI、CodeMeta、HF Space 和 .NET doctor 统一到 `1.1.2`。
-- 官方公开分发渠道只承诺 npmjs.com；GitHub Packages 在未取得 `write_package` 时作为 best-effort 镜像，不得阻塞 npm 或 GitHub Release。
-- 删除机器事实中的易漂移文件数与解包体积，改由 npm Registry 作为权威来源。
-- 修复 Lighthouse 13 对 `robots.txt` 扩展指令的解析，保留 `Content-Signal` 注释供人和 AI 阅读。
-- 1.1.1 保留为历史版本；其 tarball 与当时源码快照一致，后续文档修复通过 1.1.2 正式发布。
-
-## [未发布] · **License change（1.1.0 生效）** — 分层双许可
-
-> 生效于**下一个 minor 版本（1.1.0）**；v1.0.5 及更早版本仍为 MIT，且已分发副本的 MIT 权利永久有效。
-
-- **代码层**（`desktop/`、`scripts/`、`engine/`、`tui/`、`verify.sh`、`packaging/`）：**AGPL-3.0-only 或商业许可**（二选一）。
-- **协议规范文本**（01–07、`protocol/`、`docs/`）：**CC BY 4.0**（署名即可实现与引用）。
-- **社区投稿**（`library/`、`community/`）：保持 `LicenseRef-Community-Submission` 不变。
-- 新增 `LICENSING.md`（边界第一真源）、`LICENSE-EXCEPTIONS.md`（AGPL §7 附加许可 E1/E2/E3/E5/E6/E9）、
-  `TRADEMARK.md`、`COMMERCIAL.md`、`LICENSES/AGPL-3.0-only.txt`、`LICENSES/CC-BY-4.0.txt`、
-  `LICENSES/LicenseRef-Commercial.txt`；根 `LICENSE` 改为指引页；`REUSE.toml` 同步四层映射。
-- `package.json` 许可字段 `MIT` → `AGPL-3.0-only`；`pyproject.toml` → `AGPL-3.0-only OR LicenseRef-Commercial`。
-- AGPL 含义**不自造解释**：`LICENSING.md §3` 直接引用 GNU 官方 FAQ 原文（#InternalDistribution / #UnreleasedMods /
-  #AGPLv3InteractingRemotely / #AGPLv3CorrespondingSource / #AGPLGPL）。
-- 法律依据（`LICENSING.md §8`）：最高法 **(2021)最高法知民终51号**（开源协议按许可合同处理；违反开源义务不导致著作权丧失，
-  侵权可独立主张）、**《民法典》第 469/491 条**（数据电文属书面形式 ⇒ 点击签署的 CLA 有效）、Harmony Guide
-  （Option Five 语义与电子签署允许性）。CLA 准据法填为**中华人民共和国**（排除港澳台），争议提交作者住所地法院。
-- 免责声明：`LICENSING.md` / `COMMERCIAL.md` / `LICENSE-EXCEPTIONS.md` 顶部写明"不构成法律意见，商业授权需双方签署正式合同"
-  与 `THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND`。
-- 违规结算：`COMMERCIAL.md §4` 给出**参考价机制**（自首次违规之日按年计），并明确它是对 AGPL 的追加条款无效、
-  只在商业合同或书面和解中适用。
-- **贡献授权改用标准 CLA**：新增 `CLA.md`（Harmony Combined Contributor Agreement v1.0 **Option Five**，其 §2.3 明确可再许可为
-  copyleft/permissive/**commercial/proprietary**）；`CONTRIBUTING.md` §7 改为"必须签 CLA"，并纠正旧文案——
-  **DCO 不构成商业再许可授权**（DCO 仅声明有权提交，效果是按项目当前许可 AGPL 发布）。
-- MIT 时代终点已打 tag **`v1.0.5-mit-final`**。
-
-## [未发布] · **1.1.0 候选**（2026-10-25） · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
+## [未发布] - 2026-10-21 · 职能坐标（ADR-0006）+ 项目改名：NarrativeForge → NinFenz（宁封子）+ 全仓审计 V3 修复波
 
 > 日期为该「未发布」节的**最新一次改动**日期（审计 W9：此前停在 2026-10-06，早于 HEAD）。
+- **元认知生产驾驶舱主仓融合（2026-10-29）**：新增 `core.meta_cockpit` 运行时，33 个原子执行器、14 个方法节点、10 节点内容管线与 5 节点元管线进入主仓；接入 `nf cockpit` / `nf cockpit-ab`、事件溯源重放、上下文预算、角色化证据、结构化交接及离线盲评。驾驶舱保持无内部评分，HR-001 仍为 `PENDING`，真实跨模型 A/B 未运行。验收：驾驶舱契约 11/11、最终受影响合并集 292/292。
 - **全仓一致性与可执行性修复（2026-10-21）**：CLI 版本在 `scripts/nf.py`、npm、MCP、`pyproject.toml`、HF Space 与 .NET doctor 六面统一为 `1.0.5`；站点和上手文档的质量凭证、doctor 计数、npm 件数/体积全部改接运行时真源；修复公开文档失效相对链接与把不存在的本地计划写成开工前置的问题；恢复 `CHANGELOG.md` 中被压成一字一行的 1362 行段落，并新增跨语言版本、公开数字、本地链接与行密度回归判据。
 - **门禁矩阵化（2026-10-18）**：CI 全量门禁拆成「静态 1 台 + 测试 **32 台并行**」——`verify.sh` 新增 `--checks-only` / `--tests-only --shard i/n`，`ci-verify.yml` 改为 `static-checks` + `unit-tests`（matrix 32 片）+ `gate`（needs 两者，任一片红即整条红）三个作业；32 片的分配与本地分片用**同一套权重/LPT**，`--plan 32` 可在本地校验「并集 == discover 全集」。动机：实测同机并行收益在 16 片后饱和（8 片 502 s / 16 片 396 s），跨机器没有争用才是"全量 1 分钟"的唯一实现路径。契约测试 `test_ci_visibility` 同步改为：CI 必须恰好一次 `--checks-only` + 一次 `--tests-only --shard ${{ matrix.shard }}/N`，且 N ≥ 16 且矩阵真的声明到 N-1。
 - **check12 门禁提速（P0–P3，2026-10-18）**：把 check12（3131 条测试、串行 ~1080 s）从"单进程全量"改成"分层 + 分片 + 内容寻址缓存"：

@@ -32,6 +32,8 @@ SCHEMA = "nf-attest/1"
 SCHEME_HMAC = "hmac-sha256"
 SCHEME_SIGSTORE = "sigstore-keyless"
 SCHEME_SSH = "ssh-sig"
+#: 决策证据（Q0）：绑定「这次判定过了哪条策略」的四字段；可选，旧信封无此键时摘要不变
+DECISION_FIELDS = ("syscall", "policy_digest", "verdict", "object_sha256")
 #: ssh-sig 的签名命名空间（ssh-keygen -Y sign -n）——与密钥其他用途隔离
 SSH_NAMESPACE = "nf-attest"
 #: ssh-sig 的签名载荷格式（读者侧按同一格式重建，必须逐字一致）
@@ -74,8 +76,15 @@ def subject_of(path: str, root: str = ".") -> Dict[str, Any]:
 
 
 def envelope_digest(att: Dict[str, Any]) -> str:
-    """信封摘要 = subject + producer + issued_at 的规范化摘要（排除 signature 块本身）。"""
+    """信封摘要 = subject + producer + issued_at（+ 可选 decision）的规范化摘要。
+
+    decision 存在时纳入摘要：否则改 64 个 hex 就能「换策略」，签名面覆盖不到。
+    旧信封没有 decision 键 → base 仍是 4 键，摘要逐字节不变（向后兼容）。
+    """
     base = {k: att.get(k) for k in ("schema", "subject", "producer", "issued_at")}
+    decision = att.get("decision")
+    if isinstance(decision, dict) and decision:
+        base["decision"] = decision
     return _sha256(canonical(base))
 
 
@@ -96,8 +105,9 @@ def issue_stamp(now: Optional[datetime] = None) -> str:
 
 
 def build(path: str, root: str = ".", issuer: str = "",
-          subject: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """构造未签名 attestation（digest_only 级）。"""
+          subject: Optional[Dict[str, Any]] = None,
+          decision: dict[str, Any] | None = None) -> Dict[str, Any]:
+    """构造未签名 attestation（digest_only 级）；decision 可选（进信封摘要）。"""
     subj = subject if subject is not None else subject_of(path, root)
     att = {
         "schema": SCHEMA,
@@ -105,8 +115,35 @@ def build(path: str, root: str = ".", issuer: str = "",
         "producer": {"tool": "nf", "issuer": issuer or ""},
         "issued_at": issue_stamp(),
     }
+    if decision is not None:
+        att["decision"] = dict(decision)
     att["envelope_digest"] = envelope_digest(att)
     return att
+
+
+def decision_issues(decision: Any, member_digests: Any = None) -> list[str]:
+    """决策证据块形状校验（fail-closed）；给 member_digests 时校验 object 在成员里。"""
+    if not isinstance(decision, dict) or not decision:
+        return ["decision 必须是非空对象（修复指引：见 docs/ccos/evidence-bundle-v0.md）"]
+    issues: list[str] = []
+    unknown = sorted(set(decision) - set(DECISION_FIELDS))
+    if unknown:
+        issues.append(f"decision 含未知字段：{', '.join(unknown)}"
+                      f"（修复指引：只允许 {'/'.join(DECISION_FIELDS)}）")
+    if decision.get("syscall") != "cc_check":
+        issues.append("decision.syscall 只支持 cc_check（v0）（修复指引：换支持的调用）")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(decision.get("policy_digest") or "")):
+        issues.append("decision.policy_digest 须为 64 位小写十六进制（修复指引：用 "
+                      "nf check --json 的 policy_digest）")
+    if decision.get("verdict") not in ("ok",):
+        issues.append("decision.verdict 只允许 ok（v0 只记录通过的判定）")
+    obj = str(decision.get("object_sha256") or "")
+    if not re.fullmatch(r"[0-9a-f]{64}", obj):
+        issues.append("decision.object_sha256 须为 64 位小写十六进制"
+                      "（修复指引：用成员实体的 sha256）")
+    elif member_digests is not None and obj not in set(member_digests):
+        issues.append("decision.object_sha256 不在成员摘要里（决策未绑定到包内实体）")
+    return issues
 
 
 def sign_hmac(att: Dict[str, Any], key: bytes) -> Dict[str, Any]:

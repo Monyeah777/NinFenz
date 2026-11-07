@@ -133,9 +133,9 @@ class RepoIndex:
         rel = entry.get("rel") or entry.get("path")
         if not rel:
             return True
-        try:  # 失效条目按缺失处理，调用方会重建索引。
+        try:
             return _stat(safe_path(self.root, rel)) == entry.get("stat")
-        except (_paths.PathEscapeError, OSError, ValueError):
+        except (_paths.PathEscapeError, OSError, ValueError):  # 失效条目按缺失重建
             return False
 
     def _validate_all(self, name: str, build: Callable[[], Any],
@@ -150,9 +150,9 @@ class RepoIndex:
         from core import conformance_scan as csc
         out = []
         for p in csc._module_docs(str(self.root)):
-            try:  # 越根候选不进入只读索引。
+            try:
                 target = safe_path(self.root, _rel(self.root, Path(p)))
-            except (_paths.PathEscapeError, OSError, ValueError):
+            except (_paths.PathEscapeError, OSError, ValueError):  # 越根候选不进入只读索引
                 continue
             if target.is_file():
                 out.append(_rel(self.root, Path(p)))

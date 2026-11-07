@@ -17,7 +17,7 @@ concurrency:
   group: scorecard
   cancel-in-progress: false
 
-permissions: {}
+permissions: read-all
 
 jobs:
   analysis:

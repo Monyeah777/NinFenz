@@ -25,6 +25,18 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from core import gate_engine, gate_inproc, gate_labels, repo_trust  # noqa: E402
 
 
+def _live_gate_engine():
+    """取**当前**的 core.gate_engine（必须运行时取，不能在模块导入时抓一个）。
+
+    为什么：常驻语料层在代码变化时会把 core.* 从 sys.modules 里摘掉重载（见
+    test_watch 的 docstring）。于是「本模块导入时抓到的 gate_engine」与「nf 命令运行时
+    from core import gate_engine 拿到的」可能不是同一个对象——patch 打在旧对象上，
+    判据就变成假绿/假红（2026-11-04 分片实测踩过：单跑绿、整片跑红）。
+    """
+    import core.gate_engine as ge
+    return sys.modules.get("core.gate_engine", ge)
+
+
 def _load_nf():
     """按路径加载 CLI；裸 `import nf` 在分片进程里会撞同名包/缓存。"""
     spec = importlib.util.spec_from_file_location("nfcli_repo_trust", ROOT / "scripts" / "nf.py")
@@ -32,16 +44,6 @@ def _load_nf():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
-
-
-def _live_core(name: str):
-    """取 `sys.modules` 当前生效的 core 模块。
-
-    `daemon._sync_code` 会在长分片里摘除并重载 `core.*`；测试模块导入时保留的
-    旧句柄可能已不是 CLI 随后的导入对象。对旧句柄打补丁会让安全门测试假绿，
-    必须始终对运行期实时模块对象打补丁。
-    """
-    return importlib.import_module(f"core.{name}")
 
 
 def _repo(origin: str = "") -> Path:
@@ -151,6 +153,28 @@ class GateRefusalTest(_Base):
         self.assertIn("拒绝", text)
         self.assertIn("--trust-repo", text, "拒绝文案必须给修复指引")
 
+    def test_engine_trust_env_is_scoped_and_restored(self):
+        """H1 回归：--trust-repo 只在执行区间生效，出区间必须还原。
+
+        为什么（2026-11-04 分片实测）：引擎此前直接写进程级 NF_TRUST_REPO=1 且从不还原，
+        同进程里后续任何一次信任门判定都会被这条残留放行——一个先跑过 --trust-repo 的用例
+        就能让后面的「拒绝不可信仓库」判据失效。信任门被环境泄漏绕过 = 安全缺陷。
+        """
+        from core import gate_engine as ge
+
+        prev = os.environ.pop("NF_TRUST_REPO", None)
+        try:
+            ge.main(["--json", "--only", "999", "--trust-repo"])
+            self.assertIsNone(os.environ.get("NF_TRUST_REPO"),
+                              "trust 环境变量泄漏出执行区间（后续信任门会被放行）")
+            os.environ["NF_TRUST_REPO"] = "0"
+            ge.main(["--json", "--only", "999"])
+            self.assertEqual("0", os.environ.get("NF_TRUST_REPO"), "原有值必须按原样还原")
+        finally:
+            os.environ.pop("NF_TRUST_REPO", None)
+            if prev is not None:
+                os.environ["NF_TRUST_REPO"] = prev
+
     def test_cli_verify_preflight_refuses_untrusted_repo(self):
         """`nf verify` 在**执行前**拒绝（rc=2 + 风险文案），而不是跑完再报失败。"""
         evil = self._tmp_repo("https://github.com/evil/repo.git")
@@ -158,9 +182,11 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=False, memo=False, cached=False, jobs=0,
                          trust_repo=False)
-        with (mock.patch.object(_live_core("gate_engine"), "ROOT", evil),
-              mock.patch.object(_live_core("repo_trust"), "trust_status",
-                                return_value=(False, "untrusted fixture"))):
+        # 判据只该依赖「本用例给了什么」，不依赖进程里别的用例留下的信任开关
+        # （2026-11-04 分片实测：脏环境/前面用例的残留会让这条判据假红）。
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
+        with mock.patch.dict(os.environ, clean, clear=True), \
+                mock.patch.object(_live_gate_engine(), "ROOT", evil):
             rc = nf._cmd_verify(args)
         self.assertEqual(2, rc)
 
@@ -171,10 +197,12 @@ class GateRefusalTest(_Base):
 
         args = Namespace(only="", json=True, memo=False, cached=False, jobs=0,
                          trust_repo=True)
-        live_ge = _live_core("gate_engine")
-        with (mock.patch.object(live_ge, "ROOT", evil),
-              mock.patch.object(live_ge, "build_registry"),
-              mock.patch.object(live_ge, "run_checks", return_value=[])):
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("NF_TRUST_")}
+        ge = _live_gate_engine()
+        with (mock.patch.dict(os.environ, clean, clear=True),
+              mock.patch.object(ge, "ROOT", evil),
+              mock.patch.object(ge, "build_registry"),
+              mock.patch.object(ge, "run_checks", return_value=[])):
             rc = nf._cmd_verify(args)
         self.assertEqual(0, rc, "显式信任后应放行（本轮 run_checks 已 mock）")
 

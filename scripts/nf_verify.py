@@ -30,6 +30,8 @@ import re
 import shutil as _shutil
 import subprocess  # nosec B404/B603/B607 —— 调用 ssh-keygen/git/hf（argv 列表、无 shell、路径经 which 解析）
 import sys
+import time
+import zipfile
 
 SCHEMA = "nf-receipts/1"
 SSH_NS = "nf-attest"
@@ -100,43 +102,715 @@ def verify_ssh(digest: str, anchor, allowed_signers: str, identity: str):
                        "（修复指引：确认 ssh-keygen 可用后重试）" % TOOL_TIMEOUT_S)
     msg = (proc.stderr or proc.stdout or b"").decode("utf-8", "replace").strip()
     return (proc.returncode == 0, "ssh-sig 匹配" if proc.returncode == 0
-            else "ssh-sig 校验失败：%s" % msg[:160])
+            else f"ssh-sig 校验失败：{msg[:160]}")
 
 
-def main(argv=None) -> int:
+# ------------------------------------------------------------------ 证据文档复验（--evidence）
+#
+# 与仓内 core.evidence 是**两套独立实现**：本文件不 import 任何 NF 模块，单文件拷走即可运行
+# （这是「免费验证器 / 可嵌入」的形态要求）。判据必须一致——test_evidence.py 用同一批夹具跑
+# 两边，结论不一致即红：两套实现不一致，说明至少一边有 bug，那时第三方复验的结论就不可信。
+
+EVIDENCE_SCHEMA = "nf-evidence/1"
+RECEIPTS_SCHEMA = "nf-receipts/1"
+ATTEST_SCHEMA = "nf-attest/1"
+ATTEST_SET_SCHEMA = "nf-attest-set/1"
+REVOCATION_SCHEMA = "nf-revocation/1"
+BUNDLE_ENTRY = "bundle.json"
+PAYLOAD_DIR = "payload/"
+NODE_PREFIX = b"\x01nf-node:"
+EVIDENCE_EXIT = {"ok": 0, "invalid": 1, "revoked": 2, "expired": 3}
+EVIDENCE_INVALID = 1
+EVIDENCE_USAGE = 4
+LEVELS_EV = ("digest_only", "receipts_only", "hmac-sha256", "ssh-sig", "sigstore-keyless")
+
+
+def _v_members(src, entries, res):
+    """成员实体 + 摘要 + 叶复算 → (payloads, leaves)；有问题即 None。"""
+    payloads, leaves = {}, []
+    for e in entries:
+        try:
+            rel = _safe_rel(e.get("path") or e.get("id") or "")
+        except ValueError as exc:
+            res["issues"].append(str(exc))
+            continue
+        data = src.find(rel) if rel else None
+        if data is None:
+            res["issues"].append("缺 payload：%s" % (rel or "?"))
+            continue
+        digest = _sha_hex(data)
+        payloads[rel] = data
+        want = str(e.get("digest") or "")
+        if digest != want:
+            res["issues"].append(f"成员摘要不符：{rel}（记录={want[:16]} 实测={digest[:16]}）")
+        leaf = leaf_of(rel, digest).hex()
+        if leaf != str(e.get("leaf") or ""):
+            res["issues"].append(f"叶复算不符：{rel}")
+        leaves.append(bytes.fromhex(leaf))
+    return None if res["issues"] else (payloads, leaves)
+
+
+def _v_bundle_manifest(src, doc, res, anchor=None):
+    """包清单面：成员 → 根 → 包含证明 → 链 → 夹带成员。返回 (entries, payloads)。"""
+    entries = doc.get("entries") or []
+    res["count"] = len(entries)
+    res["root"] = str(doc.get("root") or "")
+    chain = doc.get("chain")
+    res["head"] = str((chain or {}).get("head") or "") if isinstance(chain, dict) else ""
+    res["expires_at"] = str(doc.get("expires_at") or "")
+    # 链段必填且自洽（与真源同口径）：缺段/空头/计数不符一律 invalid——缺证据 ≠ 证据成立
+    if not isinstance(chain, dict):
+        res["issues"].append("缺 chain 段（证据包必须带链头，否则无法证明条目顺序）")
+        return None
+    if not res["head"]:
+        res["issues"].append("chain.head 为空（空链头证明不了任何顺序）")
+        return None
+    if chain.get("count") != len(entries):
+        res["issues"].append("chain.count 不符：记录={} 实测={}".format(
+            chain.get("count"), len(entries)))
+        return None
+    if not entries:
+        res["issues"].append("证据包为空")
+        return None
+    got = _v_members(src, entries, res)
+    if got is None:
+        return None
+    payloads, leaves = got
+    root = (_merkle_root(leaves) or b"").hex()
+    if root != res["root"]:
+        res["issues"].append("根不一致：记录={} 实测={}".format(res["root"][:16], root[:16]))
+        return None
+    for e in entries:
+        folded = fold(bytes.fromhex(str(e.get("leaf") or "")), e.get("proof") or []).hex()
+        if folded != res["root"]:
+            res["issues"].append("包含证明不折叠到根：{}".format(_norm(e.get("path") or "")))
+    if res["issues"]:
+        return None
+    if _chain_head(entries) != res["head"]:
+        res["issues"].append("透明日志链头不一致（条目顺序被插删/改序）")
+        return None
+    if not _check_anchor(entries, doc, anchor, res):
+        return None
+    listed = {PAYLOAD_DIR + _norm(e.get("path") or e.get("id") or "") for e in entries}
+    for name in src.names():
+        if name.startswith(PAYLOAD_DIR) and name not in listed:
+            res["issues"].append(f"包内多出未登记成员：{name}")
+    if res["issues"]:
+        return None
+    return entries, payloads
+
+
+def _v_bundle_envelopes(src, doc, payloads, key, res):
+    """信封面：清单内每一份都必须通过，且每个成员都被覆盖。"""
+    names = [str(n) for n in (doc.get("attestations") or [])]
+    if not names:
+        res["issues"].append("包内无 attestation")
+        return
+    levels, covered, bad = [], set(), []
+    for name in names:
+        raw = src.read(name)
+        if raw is None:
+            bad.append(f"{name}：缺该信封")
+            continue
+        _schema, env = _parse_doc(raw)
+        if env is None:
+            bad.append(f"{name}：不是合法 JSON")
+            continue
+        level, why = _envelope_ok(env, payloads, key)
+        if level:
+            levels.append(level)
+            covered.add(_norm((env.get("subject") or {}).get("path") or ""))
+        else:
+            bad.append(f"{name}：{why}")
+    if bad:
+        res["issues"].append("信封未全部通过校验：{}".format("；".join(bad[:3])))
+        return
+    want = {_norm(e.get("path") or e.get("id") or "") for e in (doc.get("entries") or [])}
+    missing = sorted(want - covered)
+    if missing:
+        res["issues"].append("成员缺信封：{}".format(", ".join(missing[:3])))
+        return
+    res["level"] = max(levels, key=lambda lv: LEVELS_EV.index(lv) if lv in LEVELS_EV else -1)
+
+
+def _decision_issues(decision, payloads):
+    """决策块形状校验（零依赖版；与 core 同口径）。"""
+    if not isinstance(decision, dict) or not decision:
+        return ["decision 必须是非空对象"]
+    issues = []
+    if sorted(set(decision) - {"syscall", "policy_digest", "verdict", "object_sha256"}):
+        issues.append("decision 含未知字段")
+    if decision.get("syscall") != "cc_check":
+        issues.append("decision.syscall 只支持 cc_check（v0）")
+    for key in ("policy_digest", "object_sha256"):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(decision.get(key) or "")):
+            issues.append(f"decision.{key} 须为 64 位十六进制")
+    if decision.get("verdict") != "ok":
+        issues.append("decision.verdict 只允许 ok（v0）")
+    if str(decision.get("object_sha256") or "") not in {_sha_hex(d) for d in payloads.values()}:
+        issues.append("decision.object_sha256 不在成员摘要里")
+    return issues
+
+
+def _check_decision(src, doc, payloads, res, expected_policy_digest=""):
+    """决策证据块：声明面（bundle.json）与绑定面（相符信封）必须一致。"""
+    envs = []
+    for name in [str(n) for n in (doc.get("attestations") or [])]:
+        raw = src.read(name)
+        if raw is None:
+            continue
+        _schema, env = _parse_doc(raw)
+        if isinstance(env, dict):
+            envs.append(env)
+    decision = doc.get("decision")
+    if decision is None:
+        if any(isinstance(env.get("decision"), dict) for env in envs):
+            res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）")
+        elif expected_policy_digest:
+            res["warnings"].append("包内无 decision，无法比对策略（只证字节与信封）")
+        return
+    issues = _decision_issues(decision, payloads)
+    if issues:
+        res["issues"].extend(issues)
+        return
+    obj = str(decision.get("object_sha256") or "")
+    matched, signed = 0, False
+    for env in envs:
+        if str((env.get("subject") or {}).get("sha256") or "") != obj:
+            continue
+        matched += 1
+        bound = env.get("decision")
+        if not isinstance(bound, dict) or bound != decision:
+            res["issues"].append("decision 声明面与信封绑定面不一致（换策略/删块）")
+            return
+        signed = signed or bool(env.get("signature"))
+    if not matched:
+        res["issues"].append("decision 找不到主体摘要相符的信封")
+        return
+    res["decision"] = decision
+    res["decision_status"] = "bound" if signed else "declared"
+    if expected_policy_digest:
+        want = expected_policy_digest.strip().lower()
+        got = str(decision.get("policy_digest") or "")
+        if want != got:
+            res["issues"].append("decision.policy_digest 与期望策略不符")
+            return
+        res["policy_verified"] = True
+
+
+def _rev_hit(rev, entries):
+    """吊销表命中（按摘要或仓相对路径）；表形状不对一律不认。"""
+    if not rev or str(rev.get("schema") or "") != REVOCATION_SCHEMA:
+        return None
+    items = rev.get("revoked") or []
+    if not isinstance(items, list):
+        return None
+    digests = {str(e.get("digest") or "") for e in entries}
+    paths = {_norm(e.get("path") or e.get("id") or "") for e in entries}
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        dig = str(it.get("digest") or "")
+        pat = _norm(it.get("path") or "")
+        if (dig and dig in digests) or (pat and pat in paths):
+            return it
+    return None
+
+
+def _judge(res, entries, revocations, at):
+    """判定面：证据本身成立后，再判吊销（压过 ok）与时效；同时标注时间可证性（G3）。"""
+    res["time_proof"] = "pinned" if at else "none"
+    res["time_basis"] = at or ("本机时钟 " + _now())
+    if (res.get("expires_at") or "") and not at:
+        res["warnings"].append("时间不可证（G3）：本机时钟判有效期，回拨时钟即可改变 expired 结论")
+    hit = _rev_hit(revocations, entries)
+    if hit is not None:
+        res["verdict"] = "revoked"
+        res["revoked_by"] = hit
+        res["issues"].append("证据已被吊销：%s"
+                             % (hit.get("reason") or hit.get("path") or hit.get("digest")
+                                or "未给理由"))
+        return res
+    exp = res.get("expires_at") or ""
+    if exp:
+        now = at or _now()
+        if now > exp:
+            res["verdict"] = "expired"
+            res["issues"].append(f"证据已过期：有效期至 {exp}，判定时点 {now}")
+            return res
+    res["verdict"] = "ok"
+    return res
+
+
+def _v_receipts(src, doc, revocations):
+    """回执形态：成员摘要 → 叶 → 根 → 每条包含证明。"""
+    res = _res("receipts")
+    if str(doc.get("schema") or "") != RECEIPTS_SCHEMA:
+        res["issues"].append("回执 schema 不匹配")
+        return res
+    entries = doc.get("entries") or []
+    res["count"] = len(entries)
+    res["root"] = str(doc.get("root") or "")
+    if not entries:
+        res["issues"].append("回执为空")
+        return res
+    got = _v_members(src, entries, res)
+    if got is None:
+        return res
+    _payloads, leaves = got
+    if (_merkle_root(leaves) or b"").hex() != res["root"]:
+        res["issues"].append("根不一致")
+        return res
+    for e in entries:
+        folded = fold(bytes.fromhex(str(e.get("leaf") or "")), e.get("proof") or []).hex()
+        if folded != res["root"]:
+            res["issues"].append("包含证明不折叠到根：{}".format(_norm(e.get("id") or "")))
+    if res["issues"]:
+        return res
+    res["level"] = "receipts_only"
+    return _judge(res, entries, revocations, "")
+
+
+def _v_attest(src, doc, key, revocations, at):
+    """信封形态：每份信封自洽 + 指向真实成员。"""
+    res = _res("attest")
+    is_set = str(doc.get("schema") or "") == ATTEST_SET_SCHEMA
+    envs = doc.get("attestations") if is_set else [doc]
+    if not isinstance(envs, list) or not envs:
+        res["issues"].append("信封集为空")
+        return res
+    res["count"] = len(envs)
+    payloads = {}
+    for env in envs:
+        if not isinstance(env, dict):
+            res["issues"].append("信封不是对象")
+            continue
+        rel = _norm((env.get("subject") or {}).get("path") or "")
+        data = src.find(rel) if rel else None
+        if data is None:
+            res["issues"].append("缺成员实体：%s" % (rel or "?"))
+            continue
+        payloads[rel] = data
+    if res["issues"]:
+        return res
+    levels, bad = [], []
+    for env in envs:
+        level, why = _envelope_ok(env, payloads, key)
+        if level:
+            levels.append(level)
+        else:
+            bad.append(why)
+    if bad:
+        res["issues"].append("信封未全部通过校验：{}".format("；".join(bad[:3])))
+        return res
+    res["level"] = max(levels, key=lambda lv: LEVELS_EV.index(lv) if lv in LEVELS_EV else -1)
+    entries = [{"path": k, "digest": _sha_hex(v)} for k, v in payloads.items()]
+    return _judge(res, entries, revocations, at)
+
+
+def _embedded_rev(src):
+    """包内吊销表 → (表 或 None, 错误)。坏件/形状不符**不能**当「无吊销」（与真源同口径）。"""
+    raw = src.read("revocations.json")
+    if raw is None:
+        return None, ""
+    schema, doc = _parse_doc(raw)
+    if doc is None:
+        return None, "包内吊销表不可解析（坏件不能当「无吊销」）"
+    if schema != REVOCATION_SCHEMA:
+        return None, f"包内吊销表 schema 不匹配（期望 {REVOCATION_SCHEMA}）"
+    return doc, ""
+
+
+def run_evidence(args) -> int:
+    """`--evidence` 模式：零依赖复验（三形态同一套四词判定）。"""
+    try:
+        key = None
+        if args.key_file:
+            with open(args.key_file, "rb") as fh:
+                key = fh.read().strip() or None
+        rev = None
+        if args.revocations:
+            with open(args.revocations, encoding="utf-8") as fh:
+                rev = json.load(fh)
+            if not isinstance(rev, dict):     # 形状就地校验（零依赖：不走 core.json_doc）
+                print("✗ 吊销表顶层应为对象（修复指引：请给 nf-revocation/1 的 JSON 对象）",
+                      file=sys.stderr)
+                return EVIDENCE_USAGE
+        src = _Src(args.evidence, root=args.root)
+        if src.issues:      # 容器面已判死：给出 invalid + 退出码 1（与真源同口径）
+            res = _res("bundle")
+            res["issues"].extend(src.issues)
+            res["verdict"] = "invalid"
+            if args.json:
+                print(json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                for issue in res["issues"]:
+                    print(f"  [FAIL] {issue}", file=sys.stderr)
+                print(f"  判定：{res['verdict']}")
+            src.close()
+            return EVIDENCE_INVALID
+        try:
+            form, doc = _form(src, args.kind)
+            if form == "bundle":
+                res = _res("bundle")
+                anc = None
+                if getattr(args, "anchor", ""):
+                    try:
+                        with open(args.anchor, encoding="utf-8") as fh:
+                            anc = json.load(fh)      # 就地形状校验（零依赖：不走 core）
+                    except (OSError, ValueError) as exc:
+                        print(f"✗ 锚点不可读：{exc}", file=sys.stderr)
+                        return EVIDENCE_USAGE
+                    if not isinstance(anc, dict):
+                        print("✗ 锚点顶层应为对象（修复指引：给 {count, head}）", file=sys.stderr)
+                        return EVIDENCE_USAGE
+                got = _v_bundle_manifest(src, doc, res, anc)
+                if got is not None:
+                    _v_bundle_envelopes(src, doc, got[1], key, res)
+                    if not res["issues"]:
+                        _check_decision(src, doc, got[1], res,
+                                        getattr(args, "policy_digest", ""))
+                    if not res["issues"]:
+                        embedded, rev_err = _embedded_rev(src) if rev is None else (None, "")
+                        if rev_err:      # 坏吊销表 = 定案 invalid（不是「无吊销」）
+                            res["issues"].append(rev_err)
+                        else:
+                            _judge(res, got[0], rev if rev is not None else embedded,
+                                   args.at)
+            elif form == "receipts":
+                res = _v_receipts(src, doc, rev)
+            else:
+                res = _v_attest(src, doc, key, rev, args.at)
+        finally:
+            src.close()
+    except (OSError, ValueError) as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return EVIDENCE_USAGE
+    if args.json:
+        print(json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf_verify --evidence（零依赖复验）{args.evidence} ==")
+        print("  形态：%s · 判定：%s · 强度：%s · 成员 %d 件"
+              % (res["kind"], res["verdict"], res["level"], res["count"]))
+        if res["root"]:
+            print("  根：{}".format(res["root"][:32]))
+        for i in res["issues"]:
+            print(f"  [FAIL] {i}", file=sys.stderr)
+        if res["verdict"] == "ok":
+            print("  => 证据成立（口径：成员未改 + 证明到根 + 信封自洽；不等于内容质量或真实性）")
+    return EVIDENCE_EXIT.get(res["verdict"], 1)
+
+def _build_parser():
     ap = argparse.ArgumentParser(
-        prog="nf_verify", description="NF 馆藏读者侧独立验证器（纯标准库）")
-    ap.add_argument("--entry", required=True, help="馆藏编号（如 NF-1）")
+        prog="nf_verify",
+        description="NF 读者侧独立验证器（纯标准库，不依赖 NF 代码）：馆藏单条 / 证据文档复验")
+    mode = ap.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--entry", help="馆藏编号（如 NF-1）")
+    mode.add_argument("--evidence",
+                      help="证据文档：证据包 .zip / 解包目录 / nf-receipts · nf-attest JSON")
     ap.add_argument("--receipts", default="library/RECEIPTS.json",
                     help="回执文件（缺省 library/RECEIPTS.json）")
     ap.add_argument("--entry-file", default="",
                     help="条目内容文件（缺省 library/<编号>.md；无则只验包含关系）")
-    ap.add_argument("--key-file", default="", help="hmac 锚校验用密钥文件")
+    ap.add_argument("--root", default="",
+                    help="证据文档形态：成员根目录（缺省 = 该 JSON 所在目录）")
+    ap.add_argument("--kind", default="", choices=("", "bundle", "receipts", "attest"),
+                    help="证据文档形态（缺省 = 按文档 schema 自动判）")
+    ap.add_argument("--revocations", default="", help="吊销表 JSON（nf-revocation/1）")
+    ap.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    ap.add_argument("--anchor", default="",
+                    help="外部锚点 JSON（{count, head}）：核对「不是被截断的更早版本」")
+    ap.add_argument("--policy-digest", dest="policy_digest", default="",
+                    help="期望策略摘要（64 hex）：与包内 decision.policy_digest 比对"
+                         "（不符判 invalid；无 decision 只 warning）")
+    ap.add_argument("--key-file", default="", help="hmac 锚 / hmac 信封校验用密钥文件")
     ap.add_argument("--ssh-allowed-signers", default="",
                     help="ssh-sig 锚校验用 allowed_signers 文件")
     ap.add_argument("--ssh-identity", default="", help="ssh-sig 锚的 principal")
     ap.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    args = ap.parse_args(argv)
+    return ap
 
+
+def _sha_hex(data) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _merkle_root(leaves):
+    """RFC 6962 风格：空集 → None；单叶 → 该叶；否则切到最大的 2 的幂。"""
+    if not leaves:
+        return None
+    if len(leaves) == 1:
+        return leaves[0]
+    mid = 1
+    while mid * 2 < len(leaves):
+        mid *= 2
+    return node(_merkle_root(leaves[:mid]), _merkle_root(leaves[mid:]))
+
+
+
+
+def _anchor_prefix_head(entries, upto) -> str:
+    """前 upto 条的链头（外部锚点核对用，与真源同一公式）。"""
+    return _chain_head(entries[:max(0, upto)])
+
+
+def _check_anchor(entries, doc, anchor, res):
+    """外部锚点核对（G1）：防「整链被截断成更早版本」。
+
+    与真源同口径：包内 anchor 声明必须与外部材料一致；锚点声称的前缀必须存在且链头相符。
+    """
+    declared = doc.get("anchor")
+    if isinstance(declared, dict) and declared:
+        res["anchor_ref"] = {"count": declared.get("count"), "head": declared.get("head")}
+    if not isinstance(anchor, dict) or not anchor:
+        if res.get("anchor_ref"):
+            res["warnings"].append("包声明了外部锚点但未提供锚点材料（无法证明未被截断）")
+        return True
+    cnt = anchor.get("count")
+    head = str(anchor.get("head") or "")
+    if not isinstance(cnt, int) or cnt < 0 or not head:
+        res["issues"].append("锚点材料形状不对（需要 {count: 非负整数, head: 非空字符串}）")
+        return False
+    ref = res.get("anchor_ref")
+    if ref and (ref.get("count") != cnt or ref.get("head") != head):
+        res["issues"].append("包内 anchor 与外部锚点不一致（声称与证据互相矛盾）")
+        return False
+    if len(entries) < cnt:
+        res["issues"].append(f"证据包被截断：包只有 {len(entries)} 条，锚点记录 {cnt} 条")
+        return False
+    if _anchor_prefix_head(entries, cnt) != head:
+        res["issues"].append("与外部锚点不符：该位置的链头不一致（历史被改写或来自另一条链）")
+        return False
+    res["anchor_verified"] = True
+    return True
+
+
+def _chain_head(entries) -> str:
+    """透明日志链头：H(NODE_PREFIX | prev | leaf) 逐节折叠（与仓内同源）。"""
+    prev = "0" * 64
+    for e in entries:
+        h = hashlib.sha256()
+        h.update(NODE_PREFIX)
+        for part in (prev.encode("ascii"), str(e.get("leaf") or "").encode("ascii")):
+            h.update(b"|")
+            h.update(part)
+        prev = h.hexdigest()
+    return prev
+
+
+def _norm(rel: str) -> str:
+    return str(rel).replace("\\", "/").lstrip("/")
+
+
+#: 单成员/整包上限（与真源同口径：验证器收的是不可信输入）
+MAX_MEMBER_BYTES = 16 * 1024 * 1024
+MAX_TOTAL_BYTES = 96 * 1024 * 1024
+
+
+def _safe_rel(rel):
+    """仓相对路径安全闸门 → 归一路径；不安全抛 ValueError（与真源同口径）。"""
+    clean = _norm(rel)
+    if not clean:
+        raise ValueError("成员路径为空（修复指引：成员必须有仓相对路径）")
+    for part in clean.split("/"):
+        if part in ("", ".", ".."):
+            raise ValueError(f"成员路径不安全：{clean}"
+                             "（修复指引：路径段不许是空串 / 单点 / 双点）")
+        if ":" in part:
+            raise ValueError(f"成员路径含盘符/备用流写法：{clean}"
+                             "（修复指引：只接受仓内 POSIX 相对路径）")
+    return clean
+
+
+def _now() -> str:
+    epoch = (os.environ.get("SOURCE_DATE_EPOCH") or "").strip()
+    if epoch.isdigit():
+        return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(int(epoch)))
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+class _Src:
+    """证据源读面：zip / 目录 / 单 JSON + 根目录（三形态共用）。"""
+
+    def __init__(self, path: str, root: str = ""):
+        self.path = path
+        self._zf = None
+        self._dir = ""
+        self._doc_path = ""
+        #: 容器面问题（重名成员 / 超限膨胀）：按 invalid 判，不当用法错
+        self.issues = []
+        if os.path.isdir(path):
+            self._dir = path
+        elif os.path.isfile(path) and zipfile.is_zipfile(path):
+            self._zf = zipfile.ZipFile(path)
+            names = self._zf.namelist()
+            dup = sorted({n for n in names if names.count(n) > 1})
+            if dup:
+                self.issues.append(f"包内有重名成员：{dup[:3]}"
+                                   "（重名 zip 各实现取字节可能不同，判定不可复算）")
+            declared = sum(int(getattr(i, "file_size", 0) or 0) for i in self._zf.infolist())
+            if declared > MAX_TOTAL_BYTES:
+                self.issues.append(f"包声明解压后 {declared} 字节，超上限 {MAX_TOTAL_BYTES}"
+                                   "（拒绝按声明膨胀解包——防 zip 炸弹）")
+        elif os.path.isfile(path):
+            self._doc_path = path
+            self._dir = root or os.path.dirname(os.path.abspath(path)) or "."
+        else:
+            raise ValueError(f"证据源不存在：{path}"
+                             "（修复指引：请给证据包 .zip、解包目录或证据 JSON）")
+
+    def names(self):
+        if self._zf is not None:
+            return sorted(self._zf.namelist())
+        out = []
+        for base, _dirs, files in os.walk(self._dir):
+            for n in files:
+                out.append(_norm(os.path.relpath(os.path.join(base, n), self._dir)))
+        return sorted(out)
+
+    def read(self, name):
+        name = _norm(name)
+        if self._zf is not None:
+            try:
+                return self._zf.read(name)
+            except KeyError:        # 成员不在包里：按「缺件」返回 None，由调用方判 invalid
+                return None
+        full = os.path.join(self._dir, *name.split("/"))
+        if not os.path.isfile(full):
+            return None
+        with open(full, "rb") as fh:
+            return fh.read()
+
+    def find(self, rel):
+        for name in (rel, PAYLOAD_DIR + rel):
+            data = self.read(name)
+            if data is not None:
+                return data
+        return None
+
+    def doc_bytes(self):
+        if not self._doc_path:
+            return None
+        with open(self._doc_path, "rb") as fh:
+            return fh.read()
+
+    def close(self):
+        if self._zf is not None:
+            self._zf.close()
+            self._zf = None
+
+
+def _parse_doc(raw):
+    """容错解析：坏 JSON / 非对象一律返回 ("", None)。
+
+    本文件刻意**不 import 任何 NF 模块**（零依赖单文件可分发），故不能走 core.json_doc；
+    形状判据就在解析点旁边显式写出来，不散落到调用方。
+    """
+    try:
+        doc = json.loads(raw.decode())
+    except (ValueError, UnicodeDecodeError):
+        return "", None
+    if not isinstance(doc, dict):
+        return "", None
+    return str(doc.get("schema") or ""), doc
+
+
+def _form(src, kind: str = ""):
+    """判形态：只认文档 schema，不认扩展名。"""
+    mapping = {RECEIPTS_SCHEMA: "receipts", ATTEST_SCHEMA: "attest", ATTEST_SET_SCHEMA: "attest"}
+    raw = src.doc_bytes()
+    if raw is not None:
+        schema, doc = _parse_doc(raw)
+        form = mapping.get(schema, "")
+        if schema == EVIDENCE_SCHEMA:
+            raise ValueError("bundle 形态须给 .zip 或解包目录（修复指引：单 JSON 不会是自包含包）")
+        if not form or (kind and kind != form):
+            raise ValueError(f"认不出证据形态：{src.path}（schema={schema or '缺失'}）"
+                             "（修复指引：请给 nf-receipts/1、nf-attest/1、"
+                             "nf-attest-set/1 的 JSON）")
+        return form, doc
+    raw = src.read(BUNDLE_ENTRY)
+    if raw is not None:
+        schema, doc = _parse_doc(raw)
+        if schema == EVIDENCE_SCHEMA:
+            return "bundle", doc
+    for name in [n for n in src.names() if n.endswith(".json")]:
+        schema, doc = _parse_doc(src.read(name) or b"")
+        form = mapping.get(schema, "")
+        if form and (not kind or kind == form):
+            return form, doc
+    raise ValueError(f"认不出证据形态：{src.path}（修复指引：请给 nf evidence pack 的 .zip、或含 "
+                     "nf-receipts/1 · nf-attest/1 · nf-attest-set/1 的目录）")
+
+
+def _res(kind: str):
+    return {"kind": kind, "verdict": "invalid", "level": "none", "root": "",
+            "head": "", "count": 0, "issues": [], "warnings": [], "expires_at": "",
+            "revoked_by": None, "anchor_ref": None, "anchor_verified": False,
+            "decision": None, "decision_status": "absent", "policy_verified": False,
+            # 时间可证性（G3）：与真源同口径——只标「时点谁给的」，不假装时间可信
+            "time_proof": "none", "time_basis": ""}
+
+
+def _envelope_ok(env, payloads, key):
+    """单份信封 → (level 或空串, 原因)。缺锚/未知方案一律 fail-closed，不降级。"""
+    if not isinstance(env, dict) or env.get("schema") != ATTEST_SCHEMA:
+        return "", "信封 schema 不匹配"
+    base = {k: env.get(k) for k in ("schema", "subject", "producer", "issued_at")}
+    decision = env.get("decision")
+    if isinstance(decision, dict) and decision:
+        base["decision"] = decision
+    if env.get("envelope_digest") != _sha_hex(canonical_bytes(base)):
+        return "", "信封摘要不一致（信封被改）"
+    subj = env.get("subject") or {}
+    rel = _norm(subj.get("path") or "")
+    data = payloads.get(rel)
+    if data is None:
+        return "", "信封指向的成员不在证据里：%s" % (rel or "?")
+    if _sha_hex(data) != str(subj.get("sha256") or ""):
+        return "", f"信封主体与成员不同源：{rel}"
+    sig = env.get("signature")
+    if not sig:
+        return "digest_only", ""
+    scheme = str(sig.get("scheme") or "")
+    if scheme == "hmac-sha256":
+        if key is None:
+            return "", "hmac 级缺密钥（fail-closed，不降级）"
+        mac = _hmac.new(key, str(env.get("envelope_digest") or "").encode("utf-8"),
+                        hashlib.sha256).hexdigest()
+        if not _hmac.compare_digest(mac, str(sig.get("mac") or "")):
+            return "", "hmac 签名不匹配（密钥不符或信封被改）"
+        return "hmac-sha256", ""
+    return "", "信封签名方案 %s 需外部验证器（本零依赖验证器 fail-closed）" % (scheme or "缺失")
+
+
+def main(argv=None) -> int:
+    args = _build_parser().parse_args(argv)
+    if args.evidence:
+        return run_evidence(args)
+    return run_entry(args)
+
+
+def run_entry(args) -> int:
     try:
         with open(args.receipts, encoding="utf-8") as fh:
             doc = json.load(fh)
         # 独立验证器**零 NF 依赖**（本判据不改）：顶层形状在这一层就地校验，
             # 与 core.json_doc 同一口径（对象才继续，否则给指引）。
         if not isinstance(doc, dict):
-            raise ValueError("%s 顶层应为对象，实为 %s（修复指引：回执件不是数组/标量）"
-                             % (args.receipts, type(doc).__name__))
+            raise ValueError(f"{args.receipts} 顶层应为对象，实为 {type(doc).__name__}"
+                             "（修复指引：回执件不是数组/标量）")
     except (OSError, ValueError) as exc:
-        print("✗ 回执不可读：%s" % exc, file=sys.stderr)
+        print(f"✗ 回执不可读：{exc}", file=sys.stderr)
         return 2
     if doc.get("schema") != SCHEMA:
-        print("✗ 回执 schema 不匹配（期望 %s）" % SCHEMA, file=sys.stderr)
+        print(f"✗ 回执 schema 不匹配（期望 {SCHEMA}）", file=sys.stderr)
         return 2
     want = args.entry.strip().lower()
     hit = next((e for e in doc.get("entries") or []
                 if str(e.get("id", "")).lower() == want), None)
     if hit is None:
-        print("✗ 回执中没有该条目：%s" % args.entry, file=sys.stderr)
+        print(f"✗ 回执中没有该条目：{args.entry}", file=sys.stderr)
         return 2
 
     checks = []
@@ -147,16 +821,15 @@ def main(argv=None) -> int:
     folded = fold(leaf_of(hit["id"], digest), hit.get("proof") or []).hex()
     checks.append(("inclusion", folded == root,
                    "包含证明折叠到根" if folded == root
-                   else "折叠结果 %s ≠ 根 %s" % (folded[:16], root[:16])))
+                   else f"折叠结果 {folded[:16]} ≠ 根 {root[:16]}"))
 
     # 2)（可选）内容绑定：重算规范摘要 == 回执摘要
-    path = args.entry_file or os.path.join("library", "%s.md" % hit["id"])
+    path = args.entry_file or os.path.join("library", "{}.md".format(hit["id"]))
     if os.path.isfile(path):
         live = entry_digest(path)
         checks.append(("content", live == digest,
                        "内容摘要与回执一致" if live == digest
-                       else "内容摘要 %s ≠ 回执 %s（内容被改）"
-                            % (live[:16], digest[:16])))
+                       else f"内容摘要 {live[:16]} ≠ 回执 {digest[:16]}（内容被改）"))
     else:
         checks.append(("content", False,
                        "未提供条目内容（--entry-file），无法校验内容绑定"))
@@ -180,7 +853,7 @@ def main(argv=None) -> int:
             checks.append(("anchor", False,
                            "sigstore 锚需 cosign，未安装 → fail-closed"))
         else:
-            checks.append(("anchor", False, "未知锚方案：%s" % scheme))
+            checks.append(("anchor", False, f"未知锚方案：{scheme}"))
     else:
         checks.append(("anchor", True, "该条未挂签名锚（仅包含关系可验）"))
 
@@ -196,8 +869,8 @@ def main(argv=None) -> int:
                                      for n, o, m in checks]},
                          ensure_ascii=False, indent=2, sort_keys=True))
     else:
-        print("== nf_verify（读者侧独立验证）%s ==" % hit["id"])
-        print("  全馆根：%s" % root[:32])
+        print("== nf_verify（读者侧独立验证）{} ==".format(hit["id"]))
+        print(f"  全馆根：{root[:32]}")
         for n, o, m in checks:
             print("  %s %-10s %s" % ("✓" if o else "✗", n, m))
         print("  => %s" % ("可验证通过" if ok_all else "未通过（详上）"))

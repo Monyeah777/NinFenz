@@ -1,0 +1,8 @@
+{
+  "schema": "nf/value-kind-policy/1",
+  "dimensions": {
+    "D1": {"allowed": ["numeric", "qualitative"]},
+    "D2": {"allowed": ["numeric", "condition", "qualitative"]},
+    "D3": {"allowed": ["condition", "enum", "qualitative"]}
+  }
+}

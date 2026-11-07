@@ -2,8 +2,7 @@
 
 > 用途：任何 agent（Cline / Claude Code / Cursor / Codex / 自研）**只读这一份**就能把 NF 装好、自检、接上 MCP。
 > 机器入口：https://ninfenz.dev/llms.txt　事实源：https://ninfenz.dev/facts.json　完整单文件：https://ninfenz.dev/llms-full.txt
-> 许可：代码 AGPL-3.0-only 或商业许可，协议文本 CC BY 4.0（历史 ≤1.0.5 为 MIT）。
-> 官方唯一入口 https://ninfenz.dev；闭源集成、SLA、私有化和企业采购见 `/pricing/` 与 `/pilot/`。
+> 许可 MIT —— 使用请保留 LICENSE 与署名；官方唯一入口 https://ninfenz.dev，**无付费版**，不需要下载任何第三方客户端。
 
 ## 0 一句话
 
@@ -23,7 +22,7 @@ NinFenz（宁封子，简称 NF）是**内容契约层**：用「协议 + 确定
 ### A 零安装：用已发布的 npm 包（推荐给 agent，最快）
 
 ```bash
-npx -y ninfenz --version       # 期望输出 nf 1.1.2
+npx -y ninfenz --version       # 期望输出 nf 1.0.5
 npx -y ninfenz doctor          # 体检：期望 17/17 通过
 npx -y ninfenz serve           # 启动只读 MCP（stdio JSON-RPC，Ctrl+C 退出）
 ```

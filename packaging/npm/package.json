@@ -1,8 +1,8 @@
 {
   "name": "ninfenz",
-  "version": "1.1.2",
+  "version": "1.0.5",
   "mcpName": "io.github.Monyeah777/ninfenz",
-  "description": "AI output assurance: versioned content contracts, deterministic release gates, rule-level evidence and audit-ready reports. Offline CLI and MCP; AGPL-3.0-only or commercial.",
+  "description": "Content contract layer for AI long-form output: plain-markdown protocol, deterministic gates, verifiable artifacts. One-click launcher for the NF CLI (offline, MIT).",
   "keywords": [
     "ninfenz",
     "nf",
@@ -19,7 +19,7 @@
     "merkle",
     "reproducible"
   ],
-  "license": "AGPL-3.0-only",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=18.17"
@@ -59,7 +59,6 @@
     "stage": "node tools/stage-payload.mjs",
     "verify": "node tools/verify-package.mjs",
     "verify-tarball": "node tools/verify-tarball.mjs",
-    "release:build": "python tools/build_release.py --out dist/release",
     "prepack": "node tools/stage-payload.mjs && node tools/verify-package.mjs",
     "test": "node --test test/smoke.test.mjs",
     "smoke": "node tools/stage-payload.mjs && node bin/nf.mjs --version && node bin/nf.mjs doctor"

@@ -1,0 +1,154 @@
+{
+  "PORTABLE": {
+    "models": {
+      "model-a": {
+        "mean_diff": 0.1163,
+        "ci": [
+          0.0976,
+          0.135
+        ],
+        "d": 2.226,
+        "meaningful": true,
+        "regressed": false
+      },
+      "model-b": {
+        "mean_diff": 0.0828,
+        "ci": [
+          0.063,
+          0.1026
+        ],
+        "d": 1.495,
+        "meaningful": true,
+        "regressed": false
+      },
+      "model-c": {
+        "mean_diff": 0.1205,
+        "ci": [
+          0.1035,
+          0.1375
+        ],
+        "d": 2.538,
+        "meaningful": true,
+        "regressed": false
+      }
+    },
+    "meaningful": 3,
+    "portability": 1.0,
+    "regressed": false,
+    "verdict": "PASS"
+  },
+  "MODEL-SPECIFIC": {
+    "models": {
+      "model-a": {
+        "mean_diff": 0.1306,
+        "ci": [
+          0.1095,
+          0.1517
+        ],
+        "d": 2.214,
+        "meaningful": true,
+        "regressed": false
+      },
+      "model-b": {
+        "mean_diff": 0.0173,
+        "ci": [
+          0.0,
+          0.0346
+        ],
+        "d": 0.359,
+        "meaningful": false,
+        "regressed": false
+      },
+      "model-c": {
+        "mean_diff": -0.0001,
+        "ci": [
+          -0.0212,
+          0.0211
+        ],
+        "d": -0.001,
+        "meaningful": false,
+        "regressed": false
+      }
+    },
+    "meaningful": 1,
+    "portability": 0.333,
+    "regressed": false,
+    "verdict": "FAIL"
+  },
+  "REGRESSION": {
+    "models": {
+      "model-a": {
+        "mean_diff": 0.094,
+        "ci": [
+          0.0776,
+          0.1104
+        ],
+        "d": 2.048,
+        "meaningful": true,
+        "regressed": false
+      },
+      "model-b": {
+        "mean_diff": 0.1255,
+        "ci": [
+          0.1036,
+          0.1474
+        ],
+        "d": 2.051,
+        "meaningful": true,
+        "regressed": false
+      },
+      "model-c": {
+        "mean_diff": -0.1183,
+        "ci": [
+          -0.1357,
+          -0.1009
+        ],
+        "d": -2.433,
+        "meaningful": false,
+        "regressed": true
+      }
+    },
+    "meaningful": 2,
+    "portability": 0.667,
+    "regressed": true,
+    "verdict": "FAIL"
+  },
+  "NOISE": {
+    "models": {
+      "model-a": {
+        "mean_diff": 0.0067,
+        "ci": [
+          -0.0119,
+          0.0253
+        ],
+        "d": 0.129,
+        "meaningful": false,
+        "regressed": false
+      },
+      "model-b": {
+        "mean_diff": 0.0155,
+        "ci": [
+          -0.005,
+          0.0359
+        ],
+        "d": 0.271,
+        "meaningful": false,
+        "regressed": false
+      },
+      "model-c": {
+        "mean_diff": 0.0009,
+        "ci": [
+          -0.0174,
+          0.0192
+        ],
+        "d": 0.018,
+        "meaningful": false,
+        "regressed": false
+      }
+    },
+    "meaningful": 0,
+    "portability": 0.0,
+    "regressed": false,
+    "verdict": "FAIL"
+  }
+}

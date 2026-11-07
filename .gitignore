@@ -32,6 +32,9 @@ id_ed25519*
 .rivet/
 .rivet.md
 
+# 整改期隔离快照（origin/main 的只读基线副本；不入库）
+.worktrees/
+
 # 判据缓存（C1，2026-10-22）：默认落**用户级**缓存（~/.cache/ninfenz/<repo-hash>/ 或
 # %LOCALAPPDATA%）；仅当用户缓存目录不可写时回退仓内 `.nf-cache/` 并 WARN——回退面也必须
 # 被忽略，否则 `git add -A` 会把缓存件（可能被预置伪造）提交进产品仓。
@@ -42,9 +45,6 @@ id_ed25519*
 .artifacts/
 
 .coverage
-# 并行模式中间件（.coverage.<host>.<pid>.<rand>）—— 门禁在仓库根跑 coverage，
-# 若不被忽略会被「工具不得越权写工作树」判据抓成假红（2026-10-30 实测）。
-.coverage.*
 _cov_tmp.json
 
 # 本地模型权重与运行环境（决策层候选；体积 GB 级，绝不入仓）
@@ -79,10 +79,3 @@ nf_agents_*/
 nf-locks/
 shell_history
 trace.json
-
-# CI 排障日志（临时）
-.ci-*.log
-
-# cargo-fuzz build and crash output
-engine/rust/fuzz/target/
-engine/rust/fuzz/artifacts/
