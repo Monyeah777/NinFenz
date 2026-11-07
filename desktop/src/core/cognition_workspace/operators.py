@@ -101,7 +101,6 @@ OPERATORS: dict[str, dict[str, Any]] = {
 OPERATOR_IDS = tuple(OPERATORS)
 
 CONTROL_SCHEMA = "nf-control-state/1"
-RECORD_SCHEMA = "nf-control-record/1"
 GUIDE = "修复指引："
 
 

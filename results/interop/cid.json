@@ -107,14 +107,14 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreidmso24jxhplwtq23uz6gqzbnc5odgmtv5ei77orwxfsey6vzaunq",
+      "cid": "bafyreifet5bifco3h2jpvva77yelbcxvhagy54zpwx4dlfvqisnbaeyj2u",
       "path": "protocol/role_coordinates.json",
-      "sha256": "6c93b5c4dcef5da70d6e99f1a190b45d70ccc9d7a447fee8dae59131eae4146c"
+      "sha256": "a49f428289db3e92fad41ffe08b08af5380d8ef32fb5f83596b0449a101309d5"
     },
     {
-      "cid": "bafyreih2lncrym6c2ehxisinyuitwls5srcasyca3vsyu3dff5to5e2v2a",
+      "cid": "bafyreibgzwdsib63xzdliv2ddy7p62gwffqiczry2ebpnsphajqmcf7rka",
       "path": "protocol/code_metrics_baseline.json",
-      "sha256": "fa5b451c33c2d10f74490dc5113b2e5d9444096040dd658a6c652f66ee9355d0"
+      "sha256": "26cd872407dbbe46b457431e3eff68d62960816638d102f6c9e70260c117f150"
     },
     {
       "cid": "bafyreiba7u5jmfk7aalyydv7l3r7uacvpjrvrtwupvbsxbnvgwiv6kvhaa",

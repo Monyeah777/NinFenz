@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from core import json_doc
+
 SCHEMA = "nf-boot-check/1"
 DUMP_SCHEMA = "nf-panic-dump/1"
 GUIDE = "修复指引："
@@ -35,7 +37,7 @@ def check(root: str = ".") -> dict[str, Any]:
                            "detail": "关键件不在场（" + GUIDE + "恢复该文件）"})
             continue
         try:
-            doc = json.loads(path.read_text(encoding="utf-8"))
+            doc = json_doc.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
             issues.append({"file": rel, "code": "bad-json",
                            "detail": str(exc) + "（" + GUIDE + "修语法）"})

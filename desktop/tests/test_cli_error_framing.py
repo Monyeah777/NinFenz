@@ -428,6 +428,11 @@ class PathFlagCoverageTest(unittest.TestCase):
         "entry": "--entry 是馆藏编号（NF-1 这类标识符）",
         "source": "--source 是溯源说明**文字**（写进台账，不是路径）",
         "write": "--write 是布尔旗标（无取值，故不参与写法判定）",
+        "delta_json": "--delta-json 是**内联 JSON 文本**（frame_delta），不是路径",
+        "payload_json": "--payload-json 是内联 JSON 文本（算子 witness），不是路径",
+        "payload": "--payload 是算子 witness 的 JSON 文本文件**内容**入口（读文本，不进路径闸门）",
+        "research_topic": "--plan 的取值是**研究主题文字**（不是路径）",
+        "witness": "--witness 是状态迁移见证的 JSON 文本（内联/文件两用，按文本过闸）",
     }
     PATHISH = re.compile(r"文件|路径|目录|JSON|快照|密钥|信封")
 

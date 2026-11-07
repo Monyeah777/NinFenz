@@ -10,9 +10,10 @@
 from __future__ import annotations
 
 import ast
-import json
 from pathlib import Path
 from typing import Any
+
+from core import json_doc
 
 SCHEMA = "nf-closure/1"
 REL = "protocol/closure/ledger.json"
@@ -25,7 +26,7 @@ def _load(root: str) -> Any:
     if not path.is_file():
         raise ValueError("闭包台账不在场：" + REL + "（" + GUIDE + "确认 protocol/closure/）")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError(REL + " 不是合法 JSON：" + str(exc)) from exc
 
@@ -37,7 +38,7 @@ def test_methods(root: str = ".") -> dict[str, set[str]]:
     for path in sorted(base.glob("test_*.py")):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
-        except SyntaxError:
+        except SyntaxError:  # 语法坏的测试文件不计入索引：它本身会被 unittest 报红
             continue
         names: set[str] = set()
         for node in ast.walk(tree):

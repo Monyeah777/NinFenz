@@ -42,6 +42,7 @@ SINKS = re.compile(
 #: 已复核的**假阳性**（旗标本身不写；写者另有其人）。集合必须与实测**恰好相等**。
 REVIEWED_FALSE_POSITIVES = {
     "--mode": "取值开关（text/watermark），不写盘；真守卫是 --out",
+    "--plan": "取值开关（研究主题文本），不写盘；写面走 --out",
     "--backlog": "写调用嵌套在 `if args.write:` 之下（真守卫是 --write）",
     "--scope": "同上（receipts --write 才写）",
     "--by": "位于 CONFIRM_VERBS 的 `library supersede` 动词里",

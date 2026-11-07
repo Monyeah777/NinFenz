@@ -10,9 +10,10 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
+
+from core import json_doc
 
 ADR_SCHEMA = "nf-adr/1"
 LEDGER_SCHEMA = "nf-doc-ledger/1"
@@ -27,7 +28,7 @@ def _load(root: str, rel: str, schema: str) -> Any:
     if not path.is_file():
         raise ValueError("文件不在场：" + rel + "（" + GUIDE + "确认路径）")
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError(rel + " 不是合法 JSON：" + str(exc)) from exc
     if str(doc.get("schema") or "") != schema:

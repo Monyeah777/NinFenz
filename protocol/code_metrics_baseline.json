@@ -11,7 +11,7 @@
       "max_fn_lines": 19
     },
     "desktop/src/core/adr.py": {
-      "lines": 191,
+      "lines": 192,
       "max_fn_cc": 27,
       "max_fn_lines": 50
     },
@@ -126,7 +126,7 @@
       "max_fn_lines": 30
     },
     "desktop/src/core/boot_check.py": {
-      "lines": 69,
+      "lines": 71,
       "max_fn_cc": 7,
       "max_fn_lines": 24
     },
@@ -196,7 +196,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/closure.py": {
-      "lines": 127,
+      "lines": 128,
       "max_fn_cc": 32,
       "max_fn_lines": 54
     },
@@ -406,7 +406,7 @@
       "max_fn_lines": 18
     },
     "desktop/src/core/eval_harness.py": {
-      "lines": 195,
+      "lines": 216,
       "max_fn_cc": 28,
       "max_fn_lines": 51
     },
@@ -656,7 +656,7 @@
       "max_fn_lines": 20
     },
     "desktop/src/core/job_ledger.py": {
-      "lines": 169,
+      "lines": 171,
       "max_fn_cc": 17,
       "max_fn_lines": 35
     },
@@ -816,7 +816,7 @@
       "max_fn_lines": 17
     },
     "desktop/src/core/method_pack.py": {
-      "lines": 204,
+      "lines": 205,
       "max_fn_cc": 35,
       "max_fn_lines": 59
     },
@@ -1436,12 +1436,12 @@
       "max_fn_lines": 40
     },
     "scripts/adr_check.py": {
-      "lines": 92,
+      "lines": 95,
       "max_fn_cc": 8,
       "max_fn_lines": 31
     },
     "scripts/ai_domain_closure.py": {
-      "lines": 395,
+      "lines": 406,
       "max_fn_cc": 25,
       "max_fn_lines": 91
     },
@@ -1451,7 +1451,7 @@
       "max_fn_lines": 71
     },
     "scripts/atom_invariants.py": {
-      "lines": 106,
+      "lines": 109,
       "max_fn_cc": 11,
       "max_fn_lines": 51
     },
@@ -1496,7 +1496,7 @@
       "max_fn_lines": 37
     },
     "scripts/closure_audit.py": {
-      "lines": 101,
+      "lines": 104,
       "max_fn_cc": 10,
       "max_fn_lines": 45
     },
@@ -1541,7 +1541,7 @@
       "max_fn_lines": 44
     },
     "scripts/eval_run.py": {
-      "lines": 117,
+      "lines": 120,
       "max_fn_cc": 8,
       "max_fn_lines": 31
     },
@@ -1601,14 +1601,14 @@
       "max_fn_lines": 42
     },
     "scripts/mcp_manifest.py": {
-      "lines": 134,
+      "lines": 137,
       "max_fn_cc": 7,
       "max_fn_lines": 26
     },
     "scripts/nf.py": {
-      "lines": 9741,
+      "lines": 9778,
       "max_fn_cc": 122,
-      "max_fn_lines": 397
+      "max_fn_lines": 405
     },
     "scripts/nf_client.py": {
       "lines": 187,
@@ -1736,22 +1736,22 @@
       "max_fn_lines": 206
     },
     "scripts/watermark_bench.py": {
-      "lines": 218,
+      "lines": 222,
       "max_fn_cc": 6,
       "max_fn_lines": 29
     },
     "scripts/watermark_dct_probe.py": {
-      "lines": 318,
+      "lines": 323,
       "max_fn_cc": 8,
       "max_fn_lines": 47
     },
     "scripts/watermark_geometry_probe.py": {
-      "lines": 363,
+      "lines": 368,
       "max_fn_cc": 10,
       "max_fn_lines": 53
     },
     "scripts/watermark_sync_probe.py": {
-      "lines": 340,
+      "lines": 330,
       "max_fn_cc": 10,
       "max_fn_lines": 43
     },

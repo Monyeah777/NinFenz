@@ -158,7 +158,7 @@ def verify_inclusion(bundle: dict[str, Any]) -> bool:
         pub = str(bundle["pub"])
         root = str(bundle["root"])
         proof = bundle["proof"]
-    except (KeyError, TypeError):
+    except (KeyError, TypeError):  # 结构缺键 = 证明不可验，按失败处理（不是静默跳过）
         return False
     if len(root) != HEX64_LEN or not isinstance(proof, list):
         return False

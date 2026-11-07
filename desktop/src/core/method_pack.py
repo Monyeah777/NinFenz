@@ -14,9 +14,10 @@ common_failures（常见错法）+ examples（范例）。
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
+
+from core import json_doc
 
 SCHEMA = "nf-method-pack/1"
 INDEX_SCHEMA = "nf-method-pack-index/1"
@@ -45,7 +46,7 @@ def _load_json(path: Path) -> Any:
         raise ValueError("文件不存在：" + str(path)
                          + "（" + GUIDE + "确认路径，或先恢复 protocol/method_packs/）")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json_doc.load(path, dict, what=str(path))
     except (OSError, ValueError) as exc:
         raise ValueError(str(path) + " 不可读或不是合法 JSON：" + str(exc)
                          + "（" + GUIDE + "修好语法后重跑）") from exc

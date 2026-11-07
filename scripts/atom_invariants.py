@@ -21,7 +21,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
-
+from core import (  # noqa: E402 - 承重件在 desktop/src，须在 sys.path 注入后导入
+    atomic_write,
+    json_doc,
+)
 from core.meta_cockpit import atom_catalog, candidate_health  # noqa: E402
 
 OUT_REL = "results/ccos/atom_invariants.json"
@@ -64,7 +67,7 @@ def main(argv=None) -> int:
                   file=sys.stderr)
             return 2
         try:
-            candidates = json.loads(path.read_text(encoding="utf-8"))
+            candidates = json_doc.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
             print("候选文件不可读：" + str(exc), file=sys.stderr)
             return 2
@@ -81,7 +84,7 @@ def main(argv=None) -> int:
     if args.write:
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(render(report), encoding="utf-8")
+        atomic_write.write_text(dest, render(report))
         print("OK 已写入 " + OUT_REL + "（原子 " + str(report["catalog"]["count"]) + " 个）")
         return 0
     if args.check:
@@ -89,7 +92,7 @@ def main(argv=None) -> int:
         if not path.is_file():
             print("缺 " + OUT_REL + "（" + GUIDE + "跑 --write）", file=sys.stderr)
             return 1
-        recorded = json.loads(path.read_text(encoding="utf-8"))
+        recorded = json_doc.loads(path.read_text(encoding="utf-8"))
         if render(recorded) != render(report):
             print("不变量报告与重算不一致（" + GUIDE + "重跑 --write）", file=sys.stderr)
             return 1

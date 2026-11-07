@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from core import json_doc
 from core.cognition_workspace import discourse as dc
 
 SCHEMA = "nf-cog-records/1"
@@ -28,7 +29,7 @@ def append(records: dict[str, Any], state: dict[str, Any], move_id: str,
               "state_digest": new_state["digest"],
               "prev": records["records"][-1]["digest"] if records["records"] else ""}
     record["digest"] = _record_digest(record)
-    new_records = json.loads(json.dumps(records))
+    new_records = json_doc.loads(json.dumps(records))
     new_records["records"].append(record)
     new_records["head"] = record["digest"]
     return new_records, new_state

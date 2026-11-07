@@ -274,6 +274,19 @@ CANON = {
 
 #: 明确**不跑**的面 -> 理由（覆盖式点名：新面若不进 CANON 也不在这里，判据会红）。
 SKIP = {
+    "cog begin": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog step": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog control": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog claim": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog claim-check": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog replay": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog diff": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog status": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog triggers": "需参面（--bundle 必填）——真跑覆盖见 test_cog_cli_faces.py",
+    "cog bridge-commit": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog bridge-obligation": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog bridge-apply": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog bridge-verify": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
     # 写面与交互面不在「只读面真跑」这条判据里；各自的**功能覆盖**另有专件（逐条点名，
     # 免得「跳过」被读成「没人管」）。
     "library attest": "写盘面（改馆藏 frontmatter）——见 test_library.py",

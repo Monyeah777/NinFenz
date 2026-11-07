@@ -20,8 +20,11 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
-
-from core import closure  # noqa: E402
+from core import (  # noqa: E402 - 承重件在 desktop/src，须在 sys.path 注入后导入
+    atomic_write,
+    closure,
+    json_doc,
+)
 
 OUT_REL = "results/ccos/closure.json"
 SCHEMA = "nf-closure-report/1"
@@ -61,7 +64,7 @@ def main(argv=None) -> int:
     if args.write:
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(render(report), encoding="utf-8")
+        atomic_write.write_text(dest, render(report))
         s = report["summary"]
         print("OK 已写入 " + OUT_REL + "（" + str(s["total"]) + " 条：closed "
               + str(s["by_status"].get("closed", 0)) + " · debt "
@@ -72,7 +75,7 @@ def main(argv=None) -> int:
         if not path.is_file():
             print("缺 " + OUT_REL + "（" + GUIDE + "跑 --write）", file=sys.stderr)
             return 1
-        recorded = json.loads(path.read_text(encoding="utf-8"))
+        recorded = json_doc.loads(path.read_text(encoding="utf-8"))
         if render(recorded) != render(report):
             print("闭包报告与重算不一致（" + GUIDE + "重跑 --write）", file=sys.stderr)
             return 1

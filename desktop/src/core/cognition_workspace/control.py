@@ -16,6 +16,7 @@ import hashlib
 import json
 from typing import Any
 
+from core import json_doc
 from core.cognition_workspace import discourse as dc
 from core.cognition_workspace import operators as op
 
@@ -134,8 +135,8 @@ def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
     ritual = ritual_issue(control, op_id, payload)
     if ritual:
         raise ValueError(ritual)
-    new_control = json.loads(json.dumps(control))
-    new_discourse = json.loads(json.dumps(discourse)) if discourse is not None else None
+    new_control = json_doc.loads(json.dumps(control))
+    new_discourse = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
     effect = _apply_effect(new_control, op_id, payload, new_discourse)
     record = {"seq": len(new_control["records"]) + 1, "op": op_id,
               "trigger": trigger or "manual",
@@ -162,7 +163,7 @@ def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> 
         return res
     fresh = new()
     fresh["records"] = []
-    disc = json.loads(json.dumps(discourse)) if discourse is not None else None
+    disc = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
     prev = ""
     for item in control["records"]:
         if str(item.get("prev") or "") != prev:

@@ -18,6 +18,8 @@ import hashlib
 import json
 from typing import Any
 
+from core import json_doc
+
 SCHEMA = "nf-job/1"
 LEDGER_SCHEMA = "nf-job-ledger/1"
 EVENT_SCHEMA = "nf-job-event/1"
@@ -68,7 +70,7 @@ def create(ledger: dict[str, Any], job_id: str, kind: str, contract_digest: str 
         raise ValueError("作业已存在：" + job_id + "（" + GUIDE + "换 id 或复用已有作业）")
     if not str(kind).strip():
         raise ValueError("作业缺 kind（" + GUIDE + "写清是 check/label/evidence-verify 哪类）")
-    new = json.loads(json.dumps(ledger))
+    new = json_doc.loads(json.dumps(ledger))
     new["jobs"][job_id] = {"schema": SCHEMA, "id": str(job_id), "kind": str(kind),
                            "state": "created", "contract_digest": str(contract_digest),
                            "inputs_digest": str(inputs_digest),
@@ -95,7 +97,7 @@ def transition(ledger: dict[str, Any], job_id: str, to_state: str,
         raise ValueError("非法迁移：" + job["state"] + " → " + to_state
                          + "（" + GUIDE + "允许："
                          + "、".join(TRANSITIONS[job["state"]]) + "）")
-    new = json.loads(json.dumps(ledger))
+    new = json_doc.loads(json.dumps(ledger))
     new["jobs"][job_id]["state"] = to_state
     event = _append(new, job_id, "transition",
                     {"from": job["state"], "to": to_state, "witness": witness or {}})
@@ -113,7 +115,7 @@ def attach_receipt(ledger: dict[str, Any], job_id: str, receipt: dict[str, Any])
         raise ValueError("作业已终止，不能再挂回执（" + GUIDE + "回执必须在作业内产生）")
     if not isinstance(receipt, dict) or not str(receipt.get("digest") or ""):
         raise ValueError("回执缺 digest（" + GUIDE + "用 mcp_manifest.receipt 生成）")
-    new = json.loads(json.dumps(ledger))
+    new = json_doc.loads(json.dumps(ledger))
     new["jobs"][job_id]["receipts"].append(str(receipt["digest"]))
     event = _append(new, job_id, "receipt", {"receipt": str(receipt["digest"])})
     new["jobs"][job_id]["events"].append(event["digest"])

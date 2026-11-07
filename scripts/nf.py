@@ -166,6 +166,10 @@ def _add_parser_base(sub):
                           "+ POST /api/check；纯读、无客户端可控路径）")
     srv.add_argument("--port", type=int, default=8765,
                      help="--http 的端口（缺省 8765；0 = 由内核分配）")
+    srv.add_argument("--ingress-policy", dest="ingress_policy", default="",
+                     help="Ingress 策略 JSON（nf-ingress-policy/1：token 白名单/"
+                          "工具白名单/限流/同意）；"
+                          "缺省 = 不过闸（本机直连）")
 
     dsn = sub.add_parser("design",
                          help="决策辅助工具族（v2.6-A：可选装载——钢人论证工作单）",
@@ -549,7 +553,8 @@ def _cmd_cog(args) -> int:
         items = ([cg_moves.describe(args.move_id)] if args.move_id
                  else [cg_moves.describe(m) for m in cg_moves.MOVE_IDS])
         if args.json:
-            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            print(_json.dumps({"kind": "cog-moves", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("== nf cog moves（" + str(len(items)) + " 个元动作）==")
         for item in items:
@@ -590,7 +595,8 @@ def _cmd_cog(args) -> int:
             elif args.job_cmd == "verify":
                 res = cg_job.replay(ledger)
                 if args.json:
-                    print(_json.dumps({"ok": res["ok"], "issues": res["issues"]},
+                    print(_json.dumps({"kind": "cog-job-verify", "ok": res["ok"],
+                                       "issues": res["issues"]},
                                       ensure_ascii=False, indent=2, sort_keys=True))
                 else:
                     print("== nf cog job verify ==")
@@ -609,7 +615,8 @@ def _cmd_cog(args) -> int:
                                   "receipts": len(job["receipts"]),
                                   "digest": cg_job.job_digest(ledger, job_id)})
                 if args.json:
-                    print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+                    print(_json.dumps({"kind": "cog-job-show", "items": items},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
                 else:
                     print("== nf cog job show（" + str(len(items)) + " 个）==")
                     for item in items:
@@ -700,7 +707,8 @@ def _cmd_cog(args) -> int:
                 cc = _read(args.cc_result)
                 res = cg_bridge.verify_commitment(commitment, bundle, claim, cc)
                 if args.json:
-                    print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+                    print(_json.dumps({"kind": "cog-bridge-verify", **res},
+                                      ensure_ascii=False, indent=2, sort_keys=True))
                 else:
                     print("== nf cog bridge-verify ==")
                     print("  一致：" + ("是" if res["ok"] else "否"))
@@ -719,7 +727,8 @@ def _cmd_cog(args) -> int:
         except ValueError as exc:
             return _machine_fail(args, str(exc), 4)
         if args.json:
-            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            print(_json.dumps({"kind": "cog-criteria", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("== nf cog criteria（" + str(len(items)) + " 条）==")
         for item in items:
@@ -779,7 +788,8 @@ def _cmd_cog(args) -> int:
         items = ([cg_ops.describe(args.op_id)] if args.op_id
                  else [cg_ops.describe(o) for o in cg_ops.OPERATOR_IDS])
         if args.json:
-            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            print(_json.dumps({"kind": "cog-ops", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("== nf cog ops（" + str(len(items)) + " 个元算子）==")
         for item in items:
@@ -821,7 +831,8 @@ def _cmd_cog(args) -> int:
         except (OSError, ValueError) as exc:
             return _machine_fail(args, str(exc), 4)
         if args.json:
-            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            print(_json.dumps({"kind": "cog-triggers", "items": items},
+                              ensure_ascii=False, indent=2, sort_keys=True))
         else:
             print("== nf cog triggers ==")
             if not items:
@@ -879,7 +890,8 @@ def _cmd_cog(args) -> int:
         except (OSError, ValueError) as exc:
             return _machine_fail(args, str(exc), 4)
         if args.json:
-            print(_json.dumps({"ok": res["ok"], "issues": res["issues"],
+            print(_json.dumps({"kind": "cog-replay", "ok": res["ok"],
+                               "issues": res["issues"],
                                "digest": (res["state"] or {}).get("digest")},
                               ensure_ascii=False, indent=2, sort_keys=True))
         else:
@@ -2767,6 +2779,22 @@ def _cmd_render(args) -> int:
     return 0
 
 
+def _ingress_from(args):
+    """--ingress-policy → Ingress 实例；策略不合规就拒绝启动（网关宁可不服务，不带病放行）。"""
+    rel = str(getattr(args, "ingress_policy", "") or "")
+    if not rel:
+        return None
+    from core import json_doc as _jd
+    from core import mcp_ingress as _ing
+    doc = _jd.load(_rel_out(rel), dict, what=rel)
+    issues = _ing.validate_policy(doc)
+    if issues:
+        raise SystemExit("Ingress 策略不合法：" + "；".join(issues[:3])
+                         + "（修复指引：按 nf-ingress-policy/1 修策略后重试）")
+    side_effects = {str(k): str(v) for k, v in (doc.get("side_effects") or {}).items()}
+    return _ing.Ingress(doc, side_effects=side_effects)
+
+
 def _cmd_serve(args) -> int:
     """nf serve [mcp.json]：stdio JSON-RPC 服务（C1，MCP client 拉起）。
 
@@ -2803,7 +2831,9 @@ def _cmd_serve(args) -> int:
     # 参数 ⇄ inputSchema 校验器**在此注入**（依赖倒置：mcp_runtime 是稳定侧，不反向依赖
     # 校验器；见其 __init__ docstring）——上架通道因此逐条执行 tools/list 里那份声明。
     from core import json_schema
-    return McpRuntime(snapshot, schema_check=json_schema.json_schema_check).serve_stdio()
+    ingress = _ingress_from(args)
+    return McpRuntime(snapshot, schema_check=json_schema.json_schema_check,
+                      ingress=ingress).serve_stdio()
 
 
 def _cmd_design(args) -> int:
@@ -6361,7 +6391,6 @@ def _cmd_cognition(args):
                 print(f"  已写入：{_rel_display(_rel_out(args.out))}")
         return 0
 
-    from core import cognition as cg2  # noqa: F401 —— 下面的门禁分支沿用原名
     part = getattr(args, "part", "") or ""
     fns = {"glossary": cg.verify_glossary, "modes": cg.verify_modes}
     picked = [k for k in fns if not part or k == part]
@@ -6733,7 +6762,10 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "experiment", "ballots", "bundle",
                     "policy", "revocations", "anchor", "items", "table", "prev",
                     "label_object", "ir", "sidecar", "decision",
-                    "compile")
+                    "compile",
+                    # 认知工作台 / 桥 / 作业 / Ingress（2026-11-08 新增面）
+                    "claim_file", "cc_result", "commitment", "obligation", "delta",
+                    "receipt", "job_id", "ledger", "ingress_policy", "evidence")
 
 
 def _path_writing_issue(args) -> str:
@@ -6787,7 +6819,12 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "snapshot",
                     "source", "ssh_allowed_signers", "state", "state_path", "subject",
                     "target", "template", "tier", "trace", "verify",
-                    "injections", "journal", "responses", "experiment", "ballots", "bundle")
+                    "injections", "journal", "responses", "experiment", "ballots", "bundle",
+                    # 认知/桥/作业面读进来的文本件（2026-11-08）
+                    "claim_file", "cc_result", "commitment", "obligation", "delta",
+                    "receipt", "ingress_policy", "evidence",
+                    "delta_json", "payload_json", "payload", "witness", "kt_keys",
+                    "research_topic")
 
 
 def _utf8_text_issue(args) -> str:

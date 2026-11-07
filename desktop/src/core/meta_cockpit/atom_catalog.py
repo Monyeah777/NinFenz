@@ -16,9 +16,10 @@
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
+
+from core import json_doc
 
 SCHEMA = "nf/atom-catalog/2"
 V1_SCHEMA = "nf/meta-atoms/1"
@@ -39,7 +40,7 @@ def _load(root: str, rel: str, schema: str) -> Any:
     if not path.is_file():
         raise ValueError("文件不在场：" + rel + "（" + GUIDE + "确认路径）")
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError(rel + " 不是合法 JSON：" + str(exc)) from exc
     if str(doc.get("schema") or "") != schema:
@@ -54,7 +55,7 @@ def _pack_actions(root: str) -> set[str]:
     if not path.is_file():
         return used
     try:
-        index = json.loads(path.read_text(encoding="utf-8"))
+        index = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return used
     for item in index.get("packs") or []:
@@ -62,7 +63,7 @@ def _pack_actions(root: str) -> set[str]:
         if not pack_path.is_file():
             continue
         try:
-            pack = json.loads(pack_path.read_text(encoding="utf-8"))
+            pack = json_doc.loads(pack_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
         for move in pack.get("expert_moves") or []:
@@ -76,7 +77,7 @@ def _compositions(root: str) -> dict[str, list[str]]:
     if not path.is_file():
         return {}
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError(COMPOSITION_REL + " 不是合法 JSON：" + str(exc)) from exc
     if str(doc.get("schema")) != COMPOSITION_SCHEMA:
@@ -104,7 +105,7 @@ def _debt(root: str) -> dict[str, str]:
     if not path.is_file():
         return {}
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
     return {str(item.get("id")): str(item.get("reason") or "")

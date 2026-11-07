@@ -14,8 +14,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
 from core.exporter import export  # noqa: E402
+from core.ir import IRDocument, IRLayer, IRModule  # noqa: E402
 
 
 def _techdoc_ir():

@@ -60,9 +60,6 @@ def triggers(bundle: dict[str, Any]) -> list[dict[str, Any]]:
     return ct.triggers(bundle["state"], _control_of(bundle))
 
 
-def replay_control(bundle: dict[str, Any]) -> dict[str, Any]:
-    return ct.replay(_control_of(bundle), bundle.get("state"))
-
 
 def close(bundle: dict[str, Any], verdict: str = "") -> dict[str, Any]:
     state = dc.close(bundle["state"], verdict=verdict)
@@ -75,7 +72,15 @@ def status(bundle: dict[str, Any]) -> dict[str, Any]:
 
 
 def replay(bundle: dict[str, Any]) -> dict[str, Any]:
-    return rc.replay(bundle["records"])
+    """重放记录链；有控制面时一并校验控制面（两套 trace 都过才算 ok）。"""
+    base = rc.replay(bundle["records"])
+    if not base["ok"]:
+        return base
+    control_check = ct.replay(_control_of(bundle), bundle.get("state"))
+    if not control_check["ok"]:
+        return {"ok": False, "state": None,
+                "issues": ["控制面重放失败：" + i for i in control_check["issues"]]}
+    return base
 
 
 def diff(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:

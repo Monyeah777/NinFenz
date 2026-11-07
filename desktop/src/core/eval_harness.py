@@ -16,6 +16,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from core import json_doc
+
 PROTOCOL_SCHEMA = "nf-eval-protocol/1"
 RUN_SCHEMA = "nf-eval-run/1"
 COMPARE_SCHEMA = "nf-eval-compare/1"
@@ -42,7 +44,7 @@ def load_protocol(root: str = ".") -> dict[str, Any]:
     if not path.is_file():
         raise ValueError("评测协议不在场：" + REL + "（" + GUIDE + "确认 protocol/eval/）")
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc = json_doc.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError(REL + " 不是合法 JSON：" + str(exc)) from exc
     issues = validate_protocol(doc)
@@ -193,3 +195,22 @@ def compare(protocol: dict[str, Any], runs: list[dict[str, Any]]) -> dict[str, A
             "note": "只给计数差与中位数；不给 p 值、不排序、不合成总分",
             "warning": ("table_external_mechanisms 越低越说明被菜单窄化——"
                         "这是唯一专治「越建越窄」的指标")}
+
+
+def validate(record: Any) -> list[str]:
+    """校验一条评测用例记录（能力契约 eval-harness 的入口）→ 问题列表。
+
+    契约口径：合法记录（含 case_id/ok/at/trigger 等）→ 空列表；缺关键字段 → 非空。
+    """
+    issues: list[str] = []
+    if not isinstance(record, dict):
+        return ["评测记录必须是对象（" + GUIDE + "见 nf-eval-run/1 的 items 条目）"]
+    for field in ("case_id", "ok", "at", "trigger"):
+        if field not in record:
+            issues.append("评测记录缺 " + field + "（" + GUIDE + "补该字段）")
+    if "ok" in record and not isinstance(record.get("ok"), bool):
+        issues.append("ok 必须是布尔（" + GUIDE + "别用字符串）")
+    cost = record.get("cost_usd")
+    if cost is not None and not isinstance(cost, (int, float)):
+        issues.append("cost_usd 必须是数字（" + GUIDE + "无成本写 0）")
+    return issues

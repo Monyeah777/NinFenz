@@ -5,6 +5,7 @@ digest = sha256(canonical(state 去掉 digest 字段))，任何一步改动都�
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from typing import Any
@@ -149,7 +150,7 @@ def append_move(state: dict[str, Any], move_id: str,
     if state["budget"]["steps_used"] >= state["budget"]["steps_max"]:
         raise ValueError("步数已到上限 " + str(state["budget"]["steps_max"])
                          + "（" + GUIDE + "收口或新开会话）")
-    new_state = json.loads(json.dumps(state))
+    new_state = copy.deepcopy(state)
     apply_delta(new_state, move_id, delta)
     new_state["moves"].append({"seq": len(new_state["moves"]) + 1, "move": move_id,
                                "delta": delta})
@@ -158,7 +159,7 @@ def append_move(state: dict[str, Any], move_id: str,
 
 
 def close(state: dict[str, Any], verdict: str = "") -> dict[str, Any]:
-    new_state = json.loads(json.dumps(state))
+    new_state = copy.deepcopy(state)
     new_state["status"] = "closed"
     if verdict:
         new_state["verdict"] = str(verdict)

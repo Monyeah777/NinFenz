@@ -6,7 +6,7 @@
     "prod": 1055,
     "projection": 153,
     "support": 421,
-    "verify": 1014
+    "verify": 1015
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7679,6 +7679,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "cog 机器面真跑覆盖（每张 --json 面都点名，防「跳过=没人管」）。",
+      "path": "desktop/tests/test_cog_cli_faces.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "认知族（术语表 / 执行分档）正式与否定用例。",
       "path": "desktop/tests/test_cognition.py",
       "role": "verify",
@@ -12456,7 +12462,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4ce642946c60b945fefce37b60775e9199bbe06e4eea1d89be515a1fccf06cbd",
+  "root_digest": "8d6fd664a1cbc000a1542c8d97dc086ac5576362a9d34b48249df2f4ea14de0a",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 274,
@@ -12465,7 +12471,7 @@
     "R-prod": 944,
     "R-projection": 134,
     "R-support": 119,
-    "R-verify": 889,
+    "R-verify": 890,
     "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"

@@ -27,6 +27,11 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
+from core import (  # noqa: E402 - 承重件在 desktop/src，须在 sys.path 注入后导入
+    atomic_write,  # noqa: E402
+    json_doc,  # noqa: E402
+)
+
 sys.path.insert(0, str(ROOT / "scripts"))
 
 OUT_REL = "results/ccos/watermark_dct_probe.json"
@@ -290,7 +295,7 @@ def main(argv=None) -> int:
     if args.write:
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(render(doc), encoding="utf-8")
+        atomic_write.write_text(dest, render(doc))
         print("OK 已写入 " + OUT_REL)
         return 0
     if args.check:
@@ -298,7 +303,7 @@ def main(argv=None) -> int:
         if not path.is_file():
             print("缺 " + OUT_REL + "（" + GUIDE + "跑 --write）", file=sys.stderr)
             return 1
-        recorded = json.loads(path.read_text(encoding="utf-8"))
+        recorded = json_doc.loads(path.read_text(encoding="utf-8"))
         if render(recorded) != render(doc):
             print("探针结果与重算不一致（" + GUIDE + "重跑 --write）", file=sys.stderr)
             return 1
