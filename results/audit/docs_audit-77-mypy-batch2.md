@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:d1a0d6c7fbea0ee3fb1cf8585190ba957a3994df5971180f5e2b46677a0befab
+  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
 ---
+> 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
+
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）
 
 > 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）

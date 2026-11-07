@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1055,
     "projection": 148,
-    "support": 398,
-    "verify": 995
+    "support": 403,
+    "verify": 996
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7631,6 +7631,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "认知工作台 L0 判据：话语状态 + 15 元动作 + 只追加记录 + 重放 + 依赖方向。",
+      "path": "desktop/tests/test_cognition_workspace.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "提交信息机检单测（CONTRIBUTING §1 判据化 · 含\"不打断自动化\"回归）。",
       "path": "desktop/tests/test_commit_msg.py",
       "role": "verify",
@@ -12342,16 +12348,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "99b7ca4375970e4283c81c0735dda97712ee83aa67465097f3497163cf90348f",
+  "root_digest": "91874ee1f0ce3fdc8937749ec9688fdce69a73416dc36d87e29825554d80b624",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 252,
+    "R-catch": 257,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 129,
     "R-support": 119,
-    "R-verify": 875,
+    "R-verify": 876,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"

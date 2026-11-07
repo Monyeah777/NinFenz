@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:d1a0d6c7fbea0ee3fb1cf8585190ba957a3994df5971180f5e2b46677a0befab
+  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
 ---
+> 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
+
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）
 
 > 重审（2026-11-08）：同步层探针（同步字平铺 + 网格搜索，负结果可复算）

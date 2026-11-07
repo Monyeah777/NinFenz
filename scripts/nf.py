@@ -371,6 +371,175 @@ def _add_parser_catalog(sub):
 
 
 
+def _add_parser_cog(sub):
+    """认知工作台 L0：begin / step / replay / diff / moves / status。"""
+    cog = sub.add_parser("cog", help="认知工作台（话语状态 + 15 元动作 + 重放）",
+                         description="nf cog：L0 认知工作台。每步必须带 frame_delta"
+                                     "（框架变化见证），否则判失败；记录只追加，可重放复算。")
+    csub = cog.add_subparsers(dest="cog_cmd")
+    cb = csub.add_parser("begin", help="开一个会话（问题陈述必填）",
+                         description="开新会话：生成 discourse 状态与空记录链。")
+    cb.add_argument("--problem", required=True, help="问题陈述（一句能被反驳的话）")
+    cb.add_argument("--steps-max", dest="steps_max", type=int, default=24,
+                    help="步数上限（默认 24）")
+    cb.add_argument("--out", required=True, help="会话文件（bundle：state + records）")
+    cb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cs = csub.add_parser("step", help="执行一个元动作（必须带 frame_delta）",
+                         description="执行一步：校验动作契约与 frame_delta 语义，"
+                                     "写记录并推进状态。")
+    cs.add_argument("--bundle", required=True, help="会话文件")
+    cs.add_argument("--move", required=True, help="元动作 id（见 nf cog moves）")
+    cs.add_argument("--delta", default="", help="frame_delta JSON 文件")
+    cs.add_argument("--delta-json", dest="delta_json", default="",
+                    help="frame_delta 内联 JSON（与 --delta 二选一）")
+    cs.add_argument("--out", default="", help="写回会话文件（缺省=只打印）")
+    cs.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cr = csub.add_parser("replay", help="从记录重放复算状态",
+                         description="重放：逐步重建状态并校验每步 state_digest。")
+    cr.add_argument("--bundle", required=True, help="会话文件")
+    cr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cd = csub.add_parser("diff", help="两次会话的动作序列差异",
+                         description="对比两次会话的元动作序列（只列事实差异）。")
+    cd.add_argument("--a", required=True, help="会话 A")
+    cd.add_argument("--b", required=True, help="会话 B")
+    cd.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cm = csub.add_parser("moves", help="列出 15 个元动作及其契约",
+                         description="列出元动作：when / 允许的 frame_delta / 失败模式。")
+    cm.add_argument("--id", dest="move_id", default="", help="只看一个动作")
+    cm.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ct = csub.add_parser("status", help="看会话摘要（只计数）",
+                         description="摘要：动作数/假设数/张力数/未答问题数/digest。")
+    ct.add_argument("--bundle", required=True, help="会话文件")
+    ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+
+def _cmd_cog(args) -> int:
+    """认知工作台命令实现。"""
+    import json as _json
+
+    from core import atomic_write
+    from core.cognition_workspace import moves as cg_moves
+    from core.cognition_workspace import session as cg_session
+
+    def _read(path):
+        try:
+            with open(_rel_out(path), encoding="utf-8") as handle:
+                return _json.load(handle)
+        except (OSError, ValueError) as exc:
+            raise ValueError("会话文件不可读：" + str(exc)
+                             + "（修复指引：用 nf cog begin 生成）") from exc
+
+    def _write(path, bundle):
+        atomic_write.write_text(_rel_out(path),
+                                _json.dumps(bundle, ensure_ascii=False, indent=2,
+                                            sort_keys=True) + chr(10))
+
+    sub = getattr(args, "cog_cmd", None)
+    if not sub:
+        print("用法：nf cog begin|step|replay|diff|moves|status ...", file=sys.stderr)
+        return 2
+    if sub == "moves":
+        items = ([cg_moves.describe(args.move_id)] if args.move_id
+                 else [cg_moves.describe(m) for m in cg_moves.MOVE_IDS])
+        if args.json:
+            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog moves（" + str(len(items)) + " 个元动作）==")
+        for item in items:
+            print("  " + item["id"] + "：" + item["name"])
+            print("    何时：" + item["when"])
+            print("    frame_delta：" + "、".join(item["delta_kinds"]))
+            print("    失败模式：" + item["failure_mode"])
+        return 0
+    if sub == "begin":
+        try:
+            bundle = cg_session.begin(args.problem, steps_max=args.steps_max)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["state"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            print("== nf cog begin ==")
+            print("  会话：" + bundle["state"]["session_id"])
+            print("  问题：" + args.problem)
+            print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "step":
+        try:
+            bundle = _read(args.bundle)
+            if args.delta and args.delta_json:
+                raise ValueError("--delta 与 --delta-json 只能给一个（修复指引：二选一）")
+            if args.delta:
+                with open(_rel_out(args.delta), encoding="utf-8") as handle:
+                    delta = _json.load(handle)
+            elif args.delta_json:
+                delta = _json.loads(args.delta_json)
+            else:
+                raise ValueError("缺 frame_delta（修复指引：--delta 或 --delta-json）")
+            bundle = cg_session.step(bundle, args.move, delta)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["state"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            summary = cg_session.status(bundle)
+            print("== nf cog step ==")
+            print("  动作：" + args.move + " · 已用 " + str(summary["moves_used"])
+                  + "/" + str(summary["steps_max"]) + " 步")
+            print("  状态 digest：" + summary["digest"][:16])
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "replay":
+        try:
+            res = cg_session.replay(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps({"ok": res["ok"], "issues": res["issues"],
+                               "digest": (res["state"] or {}).get("digest")},
+                              ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog replay ==")
+            print("  判定：" + ("ok" if res["ok"] else "invalid"))
+            for issue in res["issues"]:
+                print("  [FAIL] " + issue, file=sys.stderr)
+        return 0 if res["ok"] else 1
+    if sub == "diff":
+        try:
+            res = cg_session.diff(_read(args.a), _read(args.b))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog diff ==")
+            print("  动作序列相同：" + ("是" if res["same_sequence"] else "否"))
+            print("  仅 A 有：" + str(res["only_in_a"]))
+            print("  仅 B 有：" + str(res["only_in_b"]))
+        return 0
+    if sub == "status":
+        try:
+            summary = cg_session.status(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog status ==")
+            for key in ("session_id", "status", "moves_used", "steps_max",
+                        "assumptions", "tensions", "open_questions", "digest"):
+                print("  " + key + "：" + str(summary[key]))
+        return 0
+    print("未知子命令：" + str(sub), file=sys.stderr)
+    return 2
+
+
 def _add_parser_evidence_face(sub):
     """label / evidence / check / resolve 族的参数面（拆分只为把单函数压回 300 行内）。"""
     lab = sub.add_parser("label",
@@ -694,6 +863,7 @@ def _add_parser_production(sub):
     at.add_argument("--selfcheck", action="store_true",
                     help="体检「外部验签」机制：独立子进程验签 + 篡改必红（check42 的用户侧入口）")
     at.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_cog(sub)
     _add_parser_evidence_face(sub)
 
 
@@ -8947,6 +9117,7 @@ _COMMAND_HANDLERS = {
     "postmortem": _cmd_postmortem,
     "audit": _cmd_audit,
     "cognition": _cmd_cognition,
+    "cog": _cmd_cog,
     "st-validate": _cmd_st_validate,
     "state-front": _cmd_state_front,
     "diff": _cmd_diff,
