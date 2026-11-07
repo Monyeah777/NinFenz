@@ -144,5 +144,5 @@ expires_at, basis}`（`basis` = `expires_at|ttl|none`）；`nf evidence verify` 
 ## 复核
 
 ```bash
-python -m unittest desktop.tests.test_revocations    # 34 项：签名/篡改/缺密钥/回滚/分叉/合并/新鲜度
+python -m unittest desktop.tests.test_revocations    # 43 项：签名/篡改/缺密钥/回滚/分叉/合并/新鲜度/ed25519
 ```

@@ -16,7 +16,7 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:dd00f9f9799ce425fdd47143840db28b47d8ee9c681dd30804e097563415c525
+  - scripts/nf.py:c9bcb25d469f55d6e4c8ace6c8cd3f99bc04000f6ca19b5ba62e1ebb5c7b29fe
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:4f93dbe7465722eb270712737a9f85814729763259450f8b65789048197aecfe
   - protocol/coupling_baseline.json:6713ca489f02179eb294c9ab18288a27d1cc9e43f085f941b6bc3d93849c71fa
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
+
 > 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
 > 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）

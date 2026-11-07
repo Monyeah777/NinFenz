@@ -5707,7 +5707,8 @@ def _path_writing_issue(args) -> str:
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
                        "label_object": "被标注对象可以是任意字节（图片/音视频）",
-                       "evidence_bundle": "证据包是 zip（二进制容器）"}
+                       "evidence_bundle": "证据包是 zip（二进制容器）",
+                       "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
                     "batch_target",
                     "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",
