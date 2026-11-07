@@ -165,5 +165,37 @@ class RealRepoTest(unittest.TestCase):
                             "每条声明须有 id 与 cmd：%s" % it)
 
 
+class ExpiryWarningTest(unittest.TestCase):
+    """临近过期必须**提前喊**：否则门禁在午夜自己变红，和「提交坏了」长得一样。"""
+
+    def _scan_at(self, days_old: int):
+        today = dt.date(2026, 11, 7)
+        ran = (today - dt.timedelta(days=days_old)).isoformat()
+        with tempfile.TemporaryDirectory() as tmp:
+            _decl(tmp, ONE, {"x": {"cmd": "python -c pass", "exit_code": 0, "ran_at": ran}})
+            return ie.scan(tmp, today=today)
+
+    def test_fresh_record_has_no_warning(self):
+        issues, warns, _stats = self._scan_at(0)
+        self.assertEqual([], issues)
+        self.assertEqual([], warns)
+
+    def test_near_expiry_warns_but_does_not_fail(self):
+        issues, warns, _stats = self._scan_at(6)      # 7 天上限：剩 1 天
+        self.assertEqual([], issues)
+        self.assertEqual(1, len(warns))
+        self.assertIn("天后过期", warns[0])
+        self.assertIn("修复指引", warns[0])
+
+    def test_expired_is_fail_not_warn(self):
+        issues, warns, _stats = self._scan_at(8)
+        self.assertTrue(any("已过期" in i for i in issues), issues)
+        self.assertEqual([], warns)
+
+    def test_warning_window_is_capped_by_max_age(self):
+        # max_age_days=3 的短窗口：剩余 <= 3 天就该喊（不能被 7 天常量吞掉）
+        self.assertLessEqual(ie.WARN_DAYS_BEFORE_EXPIRY, 7)
+
+
 if __name__ == "__main__":
     unittest.main()

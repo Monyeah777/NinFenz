@@ -37,7 +37,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from core import atomic_write
 from core import json_doc
-from . import scan_memo
 from core import repo_face
 
 DECL_REL = "protocol/LAYERS.json"
@@ -154,20 +153,6 @@ def _rule_hits(roles: Dict[str, Any], files: List[str]) -> List[Dict[str, Any]]:
     return out
 
 
-def writes_disk_at(root: str, rel: str) -> bool:
-    """`writes_disk` 的**按文件缓存**版：同一次扫描里同一文件只解析一次 AST。
-
-    `verify_report` 的 ③/核内一致两条判据都会问同一批文件「是否自带写盘入口」，
-    旧写法每问一次就 `ast.parse` 一次（实测 role_model.scan 7.0 s 的主因）。
-    """
-    text = scan_memo.read_text(Path(root) / rel) or ""
-    if "atomic_write" not in text:
-        # 文本预筛：写入口判据要求函数体里**字面出现** `atomic_write.<...>(`，正文没有该子串
-        # 就不可能命中——直接 False，不触发 AST（全仓 ~700 个 py 逐个 parse 曾是 7 s 主因）。
-        return False
-    return bool(scan_memo.facts("writes_disk", Path(root) / rel, lambda: writes_disk(text)))
-
-
 def writes_disk(text: str) -> bool:
     """该件是否**真**带写盘入口：顶层 `def write/refresh/…` 体内调用 `atomic_write.*`。
 
@@ -260,7 +245,7 @@ def _signal_role_uncached(root: str, rel: str) -> str:
         return "floor"
     if _SCAN_DEF.search(text):
         return "verify"          # 判据入口 = 只读面（自带写入口由写例外表逐条登记）
-    if writes_disk_at(root, rel):
+    if writes_disk(text):
         return "projection"
     doc = self_line(root, rel)
     for role, rx in _VERB:
@@ -433,7 +418,7 @@ def _kernel_issues(root: str, kernel: List[str], rules: List[Dict[str, Any]],
         if text is None:
             # 可吞：该件读不到 → 本判据跳过；「件不在场」另有 ① 覆盖判据兜着，不重复报。
             continue
-        if writes_disk_at(root, rel):
+        if writes_disk(text):
             writers.append(rel)
             if rel not in exc:
                 issues.append("③ verify 件自带写盘入口未登记：%s（修复指引：在 roles.write_exceptions "
@@ -474,7 +459,3 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
              "kernel_no_self": sum(1 for r in kernel if not coords[r]["function"]),
              "verify_writers": len(writers), "write_exceptions": len(exc)}
     return issues, stats
-
-
-#: 公开入口自成扫描作用域（读面/AST/事实/stat 去重共享；退出即清）
-scan = scan_memo.scoped(scan)

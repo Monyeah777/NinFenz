@@ -1,0 +1,153 @@
+{
+  "count": 6,
+  "schema": "nf-check-vectors/1",
+  "vectors": [
+    {
+      "desc": "四类规则全过",
+      "expected": {
+        "exit_code": 0,
+        "verdict": "ok"
+      },
+      "id": "ok_all_kinds",
+      "object_b64": "55SxIEFJIOeUn+aIkOeahOWGheWuueOAggrmnKzooYznlKjkuo7plb/luqbkuI7ooYzmlbDliKTlrprjgIIK",
+      "object_sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd",
+      "policy": {
+        "id": "ok-all",
+        "rules": [
+          {
+            "fix": "修复指引：示例",
+            "id": "r-utf8",
+            "kind": "utf8"
+          },
+          {
+            "fix": "修复指引：示例",
+            "id": "r-present",
+            "kind": "regex_present",
+            "pattern": "AI"
+          },
+          {
+            "field": "bytes",
+            "fix": "修复指引：示例",
+            "id": "r-count",
+            "kind": "count_at_least",
+            "n": 10
+          },
+          {
+            "fix": "修复指引：示例",
+            "id": "r-digest",
+            "kind": "digest_pin",
+            "sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd"
+          }
+        ],
+        "schema": "nf-check-policy/1"
+      }
+    },
+    {
+      "desc": "禁止内容出现",
+      "expected": {
+        "exit_code": 1,
+        "verdict": "invalid"
+      },
+      "id": "regex_absent_hit",
+      "object_b64": "55SxIEFJIOeUn+aIkOeahOWGheWuueOAggrmnKzooYznlKjkuo7plb/luqbkuI7ooYzmlbDliKTlrprjgIIK",
+      "object_sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd",
+      "policy": {
+        "id": "absent-hit",
+        "rules": [
+          {
+            "fix": "修复指引：示例",
+            "id": "r-absent",
+            "kind": "regex_absent",
+            "pattern": "AI"
+          }
+        ],
+        "schema": "nf-check-policy/1"
+      }
+    },
+    {
+      "desc": "warn 级违规不改判定",
+      "expected": {
+        "exit_code": 0,
+        "verdict": "ok"
+      },
+      "id": "warn_does_not_flip",
+      "object_b64": "55SxIEFJIOeUn+aIkOeahOWGheWuueOAggrmnKzooYznlKjkuo7plb/luqbkuI7ooYzmlbDliKTlrprjgIIK",
+      "object_sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd",
+      "policy": {
+        "id": "warn-only",
+        "rules": [
+          {
+            "fix": "修复指引：示例",
+            "id": "r-warn",
+            "kind": "regex_present",
+            "pattern": "不存在的词",
+            "severity": "warn"
+          },
+          {
+            "fix": "修复指引：示例",
+            "id": "r-utf8",
+            "kind": "utf8"
+          }
+        ],
+        "schema": "nf-check-policy/1"
+      }
+    },
+    {
+      "desc": "摘要钉不符",
+      "expected": {
+        "exit_code": 1,
+        "verdict": "invalid"
+      },
+      "id": "digest_mismatch",
+      "object_b64": "55SxIEFJIOeUn+aIkOeahOWGheWuueOAggrmnKzooYznlKjkuo7plb/luqbkuI7ooYzmlbDliKTlrprjgIIK",
+      "object_sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd",
+      "policy": {
+        "id": "digest-bad",
+        "rules": [
+          {
+            "fix": "修复指引：示例",
+            "id": "r-digest",
+            "kind": "digest_pin",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "schema": "nf-check-policy/1"
+      }
+    },
+    {
+      "desc": "非 UTF-8 对象",
+      "expected": {
+        "exit_code": 1,
+        "verdict": "invalid"
+      },
+      "id": "non_utf8_fails",
+      "object_b64": "//4AAW5vdC11dGY4",
+      "object_sha256": "8e13aa763e814cb35cc6671006d19cb368ce912abf9c3f0cd9e2c980eecfd05f",
+      "policy": {
+        "id": "utf8-only",
+        "rules": [
+          {
+            "fix": "修复指引：示例",
+            "id": "r-utf8",
+            "kind": "utf8"
+          }
+        ],
+        "schema": "nf-check-policy/1"
+      }
+    },
+    {
+      "desc": "坏策略必须拒绝（rc=4）",
+      "expected": {
+        "exit_code": 4,
+        "rejected": true
+      },
+      "id": "bad_policy_rejected",
+      "object_b64": "55SxIEFJIOeUn+aIkOeahOWGheWuueOAggrmnKzooYznlKjkuo7plb/luqbkuI7ooYzmlbDliKTlrprjgIIK",
+      "object_sha256": "27e99709d636cdbcd5f8fe197921039e3542f46175e8f4c42eae48700ead97fd",
+      "policy": {
+        "rules": [],
+        "schema": "nope"
+      }
+    }
+  ]
+}

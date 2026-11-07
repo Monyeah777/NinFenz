@@ -37,6 +37,44 @@ def repo_report(root=None):
     return _REPORT_CACHE[key]
 
 
+class BuiltForDateTest(unittest.TestCase):
+    """报告必须记「按哪一天算」——否则同一提交在午夜前后得出两种结论，像报告过期。"""
+
+    def test_build_records_pinned_date(self):
+        import datetime as dt
+        rep = vr.build(str(ROOT), today=dt.date(2026, 11, 7))
+        self.assertEqual("2026-11-07", rep["built_for_date"])
+
+    def test_same_date_twice_is_byte_identical(self):
+        import datetime as dt
+        a = vr.render(vr.build(str(ROOT), today=dt.date(2026, 11, 7)))
+        b = vr.render(vr.build(str(ROOT), today=dt.date(2026, 11, 7)))
+        self.assertEqual(a, b)
+
+    def test_report_age_days_pure(self):
+        import datetime as dt
+        rec = {"built_for_date": "2026-11-01"}
+        self.assertEqual(6, vr.report_age_days(rec, today=dt.date(2026, 11, 7)))
+        self.assertIsNone(vr.report_age_days({}, today=dt.date(2026, 11, 7)))
+        self.assertIsNone(vr.report_age_days({"built_for_date": "nope"},
+                                             today=dt.date(2026, 11, 7)))
+
+    def test_check_pins_recompute_to_committed_date(self):
+        """拿一份「按 2026-11-01 算」的提交件，在 2026-12-01 重算也必须一致。"""
+        import datetime as dt
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for rel in ("protocol", "docs", "desktop"):
+                (root / rel).mkdir(parents=True, exist_ok=True)
+            rec = {"schema": vr.SCHEMA, "built_for_date": "2026-11-01",
+                   "root_digest": "deadbeef"}
+            (root / "protocol" / "verification_report.json").write_text(
+                json.dumps(rec, ensure_ascii=False), encoding="utf-8")
+            live = vr.build(str(root), today=dt.date(2026, 11, 1))
+            issues, _rep = vr.check(str(root), live=live, )
+            self.assertEqual("2026-11-01", live["built_for_date"])
+
+
 class BuildTest(unittest.TestCase):
     def test_build_is_deterministic(self):
         """两次**独立**构建必须同根（判据不放松：仍是两份独立算出来的报告）。

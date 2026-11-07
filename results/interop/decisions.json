@@ -336,6 +336,18 @@
       "id": "AUD-0046",
       "title": "官方核心语义通用化（03/04/05 去叙述、域中立；协议层与门禁同步）",
       "verdict": "pass"
+    },
+    {
+      "date": "2026-10-30",
+      "id": "AUD-0047",
+      "title": "元认知生产驾驶舱主仓融合",
+      "verdict": "pass"
+    },
+    {
+      "date": "2026-10-30",
+      "id": "AUD-0048",
+      "title": "契约级演进时间线",
+      "verdict": "pass"
     }
   ],
   "responseContract": {

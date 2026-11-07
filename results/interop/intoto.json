@@ -2,9 +2,9 @@
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
     "algorithm": "RFC6962-style sha256 domain-separated",
-    "count": 67,
+    "count": 66,
     "note": "派生自 protocol/RECEIPTS.json；inclusion proof 留在原回执单根内。",
-    "root": "d943f4393200fd8a6b109e291ce32c64f6434e977d56ace4ba8b8986100acb05",
+    "root": "ecbf6addf98585495eaa93392654f3171ffc39abaccb89501b3e518936677ac5",
     "scope": "protocol"
   },
   "predicateType": "https://ninfenz.dev/attestation/protocol-receipts/v1",
@@ -41,7 +41,7 @@
     },
     {
       "digest": {
-        "sha256": "b65f8cb1b6492c6c0a2bc400cd210cff6604e4a02fcf2dae05dadf666775f23c"
+        "sha256": "ba9f46f80fae844c614bebf52a8d392606ee59114f51a09696b20c43d695d350"
       },
       "name": "llms.txt"
     },
@@ -113,7 +113,7 @@
     },
     {
       "digest": {
-        "sha256": "177763f62f6e4aa736f613f8478bf5ef3a5f978a75872baf9f7947b818bbb37b"
+        "sha256": "ae6d2de6f37f027a4b04140e768c41b838a8fce0744cb9c1e6ba6d7af6831619"
       },
       "name": "protocol/conformance_report.json"
     },
@@ -137,19 +137,19 @@
     },
     {
       "digest": {
-        "sha256": "b2e0a11170c131b347ce0f5f08b9292c75d971d03b84d3a1618459dab0947e20"
+        "sha256": "30af156506df4a86e8175f678526270ffe9ad922ae6cd13f47e7284968829cc5"
       },
       "name": "protocol/role_coordinates.json"
     },
     {
       "digest": {
-        "sha256": "7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a"
+        "sha256": "6503dbf027b525141363cd12bc004f94e5ab5bf89bc0754c23497b3cdf80f92f"
       },
       "name": "protocol/code_metrics_baseline.json"
     },
     {
       "digest": {
-        "sha256": "e1bb200979cb38c08015a42306d0da0e44e314e591492c574a6772f117b151a0"
+        "sha256": "78e2cf2dedd184567f5522117fe449d51dcce824f3e12195daeff183867418db"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -161,13 +161,13 @@
     },
     {
       "digest": {
-        "sha256": "935562e73e3c465f81d45f1c65a4a446919a56ee4c23092f603751e791fe2cd3"
+        "sha256": "e59b380d55c1bc6c8008ae616204b4ec29fe5488110539efaceb21dbf2fe7fa5"
       },
       "name": "protocol/instruction_evidence.json"
     },
     {
       "digest": {
-        "sha256": "bd408ead44d97cb6120a8c0207cd1cb7d5227297f17d50107933c7d03d45c6aa"
+        "sha256": "e4d3a4cfb1a68a78ff5e138d4df760adad9175ffe8ee158e223c5beb9d58acff"
       },
       "name": "protocol/perf_budget.json"
     },
@@ -179,7 +179,7 @@
     },
     {
       "digest": {
-        "sha256": "98973e7be4322d438bdf92e11b09d668edd7853294d380454dc8300e66ac8664"
+        "sha256": "9457b786590bb5469fd999759483a735ac587ac729a1e0d0beeab628fae5e206"
       },
       "name": "protocol/sast_baseline.json"
     },
@@ -203,7 +203,7 @@
     },
     {
       "digest": {
-        "sha256": "6c5e58b522bdb7b7f363f89bf7bda218b04728e17ad62134eaf97d2dbd92d07e"
+        "sha256": "e1df435c08e07f32716d378dcce7f6fc04e9b86735c09a6635236fe463480584"
       },
       "name": "protocol/endpoint_contract.json"
     },
@@ -239,7 +239,7 @@
     },
     {
       "digest": {
-        "sha256": "6e6687965cd887cb5253fe811898746001d8f93719688803229205ad8fbb8cde"
+        "sha256": "f6db86aa2ef8bdc93f8a8d81c26bbef27b57bac7c7fd5450cbf748e5b4cb0429"
       },
       "name": "protocol/locales.json"
     },
@@ -287,7 +287,7 @@
     },
     {
       "digest": {
-        "sha256": "914c5dfe05763ecab52cea35cb72fd34026cd2522ca37fbebc0a86596a1d01eb"
+        "sha256": "cce69546ca42d2d5fb3785a22d51e8cd6c49229d8d2f35c4abb1d2b9ee0a91b3"
       },
       "name": "protocol/audit.json"
     },
@@ -311,7 +311,7 @@
     },
     {
       "digest": {
-        "sha256": "b8304720efeecad29871f7ca4c6ebfc8f4d1596c732e617bff416e6c0cbbff0a"
+        "sha256": "db80976e922b08cc9becac78512326ec49ee02795a6274ae20c84c9ad3d00887"
       },
       "name": "protocol/mcp_package.json"
     },
@@ -338,12 +338,6 @@
         "sha256": "b1987e8a8f41deb886d26769382a4f129eee5e31b12f3ec9687bad7c8c31213f"
       },
       "name": "protocol/schema/asset.schema.json"
-    },
-    {
-      "digest": {
-        "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
-      },
-      "name": "protocol/schema/asset_contracts.schema.json"
     },
     {
       "digest": {

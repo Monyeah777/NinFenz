@@ -1,5 +1,4 @@
 """审计 / 验收门禁（Audit Report + Acceptance/Sign-off + Baseline）。
-
 真源：`protocol/audit.json`（规范件：审计该怎么写）+ `results/audit/*.md`（说明件：审计内容）。
 
 判据（全部可证，零第三方依赖）：
@@ -7,7 +6,7 @@
 - 带审计头的报告：必填齐；verdict 在词表；date 为 YYYY-MM-DD；
   **`subjects` 每条 `路径:sha256` 必须与当前文件一致**——对象一改，旧审计即失效；
   `accepted_by` 出现则必须有 `accepted_at`（验收签收双要素）；
-- 无审计头的存量件：按 **WARN** 挂账（legacy），不判死；
+- `legacy_records` 显式登记的存量件：按 **WARN** 挂账；未登记件缺字段一律 FAIL；
 - `rebind()`：对象改动后**机械重绑** subjects 的 digest（`nf audit rebind --note`）——
   只逐行替换 digest（不重排 frontmatter），并把重审理由落成正文首行（同一理由不重复追加）。
 """
@@ -18,7 +17,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from core import atomic_write, doc_family
+from core import atomic_write, audit_legacy, audit_subject, doc_family
 from core.library import parse_frontmatter
 
 DECL_REL = "protocol/audit.json"
@@ -66,11 +65,6 @@ def decl(root: str = ".") -> Dict[str, Any]:
     return doc_family.load_decl(root, DECL_REL)
 
 
-def _sha(path: Path) -> str:
-    import hashlib
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def entries(root: str = ".") -> List[Dict[str, Any]]:
     return doc_family.entries(root, GLOB)
 
@@ -83,30 +77,14 @@ def check_doc(root: str, rel: str) -> Tuple[List[str], Dict[str, Any]]:
     d = decl(root)
     fm, _body = parse_frontmatter(p.read_text(encoding="utf-8"))
     fm = fm or {}
-    if not fm.get("id"):
+    if audit_legacy.is_legacy(rel, d, bool(fm.get("id"))):
         return [], {"legacy": True, "subjects": 0}
     issues: List[str] = doc_family.frontmatter_issues(
         fm, d, required=("id", "date", "scope", "verdict", "auditor", "subjects"),
         vocab_key="verdict_vocabulary", field="verdict",
         default_vocab=("pass", "fail", "warn"))
-    subs = fm.get("subjects") or []
-    if isinstance(subs, str):
-        subs = [subs]
-    ok_subs = 0
-    for s in subs:
-        t = str(s).strip()
-        if ":" not in t:
-            issues.append("subjects 条目格式须为 路径:sha256：%s" % t[:40])
-            continue
-        rel_p, want = t.rsplit(":", 1)
-        sp = Path(root) / rel_p.replace("\\", "/")
-        if not sp.is_file():
-            issues.append("被审对象不存在：%s" % rel_p)
-            continue
-        if _sha(sp) != want.strip():
-            issues.append("被审对象已变，旧审计失效：%s（修复指引：重审并更新 digest）" % rel_p)
-            continue
-        ok_subs += 1
+    subject_issues, ok_subs = audit_subject.check(root, fm.get("subjects") or [])
+    issues.extend(subject_issues)
     if fm.get("accepted_by") and not _DATED.match(str(fm.get("accepted_at") or "")):
         issues.append("有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）")
     return issues, {"legacy": False, "subjects": ok_subs}
@@ -125,6 +103,7 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         issues.append("verdict 词表与判据不一致（期望 pass/fail/warn）")
     if not (d.get("rules") or []):
         issues.append("rules 不得为空（审计纪律必须成文）")
+    issues.extend(audit_legacy.validation_issues(root, d))
     rows = entries(root)
     legacy, subs = [], 0
     for e in rows:
@@ -135,7 +114,7 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         issues += ["%s：%s" % (e["fm"].get("id") or e["file"], x) for x in i]
         subs += st.get("subjects", 0)
     if legacy:
-        warns.append("存量审计件无审计头（legacy，按回合收）：%d 件 —— %s"
+        warns.append("显式登记的 legacy 历史审计件（不补造摘要）：%d 件 —— %s"
                      % (len(legacy), "、".join(legacy[:3])))
     if not rows:
         warns.append("暂无审计件（%s）" % GLOB)
@@ -153,10 +132,13 @@ def _rebind_subjects(root: str, fm: str) -> Tuple[str, List[str]]:
     out = fm
     for m in list(_SUBJECT_LINE.finditer(fm)):
         rel = m.group(2)
-        sp = Path(root) / rel.replace(chr(92), "/")
+        try:
+            sp = audit_subject.resolve(root, rel)
+        except ValueError:  # 非法 subject 由 check_doc 报 FAIL；重绑器只处理合法仓内对象
+            continue
         if not sp.is_file():
             continue
-        now = _sha(sp)
+        now = audit_subject.digest(sp)
         if now != m.group(3):
             out = out.replace("%s:%s" % (rel, m.group(3)), "%s:%s" % (rel, now))
             changed.append(rel)

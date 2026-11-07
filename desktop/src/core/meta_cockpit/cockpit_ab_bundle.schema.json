@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ninfenz.dev/schema/cockpit-ab-bundle/1",
+  "title": "NF Cockpit A/B Experiment Bundle",
+  "type": "object",
+  "required": ["schema", "manifest", "experiment", "packets", "ballots",
+               "analysis", "bundle_digest"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "nf-cockpit-ab-bundle/1"},
+    "manifest": {
+      "type": "object",
+      "required": ["schema", "experiment_id", "experiment_digest",
+                   "analysis_plan_digest", "packet_digest",
+                   "ballots_digest", "analysis_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {"const": "nf-cockpit-ab-bundle-manifest/1"},
+        "experiment_id": {"type": "string", "minLength": 1},
+        "experiment_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "analysis_plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "packet_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ballots_digest": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"type": "null"}
+          ]
+        },
+        "analysis_digest": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "experiment": {"type": "object"},
+    "packets": {"type": "object"},
+    "ballots": {
+      "anyOf": [
+        {"type": "array"},
+        {"type": "null"}
+      ]
+    },
+    "analysis": {
+      "anyOf": [
+        {"type": "object"},
+        {"type": "null"}
+      ]
+    },
+    "bundle_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

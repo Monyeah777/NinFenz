@@ -1,6 +1,6 @@
 # 迁移指南 · 基于 `nf sig` / `nf diff`（41 波C D5 · C2 产物衍生文档位）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令/步骤/判定，勿当资料阅读。
-> 最后更新：2026-09-14
+> 最后更新：2026-10-30
 
 > 用途：协议/方案文档演进与迁移核查的衍生工具文档位——C2 版本差异检测产物的「怎么用」入口。
 
@@ -19,7 +19,23 @@
 3. **修复指引**：`python scripts/nf.py explain <check>`（如 check24/25/26）取「缺什么/补什么/示例」。
 4. **验收**：`bash verify.sh` 全绿（0 WARN / 0 FAIL；check 数与 PASS 基线见 `nf stats --check` 生成区，**不钉死**——此处曾停在 check1-36/PASS=59）方可提交；迁移记录进 CHANGELOG 归档。
 
-## 三、与既有门禁的关系
+## 三、契约演进时间线
+
+单次 `nf diff OLD NEW` 只回答两份文件之间的变化；需要追查一份正式契约如何演进时，用：
+
+```bash
+python scripts/nf.py diff --history 20 01_核心协议.md
+python scripts/nf.py diff --history 20 protocol/schema/contract.schema.json --json
+```
+
+时间线按 Git 历史从旧到新重算每版签名与摘要，并对相邻版本给出 `editorial / additive / bump`
+影响度。Markdown 契约复用 `nf sig` 的章节、引用和版本面；JSON schema 额外比较结构化键路径，
+必填项增加、类型变化、移除和版本槽位变化均判 `bump`。
+
+允许的历史面：`01/02/06/07` 协议文档、`protocol/CONFORMANCE.md`、`protocol/EXTENSION.md`
+及 `protocol/schema/*.json`。命令只读，不生成或改写迁移记录；`bump` 仍须按 02 §9.3 留档。
+
+## 四、与既有门禁的关系
 
 `nf diff` 是**编译期冲突发现**（录入时），verify check25 是其自动闸门（可复现）；两者互补但不替代
 check13（协议版本一致性/迁移完整性四步）与 CHANGELOG 归档——协议层真迁移仍走 02 §9.3。

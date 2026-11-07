@@ -7,8 +7,8 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/concept_graph.py:cc629a762576347a6065da4be34ff6c6902ec4ee7299663119abbc153bd50211
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
-  - README.en.md:b1858810c2a35398283f0f27354ef421896fffbe0f6ed370d9f94b23307c4163
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
+  - README.en.md:cc72fc196f96281c28dfbbb0f019774c5a4434384d994da50e8ff9216bce18a5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - community/量化金融域包/assets/DATA_CONTRACT.md:3815cd420ce535b571149a1ca0725b2d5c1757660e83d0edd8ed1d5c14ed2af1
   - community/量化金融域包/assets/STRATEGY_SPECS.md:9174638b5caf2d5d8586b80d07ed9aeca5d221e16f01ec19ce0e4c0f50859e65
@@ -16,29 +16,7 @@ subjects:
   - .github/workflows/external-links.yml:e1a67faaeac1712bb77c9c36bf7133e68b6e705e8c4e296b40024825939f261b
 
 ---
-> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
-
-> 重审（2026-10-30）：2026-10-30: README 官方 npm 渠道说明与 GitHub Packages 非同步状态更新；重审对象变更，正文语义未改变。
-
-> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
-
-> 重审（2026-10-28）：默认并行度 10→14
-
-> 重审（2026-10-28）：tests-only 默认并行度 8→10（实测 285 s 拐点）
-
-> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
-
-> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
-
-> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
-
-> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
-
-> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
-
-> 重审（2026-10-25）：REUSE 3.3 合规（MIT-NOTICE + 徽章 + CI 作业）
-
-> 重审（2026-10-25）：英日 README 双许可表述
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
 
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 

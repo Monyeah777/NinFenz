@@ -2,56 +2,122 @@
 id: AUD-0025
 title: 抽象阶梯 v2 落地 —— 两轴 + 纵切 + 适应度函数（契约/资产/引擎/出口 × 入口面 × 验证纵切）
 date: 2026-09-26
-scope: 作者指令「对标顶尖架构设计再改一版」。把 NF 的分层从「混装的梯子」收成两轴 + 纵切，并落成有判据的协议件：真源 protocol/LAYERS.json + 语义判据 core/layer_model.py（并入 check27 R7）+ 生成投影 docs/layers.md + ADR-0004。外部只作机制借鉴（多视图描述 / 稳定依赖与依赖倒置 / 适应度函数 / 单一真源+生成投影 / ADR / 退役治理），开工依据全部来自仓库内部差距实证（见正文），不作立项理由或质量背书（STRATEGY §3.2/§3.3）。
+scope: 作者指令「对标顶尖架构设计再改一版」。把 NF 的分层从「混装的梯子」收成两轴 + 纵切，并落成有判据的协议件（2026-10-25：ADR-0004 随决策外置迁私有仓，见 decisions/ADR-0000；本审计保留其余被审对象）：真源 protocol/LAYERS.json + 语义判据 core/layer_model.py（并入 check27 R7）+ 生成投影 docs/layers.md + ADR-0004。外部只作机制借鉴（多视图描述 / 稳定依赖与依赖倒置 / 适应度函数 / 单一真源+生成投影 / ADR / 退役治理），开工依据全部来自仓库内部差距实证（见正文），不作立项理由或质量背书（STRATEGY §3.2/§3.3）。
 verdict: pass
 auditor: 本轮执行者
 subjects:
   - protocol/LAYERS.json:0285b8b1fdf20b9ca9cd0857118cd7f3c09946256d33a6d42028a5c41aad0023
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
   - desktop/tests/test_layer_model.py:8cea98de879a4bdf795f95afff9c8fa9a7675ebac227018b7b7694a158bfd69c
-  - desktop/src/core/purity_scan.py:d59188c49f87a699df53a0c37d6bdddd8ed4fa657a628a8aec917024e5a87524
-  - desktop/tests/test_purity_scan.py:f0a23dcc6b5c7c481cf8bdb0356ed0fbf81a8d65f7d3e2d9e15d3b4796f52a62
-  - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
+  - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
+  - desktop/tests/test_purity_scan.py:8f534c3cb5f4a85df538a551bf610dc4c09aae4cb28dd28aa4fe6a66a5f5c4d7
+  - scripts/nf.py:a1836181f9c508d4a3ee4ae006f19222af0b2beda84ca1d26cac4a848d35f7c7
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/layers.md:be79f2699cee390f03d54d6d0428daee6964674dcbb5d0e6967bfbb150395450
   - docs/L3_FROZEN.md:9dad824e749aac75ee4cf583adb48d0ede9c02a0a717ff43d314cbbfcb3cf3af
   - protocol/assertions.json:5a0bb383eabf678a9f660ae6d771f0be51cce5397a40a73f0d0d93457e4f1cba
   - protocol/data_contracts.json:6ca6174c77d41ad354b90e637c404bedfbe5d8ad0ce6400bb26f2ac7e5f19eb0
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/glossary.json:0af6a0f3b1f128b30c0eb88a8db0d2c143461910a889737dfdf4e38e89f85ba7
-  - desktop/src/core/receipts.py:b0f11db30f4d4b6c0b480ea1657bb8af0f98519523a7ee3e28b7ac8de4c37a69
+  - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
 
 ---
-> 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。
+> 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核
 
-> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
+> 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
 
-> 重审（2026-10-28）：默认并行度 10→14
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
 
-> 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印；Pillow 软依赖登记
 
-> 重审（2026-10-28）：tests-only 默认并行度 8→10（实测 285 s 拐点）
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
-> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
+> 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）
 
-> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
+> 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
-> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
-> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
+> 重审（2026-11-07）：batch_target 登记修正（位置参数进文本面，不进旗标名单）
 
-> 重审（2026-10-27）：rebase 重冻（fast-gate）
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
-> 重审（2026-10-27）：合并 TISA 内容寻址增量，并复核供应链纯度软导入登记与语言面签名
+> 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
 
-> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
 
-> 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
+> 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
 
-> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+> 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
 
-> 重审（2026-10-25）：1.1.0 版本面 + CLA workflow + 定价
+> 重审（2026-11-06）：sink 基线 20→21（快照失败自清已登记）
+
+> 重审（2026-11-06）：快照门禁清理进纯度放行表（临时目录自清）
+
+> 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
+
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
+> 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
+
+> 重审（2026-11-06）：注册 --decision 参数进编码/路径闸门（其提交遗漏）
+
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
+> 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）
+
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
+> 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
+
+> 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
+
+> 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数
+
+> 重审（2026-11-05）：cc_label 声明层（nf-label/1 IR）+ 供应链核对进发布结论
+
+> 重审（2026-11-05）：G1 外部锚点：证据包可声明并可核对（防整链截断），双实现同口径 + 攻击矩阵 33 条
+
+> 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
+> 重审（2026-11-04）：抽检第二个分片：原子写纪律（包/报告走 atomic_write，临时写例外登记）
+
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
+> 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
+> 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
+
+> 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
+
+> 重审（2026-10-29）：CLI 命令树无损分组、meta-cockpit 接线与恢复分支全量验证后重绑；既有结论不变
+
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
+
+> 重审（2026-10-25）：术语 used_in 改指在场件
+
+> 重审（2026-10-25）：glossary/daemon 收尾修正
+
+> 重审（2026-10-25）：ADR-0004 迁私有仓：AUD-0025 移除该被审对象
 
 > 重审（2026-10-25）：跨平台收口：真实路径归一、守护状态读写锁、autostart 原子标记与机器路径短名脱敏
 
@@ -218,7 +284,7 @@ subjects:
 | 形状类断言 | `protocol/assertions.json` 增 3 条（layers-declaration-in-place / layers-generated-region / layers-no-abs-path），11 → 14 条（kind 仍封闭四类，ADR-0003） |
 | 生成投影 | `docs/layers.md` 阶梯表进 `nf:layers` 生成区，`nf layers --write` 渲染（L10 断言逐字一致） |
 | CLI | `nf layers` / `--json` / `--verify` / `--write` |
-| 决策 | 真实决策已按 `decisions/ADR-0000` 迁入私有 Plan 仓；公开仓保留模板与 `decisions/INDEX.md` 投影 |
+| 决策 | `decisions/ADR-0004-抽象阶梯两轴与纵切.md`（accepted，已入回执锚定），`decisions/INDEX.md` 重投影 |
 | 术语 | `protocol/glossary.json` 增 **抽象阶梯**、**验证纵切**（逐字命中真源与使用面） |
 | 登记 | `protocol/normative.json` 收 LAYERS.json；`protocol/data_contracts.json` 29 → 30 件（quality_rule=check27）；`protocol/RECEIPTS.json` 49 → 51 件（+LAYERS.json +ADR-0004） |
 | 单元测试 | `test_layer_model.py` 21 例（L1–L10 各一变异样本 + 真仓库零 issue + 渲染幂等 + LF 落盘 + CLI 面）；`test_purity_scan.py` 增 R7 接线与「无阶梯件不误伤」2 例 |

@@ -12,7 +12,7 @@ subjects:
   - desktop/src/core/module_lifecycle.py:7b84396342e77fea32e6b54cd78e296f1dddf925937b8331dbcdebeb4e9ad1d0
   - desktop/src/core/market_analyzer.py:eb5edffc55470b5f4aa8e6151ab7bffded36a45ce3ecc69fcdc54de59071cbdf
   - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
-  - desktop/src/core/knowledge_sig.py:2e1177ae8701b38cff3b26e92892b3cbef4a347a48b986dd8b1f95934f60323b
+  - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
   - desktop/src/core/output_forms.py:3688d30b158493f56801ef84f6f0e60eff2cc670c7ebcf750ffd403599d1b68a
   - desktop/src/core/pipeline_loader.py:0efbfa0c0e0f8ae5817a79aed429da24504632a97679727ae9d947bf59dc7104
   - desktop/src/core/community_inventory.py:939924e6f37e0d17143d3e15c196882bd40fb98ddd22fb83479200487f3137f0
@@ -27,51 +27,192 @@ subjects:
   - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
   - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:eddcc0f9c14cf0cde6024e35cc1de1e23d63ebccf036a8ac0d5cd2e7bc300931
+  - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:7f58e4c29417fe8e5d4001cc54aba3ec1d7aa1ce774430976b689c90d2052a2a
-> 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
-> 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
-> 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
-> 重审（2026-10-27）：调度补丁重落（rebase 后）+ 自测权重
-> 重审（2026-10-27）：rebase 重冻（fast-gate）
-> 重审（2026-10-27）：机械项收尾：sink 基线 21 / json_doc / 可吞理由 / tisa 文档
-> 重审（2026-10-27）：串行段收窄（parity/watch 迁回并行池）
-> 重审（2026-10-27）：SINK_ALLOW 登记 dump 清理
-> 重审（2026-10-27）：动态切片+自测权重+scan_memo 跨调用保活
+  - protocol/code_metrics_baseline.json:6503dbf027b525141363cd12bc004f94e5ab5bf89bc0754c23497b3cdf80f92f
+---
+> 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import
 
-> 重审（2026-10-26）：TISA 规范收尾（stdio/atomic_write/可吞/去未用import）
+> 重审（2026-11-07）：Go 客户端补齐 cc_check/cc_label/cc_attest/cc_replay/cc_diff/cc_resolve（6 份向量集）
 
-> 重审（2026-10-26）：purity HARD_ALLOW 登记 scripts（TISA 复用）
+> 重审（2026-11-07）：Go 客户端补 receipts/attest 两形态；向量集扩到 28 条（三形态）
 
-> 重审（2026-10-26）：TISA 增量缓存（scripts/tisa.py + verify_tests --incremental）
+> 重审（2026-11-07）：cc_check 文本层：法规原文→意图草稿（规则抽取，四张账）
 
-> 重审（2026-10-26）：perf_counters 规范收尾（可吞/stdio/atomic_write）
+> 重审（2026-11-07）：吊销公钥信任锚（钉根 + 有界委派 + 过期/scope/链深判据）
 
-> 重审（2026-10-26）：新面收尾：coupling/style 基线重冻
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印；Pillow 软依赖登记
 
-> 重审（2026-10-26）：结构计数器 + scoped 作用域 + signals 表化
+> 重审（2026-11-07）：载体层：WebP/MP4/PDF 附加块 + PNG 像素水印（判据含 JPEG 不扛的期望行为）
 
-> 重审（2026-10-26）：结构计数器 + 作用域装饰器 + 预筛/共享读面
+> 重审（2026-11-07）：RFC 3161 可信时间戳（timestamp 模块 + CLI + 证据复验时间锚）
 
-> 重审（2026-10-26）：json_doc 深度预检摘要缓存（file_facts 实验回退）
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
 
-> 重审（2026-10-26）：scan_memo 键含 mtime/size（修跨改文件吃旧值）
+> 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
-> 重审（2026-10-26）：scan_memo 可吞说明 + read_text_strict 接线 + 耦合面刷新
+> 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning
 
-> 重审（2026-10-26）：风格基线收紧 + 共享扫描面（scan_memo）
+> 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据
 
-> 重审（2026-10-26）：asset_contract 用 partial 绑定（消 B023）
+> 重审（2026-11-07）：度量重冻（nf.py +1 行：登记面修正）
 
-> 重审（2026-10-26）：verify_report 共享扫描面（scan_memo）+ role_model/asset_contract/conformance/redos 复用
+> 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
 
-> 重审（2026-10-26）：rebase 到 fa3fdd58 后重冻（atoms/nf/perf_budget）
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
 
-> 重审（2026-10-25）：Scorecard 收口：最新 main 合并、CODEOWNERS ASCII 化、SAST/Fuzzing、最小权限、依赖漏洞与容器 digest 统一重绑
+> 重审（2026-11-07）：verification_report 记 built_for_date（涉时判据按基准日重算）
 
-> 重审（2026-10-25）：安全收口：仓库信任根收紧、IPC/MCP/插件/投稿读取资源上限与路径包含性加固重审
+> 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release
+
+> 重审（2026-11-06）：快照清理站点补成文理由 + 文档项数 47→51
+
+> 重审（2026-11-06）：快照日志/清理收口（重绑）
+
+> 重审（2026-11-06）：快照模式：内层日志边跑边落盘 + 陈旧快照自动清理
+
+> 重审（2026-11-06）：sink 基线 21→22（并发会话新增快照 run 目录清理站点）+ keep-snapshot 旗标
+
+> 重审（2026-11-06）：快照临时目录隔离 + 文档项数（release_conclusion/docs 变更）
+
+> 重审（2026-11-06）：机器面 NF_HOME 可移植（nf.py 变更）
+
+> 重审（2026-11-06）：bash 身份守卫（WSL 空输出不再冒充判据红）+ Windows 两坑入文档
+
+> 重审（2026-11-06）：CLI 命令树拆分 + 旗标字面读取（nf.py 变更）
+
+> 重审（2026-11-06）：FRESH 词表接线（evidence.py 变更）
+
+> 重审（2026-11-06）：task-27 吊销新鲜度：revocations/evidence/nf.py 变更，重绑被审对象
+
+> 重审（2026-11-06）：快照内层独立 NF_HOME + 读点改 json_doc
+
+> 重审（2026-11-06）：快照内只判 HEAD（脏树信号仅用于活树）+ 取消不崩
+
+> 重审（2026-11-06）：快照落点改仓库同盘 + TEMP 重定向（防满盘 ENOSPC）
+
+> 重审（2026-11-06）：纯度放行表扩容后度量基线重冻
+
+> 重审（2026-11-06）：发布结论器加 --snapshot（HEAD 快照里跑，免疫并发改动）
+
+> 重审（2026-11-06）：release_conclusion P2 修复：allow-dirty 与分片 drift 守卫兼容，度量重冻后重绑
+
+> 重审（2026-11-06）：并发会话遗留的派生面重冻（中途哨兵入库）
+
+> 重审（2026-11-06）：JPEG 载体 P0 硬化（nf.py/CLI 文案变化）+ 口径清理，重绑被审对象
+
+> 重审（2026-11-06）：JPEG APP15 载体（扫描数据不变）+ 真 PNG 夹具判据
+
+> 重审（2026-11-06）：Q0-r2：evidence verify 增 --policy-digest 期望比对（nf.py 参数面变化），重绑被审对象
+
+> 重审（2026-11-06）：耦合面重冻（载体模块行数变化后 metrics 面漂移）
+
+> 重审（2026-11-06）：载体 IR 读点改走 core.json_doc（未校验读点棘轮）
+
+> 重审（2026-11-06）：cc_label PNG iTXt 载体（可读回/不改像素/CRC 合法）
+
+> 重审（2026-11-06）：常驻集加 test_cli_error_framing（参数登记面 100 s 换 36 分钟）
+
+> 重审（2026-11-05）：Q0 决策证据绑定：scripts/nf.py 增 --decision 入口、evidence/attest/nf_verify 增 decision 绑定，重绑被审对象摘要
+
+> 重审（2026-11-05）：发布结论器新增静态棘轮步（style/度量/耦合/SAST，约 12 s）
+
+> 重审（2026-11-05）：攻击矩阵重名用例：构造期抑制 zipfile 重名 UserWarning（机器面逐字节一致）
+
+> 重审（2026-11-05）：并发会话风格债收口（6 处 E501/RUF100/UP031/UP012 修掉，style 基线 9923→9921）
+
+> 重审（2026-11-05）：容器面加固：路径安全闸门 / 重名判死 / 解压上限（攻击矩阵 33→35）
+
+> 重审（2026-11-05）：label_sidecar 删零引用 helper（死代码判据）
+
+> 重审（2026-11-05）：cc_label sidecar 回退（nf-label-sidecar/1，绑定对象摘要）
+
+> 重审（2026-11-05）：隔离静态判据（打桩面）+ 三个机器判据进常驻集
+
+> 重审（2026-11-05）：证据判定向量集（跨语言一致性锚点）+ 文档
+
+> 重审（2026-11-05）：http_api 行数上限重冻 266→267
+
+> 重审（2026-11-05）：HTTP 403 分支补 drain（回 4xx 前先读掉请求体）
+
+> 重审（2026-11-05）：--compile 参数登记进编码/路径闸门
+
+> 重审（2026-11-05）：cc_check 编译面 v0：意图 → 封闭词表策略（不可表达逐条挂账）
+
+> 重审（2026-11-05）：发布结论器新增新鲜度步（行数上限随之重冻 328→365）
+
+> 重审（2026-11-05）：受影响选片 v2（四类规则 + 文档目录前缀 + 硬兜底面）+ 纯函数判据
+
+> 重审（2026-11-05）：G2 吊销分发件（签名 feed：签发/校验/合并，防回滚）+ nf.py 导入块排序
+
+> 重审（2026-11-05）：label 声明层补登记（编码闸门/路径旗标）+ 删零引用函数
+
+> 重审（2026-11-05）：cc_label 声明层（nf-label/1 IR）+ 供应链核对进发布结论
+
+> 重审（2026-11-05）：G1 外部锚点：证据包可声明并可核对（防整链截断），双实现同口径 + 攻击矩阵 33 条
+
+> 重审（2026-11-05）：威胁模型 v0（能证明/不承诺/缺口）+ 发布结论前置 payload 闸门 + 站点 npm 数字自动改写
+
+> 重审（2026-11-04）：发布结论器：分区与并发分离（缺省 8 片顺序跑）+ 根 llms-full 同步（站点数字口径）
+
+> 重审（2026-11-04）：发布结论器：失败分片留输出尾部（诊断可复现）
+
+> 重审（2026-11-04）：发布结论器改用受控进程原子（不再自起 subprocess）+ 缺省串行
+
+> 重审（2026-11-04）：发布结论器：SAST nosec 标注 + 缺省改串行（并发只给独立 runner）
+
+> 重审（2026-11-04）：H1 修复：--trust-repo 环境变量不再泄漏（信任门不再被绕过）+ 新增回归判据
+
+> 重审（2026-11-04）：发布结论复跑器（release_conclusion）+ 文档落地
+
+> 重审（2026-11-04）：分片 1/8 抽检修复：编码闸门/路径旗标名单补全、删零引用常量与函数、耦合基线重冻
+
+> 重审（2026-11-04）：零依赖复验器同步 fail-closed 口径（chain 必填 / 吊销坏件）+ 一致性判据补三例
+
+> 重审（2026-11-04）：证据线 fail-closed 加固：chain 段必填 / 吊销表坏件判 invalid（攻击矩阵 25→29）
+
+> 重审（2026-11-04）：check12 修复波：JSON 面登记 / json_doc 收敛 / Rust 回执去重同步 / 基准 JSON 纯净
+
+> 重审（2026-11-04）：本地工作台页（/verify 静态页 + CSP）落地
+
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑（HTTP 面 raise 文案微调）
+
+> 重审（2026-11-04）：本地 HTTP 面 v0（nf serve --http 三端点）落地 + 端点契约登记 local.*
+
+> 重审（2026-11-04）：cc_resolve（契约面反查）+ 一条链复现脚本落地
+
+> 重审（2026-11-04）：cc_replay 轨迹 + cc_check 单对象策略体检落地（新模块 check_policy）+ 回执去重
+
+> 重审（2026-11-04）：零依赖单文件复验器（--evidence 三形态）落地 + 风格基线重冻
+
+> 重审（2026-11-04）：code_metrics 基线重冻后重绑审计摘要（证据复验器扩形态与基准）
+
+> 重审（2026-11-04）：证据复验器扩三种形态 + 攻击矩阵基准（26 项校验路径与基准落地）
+
+> 重审（2026-11-04）：证据包缺省落点改到临时目录（不往仓库落盘）+ CCOS ABI v0 收口
+
+> 重审（2026-11-04）：CCOS ABI v0 + 证据包校验器落地（scripts/nf.py 与 core/terminal.py 摘要变更；并修复本分支既有漂移）
+
+> 重审（2026-10-30）：新增契约级 Git 演进时间线；结构化 Markdown YAML 字段与 JSON schema 差异纳入影响度
+
+> 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
+
+> 重审（2026-10-29）：CLI 命令树无损分组、meta-cockpit 接线与恢复分支全量验证后重绑；既有结论不变
+
+> 重审（2026-10-29）：恢复分支全量验证：纯度修复、零引用清理、public API 接线、ReDoS/CLI 闸门/文档路径与模板示例修复
+
+> 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
+
+> 重审（2026-10-25）：术语 used_in 改指在场件
+
+> 重审（2026-10-25）：glossary/daemon 收尾修正
+
+> 重审（2026-10-25）：ADR-0000 增补原则表述后重绑
+
+> 重审（2026-10-25）：ADR-0004 迁私有仓：AUD-0025 移除该被审对象
+
+> 重审（2026-10-25）：决策/交接/复盘外置：公开面只留模板（ADR-0000）
 
 > 重审（2026-10-25）：D1 常量时间比较 + N2/L2 发布面白名单化
 
@@ -296,35 +437,7 @@ subjects:
 ## 二、交付（按修法归类）
 
 | 类 | 模块 | 修法 |
-|---
-> 重审（2026-10-30）：refreeze.sh（统一冻结入口）
-
-> 重审（2026-10-29）：治理：CI 日志落点隔离 + 两个测试修复
-
-> 重审（2026-10-28）：回滚持久读缓存后重冻
-
-> 重审（2026-10-28）：conformance_scan 进程级持久读缓存（mtime 校验）
-
-> 重审（2026-10-28）：权重重测（verify 并行后）+ 内层并行默认 2
-
-> 重审（2026-10-28）：verify 并行 workers 可调 + 可吞理由
-
-> 重审（2026-10-28）：nf verify 判据并行（heredoc→子进程，3.5×）
-
-> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
-
-> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
-
-> 重审（2026-10-28）：ASVS residual controls merged with L5, atoms metrics and Gitee gate
-
-> 重审（2026-10-27）：ASVS residual controls merged with gate-cache main; regenerate derived evidence
-
-> 重审（2026-10-27）：ASVS machine controls finalized; check12 weights and code metrics resynced
-
-> 重审（2026-10-27）：ASVS residual controls: machine inventory, code-constant reconciliation, and negative tests
-
-> 重审（2026-10-27）：合并 main 的 CI 性能优化并重新绑定 ASVS 收口后的度量摘要
-|---|---|
+|---|---|---|
 | 真标注错配 | `import_graph` | `parse` 标注写成 3 元组而实现返回 2 元组 `(deps, dyn)`、调用方也按 2 元组解包——三处只有两处一致；标注改为 `Optional[Tuple[frozenset, bool]]`，两处差错同消 |
 | 变量复用解耦 | `round_drill`（allowed→allowed_set）· `orchestration`（tools→wf_tools）· `export_schema`（e→entry） | |
 | 声明/集合显式类型 | `module_lifecycle` · `market_analyzer` · `pipeline_loader` · `community_inventory` · `retriever` · `knowledge_sig` · `silent_skip` · `decisions` · `machine_contract` · `exporter` · `decision_layer` | 补 `dict`/`list`/`Dict[str, Any]` 标注 |

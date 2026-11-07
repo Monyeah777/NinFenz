@@ -8,15 +8,11 @@
         "desktop/src/core/daemon.py::B110": 8,
         "desktop/src/core/daemon.py::B404": 1,
         "desktop/src/core/daemon.py::B603": 1,
-        "desktop/src/core/gate_engine.py::B404": 1,
-        "desktop/src/core/gate_engine.py::B603": 1,
         "desktop/src/core/gate_inproc.py::B102": 2,
         "desktop/src/core/ingest_common.py::B404": 1,
         "desktop/src/core/ingest_common.py::B603": 1,
         "desktop/src/core/ingest_common.py::B607": 1,
         "desktop/src/core/pack_combo.py::B311": 1,
-        "desktop/src/core/perf_counters.py::B110": 1,
-        "desktop/src/core/perf_counters.py::B404": 1,
         "desktop/src/core/provenance_external.py::B404": 1,
         "desktop/src/core/rust_engine.py::B110": 1,
         "desktop/src/core/rust_engine.py::B404": 1,
@@ -26,8 +22,6 @@
         "scripts/check_external_links.py::B104": 1,
         "scripts/instruction_evidence.py::B404": 1,
         "scripts/instruction_evidence.py::B603": 1,
-        "scripts/mutation_sample.py::B404": 1,
-        "scripts/mutation_sample.py::B603": 1,
         "scripts/nf.py::B404": 1,
         "scripts/nf.py::B603": 5,
         "scripts/perf_budget.py::B404": 1,
@@ -39,7 +33,6 @@
         "scripts/verify_cache.py::B404": 1,
         "scripts/verify_cache.py::B603": 1,
         "scripts/verify_run.py::B404": 1,
-        "scripts/verify_tests.py::B110": 1,
         "scripts/verify_tests.py::B404": 1,
         "scripts/verify_tests.py::B603": 2,
         "scripts/verify_tests.py::B607": 2
@@ -49,17 +42,17 @@
           "severities": [
             [
               "LOW",
-              51
+              44
             ],
             [
               "MEDIUM",
               5
             ]
           ],
-          "total": 56
+          "total": 49
         },
         "ruff": {
-          "total": 87
+          "total": 83
         }
       },
       "ruff": {
@@ -73,7 +66,6 @@
         "desktop/src/core/community_inventory.py::S112": 1,
         "desktop/src/core/daemon.py::S110": 8,
         "desktop/src/core/decision_layer.py::S310": 4,
-        "desktop/src/core/gate_engine.py::S603": 1,
         "desktop/src/core/gate_inproc.py::S102": 2,
         "desktop/src/core/ingest_common.py::S603": 1,
         "desktop/src/core/ingest_common.py::S607": 1,
@@ -82,7 +74,6 @@
         "desktop/src/core/mvu_adapter.py::S110": 1,
         "desktop/src/core/output_forms.py::S314": 2,
         "desktop/src/core/pack_combo.py::S311": 1,
-        "desktop/src/core/perf_counters.py::S110": 1,
         "desktop/src/core/protocol_golden.py::S112": 1,
         "desktop/src/core/provenance_external.py::S603": 1,
         "desktop/src/core/retriever.py::S110": 2,
@@ -98,7 +89,6 @@
         "scripts/check_external_links.py::S310": 2,
         "scripts/check_interop_schemas.py::S310": 4,
         "scripts/instruction_evidence.py::S603": 1,
-        "scripts/mutation_sample.py::S603": 1,
         "scripts/nf.py::S110": 2,
         "scripts/nf.py::S112": 3,
         "scripts/nf.py::S603": 6,
@@ -110,7 +100,6 @@
         "scripts/verify_cache.py::S603": 1,
         "scripts/verify_parallel.py::S603": 1,
         "scripts/verify_run.py::S603": 1,
-        "scripts/verify_tests.py::S110": 1,
         "scripts/verify_tests.py::S607": 2
       }
     },

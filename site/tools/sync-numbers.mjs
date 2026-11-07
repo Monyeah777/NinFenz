@@ -250,6 +250,39 @@ if (NPM_V) {
                       + '（清单 ' + wantMb + ' MB）');
         fail = 1;
       }
+      // --write 也要能改这一项（2026-11-05 实测教训）：此前只报「手改」，我连着两轮漏改，
+      // 每次都要人工去五处抄数字。口径真源是 payload 清单，改写只落在**含 ninfenz 的行**上，
+      // 不碰别的数字。根 llms-full.txt 与 site/llms-full.txt 必须逐字节一致，若改到它则同步投影
+      // （判据权威仍是 scripts/sync_llms.py，这里只做 --write 下的落地）。
+      if (write && (counts.size || sizes.size)
+          && !(counts.size === 1 && counts.has(wantCount)
+               && sizes.size === 1 && sizes.has(wantMb))) {
+        let touchedLlmsFull = false;
+        for (const f of NPM_FACES) {
+          const fp = path.join(SITE, f);
+          if (!fs.existsSync(fp)) { continue; }
+          const before = read(fp);
+          const after = before.split(/(?<=\n)/).map((ln) => {
+            if (!/ninfenz/.test(ln)) { return ln; }
+            return ln
+              .replace(/(\d+)(\s*(?:文件|files))/, (_m, _n, tail) => wantCount + tail)
+              .replace(/(\d+\.\d+)(\s*MB)/, (_m, _n, tail) => wantMb + tail);
+          }).join('');
+          if (after !== before) {
+            fs.writeFileSync(fp, after, 'utf8');
+            console.error('  └ 已改写 site/' + f + ' 的 npm 件数/体积 → ' + wantCount + ' 件 / '
+                          + wantMb + ' MB');
+            if (f === 'llms-full.txt') { touchedLlmsFull = true; }
+          }
+        }
+        if (touchedLlmsFull) {
+          fs.copyFileSync(path.join(SITE, 'llms-full.txt'), path.join(ROOT, 'llms-full.txt'));
+          console.error('  └ 根 llms-full.txt 已按 site 投影同步（判据权威仍是 scripts/sync_llms.py）');
+        }
+        counts.clear(); sizes.clear();
+        counts.add(wantCount); sizes.add(wantMb);
+        fail = 0;
+      }
     } catch (e) {
       console.error('✗ packaging/npm/payload/payload-manifest.json 不可解析：' + e.message);
       fail = 1;

@@ -9,22 +9,10 @@ subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
-  - verify.sh:d724f3a0a8ccde43ded229085dc5e3d985ec9d5f069ee298d815000743fad542
+  - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - docs/domain-packs.md:4c9ee3987699c24f1d78910281b446287dceebb3a77632ef458a07ba618f62d0
 
 ---
-> 重审（2026-10-28）：默认并行度 10→14
-
-> 重审（2026-10-28）：tests-only 默认并行度 8→10（实测 285 s 拐点）
-
-> 重审（2026-10-28）：D 第一刀：paths realpath 去重 + text_hygiene 二进制读取走 scan_memo + --pr 档
-
-> 重审（2026-10-28）：tests-only 默认 8 片 + PermissionError 退避重试
-
-> 重审（2026-10-27）：verify.sh: checks 档缓存 put/get 一致（mode=checks）
-
-> 重审（2026-10-27）：checks-only 独立档位缓存（verify_cache mode=checks）
-
 > 重审（2026-10-24）：CI 并发锁、Gitee 诊断与 ADR-0008 改变 verify/脚本字节；重审理由：相应测试与冻结链已同步
 
 > 重审（2026-10-23）：OTLP ID 判据与合作一致性稳定性修正：traceId/spanId 定长 hex，缺失真源诊断去 OS errno

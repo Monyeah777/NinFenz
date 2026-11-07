@@ -1,0 +1,43 @@
+{
+  "schema": "nf/meta-atoms/1",
+  "note": "元认知原子表：不可再分的操作原语；方法节点由原子组合而成。",
+  "atoms": [
+    {"id": "k.represent", "name": "表征", "function": "knowledge", "level_min": "M0", "level_max": "M2", "input": ["状态或断言"], "output": ["结构化表征"], "trigger": "需要把隐性内容外化", "failure_mode": "无表征则不可检验", "composed_of": []},
+    {"id": "k.partition", "name": "划分", "function": "knowledge", "level_min": "M0", "level_max": "M1", "input": ["整体对象"], "output": ["部分集合"], "trigger": "整体需要分解", "failure_mode": "部分遗漏或重叠", "composed_of": []},
+    {"id": "k.relate", "name": "关联", "function": "knowledge", "level_min": "M0", "level_max": "M1", "input": ["两个及以上对象"], "output": ["关系断言"], "trigger": "对象之间存在因果/时序/相似关系", "failure_mode": "伪关系或方向错", "composed_of": []},
+    {"id": "k.abstract", "name": "抽象", "function": "knowledge", "level_min": "M1", "level_max": "M2", "input": ["多个实例"], "output": ["共同结构"], "trigger": "需要从实例提炼共相", "failure_mode": "过度概括或丢失差异", "composed_of": []},
+    {"id": "k.define", "name": "定义", "function": "knowledge", "level_min": "M0", "level_max": "M2", "input": ["术语或边界"], "output": ["定义与适用范围"], "trigger": "术语歧义或边界不清", "failure_mode": "定义漂移", "composed_of": []},
+    {"id": "k.instantiate", "name": "实例化", "function": "knowledge", "level_min": "M0", "level_max": "M2", "input": ["抽象结构"], "output": ["具体实例"], "trigger": "抽象需要落地检验", "failure_mode": "实例不匹配抽象", "composed_of": []},
+    {"id": "k.classify", "name": "分类", "function": "knowledge", "level_min": "M0", "level_max": "M2", "input": ["实例与类别"], "output": ["类别归属"], "trigger": "需要归入已知类别", "failure_mode": "误分类", "composed_of": []},
+    {"id": "k.quantify", "name": "量化", "function": "knowledge", "level_min": "M0", "level_max": "M2", "input": ["属性"], "output": ["数值或量级"], "trigger": "属性可度量", "failure_mode": "量纲错误或伪精确", "composed_of": []},
+    {"id": "k.criterion", "name": "判据设定", "function": "knowledge", "level_min": "M2", "level_max": "M4", "input": ["目标与约束"], "output": ["判据集合"], "trigger": "需要确定合格标准", "failure_mode": "判据缺失或不可判定", "composed_of": []},
+    {"id": "k.standard", "name": "标准选择", "function": "knowledge", "level_min": "M3", "level_max": "M4", "input": ["任务类型与标准库"], "output": ["证据/有效性标准"], "trigger": "不同任务需要不同有效性标准", "failure_mode": "标准错配", "composed_of": []},
+
+    {"id": "m.observe", "name": "观察", "function": "monitoring", "level_min": "M0", "level_max": "M4", "input": ["当前状态"], "output": ["状态读数"], "trigger": "需要了解当前认知状态", "failure_mode": "读数缺失或滞后", "composed_of": []},
+    {"id": "m.compare", "name": "比较", "function": "monitoring", "level_min": "M0", "level_max": "M3", "input": ["两个状态或对象"], "output": ["差异/相似读数"], "trigger": "需要判断变化或差异", "failure_mode": "比较基准不一致", "composed_of": []},
+    {"id": "m.check", "name": "核验", "function": "monitoring", "level_min": "M0", "level_max": "M3", "input": ["命题与判据"], "output": ["通过/不通过"], "trigger": "命题需要被检验", "failure_mode": "漏检或假阳性", "composed_of": []},
+    {"id": "m.estimate", "name": "置信估计", "function": "monitoring", "level_min": "M1", "level_max": "M3", "input": ["证据与状态"], "output": ["置信度"], "trigger": "需要表达不确定性", "failure_mode": "过度自信或欠自信", "composed_of": []},
+    {"id": "m.detect", "name": "异常检测", "function": "monitoring", "level_min": "M1", "level_max": "M3", "input": ["状态序列或产物"], "output": ["异常/缺口标记"], "trigger": "状态可能偏离预期", "failure_mode": "漏报或误报", "composed_of": []},
+    {"id": "m.trace", "name": "溯源", "function": "monitoring", "level_min": "M0", "level_max": "M2", "input": ["断言或产物"], "output": ["来源链"], "trigger": "需要确认来源与推导", "failure_mode": "来源断裂或伪造", "composed_of": []},
+
+    {"id": "c.select", "name": "选择", "function": "control", "level_min": "M0", "level_max": "M4", "input": ["候选集合与目标"], "output": ["选中项"], "trigger": "存在多个可选路径", "failure_mode": "选错或无法选择", "composed_of": []},
+    {"id": "c.sequence", "name": "排序", "function": "control", "level_min": "M1", "level_max": "M3", "input": ["操作集合与约束"], "output": ["执行顺序"], "trigger": "步骤之间存在依赖", "failure_mode": "顺序错导致死锁", "composed_of": []},
+    {"id": "c.allocate", "name": "分配", "function": "control", "level_min": "M2", "level_max": "M3", "input": ["资源与需求"], "output": ["预算/注意力分配"], "trigger": "资源有限", "failure_mode": "预算耗尽或饿死", "composed_of": []},
+    {"id": "c.switch", "name": "切换", "function": "control", "level_min": "M2", "level_max": "M3", "input": ["当前策略与状态"], "output": ["策略切换"], "trigger": "当前策略失效或低效", "failure_mode": "频繁抖动或该切不切", "composed_of": []},
+    {"id": "c.stop", "name": "停止/继续", "function": "control", "level_min": "M2", "level_max": "M4", "input": ["过程读数与判据"], "output": ["停止/继续决策"], "trigger": "达到收敛或预算边界", "failure_mode": "过早停止或无限循环", "composed_of": []},
+
+    {"id": "e.verify", "name": "验证", "function": "evaluation", "level_min": "M0", "level_max": "M3", "input": ["产物与判据"], "output": ["合格/不合格"], "trigger": "产物需要对照判据", "failure_mode": "判据未覆盖", "composed_of": []},
+    {"id": "e.falsify", "name": "证伪", "function": "evaluation", "level_min": "M1", "level_max": "M2", "input": ["断言与反例"], "output": ["反驳/存活"], "trigger": "断言需要主动攻击", "failure_mode": "只证不伪", "composed_of": []},
+    {"id": "e.adjudicate", "name": "裁决", "function": "evaluation", "level_min": "M1", "level_max": "M3", "input": ["证据与争议"], "output": ["裁决结论"], "trigger": "存在冲突或不确定", "failure_mode": "无理由裁决", "composed_of": []},
+    {"id": "e.audit", "name": "审计", "function": "evaluation", "level_min": "M2", "level_max": "M4", "input": ["方法/框架/过程"], "output": ["审计发现"], "trigger": "需要检查评价本身", "failure_mode": "既当运动员又当裁判", "composed_of": []},
+    {"id": "e.calibrate", "name": "校准", "function": "evaluation", "level_min": "M2", "level_max": "M4", "input": ["置信与结果"], "output": ["校准后的置信"], "trigger": "置信与实际命中偏离", "failure_mode": "过拟合历史", "composed_of": []},
+    {"id": "e.benchmark", "name": "基准对照", "function": "evaluation", "level_min": "M1", "level_max": "M3", "input": ["产物与参照"], "output": ["相对差异"], "trigger": "需要与基线比较", "failure_mode": "基线选择偏差", "composed_of": []},
+
+    {"id": "i.merge", "name": "合并", "function": "integration", "level_min": "M1", "level_max": "M2", "input": ["兼容产物"], "output": ["合并产物"], "trigger": "多个产物可相容", "failure_mode": "丢字段或覆盖冲突", "composed_of": []},
+    {"id": "i.reconcile", "name": "冲突消解", "function": "integration", "level_min": "M1", "level_max": "M2", "input": ["冲突产物"], "output": ["消解结果"], "trigger": "产物之间存在矛盾", "failure_mode": "和稀泥或强行统一", "composed_of": []},
+    {"id": "i.cluster", "name": "聚类", "function": "integration", "level_min": "M1", "level_max": "M2", "input": ["实例集合"], "output": ["主题簇"], "trigger": "实例需要归组", "failure_mode": "簇内异质或簇间重叠", "composed_of": []},
+    {"id": "i.hierarchy", "name": "层级化", "function": "integration", "level_min": "M1", "level_max": "M2", "input": ["节点与关系"], "output": ["偏序/层级"], "trigger": "需要组织上下位关系", "failure_mode": "成环或层级虚设", "composed_of": []},
+    {"id": "i.compose", "name": "组合", "function": "integration", "level_min": "M1", "level_max": "M3", "input": ["部件与接口"], "output": ["组合结构"], "trigger": "部件需要装配成整体", "failure_mode": "接口不匹配", "composed_of": []},
+    {"id": "i.transfer", "name": "迁移", "function": "integration", "level_min": "M2", "level_max": "M4", "input": ["源域结构与目标域"], "output": ["跨域映射"], "trigger": "需要跨域复用", "failure_mode": "生搬硬套", "composed_of": []}
+  ]
+}
