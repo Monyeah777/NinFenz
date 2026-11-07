@@ -56,7 +56,8 @@ cargo test --release --manifest-path engine/rust/Cargo.toml
 为什么：`target/` 是 **gitignore 的生成物**，干净检出与 CI 上都不存在。把判据的**输入**
 放在那里，等于让 `cargo test` 依赖「这台机器上有人跑过生成器」——实测干净 worktree 直接
 `cargo test --release` 会让 `quant_metrics` 两条判据红在「读不到 good.csv」，而
-`rust-parity.yml` 正是裸跑 `cargo test`（首跑即红）。运行期自建后，本机与 CI 行为一致，
+旧 `rust-parity.yml`（已退役）正是裸跑 `cargo test`（首跑即红）；新判定面由 `cross-lang.yml`
+与运行期自建夹具覆盖。运行期自建后，本机与 CI 行为一致，
 且不把生成物塞进仓库。
 
 ### 二、普查 / 审计脚本（`survey_*.py` / `audit_engine_reads.py`）

@@ -5,7 +5,7 @@
 
   ① **包内卫生**：无 CRLF · 无 BOM · 无 `bin`/`obj`/`dist`/`_stout`/`__pycache__` ·
      **无作者机器绝对路径**（包是要进别人仓库的）；
-  ② **workflow 可解析且平台面干净**：YAML 能被解析 · 有 `jobs/steps` · 关键步骤在场（构建 / 只读门 / 对账）·
+  ② **workflow 可解析且平台面干净**：YAML 能被解析 · 有 `jobs/steps` · 关键步骤在场（构建 / 跑批）·
      **run 块里不得出现盘符路径或 `.exe`**（那是 ubuntu job，写 Windows 路径等于一次都不跑）；
   ③ **ADR 结构**：frontmatter 必填字段（id/title/status/date/evidence）· 三段齐（背景/决策/后果）·
      `decisions/INDEX.md` 投影里有对应行；
@@ -127,7 +127,7 @@ def main() -> int:
             problems.append(f"包内含{label}：{lst[:5]}")
 
     # ② workflow
-    wf = bundle / "repo" / ".github" / "workflows" / "net-engine.yml"
+    wf = bundle / "repo" / ".github" / "workflows" / "net-probes.yml"
     if not wf.exists():
         problems.append(f"workflow 不在场：{wf}")
     else:
@@ -149,7 +149,7 @@ def main() -> int:
                     names.append(str(st.get("name", "")))
                     if st.get("run"):
                         runs.append(str(st["run"]))
-            for need in ("构建", "只读门", "对账"):
+            for need in ("构建", "跑批"):
                 if not any(need in n for n in names):
                     problems.append(f"workflow 缺关键步骤（名字含「{need}」）")
             platform_bad = [(i, l) for i, blk in enumerate(runs) for l in blk.splitlines()

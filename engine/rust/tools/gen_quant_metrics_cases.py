@@ -69,7 +69,8 @@ load_cases = []
 #: 供**测试运行期**重建」。为什么不继续让判据去读 `target/test-fixtures/quant/`：`target/`
 #: 是 gitignore 的生成物，干净检出与 CI 上都不存在 ⇒ 判据会红在「读不到 good.csv」，而不是
 #: 红在真问题上（实测：干净 worktree 直接 `cargo test --release`，本文件两条判据必 FAIL；
-#: 线上 `rust-parity.yml` 也是裸跑 cargo test）。改为运行期建夹具后，本机与 CI 行为一致，
+#: 线上旧 `rust-parity.yml` 也是裸跑 cargo test（该工作流已退役，新判定面由
+#: `cross-lang.yml` 与运行期自建夹具覆盖）。改为运行期建夹具后，本机与 CI 行为一致，
 #: 且不把生成物塞进仓库。
 FIX_FILES = [('good.csv', GOOD), ('nobench.csv', NOBENCH), ('badcol.csv', BADCOL),
              ('short.csv', SHORT), ('nonpos.csv', NONPOS), ('badnum.csv', BADNUM)]
