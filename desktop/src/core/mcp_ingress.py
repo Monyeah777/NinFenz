@@ -19,7 +19,7 @@ from core import mcp_manifest as mf
 
 SCHEMA = "nf-ingress-policy/1"
 GUIDE = "修复指引："
-TOKEN_KEY = "ingress_token"
+AUTH_META_KEY = "ingress_token"
 CONSENT_KEY = "consent"
 
 
@@ -44,11 +44,11 @@ class Ingress:
         meta = meta if isinstance(meta, dict) else {}
         tokens = self.policy["tokens"]
         if tokens:
-            got = str(meta.get(TOKEN_KEY) or "")
+            got = str(meta.get(AUTH_META_KEY) or "")
             if got not in tokens:
                 raise IngressDenied(
                     "网关拒绝：token 无效或缺失（" + GUIDE + "在 params._meta."
-                    + TOKEN_KEY + " 传本机一次性 token；无 token 一律拒绝）")
+                    + AUTH_META_KEY + " 传本机一次性 token；无 token 一律拒绝）")
         deny = set(self.policy["deny"])
         allow = set(self.policy["allow"])
         if name in deny:

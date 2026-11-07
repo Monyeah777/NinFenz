@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:6f67f3133f0735d47b2b6772d933e9c582f1430ca71fbff39dd06c148a272536
+  - protocol/code_metrics_baseline.json:12d671c6e6e693b644e4742f6ea8204b1fc5068a8d32c378296ca67e91582cb2
 ---
+> 重审（2026-11-08）：SAST 修净（token 常量改名 / 去 except-pass）
+
 > 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
 
 > 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）

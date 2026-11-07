@@ -56,14 +56,15 @@ REVOKED_DEMO = ["check_file"]   # 示范吊销：check_file 被下架后必须�
 
 def _real_tool_defs() -> tuple[list[dict[str, Any]], str]:
     """优先用真 MCP 工具面（mcp_runtime.TOOL_DEFS）；不可用才回落示例，并**如实标注来源**。"""
+    defs: list[dict[str, Any]] = []
     try:
         sys.path.insert(0, str(ROOT / "desktop" / "src"))
         from core import mcp_runtime
         defs = list(getattr(mcp_runtime, "TOOL_DEFS", []) or [])
-        if defs:
-            return defs, "mcp_runtime.TOOL_DEFS"
-    except Exception:   # pragma: no cover - 环境缺依赖时回落
-        pass
+    except Exception:   # pragma: no cover - 环境缺依赖时回落示例
+        defs = []
+    if defs:
+        return defs, "mcp_runtime.TOOL_DEFS"
     return DEMO_TOOLS, "fallback.demo_tools"
 
 
