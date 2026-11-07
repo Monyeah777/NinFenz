@@ -14,8 +14,8 @@ subjects:
   - scripts/geo_export.py:d263d55b7b6a8582a13cf66126d22eeb5f05b6d02d648ee9af4ab270812f51cc
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
-  - docs/fde-stack.md:4c3a6c5e41acdedb64cef7ae38c9a2794b70dc42e611365fd137328ce08a9aed
-  - docs/fde-sample/README.md:1a6f1f4a026f5fee952636030405b6325d013a1053f3ecf0092609523504cce7
+  - docs/fde-stack.md:383a4bba4b253d5f3ca6d7f2aba6d85599fbbf20144c87ffde2f2c7f193bf0e0
+  - docs/fde-sample/README.md:9f91cb94c24d15d22fd207607ac7716a4826c3114f4bb58a09dd68f579f8ec27
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
