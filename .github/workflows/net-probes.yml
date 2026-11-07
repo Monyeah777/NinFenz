@@ -66,7 +66,7 @@ jobs:
       # 改这里即可换基线（金标前移裁决后应指向新的基线 tag）。
       NF_SNAP_REF: ${{ vars.NF_SNAP_REF || 'v2.11.0' }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
           # 金标快照要 `git archive aa259d7`：浅克隆（默认 depth=1）里没有这个祖先提交。
