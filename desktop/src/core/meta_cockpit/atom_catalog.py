@@ -27,6 +27,8 @@ ATOMS_REL = "desktop/src/core/meta_cockpit/meta_atoms.json"
 CONTRACTS_REL = "desktop/src/core/meta_cockpit/atom_contracts.json"
 PACKS_INDEX_REL = "protocol/method_packs/index.json"
 DEBT_REL = "protocol/criteria/atom_debt.json"
+COMPOSITION_REL = "protocol/atom_composition.json"
+COMPOSITION_SCHEMA = "nf-atom-composition/1"
 GUIDE = "修复指引："
 LEVELS = ("k", "m", "c", "e", "i")
 VAGUE = ("更好", "更强", "更深", "合理", "合适", "差不多", "明显")
@@ -68,6 +70,34 @@ def _pack_actions(root: str) -> set[str]:
     return used
 
 
+def _compositions(root: str) -> dict[str, list[str]]:
+    """组合覆盖层：v1 composed_of 全空，但不许改 v1 —— 组合关系以覆盖层为准。"""
+    path = Path(root) / COMPOSITION_REL
+    if not path.is_file():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError(COMPOSITION_REL + " 不是合法 JSON：" + str(exc)) from exc
+    if str(doc.get("schema")) != COMPOSITION_SCHEMA:
+        raise ValueError(COMPOSITION_REL + " schema 不匹配（" + GUIDE + "需要 "
+                         + COMPOSITION_SCHEMA + "）")
+    out: dict[str, list[str]] = {}
+    for item in doc.get("compositions") or []:
+        aid = str(item.get("id") or "")
+        if not aid:
+            raise ValueError("组合覆盖层有条目缺 id（" + GUIDE + "补 id）")
+        if aid in out:
+            raise ValueError("组合覆盖层重复 id：" + aid)
+        parts = [str(x) for x in item.get("composed_of") or []]
+        if not parts:
+            raise ValueError(aid + " 的 composed_of 为空（" + GUIDE + "删掉该条或补零件）")
+        if not str(item.get("why") or "").strip():
+            raise ValueError(aid + " 缺 why（" + GUIDE + "写清为什么是这个组合）")
+        out[aid] = parts
+    return out
+
+
 def _debt(root: str) -> dict[str, str]:
     """已知死码债：id → reason（新死码不在债里 → A4 违规，fail-closed）。"""
     path = Path(root) / DEBT_REL
@@ -87,6 +117,7 @@ def build(root: str = ".") -> dict[str, Any]:
     contracts_doc = _load(root, CONTRACTS_REL, CONTRACT_SCHEMA)
     contracts = {str(c.get("id")): c for c in contracts_doc.get("contracts") or []}
     pack_used = _pack_actions(root)
+    overlay = _compositions(root)
     items: list[dict[str, Any]] = []
     for atom in atoms_doc.get("atoms") or []:
         aid = str(atom.get("id") or "")
@@ -103,7 +134,8 @@ def build(root: str = ".") -> dict[str, Any]:
             "input": [str(x) for x in atom.get("input") or []],
             "output": output,
             "trigger": atom.get("trigger"),
-            "composed_of": [str(x) for x in atom.get("composed_of") or []],
+            "composed_of": (overlay.get(aid)
+                            or [str(x) for x in atom.get("composed_of") or []]),
             "aliases": [],
             "tags": [str(atom.get("function") or "")],
             "status": "active",
@@ -124,7 +156,8 @@ def build(root: str = ".") -> dict[str, Any]:
         })
     return {"schema": SCHEMA, "source": {"atoms": ATOMS_REL, "contracts": CONTRACTS_REL},
             "count": len(items), "atoms": items, "pack_references": sorted(pack_used),
-            "atom_debt": sorted(_debt(root))}
+            "atom_debt": sorted(_debt(root)),
+            "composition_source": COMPOSITION_REL}
 
 
 def _cycle_check(nodes: dict[str, list[str]]) -> list[str]:
@@ -226,8 +259,10 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
     #     自己契约里的 adds/removes 不算「被使用」——否则「填满但空洞」会通过。
     used: set[str] = {str(x) for x in catalog.get("pack_references") or []}
     for atom in atoms:
+        if atom.get("composed_of"):
+            used.add(str(atom.get("id")))      # 有明确组合说明的复合原子算被使用
         for ref in atom.get("composed_of") or []:
-            used.add(str(ref))
+            used.add(str(ref))                 # 被别人的组合引用
         contract = atom.get("contract") or {}
         for ref in contract.get("incompatible_with") or []:
             used.add(str(ref))

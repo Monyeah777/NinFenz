@@ -23,6 +23,7 @@
     "test_asset_provenance": 0.2,
     "test_ast_missing": 0.2,
     "test_atom_catalog": 0.2,
+    "test_atom_composition": 0.2,
     "test_atomic_write": 10.2,
     "test_atomic_write_boundaries": 0.7,
     "test_atoms": 0.8,
@@ -625,6 +626,16 @@
     "test_atom_catalog.InvariantTest.test_a5_bad_prefix": 0.0,
     "test_atom_catalog.InvariantTest.test_a5_duplicate_id": 0.0,
     "test_atom_catalog.InvariantTest.test_current_state_passes": 0.0,
+    "test_atom_composition.A1RealCheckTest.test_cycle_is_caught": 0.0,
+    "test_atom_composition.A1RealCheckTest.test_self_reference_is_caught": 0.0,
+    "test_atom_composition.A1RealCheckTest.test_unknown_reference_is_caught": 0.0,
+    "test_atom_composition.DeadCodeShrinkTest.test_dead_code_shrank": 0.0,
+    "test_atom_composition.DeadCodeShrinkTest.test_remaining_debt_is_recorded": 0.0,
+    "test_atom_composition.OverlayTest.test_catalog_merges_overlay": 0.0,
+    "test_atom_composition.OverlayTest.test_composition_source_recorded": 0.0,
+    "test_atom_composition.OverlayTest.test_overlay_entries_have_why": 0.0,
+    "test_atom_composition.OverlayTest.test_overlay_is_valid": 0.0,
+    "test_atom_composition.OverlayTest.test_v1_not_mutated": 0.0,
     "test_atomic_write.AtomicWriteTest.test_concurrent_writers_never_expose_partial_content": 1.56,
     "test_atomic_write.AtomicWriteTest.test_creates_parent_directory": 0.0,
     "test_atomic_write.AtomicWriteTest.test_failure_path_keeps_target_and_cleans_temp": 0.0,
@@ -4333,5 +4344,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1519.3
+  "total_s": 1519.5
 }

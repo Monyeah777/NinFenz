@@ -31,7 +31,10 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "k.define",
+        "k.classify"
+      ],
       "id": "k.instantiate",
       "name": "实例化",
       "status": "active"
@@ -91,7 +94,10 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "m.observe",
+        "m.check"
+      ],
       "id": "m.trace",
       "name": "溯源",
       "status": "active"
@@ -103,13 +109,19 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "c.select",
+        "c.allocate"
+      ],
       "id": "c.sequence",
       "name": "排序",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "c.select",
+        "m.estimate"
+      ],
       "id": "c.allocate",
       "name": "分配",
       "status": "active"
@@ -121,7 +133,10 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "m.detect",
+        "c.switch"
+      ],
       "id": "c.stop",
       "name": "停止/继续",
       "status": "active"
@@ -139,7 +154,11 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "e.verify",
+        "e.falsify",
+        "k.criterion"
+      ],
       "id": "e.adjudicate",
       "name": "裁决",
       "status": "active"
@@ -151,13 +170,21 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "m.estimate",
+        "e.verify",
+        "m.compare"
+      ],
       "id": "e.calibrate",
       "name": "校准",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "m.observe",
+        "m.check",
+        "e.verify"
+      ],
       "id": "e.benchmark",
       "name": "基准对照",
       "status": "active"
@@ -169,38 +196,58 @@
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "m.compare",
+        "e.adjudicate",
+        "i.merge"
+      ],
       "id": "i.reconcile",
       "name": "冲突消解",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "k.partition",
+        "m.compare",
+        "i.merge"
+      ],
       "id": "i.cluster",
       "name": "聚类",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "k.partition",
+        "k.classify",
+        "i.compose"
+      ],
       "id": "i.hierarchy",
       "name": "层级化",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "k.partition",
+        "k.relate",
+        "i.merge"
+      ],
       "id": "i.compose",
       "name": "组合",
       "status": "active"
     },
     {
-      "composed_of": [],
+      "composed_of": [
+        "k.abstract",
+        "k.instantiate",
+        "k.relate"
+      ],
       "id": "i.transfer",
       "name": "迁移",
       "status": "active"
     }
   ],
   "catalog": {
-    "atom_debt": 15,
+    "atom_debt": 1,
     "count": 33,
     "pack_references": 19,
     "schema": "nf/atom-catalog/2"
@@ -208,8 +255,8 @@
   "invariants": {
     "counts": {
       "atoms": 33,
-      "composed_of_nonempty": 0,
-      "dead": 12,
+      "composed_of_nonempty": 13,
+      "dead": 1,
       "violations": 0
     },
     "ok": true,
@@ -217,62 +264,7 @@
     "violations": [],
     "warnings": [
       {
-        "atom": "c.allocate",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "c.sequence",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "c.stop",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "e.adjudicate",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "i.cluster",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "i.compose",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "i.hierarchy",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "i.transfer",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "k.define",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "k.instantiate",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
         "atom": "k.standard",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      },
-      {
-        "atom": "m.compare",
         "code": "A4",
         "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
       }

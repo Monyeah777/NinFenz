@@ -6,7 +6,7 @@
     "prod": 1056,
     "projection": 152,
     "support": 418,
-    "verify": 1010
+    "verify": 1012
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7451,6 +7451,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子组合覆盖层判据（闭包 D-02）：v1 不许改，组合关系走覆盖层，且 A1 必须有内容。",
+      "path": "desktop/tests/test_atom_composition.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "原子写（`core/atomic_write.py`）回归测试：读者不见半截、失败不留残、LF 落盘。",
       "path": "desktop/tests/test_atomic_write.py",
       "role": "verify",
@@ -11957,6 +11963,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "原子组合关系（v2 派生用覆盖层）：v1 meta_atoms.json 的 composed_of 全空，但不许改 v1（旧 digest 必须不变），所以组合关系以本文件为准并在派生 v2 时合并。每条必须给 why（为什么是这个组合）。",
+      "path": "protocol/atom_composition.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "审计协议（机制借鉴 Audit Report + Acceptance/Sign-off + Baseline 三件）。**裁决事项**：审计报告的内容是「某时刻查到了什么」＝时点事实＝说明件（保持 `results/audit/**` 属说明件不动）；而审计报告**该怎么写、结论必须绑什么**＝约束＝规范件（本件）。冲突用分层消解，不动既有判据。",
       "path": "protocol/audit.json",
       "role": "verify",
@@ -12438,7 +12450,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "bb6eec86016d90cafda53d131e2f4125d4e7475b260f1b4ad35499dadf08bb2e",
+  "root_digest": "d1394423e0bc627cee92c79c766aa71fff28f6c7a709577397fef8d2bb3c05d8",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 272,
@@ -12447,7 +12459,7 @@
     "R-prod": 944,
     "R-projection": 133,
     "R-support": 119,
-    "R-verify": 886,
+    "R-verify": 888,
     "auto:R-core": 282
   },
   "schema": "nf-role-coordinates/1"

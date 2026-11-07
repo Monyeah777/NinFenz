@@ -195,26 +195,28 @@
       "status": "closed"
     },
     {
-      "claim": "33 原子中 12 个当前无人引用（存量死码）",
+      "claim": "33 原子死码从 12 收敛到 1（组合覆盖层 + 方法包引用），剩余 1 条已记债",
       "criteria": [
-        "test_atom_catalog.py::test_a4_debt_becomes_warning"
+        "test_atom_composition.py::test_dead_code_shrank",
+        "test_atom_composition.py::test_remaining_debt_is_recorded"
       ],
-      "debt": "已记 protocol/criteria/atom_debt.json（15 条含 12 死码），逐条给接入计划；A4 对存量降级为 warning",
+      "debt": "",
       "id": "D-01",
       "module": "atom-catalog",
-      "reverse_fixture": "新增死码（不在债里）→ 违规 fail-closed",
-      "status": "debt"
+      "reverse_fixture": "新增死码（不在债里）→ A4 违规 fail-closed（test_atom_catalog.test_a4_new_dead_atom_fails_closed）",
+      "status": "closed"
     },
     {
-      "claim": "composed_of 仍全空（原子组合关系未建立）",
+      "claim": "13 个复合原子有真实 composed_of（覆盖层，v1 未改）；A1 不再平凡通过",
       "criteria": [
-        "test_atom_catalog.py::test_current_state_passes"
+        "test_atom_composition.py::test_catalog_merges_overlay",
+        "test_atom_composition.py::test_cycle_is_caught"
       ],
-      "debt": "A1 因此平凡通过；需在 P4 后续轮次为至少 8 个复合原子补 composed_of，并让 A1 真正有内容可查",
+      "debt": "",
       "id": "D-02",
       "module": "atom-catalog",
-      "reverse_fixture": "composed_of 引用不存在/成环 → 违规",
-      "status": "debt"
+      "reverse_fixture": "组合引用不存在/自引用/成环 → A1 必红（test_unknown_reference_is_caught / test_cycle_is_caught）",
+      "status": "closed"
     },
     {
       "claim": "桥接真实证据包：pack→verify→commitment→回灌→控制面 detect（不再用合成 cc 结果）",
@@ -258,8 +260,7 @@
         "closed": 1
       },
       "atom-catalog": {
-        "closed": 1,
-        "debt": 2
+        "closed": 3
       },
       "cognition-bridge": {
         "closed": 2
@@ -300,12 +301,10 @@
       }
     },
     "by_status": {
-      "closed": 17,
-      "debt": 4
+      "closed": 19,
+      "debt": 2
     },
     "open_debt": [
-      "D-01",
-      "D-02",
       "D-04",
       "D-05"
     ],
