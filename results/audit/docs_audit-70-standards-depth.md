@@ -10,9 +10,11 @@ subjects:
   - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
   - desktop/tests/test_retriever.py:d47265d825ae4e602c478074ccfa1baf34d3b4a635a067125880e9f62723a854
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
-  - docs/domain-packs.md:55b33392a7b08dde186dcf0421e578e47d29b7aa308f165a0da3e3bc165cbf25
+  - docs/domain-packs.md:d958813bfdee544578c781b2d2bec562782a781e81278dfd4650470c03c8bd15
 
 ---
+> 重审（2026-11-07）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：standards assertion ledger
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

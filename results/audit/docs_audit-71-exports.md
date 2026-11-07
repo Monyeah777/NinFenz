@@ -14,12 +14,14 @@ subjects:
   - scripts/geo_export.py:d263d55b7b6a8582a13cf66126d22eeb5f05b6d02d648ee9af4ab270812f51cc
   - scripts/fde_sample_run.py:2826c24da2e3a0e771918eb7fdd56a14e57c893ec4ddaa739f56046a97316d6f
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
-  - docs/fde-stack.md:62fa6dae1f3efb283085c29daed2bc8233427f7cc8160b656b6377d0edfe1594
-  - docs/fde-sample/README.md:55a3f6a75cfdacf9194589101bf13cfb7f586ec517c7eb9684940f05de2e49b2
+  - docs/fde-stack.md:fe1703794eea6b62bb0c7b12d7d564e3489c13d3f7b75fca60d3ebfc064c3f11
+  - docs/fde-sample/README.md:20344eebf62299dad708b62e41fdc16f7e937effbfac25ab98af8d6aa4f55bc2
   - docs/interop-thirdparty.md:637dff4598a4b8ff21f81090c20b625269cea49903d396a3fc2968f2f1e1f2fc
   - results/interop-thirdparty-status.md:e57c95980dd8b36bf137d23db0cf3c93ba8aee5221d2d26f2a6c782c30df0469
 
 ---
+> 重审（2026-11-07）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：standards assertion ledger
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

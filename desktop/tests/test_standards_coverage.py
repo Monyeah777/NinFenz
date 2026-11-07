@@ -52,6 +52,43 @@ class CurrentLedgerTest(unittest.TestCase):
         self.assertEqual([], issues)
 
 
+class Rfc8785LedgerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.issues, cls.report = sc.build(ROOT)
+
+    def test_rfc8785_jcs_is_consumable_and_keeps_internal_rule_separate(self):
+        self.assertEqual([], self.issues)
+        rows = {row["id"]: row for row in self.report["standards"]}
+        self.assertIn("rfc8785-jcs", rows)
+        row = rows["rfc8785-jcs"]
+        self.assertEqual("data", row["layer"])
+        self.assertEqual("consumable", row["state"])
+        self.assertTrue(row["asserted"])
+
+        ledger = json.loads(
+            (ROOT / "protocol" / "standards_assertions.json").read_text(encoding="utf-8")
+        )
+        claim = next(
+            item for item in ledger["claims"] if item["id"] == "jcs-three-implementation-contract"
+        )
+        self.assertEqual("rfc8785-jcs", claim["standard"])
+        self.assertIn(
+            "desktop/tests/test_jcs_spec_gap.py::JcsSpecGapTest.test_astral_key_order_differs_from_spec",
+            claim["negative_tests"],
+        )
+        consumer_paths = {item["path"] for item in claim["consumers"]}
+        self.assertEqual(
+            {
+                "scripts/jcs.py",
+                "scripts/cross_lang_verify.py",
+                "engine/rust/canonical/src/main.rs",
+                "engine/dotnet/tools/nf-canonical/Jcs.cs",
+            },
+            consumer_paths,
+        )
+
+
 class LedgerMutationTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

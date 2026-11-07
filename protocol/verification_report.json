@@ -298,7 +298,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "22bc6edf9820010cfc586cf25d05fa6d10d2f6631a24a6b5815bd4add5fd16b3",
+        "root": "552caa8ad70472d7929055d21a8a830d0376ba300fb2d3ed5380b9e3a8d529dd",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -344,15 +344,15 @@
         "standard_bindings": 1200,
         "standards_bodies": 194,
         "standards_by_layer": {
-          "data": 148,
+          "data": 149,
           "eng": 38,
           "form": 29,
           "gov": 73,
           "iface": 84
         },
-        "standards_edges": 206,
-        "standards_reachable": 332,
-        "standards_total": 372,
+        "standards_edges": 207,
+        "standards_reachable": 333,
+        "standards_total": 373,
         "standards_unreachable": 40,
         "subdivisions_total": 1200,
         "verify_checks": 42,
@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 9,
-        "bound": 77,
-        "catalogued": 372,
-        "claims": 9,
-        "consumable": 9,
+        "asserted": 10,
+        "bound": 78,
+        "catalogued": 373,
+        "claims": 10,
+        "consumable": 10,
         "domain_bound": 70,
-        "not_domain_bound": 302,
+        "not_domain_bound": 303,
         "states": {
           "asserted": 0,
           "bound": 68,
           "catalogued": 295,
-          "consumable": 9
+          "consumable": 10
         }
       },
       "status": "pass",
@@ -641,7 +641,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4107,
+        "files": 4108,
         "kernel": 2186,
         "kernel_no_self": 436,
         "rules": 9,
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "50a29fa45760f3ee51b2a4dc404b6d47babcf407405b6cf23f9300990199e73e",
+  "root_digest": "0b035ab528085eed3a95aabbf92f7bf1a10e2c78275a54c3042aea914a5bdc29",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

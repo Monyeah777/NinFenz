@@ -24,7 +24,7 @@
 |---|---|---|
 | 传输/工具面 | MCP（`server/discover` + 四类列表）、A2A Agent Card | `results/interop/mcp.json` / `a2a.json`；他证通道 `docs/interop-thirdparty.md` |
 | 内容与格式面 | OpenAPI / AsyncAPI / SBOM / CycloneDX / in-toto / SLSA / PROV / VC | `results/interop/*.json`（12 面）+ 上游判据校验 `results/interop-schema-validation.md` |
-| 标准锚面 | 372 条可扩展标准（含扩展点）与 1200 条绑定 | `protocol/standards_catalog.json` · `standards_binding.json` · GEO 出口 `docs/standards/index.md` |
+| 标准锚面 | 373 条可扩展标准（含扩展点）与 1200 条绑定 | `protocol/standards_catalog.json` · `standards_binding.json` · GEO 出口 `docs/standards/index.md` |
 
 **对上（交付侧）——NF 向 FDE 承诺什么**
 

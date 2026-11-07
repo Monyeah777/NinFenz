@@ -8,9 +8,11 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
-  - docs/domain-packs.md:55b33392a7b08dde186dcf0421e578e47d29b7aa308f165a0da3e3bc165cbf25
+  - docs/domain-packs.md:d958813bfdee544578c781b2d2bec562782a781e81278dfd4650470c03c8bd15
   - protocol/data_contracts.json:69241e31bb9f5429346ab93c583c337757ca84ae4f1b29269e76fa3e7e672e77
 ---
+> 重审（2026-11-07）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：standards assertion ledger
 
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）

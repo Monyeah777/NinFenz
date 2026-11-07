@@ -245,6 +245,48 @@
           "symbol": "build_variant"
         }
       ]
+    },
+    {
+      "id": "jcs-three-implementation-contract",
+      "standard": "rfc8785-jcs",
+      "assertion": "RFC 8785 JCS 正负向量由 Python、Rust、C# 三个独立实现逐字节对拍；内部 nf-canonical/1 与 JCS 规则隔离，禁止混称。",
+      "tests": [
+        "desktop/tests/test_cross_lang_matrix.py::PythonJcsSpecTest.test_python_impl_matches_every_vector",
+        "desktop/tests/test_cross_lang_matrix.py::MatrixAgreementTest.test_three_implementations_agree_on_every_vector",
+        "desktop/tests/test_cross_lang_matrix.py::EdgeFixtureParityTest.test_edge_fixtures_are_byte_identical_across_implementations"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_jcs_spec_gap.py::JcsSpecGapTest.test_astral_key_order_differs_from_spec",
+        "desktop/tests/test_jcs_spec_gap.py::JcsSpecGapTest.test_integer_valued_float_differs_from_spec",
+        "desktop/tests/test_cross_lang_verify.py::CoverageRatchetTest.test_probe_entries_do_not_count_as_coverage"
+      ],
+      "checks": [],
+      "assertion_ids": [],
+      "evidence": [
+        "protocol/generated/test_vectors/jcs_conformance.json",
+        "protocol/generated/test_vectors/jcs_reject.json",
+        "protocol/generated/test_vectors/ratchet.json",
+        "protocol/CONFORMANCE.md",
+        "protocol/generated/test_vectors/README.md"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/jcs.py",
+          "symbol": "canonical_jcs"
+        },
+        {
+          "path": "scripts/cross_lang_verify.py",
+          "symbol": "canonical"
+        },
+        {
+          "path": "engine/rust/canonical/src/main.rs",
+          "contains": "fn emit(v: &Json, out: &mut String)"
+        },
+        {
+          "path": "engine/dotnet/tools/nf-canonical/Jcs.cs",
+          "contains": "public static byte[] Canonicalize(byte[] utf8)"
+        }
+      ]
     }
   ]
 }

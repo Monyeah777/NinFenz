@@ -67,13 +67,13 @@
         "registered_packs": 111,
         "pack_assets": 363,
         "concept_graphs": 101,
-        "standards_total": 372,
-        "standards_reachable": 332,
+        "standards_total": 373,
+        "standards_reachable": 333,
         "standards_unreachable": 40,
         "standard_bindings": 1200,
         "library_items": 3
       },
-      "claim_zh": "规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 372 条（可达 332 / 不可达 40）· 标准绑定 1200 条 · 馆藏 3 件",
+      "claim_zh": "规模：111 登记包 · 363 资产档 · 101 概念图；标准目录 373 条（可达 333 / 不可达 40）· 标准绑定 1200 条 · 馆藏 3 件",
       "anchor": "https://ninfenz.dev/#fact-scale",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/repo_stats.json"
     },

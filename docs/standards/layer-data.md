@@ -1,9 +1,9 @@
-# 标准目录 · 层 data（148 条）
+# 标准目录 · 层 data（149 条）
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **372** 条 · 本机可达 **332** · 不可达 **40** · 机构 **194** · 依赖边 **206**
-- 分层：data 148 · eng 38 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **373** 条 · 本机可达 **333** · 不可达 **40** · 机构 **194** · 依赖边 **207**
+- 分层：data 149 · eng 38 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
@@ -336,6 +336,9 @@
 
 ### `rfc3339`
 - 时间戳 · IETF · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 profile · 绑定 主锚 2 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc3339.txt
+
+### `rfc8785-jcs`
+- JSON Canonicalization Scheme (JCS) · IETF · 层 data · 可达 是（200 · 2026-11-07） · 扩展点 profile · 绑定 主锚 0 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc8785.txt
 
 ### `rfc9562-uuid`
 - UUID（含 v6/v7/v8） · IETF · 层 data · 可达 是（200 · 2026-09-24） · 扩展点 version-field, variant-field · 绑定 主锚 0 / 辅锚 0 · https://www.rfc-editor.org/rfc/rfc9562

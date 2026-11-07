@@ -82,6 +82,25 @@ async function copyTree(src, dst) {
 
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
+// Windows 上杀软/索引器会短暂持有刚写完的目录，rename 可能瞬时返回 EPERM/EACCES/EBUSY。
+// 只对这三类可恢复竞争退避重试；其它错误立即 fail-closed，避免掩盖真实文件系统故障。
+export async function renameWithRetry(src, dst, opts) {
+  const options = opts || {};
+  const rename = options.rename || fsp.rename;
+  const wait = options.sleep || sleep;
+  const attempts = options.attempts || 8;
+  const transient = new Set(['EPERM', 'EACCES', 'EBUSY']);
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      return await rename(src, dst);
+    } catch (e) {
+      if (!e || !transient.has(e.code) || i === attempts - 1) throw e;
+      await wait(Math.min(25 * (2 ** i), 500));
+    }
+  }
+  throw new Error('rename retry exhausted：' + src + ' -> ' + dst);
+}
+
 // 首次运行把 payload 落到缓存目录；已存在且校验通过则直接复用（冷启动只解包一次）。
 export async function ensurePayload(manifest, opts) {
   const options = opts || {};
@@ -117,7 +136,7 @@ export async function ensurePayload(manifest, opts) {
     if (bad.length) throw new Error('payload 校验失败（' + bad.length + ' 处）：' + bad.slice(0, 3).join(', '));
     await fsp.writeFile(path.join(tmp, '.nf-payload-ok'), manifest.tree_sha256 + '\n', 'utf8');
     await fsp.rm(home, { recursive: true, force: true });
-    await fsp.rename(tmp, home);
+    await renameWithRetry(tmp, home);
     return home;
   } finally {
     await fsp.rm(lock, { recursive: true, force: true });
