@@ -4,7 +4,7 @@
     "entry": 27,
     "floor": 5,
     "prod": 1044,
-    "projection": 139,
+    "projection": 140,
     "support": 315,
     "verify": 1141
   },
@@ -13152,14 +13152,14 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "ff271baed678b6d2ea914e7cfa98d5da19d0b26ba8571e259ba19988388d47ef",
+  "root_digest": "bfe9da96e5b351eb12e638458b0985b84fd784af51d635e4aa05bc0a911f0491",
   "rule_counts": {
     "R-app": 1448,
     "R-catch": 138,
     "R-entry": 27,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 124,
+    "R-projection": 125,
     "R-support": 151,
     "R-verify": 1020,
     "auto:R-core": 262
