@@ -425,6 +425,29 @@ def _add_parser_cog(sub):
     cc.add_argument("--trigger", default="", help="触发来源（manual/loop/budget_low…）")
     cc.add_argument("--out", default="", help="写回会话文件")
     cc.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccr = csub.add_parser("criteria", help="列出判据注册表（craft/standard/review）",
+                          description="判据三层：craft 可计算 / standard 可机检 / review 外部盲评；"
+                                      "不出聚合分，缺 witness 只能 unknown。")
+    ccr.add_argument("--layer", default="", help="只看一层（craft/standard/review）")
+    ccr.add_argument("--id", dest="criterion_id", default="", help="只看一条判据")
+    ccr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccl = csub.add_parser("claim", help="把主张编译成证据义务清单",
+                          description="主张 → 义务清单：方法包给「什么算证据」，判据给「怎么判」。")
+    ccl.add_argument("--claim", required=True, help="主张原文（一句能被反驳的话）")
+    ccl.add_argument("--kind", dest="claim_kind", required=True,
+                     help="主张类型（如 robustness/capacity/closure）")
+    ccl.add_argument("--pack", dest="packs", action="append", default=[],
+                     help="方法包 id（可重复，至少一个）")
+    ccl.add_argument("--criterion", dest="criteria", action="append", default=[],
+                     help="判据 id（可重复；缺省按 applies_to 自动选）")
+    ccl.add_argument("--role", default="local-trusted", help="主张角色（默认 local-trusted）")
+    ccl.add_argument("--out", default="", help="写主张文件（缺省=只打印）")
+    ccl.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cch = csub.add_parser("claim-check", help="按义务清单核对证据（三态，不评分）",
+                          description="核对：satisfied / missing / unknown；unknown 不算 pass。")
+    cch.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
+    cch.add_argument("--evidence", required=True, help="证据清单 JSON（键=义务项）")
+    cch.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cg = csub.add_parser("triggers", help="看当前状态触发了哪些算子（确定性谓词）",
                          description="触发引擎：无进展/回环/冲突/预算/校准漂移/缺上下文。")
     cg.add_argument("--bundle", required=True, help="会话文件")
@@ -470,6 +493,72 @@ def _cmd_cog(args) -> int:
             print("    frame_delta：" + "、".join(item["delta_kinds"]))
             print("    失败模式：" + item["failure_mode"])
         return 0
+    if sub == "criteria":
+        try:
+            from core.cognition_workspace import criteria as cg_criteria
+            if args.criterion_id:
+                items = [cg_criteria.get(ROOT, args.criterion_id)]
+            else:
+                items = cg_criteria.list_criteria(ROOT, args.layer)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog criteria（" + str(len(items)) + " 条）==")
+        for item in items:
+            print("  [" + item["layer"] + "] " + item["id"] + "：" + item["name"])
+            print("    how：" + item["how"])
+            print("    witness：" + "、".join(item["witness"]))
+        return 0
+    if sub == "claim":
+        try:
+            from core.cognition_workspace import claims as cg_claims
+            doc = cg_claims.compile_claim(ROOT, args.claim, args.claim_kind,
+                                          list(args.packs), list(args.criteria),
+                                          role=args.role)
+        except ValueError as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            atomic_write.write_text(_rel_out(args.out),
+                                    _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.json:
+            print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog claim ==")
+            print("  主张：" + doc["claim"])
+            print("  类型：" + doc["claim_kind"] + " · 包：" + "、".join(doc["packs"]))
+            total = sum(len(std["required"]) for block in doc["obligations"]
+                        for std in block["standards"])
+            print("  义务项：" + str(total) + " 项")
+            for block in doc["obligations"]:
+                for std in block["standards"]:
+                    for need in std["required"]:
+                        print("    - " + need)
+            print("  判据：" + "、".join(c["id"] for c in doc["criteria"]))
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "claim-check":
+        try:
+            from core.cognition_workspace import claims as cg_claims
+            doc = _read(args.claim_file)
+            with open(_rel_out(args.evidence), encoding="utf-8") as handle:
+                evidence = _json.load(handle)
+            res = cg_claims.check_claim(doc, evidence)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog claim-check ==")
+            print("  就绪：" + ("是" if res["ready"] else "否")
+                  + " · 共 " + str(res["total"]) + " 项")
+            print("  已满足：" + str(len(res["satisfied"])))
+            print("  缺项：" + str(res["missing"]))
+            print("  未知：" + str(res["unknown"]) + "（unknown 不算 pass）")
+        return 0 if res["ready"] else 1
     if sub == "ops":
         items = ([cg_ops.describe(args.op_id)] if args.op_id
                  else [cg_ops.describe(o) for o in cg_ops.OPERATOR_IDS])

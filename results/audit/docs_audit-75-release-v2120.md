@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
+  - scripts/nf.py:73506222df74766e6faf0fd26237261f5ece4252ffa9a59669dd6391630ff232
 
 ---
+> 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
+
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
 
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）

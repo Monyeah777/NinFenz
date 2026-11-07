@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
+  - scripts/nf.py:73506222df74766e6faf0fd26237261f5ece4252ffa9a59669dd6391630ff232
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:ec5bbafe97be2f1fdb18ac7457d6d1a87f0680405670ada7ba6234a0aec9d324
+  - protocol/code_metrics_baseline.json:e1d412a7bab771b3dc8dd9558ea8773a7dca84e91d0c6e76a5c777cf8fbc9169
 ---
+> 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
+
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
 
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）

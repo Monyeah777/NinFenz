@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
+  - scripts/nf.py:73506222df74766e6faf0fd26237261f5ece4252ffa9a59669dd6391630ff232
 ---
+> 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
+
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
 
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）

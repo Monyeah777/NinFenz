@@ -1,0 +1,77 @@
+{
+  "schema": "nf-criteria-registry/1",
+  "note": "判据注册表：三层（craft 可计算 / standard 可机检 / review 外部盲评）。铁律：不出聚合分、不许角色升级、witness 必填。",
+  "rules": {
+    "no_aggregate_score": "任何判据只输出 pass|fail|unknown + witness，禁止 score/grade/rating 键",
+    "no_role_upgrade": "判据声明的 source_role 不得超过 max_role；外部意见永远不能变成本地可信",
+    "witness_required": "没有 witness 的判据输出一律降为 unknown，不得写 pass"
+  },
+  "layers": {
+    "craft": [
+      {
+        "id": "craft:coherence",
+        "name": "融贯",
+        "kind": "computable",
+        "how": "检查主张与其引用的证据/前提是否互相矛盾：列出主张依赖的每条证据，标注支持/中立/矛盾",
+        "witness": ["主张原文", "依赖证据清单", "每条的支持/中立/矛盾标注"],
+        "applies_to": ["claim", "hypothesis"],
+        "source_role": "external-advisory",
+        "max_role": "external-advisory"
+      },
+      {
+        "id": "craft:evidence_sufficiency",
+        "name": "证据充分性",
+        "kind": "computable",
+        "how": "对照方法包的 evidence_standards 逐条核对：每项 required 是否有对应证据，缺项列入 missing",
+        "witness": ["claim_kind", "required 清单", "逐项对应证据或缺失"],
+        "applies_to": ["claim"],
+        "source_role": "local-trusted",
+        "max_role": "local-trusted"
+      },
+      {
+        "id": "craft:falsifiability",
+        "name": "可证伪性",
+        "kind": "computable",
+        "how": "写出至少一条「什么观察会推翻该主张」，且该观察在原理上可取得",
+        "witness": ["主张", "推翻条件（观察）", "取得方式"],
+        "applies_to": ["claim", "hypothesis"],
+        "source_role": "external-advisory",
+        "max_role": "external-advisory"
+      }
+    ],
+    "standard": [
+      {
+        "id": "standard:GB45438-2025",
+        "name": "GB 45438—2025 标识要求",
+        "kind": "machine-check",
+        "how": "由 nf check 的策略包执行；本条只登记映射关系，判定以策略引擎输出为准",
+        "witness": ["策略包版本", "门禁输出（pass/fail 与条款回链）"],
+        "applies_to": ["artifact"],
+        "source_role": "local-trusted",
+        "max_role": "local-trusted"
+      },
+      {
+        "id": "standard:evidence-bundle-v0",
+        "name": "证据包格式",
+        "kind": "machine-check",
+        "how": "nf evidence verify 的四词判定 + 退出码；不得只看退出码不看 verdict",
+        "witness": ["manifest digest", "四词判定结果"],
+        "applies_to": ["artifact"],
+        "source_role": "local-trusted",
+        "max_role": "local-trusted"
+      }
+    ],
+    "review": [
+      {
+        "id": "review:blind-review-protocol",
+        "name": "外部盲评协议",
+        "kind": "external-blind",
+        "how": "双盲：评审者不知道产出方与版本；评估维度预先登记（框架变化/假设显式化/反例质量/融贯/深度/可交付性）；本仓内部永不产出该判据的 pass",
+        "witness": ["评审协议版本", "评审者身份摘要（匿名化）", "逐维度记录", "分歧记录"],
+        "applies_to": ["claim", "artifact"],
+        "source_role": "external-blind",
+        "max_role": "external-blind"
+      }
+    ]
+  }
+}
