@@ -28,7 +28,7 @@ public static class AuxGolden
    ""issues"": [],
    ""stats"": {
     ""docs"": 5,
-    ""steps"": 9
+    ""steps"": 10
    }
   },
   ""files"": {},
