@@ -324,6 +324,7 @@
     "test_telemetry_semconv": 0.1,
     "test_terminal": 9.4,
     "test_text_hygiene": 8.1,
+    "test_timestamp": 1.9,
     "test_tool_face": 0.3,
     "test_trace_drill": 3.3,
     "test_transparency_log": 0.2,
@@ -3791,6 +3792,14 @@
     "test_text_hygiene.TextHygieneTest.test_repo_package_versions_are_semver": 1.63,
     "test_text_hygiene.TextHygieneTest.test_semver_lexemes": 0.0,
     "test_text_hygiene.TextHygieneTest.test_version_source_scans_packages": 0.12,
+    "test_timestamp.EvidenceTimeAnchorTest.test_no_token_means_clock_based_marking": 0.3,
+    "test_timestamp.EvidenceTimeAnchorTest.test_record_contains_expected_fields": 0.17,
+    "test_timestamp.EvidenceTimeAnchorTest.test_token_on_other_bundle_is_invalid": 0.21,
+    "test_timestamp.EvidenceTimeAnchorTest.test_verify_with_token_sets_time_proof_tsa": 0.28,
+    "test_timestamp.LocalTsaTest.test_full_chain_verifies_offline": 0.21,
+    "test_timestamp.LocalTsaTest.test_missing_anchor_is_fail_closed": 0.18,
+    "test_timestamp.LocalTsaTest.test_token_for_other_data_is_rejected": 0.2,
+    "test_timestamp.LocalTsaTest.test_wrong_anchor_is_rejected": 0.22,
     "test_tool_face.ToolFaceTest.test_missing_license_captured": 0.0,
     "test_tool_face.ToolFaceTest.test_repo_has_first_battle_case": 0.13,
     "test_trace_drill.TraceDrillCliTest.test_drift_is_reported": 0.43,
@@ -3990,5 +3999,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1357.3
+  "total_s": 1359.2
 }

@@ -603,8 +603,35 @@ def _add_parser_production(sub):
                           "（不符判 invalid；包内无 decision 时只给 warning，不判死）")
     evv.add_argument("--selfcheck", action="store_true",
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
+    evv.add_argument("--time-record", dest="time_record", default="",
+                     help="nf-time-token/1 记录：用 TSA token 锚定该字节的存在时刻")
+    evv.add_argument("--time-ca", dest="time_ca", default="",
+                     help="时间戳信任锚（TSA 根证书 PEM）；给了 --time-record 时必须给")
+    evv.add_argument("--time-untrusted", dest="time_untrusted", default="",
+                     help="时间戳中间证书 PEM（链不全时给）")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
     _add_parser_revocations(esub)
+    ets = esub.add_parser("timestamp",
+                          help="RFC 3161 可信时间戳：申请 / 离线校验（G3 半边）",
+                          description="时间戳：向 TSA 申请 token（绑定数据摘要），校验只需证书链、"
+                                      "不需联网。只证「该摘要在该时刻已存在」。")
+    etss = ets.add_subparsers(dest="timestamp_cmd")
+    ets_stamp = etss.add_parser("stamp", help="申请时间戳并落盘（需网络 + curl + openssl）",
+                                description="申请：ts -query 造请求 → curl POST 给 TSA → 落 "
+                                            ".tsq/.tsr/记录；给了 --ca-file 时立刻自检。")
+    ets_stamp.add_argument("timestamp_data", metavar="FILE", help="要盖时间戳的文件")
+    ets_stamp.add_argument("--url", default="", help="TSA 地址（缺省 digicert）")
+    ets_stamp.add_argument("--out-prefix", default="", help="落盘前缀（缺省同 FILE 名）")
+    ets_stamp.add_argument("--ca-file", default="", help="TSA 根证书 PEM（给了才自检）")
+    ets_stamp.add_argument("--untrusted", default="", help="中间证书 PEM")
+    ets_stamp.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ets_verify = etss.add_parser("verify", help="离线校验时间戳（token 与请求成对）",
+                                 description="校验：签名链 + status=Granted + genTime 可解析。")
+    ets_verify.add_argument("timestamp_token", metavar="TOKEN", help="TSA 返回的 .tsr")
+    ets_verify.add_argument("--query", required=True, help="当初提交的 .tsq")
+    ets_verify.add_argument("--ca-file", required=True, help="TSA 根证书 PEM（信任锚）")
+    ets_verify.add_argument("--untrusted", default="", help="中间证书 PEM")
+    ets_verify.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evba = esub.add_parser("batch",
                            help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
                            description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
@@ -3699,6 +3726,76 @@ def _revocations_merge(args):
     return 0 if res["ok"] else 1
 
 
+def _evidence_timestamp(args):
+    """nf evidence timestamp：申请（stamp）/ 离线校验（verify）时间戳。"""
+    import json as _json
+
+    from core import timestamp as ts
+    sub = str(getattr(args, "timestamp_cmd", "") or "")
+    if sub == "stamp":
+        return _timestamp_stamp(args, ts, _json)
+    if sub == "verify":
+        return _timestamp_verify(args, ts, _json)
+    print("用法：nf evidence timestamp stamp <FILE> [--url TSA --ca-file CA] "
+          "｜ verify <TOKEN> --query Q --ca-file CA", file=sys.stderr)
+    return 2
+
+
+def _timestamp_stamp(args, ts, _json):
+    data = _rel_out(args.timestamp_data)
+    prefix = _rel_out(args.out_prefix) if args.out_prefix else data
+    if not os.path.isfile(data):
+        return _machine_fail(args, f"文件不存在：{data}（修复指引：给一个真实文件）", 4)
+    query, err = ts.make_query(data, out=prefix + ".tsq")
+    if err:
+        return _machine_fail(args, err, 4)
+    token, err = ts.submit(query, url=args.url, out=prefix + ".tsr")
+    if err:
+        return _machine_fail(args, err, 4)
+    with open(data, "rb") as fh:
+        sha = ts.subject_digest(fh.read())
+    doc, err = ts.record(data, token, query, sha,
+                         _rel_out(args.ca_file) if args.ca_file else token, out=prefix + ".json")
+    checked = None
+    if args.ca_file:
+        checked = ts.verify(token, query, ca_file=_rel_out(args.ca_file),
+                            untrusted=_rel_out(args.untrusted) if args.untrusted else "")
+        if not checked["ok"]:
+            return _machine_fail(args, "；".join(checked["issues"]), 1)
+    if args.json:
+        print(_json.dumps({"kind": "timestamp-stamp", "ok": True, "record": prefix + ".json",
+                           "query": query, "token": token,
+                           "gen_time": (checked or {}).get("gen_time", ""),
+                           "subject_sha256": sha},
+                          ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence timestamp stamp（{os.path.basename(data)}）==")
+        print(f"  请求：{query} · token：{token} · 记录：{prefix}.json")
+        print(f"  被证摘要：{sha[:24]}")
+        if checked:
+            print(f"  自检：{checked['verdict']} · genTime {checked['gen_time']}")
+        else:
+            print("  自检：跳过（没给 --ca-file，无法判断 token 是谁签的）")
+    return 0
+
+
+def _timestamp_verify(args, ts, _json):
+    res = ts.verify(_rel_out(args.timestamp_token), _rel_out(args.query),
+                    ca_file=_rel_out(args.ca_file) if args.ca_file else "",
+                    untrusted=_rel_out(args.untrusted) if args.untrusted else "")
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence timestamp verify（{args.timestamp_token}）==")
+        print(f"  判定：{res['verdict']} · genTime {res['gen_time'] or '-'} · "
+              f"serial {res['serial'] or '-'}")
+        for issue in res["issues"]:
+            print(f"  [FAIL] {issue}", file=sys.stderr)
+        for warn in res["warnings"]:
+            print(f"  [WARN] {warn}", file=sys.stderr)
+    return 0 if res["ok"] else 1
+
+
 def _evidence_batch(args):
     """nf evidence batch：目录逐件复验 → 汇总（任何一件非 ok 即整体失败）。"""
     import json as _json
@@ -3740,6 +3837,8 @@ def _cmd_evidence(args):
         print("用法：nf evidence pack <文件…> --out <包.zip>｜nf evidence verify <包.zip>"
               "（各自 --help 看逐条）", file=sys.stderr)
         return 2
+    if sub == "timestamp":
+        return _evidence_timestamp(args)
     if sub == "batch":
         return _evidence_batch(args)
     if sub == "verify":
@@ -3788,10 +3887,22 @@ def _evidence_verify(args):
         root = _rel_out(args.root) if args.root else ""
         anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
                if getattr(args, "anchor", "") else None)
+        time_record = None
+        if getattr(args, "time_record", ""):
+            time_record = json_doc.load(_rel_out(args.time_record), dict,
+                                        what=args.time_record)
+            time_record["_dir"] = os.path.dirname(os.path.abspath(_rel_out(args.time_record)))
+            if not getattr(args, "time_ca", ""):
+                return _machine_fail(args, "给了 --time-record 就必须给 --time-ca（信任锚）"
+                                           "（修复指引：TSA 根证书 PEM）", 4)
         res = evidence.verify_any(path, key=key, revocations=rev, at=args.at,
                                   root=root, kind=args.kind, anchor=anc,
                                   expected_policy_digest=getattr(args, "policy_digest", ""),
-                                  require_fresh_revocations=bool(args.require_fresh_revocations))
+                                  require_fresh_revocations=bool(args.require_fresh_revocations),
+                                  time_record=time_record,
+                                  time_ca=_rel_out(args.time_ca) if args.time_ca else "",
+                                  time_untrusted=(_rel_out(args.time_untrusted)
+                                                  if args.time_untrusted else ""))
     except (OSError, ValueError) as exc:
         return _machine_fail(args, str(exc), 4)
     if args.json:
@@ -5708,7 +5819,8 @@ def _path_writing_issue(args) -> str:
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
                        "label_object": "被标注对象可以是任意字节（图片/音视频）",
                        "evidence_bundle": "证据包是 zip（二进制容器）",
-                       "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）"}
+                       "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）",
+                       "timestamp_data": "被盖时间戳的对象可以是任意字节（证据包是 zip）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
                     "batch_target",
                     "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",

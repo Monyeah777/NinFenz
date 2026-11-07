@@ -5,7 +5,7 @@
     "floor": 5,
     "prod": 1050,
     "projection": 137,
-    "support": 376,
+    "support": 377,
     "verify": 981
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
@@ -7469,7 +7469,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "CCOS 一条链复现单测（cc_check → cc_attest → cc_verify → cc_replay）。",
+      "function": "CCOS 一条链复现单测（cc_check → [cc_label] → cc_attest → cc_verify → cc_replay）。",
       "path": "desktop/tests/test_ccos_chain.py",
       "role": "verify",
       "rule": "R-verify"
@@ -12228,10 +12228,10 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "c84cc5d6f79d55d1b2fc3fd7df5830a3b9501d5e9838d109a03e4fdcb20a3a5b",
+  "root_digest": "f6fa19bb7a3c1ce165634bf7d76779d17578799ee0675b7a17f08e5c636f1ddd",
   "rule_counts": {
     "R-app": 1455,
-    "R-catch": 230,
+    "R-catch": 231,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,

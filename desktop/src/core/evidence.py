@@ -787,6 +787,46 @@ def _apply_freshness(res: dict[str, Any], require_fresh: bool, at: str,
     return True
 
 
+def _apply_time_token(res: dict[str, Any], bundle: str, record: dict[str, Any],
+                      ca_file: str, untrusted: str) -> str | None:
+    """校验外部 RFC 3161 token 并把判定时点锚到 genTime。
+
+    → 成功返回锚定时刻（ISO）；失败返回 None 并把原因写进 issues（fail-closed）。
+    语义边界：token 证的是「该字节在该时刻已存在」，所以**有效期判定用 genTime**——
+    我们仍然不知道「现在」的真实时间，只把「已过期」上的时钟依赖换成可验证的锚点。
+    """
+    from core import timestamp as ts
+    if not isinstance(record, dict) or str(record.get("schema") or "") != ts.SCHEMA:
+        res["issues"].append("时间锚记录 schema 不匹配（" + GUIDE
+                             + "给 nf-time-token/1 记录 JSON）")
+        return None
+    subject = record.get("subject") or {}
+    try:
+        with open(bundle, "rb") as fh:
+            want = ts.subject_digest(fh.read())
+    except OSError as exc:
+        res["issues"].append(f"读不到证据包：{exc}（{GUIDE}确认路径）")
+        return None
+    got = str(subject.get("sha256") or "")
+    if got != want:
+        res["issues"].append(f"时间锚与被证对象不符（记录={got[:16]} 实测={want[:16]}）"
+                             f"（{GUIDE}token 必须盖在同一份字节上——换包必须重新申请）")
+        return None
+    base = os.path.dirname(os.path.abspath(bundle))
+    record_dir = str(record.get("_dir") or base)
+    token = os.path.join(record_dir, str((record.get("token") or {}).get("path") or ""))
+    query = os.path.join(record_dir, str((record.get("query") or {}).get("path") or ""))
+    checked = ts.verify(token, query, ca_file=ca_file, untrusted=untrusted)
+    if not checked["ok"]:
+        res["issues"].extend(["时间锚不可信：" + i for i in checked["issues"]])
+        return None
+    res["time_proof"] = "tsa"
+    res["time_basis"] = checked["gen_time"]
+    res["time_token"] = {"gen_time": checked["gen_time"], "serial": checked["serial"],
+                         "tsa": checked["tsa"]}
+    return checked["gen_time"]
+
+
 def _apply_expiry(res: dict[str, Any], at: str) -> bool:
     """时效判定：有效期早于判定时点即 expired。返回是否已定案。
 
@@ -795,14 +835,15 @@ def _apply_expiry(res: dict[str, Any], at: str) -> bool:
     在包带有效期时给 warning——**不假装已经证明了时间**。
     """
     exp = res["expires_at"]
-    res["time_proof"] = "pinned" if at else "none"
-    res["time_basis"] = at or ("本机时钟 " + attest.issue_stamp())
+    if res.get("time_proof") != "tsa":      # 已有 TSA 锚：不要覆盖成 pinned/none
+        res["time_proof"] = "pinned" if at else "none"
+        res["time_basis"] = at or ("本机时钟 " + attest.issue_stamp())
     if not exp:
         return False
-    if not at:
+    if not at and res.get("time_proof") != "tsa":
         res["warnings"].append("时间不可证（G3）：本判定用本机时钟判有效期，回拨时钟即可改变 "
                                "expired 结论（修复指引：需要可对账时给 --at 固定时点，"
-                               "或接可信时间戳后再判）")
+                               "或用 nf evidence timestamp 申请 TSA token 后再判）")
     now = at or attest.issue_stamp()
     if now <= exp:
         return False
@@ -816,7 +857,9 @@ def verify(bundle: str, key: bytes | None = None,
            revocations: dict[str, Any] | None = None,
            at: str = "", anchor: dict[str, Any] | None = None,
            expected_policy_digest: str = "",
-           require_fresh_revocations: bool = False) -> dict[str, Any]:
+           require_fresh_revocations: bool = False,
+           time_record: dict[str, Any] | None = None,
+           time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
@@ -857,6 +900,11 @@ def verify(bundle: str, key: bytes | None = None,
         _check_decision(rd, meta, entries, res, expected_policy_digest)
         if res["issues"]:
             return res
+        if time_record is not None:
+            anchored = _apply_time_token(res, bundle, time_record, time_ca, time_untrusted)
+            if anchored is None:
+                return res
+            at = anchored or at
         fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
         if _apply_revocation(rd, entries, revocations, res, fresh, at):
             return res
@@ -1187,7 +1235,9 @@ def verify_any(path: str, key: bytes | None = None,
                root: str = "", kind: str = "",
                anchor: dict[str, Any] | None = None,
                expected_policy_digest: str = "",
-               require_fresh_revocations: bool = False) -> dict[str, Any]:
+               require_fresh_revocations: bool = False,
+               time_record: dict[str, Any] | None = None,
+               time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
     """cc_verify 的统一入口：自动判三种形态并给出同一套四词判定。
 
     - 容器（.zip / 目录）按内容判形态；单 JSON 按 schema 判形态，成员从 `root` 找
@@ -1205,7 +1255,9 @@ def verify_any(path: str, key: bytes | None = None,
             if form == "bundle":
                 return verify(path, key=key, revocations=revocations, at=at, anchor=anchor,
                               expected_policy_digest=expected_policy_digest,
-                              require_fresh_revocations=require_fresh_revocations)
+                              require_fresh_revocations=require_fresh_revocations,
+                              time_record=time_record, time_ca=time_ca,
+                              time_untrusted=time_untrusted)
             if form == "receipts":
                 res = _verify_receipts(doc, rd.read, revocations,
                                        require_fresh_revocations, at)
