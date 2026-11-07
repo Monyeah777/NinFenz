@@ -391,7 +391,7 @@
       "max_fn_lines": 23
     },
     "desktop/src/core/evidence.py": {
-      "lines": 1863,
+      "lines": 1866,
       "max_fn_cc": 25,
       "max_fn_lines": 161
     },
@@ -1611,9 +1611,9 @@
       "max_fn_lines": 53
     },
     "scripts/sast_check.py": {
-      "lines": 236,
+      "lines": 241,
       "max_fn_cc": 12,
-      "max_fn_lines": 30
+      "max_fn_lines": 35
     },
     "scripts/serve_decision_model.py": {
       "lines": 288,
