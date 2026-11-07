@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:c9bcb25d469f55d6e4c8ace6c8cd3f99bc04000f6ca19b5ba62e1ebb5c7b29fe
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:4f93dbe7465722eb270712737a9f85814729763259450f8b65789048197aecfe
+  - protocol/check12_weights.json:0c9f27b2f1514dc9c7f5a86b97f4dd6f5fb978edfb44a3d58a9ce9084b343186
   - protocol/coupling_baseline.json:6713ca489f02179eb294c9ab18288a27d1cc9e43f085f941b6bc3d93849c71fa
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：ed25519 吊销签名（非对称：验证方只持公钥）+ 回归判据

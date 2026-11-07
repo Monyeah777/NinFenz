@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:d241e3deb83c8c4d7737f7b510657bef9284d148a65a2ac44def5268fa7beb16
+  - protocol/code_metrics_baseline.json:70504ccc851b86443a01ebddcc0e2e9aafaf2dd3ab3124acf62dab0cd5377967
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning

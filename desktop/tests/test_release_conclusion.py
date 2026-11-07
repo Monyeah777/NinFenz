@@ -387,5 +387,39 @@ class TestSnapshotHygiene(unittest.TestCase):
             entries, set(), 1000.0 + 99 * 3600, keep="/base/mine"))
 
 
+class TestSnapshotIsolationPaths(unittest.TestCase):
+    """快照内层的落点约束（两条实测教训）：临时目录/家目录都必须在主仓树之外。
+
+    ① 同盘（否则满盘卷上测试自己 ENOSPC）；② 不进仓库树（否则 npm findRepoRoot 向上命中
+    活树、不触发解包，test_payload_is_extracted_to_cache_and_runs 假红）。
+    """
+
+    def setUp(self):
+        self.gate = _load()
+
+    def test_temp_dir_is_on_same_drive_and_outside_repo(self):
+        path = str(ROOT / ".worktrees" / "gate-snap" / "run-x" / "wt")
+        tmp = self.gate.snapshot_temp_dir(path)
+        self.assertEqual(os.path.splitdrive(os.path.abspath(path))[0],
+                         os.path.splitdrive(tmp)[0], "必须与快照同盘")
+        repo = os.path.abspath(str(ROOT))
+        self.assertFalse(os.path.abspath(tmp).startswith(repo + os.sep),
+                         "临时目录不能落在仓库树内")
+        self.assertIn(".nf-gate-tmp", tmp)
+
+    def test_home_dir_is_outside_worktree(self):
+        path = str(ROOT / ".worktrees" / "gate-snap" / "run-y" / "wt")
+        home = os.path.abspath(self.gate.snapshot_home_dir(path))
+        self.assertFalse(home.startswith(os.path.abspath(path) + os.sep),
+                         "NF_HOME 不能在 worktree 里（会被当成仓库件）")
+
+    def test_log_path_lives_in_run_dir_not_worktree(self):
+        path = str(ROOT / ".worktrees" / "gate-snap" / "run-z" / "wt")
+        log = os.path.abspath(self.gate.snapshot_log_path(path))
+        run_dir = os.path.dirname(os.path.abspath(path))
+        self.assertEqual(run_dir, os.path.dirname(log))
+        self.assertTrue(log.endswith("gate.log"))
+
+
 if __name__ == "__main__":
     unittest.main()

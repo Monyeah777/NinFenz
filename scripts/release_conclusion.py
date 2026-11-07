@@ -472,6 +472,28 @@ def _read_text(path: str) -> str:
         return ""
 
 
+def snapshot_temp_dir(path: str) -> str:
+    """快照内层临时目录：**同一卷、且在主仓树之外**的盘根独立目录。
+
+    两个约束都来自实测（2026-11-06）：① 与快照同盘，否则 C 盘满时测试自己 ENOSPC；
+    ② 不能落在任何仓库树内，否则 npm 包的 findRepoRoot 会向上命中活树、不触发解包，
+    test_payload_is_extracted_to_cache_and_runs 假红。
+    """
+    drive = os.path.splitdrive(os.path.abspath(path))[0] or ""
+    run_name = os.path.basename(os.path.dirname(path))
+    return os.path.join(drive + os.sep, ".nf-gate-tmp", run_name, "tmp")
+
+
+def snapshot_home_dir(path: str) -> str:
+    """快照内层 NF_HOME：快照旁边（不进仓库树），守护/缓存/会话自成一户。"""
+    return os.path.join(path, "..", "home")
+
+
+def snapshot_log_path(path: str) -> str:
+    """内层日志：放在 run 目录里（worktree 之外，不会把快照弄脏）。"""
+    return os.path.join(os.path.dirname(path), "gate.log")
+
+
 def _run_in_snapshot(args, head: str) -> int:
     """外层：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
 
@@ -493,7 +515,7 @@ def _run_in_snapshot(args, head: str) -> int:
     if err:
         print(f"  ✗ {err}", file=sys.stderr)
         return 2
-    log_path = os.path.join(os.path.dirname(path), "gate.log")
+    log_path = snapshot_log_path(path)
     print(f"  [snapshot] HEAD {head[:12]} · 内层日志 {log_path}（可另开终端 tail -f）",
           file=sys.stderr, flush=True)
     try:
@@ -508,11 +530,9 @@ def _run_in_snapshot(args, head: str) -> int:
         # ② **在主仓树之外**：若 %TEMP% 落在仓库树内，npm 包的 findRepoRoot 会从 %TEMP% 向上
         #    命中活树，于是不触发解包，test_payload_is_extracted_to_cache_and_runs 假红。
         #    所以用「盘根下独立目录」：同盘、且任何仓库根的祖先都不是它。
-        drive = os.path.splitdrive(os.path.abspath(path))[0] or ""
-        tmp_dir = os.path.join(drive + os.sep, ".nf-gate-tmp",
-                               os.path.basename(os.path.dirname(path)), "tmp")
+        tmp_dir = snapshot_temp_dir(path)
         os.makedirs(tmp_dir, exist_ok=True)
-        home_dir = os.path.join(path, "..", "home")
+        home_dir = snapshot_home_dir(path)
         os.makedirs(home_dir, exist_ok=True)
         env = {**os.environ, "TEMP": tmp_dir, "TMP": tmp_dir,
                # 独立 NF_HOME：快照里的守护/缓存/会话都自成一户，不会连上活树里的守护

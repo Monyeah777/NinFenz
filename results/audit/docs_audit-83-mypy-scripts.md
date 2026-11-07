@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:c9bcb25d469f55d6e4c8ace6c8cd3f99bc04000f6ca19b5ba62e1ebb5c7b29fe
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:d241e3deb83c8c4d7737f7b510657bef9284d148a65a2ac44def5268fa7beb16
+  - protocol/code_metrics_baseline.json:70504ccc851b86443a01ebddcc0e2e9aafaf2dd3ab3124acf62dab0cd5377967
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning

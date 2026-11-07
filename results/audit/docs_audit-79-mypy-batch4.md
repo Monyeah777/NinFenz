@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:be909a9e4f77effc74ec1d09a05ea140cccdf460fef090a70aa96c7d998ffec8
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:d241e3deb83c8c4d7737f7b510657bef9284d148a65a2ac44def5268fa7beb16
+  - protocol/code_metrics_baseline.json:70504ccc851b86443a01ebddcc0e2e9aafaf2dd3ab3124acf62dab0cd5377967
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning

@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:d241e3deb83c8c4d7737f7b510657bef9284d148a65a2ac44def5268fa7beb16
+  - protocol/code_metrics_baseline.json:70504ccc851b86443a01ebddcc0e2e9aafaf2dd3ab3124acf62dab0cd5377967
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning

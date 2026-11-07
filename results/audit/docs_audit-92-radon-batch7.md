@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:d241e3deb83c8c4d7737f7b510657bef9284d148a65a2ac44def5268fa7beb16
+  - protocol/code_metrics_baseline.json:70504ccc851b86443a01ebddcc0e2e9aafaf2dd3ab3124acf62dab0cd5377967
 ---
+> 重审（2026-11-07）：快照落点纯函数化 + 3 条隔离判据（同盘/出树/日志）
+
 > 重审（2026-11-07）：revocations_seed 进二进制豁免 + 两份文档项数同步（62→65 / 34→43）
 
 > 重审（2026-11-07）：G3 诚实闭环：time_proof/time_basis + 显式 warning
