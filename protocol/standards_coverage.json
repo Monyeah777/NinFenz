@@ -161,6 +161,7 @@
     "mods",
     "mqtt5",
     "msgpack",
+    "multiformats-cid",
     "netcdf",
     "netex",
     "nist-100-2",
@@ -305,7 +306,7 @@
     "zarr"
   ],
   "note": "四态仅表示仓库内部编目、绑定、断言与消费证据；不等于第三方认证。",
-  "root_digest": "7e4b4775dc38509b4fcc5fa493dfac9ccb3c3f5846d62b80c3a086867c53830d",
+  "root_digest": "24e591d9a4f5f7f6d2b0680a4e52b56060217d4991da368e4d57845d825f6d7a",
   "schema": "nf-standards-coverage/1",
   "standards": [
     {
@@ -3013,6 +3014,22 @@
       "url": "https://github.com/msgpack/msgpack/blob/master/spec.md"
     },
     {
+      "asserted": true,
+      "body": "Multiformats/IPFS",
+      "bound": true,
+      "catalogued": true,
+      "claims": [
+        "cidv1-raw-sha256-profile"
+      ],
+      "consumable": true,
+      "domain_bound": false,
+      "id": "multiformats-cid",
+      "layer": "data",
+      "state": "consumable",
+      "title": "CID (Content IDentifier)",
+      "url": "https://specs.ipfs.tech/cid/"
+    },
+    {
       "asserted": false,
       "body": "Unidata",
       "bound": false,
@@ -5558,18 +5575,18 @@
     "consumable"
   ],
   "summary": {
-    "asserted": 10,
-    "bound": 78,
-    "catalogued": 373,
-    "claims": 10,
-    "consumable": 10,
+    "asserted": 11,
+    "bound": 79,
+    "catalogued": 374,
+    "claims": 11,
+    "consumable": 11,
     "domain_bound": 70,
-    "not_domain_bound": 303,
+    "not_domain_bound": 304,
     "states": {
       "asserted": 0,
       "bound": 68,
       "catalogued": 295,
-      "consumable": 10
+      "consumable": 11
     }
   }
 }

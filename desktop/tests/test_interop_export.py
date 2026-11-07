@@ -183,6 +183,38 @@ class InteropExportTest(unittest.TestCase):
         for e in idx["entries"]:
             self.assertRegex(e["cid"], r"^b[a-z2-7]{50,}$")
 
+    def test_cidv1_profile_roundtrips_known_empty_vector(self):
+        import hashlib
+        empty_digest = hashlib.sha256(b"").hexdigest()
+        cid = ie.cidv1_raw_sha256(empty_digest)
+        self.assertEqual(
+            "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku",
+            cid,
+        )
+        self.assertEqual(bytes.fromhex(empty_digest), ie.parse_cidv1_raw_sha256(cid))
+
+    def test_cidv1_profile_rejects_non_profile_cids(self):
+        import base64
+        import hashlib
+
+        tail = b"\x12\x20" + hashlib.sha256(b"").digest()
+
+        def enc(payload):
+            return "b" + base64.b32encode(payload).decode("ascii").lower().rstrip("=")
+
+        valid = enc(b"\x01\x71" + tail)
+        bad = (
+            valid[1:],                     # 缺 multibase 前缀
+            enc(b"\x02\x71" + tail),       # 非 CIDv1
+            enc(b"\x01\x70" + tail),       # 非 raw codec
+            enc(b"\x01\x71" + b"\x13\x20" + hashlib.sha256(b"").digest()),
+            valid[:-1],                    # truncation
+            valid[:10] + "0" + valid[11:], # base32 非字母表字符
+        )
+        for cid in bad:
+            with self.assertRaises(ValueError, msg=cid):
+                ie.parse_cidv1_raw_sha256(cid)
+
     def test_cyclonedx_shape_and_same_source_as_spdx(self):
         cdx = ie.cyclonedx_doc(ROOT)
         self.assertEqual(cdx["bomFormat"], "CycloneDX")

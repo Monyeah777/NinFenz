@@ -2823,7 +2823,7 @@ public static class SelfTest
     }
 
     /// <summary>
-    /// GEO 出口（check38 子扫描 3 · `scripts/geo_export.py`）四钉：真仓（373 条标准 / 70 条被绑定 /
+    /// GEO 出口（check38 子扫描 3 · `scripts/geo_export.py`）四钉：真仓（374 条标准 / 70 条被绑定 /
     /// 8 件生成物，**引擎重算须逐字节命中盘上原件**）· 合成语料（真源 `write()` 写出的盘上原件 →
     /// 引擎重算同样命中，证明渲染器不是只对真仓凑巧）· 合成漂移（删一个索引锚点 → 漂移 + 锚点集合
     /// 各报一条）· 缺生成物（8 件逐件报缺 + 锚点集合报差）。金标由 probes/geo_export_probe.py 产出。
@@ -2836,9 +2836,9 @@ public static class SelfTest
         const string Absent = "4aa7946fa0a0edc6ccf8e560949dc5bb";
 
         var real = GeoExport.Check(repoRoot);
-        checks.Add(new Check("GEO 出口·真仓（373 条标准 / 70 条被绑定 / 8 件生成物 · 重算逐字节命中）",
+        checks.Add(new Check("GEO 出口·真仓（374 条标准 / 70 条被绑定 / 8 件生成物 · 重算逐字节命中）",
             real.Ok && real.LogDigest() == Real
-            && Convert.ToInt64(real.Stats["standards"]) == 373
+            && Convert.ToInt64(real.Stats["standards"]) == 374
             && Convert.ToInt64(real.Stats["bound_standards"]) == 70
             && Convert.ToInt64(real.Stats["files"]) == 8,
             $"FAIL {real.Issues.Count} · 标准 {real.Stats["standards"]} · 摘要 {real.LogDigest()}"

@@ -287,6 +287,44 @@
           "contains": "public static byte[] Canonicalize(byte[] utf8)"
         }
       ]
+    },
+    {
+      "id": "cidv1-raw-sha256-profile",
+      "standard": "multiformats-cid",
+      "assertion": "CIDv1 raw 0x71 + sha2-256 + base32lower profile 由 Python/C# 独立生成，全部回执可由第三方按规范复算，非 profile 输入 fail-closed。",
+      "tests": [
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_cid_multiformats_vector",
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_cidv1_profile_roundtrips_known_empty_vector",
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_committed_interop_faces_match_live"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_interop_export.py::InteropExportTest.test_cidv1_profile_rejects_non_profile_cids"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "results/interop/cid.json",
+        "protocol/RECEIPTS.json",
+        "desktop/src/core/interop_export.py",
+        "scripts/interop_thirdparty_kit.py",
+        "engine/dotnet/src/Nf.Engine/Interop.cs"
+      ],
+      "consumers": [
+        {
+          "path": "desktop/src/core/interop_export.py",
+          "symbol": "cid_index"
+        },
+        {
+          "path": "scripts/interop_thirdparty_kit.py",
+          "symbol": "_kcid_recompute"
+        },
+        {
+          "path": "engine/dotnet/src/Nf.Engine/Interop.cs",
+          "contains": "public static string Cidv1RawSha256(string digestHex)"
+        }
+      ]
     }
   ]
 }
