@@ -306,8 +306,12 @@ def _receipts_vectors(tmp: str) -> list:
 
 def _envelope(path: str, data: bytes, key: bytes | None = None) -> dict:
     """造 nf-attest/1 信封（digest_only 或 hmac-sha256 级）。"""
+    text = data.decode("utf-8")
     base = {"schema": "nf-attest/1",
-            "subject": {"path": path, "sha256": hashlib.sha256(data).hexdigest()},
+            "subject": {"path": path,
+                        "sha256": hashlib.sha256(data).hexdigest(),
+                        "bytes": len(data),
+                        "line_count": len(text.replace("\r\n", "\n").splitlines())},
             "producer": "vectors", "issued_at": PIN}
     body = json.dumps(base, sort_keys=True, ensure_ascii=False,
                       separators=(",", ":")).encode()

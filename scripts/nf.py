@@ -637,38 +637,7 @@ def _add_parser_production(sub):
     ets_verify.add_argument("--ca-file", required=True, help="TSA 根证书 PEM（信任锚）")
     ets_verify.add_argument("--untrusted", default="", help="中间证书 PEM")
     ets_verify.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evba = esub.add_parser("batch",
-                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
-                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
-                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
-                                       "「每一件都 ok」。")
-    evba.add_argument("batch_target", metavar="TARGET",
-                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
-    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
-    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
-    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
-    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
-    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
-    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
-                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
-                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
-                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
-    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
-    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
-    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
-    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
-                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
-                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
-                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
-    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
-                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
-    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
-    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
-                     help="显式指定形态（缺省 = 自动判）")
-    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
-    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
-    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    _add_parser_evidence_extra(esub)
     ck = sub.add_parser("check", help="单对象策略体检（cc_check：对象 × 策略 → verdict）",
                         description="单对象策略体检（内部差距：仓内判定全是仓库级，缺「单对象 × "
                                     "单策略」入口）。策略是 nf-check-policy/1 的封闭词表 JSON；"
@@ -802,6 +771,41 @@ def _add_parser_revocations(esub):
     rvm.add_argument("--at", default="", help="新鲜度判定时点（UTC 秒级；缺省 = 现在）")
     rvm.add_argument("--out", default="", help="输出合并表（缺省=只打印）")
     rvm.add_argument("--json", action="store_true", help="输出结构化 JSON")
+
+def _add_parser_evidence_extra(esub):
+    """evidence 的批量/bench/replay 子命令注册（从 _add_parser_production 拆出，保 300 行判据）。"""
+    evba = esub.add_parser("batch",
+                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
+                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
+                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
+                                       "「每一件都 ok」。")
+    evba.add_argument("batch_target", metavar="TARGET",
+                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
+    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
+    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
+    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
+                          description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
+                                      "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
+                                      "抓不到篡改的校验器就是摆设，本基准把这句话变成数字。")
+    evb.add_argument("--out", default="", help="把 Markdown 报告写到该路径（缺省 = 只打印）")
+    evb.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    evb.add_argument("--quiet", action="store_true", help="只输出结论行")
+    evr = esub.add_parser("replay", help="复现轨迹：把证据推导过程摊成逐步可核的 trace",
+                          description="复现轨迹（cc_replay）：成员「字节→摘要→叶→证明折叠」"
+                                      "逐算，另给链节与信封摘要；每步带规则名与输入/输出摘要，"
+                                      "trace 不含时间戳（同输入两次逐字节一致，可 diff）。")
+    evr.add_argument("evidence_bundle", nargs="?", default="", metavar="TARGET",
+                     help="证据源：证据包 .zip / 解包目录 / 回执或信封 JSON")
+    evr.add_argument("--entry", default="", help="只看单个成员（相对路径；缺省 = 全量）")
+    evr.add_argument("--kind", default="", choices=("",) + evidence_kinds(),
+                     help="显式指定形态（缺省 = 自动判）")
+    evr.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evr.add_argument("--key-file", default="", help="验 hmac 信封所需密钥")
+    evr.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 def _add_parser_validation(sub):
     sc = sub.add_parser("score",

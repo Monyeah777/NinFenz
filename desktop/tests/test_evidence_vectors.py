@@ -65,7 +65,7 @@ class TestExpectedVerdicts(unittest.TestCase):
     def _core(self, vec):
         key = base64.b64decode(vec["key_b64"]) if vec.get("key_b64") else None
         try:
-            return evidence.verify(str(self._materialize(vec)), key=key,
+            return evidence.verify_any(str(self._materialize(vec)), key=key,
                                    revocations=vec.get("revocations"),
                                    at=vec.get("at", ""),
                                    anchor=vec.get("anchor"))
