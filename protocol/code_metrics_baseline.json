@@ -1386,9 +1386,9 @@
       "max_fn_lines": 14
     },
     "scripts/abi_call_vectors.py": {
-      "lines": 252,
+      "lines": 258,
       "max_fn_cc": 5,
-      "max_fn_lines": 37
+      "max_fn_lines": 40
     },
     "scripts/ai_domain_closure.py": {
       "lines": 395,
@@ -1436,7 +1436,7 @@
       "max_fn_lines": 69
     },
     "scripts/check_vectors.py": {
-      "lines": 136,
+      "lines": 139,
       "max_fn_cc": 5,
       "max_fn_lines": 37
     },
@@ -1481,7 +1481,7 @@
       "max_fn_lines": 44
     },
     "scripts/evidence_vectors.py": {
-      "lines": 428,
+      "lines": 431,
       "max_fn_cc": 9,
       "max_fn_lines": 79
     },

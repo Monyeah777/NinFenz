@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:342792e296b1f613daf9b1555cc28c490d7e0019dc0ca8d3207c8bb83bafffaa
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3667fb4ec6461828c3426f12546f735a447f47d3ee96a4366f8fe526e1924de2
+  - protocol/code_metrics_baseline.json:21508dcf4a044caa772c006613b2604314334673f49608091ee9745270d3aaa2
 ---
+> 重审（2026-11-07）：向量面收口：三形态跨实现同判 + 信封 subject 三摘要面
+
 > 重审（2026-11-07）：命令树拆分（production 321→117 行 + 新组 evidence_face 207 行）
 
 > 重审（2026-11-07）：门禁修：silent-skip 理由 / 两个文本参数登记 / --mode 复核

@@ -84,7 +84,10 @@ def build_attest_vectors() -> dict:
 
     def _envelope(key):
         base = {"schema": "nf-attest/1",
-                "subject": {"path": "d/a.md", "sha256": _h.sha256(subject).hexdigest()},
+                "subject": {"path": "d/a.md",
+                            "sha256": _h.sha256(subject).hexdigest(),
+                            "bytes": len(subject),
+                            "line_count": len(subject.decode().splitlines())},
                 "producer": "vectors", "issued_at": "2026-01-01T00:00:00Z"}
         body = json.dumps(base, sort_keys=True, ensure_ascii=False,
                           separators=(",", ":")).encode()
@@ -105,7 +108,7 @@ def build_attest_vectors() -> dict:
                      "expected": {"ok": True,
                                   "level": "hmac-sha256" if key else "digest_only"}})
     bad = _envelope(None)
-    bad["subject"] = {"path": "d/a.md", "sha256": "0" * 64}
+    bad["subject"] = {**bad["subject"], "sha256": "0" * 64}
     rows.append({"id": "subject_flip", "desc": "主体摘要被改",
                  "subject_b64": _b64.b64encode(subject).decode(), "envelope": bad,
                  "key_b64": "", "expected": {"ok": False, "level": "none"}})
@@ -183,12 +186,12 @@ def build_replay_vectors() -> dict:
     with tempfile.TemporaryDirectory(prefix="nf_replay_vec_") as tmp:
         root = Path(tmp) / "repo"
         (root / "d").mkdir(parents=True)
-        (root / "d" / "a.md").write_text("# A\n", encoding="utf-8")
-        (root / "d" / "b.md").write_text("# B\n", encoding="utf-8")
+        atomic_write.write_text(str(root / "d" / "a.md"), "# A\n")
+        atomic_write.write_text(str(root / "d" / "b.md"), "# B\n")
         data, _info = evidence.build(str(root), ["d/a.md", "d/b.md"],
                                      created_at="2026-01-01T00:00:00Z")
         bundle = Path(tmp) / "b.zip"
-        bundle.write_bytes(data)
+        atomic_write.write_bytes(str(bundle), data)
         live = evidence.replay(str(bundle))
         rows.append({"id": "bundle_ok", "desc": "完好包的可重放轨迹",
                      "bundle_b64": base64.b64encode(data).decode(),
@@ -249,4 +252,7 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8")
     raise SystemExit(main())

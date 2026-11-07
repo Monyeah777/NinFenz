@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:3667fb4ec6461828c3426f12546f735a447f47d3ee96a4366f8fe526e1924de2
+  - protocol/code_metrics_baseline.json:21508dcf4a044caa772c006613b2604314334673f49608091ee9745270d3aaa2
 ---
+> 重审（2026-11-07）：向量面收口：三形态跨实现同判 + 信封 subject 三摘要面
+
 > 重审（2026-11-07）：命令树拆分（production 321→117 行 + 新组 evidence_face 207 行）
 
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import
