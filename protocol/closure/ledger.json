@@ -385,18 +385,21 @@
     {
       "id": "D-04",
       "module": "mcp-manifest",
-      "claim": "工具面派生用内置 5 个工具示例，未直连 mcp_runtime.TOOL_DEFS 真实清单",
-      "status": "debt",
-      "debt": "接真实 TOOL_DEFS 需要改 serve 启动路径，留到 P6 Ingress 一起做",
+      "claim": "工具清单派生自真实 MCP 工具面（mcp_runtime.TOOL_DEFS，12 个），annotations 压过名字推断",
+      "status": "closed",
       "criteria": [
         [
           "test_mcp_manifest.py",
-          "test_build_keeps_mcp_top_level_only"
+          "test_script_reports_real_source"
+        ],
+        [
+          "test_mcp_manifest.py",
+          "test_readonly_annotation_beats_name_inference"
         ]
       ],
-      "reverse_fixture": "顶层出现非 MCP 字段 → 拒",
+      "reverse_fixture": "library_read 这类前缀会被推断成 local，但 readOnlyHint 必须压过推断 → side_effect=none、不需要同意（test_readonly_annotation_beats_name_inference）",
       "evidence": [
-        "python scripts/mcp_manifest.py --json"
+        "python scripts/mcp_manifest.py --check"
       ]
     },
     {

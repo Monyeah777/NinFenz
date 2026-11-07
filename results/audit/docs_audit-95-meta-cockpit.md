@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:7687954df62e9c216a090f51b1b1a23587172b1ab5534dff982fadeb8544a4e9
+  - protocol/check12_weights.json:6a92c44f40172856a865ad8d2983cb4259e4e438d2da884785214ba7e2c0e79e
   - protocol/coupling_baseline.json:3212f64574da3454a25a65d8a792481f8d673139e8dfc41efea24be5995464ee
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）
+
 > 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）
 
 > 重审（2026-11-08）：原子组合覆盖层（13 复合原子）+ 死码 12→1（D-01/D-02 关账）

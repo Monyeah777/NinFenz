@@ -54,8 +54,22 @@ DECLARATIONS = {
 REVOKED_DEMO = ["check_file"]   # 示范吊销：check_file 被下架后必须被拒用
 
 
+def _real_tool_defs() -> tuple[list[dict[str, Any]], str]:
+    """优先用真 MCP 工具面（mcp_runtime.TOOL_DEFS）；不可用才回落示例，并**如实标注来源**。"""
+    try:
+        sys.path.insert(0, str(ROOT / "desktop" / "src"))
+        from core import mcp_runtime
+        defs = list(getattr(mcp_runtime, "TOOL_DEFS", []) or [])
+        if defs:
+            return defs, "mcp_runtime.TOOL_DEFS"
+    except Exception:   # pragma: no cover - 环境缺依赖时回落
+        pass
+    return DEMO_TOOLS, "fallback.demo_tools"
+
+
 def build_report() -> dict[str, Any]:
-    manifest = mf.build(DEMO_TOOLS, DECLARATIONS)
+    tool_defs, tool_source = _real_tool_defs()
+    manifest = mf.build(tool_defs, DECLARATIONS)
     issues = mf.validate(manifest)
     envelope = mf.sign(manifest, DEMO_SEED)
     verified = mf.verify_signature(manifest, envelope)
@@ -66,11 +80,13 @@ def build_report() -> dict[str, Any]:
     replay = mf.replay_receipts([first, second])
     http_side = mf.receipt("check_file", {"path": "a.png"}, {"verdict": "pass"})
     return {"schema": SCHEMA, "manifest": manifest, "envelope": envelope,
-            "checks": {"manifest_issues": issues,
+            "checks": {"tool_source_is_real": tool_source == "mcp_runtime.TOOL_DEFS",
+                       "manifest_issues": issues,
                        "signature_ok": verified["ok"],
                        "revoked_blocked": not revoked["ok"],
                        "receipt_replay_ok": replay["ok"],
                        "same_call_evidence": mf.same_call_evidence(first, http_side)},
+            "tool_source": tool_source,
             "counts": {"tools": len(manifest["tools"]),
                        "side_effects": {s: sum(1 for t in manifest["tools"]
                                                if t["_meta"]["ccos"]["side_effect"] == s)

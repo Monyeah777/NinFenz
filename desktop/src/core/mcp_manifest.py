@@ -39,6 +39,30 @@ def digest_of(obj: Any) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def _from_annotations(raw: dict[str, Any]) -> dict[str, Any]:
+    """真 MCP 工具自带的 annotations 优先于「按名字猜」——真实数据比启发式可靠。
+
+    readOnlyHint → side_effect=none；destructiveHint → local；openWorldHint → network。
+    没有 annotations 时才回落到名字推断。
+    """
+    ann = raw.get("annotations") or {}
+    if not isinstance(ann, dict) or not ann:
+        return {}
+    out: dict[str, Any] = {}
+    if ann.get("readOnlyHint"):
+        out["side_effect"] = "none"
+        out["requires_consent"] = False
+    elif ann.get("destructiveHint"):
+        out["side_effect"] = "local"
+        out["requires_consent"] = True
+    elif ann.get("openWorldHint"):
+        out["side_effect"] = "network"
+        out["requires_consent"] = True
+    if isinstance(ann.get("idempotentHint"), bool):
+        out["idempotent"] = ann["idempotentHint"]
+    return out
+
+
 def _infer_side_effect(name: str, declared: str = "") -> str:
     if declared in SIDE_EFFECTS:
         return declared
@@ -60,7 +84,10 @@ def build(tool_defs: list[dict[str, Any]],
         if not name:
             raise ValueError("工具缺 name（" + GUIDE + "tools/list 里每个工具必须有 name）")
         item = {key: raw[key] for key in TOP_LEVEL_ALLOWED if key in raw}
-        conf = decl.get(name) or {}
+        conf = dict(_from_annotations(raw))
+        conf.update(decl.get(name) or {})   # 显式声明可覆盖推断
+        if raw.get("outputSchema") and not conf.get("outputSchema"):
+            conf["outputSchema"] = raw["outputSchema"]
         side_effect = _infer_side_effect(name, str(conf.get("side_effect") or ""))
         item["_meta"] = {
             "ccos": {

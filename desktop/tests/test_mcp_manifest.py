@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "desktop" / "src"))
 
 from core import mcp_manifest as mf  # noqa: E402
 
-NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
+SCRIPT = (sys.executable, str(ROOT / "scripts" / "mcp_manifest.py"))
 TOOLS = [
     {"name": "check_file", "description": "门禁体检",
      "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}}}},
@@ -162,6 +162,64 @@ class ScriptTest(unittest.TestCase):
         self.assertTrue(report["ok"], report["checks"])
         self.assertTrue(report["checks"]["revoked_blocked"])
         self.assertTrue(report["checks"]["same_call_evidence"])
+
+
+
+
+class RealToolSurfaceTest(unittest.TestCase):
+    """D-04：清单必须派生自**真实** MCP 工具面，而不是手写示例。"""
+
+    def test_real_tool_defs_importable(self):
+        from core import mcp_runtime
+        defs = list(mcp_runtime.TOOL_DEFS)
+        self.assertGreaterEqual(len(defs), 8)
+        for item in defs:
+            for field in ("name", "description", "inputSchema"):
+                self.assertIn(field, item, item.get("name"))
+
+    def test_annotations_drive_side_effect(self):
+        """真工具自带 annotations：readOnlyHint → side_effect=none、不需要同意。"""
+        from core import mcp_runtime
+        manifest = mf.build(list(mcp_runtime.TOOL_DEFS))
+        self.assertEqual([], mf.validate(manifest))
+        for item in manifest["tools"]:
+            ccos = item["_meta"]["ccos"]
+            self.assertEqual("none", ccos["side_effect"], item["name"])
+            self.assertFalse(ccos["requires_consent"], item["name"])
+
+    def test_readonly_annotation_beats_name_inference(self):
+        """库内前缀推断会把 library_read 当成 local；annotations 必须压过推断。"""
+        tool = {"name": "library_read", "description": "读库",
+                "inputSchema": {"type": "object"},
+                "annotations": {"readOnlyHint": True, "idempotentHint": True}}
+        manifest = mf.build([tool])
+        ccos = manifest["tools"][0]["_meta"]["ccos"]
+        self.assertEqual("none", ccos["side_effect"])
+        self.assertFalse(ccos["requires_consent"])
+        self.assertTrue(ccos["idempotent"])
+
+    def test_destructive_annotation_requires_consent(self):
+        tool = {"name": "write_thing", "description": "写",
+                "inputSchema": {"type": "object"},
+                "annotations": {"destructiveHint": True}}
+        ccos = mf.build([tool])["tools"][0]["_meta"]["ccos"]
+        self.assertEqual("local", ccos["side_effect"])
+        self.assertTrue(ccos["requires_consent"])
+
+    def test_output_schema_is_carried_over(self):
+        from core import mcp_runtime
+        manifest = mf.build(list(mcp_runtime.TOOL_DEFS))
+        carried = [t for t in manifest["tools"]
+                   if t["_meta"]["ccos"]["outputSchema"] is not None]
+        self.assertEqual(len(manifest["tools"]), len(carried))
+
+    def test_script_reports_real_source(self):
+        proc = subprocess.run([*SCRIPT, "--json"], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=180)
+        self.assertEqual(0, proc.returncode, proc.stderr[-300:])
+        report = json.loads(proc.stdout)
+        self.assertEqual("mcp_runtime.TOOL_DEFS", report["tool_source"])
+        self.assertTrue(report["checks"]["tool_source_is_real"])
 
 
 if __name__ == "__main__":

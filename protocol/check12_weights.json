@@ -202,7 +202,7 @@
     "test_market_analyzer": 0.6,
     "test_mcp_adapter": 0.2,
     "test_mcp_live_e2e": 2.6,
-    "test_mcp_manifest": 0.3,
+    "test_mcp_manifest": 0.4,
     "test_mcp_packaging": 0.3,
     "test_mcp_read_budget": 1.2,
     "test_mcp_runtime": 2.6,
@@ -2577,6 +2577,12 @@
     "test_mcp_manifest.CompatibilityTest.test_descriptions_preserved": 0.0,
     "test_mcp_manifest.CompatibilityTest.test_extensions_live_in_meta": 0.0,
     "test_mcp_manifest.CompatibilityTest.test_side_effect_inference": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_annotations_drive_side_effect": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_destructive_annotation_requires_consent": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_output_schema_is_carried_over": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_readonly_annotation_beats_name_inference": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_real_tool_defs_importable": 0.0,
+    "test_mcp_manifest.RealToolSurfaceTest.test_script_reports_real_source": 0.11,
     "test_mcp_manifest.ReceiptTest.test_broken_chain_is_caught": 0.0,
     "test_mcp_manifest.ReceiptTest.test_different_args_are_not_same_evidence": 0.0,
     "test_mcp_manifest.ReceiptTest.test_receipt_chain_replays": 0.0,
@@ -4360,5 +4366,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1519.6
+  "total_s": 1519.7
 }
