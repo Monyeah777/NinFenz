@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:ed9183426668295405a84bb60fa4c49cbd6cf6c4b44c674dc491258fe16fc2ef
+  - protocol/code_metrics_baseline.json:1b30f2ab262b20f034b0ebace13f184571fdb7c56ab4f162f95d51a00309867d
 ---
+> 重审（2026-11-07）：CI 面删旧：移除 rust-parity/net-engine 旧工作流；生成器夹具改字节写
+
 > 重审（2026-11-07）：合并基线补齐：向量生成器 subject 字段 + 脚本原子写/stdio + 命令树拆组
 
 > 重审（2026-11-07）：纯度修：去掉 __import__，改正常 import

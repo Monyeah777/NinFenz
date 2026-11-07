@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-07",
   "approved_by": "Monyeah777",
-  "note": "合并基线补齐（红修复）",
+  "note": "CI 删旧 + 跨平台断言修复（重算 role_coordinates）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "ae6d2de6f37f027a4b04140e768c41b838a8fce0744cb9c1e6ba6d7af6831619"
