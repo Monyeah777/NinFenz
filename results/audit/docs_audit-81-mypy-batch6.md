@@ -10,7 +10,7 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:aa3dcd385b1552bf8bc2343b6aba7362f42ecd4fd6db786d214030180afefecc
+  - protocol/code_metrics_baseline.json:366187dce19d04bb893fcbeb62639c6ace160b0d0abd6712f0fb0c15d4d6a0af
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -270,6 +270,8 @@ subjects:
 
 | 模块 | 修前 | 修法 |
 |---
+> 重审（2026-11-07）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-02）：refreeze.sh（统一冻结入口）
 
 > 重审（2026-10-30）：2026-10-30: 1.1.2 版本面与发布事实同步；README 与机器事实更新，重审对象摘要变更。

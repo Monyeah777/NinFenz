@@ -212,8 +212,14 @@ class InteropExportTest(unittest.TestCase):
             valid[:10] + "0" + valid[11:], # base32 非字母表字符
         )
         for cid in bad:
-            with self.assertRaises(ValueError, msg=cid):
+            with self.assertRaises(ValueError, msg=cid) as ctx:
                 ie.parse_cidv1_raw_sha256(cid)
+            self.assertIn("修复指引", str(ctx.exception))
+
+    def test_cidv1_digest_rejection_explains_the_fix(self):
+        with self.assertRaises(ValueError) as ctx:
+            ie.cidv1_raw_sha256("not-a-sha256")
+        self.assertIn("修复指引", str(ctx.exception))
 
     def test_cyclonedx_shape_and_same_source_as_spdx(self):
         cdx = ie.cyclonedx_doc(ROOT)

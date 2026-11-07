@@ -29,7 +29,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 100,
+        "raises": 105,
         "sinks": 22
       },
       "status": "pass",
@@ -342,17 +342,17 @@
         "registered_packs": 111,
         "schema": "nf-repo-stats/1",
         "standard_bindings": 1200,
-        "standards_bodies": 194,
+        "standards_bodies": 195,
         "standards_by_layer": {
-          "data": 149,
+          "data": 150,
           "eng": 38,
           "form": 29,
           "gov": 73,
           "iface": 84
         },
         "standards_edges": 207,
-        "standards_reachable": 333,
-        "standards_total": 373,
+        "standards_reachable": 334,
+        "standards_total": 374,
         "standards_unreachable": 40,
         "subdivisions_total": 1200,
         "verify_checks": 42,
@@ -492,18 +492,18 @@
       "sample": [],
       "source": "standards_coverage.scan",
       "stats": {
-        "asserted": 10,
-        "bound": 78,
-        "catalogued": 373,
-        "claims": 10,
-        "consumable": 10,
+        "asserted": 11,
+        "bound": 79,
+        "catalogued": 374,
+        "claims": 11,
+        "consumable": 11,
         "domain_bound": 70,
-        "not_domain_bound": 303,
+        "not_domain_bound": 304,
         "states": {
           "asserted": 0,
           "bound": 68,
           "catalogued": 295,
-          "consumable": 10
+          "consumable": 11
         }
       },
       "status": "pass",
@@ -653,7 +653,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "0b035ab528085eed3a95aabbf92f7bf1a10e2c78275a54c3042aea914a5bdc29",
+  "root_digest": "1d51d04183e8e07156d8f88a7a322aefb8a3d5ce738bb892a884c093d0181847",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
