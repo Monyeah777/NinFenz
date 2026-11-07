@@ -1,9 +1,9 @@
-# 标准目录 · 层 eng（38 条）
+# 标准目录 · 层 eng（39 条）
 
 > 本页由 `python scripts/geo_export.py --write` 生成，禁止手改。真源：`protocol/standards_catalog.json` + `protocol/standards_binding.json`。
 
-- 覆盖：标准 **374** 条 · 本机可达 **334** · 不可达 **40** · 机构 **195** · 依赖边 **207**
-- 分层：data 150 · eng 38 · form 29 · gov 73 · iface 84
+- 覆盖：标准 **375** 条 · 本机可达 **334** · 不可达 **41** · 机构 **196** · 依赖边 **207**
+- 分层：data 150 · eng 39 · form 29 · gov 73 · iface 84
 - 可达性是**本机实测**（探针日期见每条），不可达条目照实标注、不假装可达。
 - 本页为 `docs/standards/index.md` 的按层切片，锚点与主索引一致。
 
@@ -48,6 +48,9 @@
 
 ### `iso-iec-42010`
 - 架构描述 · ISO/IEC · 层 eng · 可达 否（403 · 2026-09-24） · 扩展点 viewpoint-extension · 绑定 主锚 0 / 辅锚 0 · https://www.iso.org/standard/74393.html
+
+### `iso-iec-ieee-29119`
+- 软件测试（29119 系列） · ISO/IEC/IEEE · 层 eng · 可达 否（403 · 2026-11-07） · 扩展点 part-1-concepts, part-2-processes, part-3-documentation, part-4-techniques · 绑定 主锚 0 / 辅锚 0 · https://www.iso.org/standard/81254.html
 
 ### `junit-xml`
 - JUnit XML 测试报告 · JUnit 社区 · 层 eng · 可达 是（200 · 2026-09-24） · 扩展点 custom-property, system-out · 绑定 主锚 0 / 辅锚 0 · https://github.com/testmoapp/junitxml

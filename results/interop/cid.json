@@ -27,9 +27,9 @@
       "sha256": "c7c522fd4f0370674cc2c191855c2fe14849fba04f7a5d8b2c68b437d8c34233"
     },
     {
-      "cid": "bafyreiat7nypf5vcpufdclae22w5dfhqdhlp2ifgkxq7thnk6wguiqrsqu",
+      "cid": "bafyreihli7aeudiknuqx7jmrows6cksytsndpt3g3mh7yxs6h6tj6h7v7u",
       "path": "llms.txt",
-      "sha256": "13fb70f2f6a27d0a312c04d6add194f019d6fd20a655e1f99daaf58d44423285"
+      "sha256": "eb47c04a0d0a6d217fa59175a5e12a589c9a37cf66db0ffc5e5e3fa69f1ff5fd"
     },
     {
       "cid": "bafyreifmbpfnx7mqdgjr5dukf4tttxlgapdt7zntffilrsakf2yaprlwdm",
@@ -87,9 +87,9 @@
       "sha256": "313a143cfde55a7bdd5bb96fe972a552c0c865d578f661d4a6dba6af64ce706d"
     },
     {
-      "cid": "bafyreib3xbidz5ie5noabiuo4nwr6uxxzijtx3w6kfn4zu3yelwmml2i5a",
+      "cid": "bafyreihnj7fqkxsohiy6qzkmqoykmd7juitywcyq64y5mnwctf5zet7vwy",
       "path": "protocol/conformance_report.json",
-      "sha256": "3bb8503cf504eb5c00a28ee36d1f52f7ca133beede515bccd37822ecc62f48e8"
+      "sha256": "ed4fcb055e4e3a31e8654c83b0a60fe9a2278b0b10f731d636c2997b924ff5b6"
     },
     {
       "cid": "bafyreiav4koretqkw26pbhyaw4e45ltrko727oqzo56f7pdn7zjljasc44",
@@ -107,9 +107,9 @@
       "sha256": "c9e39d009b8753805982b81ffb4b0f55fe94b009452fd42039dd97183e62ec7e"
     },
     {
-      "cid": "bafyreibvkqysecxhfhw2pntez6gfb5ucu3ozpficlad37expw22rj7ysde",
+      "cid": "bafyreichqcfqijsnfrjpwa6il4c4dt3ukna6ybyolhyl77pl7pgslnedxm",
       "path": "protocol/role_coordinates.json",
-      "sha256": "355431220ae729eda7b664cf8c50f682a6dd9795025807bf92efb6b514ff1219"
+      "sha256": "47808b04264d2c52fb03c85f05c1cf745341ec070e59f0bffdebfbcd25b483bb"
     },
     {
       "cid": "bafyreiaojkb2f2iwip3zdklqcnvxqsmn7y44wnyz7in2g3eu3sgdlw52ny",
@@ -137,9 +137,9 @@
       "sha256": "bd408ead44d97cb6120a8c0207cd1cb7d5227297f17d50107933c7d03d45c6aa"
     },
     {
-      "cid": "bafyreif7a3ec72feh4huqkq2l66fvzb75ddcb372cnxfb7k54pwgoytawu",
+      "cid": "bafyreiet2tsx6ggnyriufgr4mp73olcp3c44ee4pjtw5xdrige3z32444e",
       "path": "protocol/repo_stats.json",
-      "sha256": "bf06c82fe8a43f0f482a1a5fbc5ae43fe8c620effa136e50fd5de3ec676260b5"
+      "sha256": "93d4e57f18cdc451429a3c63ffb72c4fd8b9c2138f4ceddb8e2831379deb9ce1"
     },
     {
       "cid": "bafyreihylk3cnlpqdii5fwxnjhb3vjnbpk7bwns2vkhmhp34ehpnjocttq",

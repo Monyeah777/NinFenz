@@ -2,18 +2,18 @@
   "schema": "nf-standards-catalog/1",
   "note": "可扩展标准目录（真源）。每条 = 一个**带扩展机制**的开放标准/规范：body（发布机构）/ title / url / ext_points（扩展点或扩展注册表）/ layer（该标准在 NF 里落哪一层：data 数据 · iface 接口 · form 形态 · gov 治理 · eng 工程）/ depends_on（该标准在规范层面真实依赖/承载于的另一目录内标准，只写有据可查的依赖）/ evidence（本机可达性实测：状态 + 取样标题 + sha256）。外部标准只作**口径与机制参照**，不作品质背书（STRATEGY §3.2/§3.3）。",
   "coverage": {
-    "standards": 374,
+    "standards": 375,
     "reachable": 334,
-    "unreachable": 40,
+    "unreachable": 41,
     "depends_edges": 207,
     "by_layer": {
       "data": 150,
-      "eng": 38,
+      "eng": 39,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
-    "bodies": 195
+    "bodies": 196
   },
   "standards": [
     {
@@ -3576,6 +3576,28 @@
         "title": "",
         "sha256_sample": "",
         "probe_date": "2026-09-24",
+        "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
+        "error": "HTTPError: Forbidden"
+      }
+    },
+    {
+      "id": "iso-iec-ieee-29119",
+      "body": "ISO/IEC/IEEE",
+      "title": "软件测试（29119 系列）",
+      "url": "https://www.iso.org/standard/81254.html",
+      "ext_points": [
+        "part-1-concepts",
+        "part-2-processes",
+        "part-3-documentation",
+        "part-4-techniques"
+      ],
+      "layer": "eng",
+      "evidence": {
+        "reachable": false,
+        "http_status": 403,
+        "title": "",
+        "sha256_sample": "",
+        "probe_date": "2026-11-07",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": "HTTPError: Forbidden"
       }

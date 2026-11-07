@@ -1,0 +1,469 @@
+<testsuites name="NinFenz verify" tests="42" failures="0" errors="0" skipped="0" time="745.000">
+  <testsuite name="segment-a: 官方核心出厂" tests="6" failures="0" errors="0" skipped="0">
+    <testcase classname="verify.segment-a" name="check01: 官方核心目录结构">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="1" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 根级 6 件；03 官方三管线（P00/P01/P90）；04 核心 13 件逐件在场；05=README+用户自定义</system-out>
+    </testcase>
+    <testcase classname="verify.segment-a" name="check02: 重号 ID 全限定·官方层">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="2" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 04 核心两重号在场（M10/M22 各 1 件）；02 注册两限定 ID；02/06/07 全类别前缀限定</system-out>
+    </testcase>
+    <testcase classname="verify.segment-a" name="check03: 五条不变式落点">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="3" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] I1-I5 五条不变式 + I4 五接口 + I2 核心锚点全部落于 01 §5</system-out>
+    </testcase>
+    <testcase classname="verify.segment-a" name="check04: 可见性边界">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="4" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 06 §4 可见性五步与 M23 可见性域措辞语义一致（快照/裁剪/隐藏域/fail）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-a" name="check05: 质检门">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="5" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] M80 gate_action 声明式流水线（pass/warn/fail + 最小可读降级 + 决策记录）与 06 §5 呼应一致</system-out>
+    </testcase>
+    <testcase classname="verify.segment-a" name="check06: 入口导航">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="6" />
+        <property name="segment" value="A" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] README→07→01/02/06/03/05 官方入口导航闭环可访问</system-out>
+    </testcase>
+  </testsuite>
+  <testsuite name="segment-b: 社区领域包" tests="5" failures="0" errors="0" skipped="0">
+    <testcase classname="verify.segment-b" name="check07: 社区两包结构完整">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="7" />
+        <property name="segment" value="B" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 校园 9 模块+29 资产+P02+README（与 02 §8.1 在册 9 一致）；西幻 14 模块+23 资产+P03+README（与 02 §8.2 在册 14 一致）结构完整</system-out>
+    </testcase>
+    <testcase classname="verify.segment-b" name="check08: 社区资产行数溯源">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="8" />
+        <property name="segment" value="B" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 行数溯源一致（基线可重签）：AI人力资源与招聘域包 3 文件 435 行 / AI保险域包 3 文件 414 行 / AI农业域包 3 文件 466 行 / AI制药与生物域包 3 文件 446 行 / AI制造业域包 3 文件 477 行 / AI医疗健康域包 3 文件 425 行 / AI政务与公共事务域包 3 文件 478 行 / AI教育域包 3 文件 414 行 / AI法律与合规域包 3 文件 446 行 / AI系统域包 1 文件 306 行 / AI能源与电力域包 3 文件 466 行 / AI金融投研与风控域包 3 文件 415 行 / AI食品与餐饮域包 3 文件 404 行 / 三维与世界模型域包 3 文件 405 行 / 上下文工程与长上下文域包 3 文件 426 行 / 世界书与设定库域包 3 文件 395 行 / 个人助理与日常生活域包 3 文件 384 行 / 交通与出行域包 3 文件 456 行 / 产业与商业落地域包 3 文件 394 行 / 代码与软件工程域包 3 文件 466 行 / 代码大模型域包 3 文件 447 行 / 代码审查与缺陷检测域包 3 文件 405 行 / 代码生成与补全域包 3 文件 406 行 / 企业培训与组织学习域包 3 文件 414 行 / 传媒与新闻域包 3 文件 414 行 / 信息抽取与结构化域包 3 文件 417 行 / 具身智能与机器人域包 3 文件 468 行 / 内容分发与社区运营域包 3 文件 394 行 / 内容改写与风格迁移域包 3 文件 384 行 / 分类与情感分析域包 3 文件 405 行 / 参数高效微调域包 3 文件 446 行 / 可观测性成本与可靠性域包 3 文件 457 行 / 可解释性与审计域包 3 文件 414 行 / 合成数据生成域包 3 文件 466 行 / 合规与监管域包 3 文件 394 行 / 向量库与检索管线域包 3 文件 435 行 / 图像生成与编辑域包 3 文件 469 行 / 图像生成与视觉创作域包 3 文件 404 行 / 图像生成与视觉设计域包 3 文件 426 行 / 多智能体协同域包 3 文件 415 行 / 多模态大模型域包 3 文件 468 行 / 多语翻译与本地化域包 3 文件 446 行 / 多轮对话与角色扮演域包 3 文件 469 行 / 大语言模型域包 3 文件 436 行 / 安全与对齐域包 3 文件 436 行 / 对话与客服域包 3 文件 405 行 / 对齐与偏好优化域包 3 文件 426 行 / 嵌入与检索表示域包 3 文件 394 行 / 平台与基础设施域包 3 文件 425 行 / 建筑与房地产域包 3 文件 394 行 / 开源与开发者生态域包 3 文件 466 行 / 强化学习与决策域包 3 文件 425 行 / 推理优化与加速域包 3 文件 447 行 / 推理服务与部署域包 3 文件 459 行 / 推荐排序与广告域包 3 文件 438 行 / 提示工程与指令设计域包 3 文件 415 行 / 提示工程与提示模板域包 3 文件 394 行 / 搜索与信息聚合域包 3 文件 427 行 / 摘要与信息压缩域包 3 文件 416 行 / 数字人与虚拟形象域包 3 文件 403 行 / 数学与形式化推理域包 3 文件 447 行 / 数据分析与决策支持域包 3 文件 415 行 / 数据分析与表格理解域包 3 文件 448 行 / 数据标注与标注质量域包 3 文件 393 行 / 数据采集与清洗域包 3 文件 405 行 / 文旅与酒店域包 3 文件 458 行 / 文本生成与创作域包 3 文件 385 行 / 文档解析与版面理解域包 3 文件 396 行 / 智能体与工作流编排域包 3 文件 426 行 / 智能体框架与工具调用域包 3 文件 426 行 / 机器翻译与本地化域包 3 文件 416 行 / 校园情感领域包 29 文件 1575 行 / 模型运营与成本域包 3 文件 436 行 / 测试与用例生成域包 3 文件 416 行 / 游戏与互动娱乐域包 3 文件 404 行 / 版权与知识产权域包 3 文件 424 行 / 物流与供应链域包 3 文件 445 行 / 监督微调域包 3 文件 445 行 / 知识管理与检索增强域包 3 文件 501 行 / 知识问答与检索增强域包 3 文件 386 行 / 科研与实验域包 3 文件 458 行 / 端侧与边缘小模型域包 3 文件 509 行 / 红队越狱与安全测试域包 3 文件 435 行 / 组合包-受监管行业 0 文件 0 行 / 组合包-数据管线 0 文件 0 行 / 组合包-检索栈 0 文件 0 行 / 组合包-轻混与保险 0 文件 0 行 / 编辑校对与出版域包 3 文件 447 行 / 西幻生存领域包 23 文件 4284 行 / 视觉模型域包 3 文件 456 行 / 视频生成与剪辑域包 3 文件 405 行 / 视频生成与理解域包 3 文件 426 行 / 视频生成与自动剪辑域包 3 文件 416 行 / 角色扮演与角色卡域包 3 文件 415 行 / 记忆体与个性化域包 3 文件 415 行 / 评测与基准域包 3 文件 456 行 / 评测基准与排行榜域包 3 文件 384 行 / 语音合成与配音域包 3 文件 435 行 / 语音识别与合成域包 3 文件 447 行 / 语音转写与会议记录域包 3 文件 468 行 / 量化金融域包 4 文件 414 行 / 长文本与小说创作域包 3 文件 384 行 / 隐私与数据治理域包 3 文件 436 行 / 零售与电商域包 3 文件 404 行 / 音频与音乐生成域包 3 文件 436 行 / 音频音乐与语音域包 3 文件 394 行 / 预测异常与风险域包 3 文件 488 行 / 预训练与继续预训练域包 3 文件 415 行</system-out>
+    </testcase>
+    <testcase classname="verify.segment-b" name="check09: 模块-资产引用可寻址 + 社区 README 重号限定">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="9" />
+        <property name="segment" value="B" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 代表键 ATTR_TEMPLATES/LOCATIONS/EMOTION_WHEEL/JOB/WORLD_KNOWLEDGE 在两包 assets 可寻址；两包 README 的 M10/M22 全类别前缀限定</system-out>
+    </testcase>
+    <testcase classname="verify.segment-b" name="check10: EXT 闭合 + 社区红线落地">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="10" />
+        <property name="segment" value="B" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 西幻01/20 EXT 闭合+溯源注释+已填充；冲动-社会关系隔离三落点一致（M22 §7/校园 README/06 §9 红线7）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-b" name="check11: 资产-模块三方对账">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="11" />
+        <property name="segment" value="B" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 资产三方对账全清：幽灵编号=0（源编号残留已豁免）/ 孤儿模块=0 / 未登记模块=0</system-out>
+    </testcase>
+  </testsuite>
+  <testsuite name="segment-c: 代码与协议层" tests="29" failures="0" errors="0" skipped="0">
+    <testcase classname="verify.segment-c" name="check12: 桌面核心单元测试 + 全量 py_compile 语法抽查">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="12" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="3" />
+      </properties>
+      <system-out>[PASS] desktop core 单元测试全绿（desktop/tests 全量 discover · 分片并行，判据面不变）
+[PASS] 全量 py_compile 语法抽查通过（desktop/src scripts）
+[PASS] 代码层门禁全绿：unittest 全量 + py_compile（L2 核心层）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check13: 协议版本一致性 + 迁移完整性">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="13" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="4" />
+      </properties>
+      <system-out>[PASS] 协议版本两处一致：02 头部 = desktop registry.json = "2"
+[PASS] 迁移记录在场：02 §9.3 四步齐备（现状快照/bump 声明/迁移说明/校验回读）
+[PASS] 模块逐条一致：02 §2 模块表 13 件 == registry.json modules（ID 集合全等）
+[PASS] 协议版本一致性 + 迁移完整性全绿（check13：两处版本一致 + §9.3 四步在场 + 13 件模块全等）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check14: 社区协议登记门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="14" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 社区协议登记门禁全绿（check14 八项：①protocol.yaml 在场 ②Schema 必填 12 字段 ③R2 类别不冲突 ④R1 依赖边界 ⑤编号在册一致+M91-M99 不占用+编号命名空间（类别在册/类内号唯一/全库不重号/新包裸号限段） ⑥双源一致 ⑦protocols[] 投影一致 ⑧管线 id 避让层位/官方 id 且全库唯一）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check15: 组合引用门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="15" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 组合引用门禁全绿（check15 五断言：①references 在册可寻址 ②依赖闭包闭合官方核心 ③挂载层 default 无冲突 ④schema_version v1/v2 兼容 ⑤双源一致）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check16: 契约仲裁门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="16" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 契约仲裁全绿（check16-A：官方核心 13 件 machine_contract 机读结构解析 + references 装配 publish⊆subscribe 无违约）
+[PASS] 运行时寻址授权一致（check16-B：registry references.asset_readonly ↔ _readonly_sources ↔ asset_get 三方一致，空白名单全拒）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check17: 质量治理门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="17" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 质量治理门 unittest 全绿（test_quality_gate：空装配/缺锚点 fail、资产悬空/层外 warn、合法装配 ok；ok()=fail==0 可信任度不变量）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check18: 导出契约门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="18" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 导出契约 unittest 全绿（ccv3_adapter：映射层引擎锚点排除/资产条目/无静默丢弃；exporter：chara spec 锚点/world 条目/PNG tEXt 回读）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check19: 导出产物 schema 合规">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="19" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 导出产物 schema 校验全绿（ccv3/skill/agents/claude/mcp 5 格式 shape 自检：合法产物通过 + 篡改检出）
+[PASS] 导出产物 schema 合规门禁全绿（check19：A1 外部吸收——产物 shape 不漂移）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check20: 文档完整性门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="20" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="1" />
+      </properties>
+      <system-out>[PASS] 文档完整性门禁全绿（check20：A3 模块必填项——官方强校验 + 社区机读完备强校验，未完备 WARN 统计）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check21: registry 引用图闭合门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="21" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] registry 引用图闭合校验全绿（A4 impact_check：隔离构造悬空引用/重复检出 + registry.json 真源自洽 smoke）
+[PASS] registry 引用图闭合门禁全绿（check21：A4 外部吸收——registry 自洽无悬空 source_package/module_id、无同包裸号重复）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check22: 导出物规范体检门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="22" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 导出物规范体检全绿（A4 export_schema：ccv3 spec_version 3.0-4.0 数值 + skill name a-z0-9-/≤64/匹配父目录 + description ≤1024）
+[PASS] 导出物规范体检门禁全绿（check22：A4 外部吸收——A1/A2 核查硬约束机读化，spec_version bug 拦截）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check23: 资产供应链闭合门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="23" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 资产供应链台账闭合（S2：托管资产 可溯源/可发现/键无孤儿）
+[PASS] 资产供应链闭合门禁全绿（check23：40 总纲 v2.7 S2——入库/溯源/版本/淘汰四环机读闭环，键无孤儿）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check24: 模块生命周期门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="24" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 模块状态扫描与引用门禁通过（S5：全部模块状态位可读，无 deprecated/retired 被引用）
+[PASS] 模块生命周期门禁全绿（check24：40 总纲 v2.8 波B S5——status 位 + 引用门禁闭环，流转战例在册）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check25: 协议知识签名门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="25" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 协议知识签名全量可复现（C1/C2：01-36 覆盖，两遍逐字节一致）
+[PASS] 协议知识签名门禁全绿（check25：41 波C C2——01-36 签名可复现，签名 = 新增可计算摘要）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check26: 语义矛盾扫描门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="26" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 语义矛盾扫描通过（C3：techdoc 链事件契约闭合，无挂载点/类别漂移）
+[PASS] 语义矛盾扫描门禁全绿（check26：41 波C C3——事件契约断链/漂移为零，编译期矛盾拦截）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check27: 架构纯度体检门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="27" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 架构纯度体检通过（M3：协议层无端壳残留/私货/重复标题 + 阶梯归属互斥/接口子集/依赖向下 + raise 消息修复指引零缺失 + 03/04 核心文面去叙述零命中 R8）
+[PASS] 架构纯度体检门禁全绿（check27：42 M3 + R8 去叙述——纯度体检制度化，PASS 39→41）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check28: 协议层 IDL schema 门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="28" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 协议层 IDL 全量件过 schema（A1：protocol/schema 全定义在场 + 零漂移）
+[PASS] 协议层 IDL schema 门禁全绿（check28：43 A1——IDL 单一真相落盘机检，PASS 41→43）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check29: Conformance 一致性分级门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="29" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] Conformance 声明 ≤ 可证级别（A2：模块机读块/协议包/导出面零虚标）
+[PASS] Conformance 一致性分级门禁全绿（check29：43 A2——分级标注齐 + 零虚标，PASS 43→45）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check30: 扩展策略 + bump 迁移门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="30" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 扩展策略 + bump 迁移门禁通过（A3：EXTENSION 判据在场，版本 bump 均带迁移四步）
+[PASS] 扩展策略 + bump 迁移门禁全绿（check30：43 A3——EXTENSION 判据常驻，PASS 45→47）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check31: 生成物同仓 golden 门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="31" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 生成物同仓 golden + 标准四态账本一致（catalog / binding / assertions / consumers 四方闭环）
+[PASS] 生成物同仓 golden 门禁全绿（check31：43 A4——生成物双源一致 + 标准四态可复算，PASS 47→49）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check32: 质量纵深汇总门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="32" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 质量纵深汇总扫描通过（载荷/ledger/指令/概念图/资产/world_model/world_slots 零缺口）
+[PASS] 质量纵深汇总门禁全绿（check32：45 W28 + 概念图健康 + world_model/world_slots——纵深统一硬门，PASS 49→51）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check33: 新面汇总门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="33" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 新面扫描通过（MCP dual-era / stdio 帧纪律 / attestation / 评分 / 机械修复 / 正文 lint / 编辑器面（能力·定位·生命周期·领域智能·配置）/ 许可证 / 遥测 / 编码卫生 / 互操作导出与入仓面一致 / 文档命令面 / 决策层面 / 构建回路）
+[PASS] 新面汇总门禁全绿（check33：MCP 版本对齐/stdio 帧纪律/内容外挂签名/回归评分/编辑器面/正文 lint/许可证门/遥测 semconv/编码卫生/互操作导出含入仓/文档命令面/决策层 typed-decision 端口/构建回路）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check34: 云端图书馆面门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="34" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 图书馆面扫描通过（frontmatter 真源 / 投影一致 / 四型覆盖 / llms.txt 入口 / 检索可用）
+[PASS] 云端图书馆面门禁全绿（check34：单一真相源 I5 + 生命周期 + Diátaxis 四型 + llms.txt 机器入口）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check35: 深化面门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="35" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 深化面扫描通过（dry-run / 回执单根 / 边界冻结 / 批准记录 / 一致性报告 / 语料）
+[PASS] 深化面门禁全绿（check35：抽象执行 GraphSpec + MMR 回执 + 边界签名 + 内容绑定批准 + 报告工件）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check36: 治理面门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="36" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 治理面扫描通过（声明 / RFC / driver / 实践包 / 跑分 / 端点）
+[PASS] 治理面门禁全绿（check36：一致性声明 + RFC 版本史 + 指令档路由 + 实践包 + 跑分台 + 端点契约）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check37: 知识层门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="37" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 知识层扫描通过（权威分层 / 查询有序 / 时效 / 溯源 / 巡检）
+[PASS] 知识层门禁全绿（check37：双源知识——声明 + 顺序 + 溯源 + 巡检，PASS 59→61）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check38: 出口自动化门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="38" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="7" />
+      </properties>
+      <system-out>[PASS] 出口面全绿：自述数字（check38 子扫描）
+[PASS] 出口面全绿：他证通道（check38 子扫描）
+[PASS] 出口面全绿：GEO 出口（check38 子扫描）
+[PASS] 出口面全绿：FDE 样例（check38 子扫描）
+[PASS] 出口面全绿：发布编排（check38 子扫描）
+[PASS] 出口面全绿：接入面（check38 子扫描）
+[PASS] 出口自动化门禁全绿（check38：自述数字 + 他证通道 + GEO 出口 + FDE 样例 + 发布编排 + 接入面 六子扫描）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check39: 终端与端壳残留门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="39" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 端壳残留零在场 + 终端入口在场 + 命令面全策展可达 + 五分钟入口可跑（check39 子扫描：源件/入口/打包线 + terminal.self_check 单源判据 + 检索/地图/自检/补全/限长/无色/写盘表单/活体档/纯 JSON + 单真值源投影对账（tui/_surface.py 逐字节 + 视图闸门不弱于真源）+ 顶尖 CLI 基线逐行，行数不写死 + docs/quickstart.md ↔ scripts/quickstart_check.sh 步数/命令/墙钟）
+[PASS] 终端与端壳残留门禁全绿（check39：端壳零回潮 + 终端三件在场 + 菜单无死命令 + 命令面全策展可达 + 单真值源投影同源 + 输出确定 + 五分钟入口文档步数==脚本步数）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-c" name="check40: 数字资产契约门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="40" />
+        <property name="segment" value="C" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 数字资产契约三面全绿（check40：数据格式/字段完整性/防篡改 + 代码 AST 规范/可证空指针/测试在场 + 脚本 nf-io 双源一致与链对齐）
+[PASS] 数字资产契约门禁全绿（check40：声明即契约 + 只判可证；数据/代码/脚本三面真源 protocol/asset_contracts.json）</system-out>
+    </testcase>
+  </testsuite>
+  <testsuite name="segment-d: 供应链面" tests="2" failures="0" errors="0" skipped="0">
+    <testcase classname="verify.segment-d" name="check41: 构建隔离门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="41" />
+        <property name="segment" value="D" />
+        <property name="nf.status" value="PASS" />
+        <property name="event_count" value="2" />
+      </properties>
+      <system-out>[PASS] 构建隔离通过（构建入口零取网、容器基座按 digest 钉、工具链定版）
+[PASS] 构建隔离门禁全绿（check41：SLSA L3 Build isolation——构建期读面不被宿主污染）</system-out>
+    </testcase>
+    <testcase classname="verify.segment-d" name="check42: 不可伪造 provenance 门禁">
+      <properties>
+        <property name="standard_id" value="junit-xml" />
+        <property name="check_id" value="42" />
+        <property name="segment" value="D" />
+        <property name="nf.status" value="WARN" />
+        <property name="event_count" value="3" />
+      </properties>
+      <system-out>[WARN] 仓库自身 provenance 缺签名外锚（cosign 不在场）：本检查只证明外部验签机制可用且对篡改敏感，不等于本仓 provenance 已不可伪造
+[PASS] 不可伪造 provenance 检查通过（独立进程验签 + 篡改必红）
+[PASS] 不可伪造 provenance 门禁全绿（check42：SLSA L3 Non-falsifiable——验签方 ≠ 签名方）</system-out>
+    </testcase>
+  </testsuite>
+  <properties>
+    <property name="nf.standard" value="junit-xml" />
+    <property name="nf.warnings" value="1" />
+  </properties>
+</testsuites>

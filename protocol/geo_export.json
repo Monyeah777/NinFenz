@@ -1,17 +1,17 @@
 {
   "coverage": {
-    "bodies": 195,
+    "bodies": 196,
     "by_layer": {
       "data": 150,
-      "eng": 38,
+      "eng": 39,
       "form": 29,
       "gov": 73,
       "iface": 84
     },
     "depends_edges": 207,
     "reachable": 334,
-    "standards": 374,
-    "unreachable": 40
+    "standards": 375,
+    "unreachable": 41
   },
   "note": "生成物；真源 protocol/standards_catalog.json + protocol/standards_binding.json。",
   "schema": "nf-geo-export/1",
@@ -2776,6 +2776,25 @@
       "sha256_sample": "",
       "title": "架构描述",
       "url": "https://www.iso.org/standard/74393.html"
+    },
+    {
+      "body": "ISO/IEC/IEEE",
+      "bound_main": 0,
+      "bound_support": 0,
+      "ext_points": [
+        "part-1-concepts",
+        "part-2-processes",
+        "part-3-documentation",
+        "part-4-techniques"
+      ],
+      "http_status": 403,
+      "id": "iso-iec-ieee-29119",
+      "layer": "eng",
+      "probe_date": "2026-11-07",
+      "reachable": false,
+      "sha256_sample": "",
+      "title": "软件测试（29119 系列）",
+      "url": "https://www.iso.org/standard/81254.html"
     },
     {
       "body": "JUnit 社区",

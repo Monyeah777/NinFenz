@@ -131,7 +131,7 @@
     {
       "@id": "nf:file/llms.txt",
       "@type": "prov:Entity",
-      "nf:sha256": "13fb70f2f6a27d0a312c04d6add194f019d6fd20a655e1f99daaf58d44423285"
+      "nf:sha256": "eb47c04a0d0a6d217fa59175a5e12a589c9a37cf66db0ffc5e5e3fa69f1ff5fd"
     },
     {
       "@id": "nf:file/postmortems/PO-9000-示例-复盘模板.md",
@@ -181,7 +181,7 @@
     {
       "@id": "nf:file/protocol/conformance_report.json",
       "@type": "prov:Entity",
-      "nf:sha256": "3bb8503cf504eb5c00a28ee36d1f52f7ca133beede515bccd37822ecc62f48e8"
+      "nf:sha256": "ed4fcb055e4e3a31e8654c83b0a60fe9a2278b0b10f731d636c2997b924ff5b6"
     },
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
@@ -301,7 +301,7 @@
     {
       "@id": "nf:file/protocol/repo_stats.json",
       "@type": "prov:Entity",
-      "nf:sha256": "bf06c82fe8a43f0f482a1a5fbc5ae43fe8c620effa136e50fd5de3ec676260b5"
+      "nf:sha256": "93d4e57f18cdc451429a3c63ffb72c4fd8b9c2138f4ceddb8e2831379deb9ce1"
     },
     {
       "@id": "nf:file/protocol/rfc_index.json",
@@ -311,7 +311,7 @@
     {
       "@id": "nf:file/protocol/role_coordinates.json",
       "@type": "prov:Entity",
-      "nf:sha256": "355431220ae729eda7b664cf8c50f682a6dd9795025807bf92efb6b514ff1219"
+      "nf:sha256": "47808b04264d2c52fb03c85f05c1cf745341ec070e59f0bffdebfbcd25b483bb"
     },
     {
       "@id": "nf:file/protocol/sast_baseline.json",

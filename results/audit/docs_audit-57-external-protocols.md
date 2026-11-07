@@ -24,7 +24,7 @@ subjects:
   - docs/text-hygiene.md:36edf35f60bc669192443a8c16a4bcdc7c22408270fff5ea15308a16a756f986
   - docs/endpoint.md:4da6d07f9d0ed0a7166c028b1a4070a370f2edc9e70e700cce03c3d38b4e930f
   - docs/mcp.md:c4fa52d36097253e197304e6bf6e0512bc2708077fb8ef34865653fc764caa78
-  - llms.txt:13fb70f2f6a27d0a312c04d6add194f019d6fd20a655e1f99daaf58d44423285
+  - llms.txt:eb47c04a0d0a6d217fa59175a5e12a589c9a37cf66db0ffc5e5e3fa69f1ff5fd
 
 ---
 > 重审（2026-11-07）：refreeze CID
