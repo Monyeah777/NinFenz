@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:3f099e1325f53e4c77fbfe07c012de802dc8b787efb2a85aaed2ed350b4a422b
+  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
+
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
+
 > 重审（2026-11-07）：verification_report 记 built_for_date（涉时判据按基准日重算）
 
 > 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release

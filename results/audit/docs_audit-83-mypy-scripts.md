@@ -12,10 +12,14 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:aa4911b1e7661acb8357f724bd5a3da92d209daf972a50569b5b4fab6e732bbe
+  - scripts/nf.py:168612a62c7496bb3c6064d240f0c834c45f04dc45a8493b1e1db064a857da4c
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:3f099e1325f53e4c77fbfe07c012de802dc8b787efb2a85aaed2ed350b4a422b
+  - protocol/code_metrics_baseline.json:fe3cdc40cdbd8dc95fd1f6f00c20474902fec5ea0ee31925a6f459c8bebad3fd
 ---
+> 重审（2026-11-07）：度量重冻（nf.py +3 行：batch 派发）
+
+> 重审（2026-11-07）：nf evidence batch（目录逐件复验，整批不可用即失败）
+
 > 重审（2026-11-07）：verification_report 记 built_for_date（涉时判据按基准日重算）
 
 > 重审（2026-11-07）：instruction_evidence 临近过期提前 7 天 WARN + 重录 verify/release

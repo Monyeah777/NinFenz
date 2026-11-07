@@ -298,6 +298,7 @@ SKIP = {
     "label read": "需参面（对象必填）——见 test_label_sidecar.py::TestCli",
     "label embed": "需参面（--object/--ir 必填）——见 test_label_carrier.py::TestCli",
     "label extract": "需参面（对象必填）——见 test_label_carrier.py::TestCli",
+    "evidence batch": "需参面（TARGET 必填）——见 test_evidence_batch.py::TestCli",
     "label validate": "需参面（IR 文件必填）——见 test_label_ir.py::TestCli",
 }
 

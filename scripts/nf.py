@@ -605,6 +605,19 @@ def _add_parser_production(sub):
                      help="机制体检：PASS 必过 / 篡改必红 / 吊销必判 revoked / 过期必判 expired")
     evv.add_argument("--json", action="store_true", help="输出结构化 JSON")
     _add_parser_revocations(esub)
+    evba = esub.add_parser("batch",
+                           help="批量复验：目录里的证据包逐件判，任何一件非 ok 即整体失败",
+                           description="批量复验：目标给目录（取 *.zip / *.json，按名排序）或单个"
+                                       "证据包。判定词表与单件完全一致；整体退出码 0 只代表"
+                                       "「每一件都 ok」。")
+    evba.add_argument("batch_target", metavar="TARGET",
+                      help="目录（取其中 *.zip 与 *.json）或单个证据包")
+    evba.add_argument("--key-file", default="", help="校验 hmac 级信封所需的同一密钥")
+    evba.add_argument("--revocations", default="", help="外部吊销件 JSON（同 verify）")
+    evba.add_argument("--at", default="", help="判定时点（UTC 秒级；缺省 = 现在）")
+    evba.add_argument("--root", default="", help="单 JSON 形态的成员根目录")
+    evba.add_argument("--anchor", default="", help="外部锚点 JSON（同 verify）")
+    evba.add_argument("--json", action="store_true", help="输出结构化 JSON")
     evb = esub.add_parser("bench", help="证据复验器攻击矩阵基准（38 条已知攻击，逐条比对判定）",
                           description="攻击矩阵基准：对金丝雀证据包施加已知攻击/退化，逐条断言"
                                       "「期望判定 vs 实际判定」。任何一条不达期望即 exit 1——"
@@ -3637,6 +3650,40 @@ def _revocations_merge(args):
     return 0 if res["ok"] else 1
 
 
+def _evidence_batch(args):
+    """nf evidence batch：目录逐件复验 → 汇总（任何一件非 ok 即整体失败）。"""
+    import json as _json
+
+    from core import attest, json_doc
+    from core import evidence as ev
+
+    target = str(getattr(args, "batch_target", "") or "")
+    try:
+        key = attest.read_key_file(_rel_out(args.key_file)) if args.key_file else None
+        rev = (json_doc.load(_rel_out(args.revocations), dict, what=args.revocations)
+               if args.revocations else None)
+        anc = (json_doc.load(_rel_out(args.anchor), dict, what=args.anchor)
+               if args.anchor else None)
+        res = ev.verify_batch(_rel_out(target), key=key, revocations=rev,
+                              at=args.at, root=_rel_out(args.root) if args.root else "",
+                              anchor=anc)
+    except (OSError, ValueError) as exc:
+        return _machine_fail(args, str(exc), 2)
+    if args.json:
+        print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf evidence batch（{res['total']} 件）==")
+        for row in res["rows"]:
+            mark = "✓" if row["verdict"] == "ok" else "✗"
+            print(f"  {mark} {row['path']} · {row['verdict']} · 级 {row['level'] or '-'}")
+            for issue in row["issues"]:
+                print(f"      [FAIL] {issue}")
+        counts = " · ".join(f"{k} {v}" for k, v in res["counts"].items())
+        print(f"  汇总：{counts}（失败 {res['failures']}）")
+        print("  整体判定只看「是不是每一件都 ok」，不做平均")
+    return 0 if res["ok"] else 1
+
+
 def _cmd_evidence(args):
     """nf evidence：证据包打包 / 第三方复验（cc_verify 的 CLI 面）的派发。"""
     sub = getattr(args, "evidence_cmd", "") or ""
@@ -3644,6 +3691,8 @@ def _cmd_evidence(args):
         print("用法：nf evidence pack <文件…> --out <包.zip>｜nf evidence verify <包.zip>"
               "（各自 --help 看逐条）", file=sys.stderr)
         return 2
+    if sub == "batch":
+        return _evidence_batch(args)
     if sub == "verify":
         return _evidence_verify(args)
     if sub == "bench":
@@ -5569,7 +5618,7 @@ _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", 
                     "handoff_out", "manifest_out", "context_dir", "responses",
                     "experiment", "ballots", "bundle",
                     "policy", "revocations", "anchor", "items", "table", "prev",
-                    "label_object", "ir", "sidecar", "decision",
+                    "label_object", "ir", "sidecar", "decision", "batch_target",
                     "compile")
 
 

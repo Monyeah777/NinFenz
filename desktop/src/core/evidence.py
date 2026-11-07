@@ -1107,6 +1107,68 @@ def _apply_revocation_doc(revocations: dict[str, Any] | None,
     return True
 
 
+#: 批处理的默认上限：一次最多验这么多件（防误指 / 防把整盘塞进来）
+BATCH_MAX_FILES = 200
+
+
+def batch_paths(target: str, max_files: int = BATCH_MAX_FILES) -> list[str]:
+    """批处理目标 → 待验文件列表（纯函数，便于单测）。
+
+    目标可以是：单个证据包（.zip / 单 JSON），或一个目录（取其中 *.zip 与 *.json，按名排序）。
+    目录里没有可验件就抛 ValueError（带指引），不静默返回空——空结果最容易被当成「全绿」。
+    """
+    target = str(target or "")
+    if not target:
+        raise ValueError("批处理目标为空（" + GUIDE + "给一个 .zip / 单 JSON，或包含它们的目录）")
+    if os.path.isfile(target):
+        return [target]
+    if not os.path.isdir(target):
+        raise ValueError(f"批处理目标不存在：{target}（修复指引：确认路径；目录形式只取其中的 "
+                         "*.zip 与 *.json）")
+    picked = []
+    for name in sorted(os.listdir(target)):
+        full = os.path.join(target, name)
+        if not os.path.isfile(full):
+            continue
+        low = name.lower()
+        if low.endswith(".zip") or low.endswith(".json"):
+            picked.append(full)
+    if not picked:
+        raise ValueError(f"目录里没有可验件：{target}（修复指引：只取 *.zip 与 *.json；"
+                         "先 nf evidence pack 产出证据包）")
+    if len(picked) > max_files:
+        raise ValueError(f"目录里可验件过多（{len(picked)} > 上限 {max_files}）（修复指引：分批验，"
+                         "或显式给单个文件）")
+    return picked
+
+
+def verify_batch(target: str, key: bytes | None = None,
+                 revocations: dict[str, Any] | None = None, at: str = "",
+                 root: str = "", anchor: dict[str, Any] | None = None) -> dict[str, Any]:
+    """批量复验 → {total, counts{verdict: n}, ok, failures, rows}。
+
+    判定词表与单件完全一致（复用 verify_any）；任何一件非 ok 就整体 ok=False——
+    批量的意义是「这一批能不能用」，不是「平均下来还行」。
+    """
+    paths = batch_paths(target)
+    rows: list[dict[str, Any]] = []
+    counts: dict[str, int] = {}
+    for path in paths:
+        try:
+            res = verify_any(path, key=key, revocations=revocations, at=at, root=root,
+                             anchor=anchor)
+        except (OSError, ValueError) as exc:      # 用法级错误只影响这一件，不炸整批
+            res = {"verdict": "invalid", "issues": [str(exc)], "level": "none", "root": ""}
+        verdict = str(res.get("verdict") or "invalid")
+        counts[verdict] = counts.get(verdict, 0) + 1
+        rows.append({"path": os.path.basename(path), "verdict": verdict,
+                     "level": res.get("level"), "root": res.get("root"),
+                     "issues": list(res.get("issues") or [])[:3]})
+    failures = [r for r in rows if r["verdict"] != "ok"]
+    return {"schema": "nf-evidence-batch/1", "total": len(rows), "ok": not failures,
+            "counts": dict(sorted(counts.items())), "failures": len(failures), "rows": rows}
+
+
 def verify_any(path: str, key: bytes | None = None,
                revocations: dict[str, Any] | None = None, at: str = "",
                root: str = "", kind: str = "",
