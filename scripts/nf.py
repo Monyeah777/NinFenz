@@ -678,7 +678,10 @@ def _add_parser_production(sub):
     ck.add_argument("--policy", default="", help="策略 JSON 路径（仓库相对或绝对）")
     ck.add_argument("--compile", default="", metavar="INTENT",
                     help="把 nf-check-intent/1 意图编译成策略（法规意图 → 封闭词表规则）")
-    ck.add_argument("--out", default="", help="编译结果的落点（缺省=只打印）")
+    ck.add_argument("--intent-from-text", dest="intent_from_text", default="",
+                    metavar="REGULATION.txt",
+                    help="法规原文 → 意图**草稿**（规则抽取；覆盖/待补/不可表达/未覆盖四张账）")
+    ck.add_argument("--out", default="", help="编译/草稿的落点（缺省=只打印）")
     ck.add_argument("--list-rules", action="store_true",
                     help="列出可编译的意图规则与**明确不可表达**的规则（含缺什么能力）")
     ck.add_argument("--json", action="store_true", help="输出结构化 JSON")
@@ -4152,6 +4155,49 @@ def _evidence_replay(args):
     return 0 if res["ok"] else 1
 
 
+def _check_intent_from_text(args):
+    """nf check --intent-from-text：法规原文 → 意图草稿（规则抽取，不是法律理解）。"""
+    import json as _json
+
+    from core import atomic_write, check_text_to_intent
+    path = _rel_out(args.intent_from_text)
+    try:
+        with open(path, "rb") as fh:
+            raw = fh.read()
+        text = raw.decode("utf-8")
+    except OSError as exc:
+        return _machine_fail(args, f"读不到法规文本：{exc}", 4)
+    except UnicodeDecodeError as exc:
+        return _machine_fail(args, f"法规文本不是 UTF-8：{exc}（修复指引：先转成 UTF-8 再跑）", 4)
+    try:
+        doc = check_text_to_intent.draft(text, source=_rel_display(path))
+    except ValueError as exc:
+        return _machine_fail(args, str(exc), 1)
+    if args.out:
+        atomic_write.write_text(_rel_out(args.out),
+                                _json.dumps(doc, ensure_ascii=False, indent=2,
+                                            sort_keys=True) + chr(10))
+    if args.json:
+        print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"== nf check --intent-from-text（{_rel_display(path)}）==")
+        print(f"  条文 {doc['source']['clauses']} · 可编译 {len(doc['intent']['requirements'])}"
+              f" · 待补参数 {len(doc['pending'])} · 不可表达 {len(doc['unsupported'])}"
+              f" · 未覆盖 {len(doc['uncovered'])}")
+        for c in doc["covered"]:
+            missing = ",".join(c["missing_params"])
+            mark = f"（待补 {missing}）" if c["needs_human"] else ""
+            print(f"  · {c['clause']} → {c['rule']}（置信 {c['confidence']}）{mark}")
+        for u in doc["unsupported"]:
+            print(f"  ✗ {u['clause']} 需要能力：{u['needs']}")
+        for u in doc["uncovered"]:
+            print(f"  ? {u['clause']}：{u['why']}")
+        print("  这是草稿：参数不全的条目要人工补齐，不可表达/未覆盖项要人工裁决")
+        if args.out:
+            print(f"  已写入：{_rel_display(_rel_out(args.out))}")
+    return 0
+
+
 def _cmd_check(args):
     """nf check：单对象策略体检 + 意图编译器（cc_check 的判定面与编译面）。"""
     import json as _json
@@ -4170,6 +4216,8 @@ def _cmd_check(args):
         for row in table["unsupported"]:
             print(f"  {row['rule']:<20} {row['why']} → 需要：{row['needs']}")
         return 0
+    if getattr(args, "intent_from_text", ""):
+        return _check_intent_from_text(args)
     if getattr(args, "compile", ""):
         return _check_compile(args)
     if not args.object or not args.policy:

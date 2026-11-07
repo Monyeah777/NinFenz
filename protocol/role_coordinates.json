@@ -3,10 +3,10 @@
     "app": 1456,
     "entry": 26,
     "floor": 5,
-    "prod": 1051,
+    "prod": 1053,
     "projection": 138,
     "support": 377,
-    "verify": 983
+    "verify": 985
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5843,6 +5843,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "法规文本 → 意图草稿 v0（cc_check 语义层的诚实半边）。",
+      "path": "desktop/src/core/check_text_to_intent.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "规格主张的认识论标签（机制借鉴 restless-core 规格条目认知标签）。",
       "path": "desktop/src/core/claim_labels.py",
       "role": "prod",
@@ -6977,6 +6983,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "吊销公钥的**信任锚** v0：固定根 + 委派链（不用证书链，不引 X.509）。",
+      "path": "desktop/src/core/trust_anchor.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "信任边界守卫（注入面 / 越权调用面）——把 AGENTS.md 与 06 §12 的声明变成可复用判据。",
       "path": "desktop/src/core/trust_boundary.py",
       "role": "verify",
@@ -7519,6 +7531,12 @@
     {
       "function": "单对象策略体检（cc_check）单测——封闭词表、可复算 verdict、坏策略必须拒。",
       "path": "desktop/tests/test_check_policy.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "法规文本 → 意图草稿判据：抽得准、抽不到的进待补、不可表达的进 unsupported、绝不静默丢。",
+      "path": "desktop/tests/test_check_text_to_intent.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -9223,6 +9241,12 @@
     {
       "function": "透明日志（哈希链）单测：链自洽 + 改一处即断链 + 边界声明 + 生成物一致性。",
       "path": "desktop/tests/test_transparency_log.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "信任锚判据：根 → 委派链 → 吊销 feed 的公钥归属。",
+      "path": "desktop/tests/test_trust_anchor.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12246,7 +12270,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "96d9f56faaaa62925446cd24c730740f52075cdfdea79484674bded60e22acd9",
+  "root_digest": "29aad051908aecefa7403b50fb86bbae7e069d8bd078031466237945f2d388a7",
   "rule_counts": {
     "R-app": 1456,
     "R-catch": 231,
@@ -12255,8 +12279,8 @@
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 864,
-    "auto:R-core": 272
+    "R-verify": 866,
+    "auto:R-core": 274
   },
   "schema": "nf-role-coordinates/1"
 }

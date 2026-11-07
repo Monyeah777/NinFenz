@@ -45,6 +45,7 @@
     "test_check_compile": 0.1,
     "test_check_merge_equivalence": 5.2,
     "test_check_policy": 0.2,
+    "test_check_text_to_intent": 0.9,
     "test_ci_diagnostics": 0.2,
     "test_ci_supply_chain": 0.2,
     "test_ci_visibility": 0.2,
@@ -785,6 +786,20 @@
     "test_check_policy.TestValidate.test_missing_fix": 0.0,
     "test_check_policy.TestValidate.test_unknown_kind": 0.0,
     "test_check_policy.TestValidate.test_valid_policy_passes": 0.0,
+    "test_check_text_to_intent.CliTest.test_cli_rejects_non_utf8": 0.39,
+    "test_check_text_to_intent.CliTest.test_cli_writes_draft": 0.39,
+    "test_check_text_to_intent.ExtractionTest.test_draft_compiles_into_policy": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_draft_is_deterministic": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_every_clause_lands_in_at_least_one_bucket": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_forbidden_tokens_extracted_from_quotes": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_missing_params_go_to_pending_not_silently_dropped": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_oversized_text_is_rejected_with_guide": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_quoted_text_becomes_explicit_notice": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_unmatched_clause_is_reported_as_uncovered": 0.0,
+    "test_check_text_to_intent.ExtractionTest.test_unsupported_rules_are_listed_with_needs": 0.0,
+    "test_check_text_to_intent.SplitClausesTest.test_falls_back_to_single_clause_for_plain_text": 0.0,
+    "test_check_text_to_intent.SplitClausesTest.test_numeric_numbering_is_recognized": 0.0,
+    "test_check_text_to_intent.SplitClausesTest.test_splits_by_chinese_clause_numbers": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_block_path_form_is_parsed": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_gate_workflows_keep_machine_readable_evidence": 0.0,
     "test_ci_diagnostics.ArtifactPolicyTest.test_key_workflows_have_an_artifact_step": 0.0,
@@ -4026,5 +4041,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1362.8
+  "total_s": 1363.7
 }

@@ -161,7 +161,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/check_compile.py": {
-      "lines": 240,
+      "lines": 241,
       "max_fn_cc": 39,
       "max_fn_lines": 76
     },
@@ -169,6 +169,11 @@
       "lines": 184,
       "max_fn_cc": 33,
       "max_fn_lines": 56
+    },
+    "desktop/src/core/check_text_to_intent.py": {
+      "lines": 148,
+      "max_fn_cc": 10,
+      "max_fn_lines": 57
     },
     "desktop/src/core/claim_labels.py": {
       "lines": 25,
@@ -1521,9 +1526,9 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 8952,
+      "lines": 9000,
       "max_fn_cc": 106,
-      "max_fn_lines": 319
+      "max_fn_lines": 321
     },
     "scripts/nf_client.py": {
       "lines": 187,

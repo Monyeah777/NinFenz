@@ -109,6 +109,12 @@ count_at_least / digest_pin）——不自造 DSL，新增规则 = 加一条数�
   `min_bytes` / `require_metadata` / `digest_pinned` / `utf8`）→ 上述封闭词表策略；表达不了的
   意图（模型判内容 / 载体水印 / 视觉要素 / 可信时间 / 身份签发）逐条进 `unsupported` 并写清缺什么。
   **法规原文 → 意图**仍需人写——这是编译器 v0 的边界，不假装有语义层。
+- **文本层（2026-11-07 起）**：`nf check --intent-from-text <法规.txt>` 做**规则抽取**草稿
+  （`nf-check-intent-draft/1`）——按条切分 + 封闭关键词 → 可编译规则；能抽的参数
+  （引号内文字、数字）就抽，抽不到的进 `pending`，需要能力才判的进 `unsupported`，
+  关键词都没命中的进 `uncovered`——**四张账，绝不静默丢条**。这是「机械抽取」，
+  不是自然语言理解：草稿必须人工补齐/裁决后才能当法规意图用，`covered[].confidence` 与
+  `needs_human` 就是给这个用的。
 
 ### 3. `cc_attest(subject)` → `evidence`
 

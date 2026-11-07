@@ -39,8 +39,9 @@ SUPPORTED: dict[str, dict[str, Any]] = {
 UNSUPPORTED: dict[str, dict[str, str]] = {
     "semantic_claim": {"why": "内容是不是真的 AI 生成 需要模型或人工判断",
                        "needs": "内容判定能力（本仓明确不做）"},
-    "carrier_watermark": {"why": "水印是否嵌入载体需要读取载体本身",
-                          "needs": "标识写入/读取子系统（本仓不存在）"},
+    "carrier_watermark": {"why": "水印是否真的嵌在载体里要读载体像素/容器，文本判据判不了",
+                          "needs": "载体面判定（用 nf label extract --mode watermark 单独证；"
+                                   "cc_check 只做单对象文本面）"},
     "visual_notice": {"why": "画面角标/字幕这类视觉要素不在文本判据面内",
                       "needs": "媒体渲染与图像判定"},
     "time_window": {"why": "在某时间段内发布需要可信时间",

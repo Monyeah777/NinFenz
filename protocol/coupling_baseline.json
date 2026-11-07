@@ -157,7 +157,7 @@
       "i": 0.5
     },
     "check_compile": {
-      "ca": 0,
+      "ca": 1,
       "ce": 0,
       "i": 0.0
     },
@@ -165,6 +165,11 @@
       "ca": 1,
       "ce": 1,
       "i": 0.5
+    },
+    "check_text_to_intent": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
     },
     "claim_labels": {
       "ca": 1,
