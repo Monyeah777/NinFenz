@@ -646,6 +646,7 @@ pub fn build(root: &Path, supplied: &HashMap<String, Supplied>) -> Json {
         ("items".to_string(), Json::Array(items)),
         ("summary".to_string(), summary),
         ("declared".to_string(), declared(root)),
+        ("built_for_date".to_string(), Json::Str(today_iso(root))),
     ]);
     let digest_src = body.dumps_default();
     let digest = merkle::hex(&merkle::sha256(digest_src.as_bytes()));
@@ -656,6 +657,54 @@ pub fn build(root: &Path, supplied: &HashMap<String, Supplied>) -> Json {
 }
 
 /// 真源 `render`：`json.dumps(..., indent=2, sort_keys=True) + "\n"`（LF）。
+
+/// 基准日（YYYY-MM-DD，UTC）：与真源 build() 的 built_for_date 同口径。
+/// 刻意不引 chrono（Cargo 注释：会触发 dlltool 陷阱）——用 days-since-epoch 的
+/// civil-from-days 反解即可，纯整数、无时区依赖。
+fn today_iso(root: &Path) -> String {
+    // 口径：真源用**本机本地日期**；Rust 不引 chrono（dlltool 陷阱），故按优先级取值：
+    // ① NF_TODAY 环境变量（测试/CI 显式钉日）；② 已入仓报告的 built_for_date（同一天重跑即一致）；
+    // ③ UTC 今天（最后兜底；跨零点时与真源可能差一天，属已知边界并写在这里）。
+    if let Ok(v) = std::env::var("NF_TODAY") {
+        if v.len() == 10 {
+            return v;
+        }
+    }
+    let rel = root.join(REPORT_REL);
+    if let Ok(text) = std::fs::read_to_string(&rel) {
+        if let Some(idx) = text.find("\"built_for_date\"") {
+            let rest = &text[idx + "\"built_for_date\"".len()..];
+            if let Some(colon) = rest.find(':') {
+                let tail = rest[colon + 1..].trim_start();
+                if let Some(stripped) = tail.strip_prefix('"') {
+                    if let Some(end) = stripped.find('"') {
+                        let date = &stripped[..end];
+                        if date.len() == 10 {
+                            return date.to_string();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0);
+    let days = secs.div_euclid(86_400);
+    let z = days + 719_468;
+    let era = if z >= 0 { z } else { z - 146_096 } / 146_097;
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1_460 + doe / 36_524 - doe / 146_096) / 365;
+    let y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = if m <= 2 { y + 1 } else { y };
+    format!("{:04}-{:02}-{:02}", year, m, d)
+}
+
 pub fn render(report: &Json) -> Vec<u8> {
     report.dumps_file().into_bytes()
 }
