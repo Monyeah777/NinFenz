@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1457,
+    "app": 1458,
     "entry": 26,
     "floor": 5,
-    "prod": 1054,
+    "prod": 1055,
     "projection": 145,
     "support": 395,
-    "verify": 991
+    "verify": 992
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6353,6 +6353,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "密钥透明目录 v0（nf-key-transparency/1）：补「这把公钥属于谁」的最后一环。",
+      "path": "desktop/src/core/key_transparency.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "双源知识架构门禁（权威分层 / 消化可追溯 / 查询有序 / 时效 / 可见性）。",
       "path": "desktop/src/core/knowledge.py",
       "role": "verify",
@@ -8287,6 +8293,12 @@
     {
       "function": "资产键命名规范机检（`core/key_naming.py`）回归测试 —— 资产密度面 GAP-5。",
       "path": "desktop/tests/test_key_naming.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "密钥透明目录判据：能证「这一版自洽」，也能证「两份目录分叉」。",
+      "path": "desktop/tests/test_key_transparency.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12312,17 +12324,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "39dad8db8e8ebe4d1356d44d16ec545ff3b3653598d21d02865c034c95d31f35",
+  "root_digest": "7ae1e04b167c1163673be728e2a5a4653aa7559f766424c9cfd5fecbec7e8ab9",
   "rule_counts": {
-    "R-app": 1457,
+    "R-app": 1458,
     "R-catch": 249,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 126,
     "R-support": 119,
-    "R-verify": 871,
-    "auto:R-core": 276
+    "R-verify": 872,
+    "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"
 }
