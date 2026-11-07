@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
+  - protocol/code_metrics_baseline.json:ec5bbafe97be2f1fdb18ac7457d6d1a87f0680405670ada7ba6234a0aec9d324
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）

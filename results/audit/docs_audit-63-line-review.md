@@ -14,8 +14,10 @@ subjects:
   - desktop/src/core/text_hygiene.py:99b38bfbb8656ad653689c4cba93679970a78183019fd5f02e2380d87ec99ff3
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - scripts/nf.py:60fbba6771fc7ab0cd14e755cd1034da9abe2dc32986643db9fc7cf53274cb8f
+  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

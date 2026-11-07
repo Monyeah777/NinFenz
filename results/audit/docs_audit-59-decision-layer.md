@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:60fbba6771fc7ab0cd14e755cd1034da9abe2dc32986643db9fc7cf53274cb8f
+  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

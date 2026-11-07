@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
+  - protocol/code_metrics_baseline.json:ec5bbafe97be2f1fdb18ac7457d6d1a87f0680405670ada7ba6234a0aec9d324
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）

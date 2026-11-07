@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
-  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
+  - protocol/code_metrics_baseline.json:ec5bbafe97be2f1fdb18ac7457d6d1a87f0680405670ada7ba6234a0aec9d324
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）

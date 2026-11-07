@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:8db41d2cff4d631f0574de951fb11d189dbc51880335833b2b0ded7acfe9e281
+  - protocol/code_metrics_baseline.json:ec5bbafe97be2f1fdb18ac7457d6d1a87f0680405670ada7ba6234a0aec9d324
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）

@@ -16,15 +16,17 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:60fbba6771fc7ab0cd14e755cd1034da9abe2dc32986643db9fc7cf53274cb8f
+  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:86716b5ad610d207d7378e16f78f82a373ce8b02ec6499147653f181f9d216de
+  - protocol/check12_weights.json:3650c3a181bf5ee85d8e5c2a3e7b280d7a21fba5b7f186b1bfd7a81c0d484c0f
   - protocol/coupling_baseline.json:567ec2d01f21757b61009181067d63e6c543bdc65cf75f3428c5576292a4c0fc
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：几何提示同步探针（尺寸反解 + 双假设 + 偏移搜索；谱峰不变反例）

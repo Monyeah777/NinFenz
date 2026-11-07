@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1055,
     "projection": 148,
-    "support": 403,
-    "verify": 996
+    "support": 405,
+    "verify": 997
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7625,6 +7625,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "元算子判据（P2）：11 算子 + 触发引擎 + 双 trace + 反仪式化。",
+      "path": "desktop/tests/test_cognition_control.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "认知核 · 研究层判据：切片/检索词/方法论路径必须**成体系且可证伪**，不是随便列几个词。",
       "path": "desktop/tests/test_cognition_plan.py",
       "role": "verify",
@@ -12348,16 +12354,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "91874ee1f0ce3fdc8937749ec9688fdce69a73416dc36d87e29825554d80b624",
+  "root_digest": "a647a82bc74e3dfed37df87601ec3f13e9930cb07244c69235642fd148b1ff91",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 257,
+    "R-catch": 259,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 129,
     "R-support": 119,
-    "R-verify": 876,
+    "R-verify": 877,
     "auto:R-core": 277
   },
   "schema": "nf-role-coordinates/1"

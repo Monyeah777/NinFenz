@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - scripts/nf.py:60fbba6771fc7ab0cd14e755cd1034da9abe2dc32986643db9fc7cf53274cb8f
+  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）

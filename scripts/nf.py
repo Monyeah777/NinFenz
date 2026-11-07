@@ -411,6 +411,24 @@ def _add_parser_cog(sub):
                          description="摘要：动作数/假设数/张力数/未答问题数/digest。")
     ct.add_argument("--bundle", required=True, help="会话文件")
     ct.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    co = csub.add_parser("ops", help="列出 11 个元算子及其 witness 要求",
+                         description="元算子：只改过程（策略/预算/中止/焦点），不改内容。")
+    co.add_argument("--id", dest="op_id", default="", help="只看一个算子")
+    co.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cc = csub.add_parser("control", help="执行一个元算子（必须带 witness）",
+                         description="元算子只改过程面；witness 缺失/越界写内容/仪式化全部拒绝。")
+    cc.add_argument("--bundle", required=True, help="会话文件")
+    cc.add_argument("--op", dest="op_id", required=True, help="算子 id（见 nf cog ops）")
+    cc.add_argument("--payload", default="", help="witness JSON 文件")
+    cc.add_argument("--payload-json", dest="payload_json", default="",
+                    help="witness 内联 JSON（与 --payload 二选一）")
+    cc.add_argument("--trigger", default="", help="触发来源（manual/loop/budget_low…）")
+    cc.add_argument("--out", default="", help="写回会话文件")
+    cc.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    cg = csub.add_parser("triggers", help="看当前状态触发了哪些算子（确定性谓词）",
+                         description="触发引擎：无进展/回环/冲突/预算/校准漂移/缺上下文。")
+    cg.add_argument("--bundle", required=True, help="会话文件")
+    cg.add_argument("--json", action="store_true", help="输出结构化 JSON")
 
 
 def _cmd_cog(args) -> int:
@@ -419,6 +437,7 @@ def _cmd_cog(args) -> int:
 
     from core import atomic_write
     from core.cognition_workspace import moves as cg_moves
+    from core.cognition_workspace import operators as cg_ops
     from core.cognition_workspace import session as cg_session
 
     def _read(path):
@@ -450,6 +469,60 @@ def _cmd_cog(args) -> int:
             print("    何时：" + item["when"])
             print("    frame_delta：" + "、".join(item["delta_kinds"]))
             print("    失败模式：" + item["failure_mode"])
+        return 0
+    if sub == "ops":
+        items = ([cg_ops.describe(args.op_id)] if args.op_id
+                 else [cg_ops.describe(o) for o in cg_ops.OPERATOR_IDS])
+        if args.json:
+            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+            return 0
+        print("== nf cog ops（" + str(len(items)) + " 个元算子）==")
+        for item in items:
+            print("  " + item["id"] + "：" + item["name"])
+            print("    witness：" + "、".join(item["witness"]))
+            print("    失败模式：" + item["failure_mode"])
+        return 0
+    if sub == "control":
+        try:
+            bundle = _read(args.bundle)
+            if args.payload and args.payload_json:
+                raise ValueError("--payload 与 --payload-json 只能给一个（修复指引：二选一）")
+            if args.payload:
+                with open(_rel_out(args.payload), encoding="utf-8") as handle:
+                    payload = _json.load(handle)
+            elif args.payload_json:
+                payload = _json.loads(args.payload_json)
+            else:
+                raise ValueError("缺 witness（修复指引：--payload 或 --payload-json）")
+            bundle = cg_session.control(bundle, args.op_id, payload,
+                                        trigger=args.trigger)
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.out:
+            _write(args.out, bundle)
+        if args.json:
+            print(_json.dumps(bundle["control"], ensure_ascii=False, indent=2,
+                              sort_keys=True))
+        else:
+            print("== nf cog control ==")
+            print("  算子：" + args.op_id + " · 控制面状态：" + bundle["control"]["status"])
+            print("  记录数：" + str(len(bundle["control"]["records"])))
+            if args.out:
+                print("  已写入：" + _rel_display(_rel_out(args.out)))
+        return 0
+    if sub == "triggers":
+        try:
+            items = cg_session.triggers(_read(args.bundle))
+        except (OSError, ValueError) as exc:
+            return _machine_fail(args, str(exc), 4)
+        if args.json:
+            print(_json.dumps(items, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog triggers ==")
+            if not items:
+                print("  暂无触发（无进展/回环/冲突/预算/校准漂移都不成立）")
+            for item in items:
+                print("  " + item["trigger"] + " → " + item["op"] + "：" + item["why"])
         return 0
     if sub == "begin":
         try:

@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:60fbba6771fc7ab0cd14e755cd1034da9abe2dc32986643db9fc7cf53274cb8f
+  - scripts/nf.py:1fd503126425cd70a26ebe136589732884da362163ffdd07eda76caaa59e7af3
 
 ---
+> 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）
+
 > 重审（2026-11-08）：认知工作台 L0（discourse/15 moves/records/replay + nf cog）
 
 > 重审（2026-11-08）：密钥透明目录 v0（版本根/追加链/包含证明/分叉见证）
