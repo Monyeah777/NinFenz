@@ -430,6 +430,75 @@
           "contains": "\"P6-05/09/10\": sm.report(root)"
         }
       ]
+    },
+    {
+      "id": "otel-genai-tool-span-semconv",
+      "standard": "cncf-otel-semconv",
+      "assertion": "NF trace 记录确定性映射为 OpenTelemetry GenAI 工具调用属性：operation、tool、call、agent、conversation、arguments 与 result 均使用规范键名；缺失字段不杜撰，成功/失败/未提供三态映射到 span status。",
+      "tests": [
+        "desktop/tests/test_telemetry_semconv.py::TestTelemetrySemconv.test_golden_semconv_attributes_and_otlp_ids",
+        "desktop/tests/test_telemetry_semconv.py::TestTelemetrySemconv.test_attributes_carry_semconv_names",
+        "desktop/tests/test_telemetry_semconv.py::StrictOtlpIdsTest.test_status_is_tristate"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_telemetry_semconv.py::TraceRejectTest.test_rejects_non_object_empty_and_mixed_records",
+        "desktop/tests/test_telemetry_semconv.py::TraceRejectTest.test_rejects_nonfinite_and_malformed_json"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/telemetry_semconv.py",
+        "desktop/tests/test_telemetry_semconv.py",
+        "docs/45_执行遥测规范.md",
+        "engine/dotnet/src/Nf.Engine/TelemetrySemconv.cs"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_telemetry"
+        },
+        {
+          "path": "engine/dotnet/tools/nf-dotnet/Program.cs",
+          "contains": "int TelemetryCommand()"
+        }
+      ]
+    },
+    {
+      "id": "otel-otlp-json-shape-profile",
+      "standard": "cncf-otel-otlp",
+      "assertion": "NF 输出严格限定为 OTLP JSON 的 resourceSpans → scopeSpans → spans 形状，固定长度十六进制 trace/span ID 且不写墙钟时间；该声明不包含 protobuf、网络端点或完整传输兼容承诺。",
+      "tests": [
+        "desktop/tests/test_telemetry_semconv.py::TestTelemetrySemconv.test_export_shape",
+        "desktop/tests/test_telemetry_semconv.py::TestTelemetrySemconv.test_golden_semconv_attributes_and_otlp_ids",
+        "desktop/tests/test_telemetry_semconv.py::TestTelemetrySemconv.test_otlp_json_shape_does_not_claim_transport_or_wall_clock"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_telemetry_semconv.py::TraceRejectTest.test_rejects_non_object_empty_and_mixed_records",
+        "desktop/tests/test_telemetry_semconv.py::TraceRejectTest.test_rejects_oversized_trace_before_parse"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/telemetry_semconv.py",
+        "desktop/tests/test_telemetry_semconv.py",
+        "docs/45_执行遥测规范.md",
+        "engine/dotnet/src/Nf.Engine/TelemetrySemconv.cs",
+        "engine/dotnet/probes/face_parity_probe.py"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_telemetry"
+        },
+        {
+          "path": "engine/dotnet/tools/nf-dotnet/Program.cs",
+          "contains": "int TelemetryCommand()"
+        }
+      ]
     }
   ]
 }

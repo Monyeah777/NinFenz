@@ -306,7 +306,7 @@
     "zarr"
   ],
   "note": "四态仅表示仓库内部编目、绑定、断言与消费证据；不等于第三方认证。",
-  "root_digest": "a1515209aecc3f5574d0560eba342ff8c93d0d1723eb712f01c9c96878b2c218",
+  "root_digest": "c819d06c1d4618cd8dfd5a1f2b7bdac3bb775490185d26db6e008c438cdd619b",
   "schema": "nf-standards-coverage/1",
   "standards": [
     {
@@ -814,30 +814,34 @@
       "url": "https://github.com/cloudevents/spec/blob/main/cloudevents/spec.md"
     },
     {
-      "asserted": false,
+      "asserted": true,
       "body": "OpenTelemetry",
       "bound": true,
       "catalogued": true,
-      "claims": [],
-      "consumable": false,
+      "claims": [
+        "otel-otlp-json-shape-profile"
+      ],
+      "consumable": true,
       "domain_bound": true,
       "id": "cncf-otel-otlp",
       "layer": "iface",
-      "state": "bound",
+      "state": "consumable",
       "title": "OTLP 协议",
       "url": "https://opentelemetry.io/docs/specs/otlp/"
     },
     {
-      "asserted": false,
+      "asserted": true,
       "body": "OpenTelemetry",
       "bound": true,
       "catalogued": true,
-      "claims": [],
-      "consumable": false,
+      "claims": [
+        "otel-genai-tool-span-semconv"
+      ],
+      "consumable": true,
       "domain_bound": true,
       "id": "cncf-otel-semconv",
       "layer": "eng",
-      "state": "bound",
+      "state": "consumable",
       "title": "语义约定（可扩展注册表）",
       "url": "https://opentelemetry.io/docs/specs/semconv/"
     },
@@ -5609,18 +5613,18 @@
     "consumable"
   ],
   "summary": {
-    "asserted": 14,
+    "asserted": 16,
     "bound": 82,
     "catalogued": 376,
-    "claims": 14,
-    "consumable": 14,
+    "claims": 16,
+    "consumable": 16,
     "domain_bound": 72,
     "not_domain_bound": 304,
     "states": {
       "asserted": 0,
-      "bound": 68,
+      "bound": 66,
       "catalogued": 294,
-      "consumable": 14
+      "consumable": 16
     }
   }
 }
