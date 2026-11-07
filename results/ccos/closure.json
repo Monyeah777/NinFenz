@@ -264,6 +264,19 @@
       "module": "evaluation",
       "reverse_fixture": "把 synthetic 数据标成 measured → compare 拒（test_synthetic_run_is_blocked）",
       "status": "debt"
+    },
+    {
+      "claim": "Ingress 网关五件（认证/白名单/限流/同意/记账）全部 fail-closed，且每次放行调用留回执",
+      "criteria": [
+        "test_mcp_ingress.py::test_bad_token_is_denied",
+        "test_mcp_ingress.py::test_limit_is_enforced",
+        "test_mcp_ingress.py::test_each_allowed_call_leaves_a_receipt"
+      ],
+      "debt": "",
+      "id": "C-17",
+      "module": "mcp-ingress",
+      "reverse_fixture": "坏 token/不在白名单/超限/有副作用无同意/超长参数 → 一律拒且消息带修复指引；被拒的调用不留回执（test_denied_call_leaves_no_receipt）",
+      "status": "closed"
     }
   ],
   "schema": "nf-closure-report/1",
@@ -306,6 +319,9 @@
       "label-watermark": {
         "closed": 4
       },
+      "mcp-ingress": {
+        "closed": 1
+      },
       "mcp-manifest": {
         "closed": 2
       },
@@ -314,13 +330,13 @@
       }
     },
     "by_status": {
-      "closed": 21,
+      "closed": 22,
       "debt": 1
     },
     "open_debt": [
       "D-06"
     ],
     "schema": "nf-closure-summary/1",
-    "total": 22
+    "total": 23
   }
 }

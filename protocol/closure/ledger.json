@@ -438,6 +438,30 @@
       "evidence": [
         "python scripts/eval_run.py --json"
       ]
+    },
+    {
+      "id": "C-17",
+      "module": "mcp-ingress",
+      "claim": "Ingress 网关五件（认证/白名单/限流/同意/记账）全部 fail-closed，且每次放行调用留回执",
+      "status": "closed",
+      "criteria": [
+        [
+          "test_mcp_ingress.py",
+          "test_bad_token_is_denied"
+        ],
+        [
+          "test_mcp_ingress.py",
+          "test_limit_is_enforced"
+        ],
+        [
+          "test_mcp_ingress.py",
+          "test_each_allowed_call_leaves_a_receipt"
+        ]
+      ],
+      "reverse_fixture": "坏 token/不在白名单/超限/有副作用无同意/超长参数 → 一律拒且消息带修复指引；被拒的调用不留回执（test_denied_call_leaves_no_receipt）",
+      "evidence": [
+        "python -m unittest desktop.tests.test_mcp_ingress"
+      ]
     }
   ]
 }

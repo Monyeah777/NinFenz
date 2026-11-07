@@ -1302,7 +1302,7 @@ class McpRuntime:
     内部把 text 从 Resource 元数据剥离，list 与 read 两段式对外。
     """
 
-    def __init__(self, snapshot: Dict[str, Any], schema_check=None):
+    def __init__(self, snapshot: Dict[str, Any], schema_check=None, ingress=None):
         """`schema_check`（可选）= 「参数 ⇄ inputSchema」校验器，**由调用方注入**。
 
         依赖倒置：本模块是稳定侧（被 `endpoint` / `mcp_package` 依赖），若直接 `import
@@ -1310,6 +1310,7 @@ class McpRuntime:
         违例）。故这里只**声明接口**，实现由不稳侧（CLI 启动路径、脚本）注入——与
         `domain_pack.build(renderer=…)` 同一条纪律。未注入时不校验声明面（调用方自负）。
         """
+        self._ingress = ingress
         mcp = snapshot.get("mcp", snapshot)
         self.server_name = str(mcp.get("name") or "nf-mcp")
         self.server_version = str(mcp.get("version") or "0.1.0")
@@ -1513,6 +1514,8 @@ class McpRuntime:
                              % (name, "、".join(sorted(TOOL_HANDLERS))))
         # 越权/注入参数面（trust_boundary 硬面）：控制字符 / 超长载荷 / 路径穿越写法
         # 在进入处理器之前一律拒出（映射 -32602），fail-closed。
+        if self._ingress is not None:
+            self._ingress.check_call(canonical, args, params)
         trust_boundary.check_arguments(canonical, args)
         # **声明面校验**（2026-09-30 补）：按 `tools/list` 里那份 inputSchema 逐条校验参数——
         # 类型不符、枚举越界、**多余/拼错的键**（additionalProperties=false）都在进处理器之前
@@ -1528,6 +1531,8 @@ class McpRuntime:
                     "传参——键名/类型/枚举须一致，勿夹带多余键）"
                     % (name, "；".join((errs + unsup)[:4])))
         result = handler(args)
+        if self._ingress is not None:
+            self._ingress.record_call(canonical, args, result)
         # MCP 2025-06-18+：声明了 outputSchema 的工具必须同时给 structuredContent。
         # 列表型结果统一包成 {"items": [...]}（与 outputSchema 的根对象一致）；content
         # 仍保留原来的 JSON 文本，老客户端按文本消费不受影响。

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:f47a3f9ee5b44998893ffdc6580dc76b954e8d661b13e5b9d9bfb558304d8bdf
+  - protocol/code_metrics_baseline.json:6f67f3133f0735d47b2b6772d933e9c582f1430ca71fbff39dd06c148a272536
 ---
+> 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
+
 > 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）
 
 > 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:034e516c46a37b3ed93e26cc197ee51e785c5453d08e4ef2d403204971c309e5
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:f47a3f9ee5b44998893ffdc6580dc76b954e8d661b13e5b9d9bfb558304d8bdf
+  - protocol/code_metrics_baseline.json:6f67f3133f0735d47b2b6772d933e9c582f1430ca71fbff39dd06c148a272536
 ---
+> 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
+
 > 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）
 
 > 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）

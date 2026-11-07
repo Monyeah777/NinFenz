@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:f47a3f9ee5b44998893ffdc6580dc76b954e8d661b13e5b9d9bfb558304d8bdf
+  - protocol/code_metrics_baseline.json:6f67f3133f0735d47b2b6772d933e9c582f1430ca71fbff39dd06c148a272536
 ---
+> 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
+
 > 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）
 
 > 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）

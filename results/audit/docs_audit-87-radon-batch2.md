@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:f47a3f9ee5b44998893ffdc6580dc76b954e8d661b13e5b9d9bfb558304d8bdf
+  - protocol/code_metrics_baseline.json:6f67f3133f0735d47b2b6772d933e9c582f1430ca71fbff39dd06c148a272536
 ---
+> 重审（2026-11-08）：Ingress 网关（认证/白名单/限流/同意/回执）
+
 > 重审（2026-11-08）：工具清单派生自真实 TOOL_DEFS（D-04 关账）
 
 > 重审（2026-11-08）：预注册评测协议 + harness（D-05 关账，新增 D-06 真实测量债）

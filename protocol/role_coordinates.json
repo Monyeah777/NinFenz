@@ -6,7 +6,7 @@
     "prod": 1055,
     "projection": 153,
     "support": 421,
-    "verify": 1012
+    "verify": 1014
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6485,6 +6485,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Ingress 网关（最小实现）：认证 / 白名单 / 限流 / 同意 / 证据，一次调用全过一遍。",
+      "path": "desktop/src/core/mcp_ingress.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "CCOS Tool Manifest（nf-tool-manifest/1）：给 MCP 的 tools/list 加契约与证据，不破坏兼容。",
       "path": "desktop/src/core/mcp_manifest.py",
       "role": "verify",
@@ -8509,6 +8515,12 @@
     {
       "function": "MCP server 定义导出单测（v2.1.0 A2：techdoc IR → MCP 资源型 server 定义）。",
       "path": "desktop/tests/test_mcp_adapter.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Ingress 网关判据（P6）：认证/白名单/限流/同意/记账五件，全部 fail-closed。",
+      "path": "desktop/tests/test_mcp_ingress.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12444,7 +12456,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "61eed4bc7110518ed0e7ca77497e85ecd86c183df1d7a3f61aa00327cd88b637",
+  "root_digest": "4ce642946c60b945fefce37b60775e9199bbe06e4eea1d89be515a1fccf06cbd",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 274,
@@ -12453,8 +12465,8 @@
     "R-prod": 944,
     "R-projection": 134,
     "R-support": 119,
-    "R-verify": 888,
-    "auto:R-core": 282
+    "R-verify": 889,
+    "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"
 }
