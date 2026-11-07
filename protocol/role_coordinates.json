@@ -3,10 +3,10 @@
     "app": 1455,
     "entry": 26,
     "floor": 5,
-    "prod": 1049,
+    "prod": 1050,
     "projection": 137,
     "support": 376,
-    "verify": 980
+    "verify": 981
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6029,6 +6029,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Ed25519（RFC 8032）纯标准库实现——为了让跨组织吊销不再共享对称密钥。",
+      "path": "desktop/src/core/ed25519.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "效应面（P-A2）：源码 → **效应行**（ast 可证），并给出规则层（P-A1）的同判定 구현。",
       "path": "desktop/src/core/effect_rows.py",
       "role": "verify",
@@ -7789,6 +7795,12 @@
     {
       "function": "演练保真度（`core/drill_fidelity.py`）回归测试 —— 动态可执行面。",
       "path": "desktop/tests/test_drill_fidelity.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "Ed25519（RFC 8032）判据：黄金向量 + 确定性 + 篡改必拒 + 与独立实现交叉验证。",
+      "path": "desktop/tests/test_ed25519.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12216,7 +12228,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1be7f10bb679f276e73109a1afd6fd5510fd323f9bf79b5a12f12cdc640a502b",
+  "root_digest": "c84cc5d6f79d55d1b2fc3fd7df5830a3b9501d5e9838d109a03e4fdcb20a3a5b",
   "rule_counts": {
     "R-app": 1455,
     "R-catch": 230,
@@ -12225,8 +12237,8 @@
     "R-prod": 944,
     "R-projection": 119,
     "R-support": 119,
-    "R-verify": 861,
-    "auto:R-core": 269
+    "R-verify": 862,
+    "auto:R-core": 270
   },
   "schema": "nf-role-coordinates/1"
 }
