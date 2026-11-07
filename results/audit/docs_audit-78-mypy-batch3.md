@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:e1d412a7bab771b3dc8dd9558ea8773a7dca84e91d0c6e76a5c777cf8fbc9169
+  - protocol/code_metrics_baseline.json:fe3a2e6799b11723a0f11cc3aa93e0499b48044ace534d9edc8a840f09626255
 ---
+> 重审（2026-11-08）：原子目录 v2 + 不变量 A1–A5 + 候选健康 B1–B5
+
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
 
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）

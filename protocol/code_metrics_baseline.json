@@ -1415,6 +1415,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 71
     },
+    "scripts/atom_invariants.py": {
+      "lines": 106,
+      "max_fn_cc": 11,
+      "max_fn_lines": 51
+    },
     "scripts/build_lsp_transcript.py": {
       "lines": 223,
       "max_fn_cc": 8,

@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:e1d412a7bab771b3dc8dd9558ea8773a7dca84e91d0c6e76a5c777cf8fbc9169
+  - protocol/code_metrics_baseline.json:fe3a2e6799b11723a0f11cc3aa93e0499b48044ace534d9edc8a840f09626255
 ---
+> 重审（2026-11-08）：原子目录 v2 + 不变量 A1–A5 + 候选健康 B1–B5
+
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
 
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）

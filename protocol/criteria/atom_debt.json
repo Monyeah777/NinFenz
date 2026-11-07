@@ -1,0 +1,81 @@
+{
+  "schema": "nf-atom-debt/1",
+  "note": "原子债：这些原子当前没有被方法包/组合/互斥引用（A4 死码）。记债而不是删，是为了让「新增死码」fail-closed、「存量死码」可见。逐条必须有接入计划或废弃理由。",
+  "atoms": [
+    {
+      "id": "c.allocate",
+      "reason": "调度类原子，等 P6 K2 调度器接入后由 planner 引用",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "c.sequence",
+      "reason": "序列编排原子，等 planner 落地后引用",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "c.stop",
+      "reason": "与元算子 stop 语义重叠，待裁定后二选一",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "e.adjudicate",
+      "reason": "裁决原子，等评审/仲裁场景接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "i.cluster",
+      "reason": "聚类原子，等归纳场景接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "i.compose",
+      "reason": "组合原子，与方法包 compose 语义重叠，待裁定",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "i.hierarchy",
+      "reason": "层级原子，等任务分解场景接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "i.transfer",
+      "reason": "迁移原子，等跨域类比场景接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "e.benchmark",
+      "reason": "基准原子，等基准套件接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "m.trace",
+      "reason": "追踪原子，等 trace 检索接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "k.instantiate",
+      "reason": "实例化原子，等具体化场景接入",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "e.calibrate",
+      "reason": "校准原子，与元算子 calibrate 重叠，待裁定",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "k.define",
+      "reason": "定义原子，等概念分析接进 planner 后引用",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "k.standard",
+      "reason": "标准原子，等 criteria registry 接进 planner 后引用",
+      "since": "2026-11-08"
+    },
+    {
+      "id": "m.compare",
+      "reason": "比较原子，等对比场景接进 planner 后引用",
+      "since": "2026-11-08"
+    }
+  ]
+}

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:e1d412a7bab771b3dc8dd9558ea8773a7dca84e91d0c6e76a5c777cf8fbc9169
+  - protocol/code_metrics_baseline.json:fe3a2e6799b11723a0f11cc3aa93e0499b48044ace534d9edc8a840f09626255
 ---
+> 重审（2026-11-08）：原子目录 v2 + 不变量 A1–A5 + 候选健康 B1–B5
+
 > 重审（2026-11-08）：判据注册表 + 主张编译（证据义务清单/三态核对）
 
 > 重审（2026-11-08）：元算子层（11 ops + 触发引擎 + 双 trace + 反仪式化）

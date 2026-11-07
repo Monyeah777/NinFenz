@@ -1,0 +1,282 @@
+{
+  "atoms": [
+    {
+      "composed_of": [],
+      "id": "k.represent",
+      "name": "表征",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.partition",
+      "name": "划分",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.relate",
+      "name": "关联",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.abstract",
+      "name": "抽象",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.define",
+      "name": "定义",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.instantiate",
+      "name": "实例化",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.classify",
+      "name": "分类",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.quantify",
+      "name": "量化",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.criterion",
+      "name": "判据设定",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "k.standard",
+      "name": "标准选择",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.observe",
+      "name": "观察",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.compare",
+      "name": "比较",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.check",
+      "name": "核验",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.estimate",
+      "name": "置信估计",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.detect",
+      "name": "异常检测",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "m.trace",
+      "name": "溯源",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.select",
+      "name": "选择",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.sequence",
+      "name": "排序",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.allocate",
+      "name": "分配",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.switch",
+      "name": "切换",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "c.stop",
+      "name": "停止/继续",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.verify",
+      "name": "验证",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.falsify",
+      "name": "证伪",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.adjudicate",
+      "name": "裁决",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.audit",
+      "name": "审计",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.calibrate",
+      "name": "校准",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "e.benchmark",
+      "name": "基准对照",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.merge",
+      "name": "合并",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.reconcile",
+      "name": "冲突消解",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.cluster",
+      "name": "聚类",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.hierarchy",
+      "name": "层级化",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.compose",
+      "name": "组合",
+      "status": "active"
+    },
+    {
+      "composed_of": [],
+      "id": "i.transfer",
+      "name": "迁移",
+      "status": "active"
+    }
+  ],
+  "catalog": {
+    "atom_debt": 15,
+    "count": 33,
+    "pack_references": 19,
+    "schema": "nf/atom-catalog/2"
+  },
+  "invariants": {
+    "counts": {
+      "atoms": 33,
+      "composed_of_nonempty": 0,
+      "dead": 12,
+      "violations": 0
+    },
+    "ok": true,
+    "schema": "nf/atom-invariants/1",
+    "violations": [],
+    "warnings": [
+      {
+        "atom": "c.allocate",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "c.sequence",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "c.stop",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "e.adjudicate",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "i.cluster",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "i.compose",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "i.hierarchy",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "i.transfer",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "k.define",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "k.instantiate",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "k.standard",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      },
+      {
+        "atom": "m.compare",
+        "code": "A4",
+        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
+      }
+    ]
+  },
+  "schema": "nf-atom-invariants-report/1"
+}
