@@ -44,10 +44,19 @@ jobs:
           git diff -- results/ccos/evidence_verdict_vectors.json > vectors.diff || true
           wc -l vectors.diff
           head -c 4000 vectors.diff || true
+      - name: 投影件 Linux 重算（平台无关性验证）
+        run: |
+          python scripts/nf.py layers --write
+          python scripts/verify_report.py --write
+          git diff -- protocol/role_coordinates.json protocol/verification_report.json \
+            docs/layers.md > projections.diff || true
+          wc -l projections.diff
+          head -c 4000 projections.diff || true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: linux-parity
           path: |
             sast-posix.json
             vectors.diff
+            projections.diff
           if-no-files-found: warn
