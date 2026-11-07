@@ -38,10 +38,21 @@ jobs:
         run: |
           set -o pipefail
           cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
+      - name: PyO3 扩展构建（可选进程内原语面；此前不在任何 CI 面）
+        # 2026-11-08：engine/rust/pyo3 是 cdylib（nf_pyengine），主 crate 测试不覆盖它；
+        # 依赖已从 0.22 升到 0.29（修 dependabot high OOB / Sync bound 告警），必须让 CI
+        # 真正编译一次，否则「升级」只停在 Cargo.toml。python3-dev 提供 pyo3 构建所需头。
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-dev
+          set -o pipefail
+          cargo build --release --locked --manifest-path engine/rust/pyo3/Cargo.toml 2>&1 | tee pyo3-build.log
       - name: 失败诊断产物（本 run 日志；无则跳过）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: rust-crate-test-log
-          path: rust-crate-test.log
+          path: |
+            rust-crate-test.log
+            pyo3-build.log
           if-no-files-found: warn
