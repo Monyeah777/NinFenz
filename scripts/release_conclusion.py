@@ -745,7 +745,7 @@ def _run_in_snapshot_body(args, head: str) -> int:
 def status_snapshot(base: Path) -> dict[str, Any]:
     """快照现场体检 → {lock, runs, latest}（纯读，不改任何状态）。
 
-    为什么（第 43 轮）：并发会话多的时候，「现在到底有没有人/哪一份在跑、跑到哪了」要靠翻目录和日志猜。
+    为什么（第 43 轮）：并发会话多的时候，「现在有没有人在跑、哪一份、跑到哪了」要靠翻目录猜。
     把它做成一个命令，结论状态就不再靠记忆。
     """
     base = Path(base)
