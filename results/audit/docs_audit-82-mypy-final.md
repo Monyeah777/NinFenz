@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
+  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
 ---
+> 重审（2026-11-08）：去未用 subprocess 导入
+
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
 
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）

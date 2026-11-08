@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
+  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
 ---
+> 重审（2026-11-08）：去未用 subprocess 导入
+
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
 
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）

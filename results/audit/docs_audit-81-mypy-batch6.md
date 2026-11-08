@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
+  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
 ---
+> 重审（2026-11-08）：去未用 subprocess 导入
+
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
 
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）

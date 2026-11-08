@@ -27,7 +27,6 @@ import concurrent.futures
 import json
 import os
 import shutil
-import subprocess  # nosec B404 - 只跑 argv 列表查询进程存活
 import sys
 import tempfile
 import time

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:b807908632297b878b3dcddd4c32ac8482a39dae6a2ad2b99ba9e50c8a6c287a
+  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
 ---
+> 重审（2026-11-08）：去未用 subprocess 导入
+
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）
 
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）
