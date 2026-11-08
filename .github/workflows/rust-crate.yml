@@ -65,8 +65,8 @@ jobs:
         # 真正编译一次，否则「升级」只停在 Cargo.toml。python3-dev 提供 pyo3 构建所需头。
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-dev
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y python3-dev
           set -o pipefail
           cargo build --release --locked --manifest-path engine/rust/pyo3/Cargo.toml 2>&1 | tee pyo3-build.log
       - name: 失败诊断产物（本 run 日志；无则跳过）
