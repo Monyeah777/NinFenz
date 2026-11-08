@@ -1,0 +1,134 @@
+{
+  "by_status": {
+    "closed": 23,
+    "debt": 1
+  },
+  "claims": 24,
+  "dangling": [],
+  "detail": [
+    {
+      "degree": 3,
+      "id": "C-01",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-02",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-03",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-04",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-05",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-06",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-07",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-08",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-09",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-10",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-11",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-12",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-13",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-14",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-15",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-16",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "D-01",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "D-02",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "D-03",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "D-04",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "D-05",
+      "status": "closed"
+    },
+    {
+      "degree": 2,
+      "id": "D-06",
+      "status": "debt"
+    },
+    {
+      "degree": 4,
+      "id": "C-17",
+      "status": "closed"
+    },
+    {
+      "degree": 3,
+      "id": "C-18",
+      "status": "closed"
+    }
+  ],
+  "evidence_nodes": 69,
+  "h_dangling_ratio": 0.0,
+  "note": "H = 悬挂陈述比；H>0 说明有陈述没有任何可核证据（幻觉面未收口）",
+  "schema": "nf-evidence-graph/1"
+}

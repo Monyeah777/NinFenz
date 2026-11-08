@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1056,
-    "projection": 155,
-    "support": 426,
-    "verify": 1020
+    "projection": 156,
+    "support": 427,
+    "verify": 1021
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8021,6 +8021,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "证据图探针判据：H 必须可算、口径写死、且对「没收口的陈述」会变红。",
+      "path": "desktop/tests/test_evidence_graph.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "证据判定向量集（results/ccos/evidence_verdict_vectors.json）判据。",
       "path": "desktop/tests/test_evidence_vectors.py",
       "role": "verify",
@@ -12498,16 +12504,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b2781eca5acbfc519dd9fe7043687ef971b37d91cdf814621225383741bc2d9d",
+  "root_digest": "9408e3cbc79c558b4c1c85b410f87579c5266d16650b90176be61241b816267f",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 279,
+    "R-catch": 280,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 135,
+    "R-projection": 136,
     "R-support": 119,
-    "R-verify": 895,
+    "R-verify": 896,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"

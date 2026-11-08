@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:6527da9c73d585f6ec16b83e126ca5a1ae5b173c4177d9fbeba32301b45a9cd1
+  - protocol/code_metrics_baseline.json:8947074f9d736c86221a52b05bc5366bce93edaade98997d92b17956206d9c47
 ---
+> 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
+
 > 重审（2026-11-08）：分组报告模块（先分组再汇总；n<2 不能谈方差）
 
 > 重审（2026-11-08）：口头置信触发策略（触发器非证据）+ CLI --threshold

@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "payload 同步",
+  "note": "证据图探针",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "1233826412f96df5b68de355a273b0b1f10aa52cc0dd106141c9d89b64c08813"
+  "subject_digest": "7a570ed215e91f3095676fc61dba997c3e6bf3a63de12a838ce15cf704ca40af"
 }

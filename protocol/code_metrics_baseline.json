@@ -1555,6 +1555,11 @@
       "max_fn_cc": 12,
       "max_fn_lines": 47
     },
+    "scripts/evidence_graph_probe.py": {
+      "lines": 105,
+      "max_fn_cc": 9,
+      "max_fn_lines": 30
+    },
     "scripts/evidence_vectors.py": {
       "lines": 431,
       "max_fn_cc": 9,
