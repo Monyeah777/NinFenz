@@ -103,6 +103,7 @@ python3 -m compileall -q desktop/src scripts
 - **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
 - **冻结链/投影：新增或改名文件先 `git add`，再跑 `nf layers --write` 及后续重冻（verify_report/conformance/approve/receipts/audit）**。投影走 git 追踪面（`git ls-files`），未跟踪文件会被少算——提交后 CI 检出（tracked）重算即不一致（#168/#178/#182 三次同因，shard 12/17/19/26 红）。`nf layers --write` 现在会对未跟踪文件打 warn，但**不替用户 `git add`**。
 - **打包/站点面（packaging/、site/）**：每个 PR 都会跑 `npm-package-check`（payload stage → verify-package → 包内冒烟 → `npm pack --dry-run` → tarball 逐字节 → 站点数字↔payload 对账 → 断言 stage 不改受跟踪文件）。本地复现：`cd packaging/npm && npm run stage && npm run verify`；payload 未暂存时 `test_npm_package` 的两条自检会显式 skip（`release_conclusion` 现会 warn，提示先 stage）。
+  **数字同步（2026-11-08 实测）**：payload 含 docs/protocol，**任何文档或协议改动都可能让解包体积越过「N 件 / M MB」的两位小数边界**——`npm-package-check` 会在 PR 上判红并给出准确的新值；按提示跑 `cd packaging/npm && node tools/stage-payload.mjs --sync-readme` 与 `node site/tools/sync-numbers.mjs --write`，把 README/site/llms-full 的数字同步后一起提交（别手改数字）。
 
 ### 4.3 社区领域包（community/）
 - 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。
