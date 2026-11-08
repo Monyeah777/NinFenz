@@ -144,6 +144,12 @@ class CiHealthAuditSourceTest(unittest.TestCase):
         self.assertIn("runs.extend(page_runs)", self.text,
                       "ci-health 审计分页结果未并入 runs")
 
+    def test_audit_skips_in_flight_runs(self):
+        """最新一次还在跑 → 计 pending 跳过（否则「上次红、新一次在跑」会瞬时假红）。"""
+        self.assertIn('pending = [r for r in latest.values() if r.get("status") != "completed"]',
+                      self.text, "ci-health 审计未把 in-flight 运行记为 pending")
+        self.assertIn("if pending:", self.text, "ci-health 审计缺少 pending 提示分支")
+
 
 if __name__ == "__main__":
     unittest.main()
