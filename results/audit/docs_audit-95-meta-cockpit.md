@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:f10e73e068c8920700f32819212dd63862cab626d0a171ddd1c616f7e261b00f
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:76b8a5f25cdc65f37cf743a68fe74517b854d09b44a316338339ac6bfc178e01
+  - protocol/check12_weights.json:09a147e8c3dbf4669723d3fe4caa595495dcf2cc8805e6a57a534649631b092d
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：资源层同构判据 #7：两本账（cog_steps/cc_cost_ms）并列记、不合并
+
 > 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
 
 > 重审（2026-11-09）：同构矩阵数据搬到 fixtures（单源），测试只留反射查证

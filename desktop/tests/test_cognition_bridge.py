@@ -221,8 +221,10 @@ class BridgeWireFormatTest(unittest.TestCase):
     """
 
     #: ts_digest = 同构判据 #1 的载体（两侧须指向同一外部时点引用；缺时点为空串，字段集恒定）
+    #: cost = 资源层两本账（cog_steps / cc_cost_ms 并列，不合并）——第 92 轮显式评审加入
     COMMIT_FIELDS = {"schema", "bridge_version", "cog_digest", "claim_digest",
-                     "cc_digest", "cc_verdict", "ts_digest", "roles", "prev", "digest"}
+                     "cc_digest", "cc_verdict", "ts_digest", "cost", "roles", "prev",
+                     "digest"}
     OBLIGATION_FIELDS = {"schema", "commitment_digest", "cc_verdict", "failed",
                          "unknown", "next_actions", "digest"}
 
@@ -260,6 +262,33 @@ class BridgeWireFormatTest(unittest.TestCase):
         self.assertTrue(br.obligation_record_issues(bad_order, ob), "顺序不同也要红")
         bad_digest = dict(rec, witness_digest="0" * 64)
         self.assertTrue(br.obligation_record_issues(bad_digest, ob))
+
+    def test_resource_accounting_is_two_ledgers(self):
+        """资源层同构判据 #7：两本账并列记（cog_steps / cc_cost_ms），不合并。"""
+        cc = {"verdict": "ok", "subject": "s", "detail": "d", "cost_ms": 12}
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        comm = br.commit(self._bundle(), claim, cc)
+        self.assertEqual({"cog_steps": 0, "cc_cost_ms": 12}, comm["cost"])
+        self.assertEqual([], br.resource_accounting_issues(comm))
+        # 缺成本：None 合法（契约侧没测过）
+        comm2 = br.commit(self._bundle(), claim, {"verdict": "ok", "subject": "s",
+                                                  "detail": "d"})
+        self.assertIsNone(comm2["cost"]["cc_cost_ms"])
+        self.assertEqual([], br.resource_accounting_issues(comm2))
+
+    def test_resource_accounting_can_be_killed(self):
+        """变异测试：混记聚合键 / 缺一本账 / 负数 / 非整数，四种都必须报。"""
+        base = {"cost": {"cog_steps": 3, "cc_cost_ms": 7}}
+        self.assertEqual([], br.resource_accounting_issues(base))
+        self.assertTrue(br.resource_accounting_issues(
+            {"cost": {"cog_steps": 3, "cc_cost_ms": 7, "total": 10}}),
+            "混记 total 必须报（预算不能变评分）")
+        self.assertTrue(br.resource_accounting_issues({"cost": {"cog_steps": 3}}))
+        self.assertTrue(br.resource_accounting_issues(
+            {"cost": {"cog_steps": -1, "cc_cost_ms": 7}}))
+        self.assertTrue(br.resource_accounting_issues(
+            {"cost": {"cog_steps": 3.5, "cc_cost_ms": 7}}))
 
     def test_envelope_guard_can_be_killed(self):
         """变异测试：源码里出现第三类信封时，守卫必须抓到（不是只会说「两类」）。"""

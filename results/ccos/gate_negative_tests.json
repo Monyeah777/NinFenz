@@ -109,7 +109,7 @@
       ]
     },
     {
-      "count": 7,
+      "count": 8,
       "has_negative": true,
       "id": "bridge",
       "module": "desktop.tests.test_cognition_bridge",
@@ -120,6 +120,7 @@
         "test_chain_detects_tamper",
         "test_append_rejects_broken_prev",
         "test_observation_correspondence_can_be_killed",
+        "test_resource_accounting_can_be_killed",
         "test_envelope_guard_can_be_killed"
       ]
     },

@@ -61,6 +61,11 @@ def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[st
     # 同构判据 #1（第 49 轮）：commitment 绑定契约侧的外部时点引用（如 TSA token digest）。
     # 两侧若指向不同 token，本字段不同 → 同构判据可判定；缺时点则留空串（字段集保持恒定）。
     ts_digest = str(cc_result.get("ts_digest") or "")
+    # 资源层记账（第 92 轮）：两本账**并列记、不合并**——认知侧记步数、契约侧记毫秒成本。
+    # 合并成一个分数就等于把「预算」变成「评分」，本仓禁止。
+    # 缺值用 None，不填 0（0 会被误读为「没花」）。
+    steps = (state.get("budget") or {}).get("steps_used")
+    cost = cc_result.get("cost_ms")
     payload = {"schema": COMMIT_SCHEMA, "bridge_version": BRIDGE_VERSION,
                "cog_digest": str(state["digest"]),
                "claim_digest": str(claim_doc["digest"]),
@@ -69,6 +74,8 @@ def commit(bundle: dict[str, Any], claim_doc: dict[str, Any], cc_result: dict[st
                                        "ts_digest": ts_digest}),
                "cc_verdict": verdict,
                "ts_digest": ts_digest,
+               "cost": {"cog_steps": None if steps is None else int(steps),
+                        "cc_cost_ms": None if cost is None else int(cost)},
                "roles": list(roles or ["local-trusted"]),
                "prev": str((bundle.get("commitments") or [{}])[-1].get("digest") or "")}
     payload["digest"] = digest_of(payload)
@@ -145,6 +152,40 @@ def apply_obligation(bundle: dict[str, Any], obligation_doc: dict[str, Any]) -> 
     new_bundle["control"] = new_control
     new_bundle["commitments"] = list(bundle.get("commitments") or [])
     return new_bundle
+
+
+def resource_accounting_issues(commitment: Any) -> list[str]:
+    """核对 commitment 的「两本账」（资源层同构判据 #7 的可复用核）。
+
+    规则（第 92 轮）：认知侧步数与契约侧毫秒成本必须**并列记**，不得合并成单一分数；
+    缺值用 None（不填 0——0 会被误读成「没花」）；负值非法。
+
+    为什么这条算同构：两侧量的不是同一量纲，同构点不在「数值相等」，而在**两本账都到场且不混记**。
+    混记（出现 total / score 之类聚合键）即红——那等于把预算变成评分。
+    """
+    issues: list[str] = []
+    if not isinstance(commitment, dict):
+        return ["commitment 不是对象（" + GUIDE + "用 bridge.commit 的产出）"]
+    cost = commitment.get("cost")
+    if not isinstance(cost, dict):
+        return ["缺 cost 两本账（" + GUIDE + "commitment.cost 必须是对象）"]
+    allowed = {"cog_steps", "cc_cost_ms"}
+    extra = sorted(set(cost) - allowed)
+    if extra:
+        issues.append("两本账混记了额外键 " + str(extra) + "（" + GUIDE
+                      + "只允许 cog_steps / cc_cost_ms 并列）")
+    for key in ("cog_steps", "cc_cost_ms"):
+        if key not in cost:
+            issues.append("缺 " + key + "（" + GUIDE + "两本账都要记，缺值写 None）")
+            continue
+        value = cost[key]
+        if value is None:
+            continue
+        if not isinstance(value, int) or isinstance(value, bool):
+            issues.append(key + " 必须是整数或 None（" + GUIDE + "别用浮点/字符串）")
+        elif value < 0:
+            issues.append(key + " 不能为负：" + str(value))
+    return issues
 
 
 def obligation_record_issues(record: dict[str, Any], obligation_doc: dict[str, Any],
