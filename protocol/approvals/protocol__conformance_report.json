@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-09",
   "approved_by": "Monyeah777",
-  "note": "precheck测试修复",
+  "note": "包文档",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "ca75d6e81ac5171f54dc2098c3c2fc113100d63fc2c28b7f159d32566e224b71"
+  "subject_digest": "2d25ed1c8e6b36a7b542f9bc506363cc7a5cf4ffc1c9545fd7a2b69017ce1e9e"
 }

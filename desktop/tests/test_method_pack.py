@@ -219,6 +219,25 @@ class PackContentTest(unittest.TestCase):
                 self.assertTrue(any(t in text for t in tokens),
                                 mid + " 在 " + rel + " 里找不到锚点（" + "/".join(tokens) + "）")
 
+    def test_doc_counts_match_packs(self):
+        """文档写的「N 个域 / N 个专家动作 / N 个证据类目」必须等于实际（防口径漂移）。"""
+        import re
+        doc = (ROOT / "docs" / "ccos" / "method-packs-v0.md").read_text(encoding="utf-8")
+        packs = [method_pack.load_pack(str(ROOT), pid) for pid in PACK_IDS]
+        moves = sum(len(p["expert_moves"]) for p in packs)
+        kinds = sum(len(p["evidence_standards"]) for p in packs)
+        claims = {
+            "个域": len(packs),
+            "个专家动作": moves,
+            "个证据类目": kinds,
+        }
+        for label, actual in claims.items():
+            found = re.findall(r"(\d+)\s*" + label, doc)
+            self.assertTrue(found, "文档里没写「" + label + "」")
+            for text in found:
+                self.assertEqual(int(text), actual,
+                                 f"文档写 {text} {label}，实际 {actual}（改文档或补包）")
+
     def test_checklist_projection_covers_all_moves(self):
         """清单投影：每域动作一条、按包内顺序、证据标准齐带（不评分不排序）。"""
         for pid in PACK_IDS:
