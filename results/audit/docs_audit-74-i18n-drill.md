@@ -6,12 +6,12 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——对应 62
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - protocol/locales.json:6e6687965cd887cb5253fe811898746001d8f93719688803229205ad8fbb8cde
+  - protocol/locales.json:b6b52410cc362152bd26f23ddafab72455494c760af37cf929c372b4616705ad
   - docs/locales.md:cf3a21039dad98832b3cd92ead92adaa6559b38bd9c96006fea87f0af81a6dc7
   - docs/en/locales.md:348a2b32a6f04cf830cb332b47b0b05f59265332c2fe37ec79ee63c0563168fa
   - docs/ja/locales.md:7f870e599fc00ab10c998eb115350b7ceda21655a2ebfcf870f6a2b8300e5f34
-  - docs/en/mcp.md:0653be472bb4888c814d3fc3696e7d882b35c6e49b965cf09b84d41d34c8d6f0
-  - docs/ja/mcp.md:a7a248172cc0119e023b1ed7e5e2c254b3b3db3d357f76e7e6a322e41538ddf2
+  - docs/en/mcp.md:0f6b57c2c7c0cdc27bd3e70bf1ea29da0e35e443176411eac10dddd6c125c59a
+  - docs/ja/mcp.md:5cb7c12fb8ccc31cec93bcf3c126a453ea0a4630e603c10f9e0ae340e655c8bf
   - docs/en/terminal.md:b99ee9b83dd9bcc433b97408785e85b8f265d797eb144abc09c8e0bcae97d046
   - docs/ja/terminal.md:ae1b37be3309ff21f7bd2096b0295ee073e493ec7bb402c3672ef9f5a72d168e
   - docs/en/layers.md:f92b4dcea20068c253a2a7455d21fb63bbf3c9493e80f81cb6460d4e464d6c20
@@ -298,6 +298,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
 
 > 重审（2026-11-07）：refreeze CID
