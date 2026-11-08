@@ -108,7 +108,7 @@ class PackContentTest(unittest.TestCase):
             "pi.allowlist_surface": ("desktop/src/core/mcp_ingress.py", ("allow_tools", "deny")),
             "pi.consent_gate": ("desktop/src/core/mcp_ingress.py", ("consent",)),
             "pi.receipt_audit": ("desktop/src/core/mcp_ingress.py", ("record_call", "receipt")),
-            "pi.least_privilege": ("desktop/src/core/mcp_ingress.py", ("max_args_bytes",)),
+            "pi.least_privilege": ("desktop/src/core/mcp_ingress.py", ("max_args",)),
             # 输出/参数侧 schema 复核在运行时（schema_check 注入点），不在 ingress 本身
             "pi.output_side_check": ("desktop/src/core/mcp_runtime.py", ("schema_check",)),
         }
@@ -142,6 +142,58 @@ class PackContentTest(unittest.TestCase):
         self.assertEqual(set(move_ids), {m["id"] for m in rev["expert_moves"]},
                          "逆序组合不得丢动作")
 
+
+    def test_every_pack_move_has_code_anchor_or_declared_conceptual(self):
+        """每个方法包的动作要么有真实代码锚点，要么在 CONCEPTUAL 里写明为什么不能有。
+
+        依据（第 27 轮立的规矩）：包只是文字时会退化成知识卡片；本判据逼每个动作
+        指向本仓的可核实现（文件 + 关键词），或显式承认它是纯概念动作。
+        """
+        anchors = {
+            "WM-1": ("scripts/watermark_bench.py", ("attacks",)),
+            "WM-2": ("scripts/watermark_sync_probe.py", ("sync",)),
+            "WM-3": ("scripts/watermark_dct_probe.py", ("qim",)),
+            "WM-4": ("scripts/watermark_ecc_probe.py", ("crc",)),
+            "WM-5": ("scripts/watermark_bench.py", ("ber",)),
+            "EA-1": ("desktop/src/core/cognition_workspace/claims.py", ("obligations",)),
+            "EA-2": ("desktop/src/core/closure.py", ("criteria",)),
+            "EA-3": ("desktop/src/core/cognition_workspace/claims.py", ("ready",)),
+            "EA-4": ("protocol/closure/ledger.json", ("reverse_fixture",)),
+            "EA-5": ("desktop/src/core/closure.py", ("criteria",)),
+            "MC-1": ("desktop/src/core/cognition_workspace/control.py", ("ritual",)),
+            "MC-2": ("desktop/src/core/cognition_workspace/operators.py", ("estimate",)),
+            "MC-3": ("desktop/src/core/cognition_workspace/control.py", ("calibrat",)),
+            "MC-4": ("desktop/src/core/cognition_workspace/operators.py", ("switch",)),
+            "MC-5": ("desktop/src/core/cognition_workspace/session.py", ("replay",)),
+            "ev.pre_register": ("desktop/src/core/eval_harness.py", ("frozen_before_run",)),
+            "ev.blind_partition": ("desktop/src/core/eval_harness.py", ("blind_review",)),
+            "ev.negative_control": ("desktop/src/core/eval_harness.py", ("negative_control",)),
+            "ev.synthetic_guard": ("desktop/src/core/eval_harness.py", ("synthetic",)),
+            "ev.effect_and_variance": ("desktop/src/core/eval_harness.py", ("dimensions",)),
+            "ev.cost_accounting": ("desktop/src/core/eval_harness.py", ("cost_accounting",)),
+            "ev.replicate": ("scripts/eval_run.py", ("--check",)),
+            "pi.allowlist_surface": ("desktop/src/core/mcp_ingress.py", ("allow",)),
+            "pi.consent_gate": ("desktop/src/core/mcp_ingress.py", ("consent",)),
+            "pi.receipt_audit": ("desktop/src/core/mcp_ingress.py", ("record_call",)),
+            "pi.least_privilege": ("desktop/src/core/mcp_ingress.py", ("max_args",)),
+            "pi.output_side_check": ("desktop/src/core/mcp_runtime.py", ("schema_check",)),
+            # 红队用例集的「实现」就是那组真跑用例本身（没有单一运行时锚点）
+            "pi.redteam_cases": ("desktop/tests/test_mcp_ingress.py", ("consent",)),
+        }
+        #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
+        CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            for mv in pack["expert_moves"]:
+                mid = mv["id"]
+                if mid in CONCEPTUAL:
+                    self.assertTrue(mv.get("why"), mid + " 声明为概念动作但没有 why")
+                    continue
+                self.assertIn(mid, anchors, "动作没登记锚点：" + mid)
+                rel, tokens = anchors[mid]
+                text = (ROOT / rel).read_text(encoding="utf-8")
+                self.assertTrue(any(t in text for t in tokens),
+                                mid + " 在 " + rel + " 里找不到锚点（" + "/".join(tokens) + "）")
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
         std = method_pack.obligations(pack, "calibration")
