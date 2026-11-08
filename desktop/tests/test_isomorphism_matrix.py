@@ -37,6 +37,20 @@ MISSING = {
 }
 
 
+
+#: 层 → (模块, 变异测试名)：证明该层判据**能被故意改坏打死**（不是只在好数据上为空）
+KILL_TESTS = {
+    "时相": ("desktop.tests.test_cognition_bridge",
+             "test_commitment_binds_timestamp_reference"),
+    "身份": ("desktop.tests.test_cognition_bridge", "test_verify_detects_state_change"),
+    "观测": ("desktop.tests.test_cognition_bridge",
+             "test_observation_correspondence_can_be_killed"),
+    "语义": ("desktop.tests.test_method_pack",
+             "test_vocabulary_check_can_be_killed"),
+    "负空间": ("desktop.tests.test_cognition_control",
+               "test_abstain_requires_search_boundary"),
+}
+
 class IsomorphismMatrixTest(unittest.TestCase):
     def test_every_covered_layer_points_at_a_real_test(self):
         for layer, (module_name, test_name, _how) in COVERED.items():
@@ -52,6 +66,17 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertIsNotNone(
                 holder,
                 layer + " 声称已覆盖，但 " + module_name + " 里找不到 " + test_name)
+
+    def test_every_covered_layer_has_a_kill_test(self):
+        """覆盖 ≠ 可证：每层都必须有一条「故意改坏必红」的变异测试，且真实存在。"""
+        self.assertEqual(set(COVERED), set(KILL_TESTS),
+                         "covered 与 kill 表必须一一对应")
+        for layer, (module_name, test_name) in KILL_TESTS.items():
+            mod = importlib.import_module(module_name)
+            found = any(isinstance(getattr(mod, name), type)
+                        and hasattr(getattr(mod, name), test_name)
+                        for name in dir(mod) if name.endswith("Test"))
+            self.assertTrue(found, layer + " 的变异测试不存在：" + test_name)
 
     def test_missing_layers_carry_a_reason(self):
         for layer, why in MISSING.items():

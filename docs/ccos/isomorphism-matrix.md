@@ -11,13 +11,13 @@
 
 ## 判据表
 
-| 层 | 判据形式 | 判定位置 |
-|---|---|---|
-| 时相 | `commitment.ts_digest` 两侧须指向同一 token；改 token 即 digest 不符 | `test_cognition_bridge` |
-| 身份 | `cog_digest ↔ state.digest`；discourse 变了即红 | `test_cognition_bridge` |
-| 观测 | 回灌记录与契约失败集逐项同序对应，且 `witness_digest` 可复算 | `test_cognition_bridge` |
-| 语义 | 方法包 `claim_kind` 必须来自 `protocol/criteria/registry.json` 的单一词表；死词也红 | `test_method_pack` |
-| 负空间 | `abstain` 必须带 `searched` 检索边界；缺边界即拒 | `test_cognition_control` |
+| 层 | 判据形式 | 判定位置 | 变异测试（能被改坏打死） |
+|---|---|---|---|
+| 时相 | `commitment.ts_digest` 两侧须指向同一 token；改 token 即 digest 不符 | `test_cognition_bridge` | `test_commitment_binds_timestamp_reference`（改 token 即 digest 不符） |
+| 身份 | `cog_digest ↔ state.digest`；discourse 变了即红 | `test_cognition_bridge` | `test_verify_detects_state_change`（改 state 即红） |
+| 观测 | 回灌记录与契约失败集逐项同序对应，且 `witness_digest` 可复算 | `test_cognition_bridge` | `test_observation_correspondence_can_be_killed`（改来源/改序/改证人） |
+| 语义 | 方法包 `claim_kind` 必须来自 `protocol/criteria/registry.json` 的单一词表；死词也红 | `test_method_pack` | `test_vocabulary_check_can_be_killed`（去词/加死词） |
+| 负空间 | `abstain` 必须带 `searched` 检索边界；缺边界即拒 | `test_cognition_control` | `test_abstain_requires_search_boundary`（缺 searched 即拒） |
 
 另有两条结构守卫（不属于同构，但防同一类变形）：
 
