@@ -43,6 +43,7 @@ jobs:
           rustc --version
           cargo --version
       - name: 主 crate 单测（release 档：249 条 oracle 与对拍同口径）
+        shell: bash        # windows runner 默认 pwsh：`set -o pipefail`/tee 是 bash 语法
         run: |
           set -o pipefail
           cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
