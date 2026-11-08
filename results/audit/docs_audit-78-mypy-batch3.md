@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
+  - protocol/code_metrics_baseline.json:1d4a9568acbfc3f6288083de1bad3124aaef18e94fbecf9bf8314ed2f31a0fc5
 ---
+> 重审（2026-11-09）：precheck 名单拆成数据件（precheck_gates）+ 探针改原子写
+
 > 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
 
 > 重审（2026-11-09）：变异探针风格收口

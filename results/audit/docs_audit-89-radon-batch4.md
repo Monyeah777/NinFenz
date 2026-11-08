@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
+  - protocol/code_metrics_baseline.json:1d4a9568acbfc3f6288083de1bad3124aaef18e94fbecf9bf8314ed2f31a0fc5
 ---
+> 重审（2026-11-09）：precheck 名单拆成数据件（precheck_gates）+ 探针改原子写
+
 > 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
 
 > 重审（2026-11-09）：变异探针风格收口

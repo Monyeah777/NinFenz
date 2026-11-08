@@ -5,7 +5,7 @@
 为什么不新增判据：**这里不实现任何检查**，只按名单调用既有测试模块——判据仍只有一处，
 本件只是「跑得快的那一组」。名单腐烂由 `test_precheck` 守（每个名字必须真实存在）。
 
-**边界**：本件只覆盖 20/378 个测试模块（高频横向面子集），**不是发布前检查**，
+**边界**：本件只覆盖 22/378 个测试模块（高频横向面子集），**不是发布前检查**，
 也不能替代 `release_conclusion.py` 的全量结论——目标是缩短发现时间，不是减少判据。
 
 用法：python scripts/precheck.py [--full] [--json]
@@ -18,40 +18,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from precheck_gates import GATES, SLOW_GATES  # 名单是数据件，注释见该模块
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
 GUIDE = "修复指引："
 SCHEMA = "nf-precheck/1"
 
-#: 快车道：每轮新增模块/命令/解析后最容易踩的横向面（顺序即优先级）
-GATES = (
-    ("json_shape", "desktop.tests.test_json_shape_contracts"),
-    ("dead_code", "desktop.tests.test_dead_code"),
-    ("atomic_write", "desktop.tests.test_core_atomic_writes"),
-    ("silent_skip", "desktop.tests.test_silent_skip_reasons"),
-    ("write_flag", "desktop.tests.test_write_flag_gate"),
-    ("coupling_fresh", "desktop.tests.test_coupling_metrics"),
-    ("docs_anchors", "desktop.tests.test_ccos_docs_anchors"),
-    ("abi_docs", "desktop.tests.test_ccos_abi_docs"),
-    ("method_pack", "desktop.tests.test_method_pack"),
-    ("claims", "desktop.tests.test_cognition_claims"),
-    ("bridge", "desktop.tests.test_cognition_bridge"),
-    ("eval_harness", "desktop.tests.test_eval_harness"),
-    ("calibration", "desktop.tests.test_calibration"),
-    ("grouped_report", "desktop.tests.test_grouped_report"),
-    ("evidence_graph", "desktop.tests.test_evidence_graph"),
-    ("atom_catalog", "desktop.tests.test_atom_catalog"),
-    ("cognition_control", "desktop.tests.test_cognition_control"),
-    ("isomorphism", "desktop.tests.test_isomorphism_matrix"),
-    ("clock_purity", "desktop.tests.test_judge_clock_purity"),
-    ("report_determinism",
-     "desktop.tests.test_verify_report.BuildTest.test_build_is_deterministic"),
-)
-#: 慢但值得（--full 才跑）：CLI 面与纯度扫描约 2–3 分钟
-SLOW_GATES = (
-    ("cli_error_framing", "desktop.tests.test_cli_error_framing"),
-    ("purity", "desktop.tests.test_purity_scan"),
-)
+
 
 def _run_one(module: str) -> dict[str, Any]:
     """跑一个测试模块（经受控进程原子：argv 列表 / 无 shell / 超时回收）。"""

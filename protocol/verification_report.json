@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 359,
-        "files": 359,
+        "baseline": 360,
+        "files": 360,
         "max_fn_cc": 132,
         "max_fn_lines": 442,
         "max_lines": 9859
@@ -526,7 +526,7 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4164,
+        "files": 4165,
         "kernel": 2087,
         "kernel_no_self": 308,
         "rules": 9,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "8e3f15e535cca1c6dbc387d3ec36aa7ea4c923484128d6ecd9b9b702c15563c4",
+  "root_digest": "f009c33668d9811644d9a8de065bae3859cb3bcd9156ad27431c6e42460111b7",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

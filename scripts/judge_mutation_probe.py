@@ -141,7 +141,9 @@ def main(argv=None) -> int:
     if args.write:
         dest = ROOT / OUT_REL
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(render(doc), encoding="utf-8")
+        from core import atomic_write  # 写盘只在 --write 分支需要
+
+        atomic_write.write_text(dest, render(doc))
         print("OK 已写入 " + OUT_REL + "（判据 " + str(doc["judges"]) + " · 杀死率 "
               + str(doc["kill_rate"]) + " · 误报率 " + str(doc["false_positive_rate"]) + "）")
         return 0

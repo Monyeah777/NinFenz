@@ -1581,9 +1581,9 @@
       "max_fn_lines": 59
     },
     "scripts/gate_probe.py": {
-      "lines": 104,
+      "lines": 106,
       "max_fn_cc": 4,
-      "max_fn_lines": 21
+      "max_fn_lines": 23
     },
     "scripts/gen_third_party_notices.py": {
       "lines": 161,
@@ -1621,9 +1621,9 @@
       "max_fn_lines": 42
     },
     "scripts/judge_mutation_probe.py": {
-      "lines": 166,
+      "lines": 168,
       "max_fn_cc": 5,
-      "max_fn_lines": 31
+      "max_fn_lines": 32
     },
     "scripts/mcp_manifest.py": {
       "lines": 137,
@@ -1681,9 +1681,14 @@
       "max_fn_lines": 12
     },
     "scripts/precheck.py": {
-      "lines": 112,
+      "lines": 86,
       "max_fn_cc": 7,
       "max_fn_lines": 13
+    },
+    "scripts/precheck_gates.py": {
+      "lines": 39,
+      "max_fn_cc": 0,
+      "max_fn_lines": 0
     },
     "scripts/pull_decision_model.py": {
       "lines": 165,

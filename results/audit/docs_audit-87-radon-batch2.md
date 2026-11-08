@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
+  - protocol/code_metrics_baseline.json:1d4a9568acbfc3f6288083de1bad3124aaef18e94fbecf9bf8314ed2f31a0fc5
 ---
+> 重审（2026-11-09）：precheck 名单拆成数据件（precheck_gates）+ 探针改原子写
+
 > 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
 
 > 重审（2026-11-09）：变异探针风格收口
