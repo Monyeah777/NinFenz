@@ -247,28 +247,22 @@
     }
   ],
   "catalog": {
-    "atom_debt": 1,
+    "atom_debt": 0,
     "count": 33,
-    "pack_references": 19,
+    "pack_references": 23,
     "schema": "nf/atom-catalog/2"
   },
   "invariants": {
     "counts": {
       "atoms": 33,
       "composed_of_nonempty": 13,
-      "dead": 1,
+      "dead": 0,
       "violations": 0
     },
     "ok": true,
     "schema": "nf/atom-invariants/1",
     "violations": [],
-    "warnings": [
-      {
-        "atom": "k.standard",
-        "code": "A4",
-        "detail": "存量死码（已记债，见 protocol/criteria/atom_debt.json）"
-      }
-    ]
+    "warnings": []
   },
   "schema": "nf-atom-invariants-report/1"
 }

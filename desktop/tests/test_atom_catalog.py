@@ -110,15 +110,33 @@ class InvariantTest(unittest.TestCase):
                             for v in ac.invariants(cat)["violations"]))
 
     def test_a4_new_dead_atom_fails_closed(self):
+        """新增死码必须红：注掉一个原子的所有引用，A4 立刻判违规。"""
         cat = self._cat()
         cat["atom_debt"] = []
+        cat["pack_references"] = []
+        victim = cat["atoms"][0]["id"]
+        cat["atoms"][1]["composed_of"] = []
         inv = ac.invariants(cat)
         self.assertFalse(inv["ok"])
-        self.assertTrue(any(v["code"] == "A4" for v in inv["violations"]))
+        self.assertTrue(any(v["code"] == "A4" and v["atom"] == victim
+                            for v in inv["violations"]))
 
     def test_a4_debt_becomes_warning(self):
-        inv = ac.invariants(ac.build(str(ROOT)))
-        self.assertTrue(any(w["code"] == "A4" for w in inv["warnings"]))
+        """已记债的死码只 WARN（可追溯），并且**真实仓当前零死码**（债已随方法包还清）。"""
+        cat = self._cat()
+        cat["pack_references"] = []
+        cat["atoms"][1]["composed_of"] = []
+        victim = cat["atoms"][0]["id"]
+        cat["atom_debt"] = [victim]
+        inv = ac.invariants(cat)
+        # 记债的原子只 WARN、不进违规；未记债的其它死码仍按 fail-closed 判红
+        self.assertTrue(any(w["code"] == "A4" and w["atom"] == victim
+                            for w in inv["warnings"]))
+        self.assertNotIn(victim, [v["atom"] for v in inv["violations"]])
+        real = ac.invariants(ac.build(str(ROOT)))
+        self.assertEqual([], [w for w in real["warnings"] if w["code"] == "A4"],
+                         "真实仓仍有无引用的死码：要么接入，要么写进 atom_debt.json")
+        self.assertEqual([], [v for v in real["violations"] if v["code"] == "A4"])
 
 
 class CandidateHealthTest(unittest.TestCase):
