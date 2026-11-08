@@ -26,8 +26,11 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:8c1bb9ee2fe97ab3f608b790822775afd39ecd52ffe47a1fb7b32d8f78769979
+  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
 ---
+> 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
+
+> 重审（2026-11-08）：payload 未暂存 warn
 > 重审（2026-11-08）：SLSA Source Track 技术控制、实时平台快照、离线 readiness 判据与 CI job 新增后重审。
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

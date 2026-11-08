@@ -7,8 +7,11 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:8c1bb9ee2fe97ab3f608b790822775afd39ecd52ffe47a1fb7b32d8f78769979
+  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
 ---
+> 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
+
+> 重审（2026-11-08）：payload 未暂存 warn
 > 重审（2026-11-08）：SLSA Source Track 技术控制、实时平台快照、离线 readiness 判据与 CI job 新增后重审。
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

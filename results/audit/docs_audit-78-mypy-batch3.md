@@ -9,8 +9,11 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:8c1bb9ee2fe97ab3f608b790822775afd39ecd52ffe47a1fb7b32d8f78769979
+  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
 ---
+> 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
+
+> 重审（2026-11-08）：payload 未暂存 warn
 > 重审（2026-11-08）：SLSA Source Track 技术控制、实时平台快照、离线 readiness 判据与 CI job 新增后重审。
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

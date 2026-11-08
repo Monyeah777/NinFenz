@@ -10,8 +10,11 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:8c1bb9ee2fe97ab3f608b790822775afd39ecd52ffe47a1fb7b32d8f78769979
+  - protocol/code_metrics_baseline.json:c569853af5400d2aa94cf04ffadaa8907a91062d14ba91544fefa49fdcc2bc20
 ---
+> 重审（2026-11-08）：SLSA Source Track 合并最新 main 后重审：实时控制快照、Source Level 0 诚实声明与 CI 接线按合并后字节重绑。
+
+> 重审（2026-11-08）：payload 未暂存 warn
 > 重审（2026-11-08）：SLSA Source Track 技术控制、实时平台快照、离线 readiness 判据与 CI job 新增后重审。
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

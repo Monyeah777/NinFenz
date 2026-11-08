@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "npm-package-check 全 PR 触发",
+  "note": "SLSA v1.2 Source Track technical controls and offline GitHub ruleset readiness",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "ae6d2de6f37f027a4b04140e768c41b838a8fce0744cb9c1e6ba6d7af6831619"
+  "subject_digest": "ec5017a9ae7494f5604265b64c243ecd32485bbd01efa987389d8e86f3c881c3"
 }
