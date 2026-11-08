@@ -1,6 +1,6 @@
 # 同构判据矩阵 v0（九双生层）
 
-状态：**6 覆盖 / 3 缺失**（截至 2026-11-09，以 `desktop/tests/test_isomorphism_matrix.py` 为唯一数据源）。
+状态：**8 覆盖 / 1 缺失**（截至 2026-11-09，以 `desktop/tests/fixtures/isomorphism_matrix.json` 为唯一数据源）。
 
 ## 为什么需要它
 
@@ -19,18 +19,18 @@
 | 语义 | 方法包 `claim_kind` 必须来自 `protocol/criteria/registry.json` 的单一词表；死词也红 | `test_method_pack` | `test_vocabulary_check_can_be_killed`（去词/加死词） |
 | 负空间 | `abstain` 必须带 `searched` 检索边界；缺边界即拒 | `test_cognition_control` | `test_abstain_requires_search_boundary`（缺 searched 即拒） |
 | 授权 | 终态算子（stop / abstain）必带 `authority`，且授权方在允许词表内 | `test_cognition_control` | `test_authority_check_can_be_killed`（去授权 / 换授权方 / 非对象） |
+| 资源 | 两本账并列记（`cog_steps` / `cc_cost_ms`），混记聚合键即红 | `test_cognition_bridge` | `test_resource_accounting_can_be_killed`（混记 / 缺账 / 负数 / 非整数） |
+| 对抗 | 反例必须带可复算证人（`file` + `case`）；给 root 时还核对文件真在场 | `test_cognition_workspace` | `test_counterexample_witness_file_must_exist`（指向不存在的文件必须红） |
 
 另有两条结构守卫（不属于同构，但防同一类变形）：
 
 - 桥只允许两类信封（`nf-bridge-commitment/1`、`nf-bridge-obligation/1`），新增通道须显式评审；
 - 矩阵自身：每个「已覆盖」条目必须反射到真实测试方法，缺失条目必须点名具体字段。
 
-## 缺失三层：缺的是对象，不是文案
+## 缺失一层：缺的是对象，不是文案
 
 | 层 | 缺什么 |
 |---|---|
-| 对抗 | 缺 `witness_ref`：反例目前无法被契约核复算成一条 fail witness |
-| 资源 | 认知侧 `discourse.budget` 有账实相符校验；验证侧只有阈值，没有逐次记账，两本账缺一本 |
 | 自省 | ADR 有 `falsifier`，但没有 `version_chain`（旧版验新版）可核对象 |
 
 ## 怎么跑

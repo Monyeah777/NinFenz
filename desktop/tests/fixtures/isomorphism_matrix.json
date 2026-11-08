@@ -49,17 +49,25 @@
       "how": "终态算子必带 authority，且授权方在允许词表内",
       "kill_module": "desktop.tests.test_cognition_control",
       "kill_test": "test_authority_check_can_be_killed"
-    }
-  ],
-  "missing": [
-    {
-      "layer": "对抗",
-      "why": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）"
     },
     {
       "layer": "资源",
-      "why": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账"
+      "module": "desktop.tests.test_cognition_bridge",
+      "test": "test_resource_accounting_is_two_ledgers",
+      "how": "两本账并列记（cog_steps / cc_cost_ms），混记聚合键即红",
+      "kill_module": "desktop.tests.test_cognition_bridge",
+      "kill_test": "test_resource_accounting_can_be_killed"
     },
+    {
+      "layer": "对抗",
+      "module": "desktop.tests.test_cognition_workspace",
+      "test": "test_counterexample_needs_replayable_witness",
+      "how": "反例必须带可复算证人（file + case），给 root 时还核对文件真在场",
+      "kill_module": "desktop.tests.test_cognition_workspace",
+      "kill_test": "test_counterexample_witness_file_must_exist"
+    }
+  ],
+  "missing": [
     {
       "layer": "自省",
       "why": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）"

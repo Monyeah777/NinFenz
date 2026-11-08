@@ -164,8 +164,29 @@ def _witness_shape_issues(witness: Any) -> list[str]:
     return issues
 
 
-def validate_delta(move_id: str, delta: Any) -> list[str]:
-    """校验一个 move 的 frame_delta → 问题列表（空 = 合法）。"""
+def _witness_file_issues(witness: Any, root: str) -> list[str]:
+    """带仓库根时核对证人文件是否真的存在（第 94 轮）。
+
+    为什么拆开：`validate_delta` 默认保持纯函数（不做 IO）；调用方给 root 才做存在性核对。
+    「格式对」不等于「证人真在场」——这一层补的正是后者。
+    """
+    from pathlib import Path
+
+    if not isinstance(witness, dict):
+        return []
+    rel = str(witness.get("file") or "").strip()
+    if not rel:
+        return []
+    if not (Path(root) / rel).is_file():
+        return ["witness 文件不存在：" + rel + "（修复指引：证人必须指向仓库里真实存在的复现件）"]
+    return []
+
+
+def validate_delta(move_id: str, delta: Any, root: str = "") -> list[str]:
+    """校验一个 move 的 frame_delta → 问题列表（空 = 合法）。
+
+    给 `root` 时额外核对反例证人的文件是否真的存在（不给则保持纯函数、不做 IO）。
+    """
     issues: list[str] = []
     if move_id not in MOVES:
         return ["未知元动作：" + str(move_id) + "（可用：" + "、".join(MOVE_IDS) + "）"]
@@ -192,6 +213,8 @@ def validate_delta(move_id: str, delta: Any) -> list[str]:
         if delta["breaks"] is not True:
             issues.append("breaks 必须为 true——例子不违反主张就不算反例")
         issues.extend(_witness_shape_issues(delta.get("witness")))
+        if root:
+            issues.extend(_witness_file_issues(delta.get("witness"), root))
     elif kind == "boundary_added":
         if delta["near_miss"] is not True:
             issues.append("near_miss 必须为 true——离边界很远的例子不算边界案例")

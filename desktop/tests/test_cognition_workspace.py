@@ -93,6 +93,21 @@ class ContractTest(unittest.TestCase):
         ok = dict(base, witness={"file": "results/ccos/x.json", "case": "c-01"})
         self.assertEqual([], mv.validate_delta("counterexample", ok))
 
+    def test_counterexample_witness_file_must_exist(self):
+        """对抗层补严（第 94 轮）：给 root 时必须核对证人文件真的在场。
+
+        「格式对」不等于「证人真存在」——这条补的正是后者；不给 root 时保持纯函数（不做 IO）。
+        """
+        root = str(ROOT)
+        base = {"kind": "counterexample_found", "claim": "x", "case": "y", "breaks": True}
+        real = dict(base, witness={"file": "results/ccos/watermark_ecc_probe.json",
+                                   "case": "screenshot_blur_0.3"})
+        self.assertEqual([], mv.validate_delta("counterexample", real, root))
+        ghost = dict(base, witness={"file": "results/ccos/does_not_exist_xyz.json",
+                                    "case": "c-01"})
+        issues = mv.validate_delta("counterexample", ghost, root)
+        self.assertTrue(any("不存在" in i for i in issues), issues)
+
     def test_boundary_must_be_near_miss(self):
         bad = {"kind": "boundary_added", "case": "x", "near_miss": False}
         self.assertTrue(any("near_miss" in i

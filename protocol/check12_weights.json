@@ -69,7 +69,7 @@
     "test_cognition_claims": 1.6,
     "test_cognition_control": 1.6,
     "test_cognition_plan": 1.0,
-    "test_cognition_workspace": 2.5,
+    "test_cognition_workspace": 2.3,
     "test_commit_msg": 0.1,
     "test_commit_title_guard": 0.1,
     "test_community_inventory": 1.7,
@@ -1140,13 +1140,14 @@
     "test_cognition_plan.PlanTest.test_paths_cover_used_methods": 0.0,
     "test_cognition_plan.PlanTest.test_plan_is_deterministic": 0.0,
     "test_cognition_plan.PlanTest.test_unknown_method_is_rejected_with_guide": 0.0,
-    "test_cognition_workspace.CliTest.test_full_cli_round_trip": 1.14,
-    "test_cognition_workspace.CliTest.test_moves_listing": 0.38,
-    "test_cognition_workspace.CliTest.test_ritual_step_fails_with_guide": 0.78,
+    "test_cognition_workspace.CliTest.test_full_cli_round_trip": 1.09,
+    "test_cognition_workspace.CliTest.test_moves_listing": 0.36,
+    "test_cognition_workspace.CliTest.test_ritual_step_fails_with_guide": 0.71,
     "test_cognition_workspace.ContractTest.test_analogy_needs_broken_mapping": 0.0,
     "test_cognition_workspace.ContractTest.test_boundary_must_be_near_miss": 0.0,
     "test_cognition_workspace.ContractTest.test_counterexample_must_break": 0.0,
     "test_cognition_workspace.ContractTest.test_counterexample_needs_replayable_witness": 0.0,
+    "test_cognition_workspace.ContractTest.test_counterexample_witness_file_must_exist": 0.0,
     "test_cognition_workspace.ContractTest.test_decomposition_needs_two_subquestions": 0.0,
     "test_cognition_workspace.ContractTest.test_every_move_accepts_its_canonical_delta": 0.0,
     "test_cognition_workspace.ContractTest.test_every_move_declares_contract_fields": 0.0,
@@ -4541,5 +4542,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1813.6
+  "total_s": 1813.4
 }
