@@ -18,15 +18,15 @@ class JudgeMutationTest(unittest.TestCase):
         doc = jm.build()
         self.assertEqual("nf-judge-mutation/1", doc["schema"])
         self.assertGreaterEqual(doc["judges"], 2)
-        self.assertEqual(6, doc["mutants"])
-        self.assertEqual(5, doc["legal_variants"])
+        self.assertEqual(9, doc["mutants"])
+        self.assertEqual(7, doc["legal_variants"])
         # 工件不变性：同一语义、不同顺序不得翻转判定（台账 §7.2）
         names = [c["name"] for c in jm.vocab_cases()[0]]
         self.assertIn("包顺序打乱", names)
         self.assertTrue(0.0 <= doc["kill_rate"] <= 1.0)
         self.assertTrue(0.0 <= doc["false_positive_rate"] <= 1.0)
 
-    def test_both_judges_kill_every_mutant(self):
+    def test_all_judges_kill_every_mutant(self):
         """变异体全部被杀、合法变体零误报——低于此即判据失灵，需先修判据。"""
         doc = jm.build()
         self.assertEqual(1.0, doc["kill_rate"], doc["detail"])

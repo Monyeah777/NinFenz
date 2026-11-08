@@ -90,6 +90,18 @@ def obligation_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     return legal, broken
 
 
+def witness_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """→ (合法变体, 破坏变体)；标的 = `moves._witness_shape_issues`（反例证人形状判据）。"""
+    _mp, _br = _core()
+
+    legal = [{"name": "标准证人", "witness": {"file": "results/ccos/x.json", "case": "c-01"}},
+             {"name": "多余键", "witness": {"file": "f.json", "case": "c", "note": "额外"}}]
+    broken = [{"name": "不是对象", "witness": "f.json"},
+              {"name": "缺 case", "witness": {"file": "f.json"}},
+              {"name": "case 空串", "witness": {"file": "f.json", "case": "  "}}]
+    return legal, broken
+
+
 def build() -> dict[str, Any]:
     mp, br = _core()
     judges = []
@@ -111,6 +123,13 @@ def build() -> dict[str, Any]:
     judges.append({"judge": "obligation_record_issues",
                    "legal": len(olegal), "legal_flagged": ol_hits,
                    "broken": len(obroken), "broken_caught": ob_hits})
+    wlegal, wbroken = witness_cases()
+    from core.cognition_workspace import moves as mv
+    wl_hits = [c["name"] for c in wlegal if mv._witness_shape_issues(c["witness"])]
+    wb_hits = [c["name"] for c in wbroken if mv._witness_shape_issues(c["witness"])]
+    judges.append({"judge": "_witness_shape_issues",
+                   "legal": len(wlegal), "legal_flagged": wl_hits,
+                   "broken": len(wbroken), "broken_caught": wb_hits})
     legal_total = sum(j["legal"] for j in judges)
     broken_total = sum(j["broken"] for j in judges)
     legal_bad = sum(len(j["legal_flagged"]) for j in judges)

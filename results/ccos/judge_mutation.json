@@ -21,13 +21,24 @@
       "judge": "obligation_record_issues",
       "legal": 2,
       "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "不是对象",
+        "缺 case",
+        "case 空串"
+      ],
+      "judge": "_witness_shape_issues",
+      "legal": 2,
+      "legal_flagged": []
     }
   ],
   "false_positive_rate": 0.0,
-  "judges": 2,
+  "judges": 3,
   "kill_rate": 1.0,
-  "legal_variants": 5,
-  "mutants": 6,
+  "legal_variants": 7,
+  "mutants": 9,
   "note": "只报数不设阈值；阈值与放行由负责人决定",
   "schema": "nf-judge-mutation/1"
 }

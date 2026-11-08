@@ -1626,7 +1626,7 @@
       "max_fn_lines": 42
     },
     "scripts/judge_mutation_probe.py": {
-      "lines": 179,
+      "lines": 198,
       "max_fn_cc": 8,
       "max_fn_lines": 43
     },
