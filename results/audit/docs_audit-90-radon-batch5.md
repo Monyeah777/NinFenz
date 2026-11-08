@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:794531110cc3fab81ff721501cbdaeccce1d805dd074a6897d85c19aad1a768e
+  - protocol/code_metrics_baseline.json:1abeab6b4fa1c2bf1c09357f67f3da4f00fcd19307aacda538add58ec1b3a9c5
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -261,6 +261,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
 
 > 重审（2026-11-07）：refreeze CID

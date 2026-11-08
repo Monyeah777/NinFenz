@@ -14,7 +14,7 @@ subjects:
   - scripts/geo_export.py:d263d55b7b6a8582a13cf66126d22eeb5f05b6d02d648ee9af4ab270812f51cc
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:794531110cc3fab81ff721501cbdaeccce1d805dd074a6897d85c19aad1a768e
+  - protocol/code_metrics_baseline.json:1abeab6b4fa1c2bf1c09357f67f3da4f00fcd19307aacda538add58ec1b3a9c5
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -283,6 +283,8 @@ subjects:
 
 | 脚本 | 修法 |
 |---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
 
 > 重审（2026-11-07）：refreeze CID

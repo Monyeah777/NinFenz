@@ -6,8 +6,8 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/interop_export.py:b669f37d01611a9276f7dd63cb98c0fb0f31b22b5211beb59b69fd21038763cf
-  - protocol/code_metrics_baseline.json:794531110cc3fab81ff721501cbdaeccce1d805dd074a6897d85c19aad1a768e
+  - desktop/src/core/interop_export.py:5d01203e2ce98774bb4cd7342704097022d4bd445e737ac5110ef924e203a6e9
+  - protocol/code_metrics_baseline.json:1abeab6b4fa1c2bf1c09357f67f3da4f00fcd19307aacda538add58ec1b3a9c5
 > 重审（2026-10-27）：ASVS 5.0.0 L2 最终格式收口后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 接入与代码度量基线更新后重绑
 > 重审（2026-10-27）：ASVS 5.0.0 L2 日志、绝对寿命与通用错误面加固后重绑
@@ -261,6 +261,8 @@ subjects:
 
 | 面 | 落点 |
 |---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：RFC 3161 时间戳证据与双语入口重绑
 
 > 重审（2026-11-07）：refreeze CID

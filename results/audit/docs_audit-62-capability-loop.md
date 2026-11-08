@@ -7,14 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
-  - desktop/src/core/interop_export.py:b669f37d01611a9276f7dd63cb98c0fb0f31b22b5211beb59b69fd21038763cf
+  - desktop/src/core/interop_export.py:5d01203e2ce98774bb4cd7342704097022d4bd445e737ac5110ef924e203a6e9
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
-  - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
-  - desktop/tests/test_interop_export.py:5f201df1a01dab4776f96594ddfef6429bb64b484e318b5b5ada525dba610677
+  - docs/interop.md:416978c37715d13253796ed928e911fc6f67a2b67499ea168e9bf3421b78d2b0
+  - desktop/tests/test_interop_export.py:64f3915583220cccbf05ee340228461b3243720573bcee088d7ce1dd103d61ce
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-11-08）：refreeze.sh（统一冻结入口）
+
 > 重审（2026-11-07）：refreeze CID
 
 > 重审（2026-11-07）：refreeze.sh（统一冻结入口）
