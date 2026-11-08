@@ -1,6 +1,6 @@
 # 同构判据矩阵 v0（九双生层）
 
-状态：**5 覆盖 / 4 缺失**（截至 2026-11-08，以 `desktop/tests/test_isomorphism_matrix.py` 为唯一数据源）。
+状态：**6 覆盖 / 3 缺失**（截至 2026-11-09，以 `desktop/tests/test_isomorphism_matrix.py` 为唯一数据源）。
 
 ## 为什么需要它
 
@@ -18,17 +18,17 @@
 | 观测 | 回灌记录与契约失败集逐项同序对应，且 `witness_digest` 可复算 | `test_cognition_bridge` | `test_observation_correspondence_can_be_killed`（改来源/改序/改证人） |
 | 语义 | 方法包 `claim_kind` 必须来自 `protocol/criteria/registry.json` 的单一词表；死词也红 | `test_method_pack` | `test_vocabulary_check_can_be_killed`（去词/加死词） |
 | 负空间 | `abstain` 必须带 `searched` 检索边界；缺边界即拒 | `test_cognition_control` | `test_abstain_requires_search_boundary`（缺 searched 即拒） |
+| 授权 | 终态算子（stop / abstain）必带 `authority`，且授权方在允许词表内 | `test_cognition_control` | `test_authority_check_can_be_killed`（去授权 / 换授权方 / 非对象） |
 
 另有两条结构守卫（不属于同构，但防同一类变形）：
 
 - 桥只允许两类信封（`nf-bridge-commitment/1`、`nf-bridge-obligation/1`），新增通道须显式评审；
 - 矩阵自身：每个「已覆盖」条目必须反射到真实测试方法，缺失条目必须点名具体字段。
 
-## 缺失四层：缺的是对象，不是文案
+## 缺失三层：缺的是对象，不是文案
 
 | 层 | 缺什么 |
 |---|---|
-| 授权 | 契约侧已有 `approval.subject_digest` 绑定，但认知侧 control 记录没有「谁授权」字段，两侧无共同对象 |
 | 对抗 | 缺 `witness_ref`：反例目前无法被契约核复算成一条 fail witness |
 | 资源 | 认知侧 `discourse.budget` 有账实相符校验；验证侧只有阈值，没有逐次记账，两本账缺一本 |
 | 自省 | ADR 有 `falsifier`，但没有 `version_chain`（旧版验新版）可核对象 |

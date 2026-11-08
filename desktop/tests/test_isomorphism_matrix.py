@@ -25,12 +25,13 @@ COVERED = {
     "负空间": ("desktop.tests.test_cognition_control",
                "test_abstain_requires_search_boundary",
                "abstain 必带 searched 检索边界"),
+    "授权": ("desktop.tests.test_cognition_control",
+             "test_terminal_ops_require_authority",
+             "终态算子必带 authority，且授权方在允许词表内"),
 }
 
 #: 层 → 为什么现在写不出可红判据（缺的是对象，不是文案）
 MISSING = {
-    "授权": "契约侧已有 `approval.subject_digest` 绑定（改动即失效），"
-           "但认知侧 control_record 无「谁授权」字段",
     "对抗": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）",
     "资源": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账",
     "自省": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）",
@@ -49,6 +50,8 @@ KILL_TESTS = {
              "test_vocabulary_check_can_be_killed"),
     "负空间": ("desktop.tests.test_cognition_control",
                "test_abstain_requires_search_boundary"),
+    "授权": ("desktop.tests.test_cognition_control",
+             "test_authority_check_can_be_killed"),
 }
 
 def _import_test_module(module_name: str):
@@ -118,7 +121,7 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertTrue(why.strip(), layer + " 缺判据但没写原因")
         self.assertEqual(9, len(COVERED) + len(MISSING),
                          "九层必须恰好九项（多一层少一层都要改本判据）")
-        self.assertEqual(5, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵")
+        self.assertEqual(6, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵（第 88 轮起为 6）")
 
     def test_missing_reasons_name_a_concrete_object(self):
         """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""
