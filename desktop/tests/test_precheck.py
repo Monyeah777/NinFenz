@@ -24,7 +24,7 @@ class PrecheckTest(unittest.TestCase):
 
     def test_gate_ids_are_unique(self):
         ids = [g for g, _m in list(pc.GATES) + list(pc.SLOW_GATES)]
-        self.assertEqual(len(ids), len(set(ids)), "闸门 id 重复：%s" % ids)
+        self.assertEqual(len(ids), len(set(ids)), f"闸门 id 重复：{ids}")
 
     def test_script_runs_and_reports_schema(self):
         proc = subprocess.run([sys.executable, str(SCRIPT), "--json"],
