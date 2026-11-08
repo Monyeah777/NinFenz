@@ -270,6 +270,27 @@ class BridgeWireFormatTest(unittest.TestCase):
         cc2 = br.cc_result_from_verify({"verdict": "ok", "ts_digest": "c" * 64})
         self.assertEqual("c" * 64, cc2["ts_digest"])
 
+
+    def test_observation_layer_correspondence(self):
+        """同构判据 #3（观测层）：桥回灌落下的控制记录，必须与契约侧失败集一一对应。
+
+        两侧可对应的形式：控制记录的 `trigger` 指明来源是桥；`witness.evidence` 与
+        obligation 的 failed+unknown **逐项相同**；`witness_digest` 可复算。
+        做不到这三条，就说明「同一失败在两侧对不上」。
+        """
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        cc = {"verdict": "invalid", "subject": "s", "detail": "d"}
+        bundle = self._bundle()
+        comm = br.commit(bundle, claim, cc)
+        ob = br.obligation(comm, cc, failed=["BER 超标", "缺少盲评"], unknown=["未提供成本"])
+        after = br.apply_obligation(bundle, ob)
+        rec = (after.get("control") or {}).get("records", [])[-1]
+        self.assertEqual("bridge-obligation", rec["trigger"], "来源必须写明是桥回灌")
+        self.assertEqual(list(ob["failed"]) + list(ob["unknown"]),
+                         list(rec["witness"]["evidence"]),
+                         "两侧失败集必须逐项一致（顺序也一致，便于比对）")
+        self.assertEqual(br.digest_of(rec["witness"]), rec["witness_digest"])
     def test_obligation_field_set_is_frozen(self):
         claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
                  "obligations": [], "criteria": []}
