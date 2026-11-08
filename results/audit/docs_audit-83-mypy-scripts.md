@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
+  - protocol/code_metrics_baseline.json:f3ee7a05147c743aa07b4a6d8efe7b2e53433a3ac407af5fae7543d0ef6ae7fa
 ---
+> 重审（2026-11-08）：快照锁等待模式（--lock-wait，死锁立刻接管）
+
 > 重审（2026-11-08）：去未用 subprocess 导入
 
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）

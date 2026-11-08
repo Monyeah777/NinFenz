@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:cb50b6dc1d82946afd3d636ad8306bfa33f1564905ab4230f7599c5b94063f36
+  - protocol/code_metrics_baseline.json:f3ee7a05147c743aa07b4a6d8efe7b2e53433a3ac407af5fae7543d0ef6ae7fa
 ---
+> 重审（2026-11-08）：快照锁等待模式（--lock-wait，死锁立刻接管）
+
 > 重审（2026-11-08）：去未用 subprocess 导入
 
 > 重审（2026-11-08）：锁存活探测走受控进程原子（S603/S607 收口）

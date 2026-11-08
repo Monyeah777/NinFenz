@@ -57,6 +57,32 @@ class TestPureLogic(unittest.TestCase):
             gate.lock_release(base, pid=os.getpid())
             self.assertFalse((base / gate.LOCK_NAME).is_file())
 
+
+    def test_lock_acquire_wait_times_out_on_live_holder(self):
+        """活锁 + 短等待：等满就放弃（不无限等），并且不误删别人的锁。"""
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            import time as _t
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=_t.time())
+            ok, why = gate.lock_acquire_wait(base, "b" * 40, pid=os.getpid() + 1,
+                                             wait_s=0.6, poll_s=0.2)
+            self.assertFalse(ok)
+            self.assertIn("另一份全量快照正在跑", why)
+            self.assertTrue((base / gate.LOCK_NAME).is_file())
+
+    def test_lock_acquire_wait_takes_over_dead_holder(self):
+        """死进程的锁：等待路径下应当立刻接管（不用等满）。"""
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=999999, now=1000.0)
+            ok, why = gate.lock_acquire_wait(base, "b" * 40, pid=os.getpid(),
+                                             wait_s=5.0, poll_s=0.1)
+            self.assertTrue(ok, why)
+
     def test_lock_force_takes_over(self):
         import tempfile
         gate = self.gate

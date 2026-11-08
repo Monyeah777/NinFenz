@@ -1666,9 +1666,9 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 916,
+      "lines": 941,
       "max_fn_cc": 58,
-      "max_fn_lines": 219
+      "max_fn_lines": 221
     },
     "scripts/rewrite_text.py": {
       "lines": 136,

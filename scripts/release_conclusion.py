@@ -195,6 +195,27 @@ def lock_release(base: Path, *, pid: int | None = None) -> None:
             return
 
 
+
+
+def lock_acquire_wait(base: Path, head: str, *, pid: int | None = None,
+                      wait_s: float = 0.0, poll_s: float = 5.0,
+                      force: bool = False) -> tuple[bool, str]:
+    """拿锁（可等待）→ (是否拿到, 提示)。
+
+    为什么不只是「拿不到就退出」：并发会话里**等待**比报错更省人力（尤其夜里排队跑）；
+    等待期间每 poll_s 复查一次，被抢断/超龄就立刻接管，不会无限等一份死锁。
+    wait_s<=0 → 只试一次（与 lock_acquire 等价）。
+    """
+    import time as _time
+
+    deadline = _time.time() + max(0.0, float(wait_s))
+    while True:
+        ok, why = lock_acquire(base, head, pid=pid, force=force)
+        if ok or _time.time() >= deadline:
+            return ok, why
+        print("  [snapshot] 等待快照锁：" + why, file=sys.stderr, flush=True)
+        _time.sleep(max(0.5, float(poll_s)))
+
 def _pid_alive(pid: int) -> bool:
     """进程是否还活着（Windows: tasklist 绝对路径；POSIX: os.kill(pid, 0)）。
 
@@ -599,7 +620,9 @@ def _run_in_snapshot(args, head: str) -> int:
     锁是 fail-closed 的：拿不到就不跑，宁可让调用方等。
     """
     base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
-    ok, why = lock_acquire(base, head, force=bool(getattr(args, "force_lock", False)))
+    ok, why = lock_acquire_wait(base, head,
+                                wait_s=float(getattr(args, "lock_wait", 0.0) or 0.0),
+                                force=bool(getattr(args, "force_lock", False)))
     if not ok:
         print("  ✗ " + why, file=sys.stderr)
         return 2
@@ -708,6 +731,8 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
     ap.add_argument("--only-preflight", action="store_true",
                     help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
+    ap.add_argument("--lock-wait", type=float, default=0.0,
+                    help="拿不到快照锁时最多等多少秒（缺省 0=立刻失败；>0 排队等）")
     ap.add_argument("--force-lock", action="store_true",
                     help="接管仍在跑的快照锁（确认另一进程已死/卡死时才用）")
     ap.add_argument("--json", action="store_true", help="机读汇总")
