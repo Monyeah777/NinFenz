@@ -1,0 +1,54 @@
+name: ci-health
+# 定时面「静默红」看门狗（2026-11-08 盲区收口）：
+# 本仓已两次遇到「schedule workflow 天天红但没人看见」（net-probes 金标 tag 不存在、gitee-poll 缺 token）。
+# 本 workflow 每天检查**最近 24h**内是否还有失败的 `schedule` 运行；有则列出并以 rc=1 显式失败
+# （不创建 issue、不写仓库，只让红在 Actions 面上可见）。
+#
+# 只看 schedule：push/PR 失败本来就在 main 检查面里；`workflow_dispatch` 手动跑失败不计入。
+on:
+  schedule:
+    - cron: '0 5 * * *'        # 每天 05:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  scheduled-red-audit:
+    name: scheduled-red-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 最近 24h 的 schedule 失败审计
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          from datetime import datetime, timedelta, timezone
+          since = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
+          repo = os.environ["REPO"]
+          url = "https://api.github.com/repos/%s/actions/runs?status=failure&per_page=100" % repo
+          req = urllib.request.Request(url, headers={
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+          })
+          with urllib.request.urlopen(req, timeout=60) as resp:
+              doc = json.load(resp)
+          bad = [r for r in doc.get("workflow_runs", [])
+                 if r.get("event") == "schedule" and r.get("created_at", "") >= since]
+          if not bad:
+              print("schedule 面最近 24h 无失败")
+              raise SystemExit(0)
+          print("::error::最近 24h 有失败的 schedule workflow：")
+          for r in bad:
+              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} {r.get('html_url')}")
+          raise SystemExit(1)
+          PY
