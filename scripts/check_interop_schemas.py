@@ -133,6 +133,11 @@ def _validator_for(schema: dict, js):
     return js.Draft202012Validator
 
 
+def _json_blob(blob: bytes, what: str) -> dict:
+    """严格解析器接收文本；远端/导出字节在此统一做 UTF-8(BOM) 解码。"""
+    return json_doc.loads(blob.decode("utf-8-sig"), dict, what=what)
+
+
 def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str, object]:
     """单面校验 → 结果行（status ∈ ok / fail / unavailable / skipped）。"""
     schema_url, fallback = spec
@@ -154,7 +159,7 @@ def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str,
         row["detail"] = "schema 取不到（网络/地址问题，非派生面问题）"
         return row
     try:
-        schema = json_doc.loads(blob, dict, what="官方 schema")
+        schema = _json_blob(blob, "官方 schema")
     except ValueError:
         row["status"] = "unavailable"
         row["detail"] = "schema 非 JSON（可能取到 HTML 页）"
@@ -191,6 +196,14 @@ def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str,
     row["status"] = "ok"
     row["detail"] = "官方 meta-schema 校验通过"
     return row
+
+
+def rendered_docs(root: str, ie) -> dict:
+    """导出器产出 UTF-8 bytes；严格 JSON 解析器接收文本，故在此显式解码。"""
+    return {
+        kind: json_doc.loads(ie.render(kind, root).decode("utf-8"), dict, what=kind)
+        for kind in ie.KINDS
+    }
 
 
 #: 出口面外部核验（非 JSON Schema 类）：目标平台自身的源码字面量 / 结构要求
@@ -269,7 +282,7 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
                                else "官方 schema 取不到（网络/地址问题）")})
         return row
     try:
-        schema = json_doc.loads(blob, dict, what="官方 schema")
+        schema = _json_blob(blob, "官方 schema")
         defs = schema.get("$defs") or {}
     except ValueError:
         row.update({"status": "unavailable", "detail": "schema 非 JSON"})
@@ -346,7 +359,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "验）"))
         return 0
 
-    docs = {k: json_doc.loads(ie.render(k, args.root), dict, what=k) for k in ie.KINDS}
+    docs = rendered_docs(args.root, ie)
     # 逐面校验：SCHEMAS 表 + 官方无 schema 的面（no-schema 也要出现在报告里）
     all_specs = dict(SCHEMAS)
     for kind in NOSCHEMA:

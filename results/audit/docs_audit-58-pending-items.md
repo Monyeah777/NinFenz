@@ -9,19 +9,23 @@ subjects:
   - verify.sh:5c6a3c1b051bd3b5990e981f56eb7cf31df7b192d34740534f221c3c072c899f
   - desktop/src/core/transparency_log.py:8aba0254fcf72230452600d5cb0305b5d5320cd3e95d8ed57ebe54a5d0ae46a1
   - desktop/src/core/rating_gate.py:468759e5d971fbe9319ab86e84d95031c13bc3df2c44dbffac0af3fcb071f74e
-  - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
+  - desktop/src/core/interop_export.py:e6a40e4bf776bbcdfc080fa112db1974646daf2157a72034abdca01700d25940
   - desktop/src/core/ccv3_adapter.py:ec9bfacffcb0dd6a73f88652a7273d631e40c4efd8cecfb00a5f0be831a511ad
   - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
   - desktop/src/core/mcp_runtime.py:4929a1fe7b789ed86d8978f6c49ccf120ecc7a44e741f3e38dc79c8f1aa0b23d
   - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
   - desktop/src/core/library.py:e5a867a775bbab717c882250187578b7d057c51a233c334190e5179f903918bf
-  - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
+  - scripts/check_interop_schemas.py:da1b1c628de26f1f8979e9e1c3cf325781fe6a23f4401d0bed2c8db19f8059f6
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - library/intake.json:e74dda33084b749836de3f8dc3fa83c430b885feec1465b1a94e94aa886d37a8
   - docs/external-validation-assets/E1_ccv3_sample_lightmix_P04_chara.json:a91f402cdf59faaab6808b64b00c1874cb7cc6c8df4d44fbb5379be7736b8edb
-  - results/interop-schema-validation.md:e2546c6407416b61912ac351d14d20c171167e36be4d4d3461f6c2fceb56c0c9
+  - results/interop-schema-validation.md:018bd1d1831c51cdde3de9e99f5c81f1a5a4a03686d142f288cd663699632972
 
 ---
+> 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
+
+> 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
+
 > 重审（2026-10-29）：恢复分支全量验证：接线 meta-cockpit 公共模块、清理零引用、修复 ReDoS/CLI 闸门/公开文档路径后重绑；既有结论不变
 
 > 重审（2026-10-25）：决策/交接/复盘外置：公开面只留模板（ADR-0000）

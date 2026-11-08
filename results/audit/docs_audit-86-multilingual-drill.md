@@ -12,8 +12,12 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:512a62f3ad8875c8be5f6e6b4e66976dcc807c0ffbc4c82d379b3b813620d54a
+  - protocol/code_metrics_baseline.json:4cc4b9ce26e4cb40eff902f63aebb1b8fc824ac62194c3bf55a4cc37df91afed
 ---
+> 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
+
+> 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
+
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

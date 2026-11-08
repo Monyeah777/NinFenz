@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1053,
     "projection": 144,
-    "support": 392,
-    "verify": 986
+    "support": 393,
+    "verify": 987
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6305,6 +6305,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "in-toto Statement v1 与协议层回执的绑定判据。",
+      "path": "desktop/src/core/intoto_binding.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "具名纯函数谓词的不变式登记册（机制借鉴 vivera formal-invariants.mjs:1-77 的**形式**）。",
       "path": "desktop/src/core/invariants.py",
       "role": "prod",
@@ -12276,17 +12282,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4584051e744a17832e64b81bb9a9776663d3eb9cc09adfe0e2ecae35e51d254c",
+  "root_digest": "9aa8251ee49ec2fc7e7e38485c24cf2c46da09ae6e0cb7ff7497c8249d8129f1",
   "rule_counts": {
     "R-app": 1456,
-    "R-catch": 244,
+    "R-catch": 245,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 125,
     "R-support": 121,
     "R-verify": 867,
-    "auto:R-core": 274
+    "auto:R-core": 275
   },
   "schema": "nf-role-coordinates/1"
 }

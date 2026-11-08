@@ -606,7 +606,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/interop_export.py": {
-      "lines": 1106,
+      "lines": 1094,
       "max_fn_cc": 23,
       "max_fn_lines": 96
     },
@@ -614,6 +614,11 @@
       "lines": 52,
       "max_fn_cc": 4,
       "max_fn_lines": 12
+    },
+    "desktop/src/core/intoto_binding.py": {
+      "lines": 48,
+      "max_fn_cc": 16,
+      "max_fn_lines": 33
     },
     "desktop/src/core/invariants.py": {
       "lines": 35,
@@ -1431,7 +1436,7 @@
       "max_fn_lines": 71
     },
     "scripts/check_interop_schemas.py": {
-      "lines": 391,
+      "lines": 404,
       "max_fn_cc": 22,
       "max_fn_lines": 69
     },

@@ -1,6 +1,6 @@
 # 互操作导出（interop）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
-> 最后更新：2026-09-21
+> 最后更新：2026-11-08
 
 ## 是什么
 
@@ -56,6 +56,17 @@ python scripts/nf.py interop --check
 6. **决策面的内部边界**——`decisions` 面**不导出逐次工单**（工单留在内部档案，
    `STRATEGY §四` 计划内部消化），该声明必须位；只投影能力面 + `results/audit/*.md` 的
    **公开裁决索引**（id/标题/日期/结论）。
+
+### in-toto Statement v1 证据面
+
+- `_type` 固定为 `https://in-toto.io/Statement/v1`，`predicateType` 必须是 HTTPS URI。
+- `subject` 的名称顺序与 SHA-256 digest 必须逐项等于 `protocol/RECEIPTS.json` 的条目；
+  多一条、少一条、换序或替换成另一个合法摘要均 fail-closed。
+- `predicate` 为对象，其 `count`、`root`、`algorithm`、`scope` 必须与回执同源。
+- Python 与 .NET 的 `interop --check` 使用同一组绑定判据；入仓文件还必须与实时派生逐字节一致。
+
+该证据面只声明 unsigned in-toto Statement v1 形状与 subject 绑定，不声明 DSSE 签名信封、
+外部验证器认证，也不因存在该 Statement 就宣称 SLSA 等级。
 
 > CLI 的 `--kind` 可选值**派生自 `interop_export.KINDS`**（不再手写）——此前手工列表两次漏同步
 > （`slsa`/`a2a`、`c2pa`），现由构造消除该类 bug；「CLI 可选值 ↔ 声明件」的一致性也进了

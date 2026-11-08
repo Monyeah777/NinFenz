@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:512a62f3ad8875c8be5f6e6b4e66976dcc807c0ffbc4c82d379b3b813620d54a
+  - protocol/code_metrics_baseline.json:4cc4b9ce26e4cb40eff902f63aebb1b8fc824ac62194c3bf55a4cc37df91afed
 ---
+> 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
+
+> 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
+
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

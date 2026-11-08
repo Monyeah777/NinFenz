@@ -603,11 +603,16 @@
     },
     "interop_export": {
       "ca": 1,
-      "ce": 3,
-      "i": 0.75
+      "ce": 4,
+      "i": 0.8
     },
     "interp_diet": {
       "ca": 0,
+      "ce": 0,
+      "i": 0.0
+    },
+    "intoto_binding": {
+      "ca": 1,
       "ce": 0,
       "i": 0.0
     },

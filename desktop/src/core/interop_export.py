@@ -20,7 +20,7 @@ import os
 import re
 from typing import Any, Dict, List, Tuple
 
-from core import json_doc
+from core import intoto_binding, json_doc
 
 
 #: 依赖名别名（纯度登记的 import 名 → PyPI 项目名）：SBOM 的 purl/versionInfo 要用后者。
@@ -838,20 +838,8 @@ def _check_asyncapi(aa: dict, reg: dict, ext: dict, issues: List[str]) -> None:
 
 
 def _check_intoto(st: dict, rec: dict, issues: List[str]) -> None:
-    """in-toto 派生面：subject 与回执一致、digest 合规、Statement 类型头在位。"""
-    want_subjects = {str(e.get("path")) for e in (_arr(rec.get("entries")))}
-    got_subjects = {s.get("name") for s in _arr(st.get("subject"))}
-    if got_subjects != want_subjects:
-        issues.append("in-toto subject 与协议层回执不一致：缺 %d / 多 %d"
-                      % (len(want_subjects - got_subjects),
-                         len(got_subjects - want_subjects)))
-    for s in _arr(st.get("subject")):
-        d = (_obj(s.get("digest"))).get("sha256", "")
-        if not re.fullmatch(r"[0-9a-f]{64}", str(d)):
-            issues.append("in-toto subject 缺合规 sha256：%s"
-                          "（修复指引：回执 digest 须 64 位小写十六进制）" % s.get("name"))
-    if st.get("_type") != "https://in-toto.io/Statement/v1":
-        issues.append("in-toto Statement 类型头不合法（修复指引：_type 须为 Statement/v1）")
+    """in-toto 派生面：Statement 头、subject/digest 与 predicate 均与回执同源。"""
+    intoto_binding.check_statement(st, rec, issues)
 
 
 def _check_sbom(sb: dict, issues: List[str]) -> None:

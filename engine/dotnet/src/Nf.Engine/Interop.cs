@@ -156,13 +156,19 @@ public static class Interop
 
         // in-toto ↔ 协议层回执
         var st = Intoto(root);
-        var wantSubjects = Entries(rec).Select(e => Str(e, "path")).ToHashSet(StringComparer.Ordinal);
+        var wantEntries = Entries(rec);
+        var wantSubjects = wantEntries.Select(e => Str(e, "path")).ToHashSet(StringComparer.Ordinal);
         var stSubjects = (st.GetValueOrDefault("subject") as List<object?> ?? new List<object?>())
             .OfType<Dictionary<string, object?>>().ToList();
         var gotSubjects = stSubjects.Select(s => PyText(s.GetValueOrDefault("name"))).ToHashSet(StringComparer.Ordinal);
-        if (!wantSubjects.SetEquals(gotSubjects))
+        var exactSubjects = stSubjects.Count == wantEntries.Count &&
+                            stSubjects.Zip(wantEntries).All(pair =>
+                                PyText(pair.First.GetValueOrDefault("name")) == Str(pair.Second, "path") &&
+                                PyText((pair.First.GetValueOrDefault("digest") as Dictionary<string, object?>)
+                                    ?.GetValueOrDefault("sha256")) == Str(pair.Second, "digest"));
+        if (!wantSubjects.SetEquals(gotSubjects) || !exactSubjects)
             issues.Add($"in-toto subject 与协议层回执不一致：缺 {wantSubjects.Except(gotSubjects).Count()} / " +
-                       $"多 {gotSubjects.Except(wantSubjects).Count()}");
+                       $"多 {gotSubjects.Except(wantSubjects).Count()}；须按下标逐项匹配 path + sha256");
         foreach (var s in stSubjects)
         {
             var digest = (s.GetValueOrDefault("digest") as Dictionary<string, object?>)?.GetValueOrDefault("sha256");
@@ -172,6 +178,24 @@ public static class Interop
         }
         if (st.GetValueOrDefault("_type") as string != "https://in-toto.io/Statement/v1")
             issues.Add("in-toto Statement 类型头不合法（修复指引：_type 须为 Statement/v1）");
+        var predicateType = PyText(st.GetValueOrDefault("predicateType"));
+        if (!Regex.IsMatch(predicateType, @"^https://[^\s]+$"))
+            issues.Add("in-toto predicateType 须为 HTTPS URI");
+        if (st.GetValueOrDefault("predicate") is not Dictionary<string, object?> stPredicate)
+        {
+            issues.Add("in-toto predicate 必须是对象");
+        }
+        else
+        {
+            if (PyText(stPredicate.GetValueOrDefault("count")) != PyText(stSubjects.Count))
+                issues.Add("in-toto predicate.count 与 subject 数不一致");
+            if (PyText(stPredicate.GetValueOrDefault("root")) != PyText(rec.GetValueOrDefault("root")))
+                issues.Add("in-toto predicate.root 与协议层回执不一致");
+            if (PyText(stPredicate.GetValueOrDefault("algorithm")) != PyText(rec.GetValueOrDefault("algorithm")))
+                issues.Add("in-toto predicate.algorithm 与协议层回执不一致");
+            if (PyText(stPredicate.GetValueOrDefault("scope")) != PyText(rec.GetValueOrDefault("scope")))
+                issues.Add("in-toto predicate.scope 与协议层回执不一致");
+        }
 
         // SPDX SBOM
         var sb = Sbom(root);

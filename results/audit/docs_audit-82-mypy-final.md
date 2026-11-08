@@ -30,8 +30,12 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:512a62f3ad8875c8be5f6e6b4e66976dcc807c0ffbc4c82d379b3b813620d54a
+  - protocol/code_metrics_baseline.json:4cc4b9ce26e4cb40eff902f63aebb1b8fc824ac62194c3bf55a4cc37df91afed
 ---
+> 重审（2026-11-08）：外部 schema 校验工具修复 bytes→UTF-8 解码后重审：导出面与远端 schema 均先严格解码再解析；新增离线负例防回归。
+
+> 重审（2026-11-08）：in-toto Statement v1 绑定判据收紧后重审：Python/.NET 双重校验 subject 顺序与摘要、predicate 元数据同源；导出字节未变，旧审计摘要按新门禁重绑。
+
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths

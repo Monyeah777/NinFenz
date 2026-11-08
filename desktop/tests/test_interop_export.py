@@ -4,6 +4,7 @@
 两件事必须被钉住：① 派生面**覆盖完整**（声明件里有多少端点/事件/回执，导出面就有多少）；
 ② **确定性**（同输入两次渲染逐字节一致——否则外部工具链无法做内容寻址/比对）。
 """
+import copy
 import json
 import os
 import sys
@@ -86,6 +87,71 @@ class InteropExportTest(unittest.TestCase):
         for s in st["subject"]:
             self.assertRegex(s["digest"]["sha256"], r"^[0-9a-f]{64}$")
         self.assertTrue(st["predicateType"].startswith("https://"))
+
+    def test_intoto_statement_is_exactly_bound_to_receipts(self):
+        st = ie.intoto_statement(ROOT)
+        rec = json.loads(Path(ROOT, ie.RECEIPTS_REL).read_text(encoding="utf-8"))
+        self.assertEqual({"_type", "subject", "predicateType", "predicate"}, set(st))
+        self.assertEqual(
+            [entry["path"] for entry in rec["entries"]],
+            [subject["name"] for subject in st["subject"]],
+        )
+        self.assertEqual(
+            [entry["digest"] for entry in rec["entries"]],
+            [subject["digest"]["sha256"] for subject in st["subject"]],
+        )
+        predicate = st["predicate"]
+        self.assertEqual(rec["algorithm"], predicate["algorithm"])
+        self.assertEqual(rec["root"], predicate["root"])
+        self.assertEqual(len(rec["entries"]), predicate["count"])
+        self.assertEqual(rec.get("scope", ""), predicate["scope"])
+
+    def test_intoto_checker_catches_header_subject_and_predicate_drift(self):
+        rec = json.loads(Path(ROOT, ie.RECEIPTS_REL).read_text(encoding="utf-8"))
+        base = ie.intoto_statement(ROOT)
+        cases = []
+
+        bad_type = copy.deepcopy(base)
+        bad_type["_type"] = "https://in-toto.io/Statement/v0"
+        cases.append((bad_type, "类型头"))
+
+        bad_predicate_type = copy.deepcopy(base)
+        bad_predicate_type["predicateType"] = "http://insecure.example/statement"
+        cases.append((bad_predicate_type, "HTTPS URI"))
+
+        bad_subject = copy.deepcopy(base)
+        bad_subject["subject"][0]["name"] = "not-in-receipts.md"
+        cases.append((bad_subject, "subject 与协议层回执不一致"))
+
+        bad_digest = copy.deepcopy(base)
+        bad_digest["subject"][0]["digest"]["sha256"] = "0" * 64
+        cases.append((bad_digest, "subject 与协议层回执不一致"))
+
+        swapped = copy.deepcopy(base)
+        swapped["subject"][0], swapped["subject"][1] = swapped["subject"][1], swapped["subject"][0]
+        cases.append((swapped, "subject 与协议层回执不一致"))
+
+        bad_root = copy.deepcopy(base)
+        bad_root["predicate"]["root"] = "0" * 64
+        cases.append((bad_root, "predicate.root"))
+
+        bad_count = copy.deepcopy(base)
+        bad_count["predicate"]["count"] = len(base["subject"]) + 1
+        cases.append((bad_count, "predicate.count"))
+
+        bad_algorithm = copy.deepcopy(base)
+        bad_algorithm["predicate"]["algorithm"] = "sha1"
+        cases.append((bad_algorithm, "predicate.algorithm"))
+
+        bad_scope = copy.deepcopy(base)
+        bad_scope["predicate"]["scope"] = "different-scope"
+        cases.append((bad_scope, "predicate.scope"))
+
+        for statement, expected in cases:
+            with self.subTest(expected=expected):
+                issues = []
+                ie._check_intoto(statement, rec, issues)
+                self.assertTrue(any(expected in issue for issue in issues), issues)
 
     def test_sbom_declares_project_and_registered_dependencies(self):
         sb = ie.sbom_doc(ROOT)

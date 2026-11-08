@@ -58,6 +58,27 @@ class InteropSchemaToolTest(unittest.TestCase):
         declared = set(self.tool.SCHEMAS) | set(self.tool.NOSCHEMA)
         self.assertEqual(faces, declared, "每个派生面都要有校验口径（schema 或 no-schema）")
 
+    def test_rendered_docs_decode_export_bytes_before_strict_parse(self):
+        docs = self.tool.rendered_docs(str(ROOT), ie)
+        self.assertEqual(set(ie.KINDS), set(docs))
+        self.assertEqual("https://in-toto.io/Statement/v1", docs["intoto"]["_type"])
+
+    def test_remote_schema_bytes_decode_before_strict_parse(self):
+        docs = self.tool.rendered_docs(str(ROOT), ie)
+        old_fetch = self.tool.fetch
+        self.tool.fetch = lambda _url: (200, b'{"type":"object"}')
+        try:
+            row = self.tool.validate_one(
+                "openapi", ("https://example.invalid/schema", None), docs["openapi"], None)
+        finally:
+            self.tool.fetch = old_fetch
+        self.assertEqual("skipped", row["status"])
+        self.assertIn("jsonschema 不可用", row["detail"])
+
+    def test_json_blob_accepts_utf8_bom_bytes(self):
+        self.assertEqual({"type": "object"}, self.tool._json_blob(
+            b'\xef\xbb\xbf{"type":"object"}', "官方 schema"))
+
     def test_no_schema_faces_are_honest(self):
         for kind, why in self.tool.NOSCHEMA.items():
             self.assertTrue("JSON Schema" in why and "无" in why, why)
