@@ -13,9 +13,11 @@ subjects:
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:a878a24b8631d965e30d0bc865c9f88b71049f5a73025cf2984f5bd5cbca5dbb
-  - scripts/nf.py:8e7d58c6ada303344e5df1b97fc38a563c7e6b46ba16527dc9842cb2578c80ad
+  - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
 
 ---
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
 
 > 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面

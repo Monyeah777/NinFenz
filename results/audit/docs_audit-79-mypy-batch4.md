@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:b4f49e53ee6f159282d3174b2959aa55c9de8a4eeda1214e88c7ce9ea9beceb8
+  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
 ---
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
 
 > 重审（2026-11-08）：采集单：半填必须点名「采集未完成」

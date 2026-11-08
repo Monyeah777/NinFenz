@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:b4f49e53ee6f159282d3174b2959aa55c9de8a4eeda1214e88c7ce9ea9beceb8
+  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
 ---
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
 
 > 重审（2026-11-08）：采集单：半填必须点名「采集未完成」

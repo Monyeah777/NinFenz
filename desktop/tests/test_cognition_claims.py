@@ -207,6 +207,34 @@ class CheckClaimTest(unittest.TestCase):
         self.assertFalse(cl.check_claim(doc, partial)["ready"])
 
 
+
+    def test_evidence_from_sheet_round_trips(self):
+        """作业单 → evidence 字典：unknown 保持 unknown（不得静默当 ok），填 ok 才 ready。"""
+        from core.cognition_workspace import claims as cl
+        doc = cl.compile_claim(str(ROOT), "主张", "efficacy", ["evaluation-design"])
+        sheet = cl.claim_sheet(doc)
+        evidence = cl.evidence_from_sheet(sheet)
+        self.assertEqual(len(sheet["slots"]), len(evidence))
+        self.assertEqual({"unknown"}, {v["status"] for v in evidence.values()})
+        self.assertFalse(cl.check_claim(doc, evidence)["ready"])
+        for slot in sheet["slots"]:
+            slot["status"] = "ok"
+            slot["evidence"] = "scripts/xxx.py --check"
+        filled = cl.evidence_from_sheet(sheet)
+        self.assertTrue(cl.check_claim(doc, filled)["ready"])
+
+    def test_evidence_from_sheet_rejects_bad_schema_and_unknown_status(self):
+        from core.cognition_workspace import claims as cl
+        with self.assertRaises(ValueError):
+            cl.evidence_from_sheet({"schema": "wrong"})
+        doc = cl.compile_claim(str(ROOT), "主张", "cost", ["evaluation-design"])
+        sheet = cl.claim_sheet(doc)
+        sheet["slots"][0]["status"] = "approved-by-me"
+        evidence = cl.evidence_from_sheet(sheet)
+        self.assertEqual("unknown", evidence[sheet["slots"][0]["need"]]["status"],
+                         "未知状态必须降级为 unknown，不能悄悄算通过")
+
+
 class CliTest(unittest.TestCase):
     def test_criteria_listing(self):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,

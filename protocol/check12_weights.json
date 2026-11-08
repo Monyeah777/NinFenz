@@ -64,7 +64,7 @@
     "test_cog_cli_faces": 14.6,
     "test_cognition": 0.2,
     "test_cognition_bridge": 1.9,
-    "test_cognition_claims": 1.5,
+    "test_cognition_claims": 1.4,
     "test_cognition_control": 1.5,
     "test_cognition_plan": 1.0,
     "test_cognition_workspace": 2.3,
@@ -1040,11 +1040,13 @@
     "test_cognition_claims.CheckClaimTest.test_claim_sheet_turns_obligations_into_unknown_slots": 0.0,
     "test_cognition_claims.CheckClaimTest.test_empty_evidence_is_not_ready": 0.0,
     "test_cognition_claims.CheckClaimTest.test_evaluation_design_pack_compiles_all_three_kinds": 0.0,
+    "test_cognition_claims.CheckClaimTest.test_evidence_from_sheet_rejects_bad_schema_and_unknown_status": 0.0,
+    "test_cognition_claims.CheckClaimTest.test_evidence_from_sheet_round_trips": 0.0,
     "test_cognition_claims.CheckClaimTest.test_full_evidence_is_ready": 0.0,
-    "test_cognition_claims.CheckClaimTest.test_prompt_injection_pack_compiles_security_kinds": 0.0,
+    "test_cognition_claims.CheckClaimTest.test_prompt_injection_pack_compiles_security_kinds": 0.01,
     "test_cognition_claims.CheckClaimTest.test_unknown_evidence_blocks_ready": 0.0,
-    "test_cognition_claims.CliTest.test_claim_compile_and_check": 0.85,
-    "test_cognition_claims.CliTest.test_criteria_listing": 0.43,
+    "test_cognition_claims.CliTest.test_claim_compile_and_check": 0.81,
+    "test_cognition_claims.CliTest.test_criteria_listing": 0.41,
     "test_cognition_claims.CompileClaimTest.test_compile_is_deterministic": 0.0,
     "test_cognition_claims.CompileClaimTest.test_compile_uses_pack_evidence_standards": 0.0,
     "test_cognition_claims.CompileClaimTest.test_multi_pack_composes": 0.0,
@@ -4420,5 +4422,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1537.5
+  "total_s": 1537.4
 }

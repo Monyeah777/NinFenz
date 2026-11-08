@@ -526,7 +526,9 @@ def _add_parser_cog(sub):
     cch = csub.add_parser("claim-check", help="按义务清单核对证据（三态，不评分）",
                           description="核对：satisfied / missing / unknown；unknown 不算 pass。")
     cch.add_argument("--claim-file", dest="claim_file", required=True, help="主张文件")
-    cch.add_argument("--evidence", required=True, help="证据清单 JSON（键=义务项）")
+    cch.add_argument("--evidence", default="", help="证据清单 JSON（键=义务项）")
+    cch.add_argument("--sheet", default="",
+                     help="证据作业单 JSON（nf-cog-claim-sheet/1；填完直接验收，免手抄）")
     cch.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cg = csub.add_parser("triggers", help="看当前状态触发了哪些算子（确定性谓词）",
                          description="触发引擎：无进展/回环/冲突/预算/校准漂移/缺上下文。")
@@ -785,8 +787,15 @@ def _cmd_cog(args) -> int:
         try:
             from core.cognition_workspace import claims as cg_claims
             doc = _read(args.claim_file)
-            with open(_rel_out(args.evidence), encoding="utf-8") as handle:
-                evidence = _json.load(handle)
+            if args.sheet:
+                sheet = _read(args.sheet)
+                evidence = cg_claims.evidence_from_sheet(sheet)
+            elif args.evidence:
+                with open(_rel_out(args.evidence), encoding="utf-8") as handle:
+                    evidence = _json.load(handle)
+            else:
+                return _machine_fail(args, "缺证据：给 --evidence 或 --sheet（修复指引："
+                                            "作业单用 nf cog claim --sheet 生成）", 4)
             res = cg_claims.check_claim(doc, evidence)
         except (OSError, ValueError) as exc:
             return _machine_fail(args, str(exc), 4)

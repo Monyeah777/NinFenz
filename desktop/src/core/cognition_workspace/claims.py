@@ -131,3 +131,24 @@ def claim_sheet(doc: dict[str, Any]) -> dict[str, Any]:
             "digest": doc.get("digest"),
             "slots": slots,
             "note": "unknown != pass：全部槽位改成 ok 后，check_claim 才会 ready"}
+
+def evidence_from_sheet(sheet: Any) -> dict[str, Any]:
+    """作业单 → check_claim 的 evidence 字典（键=义务项，值=该槽）。
+
+    为什么要有它：作业单原本只是「给人填的表」，填完还要人手工拼成 evidence 字典，
+    中间这一步最容易把状态抄错（unknown 抄成 ok）。直接吃作业单，抄写环节就没了。
+    规则：槽位 status 必须在 planned/unknown/ok/failed 内（其它值当 unknown，不静默通过）。
+    """
+    if not isinstance(sheet, dict) or str(sheet.get("schema") or "") != SHEET_SCHEMA:
+        raise ValueError("作业单 schema 不符（" + GUIDE + "需要 " + SHEET_SCHEMA + "）")
+    out: dict[str, Any] = {}
+    allowed = {"planned", "unknown", "ok", "failed"}
+    for slot in sheet.get("slots") or []:
+        need = str(slot.get("need") or "")
+        if not need:
+            raise ValueError("作业单里有空 need 槽（" + GUIDE + "重新生成作业单）")
+        status = str(slot.get("status") or "unknown")
+        if status not in allowed:
+            status = "unknown"
+        out[need] = {"status": status, "evidence": str(slot.get("evidence") or "")}
+    return out

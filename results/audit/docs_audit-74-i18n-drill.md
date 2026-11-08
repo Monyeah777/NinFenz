@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:b4f49e53ee6f159282d3174b2959aa55c9de8a4eeda1214e88c7ce9ea9beceb8
+  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
 ---
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
 
 > 重审（2026-11-08）：采集单：半填必须点名「采集未完成」

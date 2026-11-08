@@ -11,12 +11,14 @@ subjects:
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
   - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:8e7d58c6ada303344e5df1b97fc38a563c7e6b46ba16527dc9842cb2578c80ad
+  - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:583cb8ef79afe689df27a1b73885b314dda31e667c8f4f585c907828571356ad
 
 ---
+> 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
+
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
 
 > 重审（2026-11-08）：快照红修复：job 描述/面信封/权重/耦合面
