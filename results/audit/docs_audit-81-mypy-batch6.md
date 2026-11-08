@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:eac5441671a680d58cd4bbae3259de89474dc23bab9ef117bf504a281cb0cf3e
+  - protocol/code_metrics_baseline.json:a1c7f8381a838076f5188990f52d7ca387667ae7c9825225bf7b2992a9cf7c6a
 ---
+> 重审（2026-11-08）：提交前自查快车道（precheck：按名单跑既有横向门禁）
+
 > 重审（2026-11-08）：风格收口（F401/W291）
 
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算

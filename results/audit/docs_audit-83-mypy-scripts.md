@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:eac5441671a680d58cd4bbae3259de89474dc23bab9ef117bf504a281cb0cf3e
+  - protocol/code_metrics_baseline.json:a1c7f8381a838076f5188990f52d7ca387667ae7c9825225bf7b2992a9cf7c6a
 ---
+> 重审（2026-11-08）：提交前自查快车道（precheck：按名单跑既有横向门禁）
+
 > 重审（2026-11-08）：风格收口（F401/W291）
 
 > 重审（2026-11-08）：快照20 红修复：--pairs 入闸/json_doc/分组表接入探针/耦合重算

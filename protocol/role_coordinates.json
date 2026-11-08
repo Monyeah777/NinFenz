@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1056,
     "projection": 156,
-    "support": 427,
-    "verify": 1021
+    "support": 428,
+    "verify": 1022
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8909,6 +8909,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "提交前自查（fast lane）判据：名单不得腐烂、红要能红、不新增检查。",
+      "path": "desktop/tests/test_precheck.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "`nf preset` 面回归：退役端壳的预设语义接成 CLI 后，**真跑一遍全链**。",
       "path": "desktop/tests/test_preset_cli.py",
       "role": "verify",
@@ -12504,16 +12510,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "9408e3cbc79c558b4c1c85b410f87579c5266d16650b90176be61241b816267f",
+  "root_digest": "04ebe553d71dc25a6dbe30a0484a22e7e3842359462712e2bdade2d3d20b9f44",
   "rule_counts": {
     "R-app": 1458,
-    "R-catch": 280,
+    "R-catch": 281,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 136,
     "R-support": 119,
-    "R-verify": 896,
+    "R-verify": 897,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"

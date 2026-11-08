@@ -1670,6 +1670,11 @@
       "max_fn_cc": 2,
       "max_fn_lines": 12
     },
+    "scripts/precheck.py": {
+      "lines": 102,
+      "max_fn_cc": 7,
+      "max_fn_lines": 13
+    },
     "scripts/pull_decision_model.py": {
       "lines": 165,
       "max_fn_cc": 24,
