@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - protocol/code_metrics_baseline.json:327b04d361e653373648070196aa1778f506064f9fc8156d7984fb5d3cb081e0
+  - protocol/code_metrics_baseline.json:8bd17726d35f23998917ab8f0c582e927aee79acb68e105b359f847448ae194c
 ---
+> 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
+
 > 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）
 
 > 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算

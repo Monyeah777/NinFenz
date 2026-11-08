@@ -925,7 +925,8 @@ def _cmd_cog(args) -> int:
                 delta = _json.loads(args.delta_json)
             else:
                 raise ValueError("缺 frame_delta（修复指引：--delta 或 --delta-json）")
-            bundle = cg_session.step(bundle, args.move, delta)
+            # 传 root：凭证人（counterexample witness）要核对文件真的在场
+            bundle = cg_session.step(bundle, args.move, delta, root=str(ROOT))
         except (OSError, ValueError) as exc:
             return _machine_fail(args, str(exc), 4)
         if args.out:

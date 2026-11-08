@@ -16,7 +16,7 @@ subjects:
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:f10e73e068c8920700f32819212dd63862cab626d0a171ddd1c616f7e261b00f
+  - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
   - protocol/check12_weights.json:008898a254674bd7b5df5875d7b58d84c6b9fa5fca1a76e7ae7c7ff26c7b5a9a
   - protocol/coupling_baseline.json:e3f2b7ae1a2682e14125922dccdee5ff2ede5f2fea2f27de2263242d765608fe
@@ -25,6 +25,8 @@ subjects:
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
+
 > 重审（2026-11-09）：文档数字漂移判据（层数 / precheck 门数）
 
 > 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）

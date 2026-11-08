@@ -28,13 +28,18 @@ def _control_of(bundle: dict[str, Any]) -> dict[str, Any]:
     return bundle.get("control") or ct.new()
 
 
-def step(bundle: dict[str, Any], move_id: str, delta: dict[str, Any]) -> dict[str, Any]:
-    """执行一步（bundle = {state, records, control}），返回新 bundle。"""
+def step(bundle: dict[str, Any], move_id: str, delta: dict[str, Any],
+         root: str = "") -> dict[str, Any]:
+    """执行一步（bundle = {state, records, control}），返回新 bundle。
+
+    root：给仓库根时，反例证人要做**文件存在性核对**（第 103 轮）。
+    生产路径（CLI/桥）应传 root——否则「证人指着一个不存在的文件」也能过。
+    """
     control = _control_of(bundle)
     if control["status"] != "running":
         raise ValueError("控制面已 " + control["status"]
                          + "——stop/abstain 之后不能再加动作（修复指引：新开会话）")
-    problems = mv.validate_delta(move_id, delta)
+    problems = mv.validate_delta(move_id, delta, root=root)
     if problems:
         raise ValueError("动作不合法：" + "；".join(problems[:3]))
     new_records, new_state = rc.append(bundle["records"], bundle["state"],
