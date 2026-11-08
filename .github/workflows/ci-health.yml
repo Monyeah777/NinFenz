@@ -9,9 +9,13 @@ name: ci-health
 #
 # 只看 schedule：push/PR 失败本来就在 main 检查面里；`workflow_dispatch` 手动跑失败不计入（
 # 但会作为「某 workflow 的最新运行」被看到——若最新是 dispatch 成功，自然不报警）。
+#
+# 触发密度（2026-11-08 实测）：GitHub 对 schedule 有节流——gitee-poll 的 `*/10` 实际约 3–7 小时
+# 才跑一次（其间大量 skipped），ci-health 首日 05:00 UTC 的 cron 也延迟了 1h+。故本 workflow
+# 排 **每 6 小时一次**（4 个 cron）以提高「至少有一次被投递」的概率；需要即时结论请手动 dispatch。
 on:
   schedule:
-    - cron: '0 5 * * *'        # 每天 05:00 UTC
+    - cron: '0 5,11,17,23 * * *'   # 每 6 小时（UTC）：平台节流下多给几次投递机会
   workflow_dispatch:
 
 concurrency:
