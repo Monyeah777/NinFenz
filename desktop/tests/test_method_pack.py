@@ -21,7 +21,7 @@ from core import cognition_plan, method_pack  # noqa: E402
 
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
 PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
-            "evaluation-design", "prompt-injection-defense")
+            "evaluation-design", "prompt-injection-defense", "data-provenance")
 
 
 class PackShapeTest(unittest.TestCase):
@@ -122,10 +122,10 @@ class PackContentTest(unittest.TestCase):
                             + "/".join(tokens) + "）")
 
 
-    def test_all_five_packs_compose_without_conflict(self):
-        """五个域一起组合：证据类目并集、常见错法去重、动作不重复 id、序稳定。"""
+    def test_all_packs_compose_without_conflict(self):
+        """全部已注册域一起组合：证据类目并集、常见错法去重、动作不重复 id、序稳定。"""
         ids = [p["id"] for p in method_pack.list_packs(str(ROOT))]
-        self.assertEqual(5, len(ids), ids)
+        self.assertEqual(len(PACK_IDS), len(ids), ids)
         composed = method_pack.compose([method_pack.load_pack(str(ROOT), p) for p in ids])
         kinds = [st["claim_kind"] for st in composed["evidence_standards"]]
         self.assertEqual(len(kinds), len(set(kinds)), "证据类目应去重：" + str(kinds))
@@ -179,6 +179,13 @@ class PackContentTest(unittest.TestCase):
             "pi.output_side_check": ("desktop/src/core/mcp_runtime.py", ("schema_check",)),
             # 红队用例集已落成数据 + 逐条判据（第 40 轮）
             "pi.redteam_cases": ("protocol/redteam/mcp_injection_cases.json", ("RT-01",)),
+            # 数据溯源域（第 48 轮）：锚点落在「已有的协议/度量面」，不另造概念
+            "pv.datasheet": ("scripts/eval_run.py", ("checklist",)),
+            "pv.field_lineage": ("protocol/asset_contracts.json", ("field",)),
+            "pv.missing_semantics": ("desktop/src/core/grouped_report.py", ("note",)),
+            "pv.license_gate": ("desktop/src/core/closure.py", ("criteria",)),
+            "pv.version_pin": ("protocol/eval/protocol.json", ("analysis_plan",)),
+            "pv.leakage_audit": ("protocol/eval/protocol.json", ("prohibitions",)),
         }
         #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
         CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}

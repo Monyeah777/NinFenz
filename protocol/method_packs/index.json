@@ -26,6 +26,11 @@
       "id": "prompt-injection-defense",
       "version": "1.0.0",
       "path": "protocol/method_packs/prompt-injection-defense.json"
+    },
+    {
+      "id": "data-provenance",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/data-provenance.json"
     }
   ]
 }

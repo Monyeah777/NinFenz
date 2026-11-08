@@ -235,6 +235,19 @@ class CheckClaimTest(unittest.TestCase):
                          "未知状态必须降级为 unknown，不能悄悄算通过")
 
 
+
+    def test_data_provenance_pack_compiles_three_kinds(self):
+        """数据溯源包：data-fit / license / non-leakage 三类都要能编出义务，缺证据时点名。"""
+        from core.cognition_workspace import claims as cl
+        for kind in ("data-fit", "license", "non-leakage"):
+            doc = cl.compile_claim(str(ROOT), "主张 " + kind, kind, ["data-provenance"])
+            stds = [st for b in doc["obligations"] for st in b["standards"]]
+            self.assertTrue(stds, kind)
+            checked = cl.check_claim(doc, {})
+            self.assertFalse(checked["ready"], kind)
+            self.assertTrue(checked["missing"], kind)
+
+
 class CliTest(unittest.TestCase):
     def test_criteria_listing(self):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,
