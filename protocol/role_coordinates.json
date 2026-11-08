@@ -6,7 +6,7 @@
     "prod": 1055,
     "projection": 154,
     "support": 424,
-    "verify": 1016
+    "verify": 1017
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7565,6 +7565,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "docs/ccos/*.md 的**代码锚点**判据：文档必须能指到真实实现，不能只讲概念。",
+      "path": "desktop/tests/test_ccos_docs_anchors.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CCV3 映射层单测（v2.0.0 T1：IR→chara_card_v3 + world entries）。",
       "path": "desktop/tests/test_ccv3_adapter.py",
       "role": "verify",
@@ -12468,7 +12474,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "af56a26c57367b800446932e4108c5353bbd28c732d607075fa72bb62c193671",
+  "root_digest": "9bfaf1059179bb3174bec242a6baa01c04071a6d360b360ac3ef4ba734a6a12a",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 277,
@@ -12477,7 +12483,7 @@
     "R-prod": 944,
     "R-projection": 135,
     "R-support": 119,
-    "R-verify": 891,
+    "R-verify": 892,
     "auto:R-core": 283
   },
   "schema": "nf-role-coordinates/1"

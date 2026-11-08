@@ -2,6 +2,7 @@
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的命令与判定，勿当资料阅读。
 > 最后更新：2026-11-06
 > **Status**: v0 已实装（`core/revocations.py` + `nf evidence revocations`）· 仍是**拉取式**分发
+> **实现位置**：`desktop/src/core/revocations.py` · 判据 `desktop/tests/test_revocations.py`
 
 ## 解决什么（威胁模型 G2 的可落地部分）
 

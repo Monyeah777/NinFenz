@@ -51,7 +51,7 @@
 ```json
 {
   "schema": "nf-check-intent/1",
-  "object": "docs/ccos/report.md",
+  "object": "docs/ccos/abi-v0.md",
   "policy_id": "AIGC-basic",
   "requirements": [
     {"rule": "explicit_notice", "text": "AI 生成", "where": "start"},

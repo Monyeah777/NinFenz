@@ -1,6 +1,7 @@
 # 密钥透明目录 v0（`nf-key-transparency/1`）
 
 > **状态**：已实装（2026-11-08）· 机制来源：IETF Key Transparency 协议（draft-keytrans-mcmillion-protocol，**正文关键段已读**）
+> **实现位置**：`desktop/src/core/key_transparency.py` · CLI `nf evidence revocations trust kt-build/kt-verify/kt-witness` · 判据 `desktop/tests/test_key_transparency.py`
 
 ## 解决什么
 
