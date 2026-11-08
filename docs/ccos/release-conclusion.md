@@ -116,13 +116,17 @@ python scripts/verify_tests.py --affected           # 跑受影响模块
 参数却漏登记编码/路径闸门名单」，只有这组判据会红——不常驻就要等 36 分钟的分片才发现。
 用 100 秒换 36 分钟。
 
+**并发**：快照跑之前先拿 `.worktrees/gate-snap/.snapshot.lock`（互斥，含 pid/HEAD/时间）；
+拿不到就拒绝（或 `--lock-wait N` 排队等）——实测三份全量并发会把 45 分钟拉成 65+ 分钟，
+且两份外层会互相清对方 worktree。锁的自清 `unlink` 已登记 `purity_scan.SINK_ALLOW`。
+
 **纪律**：`--affected` 只用于本地修复回路；「可发布」的结论必须来自上面的全量五步。
 
 ## 判据（可证）
 
 ```bash
 # 纯函数判据（脏树闸门 / 分片汇总 / 计划生成）+ dry-run 集成
-python -m unittest desktop.tests.test_release_conclusion    # 54 项全绿
+python -m unittest desktop.tests.test_release_conclusion    # 59 项全绿
 
 # 真跑（干净树上）：checks-only + 8 片顺序跑（墙钟随机器变，不在此钉数字）
 python scripts/release_conclusion.py

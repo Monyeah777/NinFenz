@@ -43,6 +43,15 @@ DEFAULT_SHARDS = 8
 DEFAULT_JOBS = 1
 GUIDE = "修复指引："
 
+def _core(name: str):
+    """按需导入 desktop/src 下的 core 模块（局部导入：模块级只留纯逻辑，避开 E402）。"""
+    src = str(ROOT / "desktop" / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    import importlib
+
+    return importlib.import_module("core." + name)
+
 
 def porcelain_lines(text: str) -> list[str]:
     """git status --porcelain 输出 → 非空行列表（脏树判据的纯函数，便于单测）。"""
@@ -131,6 +140,18 @@ LOCK_NAME = ".snapshot.lock"
 LOCK_MAX_AGE_S = 3 * 3600.0
 
 
+
+def _read_lock_meta(lock: Path) -> dict | None:
+    """读锁元数据 → dict 或 None（坏件/缺件返回 None，由调用方按「可抢」处理）。"""
+    if not lock.is_file():
+        return None
+    try:
+        doc = _core("json_doc").load(lock, dict, what=str(lock))
+    except (OSError, ValueError):   # 半截/坏件锁 = 不可信 → 当作没有锁（可抢）
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
 def lock_should_reclaim(meta: dict | None, pid_alive: bool, age_s: float,
                         max_age_s: float = LOCK_MAX_AGE_S) -> str:
     """锁是否可抢 → 空串=不可抢 / 非空=可抢的理由（纯函数，便于判据）。
@@ -160,10 +181,7 @@ def lock_acquire(base: Path, head: str, *, pid: int | None = None,
     now = _time.time() if now is None else float(now)
     meta = None
     if lock.is_file():
-        try:
-            meta = json.loads(lock.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            meta = None
+        meta = _read_lock_meta(lock)
     if meta and not force:
         holder = int(meta.get("pid") or 0)
         age = max(0.0, now - float(meta.get("started_at") or 0.0))
@@ -175,8 +193,9 @@ def lock_acquire(base: Path, head: str, *, pid: int | None = None,
                            + GUIDE + "等它结束，或确认其进程已死后重试，或加 --force-lock")
         print("  [snapshot] 接管陈旧锁：" + why, file=sys.stderr, flush=True)
     base.mkdir(parents=True, exist_ok=True)
-    payload = {"pid": pid, "head": str(head), "started_at": now}
-    lock.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    _core("atomic_write").write_text(
+        lock, json.dumps({"pid": pid, "head": str(head), "started_at": now},
+                         ensure_ascii=False, sort_keys=True))
     return True, ""
 
 
@@ -184,14 +203,11 @@ def lock_release(base: Path, *, pid: int | None = None) -> None:
     """释放锁（只删自己的锁：别的进程接管后不误删）。"""
     lock = Path(base) / LOCK_NAME
     pid = os.getpid() if pid is None else int(pid)
-    try:
-        meta = json.loads(lock.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return
-    if int(meta.get("pid") or 0) == pid:
+    meta = _read_lock_meta(lock)
+    if isinstance(meta, dict) and int(meta.get("pid") or 0) == pid:
         try:
-            lock.unlink()
-        except OSError:
+            lock.unlink()   # 只删自己的锁；删不掉说明已被别人接管
+        except OSError:     # 权限/竞态：锁已在别处处理，静默降级不阻断
             return
 
 
@@ -228,7 +244,7 @@ def _pid_alive(pid: int) -> bool:
         try:
             os.kill(pid, 0)
             return True
-        except OSError:
+        except OSError:   # 非 Windows 存活探测：OSError = 进程不存在（按死处理）
             return False
     src = str(ROOT / "desktop" / "src")
     if src not in sys.path:
