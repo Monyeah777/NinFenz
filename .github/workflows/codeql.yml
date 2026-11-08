@@ -18,16 +18,19 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# 权限最小化（Scorecard TokenPermissionsID）：顶层只读，写权限下放到 job。
 permissions:
   contents: read
-  security-events: write      # 上传 SARIF 到 code scanning
-  actions: read
 
 jobs:
   analyze:
     name: analyze-${{ matrix.language }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write      # 上传 SARIF 到 code scanning
+      actions: read
     strategy:
       fail-fast: false
       matrix:

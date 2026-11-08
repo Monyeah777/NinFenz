@@ -12,13 +12,16 @@ concurrency:
   group: library-write
   cancel-in-progress: false
 
+# 权限最小化（Scorecard TokenPermissionsID）：顶层只读，写权限下放到 job。
 permissions:
-  contents: write
-  issues: write
+  contents: read
 jobs:
   ingest:
     if: startsWith(github.event.issue.title, '【NF投稿】')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     timeout-minutes: 20          # 挂死上限（2026-10-01 统一）
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
