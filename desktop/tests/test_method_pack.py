@@ -201,6 +201,27 @@ class PackContentTest(unittest.TestCase):
                 text = (ROOT / rel).read_text(encoding="utf-8")
                 self.assertTrue(any(t in text for t in tokens),
                                 mid + " 在 " + rel + " 里找不到锚点（" + "/".join(tokens) + "）")
+
+    def test_claim_kinds_come_from_single_vocabulary(self):
+        """同构判据 #4（语义层）：方法包的 claim_kind 必须来自 criteria registry 的单一词表。
+
+        两侧要「说同一件事」：包里的证据标准与 registry 的领域词表必须同源。
+        ① 包里的每个 claim_kind 都在 registry.claim_kinds 内；
+        ② 词表里不能有没人用的死词（只增不用的词表 = 假统一）。
+        """
+        import json
+        reg = json.loads((ROOT / "protocol" / "criteria" / "registry.json")
+                         .read_text(encoding="utf-8"))
+        vocab = set(reg.get("claim_kinds") or [])
+        self.assertTrue(vocab, "registry 缺 claim_kinds 词表")
+        used = set()
+        for pid in PACK_IDS:
+            pack = method_pack.load_pack(str(ROOT), pid)
+            for std in pack["evidence_standards"]:
+                kind = str(std["claim_kind"])
+                used.add(kind)
+                self.assertIn(kind, vocab, "包 " + pid + " 用了未登记词：" + kind)
+        self.assertEqual(sorted(vocab - used), [], "词表里有没人用的死词：%s" % sorted(vocab - used))
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
         std = method_pack.obligations(pack, "calibration")
