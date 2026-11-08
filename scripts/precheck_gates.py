@@ -30,6 +30,8 @@ GATES = (
      "desktop.tests.test_verify_report.BuildTest.test_build_is_deterministic"),
     ("gate_probe", "desktop.tests.test_gate_probe"),
     ("judge_mutation", "desktop.tests.test_judge_mutation_probe"),
+    # 自省层（第 98 轮）：判定面脚本改了就红，必须重算验证器摘要
+    ("verifier_version", "desktop.tests.test_verifier_version"),
 )
 
 #: 慢但值得（--full 才跑）：CLI 面与纯度扫描约 2–3 分钟

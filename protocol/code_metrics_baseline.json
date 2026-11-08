@@ -1691,7 +1691,7 @@
       "max_fn_lines": 13
     },
     "scripts/precheck_gates.py": {
-      "lines": 39,
+      "lines": 41,
       "max_fn_cc": 0,
       "max_fn_lines": 0
     },

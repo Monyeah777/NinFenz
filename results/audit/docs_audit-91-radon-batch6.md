@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:d242a2d27814b6141c72994e063460e923235c865d50cfc7a3cbc68d7653e9ff
+  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
 ---
+> 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
+
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）
 
 > 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:d242a2d27814b6141c72994e063460e923235c865d50cfc7a3cbc68d7653e9ff
+  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
 ---
+> 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
+
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）
 
 > 重审（2026-11-09）：自省层对象：验证器摘要（判定面脚本内容摘要）+ 探针 + 判据

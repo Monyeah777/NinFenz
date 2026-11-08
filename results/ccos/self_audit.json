@@ -2,5 +2,5 @@
   "files": 10,
   "note": "判定面脚本的内容摘要；与当前重算不一致即说明工具变了结论未重跑",
   "schema": "nf-self-audit/1",
-  "verifier_digest": "c75bae3e84822ce235143001dbe6f9931dcbbbbb333a62911b256101aa45c487"
+  "verifier_digest": "bdf9c648ff489f166b2f35b1daf70fa46666c7c610b10aee03f250c707e888da"
 }

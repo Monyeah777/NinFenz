@@ -1,13 +1,14 @@
 {
-  "gates": 24,
+  "gates": 25,
   "gates_with_negative": 21,
   "missing": [
     "coupling_fresh",
     "docs_anchors",
-    "abi_docs"
+    "abi_docs",
+    "verifier_version"
   ],
   "note": "命名代理，只作趋势；判定用逐条变异测试（KILL_TESTS）",
-  "ratio": 0.875,
+  "ratio": 0.84,
   "rows": [
     {
       "count": 3,
@@ -248,6 +249,13 @@
         "test_both_judges_kill_every_mutant",
         "test_probe_is_not_vacuous"
       ]
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "verifier_version",
+      "module": "desktop.tests.test_verifier_version",
+      "negative_tests": []
     },
     {
       "count": 7,
