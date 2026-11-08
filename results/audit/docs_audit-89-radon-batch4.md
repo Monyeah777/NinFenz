@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:270f595135aed18173c3729ca6667281ee5c37f245ba819dba668a862984fbf6
+  - protocol/code_metrics_baseline.json:1d3a6db896c4d52eca349b35d311230c26ed8147d198ed299321ad5963446182
 ---
+> 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
+
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
 
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）

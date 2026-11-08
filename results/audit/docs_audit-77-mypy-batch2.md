@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:270f595135aed18173c3729ca6667281ee5c37f245ba819dba668a862984fbf6
+  - protocol/code_metrics_baseline.json:1d3a6db896c4d52eca349b35d311230c26ed8147d198ed299321ad5963446182
 ---
+> 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
+
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
 
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）

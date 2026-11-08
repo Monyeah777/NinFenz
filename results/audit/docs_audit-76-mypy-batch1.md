@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:270f595135aed18173c3729ca6667281ee5c37f245ba819dba668a862984fbf6
+  - protocol/code_metrics_baseline.json:1d3a6db896c4d52eca349b35d311230c26ed8147d198ed299321ad5963446182
 ---
+> 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
+
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
 
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）

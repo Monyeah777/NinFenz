@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:adde545c33e959e35ae5ce16d2155a3f9705bc5e5143e279118a055264545b48
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:270f595135aed18173c3729ca6667281ee5c37f245ba819dba668a862984fbf6
+  - protocol/code_metrics_baseline.json:1d3a6db896c4d52eca349b35d311230c26ed8147d198ed299321ad5963446182
 ---
+> 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
+
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
 
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）

@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:adde545c33e959e35ae5ce16d2155a3f9705bc5e5143e279118a055264545b48
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:a7f38ed3c26f1b1a3f1fa93a15b2b2e2c61ce5be683865d87d6e2fdfce344be0
+  - protocol/check12_weights.json:6617232148933ab80decc5c517bb0fc39ec8cbaad34dde6c47102734f36e6ac7
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
+
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）
 
 > 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）

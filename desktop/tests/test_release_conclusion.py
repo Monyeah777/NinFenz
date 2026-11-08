@@ -85,6 +85,28 @@ class TestPureLogic(unittest.TestCase):
 
 
 
+
+    def test_status_snapshot_reports_lock_and_latest(self):
+        """现场体检：锁/运行目录/最近结论都能读出来，且优先报「与锁同 HEAD」的那份。"""
+        import tempfile
+        import time as _t
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "b" * 40, pid=os.getpid(), now=_t.time())
+            run_old = base / ("nf-gate-snap-" + "a" * 12 + "-old")
+            run_new = base / ("nf-gate-snap-" + "b" * 12 + "-new")
+            run_old.mkdir()
+            run_new.mkdir()
+            (run_old / "gate.log").write_text(json.dumps({"ok": True, "wall_s": 1.0}),
+                                               encoding="utf-8")
+            status = gate.status_snapshot(base)
+            self.assertEqual("nf-snapshot-status/1", status["schema"])
+            self.assertTrue(status["running"])
+            self.assertEqual("b" * 12, status["lock"]["head"][:12])
+            self.assertIn("new", status["latest"]["run"], "应优先报与锁同 HEAD 的那份")
+            gate.lock_release(base, pid=os.getpid())
+            self.assertFalse(gate.status_snapshot(base)["running"])
     def test_max_wall_cap_is_declared_and_used(self):
         """墙钟上限：常量 5400 s 且在 CLI/内层等待处都用到（防挂死无限等）。"""
         gate = self.gate

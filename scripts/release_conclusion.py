@@ -31,6 +31,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 #: **分区数**与**并发数**是两件事（2026-11-04 实测教训）：
@@ -739,6 +740,67 @@ def _run_in_snapshot_body(args, head: str) -> int:
         _snapshot_remove_tmp(path)
 
 
+
+
+def status_snapshot(base: Path) -> dict[str, Any]:
+    """快照现场体检 → {lock, runs, latest}（纯读，不改任何状态）。
+
+    为什么（第 43 轮）：并发会话多的时候，「现在到底有没有人/哪一份在跑、跑到哪了」要靠翻目录和日志猜。
+    把它做成一个命令，结论状态就不再靠记忆。
+    """
+    base = Path(base)
+    runs_all = [p for p in base.glob("nf-gate-snap-*") if p.is_dir()] if base.is_dir() else []
+    # 按 mtime 新→旧：最新建的那份才是「当前这份」
+    runs = sorted(runs_all, key=lambda p: p.stat().st_mtime, reverse=True)
+    lock_path = base / LOCK_NAME
+    lock_info: dict[str, Any] | None = None
+    if lock_path.is_file():
+        meta = _read_lock_meta(lock_path)
+        if meta:
+            import time as _time
+            age = max(0.0, _time.time() - float(meta.get("started_at") or 0.0))
+            lock_info = {"pid": int(meta.get("pid") or 0), "head": str(meta.get("head") or ""),
+                         "age_s": round(age, 1),
+                         "alive": _pid_alive(int(meta.get("pid") or 0))}
+    latest = None
+    head_short = str((lock_info or {}).get("head") or "")[:12]
+    if head_short:
+        matched = [r for r in runs if head_short in r.name]
+        runs = matched + [r for r in runs if r not in matched]
+        preferred = matched[0] if matched else None
+    else:
+        preferred = None
+    for run in runs:
+        log = run / "gate.log"
+        text = ""
+        if log.is_file():
+            try:
+                text = log.read_text(encoding="utf-8", errors="replace")
+            except OSError:   # 日志读不动：按「还没内容」处理，不阻断体检
+                text = ""
+        head_line = next((ln for ln in text.splitlines() if "[snapshot] HEAD" in ln), "")[:120]
+        doc = None
+        if "{" in text:
+            try:
+                doc = json.loads(text[text.index("{"):])
+            except ValueError:   # 半截 JSON（内层正在写）：先不给结论
+                doc = None
+        latest = {"run": run.name, "log_bytes": len(text.encode("utf-8")),
+                  "banner": head_line,
+                  "conclusion": None if doc is None else {
+                      "ok": doc.get("ok"), "checks_only_rc": doc.get("checks_only_rc"),
+                      "wall_s": doc.get("wall_s"),
+                      "failed_shards": [f.get("shard") for f in (doc.get("failed") or [])],
+                      "head": str(doc.get("head_start") or "")[:12],
+                      "moved": doc.get("head_moved")}}
+        if preferred is not None and run == preferred:
+            break            # 与锁同 HEAD 的那份才是「当前这份」
+        if latest["log_bytes"] > 0:
+            break            # 否则取第一份有内容的
+    return {"schema": "nf-snapshot-status/1", "base": str(base),
+            "runs": [p.name for p in runs], "lock": lock_info, "latest": latest,
+            "running": bool(lock_info and lock_info.get("alive"))}
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="release_conclusion",
                                  description="发布结论一键复跑（干净树 → 供应链核对 → "
@@ -765,8 +827,15 @@ def main(argv=None) -> int:
                     help="拿不到快照锁时最多等多少秒（缺省 0=立刻失败；>0 排队等）")
     ap.add_argument("--force-lock", action="store_true",
                     help="接管仍在跑的快照锁（确认另一进程已死/卡死时才用）")
+    ap.add_argument("--status", action="store_true",
+                    help="只看快照现场（锁持有者/运行目录/最近一次结论），不跑门禁")
     ap.add_argument("--json", action="store_true", help="机读汇总")
     args = ap.parse_args(argv)
+    if args.status:
+        base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+        doc = status_snapshot(base)
+        print(json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
 
     shards = max(1, min(int(args.shards), 32))
     concurrency = max(1, min(int(args.jobs), shards))
