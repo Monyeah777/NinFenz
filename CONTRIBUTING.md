@@ -104,6 +104,9 @@ python3 -m compileall -q desktop/src scripts
 - **冻结链/投影：新增或改名文件先 `git add`，再跑 `nf layers --write` 及后续重冻（verify_report/conformance/approve/receipts/audit）**。投影走 git 追踪面（`git ls-files`），未跟踪文件会被少算——提交后 CI 检出（tracked）重算即不一致（#168/#178/#182 三次同因，shard 12/17/19/26 红）。`nf layers --write` 现在会对未跟踪文件打 warn，但**不替用户 `git add`**。
 - **打包/站点面（packaging/、site/）**：每个 PR 都会跑 `npm-package-check`（payload stage → verify-package → 包内冒烟 → `npm pack --dry-run` → tarball 逐字节 → 站点数字↔payload 对账 → 断言 stage 不改受跟踪文件）。本地复现：`cd packaging/npm && npm run stage && npm run verify`；payload 未暂存时 `test_npm_package` 的两条自检会显式 skip（`release_conclusion` 现会 warn，提示先 stage）。
   **数字同步（2026-11-08 实测）**：payload 含 docs/protocol，**任何文档或协议改动都可能让解包体积越过「N 件 / M MB」的两位小数边界**——`npm-package-check` 会在 PR 上判红并给出准确的新值；按提示跑 `cd packaging/npm && node tools/stage-payload.mjs --sync-readme` 与 `node site/tools/sync-numbers.mjs --write`，把 README/site/llms-full 的数字同步后一起提交（别手改数字）。
+  **本地 stage 过的 payload 会随 HEAD 过期**（2026-11-09 实测）：切分支/换 HEAD 后跑 `bash verify.sh --full`，
+  `test_npm_package.test_package_verifier_passes` 会因清单 `source_commit` ≠ HEAD 而红——这是 fail-closed 预期行为；
+  重新 `cd packaging/npm && npm run stage`（在目标 HEAD/干净树上）即恢复。CI 干净检出不受影响。
 
 ### 4.3 社区领域包（community/）
 - 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。
