@@ -5,11 +5,19 @@ name: dependency-audit
 # 而把依赖审计做成独立任务——每周 + 手动触发 + push 到 main 时跑，任一已知漏洞即红。
 #
 # 为什么需要它：CI 工具链此前是无版本 `pip install`，依赖面**没有任何可审对象**；
-# 现在版本固定在 .github/requirements-ci.txt，本工作流即对该固定集做 CVE 审计。
+# 现在版本固定在 .github/requirements-*.txt，本工作流即对**全部四份固定集**做 CVE 审计
+# （ci/lint/sast/audit——此前只审 requirements-ci.txt，lint/sast/audit 的漏洞只能靠人工那次审计）。
 # 注意：审计的是 **CI 工具链版本集**，不是 NF 本体的运行时依赖（NF 本体纯标准库 + 软导入）。
+#
+# PR 面（2026-11-09 补）：requirements 改动在 PR 上就跑审计（job 实测 24–29 s），不用等合并后；
+# 仍非 required。
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - '.github/requirements-*.txt'
+      - '.github/workflows/dependency-audit.yml'
   workflow_dispatch:
   schedule:
     - cron: '23 3 * * 1'      # 每周一 03:23 UTC（与 external-links 错开）
@@ -37,8 +45,14 @@ jobs:
           python-version: '3.11'
       - name: 安装审计器（版本固定，见 .github/requirements-audit.txt）
         run: pip install --require-hashes -r .github/requirements-audit.txt
-      - name: 对固定依赖集做 CVE 审计（命中即红）
-        run: python -m pip_audit -r .github/requirements-ci.txt --progress-spinner off
+      - name: 对四份固定依赖集做 CVE 审计（命中即红）
+        run: |
+          set -euo pipefail
+          python -m pip_audit --progress-spinner off \
+            -r .github/requirements-ci.txt \
+            -r .github/requirements-lint.txt \
+            -r .github/requirements-sast.txt \
+            -r .github/requirements-audit.txt
 
       - name: 失败诊断产物（Z5：本 run 的日志/报告；无则跳过）
         # Z5（2026-10-10 审计 §11j N8）：失败时要有**可下载**的诊断物，而不是只留滚动日志。
