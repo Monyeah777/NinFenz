@@ -12,8 +12,12 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
+  - protocol/code_metrics_baseline.json:7b6783e3ea5ad8ecb95f9991c099d5f59291a16d3bf468b7f7b7bea69073589b
 ---
+> 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
+
+> 重审（2026-11-08）：快照互斥锁（并发会话互清 worktree 的实测对策）
+
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
 
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）

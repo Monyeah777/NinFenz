@@ -23,9 +23,49 @@ def _load():
     return mod
 
 
+
 class TestPureLogic(unittest.TestCase):
     def setUp(self):
         self.gate = _load()
+
+    def test_lock_reclaim_rules(self):
+        """锁抢断规则：空/死进程/超龄可抢；活进程未超龄绝不可抢（并发跑两份会互相清 worktree）。"""
+        gate = self.gate
+        self.assertTrue(gate.lock_should_reclaim(None, False, 0.0))
+        self.assertTrue(gate.lock_should_reclaim({"pid": 1}, False, 60.0))
+        self.assertTrue(gate.lock_should_reclaim({"pid": 1}, True, 4 * 3600.0))
+        self.assertEqual("", gate.lock_should_reclaim({"pid": 1}, True, 60.0))
+
+    def test_lock_acquire_refuses_when_held_and_releases(self):
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            # 持有者是**活着的**本进程：未超龄，别人（另一个 pid）必须被拒
+            ok, why = gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=1000.0)
+            self.assertTrue(ok, why)
+            ok2, why2 = gate.lock_acquire(base, "b" * 40, pid=os.getpid() + 1,
+                                          now=1060.0)
+            self.assertFalse(ok2)
+            self.assertIn("另一份全量快照正在跑", why2)
+            gate.lock_release(base, pid=os.getpid())
+            ok3, why3 = gate.lock_acquire(base, "c" * 40, pid=os.getpid(), now=1200.0)
+            self.assertTrue(ok3, why3)
+            # 别人的 pid 不能删我的锁
+            gate.lock_release(base, pid=999999)
+            self.assertTrue((base / gate.LOCK_NAME).is_file())
+            gate.lock_release(base, pid=os.getpid())
+            self.assertFalse((base / gate.LOCK_NAME).is_file())
+
+    def test_lock_force_takes_over(self):
+        import tempfile
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=1000.0)
+            ok, why = gate.lock_acquire(base, "b" * 40, pid=os.getpid(), now=1010.0,
+                                        force=True)
+            self.assertTrue(ok, why)
 
     def test_porcelain_lines_ignores_blanks(self):
         self.assertEqual([], self.gate.porcelain_lines(""))

@@ -18,13 +18,17 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - tui/_surface.py:f708147a385a47d8cb9d34ea340c172bd9ac40a3e545d15ca4956f0ec5496b5d
-  - protocol/check12_weights.json:3a73b12dd975297d0313b9641e434b5a0e64a07e23692ff04e9f8d249261dff2
+  - protocol/check12_weights.json:8de41103ce9be7878851794bb0c001ac14b2cb7182bfff1483b21157d2fb83af
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
+
+> 重审（2026-11-08）：快照互斥锁（并发会话互清 worktree 的实测对策）
+
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
 
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）

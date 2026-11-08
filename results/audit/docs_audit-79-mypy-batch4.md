@@ -7,10 +7,14 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
-  - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
+  - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
+  - protocol/code_metrics_baseline.json:7b6783e3ea5ad8ecb95f9991c099d5f59291a16d3bf468b7f7b7bea69073589b
 ---
+> 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
+
+> 重审（2026-11-08）：快照互斥锁（并发会话互清 worktree 的实测对策）
+
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
 
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）

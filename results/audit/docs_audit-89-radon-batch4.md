@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
+  - protocol/code_metrics_baseline.json:7b6783e3ea5ad8ecb95f9991c099d5f59291a16d3bf468b7f7b7bea69073589b
 ---
+> 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
+
+> 重审（2026-11-08）：快照互斥锁（并发会话互清 worktree 的实测对策）
+
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
 
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）

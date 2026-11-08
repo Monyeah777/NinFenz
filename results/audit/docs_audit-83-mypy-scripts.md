@@ -14,8 +14,12 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:d059d432155606c97d3ae035d1fe390a1793fc368621c24295e1af07b1a13fea
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:e407075c6dc95579c4e733292a65942ebe7ccbb0528103a701f53e527db23e5a
+  - protocol/code_metrics_baseline.json:7b6783e3ea5ad8ecb95f9991c099d5f59291a16d3bf468b7f7b7bea69073589b
 ---
+> 重审（2026-11-08）：快照锁 + sink 登记（lock 自清）
+
+> 重审（2026-11-08）：快照互斥锁（并发会话互清 worktree 的实测对策）
+
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）
 
 > 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）

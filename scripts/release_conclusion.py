@@ -27,6 +27,7 @@ import concurrent.futures
 import json
 import os
 import shutil
+import subprocess  # nosec B404 - 只跑 argv 列表查询进程存活
 import sys
 import tempfile
 import time
@@ -122,6 +123,92 @@ def strip_snapshot_flag(argv: list[str]) -> list[str]:
     """去掉外层消费的旗标 → 内层 argv（纯函数，便于单测）。"""
     return [a for a in argv if a not in SNAPSHOT_STRIP]
 
+
+
+
+#: 快照互斥锁（2026-11-08 实测教训：本仓与其它工作区同时跑三份全量快照，
+#: CPU 争抢把 45 分钟拉成 65+ 分钟，且两个外层进程会互相清理对方的 worktree）。
+LOCK_NAME = ".snapshot.lock"
+LOCK_MAX_AGE_S = 3 * 3600.0
+
+
+def lock_should_reclaim(meta: dict | None, pid_alive: bool, age_s: float,
+                        max_age_s: float = LOCK_MAX_AGE_S) -> str:
+    """锁是否可抢 → 空串=不可抢 / 非空=可抢的理由（纯函数，便于判据）。
+
+    口径（fail-closed）：
+    ① 没有元数据（空/坏件）→ 可抢（残留锁不该永久挡住发布）；
+    ② 持有进程已死 → 可抢；
+    ③ 持有进程活着且未超龄 → **不可抢**（宁可让调用方等，也不并发跑两份）；
+    ④ 超龄（默认 3 小时）→ 可抢（真挂死的进程不该锁死整条线）。
+    """
+    if not isinstance(meta, dict) or not meta:
+        return "锁内容为空或坏件"
+    if not pid_alive:
+        return "持有进程已不在（pid=" + str(meta.get("pid")) + "）"
+    if age_s >= max_age_s:
+        return "锁已超龄 " + str(round(age_s / 60.0)) + " 分钟（上限 " \
+               + str(round(max_age_s / 60.0)) + " 分钟）"
+    return ""
+
+
+def lock_acquire(base: Path, head: str, *, pid: int | None = None,
+                 now: float | None = None, force: bool = False) -> tuple[bool, str]:
+    """拿快照锁 → (是否拿到, 提示)。返回 False 时调用方**不得**继续跑快照。"""
+    import time as _time
+    lock = Path(base) / LOCK_NAME
+    pid = os.getpid() if pid is None else int(pid)
+    now = _time.time() if now is None else float(now)
+    meta = None
+    if lock.is_file():
+        try:
+            meta = json.loads(lock.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            meta = None
+    if meta and not force:
+        holder = int(meta.get("pid") or 0)
+        age = max(0.0, now - float(meta.get("started_at") or 0.0))
+        why = lock_should_reclaim(meta, _pid_alive(holder), age)
+        if not why:
+            return False, ("另一份全量快照正在跑（pid " + str(holder) + " · HEAD "
+                           + str(meta.get("head"))[:12] + " · 已 "
+                           + str(round(age / 60.0)) + " 分钟）；"
+                           + GUIDE + "等它结束，或确认其进程已死后重试，或加 --force-lock")
+        print("  [snapshot] 接管陈旧锁：" + why, file=sys.stderr, flush=True)
+    base.mkdir(parents=True, exist_ok=True)
+    payload = {"pid": pid, "head": str(head), "started_at": now}
+    lock.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    return True, ""
+
+
+def lock_release(base: Path, *, pid: int | None = None) -> None:
+    """释放锁（只删自己的锁：别的进程接管后不误删）。"""
+    lock = Path(base) / LOCK_NAME
+    pid = os.getpid() if pid is None else int(pid)
+    try:
+        meta = json.loads(lock.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    if int(meta.get("pid") or 0) == pid:
+        try:
+            lock.unlink()
+        except OSError:
+            return
+
+
+def _pid_alive(pid: int) -> bool:
+    """进程是否还活着（Windows: tasklist；POSIX: os.kill(pid, 0)）。"""
+    if pid <= 0:
+        return False
+    try:
+        if os.name == "nt":
+            out = subprocess.run(["tasklist", "/FI", "PID eq " + str(pid), "/NH"],
+                                 capture_output=True, text=True, timeout=15, check=False)
+            return str(pid) in (out.stdout or "")
+        os.kill(pid, 0)
+        return True
+    except (OSError, subprocess.SubprocessError):
+        return False
 
 def snapshot_dir_name(head: str) -> str:
     """快照目录名：带 HEAD 短哈希，冲突可辨（纯函数）。"""
@@ -495,7 +582,25 @@ def snapshot_log_path(path: str) -> str:
 
 
 def _run_in_snapshot(args, head: str) -> int:
-    """外层：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
+    """外层入口：**先拿互斥锁**再建快照，结束后无论成败都释放。
+
+    为什么加锁（2026-11-08 实测）：本仓与其它工作区同时跑三份全量快照，
+    CPU 争抢把 45 分钟拉到 65+ 分钟，且两份外层会互相清理对方 worktree。
+    锁是 fail-closed 的：拿不到就不跑，宁可让调用方等。
+    """
+    base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
+    ok, why = lock_acquire(base, head, force=bool(getattr(args, "force_lock", False)))
+    if not ok:
+        print("  ✗ " + why, file=sys.stderr)
+        return 2
+    try:
+        return _run_in_snapshot_body(args, head)
+    finally:
+        lock_release(base)
+
+
+def _run_in_snapshot_body(args, head: str) -> int:
+    """外层主体：建快照 → 在快照里跑一遍本件（不带 --snapshot）→ 回报 → 清理。
 
     内层是**独立进程**：它的 ROOT 就是快照目录，所以 payload 对账 / 新鲜度 / 分片天然
     都作用在快照上，无需把 cwd 透传到每个 helper。结论因此绑定**一个 SHA**。
@@ -593,6 +698,8 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="只打印计划，不执行")
     ap.add_argument("--only-preflight", action="store_true",
                     help="只跑前置面（脏树 / payload / 供应链），不跑 checks-only 与分片")
+    ap.add_argument("--force-lock", action="store_true",
+                    help="接管仍在跑的快照锁（确认另一进程已死/卡死时才用）")
     ap.add_argument("--json", action="store_true", help="机读汇总")
     args = ap.parse_args(argv)
 

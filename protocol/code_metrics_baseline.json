@@ -1056,7 +1056,7 @@
       "max_fn_lines": 29
     },
     "desktop/src/core/purity_scan.py": {
-      "lines": 580,
+      "lines": 584,
       "max_fn_cc": 24,
       "max_fn_lines": 96
     },
@@ -1666,9 +1666,9 @@
       "max_fn_lines": 39
     },
     "scripts/release_conclusion.py": {
-      "lines": 799,
+      "lines": 906,
       "max_fn_cc": 58,
-      "max_fn_lines": 217
+      "max_fn_lines": 219
     },
     "scripts/rewrite_text.py": {
       "lines": 136,
