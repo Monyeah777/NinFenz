@@ -11,7 +11,10 @@ name: net-probes
 #     RID** 再跑同一套 core 档，平台差异只体现在「执行用哪个 RID 的 CLI」。
 #   · 探针的 `{snap}` 需要**金标语料快照**（引擎常数 `CorpusStamp.Baseline` 锚定某历史导出的
 #     导出快照）。快照 ref 由 `vars.NF_SNAP_REF` 或 workflow_dispatch 的 snap_ref 指定；
-#     缺省 = `aa259d76`（金标导出提交，仍在本仓历史里；旧 tag v2.11.0 已随历史重写不存在）。
+#     缺省 = `aa259d76`（金标导出提交）；**注意：该提交目前不在公开历史里**（2026-11-08 实测
+#     `git archive aa259d76` → `not a valid object name`），跑批前须作者把金标 ref 推上来
+#     或把 `vars.NF_SNAP_REF` 指到可用 ref，否则本 workflow 在快照步骤 fail-fast。
+#     旧 tag `v2.11.0` 已随历史重写不存在。
 #     ref 不在历史里时本 workflow 会 fail-fast 并给出可执行提示（不再每周产假红）。
 #
 # 铁律（RUNBOOK §4 的两条已证伪变体，别再走）：
