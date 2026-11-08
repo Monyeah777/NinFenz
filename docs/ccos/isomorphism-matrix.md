@@ -2,6 +2,8 @@
 
 状态：**9 覆盖 / 0 缺失**（截至 2026-11-09，以 `desktop/tests/fixtures/isomorphism_matrix.json` 为唯一数据源）。
 
+本件是**判定细节**；九层的整体结论与自省闭环见 [dual-core-invariants.md](dual-core-invariants.md)。
+
 ## 为什么需要它
 
 双核设计里最容易骗自己的一句话是「两侧都有这一层」。两核各自有时相、各自有授权、各自有观测——看起来对齐了，
