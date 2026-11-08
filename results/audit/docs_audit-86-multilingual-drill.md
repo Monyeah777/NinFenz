@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
+  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
 ---
+> 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
+
 > 重审（2026-11-09）：变异探针风格收口
 
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results

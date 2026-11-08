@@ -49,6 +49,9 @@ def vocab_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         {"name": "原样", "packs": packs, "registry": registry},
         {"name": "词表顺序打乱", "packs": packs,
          "registry": dict(registry, claim_kinds=list(reversed(registry["claim_kinds"])))},
+        # 工件不变性（台账 §7.2）：包顺序变了，判定不得变
+        {"name": "包顺序打乱", "packs": list(reversed(packs)),
+         "registry": registry},
     ]
     broken = [
         {"name": "删一个词", "packs": packs,

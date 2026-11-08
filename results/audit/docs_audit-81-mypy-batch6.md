@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
+  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
 ---
+> 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
+
 > 重审（2026-11-09）：变异探针风格收口
 
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results

@@ -8,7 +8,7 @@
         "包侧把词改错一个字母"
       ],
       "judge": "vocabulary_mismatches",
-      "legal": 2,
+      "legal": 3,
       "legal_flagged": []
     },
     {
@@ -26,7 +26,7 @@
   "false_positive_rate": 0.0,
   "judges": 2,
   "kill_rate": 1.0,
-  "legal_variants": 4,
+  "legal_variants": 5,
   "mutants": 6,
   "note": "只报数不设阈值；阈值与放行由负责人决定",
   "schema": "nf-judge-mutation/1"

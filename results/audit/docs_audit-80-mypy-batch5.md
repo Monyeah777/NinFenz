@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
+  - protocol/code_metrics_baseline.json:4faa9a58901815324fe9e7ac404974698f9be31422c2e40b0e069bf131be9d96
 ---
+> 重审（2026-11-09）：工件不变性：包顺序打乱不得翻转判定（台账 §7.2）
+
 > 重审（2026-11-09）：变异探针风格收口
 
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results

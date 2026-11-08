@@ -19,7 +19,10 @@ class JudgeMutationTest(unittest.TestCase):
         self.assertEqual("nf-judge-mutation/1", doc["schema"])
         self.assertGreaterEqual(doc["judges"], 2)
         self.assertEqual(6, doc["mutants"])
-        self.assertEqual(4, doc["legal_variants"])
+        self.assertEqual(5, doc["legal_variants"])
+        # 工件不变性：同一语义、不同顺序不得翻转判定（台账 §7.2）
+        names = [c["name"] for c in jm.vocab_cases()[0]]
+        self.assertIn("包顺序打乱", names)
         self.assertTrue(0.0 <= doc["kill_rate"] <= 1.0)
         self.assertTrue(0.0 <= doc["false_positive_rate"] <= 1.0)
 
