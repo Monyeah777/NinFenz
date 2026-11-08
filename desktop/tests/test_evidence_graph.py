@@ -45,6 +45,15 @@ class EvidenceGraphTest(unittest.TestCase):
     def test_reproducible(self):
         self.assertEqual(probe.render(probe.build()), probe.render(probe.build()))
 
+    def test_committed_result_is_fresh(self):
+        """已提交结果必须与重算一致（台账或探针变了却忘刷新即红）。"""
+        path = ROOT / probe.OUT_REL
+        self.assertTrue(path.is_file(),
+                        "缺结果件：先跑 scripts/evidence_graph_probe.py --write")
+        self.assertEqual(probe.render(probe.build()),
+                         path.read_text(encoding="utf-8"),
+                         "结果已陈旧，重跑 --write")
+
 
 if __name__ == "__main__":
     unittest.main()
