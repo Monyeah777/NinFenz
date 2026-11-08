@@ -22,7 +22,7 @@ from core import cognition_plan, method_pack  # noqa: E402
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
 PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
             "evaluation-design", "prompt-injection-defense", "data-provenance",
-            "resilience", "handoff")
+            "resilience", "handoff", "privacy")
 
 
 class PackShapeTest(unittest.TestCase):
@@ -203,6 +203,13 @@ class PackContentTest(unittest.TestCase):
             "co.disagreement_log": ("protocol/closure/ledger.json", ("evidence",)),
             "co.external_verify": ("desktop/src/core/evidence.py", ("verify",)),
             "co.version_pin": ("desktop/src/core/receipts.py", ("receipt",)),
+            # 隐私工程域（第 106 轮）：锚点落入口同意 / 到期 / 吊销面
+            "pr.minimization": ("desktop/src/core/mcp_ingress.py", ("max_args",)),
+            "pr.purpose": ("desktop/src/core/grouped_report.py", ("groups",)),
+            "pr.retention": ("desktop/src/core/allowlist_expiry.py", ("expired",)),
+            "pr.consent": ("desktop/src/core/mcp_ingress.py", ("consent",)),
+            "pr.deidentify": ("protocol/redteam/mcp_injection_cases.json", ("RT-0",)),
+            "pr.deletion_proof": ("desktop/src/core/evidence.py", ("revoked",)),
         }
         #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
         CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}
