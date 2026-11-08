@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
+  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
 ---
+> 重审（2026-11-09）：变异探针风格收口
+
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
 
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）

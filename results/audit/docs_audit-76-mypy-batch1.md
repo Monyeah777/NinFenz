@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
+  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
 ---
+> 重审（2026-11-09）：变异探针风格收口
+
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
 
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）

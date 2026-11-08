@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
+  - protocol/code_metrics_baseline.json:b2f18754a65d677dc1e0657d2652964c9f2bb354600fbf90503cef41b12f1b8e
 ---
+> 重审（2026-11-09）：变异探针风格收口
+
 > 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
 
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）

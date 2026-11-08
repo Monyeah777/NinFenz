@@ -3,13 +3,15 @@
 
 为什么（第 79 轮）：设计里「红不了的门禁等于没有门禁」已由 `gate_probe` 用命名代理量过一遍；
 但命名代理只能说明「有没有拒绝型用例」，不能说明「判据对真实变异是否敏感」。
-本件做最小闭环：对同一判据喂「合法变体」与「破坏变体」，前者必须不报（无误报），后者必须报（能杀死）。
+本件做最小闭环：对同一判据喂「合法变体」与「破坏变体」，前者必须不报（无误报），
+后者必须报（能杀死）。
 
 标的（都已有真实实现，本件不新写检查逻辑）：
 1. `method_pack.vocabulary_mismatches`：词表核对；
 2. `bridge.obligation_record_issues`：回灌记录与消息的对应核对。
 
-口径：kill_rate = 被杀死的变异体 / 变异体总数；false_positive_rate = 被误报的合法变体 / 合法变体总数。
+口径：kill_rate = 被杀死的变异体 / 变异体总数；
+false_positive_rate = 被误报的合法变体 / 合法变体总数。
 只报数，不设阈值（阈值应由负责人定，agent 不自封）。
 
 用法：python scripts/judge_mutation_probe.py [--write] [--json]
