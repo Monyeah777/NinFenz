@@ -2,15 +2,19 @@ name: docker-nfal
 # NFA-L 镜像的零成本云端构建面（本机无容器引擎时的构建出口）。
 # 只 build + 冒烟，不推注册表 —— 不引入额外凭据面。
 # 构建上下文 = 仓库根（packaging/nfal/Dockerfile 里 COPY desktop/src 是根相对路径）。
+# PR 面（2026-11-09 补）：此前只在 main push 跑——镜像构建坏掉要等合并后才发现；
+# 本 job 实测 13–45 s，故对同样的 paths 加 pull_request 触发（非 required）。
 on:
   push:
     branches: [main]
-    paths:
+    paths: &nfal_paths
       - 'packaging/nfal/**'
       - 'desktop/src/core/nf_expr.py'
       - 'desktop/src/core/nfal.py'
       - 'desktop/src/core/nfal_cli.py'
       - '.github/workflows/docker-nfal.yml'
+  pull_request:
+    paths: *nfal_paths
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
