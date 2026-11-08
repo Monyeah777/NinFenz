@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:47d5e712d0ebe4c9a0dd06151e054bb31686f1170ccd6e52c302f33ddaa481bc
+  - scripts/nf.py:1164d7be98286a3849a70cc878f95e046b0cbe23ad0121655d99789c4de3c8d8
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:71cc7cd9eea682c79e5bde9e4a3536122c15050af238d97cc286ee66b5027899
+  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
 ---
+> 重审（2026-11-08）：task-35 投影少算防护
+
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复
 
 > 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测

@@ -101,6 +101,7 @@ python3 -m compileall -q desktop/src scripts
 - **core 零第三方依赖**（纯标准库）；确需引入第三方依赖先开 Issue 讨论。
 - 新增可测逻辑放 desktop/tests/，纳入 unittest 体系（check12）；暂不做端到端 / GUI 测试入 CI。
 - **批量文本改写用 `python scripts/rewrite_text.py`**（默认**干跑**：先出「文件:行号 + 改前 → 改后」对照表，`--write` 才落盘，命中数超 `--max-hits` 直接拒绝）。纪律：改盘一律走 `core.atomic_write`，且**不做无对照的全仓替换**——写盘前先看表（判据：`desktop/tests/test_rewrite_tool.py`）。
+- **冻结链/投影：新增或改名文件先 `git add`，再跑 `nf layers --write` 及后续重冻（verify_report/conformance/approve/receipts/audit）**。投影走 git 追踪面（`git ls-files`），未跟踪文件会被少算——提交后 CI 检出（tracked）重算即不一致（#168/#178/#182 三次同因，shard 12/17/19/26 红）。`nf layers --write` 现在会对未跟踪文件打 warn，但**不替用户 `git add`**。
 
 ### 4.3 社区领域包（community/）
 - 遵循 R1（包间禁互引）/ R2（类别独占）/ R3（装配契约）；新模块走 02 §8.1 登记，跑 verify.sh check7–11。

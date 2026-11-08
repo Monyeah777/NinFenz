@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:71cc7cd9eea682c79e5bde9e4a3536122c15050af238d97cc286ee66b5027899
+  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
 ---
+> 重审（2026-11-08）：task-35 投影少算防护
+
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复
 
 > 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测

@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:71cc7cd9eea682c79e5bde9e4a3536122c15050af238d97cc286ee66b5027899
+  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
 ---
+> 重审（2026-11-08）：task-35 投影少算防护
+
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复
 
 > 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测
