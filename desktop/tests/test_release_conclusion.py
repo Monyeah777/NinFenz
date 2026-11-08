@@ -83,6 +83,22 @@ class TestPureLogic(unittest.TestCase):
                                              wait_s=5.0, poll_s=0.1)
             self.assertTrue(ok, why)
 
+
+    def test_locked_run_exits_2_with_guidance(self):
+        """集成：锁被占用时 --snapshot 必须退出码 2 并给 pid/HEAD/指引（不静默继续）。"""
+        import tempfile
+        import time as _t
+        gate = self.gate
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            gate.lock_acquire(base, "a" * 40, pid=os.getpid(), now=_t.time())
+            env = dict(os.environ)
+            env["NF_SNAPSHOT_LOCK_DIR"] = tmp
+            proc = subprocess.run([str(sys.executable), str(SCRIPT), "--snapshot", "--json"],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  errors="replace", env=env, timeout=300, cwd=str(ROOT))
+            self.assertEqual(2, proc.returncode, proc.stderr[-300:])
+            self.assertIn("另一份全量快照正在跑", proc.stderr)
     def test_lock_force_takes_over(self):
         import tempfile
         gate = self.gate

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:de9d91eb9bfd08926dc7dc9b8ac4134b560996733efd71a478c8820b4f9a161b
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:ad73d95f11c28520d9871d631010d4b8716b03ca9088b826b75b435dbc34289e
+  - protocol/code_metrics_baseline.json:61c2ec731b8acf1bcb109794db8d0b029ee38997a1b7c053f4b33484bb163294
 ---
+> 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子
+
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
 
 > 重审（2026-11-08）：快照锁等待模式（--lock-wait，死锁立刻接管）

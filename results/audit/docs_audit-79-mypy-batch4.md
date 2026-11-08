@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:ad73d95f11c28520d9871d631010d4b8716b03ca9088b826b75b435dbc34289e
+  - protocol/code_metrics_baseline.json:61c2ec731b8acf1bcb109794db8d0b029ee38997a1b7c053f4b33484bb163294
 ---
+> 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子
+
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
 
 > 重审（2026-11-08）：快照锁等待模式（--lock-wait，死锁立刻接管）

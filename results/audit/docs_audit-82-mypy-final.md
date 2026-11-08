@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:ad73d95f11c28520d9871d631010d4b8716b03ca9088b826b75b435dbc34289e
+  - protocol/code_metrics_baseline.json:61c2ec731b8acf1bcb109794db8d0b029ee38997a1b7c053f4b33484bb163294
 ---
+> 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子
+
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
 
 > 重审（2026-11-08）：快照锁等待模式（--lock-wait，死锁立刻接管）

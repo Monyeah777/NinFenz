@@ -636,7 +636,9 @@ def _run_in_snapshot(args, head: str) -> int:
     锁是 fail-closed 的：拿不到就不跑，宁可让调用方等。
     """
     base = snapshot_base(ROOT, getattr(args, "snapshot_dir", "") or "")
-    ok, why = lock_acquire_wait(base, head,
+    # 测试/CI 可把锁落到独立目录（避免测试与真跑抢同一把锁）
+    lock_base = Path(os.environ.get("NF_SNAPSHOT_LOCK_DIR") or base)
+    ok, why = lock_acquire_wait(lock_base, head,
                                 wait_s=float(getattr(args, "lock_wait", 0.0) or 0.0),
                                 force=bool(getattr(args, "force_lock", False)))
     if not ok:
@@ -645,7 +647,7 @@ def _run_in_snapshot(args, head: str) -> int:
     try:
         return _run_in_snapshot_body(args, head)
     finally:
-        lock_release(base)
+        lock_release(lock_base)
 
 
 def _run_in_snapshot_body(args, head: str) -> int:
