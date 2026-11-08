@@ -208,8 +208,10 @@ def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> 
             res["issues"].append("控制记录 digest 不符（" + GUIDE + "被改过）")
             return res
         try:
+            # authority 必须回放（第 104 轮）：否则终态算子重放会被「必须给 authority」拒掉
             fresh, out = apply(fresh, str(item["op"]), dict(item["witness"]),
-                               discourse=disc, trigger=str(item.get("trigger") or ""))
+                               discourse=disc, trigger=str(item.get("trigger") or ""),
+                               authority=str(item.get("authority") or ""))
         except ValueError as exc:
             res["issues"].append("第 " + str(item.get("seq")) + " 条无法重放：" + str(exc))
             return res

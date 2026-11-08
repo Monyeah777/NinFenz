@@ -195,6 +195,17 @@ class TraceReplayTest(unittest.TestCase):
         state["records"][1]["effect"]["estimate"]["value"] = 999
         self.assertFalse(ct.replay(state)["ok"])
 
+    def test_replay_of_terminal_op_keeps_authority(self):
+        """回归（第 104 轮）：终态算子重放必须带 authority，否则重放会被自己拒掉。
+
+        这是「authority 必填」引入的回归——判据加了必填，却忘了让重放把记录里的授权带回去。
+        """
+        bundle = se.begin("重放终态算子")
+        bundle = se.control(bundle, "stop", PAYLOADS["stop"], authority="tester")
+        res = ct.replay(bundle["control"], bundle["state"])
+        self.assertTrue(res["ok"], res["issues"])
+        self.assertEqual("tester", res["control"]["records"][0]["authority"])
+
     def test_broken_chain_is_detected(self):
         state = json.loads(json.dumps(self._state()))
         state["records"][2]["prev"] = "0" * 64
