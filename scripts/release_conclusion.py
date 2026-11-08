@@ -1006,9 +1006,15 @@ def main(argv=None) -> int:
         verifier = _core("verifier_version").digest(ROOT)["verifier_digest"]
     except ValueError:
         verifier = ""
+    # 供应链（第 114 轮）：结论同时记录**材料清单摘要**——「这份结论基于哪些输入」可核。
+    try:
+        materials = _core("sbom").collect(ROOT)["digest"]
+    except ValueError:
+        materials = ""
     payload = {"schema": "nf-release-conclusion/1",
                "ok": summary["ok"] and checks_rc == 0 and not moved,
                "verifier_digest": verifier,
+               "materials_digest": materials,
                "head_start": head, "head_end": head_end, "head_moved": bool(moved),
                "supply_chain": supply, "freshness": fresh, "ratchets": ratchets,
                "checks_only_rc": checks_rc,

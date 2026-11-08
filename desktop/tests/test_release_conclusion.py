@@ -537,6 +537,20 @@ class TestSnapshotIsolationPaths(unittest.TestCase):
         self.assertEqual(run_dir, os.path.dirname(log))
         self.assertTrue(log.endswith("gate.log"))
 
+    def test_payload_includes_materials_digest(self):
+        """供应链（第 114 轮）：结论必须记录材料清单摘要（这份结论基于哪些输入）。"""
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "desktop" / "src"))
+        from core import sbom
+
+        root = Path(__file__).resolve().parents[2]
+        src = (root / "scripts" / "release_conclusion.py").read_text(encoding="utf-8")
+        self.assertIn('"materials_digest": materials', src,
+                      "结论 payload 必须带 materials_digest 字段")
+        manifest = sbom.collect(root)
+        self.assertEqual(64, len(manifest["digest"]))
+
     def test_payload_includes_verifier_digest(self):
         """自省层（第 97 轮）：结论必须记录产出它的验证器摘要（判定面脚本摘要）。"""
         import sys

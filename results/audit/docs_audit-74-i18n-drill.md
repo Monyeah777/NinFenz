@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2
+  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
 ---
+> 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
+
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）
 
 > 重审（2026-11-09）：材料清单对象（nf-sbom/1：显式范围 + 摘要折叠 + 篡改必红）

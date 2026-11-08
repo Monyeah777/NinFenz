@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2
+  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
 ---
+> 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
+
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）
 
 > 重审（2026-11-09）：材料清单对象（nf-sbom/1：显式范围 + 摘要折叠 + 篡改必红）

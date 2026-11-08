@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:c56599cf154a72feabd24c1e1535a8d9a299fb917313054636fb3434ff70cdd2
+  - protocol/code_metrics_baseline.json:e19115e4c82c6d44a42d0c1e9bd7e4af3d87d06c04d45b89d1f82800e83c678d
 ---
+> 重审（2026-11-09）：发布结论记录材料清单摘要（供应链闭环）
+
 > 重审（2026-11-09）：材料清单模块拆分 + json_doc 统一（规模基线重冻）
 
 > 重审（2026-11-09）：材料清单对象（nf-sbom/1：显式范围 + 摘要折叠 + 篡改必红）
