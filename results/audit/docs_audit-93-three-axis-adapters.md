@@ -8,13 +8,13 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/nf_language.py:ce28f875e4662957118c4abdb53d0f61c6ea857dc203d9ab75a55f88efed5de9
-  - desktop/tests/test_lsp.py:bbbad3904427e35fc7fc3c73311fd3cd97ed61fdb5db5284867a956201c9ae7e
+  - desktop/tests/test_lsp.py:94a8d6a17707d0ab1b654d19d1077d45ae513079c031bc2cbcebff0fbab23748
   - desktop/tests/test_nf_language.py:59bd38b7c2e59fe09b70804a5837849f25ecc274b093efcf4674b5e2f7176644
   - desktop/tests/test_doc_truth.py:6c0584045a8edef8f000ea7cdd547a3fe15a32a696a026467599c11afea11685
   - desktop/tests/test_site_face.py:cc5a6d48dff1f8ba70e90c64ee46009ae22221bd5b30ea16eea2debae85bfcf4
   - verify.sh:b294a23cb14943c29141d8b76e8d6a316e5c28fcf1da8ec148b48384aececa72
   - scripts/nf.py:6a2a931b373487d2aac503b295a2db3cfa579eb46ae8856b41f5d3401da7ca37
-  - docs/lsp.md:db91bbfed27d7e14eb63c72e58ad8e009ce44a2b6563c15982b644ec358eca39
+  - docs/lsp.md:46b5e082c4db90a382a2e254e6b206a4a9111a7afeb9164ceb5ec6b3281a0e82
   - docs/mcp.md:068377b363b3ebd22eafd1a614452114f4303fe17e1354beff0ae15fbb098f93
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
   - protocol/driver.json:d20ddbce281515b7c89ca02f10352bdd2f31e9c6ab80a472a9badb067807e093
