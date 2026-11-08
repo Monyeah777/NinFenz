@@ -6905,7 +6905,7 @@ _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_
                     "claim_file", "cc_result", "commitment", "obligation", "delta",
                     "receipt", "ingress_policy", "evidence", "pairs",
                     "delta_json", "payload_json", "payload", "witness", "kt_keys",
-                    "research_topic", "sheet", "pairs")
+                    "research_topic", "sheet", "pairs", "pack_checklist")
 
 
 def _utf8_text_issue(args) -> str:

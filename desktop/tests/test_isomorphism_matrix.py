@@ -51,9 +51,28 @@ KILL_TESTS = {
                "test_abstain_requires_search_boundary"),
 }
 
+def _import_test_module(module_name: str):
+    """按「包路径」或「裸模块名」导入测试模块（两种跑法都要能工作）。
+
+    为什么要有回退（第 86 轮实测）：分片跑测试时模块是**裸名**（`test_cognition_bridge`），
+    此时 `importlib.import_module("desktop.tests....")` 会 ModuleNotFoundError——
+    判据因此在前一次快照里 ERROR（不是 FAIL）。判据不能只在一种跑法下成立。
+    """
+    try:
+        return importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        import sys
+        from pathlib import Path
+
+        here = str(Path(__file__).resolve().parent)
+        if here not in sys.path:
+            sys.path.insert(0, here)
+        return importlib.import_module(module_name.rsplit(".", 1)[-1])
+
+
 def _has_test(module_name: str, test_name: str) -> bool:
     """模块里是否存在该测试方法（反射查证；供正例与变异例共用）。"""
-    mod = importlib.import_module(module_name)
+    mod = _import_test_module(module_name)
     return any(isinstance(getattr(mod, name), type)
                and hasattr(getattr(mod, name), test_name)
                for name in dir(mod) if name.endswith("Test"))
