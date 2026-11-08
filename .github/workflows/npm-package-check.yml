@@ -50,6 +50,10 @@ jobs:
           set -euo pipefail
           npm pack --dry-run
           node tools/verify-tarball.mjs
+      - name: 站点数字 ↔ payload 清单对账（sync-numbers --check 口径）
+        # stage 只同步 packaging README；site/** 的 npm 件数/体积由 sync-numbers.mjs 与
+        # payload 清单对账（CI 此前没有 payload → 该对账被跳过）。本步在 payload 在场时真跑。
+        run: node site/tools/sync-numbers.mjs
       - name: stage 后工作树必须无受跟踪改动（数字/清单与生成器一致）
         run: |
           set -euo pipefail
