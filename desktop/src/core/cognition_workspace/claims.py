@@ -105,3 +105,29 @@ def check_claim(doc: dict[str, Any], evidence: Any) -> dict[str, Any]:
             "total": total, "satisfied": satisfied, "missing": missing,
             "unknown": unknown,
             "note": "unknown ≠ pass；ready 只在 missing 与 unknown 都为空时为真"}
+
+SHEET_SCHEMA = "nf-cog-claim-sheet/1"
+
+
+def claim_sheet(doc: dict[str, Any]) -> dict[str, Any]:
+    """把主张义务清单翻成**证据作业单**：每个 required 一条空槽，status 一律 unknown。
+
+    为什么要有它：check_claim 说「差哪些证据」，但人/agent 拿到的是散落清单；
+    作业单让「取证」变成逐个填空，且默认 unknown（unknown != pass，必须显式改成 ok）。
+    """
+    if not isinstance(doc, dict) or str(doc.get("schema") or "") != SCHEMA:
+        raise ValueError("主张文件 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）")
+    slots = []
+    for block in doc.get("obligations") or []:
+        for standard in block.get("standards") or []:
+            kind = str(standard.get("claim_kind") or "")
+            for need in standard.get("required") or []:
+                slots.append({"need": str(need), "claim_kind": kind,
+                              "status": "unknown", "evidence": "",
+                              "how_to_check": "给出可复算的路径/命令/断言（不接受口头结论）"})
+    return {"schema": SHEET_SCHEMA, "claim": doc.get("claim"),
+            "claim_kind": doc.get("claim_kind"),
+            "packs": list(doc.get("packs") or []),
+            "digest": doc.get("digest"),
+            "slots": slots,
+            "note": "unknown != pass：全部槽位改成 ok 后，check_claim 才会 ready"}

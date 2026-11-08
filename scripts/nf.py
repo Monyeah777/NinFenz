@@ -520,6 +520,8 @@ def _add_parser_cog(sub):
                      help="判据 id（可重复；缺省按 applies_to 自动选）")
     ccl.add_argument("--role", default="local-trusted", help="主张角色（默认 local-trusted）")
     ccl.add_argument("--out", default="", help="写主张文件（缺省=只打印）")
+    ccl.add_argument("--sheet", default="",
+                     help="同时写证据作业单（每个 required 一条空槽，status=unknown）")
     ccl.add_argument("--json", action="store_true", help="输出结构化 JSON")
     cch = csub.add_parser("claim-check", help="按义务清单核对证据（三态，不评分）",
                           description="核对：satisfied / missing / unknown；unknown 不算 pass。")
@@ -756,6 +758,11 @@ def _cmd_cog(args) -> int:
         if args.out:
             atomic_write.write_text(_rel_out(args.out),
                                     _json.dumps(doc, ensure_ascii=False, indent=2,
+                                                sort_keys=True) + chr(10))
+        if args.sheet:
+            sheet = cg_claims.claim_sheet(doc)
+            atomic_write.write_text(_rel_out(args.sheet),
+                                    _json.dumps(sheet, ensure_ascii=False, indent=2,
                                                 sort_keys=True) + chr(10))
         if args.json:
             print(_json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True))

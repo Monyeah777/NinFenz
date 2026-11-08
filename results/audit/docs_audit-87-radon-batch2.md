@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
+  - protocol/code_metrics_baseline.json:b4f49e53ee6f159282d3174b2959aa55c9de8a4eeda1214e88c7ce9ea9beceb8
 ---
+> 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
+
 > 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
 
 > 重审（2026-11-08）：采集单校验器风格修净

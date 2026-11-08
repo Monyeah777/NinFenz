@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
+  - protocol/code_metrics_baseline.json:b4f49e53ee6f159282d3174b2959aa55c9de8a4eeda1214e88c7ce9ea9beceb8
 ---
+> 重审（2026-11-08）：主张→证据作业单（每个 required 一条 unknown 槽）
+
 > 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
 
 > 重审（2026-11-08）：采集单校验器风格修净

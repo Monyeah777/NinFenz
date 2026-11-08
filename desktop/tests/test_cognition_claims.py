@@ -183,6 +183,30 @@ class CheckClaimTest(unittest.TestCase):
             self.assertFalse(checked["ready"], kind)
             self.assertTrue(checked["missing"], kind)
 
+
+    def test_claim_sheet_turns_obligations_into_unknown_slots(self):
+        """作业单：每条 required 一个空槽、默认 unknown；槽位与 check_claim 的 missing 同一集合。"""
+        from core.cognition_workspace import claims as cl
+        doc = cl.compile_claim(str(ROOT), "评测设计主张", "efficacy", ["evaluation-design"])
+        sheet = cl.claim_sheet(doc)
+        self.assertEqual("nf-cog-claim-sheet/1", sheet["schema"])
+        needs = [st["need"] for b in doc["obligations"] for std in b["standards"]
+                 for st in [{"need": n} for n in std["required"]]]
+        self.assertEqual(set(needs), {s["need"] for s in sheet["slots"]})
+        self.assertTrue(all(s["status"] == "unknown" for s in sheet["slots"]))
+        checked = cl.check_claim(doc, {})
+        self.assertEqual(set(checked["missing"]), {s["need"] for s in sheet["slots"]})
+
+    def test_claim_sheet_slots_flip_to_ready_when_filled(self):
+        from core.cognition_workspace import claims as cl
+        doc = cl.compile_claim(str(ROOT), "评测设计主张", "cost", ["evaluation-design"])
+        sheet = cl.claim_sheet(doc)
+        evidence = {s["need"]: {"status": "ok", "evidence": "脚本路径"} for s in sheet["slots"]}
+        self.assertTrue(cl.check_claim(doc, evidence)["ready"])
+        partial = dict(list(evidence.items())[:-1])
+        self.assertFalse(cl.check_claim(doc, partial)["ready"])
+
+
 class CliTest(unittest.TestCase):
     def test_criteria_listing(self):
         proc = subprocess.run([*NF, "cog", "criteria", "--json"], capture_output=True,
