@@ -7179,6 +7179,20 @@ def _shell_baseline() -> str:
                                                 qb.EXPECTED_PASS)
 
 
+def _untracked_files() -> list[str]:
+    """git 追踪面之外的未跟踪文件（``?? `` 行）——投影按 git ls-files 生成，未跟踪会让它少算。"""
+    import subprocess
+    try:
+        proc = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if proc.returncode != 0:
+        return []
+    return [ln[3:] for ln in proc.stdout.splitlines() if ln.startswith("?? ")]
+
+
 def _cmd_layers(args) -> int:
     """nf layers：抽象阶梯（真源 protocol/LAYERS.json 的投影 + 体检）。"""
     import json
@@ -7190,12 +7204,18 @@ def _cmd_layers(args) -> int:
             rel = lm.write_region(ROOT)
         except ValueError as exc:
             return _machine_fail(args, str(exc), 1)
+        untracked = _untracked_files()
         if args.json:
             print(json.dumps({"kind": "layers-write", "ok": True, "refreshed": rel,
-                              "note": "生成区真源 protocol/LAYERS.json"},
+                              "untracked": untracked[:20],
+                              "note": "生成区真源 protocol/LAYERS.json；untracked 非空时投影"
+                                      "可能少算——先 git add 再重跑"},
                              ensure_ascii=False, indent=2, sort_keys=True))
             return 0
         print("  ✓ 生成区已刷新：%s（真源 protocol/LAYERS.json）" % rel)
+        if untracked:
+            print(f"  [warn] 检测到 {len(untracked)} 个未跟踪文件：投影按 git 追踪面生成，"
+                  f"可能少算；先 git add 再重跑 nf layers --write（例：{untracked[0][:60]}）")
         return 0
 
     doc = lm.load(ROOT)

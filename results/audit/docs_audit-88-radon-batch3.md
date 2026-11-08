@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:71cc7cd9eea682c79e5bde9e4a3536122c15050af238d97cc286ee66b5027899
+  - protocol/code_metrics_baseline.json:2275e0c4172bf800d7487b010c413b3c4576cd0a32fe39764f7ef478ea37e48b
 ---
+> 重审（2026-11-08）：task-35 投影少算防护
+
 > 重审（2026-11-08）：verify_report 基准日 UTC 化修复
 
 > 重审（2026-11-08）：跨平台确定性修复：向量重生成/posix 基线按 Linux 实测
