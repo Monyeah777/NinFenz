@@ -8,6 +8,10 @@ name: rust-crate
 #
 # 口径：与旧 rust-parity 的 cargo-test 同档（`--release`，与对拍/门禁的优化档一致）；
 # 依赖 Cargo.lock，用 `--locked` 防依赖漂移；失败时上传日志供诊断（不写仓库）。
+#
+# 平台矩阵（2026-11-08 扩展）：主 crate 有 `cfg(windows)`/平台路径面，只测 Linux 会漏；
+# 加 windows-latest（runner 预装 Rust）。PyO3 cdylib 构建仍只跑 Linux（Windows 上 pyo3 链接
+# 需要 MSVC/dlltool 工具链，实测本地缺 dlltool 会失败——不把不可复现的环境塞进 CI）。
 on:
   push:
     branches: [main]
@@ -23,9 +27,13 @@ permissions:
 
 jobs:
   rust-crate-tests:
-    name: rust-crate-tests
-    runs-on: ubuntu-latest
+    name: rust-crate-tests-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
@@ -35,6 +43,7 @@ jobs:
           rustc --version
           cargo --version
       - name: 主 crate 单测（release 档：249 条 oracle 与对拍同口径）
+        shell: bash        # windows runner 默认 pwsh：`set -o pipefail`/tee 是 bash 语法
         run: |
           set -o pipefail
           cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
@@ -42,6 +51,7 @@ jobs:
         # 2026-11-08：engine/rust/pyo3 是 cdylib（nf_pyengine），主 crate 测试不覆盖它；
         # 依赖已从 0.22 升到 0.29（修 dependabot high OOB / Sync bound 告警），必须让 CI
         # 真正编译一次，否则「升级」只停在 Cargo.toml。python3-dev 提供 pyo3 构建所需头。
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-dev
@@ -51,7 +61,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
-          name: rust-crate-test-log
+          name: rust-crate-test-log-${{ matrix.os }}
           path: |
             rust-crate-test.log
             pyo3-build.log
