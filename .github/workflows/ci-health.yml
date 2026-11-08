@@ -1,10 +1,14 @@
 name: ci-health
 # 定时面「静默红」看门狗（2026-11-08 盲区收口）：
 # 本仓已两次遇到「schedule workflow 天天红但没人看见」（net-probes 金标 tag 不存在、gitee-poll 缺 token）。
-# 本 workflow 每天检查**最近 24h**内是否还有失败的 `schedule` 运行；有则列出并以 rc=1 显式失败
-# （不创建 issue、不写仓库，只让红在 Actions 面上可见）。
+# 本 workflow 每天检查**每个 schedule workflow 的最新一次运行**：只要最新是失败就列出并以 rc=1
+# 显式失败（不创建 issue、不写仓库，只让红在 Actions 面上可见）。
 #
-# 只看 schedule：push/PR 失败本来就在 main 检查面里；`workflow_dispatch` 手动跑失败不计入。
+# 为什么取「最新一次」而不是「24h 窗口」：修复提交后的 24h 内旧失败仍在窗口里，会把看门狗
+# 自己弄红（2026-11-08 首跑实测：gitee-poll 修复前的失败被计入）。「最新一次」= 当前是否真坏。
+#
+# 只看 schedule：push/PR 失败本来就在 main 检查面里；`workflow_dispatch` 手动跑失败不计入（
+# 但会作为「某 workflow 的最新运行」被看到——若最新是 dispatch 成功，自然不报警）。
 on:
   schedule:
     - cron: '0 5 * * *'        # 每天 05:00 UTC
@@ -24,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: 最近 24h 的 schedule 失败审计
+      - name: schedule 面「最新一次是否失败」审计
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -32,23 +36,29 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json, os, urllib.request
-          from datetime import datetime, timedelta, timezone
-          since = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
           repo = os.environ["REPO"]
-          url = "https://api.github.com/repos/%s/actions/runs?status=failure&per_page=100" % repo
+          url = "https://api.github.com/repos/%s/actions/runs?event=schedule&per_page=100" % repo
           req = urllib.request.Request(url, headers={
               "Accept": "application/vnd.github+json",
               "Authorization": "Bearer " + os.environ["GH_TOKEN"],
           })
           with urllib.request.urlopen(req, timeout=60) as resp:
               doc = json.load(resp)
-          bad = [r for r in doc.get("workflow_runs", [])
-                 if r.get("event") == "schedule" and r.get("created_at", "") >= since]
+          latest = {}
+          for r in doc.get("workflow_runs", []):
+              key = r.get("workflow_id") or r.get("name")
+              prev = latest.get(key)
+              if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
+                  latest[key] = r
+          bad = sorted((r for r in latest.values()
+                        if r.get("conclusion") in ("failure", "timed_out")),
+                       key=lambda r: r.get("name") or "")
           if not bad:
-              print("schedule 面最近 24h 无失败")
+              print("schedule 面：%d 个 workflow 的最新运行均非失败" % len(latest))
               raise SystemExit(0)
-          print("::error::最近 24h 有失败的 schedule workflow：")
+          print("::error::schedule workflow 的最新运行失败（当前该定时面是坏的）：")
           for r in bad:
-              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} {r.get('html_url')}")
+              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} "
+                    f"{r.get('html_url')}")
           raise SystemExit(1)
           PY
