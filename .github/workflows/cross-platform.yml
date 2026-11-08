@@ -42,13 +42,13 @@ jobs:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: utf-8
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           persist-credentials: false
           # 2026-10-22：全量 verify.sh 含 p6_evaluations（依赖 git tag/全历史）；浅克隆必红。
           fetch-depth: 0
           fetch-tags: true
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           cache-dependency-path: .github/requirements-*.txt
           cache: pip
@@ -83,7 +83,7 @@ jobs:
           bash verify.sh --full 2>&1 | tee verify.log
       - name: 上传门禁日志（三平台各留一份；失败时同样上传）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: verify-log-${{ matrix.os }}
           path: |
@@ -102,7 +102,7 @@ jobs:
           python scripts/verify_report.py --check
       - name: 上传门禁报告（三平台各留一份·本 run 结论）
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
         with:
           name: verification-report-${{ matrix.os }}
           path: .artifacts/verification-report.json
