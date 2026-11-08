@@ -13,7 +13,11 @@ name: ci-health
 # 触发密度（2026-11-08 实测）：GitHub 对 schedule 有节流——gitee-poll 的 `*/10` 实际约 3–7 小时
 # 才跑一次（其间大量 skipped），ci-health 首日 05:00 UTC 的 cron 也延迟了 1h+。故本 workflow
 # 排 **每 6 小时一次**（4 个 cron）以提高「至少有一次被投递」的概率；需要即时结论请手动 dispatch。
+#
+# 另加 **push main** 触发（只读、~8s）：每次合并都会顺带体检一次，不依赖 cron 是否被投递/是否延迟。
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '0 5,11,17,23 * * *'   # 每 6 小时（UTC）：平台节流下多给几次投递机会
   workflow_dispatch:
