@@ -109,6 +109,8 @@ def verify_commitment(commitment: Any, bundle: dict[str, Any], claim_doc: dict[s
     ts_now = str(cc_result.get("ts_digest") or "")
     if str(commitment.get("ts_digest") or "") != ts_now:
         res["issues"].append("时点引用不匹配——两侧没有指向同一 token")
+    # 资源层（第 105 轮）：核对时顺带核两本账的形状——判据必须被生产路径调用才有用。
+    res["issues"].extend(resource_accounting_issues(commitment))
     res["ok"] = not res["issues"]
     return res
 

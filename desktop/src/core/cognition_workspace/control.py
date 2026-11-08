@@ -215,6 +215,8 @@ def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> 
         except ValueError as exc:
             res["issues"].append("第 " + str(item.get("seq")) + " 条无法重放：" + str(exc))
             return res
+        # 授权层（第 105 轮）：重放时逐条核「终态必须有授权」——判据要长在生产路径上。
+        res["issues"].extend(authority_issues(item, frozenset()))
         if out["record"]["effect"] != item.get("effect"):
             res["issues"].append("第 " + str(item.get("seq")) + " 条 effect 与记录不符")
             return res

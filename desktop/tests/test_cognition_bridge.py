@@ -290,6 +290,21 @@ class BridgeWireFormatTest(unittest.TestCase):
         self.assertTrue(br.resource_accounting_issues(
             {"cost": {"cog_steps": 3.5, "cc_cost_ms": 7}}))
 
+    def test_verify_commitment_catches_bad_cost(self):
+        """接线审计（第 105 轮）：篡改两本账后，verify_commitment 必须报出来。"""
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        cc = {"verdict": "ok", "subject": "s", "detail": "d"}
+        comm = br.commit(self._bundle(), claim, cc)
+        self.assertTrue(br.verify_commitment(comm, self._bundle(), claim, cc)["ok"])
+        bad = dict(comm)
+        bad["cost"] = {"cog_steps": 1, "cc_cost_ms": 2, "total": 3}
+        body = {k: v for k, v in bad.items() if k != "digest"}
+        bad["digest"] = br.digest_of(body)
+        res = br.verify_commitment(bad, self._bundle(), claim, cc)
+        self.assertFalse(res["ok"])
+        self.assertTrue(any("混记" in i for i in res["issues"]), res["issues"])
+
     def test_envelope_guard_can_be_killed(self):
         """变异测试：源码里出现第三类信封时，守卫必须抓到（不是只会说「两类」）。"""
         bad = 'SCHEMA = "nf-bridge-third/1"'

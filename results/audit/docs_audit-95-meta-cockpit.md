@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:879e5ff9d57a6c5bdcd47172e1d3f433fc00e9187c690a53a149abd209259931
+  - protocol/check12_weights.json:48562da9aec6f29d56305d135bd6d9ebc9e4d424d65d234bfa898c7d286193a8
   - protocol/coupling_baseline.json:e3f2b7ae1a2682e14125922dccdee5ff2ede5f2fea2f27de2263242d765608fe
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：判据接线：resource 核入 verify_commitment，authority 核入 replay
+
 > 重审（2026-11-09）：修重放回归：authority 必须随记录回放（含回归判据）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT
