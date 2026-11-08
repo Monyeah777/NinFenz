@@ -351,6 +351,18 @@ class TestSnapshotLocation(unittest.TestCase):
     def test_free_space_probe_does_not_raise(self):
         self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
 
+    def test_snapshot_space_issue(self):
+        """空间阈值判据（纯函数）：够 → 空串；不足 → 带 --snapshot-dir 指引；探针失败(-1) → 空串。
+
+        阈值 1200 MB 来自实测（2026-11-06：84 MB 剩余把一次 50 分钟门禁打成 ENOSPC）。
+        """
+        mb = 1024 * 1024
+        self.assertEqual("", self.gate.snapshot_space_issue(2 * 1200 * mb, 1200))
+        msg = self.gate.snapshot_space_issue(512 * mb, 1200)
+        self.assertIn("空间不足", msg)
+        self.assertIn("--snapshot-dir", msg)
+        self.assertEqual("", self.gate.snapshot_space_issue(-1, 1200))
+
 
 class TestBashIdentity(unittest.TestCase):
     """checks-only 之前先验 bash 身份：WSL 的 bash 会 rc=1 且**零输出**（被误读成判据红）。"""
