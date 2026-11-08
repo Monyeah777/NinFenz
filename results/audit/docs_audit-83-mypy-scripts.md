@@ -12,10 +12,12 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:de9d91eb9bfd08926dc7dc9b8ac4134b560996733efd71a478c8820b4f9a161b
+  - scripts/nf.py:adde545c33e959e35ae5ce16d2155a3f9705bc5e5143e279118a055264545b48
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:61c2ec731b8acf1bcb109794db8d0b029ee38997a1b7c053f4b33484bb163294
+  - protocol/code_metrics_baseline.json:655d24f98cc40527e49a8124ed94245ab7759288647925b39e1ffe7ad62c1c5c
 ---
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
+
 > 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子
 
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门

@@ -3,6 +3,7 @@
 判据依据：合规网关宁可拒绝，不可静默降级。所以每条闸都要有「该拒就拒」的反例，
 并且拒绝消息必须带修复指引（否则调用方无从修）。
 """
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -140,6 +141,40 @@ class ReceiptTest(unittest.TestCase):
         _call(rt, "spec_list")
         first, second = ing.receipts
         self.assertTrue(mf.same_call_evidence(first, second))
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class SelfcheckTest(unittest.TestCase):
+    """启动自检判据：探针必须真的打到四道闸（否则自检形同虚设）。"""
+
+    def setUp(self):
+        self.cases = json.loads(
+            (ROOT / "protocol" / "redteam" / "mcp_injection_cases.json").read_text(
+                encoding="utf-8"))
+
+    def test_bundled_policy_passes(self):
+        issues = mi.selfcheck(self.cases["policy"], self.cases["side_effects"])
+        self.assertEqual([], issues)
+
+    def test_loose_policy_has_nothing_to_check(self):
+        loose = {"schema": "nf-ingress-policy/1", "tokens": [], "allow": [], "deny": [],
+                 "max_calls_per_run": 0, "require_consent_for_effects": False,
+                 "max_args_bytes": 0}
+        self.assertEqual([], mi.selfcheck(loose, {}))
+
+    def test_selfcheck_is_not_vacuous(self):
+        """把闸门换成「永远放行」，自检必须报错——证明它真的在打闸门。"""
+        original = mi.Ingress.check_call
+        try:
+            mi.Ingress.check_call = lambda self, tool, args, params: None
+            issues = mi.selfcheck(self.cases["policy"], self.cases["side_effects"])
+        finally:
+            mi.Ingress.check_call = original
+        self.assertTrue(issues, "闸门被替换成放行后自检仍通过 = 判据空转")
+        self.assertTrue(any("未被拦截" in i for i in issues))
 
 
 if __name__ == "__main__":

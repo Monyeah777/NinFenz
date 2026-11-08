@@ -7,7 +7,7 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - scripts/nf.py:de9d91eb9bfd08926dc7dc9b8ac4134b560996733efd71a478c8820b4f9a161b
+  - scripts/nf.py:adde545c33e959e35ae5ce16d2155a3f9705bc5e5143e279118a055264545b48
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
@@ -19,6 +19,8 @@ subjects:
   - protocol/CONFORMANCE.md:006b56748b6daaf2419be40a65247d90efd6291e87ccd61c6527ed1526b6b4e4
 
 ---
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
+
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
 
 > 重审（2026-11-08）：--sheet 入确认闸（(cog, --sheet)）

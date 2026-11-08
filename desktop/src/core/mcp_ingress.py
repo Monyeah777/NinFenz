@@ -88,6 +88,63 @@ class Ingress:
         return mf.replay_receipts(self.receipts)
 
 
+SELFCHECK_TOOL = "nf_selfcheck_probe"
+
+
+def selfcheck(policy: dict[str, Any] | None = None,
+              side_effects: dict[str, str] | None = None) -> list[str]:
+    """启动自检：用合成探针验**这份策略**是否真的按声明拒绝 → 失败列表。
+
+    为什么（第 41 轮）：策略文件写对了不等于网关按它拦；启动前用探针把四道闸各打一次，
+    任一探针没被拦住就拒绝启动（fail-closed），比「上线后才发现」便宜得多。
+    """
+    issues: list[str] = []
+    base = dict(policy or {})
+    effects = dict(side_effects or {})
+    effects.setdefault(SELFCHECK_TOOL, "filesystem")  # 探针按「有副作用」扱，才能验同意闸
+
+    def fresh(extra: dict[str, Any] | None = None) -> Ingress:
+        pol = dict(base)
+        allow = list(pol.get("allow") or [])
+        if allow:
+            pol["allow"] = allow + [SELFCHECK_TOOL]
+        if extra:
+            pol.update(extra)
+        return Ingress(pol, side_effects=effects)
+
+    def expect_deny(label: str, gate: Ingress, params: Any, args: Any) -> None:
+        try:
+            gate.check_call(SELFCHECK_TOOL, args, params)
+        except IngressDenied as exc:
+            if "修复指引" not in str(exc):
+                issues.append(label + " 的拒绝消息缺修复指引")
+            return
+        issues.append(label + " 未被拦截（策略声明与执行不一致）")
+
+    tokens = list(base.get("tokens") or [])
+    if tokens:
+        expect_deny("token 闸", fresh(), {"_meta": {}}, {})
+        expect_deny("token 闸（伪造）", fresh(), {"_meta": {AUTH_META_KEY: "forged"}}, {})
+    if base.get("require_consent_for_effects"):
+        meta = {AUTH_META_KEY: tokens[0]} if tokens else {}
+        expect_deny("同意闸", fresh(), {"_meta": dict(meta)}, {})
+    max_bytes = int(base.get("max_args_bytes") or 0)
+    if max_bytes > 0:
+        meta = {AUTH_META_KEY: tokens[0], CONSENT_KEY: True} if tokens else {CONSENT_KEY: True}
+        expect_deny("字节上限闸", fresh(), {"_meta": dict(meta)}, {"blob": "x" * (max_bytes + 64)})
+    deny = list(base.get("deny") or [])
+    if deny:
+        gate = fresh()
+        gate.side_effects[deny[0]] = "filesystem"
+        try:
+            gate.check_call(deny[0], {}, {"_meta": {}})
+        except IngressDenied as exc:
+            if "修复指引" not in str(exc):
+                issues.append("deny 闸的拒绝消息缺修复指引")
+        else:
+            issues.append("deny 闸未拦截已下架工具 " + str(deny[0]))
+    return issues
+
 def normalize(policy: Any) -> dict[str, Any]:
     """策略规范化（宽松缺省 + 显式字段），非法值直接拒。"""
     if not isinstance(policy, dict):

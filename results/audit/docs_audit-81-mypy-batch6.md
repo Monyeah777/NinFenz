@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:61c2ec731b8acf1bcb109794db8d0b029ee38997a1b7c053f4b33484bb163294
+  - protocol/code_metrics_baseline.json:655d24f98cc40527e49a8124ed94245ab7759288647925b39e1ffe7ad62c1c5c
 ---
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
+
 > 重审（2026-11-08）：锁拒绝的集成判据（退出码 2 + 指引）+ 锁目录 env 钩子
 
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门

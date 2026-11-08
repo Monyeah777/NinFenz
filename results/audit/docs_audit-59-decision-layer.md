@@ -14,11 +14,13 @@ subjects:
   - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
   - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:de9d91eb9bfd08926dc7dc9b8ac4134b560996733efd71a478c8820b4f9a161b
+  - scripts/nf.py:adde545c33e959e35ae5ce16d2155a3f9705bc5e5143e279118a055264545b48
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cefef53f4a418ccbd7cc1f96a31850454685bcc4d959cabddceea94e1a9c30de
 
 ---
+> 重审（2026-11-08）：Ingress 启动自检（四道闸探针，非空转判据）
+
 > 重审（2026-11-08）：快照锁：json_doc/atomic_write/sink 登记/文档计数/编码闸门
 
 > 重审（2026-11-08）：claim-check 直吃作业单（免手抄 evidence）

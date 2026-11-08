@@ -203,7 +203,7 @@
     "test_lsp_transcript": 0.7,
     "test_market_analyzer": 0.6,
     "test_mcp_adapter": 0.2,
-    "test_mcp_ingress": 1.1,
+    "test_mcp_ingress": 1.7,
     "test_mcp_live_e2e": 2.6,
     "test_mcp_manifest": 0.4,
     "test_mcp_packaging": 0.3,
@@ -2617,8 +2617,11 @@
     "test_mcp_ingress.PolicyTest.test_valid_policy": 0.0,
     "test_mcp_ingress.RateLimitTest.test_limit_is_enforced": 0.0,
     "test_mcp_ingress.ReceiptTest.test_denied_call_leaves_no_receipt": 0.0,
-    "test_mcp_ingress.ReceiptTest.test_each_allowed_call_leaves_a_receipt": 0.97,
+    "test_mcp_ingress.ReceiptTest.test_each_allowed_call_leaves_a_receipt": 1.43,
     "test_mcp_ingress.ReceiptTest.test_receipt_same_across_two_identical_calls": 0.0,
+    "test_mcp_ingress.SelfcheckTest.test_bundled_policy_passes": 0.0,
+    "test_mcp_ingress.SelfcheckTest.test_loose_policy_has_nothing_to_check": 0.0,
+    "test_mcp_ingress.SelfcheckTest.test_selfcheck_is_not_vacuous": 0.0,
     "test_mcp_live_e2e.McpLiveFaceTest.test_adversarial_frames_refused_without_leak_and_session_survives": 0.65,
     "test_mcp_live_e2e.McpLiveFaceTest.test_arguments_must_be_an_object_not_a_list": 0.17,
     "test_mcp_live_e2e.McpLiveFaceTest.test_authorised_read_call_returns_repo_content": 0.65,
@@ -4436,5 +4439,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1546.7
+  "total_s": 1547.3
 }

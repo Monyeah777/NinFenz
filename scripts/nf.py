@@ -2817,6 +2817,11 @@ def _ingress_from(args):
         raise SystemExit("Ingress 策略不合法：" + "；".join(issues[:3])
                          + "（修复指引：按 nf-ingress-policy/1 修策略后重试）")
     side_effects = {str(k): str(v) for k, v in (doc.get("side_effects") or {}).items()}
+    probe = _ing.selfcheck(doc, side_effects)
+    if probe:
+        raise SystemExit("Ingress 启动自检未过：" + "；".join(probe[:3])
+                         + "（修复指引：策略声明与实际拦截不一致，修好再启动）")
+    side_effects = {str(k): str(v) for k, v in (doc.get("side_effects") or {}).items()}
     return _ing.Ingress(doc, side_effects=side_effects)
 
 
