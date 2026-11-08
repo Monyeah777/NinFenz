@@ -61,11 +61,16 @@ jobs:
               prev = latest.get(key)
               if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
                   latest[key] = r
+          pending = [r for r in latest.values() if r.get("status") != "completed"]
           bad = sorted((r for r in latest.values()
-                        if r.get("conclusion") in ("failure", "timed_out")),
+                        if r.get("status") == "completed"
+                        and r.get("conclusion") in ("failure", "timed_out")),
                        key=lambda r: r.get("name") or "")
+          if pending:
+              print("（schedule 面：%d 个 workflow 的最新运行仍在进行，跳过待其完成）" % len(pending))
           if not bad:
-              print("schedule 面：%d 个 workflow 的最新运行均非失败" % len(latest))
+              print("schedule 面：%d 个 workflow 的最新运行均非失败（其中 %d 个在跑，未计）"
+                    % (len(latest), len(pending)))
               raise SystemExit(0)
           print("::error::schedule workflow 的最新运行失败（当前该定时面是坏的）：")
           for r in bad:
