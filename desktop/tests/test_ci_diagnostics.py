@@ -149,6 +149,9 @@ class CiHealthAuditSourceTest(unittest.TestCase):
         self.assertIn('pending = [r for r in latest.values() if r.get("status") != "completed"]',
                       self.text, "ci-health 审计未把 in-flight 运行记为 pending")
         self.assertIn("if pending:", self.text, "ci-health 审计缺少 pending 提示分支")
+        # schedule 步也要 pending 跳过（2026-11-09 #243；此前只修了 main 步）
+        self.assertIn("schedule 面：%d 个 workflow 的最新运行仍在进行", self.text,
+                      "ci-health schedule 步未跳过 in-flight 运行")
 
 
 if __name__ == "__main__":
