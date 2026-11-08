@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:fa161610196a9d846f1245502e7fc6c5d32fdeeae6adbf348d57e0af0c3873e0
+  - protocol/code_metrics_baseline.json:5cdbb5dd8543fe7421aa5fa50ce830b8417a2475aaac52744f5a7a7e8aa50094
 ---
+> 重审（2026-11-08）：payload 未暂存 warn
+
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查
 
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据

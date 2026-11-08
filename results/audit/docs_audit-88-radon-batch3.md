@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
-  - protocol/code_metrics_baseline.json:fa161610196a9d846f1245502e7fc6c5d32fdeeae6adbf348d57e0af0c3873e0
+  - protocol/code_metrics_baseline.json:5cdbb5dd8543fe7421aa5fa50ce830b8417a2475aaac52744f5a7a7e8aa50094
 ---
+> 重审（2026-11-08）：payload 未暂存 warn
+
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查
 
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据

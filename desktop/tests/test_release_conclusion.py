@@ -351,6 +351,11 @@ class TestSnapshotLocation(unittest.TestCase):
     def test_free_space_probe_does_not_raise(self):
         self.assertGreater(self.gate._snapshot_free_bytes(ROOT), 0)
 
+    def test_payload_skip_hint(self):
+        """payload 未暂存 → 明确 warn（打包自检会静默 skip）；已暂存 → 空串。"""
+        self.assertIn("npm payload 未暂存", self.gate.payload_skip_hint(None))
+        self.assertEqual("", self.gate.payload_skip_hint({"count": 3030}))
+
     def test_snapshot_space_issue(self):
         """空间阈值判据（纯函数）：够 → 空串；不足 → 带 --snapshot-dir 指引；探针失败(-1) → 空串。
 
