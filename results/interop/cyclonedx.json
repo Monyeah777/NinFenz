@@ -73,7 +73,7 @@
         "value": "与 SPDX 面同源；timestamp 取仓内声明日期最大值（非墙钟）。"
       }
     ],
-    "timestamp": "2026-11-08T00:00:00Z",
+    "timestamp": "2026-11-09T00:00:00Z",
     "tools": [
       {
         "name": "nf interop --kind cyclonedx",
@@ -82,7 +82,7 @@
       }
     ]
   },
-  "serialNumber": "urn:uuid:796bee33-d6fb-913f-4c77-3b10ca04cb29",
+  "serialNumber": "urn:uuid:37fda67e-d276-c71d-0d4e-4f68652ea70d",
   "specVersion": "1.5",
   "version": 1
 }
