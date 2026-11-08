@@ -1,0 +1,52 @@
+name: dotnet-build
+# .NET 引擎线（Nf.Engine + 两个 CLI）的**编译回归面**。
+#
+# 为什么要有它（2026-11-08 盲区收口）：net-engine.yml 已随「删旧按新」退役、net-probes 又改
+# 手动且被金标快照 ref 阻塞（task-34），engine/dotnet 的**编译面**目前没有常驻 CI——源码可能
+# 静默腐烂（编译错 / 依赖漂移）。本 workflow 只构建、不跑探针（不需要金标快照），成本低可常驻；
+# 判据跑批仍走 net-probes（手动，需金标 ref）。
+#
+# 铁律（沿用 RUNBOOK）：**树外构建**——复制到 $RUNNER_TEMP 再 build，树内 bin/obj 会让
+# text-hygiene 类判据假红（实测 BOM/CRLF 全来自构建产物）。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-build:
+    name: dotnet-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 工具链就绪（.NET 8；只用 runner 预装，不引 setup-dotnet）
+        run: |
+          dotnet --list-sdks
+          dotnet --version
+          dotnet --list-sdks | grep -q '^8\.' || { echo "::error::缺 .NET 8 SDK"; exit 1; }
+      - name: 树外构建引擎 + 两个 CLI（BCL-only，无需 NuGet 源）
+        run: |
+          set -euo pipefail
+          build="$RUNNER_TEMP/nf-engine"
+          cp -R engine/dotnet "$build"
+          dotnet build "$build/src/Nf.Engine/Nf.Engine.csproj" -c Release --nologo 2>&1 | tee dotnet-build.log
+          dotnet build "$build/tools/nf-dotnet/nf-dotnet.csproj" -c Release --nologo 2>&1 | tee -a dotnet-build.log
+          dotnet build "$build/tools/nfparity/nfparity.csproj" -c Release --nologo 2>&1 | tee -a dotnet-build.log
+      - name: 失败诊断产物（构建日志；无则跳过）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: dotnet-build-log
+          path: dotnet-build.log
+          if-no-files-found: warn
