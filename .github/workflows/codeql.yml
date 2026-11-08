@@ -10,6 +10,14 @@ on:
   push:
     branches: [main]
   pull_request:
+    # 只在被扫代码真的变了才跑：dependabot 的 workflow/action 升级 PR 不触发（否则每个依赖
+    # PR 都烧 2–3 分钟两个分析；实测 2026-11-09 合并后 dependabot PR 队列里同时排了 4+ 个）。
+    paths:
+      - 'desktop/**'
+      - 'scripts/**'
+      - 'tui/**'
+      - 'site/**'
+      - '.github/scripts/**'
   schedule:
     - cron: '17 4 * * 2'      # 每周二 04:17 UTC（与其它 schedule 错开）
   workflow_dispatch:
