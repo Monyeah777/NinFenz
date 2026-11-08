@@ -11,16 +11,19 @@ import unittest
 
 #: 层 → (所属模块, 测试名, 覆盖形式)
 COVERED = {
-    "时相": ("desktop.tests.test_cognition_bridge", "test_commitment_binds_timestamp_reference",
+    "时相": ("desktop.tests.test_cognition_bridge",
+             "test_commitment_binds_timestamp_reference",
              "commitment.ts_digest：两侧须指向同一 token"),
     "身份": ("desktop.tests.test_cognition_bridge", "test_verify_detects_state_change",
              "cog_digest ↔ state.digest：discourse 变了即红"),
-    "观测": ("desktop.tests.test_cognition_bridge", "test_observation_layer_correspondence",
+    "观测": ("desktop.tests.test_cognition_bridge",
+             "test_observation_layer_correspondence",
              "回灌记录与契约失败集逐项对应 + witness_digest 可复算"),
     "语义": ("desktop.tests.test_method_pack",
              "test_claim_kinds_come_from_single_vocabulary",
              "claim_kind 单一词表（包 ⇄ registry 同源，死词也红）"),
-    "负空间": ("desktop.tests.test_cognition_control", "test_abstain_requires_search_boundary",
+    "负空间": ("desktop.tests.test_cognition_control",
+               "test_abstain_requires_search_boundary",
                "abstain 必带 searched 检索边界"),
 }
 
@@ -45,13 +48,15 @@ class IsomorphismMatrixTest(unittest.TestCase):
                 if isinstance(obj, type) and hasattr(obj, test_name):
                     holder = name
                     break
-            self.assertIsNotNone(holder,
-                                 layer + " 声称已覆盖，但 " + module_name + " 里找不到 " + test_name)
+            self.assertIsNotNone(
+                holder,
+                layer + " 声称已覆盖，但 " + module_name + " 里找不到 " + test_name)
 
     def test_missing_layers_carry_a_reason(self):
         for layer, why in MISSING.items():
             self.assertTrue(why.strip(), layer + " 缺判据但没写原因")
-        self.assertEqual(9, len(COVERED) + len(MISSING), "九层必须恰好九项（多一层少一层都要改本判据）")
+        self.assertEqual(9, len(COVERED) + len(MISSING),
+                         "九层必须恰好九项（多一层少一层都要改本判据）")
         self.assertEqual(5, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵")
 
     def test_matrix_does_not_claim_overlap(self):
