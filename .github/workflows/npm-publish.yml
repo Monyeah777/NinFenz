@@ -9,9 +9,9 @@ concurrency:
   group: npm-publish-${{ github.ref }}
   cancel-in-progress: false
 
+# 权限最小化（Scorecard TokenPermissionsID）：顶层只读，id-token 只给发布 job。
 permissions:
   contents: read
-  id-token: write          # provenance / trusted publishing 必需
 jobs:
   publish:
     name: npm-publish-provenance
@@ -47,7 +47,9 @@ jobs:
           # npm trusted publishing（OIDC，免令牌）要求 npm >= 11.5.1；runner 自带的 10.x 不够。
           # 2026-10-08 实证：带发布权的 bypass-2FA 令牌正在被 npm 弃用（2027-01 取消），令牌路线不可持续，
           # 故本作业改为纯 OIDC 发布；NPM_TOKEN secret 一旦删除即自动走 OIDC 分支。
-          npm install -g npm@latest
+          # 2026-11-09（Scorecard PinnedDependenciesID）：不再装 @latest——版本随 runner 漂。
+          # 12.2.2 = 当前 latest（≥11.5.1 的 trusted publishing 要求）；升级需显式改这行。
+          npm install -g npm@12.2.2
           npm --version
       - name: payload 暂存 + 发布前自检 + 冒烟
         working-directory: packaging/npm
