@@ -51,6 +51,7 @@
 | SAST（SQL 拼接/弱随机/XXE/命令注入等） | `sast.yml` → `scripts/sast_check.py` | (工具,文件,规则) 计数棘轮：新增/上升即红 |
 | 供应链评分 | `scorecard.yml` | OpenSSF Scorecard（结果可见） |
 | 执行目标仓库代码的信任门（H1） | `desktop/src/core/repo_trust.py` + `nf verify --trust-repo` | `tests/test_repo_trust.py`：外来仓库默认拒绝执行、无副作用 |
+| SLSA Source 技术控制 | `results/supply-chain/github-source-controls.json` + `docs/source-control-policy.md` | `scripts/slsa_source_readiness.py`；Source Level 保持 0，不把 Build provenance 冒充 Source provenance |
 
 ## 六、执行目标仓库代码的信任边界（H1，2026-10-22 审计）
 

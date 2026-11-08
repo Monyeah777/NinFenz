@@ -162,7 +162,7 @@ jobs:
           if-no-files-found: warn
   gate:
     name: gate
-    needs: [static-checks, unit-tests]
+    needs: [static-checks, unit-tests, source-controls]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -200,3 +200,15 @@ jobs:
           name: verification-report
           path: .artifacts/verification-report.json
           if-no-files-found: warn
+  source-controls:
+    name: slsa-source-controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+      - name: 验证 SLSA Source 技术控制快照与诚实等级声明
+        run: python3 scripts/slsa_source_readiness.py
