@@ -6,7 +6,7 @@
     "prod": 1056,
     "projection": 158,
     "support": 433,
-    "verify": 1026
+    "verify": 1027
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7313,6 +7313,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "九双生层同构判据矩阵（单源）。covered 每条必须有判定测试 + 变异测试（都能被反射查证）；missing 必须点名缺的对象。",
+      "path": "desktop/tests/fixtures/isomorphism_matrix.json",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "客户端帧序列 → 服务端应答（端到端金标；根路径折成 nf-repo-root，today 固定）",
       "path": "desktop/tests/fixtures/lsp/session.json",
       "role": "verify",
@@ -12534,7 +12540,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "3f16967eacbe593b53c68e8ee7483b9d72077917bccf367167c371755a2b731a",
+  "root_digest": "978d0a9caa25bb8ec07eed5228de422ee383820768039c618fabe0a36df58051",
   "rule_counts": {
     "R-app": 1460,
     "R-catch": 286,
@@ -12543,7 +12549,7 @@
     "R-prod": 944,
     "R-projection": 138,
     "R-support": 119,
-    "R-verify": 901,
+    "R-verify": 902,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"

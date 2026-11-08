@@ -1,0 +1,68 @@
+{
+  "schema": "nf-isomorphism-matrix/1",
+  "note": "九双生层同构判据矩阵（单源）。covered 每条必须有判定测试 + 变异测试（都能被反射查证）；missing 必须点名缺的对象。",
+  "covered": [
+    {
+      "layer": "时相",
+      "module": "desktop.tests.test_cognition_bridge",
+      "test": "test_commitment_binds_timestamp_reference",
+      "how": "commitment.ts_digest：两侧须指向同一 token",
+      "kill_module": "desktop.tests.test_cognition_bridge",
+      "kill_test": "test_commitment_binds_timestamp_reference"
+    },
+    {
+      "layer": "身份",
+      "module": "desktop.tests.test_cognition_bridge",
+      "test": "test_verify_detects_state_change",
+      "how": "cog_digest ↔ state.digest：discourse 变了即红",
+      "kill_module": "desktop.tests.test_cognition_bridge",
+      "kill_test": "test_verify_detects_state_change"
+    },
+    {
+      "layer": "观测",
+      "module": "desktop.tests.test_cognition_bridge",
+      "test": "test_observation_layer_correspondence",
+      "how": "回灌记录与契约失败集逐项对应 + witness_digest 可复算",
+      "kill_module": "desktop.tests.test_cognition_bridge",
+      "kill_test": "test_observation_correspondence_can_be_killed"
+    },
+    {
+      "layer": "语义",
+      "module": "desktop.tests.test_method_pack",
+      "test": "test_claim_kinds_come_from_single_vocabulary",
+      "how": "claim_kind 单一词表（包 ⇄ registry 同源，死词也红）",
+      "kill_module": "desktop.tests.test_method_pack",
+      "kill_test": "test_vocabulary_check_can_be_killed"
+    },
+    {
+      "layer": "负空间",
+      "module": "desktop.tests.test_cognition_control",
+      "test": "test_abstain_requires_search_boundary",
+      "how": "abstain 必带 searched 检索边界",
+      "kill_module": "desktop.tests.test_cognition_control",
+      "kill_test": "test_abstain_requires_search_boundary"
+    },
+    {
+      "layer": "授权",
+      "module": "desktop.tests.test_cognition_control",
+      "test": "test_terminal_ops_require_authority",
+      "how": "终态算子必带 authority，且授权方在允许词表内",
+      "kill_module": "desktop.tests.test_cognition_control",
+      "kill_test": "test_authority_check_can_be_killed"
+    }
+  ],
+  "missing": [
+    {
+      "layer": "对抗",
+      "why": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）"
+    },
+    {
+      "layer": "资源",
+      "why": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账"
+    },
+    {
+      "layer": "自省",
+      "why": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）"
+    }
+  ]
+}

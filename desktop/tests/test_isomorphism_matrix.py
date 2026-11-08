@@ -1,58 +1,32 @@
 """九双生层同构判据**矩阵**：只允许「有测试点名」的层被算作已覆盖。
 
-为什么（第 56 轮）：设计稿可以说「九条同构判据」，但仓库里必须有五条能指到具体测试方法。
-本件把矩阵写成数据，并 **AST/反射校验** 每个「covered」条目的测试方法真实存在——
-测试改名/删除就红，防止「覆盖状态」靠记忆维护。
+为什么（第 56 轮）：设计稿可以说「九条同构判据」，但仓库里必须有能指到具体测试方法的条目。
+本件把矩阵写成**数据**（`fixtures/isomorphism_matrix.json`，第 90 轮从测试常量搬出），
+并做**反射查证**——测试改名/删除就红，防止「覆盖状态」靠记忆维护。
 
-矩阵现状（2026-11-08）：5 covered / 4 missing；missing 必须写明为什么现在写不出判据。
+矩阵现状（2026-11-09）：**6 covered / 3 missing**；missing 必须写明缺的是哪个对象。
 """
 import importlib
+import json
 import unittest
+from pathlib import Path
+
+FIXTURE = Path(__file__).resolve().parent / "fixtures" / "isomorphism_matrix.json"
+
+#: 单源：矩阵数据在 fixtures 里（文档可直读，不必导入测试）
+MATRIX = json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 #: 层 → (所属模块, 测试名, 覆盖形式)
-COVERED = {
-    "时相": ("desktop.tests.test_cognition_bridge",
-             "test_commitment_binds_timestamp_reference",
-             "commitment.ts_digest：两侧须指向同一 token"),
-    "身份": ("desktop.tests.test_cognition_bridge", "test_verify_detects_state_change",
-             "cog_digest ↔ state.digest：discourse 变了即红"),
-    "观测": ("desktop.tests.test_cognition_bridge",
-             "test_observation_layer_correspondence",
-             "回灌记录与契约失败集逐项对应 + witness_digest 可复算"),
-    "语义": ("desktop.tests.test_method_pack",
-             "test_claim_kinds_come_from_single_vocabulary",
-             "claim_kind 单一词表（包 ⇄ registry 同源，死词也红）"),
-    "负空间": ("desktop.tests.test_cognition_control",
-               "test_abstain_requires_search_boundary",
-               "abstain 必带 searched 检索边界"),
-    "授权": ("desktop.tests.test_cognition_control",
-             "test_terminal_ops_require_authority",
-             "终态算子必带 authority，且授权方在允许词表内"),
-}
+COVERED = {row["layer"]: (row["module"], row["test"], row["how"])
+           for row in MATRIX["covered"]}
 
 #: 层 → 为什么现在写不出可红判据（缺的是对象，不是文案）
-MISSING = {
-    "对抗": "`counterexample` move 有语义校验，但缺 `witness_ref` 引用对象（反例无法被 cc 复算）",
-    "资源": "认知侧 `discourse.budget` 账实相符已守，验证侧只有 `perf_budget` 阈值、无逐次记账",
-    "自省": "ADR 有 `falsifier` 但也无 `version_chain`（旧版验新版缺对象）",
-}
-
-
+MISSING = {row["layer"]: row["why"] for row in MATRIX["missing"]}
 
 #: 层 → (模块, 变异测试名)：证明该层判据**能被故意改坏打死**（不是只在好数据上为空）
-KILL_TESTS = {
-    "时相": ("desktop.tests.test_cognition_bridge",
-             "test_commitment_binds_timestamp_reference"),
-    "身份": ("desktop.tests.test_cognition_bridge", "test_verify_detects_state_change"),
-    "观测": ("desktop.tests.test_cognition_bridge",
-             "test_observation_correspondence_can_be_killed"),
-    "语义": ("desktop.tests.test_method_pack",
-             "test_vocabulary_check_can_be_killed"),
-    "负空间": ("desktop.tests.test_cognition_control",
-               "test_abstain_requires_search_boundary"),
-    "授权": ("desktop.tests.test_cognition_control",
-             "test_authority_check_can_be_killed"),
-}
+KILL_TESTS = {row["layer"]: (row["kill_module"], row["kill_test"])
+              for row in MATRIX["covered"]}
+
 
 def _import_test_module(module_name: str):
     """按「包路径」或「裸模块名」导入测试模块（两种跑法都要能工作）。
@@ -65,7 +39,6 @@ def _import_test_module(module_name: str):
         return importlib.import_module(module_name)
     except ModuleNotFoundError:
         import sys
-        from pathlib import Path
 
         here = str(Path(__file__).resolve().parent)
         if here not in sys.path:
@@ -82,6 +55,13 @@ def _has_test(module_name: str, test_name: str) -> bool:
 
 
 class IsomorphismMatrixTest(unittest.TestCase):
+    def test_fixture_schema_and_shape(self):
+        self.assertEqual("nf-isomorphism-matrix/1", MATRIX["schema"])
+        self.assertTrue(MATRIX["covered"], "covered 为空——矩阵已失效")
+        for row in MATRIX["covered"]:
+            for key in ("layer", "module", "test", "how", "kill_module", "kill_test"):
+                self.assertTrue(str(row.get(key) or "").strip(), f"covered 缺 {key}：{row}")
+
     def test_every_covered_layer_points_at_a_real_test(self):
         for layer, (module_name, test_name, _how) in COVERED.items():
             self.assertTrue(_has_test(module_name, test_name),
@@ -104,11 +84,7 @@ class IsomorphismMatrixTest(unittest.TestCase):
                                    "test_this_method_does_not_exist_xyz"))
 
     def test_both_import_styles_work_for_referenced_modules(self):
-        """两种跑法都要能导入：包路径 + 裸模块名（分片跑测试时是裸名）。
-
-        依据（第 86 轮快照实测）：判据曾因只支持包路径导入而在分片里 **ERROR**（不是 FAIL）。
-        这条把「两种导入风格均可用」变成判据，覆盖 COVERED / KILL_TESTS 引用的全部模块。
-        """
+        """两种跑法都要能导入：包路径 + 裸模块名（分片跑测试时是裸名）。"""
         referenced = sorted({m for m, _t, _h in COVERED.values()}
                             | {m for m, _t in KILL_TESTS.values()})
         for module in referenced:
@@ -121,7 +97,7 @@ class IsomorphismMatrixTest(unittest.TestCase):
             self.assertTrue(why.strip(), layer + " 缺判据但没写原因")
         self.assertEqual(9, len(COVERED) + len(MISSING),
                          "九层必须恰好九项（多一层少一层都要改本判据）")
-        self.assertEqual(6, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵（第 88 轮起为 6）")
+        self.assertEqual(6, len(COVERED), "覆盖数与矩阵数据不符，需显式更新（第 88 轮起为 6）")
 
     def test_missing_reasons_name_a_concrete_object(self):
         """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""
