@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:512a62f3ad8875c8be5f6e6b4e66976dcc807c0ffbc4c82d379b3b813620d54a
+  - protocol/code_metrics_baseline.json:fa161610196a9d846f1245502e7fc6c5d32fdeeae6adbf348d57e0af0c3873e0
 ---
+> 重审（2026-11-08）：活树模式 ENOSPC 前置检查
+
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据
 
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
