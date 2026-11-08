@@ -206,5 +206,39 @@ class CliTest(unittest.TestCase):
             self.assertTrue(json.loads(verify.stdout)["ok"])
 
 
+class BridgeWireFormatTest(unittest.TestCase):
+    """桥的线格式守卫：**窄通道**是设计不是巧合，字段一旦膨胀就会偷偷耦合。
+
+    依据（双核架构纪律）：桥的唯一共享对象是 commitment；消息面只有
+    commitment / obligation 两种信封。本判据把两类信封的**字段集**钉死：
+    新增字段必须同时改本判据（逼一次显式评审），而不是悄悄加。
+    """
+
+    COMMIT_FIELDS = {"schema", "bridge_version", "cog_digest", "claim_digest",
+                     "cc_digest", "cc_verdict", "roles", "prev", "digest"}
+    OBLIGATION_FIELDS = {"schema", "commitment_digest", "cc_verdict", "failed",
+                         "unknown", "next_actions", "digest"}
+
+    def _bundle(self):
+        # 用会话 API 建合法 bundle（discourse schema 由它保证）
+        return se.begin("线格式守卫")
+
+    def test_commitment_field_set_is_frozen(self):
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        cc = {"verdict": "ok", "subject": "s", "detail": "d"}
+        comm = br.commit(self._bundle(), claim, cc)
+        self.assertEqual(self.COMMIT_FIELDS, set(comm),
+                         "commitment 字段集变了：加字段请同步本判据并说明为什么需要跨核")
+
+    def test_obligation_field_set_is_frozen(self):
+        claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
+                 "obligations": [], "criteria": []}
+        cc = {"verdict": "invalid", "subject": "s", "detail": "d"}
+        comm = br.commit(self._bundle(), claim, cc)
+        ob = br.obligation(comm, cc, failed=["BER 超标"])
+        self.assertEqual(self.OBLIGATION_FIELDS, set(ob),
+                         "obligation 字段集变了：桥的通道越窄越好，加字段要显式评审")
+
 if __name__ == "__main__":
     unittest.main()

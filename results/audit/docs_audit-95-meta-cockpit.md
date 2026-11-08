@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:8a175983abdfa40f1bf0dd59dc55bd12f4db6e330c0ef64db3c789c48435e82b
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c9071f6e620b39a52194865f61fbad68571be40493a775906957de1083014db3
+  - protocol/check12_weights.json:63b39a9bcd206ba15d468519a5e77e53882a63455ad1124859dbaa3f01fc323c
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：桥线格式守卫（commitment/obligation 字段集钉死）
+
 > 重审（2026-11-08）：证据图探针（陈述⇄证据二部图，H=悬挂比）
 
 > 重审（2026-11-08）：第六个域 data-provenance（数据溯源：说明书/字段溯源/缺失语义/许可/版本钉定/泄漏）
