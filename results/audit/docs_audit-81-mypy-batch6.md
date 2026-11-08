@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:df67a20d387df8127fffab6f8b7da71b0932f404d88c071ac484a5c13a12124f
+  - protocol/code_metrics_baseline.json:ec49be3d72d9efb59b07f66195d5f1ce5f1824c0b74cc5cf6684a9681e81d49f
 ---
+> 重审（2026-11-09）：变异探针扩到五判据（15 变异体 / 11 合法变体）
+
 > 重审（2026-11-09）：变异探针扩到三判据（9 变异体 / 7 合法变体，杀死率 1.0 误报 0.0）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
-  - protocol/code_metrics_baseline.json:df67a20d387df8127fffab6f8b7da71b0932f404d88c071ac484a5c13a12124f
+  - protocol/code_metrics_baseline.json:ec49be3d72d9efb59b07f66195d5f1ce5f1824c0b74cc5cf6684a9681e81d49f
 ---
+> 重审（2026-11-09）：变异探针扩到五判据（15 变异体 / 11 合法变体）
+
 > 重审（2026-11-09）：变异探针扩到三判据（9 变异体 / 7 合法变体，杀死率 1.0 误报 0.0）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT

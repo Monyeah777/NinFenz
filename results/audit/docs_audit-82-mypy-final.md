@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:df67a20d387df8127fffab6f8b7da71b0932f404d88c071ac484a5c13a12124f
+  - protocol/code_metrics_baseline.json:ec49be3d72d9efb59b07f66195d5f1ce5f1824c0b74cc5cf6684a9681e81d49f
 ---
+> 重审（2026-11-09）：变异探针扩到五判据（15 变异体 / 11 合法变体）
+
 > 重审（2026-11-09）：变异探针扩到三判据（9 变异体 / 7 合法变体，杀死率 1.0 误报 0.0）
 
 > 重审（2026-11-09）：证人核对接入生产路径：session.step(root=) + CLI 传 ROOT

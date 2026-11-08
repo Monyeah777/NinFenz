@@ -102,6 +102,38 @@ def witness_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     return legal, broken
 
 
+def authority_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """→ (合法变体, 破坏变体)；标的 = `control.authority_issues`（授权层）。"""
+    _mp, _br = _core()
+
+    allowed = {"tester"}
+    legal = [{"name": "终态带授权", "record": {"op": "stop", "authority": "tester"},
+              "allowed": allowed},
+             {"name": "非终态无授权", "record": {"op": "observe", "authority": ""},
+              "allowed": allowed}]
+    broken = [{"name": "终态缺授权", "record": {"op": "stop", "authority": ""},
+               "allowed": allowed},
+              {"name": "授权方不在词表", "record": {"op": "stop", "authority": "ghost"},
+               "allowed": allowed},
+              {"name": "记录不是对象", "record": "stop", "allowed": allowed}]
+    return legal, broken
+
+
+def resource_cases() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """→ (合法变体, 破坏变体)；标的 = `bridge.resource_accounting_issues`（资源层）。"""
+    _mp, br = _core()
+
+    legal = [{"name": "两本账齐全", "commitment": {"cost": {"cog_steps": 3, "cc_cost_ms": 7}}},
+             {"name": "缺值为 None", "commitment": {"cost": {"cog_steps": None,
+                                                    "cc_cost_ms": None}}}]
+    broken = [{"name": "缺 cost", "commitment": {}},
+              {"name": "混记 total",
+               "commitment": {"cost": {"cog_steps": 1, "cc_cost_ms": 2, "total": 3}}},
+              {"name": "负数", "commitment": {"cost": {"cog_steps": -1,
+                                               "cc_cost_ms": 7}}}]
+    return legal, broken
+
+
 def build() -> dict[str, Any]:
     mp, br = _core()
     judges = []
@@ -130,6 +162,23 @@ def build() -> dict[str, Any]:
     judges.append({"judge": "_witness_shape_issues",
                    "legal": len(wlegal), "legal_flagged": wl_hits,
                    "broken": len(wbroken), "broken_caught": wb_hits})
+    from core.cognition_workspace import control as ct
+    alegal, abroken = authority_cases()
+    al_hits = [c["name"] for c in alegal
+               if ct.authority_issues(c["record"], c["allowed"])]
+    ab_hits = [c["name"] for c in abroken
+               if ct.authority_issues(c["record"], c["allowed"])]
+    judges.append({"judge": "authority_issues",
+                   "legal": len(alegal), "legal_flagged": al_hits,
+                   "broken": len(abroken), "broken_caught": ab_hits})
+    rlegal, rbroken = resource_cases()
+    rl_hits = [c["name"] for c in rlegal
+               if br.resource_accounting_issues(c["commitment"])]
+    rb_hits = [c["name"] for c in rbroken
+               if br.resource_accounting_issues(c["commitment"])]
+    judges.append({"judge": "resource_accounting_issues",
+                   "legal": len(rlegal), "legal_flagged": rl_hits,
+                   "broken": len(rbroken), "broken_caught": rb_hits})
     legal_total = sum(j["legal"] for j in judges)
     broken_total = sum(j["broken"] for j in judges)
     legal_bad = sum(len(j["legal_flagged"]) for j in judges)

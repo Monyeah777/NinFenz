@@ -1626,9 +1626,9 @@
       "max_fn_lines": 42
     },
     "scripts/judge_mutation_probe.py": {
-      "lines": 198,
+      "lines": 247,
       "max_fn_cc": 8,
-      "max_fn_lines": 43
+      "max_fn_lines": 55
     },
     "scripts/mcp_manifest.py": {
       "lines": 137,
