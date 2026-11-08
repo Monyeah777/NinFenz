@@ -26,7 +26,8 @@ SCHEMA = "nf-gate-negative-tests/1"
 
 #: 拒绝型测试的命名代理（宁可漏判，也不要误报成「已经覆盖」）
 NEGATIVE_HINTS = ("bad", "invalid", "reject", "tamper", "mutat", "cannot",
-                  "must_fail", "wrong", "forged", "refuse", "denied")
+                  "must_fail", "wrong", "forged", "refuse", "denied",
+                  "catch", "kill", "vacuous", "ignores")
 
 
 def _gate_rows() -> list[dict[str, str]]:

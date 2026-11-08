@@ -1,18 +1,13 @@
 {
   "gates": 22,
-  "gates_with_negative": 14,
+  "gates_with_negative": 19,
   "missing": [
-    "atomic_write",
-    "write_flag",
     "coupling_fresh",
     "docs_anchors",
-    "abi_docs",
-    "evidence_graph",
-    "isomorphism",
-    "clock_purity"
+    "abi_docs"
   ],
   "note": "命名代理，只作趋势；判定用逐条变异测试（KILL_TESTS）",
-  "ratio": 0.636364,
+  "ratio": 0.863636,
   "rows": [
     {
       "count": 3,
@@ -26,20 +21,23 @@
       ]
     },
     {
-      "count": 1,
+      "count": 2,
       "has_negative": true,
       "id": "dead_code",
       "module": "desktop.tests.test_dead_code",
       "negative_tests": [
-        "test_rule_catches_mutation_and_keeps_referenced"
+        "test_rule_catches_mutation_and_keeps_referenced",
+        "test_method_predicate_has_catch_power"
       ]
     },
     {
-      "count": 0,
-      "has_negative": false,
+      "count": 1,
+      "has_negative": true,
       "id": "atomic_write",
       "module": "desktop.tests.test_core_atomic_writes",
-      "negative_tests": []
+      "negative_tests": [
+        "test_scanner_is_not_vacuous"
+      ]
     },
     {
       "count": 2,
@@ -52,11 +50,13 @@
       ]
     },
     {
-      "count": 0,
-      "has_negative": false,
+      "count": 1,
+      "has_negative": true,
       "id": "write_flag",
       "module": "desktop.tests.test_write_flag_gate",
-      "negative_tests": []
+      "negative_tests": [
+        "test_scanner_is_not_vacuous"
+      ]
     },
     {
       "count": 0,
@@ -80,13 +80,14 @@
       "negative_tests": []
     },
     {
-      "count": 5,
+      "count": 6,
       "has_negative": true,
       "id": "method_pack",
       "module": "desktop.tests.test_method_pack",
       "negative_tests": [
         "test_unknown_maps_to_is_rejected",
         "test_duplicate_move_id_is_rejected",
+        "test_vocabulary_check_can_be_killed",
         "test_checklist_rejects_broken_pack",
         "test_unknown_claim_kind_is_rejected_with_guide",
         "test_unknown_pack_id_is_rejected_with_guide"
@@ -108,7 +109,7 @@
       ]
     },
     {
-      "count": 5,
+      "count": 7,
       "has_negative": true,
       "id": "bridge",
       "module": "desktop.tests.test_cognition_bridge",
@@ -117,7 +118,9 @@
         "test_verify_detects_tampered_commitment",
         "test_apply_obligation_rejects_tampered_doc",
         "test_chain_detects_tamper",
-        "test_append_rejects_broken_prev"
+        "test_append_rejects_broken_prev",
+        "test_observation_correspondence_can_be_killed",
+        "test_envelope_guard_can_be_killed"
       ]
     },
     {
@@ -161,11 +164,13 @@
       ]
     },
     {
-      "count": 0,
-      "has_negative": false,
+      "count": 1,
+      "has_negative": true,
       "id": "evidence_graph",
       "module": "desktop.tests.test_evidence_graph",
-      "negative_tests": []
+      "negative_tests": [
+        "test_probe_is_not_vacuous"
+      ]
     },
     {
       "count": 4,
@@ -194,18 +199,23 @@
       ]
     },
     {
-      "count": 0,
-      "has_negative": false,
+      "count": 1,
+      "has_negative": true,
       "id": "isomorphism",
       "module": "desktop.tests.test_isomorphism_matrix",
-      "negative_tests": []
+      "negative_tests": [
+        "test_every_covered_layer_has_a_kill_test"
+      ]
     },
     {
-      "count": 0,
-      "has_negative": false,
+      "count": 2,
+      "has_negative": true,
       "id": "clock_purity",
       "module": "desktop.tests.test_judge_clock_purity",
-      "negative_tests": []
+      "negative_tests": [
+        "test_scan_catches_a_new_clock_reader",
+        "test_scan_ignores_clean_file"
+      ]
     },
     {
       "count": 2,
@@ -218,11 +228,12 @@
       ]
     },
     {
-      "count": 6,
+      "count": 7,
       "has_negative": true,
       "id": "cli_error_framing",
       "module": "desktop.tests.test_cli_error_framing",
       "negative_tests": [
+        "test_guidance_regex_has_catch_power",
         "test_bare_shell_json_is_refused_not_blocking",
         "test_helper_refuses_escape_forms_and_keeps_legit",
         "test_cli_refuses_relative_escape_without_writing_outside",

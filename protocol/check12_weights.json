@@ -142,7 +142,7 @@
     "test_gate_faces": 0.2,
     "test_gate_graph": 0.2,
     "test_gate_observe": 1.9,
-    "test_gate_probe": 0.1,
+    "test_gate_probe": 0.2,
     "test_gate_router": 0.2,
     "test_gate_select": 0.2,
     "test_gate_verdict": 0.2,
@@ -1898,7 +1898,7 @@
     "test_gate_observe.ObserveOneTest.test_timeout_is_enforced_and_says_so": 1.03,
     "test_gate_probe.GateProbeTest.test_negative_detector_recognises_known_names": 0.0,
     "test_gate_probe.GateProbeTest.test_proxy_has_catch_power": 0.01,
-    "test_gate_probe.GateProbeTest.test_ratio_is_computable_and_consistent": 0.0,
+    "test_gate_probe.GateProbeTest.test_ratio_is_computable_and_consistent": 0.01,
     "test_gate_router.MutationTest.test_culling_unsafe_is_caught": 0.01,
     "test_gate_router.MutationTest.test_dormant_without_reason_is_caught": 0.01,
     "test_gate_router.MutationTest.test_missing_expert_is_caught": 0.01,
@@ -2294,9 +2294,11 @@
     "test_json_shape_contracts.JsonDocHelperTest.test_loads_tolerates_bom_and_rejects_bad_json": 0.0,
     "test_json_shape_contracts.UnguardedRatchetTest.test_scanner_catches_a_mutation": 0.0,
     "test_json_shape_contracts.UnguardedRatchetTest.test_unguarded_sites_do_not_grow": 0.7,
-    "test_judge_clock_purity.JudgeClockPurityTest.test_allowlist_has_no_stale_entries": 0.06,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_allowlist_has_no_stale_entries": 0.05,
     "test_judge_clock_purity.JudgeClockPurityTest.test_allowlist_reasons_are_specific": 0.0,
-    "test_judge_clock_purity.JudgeClockPurityTest.test_every_clock_reader_is_registered": 0.06,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_every_clock_reader_is_registered": 0.05,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_scan_catches_a_new_clock_reader": 0.01,
+    "test_judge_clock_purity.JudgeClockPurityTest.test_scan_ignores_clean_file": 0.0,
     "test_judge_references.JudgeReferenceTest.test_code_side_judge_references_resolve": 0.17,
     "test_judge_references.JudgeReferenceTest.test_doc_side_judge_references_resolve": 0.35,
     "test_judge_references.JudgeReferenceTest.test_exemptions_are_not_stale": 0.04,
@@ -4501,5 +4503,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1808.1
+  "total_s": 1808.2
 }

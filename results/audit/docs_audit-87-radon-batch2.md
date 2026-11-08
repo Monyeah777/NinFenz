@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:3f320e66cf82fe688eca2248ae451fe991f8d4b01b9f64d55afe3c013567043d
+  - protocol/code_metrics_baseline.json:68f1bc918b70a6aeac7abab1f3446ab1634d0d9459b8ac22e0fccf39eb23891f
 ---
+> 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）
+
 > 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）
 
 > 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红

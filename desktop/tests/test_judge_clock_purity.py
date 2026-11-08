@@ -70,7 +70,26 @@ class JudgeClockPurityTest(unittest.TestCase):
     def test_allowlist_reasons_are_specific(self):
         for name, why in ALLOW.items():
             self.assertGreaterEqual(len(why.strip()), 8, name + " 的理由太短")
-
+    def test_scan_catches_a_new_clock_reader(self):
+        """负向用例：临时目录里放一个读 date.today() 的测试文件，扫描必须报出来。"""
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "test_fake_clock.py").write_text(
+                "import datetime as dt" + chr(10) + "X = dt.date.today()" + chr(10),
+                encoding="utf-8")
+            hits = scan(root)
+            self.assertIn("test_fake_clock.py", hits, "扫描没抓到临时的读时钟文件")
+            self.assertEqual(["date.today"], hits["test_fake_clock.py"])
+    def test_scan_ignores_clean_file(self):
+        """对照：不读时钟的文件不得被误报（防「全都报」的假阳性）。"""
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "test_clean.py").write_text("X = 1" + chr(10), encoding="utf-8")
+            self.assertEqual({}, scan(root))
 
 if __name__ == "__main__":
     unittest.main()

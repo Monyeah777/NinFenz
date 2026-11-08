@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:3f320e66cf82fe688eca2248ae451fe991f8d4b01b9f64d55afe3c013567043d
+  - protocol/code_metrics_baseline.json:68f1bc918b70a6aeac7abab1f3446ab1634d0d9459b8ac22e0fccf39eb23891f
 ---
+> 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）
+
 > 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）
 
 > 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红

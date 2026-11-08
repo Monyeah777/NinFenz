@@ -1581,7 +1581,7 @@
       "max_fn_lines": 59
     },
     "scripts/gate_probe.py": {
-      "lines": 103,
+      "lines": 104,
       "max_fn_cc": 4,
       "max_fn_lines": 21
     },
