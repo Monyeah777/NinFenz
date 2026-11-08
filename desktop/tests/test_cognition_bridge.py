@@ -206,6 +206,12 @@ class CliTest(unittest.TestCase):
             self.assertTrue(json.loads(verify.stdout)["ok"])
 
 
+def _envelope_schemas(source: str) -> set[str]:
+    """从源码文本里抓出桥的信封 schema（供变异测试复用）。"""
+    import re
+    return {m.strip(chr(34)) for m in re.findall(r'"nf-bridge-[a-z-]+/\d+"', source)}
+
+
 class BridgeWireFormatTest(unittest.TestCase):
     """桥的线格式守卫：**窄通道**是设计不是巧合，字段一旦膨胀就会偷偷耦合。
 
@@ -232,12 +238,17 @@ class BridgeWireFormatTest(unittest.TestCase):
         扫 `bridge.py` 源码里的 schema 字面量，只允许 `nf-bridge-commitment/1` 与
         `nf-bridge-obligation/1`。新增第三类信封 → 本判据红，必须先显式评审。
         """
-        import re
         from pathlib import Path
         src = Path(br.__file__).read_text(encoding="utf-8")
-        found = {m.strip(chr(34)) for m in re.findall(r'"nf-bridge-[a-z-]+/\d+"', src)}
+        found = _envelope_schemas(src)
         self.assertEqual({"nf-bridge-commitment/1", "nf-bridge-obligation/1"}, found,
                          f"桥的信封类型变了：{sorted(found)}（加通道要显式评审）")
+
+
+    def test_envelope_guard_can_be_killed(self):
+        """变异测试：源码里出现第三类信封时，守卫必须抓到（不是只会说「两类」）。"""
+        bad = 'SCHEMA = "nf-bridge-third/1"'
+        self.assertEqual({"nf-bridge-third/1"}, _envelope_schemas(bad))
 
     def test_commitment_field_set_is_frozen(self):
         claim = {"schema": "nf-cog-claim/1", "claim": "x", "digest": "b" * 64,
