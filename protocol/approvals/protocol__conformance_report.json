@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "refreeze.sh",
+  "note": "LSP core standard evidence",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "fcc1f16f41de8f08be59c88f0f1bf566b68180c37525a581c0c464a713f3c56e"
+  "subject_digest": "de864460c1d841878a86152c5074677acbfb039eebd38648360e912e07154640"
 }
