@@ -5,9 +5,8 @@
 为什么不新增判据：**这里不实现任何检查**，只按名单调用既有测试模块——判据仍只有一处，
 本件只是「跑得快的那一组」。名单腐烂由 `test_precheck` 守（每个名字必须真实存在）。
 
-**边界（必读）**：本件只覆盖 20/378 个测试模块——它是「高频横向面」的子集，
-**不是发布前检查**，也不能替代 `release_conclusion.py` 的全量结论。任务是把红的时间
-从 45 分钟压到 4 分钟，不是把判据变少。
+**边界**：本件只覆盖 20/378 个测试模块（高频横向面子集），**不是发布前检查**，
+也不能替代 `release_conclusion.py` 的全量结论——目标是缩短发现时间，不是减少判据。
 
 用法：python scripts/precheck.py [--full] [--json]
 """
@@ -44,13 +43,15 @@ GATES = (
     ("atom_catalog", "desktop.tests.test_atom_catalog"),
     ("cognition_control", "desktop.tests.test_cognition_control"),
     ("isomorphism", "desktop.tests.test_isomorphism_matrix"),
+    ("clock_purity", "desktop.tests.test_judge_clock_purity"),
+    ("report_determinism",
+     "desktop.tests.test_verify_report.BuildTest.test_build_is_deterministic"),
 )
 #: 慢但值得（--full 才跑）：CLI 面与纯度扫描约 2–3 分钟
 SLOW_GATES = (
     ("cli_error_framing", "desktop.tests.test_cli_error_framing"),
     ("purity", "desktop.tests.test_purity_scan"),
 )
-
 
 def _run_one(module: str) -> dict[str, Any]:
     """跑一个测试模块（经受控进程原子：argv 列表 / 无 shell / 超时回收）。"""
@@ -81,8 +82,7 @@ def run(full: bool = False) -> dict[str, Any]:
 def render(doc: dict[str, Any]) -> str:
     lines = ["== 提交前自查" + ("（含慢闸门）" if doc["full"] else "") + " =="]
     for row in doc["rows"]:
-        mark = "✓" if row["ok"] else "✗"
-        lines.append("  " + mark + " " + row["id"] + "（" + str(row["rc"]) + "）")
+        lines.append(("  ✓ " if row["ok"] else "  ✗ ") + row["id"] + "（" + str(row["rc"]) + "）")
         if not row["ok"]:
             for ln in row["tail"]:
                 lines.append("      " + ln.strip()[:120])
