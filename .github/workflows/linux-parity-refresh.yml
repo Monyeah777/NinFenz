@@ -1,9 +1,15 @@
 name: linux-parity-refresh
 # 跨平台基线刷新器（只读）：把「只能在 Linux 上得到的量」产出成工件，
 # 供维护者据此更新 protocol/sast_baseline.json 的 posix 段 / 定位向量跨平台差异。
-# 触发：workflow_dispatch（默认分支上手动跑）；不写仓库、不推送，只上传工件。
+# 触发：workflow_dispatch（手动）+ 每周一次定时（作为**跨平台漂移告警**）；
+# 不写仓库、不推送，只上传工件。
+# 2026-11-08 起：定时跑时若 `vectors.diff`/`projections.diff` 非空、或 posix SAST 计数
+# 与 `protocol/sast_baseline.json` 不符 → 红（此前只在人工跑时看输出，漂移没有 CI 告警）。
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'        # 每周一 06:00 UTC：跨平台一致性回归
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -52,7 +58,29 @@ jobs:
             docs/layers.md > projections.diff || true
           wc -l projections.diff
           head -c 4000 projections.diff || true
+      - name: 跨平台漂移判定（非空 diff / posix 计数与基线不符 → 红）
+        run: |
+          rc=0
+          for f in vectors.diff projections.diff; do
+            if [ -s "$f" ]; then
+              echo "::error::$f 非空：Linux 与本机生成物不一致（见工件 diff）"
+              rc=1
+            fi
+          done
+          python - <<'PY'
+          import json
+          cur = json.load(open("sast-posix.json", encoding="utf-8"))
+          base = json.load(open("protocol/sast_baseline.json", encoding="utf-8"))["platforms"]["posix"]
+          got = (sum(cur["bandit"].values()), sum(cur["ruff"].values()))
+          want = (sum(base["bandit"].values()), sum(base["ruff"].values()))
+          print("posix SAST：实测", got, "基线", want)
+          if got != want:
+              print("::error::posix SAST 计数与基线不一致（工具版本/平台漂移）")
+              raise SystemExit(1)
+          PY
+          exit "$rc"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        if: always()
         with:
           name: linux-parity
           path: |
