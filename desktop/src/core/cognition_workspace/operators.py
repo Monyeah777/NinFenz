@@ -71,9 +71,10 @@ OPERATORS: dict[str, dict[str, Any]] = {
     "abstain": {
         "name": "弃权",
         "when": "证据不足以下结论，但必须显式标记未覆盖",
-        "witness": ("question", "missing", "why_not_guess"),
+        # searched = 检索边界（同构判据 #5：没有边界的「不知道」等于装懂）
+        "witness": ("question", "missing", "searched", "why_not_guess"),
         "effect": "abstained",
-        "failure_mode": "把「不知道」写成「通过了」",
+        "failure_mode": "把「不知道」写成「通过了」，或没写检索边界就宣称未覆盖",
     },
     "revise": {
         "name": "修订",

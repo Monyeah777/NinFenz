@@ -32,6 +32,7 @@ PAYLOADS = {
     "switch": {"from": "explore", "to": "attack", "reason": "无进展"},
     "stop": {"reason": "已证伪", "terminal_state": "falsified"},
     "abstain": {"question": "拍屏是否可读", "missing": "拍屏样本",
+                "searched": "results/ccos/watermark_ecc_probe.json 的 10 组配置",
                 "why_not_guess": "缺样本，猜就是造假"},
     "revise": {"target": "块网格同步", "before": "可对齐", "after": "仅整数比可对齐"},
     "request_context": {"missing": "原始尺寸", "needed_for": "缩放反解"},
@@ -121,6 +122,25 @@ class ApplyTest(unittest.TestCase):
                              "reason": "扩大预算"})
         self.assertEqual(20, bundle["state"]["budget"]["steps_max"])
 
+
+    def test_abstain_requires_search_boundary(self):
+        """同构判据 #5（负空间层）：没有检索边界的「不知道」等于装懂，必须拒。
+
+        契约侧的非包含证明要求「声明覆盖集」；认知侧的 abstain 必须给出 `searched`（检索了什么）。
+        两侧同源：**没有边界的否定不是证据**。
+        """
+        bad = {"question": "拍屏是否可读", "missing": "拍屏样本",
+               "why_not_guess": "缺样本"}
+        issues = op.validate_request("abstain", bad)
+        self.assertTrue(any("searched" in i for i in issues), issues)
+        state = ct.new()
+        with self.assertRaises(ValueError) as ctx:
+            ct.apply(state, "abstain", bad)
+        self.assertIn("修复指引", str(ctx.exception))
+        good = dict(bad, searched="results/ccos/watermark_ecc_probe.json 全 10 组")
+        state2, _ = ct.apply(ct.new(), "abstain", good)
+        self.assertEqual("results/ccos/watermark_ecc_probe.json 全 10 组",
+                         state2["abstained"][-1]["searched"])
     def test_abstain_marks_status(self):
         state = ct.new()
         state, _ = ct.apply(state, "abstain", PAYLOADS["abstain"])

@@ -101,7 +101,8 @@ def _apply_effect(state: dict[str, Any], op_id: str, payload: dict[str, Any],
         effect["status"] = "stopped"
     elif op_id == "abstain":
         state["abstained"].append({"question": payload["question"],
-                                   "missing": payload["missing"]})
+                                   "missing": payload["missing"],
+                                   "searched": payload["searched"]})
         state["status"] = "abstained"
         effect["abstained"] = state["abstained"][-1]
     elif op_id == "revise":
