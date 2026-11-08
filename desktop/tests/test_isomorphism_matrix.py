@@ -51,32 +51,35 @@ KILL_TESTS = {
                "test_abstain_requires_search_boundary"),
 }
 
+def _has_test(module_name: str, test_name: str) -> bool:
+    """模块里是否存在该测试方法（反射查证；供正例与变异例共用）。"""
+    mod = importlib.import_module(module_name)
+    return any(isinstance(getattr(mod, name), type)
+               and hasattr(getattr(mod, name), test_name)
+               for name in dir(mod) if name.endswith("Test"))
+
+
 class IsomorphismMatrixTest(unittest.TestCase):
     def test_every_covered_layer_points_at_a_real_test(self):
         for layer, (module_name, test_name, _how) in COVERED.items():
-            mod = importlib.import_module(module_name)
-            found = [n for n in dir(mod)
-                     if n.startswith("Test") or n.endswith("Test")]
-            holder = None
-            for name in found:
-                obj = getattr(mod, name)
-                if isinstance(obj, type) and hasattr(obj, test_name):
-                    holder = name
-                    break
-            self.assertIsNotNone(
-                holder,
-                layer + " 声称已覆盖，但 " + module_name + " 里找不到 " + test_name)
+            self.assertTrue(_has_test(module_name, test_name),
+                            layer + " 声称已覆盖，但 " + module_name
+                            + " 里找不到 " + test_name)
 
     def test_every_covered_layer_has_a_kill_test(self):
         """覆盖 ≠ 可证：每层都必须有一条「故意改坏必红」的变异测试，且真实存在。"""
         self.assertEqual(set(COVERED), set(KILL_TESTS),
                          "covered 与 kill 表必须一一对应")
         for layer, (module_name, test_name) in KILL_TESTS.items():
-            mod = importlib.import_module(module_name)
-            found = any(isinstance(getattr(mod, name), type)
-                        and hasattr(getattr(mod, name), test_name)
-                        for name in dir(mod) if name.endswith("Test"))
-            self.assertTrue(found, layer + " 的变异测试不存在：" + test_name)
+            self.assertTrue(_has_test(module_name, test_name),
+                            layer + " 的变异测试不存在：" + test_name)
+
+    def test_reflective_check_can_be_killed(self):
+        """变异测试：指向不存在的测试方法时，反射查证必须返回 False。"""
+        self.assertTrue(_has_test("desktop.tests.test_cognition_bridge",
+                                  "test_commitment_binds_timestamp_reference"))
+        self.assertFalse(_has_test("desktop.tests.test_cognition_bridge",
+                                   "test_this_method_does_not_exist_xyz"))
 
     def test_missing_layers_carry_a_reason(self):
         for layer, why in MISSING.items():
@@ -85,11 +88,10 @@ class IsomorphismMatrixTest(unittest.TestCase):
                          "九层必须恰好九项（多一层少一层都要改本判据）")
         self.assertEqual(5, len(COVERED), "覆盖数与设计稿不符，需显式更新矩阵")
 
-
     def test_missing_reasons_name_a_concrete_object(self):
         """missing 理由不能是「暂时没做」——必须点名一个具体字段/对象（反引号 token）。"""
         for layer, why in MISSING.items():
-            self.assertRegex(why, r"`[A-Za-z0-9_.:/\\-]+`",
+            self.assertRegex(why, r"`[A-Za-z0-9_.:/\-]+`",
                              layer + " 的缺失理由没有点名具体对象：" + why)
 
     def test_matrix_does_not_claim_overlap(self):
