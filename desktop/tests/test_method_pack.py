@@ -21,7 +21,8 @@ from core import cognition_plan, method_pack  # noqa: E402
 
 NF = (sys.executable, str(ROOT / "scripts" / "nf.py"))
 PACK_IDS = ("watermarking", "evidence-audit", "metacognition",
-            "evaluation-design", "prompt-injection-defense", "data-provenance")
+            "evaluation-design", "prompt-injection-defense", "data-provenance",
+            "resilience")
 
 
 class PackShapeTest(unittest.TestCase):
@@ -186,6 +187,13 @@ class PackContentTest(unittest.TestCase):
             "pv.license_gate": ("desktop/src/core/closure.py", ("criteria",)),
             "pv.version_pin": ("protocol/eval/protocol.json", ("analysis_plan",)),
             "pv.leakage_audit": ("protocol/eval/protocol.json", ("prohibitions",)),
+            # 韧性工程域（第 66 轮）：锚点落既有隔离/变异/回滚/失败面
+            "rs.blast_radius": ("desktop/src/core/build_isolation.py", ("isolat",)),
+            "rs.chaos_drill": ("desktop/src/core/purity_scan.py", ("mutation",)),
+            "rs.rollback_path": ("protocol/closure/ledger.json", ("reverse_fixture",)),
+            "rs.fail_closed": ("desktop/src/core/decision_layer.py", ("abstain",)),
+            "rs.degradation": ("desktop/src/core/as_of.py", ("as_of",)),
+            "rs.postmortem": ("desktop/src/core/allowlist_expiry.py", ("expired",)),
         }
         #: 纯概念动作（本仓还没有对应实现）→ 理由。为空表示「全都该有锚点」。
         CONCEPTUAL = {"pi.plane_separation": "结构性保证（argv-only/无 shell），不是单一代码点"}

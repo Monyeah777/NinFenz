@@ -1,0 +1,87 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "resilience",
+  "version": "1.0.0",
+  "domain": "sre/resilience-engineering",
+  "note": "韧性工程域：把「这套东西坏的时候会怎样」拆成可核项——爆炸半径、故障演练、回滚路径、失败关闭、降级、复盘时间线。来源为 SRE/混沌工程通识与本仓既有隔离/变异/回滚机制；不引未读数字。",
+  "expert_moves": [
+    {
+      "id": "rs.blast_radius",
+      "name": "变更前先划爆炸半径：谁会被波及、波及后能不能恢复",
+      "why": "不知道影响面的变更只能靠运气；半径先划清，才谈得上「可回滚」。",
+      "maps_to": ["k.criterion", "e.audit", "c.select"]
+    },
+    {
+      "id": "rs.chaos_drill",
+      "name": "故障演练：主动注入已知失效，确认判据真的会红",
+      "why": "没红过的判据等于没判据；演练是把「以为会拦」变成「确实拦了」。",
+      "maps_to": ["e.falsify", "m.detect", "e.verify"]
+    },
+    {
+      "id": "rs.rollback_path",
+      "name": "每个写动作先写回滚路径（逆动作或补偿事务）",
+      "why": "没有逆动作的写入是单向门；单向门必须显式声明，不能假装可撤。",
+      "maps_to": ["k.quantify", "m.trace", "e.adjudicate"]
+    },
+    {
+      "id": "rs.fail_closed",
+      "name": "失败默认关闭：不确定时不放行，且必须说出缺什么",
+      "why": "「不确定就放行」是绝大多数事故的共同因子；关闭默认值要有明确缺口说明。",
+      "maps_to": ["k.standard", "e.audit", "m.observe"]
+    },
+    {
+      "id": "rs.degradation",
+      "name": "降级而非崩溃：先保住可判定性，再谈性能",
+      "why": "崩溃会同时丢失结论与证据；降级至少保住「现在不能判」这个事实。",
+      "maps_to": ["k.represent", "m.compare", "e.calibrate"]
+    },
+    {
+      "id": "rs.postmortem",
+      "name": "复盘时间线：按时间顺序记事件、根因与修复，缺口显式登记",
+      "why": "没有时间线的复盘会把「顺序问题」误判成「随机故障」。",
+      "maps_to": ["m.trace", "e.audit", "k.relate"]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "blast-radius",
+      "required": [
+        "变更影响面清单（组件/产物/下游）与判定依据",
+        "影响面之外的声明（不涉及什么，以及为什么）"
+      ]
+    },
+    {
+      "claim_kind": "drill",
+      "required": [
+        "演练的失效注入方式与被注入的判据",
+        "演练结果（红/未红）与未红时的解释"
+      ]
+    },
+    {
+      "claim_kind": "recoverability",
+      "required": [
+        "回滚/补偿动作及其验证方式",
+        "无法回滚时的显式声明与人工介入点"
+      ]
+    }
+  ],
+  "common_failures": [
+    "只写「已备份」，没验证过恢复",
+    "回滚脚本从没跑过，第一次跑是在事故里",
+    "失败时默认放行（把「不确定」当「没问题」）",
+    "降级路径没定义，出问题只能整体停服",
+    "复盘只写结论不写时间线，根因落在「偶发」",
+    "爆炸半径凭感觉估，没有影响面清单"
+  ],
+  "examples": [
+    {
+      "case": "core/purity_scan.py 用变异注入验证自己的捕获力（改了代码必须红）",
+      "why": "这是「故障演练」在静态门禁上的形态：不是相信它会拦，而是注入后验证它确实拦"
+    },
+    {
+      "case": "protocol/closure/ledger.json 每条主张都带 reverse_fixture（反例复现件）",
+      "why": "这是「失败关闭 + 可复现」的结合：说它错，得给得出复现件"
+    }
+  ],
+  "criteria_refs": ["craft:evidence_sufficiency", "craft:reproducibility", "standard:ISO27001"]
+}

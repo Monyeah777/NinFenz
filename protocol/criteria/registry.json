@@ -114,6 +114,7 @@
   },
   "claim_kinds": [
     "audit-trail",
+    "blast-radius",
     "calibration",
     "capacity",
     "closure",
@@ -122,10 +123,12 @@
     "data-fit",
     "defense-efficacy",
     "detectability",
+    "drill",
     "efficacy",
     "least-privilege",
     "license",
     "non-leakage",
+    "recoverability",
     "reliability",
     "robustness",
     "verification"
