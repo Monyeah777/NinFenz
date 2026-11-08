@@ -1750,6 +1750,11 @@
       "max_fn_cc": 5,
       "max_fn_lines": 29
     },
+    "scripts/verifier_status.py": {
+      "lines": 98,
+      "max_fn_cc": 8,
+      "max_fn_lines": 24
+    },
     "scripts/verify_cache.py": {
       "lines": 156,
       "max_fn_cc": 7,

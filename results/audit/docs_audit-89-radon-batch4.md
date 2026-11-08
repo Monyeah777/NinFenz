@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
+  - protocol/code_metrics_baseline.json:327b04d361e653373648070196aa1778f506064f9fc8156d7984fb5d3cb081e0
 ---
+> 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）
+
 > 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
 
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）

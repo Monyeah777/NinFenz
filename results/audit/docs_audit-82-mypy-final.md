@@ -30,8 +30,10 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
+  - protocol/code_metrics_baseline.json:327b04d361e653373648070196aa1778f506064f9fc8156d7984fb5d3cb081e0
 ---
+> 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）
+
 > 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
 
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）

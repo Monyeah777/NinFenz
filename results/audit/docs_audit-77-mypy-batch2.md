@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
+  - protocol/code_metrics_baseline.json:327b04d361e653373648070196aa1778f506064f9fc8156d7984fb5d3cb081e0
 ---
+> 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）
+
 > 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
 
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）

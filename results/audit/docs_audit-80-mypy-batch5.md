@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:7e128e3d953ce7d77c58f3ad3cf4df716b898d539fedf324a77f0b0cc5fc0fb8
+  - protocol/code_metrics_baseline.json:327b04d361e653373648070196aa1778f506064f9fc8156d7984fb5d3cb081e0
 ---
+> 重审（2026-11-09）：结论可复用性查询（verifier_status：current/stale/unknown）
+
 > 重审（2026-11-09）：precheck 补 verifier_version 闸门（23）+ 摘要重算
 
 > 重审（2026-11-09）：发布结论记录验证器摘要（自省层闭环）

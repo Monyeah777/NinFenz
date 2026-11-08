@@ -364,6 +364,7 @@
     "test_variants": 0.2,
     "test_verification_cards": 0.2,
     "test_verifier_props": 0.1,
+    "test_verifier_status": 0.2,
     "test_verifier_version": 0.2,
     "test_verify_guard": 6.0,
     "test_verify_parallel_checks": 2.1,
@@ -4378,6 +4379,10 @@
     "test_verifier_props.Test.test_exhaustive": 0.0,
     "test_verifier_props.Test.test_no_throw_detects": 0.0,
     "test_verifier_props.Test.test_purity": 0.0,
+    "test_verifier_status.VerifierStatusTest.test_conclusion_file_roundtrip": 0.01,
+    "test_verifier_status.VerifierStatusTest.test_no_source_is_unknown": 0.0,
+    "test_verifier_status.VerifierStatusTest.test_repo_state_is_current": 0.0,
+    "test_verifier_status.VerifierStatusTest.test_unknown_digest_is_stale": 0.0,
     "test_verifier_version.VerifierVersionTest.test_committed_self_audit_is_fresh": 0.0,
     "test_verifier_version.VerifierVersionTest.test_digest_changes_when_a_judge_file_changes": 0.02,
     "test_verifier_version.VerifierVersionTest.test_digest_is_deterministic_and_covers_judge_files": 0.0,
@@ -4548,5 +4553,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1863.7
+  "total_s": 1863.9
 }

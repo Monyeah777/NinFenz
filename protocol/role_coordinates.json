@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1056,
     "projection": 159,
-    "support": 434,
-    "verify": 1029
+    "support": 435,
+    "verify": 1030
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -9515,6 +9515,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "结论可复用性查询判据：current / stale / unknown 三态都要判得出来。",
+      "path": "desktop/tests/test_verifier_status.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "自省层判据：发布结论必须绑定「产出它的验证器摘要」。",
       "path": "desktop/tests/test_verifier_version.py",
       "role": "verify",
@@ -12552,16 +12558,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "b838e3310c6a5328ac418c1c3ca29200d63c5d86380ae29eb7c0be73169a3f44",
+  "root_digest": "09c9a478e2176fa8a7d315026785f900f61aaf20db0902a12ab1cc397dcb8111",
   "rule_counts": {
     "R-app": 1461,
-    "R-catch": 287,
+    "R-catch": 288,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 139,
     "R-support": 119,
-    "R-verify": 903,
+    "R-verify": 904,
     "auto:R-core": 286
   },
   "schema": "nf-role-coordinates/1"
