@@ -36,6 +36,11 @@
       "id": "resilience",
       "version": "1.0.0",
       "path": "protocol/method_packs/resilience.json"
+    },
+    {
+      "id": "handoff",
+      "version": "1.0.0",
+      "path": "protocol/method_packs/handoff.json"
     }
   ]
 }

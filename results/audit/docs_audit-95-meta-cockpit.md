@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:952471bb69cdbaf18ebcc11c4b925fe021bcae57e368be75b8baea8a054db4fe
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:f9bf48b1c7ee6c12a04a6cd52fd64a93969ac7822887e4a584df99b23e25b7e2
+  - protocol/check12_weights.json:5305eeff7ab077c30380a9bce410e7c1a39a0604668008460ddda09cc5bb052c
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：第八个域 handoff（协作交接）：可接续帧/承诺落证/角色分离/分歧留档/第三方复验/版本钉定
+
 > 重审（2026-11-09）：第七个域 resilience（韧性工程）：6 动作 3 证据类，锚点落既有隔离/变异/回滚面
 
 > 重审（2026-11-09）：判据时钟纯度闸门（读此刻必须登记理由）

@@ -1,0 +1,87 @@
+{
+  "schema": "nf-method-pack/1",
+  "id": "handoff",
+  "version": "1.0.0",
+  "domain": "collaboration/handoff",
+  "note": "协作交接域：把「换人或换会话之后还能不能接着干」拆成可核项——可接续帧、承诺落证、角色分离、分歧留档、第三方复验、版本钉定。来源为本仓双核桥与回执机制的实测口径；不引未读数字。",
+  "expert_moves": [
+    {
+      "id": "co.resumable_frame",
+      "name": "交接先给可接续帧：当前结论、未决项、下一步、不许改的约束",
+      "why": "长文档不是交接；能被下一个人直接接着干的才是帧，其余是背景噪音。",
+      "maps_to": ["k.define", "m.trace", "c.select"]
+    },
+    {
+      "id": "co.commitment_record",
+      "name": "承诺落证：谁对什么、以什么强度、在什么时点负责",
+      "why": "没有落证的承诺在交接时会退化成「我记得他说过」。",
+      "maps_to": ["k.standard", "e.audit", "m.observe"]
+    },
+    {
+      "id": "co.role_separation",
+      "name": "角色分离：批准、执行、复核不由同一人闭环",
+      "why": "自批自干自检的系统在单点故障上没有任何缓冲。",
+      "maps_to": ["k.criterion", "e.adjudicate", "m.compare"]
+    },
+    {
+      "id": "co.disagreement_log",
+      "name": "分歧留档：反方意见与未采纳理由必须可追",
+      "why": "只留结论会把「有人反对过」这个信息抹掉，后人会重踩同一个坑。",
+      "maps_to": ["k.represent", "e.falsify", "m.detect"]
+    },
+    {
+      "id": "co.external_verify",
+      "name": "第三方复验：结论必须能被不共享上下文的人独立重算",
+      "why": "只有参与者能复验的结论，本质上是自证。",
+      "maps_to": ["e.verify", "e.calibrate", "m.check"]
+    },
+    {
+      "id": "co.version_pin",
+      "name": "版本钉定：交接件绑定确切 SHA / digest，不跟最新走",
+      "why": "「你看最新版」会让交接变成一次不可复现的会话。",
+      "maps_to": ["k.quantify", "m.compare", "e.verify"]
+    }
+  ],
+  "evidence_standards": [
+    {
+      "claim_kind": "handoff",
+      "required": [
+        "可接续帧（当前结论 / 未决项 / 下一步 / 不许改的约束）",
+        "帧对应的版本标识（SHA 或 digest）"
+      ]
+    },
+    {
+      "claim_kind": "commitment",
+      "required": [
+        "承诺条目（对象 + 强度 + 时点）与落证位置",
+        "撤销或过期条件"
+      ]
+    },
+    {
+      "claim_kind": "separation",
+      "required": [
+        "批准/执行/复核三者的人员或角色清单",
+        "同一人闭环时的显式豁免与理由"
+      ]
+    }
+  ],
+  "common_failures": [
+    "交接只给结论不给未决项，下一轮从零开始",
+    "「我记得他说过」当承诺证据",
+    "同一人批准、执行、复核，出问题无人发现",
+    "分歧被压成一致意见，理由没留",
+    "结论只有作者本人能复算（缺独立复验）",
+    "交接件写「最新版」，无法定位到确切内容"
+  ],
+  "examples": [
+    {
+      "case": "core/cognition_workspace/bridge.py 的 commitment 绑定 cog_digest / claim_digest / cc_digest 三方摘要",
+      "why": "这是「承诺落证 + 版本钉定」在双核里的形态：两侧状态一旦变化，承诺即失效"
+    },
+    {
+      "case": "core/approval.py 的 allowed_approvers 限定批准人，且对象改动即失效",
+      "why": "这是「角色分离 + 版本钉定」的组合：批准绑对象摘要，换内容须重新批准"
+    }
+  ],
+  "criteria_refs": ["craft:coherence", "craft:evidence_sufficiency", "standard:ISO27001"]
+}

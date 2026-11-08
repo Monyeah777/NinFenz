@@ -118,6 +118,7 @@
     "calibration",
     "capacity",
     "closure",
+    "commitment",
     "control_effect",
     "cost",
     "data-fit",
@@ -125,12 +126,14 @@
     "detectability",
     "drill",
     "efficacy",
+    "handoff",
     "least-privilege",
     "license",
     "non-leakage",
     "recoverability",
     "reliability",
     "robustness",
+    "separation",
     "verification"
   ],
   "claim_kinds_note": "领域主张词表（单一真源）：方法包 evidence_standards.claim_kind 只能取这里的值；新增词必须先登记，否则 test_method_pack 判红。"
