@@ -141,7 +141,7 @@
       "max_fn_lines": 34
     },
     "desktop/src/core/calibration.py": {
-      "lines": 80,
+      "lines": 81,
       "max_fn_cc": 6,
       "max_fn_lines": 21
     },
