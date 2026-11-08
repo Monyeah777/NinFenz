@@ -4,9 +4,9 @@
     "entry": 26,
     "floor": 5,
     "prod": 1056,
-    "projection": 156,
-    "support": 430,
-    "verify": 1024
+    "projection": 157,
+    "support": 431,
+    "verify": 1025
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -8171,6 +8171,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "门禁负向用例探针判据：比率可算、命名代理不空转、清单与数据一致。",
+      "path": "desktop/tests/test_gate_probe.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "core.gate_router 回归：策略 S 路由 + 三条硬纪律 + 变异自证。",
       "path": "desktop/tests/test_gate_router.py",
       "role": "verify",
@@ -12522,16 +12528,16 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "05fdf7c92b6fa27ef0374e318e8b67080bb56a5255ae9c5f65e93dc682ec4d3f",
+  "root_digest": "4e29d3d62194124f227e577c1b299881be5778593531d244968139aa1aa3d5b5",
   "rule_counts": {
     "R-app": 1460,
-    "R-catch": 283,
+    "R-catch": 284,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 136,
+    "R-projection": 137,
     "R-support": 119,
-    "R-verify": 899,
+    "R-verify": 900,
     "auto:R-core": 285
   },
   "schema": "nf-role-coordinates/1"

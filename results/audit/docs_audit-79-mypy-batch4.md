@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:5c292af9eaab2506748bafa1efc680afeea692b4dd34fb45bfdd9444169d6efc
+  - protocol/code_metrics_baseline.json:3f320e66cf82fe688eca2248ae451fe991f8d4b01b9f64d55afe3c013567043d
 ---
+> 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）
+
 > 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红
 
 > 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist

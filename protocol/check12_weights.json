@@ -142,6 +142,7 @@
     "test_gate_faces": 0.2,
     "test_gate_graph": 0.2,
     "test_gate_observe": 1.9,
+    "test_gate_probe": 0.1,
     "test_gate_router": 0.2,
     "test_gate_select": 0.2,
     "test_gate_verdict": 0.2,
@@ -1895,6 +1896,9 @@
     "test_gate_observe.ObserveOneTest.test_missing_module_is_marked": 0.11,
     "test_gate_observe.ObserveOneTest.test_red_module_is_marked": 0.11,
     "test_gate_observe.ObserveOneTest.test_timeout_is_enforced_and_says_so": 1.03,
+    "test_gate_probe.GateProbeTest.test_negative_detector_recognises_known_names": 0.0,
+    "test_gate_probe.GateProbeTest.test_proxy_has_catch_power": 0.01,
+    "test_gate_probe.GateProbeTest.test_ratio_is_computable_and_consistent": 0.0,
     "test_gate_router.MutationTest.test_culling_unsafe_is_caught": 0.01,
     "test_gate_router.MutationTest.test_dormant_without_reason_is_caught": 0.01,
     "test_gate_router.MutationTest.test_missing_expert_is_caught": 0.01,
@@ -4497,5 +4501,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1808.0
+  "total_s": 1808.1
 }

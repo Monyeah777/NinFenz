@@ -1580,6 +1580,11 @@
       "max_fn_cc": 16,
       "max_fn_lines": 59
     },
+    "scripts/gate_probe.py": {
+      "lines": 103,
+      "max_fn_cc": 4,
+      "max_fn_lines": 21
+    },
     "scripts/gen_third_party_notices.py": {
       "lines": 161,
       "max_fn_cc": 11,

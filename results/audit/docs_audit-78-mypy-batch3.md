@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:5c292af9eaab2506748bafa1efc680afeea692b4dd34fb45bfdd9444169d6efc
+  - protocol/code_metrics_baseline.json:3f320e66cf82fe688eca2248ae451fe991f8d4b01b9f64d55afe3c013567043d
 ---
+> 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）
+
 > 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红
 
 > 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist

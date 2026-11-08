@@ -1,0 +1,254 @@
+{
+  "gates": 22,
+  "gates_with_negative": 14,
+  "missing": [
+    "atomic_write",
+    "write_flag",
+    "coupling_fresh",
+    "docs_anchors",
+    "abi_docs",
+    "evidence_graph",
+    "isomorphism",
+    "clock_purity"
+  ],
+  "note": "命名代理，只作趋势；判定用逐条变异测试（KILL_TESTS）",
+  "ratio": 0.636364,
+  "rows": [
+    {
+      "count": 3,
+      "has_negative": true,
+      "id": "json_shape",
+      "module": "desktop.tests.test_json_shape_contracts",
+      "negative_tests": [
+        "test_check_rejects_wrong_shape_with_guide",
+        "test_loads_tolerates_bom_and_rejects_bad_json",
+        "test_scanner_catches_a_mutation"
+      ]
+    },
+    {
+      "count": 1,
+      "has_negative": true,
+      "id": "dead_code",
+      "module": "desktop.tests.test_dead_code",
+      "negative_tests": [
+        "test_rule_catches_mutation_and_keeps_referenced"
+      ]
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "atomic_write",
+      "module": "desktop.tests.test_core_atomic_writes",
+      "negative_tests": []
+    },
+    {
+      "count": 2,
+      "has_negative": true,
+      "id": "silent_skip",
+      "module": "desktop.tests.test_silent_skip_reasons",
+      "negative_tests": [
+        "test_empty_return_predicate_catches_the_mutation",
+        "test_predicate_catches_the_mutation"
+      ]
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "write_flag",
+      "module": "desktop.tests.test_write_flag_gate",
+      "negative_tests": []
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "coupling_fresh",
+      "module": "desktop.tests.test_coupling_metrics",
+      "negative_tests": []
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "docs_anchors",
+      "module": "desktop.tests.test_ccos_docs_anchors",
+      "negative_tests": []
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "abi_docs",
+      "module": "desktop.tests.test_ccos_abi_docs",
+      "negative_tests": []
+    },
+    {
+      "count": 5,
+      "has_negative": true,
+      "id": "method_pack",
+      "module": "desktop.tests.test_method_pack",
+      "negative_tests": [
+        "test_unknown_maps_to_is_rejected",
+        "test_duplicate_move_id_is_rejected",
+        "test_checklist_rejects_broken_pack",
+        "test_unknown_claim_kind_is_rejected_with_guide",
+        "test_unknown_pack_id_is_rejected_with_guide"
+      ]
+    },
+    {
+      "count": 7,
+      "has_negative": true,
+      "id": "claims",
+      "module": "desktop.tests.test_cognition_claims",
+      "negative_tests": [
+        "test_aggregate_score_key_is_rejected",
+        "test_role_upgrade_is_rejected",
+        "test_unknown_claim_kind_is_rejected",
+        "test_unknown_criterion_is_rejected",
+        "test_role_upgrade_is_rejected",
+        "test_bad_schema_is_rejected",
+        "test_evidence_from_sheet_rejects_bad_schema_and_unknown_status"
+      ]
+    },
+    {
+      "count": 5,
+      "has_negative": true,
+      "id": "bridge",
+      "module": "desktop.tests.test_cognition_bridge",
+      "negative_tests": [
+        "test_claim_without_digest_rejected",
+        "test_verify_detects_tampered_commitment",
+        "test_apply_obligation_rejects_tampered_doc",
+        "test_chain_detects_tamper",
+        "test_append_rejects_broken_prev"
+      ]
+    },
+    {
+      "count": 13,
+      "has_negative": true,
+      "id": "eval_harness",
+      "module": "desktop.tests.test_eval_harness",
+      "negative_tests": [
+        "test_unfrozen_protocol_is_rejected",
+        "test_missing_free_baseline_is_rejected",
+        "test_missing_narrowing_metric_is_rejected",
+        "test_score_keys_in_protocol_are_rejected",
+        "test_bad_dimension_kind_is_rejected",
+        "test_unknown_condition_is_rejected",
+        "test_missing_dimension_is_rejected",
+        "test_score_key_in_run_is_rejected",
+        "test_bad_source_is_rejected",
+        "test_sample_out_of_range_is_rejected",
+        "test_validate_flags_missing_dimension_and_bad_status",
+        "test_validate_rejects_protocol_drift",
+        "test_empty_runs_is_rejected"
+      ]
+    },
+    {
+      "count": 2,
+      "has_negative": true,
+      "id": "calibration",
+      "module": "desktop.tests.test_calibration",
+      "negative_tests": [
+        "test_bad_input_fails_closed",
+        "test_trigger_policy_rejects_bad_threshold_and_empty"
+      ]
+    },
+    {
+      "count": 1,
+      "has_negative": true,
+      "id": "grouped_report",
+      "module": "desktop.tests.test_grouped_report",
+      "negative_tests": [
+        "test_bad_input_fails_closed"
+      ]
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "evidence_graph",
+      "module": "desktop.tests.test_evidence_graph",
+      "negative_tests": []
+    },
+    {
+      "count": 4,
+      "has_negative": true,
+      "id": "atom_catalog",
+      "module": "desktop.tests.test_atom_catalog",
+      "negative_tests": [
+        "test_build_does_not_mutate_v1",
+        "test_a2_bad_contract",
+        "test_a5_bad_prefix",
+        "test_bad_input_is_rejected_with_guide"
+      ]
+    },
+    {
+      "count": 6,
+      "has_negative": true,
+      "id": "cognition_control",
+      "module": "desktop.tests.test_cognition_control",
+      "negative_tests": [
+        "test_missing_witness_is_rejected",
+        "test_empty_witness_is_rejected",
+        "test_plane_violation_is_rejected",
+        "test_noop_effects_are_rejected",
+        "test_ritual_observe_is_rejected_on_third",
+        "test_tampered_effect_is_detected"
+      ]
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "isomorphism",
+      "module": "desktop.tests.test_isomorphism_matrix",
+      "negative_tests": []
+    },
+    {
+      "count": 0,
+      "has_negative": false,
+      "id": "clock_purity",
+      "module": "desktop.tests.test_judge_clock_purity",
+      "negative_tests": []
+    },
+    {
+      "count": 2,
+      "has_negative": true,
+      "id": "report_determinism",
+      "module": "desktop.tests.test_verify_report.BuildTest.test_build_is_deterministic",
+      "negative_tests": [
+        "test_short_temp_root_alias_cannot_leave_a_private_prefix",
+        "test_tampered_report_is_detected"
+      ]
+    },
+    {
+      "count": 6,
+      "has_negative": true,
+      "id": "cli_error_framing",
+      "module": "desktop.tests.test_cli_error_framing",
+      "negative_tests": [
+        "test_bare_shell_json_is_refused_not_blocking",
+        "test_helper_refuses_escape_forms_and_keeps_legit",
+        "test_cli_refuses_relative_escape_without_writing_outside",
+        "test_cli_refuses_backslash_escape_without_writing_outside",
+        "test_unignored_in_repo_store_is_refused",
+        "test_non_utf8_text_inputs_are_refused_cleanly"
+      ]
+    },
+    {
+      "count": 10,
+      "has_negative": true,
+      "id": "purity",
+      "module": "desktop.tests.test_purity_scan",
+      "negative_tests": [
+        "test_mutation_r1_end_shell_captured",
+        "test_mutation_r2_private_captured",
+        "test_mutation_r3_dup_heading_captured",
+        "test_mutation_r4_raise_no_guidance_captured",
+        "test_mutation_r5_unregistered_third_party_captured",
+        "test_mutation_r6_dangerous_sinks_captured",
+        "test_mutation_missing_cwe_captured",
+        "test_mutation_allow_key_for_unknown_sink_captured",
+        "test_mutation_unregistered_rmtree_captured",
+        "test_mutation_unlink_sink_captured"
+      ]
+    }
+  ],
+  "schema": "nf-gate-negative-tests/1"
+}

@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "65900efa20d1ad4f5a44624df1e7176f436cd75fc871abae08b8d8c13eb1019a",
+        "root": "89336888fce9ffe9afca7c848dd624999a5f102175a8d9be7a8022ab9b21e8ee",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,8 +369,8 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 357,
-        "files": 357,
+        "baseline": 358,
+        "files": 358,
         "max_fn_cc": 132,
         "max_fn_lines": 442,
         "max_lines": 9859
@@ -526,8 +526,8 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4158,
-        "kernel": 2085,
+        "files": 4161,
+        "kernel": 2086,
         "kernel_no_self": 308,
         "rules": 9,
         "uncovered": 0,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "1df44df746f6403242eab697293fccc0c01f306dd8e7ab5f70af25b2e197cecc",
+  "root_digest": "58167e3d2f942f7b32bc0f9a3b36fd8e1da132336def256556568073026d5a1b",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,
