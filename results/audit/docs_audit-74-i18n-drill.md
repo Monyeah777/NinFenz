@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:fa6bfc3471d5a81f76bbe13f5248f73fa6ec3d28a5116cfd9d5bfd8f06797b71
+  - protocol/code_metrics_baseline.json:0cbea091f2563f8bac1feb60028a3934942ebe8572e6b09d6013f4c6cd4e29bc
 ---
+> 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
+
 > 重审（2026-11-08）：校准模块风格收口
 
 > 重审（2026-11-08）：校准度量 core/calibration.py（分箱/ECE/可靠性表，只计数不评分）

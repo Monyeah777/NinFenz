@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:fa6bfc3471d5a81f76bbe13f5248f73fa6ec3d28a5116cfd9d5bfd8f06797b71
+  - protocol/code_metrics_baseline.json:0cbea091f2563f8bac1feb60028a3934942ebe8572e6b09d6013f4c6cd4e29bc
 ---
+> 重审（2026-11-08）：cog calibrate CLI（可靠性表出口）
+
 > 重审（2026-11-08）：校准模块风格收口
 
 > 重审（2026-11-08）：校准度量 core/calibration.py（分箱/ECE/可靠性表，只计数不评分）

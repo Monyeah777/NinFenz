@@ -141,6 +141,16 @@ class CogFacesTest(unittest.TestCase):
         self.assertEqual(0, proc.returncode, proc.stderr[-200:])
         self.assertIn("kind", payload(proc))
 
+
+    def test_calibrate_face(self):
+        pairs = self.tmp / "pairs.json"
+        pairs.write_text(json.dumps({"pairs": [{"confidence": 0.9, "correct": 1},
+                                              {"confidence": 0.1, "correct": 0}]}),
+                         encoding="utf-8")
+        data = payload(run(["cog", "calibrate", "--pairs", str(pairs), "--json"]))
+        self.assertEqual("nf-calibration/1", data["schema"])
+        self.assertIn("ece", data)
+
     def test_job_faces(self):
         self.assertEqual(0, run(["cog", "job", "create", "--ledger", str(self.ledger),
                                  "--id", "j1", "--kind", "check",

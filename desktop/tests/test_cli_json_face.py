@@ -278,6 +278,7 @@ SKIP = {
     "cog step": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
     "cog control": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
     "cog claim": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
+    "cog calibrate": "需参面（--pairs 必填）——真跑覆盖见 test_cog_cli_faces.py",
     "cog claim-check": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
     "cog replay": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",
     "cog diff": "需参/写面——真跑覆盖见 test_cog_cli_faces.py",

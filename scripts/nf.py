@@ -509,6 +509,12 @@ def _add_parser_cog(sub):
     ccr.add_argument("--layer", default="", help="只看一层（craft/standard/review）")
     ccr.add_argument("--id", dest="criterion_id", default="", help="只看一条判据")
     ccr.add_argument("--json", action="store_true", help="输出结构化 JSON")
+    ccal = csub.add_parser("calibrate", help="校准度量：置信分箱 / ECE / 可靠性表（只计数不评分）",
+                           description="输入 JSON：{\"pairs\": [{\"confidence\": 0.8, \"correct\": 1}, …]}；"
+                                       "输出 nf-calibration/1 可靠性表。")
+    ccal.add_argument("--pairs", required=True, help="样本文件（pairs: [{confidence, correct}]）")
+    ccal.add_argument("--bins", type=int, default=10, help="分箱数（缺省 10）")
+    ccal.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ccl = csub.add_parser("claim", help="把主张编译成证据义务清单",
                           description="主张 → 义务清单：方法包给「什么算证据」，判据给「怎么判」。")
     ccl.add_argument("--claim", required=True, help="主张原文（一句能被反驳的话）")
@@ -748,6 +754,24 @@ def _cmd_cog(args) -> int:
             print("  [" + item["layer"] + "] " + item["id"] + "：" + item["name"])
             print("    how：" + item["how"])
             print("    witness：" + "、".join(item["witness"]))
+        return 0
+    if sub == "calibrate":
+        try:
+            from core import calibration as cg_cal
+            doc = _read(args.pairs)
+            pairs = doc.get("pairs") if isinstance(doc, dict) else doc
+            conf = [float(x.get("confidence")) for x in pairs]
+            ok = [float(1 if x.get("correct") else 0) for x in pairs]
+            res = cg_cal.reliability(conf, ok, int(args.bins))
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            return _machine_fail(args, "校准输入不合法：" + str(exc), 4)
+        if args.json:
+            print(_json.dumps(res, ensure_ascii=False, indent=2, sort_keys=True))
+        else:
+            print("== nf cog calibrate ==")
+            print("  样本：" + str(res["n"]) + " · 分箱：" + str(res["n_bins"])
+                  + " · ECE：" + str(res["ece"]))
+            print("  " + res["note"])
         return 0
     if sub == "claim":
         try:
