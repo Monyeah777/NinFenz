@@ -556,7 +556,10 @@ class DualSourcePatternGateTest(unittest.TestCase):
         self._fixture(tmp, r"(A+)+$")
         t0 = _t.perf_counter()
         issues, _stats = of.index_verify(str(tmp))
-        self.assertLess(_t.perf_counter() - t0, 1.0, "不得真的拿投稿表达式去跑匹配")
+        # 阈值 1s 在 CI Windows（全量单进程套件 + 慢盘）会假红（2026-11-08 实测 cross-platform
+        # windows job 红）；本判据要抓的是「真拿投稿表达式去匹配」的指数级停顿（秒级→分钟级），
+        # 5s 仍能抓住，且不再被机器负载误伤。
+        self.assertLess(_t.perf_counter() - t0, 5.0, "不得真的拿投稿表达式去跑匹配")
         self.assertTrue([i for i in issues if "key_pattern" in i],
                         "指数回溯形态的 key_pattern 必须判 FAIL：%s" % issues[:3])
 

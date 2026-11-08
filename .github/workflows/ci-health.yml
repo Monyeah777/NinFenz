@@ -70,3 +70,47 @@ jobs:
                     f"{r.get('html_url')}")
           raise SystemExit(1)
           PY
+      - name: main 分支「最新一次」全 workflow 审计（push/schedule；抓非 required 的静默红）
+        # 为什么（2026-11-08）：required 检查只有 static-checks-42 + gate；rust-crate/dotnet-build/
+        # npm-package-check 等都是**非 required**——红着也能被 auto-merge 合进 main（#196 的
+        # windows rust 首版就是这么进来的）。本步把 main 分支上每个 workflow 的最新 completed
+        # push/schedule 运行做一次汇总：只要有一条 failure/timed_out 就判红。
+        # 口径与限制：只取最近 100 条 main 运行（远大于 workflow 数；长期不跑的 workflow 可能不在窗口内，
+        # 此时会显示为「不在窗口」而不是假绿）；in_progress/queued/cancelled/skipped 一律不算失败。
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          repo = os.environ["REPO"]
+          url = "https://api.github.com/repos/%s/actions/runs?branch=main&per_page=100" % repo
+          req = urllib.request.Request(url, headers={
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+          })
+          with urllib.request.urlopen(req, timeout=60) as resp:
+              doc = json.load(resp)
+          latest = {}
+          for r in doc.get("workflow_runs", []):
+              if r.get("event") not in ("push", "schedule"):
+                  continue
+              if r.get("status") != "completed":
+                  continue
+              key = r.get("workflow_id") or r.get("name")
+              prev = latest.get(key)
+              if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
+                  latest[key] = r
+          bad = sorted((r for r in latest.values()
+                        if r.get("conclusion") in ("failure", "timed_out")),
+                       key=lambda r: r.get("name") or "")
+          if not bad:
+              print("main 分支：%d 个 workflow 的最新 push/schedule 运行均非失败" % len(latest))
+              raise SystemExit(0)
+          print("::error::main 分支有 workflow 的最新 push/schedule 运行失败（含非 required 的静默红）：")
+          for r in bad:
+              print(f"  - {r.get('name')} #{r.get('run_number')} {r.get('created_at')} "
+                    f"(event={r.get('event')}) {r.get('html_url')}")
+          raise SystemExit(1)
+          PY
