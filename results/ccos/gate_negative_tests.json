@@ -247,7 +247,7 @@
       "id": "judge_mutation",
       "module": "desktop.tests.test_judge_mutation_probe",
       "negative_tests": [
-        "test_both_judges_kill_every_mutant",
+        "test_all_judges_kill_every_mutant",
         "test_probe_is_not_vacuous"
       ]
     },
