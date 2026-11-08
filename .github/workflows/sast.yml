@@ -5,7 +5,12 @@ name: sast
 # 而 SQL 拼接、弱随机、XXE、不含超时的请求等 AI 代码高频缺陷不在其中。本 job 跑
 # bandit + ruff `--select S`，并按 (工具,文件,规则) **计数棘轮**判：
 # 计数上升或出现新 (文件,规则) → 红；计数下降 → 提示重冻（债务只许减）。
+#
+# PR 面（2026-11-09 补）：此前只在 main push 跑——PR 引入的新 SAST 违规要到**合并后**才暴露。
+# 本 job 实测 31–40 s（固定版本工具 + 棘轮），PR 面完全跑得起；仍非 required（不阻塞），
+# 但让安全违规在评审时就可见。
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
