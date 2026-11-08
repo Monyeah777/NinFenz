@@ -350,6 +350,11 @@
       "max_fn_cc": 40,
       "max_fn_lines": 66
     },
+    "desktop/src/core/dsse.py": {
+      "lines": 219,
+      "max_fn_cc": 14,
+      "max_fn_lines": 38
+    },
     "desktop/src/core/ed25519.py": {
       "lines": 169,
       "max_fn_cc": 7,
@@ -1536,7 +1541,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf.py": {
-      "lines": 9016,
+      "lines": 9023,
       "max_fn_cc": 106,
       "max_fn_lines": 319
     },
@@ -1544,6 +1549,11 @@
       "lines": 187,
       "max_fn_cc": 11,
       "max_fn_lines": 42
+    },
+    "scripts/nf_dsse.py": {
+      "lines": 112,
+      "max_fn_cc": 11,
+      "max_fn_lines": 52
     },
     "scripts/nf_verify.py": {
       "lines": 887,

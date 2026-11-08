@@ -14,17 +14,21 @@ subjects:
   - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
   - desktop/src/core/terminal.py:f07b761f94e3e04a2437bbe88b5d9e646f0a247d26c985486b287153bcae4570
   - desktop/tests/test_meta_cockpit.py:cc2dc4f52729b35f400ca92aa367e685780f9f6735224e7fc0b7550b85f52662
-  - desktop/tests/test_cli_error_framing.py:4c186dc60b5e58bfe6c0400242051e14a8995bc7dad5399d68a85d8881d0e133
-  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - desktop/tests/test_cli_error_framing.py:96b4ea24e8eb68e590b641a21089a510a821f8185cb9dc1cf98d9257e525fde9
+  - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
+  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
   - protocol/check12_weights.json:a0cda888c2d2a9613d457e27474500786a41e3031ee44929b509f49198ecea7e
-  - protocol/coupling_baseline.json:78e2cf2dedd184567f5522117fe449d51dcce824f3e12195daeff183867418db
+  - protocol/coupling_baseline.json:00b095ae74ce9b40e13ecec43854554d18a821d77b6792d2eca5dd6ca1eb91b6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
+
+> 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

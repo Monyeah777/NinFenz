@@ -56,6 +56,36 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'nf-dotnet 构建失败' }
           dotnet build (Join-Path $build 'tools/nfparity/nfparity.csproj') -c Release --nologo 2>&1 | Tee-Object -Append -FilePath dotnet-build.log
           if ($LASTEXITCODE -ne 0) { throw 'nfparity 构建失败' }
+      - name: DSSE Python/.NET 交叉签验
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = (Get-Location).Path
+          $build = Join-Path $env:RUNNER_TEMP 'nf-engine'
+          $tmp = Join-Path $env:RUNNER_TEMP 'nf-dsse'
+          New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+          $payload = Join-Path $tmp 'payload.bin'
+          $key = Join-Path $tmp 'key.bin'
+          $pyEnv = Join-Path $tmp 'python.dsse.json'
+          $csEnv = Join-Path $tmp 'dotnet.dsse.json'
+          $pyOut = Join-Path $tmp 'python.verified'
+          $csOut = Join-Path $tmp 'dotnet.verified'
+          [IO.File]::WriteAllBytes($payload, [byte[]](0,1,2,255))
+          [IO.File]::WriteAllBytes($key, [Text.Encoding]::UTF8.GetBytes(('n' * 32)))
+          $dll = Join-Path $build 'tools/nf-dotnet/bin/Release/net8.0/nf-dotnet.dll'
+          python scripts/nf.py dsse sign --payload $payload --payload-type application/vnd.in-toto+json --key-file $key --keyid probe-key --out $pyEnv
+          if ($LASTEXITCODE -ne 0) { throw 'Python DSSE sign 失败' }
+          dotnet $dll --root $root dsse sign --payload $payload --payload-type application/vnd.in-toto+json --key-file $key --keyid probe-key --out $csEnv
+          if ($LASTEXITCODE -ne 0) { throw '.NET DSSE sign 失败' }
+          if ((Get-FileHash $pyEnv).Hash -ne (Get-FileHash $csEnv).Hash) { throw 'Python/.NET DSSE 信封字节不一致' }
+          python scripts/nf.py dsse verify --envelope $csEnv --key-file $key --keyid probe-key --payload-type application/vnd.in-toto+json --out $pyOut --json
+          if ($LASTEXITCODE -ne 0) { throw 'Python 验证 .NET DSSE 失败' }
+          dotnet $dll --root $root dsse verify --envelope $pyEnv --key-file $key --keyid probe-key --payload-type application/vnd.in-toto+json --out $csOut --json
+          if ($LASTEXITCODE -ne 0) { throw '.NET 验证 Python DSSE 失败' }
+          if ((Get-FileHash $payload).Hash -ne (Get-FileHash $pyOut).Hash -or
+              (Get-FileHash $payload).Hash -ne (Get-FileHash $csOut).Hash) {
+            throw 'DSSE 验签后 payload 字节不一致'
+          }
       - name: 失败诊断产物（构建日志；无则跳过）
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4

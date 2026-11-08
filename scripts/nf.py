@@ -37,7 +37,9 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "desktop", "src"))
+import nf_dsse  # noqa: E402 - 同目录 CLI 适配器
 from core import cli_bridge, interp_diet, json_doc  # noqa: E402 - 承重件在 desktop/src
 
 interp_diet.restore()
@@ -1074,6 +1076,7 @@ def _add_parser_integration(sub):
                      help="只跑导出面门禁（覆盖完整 + 形状合法 + 确定性）")
     iop.add_argument("--out", default="", help="写入文件（缺省打印到 stdout）")
     iop.add_argument("--json", action="store_true", help="--check 时输出结构化 JSON")
+    nf_dsse.add_parser(sub)
     tr = sub.add_parser("transparency",
                         help="透明日志（哈希链）：append-only 顺序 + 防删改（不可抵赖另说）",
                         description="透明日志：由 protocol/RECEIPTS.json 确定性派生哈希链"
@@ -5990,6 +5993,7 @@ def _cmd_assertions(args):
 #: 名单由「argparse 面里 help 含路径类词」运行时枚举得到，再逐条人工剔除非路径项。
 _PATH_FLAG_DESTS = ("out", "dest", "build_dest", "save_path", "store", "trace", "session_path",
                     "state", "state_path", "key_file", "ssh_key", "ssh_allowed_signers",
+                    "payload", "envelope",
                     "registry", "root", "case", "exceptions", "check_file", "check_md",
                     "artifact", "verify", "ledger", "history", "template", "dst", "script_file",
                     "baseline", "pipeline", "questions", "prompt_file", "injections", "journal",
@@ -6035,11 +6039,13 @@ def _path_writing_issue(args) -> str:
 #: 就漏出闸门」——所以改成**枚举为准**，并由 `test_cli_error_framing.PathFlagCoverageTest`
 #: 的对账判据保证「枚举到的文本类参数都在这里，或写明为什么豁免」。
 _UTF8_BINARY_EXEMPT = {"key_file": "HMAC 密钥是字节", "ssh_key": "SSH 私钥是字节",
+                       "payload": "DSSE payload 是任意二进制序列化体",
                        "label_object": "被标注对象可以是任意字节（图片/音视频）",
                        "evidence_bundle": "证据包是 zip（二进制容器）",
                        "revocations_seed": "ed25519 种子是 32 字节原始值（不能按 UTF-8 读）",
                        "timestamp_data": "被盖时间戳的对象可以是任意字节（证据包是 zip）"}
 _UTF8_TEXT_DESTS = ("a", "action", "artifact", "b", "baseline", "check", "check_file",
+                    "envelope",
                     "batch_target", "intent_from_text", "trust_manifest",
                     "items", "label_ir", "ir", "sidecar", "table", "prev", "decision",
                     "revocation_feed", "feeds",
@@ -8756,6 +8762,7 @@ _COMMAND_HANDLERS = {
     "bench": _cmd_bench,
     "endpoint": _cmd_endpoint,
     "interop": _cmd_interop,
+    "dsse": nf_dsse.run,
     "transparency": _cmd_transparency,
     "output": _cmd_output,
     "domain": _cmd_domain,

@@ -30,7 +30,7 @@
           "surfaces": 4,
           "tiers": 4
         },
-        "raises": 141,
+        "raises": 167,
         "sinks": 22
       },
       "status": "pass",
@@ -299,7 +299,7 @@
       "stats": {
         "contracts": 27,
         "passed": 27,
-        "root": "45cc0d2632fe04c9d0e6663b9c4297313755501e2b00d4297a51ca864cbdf3bb",
+        "root": "9a768f71b121ce2efd88cf9801314b6cca308bf64f9b26a2513eb5887ab4201f",
         "verdict": "conformant"
       },
       "status": "pass",
@@ -369,11 +369,11 @@
       "sample": [],
       "source": "code_metrics.scan",
       "stats": {
-        "baseline": 334,
-        "files": 334,
+        "baseline": 336,
+        "files": 336,
         "max_fn_cc": 106,
         "max_fn_lines": 319,
-        "max_lines": 9016
+        "max_lines": 9023
       },
       "status": "pass",
       "warns": 0
@@ -387,8 +387,8 @@
       "stats": {
         "budget_ms": 1500.0,
         "n": 65536,
-        "patterns": 262,
-        "probed": 262
+        "patterns": 264,
+        "probed": 264
       },
       "status": "pass",
       "warns": 0
@@ -432,8 +432,8 @@
         "cycles": 0,
         "metrics_drift": 0,
         "metrics_missing": 0,
-        "metrics_recorded": 276,
-        "modules": 276,
+        "metrics_recorded": 277,
+        "modules": 277,
         "registered_cycles": 0,
         "registered_sdp": 10,
         "sdp": 10
@@ -511,7 +511,7 @@
         "chains": 1,
         "code": 7,
         "data": 10,
-        "files": 1258,
+        "files": 1259,
         "index": 1,
         "no_schema": 206,
         "script": 4
@@ -526,9 +526,9 @@
       "sample": [],
       "source": "role_model.scan",
       "stats": {
-        "files": 4063,
-        "kernel": 2044,
-        "kernel_no_self": 309,
+        "files": 4070,
+        "kernel": 2048,
+        "kernel_no_self": 310,
         "rules": 9,
         "uncovered": 0,
         "verify_writers": 10,
@@ -538,7 +538,7 @@
       "warns": 0
     }
   ],
-  "root_digest": "d37f3f6a8b5a482dd876927591a0f3de6f9ed9e694241f15960e847a7956022c",
+  "root_digest": "0250871bd0dff766ad33de312b2161559ce797acc909742174d3ae7c24a592e9",
   "schema": "nf-verify-report/1",
   "summary": {
     "error": 0,

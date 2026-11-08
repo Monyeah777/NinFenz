@@ -28,12 +28,14 @@ subjects:
   - desktop/tests/test_daemon_parity.py:f9cd71ded4eafa37c0080c632bfd304f2fb76feb6a0109de6c73337b4ff44343
   - desktop/tests/test_concept_graph_gate.py:2a44468a58648d05497f14e25b782d2e2e55143900b1b19e9ecb18a8e3335c57
   - desktop/tests/test_commit_msg.py:b4dda2ec6229fdad0e94a9473f07dfb4d7766e1f35f9495ee3e126be6b4c5fcc
-  - desktop/tests/test_cli_json_face.py:edbbed0acb44ab9d9fe28c5de9a88af50cf63b1c1b173a873c976b9bc6367a7e
+  - desktop/tests/test_cli_json_face.py:d0a8bf023d6d01772f4fcb5c03feb9c613b7644c0027d2ba2ba38c82bcf616a6
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
   - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
-  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
+  - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
 ---
+> 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
+
 > 重审（2026-11-08）：活文档扫描扩到 engine/packaging/tools 子项目文档
 
 > 重审（2026-11-08）：活文档扫描面加 AGENTS/STRATEGY

@@ -9,12 +9,16 @@ subjects:
   - desktop/src/core/contract_history.py:e452d6d8a0d9849dece08210e7af2acbf554440e8871f8d656f745f533d06646
   - desktop/src/core/contract_text.py:01b784e63dd19425b3609ae3792b6c8d9f40366acb5806f71d10759c96de8fd6
   - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
   - desktop/tests/test_knowledge_sig.py:4705091a139b4fc4da9a61bc816e30eeec3221688f3d923e43afc3b11609c17e
-  - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
+  - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
   - docs/迁移指南-基于nf-sig-diff.md:64b4299bfdec7b663feef412ea16b8b5768c54036754fae066d1c81c3fdbfc5d
   - changes/unreleased/20261030-contract-history.md:4aa6c0df999193ab102115105c450ddae136dfa32c47d07fdebfe271f1059398
 ---
+> 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
+
+> 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

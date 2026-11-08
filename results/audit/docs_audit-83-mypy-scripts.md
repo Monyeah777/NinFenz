@@ -12,10 +12,16 @@ subjects:
   - scripts/interop_thirdparty_kit.py:803def645cab2f98a6ef27eed82a8463dcc4ed908b7885c9944158771d3d8900
   - scripts/build_verification_cards.py:370f465c17eb18e4ef928194351c759bf33af75e5c1cd5b85abfc2a4b1d39655
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
-  - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
+  - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:fa161610196a9d846f1245502e7fc6c5d32fdeeae6adbf348d57e0af0c3873e0
+  - protocol/code_metrics_baseline.json:27a045888ea0fa50e25f7fcaa9571041c6efc16672e4c54e10dc09732893ad1d
 ---
+> 重审（2026-11-08）：DSSE v1 代码规模/耦合基线最终重冻后重审：仅吸收新模块与薄 CLI 适配器行数，不改变行为判据。
+
+> 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
+
+> 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。
+
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查
 
 > 重审（2026-11-08）：快照空间阈值 400→1200MB + 纯函数判据

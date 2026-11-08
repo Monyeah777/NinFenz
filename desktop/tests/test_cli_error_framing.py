@@ -428,6 +428,8 @@ class PathFlagCoverageTest(unittest.TestCase):
         "entry": "--entry 是馆藏编号（NF-1 这类标识符）",
         "source": "--source 是溯源说明**文字**（写进台账，不是路径）",
         "write": "--write 是布尔旗标（无取值，故不参与写法判定）",
+        "keyid": "--keyid 是未认证的密钥提示字符串，不是路径",
+        "threshold": "--threshold 是签名的数量阈值，不是路径",
     }
     PATHISH = re.compile(r"文件|路径|目录|JSON|快照|密钥|信封")
 

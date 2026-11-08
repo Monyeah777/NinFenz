@@ -832,6 +832,7 @@ class DeclaredFlagsAreReadTest(unittest.TestCase):
             (ROOT / rel).read_text(encoding="utf-8")
             for rel in (
                 "scripts/nf.py",
+                "scripts/nf_dsse.py",
                 "desktop/src/core/cli_bridge.py",
                 "desktop/src/core/meta_cockpit/nf_cockpit_cli.py",
                 "desktop/src/core/meta_cockpit/nf_ab_cli.py",

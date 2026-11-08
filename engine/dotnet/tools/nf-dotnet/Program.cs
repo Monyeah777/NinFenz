@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Security.Cryptography;
 using Nf.Engine;
 
 // nf-dotnet · NF 工业引擎 CLI（只读子集，输出面与 Python 侧 nf 对齐）
@@ -35,6 +36,12 @@ string? interopKind = null;
 var interopList = false;
 var interopCheck = false;
 var interopAll = false;
+string? dssePayloadPath = null;
+string? dsseEnvelopePath = null;
+string? dssePayloadType = null;
+string? dsseKeyFile = null;
+var dsseKeyid = "";
+var dsseThreshold = 1;
 var worldModelRun = false;
 var worldModelWalk = false;
 string? worldModelState = null;
@@ -215,6 +222,31 @@ for (var i = 0; i < args.Length; i++)
         case "--kind":
             if (++i >= args.Length) return Usage("--kind 需要一个导出形状");
             interopKind = args[i];
+            break;
+        case "--payload":
+            if (++i >= args.Length) return Usage("--payload 需要文件路径");
+            dssePayloadPath = args[i];
+            break;
+        case "--envelope":
+            if (++i >= args.Length) return Usage("--envelope 需要 DSSE JSON 文件路径");
+            dsseEnvelopePath = args[i];
+            break;
+        case "--payload-type":
+            if (++i >= args.Length) return Usage("--payload-type 需要 MIME type 或 URI");
+            dssePayloadType = args[i];
+            break;
+        case "--key-file":
+            if (++i >= args.Length) return Usage("--key-file 需要密钥文件路径");
+            dsseKeyFile = args[i];
+            break;
+        case "--keyid":
+            if (++i >= args.Length) return Usage("--keyid 需要字符串");
+            dsseKeyid = args[i];
+            break;
+        case "--threshold":
+            if (++i >= args.Length) return Usage("--threshold 需要正整数");
+            if (!int.TryParse(args[i], out dsseThreshold) || dsseThreshold < 1)
+                return Usage("--threshold 需要正整数");
             break;
         case "--list":
             interopList = true;
@@ -449,6 +481,8 @@ int Dispatch()
             return DriverCommand();
     case "interop":
         return InteropCommand();
+    case "dsse":
+        return DSSECommand();
     case "workloop":
         return WorkloopCommand();
     case "license":
@@ -2479,6 +2513,90 @@ int InteropCommand()
     return 0;
 }
 
+int DSSECommand()
+{
+    try
+    {
+        if (positional.Count < 2)
+            return Usage("dsse 需要 sign 或 verify");
+        var sub = positional[1];
+        if (dsseKeyFile is null)
+            return Usage("dsse 需要 --key-file");
+        var key = DSSE.NormalizeKey(File.ReadAllBytes(dsseKeyFile));
+        if (key.Length == 0)
+            return Fail("HMAC-SHA256 密钥不能为空");
+        var keyid = dsseKeyid;
+        if (keyid.Length == 0)
+            keyid = Convert.ToHexString(SHA256.HashData(key)).ToLowerInvariant()[..16];
+        if (sub == "sign")
+        {
+            if (dssePayloadPath is null || string.IsNullOrEmpty(dssePayloadType))
+                return Usage("dsse sign 需要 --payload 与 --payload-type");
+            var payload = File.ReadAllBytes(dssePayloadPath);
+            var envelope = DSSE.Sign(dssePayloadType, payload, key, keyid);
+            var blob = System.Text.Encoding.UTF8.GetBytes(PythonJson.Indented(envelope) + "\n");
+            if (outPath is not null)
+            {
+                File.WriteAllBytes(outPath, blob);
+                Console.WriteLine($"  ✓ DSSE 信封已写入：{outPath}（{blob.Length} bytes，keyid={keyid}）");
+            }
+            else
+            {
+                using var stdout = Console.OpenStandardOutput();
+                stdout.Write(blob);
+                stdout.Flush();
+            }
+            return 0;
+        }
+        if (sub != "verify") return Usage("dsse 子命令只支持 sign / verify");
+        if (dsseEnvelopePath is null) return Usage("dsse verify 需要 --envelope");
+        using var doc = JsonIo.ReadFile(dsseEnvelopePath);
+        var expectedType = string.IsNullOrEmpty(dssePayloadType) ? null : dssePayloadType;
+        var verified = DSSE.Verify(doc.RootElement, keyid, key, dsseThreshold, expectedType);
+        if (outPath is not null) File.WriteAllBytes(outPath, verified.Payload);
+        var result = new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["kind"] = "dsse-verify",
+            ["schema"] = "dsse-envelope/1",
+            ["ok"] = true,
+            ["payloadType"] = verified.PayloadType,
+            ["accepted_keyids"] = verified.AcceptedKeyids.Cast<object?>().ToList(),
+            ["threshold"] = dsseThreshold,
+            ["payload_sha256"] = Convert.ToHexString(SHA256.HashData(verified.Payload)).ToLowerInvariant(),
+            ["payload_bytes"] = verified.Payload.Length,
+            ["out"] = outPath,
+        };
+        if (json)
+        {
+            Console.WriteLine(JsonFor(result));
+        }
+        else
+        {
+            Console.WriteLine($"  ✓ DSSE 验签通过：{verified.PayloadType} · keyid={string.Join(',', verified.AcceptedKeyids)}" +
+                              $" · payload={verified.Payload.Length} bytes · sha256={result["payload_sha256"]}");
+            if (outPath is not null) Console.WriteLine($"  ✓ 已原样写出被认证 payload：{outPath}");
+        }
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or InvalidDataException
+                               or UnauthorizedAccessException or JsonException)
+    {
+        if (json)
+        {
+            Console.WriteLine(JsonFor(new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["kind"] = "dsse-verify", ["schema"] = "dsse-envelope/1",
+                ["ok"] = false, ["error"] = ex.Message,
+            }));
+        }
+        else
+        {
+            Console.Error.WriteLine("  ✗ DSSE 失败：" + ex.Message);
+        }
+        return 1;
+    }
+}
+
 int StatsCommand()
 {
     if (writeRequested)
@@ -3950,6 +4068,7 @@ nf-dotnet 0.1.0 · NF 工业引擎 CLI（只读子集，输出面与 Python 侧 
   telemetry <trace.json> [--otlp]                   遥测 semconv 映射（trace 记录 → OTel GenAI 属性 / OTLP 形状）
   driver [工作流] [--json]                          指令档机器面路由（有 MCP 走 MCP；派发失败即停、不回退文本）
   interop --list | --kind K [--out P] [--check]     互操作导出面（12/12 形状已移植；--check 跑门禁）
+  dsse sign|verify [--json]                         DSSE v1 签名信封（PAE + HMAC-SHA256）
   impact <target> [--check] [--registry P]          变更影响面预检（拟删除 module/protocol 前查破坏性）
   related <target> [--json] [--registry P]          See-Also 关联（引用了谁 / 谁引用我 / 模块互见）
   market --list [--tier T] [--json]                 市场目录视图（官方核心 + 社区包，各带分级徽章）

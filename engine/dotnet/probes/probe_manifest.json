@@ -1,7 +1,7 @@
 {
   "schema": "nf-net-probe-manifest/1",
   "date": "2026-09-28",
-  "purpose": "38 个判据探针的**唯一参数出处**：跑批器 run-probes.ps1 只读本件，不在脚本里硬编码参数，也不靠字符串匹配猜 CLI（第一百零八片那类假红的根因）。",
+  "purpose": "判据探针的**唯一参数出处**：跑批器 run-probes.ps1 只读本件，不在脚本里硬编码参数，也不靠字符串匹配猜 CLI（第一百零八片那类假红的根因）。",
   "why": "此前每个探针的参数口径只存在于编制者脑内与逐片补记里；把口径写成机读清单，第三方才能一条命令复现全部 38 条判据。",
   "tokens": {
     "{engine}": "引擎工作区根（本仓库所在的 NF-NET-engine）",
@@ -39,6 +39,7 @@
     { "name": "differential-fuzz", "script": "differential_fuzz_probe.py", "tier": "long", "args": ["--root", "{snap}", "--py-src", "{snap}/desktop/src", "--cli", "{parity}"] },
     { "name": "doc-completeness", "script": "doc_completeness_probe.py", "tier": "core", "args": ["--snap", "{snap}", "--cli", "{cli}"] },
     { "name": "domain-closure", "script": "domain_closure_probe.py", "tier": "core", "args": ["--snap", "{snap}", "--cli", "{cli}"] },
+    { "name": "dsse", "script": "dsse_probe.py", "tier": "core", "args": ["--root", "{engine}", "--cli", "{cli}", "--py-exe", "{py}"], "note": "DSSE v1：Python/.NET 同 key 同 payload 信封逐字节一致；交叉验签、篡改拒绝、URL-safe Base64 接受" },
     { "name": "exit-faces", "script": "exit_faces_probe.py", "tier": "core", "args": ["--snap", "{snap}", "--cli", "{cli}", "--expect-embedded", "{self}"] },
     { "name": "extension-policy", "script": "extension_policy_probe.py", "tier": "core", "args": ["--snap", "{snap}", "--cli", "{cli}", "--expect-embedded", "{self}"] },
     { "name": "face-parity", "script": "face_parity_probe.py", "tier": "core", "args": ["--root", "{snap}", "--py-exe", "{py}", "--cli", "{cli}"] },
