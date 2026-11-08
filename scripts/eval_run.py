@@ -96,10 +96,21 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--checklist", action="store_true",
                     help="输出采集检查单（D-06 作业面：只排格子、不填数）")
+    ap.add_argument("--validate", default="",
+                    help="校验填好的采集单（协议绑定/状态机/维度完整/盲评与负对照）")
     args = ap.parse_args(argv)
     if args.checklist:
         print(render_checklist(build_checklist()), end="")
         return 0
+    if args.validate:
+        try:
+            sheet = json_doc.load(args.validate, dict, what=args.validate)
+            result = eh.validate_collection(str(ROOT), sheet)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if result["ok"] else 1
     try:
         report = build_report()
     except ValueError as exc:

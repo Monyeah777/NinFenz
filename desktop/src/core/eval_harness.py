@@ -257,7 +257,7 @@ def eval_run_checklist(root: str = ".") -> dict[str, Any]:
             "kind": "label-shuffle",
             "how": "把条件标签打乱后重跑同一批样本；判据：该对照不得出现显著优于 free 的差异",
             "status": "planned"},
-        "blind_review": {"per_task": 2,
+        "blind_review": {"reviewers_per_task": 2,
                          "how": "评审者只见样本内容与维度量表，不见条件标签；每任务至少两名",
                          "conflict_declaration_required": True,
                          "status": "planned"},
@@ -267,3 +267,72 @@ def eval_run_checklist(root: str = ".") -> dict[str, Any]:
         "measurement": {"status": "not-run",
                         "why": "真实测量只由作者显式触发；本检查单不填任何数"},
     }
+
+COLLECT_STATUSES = ("planned", "collected", "reviewed")
+
+
+def validate_collection(root: str, sheet: Any) -> dict[str, Any]:
+    """校验采集单（checklist 填好后的形态）→ {ok, ready, blockers, counts}。
+
+    为什么要有这一层：检查单只是格子，填完之后必须有一道**fail-closed 的验收**，
+    否则「跑完了」和「填了数」无法区分，实测数据会带着空洞进比较。规则：
+    ① 协议绑定：sheet.protocol.version/registered_at 必须与当前冻结协议一致（防悄悄换协议）；
+    ② 状态机：planned → collected → reviewed 单向；未知状态直接拒；
+    ③ collected 必须有全部维度的数值；reviewed 必须有评审者与判定；
+    ④ ready（可进比较）额外要求：所有格 reviewed + 负对照出了结论 + 盲评至少每任务 2 人。
+    """
+    protocol = load_protocol(root)
+    if not isinstance(sheet, dict):
+        raise ValueError("采集单必须是对象（" + GUIDE + "用 --checklist 生成模板）")
+    if str(sheet.get("schema") or "") != CHECKLIST_SCHEMA:
+        raise ValueError("采集单 schema 不符（" + GUIDE + "需要 " + CHECKLIST_SCHEMA + "）")
+    bound = sheet.get("protocol") or {}
+    if str(bound.get("version") or "") != str(protocol["version"]):
+        raise ValueError("采集单绑定的协议版本 " + str(bound.get("version"))
+                         + " ≠ 当前 " + str(protocol["version"])
+                         + "（" + GUIDE + "协议变更须重新生成检查单）")
+    if str(bound.get("registered_at") or "") != str(protocol["registered_at"]):
+        raise ValueError("采集单的注册时间与冻结协议不一致（" + GUIDE
+                         + "协议被改动过，须重跑 --checklist）")
+    dims = [str(d["id"]) for d in protocol["dimensions"]]
+    cells = sheet.get("cells") or []
+    expected = (len(protocol["conditions"]) * len(protocol["tasks"])
+                * int(protocol["samples_per_task"]))
+    blockers: list[str] = []
+    counts = dict.fromkeys(COLLECT_STATUSES, 0)
+    for cell in cells:
+        label = (str(cell.get("condition")) + "/" + str(cell.get("task"))
+                 + "#" + str(cell.get("sample")))
+        status = str(cell.get("status") or "")
+        if status not in COLLECT_STATUSES:
+            blockers.append(label + " 状态未知：" + status
+                            + "（" + GUIDE + "只用 planned/collected/reviewed）")
+            continue
+        counts[status] += 1
+        values = cell.get("values") or {}
+        if status != "planned" and set(dims) - set(values):
+            blockers.append(label + " 缺维度值：" + ",".join(sorted(set(dims) - set(values))))
+        if status != "planned":
+            for dim in dims:
+                if dim in values and not isinstance(values[dim], (int, float)):
+                    blockers.append(label + " 维度 " + dim + " 不是数字（"
+                                    + GUIDE + "别填空串/说明文字）")
+        review = cell.get("review") or {}
+        if status == "reviewed" and not (review.get("reviewer") and review.get("verdict")):
+            blockers.append(label + " reviewed 但缺评审者或判定")
+    if len(cells) < expected:
+        blockers.append("格子不足：" + str(len(cells)) + " < " + str(expected)
+                        + "（" + GUIDE + "补齐或重新生成检查单）")
+    nc = sheet.get("negative_control") or {}
+    if str(nc.get("status") or "") == "planned":
+        blockers.append("负对照未做（" + GUIDE + "负对照失败时任何差异都不能算证据）")
+    blind = sheet.get("blind_review") or {}
+    per_task = int(blind.get("reviewers_per_task") or 0)
+    if per_task < 2:
+        blockers.append("盲评人数不足：" + str(per_task) + " < 2（" + GUIDE + "每任务至少两名）")
+    if str(blind.get("status") or "") == "planned":
+        blockers.append("盲评未做（" + GUIDE + "改 status 并把逐格 review 填上）")
+    ready = not blockers and counts["reviewed"] == len(cells)
+    return {"ok": True, "ready": ready, "counts": counts,
+            "cells": len(cells), "expected_cells": expected,
+            "blockers": blockers[:20], "blockers_total": len(blockers)}

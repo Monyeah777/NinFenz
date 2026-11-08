@@ -7,8 +7,12 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
+  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
 ---
+> 重审（2026-11-08）：采集单校验器风格修净
+
+> 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）
+
 > 重审（2026-11-08）：eval_run 去未用导入
 
 > 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）

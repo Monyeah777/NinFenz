@@ -135,6 +135,50 @@ class RunTest(unittest.TestCase):
                          eh.eval_run_checklist(str(ROOT)))
 
 
+    def _filled_sheet(self) -> dict:
+        sheet = eh.eval_run_checklist(str(ROOT))
+        dims = sheet["protocol"]["dimensions"]
+        for cell in sheet["cells"]:
+            cell["status"] = "reviewed"
+            cell["values"] = dict.fromkeys(dims, 1)
+            cell["cost"] = {"latency_s": 12.5, "cost_usd": 0.02}
+            cell["review"] = {"reviewer": "r1", "verdict": "consistent"}
+        sheet["negative_control"]["status"] = "done"
+        sheet["negative_control"]["verdict"] = "no-difference"
+        sheet["blind_review"]["status"] = "done"
+        return sheet
+
+    def test_validate_template_is_not_ready(self):
+        result = eh.validate_collection(str(ROOT), eh.eval_run_checklist(str(ROOT)))
+        self.assertTrue(result["ok"])
+        self.assertFalse(result["ready"])
+        self.assertEqual(48, result["cells"])
+        self.assertGreaterEqual(result["blockers_total"], 2)
+
+    def test_validate_fully_filled_sheet_is_ready(self):
+        result = eh.validate_collection(str(ROOT), self._filled_sheet())
+        self.assertEqual([], result["blockers"])
+        self.assertTrue(result["ready"])
+        self.assertEqual(48, result["counts"]["reviewed"])
+
+    def test_validate_flags_missing_dimension_and_bad_status(self):
+        sheet = self._filled_sheet()
+        sheet["cells"][0]["values"] = {"frame_change": 1}
+        sheet["cells"][1]["status"] = "done"
+        result = eh.validate_collection(str(ROOT), sheet)
+        self.assertFalse(result["ready"])
+        text = " ".join(result["blockers"])
+        self.assertIn("缺维度值", text)
+        self.assertIn("状态未知", text)
+
+    def test_validate_rejects_protocol_drift(self):
+        sheet = eh.eval_run_checklist(str(ROOT))
+        sheet["protocol"]["version"] = "v0.0.0"
+        with self.assertRaises(ValueError) as ctx:
+            eh.validate_collection(str(ROOT), sheet)
+        self.assertIn("协议版本", str(ctx.exception))
+
+
 class CompareTest(unittest.TestCase):
     def test_compare_gives_diffs_and_narrowing(self):
         proto = _protocol()

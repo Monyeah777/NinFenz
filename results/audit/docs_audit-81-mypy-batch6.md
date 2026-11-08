@@ -10,8 +10,12 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
+  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
 ---
+> 重审（2026-11-08）：采集单校验器风格修净
+
+> 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）
+
 > 重审（2026-11-08）：eval_run 去未用导入
 
 > 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）

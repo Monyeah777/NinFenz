@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
   - tui/_surface.py:f708147a385a47d8cb9d34ea340c172bd9ac40a3e545d15ca4956f0ec5496b5d
-  - protocol/check12_weights.json:c7f8f00360a655cad343027dd5b6c9f4ecbc11a6dc21c95f4090d4f91925e6d9
+  - protocol/check12_weights.json:4ae21b2e15b7a6ebde7af14e5d4d18f5be70b5040c5d9433f62ebf375314216a
   - protocol/coupling_baseline.json:1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）
+
 > 重审（2026-11-08）：耦合面重算（eval_harness→method_pack 边）
 
 > 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）
