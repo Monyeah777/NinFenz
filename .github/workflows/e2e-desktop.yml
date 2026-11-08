@@ -3,7 +3,11 @@ name: e2e-desktop
 # 直驱 desktop core 真实链路（装载官方 13 件 + T2-2 组合包 M91/M92 + P04 轻混装配流管线
 # → 按层装配 → check_assembly → generate_document → 产物断言），无需 GUI、无需 Android 生成物。
 # 独立 workflow：桌面断言失败不牵连其它 workflow（原 Android 构建流已随 L3 端壳线退役移出）。
+#
+# PR 面（2026-11-09 补）：job 实测 9–10 s（headless、无 GUI），PR 面完全跑得起；此前只在 main
+# push 跑，桌面链路的回归要等合并后才发现。仍非 required（不阻塞合并）。
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
