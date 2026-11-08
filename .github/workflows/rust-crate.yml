@@ -48,6 +48,17 @@ jobs:
         run: |
           set -o pipefail
           cargo test --release --locked --manifest-path engine/rust/Cargo.toml 2>&1 | tee rust-crate-test.log
+      - name: 构建 nf-rs bin + 跑 Python 侧快线 parity 判据（2026-11-09 补）
+        # 盲区：此前 CI 从不构建 nf-rs bin（只跑 cargo test / canonical），而 python 侧
+        # test_rust_engine/test_rust_fastlane 在二进制不在场时显式 skip ⇒「快线 = Python 真源」
+        # 从未在 CI 真跑过（实测漂移：verify-report 缺 built_for_date、purity 漏 PIL allowlist）。
+        # 本步构建 bin 后跑 34 条 parity 判据（含 conformance run / contracts / score / verify-report
+        # 四面对账），把「二进制在场才跑」的面真正接进常驻 CI。
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path engine/rust/Cargo.toml
+          python3 -m unittest desktop.tests.test_rust_engine desktop.tests.test_rust_fastlane desktop.tests.test_rust_pyext
       - name: PyO3 扩展构建（可选进程内原语面；此前不在任何 CI 面）
         # 2026-11-08：engine/rust/pyo3 是 cdylib（nf_pyengine），主 crate 测试不覆盖它；
         # 依赖已从 0.22 升到 0.29（修 dependabot high OOB / Sync bound 告警），必须让 CI
