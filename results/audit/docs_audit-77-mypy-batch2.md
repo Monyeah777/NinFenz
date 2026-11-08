@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:5cdbb5dd8543fe7421aa5fa50ce830b8417a2475aaac52744f5a7a7e8aa50094
+  - protocol/code_metrics_baseline.json:4f32330e2a00ed7f90163e6879c5c177e429ac1c6d49fe675c83299c63fbef62
 ---
+> 重审（2026-11-09）：session-persist 预算 Windows 放宽
+
 > 重审（2026-11-08）：payload 未暂存 warn
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

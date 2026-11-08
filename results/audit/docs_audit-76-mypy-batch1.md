@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:5cdbb5dd8543fe7421aa5fa50ce830b8417a2475aaac52744f5a7a7e8aa50094
+  - protocol/code_metrics_baseline.json:4f32330e2a00ed7f90163e6879c5c177e429ac1c6d49fe675c83299c63fbef62
 ---
+> 重审（2026-11-09）：session-persist 预算 Windows 放宽
+
 > 重审（2026-11-08）：payload 未暂存 warn
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

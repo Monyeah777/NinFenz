@@ -1271,7 +1271,7 @@
       "max_fn_lines": 39
     },
     "desktop/src/core/terminal.py": {
-      "lines": 2418,
+      "lines": 2422,
       "max_fn_cc": 37,
       "max_fn_lines": 89
     },
