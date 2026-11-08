@@ -92,12 +92,15 @@ jobs:
           })
           with urllib.request.urlopen(req, timeout=60) as resp:
               doc = json.load(resp)
+          own = ".github/workflows/ci-health.yml"
           latest = {}
           for r in doc.get("workflow_runs", []):
               if r.get("event") not in ("push", "schedule"):
                   continue
               if r.get("status") != "completed":
                   continue
+              if r.get("path") == own:
+                  continue      # 排除自身：否则一次失败后每次都会把上一次的自己在报（自指死循环）
               key = r.get("workflow_id") or r.get("name")
               prev = latest.get(key)
               if prev is None or r.get("created_at", "") > prev.get("created_at", ""):
