@@ -606,7 +606,7 @@
       "max_fn_lines": 33
     },
     "desktop/src/core/interop_export.py": {
-      "lines": 1106,
+      "lines": 1058,
       "max_fn_cc": 23,
       "max_fn_lines": 96
     },
@@ -1225,6 +1225,11 @@
       "max_fn_cc": 4,
       "max_fn_lines": 8
     },
+    "desktop/src/core/spdx3.py": {
+      "lines": 255,
+      "max_fn_cc": 42,
+      "max_fn_lines": 160
+    },
     "desktop/src/core/st_quality.py": {
       "lines": 111,
       "max_fn_cc": 32,
@@ -1431,9 +1436,9 @@
       "max_fn_lines": 71
     },
     "scripts/check_interop_schemas.py": {
-      "lines": 391,
+      "lines": 442,
       "max_fn_cc": 22,
-      "max_fn_lines": 69
+      "max_fn_lines": 71
     },
     "scripts/check_vectors.py": {
       "lines": 139,

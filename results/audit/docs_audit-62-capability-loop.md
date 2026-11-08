@@ -7,14 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/workloop.py:3ee94f2c11939abba5507741c6b9b4dae8e8cab77c3bda38419678e31e097056
-  - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
+  - desktop/src/core/interop_export.py:98c8d218b97d6901bd23e5cac752b66af53963e9caf7ada3dbdaaf147ff7961e
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
-  - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
-  - docs/interop.md:f884a0533ed89aae8c83a2a44da491afb334c083dc05051158ac3a91e88e4f5c
-  - desktop/tests/test_interop_export.py:2308d682b075fef25982c6577c67d41714980c94db1f4f538fee26ec7239a847
+  - scripts/check_interop_schemas.py:30ac5951577c7e807438cedb2ca0607124d2a600dea19b9215d5664a44b74af4
+  - docs/interop.md:c3fc34b60476a896dd5e8b0c63b6356cc77cf2234cba27ac06bb9d96d6b2790f
+  - desktop/tests/test_interop_export.py:6695371f7b181a7d9da92641d97bf4b00cacf27bdfb05baeb2e533067475a8cc
   - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
 
 ---
+> 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

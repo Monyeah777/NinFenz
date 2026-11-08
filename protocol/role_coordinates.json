@@ -1,12 +1,12 @@
 {
   "counts": {
-    "app": 1456,
+    "app": 1457,
     "entry": 26,
     "floor": 5,
-    "prod": 1053,
+    "prod": 1054,
     "projection": 144,
     "support": 393,
-    "verify": 986
+    "verify": 987
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6923,6 +6923,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "Deterministic SPDX 3.0.1 SBOM builder with an honest AI Profile declaration.",
+      "path": "desktop/src/core/spdx3.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "ST 制卡质量规范门禁（验收层规范的**数据化**：M/S/R → fail/warn/info）。",
       "path": "desktop/src/core/st_quality.py",
       "role": "verify",
@@ -8189,7 +8195,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 2.3 / CloudEvents）。",
+      "function": "互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 3.0.1 AI / CloudEvents）。",
       "path": "desktop/tests/test_interop_export.py",
       "role": "verify",
       "rule": "R-verify"
@@ -9139,6 +9145,12 @@
     {
       "function": "",
       "path": "desktop/tests/test_skill_contract.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "SPDX 3.0.1 AI Profile builder and fail-closed negative cases.",
+      "path": "desktop/tests/test_spdx3_ai_profile.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12276,17 +12288,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4da5df0908724ae01f1f651fcf7ad4ff3144092122bdb4d522f7a6bed9e3657f",
+  "root_digest": "d640a4a42120495d958c4ee10c5cb9fa15875af3e009e960bc23bb4fe5e15c48",
   "rule_counts": {
-    "R-app": 1456,
+    "R-app": 1457,
     "R-catch": 244,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 125,
     "R-support": 122,
-    "R-verify": 867,
-    "auto:R-core": 274
+    "R-verify": 868,
+    "auto:R-core": 275
   },
   "schema": "nf-role-coordinates/1"
 }

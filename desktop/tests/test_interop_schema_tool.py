@@ -5,12 +5,14 @@
 这里钉住两件事：① 目标 schema 表覆盖全部派生面；② 官方无 JSON Schema 的面必须
 **如实记 no-schema**（不许假称校验过）；③ 拒写 protocol/ 的纪律。
 """
+import contextlib
 import importlib.util
 import io
-import contextlib
+import json
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "desktop" / "src"))
@@ -75,6 +77,24 @@ class InteropSchemaToolTest(unittest.TestCase):
         self.assertIn("未联网", out)
         for kind in ie.KINDS:
             self.assertIn(kind, out)
+
+    def test_spdx3_official_context_term_check(self):
+        doc = ie.sbom_doc(str(ROOT))
+        terms = set()
+        for element in doc["@graph"]:
+            terms.update(k for k in element if not k.startswith("@"))
+            terms.add(element["@type"])
+        context = {term: f"https://spdx.org/rdf/3.0.1/terms/{term}"
+                   for term in terms}
+        body = json.dumps({"@context": context}).encode("utf-8")
+        with mock.patch.object(self.tool, "fetch", return_value=(200, body)):
+            row = self.tool.check_spdx3_context(str(ROOT))
+        self.assertEqual("ok", row["status"], row)
+        with mock.patch.object(self.tool, "fetch",
+                               return_value=(200, b'{"@context": {}}')):
+            row = self.tool.check_spdx3_context(str(ROOT))
+        self.assertEqual("fail", row["status"], row)
+        self.assertIn("未定义", row["detail"])
 
     def test_refuses_to_write_protocol(self):
         buf = io.StringIO()

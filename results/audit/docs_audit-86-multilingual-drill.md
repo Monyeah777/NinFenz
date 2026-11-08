@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:5cdbb5dd8543fe7421aa5fa50ce830b8417a2475aaac52744f5a7a7e8aa50094
+  - protocol/code_metrics_baseline.json:5ff42744a42b48fbf43f0325b0a2b42e73707c978ca80176fa4594a392eadb20
 ---
+> 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
+
 > 重审（2026-11-08）：payload 未暂存 warn
 
 > 重审（2026-11-08）：活树模式 ENOSPC 前置检查

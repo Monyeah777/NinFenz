@@ -12,7 +12,7 @@
 | `openapi` | `protocol/endpoint_contract.json` | OpenAPI 3.1 | OpenAPI 校验器 / 客户端生成器 |
 | `asyncapi` | `protocol/event_registry.json` + `external_events.json` | AsyncAPI 3.0（含 CloudEvents 1.0 属性） | 事件网关 / 代码生成器 |
 | `intoto` | `protocol/RECEIPTS.json` | in-toto Statement v1 | in-toto / cosign 系校验器 |
-| `sbom` | 纯度扫描依赖登记面（`HARD_ALLOW` / `SOFT_IMPORTS`） | SPDX 2.3 风格 | 依赖扫描器 / 合规台 |
+| `sbom` | 纯度扫描依赖登记面（`HARD_ALLOW` / `SOFT_IMPORTS`） | SPDX 3.0.1 JSON-LD + AI Profile | 依赖扫描器 / AI 合规台 |
 | `slsa` | `protocol/RECEIPTS.json` + `verify.sh` 版本头 + `protocol/score_baseline.json` | SLSA Provenance v1 | SLSA 工具链（**注**：本地门禁 ≠ SLSA 认证，产物内含不作等级声明的注记） |
 | `a2a` | `protocol/endpoint_contract.json` + `protocol/mcp_package.json` | A2A Agent Card | A2A 客户端（能力面 = 端点契约投影；服务未实装时卡片显式声明） |
 | `prov` | `05_资产库/provenance.json` + `library/INDEX.md` + `protocol/transform_log.json` + `protocol/RECEIPTS.json` | PROV-O 图（JSON-LD 风格） | 溯源分析工具（实体/活动/代理三元组；空面如实为空） |
@@ -90,6 +90,9 @@ python scripts/check_interop_schemas.py --fetch --write results/interop-schema-v
 | ccv3（E1 出口面） | SillyTavern 写卡源码字面量 | **通过**：`spec=chara_card_v3` / `spec_version=3.0` / `data` 结构在位（首轮暴露「假 v3」缺陷并修，见 `docs/external-validation-assets/README.md`） |
 | mcp（E3 会话面） | `modelcontextprotocol: schema/2026-07-28/schema.json` | **通过**：4 方法应答过官方 `$defs`（首轮 FAIL：list 三面缺 `resultType`/`ttlMs`/`cacheScope` → 已补） |
 
-**外部校验驱动的两处真修复**：① `creationInfo.created` 缺失（SPDX 2.3 必填）→ 取
+SPDX 3 的 AI Profile 口径、诚实边界与校验规则见
+[`docs/spdx3-ai-profile.md`](spdx3-ai-profile.md)。
+
+**外部校验驱动的两处真修复**：① 早期 SPDX 2.3 的 `creationInfo.created` 缺失 → 取
 「仓内声明日期最大值」`<date>T00:00:00Z`（**非墙钟**，保「两次渲染逐字节一致」）；
 ② 首次写 `documentComment` 不在 SPDX 词表内 → 改根级 `comment`。

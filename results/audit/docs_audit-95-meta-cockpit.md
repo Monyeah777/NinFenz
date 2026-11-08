@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:83a75a4fac82461d56b03147eff04b420b8aad0ed6db9fef6e695717dcf7b6a2
   - tui/_surface.py:8db432e006d08b717d507deb8839e02e0db1ccacc3e4962a712045ccfd2a30bf
-  - protocol/check12_weights.json:a0cda888c2d2a9613d457e27474500786a41e3031ee44929b509f49198ecea7e
-  - protocol/coupling_baseline.json:78e2cf2dedd184567f5522117fe449d51dcce824f3e12195daeff183867418db
+  - protocol/check12_weights.json:ca51dbfd955646fe8cce014db5a632fbc4468492dbcd7e6d64eca7d9c1ac8324
+  - protocol/coupling_baseline.json:10df87e6c038d322492329f86e549d08d998dbe2bdc31e4d2217da996040aa2c
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：SPDX 3.0.1 AI Profile interop upgrade
+
 > 重审（2026-11-08）：task-35c：git status 收敛到 repo_face.untracked_paths
 
 > 重审（2026-11-08）：task-35：nf.py 注释修正（nosec/理由）

@@ -8,14 +8,15 @@
 | asyncapi | https://raw.githubusercontent.com/asyncapi/spec-json-schemas/master/schemas/3.0.0.json | 200 | ok | 官方 meta-schema 校验通过 |
 | slsa | https://raw.githubusercontent.com/slsa-framework/slsa/main/docs/specs/provenance/v1.0/schema.json | - | no-schema | SLSA v1 官方以 CUE / Protobuf 定义机器可读协议（slsa-framework/slsa: spec/schema/provenance.cue + provenance.proto），无官方 JSON Schema —— 本机无 CUE 工具链，故不做 schema 校验 |
 | intoto | https://raw.githubusercontent.com/in-toto/attestation/main/spec/v1/statement.schema.json | - | no-schema | in-toto Statement v1 官方以 Markdown 规范发布（in-toto/attestation: spec/v1/statement.md），该目录无 JSON Schema |
-| sbom | https://raw.githubusercontent.com/spdx/spdx-spec/develop/schemas/spdx-schema-2-3.json | 200 | ok | 官方 meta-schema 校验通过 |
 | prov | https://www.w3.org/ns/prov.jsonld | 300 | unavailable | schema 取不到（网络/地址问题，非派生面问题） |
 | cyclonedx | https://raw.githubusercontent.com/CycloneDX/specification/master/schema/bom-1.5.schema.json | 200 | ok | 官方 meta-schema 校验通过 |
 | a2a | A2A 官方仓以 .proto + 文档为主（a2aproject/A2A: specification/a2a.proto；specification/json 下仅 README），无官方 JSON Schema 可供本机校验 | - | no-schema | A2A 官方仓以 .proto + 文档为主（a2aproject/A2A: specification/a2a.proto；specification/json 下仅 README），无官方 JSON Schema 可供本机校验 |
 | vc | W3C VC Data Model 2.0 以规范文本 + JSON-LD 上下文发布（w3c/vc-data-model: 规范正文；无官方 JSON Schema 收口凭证形状） | - | no-schema | W3C VC Data Model 2.0 以规范文本 + JSON-LD 上下文发布（w3c/vc-data-model: 规范正文；无官方 JSON Schema 收口凭证形状） |
 | c2pa | C2PA 规范以 CBOR/JUMBF 容器 + JSON 清单表示定义（contentauth/c2pa-rs 等实现仓；官方无独立 JSON Schema 文件），且本仓**不做容器封装**，故只做自校验 | - | no-schema | C2PA 规范以 CBOR/JUMBF 容器 + JSON 清单表示定义（contentauth/c2pa-rs 等实现仓；官方无独立 JSON Schema 文件），且本仓**不做容器封装**，故只做自校验 |
 | cid | CID 由 multiformats 规范定义（multiformats/cid + multicodec 表），无 JSON Schema；本仓以**已知向量**校验（sha256("") 的 CIDv1 raw） | - | no-schema | CID 由 multiformats 规范定义（multiformats/cid + multicodec 表），无 JSON Schema；本仓以**已知向量**校验（sha256("") 的 CIDv1 raw） |
-| decisions | 决策面是 **NF 自有形状**（决策能力 + 公开裁决索引），非外部标准；无外部 schema 可对，判据落在本仓 check33（覆盖一致 / 内部边界声明 / 确定性） | - | no-schema | 决策面是 **NF 自有形状**（决策能力 + 公开裁决索引），非外部标准；无外部 schema 可对，判据落在本仓 check33（覆盖一致 / 内部边界声明 / 确定性） |
+| decisions | 决策面是 **NF 自有形状**（决策能力 + 公开裁决索引），非外部标准；无官方 JSON Schema 可对，判据落在本仓 check33（覆盖一致 / 内部边界声明 / 确定性） | - | no-schema | 决策面是 **NF 自有形状**（决策能力 + 公开裁决索引），非外部标准；无官方 JSON Schema 可对，判据落在本仓 check33（覆盖一致 / 内部边界声明 / 确定性） |
+| sbom | SPDX 3.0.1 以 JSON-LD context + SHACL/模型约束发布，无官方 JSON Schema；本仓由 core.spdx3 校验 @id 闭合、AI Profile 声明、许可证引用和关系可达，并以官方 JSON-LD context 作为序列化真源 | - | no-schema | SPDX 3.0.1 以 JSON-LD context + SHACL/模型约束发布，无官方 JSON Schema；本仓由 core.spdx3 校验 @id 闭合、AI Profile 声明、许可证引用和关系可达，并以官方 JSON-LD context 作为序列化真源 |
+| spdx3(AI) | https://spdx.org/rdf/3.0.1/spdx-context.jsonld | 200 | ok | 全部 compact keys/types 均由官方 3.0.1 context 定义 |
 | ccv3(E1) | SillyTavern 源码字面量 | 200 | ok | 与上游字面量一致（spec=chara_card_v3 / spec_version=3.0 / data 结构在位） |
 | mcp(E3) | https://raw.githubusercontent.com/modelcontextprotocol/modelcontextprotocol/main/schema/2026-07-28/schema.json | 200 | ok | 4 个方法应答通过官方 schema（server/discover / resources/list / tools/list / prompts/list） |
 

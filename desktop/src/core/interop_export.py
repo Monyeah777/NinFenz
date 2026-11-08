@@ -1,5 +1,5 @@
 """互操作导出面（外部标准净吸收：OpenAPI 3.1 / AsyncAPI 3.0 / in-toto Statement v1 /
-SPDX 2.3 / CloudEvents 属性 / RFC 9457 Problem Details）。
+SPDX 3.0.1 + AI Profile / CloudEvents 属性 / RFC 9457 Problem Details）。
 
 内部差距（本波实证）：NF 的**声明面**已经很厚——8 条服务端点契约、43 条事件载荷、
 48 条协议层回执（Merkle 单根）、依赖登记面（hard/soft import）——但**没有一条能直接
@@ -20,7 +20,7 @@ import os
 import re
 from typing import Any, Dict, List, Tuple
 
-from core import json_doc
+from core import json_doc, spdx3
 
 
 #: 依赖名别名（纯度登记的 import 名 → PyPI 项目名）：SBOM 的 purl/versionInfo 要用后者。
@@ -310,17 +310,22 @@ def intoto_statement(root: str = ".") -> Dict[str, Any]:
     }
 
 
-def sbom_doc(root: str = ".") -> Dict[str, Any]:
-    """依赖登记面 → SPDX 2.3 风格 SBOM（消费者：外部依赖扫描器）。"""
-    import sys
-
-    nf_version = "0.0.0"
+def _nf_version(root: str) -> str:
+    """Repository CLI version from the ``verify.sh`` version header."""
     verify_path = os.path.join(root, "verify.sh")
     if os.path.isfile(verify_path):
         with open(verify_path, encoding="utf-8") as fh:
-            m = re.search(r"# 版本\s*:\s*(v[0-9.]+)", fh.read())
-        if m:
-            nf_version = m.group(1)
+            match = re.search(r"# 版本\s*:\s*(v[0-9.]+)", fh.read())
+        if match:
+            return match.group(1)
+    return "0.0.0"
+
+
+def sbom_doc(root: str = ".") -> Dict[str, Any]:
+    """依赖登记面 → SPDX 3.0.1 JSON-LD SBOM（含诚实的 AI Profile）。"""
+    import sys
+
+    nf_version = _nf_version(root)
     sys.path.insert(0, os.path.join(root, "desktop", "src"))
     try:
         from core import purity_scan as ps
@@ -328,66 +333,22 @@ def sbom_doc(root: str = ".") -> Dict[str, Any]:
         soft = dict(ps.SOFT_IMPORTS)
     except Exception:  # pragma: no cover - 登记面不可读即空表（门禁侧会报）
         hard, soft = {}, {}
-    packages: List[Dict[str, Any]] = [{
-        "SPDXID": "SPDXRef-Package-ninfenz",
-        "name": "NinFenz",
-        "versionInfo": nf_version,
-        "downloadLocation": "NOASSERTION",
-        "licenseConcluded": LICENSE_NAME,
-        "licenseDeclared": LICENSE_NAME,
-        "copyrightText": "NOASSERTION",
-    }]
     pinned = _pinned_versions(root)
-
-    def _dep_meta(name: str) -> Dict[str, Any]:
-        """依赖包的版本证据（审计 Z4）：钉版在场 → versionInfo + pip purl；不在场 → 留空。"""
+    deps: List[Dict[str, Any]] = []
+    for name, why in sorted(hard.items()):
         proj = _DEP_ALIAS.get(name.lower(), name.lower())
         ver = pinned.get(proj, "")
-        if not ver:
-            return {}
-        return {"versionInfo": ver,
-                "externalRefs": [{"referenceCategory": "PACKAGE-MANAGER",
-                                  "referenceType": "purl",
-                                  "referenceLocator": "pkg:pypi/%s@%s" % (proj, ver)}]}
-
-    deps: List[Tuple[str, str]] = []
-    for name, why in sorted(hard.items()):
-        pkg = "SPDXRef-Dependency-%s" % name
-        packages.append({"SPDXID": pkg, "name": name, "downloadLocation": "NOASSERTION",
-                         "licenseConcluded": "NOASSERTION",
-                         "comment": "硬依赖（登记）：%s" % why, **_dep_meta(name)})
-        deps.append((pkg, "DEPENDENCY_OF"))
+        deps.append({"name": name, "version": ver,
+                     "purl": "pkg:pypi/%s%s" % (proj, ("@%s" % ver) if ver else ""),
+                     "optional": False, "reason": "硬依赖（登记）：%s" % why})
     for name, why in sorted(soft.items()):
-        pkg = "SPDXRef-Optional-%s" % name
-        packages.append({"SPDXID": pkg, "name": name, "downloadLocation": "NOASSERTION",
-                         "licenseConcluded": "NOASSERTION",
-                         "comment": "软依赖（可选，须 try/except 守卫）：%s" % why,
-                         **_dep_meta(name)})
-        deps.append((pkg, "OPTIONAL_DEPENDENCY_OF"))
-    return {
-        "spdxVersion": "SPDX-2.3",
-        "dataLicense": "CC0-1.0",
-        "SPDXID": "SPDXRef-DOCUMENT",
-        "name": "ninfenz-sbom",
-        "documentNamespace": "https://ninfenz.dev/spdx/%s" % nf_version,
-        "creationInfo": {
-            "creators": ["Tool: nf interop --kind sbom"],
-            "created": ("%sT00:00:00Z" % _declared_max_date(root)) if _declared_max_date(root)
-                       else "",
-            "comment": "由纯度扫描登记面（HARD_ALLOW / SOFT_IMPORTS）实时派生；"
-                       "created = 仓内声明日期最大值（非墙钟，保确定性）",
-        },
-        # SPDX 2.3 根级允许 `comment`（`documentComment` 不在词表内，实测被 meta-schema 拦下）
-        "comment": "派生面非真源；created = max(仓内声明日期: "
-                   "score_baseline / provenance / approvals)（保确定性，非墙钟）。",
-        "packages": packages,
-        "relationships": ([{"spdxElementId": "SPDXRef-DOCUMENT",
-                            "relatedSpdxElement": "SPDXRef-Package-ninfenz",
-                            "relationshipType": "DESCRIBES"}]
-                          + [{"spdxElementId": pkg,
-                              "relatedSpdxElement": "SPDXRef-Package-ninfenz",
-                              "relationshipType": rel} for pkg, rel in deps]),
-    }
+        proj = _DEP_ALIAS.get(name.lower(), name.lower())
+        ver = pinned.get(proj, "")
+        deps.append({"name": name, "version": ver,
+                     "purl": "pkg:pypi/%s%s" % (proj, ("@%s" % ver) if ver else ""),
+                     "optional": True,
+                     "reason": "软依赖（可选，须 try/except 守卫）：%s" % why})
+    return spdx3.build(nf_version, _declared_max_date(root), deps)
 
 
 def slsa_provenance(root: str = ".") -> Dict[str, Any]:
@@ -522,11 +483,10 @@ def prov_document(root: str = ".") -> Dict[str, Any]:
 def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
     """CycloneDX 1.5 SBOM（派生自依赖登记面 + LICENSE）——SPDX 之外的第二个 SBOM 形状。
 
-    与 `sbom_doc`（SPDX 2.3）**同源不同形**：都读 `purity_scan.HARD_ALLOW / SOFT_IMPORTS`，
+    与 `sbom_doc`（SPDX 3.0.1）**同源不同形**：都读 `purity_scan.HARD_ALLOW / SOFT_IMPORTS`，
     因此不存在「两份 SBOM 互相漂移」的问题；`serialNumber` 用内容寻址的 urn:uuid
     形式（由本仓声明摘要派生，保确定性，非随机 UUID）。
     """
-    sbom = sbom_doc(root)
     import sys as _sys
     _sys.path.insert(0, os.path.join(root, "desktop", "src"))
     try:
@@ -535,7 +495,9 @@ def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
     except Exception:  # pragma: no cover
         hard, soft = {}, {}
     import hashlib
-    seed = hashlib.sha256((sbom.get("documentNamespace") or "").encode("utf-8")).hexdigest()
+    created = _declared_max_date(root)
+    seed = hashlib.sha256(
+        ("ninfenz:%s:%s" % (_nf_version(root), created)).encode("utf-8")).hexdigest()
     serial = "urn:uuid:%s-%s-%s-%s-%s" % (seed[:8], seed[8:12], seed[12:16],
                                           seed[16:20], seed[20:32])
     pinned = _pinned_versions(root)
@@ -561,9 +523,9 @@ def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
         "serialNumber": serial,
         "version": 1,
         "metadata": {
-            "timestamp": sbom.get("creationInfo", {}).get("created", ""),
+            "timestamp": ("%sT00:00:00Z" % created) if created else "",
             "component": {"type": "application", "bom-ref": "pkg:nf/ninfenz@%s"
-                          % sbom.get("packages", [{}])[0].get("versionInfo", "0.0.0"),
+                          % _nf_version(root),
                           "name": "NinFenz",
                           "licenses": [{"license": {"id": LICENSE_NAME}}]},
             "tools": [{"vendor": "NinFenz", "name": "nf interop --kind cyclonedx",
@@ -771,7 +733,7 @@ KINDS = {
     "openapi": (openapi_doc, "OpenAPI 3.1 服务端点文档"),
     "asyncapi": (asyncapi_doc, "AsyncAPI 3.0 事件通道文档（含 CloudEvents 属性）"),
     "intoto": (intoto_statement, "in-toto Statement v1（协议层回执）"),
-    "sbom": (sbom_doc, "SPDX 2.3 SBOM（依赖登记面）"),
+    "sbom": (sbom_doc, "SPDX 3.0.1 SBOM + AI Profile（依赖登记面）"),
     "slsa": (slsa_provenance, "SLSA Provenance v1（本地门禁构建声明）"),
     "a2a": (a2a_agent_card, "A2A Agent Card（能力面投影）"),
     "prov": (prov_document, "PROV-O 溯源图（资产 / 馆藏 / 消化 / 回执）"),
@@ -855,20 +817,8 @@ def _check_intoto(st: dict, rec: dict, issues: List[str]) -> None:
 
 
 def _check_sbom(sb: dict, issues: List[str]) -> None:
-    """SPDX SBOM：SPDXID 唯一、自述本仓、DESCRIBES 关系、created 为 ISO 8601 UTC。"""
-    ids = [p.get("SPDXID") for p in _arr(sb.get("packages"))]
-    if len(set(ids)) != len(ids):
-        issues.append("SBOM 包 SPDXID 重复（修复指引：每依赖一个唯一 SPDXID）")
-    if not any(p.get("name") == "NinFenz" for p in _arr(sb.get("packages"))):
-        issues.append("SBOM 缺本项目包（修复指引：SBOM 须自述本仓）")
-    rels = _arr(sb.get("relationships"))
-    if not [r for r in rels if r.get("relationshipType") == "DESCRIBES"]:
-        issues.append("SBOM 缺 DESCRIBES 关系（修复指引：文档须描述本仓包）")
-    created = ((_obj(sb.get("creationInfo"))).get("created") or "")
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", str(created)):
-        issues.append("SBOM 的 creationInfo.created 缺失或非 ISO 8601 UTC：%r"
-                      "（修复指引：SPDX 2.3 要求必填；本仓取「仓内声明日期最大值」保确定性）"
-                      % created)
+    """SPDX 3.0.1 AI Profile：结构、关系闭合与诚实边界。"""
+    issues.extend(spdx3.validate(sb))
 
 
 def _check_determinism(root: str, issues: List[str]) -> None:
@@ -1082,7 +1032,9 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     stats = {"openapi_paths": len(_obj(oa.get("paths"))),
              "asyncapi_channels": len(_obj(aa.get("channels"))),
              "intoto_subjects": len(_arr(st.get("subject"))),
-             "sbom_packages": len(_arr(sb.get("packages"))),
+             "sbom_packages": sum(
+                 1 for e in _arr(sb.get("@graph"))
+                 if e.get("@type") in ("ai_AIPackage", "software_Package")),
              "slsa_subjects": len(_arr(sl.get("subject"))),
              "a2a_skills": len(_arr(card.get("skills"))),
              "prov_nodes": len(_arr(pv.get("@graph"))),

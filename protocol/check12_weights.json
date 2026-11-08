@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-07",
+  "measured_at": "2026-11-08",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -313,6 +313,7 @@
     "test_site_face": 1.0,
     "test_skill_adapter": 0.2,
     "test_skill_contract": 0.1,
+    "test_spdx3_ai_profile": 0.2,
     "test_st_validator": 0.1,
     "test_state_front": 0.1,
     "test_stdio_encoding": 0.5,
@@ -3580,6 +3581,11 @@
     "test_skill_adapter.TestSkillAdapter.test_techdoc_export_produces_skill_md": 0.0,
     "test_skill_contract.Test.test_clean_text": 0.0,
     "test_skill_contract.Test.test_grant_detected": 0.0,
+    "test_spdx3_ai_profile.SPDX3AIProfileTest.test_ai_claim_without_training_boundary_is_rejected": 0.0,
+    "test_spdx3_ai_profile.SPDX3AIProfileTest.test_builds_closed_ai_profile_graph": 0.0,
+    "test_spdx3_ai_profile.SPDX3AIProfileTest.test_dangling_relationship_is_rejected": 0.0,
+    "test_spdx3_ai_profile.SPDX3AIProfileTest.test_duplicate_ids_are_rejected": 0.0,
+    "test_spdx3_ai_profile.SPDX3AIProfileTest.test_missing_package_license_reference_is_rejected": 0.0,
     "test_st_validator.TestCard.test_v1_flat_needs_six_fields": 0.0,
     "test_st_validator.TestCard.test_v2_clean_passes": 0.0,
     "test_st_validator.TestCard.test_v2_wrong_spec_version_is_fail": 0.0,
@@ -4041,5 +4047,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1366.4
+  "total_s": 1366.6
 }

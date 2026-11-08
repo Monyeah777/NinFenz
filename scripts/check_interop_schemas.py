@@ -45,9 +45,6 @@ SCHEMAS: Dict[str, tuple] = {
     "intoto": ("https://raw.githubusercontent.com/in-toto/attestation/"
                "main/spec/v1/statement.schema.json",
                ("in-toto/attestation", "spec/v1/statement.schema.json", "main")),
-    "sbom": ("https://raw.githubusercontent.com/spdx/spdx-spec/"
-             "develop/schemas/spdx-schema-2-3.json",
-             ("spdx/spdx-spec", "schemas/spdx-schema-2-3.json", "develop")),
     "prov": ("https://www.w3.org/ns/prov.jsonld", None),
     "cyclonedx": ("https://raw.githubusercontent.com/CycloneDX/specification/"
                   "master/schema/bom-1.5.schema.json",
@@ -74,6 +71,9 @@ NOSCHEMA: Dict[str, str] = {
     "decisions": ("决策面是 **NF 自有形状**（决策能力 + 公开裁决索引），非外部标准；"
                   "无官方 JSON Schema 可对，判据落在本仓 check33"
                   "（覆盖一致 / 内部边界声明 / 确定性）"),
+    "sbom": ("SPDX 3.0.1 以 JSON-LD context + SHACL/模型约束发布，无官方 JSON Schema；"
+             "本仓由 core.spdx3 校验 @id 闭合、AI Profile 声明、许可证引用和关系可达，"
+             "并以官方 JSON-LD context 作为序列化真源"),
 }
 
 
@@ -104,7 +104,7 @@ def fetch(url: str, timeout: int = 25) -> Tuple[int, bytes]:
             return int(getattr(resp, "status", 200)), _read_capped(resp)
     except urllib.error.HTTPError as exc:
         return exc.code, b""
-    except Exception:  # noqa: BLE001 - 网络类异常如实计为取不到
+    except Exception:
         return 0, b""
 
 
@@ -119,7 +119,7 @@ def fetch_via_api(repo: str, path: str, ref: str, timeout: int = 25) -> Tuple[in
             return int(getattr(resp, "status", 200)), _read_capped(resp)
     except urllib.error.HTTPError as exc:
         return exc.code, b""
-    except Exception:  # noqa: BLE001
+    except Exception:
         return 0, b""
 
 
@@ -154,7 +154,7 @@ def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str,
         row["detail"] = "schema 取不到（网络/地址问题，非派生面问题）"
         return row
     try:
-        schema = json_doc.loads(blob, dict, what="官方 schema")
+        schema = json_doc.loads(blob.decode("utf-8"), dict, what="官方 schema")
     except ValueError:
         row["status"] = "unavailable"
         row["detail"] = "schema 非 JSON（可能取到 HTML 页）"
@@ -170,13 +170,13 @@ def validate_one(kind: str, spec: tuple, doc: dict, validator=None) -> Dict[str,
     cls = _validator_for(schema, validator)
     try:
         cls.check_schema(schema)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         row["status"] = "skipped"
         row["detail"] = "schema 本身无法被本机 validator 装载：%s" % str(exc)[:90]
         return row
     try:
         errs = sorted(cls(schema).iter_errors(doc), key=lambda e: list(e.path))[:5]
-    except Exception as exc:  # noqa: BLE001 - 远程 $ref 无法解析等
+    except Exception as exc:
         row["status"] = "skipped"
         row["detail"] = ("schema 含需联网解析的远程 $ref 或本机无法装载：%s"
                          % str(exc)[:110])
@@ -252,6 +252,7 @@ MCP_FACES = (("server/discover", "DiscoverResultResponse"),
              ("resources/list", "ListResourcesResultResponse"),
              ("tools/list", "ListToolsResultResponse"),
              ("prompts/list", "ListPromptsResultResponse"))
+SPDX3_CONTEXT_URL = "https://spdx.org/rdf/3.0.1/spdx-context.jsonld"
 
 
 def check_mcp_session(root: str, js=None) -> Dict[str, object]:
@@ -269,7 +270,7 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
                                else "官方 schema 取不到（网络/地址问题）")})
         return row
     try:
-        schema = json_doc.loads(blob, dict, what="官方 schema")
+        schema = json_doc.loads(blob.decode("utf-8"), dict, what="官方 schema")
         defs = schema.get("$defs") or {}
     except ValueError:
         row.update({"status": "unavailable", "detail": "schema 非 JSON"})
@@ -277,7 +278,7 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
     sys.path.insert(0, str(Path(root) / "desktop" / "src"))
     try:
         from core import mcp_runtime as mcp
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         row.update({"status": "skipped", "detail": "本仓运行时不可导入：%s" % exc})
         return row
     srv = mcp.McpRuntime({"mcp": {"name": "nf-schema-check", "version": "1.0.0",
@@ -298,7 +299,7 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
             validator = js.Draft202012Validator(
                 {"$ref": "#/$defs/%s" % def_name, "$defs": defs})
             errs = sorted(validator.iter_errors(resp), key=lambda e: list(e.path))[:3]
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             problems.append("%s：schema 装载失败 %s" % (method, str(exc)[:70]))
             continue
         for e in errs:
@@ -309,6 +310,54 @@ def check_mcp_session(root: str, js=None) -> Dict[str, object]:
     row["detail"] = ("；".join(problems) if problems
                      else "%d 个方法应答通过官方 schema（%s）"
                           % (checked, " / ".join(m for m, _ in MCP_FACES)))
+    return row
+
+
+def check_spdx3_context(root: str) -> dict[str, object]:
+    """Validate SPDX 3 compact terms and types against the official JSON-LD context."""
+    row: dict[str, object] = {"kind": "spdx3(AI)", "schema": SPDX3_CONTEXT_URL}
+    st, blob = fetch(SPDX3_CONTEXT_URL)
+    row["schema_http"] = st
+    if st != 200 or not blob:
+        row.update({"status": "unavailable",
+                    "detail": "官方 SPDX 3.0.1 JSON-LD context 取不到"})
+        return row
+    try:
+        context = json_doc.loads(blob.decode("utf-8"), dict,
+                                 what="SPDX 3.0.1 context").get("@context")
+    except (UnicodeDecodeError, ValueError):
+        row.update({"status": "unavailable", "detail": "官方 context 不是合法 JSON"})
+        return row
+    if not isinstance(context, dict):
+        row.update({"status": "unavailable", "detail": "官方 context 缺 @context 对象"})
+        return row
+    sys.path.insert(0, str(Path(root) / "desktop" / "src"))
+    try:
+        from core import interop_export as ie
+        doc = ie.sbom_doc(root)
+    except Exception as exc:
+        row.update({"status": "skipped", "detail": f"SPDX 文档不可派生：{str(exc)[:100]}"})
+        return row
+    used_keys: set[str] = set()
+    used_types: set[str] = set()
+    for element in doc.get("@graph") or []:
+        if not isinstance(element, dict):
+            continue
+        used_keys.update(k for k in element if not k.startswith("@"))
+        if isinstance(element.get("@type"), str):
+            used_types.add(element["@type"])
+    missing_keys = sorted(used_keys - set(context))
+    missing_types = sorted(used_types - set(context))
+    if missing_keys or missing_types:
+        row.update({
+            "status": "fail",
+            "detail": f"官方 context 未定义 keys={missing_keys} types={missing_types}",
+        })
+    else:
+        row.update({
+            "status": "ok",
+            "detail": "全部 compact keys/types 均由官方 3.0.1 context 定义",
+        })
     return row
 
 
@@ -327,12 +376,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     sys.path.insert(0, str(Path(args.root) / "desktop" / "src"))
     try:
         from core import interop_export as ie
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         print("  ✗ 无法导入 interop_export：%s（修复指引：在仓库根运行）" % exc, file=sys.stderr)
         return 2
     try:
         import jsonschema as validator
-    except Exception:  # noqa: BLE001
+    except Exception:
         validator = None
 
     if not args.fetch:
@@ -346,13 +395,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             "验）"))
         return 0
 
-    docs = {k: json_doc.loads(ie.render(k, args.root), dict, what=k) for k in ie.KINDS}
+    docs = {k: json_doc.loads(ie.render(k, args.root).decode("utf-8"), dict, what=k)
+            for k in ie.KINDS}
     # 逐面校验：SCHEMAS 表 + 官方无 schema 的面（no-schema 也要出现在报告里）
     all_specs = dict(SCHEMAS)
     for kind in NOSCHEMA:
         all_specs.setdefault(kind, (NOSCHEMA[kind], None))
     rows = [validate_one(kind, spec, docs.get(kind, {}), validator)
             for kind, spec in all_specs.items()]
+    rows.append(check_spdx3_context(args.root))
     rows.append(check_st_ccv3(args.root))     # 出口面核验（E1）
     rows.append(check_mcp_session(args.root, validator))   # 会话面核验（E3）
     failed = [r for r in rows if r["status"] == "fail"]

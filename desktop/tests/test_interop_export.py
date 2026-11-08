@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 2.3 / CloudEvents）。
+"""互操作导出面单测（OpenAPI 3.1 / AsyncAPI 3.0 / in-toto v1 / SPDX 3.0.1 AI / CloudEvents）。
 
 两件事必须被钉住：① 派生面**覆盖完整**（声明件里有多少端点/事件/回执，导出面就有多少）；
 ② **确定性**（同输入两次渲染逐字节一致——否则外部工具链无法做内容寻址/比对）。
@@ -89,19 +89,26 @@ class InteropExportTest(unittest.TestCase):
 
     def test_sbom_declares_project_and_registered_dependencies(self):
         sb = ie.sbom_doc(ROOT)
-        self.assertEqual(sb["spdxVersion"], "SPDX-2.3")
-        # 外部 meta-schema 实测：creationInfo.created 必填 → 本仓取「声明日期最大值」（非墙钟）
-        self.assertRegex(sb["creationInfo"]["created"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
-        self.assertEqual(sb["creationInfo"]["created"],
+        self.assertEqual(sb["@context"],
+                         "https://spdx.org/rdf/3.0.1/spdx-context.jsonld")
+        graph = sb["@graph"]
+        creation = next(e for e in graph if e["@type"] == "CreationInfo")
+        self.assertEqual(creation["specVersion"], "3.0.1")
+        self.assertEqual(creation["created"],
                          "%sT00:00:00Z" % ie._declared_max_date(ROOT))
-        self.assertNotIn("documentComment", sb, "SPDX 2.3 词表无 documentComment（用 comment）")
-        names = [p["name"] for p in sb["packages"]]
+        root = next(e for e in graph if e["@type"] == "ai_AIPackage")
+        self.assertEqual(root["name"], "NinFenz")
+        self.assertEqual(root["ai_autonomyType"], "no")
+        self.assertIn("No model training", root["ai_informationAboutTraining"])
+        self.assertIn("does not bundle model weights", root["ai_limitation"])
+        names = [e["name"] for e in graph
+                 if e.get("@type") in ("ai_AIPackage", "software_Package")]
         self.assertIn("NinFenz", names)
         from core import purity_scan as ps
         for dep in list(ps.HARD_ALLOW) + list(ps.SOFT_IMPORTS):
             self.assertIn(dep, names, "登记依赖须出现在 SBOM：%s" % dep)
-        self.assertTrue([r for r in sb["relationships"]
-                         if r["relationshipType"] == "DESCRIBES"])
+        self.assertTrue([r for r in graph if r.get("relationshipType") == "describes"])
+        self.assertEqual([], ie.spdx3.validate(sb))
 
     def test_mutation_missing_endpoint_coverage_captured(self):
         with tempfile.TemporaryDirectory() as tmp:
