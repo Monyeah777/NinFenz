@@ -992,7 +992,7 @@
 - Kafka 线协议 · Apache · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 api-key-version, flexible-version · 绑定 主锚 0 / 辅锚 0 · https://kafka.apache.org/protocol.html
 
 ### `lsp`
-- Language Server Protocol · Microsoft · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 custom-method, capability · 绑定 主锚 2 / 辅锚 0 · https://microsoft.github.io/language-server-protocol/
+- Language Server Protocol · Microsoft · 层 iface · 可达 是（200 · 2026-11-08） · 扩展点 custom-method, capability · 绑定 主锚 2 / 辅锚 0 · https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/
 
 ### `matrix`
 - Matrix 联邦协议 · Matrix.org Foundation · 层 iface · 可达 是（200 · 2026-09-24） · 扩展点 m-scoped-extension, room-version · 绑定 主锚 0 / 辅锚 0 · https://spec.matrix.org/latest/

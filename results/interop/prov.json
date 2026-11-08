@@ -261,7 +261,7 @@
     {
       "@id": "nf:file/protocol/locales.json",
       "@type": "prov:Entity",
-      "nf:sha256": "b6b52410cc362152bd26f23ddafab72455494c760af37cf929c372b4616705ad"
+      "nf:sha256": "3a4fb42b511a938ccfc7709fa993f1763124777c6bbe1b9c4af7498780d52cc3"
     },
     {
       "@id": "nf:file/protocol/mcp_package.json",
