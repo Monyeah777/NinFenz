@@ -97,6 +97,30 @@ class PackContentTest(unittest.TestCase):
         text = " ".join(str(x.get("case") or "") for x in pack["examples"])
         self.assertIn("mcp_ingress", text)
 
+
+    def test_prompt_injection_moves_have_real_code_anchors(self):
+        """包里的动作不能只是文字：每个 pi.* 动作都要在真实代码里有锚点。
+
+        映射（动作 → 代码锚点）写死在本判据里，改了实现就得同步改这里——
+        这样「包说我们做了平面分离/白名单/同意门/回执」就不是自述，而是可核。
+        """
+        anchors = {
+            "pi.allowlist_surface": ("desktop/src/core/mcp_ingress.py", ("allow_tools", "deny")),
+            "pi.consent_gate": ("desktop/src/core/mcp_ingress.py", ("consent",)),
+            "pi.receipt_audit": ("desktop/src/core/mcp_ingress.py", ("record_call", "receipt")),
+            "pi.least_privilege": ("desktop/src/core/mcp_ingress.py", ("max_args_bytes",)),
+            # 输出/参数侧 schema 复核在运行时（schema_check 注入点），不在 ingress 本身
+            "pi.output_side_check": ("desktop/src/core/mcp_runtime.py", ("schema_check",)),
+        }
+        pack = method_pack.load_pack(str(ROOT), "prompt-injection-defense")
+        ids = {m["id"] for m in pack["expert_moves"]}
+        for move_id, (rel, tokens) in anchors.items():
+            self.assertIn(move_id, ids, "包缺动作：" + move_id)
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            hit = [t for t in tokens if t in text]
+            self.assertTrue(hit, "动作 " + move_id + " 在 " + rel + " 里没有锚点（"
+                            + "/".join(tokens) + "）")
+
     def test_metacognition_pack_has_calibration_standard(self):
         pack = method_pack.load_pack(str(ROOT), "metacognition")
         std = method_pack.obligations(pack, "calibration")
