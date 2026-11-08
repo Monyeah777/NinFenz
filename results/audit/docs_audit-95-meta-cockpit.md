@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:5ad37816b44f2950cc5bd48a2a59e55fd87e074a7ad779839d540fda66440743
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:11c9feebf8a57f43e200e6ee9beae2aac50ecb0ba531ed1daadb08d8a73505ef
+  - protocol/check12_weights.json:8c505cd24ce2278f76b946275cbf9a9636c70d33f1e8ea4d74f61c91b6a5f127
   - protocol/coupling_baseline.json:e3f2b7ae1a2682e14125922dccdee5ff2ede5f2fea2f27de2263242d765608fe
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：CLI 输出确定性判据（两条只读命令逐字节比对）
+
 > 重审（2026-11-09）：第十个域 supply-chain（供应链安全）：6 动作 3 证据类，锚点落 packaging/静态扫描/溯源
 
 > 重审（2026-11-09）：文档判据变异测试（层数/门数/域数/动作数/类目数）

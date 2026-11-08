@@ -6,7 +6,7 @@
     "prod": 1056,
     "projection": 159,
     "support": 437,
-    "verify": 1030
+    "verify": 1031
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -7667,6 +7667,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CLI JSON 输出确定性：同一命令跑两次必须**逐字节相同**。",
+      "path": "desktop/tests/test_cli_determinism.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "CLI 错误框定判据：失败必须是**干净错误 + 修复指引**（错误即微型文档）。",
       "path": "desktop/tests/test_cli_error_framing.py",
       "role": "verify",
@@ -12558,7 +12564,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "decb783f0d0729495ca2fa56f5a60d610309c4707b0923b92a31cd2a7d1d3db0",
+  "root_digest": "b809169a3add1ffad385c757b3515ddc95753339dc642a3b9a06542a1c4d959e",
   "rule_counts": {
     "R-app": 1461,
     "R-catch": 290,
@@ -12567,7 +12573,7 @@
     "R-prod": 944,
     "R-projection": 139,
     "R-support": 119,
-    "R-verify": 904,
+    "R-verify": 905,
     "auto:R-core": 286
   },
   "schema": "nf-role-coordinates/1"
