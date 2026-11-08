@@ -184,6 +184,7 @@
     "test_job_ledger": 0.2,
     "test_json_shape_contracts": 0.9,
     "test_judge_clock_purity": 0.3,
+    "test_judge_mutation_probe": 0.2,
     "test_judge_references": 0.7,
     "test_judgement_coverage": 7.4,
     "test_key_naming": 0.3,
@@ -2300,6 +2301,9 @@
     "test_judge_clock_purity.JudgeClockPurityTest.test_every_clock_reader_is_registered": 0.05,
     "test_judge_clock_purity.JudgeClockPurityTest.test_scan_catches_a_new_clock_reader": 0.01,
     "test_judge_clock_purity.JudgeClockPurityTest.test_scan_ignores_clean_file": 0.0,
+    "test_judge_mutation_probe.JudgeMutationTest.test_both_judges_kill_every_mutant": 0.01,
+    "test_judge_mutation_probe.JudgeMutationTest.test_probe_is_not_vacuous": 0.01,
+    "test_judge_mutation_probe.JudgeMutationTest.test_rates_are_computable": 0.01,
     "test_judge_references.JudgeReferenceTest.test_code_side_judge_references_resolve": 0.17,
     "test_judge_references.JudgeReferenceTest.test_doc_side_judge_references_resolve": 0.35,
     "test_judge_references.JudgeReferenceTest.test_exemptions_are_not_stale": 0.04,
@@ -4504,5 +4508,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1808.1
+  "total_s": 1808.3
 }

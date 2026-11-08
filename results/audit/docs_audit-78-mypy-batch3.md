@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:68f1bc918b70a6aeac7abab1f3446ab1634d0d9459b8ac22e0fccf39eb23891f
+  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
 ---
+> 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
+
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）
 
 > 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）

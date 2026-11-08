@@ -1,0 +1,33 @@
+{
+  "detail": [
+    {
+      "broken": 3,
+      "broken_caught": [
+        "删一个词",
+        "加一个死词",
+        "包侧把词改错一个字母"
+      ],
+      "judge": "vocabulary_mismatches",
+      "legal": 2,
+      "legal_flagged": []
+    },
+    {
+      "broken": 3,
+      "broken_caught": [
+        "改来源标记",
+        "失败集换序",
+        "改证人 digest"
+      ],
+      "judge": "obligation_record_issues",
+      "legal": 2,
+      "legal_flagged": []
+    }
+  ],
+  "false_positive_rate": 0.0,
+  "judges": 2,
+  "kill_rate": 1.0,
+  "legal_variants": 4,
+  "mutants": 6,
+  "note": "只报数不设阈值；阈值与放行由负责人决定",
+  "schema": "nf-judge-mutation/1"
+}

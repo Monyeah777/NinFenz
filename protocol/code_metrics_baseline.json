@@ -1620,6 +1620,11 @@
       "max_fn_cc": 15,
       "max_fn_lines": 42
     },
+    "scripts/judge_mutation_probe.py": {
+      "lines": 161,
+      "max_fn_cc": 5,
+      "max_fn_lines": 31
+    },
     "scripts/mcp_manifest.py": {
       "lines": 137,
       "max_fn_cc": 7,

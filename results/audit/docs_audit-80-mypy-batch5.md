@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:68f1bc918b70a6aeac7abab1f3446ab1634d0d9459b8ac22e0fccf39eb23891f
+  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
 ---
+> 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
+
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）
 
 > 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）

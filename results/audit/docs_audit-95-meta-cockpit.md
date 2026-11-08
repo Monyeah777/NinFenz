@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
   - scripts/nf.py:101cd11b581a7cf23d9e6916009a21fbe4d3e36ec56729ab708283934d38b14e
   - tui/_surface.py:0845c376fd5ad601ae78b98326f1d2038b88c146d468d415efa694d8af1bb1f9
-  - protocol/check12_weights.json:c69a858ab3281531caaad05874bf784cf3340bfc64a8bc2f5cbe93c2ca352279
+  - protocol/check12_weights.json:8df7ff65629542975fe5012e89afdd63c9fcc2c3b67a0451c6dbc45e02e4fc8b
   - protocol/coupling_baseline.json:49bc59e10c4d3fdcf966709392e4a7f8511a2432a69eb5d496e74d643fa42960
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:590418d031ab6cc8ba9cabce70968f86db4c6ed773581d87ec424b7f5083b9b4
 
 ---
+> 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
+
 > 重审（2026-11-09）：同构矩阵反射查证抽函数 + 变异测试（指向不存在方法必须 False）
 
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）

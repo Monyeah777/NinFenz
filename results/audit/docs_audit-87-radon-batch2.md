@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
   - desktop/src/core/endpoint.py:118113277f5a325434470516507fd932e28188c52610d340f667745163265e6f
-  - protocol/code_metrics_baseline.json:68f1bc918b70a6aeac7abab1f3446ab1634d0d9459b8ac22e0fccf39eb23891f
+  - protocol/code_metrics_baseline.json:34c3fe1da669bd39d47e6b837c51591881372098ce8c61f360078e24e71a4eee
 ---
+> 重审（2026-11-09）：判据变异探针：两条判据 × 3 变异体，杀死率/误报率入 results
+
 > 重审（2026-11-09）：时钟纯度负向用例 + 探针代理扩词（19/22）
 
 > 重审（2026-11-09）：门禁负向用例探针（命名代理，只出比率与缺口清单）
