@@ -140,6 +140,11 @@
       "max_fn_cc": 14,
       "max_fn_lines": 34
     },
+    "desktop/src/core/calibration.py": {
+      "lines": 80,
+      "max_fn_cc": 6,
+      "max_fn_lines": 21
+    },
     "desktop/src/core/calibration_state.py": {
       "lines": 23,
       "max_fn_cc": 3,

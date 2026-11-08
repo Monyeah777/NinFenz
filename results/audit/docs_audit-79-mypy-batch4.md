@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:bc114898836f914212cec64e0b22c7d3f93b8681557d82f845a200a85683b0cc
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:1d3a6db896c4d52eca349b35d311230c26ed8147d198ed299321ad5963446182
+  - protocol/code_metrics_baseline.json:5d28c2ddf5c0bb4b496f04a42e0899736a6f4be4c2cca0311000bdf7cfaa3381
 ---
+> 重审（2026-11-08）：校准度量 core/calibration.py（分箱/ECE/可靠性表，只计数不评分）
+
 > 重审（2026-11-08）：快照现场体检（--status：锁/运行目录/最近结论一份看全）
 
 > 重审（2026-11-08）：快照墙钟上限（--max-wall-s，超时判红留证）

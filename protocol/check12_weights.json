@@ -35,6 +35,7 @@
     "test_boundaries": 0.2,
     "test_bridge_real": 2.6,
     "test_cache_bounds": 0.2,
+    "test_calibration": 0.2,
     "test_calibration_state": 0.2,
     "test_canonical_parity": 0.2,
     "test_capability_battery": 0.2,
@@ -757,6 +758,11 @@
     "test_bridge_real.RealVerifyTest.test_unknown_verdict_word_is_rejected": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_every_long_lived_cache_declares_a_positive_cap": 0.0,
     "test_cache_bounds.CacheBoundsTest.test_response_cache_evicts_at_its_cap": 0.0,
+    "test_calibration.CalibrationTest.test_bad_input_fails_closed": 0.0,
+    "test_calibration.CalibrationTest.test_bins_cover_all_samples_once": 0.0,
+    "test_calibration.CalibrationTest.test_overconfidence_increases_ece": 0.0,
+    "test_calibration.CalibrationTest.test_perfectly_calibrated_has_zero_ece": 0.0,
+    "test_calibration.CalibrationTest.test_reliability_schema_and_note": 0.0,
     "test_calibration_state.Test.test_calibration_downgrades_fail": 0.0,
     "test_calibration_state.Test.test_states": 0.0,
     "test_canonical_parity.CanonicalParityTest.test_core_and_standalone_verifier_agree_byte_for_byte": 0.0,
@@ -4441,5 +4447,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1505.1
+  "total_s": 1505.3
 }

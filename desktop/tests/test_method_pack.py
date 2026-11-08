@@ -162,7 +162,7 @@ class PackContentTest(unittest.TestCase):
             "EA-5": ("desktop/src/core/closure.py", ("criteria",)),
             "MC-1": ("desktop/src/core/cognition_workspace/control.py", ("ritual",)),
             "MC-2": ("desktop/src/core/cognition_workspace/operators.py", ("estimate",)),
-            "MC-3": ("desktop/src/core/cognition_workspace/control.py", ("calibrat",)),
+            "MC-3": ("desktop/src/core/calibration.py", ("ece",)),
             "MC-4": ("desktop/src/core/cognition_workspace/operators.py", ("switch",)),
             "MC-5": ("desktop/src/core/cognition_workspace/session.py", ("replay",)),
             "ev.pre_register": ("desktop/src/core/eval_harness.py", ("frozen_before_run",)),

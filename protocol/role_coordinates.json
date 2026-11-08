@@ -3,10 +3,10 @@
     "app": 1458,
     "entry": 26,
     "floor": 5,
-    "prod": 1055,
+    "prod": 1056,
     "projection": 154,
     "support": 425,
-    "verify": 1018
+    "verify": 1019
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5819,6 +5819,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "校准度量（元认知监控的**可算半边**）：置信度分箱 → 每箱的样本数与命中率 → ECE。",
+      "path": "desktop/src/core/calibration.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "标定态：样本不足只报 CALIBRATION 不判红（机制借鉴 stashbase evals/README.md:67-74）。",
       "path": "desktop/src/core/calibration_state.py",
       "role": "verify",
@@ -7519,6 +7525,12 @@
     {
       "function": "常驻缓存**必须有界**（稳态毫秒级响应的隐含前提：长驻守护不能随会话增长而吃内存）。",
       "path": "desktop/tests/test_cache_bounds.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "校准度量判据：把「口头置信是否可信」变成可算的可靠性表（只计数，不评分）。",
+      "path": "desktop/tests/test_calibration.py",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -12480,7 +12492,7 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "4bf8150e17f866628647c6a712e6be4990ed1372f7c42cc973e649165da02100",
+  "root_digest": "dba5ea8fd95438a7e0ae328a97925fd6b66e7cf381d6592686528f65631341f4",
   "rule_counts": {
     "R-app": 1458,
     "R-catch": 278,
@@ -12489,8 +12501,8 @@
     "R-prod": 944,
     "R-projection": 135,
     "R-support": 119,
-    "R-verify": 893,
-    "auto:R-core": 283
+    "R-verify": 894,
+    "auto:R-core": 284
   },
   "schema": "nf-role-coordinates/1"
 }
