@@ -2261,6 +2261,7 @@
     "test_isolation_patterns.TestMutationSelfCheck.test_flags_module_alias_patch": 0.0,
     "test_isolation_patterns.TestRepoIsolationPatterns.test_exemptions_carry_reasons": 0.0,
     "test_isolation_patterns.TestRepoIsolationPatterns.test_no_fragile_atomic_write_patches": 0.54,
+    "test_isomorphism_matrix.IsomorphismMatrixTest.test_both_import_styles_work_for_referenced_modules": 0.01,
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_every_covered_layer_has_a_kill_test": 0.01,
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_every_covered_layer_points_at_a_real_test": 0.01,
     "test_isomorphism_matrix.IsomorphismMatrixTest.test_matrix_does_not_claim_overlap": 0.0,

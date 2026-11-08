@@ -100,6 +100,19 @@ class IsomorphismMatrixTest(unittest.TestCase):
         self.assertFalse(_has_test("desktop.tests.test_cognition_bridge",
                                    "test_this_method_does_not_exist_xyz"))
 
+    def test_both_import_styles_work_for_referenced_modules(self):
+        """两种跑法都要能导入：包路径 + 裸模块名（分片跑测试时是裸名）。
+
+        依据（第 86 轮快照实测）：判据曾因只支持包路径导入而在分片里 **ERROR**（不是 FAIL）。
+        这条把「两种导入风格均可用」变成判据，覆盖 COVERED / KILL_TESTS 引用的全部模块。
+        """
+        referenced = sorted({m for m, _t, _h in COVERED.values()}
+                            | {m for m, _t in KILL_TESTS.values()})
+        for module in referenced:
+            bare = module.rsplit(".", 1)[-1]
+            self.assertIsNotNone(_import_test_module(module), module + " 包路径导入失败")
+            self.assertIsNotNone(_import_test_module(bare), bare + " 裸名导入失败")
+
     def test_missing_layers_carry_a_reason(self):
         for layer, why in MISSING.items():
             self.assertTrue(why.strip(), layer + " 缺判据但没写原因")
