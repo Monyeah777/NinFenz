@@ -9,8 +9,12 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:ce9c25281ea1e3e13f392bdcc7b8fbe73a8e2707a42a3bd70a379bbf0da6b200
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
+  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
 ---
+> 重审（2026-11-08）：eval_run 去未用导入
+
+> 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）
+
 > 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
 
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）

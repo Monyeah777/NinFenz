@@ -115,6 +115,25 @@ class RunTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             eh.record_run(proto, run)
 
+    def test_checklist_covers_every_cell_without_fabricating_data(self):
+        """采集检查单：格子数 = 条件×任务×样本，全部 planned、values 为空（不伪造测量）。"""
+        doc = eh.eval_run_checklist(str(ROOT))
+        protocol = eh.load_protocol(str(ROOT))
+        expected = (len(protocol["conditions"]) * len(protocol["tasks"])
+                    * int(protocol["samples_per_task"]))
+        self.assertEqual(expected, len(doc["cells"]))
+        self.assertEqual({"planned"}, {c["status"] for c in doc["cells"]})
+        self.assertTrue(all(c["values"] == {} for c in doc["cells"]),
+                        "未采集就填了值——那是伪造测量")
+        self.assertTrue(all(c["review"]["reviewer"] is None for c in doc["cells"]))
+        self.assertEqual("evaluation-design", doc["pack"]["id"])
+        self.assertIn("planned", json.dumps(doc["negative_control"]))
+        self.assertEqual("not-run", doc["measurement"]["status"])
+
+    def test_checklist_is_deterministic(self):
+        self.assertEqual(eh.eval_run_checklist(str(ROOT)),
+                         eh.eval_run_checklist(str(ROOT)))
+
 
 class CompareTest(unittest.TestCase):
     def test_compare_gives_diffs_and_narrowing(self):

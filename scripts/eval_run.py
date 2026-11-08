@@ -80,12 +80,26 @@ def render(doc: dict[str, Any]) -> str:
     return json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def build_checklist() -> dict[str, Any]:
+    """采集检查单（委托 core：协议 + 评测设计包的纯派生）。"""
+    return eh.eval_run_checklist(str(ROOT))
+
+def render_checklist(doc: dict[str, Any]) -> str:
+    return json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="eval_run", description="预注册评测：协议冻结 + harness 演练")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--checklist", action="store_true",
+                    help="输出采集检查单（D-06 作业面：只排格子、不填数）")
     args = ap.parse_args(argv)
+    if args.checklist:
+        print(render_checklist(build_checklist()), end="")
+        return 0
     try:
         report = build_report()
     except ValueError as exc:

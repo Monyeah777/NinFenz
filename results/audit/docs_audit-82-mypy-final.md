@@ -30,8 +30,12 @@ subjects:
   - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
   - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
   - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
+  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
 ---
+> 重审（2026-11-08）：eval_run 去未用导入
+
+> 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）
+
 > 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
 
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）

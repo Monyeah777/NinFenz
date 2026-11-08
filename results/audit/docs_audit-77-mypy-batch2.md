@@ -8,8 +8,12 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
+  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
 ---
+> 重审（2026-11-08）：eval_run 去未用导入
+
+> 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）
+
 > 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
 
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）

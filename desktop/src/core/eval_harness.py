@@ -214,3 +214,56 @@ def validate(record: Any) -> list[str]:
     if cost is not None and not isinstance(cost, (int, float)):
         issues.append("cost_usd 必须是数字（" + GUIDE + "无成本写 0）")
     return issues
+
+CHECKLIST_SCHEMA = "nf-eval-checklist/1"
+
+
+def eval_run_checklist(root: str = ".") -> dict[str, Any]:
+    """生成采集检查单（真实测量的作业面）：**只排格子、不填数**。
+
+    为什么在 core：检查单是「协议 + 方法包」的纯派生，脚本只负责打印/落盘。
+    纪律：values 必须为空、status 必须是 planned——先有格子再有数，
+    否则事后无法分辨哪些数是采集的、哪些是编的。
+    """
+    from core import method_pack as mp  # 局部导入：避免模块级循环
+
+    protocol = load_protocol(root)
+    pack = mp.load_pack(root, "evaluation-design")
+    samples = int(protocol["samples_per_task"])
+    cells = []
+    for cond in protocol["conditions"]:
+        for task in protocol["tasks"]:
+            for sample in range(1, samples + 1):
+                cells.append({
+                    "condition": cond["id"], "task": task["id"], "sample": sample,
+                    "status": "planned",
+                    "values": {},
+                    "cost": {"latency_s": None, "cost_usd": None},
+                    "review": {"reviewer": None, "verdict": None},
+                })
+    return {
+        "schema": CHECKLIST_SCHEMA,
+        "protocol": {"version": protocol["version"],
+                     "registered_at": protocol["registered_at"],
+                     "frozen_before_run": protocol["frozen_before_run"],
+                     "samples_per_task": samples,
+                     "dimensions": [d["id"] for d in protocol["dimensions"]],
+                     "prohibitions": protocol["prohibitions"]},
+        "pack": {"id": pack["id"],
+                 "guards": list(pack["common_failures"]),
+                 "evidence_kinds": [st["claim_kind"] for st in pack["evidence_standards"]]},
+        "cells": cells,
+        "negative_control": {
+            "kind": "label-shuffle",
+            "how": "把条件标签打乱后重跑同一批样本；判据：该对照不得出现显著优于 free 的差异",
+            "status": "planned"},
+        "blind_review": {"per_task": 2,
+                         "how": "评审者只见样本内容与维度量表，不见条件标签；每任务至少两名",
+                         "conflict_declaration_required": True,
+                         "status": "planned"},
+        "cost_accounting": {"per_cell": ["latency_s", "cost_usd"],
+                            "aggregate": ["wall_clock_s", "total_cost_usd", "review_hours"],
+                            "status": "planned"},
+        "measurement": {"status": "not-run",
+                        "why": "真实测量只由作者显式触发；本检查单不填任何数"},
+    }

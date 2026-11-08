@@ -10,8 +10,12 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:7473d6d411ce1cc49e2c38e44f7b13d82ab821fa5040d3ec341860bdd537c92d
+  - protocol/code_metrics_baseline.json:9ddc104ebc73be82888ee53f87d29b0fa682be3ae12e88753b2aa3a2767e9b72
 ---
+> 重审（2026-11-08）：eval_run 去未用导入
+
+> 重审（2026-11-08）：eval harness 采集检查单（D-06 作业面）
+
 > 重审（2026-11-08）：拍屏探针额度内压缩（271 行）+ 指标重冻
 
 > 重审（2026-11-08）：拍屏探针第五轮（10 配置全扫描，负结果锁死）

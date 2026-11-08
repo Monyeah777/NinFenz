@@ -406,7 +406,7 @@
       "max_fn_lines": 18
     },
     "desktop/src/core/eval_harness.py": {
-      "lines": 216,
+      "lines": 269,
       "max_fn_cc": 28,
       "max_fn_lines": 51
     },
@@ -1541,9 +1541,9 @@
       "max_fn_lines": 44
     },
     "scripts/eval_run.py": {
-      "lines": 120,
-      "max_fn_cc": 8,
-      "max_fn_lines": 31
+      "lines": 134,
+      "max_fn_cc": 9,
+      "max_fn_lines": 36
     },
     "scripts/evidence_vectors.py": {
       "lines": 431,
