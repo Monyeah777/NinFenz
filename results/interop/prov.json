@@ -186,7 +186,7 @@
     {
       "@id": "nf:file/protocol/coupling_baseline.json",
       "@type": "prov:Entity",
-      "nf:sha256": "30db6552f03e0d085322db1e651220d827289eebfe537897ad847305dfb5bbb6"
+      "nf:sha256": "1c4c6520d7c0e52328888d5d1dc601daab41f14ab9a8df40c95e32e3ef6ef4d6"
     },
     {
       "@id": "nf:file/protocol/data_contracts.json",

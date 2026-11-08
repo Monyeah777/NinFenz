@@ -403,8 +403,8 @@
     },
     "eval_harness": {
       "ca": 1,
-      "ce": 1,
-      "i": 0.5
+      "ce": 2,
+      "i": 0.6667
     },
     "evidence": {
       "ca": 1,
@@ -812,9 +812,9 @@
       "i": 0.0
     },
     "method_pack": {
-      "ca": 1,
+      "ca": 2,
       "ce": 1,
-      "i": 0.5
+      "i": 0.3333
     },
     "missing_sentinel": {
       "ca": 1,

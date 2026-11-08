@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-08",
   "approved_by": "Monyeah777",
-  "note": "payload 同步",
+  "note": "耦合重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "1233826412f96df5b68de355a273b0b1f10aa52cc0dd106141c9d89b64c08813"
