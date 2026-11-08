@@ -61,7 +61,8 @@ Python 探测顺序：`NINFENZ_PYTHON` → `py -3`（Windows）→ `python3` →
 > **自证门禁的正确方式**：payload 是**运行时 / 协议树**（不含 `.github/`、`results/`、`.git`）。`install --dest` 得到的是可用工作树（CLI / TUI / MCP 正常），**要跑完整 check 门禁请 git clone 后 `bash verify.sh`（check 数以 `nf stats` 生成区为准）**——`verify.sh` 依赖上述仓库件，这是设计而非缺陷。
 - 清单 `payload/payload-manifest.json`：逐文件 sha256 + 聚合 `tree_sha256`
 
-当前体积：**3030 件 · 解包 24.04 MB**（tarball 远小于此；域名包与标准目录占主要体积）。
+当前体积：件数/解包大小以 **`payload/payload-manifest.json`** 为准（每次 stage 重新生成；不在此钉死，
+避免随发布漂移；tarball 远小于解包体积，域名包与标准目录占主要部分）。
 
 ## 供应链纪律（为什么可以放心 npx）
 
