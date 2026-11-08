@@ -1,5 +1,5 @@
 # Editor integration (LSP)
-> 最后更新：2026-10-07 (last updated)
+> 最后更新：2026-11-08 (last updated)
 
 ## What this is
 
@@ -78,6 +78,20 @@ args = ["<absolute-repo-path>/scripts/nf.py", "lsp"]
 ```bash
 python -m unittest desktop.tests.test_lsp desktop.tests.test_lsp_hardening desktop.tests.test_nf_language -v
 ```
+
+## Standard evidence
+
+- `lsp`: the declared profile is **LSP 3.17 core + stdio Content-Length framing**, limited to the
+  lifecycle, full-sync, diagnostics, completion, hover, definition, documentSymbol,
+  workspace/symbol, references, foldingRange and codeAction methods listed above.
+- Position encoding is fixed to `utf-16`; exiting without `shutdown` returns 1; a malformed frame
+  returns `-32700` without terminating the long-lived session.
+- Negative cases cover out-of-root URIs, escaping `rootUri`, invalid params, invalid lifecycle order,
+  ambiguous definitions and unregistered references, all fail-closed.
+- Consumable entry point: `nf lsp`; a fixed real client-frame transcript is checked end to end.
+
+This evidence does not claim incremental sync, formatting, semantic highlighting, a VS Code
+extension host or compatibility with a real editor load.
 
 ## Boundaries (stated honestly)
 

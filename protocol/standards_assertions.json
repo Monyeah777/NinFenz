@@ -570,6 +570,48 @@
           "contains": "core.lsp"
         }
       ]
+    },
+    {
+      "id": "lsp-core-editor-profile",
+      "standard": "lsp",
+      "assertion": "NF LSP 3.17 core profile 使用 stdio Content-Length 分帧，支持 shutdown/exit 生命周期、full-sync、UTF-16 定位、诊断、补全、悬停、定义、文档/工作区符号、结构化引用、折叠与 quickfix；越界 uri/rootUri、参数与生命周期错误、歧义定义及未登记引用均 fail-closed。",
+      "tests": [
+        "desktop/tests/test_lsp.py::LspCoreProfileTest.test_request_method_profile_is_frozen",
+        "desktop/tests/test_lsp.py::TestCapabilities.test_declares_editor_surface",
+        "desktop/tests/test_lsp_transcript.py::TestLspSessionTranscript.test_live_run_round_trips_through_client_frames",
+        "desktop/tests/test_lsp_transcript.py::TestDeclaredCapabilitiesHaveEvidence.test_every_declared_capability_is_exercised"
+      ],
+      "negative_tests": [
+        "desktop/tests/test_lsp.py::TestReadContainment.test_outside_uri_returns_empty_from_every_face",
+        "desktop/tests/test_lsp.py::TestParamAdmission.test_bad_position_is_invalid_params",
+        "desktop/tests/test_lsp.py::TestLifecycleStateMachine.test_request_before_initialize_is_server_not_initialized",
+        "desktop/tests/test_lsp.py::TestDomainIntelligence.test_definition_fail_closed_on_ambiguous_token"
+      ],
+      "checks": [
+        "check33"
+      ],
+      "assertion_ids": [],
+      "evidence": [
+        "desktop/src/core/lsp.py",
+        "desktop/src/core/lsp_framing.py",
+        "desktop/src/core/lsp_params.py",
+        "desktop/src/core/lsp_doc.py",
+        "desktop/tests/test_lsp.py",
+        "desktop/tests/test_lsp_transcript.py",
+        "desktop/tests/fixtures/lsp/session.json",
+        "integrations/lsp/integration.json",
+        "docs/lsp.md"
+      ],
+      "consumers": [
+        {
+          "path": "scripts/nf.py",
+          "symbol": "_cmd_lsp"
+        },
+        {
+          "path": "desktop/src/core/lsp_client.py",
+          "symbol": "render_client_config"
+        }
+      ]
     }
   ]
 }

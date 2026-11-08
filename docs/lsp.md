@@ -1,6 +1,6 @@
 # 编辑器接入（LSP）
 > ⛔ 操作指令：阅读即执行——本文含可直接执行的配置与判定，勿当资料阅读。
-> 最后更新：2026-10-07
+> 最后更新：2026-11-08
 
 ## 是什么
 
@@ -74,6 +74,18 @@ args = ["<仓库绝对路径>/scripts/nf.py", "lsp"]
 ```bash
 python -m unittest desktop.tests.test_lsp desktop.tests.test_lsp_hardening desktop.tests.test_nf_language -v
 ```
+
+## 标准证据面
+
+- `lsp`：声明为 **LSP 3.17 core profile + stdio Content-Length 分帧**，只覆盖本文能力表列出的方法：
+  lifecycle、full-sync、diagnostics、completion、hover、definition、documentSymbol、
+  workspace/symbol、references、foldingRange、codeAction。
+- 位置编码固定为 `utf-16`；未收到 `shutdown` 就 `exit` 返回 1；非法帧返回 `-32700`
+  且不终止长驻会话。
+- 负例：工作区外 uri、越界 `rootUri`、错误参数、乱序生命周期、歧义定义与未登记引用均 fail-closed。
+- 可消费入口：`nf lsp`；真实客户端帧序列由固定转写夹具做端到端金标校验。
+
+该证据面不声明增量同步、格式化、语义高亮、VS Code 扩展宿主或真实编辑器装载兼容。
 
 ## 边界（诚实标注）
 

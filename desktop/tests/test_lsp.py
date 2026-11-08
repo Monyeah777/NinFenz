@@ -103,6 +103,40 @@ class TestCapabilities(unittest.TestCase):
         self.assertEqual(explicit.root, str(Path(ROOT).resolve()))
 
 
+class LspCoreProfileTest(unittest.TestCase):
+    def test_request_method_profile_is_frozen(self):
+        self.assertEqual({
+            lsp.M_COMPLETION,
+            lsp.M_HOVER,
+            lsp.M_DEFINITION,
+            lsp.M_DOCUMENT_SYMBOL,
+            lsp.M_WORKSPACE_SYMBOL,
+            lsp.M_REFERENCES,
+            lsp.M_FOLDING_RANGE,
+            lsp.M_CODE_ACTION,
+        }, set(lsp._REQUESTS))
+
+    def test_capability_profile_covers_the_frozen_methods(self):
+        srv = lsp.LspServer(root=ROOT)
+        caps = srv.capabilities()
+        self.assertEqual("utf-16", caps["positionEncoding"])
+        self.assertEqual(
+            {"openClose": True, "change": 1, "save": True},
+            caps["textDocumentSync"],
+        )
+        for key in (
+            "hoverProvider",
+            "completionProvider",
+            "definitionProvider",
+            "documentSymbolProvider",
+            "workspaceSymbolProvider",
+            "referencesProvider",
+            "foldingRangeProvider",
+            "codeActionProvider",
+        ):
+            self.assertIn(key, caps)
+
+
 class TestReadContainment(unittest.TestCase):
     """审计 X2（P1）：工作区外 uri 绝不返回文件内容（CWE-22 → CWE-200）。"""
 

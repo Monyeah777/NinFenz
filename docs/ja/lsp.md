@@ -1,5 +1,5 @@
 # エディタ接続（LSP）
-> 最后更新：2026-10-07 (last updated)
+> 最后更新：2026-11-08 (last updated)
 
 ## これは何か
 
@@ -75,6 +75,20 @@ args = ["<リポジトリ絶対パス>/scripts/nf.py", "lsp"]
 ```bash
 python -m unittest desktop.tests.test_lsp desktop.tests.test_lsp_hardening desktop.tests.test_nf_language -v
 ```
+
+## 標準証拠面
+
+- `lsp`：宣言範囲は **LSP 3.17 core + stdio Content-Length framing** で、上の能力表にある
+  lifecycle、full-sync、diagnostics、completion、hover、definition、documentSymbol、
+  workspace/symbol、references、foldingRange、codeAction に限定します。
+- 位置エンコーディングは `utf-16` 固定です。`shutdown` 前の `exit` は 1 を返し、不正フレームは
+  `-32700` を返しても長駐セッションを終了しません。
+- 負例：作業領域外 uri、範囲外 `rootUri`、不正パラメータ、不正なライフサイクル順序、
+  曖昧な定義、未登録参照をすべて fail-closed で処理します。
+- 消費入口は `nf lsp` です。固定した実クライアントフレーム転写を端到端で照合します。
+
+本証拠は増分同期、整形、意味的ハイライト、VS Code 拡張宿主、実エディタでのロード互換性を
+宣言しません。
 
 ## 境界（正直な注記）
 

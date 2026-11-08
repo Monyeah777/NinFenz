@@ -4304,7 +4304,7 @@
       "id": "lsp",
       "body": "Microsoft",
       "title": "Language Server Protocol",
-      "url": "https://microsoft.github.io/language-server-protocol/",
+      "url": "https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/",
       "ext_points": [
         "custom-method",
         "capability"
@@ -4316,9 +4316,9 @@
       "evidence": {
         "reachable": true,
         "http_status": 200,
-        "title": "Official page for Language Server Protocol",
-        "sha256_sample": "45aa028d7009af86f800060d4b515a1782b95fef7875ee3df922d7c10dc81b27",
-        "probe_date": "2026-09-24",
+        "title": "Specification",
+        "sha256_sample": "5bfdd650eed54129dc17ff41ec6acfc23e236eb9f65501b7f6a68535f545ba4a",
+        "probe_date": "2026-11-08",
         "probe_method": "本机 GET（32KB 取样 / 单条超时 20s）",
         "error": ""
       }
