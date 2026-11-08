@@ -510,7 +510,7 @@ def _add_parser_cog(sub):
     ccr.add_argument("--id", dest="criterion_id", default="", help="只看一条判据")
     ccr.add_argument("--json", action="store_true", help="输出结构化 JSON")
     ccal = csub.add_parser("calibrate", help="校准度量：置信分箱 / ECE / 可靠性表（只计数不评分）",
-                           description="输入 JSON：{\"pairs\": [{\"confidence\": 0.8, \"correct\": 1}, …]}；"
+                           description="输入 JSON：pairs=[{confidence:0.8, correct:1}, …]；"
                                        "输出 nf-calibration/1 可靠性表。")
     ccal.add_argument("--pairs", required=True, help="样本文件（pairs: [{confidence, correct}]）")
     ccal.add_argument("--bins", type=int, default=10, help="分箱数（缺省 10）")
