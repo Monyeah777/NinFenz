@@ -18,13 +18,15 @@ subjects:
   - desktop/tests/test_nf_cli.py:c8eba2a0040083954cfc6847a1ab2e34ae1d2981a23155847feff34bd98f477c
   - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
   - tui/_surface.py:0a2f80a836ddd0bf5835c0bc60e89252b626d54567cf1f517f9bc41e071e3c0a
-  - protocol/check12_weights.json:a0cda888c2d2a9613d457e27474500786a41e3031ee44929b509f49198ecea7e
+  - protocol/check12_weights.json:e841eb6bac928f79359d17bc6f00247a4e12e890ab10f81cf5e963e865fee87a
   - protocol/coupling_baseline.json:00b095ae74ce9b40e13ecec43854554d18a821d77b6792d2eca5dd6ca1eb91b6
   - docs/meta-cockpit/README.md:48b92addbaadc17d2bb845595bf39389269871026add1c597a8c71a0c2ca0aba
   - docs/meta-cockpit/功能解析.md:8bc9f97b3f067e11f2e3a8257e84e05845587624db8ee94de27ad10ef53a99a2
   - results/meta-cockpit-manifest.json:7b1231392bea0bc51ed14d73fac3c73c185209c1233e7727e554d5b899031af2
 
 ---
+> 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
+
 > 重审（2026-11-08）：DSSE v1 integration closure
 
 > 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。

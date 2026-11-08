@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-07",
+  "measured_at": "2026-11-08",
   "modules": {
     "test_absence_guard": 0.2,
     "test_agent_rules_adapter": 0.2,
@@ -93,6 +93,7 @@
     "test_domain_pack_render": 0.3,
     "test_dotnet_aot": 0.2,
     "test_drill_fidelity": 0.3,
+    "test_dsse": 2.2,
     "test_ed25519": 0.2,
     "test_effect_rows": 1.2,
     "test_engine_ffi_binding": 0.2,
@@ -1335,6 +1336,22 @@
     "test_drill_fidelity.ScanTest.test_imperfect_fidelity_fails": 0.01,
     "test_drill_fidelity.ScanTest.test_no_fixtures_fails_with_guidance": 0.0,
     "test_drill_fidelity.ScanTest.test_perfect_fidelity_passes": 0.01,
+    "test_dsse.CLITest.test_cli_rejects_tampered_payload_type": 1.0,
+    "test_dsse.CLITest.test_sign_and_verify_cli_roundtrip": 0.99,
+    "test_dsse.EnvelopeTest.test_keyid_is_a_hint_not_signature_authority": 0.0,
+    "test_dsse.EnvelopeTest.test_multi_signature_threshold_counts_unique_keys": 0.0,
+    "test_dsse.EnvelopeTest.test_noncanonical_and_mixed_base64_rejected": 0.0,
+    "test_dsse.EnvelopeTest.test_official_reference_envelope_shape_and_signature_size": 0.0,
+    "test_dsse.EnvelopeTest.test_payload_and_payload_type_tamper_rejected": 0.0,
+    "test_dsse.EnvelopeTest.test_required_fields_and_types_are_fail_closed": 0.0,
+    "test_dsse.EnvelopeTest.test_roundtrip_returns_exact_authenticated_bytes": 0.0,
+    "test_dsse.EnvelopeTest.test_signature_tamper_and_wrong_key_rejected": 0.0,
+    "test_dsse.EnvelopeTest.test_standard_and_urlsafe_base64_are_both_accepted": 0.0,
+    "test_dsse.EnvelopeTest.test_unknown_fields_are_ignored": 0.0,
+    "test_dsse.EnvelopeTest.test_unsupported_payload_type_rejected_after_signature": 0.0,
+    "test_dsse.PAETest.test_length_is_utf8_bytes_not_characters": 0.0,
+    "test_dsse.PAETest.test_official_vector": 0.0,
+    "test_dsse.PAETest.test_payload_must_already_be_bytes": 0.0,
     "test_ed25519.CrossImplementationTest.test_our_signature_verifies_in_reference": 0.03,
     "test_ed25519.CrossImplementationTest.test_reference_signature_verifies_here": 0.0,
     "test_ed25519.Rfc8032GoldenTest.test_test1_public_key": 0.0,
@@ -4041,5 +4058,5 @@
     "test_yaml_recheck.Test.test_invalid_reports_line_and_fix": 0.03,
     "test_yaml_recheck.Test.test_valid": 0.0
   },
-  "total_s": 1366.4
+  "total_s": 1368.6
 }

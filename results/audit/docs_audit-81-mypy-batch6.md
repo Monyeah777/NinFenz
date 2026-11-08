@@ -10,8 +10,10 @@ subjects:
   - desktop/src/core/assemble_plan.py:2c73997d32e042ac41ed642e63c9404497925868465f0f1d30b5115672c60f35
   - desktop/src/core/asset_ledger.py:2f8fbebc56233d8905a234a24e3f391d8547e0e9c64845f566199c9f3f7038ec
   - desktop/src/core/atomic_write.py:291527615e6fafc012ac5935631471a9d3422b97ffc35370bb48f815882b7770
-  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
+  - protocol/code_metrics_baseline.json:aee122e4fe97430db84a69b6d0c7c1d8d519acbec656566cfc9818ccd0cedece
 ---
+> 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
+
 > 重审（2026-11-08）：DSSE v1 integration closure
 
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。

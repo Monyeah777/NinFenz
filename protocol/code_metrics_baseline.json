@@ -1551,7 +1551,7 @@
       "max_fn_lines": 42
     },
     "scripts/nf_dsse.py": {
-      "lines": 112,
+      "lines": 119,
       "max_fn_cc": 11,
       "max_fn_lines": 52
     },

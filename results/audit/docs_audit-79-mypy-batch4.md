@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/lsp.py:2106c94befb3f11461dfec0afe9d98af79a084dcf34cfc299e4a9991323d7ac3
   - desktop/src/core/purity_scan.py:66c0419a71440173d67087494eac8697daa03e942524d948b2296f49af8770cf
   - desktop/src/core/asset_contract.py:8e2fbc3954c771d6c2eb78d9cf47dcf22612b63b9b16929bd9013792f803f9a2
-  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
+  - protocol/code_metrics_baseline.json:aee122e4fe97430db84a69b6d0c7c1d8d519acbec656566cfc9818ccd0cedece
 ---
+> 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
+
 > 重审（2026-11-08）：DSSE v1 integration closure
 
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。

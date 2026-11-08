@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
   - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
   - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:9f2f126ef137e1664b04bf9e364965303bc40ec84565cfd5fcc40a5d5745df45
+  - protocol/code_metrics_baseline.json:aee122e4fe97430db84a69b6d0c7c1d8d519acbec656566cfc9818ccd0cedece
 ---
+> 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
+
 > 重审（2026-11-08）：DSSE v1 integration closure
 
 > 重审（2026-11-08）：DSSE v1 合并最新 main 后重审：保留主干与 DSSE 变更，按合并后字节重绑。

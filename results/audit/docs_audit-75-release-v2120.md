@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:24e2f6f22cf7ab3c92b5ab6baa31bdd47e280bd7c56031309d8a213c017a39fc
   - docs/meta/VERSION-MATRIX.md:014144331c6e2715f4d4e441c69055e636d0194a1133d004904423bd23d2077a
-  - README.md:d61e2a9471653cc9fc4d6d5e1f1876d1e1a96b947a98949a9cf1a83dc80c523f
+  - README.md:bfaecb08ccfe6ead2dbe551de8a985178fc0860463612fa7cec624ba6f1ae89e
   - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
@@ -16,6 +16,8 @@ subjects:
   - scripts/nf.py:239b09099db899e182142845a802bfd713c6371972c869b09e0a4b4a065b007a
 
 ---
+> 重审（2026-11-08）：DSSE v1 CI closure: docs reachability, stdio pinning, weights
+
 > 重审（2026-11-08）：DSSE v1 最终重绑：CLI 适配器拆分、purity/路径/编码闸门与 Python/.NET 交叉签验接入后，按最终字节重算审计摘要。
 
 > 重审（2026-11-08）：DSSE v1 签名信封新增后重审：PAE、双 Base64 字母表、HMAC 多签名、阈值与篡改负例进入常驻判据；Python/.NET 交叉验签接入 CI。

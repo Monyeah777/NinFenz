@@ -139,7 +139,7 @@ AI assembly:
 | Library | `03_管线库/` · `04_模块库/` · `05_资产库/` |
 | Community | `community/README.md` · `community/模板制作指令包.md` |
 | AI | `docs/agent/AGENT_START.md` · `docs/agent/AI_ROUTING.md` · `docs/meta/DEEP_DIVE.md` |
-| Tooling | `docs/mcp.md` · `docs/terminal.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
+| Tooling | `docs/mcp.md` · `docs/terminal.md` · `docs/dsse.md` · `docs/layers.md` · `docs/release.md` · `scripts/nf.py` · `tui/nf.py` · `verify.sh` |
 | Integrations | `integrations/README.md` (MCP / LSP / CLI / TUI / library / Skill / npm / Rust / .NET / A2A) |
 | Collection | `library/INDEX.md` · `docs/agent/ROUTES.md` |
 
