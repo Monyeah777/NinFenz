@@ -8,8 +8,10 @@ auditor: 本轮执行者
 subjects:
   - desktop/src/core/domain_pack.py:907304ba4ed1918ed3d44dcda4cdb1a1d1a9b0914e2f2d1f7f51859d9b9164f9
   - desktop/src/core/prose_lint.py:99f70822009ae3df49458717e6e1c1bedb2a24f8d6629986c44804c495801c48
-  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
+  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
 ---
+> 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
+
 > 重审（2026-11-08）：采集单校验器风格修净
 
 > 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）

@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/interop_export.py:cfabc28f442a8d43526d92fca8cb17ea74473f51de8f69e918042eb5062b24f8
-  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
+  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
 ---
+> 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
+
 > 重审（2026-11-08）：采集单校验器风格修净
 
 > 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）

@@ -14,8 +14,10 @@ subjects:
   - scripts/geo_export.py:6ff73fdbd8d6ecd7bb6add47c79cba31dfd76c86ae1c7984824ba4e6f28d8eca
   - scripts/nf.py:42a01f7ceab9016cc6b55d71c8b9c56a6bac34f01a68dc46302e8c1f58184124
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
-  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
+  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
 ---
+> 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
+
 > 重审（2026-11-08）：采集单校验器风格修净
 
 > 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）

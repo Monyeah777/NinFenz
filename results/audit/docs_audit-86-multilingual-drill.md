@@ -12,8 +12,10 @@ subjects:
   - engine/rust/src/drill_fidelity.rs:f5bf89939f7695c1947011b7a89a76eea2aa6f750a91ab284ca7ad9086adb1bd
   - protocol/drill_fidelity.json:485ba48039f4c8fd607fbee3d42e1b1fbc2544044562548a8f52dc8fbfb0126e
   - docs/44_M1_执行演练扩展.md:12e58d6ae4d1cab23faaaff5e98d0a0bc9a6455c7a17552bab0d57e0cf30866c
-  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
+  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
 ---
+> 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
+
 > 重审（2026-11-08）：采集单校验器风格修净
 
 > 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）

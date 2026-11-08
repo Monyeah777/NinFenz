@@ -323,6 +323,11 @@ def validate_collection(root: str, sheet: Any) -> dict[str, Any]:
     if len(cells) < expected:
         blockers.append("格子不足：" + str(len(cells)) + " < " + str(expected)
                         + "（" + GUIDE + "补齐或重新生成检查单）")
+    if cells and counts["reviewed"] != len(cells):
+        blockers.append("采集未完成：planned " + str(counts["planned"])
+                        + " / collected " + str(counts["collected"])
+                        + " / reviewed " + str(counts["reviewed"])
+                        + "（" + GUIDE + "全部格都要到 reviewed 才能进比较）")
     nc = sheet.get("negative_control") or {}
     if str(nc.get("status") or "") == "planned":
         blockers.append("负对照未做（" + GUIDE + "负对照失败时任何差异都不能算证据）")

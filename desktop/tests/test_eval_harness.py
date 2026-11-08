@@ -171,6 +171,19 @@ class RunTest(unittest.TestCase):
         self.assertIn("缺维度值", text)
         self.assertIn("状态未知", text)
 
+
+    def test_validate_flags_incomplete_collection(self):
+        """半填的采集单：ready=false，且 blocker 必须点名「采集未完成」而不是只提负对照。"""
+        sheet = eh.eval_run_checklist(str(ROOT))
+        dims = sheet["protocol"]["dimensions"]
+        for cell in sheet["cells"][:24]:
+            cell["status"] = "collected"
+            cell["values"] = dict.fromkeys(dims, 1)
+        result = eh.validate_collection(str(ROOT), sheet)
+        self.assertFalse(result["ready"])
+        self.assertIn("采集未完成", " ".join(result["blockers"]))
+        self.assertEqual(24, result["counts"]["collected"])
+
     def test_validate_rejects_protocol_drift(self):
         sheet = eh.eval_run_checklist(str(ROOT))
         sheet["protocol"]["version"] = "v0.0.0"

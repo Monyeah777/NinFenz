@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:a392aabc55b0aa97b327b2882907da03abac6a6125cf6410ac03a783491023ab
+  - protocol/code_metrics_baseline.json:618c4b213e5dcbcff9ab7400643c5e0b53606309f441b9ea4ec4e4b23aa51759
 ---
+> 重审（2026-11-08）：采集单：半填必须点名「采集未完成」
+
 > 重审（2026-11-08）：采集单校验器风格修净
 
 > 重审（2026-11-08）：采集单校验器（协议绑定/状态机/维度完整/盲评负对照）
