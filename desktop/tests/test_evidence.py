@@ -51,6 +51,15 @@ class TestLeafSameSource(_Base):
 
 
 class TestVerdicts(_Base):
+    def test_verify_reports_cost(self):
+        """资源层记账（第 91 轮）：判定结果附 `cost_ms`，非负整数，且不影响判定。"""
+        path, _info, _data = self._pack()
+        res = evidence.verify(path)
+        self.assertIn("cost_ms", res)
+        self.assertIsInstance(res["cost_ms"], int)
+        self.assertGreaterEqual(res["cost_ms"], 0)
+        self.assertEqual("ok", res["verdict"], "成本字段不得影响判定")
+
     def test_ok_digest_only(self):
         path, info, _ = self._pack()
         res = evidence.verify(path)

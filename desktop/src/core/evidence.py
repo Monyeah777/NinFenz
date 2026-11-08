@@ -853,13 +853,13 @@ def _apply_expiry(res: dict[str, Any], at: str) -> bool:
     return True
 
 
-def verify(bundle: str, key: bytes | None = None,
-           revocations: dict[str, Any] | None = None,
-           at: str = "", anchor: dict[str, Any] | None = None,
-           expected_policy_digest: str = "",
-           require_fresh_revocations: bool = False,
-           time_record: dict[str, Any] | None = None,
-           time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
+def _verify_uncosted(bundle: str, key: bytes | None = None,
+                     revocations: dict[str, Any] | None = None,
+                     at: str = "", anchor: dict[str, Any] | None = None,
+                     expected_policy_digest: str = "",
+                     require_fresh_revocations: bool = False,
+                     time_record: dict[str, Any] | None = None,
+                     time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
     """校验证据包 → {verdict, level, root, head, issues, ...}。
 
     判定顺序固定（fail-closed，先失败先返回；**不**允许「证据弱就放行」）：
@@ -1861,3 +1861,28 @@ def bench_markdown(res: dict[str, Any]) -> str:
     lines.append("边界：本基准证明「这些已知攻击都判得出来」，**不**证明「所有攻击都判得"
                  "出来」；不可抵赖与可信时间戳仍需第三方见证，见证据包 boundary 声明。")
     return "\n".join(lines) + "\n"
+
+def verify(bundle: str, key: bytes | None = None,
+           revocations: dict[str, Any] | None = None,
+           at: str = "", anchor: dict[str, Any] | None = None,
+           expected_policy_digest: str = "",
+           require_fresh_revocations: bool = False,
+           time_record: dict[str, Any] | None = None,
+           time_ca: str = "", time_untrusted: str = "") -> dict[str, Any]:
+    """校验证据包 → 判定（同 `_verify_uncosted`），并附 `cost_ms`（本次判定耗时）。
+
+    为什么加成本（第 91 轮）：资源层同构缺的是「验证侧记账」——认知侧有 `budget.steps_used`，
+    契约侧此前没有任何「这次判定花了多少」的记录。`cost_ms` 只记**本机实测耗时**（整数毫秒），
+    不参与判定、不进任何质量分；跨机器不可比，只作同一环境下的相对成本。
+    """
+    import time
+
+    started = time.perf_counter()
+    res = _verify_uncosted(bundle, key=key, revocations=revocations, at=at, anchor=anchor,
+                           expected_policy_digest=expected_policy_digest,
+                           require_fresh_revocations=require_fresh_revocations,
+                           time_record=time_record, time_ca=time_ca,
+                           time_untrusted=time_untrusted)
+    res["cost_ms"] = max(0, int((time.perf_counter() - started) * 1000))
+    return res
+

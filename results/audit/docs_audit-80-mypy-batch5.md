@@ -13,8 +13,10 @@ subjects:
   - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
   - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
   - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:8039277c448b1af5e75712a97947f827c8aa09b2a651d428efc91a9ee636f92e
+  - protocol/code_metrics_baseline.json:b703e2a5de0759dfb4676b4e9fc1f140b816af7b5b99e97e6cf08ba552d53beb
 ---
+> 重审（2026-11-09）：资源层记账起点：证据判定附 cost_ms（只记耗时，不参与判定）
+
 > 重审（2026-11-09）：探针结果新鲜度：--check + 判据（结果陈旧即红）
 
 > 重审（2026-11-09）：precheck 名单拆成数据件（precheck_gates）+ 探针改原子写
