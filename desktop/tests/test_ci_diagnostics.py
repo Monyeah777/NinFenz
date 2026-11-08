@@ -121,5 +121,29 @@ class ArtifactPolicyTest(unittest.TestCase):
                           "%s 未上传本 run 实时重算的报告（Z5/N1）" % name)
 
 
+class CiHealthAuditSourceTest(unittest.TestCase):
+    """ci-health 的 main 审计两个已修 bug 的源码级回归守卫（2026-11-08 实测踩到）。
+
+    为什么用源码断言而不是跑 workflow：这两个 bug 都是「修好了但改别处时容易回归」的结构点——
+    ① 自指：审计把上一次失败的自已当最新失败 → 永远红（#218→#220 实测）；
+    ② 窗口：main 一天 100+ 条运行，只取 100 条会让某些 workflow 滑出窗口而假绿（#222 修）。
+    """
+
+    def setUp(self):
+        self.text = (WF / "ci-health.yml").read_text(encoding="utf-8")
+
+    def test_audit_excludes_itself(self):
+        self.assertIn('own = ".github/workflows/ci-health.yml"', self.text,
+                      "ci-health 审计未排除自身（自指会让它在一次失败后永远红）")
+        self.assertIn("if r.get(\"path\") == own:", self.text,
+                      "ci-health 审计缺少「跳过自身运行」的分支")
+
+    def test_audit_window_is_paginated(self):
+        self.assertIn("for page in (1, 2, 3)", self.text,
+                      "ci-health 审计窗口未分页（繁忙日 >100 条会假绿）")
+        self.assertIn("runs.extend(page_runs)", self.text,
+                      "ci-health 审计分页结果未并入 runs")
+
+
 if __name__ == "__main__":
     unittest.main()
