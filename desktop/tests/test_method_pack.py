@@ -219,6 +219,25 @@ class PackContentTest(unittest.TestCase):
                 self.assertTrue(any(t in text for t in tokens),
                                 mid + " 在 " + rel + " 里找不到锚点（" + "/".join(tokens) + "）")
 
+    def test_vocabulary_check_can_be_killed(self):
+        """判据 #4 的变异测试：故意改坏 registry / 包，核对函数必须报出来。
+
+        只有「真实数据为空」证明不了判据有效；这里用两份故意错的数据证明它会红，
+        对应设计里「门禁变异分」的最小事例。
+        """
+        packs = [method_pack.load_pack(str(ROOT), pid) for pid in PACK_IDS]
+        registry = json.loads((ROOT / "protocol" / "criteria" / "registry.json")
+                              .read_text(encoding="utf-8"))
+        self.assertEqual({"unknown": [], "unused": []},
+                         method_pack.vocabulary_mismatches(packs, registry))
+        # ① 去掉一个词 → 包用到的词变成「未登记」
+        broken = dict(registry, claim_kinds=list(registry["claim_kinds"])[1:])
+        self.assertTrue(method_pack.vocabulary_mismatches(packs, broken)["unknown"])
+        # ② 加一个没人用的词 → 变成「死词」
+        extra = dict(registry, claim_kinds=list(registry["claim_kinds"]) + ["ghost-kind"])
+        self.assertEqual(["ghost-kind"],
+                         method_pack.vocabulary_mismatches(packs, extra)["unused"])
+
     def test_doc_counts_match_packs(self):
         """文档写的「N 个域 / N 个专家动作 / N 个证据类目」必须等于实际（防口径漂移）。"""
         import re

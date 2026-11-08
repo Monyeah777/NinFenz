@@ -26,8 +26,10 @@ subjects:
   - desktop/tests/fixtures/execution/rounds/bad_r2.json:9498fba916ea03db23cd75fb9279335ad92127850aab54adb73f5032f6b20d24
   - desktop/tests/fixtures/execution/rounds/bad_r3.json:985bc52b5a755bb6ca33a94817cb706beb9bfe6d9d13f7933f7bbcfe0ca46e8a
   - desktop/tests/fixtures/execution/rounds/gap_ok.json:55d09b1102f7729f31439fd68cf8ad25c7e0db55e0a9064db713a0ee582d4914
-  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
+  - protocol/code_metrics_baseline.json:5c292af9eaab2506748bafa1efc680afeea692b4dd34fb45bfdd9444169d6efc
 ---
+> 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红
+
 > 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
 
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档

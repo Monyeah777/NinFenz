@@ -7,8 +7,10 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - desktop/src/core/terminal.py:9a86928171c71f4a2d3d324508fdafccb60fd7cc8423d52197185214a40ea30f
-  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
+  - protocol/code_metrics_baseline.json:5c292af9eaab2506748bafa1efc680afeea692b4dd34fb45bfdd9444169d6efc
 ---
+> 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红
+
 > 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
 
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档

@@ -236,3 +236,18 @@ def checklist(pack: dict[str, Any]) -> dict[str, Any]:
                 {"claim_kind": str(st.get("claim_kind")),
                  "required": list(st.get("required") or [])} for st in stds],
             "note": "按包内顺序；不评分不排序。每条动作要求的是「做一次并留证」，不是打卡"}
+
+
+def vocabulary_mismatches(packs: list[dict[str, Any]],
+                          registry: dict[str, Any]) -> dict[str, list[str]]:
+    """claim_kind 词表核对：包用了未登记词 / 词表里有死词（两边都要报）。
+
+    为什么单独成函数（第 72 轮）：判据需要**能被变异打死**——只有把核对逻辑抽出来，
+    才可能用一份「故意改坏」的 registry 证明它真的会红，而不是只在真实数据上碰巧为空。
+    """
+    vocab = {str(x) for x in (registry.get("claim_kinds") or [])}
+    used: set[str] = set()
+    for pack in packs:
+        for std in pack.get("evidence_standards") or []:
+            used.add(str(std.get("claim_kind")))
+    return {"unknown": sorted(used - vocab), "unused": sorted(vocab - used)}

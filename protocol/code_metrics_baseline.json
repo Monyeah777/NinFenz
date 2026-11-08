@@ -826,7 +826,7 @@
       "max_fn_lines": 17
     },
     "desktop/src/core/method_pack.py": {
-      "lines": 238,
+      "lines": 253,
       "max_fn_cc": 35,
       "max_fn_lines": 59
     },

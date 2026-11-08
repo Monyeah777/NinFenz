@@ -9,8 +9,10 @@ subjects:
   - desktop/src/core/io_types.py:09296daf865db85bda582fb646cece708c51f97e190a9e91c0eecd07252475f7
   - desktop/src/core/world_model.py:20108d40e0f708716df4c1b6c3df66081d14c51fdc2064d5bd32b77a5af9987c
   - desktop/src/core/knowledge.py:d0b678c0f1176ce6f16a33b6f6d42a16b663099b4346306fae1ea547305e316b
-  - protocol/code_metrics_baseline.json:4f928ff7608e581db9af5835df58d68f8fb51416d7bde8544bed1f3d98f1709e
+  - protocol/code_metrics_baseline.json:5c292af9eaab2506748bafa1efc680afeea692b4dd34fb45bfdd9444169d6efc
 ---
+> 重审（2026-11-09）：判据 #4 变异测试：词表核对接出独立函数，故意改坏必红
+
 > 重审（2026-11-09）：方法包可执行化：checklist 投影 + nf cognition --pack-checklist
 
 > 重审（2026-11-09）：precheck 覆盖边界（20/378）写进脚本与发布文档
